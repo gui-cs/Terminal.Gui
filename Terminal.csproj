@@ -34,10 +34,12 @@
   <ItemGroup>
     <Compile Include="Application.cs" />
     <Compile Include="driver.cs" />
+    <Compile Include="Event.cs" />
+    <Compile Include="demo.cs" />
   </ItemGroup>
   <ItemGroup>
    <Reference Include="mono-curses.dll">
-     <HintPath>../mono-curses/mono-curses.dll</HintPath>
+     <HintPath>$(MSBuildProjectDirectory)/../mono-curses/mono-curses.dll</HintPath>
    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

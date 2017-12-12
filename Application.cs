@@ -16,10 +16,26 @@ namespace Terminal {
         public override string ToString() => $"[{X},{Y}:{Width},{Height}]";
     }
 
-    public class View {
+    public class Responder {
+        public virtual Responder Next { get; set; }
+        public virtual bool IsFirstResponder => true;
+        public virtual bool CanBecomeFirstResponder => true;
+        public virtual bool CanResignFirstResponder => true;
+        public virtual void BecomeFirstResponder () {}
+        public virtual void ResignFirstResponder () {}
+
+        // Key handling
+        public virtual void KeyDown (Event.Key kb) {}
+
+        // Mouse events
+        public virtual void MouseEvent (Event.Mouse me) {}
+    }
+
+    public class View : Responder {
         public static ConsoleDriver Driver = Application.Driver;
-        View [] subviews;
-        public View [] Subviews => subviews == null ? Array.Empty<View> () : subviews;
+        public static IList<View> empty = new List<View>(0).AsReadOnly ();
+        List<View> subviews;
+        public IList<View> Subviews  => subviews == null ? empty : subviews.AsReadOnly ();
 
         Rect frame;
 
@@ -27,11 +43,39 @@ namespace Terminal {
         {
             this.frame = frame;
         }
+
+        public void AddSubview (View view)
+        {
+            if (view == null)
+                return;
+            if (subviews == null)
+                subviews = new List<View> ();
+            subviews.Add (view);
+        }
+
+        
+    }
+
+    public class ViewController : Responder {
+        View view;
+        public View View => view;
+
+        public ViewController (View startup)
+        {
+            view = startup;
+        }
     }
 
     public class Window : View {
+        public ViewController RootViewController;
+
         public Window (Rect frame) : base (frame)
         {
+        }
+
+        public override void BecomeFirstResponder() 
+        {
+            Application.MakeFirstResponder (this);
         }
 
         public static Window Toplevel () 
@@ -42,9 +86,35 @@ namespace Terminal {
 
     public class Application {
         public static ConsoleDriver Driver = new CursesDriver ();
+        public Window MainWindow { get; private set; }
+        public Mono.Terminal.MainLoop MainLoop { get; private set; }
+
+        static Stack<Responder> responders = new Stack<Responder> ();
+        static Responder responder;
+
+        public static void MakeFirstResponder (Responder newResponder)
+        {
+            if (newResponder == null)
+                throw new ArgumentNullException ();
+
+            responders.Push (responder);
+            responder = newResponder;
+        }
 
         public void Init ()
         {
+            if (MainWindow != null)
+                return;
+
+            MainLoop = new Mono.Terminal.MainLoop ();
+            MainWindow = Window.Toplevel ();  
+            responder = MainWindow;
+
+            MainLoop.AddWatch (0, Mono.Terminal.MainLoop.Condition.PollIn, x => {
+                //ProcessChar ();
+
+				return true;
+			});
 
         }
     }
