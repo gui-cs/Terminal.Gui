@@ -1,20 +1,15 @@
+//
+// 
+// Pending:
+//   - Check for NeedDisplay on the hierarchy and repaint
+//   - Layout support
+//
+// Optimziations
+//   - Add rendering limitation to the exposed area
 using System;
 using System.Collections.Generic;
 
 namespace Terminal {
-    public struct Rect {
-        public int X, Y, Width, Height;
-
-        public Rect (int x, int y, int width, int height)
-        {
-            X = x;
-            Y = y;
-            Width = width;
-            Height = height;
-        }
-
-        public override string ToString() => $"[{X},{Y}:{Width},{Height}]";
-    }
 
     public class Responder {
         public virtual Responder Next { get; set; }
@@ -32,16 +27,36 @@ namespace Terminal {
     }
 
     public class View : Responder {
+        View container = null;
         public static ConsoleDriver Driver = Application.Driver;
         public static IList<View> empty = new List<View>(0).AsReadOnly ();
         List<View> subviews;
         public IList<View> Subviews  => subviews == null ? empty : subviews.AsReadOnly ();
+        internal bool NeedDisplay { get; private set; } = true;
 
+        // The frame for the object
         Rect frame;
+
+        // The offset of the first child view inside the view
+        Point offset;
+
+        // The frame for this view
+        public Rect Frame { 
+            get => frame;
+            set {
+                frame = value;
+                SetNeedsDisplay ();
+            }
+        }
 
         public View (Rect frame)
         {
-            this.frame = frame;
+            this.Frame = frame;
+        }
+
+        public void SetNeedsDisplay ()
+        {
+            NeedDisplay = true;
         }
 
         public void AddSubview (View view)
@@ -53,7 +68,53 @@ namespace Terminal {
             subviews.Add (view);
         }
 
-        
+        public void GetRealRowCol (int col, int row, out int rcol, out int rrow)
+        {
+            // Computes the real row, col relative to the screen.
+            rrow = row;
+            rcol = col;
+            var ccontainer = container;
+            while (ccontainer != null){
+                rrow += container.frame.Y;
+                rcol += container.frame.X;
+                ccontainer = ccontainer.container;
+            }
+
+            // The following ensures that the cursor is always in the screen boundaries.
+            rrow = Math.Max (0, Math.Min (rrow, Driver.Rows-1));
+            rcol = Math.Max (0, Math.Min (rcol, Driver.Cols-1));
+        }
+
+        public void Move (int col, int row)
+        {
+            GetRealRowCol (col, row, out var rcol, out var rrow);
+            Driver.Move (rcol, rrow);
+        }
+
+        public void AddCh (int col, int row, int ch)
+        {
+            if (row < 0 || col < 0)
+                return;
+            if (row > frame.Height-1 || col > frame.Width-1)
+                return;
+            Move (col, row);
+            Driver.AddCh (ch);
+        }
+
+        public virtual void Redraw ()
+        {
+            var clipRect = new Rect (offset, frame.Size);
+
+            foreach (var view in subviews){
+                if (view.NeedDisplay){
+                    if (view.Frame.IntersectsWith (clipRect)){
+                        view.Redraw ();
+                    }
+                    view.NeedDisplay = false;
+                }
+            }
+            NeedDisplay = false;
+        }
     }
 
     public class ViewController : Responder {
@@ -66,10 +127,12 @@ namespace Terminal {
         }
     }
 
-    public class Window : View {
+    public class Toplevel : View {
         public ViewController RootViewController;
+        public bool ShowFrame;
+        
 
-        public Window (Rect frame) : base (frame)
+        public Toplevel (Rect frame) : base (frame)
         {
         }
 
@@ -78,15 +141,41 @@ namespace Terminal {
             Application.MakeFirstResponder (this);
         }
 
-        public static Window Toplevel () 
+        public static Toplevel Create () 
         {
             return new Window (new Rect (0, 0, Driver.Cols, Driver.Rows));
         }
     }
 
+    public class Window : Toplevel {
+        View contentView;
+        string title;
+
+        public string Title {
+            get => title;
+            set {
+                title = value;
+                SetNeedsDisplay ();
+            }
+        }
+
+        public Window (Rect frame, string title = null) : base (frame)
+        {
+            frame.Inflate (-1, -1);
+            contentView = new View (frame);
+            AddSubview (contentView);
+        }
+
+        public override void Redraw ()
+        {
+
+            base.Redraw ();
+        }
+    }
+
     public class Application {
         public static ConsoleDriver Driver = new CursesDriver ();
-        public Window MainWindow { get; private set; }
+        public Toplevel Top { get; private set; }
         public Mono.Terminal.MainLoop MainLoop { get; private set; }
 
         static Stack<Responder> responders = new Stack<Responder> ();
@@ -103,12 +192,12 @@ namespace Terminal {
 
         public void Init ()
         {
-            if (MainWindow != null)
+            if (Top != null)
                 return;
 
             MainLoop = new Mono.Terminal.MainLoop ();
-            MainWindow = Window.Toplevel ();  
-            responder = MainWindow;
+            Top = Toplevel.Create ();  
+            responder = Top;
 
             MainLoop.AddWatch (0, Mono.Terminal.MainLoop.Condition.PollIn, x => {
                 //ProcessChar ();
