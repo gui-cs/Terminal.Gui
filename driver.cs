@@ -20,7 +20,11 @@ namespace Terminal {
         public abstract void Init ();
         public abstract void Move (int line, int col);
         public abstract void AddCh (int ch);
-
+        public abstract void PrepareToRun ();
+        public abstract void Refresh ();
+        public abstract void End ();
+        public abstract void RedrawTop ();
+        
         // Colors used for widgets
         public static ColorScheme ColorBase, ColorDialog, ColorMenu, ColorError;
     }
@@ -31,7 +35,9 @@ namespace Terminal {
 
         public override void Move(int col, int row) => Curses.move (row, col);
         public override void AddCh(int ch) => Curses.addch (ch);
-
+        public override void Refresh() => Curses.refresh ();
+        public override void End() => Curses.endwin ();
+        public override void RedrawTop() => window.redrawwin ();
         public Curses.Window window;
 
         static short last_color_pair;
@@ -39,6 +45,11 @@ namespace Terminal {
         {
             Curses.InitColorPair (++last_color_pair, f, b);
             return Curses.ColorPair (last_color_pair);
+        }
+
+        public override void PrepareToRun()
+        {
+            Curses.timeout (-1);
         }
 
         public override void Init()

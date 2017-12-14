@@ -12,12 +12,8 @@ using System.Collections.Generic;
 namespace Terminal {
 
     public class Responder {
-        public virtual Responder Next { get; set; }
-        public virtual bool IsFirstResponder => true;
-        public virtual bool CanBecomeFirstResponder => true;
-        public virtual bool CanResignFirstResponder => true;
-        public virtual void BecomeFirstResponder () {}
-        public virtual void ResignFirstResponder () {}
+        public virtual bool CanFocus => true;
+        public bool HasFocus { get; internal set; }
 
         // Key handling
         public virtual void KeyDown (Event.Key kb) {}
@@ -28,6 +24,7 @@ namespace Terminal {
 
     public class View : Responder {
         View container = null;
+        View focused = null;
         public static ConsoleDriver Driver = Application.Driver;
         public static IList<View> empty = new List<View>(0).AsReadOnly ();
         List<View> subviews;
@@ -91,6 +88,14 @@ namespace Terminal {
             Driver.Move (rcol, rrow);
         }
 
+        public virtual void PositionCursor ()
+        {
+            if (focused != null)
+                focused.PositionCursor ();
+            else
+                Move (frame.X, frame.Y);
+        }
+
         public void AddCh (int col, int row, int ch)
         {
             if (row < 0 || col < 0)
@@ -115,30 +120,129 @@ namespace Terminal {
             }
             NeedDisplay = false;
         }
-    }
-
-    public class ViewController : Responder {
-        View view;
-        public View View => view;
-
-        public ViewController (View startup)
+        
+        public void SetFocus (View view)
         {
-            view = startup;
+            if (view == null)
+                return;
+            if (!view.CanFocus)
+                return;
+            if (focused == view)
+                return;
+            if (focused != null)
+                focused.HasFocus = false;
+            focused = view;
+            view.HasFocus = true;
+            if (view != null)
+                view.EnsureFocus ();
+            focused.PositionCursor ();
+        }
+
+        public void EnsureFocus ()
+        {
+            if (focused == null)
+                FocusFirst ();
+        }
+
+        public void FocusFirst ()
+        {
+            foreach (var view in subviews){
+                if (view.CanFocus){
+                    SetFocus (view);
+                    return;
+                }
+            }
+        }
+
+        public void FocusLast ()
+        {
+            for (int i = subviews.Count; i > 0; ){
+                i--;
+
+                View v = subviews [i];
+                if (v.CanFocus){
+                    SetFocus (v);
+                    return;
+                }
+            }
+        }
+
+        public bool FocusPrev ()
+        {
+            if (focused == null){
+                FocusLast ();
+                return true;
+            }
+            int focused_idx = -1;
+            for (int i = subviews.Count; i > 0; ){
+                i--;
+                View w = subviews [i];
+
+                if (w.HasFocus){
+                    if (w.FocusPrev ())
+                            return true;
+                    focused_idx = i;
+                    continue;
+                }
+                if (w.CanFocus && focused_idx != -1){
+                    focused.HasFocus = false;
+
+                    if (w.CanFocus)
+                        w.FocusLast (); 
+                
+                    SetFocus (w);
+                    return true;
+                }
+            }
+            if (focused != null){
+                focused.HasFocus = false;
+                focused = null;
+            }
+            return false;
+        }
+        public bool FocusNext ()
+        {       
+            if (focused == null){
+                FocusFirst (); 
+                return focused != null;
+            }
+            int n = subviews.Count;
+            int focused_idx = -1;
+            for (int i = 0; i < n; i++){
+                    View w = subviews [i];
+                    
+                    if (w.HasFocus){
+                            if (w.FocusNext ())
+                                return true;
+                            focused_idx = i;
+                            continue;
+                    }
+                    if (w.CanFocus && focused_idx != -1){
+                        focused.HasFocus = false;
+
+                        if (w != null && w.CanFocus)
+                            w.FocusFirst ();
+                        
+                        SetFocus (w);
+                        return true;
+                    }
+            }
+            if (focused != null){
+                    focused.HasFocus = false;
+                    focused = null;
+            }
+            return false;
+        }
+
+        public virtual void LayoutSubviews ()
+        {
         }
     }
 
     public class Toplevel : View {
-        public ViewController RootViewController;
-        public bool ShowFrame;
-        
 
         public Toplevel (Rect frame) : base (frame)
         {
-        }
-
-        public override void BecomeFirstResponder() 
-        {
-            Application.MakeFirstResponder (this);
         }
 
         public static Toplevel Create () 
@@ -175,36 +279,135 @@ namespace Terminal {
 
     public class Application {
         public static ConsoleDriver Driver = new CursesDriver ();
-        public Toplevel Top { get; private set; }
-        public Mono.Terminal.MainLoop MainLoop { get; private set; }
+        public static Toplevel Top { get; private set; }
+        public static Mono.Terminal.MainLoop MainLoop { get; private set; }
 
-        static Stack<Responder> responders = new Stack<Responder> ();
-        static Responder responder;
+        static Stack<View> toplevels = new Stack<View> ();
+        static Responder focus;
 
         public static void MakeFirstResponder (Responder newResponder)
         {
             if (newResponder == null)
                 throw new ArgumentNullException ();
 
-            responders.Push (responder);
-            responder = newResponder;
+            throw new NotImplementedException ();
         }
 
-        public void Init ()
+        public static void Init ()
         {
             if (Top != null)
                 return;
 
             MainLoop = new Mono.Terminal.MainLoop ();
             Top = Toplevel.Create ();  
-            responder = Top;
+            focus = Top;
 
             MainLoop.AddWatch (0, Mono.Terminal.MainLoop.Condition.PollIn, x => {
                 //ProcessChar ();
 
 				return true;
 			});
+        }
 
+        public class RunState : IDisposable {
+            internal RunState (View view)
+            {
+                View = view;
+            }
+            internal View View;
+
+            public void Dispose ()
+            {
+                Dispose (true);
+                GC.SuppressFinalize(this);
+            }
+
+            public virtual void Dispose (bool disposing)
+            {
+                if (View != null){
+                    Application.End (View);
+                    View = null;
+                }
+            }
+        }
+
+        public void Run ()
+        {
+            Run (Top);
+        }
+
+        static public RunState Begin (View view)
+        {
+            if (view == null)
+                    throw new ArgumentNullException ("view");
+            var rs = new RunState (view);
+
+            Init ();
+            Driver.PrepareToRun ();
+
+            toplevels.Push (view);
+
+            view.LayoutSubviews ();
+            view.FocusFirst ();
+            Redraw (view);
+            view.PositionCursor ();
+            Driver.Refresh ();
+            
+
+            return rs;
+        }
+
+        static public void End (RunState rs)
+        {
+            if (rs == null)
+                throw new ArgumentNullException (nameof (rs));
+            rs.Dispose ();
+        }
+
+        static void Shutdown ()
+        {
+            Driver.End ();
+        }
+
+        static void Redraw (View view)
+        {
+            view.Redraw ();
+            Driver.Refresh ();
+        }
+
+        static void Refresh (View view)
+        {
+            view.Redraw ();
+            Driver.Refresh ();
+        }
+
+        public static void Refresh ()
+        {
+            Driver.RedrawTop ();
+            View last = null;
+            foreach (var v in toplevels){
+                v.Redraw ();
+                last = v;
+            }
+            if (last != null)
+                last.PositionCursor ();
+            Driver.Refresh ();
+        }
+
+        internal static void End (View view)
+        {
+            if (toplevels.Peek () != view)
+                throw new ArgumentException ("The view that you end with must be balanced");
+            toplevels.Pop ();
+            if (toplevels.Count == 0)
+                Shutdown ();
+            else
+                Refresh ();
+        }
+
+        public void Run (View view)
+        {
+            
         }
     }
 }
