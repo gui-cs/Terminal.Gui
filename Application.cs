@@ -12,7 +12,7 @@ using System.Collections.Generic;
 namespace Terminal {
 
     public class Responder {
-        public virtual bool CanFocus => true;
+        public virtual bool CanFocus { get; set; }
         public bool HasFocus { get; internal set; }
 
         // Key handling
@@ -49,23 +49,96 @@ namespace Terminal {
         public View (Rect frame)
         {
             this.Frame = frame;
+            CanFocus = false;
         }
 
+        /// <summary>
+        /// Invoke to flag that this view needs to be redisplayed, by any code
+        /// that alters the state of the view.
+        /// </summary>
         public void SetNeedsDisplay ()
         {
             NeedDisplay = true;
         }
 
-        public void AddSubview (View view)
+        /// <summary>
+        ///   Adds a subview to this view.
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        public void Add (View view)
         {
             if (view == null)
                 return;
             if (subviews == null)
                 subviews = new List<View> ();
             subviews.Add (view);
+            view.container = this;
+            if (view.CanFocus)
+                CanFocus = true;
         }
 
-        public void GetRealRowCol (int col, int row, out int rcol, out int rrow)
+        /// <summary>
+        ///   Removes all the widgets from this container.
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        public virtual void RemoveAll ()
+        {
+            if (subviews == null)
+                return;
+
+            while (subviews.Count > 0) {
+                var view = subviews [0];
+                Remove (view);
+                subviews.RemoveAt (0);
+            }        
+        }
+
+        /// <summary>
+        ///   Removes a widget from this container.
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        public virtual void Remove (View view)
+        {
+            if (view == null)
+                return;
+
+            subviews.Remove (view);
+            view.container = null;
+
+            if (subviews.Count < 1)
+                this.CanFocus = false;
+        }
+
+        /// <summary>
+        ///   Clears the view region with the current color.
+        /// </summary>
+        /// <remarks>
+        ///   <para>
+        ///     This clears the entire region used by this view.
+        ///   </para>
+        /// </remarks>
+        public void Clear ()
+        {
+            var h = Frame.Height;
+            var w = Frame.Width;
+            for (int line = 0; line < h; line++) {
+                Move (0, line);
+                for (int col = 0; col < w; col++) 
+                    Driver.AddCh (' ');
+            }
+        }
+
+        /// <summary>
+        /// Converts the (col,row) position from the view into a screen (col,row).  The values are clamped to (0..ScreenDim-1)
+        /// </summary>
+        /// <param name="col">View-based column.</param>
+        /// <param name="row">View-based row.</param>
+        /// <param name="rcol">Absolute column, display relative.</param>
+        /// <param name="rrow">Absolute row, display relative.</param>
+        internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
         {
             // Computes the real row, col relative to the screen.
             rrow = row;
@@ -78,16 +151,40 @@ namespace Terminal {
             }
 
             // The following ensures that the cursor is always in the screen boundaries.
-            rrow = Math.Max (0, Math.Min (rrow, Driver.Rows-1));
-            rcol = Math.Max (0, Math.Min (rcol, Driver.Cols-1));
+            if (clipped) {
+                rrow = Math.Max (0, Math.Min (rrow, Driver.Rows - 1));
+                rcol = Math.Max (0, Math.Min (rcol, Driver.Cols - 1));
+            }
         }
 
+      
+
+        /// <summary>
+        /// Draws a frame in the current view, clipped by the boundary of this view
+        /// </summary>
+        /// <param name="rect">Rectangular region for the frame to be drawn.</param>
+        /// <param name="fill">If set to <c>true</c> it fill will the contents.</param>
+        public void DrawFrame (Rect rect, bool fill = false)
+        {
+            ViewToScreen (rect.X, rect.Y, out var x, out var y, clipped: false);
+            Driver.DrawFrame (new Rect (x, y, rect.Width, rect.Height), fill);
+        }
+
+        /// <summary>
+        /// This moves the cursor to the specified column and row in the view.
+        /// </summary>
+        /// <returns>The move.</returns>
+        /// <param name="col">Col.</param>
+        /// <param name="row">Row.</param>
         public void Move (int col, int row)
         {
-            GetRealRowCol (col, row, out var rcol, out var rrow);
+            ViewToScreen (col, row, out var rcol, out var rrow);
             Driver.Move (rcol, rrow);
         }
 
+        /// <summary>
+        ///   Positions the cursor in the right position based on the currently focused view in the chain.
+        /// </summary>
         public virtual void PositionCursor ()
         {
             if (focused != null)
@@ -96,6 +193,12 @@ namespace Terminal {
                 Move (frame.X, frame.Y);
         }
 
+        /// <summary>
+        /// Displays the specified character in the specified column and row.
+        /// </summary>
+        /// <param name="col">Col.</param>
+        /// <param name="row">Row.</param>
+        /// <param name="ch">Ch.</param>
         public void AddCh (int col, int row, int ch)
         {
             if (row < 0 || col < 0)
@@ -106,21 +209,30 @@ namespace Terminal {
             Driver.AddCh (ch);
         }
 
+        /// <summary>
+        /// Performs a redraw of this view and its subviews, only redraws the views that have been flagged for a re-display.
+        /// </summary>
         public virtual void Redraw ()
         {
             var clipRect = new Rect (offset, frame.Size);
 
-            foreach (var view in subviews){
-                if (view.NeedDisplay){
-                    if (view.Frame.IntersectsWith (clipRect)){
-                        view.Redraw ();
+            if (subviews != null) {
+                foreach (var view in subviews) {
+                    if (view.NeedDisplay) {
+                        if (view.Frame.IntersectsWith (clipRect)) {
+                            view.Redraw ();
+                        }
+                        view.NeedDisplay = false;
                     }
-                    view.NeedDisplay = false;
                 }
             }
             NeedDisplay = false;
         }
-        
+
+        /// <summary>
+        /// Focuses the specified sub-view.
+        /// </summary>
+        /// <param name="view">View.</param>
         public void SetFocus (View view)
         {
             if (view == null)
@@ -129,6 +241,15 @@ namespace Terminal {
                 return;
             if (focused == view)
                 return;
+
+            // Make sure that this view is a subview
+            View c;
+            for (c = view.container; c != null; c = c.container)
+                if (c == this)
+                    break;
+            if (c == null)
+                throw new ArgumentException ("the specified view is not part of the hierarchy of this view");
+            
             if (focused != null)
                 focused.HasFocus = false;
             focused = view;
@@ -138,12 +259,18 @@ namespace Terminal {
             focused.PositionCursor ();
         }
 
+        /// <summary>
+        /// Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise, it does nothing.
+        /// </summary>
         public void EnsureFocus ()
         {
             if (focused == null)
                 FocusFirst ();
         }
 
+        /// <summary>
+        /// Focuses the first focusable subview if one exists.
+        /// </summary>
         public void FocusFirst ()
         {
             foreach (var view in subviews){
@@ -154,6 +281,9 @@ namespace Terminal {
             }
         }
 
+        /// <summary>
+        /// Focuses the last focusable subview if one exists.
+        /// </summary>
         public void FocusLast ()
         {
             for (int i = subviews.Count; i > 0; ){
@@ -167,6 +297,10 @@ namespace Terminal {
             }
         }
 
+        /// <summary>
+        /// Focuses the previous view.
+        /// </summary>
+        /// <returns><c>true</c>, if previous was focused, <c>false</c> otherwise.</returns>
         public bool FocusPrev ()
         {
             if (focused == null){
@@ -200,6 +334,11 @@ namespace Terminal {
             }
             return false;
         }
+
+        /// <summary>
+        /// Focuses the next view.
+        /// </summary>
+        /// <returns><c>true</c>, if next was focused, <c>false</c> otherwise.</returns>
         public bool FocusNext ()
         {       
             if (focused == null){
@@ -239,7 +378,11 @@ namespace Terminal {
         }
     }
 
+    /// <summary>
+    /// Toplevel views can be modally executed.
+    /// </summary>
     public class Toplevel : View {
+        public bool Running;
 
         public Toplevel (Rect frame) : base (frame)
         {
@@ -247,10 +390,13 @@ namespace Terminal {
 
         public static Toplevel Create () 
         {
-            return new Window (new Rect (0, 0, Driver.Cols, Driver.Rows));
+            return new Toplevel (new Rect (0, 0, Driver.Cols, Driver.Rows));
         }
     }
 
+    /// <summary>
+    /// A toplevel view that draws a frame around its region
+    /// </summary>
     public class Window : Toplevel {
         View contentView;
         string title;
@@ -265,15 +411,34 @@ namespace Terminal {
 
         public Window (Rect frame, string title = null) : base (frame)
         {
+            this.Title = title;
             frame.Inflate (-1, -1);
             contentView = new View (frame);
-            AddSubview (contentView);
+            Add(contentView);
+        }
+
+        void DrawFrame ()
+        {
+            DrawFrame (Frame, true);
         }
 
         public override void Redraw ()
         {
-
-            base.Redraw ();
+            Driver.SetColor (Colors.Base.Normal);
+            Clear ();
+            DrawFrame ();
+            if (HasFocus)
+                Driver.SetColor (Colors.Dialog.Normal);
+            var width = Frame.Width;
+            if (Title != null && width > 4) {
+                Move (0, 1);
+                Driver.AddCh (' ');
+                var str = Title.Length > width ? Title.Substring (0, width - 4) : Title;
+                Driver.AddStr (str);
+                Driver.AddCh (' ');
+            }
+            Driver.SetColor (Colors.Dialog.Normal);
+            contentView.Redraw ();
         }
     }
 
@@ -285,6 +450,15 @@ namespace Terminal {
         static Stack<View> toplevels = new Stack<View> ();
         static Responder focus;
 
+        /// <summary>
+        ///   This event is raised on each iteration of the
+        ///   main loop. 
+        /// </summary>
+        /// <remarks>
+        ///   See also <see cref="Timeout"/>
+        /// </remarks>
+        static public event EventHandler Iteration;
+
         public static void MakeFirstResponder (Responder newResponder)
         {
             if (newResponder == null)
@@ -293,11 +467,15 @@ namespace Terminal {
             throw new NotImplementedException ();
         }
 
+        /// <summary>
+        /// Initializes the Application
+        /// </summary>
         public static void Init ()
         {
             if (Top != null)
                 return;
 
+            Driver.Init ();
             MainLoop = new Mono.Terminal.MainLoop ();
             Top = Toplevel.Create ();  
             focus = Top;
@@ -310,11 +488,11 @@ namespace Terminal {
         }
 
         public class RunState : IDisposable {
-            internal RunState (View view)
+            internal RunState (Toplevel view)
             {
-                View = view;
+                Toplevel = view;
             }
-            internal View View;
+            internal Toplevel Toplevel;
 
             public void Dispose ()
             {
@@ -324,35 +502,29 @@ namespace Terminal {
 
             public virtual void Dispose (bool disposing)
             {
-                if (View != null){
-                    Application.End (View);
-                    View = null;
+                if (Toplevel != null){
+                    Application.End (Toplevel);
+                    Toplevel = null;
                 }
             }
         }
 
-        public void Run ()
+        static public RunState Begin (Toplevel toplevel)
         {
-            Run (Top);
-        }
-
-        static public RunState Begin (View view)
-        {
-            if (view == null)
-                    throw new ArgumentNullException ("view");
-            var rs = new RunState (view);
+            if (toplevel == null)
+                throw new ArgumentNullException (nameof(toplevel));
+            var rs = new RunState (toplevel);
 
             Init ();
             Driver.PrepareToRun ();
 
-            toplevels.Push (view);
+            toplevels.Push (toplevel);
 
-            view.LayoutSubviews ();
-            view.FocusFirst ();
-            Redraw (view);
-            view.PositionCursor ();
+            toplevel.LayoutSubviews ();
+            toplevel.FocusFirst ();
+            Redraw (toplevel);
+            toplevel.PositionCursor ();
             Driver.Refresh ();
-            
 
             return rs;
         }
@@ -405,9 +577,49 @@ namespace Terminal {
                 Refresh ();
         }
 
-        public void Run (View view)
+        /// <summary>
+        ///   Runs the main loop for the created dialog
+        /// </summary>
+        /// <remarks>
+        ///   Use the wait parameter to control whether this is a
+        ///   blocking or non-blocking call.
+        /// </remarks>
+        public static void RunLoop(RunState state, bool wait = true)
         {
-            
+            if (state == null)
+                throw new ArgumentNullException(nameof(state));
+            if (state.Toplevel == null)
+                throw new ObjectDisposedException("state");
+
+            for (state.Toplevel.Running = true; state.Toplevel.Running;) {
+                if (MainLoop.EventsPending(wait)){
+                    MainLoop.MainIteration();
+                    if (Iteration != null)
+                        Iteration(null, EventArgs.Empty);
+                }
+                else if (wait == false)
+                    return;
+            }
+        }
+
+        public static void Run ()
+        {
+            Run (Top);
+        }
+
+        /// <summary>
+        ///   Runs the main loop on the given container.
+        /// </summary>
+        /// <remarks>
+        ///   This method is used to start processing events
+        ///   for the main application, but it is also used to
+        ///   run modal dialog boxes.
+        /// </remarks>
+        public static void Run (Toplevel view)
+        {
+            var runToken = Begin (view);
+            RunLoop (runToken);
+            End (runToken);
         }
     }
 }
