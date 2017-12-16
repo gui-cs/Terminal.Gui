@@ -141,12 +141,12 @@ namespace Terminal {
         internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
         {
             // Computes the real row, col relative to the screen.
-            rrow = row;
-            rcol = col;
+            rrow = row + frame.X;
+            rcol = col + frame.Y;
             var ccontainer = container;
             while (ccontainer != null){
-                rrow += container.frame.Y;
-                rcol += container.frame.X;
+                rrow += ccontainer.frame.Y;
+                rcol += ccontainer.frame.X;
                 ccontainer = ccontainer.container;
             }
 
@@ -419,7 +419,7 @@ namespace Terminal {
 
         void DrawFrame ()
         {
-            DrawFrame (Frame, true);
+            DrawFrame (new Rect (Point.Empty, Frame.Size), true);
         }
 
         public override void Redraw ()
@@ -431,7 +431,7 @@ namespace Terminal {
                 Driver.SetColor (Colors.Dialog.Normal);
             var width = Frame.Width;
             if (Title != null && width > 4) {
-                Move (0, 1);
+                Move (1, 0);
                 Driver.AddCh (' ');
                 var str = Title.Length > width ? Title.Substring (0, width - 4) : Title;
                 Driver.AddStr (str);

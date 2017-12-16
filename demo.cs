@@ -5,7 +5,7 @@ class Demo {
     {
         Application.Init ();
         var top = Application.Top;
-        top.Add (new Window (new Rect (10, 10, 20, 20), "Hello"));
+        top.Add (new Window (new Rect (10, 10, 20, 10), "Hello"));
         Application.Run ();
     }
 }
