@@ -32,18 +32,22 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Application.cs" />
-    <Compile Include="driver.cs" />
+    <Compile Include="Core.cs" />
+    <Compile Include="Driver.cs" />
     <Compile Include="Event.cs" />
     <Compile Include="Types\Point.cs" />
     <Compile Include="Types\Rect.cs" />
     <Compile Include="Types\Size.cs" />
     <Compile Include="demo.cs" />
+    <Compile Include="Views\Label.cs" />
   </ItemGroup>
   <ItemGroup>
    <Reference Include="mono-curses.dll">
      <HintPath>$(MSBuildProjectDirectory)/../mono-curses/mono-curses.dll</HintPath>
    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -66,6 +66,8 @@ namespace Terminal {
         public void SetNeedsDisplay ()
         {
             NeedDisplay = true;
+            if (container != null)
+                container.SetNeedsDisplay ();
         }
 
         /// <summary>
@@ -426,7 +428,7 @@ namespace Terminal {
                 Driver.AddStr ("Line: " + i);
             }
         }
-#endif
+#endif  
     }
 
     /// <summary>
@@ -630,9 +632,10 @@ namespace Terminal {
                     MainLoop.MainIteration();
                     if (Iteration != null)
                         Iteration(null, EventArgs.Empty);
-                }
-                else if (wait == false)
+                } else if (wait == false)
                     return;
+                if (state.Toplevel.NeedDisplay)
+                    state.Toplevel.Redraw ();
             }
         }
 

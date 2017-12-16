@@ -85,6 +85,7 @@ namespace Terminal {
 
         public override void AddStr (string str)
         {
+            // TODO; optimize this to determine if the str fits in the clip region, and if so, use Curses.addstr directly
             foreach (var c in str)
                 AddCh ((int) c);
         }
