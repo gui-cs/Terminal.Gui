@@ -42,16 +42,53 @@ namespace Terminal {
         public abstract void SetColor (Color c);
         public abstract void DrawFrame (Rect region, bool fill);
 
-        // Colors used for widgets
+        Rect clip;
+        public Rect Clip {
+            get => clip;
+            set => this.clip = value;
+        }
     }
 
     public class CursesDriver : ConsoleDriver {
         public override int Cols => Curses.Cols;
         public override int Rows => Curses.Lines;
 
-        public override void Move(int col, int row) => Curses.move (row, col);
-        public override void AddCh(int ch) => Curses.addch (ch);
-        public override void AddStr (string str) => Curses.addstr (str);
+        // Current row, and current col, tracked by Move/AddCh only
+        int ccol, crow;
+        bool needMove;
+        public override void Move (int col, int row)
+        {
+            ccol = col;
+            crow = row;
+
+            if (Clip.Contains (col, row)) {
+                Curses.move (row, col);
+                needMove = false;
+            } else {
+                Curses.move (Clip.Y, Clip.X);
+                needMove = true;
+            }
+        }
+
+        public override void AddCh (int ch)
+        {
+            if (Clip.Contains (ccol, crow)) {
+                if (needMove) {
+                    Curses.move (crow, ccol);
+                    needMove = false;
+                }
+                Curses.addch (ch);
+            } else
+                needMove = true;
+            ccol++;
+        }
+
+        public override void AddStr (string str)
+        {
+            foreach (var c in str)
+                AddCh ((int) c);
+        }
+
         public override void Refresh() => Curses.refresh ();
         public override void End() => Curses.endwin ();
         public override void RedrawTop() => window.redrawwin ();
@@ -76,27 +113,26 @@ namespace Terminal {
             int height = region.Height;
             int b;
 
-            Curses.move (region.Y, region.X);
-            Curses.addch (Curses.ACS_ULCORNER);
+            Move (region.X, region.Y);
+            AddCh (Curses.ACS_ULCORNER);
             for (b = 0; b < width - 2; b++)
-                Curses.addch (Curses.ACS_HLINE);
-            Curses.addch (Curses.ACS_URCORNER);
-
+                AddCh (Curses.ACS_HLINE);
+            AddCh (Curses.ACS_URCORNER);
             for (b = 1; b < height - 1; b++) {
-                Curses.move (region.Y + b, region.X);
-                Curses.addch (Curses.ACS_VLINE);
+                Move (region.X, region.Y + b);
+                AddCh (Curses.ACS_VLINE);
                 if (fill) {
                     for (int x = 1; x < width - 1; x++)
-                        Curses.addch (' ');
+                        AddCh (' ');
                 } else
-                    Curses.move (region.Y + b, region.X + width - 1);
-                Curses.addch (Curses.ACS_VLINE);
+                    Move (region.X + width - 1, region.Y + b);
+                AddCh (Curses.ACS_VLINE);
             }
-            Curses.move (region.Y + height - 1, region.X);
-            Curses.addch (Curses.ACS_LLCORNER);
+            Move (region.X, region.Y + height - 1);
+            AddCh (Curses.ACS_LLCORNER);
             for (b = 0; b < width - 2; b++)
-                Curses.addch (Curses.ACS_HLINE);
-            Curses.addch (Curses.ACS_LRCORNER);
+                AddCh (Curses.ACS_HLINE);
+            AddCh (Curses.ACS_LRCORNER);
         }
 
         public override void Init()
@@ -117,7 +153,7 @@ namespace Terminal {
             Colors.Dialog = new ColorScheme ();
             Colors.Menu = new ColorScheme ();
             Colors.Error = new ColorScheme ();
-
+            Clip = new Rect (0, 0, Cols, Rows);
             if (Curses.HasColors){
                 Curses.StartColor ();
                 Curses.UseDefaultColors ();

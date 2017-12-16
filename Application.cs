@@ -16,19 +16,19 @@ namespace Terminal {
         public bool HasFocus { get; internal set; }
 
         // Key handling
-        public virtual void KeyDown (Event.Key kb) {}
+        public virtual void KeyDown (Event.Key kb) { }
 
         // Mouse events
-        public virtual void MouseEvent (Event.Mouse me) {}
+        public virtual void MouseEvent (Event.Mouse me) { }
     }
 
     public class View : Responder {
         View container = null;
         View focused = null;
         public static ConsoleDriver Driver = Application.Driver;
-        public static IList<View> empty = new List<View>(0).AsReadOnly ();
+        public static IList<View> empty = new List<View> (0).AsReadOnly ();
         List<View> subviews;
-        public IList<View> Subviews  => subviews == null ? empty : subviews.AsReadOnly ();
+        public IList<View> Subviews => subviews == null ? empty : subviews.AsReadOnly ();
         internal bool NeedDisplay { get; private set; } = true;
 
         // The frame for the object
@@ -38,11 +38,18 @@ namespace Terminal {
         Point offset;
 
         // The frame for this view
-        public Rect Frame { 
+        public Rect Frame {
             get => frame;
             set {
                 frame = value;
                 SetNeedsDisplay ();
+            }
+        }
+
+        public Rect Bounds {
+            get => new Rect (Point.Empty, Frame.Size);
+            set {
+                Frame = new Rect (frame.Location, value.Size);
             }
         }
 
@@ -92,7 +99,7 @@ namespace Terminal {
                 var view = subviews [0];
                 Remove (view);
                 subviews.RemoveAt (0);
-            }        
+            }
         }
 
         /// <summary>
@@ -126,7 +133,7 @@ namespace Terminal {
             var w = Frame.Width;
             for (int line = 0; line < h; line++) {
                 Move (0, line);
-                for (int col = 0; col < w; col++) 
+                for (int col = 0; col < w; col++)
                     Driver.AddCh (' ');
             }
         }
@@ -144,7 +151,7 @@ namespace Terminal {
             rrow = row + frame.X;
             rcol = col + frame.Y;
             var ccontainer = container;
-            while (ccontainer != null){
+            while (ccontainer != null) {
                 rrow += ccontainer.frame.Y;
                 rcol += ccontainer.frame.X;
                 ccontainer = ccontainer.container;
@@ -157,7 +164,21 @@ namespace Terminal {
             }
         }
 
-      
+        Rect RectToScreen (Rect rect)
+        {
+            ViewToScreen (rect.X, rect.Y, out var x, out var y, clipped: false);
+            return new Rect (x, y, rect.Width, rect.Height);
+        }
+
+        Rect ScreenClip (Rect rect)
+        {
+            var x = rect.X < 0 ? 0 : rect.X;
+            var y = rect.Y < 0 ? 0 : rect.Y;
+            var w = rect.X + rect.Width >= Driver.Cols ? Driver.Cols - rect.X : rect.Width;
+            var h = rect.Y + rect.Height >= Driver.Rows ? Driver.Rows - rect.Y : rect.Height;
+
+            return new Rect (x, y, w, h);
+        }
 
         /// <summary>
         /// Draws a frame in the current view, clipped by the boundary of this view
@@ -166,8 +187,11 @@ namespace Terminal {
         /// <param name="fill">If set to <c>true</c> it fill will the contents.</param>
         public void DrawFrame (Rect rect, bool fill = false)
         {
-            ViewToScreen (rect.X, rect.Y, out var x, out var y, clipped: false);
-            Driver.DrawFrame (new Rect (x, y, rect.Width, rect.Height), fill);
+            var scrRect = RectToScreen (rect);
+            var savedClip = Driver.Clip;
+            Driver.Clip = ScreenClip (RectToScreen (Bounds));
+            Driver.DrawFrame (scrRect, fill);
+            Driver.Clip = savedClip;
         }
 
         /// <summary>
@@ -203,7 +227,7 @@ namespace Terminal {
         {
             if (row < 0 || col < 0)
                 return;
-            if (row > frame.Height-1 || col > frame.Width-1)
+            if (row > frame.Height - 1 || col > frame.Width - 1)
                 return;
             Move (col, row);
             Driver.AddCh (ch);
@@ -249,7 +273,7 @@ namespace Terminal {
                     break;
             if (c == null)
                 throw new ArgumentException ("the specified view is not part of the hierarchy of this view");
-            
+
             if (focused != null)
                 focused.HasFocus = false;
             focused = view;
@@ -273,8 +297,8 @@ namespace Terminal {
         /// </summary>
         public void FocusFirst ()
         {
-            foreach (var view in subviews){
-                if (view.CanFocus){
+            foreach (var view in subviews) {
+                if (view.CanFocus) {
                     SetFocus (view);
                     return;
                 }
@@ -286,11 +310,11 @@ namespace Terminal {
         /// </summary>
         public void FocusLast ()
         {
-            for (int i = subviews.Count; i > 0; ){
+            for (int i = subviews.Count; i > 0;) {
                 i--;
 
                 View v = subviews [i];
-                if (v.CanFocus){
+                if (v.CanFocus) {
                     SetFocus (v);
                     return;
                 }
@@ -303,32 +327,32 @@ namespace Terminal {
         /// <returns><c>true</c>, if previous was focused, <c>false</c> otherwise.</returns>
         public bool FocusPrev ()
         {
-            if (focused == null){
+            if (focused == null) {
                 FocusLast ();
                 return true;
             }
             int focused_idx = -1;
-            for (int i = subviews.Count; i > 0; ){
+            for (int i = subviews.Count; i > 0;) {
                 i--;
                 View w = subviews [i];
 
-                if (w.HasFocus){
+                if (w.HasFocus) {
                     if (w.FocusPrev ())
-                            return true;
+                        return true;
                     focused_idx = i;
                     continue;
                 }
-                if (w.CanFocus && focused_idx != -1){
+                if (w.CanFocus && focused_idx != -1) {
                     focused.HasFocus = false;
 
                     if (w.CanFocus)
-                        w.FocusLast (); 
-                
+                        w.FocusLast ();
+
                     SetFocus (w);
                     return true;
                 }
             }
-            if (focused != null){
+            if (focused != null) {
                 focused.HasFocus = false;
                 focused = null;
             }
@@ -340,35 +364,35 @@ namespace Terminal {
         /// </summary>
         /// <returns><c>true</c>, if next was focused, <c>false</c> otherwise.</returns>
         public bool FocusNext ()
-        {       
-            if (focused == null){
-                FocusFirst (); 
+        {
+            if (focused == null) {
+                FocusFirst ();
                 return focused != null;
             }
             int n = subviews.Count;
             int focused_idx = -1;
-            for (int i = 0; i < n; i++){
-                    View w = subviews [i];
-                    
-                    if (w.HasFocus){
-                            if (w.FocusNext ())
-                                return true;
-                            focused_idx = i;
-                            continue;
-                    }
-                    if (w.CanFocus && focused_idx != -1){
-                        focused.HasFocus = false;
+            for (int i = 0; i < n; i++) {
+                View w = subviews [i];
 
-                        if (w != null && w.CanFocus)
-                            w.FocusFirst ();
-                        
-                        SetFocus (w);
+                if (w.HasFocus) {
+                    if (w.FocusNext ())
                         return true;
-                    }
-            }
-            if (focused != null){
+                    focused_idx = i;
+                    continue;
+                }
+                if (w.CanFocus && focused_idx != -1) {
                     focused.HasFocus = false;
-                    focused = null;
+
+                    if (w != null && w.CanFocus)
+                        w.FocusFirst ();
+
+                    SetFocus (w);
+                    return true;
+                }
+            }
+            if (focused != null) {
+                focused.HasFocus = false;
+                focused = null;
             }
             return false;
         }
@@ -388,10 +412,21 @@ namespace Terminal {
         {
         }
 
-        public static Toplevel Create () 
+        public static Toplevel Create ()
         {
             return new Toplevel (new Rect (0, 0, Driver.Cols, Driver.Rows));
         }
+
+#if false
+        public override void Redraw ()
+        {
+            base.Redraw ();
+            for (int i = 0; i < Driver.Cols; i++) {
+                Driver.Move (0, i);
+                Driver.AddStr ("Line: " + i);
+            }
+        }
+#endif
     }
 
     /// <summary>
@@ -419,13 +454,12 @@ namespace Terminal {
 
         void DrawFrame ()
         {
-            DrawFrame (new Rect (Point.Empty, Frame.Size), true);
+            DrawFrame (new Rect(0, 0, Frame.Width, Frame.Height), true);
         }
 
         public override void Redraw ()
         {
             Driver.SetColor (Colors.Base.Normal);
-            Clear ();
             DrawFrame ();
             if (HasFocus)
                 Driver.SetColor (Colors.Dialog.Normal);
