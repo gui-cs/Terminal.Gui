@@ -26,6 +26,8 @@ namespace Terminal {
 
     public static class Colors {
         public static ColorScheme Base, Dialog, Menu, Error;
+
+        public 
     }
 
     public abstract class ConsoleDriver {

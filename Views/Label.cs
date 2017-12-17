@@ -1,5 +1,7 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Terminal {
     public enum TextAlignment {
@@ -10,6 +12,8 @@ namespace Terminal {
     ///   Label widget, displays a string at a given position, can include multiple lines.
     /// </summary>
     public class Label : View {
+        List<string> lines = new List<string> ();
+        bool recalcPending = true;
         string text;
         TextAlignment textAlignment;
 
@@ -51,8 +55,64 @@ namespace Terminal {
             this.text = text;
         }
 
-        public override void Redraw ()
+        static char [] whitespace = new char [] { ' ', '\t' };
+
+        string ClipAndJustify (string str)
         {
+            int slen = str.Length;
+            if (slen > Frame.Width)
+                return str.Substring (0, Frame.Width);
+            else {
+                if (textAlignment == TextAlignment.Justified) {
+                    var words = str.Split (whitespace, StringSplitOptions.RemoveEmptyEntries);
+                    int textCount = words.Sum ((arg) => arg.Length);
+
+                    var spaces = (Frame.Width - textCount) / (words.Length - 1);
+                    var extras = (Frame.Width - textCount) % words.Length;
+                    var s = new System.Text.StringBuilder ();
+                    //s.Append ($"tc={textCount} sp={spaces},x={extras} - ");
+                    for (int w = 0; w < words.Length; w++) {
+                        var x = words [w];
+                        s.Append (x);
+                        if (w + 1 < words.Length)
+                            for (int i = 0; i < spaces; i++)
+                                s.Append (' ');
+                        if (extras > 0) {
+                            s.Append ('_');
+                            extras--;
+                        }
+                    }
+                    return s.ToString ();
+                }
+                return str;
+            }
+        }
+
+        void Recalc ()
+        {
+            lines.Clear ();
+            if (text.IndexOf ('\n') == -1) {
+                lines.Add (ClipAndJustify (text));
+                return;
+            }
+            int textLen = text.Length;
+            int lp = 0;
+            for (int i = 0; i < textLen; i++) {
+                char c = text [i];
+
+                if (c == '\n') {
+                    lines.Add (ClipAndJustify (text.Substring (lp, i - lp)));
+                    lp = i + 1;
+                }
+            }
+            recalcPending = false;
+        }
+
+        public override void Redraw (Rect region)
+        {
+            if (recalcPending)
+                Recalc ();
+            
             if (TextColor != -1)
                 Driver.SetColor (TextColor);
             else
@@ -60,7 +120,28 @@ namespace Terminal {
 
             Clear ();
             Move (Frame.X, Frame.Y);
-            Driver.AddStr (text);
+            for (int line = 0; line < lines.Count; line++) {
+                if (line < region.Top || line >= region.Bottom)
+                    continue;
+                var str = lines [line];
+                int x;
+                switch (textAlignment) {
+                case TextAlignment.Left:
+                case TextAlignment.Justified:
+                    x = 0;
+                    break;
+                case TextAlignment.Right:
+                    x = Frame.Right - str.Length;
+                    break;
+                case TextAlignment.Centered:
+                    x = Frame.Left + (Frame.Width - str.Length) / 2;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException ();
+                }
+                Move (x, line);
+                Driver.AddStr (str);
+            }
         }
 
         /// <summary>
@@ -70,6 +151,7 @@ namespace Terminal {
             get => text;
             set {
                 text = value;
+                recalcPending = true;
                 SetNeedsDisplay ();
             }
         }

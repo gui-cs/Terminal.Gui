@@ -7,6 +7,7 @@
 // Optimziations
 //   - Add rendering limitation to the exposed area
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Terminal {
@@ -22,7 +23,7 @@ namespace Terminal {
         public virtual void MouseEvent (Event.Mouse me) { }
     }
 
-    public class View : Responder {
+    public class View : Responder, IEnumerable {
         View container = null;
         View focused = null;
         public static ConsoleDriver Driver = Application.Driver;
@@ -34,9 +35,6 @@ namespace Terminal {
         // The frame for the object
         Rect frame;
 
-        // The offset of the first child view inside the view
-        Point offset;
-
         // The frame for this view
         public Rect Frame {
             get => frame;
@@ -44,6 +42,12 @@ namespace Terminal {
                 frame = value;
                 SetNeedsDisplay ();
             }
+        }
+
+        public IEnumerator GetEnumerator ()
+        {
+            foreach (var v in subviews)
+                yield return v;
         }
 
         public Rect Bounds {
@@ -75,7 +79,7 @@ namespace Terminal {
         /// </summary>
         /// <remarks>
         /// </remarks>
-        public void Add (View view)
+        public virtual void Add (View view)
         {
             if (view == null)
                 return;
@@ -150,8 +154,8 @@ namespace Terminal {
         internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
         {
             // Computes the real row, col relative to the screen.
-            rrow = row + frame.X;
-            rcol = col + frame.Y;
+            rrow = row + frame.Y;
+            rcol = col + frame.X;
             var ccontainer = container;
             while (ccontainer != null) {
                 rrow += ccontainer.frame.Y;
@@ -238,15 +242,17 @@ namespace Terminal {
         /// <summary>
         /// Performs a redraw of this view and its subviews, only redraws the views that have been flagged for a re-display.
         /// </summary>
-        public virtual void Redraw ()
+        public virtual void Redraw (Rect region)
         {
-            var clipRect = new Rect (offset, frame.Size);
+            var clipRect = new Rect (Point.Empty, frame.Size);
 
             if (subviews != null) {
                 foreach (var view in subviews) {
                     if (view.NeedDisplay) {
-                        if (view.Frame.IntersectsWith (clipRect)) {
-                            view.Redraw ();
+                        if (view.Frame.IntersectsWith (clipRect) && view.Frame.IntersectsWith (region)) {
+
+                            // TODO: optimize this by computing the intersection of region and view.Bounds
+                            view.Redraw (view.Bounds);
                         }
                         view.NeedDisplay = false;
                     }
@@ -434,7 +440,7 @@ namespace Terminal {
     /// <summary>
     /// A toplevel view that draws a frame around its region
     /// </summary>
-    public class Window : Toplevel {
+    public class Window : Toplevel, IEnumerable {
         View contentView;
         string title;
 
@@ -451,7 +457,12 @@ namespace Terminal {
             this.Title = title;
             frame.Inflate (-1, -1);
             contentView = new View (frame);
-            Add(contentView);
+            base.Add(contentView);
+        }
+
+        public IEnumerator GetEnumerator ()
+        {
+            return contentView.GetEnumerator ();
         }
 
         void DrawFrame ()
@@ -459,7 +470,12 @@ namespace Terminal {
             DrawFrame (new Rect(0, 0, Frame.Width, Frame.Height), true);
         }
 
-        public override void Redraw ()
+        public override void Add (View view)
+        {
+            contentView.Add (view);
+        }
+
+        public override void Redraw (Rect bounds)
         {
             Driver.SetColor (Colors.Base.Normal);
             DrawFrame ();
@@ -474,7 +490,7 @@ namespace Terminal {
                 Driver.AddCh (' ');
             }
             Driver.SetColor (Colors.Dialog.Normal);
-            contentView.Redraw ();
+            contentView.Redraw (contentView.Bounds);
         }
     }
 
@@ -579,13 +595,13 @@ namespace Terminal {
 
         static void Redraw (View view)
         {
-            view.Redraw ();
+            view.Redraw (view.Bounds);
             Driver.Refresh ();
         }
 
         static void Refresh (View view)
         {
-            view.Redraw ();
+            view.Redraw (view.Bounds);
             Driver.Refresh ();
         }
 
@@ -594,7 +610,7 @@ namespace Terminal {
             Driver.RedrawTop ();
             View last = null;
             foreach (var v in toplevels){
-                v.Redraw ();
+                v.Redraw (v.Bounds);
                 last = v;
             }
             if (last != null)
@@ -635,7 +651,7 @@ namespace Terminal {
                 } else if (wait == false)
                     return;
                 if (state.Toplevel.NeedDisplay)
-                    state.Toplevel.Redraw ();
+                    state.Toplevel.Redraw (state.Toplevel.Bounds);
             }
         }
 
