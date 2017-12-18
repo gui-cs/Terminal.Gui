@@ -3,31 +3,49 @@ using System.Collections.Generic;
 using Unix.Terminal;
 
 namespace Terminal {
-    
-    public struct Color {
+    public enum Color
+    {
+        Black,
+        Blue,
+        Green,
+        Cyan,
+        Red,
+        Magenta,
+        Brown,
+        Gray,
+        DarkGray,
+        BrightBlue,
+        BrightGreen,
+        BrighCyan,
+        BrightRed,
+        BrightMagenta,
+        BrightYellow,
+        White
+    }
+
+    public struct Attribute {
         internal int value;
-        public Color (int v)
+        public Attribute (int v)
         {
             value = v;
         }
 
-        public static implicit operator int (Color c) => c.value;
-        public static implicit operator Color (int v) => new Color (v);
+        public static implicit operator int (Attribute c) => c.value;
+        public static implicit operator Attribute (int v) => new Attribute (v);
     }
 
     public class ColorScheme {
-        public Color Normal;
-        public Color Focus;
-        public Color HotNormal;
-        public Color HotFocus;
-        public Color Marked => HotNormal;
-        public Color MarkedSelected => HotFocus;
+        public Attribute Normal;
+        public Attribute Focus;
+        public Attribute HotNormal;
+        public Attribute HotFocus;
+        public Attribute Marked => HotNormal;
+        public Attribute MarkedSelected => HotFocus;
     }
 
     public static class Colors {
         public static ColorScheme Base, Dialog, Menu, Error;
 
-        public 
     }
 
     public abstract class ConsoleDriver {
@@ -41,7 +59,15 @@ namespace Terminal {
         public abstract void Refresh ();
         public abstract void End ();
         public abstract void RedrawTop ();
-        public abstract void SetColor (Color c);
+        public abstract void SetAttribute (Attribute c);
+
+        // Set Colors from limit sets of colors
+        public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
+
+        // Advanced uses - set colors to any pre-set pairs, you would need to init_color
+        // that independently with the R, G, B values.
+        public abstract void SetColors (short foreColorId, short backgroundColorId);
+
         public abstract void DrawFrame (Rect region, bool fill);
 
         Rect clip;
@@ -95,16 +121,44 @@ namespace Terminal {
         public override void Refresh() => Curses.refresh ();
         public override void End() => Curses.endwin ();
         public override void RedrawTop() => window.redrawwin ();
-        public override void SetColor (Color c) => Curses.attrset (c.value);
+        public override void SetAttribute (Attribute c) => Curses.attrset (c.value);
         public Curses.Window window;
 
-        static short last_color_pair;
-        static Color MakeColor (short f, short b)
+        static short last_color_pair = 16;
+        static Attribute MakeColor (short f, short b)
         {
             Curses.InitColorPair (++last_color_pair, f, b);
-            return new Color () { value = Curses.ColorPair (last_color_pair) };
+            return new Attribute () { value = Curses.ColorPair (last_color_pair) };
         }
 
+        int [,] colorPairs = new int [16, 16];
+
+        public override void SetColors (ConsoleColor foreground, ConsoleColor background)
+        {
+            int f = (short) foreground;
+            int b = (short)background;
+            var v = colorPairs [f, b];
+            if ((v & 0x10000) == 0) {
+                b = b & 0x7;
+                bool bold = (f & 0x8) != 0;
+                f = f & 0x7;
+
+                v = MakeColor ((short)f, (short)b) | (bold ? Curses.A_BOLD : 0);
+                colorPairs [(int)foreground, (int)background] = v | 0x1000;
+            }
+            SetAttribute (v & 0xffff);
+        }
+
+        Dictionary<int, int> rawPairs = new Dictionary<int, int> ();
+        public override void SetColors (short foreColorId, short backgroundColorId)
+        {
+            int key = (((ushort)foreColorId << 16)) | (ushort) backgroundColorId;
+            if (!rawPairs.TryGetValue (key, out var v)) {
+                v = MakeColor (foreColorId, backgroundColorId);
+                rawPairs [key] = v;
+            }
+            SetAttribute (v);
+        }
         public override void PrepareToRun()
         {
             Curses.timeout (-1);

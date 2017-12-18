@@ -477,10 +477,10 @@ namespace Terminal {
 
         public override void Redraw (Rect bounds)
         {
-            Driver.SetColor (Colors.Base.Normal);
+            Driver.SetAttribute (Colors.Base.Normal);
             DrawFrame ();
             if (HasFocus)
-                Driver.SetColor (Colors.Dialog.Normal);
+                Driver.SetAttribute (Colors.Dialog.Normal);
             var width = Frame.Width;
             if (Title != null && width > 4) {
                 Move (1, 0);
@@ -489,7 +489,7 @@ namespace Terminal {
                 Driver.AddStr (str);
                 Driver.AddCh (' ');
             }
-            Driver.SetColor (Colors.Dialog.Normal);
+            Driver.SetAttribute (Colors.Dialog.Normal);
             contentView.Redraw (contentView.Bounds);
         }
     }

@@ -114,9 +114,9 @@ namespace Terminal {
                 Recalc ();
             
             if (TextColor != -1)
-                Driver.SetColor (TextColor);
+                Driver.SetAttribute (TextColor);
             else
-                Driver.SetColor(Colors.Base.Normal);
+                Driver.SetAttribute(Colors.Base.Normal);
 
             Clear ();
             Move (Frame.X, Frame.Y);
@@ -167,8 +167,8 @@ namespace Terminal {
         /// <summary>
         ///   The color used for the label
         /// </summary>        
-        Color textColor = -1;
-        public Color TextColor {
+        Attribute textColor = -1;
+        public Attribute TextColor {
             get => textColor;
             set {
                 textColor = value;
