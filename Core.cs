@@ -3,6 +3,8 @@
 // Pending:
 //   - Check for NeedDisplay on the hierarchy and repaint
 //   - Layout support
+//   - "Colors" type or "Attributes" type?
+//   - What to surface as "BackgroundCOlor" when clearing a window, an attribute or colors?
 //
 // Optimziations
 //   - Add rendering limitation to the exposed area
@@ -17,7 +19,79 @@ namespace Terminal {
         public bool HasFocus { get; internal set; }
 
         // Key handling
-        public virtual void KeyDown (Event.Key kb) { }
+        /// <summary>
+        ///   This method can be overwritten by view that
+        ///     want to provide accelerator functionality
+        ///     (Alt-key for example).
+        /// </summary>
+        /// <remarks>
+        ///   <para>
+        ///     Before keys are sent to the subview on the
+        ///     current view, all the views are
+        ///     processed and the key is passed to the widgets
+        ///     to allow some of them to process the keystroke
+        ///     as a hot-key. </para>
+        ///  <para>
+        ///     For example, if you implement a button that
+        ///     has a hotkey ok "o", you would catch the
+        ///     combination Alt-o here.  If the event is
+        ///     caught, you must return true to stop the
+        ///     keystroke from being dispatched to other
+        ///     views.
+        ///  </para>
+        /// </remarks>
+
+        public virtual bool ProcessHotKey (KeyEvent kb)
+        {
+            return false;
+        }
+
+        /// <summary>
+        ///   If the view is focused, gives the view a
+        ///   chance to process the keystroke. 
+        /// </summary>
+        /// <remarks>
+        ///   <para>
+        ///     Views can override this method if they are
+        ///     interested in processing the given keystroke.
+        ///     If they consume the keystroke, they must
+        ///     return true to stop the keystroke from being
+        ///     processed by other widgets or consumed by the
+        ///     widget engine.    If they return false, the
+        ///     keystroke will be passed using the ProcessColdKey
+        ///     method to other views to process.
+        ///   </para>
+        /// </remarks>
+        public virtual bool ProcessKey (KeyEvent kb) 
+        { 
+            return false; 
+        }
+
+        /// <summary>
+        ///   This method can be overwritten by views that
+        ///     want to provide accelerator functionality
+        ///     (Alt-key for example), but without
+        ///     interefering with normal ProcessKey behavior.
+        /// </summary>
+        /// <remarks>
+        ///   <para>
+        ///     After keys are sent to the subviews on the
+        ///     current view, all the view are
+        ///     processed and the key is passed to the views
+        ///     to allow some of them to process the keystroke
+        ///     as a cold-key. </para>
+        ///  <para>
+        ///    This functionality is used, for example, by
+        ///    default buttons to act on the enter key.
+        ///    Processing this as a hot-key would prevent
+        ///    non-default buttons from consuming the enter
+        ///    keypress when they have the focus.
+        ///  </para>
+        /// </remarks>
+        public virtual bool ProcessColdKey (KeyEvent kb)
+        {
+            return false;
+        }
 
         // Mouse events
         public virtual void MouseEvent (Event.Mouse me) { }
@@ -56,6 +130,8 @@ namespace Terminal {
                 Frame = new Rect (frame.Location, value.Size);
             }
         }
+
+        public View SuperView => container;
 
         public View (Rect frame)
         {
@@ -224,6 +300,12 @@ namespace Terminal {
         }
 
         /// <summary>
+        /// Returns the currently focused view inside this view, or null if nothing is focused.
+        /// </summary>
+        /// <value>The focused.</value>
+        public View Focused => focused;
+
+        /// <summary>
         /// Displays the specified character in the specified column and row.
         /// </summary>
         /// <param name="col">Col.</param>
@@ -305,6 +387,9 @@ namespace Terminal {
         /// </summary>
         public void FocusFirst ()
         {
+            if (subviews == null)
+                return;
+            
             foreach (var view in subviews) {
                 if (view.CanFocus) {
                     SetFocus (view);
@@ -318,6 +403,9 @@ namespace Terminal {
         /// </summary>
         public void FocusLast ()
         {
+            if (subviews == null)
+                return;
+                        
             for (int i = subviews.Count; i > 0;) {
                 i--;
 
@@ -360,6 +448,7 @@ namespace Terminal {
                     return true;
                 }
             }
+        
             if (focused != null) {
                 focused.HasFocus = false;
                 focused = null;
@@ -425,6 +514,48 @@ namespace Terminal {
             return new Toplevel (new Rect (0, 0, Driver.Cols, Driver.Rows));
         }
 
+        public override bool CanFocus {
+            get => true;
+        }
+
+        public override bool ProcessKey (KeyEvent kb)
+        {
+            if (ProcessHotKey (kb))
+                return true;
+
+            // Process the key normally
+            if (Focused?.ProcessKey (kb) == true)
+                return true;
+
+            if (ProcessColdKey (kb))
+                return true;
+            
+            switch (kb.Key) {
+            case Key.ControlC:
+                // TODO: stop current execution of this container
+                break;
+            case Key.ControlZ:
+                // TODO: should suspend
+                // console_csharp_send_sigtstp ();
+                break;
+            case Key.Tab:
+                var old = Focused;
+                if (!FocusNext ())
+                    FocusNext ();
+                old?.SetNeedsDisplay ();
+                Focused?.SetNeedsDisplay ();
+                break;
+            case Key.BackTab:
+                old = Focused;
+                if (!FocusPrev ())
+                    FocusPrev ();
+                old?.SetNeedsDisplay ();
+                Focused?.SetNeedsDisplay ();
+                break;
+            }
+            return false;
+        }
+
 #if false
         public override void Redraw ()
         {
@@ -460,7 +591,7 @@ namespace Terminal {
             base.Add(contentView);
         }
 
-        public IEnumerator GetEnumerator ()
+        public new IEnumerator GetEnumerator ()
         {
             return contentView.GetEnumerator ();
         }
@@ -527,16 +658,10 @@ namespace Terminal {
             if (Top != null)
                 return;
 
-            Driver.Init ();
+            Driver.Init (TerminalResized);
             MainLoop = new Mono.Terminal.MainLoop ();
             Top = Toplevel.Create ();  
             focus = Top;
-
-            MainLoop.AddWatch (0, Mono.Terminal.MainLoop.Condition.PollIn, x => {
-                //ProcessChar ();
-
-				return true;
-			});
         }
 
         public class RunState : IDisposable {
@@ -561,6 +686,10 @@ namespace Terminal {
             }
         }
 
+        static void KeyEvent (Key key)
+        {
+        }
+
         static public RunState Begin (Toplevel toplevel)
         {
             if (toplevel == null)
@@ -568,10 +697,8 @@ namespace Terminal {
             var rs = new RunState (toplevel);
 
             Init ();
-            Driver.PrepareToRun ();
-
             toplevels.Push (toplevel);
-
+            Driver.PrepareToRun (MainLoop, toplevel);
             toplevel.LayoutSubviews ();
             toplevel.FocusFirst ();
             Redraw (toplevel);
@@ -673,6 +800,13 @@ namespace Terminal {
             var runToken = Begin (view);
             RunLoop (runToken);
             End (runToken);
+        }
+
+        static void TerminalResized ()
+        {
+            foreach (var t in toplevels) {
+                t.Frame = new Rect (0, 0, Driver.Cols, Driver.Rows);
+            }
         }
     }
 }

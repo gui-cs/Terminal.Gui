@@ -40,6 +40,7 @@
     <Compile Include="Types\Size.cs" />
     <Compile Include="demo.cs" />
     <Compile Include="Views\Label.cs" />
+    <Compile Include="Views\TextField.cs" />
   </ItemGroup>
   <ItemGroup>
    <Reference Include="mono-curses.dll">

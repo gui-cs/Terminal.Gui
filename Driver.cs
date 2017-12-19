@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using Mono.Terminal;
 using Unix.Terminal;
 
 namespace Terminal {
-    public enum Color
-    {
+
+    /// <summary>
+    /// Basic colors that can be used to set the foreground and background colors in console applications.  These can only be
+    /// </summary>
+    public enum Color {
         Black,
         Blue,
         Green,
@@ -49,13 +53,13 @@ namespace Terminal {
     }
 
     public abstract class ConsoleDriver {
-        public abstract int Cols {get;}
-        public abstract int Rows {get;}
-        public abstract void Init ();
+        public abstract int Cols { get; }
+        public abstract int Rows { get; }
+        public abstract void Init (Action terminalResized);
         public abstract void Move (int col, int row);
         public abstract void AddCh (int ch);
         public abstract void AddStr (string str);
-        public abstract void PrepareToRun ();
+        public abstract void PrepareToRun (MainLoop mainLoop, Responder target);
         public abstract void Refresh ();
         public abstract void End ();
         public abstract void RedrawTop ();
@@ -78,6 +82,8 @@ namespace Terminal {
     }
 
     public class CursesDriver : ConsoleDriver {
+        Action terminalResized;
+
         public override int Cols => Curses.Cols;
         public override int Rows => Curses.Lines;
 
@@ -115,12 +121,12 @@ namespace Terminal {
         {
             // TODO; optimize this to determine if the str fits in the clip region, and if so, use Curses.addstr directly
             foreach (var c in str)
-                AddCh ((int) c);
+                AddCh ((int)c);
         }
 
-        public override void Refresh() => Curses.refresh ();
-        public override void End() => Curses.endwin ();
-        public override void RedrawTop() => window.redrawwin ();
+        public override void Refresh () => Curses.refresh ();
+        public override void End () => Curses.endwin ();
+        public override void RedrawTop () => window.redrawwin ();
         public override void SetAttribute (Attribute c) => Curses.attrset (c.value);
         public Curses.Window window;
 
@@ -135,7 +141,7 @@ namespace Terminal {
 
         public override void SetColors (ConsoleColor foreground, ConsoleColor background)
         {
-            int f = (short) foreground;
+            int f = (short)foreground;
             int b = (short)background;
             var v = colorPairs [f, b];
             if ((v & 0x10000) == 0) {
@@ -152,16 +158,80 @@ namespace Terminal {
         Dictionary<int, int> rawPairs = new Dictionary<int, int> ();
         public override void SetColors (short foreColorId, short backgroundColorId)
         {
-            int key = (((ushort)foreColorId << 16)) | (ushort) backgroundColorId;
+            int key = (((ushort)foreColorId << 16)) | (ushort)backgroundColorId;
             if (!rawPairs.TryGetValue (key, out var v)) {
                 v = MakeColor (foreColorId, backgroundColorId);
                 rawPairs [key] = v;
             }
             SetAttribute (v);
         }
-        public override void PrepareToRun()
+
+        static Key MapCursesKey (int cursesKey)
+        {
+            switch (cursesKey) {
+            case Curses.KeyF1: return Key.F1;
+            case Curses.KeyF2: return Key.F2;
+            case Curses.KeyF3: return Key.F3;
+            case Curses.KeyF4: return Key.F4;
+            case Curses.KeyF5: return Key.F5;
+            case Curses.KeyF6: return Key.F6;
+            case Curses.KeyF7: return Key.F7;
+            case Curses.KeyF8: return Key.F8;
+            case Curses.KeyF9: return Key.F9;
+            case Curses.KeyF10: return Key.F10;
+            case Curses.KeyUp: return Key.CursorUp;
+            case Curses.KeyDown: return Key.CursorDown;
+            case Curses.KeyLeft: return Key.CursorLeft;
+            case Curses.KeyRight: return Key.CursorRight;
+            case Curses.KeyHome: return Key.Home;
+            case Curses.KeyEnd: return Key.End;
+            case Curses.KeyNPage: return Key.PageDown;
+            case Curses.KeyPPage: return Key.PageUp;
+            case Curses.KeyDeleteChar: return Key.DeleteChar;
+            case Curses.KeyInsertChar: return Key.InsertChar;
+            case Curses.KeyBackTab: return Key.BackTab;
+            default: return Key.Unknown;
+            }
+        }
+
+        void ProcessInput (Responder handler)
+        {
+            var code = Curses.getch ();
+            if ((code == -1) || (code == Curses.KeyResize)) {
+                if (Curses.CheckWinChange ()) {
+                    terminalResized ();
+                }
+            }
+            if (code == Curses.KeyMouse) {
+                // TODO
+                // Curses.MouseEvent ev;
+                // Curses.getmouse (out ev);
+                // handler.HandleMouse ();
+                return;
+            }
+
+            // ESC+letter is Alt-Letter.
+            if (code == 27) {
+                Curses.timeout (100);
+                int k = Curses.getch ();
+                if (k != Curses.ERR && k != 27) {
+                    var mapped = MapCursesKey (k) | Key.AltMask;
+                    handler.ProcessKey (new KeyEvent (mapped));
+                } 
+            } else {
+                    handler.ProcessKey (new KeyEvent (MapCursesKey (code)));
+            }
+        }
+
+        public override void PrepareToRun (MainLoop mainLoop, Responder handler)
         {
             Curses.timeout (-1);
+
+            mainLoop.AddWatch (0, Mono.Terminal.MainLoop.Condition.PollIn, x => {
+                ProcessInput (handler);
+                return true;
+            });
+
         }
 
         public override void DrawFrame (Rect region, bool fill)
@@ -192,7 +262,7 @@ namespace Terminal {
             AddCh (Curses.ACS_LRCORNER);
         }
 
-        public override void Init()
+        public override void Init(Action terminalResized)
         {
             if (window != null)
                 return;
@@ -205,6 +275,7 @@ namespace Terminal {
             Curses.raw ();
             Curses.noecho ();
             Curses.Window.Standard.keypad (true);
+            this.terminalResized = terminalResized;
         
             Colors.Base = new ColorScheme ();
             Colors.Dialog = new ColorScheme ();
