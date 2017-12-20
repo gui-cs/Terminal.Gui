@@ -41,6 +41,7 @@
     <Compile Include="demo.cs" />
     <Compile Include="Views\Label.cs" />
     <Compile Include="Views\TextField.cs" />
+    <Compile Include="Views\Button.cs" />
   </ItemGroup>
   <ItemGroup>
    <Reference Include="mono-curses.dll">

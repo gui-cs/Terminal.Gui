@@ -396,8 +396,10 @@ namespace Terminal {
         /// </summary>
         public void FocusFirst ()
         {
-            if (subviews == null)
+            if (subviews == null) {
+                SuperView.SetFocus (this);
                 return;
+            }
             
             foreach (var view in subviews) {
                 if (view.CanFocus) {
