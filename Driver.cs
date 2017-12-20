@@ -196,31 +196,37 @@ namespace Terminal {
 
         void ProcessInput (Responder handler)
         {
-            var code = Curses.getch ();
-            if ((code == -1) || (code == Curses.KeyResize)) {
-                if (Curses.CheckWinChange ()) {
-                    terminalResized ();
+            int wch;
+            var code = Curses.get_wch (out wch);
+            if (code == Curses.KEY_CODE_YES) {
+                if (wch == Curses.KeyResize) {
+                    if (Curses.CheckWinChange ()) {
+                        terminalResized ();
+                        return;
+                    }
                 }
-            }
-            if (code == Curses.KeyMouse) {
-                // TODO
-                // Curses.MouseEvent ev;
-                // Curses.getmouse (out ev);
-                // handler.HandleMouse ();
+                if (code == Curses.KeyMouse) {
+                    // TODO
+                    // Curses.MouseEvent ev;
+                    // Curses.getmouse (out ev);
+                    // handler.HandleMouse ();
+                    return;
+                }
+                handler.ProcessKey (new KeyEvent (MapCursesKey (wch)));
                 return;
             }
 
-            // ESC+letter is Alt-Letter.
-            if (code == 27) {
+            // Special handling for ESC, we want to try to catch ESC+letter to simulate alt-letter.
+            if (wch == 27) {
                 Curses.timeout (100);
-                int k = Curses.getch ();
-                if (k != Curses.ERR && k != 27) {
-                    var mapped = MapCursesKey (k) | Key.AltMask;
-                    handler.ProcessKey (new KeyEvent (mapped));
-                } 
-            } else {
-                    handler.ProcessKey (new KeyEvent (MapCursesKey (code)));
-            }
+
+                code = Curses.get_wch (out wch);
+                if (code == Curses.KEY_CODE_YES) 
+                    handler.ProcessKey (new KeyEvent (Key.AltMask | MapCursesKey (wch)));
+                if (code == 0)
+                    handler.ProcessKey (new KeyEvent (Key.AltMask | (Key)wch));
+            } else 
+                handler.ProcessKey (new KeyEvent ((Key)wch));
         }
 
         public override void PrepareToRun (MainLoop mainLoop, Responder handler)

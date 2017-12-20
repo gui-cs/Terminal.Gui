@@ -64,7 +64,7 @@ namespace Terminal {
         /// </remarks>
         public virtual bool ProcessKey (KeyEvent kb) 
         { 
-            return false; 
+            return false;
         }
 
         /// <summary>
@@ -373,6 +373,15 @@ namespace Terminal {
             focused.PositionCursor ();
         }
 
+        public override bool ProcessKey (KeyEvent kb)
+        {
+            if (Focused?.ProcessKey (kb) == true)
+                return true;
+
+            return false;
+        }
+
+
         /// <summary>
         /// Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise, it does nothing.
         /// </summary>
@@ -523,10 +532,10 @@ namespace Terminal {
             if (ProcessHotKey (kb))
                 return true;
 
-            // Process the key normally
-            if (Focused?.ProcessKey (kb) == true)
+            if (base.ProcessKey (kb))
                 return true;
-
+            
+            // Process the key normally
             if (ProcessColdKey (kb))
                 return true;
             
