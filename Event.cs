@@ -76,7 +76,7 @@ namespace Terminal {
 
     public struct KeyEvent {
         public Key Key;
-        public int KeyValue => (int)KeyValue;
+        public int KeyValue => (int)Key;
         public bool IsAlt => (Key & Key.AltMask) != 0;
         public bool IsCtrl => ((uint)Key >= 1) && ((uint)Key <= 26);
 

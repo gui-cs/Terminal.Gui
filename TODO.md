@@ -58,6 +58,10 @@ model, but needs revisiting in the new model.
 On the demo, press tab twice, instead of selecting Ok, the first tab
 does nothing, the second tab clears the screen.
 
+	=> Explanation: the Window gets a NeedsDisplay, so it displays
+	   tiself, but the contentView does not have NeedsDisplay
+	   set recursively, so it does not render any of the subviews
+
 # Merge Responder into View
 
 # Make HasFocus implicitly call SetNeedsDisplay
