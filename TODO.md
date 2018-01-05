@@ -59,5 +59,7 @@ For now it is split, in case we want to introduce formal view controllers.  But 
 
 It is still pending.
 
+Should allow for views to be dragged, in particular Window should allow this
+
 
 
