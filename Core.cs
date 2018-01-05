@@ -318,6 +318,25 @@ namespace Terminal {
 		}
 
 		/// <summary>
+		/// Utility function to draw strings that contain a hotkey
+		/// </summary>
+		/// <param name="s">String to display, the underscoore before a letter flags the next letter as the hotkey.</param>
+		/// <param name="hotColor">Hot color.</param>
+		/// <param name="normalColor">Normal color.</param>
+		public void DrawHotString (string text, Attribute hotColor, Attribute normalColor)
+		{
+			Driver.SetAttribute (normalColor);
+			foreach (var c in text) {
+				if (c == '_') {
+					Driver.SetAttribute (hotColor);
+					continue;
+				}
+				Driver.AddCh (c);
+				Driver.SetAttribute (normalColor);
+			}
+		}
+
+		/// <summary>
 		/// This moves the cursor to the specified column and row in the view.
 		/// </summary>
 		/// <returns>The move.</returns>

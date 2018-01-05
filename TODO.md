@@ -47,21 +47,17 @@ Unclear what to do about that right now.
 
 Needs to move to `ustring` from `NStack.Core` to get full Unicode support.
 
-# Focus
-
-When SetFocus is called, it need to ensure that the chain up the views is
-focused as well, something that we got for free in the old Container/Widget
-model, but needs revisiting in the new model.
-
-# Bugs
-
-On the demo, press tab twice, instead of selecting Ok, the first tab
-does nothing, the second tab clears the screen.
-
-	=> Explanation: the Window gets a NeedsDisplay, so it displays
-	   tiself, but the contentView does not have NeedsDisplay
-	   set recursively, so it does not render any of the subviews
+Should get NStack.Core to move `ustring` to `System`.
 
 # Merge Responder into View
 
-# Make HasFocus implicitly call SetNeedsDisplay
+For now it is split, in case we want to introduce formal view controllers.  But the design becomes very ugly.
+
+# Bugs
+
+# Mouse support
+
+It is still pending.
+
+
+

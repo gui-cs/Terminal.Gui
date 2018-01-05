@@ -52,6 +52,10 @@ namespace Terminal {
 
 	}
 
+	public enum SpecialChar {
+		HLine,
+	}
+
 	public abstract class ConsoleDriver {
 		public abstract int Cols { get; }
 		public abstract int Rows { get; }
@@ -73,6 +77,7 @@ namespace Terminal {
 		public abstract void SetColors (short foreColorId, short backgroundColorId);
 
 		public abstract void DrawFrame (Rect region, bool fill);
+		public abstract void AddSpecial (SpecialChar ch);
 
 		Rect clip;
 		public Rect Clip {
@@ -115,6 +120,15 @@ namespace Terminal {
 			} else
 				needMove = true;
 			ccol++;
+		}
+
+		public override void AddSpecial (SpecialChar ch)
+		{
+			switch (ch) {
+			case SpecialChar.HLine:
+				AddCh (Curses.ACS_HLINE);
+				break;
+			}
 		}
 
 		public override void AddStr (string str)

@@ -17,8 +17,9 @@ class Demo {
 			new TextField (14, 2, 40, ""),
 			new Label (3, 4, "Password: "),
 			new TextField (14, 4, 40, "") { Secret = true },
-			new Button (3, 6, "Ok"),
-			new Button (10, 6, "Cancel")
+			new CheckBox (3, 6, "Remember me"),
+			new Button (3, 8, "Ok"),
+			new Button (10, 8, "Cancel")
 		);
 	}
 
@@ -26,11 +27,28 @@ class Demo {
 	{
 		Application.Init ();
 		var top = Application.Top;
-		var win = new Window (new Rect (0, 0, 80, 24), "Hello");
+		var tframe = top.Frame;
+
+		var win = new Window (new Rect (0, 1, tframe.Width, tframe.Height-1), "Hello");
+		var menu = new MenuBar (new MenuBarItem [] {
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("New", "", null),
+				new MenuItem ("Open", "", null),
+				new MenuItem ("Close", "", null),
+				new MenuItem ("Quit", "", null)
+			}),
+			new MenuBarItem ("Edit", new MenuItem [] {
+				new MenuItem ("Copy", "", null),
+				new MenuItem ("Cut", "", null),
+				new MenuItem ("Paste", "", null)
+			})
+		});
 
 		ShowEntries (win);
+
 		// ShowTextAlignments (win);
 		top.Add (win);
+		top.Add (menu);
 		Application.Run ();
 	}
 }

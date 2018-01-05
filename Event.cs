@@ -44,6 +44,7 @@ namespace Terminal {
 		ControlY,
 		ControlZ,
 		Esc = 27,
+		Enter = '\n',
 		Space = 32,
 		Delete = 127,
 
