@@ -16,7 +16,7 @@ namespace Terminal {
 
 	public class Responder {
 		public virtual bool CanFocus { get; set; }
-		public bool HasFocus { get; internal set; }
+		public virtual bool HasFocus { get; internal set; }
 
 		// Key handling
 		/// <summary>
@@ -198,6 +198,14 @@ namespace Terminal {
 				CanFocus = true;
 		}
 
+		public void Add (params View [] views)
+		{
+			if (views == null)
+				return;
+			foreach (var view in views)
+				Add (view);
+		}
+
 		/// <summary>
 		///   Removes all the widgets from this container.
 		/// </summary>
@@ -332,6 +340,16 @@ namespace Terminal {
 				Move (frame.X, frame.Y);
 		}
 
+		public override bool HasFocus {
+			get {
+				return base.HasFocus;
+			}
+			internal set {
+				if (base.HasFocus != value)
+					SetNeedsDisplay ();
+				base.HasFocus = value;
+			}
+		}
 		/// <summary>
 		/// Returns the currently focused view inside this view, or null if nothing is focused.
 		/// </summary>
@@ -403,13 +421,12 @@ namespace Terminal {
 			if (c == null)
 				throw new ArgumentException ("the specified view is not part of the hierarchy of this view");
 
-			if (focused != null)
+			if (focused != null) 
 				focused.HasFocus = false;
+			
 			focused = view;
-			view.HasFocus = true;
-			if (view != null)
-				view.EnsureFocus ();
-			focused.PositionCursor ();
+			focused.HasFocus = true;
+			focused.EnsureFocus ();
 		}
 
 		public override bool ProcessKey (KeyEvent kb)
@@ -420,6 +437,25 @@ namespace Terminal {
 			return false;
 		}
 
+		public override bool ProcessHotKey (KeyEvent kb)
+		{
+			if (subviews == null || subviews.Count == 0)
+				return false;
+			foreach (var view in subviews)
+				if (view.ProcessHotKey (kb))
+					return true;
+			return false;
+		}
+
+		public override bool ProcessColdKey (KeyEvent kb)
+		{
+			if (subviews == null || subviews.Count == 0)
+				return false;
+			foreach (var view in subviews)
+				if (view.ProcessHotKey (kb))
+					return true;
+			return false;
+		}
 
 		/// <summary>
 		/// Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise, it does nothing.
@@ -677,19 +713,21 @@ namespace Terminal {
 
 		public override void Redraw (Rect bounds)
 		{
-			Driver.SetAttribute (Colors.Base.Normal);
-			DrawFrame ();
-			if (HasFocus)
+			if (NeedDisplay) {
+				Driver.SetAttribute (Colors.Base.Normal);
+				DrawFrame ();
+				if (HasFocus)
+					Driver.SetAttribute (Colors.Dialog.Normal);
+				var width = Frame.Width;
+				if (Title != null && width > 4) {
+					Move (1, 0);
+					Driver.AddCh (' ');
+					var str = Title.Length > width ? Title.Substring (0, width - 4) : Title;
+					Driver.AddStr (str);
+					Driver.AddCh (' ');
+				}
 				Driver.SetAttribute (Colors.Dialog.Normal);
-			var width = Frame.Width;
-			if (Title != null && width > 4) {
-				Move (1, 0);
-				Driver.AddCh (' ');
-				var str = Title.Length > width ? Title.Substring (0, width - 4) : Title;
-				Driver.AddStr (str);
-				Driver.AddCh (' ');
 			}
-			Driver.SetAttribute (Colors.Dialog.Normal);
 			contentView.Redraw (contentView.Bounds);
 		}
 	}
@@ -848,6 +886,7 @@ namespace Terminal {
 					return;
 				if (state.Toplevel.NeedDisplay || state.Toplevel.childNeedsDisplay) {
 					state.Toplevel.Redraw (state.Toplevel.Bounds);
+					state.Toplevel.PositionCursor ();
 					Driver.Refresh ();
 				}
 			}

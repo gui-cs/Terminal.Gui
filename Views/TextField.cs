@@ -105,7 +105,7 @@ namespace Terminal {
 				if (p < text.Length) {
 					Driver.AddCh (Secret ? '*' : text [p]);
 				} else
-					Driver.AddCh ('_');
+					Driver.AddCh (' ');
 			}
 			PositionCursor ();
 		}
