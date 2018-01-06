@@ -1,4 +1,13 @@
-﻿using System;
+﻿//
+// Authors:
+//   Miguel de Icaza (miguel@gnome.org)
+//
+// TODO:
+//   Add accelerator support (ShortCut in MenuItem)
+//   Add mouse support
+//   Allow menus inside menus
+
+using System;
 namespace Terminal {
 
 	/// <summary>
@@ -10,12 +19,31 @@ namespace Terminal {
 			Title = title ?? "";
 			Help = help ?? "";
 			Action = action;
-			Width = Title.Length + Help.Length + 1;
+			bool nextIsHot = false;
+			foreach (var x in title) {
+				if (x == '_')
+					nextIsHot = true;
+				else {
+					if (nextIsHot) {
+						HotKey = x;
+						break;
+					}
+					nextIsHot = false;
+				}
+			}
 		}
+
+		// The hotkey is used when the menu is active, the shortcut can be triggered
+		// when the menu is not active.
+		// For example HotKey would be "N" when the File Menu is open (assuming there is a "_New" entry
+		// if the ShortCut is set to "Control-N", this would be a global hotkey that would trigger as well
+		public char HotKey;
+		public Key ShortCut;
+
 		public string Title { get; set; }
 		public string Help { get; set; }
 		public Action Action { get; set; }
-		public int Width { get; set; }
+		internal int Width => Title.Length + Help.Length + 1 + 2;
 	}
 
 	/// <summary>
@@ -33,6 +61,93 @@ namespace Terminal {
 		public int Current { get; set; }
 	}
 
+	class Menu : View {
+		MenuBarItem barItems;
+		MenuBar host;
+
+		static Rect MakeFrame (int x, int y, MenuItem [] items)
+		{
+			int maxW = 0;
+
+			foreach (var item in items) {
+				var l = item.Width;
+				maxW = Math.Max (l, maxW);
+			}
+
+			return new Rect (x, y, maxW + 2, items.Length + 2);
+		}
+
+		public Menu (MenuBar host, int x, int y, MenuBarItem barItems) : base (MakeFrame (x, y, barItems.Children))
+		{
+			this.barItems = barItems;
+			this.host = host;
+			CanFocus = true;
+		}
+
+		public override void Redraw (Rect region)
+		{
+			Driver.SetAttribute (Colors.Menu.Normal);
+			DrawFrame (region, true);
+
+			for (int i = 0; i < barItems.Children.Length; i++){
+				var item = barItems.Children [i];
+				Move (1, i+1);
+				Driver.SetAttribute (item == null ? Colors.Base.Focus : i == barItems.Current ? Colors.Menu.Focus : Colors.Menu.Normal);
+				for (int p = 0; p < Frame.Width-2; p++)
+					if (item == null)
+						Driver.AddSpecial (SpecialChar.HLine);
+					else
+						Driver.AddCh (' ');
+
+				if (item == null)
+					continue;
+
+				Move (2, i + 1);
+				DrawHotString (item.Title,
+				               i == barItems.Current ? Colors.Menu.HotFocus : Colors.Menu.HotNormal,
+				               i == barItems.Current ? Colors.Menu.Focus : Colors.Menu.Normal);
+
+				// The help string
+				var l = item.Help.Length;
+				Move (Frame.Width - l - 2, 1 + i);
+				Driver.AddStr (item.Help);
+			}
+		}
+
+		public override void PositionCursor ()
+		{
+			Move (2, 1 + barItems.Current);
+		}
+
+		public override bool ProcessKey (KeyEvent kb)
+		{
+			switch (kb.Key) {
+			case Key.CursorUp:
+				barItems.Current--;
+				if (barItems.Current < 0)
+					barItems.Current = barItems.Children.Length - 1;
+				SetNeedsDisplay ();
+				break;
+			case Key.CursorDown:
+				barItems.Current++;
+				if (barItems.Current == barItems.Children.Length)
+					barItems.Current = 0;
+				SetNeedsDisplay ();
+				break;
+			case Key.CursorLeft:
+				host.PreviousMenu ();
+				break;
+			case Key.CursorRight:
+				host.NextMenu ();
+				break;
+			case Key.Esc:
+				host.CloseMenu ();
+				break;
+			}
+			return true;
+		}
+	}
+
 	/// <summary>
 	/// A menu bar for your application.
 	/// </summary>
@@ -40,6 +155,7 @@ namespace Terminal {
 		public MenuBarItem [] Menus { get; set; }
 		int selected;
 		Action action;
+		bool opened;
 
 		public MenuBar (MenuBarItem [] menus) : base (new Rect (0, 0, Application.Driver.Cols, 1))
 		{
@@ -87,30 +203,7 @@ namespace Terminal {
 			}
 			max += 4;
 			DrawFrame (new Rect (col, line, max, menu.Children.Length + 2), true);
-			for (int i = 0; i < menu.Children.Length; i++) {
-				var item = menu.Children [i];
 
-				Move (line + 1 + i, col + 1);
-				Driver.SetAttribute (item == null ? Colors.Base.Focus : i == menu.Current ? Colors.Menu.MarkedSelected : Colors.Menu.Marked);
-				for (int p = 0; p < max - 2; p++)
-					if (item == null)
-						Driver.AddSpecial (SpecialChar.HLine);
-					else
-						Driver.AddCh (' ');
-
-				if (item == null)
-					continue;
-
-				Move (line + 1 + i, col + 2);
-				DrawHotString (item.Title,
-				               i == menu.Current ? Colors.Menu.HotFocus: Colors.Menu.HotNormal,
-				               i == menu.Current ? Colors.Menu.MarkedSelected : Colors.Menu.Marked);
-
-				// The help string
-				var l = item.Help.Length;
-				Move (col + max - l - 2, line + 1 + i); 
-				Driver.AddStr (item.Help);
-			}
 		}
 
 		public override void Redraw (Rect region)
@@ -121,26 +214,24 @@ namespace Terminal {
 				Driver.AddCh (' ');
 
 			Move (1, 0);
-			int pos = 0;
+			int pos = 1;
+
 			for (int i = 0; i < Menus.Length; i++) {
 				var menu = Menus [i];
 				if (i == selected) {
 					DrawMenu (i, pos, 1);
-					Driver.SetAttribute (Colors.Menu.MarkedSelected);
-				} else
-					Driver.SetAttribute (Colors.Menu.Focus);
-
+				}
 				Move (pos, 0);
-				Driver.AddCh (' ');
-				Driver.AddStr(menu.Title);
-				Driver.AddCh (' ');
-				if (HasFocus && i == selected)
-					Driver.SetAttribute (Colors.Menu.MarkedSelected);
-				else
-					Driver.SetAttribute (Colors.Menu.Marked);
-				Driver.AddStr ("  ");
-
-				pos += menu.Title.Length + 4;
+				Attribute hotColor, normalColor;
+				if (opened){
+					hotColor = i == selected ? Colors.Menu.HotFocus : Colors.Menu.HotNormal;
+					normalColor = i == selected ? Colors.Menu.Focus : Colors.Menu.Normal;
+				} else {
+					hotColor = Colors.Base.Focus;
+					normalColor = Colors.Base.Focus;
+				}
+				DrawHotString (" " + menu.Title + " " + "   ", hotColor, normalColor);
+				pos += menu.Title.Length + 3;
 			}
 			PositionCursor ();
 		}
@@ -164,6 +255,46 @@ namespace Terminal {
 		{
 			// TODO: Running = false;
 			action = item.Action;
+		}
+
+		Menu openMenu;
+		View focusedWhenOpened;
+
+		void OpenMenu ()
+		{
+			if (openMenu != null)
+				return;
+
+			focusedWhenOpened = SuperView.MostFocused;
+			openMenu = new Menu (this, 0, 1, Menus [0]);
+			// Save most deeply focused chain
+			SuperView.Add (openMenu);
+			SuperView.SetFocus (openMenu);
+		}
+
+		internal void CloseMenu ()
+		{
+			SetNeedsDisplay ();
+			SuperView.Remove (openMenu);
+			focusedWhenOpened.SuperView.SetFocus (focusedWhenOpened);
+			openMenu = null;
+		}
+
+		internal void PreviousMenu ()
+		{
+		}
+
+		internal void NextMenu ()
+		{
+			}
+
+		public override bool ProcessHotKey (KeyEvent kb)
+		{
+			if (kb.Key == Key.F9) {
+				OpenMenu ();
+				return true;
+			}
+			return base.ProcessHotKey (kb);
 		}
 
 		public override bool ProcessKey (KeyEvent kb)

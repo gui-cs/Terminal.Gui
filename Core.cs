@@ -196,6 +196,7 @@ namespace Terminal {
 			view.container = this;
 			if (view.CanFocus)
 				CanFocus = true;
+			SetNeedsDisplay ();
 		}
 
 		public void Add (params View [] views)
@@ -233,11 +234,18 @@ namespace Terminal {
 			if (view == null)
 				return;
 
+			SetNeedsDisplay ();
+			var touched = view.Frame;
 			subviews.Remove (view);
 			view.container = null;
 
 			if (subviews.Count < 1)
 				this.CanFocus = false;
+
+			foreach (var v in subviews) {
+				if (v.Frame.IntersectsWith (touched))
+					view.SetNeedsDisplay ();
+			}
 		}
 
 		/// <summary>
@@ -374,6 +382,17 @@ namespace Terminal {
 		/// </summary>
 		/// <value>The focused.</value>
 		public View Focused => focused;
+
+		public View MostFocused {
+			get {
+				if (Focused == null)
+					return null;
+				var most = Focused.MostFocused;
+				if (most != null)
+					return most;
+				return Focused;
+			}
+		}
 
 		/// <summary>
 		/// Displays the specified character in the specified column and row.

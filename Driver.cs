@@ -27,6 +27,14 @@ namespace Terminal {
 		White
 	}
 
+	/// <summary>
+	/// Attributes are used as elements that contain both a foreground and a background or platform specific features
+	/// </summary>
+	/// <remarks>
+	///   Attributes are needed to map colors to terminal capabilities that might lack colors, on color
+	///   scenarios, they encode both the foreground and the background color and are used in the ColorScheme
+	///   class to define color schemes that can be used in your application.
+	/// </remarks>
 	public struct Attribute {
 		internal int value;
 		public Attribute (int v)
@@ -38,13 +46,14 @@ namespace Terminal {
 		public static implicit operator Attribute (int v) => new Attribute (v);
 	}
 
+	/// <summary>
+	/// Color scheme definitions
+	/// </summary>
 	public class ColorScheme {
 		public Attribute Normal;
 		public Attribute Focus;
 		public Attribute HotNormal;
 		public Attribute HotFocus;
-		public Attribute Marked => HotNormal;
-		public Attribute MarkedSelected => HotFocus;
 	}
 
 	public static class Colors {
@@ -230,15 +239,28 @@ namespace Terminal {
 				return;
 			}
 
-			// Special handling for ESC, we want to try to catch ESC+letter to simulate alt-letter.
+			// Special handling for ESC, we want to try to catch ESC+letter to simulate alt-letter as well as Alt-Fkey
 			if (wch == 27) {
 				Curses.timeout (100);
 
 				code = Curses.get_wch (out wch);
 				if (code == Curses.KEY_CODE_YES)
 					handler.ProcessKey (new KeyEvent (Key.AltMask | MapCursesKey (wch)));
-				if (code == 0)
-					handler.ProcessKey (new KeyEvent (Key.AltMask | (Key)wch));
+				if (code == 0) {
+					KeyEvent key;
+
+					// The ESC-number handling, debatable.
+					if (wch >= '1' && wch <= '9')
+						key = new KeyEvent ((Key)((int)Key.F1 + (wch - '0' - 1)));
+					else if (wch == '0')
+						key = new KeyEvent (Key.F10);
+					else if (wch == 27)
+						key = new KeyEvent ((Key)wch);
+					else
+						key = new KeyEvent (Key.AltMask | (Key)wch);
+					handler.ProcessKey (key);
+				} else
+					handler.ProcessKey (new KeyEvent (Key.Esc));
 			} else
 				handler.ProcessKey (new KeyEvent ((Key)wch));
 		}
@@ -310,10 +332,17 @@ namespace Terminal {
 				Colors.Base.Focus = MakeColor (Curses.COLOR_BLACK, Curses.COLOR_CYAN);
 				Colors.Base.HotNormal = Curses.A_BOLD | MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_BLUE);
 				Colors.Base.HotFocus = Curses.A_BOLD | MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_CYAN);
-				Colors.Menu.Normal = Curses.A_BOLD | MakeColor (Curses.COLOR_WHITE, Curses.COLOR_CYAN);
-				Colors.Menu.Focus = Curses.A_BOLD | MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_CYAN);
-				Colors.Menu.HotNormal = Curses.A_BOLD | MakeColor (Curses.COLOR_WHITE, Curses.COLOR_BLACK);
+
+				// Focused, 
+				//    Selected, Hot: Yellow on Black
+				//    Selected, text: white on black
+				//    Unselected, hot: yellow on cyan
+				//    unselected, text: same as unfocused
 				Colors.Menu.HotFocus = Curses.A_BOLD | MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_BLACK);
+				Colors.Menu.Focus = Curses.A_BOLD | MakeColor (Curses.COLOR_WHITE, Curses.COLOR_BLACK);
+				Colors.Menu.HotNormal = Curses.A_BOLD | MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_CYAN);
+				Colors.Menu.Normal = Curses.A_BOLD | MakeColor (Curses.COLOR_WHITE, Curses.COLOR_CYAN);
+
 				Colors.Dialog.Normal = MakeColor (Curses.COLOR_BLACK, Curses.COLOR_WHITE);
 				Colors.Dialog.Focus = MakeColor (Curses.COLOR_BLACK, Curses.COLOR_CYAN);
 				Colors.Dialog.HotNormal = MakeColor (Curses.COLOR_BLUE, Curses.COLOR_WHITE);

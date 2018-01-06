@@ -19,7 +19,8 @@ class Demo {
 			new TextField (14, 4, 40, "") { Secret = true },
 			new CheckBox (3, 6, "Remember me"),
 			new Button (3, 8, "Ok"),
-			new Button (10, 8, "Cancel")
+			new Button (10, 8, "Cancel"),
+			new Label (3, 18, "Press ESC and 9 to activate the menubar")
 		);
 	}
 
@@ -31,16 +32,16 @@ class Demo {
 
 		var win = new Window (new Rect (0, 1, tframe.Width, tframe.Height-1), "Hello");
 		var menu = new MenuBar (new MenuBarItem [] {
-			new MenuBarItem ("File", new MenuItem [] {
-				new MenuItem ("New", "", null),
-				new MenuItem ("Open", "", null),
-				new MenuItem ("Close", "", null),
-				new MenuItem ("Quit", "", null)
+			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuItem ("_New", "", null),
+				new MenuItem ("_Open", "", null),
+				new MenuItem ("_Close", "", null),
+				new MenuItem ("_Quit", "", null)
 			}),
-			new MenuBarItem ("Edit", new MenuItem [] {
-				new MenuItem ("Copy", "", null),
-				new MenuItem ("Cut", "", null),
-				new MenuItem ("Paste", "", null)
+			new MenuBarItem ("_Edit", new MenuItem [] {
+				new MenuItem ("_Copy", "", null),
+				new MenuItem ("C_ut", "", null),
+				new MenuItem ("_Paste", "", null)
 			})
 		});
 
