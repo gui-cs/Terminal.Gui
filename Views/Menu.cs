@@ -1,4 +1,6 @@
 ﻿//
+// Menu.cs: application menus and submenus
+//
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
 //

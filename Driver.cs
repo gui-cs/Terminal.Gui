@@ -1,3 +1,9 @@
+//
+// Driver.cs: Abstract and concrete interfaces to the console (curses or console)
+//
+// Authors:
+//   Miguel de Icaza (miguel@gnome.org)
+//
 using System;
 using System.Collections.Generic;
 using Mono.Terminal;

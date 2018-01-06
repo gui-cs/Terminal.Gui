@@ -1,5 +1,9 @@
 //
-// 
+// Core.cs: The core engine for gui.cs
+//
+// Authors:
+//   Miguel de Icaza (miguel@gnome.org)
+//
 // Pending:
 //   - Check for NeedDisplay on the hierarchy and repaint
 //   - Layout support

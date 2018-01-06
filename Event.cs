@@ -1,3 +1,9 @@
+//
+// Evemts.cs: Events, Key mappings
+//
+// Authors:
+//   Miguel de Icaza (miguel@gnome.org)
+//
 namespace Terminal {
 
 	/// <summary>

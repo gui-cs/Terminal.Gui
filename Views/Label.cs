@@ -1,4 +1,10 @@
-﻿
+﻿//
+// Label.cs: Label control
+//
+// Authors:
+//   Miguel de Icaza (miguel@gnome.org)
+//
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

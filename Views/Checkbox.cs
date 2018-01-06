@@ -1,4 +1,10 @@
-﻿using System;
+﻿//
+// Checkbox.cs: Checkbox control
+//
+// Authors:
+//   Miguel de Icaza (miguel@gnome.org)
+//
+using System;
 
 namespace Terminal {
 	public class CheckBox : View {
