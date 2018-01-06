@@ -55,6 +55,8 @@ For now it is split, in case we want to introduce formal view controllers.  But 
 
 # Bugs
 
+There is a problem with the high-intensity colors, they are not showing up
+
 # Mouse support
 
 It is still pending.
