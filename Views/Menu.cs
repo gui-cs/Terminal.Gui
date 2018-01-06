@@ -5,10 +5,9 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 // TODO:
-//   Add accelerator support (ShortCut in MenuItem)
+//   Add accelerator support, but should also support chords (ShortCut in MenuItem)
 //   Add mouse support
 //   Allow menus inside menus
-//   Handle actual activation	
 
 using System;
 namespace Terminal {
@@ -55,29 +54,33 @@ namespace Terminal {
 	public class MenuBarItem {
 		public MenuBarItem (string title, MenuItem [] children)
 		{
-			Title = title ?? "";
+			SetTitle (title ?? "");
 			Children = children;
+		}
+
+		void SetTitle (string title)
+		{
+			if (title == null)
+				title = "";
+			Title = title;
+			int len = 0;
+			foreach (var ch in Title) {
+				if (ch == '_')
+					continue;
+				len++;
+			}
+			TitleLength = len;
 		}
 
 		public string Title { get; set; }
 		public MenuItem [] Children { get; set; }
-		public int Current { get; set; }
-		internal int TitleLength {
-			get {
-				int len = 0;
-				foreach (var ch in Title) {
-					if (ch == '_')
-						continue;
-					len++;
-				}
-				return len;
-			}
-		}
+		internal int TitleLength { get; private set; }
 	}
 
 	class Menu : View {
 		MenuBarItem barItems;
 		MenuBar host;
+		int current;
 
 		static Rect MakeFrame (int x, int y, MenuItem [] items)
 		{
@@ -106,7 +109,7 @@ namespace Terminal {
 			for (int i = 0; i < barItems.Children.Length; i++){
 				var item = barItems.Children [i];
 				Move (1, i+1);
-				Driver.SetAttribute (item == null ? Colors.Base.Focus : i == barItems.Current ? Colors.Menu.Focus : Colors.Menu.Normal);
+				Driver.SetAttribute (item == null ? Colors.Base.Focus : i == current ? Colors.Menu.Focus : Colors.Menu.Normal);
 				for (int p = 0; p < Frame.Width-2; p++)
 					if (item == null)
 						Driver.AddSpecial (SpecialChar.HLine);
@@ -118,8 +121,8 @@ namespace Terminal {
 
 				Move (2, i + 1);
 				DrawHotString (item.Title,
-				               i == barItems.Current ? Colors.Menu.HotFocus : Colors.Menu.HotNormal,
-				               i == barItems.Current ? Colors.Menu.Focus : Colors.Menu.Normal);
+				               i == current? Colors.Menu.HotFocus : Colors.Menu.HotNormal,
+				               i == current ? Colors.Menu.Focus : Colors.Menu.Normal);
 
 				// The help string
 				var l = item.Help.Length;
@@ -130,22 +133,33 @@ namespace Terminal {
 
 		public override void PositionCursor ()
 		{
-			Move (2, 1 + barItems.Current);
+			Move (2, 1 + current);
+		}
+
+		void Run (Action action)
+		{
+			if (action == null)
+				return;
+			
+			Application.MainLoop.AddIdle (() => {
+				action ();
+				return false;
+			});
 		}
 
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			switch (kb.Key) {
 			case Key.CursorUp:
-				barItems.Current--;
-				if (barItems.Current < 0)
-					barItems.Current = barItems.Children.Length - 1;
+				current--;
+				if (current < 0)
+					current = barItems.Children.Length - 1;
 				SetNeedsDisplay ();
 				break;
 			case Key.CursorDown:
-				barItems.Current++;
-				if (barItems.Current == barItems.Children.Length)
-					barItems.Current = 0;
+				current++;
+				if (current== barItems.Children.Length)
+					current = 0;
 				SetNeedsDisplay ();
 				break;
 			case Key.CursorLeft:
@@ -156,6 +170,24 @@ namespace Terminal {
 				break;
 			case Key.Esc:
 				host.CloseMenu ();
+				break;
+			case Key.Enter:
+				host.CloseMenu ();
+				Run (barItems.Children [current].Action);
+				break;
+			default:
+				// TODO: rune-ify
+				if (Char.IsLetterOrDigit ((char)kb.KeyValue)) {
+					var x = Char.ToUpper ((char)kb.KeyValue);
+
+					foreach (var item in barItems.Children) {
+						if (item.HotKey == x) {
+							host.CloseMenu ();
+							Run (item.Action);
+							return true;
+						}
+					}
+				}
 				break;
 			}
 			return true;
@@ -175,28 +207,6 @@ namespace Terminal {
 			Menus = menus;
 			CanFocus = false;
 			selected = -1;
-		}
-
-		/// <summary>
-		///   Activates the menubar
-		/// </summary>
-		public void Activate (int idx)
-		{
-			if (idx < 0 || idx > Menus.Length)
-				throw new ArgumentException ("idx");
-
-			action = null;
-			selected = idx;
-
-			foreach (var m in Menus)
-				m.Current = 0;
-
-			// TODO: Application.Run (this);
-			selected = -1;
-			SuperView.SetNeedsDisplay ();
-
-			if (action != null)
-				action ();
 		}
 
 		public override void Redraw (Rect region)
@@ -312,38 +322,14 @@ namespace Terminal {
 				StartMenu ();
 				return true;
 			}
+			var kc = kb.KeyValue;
+
 			return base.ProcessHotKey (kb);
 		}
 
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			switch (kb.Key) {
-			case Key.CursorUp:
-				if (Menus [selected].Children == null)
-					return false;
-
-				int current = Menus [selected].Current;
-				do {
-					current--;
-					if (current < 0)
-						current = Menus [selected].Children.Length - 1;
-				} while (Menus [selected].Children [current] == null);
-				Menus [selected].Current = current;
-
-				SetNeedsDisplay ();
-				return true;
-
-			case Key.CursorDown:
-				if (Menus [selected].Children == null)
-					return false;
-
-				do {
-					Menus [selected].Current = (Menus [selected].Current + 1) % Menus [selected].Children.Length;
-				} while (Menus [selected].Children [Menus [selected].Current] == null);
-
-				SetNeedsDisplay ();
-				break;
-
 			case Key.CursorLeft:
 				selected--;
 				if (selected < 0)
@@ -351,13 +337,6 @@ namespace Terminal {
 				break;
 			case Key.CursorRight:
 				selected = (selected + 1) % Menus.Length;
-				break;
-
-			case Key.Enter:
-				if (Menus [selected].Children == null)
-					return false;
-
-				Selected (Menus [selected].Children [Menus [selected].Current]);
 				break;
 
 			case Key.Esc:

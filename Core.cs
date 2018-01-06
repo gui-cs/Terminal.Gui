@@ -15,6 +15,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Terminal {
 
@@ -808,6 +809,35 @@ namespace Terminal {
 			throw new NotImplementedException ();
 		}
 
+		class MainLoopSyncContext : SynchronizationContext {
+			Mono.Terminal.MainLoop mainLoop;
+
+			public MainLoopSyncContext (Mono.Terminal.MainLoop mainLoop)
+			{
+				this.mainLoop = mainLoop;
+			}
+
+			public override SynchronizationContext CreateCopy ()
+			{
+				return new MainLoopSyncContext (MainLoop);
+			}
+
+			public override void Post (SendOrPostCallback d, object state)
+			{
+				mainLoop.AddIdle (() => { 
+					d (state);
+					return false;
+				});
+			}
+
+			public override void Send (SendOrPostCallback d, object state)
+			{
+				mainLoop.Invoke (() => {
+					d (state);
+				});
+			}
+		}
+
 		/// <summary>
 		/// Initializes the Application
 		/// </summary>
@@ -818,6 +848,7 @@ namespace Terminal {
 
 			Driver.Init (TerminalResized);
 			MainLoop = new Mono.Terminal.MainLoop ();
+			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			Top = Toplevel.Create ();
 			focus = Top;
 		}
