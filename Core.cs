@@ -105,7 +105,7 @@ namespace Terminal {
 		public static IList<View> empty = new List<View> (0).AsReadOnly ();
 		List<View> subviews;
 		public IList<View> Subviews => subviews == null ? empty : subviews.AsReadOnly ();
-		internal bool NeedDisplay { get; private set; } = true;
+		internal Rect NeedDisplay { get; private set; } = Rect.Empty;
 
 		// The frame for the object
 		Rect frame;
@@ -121,8 +121,13 @@ namespace Terminal {
 		public Rect Frame {
 			get => frame;
 			set {
+				if (SuperView != null) {
+					SuperView.SetNeedsDisplay (frame);
+					SuperView.SetNeedsDisplay (value);
+				}
 				frame = value;
-				SetNeedsDisplay ();
+
+				SetNeedsDisplay (frame);
 			}
 		}
 
@@ -153,23 +158,28 @@ namespace Terminal {
 		/// </summary>
 		public void SetNeedsDisplay ()
 		{
-			NeedDisplay = true;
-			if (container != null)
-				container.ChildNeedsDisplay ();
+			SetNeedsDisplay (Frame);
 		}
 
-		/// <summary>
-		/// Sets the NeedsDisplay flag on this view and any child subviews.
-		/// </summary>
-		public void SetNeedsDisplayRecursive ()
+		public void SetNeedsDisplay (Rect region)
 		{
-			NeedDisplay = true;
+			if (NeedDisplay.IsEmpty)
+				NeedDisplay = region;
+			else {
+				var x = Math.Min (NeedDisplay.X, region.X);
+				var y = Math.Min (NeedDisplay.Y, region.Y);
+				var w = Math.Max (NeedDisplay.Width, region.Width);
+				var h = Math.Max (NeedDisplay.Height, region.Height);
+				NeedDisplay = new Rect (x, y, w, h);
+			}
+			if (container != null)
+				container.ChildNeedsDisplay ();
 			if (subviews == null)
 				return;
 			foreach (var view in subviews)
-				view.SetNeedsDisplayRecursive ();
-			if (container != null)
-				container.ChildNeedsDisplay ();
+				if (view.Frame.IntersectsWith (region)) {
+					view.SetNeedsDisplay (Rect.Intersect (view.Frame, region));
+				}
 		}
 
 		internal bool childNeedsDisplay;
@@ -422,18 +432,18 @@ namespace Terminal {
 
 			if (subviews != null) {
 				foreach (var view in subviews) {
-					if (view.NeedDisplay || view.childNeedsDisplay) {
+					if (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay) {
 						if (view.Frame.IntersectsWith (clipRect) && view.Frame.IntersectsWith (region)) {
 
 							// TODO: optimize this by computing the intersection of region and view.Bounds
 								view.Redraw (view.Bounds);
 						}
-						view.NeedDisplay = false;
+						view.NeedDisplay = Rect.Empty;
 						view.childNeedsDisplay = false;
 					}
 				}
 			}
-			NeedDisplay = false;
+			NeedDisplay = Rect.Empty;
 			childNeedsDisplay = false;
 		}
 
@@ -461,7 +471,6 @@ namespace Terminal {
 
 			if (focused != null) 
 				focused.HasFocus = false;
-			
 			focused = view;
 			focused.HasFocus = true;
 			focused.EnsureFocus ();
@@ -689,7 +698,7 @@ namespace Terminal {
 				}
 				return true;
 			case Key.ControlL:
-				SetNeedsDisplayRecursive ();
+				SetNeedsDisplay();
 				return true;
 			}
 			return false;
@@ -751,7 +760,7 @@ namespace Terminal {
 
 		public override void Redraw (Rect bounds)
 		{
-			if (NeedDisplay) {
+			if (!NeedDisplay.IsEmpty) {
 				Driver.SetAttribute (Colors.Base.Normal);
 				DrawFrame ();
 				if (HasFocus)
@@ -922,7 +931,7 @@ namespace Terminal {
 						Iteration (null, EventArgs.Empty);
 				} else if (wait == false)
 					return;
-				if (state.Toplevel.NeedDisplay || state.Toplevel.childNeedsDisplay) {
+				if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.childNeedsDisplay) {
 					state.Toplevel.Redraw (state.Toplevel.Bounds);
 					state.Toplevel.PositionCursor ();
 					Driver.Refresh ();
