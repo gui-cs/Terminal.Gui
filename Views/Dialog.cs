@@ -16,7 +16,7 @@ namespace Terminal {
 	public class Dialog : Window {
 		List<Button> buttons = new List<Button> ();
 
-		public Dialog (string title, int width, int height, params Button [] buttons) : base (Application.MakeCenteredRect (new Size (width, height)))
+		public Dialog (string title, int width, int height, params Button [] buttons) : base (Application.MakeCenteredRect (new Size (width, height)), title)
 		{
 			foreach (var b in buttons) {
 				this.buttons.Add (b);

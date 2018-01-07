@@ -787,6 +787,7 @@ namespace Terminal {
 	public class Application {
 		public static ConsoleDriver Driver = new CursesDriver ();
 		public static Toplevel Top { get; private set; }
+		public static View Current { get; private set; }
 		public static Mono.Terminal.MainLoop MainLoop { get; private set; }
 
 		static Stack<View> toplevels = new Stack<View> ();
@@ -852,6 +853,7 @@ namespace Terminal {
 			MainLoop = new Mono.Terminal.MainLoop ();
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			Top = Toplevel.Create ();
+			Current = Top;
 			focus = Top;
 		}
 
@@ -879,14 +881,14 @@ namespace Terminal {
 
 		static void ProcessKeyEvent (KeyEvent ke)
 		{
-			if (Top.ProcessHotKey (ke))
+			if (Current.ProcessHotKey (ke))
 				return;
 
-			if (Top.ProcessKey (ke))
+			if (Current.ProcessKey (ke))
 				return;
 			
 			// Process the key normally
-			if (Top.ProcessColdKey (ke))
+			if (Current.ProcessColdKey (ke))
 				return;
 		}
 
@@ -899,6 +901,7 @@ namespace Terminal {
 
 			Init ();
 			toplevels.Push (toplevel);
+			Current = toplevel;
 			Driver.PrepareToRun (MainLoop, ProcessKeyEvent);
 			toplevel.LayoutSubviews ();
 			toplevel.FocusFirst ();
@@ -953,8 +956,10 @@ namespace Terminal {
 			toplevels.Pop ();
 			if (toplevels.Count == 0)
 				Shutdown ();
-			else
+			else {
+				Current = toplevels.Peek ();
 				Refresh ();
+			}
 		}
 
 		/// <summary>
