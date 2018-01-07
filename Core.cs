@@ -801,12 +801,14 @@ namespace Terminal {
 		/// </remarks>
 		static public event EventHandler Iteration;
 
-		public static void MakeFirstResponder (Responder newResponder)
+		/// <summary>
+		/// Returns a rectangle that is centered in the screen for the provided size.
+		/// </summary>
+		/// <returns>The centered rect.</returns>
+		/// <param name="size">Size for the rectangle.</param>
+		public static Rect MakeCenteredRect (Size size)
 		{
-			if (newResponder == null)
-				throw new ArgumentNullException ();
-
-			throw new NotImplementedException ();
+			return new Rect (new Point ((Driver.Cols - size.Width) / 2, (Driver.Rows - size.Height) / 2), size);
 		}
 
 		class MainLoopSyncContext : SynchronizationContext {

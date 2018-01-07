@@ -44,6 +44,11 @@ Wanted:
 - Popup menus
 - Make windows draggable
 
+High-level widgets:
+- Time selector
+- Date selector
+- File selector
+- Masked input
 
 ## Layout manager
 
@@ -64,21 +69,10 @@ characters everywhere
 For now it is split, in case we want to introduce formal view
 controllers.  But the design becomes very ugly.
 
-# Bugs
-
-There is a problem with the high-intensity colors, they are not showing up
-
-Add resizing support (still needs layout as well)
-
-# Mouse support
-
-It is still pending.
-
-Should allow for views to be dragged, in particular Window should allow this
-
 # Mono-Curses
 
 The only missing feature in Mono-Curses that still relies on a native library
 is to fetch the OS SIGTSTP signal, we could hardcode this value if we had
 a way of detecting the host operating system and architecture, and just hardcode
 the value based on this.
+
