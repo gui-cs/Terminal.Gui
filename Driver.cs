@@ -78,7 +78,7 @@ namespace Terminal {
 		public abstract void Move (int col, int row);
 		public abstract void AddCh (int ch);
 		public abstract void AddStr (string str);
-		public abstract void PrepareToRun (MainLoop mainLoop, Responder target);
+		public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> target);
 		public abstract void Refresh ();
 		public abstract void End ();
 		public abstract void RedrawTop ();
@@ -223,7 +223,7 @@ namespace Terminal {
 			}
 		}
 
-		void ProcessInput (Responder handler)
+		void ProcessInput (Action<KeyEvent> keyHandler)
 		{
 			int wch;
 			var code = Curses.get_wch (out wch);
@@ -241,7 +241,7 @@ namespace Terminal {
 					// handler.HandleMouse ();
 					return;
 				}
-				handler.ProcessKey (new KeyEvent (MapCursesKey (wch)));
+				keyHandler (new KeyEvent (MapCursesKey (wch)));
 				return;
 			}
 
@@ -251,7 +251,7 @@ namespace Terminal {
 
 				code = Curses.get_wch (out wch);
 				if (code == Curses.KEY_CODE_YES)
-					handler.ProcessKey (new KeyEvent (Key.AltMask | MapCursesKey (wch)));
+					keyHandler (new KeyEvent (Key.AltMask | MapCursesKey (wch)));
 				if (code == 0) {
 					KeyEvent key;
 
@@ -264,19 +264,19 @@ namespace Terminal {
 						key = new KeyEvent ((Key)wch);
 					else
 						key = new KeyEvent (Key.AltMask | (Key)wch);
-					handler.ProcessKey (key);
+					keyHandler (key);
 				} else
-					handler.ProcessKey (new KeyEvent (Key.Esc));
+					keyHandler (new KeyEvent (Key.Esc));
 			} else
-				handler.ProcessKey (new KeyEvent ((Key)wch));
+				keyHandler (new KeyEvent ((Key)wch));
 		}
 
-		public override void PrepareToRun (MainLoop mainLoop, Responder handler)
+		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler)
 		{
 			Curses.timeout (-1);
 
 			mainLoop.AddWatch (0, Mono.Terminal.MainLoop.Condition.PollIn, x => {
-				ProcessInput (handler);
+				ProcessInput (keyHandler);
 				return true;
 			});
 

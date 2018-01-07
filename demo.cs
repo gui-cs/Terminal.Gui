@@ -33,7 +33,7 @@ class Demo {
 		var win = new Window (new Rect (0, 1, tframe.Width, tframe.Height-1), "Hello");
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_New", "Creates new file", () => System.Console.WriteLine ("foo")),
+				new MenuItem ("_New", "Creates new file", null),
 				new MenuItem ("_Open", "", null),
 				new MenuItem ("_Close", "", null),
 				new MenuItem ("_Quit", "", null)

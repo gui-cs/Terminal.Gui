@@ -190,7 +190,7 @@ namespace Terminal {
 				}
 				break;
 			}
-			return true;
+			return false;
 		}
 	}
 

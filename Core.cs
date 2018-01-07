@@ -561,6 +561,9 @@ namespace Terminal {
 		/// <returns><c>true</c>, if previous was focused, <c>false</c> otherwise.</returns>
 		public bool FocusPrev ()
 		{
+			if (subviews == null || subviews.Count == 0)
+				return false;
+
 			if (focused == null) {
 				FocusLast ();
 				return true;
@@ -585,6 +588,10 @@ namespace Terminal {
 					SetFocus (w);
 					return true;
 				}
+			}
+			if (focused_idx != -1) {
+				FocusLast ();
+				return true;
 			}
 
 			if (focused != null) {
@@ -666,14 +673,7 @@ namespace Terminal {
 
 		public override bool ProcessKey (KeyEvent kb)
 		{
-			if (ProcessHotKey (kb))
-				return true;
-
 			if (base.ProcessKey (kb))
-				return true;
-
-			// Process the key normally
-			if (ProcessColdKey (kb))
 				return true;
 
 			switch (kb.Key) {
@@ -694,7 +694,7 @@ namespace Terminal {
 				}
 				return true;
 			case Key.BackTab:
-				old = Focused;
+			old = Focused;
 				if (!FocusPrev ())
 					FocusPrev ();
 				if (old != Focused) {
@@ -875,9 +875,19 @@ namespace Terminal {
 			}
 		}
 
-		static void KeyEvent (Key key)
+		static void ProcessKeyEvent (KeyEvent ke)
 		{
+			if (Top.ProcessHotKey (ke))
+				return;
+
+			if (Top.ProcessKey (ke))
+				return;
+			
+			// Process the key normally
+			if (Top.ProcessColdKey (ke))
+				return;
 		}
+
 
 		static public RunState Begin (Toplevel toplevel)
 		{
@@ -887,7 +897,7 @@ namespace Terminal {
 
 			Init ();
 			toplevels.Push (toplevel);
-			Driver.PrepareToRun (MainLoop, toplevel);
+			Driver.PrepareToRun (MainLoop, ProcessKeyEvent);
 			toplevel.LayoutSubviews ();
 			toplevel.FocusFirst ();
 			Redraw (toplevel);
