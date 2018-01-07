@@ -43,7 +43,6 @@ Wanted:
 - Function Bar
 - ScrollView
 - Multi-line text editing
-- Radio buttons
 - DateTime widgets
 - Shell/Process?
 - Submenus in menus.

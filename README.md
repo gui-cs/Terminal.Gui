@@ -2,6 +2,15 @@
 
 This is a simple UI toolkit for .NET.
 
+It is an updated version of
+[gui.cs](https://github.com/mono/mono-curses/blob/master/gui.cs) that
+I wrote for [mono-curses](https://github.com/mono/mono-curses)
+
+# Running and Building
+
+To run this, you will need a peer checkout of mono-ncurses to this
+directory.   I should make a NuGet package at some point.
+
 # Input Handling
 
 The input handling of gui.cs is similar in some ways to Emacs and the
@@ -26,3 +35,18 @@ possible, but would have to emulate some of the behavior of curses,
 namely that operations are performed on the buffer, and the Refresh
 call reflects the contents of an internal buffer into the screen and
 position the cursor in the last set position at the end.
+
+# Tasks
+
+There are some tasks in the github issues, and some others are being
+tracked in the TODO.md file.
+
+# History
+
+The original gui.cs was a UI toolkit in a single file and tied to
+curses.  This version tries to be console-agnostic (but currently only
+has a curses backend, go figure) and instead of having a
+container/widget model, only uses Views (which can contain subviews)
+and changes the rendering model to rely on damage regions instead of 
+burderning each view with the details.
+
