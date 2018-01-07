@@ -18,8 +18,9 @@ class Demo {
 			new Label (3, 4, "Password: "),
 			new TextField (14, 4, 40, "") { Secret = true },
 			new CheckBox (3, 6, "Remember me"),
-			new Button (3, 8, "Ok"),
-			new Button (10, 8, "Cancel"),
+			new RadioGroup (3, 8, new [] { "_Personal", "_Company" }),
+			new Button (3, 14, "Ok"),
+			new Button (10, 14, "Cancel"),
 			new Label (3, 18, "Press ESC and 9 to activate the menubar")
 		);
 	}

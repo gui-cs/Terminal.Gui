@@ -29,11 +29,17 @@ Should include another theme, like the TurboPascal 6 theme
 Replaces `Colors.Base.Normal` with `Attributes.Normal`, and perhaps attributes
 points to the container.
 
+Widgets should not use Colors.Base or Colors.Dialog, they should likely use
+the colors defined in the toplevel container, so that the Dialog vs Toplevel
+colors are set there only.
+
 ## Views
 
 Checkbox, ListView, Menu.
 
 Wanted:
+- HotLabels (should be labelsw ith a hotkey that take a focus view as an argument)
+- MessageBox
 - Function Bar
 - ScrollView
 - Multi-line text editing
@@ -43,6 +49,11 @@ Wanted:
 - Submenus in menus.
 - Popup menus
 - Make windows draggable
+- ListView
+- TreeView
+- View + Attribute for SolidFills?
+- Scrollbar
+- Frame container (with label)
 
 High-level widgets:
 - Time selector
@@ -50,9 +61,17 @@ High-level widgets:
 - File selector
 - Masked input
 
+Graphs:
+- Progress bar
+
+Should Views support Padding/Margin/Border?   Would make it simpler for Forms backend and perhaps
+adopt the Forms CSS as-is
+
 ## Layout manager
 
 Unclear what to do about that right now.  Perhaps use Flex?
+
+Will at least need the protocol for sizing 
 
 # Unicode
 

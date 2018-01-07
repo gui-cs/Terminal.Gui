@@ -343,7 +343,7 @@ namespace Terminal {
 		/// <summary>
 		/// Utility function to draw strings that contain a hotkey
 		/// </summary>
-		/// <param name="s">String to display, the underscoore before a letter flags the next letter as the hotkey.</param>
+		/// <param name="text">String to display, the underscoore before a letter flags the next letter as the hotkey.</param>
 		/// <param name="hotColor">Hot color.</param>
 		/// <param name="normalColor">Normal color.</param>
 		public void DrawHotString (string text, Attribute hotColor, Attribute normalColor)
@@ -357,6 +357,20 @@ namespace Terminal {
 				Driver.AddCh (c);
 				Driver.SetAttribute (normalColor);
 			}
+		}
+
+		/// <summary>
+		/// Utility function to draw strings that contains a hotkey using a colorscheme and the "focused" state.
+		/// </summary>
+		/// <param name="text">String to display, the underscoore before a letter flags the next letter as the hotkey.</param>
+		/// <param name="focused">If set to <c>true</c> this uses the focused colors from the color scheme, otherwise the regular ones.</param>
+		/// <param name="scheme">The color scheme to use.</param>
+		public void DrawHotString (string text, bool focused, ColorScheme scheme)
+		{
+			if (focused)
+				DrawHotString (text, scheme.HotFocus, scheme.Focus);
+			else
+				DrawHotString (text, scheme.HotNormal, scheme.Normal);
 		}
 
 		/// <summary>
