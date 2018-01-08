@@ -946,6 +946,10 @@ namespace Terminal {
 				return;
 		}
 
+		static void ProcessMouseEvent (MouseEvent me)
+		{
+		}
+
 		static public RunState Begin (Toplevel toplevel)
 		{
 			if (toplevel == null)
@@ -955,7 +959,7 @@ namespace Terminal {
 			Init ();
 			toplevels.Push (toplevel);
 			Current = toplevel;
-			Driver.PrepareToRun (MainLoop, ProcessKeyEvent);
+			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessMouseEvent);
 			toplevel.LayoutSubviews ();
 			toplevel.FocusFirst ();
 			Redraw (toplevel);

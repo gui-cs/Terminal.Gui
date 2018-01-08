@@ -78,7 +78,7 @@ namespace Terminal {
 		public abstract void Move (int col, int row);
 		public abstract void AddCh (int ch);
 		public abstract void AddStr (string str);
-		public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> target);
+		public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> target, Action<MouseEvent> mouse);
 		public abstract void Refresh ();
 		public abstract void End ();
 		public abstract void RedrawTop ();
@@ -226,7 +226,16 @@ namespace Terminal {
 			}
 		}
 
-		void ProcessInput (Action<KeyEvent> keyHandler)
+		static MouseEvent ToDriverMouse (Curses.MouseEvent cev)
+		{
+			return new MouseEvent () {
+				X = cev.X,
+				Y = cev.Y,
+				Flags = (MouseFlags)cev.ButtonState
+			};
+		}
+
+		void ProcessInput (Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler)
 		{
 			int wch;
 			var code = Curses.get_wch (out wch);
@@ -238,15 +247,14 @@ namespace Terminal {
 					}
 				}
 				if (code == Curses.KeyMouse) {
-					// TODO
-					// Curses.MouseEvent ev;
-					// Curses.getmouse (out ev);
-					// handler.HandleMouse ();
+					Curses.MouseEvent ev;
+					Curses.getmouse (out ev);
+					mouseHandler (ToDriverMouse (ev));
 					return;
 				}
 				keyHandler (new KeyEvent (MapCursesKey (wch)));
 				return;
-			}
+			} 
 
 			// Special handling for ESC, we want to try to catch ESC+letter to simulate alt-letter as well as Alt-Fkey
 			if (wch == 27) {
@@ -274,12 +282,12 @@ namespace Terminal {
 				keyHandler (new KeyEvent ((Key)wch));
 		}
 
-		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler)
+		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler)
 		{
 			Curses.timeout (-1);
 
 			mainLoop.AddWatch (0, Mono.Terminal.MainLoop.Condition.PollIn, x => {
-				ProcessInput (keyHandler);
+				ProcessInput (keyHandler, mouseHandler);
 				return true;
 			});
 
