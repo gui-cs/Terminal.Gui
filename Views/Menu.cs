@@ -190,7 +190,7 @@ namespace Terminal {
 				}
 				break;
 			}
-			return false;
+			return base.ProcessKey (kb);
 		}
 	}
 

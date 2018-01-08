@@ -47,5 +47,15 @@ namespace Terminal {
 				start += bf.Width + 1;
 			}
 		}
+
+		public override bool ProcessKey (KeyEvent kb)
+		{
+			switch (kb.Key) {
+			case Key.Esc:
+				Running = false;
+				return true;
+			}
+			return base.ProcessKey (kb);
+		}
 	}
 }

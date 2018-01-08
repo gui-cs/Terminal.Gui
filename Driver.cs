@@ -124,6 +124,7 @@ namespace Terminal {
 			}
 		}
 
+		static bool sync;
 		public override void AddCh (int ch)
 		{
 			if (Clip.Contains (ccol, crow)) {
@@ -134,6 +135,8 @@ namespace Terminal {
 				Curses.addch (ch);
 			} else
 				needMove = true;
+			if (sync)
+				Application.Driver.Refresh ();
 			ccol++;
 		}
 

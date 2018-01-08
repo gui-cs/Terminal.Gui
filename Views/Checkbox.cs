@@ -110,7 +110,7 @@ namespace Terminal {
 				SetNeedsDisplay ();
 				return true;
 			}
-			return false;
+			return base.ProcessKey (kb);
 		}
 
 #if false

@@ -168,7 +168,7 @@ namespace Terminal {
 					Clicked (this, EventArgs.Empty);
 				return true;
 			}
-			return false;
+			return base.ProcessKey (kb);
 		}
 
 #if false

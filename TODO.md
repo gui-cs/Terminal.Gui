@@ -33,6 +33,10 @@ Widgets should not use Colors.Base or Colors.Dialog, they should likely use
 the colors defined in the toplevel container, so that the Dialog vs Toplevel
 colors are set there only.
 
+## Focus
+
+Use left/right/up/down to switch focus as well when nothing handles the event
+
 ## Views
 
 Checkbox, ListView, Menu.

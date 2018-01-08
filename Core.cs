@@ -16,6 +16,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using System.Linq;
 
 namespace Terminal {
 
@@ -65,6 +66,12 @@ namespace Terminal {
 		///     widget engine.    If they return false, the
 		///     keystroke will be passed using the ProcessColdKey
 		///     method to other views to process.
+		///   </para>
+		///   <para>
+		///     The View implementation does nothing but return false,
+		///     so it is not necessary to call base.ProcessKey if you 
+		///     derive directly from View, but you should if you derive
+		///     other View subclasses.
 		///   </para>
 		/// </remarks>
 		public virtual bool ProcessKey (KeyEvent kb)
@@ -439,6 +446,12 @@ namespace Terminal {
 			Driver.AddCh (ch);
 		}
 
+		protected void ClearNeedsDisplay ()
+		{
+			NeedDisplay = Rect.Empty;
+			childNeedsDisplay = false;
+		}
+
 		/// <summary>
 		/// Performs a redraw of this view and its subviews, only redraws the views that have been flagged for a re-display.
 		/// </summary>
@@ -462,8 +475,7 @@ namespace Terminal {
 					}
 				}
 			}
-			NeedDisplay = Rect.Empty;
-			childNeedsDisplay = false;
+			ClearNeedsDisplay ();
 		}
 
 		/// <summary>
@@ -669,6 +681,12 @@ namespace Terminal {
 	/// <summary>
 	/// Toplevel views can be modally executed.
 	/// </summary>
+	/// <remarks>
+	///   <para>
+	///     Toplevels can be modally executing views, and they return control
+	///     to the caller when the "Running" property is set to false.
+	///   </para>
+	/// </remarks>
 	public class Toplevel : View {
 		public bool Running;
 
@@ -708,7 +726,7 @@ namespace Terminal {
 				}
 				return true;
 			case Key.BackTab:
-			old = Focused;
+				old = Focused;
 				if (!FocusPrev ())
 					FocusPrev ();
 				if (old != Focused) {
@@ -717,26 +735,15 @@ namespace Terminal {
 				}
 				return true;
 			case Key.ControlL:
-				SetNeedsDisplay();
+				Application.Refresh ();
 				return true;
 			}
 			return false;
 		}
-
-#if false
-        public override void Redraw ()
-        {
-            base.Redraw ();
-            for (int i = 0; i < Driver.Cols; i++) {
-                Driver.Move (0, i);
-                Driver.AddStr ("Line: " + i);
-            }
-        }
-#endif
 	}
 
 	/// <summary>
-	/// A toplevel view that draws a frame around its region
+	/// A toplevel view that draws a frame around its region and has a "ContentView" subview where the contents are added.
 	/// </summary>
 	public class Window : Toplevel, IEnumerable {
 		View contentView;
@@ -754,6 +761,11 @@ namespace Terminal {
 			public ContentView (Rect frame) : base (frame) { }
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Window"/> class with an optioanl title
+		/// </summary>
+		/// <param name="frame">Frame.</param>
+		/// <param name="title">Title.</param>
 		public Window (Rect frame, string title = null) : base (frame)
 		{
 			this.Title = title;
@@ -762,6 +774,10 @@ namespace Terminal {
 			base.Add (contentView);
 		}
 
+		/// <summary>
+		/// Enumerates the various views in the ContentView.
+		/// </summary>
+		/// <returns>The enumerator.</returns>
 		public new IEnumerator GetEnumerator ()
 		{
 			return contentView.GetEnumerator ();
@@ -772,6 +788,10 @@ namespace Terminal {
 			DrawFrame (new Rect (0, 0, Frame.Width, Frame.Height), true);
 		}
 
+		/// <summary>
+		/// Add the specified view to the ContentView.
+		/// </summary>
+		/// <param name="view">View to add to the window.</param>
 		public override void Add (View view)
 		{
 			contentView.Add (view);
@@ -795,9 +815,27 @@ namespace Terminal {
 				Driver.SetAttribute (Colors.Dialog.Normal);
 			}
 			contentView.Redraw (contentView.Bounds);
+			ClearNeedsDisplay ();
 		}
 	}
 
+	/// <summary>
+	/// The application driver for gui.cs
+	/// </summary>
+	/// <remarks>
+	///   <para>
+	///     You can hook up to the Iteration event to have your method 
+	///     invoked on each iteration of the mainloop.
+	///   </para>
+	///   <para>
+	///     Creates a mainloop to process input events, handle timers and
+	///     other sources of data.   It is accessible via the MainLoop property.
+	///   </para>
+	///   <para>
+	///     When invoked sets the SynchronizationContext to one that is tied
+	///     to the mainloop, allowing user code to use async/await.
+	///   </para>
+	/// </remarks>
 	public class Application {
 		public static ConsoleDriver Driver = new CursesDriver ();
 		public static Toplevel Top { get; private set; }
@@ -805,7 +843,6 @@ namespace Terminal {
 		public static Mono.Terminal.MainLoop MainLoop { get; private set; }
 
 		static Stack<View> toplevels = new Stack<View> ();
-		static Responder focus;
 
 		/// <summary>
 		///   This event is raised on each iteration of the
@@ -826,6 +863,10 @@ namespace Terminal {
 			return new Rect (new Point ((Driver.Cols - size.Width) / 2, (Driver.Rows - size.Height) / 2), size);
 		}
 
+		//
+		// provides the sync context set while executing code in gui.cs, to let
+		// users use async/await on their code
+		//
 		class MainLoopSyncContext : SynchronizationContext {
 			Mono.Terminal.MainLoop mainLoop;
 
@@ -868,7 +909,6 @@ namespace Terminal {
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			Top = Toplevel.Create ();
 			Current = Top;
-			focus = Top;
 		}
 
 		public class RunState : IDisposable {
@@ -906,7 +946,6 @@ namespace Terminal {
 				return;
 		}
 
-
 		static public RunState Begin (Toplevel toplevel)
 		{
 			if (toplevel == null)
@@ -930,6 +969,7 @@ namespace Terminal {
 		{
 			if (rs == null)
 				throw new ArgumentNullException (nameof (rs));
+
 			rs.Dispose ();
 		}
 
@@ -950,16 +990,19 @@ namespace Terminal {
 			Driver.Refresh ();
 		}
 
+		/// <summary>
+		/// Triggers a refresh of the entire display.
+		/// </summary>
 		public static void Refresh ()
 		{
 			Driver.RedrawTop ();
 			View last = null;
-			foreach (var v in toplevels) {
+			foreach (var v in toplevels.Reverse ()) {
+				v.SetNeedsDisplay ();
 				v.Redraw (v.Bounds);
 				last = v;
 			}
-			if (last != null)
-				last.PositionCursor ();
+			last?.PositionCursor ();
 			Driver.Refresh ();
 		}
 
@@ -1014,9 +1057,15 @@ namespace Terminal {
 		///   Runs the main loop on the given container.
 		/// </summary>
 		/// <remarks>
-		///   This method is used to start processing events
-		///   for the main application, but it is also used to
-		///   run modal dialog boxes.
+		///   <para>
+		///     This method is used to start processing events
+		///     for the main application, but it is also used to
+		///     run modal dialog boxes.
+		///   </para>
+		///   <para>
+		///     To make a toplevel stop execution, set the "Running"
+		///     property to false.
+		///   </para>
 		/// </remarks>
 		public static void Run (Toplevel view)
 		{

@@ -134,10 +134,8 @@ namespace Terminal {
 			case Key.Space:
 				Selected = cursor;
 				return true;
-			default:
-				
-				return false;
 			}
+			return base.ProcessKey (kb);
 		}
 	}
 }
