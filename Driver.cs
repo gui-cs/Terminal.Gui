@@ -313,6 +313,7 @@ namespace Terminal {
 			AddCh (Curses.ACS_LRCORNER);
 		}
 
+		Curses.Event oldMouseEvents, reportableMouseEvents;
 		public override void Init (Action terminalResized)
 		{
 			if (window != null)
@@ -326,6 +327,7 @@ namespace Terminal {
 			Curses.raw ();
 			Curses.noecho ();
 			Curses.Window.Standard.keypad (true);
+			reportableMouseEvents = Curses.mousemask (Curses.Event.AllEvents, out oldMouseEvents);
 			this.terminalResized = terminalResized;
 
 			Colors.Base = new ColorScheme ();
