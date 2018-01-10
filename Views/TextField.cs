@@ -303,24 +303,24 @@ namespace Terminal {
 			return -1;
 		}
 
-#if false
-        public override void ProcessMouse (Curses.MouseEvent ev)
-        {
-            if ((ev.ButtonState & Curses.Event.Button1Clicked) == 0)
-                return;
+        	public override bool MouseEvent (MouseEvent ev)
+		{
+			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked))
+				return false;
 
-            .SetFocus (this);
-
-            // We could also set the cursor position.
-            point = first + (ev.X - x);
-            if (point > text.Length)
-                point = text.Length;
-            if (point < first)
-                point = 0;
-
-            SetNeedsDisplay ();
-        }
-#endif
+			if (!HasFocus) 
+				SuperView.SetFocus (this);
+			
+			// We could also set the cursor position.
+			point = first + ev.X;
+			if (point > text.Length)
+				point = text.Length;
+			if (point < first)
+				point = 0;
+	
+			SetNeedsDisplay ();
+			return true;
+		}
 	}
 
 

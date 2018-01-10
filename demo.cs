@@ -31,6 +31,7 @@ class Demo {
 		Application.Run (d);
 	}
 
+	static Label ml;
 	static void Main ()
 	{
 		Application.Init ();
@@ -53,6 +54,14 @@ class Demo {
 		});
 
 		ShowEntries (win);
+		int count = 0;
+		ml = new Label (new Rect (3, 16, 50, 1), "Mouse: ");
+		Application.RootMouseEvent += delegate (MouseEvent me) {
+			
+			ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
+		};
+
+		win.Add (ml);
 
 		// ShowTextAlignments (win);
 		top.Add (win);

@@ -106,7 +106,10 @@ namespace Terminal {
 		}
 
 		// Mouse events
-		public virtual void MouseEvent (Event.Mouse me) { }
+		public virtual bool MouseEvent (MouseEvent me) 
+		{
+			return false;
+		}
 	}
 
 	public class View : Responder, IEnumerable {
@@ -946,8 +949,57 @@ namespace Terminal {
 				return;
 		}
 
+		static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
+		{
+			var startFrame = start.Frame;
+
+			if (!startFrame.Contains (x, y)) {
+				resx = 0;
+				resy = 0;
+				return null;
+			}
+
+			if (start.Subviews != null){
+				int count = start.Subviews.Count;
+				if (count > 0) {
+					var rx = x - startFrame.X;
+					var ry = y - startFrame.Y;
+					for (int i = count - 1; i >= 0; i--) {
+						View v = start.Subviews [i];
+						if (v.Frame.Contains (rx, ry)) {
+							var deep = FindDeepestView (v, rx, ry, out resx, out resy);
+							if (deep == null)
+								return v;
+							return deep;
+						}
+					}
+				}
+			}
+			resx = x-startFrame.X;
+			resy = y-startFrame.Y;
+			return start;
+		}
+
+		/// <summary>
+		/// Merely a debugging aid to see the raw mouse events
+		/// </summary>
+		static public Action<MouseEvent> RootMouseEvent;
+
 		static void ProcessMouseEvent (MouseEvent me)
 		{
+			RootMouseEvent?.Invoke (me);
+			int rx, ry;
+			var view = FindDeepestView (Current, me.X, me.Y, out rx, out ry);
+			if (view != null) {
+				var nme = new MouseEvent () {
+					X = rx,
+					Y = ry,
+					Flags = me.Flags
+				};
+					          
+				// Should we bubbled up the event, if it is not handled?
+				view.MouseEvent (nme);
+			}
 		}
 
 		static public RunState Begin (Toplevel toplevel)

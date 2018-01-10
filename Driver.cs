@@ -246,7 +246,7 @@ namespace Terminal {
 						return;
 					}
 				}
-				if (code == Curses.KeyMouse) {
+				if (wch == Curses.KeyMouse) {
 					Curses.MouseEvent ev;
 					Curses.getmouse (out ev);
 					mouseHandler (ToDriverMouse (ev));

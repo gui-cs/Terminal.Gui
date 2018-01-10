@@ -137,5 +137,19 @@ namespace Terminal {
 			}
 			return base.ProcessKey (kb);
 		}
+
+		public override bool MouseEvent (MouseEvent me)
+		{
+			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked))
+				return false;
+
+			SuperView.SetFocus (this);
+
+			if (me.Y < radioLabels.Length) {
+				cursor = selected = me.Y;
+				SetNeedsDisplay ();
+			}
+			return true;
+		}
 	}
 }

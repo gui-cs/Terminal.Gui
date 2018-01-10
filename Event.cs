@@ -162,30 +162,4 @@ namespace Terminal {
 		/// </summary>
 		public MouseFlags Flags;
 	}
-
-	public class Event {
-		public class Key : Event {
-			public int Code { get; private set; }
-			public bool Alt { get; private set; }
-			public Key (int code)
-			{
-				Code = code;
-			}
-		}
-
-		public class Mouse : Event {
-		}
-
-		public static Event CreateMouseEvent ()
-		{
-			return new Mouse ();
-		}
-
-		public static Event CreateKeyEvent (int code)
-		{
-			return new Key (code);
-		}
-
-	}
-
 }

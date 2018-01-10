@@ -113,20 +113,18 @@ namespace Terminal {
 			return base.ProcessKey (kb);
 		}
 
-#if false
-		public override void ProcessMouse (Curses.MouseEvent ev)
+		public override bool MouseEvent (MouseEvent me)
 		{
-			if ((ev.ButtonState & Curses.Event.Button1Clicked) != 0){
-				Container.SetFocus (this);
-				Container.Redraw ();
+			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked))
+				return false;
 
-				Checked = !Checked;
-				
-				if (Toggled != null)
-					Toggled (this, EventArgs.Empty);
-				Redraw ();
-			}
+			SuperView.SetFocus (this);
+			Checked = !Checked;
+			SetNeedsDisplay ();
+
+			if (Toggled != null)
+				Toggled (this, EventArgs.Empty);
+			return true;
 		}
-#endif
 	}
 }
