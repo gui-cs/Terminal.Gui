@@ -106,7 +106,7 @@ namespace Terminal {
 		}
 
 		// Mouse events
-		public virtual bool MouseEvent (MouseEvent me) 
+		public virtual bool MouseEvent (MouseEvent me)
 		{
 			return false;
 		}
@@ -471,7 +471,7 @@ namespace Terminal {
 						if (view.Frame.IntersectsWith (clipRect) && view.Frame.IntersectsWith (region)) {
 
 							// TODO: optimize this by computing the intersection of region and view.Bounds
-								view.Redraw (view.Bounds);
+							view.Redraw (view.Bounds);
 						}
 						view.NeedDisplay = Rect.Empty;
 						view.childNeedsDisplay = false;
@@ -503,7 +503,7 @@ namespace Terminal {
 			if (c == null)
 				throw new ArgumentException ("the specified view is not part of the hierarchy of this view");
 
-			if (focused != null) 
+			if (focused != null)
 				focused.HasFocus = false;
 			focused = view;
 			focused.HasFocus = true;
@@ -533,7 +533,7 @@ namespace Terminal {
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.ProcessHotKey (kb))
+				if (view.ProcessColdKey (kb))
 					return true;
 			return false;
 		}
@@ -719,6 +719,13 @@ namespace Terminal {
 				// TODO: should suspend
 				// console_csharp_send_sigtstp ();
 				break;
+
+#if false
+			case Key.F5:
+				Application.DebugDrawBounds = !Application.DebugDrawBounds;
+				SetNeedsDisplay ();
+				return true;
+#endif
 			case Key.Tab:
 				var old = Focused;
 				if (!FocusNext ())
@@ -1097,10 +1104,23 @@ namespace Terminal {
 					return;
 				if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.childNeedsDisplay) {
 					state.Toplevel.Redraw (state.Toplevel.Bounds);
+					if (DebugDrawBounds)
+						DrawBounds (state.Toplevel);
 					state.Toplevel.PositionCursor ();
 					Driver.Refresh ();
 				}
 			}
+		}
+
+		public static bool DebugDrawBounds;
+
+		// Need to look into why this does not work properly.
+		static void DrawBounds (View v)
+		{
+			v.DrawFrame (v.Frame, false);
+			if (v.Subviews != null && v.Subviews.Count > 0)
+				foreach (var sub in v.Subviews)
+					DrawBounds (sub);
 		}
 
 		public static void Run ()

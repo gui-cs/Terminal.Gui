@@ -335,7 +335,7 @@ namespace Terminal {
 			Curses.raw ();
 			Curses.noecho ();
 			Curses.Window.Standard.keypad (true);
-			reportableMouseEvents = Curses.mousemask (Curses.Event.AllEvents, out oldMouseEvents);
+			reportableMouseEvents = Curses.mousemask (Curses.Event.AllEvents | Curses.Event.ReportMousePosition, out oldMouseEvents);
 			this.terminalResized = terminalResized;
 
 			Colors.Base = new ColorScheme ();
