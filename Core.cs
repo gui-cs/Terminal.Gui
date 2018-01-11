@@ -996,7 +996,6 @@ namespace Terminal {
 					Y = ry,
 					Flags = me.Flags
 				};
-					          
 				// Should we bubbled up the event, if it is not handled?
 				view.MouseEvent (nme);
 			}

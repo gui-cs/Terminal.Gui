@@ -25,7 +25,7 @@ namespace Terminal {
 			int width = 0;
 
 			foreach (var s in radioLabels)
-				width = Math.Max (radioLabels.Length + 4, width);
+				width = Math.Max (s.Length + 4, width);
 			return new Rect (x, y, width, radioLabels.Length);
 		}
 		/// <summary>

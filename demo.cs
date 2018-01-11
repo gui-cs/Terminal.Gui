@@ -57,7 +57,7 @@ class Demo {
 		int count = 0;
 		ml = new Label (new Rect (3, 16, 50, 1), "Mouse: ");
 		Application.RootMouseEvent += delegate (MouseEvent me) {
-			
+
 			ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
 		};
 
