@@ -6,6 +6,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Mono.Terminal;
 using Unix.Terminal;
 
@@ -93,6 +94,8 @@ namespace Terminal {
 
 		public abstract void DrawFrame (Rect region, bool fill);
 		public abstract void AddSpecial (SpecialChar ch);
+
+		public abstract void Suspend ();
 
 		Rect clip;
 		public Rect Clip {
@@ -389,6 +392,74 @@ namespace Terminal {
 				Colors.Error.HotNormal = Curses.A_BOLD | Curses.A_REVERSE;
 				Colors.Error.HotFocus = Curses.A_REVERSE;
 			}
+		}
+
+		public override void Suspend ()
+		{
+			Platform.Suspend ();
+			Curses.Window.Standard.redrawwin ();
+			Curses.refresh ();
+		}
+	}
+
+	internal static class Platform {
+		[DllImport ("libc")]
+		static extern int uname (IntPtr buf);
+
+		[DllImport ("libc")]
+		static extern int killpg (int pgrp, int pid);
+
+		static int suspendSignal;
+
+		static int GetSuspendSignal ()
+		{
+			if (suspendSignal != 0)
+				return suspendSignal;
+			
+			IntPtr buf = Marshal.AllocHGlobal (8192);
+			if (uname (buf) != 0) {
+				Marshal.FreeHGlobal (buf);
+				suspendSignal = -1;
+				return suspendSignal;
+			}
+			try {
+				switch (Marshal.PtrToStringAnsi (buf)) {
+				case "Darwin":
+				case "DragonFly":
+				case "FreeBSD":
+				case "NetBSD":
+				case "OpenBSD":
+					suspendSignal = 18;
+					break;
+				case "Linux":
+					// TODO: should fetch the machine name and 
+					// if it is MIPS return 24
+					suspendSignal = 20;
+					break;
+				case "Solaris":
+					suspendSignal = 24;
+					break;
+				default:
+					suspendSignal = -1;
+					break;
+				}
+				return suspendSignal;
+			} finally {
+				Marshal.FreeHGlobal (buf);
+			}
+		}
+
+		/// <summary>
+		/// Suspends the process by sending SIGTSTP to itself
+		/// </summary>
+		/// <returns>The suspend.</returns>
+		static public bool Suspend ()
+		{
+			int signal = GetSuspendSignal ();
+			if (signal == -1)
+				return false;
+			killpg (0, signal);
+			return true;
 		}
 	}
 }

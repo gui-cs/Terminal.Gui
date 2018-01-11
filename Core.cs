@@ -716,9 +716,8 @@ namespace Terminal {
 				// TODO: stop current execution of this container
 				break;
 			case Key.ControlZ:
-				// TODO: should suspend
-				// console_csharp_send_sigtstp ();
-				break;
+				Driver.Suspend ();
+				return true;
 
 #if false
 			case Key.F5:
