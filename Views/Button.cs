@@ -26,6 +26,18 @@ namespace Terminal {
 		bool is_default;
 
 		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Button"/> is the default action to activate on return on a dialog.
+		/// </summary>
+		/// <value><c>true</c> if is default; otherwise, <c>false</c>.</value>
+		public bool IsDefault {
+			get => is_default;
+			set {
+				is_default = value;
+				Update ();
+			}
+		}
+
+		/// <summary>
 		///   Clicked event, raised when the button is clicked.
 		/// </summary>
 		/// <remarks>
@@ -33,7 +45,7 @@ namespace Terminal {
 		///   raised when the button is activated either with
 		///   the mouse or the keyboard.
 		/// </remarks>
-		public event EventHandler Clicked;
+		public Action Clicked;
 
 		/// <summary>
 		///   Public constructor, creates a button based on
@@ -76,23 +88,29 @@ namespace Terminal {
 
 			set {
 				text = value;
-				if (is_default)
-					shown_text = "[< " + value + " >]";
-				else
-					shown_text = "[ " + value + " ]";
-
-				hot_pos = -1;
-				hot_key = (char)0;
-				int i = 0;
-				foreach (char c in shown_text) {
-					if (Char.IsUpper (c)) {
-						hot_key = c;
-						hot_pos = i;
-						break;
-					}
-					i++;
-				}
+				Update ();
 			}
+		}
+
+		internal void Update ()
+		{
+			if (IsDefault)
+				shown_text = "[< " + text + " >]";
+			else
+				shown_text = "[ " + text + " ]";
+
+			hot_pos = -1;
+			hot_key = (char)0;
+			int i = 0;
+			foreach (char c in shown_text) {
+				if (Char.IsUpper (c)) {
+					hot_key = c;
+					hot_pos = i;
+					break;
+				}
+				i++;
+			}
+			SetNeedsDisplay ();
 		}
 
 		/// <summary>
@@ -109,7 +127,7 @@ namespace Terminal {
 		{
 			CanFocus = true;
 
-			this.is_default = is_default;
+			this.IsDefault = is_default;
 			Text = s;
 		}
 
@@ -136,7 +154,7 @@ namespace Terminal {
 			if (Char.ToUpper ((char)key.KeyValue) == hot_key) {
 				this.SuperView.SetFocus (this);
 				if (Clicked != null)
-					Clicked (this, EventArgs.Empty);
+					Clicked ();
 				return true;
 			}
 			return false;
@@ -152,9 +170,9 @@ namespace Terminal {
 
 		public override bool ProcessColdKey (KeyEvent kb)
 		{
-			if (is_default && kb.KeyValue == '\n') {
+			if (IsDefault && kb.KeyValue == '\n') {
 				if (Clicked != null)
-					Clicked (this, EventArgs.Empty);
+					Clicked ();
 				return true;
 			}
 			return CheckKey (kb);
@@ -165,22 +183,23 @@ namespace Terminal {
 			var c = kb.KeyValue;
 			if (c == '\n' || c == ' ' || Char.ToUpper ((char)c) == hot_key) {
 				if (Clicked != null)
-					Clicked (this, EventArgs.Empty);
+					Clicked ();
 				return true;
 			}
 			return base.ProcessKey (kb);
 		}
 
-#if false
-        public override void ProcessMouse (Curses.MouseEvent ev)
-        {
-            if ((ev.ButtonState & Curses.Event.Button1Clicked) != 0) {
-                Container.SetFocus (this);
-                Container.Redraw ();
-                if (Clicked != null)
-                    Clicked (this, EventArgs.Empty);
-            }
-        }
-#endif
+		public override bool MouseEvent(MouseEvent me)
+		{
+			if (me.Flags == MouseFlags.Button1Clicked) {
+				SuperView.SetFocus (this);
+				SetNeedsDisplay ();
+
+				if (Clicked != null)
+					Clicked ();
+				return true;
+			}
+			return false;
+		}
 	}
 }

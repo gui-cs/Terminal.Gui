@@ -102,6 +102,9 @@ namespace Terminal {
 			get => clip;
 			set => this.clip = value;
 		}
+
+		public abstract void StartReportingMouseMoves ();
+		public abstract void StopReportingMouseMoves ();
 	}
 
 	public class CursesDriver : ConsoleDriver {
@@ -340,6 +343,7 @@ namespace Terminal {
 			Curses.Window.Standard.keypad (true);
 			reportableMouseEvents = Curses.mousemask (Curses.Event.AllEvents | Curses.Event.ReportMousePosition, out oldMouseEvents);
 			this.terminalResized = terminalResized;
+			StartReportingMouseMoves ();
 
 			Colors.Base = new ColorScheme ();
 			Colors.Dialog = new ColorScheme ();
@@ -396,9 +400,23 @@ namespace Terminal {
 
 		public override void Suspend ()
 		{
+			StopReportingMouseMoves ();
 			Platform.Suspend ();
 			Curses.Window.Standard.redrawwin ();
 			Curses.refresh ();
+			StartReportingMouseMoves ();
+		}
+
+		public override void StartReportingMouseMoves()
+		{
+			Console.Out.Write ("\x1b[?1003h");
+			Console.Out.Flush ();
+		}
+
+		public override void StopReportingMouseMoves()
+		{
+			Console.Out.Write ("\x1b[?1003l");
+			Console.Out.Flush ();
 		}
 	}
 

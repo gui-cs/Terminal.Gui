@@ -132,6 +132,12 @@ namespace Terminal {
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="T:Terminal.View"/> want mouse position reports.
+		/// </summary>
+		/// <value><c>true</c> if want mouse position reports; otherwise, <c>false</c>.</value>
+		public virtual bool WantMousePositionReports { get; set; } = false;
+
 		// The frame for this view
 		public Rect Frame {
 			get => frame;
@@ -315,6 +321,22 @@ namespace Terminal {
 			if (clipped) {
 				rrow = Math.Max (0, Math.Min (rrow, Driver.Rows - 1));
 				rcol = Math.Max (0, Math.Min (rcol, Driver.Cols - 1));
+			}
+		}
+
+		/// <summary>
+		/// Converts a point from screen coordinates into the view coordinate space.
+		/// </summary>
+		/// <returns>The mapped point.</returns>
+		/// <param name="x">X screen-coordinate point.</param>
+		/// <param name="y">Y screen-coordinate point.</param>
+		public Point ScreenToView (int x, int y)
+		{
+			if (SuperView == null) {
+				return new Point (x - Frame.X, y - frame.Y);
+			} else {
+				var parent = SuperView.ScreenToView (x, y);
+				return new Point (parent.X - frame.X, parent.Y - frame.Y);
 			}
 		}
 
@@ -826,6 +848,59 @@ namespace Terminal {
 			contentView.Redraw (contentView.Bounds);
 			ClearNeedsDisplay ();
 		}
+
+#if false
+		// 
+		// It does not look like the event is raised on clicked-drag
+		// need to figure that out.
+		//
+		Point? dragPosition;
+		public override bool MouseEvent(MouseEvent me)
+		{
+			if (me.Flags == MouseFlags.Button1Pressed){
+				if (dragPosition.HasValue) {
+					var dx = me.X - dragPosition.Value.X;
+					var dy = me.Y - dragPosition.Value.Y;
+
+					var nx = Frame.X + dx;
+					var ny = Frame.Y + dy;
+					if (nx < 0)
+						nx = 0;
+					if (ny < 0)
+						ny = 0;
+
+					Demo.ml2.Text = $"{dx},{dy}";
+					dragPosition = new Point (me.X, me.Y);
+
+					// TODO: optimize, only SetNeedsDisplay on the before/after regions.
+					if (SuperView == null)
+						Application.Refresh ();
+					else
+						SuperView.SetNeedsDisplay ();
+					Frame = new Rect (nx, ny, Frame.Width, Frame.Height);
+					SetNeedsDisplay ();
+					return true;
+				} else {
+					dragPosition = new Point (me.X, me.Y);
+					Application.GrabMouse (this);
+
+					Demo.ml2.Text = $"Starting at {dragPosition}";
+					return true;
+				}
+
+
+			}
+
+			if (me.Flags == MouseFlags.Button1Released) {
+				Application.UngrabMouse ();
+				dragPosition = null;
+				//Driver.StopReportingMouseMoves ();
+			}
+
+			Demo.ml.Text = me.ToString ();
+			return false;
+		}
+#endif
 	}
 
 	/// <summary>
@@ -848,10 +923,10 @@ namespace Terminal {
 	public class Application {
 		public static ConsoleDriver Driver = new CursesDriver ();
 		public static Toplevel Top { get; private set; }
-		public static View Current { get; private set; }
+		public static Toplevel Current { get; private set; }
 		public static Mono.Terminal.MainLoop MainLoop { get; private set; }
 
-		static Stack<View> toplevels = new Stack<View> ();
+		static Stack<Toplevel> toplevels = new Stack<Toplevel> ();
 
 		/// <summary>
 		///   This event is raised on each iteration of the
@@ -986,6 +1061,28 @@ namespace Terminal {
 			return start;
 		}
 
+		static View mouseGrabView;
+
+		/// <summary>
+		/// Grabs the mouse, forcing all mouse events to be routed to the specified view until UngrabMouse is called.
+		/// </summary>
+		/// <returns>The grab.</returns>
+		/// <param name="view">View that will receive all mouse events until UngrabMouse is invoked.</param>
+		public static void GrabMouse (View view)
+		{
+			if (view == null)
+				return;
+			mouseGrabView = view;
+		}
+
+		/// <summary>
+		/// Releases the mouse grab, so mouse events will be routed to the view on which the mouse is.
+		/// </summary>
+		public static void UngrabMouse ()
+		{
+			mouseGrabView = null;
+		}
+
 		/// <summary>
 		/// Merely a debugging aid to see the raw mouse events
 		/// </summary>
@@ -994,9 +1091,23 @@ namespace Terminal {
 		static void ProcessMouseEvent (MouseEvent me)
 		{
 			RootMouseEvent?.Invoke (me);
+			if (mouseGrabView != null) {
+				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
+				var nme = new MouseEvent () {
+					X = newxy.X,
+					Y = newxy.Y,
+					Flags = me.Flags
+				};
+				mouseGrabView.MouseEvent (me);
+				return;
+			}
+
 			int rx, ry;
 			var view = FindDeepestView (Current, me.X, me.Y, out rx, out ry);
 			if (view != null) {
+				if (!view.WantMousePositionReports && me.Flags == MouseFlags.ReportMousePosition)
+					return;
+				
 				var nme = new MouseEvent () {
 					X = rx,
 					Y = ry,
@@ -1075,7 +1186,7 @@ namespace Terminal {
 			if (toplevels.Count == 0)
 				Shutdown ();
 			else {
-				Current = toplevels.Peek ();
+				Current = toplevels.Peek () as Toplevel;
 				Refresh ();
 			}
 		}
@@ -1122,6 +1233,9 @@ namespace Terminal {
 					DrawBounds (sub);
 		}
 
+		/// <summary>
+		/// Runs the application with the built-in toplevel view
+		/// </summary>
 		public static void Run ()
 		{
 			Run (Top);
@@ -1146,6 +1260,16 @@ namespace Terminal {
 			var runToken = Begin (view);
 			RunLoop (runToken);
 			End (runToken);
+		}
+
+		/// <summary>
+		/// Stops running the most recent toplevel
+		/// </summary>
+		public static void RequestStop ()
+		{
+			var ct = Current as Toplevel;
+
+			Current.Running = false;
 		}
 
 		static void TerminalResized ()

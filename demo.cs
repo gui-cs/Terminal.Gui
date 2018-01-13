@@ -25,13 +25,20 @@ class Demo {
 		);
 	}
 
+	public static Label ml2;
+
 	static void NewFile ()
 	{
-		var d = new Dialog ("New File", 50, 20, new Button ("Ok"), new Button ("Cancel"));
+		var d = new Dialog (
+			"New File", 50, 20,
+			new Button ("Ok", is_default: true ) { Clicked = () => { Application.RequestStop (); } },
+			new Button ("Cancel") { Clicked = () => { Application.RequestStop (); } });
+		ml2 = new Label (1, 1, "Mouse Debug Line");
+		d.Add (ml2);
 		Application.Run (d);
 	}
 
-	static Label ml;
+	public static Label ml;
 	static void Main ()
 	{
 		Application.Init ();
@@ -44,7 +51,7 @@ class Demo {
 				new MenuItem ("_New", "Creates new file", NewFile),
 				new MenuItem ("_Open", "", null),
 				new MenuItem ("_Close", "", null),
-				new MenuItem ("_Quit", "", null)
+				new MenuItem ("_Quit", "", () => { top.Running = false; })
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
 				new MenuItem ("_Copy", "", null),

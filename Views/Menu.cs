@@ -192,6 +192,30 @@ namespace Terminal {
 			}
 			return base.ProcessKey (kb);
 		}
+
+		public override bool MouseEvent(MouseEvent me)
+		{
+			if (me.Flags == MouseFlags.Button1Clicked || me.Flags == MouseFlags.Button1Released) {
+				if (me.Y < 1)
+					return true;
+				var item = me.Y - 1;
+				if (item >= barItems.Children.Length)
+					return true;
+				host.CloseMenu ();
+				Run (barItems.Children [item].Action);
+				return true;
+			}
+			if (me.Flags == MouseFlags.Button1Pressed) {
+				if (me.Y < 1)
+					return true;
+				if (me.Y - 1 >= barItems.Children.Length)
+					return true;
+				current = me.Y - 1;
+				SetNeedsDisplay ();
+				return true;
+			}
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -275,6 +299,7 @@ namespace Terminal {
 			SuperView.SetFocus (openMenu);
 		}
 
+		// Starts the menu from a hotkey
 		void StartMenu ()
 		{
 			if (openMenu != null)
@@ -284,6 +309,18 @@ namespace Terminal {
 
 			previousFocused = SuperView.Focused;
 			OpenMenu (selected);
+		}
+
+		// Activates the menu, handles either first focus, or activating an entry when it was already active
+		// For mouse events.
+		void Activate (int idx)
+		{
+			selected = idx;
+			if (openMenu == null) 
+				previousFocused = SuperView.Focused;
+			
+			OpenMenu (idx);
+			SetNeedsDisplay ();
 		}
 
 		internal void CloseMenu ()
@@ -367,6 +404,22 @@ namespace Terminal {
 			}
 			SetNeedsDisplay ();
 			return true;
+		}
+
+		public override bool MouseEvent(MouseEvent me)
+		{
+			if (me.Flags == MouseFlags.Button1Clicked) {
+ 				int pos = 1;
+				int cx = me.X;
+				for (int i = 0; i < Menus.Length; i++) {
+					if (cx > pos && me.X < pos + 1 + Menus [i].TitleLength) {
+						Activate (i);
+						return true;
+					}
+					pos += 2 + Menus [i].TitleLength + 1;
+				}
+			}
+			return false;
 		}
 	}
 

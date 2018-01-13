@@ -161,5 +161,10 @@ namespace Terminal {
 		/// Flags indicating the kind of mouse event that is being posted.
 		/// </summary>
 		public MouseFlags Flags;
+
+		public override string ToString()
+		{
+			return $"({X},{Y}:{Flags}";
+		}
 	}
 }
