@@ -38,6 +38,12 @@ class Demo {
 		Application.Run (d);
 	}
 
+	static bool Quit ()
+	{
+		var n = MessageBox.Query (50, 5, "Quit Demo", "Are you sure you want to quit this demo?", "Yes", "No");
+		return n == 0;
+	}
+
 	public static Label ml;
 	static void Main ()
 	{
@@ -51,7 +57,7 @@ class Demo {
 				new MenuItem ("_New", "Creates new file", NewFile),
 				new MenuItem ("_Open", "", null),
 				new MenuItem ("_Close", "", null),
-				new MenuItem ("_Quit", "", () => { top.Running = false; })
+				new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
 				new MenuItem ("_Copy", "", null),

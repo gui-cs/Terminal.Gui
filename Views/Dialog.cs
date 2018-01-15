@@ -16,6 +16,13 @@ namespace Terminal {
 	public class Dialog : Window {
 		List<Button> buttons = new List<Button> ();
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Dialog"/> class with an optional set of buttons to display
+		/// </summary>
+		/// <param name="title">Title for the dialog.</param>
+		/// <param name="width">Width for the dialog.</param>
+		/// <param name="height">Height for the dialog.</param>
+		/// <param name="buttons">Optional buttons to lay out at the bottom of the dialog.</param>
 		public Dialog (string title, int width, int height, params Button [] buttons) : base (Application.MakeCenteredRect (new Size (width, height)), title)
 		{
 			foreach (var b in buttons) {
@@ -23,6 +30,20 @@ namespace Terminal {
 				Add (b);
 			}
 		}
+
+		/// <summary>
+		/// Adds a button to the dialog, its layout will be controled by the dialog
+		/// </summary>
+		/// <param name="button">Button to add.</param>
+		public void AddButton (Button button)
+		{
+			if (button == null)
+				return;
+
+			buttons.Add (button);
+			Add (button);
+		}
+
 
 		public override void LayoutSubviews ()
 		{
@@ -38,7 +59,7 @@ namespace Terminal {
 			const int borderWidth = 2;
 			var start = (Frame.Width-borderWidth - buttonSpace) / 2;
 
-			var y = Frame.Height - borderWidth - 2 - maxHeight;
+			var y = Frame.Height - borderWidth  - maxHeight;
 			foreach (var b in buttons) {
 				var bf = b.Frame;
 

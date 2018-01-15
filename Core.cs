@@ -800,8 +800,8 @@ namespace Terminal {
 		public Window (Rect frame, string title = null) : base (frame)
 		{
 			this.Title = title;
-			frame.Inflate (-1, -1);
-			contentView = new ContentView (frame);
+			var cFrame = new Rect (1, 1, frame.Width - 2, frame.Height - 2);
+			contentView = new ContentView (cFrame);
 			base.Add (contentView);
 		}
 

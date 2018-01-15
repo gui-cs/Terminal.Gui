@@ -63,18 +63,18 @@ namespace Terminal {
 
 		static char [] whitespace = new char [] { ' ', '\t' };
 
-		string ClipAndJustify (string str)
+		static string ClipAndJustify (string str, int width, TextAlignment talign)
 		{
 			int slen = str.Length;
-			if (slen > Frame.Width)
-				return str.Substring (0, Frame.Width);
+			if (slen > width)
+				return str.Substring (0, width);
 			else {
-				if (textAlignment == TextAlignment.Justified) {
+				if (talign == TextAlignment.Justified) {
 					var words = str.Split (whitespace, StringSplitOptions.RemoveEmptyEntries);
 					int textCount = words.Sum ((arg) => arg.Length);
 
-					var spaces = (Frame.Width - textCount) / (words.Length - 1);
-					var extras = (Frame.Width - textCount) % words.Length;
+					var spaces = (width- textCount) / (words.Length - 1);
+					var extras = (width - textCount) % words.Length;
 					var s = new System.Text.StringBuilder ();
 					//s.Append ($"tc={textCount} sp={spaces},x={extras} - ");
 					for (int w = 0; w < words.Length; w++) {
@@ -97,18 +97,23 @@ namespace Terminal {
 		void Recalc ()
 		{
 			recalcPending = false;
-			lines.Clear ();
-			if (text.IndexOf ('\n') == -1) {
-				lines.Add (ClipAndJustify (text));
+			Recalc (text, lines, Frame.Width, textAlignment);
+		}
+
+		static void Recalc (string textStr, List<string> lineResult, int width, TextAlignment talign)
+		{
+			lineResult.Clear ();
+			if (textStr.IndexOf ('\n') == -1) {
+				lineResult.Add (ClipAndJustify (textStr, width, talign));
 				return;
 			}
-			int textLen = text.Length;
+			int textLen = textStr.Length;
 			int lp = 0;
 			for (int i = 0; i < textLen; i++) {
-				char c = text [i];
+				char c = textStr [i];
 
 				if (c == '\n') {
-					lines.Add (ClipAndJustify (text.Substring (lp, i - lp)));
+					lineResult.Add (ClipAndJustify (textStr.Substring (lp, i - lp), width, talign));
 					lp = i + 1;
 				}
 			}
@@ -148,6 +153,19 @@ namespace Terminal {
 				Move (x, line);
 				Driver.AddStr (str);
 			}
+		}
+
+		/// <summary>
+		/// Computes the number of lines needed to render the specified text by the Label control
+		/// </summary>
+		/// <returns>Number of lines.</returns>
+		/// <param name="text">Text, may contain newlines.</param>
+		/// <param name="width">The width for the text.</param>
+		public static int MeasureLines (string text, int width)
+		{
+			var result = new List<string> ();
+			Recalc (text, result, width, TextAlignment.Left);
+			return result.Count ();
 		}
 
 		/// <summary>
