@@ -1,0 +1,142 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Attribute
+  id: Attribute
+  children:
+  - Terminal.Attribute.#ctor(System.Int32)
+  - Terminal.Attribute.op_Implicit(System.Int32 to Terminal.Attribute)
+  - Terminal.Attribute.op_Implicit(Terminal.Attribute to System.Int32)
+  langs:
+  - csharp
+  name: Attribute
+  nameWithType: Attribute
+  fullName: Terminal.Attribute
+  type: Struct
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  summary: Attributes are used as elements that contain both a foreground and a background or platform specific features
+  remarks: >-
+    Attributes are needed to map colors to terminal capabilities that might lack colors, on color
+                  scenarios, they encode both the foreground and the background color and are used in the ColorScheme
+                  class to define color schemes that can be used in your application.
+  syntax:
+    content: public struct Attribute
+  inheritance:
+  - System.ValueType
+  implements: []
+- uid: Terminal.Attribute.#ctor(System.Int32)
+  id: '#ctor(System.Int32)'
+  parent: Terminal.Attribute
+  langs:
+  - csharp
+  name: Attribute(Int32)
+  nameWithType: Attribute.Attribute(Int32)
+  fullName: Attribute.Attribute(Int32)
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: public Attribute (int v);
+    parameters:
+    - id: v
+      type: System.Int32
+      description: To be added.
+  overload: Terminal.Attribute.#ctor*
+  exceptions: []
+- uid: Terminal.Attribute.op_Implicit(System.Int32 to Terminal.Attribute)
+  id: op_Implicit(System.Int32 to Terminal.Attribute)
+  parent: Terminal.Attribute
+  langs:
+  - csharp
+  name: op_Implicit(Int32 to Attribute)
+  nameWithType: Attribute.op_Implicit(Int32 to Attribute)
+  fullName: Attribute.op_Implicit(Int32 to Attribute)
+  type: Operator
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: public static Terminal.Attribute op_Implicit (int v);
+    parameters:
+    - id: v
+      type: System.Int32
+      description: To be added.
+    return:
+      type: Terminal.Attribute
+      description: To be added.
+  overload: Terminal.Attribute.op_Implicit*
+  exceptions: []
+- uid: Terminal.Attribute.op_Implicit(Terminal.Attribute to System.Int32)
+  id: op_Implicit(Terminal.Attribute to System.Int32)
+  parent: Terminal.Attribute
+  langs:
+  - csharp
+  name: op_Implicit(Attribute to Int32)
+  nameWithType: Attribute.op_Implicit(Attribute to Int32)
+  fullName: Attribute.op_Implicit(Attribute to Int32)
+  type: Operator
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: public static int op_Implicit (Terminal.Attribute c);
+    parameters:
+    - id: c
+      type: Terminal.Attribute
+      description: To be added.
+    return:
+      type: System.Int32
+      description: To be added.
+  overload: Terminal.Attribute.op_Implicit*
+  exceptions: []
+references:
+- uid: System.ValueType
+  parent: System
+  isExternal: true
+  name: ValueType
+  nameWithType: ValueType
+  fullName: System.ValueType
+- uid: Terminal.Attribute.#ctor(System.Int32)
+  parent: Terminal.Attribute
+  isExternal: false
+  name: Attribute(Int32)
+  nameWithType: Attribute.Attribute(Int32)
+  fullName: Attribute.Attribute(Int32)
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: Terminal.Attribute.op_Implicit(System.Int32 to Terminal.Attribute)
+  parent: Terminal.Attribute
+  isExternal: false
+  name: op_Implicit(Int32 to Attribute)
+  nameWithType: Attribute.op_Implicit(Int32 to Attribute)
+  fullName: Attribute.op_Implicit(Int32 to Attribute)
+- uid: Terminal.Attribute
+  parent: Terminal
+  isExternal: false
+  name: Attribute
+  nameWithType: Attribute
+  fullName: Terminal.Attribute
+- uid: Terminal.Attribute.op_Implicit(Terminal.Attribute to System.Int32)
+  parent: Terminal.Attribute
+  isExternal: false
+  name: op_Implicit(Attribute to Int32)
+  nameWithType: Attribute.op_Implicit(Attribute to Int32)
+  fullName: Attribute.op_Implicit(Attribute to Int32)
+- uid: Terminal.Attribute.#ctor*
+  parent: Terminal.Attribute
+  isExternal: false
+  name: Attribute
+  nameWithType: Attribute.Attribute
+  fullName: Attribute.Attribute
+- uid: Terminal.Attribute.op_Implicit*
+  parent: Terminal.Attribute
+  isExternal: false
+  name: op_Implicit
+  nameWithType: Attribute.op_Implicit
+  fullName: Attribute.op_Implicit

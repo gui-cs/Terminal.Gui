@@ -1,0 +1,131 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.TextAlignment
+  id: TextAlignment
+  children:
+  - Terminal.TextAlignment.Centered
+  - Terminal.TextAlignment.Justified
+  - Terminal.TextAlignment.Left
+  - Terminal.TextAlignment.Right
+  langs:
+  - csharp
+  name: TextAlignment
+  nameWithType: TextAlignment
+  fullName: Terminal.TextAlignment
+  type: Enum
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: public enum TextAlignment
+  inheritance:
+  - System.Enum
+- uid: Terminal.TextAlignment.Centered
+  id: Centered
+  parent: Terminal.TextAlignment
+  langs:
+  - csharp
+  name: Centered
+  nameWithType: TextAlignment.Centered
+  fullName: TextAlignment.Centered
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: Centered
+    return:
+      type: Terminal.TextAlignment
+      description: To be added.
+  exceptions: []
+- uid: Terminal.TextAlignment.Justified
+  id: Justified
+  parent: Terminal.TextAlignment
+  langs:
+  - csharp
+  name: Justified
+  nameWithType: TextAlignment.Justified
+  fullName: TextAlignment.Justified
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: Justified
+    return:
+      type: Terminal.TextAlignment
+      description: To be added.
+  exceptions: []
+- uid: Terminal.TextAlignment.Left
+  id: Left
+  parent: Terminal.TextAlignment
+  langs:
+  - csharp
+  name: Left
+  nameWithType: TextAlignment.Left
+  fullName: TextAlignment.Left
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: Left
+    return:
+      type: Terminal.TextAlignment
+      description: To be added.
+  exceptions: []
+- uid: Terminal.TextAlignment.Right
+  id: Right
+  parent: Terminal.TextAlignment
+  langs:
+  - csharp
+  name: Right
+  nameWithType: TextAlignment.Right
+  fullName: TextAlignment.Right
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: Right
+    return:
+      type: Terminal.TextAlignment
+      description: To be added.
+  exceptions: []
+references:
+- uid: System.Enum
+  parent: System
+  isExternal: true
+  name: Enum
+  nameWithType: Enum
+  fullName: System.Enum
+- uid: Terminal.TextAlignment.Centered
+  parent: Terminal.TextAlignment
+  isExternal: false
+  name: Centered
+  nameWithType: TextAlignment.Centered
+  fullName: TextAlignment.Centered
+- uid: Terminal.TextAlignment
+  parent: Terminal
+  isExternal: false
+  name: TextAlignment
+  nameWithType: TextAlignment
+  fullName: Terminal.TextAlignment
+- uid: Terminal.TextAlignment.Justified
+  parent: Terminal.TextAlignment
+  isExternal: false
+  name: Justified
+  nameWithType: TextAlignment.Justified
+  fullName: TextAlignment.Justified
+- uid: Terminal.TextAlignment.Left
+  parent: Terminal.TextAlignment
+  isExternal: false
+  name: Left
+  nameWithType: TextAlignment.Left
+  fullName: TextAlignment.Left
+- uid: Terminal.TextAlignment.Right
+  parent: Terminal.TextAlignment
+  isExternal: false
+  name: Right
+  nameWithType: TextAlignment.Right
+  fullName: TextAlignment.Right

@@ -1,0 +1,164 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.ColorScheme
+  id: ColorScheme
+  children:
+  - Terminal.ColorScheme.#ctor
+  - Terminal.ColorScheme.Focus
+  - Terminal.ColorScheme.HotFocus
+  - Terminal.ColorScheme.HotNormal
+  - Terminal.ColorScheme.Normal
+  langs:
+  - csharp
+  name: ColorScheme
+  nameWithType: ColorScheme
+  fullName: Terminal.ColorScheme
+  type: Class
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  summary: Color scheme definitions
+  syntax:
+    content: public class ColorScheme
+  inheritance:
+  - System.Object
+  implements: []
+  inheritedMembers: []
+- uid: Terminal.ColorScheme.#ctor
+  id: '#ctor'
+  parent: Terminal.ColorScheme
+  langs:
+  - csharp
+  name: ColorScheme()
+  nameWithType: ColorScheme.ColorScheme()
+  fullName: ColorScheme.ColorScheme()
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: public ColorScheme ();
+    parameters: []
+  overload: Terminal.ColorScheme.#ctor*
+  exceptions: []
+- uid: Terminal.ColorScheme.Focus
+  id: Focus
+  parent: Terminal.ColorScheme
+  langs:
+  - csharp
+  name: Focus
+  nameWithType: ColorScheme.Focus
+  fullName: ColorScheme.Focus
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: public Terminal.Attribute Focus;
+    return:
+      type: Terminal.Attribute
+      description: To be added.
+  exceptions: []
+- uid: Terminal.ColorScheme.HotFocus
+  id: HotFocus
+  parent: Terminal.ColorScheme
+  langs:
+  - csharp
+  name: HotFocus
+  nameWithType: ColorScheme.HotFocus
+  fullName: ColorScheme.HotFocus
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: public Terminal.Attribute HotFocus;
+    return:
+      type: Terminal.Attribute
+      description: To be added.
+  exceptions: []
+- uid: Terminal.ColorScheme.HotNormal
+  id: HotNormal
+  parent: Terminal.ColorScheme
+  langs:
+  - csharp
+  name: HotNormal
+  nameWithType: ColorScheme.HotNormal
+  fullName: ColorScheme.HotNormal
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: public Terminal.Attribute HotNormal;
+    return:
+      type: Terminal.Attribute
+      description: To be added.
+  exceptions: []
+- uid: Terminal.ColorScheme.Normal
+  id: Normal
+  parent: Terminal.ColorScheme
+  langs:
+  - csharp
+  name: Normal
+  nameWithType: ColorScheme.Normal
+  fullName: ColorScheme.Normal
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: public Terminal.Attribute Normal;
+    return:
+      type: Terminal.Attribute
+      description: To be added.
+  exceptions: []
+references:
+- uid: System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: Terminal.ColorScheme.#ctor
+  parent: Terminal.ColorScheme
+  isExternal: false
+  name: ColorScheme()
+  nameWithType: ColorScheme.ColorScheme()
+  fullName: ColorScheme.ColorScheme()
+- uid: Terminal.ColorScheme.Focus
+  parent: Terminal.ColorScheme
+  isExternal: false
+  name: Focus
+  nameWithType: ColorScheme.Focus
+  fullName: ColorScheme.Focus
+- uid: Terminal.Attribute
+  parent: Terminal
+  isExternal: false
+  name: Attribute
+  nameWithType: Attribute
+  fullName: Terminal.Attribute
+- uid: Terminal.ColorScheme.HotFocus
+  parent: Terminal.ColorScheme
+  isExternal: false
+  name: HotFocus
+  nameWithType: ColorScheme.HotFocus
+  fullName: ColorScheme.HotFocus
+- uid: Terminal.ColorScheme.HotNormal
+  parent: Terminal.ColorScheme
+  isExternal: false
+  name: HotNormal
+  nameWithType: ColorScheme.HotNormal
+  fullName: ColorScheme.HotNormal
+- uid: Terminal.ColorScheme.Normal
+  parent: Terminal.ColorScheme
+  isExternal: false
+  name: Normal
+  nameWithType: ColorScheme.Normal
+  fullName: ColorScheme.Normal
+- uid: Terminal.ColorScheme.#ctor*
+  parent: Terminal.ColorScheme
+  isExternal: false
+  name: ColorScheme
+  nameWithType: ColorScheme.ColorScheme
+  fullName: ColorScheme.ColorScheme

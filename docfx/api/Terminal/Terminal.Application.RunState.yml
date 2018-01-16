@@ -1,0 +1,97 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Application.RunState
+  id: Application.RunState
+  children:
+  - Terminal.Application.RunState.Dispose
+  - Terminal.Application.RunState.Dispose(System.Boolean)
+  langs:
+  - csharp
+  name: Application.RunState
+  nameWithType: Application.RunState
+  fullName: Terminal.Application.RunState
+  type: Class
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: 'public class Application.RunState : IDisposable'
+  inheritance:
+  - System.Object
+  implements:
+  - System.IDisposable
+  inheritedMembers: []
+- uid: Terminal.Application.RunState.Dispose
+  id: Dispose
+  parent: Terminal.Application.RunState
+  langs:
+  - csharp
+  name: Dispose()
+  nameWithType: Application.RunState.Dispose()
+  fullName: Application.RunState.Dispose()
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: public void Dispose ();
+    parameters: []
+  overload: Terminal.Application.RunState.Dispose*
+  exceptions: []
+- uid: Terminal.Application.RunState.Dispose(System.Boolean)
+  id: Dispose(System.Boolean)
+  parent: Terminal.Application.RunState
+  langs:
+  - csharp
+  name: Dispose(Boolean)
+  nameWithType: Application.RunState.Dispose(Boolean)
+  fullName: Application.RunState.Dispose(Boolean)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  syntax:
+    content: public virtual void Dispose (bool disposing);
+    parameters:
+    - id: disposing
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Application.RunState.Dispose*
+  exceptions: []
+references:
+- uid: System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: Terminal.Application.RunState.Dispose
+  parent: Terminal.Application.RunState
+  isExternal: false
+  name: Dispose()
+  nameWithType: Application.RunState.Dispose()
+  fullName: Application.RunState.Dispose()
+- uid: Terminal.Application.RunState.Dispose(System.Boolean)
+  parent: Terminal.Application.RunState
+  isExternal: false
+  name: Dispose(Boolean)
+  nameWithType: Application.RunState.Dispose(Boolean)
+  fullName: Application.RunState.Dispose(Boolean)
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Application.RunState.Dispose*
+  parent: Terminal.Application.RunState
+  isExternal: false
+  name: Dispose
+  nameWithType: Application.RunState.Dispose
+  fullName: Application.RunState.Dispose
+- uid: System.IDisposable
+  parent: System
+  isExternal: true
+  name: IDisposable
+  nameWithType: IDisposable
+  fullName: System.IDisposable
