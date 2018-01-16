@@ -10,7 +10,9 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
+    <summary>
+            This is the Curses driver for the gui.cs/Terminal framework.
+            </summary>
     <remarks>To be added.</remarks>
   </Docs>
   <Members>

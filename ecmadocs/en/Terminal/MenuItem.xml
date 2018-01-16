@@ -29,10 +29,12 @@
         <Parameter Name="action" Type="System.Action" />
       </Parameters>
       <Docs>
-        <param name="title">To be added.</param>
-        <param name="help">To be added.</param>
-        <param name="action">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="title">Title for the menu item.</param>
+        <param name="help">Help text to display.</param>
+        <param name="action">Action to invoke when the menu item is activated.</param>
+        <summary>
+            Initializes a new <see cref="T:Terminal.MenuItem" />.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -47,8 +49,10 @@
         <ReturnType>System.Action</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
+        <summary>
+            Gets or sets the action to be invoked when the menu is triggered
+            </summary>
+        <value>Method to invoke.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -63,8 +67,10 @@
         <ReturnType>System.String</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
+        <summary>
+            Gets or sets the help text for the menu item.
+            </summary>
+        <value>The help text.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -79,7 +85,11 @@
         <ReturnType>System.Char</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The hotkey is used when the menu is active, the shortcut can be triggered when the menu is not active.   
+            For example HotKey would be "N" when the File Menu is open (assuming there is a "_New" entry
+            if the ShortCut is set to "Control-N", this would be a global hotkey that would trigger as well
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -94,7 +104,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            This is the global setting that can be used as a global shortcut to invoke the action on the menu.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -109,8 +121,10 @@
         <ReturnType>System.String</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
+        <summary>
+            Gets or sets the title.
+            </summary>
+        <value>The title.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

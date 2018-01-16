@@ -112,13 +112,45 @@ namespace Terminal {
 		}
 	}
 
+	/// <summary>
+	/// View is the base class for all views on the screen and represents a visible element that can render itself and contains zero or more nested views.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	///    The View defines the base functionality for user interface elements in Terminal/gui.cs.  Views
+	///    can contain one or more subviews, can respond to user input and render themselves on the screen.
+	/// </para>
+	/// <para>
+	///    Views are created with a specified rectangle region (the frame) that is relative to the container
+	///    that they are added into.   
+	/// </para>
+	/// <para>
+	///    Subviews can be added to a View by calling the Add method.   The container of a view is the 
+	///    Superview.
+	/// </para>
+	/// <para>
+	///    Developers can call the SetNeedsDisplay method on the view to flag a region or the entire view
+	///    as requiring to be redrawn.
+	/// </para>
+	/// </remarks>
 	public class View : Responder, IEnumerable {
 		string id = "";
 		View container = null;
 		View focused = null;
+
+		/// <summary>
+		/// Points to the current driver in use by the view, it is a convenience property
+		/// for simplifying the development of new views.
+		/// </summary>
 		public static ConsoleDriver Driver = Application.Driver;
-		public static IList<View> empty = new List<View> (0).AsReadOnly ();
+
+		static IList<View> empty = new List<View> (0).AsReadOnly ();
 		List<View> subviews;
+
+		/// <summary>
+		/// This returns a list of the subviews contained by this view.
+		/// </summary>
+		/// <value>The subviews.</value>
 		public IList<View> Subviews => subviews == null ? empty : subviews.AsReadOnly ();
 		internal Rect NeedDisplay { get; private set; } = Rect.Empty;
 
@@ -138,7 +170,14 @@ namespace Terminal {
 		/// <value><c>true</c> if want mouse position reports; otherwise, <c>false</c>.</value>
 		public virtual bool WantMousePositionReports { get; set; } = false;
 
-		// The frame for this view
+		/// <summary>
+		/// Gets or sets the frame for the view.
+		/// </summary>
+		/// <value>The frame.</value>
+		/// <remarks>
+		///    Altering the Frame of a view will trigger the redrawing of the 
+		///    view as well as the redrawing of the affected regions in the superview.
+		/// </remarks>
 		public Rect Frame {
 			get => frame;
 			set {
@@ -152,12 +191,20 @@ namespace Terminal {
 			}
 		}
 
+		/// <summary>
+		/// Gets an enumerator that enumerates the subviews in this view.
+		/// </summary>
+		/// <returns>The enumerator.</returns>
 		public IEnumerator GetEnumerator ()
 		{
 			foreach (var v in subviews)
 				yield return v;
 		}
 
+		/// <summary>
+		/// The bounds represent the View-relative rectangle used for this view.   Updates to the Bounds update the Frame, and has the same side effects as updating the frame.
+		/// </summary>
+		/// <value>The bounds.</value>
 		public Rect Bounds {
 			get => new Rect (Point.Empty, Frame.Size);
 			set {
@@ -165,8 +212,16 @@ namespace Terminal {
 			}
 		}
 
+		/// <summary>
+		/// Returns the container for this view, or null if this view has not been added to a container.
+		/// </summary>
+		/// <value>The super view.</value>
 		public View SuperView => container;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.View"/> class with the specified frame.   This is the default constructor.
+		/// </summary>
+		/// <param name="frame">The region covered by this view.</param>
 		public View (Rect frame)
 		{
 			this.Frame = frame;
@@ -182,6 +237,10 @@ namespace Terminal {
 			SetNeedsDisplay (Frame);
 		}
 
+		/// <summary>
+		/// Flags the specified rectangle region on this view as needing to be repainted.
+		/// </summary>
+		/// <param name="region">The region that must be flagged for repaint.</param>
 		public void SetNeedsDisplay (Rect region)
 		{
 			if (NeedDisplay.IsEmpty)
@@ -205,6 +264,9 @@ namespace Terminal {
 
 		internal bool childNeedsDisplay;
 
+		/// <summary>
+		/// Flags this view for requiring the children views to be repainted.
+		/// </summary>
 		public void ChildNeedsDisplay ()
 		{
 			childNeedsDisplay = true;
@@ -230,6 +292,10 @@ namespace Terminal {
 			SetNeedsDisplay ();
 		}
 
+		/// <summary>
+		/// Adds the specified views to the view.
+		/// </summary>
+		/// <param name="views">Array of one or more views (can be optional parameter).</param>
 		public void Add (params View [] views)
 		{
 			if (views == null)
@@ -305,6 +371,7 @@ namespace Terminal {
 		/// <param name="row">View-based row.</param>
 		/// <param name="rcol">Absolute column, display relative.</param>
 		/// <param name="rrow">Absolute row, display relative.</param>
+		/// <param name="clipped">Whether to clip the result of the ViewToScreen method, if set to true, the rcol, rrow values are clamped to the screen dimensions.</param>
 		internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Computes the real row, col relative to the screen.
@@ -428,6 +495,10 @@ namespace Terminal {
 				Move (frame.X, frame.Y);
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="T:Terminal.View"/> has focus.
+		/// </summary>
+		/// <value><c>true</c> if has focus; otherwise, <c>false</c>.</value>
 		public override bool HasFocus {
 			get {
 				return base.HasFocus;
@@ -444,6 +515,10 @@ namespace Terminal {
 		/// <value>The focused.</value>
 		public View Focused => focused;
 
+		/// <summary>
+		/// Returns the most focused view in the chain of subviews (the leaf view that has the focus).
+		/// </summary>
+		/// <value>The most focused.</value>
 		public View MostFocused {
 			get {
 				if (Focused == null)
@@ -471,6 +546,9 @@ namespace Terminal {
 			Driver.AddCh (ch);
 		}
 
+		/// <summary>
+		/// Removes the SetNeedsDisplay and the ChildNeedsDisplay setting on this view.
+		/// </summary>
 		protected void ClearNeedsDisplay ()
 		{
 			NeedDisplay = Rect.Empty;
@@ -693,10 +771,19 @@ namespace Terminal {
 			return false;
 		}
 
+		/// <summary>
+		/// This virtual method is invoked when a view starts executing or 
+		/// when the dimensions of the view have changed, for example in 
+		/// response to the container view or terminal resizing.
+		/// </summary>
 		public virtual void LayoutSubviews ()
 		{
 		}
 
+		/// <summary>
+		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.View"/>.
+		/// </summary>
+		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.View"/>.</returns>
 		public override string ToString ()
 		{
 			return $"{GetType ().Name}({id})({Frame})";
@@ -715,10 +802,18 @@ namespace Terminal {
 	public class Toplevel : View {
 		public bool Running;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Toplevel"/> class.
+		/// </summary>
+		/// <param name="frame">Frame.</param>
 		public Toplevel (Rect frame) : base (frame)
 		{
 		}
 
+		/// <summary>
+		/// Convenience factory method that creates a new toplevel with the current terminal dimensions.
+		/// </summary>
+		/// <returns>The create.</returns>
 		public static Toplevel Create ()
 		{
 			return new Toplevel (new Rect (0, 0, Driver.Cols, Driver.Rows));
@@ -780,6 +875,10 @@ namespace Terminal {
 		View contentView;
 		string title;
 
+		/// <summary>
+		/// The title to be displayed for this window.
+		/// </summary>
+		/// <value>The title.</value>
 		public string Title {
 			get => title;
 			set {
@@ -921,9 +1020,27 @@ namespace Terminal {
 	///   </para>
 	/// </remarks>
 	public class Application {
+		/// <summary>
+		/// The current Console Driver in use.
+		/// </summary>
 		public static ConsoleDriver Driver = new CursesDriver ();
+
+		/// <summary>
+		/// The Toplevel object used for the application on startup.
+		/// </summary>
+		/// <value>The top.</value>
 		public static Toplevel Top { get; private set; }
+
+		/// <summary>
+		/// The current toplevel object.   This is updated when Application.Run enters and leaves and points to the current toplevel.
+		/// </summary>
+		/// <value>The current.</value>
 		public static Toplevel Current { get; private set; }
+
+		/// <summary>
+		/// The mainloop driver for the applicaiton
+		/// </summary>
+		/// <value>The main loop.</value>
 		public static Mono.Terminal.MainLoop MainLoop { get; private set; }
 
 		static Stack<Toplevel> toplevels = new Stack<Toplevel> ();

@@ -32,8 +32,10 @@
         <Parameter Name="frame" Type="Terminal.Rect" />
       </Parameters>
       <Docs>
-        <param name="frame">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="frame">Frame.</param>
+        <summary>
+            Initializes a new instance of the <see cref="T:Terminal.Toplevel" /> class.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -65,8 +67,10 @@
       </ReturnValue>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
+        <summary>
+            Convenience factory method that creates a new toplevel with the current terminal dimensions.
+            </summary>
+        <returns>The create.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

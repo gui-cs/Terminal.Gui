@@ -91,11 +91,12 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The current toplevel object.   This is updated when Application.Run enters and leaves and points to the current toplevel.
   syntax:
     content: public static Terminal.Toplevel Current { get; }
     return:
       type: Terminal.Toplevel
-      description: To be added.
+      description: The current.
   overload: Terminal.Application.Current*
   exceptions: []
 - uid: Terminal.Application.DebugDrawBounds
@@ -128,6 +129,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The current Console Driver in use.
   syntax:
     content: public static Terminal.ConsoleDriver Driver;
     return:
@@ -227,11 +229,12 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The mainloop driver for the applicaiton
   syntax:
     content: public static Mono.Terminal.MainLoop MainLoop { get; }
     return:
       type: Mono.Terminal.MainLoop
-      description: To be added.
+      description: The main loop.
   overload: Terminal.Application.MainLoop*
   exceptions: []
 - uid: Terminal.Application.MakeCenteredRect(Terminal.Size)
@@ -401,11 +404,12 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The Toplevel object used for the application on startup.
   syntax:
     content: public static Terminal.Toplevel Top { get; }
     return:
       type: Terminal.Toplevel
-      description: To be added.
+      description: The top.
   overload: Terminal.Application.Top*
   exceptions: []
 - uid: Terminal.Application.UngrabMouse

@@ -6,6 +6,10 @@ It is an updated version of
 [gui.cs](https://github.com/mono/mono-curses/blob/master/gui.cs) that
 I wrote for [mono-curses](https://github.com/mono/mono-curses)
 
+# API Documentation
+
+Go to the [API documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.html) for details.
+
 # Running and Building
 
 To run this, you will need a peer checkout of mono-ncurses to this

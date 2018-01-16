@@ -32,6 +32,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: ConsoleDriver is an abstract class that defines the requirements for a console driver.   One implementation if the CursesDriver, and another one uses the .NET Console one.
   syntax:
     content: public abstract class ConsoleDriver
   inheritance:

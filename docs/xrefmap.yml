@@ -2841,11 +2841,6 @@ references:
   href: api/Terminal/Terminal.View.html#Terminal_View_Driver
   fullName: View.Driver
   nameWithType: View.Driver
-- uid: Terminal.View.empty
-  name: empty
-  href: api/Terminal/Terminal.View.html#Terminal_View_empty
-  fullName: View.empty
-  nameWithType: View.empty
 - uid: Terminal.View.EnsureFocus
   name: EnsureFocus()
   href: api/Terminal/Terminal.View.html#Terminal_View_EnsureFocus

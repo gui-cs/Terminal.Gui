@@ -53,12 +53,13 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Returns a <xref href="System.String"></xref> that represents the current <xref href="Terminal.MouseEvent"></xref>.
   syntax:
     content: public override string ToString ();
     parameters: []
     return:
       type: System.String
-      description: To be added.
+      description: A <xref href="System.String"></xref> that represents the current <xref href="Terminal.MouseEvent"></xref>.
   overload: Terminal.MouseEvent.ToString*
   exceptions: []
 - uid: Terminal.MouseEvent.X

@@ -110,8 +110,10 @@
         <ReturnType>System.String</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
+        <summary>
+            The title to be displayed for this window.
+            </summary>
+        <value>The title.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

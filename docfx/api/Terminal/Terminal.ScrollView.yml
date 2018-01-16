@@ -34,7 +34,6 @@ items:
   - Terminal.View.DrawHotString(System.String,System.Boolean,Terminal.ColorScheme)
   - Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
   - Terminal.View.Driver
-  - Terminal.View.empty
   - Terminal.View.EnsureFocus
   - Terminal.View.Focused
   - Terminal.View.FocusFirst
@@ -210,12 +209,6 @@ references:
   name: Driver
   nameWithType: View.Driver
   fullName: View.Driver
-- uid: Terminal.View.empty
-  parent: Terminal.View
-  isExternal: false
-  name: empty
-  nameWithType: View.empty
-  fullName: View.empty
 - uid: Terminal.View.EnsureFocus
   parent: Terminal.View
   isExternal: false

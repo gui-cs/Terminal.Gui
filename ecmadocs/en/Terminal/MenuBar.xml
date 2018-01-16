@@ -27,8 +27,10 @@
         <Parameter Name="menus" Type="Terminal.MenuBarItem[]" />
       </Parameters>
       <Docs>
-        <param name="menus">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="menus">Menus.</param>
+        <summary>
+            Initializes a new instance of the <see cref="T:Terminal.MenuBar" /> class with the specified set of toplevel menu items.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -43,8 +45,10 @@
         <ReturnType>Terminal.MenuBarItem[]</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
+        <summary>
+            The menus that were defined when the menubar was created.   This can be updated if the menu is not currently visible.
+            </summary>
+        <value>The menu array.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

@@ -180,6 +180,10 @@ namespace Terminal {
 			}
 		}
 
+		/// <summary>
+		/// Controls the text-alignemtn property of the label, changing it will redisplay the label.
+		/// </summary>
+		/// <value>The text alignment.</value>
 		public TextAlignment TextAlignment {
 			get => textAlignment;
 			set {
@@ -188,10 +192,10 @@ namespace Terminal {
 			}
 		}
 
+		Attribute textColor = -1;
 		/// <summary>
 		///   The color used for the label
 		/// </summary>        
-		Attribute textColor = -1;
 		public Attribute TextColor {
 			get => textColor;
 			set {

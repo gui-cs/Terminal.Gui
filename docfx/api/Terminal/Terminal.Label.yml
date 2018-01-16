@@ -41,7 +41,6 @@ items:
   - Terminal.View.DrawHotString(System.String,System.Boolean,Terminal.ColorScheme)
   - Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
   - Terminal.View.Driver
-  - Terminal.View.empty
   - Terminal.View.EnsureFocus
   - Terminal.View.Focused
   - Terminal.View.FocusFirst
@@ -206,11 +205,12 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Controls the text-alignemtn property of the label, changing it will redisplay the label.
   syntax:
     content: public Terminal.TextAlignment TextAlignment { get; set; }
     return:
       type: Terminal.TextAlignment
-      description: To be added.
+      description: The text alignment.
   overload: Terminal.Label.TextAlignment*
   exceptions: []
 - uid: Terminal.Label.TextColor
@@ -225,6 +225,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The color used for the label
   syntax:
     content: public Terminal.Attribute TextColor { get; set; }
     return:
@@ -449,12 +450,6 @@ references:
   name: Driver
   nameWithType: View.Driver
   fullName: View.Driver
-- uid: Terminal.View.empty
-  parent: Terminal.View
-  isExternal: false
-  name: empty
-  nameWithType: View.empty
-  fullName: View.empty
 - uid: Terminal.View.EnsureFocus
   parent: Terminal.View
   isExternal: false

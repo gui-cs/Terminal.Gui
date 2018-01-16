@@ -162,6 +162,11 @@ namespace Terminal {
 		/// </summary>
 		public MouseFlags Flags;
 
+
+		/// <summary>
+		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.MouseEvent"/>.
+		/// </summary>
+		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.MouseEvent"/>.</returns>
 		public override string ToString()
 		{
 			return $"({X},{Y}:{Flags}";

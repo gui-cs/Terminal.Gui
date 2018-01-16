@@ -45,8 +45,10 @@
       </ReturnValue>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
+        <summary>
+            Returns a <see cref="T:System.String" /> that represents the current <see cref="T:Terminal.MouseEvent" />.
+            </summary>
+        <returns>A <see cref="T:System.String" /> that represents the current <see cref="T:Terminal.MouseEvent" />.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

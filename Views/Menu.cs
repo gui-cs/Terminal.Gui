@@ -16,6 +16,13 @@ namespace Terminal {
 	/// A menu item has a title, an associated help text, and an action to execute on activation.
 	/// </summary>
 	public class MenuItem {
+
+		/// <summary>
+		/// Initializes a new <see cref="T:Terminal.MenuItem"/>.
+		/// </summary>
+		/// <param name="title">Title for the menu item.</param>
+		/// <param name="help">Help text to display.</param>
+		/// <param name="action">Action to invoke when the menu item is activated.</param>
 		public MenuItem (string title, string help, Action action)
 		{
 			Title = title ?? "";
@@ -35,15 +42,37 @@ namespace Terminal {
 			}
 		}
 
-		// The hotkey is used when the menu is active, the shortcut can be triggered
-		// when the menu is not active.
-		// For example HotKey would be "N" when the File Menu is open (assuming there is a "_New" entry
-		// if the ShortCut is set to "Control-N", this would be a global hotkey that would trigger as well
+		// 
+		// 
+
+		/// <summary>
+		/// The hotkey is used when the menu is active, the shortcut can be triggered when the menu is not active.   
+		/// For example HotKey would be "N" when the File Menu is open (assuming there is a "_New" entry
+		/// if the ShortCut is set to "Control-N", this would be a global hotkey that would trigger as well
+		/// </summary>
 		public char HotKey;
+
+		/// <summary>
+		/// This is the global setting that can be used as a global shortcut to invoke the action on the menu.
+		/// </summary>
 		public Key ShortCut;
 
+		/// <summary>
+		/// Gets or sets the title.
+		/// </summary>
+		/// <value>The title.</value>
 		public string Title { get; set; }
+
+		/// <summary>
+		/// Gets or sets the help text for the menu item.
+		/// </summary>
+		/// <value>The help text.</value>
 		public string Help { get; set; }
+
+		/// <summary>
+		/// Gets or sets the action to be invoked when the menu is triggered
+		/// </summary>
+		/// <value>Method to invoke.</value>
 		public Action Action { get; set; }
 		internal int Width => Title.Length + Help.Length + 1 + 2;
 	}
@@ -222,10 +251,19 @@ namespace Terminal {
 	/// A menu bar for your application.
 	/// </summary>
 	public class MenuBar : View {
+		/// <summary>
+		/// The menus that were defined when the menubar was created.   This can be updated if the menu is not currently visible.
+		/// </summary>
+		/// <value>The menu array.</value>
 		public MenuBarItem [] Menus { get; set; }
 		int selected;
 		Action action;
 
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.MenuBar"/> class with the specified set of toplevel menu items.
+		/// </summary>
+		/// <param name="menus">Menus.</param>
 		public MenuBar (MenuBarItem [] menus) : base (new Rect (0, 0, Application.Driver.Cols, 1))
 		{
 			Menus = menus;

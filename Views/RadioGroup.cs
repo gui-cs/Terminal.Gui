@@ -36,7 +36,8 @@ namespace Terminal {
 		/// <param name="x">The x coordinate.</param>
 		/// <param name="y">The y coordinate.</param>
 		/// <param name="radioLabels">Radio labels, the strings can contain hotkeys using an undermine before the letter.</param>
-		/// <param name="selected">The item to be selected, the value is clamped to the number of items.</param>		/// <summary>
+		/// <param name="selected">The item to be selected, the value is clamped to the number of items.</param>		
+		/// <summary>
 		public RadioGroup (int x, int y, string [] radioLabels, int selected = 0) : this (MakeRect (x, y, radioLabels), radioLabels, selected)
 		{
 		}

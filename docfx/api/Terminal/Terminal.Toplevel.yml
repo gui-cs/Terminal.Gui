@@ -45,7 +45,6 @@ items:
   - Terminal.View.DrawHotString(System.String,System.Boolean,Terminal.ColorScheme)
   - Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
   - Terminal.View.Driver
-  - Terminal.View.empty
   - Terminal.View.EnsureFocus
   - Terminal.View.Focused
   - Terminal.View.FocusFirst
@@ -85,12 +84,13 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Initializes a new instance of the <xref href="Terminal.Toplevel"></xref> class.
   syntax:
     content: public Toplevel (Terminal.Rect frame);
     parameters:
     - id: frame
       type: Terminal.Rect
-      description: To be added.
+      description: Frame.
   overload: Terminal.Toplevel.#ctor*
   exceptions: []
 - uid: Terminal.Toplevel.CanFocus
@@ -124,12 +124,13 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Convenience factory method that creates a new toplevel with the current terminal dimensions.
   syntax:
     content: public static Terminal.Toplevel Create ();
     parameters: []
     return:
       type: Terminal.Toplevel
-      description: To be added.
+      description: The create.
   overload: Terminal.Toplevel.Create*
   exceptions: []
 - uid: Terminal.Toplevel.ProcessKey(Terminal.KeyEvent)
@@ -348,12 +349,6 @@ references:
   name: Driver
   nameWithType: View.Driver
   fullName: View.Driver
-- uid: Terminal.View.empty
-  parent: Terminal.View
-  isExternal: false
-  name: empty
-  nameWithType: View.empty
-  fullName: View.empty
 - uid: Terminal.View.EnsureFocus
   parent: Terminal.View
   isExternal: false

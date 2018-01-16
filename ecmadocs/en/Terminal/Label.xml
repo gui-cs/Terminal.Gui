@@ -135,8 +135,10 @@
         <ReturnType>Terminal.TextAlignment</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
+        <summary>
+            Controls the text-alignemtn property of the label, changing it will redisplay the label.
+            </summary>
+        <value>The text alignment.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -151,7 +153,9 @@
         <ReturnType>Terminal.Attribute</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+              The color used for the label
+            </summary>
         <value>To be added.</value>
         <remarks>To be added.</remarks>
       </Docs>

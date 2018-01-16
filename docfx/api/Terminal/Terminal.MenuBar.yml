@@ -40,7 +40,6 @@ items:
   - Terminal.View.DrawHotString(System.String,System.Boolean,Terminal.ColorScheme)
   - Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
   - Terminal.View.Driver
-  - Terminal.View.empty
   - Terminal.View.EnsureFocus
   - Terminal.View.Focused
   - Terminal.View.FocusFirst
@@ -77,12 +76,13 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Initializes a new instance of the <xref href="Terminal.MenuBar"></xref> class with the specified set of toplevel menu items.
   syntax:
     content: public MenuBar (Terminal.MenuBarItem[] menus);
     parameters:
     - id: menus
       type: Terminal.MenuBarItem[]
-      description: To be added.
+      description: Menus.
   overload: Terminal.MenuBar.#ctor*
   exceptions: []
 - uid: Terminal.MenuBar.Menus
@@ -97,11 +97,12 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The menus that were defined when the menubar was created.   This can be updated if the menu is not currently visible.
   syntax:
     content: public Terminal.MenuBarItem[] Menus { get; set; }
     return:
       type: Terminal.MenuBarItem[]
-      description: To be added.
+      description: The menu array.
   overload: Terminal.MenuBar.Menus*
   exceptions: []
 - uid: Terminal.MenuBar.MouseEvent(Terminal.MouseEvent)
@@ -427,12 +428,6 @@ references:
   name: Driver
   nameWithType: View.Driver
   fullName: View.Driver
-- uid: Terminal.View.empty
-  parent: Terminal.View
-  isExternal: false
-  name: empty
-  nameWithType: View.empty
-  fullName: View.empty
 - uid: Terminal.View.EnsureFocus
   parent: Terminal.View
   isExternal: false

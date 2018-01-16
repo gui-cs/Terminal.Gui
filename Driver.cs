@@ -72,6 +72,9 @@ namespace Terminal {
 		HLine,
 	}
 
+	/// <summary>
+	/// ConsoleDriver is an abstract class that defines the requirements for a console driver.   One implementation if the CursesDriver, and another one uses the .NET Console one.
+	/// </summary>
 	public abstract class ConsoleDriver {
 		public abstract int Cols { get; }
 		public abstract int Rows { get; }
@@ -107,6 +110,9 @@ namespace Terminal {
 		public abstract void StopReportingMouseMoves ();
 	}
 
+	/// <summary>
+	/// This is the Curses driver for the gui.cs/Terminal framework.
+	/// </summary>
 	public class CursesDriver : ConsoleDriver {
 		Action terminalResized;
 
