@@ -1,0 +1,688 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.MouseFlags
+  id: MouseFlags
+  children:
+  - Terminal.Gui.MouseFlags.AllEvents
+  - Terminal.Gui.MouseFlags.Button1Clicked
+  - Terminal.Gui.MouseFlags.Button1DoubleClicked
+  - Terminal.Gui.MouseFlags.Button1Pressed
+  - Terminal.Gui.MouseFlags.Button1Released
+  - Terminal.Gui.MouseFlags.Button1TripleClicked
+  - Terminal.Gui.MouseFlags.Button2Clicked
+  - Terminal.Gui.MouseFlags.Button2DoubleClicked
+  - Terminal.Gui.MouseFlags.Button2Pressed
+  - Terminal.Gui.MouseFlags.Button2Released
+  - Terminal.Gui.MouseFlags.Button2TrippleClicked
+  - Terminal.Gui.MouseFlags.Button3Clicked
+  - Terminal.Gui.MouseFlags.Button3DoubleClicked
+  - Terminal.Gui.MouseFlags.Button3Pressed
+  - Terminal.Gui.MouseFlags.Button3Released
+  - Terminal.Gui.MouseFlags.Button3TripleClicked
+  - Terminal.Gui.MouseFlags.Button4Clicked
+  - Terminal.Gui.MouseFlags.Button4DoubleClicked
+  - Terminal.Gui.MouseFlags.Button4Pressed
+  - Terminal.Gui.MouseFlags.Button4Released
+  - Terminal.Gui.MouseFlags.Button4TripleClicked
+  - Terminal.Gui.MouseFlags.ButtonAlt
+  - Terminal.Gui.MouseFlags.ButtonCtrl
+  - Terminal.Gui.MouseFlags.ButtonShift
+  - Terminal.Gui.MouseFlags.ReportMousePosition
+  langs:
+  - csharp
+  name: MouseFlags
+  nameWithType: MouseFlags
+  fullName: Terminal.Gui.MouseFlags
+  type: Enum
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Mouse flags reported in MouseEvent.
+  remarks: They just happen to map to the ncurses ones.
+  syntax:
+    content: >-
+      [System.Flags]
+
+      public enum MouseFlags
+  inheritance:
+  - System.Enum
+  attributes:
+  - type: System.Flags
+- uid: Terminal.Gui.MouseFlags.AllEvents
+  id: AllEvents
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: AllEvents
+  nameWithType: MouseFlags.AllEvents
+  fullName: MouseFlags.AllEvents
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Mask that captures all the events.
+  syntax:
+    content: AllEvents
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button1Clicked
+  id: Button1Clicked
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button1Clicked
+  nameWithType: MouseFlags.Button1Clicked
+  fullName: MouseFlags.Button1Clicked
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The first mouse button was clicked (press+release).
+  syntax:
+    content: Button1Clicked
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button1DoubleClicked
+  id: Button1DoubleClicked
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button1DoubleClicked
+  nameWithType: MouseFlags.Button1DoubleClicked
+  fullName: MouseFlags.Button1DoubleClicked
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The first mouse button was double-clicked.
+  syntax:
+    content: Button1DoubleClicked
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button1Pressed
+  id: Button1Pressed
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button1Pressed
+  nameWithType: MouseFlags.Button1Pressed
+  fullName: MouseFlags.Button1Pressed
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The first mouse button was pressed.
+  syntax:
+    content: Button1Pressed
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button1Released
+  id: Button1Released
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button1Released
+  nameWithType: MouseFlags.Button1Released
+  fullName: MouseFlags.Button1Released
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The first mouse button was released.
+  syntax:
+    content: Button1Released
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button1TripleClicked
+  id: Button1TripleClicked
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button1TripleClicked
+  nameWithType: MouseFlags.Button1TripleClicked
+  fullName: MouseFlags.Button1TripleClicked
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The first mouse button was tripple-clicked.
+  syntax:
+    content: Button1TripleClicked
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button2Clicked
+  id: Button2Clicked
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button2Clicked
+  nameWithType: MouseFlags.Button2Clicked
+  fullName: MouseFlags.Button2Clicked
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The second mouse button was clicked (press+release).
+  syntax:
+    content: Button2Clicked
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button2DoubleClicked
+  id: Button2DoubleClicked
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button2DoubleClicked
+  nameWithType: MouseFlags.Button2DoubleClicked
+  fullName: MouseFlags.Button2DoubleClicked
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The second mouse button was double-clicked.
+  syntax:
+    content: Button2DoubleClicked
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button2Pressed
+  id: Button2Pressed
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button2Pressed
+  nameWithType: MouseFlags.Button2Pressed
+  fullName: MouseFlags.Button2Pressed
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The second mouse button was pressed.
+  syntax:
+    content: Button2Pressed
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button2Released
+  id: Button2Released
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button2Released
+  nameWithType: MouseFlags.Button2Released
+  fullName: MouseFlags.Button2Released
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The second mouse button was released.
+  syntax:
+    content: Button2Released
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button2TrippleClicked
+  id: Button2TrippleClicked
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button2TrippleClicked
+  nameWithType: MouseFlags.Button2TrippleClicked
+  fullName: MouseFlags.Button2TrippleClicked
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The second mouse button was tripple-clicked.
+  syntax:
+    content: Button2TrippleClicked
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button3Clicked
+  id: Button3Clicked
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button3Clicked
+  nameWithType: MouseFlags.Button3Clicked
+  fullName: MouseFlags.Button3Clicked
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The third mouse button was clicked (press+release).
+  syntax:
+    content: Button3Clicked
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button3DoubleClicked
+  id: Button3DoubleClicked
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button3DoubleClicked
+  nameWithType: MouseFlags.Button3DoubleClicked
+  fullName: MouseFlags.Button3DoubleClicked
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The third mouse button was double-clicked.
+  syntax:
+    content: Button3DoubleClicked
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button3Pressed
+  id: Button3Pressed
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button3Pressed
+  nameWithType: MouseFlags.Button3Pressed
+  fullName: MouseFlags.Button3Pressed
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The third mouse button was pressed.
+  syntax:
+    content: Button3Pressed
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button3Released
+  id: Button3Released
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button3Released
+  nameWithType: MouseFlags.Button3Released
+  fullName: MouseFlags.Button3Released
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The third mouse button was released.
+  syntax:
+    content: Button3Released
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button3TripleClicked
+  id: Button3TripleClicked
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button3TripleClicked
+  nameWithType: MouseFlags.Button3TripleClicked
+  fullName: MouseFlags.Button3TripleClicked
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The third mouse button was tripple-clicked.
+  syntax:
+    content: Button3TripleClicked
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button4Clicked
+  id: Button4Clicked
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button4Clicked
+  nameWithType: MouseFlags.Button4Clicked
+  fullName: MouseFlags.Button4Clicked
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The fourth button was clicked (press+release).
+  syntax:
+    content: Button4Clicked
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button4DoubleClicked
+  id: Button4DoubleClicked
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button4DoubleClicked
+  nameWithType: MouseFlags.Button4DoubleClicked
+  fullName: MouseFlags.Button4DoubleClicked
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The fourth button was double-clicked.
+  syntax:
+    content: Button4DoubleClicked
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button4Pressed
+  id: Button4Pressed
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button4Pressed
+  nameWithType: MouseFlags.Button4Pressed
+  fullName: MouseFlags.Button4Pressed
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The fourth mouse button was pressed.
+  syntax:
+    content: Button4Pressed
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button4Released
+  id: Button4Released
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button4Released
+  nameWithType: MouseFlags.Button4Released
+  fullName: MouseFlags.Button4Released
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The fourth mouse button was released.
+  syntax:
+    content: Button4Released
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.Button4TripleClicked
+  id: Button4TripleClicked
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: Button4TripleClicked
+  nameWithType: MouseFlags.Button4TripleClicked
+  fullName: MouseFlags.Button4TripleClicked
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The fourth button was tripple-clicked.
+  syntax:
+    content: Button4TripleClicked
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.ButtonAlt
+  id: ButtonAlt
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: ButtonAlt
+  nameWithType: MouseFlags.ButtonAlt
+  fullName: MouseFlags.ButtonAlt
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: 'Flag: the alt key was pressed when the mouse button took place.'
+  syntax:
+    content: ButtonAlt
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.ButtonCtrl
+  id: ButtonCtrl
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: ButtonCtrl
+  nameWithType: MouseFlags.ButtonCtrl
+  fullName: MouseFlags.ButtonCtrl
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: 'Flag: the shift key was pressed when the mouse button took place.'
+  syntax:
+    content: ButtonCtrl
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.ButtonShift
+  id: ButtonShift
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: ButtonShift
+  nameWithType: MouseFlags.ButtonShift
+  fullName: MouseFlags.ButtonShift
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The fourth button was pressed.
+  syntax:
+    content: ButtonShift
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseFlags.ReportMousePosition
+  id: ReportMousePosition
+  parent: Terminal.Gui.MouseFlags
+  langs:
+  - csharp
+  name: ReportMousePosition
+  nameWithType: MouseFlags.ReportMousePosition
+  fullName: MouseFlags.ReportMousePosition
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The mouse position is being reported in this event.
+  syntax:
+    content: ReportMousePosition
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+references:
+- uid: System.Enum
+  parent: System
+  isExternal: true
+  name: Enum
+  nameWithType: Enum
+  fullName: System.Enum
+- uid: Terminal.Gui.MouseFlags.AllEvents
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: AllEvents
+  nameWithType: MouseFlags.AllEvents
+  fullName: MouseFlags.AllEvents
+- uid: Terminal.Gui.MouseFlags
+  parent: Terminal.Gui
+  isExternal: false
+  name: MouseFlags
+  nameWithType: MouseFlags
+  fullName: Terminal.Gui.MouseFlags
+- uid: Terminal.Gui.MouseFlags.Button1Clicked
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button1Clicked
+  nameWithType: MouseFlags.Button1Clicked
+  fullName: MouseFlags.Button1Clicked
+- uid: Terminal.Gui.MouseFlags.Button1DoubleClicked
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button1DoubleClicked
+  nameWithType: MouseFlags.Button1DoubleClicked
+  fullName: MouseFlags.Button1DoubleClicked
+- uid: Terminal.Gui.MouseFlags.Button1Pressed
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button1Pressed
+  nameWithType: MouseFlags.Button1Pressed
+  fullName: MouseFlags.Button1Pressed
+- uid: Terminal.Gui.MouseFlags.Button1Released
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button1Released
+  nameWithType: MouseFlags.Button1Released
+  fullName: MouseFlags.Button1Released
+- uid: Terminal.Gui.MouseFlags.Button1TripleClicked
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button1TripleClicked
+  nameWithType: MouseFlags.Button1TripleClicked
+  fullName: MouseFlags.Button1TripleClicked
+- uid: Terminal.Gui.MouseFlags.Button2Clicked
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button2Clicked
+  nameWithType: MouseFlags.Button2Clicked
+  fullName: MouseFlags.Button2Clicked
+- uid: Terminal.Gui.MouseFlags.Button2DoubleClicked
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button2DoubleClicked
+  nameWithType: MouseFlags.Button2DoubleClicked
+  fullName: MouseFlags.Button2DoubleClicked
+- uid: Terminal.Gui.MouseFlags.Button2Pressed
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button2Pressed
+  nameWithType: MouseFlags.Button2Pressed
+  fullName: MouseFlags.Button2Pressed
+- uid: Terminal.Gui.MouseFlags.Button2Released
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button2Released
+  nameWithType: MouseFlags.Button2Released
+  fullName: MouseFlags.Button2Released
+- uid: Terminal.Gui.MouseFlags.Button2TrippleClicked
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button2TrippleClicked
+  nameWithType: MouseFlags.Button2TrippleClicked
+  fullName: MouseFlags.Button2TrippleClicked
+- uid: Terminal.Gui.MouseFlags.Button3Clicked
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button3Clicked
+  nameWithType: MouseFlags.Button3Clicked
+  fullName: MouseFlags.Button3Clicked
+- uid: Terminal.Gui.MouseFlags.Button3DoubleClicked
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button3DoubleClicked
+  nameWithType: MouseFlags.Button3DoubleClicked
+  fullName: MouseFlags.Button3DoubleClicked
+- uid: Terminal.Gui.MouseFlags.Button3Pressed
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button3Pressed
+  nameWithType: MouseFlags.Button3Pressed
+  fullName: MouseFlags.Button3Pressed
+- uid: Terminal.Gui.MouseFlags.Button3Released
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button3Released
+  nameWithType: MouseFlags.Button3Released
+  fullName: MouseFlags.Button3Released
+- uid: Terminal.Gui.MouseFlags.Button3TripleClicked
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button3TripleClicked
+  nameWithType: MouseFlags.Button3TripleClicked
+  fullName: MouseFlags.Button3TripleClicked
+- uid: Terminal.Gui.MouseFlags.Button4Clicked
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button4Clicked
+  nameWithType: MouseFlags.Button4Clicked
+  fullName: MouseFlags.Button4Clicked
+- uid: Terminal.Gui.MouseFlags.Button4DoubleClicked
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button4DoubleClicked
+  nameWithType: MouseFlags.Button4DoubleClicked
+  fullName: MouseFlags.Button4DoubleClicked
+- uid: Terminal.Gui.MouseFlags.Button4Pressed
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button4Pressed
+  nameWithType: MouseFlags.Button4Pressed
+  fullName: MouseFlags.Button4Pressed
+- uid: Terminal.Gui.MouseFlags.Button4Released
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button4Released
+  nameWithType: MouseFlags.Button4Released
+  fullName: MouseFlags.Button4Released
+- uid: Terminal.Gui.MouseFlags.Button4TripleClicked
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: Button4TripleClicked
+  nameWithType: MouseFlags.Button4TripleClicked
+  fullName: MouseFlags.Button4TripleClicked
+- uid: Terminal.Gui.MouseFlags.ButtonAlt
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: ButtonAlt
+  nameWithType: MouseFlags.ButtonAlt
+  fullName: MouseFlags.ButtonAlt
+- uid: Terminal.Gui.MouseFlags.ButtonCtrl
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: ButtonCtrl
+  nameWithType: MouseFlags.ButtonCtrl
+  fullName: MouseFlags.ButtonCtrl
+- uid: Terminal.Gui.MouseFlags.ButtonShift
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: ButtonShift
+  nameWithType: MouseFlags.ButtonShift
+  fullName: MouseFlags.ButtonShift
+- uid: Terminal.Gui.MouseFlags.ReportMousePosition
+  parent: Terminal.Gui.MouseFlags
+  isExternal: false
+  name: ReportMousePosition
+  nameWithType: MouseFlags.ReportMousePosition
+  fullName: MouseFlags.ReportMousePosition

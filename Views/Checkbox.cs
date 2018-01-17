@@ -6,7 +6,7 @@
 //
 using System;
 
-namespace Terminal {
+namespace Terminal.Gui {
 
 	/// <summary>
 	/// The Checkbox View shows an on/off toggle that the user can set

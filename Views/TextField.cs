@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Terminal {
+namespace Terminal.Gui {
 	/// <summary>
 	///   Text data entry widget
 	/// </summary>

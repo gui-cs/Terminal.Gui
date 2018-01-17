@@ -1,0 +1,327 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.Responder
+  id: Responder
+  children:
+  - Terminal.Gui.Responder.#ctor
+  - Terminal.Gui.Responder.CanFocus
+  - Terminal.Gui.Responder.HasFocus
+  - Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
+  - Terminal.Gui.Responder.ProcessColdKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.Responder.ProcessHotKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.Responder.ProcessKey(Terminal.Gui.KeyEvent)
+  langs:
+  - csharp
+  name: Responder
+  nameWithType: Responder
+  fullName: Terminal.Gui.Responder
+  type: Class
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public class Responder
+  inheritance:
+  - System.Object
+  derivedClasses:
+  - Terminal.Gui.View
+  implements: []
+  inheritedMembers: []
+- uid: Terminal.Gui.Responder.#ctor
+  id: '#ctor'
+  parent: Terminal.Gui.Responder
+  langs:
+  - csharp
+  name: Responder()
+  nameWithType: Responder.Responder()
+  fullName: Responder.Responder()
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public Responder ();
+    parameters: []
+  overload: Terminal.Gui.Responder.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.Responder.CanFocus
+  id: CanFocus
+  parent: Terminal.Gui.Responder
+  langs:
+  - csharp
+  name: CanFocus
+  nameWithType: Responder.CanFocus
+  fullName: Responder.CanFocus
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public virtual bool CanFocus { get; set; }
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Responder.CanFocus*
+  exceptions: []
+- uid: Terminal.Gui.Responder.HasFocus
+  id: HasFocus
+  parent: Terminal.Gui.Responder
+  langs:
+  - csharp
+  name: HasFocus
+  nameWithType: Responder.HasFocus
+  fullName: Responder.HasFocus
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public virtual bool HasFocus { get; }
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Responder.HasFocus*
+  exceptions: []
+- uid: Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
+  id: MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.Responder
+  langs:
+  - csharp
+  name: MouseEvent(MouseEvent)
+  nameWithType: Responder.MouseEvent(MouseEvent)
+  fullName: Responder.MouseEvent(MouseEvent)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public virtual bool MouseEvent (Terminal.Gui.MouseEvent me);
+    parameters:
+    - id: me
+      type: Terminal.Gui.MouseEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Responder.MouseEvent*
+  exceptions: []
+- uid: Terminal.Gui.Responder.ProcessColdKey(Terminal.Gui.KeyEvent)
+  id: ProcessColdKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.Responder
+  langs:
+  - csharp
+  name: ProcessColdKey(KeyEvent)
+  nameWithType: Responder.ProcessColdKey(KeyEvent)
+  fullName: Responder.ProcessColdKey(KeyEvent)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: >-
+    This method can be overwritten by views that
+                    want to provide accelerator functionality
+                    (Alt-key for example), but without
+                    interefering with normal ProcessKey behavior.
+  remarks: >-
+    <p>
+                    After keys are sent to the subviews on the
+                    current view, all the view are
+                    processed and the key is passed to the views
+                    to allow some of them to process the keystroke
+                    as a cold-key. </p>
+        <p>
+                   This functionality is used, for example, by
+                   default buttons to act on the enter key.
+                   Processing this as a hot-key would prevent
+                   non-default buttons from consuming the enter
+                   keypress when they have the focus.
+                 </p>
+  syntax:
+    content: public virtual bool ProcessColdKey (Terminal.Gui.KeyEvent kb);
+    parameters:
+    - id: kb
+      type: Terminal.Gui.KeyEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Responder.ProcessColdKey*
+  exceptions: []
+- uid: Terminal.Gui.Responder.ProcessHotKey(Terminal.Gui.KeyEvent)
+  id: ProcessHotKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.Responder
+  langs:
+  - csharp
+  name: ProcessHotKey(KeyEvent)
+  nameWithType: Responder.ProcessHotKey(KeyEvent)
+  fullName: Responder.ProcessHotKey(KeyEvent)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: >-
+    This method can be overwritten by view that
+                    want to provide accelerator functionality
+                    (Alt-key for example).
+  remarks: >-
+    <p>
+                    Before keys are sent to the subview on the
+                    current view, all the views are
+                    processed and the key is passed to the widgets
+                    to allow some of them to process the keystroke
+                    as a hot-key. </p>
+        <p>
+                    For example, if you implement a button that
+                    has a hotkey ok "o", you would catch the
+                    combination Alt-o here.  If the event is
+                    caught, you must return true to stop the
+                    keystroke from being dispatched to other
+                    views.
+                 </p>
+  syntax:
+    content: public virtual bool ProcessHotKey (Terminal.Gui.KeyEvent kb);
+    parameters:
+    - id: kb
+      type: Terminal.Gui.KeyEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Responder.ProcessHotKey*
+  exceptions: []
+- uid: Terminal.Gui.Responder.ProcessKey(Terminal.Gui.KeyEvent)
+  id: ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.Responder
+  langs:
+  - csharp
+  name: ProcessKey(KeyEvent)
+  nameWithType: Responder.ProcessKey(KeyEvent)
+  fullName: Responder.ProcessKey(KeyEvent)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: >-
+    If the view is focused, gives the view a
+                  chance to process the keystroke.
+  remarks: "<p>\n                Views can override this method if they are\n                interested in processing the given keystroke.\n                If they consume the keystroke, they must\n                return true to stop the keystroke from being\n                processed by other widgets or consumed by the\n                widget engine.    If they return false, the\n                keystroke will be passed using the ProcessColdKey\n                method to other views to process.\n              </p>\n    <p>\n                The View implementation does nothing but return false,\n                so it is not necessary to call base.ProcessKey if you \n                derive directly from View, but you should if you derive\n                other View subclasses.\n              </p>"
+  syntax:
+    content: public virtual bool ProcessKey (Terminal.Gui.KeyEvent kb);
+    parameters:
+    - id: kb
+      type: Terminal.Gui.KeyEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Responder.ProcessKey*
+  exceptions: []
+references:
+- uid: System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: Terminal.Gui.Responder.#ctor
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: Responder()
+  nameWithType: Responder.Responder()
+  fullName: Responder.Responder()
+- uid: Terminal.Gui.Responder.CanFocus
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: CanFocus
+  nameWithType: Responder.CanFocus
+  fullName: Responder.CanFocus
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.Responder.HasFocus
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: HasFocus
+  nameWithType: Responder.HasFocus
+  fullName: Responder.HasFocus
+- uid: Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: MouseEvent(MouseEvent)
+  nameWithType: Responder.MouseEvent(MouseEvent)
+  fullName: Responder.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.MouseEvent
+  parent: Terminal.Gui
+  isExternal: false
+  name: MouseEvent
+  nameWithType: MouseEvent
+  fullName: Terminal.Gui.MouseEvent
+- uid: Terminal.Gui.Responder.ProcessColdKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: ProcessColdKey(KeyEvent)
+  nameWithType: Responder.ProcessColdKey(KeyEvent)
+  fullName: Responder.ProcessColdKey(KeyEvent)
+- uid: Terminal.Gui.KeyEvent
+  parent: Terminal.Gui
+  isExternal: false
+  name: KeyEvent
+  nameWithType: KeyEvent
+  fullName: Terminal.Gui.KeyEvent
+- uid: Terminal.Gui.Responder.ProcessHotKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: ProcessHotKey(KeyEvent)
+  nameWithType: Responder.ProcessHotKey(KeyEvent)
+  fullName: Responder.ProcessHotKey(KeyEvent)
+- uid: Terminal.Gui.Responder.ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: ProcessKey(KeyEvent)
+  nameWithType: Responder.ProcessKey(KeyEvent)
+  fullName: Responder.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.Responder.#ctor*
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: Responder
+  nameWithType: Responder.Responder
+  fullName: Responder.Responder
+- uid: Terminal.Gui.Responder.CanFocus*
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: CanFocus
+  nameWithType: Responder.CanFocus
+  fullName: Responder.CanFocus
+- uid: Terminal.Gui.Responder.HasFocus*
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: HasFocus
+  nameWithType: Responder.HasFocus
+  fullName: Responder.HasFocus
+- uid: Terminal.Gui.Responder.MouseEvent*
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: MouseEvent
+  nameWithType: Responder.MouseEvent
+  fullName: Responder.MouseEvent
+- uid: Terminal.Gui.Responder.ProcessColdKey*
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: ProcessColdKey
+  nameWithType: Responder.ProcessColdKey
+  fullName: Responder.ProcessColdKey
+- uid: Terminal.Gui.Responder.ProcessHotKey*
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: ProcessHotKey
+  nameWithType: Responder.ProcessHotKey
+  fullName: Responder.ProcessHotKey
+- uid: Terminal.Gui.Responder.ProcessKey*
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: ProcessKey
+  nameWithType: Responder.ProcessKey
+  fullName: Responder.ProcessKey

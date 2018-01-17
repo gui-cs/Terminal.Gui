@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 
-namespace Terminal {
+namespace Terminal.Gui {
 
 	public class Responder {
 		public virtual bool CanFocus { get; set; }

@@ -11,7 +11,7 @@
 using System;
 using System.Globalization;
 
-namespace Terminal
+namespace Terminal.Gui
 {
 	/// <summary>
 	/// Represents an ordered pair of integer x- and y-coordinates that defines a point in a two-dimensional plane.

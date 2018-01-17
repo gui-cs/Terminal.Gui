@@ -1,0 +1,802 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ConsoleDriver
+  id: ConsoleDriver
+  children:
+  - Terminal.Gui.ConsoleDriver.#ctor
+  - Terminal.Gui.ConsoleDriver.AddCh(System.Int32)
+  - Terminal.Gui.ConsoleDriver.AddSpecial(Terminal.Gui.SpecialChar)
+  - Terminal.Gui.ConsoleDriver.AddStr(System.String)
+  - Terminal.Gui.ConsoleDriver.Clip
+  - Terminal.Gui.ConsoleDriver.Cols
+  - Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  - Terminal.Gui.ConsoleDriver.End
+  - Terminal.Gui.ConsoleDriver.Init(System.Action)
+  - Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+  - Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  - Terminal.Gui.ConsoleDriver.RedrawTop
+  - Terminal.Gui.ConsoleDriver.Refresh
+  - Terminal.Gui.ConsoleDriver.Rows
+  - Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+  - Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+  - Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
+  - Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
+  - Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
+  - Terminal.Gui.ConsoleDriver.Suspend
+  langs:
+  - csharp
+  name: ConsoleDriver
+  nameWithType: ConsoleDriver
+  fullName: Terminal.Gui.ConsoleDriver
+  type: Class
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: ConsoleDriver is an abstract class that defines the requirements for a console driver.   One implementation if the CursesDriver, and another one uses the .NET Console one.
+  syntax:
+    content: public abstract class ConsoleDriver
+  inheritance:
+  - System.Object
+  implements: []
+  inheritedMembers: []
+- uid: Terminal.Gui.ConsoleDriver.#ctor
+  id: '#ctor'
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: ConsoleDriver()
+  nameWithType: ConsoleDriver.ConsoleDriver()
+  fullName: ConsoleDriver.ConsoleDriver()
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: protected ConsoleDriver ();
+    parameters: []
+  overload: Terminal.Gui.ConsoleDriver.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.AddCh(System.Int32)
+  id: AddCh(System.Int32)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: AddCh(Int32)
+  nameWithType: ConsoleDriver.AddCh(Int32)
+  fullName: ConsoleDriver.AddCh(Int32)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Adds the specified rune to the display at the current cursor position
+  syntax:
+    content: public abstract void AddCh (int rune);
+    parameters:
+    - id: rune
+      type: System.Int32
+      description: Rune to add.
+  overload: Terminal.Gui.ConsoleDriver.AddCh*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.AddSpecial(Terminal.Gui.SpecialChar)
+  id: AddSpecial(Terminal.Gui.SpecialChar)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: AddSpecial(SpecialChar)
+  nameWithType: ConsoleDriver.AddSpecial(SpecialChar)
+  fullName: ConsoleDriver.AddSpecial(SpecialChar)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Draws a special characters in the screen
+  syntax:
+    content: public abstract void AddSpecial (Terminal.Gui.SpecialChar ch);
+    parameters:
+    - id: ch
+      type: Terminal.Gui.SpecialChar
+      description: Ch.
+  overload: Terminal.Gui.ConsoleDriver.AddSpecial*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.AddStr(System.String)
+  id: AddStr(System.String)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: AddStr(String)
+  nameWithType: ConsoleDriver.AddStr(String)
+  fullName: ConsoleDriver.AddStr(String)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Adds the specified
+  syntax:
+    content: public abstract void AddStr (string str);
+    parameters:
+    - id: str
+      type: System.String
+      description: String.
+  overload: Terminal.Gui.ConsoleDriver.AddStr*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.Clip
+  id: Clip
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: Clip
+  nameWithType: ConsoleDriver.Clip
+  fullName: ConsoleDriver.Clip
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Controls the current clipping region that AddCh/AddStr is subject to.
+  syntax:
+    content: public Terminal.Gui.Rect Clip { get; set; }
+    return:
+      type: Terminal.Gui.Rect
+      description: The clip.
+  overload: Terminal.Gui.ConsoleDriver.Clip*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.Cols
+  id: Cols
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: Cols
+  nameWithType: ConsoleDriver.Cols
+  fullName: ConsoleDriver.Cols
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The current number of columns in the terminal.
+  syntax:
+    content: public abstract int Cols { get; }
+    return:
+      type: System.Int32
+      description: To be added.
+  overload: Terminal.Gui.ConsoleDriver.Cols*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  id: DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: DrawFrame(Rect, Boolean)
+  nameWithType: ConsoleDriver.DrawFrame(Rect, Boolean)
+  fullName: ConsoleDriver.DrawFrame(Rect, Boolean)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public abstract void DrawFrame (Terminal.Gui.Rect region, bool fill);
+    parameters:
+    - id: region
+      type: Terminal.Gui.Rect
+      description: To be added.
+    - id: fill
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.ConsoleDriver.DrawFrame*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.End
+  id: End
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: End()
+  nameWithType: ConsoleDriver.End()
+  fullName: ConsoleDriver.End()
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Ends the execution of the console driver.
+  syntax:
+    content: public abstract void End ();
+    parameters: []
+  overload: Terminal.Gui.ConsoleDriver.End*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.Init(System.Action)
+  id: Init(System.Action)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: Init(Action)
+  nameWithType: ConsoleDriver.Init(Action)
+  fullName: ConsoleDriver.Init(Action)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Initializes the driver
+  syntax:
+    content: public abstract void Init (Action terminalResized);
+    parameters:
+    - id: terminalResized
+      type: System.Action
+      description: Method to invoke when the terminal is resized.
+  overload: Terminal.Gui.ConsoleDriver.Init*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+  id: Move(System.Int32,System.Int32)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: Move(Int32, Int32)
+  nameWithType: ConsoleDriver.Move(Int32, Int32)
+  fullName: ConsoleDriver.Move(Int32, Int32)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Moves the cursor to the specified column and row.
+  syntax:
+    content: public abstract void Move (int col, int row);
+    parameters:
+    - id: col
+      type: System.Int32
+      description: Column to move the cursor to.
+    - id: row
+      type: System.Int32
+      description: Row to move the cursor to.
+  overload: Terminal.Gui.ConsoleDriver.Move*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  id: PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: PrepareToRun(MainLoop, Action<KeyEvent>, Action<MouseEvent>)
+  nameWithType: ConsoleDriver.PrepareToRun(MainLoop, Action<KeyEvent>, Action<MouseEvent>)
+  fullName: ConsoleDriver.PrepareToRun(MainLoop, Action<KeyEvent>, Action<MouseEvent>)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public abstract void PrepareToRun (Mono.Terminal.MainLoop mainLoop, Action<Terminal.Gui.KeyEvent> target, Action<Terminal.Gui.MouseEvent> mouse);
+    parameters:
+    - id: mainLoop
+      type: Mono.Terminal.MainLoop
+      description: To be added.
+    - id: target
+      type: System.Action{Terminal.Gui.KeyEvent}
+      description: To be added.
+    - id: mouse
+      type: System.Action{Terminal.Gui.MouseEvent}
+      description: To be added.
+  overload: Terminal.Gui.ConsoleDriver.PrepareToRun*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.RedrawTop
+  id: RedrawTop
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: RedrawTop()
+  nameWithType: ConsoleDriver.RedrawTop()
+  fullName: ConsoleDriver.RedrawTop()
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public abstract void RedrawTop ();
+    parameters: []
+  overload: Terminal.Gui.ConsoleDriver.RedrawTop*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.Refresh
+  id: Refresh
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: Refresh()
+  nameWithType: ConsoleDriver.Refresh()
+  fullName: ConsoleDriver.Refresh()
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Updates the screen to reflect all the changes that have been done to the display buffer
+  syntax:
+    content: public abstract void Refresh ();
+    parameters: []
+  overload: Terminal.Gui.ConsoleDriver.Refresh*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.Rows
+  id: Rows
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: Rows
+  nameWithType: ConsoleDriver.Rows
+  fullName: ConsoleDriver.Rows
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The current number of rows in the terminal.
+  syntax:
+    content: public abstract int Rows { get; }
+    return:
+      type: System.Int32
+      description: To be added.
+  overload: Terminal.Gui.ConsoleDriver.Rows*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+  id: SetAttribute(Terminal.Gui.Attribute)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: SetAttribute(Attribute)
+  nameWithType: ConsoleDriver.SetAttribute(Attribute)
+  fullName: ConsoleDriver.SetAttribute(Attribute)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public abstract void SetAttribute (Terminal.Gui.Attribute c);
+    parameters:
+    - id: c
+      type: Terminal.Gui.Attribute
+      description: To be added.
+  overload: Terminal.Gui.ConsoleDriver.SetAttribute*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+  id: SetColors(System.ConsoleColor,System.ConsoleColor)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: SetColors(ConsoleColor, ConsoleColor)
+  nameWithType: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
+  fullName: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
+    parameters:
+    - id: foreground
+      type: System.ConsoleColor
+      description: To be added.
+    - id: background
+      type: System.ConsoleColor
+      description: To be added.
+  overload: Terminal.Gui.ConsoleDriver.SetColors*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
+  id: SetColors(System.Int16,System.Int16)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: SetColors(Int16, Int16)
+  nameWithType: ConsoleDriver.SetColors(Int16, Int16)
+  fullName: ConsoleDriver.SetColors(Int16, Int16)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: "Advanced uses - set colors to any pre-set pairs, you would need to init_color \n            that independently with the R, G, B values."
+  syntax:
+    content: public abstract void SetColors (short foregroundColorId, short backgroundColorId);
+    parameters:
+    - id: foregroundColorId
+      type: System.Int16
+      description: Foreground color identifier.
+    - id: backgroundColorId
+      type: System.Int16
+      description: Background color identifier.
+  overload: Terminal.Gui.ConsoleDriver.SetColors*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
+  id: StartReportingMouseMoves
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: StartReportingMouseMoves()
+  nameWithType: ConsoleDriver.StartReportingMouseMoves()
+  fullName: ConsoleDriver.StartReportingMouseMoves()
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public abstract void StartReportingMouseMoves ();
+    parameters: []
+  overload: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
+  id: StopReportingMouseMoves
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: StopReportingMouseMoves()
+  nameWithType: ConsoleDriver.StopReportingMouseMoves()
+  fullName: ConsoleDriver.StopReportingMouseMoves()
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public abstract void StopReportingMouseMoves ();
+    parameters: []
+  overload: Terminal.Gui.ConsoleDriver.StopReportingMouseMoves*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.Suspend
+  id: Suspend
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: Suspend()
+  nameWithType: ConsoleDriver.Suspend()
+  fullName: ConsoleDriver.Suspend()
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Suspend the application, typically needs to save the state, suspend the app and upon return, reset the console driver.
+  syntax:
+    content: public abstract void Suspend ();
+    parameters: []
+  overload: Terminal.Gui.ConsoleDriver.Suspend*
+  exceptions: []
+references:
+- uid: System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: Terminal.Gui.ConsoleDriver.#ctor
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: ConsoleDriver()
+  nameWithType: ConsoleDriver.ConsoleDriver()
+  fullName: ConsoleDriver.ConsoleDriver()
+- uid: Terminal.Gui.ConsoleDriver.AddCh(System.Int32)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: AddCh(Int32)
+  nameWithType: ConsoleDriver.AddCh(Int32)
+  fullName: ConsoleDriver.AddCh(Int32)
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: Terminal.Gui.ConsoleDriver.AddSpecial(Terminal.Gui.SpecialChar)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: AddSpecial(SpecialChar)
+  nameWithType: ConsoleDriver.AddSpecial(SpecialChar)
+  fullName: ConsoleDriver.AddSpecial(SpecialChar)
+- uid: Terminal.Gui.SpecialChar
+  parent: Terminal.Gui
+  isExternal: false
+  name: SpecialChar
+  nameWithType: SpecialChar
+  fullName: Terminal.Gui.SpecialChar
+- uid: Terminal.Gui.ConsoleDriver.AddStr(System.String)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: AddStr(String)
+  nameWithType: ConsoleDriver.AddStr(String)
+  fullName: ConsoleDriver.AddStr(String)
+- uid: System.String
+  parent: System
+  isExternal: true
+  name: String
+  nameWithType: String
+  fullName: System.String
+- uid: Terminal.Gui.ConsoleDriver.Clip
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Clip
+  nameWithType: ConsoleDriver.Clip
+  fullName: ConsoleDriver.Clip
+- uid: Terminal.Gui.Rect
+  parent: Terminal.Gui
+  isExternal: false
+  name: Rect
+  nameWithType: Rect
+  fullName: Terminal.Gui.Rect
+- uid: Terminal.Gui.ConsoleDriver.Cols
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Cols
+  nameWithType: ConsoleDriver.Cols
+  fullName: ConsoleDriver.Cols
+- uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: DrawFrame(Rect, Boolean)
+  nameWithType: ConsoleDriver.DrawFrame(Rect, Boolean)
+  fullName: ConsoleDriver.DrawFrame(Rect, Boolean)
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.ConsoleDriver.End
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: End()
+  nameWithType: ConsoleDriver.End()
+  fullName: ConsoleDriver.End()
+- uid: Terminal.Gui.ConsoleDriver.Init(System.Action)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Init(Action)
+  nameWithType: ConsoleDriver.Init(Action)
+  fullName: ConsoleDriver.Init(Action)
+- uid: System.Action
+  parent: System
+  isExternal: true
+  name: Action
+  nameWithType: Action
+  fullName: System.Action
+- uid: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Move(Int32, Int32)
+  nameWithType: ConsoleDriver.Move(Int32, Int32)
+  fullName: ConsoleDriver.Move(Int32, Int32)
+- uid: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: PrepareToRun(MainLoop, Action<KeyEvent>, Action<MouseEvent>)
+  nameWithType: ConsoleDriver.PrepareToRun(MainLoop, Action<KeyEvent>, Action<MouseEvent>)
+  fullName: ConsoleDriver.PrepareToRun(MainLoop, Action<KeyEvent>, Action<MouseEvent>)
+- uid: Mono.Terminal.MainLoop
+  parent: Mono.Terminal
+  isExternal: true
+  name: MainLoop
+  nameWithType: MainLoop
+  fullName: Mono.Terminal.MainLoop
+- uid: System.Action`1
+  name: Action
+  nameWithType: Action
+  fullName: System.Action
+- uid: Terminal.Gui.KeyEvent
+  name: KeyEvent
+  nameWithType: KeyEvent
+  fullName: Terminal.Gui.KeyEvent
+- uid: System.Action{Terminal.Gui.KeyEvent}
+  parent: System
+  isExternal: true
+  name: Action<KeyEvent>
+  nameWithType: Action<KeyEvent>
+  fullName: System.Action<Terminal.Gui.KeyEvent>
+  spec.csharp:
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+- uid: Terminal.Gui.MouseEvent
+  name: MouseEvent
+  nameWithType: MouseEvent
+  fullName: Terminal.Gui.MouseEvent
+- uid: System.Action{Terminal.Gui.MouseEvent}
+  parent: System
+  isExternal: true
+  name: Action<MouseEvent>
+  nameWithType: Action<MouseEvent>
+  fullName: System.Action<Terminal.Gui.MouseEvent>
+  spec.csharp:
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: Terminal.Gui.MouseEvent
+    name: MouseEvent
+    nameWithType: MouseEvent
+    fullName: Terminal.Gui.MouseEvent
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+- uid: Terminal.Gui.ConsoleDriver.RedrawTop
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: RedrawTop()
+  nameWithType: ConsoleDriver.RedrawTop()
+  fullName: ConsoleDriver.RedrawTop()
+- uid: Terminal.Gui.ConsoleDriver.Refresh
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Refresh()
+  nameWithType: ConsoleDriver.Refresh()
+  fullName: ConsoleDriver.Refresh()
+- uid: Terminal.Gui.ConsoleDriver.Rows
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Rows
+  nameWithType: ConsoleDriver.Rows
+  fullName: ConsoleDriver.Rows
+- uid: Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: SetAttribute(Attribute)
+  nameWithType: ConsoleDriver.SetAttribute(Attribute)
+  fullName: ConsoleDriver.SetAttribute(Attribute)
+- uid: Terminal.Gui.Attribute
+  parent: Terminal.Gui
+  isExternal: false
+  name: Attribute
+  nameWithType: Attribute
+  fullName: Terminal.Gui.Attribute
+- uid: Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: SetColors(ConsoleColor, ConsoleColor)
+  nameWithType: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
+  fullName: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
+- uid: System.ConsoleColor
+  parent: System
+  isExternal: true
+  name: ConsoleColor
+  nameWithType: ConsoleColor
+  fullName: System.ConsoleColor
+- uid: Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: SetColors(Int16, Int16)
+  nameWithType: ConsoleDriver.SetColors(Int16, Int16)
+  fullName: ConsoleDriver.SetColors(Int16, Int16)
+- uid: System.Int16
+  parent: System
+  isExternal: true
+  name: Int16
+  nameWithType: Int16
+  fullName: System.Int16
+- uid: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: StartReportingMouseMoves()
+  nameWithType: ConsoleDriver.StartReportingMouseMoves()
+  fullName: ConsoleDriver.StartReportingMouseMoves()
+- uid: Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: StopReportingMouseMoves()
+  nameWithType: ConsoleDriver.StopReportingMouseMoves()
+  fullName: ConsoleDriver.StopReportingMouseMoves()
+- uid: Terminal.Gui.ConsoleDriver.Suspend
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Suspend()
+  nameWithType: ConsoleDriver.Suspend()
+  fullName: ConsoleDriver.Suspend()
+- uid: Terminal.Gui.ConsoleDriver.#ctor*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: ConsoleDriver
+  nameWithType: ConsoleDriver.ConsoleDriver
+  fullName: ConsoleDriver.ConsoleDriver
+- uid: Terminal.Gui.ConsoleDriver.AddCh*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: AddCh
+  nameWithType: ConsoleDriver.AddCh
+  fullName: ConsoleDriver.AddCh
+- uid: Terminal.Gui.ConsoleDriver.AddSpecial*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: AddSpecial
+  nameWithType: ConsoleDriver.AddSpecial
+  fullName: ConsoleDriver.AddSpecial
+- uid: Terminal.Gui.ConsoleDriver.AddStr*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: AddStr
+  nameWithType: ConsoleDriver.AddStr
+  fullName: ConsoleDriver.AddStr
+- uid: Terminal.Gui.ConsoleDriver.Clip*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Clip
+  nameWithType: ConsoleDriver.Clip
+  fullName: ConsoleDriver.Clip
+- uid: Terminal.Gui.ConsoleDriver.Cols*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Cols
+  nameWithType: ConsoleDriver.Cols
+  fullName: ConsoleDriver.Cols
+- uid: Terminal.Gui.ConsoleDriver.DrawFrame*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: DrawFrame
+  nameWithType: ConsoleDriver.DrawFrame
+  fullName: ConsoleDriver.DrawFrame
+- uid: Terminal.Gui.ConsoleDriver.End*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: End
+  nameWithType: ConsoleDriver.End
+  fullName: ConsoleDriver.End
+- uid: Terminal.Gui.ConsoleDriver.Init*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Init
+  nameWithType: ConsoleDriver.Init
+  fullName: ConsoleDriver.Init
+- uid: Terminal.Gui.ConsoleDriver.Move*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Move
+  nameWithType: ConsoleDriver.Move
+  fullName: ConsoleDriver.Move
+- uid: Terminal.Gui.ConsoleDriver.PrepareToRun*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: PrepareToRun
+  nameWithType: ConsoleDriver.PrepareToRun
+  fullName: ConsoleDriver.PrepareToRun
+- uid: Terminal.Gui.ConsoleDriver.RedrawTop*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: RedrawTop
+  nameWithType: ConsoleDriver.RedrawTop
+  fullName: ConsoleDriver.RedrawTop
+- uid: Terminal.Gui.ConsoleDriver.Refresh*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Refresh
+  nameWithType: ConsoleDriver.Refresh
+  fullName: ConsoleDriver.Refresh
+- uid: Terminal.Gui.ConsoleDriver.Rows*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Rows
+  nameWithType: ConsoleDriver.Rows
+  fullName: ConsoleDriver.Rows
+- uid: Terminal.Gui.ConsoleDriver.SetAttribute*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: SetAttribute
+  nameWithType: ConsoleDriver.SetAttribute
+  fullName: ConsoleDriver.SetAttribute
+- uid: Terminal.Gui.ConsoleDriver.SetColors*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: SetColors
+  nameWithType: ConsoleDriver.SetColors
+  fullName: ConsoleDriver.SetColors
+- uid: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: StartReportingMouseMoves
+  nameWithType: ConsoleDriver.StartReportingMouseMoves
+  fullName: ConsoleDriver.StartReportingMouseMoves
+- uid: Terminal.Gui.ConsoleDriver.StopReportingMouseMoves*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: StopReportingMouseMoves
+  nameWithType: ConsoleDriver.StopReportingMouseMoves
+  fullName: ConsoleDriver.StopReportingMouseMoves
+- uid: Terminal.Gui.ConsoleDriver.Suspend*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Suspend
+  nameWithType: ConsoleDriver.Suspend
+  fullName: ConsoleDriver.Suspend

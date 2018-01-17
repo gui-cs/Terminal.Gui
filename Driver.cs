@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 using Mono.Terminal;
 using Unix.Terminal;
 
-namespace Terminal {
+namespace Terminal.Gui {
 
 	/// <summary>
 	/// Basic colors that can be used to set the foreground and background colors in console applications.  These can only be

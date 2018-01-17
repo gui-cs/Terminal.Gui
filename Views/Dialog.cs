@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Terminal {
+namespace Terminal.Gui {
 	/// <summary>
 	/// The dialog box is a window that by default is centered and contains one 
 	/// or more buttons.

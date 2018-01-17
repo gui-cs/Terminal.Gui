@@ -1,66 +1,69 @@
 ### YamlMime:TableOfContent
 - uid: Terminal
   name: Terminal
+  items: []
+- uid: Terminal.Gui
+  name: Terminal.Gui
   items:
-  - uid: Terminal.Application
+  - uid: Terminal.Gui.Application
     name: Application
-  - uid: Terminal.Application.RunState
+  - uid: Terminal.Gui.Application.RunState
     name: Application.RunState
-  - uid: Terminal.Attribute
+  - uid: Terminal.Gui.Attribute
     name: Attribute
-  - uid: Terminal.Button
+  - uid: Terminal.Gui.Button
     name: Button
-  - uid: Terminal.CheckBox
+  - uid: Terminal.Gui.CheckBox
     name: CheckBox
-  - uid: Terminal.Color
+  - uid: Terminal.Gui.Color
     name: Color
-  - uid: Terminal.Colors
+  - uid: Terminal.Gui.Colors
     name: Colors
-  - uid: Terminal.ColorScheme
+  - uid: Terminal.Gui.ColorScheme
     name: ColorScheme
-  - uid: Terminal.ConsoleDriver
+  - uid: Terminal.Gui.ConsoleDriver
     name: ConsoleDriver
-  - uid: Terminal.Dialog
+  - uid: Terminal.Gui.Dialog
     name: Dialog
-  - uid: Terminal.Key
+  - uid: Terminal.Gui.Key
     name: Key
-  - uid: Terminal.KeyEvent
+  - uid: Terminal.Gui.KeyEvent
     name: KeyEvent
-  - uid: Terminal.Label
+  - uid: Terminal.Gui.Label
     name: Label
-  - uid: Terminal.MenuBar
+  - uid: Terminal.Gui.MenuBar
     name: MenuBar
-  - uid: Terminal.MenuBarItem
+  - uid: Terminal.Gui.MenuBarItem
     name: MenuBarItem
-  - uid: Terminal.MenuItem
+  - uid: Terminal.Gui.MenuItem
     name: MenuItem
-  - uid: Terminal.MessageBox
+  - uid: Terminal.Gui.MessageBox
     name: MessageBox
-  - uid: Terminal.MouseEvent
+  - uid: Terminal.Gui.MouseEvent
     name: MouseEvent
-  - uid: Terminal.MouseFlags
+  - uid: Terminal.Gui.MouseFlags
     name: MouseFlags
-  - uid: Terminal.Point
+  - uid: Terminal.Gui.Point
     name: Point
-  - uid: Terminal.RadioGroup
+  - uid: Terminal.Gui.RadioGroup
     name: RadioGroup
-  - uid: Terminal.Rect
+  - uid: Terminal.Gui.Rect
     name: Rect
-  - uid: Terminal.Responder
+  - uid: Terminal.Gui.Responder
     name: Responder
-  - uid: Terminal.ScrollView
+  - uid: Terminal.Gui.ScrollView
     name: ScrollView
-  - uid: Terminal.Size
+  - uid: Terminal.Gui.Size
     name: Size
-  - uid: Terminal.SpecialChar
+  - uid: Terminal.Gui.SpecialChar
     name: SpecialChar
-  - uid: Terminal.TextAlignment
+  - uid: Terminal.Gui.TextAlignment
     name: TextAlignment
-  - uid: Terminal.TextField
+  - uid: Terminal.Gui.TextField
     name: TextField
-  - uid: Terminal.Toplevel
+  - uid: Terminal.Gui.Toplevel
     name: Toplevel
-  - uid: Terminal.View
+  - uid: Terminal.Gui.View
     name: View
-  - uid: Terminal.Window
+  - uid: Terminal.Gui.Window
     name: Window

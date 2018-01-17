@@ -1,0 +1,448 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.Color
+  id: Color
+  children:
+  - Terminal.Gui.Color.Black
+  - Terminal.Gui.Color.Blue
+  - Terminal.Gui.Color.BrighCyan
+  - Terminal.Gui.Color.BrightBlue
+  - Terminal.Gui.Color.BrightGreen
+  - Terminal.Gui.Color.BrightMagenta
+  - Terminal.Gui.Color.BrightRed
+  - Terminal.Gui.Color.BrightYellow
+  - Terminal.Gui.Color.Brown
+  - Terminal.Gui.Color.Cyan
+  - Terminal.Gui.Color.DarkGray
+  - Terminal.Gui.Color.Gray
+  - Terminal.Gui.Color.Green
+  - Terminal.Gui.Color.Magenta
+  - Terminal.Gui.Color.Red
+  - Terminal.Gui.Color.White
+  langs:
+  - csharp
+  name: Color
+  nameWithType: Color
+  fullName: Terminal.Gui.Color
+  type: Enum
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Basic colors that can be used to set the foreground and background colors in console applications.  These can only be
+  syntax:
+    content: public enum Color
+  inheritance:
+  - System.Enum
+- uid: Terminal.Gui.Color.Black
+  id: Black
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: Black
+  nameWithType: Color.Black
+  fullName: Color.Black
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The black color.
+  syntax:
+    content: Black
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Color.Blue
+  id: Blue
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: Blue
+  nameWithType: Color.Blue
+  fullName: Color.Blue
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The blue color.
+  syntax:
+    content: Blue
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Color.BrighCyan
+  id: BrighCyan
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: BrighCyan
+  nameWithType: Color.BrighCyan
+  fullName: Color.BrighCyan
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The brigh cyan color.
+  syntax:
+    content: BrighCyan
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Color.BrightBlue
+  id: BrightBlue
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: BrightBlue
+  nameWithType: Color.BrightBlue
+  fullName: Color.BrightBlue
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The bright bBlue color.
+  syntax:
+    content: BrightBlue
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Color.BrightGreen
+  id: BrightGreen
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: BrightGreen
+  nameWithType: Color.BrightGreen
+  fullName: Color.BrightGreen
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The bright green color.
+  syntax:
+    content: BrightGreen
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Color.BrightMagenta
+  id: BrightMagenta
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: BrightMagenta
+  nameWithType: Color.BrightMagenta
+  fullName: Color.BrightMagenta
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The bright magenta color.
+  syntax:
+    content: BrightMagenta
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Color.BrightRed
+  id: BrightRed
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: BrightRed
+  nameWithType: Color.BrightRed
+  fullName: Color.BrightRed
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The bright red color.
+  syntax:
+    content: BrightRed
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Color.BrightYellow
+  id: BrightYellow
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: BrightYellow
+  nameWithType: Color.BrightYellow
+  fullName: Color.BrightYellow
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The bright yellow color.
+  syntax:
+    content: BrightYellow
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Color.Brown
+  id: Brown
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: Brown
+  nameWithType: Color.Brown
+  fullName: Color.Brown
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The brown color.
+  syntax:
+    content: Brown
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Color.Cyan
+  id: Cyan
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: Cyan
+  nameWithType: Color.Cyan
+  fullName: Color.Cyan
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The cyan color.
+  syntax:
+    content: Cyan
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Color.DarkGray
+  id: DarkGray
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: DarkGray
+  nameWithType: Color.DarkGray
+  fullName: Color.DarkGray
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The dark gray color.
+  syntax:
+    content: DarkGray
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Color.Gray
+  id: Gray
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: Gray
+  nameWithType: Color.Gray
+  fullName: Color.Gray
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The gray color.
+  syntax:
+    content: Gray
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Color.Green
+  id: Green
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: Green
+  nameWithType: Color.Green
+  fullName: Color.Green
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The green color.
+  syntax:
+    content: Green
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Color.Magenta
+  id: Magenta
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: Magenta
+  nameWithType: Color.Magenta
+  fullName: Color.Magenta
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The magenta color.
+  syntax:
+    content: Magenta
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Color.Red
+  id: Red
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: Red
+  nameWithType: Color.Red
+  fullName: Color.Red
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The red color.
+  syntax:
+    content: Red
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Color.White
+  id: White
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  name: White
+  nameWithType: Color.White
+  fullName: Color.White
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The White color.
+  syntax:
+    content: White
+    return:
+      type: Terminal.Gui.Color
+      description: To be added.
+  exceptions: []
+references:
+- uid: System.Enum
+  parent: System
+  isExternal: true
+  name: Enum
+  nameWithType: Enum
+  fullName: System.Enum
+- uid: Terminal.Gui.Color.Black
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: Black
+  nameWithType: Color.Black
+  fullName: Color.Black
+- uid: Terminal.Gui.Color
+  parent: Terminal.Gui
+  isExternal: false
+  name: Color
+  nameWithType: Color
+  fullName: Terminal.Gui.Color
+- uid: Terminal.Gui.Color.Blue
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: Blue
+  nameWithType: Color.Blue
+  fullName: Color.Blue
+- uid: Terminal.Gui.Color.BrighCyan
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: BrighCyan
+  nameWithType: Color.BrighCyan
+  fullName: Color.BrighCyan
+- uid: Terminal.Gui.Color.BrightBlue
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: BrightBlue
+  nameWithType: Color.BrightBlue
+  fullName: Color.BrightBlue
+- uid: Terminal.Gui.Color.BrightGreen
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: BrightGreen
+  nameWithType: Color.BrightGreen
+  fullName: Color.BrightGreen
+- uid: Terminal.Gui.Color.BrightMagenta
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: BrightMagenta
+  nameWithType: Color.BrightMagenta
+  fullName: Color.BrightMagenta
+- uid: Terminal.Gui.Color.BrightRed
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: BrightRed
+  nameWithType: Color.BrightRed
+  fullName: Color.BrightRed
+- uid: Terminal.Gui.Color.BrightYellow
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: BrightYellow
+  nameWithType: Color.BrightYellow
+  fullName: Color.BrightYellow
+- uid: Terminal.Gui.Color.Brown
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: Brown
+  nameWithType: Color.Brown
+  fullName: Color.Brown
+- uid: Terminal.Gui.Color.Cyan
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: Cyan
+  nameWithType: Color.Cyan
+  fullName: Color.Cyan
+- uid: Terminal.Gui.Color.DarkGray
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: DarkGray
+  nameWithType: Color.DarkGray
+  fullName: Color.DarkGray
+- uid: Terminal.Gui.Color.Gray
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: Gray
+  nameWithType: Color.Gray
+  fullName: Color.Gray
+- uid: Terminal.Gui.Color.Green
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: Green
+  nameWithType: Color.Green
+  fullName: Color.Green
+- uid: Terminal.Gui.Color.Magenta
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: Magenta
+  nameWithType: Color.Magenta
+  fullName: Color.Magenta
+- uid: Terminal.Gui.Color.Red
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: Red
+  nameWithType: Color.Red
+  fullName: Color.Red
+- uid: Terminal.Gui.Color.White
+  parent: Terminal.Gui.Color
+  isExternal: false
+  name: White
+  nameWithType: Color.White
+  fullName: Color.White

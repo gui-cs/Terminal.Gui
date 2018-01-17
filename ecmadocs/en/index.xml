@@ -21,6 +21,8 @@
   <Copyright>To be added.</Copyright>
   <Types>
     <Namespace Name="Terminal">
+    </Namespace>
+    <Namespace Name="Terminal.Gui">
       <Type Name="Application" Kind="Class" />
       <Type Name="Application+RunState" Kind="Class" />
       <Type Name="Attribute" Kind="Structure" />

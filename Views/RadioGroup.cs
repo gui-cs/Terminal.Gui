@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Terminal {
+namespace Terminal.Gui {
 	/// <summary>
 	/// Radio group shows a group of labels, only one of those can be selected at a given time
 	/// </summary>

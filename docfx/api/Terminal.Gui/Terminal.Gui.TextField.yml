@@ -1,0 +1,674 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.TextField
+  id: TextField
+  children:
+  - Terminal.Gui.TextField.#ctor(System.Int32,System.Int32,System.Int32,System.String)
+  - Terminal.Gui.TextField.CanFocus
+  - Terminal.Gui.TextField.Changed
+  - Terminal.Gui.TextField.CursorPosition
+  - Terminal.Gui.TextField.MouseEvent(Terminal.Gui.MouseEvent)
+  - Terminal.Gui.TextField.PositionCursor
+  - Terminal.Gui.TextField.ProcessKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.TextField.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.TextField.Secret
+  - Terminal.Gui.TextField.Text
+  langs:
+  - csharp
+  name: TextField
+  nameWithType: TextField
+  fullName: Terminal.Gui.TextField
+  type: Class
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Text data entry widget
+  remarks: >-
+    The Entry widget provides Emacs-like editing
+                  functionality,  and mouse support.
+  syntax:
+    content: 'public class TextField : Terminal.Gui.View'
+  inheritance:
+  - System.Object
+  - Terminal.Gui.Responder
+  - Terminal.Gui.View
+  implements: []
+  inheritedMembers:
+  - Terminal.Gui.View.Add(Terminal.Gui.View)
+  - Terminal.Gui.View.Add(Terminal.Gui.View[])
+  - Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
+  - Terminal.Gui.View.Bounds
+  - Terminal.Gui.View.ChildNeedsDisplay
+  - Terminal.Gui.View.Clear
+  - Terminal.Gui.View.ClearNeedsDisplay
+  - Terminal.Gui.View.ColorScheme
+  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  - Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
+  - Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  - Terminal.Gui.View.Driver
+  - Terminal.Gui.View.EnsureFocus
+  - Terminal.Gui.View.Focused
+  - Terminal.Gui.View.FocusFirst
+  - Terminal.Gui.View.FocusLast
+  - Terminal.Gui.View.FocusNext
+  - Terminal.Gui.View.FocusPrev
+  - Terminal.Gui.View.Frame
+  - Terminal.Gui.View.GetEnumerator
+  - Terminal.Gui.View.HasFocus
+  - Terminal.Gui.View.Id
+  - Terminal.Gui.View.LayoutSubviews
+  - Terminal.Gui.View.MostFocused
+  - Terminal.Gui.View.Move(System.Int32,System.Int32)
+  - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.Remove(Terminal.Gui.View)
+  - Terminal.Gui.View.RemoveAll
+  - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  - Terminal.Gui.View.SetNeedsDisplay
+  - Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  - Terminal.Gui.View.Subviews
+  - Terminal.Gui.View.SuperView
+  - Terminal.Gui.View.ToString
+  - Terminal.Gui.View.WantMousePositionReports
+- uid: Terminal.Gui.TextField.#ctor(System.Int32,System.Int32,System.Int32,System.String)
+  id: '#ctor(System.Int32,System.Int32,System.Int32,System.String)'
+  parent: Terminal.Gui.TextField
+  langs:
+  - csharp
+  name: TextField(Int32, Int32, Int32, String)
+  nameWithType: TextField.TextField(Int32, Int32, Int32, String)
+  fullName: TextField.TextField(Int32, Int32, Int32, String)
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Public constructor.
+  syntax:
+    content: public TextField (int x, int y, int w, string s);
+    parameters:
+    - id: x
+      type: System.Int32
+      description: To be added.
+    - id: y
+      type: System.Int32
+      description: To be added.
+    - id: w
+      type: System.Int32
+      description: To be added.
+    - id: s
+      type: System.String
+      description: To be added.
+  overload: Terminal.Gui.TextField.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.TextField.CanFocus
+  id: CanFocus
+  parent: Terminal.Gui.TextField
+  langs:
+  - csharp
+  name: CanFocus
+  nameWithType: TextField.CanFocus
+  fullName: TextField.CanFocus
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool CanFocus { get; set; }
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.TextField.CanFocus*
+  exceptions: []
+- uid: Terminal.Gui.TextField.Changed
+  id: Changed
+  parent: Terminal.Gui.TextField
+  langs:
+  - csharp
+  name: Changed
+  nameWithType: TextField.Changed
+  fullName: TextField.Changed
+  type: Event
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Changed event, raised when the text has clicked.
+  remarks: >-
+    Client code can hook up to this event, it is
+                  raised when the text in the entry changes.
+  syntax:
+    content: public event EventHandler Changed;
+    return:
+      type: System.EventHandler
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.TextField.CursorPosition
+  id: CursorPosition
+  parent: Terminal.Gui.TextField
+  langs:
+  - csharp
+  name: CursorPosition
+  nameWithType: TextField.CursorPosition
+  fullName: TextField.CursorPosition
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The current cursor position.
+  syntax:
+    content: public int CursorPosition { get; }
+    return:
+      type: System.Int32
+      description: To be added.
+  overload: Terminal.Gui.TextField.CursorPosition*
+  exceptions: []
+- uid: Terminal.Gui.TextField.MouseEvent(Terminal.Gui.MouseEvent)
+  id: MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.TextField
+  langs:
+  - csharp
+  name: MouseEvent(MouseEvent)
+  nameWithType: TextField.MouseEvent(MouseEvent)
+  fullName: TextField.MouseEvent(MouseEvent)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool MouseEvent (Terminal.Gui.MouseEvent ev);
+    parameters:
+    - id: ev
+      type: Terminal.Gui.MouseEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.TextField.MouseEvent*
+  exceptions: []
+- uid: Terminal.Gui.TextField.PositionCursor
+  id: PositionCursor
+  parent: Terminal.Gui.TextField
+  langs:
+  - csharp
+  name: PositionCursor()
+  nameWithType: TextField.PositionCursor()
+  fullName: TextField.PositionCursor()
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Sets the cursor position.
+  syntax:
+    content: public override void PositionCursor ();
+    parameters: []
+  overload: Terminal.Gui.TextField.PositionCursor*
+  exceptions: []
+- uid: Terminal.Gui.TextField.ProcessKey(Terminal.Gui.KeyEvent)
+  id: ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.TextField
+  langs:
+  - csharp
+  name: ProcessKey(KeyEvent)
+  nameWithType: TextField.ProcessKey(KeyEvent)
+  fullName: TextField.ProcessKey(KeyEvent)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
+    parameters:
+    - id: kb
+      type: Terminal.Gui.KeyEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.TextField.ProcessKey*
+  exceptions: []
+- uid: Terminal.Gui.TextField.Redraw(Terminal.Gui.Rect)
+  id: Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.TextField
+  langs:
+  - csharp
+  name: Redraw(Rect)
+  nameWithType: TextField.Redraw(Rect)
+  fullName: TextField.Redraw(Rect)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void Redraw (Terminal.Gui.Rect region);
+    parameters:
+    - id: region
+      type: Terminal.Gui.Rect
+      description: To be added.
+  overload: Terminal.Gui.TextField.Redraw*
+  exceptions: []
+- uid: Terminal.Gui.TextField.Secret
+  id: Secret
+  parent: Terminal.Gui.TextField
+  langs:
+  - csharp
+  name: Secret
+  nameWithType: TextField.Secret
+  fullName: TextField.Secret
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Sets the secret property.
+  remarks: This makes the text entry suitable for entering passwords.
+  syntax:
+    content: public bool Secret { get; set; }
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.TextField.Secret*
+  exceptions: []
+- uid: Terminal.Gui.TextField.Text
+  id: Text
+  parent: Terminal.Gui.TextField
+  langs:
+  - csharp
+  name: Text
+  nameWithType: TextField.Text
+  fullName: TextField.Text
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Sets or gets the text in the entry.
+  syntax:
+    content: public string Text { get; set; }
+    return:
+      type: System.String
+      description: To be added.
+  overload: Terminal.Gui.TextField.Text*
+  exceptions: []
+references:
+- uid: Terminal.Gui.View
+  parent: Terminal.Gui
+  isExternal: false
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui.TextField.#ctor(System.Int32,System.Int32,System.Int32,System.String)
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: TextField(Int32, Int32, Int32, String)
+  nameWithType: TextField.TextField(Int32, Int32, Int32, String)
+  fullName: TextField.TextField(Int32, Int32, Int32, String)
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: System.String
+  parent: System
+  isExternal: true
+  name: String
+  nameWithType: String
+  fullName: System.String
+- uid: Terminal.Gui.TextField.CanFocus
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: CanFocus
+  nameWithType: TextField.CanFocus
+  fullName: TextField.CanFocus
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.TextField.Changed
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: Changed
+  nameWithType: TextField.Changed
+  fullName: TextField.Changed
+- uid: System.EventHandler
+  parent: System
+  isExternal: true
+  name: EventHandler
+  nameWithType: EventHandler
+  fullName: System.EventHandler
+- uid: Terminal.Gui.TextField.CursorPosition
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: CursorPosition
+  nameWithType: TextField.CursorPosition
+  fullName: TextField.CursorPosition
+- uid: Terminal.Gui.TextField.MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: MouseEvent(MouseEvent)
+  nameWithType: TextField.MouseEvent(MouseEvent)
+  fullName: TextField.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.MouseEvent
+  parent: Terminal.Gui
+  isExternal: false
+  name: MouseEvent
+  nameWithType: MouseEvent
+  fullName: Terminal.Gui.MouseEvent
+- uid: Terminal.Gui.TextField.PositionCursor
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: PositionCursor()
+  nameWithType: TextField.PositionCursor()
+  fullName: TextField.PositionCursor()
+- uid: Terminal.Gui.TextField.ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: ProcessKey(KeyEvent)
+  nameWithType: TextField.ProcessKey(KeyEvent)
+  fullName: TextField.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.KeyEvent
+  parent: Terminal.Gui
+  isExternal: false
+  name: KeyEvent
+  nameWithType: KeyEvent
+  fullName: Terminal.Gui.KeyEvent
+- uid: Terminal.Gui.TextField.Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: Redraw(Rect)
+  nameWithType: TextField.Redraw(Rect)
+  fullName: TextField.Redraw(Rect)
+- uid: Terminal.Gui.Rect
+  parent: Terminal.Gui
+  isExternal: false
+  name: Rect
+  nameWithType: Rect
+  fullName: Terminal.Gui.Rect
+- uid: Terminal.Gui.TextField.Secret
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: Secret
+  nameWithType: TextField.Secret
+  fullName: TextField.Secret
+- uid: Terminal.Gui.TextField.Text
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: Text
+  nameWithType: TextField.Text
+  fullName: TextField.Text
+- uid: Terminal.Gui.TextField.#ctor*
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: TextField
+  nameWithType: TextField.TextField
+  fullName: TextField.TextField
+- uid: Terminal.Gui.TextField.CanFocus*
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: CanFocus
+  nameWithType: TextField.CanFocus
+  fullName: TextField.CanFocus
+- uid: Terminal.Gui.TextField.CursorPosition*
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: CursorPosition
+  nameWithType: TextField.CursorPosition
+  fullName: TextField.CursorPosition
+- uid: Terminal.Gui.TextField.MouseEvent*
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: MouseEvent
+  nameWithType: TextField.MouseEvent
+  fullName: TextField.MouseEvent
+- uid: Terminal.Gui.TextField.PositionCursor*
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: PositionCursor
+  nameWithType: TextField.PositionCursor
+  fullName: TextField.PositionCursor
+- uid: Terminal.Gui.TextField.ProcessKey*
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: ProcessKey
+  nameWithType: TextField.ProcessKey
+  fullName: TextField.ProcessKey
+- uid: Terminal.Gui.TextField.Redraw*
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: Redraw
+  nameWithType: TextField.Redraw
+  fullName: TextField.Redraw
+- uid: Terminal.Gui.TextField.Secret*
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: Secret
+  nameWithType: TextField.Secret
+  fullName: TextField.Secret
+- uid: Terminal.Gui.TextField.Text*
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: Text
+  nameWithType: TextField.Text
+  fullName: TextField.Text
+- uid: Terminal.Gui.View.HasFocus
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: HasFocus
+  nameWithType: View.HasFocus
+  fullName: View.HasFocus
+- uid: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ProcessColdKey(KeyEvent)
+  nameWithType: View.ProcessColdKey(KeyEvent)
+  fullName: View.ProcessColdKey(KeyEvent)
+- uid: Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ProcessHotKey(KeyEvent)
+  nameWithType: View.ProcessHotKey(KeyEvent)
+  fullName: View.ProcessHotKey(KeyEvent)
+- uid: Terminal.Gui.View.Add(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Add(View)
+  nameWithType: View.Add(View)
+  fullName: View.Add(View)
+- uid: Terminal.Gui.View.Add(Terminal.Gui.View[])
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Add(View[])
+  nameWithType: View.Add(View[])
+  fullName: View.Add(View[])
+- uid: Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: AddCh(Int32, Int32, Int32)
+  nameWithType: View.AddCh(Int32, Int32, Int32)
+  fullName: View.AddCh(Int32, Int32, Int32)
+- uid: Terminal.Gui.View.Bounds
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Bounds
+  nameWithType: View.Bounds
+  fullName: View.Bounds
+- uid: Terminal.Gui.View.ChildNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ChildNeedsDisplay()
+  nameWithType: View.ChildNeedsDisplay()
+  fullName: View.ChildNeedsDisplay()
+- uid: Terminal.Gui.View.Clear
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Clear()
+  nameWithType: View.Clear()
+  fullName: View.Clear()
+- uid: Terminal.Gui.View.ClearNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ClearNeedsDisplay()
+  nameWithType: View.ClearNeedsDisplay()
+  fullName: View.ClearNeedsDisplay()
+- uid: Terminal.Gui.View.ColorScheme
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ColorScheme
+  nameWithType: View.ColorScheme
+  fullName: View.ColorScheme
+- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawFrame(Rect, Boolean)
+  nameWithType: View.DrawFrame(Rect, Boolean)
+  fullName: View.DrawFrame(Rect, Boolean)
+- uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(String, Boolean, ColorScheme)
+  nameWithType: View.DrawHotString(String, Boolean, ColorScheme)
+  fullName: View.DrawHotString(String, Boolean, ColorScheme)
+- uid: Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(String, Attribute, Attribute)
+  nameWithType: View.DrawHotString(String, Attribute, Attribute)
+  fullName: View.DrawHotString(String, Attribute, Attribute)
+- uid: Terminal.Gui.View.Driver
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Driver
+  nameWithType: View.Driver
+  fullName: View.Driver
+- uid: Terminal.Gui.View.EnsureFocus
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: EnsureFocus()
+  nameWithType: View.EnsureFocus()
+  fullName: View.EnsureFocus()
+- uid: Terminal.Gui.View.Focused
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Focused
+  nameWithType: View.Focused
+  fullName: View.Focused
+- uid: Terminal.Gui.View.FocusFirst
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusFirst()
+  nameWithType: View.FocusFirst()
+  fullName: View.FocusFirst()
+- uid: Terminal.Gui.View.FocusLast
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusLast()
+  nameWithType: View.FocusLast()
+  fullName: View.FocusLast()
+- uid: Terminal.Gui.View.FocusNext
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusNext()
+  nameWithType: View.FocusNext()
+  fullName: View.FocusNext()
+- uid: Terminal.Gui.View.FocusPrev
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusPrev()
+  nameWithType: View.FocusPrev()
+  fullName: View.FocusPrev()
+- uid: Terminal.Gui.View.Frame
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Frame
+  nameWithType: View.Frame
+  fullName: View.Frame
+- uid: Terminal.Gui.View.GetEnumerator
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: GetEnumerator()
+  nameWithType: View.GetEnumerator()
+  fullName: View.GetEnumerator()
+- uid: Terminal.Gui.View.Id
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Id
+  nameWithType: View.Id
+  fullName: View.Id
+- uid: Terminal.Gui.View.LayoutSubviews
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: LayoutSubviews()
+  nameWithType: View.LayoutSubviews()
+  fullName: View.LayoutSubviews()
+- uid: Terminal.Gui.View.MostFocused
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: MostFocused
+  nameWithType: View.MostFocused
+  fullName: View.MostFocused
+- uid: Terminal.Gui.View.Move(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Move(Int32, Int32)
+  nameWithType: View.Move(Int32, Int32)
+  fullName: View.Move(Int32, Int32)
+- uid: Terminal.Gui.View.Remove(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Remove(View)
+  nameWithType: View.Remove(View)
+  fullName: View.Remove(View)
+- uid: Terminal.Gui.View.RemoveAll
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: RemoveAll()
+  nameWithType: View.RemoveAll()
+  fullName: View.RemoveAll()
+- uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ScreenToView(Int32, Int32)
+  nameWithType: View.ScreenToView(Int32, Int32)
+  fullName: View.ScreenToView(Int32, Int32)
+- uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetFocus(View)
+  nameWithType: View.SetFocus(View)
+  fullName: View.SetFocus(View)
+- uid: Terminal.Gui.View.SetNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetNeedsDisplay()
+  nameWithType: View.SetNeedsDisplay()
+  fullName: View.SetNeedsDisplay()
+- uid: Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetNeedsDisplay(Rect)
+  nameWithType: View.SetNeedsDisplay(Rect)
+  fullName: View.SetNeedsDisplay(Rect)
+- uid: Terminal.Gui.View.Subviews
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Subviews
+  nameWithType: View.Subviews
+  fullName: View.Subviews
+- uid: Terminal.Gui.View.SuperView
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SuperView
+  nameWithType: View.SuperView
+  fullName: View.SuperView
+- uid: Terminal.Gui.View.ToString
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ToString()
+  nameWithType: View.ToString()
+  fullName: View.ToString()
+- uid: Terminal.Gui.View.WantMousePositionReports
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: WantMousePositionReports
+  nameWithType: View.WantMousePositionReports
+  fullName: View.WantMousePositionReports

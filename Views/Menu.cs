@@ -10,7 +10,7 @@
 //   Allow menus inside menus
 
 using System;
-namespace Terminal {
+namespace Terminal.Gui {
 
 	/// <summary>
 	/// A menu item has a title, an associated help text, and an action to execute on activation.
@@ -106,6 +106,11 @@ namespace Terminal {
 		/// </summary>
 		/// <value>The title.</value>
 		public string Title { get; set; }
+
+		/// <summary>
+		/// Gets or sets the children for this MenuBarItem
+		/// </summary>
+		/// <value>The children.</value>
 		public MenuItem [] Children { get; set; }
 		internal int TitleLength { get; private set; }
 	}

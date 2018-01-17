@@ -1,0 +1,656 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.CheckBox
+  id: CheckBox
+  children:
+  - Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,System.String)
+  - Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,System.String,System.Boolean)
+  - Terminal.Gui.CheckBox.Checked
+  - Terminal.Gui.CheckBox.MouseEvent(Terminal.Gui.MouseEvent)
+  - Terminal.Gui.CheckBox.PositionCursor
+  - Terminal.Gui.CheckBox.ProcessKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.CheckBox.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.CheckBox.Text
+  - Terminal.Gui.CheckBox.Toggled
+  langs:
+  - csharp
+  name: CheckBox
+  nameWithType: CheckBox
+  fullName: Terminal.Gui.CheckBox
+  type: Class
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The Checkbox View shows an on/off toggle that the user can set
+  syntax:
+    content: 'public class CheckBox : Terminal.Gui.View'
+  inheritance:
+  - System.Object
+  - Terminal.Gui.Responder
+  - Terminal.Gui.View
+  implements: []
+  inheritedMembers:
+  - Terminal.Gui.Responder.CanFocus
+  - Terminal.Gui.View.Add(Terminal.Gui.View)
+  - Terminal.Gui.View.Add(Terminal.Gui.View[])
+  - Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
+  - Terminal.Gui.View.Bounds
+  - Terminal.Gui.View.ChildNeedsDisplay
+  - Terminal.Gui.View.Clear
+  - Terminal.Gui.View.ClearNeedsDisplay
+  - Terminal.Gui.View.ColorScheme
+  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  - Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
+  - Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  - Terminal.Gui.View.Driver
+  - Terminal.Gui.View.EnsureFocus
+  - Terminal.Gui.View.Focused
+  - Terminal.Gui.View.FocusFirst
+  - Terminal.Gui.View.FocusLast
+  - Terminal.Gui.View.FocusNext
+  - Terminal.Gui.View.FocusPrev
+  - Terminal.Gui.View.Frame
+  - Terminal.Gui.View.GetEnumerator
+  - Terminal.Gui.View.HasFocus
+  - Terminal.Gui.View.Id
+  - Terminal.Gui.View.LayoutSubviews
+  - Terminal.Gui.View.MostFocused
+  - Terminal.Gui.View.Move(System.Int32,System.Int32)
+  - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.Remove(Terminal.Gui.View)
+  - Terminal.Gui.View.RemoveAll
+  - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  - Terminal.Gui.View.SetNeedsDisplay
+  - Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  - Terminal.Gui.View.Subviews
+  - Terminal.Gui.View.SuperView
+  - Terminal.Gui.View.ToString
+  - Terminal.Gui.View.WantMousePositionReports
+- uid: Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,System.String)
+  id: '#ctor(System.Int32,System.Int32,System.String)'
+  parent: Terminal.Gui.CheckBox
+  langs:
+  - csharp
+  name: CheckBox(Int32, Int32, String)
+  nameWithType: CheckBox.CheckBox(Int32, Int32, String)
+  fullName: CheckBox.CheckBox(Int32, Int32, String)
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: >-
+    Public constructor, creates a CheckButton based on
+                  the given text at the given position.
+  remarks: >-
+    The size of CheckButton is computed based on the
+                  text length. This CheckButton is not toggled.
+  syntax:
+    content: public CheckBox (int x, int y, string s);
+    parameters:
+    - id: x
+      type: System.Int32
+      description: To be added.
+    - id: y
+      type: System.Int32
+      description: To be added.
+    - id: s
+      type: System.String
+      description: To be added.
+  overload: Terminal.Gui.CheckBox.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,System.String,System.Boolean)
+  id: '#ctor(System.Int32,System.Int32,System.String,System.Boolean)'
+  parent: Terminal.Gui.CheckBox
+  langs:
+  - csharp
+  name: CheckBox(Int32, Int32, String, Boolean)
+  nameWithType: CheckBox.CheckBox(Int32, Int32, String, Boolean)
+  fullName: CheckBox.CheckBox(Int32, Int32, String, Boolean)
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: >-
+    Public constructor, creates a CheckButton based on
+                  the given text at the given position and a state.
+  remarks: >-
+    The size of CheckButton is computed based on the
+                  text length.
+  syntax:
+    content: public CheckBox (int x, int y, string s, bool is_checked);
+    parameters:
+    - id: x
+      type: System.Int32
+      description: To be added.
+    - id: y
+      type: System.Int32
+      description: To be added.
+    - id: s
+      type: System.String
+      description: To be added.
+    - id: is_checked
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.CheckBox.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.CheckBox.Checked
+  id: Checked
+  parent: Terminal.Gui.CheckBox
+  langs:
+  - csharp
+  name: Checked
+  nameWithType: CheckBox.Checked
+  fullName: CheckBox.Checked
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The state of the checkbox.
+  syntax:
+    content: public bool Checked { get; set; }
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.CheckBox.Checked*
+  exceptions: []
+- uid: Terminal.Gui.CheckBox.MouseEvent(Terminal.Gui.MouseEvent)
+  id: MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.CheckBox
+  langs:
+  - csharp
+  name: MouseEvent(MouseEvent)
+  nameWithType: CheckBox.MouseEvent(MouseEvent)
+  fullName: CheckBox.MouseEvent(MouseEvent)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool MouseEvent (Terminal.Gui.MouseEvent me);
+    parameters:
+    - id: me
+      type: Terminal.Gui.MouseEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.CheckBox.MouseEvent*
+  exceptions: []
+- uid: Terminal.Gui.CheckBox.PositionCursor
+  id: PositionCursor
+  parent: Terminal.Gui.CheckBox
+  langs:
+  - csharp
+  name: PositionCursor()
+  nameWithType: CheckBox.PositionCursor()
+  fullName: CheckBox.PositionCursor()
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void PositionCursor ();
+    parameters: []
+  overload: Terminal.Gui.CheckBox.PositionCursor*
+  exceptions: []
+- uid: Terminal.Gui.CheckBox.ProcessKey(Terminal.Gui.KeyEvent)
+  id: ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.CheckBox
+  langs:
+  - csharp
+  name: ProcessKey(KeyEvent)
+  nameWithType: CheckBox.ProcessKey(KeyEvent)
+  fullName: CheckBox.ProcessKey(KeyEvent)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
+    parameters:
+    - id: kb
+      type: Terminal.Gui.KeyEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.CheckBox.ProcessKey*
+  exceptions: []
+- uid: Terminal.Gui.CheckBox.Redraw(Terminal.Gui.Rect)
+  id: Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.CheckBox
+  langs:
+  - csharp
+  name: Redraw(Rect)
+  nameWithType: CheckBox.Redraw(Rect)
+  fullName: CheckBox.Redraw(Rect)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void Redraw (Terminal.Gui.Rect region);
+    parameters:
+    - id: region
+      type: Terminal.Gui.Rect
+      description: To be added.
+  overload: Terminal.Gui.CheckBox.Redraw*
+  exceptions: []
+- uid: Terminal.Gui.CheckBox.Text
+  id: Text
+  parent: Terminal.Gui.CheckBox
+  langs:
+  - csharp
+  name: Text
+  nameWithType: CheckBox.Text
+  fullName: CheckBox.Text
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The text displayed by this widget.
+  syntax:
+    content: public string Text { get; set; }
+    return:
+      type: System.String
+      description: To be added.
+  overload: Terminal.Gui.CheckBox.Text*
+  exceptions: []
+- uid: Terminal.Gui.CheckBox.Toggled
+  id: Toggled
+  parent: Terminal.Gui.CheckBox
+  langs:
+  - csharp
+  name: Toggled
+  nameWithType: CheckBox.Toggled
+  fullName: CheckBox.Toggled
+  type: Event
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Toggled event, raised when the CheckButton is toggled.
+  remarks: >-
+    Client code can hook up to this event, it is
+                  raised when the checkbutton is activated either with
+                  the mouse or the keyboard.
+  syntax:
+    content: public event EventHandler Toggled;
+    return:
+      type: System.EventHandler
+      description: To be added.
+  exceptions: []
+references:
+- uid: Terminal.Gui.View
+  parent: Terminal.Gui
+  isExternal: false
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,System.String)
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: CheckBox(Int32, Int32, String)
+  nameWithType: CheckBox.CheckBox(Int32, Int32, String)
+  fullName: CheckBox.CheckBox(Int32, Int32, String)
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: System.String
+  parent: System
+  isExternal: true
+  name: String
+  nameWithType: String
+  fullName: System.String
+- uid: Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,System.String,System.Boolean)
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: CheckBox(Int32, Int32, String, Boolean)
+  nameWithType: CheckBox.CheckBox(Int32, Int32, String, Boolean)
+  fullName: CheckBox.CheckBox(Int32, Int32, String, Boolean)
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.CheckBox.Checked
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: Checked
+  nameWithType: CheckBox.Checked
+  fullName: CheckBox.Checked
+- uid: Terminal.Gui.CheckBox.MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: MouseEvent(MouseEvent)
+  nameWithType: CheckBox.MouseEvent(MouseEvent)
+  fullName: CheckBox.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.MouseEvent
+  parent: Terminal.Gui
+  isExternal: false
+  name: MouseEvent
+  nameWithType: MouseEvent
+  fullName: Terminal.Gui.MouseEvent
+- uid: Terminal.Gui.CheckBox.PositionCursor
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: PositionCursor()
+  nameWithType: CheckBox.PositionCursor()
+  fullName: CheckBox.PositionCursor()
+- uid: Terminal.Gui.CheckBox.ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: ProcessKey(KeyEvent)
+  nameWithType: CheckBox.ProcessKey(KeyEvent)
+  fullName: CheckBox.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.KeyEvent
+  parent: Terminal.Gui
+  isExternal: false
+  name: KeyEvent
+  nameWithType: KeyEvent
+  fullName: Terminal.Gui.KeyEvent
+- uid: Terminal.Gui.CheckBox.Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: Redraw(Rect)
+  nameWithType: CheckBox.Redraw(Rect)
+  fullName: CheckBox.Redraw(Rect)
+- uid: Terminal.Gui.Rect
+  parent: Terminal.Gui
+  isExternal: false
+  name: Rect
+  nameWithType: Rect
+  fullName: Terminal.Gui.Rect
+- uid: Terminal.Gui.CheckBox.Text
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: Text
+  nameWithType: CheckBox.Text
+  fullName: CheckBox.Text
+- uid: Terminal.Gui.CheckBox.Toggled
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: Toggled
+  nameWithType: CheckBox.Toggled
+  fullName: CheckBox.Toggled
+- uid: System.EventHandler
+  parent: System
+  isExternal: true
+  name: EventHandler
+  nameWithType: EventHandler
+  fullName: System.EventHandler
+- uid: Terminal.Gui.CheckBox.#ctor*
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: CheckBox
+  nameWithType: CheckBox.CheckBox
+  fullName: CheckBox.CheckBox
+- uid: Terminal.Gui.CheckBox.Checked*
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: Checked
+  nameWithType: CheckBox.Checked
+  fullName: CheckBox.Checked
+- uid: Terminal.Gui.CheckBox.MouseEvent*
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: MouseEvent
+  nameWithType: CheckBox.MouseEvent
+  fullName: CheckBox.MouseEvent
+- uid: Terminal.Gui.CheckBox.PositionCursor*
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: PositionCursor
+  nameWithType: CheckBox.PositionCursor
+  fullName: CheckBox.PositionCursor
+- uid: Terminal.Gui.CheckBox.ProcessKey*
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: ProcessKey
+  nameWithType: CheckBox.ProcessKey
+  fullName: CheckBox.ProcessKey
+- uid: Terminal.Gui.CheckBox.Redraw*
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: Redraw
+  nameWithType: CheckBox.Redraw
+  fullName: CheckBox.Redraw
+- uid: Terminal.Gui.CheckBox.Text*
+  parent: Terminal.Gui.CheckBox
+  isExternal: false
+  name: Text
+  nameWithType: CheckBox.Text
+  fullName: CheckBox.Text
+- uid: Terminal.Gui.Responder.CanFocus
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: CanFocus
+  nameWithType: Responder.CanFocus
+  fullName: Responder.CanFocus
+- uid: Terminal.Gui.View.HasFocus
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: HasFocus
+  nameWithType: View.HasFocus
+  fullName: View.HasFocus
+- uid: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ProcessColdKey(KeyEvent)
+  nameWithType: View.ProcessColdKey(KeyEvent)
+  fullName: View.ProcessColdKey(KeyEvent)
+- uid: Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ProcessHotKey(KeyEvent)
+  nameWithType: View.ProcessHotKey(KeyEvent)
+  fullName: View.ProcessHotKey(KeyEvent)
+- uid: Terminal.Gui.View.Add(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Add(View)
+  nameWithType: View.Add(View)
+  fullName: View.Add(View)
+- uid: Terminal.Gui.View.Add(Terminal.Gui.View[])
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Add(View[])
+  nameWithType: View.Add(View[])
+  fullName: View.Add(View[])
+- uid: Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: AddCh(Int32, Int32, Int32)
+  nameWithType: View.AddCh(Int32, Int32, Int32)
+  fullName: View.AddCh(Int32, Int32, Int32)
+- uid: Terminal.Gui.View.Bounds
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Bounds
+  nameWithType: View.Bounds
+  fullName: View.Bounds
+- uid: Terminal.Gui.View.ChildNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ChildNeedsDisplay()
+  nameWithType: View.ChildNeedsDisplay()
+  fullName: View.ChildNeedsDisplay()
+- uid: Terminal.Gui.View.Clear
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Clear()
+  nameWithType: View.Clear()
+  fullName: View.Clear()
+- uid: Terminal.Gui.View.ClearNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ClearNeedsDisplay()
+  nameWithType: View.ClearNeedsDisplay()
+  fullName: View.ClearNeedsDisplay()
+- uid: Terminal.Gui.View.ColorScheme
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ColorScheme
+  nameWithType: View.ColorScheme
+  fullName: View.ColorScheme
+- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawFrame(Rect, Boolean)
+  nameWithType: View.DrawFrame(Rect, Boolean)
+  fullName: View.DrawFrame(Rect, Boolean)
+- uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(String, Boolean, ColorScheme)
+  nameWithType: View.DrawHotString(String, Boolean, ColorScheme)
+  fullName: View.DrawHotString(String, Boolean, ColorScheme)
+- uid: Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(String, Attribute, Attribute)
+  nameWithType: View.DrawHotString(String, Attribute, Attribute)
+  fullName: View.DrawHotString(String, Attribute, Attribute)
+- uid: Terminal.Gui.View.Driver
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Driver
+  nameWithType: View.Driver
+  fullName: View.Driver
+- uid: Terminal.Gui.View.EnsureFocus
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: EnsureFocus()
+  nameWithType: View.EnsureFocus()
+  fullName: View.EnsureFocus()
+- uid: Terminal.Gui.View.Focused
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Focused
+  nameWithType: View.Focused
+  fullName: View.Focused
+- uid: Terminal.Gui.View.FocusFirst
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusFirst()
+  nameWithType: View.FocusFirst()
+  fullName: View.FocusFirst()
+- uid: Terminal.Gui.View.FocusLast
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusLast()
+  nameWithType: View.FocusLast()
+  fullName: View.FocusLast()
+- uid: Terminal.Gui.View.FocusNext
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusNext()
+  nameWithType: View.FocusNext()
+  fullName: View.FocusNext()
+- uid: Terminal.Gui.View.FocusPrev
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusPrev()
+  nameWithType: View.FocusPrev()
+  fullName: View.FocusPrev()
+- uid: Terminal.Gui.View.Frame
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Frame
+  nameWithType: View.Frame
+  fullName: View.Frame
+- uid: Terminal.Gui.View.GetEnumerator
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: GetEnumerator()
+  nameWithType: View.GetEnumerator()
+  fullName: View.GetEnumerator()
+- uid: Terminal.Gui.View.Id
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Id
+  nameWithType: View.Id
+  fullName: View.Id
+- uid: Terminal.Gui.View.LayoutSubviews
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: LayoutSubviews()
+  nameWithType: View.LayoutSubviews()
+  fullName: View.LayoutSubviews()
+- uid: Terminal.Gui.View.MostFocused
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: MostFocused
+  nameWithType: View.MostFocused
+  fullName: View.MostFocused
+- uid: Terminal.Gui.View.Move(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Move(Int32, Int32)
+  nameWithType: View.Move(Int32, Int32)
+  fullName: View.Move(Int32, Int32)
+- uid: Terminal.Gui.View.Remove(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Remove(View)
+  nameWithType: View.Remove(View)
+  fullName: View.Remove(View)
+- uid: Terminal.Gui.View.RemoveAll
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: RemoveAll()
+  nameWithType: View.RemoveAll()
+  fullName: View.RemoveAll()
+- uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ScreenToView(Int32, Int32)
+  nameWithType: View.ScreenToView(Int32, Int32)
+  fullName: View.ScreenToView(Int32, Int32)
+- uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetFocus(View)
+  nameWithType: View.SetFocus(View)
+  fullName: View.SetFocus(View)
+- uid: Terminal.Gui.View.SetNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetNeedsDisplay()
+  nameWithType: View.SetNeedsDisplay()
+  fullName: View.SetNeedsDisplay()
+- uid: Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetNeedsDisplay(Rect)
+  nameWithType: View.SetNeedsDisplay(Rect)
+  fullName: View.SetNeedsDisplay(Rect)
+- uid: Terminal.Gui.View.Subviews
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Subviews
+  nameWithType: View.Subviews
+  fullName: View.Subviews
+- uid: Terminal.Gui.View.SuperView
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SuperView
+  nameWithType: View.SuperView
+  fullName: View.SuperView
+- uid: Terminal.Gui.View.ToString
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ToString()
+  nameWithType: View.ToString()
+  fullName: View.ToString()
+- uid: Terminal.Gui.View.WantMousePositionReports
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: WantMousePositionReports
+  nameWithType: View.WantMousePositionReports
+  fullName: View.WantMousePositionReports

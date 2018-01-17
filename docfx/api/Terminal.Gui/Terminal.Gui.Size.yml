@@ -1,0 +1,647 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.Size
+  id: Size
+  children:
+  - Terminal.Gui.Size.#ctor(Terminal.Gui.Point)
+  - Terminal.Gui.Size.#ctor(System.Int32,System.Int32)
+  - Terminal.Gui.Size.Add(Terminal.Gui.Size,Terminal.Gui.Size)
+  - Terminal.Gui.Size.Empty
+  - Terminal.Gui.Size.Equals(System.Object)
+  - Terminal.Gui.Size.GetHashCode
+  - Terminal.Gui.Size.Height
+  - Terminal.Gui.Size.IsEmpty
+  - Terminal.Gui.Size.op_Addition(Terminal.Gui.Size,Terminal.Gui.Size)
+  - Terminal.Gui.Size.op_Equality(Terminal.Gui.Size,Terminal.Gui.Size)
+  - Terminal.Gui.Size.op_Explicit(Terminal.Gui.Size to Terminal.Gui.Point)
+  - Terminal.Gui.Size.op_Inequality(Terminal.Gui.Size,Terminal.Gui.Size)
+  - Terminal.Gui.Size.op_Subtraction(Terminal.Gui.Size,Terminal.Gui.Size)
+  - Terminal.Gui.Size.Subtract(Terminal.Gui.Size,Terminal.Gui.Size)
+  - Terminal.Gui.Size.ToString
+  - Terminal.Gui.Size.Width
+  langs:
+  - csharp
+  name: Size
+  nameWithType: Size
+  fullName: Terminal.Gui.Size
+  type: Struct
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Stores an ordered pair of integers, which specify a Height and Width.
+  syntax:
+    content: public struct Size
+  inheritance:
+  - System.ValueType
+  implements: []
+- uid: Terminal.Gui.Size.#ctor(Terminal.Gui.Point)
+  id: '#ctor(Terminal.Gui.Point)'
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: Size(Point)
+  nameWithType: Size.Size(Point)
+  fullName: Size.Size(Point)
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Size Constructor
+  remarks: Creates a Size from a Point value.
+  syntax:
+    content: public Size (Terminal.Gui.Point pt);
+    parameters:
+    - id: pt
+      type: Terminal.Gui.Point
+      description: To be added.
+  overload: Terminal.Gui.Size.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.Size.#ctor(System.Int32,System.Int32)
+  id: '#ctor(System.Int32,System.Int32)'
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: Size(Int32, Int32)
+  nameWithType: Size.Size(Int32, Int32)
+  fullName: Size.Size(Int32, Int32)
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Size Constructor
+  remarks: Creates a Size from specified dimensions.
+  syntax:
+    content: public Size (int width, int height);
+    parameters:
+    - id: width
+      type: System.Int32
+      description: To be added.
+    - id: height
+      type: System.Int32
+      description: To be added.
+  overload: Terminal.Gui.Size.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.Size.Add(Terminal.Gui.Size,Terminal.Gui.Size)
+  id: Add(Terminal.Gui.Size,Terminal.Gui.Size)
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: Add(Size, Size)
+  nameWithType: Size.Add(Size, Size)
+  fullName: Size.Add(Size, Size)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Adds the width and height of one Size structure to the width and height of another Size structure.
+  syntax:
+    content: public static Terminal.Gui.Size Add (Terminal.Gui.Size sz1, Terminal.Gui.Size sz2);
+    parameters:
+    - id: sz1
+      type: Terminal.Gui.Size
+      description: The first Size structure to add.
+    - id: sz2
+      type: Terminal.Gui.Size
+      description: The second Size structure to add.
+    return:
+      type: Terminal.Gui.Size
+      description: The add.
+  overload: Terminal.Gui.Size.Add*
+  exceptions: []
+- uid: Terminal.Gui.Size.Empty
+  id: Empty
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: Empty
+  nameWithType: Size.Empty
+  fullName: Size.Empty
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Gets a Size structure that has a Height and Width value of 0.
+  syntax:
+    content: public static readonly Terminal.Gui.Size Empty;
+    return:
+      type: Terminal.Gui.Size
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Size.Equals(System.Object)
+  id: Equals(System.Object)
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: Equals(Object)
+  nameWithType: Size.Equals(Object)
+  fullName: Size.Equals(Object)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Equals Method
+  remarks: Checks equivalence of this Size and another object.
+  syntax:
+    content: public override bool Equals (object obj);
+    parameters:
+    - id: obj
+      type: System.Object
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Size.Equals*
+  exceptions: []
+- uid: Terminal.Gui.Size.GetHashCode
+  id: GetHashCode
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: GetHashCode()
+  nameWithType: Size.GetHashCode()
+  fullName: Size.GetHashCode()
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: GetHashCode Method
+  remarks: Calculates a hashing value.
+  syntax:
+    content: public override int GetHashCode ();
+    parameters: []
+    return:
+      type: System.Int32
+      description: To be added.
+  overload: Terminal.Gui.Size.GetHashCode*
+  exceptions: []
+- uid: Terminal.Gui.Size.Height
+  id: Height
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: Height
+  nameWithType: Size.Height
+  fullName: Size.Height
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Height Property
+  remarks: The Height coordinate of the Size.
+  syntax:
+    content: public int Height { get; set; }
+    return:
+      type: System.Int32
+      description: To be added.
+  overload: Terminal.Gui.Size.Height*
+  exceptions: []
+- uid: Terminal.Gui.Size.IsEmpty
+  id: IsEmpty
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: IsEmpty
+  nameWithType: Size.IsEmpty
+  fullName: Size.IsEmpty
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: IsEmpty Property
+  remarks: Indicates if both Width and Height are zero.
+  syntax:
+    content: public bool IsEmpty { get; }
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Size.IsEmpty*
+  exceptions: []
+- uid: Terminal.Gui.Size.op_Addition(Terminal.Gui.Size,Terminal.Gui.Size)
+  id: op_Addition(Terminal.Gui.Size,Terminal.Gui.Size)
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: op_Addition(Size, Size)
+  nameWithType: Size.op_Addition(Size, Size)
+  fullName: Size.op_Addition(Size, Size)
+  type: Operator
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Addition Operator
+  remarks: Addition of two Size structures.
+  syntax:
+    content: public static Terminal.Gui.Size op_Addition (Terminal.Gui.Size sz1, Terminal.Gui.Size sz2);
+    parameters:
+    - id: sz1
+      type: Terminal.Gui.Size
+      description: To be added.
+    - id: sz2
+      type: Terminal.Gui.Size
+      description: To be added.
+    return:
+      type: Terminal.Gui.Size
+      description: To be added.
+  overload: Terminal.Gui.Size.op_Addition*
+  exceptions: []
+- uid: Terminal.Gui.Size.op_Equality(Terminal.Gui.Size,Terminal.Gui.Size)
+  id: op_Equality(Terminal.Gui.Size,Terminal.Gui.Size)
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: op_Equality(Size, Size)
+  nameWithType: Size.op_Equality(Size, Size)
+  fullName: Size.op_Equality(Size, Size)
+  type: Operator
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Equality Operator
+  remarks: "Compares two Size objects. The return value is\n            	based on the equivalence of the Width and Height \n            	properties of the two Sizes."
+  syntax:
+    content: public static bool op_Equality (Terminal.Gui.Size sz1, Terminal.Gui.Size sz2);
+    parameters:
+    - id: sz1
+      type: Terminal.Gui.Size
+      description: To be added.
+    - id: sz2
+      type: Terminal.Gui.Size
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Size.op_Equality*
+  exceptions: []
+- uid: Terminal.Gui.Size.op_Explicit(Terminal.Gui.Size to Terminal.Gui.Point)
+  id: op_Explicit(Terminal.Gui.Size to Terminal.Gui.Point)
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: op_Explicit(Size to Point)
+  nameWithType: Size.op_Explicit(Size to Point)
+  fullName: Size.op_Explicit(Size to Point)
+  type: Operator
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Size to Point Conversion
+  remarks: "Returns a Point based on the dimensions of a given \n            	Size. Requires explicit cast."
+  syntax:
+    content: public static Terminal.Gui.Point op_Explicit (Terminal.Gui.Size size);
+    parameters:
+    - id: size
+      type: Terminal.Gui.Size
+      description: To be added.
+    return:
+      type: Terminal.Gui.Point
+      description: To be added.
+  overload: Terminal.Gui.Size.op_Explicit*
+  exceptions: []
+- uid: Terminal.Gui.Size.op_Inequality(Terminal.Gui.Size,Terminal.Gui.Size)
+  id: op_Inequality(Terminal.Gui.Size,Terminal.Gui.Size)
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: op_Inequality(Size, Size)
+  nameWithType: Size.op_Inequality(Size, Size)
+  fullName: Size.op_Inequality(Size, Size)
+  type: Operator
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Inequality Operator
+  remarks: "Compares two Size objects. The return value is\n            	based on the equivalence of the Width and Height \n            	properties of the two Sizes."
+  syntax:
+    content: public static bool op_Inequality (Terminal.Gui.Size sz1, Terminal.Gui.Size sz2);
+    parameters:
+    - id: sz1
+      type: Terminal.Gui.Size
+      description: To be added.
+    - id: sz2
+      type: Terminal.Gui.Size
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Size.op_Inequality*
+  exceptions: []
+- uid: Terminal.Gui.Size.op_Subtraction(Terminal.Gui.Size,Terminal.Gui.Size)
+  id: op_Subtraction(Terminal.Gui.Size,Terminal.Gui.Size)
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: op_Subtraction(Size, Size)
+  nameWithType: Size.op_Subtraction(Size, Size)
+  fullName: Size.op_Subtraction(Size, Size)
+  type: Operator
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Subtraction Operator
+  remarks: Subtracts two Size structures.
+  syntax:
+    content: public static Terminal.Gui.Size op_Subtraction (Terminal.Gui.Size sz1, Terminal.Gui.Size sz2);
+    parameters:
+    - id: sz1
+      type: Terminal.Gui.Size
+      description: To be added.
+    - id: sz2
+      type: Terminal.Gui.Size
+      description: To be added.
+    return:
+      type: Terminal.Gui.Size
+      description: To be added.
+  overload: Terminal.Gui.Size.op_Subtraction*
+  exceptions: []
+- uid: Terminal.Gui.Size.Subtract(Terminal.Gui.Size,Terminal.Gui.Size)
+  id: Subtract(Terminal.Gui.Size,Terminal.Gui.Size)
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: Subtract(Size, Size)
+  nameWithType: Size.Subtract(Size, Size)
+  fullName: Size.Subtract(Size, Size)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public static Terminal.Gui.Size Subtract (Terminal.Gui.Size sz1, Terminal.Gui.Size sz2);
+    parameters:
+    - id: sz1
+      type: Terminal.Gui.Size
+      description: To be added.
+    - id: sz2
+      type: Terminal.Gui.Size
+      description: To be added.
+    return:
+      type: Terminal.Gui.Size
+      description: To be added.
+  overload: Terminal.Gui.Size.Subtract*
+  exceptions: []
+- uid: Terminal.Gui.Size.ToString
+  id: ToString
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: ToString()
+  nameWithType: Size.ToString()
+  fullName: Size.ToString()
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: ToString Method
+  remarks: Formats the Size as a string in coordinate notation.
+  syntax:
+    content: public override string ToString ();
+    parameters: []
+    return:
+      type: System.String
+      description: To be added.
+  overload: Terminal.Gui.Size.ToString*
+  exceptions: []
+- uid: Terminal.Gui.Size.Width
+  id: Width
+  parent: Terminal.Gui.Size
+  langs:
+  - csharp
+  name: Width
+  nameWithType: Size.Width
+  fullName: Size.Width
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Width Property
+  remarks: The Width coordinate of the Size.
+  syntax:
+    content: public int Width { get; set; }
+    return:
+      type: System.Int32
+      description: To be added.
+  overload: Terminal.Gui.Size.Width*
+  exceptions: []
+references:
+- uid: System.ValueType
+  parent: System
+  isExternal: true
+  name: ValueType
+  nameWithType: ValueType
+  fullName: System.ValueType
+- uid: Terminal.Gui.Size.#ctor(Terminal.Gui.Point)
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: Size(Point)
+  nameWithType: Size.Size(Point)
+  fullName: Size.Size(Point)
+- uid: Terminal.Gui.Point
+  parent: Terminal.Gui
+  isExternal: false
+  name: Point
+  nameWithType: Point
+  fullName: Terminal.Gui.Point
+- uid: Terminal.Gui.Size.#ctor(System.Int32,System.Int32)
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: Size(Int32, Int32)
+  nameWithType: Size.Size(Int32, Int32)
+  fullName: Size.Size(Int32, Int32)
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: Terminal.Gui.Size.Add(Terminal.Gui.Size,Terminal.Gui.Size)
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: Add(Size, Size)
+  nameWithType: Size.Add(Size, Size)
+  fullName: Size.Add(Size, Size)
+- uid: Terminal.Gui.Size
+  parent: Terminal.Gui
+  isExternal: false
+  name: Size
+  nameWithType: Size
+  fullName: Terminal.Gui.Size
+- uid: Terminal.Gui.Size.Empty
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: Empty
+  nameWithType: Size.Empty
+  fullName: Size.Empty
+- uid: Terminal.Gui.Size.Equals(System.Object)
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: Equals(Object)
+  nameWithType: Size.Equals(Object)
+  fullName: Size.Equals(Object)
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: Terminal.Gui.Size.GetHashCode
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: GetHashCode()
+  nameWithType: Size.GetHashCode()
+  fullName: Size.GetHashCode()
+- uid: Terminal.Gui.Size.Height
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: Height
+  nameWithType: Size.Height
+  fullName: Size.Height
+- uid: Terminal.Gui.Size.IsEmpty
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: IsEmpty
+  nameWithType: Size.IsEmpty
+  fullName: Size.IsEmpty
+- uid: Terminal.Gui.Size.op_Addition(Terminal.Gui.Size,Terminal.Gui.Size)
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: op_Addition(Size, Size)
+  nameWithType: Size.op_Addition(Size, Size)
+  fullName: Size.op_Addition(Size, Size)
+- uid: Terminal.Gui.Size.op_Equality(Terminal.Gui.Size,Terminal.Gui.Size)
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: op_Equality(Size, Size)
+  nameWithType: Size.op_Equality(Size, Size)
+  fullName: Size.op_Equality(Size, Size)
+- uid: Terminal.Gui.Size.op_Explicit(Terminal.Gui.Size to Terminal.Gui.Point)
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: op_Explicit(Size to Point)
+  nameWithType: Size.op_Explicit(Size to Point)
+  fullName: Size.op_Explicit(Size to Point)
+- uid: Terminal.Gui.Size.op_Inequality(Terminal.Gui.Size,Terminal.Gui.Size)
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: op_Inequality(Size, Size)
+  nameWithType: Size.op_Inequality(Size, Size)
+  fullName: Size.op_Inequality(Size, Size)
+- uid: Terminal.Gui.Size.op_Subtraction(Terminal.Gui.Size,Terminal.Gui.Size)
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: op_Subtraction(Size, Size)
+  nameWithType: Size.op_Subtraction(Size, Size)
+  fullName: Size.op_Subtraction(Size, Size)
+- uid: Terminal.Gui.Size.Subtract(Terminal.Gui.Size,Terminal.Gui.Size)
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: Subtract(Size, Size)
+  nameWithType: Size.Subtract(Size, Size)
+  fullName: Size.Subtract(Size, Size)
+- uid: Terminal.Gui.Size.ToString
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: ToString()
+  nameWithType: Size.ToString()
+  fullName: Size.ToString()
+- uid: System.String
+  parent: System
+  isExternal: true
+  name: String
+  nameWithType: String
+  fullName: System.String
+- uid: Terminal.Gui.Size.Width
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: Width
+  nameWithType: Size.Width
+  fullName: Size.Width
+- uid: Terminal.Gui.Size.#ctor*
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: Size
+  nameWithType: Size.Size
+  fullName: Size.Size
+- uid: Terminal.Gui.Size.Add*
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: Add
+  nameWithType: Size.Add
+  fullName: Size.Add
+- uid: Terminal.Gui.Size.Equals*
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: Equals
+  nameWithType: Size.Equals
+  fullName: Size.Equals
+- uid: Terminal.Gui.Size.GetHashCode*
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: GetHashCode
+  nameWithType: Size.GetHashCode
+  fullName: Size.GetHashCode
+- uid: Terminal.Gui.Size.Height*
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: Height
+  nameWithType: Size.Height
+  fullName: Size.Height
+- uid: Terminal.Gui.Size.IsEmpty*
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: IsEmpty
+  nameWithType: Size.IsEmpty
+  fullName: Size.IsEmpty
+- uid: Terminal.Gui.Size.op_Addition*
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: op_Addition
+  nameWithType: Size.op_Addition
+  fullName: Size.op_Addition
+- uid: Terminal.Gui.Size.op_Equality*
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: op_Equality
+  nameWithType: Size.op_Equality
+  fullName: Size.op_Equality
+- uid: Terminal.Gui.Size.op_Explicit*
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: op_Explicit
+  nameWithType: Size.op_Explicit
+  fullName: Size.op_Explicit
+- uid: Terminal.Gui.Size.op_Inequality*
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: op_Inequality
+  nameWithType: Size.op_Inequality
+  fullName: Size.op_Inequality
+- uid: Terminal.Gui.Size.op_Subtraction*
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: op_Subtraction
+  nameWithType: Size.op_Subtraction
+  fullName: Size.op_Subtraction
+- uid: Terminal.Gui.Size.Subtract*
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: Subtract
+  nameWithType: Size.Subtract
+  fullName: Size.Subtract
+- uid: Terminal.Gui.Size.ToString*
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: ToString
+  nameWithType: Size.ToString
+  fullName: Size.ToString
+- uid: Terminal.Gui.Size.Width*
+  parent: Terminal.Gui.Size
+  isExternal: false
+  name: Width
+  nameWithType: Size.Width
+  fullName: Size.Width

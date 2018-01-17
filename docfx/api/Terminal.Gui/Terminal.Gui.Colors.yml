@@ -1,0 +1,138 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.Colors
+  id: Colors
+  children:
+  - Terminal.Gui.Colors.Base
+  - Terminal.Gui.Colors.Dialog
+  - Terminal.Gui.Colors.Error
+  - Terminal.Gui.Colors.Menu
+  langs:
+  - csharp
+  name: Colors
+  nameWithType: Colors
+  fullName: Terminal.Gui.Colors
+  type: Class
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The default ColorSchemes for the application.
+  syntax:
+    content: public static class Colors
+  inheritance:
+  - System.Object
+  implements: []
+  inheritedMembers: []
+- uid: Terminal.Gui.Colors.Base
+  id: Base
+  parent: Terminal.Gui.Colors
+  langs:
+  - csharp
+  name: Base
+  nameWithType: Colors.Base
+  fullName: Colors.Base
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The base color scheme, for the default toplevel views.
+  syntax:
+    content: public static Terminal.Gui.ColorScheme Base;
+    return:
+      type: Terminal.Gui.ColorScheme
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Colors.Dialog
+  id: Dialog
+  parent: Terminal.Gui.Colors
+  langs:
+  - csharp
+  name: Dialog
+  nameWithType: Colors.Dialog
+  fullName: Colors.Dialog
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The dialog color scheme, for standard popup dialog boxes
+  syntax:
+    content: public static Terminal.Gui.ColorScheme Dialog;
+    return:
+      type: Terminal.Gui.ColorScheme
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Colors.Error
+  id: Error
+  parent: Terminal.Gui.Colors
+  langs:
+  - csharp
+  name: Error
+  nameWithType: Colors.Error
+  fullName: Colors.Error
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The color scheme for showing errors.
+  syntax:
+    content: public static Terminal.Gui.ColorScheme Error;
+    return:
+      type: Terminal.Gui.ColorScheme
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Colors.Menu
+  id: Menu
+  parent: Terminal.Gui.Colors
+  langs:
+  - csharp
+  name: Menu
+  nameWithType: Colors.Menu
+  fullName: Colors.Menu
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The menu bar color
+  syntax:
+    content: public static Terminal.Gui.ColorScheme Menu;
+    return:
+      type: Terminal.Gui.ColorScheme
+      description: To be added.
+  exceptions: []
+references:
+- uid: System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: Terminal.Gui.Colors.Base
+  parent: Terminal.Gui.Colors
+  isExternal: false
+  name: Base
+  nameWithType: Colors.Base
+  fullName: Colors.Base
+- uid: Terminal.Gui.ColorScheme
+  parent: Terminal.Gui
+  isExternal: false
+  name: ColorScheme
+  nameWithType: ColorScheme
+  fullName: Terminal.Gui.ColorScheme
+- uid: Terminal.Gui.Colors.Dialog
+  parent: Terminal.Gui.Colors
+  isExternal: false
+  name: Dialog
+  nameWithType: Colors.Dialog
+  fullName: Colors.Dialog
+- uid: Terminal.Gui.Colors.Error
+  parent: Terminal.Gui.Colors
+  isExternal: false
+  name: Error
+  nameWithType: Colors.Error
+  fullName: Colors.Error
+- uid: Terminal.Gui.Colors.Menu
+  parent: Terminal.Gui.Colors
+  isExternal: false
+  name: Menu
+  nameWithType: Colors.Menu
+  fullName: Colors.Menu

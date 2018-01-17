@@ -6,7 +6,7 @@
 //
 using System;
 
-namespace Terminal {
+namespace Terminal.Gui {
 
 	/// <summary>
 	/// The Key enumeration contains special encoding for some keys, but can also

@@ -1,0 +1,703 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.RadioGroup
+  id: RadioGroup
+  children:
+  - Terminal.Gui.RadioGroup.#ctor(Terminal.Gui.Rect,System.String[],System.Int32)
+  - Terminal.Gui.RadioGroup.#ctor(System.Int32,System.Int32,System.String[],System.Int32)
+  - Terminal.Gui.RadioGroup.MouseEvent(Terminal.Gui.MouseEvent)
+  - Terminal.Gui.RadioGroup.PositionCursor
+  - Terminal.Gui.RadioGroup.ProcessHotKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.RadioGroup.ProcessKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.RadioGroup.RadioLabels
+  - Terminal.Gui.RadioGroup.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.RadioGroup.Selected
+  - Terminal.Gui.RadioGroup.SelectionChanged
+  langs:
+  - csharp
+  name: RadioGroup
+  nameWithType: RadioGroup
+  fullName: Terminal.Gui.RadioGroup
+  type: Class
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Radio group shows a group of labels, only one of those can be selected at a given time
+  syntax:
+    content: 'public class RadioGroup : Terminal.Gui.View'
+  inheritance:
+  - System.Object
+  - Terminal.Gui.Responder
+  - Terminal.Gui.View
+  implements: []
+  inheritedMembers:
+  - Terminal.Gui.Responder.CanFocus
+  - Terminal.Gui.View.Add(Terminal.Gui.View)
+  - Terminal.Gui.View.Add(Terminal.Gui.View[])
+  - Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
+  - Terminal.Gui.View.Bounds
+  - Terminal.Gui.View.ChildNeedsDisplay
+  - Terminal.Gui.View.Clear
+  - Terminal.Gui.View.ClearNeedsDisplay
+  - Terminal.Gui.View.ColorScheme
+  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  - Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
+  - Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  - Terminal.Gui.View.Driver
+  - Terminal.Gui.View.EnsureFocus
+  - Terminal.Gui.View.Focused
+  - Terminal.Gui.View.FocusFirst
+  - Terminal.Gui.View.FocusLast
+  - Terminal.Gui.View.FocusNext
+  - Terminal.Gui.View.FocusPrev
+  - Terminal.Gui.View.Frame
+  - Terminal.Gui.View.GetEnumerator
+  - Terminal.Gui.View.HasFocus
+  - Terminal.Gui.View.Id
+  - Terminal.Gui.View.LayoutSubviews
+  - Terminal.Gui.View.MostFocused
+  - Terminal.Gui.View.Move(System.Int32,System.Int32)
+  - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.Remove(Terminal.Gui.View)
+  - Terminal.Gui.View.RemoveAll
+  - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  - Terminal.Gui.View.SetNeedsDisplay
+  - Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  - Terminal.Gui.View.Subviews
+  - Terminal.Gui.View.SuperView
+  - Terminal.Gui.View.ToString
+  - Terminal.Gui.View.WantMousePositionReports
+- uid: Terminal.Gui.RadioGroup.#ctor(Terminal.Gui.Rect,System.String[],System.Int32)
+  id: '#ctor(Terminal.Gui.Rect,System.String[],System.Int32)'
+  parent: Terminal.Gui.RadioGroup
+  langs:
+  - csharp
+  name: RadioGroup(Rect, String[], Int32)
+  nameWithType: RadioGroup.RadioGroup(Rect, String[], Int32)
+  fullName: RadioGroup.RadioGroup(Rect, String[], Int32)
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: >-
+    Initializes a new instance of the <xref href="Terminal.RadioGroup"></xref> class
+                setting up the initial set of radio labels and the item that should be selected.
+  syntax:
+    content: public RadioGroup (Terminal.Gui.Rect rect, string[] radioLabels, int selected = 0);
+    parameters:
+    - id: rect
+      type: Terminal.Gui.Rect
+      description: Boundaries for the radio group.
+    - id: radioLabels
+      type: System.String[]
+      description: Radio labels, the strings can contain hotkeys using an undermine before the letter.
+    - id: selected
+      type: System.Int32
+      description: The item to be selected, the value is clamped to the number of items.
+  overload: Terminal.Gui.RadioGroup.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.RadioGroup.#ctor(System.Int32,System.Int32,System.String[],System.Int32)
+  id: '#ctor(System.Int32,System.Int32,System.String[],System.Int32)'
+  parent: Terminal.Gui.RadioGroup
+  langs:
+  - csharp
+  name: RadioGroup(Int32, Int32, String[], Int32)
+  nameWithType: RadioGroup.RadioGroup(Int32, Int32, String[], Int32)
+  fullName: RadioGroup.RadioGroup(Int32, Int32, String[], Int32)
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: "Initializes a new instance of the <xref href=\"Terminal.RadioGroup\"></xref> class\n            setting up the initial set of radio labels and the item that should be selected, \n            the view frame is computed from the provided radioLabels."
+  syntax:
+    content: public RadioGroup (int x, int y, string[] radioLabels, int selected = 0);
+    parameters:
+    - id: x
+      type: System.Int32
+      description: The x coordinate.
+    - id: y
+      type: System.Int32
+      description: The y coordinate.
+    - id: radioLabels
+      type: System.String[]
+      description: Radio labels, the strings can contain hotkeys using an undermine before the letter.
+    - id: selected
+      type: System.Int32
+      description: The item to be selected, the value is clamped to the number of items.
+  overload: Terminal.Gui.RadioGroup.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.RadioGroup.MouseEvent(Terminal.Gui.MouseEvent)
+  id: MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.RadioGroup
+  langs:
+  - csharp
+  name: MouseEvent(MouseEvent)
+  nameWithType: RadioGroup.MouseEvent(MouseEvent)
+  fullName: RadioGroup.MouseEvent(MouseEvent)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool MouseEvent (Terminal.Gui.MouseEvent me);
+    parameters:
+    - id: me
+      type: Terminal.Gui.MouseEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.RadioGroup.MouseEvent*
+  exceptions: []
+- uid: Terminal.Gui.RadioGroup.PositionCursor
+  id: PositionCursor
+  parent: Terminal.Gui.RadioGroup
+  langs:
+  - csharp
+  name: PositionCursor()
+  nameWithType: RadioGroup.PositionCursor()
+  fullName: RadioGroup.PositionCursor()
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void PositionCursor ();
+    parameters: []
+  overload: Terminal.Gui.RadioGroup.PositionCursor*
+  exceptions: []
+- uid: Terminal.Gui.RadioGroup.ProcessHotKey(Terminal.Gui.KeyEvent)
+  id: ProcessHotKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.RadioGroup
+  langs:
+  - csharp
+  name: ProcessHotKey(KeyEvent)
+  nameWithType: RadioGroup.ProcessHotKey(KeyEvent)
+  fullName: RadioGroup.ProcessHotKey(KeyEvent)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool ProcessHotKey (Terminal.Gui.KeyEvent kb);
+    parameters:
+    - id: kb
+      type: Terminal.Gui.KeyEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.RadioGroup.ProcessHotKey*
+  exceptions: []
+- uid: Terminal.Gui.RadioGroup.ProcessKey(Terminal.Gui.KeyEvent)
+  id: ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.RadioGroup
+  langs:
+  - csharp
+  name: ProcessKey(KeyEvent)
+  nameWithType: RadioGroup.ProcessKey(KeyEvent)
+  fullName: RadioGroup.ProcessKey(KeyEvent)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
+    parameters:
+    - id: kb
+      type: Terminal.Gui.KeyEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.RadioGroup.ProcessKey*
+  exceptions: []
+- uid: Terminal.Gui.RadioGroup.RadioLabels
+  id: RadioLabels
+  parent: Terminal.Gui.RadioGroup
+  langs:
+  - csharp
+  name: RadioLabels
+  nameWithType: RadioGroup.RadioLabels
+  fullName: RadioGroup.RadioLabels
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The radio labels to display
+  syntax:
+    content: public string[] RadioLabels { get; set; }
+    return:
+      type: System.String[]
+      description: The radio labels.
+  overload: Terminal.Gui.RadioGroup.RadioLabels*
+  exceptions: []
+- uid: Terminal.Gui.RadioGroup.Redraw(Terminal.Gui.Rect)
+  id: Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.RadioGroup
+  langs:
+  - csharp
+  name: Redraw(Rect)
+  nameWithType: RadioGroup.Redraw(Rect)
+  fullName: RadioGroup.Redraw(Rect)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void Redraw (Terminal.Gui.Rect region);
+    parameters:
+    - id: region
+      type: Terminal.Gui.Rect
+      description: To be added.
+  overload: Terminal.Gui.RadioGroup.Redraw*
+  exceptions: []
+- uid: Terminal.Gui.RadioGroup.Selected
+  id: Selected
+  parent: Terminal.Gui.RadioGroup
+  langs:
+  - csharp
+  name: Selected
+  nameWithType: RadioGroup.Selected
+  fullName: RadioGroup.Selected
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The currently selected item from the list of radio labels
+  syntax:
+    content: public int Selected { get; set; }
+    return:
+      type: System.Int32
+      description: The selected.
+  overload: Terminal.Gui.RadioGroup.Selected*
+  exceptions: []
+- uid: Terminal.Gui.RadioGroup.SelectionChanged
+  id: SelectionChanged
+  parent: Terminal.Gui.RadioGroup
+  langs:
+  - csharp
+  name: SelectionChanged
+  nameWithType: RadioGroup.SelectionChanged
+  fullName: RadioGroup.SelectionChanged
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public Action<int> SelectionChanged;
+    return:
+      type: System.Action{System.Int32}
+      description: To be added.
+  exceptions: []
+references:
+- uid: Terminal.Gui.View
+  parent: Terminal.Gui
+  isExternal: false
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui.RadioGroup.#ctor(Terminal.Gui.Rect,System.String[],System.Int32)
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: RadioGroup(Rect, String[], Int32)
+  nameWithType: RadioGroup.RadioGroup(Rect, String[], Int32)
+  fullName: RadioGroup.RadioGroup(Rect, String[], Int32)
+- uid: Terminal.Gui.Rect
+  parent: Terminal.Gui
+  isExternal: false
+  name: Rect
+  nameWithType: Rect
+  fullName: Terminal.Gui.Rect
+- uid: System.String
+  name: String
+  nameWithType: String
+  fullName: System.String
+- uid: System.String[]
+  parent: System
+  isExternal: true
+  name: String[]
+  nameWithType: String[]
+  fullName: System.String[]
+  spec.csharp:
+  - uid: System.String
+    name: String
+    nameWithType: String
+    fullName: System.String
+  - name: '[]'
+    nameWithType: '[]'
+    fullName: '[]'
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: Terminal.Gui.RadioGroup.#ctor(System.Int32,System.Int32,System.String[],System.Int32)
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: RadioGroup(Int32, Int32, String[], Int32)
+  nameWithType: RadioGroup.RadioGroup(Int32, Int32, String[], Int32)
+  fullName: RadioGroup.RadioGroup(Int32, Int32, String[], Int32)
+- uid: Terminal.Gui.RadioGroup.MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: MouseEvent(MouseEvent)
+  nameWithType: RadioGroup.MouseEvent(MouseEvent)
+  fullName: RadioGroup.MouseEvent(MouseEvent)
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.MouseEvent
+  parent: Terminal.Gui
+  isExternal: false
+  name: MouseEvent
+  nameWithType: MouseEvent
+  fullName: Terminal.Gui.MouseEvent
+- uid: Terminal.Gui.RadioGroup.PositionCursor
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: PositionCursor()
+  nameWithType: RadioGroup.PositionCursor()
+  fullName: RadioGroup.PositionCursor()
+- uid: Terminal.Gui.RadioGroup.ProcessHotKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: ProcessHotKey(KeyEvent)
+  nameWithType: RadioGroup.ProcessHotKey(KeyEvent)
+  fullName: RadioGroup.ProcessHotKey(KeyEvent)
+- uid: Terminal.Gui.KeyEvent
+  parent: Terminal.Gui
+  isExternal: false
+  name: KeyEvent
+  nameWithType: KeyEvent
+  fullName: Terminal.Gui.KeyEvent
+- uid: Terminal.Gui.RadioGroup.ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: ProcessKey(KeyEvent)
+  nameWithType: RadioGroup.ProcessKey(KeyEvent)
+  fullName: RadioGroup.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.RadioGroup.RadioLabels
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: RadioLabels
+  nameWithType: RadioGroup.RadioLabels
+  fullName: RadioGroup.RadioLabels
+- uid: Terminal.Gui.RadioGroup.Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: Redraw(Rect)
+  nameWithType: RadioGroup.Redraw(Rect)
+  fullName: RadioGroup.Redraw(Rect)
+- uid: Terminal.Gui.RadioGroup.Selected
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: Selected
+  nameWithType: RadioGroup.Selected
+  fullName: RadioGroup.Selected
+- uid: Terminal.Gui.RadioGroup.SelectionChanged
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: SelectionChanged
+  nameWithType: RadioGroup.SelectionChanged
+  fullName: RadioGroup.SelectionChanged
+- uid: System.Action`1
+  name: Action
+  nameWithType: Action
+  fullName: System.Action
+- uid: System.Action{System.Int32}
+  parent: System
+  isExternal: true
+  name: Action<Int32>
+  nameWithType: Action<Int32>
+  fullName: System.Action<System.Int32>
+  spec.csharp:
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+- uid: Terminal.Gui.RadioGroup.#ctor*
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: RadioGroup
+  nameWithType: RadioGroup.RadioGroup
+  fullName: RadioGroup.RadioGroup
+- uid: Terminal.Gui.RadioGroup.MouseEvent*
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: MouseEvent
+  nameWithType: RadioGroup.MouseEvent
+  fullName: RadioGroup.MouseEvent
+- uid: Terminal.Gui.RadioGroup.PositionCursor*
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: PositionCursor
+  nameWithType: RadioGroup.PositionCursor
+  fullName: RadioGroup.PositionCursor
+- uid: Terminal.Gui.RadioGroup.ProcessHotKey*
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: ProcessHotKey
+  nameWithType: RadioGroup.ProcessHotKey
+  fullName: RadioGroup.ProcessHotKey
+- uid: Terminal.Gui.RadioGroup.ProcessKey*
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: ProcessKey
+  nameWithType: RadioGroup.ProcessKey
+  fullName: RadioGroup.ProcessKey
+- uid: Terminal.Gui.RadioGroup.RadioLabels*
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: RadioLabels
+  nameWithType: RadioGroup.RadioLabels
+  fullName: RadioGroup.RadioLabels
+- uid: Terminal.Gui.RadioGroup.Redraw*
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: Redraw
+  nameWithType: RadioGroup.Redraw
+  fullName: RadioGroup.Redraw
+- uid: Terminal.Gui.RadioGroup.Selected*
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: Selected
+  nameWithType: RadioGroup.Selected
+  fullName: RadioGroup.Selected
+- uid: Terminal.Gui.Responder.CanFocus
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: CanFocus
+  nameWithType: Responder.CanFocus
+  fullName: Responder.CanFocus
+- uid: Terminal.Gui.View.HasFocus
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: HasFocus
+  nameWithType: View.HasFocus
+  fullName: View.HasFocus
+- uid: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ProcessColdKey(KeyEvent)
+  nameWithType: View.ProcessColdKey(KeyEvent)
+  fullName: View.ProcessColdKey(KeyEvent)
+- uid: Terminal.Gui.View.Add(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Add(View)
+  nameWithType: View.Add(View)
+  fullName: View.Add(View)
+- uid: Terminal.Gui.View.Add(Terminal.Gui.View[])
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Add(View[])
+  nameWithType: View.Add(View[])
+  fullName: View.Add(View[])
+- uid: Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: AddCh(Int32, Int32, Int32)
+  nameWithType: View.AddCh(Int32, Int32, Int32)
+  fullName: View.AddCh(Int32, Int32, Int32)
+- uid: Terminal.Gui.View.Bounds
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Bounds
+  nameWithType: View.Bounds
+  fullName: View.Bounds
+- uid: Terminal.Gui.View.ChildNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ChildNeedsDisplay()
+  nameWithType: View.ChildNeedsDisplay()
+  fullName: View.ChildNeedsDisplay()
+- uid: Terminal.Gui.View.Clear
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Clear()
+  nameWithType: View.Clear()
+  fullName: View.Clear()
+- uid: Terminal.Gui.View.ClearNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ClearNeedsDisplay()
+  nameWithType: View.ClearNeedsDisplay()
+  fullName: View.ClearNeedsDisplay()
+- uid: Terminal.Gui.View.ColorScheme
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ColorScheme
+  nameWithType: View.ColorScheme
+  fullName: View.ColorScheme
+- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawFrame(Rect, Boolean)
+  nameWithType: View.DrawFrame(Rect, Boolean)
+  fullName: View.DrawFrame(Rect, Boolean)
+- uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(String, Boolean, ColorScheme)
+  nameWithType: View.DrawHotString(String, Boolean, ColorScheme)
+  fullName: View.DrawHotString(String, Boolean, ColorScheme)
+- uid: Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(String, Attribute, Attribute)
+  nameWithType: View.DrawHotString(String, Attribute, Attribute)
+  fullName: View.DrawHotString(String, Attribute, Attribute)
+- uid: Terminal.Gui.View.Driver
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Driver
+  nameWithType: View.Driver
+  fullName: View.Driver
+- uid: Terminal.Gui.View.EnsureFocus
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: EnsureFocus()
+  nameWithType: View.EnsureFocus()
+  fullName: View.EnsureFocus()
+- uid: Terminal.Gui.View.Focused
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Focused
+  nameWithType: View.Focused
+  fullName: View.Focused
+- uid: Terminal.Gui.View.FocusFirst
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusFirst()
+  nameWithType: View.FocusFirst()
+  fullName: View.FocusFirst()
+- uid: Terminal.Gui.View.FocusLast
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusLast()
+  nameWithType: View.FocusLast()
+  fullName: View.FocusLast()
+- uid: Terminal.Gui.View.FocusNext
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusNext()
+  nameWithType: View.FocusNext()
+  fullName: View.FocusNext()
+- uid: Terminal.Gui.View.FocusPrev
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusPrev()
+  nameWithType: View.FocusPrev()
+  fullName: View.FocusPrev()
+- uid: Terminal.Gui.View.Frame
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Frame
+  nameWithType: View.Frame
+  fullName: View.Frame
+- uid: Terminal.Gui.View.GetEnumerator
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: GetEnumerator()
+  nameWithType: View.GetEnumerator()
+  fullName: View.GetEnumerator()
+- uid: Terminal.Gui.View.Id
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Id
+  nameWithType: View.Id
+  fullName: View.Id
+- uid: Terminal.Gui.View.LayoutSubviews
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: LayoutSubviews()
+  nameWithType: View.LayoutSubviews()
+  fullName: View.LayoutSubviews()
+- uid: Terminal.Gui.View.MostFocused
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: MostFocused
+  nameWithType: View.MostFocused
+  fullName: View.MostFocused
+- uid: Terminal.Gui.View.Move(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Move(Int32, Int32)
+  nameWithType: View.Move(Int32, Int32)
+  fullName: View.Move(Int32, Int32)
+- uid: Terminal.Gui.View.Remove(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Remove(View)
+  nameWithType: View.Remove(View)
+  fullName: View.Remove(View)
+- uid: Terminal.Gui.View.RemoveAll
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: RemoveAll()
+  nameWithType: View.RemoveAll()
+  fullName: View.RemoveAll()
+- uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ScreenToView(Int32, Int32)
+  nameWithType: View.ScreenToView(Int32, Int32)
+  fullName: View.ScreenToView(Int32, Int32)
+- uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetFocus(View)
+  nameWithType: View.SetFocus(View)
+  fullName: View.SetFocus(View)
+- uid: Terminal.Gui.View.SetNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetNeedsDisplay()
+  nameWithType: View.SetNeedsDisplay()
+  fullName: View.SetNeedsDisplay()
+- uid: Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetNeedsDisplay(Rect)
+  nameWithType: View.SetNeedsDisplay(Rect)
+  fullName: View.SetNeedsDisplay(Rect)
+- uid: Terminal.Gui.View.Subviews
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Subviews
+  nameWithType: View.Subviews
+  fullName: View.Subviews
+- uid: Terminal.Gui.View.SuperView
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SuperView
+  nameWithType: View.SuperView
+  fullName: View.SuperView
+- uid: Terminal.Gui.View.ToString
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ToString()
+  nameWithType: View.ToString()
+  fullName: View.ToString()
+- uid: Terminal.Gui.View.WantMousePositionReports
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: WantMousePositionReports
+  nameWithType: View.WantMousePositionReports
+  fullName: View.WantMousePositionReports

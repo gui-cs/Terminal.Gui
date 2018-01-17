@@ -1,4 +1,4 @@
-using Terminal;
+using Terminal.Gui;
 
 class Demo {
 	static void ShowTextAlignments (View container)

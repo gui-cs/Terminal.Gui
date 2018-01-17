@@ -1,0 +1,136 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.TextAlignment
+  id: TextAlignment
+  children:
+  - Terminal.Gui.TextAlignment.Centered
+  - Terminal.Gui.TextAlignment.Justified
+  - Terminal.Gui.TextAlignment.Left
+  - Terminal.Gui.TextAlignment.Right
+  langs:
+  - csharp
+  name: TextAlignment
+  nameWithType: TextAlignment
+  fullName: Terminal.Gui.TextAlignment
+  type: Enum
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Text alignment enumeration, controls how text is displayed.
+  syntax:
+    content: public enum TextAlignment
+  inheritance:
+  - System.Enum
+- uid: Terminal.Gui.TextAlignment.Centered
+  id: Centered
+  parent: Terminal.Gui.TextAlignment
+  langs:
+  - csharp
+  name: Centered
+  nameWithType: TextAlignment.Centered
+  fullName: TextAlignment.Centered
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Centers the text in the frame.
+  syntax:
+    content: Centered
+    return:
+      type: Terminal.Gui.TextAlignment
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.TextAlignment.Justified
+  id: Justified
+  parent: Terminal.Gui.TextAlignment
+  langs:
+  - csharp
+  name: Justified
+  nameWithType: TextAlignment.Justified
+  fullName: TextAlignment.Justified
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Shows the line as justified text in the line.
+  syntax:
+    content: Justified
+    return:
+      type: Terminal.Gui.TextAlignment
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.TextAlignment.Left
+  id: Left
+  parent: Terminal.Gui.TextAlignment
+  langs:
+  - csharp
+  name: Left
+  nameWithType: TextAlignment.Left
+  fullName: TextAlignment.Left
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Aligns the text to the left of the frame.
+  syntax:
+    content: Left
+    return:
+      type: Terminal.Gui.TextAlignment
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.TextAlignment.Right
+  id: Right
+  parent: Terminal.Gui.TextAlignment
+  langs:
+  - csharp
+  name: Right
+  nameWithType: TextAlignment.Right
+  fullName: TextAlignment.Right
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Aligns the text to the right side of the frame.
+  syntax:
+    content: Right
+    return:
+      type: Terminal.Gui.TextAlignment
+      description: To be added.
+  exceptions: []
+references:
+- uid: System.Enum
+  parent: System
+  isExternal: true
+  name: Enum
+  nameWithType: Enum
+  fullName: System.Enum
+- uid: Terminal.Gui.TextAlignment.Centered
+  parent: Terminal.Gui.TextAlignment
+  isExternal: false
+  name: Centered
+  nameWithType: TextAlignment.Centered
+  fullName: TextAlignment.Centered
+- uid: Terminal.Gui.TextAlignment
+  parent: Terminal.Gui
+  isExternal: false
+  name: TextAlignment
+  nameWithType: TextAlignment
+  fullName: Terminal.Gui.TextAlignment
+- uid: Terminal.Gui.TextAlignment.Justified
+  parent: Terminal.Gui.TextAlignment
+  isExternal: false
+  name: Justified
+  nameWithType: TextAlignment.Justified
+  fullName: TextAlignment.Justified
+- uid: Terminal.Gui.TextAlignment.Left
+  parent: Terminal.Gui.TextAlignment
+  isExternal: false
+  name: Left
+  nameWithType: TextAlignment.Left
+  fullName: TextAlignment.Left
+- uid: Terminal.Gui.TextAlignment.Right
+  parent: Terminal.Gui.TextAlignment
+  isExternal: false
+  name: Right
+  nameWithType: TextAlignment.Right
+  fullName: TextAlignment.Right

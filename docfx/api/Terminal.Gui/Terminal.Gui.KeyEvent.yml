@@ -1,0 +1,207 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.KeyEvent
+  id: KeyEvent
+  children:
+  - Terminal.Gui.KeyEvent.#ctor(Terminal.Gui.Key)
+  - Terminal.Gui.KeyEvent.IsAlt
+  - Terminal.Gui.KeyEvent.IsCtrl
+  - Terminal.Gui.KeyEvent.Key
+  - Terminal.Gui.KeyEvent.KeyValue
+  langs:
+  - csharp
+  name: KeyEvent
+  nameWithType: KeyEvent
+  fullName: Terminal.Gui.KeyEvent
+  type: Struct
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Describes a keyboard event.
+  syntax:
+    content: public struct KeyEvent
+  inheritance:
+  - System.ValueType
+  implements: []
+- uid: Terminal.Gui.KeyEvent.#ctor(Terminal.Gui.Key)
+  id: '#ctor(Terminal.Gui.Key)'
+  parent: Terminal.Gui.KeyEvent
+  langs:
+  - csharp
+  name: KeyEvent(Key)
+  nameWithType: KeyEvent.KeyEvent(Key)
+  fullName: KeyEvent.KeyEvent(Key)
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Constructs a new KeyEvent from the provided Key value - can be a rune cast into a Key value
+  syntax:
+    content: public KeyEvent (Terminal.Gui.Key k);
+    parameters:
+    - id: k
+      type: Terminal.Gui.Key
+      description: To be added.
+  overload: Terminal.Gui.KeyEvent.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.KeyEvent.IsAlt
+  id: IsAlt
+  parent: Terminal.Gui.KeyEvent
+  langs:
+  - csharp
+  name: IsAlt
+  nameWithType: KeyEvent.IsAlt
+  fullName: KeyEvent.IsAlt
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Gets a value indicating whether the Alt key was pressed (real or synthesized)
+  syntax:
+    content: public bool IsAlt { get; }
+    return:
+      type: System.Boolean
+      description: <code>true</code> if is alternate; otherwise, <code>false</code>.
+  overload: Terminal.Gui.KeyEvent.IsAlt*
+  exceptions: []
+- uid: Terminal.Gui.KeyEvent.IsCtrl
+  id: IsCtrl
+  parent: Terminal.Gui.KeyEvent
+  langs:
+  - csharp
+  name: IsCtrl
+  nameWithType: KeyEvent.IsCtrl
+  fullName: KeyEvent.IsCtrl
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Determines whether the value is a control key
+  syntax:
+    content: public bool IsCtrl { get; }
+    return:
+      type: System.Boolean
+      description: <code>true</code> if is ctrl; otherwise, <code>false</code>.
+  overload: Terminal.Gui.KeyEvent.IsCtrl*
+  exceptions: []
+- uid: Terminal.Gui.KeyEvent.Key
+  id: Key
+  parent: Terminal.Gui.KeyEvent
+  langs:
+  - csharp
+  name: Key
+  nameWithType: KeyEvent.Key
+  fullName: KeyEvent.Key
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Symb olid definition for the key.
+  syntax:
+    content: public Terminal.Gui.Key Key;
+    return:
+      type: Terminal.Gui.Key
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.KeyEvent.KeyValue
+  id: KeyValue
+  parent: Terminal.Gui.KeyEvent
+  langs:
+  - csharp
+  name: KeyValue
+  nameWithType: KeyEvent.KeyValue
+  fullName: KeyEvent.KeyValue
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: >-
+    The key value cast to an integer, you will typicall use this for
+                  extracting the Unicode rune value out of a key, when none of the
+                  symbolic options are in use.
+  syntax:
+    content: public int KeyValue { get; }
+    return:
+      type: System.Int32
+      description: To be added.
+  overload: Terminal.Gui.KeyEvent.KeyValue*
+  exceptions: []
+references:
+- uid: System.ValueType
+  parent: System
+  isExternal: true
+  name: ValueType
+  nameWithType: ValueType
+  fullName: System.ValueType
+- uid: Terminal.Gui.KeyEvent.#ctor(Terminal.Gui.Key)
+  parent: Terminal.Gui.KeyEvent
+  isExternal: false
+  name: KeyEvent(Key)
+  nameWithType: KeyEvent.KeyEvent(Key)
+  fullName: KeyEvent.KeyEvent(Key)
+- uid: Terminal.Gui.Key
+  parent: Terminal.Gui
+  isExternal: false
+  name: Key
+  nameWithType: Key
+  fullName: Terminal.Gui.Key
+- uid: Terminal.Gui.KeyEvent.IsAlt
+  parent: Terminal.Gui.KeyEvent
+  isExternal: false
+  name: IsAlt
+  nameWithType: KeyEvent.IsAlt
+  fullName: KeyEvent.IsAlt
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.KeyEvent.IsCtrl
+  parent: Terminal.Gui.KeyEvent
+  isExternal: false
+  name: IsCtrl
+  nameWithType: KeyEvent.IsCtrl
+  fullName: KeyEvent.IsCtrl
+- uid: Terminal.Gui.KeyEvent.Key
+  parent: Terminal.Gui.KeyEvent
+  isExternal: false
+  name: Key
+  nameWithType: KeyEvent.Key
+  fullName: KeyEvent.Key
+- uid: Terminal.Gui.KeyEvent.KeyValue
+  parent: Terminal.Gui.KeyEvent
+  isExternal: false
+  name: KeyValue
+  nameWithType: KeyEvent.KeyValue
+  fullName: KeyEvent.KeyValue
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: Terminal.Gui.KeyEvent.#ctor*
+  parent: Terminal.Gui.KeyEvent
+  isExternal: false
+  name: KeyEvent
+  nameWithType: KeyEvent.KeyEvent
+  fullName: KeyEvent.KeyEvent
+- uid: Terminal.Gui.KeyEvent.IsAlt*
+  parent: Terminal.Gui.KeyEvent
+  isExternal: false
+  name: IsAlt
+  nameWithType: KeyEvent.IsAlt
+  fullName: KeyEvent.IsAlt
+- uid: Terminal.Gui.KeyEvent.IsCtrl*
+  parent: Terminal.Gui.KeyEvent
+  isExternal: false
+  name: IsCtrl
+  nameWithType: KeyEvent.IsCtrl
+  fullName: KeyEvent.IsCtrl
+- uid: Terminal.Gui.KeyEvent.KeyValue*
+  parent: Terminal.Gui.KeyEvent
+  isExternal: false
+  name: KeyValue
+  nameWithType: KeyEvent.KeyValue
+  fullName: KeyEvent.KeyValue

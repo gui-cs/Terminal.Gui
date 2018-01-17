@@ -1,0 +1,58 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.SpecialChar
+  id: SpecialChar
+  children:
+  - Terminal.Gui.SpecialChar.HLine
+  langs:
+  - csharp
+  name: SpecialChar
+  nameWithType: SpecialChar
+  fullName: Terminal.Gui.SpecialChar
+  type: Enum
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Special characters that can be drawn with Driver.AddSpecial.
+  syntax:
+    content: public enum SpecialChar
+  inheritance:
+  - System.Enum
+- uid: Terminal.Gui.SpecialChar.HLine
+  id: HLine
+  parent: Terminal.Gui.SpecialChar
+  langs:
+  - csharp
+  name: HLine
+  nameWithType: SpecialChar.HLine
+  fullName: SpecialChar.HLine
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Horizontal line character.
+  syntax:
+    content: HLine
+    return:
+      type: Terminal.Gui.SpecialChar
+      description: To be added.
+  exceptions: []
+references:
+- uid: System.Enum
+  parent: System
+  isExternal: true
+  name: Enum
+  nameWithType: Enum
+  fullName: System.Enum
+- uid: Terminal.Gui.SpecialChar.HLine
+  parent: Terminal.Gui.SpecialChar
+  isExternal: false
+  name: HLine
+  nameWithType: SpecialChar.HLine
+  fullName: SpecialChar.HLine
+- uid: Terminal.Gui.SpecialChar
+  parent: Terminal.Gui
+  isExternal: false
+  name: SpecialChar
+  nameWithType: SpecialChar
+  fullName: Terminal.Gui.SpecialChar

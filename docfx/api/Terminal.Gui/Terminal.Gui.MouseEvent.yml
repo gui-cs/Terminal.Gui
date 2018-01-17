@@ -1,0 +1,157 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.MouseEvent
+  id: MouseEvent
+  children:
+  - Terminal.Gui.MouseEvent.Flags
+  - Terminal.Gui.MouseEvent.ToString
+  - Terminal.Gui.MouseEvent.X
+  - Terminal.Gui.MouseEvent.Y
+  langs:
+  - csharp
+  name: MouseEvent
+  nameWithType: MouseEvent
+  fullName: Terminal.Gui.MouseEvent
+  type: Struct
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Describes a mouse event
+  syntax:
+    content: public struct MouseEvent
+  inheritance:
+  - System.ValueType
+  implements: []
+- uid: Terminal.Gui.MouseEvent.Flags
+  id: Flags
+  parent: Terminal.Gui.MouseEvent
+  langs:
+  - csharp
+  name: Flags
+  nameWithType: MouseEvent.Flags
+  fullName: MouseEvent.Flags
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Flags indicating the kind of mouse event that is being posted.
+  syntax:
+    content: public Terminal.Gui.MouseFlags Flags;
+    return:
+      type: Terminal.Gui.MouseFlags
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseEvent.ToString
+  id: ToString
+  parent: Terminal.Gui.MouseEvent
+  langs:
+  - csharp
+  name: ToString()
+  nameWithType: MouseEvent.ToString()
+  fullName: MouseEvent.ToString()
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Returns a <xref href="System.String"></xref> that represents the current <xref href="Terminal.MouseEvent"></xref>.
+  syntax:
+    content: public override string ToString ();
+    parameters: []
+    return:
+      type: System.String
+      description: A <xref href="System.String"></xref> that represents the current <xref href="Terminal.MouseEvent"></xref>.
+  overload: Terminal.Gui.MouseEvent.ToString*
+  exceptions: []
+- uid: Terminal.Gui.MouseEvent.X
+  id: X
+  parent: Terminal.Gui.MouseEvent
+  langs:
+  - csharp
+  name: X
+  nameWithType: MouseEvent.X
+  fullName: MouseEvent.X
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The X (column) location for the mouse event.
+  syntax:
+    content: public int X;
+    return:
+      type: System.Int32
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.MouseEvent.Y
+  id: Y
+  parent: Terminal.Gui.MouseEvent
+  langs:
+  - csharp
+  name: Y
+  nameWithType: MouseEvent.Y
+  fullName: MouseEvent.Y
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The Y (column) location for the mouse event.
+  syntax:
+    content: public int Y;
+    return:
+      type: System.Int32
+      description: To be added.
+  exceptions: []
+references:
+- uid: System.ValueType
+  parent: System
+  isExternal: true
+  name: ValueType
+  nameWithType: ValueType
+  fullName: System.ValueType
+- uid: Terminal.Gui.MouseEvent.Flags
+  parent: Terminal.Gui.MouseEvent
+  isExternal: false
+  name: Flags
+  nameWithType: MouseEvent.Flags
+  fullName: MouseEvent.Flags
+- uid: Terminal.Gui.MouseFlags
+  parent: Terminal.Gui
+  isExternal: false
+  name: MouseFlags
+  nameWithType: MouseFlags
+  fullName: Terminal.Gui.MouseFlags
+- uid: Terminal.Gui.MouseEvent.ToString
+  parent: Terminal.Gui.MouseEvent
+  isExternal: false
+  name: ToString()
+  nameWithType: MouseEvent.ToString()
+  fullName: MouseEvent.ToString()
+- uid: System.String
+  parent: System
+  isExternal: true
+  name: String
+  nameWithType: String
+  fullName: System.String
+- uid: Terminal.Gui.MouseEvent.X
+  parent: Terminal.Gui.MouseEvent
+  isExternal: false
+  name: X
+  nameWithType: MouseEvent.X
+  fullName: MouseEvent.X
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: Terminal.Gui.MouseEvent.Y
+  parent: Terminal.Gui.MouseEvent
+  isExternal: false
+  name: Y
+  nameWithType: MouseEvent.Y
+  fullName: MouseEvent.Y
+- uid: Terminal.Gui.MouseEvent.ToString*
+  parent: Terminal.Gui.MouseEvent
+  isExternal: false
+  name: ToString
+  nameWithType: MouseEvent.ToString
+  fullName: MouseEvent.ToString

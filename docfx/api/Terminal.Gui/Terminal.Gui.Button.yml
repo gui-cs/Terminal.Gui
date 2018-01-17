@@ -1,0 +1,796 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.Button
+  id: Button
+  children:
+  - Terminal.Gui.Button.#ctor(System.String)
+  - Terminal.Gui.Button.#ctor(System.String,System.Boolean)
+  - Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String)
+  - Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String,System.Boolean)
+  - Terminal.Gui.Button.Clicked
+  - Terminal.Gui.Button.IsDefault
+  - Terminal.Gui.Button.MouseEvent(Terminal.Gui.MouseEvent)
+  - Terminal.Gui.Button.PositionCursor
+  - Terminal.Gui.Button.ProcessColdKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.Button.ProcessHotKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.Button.ProcessKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.Button.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.Button.Text
+  langs:
+  - csharp
+  name: Button
+  nameWithType: Button
+  fullName: Terminal.Gui.Button
+  type: Class
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Button is a view that provides an item that invokes a callback when activated.
+  remarks: >-
+    <p>
+                  Provides a button that can be clicked, or pressed with
+                  the enter key and processes hotkeys (the first uppercase
+                  letter in the button becomes the hotkey).
+                </p>
+        <p>
+                  If the button is configured as the default (IsDefault) the button
+                  will respond to the return key is no other view processes it, and
+                  turns this into a clicked event.
+                </p>
+  syntax:
+    content: 'public class Button : Terminal.Gui.View'
+  inheritance:
+  - System.Object
+  - Terminal.Gui.Responder
+  - Terminal.Gui.View
+  implements: []
+  inheritedMembers:
+  - Terminal.Gui.Responder.CanFocus
+  - Terminal.Gui.View.Add(Terminal.Gui.View)
+  - Terminal.Gui.View.Add(Terminal.Gui.View[])
+  - Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
+  - Terminal.Gui.View.Bounds
+  - Terminal.Gui.View.ChildNeedsDisplay
+  - Terminal.Gui.View.Clear
+  - Terminal.Gui.View.ClearNeedsDisplay
+  - Terminal.Gui.View.ColorScheme
+  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  - Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
+  - Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  - Terminal.Gui.View.Driver
+  - Terminal.Gui.View.EnsureFocus
+  - Terminal.Gui.View.Focused
+  - Terminal.Gui.View.FocusFirst
+  - Terminal.Gui.View.FocusLast
+  - Terminal.Gui.View.FocusNext
+  - Terminal.Gui.View.FocusPrev
+  - Terminal.Gui.View.Frame
+  - Terminal.Gui.View.GetEnumerator
+  - Terminal.Gui.View.HasFocus
+  - Terminal.Gui.View.Id
+  - Terminal.Gui.View.LayoutSubviews
+  - Terminal.Gui.View.MostFocused
+  - Terminal.Gui.View.Move(System.Int32,System.Int32)
+  - Terminal.Gui.View.Remove(Terminal.Gui.View)
+  - Terminal.Gui.View.RemoveAll
+  - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  - Terminal.Gui.View.SetNeedsDisplay
+  - Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  - Terminal.Gui.View.Subviews
+  - Terminal.Gui.View.SuperView
+  - Terminal.Gui.View.ToString
+  - Terminal.Gui.View.WantMousePositionReports
+- uid: Terminal.Gui.Button.#ctor(System.String)
+  id: '#ctor(System.String)'
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: Button(String)
+  nameWithType: Button.Button(String)
+  fullName: Button.Button(String)
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: >-
+    Public constructor, creates a button based on
+                  the given text at position 0,0
+  remarks: >-
+    The size of the button is computed based on the
+                  text length.   This button is not a default button.
+  syntax:
+    content: public Button (string s);
+    parameters:
+    - id: s
+      type: System.String
+      description: To be added.
+  overload: Terminal.Gui.Button.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.Button.#ctor(System.String,System.Boolean)
+  id: '#ctor(System.String,System.Boolean)'
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: Button(String, Boolean)
+  nameWithType: Button.Button(String, Boolean)
+  fullName: Button.Button(String, Boolean)
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: >-
+    Public constructor, creates a button based on
+                  the given text.
+  remarks: >-
+    If the value for is_default is true, a special
+                  decoration is used, and the enter key on a
+                  dialog would implicitly activate this button.
+  syntax:
+    content: public Button (string s, bool is_default);
+    parameters:
+    - id: s
+      type: System.String
+      description: To be added.
+    - id: is_default
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Button.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String)
+  id: '#ctor(System.Int32,System.Int32,System.String)'
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: Button(Int32, Int32, String)
+  nameWithType: Button.Button(Int32, Int32, String)
+  fullName: Button.Button(Int32, Int32, String)
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: >-
+    Public constructor, creates a button based on
+                  the given text at the given position.
+  remarks: >-
+    The size of the button is computed based on the
+                  text length.   This button is not a default button.
+  syntax:
+    content: public Button (int x, int y, string s);
+    parameters:
+    - id: x
+      type: System.Int32
+      description: To be added.
+    - id: y
+      type: System.Int32
+      description: To be added.
+    - id: s
+      type: System.String
+      description: To be added.
+  overload: Terminal.Gui.Button.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String,System.Boolean)
+  id: '#ctor(System.Int32,System.Int32,System.String,System.Boolean)'
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: Button(Int32, Int32, String, Boolean)
+  nameWithType: Button.Button(Int32, Int32, String, Boolean)
+  fullName: Button.Button(Int32, Int32, String, Boolean)
+  type: Constructor
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: >-
+    Public constructor, creates a button based on
+                  the given text at the given position.
+  remarks: >-
+    If the value for is_default is true, a special
+                  decoration is used, and the enter key on a
+                  dialog would implicitly activate this button.
+  syntax:
+    content: public Button (int x, int y, string s, bool is_default);
+    parameters:
+    - id: x
+      type: System.Int32
+      description: To be added.
+    - id: y
+      type: System.Int32
+      description: To be added.
+    - id: s
+      type: System.String
+      description: To be added.
+    - id: is_default
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Button.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.Button.Clicked
+  id: Clicked
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: Clicked
+  nameWithType: Button.Clicked
+  fullName: Button.Clicked
+  type: Field
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Clicked event, raised when the button is clicked.
+  remarks: >-
+    Client code can hook up to this event, it is
+                  raised when the button is activated either with
+                  the mouse or the keyboard.
+  syntax:
+    content: public Action Clicked;
+    return:
+      type: System.Action
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.Button.IsDefault
+  id: IsDefault
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: IsDefault
+  nameWithType: Button.IsDefault
+  fullName: Button.IsDefault
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: Gets or sets a value indicating whether this <xref href="Terminal.Button"></xref> is the default action to activate on return on a dialog.
+  syntax:
+    content: public bool IsDefault { get; set; }
+    return:
+      type: System.Boolean
+      description: <code>true</code> if is default; otherwise, <code>false</code>.
+  overload: Terminal.Gui.Button.IsDefault*
+  exceptions: []
+- uid: Terminal.Gui.Button.MouseEvent(Terminal.Gui.MouseEvent)
+  id: MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: MouseEvent(MouseEvent)
+  nameWithType: Button.MouseEvent(MouseEvent)
+  fullName: Button.MouseEvent(MouseEvent)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool MouseEvent (Terminal.Gui.MouseEvent me);
+    parameters:
+    - id: me
+      type: Terminal.Gui.MouseEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Button.MouseEvent*
+  exceptions: []
+- uid: Terminal.Gui.Button.PositionCursor
+  id: PositionCursor
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: PositionCursor()
+  nameWithType: Button.PositionCursor()
+  fullName: Button.PositionCursor()
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void PositionCursor ();
+    parameters: []
+  overload: Terminal.Gui.Button.PositionCursor*
+  exceptions: []
+- uid: Terminal.Gui.Button.ProcessColdKey(Terminal.Gui.KeyEvent)
+  id: ProcessColdKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: ProcessColdKey(KeyEvent)
+  nameWithType: Button.ProcessColdKey(KeyEvent)
+  fullName: Button.ProcessColdKey(KeyEvent)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool ProcessColdKey (Terminal.Gui.KeyEvent kb);
+    parameters:
+    - id: kb
+      type: Terminal.Gui.KeyEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Button.ProcessColdKey*
+  exceptions: []
+- uid: Terminal.Gui.Button.ProcessHotKey(Terminal.Gui.KeyEvent)
+  id: ProcessHotKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: ProcessHotKey(KeyEvent)
+  nameWithType: Button.ProcessHotKey(KeyEvent)
+  fullName: Button.ProcessHotKey(KeyEvent)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool ProcessHotKey (Terminal.Gui.KeyEvent kb);
+    parameters:
+    - id: kb
+      type: Terminal.Gui.KeyEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Button.ProcessHotKey*
+  exceptions: []
+- uid: Terminal.Gui.Button.ProcessKey(Terminal.Gui.KeyEvent)
+  id: ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: ProcessKey(KeyEvent)
+  nameWithType: Button.ProcessKey(KeyEvent)
+  fullName: Button.ProcessKey(KeyEvent)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
+    parameters:
+    - id: kb
+      type: Terminal.Gui.KeyEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Button.ProcessKey*
+  exceptions: []
+- uid: Terminal.Gui.Button.Redraw(Terminal.Gui.Rect)
+  id: Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: Redraw(Rect)
+  nameWithType: Button.Redraw(Rect)
+  fullName: Button.Redraw(Rect)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void Redraw (Terminal.Gui.Rect region);
+    parameters:
+    - id: region
+      type: Terminal.Gui.Rect
+      description: To be added.
+  overload: Terminal.Gui.Button.Redraw*
+  exceptions: []
+- uid: Terminal.Gui.Button.Text
+  id: Text
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: Text
+  nameWithType: Button.Text
+  fullName: Button.Text
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal.Gui
+  summary: The text displayed by this widget.
+  syntax:
+    content: public string Text { get; set; }
+    return:
+      type: System.String
+      description: To be added.
+  overload: Terminal.Gui.Button.Text*
+  exceptions: []
+references:
+- uid: Terminal.Gui.View
+  parent: Terminal.Gui
+  isExternal: false
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui.Button.#ctor(System.String)
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: Button(String)
+  nameWithType: Button.Button(String)
+  fullName: Button.Button(String)
+- uid: System.String
+  parent: System
+  isExternal: true
+  name: String
+  nameWithType: String
+  fullName: System.String
+- uid: Terminal.Gui.Button.#ctor(System.String,System.Boolean)
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: Button(String, Boolean)
+  nameWithType: Button.Button(String, Boolean)
+  fullName: Button.Button(String, Boolean)
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String)
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: Button(Int32, Int32, String)
+  nameWithType: Button.Button(Int32, Int32, String)
+  fullName: Button.Button(Int32, Int32, String)
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String,System.Boolean)
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: Button(Int32, Int32, String, Boolean)
+  nameWithType: Button.Button(Int32, Int32, String, Boolean)
+  fullName: Button.Button(Int32, Int32, String, Boolean)
+- uid: Terminal.Gui.Button.Clicked
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: Clicked
+  nameWithType: Button.Clicked
+  fullName: Button.Clicked
+- uid: System.Action
+  parent: System
+  isExternal: true
+  name: Action
+  nameWithType: Action
+  fullName: System.Action
+- uid: Terminal.Gui.Button.IsDefault
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: IsDefault
+  nameWithType: Button.IsDefault
+  fullName: Button.IsDefault
+- uid: Terminal.Gui.Button.MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: MouseEvent(MouseEvent)
+  nameWithType: Button.MouseEvent(MouseEvent)
+  fullName: Button.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.MouseEvent
+  parent: Terminal.Gui
+  isExternal: false
+  name: MouseEvent
+  nameWithType: MouseEvent
+  fullName: Terminal.Gui.MouseEvent
+- uid: Terminal.Gui.Button.PositionCursor
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: PositionCursor()
+  nameWithType: Button.PositionCursor()
+  fullName: Button.PositionCursor()
+- uid: Terminal.Gui.Button.ProcessColdKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: ProcessColdKey(KeyEvent)
+  nameWithType: Button.ProcessColdKey(KeyEvent)
+  fullName: Button.ProcessColdKey(KeyEvent)
+- uid: Terminal.Gui.KeyEvent
+  parent: Terminal.Gui
+  isExternal: false
+  name: KeyEvent
+  nameWithType: KeyEvent
+  fullName: Terminal.Gui.KeyEvent
+- uid: Terminal.Gui.Button.ProcessHotKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: ProcessHotKey(KeyEvent)
+  nameWithType: Button.ProcessHotKey(KeyEvent)
+  fullName: Button.ProcessHotKey(KeyEvent)
+- uid: Terminal.Gui.Button.ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: ProcessKey(KeyEvent)
+  nameWithType: Button.ProcessKey(KeyEvent)
+  fullName: Button.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.Button.Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: Redraw(Rect)
+  nameWithType: Button.Redraw(Rect)
+  fullName: Button.Redraw(Rect)
+- uid: Terminal.Gui.Rect
+  parent: Terminal.Gui
+  isExternal: false
+  name: Rect
+  nameWithType: Rect
+  fullName: Terminal.Gui.Rect
+- uid: Terminal.Gui.Button.Text
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: Text
+  nameWithType: Button.Text
+  fullName: Button.Text
+- uid: Terminal.Gui.Button.#ctor*
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: Button
+  nameWithType: Button.Button
+  fullName: Button.Button
+- uid: Terminal.Gui.Button.IsDefault*
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: IsDefault
+  nameWithType: Button.IsDefault
+  fullName: Button.IsDefault
+- uid: Terminal.Gui.Button.MouseEvent*
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: MouseEvent
+  nameWithType: Button.MouseEvent
+  fullName: Button.MouseEvent
+- uid: Terminal.Gui.Button.PositionCursor*
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: PositionCursor
+  nameWithType: Button.PositionCursor
+  fullName: Button.PositionCursor
+- uid: Terminal.Gui.Button.ProcessColdKey*
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: ProcessColdKey
+  nameWithType: Button.ProcessColdKey
+  fullName: Button.ProcessColdKey
+- uid: Terminal.Gui.Button.ProcessHotKey*
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: ProcessHotKey
+  nameWithType: Button.ProcessHotKey
+  fullName: Button.ProcessHotKey
+- uid: Terminal.Gui.Button.ProcessKey*
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: ProcessKey
+  nameWithType: Button.ProcessKey
+  fullName: Button.ProcessKey
+- uid: Terminal.Gui.Button.Redraw*
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: Redraw
+  nameWithType: Button.Redraw
+  fullName: Button.Redraw
+- uid: Terminal.Gui.Button.Text*
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: Text
+  nameWithType: Button.Text
+  fullName: Button.Text
+- uid: Terminal.Gui.Responder.CanFocus
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: CanFocus
+  nameWithType: Responder.CanFocus
+  fullName: Responder.CanFocus
+- uid: Terminal.Gui.View.HasFocus
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: HasFocus
+  nameWithType: View.HasFocus
+  fullName: View.HasFocus
+- uid: Terminal.Gui.View.Add(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Add(View)
+  nameWithType: View.Add(View)
+  fullName: View.Add(View)
+- uid: Terminal.Gui.View.Add(Terminal.Gui.View[])
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Add(View[])
+  nameWithType: View.Add(View[])
+  fullName: View.Add(View[])
+- uid: Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: AddCh(Int32, Int32, Int32)
+  nameWithType: View.AddCh(Int32, Int32, Int32)
+  fullName: View.AddCh(Int32, Int32, Int32)
+- uid: Terminal.Gui.View.Bounds
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Bounds
+  nameWithType: View.Bounds
+  fullName: View.Bounds
+- uid: Terminal.Gui.View.ChildNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ChildNeedsDisplay()
+  nameWithType: View.ChildNeedsDisplay()
+  fullName: View.ChildNeedsDisplay()
+- uid: Terminal.Gui.View.Clear
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Clear()
+  nameWithType: View.Clear()
+  fullName: View.Clear()
+- uid: Terminal.Gui.View.ClearNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ClearNeedsDisplay()
+  nameWithType: View.ClearNeedsDisplay()
+  fullName: View.ClearNeedsDisplay()
+- uid: Terminal.Gui.View.ColorScheme
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ColorScheme
+  nameWithType: View.ColorScheme
+  fullName: View.ColorScheme
+- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawFrame(Rect, Boolean)
+  nameWithType: View.DrawFrame(Rect, Boolean)
+  fullName: View.DrawFrame(Rect, Boolean)
+- uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(String, Boolean, ColorScheme)
+  nameWithType: View.DrawHotString(String, Boolean, ColorScheme)
+  fullName: View.DrawHotString(String, Boolean, ColorScheme)
+- uid: Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(String, Attribute, Attribute)
+  nameWithType: View.DrawHotString(String, Attribute, Attribute)
+  fullName: View.DrawHotString(String, Attribute, Attribute)
+- uid: Terminal.Gui.View.Driver
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Driver
+  nameWithType: View.Driver
+  fullName: View.Driver
+- uid: Terminal.Gui.View.EnsureFocus
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: EnsureFocus()
+  nameWithType: View.EnsureFocus()
+  fullName: View.EnsureFocus()
+- uid: Terminal.Gui.View.Focused
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Focused
+  nameWithType: View.Focused
+  fullName: View.Focused
+- uid: Terminal.Gui.View.FocusFirst
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusFirst()
+  nameWithType: View.FocusFirst()
+  fullName: View.FocusFirst()
+- uid: Terminal.Gui.View.FocusLast
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusLast()
+  nameWithType: View.FocusLast()
+  fullName: View.FocusLast()
+- uid: Terminal.Gui.View.FocusNext
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusNext()
+  nameWithType: View.FocusNext()
+  fullName: View.FocusNext()
+- uid: Terminal.Gui.View.FocusPrev
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusPrev()
+  nameWithType: View.FocusPrev()
+  fullName: View.FocusPrev()
+- uid: Terminal.Gui.View.Frame
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Frame
+  nameWithType: View.Frame
+  fullName: View.Frame
+- uid: Terminal.Gui.View.GetEnumerator
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: GetEnumerator()
+  nameWithType: View.GetEnumerator()
+  fullName: View.GetEnumerator()
+- uid: Terminal.Gui.View.Id
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Id
+  nameWithType: View.Id
+  fullName: View.Id
+- uid: Terminal.Gui.View.LayoutSubviews
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: LayoutSubviews()
+  nameWithType: View.LayoutSubviews()
+  fullName: View.LayoutSubviews()
+- uid: Terminal.Gui.View.MostFocused
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: MostFocused
+  nameWithType: View.MostFocused
+  fullName: View.MostFocused
+- uid: Terminal.Gui.View.Move(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Move(Int32, Int32)
+  nameWithType: View.Move(Int32, Int32)
+  fullName: View.Move(Int32, Int32)
+- uid: Terminal.Gui.View.Remove(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Remove(View)
+  nameWithType: View.Remove(View)
+  fullName: View.Remove(View)
+- uid: Terminal.Gui.View.RemoveAll
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: RemoveAll()
+  nameWithType: View.RemoveAll()
+  fullName: View.RemoveAll()
+- uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ScreenToView(Int32, Int32)
+  nameWithType: View.ScreenToView(Int32, Int32)
+  fullName: View.ScreenToView(Int32, Int32)
+- uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetFocus(View)
+  nameWithType: View.SetFocus(View)
+  fullName: View.SetFocus(View)
+- uid: Terminal.Gui.View.SetNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetNeedsDisplay()
+  nameWithType: View.SetNeedsDisplay()
+  fullName: View.SetNeedsDisplay()
+- uid: Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetNeedsDisplay(Rect)
+  nameWithType: View.SetNeedsDisplay(Rect)
+  fullName: View.SetNeedsDisplay(Rect)
+- uid: Terminal.Gui.View.Subviews
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Subviews
+  nameWithType: View.Subviews
+  fullName: View.Subviews
+- uid: Terminal.Gui.View.SuperView
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SuperView
+  nameWithType: View.SuperView
+  fullName: View.SuperView
+- uid: Terminal.Gui.View.ToString
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ToString()
+  nameWithType: View.ToString()
+  fullName: View.ToString()
+- uid: Terminal.Gui.View.WantMousePositionReports
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: WantMousePositionReports
+  nameWithType: View.WantMousePositionReports
+  fullName: View.WantMousePositionReports

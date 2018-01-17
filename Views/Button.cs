@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Terminal {
+namespace Terminal.Gui {
 	/// <summary>
 	///   Button is a view that provides an item that invokes a callback when activated.
 	/// </summary>
