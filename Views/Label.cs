@@ -15,7 +15,7 @@ namespace Terminal {
 	}
 
 	/// <summary>
-	///   Label widget, displays a string at a given position, can include multiple lines.
+	/// Label view, displays a string at a given position, can include multiple lines.
 	/// </summary>
 	public class Label : View {
 		List<string> lines = new List<string> ();

@@ -7,6 +7,10 @@
 using System;
 
 namespace Terminal {
+
+	/// <summary>
+	/// The Checkbox View shows an on/off toggle that the user can set
+	/// </summary>
 	public class CheckBox : View {
 		string text;
 		int hot_pos = -1;

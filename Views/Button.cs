@@ -11,12 +11,19 @@ using System.Linq;
 
 namespace Terminal {
 	/// <summary>
-	///   Button view
+	///   Button is a view that provides an item that invokes a callback when activated.
 	/// </summary>
 	/// <remarks>
+	/// <para>
 	///   Provides a button that can be clicked, or pressed with
 	///   the enter key and processes hotkeys (the first uppercase
 	///   letter in the button becomes the hotkey).
+	/// </para>
+	/// <para>
+	///   If the button is configured as the default (IsDefault) the button
+	///   will respond to the return key is no other view processes it, and
+	///   turns this into a clicked event.
+	/// </para>
 	/// </remarks>
 	public class Button : View {
 		string text;
