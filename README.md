@@ -69,7 +69,7 @@ class Demo {
 
 This shows a UI like this:
 
-![Sample app](docfx/sample.png?raw=true)
+![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.png)
 
 # Running and Building
 
