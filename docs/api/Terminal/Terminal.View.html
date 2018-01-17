@@ -119,6 +119,23 @@
     <p>
                Developers can call the SetNeedsDisplay method on the view to flag a region or the entire view
                as requiring to be redrawn.
+            </p>
+    <p>
+               Views have a ColorScheme property that defines the default colors that subviews
+               should use for rendering.   This ensures that the views fit in the context where
+               they are being used, and allows for themes to be plugged in.   For example, the
+               default colors for windows and toplevels uses a blue background, while it uses 
+               a white background for dialog boxes and a red background for errors.
+            </p>
+    <p>
+               If a ColorScheme is not set on a view, the result of the ColorScheme is the
+               value of the SuperView and the value might only be valid once a view has been
+               added to a SuperView, so your subclasses should not rely on ColorScheme being
+               set at construction time.
+            </p>
+    <p>
+               Using ColorSchemes has the advantage that your application will work both
+               in color as well as black and white displays.
             </p></div>
   <h3 id="constructors">Constructors
   </h3>
@@ -205,6 +222,34 @@
       <tr>
         <td><a class="xref" href="Terminal.Rect.html">Rect</a></td>
         <td><p>The bounds.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_View_ColorScheme_" data-uid="Terminal.View.ColorScheme*"></a>
+  <h4 id="Terminal_View_ColorScheme" data-uid="Terminal.View.ColorScheme">ColorScheme</h4>
+  <div class="markdown level1 summary"><p>The color scheme for this view, if it is not defined, it returns the parent&#39;s
+            color scheme.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Terminal.ColorScheme ColorScheme { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.ColorScheme.html">ColorScheme</a></td>
+        <td><p>To be added.</p>
 </td>
       </tr>
     </tbody>
@@ -298,7 +343,8 @@
   
   <a id="Terminal_View_Id_" data-uid="Terminal.View.Id*"></a>
   <h4 id="Terminal_View_Id" data-uid="Terminal.View.Id">Id</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets an identifier for the view;</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -315,7 +361,7 @@
     <tbody>
       <tr>
         <td><span class="xref">System.String</span></td>
-        <td><p>To be added.</p>
+        <td><p>The identifier.</p>
 </td>
       </tr>
     </tbody>
@@ -604,47 +650,6 @@
   
   
   <a id="Terminal_View_DrawHotString_" data-uid="Terminal.View.DrawHotString*"></a>
-  <h4 id="Terminal_View_DrawHotString_System_String_Terminal_Attribute_Terminal_Attribute_" data-uid="Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)">DrawHotString(String, Attribute, Attribute)</h4>
-  <div class="markdown level1 summary"><p>Utility function to draw strings that contain a hotkey</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void DrawHotString (string text, Terminal.Attribute hotColor, Terminal.Attribute normalColor);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.String</span></td>
-        <td><span class="parametername">text</span></td>
-        <td><p>String to display, the underscoore before a letter flags the next letter as the hotkey.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="Terminal.Attribute.html">Attribute</a></td>
-        <td><span class="parametername">hotColor</span></td>
-        <td><p>Hot color.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="Terminal.Attribute.html">Attribute</a></td>
-        <td><span class="parametername">normalColor</span></td>
-        <td><p>Normal color.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_View_DrawHotString_" data-uid="Terminal.View.DrawHotString*"></a>
   <h4 id="Terminal_View_DrawHotString_System_String_System_Boolean_Terminal_ColorScheme_" data-uid="Terminal.View.DrawHotString(System.String,System.Boolean,Terminal.ColorScheme)">DrawHotString(String, Boolean, ColorScheme)</h4>
   <div class="markdown level1 summary"><p>Utility function to draw strings that contains a hotkey using a colorscheme and the &quot;focused&quot; state.</p>
 </div>
@@ -679,6 +684,47 @@
         <td><a class="xref" href="Terminal.ColorScheme.html">ColorScheme</a></td>
         <td><span class="parametername">scheme</span></td>
         <td><p>The color scheme to use.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_View_DrawHotString_" data-uid="Terminal.View.DrawHotString*"></a>
+  <h4 id="Terminal_View_DrawHotString_System_String_Terminal_Attribute_Terminal_Attribute_" data-uid="Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)">DrawHotString(String, Attribute, Attribute)</h4>
+  <div class="markdown level1 summary"><p>Utility function to draw strings that contain a hotkey</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void DrawHotString (string text, Terminal.Attribute hotColor, Terminal.Attribute normalColor);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">text</span></td>
+        <td><p>String to display, the underscoore before a letter flags the next letter as the hotkey.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Attribute.html">Attribute</a></td>
+        <td><span class="parametername">hotColor</span></td>
+        <td><p>Hot color.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Attribute.html">Attribute</a></td>
+        <td><span class="parametername">normalColor</span></td>
+        <td><p>Normal color.</p>
 </td>
       </tr>
     </tbody>

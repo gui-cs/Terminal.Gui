@@ -26,7 +26,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The black color.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="Blue">
@@ -40,7 +42,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The blue color.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="BrighCyan">
@@ -54,7 +58,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The brigh cyan color.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="BrightBlue">
@@ -68,7 +74,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The bright bBlue color.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="BrightGreen">
@@ -82,7 +90,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The bright green color.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="BrightMagenta">
@@ -96,7 +106,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The bright magenta color.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="BrightRed">
@@ -110,7 +122,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The bright red color.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="BrightYellow">
@@ -124,7 +138,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The bright yellow color.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="Brown">
@@ -138,7 +154,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The brown color.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="Cyan">
@@ -152,7 +170,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The cyan color.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="DarkGray">
@@ -166,7 +186,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The dark gray color.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="Gray">
@@ -180,7 +202,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The gray color.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="Green">
@@ -194,7 +218,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The green color.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="Magenta">
@@ -208,7 +234,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The magenta color.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="Red">
@@ -222,7 +250,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The red color.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="White">
@@ -236,7 +266,9 @@
         <ReturnType>Terminal.Color</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The White color.
+            </summary>
       </Docs>
     </Member>
   </Members>

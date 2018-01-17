@@ -60,6 +60,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Mask that captures all the events.
   syntax:
     content: AllEvents
     return:
@@ -78,6 +79,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The first mouse button was clicked (press+release).
   syntax:
     content: Button1Clicked
     return:
@@ -96,6 +98,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The first mouse button was double-clicked.
   syntax:
     content: Button1DoubleClicked
     return:
@@ -114,6 +117,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The first mouse button was pressed.
   syntax:
     content: Button1Pressed
     return:
@@ -132,6 +136,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The first mouse button was released.
   syntax:
     content: Button1Released
     return:
@@ -150,6 +155,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The first mouse button was tripple-clicked.
   syntax:
     content: Button1TripleClicked
     return:
@@ -168,6 +174,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The second mouse button was clicked (press+release).
   syntax:
     content: Button2Clicked
     return:
@@ -186,6 +193,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The second mouse button was double-clicked.
   syntax:
     content: Button2DoubleClicked
     return:
@@ -204,6 +212,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The second mouse button was pressed.
   syntax:
     content: Button2Pressed
     return:
@@ -222,6 +231,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The second mouse button was released.
   syntax:
     content: Button2Released
     return:
@@ -240,6 +250,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The second mouse button was tripple-clicked.
   syntax:
     content: Button2TrippleClicked
     return:
@@ -258,6 +269,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The third mouse button was clicked (press+release).
   syntax:
     content: Button3Clicked
     return:
@@ -276,6 +288,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The third mouse button was double-clicked.
   syntax:
     content: Button3DoubleClicked
     return:
@@ -294,6 +307,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The third mouse button was pressed.
   syntax:
     content: Button3Pressed
     return:
@@ -312,6 +326,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The third mouse button was released.
   syntax:
     content: Button3Released
     return:
@@ -330,6 +345,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The third mouse button was tripple-clicked.
   syntax:
     content: Button3TripleClicked
     return:
@@ -348,6 +364,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The fourth button was clicked (press+release).
   syntax:
     content: Button4Clicked
     return:
@@ -366,6 +383,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The fourth button was double-clicked.
   syntax:
     content: Button4DoubleClicked
     return:
@@ -384,6 +402,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The fourth mouse button was pressed.
   syntax:
     content: Button4Pressed
     return:
@@ -402,6 +421,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The fourth mouse button was released.
   syntax:
     content: Button4Released
     return:
@@ -420,6 +440,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The fourth button was tripple-clicked.
   syntax:
     content: Button4TripleClicked
     return:
@@ -438,6 +459,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: 'Flag: the alt key was pressed when the mouse button took place.'
   syntax:
     content: ButtonAlt
     return:
@@ -456,6 +478,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: 'Flag: the shift key was pressed when the mouse button took place.'
   syntax:
     content: ButtonCtrl
     return:
@@ -474,6 +497,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The fourth button was pressed.
   syntax:
     content: ButtonShift
     return:
@@ -492,6 +516,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The mouse position is being reported in this event.
   syntax:
     content: ReportMousePosition
     return:

@@ -14,7 +14,9 @@
     </Interface>
   </Interfaces>
   <Docs>
-    <summary>To be added.</summary>
+    <summary>
+            Captures the execution state for the provided TopLevel view.
+            </summary>
     <remarks>To be added.</remarks>
   </Docs>
   <Members>
@@ -30,8 +32,14 @@
       </ReturnValue>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>
+            Releases all resource used by the <see cref="T:Terminal.Application.RunState" /> object.
+            </summary>
+        <remarks>Call <see cref="M:Terminal.Application.RunState.Dispose" /> when you are finished using the <see cref="T:Terminal.Application.RunState" />. The
+            <see cref="M:Terminal.Application.RunState.Dispose" /> method leaves the <see cref="T:Terminal.Application.RunState" /> in an unusable state. After
+            calling <see cref="M:Terminal.Application.RunState.Dispose" />, you must release all references to the
+            <see cref="T:Terminal.Application.RunState" /> so the garbage collector can reclaim the memory that the
+            <see cref="T:Terminal.Application.RunState" /> was occupying.</remarks>
       </Docs>
     </Member>
     <Member MemberName="Dispose">
@@ -48,8 +56,11 @@
         <Parameter Name="disposing" Type="System.Boolean" />
       </Parameters>
       <Docs>
-        <param name="disposing">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="disposing">If set to <c>true</c> disposing.</param>
+        <summary>
+            Dispose the specified disposing.
+            </summary>
+        <returns>The dispose.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

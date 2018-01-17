@@ -12,7 +12,6 @@ items:
   - Terminal.Colors
   - Terminal.ColorScheme
   - Terminal.ConsoleDriver
-  - Terminal.CursesDriver
   - Terminal.Dialog
   - Terminal.Key
   - Terminal.KeyEvent
@@ -96,12 +95,6 @@ references:
   name: ConsoleDriver
   nameWithType: ConsoleDriver
   fullName: Terminal.ConsoleDriver
-- uid: Terminal.CursesDriver
-  parent: Terminal
-  isExternal: false
-  name: CursesDriver
-  nameWithType: CursesDriver
-  fullName: Terminal.CursesDriver
 - uid: Terminal.Dialog
   parent: Terminal
   isExternal: false

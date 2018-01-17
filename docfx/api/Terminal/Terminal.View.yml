@@ -11,9 +11,10 @@ items:
   - Terminal.View.ChildNeedsDisplay
   - Terminal.View.Clear
   - Terminal.View.ClearNeedsDisplay
+  - Terminal.View.ColorScheme
   - Terminal.View.DrawFrame(Terminal.Rect,System.Boolean)
-  - Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
   - Terminal.View.DrawHotString(System.String,System.Boolean,Terminal.ColorScheme)
+  - Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
   - Terminal.View.Driver
   - Terminal.View.EnsureFocus
   - Terminal.View.Focused
@@ -53,7 +54,7 @@ items:
   - Terminal
   namespace: Terminal
   summary: View is the base class for all views on the screen and represents a visible element that can render itself and contains zero or more nested views.
-  remarks: "<p>\n               The View defines the base functionality for user interface elements in Terminal/gui.cs.  Views\n               can contain one or more subviews, can respond to user input and render themselves on the screen.\n            </p>\n    <p>\n               Views are created with a specified rectangle region (the frame) that is relative to the container\n               that they are added into.   \n            </p>\n    <p>\n               Subviews can be added to a View by calling the Add method.   The container of a view is the \n               Superview.\n            </p>\n    <p>\n               Developers can call the SetNeedsDisplay method on the view to flag a region or the entire view\n               as requiring to be redrawn.\n            </p>"
+  remarks: "<p>\n               The View defines the base functionality for user interface elements in Terminal/gui.cs.  Views\n               can contain one or more subviews, can respond to user input and render themselves on the screen.\n            </p>\n    <p>\n               Views are created with a specified rectangle region (the frame) that is relative to the container\n               that they are added into.   \n            </p>\n    <p>\n               Subviews can be added to a View by calling the Add method.   The container of a view is the \n               Superview.\n            </p>\n    <p>\n               Developers can call the SetNeedsDisplay method on the view to flag a region or the entire view\n               as requiring to be redrawn.\n            </p>\n    <p>\n               Views have a ColorScheme property that defines the default colors that subviews\n               should use for rendering.   This ensures that the views fit in the context where\n               they are being used, and allows for themes to be plugged in.   For example, the\n               default colors for windows and toplevels uses a blue background, while it uses \n               a white background for dialog boxes and a red background for errors.\n            </p>\n    <p>\n               If a ColorScheme is not set on a view, the result of the ColorScheme is the\n               value of the SuperView and the value might only be valid once a view has been\n               added to a SuperView, so your subclasses should not rely on ColorScheme being\n               set at construction time.\n            </p>\n    <p>\n               Using ColorSchemes has the advantage that your application will work both\n               in color as well as black and white displays.\n            </p>"
   syntax:
     content: 'public class View : Terminal.Responder, System.Collections.IEnumerable'
   inheritance:
@@ -241,6 +242,28 @@ items:
     parameters: []
   overload: Terminal.View.ClearNeedsDisplay*
   exceptions: []
+- uid: Terminal.View.ColorScheme
+  id: ColorScheme
+  parent: Terminal.View
+  langs:
+  - csharp
+  name: ColorScheme
+  nameWithType: View.ColorScheme
+  fullName: View.ColorScheme
+  type: Property
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  summary: >-
+    The color scheme for this view, if it is not defined, it returns the parent's
+                color scheme.
+  syntax:
+    content: public Terminal.ColorScheme ColorScheme { get; set; }
+    return:
+      type: Terminal.ColorScheme
+      description: To be added.
+  overload: Terminal.View.ColorScheme*
+  exceptions: []
 - uid: Terminal.View.DrawFrame(Terminal.Rect,System.Boolean)
   id: DrawFrame(Terminal.Rect,System.Boolean)
   parent: Terminal.View
@@ -264,33 +287,6 @@ items:
       type: System.Boolean
       description: If set to <code>true</code> it fill will the contents.
   overload: Terminal.View.DrawFrame*
-  exceptions: []
-- uid: Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
-  id: DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
-  parent: Terminal.View
-  langs:
-  - csharp
-  name: DrawHotString(String, Attribute, Attribute)
-  nameWithType: View.DrawHotString(String, Attribute, Attribute)
-  fullName: View.DrawHotString(String, Attribute, Attribute)
-  type: Method
-  assemblies:
-  - Terminal
-  namespace: Terminal
-  summary: Utility function to draw strings that contain a hotkey
-  syntax:
-    content: public void DrawHotString (string text, Terminal.Attribute hotColor, Terminal.Attribute normalColor);
-    parameters:
-    - id: text
-      type: System.String
-      description: String to display, the underscoore before a letter flags the next letter as the hotkey.
-    - id: hotColor
-      type: Terminal.Attribute
-      description: Hot color.
-    - id: normalColor
-      type: Terminal.Attribute
-      description: Normal color.
-  overload: Terminal.View.DrawHotString*
   exceptions: []
 - uid: Terminal.View.DrawHotString(System.String,System.Boolean,Terminal.ColorScheme)
   id: DrawHotString(System.String,System.Boolean,Terminal.ColorScheme)
@@ -317,6 +313,33 @@ items:
     - id: scheme
       type: Terminal.ColorScheme
       description: The color scheme to use.
+  overload: Terminal.View.DrawHotString*
+  exceptions: []
+- uid: Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
+  id: DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
+  parent: Terminal.View
+  langs:
+  - csharp
+  name: DrawHotString(String, Attribute, Attribute)
+  nameWithType: View.DrawHotString(String, Attribute, Attribute)
+  fullName: View.DrawHotString(String, Attribute, Attribute)
+  type: Method
+  assemblies:
+  - Terminal
+  namespace: Terminal
+  summary: Utility function to draw strings that contain a hotkey
+  syntax:
+    content: public void DrawHotString (string text, Terminal.Attribute hotColor, Terminal.Attribute normalColor);
+    parameters:
+    - id: text
+      type: System.String
+      description: String to display, the underscoore before a letter flags the next letter as the hotkey.
+    - id: hotColor
+      type: Terminal.Attribute
+      description: Hot color.
+    - id: normalColor
+      type: Terminal.Attribute
+      description: Normal color.
   overload: Terminal.View.DrawHotString*
   exceptions: []
 - uid: Terminal.View.Driver
@@ -535,11 +558,12 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Gets or sets an identifier for the view;
   syntax:
     content: public string Id { get; set; }
     return:
       type: System.String
-      description: To be added.
+      description: The identifier.
   overload: Terminal.View.Id*
   exceptions: []
 - uid: Terminal.View.LayoutSubviews
@@ -1009,6 +1033,18 @@ references:
   name: ClearNeedsDisplay()
   nameWithType: View.ClearNeedsDisplay()
   fullName: View.ClearNeedsDisplay()
+- uid: Terminal.View.ColorScheme
+  parent: Terminal.View
+  isExternal: false
+  name: ColorScheme
+  nameWithType: View.ColorScheme
+  fullName: View.ColorScheme
+- uid: Terminal.ColorScheme
+  parent: Terminal
+  isExternal: false
+  name: ColorScheme
+  nameWithType: ColorScheme
+  fullName: Terminal.ColorScheme
 - uid: Terminal.View.DrawFrame(Terminal.Rect,System.Boolean)
   parent: Terminal.View
   isExternal: false
@@ -1021,36 +1057,30 @@ references:
   name: Boolean
   nameWithType: Boolean
   fullName: System.Boolean
-- uid: Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
-  parent: Terminal.View
-  isExternal: false
-  name: DrawHotString(String, Attribute, Attribute)
-  nameWithType: View.DrawHotString(String, Attribute, Attribute)
-  fullName: View.DrawHotString(String, Attribute, Attribute)
-- uid: System.String
-  parent: System
-  isExternal: true
-  name: String
-  nameWithType: String
-  fullName: System.String
-- uid: Terminal.Attribute
-  parent: Terminal
-  isExternal: false
-  name: Attribute
-  nameWithType: Attribute
-  fullName: Terminal.Attribute
 - uid: Terminal.View.DrawHotString(System.String,System.Boolean,Terminal.ColorScheme)
   parent: Terminal.View
   isExternal: false
   name: DrawHotString(String, Boolean, ColorScheme)
   nameWithType: View.DrawHotString(String, Boolean, ColorScheme)
   fullName: View.DrawHotString(String, Boolean, ColorScheme)
-- uid: Terminal.ColorScheme
+- uid: System.String
+  parent: System
+  isExternal: true
+  name: String
+  nameWithType: String
+  fullName: System.String
+- uid: Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
+  parent: Terminal.View
+  isExternal: false
+  name: DrawHotString(String, Attribute, Attribute)
+  nameWithType: View.DrawHotString(String, Attribute, Attribute)
+  fullName: View.DrawHotString(String, Attribute, Attribute)
+- uid: Terminal.Attribute
   parent: Terminal
   isExternal: false
-  name: ColorScheme
-  nameWithType: ColorScheme
-  fullName: Terminal.ColorScheme
+  name: Attribute
+  nameWithType: Attribute
+  fullName: Terminal.Attribute
 - uid: Terminal.View.Driver
   parent: Terminal.View
   isExternal: false
@@ -1316,6 +1346,12 @@ references:
   name: ClearNeedsDisplay
   nameWithType: View.ClearNeedsDisplay
   fullName: View.ClearNeedsDisplay
+- uid: Terminal.View.ColorScheme*
+  parent: Terminal.View
+  isExternal: false
+  name: ColorScheme
+  nameWithType: View.ColorScheme
+  fullName: View.ColorScheme
 - uid: Terminal.View.DrawFrame*
   parent: Terminal.View
   isExternal: false

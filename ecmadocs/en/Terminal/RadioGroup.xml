@@ -53,11 +53,15 @@
         <Parameter Name="selected" Type="System.Int32" />
       </Parameters>
       <Docs>
-        <param name="x">To be added.</param>
-        <param name="y">To be added.</param>
-        <param name="radioLabels">To be added.</param>
-        <param name="selected">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="x">The x coordinate.</param>
+        <param name="y">The y coordinate.</param>
+        <param name="radioLabels">Radio labels, the strings can contain hotkeys using an undermine before the letter.</param>
+        <param name="selected">The item to be selected, the value is clamped to the number of items.</param>
+        <summary>
+            Initializes a new instance of the <see cref="T:Terminal.RadioGroup" /> class
+            setting up the initial set of radio labels and the item that should be selected, 
+            the view frame is computed from the provided radioLabels.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

@@ -80,7 +80,6 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">ConsoleDriver</span></div>
   </div>
-      <div class="level2"><a class="xref" href="Terminal.CursesDriver.html">CursesDriver</a></div>
   <h6><strong>Namespace</strong>: <a class="xref" href="../Terminal.html">Terminal</a></h6>
   <h6><strong>Assembly</strong>: Terminal.dll</h6>
   <h5 id="Terminal_ConsoleDriver_syntax">Syntax</h5>
@@ -105,7 +104,8 @@
   
   <a id="Terminal_ConsoleDriver_Clip_" data-uid="Terminal.ConsoleDriver.Clip*"></a>
   <h4 id="Terminal_ConsoleDriver_Clip" data-uid="Terminal.ConsoleDriver.Clip">Clip</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Controls the current clipping region that AddCh/AddStr is subject to.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -122,7 +122,7 @@
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Rect.html">Rect</a></td>
-        <td><p>To be added.</p>
+        <td><p>The clip.</p>
 </td>
       </tr>
     </tbody>
@@ -131,7 +131,8 @@
   
   <a id="Terminal_ConsoleDriver_Cols_" data-uid="Terminal.ConsoleDriver.Cols*"></a>
   <h4 id="Terminal_ConsoleDriver_Cols" data-uid="Terminal.ConsoleDriver.Cols">Cols</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>The current number of columns in the terminal.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -157,7 +158,8 @@
   
   <a id="Terminal_ConsoleDriver_Rows_" data-uid="Terminal.ConsoleDriver.Rows*"></a>
   <h4 id="Terminal_ConsoleDriver_Rows" data-uid="Terminal.ConsoleDriver.Rows">Rows</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>The current number of rows in the terminal.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -185,11 +187,12 @@
   
   <a id="Terminal_ConsoleDriver_AddCh_" data-uid="Terminal.ConsoleDriver.AddCh*"></a>
   <h4 id="Terminal_ConsoleDriver_AddCh_System_Int32_" data-uid="Terminal.ConsoleDriver.AddCh(System.Int32)">AddCh(Int32)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Adds the specified rune to the display at the current cursor position</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract void AddCh (int ch);</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract void AddCh (int rune);</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -241,7 +244,8 @@
   
   <a id="Terminal_ConsoleDriver_AddStr_" data-uid="Terminal.ConsoleDriver.AddStr*"></a>
   <h4 id="Terminal_ConsoleDriver_AddStr_System_String_" data-uid="Terminal.ConsoleDriver.AddStr(System.String)">AddStr(String)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Adds the specified</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -260,7 +264,7 @@
       <tr>
         <td><span class="xref">System.String</span></td>
         <td><span class="parametername">str</span></td>
-        <td><p>To be added.</p>
+        <td><p>String.</p>
 </td>
       </tr>
     </tbody>
@@ -303,7 +307,8 @@
   
   <a id="Terminal_ConsoleDriver_End_" data-uid="Terminal.ConsoleDriver.End*"></a>
   <h4 id="Terminal_ConsoleDriver_End" data-uid="Terminal.ConsoleDriver.End">End()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Ends the execution of the console driver.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -313,7 +318,8 @@
   
   <a id="Terminal_ConsoleDriver_Init_" data-uid="Terminal.ConsoleDriver.Init*"></a>
   <h4 id="Terminal_ConsoleDriver_Init_System_Action_" data-uid="Terminal.ConsoleDriver.Init(System.Action)">Init(Action)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Initializes the driver</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -332,7 +338,7 @@
       <tr>
         <td><span class="xref">System.Action</span></td>
         <td><span class="parametername">terminalResized</span></td>
-        <td><p>To be added.</p>
+        <td><p>Method to invoke when the terminal is resized.</p>
 </td>
       </tr>
     </tbody>
@@ -341,7 +347,8 @@
   
   <a id="Terminal_ConsoleDriver_Move_" data-uid="Terminal.ConsoleDriver.Move*"></a>
   <h4 id="Terminal_ConsoleDriver_Move_System_Int32_System_Int32_" data-uid="Terminal.ConsoleDriver.Move(System.Int32,System.Int32)">Move(Int32, Int32)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Moves the cursor to the specified column and row.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -360,13 +367,13 @@
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">col</span></td>
-        <td><p>To be added.</p>
+        <td><p>Column to move the cursor to.</p>
 </td>
       </tr>
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">row</span></td>
-        <td><p>To be added.</p>
+        <td><p>Row to move the cursor to.</p>
 </td>
       </tr>
     </tbody>
@@ -425,7 +432,8 @@
   
   <a id="Terminal_ConsoleDriver_Refresh_" data-uid="Terminal.ConsoleDriver.Refresh*"></a>
   <h4 id="Terminal_ConsoleDriver_Refresh" data-uid="Terminal.ConsoleDriver.Refresh">Refresh()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Updates the screen to reflect all the changes that have been done to the display buffer</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -551,7 +559,8 @@
   
   <a id="Terminal_ConsoleDriver_Suspend_" data-uid="Terminal.ConsoleDriver.Suspend*"></a>
   <h4 id="Terminal_ConsoleDriver_Suspend" data-uid="Terminal.ConsoleDriver.Suspend">Suspend()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Suspend the application, typically needs to save the state, suspend the app and upon return, reset the console driver.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">

@@ -235,13 +235,13 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
-  summary: Offset the specified p.
+  summary: Translates this Point by the specified Point.
   syntax:
     content: public void Offset (Terminal.Point p);
     parameters:
     - id: p
       type: Terminal.Point
-      description: P.
+      description: The Point used offset this Point.
   overload: Terminal.Point.Offset*
   exceptions: []
 - uid: Terminal.Point.op_Addition(Terminal.Point,Terminal.Size)
@@ -395,18 +395,19 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Returns the result of subtracting specified Size from the specified Point.
   syntax:
     content: public static Terminal.Point Subtract (Terminal.Point pt, Terminal.Size sz);
     parameters:
     - id: pt
       type: Terminal.Point
-      description: To be added.
+      description: The Point to be subtracted from.
     - id: sz
       type: Terminal.Size
-      description: To be added.
+      description: The Size to subtract from the Point.
     return:
       type: Terminal.Point
-      description: To be added.
+      description: The Point that is the result of the subtraction operation.
   overload: Terminal.Point.Subtract*
   exceptions: []
 - uid: Terminal.Point.ToString

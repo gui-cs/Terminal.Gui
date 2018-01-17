@@ -6,7 +6,6 @@ items:
   - Terminal.Application.#ctor
   - Terminal.Application.Begin(Terminal.Toplevel)
   - Terminal.Application.Current
-  - Terminal.Application.DebugDrawBounds
   - Terminal.Application.Driver
   - Terminal.Application.End(Terminal.Application.RunState)
   - Terminal.Application.GrabMouse(Terminal.View)
@@ -98,24 +97,6 @@ items:
       type: Terminal.Toplevel
       description: The current.
   overload: Terminal.Application.Current*
-  exceptions: []
-- uid: Terminal.Application.DebugDrawBounds
-  id: DebugDrawBounds
-  parent: Terminal.Application
-  langs:
-  - csharp
-  name: DebugDrawBounds
-  nameWithType: Application.DebugDrawBounds
-  fullName: Application.DebugDrawBounds
-  type: Field
-  assemblies:
-  - Terminal
-  namespace: Terminal
-  syntax:
-    content: public static bool DebugDrawBounds;
-    return:
-      type: System.Boolean
-      description: To be added.
   exceptions: []
 - uid: Terminal.Application.Driver
   id: Driver
@@ -467,18 +448,6 @@ references:
   name: Current
   nameWithType: Application.Current
   fullName: Application.Current
-- uid: Terminal.Application.DebugDrawBounds
-  parent: Terminal.Application
-  isExternal: false
-  name: DebugDrawBounds
-  nameWithType: Application.DebugDrawBounds
-  fullName: Application.DebugDrawBounds
-- uid: System.Boolean
-  parent: System
-  isExternal: true
-  name: Boolean
-  nameWithType: Boolean
-  fullName: System.Boolean
 - uid: Terminal.Application.Driver
   parent: Terminal.Application
   isExternal: false
@@ -622,6 +591,12 @@ references:
   name: RunLoop(Application+RunState, Boolean)
   nameWithType: Application.RunLoop(Application+RunState, Boolean)
   fullName: Application.RunLoop(Application+RunState, Boolean)
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
 - uid: Terminal.Application.Top
   parent: Terminal.Application
   isExternal: false

@@ -61,8 +61,10 @@
         <ReturnType>System.String</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
+        <summary>
+            Gets or sets the title to display.
+            </summary>
+        <value>The title.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

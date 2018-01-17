@@ -16,6 +16,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The default ColorSchemes for the application.
   syntax:
     content: public static class Colors
   inheritance:
@@ -34,6 +35,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The base color scheme, for the default toplevel views.
   syntax:
     content: public static Terminal.ColorScheme Base;
     return:
@@ -52,6 +54,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The dialog color scheme, for standard popup dialog boxes
   syntax:
     content: public static Terminal.ColorScheme Dialog;
     return:
@@ -70,6 +73,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The color scheme for showing errors.
   syntax:
     content: public static Terminal.ColorScheme Error;
     return:
@@ -88,6 +92,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The menu bar color
   syntax:
     content: public static Terminal.ColorScheme Menu;
     return:

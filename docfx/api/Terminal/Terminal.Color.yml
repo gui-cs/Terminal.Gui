@@ -45,6 +45,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The black color.
   syntax:
     content: Black
     return:
@@ -63,6 +64,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The blue color.
   syntax:
     content: Blue
     return:
@@ -81,6 +83,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The brigh cyan color.
   syntax:
     content: BrighCyan
     return:
@@ -99,6 +102,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The bright bBlue color.
   syntax:
     content: BrightBlue
     return:
@@ -117,6 +121,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The bright green color.
   syntax:
     content: BrightGreen
     return:
@@ -135,6 +140,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The bright magenta color.
   syntax:
     content: BrightMagenta
     return:
@@ -153,6 +159,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The bright red color.
   syntax:
     content: BrightRed
     return:
@@ -171,6 +178,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The bright yellow color.
   syntax:
     content: BrightYellow
     return:
@@ -189,6 +197,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The brown color.
   syntax:
     content: Brown
     return:
@@ -207,6 +216,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The cyan color.
   syntax:
     content: Cyan
     return:
@@ -225,6 +235,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The dark gray color.
   syntax:
     content: DarkGray
     return:
@@ -243,6 +254,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The gray color.
   syntax:
     content: Gray
     return:
@@ -261,6 +273,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The green color.
   syntax:
     content: Green
     return:
@@ -279,6 +292,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The magenta color.
   syntax:
     content: Magenta
     return:
@@ -297,6 +311,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The red color.
   syntax:
     content: Red
     return:
@@ -315,6 +330,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The White color.
   syntax:
     content: White
     return:

@@ -11,7 +11,7 @@
   <Interfaces />
   <Docs>
     <summary>
-            Describes a keyboard event
+            Describes a keyboard event.
             </summary>
     <remarks>To be added.</remarks>
   </Docs>
@@ -28,7 +28,9 @@
       </Parameters>
       <Docs>
         <param name="k">To be added.</param>
-        <summary>To be added.</summary>
+        <summary>
+              Constructs a new KeyEvent from the provided Key value - can be a rune cast into a Key value
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -81,7 +83,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Symb olid definition for the key.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -96,7 +100,11 @@
         <ReturnType>System.Int32</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+              The key value cast to an integer, you will typicall use this for
+              extracting the Unicode rune value out of a key, when none of the
+              symbolic options are in use.
+            </summary>
         <value>To be added.</value>
         <remarks>To be added.</remarks>
       </Docs>

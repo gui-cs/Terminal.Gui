@@ -14,6 +14,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Captures the execution state for the provided TopLevel view.
   syntax:
     content: 'public class Application.RunState : IDisposable'
   inheritance:
@@ -33,6 +34,13 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Releases all resource used by the <xref href="Terminal.Application.RunState"></xref> object.
+  remarks: >-
+    Call <xref href="Terminal.Application.RunState.Dispose"></xref> when you are finished using the <xref href="Terminal.Application.RunState"></xref>. The
+                <xref href="Terminal.Application.RunState.Dispose"></xref> method leaves the <xref href="Terminal.Application.RunState"></xref> in an unusable state. After
+                calling <xref href="Terminal.Application.RunState.Dispose"></xref>, you must release all references to the
+                <xref href="Terminal.Application.RunState"></xref> so the garbage collector can reclaim the memory that the
+                <xref href="Terminal.Application.RunState"></xref> was occupying.
   syntax:
     content: public void Dispose ();
     parameters: []
@@ -50,12 +58,13 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Dispose the specified disposing.
   syntax:
     content: public virtual void Dispose (bool disposing);
     parameters:
     - id: disposing
       type: System.Boolean
-      description: To be added.
+      description: If set to <code>true</code> disposing.
   overload: Terminal.Application.RunState.Dispose*
   exceptions: []
 references:

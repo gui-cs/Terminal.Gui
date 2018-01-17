@@ -34,6 +34,23 @@
                Developers can call the SetNeedsDisplay method on the view to flag a region or the entire view
                as requiring to be redrawn.
             </para>
+      <para>
+               Views have a ColorScheme property that defines the default colors that subviews
+               should use for rendering.   This ensures that the views fit in the context where
+               they are being used, and allows for themes to be plugged in.   For example, the
+               default colors for windows and toplevels uses a blue background, while it uses 
+               a white background for dialog boxes and a red background for errors.
+            </para>
+      <para>
+               If a ColorScheme is not set on a view, the result of the ColorScheme is the
+               value of the SuperView and the value might only be valid once a view has been
+               added to a SuperView, so your subclasses should not rely on ColorScheme being
+               set at construction time.
+            </para>
+      <para>
+               Using ColorSchemes has the advantage that your application will work both
+               in color as well as black and white displays.
+            </para>
     </remarks>
   </Docs>
   <Members>
@@ -201,6 +218,25 @@
         <summary>
             Removes the SetNeedsDisplay and the ChildNeedsDisplay setting on this view.
             </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ColorScheme">
+      <MemberSignature Language="C#" Value="public Terminal.ColorScheme ColorScheme { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class Terminal.ColorScheme ColorScheme" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.ColorScheme</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            The color scheme for this view, if it is not defined, it returns the parent's
+            color scheme.
+            </summary>
+        <value>To be added.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -482,8 +518,10 @@
         <ReturnType>System.String</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
+        <summary>
+            Gets or sets an identifier for the view;
+            </summary>
+        <value>The identifier.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

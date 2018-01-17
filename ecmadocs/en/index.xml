@@ -30,7 +30,6 @@
       <Type Name="Colors" Kind="Class" />
       <Type Name="ColorScheme" Kind="Class" />
       <Type Name="ConsoleDriver" Kind="Class" />
-      <Type Name="CursesDriver" Kind="Class" />
       <Type Name="Dialog" Kind="Class" />
       <Type Name="Key" Kind="Enumeration" />
       <Type Name="KeyEvent" Kind="Structure" />

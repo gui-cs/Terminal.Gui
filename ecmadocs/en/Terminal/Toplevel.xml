@@ -105,7 +105,10 @@
         <ReturnType>System.Boolean</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            This flag is checked on each iteration of the mainloop and it continues
+            running until this flag is set to false.   
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

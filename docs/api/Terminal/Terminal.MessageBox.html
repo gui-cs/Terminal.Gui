@@ -102,9 +102,78 @@
   </h3>
   
   
+  <a id="Terminal_MessageBox_ErrorQuery_" data-uid="Terminal.MessageBox.ErrorQuery*"></a>
+  <h4 id="Terminal_MessageBox_ErrorQuery_System_Int32_System_Int32_System_String_System_String_System_String___" data-uid="Terminal.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.String[])">ErrorQuery(Int32, Int32, String, String, String[])</h4>
+  <div class="markdown level1 summary"><p>Presents an error message box with the specified title and message and a list of buttons to show to the user.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int ErrorQuery (int width, int height, string title, string message, string[] buttons);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">width</span></td>
+        <td><p>Width for the window.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">height</span></td>
+        <td><p>Height for the window.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">title</span></td>
+        <td><p>Title for the query.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">message</span></td>
+        <td><p>Message to display, might contain multiple lines..</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span>[]</td>
+        <td><span class="parametername">buttons</span></td>
+        <td><p>Array of buttons to add.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><p>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_MessageBox_Query_" data-uid="Terminal.MessageBox.Query*"></a>
   <h4 id="Terminal_MessageBox_Query_System_Int32_System_Int32_System_String_System_String_System_String___" data-uid="Terminal.MessageBox.Query(System.Int32,System.Int32,System.String,System.String,System.String[])">Query(Int32, Int32, String, String, String[])</h4>
-  <div class="markdown level1 summary"><p>Runs the dialog bo</p>
+  <div class="markdown level1 summary"><p>Presents a message with the specified title and message and a list of buttons to show to the user.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>

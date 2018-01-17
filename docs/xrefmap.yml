@@ -41,11 +41,6 @@ references:
   href: api/Terminal/Terminal.Application.html#Terminal_Application_Current_
   fullName: Application.Current
   nameWithType: Application.Current
-- uid: Terminal.Application.DebugDrawBounds
-  name: DebugDrawBounds
-  href: api/Terminal/Terminal.Application.html#Terminal_Application_DebugDrawBounds
-  fullName: Application.DebugDrawBounds
-  nameWithType: Application.DebugDrawBounds
 - uid: Terminal.Application.Driver
   name: Driver
   href: api/Terminal/Terminal.Application.html#Terminal_Application_Driver
@@ -1601,6 +1596,16 @@ references:
   href: api/Terminal/Terminal.MessageBox.html#Terminal_MessageBox__ctor_
   fullName: MessageBox.MessageBox
   nameWithType: MessageBox.MessageBox
+- uid: Terminal.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.String[])
+  name: ErrorQuery(Int32, Int32, String, String, String[])
+  href: api/Terminal/Terminal.MessageBox.html#Terminal_MessageBox_ErrorQuery_System_Int32_System_Int32_System_String_System_String_System_String___
+  fullName: MessageBox.ErrorQuery(Int32, Int32, String, String, String[])
+  nameWithType: MessageBox.ErrorQuery(Int32, Int32, String, String, String[])
+- uid: Terminal.MessageBox.ErrorQuery*
+  name: ErrorQuery
+  href: api/Terminal/Terminal.MessageBox.html#Terminal_MessageBox_ErrorQuery_
+  fullName: MessageBox.ErrorQuery
+  nameWithType: MessageBox.ErrorQuery
 - uid: Terminal.MessageBox.Query(System.Int32,System.Int32,System.String,System.String,System.String[])
   name: Query(Int32, Int32, String, String, String[])
   href: api/Terminal/Terminal.MessageBox.html#Terminal_MessageBox_Query_System_Int32_System_Int32_System_String_System_String_System_String___
@@ -2811,6 +2816,16 @@ references:
   href: api/Terminal/Terminal.View.html#Terminal_View_ClearNeedsDisplay_
   fullName: View.ClearNeedsDisplay
   nameWithType: View.ClearNeedsDisplay
+- uid: Terminal.View.ColorScheme
+  name: ColorScheme
+  href: api/Terminal/Terminal.View.html#Terminal_View_ColorScheme
+  fullName: View.ColorScheme
+  nameWithType: View.ColorScheme
+- uid: Terminal.View.ColorScheme*
+  name: ColorScheme
+  href: api/Terminal/Terminal.View.html#Terminal_View_ColorScheme_
+  fullName: View.ColorScheme
+  nameWithType: View.ColorScheme
 - uid: Terminal.View.DrawFrame(Terminal.Rect,System.Boolean)
   name: DrawFrame(Rect, Boolean)
   href: api/Terminal/Terminal.View.html#Terminal_View_DrawFrame_Terminal_Rect_System_Boolean_

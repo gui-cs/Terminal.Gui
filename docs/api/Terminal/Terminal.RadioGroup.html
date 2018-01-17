@@ -109,6 +109,9 @@
       <a class="xref" href="Terminal.View.html#Terminal_View_ClearNeedsDisplay">View.ClearNeedsDisplay()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.View.html#Terminal_View_ColorScheme">View.ColorScheme</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.View.html#Terminal_View_DrawFrame_Terminal_Rect_System_Boolean_">View.DrawFrame(Rect, Boolean)</a>
     </div>
     <div>
@@ -247,7 +250,10 @@
   
   <a id="Terminal_RadioGroup__ctor_" data-uid="Terminal.RadioGroup.#ctor*"></a>
   <h4 id="Terminal_RadioGroup__ctor_System_Int32_System_Int32_System_String___System_Int32_" data-uid="Terminal.RadioGroup.#ctor(System.Int32,System.Int32,System.String[],System.Int32)">RadioGroup(Int32, Int32, String[], Int32)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Terminal.RadioGroup.html">RadioGroup</a> class
+            setting up the initial set of radio labels and the item that should be selected, 
+            the view frame is computed from the provided radioLabels.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -266,25 +272,25 @@
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">x</span></td>
-        <td><p>To be added.</p>
+        <td><p>The x coordinate.</p>
 </td>
       </tr>
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">y</span></td>
-        <td><p>To be added.</p>
+        <td><p>The y coordinate.</p>
 </td>
       </tr>
       <tr>
         <td><span class="xref">System.String</span>[]</td>
         <td><span class="parametername">radioLabels</span></td>
-        <td><p>To be added.</p>
+        <td><p>Radio labels, the strings can contain hotkeys using an undermine before the letter.</p>
 </td>
       </tr>
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">selected</span></td>
-        <td><p>To be added.</p>
+        <td><p>The item to be selected, the value is clamped to the number of items.</p>
 </td>
       </tr>
     </tbody>

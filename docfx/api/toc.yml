@@ -20,8 +20,6 @@
     name: ColorScheme
   - uid: Terminal.ConsoleDriver
     name: ConsoleDriver
-  - uid: Terminal.CursesDriver
-    name: CursesDriver
   - uid: Terminal.Dialog
     name: Dialog
   - uid: Terminal.Key

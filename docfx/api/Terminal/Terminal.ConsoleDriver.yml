@@ -37,8 +37,6 @@ items:
     content: public abstract class ConsoleDriver
   inheritance:
   - System.Object
-  derivedClasses:
-  - Terminal.CursesDriver
   implements: []
   inheritedMembers: []
 - uid: Terminal.ConsoleDriver.#ctor
@@ -70,8 +68,9 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Adds the specified rune to the display at the current cursor position
   syntax:
-    content: public abstract void AddCh (int ch);
+    content: public abstract void AddCh (int rune);
     parameters:
     - id: ch
       type: System.Int32
@@ -110,12 +109,13 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Adds the specified
   syntax:
     content: public abstract void AddStr (string str);
     parameters:
     - id: str
       type: System.String
-      description: To be added.
+      description: String.
   overload: Terminal.ConsoleDriver.AddStr*
   exceptions: []
 - uid: Terminal.ConsoleDriver.Clip
@@ -130,11 +130,12 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Controls the current clipping region that AddCh/AddStr is subject to.
   syntax:
     content: public Terminal.Rect Clip { get; set; }
     return:
       type: Terminal.Rect
-      description: To be added.
+      description: The clip.
   overload: Terminal.ConsoleDriver.Clip*
   exceptions: []
 - uid: Terminal.ConsoleDriver.Cols
@@ -149,6 +150,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The current number of columns in the terminal.
   syntax:
     content: public abstract int Cols { get; }
     return:
@@ -191,6 +193,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Ends the execution of the console driver.
   syntax:
     content: public abstract void End ();
     parameters: []
@@ -208,12 +211,13 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Initializes the driver
   syntax:
     content: public abstract void Init (Action terminalResized);
     parameters:
     - id: terminalResized
       type: System.Action
-      description: To be added.
+      description: Method to invoke when the terminal is resized.
   overload: Terminal.ConsoleDriver.Init*
   exceptions: []
 - uid: Terminal.ConsoleDriver.Move(System.Int32,System.Int32)
@@ -228,15 +232,16 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Moves the cursor to the specified column and row.
   syntax:
     content: public abstract void Move (int col, int row);
     parameters:
     - id: col
       type: System.Int32
-      description: To be added.
+      description: Column to move the cursor to.
     - id: row
       type: System.Int32
-      description: To be added.
+      description: Row to move the cursor to.
   overload: Terminal.ConsoleDriver.Move*
   exceptions: []
 - uid: Terminal.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.KeyEvent},System.Action{Terminal.MouseEvent})
@@ -294,6 +299,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Updates the screen to reflect all the changes that have been done to the display buffer
   syntax:
     content: public abstract void Refresh ();
     parameters: []
@@ -311,6 +317,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The current number of rows in the terminal.
   syntax:
     content: public abstract int Rows { get; }
     return:
@@ -430,6 +437,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Suspend the application, typically needs to save the state, suspend the app and upon return, reset the console driver.
   syntax:
     content: public abstract void Suspend ();
     parameters: []

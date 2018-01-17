@@ -17,7 +17,10 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
-  summary: Color scheme definitions
+  summary: >-
+    Color scheme definitions, they cover some common scenarios and are used
+                typically in toplevel containers to set the scheme that is used by all the
+                views contained inside.
   syntax:
     content: public class ColorScheme
   inheritance:
@@ -53,6 +56,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The color for text when the view has the focus.
   syntax:
     content: public Terminal.Attribute Focus;
     return:
@@ -71,6 +75,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The color for the hotkey when the view is focused.
   syntax:
     content: public Terminal.Attribute HotFocus;
     return:
@@ -89,6 +94,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The color for the hotkey when a view is not focused
   syntax:
     content: public Terminal.Attribute HotNormal;
     return:
@@ -107,6 +113,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: The default color for text, when the view is not focused.
   syntax:
     content: public Terminal.Attribute Normal;
     return:

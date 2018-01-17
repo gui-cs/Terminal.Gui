@@ -39,6 +39,7 @@ items:
   - Terminal.View.ChildNeedsDisplay
   - Terminal.View.Clear
   - Terminal.View.ClearNeedsDisplay
+  - Terminal.View.ColorScheme
   - Terminal.View.DrawFrame(Terminal.Rect,System.Boolean)
   - Terminal.View.DrawHotString(System.String,System.Boolean,Terminal.ColorScheme)
   - Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
@@ -108,21 +109,22 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: "Initializes a new instance of the <xref href=\"Terminal.RadioGroup\"></xref> class\n            setting up the initial set of radio labels and the item that should be selected, \n            the view frame is computed from the provided radioLabels."
   syntax:
     content: public RadioGroup (int x, int y, string[] radioLabels, int selected = 0);
     parameters:
     - id: x
       type: System.Int32
-      description: To be added.
+      description: The x coordinate.
     - id: y
       type: System.Int32
-      description: To be added.
+      description: The y coordinate.
     - id: radioLabels
       type: System.String[]
-      description: To be added.
+      description: Radio labels, the strings can contain hotkeys using an undermine before the letter.
     - id: selected
       type: System.Int32
-      description: To be added.
+      description: The item to be selected, the value is clamped to the number of items.
   overload: Terminal.RadioGroup.#ctor*
   exceptions: []
 - uid: Terminal.RadioGroup.MouseEvent(Terminal.MouseEvent)
@@ -537,24 +539,30 @@ references:
   name: ClearNeedsDisplay()
   nameWithType: View.ClearNeedsDisplay()
   fullName: View.ClearNeedsDisplay()
+- uid: Terminal.View.ColorScheme
+  parent: Terminal.View
+  isExternal: false
+  name: ColorScheme
+  nameWithType: View.ColorScheme
+  fullName: View.ColorScheme
 - uid: Terminal.View.DrawFrame(Terminal.Rect,System.Boolean)
   parent: Terminal.View
   isExternal: false
   name: DrawFrame(Rect, Boolean)
   nameWithType: View.DrawFrame(Rect, Boolean)
   fullName: View.DrawFrame(Rect, Boolean)
-- uid: Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
-  parent: Terminal.View
-  isExternal: false
-  name: DrawHotString(String, Attribute, Attribute)
-  nameWithType: View.DrawHotString(String, Attribute, Attribute)
-  fullName: View.DrawHotString(String, Attribute, Attribute)
 - uid: Terminal.View.DrawHotString(System.String,System.Boolean,Terminal.ColorScheme)
   parent: Terminal.View
   isExternal: false
   name: DrawHotString(String, Boolean, ColorScheme)
   nameWithType: View.DrawHotString(String, Boolean, ColorScheme)
   fullName: View.DrawHotString(String, Boolean, ColorScheme)
+- uid: Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
+  parent: Terminal.View
+  isExternal: false
+  name: DrawHotString(String, Attribute, Attribute)
+  nameWithType: View.DrawHotString(String, Attribute, Attribute)
+  fullName: View.DrawHotString(String, Attribute, Attribute)
 - uid: Terminal.View.Driver
   parent: Terminal.View
   isExternal: false

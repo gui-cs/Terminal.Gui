@@ -11,7 +11,9 @@
   <Interfaces />
   <Docs>
     <summary>
-            Color scheme definitions
+            Color scheme definitions, they cover some common scenarios and are used
+            typically in toplevel containers to set the scheme that is used by all the
+            views contained inside.
             </summary>
     <remarks>To be added.</remarks>
   </Docs>
@@ -40,7 +42,9 @@
         <ReturnType>Terminal.Attribute</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The color for text when the view has the focus.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -55,7 +59,9 @@
         <ReturnType>Terminal.Attribute</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The color for the hotkey when the view is focused.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -70,7 +76,9 @@
         <ReturnType>Terminal.Attribute</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The color for the hotkey when a view is not focused
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -85,7 +93,9 @@
         <ReturnType>Terminal.Attribute</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The default color for text, when the view is not focused.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

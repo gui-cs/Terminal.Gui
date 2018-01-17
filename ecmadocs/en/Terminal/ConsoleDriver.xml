@@ -30,8 +30,8 @@
       </Docs>
     </Member>
     <Member MemberName="AddCh">
-      <MemberSignature Language="C#" Value="public abstract void AddCh (int ch);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void AddCh(int32 ch) cil managed" />
+      <MemberSignature Language="C#" Value="public abstract void AddCh (int rune);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void AddCh(int32 rune) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -43,8 +43,10 @@
         <Parameter Name="ch" Type="System.Int32" />
       </Parameters>
       <Docs>
-        <param name="ch">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="rune">Rune to add.</param>
+        <summary>
+            Adds the specified rune to the display at the current cursor position
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -81,8 +83,10 @@
         <Parameter Name="str" Type="System.String" />
       </Parameters>
       <Docs>
-        <param name="str">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="str">String.</param>
+        <summary>
+            Adds the specified 
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -97,8 +101,10 @@
         <ReturnType>Terminal.Rect</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
+        <summary>
+            Controls the current clipping region that AddCh/AddStr is subject to.
+            </summary>
+        <value>The clip.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -113,7 +119,9 @@
         <ReturnType>System.Int32</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The current number of columns in the terminal.
+            </summary>
         <value>To be added.</value>
         <remarks>To be added.</remarks>
       </Docs>
@@ -151,7 +159,9 @@
       </ReturnValue>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Ends the execution of the console driver.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -169,8 +179,10 @@
         <Parameter Name="terminalResized" Type="System.Action" />
       </Parameters>
       <Docs>
-        <param name="terminalResized">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="terminalResized">Method to invoke when the terminal is resized.</param>
+        <summary>
+            Initializes the driver
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -189,9 +201,11 @@
         <Parameter Name="row" Type="System.Int32" />
       </Parameters>
       <Docs>
-        <param name="col">To be added.</param>
-        <param name="row">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="col">Column to move the cursor to.</param>
+        <param name="row">Row to move the cursor to.</param>
+        <summary>
+            Moves the cursor to the specified column and row.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -246,7 +260,9 @@
       </ReturnValue>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Updates the screen to reflect all the changes that have been done to the display buffer
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -261,7 +277,9 @@
         <ReturnType>System.Int32</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The current number of rows in the terminal.
+            </summary>
         <value>To be added.</value>
         <remarks>To be added.</remarks>
       </Docs>
@@ -371,7 +389,9 @@
       </ReturnValue>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Suspend the application, typically needs to save the state, suspend the app and upon return, reset the console driver.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

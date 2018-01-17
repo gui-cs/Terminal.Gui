@@ -83,9 +83,6 @@
       <MemberSignature Language="C#" Value="public Terminal.Attribute Color { get; set; }" />
       <MemberSignature Language="ILAsm" Value=".property instance valuetype Terminal.Attribute Color" />
       <MemberType>Property</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
       <ReturnValue>
         <ReturnType>Terminal.Attribute</ReturnType>
       </ReturnValue>

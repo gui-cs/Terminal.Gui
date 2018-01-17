@@ -180,9 +180,9 @@
         <Parameter Name="p" Type="Terminal.Point" />
       </Parameters>
       <Docs>
-        <param name="p">P.</param>
+        <param name="p">The Point used offset this Point.</param>
         <summary>
-            Offset the specified p.
+            Translates this Point by the specified Point.
             </summary>
         <returns>The offset.</returns>
         <remarks>To be added.</remarks>
@@ -363,10 +363,12 @@
         <Parameter Name="sz" Type="Terminal.Size" />
       </Parameters>
       <Docs>
-        <param name="pt">To be added.</param>
-        <param name="sz">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
+        <param name="pt">The Point to be subtracted from.</param>
+        <param name="sz">The Size to subtract from the Point.</param>
+        <summary>
+            Returns the result of subtracting specified Size from the specified Point.
+            </summary>
+        <returns>The Point that is the result of the subtraction operation.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

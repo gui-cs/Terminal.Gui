@@ -30,6 +30,7 @@ items:
   - Terminal.View.ChildNeedsDisplay
   - Terminal.View.Clear
   - Terminal.View.ClearNeedsDisplay
+  - Terminal.View.ColorScheme
   - Terminal.View.DrawFrame(Terminal.Rect,System.Boolean)
   - Terminal.View.DrawHotString(System.String,System.Boolean,Terminal.ColorScheme)
   - Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
@@ -185,24 +186,30 @@ references:
   name: ClearNeedsDisplay()
   nameWithType: View.ClearNeedsDisplay()
   fullName: View.ClearNeedsDisplay()
+- uid: Terminal.View.ColorScheme
+  parent: Terminal.View
+  isExternal: false
+  name: ColorScheme
+  nameWithType: View.ColorScheme
+  fullName: View.ColorScheme
 - uid: Terminal.View.DrawFrame(Terminal.Rect,System.Boolean)
   parent: Terminal.View
   isExternal: false
   name: DrawFrame(Rect, Boolean)
   nameWithType: View.DrawFrame(Rect, Boolean)
   fullName: View.DrawFrame(Rect, Boolean)
-- uid: Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
-  parent: Terminal.View
-  isExternal: false
-  name: DrawHotString(String, Attribute, Attribute)
-  nameWithType: View.DrawHotString(String, Attribute, Attribute)
-  fullName: View.DrawHotString(String, Attribute, Attribute)
 - uid: Terminal.View.DrawHotString(System.String,System.Boolean,Terminal.ColorScheme)
   parent: Terminal.View
   isExternal: false
   name: DrawHotString(String, Boolean, ColorScheme)
   nameWithType: View.DrawHotString(String, Boolean, ColorScheme)
   fullName: View.DrawHotString(String, Boolean, ColorScheme)
+- uid: Terminal.View.DrawHotString(System.String,Terminal.Attribute,Terminal.Attribute)
+  parent: Terminal.View
+  isExternal: false
+  name: DrawHotString(String, Attribute, Attribute)
+  nameWithType: View.DrawHotString(String, Attribute, Attribute)
+  fullName: View.DrawHotString(String, Attribute, Attribute)
 - uid: Terminal.View.Driver
   parent: Terminal.View
   isExternal: false

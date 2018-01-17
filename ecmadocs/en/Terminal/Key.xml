@@ -21,6 +21,9 @@
       <para>
               Control keys are the values between 1 and 26 corresponding to Control-A to Control-Z
             </para>
+      <para>
+              Unicode runes are also stored here, the letter 'A" for example is encoded as a value 65 (not surfaced in the enum).
+            </para>
     </remarks>
   </Docs>
   <Members>
@@ -35,7 +38,10 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+              When this value is set, the Key encodes the sequence Alt-KeyValue.
+              And the actual value must be extracted by removing the AltMask.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="Backspace">
@@ -49,7 +55,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Backspace key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="BackTab">
@@ -63,7 +71,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Shift-tab key (backwards tab key).
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="CharMask">
@@ -91,7 +101,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-A
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlB">
@@ -105,7 +117,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-B
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlC">
@@ -119,7 +133,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-C
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlD">
@@ -133,7 +149,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-D
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlE">
@@ -147,7 +165,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-E
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlF">
@@ -161,7 +181,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-F
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlG">
@@ -175,7 +197,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-G
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlH">
@@ -189,7 +213,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-H
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlI">
@@ -203,7 +229,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-I (same as the tab key).
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlJ">
@@ -217,7 +245,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-J
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlK">
@@ -231,7 +261,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-K
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlL">
@@ -245,7 +277,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-L
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlM">
@@ -259,7 +293,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-M
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlN">
@@ -273,7 +309,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-N (same as the return key).
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlO">
@@ -287,7 +325,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-O
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlP">
@@ -301,7 +341,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-P
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlQ">
@@ -315,7 +357,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-Q
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlR">
@@ -329,7 +373,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-R
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlS">
@@ -343,7 +389,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-S
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlT">
@@ -357,7 +405,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-T
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlU">
@@ -371,7 +421,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-U
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlV">
@@ -385,7 +437,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-V
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlW">
@@ -399,7 +453,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-W
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlX">
@@ -413,7 +469,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-X
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlY">
@@ -427,7 +485,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-Y
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="ControlZ">
@@ -441,7 +501,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing Control-Z
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="CursorDown">
@@ -455,7 +517,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Cursor down key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="CursorLeft">
@@ -469,7 +533,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Cursor left key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="CursorRight">
@@ -483,7 +549,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Cursor right key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="CursorUp">
@@ -497,7 +565,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Cursor up key
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="Delete">
@@ -511,7 +581,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing the delete key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="DeleteChar">
@@ -525,7 +597,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Delete character key
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="End">
@@ -539,7 +613,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            End key
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="Enter">
@@ -553,7 +629,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing the return key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="Esc">
@@ -567,7 +645,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing the escape key
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="F1">
@@ -581,7 +661,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            F1 key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="F10">
@@ -595,7 +677,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            F10 key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="F2">
@@ -609,7 +693,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            F2 key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="F3">
@@ -623,7 +709,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            F3 key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="F4">
@@ -637,7 +725,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            F4 key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="F5">
@@ -651,7 +741,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            F5 key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="F6">
@@ -665,7 +757,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            F6 key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="F7">
@@ -679,7 +773,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            F7 key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="F8">
@@ -693,7 +789,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            F8 key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="F9">
@@ -707,7 +805,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            F9 key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="Home">
@@ -721,7 +821,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Home key
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="InsertChar">
@@ -735,7 +837,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Insert character key
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="PageDown">
@@ -749,7 +853,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Page Down key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="PageUp">
@@ -763,7 +869,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Page Up key.
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="Space">
@@ -777,7 +885,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing the space bar
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="SpecialMask">
@@ -791,7 +901,10 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            If the SpecialMask is set, then the value is that of the special mask,
+            otherwise, the value is the one of the lower bits (as extracted by CharMask).
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="Tab">
@@ -805,7 +918,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The key code for the user pressing the tab key (same as pressing Control-I).
+            </summary>
       </Docs>
     </Member>
     <Member MemberName="Unknown">
@@ -819,7 +934,9 @@
         <ReturnType>Terminal.Key</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            A key with an unknown mapping was raised.
+            </summary>
       </Docs>
     </Member>
   </Members>

@@ -76,11 +76,12 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Gets or sets the title to display.
   syntax:
     content: public string Title { get; set; }
     return:
       type: System.String
-      description: To be added.
+      description: The title.
   overload: Terminal.MenuBarItem.Title*
   exceptions: []
 references:

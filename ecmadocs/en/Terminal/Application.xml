@@ -80,21 +80,6 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
-    <Member MemberName="DebugDrawBounds">
-      <MemberSignature Language="C#" Value="public static bool DebugDrawBounds;" />
-      <MemberSignature Language="ILAsm" Value=".field public static bool DebugDrawBounds" />
-      <MemberType>Field</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <ReturnValue>
-        <ReturnType>System.Boolean</ReturnType>
-      </ReturnValue>
-      <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
-      </Docs>
-    </Member>
     <Member MemberName="Driver">
       <MemberSignature Language="C#" Value="public static Terminal.ConsoleDriver Driver;" />
       <MemberSignature Language="ILAsm" Value=".field public static class Terminal.ConsoleDriver Driver" />

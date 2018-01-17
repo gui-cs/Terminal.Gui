@@ -9,7 +9,9 @@
     <BaseTypeName>System.Enum</BaseTypeName>
   </Base>
   <Docs>
-    <summary>To be added.</summary>
+    <summary>
+            Special characters that can be drawn with Driver.AddSpecial.
+            </summary>
     <remarks>To be added.</remarks>
   </Docs>
   <Members>
@@ -24,7 +26,9 @@
         <ReturnType>Terminal.SpecialChar</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Horizontal line character.
+            </summary>
       </Docs>
     </Member>
   </Members>

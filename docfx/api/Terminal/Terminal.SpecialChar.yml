@@ -13,6 +13,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Special characters that can be drawn with Driver.AddSpecial.
   syntax:
     content: public enum SpecialChar
   inheritance:
@@ -29,6 +30,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Horizontal line character.
   syntax:
     content: HLine
     return:

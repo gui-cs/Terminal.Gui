@@ -10,7 +10,9 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
+    <summary>
+            The default ColorSchemes for the application.
+            </summary>
     <remarks>To be added.</remarks>
   </Docs>
   <Members>
@@ -25,7 +27,9 @@
         <ReturnType>Terminal.ColorScheme</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The base color scheme, for the default toplevel views.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -40,7 +44,9 @@
         <ReturnType>Terminal.ColorScheme</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The dialog color scheme, for standard popup dialog boxes
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -55,7 +61,9 @@
         <ReturnType>Terminal.ColorScheme</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The color scheme for showing errors.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -70,7 +78,9 @@
         <ReturnType>Terminal.ColorScheme</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            The menu bar color
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
