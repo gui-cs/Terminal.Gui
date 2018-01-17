@@ -16,7 +16,7 @@ terminal emulators that support it.
 
 # API Documentation
 
-Go to the [API documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.html) for details.
+Go to the [API documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui.html) for details.
 
 # Sample Usage
 
@@ -68,6 +68,8 @@ class Demo {
 ```
 
 This shows a UI like this:
+
+![Sample app](docfx/sample.png)
 
 # Running and Building
 
