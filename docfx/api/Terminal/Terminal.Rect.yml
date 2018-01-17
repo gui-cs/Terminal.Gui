@@ -44,6 +44,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Stores a set of four integers that represent the location and size of a rectangle
   syntax:
     content: public struct Rect
   inheritance:
@@ -323,6 +324,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Gets or sets the height of this Rectangle structure.
   syntax:
     content: public int Height;
     return:
@@ -781,6 +783,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Gets or sets the width of this Rect structure.
   syntax:
     content: public int Width;
     return:
@@ -799,6 +802,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Gets or sets the x-coordinate of the upper-left corner of this Rectangle structure.
   syntax:
     content: public int X;
     return:
@@ -817,6 +821,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Gets or sets the y-coordinate of the upper-left corner of this Rectangle structure.
   syntax:
     content: public int Y;
     return:

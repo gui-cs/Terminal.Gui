@@ -12,9 +12,29 @@ using System;
 
 namespace Terminal
 {
+	/// <summary>
+	/// Stores a set of four integers that represent the location and size of a rectangle
+	/// </summary>
 	public struct Rect
 	{
-		public int X, Y, Width, Height;
+		/// <summary>
+		/// Gets or sets the x-coordinate of the upper-left corner of this Rectangle structure.
+		/// </summary>
+		public int X;
+		/// <summary>
+		/// Gets or sets the y-coordinate of the upper-left corner of this Rectangle structure.
+		/// </summary>
+		public int Y;
+
+		/// <summary>
+		/// Gets or sets the width of this Rect structure.
+		/// </summary>
+		public int Width;
+
+		/// <summary>
+		/// Gets or sets the height of this Rectangle structure.
+		/// </summary>
+		public int Height;
 
 		/// <summary>
 		///	Empty Shared Field

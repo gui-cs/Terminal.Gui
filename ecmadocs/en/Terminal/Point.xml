@@ -10,7 +10,9 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
+    <summary>
+            Represents an ordered pair of integer x- and y-coordinates that defines a point in a two-dimensional plane.
+            </summary>
     <remarks>To be added.</remarks>
   </Docs>
   <Members>
@@ -71,10 +73,12 @@
         <Parameter Name="sz" Type="Terminal.Size" />
       </Parameters>
       <Docs>
-        <param name="pt">To be added.</param>
-        <param name="sz">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
+        <param name="pt">The Point to add.</param>
+        <param name="sz">The Size to add.</param>
+        <summary>
+            Adds the specified Size to the specified Point.
+            </summary>
+        <returns>The Point that is the result of the addition operation.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -176,8 +180,11 @@
         <Parameter Name="p" Type="Terminal.Point" />
       </Parameters>
       <Docs>
-        <param name="p">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="p">P.</param>
+        <summary>
+            Offset the specified p.
+            </summary>
+        <returns>The offset.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -395,7 +402,9 @@
         <ReturnType>System.Int32</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Gets or sets the x-coordinate of this Point.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -410,7 +419,9 @@
         <ReturnType>System.Int32</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Gets or sets the y-coordinate of this Point.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

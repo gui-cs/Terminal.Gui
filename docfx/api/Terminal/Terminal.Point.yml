@@ -30,6 +30,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Represents an ordered pair of integer x- and y-coordinates that defines a point in a two-dimensional plane.
   syntax:
     content: public struct Point
   inheritance:
@@ -94,18 +95,19 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Adds the specified Size to the specified Point.
   syntax:
     content: public static Terminal.Point Add (Terminal.Point pt, Terminal.Size sz);
     parameters:
     - id: pt
       type: Terminal.Point
-      description: To be added.
+      description: The Point to add.
     - id: sz
       type: Terminal.Size
-      description: To be added.
+      description: The Size to add.
     return:
       type: Terminal.Point
-      description: To be added.
+      description: The Point that is the result of the addition operation.
   overload: Terminal.Point.Add*
   exceptions: []
 - uid: Terminal.Point.Empty
@@ -233,12 +235,13 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Offset the specified p.
   syntax:
     content: public void Offset (Terminal.Point p);
     parameters:
     - id: p
       type: Terminal.Point
-      description: To be added.
+      description: P.
   overload: Terminal.Point.Offset*
   exceptions: []
 - uid: Terminal.Point.op_Addition(Terminal.Point,Terminal.Size)
@@ -440,6 +443,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Gets or sets the x-coordinate of this Point.
   syntax:
     content: public int X;
     return:
@@ -458,6 +462,7 @@ items:
   assemblies:
   - Terminal
   namespace: Terminal
+  summary: Gets or sets the y-coordinate of this Point.
   syntax:
     content: public int Y;
     return:

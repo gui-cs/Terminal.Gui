@@ -13,10 +13,20 @@ using System.Globalization;
 
 namespace Terminal
 {
+	/// <summary>
+	/// Represents an ordered pair of integer x- and y-coordinates that defines a point in a two-dimensional plane.
+	/// </summary>
 	public struct Point
 	{
-		// Private x and y coordinate fields.
-		public int X, Y;
+		/// <summary>
+		/// Gets or sets the x-coordinate of this Point.
+		/// </summary>
+		public int X;
+
+		/// <summary>
+		/// Gets or sets the y-coordinate of this Point.
+		/// </summary>
+		public int Y;
 
 		// -----------------------
 		// Public Shared Members
@@ -208,16 +218,34 @@ namespace Terminal
 			return string.Format ("{{X={0},Y={1}}}", X.ToString (CultureInfo.InvariantCulture), 
 				Y.ToString (CultureInfo.InvariantCulture));
 		}
+
+		/// <summary>
+		/// Adds the specified Size to the specified Point.
+		/// </summary>
+		/// <returns>The Point that is the result of the addition operation.</returns>
+		/// <param name="pt">The Point to add.</param>
+		/// <param name="sz">The Size to add.</param>
 		public static Point Add (Point pt, Size sz)
 		{
 			return new Point (pt.X + sz.Width, pt.Y + sz.Height);
 		}
 
+		/// <summary>
+		/// Translates this Point by the specified Point.
+		/// </summary>
+		/// <returns>The offset.</returns>
+		/// <param name="p">The Point used offset this Point.</param>
 		public void Offset (Point p)
 		{
 			Offset (p.X, p.Y);
 		}
 
+		/// <summary>
+		/// Returns the result of subtracting specified Size from the specified Point.
+		/// </summary>
+		/// <returns>The Point that is the result of the subtraction operation.</returns>
+		/// <param name="pt">The Point to be subtracted from.</param>
+		/// <param name="sz">The Size to subtract from the Point.</param>
 		public static Point Subtract (Point pt, Size sz)
 		{
 			return new Point (pt.X - sz.Width, pt.Y - sz.Height);

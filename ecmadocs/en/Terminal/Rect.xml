@@ -10,7 +10,9 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
+    <summary>
+            Stores a set of four integers that represent the location and size of a rectangle
+            </summary>
     <remarks>To be added.</remarks>
   </Docs>
   <Members>
@@ -265,7 +267,9 @@
         <ReturnType>System.Int32</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Gets or sets the height of this Rectangle structure.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -707,7 +711,9 @@
         <ReturnType>System.Int32</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Gets or sets the width of this Rect structure.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -722,7 +728,9 @@
         <ReturnType>System.Int32</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Gets or sets the x-coordinate of the upper-left corner of this Rectangle structure.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -737,7 +745,9 @@
         <ReturnType>System.Int32</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
+        <summary>
+            Gets or sets the y-coordinate of the upper-left corner of this Rectangle structure.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

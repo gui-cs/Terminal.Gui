@@ -11,9 +11,16 @@
 using System;
 
 namespace Terminal {
+	/// <summary>
+	/// Stores an ordered pair of integers, which specify a Height and Width.
+	/// </summary>
 	public struct Size
 	{ 
 		private int width, height;
+
+		/// <summary>
+		/// Gets a Size structure that has a Height and Width value of 0.
+		/// </summary>
 		public static readonly Size Empty;
 
 		/// <summary>
@@ -208,6 +215,12 @@ namespace Terminal {
 			return String.Format ("{{Width={0}, Height={1}}}", width, height);
 		}
 
+		/// <summary>
+		/// Adds the width and height of one Size structure to the width and height of another Size structure.
+		/// </summary>
+		/// <returns>The add.</returns>
+		/// <param name="sz1">The first Size structure to add.</param>
+		/// <param name="sz2">The second Size structure to add.</param>
 		public static Size Add (Size sz1, Size sz2)
 		{
 			return new Size (sz1.Width + sz2.Width, 

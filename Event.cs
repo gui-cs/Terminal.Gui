@@ -23,7 +23,14 @@ namespace Terminal {
 	/// </remarks>
 	public enum Key : uint {
 		CharMask = 0xfffff,
+
+		/// <summary>
+		/// If the SpecialMask is set, then the value is that of the special mask,
+		/// otherwise, the value is the one of the lower bits (as extracted by CharMask).
+		/// </summary>
 		SpecialMask = 0xfff00000,
+
+
 		ControlA = 1,
 		ControlB,
 		ControlC,
