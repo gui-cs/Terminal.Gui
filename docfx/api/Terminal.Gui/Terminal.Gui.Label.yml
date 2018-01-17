@@ -17,7 +17,7 @@ items:
   fullName: Terminal.Gui.Label
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Label view, displays a string at a given position, can include multiple lines.
   syntax:
@@ -79,7 +79,7 @@ items:
   fullName: Label.Label(Rect, String)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     Public constructor: creates a label at the given
@@ -106,7 +106,7 @@ items:
   fullName: Label.Label(Int32, Int32, String)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     Public constructor: creates a label at the given
@@ -137,7 +137,7 @@ items:
   fullName: Label.MeasureLines(String, Int32)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Computes the number of lines needed to render the specified text by the Label control
   syntax:
@@ -164,7 +164,7 @@ items:
   fullName: Label.Redraw(Rect)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override void Redraw (Terminal.Gui.Rect region);
@@ -184,7 +184,7 @@ items:
   fullName: Label.Text
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The text displayed by this widget.
   syntax:
@@ -204,7 +204,7 @@ items:
   fullName: Label.TextAlignment
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Controls the text-alignemtn property of the label, changing it will redisplay the label.
   syntax:
@@ -224,7 +224,7 @@ items:
   fullName: Label.TextColor
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The color used for the label
   syntax:

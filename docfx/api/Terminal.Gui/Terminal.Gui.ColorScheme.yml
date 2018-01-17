@@ -15,7 +15,7 @@ items:
   fullName: Terminal.Gui.ColorScheme
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     Color scheme definitions, they cover some common scenarios and are used
@@ -37,7 +37,7 @@ items:
   fullName: ColorScheme.ColorScheme()
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public ColorScheme ();
@@ -54,7 +54,7 @@ items:
   fullName: ColorScheme.Focus
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The color for text when the view has the focus.
   syntax:
@@ -73,7 +73,7 @@ items:
   fullName: ColorScheme.HotFocus
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The color for the hotkey when the view is focused.
   syntax:
@@ -92,7 +92,7 @@ items:
   fullName: ColorScheme.HotNormal
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The color for the hotkey when a view is not focused
   syntax:
@@ -111,7 +111,7 @@ items:
   fullName: ColorScheme.Normal
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The default color for text, when the view is not focused.
   syntax:

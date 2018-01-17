@@ -20,7 +20,7 @@ items:
   fullName: Terminal.Gui.TextField
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Text data entry widget
   remarks: >-
@@ -81,7 +81,7 @@ items:
   fullName: TextField.TextField(Int32, Int32, Int32, String)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Public constructor.
   syntax:
@@ -111,7 +111,7 @@ items:
   fullName: TextField.CanFocus
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool CanFocus { get; set; }
@@ -130,7 +130,7 @@ items:
   fullName: TextField.Changed
   type: Event
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Changed event, raised when the text has clicked.
   remarks: >-
@@ -152,7 +152,7 @@ items:
   fullName: TextField.CursorPosition
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The current cursor position.
   syntax:
@@ -172,7 +172,7 @@ items:
   fullName: TextField.MouseEvent(MouseEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool MouseEvent (Terminal.Gui.MouseEvent ev);
@@ -195,7 +195,7 @@ items:
   fullName: TextField.PositionCursor()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Sets the cursor position.
   syntax:
@@ -213,7 +213,7 @@ items:
   fullName: TextField.ProcessKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
@@ -236,7 +236,7 @@ items:
   fullName: TextField.Redraw(Rect)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override void Redraw (Terminal.Gui.Rect region);
@@ -256,7 +256,7 @@ items:
   fullName: TextField.Secret
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Sets the secret property.
   remarks: This makes the text entry suitable for entering passwords.
@@ -277,7 +277,7 @@ items:
   fullName: TextField.Text
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Sets or gets the text in the entry.
   syntax:

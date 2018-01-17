@@ -51,7 +51,7 @@ items:
   fullName: Terminal.Gui.View
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: View is the base class for all views on the screen and represents a visible element that can render itself and contains zero or more nested views.
   remarks: "<p>\n               The View defines the base functionality for user interface elements in Terminal/gui.cs.  Views\n               can contain one or more subviews, can respond to user input and render themselves on the screen.\n            </p>\n    <p>\n               Views are created with a specified rectangle region (the frame) that is relative to the container\n               that they are added into.   \n            </p>\n    <p>\n               Subviews can be added to a View by calling the Add method.   The container of a view is the \n               Superview.\n            </p>\n    <p>\n               Developers can call the SetNeedsDisplay method on the view to flag a region or the entire view\n               as requiring to be redrawn.\n            </p>\n    <p>\n               Views have a ColorScheme property that defines the default colors that subviews\n               should use for rendering.   This ensures that the views fit in the context where\n               they are being used, and allows for themes to be plugged in.   For example, the\n               default colors for windows and toplevels uses a blue background, while it uses \n               a white background for dialog boxes and a red background for errors.\n            </p>\n    <p>\n               If a ColorScheme is not set on a view, the result of the ColorScheme is the\n               value of the SuperView and the value might only be valid once a view has been\n               added to a SuperView, so your subclasses should not rely on ColorScheme being\n               set at construction time.\n            </p>\n    <p>\n               Using ColorSchemes has the advantage that your application will work both\n               in color as well as black and white displays.\n            </p>"
@@ -84,7 +84,7 @@ items:
   fullName: View.View(Rect)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Initializes a new instance of the <xref href="Terminal.View"></xref> class with the specified frame.   This is the default constructor.
   syntax:
@@ -105,7 +105,7 @@ items:
   fullName: View.Add(View)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Adds a subview to this view.
   syntax:
@@ -126,7 +126,7 @@ items:
   fullName: View.Add(View[])
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Adds the specified views to the view.
   syntax:
@@ -147,7 +147,7 @@ items:
   fullName: View.AddCh(Int32, Int32, Int32)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Displays the specified character in the specified column and row.
   syntax:
@@ -174,7 +174,7 @@ items:
   fullName: View.Bounds
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The bounds represent the View-relative rectangle used for this view.   Updates to the Bounds update the Frame, and has the same side effects as updating the frame.
   syntax:
@@ -194,7 +194,7 @@ items:
   fullName: View.ChildNeedsDisplay()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Flags this view for requiring the children views to be repainted.
   syntax:
@@ -212,7 +212,7 @@ items:
   fullName: View.Clear()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Clears the view region with the current color.
   remarks: >-
@@ -234,7 +234,7 @@ items:
   fullName: View.ClearNeedsDisplay()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Removes the SetNeedsDisplay and the ChildNeedsDisplay setting on this view.
   syntax:
@@ -252,7 +252,7 @@ items:
   fullName: View.ColorScheme
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     The color scheme for this view, if it is not defined, it returns the parent's
@@ -274,7 +274,7 @@ items:
   fullName: View.DrawFrame(Rect, Boolean)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Draws a frame in the current view, clipped by the boundary of this view
   syntax:
@@ -298,7 +298,7 @@ items:
   fullName: View.DrawHotString(String, Boolean, ColorScheme)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Utility function to draw strings that contains a hotkey using a colorscheme and the "focused" state.
   syntax:
@@ -325,7 +325,7 @@ items:
   fullName: View.DrawHotString(String, Attribute, Attribute)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Utility function to draw strings that contain a hotkey
   syntax:
@@ -352,7 +352,7 @@ items:
   fullName: View.Driver
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     Points to the current driver in use by the view, it is a convenience property
@@ -373,7 +373,7 @@ items:
   fullName: View.EnsureFocus()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise, it does nothing.
   syntax:
@@ -391,7 +391,7 @@ items:
   fullName: View.Focused
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Returns the currently focused view inside this view, or null if nothing is focused.
   syntax:
@@ -411,7 +411,7 @@ items:
   fullName: View.FocusFirst()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Focuses the first focusable subview if one exists.
   syntax:
@@ -429,7 +429,7 @@ items:
   fullName: View.FocusLast()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Focuses the last focusable subview if one exists.
   syntax:
@@ -447,7 +447,7 @@ items:
   fullName: View.FocusNext()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Focuses the next view.
   syntax:
@@ -468,7 +468,7 @@ items:
   fullName: View.FocusPrev()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Focuses the previous view.
   syntax:
@@ -489,7 +489,7 @@ items:
   fullName: View.Frame
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets or sets the frame for the view.
   remarks: "Altering the Frame of a view will trigger the redrawing of the \n               view as well as the redrawing of the affected regions in the superview."
@@ -510,7 +510,7 @@ items:
   fullName: View.GetEnumerator()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets an enumerator that enumerates the subviews in this view.
   syntax:
@@ -536,7 +536,7 @@ items:
   fullName: View.HasFocus
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets or sets a value indicating whether this <xref href="Terminal.View"></xref> has focus.
   syntax:
@@ -556,7 +556,7 @@ items:
   fullName: View.Id
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets or sets an identifier for the view;
   syntax:
@@ -576,7 +576,7 @@ items:
   fullName: View.LayoutSubviews()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: "This virtual method is invoked when a view starts executing or \n            when the dimensions of the view have changed, for example in \n            response to the container view or terminal resizing."
   syntax:
@@ -594,7 +594,7 @@ items:
   fullName: View.MostFocused
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Returns the most focused view in the chain of subviews (the leaf view that has the focus).
   syntax:
@@ -614,7 +614,7 @@ items:
   fullName: View.Move(Int32, Int32)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: This moves the cursor to the specified column and row in the view.
   syntax:
@@ -638,7 +638,7 @@ items:
   fullName: View.PositionCursor()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Positions the cursor in the right position based on the currently focused view in the chain.
   syntax:
@@ -656,7 +656,7 @@ items:
   fullName: View.ProcessColdKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool ProcessColdKey (Terminal.Gui.KeyEvent kb);
@@ -679,7 +679,7 @@ items:
   fullName: View.ProcessHotKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool ProcessHotKey (Terminal.Gui.KeyEvent kb);
@@ -702,7 +702,7 @@ items:
   fullName: View.ProcessKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
@@ -725,7 +725,7 @@ items:
   fullName: View.Redraw(Rect)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Performs a redraw of this view and its subviews, only redraws the views that have been flagged for a re-display.
   remarks: The region argument is relative to the view itself.
@@ -747,7 +747,7 @@ items:
   fullName: View.Remove(View)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Removes a widget from this container.
   syntax:
@@ -768,7 +768,7 @@ items:
   fullName: View.RemoveAll()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Removes all the widgets from this container.
   syntax:
@@ -786,7 +786,7 @@ items:
   fullName: View.ScreenToView(Int32, Int32)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Converts a point from screen coordinates into the view coordinate space.
   syntax:
@@ -813,7 +813,7 @@ items:
   fullName: View.SetFocus(View)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Focuses the specified sub-view.
   syntax:
@@ -834,7 +834,7 @@ items:
   fullName: View.SetNeedsDisplay()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     Invoke to flag that this view needs to be redisplayed, by any code
@@ -854,7 +854,7 @@ items:
   fullName: View.SetNeedsDisplay(Rect)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Flags the specified rectangle region on this view as needing to be repainted.
   syntax:
@@ -875,7 +875,7 @@ items:
   fullName: View.Subviews
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: This returns a list of the subviews contained by this view.
   syntax:
@@ -895,7 +895,7 @@ items:
   fullName: View.SuperView
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Returns the container for this view, or null if this view has not been added to a container.
   syntax:
@@ -915,7 +915,7 @@ items:
   fullName: View.ToString()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Returns a <xref href="System.String"></xref> that represents the current <xref href="Terminal.View"></xref>.
   syntax:
@@ -936,7 +936,7 @@ items:
   fullName: View.WantMousePositionReports
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets or sets a value indicating whether this <xref href="Terminal.View"></xref> want mouse position reports.
   syntax:

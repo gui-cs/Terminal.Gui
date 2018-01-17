@@ -28,7 +28,7 @@ items:
   fullName: Terminal.Gui.Application
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The application driver for gui.cs
   remarks: "<p>\n                You can hook up to the Iteration event to have your method \n                invoked on each iteration of the mainloop.\n              </p>\n    <p>\n                Creates a mainloop to process input events, handle timers and\n                other sources of data.   It is accessible via the MainLoop property.\n              </p>\n    <p>\n                When invoked sets the SynchronizationContext to one that is tied\n                to the mainloop, allowing user code to use async/await.\n              </p>"
@@ -48,7 +48,7 @@ items:
   fullName: Application.Application()
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public Application ();
@@ -65,7 +65,7 @@ items:
   fullName: Application.Begin(Toplevel)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public static Terminal.Gui.Application.RunState Begin (Terminal.Gui.Toplevel toplevel);
@@ -88,7 +88,7 @@ items:
   fullName: Application.Current
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The current toplevel object.   This is updated when Application.Run enters and leaves and points to the current toplevel.
   syntax:
@@ -108,7 +108,7 @@ items:
   fullName: Application.Driver
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The current Console Driver in use.
   syntax:
@@ -127,7 +127,7 @@ items:
   fullName: Application.End(Application+RunState)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public static void End (Terminal.Gui.Application.RunState rs);
@@ -147,7 +147,7 @@ items:
   fullName: Application.GrabMouse(View)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Grabs the mouse, forcing all mouse events to be routed to the specified view until UngrabMouse is called.
   syntax:
@@ -168,7 +168,7 @@ items:
   fullName: Application.Init()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Initializes the Application
   syntax:
@@ -186,7 +186,7 @@ items:
   fullName: Application.Iteration
   type: Event
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     This event is raised on each iteration of the
@@ -208,7 +208,7 @@ items:
   fullName: Application.MainLoop
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The mainloop driver for the applicaiton
   syntax:
@@ -228,7 +228,7 @@ items:
   fullName: Application.MakeCenteredRect(Size)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Returns a rectangle that is centered in the screen for the provided size.
   syntax:
@@ -252,7 +252,7 @@ items:
   fullName: Application.Refresh()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Triggers a refresh of the entire display.
   syntax:
@@ -270,7 +270,7 @@ items:
   fullName: Application.RequestStop()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Stops running the most recent toplevel
   syntax:
@@ -288,7 +288,7 @@ items:
   fullName: Application.RootMouseEvent
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Merely a debugging aid to see the raw mouse events
   syntax:
@@ -307,7 +307,7 @@ items:
   fullName: Application.Run()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Runs the application with the built-in toplevel view
   syntax:
@@ -325,7 +325,7 @@ items:
   fullName: Application.Run(Toplevel)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Runs the main loop on the given container.
   remarks: >-
@@ -356,7 +356,7 @@ items:
   fullName: Application.RunLoop(Application+RunState, Boolean)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Runs the main loop for the created dialog
   remarks: >-
@@ -383,7 +383,7 @@ items:
   fullName: Application.Top
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The Toplevel object used for the application on startup.
   syntax:
@@ -403,7 +403,7 @@ items:
   fullName: Application.UngrabMouse()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Releases the mouse grab, so mouse events will be routed to the view on which the mouse is.
   syntax:
@@ -504,7 +504,7 @@ references:
   fullName: Application.MainLoop
 - uid: Mono.Terminal.MainLoop
   parent: Mono.Terminal
-  isExternal: true
+  isExternal: false
   name: MainLoop
   nameWithType: MainLoop
   fullName: Mono.Terminal.MainLoop

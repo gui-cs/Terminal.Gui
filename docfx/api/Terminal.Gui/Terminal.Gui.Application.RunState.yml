@@ -12,7 +12,7 @@ items:
   fullName: Terminal.Gui.Application.RunState
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Captures the execution state for the provided TopLevel view.
   syntax:
@@ -32,7 +32,7 @@ items:
   fullName: Application.RunState.Dispose()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Releases all resource used by the <xref href="Terminal.Application.RunState"></xref> object.
   remarks: >-
@@ -56,7 +56,7 @@ items:
   fullName: Application.RunState.Dispose(Boolean)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Dispose the specified disposing.
   syntax:

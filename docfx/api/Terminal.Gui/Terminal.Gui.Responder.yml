@@ -17,7 +17,7 @@ items:
   fullName: Terminal.Gui.Responder
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public class Responder
@@ -37,7 +37,7 @@ items:
   fullName: Responder.Responder()
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public Responder ();
@@ -54,7 +54,7 @@ items:
   fullName: Responder.CanFocus
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public virtual bool CanFocus { get; set; }
@@ -73,7 +73,7 @@ items:
   fullName: Responder.HasFocus
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public virtual bool HasFocus { get; }
@@ -92,7 +92,7 @@ items:
   fullName: Responder.MouseEvent(MouseEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public virtual bool MouseEvent (Terminal.Gui.MouseEvent me);
@@ -115,7 +115,7 @@ items:
   fullName: Responder.ProcessColdKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     This method can be overwritten by views that
@@ -157,7 +157,7 @@ items:
   fullName: Responder.ProcessHotKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     This method can be overwritten by view that
@@ -199,7 +199,7 @@ items:
   fullName: Responder.ProcessKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     If the view is focused, gives the view a

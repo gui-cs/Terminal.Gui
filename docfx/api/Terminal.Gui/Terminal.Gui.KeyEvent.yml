@@ -15,7 +15,7 @@ items:
   fullName: Terminal.Gui.KeyEvent
   type: Struct
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Describes a keyboard event.
   syntax:
@@ -33,7 +33,7 @@ items:
   fullName: KeyEvent.KeyEvent(Key)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Constructs a new KeyEvent from the provided Key value - can be a rune cast into a Key value
   syntax:
@@ -54,7 +54,7 @@ items:
   fullName: KeyEvent.IsAlt
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets a value indicating whether the Alt key was pressed (real or synthesized)
   syntax:
@@ -74,7 +74,7 @@ items:
   fullName: KeyEvent.IsCtrl
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Determines whether the value is a control key
   syntax:
@@ -94,7 +94,7 @@ items:
   fullName: KeyEvent.Key
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Symb olid definition for the key.
   syntax:
@@ -113,7 +113,7 @@ items:
   fullName: KeyEvent.KeyValue
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     The key value cast to an integer, you will typicall use this for

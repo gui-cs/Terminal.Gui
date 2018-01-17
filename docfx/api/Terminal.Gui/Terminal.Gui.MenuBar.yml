@@ -17,7 +17,7 @@ items:
   fullName: Terminal.Gui.MenuBar
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: A menu bar for your application.
   syntax:
@@ -75,7 +75,7 @@ items:
   fullName: MenuBar.MenuBar(MenuBarItem[])
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Initializes a new instance of the <xref href="Terminal.MenuBar"></xref> class with the specified set of toplevel menu items.
   syntax:
@@ -96,7 +96,7 @@ items:
   fullName: MenuBar.Menus
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The menus that were defined when the menubar was created.   This can be updated if the menu is not currently visible.
   syntax:
@@ -116,7 +116,7 @@ items:
   fullName: MenuBar.MouseEvent(MouseEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool MouseEvent (Terminal.Gui.MouseEvent me);
@@ -139,7 +139,7 @@ items:
   fullName: MenuBar.PositionCursor()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override void PositionCursor ();
@@ -156,7 +156,7 @@ items:
   fullName: MenuBar.ProcessHotKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool ProcessHotKey (Terminal.Gui.KeyEvent kb);
@@ -179,7 +179,7 @@ items:
   fullName: MenuBar.ProcessKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
@@ -202,7 +202,7 @@ items:
   fullName: MenuBar.Redraw(Rect)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override void Redraw (Terminal.Gui.Rect region);

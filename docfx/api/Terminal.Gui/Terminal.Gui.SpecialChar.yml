@@ -11,7 +11,7 @@ items:
   fullName: Terminal.Gui.SpecialChar
   type: Enum
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Special characters that can be drawn with Driver.AddSpecial.
   syntax:
@@ -28,7 +28,7 @@ items:
   fullName: SpecialChar.HLine
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Horizontal line character.
   syntax:

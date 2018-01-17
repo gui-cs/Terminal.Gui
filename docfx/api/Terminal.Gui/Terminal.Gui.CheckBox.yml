@@ -19,7 +19,7 @@ items:
   fullName: Terminal.Gui.CheckBox
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The Checkbox View shows an on/off toggle that the user can set
   syntax:
@@ -78,7 +78,7 @@ items:
   fullName: CheckBox.CheckBox(Int32, Int32, String)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     Public constructor, creates a CheckButton based on
@@ -110,7 +110,7 @@ items:
   fullName: CheckBox.CheckBox(Int32, Int32, String, Boolean)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     Public constructor, creates a CheckButton based on
@@ -145,7 +145,7 @@ items:
   fullName: CheckBox.Checked
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The state of the checkbox.
   syntax:
@@ -165,7 +165,7 @@ items:
   fullName: CheckBox.MouseEvent(MouseEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool MouseEvent (Terminal.Gui.MouseEvent me);
@@ -188,7 +188,7 @@ items:
   fullName: CheckBox.PositionCursor()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override void PositionCursor ();
@@ -205,7 +205,7 @@ items:
   fullName: CheckBox.ProcessKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
@@ -228,7 +228,7 @@ items:
   fullName: CheckBox.Redraw(Rect)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override void Redraw (Terminal.Gui.Rect region);
@@ -248,7 +248,7 @@ items:
   fullName: CheckBox.Text
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The text displayed by this widget.
   syntax:
@@ -268,7 +268,7 @@ items:
   fullName: CheckBox.Toggled
   type: Event
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Toggled event, raised when the CheckButton is toggled.
   remarks: >-

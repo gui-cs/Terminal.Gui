@@ -35,7 +35,7 @@ items:
   fullName: Terminal.Gui.MouseFlags
   type: Enum
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Mouse flags reported in MouseEvent.
   remarks: They just happen to map to the ncurses ones.
@@ -58,7 +58,7 @@ items:
   fullName: MouseFlags.AllEvents
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Mask that captures all the events.
   syntax:
@@ -77,7 +77,7 @@ items:
   fullName: MouseFlags.Button1Clicked
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The first mouse button was clicked (press+release).
   syntax:
@@ -96,7 +96,7 @@ items:
   fullName: MouseFlags.Button1DoubleClicked
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The first mouse button was double-clicked.
   syntax:
@@ -115,7 +115,7 @@ items:
   fullName: MouseFlags.Button1Pressed
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The first mouse button was pressed.
   syntax:
@@ -134,7 +134,7 @@ items:
   fullName: MouseFlags.Button1Released
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The first mouse button was released.
   syntax:
@@ -153,7 +153,7 @@ items:
   fullName: MouseFlags.Button1TripleClicked
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The first mouse button was tripple-clicked.
   syntax:
@@ -172,7 +172,7 @@ items:
   fullName: MouseFlags.Button2Clicked
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The second mouse button was clicked (press+release).
   syntax:
@@ -191,7 +191,7 @@ items:
   fullName: MouseFlags.Button2DoubleClicked
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The second mouse button was double-clicked.
   syntax:
@@ -210,7 +210,7 @@ items:
   fullName: MouseFlags.Button2Pressed
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The second mouse button was pressed.
   syntax:
@@ -229,7 +229,7 @@ items:
   fullName: MouseFlags.Button2Released
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The second mouse button was released.
   syntax:
@@ -248,7 +248,7 @@ items:
   fullName: MouseFlags.Button2TrippleClicked
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The second mouse button was tripple-clicked.
   syntax:
@@ -267,7 +267,7 @@ items:
   fullName: MouseFlags.Button3Clicked
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The third mouse button was clicked (press+release).
   syntax:
@@ -286,7 +286,7 @@ items:
   fullName: MouseFlags.Button3DoubleClicked
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The third mouse button was double-clicked.
   syntax:
@@ -305,7 +305,7 @@ items:
   fullName: MouseFlags.Button3Pressed
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The third mouse button was pressed.
   syntax:
@@ -324,7 +324,7 @@ items:
   fullName: MouseFlags.Button3Released
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The third mouse button was released.
   syntax:
@@ -343,7 +343,7 @@ items:
   fullName: MouseFlags.Button3TripleClicked
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The third mouse button was tripple-clicked.
   syntax:
@@ -362,7 +362,7 @@ items:
   fullName: MouseFlags.Button4Clicked
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The fourth button was clicked (press+release).
   syntax:
@@ -381,7 +381,7 @@ items:
   fullName: MouseFlags.Button4DoubleClicked
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The fourth button was double-clicked.
   syntax:
@@ -400,7 +400,7 @@ items:
   fullName: MouseFlags.Button4Pressed
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The fourth mouse button was pressed.
   syntax:
@@ -419,7 +419,7 @@ items:
   fullName: MouseFlags.Button4Released
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The fourth mouse button was released.
   syntax:
@@ -438,7 +438,7 @@ items:
   fullName: MouseFlags.Button4TripleClicked
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The fourth button was tripple-clicked.
   syntax:
@@ -457,7 +457,7 @@ items:
   fullName: MouseFlags.ButtonAlt
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: 'Flag: the alt key was pressed when the mouse button took place.'
   syntax:
@@ -476,7 +476,7 @@ items:
   fullName: MouseFlags.ButtonCtrl
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: 'Flag: the shift key was pressed when the mouse button took place.'
   syntax:
@@ -495,7 +495,7 @@ items:
   fullName: MouseFlags.ButtonShift
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The fourth button was pressed.
   syntax:
@@ -514,7 +514,7 @@ items:
   fullName: MouseFlags.ReportMousePosition
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The mouse position is being reported in this event.
   syntax:

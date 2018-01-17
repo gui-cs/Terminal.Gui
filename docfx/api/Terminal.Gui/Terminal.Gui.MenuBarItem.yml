@@ -13,7 +13,7 @@ items:
   fullName: Terminal.Gui.MenuBarItem
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: A menu bar item contains other menu items.
   syntax:
@@ -32,7 +32,7 @@ items:
   fullName: MenuBarItem.MenuBarItem(String, MenuItem[])
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public MenuBarItem (string title, Terminal.Gui.MenuItem[] children);
@@ -55,7 +55,7 @@ items:
   fullName: MenuBarItem.Children
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets or sets the children for this MenuBarItem
   syntax:
@@ -75,7 +75,7 @@ items:
   fullName: MenuBarItem.Title
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets or sets the title to display.
   syntax:

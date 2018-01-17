@@ -13,7 +13,7 @@ items:
   fullName: Terminal.Gui.Attribute
   type: Struct
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Attributes are used as elements that contain both a foreground and a background or platform specific features
   remarks: >-
@@ -35,7 +35,7 @@ items:
   fullName: Attribute.Attribute(Int32)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public Attribute (int v);
@@ -55,7 +55,7 @@ items:
   fullName: Attribute.op_Implicit(Int32 to Attribute)
   type: Operator
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public static Terminal.Gui.Attribute op_Implicit (int v);
@@ -78,7 +78,7 @@ items:
   fullName: Attribute.op_Implicit(Attribute to Int32)
   type: Operator
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public static int op_Implicit (Terminal.Gui.Attribute c);

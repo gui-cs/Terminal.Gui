@@ -1,0 +1,151 @@
+<Type Name="MenuBar" FullName="Terminal.Gui.MenuBar">
+  <TypeSignature Language="C#" Value="public class MenuBar : Terminal.Gui.View" />
+  <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit MenuBar extends Terminal.Gui.View" />
+  <AssemblyInfo>
+    <AssemblyName>Terminal.Gui</AssemblyName>
+    <AssemblyVersion>0.0.0.0</AssemblyVersion>
+  </AssemblyInfo>
+  <Base>
+    <BaseTypeName>Terminal.Gui.View</BaseTypeName>
+  </Base>
+  <Interfaces />
+  <Docs>
+    <summary>
+            A menu bar for your application.
+            </summary>
+    <remarks>To be added.</remarks>
+  </Docs>
+  <Members>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public MenuBar (Terminal.Gui.MenuBarItem[] menus);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class Terminal.Gui.MenuBarItem[] menus) cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="menus" Type="Terminal.Gui.MenuBarItem[]" />
+      </Parameters>
+      <Docs>
+        <param name="menus">Menus.</param>
+        <summary>
+            Initializes a new instance of the <see cref="T:Terminal.MenuBar" /> class with the specified set of toplevel menu items.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Menus">
+      <MemberSignature Language="C#" Value="public Terminal.Gui.MenuBarItem[] Menus { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class Terminal.Gui.MenuBarItem[] Menus" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.MenuBarItem[]</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            The menus that were defined when the menubar was created.   This can be updated if the menu is not currently visible.
+            </summary>
+        <value>The menu array.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="MouseEvent">
+      <MemberSignature Language="C#" Value="public override bool MouseEvent (Terminal.Gui.MouseEvent me);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool MouseEvent(valuetype Terminal.Gui.MouseEvent me) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="me" Type="Terminal.Gui.MouseEvent" />
+      </Parameters>
+      <Docs>
+        <param name="me">To be added.</param>
+        <summary>To be added.</summary>
+        <returns>To be added.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="PositionCursor">
+      <MemberSignature Language="C#" Value="public override void PositionCursor ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void PositionCursor() cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters />
+      <Docs>
+        <summary>To be added.</summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ProcessHotKey">
+      <MemberSignature Language="C#" Value="public override bool ProcessHotKey (Terminal.Gui.KeyEvent kb);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessHotKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="kb" Type="Terminal.Gui.KeyEvent" />
+      </Parameters>
+      <Docs>
+        <param name="kb">To be added.</param>
+        <summary>To be added.</summary>
+        <returns>To be added.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ProcessKey">
+      <MemberSignature Language="C#" Value="public override bool ProcessKey (Terminal.Gui.KeyEvent kb);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="kb" Type="Terminal.Gui.KeyEvent" />
+      </Parameters>
+      <Docs>
+        <param name="kb">To be added.</param>
+        <summary>To be added.</summary>
+        <returns>To be added.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Redraw">
+      <MemberSignature Language="C#" Value="public override void Redraw (Terminal.Gui.Rect region);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Redraw(valuetype Terminal.Gui.Rect region) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="region" Type="Terminal.Gui.Rect" />
+      </Parameters>
+      <Docs>
+        <param name="region">To be added.</param>
+        <summary>To be added.</summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+  </Members>
+</Type>

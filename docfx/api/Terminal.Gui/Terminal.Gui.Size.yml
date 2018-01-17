@@ -26,7 +26,7 @@ items:
   fullName: Terminal.Gui.Size
   type: Struct
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Stores an ordered pair of integers, which specify a Height and Width.
   syntax:
@@ -44,7 +44,7 @@ items:
   fullName: Size.Size(Point)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Size Constructor
   remarks: Creates a Size from a Point value.
@@ -66,7 +66,7 @@ items:
   fullName: Size.Size(Int32, Int32)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Size Constructor
   remarks: Creates a Size from specified dimensions.
@@ -91,7 +91,7 @@ items:
   fullName: Size.Add(Size, Size)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Adds the width and height of one Size structure to the width and height of another Size structure.
   syntax:
@@ -118,7 +118,7 @@ items:
   fullName: Size.Empty
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets a Size structure that has a Height and Width value of 0.
   syntax:
@@ -137,7 +137,7 @@ items:
   fullName: Size.Equals(Object)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Equals Method
   remarks: Checks equivalence of this Size and another object.
@@ -162,7 +162,7 @@ items:
   fullName: Size.GetHashCode()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: GetHashCode Method
   remarks: Calculates a hashing value.
@@ -184,7 +184,7 @@ items:
   fullName: Size.Height
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Height Property
   remarks: The Height coordinate of the Size.
@@ -205,7 +205,7 @@ items:
   fullName: Size.IsEmpty
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: IsEmpty Property
   remarks: Indicates if both Width and Height are zero.
@@ -226,7 +226,7 @@ items:
   fullName: Size.op_Addition(Size, Size)
   type: Operator
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Addition Operator
   remarks: Addition of two Size structures.
@@ -254,7 +254,7 @@ items:
   fullName: Size.op_Equality(Size, Size)
   type: Operator
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Equality Operator
   remarks: "Compares two Size objects. The return value is\n            	based on the equivalence of the Width and Height \n            	properties of the two Sizes."
@@ -282,7 +282,7 @@ items:
   fullName: Size.op_Explicit(Size to Point)
   type: Operator
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Size to Point Conversion
   remarks: "Returns a Point based on the dimensions of a given \n            	Size. Requires explicit cast."
@@ -307,7 +307,7 @@ items:
   fullName: Size.op_Inequality(Size, Size)
   type: Operator
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Inequality Operator
   remarks: "Compares two Size objects. The return value is\n            	based on the equivalence of the Width and Height \n            	properties of the two Sizes."
@@ -335,7 +335,7 @@ items:
   fullName: Size.op_Subtraction(Size, Size)
   type: Operator
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Subtraction Operator
   remarks: Subtracts two Size structures.
@@ -363,7 +363,7 @@ items:
   fullName: Size.Subtract(Size, Size)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public static Terminal.Gui.Size Subtract (Terminal.Gui.Size sz1, Terminal.Gui.Size sz2);
@@ -389,7 +389,7 @@ items:
   fullName: Size.ToString()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: ToString Method
   remarks: Formats the Size as a string in coordinate notation.
@@ -411,7 +411,7 @@ items:
   fullName: Size.Width
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Width Property
   remarks: The Width coordinate of the Size.

@@ -14,7 +14,7 @@ items:
   fullName: Terminal.Gui.Colors
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The default ColorSchemes for the application.
   syntax:
@@ -33,7 +33,7 @@ items:
   fullName: Colors.Base
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The base color scheme, for the default toplevel views.
   syntax:
@@ -52,7 +52,7 @@ items:
   fullName: Colors.Dialog
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The dialog color scheme, for standard popup dialog boxes
   syntax:
@@ -71,7 +71,7 @@ items:
   fullName: Colors.Error
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The color scheme for showing errors.
   syntax:
@@ -90,7 +90,7 @@ items:
   fullName: Colors.Menu
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The menu bar color
   syntax:

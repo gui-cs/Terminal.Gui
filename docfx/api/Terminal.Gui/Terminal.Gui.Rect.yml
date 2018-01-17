@@ -42,7 +42,7 @@ items:
   fullName: Terminal.Gui.Rect
   type: Struct
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Stores a set of four integers that represent the location and size of a rectangle
   syntax:
@@ -60,7 +60,7 @@ items:
   fullName: Rect.Rect(Point, Size)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Rectangle Constructor
   remarks: Creates a Rectangle from Point and Size values.
@@ -85,7 +85,7 @@ items:
   fullName: Rect.Rect(Int32, Int32, Int32, Int32)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Rectangle Constructor
   remarks: >-
@@ -118,7 +118,7 @@ items:
   fullName: Rect.Bottom
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Bottom Property
   remarks: >-
@@ -141,7 +141,7 @@ items:
   fullName: Rect.Contains(Point)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Contains Method
   remarks: Checks if a Point lies within this Rectangle.
@@ -166,7 +166,7 @@ items:
   fullName: Rect.Contains(Rect)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Contains Method
   remarks: "Checks if a Rectangle lies entirely within this \n            	Rectangle."
@@ -191,7 +191,7 @@ items:
   fullName: Rect.Contains(Int32, Int32)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Contains Method
   remarks: Checks if an x,y coordinate lies within this Rectangle.
@@ -219,7 +219,7 @@ items:
   fullName: Rect.Empty
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Empty Shared Field
   remarks: An uninitialized Rectangle Structure.
@@ -239,7 +239,7 @@ items:
   fullName: Rect.Equals(Object)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Equals Method
   remarks: Checks equivalence of this Rectangle and another object.
@@ -264,7 +264,7 @@ items:
   fullName: Rect.FromLTRB(Int32, Int32, Int32, Int32)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: FromLTRB Shared Method
   remarks: >-
@@ -300,7 +300,7 @@ items:
   fullName: Rect.GetHashCode()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: GetHashCode Method
   remarks: Calculates a hashing value.
@@ -322,7 +322,7 @@ items:
   fullName: Rect.Height
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets or sets the height of this Rectangle structure.
   syntax:
@@ -341,7 +341,7 @@ items:
   fullName: Rect.Inflate(Size)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Inflate Method
   remarks: Inflates the Rectangle by a specified Size.
@@ -363,7 +363,7 @@ items:
   fullName: Rect.Inflate(Int32, Int32)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Inflate Method
   remarks: Inflates the Rectangle by a specified width and height.
@@ -388,7 +388,7 @@ items:
   fullName: Rect.Inflate(Rect, Int32, Int32)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Inflate Shared Method
   remarks: "Produces a new Rectangle by inflating an existing \n            	Rectangle by the specified coordinate values."
@@ -419,7 +419,7 @@ items:
   fullName: Rect.Intersect(Rect, Rect)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Intersect Shared Method
   remarks: "Produces a new Rectangle by intersecting 2 existing \n            	Rectangles. Returns null if there is no	intersection."
@@ -447,7 +447,7 @@ items:
   fullName: Rect.Intersect(Rect)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Intersect Method
   remarks: >-
@@ -471,7 +471,7 @@ items:
   fullName: Rect.IntersectsWith(Rect)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: IntersectsWith Method
   remarks: Checks if a Rectangle intersects with this one.
@@ -496,7 +496,7 @@ items:
   fullName: Rect.IsEmpty
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: IsEmpty Property
   remarks: Indicates if the width or height are zero. Read only.
@@ -517,7 +517,7 @@ items:
   fullName: Rect.Left
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Left Property
   remarks: >-
@@ -540,7 +540,7 @@ items:
   fullName: Rect.Location
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Location Property
   remarks: The Location of the top-left corner of the Rectangle.
@@ -561,7 +561,7 @@ items:
   fullName: Rect.Offset(Point)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Offset Method
   remarks: Moves the Rectangle a specified distance.
@@ -583,7 +583,7 @@ items:
   fullName: Rect.Offset(Int32, Int32)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Offset Method
   remarks: Moves the Rectangle a specified distance.
@@ -608,7 +608,7 @@ items:
   fullName: Rect.op_Equality(Rect, Rect)
   type: Operator
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Equality Operator
   remarks: "Compares two Rectangle objects. The return value is\n            	based on the equivalence of the Location and Size \n            	properties of the two Rectangles."
@@ -636,7 +636,7 @@ items:
   fullName: Rect.op_Inequality(Rect, Rect)
   type: Operator
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Inequality Operator
   remarks: "Compares two Rectangle objects. The return value is\n            	based on the equivalence of the Location and Size \n            	properties of the two Rectangles."
@@ -664,7 +664,7 @@ items:
   fullName: Rect.Right
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Right Property
   remarks: >-
@@ -687,7 +687,7 @@ items:
   fullName: Rect.Size
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Size Property
   remarks: The Size of the Rectangle.
@@ -708,7 +708,7 @@ items:
   fullName: Rect.Top
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Top Property
   remarks: >-
@@ -731,7 +731,7 @@ items:
   fullName: Rect.ToString()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: ToString Method
   remarks: Formats the Rectangle as a string in (x,y,w,h) notation.
@@ -753,7 +753,7 @@ items:
   fullName: Rect.Union(Rect, Rect)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Union Shared Method
   remarks: "Produces a new Rectangle from the union of 2 existing \n            	Rectangles."
@@ -781,7 +781,7 @@ items:
   fullName: Rect.Width
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets or sets the width of this Rect structure.
   syntax:
@@ -800,7 +800,7 @@ items:
   fullName: Rect.X
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets or sets the x-coordinate of the upper-left corner of this Rectangle structure.
   syntax:
@@ -819,7 +819,7 @@ items:
   fullName: Rect.Y
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets or sets the y-coordinate of the upper-left corner of this Rectangle structure.
   syntax:

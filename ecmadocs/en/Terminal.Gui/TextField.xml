@@ -1,0 +1,216 @@
+<Type Name="TextField" FullName="Terminal.Gui.TextField">
+  <TypeSignature Language="C#" Value="public class TextField : Terminal.Gui.View" />
+  <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit TextField extends Terminal.Gui.View" />
+  <AssemblyInfo>
+    <AssemblyName>Terminal.Gui</AssemblyName>
+    <AssemblyVersion>0.0.0.0</AssemblyVersion>
+  </AssemblyInfo>
+  <Base>
+    <BaseTypeName>Terminal.Gui.View</BaseTypeName>
+  </Base>
+  <Interfaces />
+  <Docs>
+    <summary>
+              Text data entry widget
+            </summary>
+    <remarks>
+              The Entry widget provides Emacs-like editing
+              functionality,  and mouse support.
+            </remarks>
+  </Docs>
+  <Members>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public TextField (int x, int y, int w, string s);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, int32 w, string s) cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="x" Type="System.Int32" />
+        <Parameter Name="y" Type="System.Int32" />
+        <Parameter Name="w" Type="System.Int32" />
+        <Parameter Name="s" Type="System.String" />
+      </Parameters>
+      <Docs>
+        <param name="x">To be added.</param>
+        <param name="y">To be added.</param>
+        <param name="w">To be added.</param>
+        <param name="s">To be added.</param>
+        <summary>
+              Public constructor.
+            </summary>
+        <remarks />
+      </Docs>
+    </Member>
+    <Member MemberName="CanFocus">
+      <MemberSignature Language="C#" Value="public override bool CanFocus { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance bool CanFocus" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>To be added.</summary>
+        <value>To be added.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Changed">
+      <MemberSignature Language="C#" Value="public event EventHandler Changed;" />
+      <MemberSignature Language="ILAsm" Value=".event class System.EventHandler Changed" />
+      <MemberType>Event</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.EventHandler</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+              Changed event, raised when the text has clicked.
+            </summary>
+        <remarks>
+              Client code can hook up to this event, it is
+              raised when the text in the entry changes.
+            </remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="CursorPosition">
+      <MemberSignature Language="C#" Value="public int CursorPosition { get; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance int32 CursorPosition" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Int32</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+               The current cursor position.
+            </summary>
+        <value>To be added.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="MouseEvent">
+      <MemberSignature Language="C#" Value="public override bool MouseEvent (Terminal.Gui.MouseEvent ev);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool MouseEvent(valuetype Terminal.Gui.MouseEvent ev) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="ev" Type="Terminal.Gui.MouseEvent" />
+      </Parameters>
+      <Docs>
+        <param name="ev">To be added.</param>
+        <summary>To be added.</summary>
+        <returns>To be added.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="PositionCursor">
+      <MemberSignature Language="C#" Value="public override void PositionCursor ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void PositionCursor() cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters />
+      <Docs>
+        <summary>
+              Sets the cursor position.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ProcessKey">
+      <MemberSignature Language="C#" Value="public override bool ProcessKey (Terminal.Gui.KeyEvent kb);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="kb" Type="Terminal.Gui.KeyEvent" />
+      </Parameters>
+      <Docs>
+        <param name="kb">To be added.</param>
+        <summary>To be added.</summary>
+        <returns>To be added.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Redraw">
+      <MemberSignature Language="C#" Value="public override void Redraw (Terminal.Gui.Rect region);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Redraw(valuetype Terminal.Gui.Rect region) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="region" Type="Terminal.Gui.Rect" />
+      </Parameters>
+      <Docs>
+        <param name="region">To be added.</param>
+        <summary>To be added.</summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Secret">
+      <MemberSignature Language="C#" Value="public bool Secret { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance bool Secret" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+              Sets the secret property.
+            </summary>
+        <value>To be added.</value>
+        <remarks>
+              This makes the text entry suitable for entering passwords. 
+            </remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Text">
+      <MemberSignature Language="C#" Value="public string Text { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance string Text" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.String</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+              Sets or gets the text in the entry.
+            </summary>
+        <value>To be added.</value>
+        <remarks />
+      </Docs>
+    </Member>
+  </Members>
+</Type>

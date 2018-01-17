@@ -11,7 +11,7 @@ items:
   fullName: Terminal.Gui.ScrollView
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: 'public class ScrollView : Terminal.Gui.View'
@@ -73,7 +73,7 @@ items:
   fullName: ScrollView.ScrollView(Rect)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public ScrollView (Terminal.Gui.Rect frame);

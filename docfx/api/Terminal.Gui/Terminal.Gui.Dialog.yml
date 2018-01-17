@@ -14,7 +14,7 @@ items:
   fullName: Terminal.Gui.Dialog
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: "The dialog box is a window that by default is centered and contains one \n            or more buttons."
   syntax:
@@ -80,7 +80,7 @@ items:
   fullName: Dialog.Dialog(String, Int32, Int32, Button[])
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Initializes a new instance of the <xref href="Terminal.Dialog"></xref> class with an optional set of buttons to display
   syntax:
@@ -110,7 +110,7 @@ items:
   fullName: Dialog.AddButton(Button)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Adds a button to the dialog, its layout will be controled by the dialog
   syntax:
@@ -131,7 +131,7 @@ items:
   fullName: Dialog.LayoutSubviews()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override void LayoutSubviews ();
@@ -148,7 +148,7 @@ items:
   fullName: Dialog.ProcessKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);

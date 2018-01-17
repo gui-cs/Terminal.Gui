@@ -28,7 +28,7 @@ items:
   fullName: Terminal.Gui.Point
   type: Struct
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Represents an ordered pair of integer x- and y-coordinates that defines a point in a two-dimensional plane.
   syntax:
@@ -46,7 +46,7 @@ items:
   fullName: Point.Point(Size)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Point Constructor
   remarks: Creates a Point from a Size value.
@@ -68,7 +68,7 @@ items:
   fullName: Point.Point(Int32, Int32)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Point Constructor
   remarks: Creates a Point from a specified x,y coordinate pair.
@@ -93,7 +93,7 @@ items:
   fullName: Point.Add(Point, Size)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Adds the specified Size to the specified Point.
   syntax:
@@ -120,7 +120,7 @@ items:
   fullName: Point.Empty
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Empty Shared Field
   remarks: An uninitialized Point Structure.
@@ -140,7 +140,7 @@ items:
   fullName: Point.Equals(Object)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Equals Method
   remarks: Checks equivalence of this Point and another object.
@@ -165,7 +165,7 @@ items:
   fullName: Point.GetHashCode()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: GetHashCode Method
   remarks: Calculates a hashing value.
@@ -187,7 +187,7 @@ items:
   fullName: Point.IsEmpty
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: IsEmpty Property
   remarks: Indicates if both X and Y are zero.
@@ -208,7 +208,7 @@ items:
   fullName: Point.Offset(Int32, Int32)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Offset Method
   remarks: Moves the Point a specified distance.
@@ -233,7 +233,7 @@ items:
   fullName: Point.Offset(Point)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Translates this Point by the specified Point.
   syntax:
@@ -254,7 +254,7 @@ items:
   fullName: Point.op_Addition(Point, Size)
   type: Operator
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Addition Operator
   remarks: >-
@@ -284,7 +284,7 @@ items:
   fullName: Point.op_Equality(Point, Point)
   type: Operator
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Equality Operator
   remarks: "Compares two Point objects. The return value is\n            	based on the equivalence of the X and Y properties \n            	of the two points."
@@ -312,7 +312,7 @@ items:
   fullName: Point.op_Explicit(Point to Size)
   type: Operator
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Point to Size Conversion
   remarks: "Returns a Size based on the Coordinates of a given \n            	Point. Requires explicit cast."
@@ -337,7 +337,7 @@ items:
   fullName: Point.op_Inequality(Point, Point)
   type: Operator
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Inequality Operator
   remarks: "Compares two Point objects. The return value is\n            	based on the equivalence of the X and Y properties \n            	of the two points."
@@ -365,7 +365,7 @@ items:
   fullName: Point.op_Subtraction(Point, Size)
   type: Operator
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Subtraction Operator
   remarks: "Translates a Point using the negation of the Width \n            	and Height properties of the given Size."
@@ -393,7 +393,7 @@ items:
   fullName: Point.Subtract(Point, Size)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Returns the result of subtracting specified Size from the specified Point.
   syntax:
@@ -420,7 +420,7 @@ items:
   fullName: Point.ToString()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: ToString Method
   remarks: Formats the Point as a string in coordinate notation.
@@ -442,7 +442,7 @@ items:
   fullName: Point.X
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets or sets the x-coordinate of this Point.
   syntax:
@@ -461,7 +461,7 @@ items:
   fullName: Point.Y
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets or sets the y-coordinate of this Point.
   syntax:

@@ -1,0 +1,26 @@
+### YamlMime:ManagedReference
+items:
+- uid: Mono.Terminal
+  id: Mono.Terminal
+  children:
+  - Mono.Terminal.MainLoop
+  - Mono.Terminal.MainLoop.Condition
+  langs:
+  - csharp
+  name: Mono.Terminal
+  nameWithType: Mono.Terminal
+  fullName: Mono.Terminal
+  type: Namespace
+references:
+- uid: Mono.Terminal.MainLoop
+  parent: Mono.Terminal
+  isExternal: false
+  name: MainLoop
+  nameWithType: MainLoop
+  fullName: Mono.Terminal.MainLoop
+- uid: Mono.Terminal.MainLoop.Condition
+  parent: Mono.Terminal
+  isExternal: false
+  name: MainLoop.Condition
+  nameWithType: MainLoop.Condition
+  fullName: Mono.Terminal.MainLoop.Condition

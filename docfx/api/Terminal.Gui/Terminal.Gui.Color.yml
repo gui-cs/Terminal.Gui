@@ -26,7 +26,7 @@ items:
   fullName: Terminal.Gui.Color
   type: Enum
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Basic colors that can be used to set the foreground and background colors in console applications.  These can only be
   syntax:
@@ -43,7 +43,7 @@ items:
   fullName: Color.Black
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The black color.
   syntax:
@@ -62,7 +62,7 @@ items:
   fullName: Color.Blue
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The blue color.
   syntax:
@@ -81,7 +81,7 @@ items:
   fullName: Color.BrighCyan
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The brigh cyan color.
   syntax:
@@ -100,7 +100,7 @@ items:
   fullName: Color.BrightBlue
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The bright bBlue color.
   syntax:
@@ -119,7 +119,7 @@ items:
   fullName: Color.BrightGreen
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The bright green color.
   syntax:
@@ -138,7 +138,7 @@ items:
   fullName: Color.BrightMagenta
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The bright magenta color.
   syntax:
@@ -157,7 +157,7 @@ items:
   fullName: Color.BrightRed
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The bright red color.
   syntax:
@@ -176,7 +176,7 @@ items:
   fullName: Color.BrightYellow
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The bright yellow color.
   syntax:
@@ -195,7 +195,7 @@ items:
   fullName: Color.Brown
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The brown color.
   syntax:
@@ -214,7 +214,7 @@ items:
   fullName: Color.Cyan
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The cyan color.
   syntax:
@@ -233,7 +233,7 @@ items:
   fullName: Color.DarkGray
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The dark gray color.
   syntax:
@@ -252,7 +252,7 @@ items:
   fullName: Color.Gray
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The gray color.
   syntax:
@@ -271,7 +271,7 @@ items:
   fullName: Color.Green
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The green color.
   syntax:
@@ -290,7 +290,7 @@ items:
   fullName: Color.Magenta
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The magenta color.
   syntax:
@@ -309,7 +309,7 @@ items:
   fullName: Color.Red
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The red color.
   syntax:
@@ -328,7 +328,7 @@ items:
   fullName: Color.White
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The White color.
   syntax:

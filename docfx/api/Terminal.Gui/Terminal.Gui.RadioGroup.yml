@@ -20,7 +20,7 @@ items:
   fullName: Terminal.Gui.RadioGroup
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Radio group shows a group of labels, only one of those can be selected at a given time
   syntax:
@@ -78,7 +78,7 @@ items:
   fullName: RadioGroup.RadioGroup(Rect, String[], Int32)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     Initializes a new instance of the <xref href="Terminal.RadioGroup"></xref> class
@@ -107,7 +107,7 @@ items:
   fullName: RadioGroup.RadioGroup(Int32, Int32, String[], Int32)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: "Initializes a new instance of the <xref href=\"Terminal.RadioGroup\"></xref> class\n            setting up the initial set of radio labels and the item that should be selected, \n            the view frame is computed from the provided radioLabels."
   syntax:
@@ -137,7 +137,7 @@ items:
   fullName: RadioGroup.MouseEvent(MouseEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool MouseEvent (Terminal.Gui.MouseEvent me);
@@ -160,7 +160,7 @@ items:
   fullName: RadioGroup.PositionCursor()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override void PositionCursor ();
@@ -177,7 +177,7 @@ items:
   fullName: RadioGroup.ProcessHotKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool ProcessHotKey (Terminal.Gui.KeyEvent kb);
@@ -200,7 +200,7 @@ items:
   fullName: RadioGroup.ProcessKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
@@ -223,7 +223,7 @@ items:
   fullName: RadioGroup.RadioLabels
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The radio labels to display
   syntax:
@@ -243,7 +243,7 @@ items:
   fullName: RadioGroup.Redraw(Rect)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override void Redraw (Terminal.Gui.Rect region);
@@ -263,7 +263,7 @@ items:
   fullName: RadioGroup.Selected
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The currently selected item from the list of radio labels
   syntax:
@@ -283,7 +283,7 @@ items:
   fullName: RadioGroup.SelectionChanged
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public Action<int> SelectionChanged;

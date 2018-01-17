@@ -30,7 +30,7 @@ items:
   fullName: Terminal.Gui.ConsoleDriver
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: ConsoleDriver is an abstract class that defines the requirements for a console driver.   One implementation if the CursesDriver, and another one uses the .NET Console one.
   syntax:
@@ -49,7 +49,7 @@ items:
   fullName: ConsoleDriver.ConsoleDriver()
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: protected ConsoleDriver ();
@@ -66,7 +66,7 @@ items:
   fullName: ConsoleDriver.AddCh(Int32)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Adds the specified rune to the display at the current cursor position
   syntax:
@@ -87,7 +87,7 @@ items:
   fullName: ConsoleDriver.AddSpecial(SpecialChar)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Draws a special characters in the screen
   syntax:
@@ -108,7 +108,7 @@ items:
   fullName: ConsoleDriver.AddStr(String)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Adds the specified
   syntax:
@@ -129,7 +129,7 @@ items:
   fullName: ConsoleDriver.Clip
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Controls the current clipping region that AddCh/AddStr is subject to.
   syntax:
@@ -149,7 +149,7 @@ items:
   fullName: ConsoleDriver.Cols
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The current number of columns in the terminal.
   syntax:
@@ -169,7 +169,7 @@ items:
   fullName: ConsoleDriver.DrawFrame(Rect, Boolean)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public abstract void DrawFrame (Terminal.Gui.Rect region, bool fill);
@@ -192,7 +192,7 @@ items:
   fullName: ConsoleDriver.End()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Ends the execution of the console driver.
   syntax:
@@ -210,7 +210,7 @@ items:
   fullName: ConsoleDriver.Init(Action)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Initializes the driver
   syntax:
@@ -231,7 +231,7 @@ items:
   fullName: ConsoleDriver.Move(Int32, Int32)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Moves the cursor to the specified column and row.
   syntax:
@@ -255,7 +255,7 @@ items:
   fullName: ConsoleDriver.PrepareToRun(MainLoop, Action<KeyEvent>, Action<MouseEvent>)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public abstract void PrepareToRun (Mono.Terminal.MainLoop mainLoop, Action<Terminal.Gui.KeyEvent> target, Action<Terminal.Gui.MouseEvent> mouse);
@@ -281,7 +281,7 @@ items:
   fullName: ConsoleDriver.RedrawTop()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public abstract void RedrawTop ();
@@ -298,7 +298,7 @@ items:
   fullName: ConsoleDriver.Refresh()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Updates the screen to reflect all the changes that have been done to the display buffer
   syntax:
@@ -316,7 +316,7 @@ items:
   fullName: ConsoleDriver.Rows
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The current number of rows in the terminal.
   syntax:
@@ -336,7 +336,7 @@ items:
   fullName: ConsoleDriver.SetAttribute(Attribute)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public abstract void SetAttribute (Terminal.Gui.Attribute c);
@@ -356,7 +356,7 @@ items:
   fullName: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
@@ -379,7 +379,7 @@ items:
   fullName: ConsoleDriver.SetColors(Int16, Int16)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: "Advanced uses - set colors to any pre-set pairs, you would need to init_color \n            that independently with the R, G, B values."
   syntax:
@@ -403,7 +403,7 @@ items:
   fullName: ConsoleDriver.StartReportingMouseMoves()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public abstract void StartReportingMouseMoves ();
@@ -420,7 +420,7 @@ items:
   fullName: ConsoleDriver.StopReportingMouseMoves()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public abstract void StopReportingMouseMoves ();
@@ -437,7 +437,7 @@ items:
   fullName: ConsoleDriver.Suspend()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Suspend the application, typically needs to save the state, suspend the app and upon return, reset the console driver.
   syntax:
@@ -556,7 +556,7 @@ references:
   fullName: ConsoleDriver.PrepareToRun(MainLoop, Action<KeyEvent>, Action<MouseEvent>)
 - uid: Mono.Terminal.MainLoop
   parent: Mono.Terminal
-  isExternal: true
+  isExternal: false
   name: MainLoop
   nameWithType: MainLoop
   fullName: Mono.Terminal.MainLoop

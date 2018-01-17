@@ -14,7 +14,7 @@ items:
   fullName: Terminal.Gui.MouseEvent
   type: Struct
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Describes a mouse event
   syntax:
@@ -32,7 +32,7 @@ items:
   fullName: MouseEvent.Flags
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Flags indicating the kind of mouse event that is being posted.
   syntax:
@@ -51,7 +51,7 @@ items:
   fullName: MouseEvent.ToString()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Returns a <xref href="System.String"></xref> that represents the current <xref href="Terminal.MouseEvent"></xref>.
   syntax:
@@ -72,7 +72,7 @@ items:
   fullName: MouseEvent.X
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The X (column) location for the mouse event.
   syntax:
@@ -91,7 +91,7 @@ items:
   fullName: MouseEvent.Y
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The Y (column) location for the mouse event.
   syntax:

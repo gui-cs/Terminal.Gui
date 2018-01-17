@@ -15,7 +15,7 @@ items:
   fullName: Terminal.Gui.Toplevel
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Toplevel views can be modally executed.
   remarks: >-
@@ -83,7 +83,7 @@ items:
   fullName: Toplevel.Toplevel(Rect)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Initializes a new instance of the <xref href="Terminal.Toplevel"></xref> class.
   syntax:
@@ -104,7 +104,7 @@ items:
   fullName: Toplevel.CanFocus
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool CanFocus { get; }
@@ -123,7 +123,7 @@ items:
   fullName: Toplevel.Create()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Convenience factory method that creates a new toplevel with the current terminal dimensions.
   syntax:
@@ -144,7 +144,7 @@ items:
   fullName: Toplevel.ProcessKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
@@ -167,7 +167,7 @@ items:
   fullName: Toplevel.Running
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     This flag is checked on each iteration of the mainloop and it continues

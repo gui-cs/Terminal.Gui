@@ -23,7 +23,7 @@ items:
   fullName: Terminal.Gui.Button
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Button is a view that provides an item that invokes a callback when activated.
   remarks: >-
@@ -91,7 +91,7 @@ items:
   fullName: Button.Button(String)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     Public constructor, creates a button based on
@@ -117,7 +117,7 @@ items:
   fullName: Button.Button(String, Boolean)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     Public constructor, creates a button based on
@@ -147,7 +147,7 @@ items:
   fullName: Button.Button(Int32, Int32, String)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     Public constructor, creates a button based on
@@ -179,7 +179,7 @@ items:
   fullName: Button.Button(Int32, Int32, String, Boolean)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: >-
     Public constructor, creates a button based on
@@ -215,7 +215,7 @@ items:
   fullName: Button.Clicked
   type: Field
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Clicked event, raised when the button is clicked.
   remarks: >-
@@ -238,7 +238,7 @@ items:
   fullName: Button.IsDefault
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Gets or sets a value indicating whether this <xref href="Terminal.Button"></xref> is the default action to activate on return on a dialog.
   syntax:
@@ -258,7 +258,7 @@ items:
   fullName: Button.MouseEvent(MouseEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool MouseEvent (Terminal.Gui.MouseEvent me);
@@ -281,7 +281,7 @@ items:
   fullName: Button.PositionCursor()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override void PositionCursor ();
@@ -298,7 +298,7 @@ items:
   fullName: Button.ProcessColdKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool ProcessColdKey (Terminal.Gui.KeyEvent kb);
@@ -321,7 +321,7 @@ items:
   fullName: Button.ProcessHotKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool ProcessHotKey (Terminal.Gui.KeyEvent kb);
@@ -344,7 +344,7 @@ items:
   fullName: Button.ProcessKey(KeyEvent)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
@@ -367,7 +367,7 @@ items:
   fullName: Button.Redraw(Rect)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override void Redraw (Terminal.Gui.Rect region);
@@ -387,7 +387,7 @@ items:
   fullName: Button.Text
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The text displayed by this widget.
   syntax:

@@ -15,7 +15,7 @@ items:
   fullName: Terminal.Gui.Window
   type: Class
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: A toplevel view that draws a frame around its region and has a "ContentView" subview where the contents are added.
   syntax:
@@ -81,7 +81,7 @@ items:
   fullName: Window.Window(Rect, String)
   type: Constructor
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Initializes a new instance of the <xref href="Terminal.Window"></xref> class with an optioanl title
   syntax:
@@ -105,7 +105,7 @@ items:
   fullName: Window.Add(View)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Add the specified view to the ContentView.
   syntax:
@@ -126,7 +126,7 @@ items:
   fullName: Window.GetEnumerator()
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: Enumerates the various views in the ContentView.
   syntax:
@@ -147,7 +147,7 @@ items:
   fullName: Window.Redraw(Rect)
   type: Method
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
     content: public override void Redraw (Terminal.Gui.Rect bounds);
@@ -167,7 +167,7 @@ items:
   fullName: Window.Title
   type: Property
   assemblies:
-  - Terminal
+  - Terminal.Gui
   namespace: Terminal.Gui
   summary: The title to be displayed for this window.
   syntax:

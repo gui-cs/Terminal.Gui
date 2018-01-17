@@ -1,0 +1,35 @@
+<Type Name="SpecialChar" FullName="Terminal.Gui.SpecialChar">
+  <TypeSignature Language="C#" Value="public enum SpecialChar" />
+  <TypeSignature Language="ILAsm" Value=".class public auto ansi sealed SpecialChar extends System.Enum" />
+  <AssemblyInfo>
+    <AssemblyName>Terminal.Gui</AssemblyName>
+    <AssemblyVersion>0.0.0.0</AssemblyVersion>
+  </AssemblyInfo>
+  <Base>
+    <BaseTypeName>System.Enum</BaseTypeName>
+  </Base>
+  <Docs>
+    <summary>
+            Special characters that can be drawn with Driver.AddSpecial.
+            </summary>
+    <remarks>To be added.</remarks>
+  </Docs>
+  <Members>
+    <Member MemberName="HLine">
+      <MemberSignature Language="C#" Value="HLine" />
+      <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.SpecialChar HLine = int32(0)" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.SpecialChar</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Horizontal line character.
+            </summary>
+      </Docs>
+    </Member>
+  </Members>
+</Type>
