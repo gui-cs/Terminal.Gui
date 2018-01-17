@@ -20,7 +20,7 @@ Go to the [API documentation](https://migueldeicaza.github.io/gui.cs/api/Termina
 
 # Sample Usage
 
-```
+```csharp
 using Terminal.Gui;
 
 class Demo {
