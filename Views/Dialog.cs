@@ -25,6 +25,8 @@ namespace Terminal {
 		/// <param name="buttons">Optional buttons to lay out at the bottom of the dialog.</param>
 		public Dialog (string title, int width, int height, params Button [] buttons) : base (Application.MakeCenteredRect (new Size (width, height)), title)
 		{
+			ColorScheme = Colors.Dialog;
+
 			foreach (var b in buttons) {
 				this.buttons.Add (b);
 				Add (b);

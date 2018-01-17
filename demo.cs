@@ -31,7 +31,7 @@ class Demo {
 	{
 		var d = new Dialog (
 			"New File", 50, 20,
-			new Button ("Ok", is_default: true ) { Clicked = () => { Application.RequestStop (); } },
+			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
 			new Button ("Cancel") { Clicked = () => { Application.RequestStop (); } });
 		ml2 = new Label (1, 1, "Mouse Debug Line");
 		d.Add (ml2);
@@ -42,6 +42,11 @@ class Demo {
 	{
 		var n = MessageBox.Query (50, 5, "Quit Demo", "Are you sure you want to quit this demo?", "Yes", "No");
 		return n == 0;
+	}
+
+	static void Close ()
+	{
+		MessageBox.ErrorQuery (50, 5, "Error", "There is nothing to close", "Ok");
 	}
 
 	public static Label ml;
@@ -56,7 +61,7 @@ class Demo {
 			new MenuBarItem ("_File", new MenuItem [] {
 				new MenuItem ("_New", "Creates new file", NewFile),
 				new MenuItem ("_Open", "", null),
-				new MenuItem ("_Close", "", null),
+				new MenuItem ("_Close", "", () => Close ()),
 				new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {

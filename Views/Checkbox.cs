@@ -82,14 +82,14 @@ namespace Terminal {
 
 		public override void Redraw (Rect region)
 		{
-			Driver.SetAttribute (HasFocus ? Colors.Base.Focus : Colors.Base.Normal);
+			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			Move (0, 0);
 			Driver.AddStr (Checked ? "[x] " : "[ ] ");
 			Move (4, 0);
 			Driver.AddStr (Text);
 			if (hot_pos != -1) {
 				Move (4 + hot_pos, 0);
-				Driver.SetAttribute (HasFocus ? Colors.Base.HotFocus : Colors.Base.HotNormal);
+				Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
 				Driver.AddCh (hot_key);
 			}
 		}

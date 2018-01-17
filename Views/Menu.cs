@@ -127,18 +127,19 @@ namespace Terminal {
 		{
 			this.barItems = barItems;
 			this.host = host;
+			ColorScheme = Colors.Menu;
 			CanFocus = true;
 		}
 
 		public override void Redraw (Rect region)
 		{
-			Driver.SetAttribute (Colors.Menu.Normal);
+			Driver.SetAttribute (ColorScheme.Normal);
 			DrawFrame (region, true);
 
 			for (int i = 0; i < barItems.Children.Length; i++){
 				var item = barItems.Children [i];
 				Move (1, i+1);
-				Driver.SetAttribute (item == null ? Colors.Base.Focus : i == current ? Colors.Menu.Focus : Colors.Menu.Normal);
+				Driver.SetAttribute (item == null ? Colors.Base.Focus : i == current ? ColorScheme.Focus : ColorScheme.Normal);
 				for (int p = 0; p < Frame.Width-2; p++)
 					if (item == null)
 						Driver.AddSpecial (SpecialChar.HLine);
@@ -150,8 +151,8 @@ namespace Terminal {
 
 				Move (2, i + 1);
 				DrawHotString (item.Title,
-				               i == current? Colors.Menu.HotFocus : Colors.Menu.HotNormal,
-				               i == current ? Colors.Menu.Focus : Colors.Menu.Normal);
+				               i == current? ColorScheme.HotFocus : ColorScheme.HotNormal,
+				               i == current ? ColorScheme.Focus : ColorScheme.Normal);
 
 				// The help string
 				var l = item.Help.Length;
@@ -269,6 +270,7 @@ namespace Terminal {
 			Menus = menus;
 			CanFocus = false;
 			selected = -1;
+			ColorScheme = Colors.Menu;
 		}
 
 		public override void Redraw (Rect region)
@@ -286,8 +288,8 @@ namespace Terminal {
 				Move (pos, 0);
 				Attribute hotColor, normalColor;
 				if (i == selected){
-					hotColor = i == selected ? Colors.Menu.HotFocus : Colors.Menu.HotNormal;
-					normalColor = i == selected ? Colors.Menu.Focus : Colors.Menu.Normal;
+					hotColor = i == selected ? ColorScheme.HotFocus : ColorScheme.HotNormal;
+					normalColor = i == selected ? ColorScheme.Focus : ColorScheme.Normal;
 				} else {
 					hotColor = Colors.Base.Focus;
 					normalColor = Colors.Base.Focus;

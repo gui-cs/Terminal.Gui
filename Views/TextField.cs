@@ -45,7 +45,6 @@ namespace Terminal {
 			point = s.Length;
 			first = point > w ? point - w : 0;
 			CanFocus = true;
-			Color = Colors.Dialog.Focus;
 		}
 
 		/// <summary>
@@ -75,19 +74,6 @@ namespace Terminal {
 		/// </remarks>
 		public bool Secret { get; set; }
 
-		Attribute color;
-		/// <summary>
-		/// Sets the color attribute to use (includes foreground and background).
-		/// </summary>
-		/// <value>The color.</value>
-		public Attribute Color {
-			get => color;
-			set {
-				color = value;
-				SetNeedsDisplay ();
-			}
-		}
-
 		/// <summary>
 		///    The current cursor position.
 		/// </summary>
@@ -103,7 +89,7 @@ namespace Terminal {
 
 		public override void Redraw (Rect region)
 		{
-			Driver.SetAttribute (Color);
+			Driver.SetAttribute (ColorScheme.Focus);
 			Move (0, 0);
 
 			for (int i = 0; i < Frame.Width; i++) {

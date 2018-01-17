@@ -127,7 +127,7 @@ namespace Terminal {
 			if (TextColor != -1)
 				Driver.SetAttribute (TextColor);
 			else
-				Driver.SetAttribute (Colors.Base.Normal);
+				Driver.SetAttribute (ColorScheme.Normal);
 
 			Clear ();
 			Move (Frame.X, Frame.Y);

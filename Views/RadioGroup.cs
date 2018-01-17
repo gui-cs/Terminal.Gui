@@ -63,9 +63,9 @@ namespace Terminal {
 			base.Redraw (region);
 			for (int i = 0; i < radioLabels.Length; i++) {
 				Move (0, i);
-				Driver.SetAttribute (Colors.Base.Normal);
+				Driver.SetAttribute (ColorScheme.Normal);
 				Driver.AddStr (i == selected ? "(o) " : "( ) ");
-				DrawHotString (radioLabels [i], HasFocus && i == cursor, Colors.Base);
+				DrawHotString (radioLabels [i], HasFocus && i == cursor, ColorScheme);
 			}
 		}
 

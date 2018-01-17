@@ -54,7 +54,9 @@ namespace Terminal {
 	}
 
 	/// <summary>
-	/// Color scheme definitions
+	/// Color scheme definitions, they cover some common scenarios and are used
+	/// typically in toplevel containers to set the scheme that is used by all the
+	/// views contained inside.
 	/// </summary>
 	public class ColorScheme {
 		public Attribute Normal;

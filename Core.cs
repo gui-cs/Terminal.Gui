@@ -132,6 +132,19 @@ namespace Terminal {
 	///    Developers can call the SetNeedsDisplay method on the view to flag a region or the entire view
 	///    as requiring to be redrawn.
 	/// </para>
+	/// <para>
+	///    Views have a ColorScheme property that defines the default colors that subviews
+	///    should use for rendering.   This ensures that the views fit in the context where
+	///    they are being used, and allows for themes to be plugged in.   For example, the
+	///    default colors for windows and toplevels uses a blue background, while it uses 
+	///    a white background for dialog boxes and a red background for errors.
+	/// </para>
+	/// <para>
+	///    If a ColorScheme is not set on a view, the result of the ColorScheme is the
+	///    value of the SuperView and the value might only be valid once a view has been
+	///    added to a SuperView, so your subclasses should not rely on ColorScheme being
+	///    set at construction time.
+	/// </para>
 	/// </remarks>
 	public class View : Responder, IEnumerable {
 		string id = "";
@@ -531,6 +544,23 @@ namespace Terminal {
 		}
 
 		/// <summary>
+		/// The color scheme for this view, if it is not defined, it returns the parent's
+		/// color scheme.
+		/// </summary>
+		public ColorScheme ColorScheme {
+			get {
+				if (colorScheme == null)
+					return SuperView?.ColorScheme;
+				return colorScheme;
+			}
+			set {
+				colorScheme = value;
+			}
+		}
+
+		ColorScheme colorScheme;
+
+		/// <summary>
 		/// Displays the specified character in the specified column and row.
 		/// </summary>
 		/// <param name="col">Col.</param>
@@ -808,6 +838,7 @@ namespace Terminal {
 		/// <param name="frame">Frame.</param>
 		public Toplevel (Rect frame) : base (frame)
 		{
+			ColorScheme = Colors.Base;
 		}
 
 		/// <summary>
@@ -930,10 +961,10 @@ namespace Terminal {
 		public override void Redraw (Rect bounds)
 		{
 			if (!NeedDisplay.IsEmpty) {
-				Driver.SetAttribute (Colors.Base.Normal);
+				Driver.SetAttribute (ColorScheme.Normal);
 				DrawFrame ();
 				if (HasFocus)
-					Driver.SetAttribute (Colors.Dialog.Normal);
+					Driver.SetAttribute (ColorScheme.Normal);
 				var width = Frame.Width;
 				if (Title != null && width > 4) {
 					Move (1, 0);
@@ -942,7 +973,7 @@ namespace Terminal {
 					Driver.AddStr (str);
 					Driver.AddCh (' ');
 				}
-				Driver.SetAttribute (Colors.Dialog.Normal);
+				Driver.SetAttribute (ColorScheme.Normal);
 			}
 			contentView.Redraw (contentView.Bounds);
 			ClearNeedsDisplay ();
