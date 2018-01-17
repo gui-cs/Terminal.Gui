@@ -16,21 +16,69 @@ namespace Terminal {
 	/// Basic colors that can be used to set the foreground and background colors in console applications.  These can only be
 	/// </summary>
 	public enum Color {
+		/// <summary>
+		/// The black color.
+		/// </summary>
 		Black,
+		/// <summary>
+		/// The blue color.
+		/// </summary>
 		Blue,
+		/// <summary>
+		/// The green color.
+		/// </summary>
 		Green,
+		/// <summary>
+		/// The cyan color.
+		/// </summary>
 		Cyan,
+		/// <summary>
+		/// The red color.
+		/// </summary>
 		Red,
+		/// <summary>
+		/// The magenta color.
+		/// </summary>
 		Magenta,
+		/// <summary>
+		/// The brown color.
+		/// </summary>
 		Brown,
+		/// <summary>
+		/// The gray color.
+		/// </summary>
 		Gray,
+		/// <summary>
+		/// The dark gray color.
+		/// </summary>
 		DarkGray,
+		/// <summary>
+		/// The bright bBlue color.
+		/// </summary>
 		BrightBlue,
+		/// <summary>
+		/// The bright green color.
+		/// </summary>
 		BrightGreen,
+		/// <summary>
+		/// The brigh cyan color.
+		/// </summary>
 		BrighCyan,
+		/// <summary>
+		/// The bright red color.
+		/// </summary>
 		BrightRed,
+		/// <summary>
+		/// The bright magenta color.
+		/// </summary>
 		BrightMagenta,
+		/// <summary>
+		/// The bright yellow color.
+		/// </summary>
 		BrightYellow,
+		/// <summary>
+		/// The White color.
+		/// </summary>
 		White
 	}
 
@@ -59,18 +107,58 @@ namespace Terminal {
 	/// views contained inside.
 	/// </summary>
 	public class ColorScheme {
+		/// <summary>
+		/// The default color for text, when the view is not focused.
+		/// </summary>
 		public Attribute Normal;
+		/// <summary>
+		/// The color for text when the view has the focus.
+		/// </summary>
 		public Attribute Focus;
+
+		/// <summary>
+		/// The color for the hotkey when a view is not focused
+		/// </summary>
 		public Attribute HotNormal;
+
+		/// <summary>
+		/// The color for the hotkey when the view is focused.
+		/// </summary>
 		public Attribute HotFocus;
 	}
 
+	/// <summary>
+	/// The default ColorSchemes for the application.
+	/// </summary>
 	public static class Colors {
-		public static ColorScheme Base, Dialog, Menu, Error;
+		/// <summary>
+		/// The base color scheme, for the default toplevel views.
+		/// </summary>
+		public static ColorScheme Base;
+		/// <summary>
+		/// The dialog color scheme, for standard popup dialog boxes
+		/// </summary>
+		public static ColorScheme Dialog;
+
+		/// <summary>
+		/// The menu bar color
+		/// </summary>
+		public static ColorScheme Menu;
+
+		/// <summary>
+		/// The color scheme for showing errors.
+		/// </summary>
+		public static ColorScheme Error;
 
 	}
 
+	/// <summary>
+	/// Special characters that can be drawn with Driver.AddSpecial.
+	/// </summary>
 	public enum SpecialChar {
+		/// <summary>
+		/// Horizontal line character.
+		/// </summary>
 		HLine,
 	}
 
@@ -78,14 +166,45 @@ namespace Terminal {
 	/// ConsoleDriver is an abstract class that defines the requirements for a console driver.   One implementation if the CursesDriver, and another one uses the .NET Console one.
 	/// </summary>
 	public abstract class ConsoleDriver {
+		/// <summary>
+		/// The current number of columns in the terminal.
+		/// </summary>
 		public abstract int Cols { get; }
+		/// <summary>
+		/// The current number of rows in the terminal.
+		/// </summary>
 		public abstract int Rows { get; }
+		/// <summary>
+		/// Initializes the driver
+		/// </summary>
+		/// <param name="terminalResized">Method to invoke when the terminal is resized.</param>
 		public abstract void Init (Action terminalResized);
+		/// <summary>
+		/// Moves the cursor to the specified column and row.
+		/// </summary>
+		/// <param name="col">Column to move the cursor to.</param>
+		/// <param name="row">Row to move the cursor to.</param>
 		public abstract void Move (int col, int row);
-		public abstract void AddCh (int ch);
+		/// <summary>
+		/// Adds the specified rune to the display at the current cursor position
+		/// </summary>
+		/// <param name="rune">Rune to add.</param>
+		public abstract void AddCh (int rune);
+		/// <summary>
+		/// Adds the specified 
+		/// </summary>
+		/// <param name="str">String.</param>
 		public abstract void AddStr (string str);
 		public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> target, Action<MouseEvent> mouse);
+
+		/// <summary>
+		/// Updates the screen to reflect all the changes that have been done to the display buffer
+		/// </summary>
 		public abstract void Refresh ();
+
+		/// <summary>
+		/// Ends the execution of the console driver.
+		/// </summary>
 		public abstract void End ();
 		public abstract void RedrawTop ();
 		public abstract void SetAttribute (Attribute c);
@@ -95,14 +214,32 @@ namespace Terminal {
 
 		// Advanced uses - set colors to any pre-set pairs, you would need to init_color
 		// that independently with the R, G, B values.
-		public abstract void SetColors (short foreColorId, short backgroundColorId);
+		/// <summary>
+		/// Advanced uses - set colors to any pre-set pairs, you would need to init_color 
+		/// that independently with the R, G, B values.
+		/// </summary>
+		/// <param name="foregroundColorId">Foreground color identifier.</param>
+		/// <param name="backgroundColorId">Background color identifier.</param>
+		public abstract void SetColors (short foregroundColorId, short backgroundColorId);
 
 		public abstract void DrawFrame (Rect region, bool fill);
+		/// <summary>
+		/// Draws a special characters in the screen
+		/// </summary>
+		/// <param name="ch">Ch.</param>
 		public abstract void AddSpecial (SpecialChar ch);
 
+		/// <summary>
+		/// Suspend the application, typically needs to save the state, suspend the app and upon return, reset the console driver.
+		/// </summary>
 		public abstract void Suspend ();
 
 		Rect clip;
+
+		/// <summary>
+		/// Controls the current clipping region that AddCh/AddStr is subject to.
+		/// </summary>
+		/// <value>The clip.</value>
 		public Rect Clip {
 			get => clip;
 			set => this.clip = value;
@@ -115,7 +252,7 @@ namespace Terminal {
 	/// <summary>
 	/// This is the Curses driver for the gui.cs/Terminal framework.
 	/// </summary>
-	public class CursesDriver : ConsoleDriver {
+	internal class CursesDriver : ConsoleDriver {
 		Action terminalResized;
 
 		public override int Cols => Curses.Cols;
@@ -139,14 +276,14 @@ namespace Terminal {
 		}
 
 		static bool sync;
-		public override void AddCh (int ch)
+		public override void AddCh (int rune)
 		{
 			if (Clip.Contains (ccol, crow)) {
 				if (needMove) {
 					Curses.move (crow, ccol);
 					needMove = false;
 				}
-				Curses.addch (ch);
+				Curses.addch (rune);
 			} else
 				needMove = true;
 			if (sync)
@@ -166,8 +303,8 @@ namespace Terminal {
 		public override void AddStr (string str)
 		{
 			// TODO; optimize this to determine if the str fits in the clip region, and if so, use Curses.addstr directly
-			foreach (var c in str)
-				AddCh ((int)c);
+			foreach (var rune in str)
+				AddCh ((int)rune);
 		}
 
 		public override void Refresh () => Curses.refresh ();

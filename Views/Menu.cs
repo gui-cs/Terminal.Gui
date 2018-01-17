@@ -101,6 +101,10 @@ namespace Terminal {
 			TitleLength = len;
 		}
 
+		/// <summary>
+		/// Gets or sets the title to display.
+		/// </summary>
+		/// <value>The title.</value>
 		public string Title { get; set; }
 		public MenuItem [] Children { get; set; }
 		internal int TitleLength { get; private set; }

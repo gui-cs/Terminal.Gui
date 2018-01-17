@@ -145,9 +145,12 @@ namespace Terminal {
 	///    added to a SuperView, so your subclasses should not rely on ColorScheme being
 	///    set at construction time.
 	/// </para>
+	/// <para>
+	///    Using ColorSchemes has the advantage that your application will work both
+	///    in color as well as black and white displays.
+	/// </para>
 	/// </remarks>
 	public class View : Responder, IEnumerable {
-		string id = "";
 		View container = null;
 		View focused = null;
 
@@ -170,12 +173,11 @@ namespace Terminal {
 		// The frame for the object
 		Rect frame;
 
-		public string Id {
-			get => id;
-			set {
-				id = value;
-			}
-		}
+		/// <summary>
+		/// Gets or sets an identifier for the view;
+		/// </summary>
+		/// <value>The identifier.</value>
+		public string Id { get; set; } = "";
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="T:Terminal.View"/> want mouse position reports.
@@ -816,7 +818,7 @@ namespace Terminal {
 		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.View"/>.</returns>
 		public override string ToString ()
 		{
-			return $"{GetType ().Name}({id})({Frame})";
+			return $"{GetType ().Name}({Id})({Frame})";
 		}
 	}
 
@@ -830,6 +832,10 @@ namespace Terminal {
 	///   </para>
 	/// </remarks>
 	public class Toplevel : View {
+		/// <summary>
+		/// This flag is checked on each iteration of the mainloop and it continues
+		/// running until this flag is set to false.   
+		/// </summary>
 		public bool Running;
 
 		/// <summary>
@@ -1143,6 +1149,9 @@ namespace Terminal {
 			Current = Top;
 		}
 
+		/// <summary>
+		/// Captures the execution state for the provided TopLevel view.
+		/// </summary>
 		public class RunState : IDisposable {
 			internal RunState (Toplevel view)
 			{
@@ -1150,12 +1159,25 @@ namespace Terminal {
 			}
 			internal Toplevel Toplevel;
 
+			/// <summary>
+			/// Releases all resource used by the <see cref="T:Terminal.Application.RunState"/> object.
+			/// </summary>
+			/// <remarks>Call <see cref="Dispose"/> when you are finished using the <see cref="T:Terminal.Application.RunState"/>. The
+			/// <see cref="Dispose"/> method leaves the <see cref="T:Terminal.Application.RunState"/> in an unusable state. After
+			/// calling <see cref="Dispose"/>, you must release all references to the
+			/// <see cref="T:Terminal.Application.RunState"/> so the garbage collector can reclaim the memory that the
+			/// <see cref="T:Terminal.Application.RunState"/> was occupying.</remarks>
 			public void Dispose ()
 			{
 				Dispose (true);
 				GC.SuppressFinalize (this);
 			}
 
+			/// <summary>
+			/// Dispose the specified disposing.
+			/// </summary>
+			/// <returns>The dispose.</returns>
+			/// <param name="disposing">If set to <c>true</c> disposing.</param>
 			public virtual void Dispose (bool disposing)
 			{
 				if (Toplevel != null) {
@@ -1370,7 +1392,7 @@ namespace Terminal {
 			}
 		}
 
-		public static bool DebugDrawBounds;
+		internal static bool DebugDrawBounds;
 
 		// Need to look into why this does not work properly.
 		static void DrawBounds (View v)
