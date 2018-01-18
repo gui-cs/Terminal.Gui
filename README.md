@@ -60,8 +60,6 @@ class Demo {
             new Button (10, 14, "Cancel"),
             new Label (3, 18, "Press ESC and 9 to activate the menubar"));
 
-        ShowEntries (win);
-
         Application.Run ();
     }
 }
