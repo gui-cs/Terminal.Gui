@@ -40,7 +40,7 @@ class Demo {
 
 	static bool Quit ()
 	{
-		var n = MessageBox.Query (50, 5, "Quit Demo", "Are you sure you want to quit this demo?", "Yes", "No");
+		var n = MessageBox.Query (50, 7, "Quit Demo", "Are you sure you want to quit this demo?", "Yes", "No");
 		return n == 0;
 	}
 

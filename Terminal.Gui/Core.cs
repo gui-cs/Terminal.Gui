@@ -444,13 +444,14 @@ namespace Terminal.Gui {
 		/// Draws a frame in the current view, clipped by the boundary of this view
 		/// </summary>
 		/// <param name="rect">Rectangular region for the frame to be drawn.</param>
+		/// <param name="padding">The padding to add to the drawn frame.</param>
 		/// <param name="fill">If set to <c>true</c> it fill will the contents.</param>
-		public void DrawFrame (Rect rect, bool fill = false)
+		public void DrawFrame (Rect rect, int padding = 0, bool fill = false)
 		{
 			var scrRect = RectToScreen (rect);
 			var savedClip = Driver.Clip;
 			Driver.Clip = ScreenClip (RectToScreen (Bounds));
-			Driver.DrawFrame (scrRect, fill);
+			Driver.DrawFrame (scrRect, padding, fill);
 			Driver.Clip = savedClip;
 		}
 
@@ -933,10 +934,25 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		/// <param name="title">Title.</param>
-		public Window (Rect frame, string title = null) : base (frame)
+		public Window (Rect frame, string title = null) : this (frame, title, padding: 0)
+		{
+		}
+
+		int padding;
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Window"/> with
+		/// the specified frame for its location, with the specified border 
+		/// an optional title.
+		/// </summary>
+		/// <param name="frame">Frame.</param>
+		/// <param name="padding">Number of characters to use for padding of the drawn frame.</param>
+		/// <param name="title">Title.</param>
+		public Window (Rect frame, string title = null, int padding = 0) : base (frame)
 		{
 			this.Title = title;
-			var cFrame = new Rect (1, 1, frame.Width - 2, frame.Height - 2);
+			int wb = 2 * (1 + padding);
+			this.padding = padding;
+			var cFrame = new Rect (1 + padding, 1 + padding, frame.Width - wb, frame.Height - wb);
 			contentView = new ContentView (cFrame);
 			base.Add (contentView);
 		}
@@ -952,7 +968,7 @@ namespace Terminal.Gui {
 
 		void DrawFrame ()
 		{
-			DrawFrame (new Rect (0, 0, Frame.Width, Frame.Height), true);
+			DrawFrame (new Rect (0, 0, Frame.Width, Frame.Height), padding, fill: true);
 		}
 
 		/// <summary>
@@ -973,7 +989,7 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (ColorScheme.Normal);
 				var width = Frame.Width;
 				if (Title != null && width > 4) {
-					Move (1, 0);
+					Move (1+padding, padding);
 					Driver.AddCh (' ');
 					var str = Title.Length > width ? Title.Substring (0, width - 4) : Title;
 					Driver.AddStr (str);
@@ -1397,7 +1413,7 @@ namespace Terminal.Gui {
 		// Need to look into why this does not work properly.
 		static void DrawBounds (View v)
 		{
-			v.DrawFrame (v.Frame, false);
+			v.DrawFrame (v.Frame, padding: 0, fill: false);
 			if (v.Subviews != null && v.Subviews.Count > 0)
 				foreach (var sub in v.Subviews)
 					DrawBounds (sub);

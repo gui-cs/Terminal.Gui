@@ -222,7 +222,7 @@ namespace Terminal.Gui {
 		/// <param name="backgroundColorId">Background color identifier.</param>
 		public abstract void SetColors (short foregroundColorId, short backgroundColorId);
 
-		public abstract void DrawFrame (Rect region, bool fill);
+		public abstract void DrawFrame (Rect region, int padding, bool fill);
 		/// <summary>
 		/// Draws a special characters in the screen
 		/// </summary>
@@ -275,7 +275,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static bool sync;
+		static bool sync = true;
 		public override void AddCh (int rune)
 		{
 			if (Clip.Contains (ccol, crow)) {
@@ -444,32 +444,59 @@ namespace Terminal.Gui {
 
 		}
 
-		public override void DrawFrame (Rect region, bool fill)
+		public override void DrawFrame (Rect region, int padding, bool fill)
 		{
 			int width = region.Width;
 			int height = region.Height;
 			int b;
+			int fwidth = width - padding * 2;
+			int fheight = height - 1 - padding;
 
 			Move (region.X, region.Y);
+			if (padding > 0) {
+				for (int l = 0; l < padding; l++)
+					for (b = 0; b < width; b++)
+						AddCh (' ');
+			}
+			Move (region.X, region.Y + padding);
+			for (int c = 0; c < padding; c++)
+				AddCh (' ');
 			AddCh (Curses.ACS_ULCORNER);
-			for (b = 0; b < width - 2; b++)
+			for (b = 0; b < fwidth - 2; b++)
 				AddCh (Curses.ACS_HLINE);
 			AddCh (Curses.ACS_URCORNER);
-			for (b = 1; b < height - 1; b++) {
+			for (int c = 0; c < padding; c++)
+				AddCh (' ');
+				
+			for (b = 1+padding; b < fheight; b++) {
 				Move (region.X, region.Y + b);
+				for (int c = 0; c < padding; c++)
+					AddCh (' ');
 				AddCh (Curses.ACS_VLINE);
-				if (fill) {
-					for (int x = 1; x < width - 1; x++)
+				if (fill) {	
+					for (int x = 1; x < fwidth - 1; x++)
 						AddCh (' ');
 				} else
-					Move (region.X + width - 1, region.Y + b);
+					Move (region.X + fwidth - 1, region.Y + b);
 				AddCh (Curses.ACS_VLINE);
+				for (int c = 0; c < padding; c++)
+					AddCh (' ');
 			}
-			Move (region.X, region.Y + height - 1);
+			Move (region.X, region.Y + fheight);
+			for (int c = 0; c < padding; c++)
+				AddCh (' ');
 			AddCh (Curses.ACS_LLCORNER);
-			for (b = 0; b < width - 2; b++)
+			for (b = 0; b < fwidth - 2; b++)
 				AddCh (Curses.ACS_HLINE);
 			AddCh (Curses.ACS_LRCORNER);
+			for (int c = 0; c < padding; c++)
+				AddCh (' ');
+			if (padding > 0) {
+				Move (region.X, region.Y + height - padding);
+				for (int l = 0; l < padding; l++)
+					for (b = 0; b < width; b++)
+						AddCh (' ');
+			}
 		}
 
 		Curses.Event oldMouseEvents, reportableMouseEvents;
@@ -623,6 +650,184 @@ namespace Terminal.Gui {
 				return false;
 			killpg (0, signal);
 			return true;
+		}
+	}
+
+	internal class NetDriver : ConsoleDriver {
+		public override int Cols => Console.WindowWidth;
+		public override int Rows => Console.WindowHeight;
+
+		int [,,] contents;
+		bool [] dirtyLine;
+
+		static int MakeColor (int fg, int bg)
+		{
+			return (fg << 16) | bg;
+		}
+
+		void UpdateOffscreen ()
+		{
+			int cols = Cols;
+			int rows = Rows;
+
+			contents = new int [cols, rows, 3];
+			for (int r = 0; r < rows; r++) {
+				for (int c = 0; c < cols; c++) {
+					contents [r, c, 0] = ' ';
+					contents [r, c, 1] = MakeColor (7, 0);
+					contents [r, c, 2] = 0;
+				}
+			}
+			dirtyLine = new bool [rows];
+			for (int row = 0; row < rows; row++)
+				dirtyLine [row] = true;
+		}
+
+		public NetDriver ()
+		{
+			UpdateOffscreen ();
+		}
+
+		// Current row, and current col, tracked by Move/AddCh only
+		int ccol, crow;
+		public override void Move (int col, int row)
+		{
+			ccol = col;
+			crow = row;
+		}
+
+		public override void AddCh (int rune)
+		{
+			if (Clip.Contains (ccol, crow)) {
+				contents [crow, ccol, 0] = rune;
+				contents [crow, ccol, 2] = 1;
+			}
+			ccol++;
+			if (ccol == Cols) {
+				ccol = 0;
+				if (crow + 1 < Rows)
+					crow++;
+			}
+		}
+
+		public override void AddSpecial (SpecialChar ch)
+		{
+			AddCh ('*');
+		}
+
+		public override void AddStr (string str)
+		{
+			foreach (var rune in str)
+				AddCh ((int)rune);
+		}
+
+		public override void DrawFrame(Rect region, int padding, bool fill)
+		{
+			int width = region.Width;
+			int height = region.Height;
+			int b;
+
+			Move (region.X, region.Y);
+			AddCh ('+');
+			for (b = 0; b < width - 2; b++)
+				AddCh ('-');
+			AddCh ('+');
+			for (b = 1; b < height - 1; b++) {
+				Move (region.X, region.Y + b);
+				AddCh ('|');
+				if (fill) {
+					for (int x = 1; x < width - 1; x++)
+						AddCh (' ');
+				} else
+					Move (region.X + width - 1, region.Y + b);
+				AddCh ('|');
+			}
+			Move (region.X, region.Y + height - 1);
+			AddCh ('+');
+			for (b = 0; b < width - 2; b++)
+				AddCh ('-');
+			AddCh ('+');
+		}
+
+		public override void End()
+		{
+			
+		}
+
+		public override void Init(Action terminalResized)
+		{
+			
+		}
+
+		public override void RedrawTop()
+		{
+			int rows = Rows;
+			int cols = Cols;
+
+			Console.CursorTop = 0;
+			Console.CursorLeft = 0;
+			for (int row = 0; row < rows; row++) {
+				dirtyLine [row] = false;
+				for (int col = 0; col < cols; col++) {
+					contents [row, col, 2] = 0;
+					Console.Write ((char)contents [row, col, 0]);
+				}
+			}
+		}
+
+		public override void Refresh()
+		{
+			int rows = Rows;
+			int cols = Cols;
+
+			for (int row = 0; row < rows; row++) {
+				if (!dirtyLine [row])
+					continue;
+				dirtyLine [row] = false;
+				for (int col = 0; col < cols; col++) {
+					if (contents [row, col, 2] != 1)
+						continue;
+					
+					Console.CursorTop = row;
+					Console.CursorLeft = col;
+					for (; col < cols && contents [row, col, 2] == 1; col++) {
+						Console.Write ((char)contents [row, col, 0]);
+						contents [row, col, 2] = 0;
+					}
+				}
+			}
+		}
+
+		public override void StartReportingMouseMoves()
+		{
+		}
+
+		public override void StopReportingMouseMoves()
+		{
+		}
+
+		public override void Suspend()
+		{
+		}
+
+		public override void SetAttribute(Attribute c)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void PrepareToRun(MainLoop mainLoop, Action<KeyEvent> target, Action<MouseEvent> mouse)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void SetColors(ConsoleColor foreground, ConsoleColor background)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void SetColors(short foregroundColorId, short backgroundColorId)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

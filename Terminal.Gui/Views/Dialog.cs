@@ -15,6 +15,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class Dialog : Window {
 		List<Button> buttons = new List<Button> ();
+		const int padding = 1;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Dialog"/> class with an optional set of buttons to display
@@ -23,7 +24,7 @@ namespace Terminal.Gui {
 		/// <param name="width">Width for the dialog.</param>
 		/// <param name="height">Height for the dialog.</param>
 		/// <param name="buttons">Optional buttons to lay out at the bottom of the dialog.</param>
-		public Dialog (string title, int width, int height, params Button [] buttons) : base (Application.MakeCenteredRect (new Size (width, height)), title)
+		public Dialog (string title, int width, int height, params Button [] buttons) : base (Application.MakeCenteredRect (new Size (width, height)), title, padding: padding)
 		{
 			ColorScheme = Colors.Dialog;
 
@@ -61,7 +62,7 @@ namespace Terminal.Gui {
 			const int borderWidth = 2;
 			var start = (Frame.Width-borderWidth - buttonSpace) / 2;
 
-			var y = Frame.Height - borderWidth  - maxHeight;
+			var y = Frame.Height - borderWidth  - maxHeight-1-padding;
 			foreach (var b in buttons) {
 				var bf = b.Frame;
 

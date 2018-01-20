@@ -143,7 +143,7 @@ namespace Terminal.Gui {
 		public override void Redraw (Rect region)
 		{
 			Driver.SetAttribute (ColorScheme.Normal);
-			DrawFrame (region, true);
+			DrawFrame (region, padding: 0, fill: true);
 
 			for (int i = 0; i < barItems.Children.Length; i++){
 				var item = barItems.Children [i];
