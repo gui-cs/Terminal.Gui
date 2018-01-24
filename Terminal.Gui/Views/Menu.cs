@@ -6,10 +6,11 @@
 //
 // TODO:
 //   Add accelerator support, but should also support chords (ShortCut in MenuItem)
-//   Add mouse support
 //   Allow menus inside menus
 
 using System;
+using NStack;
+
 namespace Terminal.Gui {
 
 	/// <summary>
@@ -23,7 +24,7 @@ namespace Terminal.Gui {
 		/// <param name="title">Title for the menu item.</param>
 		/// <param name="help">Help text to display.</param>
 		/// <param name="action">Action to invoke when the menu item is activated.</param>
-		public MenuItem (string title, string help, Action action)
+		public MenuItem (ustring title, string help, Action action)
 		{
 			Title = title ?? "";
 			Help = help ?? "";
@@ -50,7 +51,7 @@ namespace Terminal.Gui {
 		/// For example HotKey would be "N" when the File Menu is open (assuming there is a "_New" entry
 		/// if the ShortCut is set to "Control-N", this would be a global hotkey that would trigger as well
 		/// </summary>
-		public char HotKey;
+		public Rune HotKey;
 
 		/// <summary>
 		/// This is the global setting that can be used as a global shortcut to invoke the action on the menu.
@@ -61,13 +62,13 @@ namespace Terminal.Gui {
 		/// Gets or sets the title.
 		/// </summary>
 		/// <value>The title.</value>
-		public string Title { get; set; }
+		public ustring Title { get; set; }
 
 		/// <summary>
 		/// Gets or sets the help text for the menu item.
 		/// </summary>
 		/// <value>The help text.</value>
-		public string Help { get; set; }
+		public ustring Help { get; set; }
 
 		/// <summary>
 		/// Gets or sets the action to be invoked when the menu is triggered
@@ -81,13 +82,13 @@ namespace Terminal.Gui {
 	/// A menu bar item contains other menu items.
 	/// </summary>
 	public class MenuBarItem {
-		public MenuBarItem (string title, MenuItem [] children)
+		public MenuBarItem (ustring title, MenuItem [] children)
 		{
 			SetTitle (title ?? "");
 			Children = children;
 		}
 
-		void SetTitle (string title)
+		void SetTitle (ustring title)
 		{
 			if (title == null)
 				title = "";
@@ -105,7 +106,7 @@ namespace Terminal.Gui {
 		/// Gets or sets the title to display.
 		/// </summary>
 		/// <value>The title.</value>
-		public string Title { get; set; }
+		public ustring Title { get; set; }
 
 		/// <summary>
 		/// Gets or sets the children for this MenuBarItem
@@ -153,7 +154,7 @@ namespace Terminal.Gui {
 					if (item == null)
 						Driver.AddSpecial (SpecialChar.HLine);
 					else
-						Driver.AddCh (' ');
+						Driver.AddRune (' ');
 
 				if (item == null)
 					continue;
@@ -287,7 +288,7 @@ namespace Terminal.Gui {
 			Move (0, 0);
 			Driver.SetAttribute (Colors.Base.Focus);
 			for (int i = 0; i < Frame.Width; i++)
-				Driver.AddCh (' ');
+				Driver.AddRune (' ');
 
 			Move (1, 0);
 			int pos = 1;

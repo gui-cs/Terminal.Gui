@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -18,7 +19,7 @@ namespace Terminal.Gui {
 	///   functionality,  and mouse support.
 	/// </remarks>
 	public class TextField : View {
-		string text, kill;
+		ustring text, kill;
 		int first, point;
 		bool used;
 
@@ -52,7 +53,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
-		public string Text {
+		public ustring Text {
 			get {
 				return text;
 			}
@@ -96,9 +97,9 @@ namespace Terminal.Gui {
 				int p = first + i;
 
 				if (p < text.Length) {
-					Driver.AddCh (Secret ? '*' : text [p]);
+					Driver.AddRune (Secret ? (Rune)'*' : text [p]);
 				} else
-					Driver.AddCh (' ');
+					Driver.AddRune (' ');
 			}
 			PositionCursor ();
 		}
@@ -112,7 +113,7 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
-		void SetText (string new_text)
+		void SetText (ustring new_text)
 		{
 			text = new_text;
 			if (Changed != null)
@@ -132,7 +133,7 @@ namespace Terminal.Gui {
 				if (point == 0)
 					return true;
 
-				SetText (text.Substring (0, point - 1) + text.Substring (point));
+				SetText (text [0, point - 1] + text [point, null]);
 				point--;
 				Adjust ();
 				break;
@@ -155,7 +156,7 @@ namespace Terminal.Gui {
 			case Key.ControlD: // Delete
 				if (point == text.Length)
 					break;
-				SetText (text.Substring (0, point) + text.Substring (point + 1));
+				SetText (text [0, point] + text [point + 1, null]);
 				Adjust ();
 				break;
 
@@ -174,7 +175,7 @@ namespace Terminal.Gui {
 
 			case Key.ControlK: // kill-to-end
 				kill = text.Substring (point);
-				SetText (text.Substring (0, point));
+				SetText (text [0, point]);
 				Adjust ();
 				break;
 
@@ -186,7 +187,7 @@ namespace Terminal.Gui {
 					SetText (text + kill);
 					point = text.Length;
 				} else {
-					SetText (text.Substring (0, point) + kill + text.Substring (point));
+					SetText (text [0, point] + kill + text.Substring (point));
 					point += kill.Length;
 				}
 				Adjust ();
@@ -211,15 +212,16 @@ namespace Terminal.Gui {
 				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
 					return false;
 
+				var kbstr = ustring.Make ((uint)kb.Key);
 				if (used) {
 					if (point == text.Length) {
-						SetText (text + (char)kb.Key);
+						SetText (text + kbstr);
 					} else {
-						SetText (text.Substring (0, point) + (char)kb.Key + text.Substring (point));
+						SetText (text [0, point] + kbstr + text [point, null]);
 					}
 					point++;
 				} else {
-					SetText ("" + (char)kb.Key);
+					SetText (kbstr);
 					first = 0;
 					point = 1;
 				}
@@ -237,18 +239,21 @@ namespace Terminal.Gui {
 				return -1;
 
 			int i = p;
-			if (Char.IsPunctuation (text [p]) || Char.IsWhiteSpace (text [p])) {
+			if (Rune.IsPunctuation (text [p]) || Rune.IsWhiteSpace(text [p])) {
 				for (; i < text.Length; i++) {
-					if (Char.IsLetterOrDigit (text [i]))
+					var r = text [i];
+					if (Rune.IsLetterOrDigit(r))
 						break;
 				}
 				for (; i < text.Length; i++) {
-					if (!Char.IsLetterOrDigit (text [i]))
+					var r = text [i];
+					if (!Rune.IsLetterOrDigit (r))
 						break;
 				}
 			} else {
 				for (; i < text.Length; i++) {
-					if (!Char.IsLetterOrDigit (text [i]))
+					var r = text [i];
+					if (!Rune.IsLetterOrDigit (r))
 						break;
 				}
 			}
@@ -266,18 +271,19 @@ namespace Terminal.Gui {
 			if (i == 0)
 				return 0;
 
-			if (Char.IsPunctuation (text [i]) || Char.IsSymbol (text [i]) || Char.IsWhiteSpace (text [i])) {
+			var ti = text [i];
+			if (Rune.IsPunctuation (ti) || Rune.IsSymbol(ti) || Rune.IsWhiteSpace(ti)) {
 				for (; i >= 0; i--) {
-					if (Char.IsLetterOrDigit (text [i]))
+					if (Rune.IsLetterOrDigit (text [i]))
 						break;
 				}
 				for (; i >= 0; i--) {
-					if (!Char.IsLetterOrDigit (text [i]))
+					if (!Rune.IsLetterOrDigit (text [i]))
 						break;
 				}
 			} else {
 				for (; i >= 0; i--) {
-					if (!Char.IsLetterOrDigit (text [i]))
+					if (!Rune.IsLetterOrDigit (text [i]))
 						break;
 				}
 			}

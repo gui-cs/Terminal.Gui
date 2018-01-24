@@ -5,6 +5,7 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 using System;
+using NStack;
 
 namespace Terminal.Gui {
 
@@ -12,7 +13,7 @@ namespace Terminal.Gui {
 	/// The Checkbox View shows an on/off toggle that the user can set
 	/// </summary>
 	public class CheckBox : View {
-		string text;
+		ustring text;
 		int hot_pos = -1;
 		char hot_key;
 
@@ -34,7 +35,7 @@ namespace Terminal.Gui {
 		///   The size of CheckButton is computed based on the
 		///   text length. This CheckButton is not toggled.
 		/// </remarks>
-		public CheckBox (int x, int y, string s) : this (x, y, s, false)
+		public CheckBox (int x, int y, ustring s) : this (x, y, s, false)
 		{
 		}
 
@@ -46,7 +47,7 @@ namespace Terminal.Gui {
 		///   The size of CheckButton is computed based on the
 		///   text length. 
 		/// </remarks>
-		public CheckBox (int x, int y, string s, bool is_checked) : base (new Rect (x, y, s.Length + 4, 1))
+		public CheckBox (int x, int y, ustring s, bool is_checked) : base (new Rect (x, y, s.Length + 4, 1))
 		{
 			Checked = is_checked;
 			Text = s;
@@ -62,7 +63,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		///   The text displayed by this widget.
 		/// </summary>
-		public string Text {
+		public ustring Text {
 			get {
 				return text;
 			}
@@ -94,7 +95,7 @@ namespace Terminal.Gui {
 			if (hot_pos != -1) {
 				Move (4 + hot_pos, 0);
 				Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
-				Driver.AddCh (hot_key);
+				Driver.AddRune (hot_key);
 			}
 		}
 

@@ -6,8 +6,7 @@
 //
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -26,8 +25,8 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public class Button : View {
-		string text;
-		string shown_text;
+		ustring text;
+		ustring shown_text;
 		char hot_key;
 		int hot_pos = -1;
 		bool is_default;
@@ -88,7 +87,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		///   The text displayed by this widget.
 		/// </summary>
-		public string Text {
+		public ustring Text {
 			get {
 				return text;
 			}
@@ -147,7 +146,7 @@ namespace Terminal.Gui {
 			if (hot_pos != -1) {
 				Move (hot_pos, 0);
 				Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
-				Driver.AddCh (hot_key);
+				Driver.AddRune (hot_key);
 			}
 		}
 

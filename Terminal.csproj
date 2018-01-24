@@ -31,6 +31,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="NStack">
+      <HintPath>packages\NStack.Core.0.7.0\lib\netstandard1.5\NStack.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="demo.cs" />
@@ -40,6 +44,9 @@
       <Project>{00F366F8-DEE4-482C-B9FD-6DB0200B79E5}</Project>
       <Name>Terminal.Gui</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

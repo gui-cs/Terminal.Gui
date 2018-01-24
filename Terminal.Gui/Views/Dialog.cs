@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>

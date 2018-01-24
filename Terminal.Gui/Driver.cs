@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Mono.Terminal;
+using NStack;
 using Unix.Terminal;
 
 namespace Terminal.Gui {
@@ -189,12 +190,12 @@ namespace Terminal.Gui {
 		/// Adds the specified rune to the display at the current cursor position
 		/// </summary>
 		/// <param name="rune">Rune to add.</param>
-		public abstract void AddCh (int rune);
+		public abstract void AddRune (Rune rune);
 		/// <summary>
 		/// Adds the specified 
 		/// </summary>
 		/// <param name="str">String.</param>
-		public abstract void AddStr (string str);
+		public abstract void AddStr (ustring str);
 		public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> target, Action<MouseEvent> mouse);
 
 		/// <summary>
@@ -237,7 +238,7 @@ namespace Terminal.Gui {
 		Rect clip;
 
 		/// <summary>
-		/// Controls the current clipping region that AddCh/AddStr is subject to.
+		/// Controls the current clipping region that AddRune/AddStr is subject to.
 		/// </summary>
 		/// <value>The clip.</value>
 		public Rect Clip {
@@ -258,7 +259,7 @@ namespace Terminal.Gui {
 		public override int Cols => Curses.Cols;
 		public override int Rows => Curses.Lines;
 
-		// Current row, and current col, tracked by Move/AddCh only
+		// Current row, and current col, tracked by Move/AddRune only
 		int ccol, crow;
 		bool needMove;
 		public override void Move (int col, int row)
@@ -275,15 +276,15 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static bool sync = true;
-		public override void AddCh (int rune)
+		static bool sync = false;
+		public override void AddRune (Rune rune)
 		{
 			if (Clip.Contains (ccol, crow)) {
 				if (needMove) {
 					Curses.move (crow, ccol);
 					needMove = false;
 				}
-				Curses.addch (rune);
+				Curses.addch ((int)(uint)rune);
 			} else
 				needMove = true;
 			if (sync)
@@ -295,16 +296,16 @@ namespace Terminal.Gui {
 		{
 			switch (ch) {
 			case SpecialChar.HLine:
-				AddCh (Curses.ACS_HLINE);
+				AddRune (Curses.ACS_HLINE);
 				break;
 			}
 		}
 
-		public override void AddStr (string str)
+		public override void AddStr (ustring str)
 		{
 			// TODO; optimize this to determine if the str fits in the clip region, and if so, use Curses.addstr directly
 			foreach (var rune in str)
-				AddCh ((int)rune);
+				AddRune (rune);
 		}
 
 		public override void Refresh () => Curses.refresh ();
@@ -456,46 +457,46 @@ namespace Terminal.Gui {
 			if (padding > 0) {
 				for (int l = 0; l < padding; l++)
 					for (b = 0; b < width; b++)
-						AddCh (' ');
+						AddRune (' ');
 			}
 			Move (region.X, region.Y + padding);
 			for (int c = 0; c < padding; c++)
-				AddCh (' ');
-			AddCh (Curses.ACS_ULCORNER);
+				AddRune (' ');
+			AddRune (Curses.ACS_ULCORNER);
 			for (b = 0; b < fwidth - 2; b++)
-				AddCh (Curses.ACS_HLINE);
-			AddCh (Curses.ACS_URCORNER);
+				AddRune (Curses.ACS_HLINE);
+			AddRune (Curses.ACS_URCORNER);
 			for (int c = 0; c < padding; c++)
-				AddCh (' ');
+				AddRune (' ');
 				
 			for (b = 1+padding; b < fheight; b++) {
 				Move (region.X, region.Y + b);
 				for (int c = 0; c < padding; c++)
-					AddCh (' ');
-				AddCh (Curses.ACS_VLINE);
+					AddRune (' ');
+				AddRune (Curses.ACS_VLINE);
 				if (fill) {	
 					for (int x = 1; x < fwidth - 1; x++)
-						AddCh (' ');
+						AddRune (' ');
 				} else
 					Move (region.X + fwidth - 1, region.Y + b);
-				AddCh (Curses.ACS_VLINE);
+				AddRune (Curses.ACS_VLINE);
 				for (int c = 0; c < padding; c++)
-					AddCh (' ');
+					AddRune (' ');
 			}
 			Move (region.X, region.Y + fheight);
 			for (int c = 0; c < padding; c++)
-				AddCh (' ');
-			AddCh (Curses.ACS_LLCORNER);
+				AddRune (' ');
+			AddRune (Curses.ACS_LLCORNER);
 			for (b = 0; b < fwidth - 2; b++)
-				AddCh (Curses.ACS_HLINE);
-			AddCh (Curses.ACS_LRCORNER);
+				AddRune (Curses.ACS_HLINE);
+			AddRune (Curses.ACS_LRCORNER);
 			for (int c = 0; c < padding; c++)
-				AddCh (' ');
+				AddRune (' ');
 			if (padding > 0) {
 				Move (region.X, region.Y + height - padding);
 				for (int l = 0; l < padding; l++)
 					for (b = 0; b < width; b++)
-						AddCh (' ');
+						AddRune (' ');
 			}
 		}
 
@@ -696,10 +697,10 @@ namespace Terminal.Gui {
 			crow = row;
 		}
 
-		public override void AddCh (int rune)
+		public override void AddRune (Rune rune)
 		{
 			if (Clip.Contains (ccol, crow)) {
-				contents [crow, ccol, 0] = rune;
+				contents [crow, ccol, 0] = (int) (uint) rune;
 				contents [crow, ccol, 2] = 1;
 			}
 			ccol++;
@@ -712,13 +713,13 @@ namespace Terminal.Gui {
 
 		public override void AddSpecial (SpecialChar ch)
 		{
-			AddCh ('*');
+			AddRune ('*');
 		}
 
-		public override void AddStr (string str)
+		public override void AddStr (ustring str)
 		{
 			foreach (var rune in str)
-				AddCh ((int)rune);
+				AddRune (rune);
 		}
 
 		public override void DrawFrame(Rect region, int padding, bool fill)
@@ -728,25 +729,25 @@ namespace Terminal.Gui {
 			int b;
 
 			Move (region.X, region.Y);
-			AddCh ('+');
+			AddRune ('+');
 			for (b = 0; b < width - 2; b++)
-				AddCh ('-');
-			AddCh ('+');
+				AddRune ('-');
+			AddRune ('+');
 			for (b = 1; b < height - 1; b++) {
 				Move (region.X, region.Y + b);
-				AddCh ('|');
+				AddRune ('|');
 				if (fill) {
 					for (int x = 1; x < width - 1; x++)
-						AddCh (' ');
+						AddRune (' ');
 				} else
 					Move (region.X + width - 1, region.Y + b);
-				AddCh ('|');
+				AddRune ('|');
 			}
 			Move (region.X, region.Y + height - 1);
-			AddCh ('+');
+			AddRune ('+');
 			for (b = 0; b < width - 2; b++)
-				AddCh ('-');
-			AddCh ('+');
+				AddRune ('-');
+			AddRune ('+');
 		}
 
 		public override void End()

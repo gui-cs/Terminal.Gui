@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -36,19 +37,19 @@ namespace Terminal.Gui {
 	/// Label view, displays a string at a given position, can include multiple lines.
 	/// </summary>
 	public class Label : View {
-		List<string> lines = new List<string> ();
+		List<ustring> lines = new List<ustring> ();
 		bool recalcPending = true;
-		string text;
+		ustring text;
 		TextAlignment textAlignment;
 
-		static Rect CalcRect (int x, int y, string s)
+		static Rect CalcRect (int x, int y, ustring s)
 		{
 			int mw = 0;
 			int ml = 1;
 
 			int cols = 0;
-			foreach (var c in s) {
-				if (c == '\n') {
+			foreach (var rune in s) {
+				if (rune == '\n') {
 					ml++;
 					if (cols > mw)
 						mw = cols;
@@ -65,7 +66,7 @@ namespace Terminal.Gui {
 		///   based on the size of the string, assumes that the string contains
 		///   newlines for multiple lines, no special breaking rules are used.
 		/// </summary>
-		public Label (int x, int y, string text) : this (CalcRect (x, y, text), text)
+		public Label (int x, int y, ustring text) : this (CalcRect (x, y, text), text)
 		{
 		}
 
@@ -74,25 +75,27 @@ namespace Terminal.Gui {
 		///   coordinate with the given string and uses the specified
 		///   frame for the string.
 		/// </summary>
-		public Label (Rect rect, string text) : base (rect)
+		public Label (Rect rect, ustring text) : base (rect)
 		{
 			this.text = text;
 		}
 
 		static char [] whitespace = new char [] { ' ', '\t' };
 
-		static string ClipAndJustify (string str, int width, TextAlignment talign)
+		static ustring ClipAndJustify (ustring str, int width, TextAlignment talign)
 		{
 			int slen = str.Length;
 			if (slen > width)
-				return str.Substring (0, width);
+				return str [0, width];
 			else {
 				if (talign == TextAlignment.Justified) {
-					var words = str.Split (whitespace, StringSplitOptions.RemoveEmptyEntries);
+					// TODO: ustring needs this
+			               	var words = str.ToString ().Split (whitespace, StringSplitOptions.RemoveEmptyEntries);
 					int textCount = words.Sum ((arg) => arg.Length);
 
 					var spaces = (width- textCount) / (words.Length - 1);
 					var extras = (width - textCount) % words.Length;
+
 					var s = new System.Text.StringBuilder ();
 					//s.Append ($"tc={textCount} sp={spaces},x={extras} - ");
 					for (int w = 0; w < words.Length; w++) {
@@ -106,7 +109,7 @@ namespace Terminal.Gui {
 							extras--;
 						}
 					}
-					return s.ToString ();
+					return ustring.Make (s.ToString ());
 				}
 				return str;
 			}
@@ -118,7 +121,7 @@ namespace Terminal.Gui {
 			Recalc (text, lines, Frame.Width, textAlignment);
 		}
 
-		static void Recalc (string textStr, List<string> lineResult, int width, TextAlignment talign)
+		static void Recalc (ustring textStr, List<ustring> lineResult, int width, TextAlignment talign)
 		{
 			lineResult.Clear ();
 			if (textStr.IndexOf ('\n') == -1) {
@@ -128,10 +131,10 @@ namespace Terminal.Gui {
 			int textLen = textStr.Length;
 			int lp = 0;
 			for (int i = 0; i < textLen; i++) {
-				char c = textStr [i];
+				Rune c = textStr [i];
 
 				if (c == '\n') {
-					lineResult.Add (ClipAndJustify (textStr.Substring (lp, i - lp), width, talign));
+					lineResult.Add (ClipAndJustify (textStr [lp, i], width, talign));
 					lp = i + 1;
 				}
 			}
@@ -179,9 +182,9 @@ namespace Terminal.Gui {
 		/// <returns>Number of lines.</returns>
 		/// <param name="text">Text, may contain newlines.</param>
 		/// <param name="width">The width for the text.</param>
-		public static int MeasureLines (string text, int width)
+		public static int MeasureLines (ustring text, int width)
 		{
-			var result = new List<string> ();
+			var result = new List<ustring> ();
 			Recalc (text, result, width, TextAlignment.Left);
 			return result.Count ();
 		}
@@ -189,7 +192,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		///   The text displayed by this widget.
 		/// </summary>
-		public virtual string Text {
+		public virtual ustring Text {
 			get => text;
 			set {
 				text = value;

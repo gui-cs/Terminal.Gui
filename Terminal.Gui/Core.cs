@@ -17,6 +17,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
+using NStack;
 
 namespace Terminal.Gui {
 
@@ -177,7 +178,7 @@ namespace Terminal.Gui {
 		/// Gets or sets an identifier for the view;
 		/// </summary>
 		/// <value>The identifier.</value>
-		public string Id { get; set; } = "";
+		public ustring Id { get; set; } = "";
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="T:Terminal.View"/> want mouse position reports.
@@ -375,7 +376,7 @@ namespace Terminal.Gui {
 			for (int line = 0; line < h; line++) {
 				Move (0, line);
 				for (int col = 0; col < w; col++)
-					Driver.AddCh (' ');
+					Driver.AddRune (' ');
 			}
 		}
 
@@ -461,15 +462,15 @@ namespace Terminal.Gui {
 		/// <param name="text">String to display, the underscoore before a letter flags the next letter as the hotkey.</param>
 		/// <param name="hotColor">Hot color.</param>
 		/// <param name="normalColor">Normal color.</param>
-		public void DrawHotString (string text, Attribute hotColor, Attribute normalColor)
+		public void DrawHotString (ustring text, Attribute hotColor, Attribute normalColor)
 		{
 			Driver.SetAttribute (normalColor);
-			foreach (var c in text) {
-				if (c == '_') {
+			foreach (var rune in text) {
+				if (rune == '_') {
 					Driver.SetAttribute (hotColor);
 					continue;
 				}
-				Driver.AddCh (c);
+				Driver.AddRune (rune);
 				Driver.SetAttribute (normalColor);
 			}
 		}
@@ -480,7 +481,7 @@ namespace Terminal.Gui {
 		/// <param name="text">String to display, the underscoore before a letter flags the next letter as the hotkey.</param>
 		/// <param name="focused">If set to <c>true</c> this uses the focused colors from the color scheme, otherwise the regular ones.</param>
 		/// <param name="scheme">The color scheme to use.</param>
-		public void DrawHotString (string text, bool focused, ColorScheme scheme)
+		public void DrawHotString (ustring text, bool focused, ColorScheme scheme)
 		{
 			if (focused)
 				DrawHotString (text, scheme.HotFocus, scheme.Focus);
@@ -569,14 +570,14 @@ namespace Terminal.Gui {
 		/// <param name="col">Col.</param>
 		/// <param name="row">Row.</param>
 		/// <param name="ch">Ch.</param>
-		public void AddCh (int col, int row, int ch)
+		public void AddRune (int col, int row, Rune ch)
 		{
 			if (row < 0 || col < 0)
 				return;
 			if (row > frame.Height - 1 || col > frame.Width - 1)
 				return;
 			Move (col, row);
-			Driver.AddCh (ch);
+			Driver.AddRune (ch);
 		}
 
 		/// <summary>
@@ -911,13 +912,13 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class Window : Toplevel, IEnumerable {
 		View contentView;
-		string title;
+		ustring title;
 
 		/// <summary>
 		/// The title to be displayed for this window.
 		/// </summary>
 		/// <value>The title.</value>
-		public string Title {
+		public ustring Title {
 			get => title;
 			set {
 				title = value;
@@ -934,7 +935,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		/// <param name="title">Title.</param>
-		public Window (Rect frame, string title = null) : this (frame, title, padding: 0)
+		public Window (Rect frame, ustring title = null) : this (frame, title, padding: 0)
 		{
 		}
 
@@ -947,7 +948,7 @@ namespace Terminal.Gui {
 		/// <param name="frame">Frame.</param>
 		/// <param name="padding">Number of characters to use for padding of the drawn frame.</param>
 		/// <param name="title">Title.</param>
-		public Window (Rect frame, string title = null, int padding = 0) : base (frame)
+		public Window (Rect frame, ustring title = null, int padding = 0) : base (frame)
 		{
 			this.Title = title;
 			int wb = 2 * (1 + padding);
@@ -990,10 +991,10 @@ namespace Terminal.Gui {
 				var width = Frame.Width;
 				if (Title != null && width > 4) {
 					Move (1+padding, padding);
-					Driver.AddCh (' ');
-					var str = Title.Length > width ? Title.Substring (0, width - 4) : Title;
+					Driver.AddRune (' ');
+					var str = Title.Length > width ? Title [0, width-4] : Title;
 					Driver.AddStr (str);
-					Driver.AddCh (' ');
+					Driver.AddRune (' ');
 				}
 				Driver.SetAttribute (ColorScheme.Normal);
 			}
