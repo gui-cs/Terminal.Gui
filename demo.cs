@@ -17,10 +17,12 @@ class Demo {
 			new TextField (14, 6, 40, ""),
 			new Label (3, 8, "Password: "),
 			new TextField (14, 8, 40, "") { Secret = true },
-			new CheckBox (3, 10, "Remember me"),
-			new RadioGroup (3, 12, new [] { "_Personal", "_Company" }),
-			new Button (3, 18, "Ok"),
-			new Button (10, 18, "Cancel"),
+			new FrameView (new Rect (3, 10, 25, 6), "Options"){
+				new CheckBox (1, 0, "Remember me"),
+				new RadioGroup (1, 2, new [] { "_Personal", "_Company" }),
+			},
+			new Button (3, 19, "Ok"),
+			new Button (10, 19, "Cancel"),
 			new Label (3, 22, "Press ESC and 9 to activate the menubar")
 		);
 	}
@@ -73,7 +75,7 @@ class Demo {
 
 		ShowEntries (win);
 		int count = 0;
-		ml = new Label (new Rect (3, 16, 50, 1), "Mouse: ");
+		ml = new Label (new Rect (3, 17, 50, 1), "Mouse: ");
 		Application.RootMouseEvent += delegate (MouseEvent me) {
 
 			ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";

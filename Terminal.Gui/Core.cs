@@ -931,7 +931,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Window"/> class with an optioanl title
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Window"/> class with an optioanl title
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		/// <param name="title">Title.</param>

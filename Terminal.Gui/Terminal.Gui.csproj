@@ -34,6 +34,10 @@
     <Reference Include="NStack">
       <HintPath>..\packages\NStack.Core.0.7.0\lib\netstandard1.5\NStack.dll</HintPath>
     </Reference>
+    <Reference Include="System.ValueTuple">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
@@ -61,6 +65,8 @@
     <Compile Include="MonoCurses\constants.cs" />
     <Compile Include="MonoCurses\handles.cs" />
     <Compile Include="MonoCurses\mainloop.cs" />
+    <Compile Include="Views\FrameView.cs" />
+    <Compile Include="Views\ListView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
