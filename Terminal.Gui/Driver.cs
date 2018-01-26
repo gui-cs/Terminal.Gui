@@ -177,6 +177,46 @@ namespace Terminal.Gui {
 		/// </summary>
 		Diamond,
 
+		/// <summary>
+		/// Upper left corner
+		/// </summary>
+		ULCorner,
+
+		/// <summary>
+		/// Lower left corner
+		/// </summary>
+		LLCorner,
+
+		/// <summary>
+		/// Upper right corner
+		/// </summary>
+		URCorner,
+
+		/// <summary>
+		/// Lower right corner
+		/// </summary>
+		LRCorner,
+
+		/// <summary>
+		/// Left tee
+		/// </summary>
+		LeftTee,
+
+		/// <summary>
+		/// Right tee
+		/// </summary>
+		RightTee,
+
+		/// <summary>
+		/// Top tee 
+		/// </summary>
+		TopTee,
+
+		/// <summary>
+		/// The bottom tee.
+		/// </summary>
+		BottomTee,
+
 	}
 
 	/// <summary>
@@ -312,16 +352,40 @@ namespace Terminal.Gui {
 		{
 			switch (ch) {
 			case SpecialChar.HLine:
-				AddRune (Curses.ACS_HLINE);
+				AddRune(Curses.ACS_HLINE);
 				break;
 			case SpecialChar.VLine:
-				AddRune (Curses.ACS_VLINE);
+				AddRune(Curses.ACS_VLINE);
 				break;
 			case SpecialChar.Stipple:
-				AddRune (Curses.ACS_CKBOARD);
+				AddRune(Curses.ACS_CKBOARD);
 				break;
 			case SpecialChar.Diamond:
-				AddRune (Curses.ACS_DIAMOND);
+				AddRune(Curses.ACS_DIAMOND);
+				break;
+			case SpecialChar.ULCorner:
+				AddRune (Curses.ACS_ULCORNER);
+				break;
+			case SpecialChar.LLCorner:
+				AddRune (Curses.ACS_LLCORNER);
+				break;
+			case SpecialChar.URCorner:
+				AddRune (Curses.ACS_URCORNER);
+				break;
+			case SpecialChar.LRCorner:
+				AddRune (Curses.ACS_LRCORNER);
+				break;
+			case SpecialChar.LeftTee:
+				AddRune (Curses.ACS_LTEE);
+				break;
+			case SpecialChar.RightTee:
+				AddRune (Curses.ACS_RTEE);
+				break;
+			case SpecialChar.TopTee:
+				AddRune (Curses.ACS_TTEE);
+				break;
+			case SpecialChar.BottomTee:
+				AddRune (Curses.ACS_BTEE);
 				break;
 			}
 		}

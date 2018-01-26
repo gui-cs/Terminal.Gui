@@ -112,32 +112,54 @@ namespace Terminal.Gui {
 
 			if (true || ShowVerticalScrollIndicator) {
 				var bh = Bounds.Height;
-				var by1 = contentOffset.Y * bh/ contentSize.Height;
-				var by2 = (contentOffset.Y+bh) * bh/ contentSize.Height;
+				var by1 = -contentOffset.Y * bh/ contentSize.Height;
+				var by2 = (-contentOffset.Y+bh) * bh/ contentSize.Height;
 
 				for (int y = 0; y < bh; y++) {
 					Move (Bounds.Width - 1, y);
+					SpecialChar special;
+
 					if (y < by1 || y > by2)
-						Driver.AddSpecial (SpecialChar.Stipple);
-					else
-						Driver.AddSpecial (SpecialChar.Diamond);
+						special = SpecialChar.Stipple;
+					else {
+						if (by2 - by1 == 0)
+							special = SpecialChar.Diamond;
+						else {
+							if (y == by1)
+								special = SpecialChar.TopTee;
+							else if (y == by2)
+								special = SpecialChar.BottomTee;
+							else
+								special = SpecialChar.VLine;
+						}
+					}
+					Driver.AddSpecial (special);
 				}
 			}
 			if (true || ShowHorizontalScrollIndicator){
 				var bw = Bounds.Width;
-				var bx1 = contentOffset.X * bw / contentSize.Width;
-				var bx2 = (contentOffset.X + bw) * bw / contentSize.Width;
+				var bx1 = -contentOffset.X * bw / contentSize.Width;
+				var bx2 = (-contentOffset.X + bw) * bw / contentSize.Width;
 
 				Move (0, Bounds.Height - 1);
 				for (int x = 0; x < bw; x++) {
+					SpecialChar special;
+
 					if (x < bx1 || x > bx2){
-						SetColor (ColorScheme.Normal);
-						Driver.AddSpecial (SpecialChar.Stipple);
+						special = SpecialChar.Stipple;
 					} else {
-						// Driver.AddSpecial (SpecialChar.Diamond);
-						SetColor (ColorScheme.Focus);
-						Driver.AddSpecial (SpecialChar.Stipple);
+						if (bx2 - bx1 == 0)
+							special = SpecialChar.Diamond;
+						else {
+							if (x == bx1)
+								special = SpecialChar.LeftTee;
+							else if (x == bx2)
+								special = SpecialChar.RightTee;
+							else
+								special = SpecialChar.HLine;
+						}
 					}
+					Driver.AddSpecial (special);
 				}
 			}
 		}
