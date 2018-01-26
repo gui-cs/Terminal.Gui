@@ -2,8 +2,8 @@ using Terminal.Gui;
 using System;
 
 class Demo {
-	class MyView : View {
-		public MyView (int x, int y) : base (new Rect (x, y, 10, 10))
+	class Box10x : View {
+		public Box10x (int x, int y) : base (new Rect (x, y, 10, 10))
 		{
 		}
 
@@ -20,8 +20,39 @@ class Demo {
 			}
 	
 		}
-
 	}
+
+	class Filler : View {
+		public Filler (Rect rect) : base (rect)
+		{
+		}
+
+		public override void Redraw(Rect region)
+		{
+			Driver.SetAttribute (ColorScheme.Focus);
+			var f = Frame;
+
+			for (int y = 0; y < f.Width; y++) {
+				Move (0, y);
+				for (int x = 0; x < f.Height; x++) {
+					Rune r;
+					switch (x % 3) {
+					case 0:
+						r = '.';
+						break;
+					case 1:
+						r = 'o';
+						break;
+					default:
+						r = 'O';
+						break;
+					}
+					Driver.AddRune (r);
+				}
+			}	
+		}
+	}
+
 
 	static void ShowTextAlignments (View container)
 	{
@@ -36,10 +67,11 @@ class Demo {
 	{
 		var scrollView = new ScrollView (new Rect (50, 10, 20, 8)) {
 			ContentSize = new Size (100, 100),
-			ContentOffset = new Point (-1, -1)
+			ContentOffset = new Point (5, -2)
 		};
 
-		scrollView.Add (new MyView (0, 0));
+		//scrollView.Add (new Box10x (0, 0));
+		scrollView.Add (new Filler (new Rect (0, 0, 40, 40)));
 
 		container.Add (
 			new Label (3, 6, "Login: "),

@@ -98,10 +98,48 @@ namespace Terminal.Gui {
 		{
 			var oldClip = ClipToBounds ();
 			base.Redraw(region);
-			Driver.SetAttribute (ColorScheme.Normal);
+			Attribute last = ColorScheme.Normal;
+			Driver.SetAttribute (last);
 
-			DrawFrame (Bounds);
+			void SetColor (Attribute a)
+			{
+				if (a != last)
+					Driver.SetAttribute (a);
+				last = a;
+			}
+
 			Driver.Clip = oldClip;
+
+			if (true || ShowVerticalScrollIndicator) {
+				var bh = Bounds.Height;
+				var by1 = contentOffset.Y * bh/ contentSize.Height;
+				var by2 = (contentOffset.Y+bh) * bh/ contentSize.Height;
+
+				for (int y = 0; y < bh; y++) {
+					Move (Bounds.Width - 1, y);
+					if (y < by1 || y > by2)
+						Driver.AddSpecial (SpecialChar.Stipple);
+					else
+						Driver.AddSpecial (SpecialChar.Diamond);
+				}
+			}
+			if (true || ShowHorizontalScrollIndicator){
+				var bw = Bounds.Width;
+				var bx1 = contentOffset.X * bw / contentSize.Width;
+				var bx2 = (contentOffset.X + bw) * bw / contentSize.Width;
+
+				Move (0, Bounds.Height - 1);
+				for (int x = 0; x < bw; x++) {
+					if (x < bx1 || x > bx2){
+						SetColor (ColorScheme.Normal);
+						Driver.AddSpecial (SpecialChar.Stipple);
+					} else {
+						// Driver.AddSpecial (SpecialChar.Diamond);
+						SetColor (ColorScheme.Focus);
+						Driver.AddSpecial (SpecialChar.Stipple);
+					}
+				}
+			}
 		}
 	}
 }

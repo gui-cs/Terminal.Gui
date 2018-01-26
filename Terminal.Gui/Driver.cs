@@ -161,6 +161,22 @@ namespace Terminal.Gui {
 		/// Horizontal line character.
 		/// </summary>
 		HLine,
+
+		/// <summary>
+		/// Vertical line character.
+		/// </summary>
+		VLine,
+
+		/// <summary>
+		/// Stipple pattern
+		/// </summary>
+		Stipple,
+
+		/// <summary>
+		/// Diamond character
+		/// </summary>
+		Diamond,
+
 	}
 
 	/// <summary>
@@ -297,6 +313,15 @@ namespace Terminal.Gui {
 			switch (ch) {
 			case SpecialChar.HLine:
 				AddRune (Curses.ACS_HLINE);
+				break;
+			case SpecialChar.VLine:
+				AddRune (Curses.ACS_VLINE);
+				break;
+			case SpecialChar.Stipple:
+				AddRune (Curses.ACS_CKBOARD);
+				break;
+			case SpecialChar.Diamond:
+				AddRune (Curses.ACS_DIAMOND);
 				break;
 			}
 		}
