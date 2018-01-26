@@ -276,7 +276,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static bool sync = false;
+		static bool sync = true;
 		public override void AddRune (Rune rune)
 		{
 			if (Clip.Contains (ccol, crow)) {

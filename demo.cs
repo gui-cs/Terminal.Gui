@@ -1,6 +1,28 @@
 using Terminal.Gui;
+using System;
 
 class Demo {
+	class MyView : View {
+		public MyView (int x, int y) : base (new Rect (x, y, 10, 10))
+		{
+		}
+
+		public override void Redraw(Rect region)
+		{
+			Driver.SetAttribute (ColorScheme.Focus);
+
+			for (int y = 0; y < 10; y++) {
+				Move (0, y);
+				for (int x = 0; x < 10; x++) {
+					
+					Driver.AddRune ((Rune)('0' + (x+y)%10));
+				}
+			}
+	
+		}
+
+	}
+
 	static void ShowTextAlignments (View container)
 	{
 		container.Add (
@@ -12,6 +34,13 @@ class Demo {
 
 	static void ShowEntries (View container)
 	{
+		var scrollView = new ScrollView (new Rect (50, 10, 20, 8)) {
+			ContentSize = new Size (100, 100),
+			ContentOffset = new Point (-1, -1)
+		};
+
+		scrollView.Add (new MyView (0, 0));
+
 		container.Add (
 			new Label (3, 6, "Login: "),
 			new TextField (14, 6, 40, ""),
@@ -21,6 +50,7 @@ class Demo {
 				new CheckBox (1, 0, "Remember me"),
 				new RadioGroup (1, 2, new [] { "_Personal", "_Company" }),
 			},
+			scrollView,
 			new Button (3, 19, "Ok"),
 			new Button (10, 19, "Cancel"),
 			new Label (3, 22, "Press ESC and 9 to activate the menubar")
@@ -75,7 +105,7 @@ class Demo {
 
 		ShowEntries (win);
 		int count = 0;
-		ml = new Label (new Rect (3, 17, 50, 1), "Mouse: ");
+		ml = new Label (new Rect (3, 17, 47, 1), "Mouse: ");
 		Application.RootMouseEvent += delegate (MouseEvent me) {
 
 			ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";

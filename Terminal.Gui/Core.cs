@@ -150,6 +150,13 @@ namespace Terminal.Gui {
 	///    Using ColorSchemes has the advantage that your application will work both
 	///    in color as well as black and white displays.
 	/// </para>
+	/// <para>
+	///    Views that are focusable should implement the PositionCursor to make sure that
+	///    the cursor is placed in a location that makes sense.   Unix terminals do not have
+	///    a way of hiding the cursor, so it can be distracting to have the cursor left at 
+	///    the last focused view.   So views should make sure that they place the cursor
+	///    in a visually sensible place.
+	/// </para>
 	/// </remarks>
 	public class View : Responder, IEnumerable {
 		View container = null;
@@ -442,6 +449,28 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Sets the Console driver's clip region to the current View's Bounds.
+		/// </summary>
+		/// <returns>The existing driver's Clip region, which can be then set by setting the Driver.Clip property.</returns>
+		public Rect ClipToBounds ()
+		{
+			return SetClip (Bounds);
+		}
+
+		/// <summary>
+		/// Sets the clipping region to the specified region, the region is view-relative
+		/// </summary>
+		/// <returns>The previous clip region.</returns>
+		/// <param name="rect">Rectangle region to clip into, the region is view-relative.</param>
+		public Rect SetClip (Rect rect)
+		{
+			var bscreen = RectToScreen (rect);
+			var previous = Driver.Clip;
+			Driver.Clip = ScreenClip (RectToScreen (Bounds));
+			return previous;
+		}
+
+		/// <summary>
 		/// Draws a frame in the current view, clipped by the boundary of this view
 		/// </summary>
 		/// <param name="rect">Rectangular region for the frame to be drawn.</param>
@@ -592,8 +621,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Performs a redraw of this view and its subviews, only redraws the views that have been flagged for a re-display.
 		/// </summary>
+		/// <param name="region">The region to redraw, this is relative to the view itself.</param>
 		/// <remarks>
-		/// The region argument is relative to the view itself.
+		/// <para>
+		///    Views should set the color that they want to use on entry, as otherwise this will inherit
+		///    the last color that was set globaly on the driver.
+		/// </para>
 		/// </remarks>
 		public virtual void Redraw (Rect region)
 		{

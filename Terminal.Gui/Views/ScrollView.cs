@@ -14,11 +14,15 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public class ScrollView : View {
+		View contentView;
+
 		public ScrollView (Rect frame) : base (frame)
 		{
+			contentView = new View (frame);
+			base.Add (contentView);
 		}
 
-		Rect contentSize;
+		Size contentSize;
 		Point contentOffset;
 		bool showHorizontalScrollIndicator;
 		bool showVerticalScrollIndicator;
@@ -27,12 +31,13 @@ namespace Terminal.Gui {
 		/// Represents the contents of the data shown inside the scrolview
 		/// </summary>
 		/// <value>The size of the content.</value>
-		public Rect ContentSize {
+		public Size ContentSize {
 			get {
 				return contentSize;
 			}
 			set {
 				contentSize = value;
+				contentView.Frame = new Rect (contentOffset, value);
 			}
 		}
 
@@ -45,8 +50,18 @@ namespace Terminal.Gui {
 				return contentOffset;
 			}
 			set {
-				contentOffset = value;
+				contentOffset = new Point (-value.X, -value.Y);
+				contentView.Frame = new Rect (contentOffset, contentSize);
 			}
+		}
+
+		/// <summary>
+		/// Adds the view to the scrollview.
+		/// </summary>
+		/// <param name="view">The view to add to the scrollview.</param>
+		public override void Add (View view)
+		{
+			contentView.Add (view);
 		}
 
 		/// <summary>
@@ -81,7 +96,12 @@ namespace Terminal.Gui {
 
 		public override void Redraw(Rect region)
 		{
+			var oldClip = ClipToBounds ();
 			base.Redraw(region);
+			Driver.SetAttribute (ColorScheme.Normal);
+
+			DrawFrame (Bounds);
+			Driver.Clip = oldClip;
 		}
 	}
 }
