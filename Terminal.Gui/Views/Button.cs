@@ -32,7 +32,7 @@ namespace Terminal.Gui {
 		bool is_default;
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Button"/> is the default action to activate on return on a dialog.
+		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Button"/> is the default action to activate on return on a dialog.
 		/// </summary>
 		/// <value><c>true</c> if is default; otherwise, <c>false</c>.</value>
 		public bool IsDefault {

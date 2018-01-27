@@ -19,7 +19,7 @@ namespace Terminal.Gui {
 		const int padding = 1;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Dialog"/> class with an optional set of buttons to display
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Dialog"/> class with an optional set of buttons to display
 		/// </summary>
 		/// <param name="title">Title for the dialog.</param>
 		/// <param name="width">Width for the dialog.</param>

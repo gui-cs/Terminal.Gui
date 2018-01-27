@@ -49,7 +49,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.ScrollBarView"/> class.
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Gui.ScrollBarView"/> class.
 		/// </summary>
 		/// <param name="rect">Frame for the scrollbar.</param>
 		/// <param name="size">The size that this scrollbar represents.</param>

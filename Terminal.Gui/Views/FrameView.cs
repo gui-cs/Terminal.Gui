@@ -34,7 +34,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.FrameView"/> class with
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Gui.FrameView"/> class with
 		/// a title.
 		/// </summary>
 		/// <param name="frame">Frame.</param>

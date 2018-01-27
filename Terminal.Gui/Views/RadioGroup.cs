@@ -7,7 +7,7 @@ namespace Terminal.Gui {
 		int selected, cursor;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.RadioGroup"/> class
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.RadioGroup"/> class
 		/// setting up the initial set of radio labels and the item that should be selected.
 		/// </summary>
 		/// <param name="rect">Boundaries for the radio group.</param>
@@ -29,7 +29,7 @@ namespace Terminal.Gui {
 			return new Rect (x, y, width, radioLabels.Length);
 		}
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.RadioGroup"/> class
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.RadioGroup"/> class
 		/// setting up the initial set of radio labels and the item that should be selected, 
 		/// the view frame is computed from the provided radioLabels.
 		/// </summary>

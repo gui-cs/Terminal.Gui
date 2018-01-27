@@ -188,7 +188,7 @@ namespace Terminal.Gui {
 		public ustring Id { get; set; } = "";
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.View"/> want mouse position reports.
+		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.View"/> want mouse position reports.
 		/// </summary>
 		/// <value><c>true</c> if want mouse position reports; otherwise, <c>false</c>.</value>
 		public virtual bool WantMousePositionReports { get; set; } = false;
@@ -242,7 +242,7 @@ namespace Terminal.Gui {
 		public View SuperView => container;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.View"/> class with the specified frame.   This is the default constructor.
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.View"/> class with the specified frame.   This is the default constructor.
 		/// </summary>
 		/// <param name="frame">The region covered by this view.</param>
 		public View (Rect frame)
@@ -542,7 +542,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.View"/> has focus.
+		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.View"/> has focus.
 		/// </summary>
 		/// <value><c>true</c> if has focus; otherwise, <c>false</c>.</value>
 		public override bool HasFocus {
@@ -848,9 +848,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.View"/>.
+		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.View"/>.
 		/// </summary>
-		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.View"/>.</returns>
+		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.View"/>.</returns>
 		public override string ToString ()
 		{
 			return $"{GetType ().Name}({Id})({Frame})";
@@ -874,7 +874,7 @@ namespace Terminal.Gui {
 		public bool Running;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Toplevel"/> class.
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Toplevel"/> class.
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		public Toplevel (Rect frame) : base (frame)
@@ -964,7 +964,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Window"/> class with an optioanl title
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Gui.Window"/> class with an optioanl title
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		/// <param name="title">Title.</param>
@@ -974,7 +974,7 @@ namespace Terminal.Gui {
 
 		int padding;
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Window"/> with
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Window"/> with
 		/// the specified frame for its location, with the specified border 
 		/// an optional title.
 		/// </summary>
@@ -1210,13 +1210,13 @@ namespace Terminal.Gui {
 			internal Toplevel Toplevel;
 
 			/// <summary>
-			/// Releases all resource used by the <see cref="T:Terminal.Application.RunState"/> object.
+			/// Releases all resource used by the <see cref="T:Terminal.Gui.Application.RunState"/> object.
 			/// </summary>
-			/// <remarks>Call <see cref="Dispose"/> when you are finished using the <see cref="T:Terminal.Application.RunState"/>. The
-			/// <see cref="Dispose"/> method leaves the <see cref="T:Terminal.Application.RunState"/> in an unusable state. After
+			/// <remarks>Call <see cref="Dispose"/> when you are finished using the <see cref="T:Terminal.Gui.Application.RunState"/>. The
+			/// <see cref="Dispose"/> method leaves the <see cref="T:Terminal.Gui.Application.RunState"/> in an unusable state. After
 			/// calling <see cref="Dispose"/>, you must release all references to the
-			/// <see cref="T:Terminal.Application.RunState"/> so the garbage collector can reclaim the memory that the
-			/// <see cref="T:Terminal.Application.RunState"/> was occupying.</remarks>
+			/// <see cref="T:Terminal.Gui.Application.RunState"/> so the garbage collector can reclaim the memory that the
+			/// <see cref="T:Terminal.Gui.Application.RunState"/> was occupying.</remarks>
 			public void Dispose ()
 			{
 				Dispose (true);

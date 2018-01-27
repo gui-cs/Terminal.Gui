@@ -431,9 +431,9 @@ namespace Terminal.Gui {
 		public MouseFlags Flags;
 
 		/// <summary>
-		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.MouseEvent"/>.
+		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.MouseEvent"/>.
 		/// </summary>
-		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.MouseEvent"/>.</returns>
+		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.MouseEvent"/>.</returns>
 		public override string ToString()
 		{
 			return $"({X},{Y}:{Flags}";

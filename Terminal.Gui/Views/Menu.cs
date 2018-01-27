@@ -19,7 +19,7 @@ namespace Terminal.Gui {
 	public class MenuItem {
 
 		/// <summary>
-		/// Initializes a new <see cref="T:Terminal.MenuItem"/>.
+		/// Initializes a new <see cref="T:Terminal.Gui.MenuItem"/>.
 		/// </summary>
 		/// <param name="title">Title for the menu item.</param>
 		/// <param name="help">Help text to display.</param>
@@ -272,7 +272,7 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.MenuBar"/> class with the specified set of toplevel menu items.
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.MenuBar"/> class with the specified set of toplevel menu items.
 		/// </summary>
 		/// <param name="menus">Menus.</param>
 		public MenuBar (MenuBarItem [] menus) : base (new Rect (0, 0, Application.Driver.Cols, 1))
