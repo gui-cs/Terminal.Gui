@@ -67,7 +67,9 @@ class Demo {
 	{
 		var scrollView = new ScrollView (new Rect (50, 10, 20, 8)) {
 			ContentSize = new Size (100, 100),
-			ContentOffset = new Point (5, -2)
+			ContentOffset = new Point (5, -2),
+			ShowVerticalScrollIndicator = true,
+			ShowHorizontalScrollIndicator = true
 		};
 
 		//scrollView.Add (new Box10x (0, 0));
