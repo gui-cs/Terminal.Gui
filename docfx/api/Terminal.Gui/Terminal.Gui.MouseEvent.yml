@@ -53,13 +53,13 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Returns a <xref href="System.String"></xref> that represents the current <xref href="Terminal.MouseEvent"></xref>.
+  summary: Returns a <xref href="System.String"></xref> that represents the current <xref href="Terminal.Gui.MouseEvent"></xref>.
   syntax:
     content: public override string ToString ();
     parameters: []
     return:
       type: System.String
-      description: A <xref href="System.String"></xref> that represents the current <xref href="Terminal.MouseEvent"></xref>.
+      description: A <xref href="System.String"></xref> that represents the current <xref href="Terminal.Gui.MouseEvent"></xref>.
   overload: Terminal.Gui.MouseEvent.ToString*
   exceptions: []
 - uid: Terminal.Gui.MouseEvent.X

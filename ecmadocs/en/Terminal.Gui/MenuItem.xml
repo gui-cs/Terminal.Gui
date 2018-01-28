@@ -17,12 +17,31 @@
   </Docs>
   <Members>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public MenuItem (string title, string help, Action action);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string title, string help, class System.Action action) cil managed" />
+      <MemberSignature Language="C#" Value="public MenuItem (NStack.ustring title, string help, Action action);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class NStack.ustring title, string help, class System.Action action) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
       </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="title" Type="NStack.ustring" />
+        <Parameter Name="help" Type="System.String" />
+        <Parameter Name="action" Type="System.Action" />
+      </Parameters>
+      <Docs>
+        <param name="title">Title for the menu item.</param>
+        <param name="help">Help text to display.</param>
+        <param name="action">Action to invoke when the menu item is activated.</param>
+        <summary>
+            Initializes a new <see cref="T:Terminal.Gui.MenuItem" />.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public MenuItem (string title, string help, Action action);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string title, string help, class System.Action action) cil managed" />
+      <MemberType>Constructor</MemberType>
       <Parameters>
         <Parameter Name="title" Type="System.String" />
         <Parameter Name="help" Type="System.String" />
@@ -57,14 +76,14 @@
       </Docs>
     </Member>
     <Member MemberName="Help">
-      <MemberSignature Language="C#" Value="public string Help { get; set; }" />
-      <MemberSignature Language="ILAsm" Value=".property instance string Help" />
+      <MemberSignature Language="C#" Value="public NStack.ustring Help { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class NStack.ustring Help" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
-        <ReturnType>System.String</ReturnType>
+        <ReturnType>NStack.ustring</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>
@@ -75,14 +94,14 @@
       </Docs>
     </Member>
     <Member MemberName="HotKey">
-      <MemberSignature Language="C#" Value="public char HotKey;" />
-      <MemberSignature Language="ILAsm" Value=".field public char HotKey" />
+      <MemberSignature Language="C#" Value="public Rune HotKey;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune HotKey" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
-        <ReturnType>System.Char</ReturnType>
+        <ReturnType>System.Rune</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>
@@ -111,14 +130,14 @@
       </Docs>
     </Member>
     <Member MemberName="Title">
-      <MemberSignature Language="C#" Value="public string Title { get; set; }" />
-      <MemberSignature Language="ILAsm" Value=".property instance string Title" />
+      <MemberSignature Language="C#" Value="public NStack.ustring Title { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class NStack.ustring Title" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
-        <ReturnType>System.String</ReturnType>
+        <ReturnType>NStack.ustring</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>

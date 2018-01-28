@@ -33,12 +33,18 @@ items:
   - Terminal.Gui.Toplevel.Running
   - Terminal.Gui.View.Add(Terminal.Gui.View[])
   - Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
+  - Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
   - Terminal.Gui.View.Bounds
   - Terminal.Gui.View.ChildNeedsDisplay
   - Terminal.Gui.View.Clear
+  - Terminal.Gui.View.Clear(Terminal.Gui.Rect)
   - Terminal.Gui.View.ClearNeedsDisplay
+  - Terminal.Gui.View.ClipToBounds
   - Terminal.Gui.View.ColorScheme
   - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  - Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  - Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
   - Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
   - Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
   - Terminal.Gui.View.Driver
@@ -56,9 +62,9 @@ items:
   - Terminal.Gui.View.PositionCursor
   - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
-  - Terminal.Gui.View.Remove(Terminal.Gui.View)
   - Terminal.Gui.View.RemoveAll
   - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  - Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
   - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
   - Terminal.Gui.View.SetNeedsDisplay
   - Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
@@ -69,6 +75,7 @@ items:
   - Terminal.Gui.Window.Add(Terminal.Gui.View)
   - Terminal.Gui.Window.GetEnumerator
   - Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.Window.Remove(Terminal.Gui.View)
   - Terminal.Gui.Window.Title
 - uid: Terminal.Gui.Dialog.#ctor(System.String,System.Int32,System.Int32,Terminal.Gui.Button[])
   id: '#ctor(System.String,System.Int32,System.Int32,Terminal.Gui.Button[])'
@@ -82,7 +89,7 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Initializes a new instance of the <xref href="Terminal.Dialog"></xref> class with an optional set of buttons to display
+  summary: Initializes a new instance of the <xref href="Terminal.Gui.Dialog"></xref> class with an optional set of buttons to display
   syntax:
     content: public Dialog (string title, int width, int height, Terminal.Gui.Button[] buttons);
     parameters:
@@ -306,6 +313,12 @@ references:
   name: AddCh(Int32, Int32, Int32)
   nameWithType: View.AddCh(Int32, Int32, Int32)
   fullName: View.AddCh(Int32, Int32, Int32)
+- uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: AddRune(Int32, Int32, Rune)
+  nameWithType: View.AddRune(Int32, Int32, Rune)
+  fullName: View.AddRune(Int32, Int32, Rune)
 - uid: Terminal.Gui.View.Bounds
   parent: Terminal.Gui.View
   isExternal: false
@@ -324,12 +337,24 @@ references:
   name: Clear()
   nameWithType: View.Clear()
   fullName: View.Clear()
+- uid: Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Clear(Rect)
+  nameWithType: View.Clear(Rect)
+  fullName: View.Clear(Rect)
 - uid: Terminal.Gui.View.ClearNeedsDisplay
   parent: Terminal.Gui.View
   isExternal: false
   name: ClearNeedsDisplay()
   nameWithType: View.ClearNeedsDisplay()
   fullName: View.ClearNeedsDisplay()
+- uid: Terminal.Gui.View.ClipToBounds
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ClipToBounds()
+  nameWithType: View.ClipToBounds()
+  fullName: View.ClipToBounds()
 - uid: Terminal.Gui.View.ColorScheme
   parent: Terminal.Gui.View
   isExternal: false
@@ -342,6 +367,24 @@ references:
   name: DrawFrame(Rect, Boolean)
   nameWithType: View.DrawFrame(Rect, Boolean)
   fullName: View.DrawFrame(Rect, Boolean)
+- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawFrame(Rect, Int32, Boolean)
+  nameWithType: View.DrawFrame(Rect, Int32, Boolean)
+  fullName: View.DrawFrame(Rect, Int32, Boolean)
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(ustring, Boolean, ColorScheme)
+  nameWithType: View.DrawHotString(ustring, Boolean, ColorScheme)
+  fullName: View.DrawHotString(ustring, Boolean, ColorScheme)
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(ustring, Attribute, Attribute)
+  nameWithType: View.DrawHotString(ustring, Attribute, Attribute)
+  fullName: View.DrawHotString(ustring, Attribute, Attribute)
 - uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
   parent: Terminal.Gui.View
   isExternal: false
@@ -438,12 +481,12 @@ references:
   name: Redraw(Rect)
   nameWithType: Window.Redraw(Rect)
   fullName: Window.Redraw(Rect)
-- uid: Terminal.Gui.View.Remove(Terminal.Gui.View)
-  parent: Terminal.Gui.View
+- uid: Terminal.Gui.Window.Remove(Terminal.Gui.View)
+  parent: Terminal.Gui.Window
   isExternal: false
   name: Remove(View)
-  nameWithType: View.Remove(View)
-  fullName: View.Remove(View)
+  nameWithType: Window.Remove(View)
+  fullName: Window.Remove(View)
 - uid: Terminal.Gui.View.RemoveAll
   parent: Terminal.Gui.View
   isExternal: false
@@ -456,6 +499,12 @@ references:
   name: ScreenToView(Int32, Int32)
   nameWithType: View.ScreenToView(Int32, Int32)
   fullName: View.ScreenToView(Int32, Int32)
+- uid: Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetClip(Rect)
+  nameWithType: View.SetClip(Rect)
+  fullName: View.SetClip(Rect)
 - uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
   parent: Terminal.Gui.View
   isExternal: false

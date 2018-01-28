@@ -29,7 +29,7 @@
       <Docs>
         <param name="menus">Menus.</param>
         <summary>
-            Initializes a new instance of the <see cref="T:Terminal.MenuBar" /> class with the specified set of toplevel menu items.
+            Initializes a new instance of the <see cref="T:Terminal.Gui.MenuBar" /> class with the specified set of toplevel menu items.
             </summary>
         <remarks>To be added.</remarks>
       </Docs>

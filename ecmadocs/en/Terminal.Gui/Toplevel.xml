@@ -34,7 +34,7 @@
       <Docs>
         <param name="frame">Frame.</param>
         <summary>
-            Initializes a new instance of the <see cref="T:Terminal.Toplevel" /> class.
+            Initializes a new instance of the <see cref="T:Terminal.Gui.Toplevel" /> class.
             </summary>
         <remarks>To be added.</remarks>
       </Docs>

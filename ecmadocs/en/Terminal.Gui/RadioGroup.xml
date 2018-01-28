@@ -33,7 +33,7 @@
         <param name="radioLabels">Radio labels, the strings can contain hotkeys using an undermine before the letter.</param>
         <param name="selected">The item to be selected, the value is clamped to the number of items.</param>
         <summary>
-            Initializes a new instance of the <see cref="T:Terminal.RadioGroup" /> class
+            Initializes a new instance of the <see cref="T:Terminal.Gui.RadioGroup" /> class
             setting up the initial set of radio labels and the item that should be selected.
             </summary>
         <remarks>To be added.</remarks>
@@ -58,7 +58,7 @@
         <param name="radioLabels">Radio labels, the strings can contain hotkeys using an undermine before the letter.</param>
         <param name="selected">The item to be selected, the value is clamped to the number of items.</param>
         <summary>
-            Initializes a new instance of the <see cref="T:Terminal.RadioGroup" /> class
+            Initializes a new instance of the <see cref="T:Terminal.Gui.RadioGroup" /> class
             setting up the initial set of radio labels and the item that should be selected, 
             the view frame is computed from the provided radioLabels.
             </summary>

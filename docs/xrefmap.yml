@@ -1511,6 +1511,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html
   fullName: Terminal.Gui.CheckBox
   nameWithType: CheckBox
+- uid: Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,NStack.ustring)
+  name: CheckBox(Int32, Int32, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_NStack_ustring_
+  fullName: CheckBox.CheckBox(Int32, Int32, ustring)
+  nameWithType: CheckBox.CheckBox(Int32, Int32, ustring)
+- uid: Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,NStack.ustring,System.Boolean)
+  name: CheckBox(Int32, Int32, ustring, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_NStack_ustring_System_Boolean_
+  fullName: CheckBox.CheckBox(Int32, Int32, ustring, Boolean)
+  nameWithType: CheckBox.CheckBox(Int32, Int32, ustring, Boolean)
 - uid: Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,System.String)
   name: CheckBox(Int32, Int32, String)
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_System_String_
@@ -1761,6 +1771,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddCh_
   fullName: ConsoleDriver.AddCh
   nameWithType: ConsoleDriver.AddCh
+- uid: Terminal.Gui.ConsoleDriver.AddRune(System.Rune)
+  name: AddRune(Rune)
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddRune_System_Rune_
+  fullName: ConsoleDriver.AddRune(Rune)
+  nameWithType: ConsoleDriver.AddRune(Rune)
+- uid: Terminal.Gui.ConsoleDriver.AddRune*
+  name: AddRune
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddRune_
+  fullName: ConsoleDriver.AddRune
+  nameWithType: ConsoleDriver.AddRune
 - uid: Terminal.Gui.ConsoleDriver.AddSpecial(Terminal.Gui.SpecialChar)
   name: AddSpecial(SpecialChar)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddSpecial_Terminal_Gui_SpecialChar_
@@ -1771,6 +1791,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddSpecial_
   fullName: ConsoleDriver.AddSpecial
   nameWithType: ConsoleDriver.AddSpecial
+- uid: Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)
+  name: AddStr(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddStr_NStack_ustring_
+  fullName: ConsoleDriver.AddStr(ustring)
+  nameWithType: ConsoleDriver.AddStr(ustring)
 - uid: Terminal.Gui.ConsoleDriver.AddStr(System.String)
   name: AddStr(String)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddStr_System_String_
@@ -1801,11 +1826,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Cols_
   fullName: ConsoleDriver.Cols
   nameWithType: ConsoleDriver.Cols
-- uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Boolean)
-  name: DrawFrame(Rect, Boolean)
-  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawFrame_Terminal_Gui_Rect_System_Boolean_
-  fullName: ConsoleDriver.DrawFrame(Rect, Boolean)
-  nameWithType: ConsoleDriver.DrawFrame(Rect, Boolean)
+- uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  name: DrawFrame(Rect, Int32, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_
+  fullName: ConsoleDriver.DrawFrame(Rect, Int32, Boolean)
+  nameWithType: ConsoleDriver.DrawFrame(Rect, Int32, Boolean)
 - uid: Terminal.Gui.ConsoleDriver.DrawFrame*
   name: DrawFrame
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawFrame_
@@ -1981,6 +2006,76 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_ProcessKey_
   fullName: Dialog.ProcessKey
   nameWithType: Dialog.ProcessKey
+- uid: Terminal.Gui.FrameView
+  name: FrameView
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html
+  fullName: Terminal.Gui.FrameView
+  nameWithType: FrameView
+- uid: Terminal.Gui.FrameView.#ctor(Terminal.Gui.Rect,NStack.ustring)
+  name: FrameView(Rect, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView__ctor_Terminal_Gui_Rect_NStack_ustring_
+  fullName: FrameView.FrameView(Rect, ustring)
+  nameWithType: FrameView.FrameView(Rect, ustring)
+- uid: Terminal.Gui.FrameView.#ctor*
+  name: FrameView
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView__ctor_
+  fullName: FrameView.FrameView
+  nameWithType: FrameView.FrameView
+- uid: Terminal.Gui.FrameView.Add(Terminal.Gui.View)
+  name: Add(View)
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Add_Terminal_Gui_View_
+  fullName: FrameView.Add(View)
+  nameWithType: FrameView.Add(View)
+- uid: Terminal.Gui.FrameView.Add*
+  name: Add
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Add_
+  fullName: FrameView.Add
+  nameWithType: FrameView.Add
+- uid: Terminal.Gui.FrameView.Redraw(Terminal.Gui.Rect)
+  name: Redraw(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Redraw_Terminal_Gui_Rect_
+  fullName: FrameView.Redraw(Rect)
+  nameWithType: FrameView.Redraw(Rect)
+- uid: Terminal.Gui.FrameView.Redraw*
+  name: Redraw
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Redraw_
+  fullName: FrameView.Redraw
+  nameWithType: FrameView.Redraw
+- uid: Terminal.Gui.FrameView.Remove(Terminal.Gui.View)
+  name: Remove(View)
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Remove_Terminal_Gui_View_
+  fullName: FrameView.Remove(View)
+  nameWithType: FrameView.Remove(View)
+- uid: Terminal.Gui.FrameView.Remove*
+  name: Remove
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Remove_
+  fullName: FrameView.Remove
+  nameWithType: FrameView.Remove
+- uid: Terminal.Gui.FrameView.Title
+  name: Title
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Title
+  fullName: FrameView.Title
+  nameWithType: FrameView.Title
+- uid: Terminal.Gui.FrameView.Title*
+  name: Title
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Title_
+  fullName: FrameView.Title
+  nameWithType: FrameView.Title
+- uid: Terminal.Gui.IListDataSource
+  name: IListDataSource
+  href: api/Terminal.Gui/Terminal.Gui.IListDataSource.html
+  fullName: Terminal.Gui.IListDataSource
+  nameWithType: IListDataSource
+- uid: Terminal.Gui.IListDataSource.Count
+  name: Count
+  href: api/Terminal.Gui/Terminal.Gui.IListDataSource.html#Terminal_Gui_IListDataSource_Count
+  fullName: IListDataSource.Count
+  nameWithType: IListDataSource.Count
+- uid: Terminal.Gui.IListDataSource.Count*
+  name: Count
+  href: api/Terminal.Gui/Terminal.Gui.IListDataSource.html#Terminal_Gui_IListDataSource_Count_
+  fullName: IListDataSource.Count
+  nameWithType: IListDataSource.Count
 - uid: Terminal.Gui.Key
   name: Key
   href: api/Terminal.Gui/Terminal.Gui.Key.html
@@ -2326,11 +2421,21 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Label.html
   fullName: Terminal.Gui.Label
   nameWithType: Label
+- uid: Terminal.Gui.Label.#ctor(System.Int32,System.Int32,NStack.ustring)
+  name: Label(Int32, Int32, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label__ctor_System_Int32_System_Int32_NStack_ustring_
+  fullName: Label.Label(Int32, Int32, ustring)
+  nameWithType: Label.Label(Int32, Int32, ustring)
 - uid: Terminal.Gui.Label.#ctor(System.Int32,System.Int32,System.String)
   name: Label(Int32, Int32, String)
   href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label__ctor_System_Int32_System_Int32_System_String_
   fullName: Label.Label(Int32, Int32, String)
   nameWithType: Label.Label(Int32, Int32, String)
+- uid: Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,NStack.ustring)
+  name: Label(Rect, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label__ctor_Terminal_Gui_Rect_NStack_ustring_
+  fullName: Label.Label(Rect, ustring)
+  nameWithType: Label.Label(Rect, ustring)
 - uid: Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,System.String)
   name: Label(Rect, String)
   href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label__ctor_Terminal_Gui_Rect_System_String_
@@ -2341,6 +2446,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label__ctor_
   fullName: Label.Label
   nameWithType: Label.Label
+- uid: Terminal.Gui.Label.MeasureLines(NStack.ustring,System.Int32)
+  name: MeasureLines(ustring, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_MeasureLines_NStack_ustring_System_Int32_
+  fullName: Label.MeasureLines(ustring, Int32)
+  nameWithType: Label.MeasureLines(ustring, Int32)
 - uid: Terminal.Gui.Label.MeasureLines(System.String,System.Int32)
   name: MeasureLines(String, Int32)
   href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_MeasureLines_System_String_System_Int32_
@@ -2391,6 +2501,21 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_TextColor_
   fullName: Label.TextColor
   nameWithType: Label.TextColor
+- uid: Terminal.Gui.ListView
+  name: ListView
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html
+  fullName: Terminal.Gui.ListView
+  nameWithType: ListView
+- uid: Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource,System.ValueTuple{NStack.ustring,System.Int32}[])
+  name: ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView__ctor_Terminal_Gui_Rect_Terminal_Gui_IListDataSource_System_ValueTuple_NStack_ustring_System_Int32____
+  fullName: ListView.ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
+  nameWithType: ListView.ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
+- uid: Terminal.Gui.ListView.#ctor*
+  name: ListView
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView__ctor_
+  fullName: ListView.ListView
+  nameWithType: ListView.ListView
 - uid: Terminal.Gui.MenuBar
   name: MenuBar
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html
@@ -2471,11 +2596,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html
   fullName: Terminal.Gui.MenuBarItem
   nameWithType: MenuBarItem
-- uid: Terminal.Gui.MenuBarItem.#ctor(System.String,Terminal.Gui.MenuItem[])
-  name: MenuBarItem(String, MenuItem[])
-  href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem__ctor_System_String_Terminal_Gui_MenuItem___
-  fullName: MenuBarItem.MenuBarItem(String, MenuItem[])
-  nameWithType: MenuBarItem.MenuBarItem(String, MenuItem[])
+- uid: Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,Terminal.Gui.MenuItem[])
+  name: MenuBarItem(ustring, MenuItem[])
+  href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem__ctor_NStack_ustring_Terminal_Gui_MenuItem___
+  fullName: MenuBarItem.MenuBarItem(ustring, MenuItem[])
+  nameWithType: MenuBarItem.MenuBarItem(ustring, MenuItem[])
 - uid: Terminal.Gui.MenuBarItem.#ctor*
   name: MenuBarItem
   href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem__ctor_
@@ -2506,6 +2631,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.MenuItem.html
   fullName: Terminal.Gui.MenuItem
   nameWithType: MenuItem
+- uid: Terminal.Gui.MenuItem.#ctor(NStack.ustring,System.String,System.Action)
+  name: MenuItem(ustring, String, Action)
+  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem__ctor_NStack_ustring_System_String_System_Action_
+  fullName: MenuItem.MenuItem(ustring, String, Action)
+  nameWithType: MenuItem.MenuItem(ustring, String, Action)
 - uid: Terminal.Gui.MenuItem.#ctor(System.String,System.String,System.Action)
   name: MenuItem(String, String, Action)
   href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem__ctor_System_String_System_String_System_Action_
@@ -3346,6 +3476,66 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Responder.html#Terminal_Gui_Responder_ProcessKey_
   fullName: Responder.ProcessKey
   nameWithType: Responder.ProcessKey
+- uid: Terminal.Gui.ScrollBarView
+  name: ScrollBarView
+  href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html
+  fullName: Terminal.Gui.ScrollBarView
+  nameWithType: ScrollBarView
+- uid: Terminal.Gui.ScrollBarView.#ctor(Terminal.Gui.Rect,System.Int32,System.Int32,System.Boolean)
+  name: ScrollBarView(Rect, Int32, Int32, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView__ctor_Terminal_Gui_Rect_System_Int32_System_Int32_System_Boolean_
+  fullName: ScrollBarView.ScrollBarView(Rect, Int32, Int32, Boolean)
+  nameWithType: ScrollBarView.ScrollBarView(Rect, Int32, Int32, Boolean)
+- uid: Terminal.Gui.ScrollBarView.#ctor*
+  name: ScrollBarView
+  href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView__ctor_
+  fullName: ScrollBarView.ScrollBarView
+  nameWithType: ScrollBarView.ScrollBarView
+- uid: Terminal.Gui.ScrollBarView.ChangedPosition
+  name: ChangedPosition
+  href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_ChangedPosition
+  fullName: ScrollBarView.ChangedPosition
+  nameWithType: ScrollBarView.ChangedPosition
+- uid: Terminal.Gui.ScrollBarView.MouseEvent(Terminal.Gui.MouseEvent)
+  name: MouseEvent(MouseEvent)
+  href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_MouseEvent_Terminal_Gui_MouseEvent_
+  fullName: ScrollBarView.MouseEvent(MouseEvent)
+  nameWithType: ScrollBarView.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.ScrollBarView.MouseEvent*
+  name: MouseEvent
+  href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_MouseEvent_
+  fullName: ScrollBarView.MouseEvent
+  nameWithType: ScrollBarView.MouseEvent
+- uid: Terminal.Gui.ScrollBarView.Position
+  name: Position
+  href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_Position
+  fullName: ScrollBarView.Position
+  nameWithType: ScrollBarView.Position
+- uid: Terminal.Gui.ScrollBarView.Position*
+  name: Position
+  href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_Position_
+  fullName: ScrollBarView.Position
+  nameWithType: ScrollBarView.Position
+- uid: Terminal.Gui.ScrollBarView.Redraw(Terminal.Gui.Rect)
+  name: Redraw(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_Redraw_Terminal_Gui_Rect_
+  fullName: ScrollBarView.Redraw(Rect)
+  nameWithType: ScrollBarView.Redraw(Rect)
+- uid: Terminal.Gui.ScrollBarView.Redraw*
+  name: Redraw
+  href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_Redraw_
+  fullName: ScrollBarView.Redraw
+  nameWithType: ScrollBarView.Redraw
+- uid: Terminal.Gui.ScrollBarView.Size
+  name: Size
+  href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_Size
+  fullName: ScrollBarView.Size
+  nameWithType: ScrollBarView.Size
+- uid: Terminal.Gui.ScrollBarView.Size*
+  name: Size
+  href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_Size_
+  fullName: ScrollBarView.Size
+  nameWithType: ScrollBarView.Size
 - uid: Terminal.Gui.ScrollView
   name: ScrollView
   href: api/Terminal.Gui/Terminal.Gui.ScrollView.html
@@ -3361,6 +3551,81 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView__ctor_
   fullName: ScrollView.ScrollView
   nameWithType: ScrollView.ScrollView
+- uid: Terminal.Gui.ScrollView.Add(Terminal.Gui.View)
+  name: Add(View)
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_Add_Terminal_Gui_View_
+  fullName: ScrollView.Add(View)
+  nameWithType: ScrollView.Add(View)
+- uid: Terminal.Gui.ScrollView.Add*
+  name: Add
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_Add_
+  fullName: ScrollView.Add
+  nameWithType: ScrollView.Add
+- uid: Terminal.Gui.ScrollView.ContentOffset
+  name: ContentOffset
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ContentOffset
+  fullName: ScrollView.ContentOffset
+  nameWithType: ScrollView.ContentOffset
+- uid: Terminal.Gui.ScrollView.ContentOffset*
+  name: ContentOffset
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ContentOffset_
+  fullName: ScrollView.ContentOffset
+  nameWithType: ScrollView.ContentOffset
+- uid: Terminal.Gui.ScrollView.ContentSize
+  name: ContentSize
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ContentSize
+  fullName: ScrollView.ContentSize
+  nameWithType: ScrollView.ContentSize
+- uid: Terminal.Gui.ScrollView.ContentSize*
+  name: ContentSize
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ContentSize_
+  fullName: ScrollView.ContentSize
+  nameWithType: ScrollView.ContentSize
+- uid: Terminal.Gui.ScrollView.PositionCursor
+  name: PositionCursor()
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_PositionCursor
+  fullName: ScrollView.PositionCursor()
+  nameWithType: ScrollView.PositionCursor()
+- uid: Terminal.Gui.ScrollView.PositionCursor*
+  name: PositionCursor
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_PositionCursor_
+  fullName: ScrollView.PositionCursor
+  nameWithType: ScrollView.PositionCursor
+- uid: Terminal.Gui.ScrollView.Redraw(Terminal.Gui.Rect)
+  name: Redraw(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_Redraw_Terminal_Gui_Rect_
+  fullName: ScrollView.Redraw(Rect)
+  nameWithType: ScrollView.Redraw(Rect)
+- uid: Terminal.Gui.ScrollView.Redraw*
+  name: Redraw
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_Redraw_
+  fullName: ScrollView.Redraw
+  nameWithType: ScrollView.Redraw
+- uid: Terminal.Gui.ScrollView.Scrolled
+  name: Scrolled
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_Scrolled
+  fullName: ScrollView.Scrolled
+  nameWithType: ScrollView.Scrolled
+- uid: Terminal.Gui.ScrollView.ShowHorizontalScrollIndicator
+  name: ShowHorizontalScrollIndicator
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ShowHorizontalScrollIndicator
+  fullName: ScrollView.ShowHorizontalScrollIndicator
+  nameWithType: ScrollView.ShowHorizontalScrollIndicator
+- uid: Terminal.Gui.ScrollView.ShowHorizontalScrollIndicator*
+  name: ShowHorizontalScrollIndicator
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ShowHorizontalScrollIndicator_
+  fullName: ScrollView.ShowHorizontalScrollIndicator
+  nameWithType: ScrollView.ShowHorizontalScrollIndicator
+- uid: Terminal.Gui.ScrollView.ShowVerticalScrollIndicator
+  name: ShowVerticalScrollIndicator
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ShowVerticalScrollIndicator
+  fullName: ScrollView.ShowVerticalScrollIndicator
+  nameWithType: ScrollView.ShowVerticalScrollIndicator
+- uid: Terminal.Gui.ScrollView.ShowVerticalScrollIndicator*
+  name: ShowVerticalScrollIndicator
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ShowVerticalScrollIndicator_
+  fullName: ScrollView.ShowVerticalScrollIndicator
+  nameWithType: ScrollView.ShowVerticalScrollIndicator
 - uid: Terminal.Gui.Size
   name: Size
   href: api/Terminal.Gui/Terminal.Gui.Size.html
@@ -3521,11 +3786,66 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html
   fullName: Terminal.Gui.SpecialChar
   nameWithType: SpecialChar
+- uid: Terminal.Gui.SpecialChar.BottomTee
+  name: BottomTee
+  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_BottomTee
+  fullName: SpecialChar.BottomTee
+  nameWithType: SpecialChar.BottomTee
+- uid: Terminal.Gui.SpecialChar.Diamond
+  name: Diamond
+  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_Diamond
+  fullName: SpecialChar.Diamond
+  nameWithType: SpecialChar.Diamond
 - uid: Terminal.Gui.SpecialChar.HLine
   name: HLine
   href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_HLine
   fullName: SpecialChar.HLine
   nameWithType: SpecialChar.HLine
+- uid: Terminal.Gui.SpecialChar.LeftTee
+  name: LeftTee
+  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_LeftTee
+  fullName: SpecialChar.LeftTee
+  nameWithType: SpecialChar.LeftTee
+- uid: Terminal.Gui.SpecialChar.LLCorner
+  name: LLCorner
+  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_LLCorner
+  fullName: SpecialChar.LLCorner
+  nameWithType: SpecialChar.LLCorner
+- uid: Terminal.Gui.SpecialChar.LRCorner
+  name: LRCorner
+  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_LRCorner
+  fullName: SpecialChar.LRCorner
+  nameWithType: SpecialChar.LRCorner
+- uid: Terminal.Gui.SpecialChar.RightTee
+  name: RightTee
+  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_RightTee
+  fullName: SpecialChar.RightTee
+  nameWithType: SpecialChar.RightTee
+- uid: Terminal.Gui.SpecialChar.Stipple
+  name: Stipple
+  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_Stipple
+  fullName: SpecialChar.Stipple
+  nameWithType: SpecialChar.Stipple
+- uid: Terminal.Gui.SpecialChar.TopTee
+  name: TopTee
+  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_TopTee
+  fullName: SpecialChar.TopTee
+  nameWithType: SpecialChar.TopTee
+- uid: Terminal.Gui.SpecialChar.ULCorner
+  name: ULCorner
+  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_ULCorner
+  fullName: SpecialChar.ULCorner
+  nameWithType: SpecialChar.ULCorner
+- uid: Terminal.Gui.SpecialChar.URCorner
+  name: URCorner
+  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_URCorner
+  fullName: SpecialChar.URCorner
+  nameWithType: SpecialChar.URCorner
+- uid: Terminal.Gui.SpecialChar.VLine
+  name: VLine
+  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_VLine
+  fullName: SpecialChar.VLine
+  nameWithType: SpecialChar.VLine
 - uid: Terminal.Gui.TextAlignment
   name: TextAlignment
   href: api/Terminal.Gui/Terminal.Gui.TextAlignment.html
@@ -3741,6 +4061,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_AddCh_
   fullName: View.AddCh
   nameWithType: View.AddCh
+- uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+  name: AddRune(Int32, Int32, Rune)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_AddRune_System_Int32_System_Int32_System_Rune_
+  fullName: View.AddRune(Int32, Int32, Rune)
+  nameWithType: View.AddRune(Int32, Int32, Rune)
+- uid: Terminal.Gui.View.AddRune*
+  name: AddRune
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_AddRune_
+  fullName: View.AddRune
+  nameWithType: View.AddRune
 - uid: Terminal.Gui.View.Bounds
   name: Bounds
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Bounds
@@ -3766,6 +4096,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Clear
   fullName: View.Clear()
   nameWithType: View.Clear()
+- uid: Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+  name: Clear(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Clear_Terminal_Gui_Rect_
+  fullName: View.Clear(Rect)
+  nameWithType: View.Clear(Rect)
 - uid: Terminal.Gui.View.Clear*
   name: Clear
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Clear_
@@ -3781,6 +4116,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ClearNeedsDisplay_
   fullName: View.ClearNeedsDisplay
   nameWithType: View.ClearNeedsDisplay
+- uid: Terminal.Gui.View.ClipToBounds
+  name: ClipToBounds()
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ClipToBounds
+  fullName: View.ClipToBounds()
+  nameWithType: View.ClipToBounds()
+- uid: Terminal.Gui.View.ClipToBounds*
+  name: ClipToBounds
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ClipToBounds_
+  fullName: View.ClipToBounds
+  nameWithType: View.ClipToBounds
 - uid: Terminal.Gui.View.ColorScheme
   name: ColorScheme
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ColorScheme
@@ -3796,11 +4141,26 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Boolean_
   fullName: View.DrawFrame(Rect, Boolean)
   nameWithType: View.DrawFrame(Rect, Boolean)
+- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  name: DrawFrame(Rect, Int32, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_
+  fullName: View.DrawFrame(Rect, Int32, Boolean)
+  nameWithType: View.DrawFrame(Rect, Int32, Boolean)
 - uid: Terminal.Gui.View.DrawFrame*
   name: DrawFrame
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_
   fullName: View.DrawFrame
   nameWithType: View.DrawFrame
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  name: DrawHotString(ustring, Boolean, ColorScheme)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_
+  fullName: View.DrawHotString(ustring, Boolean, ColorScheme)
+  nameWithType: View.DrawHotString(ustring, Boolean, ColorScheme)
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  name: DrawHotString(ustring, Attribute, Attribute)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_Terminal_Gui_Attribute_Terminal_Gui_Attribute_
+  fullName: View.DrawHotString(ustring, Attribute, Attribute)
+  nameWithType: View.DrawHotString(ustring, Attribute, Attribute)
 - uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
   name: DrawHotString(String, Boolean, ColorScheme)
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_System_String_System_Boolean_Terminal_Gui_ColorScheme_
@@ -4031,6 +4391,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ScreenToView_
   fullName: View.ScreenToView
   nameWithType: View.ScreenToView
+- uid: Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+  name: SetClip(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_SetClip_Terminal_Gui_Rect_
+  fullName: View.SetClip(Rect)
+  nameWithType: View.SetClip(Rect)
+- uid: Terminal.Gui.View.SetClip*
+  name: SetClip
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_SetClip_
+  fullName: View.SetClip
+  nameWithType: View.SetClip
 - uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
   name: SetFocus(View)
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_SetFocus_Terminal_Gui_View_
@@ -4101,6 +4471,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Window.html
   fullName: Terminal.Gui.Window
   nameWithType: Window
+- uid: Terminal.Gui.Window.#ctor(Terminal.Gui.Rect,NStack.ustring)
+  name: Window(Rect, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window__ctor_Terminal_Gui_Rect_NStack_ustring_
+  fullName: Window.Window(Rect, ustring)
+  nameWithType: Window.Window(Rect, ustring)
+- uid: Terminal.Gui.Window.#ctor(Terminal.Gui.Rect,NStack.ustring,System.Int32)
+  name: Window(Rect, ustring, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window__ctor_Terminal_Gui_Rect_NStack_ustring_System_Int32_
+  fullName: Window.Window(Rect, ustring, Int32)
+  nameWithType: Window.Window(Rect, ustring, Int32)
 - uid: Terminal.Gui.Window.#ctor(Terminal.Gui.Rect,System.String)
   name: Window(Rect, String)
   href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window__ctor_Terminal_Gui_Rect_System_String_
@@ -4141,6 +4521,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_Redraw_
   fullName: Window.Redraw
   nameWithType: Window.Redraw
+- uid: Terminal.Gui.Window.Remove(Terminal.Gui.View)
+  name: Remove(View)
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_Remove_Terminal_Gui_View_
+  fullName: Window.Remove(View)
+  nameWithType: Window.Remove(View)
+- uid: Terminal.Gui.Window.Remove*
+  name: Remove
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_Remove_
+  fullName: Window.Remove
+  nameWithType: Window.Remove
 - uid: Terminal.Gui.Window.Title
   name: Title
   href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_Title

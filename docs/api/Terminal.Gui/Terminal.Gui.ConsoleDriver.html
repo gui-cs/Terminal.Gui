@@ -104,7 +104,7 @@
   
   <a id="Terminal_Gui_ConsoleDriver_Clip_" data-uid="Terminal.Gui.ConsoleDriver.Clip*"></a>
   <h4 id="Terminal_Gui_ConsoleDriver_Clip" data-uid="Terminal.Gui.ConsoleDriver.Clip">Clip</h4>
-  <div class="markdown level1 summary"><p>Controls the current clipping region that AddCh/AddStr is subject to.</p>
+  <div class="markdown level1 summary"><p>Controls the current clipping region that AddRune/AddStr is subject to.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -214,6 +214,35 @@
   </table>
   
   
+  <a id="Terminal_Gui_ConsoleDriver_AddRune_" data-uid="Terminal.Gui.ConsoleDriver.AddRune*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_AddRune_System_Rune_" data-uid="Terminal.Gui.ConsoleDriver.AddRune(System.Rune)">AddRune(Rune)</h4>
+  <div class="markdown level1 summary"><p>Adds the specified rune to the display at the current cursor position</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract void AddRune (Rune rune);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td><span class="parametername">rune</span></td>
+        <td><p>Rune to add.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_ConsoleDriver_AddSpecial_" data-uid="Terminal.Gui.ConsoleDriver.AddSpecial*"></a>
   <h4 id="Terminal_Gui_ConsoleDriver_AddSpecial_Terminal_Gui_SpecialChar_" data-uid="Terminal.Gui.ConsoleDriver.AddSpecial(Terminal.Gui.SpecialChar)">AddSpecial(SpecialChar)</h4>
   <div class="markdown level1 summary"><p>Draws a special characters in the screen</p>
@@ -237,6 +266,35 @@
         <td><a class="xref" href="Terminal.Gui.SpecialChar.html">SpecialChar</a></td>
         <td><span class="parametername">ch</span></td>
         <td><p>Ch.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_AddStr_" data-uid="Terminal.Gui.ConsoleDriver.AddStr*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_AddStr_NStack_ustring_" data-uid="Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)">AddStr(ustring)</h4>
+  <div class="markdown level1 summary"><p>Adds the specified</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract void AddStr (NStack.ustring str);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">str</span></td>
+        <td><p>String.</p>
 </td>
       </tr>
     </tbody>
@@ -273,12 +331,12 @@
   
   
   <a id="Terminal_Gui_ConsoleDriver_DrawFrame_" data-uid="Terminal.Gui.ConsoleDriver.DrawFrame*"></a>
-  <h4 id="Terminal_Gui_ConsoleDriver_DrawFrame_Terminal_Gui_Rect_System_Boolean_" data-uid="Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Boolean)">DrawFrame(Rect, Boolean)</h4>
+  <h4 id="Terminal_Gui_ConsoleDriver_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_" data-uid="Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)">DrawFrame(Rect, Int32, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract void DrawFrame (Terminal.Gui.Rect region, bool fill);</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract void DrawFrame (Terminal.Gui.Rect region, int padding, bool fill);</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -293,6 +351,12 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">region</span></td>
+        <td><p>To be added.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">padding</span></td>
         <td><p>To be added.</p>
 </td>
       </tr>

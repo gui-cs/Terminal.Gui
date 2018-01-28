@@ -7,12 +7,18 @@ items:
   - Terminal.Gui.View.Add(Terminal.Gui.View)
   - Terminal.Gui.View.Add(Terminal.Gui.View[])
   - Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
+  - Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
   - Terminal.Gui.View.Bounds
   - Terminal.Gui.View.ChildNeedsDisplay
   - Terminal.Gui.View.Clear
+  - Terminal.Gui.View.Clear(Terminal.Gui.Rect)
   - Terminal.Gui.View.ClearNeedsDisplay
+  - Terminal.Gui.View.ClipToBounds
   - Terminal.Gui.View.ColorScheme
   - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  - Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  - Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
   - Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
   - Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
   - Terminal.Gui.View.Driver
@@ -37,6 +43,7 @@ items:
   - Terminal.Gui.View.Remove(Terminal.Gui.View)
   - Terminal.Gui.View.RemoveAll
   - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  - Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
   - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
   - Terminal.Gui.View.SetNeedsDisplay
   - Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
@@ -54,7 +61,7 @@ items:
   - Terminal.Gui
   namespace: Terminal.Gui
   summary: View is the base class for all views on the screen and represents a visible element that can render itself and contains zero or more nested views.
-  remarks: "<p>\n               The View defines the base functionality for user interface elements in Terminal/gui.cs.  Views\n               can contain one or more subviews, can respond to user input and render themselves on the screen.\n            </p>\n    <p>\n               Views are created with a specified rectangle region (the frame) that is relative to the container\n               that they are added into.   \n            </p>\n    <p>\n               Subviews can be added to a View by calling the Add method.   The container of a view is the \n               Superview.\n            </p>\n    <p>\n               Developers can call the SetNeedsDisplay method on the view to flag a region or the entire view\n               as requiring to be redrawn.\n            </p>\n    <p>\n               Views have a ColorScheme property that defines the default colors that subviews\n               should use for rendering.   This ensures that the views fit in the context where\n               they are being used, and allows for themes to be plugged in.   For example, the\n               default colors for windows and toplevels uses a blue background, while it uses \n               a white background for dialog boxes and a red background for errors.\n            </p>\n    <p>\n               If a ColorScheme is not set on a view, the result of the ColorScheme is the\n               value of the SuperView and the value might only be valid once a view has been\n               added to a SuperView, so your subclasses should not rely on ColorScheme being\n               set at construction time.\n            </p>\n    <p>\n               Using ColorSchemes has the advantage that your application will work both\n               in color as well as black and white displays.\n            </p>"
+  remarks: "<p>\n               The View defines the base functionality for user interface elements in Terminal/gui.cs.  Views\n               can contain one or more subviews, can respond to user input and render themselves on the screen.\n            </p>\n    <p>\n               Views are created with a specified rectangle region (the frame) that is relative to the container\n               that they are added into.   \n            </p>\n    <p>\n               Subviews can be added to a View by calling the Add method.   The container of a view is the \n               Superview.\n            </p>\n    <p>\n               Developers can call the SetNeedsDisplay method on the view to flag a region or the entire view\n               as requiring to be redrawn.\n            </p>\n    <p>\n               Views have a ColorScheme property that defines the default colors that subviews\n               should use for rendering.   This ensures that the views fit in the context where\n               they are being used, and allows for themes to be plugged in.   For example, the\n               default colors for windows and toplevels uses a blue background, while it uses \n               a white background for dialog boxes and a red background for errors.\n            </p>\n    <p>\n               If a ColorScheme is not set on a view, the result of the ColorScheme is the\n               value of the SuperView and the value might only be valid once a view has been\n               added to a SuperView, so your subclasses should not rely on ColorScheme being\n               set at construction time.\n            </p>\n    <p>\n               Using ColorSchemes has the advantage that your application will work both\n               in color as well as black and white displays.\n            </p>\n    <p>\n               Views that are focusable should implement the PositionCursor to make sure that\n               the cursor is placed in a location that makes sense.   Unix terminals do not have\n               a way of hiding the cursor, so it can be distracting to have the cursor left at \n               the last focused view.   So views should make sure that they place the cursor\n               in a visually sensible place.\n            </p>"
   syntax:
     content: 'public class View : Terminal.Gui.Responder, System.Collections.IEnumerable'
   inheritance:
@@ -63,9 +70,12 @@ items:
   derivedClasses:
   - Terminal.Gui.Button
   - Terminal.Gui.CheckBox
+  - Terminal.Gui.FrameView
   - Terminal.Gui.Label
+  - Terminal.Gui.ListView
   - Terminal.Gui.MenuBar
   - Terminal.Gui.RadioGroup
+  - Terminal.Gui.ScrollBarView
   - Terminal.Gui.ScrollView
   - Terminal.Gui.TextField
   - Terminal.Gui.Toplevel
@@ -86,7 +96,7 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Initializes a new instance of the <xref href="Terminal.View"></xref> class with the specified frame.   This is the default constructor.
+  summary: Initializes a new instance of the <xref href="Terminal.Gui.View"></xref> class with the specified frame.   This is the default constructor.
   syntax:
     content: public View (Terminal.Gui.Rect frame);
     parameters:
@@ -146,8 +156,7 @@ items:
   nameWithType: View.AddCh(Int32, Int32, Int32)
   fullName: View.AddCh(Int32, Int32, Int32)
   type: Method
-  assemblies:
-  - Terminal.Gui
+  assemblies: []
   namespace: Terminal.Gui
   summary: Displays the specified character in the specified column and row.
   syntax:
@@ -163,6 +172,33 @@ items:
       type: System.Int32
       description: Ch.
   overload: Terminal.Gui.View.AddCh*
+  exceptions: []
+- uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+  id: AddRune(System.Int32,System.Int32,System.Rune)
+  parent: Terminal.Gui.View
+  langs:
+  - csharp
+  name: AddRune(Int32, Int32, Rune)
+  nameWithType: View.AddRune(Int32, Int32, Rune)
+  fullName: View.AddRune(Int32, Int32, Rune)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Displays the specified character in the specified column and row.
+  syntax:
+    content: public void AddRune (int col, int row, Rune ch);
+    parameters:
+    - id: col
+      type: System.Int32
+      description: Col.
+    - id: row
+      type: System.Int32
+      description: Row.
+    - id: ch
+      type: System.Rune
+      description: Ch.
+  overload: Terminal.Gui.View.AddRune*
   exceptions: []
 - uid: Terminal.Gui.View.Bounds
   id: Bounds
@@ -224,6 +260,27 @@ items:
     parameters: []
   overload: Terminal.Gui.View.Clear*
   exceptions: []
+- uid: Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+  id: Clear(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  langs:
+  - csharp
+  name: Clear(Rect)
+  nameWithType: View.Clear(Rect)
+  fullName: View.Clear(Rect)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Clears the specfied rectangular region with the current color
+  syntax:
+    content: public void Clear (Terminal.Gui.Rect r);
+    parameters:
+    - id: r
+      type: Terminal.Gui.Rect
+      description: To be added.
+  overload: Terminal.Gui.View.Clear*
+  exceptions: []
 - uid: Terminal.Gui.View.ClearNeedsDisplay
   id: ClearNeedsDisplay
   parent: Terminal.Gui.View
@@ -241,6 +298,27 @@ items:
     content: protected void ClearNeedsDisplay ();
     parameters: []
   overload: Terminal.Gui.View.ClearNeedsDisplay*
+  exceptions: []
+- uid: Terminal.Gui.View.ClipToBounds
+  id: ClipToBounds
+  parent: Terminal.Gui.View
+  langs:
+  - csharp
+  name: ClipToBounds()
+  nameWithType: View.ClipToBounds()
+  fullName: View.ClipToBounds()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Sets the Console driver's clip region to the current View's Bounds.
+  syntax:
+    content: public Terminal.Gui.Rect ClipToBounds ();
+    parameters: []
+    return:
+      type: Terminal.Gui.Rect
+      description: The existing driver's Clip region, which can be then set by setting the Driver.Clip property.
+  overload: Terminal.Gui.View.ClipToBounds*
   exceptions: []
 - uid: Terminal.Gui.View.ColorScheme
   id: ColorScheme
@@ -273,8 +351,7 @@ items:
   nameWithType: View.DrawFrame(Rect, Boolean)
   fullName: View.DrawFrame(Rect, Boolean)
   type: Method
-  assemblies:
-  - Terminal.Gui
+  assemblies: []
   namespace: Terminal.Gui
   summary: Draws a frame in the current view, clipped by the boundary of this view
   syntax:
@@ -288,6 +365,87 @@ items:
       description: If set to <code>true</code> it fill will the contents.
   overload: Terminal.Gui.View.DrawFrame*
   exceptions: []
+- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  id: DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  parent: Terminal.Gui.View
+  langs:
+  - csharp
+  name: DrawFrame(Rect, Int32, Boolean)
+  nameWithType: View.DrawFrame(Rect, Int32, Boolean)
+  fullName: View.DrawFrame(Rect, Int32, Boolean)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Draws a frame in the current view, clipped by the boundary of this view
+  syntax:
+    content: public void DrawFrame (Terminal.Gui.Rect rect, int padding = 0, bool fill = false);
+    parameters:
+    - id: rect
+      type: Terminal.Gui.Rect
+      description: Rectangular region for the frame to be drawn.
+    - id: padding
+      type: System.Int32
+      description: The padding to add to the drawn frame.
+    - id: fill
+      type: System.Boolean
+      description: If set to <code>true</code> it fill will the contents.
+  overload: Terminal.Gui.View.DrawFrame*
+  exceptions: []
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  id: DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  parent: Terminal.Gui.View
+  langs:
+  - csharp
+  name: DrawHotString(ustring, Boolean, ColorScheme)
+  nameWithType: View.DrawHotString(ustring, Boolean, ColorScheme)
+  fullName: View.DrawHotString(ustring, Boolean, ColorScheme)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Utility function to draw strings that contains a hotkey using a colorscheme and the "focused" state.
+  syntax:
+    content: public void DrawHotString (NStack.ustring text, bool focused, Terminal.Gui.ColorScheme scheme);
+    parameters:
+    - id: text
+      type: NStack.ustring
+      description: String to display, the underscoore before a letter flags the next letter as the hotkey.
+    - id: focused
+      type: System.Boolean
+      description: If set to <code>true</code> this uses the focused colors from the color scheme, otherwise the regular ones.
+    - id: scheme
+      type: Terminal.Gui.ColorScheme
+      description: The color scheme to use.
+  overload: Terminal.Gui.View.DrawHotString*
+  exceptions: []
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  id: DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.View
+  langs:
+  - csharp
+  name: DrawHotString(ustring, Attribute, Attribute)
+  nameWithType: View.DrawHotString(ustring, Attribute, Attribute)
+  fullName: View.DrawHotString(ustring, Attribute, Attribute)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Utility function to draw strings that contain a hotkey
+  syntax:
+    content: public void DrawHotString (NStack.ustring text, Terminal.Gui.Attribute hotColor, Terminal.Gui.Attribute normalColor);
+    parameters:
+    - id: text
+      type: NStack.ustring
+      description: String to display, the underscoore before a letter flags the next letter as the hotkey.
+    - id: hotColor
+      type: Terminal.Gui.Attribute
+      description: Hot color.
+    - id: normalColor
+      type: Terminal.Gui.Attribute
+      description: Normal color.
+  overload: Terminal.Gui.View.DrawHotString*
+  exceptions: []
 - uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
   id: DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
   parent: Terminal.Gui.View
@@ -297,8 +455,7 @@ items:
   nameWithType: View.DrawHotString(String, Boolean, ColorScheme)
   fullName: View.DrawHotString(String, Boolean, ColorScheme)
   type: Method
-  assemblies:
-  - Terminal.Gui
+  assemblies: []
   namespace: Terminal.Gui
   summary: Utility function to draw strings that contains a hotkey using a colorscheme and the "focused" state.
   syntax:
@@ -324,8 +481,7 @@ items:
   nameWithType: View.DrawHotString(String, Attribute, Attribute)
   fullName: View.DrawHotString(String, Attribute, Attribute)
   type: Method
-  assemblies:
-  - Terminal.Gui
+  assemblies: []
   namespace: Terminal.Gui
   summary: Utility function to draw strings that contain a hotkey
   syntax:
@@ -538,7 +694,7 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Gets or sets a value indicating whether this <xref href="Terminal.View"></xref> has focus.
+  summary: Gets or sets a value indicating whether this <xref href="Terminal.Gui.View"></xref> has focus.
   syntax:
     content: public override bool HasFocus { get; }
     return:
@@ -560,9 +716,9 @@ items:
   namespace: Terminal.Gui
   summary: Gets or sets an identifier for the view;
   syntax:
-    content: public string Id { get; set; }
+    content: public NStack.ustring Id { get; set; }
     return:
-      type: System.String
+      type: NStack.ustring
       description: The identifier.
   overload: Terminal.Gui.View.Id*
   exceptions: []
@@ -728,13 +884,17 @@ items:
   - Terminal.Gui
   namespace: Terminal.Gui
   summary: Performs a redraw of this view and its subviews, only redraws the views that have been flagged for a re-display.
-  remarks: The region argument is relative to the view itself.
+  remarks: >-
+    <p>
+                   Views should set the color that they want to use on entry, as otherwise this will inherit
+                   the last color that was set globaly on the driver.
+                </p>
   syntax:
     content: public virtual void Redraw (Terminal.Gui.Rect region);
     parameters:
     - id: region
       type: Terminal.Gui.Rect
-      description: To be added.
+      description: The region to redraw, this is relative to the view itself.
   overload: Terminal.Gui.View.Redraw*
   exceptions: []
 - uid: Terminal.Gui.View.Remove(Terminal.Gui.View)
@@ -802,6 +962,30 @@ items:
       type: Terminal.Gui.Point
       description: The mapped point.
   overload: Terminal.Gui.View.ScreenToView*
+  exceptions: []
+- uid: Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+  id: SetClip(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  langs:
+  - csharp
+  name: SetClip(Rect)
+  nameWithType: View.SetClip(Rect)
+  fullName: View.SetClip(Rect)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Sets the clipping region to the specified region, the region is view-relative
+  syntax:
+    content: public Terminal.Gui.Rect SetClip (Terminal.Gui.Rect rect);
+    parameters:
+    - id: rect
+      type: Terminal.Gui.Rect
+      description: Rectangle region to clip into, the region is view-relative.
+    return:
+      type: Terminal.Gui.Rect
+      description: The previous clip region.
+  overload: Terminal.Gui.View.SetClip*
   exceptions: []
 - uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
   id: SetFocus(Terminal.Gui.View)
@@ -917,13 +1101,13 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Returns a <xref href="System.String"></xref> that represents the current <xref href="Terminal.View"></xref>.
+  summary: Returns a <xref href="System.String"></xref> that represents the current <xref href="Terminal.Gui.View"></xref>.
   syntax:
     content: public override string ToString ();
     parameters: []
     return:
       type: System.String
-      description: A <xref href="System.String"></xref> that represents the current <xref href="Terminal.View"></xref>.
+      description: A <xref href="System.String"></xref> that represents the current <xref href="Terminal.Gui.View"></xref>.
   overload: Terminal.Gui.View.ToString*
   exceptions: []
 - uid: Terminal.Gui.View.WantMousePositionReports
@@ -938,7 +1122,7 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Gets or sets a value indicating whether this <xref href="Terminal.View"></xref> want mouse position reports.
+  summary: Gets or sets a value indicating whether this <xref href="Terminal.Gui.View"></xref> want mouse position reports.
   syntax:
     content: public virtual bool WantMousePositionReports { get; set; }
     return:
@@ -1009,6 +1193,18 @@ references:
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
+- uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: AddRune(Int32, Int32, Rune)
+  nameWithType: View.AddRune(Int32, Int32, Rune)
+  fullName: View.AddRune(Int32, Int32, Rune)
+- uid: System.Rune
+  parent: System
+  isExternal: true
+  name: Rune
+  nameWithType: Rune
+  fullName: System.Rune
 - uid: Terminal.Gui.View.Bounds
   parent: Terminal.Gui.View
   isExternal: false
@@ -1027,12 +1223,24 @@ references:
   name: Clear()
   nameWithType: View.Clear()
   fullName: View.Clear()
+- uid: Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Clear(Rect)
+  nameWithType: View.Clear(Rect)
+  fullName: View.Clear(Rect)
 - uid: Terminal.Gui.View.ClearNeedsDisplay
   parent: Terminal.Gui.View
   isExternal: false
   name: ClearNeedsDisplay()
   nameWithType: View.ClearNeedsDisplay()
   fullName: View.ClearNeedsDisplay()
+- uid: Terminal.Gui.View.ClipToBounds
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ClipToBounds()
+  nameWithType: View.ClipToBounds()
+  fullName: View.ClipToBounds()
 - uid: Terminal.Gui.View.ColorScheme
   parent: Terminal.Gui.View
   isExternal: false
@@ -1057,6 +1265,36 @@ references:
   name: Boolean
   nameWithType: Boolean
   fullName: System.Boolean
+- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawFrame(Rect, Int32, Boolean)
+  nameWithType: View.DrawFrame(Rect, Int32, Boolean)
+  fullName: View.DrawFrame(Rect, Int32, Boolean)
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(ustring, Boolean, ColorScheme)
+  nameWithType: View.DrawHotString(ustring, Boolean, ColorScheme)
+  fullName: View.DrawHotString(ustring, Boolean, ColorScheme)
+- uid: NStack.ustring
+  parent: NStack
+  isExternal: true
+  name: ustring
+  nameWithType: ustring
+  fullName: NStack.ustring
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(ustring, Attribute, Attribute)
+  nameWithType: View.DrawHotString(ustring, Attribute, Attribute)
+  fullName: View.DrawHotString(ustring, Attribute, Attribute)
+- uid: Terminal.Gui.Attribute
+  parent: Terminal.Gui
+  isExternal: false
+  name: Attribute
+  nameWithType: Attribute
+  fullName: Terminal.Gui.Attribute
 - uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
   parent: Terminal.Gui.View
   isExternal: false
@@ -1075,12 +1313,6 @@ references:
   name: DrawHotString(String, Attribute, Attribute)
   nameWithType: View.DrawHotString(String, Attribute, Attribute)
   fullName: View.DrawHotString(String, Attribute, Attribute)
-- uid: Terminal.Gui.Attribute
-  parent: Terminal.Gui
-  isExternal: false
-  name: Attribute
-  nameWithType: Attribute
-  fullName: Terminal.Gui.Attribute
 - uid: Terminal.Gui.View.Driver
   parent: Terminal.Gui.View
   isExternal: false
@@ -1237,6 +1469,12 @@ references:
   name: Point
   nameWithType: Point
   fullName: Terminal.Gui.Point
+- uid: Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetClip(Rect)
+  nameWithType: View.SetClip(Rect)
+  fullName: View.SetClip(Rect)
 - uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
   parent: Terminal.Gui.View
   isExternal: false
@@ -1322,6 +1560,12 @@ references:
   name: AddCh
   nameWithType: View.AddCh
   fullName: View.AddCh
+- uid: Terminal.Gui.View.AddRune*
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: AddRune
+  nameWithType: View.AddRune
+  fullName: View.AddRune
 - uid: Terminal.Gui.View.Bounds*
   parent: Terminal.Gui.View
   isExternal: false
@@ -1346,6 +1590,12 @@ references:
   name: ClearNeedsDisplay
   nameWithType: View.ClearNeedsDisplay
   fullName: View.ClearNeedsDisplay
+- uid: Terminal.Gui.View.ClipToBounds*
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ClipToBounds
+  nameWithType: View.ClipToBounds
+  fullName: View.ClipToBounds
 - uid: Terminal.Gui.View.ColorScheme*
   parent: Terminal.Gui.View
   isExternal: false
@@ -1490,6 +1740,12 @@ references:
   name: ScreenToView
   nameWithType: View.ScreenToView
   fullName: View.ScreenToView
+- uid: Terminal.Gui.View.SetClip*
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetClip
+  nameWithType: View.SetClip
+  fullName: View.SetClip
 - uid: Terminal.Gui.View.SetFocus*
   parent: Terminal.Gui.View
   isExternal: false

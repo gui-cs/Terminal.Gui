@@ -3,7 +3,7 @@ items:
 - uid: Terminal.Gui.MenuBarItem
   id: MenuBarItem
   children:
-  - Terminal.Gui.MenuBarItem.#ctor(System.String,Terminal.Gui.MenuItem[])
+  - Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,Terminal.Gui.MenuItem[])
   - Terminal.Gui.MenuBarItem.Children
   - Terminal.Gui.MenuBarItem.Title
   langs:
@@ -22,23 +22,23 @@ items:
   - System.Object
   implements: []
   inheritedMembers: []
-- uid: Terminal.Gui.MenuBarItem.#ctor(System.String,Terminal.Gui.MenuItem[])
-  id: '#ctor(System.String,Terminal.Gui.MenuItem[])'
+- uid: Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,Terminal.Gui.MenuItem[])
+  id: '#ctor(NStack.ustring,Terminal.Gui.MenuItem[])'
   parent: Terminal.Gui.MenuBarItem
   langs:
   - csharp
-  name: MenuBarItem(String, MenuItem[])
-  nameWithType: MenuBarItem.MenuBarItem(String, MenuItem[])
-  fullName: MenuBarItem.MenuBarItem(String, MenuItem[])
+  name: MenuBarItem(ustring, MenuItem[])
+  nameWithType: MenuBarItem.MenuBarItem(ustring, MenuItem[])
+  fullName: MenuBarItem.MenuBarItem(ustring, MenuItem[])
   type: Constructor
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
-    content: public MenuBarItem (string title, Terminal.Gui.MenuItem[] children);
+    content: public MenuBarItem (NStack.ustring title, Terminal.Gui.MenuItem[] children);
     parameters:
     - id: title
-      type: System.String
+      type: NStack.ustring
       description: To be added.
     - id: children
       type: Terminal.Gui.MenuItem[]
@@ -79,9 +79,9 @@ items:
   namespace: Terminal.Gui
   summary: Gets or sets the title to display.
   syntax:
-    content: public string Title { get; set; }
+    content: public NStack.ustring Title { get; set; }
     return:
-      type: System.String
+      type: NStack.ustring
       description: The title.
   overload: Terminal.Gui.MenuBarItem.Title*
   exceptions: []
@@ -92,18 +92,18 @@ references:
   name: Object
   nameWithType: Object
   fullName: System.Object
-- uid: Terminal.Gui.MenuBarItem.#ctor(System.String,Terminal.Gui.MenuItem[])
+- uid: Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,Terminal.Gui.MenuItem[])
   parent: Terminal.Gui.MenuBarItem
   isExternal: false
-  name: MenuBarItem(String, MenuItem[])
-  nameWithType: MenuBarItem.MenuBarItem(String, MenuItem[])
-  fullName: MenuBarItem.MenuBarItem(String, MenuItem[])
-- uid: System.String
-  parent: System
+  name: MenuBarItem(ustring, MenuItem[])
+  nameWithType: MenuBarItem.MenuBarItem(ustring, MenuItem[])
+  fullName: MenuBarItem.MenuBarItem(ustring, MenuItem[])
+- uid: NStack.ustring
+  parent: NStack
   isExternal: true
-  name: String
-  nameWithType: String
-  fullName: System.String
+  name: ustring
+  nameWithType: ustring
+  fullName: NStack.ustring
 - uid: Terminal.Gui.MenuItem
   name: MenuItem
   nameWithType: MenuItem

@@ -1,38 +1,28 @@
 ### YamlMime:ManagedReference
 items:
-- uid: Terminal.Gui.Toplevel
-  id: Toplevel
+- uid: Terminal.Gui.ListView
+  id: ListView
   children:
-  - Terminal.Gui.Toplevel.#ctor(Terminal.Gui.Rect)
-  - Terminal.Gui.Toplevel.CanFocus
-  - Terminal.Gui.Toplevel.Create
-  - Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)
-  - Terminal.Gui.Toplevel.Running
+  - Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource,System.ValueTuple{NStack.ustring,System.Int32}[])
   langs:
   - csharp
-  name: Toplevel
-  nameWithType: Toplevel
-  fullName: Terminal.Gui.Toplevel
+  name: ListView
+  nameWithType: ListView
+  fullName: Terminal.Gui.ListView
   type: Class
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Toplevel views can be modally executed.
-  remarks: >-
-    <p>
-                    Toplevels can be modally executing views, and they return control
-                    to the caller when the "Running" property is set to false.
-                  </p>
+  summary: ListView widget renders a list of data.
   syntax:
-    content: 'public class Toplevel : Terminal.Gui.View'
+    content: 'public class ListView : Terminal.Gui.View'
   inheritance:
   - System.Object
   - Terminal.Gui.Responder
   - Terminal.Gui.View
-  derivedClasses:
-  - Terminal.Gui.Window
   implements: []
   inheritedMembers:
+  - Terminal.Gui.Responder.CanFocus
   - Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
   - Terminal.Gui.View.Add(Terminal.Gui.View)
   - Terminal.Gui.View.Add(Terminal.Gui.View[])
@@ -68,6 +58,7 @@ items:
   - Terminal.Gui.View.PositionCursor
   - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.ProcessKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.Redraw(Terminal.Gui.Rect)
   - Terminal.Gui.View.Remove(Terminal.Gui.View)
   - Terminal.Gui.View.RemoveAll
@@ -80,110 +71,31 @@ items:
   - Terminal.Gui.View.SuperView
   - Terminal.Gui.View.ToString
   - Terminal.Gui.View.WantMousePositionReports
-- uid: Terminal.Gui.Toplevel.#ctor(Terminal.Gui.Rect)
-  id: '#ctor(Terminal.Gui.Rect)'
-  parent: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource,System.ValueTuple{NStack.ustring,System.Int32}[])
+  id: '#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource,System.ValueTuple{NStack.ustring,System.Int32}[])'
+  parent: Terminal.Gui.ListView
   langs:
   - csharp
-  name: Toplevel(Rect)
-  nameWithType: Toplevel.Toplevel(Rect)
-  fullName: Toplevel.Toplevel(Rect)
+  name: ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
+  nameWithType: ListView.ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
+  fullName: ListView.ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
   type: Constructor
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Initializes a new instance of the <xref href="Terminal.Gui.Toplevel"></xref> class.
   syntax:
-    content: public Toplevel (Terminal.Gui.Rect frame);
+    content: public ListView (Terminal.Gui.Rect rect, Terminal.Gui.IListDataSource source, ValueTuple<NStack.ustring,int>[] headers = null);
     parameters:
-    - id: frame
+    - id: rect
       type: Terminal.Gui.Rect
-      description: Frame.
-  overload: Terminal.Gui.Toplevel.#ctor*
-  exceptions: []
-- uid: Terminal.Gui.Toplevel.CanFocus
-  id: CanFocus
-  parent: Terminal.Gui.Toplevel
-  langs:
-  - csharp
-  name: CanFocus
-  nameWithType: Toplevel.CanFocus
-  fullName: Toplevel.CanFocus
-  type: Property
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  syntax:
-    content: public override bool CanFocus { get; }
-    return:
-      type: System.Boolean
       description: To be added.
-  overload: Terminal.Gui.Toplevel.CanFocus*
-  exceptions: []
-- uid: Terminal.Gui.Toplevel.Create
-  id: Create
-  parent: Terminal.Gui.Toplevel
-  langs:
-  - csharp
-  name: Create()
-  nameWithType: Toplevel.Create()
-  fullName: Toplevel.Create()
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Convenience factory method that creates a new toplevel with the current terminal dimensions.
-  syntax:
-    content: public static Terminal.Gui.Toplevel Create ();
-    parameters: []
-    return:
-      type: Terminal.Gui.Toplevel
-      description: The create.
-  overload: Terminal.Gui.Toplevel.Create*
-  exceptions: []
-- uid: Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)
-  id: ProcessKey(Terminal.Gui.KeyEvent)
-  parent: Terminal.Gui.Toplevel
-  langs:
-  - csharp
-  name: ProcessKey(KeyEvent)
-  nameWithType: Toplevel.ProcessKey(KeyEvent)
-  fullName: Toplevel.ProcessKey(KeyEvent)
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  syntax:
-    content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
-    parameters:
-    - id: kb
-      type: Terminal.Gui.KeyEvent
+    - id: source
+      type: Terminal.Gui.IListDataSource
       description: To be added.
-    return:
-      type: System.Boolean
+    - id: headers
+      type: System.ValueTuple{NStack.ustring,System.Int32}[]
       description: To be added.
-  overload: Terminal.Gui.Toplevel.ProcessKey*
-  exceptions: []
-- uid: Terminal.Gui.Toplevel.Running
-  id: Running
-  parent: Terminal.Gui.Toplevel
-  langs:
-  - csharp
-  name: Running
-  nameWithType: Toplevel.Running
-  fullName: Toplevel.Running
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: >-
-    This flag is checked on each iteration of the mainloop and it continues
-                running until this flag is set to false.
-  syntax:
-    content: public bool Running;
-    return:
-      type: System.Boolean
-      description: To be added.
+  overload: Terminal.Gui.ListView.#ctor*
   exceptions: []
 references:
 - uid: Terminal.Gui.View
@@ -192,84 +104,79 @@ references:
   name: View
   nameWithType: View
   fullName: Terminal.Gui.View
-- uid: Terminal.Gui.Toplevel.#ctor(Terminal.Gui.Rect)
-  parent: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource,System.ValueTuple{NStack.ustring,System.Int32}[])
+  parent: Terminal.Gui.ListView
   isExternal: false
-  name: Toplevel(Rect)
-  nameWithType: Toplevel.Toplevel(Rect)
-  fullName: Toplevel.Toplevel(Rect)
+  name: ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
+  nameWithType: ListView.ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
+  fullName: ListView.ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
 - uid: Terminal.Gui.Rect
   parent: Terminal.Gui
   isExternal: false
   name: Rect
   nameWithType: Rect
   fullName: Terminal.Gui.Rect
-- uid: Terminal.Gui.Toplevel.CanFocus
-  parent: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.IListDataSource
+  parent: Terminal.Gui
   isExternal: false
-  name: CanFocus
-  nameWithType: Toplevel.CanFocus
-  fullName: Toplevel.CanFocus
-- uid: System.Boolean
+  name: IListDataSource
+  nameWithType: IListDataSource
+  fullName: Terminal.Gui.IListDataSource
+- uid: System.ValueTuple`2
+  name: ValueTuple
+  nameWithType: ValueTuple
+  fullName: System.ValueTuple
+- uid: NStack.ustring
+  name: ustring
+  nameWithType: ustring
+  fullName: NStack.ustring
+- uid: System.Int32
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: System.ValueTuple{NStack.ustring,System.Int32}[]
   parent: System
   isExternal: true
-  name: Boolean
-  nameWithType: Boolean
-  fullName: System.Boolean
-- uid: Terminal.Gui.Toplevel.Create
-  parent: Terminal.Gui.Toplevel
+  name: ValueTuple<ustring,Int32>[]
+  nameWithType: ValueTuple<ustring,Int32>[]
+  fullName: System.ValueTuple<NStack.ustring,System.Int32>[]
+  spec.csharp:
+  - uid: System.ValueTuple`2
+    name: ValueTuple
+    nameWithType: ValueTuple
+    fullName: System.ValueTuple
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: NStack.ustring
+    name: ustring
+    nameWithType: ustring
+    fullName: NStack.ustring
+  - name: ','
+    nameWithType: ','
+    fullName: ','
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+  - name: '[]'
+    nameWithType: '[]'
+    fullName: '[]'
+- uid: Terminal.Gui.ListView.#ctor*
+  parent: Terminal.Gui.ListView
   isExternal: false
-  name: Create()
-  nameWithType: Toplevel.Create()
-  fullName: Toplevel.Create()
-- uid: Terminal.Gui.Toplevel
-  parent: Terminal.Gui
-  isExternal: false
-  name: Toplevel
-  nameWithType: Toplevel
-  fullName: Terminal.Gui.Toplevel
-- uid: Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)
-  parent: Terminal.Gui.Toplevel
-  isExternal: false
-  name: ProcessKey(KeyEvent)
-  nameWithType: Toplevel.ProcessKey(KeyEvent)
-  fullName: Toplevel.ProcessKey(KeyEvent)
-- uid: Terminal.Gui.KeyEvent
-  parent: Terminal.Gui
-  isExternal: false
-  name: KeyEvent
-  nameWithType: KeyEvent
-  fullName: Terminal.Gui.KeyEvent
-- uid: Terminal.Gui.Toplevel.Running
-  parent: Terminal.Gui.Toplevel
-  isExternal: false
-  name: Running
-  nameWithType: Toplevel.Running
-  fullName: Toplevel.Running
-- uid: Terminal.Gui.Toplevel.#ctor*
-  parent: Terminal.Gui.Toplevel
-  isExternal: false
-  name: Toplevel
-  nameWithType: Toplevel.Toplevel
-  fullName: Toplevel.Toplevel
-- uid: Terminal.Gui.Toplevel.CanFocus*
-  parent: Terminal.Gui.Toplevel
+  name: ListView
+  nameWithType: ListView.ListView
+  fullName: ListView.ListView
+- uid: Terminal.Gui.Responder.CanFocus
+  parent: Terminal.Gui.Responder
   isExternal: false
   name: CanFocus
-  nameWithType: Toplevel.CanFocus
-  fullName: Toplevel.CanFocus
-- uid: Terminal.Gui.Toplevel.Create*
-  parent: Terminal.Gui.Toplevel
-  isExternal: false
-  name: Create
-  nameWithType: Toplevel.Create
-  fullName: Toplevel.Create
-- uid: Terminal.Gui.Toplevel.ProcessKey*
-  parent: Terminal.Gui.Toplevel
-  isExternal: false
-  name: ProcessKey
-  nameWithType: Toplevel.ProcessKey
-  fullName: Toplevel.ProcessKey
+  nameWithType: Responder.CanFocus
+  fullName: Responder.CanFocus
 - uid: Terminal.Gui.View.HasFocus
   parent: Terminal.Gui.View
   isExternal: false
@@ -294,6 +201,12 @@ references:
   name: ProcessHotKey(KeyEvent)
   nameWithType: View.ProcessHotKey(KeyEvent)
   fullName: View.ProcessHotKey(KeyEvent)
+- uid: Terminal.Gui.View.ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ProcessKey(KeyEvent)
+  nameWithType: View.ProcessKey(KeyEvent)
+  fullName: View.ProcessKey(KeyEvent)
 - uid: Terminal.Gui.View.Add(Terminal.Gui.View)
   parent: Terminal.Gui.View
   isExternal: false

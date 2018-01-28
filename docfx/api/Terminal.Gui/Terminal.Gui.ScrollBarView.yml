@@ -1,39 +1,34 @@
 ### YamlMime:ManagedReference
 items:
-- uid: Terminal.Gui.Toplevel
-  id: Toplevel
+- uid: Terminal.Gui.ScrollBarView
+  id: ScrollBarView
   children:
-  - Terminal.Gui.Toplevel.#ctor(Terminal.Gui.Rect)
-  - Terminal.Gui.Toplevel.CanFocus
-  - Terminal.Gui.Toplevel.Create
-  - Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)
-  - Terminal.Gui.Toplevel.Running
+  - Terminal.Gui.ScrollBarView.#ctor(Terminal.Gui.Rect,System.Int32,System.Int32,System.Boolean)
+  - Terminal.Gui.ScrollBarView.ChangedPosition
+  - Terminal.Gui.ScrollBarView.MouseEvent(Terminal.Gui.MouseEvent)
+  - Terminal.Gui.ScrollBarView.Position
+  - Terminal.Gui.ScrollBarView.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.ScrollBarView.Size
   langs:
   - csharp
-  name: Toplevel
-  nameWithType: Toplevel
-  fullName: Terminal.Gui.Toplevel
+  name: ScrollBarView
+  nameWithType: ScrollBarView
+  fullName: Terminal.Gui.ScrollBarView
   type: Class
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Toplevel views can be modally executed.
-  remarks: >-
-    <p>
-                    Toplevels can be modally executing views, and they return control
-                    to the caller when the "Running" property is set to false.
-                  </p>
+  summary: ScrollBarViews are views that display a 1-character scrollbar, either horizontal or vertical
+  remarks: "<p>\n              The scrollbar is drawn to be a representation of the Size, assuming that the \n              scroll position is set at Position.\n            </p>\n    <p>\n              If the region to display the scrollbar is larger than three characters, \n              arrow indicators are drawn.\n            </p>"
   syntax:
-    content: 'public class Toplevel : Terminal.Gui.View'
+    content: 'public class ScrollBarView : Terminal.Gui.View'
   inheritance:
   - System.Object
   - Terminal.Gui.Responder
   - Terminal.Gui.View
-  derivedClasses:
-  - Terminal.Gui.Window
   implements: []
   inheritedMembers:
-  - Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
+  - Terminal.Gui.Responder.CanFocus
   - Terminal.Gui.View.Add(Terminal.Gui.View)
   - Terminal.Gui.View.Add(Terminal.Gui.View[])
   - Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
@@ -68,7 +63,7 @@ items:
   - Terminal.Gui.View.PositionCursor
   - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
-  - Terminal.Gui.View.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.View.ProcessKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.Remove(Terminal.Gui.View)
   - Terminal.Gui.View.RemoveAll
   - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
@@ -80,110 +75,138 @@ items:
   - Terminal.Gui.View.SuperView
   - Terminal.Gui.View.ToString
   - Terminal.Gui.View.WantMousePositionReports
-- uid: Terminal.Gui.Toplevel.#ctor(Terminal.Gui.Rect)
-  id: '#ctor(Terminal.Gui.Rect)'
-  parent: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.ScrollBarView.#ctor(Terminal.Gui.Rect,System.Int32,System.Int32,System.Boolean)
+  id: '#ctor(Terminal.Gui.Rect,System.Int32,System.Int32,System.Boolean)'
+  parent: Terminal.Gui.ScrollBarView
   langs:
   - csharp
-  name: Toplevel(Rect)
-  nameWithType: Toplevel.Toplevel(Rect)
-  fullName: Toplevel.Toplevel(Rect)
+  name: ScrollBarView(Rect, Int32, Int32, Boolean)
+  nameWithType: ScrollBarView.ScrollBarView(Rect, Int32, Int32, Boolean)
+  fullName: ScrollBarView.ScrollBarView(Rect, Int32, Int32, Boolean)
   type: Constructor
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Initializes a new instance of the <xref href="Terminal.Gui.Toplevel"></xref> class.
+  summary: Initializes a new instance of the <xref href="Terminal.Gui.Gui.ScrollBarView"></xref> class.
   syntax:
-    content: public Toplevel (Terminal.Gui.Rect frame);
+    content: public ScrollBarView (Terminal.Gui.Rect rect, int size, int position, bool isVertical);
     parameters:
-    - id: frame
+    - id: rect
       type: Terminal.Gui.Rect
-      description: Frame.
-  overload: Terminal.Gui.Toplevel.#ctor*
+      description: Frame for the scrollbar.
+    - id: size
+      type: System.Int32
+      description: The size that this scrollbar represents.
+    - id: position
+      type: System.Int32
+      description: The position within this scrollbar.
+    - id: isVertical
+      type: System.Boolean
+      description: If set to <code>true</code> this is a vertical scrollbar, otherwize, the scrollbar is horizontal.
+  overload: Terminal.Gui.ScrollBarView.#ctor*
   exceptions: []
-- uid: Terminal.Gui.Toplevel.CanFocus
-  id: CanFocus
-  parent: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.ScrollBarView.ChangedPosition
+  id: ChangedPosition
+  parent: Terminal.Gui.ScrollBarView
   langs:
   - csharp
-  name: CanFocus
-  nameWithType: Toplevel.CanFocus
-  fullName: Toplevel.CanFocus
+  name: ChangedPosition
+  nameWithType: ScrollBarView.ChangedPosition
+  fullName: ScrollBarView.ChangedPosition
+  type: Event
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: This event is raised when the position on the scrollbar has changed.
+  syntax:
+    content: public event Action ChangedPosition;
+    return:
+      type: System.Action
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.ScrollBarView.MouseEvent(Terminal.Gui.MouseEvent)
+  id: MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.ScrollBarView
+  langs:
+  - csharp
+  name: MouseEvent(MouseEvent)
+  nameWithType: ScrollBarView.MouseEvent(MouseEvent)
+  fullName: ScrollBarView.MouseEvent(MouseEvent)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool MouseEvent (Terminal.Gui.MouseEvent me);
+    parameters:
+    - id: me
+      type: Terminal.Gui.MouseEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.ScrollBarView.MouseEvent*
+  exceptions: []
+- uid: Terminal.Gui.ScrollBarView.Position
+  id: Position
+  parent: Terminal.Gui.ScrollBarView
+  langs:
+  - csharp
+  name: Position
+  nameWithType: ScrollBarView.Position
+  fullName: ScrollBarView.Position
   type: Property
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: The position to show the scrollbar at.
   syntax:
-    content: public override bool CanFocus { get; }
+    content: public int Position { get; set; }
     return:
-      type: System.Boolean
-      description: To be added.
-  overload: Terminal.Gui.Toplevel.CanFocus*
+      type: System.Int32
+      description: The position.
+  overload: Terminal.Gui.ScrollBarView.Position*
   exceptions: []
-- uid: Terminal.Gui.Toplevel.Create
-  id: Create
-  parent: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.ScrollBarView.Redraw(Terminal.Gui.Rect)
+  id: Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.ScrollBarView
   langs:
   - csharp
-  name: Create()
-  nameWithType: Toplevel.Create()
-  fullName: Toplevel.Create()
+  name: Redraw(Rect)
+  nameWithType: ScrollBarView.Redraw(Rect)
+  fullName: ScrollBarView.Redraw(Rect)
   type: Method
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Convenience factory method that creates a new toplevel with the current terminal dimensions.
+  summary: Redraw the scrollbar
   syntax:
-    content: public static Terminal.Gui.Toplevel Create ();
-    parameters: []
-    return:
-      type: Terminal.Gui.Toplevel
-      description: The create.
-  overload: Terminal.Gui.Toplevel.Create*
-  exceptions: []
-- uid: Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)
-  id: ProcessKey(Terminal.Gui.KeyEvent)
-  parent: Terminal.Gui.Toplevel
-  langs:
-  - csharp
-  name: ProcessKey(KeyEvent)
-  nameWithType: Toplevel.ProcessKey(KeyEvent)
-  fullName: Toplevel.ProcessKey(KeyEvent)
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  syntax:
-    content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
+    content: public override void Redraw (Terminal.Gui.Rect region);
     parameters:
-    - id: kb
-      type: Terminal.Gui.KeyEvent
-      description: To be added.
-    return:
-      type: System.Boolean
-      description: To be added.
-  overload: Terminal.Gui.Toplevel.ProcessKey*
+    - id: region
+      type: Terminal.Gui.Rect
+      description: Region to be redrawn.
+  overload: Terminal.Gui.ScrollBarView.Redraw*
   exceptions: []
-- uid: Terminal.Gui.Toplevel.Running
-  id: Running
-  parent: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.ScrollBarView.Size
+  id: Size
+  parent: Terminal.Gui.ScrollBarView
   langs:
   - csharp
-  name: Running
-  nameWithType: Toplevel.Running
-  fullName: Toplevel.Running
-  type: Field
+  name: Size
+  nameWithType: ScrollBarView.Size
+  fullName: ScrollBarView.Size
+  type: Property
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: >-
-    This flag is checked on each iteration of the mainloop and it continues
-                running until this flag is set to false.
+  summary: The size that this scrollbar represents
   syntax:
-    content: public bool Running;
+    content: public int Size { get; set; }
     return:
-      type: System.Boolean
-      description: To be added.
+      type: System.Int32
+      description: The size.
+  overload: Terminal.Gui.ScrollBarView.Size*
   exceptions: []
 references:
 - uid: Terminal.Gui.View
@@ -192,96 +215,114 @@ references:
   name: View
   nameWithType: View
   fullName: Terminal.Gui.View
-- uid: Terminal.Gui.Toplevel.#ctor(Terminal.Gui.Rect)
-  parent: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.ScrollBarView.#ctor(Terminal.Gui.Rect,System.Int32,System.Int32,System.Boolean)
+  parent: Terminal.Gui.ScrollBarView
   isExternal: false
-  name: Toplevel(Rect)
-  nameWithType: Toplevel.Toplevel(Rect)
-  fullName: Toplevel.Toplevel(Rect)
+  name: ScrollBarView(Rect, Int32, Int32, Boolean)
+  nameWithType: ScrollBarView.ScrollBarView(Rect, Int32, Int32, Boolean)
+  fullName: ScrollBarView.ScrollBarView(Rect, Int32, Int32, Boolean)
 - uid: Terminal.Gui.Rect
   parent: Terminal.Gui
   isExternal: false
   name: Rect
   nameWithType: Rect
   fullName: Terminal.Gui.Rect
-- uid: Terminal.Gui.Toplevel.CanFocus
-  parent: Terminal.Gui.Toplevel
-  isExternal: false
-  name: CanFocus
-  nameWithType: Toplevel.CanFocus
-  fullName: Toplevel.CanFocus
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
 - uid: System.Boolean
   parent: System
   isExternal: true
   name: Boolean
   nameWithType: Boolean
   fullName: System.Boolean
-- uid: Terminal.Gui.Toplevel.Create
-  parent: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.ScrollBarView.ChangedPosition
+  parent: Terminal.Gui.ScrollBarView
   isExternal: false
-  name: Create()
-  nameWithType: Toplevel.Create()
-  fullName: Toplevel.Create()
-- uid: Terminal.Gui.Toplevel
+  name: ChangedPosition
+  nameWithType: ScrollBarView.ChangedPosition
+  fullName: ScrollBarView.ChangedPosition
+- uid: System.Action
+  parent: System
+  isExternal: true
+  name: Action
+  nameWithType: Action
+  fullName: System.Action
+- uid: Terminal.Gui.ScrollBarView.MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.ScrollBarView
+  isExternal: false
+  name: MouseEvent(MouseEvent)
+  nameWithType: ScrollBarView.MouseEvent(MouseEvent)
+  fullName: ScrollBarView.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.MouseEvent
   parent: Terminal.Gui
   isExternal: false
-  name: Toplevel
-  nameWithType: Toplevel
-  fullName: Terminal.Gui.Toplevel
-- uid: Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)
-  parent: Terminal.Gui.Toplevel
+  name: MouseEvent
+  nameWithType: MouseEvent
+  fullName: Terminal.Gui.MouseEvent
+- uid: Terminal.Gui.ScrollBarView.Position
+  parent: Terminal.Gui.ScrollBarView
   isExternal: false
-  name: ProcessKey(KeyEvent)
-  nameWithType: Toplevel.ProcessKey(KeyEvent)
-  fullName: Toplevel.ProcessKey(KeyEvent)
-- uid: Terminal.Gui.KeyEvent
-  parent: Terminal.Gui
+  name: Position
+  nameWithType: ScrollBarView.Position
+  fullName: ScrollBarView.Position
+- uid: Terminal.Gui.ScrollBarView.Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.ScrollBarView
   isExternal: false
-  name: KeyEvent
-  nameWithType: KeyEvent
-  fullName: Terminal.Gui.KeyEvent
-- uid: Terminal.Gui.Toplevel.Running
-  parent: Terminal.Gui.Toplevel
+  name: Redraw(Rect)
+  nameWithType: ScrollBarView.Redraw(Rect)
+  fullName: ScrollBarView.Redraw(Rect)
+- uid: Terminal.Gui.ScrollBarView.Size
+  parent: Terminal.Gui.ScrollBarView
   isExternal: false
-  name: Running
-  nameWithType: Toplevel.Running
-  fullName: Toplevel.Running
-- uid: Terminal.Gui.Toplevel.#ctor*
-  parent: Terminal.Gui.Toplevel
+  name: Size
+  nameWithType: ScrollBarView.Size
+  fullName: ScrollBarView.Size
+- uid: Terminal.Gui.ScrollBarView.#ctor*
+  parent: Terminal.Gui.ScrollBarView
   isExternal: false
-  name: Toplevel
-  nameWithType: Toplevel.Toplevel
-  fullName: Toplevel.Toplevel
-- uid: Terminal.Gui.Toplevel.CanFocus*
-  parent: Terminal.Gui.Toplevel
+  name: ScrollBarView
+  nameWithType: ScrollBarView.ScrollBarView
+  fullName: ScrollBarView.ScrollBarView
+- uid: Terminal.Gui.ScrollBarView.MouseEvent*
+  parent: Terminal.Gui.ScrollBarView
+  isExternal: false
+  name: MouseEvent
+  nameWithType: ScrollBarView.MouseEvent
+  fullName: ScrollBarView.MouseEvent
+- uid: Terminal.Gui.ScrollBarView.Position*
+  parent: Terminal.Gui.ScrollBarView
+  isExternal: false
+  name: Position
+  nameWithType: ScrollBarView.Position
+  fullName: ScrollBarView.Position
+- uid: Terminal.Gui.ScrollBarView.Redraw*
+  parent: Terminal.Gui.ScrollBarView
+  isExternal: false
+  name: Redraw
+  nameWithType: ScrollBarView.Redraw
+  fullName: ScrollBarView.Redraw
+- uid: Terminal.Gui.ScrollBarView.Size*
+  parent: Terminal.Gui.ScrollBarView
+  isExternal: false
+  name: Size
+  nameWithType: ScrollBarView.Size
+  fullName: ScrollBarView.Size
+- uid: Terminal.Gui.Responder.CanFocus
+  parent: Terminal.Gui.Responder
   isExternal: false
   name: CanFocus
-  nameWithType: Toplevel.CanFocus
-  fullName: Toplevel.CanFocus
-- uid: Terminal.Gui.Toplevel.Create*
-  parent: Terminal.Gui.Toplevel
-  isExternal: false
-  name: Create
-  nameWithType: Toplevel.Create
-  fullName: Toplevel.Create
-- uid: Terminal.Gui.Toplevel.ProcessKey*
-  parent: Terminal.Gui.Toplevel
-  isExternal: false
-  name: ProcessKey
-  nameWithType: Toplevel.ProcessKey
-  fullName: Toplevel.ProcessKey
+  nameWithType: Responder.CanFocus
+  fullName: Responder.CanFocus
 - uid: Terminal.Gui.View.HasFocus
   parent: Terminal.Gui.View
   isExternal: false
   name: HasFocus
   nameWithType: View.HasFocus
   fullName: View.HasFocus
-- uid: Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
-  parent: Terminal.Gui.Responder
-  isExternal: false
-  name: MouseEvent(MouseEvent)
-  nameWithType: Responder.MouseEvent(MouseEvent)
-  fullName: Responder.MouseEvent(MouseEvent)
 - uid: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
   parent: Terminal.Gui.View
   isExternal: false
@@ -294,6 +335,12 @@ references:
   name: ProcessHotKey(KeyEvent)
   nameWithType: View.ProcessHotKey(KeyEvent)
   fullName: View.ProcessHotKey(KeyEvent)
+- uid: Terminal.Gui.View.ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ProcessKey(KeyEvent)
+  nameWithType: View.ProcessKey(KeyEvent)
+  fullName: View.ProcessKey(KeyEvent)
 - uid: Terminal.Gui.View.Add(Terminal.Gui.View)
   parent: Terminal.Gui.View
   isExternal: false
@@ -480,12 +527,6 @@ references:
   name: PositionCursor()
   nameWithType: View.PositionCursor()
   fullName: View.PositionCursor()
-- uid: Terminal.Gui.View.Redraw(Terminal.Gui.Rect)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Redraw(Rect)
-  nameWithType: View.Redraw(Rect)
-  fullName: View.Redraw(Rect)
 - uid: Terminal.Gui.View.Remove(Terminal.Gui.View)
   parent: Terminal.Gui.View
   isExternal: false

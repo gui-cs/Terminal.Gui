@@ -17,12 +17,35 @@
   </Docs>
   <Members>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public CheckBox (int x, int y, string s);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, string s) cil managed" />
+      <MemberSignature Language="C#" Value="public CheckBox (int x, int y, NStack.ustring s);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, class NStack.ustring s) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
       </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="x" Type="System.Int32" />
+        <Parameter Name="y" Type="System.Int32" />
+        <Parameter Name="s" Type="NStack.ustring" />
+      </Parameters>
+      <Docs>
+        <param name="x">To be added.</param>
+        <param name="y">To be added.</param>
+        <param name="s">To be added.</param>
+        <summary>
+              Public constructor, creates a CheckButton based on
+              the given text at the given position.
+            </summary>
+        <remarks>
+              The size of CheckButton is computed based on the
+              text length. This CheckButton is not toggled.
+            </remarks>
+      </Docs>
+    </Member>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public CheckBox (int x, int y, string s);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, string s) cil managed" />
+      <MemberType>Constructor</MemberType>
       <Parameters>
         <Parameter Name="x" Type="System.Int32" />
         <Parameter Name="y" Type="System.Int32" />
@@ -43,12 +66,37 @@
       </Docs>
     </Member>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public CheckBox (int x, int y, string s, bool is_checked);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, string s, bool is_checked) cil managed" />
+      <MemberSignature Language="C#" Value="public CheckBox (int x, int y, NStack.ustring s, bool is_checked);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, class NStack.ustring s, bool is_checked) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
       </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="x" Type="System.Int32" />
+        <Parameter Name="y" Type="System.Int32" />
+        <Parameter Name="s" Type="NStack.ustring" />
+        <Parameter Name="is_checked" Type="System.Boolean" />
+      </Parameters>
+      <Docs>
+        <param name="x">To be added.</param>
+        <param name="y">To be added.</param>
+        <param name="s">To be added.</param>
+        <param name="is_checked">To be added.</param>
+        <summary>
+              Public constructor, creates a CheckButton based on
+              the given text at the given position and a state.
+            </summary>
+        <remarks>
+              The size of CheckButton is computed based on the
+              text length. 
+            </remarks>
+      </Docs>
+    </Member>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public CheckBox (int x, int y, string s, bool is_checked);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, string s, bool is_checked) cil managed" />
+      <MemberType>Constructor</MemberType>
       <Parameters>
         <Parameter Name="x" Type="System.Int32" />
         <Parameter Name="y" Type="System.Int32" />
@@ -164,14 +212,14 @@
       </Docs>
     </Member>
     <Member MemberName="Text">
-      <MemberSignature Language="C#" Value="public string Text { get; set; }" />
-      <MemberSignature Language="ILAsm" Value=".property instance string Text" />
+      <MemberSignature Language="C#" Value="public NStack.ustring Text { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class NStack.ustring Text" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
-        <ReturnType>System.String</ReturnType>
+        <ReturnType>NStack.ustring</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>

@@ -1,0 +1,56 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.IListDataSource
+  id: IListDataSource
+  children:
+  - Terminal.Gui.IListDataSource.Count
+  langs:
+  - csharp
+  name: IListDataSource
+  nameWithType: IListDataSource
+  fullName: Terminal.Gui.IListDataSource
+  type: Interface
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public interface IListDataSource
+  implements: []
+- uid: Terminal.Gui.IListDataSource.Count
+  id: Count
+  parent: Terminal.Gui.IListDataSource
+  langs:
+  - csharp
+  name: Count
+  nameWithType: IListDataSource.Count
+  fullName: IListDataSource.Count
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public int Count { get; }
+    return:
+      type: System.Int32
+      description: To be added.
+  overload: Terminal.Gui.IListDataSource.Count*
+  exceptions: []
+references:
+- uid: Terminal.Gui.IListDataSource.Count
+  parent: Terminal.Gui.IListDataSource
+  isExternal: false
+  name: Count
+  nameWithType: IListDataSource.Count
+  fullName: IListDataSource.Count
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: Terminal.Gui.IListDataSource.Count*
+  parent: Terminal.Gui.IListDataSource
+  isExternal: false
+  name: Count
+  nameWithType: IListDataSource.Count
+  fullName: IListDataSource.Count

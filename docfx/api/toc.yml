@@ -29,12 +29,18 @@
     name: ConsoleDriver
   - uid: Terminal.Gui.Dialog
     name: Dialog
+  - uid: Terminal.Gui.FrameView
+    name: FrameView
+  - uid: Terminal.Gui.IListDataSource
+    name: IListDataSource
   - uid: Terminal.Gui.Key
     name: Key
   - uid: Terminal.Gui.KeyEvent
     name: KeyEvent
   - uid: Terminal.Gui.Label
     name: Label
+  - uid: Terminal.Gui.ListView
+    name: ListView
   - uid: Terminal.Gui.MenuBar
     name: MenuBar
   - uid: Terminal.Gui.MenuBarItem
@@ -55,6 +61,8 @@
     name: Rect
   - uid: Terminal.Gui.Responder
     name: Responder
+  - uid: Terminal.Gui.ScrollBarView
+    name: ScrollBarView
   - uid: Terminal.Gui.ScrollView
     name: ScrollView
   - uid: Terminal.Gui.Size

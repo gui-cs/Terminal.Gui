@@ -1,0 +1,46 @@
+<Type Name="ListView" FullName="Terminal.Gui.ListView">
+  <TypeSignature Language="C#" Value="public class ListView : Terminal.Gui.View" />
+  <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit ListView extends Terminal.Gui.View" />
+  <AssemblyInfo>
+    <AssemblyName>Terminal.Gui</AssemblyName>
+    <AssemblyVersion>0.0.0.0</AssemblyVersion>
+  </AssemblyInfo>
+  <Base>
+    <BaseTypeName>Terminal.Gui.View</BaseTypeName>
+  </Base>
+  <Interfaces />
+  <Docs>
+    <summary>
+            ListView widget renders a list of data.
+            </summary>
+    <remarks>To be added.</remarks>
+  </Docs>
+  <Members>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public ListView (Terminal.Gui.Rect rect, Terminal.Gui.IListDataSource source, ValueTuple&lt;NStack.ustring,int&gt;[] headers = null);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(valuetype Terminal.Gui.Rect rect, class Terminal.Gui.IListDataSource source, valuetype System.ValueTuple`2&lt;class NStack.ustring, int32&gt;[] headers) cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="rect" Type="Terminal.Gui.Rect" />
+        <Parameter Name="source" Type="Terminal.Gui.IListDataSource" />
+        <Parameter Name="headers" Type="System.ValueTuple&lt;NStack.ustring,System.Int32&gt;[]">
+          <Attributes>
+            <Attribute>
+              <AttributeName>System.Runtime.CompilerServices.TupleElementNames(Mono.Cecil.CustomAttributeArgument[])</AttributeName>
+            </Attribute>
+          </Attributes>
+        </Parameter>
+      </Parameters>
+      <Docs>
+        <param name="rect">To be added.</param>
+        <param name="source">To be added.</param>
+        <param name="headers">To be added.</param>
+        <summary>To be added.</summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+  </Members>
+</Type>

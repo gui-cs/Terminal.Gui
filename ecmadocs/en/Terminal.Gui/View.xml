@@ -51,6 +51,13 @@
                Using ColorSchemes has the advantage that your application will work both
                in color as well as black and white displays.
             </para>
+      <para>
+               Views that are focusable should implement the PositionCursor to make sure that
+               the cursor is placed in a location that makes sense.   Unix terminals do not have
+               a way of hiding the cursor, so it can be distracting to have the cursor left at 
+               the last focused view.   So views should make sure that they place the cursor
+               in a visually sensible place.
+            </para>
     </remarks>
   </Docs>
   <Members>
@@ -67,7 +74,7 @@
       <Docs>
         <param name="frame">The region covered by this view.</param>
         <summary>
-            Initializes a new instance of the <see cref="T:Terminal.View" /> class with the specified frame.   This is the default constructor.
+            Initializes a new instance of the <see cref="T:Terminal.Gui.View" /> class with the specified frame.   This is the default constructor.
             </summary>
         <remarks>To be added.</remarks>
       </Docs>
@@ -124,6 +131,28 @@
       <MemberSignature Language="C#" Value="public void AddCh (int col, int row, int ch);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void AddCh(int32 col, int32 row, int32 ch) cil managed" />
       <MemberType>Method</MemberType>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="col" Type="System.Int32" />
+        <Parameter Name="row" Type="System.Int32" />
+        <Parameter Name="ch" Type="System.Int32" />
+      </Parameters>
+      <Docs>
+        <param name="col">Col.</param>
+        <param name="row">Row.</param>
+        <param name="ch">Ch.</param>
+        <summary>
+            Displays the specified character in the specified column and row.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="AddRune">
+      <MemberSignature Language="C#" Value="public void AddRune (int col, int row, Rune ch);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void AddRune(int32 col, int32 row, valuetype System.Rune ch) cil managed" />
+      <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
       </AssemblyInfo>
@@ -133,7 +162,7 @@
       <Parameters>
         <Parameter Name="col" Type="System.Int32" />
         <Parameter Name="row" Type="System.Int32" />
-        <Parameter Name="ch" Type="System.Int32" />
+        <Parameter Name="ch" Type="System.Rune" />
       </Parameters>
       <Docs>
         <param name="col">Col.</param>
@@ -203,6 +232,27 @@
         </remarks>
       </Docs>
     </Member>
+    <Member MemberName="Clear">
+      <MemberSignature Language="C#" Value="public void Clear (Terminal.Gui.Rect r);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void Clear(valuetype Terminal.Gui.Rect r) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="r" Type="Terminal.Gui.Rect" />
+      </Parameters>
+      <Docs>
+        <param name="r">To be added.</param>
+        <summary>
+              Clears the specfied rectangular region with the current color
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="ClearNeedsDisplay">
       <MemberSignature Language="C#" Value="protected void ClearNeedsDisplay ();" />
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig instance void ClearNeedsDisplay() cil managed" />
@@ -218,6 +268,25 @@
         <summary>
             Removes the SetNeedsDisplay and the ChildNeedsDisplay setting on this view.
             </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ClipToBounds">
+      <MemberSignature Language="C#" Value="public Terminal.Gui.Rect ClipToBounds ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance valuetype Terminal.Gui.Rect ClipToBounds() cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.Rect</ReturnType>
+      </ReturnValue>
+      <Parameters />
+      <Docs>
+        <summary>
+            Sets the Console driver's clip region to the current View's Bounds.
+            </summary>
+        <returns>The existing driver's Clip region, which can be then set by setting the Driver.Clip property.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -244,9 +313,6 @@
       <MemberSignature Language="C#" Value="public void DrawFrame (Terminal.Gui.Rect rect, bool fill = false);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void DrawFrame(valuetype Terminal.Gui.Rect rect, bool fill) cil managed" />
       <MemberType>Method</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
       </ReturnValue>
@@ -263,13 +329,85 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
-    <Member MemberName="DrawHotString">
-      <MemberSignature Language="C#" Value="public void DrawHotString (string text, bool focused, Terminal.Gui.ColorScheme scheme);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void DrawHotString(string text, bool focused, class Terminal.Gui.ColorScheme scheme) cil managed" />
+    <Member MemberName="DrawFrame">
+      <MemberSignature Language="C#" Value="public void DrawFrame (Terminal.Gui.Rect rect, int padding = 0, bool fill = false);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void DrawFrame(valuetype Terminal.Gui.Rect rect, int32 padding, bool fill) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
       </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="rect" Type="Terminal.Gui.Rect" />
+        <Parameter Name="padding" Type="System.Int32" />
+        <Parameter Name="fill" Type="System.Boolean" />
+      </Parameters>
+      <Docs>
+        <param name="rect">Rectangular region for the frame to be drawn.</param>
+        <param name="padding">The padding to add to the drawn frame.</param>
+        <param name="fill">If set to <c>true</c> it fill will the contents.</param>
+        <summary>
+            Draws a frame in the current view, clipped by the boundary of this view
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="DrawHotString">
+      <MemberSignature Language="C#" Value="public void DrawHotString (NStack.ustring text, bool focused, Terminal.Gui.ColorScheme scheme);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void DrawHotString(class NStack.ustring text, bool focused, class Terminal.Gui.ColorScheme scheme) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="text" Type="NStack.ustring" />
+        <Parameter Name="focused" Type="System.Boolean" />
+        <Parameter Name="scheme" Type="Terminal.Gui.ColorScheme" />
+      </Parameters>
+      <Docs>
+        <param name="text">String to display, the underscoore before a letter flags the next letter as the hotkey.</param>
+        <param name="focused">If set to <c>true</c> this uses the focused colors from the color scheme, otherwise the regular ones.</param>
+        <param name="scheme">The color scheme to use.</param>
+        <summary>
+            Utility function to draw strings that contains a hotkey using a colorscheme and the "focused" state.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="DrawHotString">
+      <MemberSignature Language="C#" Value="public void DrawHotString (NStack.ustring text, Terminal.Gui.Attribute hotColor, Terminal.Gui.Attribute normalColor);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void DrawHotString(class NStack.ustring text, valuetype Terminal.Gui.Attribute hotColor, valuetype Terminal.Gui.Attribute normalColor) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="text" Type="NStack.ustring" />
+        <Parameter Name="hotColor" Type="Terminal.Gui.Attribute" />
+        <Parameter Name="normalColor" Type="Terminal.Gui.Attribute" />
+      </Parameters>
+      <Docs>
+        <param name="text">String to display, the underscoore before a letter flags the next letter as the hotkey.</param>
+        <param name="hotColor">Hot color.</param>
+        <param name="normalColor">Normal color.</param>
+        <summary>
+            Utility function to draw strings that contain a hotkey
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="DrawHotString">
+      <MemberSignature Language="C#" Value="public void DrawHotString (string text, bool focused, Terminal.Gui.ColorScheme scheme);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void DrawHotString(string text, bool focused, class Terminal.Gui.ColorScheme scheme) cil managed" />
+      <MemberType>Method</MemberType>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
       </ReturnValue>
@@ -292,9 +430,6 @@
       <MemberSignature Language="C#" Value="public void DrawHotString (string text, Terminal.Gui.Attribute hotColor, Terminal.Gui.Attribute normalColor);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void DrawHotString(string text, valuetype Terminal.Gui.Attribute hotColor, valuetype Terminal.Gui.Attribute normalColor) cil managed" />
       <MemberType>Method</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
       </ReturnValue>
@@ -500,7 +635,7 @@
       </ReturnValue>
       <Docs>
         <summary>
-            Gets or sets a value indicating whether this <see cref="T:Terminal.View" /> has focus.
+            Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.View" /> has focus.
             </summary>
         <value>
           <c>true</c> if has focus; otherwise, <c>false</c>.</value>
@@ -508,14 +643,14 @@
       </Docs>
     </Member>
     <Member MemberName="Id">
-      <MemberSignature Language="C#" Value="public string Id { get; set; }" />
-      <MemberSignature Language="ILAsm" Value=".property instance string Id" />
+      <MemberSignature Language="C#" Value="public NStack.ustring Id { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class NStack.ustring Id" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
-        <ReturnType>System.String</ReturnType>
+        <ReturnType>NStack.ustring</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>
@@ -679,13 +814,16 @@
         <Parameter Name="region" Type="Terminal.Gui.Rect" />
       </Parameters>
       <Docs>
-        <param name="region">To be added.</param>
+        <param name="region">The region to redraw, this is relative to the view itself.</param>
         <summary>
             Performs a redraw of this view and its subviews, only redraws the views that have been flagged for a re-display.
             </summary>
         <remarks>
-            The region argument is relative to the view itself.
-            </remarks>
+          <para>
+               Views should set the color that they want to use on entry, as otherwise this will inherit
+               the last color that was set globaly on the driver.
+            </para>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Remove">
@@ -748,6 +886,28 @@
             Converts a point from screen coordinates into the view coordinate space.
             </summary>
         <returns>The mapped point.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="SetClip">
+      <MemberSignature Language="C#" Value="public Terminal.Gui.Rect SetClip (Terminal.Gui.Rect rect);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance valuetype Terminal.Gui.Rect SetClip(valuetype Terminal.Gui.Rect rect) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.Rect</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="rect" Type="Terminal.Gui.Rect" />
+      </Parameters>
+      <Docs>
+        <param name="rect">Rectangle region to clip into, the region is view-relative.</param>
+        <summary>
+            Sets the clipping region to the specified region, the region is view-relative
+            </summary>
+        <returns>The previous clip region.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -861,9 +1021,9 @@
       <Parameters />
       <Docs>
         <summary>
-            Returns a <see cref="T:System.String" /> that represents the current <see cref="T:Terminal.View" />.
+            Returns a <see cref="T:System.String" /> that represents the current <see cref="T:Terminal.Gui.View" />.
             </summary>
-        <returns>A <see cref="T:System.String" /> that represents the current <see cref="T:Terminal.View" />.</returns>
+        <returns>A <see cref="T:System.String" /> that represents the current <see cref="T:Terminal.Gui.View" />.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -879,7 +1039,7 @@
       </ReturnValue>
       <Docs>
         <summary>
-            Gets or sets a value indicating whether this <see cref="T:Terminal.View" /> want mouse position reports.
+            Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.View" /> want mouse position reports.
             </summary>
         <value>
           <c>true</c> if want mouse position reports; otherwise, <c>false</c>.</value>

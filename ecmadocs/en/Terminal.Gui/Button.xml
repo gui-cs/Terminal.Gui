@@ -162,7 +162,7 @@
       </ReturnValue>
       <Docs>
         <summary>
-            Gets or sets a value indicating whether this <see cref="T:Terminal.Button" /> is the default action to activate on return on a dialog.
+            Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Button" /> is the default action to activate on return on a dialog.
             </summary>
         <value>
           <c>true</c> if is default; otherwise, <c>false</c>.</value>
@@ -285,14 +285,14 @@
       </Docs>
     </Member>
     <Member MemberName="Text">
-      <MemberSignature Language="C#" Value="public string Text { get; set; }" />
-      <MemberSignature Language="ILAsm" Value=".property instance string Text" />
+      <MemberSignature Language="C#" Value="public NStack.ustring Text { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class NStack.ustring Text" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
-        <ReturnType>System.String</ReturnType>
+        <ReturnType>NStack.ustring</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>

@@ -5,11 +5,13 @@ items:
   children:
   - Terminal.Gui.ConsoleDriver.#ctor
   - Terminal.Gui.ConsoleDriver.AddCh(System.Int32)
+  - Terminal.Gui.ConsoleDriver.AddRune(System.Rune)
   - Terminal.Gui.ConsoleDriver.AddSpecial(Terminal.Gui.SpecialChar)
+  - Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)
   - Terminal.Gui.ConsoleDriver.AddStr(System.String)
   - Terminal.Gui.ConsoleDriver.Clip
   - Terminal.Gui.ConsoleDriver.Cols
-  - Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  - Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   - Terminal.Gui.ConsoleDriver.End
   - Terminal.Gui.ConsoleDriver.Init(System.Action)
   - Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
@@ -65,8 +67,7 @@ items:
   nameWithType: ConsoleDriver.AddCh(Int32)
   fullName: ConsoleDriver.AddCh(Int32)
   type: Method
-  assemblies:
-  - Terminal.Gui
+  assemblies: []
   namespace: Terminal.Gui
   summary: Adds the specified rune to the display at the current cursor position
   syntax:
@@ -76,6 +77,27 @@ items:
       type: System.Int32
       description: Rune to add.
   overload: Terminal.Gui.ConsoleDriver.AddCh*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.AddRune(System.Rune)
+  id: AddRune(System.Rune)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: AddRune(Rune)
+  nameWithType: ConsoleDriver.AddRune(Rune)
+  fullName: ConsoleDriver.AddRune(Rune)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Adds the specified rune to the display at the current cursor position
+  syntax:
+    content: public abstract void AddRune (Rune rune);
+    parameters:
+    - id: rune
+      type: System.Rune
+      description: Rune to add.
+  overload: Terminal.Gui.ConsoleDriver.AddRune*
   exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.AddSpecial(Terminal.Gui.SpecialChar)
   id: AddSpecial(Terminal.Gui.SpecialChar)
@@ -98,6 +120,27 @@ items:
       description: Ch.
   overload: Terminal.Gui.ConsoleDriver.AddSpecial*
   exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)
+  id: AddStr(NStack.ustring)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: AddStr(ustring)
+  nameWithType: ConsoleDriver.AddStr(ustring)
+  fullName: ConsoleDriver.AddStr(ustring)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Adds the specified
+  syntax:
+    content: public abstract void AddStr (NStack.ustring str);
+    parameters:
+    - id: str
+      type: NStack.ustring
+      description: String.
+  overload: Terminal.Gui.ConsoleDriver.AddStr*
+  exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.AddStr(System.String)
   id: AddStr(System.String)
   parent: Terminal.Gui.ConsoleDriver
@@ -107,8 +150,7 @@ items:
   nameWithType: ConsoleDriver.AddStr(String)
   fullName: ConsoleDriver.AddStr(String)
   type: Method
-  assemblies:
-  - Terminal.Gui
+  assemblies: []
   namespace: Terminal.Gui
   summary: Adds the specified
   syntax:
@@ -131,7 +173,7 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Controls the current clipping region that AddCh/AddStr is subject to.
+  summary: Controls the current clipping region that AddRune/AddStr is subject to.
   syntax:
     content: public Terminal.Gui.Rect Clip { get; set; }
     return:
@@ -159,23 +201,26 @@ items:
       description: To be added.
   overload: Terminal.Gui.ConsoleDriver.Cols*
   exceptions: []
-- uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Boolean)
-  id: DrawFrame(Terminal.Gui.Rect,System.Boolean)
+- uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  id: DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   parent: Terminal.Gui.ConsoleDriver
   langs:
   - csharp
-  name: DrawFrame(Rect, Boolean)
-  nameWithType: ConsoleDriver.DrawFrame(Rect, Boolean)
-  fullName: ConsoleDriver.DrawFrame(Rect, Boolean)
+  name: DrawFrame(Rect, Int32, Boolean)
+  nameWithType: ConsoleDriver.DrawFrame(Rect, Int32, Boolean)
+  fullName: ConsoleDriver.DrawFrame(Rect, Int32, Boolean)
   type: Method
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
-    content: public abstract void DrawFrame (Terminal.Gui.Rect region, bool fill);
+    content: public abstract void DrawFrame (Terminal.Gui.Rect region, int padding, bool fill);
     parameters:
     - id: region
       type: Terminal.Gui.Rect
+      description: To be added.
+    - id: padding
+      type: System.Int32
       description: To be added.
     - id: fill
       type: System.Boolean
@@ -470,6 +515,18 @@ references:
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
+- uid: Terminal.Gui.ConsoleDriver.AddRune(System.Rune)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: AddRune(Rune)
+  nameWithType: ConsoleDriver.AddRune(Rune)
+  fullName: ConsoleDriver.AddRune(Rune)
+- uid: System.Rune
+  parent: System
+  isExternal: true
+  name: Rune
+  nameWithType: Rune
+  fullName: System.Rune
 - uid: Terminal.Gui.ConsoleDriver.AddSpecial(Terminal.Gui.SpecialChar)
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -482,6 +539,18 @@ references:
   name: SpecialChar
   nameWithType: SpecialChar
   fullName: Terminal.Gui.SpecialChar
+- uid: Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: AddStr(ustring)
+  nameWithType: ConsoleDriver.AddStr(ustring)
+  fullName: ConsoleDriver.AddStr(ustring)
+- uid: NStack.ustring
+  parent: NStack
+  isExternal: true
+  name: ustring
+  nameWithType: ustring
+  fullName: NStack.ustring
 - uid: Terminal.Gui.ConsoleDriver.AddStr(System.String)
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -512,12 +581,12 @@ references:
   name: Cols
   nameWithType: ConsoleDriver.Cols
   fullName: ConsoleDriver.Cols
-- uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+- uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
-  name: DrawFrame(Rect, Boolean)
-  nameWithType: ConsoleDriver.DrawFrame(Rect, Boolean)
-  fullName: ConsoleDriver.DrawFrame(Rect, Boolean)
+  name: DrawFrame(Rect, Int32, Boolean)
+  nameWithType: ConsoleDriver.DrawFrame(Rect, Int32, Boolean)
+  fullName: ConsoleDriver.DrawFrame(Rect, Int32, Boolean)
 - uid: System.Boolean
   parent: System
   isExternal: true
@@ -698,6 +767,12 @@ references:
   name: AddCh
   nameWithType: ConsoleDriver.AddCh
   fullName: ConsoleDriver.AddCh
+- uid: Terminal.Gui.ConsoleDriver.AddRune*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: AddRune
+  nameWithType: ConsoleDriver.AddRune
+  fullName: ConsoleDriver.AddRune
 - uid: Terminal.Gui.ConsoleDriver.AddSpecial*
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false

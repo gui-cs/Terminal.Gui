@@ -83,9 +83,12 @@
   </div>
       <div class="level3"><a class="xref" href="Terminal.Gui.Button.html">Button</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a></div>
+      <div class="level3"><a class="xref" href="Terminal.Gui.FrameView.html">FrameView</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.Label.html">Label</a></div>
+      <div class="level3"><a class="xref" href="Terminal.Gui.ListView.html">ListView</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.RadioGroup.html">RadioGroup</a></div>
+      <div class="level3"><a class="xref" href="Terminal.Gui.ScrollBarView.html">ScrollBarView</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.ScrollView.html">ScrollView</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.TextField.html">TextField</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a></div>
@@ -136,6 +139,13 @@
     <p>
                Using ColorSchemes has the advantage that your application will work both
                in color as well as black and white displays.
+            </p>
+    <p>
+               Views that are focusable should implement the PositionCursor to make sure that
+               the cursor is placed in a location that makes sense.   Unix terminals do not have
+               a way of hiding the cursor, so it can be distracting to have the cursor left at 
+               the last focused view.   So views should make sure that they place the cursor
+               in a visually sensible place.
             </p></div>
   <h3 id="constructors">Constructors
   </h3>
@@ -143,7 +153,7 @@
   
   <a id="Terminal_Gui_View__ctor_" data-uid="Terminal.Gui.View.#ctor*"></a>
   <h4 id="Terminal_Gui_View__ctor_Terminal_Gui_Rect_" data-uid="Terminal.Gui.View.#ctor(Terminal.Gui.Rect)">View(Rect)</h4>
-  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="../Terminal/Terminal.View.html">View</a> class with the specified frame.   This is the default constructor.</p>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Terminal.Gui.View.html">View</a> class with the specified frame.   This is the default constructor.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -316,7 +326,7 @@
   
   <a id="Terminal_Gui_View_HasFocus_" data-uid="Terminal.Gui.View.HasFocus*"></a>
   <h4 id="Terminal_Gui_View_HasFocus" data-uid="Terminal.Gui.View.HasFocus">HasFocus</h4>
-  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="../Terminal/Terminal.View.html">View</a> has focus.</p>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.View.html">View</a> has focus.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -348,7 +358,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string Id { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public NStack.ustring Id { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -360,7 +370,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><span class="xref">NStack.ustring</span></td>
         <td><p>The identifier.</p>
 </td>
       </tr>
@@ -451,7 +461,7 @@
   
   <a id="Terminal_Gui_View_WantMousePositionReports_" data-uid="Terminal.Gui.View.WantMousePositionReports*"></a>
   <h4 id="Terminal_Gui_View_WantMousePositionReports" data-uid="Terminal.Gui.View.WantMousePositionReports">WantMousePositionReports</h4>
-  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="../Terminal/Terminal.View.html">View</a> want mouse position reports.</p>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.View.html">View</a> want mouse position reports.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -577,6 +587,47 @@
   </table>
   
   
+  <a id="Terminal_Gui_View_AddRune_" data-uid="Terminal.Gui.View.AddRune*"></a>
+  <h4 id="Terminal_Gui_View_AddRune_System_Int32_System_Int32_System_Rune_" data-uid="Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)">AddRune(Int32, Int32, Rune)</h4>
+  <div class="markdown level1 summary"><p>Displays the specified character in the specified column and row.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AddRune (int col, int row, Rune ch);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">col</span></td>
+        <td><p>Col.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">row</span></td>
+        <td><p>Row.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Rune</span></td>
+        <td><span class="parametername">ch</span></td>
+        <td><p>Ch.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_View_ChildNeedsDisplay_" data-uid="Terminal.Gui.View.ChildNeedsDisplay*"></a>
   <h4 id="Terminal_Gui_View_ChildNeedsDisplay" data-uid="Terminal.Gui.View.ChildNeedsDisplay">ChildNeedsDisplay()</h4>
   <div class="markdown level1 summary"><p>Flags this view for requiring the children views to be repainted.</p>
@@ -603,6 +654,35 @@
               </p></div>
   
   
+  <a id="Terminal_Gui_View_Clear_" data-uid="Terminal.Gui.View.Clear*"></a>
+  <h4 id="Terminal_Gui_View_Clear_Terminal_Gui_Rect_" data-uid="Terminal.Gui.View.Clear(Terminal.Gui.Rect)">Clear(Rect)</h4>
+  <div class="markdown level1 summary"><p>Clears the specfied rectangular region with the current color</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Clear (Terminal.Gui.Rect r);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><span class="parametername">r</span></td>
+        <td><p>To be added.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_View_ClearNeedsDisplay_" data-uid="Terminal.Gui.View.ClearNeedsDisplay*"></a>
   <h4 id="Terminal_Gui_View_ClearNeedsDisplay" data-uid="Terminal.Gui.View.ClearNeedsDisplay">ClearNeedsDisplay()</h4>
   <div class="markdown level1 summary"><p>Removes the SetNeedsDisplay and the ChildNeedsDisplay setting on this view.</p>
@@ -612,6 +692,33 @@
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">protected void ClearNeedsDisplay ();</code></pre>
   </div>
+  
+  
+  <a id="Terminal_Gui_View_ClipToBounds_" data-uid="Terminal.Gui.View.ClipToBounds*"></a>
+  <h4 id="Terminal_Gui_View_ClipToBounds" data-uid="Terminal.Gui.View.ClipToBounds">ClipToBounds()</h4>
+  <div class="markdown level1 summary"><p>Sets the Console driver&#39;s clip region to the current View&#39;s Bounds.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Terminal.Gui.Rect ClipToBounds ();</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><p>The existing driver&#39;s Clip region, which can be then set by setting the Driver.Clip property.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="Terminal_Gui_View_DrawFrame_" data-uid="Terminal.Gui.View.DrawFrame*"></a>
@@ -643,6 +750,129 @@
         <td><span class="xref">System.Boolean</span></td>
         <td><span class="parametername">fill</span></td>
         <td><p>If set to <code>true</code> it fill will the contents.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_View_DrawFrame_" data-uid="Terminal.Gui.View.DrawFrame*"></a>
+  <h4 id="Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_" data-uid="Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)">DrawFrame(Rect, Int32, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Draws a frame in the current view, clipped by the boundary of this view</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void DrawFrame (Terminal.Gui.Rect rect, int padding = 0, bool fill = false);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><span class="parametername">rect</span></td>
+        <td><p>Rectangular region for the frame to be drawn.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">padding</span></td>
+        <td><p>The padding to add to the drawn frame.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">fill</span></td>
+        <td><p>If set to <code>true</code> it fill will the contents.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_View_DrawHotString_" data-uid="Terminal.Gui.View.DrawHotString*"></a>
+  <h4 id="Terminal_Gui_View_DrawHotString_NStack_ustring_System_Boolean_Terminal_Gui_ColorScheme_" data-uid="Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)">DrawHotString(ustring, Boolean, ColorScheme)</h4>
+  <div class="markdown level1 summary"><p>Utility function to draw strings that contains a hotkey using a colorscheme and the &quot;focused&quot; state.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void DrawHotString (NStack.ustring text, bool focused, Terminal.Gui.ColorScheme scheme);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">text</span></td>
+        <td><p>String to display, the underscoore before a letter flags the next letter as the hotkey.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">focused</span></td>
+        <td><p>If set to <code>true</code> this uses the focused colors from the color scheme, otherwise the regular ones.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
+        <td><span class="parametername">scheme</span></td>
+        <td><p>The color scheme to use.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_View_DrawHotString_" data-uid="Terminal.Gui.View.DrawHotString*"></a>
+  <h4 id="Terminal_Gui_View_DrawHotString_NStack_ustring_Terminal_Gui_Attribute_Terminal_Gui_Attribute_" data-uid="Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)">DrawHotString(ustring, Attribute, Attribute)</h4>
+  <div class="markdown level1 summary"><p>Utility function to draw strings that contain a hotkey</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void DrawHotString (NStack.ustring text, Terminal.Gui.Attribute hotColor, Terminal.Gui.Attribute normalColor);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">text</span></td>
+        <td><p>String to display, the underscoore before a letter flags the next letter as the hotkey.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a></td>
+        <td><span class="parametername">hotColor</span></td>
+        <td><p>Hot color.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a></td>
+        <td><span class="parametername">normalColor</span></td>
+        <td><p>Normal color.</p>
 </td>
       </tr>
     </tbody>
@@ -1059,14 +1289,16 @@ public System.Collections.IEnumerator GetEnumerator ();</code></pre>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">region</span></td>
-        <td><p>To be added.</p>
+        <td><p>The region to redraw, this is relative to the view itself.</p>
 </td>
       </tr>
     </tbody>
   </table>
   <h5 id="Terminal_Gui_View_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>The region argument is relative to the view itself.</p>
-</div>
+  <div class="markdown level1 remarks"><p>
+               Views should set the color that they want to use on entry, as otherwise this will inherit
+               the last color that was set globaly on the driver.
+            </p></div>
   
   
   <a id="Terminal_Gui_View_Remove_" data-uid="Terminal.Gui.View.Remove*"></a>
@@ -1160,6 +1392,51 @@ public System.Collections.IEnumerator GetEnumerator ();</code></pre>
   </table>
   
   
+  <a id="Terminal_Gui_View_SetClip_" data-uid="Terminal.Gui.View.SetClip*"></a>
+  <h4 id="Terminal_Gui_View_SetClip_Terminal_Gui_Rect_" data-uid="Terminal.Gui.View.SetClip(Terminal.Gui.Rect)">SetClip(Rect)</h4>
+  <div class="markdown level1 summary"><p>Sets the clipping region to the specified region, the region is view-relative</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Terminal.Gui.Rect SetClip (Terminal.Gui.Rect rect);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><span class="parametername">rect</span></td>
+        <td><p>Rectangle region to clip into, the region is view-relative.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><p>The previous clip region.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_View_SetFocus_" data-uid="Terminal.Gui.View.SetFocus*"></a>
   <h4 id="Terminal_Gui_View_SetFocus_Terminal_Gui_View_" data-uid="Terminal.Gui.View.SetFocus(Terminal.Gui.View)">SetFocus(View)</h4>
   <div class="markdown level1 summary"><p>Focuses the specified sub-view.</p>
@@ -1232,7 +1509,7 @@ public System.Collections.IEnumerator GetEnumerator ();</code></pre>
   
   <a id="Terminal_Gui_View_ToString_" data-uid="Terminal.Gui.View.ToString*"></a>
   <h4 id="Terminal_Gui_View_ToString" data-uid="Terminal.Gui.View.ToString">ToString()</h4>
-  <div class="markdown level1 summary"><p>Returns a <span class="xref">System.String</span> that represents the current <a class="xref" href="../Terminal/Terminal.View.html">View</a>.</p>
+  <div class="markdown level1 summary"><p>Returns a <span class="xref">System.String</span> that represents the current <a class="xref" href="Terminal.Gui.View.html">View</a>.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1250,7 +1527,7 @@ public System.Collections.IEnumerator GetEnumerator ();</code></pre>
     <tbody>
       <tr>
         <td><span class="xref">System.String</span></td>
-        <td><p>A <span class="xref">System.String</span> that represents the current <a class="xref" href="../Terminal/Terminal.View.html">View</a>.</p>
+        <td><p>A <span class="xref">System.String</span> that represents the current <a class="xref" href="Terminal.Gui.View.html">View</a>.</p>
 </td>
       </tr>
     </tbody>

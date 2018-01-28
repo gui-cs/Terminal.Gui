@@ -37,9 +37,12 @@
       <Type Name="ColorScheme" Kind="Class" />
       <Type Name="ConsoleDriver" Kind="Class" />
       <Type Name="Dialog" Kind="Class" />
+      <Type Name="FrameView" Kind="Class" />
+      <Type Name="IListDataSource" Kind="Interface" />
       <Type Name="Key" Kind="Enumeration" />
       <Type Name="KeyEvent" Kind="Structure" />
       <Type Name="Label" Kind="Class" />
+      <Type Name="ListView" Kind="Class" />
       <Type Name="MenuBar" Kind="Class" />
       <Type Name="MenuBarItem" Kind="Class" />
       <Type Name="MenuItem" Kind="Class" />
@@ -50,6 +53,7 @@
       <Type Name="RadioGroup" Kind="Class" />
       <Type Name="Rect" Kind="Structure" />
       <Type Name="Responder" Kind="Class" />
+      <Type Name="ScrollBarView" Kind="Class" />
       <Type Name="ScrollView" Kind="Class" />
       <Type Name="Size" Kind="Structure" />
       <Type Name="SpecialChar" Kind="Enumeration" />

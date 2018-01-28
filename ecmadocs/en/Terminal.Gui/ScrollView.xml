@@ -10,8 +10,17 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>
+            Scrollviews are views that present a window into a virtual space where children views are added.  Similar to the iOS UIScrollView.
+            </summary>
+    <remarks>
+      <para>
+              The subviews that are added to this scrollview are offset by the
+              ContentOffset property.   The view itself is a window into the 
+              space represented by the ContentSize.
+            </para>
+      <para />
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -27,6 +36,153 @@
       <Docs>
         <param name="frame">To be added.</param>
         <summary>To be added.</summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Add">
+      <MemberSignature Language="C#" Value="public override void Add (Terminal.Gui.View view);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Add(class Terminal.Gui.View view) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="view" Type="Terminal.Gui.View" />
+      </Parameters>
+      <Docs>
+        <param name="view">The view to add to the scrollview.</param>
+        <summary>
+            Adds the view to the scrollview.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ContentOffset">
+      <MemberSignature Language="C#" Value="public Terminal.Gui.Point ContentOffset { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance valuetype Terminal.Gui.Point ContentOffset" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.Point</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Represents the top left corner coordinate that is displayed by the scrollview
+            </summary>
+        <value>The content offset.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ContentSize">
+      <MemberSignature Language="C#" Value="public Terminal.Gui.Size ContentSize { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance valuetype Terminal.Gui.Size ContentSize" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.Size</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Represents the contents of the data shown inside the scrolview
+            </summary>
+        <value>The size of the content.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="PositionCursor">
+      <MemberSignature Language="C#" Value="public override void PositionCursor ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void PositionCursor() cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters />
+      <Docs>
+        <summary>To be added.</summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Redraw">
+      <MemberSignature Language="C#" Value="public override void Redraw (Terminal.Gui.Rect region);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Redraw(valuetype Terminal.Gui.Rect region) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="region" Type="Terminal.Gui.Rect" />
+      </Parameters>
+      <Docs>
+        <param name="region">To be added.</param>
+        <summary>To be added.</summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Scrolled">
+      <MemberSignature Language="C#" Value="public event Action&lt;Terminal.Gui.ScrollView&gt; Scrolled;" />
+      <MemberSignature Language="ILAsm" Value=".event class System.Action`1&lt;class Terminal.Gui.ScrollView&gt; Scrolled" />
+      <MemberType>Event</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Action&lt;Terminal.Gui.ScrollView&gt;</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            This event is raised when the contents have scrolled
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ShowHorizontalScrollIndicator">
+      <MemberSignature Language="C#" Value="public bool ShowHorizontalScrollIndicator { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance bool ShowHorizontalScrollIndicator" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Gets or sets the visibility for the horizontal scroll indicator.
+            </summary>
+        <value>
+          <c>true</c> if show vertical scroll indicator; otherwise, <c>false</c>.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ShowVerticalScrollIndicator">
+      <MemberSignature Language="C#" Value="public bool ShowVerticalScrollIndicator { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance bool ShowVerticalScrollIndicator" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            /// Gets or sets the visibility for the vertical scroll indicator.
+            </summary>
+        <value>
+          <c>true</c> if show vertical scroll indicator; otherwise, <c>false</c>.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

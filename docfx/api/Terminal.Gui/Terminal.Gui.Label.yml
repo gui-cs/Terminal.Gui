@@ -3,8 +3,11 @@ items:
 - uid: Terminal.Gui.Label
   id: Label
   children:
+  - Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,NStack.ustring)
   - Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,System.String)
+  - Terminal.Gui.Label.#ctor(System.Int32,System.Int32,NStack.ustring)
   - Terminal.Gui.Label.#ctor(System.Int32,System.Int32,System.String)
+  - Terminal.Gui.Label.MeasureLines(NStack.ustring,System.Int32)
   - Terminal.Gui.Label.MeasureLines(System.String,System.Int32)
   - Terminal.Gui.Label.Redraw(Terminal.Gui.Rect)
   - Terminal.Gui.Label.Text
@@ -33,12 +36,18 @@ items:
   - Terminal.Gui.View.Add(Terminal.Gui.View)
   - Terminal.Gui.View.Add(Terminal.Gui.View[])
   - Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
+  - Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
   - Terminal.Gui.View.Bounds
   - Terminal.Gui.View.ChildNeedsDisplay
   - Terminal.Gui.View.Clear
+  - Terminal.Gui.View.Clear(Terminal.Gui.Rect)
   - Terminal.Gui.View.ClearNeedsDisplay
+  - Terminal.Gui.View.ClipToBounds
   - Terminal.Gui.View.ColorScheme
   - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  - Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  - Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
   - Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
   - Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
   - Terminal.Gui.View.Driver
@@ -62,6 +71,7 @@ items:
   - Terminal.Gui.View.Remove(Terminal.Gui.View)
   - Terminal.Gui.View.RemoveAll
   - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  - Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
   - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
   - Terminal.Gui.View.SetNeedsDisplay
   - Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
@@ -69,6 +79,33 @@ items:
   - Terminal.Gui.View.SuperView
   - Terminal.Gui.View.ToString
   - Terminal.Gui.View.WantMousePositionReports
+- uid: Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,NStack.ustring)
+  id: '#ctor(Terminal.Gui.Rect,NStack.ustring)'
+  parent: Terminal.Gui.Label
+  langs:
+  - csharp
+  name: Label(Rect, ustring)
+  nameWithType: Label.Label(Rect, ustring)
+  fullName: Label.Label(Rect, ustring)
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Public constructor: creates a label at the given
+                  coordinate with the given string and uses the specified
+                  frame for the string.
+  syntax:
+    content: public Label (Terminal.Gui.Rect rect, NStack.ustring text);
+    parameters:
+    - id: rect
+      type: Terminal.Gui.Rect
+      description: To be added.
+    - id: text
+      type: NStack.ustring
+      description: To be added.
+  overload: Terminal.Gui.Label.#ctor*
+  exceptions: []
 - uid: Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,System.String)
   id: '#ctor(Terminal.Gui.Rect,System.String)'
   parent: Terminal.Gui.Label
@@ -78,8 +115,7 @@ items:
   nameWithType: Label.Label(Rect, String)
   fullName: Label.Label(Rect, String)
   type: Constructor
-  assemblies:
-  - Terminal.Gui
+  assemblies: []
   namespace: Terminal.Gui
   summary: >-
     Public constructor: creates a label at the given
@@ -96,6 +132,37 @@ items:
       description: To be added.
   overload: Terminal.Gui.Label.#ctor*
   exceptions: []
+- uid: Terminal.Gui.Label.#ctor(System.Int32,System.Int32,NStack.ustring)
+  id: '#ctor(System.Int32,System.Int32,NStack.ustring)'
+  parent: Terminal.Gui.Label
+  langs:
+  - csharp
+  name: Label(Int32, Int32, ustring)
+  nameWithType: Label.Label(Int32, Int32, ustring)
+  fullName: Label.Label(Int32, Int32, ustring)
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Public constructor: creates a label at the given
+                  coordinate with the given string, computes the bounding box
+                  based on the size of the string, assumes that the string contains
+                  newlines for multiple lines, no special breaking rules are used.
+  syntax:
+    content: public Label (int x, int y, NStack.ustring text);
+    parameters:
+    - id: x
+      type: System.Int32
+      description: To be added.
+    - id: y
+      type: System.Int32
+      description: To be added.
+    - id: text
+      type: NStack.ustring
+      description: To be added.
+  overload: Terminal.Gui.Label.#ctor*
+  exceptions: []
 - uid: Terminal.Gui.Label.#ctor(System.Int32,System.Int32,System.String)
   id: '#ctor(System.Int32,System.Int32,System.String)'
   parent: Terminal.Gui.Label
@@ -105,8 +172,7 @@ items:
   nameWithType: Label.Label(Int32, Int32, String)
   fullName: Label.Label(Int32, Int32, String)
   type: Constructor
-  assemblies:
-  - Terminal.Gui
+  assemblies: []
   namespace: Terminal.Gui
   summary: >-
     Public constructor: creates a label at the given
@@ -127,6 +193,33 @@ items:
       description: To be added.
   overload: Terminal.Gui.Label.#ctor*
   exceptions: []
+- uid: Terminal.Gui.Label.MeasureLines(NStack.ustring,System.Int32)
+  id: MeasureLines(NStack.ustring,System.Int32)
+  parent: Terminal.Gui.Label
+  langs:
+  - csharp
+  name: MeasureLines(ustring, Int32)
+  nameWithType: Label.MeasureLines(ustring, Int32)
+  fullName: Label.MeasureLines(ustring, Int32)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Computes the number of lines needed to render the specified text by the Label control
+  syntax:
+    content: public static int MeasureLines (NStack.ustring text, int width);
+    parameters:
+    - id: text
+      type: NStack.ustring
+      description: Text, may contain newlines.
+    - id: width
+      type: System.Int32
+      description: The width for the text.
+    return:
+      type: System.Int32
+      description: Number of lines.
+  overload: Terminal.Gui.Label.MeasureLines*
+  exceptions: []
 - uid: Terminal.Gui.Label.MeasureLines(System.String,System.Int32)
   id: MeasureLines(System.String,System.Int32)
   parent: Terminal.Gui.Label
@@ -136,8 +229,7 @@ items:
   nameWithType: Label.MeasureLines(String, Int32)
   fullName: Label.MeasureLines(String, Int32)
   type: Method
-  assemblies:
-  - Terminal.Gui
+  assemblies: []
   namespace: Terminal.Gui
   summary: Computes the number of lines needed to render the specified text by the Label control
   syntax:
@@ -188,9 +280,9 @@ items:
   namespace: Terminal.Gui
   summary: The text displayed by this widget.
   syntax:
-    content: public virtual string Text { get; set; }
+    content: public virtual NStack.ustring Text { get; set; }
     return:
-      type: System.String
+      type: NStack.ustring
       description: To be added.
   overload: Terminal.Gui.Label.Text*
   exceptions: []
@@ -241,36 +333,60 @@ references:
   name: View
   nameWithType: View
   fullName: Terminal.Gui.View
-- uid: Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,System.String)
+- uid: Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,NStack.ustring)
   parent: Terminal.Gui.Label
   isExternal: false
-  name: Label(Rect, String)
-  nameWithType: Label.Label(Rect, String)
-  fullName: Label.Label(Rect, String)
+  name: Label(Rect, ustring)
+  nameWithType: Label.Label(Rect, ustring)
+  fullName: Label.Label(Rect, ustring)
 - uid: Terminal.Gui.Rect
   parent: Terminal.Gui
   isExternal: false
   name: Rect
   nameWithType: Rect
   fullName: Terminal.Gui.Rect
+- uid: NStack.ustring
+  parent: NStack
+  isExternal: true
+  name: ustring
+  nameWithType: ustring
+  fullName: NStack.ustring
+- uid: Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,System.String)
+  parent: Terminal.Gui.Label
+  isExternal: false
+  name: Label(Rect, String)
+  nameWithType: Label.Label(Rect, String)
+  fullName: Label.Label(Rect, String)
 - uid: System.String
   parent: System
   isExternal: true
   name: String
   nameWithType: String
   fullName: System.String
-- uid: Terminal.Gui.Label.#ctor(System.Int32,System.Int32,System.String)
+- uid: Terminal.Gui.Label.#ctor(System.Int32,System.Int32,NStack.ustring)
   parent: Terminal.Gui.Label
   isExternal: false
-  name: Label(Int32, Int32, String)
-  nameWithType: Label.Label(Int32, Int32, String)
-  fullName: Label.Label(Int32, Int32, String)
+  name: Label(Int32, Int32, ustring)
+  nameWithType: Label.Label(Int32, Int32, ustring)
+  fullName: Label.Label(Int32, Int32, ustring)
 - uid: System.Int32
   parent: System
   isExternal: true
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
+- uid: Terminal.Gui.Label.#ctor(System.Int32,System.Int32,System.String)
+  parent: Terminal.Gui.Label
+  isExternal: false
+  name: Label(Int32, Int32, String)
+  nameWithType: Label.Label(Int32, Int32, String)
+  fullName: Label.Label(Int32, Int32, String)
+- uid: Terminal.Gui.Label.MeasureLines(NStack.ustring,System.Int32)
+  parent: Terminal.Gui.Label
+  isExternal: false
+  name: MeasureLines(ustring, Int32)
+  nameWithType: Label.MeasureLines(ustring, Int32)
+  fullName: Label.MeasureLines(ustring, Int32)
 - uid: Terminal.Gui.Label.MeasureLines(System.String,System.Int32)
   parent: Terminal.Gui.Label
   isExternal: false
@@ -403,6 +519,12 @@ references:
   name: AddCh(Int32, Int32, Int32)
   nameWithType: View.AddCh(Int32, Int32, Int32)
   fullName: View.AddCh(Int32, Int32, Int32)
+- uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: AddRune(Int32, Int32, Rune)
+  nameWithType: View.AddRune(Int32, Int32, Rune)
+  fullName: View.AddRune(Int32, Int32, Rune)
 - uid: Terminal.Gui.View.Bounds
   parent: Terminal.Gui.View
   isExternal: false
@@ -421,12 +543,24 @@ references:
   name: Clear()
   nameWithType: View.Clear()
   fullName: View.Clear()
+- uid: Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Clear(Rect)
+  nameWithType: View.Clear(Rect)
+  fullName: View.Clear(Rect)
 - uid: Terminal.Gui.View.ClearNeedsDisplay
   parent: Terminal.Gui.View
   isExternal: false
   name: ClearNeedsDisplay()
   nameWithType: View.ClearNeedsDisplay()
   fullName: View.ClearNeedsDisplay()
+- uid: Terminal.Gui.View.ClipToBounds
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ClipToBounds()
+  nameWithType: View.ClipToBounds()
+  fullName: View.ClipToBounds()
 - uid: Terminal.Gui.View.ColorScheme
   parent: Terminal.Gui.View
   isExternal: false
@@ -439,6 +573,24 @@ references:
   name: DrawFrame(Rect, Boolean)
   nameWithType: View.DrawFrame(Rect, Boolean)
   fullName: View.DrawFrame(Rect, Boolean)
+- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawFrame(Rect, Int32, Boolean)
+  nameWithType: View.DrawFrame(Rect, Int32, Boolean)
+  fullName: View.DrawFrame(Rect, Int32, Boolean)
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(ustring, Boolean, ColorScheme)
+  nameWithType: View.DrawHotString(ustring, Boolean, ColorScheme)
+  fullName: View.DrawHotString(ustring, Boolean, ColorScheme)
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(ustring, Attribute, Attribute)
+  nameWithType: View.DrawHotString(ustring, Attribute, Attribute)
+  fullName: View.DrawHotString(ustring, Attribute, Attribute)
 - uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
   parent: Terminal.Gui.View
   isExternal: false
@@ -553,6 +705,12 @@ references:
   name: ScreenToView(Int32, Int32)
   nameWithType: View.ScreenToView(Int32, Int32)
   fullName: View.ScreenToView(Int32, Int32)
+- uid: Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetClip(Rect)
+  nameWithType: View.SetClip(Rect)
+  fullName: View.SetClip(Rect)
 - uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
   parent: Terminal.Gui.View
   isExternal: false

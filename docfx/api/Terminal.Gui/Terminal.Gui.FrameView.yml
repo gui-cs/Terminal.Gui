@@ -1,40 +1,33 @@
 ### YamlMime:ManagedReference
 items:
-- uid: Terminal.Gui.Toplevel
-  id: Toplevel
+- uid: Terminal.Gui.FrameView
+  id: FrameView
   children:
-  - Terminal.Gui.Toplevel.#ctor(Terminal.Gui.Rect)
-  - Terminal.Gui.Toplevel.CanFocus
-  - Terminal.Gui.Toplevel.Create
-  - Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)
-  - Terminal.Gui.Toplevel.Running
+  - Terminal.Gui.FrameView.#ctor(Terminal.Gui.Rect,NStack.ustring)
+  - Terminal.Gui.FrameView.Add(Terminal.Gui.View)
+  - Terminal.Gui.FrameView.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.FrameView.Remove(Terminal.Gui.View)
+  - Terminal.Gui.FrameView.Title
   langs:
   - csharp
-  name: Toplevel
-  nameWithType: Toplevel
-  fullName: Terminal.Gui.Toplevel
+  name: FrameView
+  nameWithType: FrameView
+  fullName: Terminal.Gui.FrameView
   type: Class
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Toplevel views can be modally executed.
-  remarks: >-
-    <p>
-                    Toplevels can be modally executing views, and they return control
-                    to the caller when the "Running" property is set to false.
-                  </p>
+  summary: The FrameView is a container frame that draws a frame around the contents
   syntax:
-    content: 'public class Toplevel : Terminal.Gui.View'
+    content: 'public class FrameView : Terminal.Gui.View'
   inheritance:
   - System.Object
   - Terminal.Gui.Responder
   - Terminal.Gui.View
-  derivedClasses:
-  - Terminal.Gui.Window
   implements: []
   inheritedMembers:
+  - Terminal.Gui.Responder.CanFocus
   - Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
-  - Terminal.Gui.View.Add(Terminal.Gui.View)
   - Terminal.Gui.View.Add(Terminal.Gui.View[])
   - Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
   - Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
@@ -68,8 +61,7 @@ items:
   - Terminal.Gui.View.PositionCursor
   - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
-  - Terminal.Gui.View.Redraw(Terminal.Gui.Rect)
-  - Terminal.Gui.View.Remove(Terminal.Gui.View)
+  - Terminal.Gui.View.ProcessKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.RemoveAll
   - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
   - Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
@@ -80,110 +72,113 @@ items:
   - Terminal.Gui.View.SuperView
   - Terminal.Gui.View.ToString
   - Terminal.Gui.View.WantMousePositionReports
-- uid: Terminal.Gui.Toplevel.#ctor(Terminal.Gui.Rect)
-  id: '#ctor(Terminal.Gui.Rect)'
-  parent: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.FrameView.#ctor(Terminal.Gui.Rect,NStack.ustring)
+  id: '#ctor(Terminal.Gui.Rect,NStack.ustring)'
+  parent: Terminal.Gui.FrameView
   langs:
   - csharp
-  name: Toplevel(Rect)
-  nameWithType: Toplevel.Toplevel(Rect)
-  fullName: Toplevel.Toplevel(Rect)
+  name: FrameView(Rect, ustring)
+  nameWithType: FrameView.FrameView(Rect, ustring)
+  fullName: FrameView.FrameView(Rect, ustring)
   type: Constructor
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Initializes a new instance of the <xref href="Terminal.Gui.Toplevel"></xref> class.
+  summary: >-
+    Initializes a new instance of the <xref href="Terminal.Gui.Gui.FrameView"></xref> class with
+                a title.
   syntax:
-    content: public Toplevel (Terminal.Gui.Rect frame);
+    content: public FrameView (Terminal.Gui.Rect frame, NStack.ustring title);
     parameters:
     - id: frame
       type: Terminal.Gui.Rect
       description: Frame.
-  overload: Terminal.Gui.Toplevel.#ctor*
+    - id: title
+      type: NStack.ustring
+      description: Title.
+  overload: Terminal.Gui.FrameView.#ctor*
   exceptions: []
-- uid: Terminal.Gui.Toplevel.CanFocus
-  id: CanFocus
-  parent: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.FrameView.Add(Terminal.Gui.View)
+  id: Add(Terminal.Gui.View)
+  parent: Terminal.Gui.FrameView
   langs:
   - csharp
-  name: CanFocus
-  nameWithType: Toplevel.CanFocus
-  fullName: Toplevel.CanFocus
+  name: Add(View)
+  nameWithType: FrameView.Add(View)
+  fullName: FrameView.Add(View)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Add the specified view to the ContentView.
+  syntax:
+    content: public override void Add (Terminal.Gui.View view);
+    parameters:
+    - id: view
+      type: Terminal.Gui.View
+      description: View to add to the window.
+  overload: Terminal.Gui.FrameView.Add*
+  exceptions: []
+- uid: Terminal.Gui.FrameView.Redraw(Terminal.Gui.Rect)
+  id: Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.FrameView
+  langs:
+  - csharp
+  name: Redraw(Rect)
+  nameWithType: FrameView.Redraw(Rect)
+  fullName: FrameView.Redraw(Rect)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void Redraw (Terminal.Gui.Rect bounds);
+    parameters:
+    - id: bounds
+      type: Terminal.Gui.Rect
+      description: To be added.
+  overload: Terminal.Gui.FrameView.Redraw*
+  exceptions: []
+- uid: Terminal.Gui.FrameView.Remove(Terminal.Gui.View)
+  id: Remove(Terminal.Gui.View)
+  parent: Terminal.Gui.FrameView
+  langs:
+  - csharp
+  name: Remove(View)
+  nameWithType: FrameView.Remove(View)
+  fullName: FrameView.Remove(View)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Removes a widget from this container.
+  syntax:
+    content: public virtual void Remove (Terminal.Gui.View view);
+    parameters:
+    - id: view
+      type: Terminal.Gui.View
+      description: To be added.
+  overload: Terminal.Gui.FrameView.Remove*
+  exceptions: []
+- uid: Terminal.Gui.FrameView.Title
+  id: Title
+  parent: Terminal.Gui.FrameView
+  langs:
+  - csharp
+  name: Title
+  nameWithType: FrameView.Title
+  fullName: FrameView.Title
   type: Property
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: The title to be displayed for this window.
   syntax:
-    content: public override bool CanFocus { get; }
+    content: public NStack.ustring Title { get; set; }
     return:
-      type: System.Boolean
-      description: To be added.
-  overload: Terminal.Gui.Toplevel.CanFocus*
-  exceptions: []
-- uid: Terminal.Gui.Toplevel.Create
-  id: Create
-  parent: Terminal.Gui.Toplevel
-  langs:
-  - csharp
-  name: Create()
-  nameWithType: Toplevel.Create()
-  fullName: Toplevel.Create()
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Convenience factory method that creates a new toplevel with the current terminal dimensions.
-  syntax:
-    content: public static Terminal.Gui.Toplevel Create ();
-    parameters: []
-    return:
-      type: Terminal.Gui.Toplevel
-      description: The create.
-  overload: Terminal.Gui.Toplevel.Create*
-  exceptions: []
-- uid: Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)
-  id: ProcessKey(Terminal.Gui.KeyEvent)
-  parent: Terminal.Gui.Toplevel
-  langs:
-  - csharp
-  name: ProcessKey(KeyEvent)
-  nameWithType: Toplevel.ProcessKey(KeyEvent)
-  fullName: Toplevel.ProcessKey(KeyEvent)
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  syntax:
-    content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
-    parameters:
-    - id: kb
-      type: Terminal.Gui.KeyEvent
-      description: To be added.
-    return:
-      type: System.Boolean
-      description: To be added.
-  overload: Terminal.Gui.Toplevel.ProcessKey*
-  exceptions: []
-- uid: Terminal.Gui.Toplevel.Running
-  id: Running
-  parent: Terminal.Gui.Toplevel
-  langs:
-  - csharp
-  name: Running
-  nameWithType: Toplevel.Running
-  fullName: Toplevel.Running
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: >-
-    This flag is checked on each iteration of the mainloop and it continues
-                running until this flag is set to false.
-  syntax:
-    content: public bool Running;
-    return:
-      type: System.Boolean
-      description: To be added.
+      type: NStack.ustring
+      description: The title.
+  overload: Terminal.Gui.FrameView.Title*
   exceptions: []
 references:
 - uid: Terminal.Gui.View
@@ -192,84 +187,84 @@ references:
   name: View
   nameWithType: View
   fullName: Terminal.Gui.View
-- uid: Terminal.Gui.Toplevel.#ctor(Terminal.Gui.Rect)
-  parent: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.FrameView.#ctor(Terminal.Gui.Rect,NStack.ustring)
+  parent: Terminal.Gui.FrameView
   isExternal: false
-  name: Toplevel(Rect)
-  nameWithType: Toplevel.Toplevel(Rect)
-  fullName: Toplevel.Toplevel(Rect)
+  name: FrameView(Rect, ustring)
+  nameWithType: FrameView.FrameView(Rect, ustring)
+  fullName: FrameView.FrameView(Rect, ustring)
 - uid: Terminal.Gui.Rect
   parent: Terminal.Gui
   isExternal: false
   name: Rect
   nameWithType: Rect
   fullName: Terminal.Gui.Rect
-- uid: Terminal.Gui.Toplevel.CanFocus
-  parent: Terminal.Gui.Toplevel
-  isExternal: false
-  name: CanFocus
-  nameWithType: Toplevel.CanFocus
-  fullName: Toplevel.CanFocus
-- uid: System.Boolean
-  parent: System
+- uid: NStack.ustring
+  parent: NStack
   isExternal: true
-  name: Boolean
-  nameWithType: Boolean
-  fullName: System.Boolean
-- uid: Terminal.Gui.Toplevel.Create
-  parent: Terminal.Gui.Toplevel
+  name: ustring
+  nameWithType: ustring
+  fullName: NStack.ustring
+- uid: Terminal.Gui.FrameView.Add(Terminal.Gui.View)
+  parent: Terminal.Gui.FrameView
   isExternal: false
-  name: Create()
-  nameWithType: Toplevel.Create()
-  fullName: Toplevel.Create()
-- uid: Terminal.Gui.Toplevel
-  parent: Terminal.Gui
+  name: Add(View)
+  nameWithType: FrameView.Add(View)
+  fullName: FrameView.Add(View)
+- uid: Terminal.Gui.FrameView.Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.FrameView
   isExternal: false
-  name: Toplevel
-  nameWithType: Toplevel
-  fullName: Terminal.Gui.Toplevel
-- uid: Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)
-  parent: Terminal.Gui.Toplevel
+  name: Redraw(Rect)
+  nameWithType: FrameView.Redraw(Rect)
+  fullName: FrameView.Redraw(Rect)
+- uid: Terminal.Gui.FrameView.Remove(Terminal.Gui.View)
+  parent: Terminal.Gui.FrameView
   isExternal: false
-  name: ProcessKey(KeyEvent)
-  nameWithType: Toplevel.ProcessKey(KeyEvent)
-  fullName: Toplevel.ProcessKey(KeyEvent)
-- uid: Terminal.Gui.KeyEvent
-  parent: Terminal.Gui
+  name: Remove(View)
+  nameWithType: FrameView.Remove(View)
+  fullName: FrameView.Remove(View)
+- uid: Terminal.Gui.FrameView.Title
+  parent: Terminal.Gui.FrameView
   isExternal: false
-  name: KeyEvent
-  nameWithType: KeyEvent
-  fullName: Terminal.Gui.KeyEvent
-- uid: Terminal.Gui.Toplevel.Running
-  parent: Terminal.Gui.Toplevel
+  name: Title
+  nameWithType: FrameView.Title
+  fullName: FrameView.Title
+- uid: Terminal.Gui.FrameView.#ctor*
+  parent: Terminal.Gui.FrameView
   isExternal: false
-  name: Running
-  nameWithType: Toplevel.Running
-  fullName: Toplevel.Running
-- uid: Terminal.Gui.Toplevel.#ctor*
-  parent: Terminal.Gui.Toplevel
+  name: FrameView
+  nameWithType: FrameView.FrameView
+  fullName: FrameView.FrameView
+- uid: Terminal.Gui.FrameView.Add*
+  parent: Terminal.Gui.FrameView
   isExternal: false
-  name: Toplevel
-  nameWithType: Toplevel.Toplevel
-  fullName: Toplevel.Toplevel
-- uid: Terminal.Gui.Toplevel.CanFocus*
-  parent: Terminal.Gui.Toplevel
+  name: Add
+  nameWithType: FrameView.Add
+  fullName: FrameView.Add
+- uid: Terminal.Gui.FrameView.Redraw*
+  parent: Terminal.Gui.FrameView
+  isExternal: false
+  name: Redraw
+  nameWithType: FrameView.Redraw
+  fullName: FrameView.Redraw
+- uid: Terminal.Gui.FrameView.Remove*
+  parent: Terminal.Gui.FrameView
+  isExternal: false
+  name: Remove
+  nameWithType: FrameView.Remove
+  fullName: FrameView.Remove
+- uid: Terminal.Gui.FrameView.Title*
+  parent: Terminal.Gui.FrameView
+  isExternal: false
+  name: Title
+  nameWithType: FrameView.Title
+  fullName: FrameView.Title
+- uid: Terminal.Gui.Responder.CanFocus
+  parent: Terminal.Gui.Responder
   isExternal: false
   name: CanFocus
-  nameWithType: Toplevel.CanFocus
-  fullName: Toplevel.CanFocus
-- uid: Terminal.Gui.Toplevel.Create*
-  parent: Terminal.Gui.Toplevel
-  isExternal: false
-  name: Create
-  nameWithType: Toplevel.Create
-  fullName: Toplevel.Create
-- uid: Terminal.Gui.Toplevel.ProcessKey*
-  parent: Terminal.Gui.Toplevel
-  isExternal: false
-  name: ProcessKey
-  nameWithType: Toplevel.ProcessKey
-  fullName: Toplevel.ProcessKey
+  nameWithType: Responder.CanFocus
+  fullName: Responder.CanFocus
 - uid: Terminal.Gui.View.HasFocus
   parent: Terminal.Gui.View
   isExternal: false
@@ -294,12 +289,12 @@ references:
   name: ProcessHotKey(KeyEvent)
   nameWithType: View.ProcessHotKey(KeyEvent)
   fullName: View.ProcessHotKey(KeyEvent)
-- uid: Terminal.Gui.View.Add(Terminal.Gui.View)
+- uid: Terminal.Gui.View.ProcessKey(Terminal.Gui.KeyEvent)
   parent: Terminal.Gui.View
   isExternal: false
-  name: Add(View)
-  nameWithType: View.Add(View)
-  fullName: View.Add(View)
+  name: ProcessKey(KeyEvent)
+  nameWithType: View.ProcessKey(KeyEvent)
+  fullName: View.ProcessKey(KeyEvent)
 - uid: Terminal.Gui.View.Add(Terminal.Gui.View[])
   parent: Terminal.Gui.View
   isExternal: false
@@ -480,18 +475,6 @@ references:
   name: PositionCursor()
   nameWithType: View.PositionCursor()
   fullName: View.PositionCursor()
-- uid: Terminal.Gui.View.Redraw(Terminal.Gui.Rect)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Redraw(Rect)
-  nameWithType: View.Redraw(Rect)
-  fullName: View.Redraw(Rect)
-- uid: Terminal.Gui.View.Remove(Terminal.Gui.View)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Remove(View)
-  nameWithType: View.Remove(View)
-  fullName: View.Remove(View)
 - uid: Terminal.Gui.View.RemoveAll
   parent: Terminal.Gui.View
   isExternal: false

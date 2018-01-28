@@ -13,9 +13,12 @@ items:
   - Terminal.Gui.ColorScheme
   - Terminal.Gui.ConsoleDriver
   - Terminal.Gui.Dialog
+  - Terminal.Gui.FrameView
+  - Terminal.Gui.IListDataSource
   - Terminal.Gui.Key
   - Terminal.Gui.KeyEvent
   - Terminal.Gui.Label
+  - Terminal.Gui.ListView
   - Terminal.Gui.MenuBar
   - Terminal.Gui.MenuBarItem
   - Terminal.Gui.MenuItem
@@ -26,6 +29,7 @@ items:
   - Terminal.Gui.RadioGroup
   - Terminal.Gui.Rect
   - Terminal.Gui.Responder
+  - Terminal.Gui.ScrollBarView
   - Terminal.Gui.ScrollView
   - Terminal.Gui.Size
   - Terminal.Gui.SpecialChar
@@ -101,6 +105,18 @@ references:
   name: Dialog
   nameWithType: Dialog
   fullName: Terminal.Gui.Dialog
+- uid: Terminal.Gui.FrameView
+  parent: Terminal.Gui
+  isExternal: false
+  name: FrameView
+  nameWithType: FrameView
+  fullName: Terminal.Gui.FrameView
+- uid: Terminal.Gui.IListDataSource
+  parent: Terminal.Gui
+  isExternal: false
+  name: IListDataSource
+  nameWithType: IListDataSource
+  fullName: Terminal.Gui.IListDataSource
 - uid: Terminal.Gui.Key
   parent: Terminal.Gui
   isExternal: false
@@ -119,6 +135,12 @@ references:
   name: Label
   nameWithType: Label
   fullName: Terminal.Gui.Label
+- uid: Terminal.Gui.ListView
+  parent: Terminal.Gui
+  isExternal: false
+  name: ListView
+  nameWithType: ListView
+  fullName: Terminal.Gui.ListView
 - uid: Terminal.Gui.MenuBar
   parent: Terminal.Gui
   isExternal: false
@@ -179,6 +201,12 @@ references:
   name: Responder
   nameWithType: Responder
   fullName: Terminal.Gui.Responder
+- uid: Terminal.Gui.ScrollBarView
+  parent: Terminal.Gui
+  isExternal: false
+  name: ScrollBarView
+  nameWithType: ScrollBarView
+  fullName: Terminal.Gui.ScrollBarView
 - uid: Terminal.Gui.ScrollView
   parent: Terminal.Gui
   isExternal: false

@@ -33,6 +33,24 @@
       <MemberSignature Language="C#" Value="public abstract void AddCh (int rune);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void AddCh(int32 rune) cil managed" />
       <MemberType>Method</MemberType>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="rune" Type="System.Int32" />
+      </Parameters>
+      <Docs>
+        <param name="rune">Rune to add.</param>
+        <summary>
+            Adds the specified rune to the display at the current cursor position
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="AddRune">
+      <MemberSignature Language="C#" Value="public abstract void AddRune (Rune rune);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void AddRune(valuetype System.Rune rune) cil managed" />
+      <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
       </AssemblyInfo>
@@ -40,7 +58,7 @@
         <ReturnType>System.Void</ReturnType>
       </ReturnValue>
       <Parameters>
-        <Parameter Name="rune" Type="System.Int32" />
+        <Parameter Name="rune" Type="System.Rune" />
       </Parameters>
       <Docs>
         <param name="rune">Rune to add.</param>
@@ -72,12 +90,30 @@
       </Docs>
     </Member>
     <Member MemberName="AddStr">
-      <MemberSignature Language="C#" Value="public abstract void AddStr (string str);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void AddStr(string str) cil managed" />
+      <MemberSignature Language="C#" Value="public abstract void AddStr (NStack.ustring str);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void AddStr(class NStack.ustring str) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
       </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="str" Type="NStack.ustring" />
+      </Parameters>
+      <Docs>
+        <param name="str">String.</param>
+        <summary>
+            Adds the specified 
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="AddStr">
+      <MemberSignature Language="C#" Value="public abstract void AddStr (string str);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void AddStr(string str) cil managed" />
+      <MemberType>Method</MemberType>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
       </ReturnValue>
@@ -104,7 +140,7 @@
       </ReturnValue>
       <Docs>
         <summary>
-            Controls the current clipping region that AddCh/AddStr is subject to.
+            Controls the current clipping region that AddRune/AddStr is subject to.
             </summary>
         <value>The clip.</value>
         <remarks>To be added.</remarks>
@@ -129,8 +165,8 @@
       </Docs>
     </Member>
     <Member MemberName="DrawFrame">
-      <MemberSignature Language="C#" Value="public abstract void DrawFrame (Terminal.Gui.Rect region, bool fill);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void DrawFrame(valuetype Terminal.Gui.Rect region, bool fill) cil managed" />
+      <MemberSignature Language="C#" Value="public abstract void DrawFrame (Terminal.Gui.Rect region, int padding, bool fill);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void DrawFrame(valuetype Terminal.Gui.Rect region, int32 padding, bool fill) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -140,10 +176,12 @@
       </ReturnValue>
       <Parameters>
         <Parameter Name="region" Type="Terminal.Gui.Rect" />
+        <Parameter Name="padding" Type="System.Int32" />
         <Parameter Name="fill" Type="System.Boolean" />
       </Parameters>
       <Docs>
         <param name="region">To be added.</param>
+        <param name="padding">To be added.</param>
         <param name="fill">To be added.</param>
         <summary>To be added.</summary>
         <remarks>To be added.</remarks>

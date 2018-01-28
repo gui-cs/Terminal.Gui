@@ -195,14 +195,14 @@
       </Docs>
     </Member>
     <Member MemberName="Text">
-      <MemberSignature Language="C#" Value="public string Text { get; set; }" />
-      <MemberSignature Language="ILAsm" Value=".property instance string Text" />
+      <MemberSignature Language="C#" Value="public NStack.ustring Text { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class NStack.ustring Text" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
-        <ReturnType>System.String</ReturnType>
+        <ReturnType>NStack.ustring</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>

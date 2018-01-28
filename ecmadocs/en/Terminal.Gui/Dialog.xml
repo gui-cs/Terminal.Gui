@@ -42,7 +42,7 @@
         <param name="height">Height for the dialog.</param>
         <param name="buttons">Optional buttons to lay out at the bottom of the dialog.</param>
         <summary>
-            Initializes a new instance of the <see cref="T:Terminal.Dialog" /> class with an optional set of buttons to display
+            Initializes a new instance of the <see cref="T:Terminal.Gui.Dialog" /> class with an optional set of buttons to display
             </summary>
         <remarks>To be added.</remarks>
       </Docs>
