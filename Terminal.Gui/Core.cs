@@ -257,7 +257,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void SetNeedsDisplay ()
 		{
-			SetNeedsDisplay (Frame);
+			SetNeedsDisplay (Bounds);
 		}
 
 		/// <summary>
@@ -281,7 +281,10 @@ namespace Terminal.Gui {
 				return;
 			foreach (var view in subviews)
 				if (view.Frame.IntersectsWith (region)) {
-					view.SetNeedsDisplay (Rect.Intersect (view.Frame, region));
+					var childRegion = Rect.Intersect (view.Frame, region);
+					childRegion.X -= view.Frame.X;
+					childRegion.Y -= view.Frame.Y;
+					view.SetNeedsDisplay (childRegion);
 				}
 		}
 
@@ -380,6 +383,20 @@ namespace Terminal.Gui {
 		{
 			var h = Frame.Height;
 			var w = Frame.Width;
+			for (int line = 0; line < h; line++) {
+				Move (0, line);
+				for (int col = 0; col < w; col++)
+					Driver.AddRune (' ');
+			}
+		}
+
+		/// <summary>
+		///   Clears the specfied rectangular region with the current color
+		/// </summary>
+		public void Clear (Rect r)
+		{
+			var h = r.Height;
+			var w = r.Width;
 			for (int line = 0; line < h; line++) {
 				Move (0, line);
 				for (int col = 0; col < w; col++)
@@ -1012,6 +1029,27 @@ namespace Terminal.Gui {
 		public override void Add (View view)
 		{
 			contentView.Add (view);
+			if (view.CanFocus)
+				CanFocus = true;
+		}
+
+
+		/// <summary>
+		///   Removes a widget from this container.
+		/// </summary>
+		/// <remarks>
+		/// </remarks>
+		public virtual void Remove (View view)
+		{
+			if (view == null)
+				return;
+
+			SetNeedsDisplay ();
+			var touched = view.Frame;
+			contentView.Remove (view);
+
+			if (contentView.Subviews.Count < 1)
+				this.CanFocus = false;
 		}
 
 		public override void Redraw (Rect bounds)

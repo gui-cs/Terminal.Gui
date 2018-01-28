@@ -59,6 +59,27 @@ namespace Terminal.Gui {
 		public override void Add (View view)
 		{
 			contentView.Add (view);
+			if (view.CanFocus)
+				CanFocus = true;
+		}
+
+
+		/// <summary>
+		///   Removes a widget from this container.
+		/// </summary>
+		/// <remarks>
+		/// </remarks>
+		public virtual void Remove (View view)
+		{
+			if (view == null)
+				return;
+
+			SetNeedsDisplay ();
+			var touched = view.Frame;
+			contentView.Remove (view);
+
+			if (contentView.Subviews.Count < 1)
+				this.CanFocus = false;
 		}
 
 		public override void Redraw (Rect bounds)

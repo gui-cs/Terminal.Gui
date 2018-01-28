@@ -11,14 +11,22 @@
 // - keyboard handling in scrollview to scroll
 // - focus handling in scrollview to auto scroll to focused view
 // - Raise events
+// - Perhaps allow an option to not display the scrollbar arrow indicators?
+
 using System;
 namespace Terminal.Gui {
 	/// <summary>
 	/// ScrollBarViews are views that display a 1-character scrollbar, either horizontal or vertical
 	/// </summary>
 	/// <remarks>
-	/// The scrollbar is drawn to be a representation of the Size, assuming that the 
-	/// scroll position is set at Position.
+	/// <para>
+	///   The scrollbar is drawn to be a representation of the Size, assuming that the 
+	///   scroll position is set at Position.
+	/// </para>
+	/// <para>
+	///   If the region to display the scrollbar is larger than three characters, 
+	///   arrow indicators are drawn.
+	/// </para>
 	/// </remarks>
 	public class ScrollBarView : View {
 		bool vertical;
@@ -37,6 +45,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// This event is raised when the position on the scrollbar has changed.
+		/// </summary>
+		public event Action ChangedPosition;
+
+		/// <summary>
 		/// The position to show the scrollbar at.
 		/// </summary>
 		/// <value>The position.</value>
@@ -46,6 +59,12 @@ namespace Terminal.Gui {
 				position = value;
 				SetNeedsDisplay ();
 			}
+		}
+
+		void SetPosition (int newPos)
+		{
+			Position = newPos;
+			ChangedPosition?.Invoke ();
 		}
 
 		/// <summary>
@@ -78,7 +97,7 @@ namespace Terminal.Gui {
 				var bh = Bounds.Height;
 				SpecialChar special;
 
-				if (bh < 3) {
+				if (bh < 4) {
 					var by1 = position * bh / Size;
 					var by2 = (position + bh) * bh / Size;
 
@@ -126,7 +145,20 @@ namespace Terminal.Gui {
 
 				var row = Bounds.Height - 1;
 				var bw = Bounds.Width;
-				if (bw < 3) {
+				SpecialChar special;
+
+				if (bw < 4) {
+					var bx1 = position * bw / Size;
+					var bx2 = (position + bw) * bw / Size;
+
+					for (int x = 0; x < bw; x++) {
+						Move (0, x);
+						if (x < bx1 || x > bx2)
+							special = SpecialChar.Stipple;
+						else
+							special = SpecialChar.Diamond;
+						Driver.AddSpecial (special);
+					}
 				} else {
 					bw -= 2;
 					var bx1 = position * bw / Size;
@@ -136,7 +168,6 @@ namespace Terminal.Gui {
 					Driver.AddRune ('<');
 
 					for (int x = 0; x < bw; x++) {
-						SpecialChar special;
 
 						if (x < bx1 || x > bx2) {
 							special = SpecialChar.Stipple;
@@ -157,6 +188,35 @@ namespace Terminal.Gui {
 					Driver.AddRune ('>');
 				}
 			}
+		}
+
+		public override bool MouseEvent(MouseEvent me)
+		{
+			if (me.Flags != MouseFlags.Button1Clicked)
+				return false;
+
+			int location = vertical ? me.Y : me.X;
+			int barsize = vertical ? Bounds.Height : Bounds.Width;
+
+			if (barsize < 4) {
+				// Handle scrollbars with no buttons
+				Console.WriteLine ("TODO at ScrollBarView2");
+			} else {
+				barsize -= 2;
+				// Handle scrollbars with arrow buttons
+				var pos = Position;
+				if (location == 0) {
+					if (pos > 0)
+						SetPosition (pos - 1);
+				} else if (location == Bounds.Width - 1){
+					if (pos + 1 + barsize < Size)
+						SetPosition (pos + 1);
+				} else {
+					Console.WriteLine ("TODO at ScrollBarView");
+				}
+			}
+
+			return true;
 		}
 	}
 
@@ -181,7 +241,13 @@ namespace Terminal.Gui {
 		{
 			contentView = new View (frame);
 			vertical = new ScrollBarView (new Rect (frame.Width - 1, 0, 1, frame.Height), frame.Height, 0, isVertical: true);
+			vertical.ChangedPosition += delegate {
+				ContentOffset = new Point (ContentOffset.X, vertical.Position);
+			};
 			horizontal = new ScrollBarView (new Rect (0, frame.Height-1, frame.Width-1, 1), frame.Width-1, 0, isVertical: false);
+			horizontal.ChangedPosition += delegate {
+				ContentOffset = new Point (horizontal.Position, ContentOffset.Y);
+			};
 			base.Add (contentView);
 			CanFocus = true;
 		}
@@ -279,6 +345,8 @@ namespace Terminal.Gui {
 		public override void Redraw(Rect region)
 		{
 			var oldClip = ClipToBounds ();
+			Driver.SetAttribute (ColorScheme.Normal);
+			Clear ();
 			base.Redraw(region);
 			Driver.Clip = oldClip;
 			Driver.SetAttribute (ColorScheme.Normal);

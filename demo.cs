@@ -67,14 +67,23 @@ class Demo {
 	{
 		var scrollView = new ScrollView (new Rect (50, 10, 20, 8)) {
 			ContentSize = new Size (100, 100),
-			ContentOffset = new Point (5, -2),
+			//ContentOffset = new Point (5, -2),
 			ShowVerticalScrollIndicator = true,
 			ShowHorizontalScrollIndicator = true
 		};
 
-		//scrollView.Add (new Box10x (0, 0));
-		scrollView.Add (new Filler (new Rect (0, 0, 40, 40)));
+		scrollView.Add (new Box10x (0, 0));
+		//scrollView.Add (new Filler (new Rect (0, 0, 40, 40)));
 
+		// This is just to debug the visuals of the scrollview when small
+		var scrollView2 = new ScrollView (new Rect (72, 10, 3, 3)) {
+			ContentSize = new Size (100, 100),
+			ShowVerticalScrollIndicator = true,
+			ShowHorizontalScrollIndicator = true
+		};
+		scrollView2.Add (new Box10x (0, 0));
+
+		// Add some content
 		container.Add (
 			new Label (3, 6, "Login: "),
 			new TextField (14, 6, 40, ""),
@@ -84,11 +93,13 @@ class Demo {
 				new CheckBox (1, 0, "Remember me"),
 				new RadioGroup (1, 2, new [] { "_Personal", "_Company" }),
 			},
-			scrollView,
+			//scrollView,
+			//scrollView2,
 			new Button (3, 19, "Ok"),
 			new Button (10, 19, "Cancel"),
 			new Label (3, 22, "Press ESC and 9 to activate the menubar")
 		);
+
 	}
 
 	public static Label ml2;
