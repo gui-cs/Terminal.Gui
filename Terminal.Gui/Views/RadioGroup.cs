@@ -123,14 +123,16 @@ namespace Terminal.Gui {
 				if (cursor > 0) {
 					cursor--;
 					SetNeedsDisplay ();
+					return true;
 				}
-				return true;
+				break;
 			case Key.CursorDown:
 				if (cursor + 1 < radioLabels.Length) {
 					cursor++;
 					SetNeedsDisplay ();
+					return true;
 				}
-				return true;
+				break;
 			case Key.Space:
 				Selected = cursor;
 				return true;

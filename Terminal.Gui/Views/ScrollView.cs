@@ -282,7 +282,7 @@ namespace Terminal.Gui {
 				return contentOffset;
 			}
 			set {
-				contentOffset = new Point (-value.X, -value.Y);
+				contentOffset = new Point (-Math.Abs (value.X), -Math.Abs(value.Y));
 				contentView.Frame = new Rect (contentOffset, contentSize);
 				vertical.Position = Math.Max (0, -contentOffset.Y);
 				horizontal.Position = Math.Max (0, -contentOffset.X);
@@ -358,6 +358,92 @@ namespace Terminal.Gui {
 				Driver.Move (0, 0);
 			else
 				base.PositionCursor ();
+		}
+
+		/// <summary>
+		/// Scrolls the view up.
+		/// </summary>
+		/// <returns><c>true</c>, if left was scrolled, <c>false</c> otherwise.</returns>
+		/// <param name="lines">Number of lines to scroll.</param>
+		public bool ScrollUp (int lines)
+		{
+			if (contentOffset.Y < 0) {
+				ContentOffset = new Point (contentOffset.X, Math.Min (contentOffset.Y + lines, 0));
+				return true;
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// Scrolls the view to the left
+		/// </summary>
+		/// <returns><c>true</c>, if left was scrolled, <c>false</c> otherwise.</returns>
+		/// <param name="cols">Number of columns to scroll by.</param>
+		public bool ScrollLeft (int cols)
+		{
+			if (contentOffset.X < 0) {
+				ContentOffset = new Point (Math.Min (contentOffset.X + cols, 0), contentOffset.Y);
+				return true;
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// Scrolls the view down.
+		/// </summary>
+		/// <returns><c>true</c>, if left was scrolled, <c>false</c> otherwise.</returns>
+		/// <param name="lines">Number of lines to scroll.</param>
+		public bool ScrollDown (int lines)
+		{
+			var ny = Math.Max (-contentSize.Height, contentOffset.Y - lines);
+			if (ny == contentOffset.Y)
+				return false;
+			ContentOffset = new Point (contentOffset.X, ny);
+			return true;
+		}
+
+		/// <summary>
+		/// Scrolls the view to the right.
+		/// </summary>
+		/// <returns><c>true</c>, if right was scrolled, <c>false</c> otherwise.</returns>
+		/// <param name="cols">Number of columns to scroll by.</param>
+		public bool ScrollRight (int cols)
+		{
+			var nx = Math.Max (-contentSize.Width, contentOffset.X - cols);
+			if (nx == contentOffset.X)
+				return false;
+			
+			ContentOffset = new Point (nx, contentOffset.Y);
+			return true;
+		}
+
+		public override bool ProcessKey(KeyEvent kb)
+		{
+			if (base.ProcessKey (kb))
+				return true;
+
+			switch (kb.Key) {
+			case Key.CursorUp:
+				return ScrollUp (1);
+			case (Key) 'v' | Key.AltMask:
+			case Key.PageUp:
+				return ScrollUp (Bounds.Height);
+
+			case Key.ControlV:
+			case Key.PageDown:
+				return ScrollDown (Bounds.Height);
+
+			case Key.CursorDown:
+				return ScrollDown (1);
+
+			case Key.CursorLeft:
+				return ScrollLeft (1);
+
+			case Key.CursorRight:
+				return ScrollRight (1);
+
+			}
+			return false;
 		}
 	}
 }

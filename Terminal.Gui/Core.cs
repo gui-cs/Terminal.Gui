@@ -932,6 +932,8 @@ namespace Terminal.Gui {
 				return true;
 #endif
 			case Key.Tab:
+			case Key.CursorRight:
+			case Key.CursorDown:
 				var old = Focused;
 				if (!FocusNext ())
 					FocusNext ();
@@ -940,6 +942,8 @@ namespace Terminal.Gui {
 					Focused?.SetNeedsDisplay ();
 				}
 				return true;
+			case Key.CursorLeft:
+			case Key.CursorUp:
 			case Key.BackTab:
 				old = Focused;
 				if (!FocusPrev ())
@@ -949,6 +953,7 @@ namespace Terminal.Gui {
 					Focused?.SetNeedsDisplay ();
 				}
 				return true;
+			
 			case Key.ControlL:
 				Application.Refresh ();
 				return true;

@@ -67,7 +67,7 @@ class Demo {
 	{
 		var scrollView = new ScrollView (new Rect (50, 10, 20, 8)) {
 			ContentSize = new Size (100, 100),
-			//ContentOffset = new Point (5, -2),
+			ContentOffset = new Point (-1, -1),
 			ShowVerticalScrollIndicator = true,
 			ShowHorizontalScrollIndicator = true
 		};
@@ -93,7 +93,7 @@ class Demo {
 				new CheckBox (1, 0, "Remember me"),
 				new RadioGroup (1, 2, new [] { "_Personal", "_Company" }),
 			},
-			//scrollView,
+			scrollView,
 			//scrollView2,
 			new Button (3, 19, "Ok"),
 			new Button (10, 19, "Cancel"),
