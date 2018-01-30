@@ -1,75 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{00F366F8-DEE4-482C-B9FD-6DB0200B79E5}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>Terminal.Gui</RootNamespace>
-    <AssemblyName>Terminal.Gui</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <Commandlineparameters></Commandlineparameters>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
-    <ConsolePause>false</ConsolePause>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="Mono.Posix" />
-    <Reference Include="NStack">
-      <HintPath>..\packages\NStack.Core.0.7.0\lib\netstandard1.5\NStack.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ValueTuple">
-      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
-    </Reference>
-    <Reference Include="mscorlib" />
+    <PackageReference Include="NStack.Core" Version="0.7.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-    <Folder Include="Types\" />
-    <Folder Include="Views\" />
-    <Folder Include="MonoCurses\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Types\Point.cs" />
-    <Compile Include="Types\Rect.cs" />
-    <Compile Include="Types\Size.cs" />
-    <Compile Include="Views\Button.cs" />
-    <Compile Include="Views\Checkbox.cs" />
-    <Compile Include="Views\Dialog.cs" />
-    <Compile Include="Views\Label.cs" />
-    <Compile Include="Views\Menu.cs" />
-    <Compile Include="Views\MessageBox.cs" />
-    <Compile Include="Views\RadioGroup.cs" />
-    <Compile Include="Views\ScrollView.cs" />
-    <Compile Include="Views\TextField.cs" />
-    <Compile Include="Core.cs" />
-    <Compile Include="Driver.cs" />
-    <Compile Include="Event.cs" />
-    <Compile Include="MonoCurses\binding.cs" />
-    <Compile Include="MonoCurses\constants.cs" />
-    <Compile Include="MonoCurses\handles.cs" />
-    <Compile Include="MonoCurses\mainloop.cs" />
-    <Compile Include="Views\FrameView.cs" />
-    <Compile Include="Views\ListView.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
