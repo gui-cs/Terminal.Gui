@@ -53,12 +53,12 @@ namespace Unix.Terminal {
 		static void FindNCurses ()
 		{
 			if (File.Exists ("/usr/lib/libncurses.dylib"))
-				curses_handle = dlopen ("libncurses.dylib", 0);
+				curses_handle = dlopen ("libncurses.dylib", 1);
 			else
-				curses_handle = dlopen ("libncurses.so", 0);
+				curses_handle = dlopen ("libncurses.so", 1);
 			
 			if (curses_handle == IntPtr.Zero)
-				throw new Exception ("Could not dlopen ncurses");
+				throw new Exception ("Could not dlopen ncurses: " + dlerror());
 
 			stdscr = read_static_ptr ("stdscr");
 			curscr_ptr = get_ptr ("curscr");
@@ -314,10 +314,13 @@ namespace Unix.Terminal {
 		
 #endregion
 		
-		[DllImport ("libdl")]
+		[DllImport ("dl")]
 		extern static IntPtr dlopen (string file, int mode);
+		
+		[DllImport ("dl")]
+		private static extern string dlerror();
 
-		[DllImport ("libdl")]
+		[DllImport ("dl")]
 		extern static IntPtr dlsym (IntPtr handle, string symbol);
 
 		static IntPtr stdscr;
