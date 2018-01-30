@@ -314,10 +314,10 @@ namespace Unix.Terminal {
 		
 #endregion
 		
-		[DllImport ("libc")]
+		[DllImport ("libdl")]
 		extern static IntPtr dlopen (string file, int mode);
 
-		[DllImport ("libc")]
+		[DllImport ("libdl")]
 		extern static IntPtr dlsym (IntPtr handle, string symbol);
 
 		static IntPtr stdscr;
