@@ -67,6 +67,7 @@
     <Compile Include="MonoCurses\mainloop.cs" />
     <Compile Include="Views\FrameView.cs" />
     <Compile Include="Views\ListView.cs" />
+    <Compile Include="Flex.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
