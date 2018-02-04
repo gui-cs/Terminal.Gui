@@ -3,4 +3,5 @@ obj
 *~
 *.userprefs
 *~
-packages
+packages/
+.idea/
