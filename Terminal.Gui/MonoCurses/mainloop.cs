@@ -243,6 +243,7 @@ namespace Mono.Terminal {
 			foreach (var fd in descriptorWatchers.Keys){
 				pollmap [i].fd = fd;
 				pollmap [i].events = MapCondition (descriptorWatchers [fd].Condition);
+				i++;
 			}
 		}
 
