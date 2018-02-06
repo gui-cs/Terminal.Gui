@@ -19,7 +19,7 @@ namespace Terminal.Gui {
 	///   functionality,  and mouse support.
 	/// </remarks>
 	public class TextField : View {
-		ustring text, kill;
+		ustring text;
 		int first, point;
 		bool used;
 
@@ -125,6 +125,12 @@ namespace Terminal.Gui {
 			set { base.CanFocus = value; }
 		}
 
+		void SetClipboard (ustring text)
+		{
+			if (!Secret)
+				Clipboard.Contents = text;
+		}
+
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			switch (kb.Key) {
@@ -174,21 +180,22 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.ControlK: // kill-to-end
-				kill = text.Substring (point);
+				SetClipboard (text.Substring (point));
 				SetText (text [0, point]);
 				Adjust ();
 				break;
 
 			case Key.ControlY: // Control-y, yank
-				if (kill == null)
+				var clip = Clipboard.Contents;
+				if (clip== null)
 					return true;
 
 				if (point == text.Length) {
-					SetText (text + kill);
+					SetText (text + clip);
 					point = text.Length;
 				} else {
-					SetText (text [0, point] + kill + text.Substring (point));
-					point += kill.Length;
+					SetText (text [0, point] + clip + text.Substring (point));
+					point += clip.RuneCount;
 				}
 				Adjust ();
 				break;
@@ -206,6 +213,11 @@ namespace Terminal.Gui {
 					point = fw;
 				Adjust ();
 				break;
+
+				// MISSING:
+				// Alt-D, Alt-backspace
+				// Alt-Y
+				// Delete adding to kill buffer
 
 			default:
 				// Ignore other control characters.
