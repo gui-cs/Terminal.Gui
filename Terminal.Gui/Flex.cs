@@ -7,8 +7,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Termina.Gui {
-	enum AlignContent {
+namespace Terminal.Gui {
+	public enum AlignContent {
 		Stretch = 1,
 		Center = 2,
 		Start = 3,
@@ -18,7 +18,7 @@ namespace Termina.Gui {
 		SpaceEvenly = 7,
 	}
 
-	enum AlignItems {
+	public enum AlignItems {
 		Stretch = 1,
 		Center = 2,
 		Start = 3,
@@ -26,7 +26,7 @@ namespace Termina.Gui {
 		//Baseline = 8,
 	}
 
-	enum AlignSelf {
+	public enum AlignSelf {
 		Auto = 0,
 		Stretch = 1,
 		Center = 2,
@@ -35,14 +35,14 @@ namespace Termina.Gui {
 		//Baseline = 8,
 	}
 
-	enum Direction {
+	public enum Direction {
 		Row = 0,
 		RowReverse = 1,
 		Column = 2,
 		ColumnReverse = 3,
 	}
 
-	enum Justify {
+	public enum Justify {
 		Center = 2,
 		Start = 3,
 		End = 4,
@@ -51,26 +51,26 @@ namespace Termina.Gui {
 		SpaceEvenly = 7,
 	}
 
-	enum Position {
+	public enum Position {
 		Relative = 0,
 		Absolute = 1,
 	}
 
-	enum Wrap {
+	public enum Wrap {
 		NoWrap = 0,
 		Wrap = 1,
 		WrapReverse = 2,
 	}
 
-	struct Basis {
+	public struct Basis {
 		readonly bool _isRelative;
 		readonly bool _isLength;
-		readonly float _length;
+		readonly int _length;
 		public static Basis Auto = new Basis ();
 		public bool IsRelative => _isRelative;
 		public bool IsAuto => !_isLength && !_isRelative;
-		public float Length => _length;
-		public Basis (float length, bool isRelative = false)
+		public int Length => _length;
+		public Basis (int length, bool isRelative = false)
 		{
 			_length = length;
 			_isLength = !isRelative;
@@ -78,141 +78,180 @@ namespace Termina.Gui {
 		}
 	}
 
-	class Item : IEnumerable<Item> {
-		public float [] Frame { get; } = new float [4];                                         //x, y, w, h
-		public Item Parent { get; private set; }
-		IList<Item> Children { get; set; }
+	public partial class View : IEnumerable<View> {
 		bool ShouldOrderChildren { get; set; }
 
 		public AlignContent AlignContent { get; set; } = AlignContent.Stretch;
 		public AlignItems AlignItems { get; set; } = AlignItems.Stretch;
 		public AlignSelf AlignSelf { get; set; } = AlignSelf.Auto;
 		public Basis Basis { get; set; } = Basis.Auto;
-		public float Bottom { get; set; } = float.NaN;
+		public int Bottom { get; set; } = UnsetValue;
 		public Direction Direction { get; set; } = Direction.Column;
-		public float Grow { get; set; } = 0f;
-		public float Height { get; set; } = float.NaN;
+		public int Grow { get; set; } = 0;
+		public int Height { get; set; } = UnsetValue;
 		public Justify JustifyContent { get; set; } = Justify.Start;
-		public float Left { get; set; } = float.NaN;
-		public float MarginBottom { get; set; } = 0f;
-		public float MarginLeft { get; set; } = 0f;
-		public float MarginRight { get; set; } = 0f;
-		public float MarginTop { get; set; } = 0f;
+		public int Left { get; set; } = UnsetValue;
+		public int MarginBottom { get; set; } = 0;
+		public int MarginLeft { get; set; } = 0;
+		public int MarginRight { get; set; } = 0;
+
+		/// <summary>
+		/// This value is used to reprensent that a dimension has not been set
+		/// </summary>
+		public const int UnsetValue = Int32.MaxValue;
+
+		static bool IsUnset (int value)
+		{
+			return value == UnsetValue;
+		}
+
+		public int MarginTop { get; set; } = 0;
 
 		int order;
 		public int Order {
 			get => order;
 			set {
-				if ((order = value) != 0 && Parent != null)
-					Parent.ShouldOrderChildren = true;
+				if ((order = value) != 0 && SuperView != null)
+					SuperView.ShouldOrderChildren = true;
 			}
 		}
 
-		public float PaddingBottom { get; set; } = 0f;
-		public float PaddingLeft { get; set; } = 0f;
-		public float PaddingRight { get; set; } = 0f;
-		public float PaddingTop { get; set; } = 0f;
+		public int PaddingBottom { get; set; } = 0;
+		public int PaddingLeft { get; set; } = 0;
+		public int PaddingRight { get; set; } = 0;
+		public int PaddingTop { get; set; } = 0;
 
 		public Position Position { get; set; } = Position.Relative;
-		public float Right { get; set; } = float.NaN;
-		public float Shrink { get; set; } = 1f;
-		public float Top { get; set; } = float.NaN;
-		public float Width { get; set; } = float.NaN;
+		public int Right { get; set; } = UnsetValue;
+		public int Shrink { get; set; } = 1;
+		public int Top { get; set; } = UnsetValue;
+		public int Width { get; set; } = UnsetValue;
 		public Wrap Wrap { get; set; } = Wrap.NoWrap;
 
-		public Item ()
+		public View ()
 		{
 		}
 
-		public Item (float width, float height)
+		public View (int width, int height)
 		{
 			Width = width;
 			Height = height;
 		}
 
-		public void Add (Item child)
-		{
-			ValidateChild (child);
-			(Children ?? (Children = new List<Item> ())).Add (child);
-			child.Parent = this;
-			ShouldOrderChildren |= child.Order != 0;
-		}
-
-		public void InsertAt (uint index, Item child)
+#if false
+		public void InsertAt (uint index, View child)
 		{
 			ValidateChild (child);
 			(Children ?? (Children = new List<Item> ())).Insert ((int)index, child);
-			child.Parent = this;
+			child.SuperView = this;
 			ShouldOrderChildren |= child.Order != 0;
 		}
 
 		public Item RemoveAt (uint index)
 		{
 			var child = Children [(int)index];
-			child.Parent = null;
+			child.SuperView = null;
 			Children.RemoveAt ((int)index);
 			return child;
 		}
-
+#endif
 		public uint Count =>
-			(uint)(Children?.Count ?? 0);
+			(uint)(subviews?.Count ?? 0);
 
-		public Item ItemAt (uint index) =>
-			Children? [(int)index];
+		public View ItemAt (uint index) =>
+			subviews? [(int)index];
 
-		public Item this [uint index] {
+		public View this [uint index] {
 			get => ItemAt (index);
 		}
 
-		public Item Root {
+		/// <summary>
+		/// Returns the root view, this walks the hierarchy of parents until it reaches the view with no containing superview.
+		/// </summary>
+		/// <value>The root view.</value>
+		public View Root {
 			get {
 				var root = this;
-				while (root.Parent != null)
-					root = root.Parent;
+				while (root.SuperView != null)
+					root = root.SuperView;
 				return root;
 			}
 		}
 
 		public void Layout ()
 		{
-			if (Parent != null)
+			if (SuperView != null)
 				throw new InvalidOperationException ("Layout() must be called on a root item (that hasn't been added to another item)");
-			if (Double.IsNaN (Width) || Double.IsNaN (Height))
+			if (IsUnset (Width) || IsUnset (Height))
 				throw new InvalidOperationException ("Layout() must be called on an item that has proper values for the Width and Height properties");
 			if (SelfSizing != null)
 				throw new InvalidOperationException ("Layout() cannot be called on an item that has the SelfSizing property set");
 			layout_item (this, Width, Height);
 		}
 
-		public float Padding {
+		public int Padding {
 			set => PaddingTop = PaddingLeft = PaddingRight = PaddingBottom = value;
 		}
 
-		public float Margin {
+		public int Margin {
 			set => MarginTop = MarginLeft = MarginRight = MarginBottom = value;
 		}
 
-		public delegate void SelfSizingDelegate (Item item, ref float width, ref float height);
+		public delegate void SelfSizingDelegate (View item, ref int width, ref int height);
 
 		public SelfSizingDelegate SelfSizing { get; set; }
 
 		IEnumerator IEnumerable.GetEnumerator () =>
-			Children.GetEnumerator ();
+		                       Subviews.GetEnumerator ();
 
-		IEnumerator<Item> IEnumerable<Item>.GetEnumerator () =>
-			Children.GetEnumerator ();
+		IEnumerator<View> IEnumerable<View>.GetEnumerator () =>
+		                                   Subviews.GetEnumerator ();
 
-		void ValidateChild (Item child)
+		void ValidateChild (View child)
 		{
 			if (this == child)
 				throw new ArgumentException ("cannot add item into self");
-			if (child.Parent != null)
-				throw new ArgumentException ("child already has a parent");
+			if (child.SuperView != null)
+				throw new ArgumentException ("child already has a superview");
 		}
 
-		static void layout_item (Item item, float width, float height)
+		static int GetDim (Rect rect, Dim dim)
 		{
-			if (item.Children == null || item.Children.Count == 0)
+			if (dim == Dim.Height)
+				return rect.Height;
+			else
+				return rect.Width;
+		}
+
+		static Rect SetDim (Rect target, Dim dim, int value)
+		{
+			if (dim == Dim.Height)
+				target.Height = value;
+			else
+				target.Width = value;
+			return target;
+		}
+
+		static int GetAxis (Rect rect, Axis axis)
+		{
+			if (axis == Axis.X)
+				return rect.X;
+			else
+				return rect.Y;
+		}
+
+		static Rect SetAxis (Rect target, Axis axis, int value)
+		{
+			if (axis == Axis.X)
+				target.X = value;
+			else
+				target.Y = value;
+			return target;
+		}
+
+		static void layout_item (View item, int width, int height)
+		{
+			if (item.Subviews == null || item.Subviews.Count == 0)
 				return;
 
 			var layout = new flex_layout ();
@@ -222,65 +261,66 @@ namespace Termina.Gui {
 			uint last_layout_child = 0;
 			uint relative_children_count = 0;
 			for (uint i = 0; i < item.Count; i++) {
-				Item child = layout.child_at (item, i);
+				View child = layout.child_at (item, i);
 				// Items with an absolute position have their frames determined
 				// directly and are skipped during layout.
 				if (child.Position == Position.Absolute) {
-					float child_width = absolute_size (child.Width, child.Left, child.Right, width);
-					float child_height = absolute_size (child.Height, child.Top, child.Bottom, height);
-					float child_x = absolute_pos (child.Left, child.Right, child_width, width);
-					float child_y = absolute_pos (child.Top, child.Bottom, child_height, height);
+					int child_width = absolute_size (child.Width, child.Left, child.Right, width);
+					int child_height = absolute_size (child.Height, child.Top, child.Bottom, height);
+					int child_x = absolute_pos (child.Left, child.Right, child_width, width);
+					int child_y = absolute_pos (child.Top, child.Bottom, child_height, height);
 
-					child.Frame [0] = child_x;
-					child.Frame [1] = child_y;
-					child.Frame [2] = child_width;
-					child.Frame [3] = child_height;
+					child.Frame = new Rect (child_x, child_y, child_width, child_height);
 
 					// Now that the item has a frame, we can layout its children.
-					layout_item (child, child.Frame [2], child.Frame [3]);
+					layout_item (child, child.Width, child.Height);
 					continue;
 				}
 
 				// Initialize frame.
-				child.Frame [0] = 0;
-				child.Frame [1] = 0;
-				child.Frame [2] = child.Width;
-				child.Frame [3] = child.Height;
+				child.Frame = new Rect (0, 0, child.Width, child.Height);
 
 				// Main axis size defaults to 0.
-				if (float.IsNaN (child.Frame [layout.frame_size_i])) {
-					child.Frame [layout.frame_size_i] = 0;
+				if (IsUnset (GetDim (child.Frame, layout.frame_size_i))) {
+					child.Frame = SetDim (child.Frame, layout.frame_size_i, 0);
 				}
 
 				// Cross axis size defaults to the parent's size (or line size in wrap
 				// mode, which is calculated later on).
-				if (float.IsNaN (child.Frame [layout.frame_size2_i])) {
+				if (IsUnset (GetDim (child.Frame, layout.frame_size2_i))) {
 					if (layout.wrap) {
 						layout.need_lines = true;
 					} else {
-						child.Frame [layout.frame_size2_i] = (layout.vertical ? width : height)
-							- (layout.vertical ? child.MarginLeft : child.MarginTop)
-							- (layout.vertical ? child.MarginRight : child.MarginBottom);
+						child.Frame = SetDim (child.Frame, layout.frame_size2_i, (layout.vertical ? width : height)
+								      - (layout.vertical ? child.MarginLeft : child.MarginTop)
+								      - (layout.vertical ? child.MarginRight : child.MarginBottom));
 
 					}
 				}
 
-				// Call the self_sizing callback if provided. Only non-NAN values
+				// Call the self_sizing callback if provided. Only non-Unset values
 				// are taken into account. If the item's cross-axis align property
 				// is set to stretch, ignore the value returned by the callback.
 				if (child.SelfSizing != null) {
-					float [] size = { child.Frame [2], child.Frame [3] };
+					var f = child.Frame;
+					var w = f.Width;
+					int h = f.Height;
 
-					child.SelfSizing (child, ref size [0], ref size [1]);
+					child.SelfSizing (child, ref w, ref h);
 
-					for (uint j = 0; j < 2; j++) {
-						uint size_off = j + 2;
-						if (size_off == layout.frame_size2_i && child_align (child, item) == AlignItems.Stretch) {
-							continue;
+					// Handle X
+					if (!(layout.frame_size2_i == Dim.Width && child_align (child, item) == AlignItems.Stretch)) {
+						if (!IsUnset (w)) {
+							f.Width = w;
+							child.Frame = f;
 						}
-						float val = size [j];
-						if (!float.IsNaN (val)) {
-							child.Frame [size_off] = val;
+					}
+						
+					// Handle Y
+					if (!(layout.frame_size2_i == Dim.Height && child_align (child, item) == AlignItems.Stretch)) {
+						if (!IsUnset (h)) {
+							f.Height = h;
+							child.Frame = f;
 						}
 					}
 				}
@@ -289,13 +329,13 @@ namespace Termina.Gui {
 				if (!child.Basis.IsAuto) {
 					if (child.Basis.Length < 0) throw new Exception ("basis should >=0");
 					if (child.Basis.IsRelative && child.Basis.Length > 1) throw new Exception ("relative basis should be <=1");
-					float basis = child.Basis.Length;
+					int basis = child.Basis.Length;
 					if (child.Basis.IsRelative)
 						basis *= (layout.vertical ? height : width);
-					child.Frame [layout.frame_size_i] = basis;
+					child.Frame = SetDim (child.Frame, layout.frame_size_i, basis);
 				}
 
-				float child_size = child.Frame [layout.frame_size_i];
+				int child_size = GetDim (child.Frame, layout.frame_size_i);
 				if (layout.wrap) {
 					if (layout.flex_dim < child_size) {
 						// Not enough space for this child on this line, layout the
@@ -307,8 +347,8 @@ namespace Termina.Gui {
 						relative_children_count = 0;
 					}
 
-					float child_size2 = child.Frame [layout.frame_size2_i];
-					if (!float.IsNaN (child_size2) && child_size2 > layout.line_dim) {
+					int child_size2 = GetDim (child.Frame, layout.frame_size2_i);
+					if (!IsUnset (child_size2) && child_size2 > layout.line_dim) {
 						layout.line_dim = child_size2;
 					}
 				}
@@ -338,13 +378,13 @@ namespace Termina.Gui {
 			// the align_content property as well as the cross-axis size of items that
 			// haven't been set yet.
 			if (layout.need_lines && (layout.lines?.Length ?? 0) > 0) {
-				float pos = 0;
-				float spacing = 0;
-				float flex_dim = layout.align_dim - layout.lines_sizes;
+				int pos = 0;
+				int spacing = 0;
+				int flex_dim = layout.align_dim - layout.lines_sizes;
 				if (flex_dim > 0)
-					layout_align (item.AlignContent, flex_dim, (uint)(layout.lines?.Length ?? 0), ref pos, ref spacing);
+					layout_align (item.AlignContent, flex_dim, (uint) (layout.lines?.Length ?? 0), ref pos, ref spacing);
 
-				float old_pos = 0;
+				int old_pos = 0;
 				if (layout.reverse2) {
 					pos = layout.align_dim - pos;
 					old_pos = layout.align_dim;
@@ -363,19 +403,18 @@ namespace Termina.Gui {
 					// Re-position the children of this line, honoring any child
 					// alignment previously set within the line.
 					for (uint j = line.child_begin; j < line.child_end; j++) {
-						Item child = layout.child_at (item, j);
+						View child = layout.child_at (item, j);
 						if (child.Position == Position.Absolute) {
 							// Should not be re-positioned.
 							continue;
 						}
-						if (float.IsNaN (child.Frame [layout.frame_size2_i])) {
+						if (IsUnset (GetDim (child.Frame, layout.frame_size2_i))) {
 							// If the child's cross axis size hasn't been set it, it
 							// defaults to the line size.
-							child.Frame [layout.frame_size2_i] = line.size
-								+ (item.AlignContent == AlignContent.Stretch
-								   ? spacing : 0);
+							child.Frame = SetDim (child.Frame, layout.frame_size2_i, line.size
+									      + (item.AlignContent == AlignContent.Stretch ? spacing : 0));
 						}
-						child.Frame [layout.frame_pos2_i] = pos + (child.Frame [layout.frame_pos2_i] - old_pos);
+						child.Frame = SetAxis (child.Frame, layout.frame_pos2_i, pos + GetAxis (child.Frame, layout.frame_pos2_i) - old_pos);
 					}
 
 					if (!layout.reverse2) {
@@ -389,10 +428,13 @@ namespace Termina.Gui {
 			layout.cleanup ();
 		}
 
-		static void layout_align (Justify align, float flex_dim, uint children_count, ref float pos_p, ref float spacing_p)
+		static void layout_align (Justify align, int flex_dim, uint children_count, ref int pos_p, ref int spacing_p)
 		{
 			if (flex_dim < 0)
 				throw new ArgumentException ();
+			if (children_count > Int32.MaxValue-1)
+				throw new ArgumentException ("Too many children");
+			
 			pos_p = 0;
 			spacing_p = 0;
 
@@ -407,17 +449,17 @@ namespace Termina.Gui {
 				return;
 			case Justify.SpaceBetween:
 				if (children_count > 0)
-					spacing_p = flex_dim / (children_count - 1);
+					spacing_p = flex_dim / (int)(children_count - 1);
 				return;
 			case Justify.SpaceAround:
 				if (children_count > 0) {
-					spacing_p = flex_dim / children_count;
+					spacing_p = flex_dim / (int)children_count;
 					pos_p = spacing_p / 2;
 				}
 				return;
 			case Justify.SpaceEvenly:
 				if (children_count > 0) {
-					spacing_p = flex_dim / (children_count + 1);
+					spacing_p = flex_dim / (int) (children_count + 1);
 					pos_p = spacing_p;
 				}
 				return;
@@ -426,10 +468,13 @@ namespace Termina.Gui {
 			}
 		}
 
-		static void layout_align (AlignContent align, float flex_dim, uint children_count, ref float pos_p, ref float spacing_p)
+		static void layout_align (AlignContent align, int flex_dim, uint children_count, ref int pos_p, ref int spacing_p)
 		{
 			if (flex_dim < 0)
 				throw new ArgumentException ();
+			if (children_count > Int32.MaxValue - 1)
+				throw new ArgumentException ("Too many children");
+			
 			pos_p = 0;
 			spacing_p = 0;
 
@@ -444,29 +489,29 @@ namespace Termina.Gui {
 				return;
 			case AlignContent.SpaceBetween:
 				if (children_count > 0)
-					spacing_p = flex_dim / (children_count - 1);
+					spacing_p = flex_dim / (int)(children_count - 1);
 				return;
 			case AlignContent.SpaceAround:
 				if (children_count > 0) {
-					spacing_p = flex_dim / children_count;
+					spacing_p = flex_dim / (int) children_count;
 					pos_p = spacing_p / 2;
 				}
 				return;
 			case AlignContent.SpaceEvenly:
 				if (children_count > 0) {
-					spacing_p = flex_dim / (children_count + 1);
+					spacing_p = flex_dim / (int)(children_count + 1);
 					pos_p = spacing_p;
 				}
 				return;
 			case AlignContent.Stretch:
-				spacing_p = flex_dim / children_count;
+				spacing_p = flex_dim / (int) children_count;
 				return;
 			default:
 				throw new ArgumentException ();
 			}
 		}
 
-		static void layout_items (Item item, uint child_begin, uint child_end, uint children_count, ref flex_layout layout)
+		static void layout_items (View item, uint child_begin, uint child_end, uint children_count, ref flex_layout layout)
 		{
 			if (children_count > (child_end - child_begin))
 				throw new ArgumentException ();
@@ -479,8 +524,8 @@ namespace Termina.Gui {
 			}
 
 			// Determine the main axis initial position and optional spacing.
-			float pos = 0;
-			float spacing = 0;
+			int pos = 0;
+			int spacing = 0;
 			if (layout.flex_grows == 0 && layout.flex_dim > 0) {
 				layout_align (item.JustifyContent, layout.flex_dim, children_count, ref pos, ref spacing);
 
@@ -499,18 +544,17 @@ namespace Termina.Gui {
 			}
 
 			for (uint i = child_begin; i < child_end; i++) {
-
-				Item child = layout.child_at (item, i);
+				View child = layout.child_at (item, i);
 				if (child.Position == Position.Absolute) {
 					// Already positioned.
 					continue;
 				}
 
 				// Grow or shrink the main axis item size if needed.
-				float flex_size = 0;
+				int flex_size = 0;
 				if (layout.flex_dim > 0) {
 					if (child.Grow != 0) {
-						child.Frame [layout.frame_size_i] = 0; // Ignore previous size when growing.
+						child.Frame = SetDim (child.Frame, layout.frame_size_i, 0); // Ignore previous size when growing.
 						flex_size = (layout.flex_dim / layout.flex_grows) * child.Grow;
 					}
 				} else if (layout.flex_dim < 0) {
@@ -518,12 +562,12 @@ namespace Termina.Gui {
 						flex_size = (layout.flex_dim / layout.flex_shrinks) * child.Shrink;
 					}
 				}
-				child.Frame [layout.frame_size_i] += flex_size;
+				child.Frame = SetDim (child.Frame, layout.frame_size_i, GetDim (child.Frame, layout.frame_size_i) + flex_size);
 
 				// Set the cross axis position (and stretch the cross axis size if
 				// needed).
-				float align_size = child.Frame [layout.frame_size2_i];
-				float align_pos = layout.pos2 + 0;
+				int align_size = GetDim (child.Frame, layout.frame_size2_i);
+				int align_pos = layout.pos2 + 0;
 				switch (child_align (child, item)) {
 				case AlignItems.End:
 					align_pos += layout.line_dim - align_size - (layout.vertical ? child.MarginRight : child.MarginBottom);
@@ -537,9 +581,9 @@ namespace Termina.Gui {
 
 				case AlignItems.Stretch:
 					if (align_size == 0) {
-						child.Frame [layout.frame_size2_i] = layout.line_dim
-							- ((layout.vertical ? child.MarginLeft : child.MarginTop)
-							   + (layout.vertical ? child.MarginRight : child.MarginBottom));
+						child.Frame = SetDim (child.Frame, layout.frame_size2_i, layout.line_dim
+								      - ((layout.vertical ? child.MarginLeft : child.MarginTop)
+									 + (layout.vertical ? child.MarginRight : child.MarginBottom)));
 					}
 					align_pos += (layout.vertical ? child.MarginLeft : child.MarginTop);
 					break;
@@ -550,25 +594,25 @@ namespace Termina.Gui {
 				default:
 					throw new Exception ();
 				}
-				child.Frame [layout.frame_pos2_i] = align_pos;
+				child.Frame = SetAxis (child.Frame, layout.frame_pos2_i, align_pos);
 
 				// Set the main axis position.
 				if (layout.reverse) {
 					pos -= (layout.vertical ? child.MarginBottom : child.MarginRight);
-					pos -= child.Frame [layout.frame_size_i];
-					child.Frame [layout.frame_pos_i] = pos;
+					pos -= GetDim (child.Frame, layout.frame_size_i);
+					child.Frame = SetAxis(child.Frame, layout.frame_pos_i, pos);
 					pos -= spacing;
 					pos -= (layout.vertical ? child.MarginTop : child.MarginLeft);
 				} else {
 					pos += (layout.vertical ? child.MarginTop : child.MarginLeft);
-					child.Frame [layout.frame_pos_i] = pos;
-					pos += child.Frame [layout.frame_size_i];
+					child.Frame = SetAxis (child.Frame, layout.frame_pos_i, pos);
+					pos += GetDim (child.Frame, layout.frame_size_i);
 					pos += spacing;
 					pos += (layout.vertical ? child.MarginBottom : child.MarginRight);
 				}
 
 				// Now that the item has a frame, we can layout its children.
-				layout_item (child, child.Frame [2], child.Frame [3]);
+				layout_item (child, child.Frame.Width, child.Frame.Height);
 			}
 
 			if (layout.wrap && !layout.reverse2) {
@@ -588,14 +632,21 @@ namespace Termina.Gui {
 			}
 		}
 
-		static float absolute_size (float val, float pos1, float pos2, float dim) =>
-			!float.IsNaN (val) ? val : (!float.IsNaN (pos1) && !float.IsNaN (pos2) ? dim - pos2 - pos1 : 0);
+		static int absolute_size (int val, int pos1, int pos2, int dim) =>
+			!IsUnset(val) ? val : (!IsUnset(pos1) && !IsUnset(pos2) ? dim - pos2 - pos1 : 0);
 
-		static float absolute_pos (float pos1, float pos2, float size, float dim) =>
-			!float.IsNaN (pos1) ? pos1 : (!float.IsNaN (pos2) ? dim - size - pos2 : 0);
+		static int absolute_pos (int pos1, int pos2, int size, int dim) =>
+			!IsUnset (pos1) ? pos1 : (!IsUnset (pos2) ? dim - size - pos2 : 0);
 
-		static AlignItems child_align (Item child, Item parent) =>
+		static AlignItems child_align (View child, View parent) =>
 			child.AlignSelf == AlignSelf.Auto ? parent.AlignItems : (AlignItems)child.AlignSelf;
+
+		enum Dim {
+			Width, Height
+		};
+		enum Axis {
+			X, Y
+		};
 
 		struct flex_layout {
 			// Set during init.
@@ -603,21 +654,21 @@ namespace Termina.Gui {
 			public bool reverse;                            // whether main axis is reversed
 			public bool reverse2;                           // whether cross axis is reversed (wrap only)
 			public bool vertical;
-			public float size_dim;                          // main axis parent size
-			public float align_dim;                         // cross axis parent size
-			public uint frame_pos_i;                        // main axis position
-			public uint frame_pos2_i;                       // cross axis position
-			public uint frame_size_i;                       // main axis size
-			public uint frame_size2_i;                      // cross axis size
+			public int size_dim;                          // main axis parent size
+			public int align_dim;                         // cross axis parent size
+			public Axis frame_pos_i;                        // main axis position
+			public Axis frame_pos2_i;                       // cross axis position
+			public Dim frame_size_i;                       // main axis size
+			public Dim frame_size2_i;                      // cross axis size
 			uint [] ordered_indices;
 
 			// Set for each line layout.
-			public float line_dim;                          // the cross axis size
-			public float flex_dim;                          // the flexible part of the main axis size
-			public float extra_flex_dim;            // sizes of flexible items
-			public float flex_grows;
-			public float flex_shrinks;
-			public float pos2;                                      // cross axis position
+			public int line_dim;                          // the cross axis size
+			public int flex_dim;                          // the flexible part of the main axis size
+			public int extra_flex_dim;            // sizes of flexible items
+			public int flex_grows;
+			public int flex_shrinks;
+			public int pos2;                                      // cross axis position
 
 			// Calculated layout lines - only tracked when needed:
 			//   - if the root's align_content property isn't set to FLEX_ALIGN_START
@@ -626,11 +677,11 @@ namespace Termina.Gui {
 			public struct flex_layout_line {
 				public uint child_begin;
 				public uint child_end;
-				public float size;
+				public int size;
 			};
 
 			public flex_layout_line [] lines;
-			public float lines_sizes;
+			public int lines_sizes;
 
 			//LAYOUT_RESET
 			public void reset ()
@@ -643,7 +694,7 @@ namespace Termina.Gui {
 			}
 
 			//layout_init
-			public void init (Item item, float width, float height)
+			public void init (View item, int width, int height)
 			{
 				if (item.PaddingLeft < 0
 				    || item.PaddingRight < 0
@@ -665,19 +716,19 @@ namespace Termina.Gui {
 					vertical = false;
 					size_dim = width;
 					align_dim = height;
-					frame_pos_i = 0;
-					frame_pos2_i = 1;
-					frame_size_i = 2;
-					frame_size2_i = 3;
+					frame_pos_i = Axis.X;
+					frame_pos2_i = Axis.Y;
+					frame_size_i = Dim.Width;
+					frame_size2_i = Dim.Height;
 					break;
 				case Direction.Column:
 				case Direction.ColumnReverse:
 					size_dim = height;
 					align_dim = width;
-					frame_pos_i = 1;
-					frame_pos2_i = 0;
-					frame_size_i = 3;
-					frame_size2_i = 2;
+					frame_pos_i = Axis.Y;
+					frame_pos2_i = Axis.X;
+					frame_size_i = Dim.Height;
+					frame_size2_i = Dim.Width;
 					break;
 				}
 
@@ -694,7 +745,7 @@ namespace Termina.Gui {
 						for (uint j = i; j > 0; j--) {
 							uint prev = indices [j - 1];
 							uint curr = indices [j];
-							if (item.Children [(int)prev].Order <= item.Children [(int)curr].Order) {
+							if (item.Subviews [(int)prev].Order <= item.Subviews [(int)curr].Order) {
 								break;
 							}
 							indices [j - 1] = curr;
@@ -724,8 +775,8 @@ namespace Termina.Gui {
 				lines_sizes = 0;
 			}
 
-			public Item child_at (Item item, uint i) =>
-				item.Children [(int)(ordered_indices? [i] ?? i)];
+			public View child_at (View item, uint i) =>
+			item.Subviews [(int)(ordered_indices? [i] ?? i)];
 
 			public void cleanup ()
 			{

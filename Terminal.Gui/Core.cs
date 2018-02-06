@@ -158,7 +158,7 @@ namespace Terminal.Gui {
 	///    in a visually sensible place.
 	/// </para>
 	/// </remarks>
-	public class View : Responder, IEnumerable {
+	public partial class View : Responder, IEnumerable {
 		View container = null;
 		View focused = null;
 
@@ -309,9 +309,12 @@ namespace Terminal.Gui {
 		{
 			if (view == null)
 				return;
+			ValidateChild (view);
 			if (subviews == null)
 				subviews = new List<View> ();
 			subviews.Add (view);
+			ShouldOrderChildren |= view.Order != 0;
+
 			view.container = this;
 			if (view.CanFocus)
 				CanFocus = true;

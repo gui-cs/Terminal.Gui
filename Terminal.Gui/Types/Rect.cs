@@ -231,7 +231,22 @@ namespace Terminal.Gui
 			this.Height = height;
 		}
 
-
+		/// <summary>
+		///	Rectangle Constructor
+		/// </summary>
+		///
+		/// <remarks>
+		///	Creates a Rectangle from a specified x,y location and
+		///	with the width and height set to Int32.MaxValue which is
+		///     intended to be a flag that those values are not set.
+		/// </remarks>
+		public Rect (int x, int y)
+		{
+			this.X = x;
+			this.Y = y;
+			this.Width = Int32.MaxValue;
+			this.Height = Int32.MaxValue;
+		}
 
 		/// <summary>
 		///	Bottom Property
