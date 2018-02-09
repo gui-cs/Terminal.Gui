@@ -93,9 +93,14 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public struct Attribute {
 		internal int value;
-		public Attribute (int v)
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Attribute"/> struct.
+		/// </summary>
+		/// <param name="value">Value.</param>
+		public Attribute (int value)
 		{
-			value = v;
+			this.value = value;
 		}
 
 		public static implicit operator int (Attribute c) => c.value;

@@ -106,7 +106,11 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		// Mouse events
+		/// <summary>
+		/// Method invoked when a mouse event is generated
+		/// </summary>
+		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
+		/// <param name="me">Me.</param>
 		public virtual bool MouseEvent (MouseEvent me)
 		{
 			return false;

@@ -256,6 +256,10 @@ namespace Terminal.Gui {
 			CanFocus = true;
 		}
 
+		/// <summary>
+		/// Redraws the ListView
+		/// </summary>
+		/// <param name="region">Region.</param>
 		public override void Redraw(Rect region)
 		{
 			var current = ColorScheme.Focus;
@@ -287,6 +291,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action SelectedChanged;
 
+		/// <summary>
+		/// Handles cursor movement for this view, passes all other events.
+		/// </summary>
+		/// <returns><c>true</c>, if key was processed, <c>false</c> otherwise.</returns>
+		/// <param name="kb">Keyboard event.</param>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			switch (kb.Key) {
@@ -345,6 +354,14 @@ namespace Terminal.Gui {
 				return true;
 			}
 			return base.ProcessKey (kb);
+		}
+
+		/// <summary>
+		/// Positions the cursor in this view
+		/// </summary>
+		public override void PositionCursor()
+		{
+			Driver.Move (0, selected);
 		}
 	}
 }

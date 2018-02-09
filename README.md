@@ -3,8 +3,8 @@
 This is a simple UI toolkit for .NET.
 
 It is an updated version of
-[gui.cs](https://github.com/mono/mono-curses/blob/master/gui.cs) that
-I wrote for [mono-curses](https://github.com/mono/mono-curses).
+[gui.cs](http://tirania.org/blog/archive/2007/Apr-16.html) that
+I wrote for [mono-curses](https://github.com/mono/mono-curses) in 2007.
 
 The toolkit contains various controls (labesl, text entry, buttons,
 radio buttons, checkboxes, dialog boxes, windows, menus) for building
