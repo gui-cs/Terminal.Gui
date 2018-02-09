@@ -6,12 +6,32 @@ It is an updated version of
 [gui.cs](http://tirania.org/blog/archive/2007/Apr-16.html) that
 I wrote for [mono-curses](https://github.com/mono/mono-curses) in 2007.
 
-The toolkit contains various controls (labesl, text entry, buttons,
-radio buttons, checkboxes, dialog boxes, windows, menus) for building
-text user interfaces, a main loop, is designed to work on Curses and
-the [Windows
-Console](https://github.com/migueldeicaza/gui.cs/issues/27), works
-well on both color and monochrome terminals and has mouse support on
+The toolkit contains various controls for building text user interfaces:
+
+* [Buttons](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Button.html) 
+* [Labels](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Label.html)
+* [Text entry](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextField.html)
+* [Radio buttons](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.RadioGroup.html)
+* [Checkboxes](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.CheckBox.html)
+* [Dialog boxes](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Dialog.html)
+  * [Message boxes](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MessageBox.html)
+* [Windows](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Window.html)
+* [Menus](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MenuBar.html)
+* [ListViews](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ListView.html)
+* [Frames](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.FrameView.html)
+* [Scroll views](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollView.html) and [Scrollbars](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollBarView.html)
+
+All visible UI elements are subclasses of the
+[View](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.View.html),
+and these in turn can contain an arbitrary number of subviews.   
+
+It comes with a
+[mainloop](https://migueldeicaza.github.io/gui.cs/api/Mono.Terminal/Mono.Terminal.MainLoop.html)
+to process events, process idle handlers, timers and monitoring file
+descriptors.
+
+It is designed to work on Curses and the [Windows Console](https://github.com/migueldeicaza/gui.cs/issues/27), 
+works well on both color and monochrome terminals and has mouse support on
 terminal emulators that support it.
 
 # API Documentation
