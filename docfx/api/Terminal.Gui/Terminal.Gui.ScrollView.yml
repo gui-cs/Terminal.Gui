@@ -8,8 +8,13 @@ items:
   - Terminal.Gui.ScrollView.ContentOffset
   - Terminal.Gui.ScrollView.ContentSize
   - Terminal.Gui.ScrollView.PositionCursor
+  - Terminal.Gui.ScrollView.ProcessKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.ScrollView.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.ScrollView.ScrollDown(System.Int32)
   - Terminal.Gui.ScrollView.Scrolled
+  - Terminal.Gui.ScrollView.ScrollLeft(System.Int32)
+  - Terminal.Gui.ScrollView.ScrollRight(System.Int32)
+  - Terminal.Gui.ScrollView.ScrollUp(System.Int32)
   - Terminal.Gui.ScrollView.ShowHorizontalScrollIndicator
   - Terminal.Gui.ScrollView.ShowVerticalScrollIndicator
   langs:
@@ -65,7 +70,6 @@ items:
   - Terminal.Gui.View.Move(System.Int32,System.Int32)
   - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
-  - Terminal.Gui.View.ProcessKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.Remove(Terminal.Gui.View)
   - Terminal.Gui.View.RemoveAll
   - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
@@ -175,6 +179,29 @@ items:
     parameters: []
   overload: Terminal.Gui.ScrollView.PositionCursor*
   exceptions: []
+- uid: Terminal.Gui.ScrollView.ProcessKey(Terminal.Gui.KeyEvent)
+  id: ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.ScrollView
+  langs:
+  - csharp
+  name: ProcessKey(KeyEvent)
+  nameWithType: ScrollView.ProcessKey(KeyEvent)
+  fullName: ScrollView.ProcessKey(KeyEvent)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
+    parameters:
+    - id: kb
+      type: Terminal.Gui.KeyEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.ScrollView.ProcessKey*
+  exceptions: []
 - uid: Terminal.Gui.ScrollView.Redraw(Terminal.Gui.Rect)
   id: Redraw(Terminal.Gui.Rect)
   parent: Terminal.Gui.ScrollView
@@ -195,6 +222,30 @@ items:
       description: To be added.
   overload: Terminal.Gui.ScrollView.Redraw*
   exceptions: []
+- uid: Terminal.Gui.ScrollView.ScrollDown(System.Int32)
+  id: ScrollDown(System.Int32)
+  parent: Terminal.Gui.ScrollView
+  langs:
+  - csharp
+  name: ScrollDown(Int32)
+  nameWithType: ScrollView.ScrollDown(Int32)
+  fullName: ScrollView.ScrollDown(Int32)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Scrolls the view down.
+  syntax:
+    content: public bool ScrollDown (int lines);
+    parameters:
+    - id: lines
+      type: System.Int32
+      description: Number of lines to scroll.
+    return:
+      type: System.Boolean
+      description: <code>true</code>, if left was scrolled, <code>false</code> otherwise.
+  overload: Terminal.Gui.ScrollView.ScrollDown*
+  exceptions: []
 - uid: Terminal.Gui.ScrollView.Scrolled
   id: Scrolled
   parent: Terminal.Gui.ScrollView
@@ -213,6 +264,78 @@ items:
     return:
       type: System.Action{Terminal.Gui.ScrollView}
       description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.ScrollView.ScrollLeft(System.Int32)
+  id: ScrollLeft(System.Int32)
+  parent: Terminal.Gui.ScrollView
+  langs:
+  - csharp
+  name: ScrollLeft(Int32)
+  nameWithType: ScrollView.ScrollLeft(Int32)
+  fullName: ScrollView.ScrollLeft(Int32)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Scrolls the view to the left
+  syntax:
+    content: public bool ScrollLeft (int cols);
+    parameters:
+    - id: cols
+      type: System.Int32
+      description: Number of columns to scroll by.
+    return:
+      type: System.Boolean
+      description: <code>true</code>, if left was scrolled, <code>false</code> otherwise.
+  overload: Terminal.Gui.ScrollView.ScrollLeft*
+  exceptions: []
+- uid: Terminal.Gui.ScrollView.ScrollRight(System.Int32)
+  id: ScrollRight(System.Int32)
+  parent: Terminal.Gui.ScrollView
+  langs:
+  - csharp
+  name: ScrollRight(Int32)
+  nameWithType: ScrollView.ScrollRight(Int32)
+  fullName: ScrollView.ScrollRight(Int32)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Scrolls the view to the right.
+  syntax:
+    content: public bool ScrollRight (int cols);
+    parameters:
+    - id: cols
+      type: System.Int32
+      description: Number of columns to scroll by.
+    return:
+      type: System.Boolean
+      description: <code>true</code>, if right was scrolled, <code>false</code> otherwise.
+  overload: Terminal.Gui.ScrollView.ScrollRight*
+  exceptions: []
+- uid: Terminal.Gui.ScrollView.ScrollUp(System.Int32)
+  id: ScrollUp(System.Int32)
+  parent: Terminal.Gui.ScrollView
+  langs:
+  - csharp
+  name: ScrollUp(Int32)
+  nameWithType: ScrollView.ScrollUp(Int32)
+  fullName: ScrollView.ScrollUp(Int32)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Scrolls the view up.
+  syntax:
+    content: public bool ScrollUp (int lines);
+    parameters:
+    - id: lines
+      type: System.Int32
+      description: Number of lines to scroll.
+    return:
+      type: System.Boolean
+      description: <code>true</code>, if left was scrolled, <code>false</code> otherwise.
+  overload: Terminal.Gui.ScrollView.ScrollUp*
   exceptions: []
 - uid: Terminal.Gui.ScrollView.ShowHorizontalScrollIndicator
   id: ShowHorizontalScrollIndicator
@@ -309,12 +432,42 @@ references:
   name: PositionCursor()
   nameWithType: ScrollView.PositionCursor()
   fullName: ScrollView.PositionCursor()
+- uid: Terminal.Gui.ScrollView.ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.ScrollView
+  isExternal: false
+  name: ProcessKey(KeyEvent)
+  nameWithType: ScrollView.ProcessKey(KeyEvent)
+  fullName: ScrollView.ProcessKey(KeyEvent)
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.KeyEvent
+  parent: Terminal.Gui
+  isExternal: false
+  name: KeyEvent
+  nameWithType: KeyEvent
+  fullName: Terminal.Gui.KeyEvent
 - uid: Terminal.Gui.ScrollView.Redraw(Terminal.Gui.Rect)
   parent: Terminal.Gui.ScrollView
   isExternal: false
   name: Redraw(Rect)
   nameWithType: ScrollView.Redraw(Rect)
   fullName: ScrollView.Redraw(Rect)
+- uid: Terminal.Gui.ScrollView.ScrollDown(System.Int32)
+  parent: Terminal.Gui.ScrollView
+  isExternal: false
+  name: ScrollDown(Int32)
+  nameWithType: ScrollView.ScrollDown(Int32)
+  fullName: ScrollView.ScrollDown(Int32)
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
 - uid: Terminal.Gui.ScrollView.Scrolled
   parent: Terminal.Gui.ScrollView
   isExternal: false
@@ -350,18 +503,30 @@ references:
   - name: '>'
     nameWithType: '>'
     fullName: '>'
+- uid: Terminal.Gui.ScrollView.ScrollLeft(System.Int32)
+  parent: Terminal.Gui.ScrollView
+  isExternal: false
+  name: ScrollLeft(Int32)
+  nameWithType: ScrollView.ScrollLeft(Int32)
+  fullName: ScrollView.ScrollLeft(Int32)
+- uid: Terminal.Gui.ScrollView.ScrollRight(System.Int32)
+  parent: Terminal.Gui.ScrollView
+  isExternal: false
+  name: ScrollRight(Int32)
+  nameWithType: ScrollView.ScrollRight(Int32)
+  fullName: ScrollView.ScrollRight(Int32)
+- uid: Terminal.Gui.ScrollView.ScrollUp(System.Int32)
+  parent: Terminal.Gui.ScrollView
+  isExternal: false
+  name: ScrollUp(Int32)
+  nameWithType: ScrollView.ScrollUp(Int32)
+  fullName: ScrollView.ScrollUp(Int32)
 - uid: Terminal.Gui.ScrollView.ShowHorizontalScrollIndicator
   parent: Terminal.Gui.ScrollView
   isExternal: false
   name: ShowHorizontalScrollIndicator
   nameWithType: ScrollView.ShowHorizontalScrollIndicator
   fullName: ScrollView.ShowHorizontalScrollIndicator
-- uid: System.Boolean
-  parent: System
-  isExternal: true
-  name: Boolean
-  nameWithType: Boolean
-  fullName: System.Boolean
 - uid: Terminal.Gui.ScrollView.ShowVerticalScrollIndicator
   parent: Terminal.Gui.ScrollView
   isExternal: false
@@ -398,12 +563,42 @@ references:
   name: PositionCursor
   nameWithType: ScrollView.PositionCursor
   fullName: ScrollView.PositionCursor
+- uid: Terminal.Gui.ScrollView.ProcessKey*
+  parent: Terminal.Gui.ScrollView
+  isExternal: false
+  name: ProcessKey
+  nameWithType: ScrollView.ProcessKey
+  fullName: ScrollView.ProcessKey
 - uid: Terminal.Gui.ScrollView.Redraw*
   parent: Terminal.Gui.ScrollView
   isExternal: false
   name: Redraw
   nameWithType: ScrollView.Redraw
   fullName: ScrollView.Redraw
+- uid: Terminal.Gui.ScrollView.ScrollDown*
+  parent: Terminal.Gui.ScrollView
+  isExternal: false
+  name: ScrollDown
+  nameWithType: ScrollView.ScrollDown
+  fullName: ScrollView.ScrollDown
+- uid: Terminal.Gui.ScrollView.ScrollLeft*
+  parent: Terminal.Gui.ScrollView
+  isExternal: false
+  name: ScrollLeft
+  nameWithType: ScrollView.ScrollLeft
+  fullName: ScrollView.ScrollLeft
+- uid: Terminal.Gui.ScrollView.ScrollRight*
+  parent: Terminal.Gui.ScrollView
+  isExternal: false
+  name: ScrollRight
+  nameWithType: ScrollView.ScrollRight
+  fullName: ScrollView.ScrollRight
+- uid: Terminal.Gui.ScrollView.ScrollUp*
+  parent: Terminal.Gui.ScrollView
+  isExternal: false
+  name: ScrollUp
+  nameWithType: ScrollView.ScrollUp
+  fullName: ScrollView.ScrollUp
 - uid: Terminal.Gui.ScrollView.ShowHorizontalScrollIndicator*
   parent: Terminal.Gui.ScrollView
   isExternal: false
@@ -446,12 +641,6 @@ references:
   name: ProcessHotKey(KeyEvent)
   nameWithType: View.ProcessHotKey(KeyEvent)
   fullName: View.ProcessHotKey(KeyEvent)
-- uid: Terminal.Gui.View.ProcessKey(Terminal.Gui.KeyEvent)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: ProcessKey(KeyEvent)
-  nameWithType: View.ProcessKey(KeyEvent)
-  fullName: View.ProcessKey(KeyEvent)
 - uid: Terminal.Gui.View.Add(Terminal.Gui.View[])
   parent: Terminal.Gui.View
   isExternal: false

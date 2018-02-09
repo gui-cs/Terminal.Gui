@@ -3,7 +3,16 @@ items:
 - uid: Terminal.Gui.ListView
   id: ListView
   children:
-  - Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource,System.ValueTuple{NStack.ustring,System.Int32}[])
+  - Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,System.Collections.IList)
+  - Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource)
+  - Terminal.Gui.ListView.AllowsMarking
+  - Terminal.Gui.ListView.ProcessKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.ListView.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.ListView.SelectedChanged
+  - Terminal.Gui.ListView.SelectedItem
+  - Terminal.Gui.ListView.SetSource(System.Collections.IList)
+  - Terminal.Gui.ListView.Source
+  - Terminal.Gui.ListView.TopItem
   langs:
   - csharp
   name: ListView
@@ -58,8 +67,6 @@ items:
   - Terminal.Gui.View.PositionCursor
   - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
-  - Terminal.Gui.View.ProcessKey(Terminal.Gui.KeyEvent)
-  - Terminal.Gui.View.Redraw(Terminal.Gui.Rect)
   - Terminal.Gui.View.Remove(Terminal.Gui.View)
   - Terminal.Gui.View.RemoveAll
   - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
@@ -71,31 +78,216 @@ items:
   - Terminal.Gui.View.SuperView
   - Terminal.Gui.View.ToString
   - Terminal.Gui.View.WantMousePositionReports
-- uid: Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource,System.ValueTuple{NStack.ustring,System.Int32}[])
-  id: '#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource,System.ValueTuple{NStack.ustring,System.Int32}[])'
+- uid: Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,System.Collections.IList)
+  id: '#ctor(Terminal.Gui.Rect,System.Collections.IList)'
   parent: Terminal.Gui.ListView
   langs:
   - csharp
-  name: ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
-  nameWithType: ListView.ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
-  fullName: ListView.ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
+  name: ListView(Rect, IList)
+  nameWithType: ListView.ListView(Rect, IList)
+  fullName: ListView.ListView(Rect, IList)
   type: Constructor
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Initializes a new ListView that will display the contents of the object implementing the IList interface.
   syntax:
-    content: public ListView (Terminal.Gui.Rect rect, Terminal.Gui.IListDataSource source, ValueTuple<NStack.ustring,int>[] headers = null);
+    content: public ListView (Terminal.Gui.Rect rect, System.Collections.IList source);
     parameters:
     - id: rect
       type: Terminal.Gui.Rect
-      description: To be added.
+      description: Frame for the listview.
+    - id: source
+      type: System.Collections.IList
+      description: An IList data source, if the elements of the IList are strings or ustrings, the string is rendered, otherwise the ToString() method is invoked on the result.
+  overload: Terminal.Gui.ListView.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource)
+  id: '#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource)'
+  parent: Terminal.Gui.ListView
+  langs:
+  - csharp
+  name: ListView(Rect, IListDataSource)
+  nameWithType: ListView.ListView(Rect, IListDataSource)
+  fullName: ListView.ListView(Rect, IListDataSource)
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Initializes a new ListView that will display the provided data source.
+  syntax:
+    content: public ListView (Terminal.Gui.Rect rect, Terminal.Gui.IListDataSource source);
+    parameters:
+    - id: rect
+      type: Terminal.Gui.Rect
+      description: Frame for the listview.
     - id: source
       type: Terminal.Gui.IListDataSource
-      description: To be added.
-    - id: headers
-      type: System.ValueTuple{NStack.ustring,System.Int32}[]
-      description: To be added.
+      description: IListDataSource object that provides a mechanism to render the data. The number of elements on the collection should not change, if you must change, set the "Source" property to reset the internal settings of the ListView.
   overload: Terminal.Gui.ListView.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.ListView.AllowsMarking
+  id: AllowsMarking
+  parent: Terminal.Gui.ListView
+  langs:
+  - csharp
+  name: AllowsMarking
+  nameWithType: ListView.AllowsMarking
+  fullName: ListView.AllowsMarking
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets a value indicating whether this <xref href="Terminal.Gui.ListView"></xref> allows items to be marked.
+  syntax:
+    content: public bool AllowsMarking { get; set; }
+    return:
+      type: System.Boolean
+      description: <code>true</code> if allows marking elements of the list; otherwise, <code>false</code>.
+  overload: Terminal.Gui.ListView.AllowsMarking*
+  exceptions: []
+- uid: Terminal.Gui.ListView.ProcessKey(Terminal.Gui.KeyEvent)
+  id: ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.ListView
+  langs:
+  - csharp
+  name: ProcessKey(KeyEvent)
+  nameWithType: ListView.ProcessKey(KeyEvent)
+  fullName: ListView.ProcessKey(KeyEvent)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
+    parameters:
+    - id: kb
+      type: Terminal.Gui.KeyEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.ListView.ProcessKey*
+  exceptions: []
+- uid: Terminal.Gui.ListView.Redraw(Terminal.Gui.Rect)
+  id: Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.ListView
+  langs:
+  - csharp
+  name: Redraw(Rect)
+  nameWithType: ListView.Redraw(Rect)
+  fullName: ListView.Redraw(Rect)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void Redraw (Terminal.Gui.Rect region);
+    parameters:
+    - id: region
+      type: Terminal.Gui.Rect
+      description: To be added.
+  overload: Terminal.Gui.ListView.Redraw*
+  exceptions: []
+- uid: Terminal.Gui.ListView.SelectedChanged
+  id: SelectedChanged
+  parent: Terminal.Gui.ListView
+  langs:
+  - csharp
+  name: SelectedChanged
+  nameWithType: ListView.SelectedChanged
+  fullName: ListView.SelectedChanged
+  type: Event
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: This event is raised when the cursor selection has changed.
+  syntax:
+    content: public event Action SelectedChanged;
+    return:
+      type: System.Action
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.ListView.SelectedItem
+  id: SelectedItem
+  parent: Terminal.Gui.ListView
+  langs:
+  - csharp
+  name: SelectedItem
+  nameWithType: ListView.SelectedItem
+  fullName: ListView.SelectedItem
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the currently selecteded item.
+  syntax:
+    content: public int SelectedItem { get; set; }
+    return:
+      type: System.Int32
+      description: The selected item.
+  overload: Terminal.Gui.ListView.SelectedItem*
+  exceptions: []
+- uid: Terminal.Gui.ListView.SetSource(System.Collections.IList)
+  id: SetSource(System.Collections.IList)
+  parent: Terminal.Gui.ListView
+  langs:
+  - csharp
+  name: SetSource(IList)
+  nameWithType: ListView.SetSource(IList)
+  fullName: ListView.SetSource(IList)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Sets the source to an IList value, if you want to set a full IListDataSource, use the Source property.
+  syntax:
+    content: public void SetSource (System.Collections.IList source);
+    parameters:
+    - id: source
+      type: System.Collections.IList
+      description: To be added.
+  overload: Terminal.Gui.ListView.SetSource*
+  exceptions: []
+- uid: Terminal.Gui.ListView.Source
+  id: Source
+  parent: Terminal.Gui.ListView
+  langs:
+  - csharp
+  name: Source
+  nameWithType: ListView.Source
+  fullName: ListView.Source
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the IListDataSource backing this view, use SetSource() if you want to set a new IList source.
+  syntax:
+    content: public Terminal.Gui.IListDataSource Source { get; set; }
+    return:
+      type: Terminal.Gui.IListDataSource
+      description: The source.
+  overload: Terminal.Gui.ListView.Source*
+  exceptions: []
+- uid: Terminal.Gui.ListView.TopItem
+  id: TopItem
+  parent: Terminal.Gui.ListView
+  langs:
+  - csharp
+  name: TopItem
+  nameWithType: ListView.TopItem
+  fullName: ListView.TopItem
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the item that is displayed at the top of the listview
+  syntax:
+    content: public int TopItem { get; set; }
+    return:
+      type: System.Int32
+      description: The top item.
+  overload: Terminal.Gui.ListView.TopItem*
   exceptions: []
 references:
 - uid: Terminal.Gui.View
@@ -104,73 +296,156 @@ references:
   name: View
   nameWithType: View
   fullName: Terminal.Gui.View
-- uid: Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource,System.ValueTuple{NStack.ustring,System.Int32}[])
+- uid: Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,System.Collections.IList)
   parent: Terminal.Gui.ListView
   isExternal: false
-  name: ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
-  nameWithType: ListView.ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
-  fullName: ListView.ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
+  name: ListView(Rect, IList)
+  nameWithType: ListView.ListView(Rect, IList)
+  fullName: ListView.ListView(Rect, IList)
 - uid: Terminal.Gui.Rect
   parent: Terminal.Gui
   isExternal: false
   name: Rect
   nameWithType: Rect
   fullName: Terminal.Gui.Rect
+- uid: System.Collections.IList
+  parent: System.Collections
+  isExternal: true
+  name: IList
+  nameWithType: IList
+  fullName: System.Collections.IList
+- uid: Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource)
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: ListView(Rect, IListDataSource)
+  nameWithType: ListView.ListView(Rect, IListDataSource)
+  fullName: ListView.ListView(Rect, IListDataSource)
 - uid: Terminal.Gui.IListDataSource
   parent: Terminal.Gui
   isExternal: false
   name: IListDataSource
   nameWithType: IListDataSource
   fullName: Terminal.Gui.IListDataSource
-- uid: System.ValueTuple`2
-  name: ValueTuple
-  nameWithType: ValueTuple
-  fullName: System.ValueTuple
-- uid: NStack.ustring
-  name: ustring
-  nameWithType: ustring
-  fullName: NStack.ustring
+- uid: Terminal.Gui.ListView.AllowsMarking
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: AllowsMarking
+  nameWithType: ListView.AllowsMarking
+  fullName: ListView.AllowsMarking
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.ListView.ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: ProcessKey(KeyEvent)
+  nameWithType: ListView.ProcessKey(KeyEvent)
+  fullName: ListView.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.KeyEvent
+  parent: Terminal.Gui
+  isExternal: false
+  name: KeyEvent
+  nameWithType: KeyEvent
+  fullName: Terminal.Gui.KeyEvent
+- uid: Terminal.Gui.ListView.Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: Redraw(Rect)
+  nameWithType: ListView.Redraw(Rect)
+  fullName: ListView.Redraw(Rect)
+- uid: Terminal.Gui.ListView.SelectedChanged
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: SelectedChanged
+  nameWithType: ListView.SelectedChanged
+  fullName: ListView.SelectedChanged
+- uid: System.Action
+  parent: System
+  isExternal: true
+  name: Action
+  nameWithType: Action
+  fullName: System.Action
+- uid: Terminal.Gui.ListView.SelectedItem
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: SelectedItem
+  nameWithType: ListView.SelectedItem
+  fullName: ListView.SelectedItem
 - uid: System.Int32
+  parent: System
+  isExternal: true
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
-- uid: System.ValueTuple{NStack.ustring,System.Int32}[]
-  parent: System
-  isExternal: true
-  name: ValueTuple<ustring,Int32>[]
-  nameWithType: ValueTuple<ustring,Int32>[]
-  fullName: System.ValueTuple<NStack.ustring,System.Int32>[]
-  spec.csharp:
-  - uid: System.ValueTuple`2
-    name: ValueTuple
-    nameWithType: ValueTuple
-    fullName: System.ValueTuple
-  - name: <
-    nameWithType: <
-    fullName: <
-  - uid: NStack.ustring
-    name: ustring
-    nameWithType: ustring
-    fullName: NStack.ustring
-  - name: ','
-    nameWithType: ','
-    fullName: ','
-  - uid: System.Int32
-    name: Int32
-    nameWithType: Int32
-    fullName: System.Int32
-  - name: '>'
-    nameWithType: '>'
-    fullName: '>'
-  - name: '[]'
-    nameWithType: '[]'
-    fullName: '[]'
+- uid: Terminal.Gui.ListView.SetSource(System.Collections.IList)
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: SetSource(IList)
+  nameWithType: ListView.SetSource(IList)
+  fullName: ListView.SetSource(IList)
+- uid: Terminal.Gui.ListView.Source
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: Source
+  nameWithType: ListView.Source
+  fullName: ListView.Source
+- uid: Terminal.Gui.ListView.TopItem
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: TopItem
+  nameWithType: ListView.TopItem
+  fullName: ListView.TopItem
 - uid: Terminal.Gui.ListView.#ctor*
   parent: Terminal.Gui.ListView
   isExternal: false
   name: ListView
   nameWithType: ListView.ListView
   fullName: ListView.ListView
+- uid: Terminal.Gui.ListView.AllowsMarking*
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: AllowsMarking
+  nameWithType: ListView.AllowsMarking
+  fullName: ListView.AllowsMarking
+- uid: Terminal.Gui.ListView.ProcessKey*
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: ProcessKey
+  nameWithType: ListView.ProcessKey
+  fullName: ListView.ProcessKey
+- uid: Terminal.Gui.ListView.Redraw*
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: Redraw
+  nameWithType: ListView.Redraw
+  fullName: ListView.Redraw
+- uid: Terminal.Gui.ListView.SelectedItem*
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: SelectedItem
+  nameWithType: ListView.SelectedItem
+  fullName: ListView.SelectedItem
+- uid: Terminal.Gui.ListView.SetSource*
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: SetSource
+  nameWithType: ListView.SetSource
+  fullName: ListView.SetSource
+- uid: Terminal.Gui.ListView.Source*
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: Source
+  nameWithType: ListView.Source
+  fullName: ListView.Source
+- uid: Terminal.Gui.ListView.TopItem*
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: TopItem
+  nameWithType: ListView.TopItem
+  fullName: ListView.TopItem
 - uid: Terminal.Gui.Responder.CanFocus
   parent: Terminal.Gui.Responder
   isExternal: false
@@ -201,12 +476,6 @@ references:
   name: ProcessHotKey(KeyEvent)
   nameWithType: View.ProcessHotKey(KeyEvent)
   fullName: View.ProcessHotKey(KeyEvent)
-- uid: Terminal.Gui.View.ProcessKey(Terminal.Gui.KeyEvent)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: ProcessKey(KeyEvent)
-  nameWithType: View.ProcessKey(KeyEvent)
-  fullName: View.ProcessKey(KeyEvent)
 - uid: Terminal.Gui.View.Add(Terminal.Gui.View)
   parent: Terminal.Gui.View
   isExternal: false
@@ -393,12 +662,6 @@ references:
   name: PositionCursor()
   nameWithType: View.PositionCursor()
   fullName: View.PositionCursor()
-- uid: Terminal.Gui.View.Redraw(Terminal.Gui.Rect)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Redraw(Rect)
-  nameWithType: View.Redraw(Rect)
-  fullName: View.Redraw(Rect)
 - uid: Terminal.Gui.View.Remove(Terminal.Gui.View)
   parent: Terminal.Gui.View
   isExternal: false

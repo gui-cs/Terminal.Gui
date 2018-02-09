@@ -32,6 +32,7 @@
       <Type Name="Attribute" Kind="Structure" />
       <Type Name="Button" Kind="Class" />
       <Type Name="CheckBox" Kind="Class" />
+      <Type Name="Clipboard" Kind="Class" />
       <Type Name="Color" Kind="Enumeration" />
       <Type Name="Colors" Kind="Class" />
       <Type Name="ColorScheme" Kind="Class" />

@@ -8,6 +8,7 @@ items:
   - Terminal.Gui.Attribute
   - Terminal.Gui.Button
   - Terminal.Gui.CheckBox
+  - Terminal.Gui.Clipboard
   - Terminal.Gui.Color
   - Terminal.Gui.Colors
   - Terminal.Gui.ColorScheme
@@ -75,6 +76,12 @@ references:
   name: CheckBox
   nameWithType: CheckBox
   fullName: Terminal.Gui.CheckBox
+- uid: Terminal.Gui.Clipboard
+  parent: Terminal.Gui
+  isExternal: false
+  name: Clipboard
+  nameWithType: Clipboard
+  fullName: Terminal.Gui.Clipboard
 - uid: Terminal.Gui.Color
   parent: Terminal.Gui
   isExternal: false

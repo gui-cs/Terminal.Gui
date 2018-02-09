@@ -4,6 +4,9 @@ items:
   id: IListDataSource
   children:
   - Terminal.Gui.IListDataSource.Count
+  - Terminal.Gui.IListDataSource.IsMarked(System.Int32)
+  - Terminal.Gui.IListDataSource.Render(System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  - Terminal.Gui.IListDataSource.SetMark(System.Int32,System.Boolean)
   langs:
   - csharp
   name: IListDataSource
@@ -13,6 +16,7 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Implement this interface to provide your own custom rendering for a list.
   syntax:
     content: public interface IListDataSource
   implements: []
@@ -28,12 +32,95 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Returns the number of elements to display
   syntax:
     content: public int Count { get; }
     return:
       type: System.Int32
       description: To be added.
   overload: Terminal.Gui.IListDataSource.Count*
+  exceptions: []
+- uid: Terminal.Gui.IListDataSource.IsMarked(System.Int32)
+  id: IsMarked(System.Int32)
+  parent: Terminal.Gui.IListDataSource
+  langs:
+  - csharp
+  name: IsMarked(Int32)
+  nameWithType: IListDataSource.IsMarked(Int32)
+  fullName: IListDataSource.IsMarked(Int32)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Should return whether the specified item is currently marked.
+  syntax:
+    content: public bool IsMarked (int item);
+    parameters:
+    - id: item
+      type: System.Int32
+      description: Item index.
+    return:
+      type: System.Boolean
+      description: <code>true</code>, if marked, <code>false</code> otherwise.
+  overload: Terminal.Gui.IListDataSource.IsMarked*
+  exceptions: []
+- uid: Terminal.Gui.IListDataSource.Render(System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  id: Render(System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  parent: Terminal.Gui.IListDataSource
+  langs:
+  - csharp
+  name: Render(Boolean, Int32, Int32, Int32, Int32)
+  nameWithType: IListDataSource.Render(Boolean, Int32, Int32, Int32, Int32)
+  fullName: IListDataSource.Render(Boolean, Int32, Int32, Int32, Int32)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: This method is invoked to render a specified item, the method should cover the entire provided width.
+  remarks: The default color will be set before this method is invoked, and will be based on whether the item is selected or not.
+  syntax:
+    content: public void Render (bool selected, int item, int col, int line, int width);
+    parameters:
+    - id: selected
+      type: System.Boolean
+      description: Describes whether the item being rendered is currently selected by the user.
+    - id: item
+      type: System.Int32
+      description: The index of the item to render, zero for the first item and so on.
+    - id: col
+      type: System.Int32
+      description: The column where the rendering will start
+    - id: line
+      type: System.Int32
+      description: The line where the rendering will be done.
+    - id: width
+      type: System.Int32
+      description: The width that must be filled out.
+  overload: Terminal.Gui.IListDataSource.Render*
+  exceptions: []
+- uid: Terminal.Gui.IListDataSource.SetMark(System.Int32,System.Boolean)
+  id: SetMark(System.Int32,System.Boolean)
+  parent: Terminal.Gui.IListDataSource
+  langs:
+  - csharp
+  name: SetMark(Int32, Boolean)
+  nameWithType: IListDataSource.SetMark(Int32, Boolean)
+  fullName: IListDataSource.SetMark(Int32, Boolean)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Flags the item as marked.
+  syntax:
+    content: public void SetMark (int item, bool value);
+    parameters:
+    - id: item
+      type: System.Int32
+      description: Item index.
+    - id: value
+      type: System.Boolean
+      description: If set to <code>true</code> value.
+  overload: Terminal.Gui.IListDataSource.SetMark*
   exceptions: []
 references:
 - uid: Terminal.Gui.IListDataSource.Count
@@ -48,9 +135,51 @@ references:
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
+- uid: Terminal.Gui.IListDataSource.IsMarked(System.Int32)
+  parent: Terminal.Gui.IListDataSource
+  isExternal: false
+  name: IsMarked(Int32)
+  nameWithType: IListDataSource.IsMarked(Int32)
+  fullName: IListDataSource.IsMarked(Int32)
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.IListDataSource.Render(System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  parent: Terminal.Gui.IListDataSource
+  isExternal: false
+  name: Render(Boolean, Int32, Int32, Int32, Int32)
+  nameWithType: IListDataSource.Render(Boolean, Int32, Int32, Int32, Int32)
+  fullName: IListDataSource.Render(Boolean, Int32, Int32, Int32, Int32)
+- uid: Terminal.Gui.IListDataSource.SetMark(System.Int32,System.Boolean)
+  parent: Terminal.Gui.IListDataSource
+  isExternal: false
+  name: SetMark(Int32, Boolean)
+  nameWithType: IListDataSource.SetMark(Int32, Boolean)
+  fullName: IListDataSource.SetMark(Int32, Boolean)
 - uid: Terminal.Gui.IListDataSource.Count*
   parent: Terminal.Gui.IListDataSource
   isExternal: false
   name: Count
   nameWithType: IListDataSource.Count
   fullName: IListDataSource.Count
+- uid: Terminal.Gui.IListDataSource.IsMarked*
+  parent: Terminal.Gui.IListDataSource
+  isExternal: false
+  name: IsMarked
+  nameWithType: IListDataSource.IsMarked
+  fullName: IListDataSource.IsMarked
+- uid: Terminal.Gui.IListDataSource.Render*
+  parent: Terminal.Gui.IListDataSource
+  isExternal: false
+  name: Render
+  nameWithType: IListDataSource.Render
+  fullName: IListDataSource.Render
+- uid: Terminal.Gui.IListDataSource.SetMark*
+  parent: Terminal.Gui.IListDataSource
+  isExternal: false
+  name: SetMark
+  nameWithType: IListDataSource.SetMark
+  fullName: IListDataSource.SetMark

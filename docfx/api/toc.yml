@@ -19,6 +19,8 @@
     name: Button
   - uid: Terminal.Gui.CheckBox
     name: CheckBox
+  - uid: Terminal.Gui.Clipboard
+    name: Clipboard
   - uid: Terminal.Gui.Color
     name: Color
   - uid: Terminal.Gui.Colors

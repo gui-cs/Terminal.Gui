@@ -17,8 +17,28 @@
   </Docs>
   <Members>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public ListView (Terminal.Gui.Rect rect, Terminal.Gui.IListDataSource source, ValueTuple&lt;NStack.ustring,int&gt;[] headers = null);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(valuetype Terminal.Gui.Rect rect, class Terminal.Gui.IListDataSource source, valuetype System.ValueTuple`2&lt;class NStack.ustring, int32&gt;[] headers) cil managed" />
+      <MemberSignature Language="C#" Value="public ListView (Terminal.Gui.Rect rect, System.Collections.IList source);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(valuetype Terminal.Gui.Rect rect, class System.Collections.IList source) cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="rect" Type="Terminal.Gui.Rect" />
+        <Parameter Name="source" Type="System.Collections.IList" />
+      </Parameters>
+      <Docs>
+        <param name="rect">Frame for the listview.</param>
+        <param name="source">An IList data source, if the elements of the IList are strings or ustrings, the string is rendered, otherwise the ToString() method is invoked on the result.</param>
+        <summary>
+            Initializes a new ListView that will display the contents of the object implementing the IList interface.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public ListView (Terminal.Gui.Rect rect, Terminal.Gui.IListDataSource source);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(valuetype Terminal.Gui.Rect rect, class Terminal.Gui.IListDataSource source) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -26,19 +46,164 @@
       <Parameters>
         <Parameter Name="rect" Type="Terminal.Gui.Rect" />
         <Parameter Name="source" Type="Terminal.Gui.IListDataSource" />
-        <Parameter Name="headers" Type="System.ValueTuple&lt;NStack.ustring,System.Int32&gt;[]">
-          <Attributes>
-            <Attribute>
-              <AttributeName>System.Runtime.CompilerServices.TupleElementNames(Mono.Cecil.CustomAttributeArgument[])</AttributeName>
-            </Attribute>
-          </Attributes>
-        </Parameter>
       </Parameters>
       <Docs>
-        <param name="rect">To be added.</param>
-        <param name="source">To be added.</param>
-        <param name="headers">To be added.</param>
+        <param name="rect">Frame for the listview.</param>
+        <param name="source">IListDataSource object that provides a mechanism to render the data. The number of elements on the collection should not change, if you must change, set the "Source" property to reset the internal settings of the ListView.</param>
+        <summary>
+            Initializes a new ListView that will display the provided data source.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="AllowsMarking">
+      <MemberSignature Language="C#" Value="public bool AllowsMarking { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance bool AllowsMarking" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.ListView" /> allows items to be marked.
+            </summary>
+        <value>
+          <c>true</c> if allows marking elements of the list; otherwise, <c>false</c>.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ProcessKey">
+      <MemberSignature Language="C#" Value="public override bool ProcessKey (Terminal.Gui.KeyEvent kb);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="kb" Type="Terminal.Gui.KeyEvent" />
+      </Parameters>
+      <Docs>
+        <param name="kb">To be added.</param>
         <summary>To be added.</summary>
+        <returns>To be added.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Redraw">
+      <MemberSignature Language="C#" Value="public override void Redraw (Terminal.Gui.Rect region);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Redraw(valuetype Terminal.Gui.Rect region) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="region" Type="Terminal.Gui.Rect" />
+      </Parameters>
+      <Docs>
+        <param name="region">To be added.</param>
+        <summary>To be added.</summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="SelectedChanged">
+      <MemberSignature Language="C#" Value="public event Action SelectedChanged;" />
+      <MemberSignature Language="ILAsm" Value=".event class System.Action SelectedChanged" />
+      <MemberType>Event</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Action</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            This event is raised when the cursor selection has changed.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="SelectedItem">
+      <MemberSignature Language="C#" Value="public int SelectedItem { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance int32 SelectedItem" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Int32</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Gets or sets the currently selecteded item.
+            </summary>
+        <value>The selected item.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="SetSource">
+      <MemberSignature Language="C#" Value="public void SetSource (System.Collections.IList source);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void SetSource(class System.Collections.IList source) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="source" Type="System.Collections.IList" />
+      </Parameters>
+      <Docs>
+        <param name="source">To be added.</param>
+        <summary>
+            Sets the source to an IList value, if you want to set a full IListDataSource, use the Source property.
+            </summary>
+        <returns>An item implementing the IList interface.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Source">
+      <MemberSignature Language="C#" Value="public Terminal.Gui.IListDataSource Source { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class Terminal.Gui.IListDataSource Source" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.IListDataSource</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Gets or sets the IListDataSource backing this view, use SetSource() if you want to set a new IList source.
+            </summary>
+        <value>The source.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="TopItem">
+      <MemberSignature Language="C#" Value="public int TopItem { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance int32 TopItem" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Int32</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Gets or sets the item that is displayed at the top of the listview
+            </summary>
+        <value>The top item.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
