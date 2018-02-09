@@ -2,9 +2,7 @@
 
 This is a simple UI toolkit for .NET.
 
-It is an updated version of
-[gui.cs](http://tirania.org/blog/archive/2007/Apr-16.html) that
-I wrote for [mono-curses](https://github.com/mono/mono-curses) in 2007.
+![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.png)
 
 The toolkit contains various controls for building text user interfaces:
 
@@ -85,10 +83,6 @@ class Demo {
 }
 ```
 
-This shows a UI like this:
-
-![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.png)
-
 # Running and Building
 
 Open the solution and run the sample program.
@@ -125,10 +119,13 @@ tracked in the TODO.md file.
 
 # History
 
+This is an updated version of
+[gui.cs](http://tirania.org/blog/archive/2007/Apr-16.html) that
+I wrote for [mono-curses](https://github.com/mono/mono-curses) in 2007.
+
 The original gui.cs was a UI toolkit in a single file and tied to
-curses.  This version tries to be console-agnostic (but currently only
-has a curses backend, go figure) and instead of having a
-container/widget model, only uses Views (which can contain subviews)
-and changes the rendering model to rely on damage regions instead of 
-burderning each view with the details.
+curses.  This version tries to be console-agnostic and instead of
+having a container/widget model, only uses Views (which can contain
+subviews) and changes the rendering model to rely on damage regions
+instead of burderning each view with the details.
 
