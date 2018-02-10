@@ -367,6 +367,9 @@ namespace Unix.Terminal {
 
 		[DllImport ("ncurses")]
 		public extern static uint ungetmouse (ref MouseEvent ev);
+
+		[DllImport ("ncurses")]
+		public extern static int mouseinterval (int interval);
 #endregion
 
 		// We encode ESC + char (what Alt-char generates) as 0x2000 + char
