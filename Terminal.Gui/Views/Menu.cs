@@ -230,7 +230,7 @@ namespace Terminal.Gui {
 				}
 				break;
 			}
-			return base.ProcessKey (kb);
+			return true;
 		}
 
 		public override bool MouseEvent(MouseEvent me)
