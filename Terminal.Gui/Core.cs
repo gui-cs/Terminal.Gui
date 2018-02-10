@@ -1082,7 +1082,7 @@ namespace Terminal.Gui {
 			ClearNeedsDisplay ();
 		}
 
-#if false
+#if true
 		// 
 		// It does not look like the event is raised on clicked-drag
 		// need to figure that out.
@@ -1090,7 +1090,14 @@ namespace Terminal.Gui {
 		Point? dragPosition;
 		public override bool MouseEvent(MouseEvent me)
 		{
-			if (me.Flags == MouseFlags.Button1Pressed){
+			// The code is currently disabled, because the 
+			// Driver.UncookMouse does not seem to have an effect if there is 
+			// a pending mouse event activated.
+			if (true)
+				return false;
+			
+			if ((me.Flags == MouseFlags.Button1Pressed|| me.Flags == MouseFlags.Button4Pressed)){
+				
 				if (dragPosition.HasValue) {
 					var dx = me.X - dragPosition.Value.X;
 					var dy = me.Y - dragPosition.Value.Y;
@@ -1102,7 +1109,7 @@ namespace Terminal.Gui {
 					if (ny < 0)
 						ny = 0;
 
-					Demo.ml2.Text = $"{dx},{dy}";
+					//Demo.ml2.Text = $"{dx},{dy}";
 					dragPosition = new Point (me.X, me.Y);
 
 					// TODO: optimize, only SetNeedsDisplay on the before/after regions.
@@ -1114,23 +1121,26 @@ namespace Terminal.Gui {
 					SetNeedsDisplay ();
 					return true;
 				} else {
-					dragPosition = new Point (me.X, me.Y);
-					Application.GrabMouse (this);
+					// Only start grabbing if the user clicks on the title bar.
+					if (me.Y == 0) {
+						dragPosition = new Point (me.X, me.Y);
+						Application.GrabMouse (this);
+					}
 
-					Demo.ml2.Text = $"Starting at {dragPosition}";
+					//Demo.ml2.Text = $"Starting at {dragPosition}";
 					return true;
 				}
-
-
 			}
 
 			if (me.Flags == MouseFlags.Button1Released) {
 				Application.UngrabMouse ();
+				Driver.UncookMouse ();
+
 				dragPosition = null;
 				//Driver.StopReportingMouseMoves ();
 			}
 
-			Demo.ml.Text = me.ToString ();
+			//Demo.ml.Text = me.ToString ();
 			return false;
 		}
 #endif
@@ -1340,6 +1350,7 @@ namespace Terminal.Gui {
 			if (view == null)
 				return;
 			mouseGrabView = view;
+			Driver.UncookMouse ();
 		}
 
 		/// <summary>
@@ -1348,6 +1359,7 @@ namespace Terminal.Gui {
 		public static void UngrabMouse ()
 		{
 			mouseGrabView = null;
+			Driver.CookMouse ();
 		}
 
 		/// <summary>

@@ -309,6 +309,16 @@ namespace Terminal.Gui {
 
 		public abstract void StartReportingMouseMoves ();
 		public abstract void StopReportingMouseMoves ();
+
+		/// <summary>
+		/// Disables the cooked event processing from the mouse driver.  At startup, it is assumed mouse events are cooked.
+		/// </summary>
+		public abstract void UncookMouse ();
+
+		/// <summary>
+		/// Enables the cooked event processing from the mouse driver
+		/// </summary>
+		public abstract void CookMouse ();
 	}
 
 	/// <summary>
@@ -607,6 +617,7 @@ namespace Terminal.Gui {
 			}
 			Curses.raw ();
 			Curses.noecho ();
+
 			Curses.Window.Standard.keypad (true);
 			reportableMouseEvents = Curses.mousemask (Curses.Event.AllEvents | Curses.Event.ReportMousePosition, out oldMouseEvents);
 			this.terminalResized = terminalResized;
@@ -684,6 +695,23 @@ namespace Terminal.Gui {
 		{
 			Console.Out.Write ("\x1b[?1003l");
 			Console.Out.Flush ();
+		}
+
+		int lastMouseInterval;
+		bool mouseGrabbed;
+
+		public override void UncookMouse()
+		{
+			if (mouseGrabbed)
+				return;
+			lastMouseInterval = Curses.mouseinterval (0);
+			mouseGrabbed = true;
+		}
+
+		public override void CookMouse()
+		{
+			mouseGrabbed = false;
+			Curses.mouseinterval (lastMouseInterval);
 		}
 	}
 
@@ -923,6 +951,14 @@ namespace Terminal.Gui {
 		public override void SetColors(short foregroundColorId, short backgroundColorId)
 		{
 			throw new NotImplementedException();
+		}
+
+		public override void CookMouse()
+		{
+		}
+
+		public override void UncookMouse()
+		{
 		}
 	}
 }
