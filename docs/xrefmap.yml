@@ -2586,6 +2586,26 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_AllowsMarking_
   fullName: ListView.AllowsMarking
   nameWithType: ListView.AllowsMarking
+- uid: Terminal.Gui.ListView.MouseEvent(Terminal.Gui.MouseEvent)
+  name: MouseEvent(MouseEvent)
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_MouseEvent_Terminal_Gui_MouseEvent_
+  fullName: ListView.MouseEvent(MouseEvent)
+  nameWithType: ListView.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.ListView.MouseEvent*
+  name: MouseEvent
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_MouseEvent_
+  fullName: ListView.MouseEvent
+  nameWithType: ListView.MouseEvent
+- uid: Terminal.Gui.ListView.PositionCursor
+  name: PositionCursor()
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_PositionCursor
+  fullName: ListView.PositionCursor()
+  nameWithType: ListView.PositionCursor()
+- uid: Terminal.Gui.ListView.PositionCursor*
+  name: PositionCursor
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_PositionCursor_
+  fullName: ListView.PositionCursor
+  nameWithType: ListView.PositionCursor
 - uid: Terminal.Gui.ListView.ProcessKey(Terminal.Gui.KeyEvent)
   name: ProcessKey(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_ProcessKey_Terminal_Gui_KeyEvent_
@@ -3176,6 +3196,51 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Point.html#Terminal_Gui_Point_Y
   fullName: Point.Y
   nameWithType: Point.Y
+- uid: Terminal.Gui.ProgressBar
+  name: ProgressBar
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html
+  fullName: Terminal.Gui.ProgressBar
+  nameWithType: ProgressBar
+- uid: Terminal.Gui.ProgressBar.#ctor(Terminal.Gui.Rect)
+  name: ProgressBar(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar__ctor_Terminal_Gui_Rect_
+  fullName: ProgressBar.ProgressBar(Rect)
+  nameWithType: ProgressBar.ProgressBar(Rect)
+- uid: Terminal.Gui.ProgressBar.#ctor*
+  name: ProgressBar
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar__ctor_
+  fullName: ProgressBar.ProgressBar
+  nameWithType: ProgressBar.ProgressBar
+- uid: Terminal.Gui.ProgressBar.Fraction
+  name: Fraction
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Fraction
+  fullName: ProgressBar.Fraction
+  nameWithType: ProgressBar.Fraction
+- uid: Terminal.Gui.ProgressBar.Fraction*
+  name: Fraction
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Fraction_
+  fullName: ProgressBar.Fraction
+  nameWithType: ProgressBar.Fraction
+- uid: Terminal.Gui.ProgressBar.Pulse
+  name: Pulse()
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Pulse
+  fullName: ProgressBar.Pulse()
+  nameWithType: ProgressBar.Pulse()
+- uid: Terminal.Gui.ProgressBar.Pulse*
+  name: Pulse
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Pulse_
+  fullName: ProgressBar.Pulse
+  nameWithType: ProgressBar.Pulse
+- uid: Terminal.Gui.ProgressBar.Redraw(Terminal.Gui.Rect)
+  name: Redraw(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Redraw_Terminal_Gui_Rect_
+  fullName: ProgressBar.Redraw(Rect)
+  nameWithType: ProgressBar.Redraw(Rect)
+- uid: Terminal.Gui.ProgressBar.Redraw*
+  name: Redraw
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Redraw_
+  fullName: ProgressBar.Redraw
+  nameWithType: ProgressBar.Redraw
 - uid: Terminal.Gui.RadioGroup
   name: RadioGroup
   href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html

@@ -68,6 +68,7 @@
     <Compile Include="Views\FrameView.cs" />
     <Compile Include="Views\ListView.cs" />
     <Compile Include="Views\Clipboard.cs" />
+    <Compile Include="Views\ProgressBar.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

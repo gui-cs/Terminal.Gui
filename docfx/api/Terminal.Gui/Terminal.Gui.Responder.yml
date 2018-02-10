@@ -94,15 +94,16 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Method invoked when a mouse event is generated
   syntax:
     content: public virtual bool MouseEvent (Terminal.Gui.MouseEvent me);
     parameters:
     - id: me
       type: Terminal.Gui.MouseEvent
-      description: To be added.
+      description: Me.
     return:
       type: System.Boolean
-      description: To be added.
+      description: <code>true</code>, if the event was handled, <code>false</code> otherwise.
   overload: Terminal.Gui.Responder.MouseEvent*
   exceptions: []
 - uid: Terminal.Gui.Responder.ProcessColdKey(Terminal.Gui.KeyEvent)

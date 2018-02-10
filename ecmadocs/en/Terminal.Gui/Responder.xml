@@ -73,9 +73,12 @@
         <Parameter Name="me" Type="Terminal.Gui.MouseEvent" />
       </Parameters>
       <Docs>
-        <param name="me">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
+        <param name="me">Me.</param>
+        <summary>
+            Method invoked when a mouse event is generated
+            </summary>
+        <returns>
+          <c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

@@ -74,6 +74,7 @@ items:
   - Terminal.Gui.Label
   - Terminal.Gui.ListView
   - Terminal.Gui.MenuBar
+  - Terminal.Gui.ProgressBar
   - Terminal.Gui.RadioGroup
   - Terminal.Gui.ScrollBarView
   - Terminal.Gui.ScrollView

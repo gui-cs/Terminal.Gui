@@ -21,8 +21,8 @@
   </Docs>
   <Members>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public Attribute (int v);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 v) cil managed" />
+      <MemberSignature Language="C#" Value="public Attribute (int value);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 value) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -31,8 +31,10 @@
         <Parameter Name="v" Type="System.Int32" />
       </Parameters>
       <Docs>
-        <param name="v">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="value">Value.</param>
+        <summary>
+            Initializes a new instance of the <see cref="T:Terminal.Gui.Attribute" /> struct.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

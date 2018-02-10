@@ -75,6 +75,44 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="MouseEvent">
+      <MemberSignature Language="C#" Value="public override bool MouseEvent (Terminal.Gui.MouseEvent me);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool MouseEvent(valuetype Terminal.Gui.MouseEvent me) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="me" Type="Terminal.Gui.MouseEvent" />
+      </Parameters>
+      <Docs>
+        <param name="me">To be added.</param>
+        <summary>To be added.</summary>
+        <returns>To be added.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="PositionCursor">
+      <MemberSignature Language="C#" Value="public override void PositionCursor ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void PositionCursor() cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters />
+      <Docs>
+        <summary>
+            Positions the cursor in this view
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="ProcessKey">
       <MemberSignature Language="C#" Value="public override bool ProcessKey (Terminal.Gui.KeyEvent kb);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
@@ -89,9 +127,12 @@
         <Parameter Name="kb" Type="Terminal.Gui.KeyEvent" />
       </Parameters>
       <Docs>
-        <param name="kb">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
+        <param name="kb">Keyboard event.</param>
+        <summary>
+            Handles cursor movement for this view, passes all other events.
+            </summary>
+        <returns>
+          <c>true</c>, if key was processed, <c>false</c> otherwise.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -109,8 +150,10 @@
         <Parameter Name="region" Type="Terminal.Gui.Rect" />
       </Parameters>
       <Docs>
-        <param name="region">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="region">Region.</param>
+        <summary>
+            Redraws the ListView
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

@@ -57,6 +57,8 @@
     name: MouseFlags
   - uid: Terminal.Gui.Point
     name: Point
+  - uid: Terminal.Gui.ProgressBar
+    name: ProgressBar
   - uid: Terminal.Gui.RadioGroup
     name: RadioGroup
   - uid: Terminal.Gui.Rect

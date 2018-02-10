@@ -363,5 +363,21 @@ namespace Terminal.Gui {
 		{
 			Driver.Move (0, selected);
 		}
+
+		public override bool MouseEvent(MouseEvent me)
+		{
+			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked))
+				return false;
+
+			if (!HasFocus) 
+				SuperView.SetFocus (this);
+
+			if (me.Y + top >= source.Count)
+				return true;
+
+			selected = top + me.Y;
+			SetNeedsDisplay ();
+			return true;
+		}
 	}
 }

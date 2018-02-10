@@ -253,12 +253,12 @@ namespace Mono.Terminal {
 			var copy = timeouts;
 			timeouts = new SortedList<double,Timeout> ();
 			foreach (var k in copy.Keys){
-				if (k >= now)
-					break;
-
 				var timeout = copy [k];
-				if (timeout.Callback (this))
-					AddTimeout (timeout.Span, timeout);
+				if (k < now) {
+					if (timeout.Callback (this))
+						AddTimeout (timeout.Span, timeout);
+				} else
+					timeouts.Add (k, timeout);
 			}
 		}
 
