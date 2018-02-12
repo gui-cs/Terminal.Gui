@@ -379,5 +379,22 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="UseSystemConsole">
+      <MemberSignature Language="C#" Value="public static bool UseSystemConsole;" />
+      <MemberSignature Language="ILAsm" Value=".field public static bool UseSystemConsole" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            If set, it forces the use of the System.Console-based driver.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
   </Members>
 </Type>

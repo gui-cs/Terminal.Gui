@@ -27,7 +27,6 @@ items:
   - Terminal.Gui.Window
   implements: []
   inheritedMembers:
-  - Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
   - Terminal.Gui.Toplevel.CanFocus
   - Terminal.Gui.Toplevel.Create
   - Terminal.Gui.Toplevel.Running
@@ -74,6 +73,7 @@ items:
   - Terminal.Gui.View.WantMousePositionReports
   - Terminal.Gui.Window.Add(Terminal.Gui.View)
   - Terminal.Gui.Window.GetEnumerator
+  - Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
   - Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
   - Terminal.Gui.Window.Remove(Terminal.Gui.View)
   - Terminal.Gui.Window.Title
@@ -277,12 +277,12 @@ references:
   name: HasFocus
   nameWithType: View.HasFocus
   fullName: View.HasFocus
-- uid: Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
-  parent: Terminal.Gui.Responder
+- uid: Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.Window
   isExternal: false
   name: MouseEvent(MouseEvent)
-  nameWithType: Responder.MouseEvent(MouseEvent)
-  fullName: Responder.MouseEvent(MouseEvent)
+  nameWithType: Window.MouseEvent(MouseEvent)
+  fullName: Window.MouseEvent(MouseEvent)
 - uid: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
   parent: Terminal.Gui.View
   isExternal: false

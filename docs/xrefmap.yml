@@ -1361,6 +1361,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_UngrabMouse_
   fullName: Application.UngrabMouse
   nameWithType: Application.UngrabMouse
+- uid: Terminal.Gui.Application.UseSystemConsole
+  name: UseSystemConsole
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_UseSystemConsole
+  fullName: Application.UseSystemConsole
+  nameWithType: Application.UseSystemConsole
 - uid: Terminal.Gui.Attribute
   name: Attribute
   href: api/Terminal.Gui/Terminal.Gui.Attribute.html
@@ -1831,6 +1836,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddStr_
   fullName: ConsoleDriver.AddStr
   nameWithType: ConsoleDriver.AddStr
+- uid: Terminal.Gui.ConsoleDriver.BottomTee
+  name: BottomTee
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_BottomTee
+  fullName: ConsoleDriver.BottomTee
+  nameWithType: ConsoleDriver.BottomTee
 - uid: Terminal.Gui.ConsoleDriver.Clip
   name: Clip
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Clip
@@ -1851,6 +1861,21 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Cols_
   fullName: ConsoleDriver.Cols
   nameWithType: ConsoleDriver.Cols
+- uid: Terminal.Gui.ConsoleDriver.CookMouse
+  name: CookMouse()
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_CookMouse
+  fullName: ConsoleDriver.CookMouse()
+  nameWithType: ConsoleDriver.CookMouse()
+- uid: Terminal.Gui.ConsoleDriver.CookMouse*
+  name: CookMouse
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_CookMouse_
+  fullName: ConsoleDriver.CookMouse
+  nameWithType: ConsoleDriver.CookMouse
+- uid: Terminal.Gui.ConsoleDriver.Diamond
+  name: Diamond
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Diamond
+  fullName: ConsoleDriver.Diamond
+  nameWithType: ConsoleDriver.Diamond
 - uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   name: DrawFrame(Rect, Int32, Boolean)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_
@@ -1871,6 +1896,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_End_
   fullName: ConsoleDriver.End
   nameWithType: ConsoleDriver.End
+- uid: Terminal.Gui.ConsoleDriver.HLine
+  name: HLine
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_HLine
+  fullName: ConsoleDriver.HLine
+  nameWithType: ConsoleDriver.HLine
 - uid: Terminal.Gui.ConsoleDriver.Init(System.Action)
   name: Init(Action)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Init_System_Action_
@@ -1881,6 +1911,21 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Init_
   fullName: ConsoleDriver.Init
   nameWithType: ConsoleDriver.Init
+- uid: Terminal.Gui.ConsoleDriver.LeftTee
+  name: LeftTee
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_LeftTee
+  fullName: ConsoleDriver.LeftTee
+  nameWithType: ConsoleDriver.LeftTee
+- uid: Terminal.Gui.ConsoleDriver.LLCorner
+  name: LLCorner
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_LLCorner
+  fullName: ConsoleDriver.LLCorner
+  nameWithType: ConsoleDriver.LLCorner
+- uid: Terminal.Gui.ConsoleDriver.LRCorner
+  name: LRCorner
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_LRCorner
+  fullName: ConsoleDriver.LRCorner
+  nameWithType: ConsoleDriver.LRCorner
 - uid: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
   name: Move(Int32, Int32)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Move_System_Int32_System_Int32_
@@ -1921,6 +1966,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Refresh_
   fullName: ConsoleDriver.Refresh
   nameWithType: ConsoleDriver.Refresh
+- uid: Terminal.Gui.ConsoleDriver.RightTee
+  name: RightTee
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_RightTee
+  fullName: ConsoleDriver.RightTee
+  nameWithType: ConsoleDriver.RightTee
 - uid: Terminal.Gui.ConsoleDriver.Rows
   name: Rows
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Rows
@@ -1966,6 +2016,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_StartReportingMouseMoves_
   fullName: ConsoleDriver.StartReportingMouseMoves
   nameWithType: ConsoleDriver.StartReportingMouseMoves
+- uid: Terminal.Gui.ConsoleDriver.Stipple
+  name: Stipple
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Stipple
+  fullName: ConsoleDriver.Stipple
+  nameWithType: ConsoleDriver.Stipple
 - uid: Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
   name: StopReportingMouseMoves()
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_StopReportingMouseMoves
@@ -1986,6 +2041,36 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Suspend_
   fullName: ConsoleDriver.Suspend
   nameWithType: ConsoleDriver.Suspend
+- uid: Terminal.Gui.ConsoleDriver.TopTee
+  name: TopTee
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_TopTee
+  fullName: ConsoleDriver.TopTee
+  nameWithType: ConsoleDriver.TopTee
+- uid: Terminal.Gui.ConsoleDriver.ULCorner
+  name: ULCorner
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_ULCorner
+  fullName: ConsoleDriver.ULCorner
+  nameWithType: ConsoleDriver.ULCorner
+- uid: Terminal.Gui.ConsoleDriver.UncookMouse
+  name: UncookMouse()
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UncookMouse
+  fullName: ConsoleDriver.UncookMouse()
+  nameWithType: ConsoleDriver.UncookMouse()
+- uid: Terminal.Gui.ConsoleDriver.UncookMouse*
+  name: UncookMouse
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UncookMouse_
+  fullName: ConsoleDriver.UncookMouse
+  nameWithType: ConsoleDriver.UncookMouse
+- uid: Terminal.Gui.ConsoleDriver.URCorner
+  name: URCorner
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_URCorner
+  fullName: ConsoleDriver.URCorner
+  nameWithType: ConsoleDriver.URCorner
+- uid: Terminal.Gui.ConsoleDriver.VLine
+  name: VLine
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_VLine
+  fullName: ConsoleDriver.VLine
+  nameWithType: ConsoleDriver.VLine
 - uid: Terminal.Gui.Dialog
   name: Dialog
   href: api/Terminal.Gui/Terminal.Gui.Dialog.html
@@ -4761,6 +4846,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_GetEnumerator_
   fullName: Window.GetEnumerator
   nameWithType: Window.GetEnumerator
+- uid: Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
+  name: MouseEvent(MouseEvent)
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_MouseEvent_Terminal_Gui_MouseEvent_
+  fullName: Window.MouseEvent(MouseEvent)
+  nameWithType: Window.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.Window.MouseEvent*
+  name: MouseEvent
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_MouseEvent_
+  fullName: Window.MouseEvent
+  nameWithType: Window.MouseEvent
 - uid: Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
   name: Redraw(Rect)
   href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_Redraw_Terminal_Gui_Rect_

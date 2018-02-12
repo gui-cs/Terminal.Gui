@@ -1167,7 +1167,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The current Console Driver in use.
 		/// </summary>
-		public static ConsoleDriver Driver = new CursesDriver ();
+		public static ConsoleDriver Driver;
 
 		/// <summary>
 		/// The Toplevel object used for the application on startup.
@@ -1242,6 +1242,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// If set, it forces the use of the System.Console-based driver.
+		/// </summary>
+		public static bool UseSystemConsole;
+
+		/// <summary>
 		/// Initializes the Application
 		/// </summary>
 		public static void Init ()
@@ -1249,6 +1254,17 @@ namespace Terminal.Gui {
 			if (Top != null)
 				return;
 
+			if (!UseSystemConsole) {
+				var p = Environment.OSVersion.Platform;
+				if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+					UseSystemConsole = true;
+			}
+			if (UseSystemConsole){
+				Console.WriteLine ("WARNING: This version currently does not support data input yet, working on it");
+				Console.ReadLine ();
+				Driver = new NetDriver ();
+			} else
+				Driver = new CursesDriver ();
 			Driver.Init (TerminalResized);
 			MainLoop = new Mono.Terminal.MainLoop ();
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));

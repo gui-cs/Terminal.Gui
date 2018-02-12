@@ -121,6 +121,26 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="MouseEvent">
+      <MemberSignature Language="C#" Value="public override bool MouseEvent (Terminal.Gui.MouseEvent me);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool MouseEvent(valuetype Terminal.Gui.MouseEvent me) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="me" Type="Terminal.Gui.MouseEvent" />
+      </Parameters>
+      <Docs>
+        <param name="me">To be added.</param>
+        <summary>To be added.</summary>
+        <returns>To be added.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="Redraw">
       <MemberSignature Language="C#" Value="public override void Redraw (Terminal.Gui.Rect bounds);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Redraw(valuetype Terminal.Gui.Rect bounds) cil managed" />

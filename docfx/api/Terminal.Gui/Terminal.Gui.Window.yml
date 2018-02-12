@@ -8,6 +8,7 @@ items:
   - Terminal.Gui.Window.#ctor(Terminal.Gui.Rect,NStack.ustring,System.Int32)
   - Terminal.Gui.Window.Add(Terminal.Gui.View)
   - Terminal.Gui.Window.GetEnumerator
+  - Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
   - Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
   - Terminal.Gui.Window.Remove(Terminal.Gui.View)
   - Terminal.Gui.Window.Title
@@ -33,7 +34,6 @@ items:
   implements:
   - System.Collections.IEnumerable
   inheritedMembers:
-  - Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
   - Terminal.Gui.Toplevel.CanFocus
   - Terminal.Gui.Toplevel.Create
   - Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)
@@ -196,6 +196,29 @@ items:
       description: The enumerator.
   overload: Terminal.Gui.Window.GetEnumerator*
   exceptions: []
+- uid: Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
+  id: MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.Window
+  langs:
+  - csharp
+  name: MouseEvent(MouseEvent)
+  nameWithType: Window.MouseEvent(MouseEvent)
+  fullName: Window.MouseEvent(MouseEvent)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool MouseEvent (Terminal.Gui.MouseEvent me);
+    parameters:
+    - id: me
+      type: Terminal.Gui.MouseEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.Window.MouseEvent*
+  exceptions: []
 - uid: Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
   id: Redraw(Terminal.Gui.Rect)
   parent: Terminal.Gui.Window
@@ -330,6 +353,24 @@ references:
   name: IEnumerator
   nameWithType: IEnumerator
   fullName: System.Collections.IEnumerator
+- uid: Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.Window
+  isExternal: false
+  name: MouseEvent(MouseEvent)
+  nameWithType: Window.MouseEvent(MouseEvent)
+  fullName: Window.MouseEvent(MouseEvent)
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.MouseEvent
+  parent: Terminal.Gui
+  isExternal: false
+  name: MouseEvent
+  nameWithType: MouseEvent
+  fullName: Terminal.Gui.MouseEvent
 - uid: Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
   parent: Terminal.Gui.Window
   isExternal: false
@@ -366,6 +407,12 @@ references:
   name: GetEnumerator
   nameWithType: Window.GetEnumerator
   fullName: Window.GetEnumerator
+- uid: Terminal.Gui.Window.MouseEvent*
+  parent: Terminal.Gui.Window
+  isExternal: false
+  name: MouseEvent
+  nameWithType: Window.MouseEvent
+  fullName: Window.MouseEvent
 - uid: Terminal.Gui.Window.Redraw*
   parent: Terminal.Gui.Window
   isExternal: false
@@ -396,12 +443,6 @@ references:
   name: HasFocus
   nameWithType: View.HasFocus
   fullName: View.HasFocus
-- uid: Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
-  parent: Terminal.Gui.Responder
-  isExternal: false
-  name: MouseEvent(MouseEvent)
-  nameWithType: Responder.MouseEvent(MouseEvent)
-  fullName: Responder.MouseEvent(MouseEvent)
 - uid: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
   parent: Terminal.Gui.View
   isExternal: false

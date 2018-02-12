@@ -21,6 +21,7 @@ items:
   - Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)
   - Terminal.Gui.Application.Top
   - Terminal.Gui.Application.UngrabMouse
+  - Terminal.Gui.Application.UseSystemConsole
   langs:
   - csharp
   name: Application
@@ -411,6 +412,25 @@ items:
     parameters: []
   overload: Terminal.Gui.Application.UngrabMouse*
   exceptions: []
+- uid: Terminal.Gui.Application.UseSystemConsole
+  id: UseSystemConsole
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  name: UseSystemConsole
+  nameWithType: Application.UseSystemConsole
+  fullName: Application.UseSystemConsole
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: If set, it forces the use of the System.Console-based driver.
+  syntax:
+    content: public static bool UseSystemConsole;
+    return:
+      type: System.Boolean
+      description: To be added.
+  exceptions: []
 references:
 - uid: System.Object
   parent: System
@@ -609,6 +629,12 @@ references:
   name: UngrabMouse()
   nameWithType: Application.UngrabMouse()
   fullName: Application.UngrabMouse()
+- uid: Terminal.Gui.Application.UseSystemConsole
+  parent: Terminal.Gui.Application
+  isExternal: false
+  name: UseSystemConsole
+  nameWithType: Application.UseSystemConsole
+  fullName: Application.UseSystemConsole
 - uid: Terminal.Gui.Application.#ctor*
   parent: Terminal.Gui.Application
   isExternal: false

@@ -81,7 +81,7 @@ namespace Terminal.Gui {
 				Move (0, 0);
 				for (int i = 0; i < top; i++)
 					if (i == activityPos)
-						Driver.AddSpecial (SpecialChar.Stipple);
+						Driver.AddRune (Driver.Stipple);
 					else
 						Driver.AddRune (' ');
 			} else {
@@ -89,7 +89,7 @@ namespace Terminal.Gui {
 				int mid = (int)(fraction * top);
 				int i;
 				for (i = 0; i < mid; i++)
-					Driver.AddSpecial (SpecialChar.Stipple);
+					Driver.AddRune (Driver.Stipple);
 				for (; i < top; i++)
 					Driver.AddRune (' ');
 			}

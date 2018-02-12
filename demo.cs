@@ -148,6 +148,7 @@ class Demo {
 	public static Label ml;
 	static void Main ()
 	{
+		//Application.UseSystemConsole = true;
 		Application.Init ();
 
 		var top = Application.Top;

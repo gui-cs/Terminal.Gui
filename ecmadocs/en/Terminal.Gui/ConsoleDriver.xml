@@ -72,9 +72,6 @@
       <MemberSignature Language="C#" Value="public abstract void AddSpecial (Terminal.Gui.SpecialChar ch);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void AddSpecial(valuetype Terminal.Gui.SpecialChar ch) cil managed" />
       <MemberType>Method</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
       </ReturnValue>
@@ -128,6 +125,23 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="BottomTee">
+      <MemberSignature Language="C#" Value="public Rune BottomTee;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune BottomTee" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Rune</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            The bottom tee.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="Clip">
       <MemberSignature Language="C#" Value="public Terminal.Gui.Rect Clip { get; set; }" />
       <MemberSignature Language="ILAsm" Value=".property instance valuetype Terminal.Gui.Rect Clip" />
@@ -164,8 +178,43 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="CookMouse">
+      <MemberSignature Language="C#" Value="public abstract void CookMouse ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void CookMouse() cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters />
+      <Docs>
+        <summary>
+            Enables the cooked event processing from the mouse driver
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Diamond">
+      <MemberSignature Language="C#" Value="public Rune Diamond;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune Diamond" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Rune</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Diamond character
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="DrawFrame">
-      <MemberSignature Language="C#" Value="public abstract void DrawFrame (Terminal.Gui.Rect region, int padding, bool fill);" />
+      <MemberSignature Language="C#" Value="public virtual void DrawFrame (Terminal.Gui.Rect region, int padding, bool fill);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void DrawFrame(valuetype Terminal.Gui.Rect region, int32 padding, bool fill) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
@@ -205,6 +254,23 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="HLine">
+      <MemberSignature Language="C#" Value="public Rune HLine;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune HLine" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Rune</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Horizontal line character.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="Init">
       <MemberSignature Language="C#" Value="public abstract void Init (Action terminalResized);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void Init(class System.Action terminalResized) cil managed" />
@@ -222,6 +288,57 @@
         <param name="terminalResized">Method to invoke when the terminal is resized.</param>
         <summary>
             Initializes the driver
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="LeftTee">
+      <MemberSignature Language="C#" Value="public Rune LeftTee;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune LeftTee" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Rune</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Left tee
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="LLCorner">
+      <MemberSignature Language="C#" Value="public Rune LLCorner;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune LLCorner" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Rune</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Lower left corner
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="LRCorner">
+      <MemberSignature Language="C#" Value="public Rune LRCorner;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune LRCorner" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Rune</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Lower right corner
             </summary>
         <remarks>To be added.</remarks>
       </Docs>
@@ -302,6 +419,23 @@
       <Docs>
         <summary>
             Updates the screen to reflect all the changes that have been done to the display buffer
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="RightTee">
+      <MemberSignature Language="C#" Value="public Rune RightTee;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune RightTee" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Rune</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Right tee
             </summary>
         <remarks>To be added.</remarks>
       </Docs>
@@ -404,6 +538,23 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="Stipple">
+      <MemberSignature Language="C#" Value="public Rune Stipple;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune Stipple" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Rune</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Stipple pattern
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="StopReportingMouseMoves">
       <MemberSignature Language="C#" Value="public abstract void StopReportingMouseMoves ();" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void StopReportingMouseMoves() cil managed" />
@@ -434,6 +585,92 @@
       <Docs>
         <summary>
             Suspend the application, typically needs to save the state, suspend the app and upon return, reset the console driver.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="TopTee">
+      <MemberSignature Language="C#" Value="public Rune TopTee;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune TopTee" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Rune</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Top tee 
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ULCorner">
+      <MemberSignature Language="C#" Value="public Rune ULCorner;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune ULCorner" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Rune</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Upper left corner
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="UncookMouse">
+      <MemberSignature Language="C#" Value="public abstract void UncookMouse ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void UncookMouse() cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters />
+      <Docs>
+        <summary>
+            Disables the cooked event processing from the mouse driver.  At startup, it is assumed mouse events are cooked.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="URCorner">
+      <MemberSignature Language="C#" Value="public Rune URCorner;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune URCorner" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Rune</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Upper right corner
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="VLine">
+      <MemberSignature Language="C#" Value="public Rune VLine;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune VLine" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Rune</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Vertical line character.
             </summary>
         <remarks>To be added.</remarks>
       </Docs>

@@ -152,7 +152,7 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (item == null ? Colors.Base.Focus : i == current ? ColorScheme.Focus : ColorScheme.Normal);
 				for (int p = 0; p < Frame.Width-2; p++)
 					if (item == null)
-						Driver.AddSpecial (SpecialChar.HLine);
+						Driver.AddRune (Driver.HLine);
 					else
 						Driver.AddRune (' ');
 

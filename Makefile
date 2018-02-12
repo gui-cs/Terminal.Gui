@@ -2,6 +2,7 @@ all: doc-update yaml
 
 # Used to fetch XML doc updates from the C# compiler into the ECMA docs
 doc-update:
+	msbuild /p:Configuration=Release
 	mdoc update -i Terminal.Gui/bin/Release/Terminal.Gui.xml -o ecmadocs/en Terminal.Gui/bin/Release/Terminal.Gui.dll
 
 yaml:
