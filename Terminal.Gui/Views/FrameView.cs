@@ -69,7 +69,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
-		public virtual void Remove (View view)
+		public override void Remove (View view)
 		{
 			if (view == null)
 				return;

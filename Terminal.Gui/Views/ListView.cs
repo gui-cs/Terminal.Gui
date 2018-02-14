@@ -70,7 +70,7 @@ namespace Terminal.Gui {
 	///   and optionally mark elements of the list (controlled by the AllowsMark property).  
 	/// </para>
 	/// <para>
-	///   The ListView can either render an arbitrary IList object (for example, arrays, List<T>
+	///   The ListView can either render an arbitrary IList object (for example, arrays, List&lt;T&gt;
 	///   and other collections) which are drawn by drawing the string/ustring contents or the 
 	///   result of calling ToString().   Alternatively, you can provide you own IListDataSource
 	///   object that gives you full control of what is rendered.

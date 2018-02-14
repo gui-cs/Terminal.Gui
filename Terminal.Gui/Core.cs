@@ -75,7 +75,8 @@ namespace Terminal.Gui {
 		///     other View subclasses.
 		///   </para>
 		/// </remarks>
-		public virtual bool ProcessKey (KeyEvent kb)
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public virtual bool ProcessKey (KeyEvent keyEvent)
 		{
 			return false;
 		}
@@ -101,7 +102,8 @@ namespace Terminal.Gui {
 		///    keypress when they have the focus.
 		///  </para>
 		/// </remarks>
-		public virtual bool ProcessColdKey (KeyEvent kb)
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public virtual bool ProcessColdKey (KeyEvent keyEvent)
 		{
 			return false;
 		}
@@ -110,8 +112,8 @@ namespace Terminal.Gui {
 		/// Method invoked when a mouse event is generated
 		/// </summary>
 		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
-		/// <param name="me">Me.</param>
-		public virtual bool MouseEvent (MouseEvent me)
+		/// <param name="mouseEvent">Contains the details about the mouse event.</param>
+		public virtual bool MouseEvent (MouseEvent mouseEvent)
 		{
 			return false;
 		}
@@ -698,30 +700,33 @@ namespace Terminal.Gui {
 			focused.EnsureFocus ();
 		}
 
-		public override bool ProcessKey (KeyEvent kb)
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if (Focused?.ProcessKey (kb) == true)
+			if (Focused?.ProcessKey (keyEvent) == true)
 				return true;
 
 			return false;
 		}
 
-		public override bool ProcessHotKey (KeyEvent kb)
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.ProcessHotKey (kb))
+				if (view.ProcessHotKey (keyEvent))
 					return true;
 			return false;
 		}
 
-		public override bool ProcessColdKey (KeyEvent kb)
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public override bool ProcessColdKey (KeyEvent keyEvent)
 		{
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.ProcessColdKey (kb))
+				if (view.ProcessColdKey (keyEvent))
 					return true;
 			return false;
 		}
@@ -916,12 +921,12 @@ namespace Terminal.Gui {
 			get => true;
 		}
 
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if (base.ProcessKey (kb))
+			if (base.ProcessKey (keyEvent))
 				return true;
 
-			switch (kb.Key) {
+			switch (keyEvent.Key) {
 			case Key.ControlC:
 				// TODO: stop current execution of this container
 				break;
@@ -1048,7 +1053,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
-		public virtual void Remove (View view)
+		public override void Remove (View view)
 		{
 			if (view == null)
 				return;
@@ -1088,7 +1093,7 @@ namespace Terminal.Gui {
 		// need to figure that out.
 		//
 		Point? dragPosition;
-		public override bool MouseEvent(MouseEvent me)
+		public override bool MouseEvent(MouseEvent mouseEvent)
 		{
 			// The code is currently disabled, because the 
 			// Driver.UncookMouse does not seem to have an effect if there is 
@@ -1096,11 +1101,11 @@ namespace Terminal.Gui {
 			if (true)
 				return false;
 			
-			if ((me.Flags == MouseFlags.Button1Pressed|| me.Flags == MouseFlags.Button4Pressed)){
+			if ((mouseEvent.Flags == MouseFlags.Button1Pressed|| mouseEvent.Flags == MouseFlags.Button4Pressed)){
 				
 				if (dragPosition.HasValue) {
-					var dx = me.X - dragPosition.Value.X;
-					var dy = me.Y - dragPosition.Value.Y;
+					var dx = mouseEvent.X - dragPosition.Value.X;
+					var dy = mouseEvent.Y - dragPosition.Value.Y;
 
 					var nx = Frame.X + dx;
 					var ny = Frame.Y + dy;
@@ -1110,7 +1115,7 @@ namespace Terminal.Gui {
 						ny = 0;
 
 					//Demo.ml2.Text = $"{dx},{dy}";
-					dragPosition = new Point (me.X, me.Y);
+					dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
 
 					// TODO: optimize, only SetNeedsDisplay on the before/after regions.
 					if (SuperView == null)
@@ -1122,8 +1127,8 @@ namespace Terminal.Gui {
 					return true;
 				} else {
 					// Only start grabbing if the user clicks on the title bar.
-					if (me.Y == 0) {
-						dragPosition = new Point (me.X, me.Y);
+					if (mouseEvent.Y == 0) {
+						dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
 						Application.GrabMouse (this);
 					}
 
@@ -1132,7 +1137,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			if (me.Flags == MouseFlags.Button1Released) {
+			if (mouseEvent.Flags == MouseFlags.Button1Released) {
 				Application.UngrabMouse ();
 				Driver.UncookMouse ();
 

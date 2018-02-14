@@ -25,7 +25,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-using Mono.Unix.Native;
 using System.Collections.Generic;
 using System;
 using System.Runtime.InteropServices;
@@ -38,10 +37,10 @@ namespace Mono.Terminal {
 	/// </summary>
 	public class MainLoop {
 		/// <summary>
-		///   Condition on which to wake up from file descriptor activity
+		///   Condition on which to wake up from file descriptor activity.  These match the Linux/BSD poll definitions.
 		/// </summary>
 		[Flags]
-		public enum Condition {
+		public enum Condition : short {
 			/// <summary>
 			/// There is data to read
 			/// </summary>
@@ -49,11 +48,11 @@ namespace Mono.Terminal {
 			/// <summary>
 			/// Writing to the specified descriptor will not block
 			/// </summary>
-			PollOut = 2,
+			PollOut = 4,
 			/// <summary>
 			/// There is urgent data to read
 			/// </summary>
-			PollPri = 4,
+			PollPri = 2,
 			/// <summary>
 			///  Error condition on output
 			/// </summary>
@@ -82,7 +81,25 @@ namespace Mono.Terminal {
 		Dictionary <int, Watch> descriptorWatchers = new Dictionary<int,Watch>();
 		SortedList <double, Timeout> timeouts = new SortedList<double,Timeout> ();
 		List<Func<bool>> idleHandlers = new List<Func<bool>> ();
-		
+
+		[StructLayout(LayoutKind.Sequential)]
+		struct Pollfd {
+			public int fd;
+			public short events, revents;
+		}
+
+		[DllImport ("libc")]
+		extern static int poll ([In,Out]Pollfd[] ufds, uint nfds, int timeout);
+
+		[DllImport ("libc")]
+		extern static int pipe ([In,Out]int [] pipes);
+
+		[DllImport ("libc")]
+		extern static int read (int fd, IntPtr buf, IntPtr n);
+
+		[DllImport ("libc")]
+		extern static int write (int fd, IntPtr buf, IntPtr n);
+
 		Pollfd [] pollmap;
 		bool poll_dirty = true;
 		int [] wakeupPipes = new int [2];
@@ -93,16 +110,16 @@ namespace Mono.Terminal {
 		/// </summary>
 		public MainLoop ()
 		{
-			Syscall.pipe (wakeupPipes);
+			pipe (wakeupPipes);
 			AddWatch (wakeupPipes [0], Condition.PollIn, ml => {
-				Syscall.read (wakeupPipes [0], ignore, 1);
+					read (wakeupPipes [0], ignore, (IntPtr) 1);
 				return true;
 			});
 		}
 
 		void Wakeup ()
 		{
-			Syscall.write (wakeupPipes [1], ignore, 1);
+			write (wakeupPipes [1], ignore, (IntPtr) 1);
 		}
 		
 		/// <summary>
@@ -214,24 +231,6 @@ namespace Mono.Terminal {
 			timeouts.RemoveAt (idx);
 		}
 
-		static PollEvents MapCondition (Condition condition)
-		{
-			PollEvents ret = 0;
-			if ((condition & Condition.PollIn) != 0)
-				ret |= PollEvents.POLLIN;
-			if ((condition & Condition.PollOut) != 0)
-				ret |= PollEvents.POLLOUT;
-			if ((condition & Condition.PollPri) != 0)
-				ret |= PollEvents.POLLPRI;
-			if ((condition & Condition.PollErr) != 0)
-				ret |= PollEvents.POLLERR;
-			if ((condition & Condition.PollHup) != 0)
-				ret |= PollEvents.POLLHUP;
-			if ((condition & Condition.PollNval) != 0)
-				ret |= PollEvents.POLLNVAL;
-			return ret;
-		}
-		
 		void UpdatePollMap ()
 		{
 			if (!poll_dirty)
@@ -242,7 +241,7 @@ namespace Mono.Terminal {
 			int i = 0;
 			foreach (var fd in descriptorWatchers.Keys){
 				pollmap [i].fd = fd;
-				pollmap [i].events = MapCondition (descriptorWatchers [fd].Condition);
+				pollmap [i].events = (short) descriptorWatchers [fd].Condition;
 				i++;
 			}
 		}
@@ -310,7 +309,7 @@ namespace Mono.Terminal {
 			
 			UpdatePollMap ();
 
-			n = Syscall.poll (pollmap, (uint) pollmap.Length, pollTimeout);
+			n = poll (pollmap, (uint) pollmap.Length, pollTimeout);
 			int ic;
 			lock (idleHandlers)
 				ic = idleHandlers.Count;

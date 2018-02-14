@@ -61,7 +61,8 @@ namespace Terminal.Gui {
 		///   The size of the button is computed based on the
 		///   text length.   This button is not a default button.
 		/// </remarks>
-		public Button (string s) : this (0, 0, s) { }
+		/// <param name="text">The button's text</param>
+		public Button (string text) : this (0, 0, text) { }
 
 		/// <summary>
 		///   Public constructor, creates a button based on
@@ -72,7 +73,9 @@ namespace Terminal.Gui {
 		///   decoration is used, and the enter key on a
 		///   dialog would implicitly activate this button.
 		/// </remarks>
-		public Button (string s, bool is_default) : this (0, 0, s, is_default) { }
+		/// <param name="text">The button's text</param>
+		/// <param name="is_default">If set, this makes the button the default button in the current view, which means that if the user presses return on a view that does not handle return, it will be treated as if he had clicked on the button</param>
+		public Button (string text, bool is_default) : this (0, 0, text, is_default) { }
 
 		/// <summary>
 		///   Public constructor, creates a button based on
@@ -82,7 +85,10 @@ namespace Terminal.Gui {
 		///   The size of the button is computed based on the
 		///   text length.   This button is not a default button.
 		/// </remarks>
-		public Button (int x, int y, string s) : this (x, y, s, false) { }
+		/// <param name="x">X position where the button will be shown.</param>
+		/// <param name="y">Y position where the button will be shown.</param>
+		/// <param name="text">The button's text</param>
+		public Button (int x, int y, string text) : this (x, y, text, false) { }
 
 		/// <summary>
 		///   The text displayed by this widget.
@@ -128,13 +134,17 @@ namespace Terminal.Gui {
 		///   decoration is used, and the enter key on a
 		///   dialog would implicitly activate this button.
 		/// </remarks>
-		public Button (int x, int y, string s, bool is_default)
-		    : base (new Rect (x, y, s.Length + 4 + (is_default ? 2 : 0), 1))
+		/// <param name="x">X position where the button will be shown.</param>
+		/// <param name="y">Y position where the button will be shown.</param>
+		/// <param name="text">The button's text</param>
+		/// <param name="is_default">If set, this makes the button the default button in the current view, which means that if the user presses return on a view that does not handle return, it will be treated as if he had clicked on the button</param>
+		public Button (int x, int y, string text, bool is_default)
+		    : base (new Rect (x, y, text.Length + 4 + (is_default ? 2 : 0), 1))
 		{
 			CanFocus = true;
 
 			this.IsDefault = is_default;
-			Text = s;
+			Text = text;
 		}
 
 		public override void Redraw (Rect region)
