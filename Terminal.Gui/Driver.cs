@@ -257,7 +257,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="str">String.</param>
 		public abstract void AddStr (ustring str);
-		public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> target, Action<MouseEvent> mouse);
+		public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler);
 
 		/// <summary>
 		/// Updates the screen to reflect all the changes that have been done to the display buffer
@@ -996,8 +996,67 @@ namespace Terminal.Gui {
 			currentAttribute = c.value;
 		}
 
-		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> target, Action<MouseEvent> mouse)
+		Key MapKey (ConsoleKeyInfo keyInfo)
 		{
+			var key = keyInfo.Key;
+			if (key >= ConsoleKey.A && key <= ConsoleKey.Z){
+				var delta = key - ConsoleKey.A;
+				if (keyInfo.Modifiers == ConsoleModifiers.Control)
+					return (Key)((uint)Key.ControlA + delta);
+				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
+					return (Key) (((uint)Key.AltMask) | ((uint)'A' + delta));
+				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
+					return (Key)((uint)'A' + delta);
+				else
+					return (Key)((uint)'a' + delta);
+			}
+			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
+				var delta = key - ConsoleKey.F1;
+
+				return (Key)(ConsoleKey.F1 + delta);
+			}
+
+			switch (keyInfo.Key){
+			case ConsoleKey.Tab:
+				return Key.ControlT;
+			case ConsoleKey.Escape:
+				return Key.Esc;
+			case ConsoleKey.Home:
+				return Key.Home;
+			case ConsoleKey.End:
+				return Key.End;
+			case ConsoleKey.LeftArrow:
+				return Key.CursorLeft;
+			case ConsoleKey.RightArrow:
+				return Key.CursorRight;
+			case ConsoleKey.UpArrow:
+				return Key.CursorUp;
+			case ConsoleKey.DownArrow:
+				return Key.CursorDown;
+			case ConsoleKey.PageUp:
+				return Key.PageUp;
+			case ConsoleKey.PageDown:
+				return Key.PageDown;
+			case ConsoleKey.Enter:
+				return Key.Enter;
+			case ConsoleKey.Spacebar:
+				return Key.Space;
+			case ConsoleKey.Backspace:
+				return Key.Backspace;
+			case ConsoleKey.Delete:
+				return Key.Delete;
+			}
+			return (Key)(0xffffffff);
+		}
+
+		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler)
+		{
+			mainLoop.WindowsKeyPressed = delegate (ConsoleKeyInfo consoleKey) {
+				var map = MapKey (consoleKey);
+				if (map == (Key) 0xffffffff)
+					return;
+				keyHandler (new KeyEvent (map));
+			};
 		}
 
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)

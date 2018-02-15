@@ -28,6 +28,7 @@
 using System.Collections.Generic;
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace Mono.Terminal {
 
@@ -36,6 +37,8 @@ namespace Mono.Terminal {
 	///   file descriptor, run timers and idle handlers.
 	/// </summary>
 	public class MainLoop {
+		static bool useUnix = true;
+
 		/// <summary>
 		///   Condition on which to wake up from file descriptor activity.  These match the Linux/BSD poll definitions.
 		/// </summary>
@@ -168,12 +171,19 @@ namespace Mono.Terminal {
 		{
 			if (callback == null)
 				throw new ArgumentNullException ("callback");
-
+			if (!useUnix)
+				throw new Exception ("AddWatch is only supported for Unix");
+			
 			var watch = new Watch () { Condition = condition, Callback = callback, File = fileDescriptor };
 			descriptorWatchers [fileDescriptor] = watch;
 			poll_dirty = true;
 			return watch;
 		}
+
+		/// <summary>
+		/// This event is raised when a key is pressed when using the Windows driver.
+		/// </summary>
+		public Action<ConsoleKeyInfo> WindowsKeyPressed;
 
 		/// <summary>
 		///   Removes an active watch from the mainloop.
@@ -287,6 +297,18 @@ namespace Mono.Terminal {
 			Wakeup ();
 		}
 
+		AutoResetEvent keyReady = new AutoResetEvent (false);
+		AutoResetEvent waitForProbe = new AutoResetEvent (false);
+		ConsoleKeyInfo? windowsKeyResult = null;
+		void WindowsKeyReader ()
+		{
+			while (true) {
+				waitForProbe.WaitOne ();
+				var result = Console.ReadKey ();
+				keyReady.Set ();
+			}
+		}
+
 		/// <summary>
 		///   Determines whether there are pending events to be processed.
 		/// </summary>
@@ -298,22 +320,29 @@ namespace Mono.Terminal {
 		public bool EventsPending (bool wait = false)
 		{
 			long now = DateTime.UtcNow.Ticks;
-			int pollTimeout, n;
-			if (timeouts.Count > 0)
-				pollTimeout = (int) ((timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-			else
-				pollTimeout = -1;
-			
-			if (!wait)
-				pollTimeout = 0;
-			
-			UpdatePollMap ();
+			if (useUnix) {
+				int pollTimeout, n;
+				if (timeouts.Count > 0)
+					pollTimeout = (int)((timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+				else
+					pollTimeout = -1;
 
-			n = poll (pollmap, (uint) pollmap.Length, pollTimeout);
-			int ic;
-			lock (idleHandlers)
-				ic = idleHandlers.Count;
-			return n > 0 || timeouts.Count > 0 && ((timeouts.Keys [0] - DateTime.UtcNow.Ticks) < 0) || ic > 0;
+				if (!wait)
+					pollTimeout = 0;
+
+				UpdatePollMap ();
+
+				n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
+				int ic;
+				lock (idleHandlers)
+					ic = idleHandlers.Count;
+				return n > 0 || timeouts.Count > 0 && ((timeouts.Keys [0] - DateTime.UtcNow.Ticks) < 0) || ic > 0;
+			} else {
+				windowsKeyResult = null;
+				waitForProbe.Set ();
+				keyReady.WaitOne ();
+				return false;
+			}
 		}
 
 		/// <summary>
@@ -329,18 +358,27 @@ namespace Mono.Terminal {
 		{
 			if (timeouts.Count > 0)
 				RunTimers ();
-			
-			foreach (var p in pollmap){
-				Watch watch;
 
-				if (p.revents == 0)
-					continue;
+			if (useUnix) {
+				foreach (var p in pollmap) {
+					Watch watch;
 
-				if (!descriptorWatchers.TryGetValue (p.fd, out watch))
-					continue;
-				if (!watch.Callback (this))
-					descriptorWatchers.Remove (p.fd);
+					if (p.revents == 0)
+						continue;
+
+					if (!descriptorWatchers.TryGetValue (p.fd, out watch))
+						continue;
+					if (!watch.Callback (this))
+						descriptorWatchers.Remove (p.fd);
+				}
+			} else {
+				if (windowsKeyResult.HasValue) {
+					if (WindowsKeyPressed != null)
+						WindowsKeyPressed (windowsKeyResult.Value);
+					windowsKeyResult = null;
+				}
 			}
+
 			if (idleHandlers.Count > 0)
 				RunIdle ();
 		}
