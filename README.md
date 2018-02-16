@@ -118,7 +118,7 @@ F10, and F1 to F9 respectively.
 
 Currently gui.cs has support for both ncurses and the `System.Console`
 front-ends.  ncurses is used on Unix, while `System.Console` is used
-on Windows, but youc an force the use of `System.Console` on Unix as
+on Windows, but you can force the use of `System.Console` on Unix as
 well, see `Core.cs`.
 
 # Tasks
