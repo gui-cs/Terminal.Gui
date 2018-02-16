@@ -84,6 +84,12 @@ class Demo {
 }
 ```
 
+# Installing it
+
+If you want to try Gui.cs, use NuGet to install the `Terminal.Gui` NuGet package:
+
+https://www.nuget.org/packages/Terminal.Gui/0.1.0
+
 # Running and Building
 
 Open the solution and run the sample program.
