@@ -1264,7 +1264,7 @@ namespace Terminal.Gui {
 				if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
 					UseSystemConsole = true;
 			}
-			UseSystemConsole = true;
+			//UseSystemConsole = true;
 			if (UseSystemConsole)
 				Driver = new NetDriver ();
 			else
