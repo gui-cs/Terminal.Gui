@@ -1,6 +1,7 @@
 # Gui.cs - Terminal UI toolkit for .NET
 
-This is a simple UI toolkit for .NET.
+This is a simple UI toolkit for .NET, .NET Core and Mono and works on
+both Windows and Linux/Unix.
 
 ![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.png)
 
@@ -94,6 +95,9 @@ https://www.nuget.org/packages/Terminal.Gui/0.1.0
 
 Open the solution and run the sample program.
 
+You can find a trivial .NET core sample application in the
+"StandaloneExample" directory.   
+
 # Input Handling
 
 The input handling of gui.cs is similar in some ways to Emacs and the
@@ -112,12 +116,10 @@ F10, and F1 to F9 respectively.
 
 # Driver model
 
-Currently gui.cs is built on top of curses, but the console driver has
-been abstracted, an implementation that uses `System.Console` is
-possible, but would have to emulate some of the behavior of curses,
-namely that operations are performed on the buffer, and the Refresh
-call reflects the contents of an internal buffer into the screen and
-position the cursor in the last set position at the end.
+Currently gui.cs has support for both ncurses and the `System.Console`
+front-ends.  ncurses is used on Unix, while `System.Console` is used
+on Windows, but youc an force the use of `System.Console` on Unix as
+well, see `Core.cs`.
 
 # Tasks
 
