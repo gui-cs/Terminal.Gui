@@ -1,0 +1,10 @@
+language: csharp
+solution: Terminal.sln
+script:
+  - tsh_version=1.4.0-pre1
+  - msbuild /t:Restore $TRAVIS_BUILD_DIR/Terminal.sln
+  - cd $TRAVIS_BUILD_DIR/
+  - msbuild /p:Configuration=Release Terminal.sln
+mono: "5.4.1"
+dotnet: "2.1.4"
+os: "osx"
