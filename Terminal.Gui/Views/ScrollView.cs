@@ -270,6 +270,7 @@ namespace Terminal.Gui {
 				contentView.Frame = new Rect (contentOffset, value);
 				vertical.Size = contentSize.Height;
 				horizontal.Size = contentSize.Width;
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -286,6 +287,7 @@ namespace Terminal.Gui {
 				contentView.Frame = new Rect (contentOffset, contentSize);
 				vertical.Position = Math.Max (0, -contentOffset.Y);
 				horizontal.Position = Math.Max (0, -contentOffset.X);
+				SetNeedsDisplay ();
 			}
 		}
 

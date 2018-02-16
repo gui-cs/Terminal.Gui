@@ -282,7 +282,6 @@ namespace Terminal.Gui {
 						Driver.AddRune (' ');
 				else
 					Source.Render (isSelected, item, 0, row, f.Width);
-
 			}
 		}
 
@@ -361,7 +360,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor()
 		{
-			Driver.Move (0, selected);
+			Move (0, selected-top);
 		}
 
 		public override bool MouseEvent(MouseEvent me)

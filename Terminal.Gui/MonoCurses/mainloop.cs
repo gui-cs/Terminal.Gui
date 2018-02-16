@@ -36,8 +36,12 @@ namespace Mono.Terminal {
 	///   Simple main loop implementation that can be used to monitor
 	///   file descriptor, run timers and idle handlers.
 	/// </summary>
+	/// <remarks>
+	///   Monitoring of file descriptors is only available on Unix, there
+	///   does not seem to be a way of supporting this on Windows.
+	/// </remarks>
 	public class MainLoop {
-		static bool useUnix = true;
+		bool useUnix = true;
 
 		/// <summary>
 		///   Condition on which to wake up from file descriptor activity.  These match the Linux/BSD poll definitions.
@@ -82,7 +86,7 @@ namespace Mono.Terminal {
 		}
 
 		Dictionary <int, Watch> descriptorWatchers = new Dictionary<int,Watch>();
-		SortedList <double, Timeout> timeouts = new SortedList<double,Timeout> ();
+		SortedList <long, Timeout> timeouts = new SortedList<long,Timeout> ();
 		List<Func<bool>> idleHandlers = new List<Func<bool>> ();
 
 		[StructLayout(LayoutKind.Sequential)]
@@ -107,17 +111,27 @@ namespace Mono.Terminal {
 		bool poll_dirty = true;
 		int [] wakeupPipes = new int [2];
 		static IntPtr ignore = Marshal.AllocHGlobal (1);
-		
+
 		/// <summary>
 		///  Default constructor
 		/// </summary>
-		public MainLoop ()
+		public MainLoop () : this (useUnix: true)
 		{
-			pipe (wakeupPipes);
-			AddWatch (wakeupPipes [0], Condition.PollIn, ml => {
-					read (wakeupPipes [0], ignore, (IntPtr) 1);
-				return true;
-			});
+		}
+
+		public MainLoop (bool useUnix)
+		{
+			this.useUnix = useUnix;
+			if (useUnix) {
+				pipe (wakeupPipes);
+				AddWatch (wakeupPipes [0], Condition.PollIn, ml => {
+					read (wakeupPipes [0], ignore, (IntPtr)1);
+					return true;
+				});
+			} else {
+				Thread readThread = new Thread (WindowsKeyReader);
+				readThread.Start ();
+			}
 		}
 
 		void Wakeup ()
@@ -260,7 +274,7 @@ namespace Mono.Terminal {
 		{
 			long now = DateTime.UtcNow.Ticks;
 			var copy = timeouts;
-			timeouts = new SortedList<double,Timeout> ();
+			timeouts = new SortedList<long,Timeout> ();
 			foreach (var k in copy.Keys){
 				var timeout = copy [k];
 				if (k < now) {
@@ -304,7 +318,7 @@ namespace Mono.Terminal {
 		{
 			while (true) {
 				waitForProbe.WaitOne ();
-				var result = Console.ReadKey ();
+				windowsKeyResult = Console.ReadKey ();
 				keyReady.Set ();
 			}
 		}
@@ -322,9 +336,12 @@ namespace Mono.Terminal {
 			long now = DateTime.UtcNow.Ticks;
 			if (useUnix) {
 				int pollTimeout, n;
-				if (timeouts.Count > 0)
+				if (timeouts.Count > 0){
 					pollTimeout = (int)((timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-				else
+					if (pollTimeout < 0)
+						return true;
+
+				} else
 					pollTimeout = -1;
 
 				if (!wait)
@@ -338,10 +355,21 @@ namespace Mono.Terminal {
 					ic = idleHandlers.Count;
 				return n > 0 || timeouts.Count > 0 && ((timeouts.Keys [0] - DateTime.UtcNow.Ticks) < 0) || ic > 0;
 			} else {
+				int waitTimeout;
+				if (timeouts.Count > 0){
+					waitTimeout = (int)((timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+					if (waitTimeout < 0)
+						return true;
+				} else
+					waitTimeout = -1;
+
+				if (!wait)
+					waitTimeout = 0;
+				
 				windowsKeyResult = null;
 				waitForProbe.Set ();
-				keyReady.WaitOne ();
-				return false;
+				keyReady.WaitOne (waitTimeout);
+				return windowsKeyResult.HasValue;
 			}
 		}
 

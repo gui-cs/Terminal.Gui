@@ -1264,14 +1264,13 @@ namespace Terminal.Gui {
 				if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
 					UseSystemConsole = true;
 			}
-			if (UseSystemConsole){
-				Console.WriteLine ("WARNING: This version currently does not support data input yet, working on it");
-				Console.ReadLine ();
+			UseSystemConsole = true;
+			if (UseSystemConsole)
 				Driver = new NetDriver ();
-			} else
+			else
 				Driver = new CursesDriver ();
 			Driver.Init (TerminalResized);
-			MainLoop = new Mono.Terminal.MainLoop ();
+			MainLoop = new Mono.Terminal.MainLoop (Driver is CursesDriver);
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			Top = Toplevel.Create ();
 			Current = Top;

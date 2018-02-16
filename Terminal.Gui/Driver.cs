@@ -834,21 +834,40 @@ namespace Terminal.Gui {
 			UpdateOffscreen ();
 		}
 
+		bool needMove;
 		// Current row, and current col, tracked by Move/AddCh only
 		int ccol, crow;
 		public override void Move (int col, int row)
 		{
 			ccol = col;
 			crow = row;
+
+			if (Clip.Contains (col, row)) {
+				Console.CursorTop = row;
+				Console.CursorLeft = col;
+				needMove = false;
+			} else {
+				Console.CursorTop = Clip.Y;
+				Console.CursorLeft = Clip.X;
+				needMove = true;
+			}
+
 		}
 
 		public override void AddRune (Rune rune)
 		{
 			if (Clip.Contains (ccol, crow)) {
-				contents [crow, ccol, 0] = (int) (uint) rune;
+				if (needMove) {
+					Console.CursorLeft = ccol;
+					Console.CursorTop = crow;
+					needMove = false;
+				}
+				contents [crow, ccol, 0] = (int)(uint)rune;
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
-			}
+				dirtyLine [crow] = true;
+			} else
+				needMove = true;
 			ccol++;
 			if (ccol == Cols) {
 				ccol = 0;
@@ -956,6 +975,8 @@ namespace Terminal.Gui {
 			int rows = Rows;
 			int cols = Cols;
 
+			var savedRow = Console.CursorTop;
+			var savedCol = Console.CursorLeft;
 			for (int row = 0; row < rows; row++) {
 				if (!dirtyLine [row])
 					continue;
@@ -976,6 +997,8 @@ namespace Terminal.Gui {
 					}
 				}
 			}
+			Console.CursorTop = savedRow;
+			Console.CursorLeft = savedCol;
 		}
 
 		public override void StartReportingMouseMoves()
@@ -998,27 +1021,9 @@ namespace Terminal.Gui {
 
 		Key MapKey (ConsoleKeyInfo keyInfo)
 		{
-			var key = keyInfo.Key;
-			if (key >= ConsoleKey.A && key <= ConsoleKey.Z){
-				var delta = key - ConsoleKey.A;
-				if (keyInfo.Modifiers == ConsoleModifiers.Control)
-					return (Key)((uint)Key.ControlA + delta);
-				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
-					return (Key) (((uint)Key.AltMask) | ((uint)'A' + delta));
-				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
-					return (Key)((uint)'A' + delta);
-				else
-					return (Key)((uint)'a' + delta);
-			}
-			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
-				var delta = key - ConsoleKey.F1;
-
-				return (Key)(ConsoleKey.F1 + delta);
-			}
-
-			switch (keyInfo.Key){
+			switch (keyInfo.Key) {
 			case ConsoleKey.Tab:
-				return Key.ControlT;
+				return Key.Tab;
 			case ConsoleKey.Escape:
 				return Key.Esc;
 			case ConsoleKey.Home:
@@ -1046,6 +1051,25 @@ namespace Terminal.Gui {
 			case ConsoleKey.Delete:
 				return Key.Delete;
 			}
+
+			var key = keyInfo.Key;
+			if (key >= ConsoleKey.A && key <= ConsoleKey.Z){
+				var delta = key - ConsoleKey.A;
+				if (keyInfo.Modifiers == ConsoleModifiers.Control)
+					return (Key)((uint)Key.ControlA + delta);
+				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
+					return (Key) (((uint)Key.AltMask) | ((uint)'A' + delta));
+				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
+					return (Key)((uint)'A' + delta);
+				else
+					return (Key)((uint)'a' + delta);
+			}
+			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
+				var delta = key - ConsoleKey.F1;
+
+				return (Key)(ConsoleKey.F1 + delta);
+			}
+
 			return (Key)(0xffffffff);
 		}
 
