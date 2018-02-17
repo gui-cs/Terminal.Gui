@@ -10,7 +10,7 @@
   <PropertyGroup>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <PackageId>Terminal.Gui</PackageId>
-    <PackageVersion>0.24</PackageVersion>
+    <PackageVersion>0.25</PackageVersion>
     <Authors>Miguel de Icaza</Authors>
     <PackageLicenseUrl>https://github.com/migueldeicaza/gui.cs/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/migueldeicaza/gui.cs/</PackageProjectUrl>
@@ -69,14 +69,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Dialogs\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="NStack">
-      <HintPath>..\..\..\Users\miguel\.nuget\packages\nstack.core\0.11.0\lib\netstandard1.5\NStack.dll</HintPath>
-    </Reference>
-    <Reference Include="NStack">
-      <HintPath>..\..\..\Users\miguel\.nuget\packages\nstack.core\0.11.0\lib\netstandard1.5\NStack.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Remove="Drivers\#ConsoleDriver.cs#" />
