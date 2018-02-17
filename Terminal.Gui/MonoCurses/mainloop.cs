@@ -318,7 +318,7 @@ namespace Mono.Terminal {
 		{
 			while (true) {
 				waitForProbe.WaitOne ();
-				windowsKeyResult = Console.ReadKey ();
+				windowsKeyResult = Console.ReadKey (true);
 				keyReady.Set ();
 			}
 		}
