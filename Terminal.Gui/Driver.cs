@@ -1022,10 +1022,10 @@ namespace Terminal.Gui {
 		Key MapKey (ConsoleKeyInfo keyInfo)
 		{
 			switch (keyInfo.Key) {
-			case ConsoleKey.Tab:
-				return Key.Tab;
 			case ConsoleKey.Escape:
 				return Key.Esc;
+			case ConsoleKey.Tab:
+				return Key.Tab;
 			case ConsoleKey.Home:
 				return Key.Home;
 			case ConsoleKey.End:
@@ -1067,7 +1067,7 @@ namespace Terminal.Gui {
 			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
 				var delta = key - ConsoleKey.F1;
 
-				return (Key)(ConsoleKey.F1 + delta);
+				return (Key)((int) Key.F1 + delta);
 			}
 
 			return (Key)(0xffffffff);
