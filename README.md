@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/migueldeicaza/gui.cs?branch=master)](https://travis-ci.org/migueldeicaza/gui.cs)
 # Gui.cs - Terminal UI toolkit for .NET
 
 This is a simple UI toolkit for .NET, .NET Core and Mono and works on
