@@ -88,7 +88,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public override bool ProcessHotKey (KeyEvent kb)
+		public override bool ProcessColdKey (KeyEvent kb)
 		{
 			var key = kb.KeyValue;
 			if (key < Char.MaxValue && Char.IsLetterOrDigit ((char)key)) {
