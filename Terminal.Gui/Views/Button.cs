@@ -62,7 +62,7 @@ namespace Terminal.Gui {
 		///   text length.   This button is not a default button.
 		/// </remarks>
 		/// <param name="text">The button's text</param>
-		public Button (string text) : this (0, 0, text) { }
+		public Button (ustring text) : this (0, 0, text) { }
 
 		/// <summary>
 		///   Public constructor, creates a button based on
@@ -75,7 +75,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		/// <param name="text">The button's text</param>
 		/// <param name="is_default">If set, this makes the button the default button in the current view, which means that if the user presses return on a view that does not handle return, it will be treated as if he had clicked on the button</param>
-		public Button (string text, bool is_default) : this (0, 0, text, is_default) { }
+		public Button (ustring text, bool is_default) : this (0, 0, text, is_default) { }
 
 		/// <summary>
 		///   Public constructor, creates a button based on
@@ -88,7 +88,7 @@ namespace Terminal.Gui {
 		/// <param name="x">X position where the button will be shown.</param>
 		/// <param name="y">Y position where the button will be shown.</param>
 		/// <param name="text">The button's text</param>
-		public Button (int x, int y, string text) : this (x, y, text, false) { }
+		public Button (int x, int y, ustring text) : this (x, y, text, false) { }
 
 		/// <summary>
 		///   The text displayed by this widget.
@@ -138,7 +138,7 @@ namespace Terminal.Gui {
 		/// <param name="y">Y position where the button will be shown.</param>
 		/// <param name="text">The button's text</param>
 		/// <param name="is_default">If set, this makes the button the default button in the current view, which means that if the user presses return on a view that does not handle return, it will be treated as if he had clicked on the button</param>
-		public Button (int x, int y, string text, bool is_default)
+		public Button (int x, int y, ustring text, bool is_default)
 		    : base (new Rect (x, y, text.Length + 4 + (is_default ? 2 : 0), 1))
 		{
 			CanFocus = true;

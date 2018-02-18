@@ -268,7 +268,16 @@ namespace Terminal.Gui {
 		/// Ends the execution of the console driver.
 		/// </summary>
 		public abstract void End ();
-		public abstract void RedrawTop ();
+
+		/// <summary>
+		/// Redraws the physical screen with the contents that have been queued up via any of the printing commands.
+		/// </summary>
+		public abstract void UpdateScreen ();
+
+		/// <summary>
+		/// Selects the specified attribute as the attribute to use for future calls to AddRune, AddString.
+		/// </summary>
+		/// <param name="c">C.</param>
 		public abstract void SetAttribute (Attribute c);
 
 		// Set Colors from limit sets of colors
@@ -284,6 +293,12 @@ namespace Terminal.Gui {
 		/// <param name="backgroundColorId">Background color identifier.</param>
 		public abstract void SetColors (short foregroundColorId, short backgroundColorId);
 
+		/// <summary>
+		/// Draws a frame on the specified region with the specified padding around the frame.
+		/// </summary>
+		/// <param name="region">Region where the frame will be drawn..</param>
+		/// <param name="padding">Padding to add on the sides.</param>
+		/// <param name="fill">If set to <c>true</c> it will clear the contents with the current color, otherwise the contents will be left untouched.</param>
 		public virtual void DrawFrame (Rect region, int padding, bool fill)
 		{
 			int width = region.Width;
@@ -481,7 +496,7 @@ namespace Terminal.Gui {
 
 		public override void Refresh () => Curses.refresh ();
 		public override void End () => Curses.endwin ();
-		public override void RedrawTop () => window.redrawwin ();
+		public override void UpdateScreen () => window.redrawwin ();
 		public override void SetAttribute (Attribute c) => Curses.attrset (c.value);
 		public Curses.Window window;
 
@@ -875,7 +890,7 @@ namespace Terminal.Gui {
 					crow++;
 			}
 			if (sync)
-				RedrawTop ();
+				UpdateScreen ();
 		}
 
 		public override void AddStr (ustring str)
@@ -951,7 +966,7 @@ namespace Terminal.Gui {
 			Console.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
 		}
 
-		public override void RedrawTop ()
+		public override void UpdateScreen ()
 		{
 			int rows = Rows;
 			int cols = Cols;

@@ -18,7 +18,6 @@ namespace Terminal.Gui {
 	public class ProgressBar : View {
 		bool isActivity;
 		int activityPos, delta;
-		float progress;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.ProgressBar"/> class, starts in percentage mode.
@@ -27,7 +26,7 @@ namespace Terminal.Gui {
 		public ProgressBar (Rect rect) : base (rect)
 		{
 			CanFocus = false;
-			progress = 0;
+			fraction = 0;
 		}
 
 		float fraction;

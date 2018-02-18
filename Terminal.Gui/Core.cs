@@ -1289,9 +1289,9 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// Releases all resource used by the <see cref="T:Terminal.Gui.Application.RunState"/> object.
 			/// </summary>
-			/// <remarks>Call <see cref="Dispose"/> when you are finished using the <see cref="T:Terminal.Gui.Application.RunState"/>. The
-			/// <see cref="Dispose"/> method leaves the <see cref="T:Terminal.Gui.Application.RunState"/> in an unusable state. After
-			/// calling <see cref="Dispose"/>, you must release all references to the
+			/// <remarks>Call <see cref="Dispose()"/> when you are finished using the <see cref="T:Terminal.Gui.Application.RunState"/>. The
+			/// <see cref="Dispose()"/> method leaves the <see cref="T:Terminal.Gui.Application.RunState"/> in an unusable state. After
+			/// calling <see cref="Dispose()"/>, you must release all references to the
 			/// <see cref="T:Terminal.Gui.Application.RunState"/> so the garbage collector can reclaim the memory that the
 			/// <see cref="T:Terminal.Gui.Application.RunState"/> was occupying.</remarks>
 			public void Dispose ()
@@ -1305,7 +1305,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <returns>The dispose.</returns>
 			/// <param name="disposing">If set to <c>true</c> disposing.</param>
-			public virtual void Dispose (bool disposing)
+			protected virtual void Dispose (bool disposing)
 			{
 				if (Toplevel != null) {
 					Application.End (Toplevel);
@@ -1417,6 +1417,19 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Building block API: Prepares the provided toplevel for execution.
+		/// </summary>
+		/// <returns>The runstate handle that needs to be passed to the End() method upon completion.</returns>
+		/// <param name="toplevel">Toplevel to prepare execution for.</param>
+		/// <remarks>
+		///  This method prepares the provided toplevel for running with the focus,
+		///  it adds this to the list of toplevels, sets up the mainloop to process the 
+		///  event, lays out the subviews, focuses the first element, and draws the
+		///  toplevel in the screen.   This is usually followed by executing
+		///  the <see cref="RunLoop"/> method, and then the <see cref="End(RunState)"/> method upon termination which will
+		///   undo these changes.
+		/// </remarks>
 		static public RunState Begin (Toplevel toplevel)
 		{
 			if (toplevel == null)
@@ -1436,12 +1449,16 @@ namespace Terminal.Gui {
 			return rs;
 		}
 
-		static public void End (RunState rs)
+		/// <summary>
+		/// Building block API: completes the exection of a Toplevel that was started with Begin.
+		/// </summary>
+		/// <param name="runState">The runstate returned by the <see cref="Begin(Toplevel)"/> method.</param>
+		static public void End (RunState runState)
 		{
-			if (rs == null)
-				throw new ArgumentNullException (nameof (rs));
+			if (runState == null)
+				throw new ArgumentNullException (nameof (runState));
 
-			rs.Dispose ();
+			runState.Dispose ();
 		}
 
 		static void Shutdown ()
@@ -1466,7 +1483,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void Refresh ()
 		{
-			Driver.RedrawTop ();
+			Driver.UpdateScreen ();
 			View last = null;
 			foreach (var v in toplevels.Reverse ()) {
 				v.SetNeedsDisplay ();
@@ -1491,12 +1508,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Runs the main loop for the created dialog
+		///   Building block API: Runs the main loop for the created dialog
 		/// </summary>
 		/// <remarks>
 		///   Use the wait parameter to control whether this is a
-		///   blocking or non-blocking call.
+		///   blocking or non-blocking call.   
 		/// </remarks>
+		/// <param name="state">The state returned by the Begin method.</param>
+		/// <param name="wait">By default this is true which will execute the runloop waiting for events, if you pass false, you can use this method to run a single iteration of the events.</param>
 		public static void RunLoop (RunState state, bool wait = true)
 		{
 			if (state == null)
@@ -1552,6 +1571,17 @@ namespace Terminal.Gui {
 		///   <para>
 		///     To make a toplevel stop execution, set the "Running"
 		///     property to false.
+		///   </para>
+		///   <para>
+		///     This is equivalent to calling Begin on the toplevel view, followed by RunLoop with the
+		///     returned value, and then calling end on the return value.
+		///   </para>
+		///   <para>
+		///     Alternatively, if your program needs to control the main loop and needs to 
+		///     process events manually, you can invoke Begin to set things up manually and then
+		///     repeatedly call RunLoop with the wait parameter set to false.   By doing this
+		///     the RunLoop method will only process any pending events, timers, idle handlers and
+		///     then return control immediately.
 		///   </para>
 		/// </remarks>
 		public static void Run (Toplevel view)
