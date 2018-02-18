@@ -213,3 +213,15 @@ package version has been updated on the
 Terminal.Gui/Terminal.Gui.csproj, and push.
 
 Then once the package is built, VSTS will request an approval.
+
+
+# Known Issues
+
+There is a [known issue](https://github.com/NuGet/Home/issues/4837) that causes the
+referenced package assemblies to be missing from the output directory of your console 
+apps and therefore fail at run-time. In order to force the copying, you can add the 
+following property to your console project:
+
+```xml
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+```
