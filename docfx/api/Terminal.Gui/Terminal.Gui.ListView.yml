@@ -25,6 +25,7 @@ items:
   - Terminal.Gui
   namespace: Terminal.Gui
   summary: ListView widget renders a list of data.
+  remarks: "<p>\n              The ListView displays lists of data and allows the user to scroll through the data\n              and optionally mark elements of the list (controlled by the AllowsMark property).  \n            </p>\n    <p>\n              The ListView can either render an arbitrary IList object (for example, arrays, List<T>\n              and other collections) which are drawn by drawing the string/ustring contents or the \n              result of calling ToString().   Alternatively, you can provide you own IListDataSource\n              object that gives you full control of what is rendered.\n            </p>\n    <p>\n              The ListView can display any object that implements the System.Collection.IList interface,\n              string values are converted into ustring values before rendering, and other values are\n              converted into ustrings by calling ToString() and then converting to ustring.\n            </p>\n    <p>\n              If you must change the contents of the ListView, set the Source property (when you are\n              providing your own rendering via the IListDataSource implementation) or call SetSource\n              when you are providing an IList.\n            </p>"
   syntax:
     content: 'public class ListView : Terminal.Gui.View'
   inheritance:

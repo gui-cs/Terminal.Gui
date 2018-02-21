@@ -13,7 +13,28 @@
     <summary>
             ListView widget renders a list of data.
             </summary>
-    <remarks>To be added.</remarks>
+    <remarks>
+      <para>
+              The ListView displays lists of data and allows the user to scroll through the data
+              and optionally mark elements of the list (controlled by the AllowsMark property).  
+            </para>
+      <para>
+              The ListView can either render an arbitrary IList object (for example, arrays, List&lt;T&gt;
+              and other collections) which are drawn by drawing the string/ustring contents or the 
+              result of calling ToString().   Alternatively, you can provide you own IListDataSource
+              object that gives you full control of what is rendered.
+            </para>
+      <para>
+              The ListView can display any object that implements the System.Collection.IList interface,
+              string values are converted into ustring values before rendering, and other values are
+              converted into ustrings by calling ToString() and then converting to ustring.
+            </para>
+      <para>
+              If you must change the contents of the ListView, set the Source property (when you are
+              providing your own rendering via the IListDataSource implementation) or call SetSource
+              when you are providing an IList.
+            </para>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">

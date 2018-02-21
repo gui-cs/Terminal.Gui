@@ -154,7 +154,7 @@ items:
   - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
-    content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
+    content: public override bool ProcessKey (Terminal.Gui.KeyEvent keyEvent);
     parameters:
     - id: kb
       type: Terminal.Gui.KeyEvent

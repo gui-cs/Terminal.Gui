@@ -282,18 +282,19 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Draws a frame on the specified region with the specified padding around the frame.
   syntax:
     content: public virtual void DrawFrame (Terminal.Gui.Rect region, int padding, bool fill);
     parameters:
     - id: region
       type: Terminal.Gui.Rect
-      description: To be added.
+      description: Region where the frame will be drawn..
     - id: padding
       type: System.Int32
-      description: To be added.
+      description: Padding to add on the sides.
     - id: fill
       type: System.Boolean
-      description: To be added.
+      description: If set to <code>true</code> it will clear the contents with the current color, otherwise the contents will be left untouched.
   overload: Terminal.Gui.ConsoleDriver.DrawFrame*
   exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.End
@@ -547,12 +548,13 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Selects the specified attribute as the attribute to use for future calls to AddRune, AddString.
   syntax:
     content: public abstract void SetAttribute (Terminal.Gui.Attribute c);
     parameters:
     - id: c
       type: Terminal.Gui.Attribute
-      description: To be added.
+      description: C.
   overload: Terminal.Gui.ConsoleDriver.SetAttribute*
   exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)

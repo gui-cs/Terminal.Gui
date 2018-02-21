@@ -816,7 +816,7 @@ items:
   - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
-    content: public override bool ProcessColdKey (Terminal.Gui.KeyEvent kb);
+    content: public override bool ProcessColdKey (Terminal.Gui.KeyEvent keyEvent);
     parameters:
     - id: kb
       type: Terminal.Gui.KeyEvent
@@ -839,7 +839,7 @@ items:
   - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
-    content: public override bool ProcessHotKey (Terminal.Gui.KeyEvent kb);
+    content: public override bool ProcessHotKey (Terminal.Gui.KeyEvent keyEvent);
     parameters:
     - id: kb
       type: Terminal.Gui.KeyEvent
@@ -862,7 +862,7 @@ items:
   - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
-    content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
+    content: public override bool ProcessKey (Terminal.Gui.KeyEvent keyEvent);
     parameters:
     - id: kb
       type: Terminal.Gui.KeyEvent

@@ -153,7 +153,7 @@ items:
   namespace: Terminal.Gui
   summary: Removes a widget from this container.
   syntax:
-    content: public virtual void Remove (Terminal.Gui.View view);
+    content: public override void Remove (Terminal.Gui.View view);
     parameters:
     - id: view
       type: Terminal.Gui.View

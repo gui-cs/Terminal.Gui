@@ -27,6 +27,9 @@ items:
   summary: >-
     Simple main loop implementation that can be used to monitor
                   file descriptor, run timers and idle handlers.
+  remarks: >-
+    Monitoring of file descriptors is only available on Unix, there
+                  does not seem to be a way of supporting this on Windows.
   syntax:
     content: public class MainLoop
   inheritance:

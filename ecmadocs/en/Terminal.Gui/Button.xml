@@ -28,8 +28,8 @@
   </Docs>
   <Members>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public Button (string s);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string s) cil managed" />
+      <MemberSignature Language="C#" Value="public Button (string text);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string text) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -38,7 +38,7 @@
         <Parameter Name="s" Type="System.String" />
       </Parameters>
       <Docs>
-        <param name="s">To be added.</param>
+        <param name="text">To be added.</param>
         <summary>
               Public constructor, creates a button based on
               the given text at position 0,0
@@ -50,8 +50,8 @@
       </Docs>
     </Member>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public Button (string s, bool is_default);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string s, bool is_default) cil managed" />
+      <MemberSignature Language="C#" Value="public Button (string text, bool is_default);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string text, bool is_default) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -61,7 +61,7 @@
         <Parameter Name="is_default" Type="System.Boolean" />
       </Parameters>
       <Docs>
-        <param name="s">To be added.</param>
+        <param name="text">To be added.</param>
         <param name="is_default">To be added.</param>
         <summary>
               Public constructor, creates a button based on
@@ -75,8 +75,8 @@
       </Docs>
     </Member>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public Button (int x, int y, string s);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, string s) cil managed" />
+      <MemberSignature Language="C#" Value="public Button (int x, int y, string text);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, string text) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -89,7 +89,7 @@
       <Docs>
         <param name="x">To be added.</param>
         <param name="y">To be added.</param>
-        <param name="s">To be added.</param>
+        <param name="text">To be added.</param>
         <summary>
               Public constructor, creates a button based on
               the given text at the given position.
@@ -101,8 +101,8 @@
       </Docs>
     </Member>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public Button (int x, int y, string s, bool is_default);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, string s, bool is_default) cil managed" />
+      <MemberSignature Language="C#" Value="public Button (int x, int y, string text, bool is_default);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, string text, bool is_default) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -116,7 +116,7 @@
       <Docs>
         <param name="x">To be added.</param>
         <param name="y">To be added.</param>
-        <param name="s">To be added.</param>
+        <param name="text">To be added.</param>
         <param name="is_default">To be added.</param>
         <summary>
               Public constructor, creates a button based on

@@ -229,10 +229,12 @@
         <Parameter Name="fill" Type="System.Boolean" />
       </Parameters>
       <Docs>
-        <param name="region">To be added.</param>
-        <param name="padding">To be added.</param>
-        <param name="fill">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="region">Region where the frame will be drawn..</param>
+        <param name="padding">Padding to add on the sides.</param>
+        <param name="fill">If set to <c>true</c> it will clear the contents with the current color, otherwise the contents will be left untouched.</param>
+        <summary>
+            Draws a frame on the specified region with the specified padding around the frame.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -472,8 +474,10 @@
         <Parameter Name="c" Type="Terminal.Gui.Attribute" />
       </Parameters>
       <Docs>
-        <param name="c">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="c">C.</param>
+        <summary>
+            Selects the specified attribute as the attribute to use for future calls to AddRune, AddString.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

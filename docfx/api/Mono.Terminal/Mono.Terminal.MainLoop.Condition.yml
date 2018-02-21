@@ -18,7 +18,7 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Mono.Terminal
-  summary: Condition on which to wake up from file descriptor activity
+  summary: Condition on which to wake up from file descriptor activity.  These match the Linux/BSD poll definitions.
   syntax:
     content: >-
       [System.Flags]

@@ -741,8 +741,8 @@
       </Docs>
     </Member>
     <Member MemberName="ProcessColdKey">
-      <MemberSignature Language="C#" Value="public override bool ProcessColdKey (Terminal.Gui.KeyEvent kb);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessColdKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
+      <MemberSignature Language="C#" Value="public override bool ProcessColdKey (Terminal.Gui.KeyEvent keyEvent);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessColdKey(valuetype Terminal.Gui.KeyEvent keyEvent) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -754,15 +754,15 @@
         <Parameter Name="kb" Type="Terminal.Gui.KeyEvent" />
       </Parameters>
       <Docs>
-        <param name="kb">To be added.</param>
+        <param name="keyEvent">Contains the details about the key that produced the event.</param>
         <summary>To be added.</summary>
         <returns>To be added.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
     <Member MemberName="ProcessHotKey">
-      <MemberSignature Language="C#" Value="public override bool ProcessHotKey (Terminal.Gui.KeyEvent kb);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessHotKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
+      <MemberSignature Language="C#" Value="public override bool ProcessHotKey (Terminal.Gui.KeyEvent keyEvent);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessHotKey(valuetype Terminal.Gui.KeyEvent keyEvent) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -774,15 +774,15 @@
         <Parameter Name="kb" Type="Terminal.Gui.KeyEvent" />
       </Parameters>
       <Docs>
-        <param name="kb">To be added.</param>
+        <param name="keyEvent">Contains the details about the key that produced the event.</param>
         <summary>To be added.</summary>
         <returns>To be added.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
     <Member MemberName="ProcessKey">
-      <MemberSignature Language="C#" Value="public override bool ProcessKey (Terminal.Gui.KeyEvent kb);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
+      <MemberSignature Language="C#" Value="public override bool ProcessKey (Terminal.Gui.KeyEvent keyEvent);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessKey(valuetype Terminal.Gui.KeyEvent keyEvent) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -794,7 +794,7 @@
         <Parameter Name="kb" Type="Terminal.Gui.KeyEvent" />
       </Parameters>
       <Docs>
-        <param name="kb">To be added.</param>
+        <param name="keyEvent">Contains the details about the key that produced the event.</param>
         <summary>To be added.</summary>
         <returns>To be added.</returns>
         <remarks>To be added.</remarks>

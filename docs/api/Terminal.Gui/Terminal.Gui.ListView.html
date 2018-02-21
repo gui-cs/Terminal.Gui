@@ -226,6 +226,26 @@
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class ListView : Terminal.Gui.View</code></pre>
   </div>
+  <h5 id="Terminal_Gui_ListView_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks"><p>
+              The ListView displays lists of data and allows the user to scroll through the data
+              and optionally mark elements of the list (controlled by the AllowsMark property).<br>            </p>
+    <p>
+              The ListView can either render an arbitrary IList object (for example, arrays, List<t>
+              and other collections) which are drawn by drawing the string/ustring contents or the 
+              result of calling ToString().   Alternatively, you can provide you own IListDataSource
+              object that gives you full control of what is rendered.
+            <p>
+    <p>
+              The ListView can display any object that implements the System.Collection.IList interface,
+              string values are converted into ustring values before rendering, and other values are
+              converted into ustrings by calling ToString() and then converting to ustring.
+            </p>
+    <p>
+              If you must change the contents of the ListView, set the Source property (when you are
+              providing your own rendering via the IListDataSource implementation) or call SetSource
+              when you are providing an IList.
+            </p></t></div>
   <h3 id="constructors">Constructors
   </h3>
   

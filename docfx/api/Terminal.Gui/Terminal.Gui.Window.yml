@@ -209,7 +209,7 @@ items:
   - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
-    content: public override bool MouseEvent (Terminal.Gui.MouseEvent me);
+    content: public override bool MouseEvent (Terminal.Gui.MouseEvent mouseEvent);
     parameters:
     - id: me
       type: Terminal.Gui.MouseEvent
@@ -253,7 +253,7 @@ items:
   namespace: Terminal.Gui
   summary: Removes a widget from this container.
   syntax:
-    content: public virtual void Remove (Terminal.Gui.View view);
+    content: public override void Remove (Terminal.Gui.View view);
     parameters:
     - id: view
       type: Terminal.Gui.View
