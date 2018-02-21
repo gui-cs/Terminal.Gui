@@ -901,7 +901,8 @@ namespace Terminal.Gui {
 
 		public override void End ()
 		{
-
+			Console.ResetColor ();
+			Console.Clear ();
 		}
 
 		static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
