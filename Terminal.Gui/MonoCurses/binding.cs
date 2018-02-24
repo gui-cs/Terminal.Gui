@@ -52,10 +52,23 @@ namespace Unix.Terminal {
 
 		static void FindNCurses ()
 		{
-			if (File.Exists ("/usr/lib/libncurses.dylib"))
-				curses_handle = dlopen ("libncurses.dylib", 1);
-			else
-				curses_handle = dlopen ("libncurses.so", 1);
+			try {
+				if (File.Exists ("/usr/lib/libncurses.dylib"))
+					curses_handle = dlopen ("libncurses.dylib", 1);
+				else
+					curses_handle = dlopen ("libncurses.so", 1);
+			} catch (DllNotFoundException) {
+				uselibc = true;
+				if (File.Exists ("/usr/lib/libncurses.dylib"))
+					curses_handle = libc_dlopen ("libncurses.dylib", 1);
+				else {
+					curses_handle = libc_dlopen ("libncurses.so", 1);
+					if (curses_handle == IntPtr.Zero) {
+						Console.WriteLine ("It is not possible to open libncurses.so, you might need to symlink libncurses.so.5 to libncurses.so");
+						Environment.Exit (1);
+					}
+				}
+			}
 			
 			if (curses_handle == IntPtr.Zero)
 				throw new Exception ("Could not dlopen ncurses");
@@ -320,11 +333,20 @@ namespace Unix.Terminal {
 		[DllImport ("dl")]
 		extern static IntPtr dlsym (IntPtr handle, string symbol);
 
+		[DllImport ("libc", EntryPoint="dlopen")]
+		extern static IntPtr libc_dlopen (string file, int mode);
+
+		[DllImport ("libc", EntryPoint ="dlsym")]
+		extern static IntPtr libc_dlsym (IntPtr handle, string symbol);
+
+		static bool uselibc;
+
 		static IntPtr stdscr;
 
 		static IntPtr get_ptr (string key)
 		{
-			var ptr = dlsym (curses_handle, key);
+			var ptr = uselibc ? libc_dlsym (curses_handle, key) : dlsym (curses_handle, key);
+
 			if (ptr == IntPtr.Zero)
 				throw new Exception ("Could not load the key " + key);
 			return ptr;
