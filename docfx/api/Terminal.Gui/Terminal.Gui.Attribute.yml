@@ -37,8 +37,9 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Initializes a new instance of the <xref href="Terminal.Gui.Attribute"></xref> struct.
   syntax:
-    content: public Attribute (int v);
+    content: public Attribute (int value);
     parameters:
     - id: v
       type: System.Int32

@@ -88,9 +88,6 @@
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_CanFocus">Responder.CanFocus</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">View.Add(View)</a>
     </div>
     <div>
@@ -184,19 +181,10 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_PositionCursor">View.PositionCursor()</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_">View.ProcessColdKey(KeyEvent)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Remove_Terminal_Gui_View_">View.Remove(View)</a>
@@ -238,17 +226,38 @@
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class ListView : Terminal.Gui.View</code></pre>
   </div>
+  <h5 id="Terminal_Gui_ListView_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks"><p>
+              The ListView displays lists of data and allows the user to scroll through the data
+              and optionally mark elements of the list (controlled by the AllowsMark property).<br>            </p>
+    <p>
+              The ListView can either render an arbitrary IList object (for example, arrays, List<t>
+              and other collections) which are drawn by drawing the string/ustring contents or the 
+              result of calling ToString().   Alternatively, you can provide you own IListDataSource
+              object that gives you full control of what is rendered.
+            <p>
+    <p>
+              The ListView can display any object that implements the System.Collection.IList interface,
+              string values are converted into ustring values before rendering, and other values are
+              converted into ustrings by calling ToString() and then converting to ustring.
+            </p>
+    <p>
+              If you must change the contents of the ListView, set the Source property (when you are
+              providing your own rendering via the IListDataSource implementation) or call SetSource
+              when you are providing an IList.
+            </p></t></div>
   <h3 id="constructors">Constructors
   </h3>
   
   
   <a id="Terminal_Gui_ListView__ctor_" data-uid="Terminal.Gui.ListView.#ctor*"></a>
-  <h4 id="Terminal_Gui_ListView__ctor_Terminal_Gui_Rect_Terminal_Gui_IListDataSource_System_ValueTuple_NStack_ustring_System_Int32____" data-uid="Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource,System.ValueTuple{NStack.ustring,System.Int32}[])">ListView(Rect, IListDataSource, ValueTuple&lt;ustring,Int32&gt;[])</h4>
-  <div class="markdown level1 summary"></div>
+  <h4 id="Terminal_Gui_ListView__ctor_Terminal_Gui_Rect_System_Collections_IList_" data-uid="Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,System.Collections.IList)">ListView(Rect, IList)</h4>
+  <div class="markdown level1 summary"><p>Initializes a new ListView that will display the contents of the object implementing the IList interface.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ListView (Terminal.Gui.Rect rect, Terminal.Gui.IListDataSource source, ValueTuple&lt;NStack.ustring,int&gt;[] headers = null);</code></pre>
+    <pre><code class="lang-csharp hljs">public ListView (Terminal.Gui.Rect rect, System.Collections.IList source);</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -263,18 +272,345 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">rect</span></td>
-        <td><p>To be added.</p>
+        <td><p>Frame for the listview.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Collections.IList</span></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>An IList data source, if the elements of the IList are strings or ustrings, the string is rendered, otherwise the ToString() method is invoked on the result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ListView__ctor_" data-uid="Terminal.Gui.ListView.#ctor*"></a>
+  <h4 id="Terminal_Gui_ListView__ctor_Terminal_Gui_Rect_Terminal_Gui_IListDataSource_" data-uid="Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource)">ListView(Rect, IListDataSource)</h4>
+  <div class="markdown level1 summary"><p>Initializes a new ListView that will display the provided data source.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ListView (Terminal.Gui.Rect rect, Terminal.Gui.IListDataSource source);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><span class="parametername">rect</span></td>
+        <td><p>Frame for the listview.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a></td>
         <td><span class="parametername">source</span></td>
+        <td><p>IListDataSource object that provides a mechanism to render the data. The number of elements on the collection should not change, if you must change, set the &quot;Source&quot; property to reset the internal settings of the ListView.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Terminal_Gui_ListView_AllowsMarking_" data-uid="Terminal.Gui.ListView.AllowsMarking*"></a>
+  <h4 id="Terminal_Gui_ListView_AllowsMarking" data-uid="Terminal.Gui.ListView.AllowsMarking">AllowsMarking</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.ListView.html">ListView</a> allows items to be marked.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool AllowsMarking { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><p><code>true</code> if allows marking elements of the list; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ListView_SelectedItem_" data-uid="Terminal.Gui.ListView.SelectedItem*"></a>
+  <h4 id="Terminal_Gui_ListView_SelectedItem" data-uid="Terminal.Gui.ListView.SelectedItem">SelectedItem</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the currently selecteded item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int SelectedItem { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><p>The selected item.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ListView_Source_" data-uid="Terminal.Gui.ListView.Source*"></a>
+  <h4 id="Terminal_Gui_ListView_Source" data-uid="Terminal.Gui.ListView.Source">Source</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the IListDataSource backing this view, use SetSource() if you want to set a new IList source.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Terminal.Gui.IListDataSource Source { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a></td>
+        <td><p>The source.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ListView_TopItem_" data-uid="Terminal.Gui.ListView.TopItem*"></a>
+  <h4 id="Terminal_Gui_ListView_TopItem" data-uid="Terminal.Gui.ListView.TopItem">TopItem</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the item that is displayed at the top of the listview</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int TopItem { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><p>The top item.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Terminal_Gui_ListView_MouseEvent_" data-uid="Terminal.Gui.ListView.MouseEvent*"></a>
+  <h4 id="Terminal_Gui_ListView_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.ListView.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool MouseEvent (Terminal.Gui.MouseEvent me);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></td>
+        <td><span class="parametername">me</span></td>
         <td><p>To be added.</p>
 </td>
       </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
       <tr>
-        <td><span class="xref">System.ValueTuple</span>&lt;<span class="xref">NStack.ustring</span>,<span class="xref">System.Int32</span>&gt;[]</td>
-        <td><span class="parametername">headers</span></td>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><p>To be added.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ListView_PositionCursor_" data-uid="Terminal.Gui.ListView.PositionCursor*"></a>
+  <h4 id="Terminal_Gui_ListView_PositionCursor" data-uid="Terminal.Gui.ListView.PositionCursor">PositionCursor()</h4>
+  <div class="markdown level1 summary"><p>Positions the cursor in this view</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void PositionCursor ();</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_ListView_ProcessKey_" data-uid="Terminal.Gui.ListView.ProcessKey*"></a>
+  <h4 id="Terminal_Gui_ListView_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.ListView.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
+  <div class="markdown level1 summary"><p>Handles cursor movement for this view, passes all other events.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool ProcessKey (Terminal.Gui.KeyEvent kb);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
+        <td><span class="parametername">kb</span></td>
+        <td><p>Keyboard event.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><p><code>true</code>, if key was processed, <code>false</code> otherwise.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ListView_Redraw_" data-uid="Terminal.Gui.ListView.Redraw*"></a>
+  <h4 id="Terminal_Gui_ListView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.ListView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
+  <div class="markdown level1 summary"><p>Redraws the ListView</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void Redraw (Terminal.Gui.Rect region);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><span class="parametername">region</span></td>
+        <td><p>Region.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ListView_SetSource_" data-uid="Terminal.Gui.ListView.SetSource*"></a>
+  <h4 id="Terminal_Gui_ListView_SetSource_System_Collections_IList_" data-uid="Terminal.Gui.ListView.SetSource(System.Collections.IList)">SetSource(IList)</h4>
+  <div class="markdown level1 summary"><p>Sets the source to an IList value, if you want to set a full IListDataSource, use the Source property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetSource (System.Collections.IList source);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.IList</span></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>To be added.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="events">Events
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_ListView_SelectedChanged" data-uid="Terminal.Gui.ListView.SelectedChanged">SelectedChanged</h4>
+  <div class="markdown level1 summary"><p>This event is raised when the cursor selection has changed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action SelectedChanged;</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span></td>
         <td><p>To be added.</p>
 </td>
       </tr>

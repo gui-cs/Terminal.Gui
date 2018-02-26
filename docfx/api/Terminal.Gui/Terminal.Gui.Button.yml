@@ -107,7 +107,7 @@ items:
     The size of the button is computed based on the
                   text length.   This button is not a default button.
   syntax:
-    content: public Button (string s);
+    content: public Button (string text);
     parameters:
     - id: s
       type: System.String
@@ -134,7 +134,7 @@ items:
                   decoration is used, and the enter key on a
                   dialog would implicitly activate this button.
   syntax:
-    content: public Button (string s, bool is_default);
+    content: public Button (string text, bool is_default);
     parameters:
     - id: s
       type: System.String
@@ -163,7 +163,7 @@ items:
     The size of the button is computed based on the
                   text length.   This button is not a default button.
   syntax:
-    content: public Button (int x, int y, string s);
+    content: public Button (int x, int y, string text);
     parameters:
     - id: x
       type: System.Int32
@@ -196,7 +196,7 @@ items:
                   decoration is used, and the enter key on a
                   dialog would implicitly activate this button.
   syntax:
-    content: public Button (int x, int y, string s, bool is_default);
+    content: public Button (int x, int y, string text, bool is_default);
     parameters:
     - id: x
       type: System.Int32

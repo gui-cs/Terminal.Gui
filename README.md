@@ -1,17 +1,38 @@
+[![Build Status](https://travis-ci.org/migueldeicaza/gui.cs.svg?branch=master)](https://travis-ci.org/migueldeicaza/gui.cs)
 # Gui.cs - Terminal UI toolkit for .NET
 
-This is a simple UI toolkit for .NET.
+This is a simple UI toolkit for .NET, .NET Core and Mono and works on
+both Windows and Linux/Unix.
 
-It is an updated version of
-[gui.cs](https://github.com/mono/mono-curses/blob/master/gui.cs) that
-I wrote for [mono-curses](https://github.com/mono/mono-curses).
+![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.png)
 
-The toolkit contains various controls (labesl, text entry, buttons,
-radio buttons, checkboxes, dialog boxes, windows, menus) for building
-text user interfaces, a main loop, is designed to work on Curses and
-the [Windows
-Console](https://github.com/migueldeicaza/gui.cs/issues/27), works
-well on both color and monochrome terminals and has mouse support on
+The toolkit contains various controls for building text user interfaces:
+
+* [Buttons](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Button.html) 
+* [Labels](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Label.html)
+* [Text entry](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextField.html)
+* [Radio buttons](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.RadioGroup.html)
+* [Checkboxes](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.CheckBox.html)
+* [Dialog boxes](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Dialog.html)
+  * [Message boxes](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MessageBox.html)
+* [Windows](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Window.html)
+* [Menus](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MenuBar.html)
+* [ListViews](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ListView.html)
+* [Frames](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.FrameView.html)
+* [ProgressBars](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ProgressBar.html)
+* [Scroll views](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollView.html) and [Scrollbars](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollBarView.html)
+
+All visible UI elements are subclasses of the
+[View](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.View.html),
+and these in turn can contain an arbitrary number of subviews.   
+
+It comes with a
+[mainloop](https://migueldeicaza.github.io/gui.cs/api/Mono.Terminal/Mono.Terminal.MainLoop.html)
+to process events, process idle handlers, timers and monitoring file
+descriptors.
+
+It is designed to work on Curses and the [Windows Console](https://github.com/migueldeicaza/gui.cs/issues/27), 
+works well on both color and monochrome terminals and has mouse support on
 terminal emulators that support it.
 
 # API Documentation
@@ -65,13 +86,18 @@ class Demo {
 }
 ```
 
-This shows a UI like this:
+# Installing it
 
-![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.png)
+If you want to try Gui.cs, use NuGet to install the `Terminal.Gui` NuGet package:
+
+https://www.nuget.org/packages/Terminal.Gui/0.1.0
 
 # Running and Building
 
 Open the solution and run the sample program.
+
+You can find a trivial .NET core sample application in the
+"StandaloneExample" directory.   
 
 # Input Handling
 
@@ -91,12 +117,10 @@ F10, and F1 to F9 respectively.
 
 # Driver model
 
-Currently gui.cs is built on top of curses, but the console driver has
-been abstracted, an implementation that uses `System.Console` is
-possible, but would have to emulate some of the behavior of curses,
-namely that operations are performed on the buffer, and the Refresh
-call reflects the contents of an internal buffer into the screen and
-position the cursor in the last set position at the end.
+Currently gui.cs has support for both ncurses and the `System.Console`
+front-ends.  ncurses is used on Unix, while `System.Console` is used
+on Windows, but you can force the use of `System.Console` on Unix as
+well, see `Core.cs`.
 
 # Tasks
 
@@ -105,10 +129,13 @@ tracked in the TODO.md file.
 
 # History
 
+This is an updated version of
+[gui.cs](http://tirania.org/blog/archive/2007/Apr-16.html) that
+I wrote for [mono-curses](https://github.com/mono/mono-curses) in 2007.
+
 The original gui.cs was a UI toolkit in a single file and tied to
-curses.  This version tries to be console-agnostic (but currently only
-has a curses backend, go figure) and instead of having a
-container/widget model, only uses Views (which can contain subviews)
-and changes the rendering model to rely on damage regions instead of 
-burderning each view with the details.
+curses.  This version tries to be console-agnostic and instead of
+having a container/widget model, only uses Views (which can contain
+subviews) and changes the rendering model to rely on damage regions
+instead of burderning each view with the details.
 

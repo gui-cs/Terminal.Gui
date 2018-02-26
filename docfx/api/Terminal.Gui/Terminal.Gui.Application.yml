@@ -21,6 +21,7 @@ items:
   - Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)
   - Terminal.Gui.Application.Top
   - Terminal.Gui.Application.UngrabMouse
+  - Terminal.Gui.Application.UseSystemConsole
   langs:
   - csharp
   name: Application
@@ -67,15 +68,17 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: 'Building block API: Prepares the provided toplevel for execution.'
+  remarks: "This method prepares the provided toplevel for running with the focus,\n             it adds this to the list of toplevels, sets up the mainloop to process the \n             event, lays out the subviews, focuses the first element, and draws the\n             toplevel in the screen.   This is usually followed by executing\n             the <xref href=\"Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)\"></xref> method, and then the <xref href=\"Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)\"></xref> method upon termination which will\n              undo these changes."
   syntax:
     content: public static Terminal.Gui.Application.RunState Begin (Terminal.Gui.Toplevel toplevel);
     parameters:
     - id: toplevel
       type: Terminal.Gui.Toplevel
-      description: To be added.
+      description: Toplevel to prepare execution for.
     return:
       type: Terminal.Gui.Application+RunState
-      description: To be added.
+      description: The runstate handle that needs to be passed to the End() method upon completion.
   overload: Terminal.Gui.Application.Begin*
   exceptions: []
 - uid: Terminal.Gui.Application.Current
@@ -129,6 +132,7 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: 'Building block API: completes the exection of a Toplevel that was started with Begin.'
   syntax:
     content: public static void End (Terminal.Gui.Application.RunState rs);
     parameters:
@@ -328,16 +332,7 @@ items:
   - Terminal.Gui
   namespace: Terminal.Gui
   summary: Runs the main loop on the given container.
-  remarks: >-
-    <p>
-                    This method is used to start processing events
-                    for the main application, but it is also used to
-                    run modal dialog boxes.
-                  </p>
-        <p>
-                    To make a toplevel stop execution, set the "Running"
-                    property to false.
-                  </p>
+  remarks: "<p>\n                This method is used to start processing events\n                for the main application, but it is also used to\n                run modal dialog boxes.\n              </p>\n    <p>\n                To make a toplevel stop execution, set the \"Running\"\n                property to false.\n              </p>\n    <p>\n                This is equivalent to calling Begin on the toplevel view, followed by RunLoop with the\n                returned value, and then calling end on the return value.\n              </p>\n    <p>\n                Alternatively, if your program needs to control the main loop and needs to \n                process events manually, you can invoke Begin to set things up manually and then\n                repeatedly call RunLoop with the wait parameter set to false.   By doing this\n                the RunLoop method will only process any pending events, timers, idle handlers and\n                then return control immediately.\n              </p>"
   syntax:
     content: public static void Run (Terminal.Gui.Toplevel view);
     parameters:
@@ -358,7 +353,7 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Runs the main loop for the created dialog
+  summary: 'Building block API: Runs the main loop for the created dialog'
   remarks: >-
     Use the wait parameter to control whether this is a
                   blocking or non-blocking call.
@@ -367,10 +362,10 @@ items:
     parameters:
     - id: state
       type: Terminal.Gui.Application+RunState
-      description: To be added.
+      description: The state returned by the Begin method.
     - id: wait
       type: System.Boolean
-      description: To be added.
+      description: By default this is true which will execute the runloop waiting for events, if you pass false, you can use this method to run a single iteration of the events.
   overload: Terminal.Gui.Application.RunLoop*
   exceptions: []
 - uid: Terminal.Gui.Application.Top
@@ -410,6 +405,25 @@ items:
     content: public static void UngrabMouse ();
     parameters: []
   overload: Terminal.Gui.Application.UngrabMouse*
+  exceptions: []
+- uid: Terminal.Gui.Application.UseSystemConsole
+  id: UseSystemConsole
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  name: UseSystemConsole
+  nameWithType: Application.UseSystemConsole
+  fullName: Application.UseSystemConsole
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: If set, it forces the use of the System.Console-based driver.
+  syntax:
+    content: public static bool UseSystemConsole;
+    return:
+      type: System.Boolean
+      description: To be added.
   exceptions: []
 references:
 - uid: System.Object
@@ -609,6 +623,12 @@ references:
   name: UngrabMouse()
   nameWithType: Application.UngrabMouse()
   fullName: Application.UngrabMouse()
+- uid: Terminal.Gui.Application.UseSystemConsole
+  parent: Terminal.Gui.Application
+  isExternal: false
+  name: UseSystemConsole
+  nameWithType: Application.UseSystemConsole
+  fullName: Application.UseSystemConsole
 - uid: Terminal.Gui.Application.#ctor*
   parent: Terminal.Gui.Application
   isExternal: false

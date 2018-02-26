@@ -75,7 +75,8 @@ namespace Terminal.Gui {
 		///     other View subclasses.
 		///   </para>
 		/// </remarks>
-		public virtual bool ProcessKey (KeyEvent kb)
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public virtual bool ProcessKey (KeyEvent keyEvent)
 		{
 			return false;
 		}
@@ -101,13 +102,18 @@ namespace Terminal.Gui {
 		///    keypress when they have the focus.
 		///  </para>
 		/// </remarks>
-		public virtual bool ProcessColdKey (KeyEvent kb)
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public virtual bool ProcessColdKey (KeyEvent keyEvent)
 		{
 			return false;
 		}
 
-		// Mouse events
-		public virtual bool MouseEvent (MouseEvent me)
+		/// <summary>
+		/// Method invoked when a mouse event is generated
+		/// </summary>
+		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
+		/// <param name="mouseEvent">Contains the details about the mouse event.</param>
+		public virtual bool MouseEvent (MouseEvent mouseEvent)
 		{
 			return false;
 		}
@@ -697,30 +703,33 @@ namespace Terminal.Gui {
 			focused.EnsureFocus ();
 		}
 
-		public override bool ProcessKey (KeyEvent kb)
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if (Focused?.ProcessKey (kb) == true)
+			if (Focused?.ProcessKey (keyEvent) == true)
 				return true;
 
 			return false;
 		}
 
-		public override bool ProcessHotKey (KeyEvent kb)
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.ProcessHotKey (kb))
+				if (view.ProcessHotKey (keyEvent))
 					return true;
 			return false;
 		}
 
-		public override bool ProcessColdKey (KeyEvent kb)
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public override bool ProcessColdKey (KeyEvent keyEvent)
 		{
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.ProcessColdKey (kb))
+				if (view.ProcessColdKey (keyEvent))
 					return true;
 			return false;
 		}
@@ -915,12 +924,12 @@ namespace Terminal.Gui {
 			get => true;
 		}
 
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if (base.ProcessKey (kb))
+			if (base.ProcessKey (keyEvent))
 				return true;
 
-			switch (kb.Key) {
+			switch (keyEvent.Key) {
 			case Key.ControlC:
 				// TODO: stop current execution of this container
 				break;
@@ -1047,7 +1056,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
-		public virtual void Remove (View view)
+		public override void Remove (View view)
 		{
 			if (view == null)
 				return;
@@ -1081,18 +1090,25 @@ namespace Terminal.Gui {
 			ClearNeedsDisplay ();
 		}
 
-#if false
+#if true
 		// 
 		// It does not look like the event is raised on clicked-drag
 		// need to figure that out.
 		//
 		Point? dragPosition;
-		public override bool MouseEvent(MouseEvent me)
+		public override bool MouseEvent(MouseEvent mouseEvent)
 		{
-			if (me.Flags == MouseFlags.Button1Pressed){
+			// The code is currently disabled, because the 
+			// Driver.UncookMouse does not seem to have an effect if there is 
+			// a pending mouse event activated.
+			if (true)
+				return false;
+			
+			if ((mouseEvent.Flags == MouseFlags.Button1Pressed|| mouseEvent.Flags == MouseFlags.Button4Pressed)){
+				
 				if (dragPosition.HasValue) {
-					var dx = me.X - dragPosition.Value.X;
-					var dy = me.Y - dragPosition.Value.Y;
+					var dx = mouseEvent.X - dragPosition.Value.X;
+					var dy = mouseEvent.Y - dragPosition.Value.Y;
 
 					var nx = Frame.X + dx;
 					var ny = Frame.Y + dy;
@@ -1101,8 +1117,8 @@ namespace Terminal.Gui {
 					if (ny < 0)
 						ny = 0;
 
-					Demo.ml2.Text = $"{dx},{dy}";
-					dragPosition = new Point (me.X, me.Y);
+					//Demo.ml2.Text = $"{dx},{dy}";
+					dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
 
 					// TODO: optimize, only SetNeedsDisplay on the before/after regions.
 					if (SuperView == null)
@@ -1113,23 +1129,26 @@ namespace Terminal.Gui {
 					SetNeedsDisplay ();
 					return true;
 				} else {
-					dragPosition = new Point (me.X, me.Y);
-					Application.GrabMouse (this);
+					// Only start grabbing if the user clicks on the title bar.
+					if (mouseEvent.Y == 0) {
+						dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
+						Application.GrabMouse (this);
+					}
 
-					Demo.ml2.Text = $"Starting at {dragPosition}";
+					//Demo.ml2.Text = $"Starting at {dragPosition}";
 					return true;
 				}
-
-
 			}
 
-			if (me.Flags == MouseFlags.Button1Released) {
+			if (mouseEvent.Flags == MouseFlags.Button1Released) {
 				Application.UngrabMouse ();
+				Driver.UncookMouse ();
+
 				dragPosition = null;
 				//Driver.StopReportingMouseMoves ();
 			}
 
-			Demo.ml.Text = me.ToString ();
+			//Demo.ml.Text = me.ToString ();
 			return false;
 		}
 #endif
@@ -1156,7 +1175,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The current Console Driver in use.
 		/// </summary>
-		public static ConsoleDriver Driver = new CursesDriver ();
+		public static ConsoleDriver Driver;
 
 		/// <summary>
 		/// The Toplevel object used for the application on startup.
@@ -1231,6 +1250,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// If set, it forces the use of the System.Console-based driver.
+		/// </summary>
+		public static bool UseSystemConsole;
+
+		/// <summary>
 		/// Initializes the Application
 		/// </summary>
 		public static void Init ()
@@ -1238,8 +1262,18 @@ namespace Terminal.Gui {
 			if (Top != null)
 				return;
 
+			if (!UseSystemConsole) {
+				var p = Environment.OSVersion.Platform;
+				if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+					UseSystemConsole = true;
+			}
+			//UseSystemConsole = true;
+			if (UseSystemConsole)
+				Driver = new NetDriver ();
+			else
+				Driver = new CursesDriver ();
 			Driver.Init (TerminalResized);
-			MainLoop = new Mono.Terminal.MainLoop ();
+			MainLoop = new Mono.Terminal.MainLoop (Driver is CursesDriver);
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			Top = Toplevel.Create ();
 			Current = Top;
@@ -1258,9 +1292,9 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// Releases all resource used by the <see cref="T:Terminal.Gui.Application.RunState"/> object.
 			/// </summary>
-			/// <remarks>Call <see cref="Dispose"/> when you are finished using the <see cref="T:Terminal.Gui.Application.RunState"/>. The
-			/// <see cref="Dispose"/> method leaves the <see cref="T:Terminal.Gui.Application.RunState"/> in an unusable state. After
-			/// calling <see cref="Dispose"/>, you must release all references to the
+			/// <remarks>Call <see cref="Dispose()"/> when you are finished using the <see cref="T:Terminal.Gui.Application.RunState"/>. The
+			/// <see cref="Dispose()"/> method leaves the <see cref="T:Terminal.Gui.Application.RunState"/> in an unusable state. After
+			/// calling <see cref="Dispose()"/>, you must release all references to the
 			/// <see cref="T:Terminal.Gui.Application.RunState"/> so the garbage collector can reclaim the memory that the
 			/// <see cref="T:Terminal.Gui.Application.RunState"/> was occupying.</remarks>
 			public void Dispose ()
@@ -1274,7 +1308,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <returns>The dispose.</returns>
 			/// <param name="disposing">If set to <c>true</c> disposing.</param>
-			public virtual void Dispose (bool disposing)
+			protected virtual void Dispose (bool disposing)
 			{
 				if (Toplevel != null) {
 					Application.End (Toplevel);
@@ -1339,6 +1373,7 @@ namespace Terminal.Gui {
 			if (view == null)
 				return;
 			mouseGrabView = view;
+			Driver.UncookMouse ();
 		}
 
 		/// <summary>
@@ -1347,6 +1382,7 @@ namespace Terminal.Gui {
 		public static void UngrabMouse ()
 		{
 			mouseGrabView = null;
+			Driver.CookMouse ();
 		}
 
 		/// <summary>
@@ -1384,6 +1420,19 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Building block API: Prepares the provided toplevel for execution.
+		/// </summary>
+		/// <returns>The runstate handle that needs to be passed to the End() method upon completion.</returns>
+		/// <param name="toplevel">Toplevel to prepare execution for.</param>
+		/// <remarks>
+		///  This method prepares the provided toplevel for running with the focus,
+		///  it adds this to the list of toplevels, sets up the mainloop to process the 
+		///  event, lays out the subviews, focuses the first element, and draws the
+		///  toplevel in the screen.   This is usually followed by executing
+		///  the <see cref="RunLoop"/> method, and then the <see cref="End(RunState)"/> method upon termination which will
+		///   undo these changes.
+		/// </remarks>
 		static public RunState Begin (Toplevel toplevel)
 		{
 			if (toplevel == null)
@@ -1403,12 +1452,16 @@ namespace Terminal.Gui {
 			return rs;
 		}
 
-		static public void End (RunState rs)
+		/// <summary>
+		/// Building block API: completes the exection of a Toplevel that was started with Begin.
+		/// </summary>
+		/// <param name="runState">The runstate returned by the <see cref="Begin(Toplevel)"/> method.</param>
+		static public void End (RunState runState)
 		{
-			if (rs == null)
-				throw new ArgumentNullException (nameof (rs));
+			if (runState == null)
+				throw new ArgumentNullException (nameof (runState));
 
-			rs.Dispose ();
+			runState.Dispose ();
 		}
 
 		static void Shutdown ()
@@ -1433,7 +1486,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void Refresh ()
 		{
-			Driver.RedrawTop ();
+			Driver.UpdateScreen ();
 			View last = null;
 			foreach (var v in toplevels.Reverse ()) {
 				v.SetNeedsDisplay ();
@@ -1458,12 +1511,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Runs the main loop for the created dialog
+		///   Building block API: Runs the main loop for the created dialog
 		/// </summary>
 		/// <remarks>
 		///   Use the wait parameter to control whether this is a
-		///   blocking or non-blocking call.
+		///   blocking or non-blocking call.   
 		/// </remarks>
+		/// <param name="state">The state returned by the Begin method.</param>
+		/// <param name="wait">By default this is true which will execute the runloop waiting for events, if you pass false, you can use this method to run a single iteration of the events.</param>
 		public static void RunLoop (RunState state, bool wait = true)
 		{
 			if (state == null)
@@ -1519,6 +1574,17 @@ namespace Terminal.Gui {
 		///   <para>
 		///     To make a toplevel stop execution, set the "Running"
 		///     property to false.
+		///   </para>
+		///   <para>
+		///     This is equivalent to calling Begin on the toplevel view, followed by RunLoop with the
+		///     returned value, and then calling end on the return value.
+		///   </para>
+		///   <para>
+		///     Alternatively, if your program needs to control the main loop and needs to 
+		///     process events manually, you can invoke Begin to set things up manually and then
+		///     repeatedly call RunLoop with the wait parameter set to false.   By doing this
+		///     the RunLoop method will only process any pending events, timers, idle handlers and
+		///     then return control immediately.
 		///   </para>
 		/// </remarks>
 		public static void Run (Toplevel view)

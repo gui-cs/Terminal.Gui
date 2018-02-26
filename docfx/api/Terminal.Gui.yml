@@ -8,6 +8,7 @@ items:
   - Terminal.Gui.Attribute
   - Terminal.Gui.Button
   - Terminal.Gui.CheckBox
+  - Terminal.Gui.Clipboard
   - Terminal.Gui.Color
   - Terminal.Gui.Colors
   - Terminal.Gui.ColorScheme
@@ -26,6 +27,7 @@ items:
   - Terminal.Gui.MouseEvent
   - Terminal.Gui.MouseFlags
   - Terminal.Gui.Point
+  - Terminal.Gui.ProgressBar
   - Terminal.Gui.RadioGroup
   - Terminal.Gui.Rect
   - Terminal.Gui.Responder
@@ -75,6 +77,12 @@ references:
   name: CheckBox
   nameWithType: CheckBox
   fullName: Terminal.Gui.CheckBox
+- uid: Terminal.Gui.Clipboard
+  parent: Terminal.Gui
+  isExternal: false
+  name: Clipboard
+  nameWithType: Clipboard
+  fullName: Terminal.Gui.Clipboard
 - uid: Terminal.Gui.Color
   parent: Terminal.Gui
   isExternal: false
@@ -183,6 +191,12 @@ references:
   name: Point
   nameWithType: Point
   fullName: Terminal.Gui.Point
+- uid: Terminal.Gui.ProgressBar
+  parent: Terminal.Gui
+  isExternal: false
+  name: ProgressBar
+  nameWithType: ProgressBar
+  fullName: Terminal.Gui.ProgressBar
 - uid: Terminal.Gui.RadioGroup
   parent: Terminal.Gui
   isExternal: false

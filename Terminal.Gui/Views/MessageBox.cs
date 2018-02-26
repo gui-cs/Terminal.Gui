@@ -4,6 +4,23 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Message box displays a modal message to the user, with a title, a message and a series of options that the user can choose from.
 	/// </summary>
+	/// <para>
+	///   The difference between the Query and ErrorQuery method is the default set of colors used for the message box.
+	/// </para>
+	/// <para>
+	/// The following example pops up a Message Box with 50 columns, and 7 lines, with the specified title and text, plus two buttons.
+	/// The value -1 is returned when the user cancels the dialog by pressing the ESC key.
+	/// </para>
+	/// <example>
+	/// <code lang="c#">
+	/// var n = MessageBox.Query (50, 7, "Quit Demo", "Are you sure you want to quit this demo?", "Yes", "No");
+	/// if (n == 0)
+	///    quit = true;
+	/// else
+	///    quit = false;
+	/// 
+	/// </code>
+	/// </example>
 	public class MessageBox {
 		/// <summary>
 		/// Presents a message with the specified title and message and a list of buttons to show to the user.

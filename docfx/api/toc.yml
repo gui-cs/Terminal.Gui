@@ -19,6 +19,8 @@
     name: Button
   - uid: Terminal.Gui.CheckBox
     name: CheckBox
+  - uid: Terminal.Gui.Clipboard
+    name: Clipboard
   - uid: Terminal.Gui.Color
     name: Color
   - uid: Terminal.Gui.Colors
@@ -55,6 +57,8 @@
     name: MouseFlags
   - uid: Terminal.Gui.Point
     name: Point
+  - uid: Terminal.Gui.ProgressBar
+    name: ProgressBar
   - uid: Terminal.Gui.RadioGroup
     name: RadioGroup
   - uid: Terminal.Gui.Rect

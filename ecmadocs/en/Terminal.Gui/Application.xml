@@ -56,10 +56,19 @@
         <Parameter Name="toplevel" Type="Terminal.Gui.Toplevel" />
       </Parameters>
       <Docs>
-        <param name="toplevel">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <param name="toplevel">Toplevel to prepare execution for.</param>
+        <summary>
+            Building block API: Prepares the provided toplevel for execution.
+            </summary>
+        <returns>The runstate handle that needs to be passed to the End() method upon completion.</returns>
+        <remarks>
+             This method prepares the provided toplevel for running with the focus,
+             it adds this to the list of toplevels, sets up the mainloop to process the 
+             event, lays out the subviews, focuses the first element, and draws the
+             toplevel in the screen.   This is usually followed by executing
+             the <see cref="M:Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)" /> method, and then the <see cref="M:Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)" /> method upon termination which will
+              undo these changes.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Current">
@@ -112,7 +121,9 @@
       </Parameters>
       <Docs>
         <param name="rs">To be added.</param>
-        <summary>To be added.</summary>
+        <summary>
+            Building block API: completes the exection of a Toplevel that was started with Begin.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -314,6 +325,17 @@
                 To make a toplevel stop execution, set the "Running"
                 property to false.
               </para>
+          <para>
+                This is equivalent to calling Begin on the toplevel view, followed by RunLoop with the
+                returned value, and then calling end on the return value.
+              </para>
+          <para>
+                Alternatively, if your program needs to control the main loop and needs to 
+                process events manually, you can invoke Begin to set things up manually and then
+                repeatedly call RunLoop with the wait parameter set to false.   By doing this
+                the RunLoop method will only process any pending events, timers, idle handlers and
+                then return control immediately.
+              </para>
         </remarks>
       </Docs>
     </Member>
@@ -332,14 +354,14 @@
         <Parameter Name="wait" Type="System.Boolean" />
       </Parameters>
       <Docs>
-        <param name="state">To be added.</param>
-        <param name="wait">To be added.</param>
+        <param name="state">The state returned by the Begin method.</param>
+        <param name="wait">By default this is true which will execute the runloop waiting for events, if you pass false, you can use this method to run a single iteration of the events.</param>
         <summary>
-              Runs the main loop for the created dialog
+              Building block API: Runs the main loop for the created dialog
             </summary>
         <remarks>
               Use the wait parameter to control whether this is a
-              blocking or non-blocking call.
+              blocking or non-blocking call.   
             </remarks>
       </Docs>
     </Member>
@@ -375,6 +397,23 @@
       <Docs>
         <summary>
             Releases the mouse grab, so mouse events will be routed to the view on which the mouse is.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="UseSystemConsole">
+      <MemberSignature Language="C#" Value="public static bool UseSystemConsole;" />
+      <MemberSignature Language="ILAsm" Value=".field public static bool UseSystemConsole" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            If set, it forces the use of the System.Console-based driver.
             </summary>
         <remarks>To be added.</remarks>
       </Docs>

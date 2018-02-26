@@ -165,6 +165,32 @@
       </tr>
     </tbody>
   </table>
+  
+  
+  <h4 id="Terminal_Gui_Application_UseSystemConsole" data-uid="Terminal.Gui.Application.UseSystemConsole">UseSystemConsole</h4>
+  <div class="markdown level1 summary"><p>If set, it forces the use of the System.Console-based driver.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool UseSystemConsole;</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><p>To be added.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="properties">Properties
   </h3>
   
@@ -254,7 +280,8 @@
   
   <a id="Terminal_Gui_Application_Begin_" data-uid="Terminal.Gui.Application.Begin*"></a>
   <h4 id="Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_" data-uid="Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)">Begin(Toplevel)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Building block API: Prepares the provided toplevel for execution.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -273,7 +300,7 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a></td>
         <td><span class="parametername">toplevel</span></td>
-        <td><p>To be added.</p>
+        <td><p>Toplevel to prepare execution for.</p>
 </td>
       </tr>
     </tbody>
@@ -289,16 +316,25 @@
     <tbody>
       <tr>
         <td></td>
-        <td><p>To be added.</p>
+        <td><p>The runstate handle that needs to be passed to the End() method upon completion.</p>
 </td>
       </tr>
     </tbody>
   </table>
+  <h5 id="Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method prepares the provided toplevel for running with the focus,
+             it adds this to the list of toplevels, sets up the mainloop to process the 
+             event, lays out the subviews, focuses the first element, and draws the
+             toplevel in the screen.   This is usually followed by executing
+             the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_">RunLoop(Application+RunState, Boolean)</a> method, and then the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_">End(Application+RunState)</a> method upon termination which will
+              undo these changes.</p>
+</div>
   
   
   <a id="Terminal_Gui_Application_End_" data-uid="Terminal.Gui.Application.End*"></a>
   <h4 id="Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_" data-uid="Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)">End(Application+RunState)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Building block API: completes the exection of a Toplevel that was started with Begin.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -478,12 +514,23 @@
     <p>
                 To make a toplevel stop execution, set the &quot;Running&quot;
                 property to false.
+              </p>
+    <p>
+                This is equivalent to calling Begin on the toplevel view, followed by RunLoop with the
+                returned value, and then calling end on the return value.
+              </p>
+    <p>
+                Alternatively, if your program needs to control the main loop and needs to 
+                process events manually, you can invoke Begin to set things up manually and then
+                repeatedly call RunLoop with the wait parameter set to false.   By doing this
+                the RunLoop method will only process any pending events, timers, idle handlers and
+                then return control immediately.
               </p></div>
   
   
   <a id="Terminal_Gui_Application_RunLoop_" data-uid="Terminal.Gui.Application.RunLoop*"></a>
   <h4 id="Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_" data-uid="Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)">RunLoop(Application+RunState, Boolean)</h4>
-  <div class="markdown level1 summary"><p>Runs the main loop for the created dialog</p>
+  <div class="markdown level1 summary"><p>Building block API: Runs the main loop for the created dialog</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -503,13 +550,13 @@
       <tr>
         <td></td>
         <td><span class="parametername">state</span></td>
-        <td><p>To be added.</p>
+        <td><p>The state returned by the Begin method.</p>
 </td>
       </tr>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
         <td><span class="parametername">wait</span></td>
-        <td><p>To be added.</p>
+        <td><p>By default this is true which will execute the runloop waiting for events, if you pass false, you can use this method to run a single iteration of the events.</p>
 </td>
       </tr>
     </tbody>

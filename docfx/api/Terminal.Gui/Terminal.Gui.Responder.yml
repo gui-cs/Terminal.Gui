@@ -94,15 +94,16 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Method invoked when a mouse event is generated
   syntax:
-    content: public virtual bool MouseEvent (Terminal.Gui.MouseEvent me);
+    content: public virtual bool MouseEvent (Terminal.Gui.MouseEvent mouseEvent);
     parameters:
     - id: me
       type: Terminal.Gui.MouseEvent
       description: To be added.
     return:
       type: System.Boolean
-      description: To be added.
+      description: <code>true</code>, if the event was handled, <code>false</code> otherwise.
   overload: Terminal.Gui.Responder.MouseEvent*
   exceptions: []
 - uid: Terminal.Gui.Responder.ProcessColdKey(Terminal.Gui.KeyEvent)
@@ -137,7 +138,7 @@ items:
                    keypress when they have the focus.
                  </p>
   syntax:
-    content: public virtual bool ProcessColdKey (Terminal.Gui.KeyEvent kb);
+    content: public virtual bool ProcessColdKey (Terminal.Gui.KeyEvent keyEvent);
     parameters:
     - id: kb
       type: Terminal.Gui.KeyEvent
@@ -206,7 +207,7 @@ items:
                   chance to process the keystroke.
   remarks: "<p>\n                Views can override this method if they are\n                interested in processing the given keystroke.\n                If they consume the keystroke, they must\n                return true to stop the keystroke from being\n                processed by other widgets or consumed by the\n                widget engine.    If they return false, the\n                keystroke will be passed using the ProcessColdKey\n                method to other views to process.\n              </p>\n    <p>\n                The View implementation does nothing but return false,\n                so it is not necessary to call base.ProcessKey if you \n                derive directly from View, but you should if you derive\n                other View subclasses.\n              </p>"
   syntax:
-    content: public virtual bool ProcessKey (Terminal.Gui.KeyEvent kb);
+    content: public virtual bool ProcessKey (Terminal.Gui.KeyEvent keyEvent);
     parameters:
     - id: kb
       type: Terminal.Gui.KeyEvent

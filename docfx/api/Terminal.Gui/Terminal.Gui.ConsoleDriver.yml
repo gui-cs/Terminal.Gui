@@ -9,22 +9,36 @@ items:
   - Terminal.Gui.ConsoleDriver.AddSpecial(Terminal.Gui.SpecialChar)
   - Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)
   - Terminal.Gui.ConsoleDriver.AddStr(System.String)
+  - Terminal.Gui.ConsoleDriver.BottomTee
   - Terminal.Gui.ConsoleDriver.Clip
   - Terminal.Gui.ConsoleDriver.Cols
+  - Terminal.Gui.ConsoleDriver.CookMouse
+  - Terminal.Gui.ConsoleDriver.Diamond
   - Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   - Terminal.Gui.ConsoleDriver.End
+  - Terminal.Gui.ConsoleDriver.HLine
   - Terminal.Gui.ConsoleDriver.Init(System.Action)
+  - Terminal.Gui.ConsoleDriver.LeftTee
+  - Terminal.Gui.ConsoleDriver.LLCorner
+  - Terminal.Gui.ConsoleDriver.LRCorner
   - Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
   - Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
   - Terminal.Gui.ConsoleDriver.RedrawTop
   - Terminal.Gui.ConsoleDriver.Refresh
+  - Terminal.Gui.ConsoleDriver.RightTee
   - Terminal.Gui.ConsoleDriver.Rows
   - Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
-  - Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
   - Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
+  - Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
   - Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
+  - Terminal.Gui.ConsoleDriver.Stipple
   - Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
   - Terminal.Gui.ConsoleDriver.Suspend
+  - Terminal.Gui.ConsoleDriver.TopTee
+  - Terminal.Gui.ConsoleDriver.ULCorner
+  - Terminal.Gui.ConsoleDriver.UncookMouse
+  - Terminal.Gui.ConsoleDriver.URCorner
+  - Terminal.Gui.ConsoleDriver.VLine
   langs:
   - csharp
   name: ConsoleDriver
@@ -108,8 +122,7 @@ items:
   nameWithType: ConsoleDriver.AddSpecial(SpecialChar)
   fullName: ConsoleDriver.AddSpecial(SpecialChar)
   type: Method
-  assemblies:
-  - Terminal.Gui
+  assemblies: []
   namespace: Terminal.Gui
   summary: Draws a special characters in the screen
   syntax:
@@ -161,6 +174,25 @@ items:
       description: String.
   overload: Terminal.Gui.ConsoleDriver.AddStr*
   exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.BottomTee
+  id: BottomTee
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: BottomTee
+  nameWithType: ConsoleDriver.BottomTee
+  fullName: ConsoleDriver.BottomTee
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The bottom tee.
+  syntax:
+    content: public Rune BottomTee;
+    return:
+      type: System.Rune
+      description: To be added.
+  exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.Clip
   id: Clip
   parent: Terminal.Gui.ConsoleDriver
@@ -201,6 +233,43 @@ items:
       description: To be added.
   overload: Terminal.Gui.ConsoleDriver.Cols*
   exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.CookMouse
+  id: CookMouse
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: CookMouse()
+  nameWithType: ConsoleDriver.CookMouse()
+  fullName: ConsoleDriver.CookMouse()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Enables the cooked event processing from the mouse driver
+  syntax:
+    content: public abstract void CookMouse ();
+    parameters: []
+  overload: Terminal.Gui.ConsoleDriver.CookMouse*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.Diamond
+  id: Diamond
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: Diamond
+  nameWithType: ConsoleDriver.Diamond
+  fullName: ConsoleDriver.Diamond
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Diamond character
+  syntax:
+    content: public Rune Diamond;
+    return:
+      type: System.Rune
+      description: To be added.
+  exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   id: DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   parent: Terminal.Gui.ConsoleDriver
@@ -213,18 +282,19 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Draws a frame on the specified region with the specified padding around the frame.
   syntax:
-    content: public abstract void DrawFrame (Terminal.Gui.Rect region, int padding, bool fill);
+    content: public virtual void DrawFrame (Terminal.Gui.Rect region, int padding, bool fill);
     parameters:
     - id: region
       type: Terminal.Gui.Rect
-      description: To be added.
+      description: Region where the frame will be drawn..
     - id: padding
       type: System.Int32
-      description: To be added.
+      description: Padding to add on the sides.
     - id: fill
       type: System.Boolean
-      description: To be added.
+      description: If set to <code>true</code> it will clear the contents with the current color, otherwise the contents will be left untouched.
   overload: Terminal.Gui.ConsoleDriver.DrawFrame*
   exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.End
@@ -244,6 +314,25 @@ items:
     content: public abstract void End ();
     parameters: []
   overload: Terminal.Gui.ConsoleDriver.End*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.HLine
+  id: HLine
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: HLine
+  nameWithType: ConsoleDriver.HLine
+  fullName: ConsoleDriver.HLine
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Horizontal line character.
+  syntax:
+    content: public Rune HLine;
+    return:
+      type: System.Rune
+      description: To be added.
   exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.Init(System.Action)
   id: Init(System.Action)
@@ -265,6 +354,63 @@ items:
       type: System.Action
       description: Method to invoke when the terminal is resized.
   overload: Terminal.Gui.ConsoleDriver.Init*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.LeftTee
+  id: LeftTee
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: LeftTee
+  nameWithType: ConsoleDriver.LeftTee
+  fullName: ConsoleDriver.LeftTee
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Left tee
+  syntax:
+    content: public Rune LeftTee;
+    return:
+      type: System.Rune
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.LLCorner
+  id: LLCorner
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: LLCorner
+  nameWithType: ConsoleDriver.LLCorner
+  fullName: ConsoleDriver.LLCorner
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Lower left corner
+  syntax:
+    content: public Rune LLCorner;
+    return:
+      type: System.Rune
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.LRCorner
+  id: LRCorner
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: LRCorner
+  nameWithType: ConsoleDriver.LRCorner
+  fullName: ConsoleDriver.LRCorner
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Lower right corner
+  syntax:
+    content: public Rune LRCorner;
+    return:
+      type: System.Rune
+      description: To be added.
   exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
   id: Move(System.Int32,System.Int32)
@@ -351,6 +497,25 @@ items:
     parameters: []
   overload: Terminal.Gui.ConsoleDriver.Refresh*
   exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.RightTee
+  id: RightTee
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: RightTee
+  nameWithType: ConsoleDriver.RightTee
+  fullName: ConsoleDriver.RightTee
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Right tee
+  syntax:
+    content: public Rune RightTee;
+    return:
+      type: System.Rune
+      description: To be added.
+  exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.Rows
   id: Rows
   parent: Terminal.Gui.ConsoleDriver
@@ -383,36 +548,14 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Selects the specified attribute as the attribute to use for future calls to AddRune, AddString.
   syntax:
     content: public abstract void SetAttribute (Terminal.Gui.Attribute c);
     parameters:
     - id: c
       type: Terminal.Gui.Attribute
-      description: To be added.
+      description: C.
   overload: Terminal.Gui.ConsoleDriver.SetAttribute*
-  exceptions: []
-- uid: Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
-  id: SetColors(System.ConsoleColor,System.ConsoleColor)
-  parent: Terminal.Gui.ConsoleDriver
-  langs:
-  - csharp
-  name: SetColors(ConsoleColor, ConsoleColor)
-  nameWithType: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
-  fullName: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  syntax:
-    content: public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
-    parameters:
-    - id: foreground
-      type: System.ConsoleColor
-      description: To be added.
-    - id: background
-      type: System.ConsoleColor
-      description: To be added.
-  overload: Terminal.Gui.ConsoleDriver.SetColors*
   exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
   id: SetColors(System.Int16,System.Int16)
@@ -438,6 +581,29 @@ items:
       description: Background color identifier.
   overload: Terminal.Gui.ConsoleDriver.SetColors*
   exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+  id: SetColors(System.ConsoleColor,System.ConsoleColor)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: SetColors(ConsoleColor, ConsoleColor)
+  nameWithType: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
+  fullName: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
+    parameters:
+    - id: foreground
+      type: System.ConsoleColor
+      description: To be added.
+    - id: background
+      type: System.ConsoleColor
+      description: To be added.
+  overload: Terminal.Gui.ConsoleDriver.SetColors*
+  exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
   id: StartReportingMouseMoves
   parent: Terminal.Gui.ConsoleDriver
@@ -454,6 +620,25 @@ items:
     content: public abstract void StartReportingMouseMoves ();
     parameters: []
   overload: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.Stipple
+  id: Stipple
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: Stipple
+  nameWithType: ConsoleDriver.Stipple
+  fullName: ConsoleDriver.Stipple
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Stipple pattern
+  syntax:
+    content: public Rune Stipple;
+    return:
+      type: System.Rune
+      description: To be added.
   exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
   id: StopReportingMouseMoves
@@ -489,6 +674,100 @@ items:
     content: public abstract void Suspend ();
     parameters: []
   overload: Terminal.Gui.ConsoleDriver.Suspend*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.TopTee
+  id: TopTee
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: TopTee
+  nameWithType: ConsoleDriver.TopTee
+  fullName: ConsoleDriver.TopTee
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Top tee
+  syntax:
+    content: public Rune TopTee;
+    return:
+      type: System.Rune
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.ULCorner
+  id: ULCorner
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: ULCorner
+  nameWithType: ConsoleDriver.ULCorner
+  fullName: ConsoleDriver.ULCorner
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Upper left corner
+  syntax:
+    content: public Rune ULCorner;
+    return:
+      type: System.Rune
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.UncookMouse
+  id: UncookMouse
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: UncookMouse()
+  nameWithType: ConsoleDriver.UncookMouse()
+  fullName: ConsoleDriver.UncookMouse()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Disables the cooked event processing from the mouse driver.  At startup, it is assumed mouse events are cooked.
+  syntax:
+    content: public abstract void UncookMouse ();
+    parameters: []
+  overload: Terminal.Gui.ConsoleDriver.UncookMouse*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.URCorner
+  id: URCorner
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: URCorner
+  nameWithType: ConsoleDriver.URCorner
+  fullName: ConsoleDriver.URCorner
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Upper right corner
+  syntax:
+    content: public Rune URCorner;
+    return:
+      type: System.Rune
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.VLine
+  id: VLine
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: VLine
+  nameWithType: ConsoleDriver.VLine
+  fullName: ConsoleDriver.VLine
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Vertical line character.
+  syntax:
+    content: public Rune VLine;
+    return:
+      type: System.Rune
+      description: To be added.
   exceptions: []
 references:
 - uid: System.Object
@@ -563,6 +842,12 @@ references:
   name: String
   nameWithType: String
   fullName: System.String
+- uid: Terminal.Gui.ConsoleDriver.BottomTee
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: BottomTee
+  nameWithType: ConsoleDriver.BottomTee
+  fullName: ConsoleDriver.BottomTee
 - uid: Terminal.Gui.ConsoleDriver.Clip
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -581,6 +866,18 @@ references:
   name: Cols
   nameWithType: ConsoleDriver.Cols
   fullName: ConsoleDriver.Cols
+- uid: Terminal.Gui.ConsoleDriver.CookMouse
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: CookMouse()
+  nameWithType: ConsoleDriver.CookMouse()
+  fullName: ConsoleDriver.CookMouse()
+- uid: Terminal.Gui.ConsoleDriver.Diamond
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Diamond
+  nameWithType: ConsoleDriver.Diamond
+  fullName: ConsoleDriver.Diamond
 - uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -599,6 +896,12 @@ references:
   name: End()
   nameWithType: ConsoleDriver.End()
   fullName: ConsoleDriver.End()
+- uid: Terminal.Gui.ConsoleDriver.HLine
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: HLine
+  nameWithType: ConsoleDriver.HLine
+  fullName: ConsoleDriver.HLine
 - uid: Terminal.Gui.ConsoleDriver.Init(System.Action)
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -611,6 +914,24 @@ references:
   name: Action
   nameWithType: Action
   fullName: System.Action
+- uid: Terminal.Gui.ConsoleDriver.LeftTee
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: LeftTee
+  nameWithType: ConsoleDriver.LeftTee
+  fullName: ConsoleDriver.LeftTee
+- uid: Terminal.Gui.ConsoleDriver.LLCorner
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: LLCorner
+  nameWithType: ConsoleDriver.LLCorner
+  fullName: ConsoleDriver.LLCorner
+- uid: Terminal.Gui.ConsoleDriver.LRCorner
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: LRCorner
+  nameWithType: ConsoleDriver.LRCorner
+  fullName: ConsoleDriver.LRCorner
 - uid: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -695,6 +1016,12 @@ references:
   name: Refresh()
   nameWithType: ConsoleDriver.Refresh()
   fullName: ConsoleDriver.Refresh()
+- uid: Terminal.Gui.ConsoleDriver.RightTee
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: RightTee
+  nameWithType: ConsoleDriver.RightTee
+  fullName: ConsoleDriver.RightTee
 - uid: Terminal.Gui.ConsoleDriver.Rows
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -713,18 +1040,6 @@ references:
   name: Attribute
   nameWithType: Attribute
   fullName: Terminal.Gui.Attribute
-- uid: Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
-  parent: Terminal.Gui.ConsoleDriver
-  isExternal: false
-  name: SetColors(ConsoleColor, ConsoleColor)
-  nameWithType: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
-  fullName: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
-- uid: System.ConsoleColor
-  parent: System
-  isExternal: true
-  name: ConsoleColor
-  nameWithType: ConsoleColor
-  fullName: System.ConsoleColor
 - uid: Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -737,12 +1052,30 @@ references:
   name: Int16
   nameWithType: Int16
   fullName: System.Int16
+- uid: Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: SetColors(ConsoleColor, ConsoleColor)
+  nameWithType: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
+  fullName: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
+- uid: System.ConsoleColor
+  parent: System
+  isExternal: true
+  name: ConsoleColor
+  nameWithType: ConsoleColor
+  fullName: System.ConsoleColor
 - uid: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
   name: StartReportingMouseMoves()
   nameWithType: ConsoleDriver.StartReportingMouseMoves()
   fullName: ConsoleDriver.StartReportingMouseMoves()
+- uid: Terminal.Gui.ConsoleDriver.Stipple
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: Stipple
+  nameWithType: ConsoleDriver.Stipple
+  fullName: ConsoleDriver.Stipple
 - uid: Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -755,6 +1088,36 @@ references:
   name: Suspend()
   nameWithType: ConsoleDriver.Suspend()
   fullName: ConsoleDriver.Suspend()
+- uid: Terminal.Gui.ConsoleDriver.TopTee
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: TopTee
+  nameWithType: ConsoleDriver.TopTee
+  fullName: ConsoleDriver.TopTee
+- uid: Terminal.Gui.ConsoleDriver.ULCorner
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: ULCorner
+  nameWithType: ConsoleDriver.ULCorner
+  fullName: ConsoleDriver.ULCorner
+- uid: Terminal.Gui.ConsoleDriver.UncookMouse
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: UncookMouse()
+  nameWithType: ConsoleDriver.UncookMouse()
+  fullName: ConsoleDriver.UncookMouse()
+- uid: Terminal.Gui.ConsoleDriver.URCorner
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: URCorner
+  nameWithType: ConsoleDriver.URCorner
+  fullName: ConsoleDriver.URCorner
+- uid: Terminal.Gui.ConsoleDriver.VLine
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: VLine
+  nameWithType: ConsoleDriver.VLine
+  fullName: ConsoleDriver.VLine
 - uid: Terminal.Gui.ConsoleDriver.#ctor*
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -797,6 +1160,12 @@ references:
   name: Cols
   nameWithType: ConsoleDriver.Cols
   fullName: ConsoleDriver.Cols
+- uid: Terminal.Gui.ConsoleDriver.CookMouse*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: CookMouse
+  nameWithType: ConsoleDriver.CookMouse
+  fullName: ConsoleDriver.CookMouse
 - uid: Terminal.Gui.ConsoleDriver.DrawFrame*
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -875,3 +1244,9 @@ references:
   name: Suspend
   nameWithType: ConsoleDriver.Suspend
   fullName: ConsoleDriver.Suspend
+- uid: Terminal.Gui.ConsoleDriver.UncookMouse*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: UncookMouse
+  nameWithType: ConsoleDriver.UncookMouse
+  fullName: ConsoleDriver.UncookMouse

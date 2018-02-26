@@ -46,10 +46,3 @@ Will at least need the protocol for sizing
 For now it is split, in case we want to introduce formal view
 controllers.  But the design becomes very ugly.
 
-# Mono-Curses
-
-The only missing feature in Mono-Curses that still relies on a native library
-is to fetch the OS SIGTSTP signal, we could hardcode this value if we had
-a way of detecting the host operating system and architecture, and just hardcode
-the value based on this.
-

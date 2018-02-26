@@ -95,7 +95,7 @@ namespace Terminal.Gui {
 
 				var col = Bounds.Width - 1;
 				var bh = Bounds.Height;
-				SpecialChar special;
+				Rune special;
 
 				if (bh < 4) {
 					var by1 = position * bh / Size;
@@ -104,10 +104,10 @@ namespace Terminal.Gui {
 					for (int y = 0; y < bh; y++) {
 						Move (col, y);
 						if (y < by1 || y > by2)
-							special = SpecialChar.Stipple;
+							special = Driver.Stipple;
 						else
-							special = SpecialChar.Diamond;
-						Driver.AddSpecial (special);
+							special = Driver.Diamond;
+						Driver.AddRune(special);
 					}
 				} else {
 					bh -= 2;
@@ -123,20 +123,20 @@ namespace Terminal.Gui {
 						Move (col, y+1);
 
 						if (y < by1 || y > by2)
-							special = SpecialChar.Stipple;
+							special = Driver.Stipple;
 						else {
 							if (by2 - by1 == 0)
-								special = SpecialChar.Diamond;
+								special = Driver.Diamond;
 							else {
 								if (y == by1)
-									special = SpecialChar.TopTee;
+									special = Driver.TopTee;
 								else if (y == by2)
-									special = SpecialChar.BottomTee;
+									special = Driver.BottomTee;
 								else
-									special = SpecialChar.VLine;
+									special = Driver.VLine;
 							}
 						}
-						Driver.AddSpecial (special);
+						Driver.AddRune (special);
 					}
 				}
 			} else {
@@ -145,7 +145,7 @@ namespace Terminal.Gui {
 
 				var row = Bounds.Height - 1;
 				var bw = Bounds.Width;
-				SpecialChar special;
+				Rune special;
 
 				if (bw < 4) {
 					var bx1 = position * bw / Size;
@@ -154,10 +154,10 @@ namespace Terminal.Gui {
 					for (int x = 0; x < bw; x++) {
 						Move (0, x);
 						if (x < bx1 || x > bx2)
-							special = SpecialChar.Stipple;
+							special = Driver.Stipple;
 						else
-							special = SpecialChar.Diamond;
-						Driver.AddSpecial (special);
+							special = Driver.Diamond;
+						Driver.AddRune (special);
 					}
 				} else {
 					bw -= 2;
@@ -170,20 +170,20 @@ namespace Terminal.Gui {
 					for (int x = 0; x < bw; x++) {
 
 						if (x < bx1 || x > bx2) {
-							special = SpecialChar.Stipple;
+							special = Driver.Stipple;
 						} else {
 							if (bx2 - bx1 == 0)
-								special = SpecialChar.Diamond;
+								special = Driver.Diamond;
 							else {
 								if (x == bx1)
-									special = SpecialChar.LeftTee;
+									special = Driver.LeftTee;
 								else if (x == bx2)
-									special = SpecialChar.RightTee;
+									special = Driver.RightTee;
 								else
-									special = SpecialChar.HLine;
+									special = Driver.HLine;
 							}
 						}
-						Driver.AddSpecial (special);
+						Driver.AddRune (special);
 					}
 					Driver.AddRune ('>');
 				}
@@ -270,6 +270,7 @@ namespace Terminal.Gui {
 				contentView.Frame = new Rect (contentOffset, value);
 				vertical.Size = contentSize.Height;
 				horizontal.Size = contentSize.Width;
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -286,6 +287,7 @@ namespace Terminal.Gui {
 				contentView.Frame = new Rect (contentOffset, contentSize);
 				vertical.Position = Math.Max (0, -contentOffset.Y);
 				horizontal.Position = Math.Max (0, -contentOffset.X);
+				SetNeedsDisplay ();
 			}
 		}
 

@@ -1361,6 +1361,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_UngrabMouse_
   fullName: Application.UngrabMouse
   nameWithType: Application.UngrabMouse
+- uid: Terminal.Gui.Application.UseSystemConsole
+  name: UseSystemConsole
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_UseSystemConsole
+  fullName: Application.UseSystemConsole
+  nameWithType: Application.UseSystemConsole
 - uid: Terminal.Gui.Attribute
   name: Attribute
   href: api/Terminal.Gui/Terminal.Gui.Attribute.html
@@ -1601,6 +1606,31 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox_Toggled
   fullName: CheckBox.Toggled
   nameWithType: CheckBox.Toggled
+- uid: Terminal.Gui.Clipboard
+  name: Clipboard
+  href: api/Terminal.Gui/Terminal.Gui.Clipboard.html
+  fullName: Terminal.Gui.Clipboard
+  nameWithType: Clipboard
+- uid: Terminal.Gui.Clipboard.#ctor
+  name: Clipboard()
+  href: api/Terminal.Gui/Terminal.Gui.Clipboard.html#Terminal_Gui_Clipboard__ctor
+  fullName: Clipboard.Clipboard()
+  nameWithType: Clipboard.Clipboard()
+- uid: Terminal.Gui.Clipboard.#ctor*
+  name: Clipboard
+  href: api/Terminal.Gui/Terminal.Gui.Clipboard.html#Terminal_Gui_Clipboard__ctor_
+  fullName: Clipboard.Clipboard
+  nameWithType: Clipboard.Clipboard
+- uid: Terminal.Gui.Clipboard.Contents
+  name: Contents
+  href: api/Terminal.Gui/Terminal.Gui.Clipboard.html#Terminal_Gui_Clipboard_Contents
+  fullName: Clipboard.Contents
+  nameWithType: Clipboard.Contents
+- uid: Terminal.Gui.Clipboard.Contents*
+  name: Contents
+  href: api/Terminal.Gui/Terminal.Gui.Clipboard.html#Terminal_Gui_Clipboard_Contents_
+  fullName: Clipboard.Contents
+  nameWithType: Clipboard.Contents
 - uid: Terminal.Gui.Color
   name: Color
   href: api/Terminal.Gui/Terminal.Gui.Color.html
@@ -1806,6 +1836,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddStr_
   fullName: ConsoleDriver.AddStr
   nameWithType: ConsoleDriver.AddStr
+- uid: Terminal.Gui.ConsoleDriver.BottomTee
+  name: BottomTee
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_BottomTee
+  fullName: ConsoleDriver.BottomTee
+  nameWithType: ConsoleDriver.BottomTee
 - uid: Terminal.Gui.ConsoleDriver.Clip
   name: Clip
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Clip
@@ -1826,6 +1861,21 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Cols_
   fullName: ConsoleDriver.Cols
   nameWithType: ConsoleDriver.Cols
+- uid: Terminal.Gui.ConsoleDriver.CookMouse
+  name: CookMouse()
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_CookMouse
+  fullName: ConsoleDriver.CookMouse()
+  nameWithType: ConsoleDriver.CookMouse()
+- uid: Terminal.Gui.ConsoleDriver.CookMouse*
+  name: CookMouse
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_CookMouse_
+  fullName: ConsoleDriver.CookMouse
+  nameWithType: ConsoleDriver.CookMouse
+- uid: Terminal.Gui.ConsoleDriver.Diamond
+  name: Diamond
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Diamond
+  fullName: ConsoleDriver.Diamond
+  nameWithType: ConsoleDriver.Diamond
 - uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   name: DrawFrame(Rect, Int32, Boolean)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_
@@ -1846,6 +1896,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_End_
   fullName: ConsoleDriver.End
   nameWithType: ConsoleDriver.End
+- uid: Terminal.Gui.ConsoleDriver.HLine
+  name: HLine
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_HLine
+  fullName: ConsoleDriver.HLine
+  nameWithType: ConsoleDriver.HLine
 - uid: Terminal.Gui.ConsoleDriver.Init(System.Action)
   name: Init(Action)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Init_System_Action_
@@ -1856,6 +1911,21 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Init_
   fullName: ConsoleDriver.Init
   nameWithType: ConsoleDriver.Init
+- uid: Terminal.Gui.ConsoleDriver.LeftTee
+  name: LeftTee
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_LeftTee
+  fullName: ConsoleDriver.LeftTee
+  nameWithType: ConsoleDriver.LeftTee
+- uid: Terminal.Gui.ConsoleDriver.LLCorner
+  name: LLCorner
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_LLCorner
+  fullName: ConsoleDriver.LLCorner
+  nameWithType: ConsoleDriver.LLCorner
+- uid: Terminal.Gui.ConsoleDriver.LRCorner
+  name: LRCorner
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_LRCorner
+  fullName: ConsoleDriver.LRCorner
+  nameWithType: ConsoleDriver.LRCorner
 - uid: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
   name: Move(Int32, Int32)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Move_System_Int32_System_Int32_
@@ -1896,6 +1966,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Refresh_
   fullName: ConsoleDriver.Refresh
   nameWithType: ConsoleDriver.Refresh
+- uid: Terminal.Gui.ConsoleDriver.RightTee
+  name: RightTee
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_RightTee
+  fullName: ConsoleDriver.RightTee
+  nameWithType: ConsoleDriver.RightTee
 - uid: Terminal.Gui.ConsoleDriver.Rows
   name: Rows
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Rows
@@ -1941,6 +2016,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_StartReportingMouseMoves_
   fullName: ConsoleDriver.StartReportingMouseMoves
   nameWithType: ConsoleDriver.StartReportingMouseMoves
+- uid: Terminal.Gui.ConsoleDriver.Stipple
+  name: Stipple
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Stipple
+  fullName: ConsoleDriver.Stipple
+  nameWithType: ConsoleDriver.Stipple
 - uid: Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
   name: StopReportingMouseMoves()
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_StopReportingMouseMoves
@@ -1961,6 +2041,36 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Suspend_
   fullName: ConsoleDriver.Suspend
   nameWithType: ConsoleDriver.Suspend
+- uid: Terminal.Gui.ConsoleDriver.TopTee
+  name: TopTee
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_TopTee
+  fullName: ConsoleDriver.TopTee
+  nameWithType: ConsoleDriver.TopTee
+- uid: Terminal.Gui.ConsoleDriver.ULCorner
+  name: ULCorner
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_ULCorner
+  fullName: ConsoleDriver.ULCorner
+  nameWithType: ConsoleDriver.ULCorner
+- uid: Terminal.Gui.ConsoleDriver.UncookMouse
+  name: UncookMouse()
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UncookMouse
+  fullName: ConsoleDriver.UncookMouse()
+  nameWithType: ConsoleDriver.UncookMouse()
+- uid: Terminal.Gui.ConsoleDriver.UncookMouse*
+  name: UncookMouse
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UncookMouse_
+  fullName: ConsoleDriver.UncookMouse
+  nameWithType: ConsoleDriver.UncookMouse
+- uid: Terminal.Gui.ConsoleDriver.URCorner
+  name: URCorner
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_URCorner
+  fullName: ConsoleDriver.URCorner
+  nameWithType: ConsoleDriver.URCorner
+- uid: Terminal.Gui.ConsoleDriver.VLine
+  name: VLine
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_VLine
+  fullName: ConsoleDriver.VLine
+  nameWithType: ConsoleDriver.VLine
 - uid: Terminal.Gui.Dialog
   name: Dialog
   href: api/Terminal.Gui/Terminal.Gui.Dialog.html
@@ -2076,6 +2186,36 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.IListDataSource.html#Terminal_Gui_IListDataSource_Count_
   fullName: IListDataSource.Count
   nameWithType: IListDataSource.Count
+- uid: Terminal.Gui.IListDataSource.IsMarked(System.Int32)
+  name: IsMarked(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.IListDataSource.html#Terminal_Gui_IListDataSource_IsMarked_System_Int32_
+  fullName: IListDataSource.IsMarked(Int32)
+  nameWithType: IListDataSource.IsMarked(Int32)
+- uid: Terminal.Gui.IListDataSource.IsMarked*
+  name: IsMarked
+  href: api/Terminal.Gui/Terminal.Gui.IListDataSource.html#Terminal_Gui_IListDataSource_IsMarked_
+  fullName: IListDataSource.IsMarked
+  nameWithType: IListDataSource.IsMarked
+- uid: Terminal.Gui.IListDataSource.Render(System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  name: Render(Boolean, Int32, Int32, Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.IListDataSource.html#Terminal_Gui_IListDataSource_Render_System_Boolean_System_Int32_System_Int32_System_Int32_System_Int32_
+  fullName: IListDataSource.Render(Boolean, Int32, Int32, Int32, Int32)
+  nameWithType: IListDataSource.Render(Boolean, Int32, Int32, Int32, Int32)
+- uid: Terminal.Gui.IListDataSource.Render*
+  name: Render
+  href: api/Terminal.Gui/Terminal.Gui.IListDataSource.html#Terminal_Gui_IListDataSource_Render_
+  fullName: IListDataSource.Render
+  nameWithType: IListDataSource.Render
+- uid: Terminal.Gui.IListDataSource.SetMark(System.Int32,System.Boolean)
+  name: SetMark(Int32, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.IListDataSource.html#Terminal_Gui_IListDataSource_SetMark_System_Int32_System_Boolean_
+  fullName: IListDataSource.SetMark(Int32, Boolean)
+  nameWithType: IListDataSource.SetMark(Int32, Boolean)
+- uid: Terminal.Gui.IListDataSource.SetMark*
+  name: SetMark
+  href: api/Terminal.Gui/Terminal.Gui.IListDataSource.html#Terminal_Gui_IListDataSource_SetMark_
+  fullName: IListDataSource.SetMark
+  nameWithType: IListDataSource.SetMark
 - uid: Terminal.Gui.Key
   name: Key
   href: api/Terminal.Gui/Terminal.Gui.Key.html
@@ -2506,16 +2646,116 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ListView.html
   fullName: Terminal.Gui.ListView
   nameWithType: ListView
-- uid: Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource,System.ValueTuple{NStack.ustring,System.Int32}[])
-  name: ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
-  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView__ctor_Terminal_Gui_Rect_Terminal_Gui_IListDataSource_System_ValueTuple_NStack_ustring_System_Int32____
-  fullName: ListView.ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
-  nameWithType: ListView.ListView(Rect, IListDataSource, ValueTuple<ustring,Int32>[])
+- uid: Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,System.Collections.IList)
+  name: ListView(Rect, IList)
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView__ctor_Terminal_Gui_Rect_System_Collections_IList_
+  fullName: ListView.ListView(Rect, IList)
+  nameWithType: ListView.ListView(Rect, IList)
+- uid: Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource)
+  name: ListView(Rect, IListDataSource)
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView__ctor_Terminal_Gui_Rect_Terminal_Gui_IListDataSource_
+  fullName: ListView.ListView(Rect, IListDataSource)
+  nameWithType: ListView.ListView(Rect, IListDataSource)
 - uid: Terminal.Gui.ListView.#ctor*
   name: ListView
   href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView__ctor_
   fullName: ListView.ListView
   nameWithType: ListView.ListView
+- uid: Terminal.Gui.ListView.AllowsMarking
+  name: AllowsMarking
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_AllowsMarking
+  fullName: ListView.AllowsMarking
+  nameWithType: ListView.AllowsMarking
+- uid: Terminal.Gui.ListView.AllowsMarking*
+  name: AllowsMarking
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_AllowsMarking_
+  fullName: ListView.AllowsMarking
+  nameWithType: ListView.AllowsMarking
+- uid: Terminal.Gui.ListView.MouseEvent(Terminal.Gui.MouseEvent)
+  name: MouseEvent(MouseEvent)
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_MouseEvent_Terminal_Gui_MouseEvent_
+  fullName: ListView.MouseEvent(MouseEvent)
+  nameWithType: ListView.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.ListView.MouseEvent*
+  name: MouseEvent
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_MouseEvent_
+  fullName: ListView.MouseEvent
+  nameWithType: ListView.MouseEvent
+- uid: Terminal.Gui.ListView.PositionCursor
+  name: PositionCursor()
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_PositionCursor
+  fullName: ListView.PositionCursor()
+  nameWithType: ListView.PositionCursor()
+- uid: Terminal.Gui.ListView.PositionCursor*
+  name: PositionCursor
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_PositionCursor_
+  fullName: ListView.PositionCursor
+  nameWithType: ListView.PositionCursor
+- uid: Terminal.Gui.ListView.ProcessKey(Terminal.Gui.KeyEvent)
+  name: ProcessKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_ProcessKey_Terminal_Gui_KeyEvent_
+  fullName: ListView.ProcessKey(KeyEvent)
+  nameWithType: ListView.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.ListView.ProcessKey*
+  name: ProcessKey
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_ProcessKey_
+  fullName: ListView.ProcessKey
+  nameWithType: ListView.ProcessKey
+- uid: Terminal.Gui.ListView.Redraw(Terminal.Gui.Rect)
+  name: Redraw(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_Redraw_Terminal_Gui_Rect_
+  fullName: ListView.Redraw(Rect)
+  nameWithType: ListView.Redraw(Rect)
+- uid: Terminal.Gui.ListView.Redraw*
+  name: Redraw
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_Redraw_
+  fullName: ListView.Redraw
+  nameWithType: ListView.Redraw
+- uid: Terminal.Gui.ListView.SelectedChanged
+  name: SelectedChanged
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_SelectedChanged
+  fullName: ListView.SelectedChanged
+  nameWithType: ListView.SelectedChanged
+- uid: Terminal.Gui.ListView.SelectedItem
+  name: SelectedItem
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_SelectedItem
+  fullName: ListView.SelectedItem
+  nameWithType: ListView.SelectedItem
+- uid: Terminal.Gui.ListView.SelectedItem*
+  name: SelectedItem
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_SelectedItem_
+  fullName: ListView.SelectedItem
+  nameWithType: ListView.SelectedItem
+- uid: Terminal.Gui.ListView.SetSource(System.Collections.IList)
+  name: SetSource(IList)
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_SetSource_System_Collections_IList_
+  fullName: ListView.SetSource(IList)
+  nameWithType: ListView.SetSource(IList)
+- uid: Terminal.Gui.ListView.SetSource*
+  name: SetSource
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_SetSource_
+  fullName: ListView.SetSource
+  nameWithType: ListView.SetSource
+- uid: Terminal.Gui.ListView.Source
+  name: Source
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_Source
+  fullName: ListView.Source
+  nameWithType: ListView.Source
+- uid: Terminal.Gui.ListView.Source*
+  name: Source
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_Source_
+  fullName: ListView.Source
+  nameWithType: ListView.Source
+- uid: Terminal.Gui.ListView.TopItem
+  name: TopItem
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_TopItem
+  fullName: ListView.TopItem
+  nameWithType: ListView.TopItem
+- uid: Terminal.Gui.ListView.TopItem*
+  name: TopItem
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_TopItem_
+  fullName: ListView.TopItem
+  nameWithType: ListView.TopItem
 - uid: Terminal.Gui.MenuBar
   name: MenuBar
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html
@@ -3041,6 +3281,51 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Point.html#Terminal_Gui_Point_Y
   fullName: Point.Y
   nameWithType: Point.Y
+- uid: Terminal.Gui.ProgressBar
+  name: ProgressBar
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html
+  fullName: Terminal.Gui.ProgressBar
+  nameWithType: ProgressBar
+- uid: Terminal.Gui.ProgressBar.#ctor(Terminal.Gui.Rect)
+  name: ProgressBar(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar__ctor_Terminal_Gui_Rect_
+  fullName: ProgressBar.ProgressBar(Rect)
+  nameWithType: ProgressBar.ProgressBar(Rect)
+- uid: Terminal.Gui.ProgressBar.#ctor*
+  name: ProgressBar
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar__ctor_
+  fullName: ProgressBar.ProgressBar
+  nameWithType: ProgressBar.ProgressBar
+- uid: Terminal.Gui.ProgressBar.Fraction
+  name: Fraction
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Fraction
+  fullName: ProgressBar.Fraction
+  nameWithType: ProgressBar.Fraction
+- uid: Terminal.Gui.ProgressBar.Fraction*
+  name: Fraction
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Fraction_
+  fullName: ProgressBar.Fraction
+  nameWithType: ProgressBar.Fraction
+- uid: Terminal.Gui.ProgressBar.Pulse
+  name: Pulse()
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Pulse
+  fullName: ProgressBar.Pulse()
+  nameWithType: ProgressBar.Pulse()
+- uid: Terminal.Gui.ProgressBar.Pulse*
+  name: Pulse
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Pulse_
+  fullName: ProgressBar.Pulse
+  nameWithType: ProgressBar.Pulse
+- uid: Terminal.Gui.ProgressBar.Redraw(Terminal.Gui.Rect)
+  name: Redraw(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Redraw_Terminal_Gui_Rect_
+  fullName: ProgressBar.Redraw(Rect)
+  nameWithType: ProgressBar.Redraw(Rect)
+- uid: Terminal.Gui.ProgressBar.Redraw*
+  name: Redraw
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar_Redraw_
+  fullName: ProgressBar.Redraw
+  nameWithType: ProgressBar.Redraw
 - uid: Terminal.Gui.RadioGroup
   name: RadioGroup
   href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html
@@ -3591,6 +3876,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_PositionCursor_
   fullName: ScrollView.PositionCursor
   nameWithType: ScrollView.PositionCursor
+- uid: Terminal.Gui.ScrollView.ProcessKey(Terminal.Gui.KeyEvent)
+  name: ProcessKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ProcessKey_Terminal_Gui_KeyEvent_
+  fullName: ScrollView.ProcessKey(KeyEvent)
+  nameWithType: ScrollView.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.ScrollView.ProcessKey*
+  name: ProcessKey
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ProcessKey_
+  fullName: ScrollView.ProcessKey
+  nameWithType: ScrollView.ProcessKey
 - uid: Terminal.Gui.ScrollView.Redraw(Terminal.Gui.Rect)
   name: Redraw(Rect)
   href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_Redraw_Terminal_Gui_Rect_
@@ -3601,11 +3896,51 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_Redraw_
   fullName: ScrollView.Redraw
   nameWithType: ScrollView.Redraw
+- uid: Terminal.Gui.ScrollView.ScrollDown(System.Int32)
+  name: ScrollDown(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ScrollDown_System_Int32_
+  fullName: ScrollView.ScrollDown(Int32)
+  nameWithType: ScrollView.ScrollDown(Int32)
+- uid: Terminal.Gui.ScrollView.ScrollDown*
+  name: ScrollDown
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ScrollDown_
+  fullName: ScrollView.ScrollDown
+  nameWithType: ScrollView.ScrollDown
 - uid: Terminal.Gui.ScrollView.Scrolled
   name: Scrolled
   href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_Scrolled
   fullName: ScrollView.Scrolled
   nameWithType: ScrollView.Scrolled
+- uid: Terminal.Gui.ScrollView.ScrollLeft(System.Int32)
+  name: ScrollLeft(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ScrollLeft_System_Int32_
+  fullName: ScrollView.ScrollLeft(Int32)
+  nameWithType: ScrollView.ScrollLeft(Int32)
+- uid: Terminal.Gui.ScrollView.ScrollLeft*
+  name: ScrollLeft
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ScrollLeft_
+  fullName: ScrollView.ScrollLeft
+  nameWithType: ScrollView.ScrollLeft
+- uid: Terminal.Gui.ScrollView.ScrollRight(System.Int32)
+  name: ScrollRight(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ScrollRight_System_Int32_
+  fullName: ScrollView.ScrollRight(Int32)
+  nameWithType: ScrollView.ScrollRight(Int32)
+- uid: Terminal.Gui.ScrollView.ScrollRight*
+  name: ScrollRight
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ScrollRight_
+  fullName: ScrollView.ScrollRight
+  nameWithType: ScrollView.ScrollRight
+- uid: Terminal.Gui.ScrollView.ScrollUp(System.Int32)
+  name: ScrollUp(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ScrollUp_System_Int32_
+  fullName: ScrollView.ScrollUp(Int32)
+  nameWithType: ScrollView.ScrollUp(Int32)
+- uid: Terminal.Gui.ScrollView.ScrollUp*
+  name: ScrollUp
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ScrollUp_
+  fullName: ScrollView.ScrollUp
+  nameWithType: ScrollView.ScrollUp
 - uid: Terminal.Gui.ScrollView.ShowHorizontalScrollIndicator
   name: ShowHorizontalScrollIndicator
   href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ShowHorizontalScrollIndicator
@@ -4511,6 +4846,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_GetEnumerator_
   fullName: Window.GetEnumerator
   nameWithType: Window.GetEnumerator
+- uid: Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
+  name: MouseEvent(MouseEvent)
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_MouseEvent_Terminal_Gui_MouseEvent_
+  fullName: Window.MouseEvent(MouseEvent)
+  nameWithType: Window.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.Window.MouseEvent*
+  name: MouseEvent
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_MouseEvent_
+  fullName: Window.MouseEvent
+  nameWithType: Window.MouseEvent
 - uid: Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
   name: Redraw(Rect)
   href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_Redraw_Terminal_Gui_Rect_

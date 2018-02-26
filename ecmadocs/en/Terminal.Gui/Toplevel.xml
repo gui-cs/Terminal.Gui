@@ -75,8 +75,8 @@
       </Docs>
     </Member>
     <Member MemberName="ProcessKey">
-      <MemberSignature Language="C#" Value="public override bool ProcessKey (Terminal.Gui.KeyEvent kb);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
+      <MemberSignature Language="C#" Value="public override bool ProcessKey (Terminal.Gui.KeyEvent keyEvent);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessKey(valuetype Terminal.Gui.KeyEvent keyEvent) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -88,7 +88,7 @@
         <Parameter Name="kb" Type="Terminal.Gui.KeyEvent" />
       </Parameters>
       <Docs>
-        <param name="kb">To be added.</param>
+        <param name="keyEvent">To be added.</param>
         <summary>To be added.</summary>
         <returns>To be added.</returns>
         <remarks>To be added.</remarks>

@@ -72,7 +72,8 @@
   
   <h1 id="Terminal_Gui_IListDataSource" data-uid="Terminal.Gui.IListDataSource">Interface IListDataSource
   </h1>
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>Implement this interface to provide your own custom rendering for a list.</p>
+</div>
   <div class="markdown level0 conceptual"></div>
   <h6><strong>Namespace</strong>: <a class="xref" href="../Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
@@ -86,7 +87,8 @@
   
   <a id="Terminal_Gui_IListDataSource_Count_" data-uid="Terminal.Gui.IListDataSource.Count*"></a>
   <h4 id="Terminal_Gui_IListDataSource_Count" data-uid="Terminal.Gui.IListDataSource.Count">Count</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Returns the number of elements to display</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -104,6 +106,144 @@
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><p>To be added.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Terminal_Gui_IListDataSource_IsMarked_" data-uid="Terminal.Gui.IListDataSource.IsMarked*"></a>
+  <h4 id="Terminal_Gui_IListDataSource_IsMarked_System_Int32_" data-uid="Terminal.Gui.IListDataSource.IsMarked(System.Int32)">IsMarked(Int32)</h4>
+  <div class="markdown level1 summary"><p>Should return whether the specified item is currently marked.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsMarked (int item);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">item</span></td>
+        <td><p>Item index.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><p><code>true</code>, if marked, <code>false</code> otherwise.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_IListDataSource_Render_" data-uid="Terminal.Gui.IListDataSource.Render*"></a>
+  <h4 id="Terminal_Gui_IListDataSource_Render_System_Boolean_System_Int32_System_Int32_System_Int32_System_Int32_" data-uid="Terminal.Gui.IListDataSource.Render(System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)">Render(Boolean, Int32, Int32, Int32, Int32)</h4>
+  <div class="markdown level1 summary"><p>This method is invoked to render a specified item, the method should cover the entire provided width.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Render (bool selected, int item, int col, int line, int width);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">selected</span></td>
+        <td><p>Describes whether the item being rendered is currently selected by the user.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">item</span></td>
+        <td><p>The index of the item to render, zero for the first item and so on.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">col</span></td>
+        <td><p>The column where the rendering will start</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">line</span></td>
+        <td><p>The line where the rendering will be done.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">width</span></td>
+        <td><p>The width that must be filled out.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_IListDataSource_Render_System_Boolean_System_Int32_System_Int32_System_Int32_System_Int32__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>The default color will be set before this method is invoked, and will be based on whether the item is selected or not.</p>
+</div>
+  
+  
+  <a id="Terminal_Gui_IListDataSource_SetMark_" data-uid="Terminal.Gui.IListDataSource.SetMark*"></a>
+  <h4 id="Terminal_Gui_IListDataSource_SetMark_System_Int32_System_Boolean_" data-uid="Terminal.Gui.IListDataSource.SetMark(System.Int32,System.Boolean)">SetMark(Int32, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Flags the item as marked.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetMark (int item, bool value);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">item</span></td>
+        <td><p>Item index.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">value</span></td>
+        <td><p>If set to <code>true</code> value.</p>
 </td>
       </tr>
     </tbody>

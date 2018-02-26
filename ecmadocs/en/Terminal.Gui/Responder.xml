@@ -60,8 +60,8 @@
       </Docs>
     </Member>
     <Member MemberName="MouseEvent">
-      <MemberSignature Language="C#" Value="public virtual bool MouseEvent (Terminal.Gui.MouseEvent me);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance bool MouseEvent(valuetype Terminal.Gui.MouseEvent me) cil managed" />
+      <MemberSignature Language="C#" Value="public virtual bool MouseEvent (Terminal.Gui.MouseEvent mouseEvent);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance bool MouseEvent(valuetype Terminal.Gui.MouseEvent mouseEvent) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -73,15 +73,18 @@
         <Parameter Name="me" Type="Terminal.Gui.MouseEvent" />
       </Parameters>
       <Docs>
-        <param name="me">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
+        <param name="mouseEvent">Contains the details about the mouse event.</param>
+        <summary>
+            Method invoked when a mouse event is generated
+            </summary>
+        <returns>
+          <c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
     <Member MemberName="ProcessColdKey">
-      <MemberSignature Language="C#" Value="public virtual bool ProcessColdKey (Terminal.Gui.KeyEvent kb);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance bool ProcessColdKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
+      <MemberSignature Language="C#" Value="public virtual bool ProcessColdKey (Terminal.Gui.KeyEvent keyEvent);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance bool ProcessColdKey(valuetype Terminal.Gui.KeyEvent keyEvent) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -93,7 +96,7 @@
         <Parameter Name="kb" Type="Terminal.Gui.KeyEvent" />
       </Parameters>
       <Docs>
-        <param name="kb">To be added.</param>
+        <param name="keyEvent">Contains the details about the key that produced the event.</param>
         <summary>
               This method can be overwritten by views that
                 want to provide accelerator functionality
@@ -158,8 +161,8 @@
       </Docs>
     </Member>
     <Member MemberName="ProcessKey">
-      <MemberSignature Language="C#" Value="public virtual bool ProcessKey (Terminal.Gui.KeyEvent kb);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance bool ProcessKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
+      <MemberSignature Language="C#" Value="public virtual bool ProcessKey (Terminal.Gui.KeyEvent keyEvent);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance bool ProcessKey(valuetype Terminal.Gui.KeyEvent keyEvent) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -171,7 +174,7 @@
         <Parameter Name="kb" Type="Terminal.Gui.KeyEvent" />
       </Parameters>
       <Docs>
-        <param name="kb">To be added.</param>
+        <param name="keyEvent">Contains the details about the key that produced the event.</param>
         <summary>
               If the view is focused, gives the view a
               chance to process the keystroke. 

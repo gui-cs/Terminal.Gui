@@ -93,9 +93,14 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public struct Attribute {
 		internal int value;
-		public Attribute (int v)
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Attribute"/> struct.
+		/// </summary>
+		/// <param name="value">Value.</param>
+		public Attribute (int value)
 		{
-			value = v;
+			this.value = value;
 		}
 
 		public static implicit operator int (Attribute c) => c.value;
@@ -252,7 +257,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="str">String.</param>
 		public abstract void AddStr (ustring str);
-		public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> target, Action<MouseEvent> mouse);
+		public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler);
 
 		/// <summary>
 		/// Updates the screen to reflect all the changes that have been done to the display buffer
@@ -263,7 +268,16 @@ namespace Terminal.Gui {
 		/// Ends the execution of the console driver.
 		/// </summary>
 		public abstract void End ();
-		public abstract void RedrawTop ();
+
+		/// <summary>
+		/// Redraws the physical screen with the contents that have been queued up via any of the printing commands.
+		/// </summary>
+		public abstract void UpdateScreen ();
+
+		/// <summary>
+		/// Selects the specified attribute as the attribute to use for future calls to AddRune, AddString.
+		/// </summary>
+		/// <param name="c">C.</param>
 		public abstract void SetAttribute (Attribute c);
 
 		// Set Colors from limit sets of colors
@@ -279,12 +293,67 @@ namespace Terminal.Gui {
 		/// <param name="backgroundColorId">Background color identifier.</param>
 		public abstract void SetColors (short foregroundColorId, short backgroundColorId);
 
-		public abstract void DrawFrame (Rect region, int padding, bool fill);
 		/// <summary>
-		/// Draws a special characters in the screen
+		/// Draws a frame on the specified region with the specified padding around the frame.
 		/// </summary>
-		/// <param name="ch">Ch.</param>
-		public abstract void AddSpecial (SpecialChar ch);
+		/// <param name="region">Region where the frame will be drawn..</param>
+		/// <param name="padding">Padding to add on the sides.</param>
+		/// <param name="fill">If set to <c>true</c> it will clear the contents with the current color, otherwise the contents will be left untouched.</param>
+		public virtual void DrawFrame (Rect region, int padding, bool fill)
+		{
+			int width = region.Width;
+			int height = region.Height;
+			int b;
+			int fwidth = width - padding * 2;
+			int fheight = height - 1 - padding;
+
+			Move (region.X, region.Y);
+			if (padding > 0) {
+				for (int l = 0; l < padding; l++)
+					for (b = 0; b < width; b++)
+						AddRune (' ');
+			}
+			Move (region.X, region.Y + padding);
+			for (int c = 0; c < padding; c++)
+				AddRune (' ');
+			AddRune (ULCorner);
+			for (b = 0; b < fwidth - 2; b++)
+				AddRune (HLine);
+			AddRune (URCorner);
+			for (int c = 0; c < padding; c++)
+				AddRune (' ');
+
+			for (b = 1 + padding; b < fheight; b++) {
+				Move (region.X, region.Y + b);
+				for (int c = 0; c < padding; c++)
+					AddRune (' ');
+				AddRune (VLine);
+				if (fill) {
+					for (int x = 1; x < fwidth - 1; x++)
+						AddRune (' ');
+				} else
+					Move (region.X + fwidth - 1, region.Y + b);
+				AddRune (VLine);
+				for (int c = 0; c < padding; c++)
+					AddRune (' ');
+			}
+			Move (region.X, region.Y + fheight);
+			for (int c = 0; c < padding; c++)
+				AddRune (' ');
+			AddRune (LLCorner);
+			for (b = 0; b < fwidth - 2; b++)
+				AddRune (HLine);
+			AddRune (LRCorner);
+			for (int c = 0; c < padding; c++)
+				AddRune (' ');
+			if (padding > 0) {
+				Move (region.X, region.Y + height - padding);
+				for (int l = 0; l < padding; l++)
+					for (b = 0; b < width; b++)
+						AddRune (' ');
+			}			
+		}
+
 
 		/// <summary>
 		/// Suspend the application, typically needs to save the state, suspend the app and upon return, reset the console driver.
@@ -304,6 +373,76 @@ namespace Terminal.Gui {
 
 		public abstract void StartReportingMouseMoves ();
 		public abstract void StopReportingMouseMoves ();
+
+		/// <summary>
+		/// Disables the cooked event processing from the mouse driver.  At startup, it is assumed mouse events are cooked.
+		/// </summary>
+		public abstract void UncookMouse ();
+
+		/// <summary>
+		/// Enables the cooked event processing from the mouse driver
+		/// </summary>
+		public abstract void CookMouse ();
+
+		/// <summary>
+		/// Horizontal line character.
+		/// </summary>
+		public Rune HLine;
+
+		/// <summary>
+		/// Vertical line character.
+		/// </summary>
+		public Rune VLine;
+
+		/// <summary>
+		/// Stipple pattern
+		/// </summary>
+		public Rune Stipple;
+
+		/// <summary>
+		/// Diamond character
+		/// </summary>
+		public Rune Diamond;
+
+		/// <summary>
+		/// Upper left corner
+		/// </summary>
+		public Rune ULCorner;
+
+		/// <summary>
+		/// Lower left corner
+		/// </summary>
+		public Rune LLCorner;
+
+		/// <summary>
+		/// Upper right corner
+		/// </summary>
+		public Rune URCorner;
+
+		/// <summary>
+		/// Lower right corner
+		/// </summary>
+		public Rune LRCorner;
+
+		/// <summary>
+		/// Left tee
+		/// </summary>
+		public Rune LeftTee;
+
+		/// <summary>
+		/// Right tee
+		/// </summary>
+		public Rune RightTee;
+
+		/// <summary>
+		/// Top tee 
+		/// </summary>
+		public Rune TopTee;
+
+		/// <summary>
+		/// The bottom tee.
+		/// </summary>
+		public Rune BottomTee;
 	}
 
 	/// <summary>
@@ -332,7 +471,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static bool sync = false;
+		static bool sync;
 		public override void AddRune (Rune rune)
 		{
 			if (Clip.Contains (ccol, crow)) {
@@ -348,48 +487,6 @@ namespace Terminal.Gui {
 			ccol++;
 		}
 
-		public override void AddSpecial (SpecialChar ch)
-		{
-			switch (ch) {
-			case SpecialChar.HLine:
-				AddRune(Curses.ACS_HLINE);
-				break;
-			case SpecialChar.VLine:
-				AddRune(Curses.ACS_VLINE);
-				break;
-			case SpecialChar.Stipple:
-				AddRune(Curses.ACS_CKBOARD);
-				break;
-			case SpecialChar.Diamond:
-				AddRune(Curses.ACS_DIAMOND);
-				break;
-			case SpecialChar.ULCorner:
-				AddRune (Curses.ACS_ULCORNER);
-				break;
-			case SpecialChar.LLCorner:
-				AddRune (Curses.ACS_LLCORNER);
-				break;
-			case SpecialChar.URCorner:
-				AddRune (Curses.ACS_URCORNER);
-				break;
-			case SpecialChar.LRCorner:
-				AddRune (Curses.ACS_LRCORNER);
-				break;
-			case SpecialChar.LeftTee:
-				AddRune (Curses.ACS_LTEE);
-				break;
-			case SpecialChar.RightTee:
-				AddRune (Curses.ACS_RTEE);
-				break;
-			case SpecialChar.TopTee:
-				AddRune (Curses.ACS_TTEE);
-				break;
-			case SpecialChar.BottomTee:
-				AddRune (Curses.ACS_BTEE);
-				break;
-			}
-		}
-
 		public override void AddStr (ustring str)
 		{
 			// TODO; optimize this to determine if the str fits in the clip region, and if so, use Curses.addstr directly
@@ -399,7 +496,7 @@ namespace Terminal.Gui {
 
 		public override void Refresh () => Curses.refresh ();
 		public override void End () => Curses.endwin ();
-		public override void RedrawTop () => window.redrawwin ();
+		public override void UpdateScreen () => window.redrawwin ();
 		public override void SetAttribute (Attribute c) => Curses.attrset (c.value);
 		public Curses.Window window;
 
@@ -534,61 +631,6 @@ namespace Terminal.Gui {
 
 		}
 
-		public override void DrawFrame (Rect region, int padding, bool fill)
-		{
-			int width = region.Width;
-			int height = region.Height;
-			int b;
-			int fwidth = width - padding * 2;
-			int fheight = height - 1 - padding;
-
-			Move (region.X, region.Y);
-			if (padding > 0) {
-				for (int l = 0; l < padding; l++)
-					for (b = 0; b < width; b++)
-						AddRune (' ');
-			}
-			Move (region.X, region.Y + padding);
-			for (int c = 0; c < padding; c++)
-				AddRune (' ');
-			AddRune (Curses.ACS_ULCORNER);
-			for (b = 0; b < fwidth - 2; b++)
-				AddRune (Curses.ACS_HLINE);
-			AddRune (Curses.ACS_URCORNER);
-			for (int c = 0; c < padding; c++)
-				AddRune (' ');
-				
-			for (b = 1+padding; b < fheight; b++) {
-				Move (region.X, region.Y + b);
-				for (int c = 0; c < padding; c++)
-					AddRune (' ');
-				AddRune (Curses.ACS_VLINE);
-				if (fill) {	
-					for (int x = 1; x < fwidth - 1; x++)
-						AddRune (' ');
-				} else
-					Move (region.X + fwidth - 1, region.Y + b);
-				AddRune (Curses.ACS_VLINE);
-				for (int c = 0; c < padding; c++)
-					AddRune (' ');
-			}
-			Move (region.X, region.Y + fheight);
-			for (int c = 0; c < padding; c++)
-				AddRune (' ');
-			AddRune (Curses.ACS_LLCORNER);
-			for (b = 0; b < fwidth - 2; b++)
-				AddRune (Curses.ACS_HLINE);
-			AddRune (Curses.ACS_LRCORNER);
-			for (int c = 0; c < padding; c++)
-				AddRune (' ');
-			if (padding > 0) {
-				Move (region.X, region.Y + height - padding);
-				for (int l = 0; l < padding; l++)
-					for (b = 0; b < width; b++)
-						AddRune (' ');
-			}
-		}
-
 		Curses.Event oldMouseEvents, reportableMouseEvents;
 		public override void Init (Action terminalResized)
 		{
@@ -602,10 +644,24 @@ namespace Terminal.Gui {
 			}
 			Curses.raw ();
 			Curses.noecho ();
+
 			Curses.Window.Standard.keypad (true);
 			reportableMouseEvents = Curses.mousemask (Curses.Event.AllEvents | Curses.Event.ReportMousePosition, out oldMouseEvents);
 			this.terminalResized = terminalResized;
 			StartReportingMouseMoves ();
+
+			HLine = Curses.ACS_HLINE;
+			VLine = Curses.ACS_VLINE;
+			Stipple = Curses.ACS_CKBOARD;
+			Diamond = Curses.ACS_DIAMOND;
+			ULCorner = Curses.ACS_ULCORNER;
+			LLCorner = Curses.ACS_LLCORNER;
+			URCorner = Curses.ACS_URCORNER;
+			LRCorner = Curses.ACS_LRCORNER;
+			LeftTee = Curses.ACS_LTEE;
+			RightTee = Curses.ACS_RTEE;
+			TopTee = Curses.ACS_TTEE;
+			BottomTee = Curses.ACS_BTEE;
 
 			Colors.Base = new ColorScheme ();
 			Colors.Dialog = new ColorScheme ();
@@ -680,6 +736,23 @@ namespace Terminal.Gui {
 			Console.Out.Write ("\x1b[?1003l");
 			Console.Out.Flush ();
 		}
+
+		int lastMouseInterval;
+		bool mouseGrabbed;
+
+		public override void UncookMouse()
+		{
+			if (mouseGrabbed)
+				return;
+			lastMouseInterval = Curses.mouseinterval (0);
+			mouseGrabbed = true;
+		}
+
+		public override void CookMouse()
+		{
+			mouseGrabbed = false;
+			Curses.mouseinterval (lastMouseInterval);
+		}
 	}
 
 	internal static class Platform {
@@ -747,24 +820,20 @@ namespace Terminal.Gui {
 		public override int Cols => Console.WindowWidth;
 		public override int Rows => Console.WindowHeight;
 
+		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		int [,,] contents;
 		bool [] dirtyLine;
-
-		static int MakeColor (int fg, int bg)
-		{
-			return (fg << 16) | bg;
-		}
 
 		void UpdateOffscreen ()
 		{
 			int cols = Cols;
 			int rows = Rows;
 
-			contents = new int [cols, rows, 3];
+			contents = new int [rows, cols, 3];
 			for (int r = 0; r < rows; r++) {
 				for (int c = 0; c < cols; c++) {
 					contents [r, c, 0] = ' ';
-					contents [r, c, 1] = MakeColor (7, 0);
+					contents [r, c, 1] = MakeColor (ConsoleColor.Gray, ConsoleColor.Black);
 					contents [r, c, 2] = 0;
 				}
 			}
@@ -773,36 +842,55 @@ namespace Terminal.Gui {
 				dirtyLine [row] = true;
 		}
 
+		static bool sync;
+
 		public NetDriver ()
 		{
 			UpdateOffscreen ();
 		}
 
+		bool needMove;
 		// Current row, and current col, tracked by Move/AddCh only
 		int ccol, crow;
 		public override void Move (int col, int row)
 		{
 			ccol = col;
 			crow = row;
+
+			if (Clip.Contains (col, row)) {
+				Console.CursorTop = row;
+				Console.CursorLeft = col;
+				needMove = false;
+			} else {
+				Console.CursorTop = Clip.Y;
+				Console.CursorLeft = Clip.X;
+				needMove = true;
+			}
+
 		}
 
 		public override void AddRune (Rune rune)
 		{
 			if (Clip.Contains (ccol, crow)) {
-				contents [crow, ccol, 0] = (int) (uint) rune;
+				if (needMove) {
+					Console.CursorLeft = ccol;
+					Console.CursorTop = crow;
+					needMove = false;
+				}
+				contents [crow, ccol, 0] = (int)(uint)rune;
+				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
-			}
+				dirtyLine [crow] = true;
+			} else
+				needMove = true;
 			ccol++;
 			if (ccol == Cols) {
 				ccol = 0;
 				if (crow + 1 < Rows)
 					crow++;
 			}
-		}
-
-		public override void AddSpecial (SpecialChar ch)
-		{
-			AddRune ('*');
+			if (sync)
+				UpdateScreen ();
 		}
 
 		public override void AddStr (ustring str)
@@ -811,45 +899,75 @@ namespace Terminal.Gui {
 				AddRune (rune);
 		}
 
-		public override void DrawFrame(Rect region, int padding, bool fill)
+		public override void End ()
 		{
-			int width = region.Width;
-			int height = region.Height;
-			int b;
-
-			Move (region.X, region.Y);
-			AddRune ('+');
-			for (b = 0; b < width - 2; b++)
-				AddRune ('-');
-			AddRune ('+');
-			for (b = 1; b < height - 1; b++) {
-				Move (region.X, region.Y + b);
-				AddRune ('|');
-				if (fill) {
-					for (int x = 1; x < width - 1; x++)
-						AddRune (' ');
-				} else
-					Move (region.X + width - 1, region.Y + b);
-				AddRune ('|');
-			}
-			Move (region.X, region.Y + height - 1);
-			AddRune ('+');
-			for (b = 0; b < width - 2; b++)
-				AddRune ('-');
-			AddRune ('+');
+			Console.ResetColor ();
+			Console.Clear ();
 		}
 
-		public override void End()
+		static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
 		{
+			// Encode the colors into the int value.
+			return new Attribute () { value = ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff) };
+		}
+
+
+		public override void Init (Action terminalResized)
+		{
+			Colors.Base = new ColorScheme ();
+			Colors.Dialog = new ColorScheme ();
+			Colors.Menu = new ColorScheme ();
+			Colors.Error = new ColorScheme ();
+			Clip = new Rect (0, 0, Cols, Rows);
+
+			HLine =  '\u2500';
+			VLine =  '\u2502';
+			Stipple =  '\u2592';
+			Diamond =  '\u25c6';
+			ULCorner =  '\u250C';
+			LLCorner =  '\u2514';
+			URCorner =  '\u2510';
+			LRCorner =  '\u2518';
+			LeftTee =  '\u251c';
+			RightTee =  '\u2524';
+			TopTee =  '\u22a4';
+			BottomTee =  '\u22a5';
 			
+			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Blue);
+			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
+			Colors.Base.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Blue);
+			Colors.Base.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
+
+			// Focused, 
+			//    Selected, Hot: Yellow on Black
+			//    Selected, text: white on black
+			//    Unselected, hot: yellow on cyan
+			//    unselected, text: same as unfocused
+			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
+			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
+			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
+			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Cyan);
+
+			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
+			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
+			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
+			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Cyan);
+
+			Colors.Error.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Red);
+			Colors.Error.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
+			Colors.Error.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Red);
+			Colors.Error.HotFocus = Colors.Error.HotNormal;
 		}
 
-		public override void Init(Action terminalResized)
+		int redrawColor = -1;
+		void SetColor (int color)
 		{
-			
+			redrawColor = color;
+			Console.BackgroundColor = (ConsoleColor)(color & 0xffff);
+			Console.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
 		}
 
-		public override void RedrawTop()
+		public override void UpdateScreen ()
 		{
 			int rows = Rows;
 			int cols = Cols;
@@ -860,16 +978,21 @@ namespace Terminal.Gui {
 				dirtyLine [row] = false;
 				for (int col = 0; col < cols; col++) {
 					contents [row, col, 2] = 0;
+					var color = contents [row, col, 1];
+					if (color != redrawColor)
+						SetColor (color);
 					Console.Write ((char)contents [row, col, 0]);
 				}
 			}
 		}
 
-		public override void Refresh()
+		public override void Refresh ()
 		{
 			int rows = Rows;
 			int cols = Cols;
 
+			var savedRow = Console.CursorTop;
+			var savedCol = Console.CursorLeft;
 			for (int row = 0; row < rows; row++) {
 				if (!dirtyLine [row])
 					continue;
@@ -877,47 +1000,121 @@ namespace Terminal.Gui {
 				for (int col = 0; col < cols; col++) {
 					if (contents [row, col, 2] != 1)
 						continue;
-					
+
 					Console.CursorTop = row;
 					Console.CursorLeft = col;
 					for (; col < cols && contents [row, col, 2] == 1; col++) {
+						var color = contents [row, col, 1];
+						if (color != redrawColor)
+							SetColor (color);
+
 						Console.Write ((char)contents [row, col, 0]);
 						contents [row, col, 2] = 0;
 					}
 				}
 			}
+			Console.CursorTop = savedRow;
+			Console.CursorLeft = savedCol;
 		}
 
 		public override void StartReportingMouseMoves()
 		{
 		}
 
-		public override void StopReportingMouseMoves()
+		public override void StopReportingMouseMoves ()
 		{
 		}
 
-		public override void Suspend()
+		public override void Suspend ()
 		{
 		}
 
-		public override void SetAttribute(Attribute c)
+		int currentAttribute;
+		public override void SetAttribute (Attribute c)
 		{
-			throw new NotImplementedException();
+			currentAttribute = c.value;
 		}
 
-		public override void PrepareToRun(MainLoop mainLoop, Action<KeyEvent> target, Action<MouseEvent> mouse)
+		Key MapKey (ConsoleKeyInfo keyInfo)
 		{
-			throw new NotImplementedException();
+			switch (keyInfo.Key) {
+			case ConsoleKey.Escape:
+				return Key.Esc;
+			case ConsoleKey.Tab:
+				return Key.Tab;
+			case ConsoleKey.Home:
+				return Key.Home;
+			case ConsoleKey.End:
+				return Key.End;
+			case ConsoleKey.LeftArrow:
+				return Key.CursorLeft;
+			case ConsoleKey.RightArrow:
+				return Key.CursorRight;
+			case ConsoleKey.UpArrow:
+				return Key.CursorUp;
+			case ConsoleKey.DownArrow:
+				return Key.CursorDown;
+			case ConsoleKey.PageUp:
+				return Key.PageUp;
+			case ConsoleKey.PageDown:
+				return Key.PageDown;
+			case ConsoleKey.Enter:
+				return Key.Enter;
+			case ConsoleKey.Spacebar:
+				return Key.Space;
+			case ConsoleKey.Backspace:
+				return Key.Backspace;
+			case ConsoleKey.Delete:
+				return Key.Delete;
+			}
+
+			var key = keyInfo.Key;
+			if (key >= ConsoleKey.A && key <= ConsoleKey.Z){
+				var delta = key - ConsoleKey.A;
+				if (keyInfo.Modifiers == ConsoleModifiers.Control)
+					return (Key)((uint)Key.ControlA + delta);
+				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
+					return (Key) (((uint)Key.AltMask) | ((uint)'A' + delta));
+				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
+					return (Key)((uint)'A' + delta);
+				else
+					return (Key)((uint)'a' + delta);
+			}
+			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
+				var delta = key - ConsoleKey.F1;
+
+				return (Key)((int) Key.F1 + delta);
+			}
+
+			return (Key)(0xffffffff);
 		}
 
-		public override void SetColors(ConsoleColor foreground, ConsoleColor background)
+		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler)
 		{
-			throw new NotImplementedException();
+			mainLoop.WindowsKeyPressed = delegate (ConsoleKeyInfo consoleKey) {
+				var map = MapKey (consoleKey);
+				if (map == (Key) 0xffffffff)
+					return;
+				keyHandler (new KeyEvent (map));
+			};
 		}
 
-		public override void SetColors(short foregroundColorId, short backgroundColorId)
+		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
-			throw new NotImplementedException();
+			throw new NotImplementedException ();
+		}
+
+		public override void SetColors (short foregroundColorId, short backgroundColorId)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override void CookMouse ()
+		{
+		}
+
+		public override void UncookMouse ()
+		{
 		}
 	}
 }

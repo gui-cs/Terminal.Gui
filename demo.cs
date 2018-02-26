@@ -1,5 +1,6 @@
 using Terminal.Gui;
 using System;
+using Mono.Terminal;
 
 class Demo {
 	class Box10x : View {
@@ -82,6 +83,14 @@ class Demo {
 			ShowHorizontalScrollIndicator = true
 		};
 		scrollView2.Add (new Box10x (0, 0));
+		var progress = new ProgressBar (new Rect (68, 1, 10, 1));
+		bool timer (MainLoop caller)
+		{
+			progress.Pulse ();
+			return true;
+		}
+
+		Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
 
 		// Add some content
 		container.Add (
@@ -93,10 +102,20 @@ class Demo {
 				new CheckBox (1, 0, "Remember me"),
 				new RadioGroup (1, 2, new [] { "_Personal", "_Company" }),
 			},
+			new ListView (new Rect (60, 6, 16, 4), new string [] {
+				"First row",
+				"<>",
+				"This is a very long row that should overflow what is shown",
+				"4th",
+				"There is an empty slot on the second row",
+				"Whoa",
+				"This is so cool"
+			}),
 			scrollView,
 			//scrollView2,
 			new Button (3, 19, "Ok"),
 			new Button (10, 19, "Cancel"),
+			progress,
 			new Label (3, 22, "Press ESC and 9 to activate the menubar")
 		);
 
@@ -129,7 +148,9 @@ class Demo {
 	public static Label ml;
 	static void Main ()
 	{
+		//Application.UseSystemConsole = true;
 		Application.Init ();
+
 		var top = Application.Top;
 		var tframe = top.Frame;
 
