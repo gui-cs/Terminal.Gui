@@ -30,7 +30,13 @@ namespace Terminal.Gui {
 		}
 
 		class ContentView : View {
-			public ContentView (Rect frame) : base (frame) { }
+			static int c;
+			int d;
+			public ContentView (Rect frame) : base (frame) { d = c++; }
+			public override string ToString()
+			{
+				return d + ": " + base.ToString ();
+			}
 		}
 
 		/// <summary>
@@ -42,7 +48,12 @@ namespace Terminal.Gui {
 		public FrameView (Rect frame, ustring title) : base (frame)
 		{
 			var cFrame = new Rect (1, 1 , frame.Width - 2, frame.Height - 2);
-			contentView = new ContentView (cFrame);
+			contentView = new ContentView (cFrame) {
+				MarginTop = 1,
+				MarginLeft = 1,
+				MarginRight = 1,
+				MarginBottom = 1
+			};
 			base.Add (contentView);
 			Title = title;
 		}

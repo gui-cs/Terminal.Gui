@@ -254,6 +254,8 @@ namespace Terminal.Gui {
 		public View (Rect frame)
 		{
 			this.Frame = frame;
+			Width = frame.Width;
+			Height = frame.Height;
 			CanFocus = false;
 		}
 

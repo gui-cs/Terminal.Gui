@@ -1,6 +1,7 @@
 using Terminal.Gui;
 using System;
 using Mono.Terminal;
+using System.Collections.Generic;
 
 class Demo {
 	class Box10x : View {
@@ -24,6 +25,7 @@ class Demo {
 	}
 
 	class Filler : View {
+		public Filler (int w, int h) : base (w, h) { }
 		public Filler (Rect rect) : base (rect)
 		{
 		}
@@ -33,9 +35,9 @@ class Demo {
 			Driver.SetAttribute (ColorScheme.Focus);
 			var f = Frame;
 
-			for (int y = 0; y < f.Width; y++) {
+			for (int y = 0; y < f.Height; y++) {
 				Move (0, y);
-				for (int x = 0; x < f.Height; x++) {
+				for (int x = 0; x < f.Width; x++) {
 					Rune r;
 					switch (x % 3) {
 					case 0:
@@ -145,6 +147,61 @@ class Demo {
 		MessageBox.ErrorQuery (50, 5, "Error", "There is nothing to close", "Ok");
 	}
 
+	static void ShowLayout (View container)
+	{
+		View [,] views = new View [3, 2];
+		View [,] fillers = new View [3, 2];
+		int w = 25;
+		int h = 10;
+		int x, y;
+
+		for (x = 0; x < 3; x++) {
+			for (y = 0; y < 2; y++) {
+
+				views [x, y] = new FrameView (new Rect (x * (w+1), y * (h+1), w, h), $"{x},{y}");
+				fillers [x, y] = new Filler (3, 3);
+			}
+		}
+
+		x = -1; y = 0;
+		void Demo (Action<View, View> cback)
+		{
+			if (x < 2)
+				x++;
+			else {
+				x = 0;
+				y++;
+			}
+			if (y == 2)
+				return;
+			cback (views [x, y], fillers [x, y]);
+			views [x, y].Add (fillers [x,y]);
+			views [x, y].Layout ();
+		}
+		// Just add
+		Demo ((host, filler) => { });
+		Demo ((host, filler) => {
+			filler.MarginLeft = 5;
+		});
+		Demo ((host, filler) => {
+			filler.MarginRight = 5;
+		});
+		Demo ((host, filler) => {
+			filler.AlignContent = AlignContent.Center;
+			filler.Right = 1;
+		});
+		Demo ((host, filler) => {
+			filler.AlignContent = AlignContent.Stretch;
+		});
+		Demo ((host, filler) => {
+			filler.AlignContent = AlignContent.End;
+		});
+
+		foreach (var j in views){
+			container.Add (j);
+		}
+	}
+
 	public static Label ml;
 	static void Main ()
 	{
@@ -169,16 +226,22 @@ class Demo {
 			})
 		});
 
-		ShowEntries (win);
-		int count = 0;
 		ml = new Label (new Rect (3, 17, 47, 1), "Mouse: ");
-		Application.RootMouseEvent += delegate (MouseEvent me) {
+		if (true) {
+			ShowLayout (win);
+		} else {
+			ShowEntries (win);
 
-			ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
-		};
 
-		win.Add (ml);
+			int count = 0;
 
+			Application.RootMouseEvent += delegate (MouseEvent me) {
+
+				ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
+			};
+
+			win.Add (ml);
+		}
 		// ShowTextAlignments (win);
 		top.Add (win);
 		top.Add (menu);
