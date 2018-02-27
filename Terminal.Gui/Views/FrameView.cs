@@ -48,7 +48,8 @@ namespace Terminal.Gui {
 		public FrameView (Rect frame, ustring title) : base (frame)
 		{
 			var cFrame = new Rect (1, 1 , frame.Width - 2, frame.Height - 2);
-			contentView = new ContentView (cFrame) {
+			contentView = new ContentView (cFrame)
+			{
 				MarginTop = 1,
 				MarginLeft = 1,
 				MarginRight = 1,

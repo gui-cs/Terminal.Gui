@@ -256,6 +256,9 @@ namespace Terminal.Gui {
 			this.Frame = frame;
 			Width = frame.Width;
 			Height = frame.Height;
+			Left = frame.Left;
+			Top = frame.Top;
+			Position = Position.Absolute;
 			CanFocus = false;
 		}
 

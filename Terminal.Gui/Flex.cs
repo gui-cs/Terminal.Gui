@@ -180,8 +180,10 @@ namespace Terminal.Gui {
 
 		public void Layout ()
 		{
+#if false
 			if (SuperView != null)
 				throw new InvalidOperationException ("Layout() must be called on a root item (that hasn't been added to another item)");
+#endif
 			if (IsUnset (Width) || IsUnset (Height))
 				throw new InvalidOperationException ("Layout() must be called on an item that has proper values for the Width and Height properties");
 			if (SelfSizing != null)
