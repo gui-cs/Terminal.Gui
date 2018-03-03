@@ -120,15 +120,15 @@ namespace Terminal.Gui {
 	/// </summary>
 	public enum Justify {
 		/// <summary>
-		/// Whether an item should be packed around the center.
+		/// Items are centered along th eline.
 		/// </summary>
 		Center = 2,
 		/// <summary>
-		/// Whether an item should be packed at the start.
+		/// Items are packed towards the start of the line.
 		/// </summary>
 		Start = 3,
 		/// <summary>
-		/// Whether an item should be packed at the end.
+		/// Items are packed towards the end of the line.
 		/// </summary>
 		End = 4,
 		/// <summary>
