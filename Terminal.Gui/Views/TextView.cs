@@ -4,6 +4,13 @@
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
 //
+// 
+// TODO:
+// Attributed text on spans
+// Cursor target track
+// Kill-ring, paste
+// Render selection
+// Mark/Delete/Cut commands
 
 using System;
 using System.Collections.Generic;
@@ -98,6 +105,16 @@ namespace Terminal.Gui {
 		public int Count => lines.Count;
 
 		public List<Rune> GetLine (int line) => lines [line];
+
+		public void AddLine (int pos, List<Rune> runes)
+		{
+			lines.Insert (pos, runes);
+		}
+
+		public void RemoveLine (int pos)
+		{
+			lines.RemoveAt (pos);
+		}
 	}
 
 	/// <summary>
@@ -224,7 +241,7 @@ namespace Terminal.Gui {
 			Clipboard.Contents = text;
 		}
 
-		public void Insert (Rune rune)
+		void Insert (Rune rune)
 		{
 			var line = model.GetLine (currentRow);
 			line.Insert (currentColumn, rune);
@@ -316,6 +333,30 @@ namespace Terminal.Gui {
 
 			case Key.Delete:
 			case Key.Backspace:
+				if (currentColumn > 0) {
+					currentLine = model.GetLine (currentRow);
+					currentLine.RemoveAt (currentColumn - 1);
+					currentColumn--;
+					if (currentColumn < leftColumn) {
+						leftColumn--;
+						SetNeedsDisplay ();
+					} else
+						SetNeedsDisplay (new Rect (0, currentRow - topRow, 1, Frame.Width));
+				} else {
+					// Merges the current line with the previous one.
+					if (currentRow == 0)
+						return true;
+					var prowIdx = currentRow - 1;
+					var prevRow = model.GetLine (prowIdx);
+					var prevCount = prevRow.Count;
+					model.GetLine (prowIdx).AddRange (model.GetLine (currentRow));
+					currentRow--;
+					currentColumn = prevCount;
+					leftColumn = currentColumn - Frame.Width + 1;
+					if (leftColumn < 0)
+						leftColumn = 0;
+					SetNeedsDisplay ();
+				}
 				break;
 
 			// Home, C-A
@@ -330,6 +371,20 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.ControlD: // Delete
+				currentLine = model.GetLine (currentRow);
+				if (currentColumn == currentLine.Count) {
+					if (currentRow + 1 == model.Count)
+						break;
+					var nextLine = model.GetLine (currentRow + 1);
+					currentLine.AddRange (nextLine);
+					model.RemoveLine (currentRow + 1);
+					var sr = currentRow - topRow;
+					SetNeedsDisplay (new Rect (0, sr, Frame.Width, sr + 1));
+				} else {
+					currentLine.RemoveAt (currentColumn);
+					var r = currentRow - topRow;
+					SetNeedsDisplay (new Rect (currentColumn - leftColumn, r, Frame.Width, r + 1));
+				}
 				break;
 
 			case Key.ControlE: // End
@@ -355,6 +410,30 @@ namespace Terminal.Gui {
 			case (Key)((int)'f' + Key.AltMask):
 				break;
 
+			case Key.Enter:
+				var orow = currentRow;
+				currentLine = model.GetLine (currentRow);
+				var restCount = currentLine.Count - currentColumn;
+				var rest = currentLine.GetRange (currentColumn, restCount);
+				currentLine.RemoveRange (currentColumn, restCount);
+				model.AddLine (currentRow + 1, rest);
+				currentRow++;
+				bool fullNeedsDisplay = false;
+				if (currentRow >= topRow + Frame.Height) {
+					topRow++;
+					fullNeedsDisplay = true;
+				}
+				currentColumn = 0;
+				if (currentColumn < leftColumn) {
+					fullNeedsDisplay = true;
+					leftColumn = 0;
+				}
+
+				if (fullNeedsDisplay)
+					SetNeedsDisplay ();
+				else
+					SetNeedsDisplay (new Rect (0, currentRow - topRow, 0, Frame.Height));
+				break;
 			default:
 				// Ignore control characters and other special keys
 				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
