@@ -1536,7 +1536,8 @@ namespace Terminal.Gui {
 						DrawBounds (state.Toplevel);
 					state.Toplevel.PositionCursor ();
 					Driver.Refresh ();
-				}
+				} else
+					Driver.UpdateCursor ();
 			}
 		}
 

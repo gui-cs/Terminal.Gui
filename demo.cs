@@ -169,7 +169,11 @@ class Demo {
 			})
 		});
 
-		ShowEntries (win);
+		//ShowEntries (win);
+		var text = new TextView (new Rect (1, 1, 60, 14));
+		text.Text = System.IO.File.ReadAllText ("/etc/passwd");
+		win.Add (text);
+
 		int count = 0;
 		ml = new Label (new Rect (3, 17, 47, 1), "Mouse: ");
 		Application.RootMouseEvent += delegate (MouseEvent me) {

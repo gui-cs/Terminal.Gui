@@ -265,6 +265,11 @@ namespace Terminal.Gui {
 		public abstract void Refresh ();
 
 		/// <summary>
+		/// Updates the location of the cursor position
+		/// </summary>
+		public abstract void UpdateCursor ();
+
+		/// <summary>
 		/// Ends the execution of the console driver.
 		/// </summary>
 		public abstract void End ();
@@ -495,6 +500,7 @@ namespace Terminal.Gui {
 		}
 
 		public override void Refresh () => Curses.refresh ();
+		public override void UpdateCursor () => Curses.refresh ();
 		public override void End () => Curses.endwin ();
 		public override void UpdateScreen () => window.redrawwin ();
 		public override void SetAttribute (Attribute c) => Curses.attrset (c.value);
@@ -1015,6 +1021,11 @@ namespace Terminal.Gui {
 			}
 			Console.CursorTop = savedRow;
 			Console.CursorLeft = savedCol;
+		}
+
+		public override void UpdateCursor ()
+		{
+			//
 		}
 
 		public override void StartReportingMouseMoves()
