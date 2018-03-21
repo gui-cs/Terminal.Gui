@@ -7,11 +7,11 @@
 // 
 // TODO:
 // Attributed text on spans
-// Cursor target track
-// Kill-ring, paste
 // Render selection
 // Mark/Delete/Cut commands
-
+// Replace insertion with Insert method
+// String accumulation (Control-k, control-k is not preserving the last new line, see StringToRunes
+//
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,7 +22,6 @@ using NStack;
 namespace Terminal.Gui {
 	class TextModel {
 		List<List<Rune>> lines;
-		List<int> lineLength;
 
 		public bool LoadFile (string file)
 		{
@@ -39,13 +38,34 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		List<Rune> ToRunes (ustring str)
+		// Turns the ustring into runes, this does not split the 
+		// contents on a newline if it is present.
+		static List<Rune> ToRunes (ustring str)
 		{
 			List<Rune> runes = new List<Rune> ();
 			foreach (var x in str.ToRunes ()) {
 				runes.Add (x);
 			}
 			return runes;
+		}
+
+		// Splits a string into a List that contains a List<Rune> for each line
+		public static List<List<Rune>> StringToRunes (ustring content)
+		{
+			var lines = new List<List<Rune>> ();
+			int start = 0, i = 0;
+			for (; i < content.Length; i++) {
+				if (content [i] == 10) {
+					if (i - start > 0)
+						lines.Add (ToRunes (content [start, i]));
+					else
+						lines.Add (ToRunes (ustring.Empty));
+					start = i + 1;
+				}
+			}
+			if (i - start > 0)
+				lines.Add (ToRunes (content [start, null]));
+			return lines;
 		}
 
 		void Append (List<byte> line)
@@ -77,19 +97,7 @@ namespace Terminal.Gui {
 
 		public void LoadString (ustring content)
 		{
-			lines = new List<List<Rune>> ();
-			int start = 0, i = 0;
-			for (; i < content.Length; i++) {
-				if (content [i] == 10) {
-					if (i - start > 0)
-						lines.Add (ToRunes (content [start, i]));
-					else
-						lines.Add (ToRunes (ustring.Empty));
-					start = i + 1;
-				}
-			}
-			if (i - start > 0)
-				lines.Add (ToRunes (content [start, null]));
+			lines = StringToRunes (content);
 		}
 
 		public override string ToString ()
@@ -201,6 +209,10 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Redraw the text editor region 
+		/// </summary>
+		/// <param name="region">The region to redraw.</param>
 		public override void Redraw (Rect region)
 		{
 			Driver.SetAttribute (ColorScheme.Focus);
@@ -241,26 +253,146 @@ namespace Terminal.Gui {
 			Clipboard.Contents = text;
 		}
 
+		void AppendClipboard (ustring text)
+		{
+			Clipboard.Contents = Clipboard.Contents + text;
+		}
+
 		void Insert (Rune rune)
 		{
-			var line = model.GetLine (currentRow);
+			var line = GetCurrentLine ();
 			line.Insert (currentColumn, rune);
 			var prow = currentRow - topRow;
 
 			SetNeedsDisplay (new Rect (0, prow, Frame.Width, prow + 1));
 		}
 
+		ustring StringFromRunes (List<Rune> runes)
+		{
+			if (runes == null)
+				throw new ArgumentNullException (nameof (runes));
+			int size = 0;
+			foreach (var rune in runes) {
+				size += Utf8.RuneLen (rune);
+			}
+			var encoded = new byte [size];
+			int offset = 0;
+			foreach (var rune in runes) {
+				offset += Utf8.EncodeRune (rune, encoded, offset);
+			}
+			return ustring.Make (encoded);
+		}
+
+		List<Rune> GetCurrentLine () => model.GetLine (currentRow);
+
+		void InsertText (ustring text)
+		{
+			var lines = TextModel.StringToRunes (text);
+
+			if (lines.Count == 0)
+				return;
+
+			var line = GetCurrentLine ();
+
+			// Optmize single line
+			if (lines.Count == 1) {
+				line.InsertRange (currentColumn, lines [0]);
+				currentColumn += lines [0].Count;
+				if (currentColumn - leftColumn > Frame.Width)
+					leftColumn = currentColumn - Frame.Width + 1;
+				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, currentRow - topRow + 1));
+				return;
+			}
+
+			// Keep a copy of the rest of the line
+			var restCount = line.Count - currentColumn;
+			var rest = line.GetRange (currentColumn, restCount);
+			line.RemoveRange (currentColumn, restCount);
+
+			// First line is inserted at the current location, the rest is appended
+			line.InsertRange (currentColumn, lines [0]);
+
+			for (int i = 1; i < lines.Count; i++)
+				model.AddLine (currentRow + i, lines [i]);
+
+			var last = model.GetLine (currentRow + lines.Count-1);
+			var lastp = last.Count;
+			last.InsertRange (last.Count, rest);
+
+			// Now adjjust column and row positions
+			currentRow += lines.Count-1;
+			currentColumn = lastp;
+			if (currentRow - topRow > Frame.Height) {
+				topRow = currentRow - Frame.Height + 1;
+				if (topRow < 0)
+					topRow = 0;
+			}
+			if (currentColumn < leftColumn)
+				leftColumn = currentColumn;
+			if (currentColumn-leftColumn >= Frame.Width)
+				leftColumn = currentColumn - Frame.Width + 1;
+			SetNeedsDisplay ();
+		}
+
+		// The column we are tracking, or -1 if we are not tracking any column
+		int columnTrack = -1;
+
+		// Tries to snap the cursor to the tracking column
+		void TrackColumn ()
+		{
+			// Now track the column
+			var line = GetCurrentLine ();
+			if (line.Count < columnTrack)
+				currentColumn = line.Count;
+			else if (columnTrack != -1)
+				currentColumn = columnTrack;
+			else if (currentColumn > line.Count)
+				currentColumn = line.Count;
+			
+			if (currentColumn < leftColumn) {
+				leftColumn = currentColumn;
+				SetNeedsDisplay ();
+			}
+			if (currentColumn - leftColumn > Frame.Width) {
+				leftColumn = currentColumn - Frame.Width + 1;
+				SetNeedsDisplay ();
+			}
+		}
+
+		bool lastWasKill;
+
 		public override bool ProcessKey (KeyEvent kb)
 		{
+			int restCount;
+			List<Rune> rest;
+
+			switch (kb.Key) {
+			case Key.ControlN:
+			case Key.CursorDown:
+			case Key.ControlP:
+			case Key.CursorUp:
+				lastWasKill = false;
+				break;
+			case Key.ControlK:
+				break;
+			default:
+				lastWasKill = false;
+				columnTrack = -1;
+				break;
+			}
+
 			switch (kb.Key) {
 			case Key.ControlN:
 			case Key.CursorDown:
 				if (currentRow + 1 < model.Count) {
+					if (columnTrack == -1)
+						columnTrack = currentColumn;
 					currentRow++;
 					if (currentRow >= topRow + Frame.Height) {
 						topRow++;
 						SetNeedsDisplay ();
 					}
+					TrackColumn ();
 					PositionCursor ();
 				}
 				break;
@@ -268,18 +400,21 @@ namespace Terminal.Gui {
 			case Key.ControlP:
 			case Key.CursorUp:
 				if (currentRow > 0) {
+					if (columnTrack == -1)
+						columnTrack = currentColumn;
 					currentRow--;
 					if (currentRow < topRow) {
 						topRow--;
 						SetNeedsDisplay ();
 					}
+					TrackColumn ();
 					PositionCursor ();
 				}
 				break;
 
 			case Key.ControlF:
 			case Key.CursorRight:
-				var currentLine = model.GetLine (currentRow);
+				var currentLine = GetCurrentLine ();
 				if (currentColumn < currentLine.Count) {
 					currentColumn++;
 					if (currentColumn >= leftColumn + Frame.Width) {
@@ -318,7 +453,7 @@ namespace Terminal.Gui {
 							topRow--;
 
 						}
-						currentLine = model.GetLine (currentRow);
+						currentLine = GetCurrentLine ();
 						currentColumn = currentLine.Count;
 						int prev = leftColumn;
 						leftColumn = currentColumn - Frame.Width + 1;
@@ -334,7 +469,8 @@ namespace Terminal.Gui {
 			case Key.Delete:
 			case Key.Backspace:
 				if (currentColumn > 0) {
-					currentLine = model.GetLine (currentRow);
+					// Delete backwards 
+					currentLine = GetCurrentLine ();
 					currentLine.RemoveAt (currentColumn - 1);
 					currentColumn--;
 					if (currentColumn < leftColumn) {
@@ -349,7 +485,7 @@ namespace Terminal.Gui {
 					var prowIdx = currentRow - 1;
 					var prevRow = model.GetLine (prowIdx);
 					var prevCount = prevRow.Count;
-					model.GetLine (prowIdx).AddRange (model.GetLine (currentRow));
+					model.GetLine (prowIdx).AddRange (GetCurrentLine ());
 					currentRow--;
 					currentColumn = prevCount;
 					leftColumn = currentColumn - Frame.Width + 1;
@@ -371,7 +507,7 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.ControlD: // Delete
-				currentLine = model.GetLine (currentRow);
+				currentLine = GetCurrentLine ();
 				if (currentColumn == currentLine.Count) {
 					if (currentRow + 1 == model.Count)
 						break;
@@ -388,7 +524,7 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.ControlE: // End
-				currentLine = model.GetLine (currentRow);
+				currentLine = GetCurrentLine ();
 				currentColumn = currentLine.Count;
 				int pcol = leftColumn;
 				leftColumn = currentColumn - Frame.Width + 1;
@@ -400,9 +536,31 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.ControlK: // kill-to-end
+				currentLine = GetCurrentLine ();
+				if (currentLine.Count == 0) {
+					model.RemoveLine (currentRow);
+					var val = ustring.Make ('\n');
+					if (lastWasKill)
+						AppendClipboard (val);
+					else
+						SetClipboard (val);
+				} else {
+					restCount = currentLine.Count - currentColumn;
+					rest = currentLine.GetRange (currentColumn, restCount);
+					var val = StringFromRunes (rest);
+					if (lastWasKill)
+						AppendClipboard (val);
+					else
+						SetClipboard (val);
+					currentLine.RemoveRange (currentColumn, restCount);
+				}
+				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+				lastWasKill = true;
 				break;
 
 			case Key.ControlY: // Control-y, yank
+				InsertText (Clipboard.Contents);
+				break;
 
 			case (Key)((int)'b' + Key.AltMask):
 				break;
@@ -412,9 +570,9 @@ namespace Terminal.Gui {
 
 			case Key.Enter:
 				var orow = currentRow;
-				currentLine = model.GetLine (currentRow);
-				var restCount = currentLine.Count - currentColumn;
-				var rest = currentLine.GetRange (currentColumn, restCount);
+				currentLine = GetCurrentLine ();
+				restCount = currentLine.Count - currentColumn;
+				rest = currentLine.GetRange (currentColumn, restCount);
 				currentLine.RemoveRange (currentColumn, restCount);
 				model.AddLine (currentRow + 1, rest);
 				currentRow++;
@@ -434,6 +592,7 @@ namespace Terminal.Gui {
 				else
 					SetNeedsDisplay (new Rect (0, currentRow - topRow, 0, Frame.Height));
 				break;
+
 			default:
 				// Ignore control characters and other special keys
 				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
