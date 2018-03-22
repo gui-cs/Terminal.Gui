@@ -1,0 +1,707 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.TextView
+  id: TextView
+  children:
+  - Terminal.Gui.TextView.#ctor(Terminal.Gui.Rect)
+  - Terminal.Gui.TextView.CanFocus
+  - Terminal.Gui.TextView.ClearRegion
+  - Terminal.Gui.TextView.CurrentColumn
+  - Terminal.Gui.TextView.CurrentRow
+  - Terminal.Gui.TextView.GetRegion
+  - Terminal.Gui.TextView.PositionCursor
+  - Terminal.Gui.TextView.ProcessKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.TextView.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.TextView.Text
+  langs:
+  - csharp
+  name: TextView
+  nameWithType: TextView
+  fullName: Terminal.Gui.TextView
+  type: Class
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Text data entry widget
+  remarks: >-
+    The Entry widget provides Emacs-like editing
+                  functionality,  and mouse support.
+  syntax:
+    content: 'public class TextView : Terminal.Gui.View'
+  inheritance:
+  - System.Object
+  - Terminal.Gui.Responder
+  - Terminal.Gui.View
+  implements: []
+  inheritedMembers:
+  - Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
+  - Terminal.Gui.View.Add(Terminal.Gui.View)
+  - Terminal.Gui.View.Add(Terminal.Gui.View[])
+  - Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
+  - Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+  - Terminal.Gui.View.Bounds
+  - Terminal.Gui.View.ChildNeedsDisplay
+  - Terminal.Gui.View.Clear
+  - Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+  - Terminal.Gui.View.ClearNeedsDisplay
+  - Terminal.Gui.View.ClipToBounds
+  - Terminal.Gui.View.ColorScheme
+  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  - Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  - Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  - Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
+  - Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  - Terminal.Gui.View.Driver
+  - Terminal.Gui.View.EnsureFocus
+  - Terminal.Gui.View.Focused
+  - Terminal.Gui.View.FocusFirst
+  - Terminal.Gui.View.FocusLast
+  - Terminal.Gui.View.FocusNext
+  - Terminal.Gui.View.FocusPrev
+  - Terminal.Gui.View.Frame
+  - Terminal.Gui.View.GetEnumerator
+  - Terminal.Gui.View.HasFocus
+  - Terminal.Gui.View.Id
+  - Terminal.Gui.View.LayoutSubviews
+  - Terminal.Gui.View.MostFocused
+  - Terminal.Gui.View.Move(System.Int32,System.Int32)
+  - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.Remove(Terminal.Gui.View)
+  - Terminal.Gui.View.RemoveAll
+  - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  - Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+  - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  - Terminal.Gui.View.SetNeedsDisplay
+  - Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  - Terminal.Gui.View.Subviews
+  - Terminal.Gui.View.SuperView
+  - Terminal.Gui.View.ToString
+  - Terminal.Gui.View.WantMousePositionReports
+- uid: Terminal.Gui.TextView.#ctor(Terminal.Gui.Rect)
+  id: '#ctor(Terminal.Gui.Rect)'
+  parent: Terminal.Gui.TextView
+  langs:
+  - csharp
+  name: TextView(Rect)
+  nameWithType: TextView.TextView(Rect)
+  fullName: TextView.TextView(Rect)
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Public constructor.
+  syntax:
+    content: public TextView (Terminal.Gui.Rect frame);
+    parameters:
+    - id: frame
+      type: Terminal.Gui.Rect
+      description: To be added.
+  overload: Terminal.Gui.TextView.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.TextView.CanFocus
+  id: CanFocus
+  parent: Terminal.Gui.TextView
+  langs:
+  - csharp
+  name: CanFocus
+  nameWithType: TextView.CanFocus
+  fullName: TextView.CanFocus
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool CanFocus { get; set; }
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.TextView.CanFocus*
+  exceptions: []
+- uid: Terminal.Gui.TextView.ClearRegion
+  id: ClearRegion
+  parent: Terminal.Gui.TextView
+  langs:
+  - csharp
+  name: ClearRegion()
+  nameWithType: TextView.ClearRegion()
+  fullName: TextView.ClearRegion()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public void ClearRegion ();
+    parameters: []
+  overload: Terminal.Gui.TextView.ClearRegion*
+  exceptions: []
+- uid: Terminal.Gui.TextView.CurrentColumn
+  id: CurrentColumn
+  parent: Terminal.Gui.TextView
+  langs:
+  - csharp
+  name: CurrentColumn
+  nameWithType: TextView.CurrentColumn
+  fullName: TextView.CurrentColumn
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the cursor column.
+  syntax:
+    content: public int CurrentColumn { get; }
+    return:
+      type: System.Int32
+      description: The cursor column.
+  overload: Terminal.Gui.TextView.CurrentColumn*
+  exceptions: []
+- uid: Terminal.Gui.TextView.CurrentRow
+  id: CurrentRow
+  parent: Terminal.Gui.TextView
+  langs:
+  - csharp
+  name: CurrentRow
+  nameWithType: TextView.CurrentRow
+  fullName: TextView.CurrentRow
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The current cursor row.
+  syntax:
+    content: public int CurrentRow { get; }
+    return:
+      type: System.Int32
+      description: To be added.
+  overload: Terminal.Gui.TextView.CurrentRow*
+  exceptions: []
+- uid: Terminal.Gui.TextView.GetRegion
+  id: GetRegion
+  parent: Terminal.Gui.TextView
+  langs:
+  - csharp
+  name: GetRegion()
+  nameWithType: TextView.GetRegion()
+  fullName: TextView.GetRegion()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public NStack.ustring GetRegion ();
+    parameters: []
+    return:
+      type: NStack.ustring
+      description: To be added.
+  overload: Terminal.Gui.TextView.GetRegion*
+  exceptions: []
+- uid: Terminal.Gui.TextView.PositionCursor
+  id: PositionCursor
+  parent: Terminal.Gui.TextView
+  langs:
+  - csharp
+  name: PositionCursor()
+  nameWithType: TextView.PositionCursor()
+  fullName: TextView.PositionCursor()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Sets the cursor position.
+  syntax:
+    content: public override void PositionCursor ();
+    parameters: []
+  overload: Terminal.Gui.TextView.PositionCursor*
+  exceptions: []
+- uid: Terminal.Gui.TextView.ProcessKey(Terminal.Gui.KeyEvent)
+  id: ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.TextView
+  langs:
+  - csharp
+  name: ProcessKey(KeyEvent)
+  nameWithType: TextView.ProcessKey(KeyEvent)
+  fullName: TextView.ProcessKey(KeyEvent)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool ProcessKey (Terminal.Gui.KeyEvent kb);
+    parameters:
+    - id: kb
+      type: Terminal.Gui.KeyEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.TextView.ProcessKey*
+  exceptions: []
+- uid: Terminal.Gui.TextView.Redraw(Terminal.Gui.Rect)
+  id: Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.TextView
+  langs:
+  - csharp
+  name: Redraw(Rect)
+  nameWithType: TextView.Redraw(Rect)
+  fullName: TextView.Redraw(Rect)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Redraw the text editor region
+  syntax:
+    content: public override void Redraw (Terminal.Gui.Rect region);
+    parameters:
+    - id: region
+      type: Terminal.Gui.Rect
+      description: The region to redraw.
+  overload: Terminal.Gui.TextView.Redraw*
+  exceptions: []
+- uid: Terminal.Gui.TextView.Text
+  id: Text
+  parent: Terminal.Gui.TextView
+  langs:
+  - csharp
+  name: Text
+  nameWithType: TextView.Text
+  fullName: TextView.Text
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Sets or gets the text in the entry.
+  syntax:
+    content: public NStack.ustring Text { get; set; }
+    return:
+      type: NStack.ustring
+      description: To be added.
+  overload: Terminal.Gui.TextView.Text*
+  exceptions: []
+references:
+- uid: Terminal.Gui.View
+  parent: Terminal.Gui
+  isExternal: false
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui.TextView.#ctor(Terminal.Gui.Rect)
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: TextView(Rect)
+  nameWithType: TextView.TextView(Rect)
+  fullName: TextView.TextView(Rect)
+- uid: Terminal.Gui.Rect
+  parent: Terminal.Gui
+  isExternal: false
+  name: Rect
+  nameWithType: Rect
+  fullName: Terminal.Gui.Rect
+- uid: Terminal.Gui.TextView.CanFocus
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: CanFocus
+  nameWithType: TextView.CanFocus
+  fullName: TextView.CanFocus
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.TextView.ClearRegion
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: ClearRegion()
+  nameWithType: TextView.ClearRegion()
+  fullName: TextView.ClearRegion()
+- uid: Terminal.Gui.TextView.CurrentColumn
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: CurrentColumn
+  nameWithType: TextView.CurrentColumn
+  fullName: TextView.CurrentColumn
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: Terminal.Gui.TextView.CurrentRow
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: CurrentRow
+  nameWithType: TextView.CurrentRow
+  fullName: TextView.CurrentRow
+- uid: Terminal.Gui.TextView.GetRegion
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: GetRegion()
+  nameWithType: TextView.GetRegion()
+  fullName: TextView.GetRegion()
+- uid: NStack.ustring
+  parent: NStack
+  isExternal: true
+  name: ustring
+  nameWithType: ustring
+  fullName: NStack.ustring
+- uid: Terminal.Gui.TextView.PositionCursor
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: PositionCursor()
+  nameWithType: TextView.PositionCursor()
+  fullName: TextView.PositionCursor()
+- uid: Terminal.Gui.TextView.ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: ProcessKey(KeyEvent)
+  nameWithType: TextView.ProcessKey(KeyEvent)
+  fullName: TextView.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.KeyEvent
+  parent: Terminal.Gui
+  isExternal: false
+  name: KeyEvent
+  nameWithType: KeyEvent
+  fullName: Terminal.Gui.KeyEvent
+- uid: Terminal.Gui.TextView.Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: Redraw(Rect)
+  nameWithType: TextView.Redraw(Rect)
+  fullName: TextView.Redraw(Rect)
+- uid: Terminal.Gui.TextView.Text
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: Text
+  nameWithType: TextView.Text
+  fullName: TextView.Text
+- uid: Terminal.Gui.TextView.#ctor*
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: TextView
+  nameWithType: TextView.TextView
+  fullName: TextView.TextView
+- uid: Terminal.Gui.TextView.CanFocus*
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: CanFocus
+  nameWithType: TextView.CanFocus
+  fullName: TextView.CanFocus
+- uid: Terminal.Gui.TextView.ClearRegion*
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: ClearRegion
+  nameWithType: TextView.ClearRegion
+  fullName: TextView.ClearRegion
+- uid: Terminal.Gui.TextView.CurrentColumn*
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: CurrentColumn
+  nameWithType: TextView.CurrentColumn
+  fullName: TextView.CurrentColumn
+- uid: Terminal.Gui.TextView.CurrentRow*
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: CurrentRow
+  nameWithType: TextView.CurrentRow
+  fullName: TextView.CurrentRow
+- uid: Terminal.Gui.TextView.GetRegion*
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: GetRegion
+  nameWithType: TextView.GetRegion
+  fullName: TextView.GetRegion
+- uid: Terminal.Gui.TextView.PositionCursor*
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: PositionCursor
+  nameWithType: TextView.PositionCursor
+  fullName: TextView.PositionCursor
+- uid: Terminal.Gui.TextView.ProcessKey*
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: ProcessKey
+  nameWithType: TextView.ProcessKey
+  fullName: TextView.ProcessKey
+- uid: Terminal.Gui.TextView.Redraw*
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: Redraw
+  nameWithType: TextView.Redraw
+  fullName: TextView.Redraw
+- uid: Terminal.Gui.TextView.Text*
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: Text
+  nameWithType: TextView.Text
+  fullName: TextView.Text
+- uid: Terminal.Gui.View.HasFocus
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: HasFocus
+  nameWithType: View.HasFocus
+  fullName: View.HasFocus
+- uid: Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: MouseEvent(MouseEvent)
+  nameWithType: Responder.MouseEvent(MouseEvent)
+  fullName: Responder.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ProcessColdKey(KeyEvent)
+  nameWithType: View.ProcessColdKey(KeyEvent)
+  fullName: View.ProcessColdKey(KeyEvent)
+- uid: Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ProcessHotKey(KeyEvent)
+  nameWithType: View.ProcessHotKey(KeyEvent)
+  fullName: View.ProcessHotKey(KeyEvent)
+- uid: Terminal.Gui.View.Add(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Add(View)
+  nameWithType: View.Add(View)
+  fullName: View.Add(View)
+- uid: Terminal.Gui.View.Add(Terminal.Gui.View[])
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Add(View[])
+  nameWithType: View.Add(View[])
+  fullName: View.Add(View[])
+- uid: Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: AddCh(Int32, Int32, Int32)
+  nameWithType: View.AddCh(Int32, Int32, Int32)
+  fullName: View.AddCh(Int32, Int32, Int32)
+- uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: AddRune(Int32, Int32, Rune)
+  nameWithType: View.AddRune(Int32, Int32, Rune)
+  fullName: View.AddRune(Int32, Int32, Rune)
+- uid: Terminal.Gui.View.Bounds
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Bounds
+  nameWithType: View.Bounds
+  fullName: View.Bounds
+- uid: Terminal.Gui.View.ChildNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ChildNeedsDisplay()
+  nameWithType: View.ChildNeedsDisplay()
+  fullName: View.ChildNeedsDisplay()
+- uid: Terminal.Gui.View.Clear
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Clear()
+  nameWithType: View.Clear()
+  fullName: View.Clear()
+- uid: Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Clear(Rect)
+  nameWithType: View.Clear(Rect)
+  fullName: View.Clear(Rect)
+- uid: Terminal.Gui.View.ClearNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ClearNeedsDisplay()
+  nameWithType: View.ClearNeedsDisplay()
+  fullName: View.ClearNeedsDisplay()
+- uid: Terminal.Gui.View.ClipToBounds
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ClipToBounds()
+  nameWithType: View.ClipToBounds()
+  fullName: View.ClipToBounds()
+- uid: Terminal.Gui.View.ColorScheme
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ColorScheme
+  nameWithType: View.ColorScheme
+  fullName: View.ColorScheme
+- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawFrame(Rect, Boolean)
+  nameWithType: View.DrawFrame(Rect, Boolean)
+  fullName: View.DrawFrame(Rect, Boolean)
+- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawFrame(Rect, Int32, Boolean)
+  nameWithType: View.DrawFrame(Rect, Int32, Boolean)
+  fullName: View.DrawFrame(Rect, Int32, Boolean)
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(ustring, Boolean, ColorScheme)
+  nameWithType: View.DrawHotString(ustring, Boolean, ColorScheme)
+  fullName: View.DrawHotString(ustring, Boolean, ColorScheme)
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(ustring, Attribute, Attribute)
+  nameWithType: View.DrawHotString(ustring, Attribute, Attribute)
+  fullName: View.DrawHotString(ustring, Attribute, Attribute)
+- uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(String, Boolean, ColorScheme)
+  nameWithType: View.DrawHotString(String, Boolean, ColorScheme)
+  fullName: View.DrawHotString(String, Boolean, ColorScheme)
+- uid: Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(String, Attribute, Attribute)
+  nameWithType: View.DrawHotString(String, Attribute, Attribute)
+  fullName: View.DrawHotString(String, Attribute, Attribute)
+- uid: Terminal.Gui.View.Driver
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Driver
+  nameWithType: View.Driver
+  fullName: View.Driver
+- uid: Terminal.Gui.View.EnsureFocus
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: EnsureFocus()
+  nameWithType: View.EnsureFocus()
+  fullName: View.EnsureFocus()
+- uid: Terminal.Gui.View.Focused
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Focused
+  nameWithType: View.Focused
+  fullName: View.Focused
+- uid: Terminal.Gui.View.FocusFirst
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusFirst()
+  nameWithType: View.FocusFirst()
+  fullName: View.FocusFirst()
+- uid: Terminal.Gui.View.FocusLast
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusLast()
+  nameWithType: View.FocusLast()
+  fullName: View.FocusLast()
+- uid: Terminal.Gui.View.FocusNext
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusNext()
+  nameWithType: View.FocusNext()
+  fullName: View.FocusNext()
+- uid: Terminal.Gui.View.FocusPrev
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusPrev()
+  nameWithType: View.FocusPrev()
+  fullName: View.FocusPrev()
+- uid: Terminal.Gui.View.Frame
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Frame
+  nameWithType: View.Frame
+  fullName: View.Frame
+- uid: Terminal.Gui.View.GetEnumerator
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: GetEnumerator()
+  nameWithType: View.GetEnumerator()
+  fullName: View.GetEnumerator()
+- uid: Terminal.Gui.View.Id
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Id
+  nameWithType: View.Id
+  fullName: View.Id
+- uid: Terminal.Gui.View.LayoutSubviews
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: LayoutSubviews()
+  nameWithType: View.LayoutSubviews()
+  fullName: View.LayoutSubviews()
+- uid: Terminal.Gui.View.MostFocused
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: MostFocused
+  nameWithType: View.MostFocused
+  fullName: View.MostFocused
+- uid: Terminal.Gui.View.Move(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Move(Int32, Int32)
+  nameWithType: View.Move(Int32, Int32)
+  fullName: View.Move(Int32, Int32)
+- uid: Terminal.Gui.View.Remove(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Remove(View)
+  nameWithType: View.Remove(View)
+  fullName: View.Remove(View)
+- uid: Terminal.Gui.View.RemoveAll
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: RemoveAll()
+  nameWithType: View.RemoveAll()
+  fullName: View.RemoveAll()
+- uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ScreenToView(Int32, Int32)
+  nameWithType: View.ScreenToView(Int32, Int32)
+  fullName: View.ScreenToView(Int32, Int32)
+- uid: Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetClip(Rect)
+  nameWithType: View.SetClip(Rect)
+  fullName: View.SetClip(Rect)
+- uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetFocus(View)
+  nameWithType: View.SetFocus(View)
+  fullName: View.SetFocus(View)
+- uid: Terminal.Gui.View.SetNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetNeedsDisplay()
+  nameWithType: View.SetNeedsDisplay()
+  fullName: View.SetNeedsDisplay()
+- uid: Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetNeedsDisplay(Rect)
+  nameWithType: View.SetNeedsDisplay(Rect)
+  fullName: View.SetNeedsDisplay(Rect)
+- uid: Terminal.Gui.View.Subviews
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Subviews
+  nameWithType: View.Subviews
+  fullName: View.Subviews
+- uid: Terminal.Gui.View.SuperView
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SuperView
+  nameWithType: View.SuperView
+  fullName: View.SuperView
+- uid: Terminal.Gui.View.ToString
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ToString()
+  nameWithType: View.ToString()
+  fullName: View.ToString()
+- uid: Terminal.Gui.View.WantMousePositionReports
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: WantMousePositionReports
+  nameWithType: View.WantMousePositionReports
+  fullName: View.WantMousePositionReports

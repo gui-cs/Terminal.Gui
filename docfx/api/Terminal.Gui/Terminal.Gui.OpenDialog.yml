@@ -1,0 +1,672 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.OpenDialog
+  id: OpenDialog
+  children:
+  - Terminal.Gui.OpenDialog.#ctor(NStack.ustring,NStack.ustring)
+  - Terminal.Gui.OpenDialog.AllowsMultipleSelection
+  - Terminal.Gui.OpenDialog.CanChooseDirectories
+  - Terminal.Gui.OpenDialog.CanChooseFiles
+  - Terminal.Gui.OpenDialog.FilePaths
+  langs:
+  - csharp
+  name: OpenDialog
+  nameWithType: OpenDialog
+  fullName: Terminal.Gui.OpenDialog
+  type: Class
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: 'public class OpenDialog : Terminal.Gui.FileDialog'
+  inheritance:
+  - System.Object
+  - Terminal.Gui.Responder
+  - Terminal.Gui.View
+  - Terminal.Gui.Toplevel
+  - Terminal.Gui.Window
+  - Terminal.Gui.Dialog
+  - Terminal.Gui.FileDialog
+  implements: []
+  inheritedMembers:
+  - Terminal.Gui.Dialog.AddButton(Terminal.Gui.Button)
+  - Terminal.Gui.Dialog.LayoutSubviews
+  - Terminal.Gui.Dialog.ProcessKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.FileDialog.AllowedFileTypes
+  - Terminal.Gui.FileDialog.AllowsOtherFileTypes
+  - Terminal.Gui.FileDialog.CanCreateDirectories
+  - Terminal.Gui.FileDialog.DirectoryPath
+  - Terminal.Gui.FileDialog.FilePath
+  - Terminal.Gui.FileDialog.IsExtensionHidden
+  - Terminal.Gui.FileDialog.Message
+  - Terminal.Gui.FileDialog.NameFieldLabel
+  - Terminal.Gui.FileDialog.Prompt
+  - Terminal.Gui.Toplevel.CanFocus
+  - Terminal.Gui.Toplevel.Create
+  - Terminal.Gui.Toplevel.Running
+  - Terminal.Gui.View.Add(Terminal.Gui.View[])
+  - Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
+  - Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+  - Terminal.Gui.View.Bounds
+  - Terminal.Gui.View.ChildNeedsDisplay
+  - Terminal.Gui.View.Clear
+  - Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+  - Terminal.Gui.View.ClearNeedsDisplay
+  - Terminal.Gui.View.ClipToBounds
+  - Terminal.Gui.View.ColorScheme
+  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  - Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  - Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  - Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
+  - Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  - Terminal.Gui.View.Driver
+  - Terminal.Gui.View.EnsureFocus
+  - Terminal.Gui.View.Focused
+  - Terminal.Gui.View.FocusFirst
+  - Terminal.Gui.View.FocusLast
+  - Terminal.Gui.View.FocusNext
+  - Terminal.Gui.View.FocusPrev
+  - Terminal.Gui.View.Frame
+  - Terminal.Gui.View.HasFocus
+  - Terminal.Gui.View.Id
+  - Terminal.Gui.View.MostFocused
+  - Terminal.Gui.View.Move(System.Int32,System.Int32)
+  - Terminal.Gui.View.PositionCursor
+  - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.RemoveAll
+  - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  - Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+  - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  - Terminal.Gui.View.SetNeedsDisplay
+  - Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  - Terminal.Gui.View.Subviews
+  - Terminal.Gui.View.SuperView
+  - Terminal.Gui.View.ToString
+  - Terminal.Gui.View.WantMousePositionReports
+  - Terminal.Gui.Window.Add(Terminal.Gui.View)
+  - Terminal.Gui.Window.GetEnumerator
+  - Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
+  - Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.Window.Remove(Terminal.Gui.View)
+  - Terminal.Gui.Window.Title
+- uid: Terminal.Gui.OpenDialog.#ctor(NStack.ustring,NStack.ustring)
+  id: '#ctor(NStack.ustring,NStack.ustring)'
+  parent: Terminal.Gui.OpenDialog
+  langs:
+  - csharp
+  name: OpenDialog(ustring, ustring)
+  nameWithType: OpenDialog.OpenDialog(ustring, ustring)
+  fullName: OpenDialog.OpenDialog(ustring, ustring)
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public OpenDialog (NStack.ustring title, NStack.ustring message);
+    parameters:
+    - id: title
+      type: NStack.ustring
+      description: To be added.
+    - id: message
+      type: NStack.ustring
+      description: To be added.
+  overload: Terminal.Gui.OpenDialog.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.OpenDialog.AllowsMultipleSelection
+  id: AllowsMultipleSelection
+  parent: Terminal.Gui.OpenDialog
+  langs:
+  - csharp
+  name: AllowsMultipleSelection
+  nameWithType: OpenDialog.AllowsMultipleSelection
+  fullName: OpenDialog.AllowsMultipleSelection
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets a value indicating whether this <xref href="Terminal.Gui.OpenDialog"></xref> allows multiple selection.
+  syntax:
+    content: public bool AllowsMultipleSelection { get; set; }
+    return:
+      type: System.Boolean
+      description: <code>true</code> if allows multiple selection; otherwise, <code>false</code>.
+  overload: Terminal.Gui.OpenDialog.AllowsMultipleSelection*
+  exceptions: []
+- uid: Terminal.Gui.OpenDialog.CanChooseDirectories
+  id: CanChooseDirectories
+  parent: Terminal.Gui.OpenDialog
+  langs:
+  - csharp
+  name: CanChooseDirectories
+  nameWithType: OpenDialog.CanChooseDirectories
+  fullName: OpenDialog.CanChooseDirectories
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets a value indicating whether this <xref href="Terminal.Gui.OpenDialog"></xref> can choose directories.
+  syntax:
+    content: public bool CanChooseDirectories { get; set; }
+    return:
+      type: System.Boolean
+      description: <code>true</code> if can choose directories; otherwise, <code>false</code>.
+  overload: Terminal.Gui.OpenDialog.CanChooseDirectories*
+  exceptions: []
+- uid: Terminal.Gui.OpenDialog.CanChooseFiles
+  id: CanChooseFiles
+  parent: Terminal.Gui.OpenDialog
+  langs:
+  - csharp
+  name: CanChooseFiles
+  nameWithType: OpenDialog.CanChooseFiles
+  fullName: OpenDialog.CanChooseFiles
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets a value indicating whether this <xref href="Terminal.Gui.OpenDialog"></xref> can choose files.
+  syntax:
+    content: public bool CanChooseFiles { get; set; }
+    return:
+      type: System.Boolean
+      description: <code>true</code> if can choose files; otherwise, <code>false</code>.
+  overload: Terminal.Gui.OpenDialog.CanChooseFiles*
+  exceptions: []
+- uid: Terminal.Gui.OpenDialog.FilePaths
+  id: FilePaths
+  parent: Terminal.Gui.OpenDialog
+  langs:
+  - csharp
+  name: FilePaths
+  nameWithType: OpenDialog.FilePaths
+  fullName: OpenDialog.FilePaths
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the file paths selected
+  syntax:
+    content: public System.Collections.Generic.IReadOnlyList<NStack.ustring> FilePaths { get; }
+    return:
+      type: System.Collections.Generic.IReadOnlyList{NStack.ustring}
+      description: The file paths.
+  overload: Terminal.Gui.OpenDialog.FilePaths*
+  exceptions: []
+references:
+- uid: Terminal.Gui.FileDialog
+  parent: Terminal.Gui
+  isExternal: false
+  name: FileDialog
+  nameWithType: FileDialog
+  fullName: Terminal.Gui.FileDialog
+- uid: Terminal.Gui.OpenDialog.#ctor(NStack.ustring,NStack.ustring)
+  parent: Terminal.Gui.OpenDialog
+  isExternal: false
+  name: OpenDialog(ustring, ustring)
+  nameWithType: OpenDialog.OpenDialog(ustring, ustring)
+  fullName: OpenDialog.OpenDialog(ustring, ustring)
+- uid: NStack.ustring
+  parent: NStack
+  isExternal: true
+  name: ustring
+  nameWithType: ustring
+  fullName: NStack.ustring
+- uid: Terminal.Gui.OpenDialog.AllowsMultipleSelection
+  parent: Terminal.Gui.OpenDialog
+  isExternal: false
+  name: AllowsMultipleSelection
+  nameWithType: OpenDialog.AllowsMultipleSelection
+  fullName: OpenDialog.AllowsMultipleSelection
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.OpenDialog.CanChooseDirectories
+  parent: Terminal.Gui.OpenDialog
+  isExternal: false
+  name: CanChooseDirectories
+  nameWithType: OpenDialog.CanChooseDirectories
+  fullName: OpenDialog.CanChooseDirectories
+- uid: Terminal.Gui.OpenDialog.CanChooseFiles
+  parent: Terminal.Gui.OpenDialog
+  isExternal: false
+  name: CanChooseFiles
+  nameWithType: OpenDialog.CanChooseFiles
+  fullName: OpenDialog.CanChooseFiles
+- uid: Terminal.Gui.OpenDialog.FilePaths
+  parent: Terminal.Gui.OpenDialog
+  isExternal: false
+  name: FilePaths
+  nameWithType: OpenDialog.FilePaths
+  fullName: OpenDialog.FilePaths
+- uid: System.Collections.Generic.IReadOnlyList`1
+  name: IReadOnlyList
+  nameWithType: IReadOnlyList
+  fullName: System.Collections.Generic.IReadOnlyList
+- uid: System.Collections.Generic.IReadOnlyList{NStack.ustring}
+  parent: System.Collections.Generic
+  isExternal: true
+  name: IReadOnlyList<ustring>
+  nameWithType: IReadOnlyList<ustring>
+  fullName: System.Collections.Generic.IReadOnlyList<NStack.ustring>
+  spec.csharp:
+  - uid: System.Collections.Generic.IReadOnlyList`1
+    name: IReadOnlyList
+    nameWithType: IReadOnlyList
+    fullName: System.Collections.Generic.IReadOnlyList
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: NStack.ustring
+    name: ustring
+    nameWithType: ustring
+    fullName: NStack.ustring
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+- uid: Terminal.Gui.OpenDialog.#ctor*
+  parent: Terminal.Gui.OpenDialog
+  isExternal: false
+  name: OpenDialog
+  nameWithType: OpenDialog.OpenDialog
+  fullName: OpenDialog.OpenDialog
+- uid: Terminal.Gui.OpenDialog.AllowsMultipleSelection*
+  parent: Terminal.Gui.OpenDialog
+  isExternal: false
+  name: AllowsMultipleSelection
+  nameWithType: OpenDialog.AllowsMultipleSelection
+  fullName: OpenDialog.AllowsMultipleSelection
+- uid: Terminal.Gui.OpenDialog.CanChooseDirectories*
+  parent: Terminal.Gui.OpenDialog
+  isExternal: false
+  name: CanChooseDirectories
+  nameWithType: OpenDialog.CanChooseDirectories
+  fullName: OpenDialog.CanChooseDirectories
+- uid: Terminal.Gui.OpenDialog.CanChooseFiles*
+  parent: Terminal.Gui.OpenDialog
+  isExternal: false
+  name: CanChooseFiles
+  nameWithType: OpenDialog.CanChooseFiles
+  fullName: OpenDialog.CanChooseFiles
+- uid: Terminal.Gui.OpenDialog.FilePaths*
+  parent: Terminal.Gui.OpenDialog
+  isExternal: false
+  name: FilePaths
+  nameWithType: OpenDialog.FilePaths
+  fullName: OpenDialog.FilePaths
+- uid: Terminal.Gui.Toplevel.CanFocus
+  parent: Terminal.Gui.Toplevel
+  isExternal: false
+  name: CanFocus
+  nameWithType: Toplevel.CanFocus
+  fullName: Toplevel.CanFocus
+- uid: Terminal.Gui.View.HasFocus
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: HasFocus
+  nameWithType: View.HasFocus
+  fullName: View.HasFocus
+- uid: Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.Window
+  isExternal: false
+  name: MouseEvent(MouseEvent)
+  nameWithType: Window.MouseEvent(MouseEvent)
+  fullName: Window.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ProcessColdKey(KeyEvent)
+  nameWithType: View.ProcessColdKey(KeyEvent)
+  fullName: View.ProcessColdKey(KeyEvent)
+- uid: Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ProcessHotKey(KeyEvent)
+  nameWithType: View.ProcessHotKey(KeyEvent)
+  fullName: View.ProcessHotKey(KeyEvent)
+- uid: Terminal.Gui.Dialog.ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.Dialog
+  isExternal: false
+  name: ProcessKey(KeyEvent)
+  nameWithType: Dialog.ProcessKey(KeyEvent)
+  fullName: Dialog.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.Window.Add(Terminal.Gui.View)
+  parent: Terminal.Gui.Window
+  isExternal: false
+  name: Add(View)
+  nameWithType: Window.Add(View)
+  fullName: Window.Add(View)
+- uid: Terminal.Gui.View.Add(Terminal.Gui.View[])
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Add(View[])
+  nameWithType: View.Add(View[])
+  fullName: View.Add(View[])
+- uid: Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: AddCh(Int32, Int32, Int32)
+  nameWithType: View.AddCh(Int32, Int32, Int32)
+  fullName: View.AddCh(Int32, Int32, Int32)
+- uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: AddRune(Int32, Int32, Rune)
+  nameWithType: View.AddRune(Int32, Int32, Rune)
+  fullName: View.AddRune(Int32, Int32, Rune)
+- uid: Terminal.Gui.View.Bounds
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Bounds
+  nameWithType: View.Bounds
+  fullName: View.Bounds
+- uid: Terminal.Gui.View.ChildNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ChildNeedsDisplay()
+  nameWithType: View.ChildNeedsDisplay()
+  fullName: View.ChildNeedsDisplay()
+- uid: Terminal.Gui.View.Clear
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Clear()
+  nameWithType: View.Clear()
+  fullName: View.Clear()
+- uid: Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Clear(Rect)
+  nameWithType: View.Clear(Rect)
+  fullName: View.Clear(Rect)
+- uid: Terminal.Gui.View.ClearNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ClearNeedsDisplay()
+  nameWithType: View.ClearNeedsDisplay()
+  fullName: View.ClearNeedsDisplay()
+- uid: Terminal.Gui.View.ClipToBounds
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ClipToBounds()
+  nameWithType: View.ClipToBounds()
+  fullName: View.ClipToBounds()
+- uid: Terminal.Gui.View.ColorScheme
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ColorScheme
+  nameWithType: View.ColorScheme
+  fullName: View.ColorScheme
+- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawFrame(Rect, Boolean)
+  nameWithType: View.DrawFrame(Rect, Boolean)
+  fullName: View.DrawFrame(Rect, Boolean)
+- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawFrame(Rect, Int32, Boolean)
+  nameWithType: View.DrawFrame(Rect, Int32, Boolean)
+  fullName: View.DrawFrame(Rect, Int32, Boolean)
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(ustring, Boolean, ColorScheme)
+  nameWithType: View.DrawHotString(ustring, Boolean, ColorScheme)
+  fullName: View.DrawHotString(ustring, Boolean, ColorScheme)
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(ustring, Attribute, Attribute)
+  nameWithType: View.DrawHotString(ustring, Attribute, Attribute)
+  fullName: View.DrawHotString(ustring, Attribute, Attribute)
+- uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(String, Boolean, ColorScheme)
+  nameWithType: View.DrawHotString(String, Boolean, ColorScheme)
+  fullName: View.DrawHotString(String, Boolean, ColorScheme)
+- uid: Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(String, Attribute, Attribute)
+  nameWithType: View.DrawHotString(String, Attribute, Attribute)
+  fullName: View.DrawHotString(String, Attribute, Attribute)
+- uid: Terminal.Gui.View.Driver
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Driver
+  nameWithType: View.Driver
+  fullName: View.Driver
+- uid: Terminal.Gui.View.EnsureFocus
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: EnsureFocus()
+  nameWithType: View.EnsureFocus()
+  fullName: View.EnsureFocus()
+- uid: Terminal.Gui.View.Focused
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Focused
+  nameWithType: View.Focused
+  fullName: View.Focused
+- uid: Terminal.Gui.View.FocusFirst
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusFirst()
+  nameWithType: View.FocusFirst()
+  fullName: View.FocusFirst()
+- uid: Terminal.Gui.View.FocusLast
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusLast()
+  nameWithType: View.FocusLast()
+  fullName: View.FocusLast()
+- uid: Terminal.Gui.View.FocusNext
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusNext()
+  nameWithType: View.FocusNext()
+  fullName: View.FocusNext()
+- uid: Terminal.Gui.View.FocusPrev
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusPrev()
+  nameWithType: View.FocusPrev()
+  fullName: View.FocusPrev()
+- uid: Terminal.Gui.View.Frame
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Frame
+  nameWithType: View.Frame
+  fullName: View.Frame
+- uid: Terminal.Gui.Window.GetEnumerator
+  parent: Terminal.Gui.Window
+  isExternal: false
+  name: GetEnumerator()
+  nameWithType: Window.GetEnumerator()
+  fullName: Window.GetEnumerator()
+- uid: Terminal.Gui.View.Id
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Id
+  nameWithType: View.Id
+  fullName: View.Id
+- uid: Terminal.Gui.Dialog.LayoutSubviews
+  parent: Terminal.Gui.Dialog
+  isExternal: false
+  name: LayoutSubviews()
+  nameWithType: Dialog.LayoutSubviews()
+  fullName: Dialog.LayoutSubviews()
+- uid: Terminal.Gui.View.MostFocused
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: MostFocused
+  nameWithType: View.MostFocused
+  fullName: View.MostFocused
+- uid: Terminal.Gui.View.Move(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Move(Int32, Int32)
+  nameWithType: View.Move(Int32, Int32)
+  fullName: View.Move(Int32, Int32)
+- uid: Terminal.Gui.View.PositionCursor
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: PositionCursor()
+  nameWithType: View.PositionCursor()
+  fullName: View.PositionCursor()
+- uid: Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.Window
+  isExternal: false
+  name: Redraw(Rect)
+  nameWithType: Window.Redraw(Rect)
+  fullName: Window.Redraw(Rect)
+- uid: Terminal.Gui.Window.Remove(Terminal.Gui.View)
+  parent: Terminal.Gui.Window
+  isExternal: false
+  name: Remove(View)
+  nameWithType: Window.Remove(View)
+  fullName: Window.Remove(View)
+- uid: Terminal.Gui.View.RemoveAll
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: RemoveAll()
+  nameWithType: View.RemoveAll()
+  fullName: View.RemoveAll()
+- uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ScreenToView(Int32, Int32)
+  nameWithType: View.ScreenToView(Int32, Int32)
+  fullName: View.ScreenToView(Int32, Int32)
+- uid: Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetClip(Rect)
+  nameWithType: View.SetClip(Rect)
+  fullName: View.SetClip(Rect)
+- uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetFocus(View)
+  nameWithType: View.SetFocus(View)
+  fullName: View.SetFocus(View)
+- uid: Terminal.Gui.View.SetNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetNeedsDisplay()
+  nameWithType: View.SetNeedsDisplay()
+  fullName: View.SetNeedsDisplay()
+- uid: Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetNeedsDisplay(Rect)
+  nameWithType: View.SetNeedsDisplay(Rect)
+  fullName: View.SetNeedsDisplay(Rect)
+- uid: Terminal.Gui.View.Subviews
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Subviews
+  nameWithType: View.Subviews
+  fullName: View.Subviews
+- uid: Terminal.Gui.View.SuperView
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SuperView
+  nameWithType: View.SuperView
+  fullName: View.SuperView
+- uid: Terminal.Gui.View.ToString
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ToString()
+  nameWithType: View.ToString()
+  fullName: View.ToString()
+- uid: Terminal.Gui.View.WantMousePositionReports
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: WantMousePositionReports
+  nameWithType: View.WantMousePositionReports
+  fullName: View.WantMousePositionReports
+- uid: Terminal.Gui.Toplevel.Create
+  parent: Terminal.Gui.Toplevel
+  isExternal: false
+  name: Create()
+  nameWithType: Toplevel.Create()
+  fullName: Toplevel.Create()
+- uid: Terminal.Gui.Toplevel.Running
+  parent: Terminal.Gui.Toplevel
+  isExternal: false
+  name: Running
+  nameWithType: Toplevel.Running
+  fullName: Toplevel.Running
+- uid: Terminal.Gui.Window.Title
+  parent: Terminal.Gui.Window
+  isExternal: false
+  name: Title
+  nameWithType: Window.Title
+  fullName: Window.Title
+- uid: Terminal.Gui.Dialog.AddButton(Terminal.Gui.Button)
+  parent: Terminal.Gui.Dialog
+  isExternal: false
+  name: AddButton(Button)
+  nameWithType: Dialog.AddButton(Button)
+  fullName: Dialog.AddButton(Button)
+- uid: Terminal.Gui.FileDialog.AllowedFileTypes
+  parent: Terminal.Gui.FileDialog
+  isExternal: false
+  name: AllowedFileTypes
+  nameWithType: FileDialog.AllowedFileTypes
+  fullName: FileDialog.AllowedFileTypes
+- uid: Terminal.Gui.FileDialog.AllowsOtherFileTypes
+  parent: Terminal.Gui.FileDialog
+  isExternal: false
+  name: AllowsOtherFileTypes
+  nameWithType: FileDialog.AllowsOtherFileTypes
+  fullName: FileDialog.AllowsOtherFileTypes
+- uid: Terminal.Gui.FileDialog.CanCreateDirectories
+  parent: Terminal.Gui.FileDialog
+  isExternal: false
+  name: CanCreateDirectories
+  nameWithType: FileDialog.CanCreateDirectories
+  fullName: FileDialog.CanCreateDirectories
+- uid: Terminal.Gui.FileDialog.DirectoryPath
+  parent: Terminal.Gui.FileDialog
+  isExternal: false
+  name: DirectoryPath
+  nameWithType: FileDialog.DirectoryPath
+  fullName: FileDialog.DirectoryPath
+- uid: Terminal.Gui.FileDialog.FilePath
+  parent: Terminal.Gui.FileDialog
+  isExternal: false
+  name: FilePath
+  nameWithType: FileDialog.FilePath
+  fullName: FileDialog.FilePath
+- uid: Terminal.Gui.FileDialog.IsExtensionHidden
+  parent: Terminal.Gui.FileDialog
+  isExternal: false
+  name: IsExtensionHidden
+  nameWithType: FileDialog.IsExtensionHidden
+  fullName: FileDialog.IsExtensionHidden
+- uid: Terminal.Gui.FileDialog.Message
+  parent: Terminal.Gui.FileDialog
+  isExternal: false
+  name: Message
+  nameWithType: FileDialog.Message
+  fullName: FileDialog.Message
+- uid: Terminal.Gui.FileDialog.NameFieldLabel
+  parent: Terminal.Gui.FileDialog
+  isExternal: false
+  name: NameFieldLabel
+  nameWithType: FileDialog.NameFieldLabel
+  fullName: FileDialog.NameFieldLabel
+- uid: Terminal.Gui.FileDialog.Prompt
+  parent: Terminal.Gui.FileDialog
+  isExternal: false
+  name: Prompt
+  nameWithType: FileDialog.Prompt
+  fullName: FileDialog.Prompt

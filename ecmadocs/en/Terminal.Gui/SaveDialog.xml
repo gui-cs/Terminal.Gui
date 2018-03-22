@@ -1,0 +1,36 @@
+<Type Name="SaveDialog" FullName="Terminal.Gui.SaveDialog">
+  <TypeSignature Language="C#" Value="public class SaveDialog : Terminal.Gui.FileDialog" />
+  <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit SaveDialog extends Terminal.Gui.FileDialog" />
+  <AssemblyInfo>
+    <AssemblyName>Terminal.Gui</AssemblyName>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+  </AssemblyInfo>
+  <Base>
+    <BaseTypeName>Terminal.Gui.FileDialog</BaseTypeName>
+  </Base>
+  <Interfaces />
+  <Docs>
+    <summary>To be added.</summary>
+    <remarks>To be added.</remarks>
+  </Docs>
+  <Members>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public SaveDialog (NStack.ustring title, NStack.ustring message);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class NStack.ustring title, class NStack.ustring message) cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="title" Type="NStack.ustring" />
+        <Parameter Name="message" Type="NStack.ustring" />
+      </Parameters>
+      <Docs>
+        <param name="title">To be added.</param>
+        <param name="message">To be added.</param>
+        <summary>To be added.</summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+  </Members>
+</Type>

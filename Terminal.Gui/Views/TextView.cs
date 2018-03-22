@@ -9,7 +9,13 @@
 // Attributed text on spans
 // Replace insertion with Insert method
 // String accumulation (Control-k, control-k is not preserving the last new line, see StringToRunes
-//
+// Alt-D, Alt-Backspace
+// API to set the cursor position
+// API to scroll to a particular place
+// keybindings to go to top/bottom
+// public API to insert, remove ranges
+// Add word forward/word backwards commands
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -124,11 +130,109 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	///   Text data entry widget
+	///   Multi-line text editing view
 	/// </summary>
 	/// <remarks>
-	///   The Entry widget provides Emacs-like editing
-	///   functionality,  and mouse support.
+	///   <para>
+	///     The text view provides a multi-line text view.   Users interact
+	///     with it with the standard Emacs commands for movement or the arrow
+	///     keys. 
+	///   </para> 
+	///   <list type="table"> 
+	///     <listheader>
+	///       <term>Shortcut</term>
+	///       <description>Action performed</description>
+	///     </listheader>
+	///     <item>
+	///        <term>Left cursor, Control-b</term>
+	///        <description>
+	///          Moves the editing point left.
+	///        </description>
+	///     </item>
+	///     <item>
+	///        <term>Right cursor, Control-f</term>
+	///        <description>
+	///          Moves the editing point right.
+	///        </description>
+	///     </item>
+	///     <item>
+	///        <term>Alt-b</term>
+	///        <description>
+	///          Moves one word back.
+	///        </description>
+	///     </item>
+	///     <item>
+	///        <term>Alt-f</term>
+	///        <description>
+	///          Moves one word forward.
+	///        </description>
+	///     </item>
+	///     <item>
+	///        <term>Up cursor, Control-p</term>
+	///        <description>
+	///          Moves the editing point one line up.
+	///        </description>
+	///     </item>
+	///     <item>
+	///        <term>Down cursor, Control-n</term>
+	///        <description>
+	///          Moves the editing point one line down
+	///        </description>
+	///     </item>
+	///     <item>
+	///        <term>Home key, Control-a</term>
+	///        <description>
+	///          Moves the cursor to the beginning of the line.
+	///        </description>
+	///     </item>
+	///     <item>
+	///        <term>End key, Control-e</term>
+	///        <description>
+	///          Moves the cursor to the end of the line.
+	///        </description>
+	///     </item>
+	///     <item>
+	///        <term>Delete, Control-d</term>
+	///        <description>
+	///          Deletes the character in front of the cursor.
+	///        </description>
+	///     </item>
+	///     <item>
+	///        <term>Backspace</term>
+	///        <description>
+	///          Deletes the character behind the cursor.
+	///        </description>
+	///     </item>
+	///     <item>
+	///        <term>Control-k</term>
+	///        <description>
+	///          Deletes the text until the end of the line and replaces the kill buffer
+	///          with the deleted text.   You can paste this text in a different place by
+	///          using Control-y.
+	///        </description>
+	///     </item>
+	///     <item>
+	///     <item>
+	///        <term>Control-y</term>
+	///        <description>
+	///           Pastes the content of the kill ring into the current position.
+	///        </description>
+	///     </item>
+	///     <item>
+	///        <term>Alt-d</term>
+	///        <description>
+	///           Deletes the word above the cursor and adds it to the kill ring.  You 
+	///           can paste the contents of the kill ring with Control-y.
+	///        </description>
+	///     </item>
+	///     <item>
+	///        <term>Control-q</term>
+	///        <description>
+	///          Quotes the next input character, to prevent the normal processing of
+	///          key handling to take place.
+	///        </description>
+	///     </item>
+	///   </list>
 	/// </remarks>
 	public class TextView : View {
 		TextModel model = new TextModel ();
@@ -151,7 +255,7 @@ namespace Terminal.Gui {
 		public event EventHandler Changed;
 #endif
 		/// <summary>
-		///   Public constructor.
+		///   Public constructor, creates a view on the specfied area
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
@@ -194,7 +298,7 @@ namespace Terminal.Gui {
 		public int CurrentColumn => currentColumn;
 
 		/// <summary>
-		///   Sets the cursor position.
+		///   Positions the cursor on the current row and column
 		/// </summary>
 		public override void PositionCursor ()
 		{
@@ -255,7 +359,7 @@ namespace Terminal.Gui {
 		// Returns a ustring with the text in the selected 
 		// region.
 		//
-		public ustring GetRegion ()
+		ustring GetRegion ()
 		{
 			long start, end;
 			GetEncodedRegionBounds (out start, out end);
@@ -281,7 +385,7 @@ namespace Terminal.Gui {
 		//
 		// Clears the contents of the selected region
 		//
-		public void ClearRegion ()
+		void ClearRegion ()
 		{
 			long start, end;
 			long currentEncoded = ((long)(uint)currentRow << 32) | (uint)currentColumn;

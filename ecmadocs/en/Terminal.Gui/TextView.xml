@@ -1,0 +1,203 @@
+<Type Name="TextView" FullName="Terminal.Gui.TextView">
+  <TypeSignature Language="C#" Value="public class TextView : Terminal.Gui.View" />
+  <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit TextView extends Terminal.Gui.View" />
+  <AssemblyInfo>
+    <AssemblyName>Terminal.Gui</AssemblyName>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+  </AssemblyInfo>
+  <Base>
+    <BaseTypeName>Terminal.Gui.View</BaseTypeName>
+  </Base>
+  <Interfaces />
+  <Docs>
+    <summary>
+              Text data entry widget
+            </summary>
+    <remarks>
+              The Entry widget provides Emacs-like editing
+              functionality,  and mouse support.
+            </remarks>
+  </Docs>
+  <Members>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public TextView (Terminal.Gui.Rect frame);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(valuetype Terminal.Gui.Rect frame) cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="frame" Type="Terminal.Gui.Rect" />
+      </Parameters>
+      <Docs>
+        <param name="frame">To be added.</param>
+        <summary>
+              Public constructor.
+            </summary>
+        <remarks />
+      </Docs>
+    </Member>
+    <Member MemberName="CanFocus">
+      <MemberSignature Language="C#" Value="public override bool CanFocus { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance bool CanFocus" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>To be added.</summary>
+        <value>To be added.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ClearRegion">
+      <MemberSignature Language="C#" Value="public void ClearRegion ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void ClearRegion() cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters />
+      <Docs>
+        <summary>To be added.</summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="CurrentColumn">
+      <MemberSignature Language="C#" Value="public int CurrentColumn { get; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance int32 CurrentColumn" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Int32</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Gets the cursor column.
+            </summary>
+        <value>The cursor column.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="CurrentRow">
+      <MemberSignature Language="C#" Value="public int CurrentRow { get; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance int32 CurrentRow" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Int32</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+               The current cursor row.
+            </summary>
+        <value>To be added.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="GetRegion">
+      <MemberSignature Language="C#" Value="public NStack.ustring GetRegion ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class NStack.ustring GetRegion() cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>NStack.ustring</ReturnType>
+      </ReturnValue>
+      <Parameters />
+      <Docs>
+        <summary>To be added.</summary>
+        <returns>To be added.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="PositionCursor">
+      <MemberSignature Language="C#" Value="public override void PositionCursor ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void PositionCursor() cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters />
+      <Docs>
+        <summary>
+              Sets the cursor position.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ProcessKey">
+      <MemberSignature Language="C#" Value="public override bool ProcessKey (Terminal.Gui.KeyEvent kb);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="kb" Type="Terminal.Gui.KeyEvent" />
+      </Parameters>
+      <Docs>
+        <param name="kb">To be added.</param>
+        <summary>To be added.</summary>
+        <returns>To be added.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Redraw">
+      <MemberSignature Language="C#" Value="public override void Redraw (Terminal.Gui.Rect region);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Redraw(valuetype Terminal.Gui.Rect region) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="region" Type="Terminal.Gui.Rect" />
+      </Parameters>
+      <Docs>
+        <param name="region">The region to redraw.</param>
+        <summary>
+            Redraw the text editor region 
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Text">
+      <MemberSignature Language="C#" Value="public NStack.ustring Text { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class NStack.ustring Text" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>NStack.ustring</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+              Sets or gets the text in the entry.
+            </summary>
+        <value>To be added.</value>
+        <remarks />
+      </Docs>
+    </Member>
+  </Members>
+</Type>

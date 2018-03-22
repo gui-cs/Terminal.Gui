@@ -1,0 +1,111 @@
+<Type Name="OpenDialog" FullName="Terminal.Gui.OpenDialog">
+  <TypeSignature Language="C#" Value="public class OpenDialog : Terminal.Gui.FileDialog" />
+  <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit OpenDialog extends Terminal.Gui.FileDialog" />
+  <AssemblyInfo>
+    <AssemblyName>Terminal.Gui</AssemblyName>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+  </AssemblyInfo>
+  <Base>
+    <BaseTypeName>Terminal.Gui.FileDialog</BaseTypeName>
+  </Base>
+  <Interfaces />
+  <Docs>
+    <summary>To be added.</summary>
+    <remarks>To be added.</remarks>
+  </Docs>
+  <Members>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public OpenDialog (NStack.ustring title, NStack.ustring message);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class NStack.ustring title, class NStack.ustring message) cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="title" Type="NStack.ustring" />
+        <Parameter Name="message" Type="NStack.ustring" />
+      </Parameters>
+      <Docs>
+        <param name="title">To be added.</param>
+        <param name="message">To be added.</param>
+        <summary>To be added.</summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="AllowsMultipleSelection">
+      <MemberSignature Language="C#" Value="public bool AllowsMultipleSelection { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance bool AllowsMultipleSelection" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.OpenDialog" /> allows multiple selection.
+            </summary>
+        <value>
+          <c>true</c> if allows multiple selection; otherwise, <c>false</c>.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="CanChooseDirectories">
+      <MemberSignature Language="C#" Value="public bool CanChooseDirectories { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance bool CanChooseDirectories" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.OpenDialog" /> can choose directories.
+            </summary>
+        <value>
+          <c>true</c> if can choose directories; otherwise, <c>false</c>.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="CanChooseFiles">
+      <MemberSignature Language="C#" Value="public bool CanChooseFiles { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance bool CanChooseFiles" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.OpenDialog" /> can choose files.
+            </summary>
+        <value>
+          <c>true</c> if can choose files; otherwise, <c>false</c>.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="FilePaths">
+      <MemberSignature Language="C#" Value="public System.Collections.Generic.IReadOnlyList&lt;NStack.ustring&gt; FilePaths { get; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class System.Collections.Generic.IReadOnlyList`1&lt;class NStack.ustring&gt; FilePaths" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Collections.Generic.IReadOnlyList&lt;NStack.ustring&gt;</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Gets the file paths selected
+            </summary>
+        <value>The file paths.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+  </Members>
+</Type>
