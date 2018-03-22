@@ -889,7 +889,15 @@ namespace Terminal.Gui {
 	/// <remarks>
 	///   <para>
 	///     Toplevels can be modally executing views, and they return control
-	///     to the caller when the "Running" property is set to false.
+	///     to the caller when the "Running" property is set to false, or
+	///     by calling <see cref="M:Terminal.Gui.Application.RequestStop()"/>
+	///   </para>
+	///   <para>
+	///     There will be a toplevel created for you on the first time use
+	///     and can be accessed from the property <see cref="P:Terminal.Gui.Application.Top"/>,
+	///     but new toplevels can be created and ran on top of it.   To run, create the
+	///     toplevel and then invoke <see cref="M:Terminal.Gui.Application.Run"/> with the
+	///     new toplevel.
 	///   </para>
 	/// </remarks>
 	public class Toplevel : View {

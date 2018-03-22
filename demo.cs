@@ -134,6 +134,34 @@ class Demo {
 		Application.Run (d);
 	}
 
+	// 
+	// Creates a nested editor
+	static void Editor (Toplevel top)
+	{
+		var tframe = top.Frame;
+		var ntop = new Toplevel (tframe);
+		var menu = new MenuBar (new MenuBarItem [] {
+			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuItem ("_Close", "", () => {Application.RequestStop ();}),
+			}),
+			new MenuBarItem ("_Edit", new MenuItem [] {
+				new MenuItem ("_Copy", "", null),
+				new MenuItem ("C_ut", "", null),
+				new MenuItem ("_Paste", "", null)
+			}),
+		});
+		ntop.Add (menu);
+
+		var win = new Window (new Rect (0, 1, tframe.Width, tframe.Height - 1), "/etc/passwd");
+		ntop.Add (win);
+
+		var text = new TextView (new Rect (0, 0, tframe.Width - 2, tframe.Height - 3));
+		text.Text = System.IO.File.ReadAllText ("/etc/passwd");
+		win.Add (text);
+
+		Application.Run (ntop);
+	}
+
 	static bool Quit ()
 	{
 		var n = MessageBox.Query (50, 7, "Quit Demo", "Are you sure you want to quit this demo?", "Yes", "No");
@@ -157,6 +185,7 @@ class Demo {
 		var win = new Window (new Rect (0, 1, tframe.Width, tframe.Height-1), "Hello");
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuItem ("Text Editor Demo", "", () => { Editor (top); }),
 				new MenuItem ("_New", "Creates new file", NewFile),
 				new MenuItem ("_Open", "", null),
 				new MenuItem ("_Close", "", () => Close ()),
@@ -166,13 +195,10 @@ class Demo {
 				new MenuItem ("_Copy", "", null),
 				new MenuItem ("C_ut", "", null),
 				new MenuItem ("_Paste", "", null)
-			})
+			}),
 		});
 
-		//ShowEntries (win);
-		var text = new TextView (new Rect (1, 1, 60, 14));
-		text.Text = System.IO.File.ReadAllText ("/etc/passwd");
-		win.Add (text);
+		ShowEntries (win);
 
 		int count = 0;
 		ml = new Label (new Rect (3, 17, 47, 1), "Mouse: ");
