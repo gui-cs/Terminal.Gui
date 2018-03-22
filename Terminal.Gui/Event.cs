@@ -39,6 +39,11 @@ namespace Terminal.Gui {
 		SpecialMask = 0xfff00000,
 
 		/// <summary>
+		/// The key code for the user pressing Control-spacebar
+		/// </summary>
+		ControlSpace = 0,
+			
+		/// <summary>
 	        /// The key code for the user pressing Control-A
 		/// </summary>
 		ControlA = 1,

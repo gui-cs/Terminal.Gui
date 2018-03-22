@@ -7,8 +7,6 @@
 // 
 // TODO:
 // Attributed text on spans
-// Render selection
-// Mark/Delete/Cut commands
 // Replace insertion with Insert method
 // String accumulation (Control-k, control-k is not preserving the last new line, see StringToRunes
 //
@@ -63,7 +61,7 @@ namespace Terminal.Gui {
 					start = i + 1;
 				}
 			}
-			if (i - start > 0)
+			if (i - start >= 0)
 				lines.Add (ToRunes (content [start, null]));
 			return lines;
 		}
@@ -138,8 +136,11 @@ namespace Terminal.Gui {
 		int leftColumn;
 		int currentRow;
 		int currentColumn;
-		bool used;
+		int selectionStartColumn, selectionStartRow;
+		bool selecting;
+		//bool used;
 
+#if false
 		/// <summary>
 		///   Changed event, raised when the text has clicked.
 		/// </summary>
@@ -148,7 +149,7 @@ namespace Terminal.Gui {
 		///   raised when the text in the entry changes.
 		/// </remarks>
 		public event EventHandler Changed;
-
+#endif
 		/// <summary>
 		///   Public constructor.
 		/// </summary>
@@ -197,6 +198,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor ()
 		{
+			if (selecting) {
+				var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow)-topRow, 0), Frame.Height);
+				var maxRow = Math.Min (Math.Max (Math.Max (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
+
+				SetNeedsDisplay (new Rect (0, minRow, Frame.Width, maxRow));
+			}
 			Move (CurrentColumn - leftColumn, CurrentRow - topRow);
 		}
 
@@ -209,20 +216,117 @@ namespace Terminal.Gui {
 			}
 		}
 
+		void ColorNormal ()
+		{
+			Driver.SetAttribute (ColorScheme.Normal);
+		}
+
+		void ColorSelection ()
+		{
+			if (HasFocus)
+				Driver.SetAttribute (ColorScheme.Focus);
+			else
+				Driver.SetAttribute (ColorScheme.Normal);
+		}
+
+		// Returns an encoded region start..end (top 32 bits are the row, low32 the column)
+		void GetEncodedRegionBounds (out long start, out long end)
+		{
+			long selection = ((long)(uint)selectionStartRow << 32) | (uint)selectionStartColumn;
+			long point = ((long)(uint)currentRow << 32) | (uint)currentColumn;
+			if (selection > point) {
+				start = point;
+				end = selection;
+			} else {
+				start = selection;
+				end = point;
+			}
+		}
+
+		bool PointInSelection (int col, int row)
+		{
+			long start, end;
+			GetEncodedRegionBounds (out start, out end);
+			var q = ((long)(uint)row << 32) | (uint)col;
+			return q >= start && q <= end;
+		}
+
+		//
+		// Returns a ustring with the text in the selected 
+		// region.
+		//
+		public ustring GetRegion ()
+		{
+			long start, end;
+			GetEncodedRegionBounds (out start, out end);
+			int startRow = (int)(start >> 32);
+			var maxrow = ((int)(end >> 32));
+			int startCol = (int)(start & 0xffffffff);
+			var endCol = (int)(end & 0xffffffff);
+			var line = model.GetLine (startRow);
+
+			if (startRow == maxrow) 
+				return StringFromRunes (line.GetRange (startCol, endCol));
+
+			ustring res = StringFromRunes (line.GetRange (startCol, line.Count - startCol));
+
+			for (int row = startRow+1; row < maxrow; row++) {
+				res = res + ustring.Make (10) + StringFromRunes (model.GetLine (row));
+			}
+			line = model.GetLine (maxrow);
+			res = res + ustring.Make (10) + StringFromRunes (line.GetRange (0, endCol));
+			return res;
+		}
+
+		//
+		// Clears the contents of the selected region
+		//
+		public void ClearRegion ()
+		{
+			long start, end;
+			long currentEncoded = ((long)(uint)currentRow << 32) | (uint)currentColumn;
+			GetEncodedRegionBounds (out start, out end);
+			int startRow = (int)(start >> 32);
+			var maxrow = ((int)(end >> 32));
+			int startCol = (int)(start & 0xffffffff);
+			var endCol = (int)(end & 0xffffffff);
+			var line = model.GetLine (startRow);
+
+			if (startRow == maxrow) {
+				line.RemoveRange (startCol, endCol - startCol);
+				currentColumn = startCol;
+				SetNeedsDisplay (new Rect (0, startRow - topRow, Frame.Width, startRow - topRow + 1));
+				return;
+			}
+
+			line.RemoveRange (startCol, line.Count - startCol);
+			var line2 = model.GetLine (maxrow);
+			line.AddRange (line2.Skip (endCol));
+			for (int row = startRow + 1; row <= maxrow; row++) {
+				model.RemoveLine (startRow+1);
+			}
+			if (currentEncoded == end) {
+				currentRow -= maxrow - (startRow);
+			}
+			currentColumn = startCol;
+
+			SetNeedsDisplay ();
+		}
+
 		/// <summary>
 		/// Redraw the text editor region 
 		/// </summary>
 		/// <param name="region">The region to redraw.</param>
 		public override void Redraw (Rect region)
 		{
-			Driver.SetAttribute (ColorScheme.Focus);
-			Move (0, 0);
+			ColorNormal ();
 
 			int bottom = region.Bottom;
 			int right = region.Right;
 			for (int row = region.Top; row < bottom; row++) {
 				int textLine = topRow + row;
 				if (textLine >= model.Count) {
+					ColorNormal ();
 					ClearRegion (region.Left, row, region.Right, row + 1);
 					continue;
 				}
@@ -237,6 +341,11 @@ namespace Terminal.Gui {
 				for (int col = region.Left; col < right; col++) {
 					var lineCol = leftColumn + col;
 					var rune = lineCol >= lineRuneCount ? ' ' : line [lineCol];
+					if (selecting && PointInSelection (col, row))
+						ColorSelection ();
+					else
+						ColorNormal ();
+					
 					AddRune (col, row, rune);
 				}
 			}
@@ -366,6 +475,8 @@ namespace Terminal.Gui {
 			int restCount;
 			List<Rune> rest;
 
+			// Handle some state here - whether the last command was a kill
+			// operation and the column tracking (up/down)
 			switch (kb.Key) {
 			case Key.ControlN:
 			case Key.CursorDown:
@@ -381,6 +492,7 @@ namespace Terminal.Gui {
 				break;
 			}
 
+			// Dispatch the command.
 			switch (kb.Key) {
 			case Key.ControlN:
 			case Key.CursorDown:
@@ -560,6 +672,24 @@ namespace Terminal.Gui {
 
 			case Key.ControlY: // Control-y, yank
 				InsertText (Clipboard.Contents);
+				selecting = false;
+				break;
+
+			case Key.ControlSpace:
+				selecting = true;
+				selectionStartColumn = currentColumn;
+				selectionStartRow = currentRow;
+				break;
+
+			case (Key)((int)'w' + Key.AltMask):
+				SetClipboard (GetRegion ());
+				selecting = false;
+				break;
+
+			case Key.ControlW:
+				SetClipboard (GetRegion ());
+				ClearRegion ();
+				selecting = false;
 				break;
 
 			case (Key)((int)'b' + Key.AltMask):
@@ -690,7 +820,7 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 			return true;
 		}
-		#endif
+#endif
 	}
 
 }
