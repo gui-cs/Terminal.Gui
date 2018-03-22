@@ -15,6 +15,7 @@
 // keybindings to go to top/bottom
 // public API to insert, remove ranges
 // Add word forward/word backwards commands
+// Save buffer API
 
 using System;
 using System.Collections.Generic;
@@ -284,6 +285,36 @@ namespace Terminal.Gui {
 				model.LoadString (value);
 				SetNeedsDisplay ();
 			}
+		}
+
+		/// <summary>
+		/// Loads the contents of the file into the TextView.
+		/// </summary>
+		/// <returns><c>true</c>, if file was loaded, <c>false</c> otherwise.</returns>
+		/// <param name="path">Path to the file to load.</param>
+		public bool LoadFile (string path)
+		{
+			if (path == null)
+				throw new ArgumentNullException (nameof (path));
+			ResetPosition ();
+			var res = model.LoadFile (path);
+			SetNeedsDisplay ();
+			return res;
+		}
+
+		/// <summary>
+		/// Loads the contents of the stream into the TextView.
+		/// </summary>
+		/// <returns><c>true</c>, if stream was loaded, <c>false</c> otherwise.</returns>
+		/// <param name="stream">Stream.</param>
+		public bool LoadStream (Stream stream)
+		{
+			if (stream == null)
+				throw new ArgumentNullException (nameof (stream));
+			ResetPosition ();
+			var res = model.LoadFile (path);
+			SetNeedsDisplay ();
+			return res;
 		}
 
 		/// <summary>
