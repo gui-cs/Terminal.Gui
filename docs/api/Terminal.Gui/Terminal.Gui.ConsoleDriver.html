@@ -777,7 +777,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract void PrepareToRun (Mono.Terminal.MainLoop mainLoop, Action&lt;Terminal.Gui.KeyEvent&gt; target, Action&lt;Terminal.Gui.MouseEvent&gt; mouse);</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract void PrepareToRun (Mono.Terminal.MainLoop mainLoop, Action&lt;Terminal.Gui.KeyEvent&gt; keyHandler, Action&lt;Terminal.Gui.MouseEvent&gt; mouseHandler);</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -862,6 +862,40 @@
   
   
   <a id="Terminal_Gui_ConsoleDriver_SetColors_" data-uid="Terminal.Gui.ConsoleDriver.SetColors*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_SetColors_System_ConsoleColor_System_ConsoleColor_" data-uid="Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)">SetColors(ConsoleColor, ConsoleColor)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.ConsoleColor</span></td>
+        <td><span class="parametername">foreground</span></td>
+        <td><p>To be added.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.ConsoleColor</span></td>
+        <td><span class="parametername">background</span></td>
+        <td><p>To be added.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_SetColors_" data-uid="Terminal.Gui.ConsoleDriver.SetColors*"></a>
   <h4 id="Terminal_Gui_ConsoleDriver_SetColors_System_Int16_System_Int16_" data-uid="Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)">SetColors(Int16, Int16)</h4>
   <div class="markdown level1 summary"><p>Advanced uses - set colors to any pre-set pairs, you would need to init_color 
             that independently with the R, G, B values.</p>
@@ -891,40 +925,6 @@
         <td><span class="xref">System.Int16</span></td>
         <td><span class="parametername">backgroundColorId</span></td>
         <td><p>Background color identifier.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_ConsoleDriver_SetColors_" data-uid="Terminal.Gui.ConsoleDriver.SetColors*"></a>
-  <h4 id="Terminal_Gui_ConsoleDriver_SetColors_System_ConsoleColor_System_ConsoleColor_" data-uid="Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)">SetColors(ConsoleColor, ConsoleColor)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.ConsoleColor</span></td>
-        <td><span class="parametername">foreground</span></td>
-        <td><p>To be added.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.ConsoleColor</span></td>
-        <td><span class="parametername">background</span></td>
-        <td><p>To be added.</p>
 </td>
       </tr>
     </tbody>
@@ -970,6 +970,28 @@
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public abstract void UncookMouse ();</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_UpdateCursor_" data-uid="Terminal.Gui.ConsoleDriver.UpdateCursor*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_UpdateCursor" data-uid="Terminal.Gui.ConsoleDriver.UpdateCursor">UpdateCursor()</h4>
+  <div class="markdown level1 summary"><p>Updates the location of the cursor position</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract void UpdateCursor ();</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_UpdateScreen_" data-uid="Terminal.Gui.ConsoleDriver.UpdateScreen*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_UpdateScreen" data-uid="Terminal.Gui.ConsoleDriver.UpdateScreen">UpdateScreen()</h4>
+  <div class="markdown level1 summary"><p>Redraws the physical screen with the contents that have been queued up via any of the printing commands.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract void UpdateScreen ();</code></pre>
   </div>
 </article>
           </div>

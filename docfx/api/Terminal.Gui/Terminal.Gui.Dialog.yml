@@ -3,6 +3,7 @@ items:
 - uid: Terminal.Gui.Dialog
   id: Dialog
   children:
+  - Terminal.Gui.Dialog.#ctor(NStack.ustring,System.Int32,System.Int32,Terminal.Gui.Button[])
   - Terminal.Gui.Dialog.#ctor(System.String,System.Int32,System.Int32,Terminal.Gui.Button[])
   - Terminal.Gui.Dialog.AddButton(Terminal.Gui.Button)
   - Terminal.Gui.Dialog.LayoutSubviews
@@ -25,6 +26,8 @@ items:
   - Terminal.Gui.View
   - Terminal.Gui.Toplevel
   - Terminal.Gui.Window
+  derivedClasses:
+  - Terminal.Gui.FileDialog
   implements: []
   inheritedMembers:
   - Terminal.Gui.Toplevel.CanFocus
@@ -77,6 +80,36 @@ items:
   - Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
   - Terminal.Gui.Window.Remove(Terminal.Gui.View)
   - Terminal.Gui.Window.Title
+- uid: Terminal.Gui.Dialog.#ctor(NStack.ustring,System.Int32,System.Int32,Terminal.Gui.Button[])
+  id: '#ctor(NStack.ustring,System.Int32,System.Int32,Terminal.Gui.Button[])'
+  parent: Terminal.Gui.Dialog
+  langs:
+  - csharp
+  name: Dialog(ustring, Int32, Int32, Button[])
+  nameWithType: Dialog.Dialog(ustring, Int32, Int32, Button[])
+  fullName: Dialog.Dialog(ustring, Int32, Int32, Button[])
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Initializes a new instance of the <xref href="Terminal.Gui.Dialog"></xref> class with an optional set of buttons to display
+  syntax:
+    content: public Dialog (NStack.ustring title, int width, int height, Terminal.Gui.Button[] buttons);
+    parameters:
+    - id: title
+      type: NStack.ustring
+      description: Title for the dialog.
+    - id: width
+      type: System.Int32
+      description: Width for the dialog.
+    - id: height
+      type: System.Int32
+      description: Height for the dialog.
+    - id: buttons
+      type: Terminal.Gui.Button[]
+      description: Optional buttons to lay out at the bottom of the dialog.
+  overload: Terminal.Gui.Dialog.#ctor*
+  exceptions: []
 - uid: Terminal.Gui.Dialog.#ctor(System.String,System.Int32,System.Int32,Terminal.Gui.Button[])
   id: '#ctor(System.String,System.Int32,System.Int32,Terminal.Gui.Button[])'
   parent: Terminal.Gui.Dialog
@@ -175,18 +208,18 @@ references:
   name: Window
   nameWithType: Window
   fullName: Terminal.Gui.Window
-- uid: Terminal.Gui.Dialog.#ctor(System.String,System.Int32,System.Int32,Terminal.Gui.Button[])
+- uid: Terminal.Gui.Dialog.#ctor(NStack.ustring,System.Int32,System.Int32,Terminal.Gui.Button[])
   parent: Terminal.Gui.Dialog
   isExternal: false
-  name: Dialog(String, Int32, Int32, Button[])
-  nameWithType: Dialog.Dialog(String, Int32, Int32, Button[])
-  fullName: Dialog.Dialog(String, Int32, Int32, Button[])
-- uid: System.String
-  parent: System
+  name: Dialog(ustring, Int32, Int32, Button[])
+  nameWithType: Dialog.Dialog(ustring, Int32, Int32, Button[])
+  fullName: Dialog.Dialog(ustring, Int32, Int32, Button[])
+- uid: NStack.ustring
+  parent: NStack
   isExternal: true
-  name: String
-  nameWithType: String
-  fullName: System.String
+  name: ustring
+  nameWithType: ustring
+  fullName: NStack.ustring
 - uid: System.Int32
   parent: System
   isExternal: true
@@ -211,6 +244,18 @@ references:
   - name: '[]'
     nameWithType: '[]'
     fullName: '[]'
+- uid: Terminal.Gui.Dialog.#ctor(System.String,System.Int32,System.Int32,Terminal.Gui.Button[])
+  parent: Terminal.Gui.Dialog
+  isExternal: false
+  name: Dialog(String, Int32, Int32, Button[])
+  nameWithType: Dialog.Dialog(String, Int32, Int32, Button[])
+  fullName: Dialog.Dialog(String, Int32, Int32, Button[])
+- uid: System.String
+  parent: System
+  isExternal: true
+  name: String
+  nameWithType: String
+  fullName: System.String
 - uid: Terminal.Gui.Dialog.AddButton(Terminal.Gui.Button)
   parent: Terminal.Gui.Dialog
   isExternal: false

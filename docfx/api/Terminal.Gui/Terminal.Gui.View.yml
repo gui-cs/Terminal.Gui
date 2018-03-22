@@ -79,6 +79,7 @@ items:
   - Terminal.Gui.ScrollBarView
   - Terminal.Gui.ScrollView
   - Terminal.Gui.TextField
+  - Terminal.Gui.TextView
   - Terminal.Gui.Toplevel
   implements:
   - System.Collections.IEnumerable

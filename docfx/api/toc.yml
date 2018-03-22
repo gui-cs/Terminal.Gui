@@ -31,6 +31,8 @@
     name: ConsoleDriver
   - uid: Terminal.Gui.Dialog
     name: Dialog
+  - uid: Terminal.Gui.FileDialog
+    name: FileDialog
   - uid: Terminal.Gui.FrameView
     name: FrameView
   - uid: Terminal.Gui.IListDataSource
@@ -55,6 +57,8 @@
     name: MouseEvent
   - uid: Terminal.Gui.MouseFlags
     name: MouseFlags
+  - uid: Terminal.Gui.OpenDialog
+    name: OpenDialog
   - uid: Terminal.Gui.Point
     name: Point
   - uid: Terminal.Gui.ProgressBar
@@ -65,6 +69,8 @@
     name: Rect
   - uid: Terminal.Gui.Responder
     name: Responder
+  - uid: Terminal.Gui.SaveDialog
+    name: SaveDialog
   - uid: Terminal.Gui.ScrollBarView
     name: ScrollBarView
   - uid: Terminal.Gui.ScrollView
@@ -77,6 +83,8 @@
     name: TextAlignment
   - uid: Terminal.Gui.TextField
     name: TextField
+  - uid: Terminal.Gui.TextView
+    name: TextView
   - uid: Terminal.Gui.Toplevel
     name: Toplevel
   - uid: Terminal.Gui.View

@@ -134,7 +134,7 @@ items:
   namespace: Terminal.Gui
   summary: 'Building block API: completes the exection of a Toplevel that was started with Begin.'
   syntax:
-    content: public static void End (Terminal.Gui.Application.RunState rs);
+    content: public static void End (Terminal.Gui.Application.RunState runState);
     parameters:
     - id: rs
       type: Terminal.Gui.Application+RunState

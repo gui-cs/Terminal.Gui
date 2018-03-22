@@ -236,6 +236,40 @@
   
   
   <a id="Terminal_Gui_Button__ctor_" data-uid="Terminal.Gui.Button.#ctor*"></a>
+  <h4 id="Terminal_Gui_Button__ctor_NStack_ustring_" data-uid="Terminal.Gui.Button.#ctor(NStack.ustring)">Button(ustring)</h4>
+  <div class="markdown level1 summary"><p>Public constructor, creates a button based on
+              the given text at position 0,0</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Button (NStack.ustring text);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">text</span></td>
+        <td><p>The button&#39;s text</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_Button__ctor_NStack_ustring__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>The size of the button is computed based on the
+              text length.   This button is not a default button.</p>
+</div>
+  
+  
+  <a id="Terminal_Gui_Button__ctor_" data-uid="Terminal.Gui.Button.#ctor*"></a>
   <h4 id="Terminal_Gui_Button__ctor_System_String_" data-uid="Terminal.Gui.Button.#ctor(System.String)">Button(String)</h4>
   <div class="markdown level1 summary"><p>Public constructor, creates a button based on
               the given text at position 0,0</p>
@@ -266,6 +300,47 @@
   <h5 id="Terminal_Gui_Button__ctor_System_String__remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>The size of the button is computed based on the
               text length.   This button is not a default button.</p>
+</div>
+  
+  
+  <a id="Terminal_Gui_Button__ctor_" data-uid="Terminal.Gui.Button.#ctor*"></a>
+  <h4 id="Terminal_Gui_Button__ctor_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.Button.#ctor(NStack.ustring,System.Boolean)">Button(ustring, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Public constructor, creates a button based on
+              the given text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Button (NStack.ustring text, bool is_default);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">text</span></td>
+        <td><p>The button&#39;s text</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">is_default</span></td>
+        <td><p>If set, this makes the button the default button in the current view, which means that if the user presses return on a view that does not handle return, it will be treated as if he had clicked on the button</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_Button__ctor_NStack_ustring_System_Boolean__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>If the value for is_default is true, a special
+              decoration is used, and the enter key on a
+              dialog would implicitly activate this button.</p>
 </div>
   
   
@@ -307,6 +382,52 @@
   <div class="markdown level1 remarks"><p>If the value for is_default is true, a special
               decoration is used, and the enter key on a
               dialog would implicitly activate this button.</p>
+</div>
+  
+  
+  <a id="Terminal_Gui_Button__ctor_" data-uid="Terminal.Gui.Button.#ctor*"></a>
+  <h4 id="Terminal_Gui_Button__ctor_System_Int32_System_Int32_NStack_ustring_" data-uid="Terminal.Gui.Button.#ctor(System.Int32,System.Int32,NStack.ustring)">Button(Int32, Int32, ustring)</h4>
+  <div class="markdown level1 summary"><p>Public constructor, creates a button based on
+              the given text at the given position.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Button (int x, int y, NStack.ustring text);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">x</span></td>
+        <td><p>X position where the button will be shown.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">y</span></td>
+        <td><p>Y position where the button will be shown.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">text</span></td>
+        <td><p>The button&#39;s text</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_Button__ctor_System_Int32_System_Int32_NStack_ustring__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>The size of the button is computed based on the
+              text length.   This button is not a default button.</p>
 </div>
   
   
@@ -353,6 +474,59 @@
   <h5 id="Terminal_Gui_Button__ctor_System_Int32_System_Int32_System_String__remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>The size of the button is computed based on the
               text length.   This button is not a default button.</p>
+</div>
+  
+  
+  <a id="Terminal_Gui_Button__ctor_" data-uid="Terminal.Gui.Button.#ctor*"></a>
+  <h4 id="Terminal_Gui_Button__ctor_System_Int32_System_Int32_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.Button.#ctor(System.Int32,System.Int32,NStack.ustring,System.Boolean)">Button(Int32, Int32, ustring, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Public constructor, creates a button based on
+              the given text at the given position.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Button (int x, int y, NStack.ustring text, bool is_default);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">x</span></td>
+        <td><p>X position where the button will be shown.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">y</span></td>
+        <td><p>Y position where the button will be shown.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">text</span></td>
+        <td><p>The button&#39;s text</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">is_default</span></td>
+        <td><p>If set, this makes the button the default button in the current view, which means that if the user presses return on a view that does not handle return, it will be treated as if he had clicked on the button</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_Button__ctor_System_Int32_System_Int32_NStack_ustring_System_Boolean__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>If the value for is_default is true, a special
+              decoration is used, and the enter key on a
+              dialog would implicitly activate this button.</p>
 </div>
   
   

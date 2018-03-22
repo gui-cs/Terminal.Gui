@@ -28,8 +28,8 @@ items:
   - Terminal.Gui.ConsoleDriver.RightTee
   - Terminal.Gui.ConsoleDriver.Rows
   - Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
-  - Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
   - Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+  - Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
   - Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
   - Terminal.Gui.ConsoleDriver.Stipple
   - Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
@@ -37,6 +37,8 @@ items:
   - Terminal.Gui.ConsoleDriver.TopTee
   - Terminal.Gui.ConsoleDriver.ULCorner
   - Terminal.Gui.ConsoleDriver.UncookMouse
+  - Terminal.Gui.ConsoleDriver.UpdateCursor
+  - Terminal.Gui.ConsoleDriver.UpdateScreen
   - Terminal.Gui.ConsoleDriver.URCorner
   - Terminal.Gui.ConsoleDriver.VLine
   langs:
@@ -449,7 +451,7 @@ items:
   - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
-    content: public abstract void PrepareToRun (Mono.Terminal.MainLoop mainLoop, Action<Terminal.Gui.KeyEvent> target, Action<Terminal.Gui.MouseEvent> mouse);
+    content: public abstract void PrepareToRun (Mono.Terminal.MainLoop mainLoop, Action<Terminal.Gui.KeyEvent> keyHandler, Action<Terminal.Gui.MouseEvent> mouseHandler);
     parameters:
     - id: mainLoop
       type: Mono.Terminal.MainLoop
@@ -557,6 +559,29 @@ items:
       description: C.
   overload: Terminal.Gui.ConsoleDriver.SetAttribute*
   exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+  id: SetColors(System.ConsoleColor,System.ConsoleColor)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: SetColors(ConsoleColor, ConsoleColor)
+  nameWithType: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
+  fullName: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
+    parameters:
+    - id: foreground
+      type: System.ConsoleColor
+      description: To be added.
+    - id: background
+      type: System.ConsoleColor
+      description: To be added.
+  overload: Terminal.Gui.ConsoleDriver.SetColors*
+  exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
   id: SetColors(System.Int16,System.Int16)
   parent: Terminal.Gui.ConsoleDriver
@@ -579,29 +604,6 @@ items:
     - id: backgroundColorId
       type: System.Int16
       description: Background color identifier.
-  overload: Terminal.Gui.ConsoleDriver.SetColors*
-  exceptions: []
-- uid: Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
-  id: SetColors(System.ConsoleColor,System.ConsoleColor)
-  parent: Terminal.Gui.ConsoleDriver
-  langs:
-  - csharp
-  name: SetColors(ConsoleColor, ConsoleColor)
-  nameWithType: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
-  fullName: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  syntax:
-    content: public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
-    parameters:
-    - id: foreground
-      type: System.ConsoleColor
-      description: To be added.
-    - id: background
-      type: System.ConsoleColor
-      description: To be added.
   overload: Terminal.Gui.ConsoleDriver.SetColors*
   exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
@@ -730,6 +732,42 @@ items:
     content: public abstract void UncookMouse ();
     parameters: []
   overload: Terminal.Gui.ConsoleDriver.UncookMouse*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.UpdateCursor
+  id: UpdateCursor
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: UpdateCursor()
+  nameWithType: ConsoleDriver.UpdateCursor()
+  fullName: ConsoleDriver.UpdateCursor()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Updates the location of the cursor position
+  syntax:
+    content: public abstract void UpdateCursor ();
+    parameters: []
+  overload: Terminal.Gui.ConsoleDriver.UpdateCursor*
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.UpdateScreen
+  id: UpdateScreen
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: UpdateScreen()
+  nameWithType: ConsoleDriver.UpdateScreen()
+  fullName: ConsoleDriver.UpdateScreen()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Redraws the physical screen with the contents that have been queued up via any of the printing commands.
+  syntax:
+    content: public abstract void UpdateScreen ();
+    parameters: []
+  overload: Terminal.Gui.ConsoleDriver.UpdateScreen*
   exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.URCorner
   id: URCorner
@@ -1040,18 +1078,6 @@ references:
   name: Attribute
   nameWithType: Attribute
   fullName: Terminal.Gui.Attribute
-- uid: Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
-  parent: Terminal.Gui.ConsoleDriver
-  isExternal: false
-  name: SetColors(Int16, Int16)
-  nameWithType: ConsoleDriver.SetColors(Int16, Int16)
-  fullName: ConsoleDriver.SetColors(Int16, Int16)
-- uid: System.Int16
-  parent: System
-  isExternal: true
-  name: Int16
-  nameWithType: Int16
-  fullName: System.Int16
 - uid: Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -1064,6 +1090,18 @@ references:
   name: ConsoleColor
   nameWithType: ConsoleColor
   fullName: System.ConsoleColor
+- uid: Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: SetColors(Int16, Int16)
+  nameWithType: ConsoleDriver.SetColors(Int16, Int16)
+  fullName: ConsoleDriver.SetColors(Int16, Int16)
+- uid: System.Int16
+  parent: System
+  isExternal: true
+  name: Int16
+  nameWithType: Int16
+  fullName: System.Int16
 - uid: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -1106,6 +1144,18 @@ references:
   name: UncookMouse()
   nameWithType: ConsoleDriver.UncookMouse()
   fullName: ConsoleDriver.UncookMouse()
+- uid: Terminal.Gui.ConsoleDriver.UpdateCursor
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: UpdateCursor()
+  nameWithType: ConsoleDriver.UpdateCursor()
+  fullName: ConsoleDriver.UpdateCursor()
+- uid: Terminal.Gui.ConsoleDriver.UpdateScreen
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: UpdateScreen()
+  nameWithType: ConsoleDriver.UpdateScreen()
+  fullName: ConsoleDriver.UpdateScreen()
 - uid: Terminal.Gui.ConsoleDriver.URCorner
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -1250,3 +1300,15 @@ references:
   name: UncookMouse
   nameWithType: ConsoleDriver.UncookMouse
   fullName: ConsoleDriver.UncookMouse
+- uid: Terminal.Gui.ConsoleDriver.UpdateCursor*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: UpdateCursor
+  nameWithType: ConsoleDriver.UpdateCursor
+  fullName: ConsoleDriver.UpdateCursor
+- uid: Terminal.Gui.ConsoleDriver.UpdateScreen*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: UpdateScreen
+  nameWithType: ConsoleDriver.UpdateScreen
+  fullName: ConsoleDriver.UpdateScreen

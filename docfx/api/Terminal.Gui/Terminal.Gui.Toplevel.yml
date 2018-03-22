@@ -21,7 +21,14 @@ items:
   remarks: >-
     <p>
                     Toplevels can be modally executing views, and they return control
-                    to the caller when the "Running" property is set to false.
+                    to the caller when the "Running" property is set to false, or
+                    by calling <xref href="Terminal.Gui.Application.RequestStop()"></xref></p>
+        <p>
+                    There will be a toplevel created for you on the first time use
+                    and can be accessed from the property <xref href="Terminal.Gui.Application.Top"></xref>,
+                    but new toplevels can be created and ran on top of it.   To run, create the
+                    toplevel and then invoke <xref href="Terminal.Gui.Application.Run"></xref> with the
+                    new toplevel.
                   </p>
   syntax:
     content: 'public class Toplevel : Terminal.Gui.View'

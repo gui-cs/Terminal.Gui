@@ -3,9 +3,13 @@ items:
 - uid: Terminal.Gui.Button
   id: Button
   children:
+  - Terminal.Gui.Button.#ctor(NStack.ustring)
   - Terminal.Gui.Button.#ctor(System.String)
+  - Terminal.Gui.Button.#ctor(NStack.ustring,System.Boolean)
   - Terminal.Gui.Button.#ctor(System.String,System.Boolean)
+  - Terminal.Gui.Button.#ctor(System.Int32,System.Int32,NStack.ustring)
   - Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String)
+  - Terminal.Gui.Button.#ctor(System.Int32,System.Int32,NStack.ustring,System.Boolean)
   - Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String,System.Boolean)
   - Terminal.Gui.Button.Clicked
   - Terminal.Gui.Button.IsDefault
@@ -88,6 +92,32 @@ items:
   - Terminal.Gui.View.SuperView
   - Terminal.Gui.View.ToString
   - Terminal.Gui.View.WantMousePositionReports
+- uid: Terminal.Gui.Button.#ctor(NStack.ustring)
+  id: '#ctor(NStack.ustring)'
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: Button(ustring)
+  nameWithType: Button.Button(ustring)
+  fullName: Button.Button(ustring)
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Public constructor, creates a button based on
+                  the given text at position 0,0
+  remarks: >-
+    The size of the button is computed based on the
+                  text length.   This button is not a default button.
+  syntax:
+    content: public Button (NStack.ustring text);
+    parameters:
+    - id: text
+      type: NStack.ustring
+      description: The button's text
+  overload: Terminal.Gui.Button.#ctor*
+  exceptions: []
 - uid: Terminal.Gui.Button.#ctor(System.String)
   id: '#ctor(System.String)'
   parent: Terminal.Gui.Button
@@ -112,6 +142,36 @@ items:
     - id: s
       type: System.String
       description: To be added.
+  overload: Terminal.Gui.Button.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.Button.#ctor(NStack.ustring,System.Boolean)
+  id: '#ctor(NStack.ustring,System.Boolean)'
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: Button(ustring, Boolean)
+  nameWithType: Button.Button(ustring, Boolean)
+  fullName: Button.Button(ustring, Boolean)
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Public constructor, creates a button based on
+                  the given text.
+  remarks: >-
+    If the value for is_default is true, a special
+                  decoration is used, and the enter key on a
+                  dialog would implicitly activate this button.
+  syntax:
+    content: public Button (NStack.ustring text, bool is_default);
+    parameters:
+    - id: text
+      type: NStack.ustring
+      description: The button's text
+    - id: is_default
+      type: System.Boolean
+      description: If set, this makes the button the default button in the current view, which means that if the user presses return on a view that does not handle return, it will be treated as if he had clicked on the button
   overload: Terminal.Gui.Button.#ctor*
   exceptions: []
 - uid: Terminal.Gui.Button.#ctor(System.String,System.Boolean)
@@ -144,6 +204,38 @@ items:
       description: To be added.
   overload: Terminal.Gui.Button.#ctor*
   exceptions: []
+- uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,NStack.ustring)
+  id: '#ctor(System.Int32,System.Int32,NStack.ustring)'
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: Button(Int32, Int32, ustring)
+  nameWithType: Button.Button(Int32, Int32, ustring)
+  fullName: Button.Button(Int32, Int32, ustring)
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Public constructor, creates a button based on
+                  the given text at the given position.
+  remarks: >-
+    The size of the button is computed based on the
+                  text length.   This button is not a default button.
+  syntax:
+    content: public Button (int x, int y, NStack.ustring text);
+    parameters:
+    - id: x
+      type: System.Int32
+      description: X position where the button will be shown.
+    - id: y
+      type: System.Int32
+      description: Y position where the button will be shown.
+    - id: text
+      type: NStack.ustring
+      description: The button's text
+  overload: Terminal.Gui.Button.#ctor*
+  exceptions: []
 - uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String)
   id: '#ctor(System.Int32,System.Int32,System.String)'
   parent: Terminal.Gui.Button
@@ -174,6 +266,42 @@ items:
     - id: s
       type: System.String
       description: To be added.
+  overload: Terminal.Gui.Button.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,NStack.ustring,System.Boolean)
+  id: '#ctor(System.Int32,System.Int32,NStack.ustring,System.Boolean)'
+  parent: Terminal.Gui.Button
+  langs:
+  - csharp
+  name: Button(Int32, Int32, ustring, Boolean)
+  nameWithType: Button.Button(Int32, Int32, ustring, Boolean)
+  fullName: Button.Button(Int32, Int32, ustring, Boolean)
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Public constructor, creates a button based on
+                  the given text at the given position.
+  remarks: >-
+    If the value for is_default is true, a special
+                  decoration is used, and the enter key on a
+                  dialog would implicitly activate this button.
+  syntax:
+    content: public Button (int x, int y, NStack.ustring text, bool is_default);
+    parameters:
+    - id: x
+      type: System.Int32
+      description: X position where the button will be shown.
+    - id: y
+      type: System.Int32
+      description: Y position where the button will be shown.
+    - id: text
+      type: NStack.ustring
+      description: The button's text
+    - id: is_default
+      type: System.Boolean
+      description: If set, this makes the button the default button in the current view, which means that if the user presses return on a view that does not handle return, it will be treated as if he had clicked on the button
   overload: Terminal.Gui.Button.#ctor*
   exceptions: []
 - uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String,System.Boolean)
@@ -411,6 +539,18 @@ references:
   name: View
   nameWithType: View
   fullName: Terminal.Gui.View
+- uid: Terminal.Gui.Button.#ctor(NStack.ustring)
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: Button(ustring)
+  nameWithType: Button.Button(ustring)
+  fullName: Button.Button(ustring)
+- uid: NStack.ustring
+  parent: NStack
+  isExternal: true
+  name: ustring
+  nameWithType: ustring
+  fullName: NStack.ustring
 - uid: Terminal.Gui.Button.#ctor(System.String)
   parent: Terminal.Gui.Button
   isExternal: false
@@ -423,30 +563,48 @@ references:
   name: String
   nameWithType: String
   fullName: System.String
-- uid: Terminal.Gui.Button.#ctor(System.String,System.Boolean)
+- uid: Terminal.Gui.Button.#ctor(NStack.ustring,System.Boolean)
   parent: Terminal.Gui.Button
   isExternal: false
-  name: Button(String, Boolean)
-  nameWithType: Button.Button(String, Boolean)
-  fullName: Button.Button(String, Boolean)
+  name: Button(ustring, Boolean)
+  nameWithType: Button.Button(ustring, Boolean)
+  fullName: Button.Button(ustring, Boolean)
 - uid: System.Boolean
   parent: System
   isExternal: true
   name: Boolean
   nameWithType: Boolean
   fullName: System.Boolean
-- uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String)
+- uid: Terminal.Gui.Button.#ctor(System.String,System.Boolean)
   parent: Terminal.Gui.Button
   isExternal: false
-  name: Button(Int32, Int32, String)
-  nameWithType: Button.Button(Int32, Int32, String)
-  fullName: Button.Button(Int32, Int32, String)
+  name: Button(String, Boolean)
+  nameWithType: Button.Button(String, Boolean)
+  fullName: Button.Button(String, Boolean)
+- uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,NStack.ustring)
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: Button(Int32, Int32, ustring)
+  nameWithType: Button.Button(Int32, Int32, ustring)
+  fullName: Button.Button(Int32, Int32, ustring)
 - uid: System.Int32
   parent: System
   isExternal: true
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
+- uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String)
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: Button(Int32, Int32, String)
+  nameWithType: Button.Button(Int32, Int32, String)
+  fullName: Button.Button(Int32, Int32, String)
+- uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,NStack.ustring,System.Boolean)
+  parent: Terminal.Gui.Button
+  isExternal: false
+  name: Button(Int32, Int32, ustring, Boolean)
+  nameWithType: Button.Button(Int32, Int32, ustring, Boolean)
+  fullName: Button.Button(Int32, Int32, ustring, Boolean)
 - uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String,System.Boolean)
   parent: Terminal.Gui.Button
   isExternal: false
@@ -531,12 +689,6 @@ references:
   name: Text
   nameWithType: Button.Text
   fullName: Button.Text
-- uid: NStack.ustring
-  parent: NStack
-  isExternal: true
-  name: ustring
-  nameWithType: ustring
-  fullName: NStack.ustring
 - uid: Terminal.Gui.Button.#ctor*
   parent: Terminal.Gui.Button
   isExternal: false

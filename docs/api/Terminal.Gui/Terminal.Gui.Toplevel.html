@@ -236,7 +236,14 @@
   <h5 id="Terminal_Gui_Toplevel_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks"><p>
                 Toplevels can be modally executing views, and they return control
-                to the caller when the &quot;Running&quot; property is set to false.
+                to the caller when the &quot;Running&quot; property is set to false, or
+                by calling <span class="xref">Terminal.Gui.Application.RequestStop()</span></p>
+    <p>
+                There will be a toplevel created for you on the first time use
+                and can be accessed from the property <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Top">Top</a>,
+                but new toplevels can be created and ran on top of it.   To run, create the
+                toplevel and then invoke <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run">Run()</a> with the
+                new toplevel.
               </p></div>
   <h3 id="constructors">Constructors
   </h3>

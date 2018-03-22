@@ -4,6 +4,7 @@ items:
   id: MainLoop
   children:
   - Mono.Terminal.MainLoop.#ctor
+  - Mono.Terminal.MainLoop.#ctor(System.Boolean)
   - Mono.Terminal.MainLoop.AddIdle(System.Func{System.Boolean})
   - Mono.Terminal.MainLoop.AddTimeout(System.TimeSpan,System.Func{Mono.Terminal.MainLoop,System.Boolean})
   - Mono.Terminal.MainLoop.AddWatch(System.Int32,Mono.Terminal.MainLoop.Condition,System.Func{Mono.Terminal.MainLoop,System.Boolean})
@@ -15,6 +16,7 @@ items:
   - Mono.Terminal.MainLoop.RemoveWatch(System.Object)
   - Mono.Terminal.MainLoop.Run
   - Mono.Terminal.MainLoop.Stop
+  - Mono.Terminal.MainLoop.WindowsKeyPressed
   langs:
   - csharp
   name: MainLoop
@@ -52,6 +54,26 @@ items:
   syntax:
     content: public MainLoop ();
     parameters: []
+  overload: Mono.Terminal.MainLoop.#ctor*
+  exceptions: []
+- uid: Mono.Terminal.MainLoop.#ctor(System.Boolean)
+  id: '#ctor(System.Boolean)'
+  parent: Mono.Terminal.MainLoop
+  langs:
+  - csharp
+  name: MainLoop(Boolean)
+  nameWithType: MainLoop.MainLoop(Boolean)
+  fullName: MainLoop.MainLoop(Boolean)
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Mono.Terminal
+  syntax:
+    content: public MainLoop (bool useUnix);
+    parameters:
+    - id: useUnix
+      type: System.Boolean
+      description: To be added.
   overload: Mono.Terminal.MainLoop.#ctor*
   exceptions: []
 - uid: Mono.Terminal.MainLoop.AddIdle(System.Func{System.Boolean})
@@ -306,6 +328,25 @@ items:
     parameters: []
   overload: Mono.Terminal.MainLoop.Stop*
   exceptions: []
+- uid: Mono.Terminal.MainLoop.WindowsKeyPressed
+  id: WindowsKeyPressed
+  parent: Mono.Terminal.MainLoop
+  langs:
+  - csharp
+  name: WindowsKeyPressed
+  nameWithType: MainLoop.WindowsKeyPressed
+  fullName: MainLoop.WindowsKeyPressed
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Mono.Terminal
+  summary: This event is raised when a key is pressed when using the Windows driver.
+  syntax:
+    content: public Action<ConsoleKeyInfo> WindowsKeyPressed;
+    return:
+      type: System.Action{System.ConsoleKeyInfo}
+      description: To be added.
+  exceptions: []
 references:
 - uid: System.Object
   parent: System
@@ -319,6 +360,18 @@ references:
   name: MainLoop()
   nameWithType: MainLoop.MainLoop()
   fullName: MainLoop.MainLoop()
+- uid: Mono.Terminal.MainLoop.#ctor(System.Boolean)
+  parent: Mono.Terminal.MainLoop
+  isExternal: false
+  name: MainLoop(Boolean)
+  nameWithType: MainLoop.MainLoop(Boolean)
+  fullName: MainLoop.MainLoop(Boolean)
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
 - uid: Mono.Terminal.MainLoop.AddIdle(System.Func{System.Boolean})
   parent: Mono.Terminal.MainLoop
   isExternal: false
@@ -329,10 +382,6 @@ references:
   name: Func
   nameWithType: Func
   fullName: System.Func
-- uid: System.Boolean
-  name: Boolean
-  nameWithType: Boolean
-  fullName: System.Boolean
 - uid: System.Func{System.Boolean}
   parent: System
   isExternal: true
@@ -468,6 +517,41 @@ references:
   name: Stop()
   nameWithType: MainLoop.Stop()
   fullName: MainLoop.Stop()
+- uid: Mono.Terminal.MainLoop.WindowsKeyPressed
+  parent: Mono.Terminal.MainLoop
+  isExternal: false
+  name: WindowsKeyPressed
+  nameWithType: MainLoop.WindowsKeyPressed
+  fullName: MainLoop.WindowsKeyPressed
+- uid: System.Action`1
+  name: Action
+  nameWithType: Action
+  fullName: System.Action
+- uid: System.ConsoleKeyInfo
+  name: ConsoleKeyInfo
+  nameWithType: ConsoleKeyInfo
+  fullName: System.ConsoleKeyInfo
+- uid: System.Action{System.ConsoleKeyInfo}
+  parent: System
+  isExternal: true
+  name: Action<ConsoleKeyInfo>
+  nameWithType: Action<ConsoleKeyInfo>
+  fullName: System.Action<System.ConsoleKeyInfo>
+  spec.csharp:
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: System.ConsoleKeyInfo
+    name: ConsoleKeyInfo
+    nameWithType: ConsoleKeyInfo
+    fullName: System.ConsoleKeyInfo
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
 - uid: Mono.Terminal.MainLoop.#ctor*
   parent: Mono.Terminal.MainLoop
   isExternal: false

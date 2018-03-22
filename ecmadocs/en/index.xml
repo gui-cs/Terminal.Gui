@@ -1,9 +1,30 @@
 <Overview>
   <Assemblies>
-    <Assembly Name="Terminal.Gui" Version="0.0.0.0">
+    <Assembly Name="Terminal.Gui" Version="1.0.0.0">
       <Attributes>
         <Attribute>
           <AttributeName>System.Diagnostics.Debuggable(System.Diagnostics.DebuggableAttribute+DebuggingModes.IgnoreSymbolStoreSequencePoints)</AttributeName>
+        </Attribute>
+        <Attribute>
+          <AttributeName>System.Reflection.AssemblyCompany("Miguel de Icaza")</AttributeName>
+        </Attribute>
+        <Attribute>
+          <AttributeName>System.Reflection.AssemblyConfiguration("Release")</AttributeName>
+        </Attribute>
+        <Attribute>
+          <AttributeName>System.Reflection.AssemblyDescription("Console-based user interface toolkit for .NET applications.")</AttributeName>
+        </Attribute>
+        <Attribute>
+          <AttributeName>System.Reflection.AssemblyFileVersion("1.0.0.0")</AttributeName>
+        </Attribute>
+        <Attribute>
+          <AttributeName>System.Reflection.AssemblyInformationalVersion("1.0.0")</AttributeName>
+        </Attribute>
+        <Attribute>
+          <AttributeName>System.Reflection.AssemblyProduct("Terminal.Gui")</AttributeName>
+        </Attribute>
+        <Attribute>
+          <AttributeName>System.Reflection.AssemblyTitle("Terminal.Gui")</AttributeName>
         </Attribute>
         <Attribute>
           <AttributeName>System.Runtime.CompilerServices.CompilationRelaxations(8)</AttributeName>
@@ -38,6 +59,7 @@
       <Type Name="ColorScheme" Kind="Class" />
       <Type Name="ConsoleDriver" Kind="Class" />
       <Type Name="Dialog" Kind="Class" />
+      <Type Name="FileDialog" Kind="Class" />
       <Type Name="FrameView" Kind="Class" />
       <Type Name="IListDataSource" Kind="Interface" />
       <Type Name="Key" Kind="Enumeration" />
@@ -50,17 +72,20 @@
       <Type Name="MessageBox" Kind="Class" />
       <Type Name="MouseEvent" Kind="Structure" />
       <Type Name="MouseFlags" Kind="Enumeration" />
+      <Type Name="OpenDialog" Kind="Class" />
       <Type Name="Point" Kind="Structure" />
       <Type Name="ProgressBar" Kind="Class" />
       <Type Name="RadioGroup" Kind="Class" />
       <Type Name="Rect" Kind="Structure" />
       <Type Name="Responder" Kind="Class" />
+      <Type Name="SaveDialog" Kind="Class" />
       <Type Name="ScrollBarView" Kind="Class" />
       <Type Name="ScrollView" Kind="Class" />
       <Type Name="Size" Kind="Structure" />
       <Type Name="SpecialChar" Kind="Enumeration" />
       <Type Name="TextAlignment" Kind="Enumeration" />
       <Type Name="TextField" Kind="Class" />
+      <Type Name="TextView" Kind="Class" />
       <Type Name="Toplevel" Kind="Class" />
       <Type Name="View" Kind="Class" />
       <Type Name="Window" Kind="Class" />

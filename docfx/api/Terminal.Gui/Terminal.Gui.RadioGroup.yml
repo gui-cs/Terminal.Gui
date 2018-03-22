@@ -7,6 +7,7 @@ items:
   - Terminal.Gui.RadioGroup.#ctor(System.Int32,System.Int32,System.String[],System.Int32)
   - Terminal.Gui.RadioGroup.MouseEvent(Terminal.Gui.MouseEvent)
   - Terminal.Gui.RadioGroup.PositionCursor
+  - Terminal.Gui.RadioGroup.ProcessColdKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.RadioGroup.ProcessHotKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.RadioGroup.ProcessKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.RadioGroup.RadioLabels
@@ -63,7 +64,6 @@ items:
   - Terminal.Gui.View.LayoutSubviews
   - Terminal.Gui.View.MostFocused
   - Terminal.Gui.View.Move(System.Int32,System.Int32)
-  - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.Remove(Terminal.Gui.View)
   - Terminal.Gui.View.RemoveAll
   - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
@@ -173,6 +173,29 @@ items:
     content: public override void PositionCursor ();
     parameters: []
   overload: Terminal.Gui.RadioGroup.PositionCursor*
+  exceptions: []
+- uid: Terminal.Gui.RadioGroup.ProcessColdKey(Terminal.Gui.KeyEvent)
+  id: ProcessColdKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.RadioGroup
+  langs:
+  - csharp
+  name: ProcessColdKey(KeyEvent)
+  nameWithType: RadioGroup.ProcessColdKey(KeyEvent)
+  fullName: RadioGroup.ProcessColdKey(KeyEvent)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool ProcessColdKey (Terminal.Gui.KeyEvent kb);
+    parameters:
+    - id: kb
+      type: Terminal.Gui.KeyEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.RadioGroup.ProcessColdKey*
   exceptions: []
 - uid: Terminal.Gui.RadioGroup.ProcessHotKey(Terminal.Gui.KeyEvent)
   id: ProcessHotKey(Terminal.Gui.KeyEvent)
@@ -371,18 +394,24 @@ references:
   name: PositionCursor()
   nameWithType: RadioGroup.PositionCursor()
   fullName: RadioGroup.PositionCursor()
-- uid: Terminal.Gui.RadioGroup.ProcessHotKey(Terminal.Gui.KeyEvent)
+- uid: Terminal.Gui.RadioGroup.ProcessColdKey(Terminal.Gui.KeyEvent)
   parent: Terminal.Gui.RadioGroup
   isExternal: false
-  name: ProcessHotKey(KeyEvent)
-  nameWithType: RadioGroup.ProcessHotKey(KeyEvent)
-  fullName: RadioGroup.ProcessHotKey(KeyEvent)
+  name: ProcessColdKey(KeyEvent)
+  nameWithType: RadioGroup.ProcessColdKey(KeyEvent)
+  fullName: RadioGroup.ProcessColdKey(KeyEvent)
 - uid: Terminal.Gui.KeyEvent
   parent: Terminal.Gui
   isExternal: false
   name: KeyEvent
   nameWithType: KeyEvent
   fullName: Terminal.Gui.KeyEvent
+- uid: Terminal.Gui.RadioGroup.ProcessHotKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: ProcessHotKey(KeyEvent)
+  nameWithType: RadioGroup.ProcessHotKey(KeyEvent)
+  fullName: RadioGroup.ProcessHotKey(KeyEvent)
 - uid: Terminal.Gui.RadioGroup.ProcessKey(Terminal.Gui.KeyEvent)
   parent: Terminal.Gui.RadioGroup
   isExternal: false
@@ -456,6 +485,12 @@ references:
   name: PositionCursor
   nameWithType: RadioGroup.PositionCursor
   fullName: RadioGroup.PositionCursor
+- uid: Terminal.Gui.RadioGroup.ProcessColdKey*
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: ProcessColdKey
+  nameWithType: RadioGroup.ProcessColdKey
+  fullName: RadioGroup.ProcessColdKey
 - uid: Terminal.Gui.RadioGroup.ProcessHotKey*
   parent: Terminal.Gui.RadioGroup
   isExternal: false
@@ -498,12 +533,6 @@ references:
   name: HasFocus
   nameWithType: View.HasFocus
   fullName: View.HasFocus
-- uid: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: ProcessColdKey(KeyEvent)
-  nameWithType: View.ProcessColdKey(KeyEvent)
-  fullName: View.ProcessColdKey(KeyEvent)
 - uid: Terminal.Gui.View.Add(Terminal.Gui.View)
   parent: Terminal.Gui.View
   isExternal: false

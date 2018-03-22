@@ -16,6 +16,11 @@ references:
   href: api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop__ctor
   fullName: MainLoop.MainLoop()
   nameWithType: MainLoop.MainLoop()
+- uid: Mono.Terminal.MainLoop.#ctor(System.Boolean)
+  name: MainLoop(Boolean)
+  href: api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop__ctor_System_Boolean_
+  fullName: MainLoop.MainLoop(Boolean)
+  nameWithType: MainLoop.MainLoop(Boolean)
 - uid: Mono.Terminal.MainLoop.#ctor*
   name: MainLoop
   href: api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop__ctor_
@@ -166,6 +171,11 @@ references:
   href: api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_Stop_
   fullName: MainLoop.Stop
   nameWithType: MainLoop.Stop
+- uid: Mono.Terminal.MainLoop.WindowsKeyPressed
+  name: WindowsKeyPressed
+  href: api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_WindowsKeyPressed
+  fullName: MainLoop.WindowsKeyPressed
+  nameWithType: MainLoop.WindowsKeyPressed
 - uid: Terminal
   name: Terminal
   href: api/Terminal.html
@@ -1401,6 +1411,26 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Button.html
   fullName: Terminal.Gui.Button
   nameWithType: Button
+- uid: Terminal.Gui.Button.#ctor(NStack.ustring)
+  name: Button(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button__ctor_NStack_ustring_
+  fullName: Button.Button(ustring)
+  nameWithType: Button.Button(ustring)
+- uid: Terminal.Gui.Button.#ctor(NStack.ustring,System.Boolean)
+  name: Button(ustring, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button__ctor_NStack_ustring_System_Boolean_
+  fullName: Button.Button(ustring, Boolean)
+  nameWithType: Button.Button(ustring, Boolean)
+- uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,NStack.ustring)
+  name: Button(Int32, Int32, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button__ctor_System_Int32_System_Int32_NStack_ustring_
+  fullName: Button.Button(Int32, Int32, ustring)
+  nameWithType: Button.Button(Int32, Int32, ustring)
+- uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,NStack.ustring,System.Boolean)
+  name: Button(Int32, Int32, ustring, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button__ctor_System_Int32_System_Int32_NStack_ustring_System_Boolean_
+  fullName: Button.Button(Int32, Int32, ustring, Boolean)
+  nameWithType: Button.Button(Int32, Int32, ustring, Boolean)
 - uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String)
   name: Button(Int32, Int32, String)
   href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button__ctor_System_Int32_System_Int32_System_String_
@@ -2061,6 +2091,26 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UncookMouse_
   fullName: ConsoleDriver.UncookMouse
   nameWithType: ConsoleDriver.UncookMouse
+- uid: Terminal.Gui.ConsoleDriver.UpdateCursor
+  name: UpdateCursor()
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UpdateCursor
+  fullName: ConsoleDriver.UpdateCursor()
+  nameWithType: ConsoleDriver.UpdateCursor()
+- uid: Terminal.Gui.ConsoleDriver.UpdateCursor*
+  name: UpdateCursor
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UpdateCursor_
+  fullName: ConsoleDriver.UpdateCursor
+  nameWithType: ConsoleDriver.UpdateCursor
+- uid: Terminal.Gui.ConsoleDriver.UpdateScreen
+  name: UpdateScreen()
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UpdateScreen
+  fullName: ConsoleDriver.UpdateScreen()
+  nameWithType: ConsoleDriver.UpdateScreen()
+- uid: Terminal.Gui.ConsoleDriver.UpdateScreen*
+  name: UpdateScreen
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UpdateScreen_
+  fullName: ConsoleDriver.UpdateScreen
+  nameWithType: ConsoleDriver.UpdateScreen
 - uid: Terminal.Gui.ConsoleDriver.URCorner
   name: URCorner
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_URCorner
@@ -2076,6 +2126,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Dialog.html
   fullName: Terminal.Gui.Dialog
   nameWithType: Dialog
+- uid: Terminal.Gui.Dialog.#ctor(NStack.ustring,System.Int32,System.Int32,Terminal.Gui.Button[])
+  name: Dialog(ustring, Int32, Int32, Button[])
+  href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog__ctor_NStack_ustring_System_Int32_System_Int32_Terminal_Gui_Button___
+  fullName: Dialog.Dialog(ustring, Int32, Int32, Button[])
+  nameWithType: Dialog.Dialog(ustring, Int32, Int32, Button[])
 - uid: Terminal.Gui.Dialog.#ctor(System.String,System.Int32,System.Int32,Terminal.Gui.Button[])
   name: Dialog(String, Int32, Int32, Button[])
   href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog__ctor_System_String_System_Int32_System_Int32_Terminal_Gui_Button___
@@ -2116,6 +2171,111 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_ProcessKey_
   fullName: Dialog.ProcessKey
   nameWithType: Dialog.ProcessKey
+- uid: Terminal.Gui.FileDialog
+  name: FileDialog
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html
+  fullName: Terminal.Gui.FileDialog
+  nameWithType: FileDialog
+- uid: Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring)
+  name: FileDialog(ustring, ustring, ustring, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog__ctor_NStack_ustring_NStack_ustring_NStack_ustring_NStack_ustring_
+  fullName: FileDialog.FileDialog(ustring, ustring, ustring, ustring)
+  nameWithType: FileDialog.FileDialog(ustring, ustring, ustring, ustring)
+- uid: Terminal.Gui.FileDialog.#ctor*
+  name: FileDialog
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog__ctor_
+  fullName: FileDialog.FileDialog
+  nameWithType: FileDialog.FileDialog
+- uid: Terminal.Gui.FileDialog.AllowedFileTypes
+  name: AllowedFileTypes
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_AllowedFileTypes
+  fullName: FileDialog.AllowedFileTypes
+  nameWithType: FileDialog.AllowedFileTypes
+- uid: Terminal.Gui.FileDialog.AllowedFileTypes*
+  name: AllowedFileTypes
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_AllowedFileTypes_
+  fullName: FileDialog.AllowedFileTypes
+  nameWithType: FileDialog.AllowedFileTypes
+- uid: Terminal.Gui.FileDialog.AllowsOtherFileTypes
+  name: AllowsOtherFileTypes
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_AllowsOtherFileTypes
+  fullName: FileDialog.AllowsOtherFileTypes
+  nameWithType: FileDialog.AllowsOtherFileTypes
+- uid: Terminal.Gui.FileDialog.AllowsOtherFileTypes*
+  name: AllowsOtherFileTypes
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_AllowsOtherFileTypes_
+  fullName: FileDialog.AllowsOtherFileTypes
+  nameWithType: FileDialog.AllowsOtherFileTypes
+- uid: Terminal.Gui.FileDialog.CanCreateDirectories
+  name: CanCreateDirectories
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_CanCreateDirectories
+  fullName: FileDialog.CanCreateDirectories
+  nameWithType: FileDialog.CanCreateDirectories
+- uid: Terminal.Gui.FileDialog.CanCreateDirectories*
+  name: CanCreateDirectories
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_CanCreateDirectories_
+  fullName: FileDialog.CanCreateDirectories
+  nameWithType: FileDialog.CanCreateDirectories
+- uid: Terminal.Gui.FileDialog.DirectoryPath
+  name: DirectoryPath
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_DirectoryPath
+  fullName: FileDialog.DirectoryPath
+  nameWithType: FileDialog.DirectoryPath
+- uid: Terminal.Gui.FileDialog.DirectoryPath*
+  name: DirectoryPath
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_DirectoryPath_
+  fullName: FileDialog.DirectoryPath
+  nameWithType: FileDialog.DirectoryPath
+- uid: Terminal.Gui.FileDialog.FilePath
+  name: FilePath
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_FilePath
+  fullName: FileDialog.FilePath
+  nameWithType: FileDialog.FilePath
+- uid: Terminal.Gui.FileDialog.FilePath*
+  name: FilePath
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_FilePath_
+  fullName: FileDialog.FilePath
+  nameWithType: FileDialog.FilePath
+- uid: Terminal.Gui.FileDialog.IsExtensionHidden
+  name: IsExtensionHidden
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_IsExtensionHidden
+  fullName: FileDialog.IsExtensionHidden
+  nameWithType: FileDialog.IsExtensionHidden
+- uid: Terminal.Gui.FileDialog.IsExtensionHidden*
+  name: IsExtensionHidden
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_IsExtensionHidden_
+  fullName: FileDialog.IsExtensionHidden
+  nameWithType: FileDialog.IsExtensionHidden
+- uid: Terminal.Gui.FileDialog.Message
+  name: Message
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_Message
+  fullName: FileDialog.Message
+  nameWithType: FileDialog.Message
+- uid: Terminal.Gui.FileDialog.Message*
+  name: Message
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_Message_
+  fullName: FileDialog.Message
+  nameWithType: FileDialog.Message
+- uid: Terminal.Gui.FileDialog.NameFieldLabel
+  name: NameFieldLabel
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_NameFieldLabel
+  fullName: FileDialog.NameFieldLabel
+  nameWithType: FileDialog.NameFieldLabel
+- uid: Terminal.Gui.FileDialog.NameFieldLabel*
+  name: NameFieldLabel
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_NameFieldLabel_
+  fullName: FileDialog.NameFieldLabel
+  nameWithType: FileDialog.NameFieldLabel
+- uid: Terminal.Gui.FileDialog.Prompt
+  name: Prompt
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_Prompt
+  fullName: FileDialog.Prompt
+  nameWithType: FileDialog.Prompt
+- uid: Terminal.Gui.FileDialog.Prompt*
+  name: Prompt
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_Prompt_
+  fullName: FileDialog.Prompt
+  nameWithType: FileDialog.Prompt
 - uid: Terminal.Gui.FrameView
   name: FrameView
   href: api/Terminal.Gui/Terminal.Gui.FrameView.html
@@ -2336,6 +2496,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlS
   fullName: Key.ControlS
   nameWithType: Key.ControlS
+- uid: Terminal.Gui.Key.ControlSpace
+  name: ControlSpace
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlSpace
+  fullName: Key.ControlSpace
+  nameWithType: Key.ControlSpace
 - uid: Terminal.Gui.Key.ControlT
   name: ControlT
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlT
@@ -3121,6 +3286,61 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.MouseFlags.html#Terminal_Gui_MouseFlags_ReportMousePosition
   fullName: MouseFlags.ReportMousePosition
   nameWithType: MouseFlags.ReportMousePosition
+- uid: Terminal.Gui.OpenDialog
+  name: OpenDialog
+  href: api/Terminal.Gui/Terminal.Gui.OpenDialog.html
+  fullName: Terminal.Gui.OpenDialog
+  nameWithType: OpenDialog
+- uid: Terminal.Gui.OpenDialog.#ctor(NStack.ustring,NStack.ustring)
+  name: OpenDialog(ustring, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.OpenDialog.html#Terminal_Gui_OpenDialog__ctor_NStack_ustring_NStack_ustring_
+  fullName: OpenDialog.OpenDialog(ustring, ustring)
+  nameWithType: OpenDialog.OpenDialog(ustring, ustring)
+- uid: Terminal.Gui.OpenDialog.#ctor*
+  name: OpenDialog
+  href: api/Terminal.Gui/Terminal.Gui.OpenDialog.html#Terminal_Gui_OpenDialog__ctor_
+  fullName: OpenDialog.OpenDialog
+  nameWithType: OpenDialog.OpenDialog
+- uid: Terminal.Gui.OpenDialog.AllowsMultipleSelection
+  name: AllowsMultipleSelection
+  href: api/Terminal.Gui/Terminal.Gui.OpenDialog.html#Terminal_Gui_OpenDialog_AllowsMultipleSelection
+  fullName: OpenDialog.AllowsMultipleSelection
+  nameWithType: OpenDialog.AllowsMultipleSelection
+- uid: Terminal.Gui.OpenDialog.AllowsMultipleSelection*
+  name: AllowsMultipleSelection
+  href: api/Terminal.Gui/Terminal.Gui.OpenDialog.html#Terminal_Gui_OpenDialog_AllowsMultipleSelection_
+  fullName: OpenDialog.AllowsMultipleSelection
+  nameWithType: OpenDialog.AllowsMultipleSelection
+- uid: Terminal.Gui.OpenDialog.CanChooseDirectories
+  name: CanChooseDirectories
+  href: api/Terminal.Gui/Terminal.Gui.OpenDialog.html#Terminal_Gui_OpenDialog_CanChooseDirectories
+  fullName: OpenDialog.CanChooseDirectories
+  nameWithType: OpenDialog.CanChooseDirectories
+- uid: Terminal.Gui.OpenDialog.CanChooseDirectories*
+  name: CanChooseDirectories
+  href: api/Terminal.Gui/Terminal.Gui.OpenDialog.html#Terminal_Gui_OpenDialog_CanChooseDirectories_
+  fullName: OpenDialog.CanChooseDirectories
+  nameWithType: OpenDialog.CanChooseDirectories
+- uid: Terminal.Gui.OpenDialog.CanChooseFiles
+  name: CanChooseFiles
+  href: api/Terminal.Gui/Terminal.Gui.OpenDialog.html#Terminal_Gui_OpenDialog_CanChooseFiles
+  fullName: OpenDialog.CanChooseFiles
+  nameWithType: OpenDialog.CanChooseFiles
+- uid: Terminal.Gui.OpenDialog.CanChooseFiles*
+  name: CanChooseFiles
+  href: api/Terminal.Gui/Terminal.Gui.OpenDialog.html#Terminal_Gui_OpenDialog_CanChooseFiles_
+  fullName: OpenDialog.CanChooseFiles
+  nameWithType: OpenDialog.CanChooseFiles
+- uid: Terminal.Gui.OpenDialog.FilePaths
+  name: FilePaths
+  href: api/Terminal.Gui/Terminal.Gui.OpenDialog.html#Terminal_Gui_OpenDialog_FilePaths
+  fullName: OpenDialog.FilePaths
+  nameWithType: OpenDialog.FilePaths
+- uid: Terminal.Gui.OpenDialog.FilePaths*
+  name: FilePaths
+  href: api/Terminal.Gui/Terminal.Gui.OpenDialog.html#Terminal_Gui_OpenDialog_FilePaths_
+  fullName: OpenDialog.FilePaths
+  nameWithType: OpenDialog.FilePaths
 - uid: Terminal.Gui.Point
   name: Point
   href: api/Terminal.Gui/Terminal.Gui.Point.html
@@ -3366,6 +3586,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_PositionCursor_
   fullName: RadioGroup.PositionCursor
   nameWithType: RadioGroup.PositionCursor
+- uid: Terminal.Gui.RadioGroup.ProcessColdKey(Terminal.Gui.KeyEvent)
+  name: ProcessColdKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_ProcessColdKey_Terminal_Gui_KeyEvent_
+  fullName: RadioGroup.ProcessColdKey(KeyEvent)
+  nameWithType: RadioGroup.ProcessColdKey(KeyEvent)
+- uid: Terminal.Gui.RadioGroup.ProcessColdKey*
+  name: ProcessColdKey
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_ProcessColdKey_
+  fullName: RadioGroup.ProcessColdKey
+  nameWithType: RadioGroup.ProcessColdKey
 - uid: Terminal.Gui.RadioGroup.ProcessHotKey(Terminal.Gui.KeyEvent)
   name: ProcessHotKey(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_ProcessHotKey_Terminal_Gui_KeyEvent_
@@ -3761,6 +3991,21 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Responder.html#Terminal_Gui_Responder_ProcessKey_
   fullName: Responder.ProcessKey
   nameWithType: Responder.ProcessKey
+- uid: Terminal.Gui.SaveDialog
+  name: SaveDialog
+  href: api/Terminal.Gui/Terminal.Gui.SaveDialog.html
+  fullName: Terminal.Gui.SaveDialog
+  nameWithType: SaveDialog
+- uid: Terminal.Gui.SaveDialog.#ctor(NStack.ustring,NStack.ustring)
+  name: SaveDialog(ustring, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.SaveDialog.html#Terminal_Gui_SaveDialog__ctor_NStack_ustring_NStack_ustring_
+  fullName: SaveDialog.SaveDialog(ustring, ustring)
+  nameWithType: SaveDialog.SaveDialog(ustring, ustring)
+- uid: Terminal.Gui.SaveDialog.#ctor*
+  name: SaveDialog
+  href: api/Terminal.Gui/Terminal.Gui.SaveDialog.html#Terminal_Gui_SaveDialog__ctor_
+  fullName: SaveDialog.SaveDialog
+  nameWithType: SaveDialog.SaveDialog
 - uid: Terminal.Gui.ScrollBarView
   name: ScrollBarView
   href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html
@@ -4306,6 +4551,111 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_Text_
   fullName: TextField.Text
   nameWithType: TextField.Text
+- uid: Terminal.Gui.TextView
+  name: TextView
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html
+  fullName: Terminal.Gui.TextView
+  nameWithType: TextView
+- uid: Terminal.Gui.TextView.#ctor(Terminal.Gui.Rect)
+  name: TextView(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView__ctor_Terminal_Gui_Rect_
+  fullName: TextView.TextView(Rect)
+  nameWithType: TextView.TextView(Rect)
+- uid: Terminal.Gui.TextView.#ctor*
+  name: TextView
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView__ctor_
+  fullName: TextView.TextView
+  nameWithType: TextView.TextView
+- uid: Terminal.Gui.TextView.CanFocus
+  name: CanFocus
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_CanFocus
+  fullName: TextView.CanFocus
+  nameWithType: TextView.CanFocus
+- uid: Terminal.Gui.TextView.CanFocus*
+  name: CanFocus
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_CanFocus_
+  fullName: TextView.CanFocus
+  nameWithType: TextView.CanFocus
+- uid: Terminal.Gui.TextView.ClearRegion
+  name: ClearRegion()
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ClearRegion
+  fullName: TextView.ClearRegion()
+  nameWithType: TextView.ClearRegion()
+- uid: Terminal.Gui.TextView.ClearRegion*
+  name: ClearRegion
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ClearRegion_
+  fullName: TextView.ClearRegion
+  nameWithType: TextView.ClearRegion
+- uid: Terminal.Gui.TextView.CurrentColumn
+  name: CurrentColumn
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_CurrentColumn
+  fullName: TextView.CurrentColumn
+  nameWithType: TextView.CurrentColumn
+- uid: Terminal.Gui.TextView.CurrentColumn*
+  name: CurrentColumn
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_CurrentColumn_
+  fullName: TextView.CurrentColumn
+  nameWithType: TextView.CurrentColumn
+- uid: Terminal.Gui.TextView.CurrentRow
+  name: CurrentRow
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_CurrentRow
+  fullName: TextView.CurrentRow
+  nameWithType: TextView.CurrentRow
+- uid: Terminal.Gui.TextView.CurrentRow*
+  name: CurrentRow
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_CurrentRow_
+  fullName: TextView.CurrentRow
+  nameWithType: TextView.CurrentRow
+- uid: Terminal.Gui.TextView.GetRegion
+  name: GetRegion()
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_GetRegion
+  fullName: TextView.GetRegion()
+  nameWithType: TextView.GetRegion()
+- uid: Terminal.Gui.TextView.GetRegion*
+  name: GetRegion
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_GetRegion_
+  fullName: TextView.GetRegion
+  nameWithType: TextView.GetRegion
+- uid: Terminal.Gui.TextView.PositionCursor
+  name: PositionCursor()
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_PositionCursor
+  fullName: TextView.PositionCursor()
+  nameWithType: TextView.PositionCursor()
+- uid: Terminal.Gui.TextView.PositionCursor*
+  name: PositionCursor
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_PositionCursor_
+  fullName: TextView.PositionCursor
+  nameWithType: TextView.PositionCursor
+- uid: Terminal.Gui.TextView.ProcessKey(Terminal.Gui.KeyEvent)
+  name: ProcessKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ProcessKey_Terminal_Gui_KeyEvent_
+  fullName: TextView.ProcessKey(KeyEvent)
+  nameWithType: TextView.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.TextView.ProcessKey*
+  name: ProcessKey
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ProcessKey_
+  fullName: TextView.ProcessKey
+  nameWithType: TextView.ProcessKey
+- uid: Terminal.Gui.TextView.Redraw(Terminal.Gui.Rect)
+  name: Redraw(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Redraw_Terminal_Gui_Rect_
+  fullName: TextView.Redraw(Rect)
+  nameWithType: TextView.Redraw(Rect)
+- uid: Terminal.Gui.TextView.Redraw*
+  name: Redraw
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Redraw_
+  fullName: TextView.Redraw
+  nameWithType: TextView.Redraw
+- uid: Terminal.Gui.TextView.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Text
+  fullName: TextView.Text
+  nameWithType: TextView.Text
+- uid: Terminal.Gui.TextView.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Text_
+  fullName: TextView.Text
+  nameWithType: TextView.Text
 - uid: Terminal.Gui.Toplevel
   name: Toplevel
   href: api/Terminal.Gui/Terminal.Gui.Toplevel.html
