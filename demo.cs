@@ -2,7 +2,7 @@ using Terminal.Gui;
 using System;
 using Mono.Terminal;
 
-class Demo {
+static class Demo {
 	class Box10x : View {
 		public Box10x (int x, int y) : base (new Rect (x, y, 10, 10))
 		{

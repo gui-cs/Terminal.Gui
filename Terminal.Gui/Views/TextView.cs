@@ -16,6 +16,11 @@
 // public API to insert, remove ranges
 // Add word forward/word backwards commands
 // Save buffer API
+// Mouse
+//
+// Desirable:
+//   Move all the text manipulation into the TextModel
+
 
 using System;
 using System.Collections.Generic;
@@ -34,8 +39,6 @@ namespace Terminal.Gui {
 				throw new ArgumentNullException (nameof (file));
 			try {
 				var stream = File.OpenRead (file);
-				if (stream == null)
-					return false;
 			} catch {
 				return false;
 			}
@@ -115,15 +118,32 @@ namespace Terminal.Gui {
 			return sb.ToString ();
 		}
 
+		/// <summary>
+		/// The number of text lines in the model
+		/// </summary>
 		public int Count => lines.Count;
 
+		/// <summary>
+		/// Returns the specified line as a List of Rune
+		/// </summary>
+		/// <returns>The line.</returns>
+		/// <param name="line">Line number to retrieve.</param>
 		public List<Rune> GetLine (int line) => lines [line];
 
+		/// <summary>
+		/// Adds a line to the model at the specified position.
+		/// </summary>
+		/// <param name="pos">Line number where the line will be inserted.</param>
+		/// <param name="runes">The line of text, as a List of Rune.</param>
 		public void AddLine (int pos, List<Rune> runes)
 		{
 			lines.Insert (pos, runes);
 		}
 
+		/// <summary>
+		/// Removes the line at the specified position
+		/// </summary>
+		/// <param name="pos">Position.</param>
 		public void RemoveLine (int pos)
 		{
 			lines.RemoveAt (pos);
@@ -306,15 +326,14 @@ namespace Terminal.Gui {
 		/// Loads the contents of the stream into the TextView.
 		/// </summary>
 		/// <returns><c>true</c>, if stream was loaded, <c>false</c> otherwise.</returns>
-		/// <param name="stream">Stream.</param>
-		public bool LoadStream (Stream stream)
+		/// <param name="stream">Stream to load the contents from.</param>
+		public void LoadStream (Stream stream)
 		{
 			if (stream == null)
 				throw new ArgumentNullException (nameof (stream));
 			ResetPosition ();
-			var res = model.LoadFile (path);
+			model.LoadStream(stream);
 			SetNeedsDisplay ();
-			return res;
 		}
 
 		/// <summary>
@@ -406,10 +425,10 @@ namespace Terminal.Gui {
 			ustring res = StringFromRunes (line.GetRange (startCol, line.Count - startCol));
 
 			for (int row = startRow+1; row < maxrow; row++) {
-				res = res + ustring.Make (10) + StringFromRunes (model.GetLine (row));
+				res = res + ustring.Make ((Rune)10) + StringFromRunes (model.GetLine (row));
 			}
 			line = model.GetLine (maxrow);
-			res = res + ustring.Make (10) + StringFromRunes (line.GetRange (0, endCol));
+			res = res + ustring.Make ((Rune)10) + StringFromRunes (line.GetRange (0, endCol));
 			return res;
 		}
 
@@ -592,15 +611,32 @@ namespace Terminal.Gui {
 				currentColumn = columnTrack;
 			else if (currentColumn > line.Count)
 				currentColumn = line.Count;
-			
+			Adjust ();
+		}
+
+		void Adjust ()
+		{
+			bool need = false;
 			if (currentColumn < leftColumn) {
-				leftColumn = currentColumn;
-				SetNeedsDisplay ();
+				currentColumn = leftColumn;
+				need = true;
 			}
 			if (currentColumn - leftColumn > Frame.Width) {
 				leftColumn = currentColumn - Frame.Width + 1;
-				SetNeedsDisplay ();
+				need = true;
 			}
+			if (currentRow < topRow) {
+				topRow = currentRow;
+				need = true;
+			}
+			if (currentRow - topRow > Frame.Height) {
+				topRow = currentRow - Frame.Height + 1;
+				need = true;
+			}
+			if (need)
+				SetNeedsDisplay ();
+			else
+				PositionCursor ();
 		}
 
 		bool lastWasKill;
@@ -786,7 +822,7 @@ namespace Terminal.Gui {
 				currentLine = GetCurrentLine ();
 				if (currentLine.Count == 0) {
 					model.RemoveLine (currentRow);
-					var val = ustring.Make ('\n');
+					var val = ustring.Make ((Rune)'\n');
 					if (lastWasKill)
 						AppendClipboard (val);
 					else
@@ -816,7 +852,7 @@ namespace Terminal.Gui {
 				selectionStartRow = currentRow;
 				break;
 
-			case (Key)((int)'w' + Key.AltMask):
+			case ((int)'w' + Key.AltMask):
 				SetClipboard (GetRegion ());
 				selecting = false;
 				break;
@@ -828,9 +864,22 @@ namespace Terminal.Gui {
 				break;
 
 			case (Key)((int)'b' + Key.AltMask):
+				var newPos = WordBackward (currentColumn, currentRow);
+				if (newPos.HasValue) {
+					currentColumn = newPos.Value.col;
+					currentRow = newPos.Value.row;
+				}
+				Adjust ();
+
 				break;
 
-			case (Key)((int)'f' + Key.AltMask):
+			case (Key)((int)'f' + Key.AltMask): 
+				newPos = WordForward (currentColumn, currentRow);
+				if (newPos.HasValue) {
+					currentColumn = newPos.Value.col;
+					currentRow = newPos.Value.row;
+				}
+				Adjust ();
 				break;
 
 			case Key.Enter:
@@ -874,69 +923,134 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		IEnumerable<(int col, int row, Rune rune)> ForwardIterator (int col, int row)
+		{
+			if (col < 0 || row < 0)
+				yield break;
+			if (row >= model.Count)
+				yield break;
+			var line = GetCurrentLine ();
+			if (col >= line.Count)
+				yield break;
+
+			while (row < model.Count) {
+				for (int c = col; c < line.Count; c++) {
+					yield return (c, row, line [c]);
+				}
+				col = 0;
+				row++;
+				line = GetCurrentLine ();
+			}
+		}
+
+		Rune RuneAt (int col, int row) => model.GetLine (row) [col];
+
+		bool MoveNext (ref int col, ref int row, out Rune rune)
+		{
+			var line = model.GetLine (row);
+			if (col + 1 < line.Count) {
+				col++;
+				rune = line [col];
+				return true;
+			} 
+			while (row + 1 < model.Count){
+				col = 0;
+				row++;
+				line = model.GetLine (row);
+				if (line.Count > 0) {
+					rune = line [0];
+					return true;
+				}
+			}
+			rune = 0;
+			return false;
+		}
+
+		bool MovePrev (ref int col, ref int row, out Rune rune)
+		{
+			var line = model.GetLine (row);
+
+			if (col > 0) {
+				col--;
+				rune = line [col];
+				return true;
+			}
+			if (row == 0) {
+				rune = 0;
+				return false;
+			}
+			while (row > 0) {
+				row--;
+				line = model.GetLine (row);
+				col = line.Count - 1;
+				if (col >= 0) {
+					rune = line [col];
+					return true;
+				}
+			}
+			rune = 0;
+			return false;
+		}
+
+		(int col, int row)? WordForward (int fromCol, int fromRow)
+		{
+			var col = fromCol;
+			var row = fromRow;
+			var line = GetCurrentLine ();
+			var rune = RuneAt (col, row);
+
+			var srow = row;
+			if (Rune.IsPunctuation (rune) || Rune.IsWhiteSpace (rune)) {
+				while (MoveNext (ref col, ref row, out rune)){
+					if (Rune.IsLetterOrDigit (rune))
+						break;
+				}
+				while (MoveNext (ref col, ref row, out rune)) {
+					if (!Rune.IsLetterOrDigit (rune))
+						break;
+				}
+			} else {
+				while (MoveNext (ref col, ref row, out rune)) {
+					if (!Rune.IsLetterOrDigit (rune))
+						break;
+				}
+			}
+			if (fromCol != col || fromRow != row)
+				return (col, row);
+			return null;
+		}
+
+		(int col, int row)? WordBackward (int fromCol, int fromRow)
+		{
+			if (fromRow == 0 && fromCol == 0)
+				return null;
+			
+			var col = fromCol;
+			var row = fromRow;
+			var line = GetCurrentLine ();
+			var rune = RuneAt (col, row);
+
+			if (Rune.IsPunctuation (rune) || Rune.IsSymbol (rune) || Rune.IsWhiteSpace (rune)) {
+				while (MovePrev (ref col, ref row, out rune)){
+					if (Rune.IsLetterOrDigit (rune))
+						break;
+				}
+				while (MovePrev (ref col, ref row, out rune)){
+					if (!Rune.IsLetterOrDigit (rune))
+						break;
+				}
+			} else {
+				while (MovePrev (ref col, ref row, out rune)) {
+					if (!Rune.IsLetterOrDigit (rune))
+						break;
+				}
+			}
+			if (fromCol != col || fromRow != row)
+				return (col, row);
+			return null;
+		}
+
 #if false
-		int WordForward (int p)
-		{
-			if (p >= text.Length)
-				return -1;
-
-			int i = p;
-			if (Rune.IsPunctuation (text [p]) || Rune.IsWhiteSpace (text [p])) {
-				for (; i < text.Length; i++) {
-					var r = text [i];
-					if (Rune.IsLetterOrDigit (r))
-						break;
-				}
-				for (; i < text.Length; i++) {
-					var r = text [i];
-					if (!Rune.IsLetterOrDigit (r))
-						break;
-				}
-			} else {
-				for (; i < text.Length; i++) {
-					var r = text [i];
-					if (!Rune.IsLetterOrDigit (r))
-						break;
-				}
-			}
-			if (i != p)
-				return i;
-			return -1;
-		}
-
-		int WordBackward (int p)
-		{
-			if (p == 0)
-				return -1;
-
-			int i = p - 1;
-			if (i == 0)
-				return 0;
-
-			var ti = text [i];
-			if (Rune.IsPunctuation (ti) || Rune.IsSymbol (ti) || Rune.IsWhiteSpace (ti)) {
-				for (; i >= 0; i--) {
-					if (Rune.IsLetterOrDigit (text [i]))
-						break;
-				}
-				for (; i >= 0; i--) {
-					if (!Rune.IsLetterOrDigit (text [i]))
-						break;
-				}
-			} else {
-				for (; i >= 0; i--) {
-					if (!Rune.IsLetterOrDigit (text [i]))
-						break;
-				}
-			}
-			i++;
-
-			if (i != p)
-				return i;
-
-			return -1;
-		}
-
 		public override bool MouseEvent (MouseEvent ev)
 		{
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked))

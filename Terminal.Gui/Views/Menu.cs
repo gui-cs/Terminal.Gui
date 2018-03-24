@@ -30,7 +30,7 @@ namespace Terminal.Gui {
 			Help = help ?? "";
 			Action = action;
 			bool nextIsHot = false;
-			foreach (var x in title) {
+			foreach (var x in Title) {
 				if (x == '_')
 					nextIsHot = true;
 				else {

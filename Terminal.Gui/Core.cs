@@ -1176,7 +1176,7 @@ namespace Terminal.Gui {
 	///     to the mainloop, allowing user code to use async/await.
 	///   </para>
 	/// </remarks>
-	public class Application {
+	public static class Application {
 		/// <summary>
 		/// The current Console Driver in use.
 		/// </summary>
@@ -1316,7 +1316,7 @@ namespace Terminal.Gui {
 			protected virtual void Dispose (bool disposing)
 			{
 				if (Toplevel != null) {
-					Application.End (Toplevel);
+					End (Toplevel);
 					Toplevel = null;
 				}
 			}
@@ -1509,8 +1509,9 @@ namespace Terminal.Gui {
 			toplevels.Pop ();
 			if (toplevels.Count == 0)
 				Shutdown ();
-			else {
-				Current = toplevels.Peek () as Toplevel;
+			else
+			{
+				Current = toplevels.Peek();
 				Refresh ();
 			}
 		}
@@ -1605,8 +1606,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void RequestStop ()
 		{
-			var ct = Current as Toplevel;
-
 			Current.Running = false;
 		}
 

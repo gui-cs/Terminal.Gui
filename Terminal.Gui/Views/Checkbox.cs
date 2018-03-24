@@ -15,7 +15,7 @@ namespace Terminal.Gui {
 	public class CheckBox : View {
 		ustring text;
 		int hot_pos = -1;
-		char hot_key;
+		Rune hot_key;
 
 		/// <summary>
 		///   Toggled event, raised when the CheckButton is toggled.
@@ -74,8 +74,8 @@ namespace Terminal.Gui {
 				int i = 0;
 				hot_pos = -1;
 				hot_key = (char)0;
-				foreach (char c in text) {
-					if (Char.IsUpper (c)) {
+				foreach (Rune c in text) {
+					if (Rune.IsUpper (c)) {
 						hot_key = c;
 						hot_pos = i;
 						break;

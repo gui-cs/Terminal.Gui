@@ -21,7 +21,7 @@ namespace Terminal.Gui {
 	/// 
 	/// </code>
 	/// </example>
-	public class MessageBox {
+	public static class MessageBox {
 		/// <summary>
 		/// Presents a message with the specified title and message and a list of buttons to show to the user.
 		/// </summary>

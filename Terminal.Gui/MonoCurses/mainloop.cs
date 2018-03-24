@@ -407,8 +407,10 @@ namespace Mono.Terminal {
 				}
 			}
 
-			if (idleHandlers.Count > 0)
-				RunIdle ();
+			lock (idleHandlers){
+				if (idleHandlers.Count > 0)
+					RunIdle();
+			}
 		}
 		
 		/// <summary>

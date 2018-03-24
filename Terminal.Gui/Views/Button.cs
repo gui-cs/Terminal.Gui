@@ -27,7 +27,7 @@ namespace Terminal.Gui {
 	public class Button : View {
 		ustring text;
 		ustring shown_text;
-		char hot_key;
+		Rune hot_key;
 		int hot_pos = -1;
 		bool is_default;
 
@@ -112,10 +112,10 @@ namespace Terminal.Gui {
 				shown_text = "[ " + text + " ]";
 
 			hot_pos = -1;
-			hot_key = (char)0;
+			hot_key = (Rune)0;
 			int i = 0;
-			foreach (char c in shown_text) {
-				if (Char.IsUpper (c)) {
+			foreach (Rune c in shown_text) {
+				if (Rune.IsUpper (c)) {
 					hot_key = c;
 					hot_pos = i;
 					break;
@@ -197,7 +197,7 @@ namespace Terminal.Gui {
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			var c = kb.KeyValue;
-			if (c == '\n' || c == ' ' || Char.ToUpper ((char)c) == hot_key) {
+			if (c == '\n' || c == ' ' || Rune.ToUpper ((Rune)c) == hot_key) {
 				if (Clicked != null)
 					Clicked ();
 				return true;

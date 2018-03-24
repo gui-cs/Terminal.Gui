@@ -137,7 +137,7 @@ namespace Terminal.Gui {
 				} else if (t is string) {
 					RenderUstr (t as string, col, line, width);
 				} else
-					RenderUstr (((string)t).ToString (), col, line, width);
+					RenderUstr (t.ToString (), col, line, width);
 			}
 
 			public bool IsMarked (int item)

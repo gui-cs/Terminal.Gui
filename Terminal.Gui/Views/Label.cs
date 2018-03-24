@@ -91,7 +91,7 @@ namespace Terminal.Gui {
 				if (talign == TextAlignment.Justified) {
 					// TODO: ustring needs this
 			               	var words = str.ToString ().Split (whitespace, StringSplitOptions.RemoveEmptyEntries);
-					int textCount = words.Sum ((arg) => arg.Length);
+					int textCount = words.Sum (arg => arg.Length);
 
 					var spaces = (width- textCount) / (words.Length - 1);
 					var extras = (width - textCount) % words.Length;
@@ -186,7 +186,7 @@ namespace Terminal.Gui {
 		{
 			var result = new List<ustring> ();
 			Recalc (text, result, width, TextAlignment.Left);
-			return result.Count ();
+			return result.Count;
 		}
 
 		/// <summary>
