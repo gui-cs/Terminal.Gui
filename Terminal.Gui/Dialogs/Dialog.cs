@@ -29,9 +29,11 @@ namespace Terminal.Gui {
 		{
 			ColorScheme = Colors.Dialog;
 
-			foreach (var b in buttons) {
-				this.buttons.Add (b);
-				Add (b);
+			if (buttons != null) {
+				foreach (var b in buttons) {
+					this.buttons.Add (b);
+					Add (b);
+				}
 			}
 		}
 

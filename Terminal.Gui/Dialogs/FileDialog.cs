@@ -8,11 +8,18 @@ using NStack;
 
 namespace Terminal.Gui {
 	public class FileDialog : Dialog {
-		Button prompt;
-		Label nameFieldLabel, message;
+		Button prompt, cancel;
+		Label nameFieldLabel, message, dirLabel;
+		TextField dir;
 
 		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message) : base (title, Driver.Cols - 20, Driver.Rows - 6, null)
 		{
+			dirLabel = new Label (2, 1, "Directory");
+			Add (dirLabel);
+
+			this.cancel = new Button ("Cancel");
+			AddButton (cancel);
+
 			this.prompt = new Button (prompt);
 			AddButton (this.prompt);
 

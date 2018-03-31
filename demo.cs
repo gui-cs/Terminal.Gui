@@ -8,18 +8,18 @@ static class Demo {
 		{
 		}
 
-		public override void Redraw(Rect region)
+		public override void Redraw (Rect region)
 		{
 			Driver.SetAttribute (ColorScheme.Focus);
 
 			for (int y = 0; y < 10; y++) {
 				Move (0, y);
 				for (int x = 0; x < 10; x++) {
-					
-					Driver.AddRune ((Rune)('0' + (x+y)%10));
+
+					Driver.AddRune ((Rune)('0' + (x + y) % 10));
 				}
 			}
-	
+
 		}
 	}
 
@@ -28,7 +28,7 @@ static class Demo {
 		{
 		}
 
-		public override void Redraw(Rect region)
+		public override void Redraw (Rect region)
 		{
 			Driver.SetAttribute (ColorScheme.Focus);
 			var f = Frame;
@@ -50,7 +50,7 @@ static class Demo {
 					}
 					Driver.AddRune (r);
 				}
-			}	
+			}
 		}
 	}
 
@@ -173,6 +173,16 @@ static class Demo {
 		MessageBox.ErrorQuery (50, 5, "Error", "There is nothing to close", "Ok");
 	}
 
+	// Watch what happens when I try to introduce a newline after the first open brace
+	// it introduces a new brace instead, and does not indent.  Then watch me fight
+	// the editor as more oddities happen.
+
+	public static void Open ()
+	{
+		var d = new OpenDialog ("Open", "Open a file");
+		Application.Run (d);
+	}
+
 	public static Label ml;
 	static void Main ()
 	{
@@ -187,7 +197,7 @@ static class Demo {
 			new MenuBarItem ("_File", new MenuItem [] {
 				new MenuItem ("Text Editor Demo", "", () => { Editor (top); }),
 				new MenuItem ("_New", "Creates new file", NewFile),
-				new MenuItem ("_Open", "", null),
+				new MenuItem ("_Open", "", Open),
 				new MenuItem ("_Close", "", () => Close ()),
 				new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
 			}),
