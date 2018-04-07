@@ -1050,26 +1050,29 @@ namespace Terminal.Gui {
 			return null;
 		}
 
-#if false
 		public override bool MouseEvent (MouseEvent ev)
 		{
-			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked))
+			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked)) {
 				return false;
+			}
 
 			if (!HasFocus)
 				SuperView.SetFocus (this);
 
-			// We could also set the cursor position.
-			point = first + ev.X;
-			if (point > text.Length)
-				point = text.Length;
-			if (point < first)
-				point = 0;
+			if (ev.Y + topRow >= model.Count) {
+				currentRow = model.Count - topRow;
+			} else {
+				currentRow = ev.Y + topRow;
+			}
+			var r = GetCurrentLine ();
+			if (ev.X - leftColumn >= r.Count)
+				currentColumn = r.Count - leftColumn;
+			else
+				currentColumn = ev.X - leftColumn;
 
-			SetNeedsDisplay ();
+			PositionCursor ();
 			return true;
 		}
-#endif
 	}
 
 }
