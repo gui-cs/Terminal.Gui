@@ -1266,12 +1266,17 @@ namespace Terminal.Gui {
 		{
 			if (Top != null)
 				return;
-
 			if (!UseSystemConsole) {
+				#if netstandard1_6
+				UseSystemConsole = OsVersion.Current.Platform == OsPlatform.Windows;
+				#else
+				// check net461 approach
 				var p = Environment.OSVersion.Platform;
 				if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
 					UseSystemConsole = true;
+				#endif
 			}
+
 			//UseSystemConsole = true;
 			if (UseSystemConsole)
 				Driver = new NetDriver ();

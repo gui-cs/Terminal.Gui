@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mono.Terminal {
 
@@ -129,8 +130,8 @@ namespace Mono.Terminal {
 					return true;
 				});
 			} else {
-				Thread readThread = new Thread (WindowsKeyReader);
-				readThread.Start ();
+				// Move this to a Task and let the Runtime handle this since that appears to be the direction for net standard
+				Task.Run(() => WindowsKeyReader());
 			}
 		}
 
