@@ -1,7 +1,7 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminal", "Terminal.csproj", "{B0A602CD-E176-449D-8663-64238D54F857}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example\Example", "Example\Example.csproj", "{B0A602CD-E176-449D-8663-64238D54F857}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminal.Gui", "Terminal.Gui\Terminal.Gui.csproj", "{00F366F8-DEE4-482C-B9FD-6DB0200B79E5}"
 EndProject
