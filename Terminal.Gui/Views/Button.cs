@@ -62,20 +62,13 @@ namespace Terminal.Gui {
 		///   text length.   This button is not a default button.
 		/// </remarks>
 		/// <param name="text">The button's text</param>
-		public Button (ustring text) : this (0, 0, text) { }
-
-		/// <summary>
-		///   Public constructor, creates a button based on
-		///   the given text.
-		/// </summary>
-		/// <remarks>
-		///   If the value for is_default is true, a special
-		///   decoration is used, and the enter key on a
-		///   dialog would implicitly activate this button.
-		/// </remarks>
-		/// <param name="text">The button's text</param>
 		/// <param name="is_default">If set, this makes the button the default button in the current view, which means that if the user presses return on a view that does not handle return, it will be treated as if he had clicked on the button</param>
-		public Button (ustring text, bool is_default) : this (0, 0, text, is_default) { }
+		public Button (ustring text, bool is_default = false) : base ()
+		{
+			Text = text;
+			Width = text.Length + 4 + (is_default ? 2 : 0);
+			Height = 1;
+		}
 
 		/// <summary>
 		///   Public constructor, creates a button based on

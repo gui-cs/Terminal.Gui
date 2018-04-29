@@ -28,8 +28,22 @@ namespace Terminal.Gui {
 		public event EventHandler Toggled;
 
 		/// <summary>
+		/// Public constructor, creates a CheckButton based on the given text, uses Computed layout and sets the height and width.
+		/// </summary>
+		/// <param name="s">S.</param>
+		/// <param name="is_checked">If set to <c>true</c> is checked.</param>
+		public CheckBox (ustring s, bool is_checked = false) : base ()
+		{
+			Checked = is_checked;
+			Text = s;
+			CanFocus = true;
+			Height = 1;
+			Width = s.Length + 4;
+		}
+
+		/// <summary>
 		///   Public constructor, creates a CheckButton based on
-		///   the given text at the given position.
+		///   the given text at an absolute position.
 		/// </summary>
 		/// <remarks>
 		///   The size of CheckButton is computed based on the

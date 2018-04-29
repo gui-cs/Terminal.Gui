@@ -120,6 +120,24 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
+	/// Determines the LayoutStyle for a view, if Absolute, during LayoutSubviews, the
+	/// value from the Frame will be used, if the value is Computer, then the Frame 
+	/// will be updated from the X, Y Pos objets and the Width and Heigh Dim objects.
+	/// </summary>
+	public enum LayoutStyle {
+		/// <summary>
+		/// The position and size of the view are based on the Frame value.
+		/// </summary>
+		Absolute,
+
+		/// <summary>
+		/// The position and size of the view will be computed based on the
+		/// X, Y, Width and Height properties and set on the Frame.
+		/// </summary>
+		Computed
+	}
+
+	/// <summary>
 	/// View is the base class for all views on the screen and represents a visible element that can render itself and contains zero or more nested views.
 	/// </summary>
 	/// <remarks>
@@ -128,8 +146,26 @@ namespace Terminal.Gui {
 	///    can contain one or more subviews, can respond to user input and render themselves on the screen.
 	/// </para>
 	/// <para>
-	///    Views are created with a specified rectangle region (the frame) that is relative to the container
-	///    that they are added into.   
+	///    Views can either be created with an absolute position, by calling the constructor that takes a
+	///    Rect parameter to specify the absolute position and size (the Frame of the View) or by setting the
+	///    X, Y, Width and Height properties on the view.    Both approaches use coordinates that are relative 
+	///    to the container they are being added to.
+	/// </para>
+	/// <para>
+	///    When you do not specify a Rect frame you can use the more flexible 
+	///    Dim and Pos objects that can dynamically update the position of a view.   
+	///    The X and Y properties are of type <see cref="T:Terminal.Gui.Pos"/>
+	///    and you can use either absolute positions, percentages or anchor
+	///    points.   The Width and Height properties are of type 
+	///    <see cref="T:Terminal.Gui.Dim"/> and can use absolute position, 
+	///    percentages and anchors.  These are useful as they will take
+	///    care of repositioning your views if your view's frames are resized
+	///    or if the terminal size changes.
+	/// </para>
+	/// <para>
+	///    When you specify the Rect parameter to a view, you are setting the LayoutStyle to Absolute, and the 
+	///    view will always stay in the position that you placed it.   To change the position change the 
+	///    Frame property to the new position.
 	/// </para>
 	/// <para>
 	///    Subviews can be added to a View by calling the Add method.   The container of a view is the 
@@ -162,6 +198,12 @@ namespace Terminal.Gui {
 	///    a way of hiding the cursor, so it can be distracting to have the cursor left at 
 	///    the last focused view.   So views should make sure that they place the cursor
 	///    in a visually sensible place.
+	/// </para>
+	/// <para>
+	///    The metnod LayoutSubviews is invoked when the size or layout of a view has
+	///    changed.   The default processing system will keep the size and dimensions
+	///    for views that use the LayoutKind.Absolute, and will recompute the
+	///    frames for the vies that use LayoutKind.Computed.
 	/// </para>
 	/// </remarks>
 	public class View : Responder, IEnumerable {
@@ -207,7 +249,7 @@ namespace Terminal.Gui {
 		///    Altering the Frame of a view will trigger the redrawing of the 
 		///    view as well as the redrawing of the affected regions in the superview.
 		/// </remarks>
-		public Rect Frame {
+		public virtual Rect Frame {
 			get => frame;
 			set {
 				if (SuperView != null) {
@@ -216,6 +258,7 @@ namespace Terminal.Gui {
 				}
 				frame = value;
 
+				SetNeedsLayout ();
 				SetNeedsDisplay (frame);
 			}
 		}
@@ -230,6 +273,22 @@ namespace Terminal.Gui {
 				yield return v;
 		}
 
+		LayoutStyle layoutStyle;
+
+		/// <summary>
+		/// Controls how the view's Frame is computed during the LayoutSubviews method, if Absolute, then
+		/// LayoutSubviews does not change the Frame properties, otherwise the Frame is updated from the
+		/// values in X, Y, Width and Height properties.
+		/// </summary>
+		/// <value>The layout style.</value>
+		public LayoutStyle LayoutStyle {
+			get => layoutStyle;
+			set {
+				layoutStyle = value;
+				SetNeedsLayout ();
+			}
+		}
+
 		/// <summary>
 		/// The bounds represent the View-relative rectangle used for this view.   Updates to the Bounds update the Frame, and has the same side effects as updating the frame.
 		/// </summary>
@@ -241,6 +300,61 @@ namespace Terminal.Gui {
 			}
 		}
 
+		Pos x, y;
+		/// <summary>
+		/// Gets or sets the X position for the view (the column).  This is only used when the LayoutStyle is Computed, if the
+		/// LayoutStyle is set to Absolute, this value is ignored.
+		/// </summary>
+		/// <value>The X Position.</value>
+		public Pos X {
+			get => x;
+			set {
+				x = value;
+				SetNeedsLayout ();
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the Y position for the view (line).  This is only used when the LayoutStyle is Computed, if the
+		/// LayoutStyle is set to Absolute, this value is ignored.
+		/// </summary>
+		/// <value>The y position (line).</value>
+		public Pos Y {
+			get => y;
+			set {
+				y = value;
+				SetNeedsLayout ();
+			}
+		}
+
+		Dim width, height;
+
+		/// <summary>
+		/// Gets or sets the width for the view. This is only used when the LayoutStyle is Computed, if the
+		/// LayoutStyle is set to Absolute, this value is ignored.
+		/// </summary>
+		/// <value>The width.</value>
+		public Dim Width {
+			get => width;
+			set {
+				width = value;
+				SetNeedsLayout ();
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the height for the view. This is only used when the LayoutStyle is Computed, if the
+		/// LayoutStyle is set to Absolute, this value is ignored.
+		/// </summary>
+		/// <value>The height.</value>
+		public Dim Height {
+			get => height;
+			set {
+				height = value;
+				SetNeedsLayout ();
+			}
+		}
+
 		/// <summary>
 		/// Returns the container for this view, or null if this view has not been added to a container.
 		/// </summary>
@@ -248,13 +362,27 @@ namespace Terminal.Gui {
 		public View SuperView => container;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.View"/> class with the specified frame.   This is the default constructor.
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.View"/> class with the absolute
+		/// dimensions specified in the frame.   If you want to have Views that can be positioned with
+		/// Pos and Dim properties on X, Y, Width and Height, use the empty constructor.
 		/// </summary>
 		/// <param name="frame">The region covered by this view.</param>
 		public View (Rect frame)
 		{
 			this.Frame = frame;
 			CanFocus = false;
+			LayoutStyle = LayoutStyle.Absolute;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.View"/> class and sets the
+		/// view up for Computed layout, which will use the values in X, Y, Width and Height to 
+		/// compute the View's Frame.
+		/// </summary>
+		public View ()
+		{
+			CanFocus = false;
+			LayoutStyle = LayoutStyle.Computed;
 		}
 
 		/// <summary>
@@ -264,6 +392,18 @@ namespace Terminal.Gui {
 		public void SetNeedsDisplay ()
 		{
 			SetNeedsDisplay (Bounds);
+		}
+
+		bool layoutNeeded = true;
+
+		internal void SetNeedsLayout ()
+		{
+			if (layoutNeeded)
+				return;
+			layoutNeeded = true;
+			if (SuperView == null)
+				return;
+			SuperView.layoutNeeded = true;
 		}
 
 		/// <summary>
@@ -865,12 +1005,60 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Computes the RelativeLayout for the view, given the frame for its container.
+		/// </summary>
+		/// <param name="hostFrame">The Frame for the host.</param>
+		internal void RelativeLayout (Rect hostFrame)
+		{
+			int w, h, _x, _y;
+			if (width == null)
+				w = hostFrame.Width;
+			else
+				w = width.Anchor (hostFrame.Width);
+
+			if (x == null)
+				_x = 0;
+			else {
+				if (x is Pos.PosCenter)
+					_x = x.Anchor (hostFrame.Width - w);
+				else
+					_x = x.Anchor (hostFrame.Width);
+			}
+			if (height == null)
+				h = hostFrame.Height;
+			else
+				h = height.Anchor (hostFrame.Height);
+
+			if (y == null)
+				_y = 0;
+			else {
+				if (y is Pos.PosCenter)
+					_y = y.Anchor (hostFrame.Height - h);
+				else
+					_y = y.Anchor (hostFrame.Height);
+			}
+
+			Frame = new Rect (_x, _y, w, h);
+		}
+
+		/// <summary>
 		/// This virtual method is invoked when a view starts executing or 
 		/// when the dimensions of the view have changed, for example in 
 		/// response to the container view or terminal resizing.
 		/// </summary>
 		public virtual void LayoutSubviews ()
 		{
+			if (!layoutNeeded)
+				return;
+			
+			foreach (var v in Subviews) {
+				if (v.LayoutStyle == LayoutStyle.Absolute)
+					continue;
+
+				v.RelativeLayout (Frame);
+				v.layoutNeeded = false;
+			}
+			layoutNeeded = false;
 		}
 
 		/// <summary>
@@ -908,12 +1096,22 @@ namespace Terminal.Gui {
 		public bool Running;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Toplevel"/> class.
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Toplevel"/> class with the specified absolute layout.
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		public Toplevel (Rect frame) : base (frame)
 		{
 			ColorScheme = Colors.Base;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Toplevel"/> class with Computed layout, defaulting to <see langword="async"/> full screen.
+		/// </summary>
+		public Toplevel () : base ()
+		{
+			ColorScheme = Colors.Base;
+			Width = Dim.Fill ();
+			Height = Dim.Fill ();
 		}
 
 		/// <summary>
@@ -1000,14 +1198,23 @@ namespace Terminal.Gui {
 
 		class ContentView : View {
 			public ContentView (Rect frame) : base (frame) { }
+			public ContentView () : base () { }
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Gui.Window"/> class with an optioanl title
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Gui.Window"/> class with an optional title and a set frame.
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		/// <param name="title">Title.</param>
 		public Window (Rect frame, ustring title = null) : this (frame, title, padding: 0)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Window"/> class with an optional title.
+		/// </summary>
+		/// <param name="title">Title.</param>
+		public Window (ustring title = null) : this (title, padding: 0)
 		{
 		}
 
@@ -1027,6 +1234,27 @@ namespace Terminal.Gui {
 			this.padding = padding;
 			var cFrame = new Rect (1 + padding, 1 + padding, frame.Width - wb, frame.Height - wb);
 			contentView = new ContentView (cFrame);
+			base.Add (contentView);
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Window"/> with
+		/// the specified frame for its location, with the specified border 
+		/// an optional title.
+		/// </summary>
+		/// <param name="padding">Number of characters to use for padding of the drawn frame.</param>
+		/// <param name="title">Title.</param>
+		public Window (ustring title = null, int padding = 0) : base ()
+		{
+			this.Title = title;
+			int wb = 2 * (1 + padding);
+			this.padding = padding;
+			contentView = new ContentView () {
+				X = 1 + padding,
+				Y = 1 + padding,
+				Width = Dim.Fill (wb),
+				Height = Dim.Fill (wb)
+			};
 			base.Add (contentView);
 		}
 
@@ -1295,7 +1523,7 @@ namespace Terminal.Gui {
 			internal Toplevel Toplevel;
 
 			/// <summary>
-			/// Releases all resource used by the <see cref="T:Terminal.Gui.Application.RunState"/> object.
+			/// Releases alTop = l resource used by the <see cref="T:Terminal.Gui.Application.RunState"/> object.
 			/// </summary>
 			/// <remarks>Call <see cref="Dispose()"/> when you are finished using the <see cref="T:Terminal.Gui.Application.RunState"/>. The
 			/// <see cref="Dispose()"/> method leaves the <see cref="T:Terminal.Gui.Application.RunState"/> in an unusable state. After
@@ -1448,6 +1676,8 @@ namespace Terminal.Gui {
 			toplevels.Push (toplevel);
 			Current = toplevel;
 			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessMouseEvent);
+			if (toplevel.LayoutStyle == LayoutStyle.Computed)
+				toplevel.RelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
 			toplevel.LayoutSubviews ();
 			toplevel.FocusFirst ();
 			Redraw (toplevel);

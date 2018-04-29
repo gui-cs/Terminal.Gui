@@ -25,8 +25,12 @@ namespace Terminal.Gui {
 		/// <param name="width">Width for the dialog.</param>
 		/// <param name="height">Height for the dialog.</param>
 		/// <param name="buttons">Optional buttons to lay out at the bottom of the dialog.</param>
-		public Dialog (ustring title, int width, int height, params Button [] buttons) : base (Application.MakeCenteredRect (new Size (width, height)), title, padding: padding)
+		public Dialog (ustring title, int width, int height, params Button [] buttons) : base (title, padding: padding)
 		{
+			X = Pos.Center ();
+			Y = Pos.Center ();
+			Width = width;
+			Height = height;
 			ColorScheme = Colors.Dialog;
 
 			if (buttons != null) {

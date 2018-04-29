@@ -33,19 +33,44 @@ namespace Terminal.Gui {
 		public event EventHandler Changed;
 
 		/// <summary>
-		///   Public constructor.
+		///    Public constructor that creates a text field, with layout controlled with X, Y, Width and Height.
 		/// </summary>
-		/// <remarks>
-		/// </remarks>
-		public TextField (int x, int y, int w, string s) : base (new Rect (x, y, w, 1))
+		/// <param name="text">Initial text contents.</param>
+		public TextField (ustring text)
 		{
-			if (s == null)
-				s = "";
+			if (text == null)
+				text = "";
 
-			text = s;
-			point = s.Length;
+			this.text = text;
+			point = text.Length;
+			CanFocus = true;
+		}
+
+		/// <summary>
+		///    Public constructor that creates a text field at an absolute position and size.
+		/// </summary>
+		/// <param name="x">The x coordinate.</param>
+		/// <param name="y">The y coordinate.</param>
+		/// <param name="w">The width.</param>
+		/// <param name="text">Initial text contents.</param>
+		public TextField (int x, int y, int w, ustring text) : base (new Rect (x, y, w, 1))
+		{
+			if (text == null)
+				text = "";
+
+			this.text = text;
+			point = text.Length;
 			first = point > w ? point - w : 0;
 			CanFocus = true;
+		}
+
+		public override Rect Frame {
+			get => base.Frame;
+			set {
+				base.Frame = value;
+				var w = base.Frame.Width;
+				first = point > w ? point - w : 0;
+			}
 		}
 
 		/// <summary>

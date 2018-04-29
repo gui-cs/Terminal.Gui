@@ -388,16 +388,18 @@ namespace Mono.Terminal {
 				RunTimers ();
 
 			if (useUnix) {
-				foreach (var p in pollmap) {
-					Watch watch;
+				if (pollmap != null) {
+					foreach (var p in pollmap) {
+						Watch watch;
 
-					if (p.revents == 0)
-						continue;
+						if (p.revents == 0)
+							continue;
 
-					if (!descriptorWatchers.TryGetValue (p.fd, out watch))
-						continue;
-					if (!watch.Callback (this))
-						descriptorWatchers.Remove (p.fd);
+						if (!descriptorWatchers.TryGetValue (p.fd, out watch))
+							continue;
+						if (!watch.Callback (this))
+							descriptorWatchers.Remove (p.fd);
+					}
 				}
 			} else {
 				if (windowsKeyResult.HasValue) {

@@ -233,7 +233,29 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new ListView that will display the contents of the object implementing the IList interface.
+		/// Initializes a new ListView that will display the contents of the object implementing the IList interface, with relative positioning
+		/// </summary>
+		/// <param name="source">An IList data source, if the elements of the IList are strings or ustrings, the string is rendered, otherwise the ToString() method is invoked on the result.</param>
+		public ListView (IList source) : this (MakeWrapper (source))
+		{
+			((ListWrapper)(Source)).Container = this;
+			((ListWrapper)(Source)).Driver = Driver;
+		}
+
+		/// <summary>
+		/// Initializes a new ListView that will display the provided data source, uses relative positioning.
+		/// </summary>
+		/// <param name="source">IListDataSource object that provides a mechanism to render the data. The number of elements on the collection should not change, if you must change, set the "Source" property to reset the internal settings of the ListView.</param>
+		public ListView (IListDataSource source) : base ()
+		{
+			if (source == null)
+				throw new ArgumentNullException (nameof (source));
+			Source = source;
+			CanFocus = true;
+		}
+
+		/// <summary>
+		/// Initializes a new ListView that will display the contents of the object implementing the IList interface with an absolute position.
 		/// </summary>
 		/// <param name="rect">Frame for the listview.</param>
 		/// <param name="source">An IList data source, if the elements of the IList are strings or ustrings, the string is rendered, otherwise the ToString() method is invoked on the result.</param>
@@ -244,7 +266,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new ListView that will display the provided data source.
+		/// Initializes a new ListView that will display the provided data source  with an absolute position
 		/// </summary>
 		/// <param name="rect">Frame for the listview.</param>
 		/// <param name="source">IListDataSource object that provides a mechanism to render the data. The number of elements on the collection should not change, if you must change, set the "Source" property to reset the internal settings of the ListView.</param>

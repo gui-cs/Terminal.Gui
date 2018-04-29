@@ -80,6 +80,18 @@ namespace Terminal.Gui {
 			this.text = text;
 		}
 
+		/// <summary>
+		/// Public constructor: creates a label and configures the default Width and Height based on the text, the result is suitable for Computed layout.
+		/// </summary>
+		/// <param name="text">Text.</param>
+		public Label (ustring text) : base ()
+		{
+			this.text = text;
+			var r = CalcRect (0, 0, text);
+			Width = r.Width;
+			Height = r.Height;
+		}
+
 		static char [] whitespace = new char [] { ' ', '\t' };
 
 		static ustring ClipAndJustify (ustring str, int width, TextAlignment talign)

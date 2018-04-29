@@ -276,11 +276,19 @@ namespace Terminal.Gui {
 		public event EventHandler Changed;
 #endif
 		/// <summary>
-		///   Public constructor, creates a view on the specfied area
+		///   Public constructor, creates a view on the specified area, with absolute position and size.
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
 		public TextView (Rect frame) : base (frame)
+		{
+			CanFocus = true;
+		}
+
+		/// <summary>
+		/// Public constructor, creates a view on the specified area, with dimensions controlled with the X, Y, Width and Height properties.
+		/// </summary>
+		public TextView () : base ()
 		{
 			CanFocus = true;
 		}

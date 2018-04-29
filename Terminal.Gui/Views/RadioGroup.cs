@@ -8,13 +8,31 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.RadioGroup"/> class
-		/// setting up the initial set of radio labels and the item that should be selected.
+		/// setting up the initial set of radio labels and the item that should be selected and uses
+		/// an absolute layout for the result.
 		/// </summary>
 		/// <param name="rect">Boundaries for the radio group.</param>
 		/// <param name="radioLabels">Radio labels, the strings can contain hotkeys using an undermine before the letter.</param>
 		/// <param name="selected">The item to be selected, the value is clamped to the number of items.</param>
 		public RadioGroup (Rect rect, string [] radioLabels, int selected = 0) : base (rect)
 		{
+			this.selected = selected;
+			this.radioLabels = radioLabels;
+			CanFocus = true;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.RadioGroup"/> class
+		/// setting up the initial set of radio labels and the item that should be selected.
+		/// </summary>
+		/// <param name="radioLabels">Radio labels, the strings can contain hotkeys using an undermine before the letter.</param>
+		/// <param name="selected">The item to be selected, the value is clamped to the number of items.</param>
+		public RadioGroup (string [] radioLabels, int selected = 0) : base ()
+		{
+			var r = MakeRect (0, 0, radioLabels);
+			Width = r.Width;
+			Height = radioLabels.Length;
+
 			this.selected = selected;
 			this.radioLabels = radioLabels;
 			CanFocus = true;

@@ -20,10 +20,19 @@ namespace Terminal.Gui {
 		int activityPos, delta;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.ProgressBar"/> class, starts in percentage mode.
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.ProgressBar"/> class, starts in percentage mode with an absolute position and size.
 		/// </summary>
 		/// <param name="rect">Rect.</param>
 		public ProgressBar (Rect rect) : base (rect)
+		{
+			CanFocus = false;
+			fraction = 0;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.ProgressBar"/> class, starts in percentage mode and uses relative layout.
+		/// </summary>
+		public ProgressBar () : base ()
 		{
 			CanFocus = false;
 			fraction = 0;

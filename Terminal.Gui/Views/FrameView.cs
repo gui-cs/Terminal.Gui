@@ -31,11 +31,12 @@ namespace Terminal.Gui {
 
 		class ContentView : View {
 			public ContentView (Rect frame) : base (frame) { }
+			public ContentView () : base () { }
 		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Gui.FrameView"/> class with
-		/// a title.
+		/// an absolute position and a title.
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		/// <param name="title">Title.</param>
@@ -46,6 +47,24 @@ namespace Terminal.Gui {
 			base.Add (contentView);
 			Title = title;
 		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Gui.FrameView"/> class with
+		/// a title and the result is suitable to have its X, Y, Width and Height properties computed.
+		/// </summary>
+		/// <param name="title">Title.</param>
+		public FrameView (ustring title)
+		{
+			contentView = new ContentView () {
+				X = 1,
+				Y = 1,
+				Width = Dim.Fill (2),
+				Height = Dim.Fill (2)
+			};
+			base.Add (contentView);
+			Title = title;
+		}
+
 
 		void DrawFrame ()
 		{

@@ -275,8 +275,12 @@ namespace Terminal.Gui {
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.MenuBar"/> class with the specified set of toplevel menu items.
 		/// </summary>
 		/// <param name="menus">Menus.</param>
-		public MenuBar (MenuBarItem [] menus) : base (new Rect (0, 0, Application.Driver.Cols, 1))
+		public MenuBar (MenuBarItem [] menus) : base ()
 		{
+			X = 0;
+			Y = 0;
+			Width = Dim.Fill ();
+			Height = 1;
 			Menus = menus;
 			CanFocus = false;
 			selected = -1;
