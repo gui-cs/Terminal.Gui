@@ -65,6 +65,8 @@ namespace Terminal.Gui {
 		/// <param name="is_default">If set, this makes the button the default button in the current view, which means that if the user presses return on a view that does not handle return, it will be treated as if he had clicked on the button</param>
 		public Button (ustring text, bool is_default = false) : base ()
 		{
+			CanFocus = true;
+			this.IsDefault = is_default;
 			Text = text;
 			int w = text.Length + 4 + (is_default ? 2 : 0);
 			Width = w;
