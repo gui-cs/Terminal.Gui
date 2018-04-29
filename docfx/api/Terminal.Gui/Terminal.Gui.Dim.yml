@@ -1,0 +1,276 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.Dim
+  id: Dim
+  children:
+  - Terminal.Gui.Dim.#ctor
+  - Terminal.Gui.Dim.Fill(System.Int32)
+  - Terminal.Gui.Dim.op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  - Terminal.Gui.Dim.op_Implicit(System.Int32 to Terminal.Gui.Dim)
+  - Terminal.Gui.Dim.op_Subtraction(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  - Terminal.Gui.Dim.Percent(System.Single)
+  langs:
+  - csharp
+  name: Dim
+  nameWithType: Dim
+  fullName: Terminal.Gui.Dim
+  type: Class
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  remarks: >-
+    <p>
+                    Use the Dim objects on the Width or Height properties of a view to control the position.
+                  </p>
+        <p>
+                    These can be used to set the absolute position, when merely assigning an
+                    integer value (via the implicit integer to Pos conversion), and they can be combined
+                    to produce more useful layouts, like: Pos.Center - 3, which would shift the postion
+                    of the view 3 characters to the left after centering for example.
+                  </p>
+  syntax:
+    content: public class Dim
+  inheritance:
+  - System.Object
+  implements: []
+  inheritedMembers: []
+- uid: Terminal.Gui.Dim.#ctor
+  id: '#ctor'
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  name: Dim()
+  nameWithType: Dim.Dim()
+  fullName: Dim.Dim()
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public Dim ();
+    parameters: []
+  overload: Terminal.Gui.Dim.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.Dim.Fill(System.Int32)
+  id: Fill(System.Int32)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  name: Fill(Int32)
+  nameWithType: Dim.Fill(Int32)
+  fullName: Dim.Fill(Int32)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates a Dim object that fills the dimension, but leaves the specified number of colums for a margin.
+  syntax:
+    content: public static Terminal.Gui.Dim Fill (int margin = 0);
+    parameters:
+    - id: margin
+      type: System.Int32
+      description: Margin to use.
+    return:
+      type: Terminal.Gui.Dim
+      description: The Fill dimension.
+  overload: Terminal.Gui.Dim.Fill*
+  exceptions: []
+- uid: Terminal.Gui.Dim.op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  id: op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  name: op_Addition(Dim, Dim)
+  nameWithType: Dim.op_Addition(Dim, Dim)
+  fullName: Dim.op_Addition(Dim, Dim)
+  type: Operator
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Adds a <xref href="Terminal.Gui.Pos"></xref> to a <xref href="Terminal.Gui.Pos"></xref>, yielding a new <xref href="Terminal.Gui.Pos"></xref>.
+  syntax:
+    content: public static Terminal.Gui.Dim op_Addition (Terminal.Gui.Dim left, Terminal.Gui.Dim right);
+    parameters:
+    - id: left
+      type: Terminal.Gui.Dim
+      description: The first <xref href="Terminal.Gui.Pos"></xref> to add.
+    - id: right
+      type: Terminal.Gui.Dim
+      description: The second <xref href="Terminal.Gui.Pos"></xref> to add.
+    return:
+      type: Terminal.Gui.Dim
+      description: The <xref href="Terminal.Gui.Pos"></xref> that is the sum of the values of <code>left</code> and <code>right</code>.
+  overload: Terminal.Gui.Dim.op_Addition*
+  exceptions: []
+- uid: Terminal.Gui.Dim.op_Implicit(System.Int32 to Terminal.Gui.Dim)
+  id: op_Implicit(System.Int32 to Terminal.Gui.Dim)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  name: op_Implicit(Int32 to Dim)
+  nameWithType: Dim.op_Implicit(Int32 to Dim)
+  fullName: Dim.op_Implicit(Int32 to Dim)
+  type: Operator
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates an Absolute Pos from the specified integer value.
+  syntax:
+    content: public static Terminal.Gui.Dim op_Implicit (int n);
+    parameters:
+    - id: n
+      type: System.Int32
+      description: The value to convert to the pos.
+    return:
+      type: Terminal.Gui.Dim
+      description: The Absolute Pos.
+  overload: Terminal.Gui.Dim.op_Implicit*
+  exceptions: []
+- uid: Terminal.Gui.Dim.op_Subtraction(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  id: op_Subtraction(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  name: op_Subtraction(Dim, Dim)
+  nameWithType: Dim.op_Subtraction(Dim, Dim)
+  fullName: Dim.op_Subtraction(Dim, Dim)
+  type: Operator
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Subtracts a <xref href="Terminal.Gui.Pos"></xref> from a <xref href="Terminal.Gui.Pos"></xref>, yielding a new <xref href="Terminal.Gui.Pos"></xref>.
+  syntax:
+    content: public static Terminal.Gui.Dim op_Subtraction (Terminal.Gui.Dim left, Terminal.Gui.Dim right);
+    parameters:
+    - id: left
+      type: Terminal.Gui.Dim
+      description: The <xref href="Terminal.Gui.Pos"></xref> to subtract from (the minuend).
+    - id: right
+      type: Terminal.Gui.Dim
+      description: The <xref href="Terminal.Gui.Pos"></xref> to subtract (the subtrahend).
+    return:
+      type: Terminal.Gui.Dim
+      description: The <xref href="Terminal.Gui.Pos"></xref> that is the <code>left</code> minus <code>right</code>.
+  overload: Terminal.Gui.Dim.op_Subtraction*
+  exceptions: []
+- uid: Terminal.Gui.Dim.Percent(System.Single)
+  id: Percent(System.Single)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  name: Percent(Single)
+  nameWithType: Dim.Percent(Single)
+  fullName: Dim.Percent(Single)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates a percentage Dim object
+  syntax:
+    content: public static Terminal.Gui.Dim Percent (float n);
+    parameters:
+    - id: n
+      type: System.Single
+      description: A value between 0 and 100 representing the percentage.
+    return:
+      type: Terminal.Gui.Dim
+      description: The percent Dim object.
+  overload: Terminal.Gui.Dim.Percent*
+  exceptions: []
+references:
+- uid: System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: Terminal.Gui.Dim.#ctor
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: Dim()
+  nameWithType: Dim.Dim()
+  fullName: Dim.Dim()
+- uid: Terminal.Gui.Dim.Fill(System.Int32)
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: Fill(Int32)
+  nameWithType: Dim.Fill(Int32)
+  fullName: Dim.Fill(Int32)
+- uid: Terminal.Gui.Dim
+  parent: Terminal.Gui
+  isExternal: false
+  name: Dim
+  nameWithType: Dim
+  fullName: Terminal.Gui.Dim
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: Terminal.Gui.Dim.op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: op_Addition(Dim, Dim)
+  nameWithType: Dim.op_Addition(Dim, Dim)
+  fullName: Dim.op_Addition(Dim, Dim)
+- uid: Terminal.Gui.Dim.op_Implicit(System.Int32 to Terminal.Gui.Dim)
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: op_Implicit(Int32 to Dim)
+  nameWithType: Dim.op_Implicit(Int32 to Dim)
+  fullName: Dim.op_Implicit(Int32 to Dim)
+- uid: Terminal.Gui.Dim.op_Subtraction(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: op_Subtraction(Dim, Dim)
+  nameWithType: Dim.op_Subtraction(Dim, Dim)
+  fullName: Dim.op_Subtraction(Dim, Dim)
+- uid: Terminal.Gui.Dim.Percent(System.Single)
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: Percent(Single)
+  nameWithType: Dim.Percent(Single)
+  fullName: Dim.Percent(Single)
+- uid: System.Single
+  parent: System
+  isExternal: true
+  name: Single
+  nameWithType: Single
+  fullName: System.Single
+- uid: Terminal.Gui.Dim.#ctor*
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: Dim
+  nameWithType: Dim.Dim
+  fullName: Dim.Dim
+- uid: Terminal.Gui.Dim.Fill*
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: Fill
+  nameWithType: Dim.Fill
+  fullName: Dim.Fill
+- uid: Terminal.Gui.Dim.op_Addition*
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: op_Addition
+  nameWithType: Dim.op_Addition
+  fullName: Dim.op_Addition
+- uid: Terminal.Gui.Dim.op_Implicit*
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: op_Implicit
+  nameWithType: Dim.op_Implicit
+  fullName: Dim.op_Implicit
+- uid: Terminal.Gui.Dim.op_Subtraction*
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: op_Subtraction
+  nameWithType: Dim.op_Subtraction
+  fullName: Dim.op_Subtraction
+- uid: Terminal.Gui.Dim.Percent*
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: Percent
+  nameWithType: Dim.Percent
+  fullName: Dim.Percent

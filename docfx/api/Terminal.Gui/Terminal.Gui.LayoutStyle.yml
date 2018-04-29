@@ -1,0 +1,86 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.LayoutStyle
+  id: LayoutStyle
+  children:
+  - Terminal.Gui.LayoutStyle.Absolute
+  - Terminal.Gui.LayoutStyle.Computed
+  langs:
+  - csharp
+  name: LayoutStyle
+  nameWithType: LayoutStyle
+  fullName: Terminal.Gui.LayoutStyle
+  type: Enum
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "Determines the LayoutStyle for a view, if Absolute, during LayoutSubviews, the\n            value from the Frame will be used, if the value is Computer, then the Frame \n            will be updated from the X, Y Pos objets and the Width and Heigh Dim objects."
+  syntax:
+    content: public enum LayoutStyle
+  inheritance:
+  - System.Enum
+- uid: Terminal.Gui.LayoutStyle.Absolute
+  id: Absolute
+  parent: Terminal.Gui.LayoutStyle
+  langs:
+  - csharp
+  name: Absolute
+  nameWithType: LayoutStyle.Absolute
+  fullName: LayoutStyle.Absolute
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The position and size of the view are based on the Frame value.
+  syntax:
+    content: Absolute
+    return:
+      type: Terminal.Gui.LayoutStyle
+      description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.LayoutStyle.Computed
+  id: Computed
+  parent: Terminal.Gui.LayoutStyle
+  langs:
+  - csharp
+  name: Computed
+  nameWithType: LayoutStyle.Computed
+  fullName: LayoutStyle.Computed
+  type: Field
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    The position and size of the view will be computed based on the
+                X, Y, Width and Height properties and set on the Frame.
+  syntax:
+    content: Computed
+    return:
+      type: Terminal.Gui.LayoutStyle
+      description: To be added.
+  exceptions: []
+references:
+- uid: System.Enum
+  parent: System
+  isExternal: true
+  name: Enum
+  nameWithType: Enum
+  fullName: System.Enum
+- uid: Terminal.Gui.LayoutStyle.Absolute
+  parent: Terminal.Gui.LayoutStyle
+  isExternal: false
+  name: Absolute
+  nameWithType: LayoutStyle.Absolute
+  fullName: LayoutStyle.Absolute
+- uid: Terminal.Gui.LayoutStyle
+  parent: Terminal.Gui
+  isExternal: false
+  name: LayoutStyle
+  nameWithType: LayoutStyle
+  fullName: Terminal.Gui.LayoutStyle
+- uid: Terminal.Gui.LayoutStyle.Computed
+  parent: Terminal.Gui.LayoutStyle
+  isExternal: false
+  name: Computed
+  nameWithType: LayoutStyle.Computed
+  fullName: LayoutStyle.Computed

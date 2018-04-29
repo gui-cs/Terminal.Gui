@@ -1,0 +1,54 @@
+<Type Name="LayoutStyle" FullName="Terminal.Gui.LayoutStyle">
+  <TypeSignature Language="C#" Value="public enum LayoutStyle" />
+  <TypeSignature Language="ILAsm" Value=".class public auto ansi sealed LayoutStyle extends System.Enum" />
+  <AssemblyInfo>
+    <AssemblyName>Terminal.Gui</AssemblyName>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+  </AssemblyInfo>
+  <Base>
+    <BaseTypeName>System.Enum</BaseTypeName>
+  </Base>
+  <Docs>
+    <summary>
+            Determines the LayoutStyle for a view, if Absolute, during LayoutSubviews, the
+            value from the Frame will be used, if the value is Computer, then the Frame 
+            will be updated from the X, Y Pos objets and the Width and Heigh Dim objects.
+            </summary>
+    <remarks>To be added.</remarks>
+  </Docs>
+  <Members>
+    <Member MemberName="Absolute">
+      <MemberSignature Language="C#" Value="Absolute" />
+      <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.LayoutStyle Absolute = int32(0)" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.LayoutStyle</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            The position and size of the view are based on the Frame value.
+            </summary>
+      </Docs>
+    </Member>
+    <Member MemberName="Computed">
+      <MemberSignature Language="C#" Value="Computed" />
+      <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.LayoutStyle Computed = int32(1)" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.LayoutStyle</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            The position and size of the view will be computed based on the
+            X, Y, Width and Height properties and set on the Frame.
+            </summary>
+      </Docs>
+    </Member>
+  </Members>
+</Type>

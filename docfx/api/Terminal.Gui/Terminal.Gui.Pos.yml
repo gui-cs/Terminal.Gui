@@ -1,0 +1,311 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.Pos
+  id: Pos
+  children:
+  - Terminal.Gui.Pos.#ctor
+  - Terminal.Gui.Pos.AnchorEnd(System.Int32)
+  - Terminal.Gui.Pos.Center
+  - Terminal.Gui.Pos.op_Addition(Terminal.Gui.Pos,Terminal.Gui.Pos)
+  - Terminal.Gui.Pos.op_Implicit(System.Int32 to Terminal.Gui.Pos)
+  - Terminal.Gui.Pos.op_Subtraction(Terminal.Gui.Pos,Terminal.Gui.Pos)
+  - Terminal.Gui.Pos.Percent(System.Single)
+  langs:
+  - csharp
+  name: Pos
+  nameWithType: Pos
+  fullName: Terminal.Gui.Pos
+  type: Class
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "Describes a position which can be an absolute value, a percentage, centered, or \n            relative to the ending dimension.   Integer values are implicitly convertible to\n            an absolute Pos.    These objects are created using the static methods Percent,\n            AnchorEnd and Center.   The Pos objects can be combined with the addition and \n            subtraction operators."
+  remarks: >-
+    <p>
+                    Use the Pos objects on the X or Y properties of a view to control the position.
+                  </p>
+        <p>
+                    These can be used to set the absolute position, when merely assigning an
+                    integer value (via the implicit integer to Pos conversion), and they can be combined
+                    to produce more useful layouts, like: Pos.Center - 3, which would shift the postion
+                    of the view 3 characters to the left after centering for example.
+                  </p>
+  syntax:
+    content: public class Pos
+  inheritance:
+  - System.Object
+  implements: []
+  inheritedMembers: []
+- uid: Terminal.Gui.Pos.#ctor
+  id: '#ctor'
+  parent: Terminal.Gui.Pos
+  langs:
+  - csharp
+  name: Pos()
+  nameWithType: Pos.Pos()
+  fullName: Pos.Pos()
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public Pos ();
+    parameters: []
+  overload: Terminal.Gui.Pos.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.Pos.AnchorEnd(System.Int32)
+  id: AnchorEnd(System.Int32)
+  parent: Terminal.Gui.Pos
+  langs:
+  - csharp
+  name: AnchorEnd(Int32)
+  nameWithType: Pos.AnchorEnd(Int32)
+  fullName: Pos.AnchorEnd(Int32)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "Creates a Pos object that is anchored to the end of the dimension, useful to flush \n            the layout from the end."
+  syntax:
+    content: public static Terminal.Gui.Pos AnchorEnd (int margin = 0);
+    parameters:
+    - id: margin
+      type: System.Int32
+      description: Optional margin to set aside.
+    return:
+      type: Terminal.Gui.Pos
+      description: The Pos object anchored to the end (the bottom or the right side).
+  overload: Terminal.Gui.Pos.AnchorEnd*
+  exceptions: []
+- uid: Terminal.Gui.Pos.Center
+  id: Center
+  parent: Terminal.Gui.Pos
+  langs:
+  - csharp
+  name: Center()
+  nameWithType: Pos.Center()
+  fullName: Pos.Center()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns a Pos object that can be used to center the views.
+  syntax:
+    content: public static Terminal.Gui.Pos Center ();
+    parameters: []
+    return:
+      type: Terminal.Gui.Pos
+      description: The center Pos.
+  overload: Terminal.Gui.Pos.Center*
+  exceptions: []
+- uid: Terminal.Gui.Pos.op_Addition(Terminal.Gui.Pos,Terminal.Gui.Pos)
+  id: op_Addition(Terminal.Gui.Pos,Terminal.Gui.Pos)
+  parent: Terminal.Gui.Pos
+  langs:
+  - csharp
+  name: op_Addition(Pos, Pos)
+  nameWithType: Pos.op_Addition(Pos, Pos)
+  fullName: Pos.op_Addition(Pos, Pos)
+  type: Operator
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Adds a <xref href="Terminal.Gui.Pos"></xref> to a <xref href="Terminal.Gui.Pos"></xref>, yielding a new <xref href="Terminal.Gui.Pos"></xref>.
+  syntax:
+    content: public static Terminal.Gui.Pos op_Addition (Terminal.Gui.Pos left, Terminal.Gui.Pos right);
+    parameters:
+    - id: left
+      type: Terminal.Gui.Pos
+      description: The first <xref href="Terminal.Gui.Pos"></xref> to add.
+    - id: right
+      type: Terminal.Gui.Pos
+      description: The second <xref href="Terminal.Gui.Pos"></xref> to add.
+    return:
+      type: Terminal.Gui.Pos
+      description: The <xref href="Terminal.Gui.Pos"></xref> that is the sum of the values of <code>left</code> and <code>right</code>.
+  overload: Terminal.Gui.Pos.op_Addition*
+  exceptions: []
+- uid: Terminal.Gui.Pos.op_Implicit(System.Int32 to Terminal.Gui.Pos)
+  id: op_Implicit(System.Int32 to Terminal.Gui.Pos)
+  parent: Terminal.Gui.Pos
+  langs:
+  - csharp
+  name: op_Implicit(Int32 to Pos)
+  nameWithType: Pos.op_Implicit(Int32 to Pos)
+  fullName: Pos.op_Implicit(Int32 to Pos)
+  type: Operator
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates an Absolute Pos from the specified integer value.
+  syntax:
+    content: public static Terminal.Gui.Pos op_Implicit (int n);
+    parameters:
+    - id: n
+      type: System.Int32
+      description: The value to convert to the pos.
+    return:
+      type: Terminal.Gui.Pos
+      description: The Absolute Pos.
+  overload: Terminal.Gui.Pos.op_Implicit*
+  exceptions: []
+- uid: Terminal.Gui.Pos.op_Subtraction(Terminal.Gui.Pos,Terminal.Gui.Pos)
+  id: op_Subtraction(Terminal.Gui.Pos,Terminal.Gui.Pos)
+  parent: Terminal.Gui.Pos
+  langs:
+  - csharp
+  name: op_Subtraction(Pos, Pos)
+  nameWithType: Pos.op_Subtraction(Pos, Pos)
+  fullName: Pos.op_Subtraction(Pos, Pos)
+  type: Operator
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Subtracts a <xref href="Terminal.Gui.Pos"></xref> from a <xref href="Terminal.Gui.Pos"></xref>, yielding a new <xref href="Terminal.Gui.Pos"></xref>.
+  syntax:
+    content: public static Terminal.Gui.Pos op_Subtraction (Terminal.Gui.Pos left, Terminal.Gui.Pos right);
+    parameters:
+    - id: left
+      type: Terminal.Gui.Pos
+      description: The <xref href="Terminal.Gui.Pos"></xref> to subtract from (the minuend).
+    - id: right
+      type: Terminal.Gui.Pos
+      description: The <xref href="Terminal.Gui.Pos"></xref> to subtract (the subtrahend).
+    return:
+      type: Terminal.Gui.Pos
+      description: The <xref href="Terminal.Gui.Pos"></xref> that is the <code>left</code> minus <code>right</code>.
+  overload: Terminal.Gui.Pos.op_Subtraction*
+  exceptions: []
+- uid: Terminal.Gui.Pos.Percent(System.Single)
+  id: Percent(System.Single)
+  parent: Terminal.Gui.Pos
+  langs:
+  - csharp
+  name: Percent(Single)
+  nameWithType: Pos.Percent(Single)
+  fullName: Pos.Percent(Single)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates a percentage Pos object
+  syntax:
+    content: public static Terminal.Gui.Pos Percent (float n);
+    parameters:
+    - id: n
+      type: System.Single
+      description: A value between 0 and 100 representing the percentage.
+    return:
+      type: Terminal.Gui.Pos
+      description: The percent Pos object.
+  overload: Terminal.Gui.Pos.Percent*
+  exceptions: []
+references:
+- uid: System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: Terminal.Gui.Pos.#ctor
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Pos()
+  nameWithType: Pos.Pos()
+  fullName: Pos.Pos()
+- uid: Terminal.Gui.Pos.AnchorEnd(System.Int32)
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: AnchorEnd(Int32)
+  nameWithType: Pos.AnchorEnd(Int32)
+  fullName: Pos.AnchorEnd(Int32)
+- uid: Terminal.Gui.Pos
+  parent: Terminal.Gui
+  isExternal: false
+  name: Pos
+  nameWithType: Pos
+  fullName: Terminal.Gui.Pos
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: Terminal.Gui.Pos.Center
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Center()
+  nameWithType: Pos.Center()
+  fullName: Pos.Center()
+- uid: Terminal.Gui.Pos.op_Addition(Terminal.Gui.Pos,Terminal.Gui.Pos)
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: op_Addition(Pos, Pos)
+  nameWithType: Pos.op_Addition(Pos, Pos)
+  fullName: Pos.op_Addition(Pos, Pos)
+- uid: Terminal.Gui.Pos.op_Implicit(System.Int32 to Terminal.Gui.Pos)
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: op_Implicit(Int32 to Pos)
+  nameWithType: Pos.op_Implicit(Int32 to Pos)
+  fullName: Pos.op_Implicit(Int32 to Pos)
+- uid: Terminal.Gui.Pos.op_Subtraction(Terminal.Gui.Pos,Terminal.Gui.Pos)
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: op_Subtraction(Pos, Pos)
+  nameWithType: Pos.op_Subtraction(Pos, Pos)
+  fullName: Pos.op_Subtraction(Pos, Pos)
+- uid: Terminal.Gui.Pos.Percent(System.Single)
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Percent(Single)
+  nameWithType: Pos.Percent(Single)
+  fullName: Pos.Percent(Single)
+- uid: System.Single
+  parent: System
+  isExternal: true
+  name: Single
+  nameWithType: Single
+  fullName: System.Single
+- uid: Terminal.Gui.Pos.#ctor*
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Pos
+  nameWithType: Pos.Pos
+  fullName: Pos.Pos
+- uid: Terminal.Gui.Pos.AnchorEnd*
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: AnchorEnd
+  nameWithType: Pos.AnchorEnd
+  fullName: Pos.AnchorEnd
+- uid: Terminal.Gui.Pos.Center*
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Center
+  nameWithType: Pos.Center
+  fullName: Pos.Center
+- uid: Terminal.Gui.Pos.op_Addition*
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: op_Addition
+  nameWithType: Pos.op_Addition
+  fullName: Pos.op_Addition
+- uid: Terminal.Gui.Pos.op_Implicit*
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: op_Implicit
+  nameWithType: Pos.op_Implicit
+  fullName: Pos.op_Implicit
+- uid: Terminal.Gui.Pos.op_Subtraction*
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: op_Subtraction
+  nameWithType: Pos.op_Subtraction
+  fullName: Pos.op_Subtraction
+- uid: Terminal.Gui.Pos.Percent*
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Percent
+  nameWithType: Pos.Percent
+  fullName: Pos.Percent
