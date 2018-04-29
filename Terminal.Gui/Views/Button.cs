@@ -66,8 +66,10 @@ namespace Terminal.Gui {
 		public Button (ustring text, bool is_default = false) : base ()
 		{
 			Text = text;
-			Width = text.Length + 4 + (is_default ? 2 : 0);
+			int w = text.Length + 4 + (is_default ? 2 : 0);
+			Width = w;
 			Height = 1;
+			Frame = new Rect (0, 0, w, 1);
 		}
 
 		/// <summary>
