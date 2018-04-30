@@ -209,13 +209,10 @@ namespace Unix.Terminal {
 			cols = Marshal.ReadInt32 (cols_ptr);
 		}
 
-		[DllImport ("ncurses", EntryPoint="mousemask")]
-		extern static IntPtr call_mousemask (IntPtr newmask, out IntPtr oldmask);
-		
 		public static Event mousemask (Event newmask, out Event oldmask)
 		{
 			IntPtr e;
-			var ret = (Event) call_mousemask ((IntPtr) newmask, out e);
+			var ret = (Event) (use_naked_driver ? RegularCurses.call_mousemask ((IntPtr) newmask, out e) : CursesLinux.call_mousemask ((IntPtr) newmask, out e));
 			oldmask = (Event) e;
 			return ret;
 		}
@@ -473,6 +470,9 @@ namespace Unix.Terminal {
 		[DllImport ("ncurses")]
 		public extern static int mouseinterval (int interval);
 		
+		[DllImport ("ncurses", EntryPoint="mousemask")]
+		public extern static IntPtr call_mousemask (IntPtr newmask, out IntPtr oldmask);
+		
 	}
 	
 	//
@@ -480,6 +480,9 @@ namespace Unix.Terminal {
 	// by the dynamic linker, different than RegularCurses that looksup by "ncurses"
 	//
 	internal class CursesLinux {
+		[DllImport ("libncursesw.so.5", EntryPoint="mousemask")]
+		public extern static IntPtr call_mousemask (IntPtr newmask, out IntPtr oldmask);
+		
 		[DllImport ("libncursesw.so.5", EntryPoint="initscr")]
 		extern static internal IntPtr real_initscr ();
 
