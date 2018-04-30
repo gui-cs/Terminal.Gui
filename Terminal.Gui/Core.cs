@@ -1052,10 +1052,10 @@ namespace Terminal.Gui {
 				return;
 			
 			foreach (var v in Subviews) {
-				if (v.LayoutStyle == LayoutStyle.Absolute)
-					continue;
+				if (v.LayoutStyle == LayoutStyle.Computed)
+					v.RelativeLayout (Frame);
 
-				v.RelativeLayout (Frame);
+				v.LayoutSubviews ();
 				v.layoutNeeded = false;
 			}
 			layoutNeeded = false;

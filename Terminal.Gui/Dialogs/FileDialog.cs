@@ -10,21 +10,40 @@ namespace Terminal.Gui {
 	public class FileDialog : Dialog {
 		Button prompt, cancel;
 		Label nameFieldLabel, message, dirLabel;
-		TextField dir;
+		TextField dirEntry, nameEntry;
 
 		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message) : base (title, Driver.Cols - 20, Driver.Rows - 6, null)
 		{
-			dirLabel = new Label (2, 1, "Directory");
-			Add (dirLabel);
+			this.message = new Label (Rect.Empty, message);
+			var msgLines = Label.MeasureLines (message, Driver.Cols - 20);
+
+			dirLabel = new Label ("Directory: ") {
+				X = 2,
+				Y = 1 + msgLines
+			};
+
+			dirEntry = new TextField ("") {
+				X = 12,
+				Y = 1 + msgLines
+			};
+			Add (dirLabel, dirEntry);
+
+			this.nameFieldLabel = new Label (nameFieldLabel) {
+				X = 2,
+				Y = 3 + msgLines,
+			};
+			nameEntry = new TextField ("") {
+				X = 2 + nameFieldLabel.RuneCount + 1,
+				Y = 3 + msgLines,
+				Width = Dim.Fill () - 1
+			};
+			Add (this.nameFieldLabel, nameEntry);
 
 			this.cancel = new Button ("Cancel");
 			AddButton (cancel);
 
 			this.prompt = new Button (prompt);
 			AddButton (this.prompt);
-
-			this.nameFieldLabel = new Label (Rect.Empty, nameFieldLabel);
-			this.message = new Label (Rect.Empty, message);
 		}
 
 		/// <summary>
@@ -53,8 +72,12 @@ namespace Terminal.Gui {
 		/// Gets or sets the message displayed to the user, defaults to nothing
 		/// </summary>
 		/// <value>The message.</value>
-		public ustring Message { get; set; }
-
+		public ustring Message {
+			get => message.Text;
+			set {
+				message.Text = value;
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.FileDialog"/> can create directories.
@@ -72,7 +95,12 @@ namespace Terminal.Gui {
 		/// Gets or sets the directory path for this panel
 		/// </summary>
 		/// <value>The directory path.</value>
-		public ustring DirectoryPath { get; set; }
+		public ustring DirectoryPath {
+			get => dirEntry.Text;
+			set {
+				dirEntry.Text = value;
+			}
+		}
 
 		/// <summary>
 		/// The array of filename extensions allowed, or null if all file extensions are allowed.
@@ -91,17 +119,22 @@ namespace Terminal.Gui {
 		/// The File path that is currently shown on the panel
 		/// </summary>
 		/// <value>The absolute file path for the file path entered.</value>
-		public ustring FilePath { get; set; }
+		public ustring FilePath {
+			get => nameEntry.Text;
+			set {
+				nameEntry.Text = value;
+			}
+		}
 	}
 
 	public class SaveDialog : FileDialog {
-		public SaveDialog (ustring title, ustring message) : base (title, "Save", "Save as:", message)
+		public SaveDialog (ustring title, ustring message) : base (title, prompt: "Save", nameFieldLabel: "Save as:", message: message)
 		{
 		}
 	}
 
 	public class OpenDialog : FileDialog {
-		public OpenDialog (ustring title, ustring message) : base (title, "Open", "Open", message)
+		public OpenDialog (ustring title, ustring message) : base (title, prompt: "Open", nameFieldLabel: "Open", message: message)
 		{
 		}
 
