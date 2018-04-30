@@ -94,10 +94,12 @@ class Demo {
 
 		// Add some content
 		container.Add (
-			new Label (3, 6, "Login: "),
-			new TextField (14, 6, 40, ""),
-			new Label (3, 8, "Password: "),
-			new TextField (14, 8, 40, "") { Secret = true },
+			//new Label (3, 6, "Login: "),
+			//new TextField (14, 6, 40, ""),
+			new Label ("Login: ") { X = 3, Y = 6 },
+			new TextField ("") { X = 14, Y = 6, Width = 40 },
+			new Label ("Password: ") { X = 3, Y = 8 },
+			new TextField ("") { X = 14, Y = 18, Width = 40, Secret = true },
 			new FrameView (new Rect (3, 10, 25, 6), "Options"){
 				new CheckBox (1, 0, "Remember me"),
 				new RadioGroup (1, 2, new [] { "_Personal", "_Company" }),
@@ -113,10 +115,10 @@ class Demo {
 			}),
 			scrollView,
 			//scrollView2,
-			new Button (3, 19, "Ok"),
-			new Button (10, 19, "Cancel"),
+			new Button ("Ok") { X = 3, Y = 19 },
+			new Button ("Cancel") { X = 10, Y = 19 },
 			progress,
-			new Label (3, 22, "Press ESC and 9 to activate the menubar")
+			new Label ("Press ESC and 9 to activate the menubar") { X = 3, Y = 22 }
 		);
 
 	}
@@ -154,7 +156,12 @@ class Demo {
 		var top = Application.Top;
 		var tframe = top.Frame;
 
-		var win = new Window (new Rect (0, 1, tframe.Width, tframe.Height - 1), "Hello");
+		var win = new Window ("Hello"){
+			X = 0,
+			Y = 1,
+			Width = Dim.Fill (),
+			Height = Dim.Fill () - 1
+		};					
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
 				new MenuItem ("_New", "Creates new file", NewFile),
@@ -173,14 +180,12 @@ class Demo {
 		int count = 0;
 		ml = new Label (new Rect (3, 17, 47, 1), "Mouse: ");
 		Application.RootMouseEvent += delegate (MouseEvent me) {
-
 			ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
 		};
 
 		win.Add (ml);
 
-		// ShowTextAlignments (win);
-		top.Add (win);
+		top.Add (win, menu);
 		top.Add (menu);
 		Application.Run ();
 	}
