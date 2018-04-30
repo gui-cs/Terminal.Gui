@@ -4,7 +4,6 @@ items:
   id: MenuItem
   children:
   - Terminal.Gui.MenuItem.#ctor(NStack.ustring,System.String,System.Action)
-  - Terminal.Gui.MenuItem.#ctor(System.String,System.String,System.Action)
   - Terminal.Gui.MenuItem.Action
   - Terminal.Gui.MenuItem.Help
   - Terminal.Gui.MenuItem.HotKey
@@ -44,32 +43,6 @@ items:
     parameters:
     - id: title
       type: NStack.ustring
-      description: Title for the menu item.
-    - id: help
-      type: System.String
-      description: Help text to display.
-    - id: action
-      type: System.Action
-      description: Action to invoke when the menu item is activated.
-  overload: Terminal.Gui.MenuItem.#ctor*
-  exceptions: []
-- uid: Terminal.Gui.MenuItem.#ctor(System.String,System.String,System.Action)
-  id: '#ctor(System.String,System.String,System.Action)'
-  parent: Terminal.Gui.MenuItem
-  langs:
-  - csharp
-  name: MenuItem(String, String, Action)
-  nameWithType: MenuItem.MenuItem(String, String, Action)
-  fullName: MenuItem.MenuItem(String, String, Action)
-  type: Constructor
-  assemblies: []
-  namespace: Terminal.Gui
-  summary: Initializes a new <xref href="Terminal.MenuItem"></xref>.
-  syntax:
-    content: public MenuItem (string title, string help, Action action);
-    parameters:
-    - id: title
-      type: System.String
       description: Title for the menu item.
     - id: help
       type: System.String
@@ -208,12 +181,6 @@ references:
   name: Action
   nameWithType: Action
   fullName: System.Action
-- uid: Terminal.Gui.MenuItem.#ctor(System.String,System.String,System.Action)
-  parent: Terminal.Gui.MenuItem
-  isExternal: false
-  name: MenuItem(String, String, Action)
-  nameWithType: MenuItem.MenuItem(String, String, Action)
-  fullName: MenuItem.MenuItem(String, String, Action)
 - uid: Terminal.Gui.MenuItem.Action
   parent: Terminal.Gui.MenuItem
   isExternal: false

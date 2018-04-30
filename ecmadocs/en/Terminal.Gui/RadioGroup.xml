@@ -3,7 +3,6 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit RadioGroup extends Terminal.Gui.View" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -18,11 +17,31 @@
   </Docs>
   <Members>
     <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public RadioGroup (string[] radioLabels, int selected = 0);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string[] radioLabels, int32 selected) cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="radioLabels" Type="System.String[]" />
+        <Parameter Name="selected" Type="System.Int32" />
+      </Parameters>
+      <Docs>
+        <param name="radioLabels">Radio labels, the strings can contain hotkeys using an undermine before the letter.</param>
+        <param name="selected">The item to be selected, the value is clamped to the number of items.</param>
+        <summary>
+            Initializes a new instance of the <see cref="T:Terminal.Gui.RadioGroup" /> class
+            setting up the initial set of radio labels and the item that should be selected.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName=".ctor">
       <MemberSignature Language="C#" Value="public RadioGroup (Terminal.Gui.Rect rect, string[] radioLabels, int selected = 0);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(valuetype Terminal.Gui.Rect rect, string[] radioLabels, int32 selected) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
@@ -36,7 +55,8 @@
         <param name="selected">The item to be selected, the value is clamped to the number of items.</param>
         <summary>
             Initializes a new instance of the <see cref="T:Terminal.Gui.RadioGroup" /> class
-            setting up the initial set of radio labels and the item that should be selected.
+            setting up the initial set of radio labels and the item that should be selected and uses
+            an absolute layout for the result.
             </summary>
         <remarks>To be added.</remarks>
       </Docs>
@@ -46,7 +66,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, string[] radioLabels, int32 selected) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
@@ -73,7 +92,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool MouseEvent(valuetype Terminal.Gui.MouseEvent me) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -94,7 +112,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void PositionCursor() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -126,32 +143,11 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
-    <Member MemberName="ProcessHotKey">
-      <MemberSignature Language="C#" Value="public override bool ProcessHotKey (Terminal.Gui.KeyEvent kb);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessHotKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
-      <MemberType>Method</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <ReturnValue>
-        <ReturnType>System.Boolean</ReturnType>
-      </ReturnValue>
-      <Parameters>
-        <Parameter Name="kb" Type="Terminal.Gui.KeyEvent" />
-      </Parameters>
-      <Docs>
-        <param name="kb">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
-      </Docs>
-    </Member>
     <Member MemberName="ProcessKey">
       <MemberSignature Language="C#" Value="public override bool ProcessKey (Terminal.Gui.KeyEvent kb);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -172,7 +168,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance string[] RadioLabels" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -191,7 +186,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Redraw(valuetype Terminal.Gui.Rect region) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -211,7 +205,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance int32 Selected" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -230,7 +223,6 @@
       <MemberSignature Language="ILAsm" Value=".field public class System.Action`1&lt;int32&gt; SelectionChanged" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>

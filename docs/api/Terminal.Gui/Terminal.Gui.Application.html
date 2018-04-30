@@ -84,7 +84,7 @@
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Application_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class Application</code></pre>
+    <pre><code class="lang-csharp hljs">public static class Application</code></pre>
   </div>
   <h5 id="Terminal_Gui_Application_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks"><p>
@@ -99,18 +99,6 @@
                 When invoked sets the SynchronizationContext to one that is tied
                 to the mainloop, allowing user code to use async/await.
               </p></div>
-  <h3 id="constructors">Constructors
-  </h3>
-  
-  
-  <a id="Terminal_Gui_Application__ctor_" data-uid="Terminal.Gui.Application.#ctor*"></a>
-  <h4 id="Terminal_Gui_Application__ctor" data-uid="Terminal.Gui.Application.#ctor">Application()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Application ();</code></pre>
-  </div>
   <h3 id="fields">Fields
   </h3>
   
@@ -352,8 +340,8 @@
     <tbody>
       <tr>
         <td></td>
-        <td><span class="parametername">rs</span></td>
-        <td><p>To be added.</p>
+        <td><span class="parametername">runState</span></td>
+        <td><p>The runstate returned by the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_">Begin(Toplevel)</a> method.</p>
 </td>
       </tr>
     </tbody>

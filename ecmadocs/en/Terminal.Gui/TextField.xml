@@ -3,7 +3,6 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit TextField extends Terminal.Gui.View" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -21,28 +20,45 @@
   </Docs>
   <Members>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public TextField (int x, int y, int w, string s);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, int32 w, string s) cil managed" />
+      <MemberSignature Language="C#" Value="public TextField (NStack.ustring text);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class NStack.ustring text) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="text" Type="NStack.ustring" />
+      </Parameters>
+      <Docs>
+        <param name="text">Initial text contents.</param>
+        <summary>
+               Public constructor that creates a text field, with layout controlled with X, Y, Width and Height.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public TextField (int x, int y, int w, NStack.ustring text);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, int32 w, class NStack.ustring text) cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
         <Parameter Name="x" Type="System.Int32" />
         <Parameter Name="y" Type="System.Int32" />
         <Parameter Name="w" Type="System.Int32" />
-        <Parameter Name="s" Type="System.String" />
+        <Parameter Name="text" Type="NStack.ustring" />
       </Parameters>
       <Docs>
-        <param name="x">To be added.</param>
-        <param name="y">To be added.</param>
-        <param name="w">To be added.</param>
-        <param name="s">To be added.</param>
+        <param name="x">The x coordinate.</param>
+        <param name="y">The y coordinate.</param>
+        <param name="w">The width.</param>
+        <param name="text">Initial text contents.</param>
         <summary>
-              Public constructor.
+               Public constructor that creates a text field at an absolute position and size.
             </summary>
-        <remarks />
+        <remarks>To be added.</remarks>
       </Docs>
     </Member>
     <Member MemberName="CanFocus">
@@ -50,7 +66,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanFocus" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -67,7 +82,6 @@
       <MemberSignature Language="ILAsm" Value=".event class System.EventHandler Changed" />
       <MemberType>Event</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -88,7 +102,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance int32 CursorPosition" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -102,12 +115,27 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="Frame">
+      <MemberSignature Language="C#" Value="public override Terminal.Gui.Rect Frame { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance valuetype Terminal.Gui.Rect Frame" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.Rect</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>To be added.</summary>
+        <value>To be added.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="MouseEvent">
       <MemberSignature Language="C#" Value="public override bool MouseEvent (Terminal.Gui.MouseEvent ev);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool MouseEvent(valuetype Terminal.Gui.MouseEvent ev) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -128,7 +156,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void PositionCursor() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -147,7 +174,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -168,7 +194,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Redraw(valuetype Terminal.Gui.Rect region) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -188,7 +213,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool Secret" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -209,7 +233,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance class NStack.ustring Text" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>

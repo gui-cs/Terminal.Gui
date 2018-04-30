@@ -3,7 +3,6 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit Window extends Terminal.Gui.Toplevel implements class System.Collections.IEnumerable" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -22,11 +21,50 @@
   </Docs>
   <Members>
     <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public Window (NStack.ustring title = null);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class NStack.ustring title) cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="title" Type="NStack.ustring" />
+      </Parameters>
+      <Docs>
+        <param name="title">Title.</param>
+        <summary>
+            Initializes a new instance of the <see cref="T:Terminal.Gui.Window" /> class with an optional title.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public Window (NStack.ustring title = null, int padding = 0);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class NStack.ustring title, int32 padding) cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="title" Type="NStack.ustring" />
+        <Parameter Name="padding" Type="System.Int32" />
+      </Parameters>
+      <Docs>
+        <param name="title">Title.</param>
+        <param name="padding">Number of characters to use for padding of the drawn frame.</param>
+        <summary>
+            Initializes a new instance of the <see cref="T:Terminal.Gui.Window" /> with
+            the specified frame for its location, with the specified border 
+            an optional title.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName=".ctor">
       <MemberSignature Language="C#" Value="public Window (Terminal.Gui.Rect frame, NStack.ustring title = null);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(valuetype Terminal.Gui.Rect frame, class NStack.ustring title) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
@@ -37,24 +75,7 @@
         <param name="frame">Frame.</param>
         <param name="title">Title.</param>
         <summary>
-            Initializes a new instance of the <see cref="T:Terminal.Gui.Gui.Window" /> class with an optioanl title
-            </summary>
-        <remarks>To be added.</remarks>
-      </Docs>
-    </Member>
-    <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public Window (Terminal.Gui.Rect frame, string title = null);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(valuetype Terminal.Gui.Rect frame, string title) cil managed" />
-      <MemberType>Constructor</MemberType>
-      <Parameters>
-        <Parameter Name="frame" Type="Terminal.Gui.Rect" />
-        <Parameter Name="title" Type="System.String" />
-      </Parameters>
-      <Docs>
-        <param name="frame">Frame.</param>
-        <param name="title">Title.</param>
-        <summary>
-            Initializes a new instance of the <see cref="T:Terminal.Window" /> class with an optioanl title
+            Initializes a new instance of the <see cref="T:Terminal.Gui.Gui.Window" /> class with an optional title and a set frame.
             </summary>
         <remarks>To be added.</remarks>
       </Docs>
@@ -64,7 +85,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(valuetype Terminal.Gui.Rect frame, class NStack.ustring title, int32 padding) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
@@ -89,7 +109,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Add(class Terminal.Gui.View view) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -111,7 +130,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance class System.Collections.IEnumerator GetEnumerator() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -131,14 +149,13 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool MouseEvent(valuetype Terminal.Gui.MouseEvent mouseEvent) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
       </ReturnValue>
       <Parameters>
-        <Parameter Name="me" Type="Terminal.Gui.MouseEvent" />
+        <Parameter Name="mouseEvent" Type="Terminal.Gui.MouseEvent" />
       </Parameters>
       <Docs>
         <param name="mouseEvent">To be added.</param>
@@ -152,7 +169,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Redraw(valuetype Terminal.Gui.Rect bounds) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -172,7 +188,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Remove(class Terminal.Gui.View view) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -194,7 +209,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance class NStack.ustring Title" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>

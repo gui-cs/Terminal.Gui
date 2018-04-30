@@ -98,9 +98,9 @@ items:
   syntax:
     content: public virtual bool MouseEvent (Terminal.Gui.MouseEvent mouseEvent);
     parameters:
-    - id: me
+    - id: mouseEvent
       type: Terminal.Gui.MouseEvent
-      description: To be added.
+      description: Contains the details about the mouse event.
     return:
       type: System.Boolean
       description: <code>true</code>, if the event was handled, <code>false</code> otherwise.
@@ -140,9 +140,9 @@ items:
   syntax:
     content: public virtual bool ProcessColdKey (Terminal.Gui.KeyEvent keyEvent);
     parameters:
-    - id: kb
+    - id: keyEvent
       type: Terminal.Gui.KeyEvent
-      description: To be added.
+      description: Contains the details about the key that produced the event.
     return:
       type: System.Boolean
       description: To be added.
@@ -209,9 +209,9 @@ items:
   syntax:
     content: public virtual bool ProcessKey (Terminal.Gui.KeyEvent keyEvent);
     parameters:
-    - id: kb
+    - id: keyEvent
       type: Terminal.Gui.KeyEvent
-      description: To be added.
+      description: Contains the details about the key that produced the event.
     return:
       type: System.Boolean
       description: To be added.

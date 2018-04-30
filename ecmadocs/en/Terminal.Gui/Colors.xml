@@ -3,7 +3,6 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi abstract sealed beforefieldinit Colors extends System.Object" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -22,7 +21,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static class Terminal.Gui.ColorScheme Base" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -40,7 +38,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static class Terminal.Gui.ColorScheme Dialog" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -58,7 +55,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static class Terminal.Gui.ColorScheme Error" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -76,7 +72,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static class Terminal.Gui.ColorScheme Menu" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>

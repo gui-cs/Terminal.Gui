@@ -34,7 +34,7 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Releases all resource used by the <xref href="Terminal.Gui.Application.RunState"></xref> object.
+  summary: Releases alTop = l resource used by the <xref href="Terminal.Gui.Application.RunState"></xref> object.
   remarks: >-
     Call <xref href="Terminal.Gui.Application.RunState.Dispose"></xref> when you are finished using the <xref href="Terminal.Gui.Application.RunState"></xref>. The
                 <xref href="Terminal.Gui.Application.RunState.Dispose"></xref> method leaves the <xref href="Terminal.Gui.Application.RunState"></xref> in an unusable state. After

@@ -3,7 +3,6 @@
   <TypeSignature Language="ILAsm" Value=".class public sequential ansi sealed beforefieldinit KeyEvent extends System.ValueType" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -22,7 +21,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(valuetype Terminal.Gui.Key k) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
@@ -41,7 +39,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool IsAlt" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -61,7 +58,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool IsCtrl" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -81,7 +77,6 @@
       <MemberSignature Language="ILAsm" Value=".field public valuetype Terminal.Gui.Key Key" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -99,7 +94,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance int32 KeyValue" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>

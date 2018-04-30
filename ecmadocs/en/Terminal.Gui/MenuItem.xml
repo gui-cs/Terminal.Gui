@@ -3,7 +3,6 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit MenuItem extends System.Object" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -22,7 +21,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class NStack.ustring title, string help, class System.Action action) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
@@ -40,31 +38,11 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
-    <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public MenuItem (string title, string help, Action action);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string title, string help, class System.Action action) cil managed" />
-      <MemberType>Constructor</MemberType>
-      <Parameters>
-        <Parameter Name="title" Type="System.String" />
-        <Parameter Name="help" Type="System.String" />
-        <Parameter Name="action" Type="System.Action" />
-      </Parameters>
-      <Docs>
-        <param name="title">Title for the menu item.</param>
-        <param name="help">Help text to display.</param>
-        <param name="action">Action to invoke when the menu item is activated.</param>
-        <summary>
-            Initializes a new <see cref="T:Terminal.MenuItem" />.
-            </summary>
-        <remarks>To be added.</remarks>
-      </Docs>
-    </Member>
     <Member MemberName="Action">
       <MemberSignature Language="C#" Value="public Action Action { get; set; }" />
       <MemberSignature Language="ILAsm" Value=".property instance class System.Action Action" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -83,7 +61,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance class NStack.ustring Help" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -102,7 +79,6 @@
       <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune HotKey" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -122,7 +98,6 @@
       <MemberSignature Language="ILAsm" Value=".field public valuetype Terminal.Gui.Key ShortCut" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -140,7 +115,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance class NStack.ustring Title" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>

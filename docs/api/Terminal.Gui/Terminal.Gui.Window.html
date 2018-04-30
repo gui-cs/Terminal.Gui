@@ -102,9 +102,6 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">View.Add(View[])</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCh_System_Int32_System_Int32_System_Int32_">View.AddCh(Int32, Int32, Int32)</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddRune_System_Int32_System_Int32_System_Rune_">View.AddRune(Int32, Int32, Rune)</a>
     </div>
     <div>
@@ -129,9 +126,6 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ColorScheme">View.ColorScheme</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Boolean_">View.DrawFrame(Rect, Boolean)</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_">View.DrawFrame(Rect, Int32, Boolean)</a>
     </div>
     <div>
@@ -139,12 +133,6 @@
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">View.DrawHotString(ustring, Attribute, Attribute)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_System_String_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(String, Boolean, ColorScheme)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_System_String_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">View.DrawHotString(String, Attribute, Attribute)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
@@ -174,7 +162,13 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">View.Height</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Id">View.Id</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle">View.LayoutStyle</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
@@ -224,6 +218,15 @@
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_WantMousePositionReports">View.WantMousePositionReports</a>
     </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">View.Width</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_X">View.X</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Y">View.Y</a>
+    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="../Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
@@ -236,8 +239,74 @@
   
   
   <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
+  <h4 id="Terminal_Gui_Window__ctor_NStack_ustring_" data-uid="Terminal.Gui.Window.#ctor(NStack.ustring)">Window(ustring)</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Terminal.Gui.Window.html">Window</a> class with an optional title.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Window (NStack.ustring title = null);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">title</span></td>
+        <td><p>Title.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
+  <h4 id="Terminal_Gui_Window__ctor_NStack_ustring_System_Int32_" data-uid="Terminal.Gui.Window.#ctor(NStack.ustring,System.Int32)">Window(ustring, Int32)</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Terminal.Gui.Window.html">Window</a> with
+            the specified frame for its location, with the specified border 
+            an optional title.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Window (NStack.ustring title = null, int padding = 0);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">title</span></td>
+        <td><p>Title.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">padding</span></td>
+        <td><p>Number of characters to use for padding of the drawn frame.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
   <h4 id="Terminal_Gui_Window__ctor_Terminal_Gui_Rect_NStack_ustring_" data-uid="Terminal.Gui.Window.#ctor(Terminal.Gui.Rect,NStack.ustring)">Window(Rect, ustring)</h4>
-  <div class="markdown level1 summary"><p>Initializes a new instance of the <span class="xref">Terminal.Gui.Gui.Window</span> class with an optioanl title</p>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <span class="xref">Terminal.Gui.Gui.Window</span> class with an optional title and a set frame.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -262,41 +331,6 @@
       </tr>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">title</span></td>
-        <td><p>Title.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
-  <h4 id="Terminal_Gui_Window__ctor_Terminal_Gui_Rect_System_String_" data-uid="Terminal.Gui.Window.#ctor(Terminal.Gui.Rect,System.String)">Window(Rect, String)</h4>
-  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="../Terminal/Terminal.Window.html">Window</a> class with an optioanl title</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Window (Terminal.Gui.Rect frame, string title = null);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
-        <td><span class="parametername">frame</span></td>
-        <td><p>Frame.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.String</span></td>
         <td><span class="parametername">title</span></td>
         <td><p>Title.</p>
 </td>
@@ -455,7 +489,7 @@
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></td>
-        <td><span class="parametername">me</span></td>
+        <td><span class="parametername">mouseEvent</span></td>
         <td><p>To be added.</p>
 </td>
       </tr>

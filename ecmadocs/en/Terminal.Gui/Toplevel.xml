@@ -3,7 +3,6 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit Toplevel extends Terminal.Gui.View" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -30,11 +29,25 @@
   </Docs>
   <Members>
     <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public Toplevel ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor() cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters />
+      <Docs>
+        <summary>
+            Initializes a new instance of the <see cref="T:Terminal.Gui.Toplevel" /> class with Computed layout, defaulting to <see langword="async" /> full screen.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName=".ctor">
       <MemberSignature Language="C#" Value="public Toplevel (Terminal.Gui.Rect frame);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(valuetype Terminal.Gui.Rect frame) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
@@ -43,7 +56,7 @@
       <Docs>
         <param name="frame">Frame.</param>
         <summary>
-            Initializes a new instance of the <see cref="T:Terminal.Gui.Toplevel" /> class.
+            Initializes a new instance of the <see cref="T:Terminal.Gui.Toplevel" /> class with the specified absolute layout.
             </summary>
         <remarks>To be added.</remarks>
       </Docs>
@@ -53,7 +66,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool CanFocus" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -70,7 +82,6 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class Terminal.Gui.Toplevel Create() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -90,14 +101,13 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessKey(valuetype Terminal.Gui.KeyEvent keyEvent) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Boolean</ReturnType>
       </ReturnValue>
       <Parameters>
-        <Parameter Name="kb" Type="Terminal.Gui.KeyEvent" />
+        <Parameter Name="keyEvent" Type="Terminal.Gui.KeyEvent" />
       </Parameters>
       <Docs>
         <param name="keyEvent">To be added.</param>
@@ -111,7 +121,6 @@
       <MemberSignature Language="ILAsm" Value=".field public bool Running" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>

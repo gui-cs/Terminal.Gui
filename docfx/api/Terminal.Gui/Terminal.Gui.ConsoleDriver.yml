@@ -4,11 +4,8 @@ items:
   id: ConsoleDriver
   children:
   - Terminal.Gui.ConsoleDriver.#ctor
-  - Terminal.Gui.ConsoleDriver.AddCh(System.Int32)
   - Terminal.Gui.ConsoleDriver.AddRune(System.Rune)
-  - Terminal.Gui.ConsoleDriver.AddSpecial(Terminal.Gui.SpecialChar)
   - Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)
-  - Terminal.Gui.ConsoleDriver.AddStr(System.String)
   - Terminal.Gui.ConsoleDriver.BottomTee
   - Terminal.Gui.ConsoleDriver.Clip
   - Terminal.Gui.ConsoleDriver.Cols
@@ -23,7 +20,6 @@ items:
   - Terminal.Gui.ConsoleDriver.LRCorner
   - Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
   - Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
-  - Terminal.Gui.ConsoleDriver.RedrawTop
   - Terminal.Gui.ConsoleDriver.Refresh
   - Terminal.Gui.ConsoleDriver.RightTee
   - Terminal.Gui.ConsoleDriver.Rows
@@ -74,26 +70,6 @@ items:
     parameters: []
   overload: Terminal.Gui.ConsoleDriver.#ctor*
   exceptions: []
-- uid: Terminal.Gui.ConsoleDriver.AddCh(System.Int32)
-  id: AddCh(System.Int32)
-  parent: Terminal.Gui.ConsoleDriver
-  langs:
-  - csharp
-  name: AddCh(Int32)
-  nameWithType: ConsoleDriver.AddCh(Int32)
-  fullName: ConsoleDriver.AddCh(Int32)
-  type: Method
-  assemblies: []
-  namespace: Terminal.Gui
-  summary: Adds the specified rune to the display at the current cursor position
-  syntax:
-    content: public abstract void AddCh (int rune);
-    parameters:
-    - id: rune
-      type: System.Int32
-      description: Rune to add.
-  overload: Terminal.Gui.ConsoleDriver.AddCh*
-  exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.AddRune(System.Rune)
   id: AddRune(System.Rune)
   parent: Terminal.Gui.ConsoleDriver
@@ -115,26 +91,6 @@ items:
       description: Rune to add.
   overload: Terminal.Gui.ConsoleDriver.AddRune*
   exceptions: []
-- uid: Terminal.Gui.ConsoleDriver.AddSpecial(Terminal.Gui.SpecialChar)
-  id: AddSpecial(Terminal.Gui.SpecialChar)
-  parent: Terminal.Gui.ConsoleDriver
-  langs:
-  - csharp
-  name: AddSpecial(SpecialChar)
-  nameWithType: ConsoleDriver.AddSpecial(SpecialChar)
-  fullName: ConsoleDriver.AddSpecial(SpecialChar)
-  type: Method
-  assemblies: []
-  namespace: Terminal.Gui
-  summary: Draws a special characters in the screen
-  syntax:
-    content: public abstract void AddSpecial (Terminal.Gui.SpecialChar ch);
-    parameters:
-    - id: ch
-      type: Terminal.Gui.SpecialChar
-      description: Ch.
-  overload: Terminal.Gui.ConsoleDriver.AddSpecial*
-  exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)
   id: AddStr(NStack.ustring)
   parent: Terminal.Gui.ConsoleDriver
@@ -153,26 +109,6 @@ items:
     parameters:
     - id: str
       type: NStack.ustring
-      description: String.
-  overload: Terminal.Gui.ConsoleDriver.AddStr*
-  exceptions: []
-- uid: Terminal.Gui.ConsoleDriver.AddStr(System.String)
-  id: AddStr(System.String)
-  parent: Terminal.Gui.ConsoleDriver
-  langs:
-  - csharp
-  name: AddStr(String)
-  nameWithType: ConsoleDriver.AddStr(String)
-  fullName: ConsoleDriver.AddStr(String)
-  type: Method
-  assemblies: []
-  namespace: Terminal.Gui
-  summary: Adds the specified
-  syntax:
-    content: public abstract void AddStr (string str);
-    parameters:
-    - id: str
-      type: System.String
       description: String.
   overload: Terminal.Gui.ConsoleDriver.AddStr*
   exceptions: []
@@ -456,30 +392,13 @@ items:
     - id: mainLoop
       type: Mono.Terminal.MainLoop
       description: To be added.
-    - id: target
+    - id: keyHandler
       type: System.Action{Terminal.Gui.KeyEvent}
       description: To be added.
-    - id: mouse
+    - id: mouseHandler
       type: System.Action{Terminal.Gui.MouseEvent}
       description: To be added.
   overload: Terminal.Gui.ConsoleDriver.PrepareToRun*
-  exceptions: []
-- uid: Terminal.Gui.ConsoleDriver.RedrawTop
-  id: RedrawTop
-  parent: Terminal.Gui.ConsoleDriver
-  langs:
-  - csharp
-  name: RedrawTop()
-  nameWithType: ConsoleDriver.RedrawTop()
-  fullName: ConsoleDriver.RedrawTop()
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  syntax:
-    content: public abstract void RedrawTop ();
-    parameters: []
-  overload: Terminal.Gui.ConsoleDriver.RedrawTop*
   exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.Refresh
   id: Refresh
@@ -820,18 +739,6 @@ references:
   name: ConsoleDriver()
   nameWithType: ConsoleDriver.ConsoleDriver()
   fullName: ConsoleDriver.ConsoleDriver()
-- uid: Terminal.Gui.ConsoleDriver.AddCh(System.Int32)
-  parent: Terminal.Gui.ConsoleDriver
-  isExternal: false
-  name: AddCh(Int32)
-  nameWithType: ConsoleDriver.AddCh(Int32)
-  fullName: ConsoleDriver.AddCh(Int32)
-- uid: System.Int32
-  parent: System
-  isExternal: true
-  name: Int32
-  nameWithType: Int32
-  fullName: System.Int32
 - uid: Terminal.Gui.ConsoleDriver.AddRune(System.Rune)
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -844,18 +751,6 @@ references:
   name: Rune
   nameWithType: Rune
   fullName: System.Rune
-- uid: Terminal.Gui.ConsoleDriver.AddSpecial(Terminal.Gui.SpecialChar)
-  parent: Terminal.Gui.ConsoleDriver
-  isExternal: false
-  name: AddSpecial(SpecialChar)
-  nameWithType: ConsoleDriver.AddSpecial(SpecialChar)
-  fullName: ConsoleDriver.AddSpecial(SpecialChar)
-- uid: Terminal.Gui.SpecialChar
-  parent: Terminal.Gui
-  isExternal: false
-  name: SpecialChar
-  nameWithType: SpecialChar
-  fullName: Terminal.Gui.SpecialChar
 - uid: Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -868,18 +763,6 @@ references:
   name: ustring
   nameWithType: ustring
   fullName: NStack.ustring
-- uid: Terminal.Gui.ConsoleDriver.AddStr(System.String)
-  parent: Terminal.Gui.ConsoleDriver
-  isExternal: false
-  name: AddStr(String)
-  nameWithType: ConsoleDriver.AddStr(String)
-  fullName: ConsoleDriver.AddStr(String)
-- uid: System.String
-  parent: System
-  isExternal: true
-  name: String
-  nameWithType: String
-  fullName: System.String
 - uid: Terminal.Gui.ConsoleDriver.BottomTee
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -904,6 +787,12 @@ references:
   name: Cols
   nameWithType: ConsoleDriver.Cols
   fullName: ConsoleDriver.Cols
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
 - uid: Terminal.Gui.ConsoleDriver.CookMouse
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -1042,12 +931,6 @@ references:
   - name: '>'
     nameWithType: '>'
     fullName: '>'
-- uid: Terminal.Gui.ConsoleDriver.RedrawTop
-  parent: Terminal.Gui.ConsoleDriver
-  isExternal: false
-  name: RedrawTop()
-  nameWithType: ConsoleDriver.RedrawTop()
-  fullName: ConsoleDriver.RedrawTop()
 - uid: Terminal.Gui.ConsoleDriver.Refresh
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -1174,24 +1057,12 @@ references:
   name: ConsoleDriver
   nameWithType: ConsoleDriver.ConsoleDriver
   fullName: ConsoleDriver.ConsoleDriver
-- uid: Terminal.Gui.ConsoleDriver.AddCh*
-  parent: Terminal.Gui.ConsoleDriver
-  isExternal: false
-  name: AddCh
-  nameWithType: ConsoleDriver.AddCh
-  fullName: ConsoleDriver.AddCh
 - uid: Terminal.Gui.ConsoleDriver.AddRune*
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
   name: AddRune
   nameWithType: ConsoleDriver.AddRune
   fullName: ConsoleDriver.AddRune
-- uid: Terminal.Gui.ConsoleDriver.AddSpecial*
-  parent: Terminal.Gui.ConsoleDriver
-  isExternal: false
-  name: AddSpecial
-  nameWithType: ConsoleDriver.AddSpecial
-  fullName: ConsoleDriver.AddSpecial
 - uid: Terminal.Gui.ConsoleDriver.AddStr*
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -1246,12 +1117,6 @@ references:
   name: PrepareToRun
   nameWithType: ConsoleDriver.PrepareToRun
   fullName: ConsoleDriver.PrepareToRun
-- uid: Terminal.Gui.ConsoleDriver.RedrawTop*
-  parent: Terminal.Gui.ConsoleDriver
-  isExternal: false
-  name: RedrawTop
-  nameWithType: ConsoleDriver.RedrawTop
-  fullName: ConsoleDriver.RedrawTop
 - uid: Terminal.Gui.ConsoleDriver.Refresh*
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false

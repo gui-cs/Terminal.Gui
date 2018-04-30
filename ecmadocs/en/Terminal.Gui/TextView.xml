@@ -10,15 +10,25 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>
-              Text data entry widget
-            </summary>
-    <remarks>
-              The Entry widget provides Emacs-like editing
-              functionality,  and mouse support.
-            </remarks>
+    <summary>To be added.</summary>
+    <remarks>To be added.</remarks>
   </Docs>
   <Members>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public TextView ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor() cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters />
+      <Docs>
+        <summary>
+            Public constructor, creates a view on the specified area, with dimensions controlled with the X, Y, Width and Height properties.
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName=".ctor">
       <MemberSignature Language="C#" Value="public TextView (Terminal.Gui.Rect frame);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(valuetype Terminal.Gui.Rect frame) cil managed" />
@@ -32,7 +42,7 @@
       <Docs>
         <param name="frame">To be added.</param>
         <summary>
-              Public constructor.
+              Public constructor, creates a view on the specified area, with absolute position and size.
             </summary>
         <remarks />
       </Docs>
@@ -50,22 +60,6 @@
       <Docs>
         <summary>To be added.</summary>
         <value>To be added.</value>
-        <remarks>To be added.</remarks>
-      </Docs>
-    </Member>
-    <Member MemberName="ClearRegion">
-      <MemberSignature Language="C#" Value="public void ClearRegion ();" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void ClearRegion() cil managed" />
-      <MemberType>Method</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <ReturnValue>
-        <ReturnType>System.Void</ReturnType>
-      </ReturnValue>
-      <Parameters />
-      <Docs>
-        <summary>To be added.</summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -105,18 +99,67 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
-    <Member MemberName="GetRegion">
-      <MemberSignature Language="C#" Value="public NStack.ustring GetRegion ();" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance class NStack.ustring GetRegion() cil managed" />
+    <Member MemberName="LoadFile">
+      <MemberSignature Language="C#" Value="public bool LoadFile (string path);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance bool LoadFile(string path) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
-        <ReturnType>NStack.ustring</ReturnType>
+        <ReturnType>System.Boolean</ReturnType>
       </ReturnValue>
-      <Parameters />
+      <Parameters>
+        <Parameter Name="path" Type="System.String" />
+      </Parameters>
       <Docs>
+        <param name="path">Path to the file to load.</param>
+        <summary>
+            Loads the contents of the file into the TextView.
+            </summary>
+        <returns>
+          <c>true</c>, if file was loaded, <c>false</c> otherwise.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="LoadStream">
+      <MemberSignature Language="C#" Value="public void LoadStream (System.IO.Stream stream);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void LoadStream(class System.IO.Stream stream) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="stream" Type="System.IO.Stream" />
+      </Parameters>
+      <Docs>
+        <param name="stream">Stream to load the contents from.</param>
+        <summary>
+            Loads the contents of the stream into the TextView.
+            </summary>
+        <returns>
+          <c>true</c>, if stream was loaded, <c>false</c> otherwise.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="MouseEvent">
+      <MemberSignature Language="C#" Value="public override bool MouseEvent (Terminal.Gui.MouseEvent ev);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool MouseEvent(valuetype Terminal.Gui.MouseEvent ev) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="ev" Type="Terminal.Gui.MouseEvent" />
+      </Parameters>
+      <Docs>
+        <param name="ev">To be added.</param>
         <summary>To be added.</summary>
         <returns>To be added.</returns>
         <remarks>To be added.</remarks>
@@ -135,7 +178,7 @@
       <Parameters />
       <Docs>
         <summary>
-              Sets the cursor position.
+              Positions the cursor on the current row and column
             </summary>
         <remarks>To be added.</remarks>
       </Docs>

@@ -3,7 +3,6 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi sealed MouseFlags extends System.Enum" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -28,7 +27,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags AllEvents = int32(134217727)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -45,7 +43,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button1Clicked = int32(4)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -62,7 +59,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button1DoubleClicked = int32(8)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -79,7 +75,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button1Pressed = int32(2)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -96,7 +91,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button1Released = int32(1)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -113,7 +107,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button1TripleClicked = int32(16)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -130,7 +123,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button2Clicked = int32(256)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -147,7 +139,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button2DoubleClicked = int32(512)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -164,7 +155,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button2Pressed = int32(128)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -181,7 +171,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button2Released = int32(64)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -198,7 +187,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button2TrippleClicked = int32(1024)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -215,7 +203,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button3Clicked = int32(16384)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -232,7 +219,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button3DoubleClicked = int32(32768)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -249,7 +235,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button3Pressed = int32(8192)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -266,7 +251,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button3Released = int32(4096)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -283,7 +267,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button3TripleClicked = int32(65536)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -300,7 +283,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button4Clicked = int32(1048576)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -317,7 +299,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button4DoubleClicked = int32(2097152)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -334,7 +315,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button4Pressed = int32(524288)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -351,7 +331,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button4Released = int32(262144)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -368,7 +347,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags Button4TripleClicked = int32(4194304)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -385,7 +363,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags ButtonAlt = int32(67108864)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -402,7 +379,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags ButtonCtrl = int32(16777216)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -419,7 +395,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags ButtonShift = int32(33554432)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -436,7 +411,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.MouseFlags ReportMousePosition = int32(134217728)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>

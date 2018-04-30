@@ -3,7 +3,6 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi sealed TextAlignment extends System.Enum" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -21,7 +20,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.TextAlignment Centered = int32(2)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -38,7 +36,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.TextAlignment Justified = int32(3)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -55,7 +52,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.TextAlignment Left = int32(0)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -72,7 +68,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.TextAlignment Right = int32(1)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>

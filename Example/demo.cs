@@ -188,11 +188,19 @@ static class Demo {
 	{
 		//Application.UseSystemConsole = true;
 		Application.Init ();
-
 		var top = Application.Top;
 		var tframe = top.Frame;
 
-		var win = new Window (new Rect (0, 1, tframe.Width, tframe.Height-1), "Hello");
+#if true
+		var win = new Window ("Hello") {
+			X = 0,
+			Y = 1,
+			Width = Dim.Fill (),
+			Height = Dim.Fill () - 1
+		};
+#else
+		var win = new Window (new Rect (0, 1, tframe.Width, tframe.Height - 1), "Hello");
+#endif
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
 				new MenuItem ("Text Editor Demo", "", () => { Editor (top); }),

@@ -94,9 +94,6 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">View.Add(View[])</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCh_System_Int32_System_Int32_System_Int32_">View.AddCh(Int32, Int32, Int32)</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddRune_System_Int32_System_Int32_System_Rune_">View.AddRune(Int32, Int32, Rune)</a>
     </div>
     <div>
@@ -121,9 +118,6 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ColorScheme">View.ColorScheme</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Boolean_">View.DrawFrame(Rect, Boolean)</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_">View.DrawFrame(Rect, Int32, Boolean)</a>
     </div>
     <div>
@@ -131,12 +125,6 @@
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">View.DrawHotString(ustring, Attribute, Attribute)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_System_String_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(String, Boolean, ColorScheme)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_System_String_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">View.DrawHotString(String, Attribute, Attribute)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
@@ -169,7 +157,13 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">View.Height</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Id">View.Id</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle">View.LayoutStyle</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
@@ -219,6 +213,15 @@
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_WantMousePositionReports">View.WantMousePositionReports</a>
     </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">View.Width</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_X">View.X</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Y">View.Y</a>
+    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="../Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
@@ -251,8 +254,66 @@
   
   
   <a id="Terminal_Gui_ListView__ctor_" data-uid="Terminal.Gui.ListView.#ctor*"></a>
+  <h4 id="Terminal_Gui_ListView__ctor_System_Collections_IList_" data-uid="Terminal.Gui.ListView.#ctor(System.Collections.IList)">ListView(IList)</h4>
+  <div class="markdown level1 summary"><p>Initializes a new ListView that will display the contents of the object implementing the IList interface, with relative positioning</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ListView (System.Collections.IList source);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.IList</span></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>An IList data source, if the elements of the IList are strings or ustrings, the string is rendered, otherwise the ToString() method is invoked on the result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ListView__ctor_" data-uid="Terminal.Gui.ListView.#ctor*"></a>
+  <h4 id="Terminal_Gui_ListView__ctor_Terminal_Gui_IListDataSource_" data-uid="Terminal.Gui.ListView.#ctor(Terminal.Gui.IListDataSource)">ListView(IListDataSource)</h4>
+  <div class="markdown level1 summary"><p>Initializes a new ListView that will display the provided data source, uses relative positioning.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ListView (Terminal.Gui.IListDataSource source);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>IListDataSource object that provides a mechanism to render the data. The number of elements on the collection should not change, if you must change, set the &quot;Source&quot; property to reset the internal settings of the ListView.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ListView__ctor_" data-uid="Terminal.Gui.ListView.#ctor*"></a>
   <h4 id="Terminal_Gui_ListView__ctor_Terminal_Gui_Rect_System_Collections_IList_" data-uid="Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,System.Collections.IList)">ListView(Rect, IList)</h4>
-  <div class="markdown level1 summary"><p>Initializes a new ListView that will display the contents of the object implementing the IList interface.</p>
+  <div class="markdown level1 summary"><p>Initializes a new ListView that will display the contents of the object implementing the IList interface with an absolute position.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -287,7 +348,7 @@
   
   <a id="Terminal_Gui_ListView__ctor_" data-uid="Terminal.Gui.ListView.#ctor*"></a>
   <h4 id="Terminal_Gui_ListView__ctor_Terminal_Gui_Rect_Terminal_Gui_IListDataSource_" data-uid="Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,Terminal.Gui.IListDataSource)">ListView(Rect, IListDataSource)</h4>
-  <div class="markdown level1 summary"><p>Initializes a new ListView that will display the provided data source.</p>
+  <div class="markdown level1 summary"><p>Initializes a new ListView that will display the provided data source  with an absolute position</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>

@@ -94,9 +94,6 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">View.Add(View[])</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCh_System_Int32_System_Int32_System_Int32_">View.AddCh(Int32, Int32, Int32)</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddRune_System_Int32_System_Int32_System_Rune_">View.AddRune(Int32, Int32, Rune)</a>
     </div>
     <div>
@@ -121,9 +118,6 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ColorScheme">View.ColorScheme</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Boolean_">View.DrawFrame(Rect, Boolean)</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_">View.DrawFrame(Rect, Int32, Boolean)</a>
     </div>
     <div>
@@ -131,12 +125,6 @@
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">View.DrawHotString(ustring, Attribute, Attribute)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_System_String_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(String, Boolean, ColorScheme)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_System_String_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">View.DrawHotString(String, Attribute, Attribute)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
@@ -169,7 +157,13 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">View.Height</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Id">View.Id</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle">View.LayoutStyle</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
@@ -219,6 +213,15 @@
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_WantMousePositionReports">View.WantMousePositionReports</a>
     </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">View.Width</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_X">View.X</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Y">View.Y</a>
+    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="../Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
@@ -231,9 +234,44 @@
   
   
   <a id="Terminal_Gui_CheckBox__ctor_" data-uid="Terminal.Gui.CheckBox.#ctor*"></a>
+  <h4 id="Terminal_Gui_CheckBox__ctor_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.CheckBox.#ctor(NStack.ustring,System.Boolean)">CheckBox(ustring, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Public constructor, creates a CheckButton based on the given text, uses Computed layout and sets the height and width.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CheckBox (NStack.ustring s, bool is_checked = false);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">s</span></td>
+        <td><p>S.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">is_checked</span></td>
+        <td><p>If set to <code>true</code> is checked.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_CheckBox__ctor_" data-uid="Terminal.Gui.CheckBox.#ctor*"></a>
   <h4 id="Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_NStack_ustring_" data-uid="Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,NStack.ustring)">CheckBox(Int32, Int32, ustring)</h4>
   <div class="markdown level1 summary"><p>Public constructor, creates a CheckButton based on
-              the given text at the given position.</p>
+              the given text at an absolute position.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -271,52 +309,6 @@
     </tbody>
   </table>
   <h5 id="Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_NStack_ustring__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>The size of CheckButton is computed based on the
-              text length. This CheckButton is not toggled.</p>
-</div>
-  
-  
-  <a id="Terminal_Gui_CheckBox__ctor_" data-uid="Terminal.Gui.CheckBox.#ctor*"></a>
-  <h4 id="Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_System_String_" data-uid="Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,System.String)">CheckBox(Int32, Int32, String)</h4>
-  <div class="markdown level1 summary"><p>Public constructor, creates a CheckButton based on
-              the given text at the given position.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public CheckBox (int x, int y, string s);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">x</span></td>
-        <td><p>To be added.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">y</span></td>
-        <td><p>To be added.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.String</span></td>
-        <td><span class="parametername">s</span></td>
-        <td><p>To be added.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 id="Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_System_String__remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>The size of CheckButton is computed based on the
               text length. This CheckButton is not toggled.</p>
 </div>
@@ -369,58 +361,6 @@
     </tbody>
   </table>
   <h5 id="Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_NStack_ustring_System_Boolean__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>The size of CheckButton is computed based on the
-              text length.</p>
-</div>
-  
-  
-  <a id="Terminal_Gui_CheckBox__ctor_" data-uid="Terminal.Gui.CheckBox.#ctor*"></a>
-  <h4 id="Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_System_String_System_Boolean_" data-uid="Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,System.String,System.Boolean)">CheckBox(Int32, Int32, String, Boolean)</h4>
-  <div class="markdown level1 summary"><p>Public constructor, creates a CheckButton based on
-              the given text at the given position and a state.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public CheckBox (int x, int y, string s, bool is_checked);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">x</span></td>
-        <td><p>To be added.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">y</span></td>
-        <td><p>To be added.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.String</span></td>
-        <td><span class="parametername">s</span></td>
-        <td><p>To be added.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">is_checked</span></td>
-        <td><p>To be added.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 id="Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_System_String_System_Boolean__remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>The size of CheckButton is computed based on the
               text length.</p>
 </div>

@@ -499,35 +499,6 @@
   </h3>
   
   
-  <a id="Terminal_Gui_ConsoleDriver_AddCh_" data-uid="Terminal.Gui.ConsoleDriver.AddCh*"></a>
-  <h4 id="Terminal_Gui_ConsoleDriver_AddCh_System_Int32_" data-uid="Terminal.Gui.ConsoleDriver.AddCh(System.Int32)">AddCh(Int32)</h4>
-  <div class="markdown level1 summary"><p>Adds the specified rune to the display at the current cursor position</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract void AddCh (int rune);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">rune</span></td>
-        <td><p>Rune to add.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
   <a id="Terminal_Gui_ConsoleDriver_AddRune_" data-uid="Terminal.Gui.ConsoleDriver.AddRune*"></a>
   <h4 id="Terminal_Gui_ConsoleDriver_AddRune_System_Rune_" data-uid="Terminal.Gui.ConsoleDriver.AddRune(System.Rune)">AddRune(Rune)</h4>
   <div class="markdown level1 summary"><p>Adds the specified rune to the display at the current cursor position</p>
@@ -557,35 +528,6 @@
   </table>
   
   
-  <a id="Terminal_Gui_ConsoleDriver_AddSpecial_" data-uid="Terminal.Gui.ConsoleDriver.AddSpecial*"></a>
-  <h4 id="Terminal_Gui_ConsoleDriver_AddSpecial_Terminal_Gui_SpecialChar_" data-uid="Terminal.Gui.ConsoleDriver.AddSpecial(Terminal.Gui.SpecialChar)">AddSpecial(SpecialChar)</h4>
-  <div class="markdown level1 summary"><p>Draws a special characters in the screen</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract void AddSpecial (Terminal.Gui.SpecialChar ch);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.SpecialChar.html">SpecialChar</a></td>
-        <td><span class="parametername">ch</span></td>
-        <td><p>Ch.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
   <a id="Terminal_Gui_ConsoleDriver_AddStr_" data-uid="Terminal.Gui.ConsoleDriver.AddStr*"></a>
   <h4 id="Terminal_Gui_ConsoleDriver_AddStr_NStack_ustring_" data-uid="Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)">AddStr(ustring)</h4>
   <div class="markdown level1 summary"><p>Adds the specified</p>
@@ -607,35 +549,6 @@
     <tbody>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">str</span></td>
-        <td><p>String.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_ConsoleDriver_AddStr_" data-uid="Terminal.Gui.ConsoleDriver.AddStr*"></a>
-  <h4 id="Terminal_Gui_ConsoleDriver_AddStr_System_String_" data-uid="Terminal.Gui.ConsoleDriver.AddStr(System.String)">AddStr(String)</h4>
-  <div class="markdown level1 summary"><p>Adds the specified</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract void AddStr (string str);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.String</span></td>
         <td><span class="parametername">str</span></td>
         <td><p>String.</p>
 </td>
@@ -797,28 +710,18 @@
       </tr>
       <tr>
         <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a>&gt;</td>
-        <td><span class="parametername">target</span></td>
+        <td><span class="parametername">keyHandler</span></td>
         <td><p>To be added.</p>
 </td>
       </tr>
       <tr>
         <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a>&gt;</td>
-        <td><span class="parametername">mouse</span></td>
+        <td><span class="parametername">mouseHandler</span></td>
         <td><p>To be added.</p>
 </td>
       </tr>
     </tbody>
   </table>
-  
-  
-  <a id="Terminal_Gui_ConsoleDriver_RedrawTop_" data-uid="Terminal.Gui.ConsoleDriver.RedrawTop*"></a>
-  <h4 id="Terminal_Gui_ConsoleDriver_RedrawTop" data-uid="Terminal.Gui.ConsoleDriver.RedrawTop">RedrawTop()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract void RedrawTop ();</code></pre>
-  </div>
   
   
   <a id="Terminal_Gui_ConsoleDriver_Refresh_" data-uid="Terminal.Gui.ConsoleDriver.Refresh*"></a>

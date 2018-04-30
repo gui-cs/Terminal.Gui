@@ -97,9 +97,6 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">View.Add(View[])</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddCh_System_Int32_System_Int32_System_Int32_">View.AddCh(Int32, Int32, Int32)</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AddRune_System_Int32_System_Int32_System_Rune_">View.AddRune(Int32, Int32, Rune)</a>
     </div>
     <div>
@@ -124,9 +121,6 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ColorScheme">View.ColorScheme</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Boolean_">View.DrawFrame(Rect, Boolean)</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_">View.DrawFrame(Rect, Int32, Boolean)</a>
     </div>
     <div>
@@ -134,12 +128,6 @@
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">View.DrawHotString(ustring, Attribute, Attribute)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_System_String_System_Boolean_Terminal_Gui_ColorScheme_">View.DrawHotString(String, Boolean, ColorScheme)</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_System_String_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">View.DrawHotString(String, Attribute, Attribute)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
@@ -172,7 +160,13 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">View.Height</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Id">View.Id</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle">View.LayoutStyle</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
@@ -228,6 +222,15 @@
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_WantMousePositionReports">View.WantMousePositionReports</a>
     </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">View.Width</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_X">View.X</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Y">View.Y</a>
+    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="../Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
@@ -237,6 +240,35 @@
   </div>
   <h3 id="constructors">Constructors
   </h3>
+  
+  
+  <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
+  <h4 id="Terminal_Gui_Label__ctor_NStack_ustring_" data-uid="Terminal.Gui.Label.#ctor(NStack.ustring)">Label(ustring)</h4>
+  <div class="markdown level1 summary"><p>Public constructor: creates a label and configures the default Width and Height based on the text, the result is suitable for Computed layout.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Label (NStack.ustring text);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">text</span></td>
+        <td><p>Text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
@@ -268,43 +300,6 @@
       </tr>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">text</span></td>
-        <td><p>To be added.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
-  <h4 id="Terminal_Gui_Label__ctor_Terminal_Gui_Rect_System_String_" data-uid="Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,System.String)">Label(Rect, String)</h4>
-  <div class="markdown level1 summary"><p>Public constructor: creates a label at the given
-              coordinate with the given string and uses the specified
-              frame for the string.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Label (Terminal.Gui.Rect rect, string text);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
-        <td><span class="parametername">rect</span></td>
-        <td><p>To be added.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.String</span></td>
         <td><span class="parametername">text</span></td>
         <td><p>To be added.</p>
 </td>
@@ -349,50 +344,6 @@
       </tr>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">text</span></td>
-        <td><p>To be added.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
-  <h4 id="Terminal_Gui_Label__ctor_System_Int32_System_Int32_System_String_" data-uid="Terminal.Gui.Label.#ctor(System.Int32,System.Int32,System.String)">Label(Int32, Int32, String)</h4>
-  <div class="markdown level1 summary"><p>Public constructor: creates a label at the given
-              coordinate with the given string, computes the bounding box
-              based on the size of the string, assumes that the string contains
-              newlines for multiple lines, no special breaking rules are used.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Label (int x, int y, string text);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">x</span></td>
-        <td><p>To be added.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">y</span></td>
-        <td><p>To be added.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.String</span></td>
         <td><span class="parametername">text</span></td>
         <td><p>To be added.</p>
 </td>
@@ -507,57 +458,6 @@
     <tbody>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">text</span></td>
-        <td><p>Text, may contain newlines.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">width</span></td>
-        <td><p>The width for the text.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><p>Number of lines.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_Label_MeasureLines_" data-uid="Terminal.Gui.Label.MeasureLines*"></a>
-  <h4 id="Terminal_Gui_Label_MeasureLines_System_String_System_Int32_" data-uid="Terminal.Gui.Label.MeasureLines(System.String,System.Int32)">MeasureLines(String, Int32)</h4>
-  <div class="markdown level1 summary"><p>Computes the number of lines needed to render the specified text by the Label control</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static int MeasureLines (string text, int width);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.String</span></td>
         <td><span class="parametername">text</span></td>
         <td><p>Text, may contain newlines.</p>
 </td>

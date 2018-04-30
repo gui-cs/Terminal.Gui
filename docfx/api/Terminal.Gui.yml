@@ -14,12 +14,14 @@ items:
   - Terminal.Gui.ColorScheme
   - Terminal.Gui.ConsoleDriver
   - Terminal.Gui.Dialog
+  - Terminal.Gui.Dim
   - Terminal.Gui.FileDialog
   - Terminal.Gui.FrameView
   - Terminal.Gui.IListDataSource
   - Terminal.Gui.Key
   - Terminal.Gui.KeyEvent
   - Terminal.Gui.Label
+  - Terminal.Gui.LayoutStyle
   - Terminal.Gui.ListView
   - Terminal.Gui.MenuBar
   - Terminal.Gui.MenuBarItem
@@ -29,6 +31,7 @@ items:
   - Terminal.Gui.MouseFlags
   - Terminal.Gui.OpenDialog
   - Terminal.Gui.Point
+  - Terminal.Gui.Pos
   - Terminal.Gui.ProgressBar
   - Terminal.Gui.RadioGroup
   - Terminal.Gui.Rect
@@ -117,6 +120,12 @@ references:
   name: Dialog
   nameWithType: Dialog
   fullName: Terminal.Gui.Dialog
+- uid: Terminal.Gui.Dim
+  parent: Terminal.Gui
+  isExternal: false
+  name: Dim
+  nameWithType: Dim
+  fullName: Terminal.Gui.Dim
 - uid: Terminal.Gui.FileDialog
   parent: Terminal.Gui
   isExternal: false
@@ -153,6 +162,12 @@ references:
   name: Label
   nameWithType: Label
   fullName: Terminal.Gui.Label
+- uid: Terminal.Gui.LayoutStyle
+  parent: Terminal.Gui
+  isExternal: false
+  name: LayoutStyle
+  nameWithType: LayoutStyle
+  fullName: Terminal.Gui.LayoutStyle
 - uid: Terminal.Gui.ListView
   parent: Terminal.Gui
   isExternal: false
@@ -207,6 +222,12 @@ references:
   name: Point
   nameWithType: Point
   fullName: Terminal.Gui.Point
+- uid: Terminal.Gui.Pos
+  parent: Terminal.Gui
+  isExternal: false
+  name: Pos
+  nameWithType: Pos
+  fullName: Terminal.Gui.Pos
 - uid: Terminal.Gui.ProgressBar
   parent: Terminal.Gui
   isExternal: false

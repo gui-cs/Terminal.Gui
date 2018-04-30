@@ -3,6 +3,7 @@ items:
 - uid: Terminal.Gui.FrameView
   id: FrameView
   children:
+  - Terminal.Gui.FrameView.#ctor(NStack.ustring)
   - Terminal.Gui.FrameView.#ctor(Terminal.Gui.Rect,NStack.ustring)
   - Terminal.Gui.FrameView.Add(Terminal.Gui.View)
   - Terminal.Gui.FrameView.Redraw(Terminal.Gui.Rect)
@@ -29,7 +30,6 @@ items:
   - Terminal.Gui.Responder.CanFocus
   - Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
   - Terminal.Gui.View.Add(Terminal.Gui.View[])
-  - Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
   - Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
   - Terminal.Gui.View.Bounds
   - Terminal.Gui.View.ChildNeedsDisplay
@@ -38,12 +38,9 @@ items:
   - Terminal.Gui.View.ClearNeedsDisplay
   - Terminal.Gui.View.ClipToBounds
   - Terminal.Gui.View.ColorScheme
-  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
   - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   - Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
   - Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
-  - Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
-  - Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
   - Terminal.Gui.View.Driver
   - Terminal.Gui.View.EnsureFocus
   - Terminal.Gui.View.Focused
@@ -54,7 +51,9 @@ items:
   - Terminal.Gui.View.Frame
   - Terminal.Gui.View.GetEnumerator
   - Terminal.Gui.View.HasFocus
+  - Terminal.Gui.View.Height
   - Terminal.Gui.View.Id
+  - Terminal.Gui.View.LayoutStyle
   - Terminal.Gui.View.LayoutSubviews
   - Terminal.Gui.View.MostFocused
   - Terminal.Gui.View.Move(System.Int32,System.Int32)
@@ -72,6 +71,32 @@ items:
   - Terminal.Gui.View.SuperView
   - Terminal.Gui.View.ToString
   - Terminal.Gui.View.WantMousePositionReports
+  - Terminal.Gui.View.Width
+  - Terminal.Gui.View.X
+  - Terminal.Gui.View.Y
+- uid: Terminal.Gui.FrameView.#ctor(NStack.ustring)
+  id: '#ctor(NStack.ustring)'
+  parent: Terminal.Gui.FrameView
+  langs:
+  - csharp
+  name: FrameView(ustring)
+  nameWithType: FrameView.FrameView(ustring)
+  fullName: FrameView.FrameView(ustring)
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Initializes a new instance of the <xref href="Terminal.Gui.Gui.FrameView"></xref> class with
+                a title and the result is suitable to have its X, Y, Width and Height properties computed.
+  syntax:
+    content: public FrameView (NStack.ustring title);
+    parameters:
+    - id: title
+      type: NStack.ustring
+      description: Title.
+  overload: Terminal.Gui.FrameView.#ctor*
+  exceptions: []
 - uid: Terminal.Gui.FrameView.#ctor(Terminal.Gui.Rect,NStack.ustring)
   id: '#ctor(Terminal.Gui.Rect,NStack.ustring)'
   parent: Terminal.Gui.FrameView
@@ -86,7 +111,7 @@ items:
   namespace: Terminal.Gui
   summary: >-
     Initializes a new instance of the <xref href="Terminal.Gui.Gui.FrameView"></xref> class with
-                a title.
+                an absolute position and a title.
   syntax:
     content: public FrameView (Terminal.Gui.Rect frame, NStack.ustring title);
     parameters:
@@ -187,6 +212,18 @@ references:
   name: View
   nameWithType: View
   fullName: Terminal.Gui.View
+- uid: Terminal.Gui.FrameView.#ctor(NStack.ustring)
+  parent: Terminal.Gui.FrameView
+  isExternal: false
+  name: FrameView(ustring)
+  nameWithType: FrameView.FrameView(ustring)
+  fullName: FrameView.FrameView(ustring)
+- uid: NStack.ustring
+  parent: NStack
+  isExternal: true
+  name: ustring
+  nameWithType: ustring
+  fullName: NStack.ustring
 - uid: Terminal.Gui.FrameView.#ctor(Terminal.Gui.Rect,NStack.ustring)
   parent: Terminal.Gui.FrameView
   isExternal: false
@@ -199,12 +236,6 @@ references:
   name: Rect
   nameWithType: Rect
   fullName: Terminal.Gui.Rect
-- uid: NStack.ustring
-  parent: NStack
-  isExternal: true
-  name: ustring
-  nameWithType: ustring
-  fullName: NStack.ustring
 - uid: Terminal.Gui.FrameView.Add(Terminal.Gui.View)
   parent: Terminal.Gui.FrameView
   isExternal: false
@@ -301,12 +332,6 @@ references:
   name: Add(View[])
   nameWithType: View.Add(View[])
   fullName: View.Add(View[])
-- uid: Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: AddCh(Int32, Int32, Int32)
-  nameWithType: View.AddCh(Int32, Int32, Int32)
-  fullName: View.AddCh(Int32, Int32, Int32)
 - uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
   parent: Terminal.Gui.View
   isExternal: false
@@ -355,12 +380,6 @@ references:
   name: ColorScheme
   nameWithType: View.ColorScheme
   fullName: View.ColorScheme
-- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: DrawFrame(Rect, Boolean)
-  nameWithType: View.DrawFrame(Rect, Boolean)
-  fullName: View.DrawFrame(Rect, Boolean)
 - uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   parent: Terminal.Gui.View
   isExternal: false
@@ -379,18 +398,6 @@ references:
   name: DrawHotString(ustring, Attribute, Attribute)
   nameWithType: View.DrawHotString(ustring, Attribute, Attribute)
   fullName: View.DrawHotString(ustring, Attribute, Attribute)
-- uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: DrawHotString(String, Boolean, ColorScheme)
-  nameWithType: View.DrawHotString(String, Boolean, ColorScheme)
-  fullName: View.DrawHotString(String, Boolean, ColorScheme)
-- uid: Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: DrawHotString(String, Attribute, Attribute)
-  nameWithType: View.DrawHotString(String, Attribute, Attribute)
-  fullName: View.DrawHotString(String, Attribute, Attribute)
 - uid: Terminal.Gui.View.Driver
   parent: Terminal.Gui.View
   isExternal: false
@@ -445,12 +452,24 @@ references:
   name: GetEnumerator()
   nameWithType: View.GetEnumerator()
   fullName: View.GetEnumerator()
+- uid: Terminal.Gui.View.Height
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Height
+  nameWithType: View.Height
+  fullName: View.Height
 - uid: Terminal.Gui.View.Id
   parent: Terminal.Gui.View
   isExternal: false
   name: Id
   nameWithType: View.Id
   fullName: View.Id
+- uid: Terminal.Gui.View.LayoutStyle
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: LayoutStyle
+  nameWithType: View.LayoutStyle
+  fullName: View.LayoutStyle
 - uid: Terminal.Gui.View.LayoutSubviews
   parent: Terminal.Gui.View
   isExternal: false
@@ -535,3 +554,21 @@ references:
   name: WantMousePositionReports
   nameWithType: View.WantMousePositionReports
   fullName: View.WantMousePositionReports
+- uid: Terminal.Gui.View.Width
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Width
+  nameWithType: View.Width
+  fullName: View.Width
+- uid: Terminal.Gui.View.X
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: X
+  nameWithType: View.X
+  fullName: View.X
+- uid: Terminal.Gui.View.Y
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Y
+  nameWithType: View.Y
+  fullName: View.Y

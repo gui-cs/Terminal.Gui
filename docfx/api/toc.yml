@@ -31,6 +31,8 @@
     name: ConsoleDriver
   - uid: Terminal.Gui.Dialog
     name: Dialog
+  - uid: Terminal.Gui.Dim
+    name: Dim
   - uid: Terminal.Gui.FileDialog
     name: FileDialog
   - uid: Terminal.Gui.FrameView
@@ -43,6 +45,8 @@
     name: KeyEvent
   - uid: Terminal.Gui.Label
     name: Label
+  - uid: Terminal.Gui.LayoutStyle
+    name: LayoutStyle
   - uid: Terminal.Gui.ListView
     name: ListView
   - uid: Terminal.Gui.MenuBar
@@ -61,6 +65,8 @@
     name: OpenDialog
   - uid: Terminal.Gui.Point
     name: Point
+  - uid: Terminal.Gui.Pos
+    name: Pos
   - uid: Terminal.Gui.ProgressBar
     name: ProgressBar
   - uid: Terminal.Gui.RadioGroup

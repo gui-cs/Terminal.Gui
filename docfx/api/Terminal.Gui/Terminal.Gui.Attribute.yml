@@ -41,9 +41,9 @@ items:
   syntax:
     content: public Attribute (int value);
     parameters:
-    - id: v
+    - id: value
       type: System.Int32
-      description: To be added.
+      description: Value.
   overload: Terminal.Gui.Attribute.#ctor*
   exceptions: []
 - uid: Terminal.Gui.Attribute.op_Implicit(System.Int32 to Terminal.Gui.Attribute)

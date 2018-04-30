@@ -1,9 +1,8 @@
 <Type Name="Application" FullName="Terminal.Gui.Application">
-  <TypeSignature Language="C#" Value="public class Application" />
-  <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit Application extends System.Object" />
+  <TypeSignature Language="C#" Value="public static class Application" />
+  <TypeSignature Language="ILAsm" Value=".class public auto ansi abstract sealed beforefieldinit Application extends System.Object" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -30,26 +29,11 @@
     </remarks>
   </Docs>
   <Members>
-    <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public Application ();" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor() cil managed" />
-      <MemberType>Constructor</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <Parameters />
-      <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
-      </Docs>
-    </Member>
     <Member MemberName="Begin">
       <MemberSignature Language="C#" Value="public static Terminal.Gui.Application.RunState Begin (Terminal.Gui.Toplevel toplevel);" />
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class Terminal.Gui.Application/RunState Begin(class Terminal.Gui.Toplevel toplevel) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -79,7 +63,6 @@
       <MemberSignature Language="ILAsm" Value=".property class Terminal.Gui.Toplevel Current" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -98,7 +81,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static class Terminal.Gui.ConsoleDriver Driver" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -116,14 +98,13 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig void End(class Terminal.Gui.Application/RunState runState) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
       </ReturnValue>
       <Parameters>
-        <Parameter Name="rs" Type="Terminal.Gui.Application+RunState" />
+        <Parameter Name="runState" Type="Terminal.Gui.Application+RunState" />
       </Parameters>
       <Docs>
         <param name="runState">The runstate returned by the <see cref="M:Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)" /> method.</param>
@@ -138,7 +119,6 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig void GrabMouse(class Terminal.Gui.View view) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -161,7 +141,6 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig void Init() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -180,7 +159,6 @@
       <MemberSignature Language="ILAsm" Value=".event class System.EventHandler Iteration" />
       <MemberType>Event</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -200,7 +178,6 @@
       <MemberSignature Language="ILAsm" Value=".property class Mono.Terminal.MainLoop MainLoop" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -219,7 +196,6 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig valuetype Terminal.Gui.Rect MakeCenteredRect(valuetype Terminal.Gui.Size size) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -242,7 +218,6 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig void Refresh() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -261,7 +236,6 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig void RequestStop() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -280,7 +254,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static class System.Action`1&lt;valuetype Terminal.Gui.MouseEvent&gt; RootMouseEvent" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -298,7 +271,6 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig void Run() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -317,7 +289,6 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig void Run(class Terminal.Gui.Toplevel view) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -360,7 +331,6 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig void RunLoop(class Terminal.Gui.Application/RunState state, bool wait) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -387,7 +357,6 @@
       <MemberSignature Language="ILAsm" Value=".property class Terminal.Gui.Toplevel Top" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -406,7 +375,6 @@
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig void UngrabMouse() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -425,7 +393,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static bool UseSystemConsole" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>

@@ -3,10 +3,12 @@ items:
 - uid: Terminal.Gui.TextField
   id: TextField
   children:
-  - Terminal.Gui.TextField.#ctor(System.Int32,System.Int32,System.Int32,System.String)
+  - Terminal.Gui.TextField.#ctor(NStack.ustring)
+  - Terminal.Gui.TextField.#ctor(System.Int32,System.Int32,System.Int32,NStack.ustring)
   - Terminal.Gui.TextField.CanFocus
   - Terminal.Gui.TextField.Changed
   - Terminal.Gui.TextField.CursorPosition
+  - Terminal.Gui.TextField.Frame
   - Terminal.Gui.TextField.MouseEvent(Terminal.Gui.MouseEvent)
   - Terminal.Gui.TextField.PositionCursor
   - Terminal.Gui.TextField.ProcessKey(Terminal.Gui.KeyEvent)
@@ -36,7 +38,6 @@ items:
   inheritedMembers:
   - Terminal.Gui.View.Add(Terminal.Gui.View)
   - Terminal.Gui.View.Add(Terminal.Gui.View[])
-  - Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
   - Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
   - Terminal.Gui.View.Bounds
   - Terminal.Gui.View.ChildNeedsDisplay
@@ -45,12 +46,9 @@ items:
   - Terminal.Gui.View.ClearNeedsDisplay
   - Terminal.Gui.View.ClipToBounds
   - Terminal.Gui.View.ColorScheme
-  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
   - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   - Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
   - Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
-  - Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
-  - Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
   - Terminal.Gui.View.Driver
   - Terminal.Gui.View.EnsureFocus
   - Terminal.Gui.View.Focused
@@ -58,10 +56,11 @@ items:
   - Terminal.Gui.View.FocusLast
   - Terminal.Gui.View.FocusNext
   - Terminal.Gui.View.FocusPrev
-  - Terminal.Gui.View.Frame
   - Terminal.Gui.View.GetEnumerator
   - Terminal.Gui.View.HasFocus
+  - Terminal.Gui.View.Height
   - Terminal.Gui.View.Id
+  - Terminal.Gui.View.LayoutStyle
   - Terminal.Gui.View.LayoutSubviews
   - Terminal.Gui.View.MostFocused
   - Terminal.Gui.View.Move(System.Int32,System.Int32)
@@ -78,34 +77,58 @@ items:
   - Terminal.Gui.View.SuperView
   - Terminal.Gui.View.ToString
   - Terminal.Gui.View.WantMousePositionReports
-- uid: Terminal.Gui.TextField.#ctor(System.Int32,System.Int32,System.Int32,System.String)
-  id: '#ctor(System.Int32,System.Int32,System.Int32,System.String)'
+  - Terminal.Gui.View.Width
+  - Terminal.Gui.View.X
+  - Terminal.Gui.View.Y
+- uid: Terminal.Gui.TextField.#ctor(NStack.ustring)
+  id: '#ctor(NStack.ustring)'
   parent: Terminal.Gui.TextField
   langs:
   - csharp
-  name: TextField(Int32, Int32, Int32, String)
-  nameWithType: TextField.TextField(Int32, Int32, Int32, String)
-  fullName: TextField.TextField(Int32, Int32, Int32, String)
+  name: TextField(ustring)
+  nameWithType: TextField.TextField(ustring)
+  fullName: TextField.TextField(ustring)
   type: Constructor
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Public constructor.
+  summary: Public constructor that creates a text field, with layout controlled with X, Y, Width and Height.
   syntax:
-    content: public TextField (int x, int y, int w, string s);
+    content: public TextField (NStack.ustring text);
+    parameters:
+    - id: text
+      type: NStack.ustring
+      description: Initial text contents.
+  overload: Terminal.Gui.TextField.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.TextField.#ctor(System.Int32,System.Int32,System.Int32,NStack.ustring)
+  id: '#ctor(System.Int32,System.Int32,System.Int32,NStack.ustring)'
+  parent: Terminal.Gui.TextField
+  langs:
+  - csharp
+  name: TextField(Int32, Int32, Int32, ustring)
+  nameWithType: TextField.TextField(Int32, Int32, Int32, ustring)
+  fullName: TextField.TextField(Int32, Int32, Int32, ustring)
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Public constructor that creates a text field at an absolute position and size.
+  syntax:
+    content: public TextField (int x, int y, int w, NStack.ustring text);
     parameters:
     - id: x
       type: System.Int32
-      description: To be added.
+      description: The x coordinate.
     - id: y
       type: System.Int32
-      description: To be added.
+      description: The y coordinate.
     - id: w
       type: System.Int32
-      description: To be added.
-    - id: s
-      type: System.String
-      description: To be added.
+      description: The width.
+    - id: text
+      type: NStack.ustring
+      description: Initial text contents.
   overload: Terminal.Gui.TextField.#ctor*
   exceptions: []
 - uid: Terminal.Gui.TextField.CanFocus
@@ -168,6 +191,25 @@ items:
       type: System.Int32
       description: To be added.
   overload: Terminal.Gui.TextField.CursorPosition*
+  exceptions: []
+- uid: Terminal.Gui.TextField.Frame
+  id: Frame
+  parent: Terminal.Gui.TextField
+  langs:
+  - csharp
+  name: Frame
+  nameWithType: TextField.Frame
+  fullName: TextField.Frame
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override Terminal.Gui.Rect Frame { get; set; }
+    return:
+      type: Terminal.Gui.Rect
+      description: To be added.
+  overload: Terminal.Gui.TextField.Frame*
   exceptions: []
 - uid: Terminal.Gui.TextField.MouseEvent(Terminal.Gui.MouseEvent)
   id: MouseEvent(Terminal.Gui.MouseEvent)
@@ -301,24 +343,30 @@ references:
   name: View
   nameWithType: View
   fullName: Terminal.Gui.View
-- uid: Terminal.Gui.TextField.#ctor(System.Int32,System.Int32,System.Int32,System.String)
+- uid: Terminal.Gui.TextField.#ctor(NStack.ustring)
   parent: Terminal.Gui.TextField
   isExternal: false
-  name: TextField(Int32, Int32, Int32, String)
-  nameWithType: TextField.TextField(Int32, Int32, Int32, String)
-  fullName: TextField.TextField(Int32, Int32, Int32, String)
+  name: TextField(ustring)
+  nameWithType: TextField.TextField(ustring)
+  fullName: TextField.TextField(ustring)
+- uid: NStack.ustring
+  parent: NStack
+  isExternal: true
+  name: ustring
+  nameWithType: ustring
+  fullName: NStack.ustring
+- uid: Terminal.Gui.TextField.#ctor(System.Int32,System.Int32,System.Int32,NStack.ustring)
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: TextField(Int32, Int32, Int32, ustring)
+  nameWithType: TextField.TextField(Int32, Int32, Int32, ustring)
+  fullName: TextField.TextField(Int32, Int32, Int32, ustring)
 - uid: System.Int32
   parent: System
   isExternal: true
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
-- uid: System.String
-  parent: System
-  isExternal: true
-  name: String
-  nameWithType: String
-  fullName: System.String
 - uid: Terminal.Gui.TextField.CanFocus
   parent: Terminal.Gui.TextField
   isExternal: false
@@ -349,6 +397,18 @@ references:
   name: CursorPosition
   nameWithType: TextField.CursorPosition
   fullName: TextField.CursorPosition
+- uid: Terminal.Gui.TextField.Frame
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: Frame
+  nameWithType: TextField.Frame
+  fullName: TextField.Frame
+- uid: Terminal.Gui.Rect
+  parent: Terminal.Gui
+  isExternal: false
+  name: Rect
+  nameWithType: Rect
+  fullName: Terminal.Gui.Rect
 - uid: Terminal.Gui.TextField.MouseEvent(Terminal.Gui.MouseEvent)
   parent: Terminal.Gui.TextField
   isExternal: false
@@ -385,12 +445,6 @@ references:
   name: Redraw(Rect)
   nameWithType: TextField.Redraw(Rect)
   fullName: TextField.Redraw(Rect)
-- uid: Terminal.Gui.Rect
-  parent: Terminal.Gui
-  isExternal: false
-  name: Rect
-  nameWithType: Rect
-  fullName: Terminal.Gui.Rect
 - uid: Terminal.Gui.TextField.Secret
   parent: Terminal.Gui.TextField
   isExternal: false
@@ -403,12 +457,6 @@ references:
   name: Text
   nameWithType: TextField.Text
   fullName: TextField.Text
-- uid: NStack.ustring
-  parent: NStack
-  isExternal: true
-  name: ustring
-  nameWithType: ustring
-  fullName: NStack.ustring
 - uid: Terminal.Gui.TextField.#ctor*
   parent: Terminal.Gui.TextField
   isExternal: false
@@ -427,6 +475,12 @@ references:
   name: CursorPosition
   nameWithType: TextField.CursorPosition
   fullName: TextField.CursorPosition
+- uid: Terminal.Gui.TextField.Frame*
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: Frame
+  nameWithType: TextField.Frame
+  fullName: TextField.Frame
 - uid: Terminal.Gui.TextField.MouseEvent*
   parent: Terminal.Gui.TextField
   isExternal: false
@@ -493,12 +547,6 @@ references:
   name: Add(View[])
   nameWithType: View.Add(View[])
   fullName: View.Add(View[])
-- uid: Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: AddCh(Int32, Int32, Int32)
-  nameWithType: View.AddCh(Int32, Int32, Int32)
-  fullName: View.AddCh(Int32, Int32, Int32)
 - uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
   parent: Terminal.Gui.View
   isExternal: false
@@ -547,12 +595,6 @@ references:
   name: ColorScheme
   nameWithType: View.ColorScheme
   fullName: View.ColorScheme
-- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: DrawFrame(Rect, Boolean)
-  nameWithType: View.DrawFrame(Rect, Boolean)
-  fullName: View.DrawFrame(Rect, Boolean)
 - uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   parent: Terminal.Gui.View
   isExternal: false
@@ -571,18 +613,6 @@ references:
   name: DrawHotString(ustring, Attribute, Attribute)
   nameWithType: View.DrawHotString(ustring, Attribute, Attribute)
   fullName: View.DrawHotString(ustring, Attribute, Attribute)
-- uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: DrawHotString(String, Boolean, ColorScheme)
-  nameWithType: View.DrawHotString(String, Boolean, ColorScheme)
-  fullName: View.DrawHotString(String, Boolean, ColorScheme)
-- uid: Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: DrawHotString(String, Attribute, Attribute)
-  nameWithType: View.DrawHotString(String, Attribute, Attribute)
-  fullName: View.DrawHotString(String, Attribute, Attribute)
 - uid: Terminal.Gui.View.Driver
   parent: Terminal.Gui.View
   isExternal: false
@@ -625,24 +655,30 @@ references:
   name: FocusPrev()
   nameWithType: View.FocusPrev()
   fullName: View.FocusPrev()
-- uid: Terminal.Gui.View.Frame
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Frame
-  nameWithType: View.Frame
-  fullName: View.Frame
 - uid: Terminal.Gui.View.GetEnumerator
   parent: Terminal.Gui.View
   isExternal: false
   name: GetEnumerator()
   nameWithType: View.GetEnumerator()
   fullName: View.GetEnumerator()
+- uid: Terminal.Gui.View.Height
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Height
+  nameWithType: View.Height
+  fullName: View.Height
 - uid: Terminal.Gui.View.Id
   parent: Terminal.Gui.View
   isExternal: false
   name: Id
   nameWithType: View.Id
   fullName: View.Id
+- uid: Terminal.Gui.View.LayoutStyle
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: LayoutStyle
+  nameWithType: View.LayoutStyle
+  fullName: View.LayoutStyle
 - uid: Terminal.Gui.View.LayoutSubviews
   parent: Terminal.Gui.View
   isExternal: false
@@ -727,3 +763,21 @@ references:
   name: WantMousePositionReports
   nameWithType: View.WantMousePositionReports
   fullName: View.WantMousePositionReports
+- uid: Terminal.Gui.View.Width
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Width
+  nameWithType: View.Width
+  fullName: View.Width
+- uid: Terminal.Gui.View.X
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: X
+  nameWithType: View.X
+  fullName: View.X
+- uid: Terminal.Gui.View.Y
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Y
+  nameWithType: View.Y
+  fullName: View.Y

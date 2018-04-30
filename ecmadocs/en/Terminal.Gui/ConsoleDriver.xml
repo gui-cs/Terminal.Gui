@@ -3,7 +3,6 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi abstract beforefieldinit ConsoleDriver extends System.Object" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -22,7 +21,6 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig specialname rtspecialname instance void .ctor() cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters />
@@ -31,30 +29,11 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
-    <Member MemberName="AddCh">
-      <MemberSignature Language="C#" Value="public abstract void AddCh (int rune);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void AddCh(int32 rune) cil managed" />
-      <MemberType>Method</MemberType>
-      <ReturnValue>
-        <ReturnType>System.Void</ReturnType>
-      </ReturnValue>
-      <Parameters>
-        <Parameter Name="rune" Type="System.Int32" />
-      </Parameters>
-      <Docs>
-        <param name="rune">Rune to add.</param>
-        <summary>
-            Adds the specified rune to the display at the current cursor position
-            </summary>
-        <remarks>To be added.</remarks>
-      </Docs>
-    </Member>
     <Member MemberName="AddRune">
       <MemberSignature Language="C#" Value="public abstract void AddRune (Rune rune);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void AddRune(valuetype System.Rune rune) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -71,30 +50,11 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
-    <Member MemberName="AddSpecial">
-      <MemberSignature Language="C#" Value="public abstract void AddSpecial (Terminal.Gui.SpecialChar ch);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void AddSpecial(valuetype Terminal.Gui.SpecialChar ch) cil managed" />
-      <MemberType>Method</MemberType>
-      <ReturnValue>
-        <ReturnType>System.Void</ReturnType>
-      </ReturnValue>
-      <Parameters>
-        <Parameter Name="ch" Type="Terminal.Gui.SpecialChar" />
-      </Parameters>
-      <Docs>
-        <param name="ch">Ch.</param>
-        <summary>
-            Draws a special characters in the screen
-            </summary>
-        <remarks>To be added.</remarks>
-      </Docs>
-    </Member>
     <Member MemberName="AddStr">
       <MemberSignature Language="C#" Value="public abstract void AddStr (NStack.ustring str);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void AddStr(class NStack.ustring str) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -111,30 +71,11 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
-    <Member MemberName="AddStr">
-      <MemberSignature Language="C#" Value="public abstract void AddStr (string str);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void AddStr(string str) cil managed" />
-      <MemberType>Method</MemberType>
-      <ReturnValue>
-        <ReturnType>System.Void</ReturnType>
-      </ReturnValue>
-      <Parameters>
-        <Parameter Name="str" Type="System.String" />
-      </Parameters>
-      <Docs>
-        <param name="str">String.</param>
-        <summary>
-            Adds the specified 
-            </summary>
-        <remarks>To be added.</remarks>
-      </Docs>
-    </Member>
     <Member MemberName="BottomTee">
       <MemberSignature Language="C#" Value="public Rune BottomTee;" />
       <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune BottomTee" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -152,7 +93,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance valuetype Terminal.Gui.Rect Clip" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -171,7 +111,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance int32 Cols" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -190,7 +129,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void CookMouse() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -209,7 +147,6 @@
       <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune Diamond" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -227,7 +164,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void DrawFrame(valuetype Terminal.Gui.Rect region, int32 padding, bool fill) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -253,7 +189,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void End() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -272,7 +207,6 @@
       <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune HLine" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -290,7 +224,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void Init(class System.Action terminalResized) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -312,7 +245,6 @@
       <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune LeftTee" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -330,7 +262,6 @@
       <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune LLCorner" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -348,7 +279,6 @@
       <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune LRCorner" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -366,7 +296,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void Move(int32 col, int32 row) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -390,7 +319,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void PrepareToRun(class Mono.Terminal.MainLoop mainLoop, class System.Action`1&lt;valuetype Terminal.Gui.KeyEvent&gt; keyHandler, class System.Action`1&lt;valuetype Terminal.Gui.MouseEvent&gt; mouseHandler) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -398,8 +326,8 @@
       </ReturnValue>
       <Parameters>
         <Parameter Name="mainLoop" Type="Mono.Terminal.MainLoop" />
-        <Parameter Name="target" Type="System.Action&lt;Terminal.Gui.KeyEvent&gt;" />
-        <Parameter Name="mouse" Type="System.Action&lt;Terminal.Gui.MouseEvent&gt;" />
+        <Parameter Name="keyHandler" Type="System.Action&lt;Terminal.Gui.KeyEvent&gt;" />
+        <Parameter Name="mouseHandler" Type="System.Action&lt;Terminal.Gui.MouseEvent&gt;" />
       </Parameters>
       <Docs>
         <param name="mainLoop">To be added.</param>
@@ -409,28 +337,11 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
-    <Member MemberName="RedrawTop">
-      <MemberSignature Language="C#" Value="public abstract void RedrawTop ();" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void RedrawTop() cil managed" />
-      <MemberType>Method</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <ReturnValue>
-        <ReturnType>System.Void</ReturnType>
-      </ReturnValue>
-      <Parameters />
-      <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
-      </Docs>
-    </Member>
     <Member MemberName="Refresh">
       <MemberSignature Language="C#" Value="public abstract void Refresh ();" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void Refresh() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -449,7 +360,6 @@
       <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune RightTee" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -467,7 +377,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance int32 Rows" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -486,7 +395,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void SetAttribute(valuetype Terminal.Gui.Attribute c) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -508,7 +416,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void SetColors(valuetype System.ConsoleColor foreground, valuetype System.ConsoleColor background) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -530,7 +437,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void SetColors(int16 foregroundColorId, int16 backgroundColorId) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -555,7 +461,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void StartReportingMouseMoves() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -572,7 +477,6 @@
       <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune Stipple" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -590,7 +494,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void StopReportingMouseMoves() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -607,7 +510,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void Suspend() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -626,7 +528,6 @@
       <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune TopTee" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -644,7 +545,6 @@
       <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune ULCorner" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -662,7 +562,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void UncookMouse() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -717,7 +616,6 @@
       <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune URCorner" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -735,7 +633,6 @@
       <MemberSignature Language="ILAsm" Value=".field public valuetype System.Rune VLine" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>

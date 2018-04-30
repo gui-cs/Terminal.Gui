@@ -1191,16 +1191,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Application.html
   fullName: Terminal.Gui.Application
   nameWithType: Application
-- uid: Terminal.Gui.Application.#ctor
-  name: Application()
-  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application__ctor
-  fullName: Application.Application()
-  nameWithType: Application.Application()
-- uid: Terminal.Gui.Application.#ctor*
-  name: Application
-  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application__ctor_
-  fullName: Application.Application
-  nameWithType: Application.Application
 - uid: Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)
   name: Begin(Toplevel)
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_
@@ -1411,11 +1401,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Button.html
   fullName: Terminal.Gui.Button
   nameWithType: Button
-- uid: Terminal.Gui.Button.#ctor(NStack.ustring)
-  name: Button(ustring)
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button__ctor_NStack_ustring_
-  fullName: Button.Button(ustring)
-  nameWithType: Button.Button(ustring)
 - uid: Terminal.Gui.Button.#ctor(NStack.ustring,System.Boolean)
   name: Button(ustring, Boolean)
   href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button__ctor_NStack_ustring_System_Boolean_
@@ -1431,26 +1416,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button__ctor_System_Int32_System_Int32_NStack_ustring_System_Boolean_
   fullName: Button.Button(Int32, Int32, ustring, Boolean)
   nameWithType: Button.Button(Int32, Int32, ustring, Boolean)
-- uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String)
-  name: Button(Int32, Int32, String)
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button__ctor_System_Int32_System_Int32_System_String_
-  fullName: Button.Button(Int32, Int32, String)
-  nameWithType: Button.Button(Int32, Int32, String)
-- uid: Terminal.Gui.Button.#ctor(System.Int32,System.Int32,System.String,System.Boolean)
-  name: Button(Int32, Int32, String, Boolean)
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button__ctor_System_Int32_System_Int32_System_String_System_Boolean_
-  fullName: Button.Button(Int32, Int32, String, Boolean)
-  nameWithType: Button.Button(Int32, Int32, String, Boolean)
-- uid: Terminal.Gui.Button.#ctor(System.String)
-  name: Button(String)
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button__ctor_System_String_
-  fullName: Button.Button(String)
-  nameWithType: Button.Button(String)
-- uid: Terminal.Gui.Button.#ctor(System.String,System.Boolean)
-  name: Button(String, Boolean)
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button__ctor_System_String_System_Boolean_
-  fullName: Button.Button(String, Boolean)
-  nameWithType: Button.Button(String, Boolean)
 - uid: Terminal.Gui.Button.#ctor*
   name: Button
   href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button__ctor_
@@ -1546,6 +1511,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html
   fullName: Terminal.Gui.CheckBox
   nameWithType: CheckBox
+- uid: Terminal.Gui.CheckBox.#ctor(NStack.ustring,System.Boolean)
+  name: CheckBox(ustring, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox__ctor_NStack_ustring_System_Boolean_
+  fullName: CheckBox.CheckBox(ustring, Boolean)
+  nameWithType: CheckBox.CheckBox(ustring, Boolean)
 - uid: Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,NStack.ustring)
   name: CheckBox(Int32, Int32, ustring)
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_NStack_ustring_
@@ -1556,16 +1526,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_NStack_ustring_System_Boolean_
   fullName: CheckBox.CheckBox(Int32, Int32, ustring, Boolean)
   nameWithType: CheckBox.CheckBox(Int32, Int32, ustring, Boolean)
-- uid: Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,System.String)
-  name: CheckBox(Int32, Int32, String)
-  href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_System_String_
-  fullName: CheckBox.CheckBox(Int32, Int32, String)
-  nameWithType: CheckBox.CheckBox(Int32, Int32, String)
-- uid: Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,System.String,System.Boolean)
-  name: CheckBox(Int32, Int32, String, Boolean)
-  href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_System_String_System_Boolean_
-  fullName: CheckBox.CheckBox(Int32, Int32, String, Boolean)
-  nameWithType: CheckBox.CheckBox(Int32, Int32, String, Boolean)
 - uid: Terminal.Gui.CheckBox.#ctor*
   name: CheckBox
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox__ctor_
@@ -1641,16 +1601,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Clipboard.html
   fullName: Terminal.Gui.Clipboard
   nameWithType: Clipboard
-- uid: Terminal.Gui.Clipboard.#ctor
-  name: Clipboard()
-  href: api/Terminal.Gui/Terminal.Gui.Clipboard.html#Terminal_Gui_Clipboard__ctor
-  fullName: Clipboard.Clipboard()
-  nameWithType: Clipboard.Clipboard()
-- uid: Terminal.Gui.Clipboard.#ctor*
-  name: Clipboard
-  href: api/Terminal.Gui/Terminal.Gui.Clipboard.html#Terminal_Gui_Clipboard__ctor_
-  fullName: Clipboard.Clipboard
-  nameWithType: Clipboard.Clipboard
 - uid: Terminal.Gui.Clipboard.Contents
   name: Contents
   href: api/Terminal.Gui/Terminal.Gui.Clipboard.html#Terminal_Gui_Clipboard_Contents
@@ -1821,16 +1771,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver__ctor_
   fullName: ConsoleDriver.ConsoleDriver
   nameWithType: ConsoleDriver.ConsoleDriver
-- uid: Terminal.Gui.ConsoleDriver.AddCh(System.Int32)
-  name: AddCh(Int32)
-  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddCh_System_Int32_
-  fullName: ConsoleDriver.AddCh(Int32)
-  nameWithType: ConsoleDriver.AddCh(Int32)
-- uid: Terminal.Gui.ConsoleDriver.AddCh*
-  name: AddCh
-  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddCh_
-  fullName: ConsoleDriver.AddCh
-  nameWithType: ConsoleDriver.AddCh
 - uid: Terminal.Gui.ConsoleDriver.AddRune(System.Rune)
   name: AddRune(Rune)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddRune_System_Rune_
@@ -1841,26 +1781,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddRune_
   fullName: ConsoleDriver.AddRune
   nameWithType: ConsoleDriver.AddRune
-- uid: Terminal.Gui.ConsoleDriver.AddSpecial(Terminal.Gui.SpecialChar)
-  name: AddSpecial(SpecialChar)
-  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddSpecial_Terminal_Gui_SpecialChar_
-  fullName: ConsoleDriver.AddSpecial(SpecialChar)
-  nameWithType: ConsoleDriver.AddSpecial(SpecialChar)
-- uid: Terminal.Gui.ConsoleDriver.AddSpecial*
-  name: AddSpecial
-  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddSpecial_
-  fullName: ConsoleDriver.AddSpecial
-  nameWithType: ConsoleDriver.AddSpecial
 - uid: Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)
   name: AddStr(ustring)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddStr_NStack_ustring_
   fullName: ConsoleDriver.AddStr(ustring)
   nameWithType: ConsoleDriver.AddStr(ustring)
-- uid: Terminal.Gui.ConsoleDriver.AddStr(System.String)
-  name: AddStr(String)
-  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddStr_System_String_
-  fullName: ConsoleDriver.AddStr(String)
-  nameWithType: ConsoleDriver.AddStr(String)
 - uid: Terminal.Gui.ConsoleDriver.AddStr*
   name: AddStr
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddStr_
@@ -1976,16 +1901,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_PrepareToRun_
   fullName: ConsoleDriver.PrepareToRun
   nameWithType: ConsoleDriver.PrepareToRun
-- uid: Terminal.Gui.ConsoleDriver.RedrawTop
-  name: RedrawTop()
-  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_RedrawTop
-  fullName: ConsoleDriver.RedrawTop()
-  nameWithType: ConsoleDriver.RedrawTop()
-- uid: Terminal.Gui.ConsoleDriver.RedrawTop*
-  name: RedrawTop
-  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_RedrawTop_
-  fullName: ConsoleDriver.RedrawTop
-  nameWithType: ConsoleDriver.RedrawTop
 - uid: Terminal.Gui.ConsoleDriver.Refresh
   name: Refresh()
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Refresh
@@ -2131,11 +2046,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog__ctor_NStack_ustring_System_Int32_System_Int32_Terminal_Gui_Button___
   fullName: Dialog.Dialog(ustring, Int32, Int32, Button[])
   nameWithType: Dialog.Dialog(ustring, Int32, Int32, Button[])
-- uid: Terminal.Gui.Dialog.#ctor(System.String,System.Int32,System.Int32,Terminal.Gui.Button[])
-  name: Dialog(String, Int32, Int32, Button[])
-  href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog__ctor_System_String_System_Int32_System_Int32_Terminal_Gui_Button___
-  fullName: Dialog.Dialog(String, Int32, Int32, Button[])
-  nameWithType: Dialog.Dialog(String, Int32, Int32, Button[])
 - uid: Terminal.Gui.Dialog.#ctor*
   name: Dialog
   href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog__ctor_
@@ -2171,6 +2081,71 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_ProcessKey_
   fullName: Dialog.ProcessKey
   nameWithType: Dialog.ProcessKey
+- uid: Terminal.Gui.Dim
+  name: Dim
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html
+  fullName: Terminal.Gui.Dim
+  nameWithType: Dim
+- uid: Terminal.Gui.Dim.#ctor
+  name: Dim()
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim__ctor
+  fullName: Dim.Dim()
+  nameWithType: Dim.Dim()
+- uid: Terminal.Gui.Dim.#ctor*
+  name: Dim
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim__ctor_
+  fullName: Dim.Dim
+  nameWithType: Dim.Dim
+- uid: Terminal.Gui.Dim.Fill(System.Int32)
+  name: Fill(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Fill_System_Int32_
+  fullName: Dim.Fill(Int32)
+  nameWithType: Dim.Fill(Int32)
+- uid: Terminal.Gui.Dim.Fill*
+  name: Fill
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Fill_
+  fullName: Dim.Fill
+  nameWithType: Dim.Fill
+- uid: Terminal.Gui.Dim.op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  name: op_Addition(Dim, Dim)
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_op_Addition_Terminal_Gui_Dim_Terminal_Gui_Dim_
+  fullName: Dim.op_Addition(Dim, Dim)
+  nameWithType: Dim.op_Addition(Dim, Dim)
+- uid: Terminal.Gui.Dim.op_Addition*
+  name: op_Addition
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_op_Addition_
+  fullName: Dim.op_Addition
+  nameWithType: Dim.op_Addition
+- uid: Terminal.Gui.Dim.op_Implicit(System.Int32 to Terminal.Gui.Dim)
+  name: op_Implicit(Int32 to Dim)
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_op_Implicit_System_Int32_to_Terminal_Gui_Dim_
+  fullName: Dim.op_Implicit(Int32 to Dim)
+  nameWithType: Dim.op_Implicit(Int32 to Dim)
+- uid: Terminal.Gui.Dim.op_Implicit*
+  name: op_Implicit
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_op_Implicit_
+  fullName: Dim.op_Implicit
+  nameWithType: Dim.op_Implicit
+- uid: Terminal.Gui.Dim.op_Subtraction(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  name: op_Subtraction(Dim, Dim)
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_op_Subtraction_Terminal_Gui_Dim_Terminal_Gui_Dim_
+  fullName: Dim.op_Subtraction(Dim, Dim)
+  nameWithType: Dim.op_Subtraction(Dim, Dim)
+- uid: Terminal.Gui.Dim.op_Subtraction*
+  name: op_Subtraction
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_op_Subtraction_
+  fullName: Dim.op_Subtraction
+  nameWithType: Dim.op_Subtraction
+- uid: Terminal.Gui.Dim.Percent(System.Single)
+  name: Percent(Single)
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Percent_System_Single_
+  fullName: Dim.Percent(Single)
+  nameWithType: Dim.Percent(Single)
+- uid: Terminal.Gui.Dim.Percent*
+  name: Percent
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Percent_
+  fullName: Dim.Percent
+  nameWithType: Dim.Percent
 - uid: Terminal.Gui.FileDialog
   name: FileDialog
   href: api/Terminal.Gui/Terminal.Gui.FileDialog.html
@@ -2281,6 +2256,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.FrameView.html
   fullName: Terminal.Gui.FrameView
   nameWithType: FrameView
+- uid: Terminal.Gui.FrameView.#ctor(NStack.ustring)
+  name: FrameView(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView__ctor_NStack_ustring_
+  fullName: FrameView.FrameView(ustring)
+  nameWithType: FrameView.FrameView(ustring)
 - uid: Terminal.Gui.FrameView.#ctor(Terminal.Gui.Rect,NStack.ustring)
   name: FrameView(Rect, ustring)
   href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView__ctor_Terminal_Gui_Rect_NStack_ustring_
@@ -2726,26 +2706,21 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Label.html
   fullName: Terminal.Gui.Label
   nameWithType: Label
+- uid: Terminal.Gui.Label.#ctor(NStack.ustring)
+  name: Label(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label__ctor_NStack_ustring_
+  fullName: Label.Label(ustring)
+  nameWithType: Label.Label(ustring)
 - uid: Terminal.Gui.Label.#ctor(System.Int32,System.Int32,NStack.ustring)
   name: Label(Int32, Int32, ustring)
   href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label__ctor_System_Int32_System_Int32_NStack_ustring_
   fullName: Label.Label(Int32, Int32, ustring)
   nameWithType: Label.Label(Int32, Int32, ustring)
-- uid: Terminal.Gui.Label.#ctor(System.Int32,System.Int32,System.String)
-  name: Label(Int32, Int32, String)
-  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label__ctor_System_Int32_System_Int32_System_String_
-  fullName: Label.Label(Int32, Int32, String)
-  nameWithType: Label.Label(Int32, Int32, String)
 - uid: Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,NStack.ustring)
   name: Label(Rect, ustring)
   href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label__ctor_Terminal_Gui_Rect_NStack_ustring_
   fullName: Label.Label(Rect, ustring)
   nameWithType: Label.Label(Rect, ustring)
-- uid: Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,System.String)
-  name: Label(Rect, String)
-  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label__ctor_Terminal_Gui_Rect_System_String_
-  fullName: Label.Label(Rect, String)
-  nameWithType: Label.Label(Rect, String)
 - uid: Terminal.Gui.Label.#ctor*
   name: Label
   href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label__ctor_
@@ -2756,11 +2731,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_MeasureLines_NStack_ustring_System_Int32_
   fullName: Label.MeasureLines(ustring, Int32)
   nameWithType: Label.MeasureLines(ustring, Int32)
-- uid: Terminal.Gui.Label.MeasureLines(System.String,System.Int32)
-  name: MeasureLines(String, Int32)
-  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_MeasureLines_System_String_System_Int32_
-  fullName: Label.MeasureLines(String, Int32)
-  nameWithType: Label.MeasureLines(String, Int32)
 - uid: Terminal.Gui.Label.MeasureLines*
   name: MeasureLines
   href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_MeasureLines_
@@ -2806,11 +2776,36 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_TextColor_
   fullName: Label.TextColor
   nameWithType: Label.TextColor
+- uid: Terminal.Gui.LayoutStyle
+  name: LayoutStyle
+  href: api/Terminal.Gui/Terminal.Gui.LayoutStyle.html
+  fullName: Terminal.Gui.LayoutStyle
+  nameWithType: LayoutStyle
+- uid: Terminal.Gui.LayoutStyle.Absolute
+  name: Absolute
+  href: api/Terminal.Gui/Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute
+  fullName: LayoutStyle.Absolute
+  nameWithType: LayoutStyle.Absolute
+- uid: Terminal.Gui.LayoutStyle.Computed
+  name: Computed
+  href: api/Terminal.Gui/Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed
+  fullName: LayoutStyle.Computed
+  nameWithType: LayoutStyle.Computed
 - uid: Terminal.Gui.ListView
   name: ListView
   href: api/Terminal.Gui/Terminal.Gui.ListView.html
   fullName: Terminal.Gui.ListView
   nameWithType: ListView
+- uid: Terminal.Gui.ListView.#ctor(System.Collections.IList)
+  name: ListView(IList)
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView__ctor_System_Collections_IList_
+  fullName: ListView.ListView(IList)
+  nameWithType: ListView.ListView(IList)
+- uid: Terminal.Gui.ListView.#ctor(Terminal.Gui.IListDataSource)
+  name: ListView(IListDataSource)
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView__ctor_Terminal_Gui_IListDataSource_
+  fullName: ListView.ListView(IListDataSource)
+  nameWithType: ListView.ListView(IListDataSource)
 - uid: Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,System.Collections.IList)
   name: ListView(Rect, IList)
   href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView__ctor_Terminal_Gui_Rect_System_Collections_IList_
@@ -3041,11 +3036,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem__ctor_NStack_ustring_System_String_System_Action_
   fullName: MenuItem.MenuItem(ustring, String, Action)
   nameWithType: MenuItem.MenuItem(ustring, String, Action)
-- uid: Terminal.Gui.MenuItem.#ctor(System.String,System.String,System.Action)
-  name: MenuItem(String, String, Action)
-  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem__ctor_System_String_System_String_System_Action_
-  fullName: MenuItem.MenuItem(String, String, Action)
-  nameWithType: MenuItem.MenuItem(String, String, Action)
 - uid: Terminal.Gui.MenuItem.#ctor*
   name: MenuItem
   href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem__ctor_
@@ -3096,16 +3086,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.MessageBox.html
   fullName: Terminal.Gui.MessageBox
   nameWithType: MessageBox
-- uid: Terminal.Gui.MessageBox.#ctor
-  name: MessageBox()
-  href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox__ctor
-  fullName: MessageBox.MessageBox()
-  nameWithType: MessageBox.MessageBox()
-- uid: Terminal.Gui.MessageBox.#ctor*
-  name: MessageBox
-  href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox__ctor_
-  fullName: MessageBox.MessageBox
-  nameWithType: MessageBox.MessageBox
 - uid: Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.String[])
   name: ErrorQuery(Int32, Int32, String, String, String[])
   href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_ErrorQuery_System_Int32_System_Int32_System_String_System_String_System_String___
@@ -3501,11 +3481,91 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Point.html#Terminal_Gui_Point_Y
   fullName: Point.Y
   nameWithType: Point.Y
+- uid: Terminal.Gui.Pos
+  name: Pos
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html
+  fullName: Terminal.Gui.Pos
+  nameWithType: Pos
+- uid: Terminal.Gui.Pos.#ctor
+  name: Pos()
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos__ctor
+  fullName: Pos.Pos()
+  nameWithType: Pos.Pos()
+- uid: Terminal.Gui.Pos.#ctor*
+  name: Pos
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos__ctor_
+  fullName: Pos.Pos
+  nameWithType: Pos.Pos
+- uid: Terminal.Gui.Pos.AnchorEnd(System.Int32)
+  name: AnchorEnd(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_AnchorEnd_System_Int32_
+  fullName: Pos.AnchorEnd(Int32)
+  nameWithType: Pos.AnchorEnd(Int32)
+- uid: Terminal.Gui.Pos.AnchorEnd*
+  name: AnchorEnd
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_AnchorEnd_
+  fullName: Pos.AnchorEnd
+  nameWithType: Pos.AnchorEnd
+- uid: Terminal.Gui.Pos.Center
+  name: Center()
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Center
+  fullName: Pos.Center()
+  nameWithType: Pos.Center()
+- uid: Terminal.Gui.Pos.Center*
+  name: Center
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Center_
+  fullName: Pos.Center
+  nameWithType: Pos.Center
+- uid: Terminal.Gui.Pos.op_Addition(Terminal.Gui.Pos,Terminal.Gui.Pos)
+  name: op_Addition(Pos, Pos)
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_op_Addition_Terminal_Gui_Pos_Terminal_Gui_Pos_
+  fullName: Pos.op_Addition(Pos, Pos)
+  nameWithType: Pos.op_Addition(Pos, Pos)
+- uid: Terminal.Gui.Pos.op_Addition*
+  name: op_Addition
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_op_Addition_
+  fullName: Pos.op_Addition
+  nameWithType: Pos.op_Addition
+- uid: Terminal.Gui.Pos.op_Implicit(System.Int32 to Terminal.Gui.Pos)
+  name: op_Implicit(Int32 to Pos)
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_op_Implicit_System_Int32_to_Terminal_Gui_Pos_
+  fullName: Pos.op_Implicit(Int32 to Pos)
+  nameWithType: Pos.op_Implicit(Int32 to Pos)
+- uid: Terminal.Gui.Pos.op_Implicit*
+  name: op_Implicit
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_op_Implicit_
+  fullName: Pos.op_Implicit
+  nameWithType: Pos.op_Implicit
+- uid: Terminal.Gui.Pos.op_Subtraction(Terminal.Gui.Pos,Terminal.Gui.Pos)
+  name: op_Subtraction(Pos, Pos)
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_op_Subtraction_Terminal_Gui_Pos_Terminal_Gui_Pos_
+  fullName: Pos.op_Subtraction(Pos, Pos)
+  nameWithType: Pos.op_Subtraction(Pos, Pos)
+- uid: Terminal.Gui.Pos.op_Subtraction*
+  name: op_Subtraction
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_op_Subtraction_
+  fullName: Pos.op_Subtraction
+  nameWithType: Pos.op_Subtraction
+- uid: Terminal.Gui.Pos.Percent(System.Single)
+  name: Percent(Single)
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Percent_System_Single_
+  fullName: Pos.Percent(Single)
+  nameWithType: Pos.Percent(Single)
+- uid: Terminal.Gui.Pos.Percent*
+  name: Percent
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Percent_
+  fullName: Pos.Percent
+  nameWithType: Pos.Percent
 - uid: Terminal.Gui.ProgressBar
   name: ProgressBar
   href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html
   fullName: Terminal.Gui.ProgressBar
   nameWithType: ProgressBar
+- uid: Terminal.Gui.ProgressBar.#ctor
+  name: ProgressBar()
+  href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar__ctor
+  fullName: ProgressBar.ProgressBar()
+  nameWithType: ProgressBar.ProgressBar()
 - uid: Terminal.Gui.ProgressBar.#ctor(Terminal.Gui.Rect)
   name: ProgressBar(Rect)
   href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html#Terminal_Gui_ProgressBar__ctor_Terminal_Gui_Rect_
@@ -3556,6 +3616,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup__ctor_System_Int32_System_Int32_System_String___System_Int32_
   fullName: RadioGroup.RadioGroup(Int32, Int32, String[], Int32)
   nameWithType: RadioGroup.RadioGroup(Int32, Int32, String[], Int32)
+- uid: Terminal.Gui.RadioGroup.#ctor(System.String[],System.Int32)
+  name: RadioGroup(String[], Int32)
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup__ctor_System_String___System_Int32_
+  fullName: RadioGroup.RadioGroup(String[], Int32)
+  nameWithType: RadioGroup.RadioGroup(String[], Int32)
 - uid: Terminal.Gui.RadioGroup.#ctor(Terminal.Gui.Rect,System.String[],System.Int32)
   name: RadioGroup(Rect, String[], Int32)
   href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup__ctor_Terminal_Gui_Rect_System_String___System_Int32_
@@ -3596,16 +3661,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_ProcessColdKey_
   fullName: RadioGroup.ProcessColdKey
   nameWithType: RadioGroup.ProcessColdKey
-- uid: Terminal.Gui.RadioGroup.ProcessHotKey(Terminal.Gui.KeyEvent)
-  name: ProcessHotKey(KeyEvent)
-  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_ProcessHotKey_Terminal_Gui_KeyEvent_
-  fullName: RadioGroup.ProcessHotKey(KeyEvent)
-  nameWithType: RadioGroup.ProcessHotKey(KeyEvent)
-- uid: Terminal.Gui.RadioGroup.ProcessHotKey*
-  name: ProcessHotKey
-  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_ProcessHotKey_
-  fullName: RadioGroup.ProcessHotKey
-  nameWithType: RadioGroup.ProcessHotKey
 - uid: Terminal.Gui.RadioGroup.ProcessKey(Terminal.Gui.KeyEvent)
   name: ProcessKey(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_ProcessKey_Terminal_Gui_KeyEvent_
@@ -4456,11 +4511,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.TextField.html
   fullName: Terminal.Gui.TextField
   nameWithType: TextField
-- uid: Terminal.Gui.TextField.#ctor(System.Int32,System.Int32,System.Int32,System.String)
-  name: TextField(Int32, Int32, Int32, String)
-  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField__ctor_System_Int32_System_Int32_System_Int32_System_String_
-  fullName: TextField.TextField(Int32, Int32, Int32, String)
-  nameWithType: TextField.TextField(Int32, Int32, Int32, String)
+- uid: Terminal.Gui.TextField.#ctor(NStack.ustring)
+  name: TextField(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField__ctor_NStack_ustring_
+  fullName: TextField.TextField(ustring)
+  nameWithType: TextField.TextField(ustring)
+- uid: Terminal.Gui.TextField.#ctor(System.Int32,System.Int32,System.Int32,NStack.ustring)
+  name: TextField(Int32, Int32, Int32, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField__ctor_System_Int32_System_Int32_System_Int32_NStack_ustring_
+  fullName: TextField.TextField(Int32, Int32, Int32, ustring)
+  nameWithType: TextField.TextField(Int32, Int32, Int32, ustring)
 - uid: Terminal.Gui.TextField.#ctor*
   name: TextField
   href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField__ctor_
@@ -4491,6 +4551,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_CursorPosition_
   fullName: TextField.CursorPosition
   nameWithType: TextField.CursorPosition
+- uid: Terminal.Gui.TextField.Frame
+  name: Frame
+  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_Frame
+  fullName: TextField.Frame
+  nameWithType: TextField.Frame
+- uid: Terminal.Gui.TextField.Frame*
+  name: Frame
+  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_Frame_
+  fullName: TextField.Frame
+  nameWithType: TextField.Frame
 - uid: Terminal.Gui.TextField.MouseEvent(Terminal.Gui.MouseEvent)
   name: MouseEvent(MouseEvent)
   href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_MouseEvent_Terminal_Gui_MouseEvent_
@@ -4556,6 +4626,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.TextView.html
   fullName: Terminal.Gui.TextView
   nameWithType: TextView
+- uid: Terminal.Gui.TextView.#ctor
+  name: TextView()
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView__ctor
+  fullName: TextView.TextView()
+  nameWithType: TextView.TextView()
 - uid: Terminal.Gui.TextView.#ctor(Terminal.Gui.Rect)
   name: TextView(Rect)
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView__ctor_Terminal_Gui_Rect_
@@ -4576,16 +4651,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_CanFocus_
   fullName: TextView.CanFocus
   nameWithType: TextView.CanFocus
-- uid: Terminal.Gui.TextView.ClearRegion
-  name: ClearRegion()
-  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ClearRegion
-  fullName: TextView.ClearRegion()
-  nameWithType: TextView.ClearRegion()
-- uid: Terminal.Gui.TextView.ClearRegion*
-  name: ClearRegion
-  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ClearRegion_
-  fullName: TextView.ClearRegion
-  nameWithType: TextView.ClearRegion
 - uid: Terminal.Gui.TextView.CurrentColumn
   name: CurrentColumn
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_CurrentColumn
@@ -4606,16 +4671,36 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_CurrentRow_
   fullName: TextView.CurrentRow
   nameWithType: TextView.CurrentRow
-- uid: Terminal.Gui.TextView.GetRegion
-  name: GetRegion()
-  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_GetRegion
-  fullName: TextView.GetRegion()
-  nameWithType: TextView.GetRegion()
-- uid: Terminal.Gui.TextView.GetRegion*
-  name: GetRegion
-  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_GetRegion_
-  fullName: TextView.GetRegion
-  nameWithType: TextView.GetRegion
+- uid: Terminal.Gui.TextView.LoadFile(System.String)
+  name: LoadFile(String)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_LoadFile_System_String_
+  fullName: TextView.LoadFile(String)
+  nameWithType: TextView.LoadFile(String)
+- uid: Terminal.Gui.TextView.LoadFile*
+  name: LoadFile
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_LoadFile_
+  fullName: TextView.LoadFile
+  nameWithType: TextView.LoadFile
+- uid: Terminal.Gui.TextView.LoadStream(System.IO.Stream)
+  name: LoadStream(Stream)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_LoadStream_System_IO_Stream_
+  fullName: TextView.LoadStream(Stream)
+  nameWithType: TextView.LoadStream(Stream)
+- uid: Terminal.Gui.TextView.LoadStream*
+  name: LoadStream
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_LoadStream_
+  fullName: TextView.LoadStream
+  nameWithType: TextView.LoadStream
+- uid: Terminal.Gui.TextView.MouseEvent(Terminal.Gui.MouseEvent)
+  name: MouseEvent(MouseEvent)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_MouseEvent_Terminal_Gui_MouseEvent_
+  fullName: TextView.MouseEvent(MouseEvent)
+  nameWithType: TextView.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.TextView.MouseEvent*
+  name: MouseEvent
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_MouseEvent_
+  fullName: TextView.MouseEvent
+  nameWithType: TextView.MouseEvent
 - uid: Terminal.Gui.TextView.PositionCursor
   name: PositionCursor()
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_PositionCursor
@@ -4661,6 +4746,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Toplevel.html
   fullName: Terminal.Gui.Toplevel
   nameWithType: Toplevel
+- uid: Terminal.Gui.Toplevel.#ctor
+  name: Toplevel()
+  href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel__ctor
+  fullName: Toplevel.Toplevel()
+  nameWithType: Toplevel.Toplevel()
 - uid: Terminal.Gui.Toplevel.#ctor(Terminal.Gui.Rect)
   name: Toplevel(Rect)
   href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel__ctor_Terminal_Gui_Rect_
@@ -4711,6 +4801,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.View.html
   fullName: Terminal.Gui.View
   nameWithType: View
+- uid: Terminal.Gui.View.#ctor
+  name: View()
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View__ctor
+  fullName: View.View()
+  nameWithType: View.View()
 - uid: Terminal.Gui.View.#ctor(Terminal.Gui.Rect)
   name: View(Rect)
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View__ctor_Terminal_Gui_Rect_
@@ -4736,16 +4831,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Add_
   fullName: View.Add
   nameWithType: View.Add
-- uid: Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
-  name: AddCh(Int32, Int32, Int32)
-  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_AddCh_System_Int32_System_Int32_System_Int32_
-  fullName: View.AddCh(Int32, Int32, Int32)
-  nameWithType: View.AddCh(Int32, Int32, Int32)
-- uid: Terminal.Gui.View.AddCh*
-  name: AddCh
-  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_AddCh_
-  fullName: View.AddCh
-  nameWithType: View.AddCh
 - uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
   name: AddRune(Int32, Int32, Rune)
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_AddRune_System_Int32_System_Int32_System_Rune_
@@ -4821,11 +4906,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ColorScheme_
   fullName: View.ColorScheme
   nameWithType: View.ColorScheme
-- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
-  name: DrawFrame(Rect, Boolean)
-  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Boolean_
-  fullName: View.DrawFrame(Rect, Boolean)
-  nameWithType: View.DrawFrame(Rect, Boolean)
 - uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   name: DrawFrame(Rect, Int32, Boolean)
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_
@@ -4846,16 +4926,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_NStack_ustring_Terminal_Gui_Attribute_Terminal_Gui_Attribute_
   fullName: View.DrawHotString(ustring, Attribute, Attribute)
   nameWithType: View.DrawHotString(ustring, Attribute, Attribute)
-- uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
-  name: DrawHotString(String, Boolean, ColorScheme)
-  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_System_String_System_Boolean_Terminal_Gui_ColorScheme_
-  fullName: View.DrawHotString(String, Boolean, ColorScheme)
-  nameWithType: View.DrawHotString(String, Boolean, ColorScheme)
-- uid: Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
-  name: DrawHotString(String, Attribute, Attribute)
-  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_System_String_Terminal_Gui_Attribute_Terminal_Gui_Attribute_
-  fullName: View.DrawHotString(String, Attribute, Attribute)
-  nameWithType: View.DrawHotString(String, Attribute, Attribute)
 - uid: Terminal.Gui.View.DrawHotString*
   name: DrawHotString
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_DrawHotString_
@@ -4956,6 +5026,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_HasFocus_
   fullName: View.HasFocus
   nameWithType: View.HasFocus
+- uid: Terminal.Gui.View.Height
+  name: Height
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Height
+  fullName: View.Height
+  nameWithType: View.Height
+- uid: Terminal.Gui.View.Height*
+  name: Height
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Height_
+  fullName: View.Height
+  nameWithType: View.Height
 - uid: Terminal.Gui.View.Id
   name: Id
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Id
@@ -4966,6 +5046,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Id_
   fullName: View.Id
   nameWithType: View.Id
+- uid: Terminal.Gui.View.LayoutStyle
+  name: LayoutStyle
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle
+  fullName: View.LayoutStyle
+  nameWithType: View.LayoutStyle
+- uid: Terminal.Gui.View.LayoutStyle*
+  name: LayoutStyle
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle_
+  fullName: View.LayoutStyle
+  nameWithType: View.LayoutStyle
 - uid: Terminal.Gui.View.LayoutSubviews
   name: LayoutSubviews()
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews
@@ -5151,11 +5241,51 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_WantMousePositionReports_
   fullName: View.WantMousePositionReports
   nameWithType: View.WantMousePositionReports
+- uid: Terminal.Gui.View.Width
+  name: Width
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Width
+  fullName: View.Width
+  nameWithType: View.Width
+- uid: Terminal.Gui.View.Width*
+  name: Width
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Width_
+  fullName: View.Width
+  nameWithType: View.Width
+- uid: Terminal.Gui.View.X
+  name: X
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_X
+  fullName: View.X
+  nameWithType: View.X
+- uid: Terminal.Gui.View.X*
+  name: X
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_X_
+  fullName: View.X
+  nameWithType: View.X
+- uid: Terminal.Gui.View.Y
+  name: Y
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Y
+  fullName: View.Y
+  nameWithType: View.Y
+- uid: Terminal.Gui.View.Y*
+  name: Y
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Y_
+  fullName: View.Y
+  nameWithType: View.Y
 - uid: Terminal.Gui.Window
   name: Window
   href: api/Terminal.Gui/Terminal.Gui.Window.html
   fullName: Terminal.Gui.Window
   nameWithType: Window
+- uid: Terminal.Gui.Window.#ctor(NStack.ustring)
+  name: Window(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window__ctor_NStack_ustring_
+  fullName: Window.Window(ustring)
+  nameWithType: Window.Window(ustring)
+- uid: Terminal.Gui.Window.#ctor(NStack.ustring,System.Int32)
+  name: Window(ustring, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window__ctor_NStack_ustring_System_Int32_
+  fullName: Window.Window(ustring, Int32)
+  nameWithType: Window.Window(ustring, Int32)
 - uid: Terminal.Gui.Window.#ctor(Terminal.Gui.Rect,NStack.ustring)
   name: Window(Rect, ustring)
   href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window__ctor_Terminal_Gui_Rect_NStack_ustring_
@@ -5166,11 +5296,6 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window__ctor_Terminal_Gui_Rect_NStack_ustring_System_Int32_
   fullName: Window.Window(Rect, ustring, Int32)
   nameWithType: Window.Window(Rect, ustring, Int32)
-- uid: Terminal.Gui.Window.#ctor(Terminal.Gui.Rect,System.String)
-  name: Window(Rect, String)
-  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window__ctor_Terminal_Gui_Rect_System_String_
-  fullName: Window.Window(Rect, String)
-  nameWithType: Window.Window(Rect, String)
 - uid: Terminal.Gui.Window.#ctor*
   name: Window
   href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window__ctor_

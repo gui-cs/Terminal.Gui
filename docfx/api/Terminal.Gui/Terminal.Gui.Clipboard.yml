@@ -3,7 +3,6 @@ items:
 - uid: Terminal.Gui.Clipboard
   id: Clipboard
   children:
-  - Terminal.Gui.Clipboard.#ctor
   - Terminal.Gui.Clipboard.Contents
   langs:
   - csharp
@@ -15,28 +14,11 @@ items:
   - Terminal.Gui
   namespace: Terminal.Gui
   syntax:
-    content: public class Clipboard
+    content: public static class Clipboard
   inheritance:
   - System.Object
   implements: []
   inheritedMembers: []
-- uid: Terminal.Gui.Clipboard.#ctor
-  id: '#ctor'
-  parent: Terminal.Gui.Clipboard
-  langs:
-  - csharp
-  name: Clipboard()
-  nameWithType: Clipboard.Clipboard()
-  fullName: Clipboard.Clipboard()
-  type: Constructor
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  syntax:
-    content: public Clipboard ();
-    parameters: []
-  overload: Terminal.Gui.Clipboard.#ctor*
-  exceptions: []
 - uid: Terminal.Gui.Clipboard.Contents
   id: Contents
   parent: Terminal.Gui.Clipboard
@@ -63,12 +45,6 @@ references:
   name: Object
   nameWithType: Object
   fullName: System.Object
-- uid: Terminal.Gui.Clipboard.#ctor
-  parent: Terminal.Gui.Clipboard
-  isExternal: false
-  name: Clipboard()
-  nameWithType: Clipboard.Clipboard()
-  fullName: Clipboard.Clipboard()
 - uid: Terminal.Gui.Clipboard.Contents
   parent: Terminal.Gui.Clipboard
   isExternal: false
@@ -81,12 +57,6 @@ references:
   name: ustring
   nameWithType: ustring
   fullName: NStack.ustring
-- uid: Terminal.Gui.Clipboard.#ctor*
-  parent: Terminal.Gui.Clipboard
-  isExternal: false
-  name: Clipboard
-  nameWithType: Clipboard.Clipboard
-  fullName: Clipboard.Clipboard
 - uid: Terminal.Gui.Clipboard.Contents*
   parent: Terminal.Gui.Clipboard
   isExternal: false

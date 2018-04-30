@@ -3,7 +3,6 @@
   <TypeSignature Language="ILAsm" Value=".class public interface auto ansi abstract IListDataSource" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Interfaces />
@@ -19,7 +18,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance int32 Count" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -38,7 +36,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance bool IsMarked(int32 item) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -62,7 +59,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void Render(bool selected, int32 item, int32 col, int32 line, int32 width) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -95,7 +91,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void SetMark(int32 item, bool value) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>

@@ -3,7 +3,6 @@ items:
 - uid: Terminal.Gui.MessageBox
   id: MessageBox
   children:
-  - Terminal.Gui.MessageBox.#ctor
   - Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.String[])
   - Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,System.String,System.String,System.String[])
   langs:
@@ -17,28 +16,11 @@ items:
   namespace: Terminal.Gui
   summary: Message box displays a modal message to the user, with a title, a message and a series of options that the user can choose from.
   syntax:
-    content: public class MessageBox
+    content: public static class MessageBox
   inheritance:
   - System.Object
   implements: []
   inheritedMembers: []
-- uid: Terminal.Gui.MessageBox.#ctor
-  id: '#ctor'
-  parent: Terminal.Gui.MessageBox
-  langs:
-  - csharp
-  name: MessageBox()
-  nameWithType: MessageBox.MessageBox()
-  fullName: MessageBox.MessageBox()
-  type: Constructor
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  syntax:
-    content: public MessageBox ();
-    parameters: []
-  overload: Terminal.Gui.MessageBox.#ctor*
-  exceptions: []
 - uid: Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.String[])
   id: ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.String[])
   parent: Terminal.Gui.MessageBox
@@ -118,12 +100,6 @@ references:
   name: Object
   nameWithType: Object
   fullName: System.Object
-- uid: Terminal.Gui.MessageBox.#ctor
-  parent: Terminal.Gui.MessageBox
-  isExternal: false
-  name: MessageBox()
-  nameWithType: MessageBox.MessageBox()
-  fullName: MessageBox.MessageBox()
 - uid: Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.String[])
   parent: Terminal.Gui.MessageBox
   isExternal: false
@@ -162,12 +138,6 @@ references:
   name: Query(Int32, Int32, String, String, String[])
   nameWithType: MessageBox.Query(Int32, Int32, String, String, String[])
   fullName: MessageBox.Query(Int32, Int32, String, String, String[])
-- uid: Terminal.Gui.MessageBox.#ctor*
-  parent: Terminal.Gui.MessageBox
-  isExternal: false
-  name: MessageBox
-  nameWithType: MessageBox.MessageBox
-  fullName: MessageBox.MessageBox
 - uid: Terminal.Gui.MessageBox.ErrorQuery*
   parent: Terminal.Gui.MessageBox
   isExternal: false

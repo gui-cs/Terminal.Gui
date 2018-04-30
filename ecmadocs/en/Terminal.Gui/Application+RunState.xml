@@ -3,7 +3,6 @@
   <TypeSignature Language="ILAsm" Value=".class nested public auto ansi beforefieldinit Application/RunState extends System.Object implements class System.IDisposable" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -26,7 +25,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void Dispose() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -35,7 +33,7 @@
       <Parameters />
       <Docs>
         <summary>
-            Releases all resource used by the <see cref="T:Terminal.Gui.Application.RunState" /> object.
+            Releases alTop = l resource used by the <see cref="T:Terminal.Gui.Application.RunState" /> object.
             </summary>
         <remarks>Call <see cref="M:Terminal.Gui.Application.RunState.Dispose" /> when you are finished using the <see cref="T:Terminal.Gui.Application.RunState" />. The
             <see cref="M:Terminal.Gui.Application.RunState.Dispose" /> method leaves the <see cref="T:Terminal.Gui.Application.RunState" /> in an unusable state. After
@@ -49,7 +47,6 @@
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig newslot virtual instance void Dispose(bool disposing) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>

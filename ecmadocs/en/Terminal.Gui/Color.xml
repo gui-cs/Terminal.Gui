@@ -3,7 +3,6 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi sealed Color extends System.Enum" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -21,7 +20,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color Black = int32(0)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -38,7 +36,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color Blue = int32(1)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -55,7 +52,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color BrighCyan = int32(11)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -72,7 +68,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color BrightBlue = int32(9)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -89,7 +84,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color BrightGreen = int32(10)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -106,7 +100,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color BrightMagenta = int32(13)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -123,7 +116,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color BrightRed = int32(12)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -140,7 +132,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color BrightYellow = int32(14)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -157,7 +148,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color Brown = int32(6)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -174,7 +164,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color Cyan = int32(3)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -191,7 +180,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color DarkGray = int32(8)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -208,7 +196,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color Gray = int32(7)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -225,7 +212,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color Green = int32(2)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -242,7 +228,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color Magenta = int32(5)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -259,7 +244,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color Red = int32(4)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -276,7 +260,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Color White = int32(15)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>

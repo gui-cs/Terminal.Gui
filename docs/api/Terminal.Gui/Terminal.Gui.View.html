@@ -115,8 +115,26 @@
                can contain one or more subviews, can respond to user input and render themselves on the screen.
             </p>
     <p>
-               Views are created with a specified rectangle region (the frame) that is relative to the container
-               that they are added into.<br>            </p>
+               Views can either be created with an absolute position, by calling the constructor that takes a
+               Rect parameter to specify the absolute position and size (the Frame of the View) or by setting the
+               X, Y, Width and Height properties on the view.    Both approaches use coordinates that are relative 
+               to the container they are being added to.
+            </p>
+    <p>
+               When you do not specify a Rect frame you can use the more flexible 
+               Dim and Pos objects that can dynamically update the position of a view.<br>               The X and Y properties are of type <a class="xref" href="Terminal.Gui.Pos.html">Pos</a>
+               and you can use either absolute positions, percentages or anchor
+               points.   The Width and Height properties are of type 
+               <a class="xref" href="Terminal.Gui.Dim.html">Dim</a> and can use absolute position, 
+               percentages and anchors.  These are useful as they will take
+               care of repositioning your views if your view&#39;s frames are resized
+               or if the terminal size changes.
+            </p>
+    <p>
+               When you specify the Rect parameter to a view, you are setting the LayoutStyle to Absolute, and the 
+               view will always stay in the position that you placed it.   To change the position change the 
+               Frame property to the new position.
+            </p>
     <p>
                Subviews can be added to a View by calling the Add method.   The container of a view is the 
                Superview.
@@ -148,14 +166,35 @@
                a way of hiding the cursor, so it can be distracting to have the cursor left at 
                the last focused view.   So views should make sure that they place the cursor
                in a visually sensible place.
+            </p>
+    <p>
+               The metnod LayoutSubviews is invoked when the size or layout of a view has
+               changed.   The default processing system will keep the size and dimensions
+               for views that use the LayoutKind.Absolute, and will recompute the
+               frames for the vies that use LayoutKind.Computed.
             </p></div>
   <h3 id="constructors">Constructors
   </h3>
   
   
   <a id="Terminal_Gui_View__ctor_" data-uid="Terminal.Gui.View.#ctor*"></a>
+  <h4 id="Terminal_Gui_View__ctor" data-uid="Terminal.Gui.View.#ctor">View()</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Terminal.Gui.View.html">View</a> class and sets the
+            view up for Computed layout, which will use the values in X, Y, Width and Height to 
+            compute the View&#39;s Frame.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public View ();</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_View__ctor_" data-uid="Terminal.Gui.View.#ctor*"></a>
   <h4 id="Terminal_Gui_View__ctor_Terminal_Gui_Rect_" data-uid="Terminal.Gui.View.#ctor(Terminal.Gui.Rect)">View(Rect)</h4>
-  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Terminal.Gui.View.html">View</a> class with the specified frame.   This is the default constructor.</p>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Terminal.Gui.View.html">View</a> class with the absolute
+            dimensions specified in the frame.   If you want to have Views that can be positioned with
+            Pos and Dim properties on X, Y, Width and Height, use the empty constructor.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -302,7 +341,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Terminal.Gui.Rect Frame { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual Terminal.Gui.Rect Frame { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -353,6 +392,34 @@
   </table>
   
   
+  <a id="Terminal_Gui_View_Height_" data-uid="Terminal.Gui.View.Height*"></a>
+  <h4 id="Terminal_Gui_View_Height" data-uid="Terminal.Gui.View.Height">Height</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the height for the view. This is only used when the LayoutStyle is Computed, if the
+            LayoutStyle is set to Absolute, this value is ignored.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Terminal.Gui.Dim Height { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Dim.html">Dim</a></td>
+        <td><p>The height.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_View_Id_" data-uid="Terminal.Gui.View.Id*"></a>
   <h4 id="Terminal_Gui_View_Id" data-uid="Terminal.Gui.View.Id">Id</h4>
   <div class="markdown level1 summary"><p>Gets or sets an identifier for the view;</p>
@@ -374,6 +441,35 @@
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
         <td><p>The identifier.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_View_LayoutStyle_" data-uid="Terminal.Gui.View.LayoutStyle*"></a>
+  <h4 id="Terminal_Gui_View_LayoutStyle" data-uid="Terminal.Gui.View.LayoutStyle">LayoutStyle</h4>
+  <div class="markdown level1 summary"><p>Controls how the view&#39;s Frame is computed during the LayoutSubviews method, if Absolute, then
+            LayoutSubviews does not change the Frame properties, otherwise the Frame is updated from the
+            values in X, Y, Width and Height properties.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Terminal.Gui.LayoutStyle LayoutStyle { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a></td>
+        <td><p>The layout style.</p>
 </td>
       </tr>
     </tbody>
@@ -486,6 +582,90 @@
       </tr>
     </tbody>
   </table>
+  
+  
+  <a id="Terminal_Gui_View_Width_" data-uid="Terminal.Gui.View.Width*"></a>
+  <h4 id="Terminal_Gui_View_Width" data-uid="Terminal.Gui.View.Width">Width</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the width for the view. This is only used when the LayoutStyle is Computed, if the
+            LayoutStyle is set to Absolute, this value is ignored.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Terminal.Gui.Dim Width { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Dim.html">Dim</a></td>
+        <td><p>The width.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_View_X_" data-uid="Terminal.Gui.View.X*"></a>
+  <h4 id="Terminal_Gui_View_X" data-uid="Terminal.Gui.View.X">X</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the X position for the view (the column).  This is only used when the LayoutStyle is Computed, if the
+            LayoutStyle is set to Absolute, this value is ignored.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Terminal.Gui.Pos X { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td><p>The X Position.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_View_Y_" data-uid="Terminal.Gui.View.Y*"></a>
+  <h4 id="Terminal_Gui_View_Y" data-uid="Terminal.Gui.View.Y">Y</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the Y position for the view (line).  This is only used when the LayoutStyle is Computed, if the
+            LayoutStyle is set to Absolute, this value is ignored.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Terminal.Gui.Pos Y { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td><p>The y position (line).</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="methods">Methods
   </h3>
   
@@ -542,47 +722,6 @@
         <td><a class="xref" href="Terminal.Gui.View.html">View</a>[]</td>
         <td><span class="parametername">views</span></td>
         <td><p>Array of one or more views (can be optional parameter).</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_View_AddCh_" data-uid="Terminal.Gui.View.AddCh*"></a>
-  <h4 id="Terminal_Gui_View_AddCh_System_Int32_System_Int32_System_Int32_" data-uid="Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)">AddCh(Int32, Int32, Int32)</h4>
-  <div class="markdown level1 summary"><p>Displays the specified character in the specified column and row.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void AddCh (int col, int row, int ch);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">col</span></td>
-        <td><p>Col.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">row</span></td>
-        <td><p>Row.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">ch</span></td>
-        <td><p>Ch.</p>
 </td>
       </tr>
     </tbody>
@@ -724,41 +863,6 @@
   
   
   <a id="Terminal_Gui_View_DrawFrame_" data-uid="Terminal.Gui.View.DrawFrame*"></a>
-  <h4 id="Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Boolean_" data-uid="Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)">DrawFrame(Rect, Boolean)</h4>
-  <div class="markdown level1 summary"><p>Draws a frame in the current view, clipped by the boundary of this view</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void DrawFrame (Terminal.Gui.Rect rect, bool fill = false);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
-        <td><span class="parametername">rect</span></td>
-        <td><p>Rectangular region for the frame to be drawn.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">fill</span></td>
-        <td><p>If set to <code>true</code> it fill will the contents.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_View_DrawFrame_" data-uid="Terminal.Gui.View.DrawFrame*"></a>
   <h4 id="Terminal_Gui_View_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_" data-uid="Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)">DrawFrame(Rect, Int32, Boolean)</h4>
   <div class="markdown level1 summary"><p>Draws a frame in the current view, clipped by the boundary of this view</p>
 </div>
@@ -861,88 +965,6 @@
     <tbody>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">text</span></td>
-        <td><p>String to display, the underscoore before a letter flags the next letter as the hotkey.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a></td>
-        <td><span class="parametername">hotColor</span></td>
-        <td><p>Hot color.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a></td>
-        <td><span class="parametername">normalColor</span></td>
-        <td><p>Normal color.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_View_DrawHotString_" data-uid="Terminal.Gui.View.DrawHotString*"></a>
-  <h4 id="Terminal_Gui_View_DrawHotString_System_String_System_Boolean_Terminal_Gui_ColorScheme_" data-uid="Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)">DrawHotString(String, Boolean, ColorScheme)</h4>
-  <div class="markdown level1 summary"><p>Utility function to draw strings that contains a hotkey using a colorscheme and the &quot;focused&quot; state.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void DrawHotString (string text, bool focused, Terminal.Gui.ColorScheme scheme);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.String</span></td>
-        <td><span class="parametername">text</span></td>
-        <td><p>String to display, the underscoore before a letter flags the next letter as the hotkey.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">focused</span></td>
-        <td><p>If set to <code>true</code> this uses the focused colors from the color scheme, otherwise the regular ones.</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
-        <td><span class="parametername">scheme</span></td>
-        <td><p>The color scheme to use.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_View_DrawHotString_" data-uid="Terminal.Gui.View.DrawHotString*"></a>
-  <h4 id="Terminal_Gui_View_DrawHotString_System_String_Terminal_Gui_Attribute_Terminal_Gui_Attribute_" data-uid="Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)">DrawHotString(String, Attribute, Attribute)</h4>
-  <div class="markdown level1 summary"><p>Utility function to draw strings that contain a hotkey</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void DrawHotString (string text, Terminal.Gui.Attribute hotColor, Terminal.Gui.Attribute normalColor);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.String</span></td>
         <td><span class="parametername">text</span></td>
         <td><p>String to display, the underscoore before a letter flags the next letter as the hotkey.</p>
 </td>
@@ -1157,8 +1179,8 @@ public System.Collections.IEnumerator GetEnumerator ();</code></pre>
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
-        <td><span class="parametername">kb</span></td>
-        <td><p>To be added.</p>
+        <td><span class="parametername">keyEvent</span></td>
+        <td><p>Contains the details about the key that produced the event.</p>
 </td>
       </tr>
     </tbody>
@@ -1201,8 +1223,8 @@ public System.Collections.IEnumerator GetEnumerator ();</code></pre>
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
-        <td><span class="parametername">kb</span></td>
-        <td><p>To be added.</p>
+        <td><span class="parametername">keyEvent</span></td>
+        <td><p>Contains the details about the key that produced the event.</p>
 </td>
       </tr>
     </tbody>
@@ -1245,8 +1267,8 @@ public System.Collections.IEnumerator GetEnumerator ();</code></pre>
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
-        <td><span class="parametername">kb</span></td>
-        <td><p>To be added.</p>
+        <td><span class="parametername">keyEvent</span></td>
+        <td><p>Contains the details about the key that produced the event.</p>
 </td>
       </tr>
     </tbody>

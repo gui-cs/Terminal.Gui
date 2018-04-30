@@ -3,10 +3,10 @@ items:
 - uid: Terminal.Gui.View
   id: View
   children:
+  - Terminal.Gui.View.#ctor
   - Terminal.Gui.View.#ctor(Terminal.Gui.Rect)
   - Terminal.Gui.View.Add(Terminal.Gui.View)
   - Terminal.Gui.View.Add(Terminal.Gui.View[])
-  - Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
   - Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
   - Terminal.Gui.View.Bounds
   - Terminal.Gui.View.ChildNeedsDisplay
@@ -15,12 +15,9 @@ items:
   - Terminal.Gui.View.ClearNeedsDisplay
   - Terminal.Gui.View.ClipToBounds
   - Terminal.Gui.View.ColorScheme
-  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
   - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   - Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
   - Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
-  - Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
-  - Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
   - Terminal.Gui.View.Driver
   - Terminal.Gui.View.EnsureFocus
   - Terminal.Gui.View.Focused
@@ -31,7 +28,9 @@ items:
   - Terminal.Gui.View.Frame
   - Terminal.Gui.View.GetEnumerator
   - Terminal.Gui.View.HasFocus
+  - Terminal.Gui.View.Height
   - Terminal.Gui.View.Id
+  - Terminal.Gui.View.LayoutStyle
   - Terminal.Gui.View.LayoutSubviews
   - Terminal.Gui.View.MostFocused
   - Terminal.Gui.View.Move(System.Int32,System.Int32)
@@ -51,6 +50,9 @@ items:
   - Terminal.Gui.View.SuperView
   - Terminal.Gui.View.ToString
   - Terminal.Gui.View.WantMousePositionReports
+  - Terminal.Gui.View.Width
+  - Terminal.Gui.View.X
+  - Terminal.Gui.View.Y
   langs:
   - csharp
   name: View
@@ -61,7 +63,7 @@ items:
   - Terminal.Gui
   namespace: Terminal.Gui
   summary: View is the base class for all views on the screen and represents a visible element that can render itself and contains zero or more nested views.
-  remarks: "<p>\n               The View defines the base functionality for user interface elements in Terminal/gui.cs.  Views\n               can contain one or more subviews, can respond to user input and render themselves on the screen.\n            </p>\n    <p>\n               Views are created with a specified rectangle region (the frame) that is relative to the container\n               that they are added into.   \n            </p>\n    <p>\n               Subviews can be added to a View by calling the Add method.   The container of a view is the \n               Superview.\n            </p>\n    <p>\n               Developers can call the SetNeedsDisplay method on the view to flag a region or the entire view\n               as requiring to be redrawn.\n            </p>\n    <p>\n               Views have a ColorScheme property that defines the default colors that subviews\n               should use for rendering.   This ensures that the views fit in the context where\n               they are being used, and allows for themes to be plugged in.   For example, the\n               default colors for windows and toplevels uses a blue background, while it uses \n               a white background for dialog boxes and a red background for errors.\n            </p>\n    <p>\n               If a ColorScheme is not set on a view, the result of the ColorScheme is the\n               value of the SuperView and the value might only be valid once a view has been\n               added to a SuperView, so your subclasses should not rely on ColorScheme being\n               set at construction time.\n            </p>\n    <p>\n               Using ColorSchemes has the advantage that your application will work both\n               in color as well as black and white displays.\n            </p>\n    <p>\n               Views that are focusable should implement the PositionCursor to make sure that\n               the cursor is placed in a location that makes sense.   Unix terminals do not have\n               a way of hiding the cursor, so it can be distracting to have the cursor left at \n               the last focused view.   So views should make sure that they place the cursor\n               in a visually sensible place.\n            </p>"
+  remarks: "<p>\n               The View defines the base functionality for user interface elements in Terminal/gui.cs.  Views\n               can contain one or more subviews, can respond to user input and render themselves on the screen.\n            </p>\n    <p>\n               Views can either be created with an absolute position, by calling the constructor that takes a\n               Rect parameter to specify the absolute position and size (the Frame of the View) or by setting the\n               X, Y, Width and Height properties on the view.    Both approaches use coordinates that are relative \n               to the container they are being added to.\n            </p>\n    <p>\n               When you do not specify a Rect frame you can use the more flexible \n               Dim and Pos objects that can dynamically update the position of a view.   \n               The X and Y properties are of type <xref href=\"Terminal.Gui.Pos\"></xref>\n               and you can use either absolute positions, percentages or anchor\n               points.   The Width and Height properties are of type \n               <xref href=\"Terminal.Gui.Dim\"></xref> and can use absolute position, \n               percentages and anchors.  These are useful as they will take\n               care of repositioning your views if your view's frames are resized\n               or if the terminal size changes.\n            </p>\n    <p>\n               When you specify the Rect parameter to a view, you are setting the LayoutStyle to Absolute, and the \n               view will always stay in the position that you placed it.   To change the position change the \n               Frame property to the new position.\n            </p>\n    <p>\n               Subviews can be added to a View by calling the Add method.   The container of a view is the \n               Superview.\n            </p>\n    <p>\n               Developers can call the SetNeedsDisplay method on the view to flag a region or the entire view\n               as requiring to be redrawn.\n            </p>\n    <p>\n               Views have a ColorScheme property that defines the default colors that subviews\n               should use for rendering.   This ensures that the views fit in the context where\n               they are being used, and allows for themes to be plugged in.   For example, the\n               default colors for windows and toplevels uses a blue background, while it uses \n               a white background for dialog boxes and a red background for errors.\n            </p>\n    <p>\n               If a ColorScheme is not set on a view, the result of the ColorScheme is the\n               value of the SuperView and the value might only be valid once a view has been\n               added to a SuperView, so your subclasses should not rely on ColorScheme being\n               set at construction time.\n            </p>\n    <p>\n               Using ColorSchemes has the advantage that your application will work both\n               in color as well as black and white displays.\n            </p>\n    <p>\n               Views that are focusable should implement the PositionCursor to make sure that\n               the cursor is placed in a location that makes sense.   Unix terminals do not have\n               a way of hiding the cursor, so it can be distracting to have the cursor left at \n               the last focused view.   So views should make sure that they place the cursor\n               in a visually sensible place.\n            </p>\n    <p>\n               The metnod LayoutSubviews is invoked when the size or layout of a view has\n               changed.   The default processing system will keep the size and dimensions\n               for views that use the LayoutKind.Absolute, and will recompute the\n               frames for the vies that use LayoutKind.Computed.\n            </p>"
   syntax:
     content: 'public class View : Terminal.Gui.Responder, System.Collections.IEnumerable'
   inheritance:
@@ -86,6 +88,24 @@ items:
   inheritedMembers:
   - Terminal.Gui.Responder.CanFocus
   - Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
+- uid: Terminal.Gui.View.#ctor
+  id: '#ctor'
+  parent: Terminal.Gui.View
+  langs:
+  - csharp
+  name: View()
+  nameWithType: View.View()
+  fullName: View.View()
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "Initializes a new instance of the <xref href=\"Terminal.Gui.View\"></xref> class and sets the\n            view up for Computed layout, which will use the values in X, Y, Width and Height to \n            compute the View's Frame."
+  syntax:
+    content: public View ();
+    parameters: []
+  overload: Terminal.Gui.View.#ctor*
+  exceptions: []
 - uid: Terminal.Gui.View.#ctor(Terminal.Gui.Rect)
   id: '#ctor(Terminal.Gui.Rect)'
   parent: Terminal.Gui.View
@@ -98,7 +118,10 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Initializes a new instance of the <xref href="Terminal.Gui.View"></xref> class with the specified frame.   This is the default constructor.
+  summary: >-
+    Initializes a new instance of the <xref href="Terminal.Gui.View"></xref> class with the absolute
+                dimensions specified in the frame.   If you want to have Views that can be positioned with
+                Pos and Dim properties on X, Y, Width and Height, use the empty constructor.
   syntax:
     content: public View (Terminal.Gui.Rect frame);
     parameters:
@@ -148,32 +171,6 @@ items:
       type: Terminal.Gui.View[]
       description: Array of one or more views (can be optional parameter).
   overload: Terminal.Gui.View.Add*
-  exceptions: []
-- uid: Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
-  id: AddCh(System.Int32,System.Int32,System.Int32)
-  parent: Terminal.Gui.View
-  langs:
-  - csharp
-  name: AddCh(Int32, Int32, Int32)
-  nameWithType: View.AddCh(Int32, Int32, Int32)
-  fullName: View.AddCh(Int32, Int32, Int32)
-  type: Method
-  assemblies: []
-  namespace: Terminal.Gui
-  summary: Displays the specified character in the specified column and row.
-  syntax:
-    content: public void AddCh (int col, int row, int ch);
-    parameters:
-    - id: col
-      type: System.Int32
-      description: Col.
-    - id: row
-      type: System.Int32
-      description: Row.
-    - id: ch
-      type: System.Int32
-      description: Ch.
-  overload: Terminal.Gui.View.AddCh*
   exceptions: []
 - uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
   id: AddRune(System.Int32,System.Int32,System.Rune)
@@ -344,29 +341,6 @@ items:
       description: To be added.
   overload: Terminal.Gui.View.ColorScheme*
   exceptions: []
-- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
-  id: DrawFrame(Terminal.Gui.Rect,System.Boolean)
-  parent: Terminal.Gui.View
-  langs:
-  - csharp
-  name: DrawFrame(Rect, Boolean)
-  nameWithType: View.DrawFrame(Rect, Boolean)
-  fullName: View.DrawFrame(Rect, Boolean)
-  type: Method
-  assemblies: []
-  namespace: Terminal.Gui
-  summary: Draws a frame in the current view, clipped by the boundary of this view
-  syntax:
-    content: public void DrawFrame (Terminal.Gui.Rect rect, bool fill = false);
-    parameters:
-    - id: rect
-      type: Terminal.Gui.Rect
-      description: Rectangular region for the frame to be drawn.
-    - id: fill
-      type: System.Boolean
-      description: If set to <code>true</code> it fill will the contents.
-  overload: Terminal.Gui.View.DrawFrame*
-  exceptions: []
 - uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   id: DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   parent: Terminal.Gui.View
@@ -439,58 +413,6 @@ items:
     parameters:
     - id: text
       type: NStack.ustring
-      description: String to display, the underscoore before a letter flags the next letter as the hotkey.
-    - id: hotColor
-      type: Terminal.Gui.Attribute
-      description: Hot color.
-    - id: normalColor
-      type: Terminal.Gui.Attribute
-      description: Normal color.
-  overload: Terminal.Gui.View.DrawHotString*
-  exceptions: []
-- uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
-  id: DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
-  parent: Terminal.Gui.View
-  langs:
-  - csharp
-  name: DrawHotString(String, Boolean, ColorScheme)
-  nameWithType: View.DrawHotString(String, Boolean, ColorScheme)
-  fullName: View.DrawHotString(String, Boolean, ColorScheme)
-  type: Method
-  assemblies: []
-  namespace: Terminal.Gui
-  summary: Utility function to draw strings that contains a hotkey using a colorscheme and the "focused" state.
-  syntax:
-    content: public void DrawHotString (string text, bool focused, Terminal.Gui.ColorScheme scheme);
-    parameters:
-    - id: text
-      type: System.String
-      description: String to display, the underscoore before a letter flags the next letter as the hotkey.
-    - id: focused
-      type: System.Boolean
-      description: If set to <code>true</code> this uses the focused colors from the color scheme, otherwise the regular ones.
-    - id: scheme
-      type: Terminal.Gui.ColorScheme
-      description: The color scheme to use.
-  overload: Terminal.Gui.View.DrawHotString*
-  exceptions: []
-- uid: Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
-  id: DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
-  parent: Terminal.Gui.View
-  langs:
-  - csharp
-  name: DrawHotString(String, Attribute, Attribute)
-  nameWithType: View.DrawHotString(String, Attribute, Attribute)
-  fullName: View.DrawHotString(String, Attribute, Attribute)
-  type: Method
-  assemblies: []
-  namespace: Terminal.Gui
-  summary: Utility function to draw strings that contain a hotkey
-  syntax:
-    content: public void DrawHotString (string text, Terminal.Gui.Attribute hotColor, Terminal.Gui.Attribute normalColor);
-    parameters:
-    - id: text
-      type: System.String
       description: String to display, the underscoore before a letter flags the next letter as the hotkey.
     - id: hotColor
       type: Terminal.Gui.Attribute
@@ -652,7 +574,7 @@ items:
   summary: Gets or sets the frame for the view.
   remarks: "Altering the Frame of a view will trigger the redrawing of the \n               view as well as the redrawing of the affected regions in the superview."
   syntax:
-    content: public Terminal.Gui.Rect Frame { get; set; }
+    content: public virtual Terminal.Gui.Rect Frame { get; set; }
     return:
       type: Terminal.Gui.Rect
       description: The frame.
@@ -704,6 +626,28 @@ items:
       description: <code>true</code> if has focus; otherwise, <code>false</code>.
   overload: Terminal.Gui.View.HasFocus*
   exceptions: []
+- uid: Terminal.Gui.View.Height
+  id: Height
+  parent: Terminal.Gui.View
+  langs:
+  - csharp
+  name: Height
+  nameWithType: View.Height
+  fullName: View.Height
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the height for the view. This is only used when the LayoutStyle is Computed, if the
+                LayoutStyle is set to Absolute, this value is ignored.
+  syntax:
+    content: public Terminal.Gui.Dim Height { get; set; }
+    return:
+      type: Terminal.Gui.Dim
+      description: The height.
+  overload: Terminal.Gui.View.Height*
+  exceptions: []
 - uid: Terminal.Gui.View.Id
   id: Id
   parent: Terminal.Gui.View
@@ -723,6 +667,29 @@ items:
       type: NStack.ustring
       description: The identifier.
   overload: Terminal.Gui.View.Id*
+  exceptions: []
+- uid: Terminal.Gui.View.LayoutStyle
+  id: LayoutStyle
+  parent: Terminal.Gui.View
+  langs:
+  - csharp
+  name: LayoutStyle
+  nameWithType: View.LayoutStyle
+  fullName: View.LayoutStyle
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Controls how the view's Frame is computed during the LayoutSubviews method, if Absolute, then
+                LayoutSubviews does not change the Frame properties, otherwise the Frame is updated from the
+                values in X, Y, Width and Height properties.
+  syntax:
+    content: public Terminal.Gui.LayoutStyle LayoutStyle { get; set; }
+    return:
+      type: Terminal.Gui.LayoutStyle
+      description: The layout style.
+  overload: Terminal.Gui.View.LayoutStyle*
   exceptions: []
 - uid: Terminal.Gui.View.LayoutSubviews
   id: LayoutSubviews
@@ -819,9 +786,9 @@ items:
   syntax:
     content: public override bool ProcessColdKey (Terminal.Gui.KeyEvent keyEvent);
     parameters:
-    - id: kb
+    - id: keyEvent
       type: Terminal.Gui.KeyEvent
-      description: To be added.
+      description: Contains the details about the key that produced the event.
     return:
       type: System.Boolean
       description: To be added.
@@ -842,9 +809,9 @@ items:
   syntax:
     content: public override bool ProcessHotKey (Terminal.Gui.KeyEvent keyEvent);
     parameters:
-    - id: kb
+    - id: keyEvent
       type: Terminal.Gui.KeyEvent
-      description: To be added.
+      description: Contains the details about the key that produced the event.
     return:
       type: System.Boolean
       description: To be added.
@@ -865,9 +832,9 @@ items:
   syntax:
     content: public override bool ProcessKey (Terminal.Gui.KeyEvent keyEvent);
     parameters:
-    - id: kb
+    - id: keyEvent
       type: Terminal.Gui.KeyEvent
-      description: To be added.
+      description: Contains the details about the key that produced the event.
     return:
       type: System.Boolean
       description: To be added.
@@ -1132,6 +1099,72 @@ items:
       description: <code>true</code> if want mouse position reports; otherwise, <code>false</code>.
   overload: Terminal.Gui.View.WantMousePositionReports*
   exceptions: []
+- uid: Terminal.Gui.View.Width
+  id: Width
+  parent: Terminal.Gui.View
+  langs:
+  - csharp
+  name: Width
+  nameWithType: View.Width
+  fullName: View.Width
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the width for the view. This is only used when the LayoutStyle is Computed, if the
+                LayoutStyle is set to Absolute, this value is ignored.
+  syntax:
+    content: public Terminal.Gui.Dim Width { get; set; }
+    return:
+      type: Terminal.Gui.Dim
+      description: The width.
+  overload: Terminal.Gui.View.Width*
+  exceptions: []
+- uid: Terminal.Gui.View.X
+  id: X
+  parent: Terminal.Gui.View
+  langs:
+  - csharp
+  name: X
+  nameWithType: View.X
+  fullName: View.X
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the X position for the view (the column).  This is only used when the LayoutStyle is Computed, if the
+                LayoutStyle is set to Absolute, this value is ignored.
+  syntax:
+    content: public Terminal.Gui.Pos X { get; set; }
+    return:
+      type: Terminal.Gui.Pos
+      description: The X Position.
+  overload: Terminal.Gui.View.X*
+  exceptions: []
+- uid: Terminal.Gui.View.Y
+  id: Y
+  parent: Terminal.Gui.View
+  langs:
+  - csharp
+  name: Y
+  nameWithType: View.Y
+  fullName: View.Y
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the Y position for the view (line).  This is only used when the LayoutStyle is Computed, if the
+                LayoutStyle is set to Absolute, this value is ignored.
+  syntax:
+    content: public Terminal.Gui.Pos Y { get; set; }
+    return:
+      type: Terminal.Gui.Pos
+      description: The y position (line).
+  overload: Terminal.Gui.View.Y*
+  exceptions: []
 references:
 - uid: Terminal.Gui.Responder
   parent: Terminal.Gui
@@ -1139,6 +1172,12 @@ references:
   name: Responder
   nameWithType: Responder
   fullName: Terminal.Gui.Responder
+- uid: Terminal.Gui.View.#ctor
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: View()
+  nameWithType: View.View()
+  fullName: View.View()
 - uid: Terminal.Gui.View.#ctor(Terminal.Gui.Rect)
   parent: Terminal.Gui.View
   isExternal: false
@@ -1183,24 +1222,18 @@ references:
   - name: '[]'
     nameWithType: '[]'
     fullName: '[]'
-- uid: Terminal.Gui.View.AddCh(System.Int32,System.Int32,System.Int32)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: AddCh(Int32, Int32, Int32)
-  nameWithType: View.AddCh(Int32, Int32, Int32)
-  fullName: View.AddCh(Int32, Int32, Int32)
-- uid: System.Int32
-  parent: System
-  isExternal: true
-  name: Int32
-  nameWithType: Int32
-  fullName: System.Int32
 - uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
   parent: Terminal.Gui.View
   isExternal: false
   name: AddRune(Int32, Int32, Rune)
   nameWithType: View.AddRune(Int32, Int32, Rune)
   fullName: View.AddRune(Int32, Int32, Rune)
+- uid: System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
 - uid: System.Rune
   parent: System
   isExternal: true
@@ -1255,24 +1288,18 @@ references:
   name: ColorScheme
   nameWithType: ColorScheme
   fullName: Terminal.Gui.ColorScheme
-- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Boolean)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: DrawFrame(Rect, Boolean)
-  nameWithType: View.DrawFrame(Rect, Boolean)
-  fullName: View.DrawFrame(Rect, Boolean)
-- uid: System.Boolean
-  parent: System
-  isExternal: true
-  name: Boolean
-  nameWithType: Boolean
-  fullName: System.Boolean
 - uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   parent: Terminal.Gui.View
   isExternal: false
   name: DrawFrame(Rect, Int32, Boolean)
   nameWithType: View.DrawFrame(Rect, Int32, Boolean)
   fullName: View.DrawFrame(Rect, Int32, Boolean)
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
 - uid: Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
   parent: Terminal.Gui.View
   isExternal: false
@@ -1297,24 +1324,6 @@ references:
   name: Attribute
   nameWithType: Attribute
   fullName: Terminal.Gui.Attribute
-- uid: Terminal.Gui.View.DrawHotString(System.String,System.Boolean,Terminal.Gui.ColorScheme)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: DrawHotString(String, Boolean, ColorScheme)
-  nameWithType: View.DrawHotString(String, Boolean, ColorScheme)
-  fullName: View.DrawHotString(String, Boolean, ColorScheme)
-- uid: System.String
-  parent: System
-  isExternal: true
-  name: String
-  nameWithType: String
-  fullName: System.String
-- uid: Terminal.Gui.View.DrawHotString(System.String,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: DrawHotString(String, Attribute, Attribute)
-  nameWithType: View.DrawHotString(String, Attribute, Attribute)
-  fullName: View.DrawHotString(String, Attribute, Attribute)
 - uid: Terminal.Gui.View.Driver
   parent: Terminal.Gui.View
   isExternal: false
@@ -1387,12 +1396,36 @@ references:
   name: HasFocus
   nameWithType: View.HasFocus
   fullName: View.HasFocus
+- uid: Terminal.Gui.View.Height
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Height
+  nameWithType: View.Height
+  fullName: View.Height
+- uid: Terminal.Gui.Dim
+  parent: Terminal.Gui
+  isExternal: false
+  name: Dim
+  nameWithType: Dim
+  fullName: Terminal.Gui.Dim
 - uid: Terminal.Gui.View.Id
   parent: Terminal.Gui.View
   isExternal: false
   name: Id
   nameWithType: View.Id
   fullName: View.Id
+- uid: Terminal.Gui.View.LayoutStyle
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: LayoutStyle
+  nameWithType: View.LayoutStyle
+  fullName: View.LayoutStyle
+- uid: Terminal.Gui.LayoutStyle
+  parent: Terminal.Gui
+  isExternal: false
+  name: LayoutStyle
+  nameWithType: LayoutStyle
+  fullName: Terminal.Gui.LayoutStyle
 - uid: Terminal.Gui.View.LayoutSubviews
   parent: Terminal.Gui.View
   isExternal: false
@@ -1538,12 +1571,42 @@ references:
   name: ToString()
   nameWithType: View.ToString()
   fullName: View.ToString()
+- uid: System.String
+  parent: System
+  isExternal: true
+  name: String
+  nameWithType: String
+  fullName: System.String
 - uid: Terminal.Gui.View.WantMousePositionReports
   parent: Terminal.Gui.View
   isExternal: false
   name: WantMousePositionReports
   nameWithType: View.WantMousePositionReports
   fullName: View.WantMousePositionReports
+- uid: Terminal.Gui.View.Width
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Width
+  nameWithType: View.Width
+  fullName: View.Width
+- uid: Terminal.Gui.View.X
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: X
+  nameWithType: View.X
+  fullName: View.X
+- uid: Terminal.Gui.Pos
+  parent: Terminal.Gui
+  isExternal: false
+  name: Pos
+  nameWithType: Pos
+  fullName: Terminal.Gui.Pos
+- uid: Terminal.Gui.View.Y
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Y
+  nameWithType: View.Y
+  fullName: View.Y
 - uid: Terminal.Gui.View.#ctor*
   parent: Terminal.Gui.View
   isExternal: false
@@ -1556,12 +1619,6 @@ references:
   name: Add
   nameWithType: View.Add
   fullName: View.Add
-- uid: Terminal.Gui.View.AddCh*
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: AddCh
-  nameWithType: View.AddCh
-  fullName: View.AddCh
 - uid: Terminal.Gui.View.AddRune*
   parent: Terminal.Gui.View
   isExternal: false
@@ -1670,12 +1727,24 @@ references:
   name: HasFocus
   nameWithType: View.HasFocus
   fullName: View.HasFocus
+- uid: Terminal.Gui.View.Height*
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Height
+  nameWithType: View.Height
+  fullName: View.Height
 - uid: Terminal.Gui.View.Id*
   parent: Terminal.Gui.View
   isExternal: false
   name: Id
   nameWithType: View.Id
   fullName: View.Id
+- uid: Terminal.Gui.View.LayoutStyle*
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: LayoutStyle
+  nameWithType: View.LayoutStyle
+  fullName: View.LayoutStyle
 - uid: Terminal.Gui.View.LayoutSubviews*
   parent: Terminal.Gui.View
   isExternal: false
@@ -1784,6 +1853,24 @@ references:
   name: WantMousePositionReports
   nameWithType: View.WantMousePositionReports
   fullName: View.WantMousePositionReports
+- uid: Terminal.Gui.View.Width*
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Width
+  nameWithType: View.Width
+  fullName: View.Width
+- uid: Terminal.Gui.View.X*
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: X
+  nameWithType: View.X
+  fullName: View.X
+- uid: Terminal.Gui.View.Y*
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Y
+  nameWithType: View.Y
+  fullName: View.Y
 - uid: Terminal.Gui.Responder.CanFocus
   parent: Terminal.Gui.Responder
   isExternal: false

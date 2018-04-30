@@ -3,7 +3,6 @@ items:
 - uid: Terminal.Gui.Application
   id: Application
   children:
-  - Terminal.Gui.Application.#ctor
   - Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)
   - Terminal.Gui.Application.Current
   - Terminal.Gui.Application.Driver
@@ -34,28 +33,11 @@ items:
   summary: The application driver for gui.cs
   remarks: "<p>\n                You can hook up to the Iteration event to have your method \n                invoked on each iteration of the mainloop.\n              </p>\n    <p>\n                Creates a mainloop to process input events, handle timers and\n                other sources of data.   It is accessible via the MainLoop property.\n              </p>\n    <p>\n                When invoked sets the SynchronizationContext to one that is tied\n                to the mainloop, allowing user code to use async/await.\n              </p>"
   syntax:
-    content: public class Application
+    content: public static class Application
   inheritance:
   - System.Object
   implements: []
   inheritedMembers: []
-- uid: Terminal.Gui.Application.#ctor
-  id: '#ctor'
-  parent: Terminal.Gui.Application
-  langs:
-  - csharp
-  name: Application()
-  nameWithType: Application.Application()
-  fullName: Application.Application()
-  type: Constructor
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  syntax:
-    content: public Application ();
-    parameters: []
-  overload: Terminal.Gui.Application.#ctor*
-  exceptions: []
 - uid: Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)
   id: Begin(Terminal.Gui.Toplevel)
   parent: Terminal.Gui.Application
@@ -136,9 +118,9 @@ items:
   syntax:
     content: public static void End (Terminal.Gui.Application.RunState runState);
     parameters:
-    - id: rs
+    - id: runState
       type: Terminal.Gui.Application+RunState
-      description: To be added.
+      description: The runstate returned by the <xref href="Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)"></xref> method.
   overload: Terminal.Gui.Application.End*
   exceptions: []
 - uid: Terminal.Gui.Application.GrabMouse(Terminal.Gui.View)
@@ -432,12 +414,6 @@ references:
   name: Object
   nameWithType: Object
   fullName: System.Object
-- uid: Terminal.Gui.Application.#ctor
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: Application()
-  nameWithType: Application.Application()
-  fullName: Application.Application()
 - uid: Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)
   parent: Terminal.Gui.Application
   isExternal: false
@@ -629,12 +605,6 @@ references:
   name: UseSystemConsole
   nameWithType: Application.UseSystemConsole
   fullName: Application.UseSystemConsole
-- uid: Terminal.Gui.Application.#ctor*
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: Application
-  nameWithType: Application.Application
-  fullName: Application.Application
 - uid: Terminal.Gui.Application.Begin*
   parent: Terminal.Gui.Application
   isExternal: false

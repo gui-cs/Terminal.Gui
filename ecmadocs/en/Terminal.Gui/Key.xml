@@ -3,7 +3,6 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi sealed Key extends System.Enum" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -33,7 +32,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key AltMask = unsigned int32(2147483648)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -51,7 +49,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key Backspace = unsigned int32(1048576)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -68,7 +65,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key BackTab = unsigned int32(1048597)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -85,7 +81,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key CharMask = unsigned int32(1048575)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -104,7 +99,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlA = unsigned int32(1)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -121,7 +115,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlB = unsigned int32(2)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -138,7 +131,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlC = unsigned int32(3)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -155,7 +147,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlD = unsigned int32(4)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -172,7 +163,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlE = unsigned int32(5)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -189,7 +179,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlF = unsigned int32(6)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -206,7 +195,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlG = unsigned int32(7)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -223,7 +211,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlH = unsigned int32(8)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -240,7 +227,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlI = unsigned int32(9)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -257,7 +243,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlJ = unsigned int32(10)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -274,7 +259,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlK = unsigned int32(11)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -291,7 +275,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlL = unsigned int32(12)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -308,7 +291,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlM = unsigned int32(13)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -325,7 +307,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlN = unsigned int32(14)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -342,7 +323,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlO = unsigned int32(15)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -359,7 +339,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlP = unsigned int32(16)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -376,7 +355,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlQ = unsigned int32(17)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -393,7 +371,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlR = unsigned int32(18)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -410,7 +387,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlS = unsigned int32(19)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -443,7 +419,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlT = unsigned int32(20)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -460,7 +435,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlU = unsigned int32(21)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -477,7 +451,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlV = unsigned int32(22)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -494,7 +467,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlW = unsigned int32(23)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -511,7 +483,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlX = unsigned int32(24)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -528,7 +499,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlY = unsigned int32(25)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -545,7 +515,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key ControlZ = unsigned int32(26)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -562,7 +531,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key CursorDown = unsigned int32(1048578)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -579,7 +547,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key CursorLeft = unsigned int32(1048579)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -596,7 +563,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key CursorRight = unsigned int32(1048580)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -613,7 +579,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key CursorUp = unsigned int32(1048577)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -630,7 +595,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key Delete = unsigned int32(127)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -647,7 +611,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key DeleteChar = unsigned int32(1048585)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -664,7 +627,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key End = unsigned int32(1048584)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -681,7 +643,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key Enter = unsigned int32(10)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -698,7 +659,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key Esc = unsigned int32(27)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -715,7 +675,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key F1 = unsigned int32(1048587)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -732,7 +691,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key F10 = unsigned int32(1048596)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -749,7 +707,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key F2 = unsigned int32(1048588)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -766,7 +723,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key F3 = unsigned int32(1048589)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -783,7 +739,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key F4 = unsigned int32(1048590)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -800,7 +755,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key F5 = unsigned int32(1048591)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -817,7 +771,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key F6 = unsigned int32(1048592)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -834,7 +787,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key F7 = unsigned int32(1048593)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -851,7 +803,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key F8 = unsigned int32(1048594)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -868,7 +819,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key F9 = unsigned int32(1048595)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -885,7 +835,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key Home = unsigned int32(1048583)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -902,7 +851,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key InsertChar = unsigned int32(1048586)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -919,7 +867,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key PageDown = unsigned int32(1048582)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -936,7 +883,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key PageUp = unsigned int32(1048581)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -953,7 +899,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key Space = unsigned int32(32)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -970,7 +915,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key SpecialMask = unsigned int32(4293918720)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -988,7 +932,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key Tab = unsigned int32(9)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -1005,7 +948,6 @@
       <MemberSignature Language="ILAsm" Value=".field public static literal valuetype Terminal.Gui.Key Unknown = unsigned int32(1048598)" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>

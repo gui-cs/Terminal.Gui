@@ -3,7 +3,6 @@
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit Button extends Terminal.Gui.View" />
   <AssemblyInfo>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -29,51 +28,7 @@
   </Docs>
   <Members>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public Button (NStack.ustring text);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class NStack.ustring text) cil managed" />
-      <MemberType>Constructor</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <Parameters>
-        <Parameter Name="text" Type="NStack.ustring" />
-      </Parameters>
-      <Docs>
-        <param name="text">The button's text</param>
-        <summary>
-              Public constructor, creates a button based on
-              the given text at position 0,0
-            </summary>
-        <remarks>
-              The size of the button is computed based on the
-              text length.   This button is not a default button.
-            </remarks>
-      </Docs>
-    </Member>
-    <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public Button (string text);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string text) cil managed" />
-      <MemberType>Constructor</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <Parameters>
-        <Parameter Name="s" Type="System.String" />
-      </Parameters>
-      <Docs>
-        <param name="text">To be added.</param>
-        <summary>
-              Public constructor, creates a button based on
-              the given text at position 0,0
-            </summary>
-        <remarks>
-              The size of the button is computed based on the
-              text length.   This button is not a default button.
-            </remarks>
-      </Docs>
-    </Member>
-    <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public Button (NStack.ustring text, bool is_default);" />
+      <MemberSignature Language="C#" Value="public Button (NStack.ustring text, bool is_default = false);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class NStack.ustring text, bool is_default) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
@@ -88,37 +43,11 @@
         <param name="is_default">If set, this makes the button the default button in the current view, which means that if the user presses return on a view that does not handle return, it will be treated as if he had clicked on the button</param>
         <summary>
               Public constructor, creates a button based on
-              the given text.
+              the given text at position 0,0
             </summary>
         <remarks>
-              If the value for is_default is true, a special
-              decoration is used, and the enter key on a
-              dialog would implicitly activate this button.
-            </remarks>
-      </Docs>
-    </Member>
-    <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public Button (string text, bool is_default);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string text, bool is_default) cil managed" />
-      <MemberType>Constructor</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <Parameters>
-        <Parameter Name="s" Type="System.String" />
-        <Parameter Name="is_default" Type="System.Boolean" />
-      </Parameters>
-      <Docs>
-        <param name="text">To be added.</param>
-        <param name="is_default">To be added.</param>
-        <summary>
-              Public constructor, creates a button based on
-              the given text.
-            </summary>
-        <remarks>
-              If the value for is_default is true, a special
-              decoration is used, and the enter key on a
-              dialog would implicitly activate this button.
+              The size of the button is computed based on the
+              text length.   This button is not a default button.
             </remarks>
       </Docs>
     </Member>
@@ -138,32 +67,6 @@
         <param name="x">X position where the button will be shown.</param>
         <param name="y">Y position where the button will be shown.</param>
         <param name="text">The button's text</param>
-        <summary>
-              Public constructor, creates a button based on
-              the given text at the given position.
-            </summary>
-        <remarks>
-              The size of the button is computed based on the
-              text length.   This button is not a default button.
-            </remarks>
-      </Docs>
-    </Member>
-    <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public Button (int x, int y, string text);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, string text) cil managed" />
-      <MemberType>Constructor</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <Parameters>
-        <Parameter Name="x" Type="System.Int32" />
-        <Parameter Name="y" Type="System.Int32" />
-        <Parameter Name="s" Type="System.String" />
-      </Parameters>
-      <Docs>
-        <param name="x">To be added.</param>
-        <param name="y">To be added.</param>
-        <param name="text">To be added.</param>
         <summary>
               Public constructor, creates a button based on
               the given text at the given position.
@@ -203,41 +106,11 @@
             </remarks>
       </Docs>
     </Member>
-    <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public Button (int x, int y, string text, bool is_default);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(int32 x, int32 y, string text, bool is_default) cil managed" />
-      <MemberType>Constructor</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
-      <Parameters>
-        <Parameter Name="x" Type="System.Int32" />
-        <Parameter Name="y" Type="System.Int32" />
-        <Parameter Name="s" Type="System.String" />
-        <Parameter Name="is_default" Type="System.Boolean" />
-      </Parameters>
-      <Docs>
-        <param name="x">To be added.</param>
-        <param name="y">To be added.</param>
-        <param name="text">To be added.</param>
-        <param name="is_default">To be added.</param>
-        <summary>
-              Public constructor, creates a button based on
-              the given text at the given position.
-            </summary>
-        <remarks>
-              If the value for is_default is true, a special
-              decoration is used, and the enter key on a
-              dialog would implicitly activate this button.
-            </remarks>
-      </Docs>
-    </Member>
     <Member MemberName="Clicked">
       <MemberSignature Language="C#" Value="public Action Clicked;" />
       <MemberSignature Language="ILAsm" Value=".field public class System.Action Clicked" />
       <MemberType>Field</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -259,7 +132,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance bool IsDefault" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -279,7 +151,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool MouseEvent(valuetype Terminal.Gui.MouseEvent me) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -300,7 +171,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void PositionCursor() cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -317,7 +187,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessColdKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -338,7 +207,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessHotKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -359,7 +227,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool ProcessKey(valuetype Terminal.Gui.KeyEvent kb) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -380,7 +247,6 @@
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Redraw(valuetype Terminal.Gui.Rect region) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
@@ -400,7 +266,6 @@
       <MemberSignature Language="ILAsm" Value=".property instance class NStack.ustring Text" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
