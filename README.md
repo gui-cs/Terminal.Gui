@@ -36,9 +36,12 @@ It is designed to work on Curses and the [Windows Console](https://github.com/mi
 works well on both color and monochrome terminals and has mouse support on
 terminal emulators that support it.
 
-# API Documentation
+# Documentation
 
-Go to the [API documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui.html) for details.
+* [API documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui.html) for details.
+
+* [Overview](https://migueldeicaza.github.io/gui.cs/articles/overview.html) contains the conceptual
+  documentation and a walkthrough of the core concepts of `gui.cs`
 
 # Sample Usage
 
@@ -91,14 +94,17 @@ class Demo {
 
 If you want to try Gui.cs, use NuGet to install the `Terminal.Gui` NuGet package:
 
-https://www.nuget.org/packages/Terminal.Gui/0.1.0
+https://www.nuget.org/packages/Terminal.Gui
 
 # Running and Building
 
-Open the solution and run the sample program.
-
 You can find a trivial .NET core sample application in the
-"StandaloneExample" directory.   
+"StandaloneExample" directory.   You can execute it by running
+`dotnet core` in that directory.
+
+That sample relies on the distributed NuGet package, if you want to
+to use the code on GitHub, you can open the Example program which 
+references the library built out of this tree.
 
 # Input Handling
 
