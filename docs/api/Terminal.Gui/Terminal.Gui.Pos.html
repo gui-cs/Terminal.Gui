@@ -99,6 +99,11 @@
                 integer value (via the implicit integer to Pos conversion), and they can be combined
                 to produce more useful layouts, like: Pos.Center - 3, which would shift the postion
                 of the view 3 characters to the left after centering for example.
+              </p>
+    <p>
+                It is possible to reference coordinates of another view by using the methods
+                Left(View), Right(View), Bottom(View), Top(View).   The X(View) and Y(View) are
+                aliases to Left(View) and Top(View) respectively.
               </p></div>
   <h3 id="constructors">Constructors
   </h3>
@@ -162,6 +167,51 @@
   </table>
   
   
+  <a id="Terminal_Gui_Pos_Bottom_" data-uid="Terminal.Gui.Pos.Bottom*"></a>
+  <h4 id="Terminal_Gui_Pos_Bottom_Terminal_Gui_View_" data-uid="Terminal.Gui.Pos.Bottom(Terminal.Gui.View)">Bottom(View)</h4>
+  <div class="markdown level1 summary"><p>Returns a Pos object tracks the Bottom (Y+Height) coordinate of the specified view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Terminal.Gui.Pos Bottom (Terminal.Gui.View view);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td><p>The view that will be tracked.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td><p>The Position that depends on the other view.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_Pos_Center_" data-uid="Terminal.Gui.Pos.Center*"></a>
   <h4 id="Terminal_Gui_Pos_Center" data-uid="Terminal.Gui.Pos.Center">Center()</h4>
   <div class="markdown level1 summary"><p>Returns a Pos object that can be used to center the views.</p>
@@ -183,6 +233,51 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
         <td><p>The center Pos.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Pos_Left_" data-uid="Terminal.Gui.Pos.Left*"></a>
+  <h4 id="Terminal_Gui_Pos_Left_Terminal_Gui_View_" data-uid="Terminal.Gui.Pos.Left(Terminal.Gui.View)">Left(View)</h4>
+  <div class="markdown level1 summary"><p>Returns a Pos object tracks the Left (X) position of the specified view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Terminal.Gui.Pos Left (Terminal.Gui.View view);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td><p>The view that will be tracked.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td><p>The Position that depends on the other view.</p>
 </td>
       </tr>
     </tbody>
@@ -228,6 +323,186 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
         <td><p>The percent Pos object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Pos_Right_" data-uid="Terminal.Gui.Pos.Right*"></a>
+  <h4 id="Terminal_Gui_Pos_Right_Terminal_Gui_View_" data-uid="Terminal.Gui.Pos.Right(Terminal.Gui.View)">Right(View)</h4>
+  <div class="markdown level1 summary"><p>Returns a Pos object tracks the Right (X+Width) coordinate of the specified view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Terminal.Gui.Pos Right (Terminal.Gui.View view);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td><p>The view that will be tracked.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td><p>The Position that depends on the other view.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Pos_Top_" data-uid="Terminal.Gui.Pos.Top*"></a>
+  <h4 id="Terminal_Gui_Pos_Top_Terminal_Gui_View_" data-uid="Terminal.Gui.Pos.Top(Terminal.Gui.View)">Top(View)</h4>
+  <div class="markdown level1 summary"><p>Returns a Pos object tracks the Top (Y) position of the specified view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Terminal.Gui.Pos Top (Terminal.Gui.View view);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td><p>The view that will be tracked.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td><p>The Position that depends on the other view.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Pos_X_" data-uid="Terminal.Gui.Pos.X*"></a>
+  <h4 id="Terminal_Gui_Pos_X_Terminal_Gui_View_" data-uid="Terminal.Gui.Pos.X(Terminal.Gui.View)">X(View)</h4>
+  <div class="markdown level1 summary"><p>Returns a Pos object tracks the Left (X) position of the specified view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Terminal.Gui.Pos X (Terminal.Gui.View view);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td><p>The view that will be tracked.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td><p>The Position that depends on the other view.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Pos_Y_" data-uid="Terminal.Gui.Pos.Y*"></a>
+  <h4 id="Terminal_Gui_Pos_Y_Terminal_Gui_View_" data-uid="Terminal.Gui.Pos.Y(Terminal.Gui.View)">Y(View)</h4>
+  <div class="markdown level1 summary"><p>Returns a Pos object tracks the Top (Y) position of the specified view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Terminal.Gui.Pos Y (Terminal.Gui.View view);</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td><p>The view that will be tracked.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></td>
+        <td><p>The Position that depends on the other view.</p>
 </td>
       </tr>
     </tbody>

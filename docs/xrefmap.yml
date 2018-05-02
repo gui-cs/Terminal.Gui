@@ -2106,6 +2106,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Fill_
   fullName: Dim.Fill
   nameWithType: Dim.Fill
+- uid: Terminal.Gui.Dim.Height(Terminal.Gui.View)
+  name: Height(View)
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Height_Terminal_Gui_View_
+  fullName: Dim.Height(View)
+  nameWithType: Dim.Height(View)
+- uid: Terminal.Gui.Dim.Height*
+  name: Height
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Height_
+  fullName: Dim.Height
+  nameWithType: Dim.Height
 - uid: Terminal.Gui.Dim.op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
   name: op_Addition(Dim, Dim)
   href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_op_Addition_Terminal_Gui_Dim_Terminal_Gui_Dim_
@@ -2146,6 +2156,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Percent_
   fullName: Dim.Percent
   nameWithType: Dim.Percent
+- uid: Terminal.Gui.Dim.Width(Terminal.Gui.View)
+  name: Width(View)
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Width_Terminal_Gui_View_
+  fullName: Dim.Width(View)
+  nameWithType: Dim.Width(View)
+- uid: Terminal.Gui.Dim.Width*
+  name: Width
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Width_
+  fullName: Dim.Width
+  nameWithType: Dim.Width
 - uid: Terminal.Gui.FileDialog
   name: FileDialog
   href: api/Terminal.Gui/Terminal.Gui.FileDialog.html
@@ -3506,6 +3526,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_AnchorEnd_
   fullName: Pos.AnchorEnd
   nameWithType: Pos.AnchorEnd
+- uid: Terminal.Gui.Pos.Bottom(Terminal.Gui.View)
+  name: Bottom(View)
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Bottom_Terminal_Gui_View_
+  fullName: Pos.Bottom(View)
+  nameWithType: Pos.Bottom(View)
+- uid: Terminal.Gui.Pos.Bottom*
+  name: Bottom
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Bottom_
+  fullName: Pos.Bottom
+  nameWithType: Pos.Bottom
 - uid: Terminal.Gui.Pos.Center
   name: Center()
   href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Center
@@ -3516,6 +3546,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Center_
   fullName: Pos.Center
   nameWithType: Pos.Center
+- uid: Terminal.Gui.Pos.Left(Terminal.Gui.View)
+  name: Left(View)
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Left_Terminal_Gui_View_
+  fullName: Pos.Left(View)
+  nameWithType: Pos.Left(View)
+- uid: Terminal.Gui.Pos.Left*
+  name: Left
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Left_
+  fullName: Pos.Left
+  nameWithType: Pos.Left
 - uid: Terminal.Gui.Pos.op_Addition(Terminal.Gui.Pos,Terminal.Gui.Pos)
   name: op_Addition(Pos, Pos)
   href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_op_Addition_Terminal_Gui_Pos_Terminal_Gui_Pos_
@@ -3556,6 +3596,46 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Percent_
   fullName: Pos.Percent
   nameWithType: Pos.Percent
+- uid: Terminal.Gui.Pos.Right(Terminal.Gui.View)
+  name: Right(View)
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Right_Terminal_Gui_View_
+  fullName: Pos.Right(View)
+  nameWithType: Pos.Right(View)
+- uid: Terminal.Gui.Pos.Right*
+  name: Right
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Right_
+  fullName: Pos.Right
+  nameWithType: Pos.Right
+- uid: Terminal.Gui.Pos.Top(Terminal.Gui.View)
+  name: Top(View)
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Top_Terminal_Gui_View_
+  fullName: Pos.Top(View)
+  nameWithType: Pos.Top(View)
+- uid: Terminal.Gui.Pos.Top*
+  name: Top
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Top_
+  fullName: Pos.Top
+  nameWithType: Pos.Top
+- uid: Terminal.Gui.Pos.X(Terminal.Gui.View)
+  name: X(View)
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_X_Terminal_Gui_View_
+  fullName: Pos.X(View)
+  nameWithType: Pos.X(View)
+- uid: Terminal.Gui.Pos.X*
+  name: X
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_X_
+  fullName: Pos.X
+  nameWithType: Pos.X
+- uid: Terminal.Gui.Pos.Y(Terminal.Gui.View)
+  name: Y(View)
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Y_Terminal_Gui_View_
+  fullName: Pos.Y(View)
+  nameWithType: Pos.Y(View)
+- uid: Terminal.Gui.Pos.Y*
+  name: Y
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Y_
+  fullName: Pos.Y
+  nameWithType: Pos.Y
 - uid: Terminal.Gui.ProgressBar
   name: ProgressBar
   href: api/Terminal.Gui/Terminal.Gui.ProgressBar.html

@@ -1041,6 +1041,47 @@ namespace Terminal.Gui {
 			Frame = new Rect (_x, _y, w, h);
 		}
 
+		// https://en.wikipedia.org/wiki/Topological_sorting
+		static List<View> TopologicalSort (HashSet<View> nodes, HashSet<(View, View)> edges)
+		{
+			var result = new List<View> ();
+
+			// Set of all nodes with no incoming edges
+			var S = new HashSet<View> (nodes.Where (n => edges.All (e => e.Item2.Equals (n) == false)));
+
+			while (S.Any ()) {
+				//  remove a node n from S
+				var n = S.First ();
+				S.Remove (n);
+
+				// add n to tail of L
+				result.Add (n);
+
+				// for each node m with an edge e from n to m do
+				foreach (var e in edges.Where (e => e.Item1.Equals (n)).ToList ()) {
+					var m = e.Item2;
+
+					// remove edge e from the graph
+					edges.Remove (e);
+
+					// if m has no other incoming edges then
+					if (edges.All (me => me.Item2.Equals (m) == false)) {
+						// insert m into S
+						S.Add (m);
+					}
+				}
+			}
+
+			// if graph has edges then
+			if (edges.Any ()) {
+				// return error (graph has at least one cycle)
+				return null;
+			} else {
+				// return L (a topologically sorted order)
+				return result;
+			}
+		}
+
 		/// <summary>
 		/// This virtual method is invoked when a view starts executing or 
 		/// when the dimensions of the view have changed, for example in 
@@ -1050,8 +1091,31 @@ namespace Terminal.Gui {
 		{
 			if (!layoutNeeded)
 				return;
-			
+
+			// Sort out the dependencies of the X, Y, Width, Height properties
+			var nodes = new HashSet<View> ();
+			var edges = new HashSet<(View, View)> ();
+
 			foreach (var v in Subviews) {
+				nodes.Add (v);
+				if (v.LayoutStyle == LayoutStyle.Computed) {
+					if (v.X is Pos.PosView)
+						edges.Add ((v, (v.X as Pos.PosView).Target));
+					if (v.Y is Pos.PosView)
+						edges.Add ((v, (v.Y as Pos.PosView).Target));
+					if (v.Width is Dim.DimView)
+						edges.Add ((v, (v.Width as Dim.DimView).Target));
+					if (v.Height is Dim.DimView)
+						edges.Add ((v, (v.Height as Dim.DimView).Target));
+				}
+			}
+
+			var ordered = TopologicalSort (nodes, edges);
+			ordered.Reverse ();
+			if (ordered == null)
+				throw new Exception ("There is a recursive cycle in the relative Pos/Dim in the views of " + this);
+
+			foreach (var v in ordered) {
 				if (v.LayoutStyle == LayoutStyle.Computed)
 					v.RelativeLayout (Frame);
 

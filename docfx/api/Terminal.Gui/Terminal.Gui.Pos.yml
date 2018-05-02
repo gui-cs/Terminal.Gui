@@ -5,11 +5,17 @@ items:
   children:
   - Terminal.Gui.Pos.#ctor
   - Terminal.Gui.Pos.AnchorEnd(System.Int32)
+  - Terminal.Gui.Pos.Bottom(Terminal.Gui.View)
   - Terminal.Gui.Pos.Center
+  - Terminal.Gui.Pos.Left(Terminal.Gui.View)
   - Terminal.Gui.Pos.op_Addition(Terminal.Gui.Pos,Terminal.Gui.Pos)
   - Terminal.Gui.Pos.op_Implicit(System.Int32 to Terminal.Gui.Pos)
   - Terminal.Gui.Pos.op_Subtraction(Terminal.Gui.Pos,Terminal.Gui.Pos)
   - Terminal.Gui.Pos.Percent(System.Single)
+  - Terminal.Gui.Pos.Right(Terminal.Gui.View)
+  - Terminal.Gui.Pos.Top(Terminal.Gui.View)
+  - Terminal.Gui.Pos.X(Terminal.Gui.View)
+  - Terminal.Gui.Pos.Y(Terminal.Gui.View)
   langs:
   - csharp
   name: Pos
@@ -29,6 +35,11 @@ items:
                     integer value (via the implicit integer to Pos conversion), and they can be combined
                     to produce more useful layouts, like: Pos.Center - 3, which would shift the postion
                     of the view 3 characters to the left after centering for example.
+                  </p>
+        <p>
+                    It is possible to reference coordinates of another view by using the methods
+                    Left(View), Right(View), Bottom(View), Top(View).   The X(View) and Y(View) are
+                    aliases to Left(View) and Top(View) respectively.
                   </p>
   syntax:
     content: public class Pos
@@ -77,6 +88,30 @@ items:
       description: The Pos object anchored to the end (the bottom or the right side).
   overload: Terminal.Gui.Pos.AnchorEnd*
   exceptions: []
+- uid: Terminal.Gui.Pos.Bottom(Terminal.Gui.View)
+  id: Bottom(Terminal.Gui.View)
+  parent: Terminal.Gui.Pos
+  langs:
+  - csharp
+  name: Bottom(View)
+  nameWithType: Pos.Bottom(View)
+  fullName: Pos.Bottom(View)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns a Pos object tracks the Bottom (Y+Height) coordinate of the specified view.
+  syntax:
+    content: public static Terminal.Gui.Pos Bottom (Terminal.Gui.View view);
+    parameters:
+    - id: view
+      type: Terminal.Gui.View
+      description: The view that will be tracked.
+    return:
+      type: Terminal.Gui.Pos
+      description: The Position that depends on the other view.
+  overload: Terminal.Gui.Pos.Bottom*
+  exceptions: []
 - uid: Terminal.Gui.Pos.Center
   id: Center
   parent: Terminal.Gui.Pos
@@ -97,6 +132,30 @@ items:
       type: Terminal.Gui.Pos
       description: The center Pos.
   overload: Terminal.Gui.Pos.Center*
+  exceptions: []
+- uid: Terminal.Gui.Pos.Left(Terminal.Gui.View)
+  id: Left(Terminal.Gui.View)
+  parent: Terminal.Gui.Pos
+  langs:
+  - csharp
+  name: Left(View)
+  nameWithType: Pos.Left(View)
+  fullName: Pos.Left(View)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns a Pos object tracks the Left (X) position of the specified view.
+  syntax:
+    content: public static Terminal.Gui.Pos Left (Terminal.Gui.View view);
+    parameters:
+    - id: view
+      type: Terminal.Gui.View
+      description: The view that will be tracked.
+    return:
+      type: Terminal.Gui.Pos
+      description: The Position that depends on the other view.
+  overload: Terminal.Gui.Pos.Left*
   exceptions: []
 - uid: Terminal.Gui.Pos.op_Addition(Terminal.Gui.Pos,Terminal.Gui.Pos)
   id: op_Addition(Terminal.Gui.Pos,Terminal.Gui.Pos)
@@ -200,6 +259,102 @@ items:
       description: The percent Pos object.
   overload: Terminal.Gui.Pos.Percent*
   exceptions: []
+- uid: Terminal.Gui.Pos.Right(Terminal.Gui.View)
+  id: Right(Terminal.Gui.View)
+  parent: Terminal.Gui.Pos
+  langs:
+  - csharp
+  name: Right(View)
+  nameWithType: Pos.Right(View)
+  fullName: Pos.Right(View)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns a Pos object tracks the Right (X+Width) coordinate of the specified view.
+  syntax:
+    content: public static Terminal.Gui.Pos Right (Terminal.Gui.View view);
+    parameters:
+    - id: view
+      type: Terminal.Gui.View
+      description: The view that will be tracked.
+    return:
+      type: Terminal.Gui.Pos
+      description: The Position that depends on the other view.
+  overload: Terminal.Gui.Pos.Right*
+  exceptions: []
+- uid: Terminal.Gui.Pos.Top(Terminal.Gui.View)
+  id: Top(Terminal.Gui.View)
+  parent: Terminal.Gui.Pos
+  langs:
+  - csharp
+  name: Top(View)
+  nameWithType: Pos.Top(View)
+  fullName: Pos.Top(View)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns a Pos object tracks the Top (Y) position of the specified view.
+  syntax:
+    content: public static Terminal.Gui.Pos Top (Terminal.Gui.View view);
+    parameters:
+    - id: view
+      type: Terminal.Gui.View
+      description: The view that will be tracked.
+    return:
+      type: Terminal.Gui.Pos
+      description: The Position that depends on the other view.
+  overload: Terminal.Gui.Pos.Top*
+  exceptions: []
+- uid: Terminal.Gui.Pos.X(Terminal.Gui.View)
+  id: X(Terminal.Gui.View)
+  parent: Terminal.Gui.Pos
+  langs:
+  - csharp
+  name: X(View)
+  nameWithType: Pos.X(View)
+  fullName: Pos.X(View)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns a Pos object tracks the Left (X) position of the specified view.
+  syntax:
+    content: public static Terminal.Gui.Pos X (Terminal.Gui.View view);
+    parameters:
+    - id: view
+      type: Terminal.Gui.View
+      description: The view that will be tracked.
+    return:
+      type: Terminal.Gui.Pos
+      description: The Position that depends on the other view.
+  overload: Terminal.Gui.Pos.X*
+  exceptions: []
+- uid: Terminal.Gui.Pos.Y(Terminal.Gui.View)
+  id: Y(Terminal.Gui.View)
+  parent: Terminal.Gui.Pos
+  langs:
+  - csharp
+  name: Y(View)
+  nameWithType: Pos.Y(View)
+  fullName: Pos.Y(View)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns a Pos object tracks the Top (Y) position of the specified view.
+  syntax:
+    content: public static Terminal.Gui.Pos Y (Terminal.Gui.View view);
+    parameters:
+    - id: view
+      type: Terminal.Gui.View
+      description: The view that will be tracked.
+    return:
+      type: Terminal.Gui.Pos
+      description: The Position that depends on the other view.
+  overload: Terminal.Gui.Pos.Y*
+  exceptions: []
 references:
 - uid: System.Object
   parent: System
@@ -231,12 +386,30 @@ references:
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
+- uid: Terminal.Gui.Pos.Bottom(Terminal.Gui.View)
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Bottom(View)
+  nameWithType: Pos.Bottom(View)
+  fullName: Pos.Bottom(View)
+- uid: Terminal.Gui.View
+  parent: Terminal.Gui
+  isExternal: false
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
 - uid: Terminal.Gui.Pos.Center
   parent: Terminal.Gui.Pos
   isExternal: false
   name: Center()
   nameWithType: Pos.Center()
   fullName: Pos.Center()
+- uid: Terminal.Gui.Pos.Left(Terminal.Gui.View)
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Left(View)
+  nameWithType: Pos.Left(View)
+  fullName: Pos.Left(View)
 - uid: Terminal.Gui.Pos.op_Addition(Terminal.Gui.Pos,Terminal.Gui.Pos)
   parent: Terminal.Gui.Pos
   isExternal: false
@@ -267,6 +440,30 @@ references:
   name: Single
   nameWithType: Single
   fullName: System.Single
+- uid: Terminal.Gui.Pos.Right(Terminal.Gui.View)
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Right(View)
+  nameWithType: Pos.Right(View)
+  fullName: Pos.Right(View)
+- uid: Terminal.Gui.Pos.Top(Terminal.Gui.View)
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Top(View)
+  nameWithType: Pos.Top(View)
+  fullName: Pos.Top(View)
+- uid: Terminal.Gui.Pos.X(Terminal.Gui.View)
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: X(View)
+  nameWithType: Pos.X(View)
+  fullName: Pos.X(View)
+- uid: Terminal.Gui.Pos.Y(Terminal.Gui.View)
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Y(View)
+  nameWithType: Pos.Y(View)
+  fullName: Pos.Y(View)
 - uid: Terminal.Gui.Pos.#ctor*
   parent: Terminal.Gui.Pos
   isExternal: false
@@ -279,12 +476,24 @@ references:
   name: AnchorEnd
   nameWithType: Pos.AnchorEnd
   fullName: Pos.AnchorEnd
+- uid: Terminal.Gui.Pos.Bottom*
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Bottom
+  nameWithType: Pos.Bottom
+  fullName: Pos.Bottom
 - uid: Terminal.Gui.Pos.Center*
   parent: Terminal.Gui.Pos
   isExternal: false
   name: Center
   nameWithType: Pos.Center
   fullName: Pos.Center
+- uid: Terminal.Gui.Pos.Left*
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Left
+  nameWithType: Pos.Left
+  fullName: Pos.Left
 - uid: Terminal.Gui.Pos.op_Addition*
   parent: Terminal.Gui.Pos
   isExternal: false
@@ -309,3 +518,27 @@ references:
   name: Percent
   nameWithType: Pos.Percent
   fullName: Pos.Percent
+- uid: Terminal.Gui.Pos.Right*
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Right
+  nameWithType: Pos.Right
+  fullName: Pos.Right
+- uid: Terminal.Gui.Pos.Top*
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Top
+  nameWithType: Pos.Top
+  fullName: Pos.Top
+- uid: Terminal.Gui.Pos.X*
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: X
+  nameWithType: Pos.X
+  fullName: Pos.X
+- uid: Terminal.Gui.Pos.Y*
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: Y
+  nameWithType: Pos.Y
+  fullName: Pos.Y

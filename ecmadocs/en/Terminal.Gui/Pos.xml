@@ -27,6 +27,11 @@
                 to produce more useful layouts, like: Pos.Center - 3, which would shift the postion
                 of the view 3 characters to the left after centering for example.
               </para>
+      <para>
+                It is possible to reference coordinates of another view by using the methods
+                Left(View), Right(View), Bottom(View), Top(View).   The X(View) and Y(View) are
+                aliases to Left(View) and Top(View) respectively.
+              </para>
     </remarks>
   </Docs>
   <Members>
@@ -66,6 +71,28 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="Bottom">
+      <MemberSignature Language="C#" Value="public static Terminal.Gui.Pos Bottom (Terminal.Gui.View view);" />
+      <MemberSignature Language="ILAsm" Value=".method public static hidebysig class Terminal.Gui.Pos Bottom(class Terminal.Gui.View view) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.Pos</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="view" Type="Terminal.Gui.View" />
+      </Parameters>
+      <Docs>
+        <param name="view">The view that will be tracked.</param>
+        <summary>
+            Returns a Pos object tracks the Bottom (Y+Height) coordinate of the specified view.
+            </summary>
+        <returns>The Position that depends on the other view.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="Center">
       <MemberSignature Language="C#" Value="public static Terminal.Gui.Pos Center ();" />
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class Terminal.Gui.Pos Center() cil managed" />
@@ -82,6 +109,28 @@
             Returns a Pos object that can be used to center the views.
             </summary>
         <returns>The center Pos.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Left">
+      <MemberSignature Language="C#" Value="public static Terminal.Gui.Pos Left (Terminal.Gui.View view);" />
+      <MemberSignature Language="ILAsm" Value=".method public static hidebysig class Terminal.Gui.Pos Left(class Terminal.Gui.View view) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.Pos</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="view" Type="Terminal.Gui.View" />
+      </Parameters>
+      <Docs>
+        <param name="view">The view that will be tracked.</param>
+        <summary>
+            Returns a Pos object tracks the Left (X) position of the specified view.
+            </summary>
+        <returns>The Position that depends on the other view.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -174,6 +223,94 @@
             Creates a percentage Pos object
             </summary>
         <returns>The percent Pos object.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Right">
+      <MemberSignature Language="C#" Value="public static Terminal.Gui.Pos Right (Terminal.Gui.View view);" />
+      <MemberSignature Language="ILAsm" Value=".method public static hidebysig class Terminal.Gui.Pos Right(class Terminal.Gui.View view) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.Pos</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="view" Type="Terminal.Gui.View" />
+      </Parameters>
+      <Docs>
+        <param name="view">The view that will be tracked.</param>
+        <summary>
+            Returns a Pos object tracks the Right (X+Width) coordinate of the specified view.
+            </summary>
+        <returns>The Position that depends on the other view.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Top">
+      <MemberSignature Language="C#" Value="public static Terminal.Gui.Pos Top (Terminal.Gui.View view);" />
+      <MemberSignature Language="ILAsm" Value=".method public static hidebysig class Terminal.Gui.Pos Top(class Terminal.Gui.View view) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.Pos</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="view" Type="Terminal.Gui.View" />
+      </Parameters>
+      <Docs>
+        <param name="view">The view that will be tracked.</param>
+        <summary>
+            Returns a Pos object tracks the Top (Y) position of the specified view.
+            </summary>
+        <returns>The Position that depends on the other view.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="X">
+      <MemberSignature Language="C#" Value="public static Terminal.Gui.Pos X (Terminal.Gui.View view);" />
+      <MemberSignature Language="ILAsm" Value=".method public static hidebysig class Terminal.Gui.Pos X(class Terminal.Gui.View view) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.Pos</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="view" Type="Terminal.Gui.View" />
+      </Parameters>
+      <Docs>
+        <param name="view">The view that will be tracked.</param>
+        <summary>
+            Returns a Pos object tracks the Left (X) position of the specified view.
+            </summary>
+        <returns>The Position that depends on the other view.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Y">
+      <MemberSignature Language="C#" Value="public static Terminal.Gui.Pos Y (Terminal.Gui.View view);" />
+      <MemberSignature Language="ILAsm" Value=".method public static hidebysig class Terminal.Gui.Pos Y(class Terminal.Gui.View view) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.Pos</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="view" Type="Terminal.Gui.View" />
+      </Parameters>
+      <Docs>
+        <param name="view">The view that will be tracked.</param>
+        <summary>
+            Returns a Pos object tracks the Top (Y) position of the specified view.
+            </summary>
+        <returns>The Position that depends on the other view.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

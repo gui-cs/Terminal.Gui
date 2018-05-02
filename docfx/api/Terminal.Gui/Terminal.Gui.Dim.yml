@@ -5,10 +5,12 @@ items:
   children:
   - Terminal.Gui.Dim.#ctor
   - Terminal.Gui.Dim.Fill(System.Int32)
+  - Terminal.Gui.Dim.Height(Terminal.Gui.View)
   - Terminal.Gui.Dim.op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
   - Terminal.Gui.Dim.op_Implicit(System.Int32 to Terminal.Gui.Dim)
   - Terminal.Gui.Dim.op_Subtraction(Terminal.Gui.Dim,Terminal.Gui.Dim)
   - Terminal.Gui.Dim.Percent(System.Single)
+  - Terminal.Gui.Dim.Width(Terminal.Gui.View)
   langs:
   - csharp
   name: Dim
@@ -74,6 +76,30 @@ items:
       type: Terminal.Gui.Dim
       description: The Fill dimension.
   overload: Terminal.Gui.Dim.Fill*
+  exceptions: []
+- uid: Terminal.Gui.Dim.Height(Terminal.Gui.View)
+  id: Height(Terminal.Gui.View)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  name: Height(View)
+  nameWithType: Dim.Height(View)
+  fullName: Dim.Height(View)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns a Dim object tracks the Height of the specified view.
+  syntax:
+    content: public static Terminal.Gui.Dim Height (Terminal.Gui.View view);
+    parameters:
+    - id: view
+      type: Terminal.Gui.View
+      description: The view that will be tracked.
+    return:
+      type: Terminal.Gui.Dim
+      description: The dimension of the other view.
+  overload: Terminal.Gui.Dim.Height*
   exceptions: []
 - uid: Terminal.Gui.Dim.op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
   id: op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
@@ -177,6 +203,30 @@ items:
       description: The percent Dim object.
   overload: Terminal.Gui.Dim.Percent*
   exceptions: []
+- uid: Terminal.Gui.Dim.Width(Terminal.Gui.View)
+  id: Width(Terminal.Gui.View)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  name: Width(View)
+  nameWithType: Dim.Width(View)
+  fullName: Dim.Width(View)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns a Dim object tracks the Width of the specified view.
+  syntax:
+    content: public static Terminal.Gui.Dim Width (Terminal.Gui.View view);
+    parameters:
+    - id: view
+      type: Terminal.Gui.View
+      description: The view that will be tracked.
+    return:
+      type: Terminal.Gui.Dim
+      description: The dimension of the other view.
+  overload: Terminal.Gui.Dim.Width*
+  exceptions: []
 references:
 - uid: System.Object
   parent: System
@@ -208,6 +258,18 @@ references:
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
+- uid: Terminal.Gui.Dim.Height(Terminal.Gui.View)
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: Height(View)
+  nameWithType: Dim.Height(View)
+  fullName: Dim.Height(View)
+- uid: Terminal.Gui.View
+  parent: Terminal.Gui
+  isExternal: false
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
 - uid: Terminal.Gui.Dim.op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
   parent: Terminal.Gui.Dim
   isExternal: false
@@ -238,6 +300,12 @@ references:
   name: Single
   nameWithType: Single
   fullName: System.Single
+- uid: Terminal.Gui.Dim.Width(Terminal.Gui.View)
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: Width(View)
+  nameWithType: Dim.Width(View)
+  fullName: Dim.Width(View)
 - uid: Terminal.Gui.Dim.#ctor*
   parent: Terminal.Gui.Dim
   isExternal: false
@@ -250,6 +318,12 @@ references:
   name: Fill
   nameWithType: Dim.Fill
   fullName: Dim.Fill
+- uid: Terminal.Gui.Dim.Height*
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: Height
+  nameWithType: Dim.Height
+  fullName: Dim.Height
 - uid: Terminal.Gui.Dim.op_Addition*
   parent: Terminal.Gui.Dim
   isExternal: false
@@ -274,3 +348,9 @@ references:
   name: Percent
   nameWithType: Dim.Percent
   fullName: Dim.Percent
+- uid: Terminal.Gui.Dim.Width*
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: Width
+  nameWithType: Dim.Width
+  fullName: Dim.Width

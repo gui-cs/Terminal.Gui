@@ -24,6 +24,11 @@ namespace Terminal.Gui {
 	///     to produce more useful layouts, like: Pos.Center - 3, which would shift the postion
 	///     of the view 3 characters to the left after centering for example.
 	///   </para>
+	///   <para>
+	///     It is possible to reference coordinates of another view by using the methods
+	///     Left(View), Right(View), Bottom(View), Top(View).   The X(View) and Y(View) are
+	///     aliases to Left(View) and Top(View) respectively.
+	///   </para>
 	/// </remarks>
 	public class Pos {
 		internal virtual int Anchor (int width)
@@ -195,6 +200,69 @@ namespace Terminal.Gui {
 		{
 			return new PosCombine (false, left, right);
 		}
+
+		internal class PosView : Pos {
+			public View Target;
+			int side;
+			public PosView (View view, int side)
+			{
+				Target = view;
+				this.side = side;
+			}
+			internal override int Anchor (int width)
+			{
+				switch (side) {
+				case 0: return Target.Frame.X;
+				case 1: return Target.Frame.Y;
+				case 2: return Target.Frame.Right;
+				case 3: return Target.Frame.Bottom;
+				default:
+					return 0;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Returns a Pos object tracks the Left (X) position of the specified view.
+		/// </summary>
+		/// <returns>The Position that depends on the other view.</returns>
+		/// <param name="view">The view that will be tracked.</param>
+		public static Pos Left (View view) => new PosView (view, 0);
+
+		/// <summary>
+		/// Returns a Pos object tracks the Left (X) position of the specified view.
+		/// </summary>
+		/// <returns>The Position that depends on the other view.</returns>
+		/// <param name="view">The view that will be tracked.</param>
+		public static Pos X (View view) => new PosView (view, 0);
+
+		/// <summary>
+		/// Returns a Pos object tracks the Top (Y) position of the specified view.
+		/// </summary>
+		/// <returns>The Position that depends on the other view.</returns>
+		/// <param name="view">The view that will be tracked.</param>
+		public static Pos Top (View view) => new PosView (view, 1);
+
+		/// <summary>
+		/// Returns a Pos object tracks the Top (Y) position of the specified view.
+		/// </summary>
+		/// <returns>The Position that depends on the other view.</returns>
+		/// <param name="view">The view that will be tracked.</param>
+		public static Pos Y (View view) => new PosView (view, 1);
+
+		/// <summary>
+		/// Returns a Pos object tracks the Right (X+Width) coordinate of the specified view.
+		/// </summary>
+		/// <returns>The Position that depends on the other view.</returns>
+		/// <param name="view">The view that will be tracked.</param>
+		public static Pos Right (View view) => new PosView (view, 2);
+
+		/// <summary>
+		/// Returns a Pos object tracks the Bottom (Y+Height) coordinate of the specified view.
+		/// </summary>
+		/// <returns>The Position that depends on the other view.</returns>
+		/// <param name="view">The view that will be tracked.</param>
+		public static Pos Bottom (View view) => new PosView (view, 3);
 	}
 
 	/// <summary>
@@ -347,5 +415,38 @@ namespace Terminal.Gui {
 		{
 			return new DimCombine (false, left, right);
 		}
+
+		internal class DimView : Dim {
+			public View Target;
+			int side;
+			public DimView (View view, int side)
+			{
+				Target = view;
+				this.side = side;
+			}
+
+			internal override int Anchor (int width)
+			{
+				switch (side) {
+				case 0: return Target.Frame.Height;
+				case 1: return Target.Frame.Width;
+				default:
+					return 0;
+				}
+			}
+		}
+		/// <summary>
+		/// Returns a Dim object tracks the Width of the specified view.
+		/// </summary>
+		/// <returns>The dimension of the other view.</returns>
+		/// <param name="view">The view that will be tracked.</param>
+		public static Dim Width (View view) => new DimView (view, 1);
+
+		/// <summary>
+		/// Returns a Dim object tracks the Height of the specified view.
+		/// </summary>
+		/// <returns>The dimension of the other view.</returns>
+		/// <param name="view">The view that will be tracked.</param>
+		public static Dim Height (View view) => new DimView (view, 0);
 	}
 }

@@ -59,6 +59,28 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="Height">
+      <MemberSignature Language="C#" Value="public static Terminal.Gui.Dim Height (Terminal.Gui.View view);" />
+      <MemberSignature Language="ILAsm" Value=".method public static hidebysig class Terminal.Gui.Dim Height(class Terminal.Gui.View view) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.Dim</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="view" Type="Terminal.Gui.View" />
+      </Parameters>
+      <Docs>
+        <param name="view">The view that will be tracked.</param>
+        <summary>
+            Returns a Dim object tracks the Height of the specified view.
+            </summary>
+        <returns>The dimension of the other view.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="op_Addition">
       <MemberSignature Language="C#" Value="public static Terminal.Gui.Dim op_Addition (Terminal.Gui.Dim left, Terminal.Gui.Dim right);" />
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig specialname class Terminal.Gui.Dim op_Addition(class Terminal.Gui.Dim left, class Terminal.Gui.Dim right) cil managed" />
@@ -148,6 +170,28 @@
             Creates a percentage Dim object
             </summary>
         <returns>The percent Dim object.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Width">
+      <MemberSignature Language="C#" Value="public static Terminal.Gui.Dim Width (Terminal.Gui.View view);" />
+      <MemberSignature Language="ILAsm" Value=".method public static hidebysig class Terminal.Gui.Dim Width(class Terminal.Gui.View view) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.Dim</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="view" Type="Terminal.Gui.View" />
+      </Parameters>
+      <Docs>
+        <param name="view">The view that will be tracked.</param>
+        <summary>
+            Returns a Dim object tracks the Width of the specified view.
+            </summary>
+        <returns>The dimension of the other view.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

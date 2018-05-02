@@ -204,6 +204,7 @@ var label2 = new Label (new Rect (1, 2, 20, 1), &quot;World&quot;)
 <li>Percentage of the parent&#39;s view size - <code>Pos.Percent(n)</code></li>
 <li>Anchored from the end of the dimension - <code>AnchorEnd(int margin=0)</code></li>
 <li>Centered, using <code>Center()</code></li>
+<li>Reference the Left (X), Top (Y), Bottom, Right positions of another view</li>
 </ul>
 <p>The <code>Pos</code> values can be added or subtracted, like this:</p>
 <pre><code class="lang-csharp">// Set the X coordinate to 10 characters left from the center
@@ -213,6 +214,9 @@ view.Y = Pos.Percent (20);
 
 anotherView.X = AnchorEnd (10);
 anotherView.Width = 9;
+
+myView.X = Pos.X (view);
+myView.Y = Pos.Bottom (anotherView);
 </code></pre><h3 id="the-dim-type">The <code>Dim</code> Type</h3>
 <p>The <code>Dim</code> type is used for the <code>Width</code> and <code>Height</code> properties on the View and offers
 the following options:</p>
@@ -220,6 +224,7 @@ the following options:</p>
 <li>Absolute size, by passing an integer</li>
 <li>Percentage of the parent&#39;s view size - <code>Dim.Percent(n)</code></li>
 <li>Fill to the end - <code>Dim.Fill ()</code></li>
+<li>Reference the Width or Height of another view</li>
 </ul>
 <p>Like, <code>Pos</code>, objects of type <code>Dim</code> can be added an subtracted, like this:</p>
 <pre><code class="lang-csharp">// Set the Width to be 10 characters less than filling 
@@ -227,6 +232,8 @@ the following options:</p>
 view.Width = Dim.Fill () - 10;
 
 view.Height = Dim.Percent(20) - 1;
+
+anotherView.Height = Dim.Height (view)+1
 </code></pre><h1 id="toplevels-windows-and-dialogs">TopLevels, Windows and Dialogs.</h1>
 <p>Among the many kinds of views, you typically will create a <a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a> view (or any of its subclasses,
 like <a href="../api/Terminal.Gui/Terminal.Gui.Window.html">Window</a> or <a href="../api/Terminal.Gui/Terminal.Gui.Dialog.html">Dialog</a> which is special kind of views

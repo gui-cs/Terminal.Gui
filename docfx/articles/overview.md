@@ -182,6 +182,7 @@ The `Pos` type on `X` and `Y` offers a few options:
 * Percentage of the parent's view size - `Pos.Percent(n)`
 * Anchored from the end of the dimension - `AnchorEnd(int margin=0)`
 * Centered, using `Center()`
+* Reference the Left (X), Top (Y), Bottom, Right positions of another view
 
 The `Pos` values can be added or subtracted, like this:
 
@@ -193,6 +194,9 @@ view.Y = Pos.Percent (20);
 
 anotherView.X = AnchorEnd (10);
 anotherView.Width = 9;
+
+myView.X = Pos.X (view);
+myView.Y = Pos.Bottom (anotherView);
 ```
 
 ### The `Dim` Type
@@ -203,6 +207,7 @@ the following options:
 * Absolute size, by passing an integer
 * Percentage of the parent's view size - `Dim.Percent(n)`
 * Fill to the end - `Dim.Fill ()`
+* Reference the Width or Height of another view
 
 Like, `Pos`, objects of type `Dim` can be added an subtracted, like this:
 
@@ -213,6 +218,8 @@ Like, `Pos`, objects of type `Dim` can be added an subtracted, like this:
 view.Width = Dim.Fill () - 10;
 
 view.Height = Dim.Percent(20) - 1;
+
+anotherView.Height = Dim.Height (view)+1
 ```
 
 # TopLevels, Windows and Dialogs.
