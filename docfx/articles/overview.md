@@ -17,7 +17,7 @@ one or more callbacks.
 
 The simplest application looks like this:
 
-```
+```csharp
 using Terminal.Gui;
 
 class Demo {
@@ -25,9 +25,10 @@ class Demo {
     {
         Application.Init ();
 
-	var n = MessageBox.Query (50, 7, "Question", "Do you like console apps?", "Yes", "No");
+        var n = MessageBox.Query (50, 7, 
+            "Question", "Do you like console apps?", "Yes", "No");
 
-	return n;
+        return n;
     }
 }
 ```
@@ -47,7 +48,7 @@ schemes available for your application and clears the screen to start your appli
 The [`Application`](../api/Terminal.Gui/Terminal.Gui.Application.html) class, additionally creates an instance of the [Toplevel]((../api/Terminal.Gui/Terminal.Gui.Toplevel.html) class that is ready to be consumed, 
 this instance is available in the `Application.Top` property, and can be used like this:
 
-```
+```csharp
 using Terminal.Gui;
 
 class Demo {
@@ -70,7 +71,7 @@ Typically, you will want your application to have more than a label, you might
 want a menu, and a region for your application to live in, the following code
 does this:
 
-```
+```csharp
 using Terminal.Gui;
 
 class Demo {
@@ -78,17 +79,19 @@ class Demo {
     {
         Application.Init ();
         var menu = new MenuBar (new MenuBarItem [] {
-			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_Quit", "", () => { Application.Top.Running = false; })
-			}),
-		});
+            new MenuBarItem ("_File", new MenuItem [] {
+                new MenuItem ("_Quit", "", () => { 
+                    Application.RequestStop (); 
+                })
+            }),
+        });
         
         var win = new Window ("Hello") {
-			X = 0,
-			Y = 1,
-			Width = Dim.Fill (),
-			Height = Dim.Fill () - 1
-		};
+            X = 0,
+            Y = 1,
+            Width = Dim.Fill (),
+            Height = Dim.Fill () - 1
+        };
 
         // Add both menu and win in a single call
         Application.Top.Add (menu, win);
@@ -133,33 +136,156 @@ void SetupMyView (View myView)
 The container of a given view is called the `SuperView` and it is a property of every
 View.
 
-Among the many kinds of views, you typically will create a [Toplevel](../api/Terminal.Gui/Terminal.Gui.Toplevel.html) view or a [Window]
-(../api/Terminal.Gui/Terminal.Gui.Window.html) which are special kinds of views
+There are many views that you can use to spice up your application:
+
+[Buttons](../api/Terminal.Gui/Terminal.Gui.Button.html), [Labels](../api/Terminal.Gui/Terminal.Gui.Label.html), [Text entry](../api/Terminal.Gui/Terminal.Gui.TextField.html), [Text view](../api/Terminal.Gui/Terminal.Gui.TextView.html), [Radio buttons](../api/Terminal.Gui/Terminal.Gui.RadioGroup.html), [Checkboxes](../api/Terminal.Gui/Terminal.Gui.CheckBox.html), [Dialog boxes](../api/Terminal.Gui/Terminal.Gui.Dialog.html), [Message boxes](../api/Terminal.Gui/Terminal.Gui.MessageBox.html), [Windows](../api/Terminal.Gui/Terminal.Gui.Window.html), [Menus](../api/Terminal.Gui/Terminal.Gui.MenuBar.html), [ListViews](../api/Terminal.Gui/Terminal.Gui.ListView.html), [Frames](../api/Terminal.Gui/Terminal.Gui.FrameView.html), [ProgressBars](../api/Terminal.Gui/Terminal.Gui.ProgressBar.html), [Scroll views](../api/Terminal.Gui/Terminal.Gui.ScrollView.html) and [Scrollbars](../api/Terminal.Gui/Terminal.Gui.ScrollBarView.html).
+
+Layout
+------
+
+`Terminal.Gui` supports two different layout systems, absolute and computed \
+(controlled by the [`LayoutStyle`](../api/Terminal.Gui/Terminal.Gui.LayoutStyle.html)
+property on the view.
+
+The absolute system is used when you want the view to be positioned exactly in
+one location and want to manually control where the view is.   This is done
+by invoking your View constructor with an argument of type [`Rect`](../api/Terminal.Gui/Terminal.Gui.Rect.html).   When you do this, to change the
+position of the View, you can change the `Frame` property on the View.
+
+The computed layout system offers a few additional capabilities, like automatic
+centering, expanding of dimensions and a handful of other features.  To use
+this you construct your object without an initial `Frame`, but set the 
+ `X`, `Y`, `Width` and `Height` properties after the object has been created.
+
+Examples:
+
+```csharp
+
+// Dynamically computed
+var label = new Label ("Hello") {
+    X = 1,
+    Y = Pos.Center (),
+    Width = Dim.Fill (),
+    Height = 1
+};
+
+// Absolute position using the provided rectangle
+var label2 = new Label (new Rect (1, 2, 20, 1), "World")
+```
+
+The computed layout system does not take integers, instead the `X` and `Y` properties are of type [`Pos`](../api/Terminal.Gui/Terminal.Gui.Pos.html) and the `Width` and `Height` properties are of type [`Dim`](../api/Terminal.Gui/Terminal.Gui.Dim.html) both which can be created implicitly from integer values.
+
+### The `Pos` Type
+
+The `Pos` type on `X` and `Y` offers a few options:
+* Absolute position, by passing an integer
+* Percentage of the parent's view size - `Pos.Percent(n)`
+* Anchored from the end of the dimension - `AnchorEnd(int margin=0)`
+* Centered, using `Center()`
+
+The `Pos` values can be added or subtracted, like this:
+
+```csharp
+// Set the X coordinate to 10 characters left from the center
+view.X = Pos.Center () - 10;
+
+view.Y = Pos.Percent (20);
+
+anotherView.X = AnchorEnd (10);
+anotherView.Width = 9;
+```
+
+### The `Dim` Type
+
+The `Dim` type is used for the `Width` and `Height` properties on the View and offers
+the following options:
+
+* Absolute size, by passing an integer
+* Percentage of the parent's view size - `Dim.Percent(n)`
+* Fill to the end - `Dim.Fill ()`
+
+Like, `Pos`, objects of type `Dim` can be added an subtracted, like this:
+
+
+```csharp
+// Set the Width to be 10 characters less than filling 
+// the remaining portion of the screen
+view.Width = Dim.Fill () - 10;
+
+view.Height = Dim.Percent(20) - 1;
+```
+
+# TopLevels, Windows and Dialogs.
+
+Among the many kinds of views, you typically will create a [Toplevel](../api/Terminal.Gui/Terminal.Gui.Toplevel.html) view (or any of its subclasses,
+like [Window](../api/Terminal.Gui/Terminal.Gui.Window.html) or [Dialog](../api/Terminal.Gui/Terminal.Gui.Dialog.html) which is special kind of views
 that can be executed modally - that is, the view can take over all input and returns
 only when the user chooses to complete their work there.   
 
-Modal views take over all the event processing, and do not let other views
-receive any events while they are running.
+The following sections cover the differences.
 
-There are many views that you can use to spice up your application:
+## TopLevel Views
 
-* [Buttons](../api/Terminal.Gui/Terminal.Gui.Button.html) 
-* [Labels](../api/Terminal.Gui/Terminal.Gui.Label.html)
-* [Text entry](../api/Terminal.Gui/Terminal.Gui.TextField.html)
-* [Text view](../api/Terminal.Gui/Terminal.Gui.TextView.html)
-* [Radio buttons](../api/Terminal.Gui/Terminal.Gui.RadioGroup.html)
-* [Checkboxes](../api/Terminal.Gui/Terminal.Gui.CheckBox.html)
-* [Dialog boxes](../api/Terminal.Gui/Terminal.Gui.Dialog.html)
-  * [Message boxes](../api/Terminal.Gui/Terminal.Gui.MessageBox.html)
-* [Windows](../api/Terminal.Gui/Terminal.Gui.Window.html)
-* [Menus](../api/Terminal.Gui/Terminal.Gui.MenuBar.html)
-* [ListViews](../api/Terminal.Gui/Terminal.Gui.ListView.html)
-* [Frames](../api/Terminal.Gui/Terminal.Gui.FrameView.html)
-* [ProgressBars](../api/Terminal.Gui/Terminal.Gui.ProgressBar.html)
-* [Scroll views](../api/Terminal.Gui/Terminal.Gui.ScrollView.html) and [Scrollbars](../api/Terminal.Gui/Terminal.Gui.ScrollBarView.html)
+[Toplevel](../api/Terminal.Gui/Terminal.Gui.Toplevel.html) views have no visible user interface elements and occupy an arbitrary portion of the screen.
+
+You would use a toplevel Modal view for example to launch an entire new experience in your application, one where you would have a new top-level menu for example.   You 
+typically would add a Menu and a Window to your Toplevel, it would look like this:
+
+```csharp
+using Terminal.Gui;
+
+class Demo {
+    static void Edit (string filename)
+    {
+        var top = new Toplevel () { 
+            X = 0, 
+            Y = 0, 
+            Width = Dim.Fill (), 
+            Height = Dim.Fill () 
+        };
+        var menu = new MenuBar (new MenuBarItem [] {
+            new MenuBarItem ("_File", new MenuItem [] {
+                new MenuItem ("_Close", "", () => { 
+                    Application.RequestStop ();
+                })
+            }),
+        });
+        
+        // nest a window for the editor
+        var win = new Window (filename) {
+            X = 0,
+            Y = 1,
+            Width = Dim.Fill (),
+            Height = Dim.Fill () - 1
+        };
+
+        var editor = new TextView () {
+            X = 0, 
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+		editor.Text = System.IO.File.ReadAllText (filename);
+		win.Add (editor);
+
+        // Add both menu and win in a single call
+        top.Add (win, menu);
+        Application.Run (top);
+    }
+}
+```
+
+Window Views
+------------
+
+[Window](../api/Terminal.Gui/Terminal.Gui.Window.html) views extend the Toplevel view by providing a frame and a title around the toplevel - and can be moved on the screen with the mouse (caveat: code is currently disabled)
+
+From a user interface perspective, you might have more than one Window on the screen at a given time.
 
 Dialogs
-=======
+-------
+
+[Dialog](../api/Terminal.Gui/Terminal.Gui.Dialog.html) are [Window](../api/Terminal.Gui/Terminal.Gui.Window.html) objects that happen to be centered in the middle of the screen.
 
 Dialogs are instances of a Window that are centered in the screen, and are intended
 to be used modally - that is, they run, and they are expected to return a result 
@@ -169,6 +295,54 @@ Dialogs are a subclass of `Window` and additionally expose the
 [`AddButton`](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_AddButton_Terminal_Gui_Button_) API which manages the layout
 of any button passed to it, ensuring that the buttons are at the bottom of the dialog.
 
+Example:
+```csharp
+bool okpressed = false;
+var ok = new Button("Ok");
+var cancel = new Button("Cancel");
+var dialog = new Dialog ("Quit", 60, 7, ok, cancel);
+```
+
+Which will show something like this:
+```
++- Quit -----------------------------------------------+
+|                                                      |
+|                                                      |
+|                  [ Ok ] [ Cancel ]                   |
++------------------------------------------------------+
+```
+
+Running Modally
+---------------
+
+To run your Dialog, Window or Toplevel modally, you will invoke the `Application.Run`
+method on the toplevel.   It is up to your code and event handlers to invoke the `Application.RequestStop()` method to terminate the modal execution.
+
+```csharp
+bool okpressed = false;
+var ok = new Button(3, 14, "Ok") { 
+    Clicked = () => { Application.RequestStop (); okpressed = true; }
+};
+var cancel = new Button(10, 14, "Cancel") {
+    Clicked = () => Application.RequestStop () 
+};
+var dialog = new Dialog ("Login", 60, 18, ok, cancel);
+
+var entry = new TextField () {
+    X = 1, 
+    Y = 1,
+    Width = Dim.Fill (),
+    Height = 1
+};
+dialog.Add (entry);
+Application.Run (dialog);
+if (okpressed)
+    Console.WriteLine ("The user entered: " + entry.Text);
+```
+
+There is no return value from running modally, so your code will need to have a mechanism
+of indicating the reason that the execution of the modal dialog was completed, in the 
+case above, the `okpressed` value is set to true if the user pressed or selected the Ok button.
 
 Input Handling
 ==============
