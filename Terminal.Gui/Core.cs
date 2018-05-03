@@ -1905,9 +1905,13 @@ namespace Terminal.Gui {
 
 		static void TerminalResized ()
 		{
+			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
+			Driver.Clip = full;
 			foreach (var t in toplevels) {
-				t.Frame = new Rect (0, 0, Driver.Cols, Driver.Rows);
+				t.RelativeLayout (full);
+				t.LayoutSubviews ();
 			}
+			Refresh ();
 		}
 	}
 }
