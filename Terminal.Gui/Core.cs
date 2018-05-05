@@ -1006,38 +1006,46 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Computes the RelativeLayout for the view, given the frame for its container.
+
 		/// </summary>
 		/// <param name="hostFrame">The Frame for the host.</param>
 		internal void RelativeLayout (Rect hostFrame)
 		{
 			int w, h, _x, _y;
-			if (width == null)
-				w = hostFrame.Width;
-			else
-				w = width.Anchor (hostFrame.Width);
 
-			if (x == null)
-				_x = 0;
-			else {
-				if (x is Pos.PosCenter)
-					_x = x.Anchor (hostFrame.Width - w);
+			if (x is Pos.PosCenter) {
+				if (width == null)
+					w = hostFrame.Width;
 				else
+					w = width.Anchor (hostFrame.Width);
+				_x = x.Anchor (hostFrame.Width - w);
+			} else {
+				if (x == null) 
+					_x = 0;
+				else 
 					_x = x.Anchor (hostFrame.Width);
+				if (width == null)
+					w = hostFrame.Width;
+				else
+					w = width.Anchor (hostFrame.Width - _x);
 			}
-			if (height == null)
-				h = hostFrame.Height;
-			else
-				h = height.Anchor (hostFrame.Height);
 
-			if (y == null)
-				_y = 0;
-			else {
-				if (y is Pos.PosCenter)
-					_y = y.Anchor (hostFrame.Height - h);
+			if (y is Pos.PosCenter) {
+				if (height == null)
+					h = hostFrame.Height;
+				else
+					h = height.Anchor (hostFrame.Height);
+				_y = y.Anchor (hostFrame.Height - h);
+			} else {
+				if (y == null)
+					_y = 0;
 				else
 					_y = y.Anchor (hostFrame.Height);
+				if (height == null)
+					h = hostFrame.Height;
+				else
+					h = height.Anchor (hostFrame.Height - _y);
 			}
-
 			Frame = new Rect (_x, _y, w, h);
 		}
 

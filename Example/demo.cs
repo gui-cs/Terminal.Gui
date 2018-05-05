@@ -217,7 +217,7 @@ static class Demo {
 			X = 0,
 			Y = 1,
 			Width = Dim.Fill (),
-			Height = Dim.Fill () - 1
+			Height = Dim.Fill ()
 		};
 #else
 		var win = new Window (new Rect (0, 1, tframe.Width, tframe.Height - 1), "Hello");
