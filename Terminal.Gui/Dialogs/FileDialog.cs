@@ -1,6 +1,17 @@
 ﻿// 
 // FileDialog.cs: File system dialogs for open and save
 //
+// TODO:
+//   * Raise event on file selected
+//   * Add directory selector
+//   * Update file name on cursor changes
+//   * Figure out why Ok/Cancel buttons do not work
+//   * Implement subclasses
+//   * Figure out why message text does not show
+//   * Remove the extra space when message does not show
+//   * Use a line separator to show the file listing, so we can use same colors as the rest
+//   * Implement support for the subclass properties.
+//   * Add mouse support
 
 using System;
 using System.Collections.Generic;
@@ -10,72 +21,94 @@ using System.Linq;
 
 namespace Terminal.Gui {
 	internal class DirListView : View {
-		int topFile, currentFile;
+		int top, selected;
 		DirectoryInfo dirInfo;
-		List<FileSystemInfo> infos;
+		List<(string,bool)> infos;
 
 		public DirListView ()
 		{
-			infos = new List<FileSystemInfo> ();
+			infos = new List<(string,bool)> ();
 			CanFocus = true;
+		}
+
+		bool IsAllowed (FileSystemInfo fsi)
+		{
+			if (fsi.Attributes.HasFlag (FileAttributes.Directory))
+			    return true;
+			if (allowedFileTypes == null)
+				return true;
+			foreach (var ft in allowedFileTypes)
+				if (fsi.Name.EndsWith (ft))
+					return true;
+			return false;
 		}
 
 		void Reload ()
 		{
-			dirInfo = new DirectoryInfo (directory);
-			infos = (from x in dirInfo.GetFileSystemInfos () orderby (!x.Attributes.HasFlag (FileAttributes.Directory)) + x.Name select x).ToList ();
-			topFile = 0;
-			currentFile = 0;
+			dirInfo = new DirectoryInfo (directory.ToString ());
+			infos = (from x in dirInfo.GetFileSystemInfos ()
+			         where IsAllowed (x)
+			         orderby (!x.Attributes.HasFlag (FileAttributes.Directory)) + x.Name
+			         select (x.Name, x.Attributes.HasFlag (FileAttributes.Directory))).ToList ();
+			infos.Insert (0, ("..", true));
+			top = 0;
+			selected = 0;
 			SetNeedsDisplay ();
 		}
 
-		string directory;
-		public string Directory {
+		ustring directory;
+		public ustring Directory {
 			get => directory;
 			set {
-				if (directory != value)
+				if (directory == value)
 					return;
-				
 				directory = value;
 				Reload ();
 			}
 		}
 
+		public override void PositionCursor ()
+		{
+			Move (0, selected - top);
+		}
+
+		void DrawString (int line, string str)
+		{
+			var f = Frame;
+			var width = f.Width;
+			var ustr = ustring.Make (str);
+
+			Move (2, line);
+			int byteLen = ustr.Length;
+			int used = 0;
+			for (int i = 0; i < byteLen;) {
+				(var rune, var size) = Utf8.DecodeRune (ustr, i, i - byteLen);
+				var count = Rune.ColumnWidth (rune);
+				if (used + count >= width)
+					break;
+				Driver.AddRune (rune);
+				used += count;
+				i += size;
+			}
+			for (; used < width; used++) {
+				Driver.AddRune (' ');
+			}			
+		}
+
 		public override void Redraw (Rect region)
 		{
-			Driver.SetAttribute (ColorScheme.Focus);
-			var g = Frame;
-
-			for (int y = 0; y < g.Height; y++) {
-				Move (0, y);
-				for (int x = 0; x < g.Width; x++) {
-					Rune r;
-					switch (x % 3) {
-					case 0:
-						r = '.';
-						break;
-					case 1:
-						r = 'o';
-						break;
-					default:
-						r = 'O';
-						break;
-					}
-					Driver.AddRune (r);
-				}
-			}
-			return;
 			var current = ColorScheme.Focus;
 			Driver.SetAttribute (current);
 			Move (0, 0);
 			var f = Frame;
-			var item = topFile;
+			var item = top;
 			bool focused = HasFocus;
 			var width = region.Width;
 
-			bool isSelected = false;
 			for (int row = 0; row < f.Height; row++, item++) {
-				var newcolor = focused ? (isSelected ? ColorScheme.Focus : ColorScheme.Normal) : ColorScheme.Normal;
+				bool isSelected = item == selected;
+				Move (0, row);
+				var newcolor = focused ? (isSelected ? ColorScheme.HotNormal : ColorScheme.Focus) : ColorScheme.Focus;
 				if (newcolor != current) {
 					Driver.SetAttribute (newcolor);
 					current = newcolor;
@@ -86,23 +119,101 @@ namespace Terminal.Gui {
 					continue;
 				}
 				var fi = infos [item];
-				var ustr = ustring.Make (fi.Name);
-				int byteLen = ustr.Length;
-				int used = 0;
-				for (int i = 0; i < byteLen;) {
-					(var rune, var size) = Utf8.DecodeRune (ustr, i, i - byteLen);
-					var count = Rune.ColumnWidth (rune);
-					if (used + count >= width)
-						break;
-					Driver.AddRune (rune);
-					used += count;
-					i += size;
-				}
-				for (; used < width; used++) {
+
+				Driver.AddRune (isSelected ? '>' : ' ');
+				if (fi.Item2)
+					Driver.AddRune ('/');
+				else
 					Driver.AddRune (' ');
-				}
+				DrawString (row, fi.Item1);
 			}
 		}
+
+		public Action<(string,bool)> SelectedChanged;
+		public Action<ustring> DirectoryChanged;
+
+		void SelectionChanged ()
+		{
+			if (SelectedChanged != null)
+				SelectedChanged (infos [selected]);
+		}
+
+		public override bool ProcessKey (KeyEvent keyEvent)
+		{
+			switch (keyEvent.Key) {
+			case Key.CursorUp:
+			case Key.ControlP:
+				if (selected > 0) {
+					selected--;
+					if (selected < top)
+						top = selected;
+					SelectionChanged ();
+					SetNeedsDisplay ();
+				}
+				return true;
+
+			case Key.CursorDown:
+			case Key.ControlN:
+				if (selected + 1 < infos.Count) {
+					selected++;
+					if (selected >= top + Frame.Height)
+						top++;
+					SelectionChanged ();
+					SetNeedsDisplay ();
+				}
+				return true;
+
+			case Key.ControlV:
+			case Key.PageDown:
+				var n = (selected + Frame.Height);
+				if (n > infos.Count)
+					n = infos.Count - 1;
+				if (n != selected) {
+					selected = n;
+					if (infos.Count >= Frame.Height)
+						top = selected;
+					else
+						top = 0;
+					SelectionChanged ();
+
+					SetNeedsDisplay ();
+				}
+				return true;
+
+			case Key.Enter:
+				if (infos [selected].Item2) {
+					Directory = Path.GetFullPath (Path.Combine (Path.GetFullPath (Directory.ToString ()), infos [selected].Item1));
+					if (DirectoryChanged != null)
+						DirectoryChanged (Directory);
+				} else {
+					// File Selected
+				}
+				return true;
+
+			case Key.PageUp:
+				n = (selected - Frame.Height);
+				if (n < 0)
+					n = 0;
+				if (n != selected) {
+					selected = n;
+					top = selected;
+					SelectionChanged ();
+					SetNeedsDisplay ();
+				}
+				return true;
+			}
+			return base.ProcessKey (keyEvent);
+		}
+
+		string [] allowedFileTypes;
+		public string [] AllowedFileTypes {
+			get => allowedFileTypes;
+			set {
+				allowedFileTypes = value;
+				Reload ();
+			}
+		}
+
 	}
 
 	public class FileDialog : Dialog {
@@ -111,42 +222,43 @@ namespace Terminal.Gui {
 		TextField dirEntry, nameEntry;
 		DirListView dirListView;
 
-		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message) : base (title, Driver.Cols - 20, Driver.Rows - 6, null)
+		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message) : base (title, Driver.Cols - 20, Driver.Rows - 5, null)
 		{
 			this.message = new Label (Rect.Empty, "MESSAGE" + message);
 			var msgLines = Label.MeasureLines (message, Driver.Cols - 20);
 
 			dirLabel = new Label ("Directory: ") {
-				X = 2,
+				X = 1,
 				Y = 1 + msgLines
 			};
 
 			dirEntry = new TextField ("") {
-				X = 12,
+				X = 11,
 				Y = 1 + msgLines,
 				Width = Dim.Fill () - 1
 			};
 			Add (dirLabel, dirEntry);
 
 			this.nameFieldLabel = new Label (nameFieldLabel) {
-				X = 2,
+				X = 1,
 				Y = 3 + msgLines,
 			};
 			nameEntry = new TextField ("") {
-				X = 2 + nameFieldLabel.RuneCount + 1,
+				X = 1 + nameFieldLabel.RuneCount + 1,
 				Y = 3 + msgLines,
 				Width = Dim.Fill () - 1
 			};
 			Add (this.nameFieldLabel, nameEntry);
 
 			dirListView = new DirListView () {
-				X = 2,
+				X = 1,
 				Y = 3 + msgLines + 2,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 				Directory = "."	
 			};
 			Add (dirListView);
+			dirListView.DirectoryChanged = (dir) => dirEntry.Text = dir;
 
 			this.cancel = new Button ("Cancel");
 			AddButton (cancel);
@@ -208,6 +320,7 @@ namespace Terminal.Gui {
 			get => dirEntry.Text;
 			set {
 				dirEntry.Text = value;
+				dirListView.Directory = value;
 			}
 		}
 
@@ -215,7 +328,10 @@ namespace Terminal.Gui {
 		/// The array of filename extensions allowed, or null if all file extensions are allowed.
 		/// </summary>
 		/// <value>The allowed file types.</value>
-		public ustring [] AllowedFileTypes { get; set; }
+		public string [] AllowedFileTypes {
+			get => dirListView.AllowedFileTypes;
+			set => dirListView.AllowedFileTypes = value;
+		}
 
 
 		/// <summary>
