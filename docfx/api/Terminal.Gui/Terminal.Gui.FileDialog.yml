@@ -133,9 +133,9 @@ items:
   namespace: Terminal.Gui
   summary: The array of filename extensions allowed, or null if all file extensions are allowed.
   syntax:
-    content: public NStack.ustring[] AllowedFileTypes { get; set; }
+    content: public string[] AllowedFileTypes { get; set; }
     return:
-      type: NStack.ustring[]
+      type: System.String[]
       description: The allowed file types.
   overload: Terminal.Gui.FileDialog.AllowedFileTypes*
   exceptions: []
@@ -324,17 +324,21 @@ references:
   name: AllowedFileTypes
   nameWithType: FileDialog.AllowedFileTypes
   fullName: FileDialog.AllowedFileTypes
-- uid: NStack.ustring[]
-  parent: NStack
+- uid: System.String
+  name: String
+  nameWithType: String
+  fullName: System.String
+- uid: System.String[]
+  parent: System
   isExternal: true
-  name: ustring[]
-  nameWithType: ustring[]
-  fullName: NStack.ustring[]
+  name: String[]
+  nameWithType: String[]
+  fullName: System.String[]
   spec.csharp:
-  - uid: NStack.ustring
-    name: ustring
-    nameWithType: ustring
-    fullName: NStack.ustring
+  - uid: System.String
+    name: String
+    nameWithType: String
+    fullName: System.String
   - name: '[]'
     nameWithType: '[]'
     fullName: '[]'

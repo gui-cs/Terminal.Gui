@@ -272,8 +272,8 @@ class Demo {
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
-		editor.Text = System.IO.File.ReadAllText (filename);
-		win.Add (editor);
+        editor.Text = System.IO.File.ReadAllText (filename);
+        win.Add (editor);
 
         // Add both menu and win in a single call
         top.Add (win, menu);

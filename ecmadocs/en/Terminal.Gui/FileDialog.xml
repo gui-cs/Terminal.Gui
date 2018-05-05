@@ -37,14 +37,14 @@
       </Docs>
     </Member>
     <Member MemberName="AllowedFileTypes">
-      <MemberSignature Language="C#" Value="public NStack.ustring[] AllowedFileTypes { get; set; }" />
-      <MemberSignature Language="ILAsm" Value=".property instance class NStack.ustring[] AllowedFileTypes" />
+      <MemberSignature Language="C#" Value="public string[] AllowedFileTypes { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance string[] AllowedFileTypes" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <ReturnValue>
-        <ReturnType>NStack.ustring[]</ReturnType>
+        <ReturnType>System.String[]</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>
