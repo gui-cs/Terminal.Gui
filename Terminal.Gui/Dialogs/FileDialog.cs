@@ -5,16 +5,115 @@
 using System;
 using System.Collections.Generic;
 using NStack;
+using System.IO;
+using System.Linq;
 
 namespace Terminal.Gui {
+	internal class DirListView : View {
+		int topFile, currentFile;
+		DirectoryInfo dirInfo;
+		List<FileSystemInfo> infos;
+
+		public DirListView ()
+		{
+			infos = new List<FileSystemInfo> ();
+			CanFocus = true;
+		}
+
+		void Reload ()
+		{
+			dirInfo = new DirectoryInfo (directory);
+			infos = (from x in dirInfo.GetFileSystemInfos () orderby (!x.Attributes.HasFlag (FileAttributes.Directory)) + x.Name select x).ToList ();
+			topFile = 0;
+			currentFile = 0;
+			SetNeedsDisplay ();
+		}
+
+		string directory;
+		public string Directory {
+			get => directory;
+			set {
+				if (directory != value)
+					return;
+				
+				directory = value;
+				Reload ();
+			}
+		}
+
+		public override void Redraw (Rect region)
+		{
+			Driver.SetAttribute (ColorScheme.Focus);
+			var g = Frame;
+
+			for (int y = 0; y < g.Height; y++) {
+				Move (0, y);
+				for (int x = 0; x < g.Width; x++) {
+					Rune r;
+					switch (x % 3) {
+					case 0:
+						r = '.';
+						break;
+					case 1:
+						r = 'o';
+						break;
+					default:
+						r = 'O';
+						break;
+					}
+					Driver.AddRune (r);
+				}
+			}
+			return;
+			var current = ColorScheme.Focus;
+			Driver.SetAttribute (current);
+			Move (0, 0);
+			var f = Frame;
+			var item = topFile;
+			bool focused = HasFocus;
+			var width = region.Width;
+
+			bool isSelected = false;
+			for (int row = 0; row < f.Height; row++, item++) {
+				var newcolor = focused ? (isSelected ? ColorScheme.Focus : ColorScheme.Normal) : ColorScheme.Normal;
+				if (newcolor != current) {
+					Driver.SetAttribute (newcolor);
+					current = newcolor;
+				}
+				if (item >= infos.Count) {
+					for (int c = 0; c < f.Width; c++)
+						Driver.AddRune (' ');
+					continue;
+				}
+				var fi = infos [item];
+				var ustr = ustring.Make (fi.Name);
+				int byteLen = ustr.Length;
+				int used = 0;
+				for (int i = 0; i < byteLen;) {
+					(var rune, var size) = Utf8.DecodeRune (ustr, i, i - byteLen);
+					var count = Rune.ColumnWidth (rune);
+					if (used + count >= width)
+						break;
+					Driver.AddRune (rune);
+					used += count;
+					i += size;
+				}
+				for (; used < width; used++) {
+					Driver.AddRune (' ');
+				}
+			}
+		}
+	}
+
 	public class FileDialog : Dialog {
 		Button prompt, cancel;
 		Label nameFieldLabel, message, dirLabel;
 		TextField dirEntry, nameEntry;
+		DirListView dirListView;
 
 		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message) : base (title, Driver.Cols - 20, Driver.Rows - 6, null)
 		{
-			this.message = new Label (Rect.Empty, message);
+			this.message = new Label (Rect.Empty, "MESSAGE" + message);
 			var msgLines = Label.MeasureLines (message, Driver.Cols - 20);
 
 			dirLabel = new Label ("Directory: ") {
@@ -24,7 +123,8 @@ namespace Terminal.Gui {
 
 			dirEntry = new TextField ("") {
 				X = 12,
-				Y = 1 + msgLines
+				Y = 1 + msgLines,
+				Width = Dim.Fill () - 1
 			};
 			Add (dirLabel, dirEntry);
 
@@ -38,6 +138,15 @@ namespace Terminal.Gui {
 				Width = Dim.Fill () - 1
 			};
 			Add (this.nameFieldLabel, nameEntry);
+
+			dirListView = new DirListView () {
+				X = 2,
+				Y = 3 + msgLines + 2,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Directory = "."	
+			};
+			Add (dirListView);
 
 			this.cancel = new Button ("Cancel");
 			AddButton (cancel);
