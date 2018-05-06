@@ -254,7 +254,7 @@ namespace Terminal.Gui {
 				X = 1,
 				Y = 3 + msgLines + 2,
 				Width = Dim.Fill (),
-				Height = Dim.Fill (),
+				Height = Dim.Fill ()-2,
 				Directory = "."	
 			};
 			Add (dirListView);

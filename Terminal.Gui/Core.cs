@@ -1020,9 +1020,9 @@ namespace Terminal.Gui {
 					w = width.Anchor (hostFrame.Width);
 				_x = x.Anchor (hostFrame.Width - w);
 			} else {
-				if (x == null) 
+				if (x == null)
 					_x = 0;
-				else 
+				else
 					_x = x.Anchor (hostFrame.Width);
 				if (width == null)
 					w = hostFrame.Width;
@@ -1240,7 +1240,7 @@ namespace Terminal.Gui {
 					Focused?.SetNeedsDisplay ();
 				}
 				return true;
-			
+
 			case Key.ControlL:
 				Application.Refresh ();
 				return true;
@@ -1271,6 +1271,20 @@ namespace Terminal.Gui {
 		class ContentView : View {
 			public ContentView (Rect frame) : base (frame) { }
 			public ContentView () : base () { }
+#if false
+			public override void Redraw (Rect region)
+			{
+				Driver.SetAttribute (ColorScheme.Focus);
+
+				for (int y = 0; y < Frame.Height; y++) {
+					Move (0, y);
+					for (int x = 0; x < Frame.Width; x++) {
+
+						Driver.AddRune ('x');
+					}
+				}
+			}
+#endif
 		}
 
 		/// <summary>
@@ -1319,11 +1333,11 @@ namespace Terminal.Gui {
 		public Window (ustring title = null, int padding = 0) : base ()
 		{
 			this.Title = title;
-			int wb = 2 * (1 + padding);
+			int wb = 1 + padding;
 			this.padding = padding;
-			contentView = new ContentView () {
-				X = 1 + padding,
-				Y = 1 + padding,
+ 			contentView = new ContentView () {
+				X = wb,
+				Y = wb,
 				Width = Dim.Fill (wb),
 				Height = Dim.Fill (wb)
 			};

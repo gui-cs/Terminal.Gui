@@ -211,7 +211,7 @@ static class Demo {
 		Application.Init ();
 		var top = Application.Top;
 		var tframe = top.Frame;
-		Open ();
+		//Open ();
 #if true
 		var win = new Window ("Hello") {
 			X = 0,
