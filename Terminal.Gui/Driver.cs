@@ -566,6 +566,7 @@ namespace Terminal.Gui {
 			case Curses.KeyDeleteChar: return Key.DeleteChar;
 			case Curses.KeyInsertChar: return Key.InsertChar;
 			case Curses.KeyBackTab: return Key.BackTab;
+			case Curses.KeyBackspace: return Key.Backspace;
 			default: return Key.Unknown;
 			}
 		}

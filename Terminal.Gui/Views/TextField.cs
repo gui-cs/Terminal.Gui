@@ -160,6 +160,14 @@ namespace Terminal.Gui {
 		{
 			switch (kb.Key) {
 			case Key.Delete:
+			case Key.DeleteChar:
+				if (text.Length == 0 || text.Length == point)
+					return true;
+
+				SetText (text [0, point] + text [point + 1, null]);
+				Adjust ();
+				break;
+
 			case Key.Backspace:
 				if (point == 0)
 					return true;
