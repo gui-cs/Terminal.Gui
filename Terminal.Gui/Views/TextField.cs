@@ -159,8 +159,6 @@ namespace Terminal.Gui {
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			switch (kb.Key) {
-			case Key.Delete:
-#if false
 			case Key.DeleteChar:
 				if (text.Length == 0 || text.Length == point)
 					return true;
@@ -168,7 +166,8 @@ namespace Terminal.Gui {
 				SetText (text [0, point] + text [point + 1, null]);
 				Adjust ();
 				break;
-#endif
+
+			case Key.Delete:
 			case Key.Backspace:
 				if (point == 0)
 					return true;
