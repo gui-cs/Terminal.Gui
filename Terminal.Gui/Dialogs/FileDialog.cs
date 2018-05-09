@@ -23,11 +23,14 @@ namespace Terminal.Gui {
 	internal class DirListView : View {
 		int top, selected;
 		DirectoryInfo dirInfo;
-		List<(string,bool)> infos;
+		List<(string,bool,bool)> infos;
+		internal bool canChooseFiles = true;
+		internal bool canChooseDirectories = false;
+		internal bool allowsMultipleSelection = false;
 
 		public DirListView ()
 		{
-			infos = new List<(string,bool)> ();
+			infos = new List<(string,bool,bool)> ();
 			CanFocus = true;
 		}
 
@@ -43,14 +46,14 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		void Reload ()
+		internal void Reload ()
 		{
 			dirInfo = new DirectoryInfo (directory.ToString ());
 			infos = (from x in dirInfo.GetFileSystemInfos ()
 			         where IsAllowed (x)
 			         orderby (!x.Attributes.HasFlag (FileAttributes.Directory)) + x.Name
-			         select (x.Name, x.Attributes.HasFlag (FileAttributes.Directory))).ToList ();
-			infos.Insert (0, ("..", true));
+			         select (x.Name, x.Attributes.HasFlag (FileAttributes.Directory), false)).ToList ();
+			infos.Insert (0, ("..", true, false));
 			top = 0;
 			selected = 0;
 			SetNeedsDisplay ();
@@ -78,7 +81,7 @@ namespace Terminal.Gui {
 			var width = f.Width;
 			var ustr = ustring.Make (str);
 
-			Move (2, line);
+			Move (allowsMultipleSelection ? 3 : 2, line);
 			int byteLen = ustr.Length;
 			int used = 0;
 			for (int i = 0; i < byteLen;) {
@@ -121,6 +124,10 @@ namespace Terminal.Gui {
 				var fi = infos [item];
 
 				Driver.AddRune (isSelected ? '>' : ' ');
+
+				if (allowsMultipleSelection)
+					Driver.AddRune (fi.Item3 ? '*' : ' ');
+				
 				if (fi.Item2)
 					Driver.AddRune ('/');
 				else
@@ -134,8 +141,10 @@ namespace Terminal.Gui {
 
 		void SelectionChanged ()
 		{
-			if (SelectedChanged != null)
-				SelectedChanged (infos [selected]);
+			if (SelectedChanged != null) {
+				var sel = infos [selected];
+				SelectedChanged ((sel.Item1, sel.Item2));
+			}
 		}
 
 		public override bool ProcessKey (KeyEvent keyEvent)
@@ -201,6 +210,19 @@ namespace Terminal.Gui {
 					SetNeedsDisplay ();
 				}
 				return true;
+
+			case Key.Space:
+			case Key.ControlT: 
+				if (allowsMultipleSelection) {
+					if ((canChooseFiles && infos [selected].Item2 == false) ||
+					    (canChooseDirectories && infos [selected].Item2 &&
+					     infos [selected].Item1 != "..")){
+						infos [selected] = (infos [selected].Item1, infos [selected].Item2, !infos [selected].Item3);
+						SelectionChanged ();
+						SetNeedsDisplay ();
+					}
+				}
+				return true;
 			}
 			return base.ProcessKey (keyEvent);
 		}
@@ -214,13 +236,42 @@ namespace Terminal.Gui {
 			}
 		}
 
+		public string MakePath (string relativePath)
+		{
+			return Path.GetFullPath (Path.Combine (Directory.ToString (), relativePath));
+		}
+
+		public IReadOnlyList<string> FilePaths {
+			get {
+				if (allowsMultipleSelection) {
+					var res = new List<string> ();
+					foreach (var item in infos)
+						if (item.Item3)
+							res.Add (MakePath (item.Item1));
+					return res;
+				} else {
+					if (infos [selected].Item2) {
+						if (canChooseDirectories)
+							return new List<string> () { MakePath (infos [selected].Item1) };
+						return Array.Empty<string> ();
+					} else {
+						if (canChooseFiles) 
+							return new List<string> () { MakePath (infos [selected].Item1) };
+						return Array.Empty<string> ();
+					}
+				}
+			}
+		}
 	}
 
+	/// <summary>
+	/// Base class for the OpenDialog and the SaveDialog
+	/// </summary>
 	public class FileDialog : Dialog {
 		Button prompt, cancel;
 		Label nameFieldLabel, message, dirLabel;
 		TextField dirEntry, nameEntry;
-		DirListView dirListView;
+		internal DirListView dirListView;
 
 		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message) : base (title, Driver.Cols - 20, Driver.Rows - 5, null)
 		{
@@ -358,6 +409,19 @@ namespace Terminal.Gui {
 		}
 	}
 
+	/// <summary>
+	/// The Open Dialog provides an interactive dialog box for users to select files or directories.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// The open dialog can be used to select files for opening, it can be configured to allow
+	/// multiple items to be selected (based on the AllowsMultipleSelection) variable and
+	/// you can control whether this should allow files or directories to be selected.
+	/// </para>
+	/// <para>
+	/// To select more than one file, users can use the spacebar, or control-t.
+	/// </para>
+	/// </remarks>
 	public class OpenDialog : FileDialog {
 		public OpenDialog (ustring title, ustring message) : base (title, prompt: "Open", nameFieldLabel: "Open", message: message)
 		{
@@ -366,25 +430,45 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.OpenDialog"/> can choose files.
 		/// </summary>
-		/// <value><c>true</c> if can choose files; otherwise, <c>false</c>.</value>
-		public bool CanChooseFiles { get; set; }
+		/// <value><c>true</c> if can choose files; otherwise, <c>false</c>.  Defaults to <c>true</c></value>
+		public bool CanChooseFiles {
+			get => dirListView.canChooseFiles;
+			set {
+				dirListView.canChooseDirectories = value;
+				dirListView.Reload ();
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.OpenDialog"/> can choose directories.
 		/// </summary>
-		/// <value><c>true</c> if can choose directories; otherwise, <c>false</c>.</value>
-		public bool CanChooseDirectories { get; set; }
+		/// <value><c>true</c> if can choose directories; otherwise, <c>false</c> defaults to <c>false</c>.</value>
+		public bool CanChooseDirectories {
+			get => dirListView.canChooseDirectories;
+			set {
+				dirListView.canChooseDirectories = value;
+				dirListView.Reload ();
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.OpenDialog"/> allows multiple selection.
 		/// </summary>
-		/// <value><c>true</c> if allows multiple selection; otherwise, <c>false</c>.</value>
-		public bool AllowsMultipleSelection { get; set; }
+		/// <value><c>true</c> if allows multiple selection; otherwise, <c>false</c>, defaults to false.</value>
+		public bool AllowsMultipleSelection {
+			get => dirListView.allowsMultipleSelection;
+			set {
+				dirListView.allowsMultipleSelection = value;
+				dirListView.Reload ();
+			}
+		}
 
 		/// <summary>
-		/// Gets the file paths selected
+		/// Returns the selected files, or an empty list if nothing has been selected
 		/// </summary>
 		/// <value>The file paths.</value>
-		public IReadOnlyList<ustring> FilePaths { get; }
+		public IReadOnlyList<string> FilePaths {
+			get => dirListView.FilePaths;
+		}
 	}
 }
