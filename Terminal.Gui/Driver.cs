@@ -1084,6 +1084,21 @@ namespace Terminal.Gui {
 				return Key.Backspace;
 			case ConsoleKey.Delete:
 				return Key.Delete;
+
+			case ConsoleKey.Oem1:
+			case ConsoleKey.Oem2:
+			case ConsoleKey.Oem3:
+			case ConsoleKey.Oem4:
+			case ConsoleKey.Oem5:
+			case ConsoleKey.Oem6:
+			case ConsoleKey.Oem7:
+			case ConsoleKey.Oem8:
+			case ConsoleKey.Oem102:
+			case ConsoleKey.OemPeriod:
+			case ConsoleKey.OemComma:
+			case ConsoleKey.OemPlus:
+			case ConsoleKey.OemMinus:
+				return (Key)((uint)keyInfo.KeyChar);
 			}
 
 			var key = keyInfo.Key;
@@ -1098,12 +1113,19 @@ namespace Terminal.Gui {
 				else
 					return (Key)((uint)'a' + delta);
 			}
+			if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
+				var delta = key - ConsoleKey.D0;
+				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
+					return (Key)(((uint)Key.AltMask) | ((uint)'0' + delta));
+				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
+					return (Key)((uint)keyInfo.KeyChar);
+				return (Key)((uint)'0' + delta);
+			}
 			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
 				var delta = key - ConsoleKey.F1;
 
 				return (Key)((int) Key.F1 + delta);
 			}
-
 			return (Key)(0xffffffff);
 		}
 
