@@ -2,16 +2,12 @@
 // FileDialog.cs: File system dialogs for open and save
 //
 // TODO:
-//   * Raise event on file selected
 //   * Add directory selector
-//   * Update file name on cursor changes
-//   * Figure out why Ok/Cancel buttons do not work
 //   * Implement subclasses
 //   * Figure out why message text does not show
 //   * Remove the extra space when message does not show
 //   * Use a line separator to show the file listing, so we can use same colors as the rest
-//   * Implement support for the subclass properties.
-//   * Add mouse support
+//   * DirListView: Add mouse support
 
 using System;
 using System.Collections.Generic;
@@ -138,6 +134,7 @@ namespace Terminal.Gui {
 
 		public Action<(string,bool)> SelectedChanged;
 		public Action<ustring> DirectoryChanged;
+		public Action<ustring> FileChanged;
 
 		void SelectionChanged ()
 		{
@@ -190,12 +187,20 @@ namespace Terminal.Gui {
 				return true;
 
 			case Key.Enter:
-				if (infos [selected].Item2) {
+				var isDir = infos [selected].Item2;
+
+				if (isDir) {
 					Directory = Path.GetFullPath (Path.Combine (Path.GetFullPath (Directory.ToString ()), infos [selected].Item1));
 					if (DirectoryChanged != null)
 						DirectoryChanged (Directory);
 				} else {
-					// File Selected
+					if (FileChanged != null)
+						FileChanged (infos [selected].Item1);
+					if (canChooseFiles) {
+						// Let the OK handler take it over
+						return false;
+					}
+					// No files allowed, do not let the default handler take it.
 				}
 				return true;
 
@@ -284,18 +289,18 @@ namespace Terminal.Gui {
 			};
 
 			dirEntry = new TextField ("") {
-				X = 11,
+				X = Pos.Right (dirLabel),
 				Y = 1 + msgLines,
 				Width = Dim.Fill () - 1
 			};
 			Add (dirLabel, dirEntry);
 
-			this.nameFieldLabel = new Label (nameFieldLabel) {
-				X = 1,
+			this.nameFieldLabel = new Label ("Open: ") {
+				X = 6,
 				Y = 3 + msgLines,
 			};
 			nameEntry = new TextField ("") {
-				X = 1 + nameFieldLabel.RuneCount + 1,
+				X = Pos.Left (dirEntry),
 				Y = 3 + msgLines,
 				Width = Dim.Fill () - 1
 			};
@@ -305,17 +310,37 @@ namespace Terminal.Gui {
 				X = 1,
 				Y = 3 + msgLines + 2,
 				Width = Dim.Fill (),
-				Height = Dim.Fill ()-2,
-				Directory = "."	
+				Height = Dim.Fill () - 2,
 			};
+			DirectoryPath = Path.GetFullPath (Environment.CurrentDirectory);
 			Add (dirListView);
 			dirListView.DirectoryChanged = (dir) => dirEntry.Text = dir;
+			dirListView.FileChanged = (file) => {
+				nameEntry.Text = file;
+			};
 
 			this.cancel = new Button ("Cancel");
 			AddButton (cancel);
 
-			this.prompt = new Button (prompt);
+			this.prompt = new Button (prompt) {
+				IsDefault = true,
+			};
+			this.prompt.Clicked += () => {
+				canceled = false;
+				Application.RequestStop ();
+			};
 			AddButton (this.prompt);
+
+			// On success, we will set this to false.
+			canceled = true;
+		}
+
+		internal bool canceled;
+
+		public override void WillPresent ()
+		{
+			base.WillPresent ();
+			//SetFocus (nameEntry);
 		}
 
 		/// <summary>
@@ -403,9 +428,33 @@ namespace Terminal.Gui {
 		}
 	}
 
+	/// <summary>
+	///  The save dialog provides an interactive dialog box for users to pick a file to 
+	///  save.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	///   To use it, create an instance of the SaveDialog, and then
+	///   call Application.Run on the resulting instance.   This will run the dialog modally,
+	///   and when this returns, the FileName property will contain the selected value or 
+	///   null if the user canceled. 
+	/// </remarks>
 	public class SaveDialog : FileDialog {
 		public SaveDialog (ustring title, ustring message) : base (title, prompt: "Save", nameFieldLabel: "Save as:", message: message)
 		{
+		}
+
+		/// <summary>
+		/// Gets the name of the file the user selected for saving, or null
+		/// if the user canceled the dialog box.
+		/// </summary>
+		/// <value>The name of the file.</value>
+		public ustring FileName {
+			get {
+				if (canceled)
+					return null;
+				return FilePath;
+			}
 		}
 	}
 
@@ -414,9 +463,14 @@ namespace Terminal.Gui {
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	/// The open dialog can be used to select files for opening, it can be configured to allow
-	/// multiple items to be selected (based on the AllowsMultipleSelection) variable and
-	/// you can control whether this should allow files or directories to be selected.
+	///   The open dialog can be used to select files for opening, it can be configured to allow
+	///   multiple items to be selected (based on the AllowsMultipleSelection) variable and
+	///   you can control whether this should allow files or directories to be selected.
+	/// </para>
+	/// <para>
+	///   To use it, create an instance of the OpenDialog, configure its properties, and then
+	///   call Application.Run on the resulting instance.   This will run the dialog modally,
+	///   and when this returns, the list of filds will be available on the FilePaths property.
 	/// </para>
 	/// <para>
 	/// To select more than one file, users can use the spacebar, or control-t.

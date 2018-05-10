@@ -97,14 +97,14 @@ static class Demo {
 		// layout based on referencing elements of another view:
 
 		var login = new Label ("Login: ") { X = 3, Y = 6 };
-		var password = new Label ("Password: ") { 
-			X = Pos.Left (login), 
-			Y = Pos.Bottom (login) + 1 
+		var password = new Label ("Password: ") {
+			X = Pos.Left (login),
+			Y = Pos.Bottom (login) + 1
 		};
-		var loginText = new TextField ("") { 
-			X = Pos.Right (password),  
-			Y = Pos.Top (login), 
-			Width = 40 
+		var loginText = new TextField ("") {
+			X = Pos.Right (password),
+			Y = Pos.Top (login),
+			Width = 40
 		};
 		var passText = new TextField ("") {
 			Secret = true,
@@ -173,7 +173,12 @@ static class Demo {
 		});
 		ntop.Add (menu);
 
-		var win = new Window (new Rect (0, 1, tframe.Width, tframe.Height - 1), "/etc/passwd");
+		var win = new Window ("/etc/passwd") {
+			X = 0,
+			Y = 0,
+			Width = Dim.Fill (),
+			Height = Dim.Fill ()
+		};
 		ntop.Add (win);
 
 		var text = new TextView (new Rect (0, 0, tframe.Width - 2, tframe.Height - 3));
@@ -204,6 +209,37 @@ static class Demo {
 		Application.Run (d);
 	}
 
+	public static void ShowHex (Toplevel top)
+	{
+		var tframe = top.Frame;
+		var ntop = new Toplevel (tframe);
+		var menu = new MenuBar (new MenuBarItem [] {
+			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuItem ("_Close", "", () => {Application.RequestStop ();}),
+			}),
+		});
+		ntop.Add (menu);
+
+		var win = new Window ("/etc/passwd") {
+			X = 0,
+			Y = 1,
+			Width = Dim.Fill (),
+			Height = Dim.Fill ()
+		};
+		ntop.Add (win);
+
+		var source = System.IO.File.OpenRead ("/etc/passwd");
+		var hex = new HexView (source) {
+			X = 0,
+			Y = 0,
+			Width = Dim.Fill (),
+			Height = Dim.Fill ()
+		};
+		win.Add (hex);
+		Application.Run (ntop);
+			
+	}
+
 	public static Label ml;
 	static void Main ()
 	{
@@ -211,7 +247,7 @@ static class Demo {
 		Application.Init ();
 		var top = Application.Top;
 		var tframe = top.Frame;
-		Open ();
+		//Open ();
 #if true
 		var win = new Window ("Hello") {
 			X = 0,
@@ -227,6 +263,7 @@ static class Demo {
 				new MenuItem ("Text Editor Demo", "", () => { Editor (top); }),
 				new MenuItem ("_New", "Creates new file", NewFile),
 				new MenuItem ("_Open", "", Open),
+				new MenuItem ("_Hex", "", () => ShowHex (top)),
 				new MenuItem ("_Close", "", () => Close ()),
 				new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
 			}),

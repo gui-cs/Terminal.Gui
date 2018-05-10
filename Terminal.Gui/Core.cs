@@ -1247,6 +1247,15 @@ namespace Terminal.Gui {
 			}
 			return false;
 		}
+
+		/// <summary>
+		/// This method is invoked by Application.Begin as part of the Application.Run after
+		/// the views have been laid out, and before the views are drawn for the first time.
+		/// </summary>
+		public virtual void WillPresent ()
+		{
+			FocusFirst ();
+		}
 	}
 
 	/// <summary>
@@ -1765,7 +1774,7 @@ namespace Terminal.Gui {
 			if (toplevel.LayoutStyle == LayoutStyle.Computed)
 				toplevel.RelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
 			toplevel.LayoutSubviews ();
-			toplevel.FocusFirst ();
+			toplevel.WillPresent ();
 			Redraw (toplevel);
 			toplevel.PositionCursor ();
 			Driver.Refresh ();
