@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using Mono.Terminal;
 
 namespace Terminal.Gui {
 
@@ -8,9 +10,6 @@ namespace Terminal.Gui {
 		public const int STD_INPUT_HANDLE = -10;
 		public const int STD_ERROR_HANDLE = -12;
 
-		[DllImport ("kernel32.dll", SetLastError = true)]
-		static extern IntPtr GetStdHandle (int nStdHandle);
-
 		IntPtr inputHandle, outputHandle;
 
 		public WindowsConsole ()
@@ -18,6 +17,15 @@ namespace Terminal.Gui {
 			inputHandle = GetStdHandle (STD_INPUT_HANDLE);
 			outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
 		}
+
+		[Flags]
+		public enum ConsoleModes : uint
+		{
+			EnableMouseInput = 16,
+			EnableQuickEditMode = 64,
+			EnableExtendedFlags = 128,
+		}
+
 
 		[StructLayout (LayoutKind.Explicit, CharSet = CharSet.Unicode)]
 		public struct KeyEventRecord {
@@ -160,6 +168,57 @@ namespace Terminal.Gui {
 			}
 		};
 
+		public void PollEvents(Action<InputRecord> inputEventHandler)
+		{
+			if (OriginalConsoleMode != 0)
+				return;
+
+			OriginalConsoleMode = ConsoleMode;
+
+			ConsoleMode |= (uint)ConsoleModes.EnableMouseInput;
+			ConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
+			ConsoleMode |= (uint)ConsoleModes.EnableExtendedFlags;
+
+			Task.Run(() =>
+			{
+				uint numberEventsRead = 0;
+				uint length = 1;
+				InputRecord[] records = new InputRecord[length];
+
+				while (
+					ContinueListeningForConsoleEvents &&
+					ReadConsoleInput(inputHandle, records, length, out numberEventsRead) &&
+					numberEventsRead > 0
+				)
+				{
+					inputEventHandler(records[0]);
+				}
+			});
+		}
+
+		public void Cleanup()
+		{
+			ContinueListeningForConsoleEvents = false;
+			ConsoleMode = OriginalConsoleMode;
+			OriginalConsoleMode = 0;
+		}
+
+		private bool ContinueListeningForConsoleEvents = true;
+
+		private uint OriginalConsoleMode = 0;
+
+		public uint ConsoleMode {
+			get {
+				uint v;
+				GetConsoleMode (inputHandle, out v);
+				return v;
+			}
+
+			set {
+				SetConsoleMode (inputHandle, value);
+			}
+		}
+
 		[DllImport ("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode)]
 		public static extern bool ReadConsoleInput (
 			IntPtr hConsoleInput,
@@ -173,21 +232,93 @@ namespace Terminal.Gui {
 		[DllImport ("kernel32.dll")]
 		static extern bool SetConsoleMode (IntPtr hConsoleHandle, uint dwMode);
 
-		public uint ConsoleMode {
-			get {
-				uint v;
-				GetConsoleMode (inputHandle, out v);
-				return v;
-			}
+		[DllImport ("kernel32.dll", SetLastError = true)]
+		static extern IntPtr GetStdHandle (int nStdHandle);
 
-			set {
-				SetConsoleMode (inputHandle, value);
-			}
-		}
-	}	
-	public class WindowsDriver {
+	}
+
+	internal class WindowsDriver : NetDriver {
+
+		WindowsConsole WinConsole;
+
 		public WindowsDriver ()
 		{
+			WinConsole = new WindowsConsole();
 		}
+
+		private MouseEvent ToDriverMouse(WindowsConsole.MouseEventRecord mouseEvent)
+		{
+			MouseFlags mouseFlag = MouseFlags.AllEvents;
+
+			if (mouseEvent.EventFlags == 0)
+			{
+				switch (mouseEvent.ButtonState)
+				{
+				case WindowsConsole.ButtonState.Button1Pressed:
+					mouseFlag = MouseFlags.Button1Clicked;
+					break;
+
+				case WindowsConsole.ButtonState.Button2Pressed:
+					mouseFlag = MouseFlags.Button2Clicked;
+					break;
+
+				case WindowsConsole.ButtonState.Button3Pressed:
+					mouseFlag = MouseFlags.Button3Clicked;
+					break;
+				}
+			}
+			else if(mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved)
+			{
+				mouseFlag = MouseFlags.ReportMousePosition;
+			}
+
+
+			return new MouseEvent () {
+				X = mouseEvent.MousePosition.X,
+				Y = mouseEvent.MousePosition.Y,
+				Flags = mouseFlag
+			};
+		}
+
+		private ConsoleKeyInfo ToConsoleKeyInfo(WindowsConsole.KeyEventRecord keyEvent)
+		{
+			var state = keyEvent.dwControlKeyState;
+
+			bool shift = (state & WindowsConsole.ControlKeyState.ShiftPressed) != 0;
+			bool alt = (state & (WindowsConsole.ControlKeyState.LeftAltPressed | WindowsConsole.ControlKeyState.RightAltPressed)) != 0;
+			bool control = (state & (WindowsConsole.ControlKeyState.LeftControlPressed | WindowsConsole.ControlKeyState.RightControlPressed)) != 0;
+
+			return new ConsoleKeyInfo(keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
+		}
+
+		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler)
+		{
+			WinConsole.PollEvents (inputEvent =>
+			{
+				switch(inputEvent.EventType)
+				{
+					case WindowsConsole.EventType.Key:
+						if (inputEvent.KeyEvent.bKeyDown == false)
+							return;
+						var map = MapKey (ToConsoleKeyInfo (inputEvent.KeyEvent));
+						if (map == (Key) 0xffffffff)
+							return;
+						keyHandler (new KeyEvent (map));
+						break;
+
+					case WindowsConsole.EventType.Mouse:
+						mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
+						break;
+
+				}
+			});
+		}
+
+		public override void End()
+		{
+			WinConsole.Cleanup();
+			base.End();
+		}
+
 	}
 }

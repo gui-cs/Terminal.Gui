@@ -128,10 +128,13 @@ namespace Mono.Terminal {
 					read (wakeupPipes [0], ignore, (IntPtr)1);
 					return true;
 				});
-			} else {
-				Thread readThread = new Thread (WindowsKeyReader);
-				readThread.Start ();
 			}
+			// Using this results in buggy behavior when we are hooking into ReadConsoleInput api ourselves
+			// Because if left in both custom code and this one tries to read from the consoleInput
+			// else {
+			// 	Thread readThread = new Thread (WindowsKeyReader);
+			// 	readThread.Start ();
+			// }
 		}
 
 		void Wakeup ()
