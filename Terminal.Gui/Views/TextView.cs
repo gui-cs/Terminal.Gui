@@ -6,6 +6,7 @@
 //
 // 
 // TODO:
+// PageUp/PageDown
 // Attributed text on spans
 // Replace insertion with Insert method
 // String accumulation (Control-k, control-k is not preserving the last new line, see StringToRunes

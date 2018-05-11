@@ -3,7 +3,7 @@
 //
 // TODO:
 // - Support searching and highlighting of the search result
-// - Support PageUp/PageDown/Home/End
+// - Bug showing the last line
 // 
 using System;
 using System.Collections.Generic;
@@ -254,6 +254,32 @@ namespace Terminal.Gui {
 				RedisplayLine (position);
 		}
 
+		void MoveUp (int bytes)
+		{
+			RedisplayLine (position);
+			position -= bytes;
+			if (position < 0)
+				position = 0;
+			if (position < DisplayStart) {
+				SetDisplayStart (DisplayStart - bytes);
+				SetNeedsDisplay ();
+			} else
+				RedisplayLine (position);
+
+		}
+
+		void MoveDown (int bytes)
+		{
+			RedisplayLine (position);
+			if (position + bytes < source.Length)
+				position += bytes;
+			if (position >= (DisplayStart + bytesPerLine * Frame.Height)) {
+				SetDisplayStart (DisplayStart + bytes);
+				SetNeedsDisplay ();
+			} else
+				RedisplayLine (position);			
+		}
+
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			switch (keyEvent.Key) {
@@ -279,32 +305,28 @@ namespace Terminal.Gui {
 				CursorRight ();
 				break;
 			case Key.CursorDown:
-				RedisplayLine (position);
-				if (position + bytesPerLine < source.Length)
-					position += bytesPerLine;
-				if (position >= (DisplayStart + bytesPerLine * Frame.Height)) {
-					SetDisplayStart (DisplayStart + bytesPerLine);
-					SetNeedsDisplay ();
-				} else 
-					RedisplayLine (position);
+				MoveDown (bytesPerLine);
 				break;
 			case Key.CursorUp:
-				RedisplayLine (position);
-				position -= bytesPerLine;
-				if (position < 0)
-					position = 0;
-				if (position < DisplayStart) {
-					SetDisplayStart (DisplayStart - bytesPerLine);
-					SetNeedsDisplay ();
-				}  else 
-					RedisplayLine (position);
+				MoveUp (bytesPerLine);
 				break;
 			case Key.Tab:
 				leftSide = !leftSide;
 				RedisplayLine (position);
 				firstNibble = true;
 				break;
-
+			case ((int)'v' + Key.AltMask):
+			case Key.PageUp:
+				MoveUp (bytesPerLine * Frame.Height);
+				break;
+			case Key.ControlV:
+			case Key.PageDown:
+				MoveDown (bytesPerLine * Frame.Height);
+				break;
+			case Key.Home:
+				DisplayStart = 0;
+				SetNeedsDisplay ();
+				break;
 			default:
 				if (leftSide) {
 					int value = -1;
