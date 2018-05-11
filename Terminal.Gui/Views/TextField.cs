@@ -254,7 +254,7 @@ namespace Terminal.Gui {
 
 			default:
 				// Ignore other control characters.
-					if (kb.Key < Key.Space || kb.Key > Key.CharMask)
+				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
 					return false;
 
 				var kbstr = ustring.Make ((uint)kb.Key);
