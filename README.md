@@ -22,6 +22,7 @@ The toolkit contains various controls for building text user interfaces:
 * [Frames](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.FrameView.html)
 * [ProgressBars](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ProgressBar.html)
 * [Scroll views](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollView.html) and [Scrollbars](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollBarView.html)
+* Hexadecimal viewer/editor (HexView)
 
 All visible UI elements are subclasses of the
 [View](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.View.html),
