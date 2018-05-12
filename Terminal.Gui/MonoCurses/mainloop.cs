@@ -129,12 +129,6 @@ namespace Mono.Terminal {
 					return true;
 				});
 			}
-			// Using this results in buggy behavior when we are hooking into ReadConsoleInput api ourselves
-			// Because if left in both custom code and this one tries to read from the consoleInput
-			// else {
-			// 	Thread readThread = new Thread (WindowsKeyReader);
-			// 	readThread.Start ();
-			// }
 		}
 
 		void Wakeup ()

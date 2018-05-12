@@ -238,7 +238,7 @@ namespace Terminal.Gui {
 			currentAttribute = c.value;
 		}
 
-		public Key MapKey (ConsoleKeyInfo keyInfo)
+		Key MapKey (ConsoleKeyInfo keyInfo)
 		{
 			switch (keyInfo.Key) {
 			case ConsoleKey.Escape:
