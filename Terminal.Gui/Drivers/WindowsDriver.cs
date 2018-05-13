@@ -37,9 +37,9 @@ namespace Terminal.Gui {
 		public const int STD_INPUT_HANDLE = -10;
 		public const int STD_ERROR_HANDLE = -12;
 
-		public IntPtr InputHandle, OutputHandle;
+		IntPtr InputHandle, OutputHandle;
 
-		public IntPtr ScreenBuffer;
+		IntPtr ScreenBuffer;
 
 		public WindowsConsole ()
 		{
@@ -442,13 +442,43 @@ namespace Terminal.Gui {
 			UpdateOffScreen ();
 		}
 
+		private WindowsConsole.ButtonState? LastMouseButtonPressed = null;
+
 		private MouseEvent ToDriverMouse(WindowsConsole.MouseEventRecord mouseEvent)
 		{
 			MouseFlags mouseFlag = MouseFlags.AllEvents;
 
-			if (mouseEvent.EventFlags == 0)
+			// The ButtonState member of the MouseEvent structure has bit corresponding to each mouse button.
+			// This will tell when a mouse button is pressed. When the button is released this event will
+			// be fired with it's bit set to 0. So when the button is up ButtonState will be 0.
+			// To map to the correct driver events we save the last pressed mouse button so we can
+			// map to the correct clicked event.
+			if (LastMouseButtonPressed != null && mouseEvent.ButtonState != 0)
+			{
+				LastMouseButtonPressed = null;
+			}
+
+			if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null)
 			{
 				switch (mouseEvent.ButtonState)
+				{
+				case WindowsConsole.ButtonState.Button1Pressed:
+					mouseFlag = MouseFlags.Button1Pressed;
+					break;
+
+				case WindowsConsole.ButtonState.Button2Pressed:
+					mouseFlag = MouseFlags.Button2Pressed;
+					break;
+
+				case WindowsConsole.ButtonState.Button3Pressed:
+					mouseFlag = MouseFlags.Button3Pressed;
+					break;
+				}
+				LastMouseButtonPressed = mouseEvent.ButtonState;
+			}
+			else if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed != null)
+			{
+				switch (LastMouseButtonPressed)
 				{
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Clicked;
@@ -462,12 +492,12 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button3Clicked;
 					break;
 				}
+				LastMouseButtonPressed = null;
 			}
 			else if(mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved)
 			{
 				mouseFlag = MouseFlags.ReportMousePosition;
 			}
-
 
 			return new MouseEvent () {
 				X = mouseEvent.MousePosition.X,
@@ -517,7 +547,7 @@ namespace Terminal.Gui {
 			case ConsoleKey.Backspace:
 				return Key.Backspace;
 			case ConsoleKey.Delete:
-				return Key.Delete;
+				return Key.DeleteChar;
 
 			case ConsoleKey.Oem1:
 			case ConsoleKey.Oem2:

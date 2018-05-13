@@ -129,8 +129,8 @@ namespace Mono.Terminal {
 					return true;
 				});
 			} else if (useNet) {
-				Thread readThread = new Thread (WindowsKeyReader); 
-				readThread.Start (); 
+				Thread readThread = new Thread (WindowsKeyReader);
+				readThread.Start ();
 			}
 		}
 
