@@ -23,11 +23,11 @@ namespace Terminal.Gui {
 
 		public CharInfo[] OriginalStdOutChars;
 
-		public bool WriteToConsole(CharInfo[] charInfoBuffer, Coord coords, SmallRect window)
+		public bool WriteToConsole (CharInfo[] charInfoBuffer, Coord coords, SmallRect window)
 		{
 			if (ScreenBuffer == IntPtr.Zero)
 			{
-				ScreenBuffer = CreateConsoleScreenBuffer(
+				ScreenBuffer = CreateConsoleScreenBuffer (
 					DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
 					ShareMode.FileShareRead | ShareMode.FileShareWrite,
 					IntPtr.Zero,
@@ -35,23 +35,22 @@ namespace Terminal.Gui {
 					IntPtr.Zero
 				);
 
-				var err = Marshal.GetLastWin32Error();
+				var err = Marshal.GetLastWin32Error ();
 
 				if (err != 0)
 				{
-					Console.WriteLine("Error: {0}", err);
 					throw new System.ComponentModel.Win32Exception(err);
 				}
 
-				if (!SetConsoleActiveScreenBuffer(ScreenBuffer))
+				if (!SetConsoleActiveScreenBuffer (ScreenBuffer))
 				{
 					err = Marshal.GetLastWin32Error();
-					Console.WriteLine("Error: {0}", err);
+					throw new System.ComponentModel.Win32Exception(err);
 				}
 
 				OriginalStdOutChars = new CharInfo[Console.WindowHeight * Console.WindowWidth];
 
-				ReadConsoleOutput(
+				ReadConsoleOutput (
 					OutputHandle,
 					OriginalStdOutChars,
 					coords,
@@ -60,13 +59,75 @@ namespace Terminal.Gui {
 				);
 			}
 
-			return WriteConsoleOutput(
+			return WriteConsoleOutput (
 				ScreenBuffer,
 				charInfoBuffer,
 				coords,
 				new Coord() { X = 0, Y = 0 },
 				ref window
 			);
+		}
+
+		public bool SetCursorPosition(Coord position)
+		{
+			return SetConsoleCursorPosition (ScreenBuffer, position);
+		}
+
+		public void PollEvents (Action<InputRecord> inputEventHandler)
+		{
+			if (OriginalConsoleMode != 0)
+				return;
+
+			OriginalConsoleMode = ConsoleMode;
+
+			ConsoleMode |= (uint)ConsoleModes.EnableMouseInput;
+			ConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
+			ConsoleMode |= (uint)ConsoleModes.EnableExtendedFlags;
+
+			Task.Run (() =>
+			{
+				uint numberEventsRead = 0;
+				uint length = 1;
+				InputRecord[] records = new InputRecord[length];
+
+				while (
+					ContinueListeningForConsoleEvents &&
+					ReadConsoleInput(InputHandle, records, length, out numberEventsRead) &&
+					numberEventsRead > 0
+				)
+				{
+					inputEventHandler (records[0]);
+				}
+			});
+		}
+
+		public void Cleanup ()
+		{
+			ContinueListeningForConsoleEvents = false;
+			ConsoleMode = OriginalConsoleMode;
+			OriginalConsoleMode = 0;
+
+			if (!SetConsoleActiveScreenBuffer (OutputHandle))
+			{
+				var err = Marshal.GetLastWin32Error ();
+				Console.WriteLine("Error: {0}", err);
+			}
+		}
+
+		private bool ContinueListeningForConsoleEvents = true;
+
+		private uint OriginalConsoleMode = 0;
+
+		public uint ConsoleMode {
+			get {
+				uint v;
+				GetConsoleMode (InputHandle, out v);
+				return v;
+			}
+
+			set {
+				SetConsoleMode (InputHandle, value);
+			}
 		}
 
 		[Flags]
@@ -218,63 +279,6 @@ namespace Terminal.Gui {
 			}
 		};
 
-		public void PollEvents(Action<InputRecord> inputEventHandler)
-		{
-			if (OriginalConsoleMode != 0)
-				return;
-
-			OriginalConsoleMode = ConsoleMode;
-
-			ConsoleMode |= (uint)ConsoleModes.EnableMouseInput;
-			ConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
-			ConsoleMode |= (uint)ConsoleModes.EnableExtendedFlags;
-
-			Task.Run(() =>
-			{
-				uint numberEventsRead = 0;
-				uint length = 1;
-				InputRecord[] records = new InputRecord[length];
-
-				while (
-					ContinueListeningForConsoleEvents &&
-					ReadConsoleInput(InputHandle, records, length, out numberEventsRead) &&
-					numberEventsRead > 0
-				)
-				{
-					inputEventHandler(records[0]);
-				}
-			});
-		}
-
-		public void Cleanup()
-		{
-			ContinueListeningForConsoleEvents = false;
-			ConsoleMode = OriginalConsoleMode;
-			OriginalConsoleMode = 0;
-
-			if (!SetConsoleActiveScreenBuffer(OutputHandle))
-			{
-				var err = Marshal.GetLastWin32Error();
-				Console.WriteLine("Error: {0}", err);
-			}
-		}
-
-		private bool ContinueListeningForConsoleEvents = true;
-
-		private uint OriginalConsoleMode = 0;
-
-		public uint ConsoleMode {
-			get {
-				uint v;
-				GetConsoleMode (InputHandle, out v);
-				return v;
-			}
-
-			set {
-				SetConsoleMode (InputHandle, value);
-			}
-		}
-
 		[Flags]
 		enum ShareMode : uint
 		{
@@ -364,7 +368,11 @@ namespace Terminal.Gui {
 		);
 
 		[DllImport ("kernel32.dll")]
+		static extern bool SetConsoleCursorPosition(IntPtr hConsoleOutput, Coord dwCursorPosition);
+
+		[DllImport ("kernel32.dll")]
 		static extern bool GetConsoleMode (IntPtr hConsoleHandle, out uint lpMode);
+
 
 		[DllImport ("kernel32.dll")]
 		static extern bool SetConsoleMode (IntPtr hConsoleHandle, uint dwMode);
@@ -685,6 +693,7 @@ namespace Terminal.Gui {
 				Bottom = (short)Clip.Bottom
 			};
 
+			UpdateCursor();
 			WinConsole.WriteToConsole (OutputBuffer, bufferCoords, window);
 		}
 
@@ -704,7 +713,18 @@ namespace Terminal.Gui {
 				Bottom = (short)Clip.Bottom
 			};
 
+			UpdateCursor();
 			WinConsole.WriteToConsole (OutputBuffer, bufferCoords, window);
+		}
+
+		public override void UpdateCursor()
+		{
+			var position = new WindowsConsole.Coord()
+			{
+				X = (short)ccol,
+				Y = (short)crow
+			};
+			WinConsole.SetCursorPosition(position);
 		}
 		public override void End ()
 		{
@@ -714,11 +734,6 @@ namespace Terminal.Gui {
 		#region Unused
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
-		}
-
-		public override void UpdateCursor()
-		{
-			
 		}
 
 		public override void SetColors (short foregroundColorId, short backgroundColorId)

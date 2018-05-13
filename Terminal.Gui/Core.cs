@@ -1599,7 +1599,7 @@ namespace Terminal.Gui {
 			else
 				Driver = new CursesDriver ();
 			Driver.Init (TerminalResized);
-			MainLoop = new Mono.Terminal.MainLoop (Driver is CursesDriver);
+			MainLoop = new Mono.Terminal.MainLoop (Driver is CursesDriver, UseSystemConsole);
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			Top = Toplevel.Create ();
 			Current = Top;

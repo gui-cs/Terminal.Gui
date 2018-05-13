@@ -119,7 +119,7 @@ namespace Mono.Terminal {
 		{
 		}
 
-		public MainLoop (bool useUnix)
+		public MainLoop (bool useUnix, bool useNet=false)
 		{
 			this.useUnix = useUnix;
 			if (useUnix) {
@@ -128,6 +128,9 @@ namespace Mono.Terminal {
 					read (wakeupPipes [0], ignore, (IntPtr)1);
 					return true;
 				});
+			} else if (useNet) {
+				Thread readThread = new Thread (WindowsKeyReader); 
+				readThread.Start (); 
 			}
 		}
 
