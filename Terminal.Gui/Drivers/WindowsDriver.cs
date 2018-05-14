@@ -2,6 +2,7 @@
 // WindowsDriver.cs: Windows specific driver 
 //
 // Authors:
+//   Miguel de Icaza (miguel@gnome.org)
 //   Nick Van Dyck (vandyck.nick@outlook.com)
 //
 // Copyright (c) 2018
@@ -60,38 +61,24 @@ namespace Terminal.Gui {
 					1,
 					IntPtr.Zero
 				);
+				if (ScreenBuffer == INVALID_HANDLE_VALUE){
+					var err = Marshal.GetLastWin32Error ();
 
-				var err = Marshal.GetLastWin32Error ();
-
-				if (err != 0)
-				{
+					if (err != 0)
 					throw new System.ComponentModel.Win32Exception(err);
 				}
 
-				if (!SetConsoleActiveScreenBuffer (ScreenBuffer))
-				{
-					err = Marshal.GetLastWin32Error();
+				if (!SetConsoleActiveScreenBuffer (ScreenBuffer)){
+					var err = Marshal.GetLastWin32Error();
 					throw new System.ComponentModel.Win32Exception(err);
 				}
 
 				OriginalStdOutChars = new CharInfo[Console.WindowHeight * Console.WindowWidth];
 
-				ReadConsoleOutput (
-					OutputHandle,
-					OriginalStdOutChars,
-					coords,
-					new Coord() { X = 0, Y = 0 },
-					ref window
-				);
+				ReadConsoleOutput (OutputHandle, OriginalStdOutChars, coords, new Coord () { X = 0, Y = 0 }, ref window);
 			}
 
-			return WriteConsoleOutput (
-				ScreenBuffer,
-				charInfoBuffer,
-				coords,
-				new Coord() { X = 0, Y = 0 },
-				ref window
-			);
+			return WriteConsoleOutput (ScreenBuffer, charInfoBuffer, coords, new Coord () { X = 0, Y = 0 }, ref window);
 		}
 
 		public bool SetCursorPosition(Coord position)
@@ -116,12 +103,9 @@ namespace Terminal.Gui {
 				uint length = 1;
 				InputRecord[] records = new InputRecord[length];
 
-				while (
-					ContinueListeningForConsoleEvents &&
+				while (ContinueListeningForConsoleEvents &&
 					ReadConsoleInput(InputHandle, records, length, out numberEventsRead) &&
-					numberEventsRead > 0
-				)
-				{
+				       numberEventsRead > 0){
 					inputEventHandler (records[0]);
 				}
 			});
@@ -133,8 +117,7 @@ namespace Terminal.Gui {
 			ConsoleMode = OriginalConsoleMode;
 			OriginalConsoleMode = 0;
 
-			if (!SetConsoleActiveScreenBuffer (OutputHandle))
-			{
+			if (!SetConsoleActiveScreenBuffer (OutputHandle)){
 				var err = Marshal.GetLastWin32Error ();
 				Console.WriteLine("Error: {0}", err);
 			}
@@ -412,6 +395,9 @@ namespace Terminal.Gui {
 			IntPtr screenBufferData
 		);
 
+		internal static IntPtr INVALID_HANDLE_VALUE = new IntPtr (-1);
+
+
 		[DllImport("kernel32.dll", SetLastError = true)]
 		static extern bool SetConsoleActiveScreenBuffer(IntPtr Handle);
 
@@ -458,10 +444,8 @@ namespace Terminal.Gui {
 				LastMouseButtonPressed = null;
 			}
 
-			if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null)
-			{
-				switch (mouseEvent.ButtonState)
-				{
+			if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null){
+				switch (mouseEvent.ButtonState){
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Pressed;
 					break;
@@ -475,11 +459,8 @@ namespace Terminal.Gui {
 					break;
 				}
 				LastMouseButtonPressed = mouseEvent.ButtonState;
-			}
-			else if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed != null)
-			{
-				switch (LastMouseButtonPressed)
-				{
+			} else if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed != null){
+				switch (LastMouseButtonPressed){
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Clicked;
 					break;
@@ -493,9 +474,7 @@ namespace Terminal.Gui {
 					break;
 				}
 				LastMouseButtonPressed = null;
-			}
-			else if(mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved)
-			{
+			} else if(mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved){
 				mouseFlag = MouseFlags.ReportMousePosition;
 			}
 
@@ -597,29 +576,27 @@ namespace Terminal.Gui {
 		{
 			WinConsole.PollEvents (inputEvent =>
 			{
-				switch(inputEvent.EventType)
-				{
-					case WindowsConsole.EventType.Key:
-						if (inputEvent.KeyEvent.bKeyDown == false)
-							return;
-						var map = MapKey (ToConsoleKeyInfo (inputEvent.KeyEvent));
-						if (map == (Key) 0xffffffff)
-							return;
-						keyHandler (new KeyEvent (map));
-						break;
+				switch(inputEvent.EventType){
+				case WindowsConsole.EventType.Key:
+					if (inputEvent.KeyEvent.bKeyDown == false)
+						return;
+					var map = MapKey (ToConsoleKeyInfo (inputEvent.KeyEvent));
+					if (map == (Key) 0xffffffff)
+						return;
+					keyHandler (new KeyEvent (map));
+					break;
 
-					case WindowsConsole.EventType.Mouse:
-						mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
-						break;
+				case WindowsConsole.EventType.Mouse:
+					mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
+					break;
 
-					case WindowsConsole.EventType.WindowBufferSize:
-						cols = inputEvent.WindowBufferSizeEvent.size.X;
-						rows = inputEvent.WindowBufferSizeEvent.size.Y - 1;
-						ResizeScreen ();
-						UpdateOffScreen ();
-						TerminalResized ();
-						break;
-
+				case WindowsConsole.EventType.WindowBufferSize:
+					cols = inputEvent.WindowBufferSizeEvent.size.X;
+					rows = inputEvent.WindowBufferSizeEvent.size.Y - 1;
+					ResizeScreen ();
+					UpdateOffScreen ();
+					TerminalResized ();
+					break;
 				}
 			});
 		}
@@ -677,12 +654,11 @@ namespace Terminal.Gui {
 		void UpdateOffScreen ()
 		{
 			for (int row = 0; row < rows; row++)
-			for (int col = 0; col < cols; col++)
-			{
-				int position = row * cols + col;
-				OutputBuffer[position].Attributes = (ushort)MakeColor(ConsoleColor.White, ConsoleColor.Blue);
-				OutputBuffer[position].Char.UnicodeChar = ' ';
-			}
+				for (int col = 0; col < cols; col++){
+					int position = row * cols + col;
+					OutputBuffer[position].Attributes = (ushort)MakeColor(ConsoleColor.White, ConsoleColor.Blue);
+					OutputBuffer[position].Char.UnicodeChar = ' ';
+				}
 		}
 
 		int ccol, crow;
@@ -696,8 +672,7 @@ namespace Terminal.Gui {
 		{
 			var position = crow * Cols + ccol;
 
-			if (Clip.Contains (ccol, crow))
-			{
+			if (Clip.Contains (ccol, crow)){
 				OutputBuffer[position].Attributes = (ushort)currentAttribute;
 				OutputBuffer[position].Char.UnicodeChar = (char)rune;
 			}
@@ -727,22 +702,19 @@ namespace Terminal.Gui {
 		private Attribute MakeColor (ConsoleColor f, ConsoleColor b)
 		{
 			// Encode the colors into the int value.
-			return new Attribute ()
-			{
+			return new Attribute (){
 				value = ((int)f | (int)b << 4)
 			};
 		}
 
 		public override void Refresh()
 		{
-			var bufferCoords = new WindowsConsole.Coord ()
-			{
+			var bufferCoords = new WindowsConsole.Coord (){
 				X = (short)Clip.Width,
 				Y = (short)Clip.Height
 			};
 
-			var window = new WindowsConsole.SmallRect ()
-			{
+			var window = new WindowsConsole.SmallRect (){
 				Top = 0,
 				Left = 0,
 				Right = (short)Clip.Right,
@@ -755,14 +727,12 @@ namespace Terminal.Gui {
 
 		public override void UpdateScreen ()
 		{
-			var bufferCoords = new WindowsConsole.Coord ()
-			{
+			var bufferCoords = new WindowsConsole.Coord (){
 				X = (short)Clip.Width,
 				Y = (short)Clip.Height
 			};
 
-			var window = new WindowsConsole.SmallRect ()
-			{
+			var window = new WindowsConsole.SmallRect (){
 				Top = 0,
 				Left = 0,
 				Right = (short)Clip.Right,
@@ -775,8 +745,7 @@ namespace Terminal.Gui {
 
 		public override void UpdateCursor()
 		{
-			var position = new WindowsConsole.Coord()
-			{
+			var position = new WindowsConsole.Coord(){
 				X = (short)ccol,
 				Y = (short)crow
 			};
