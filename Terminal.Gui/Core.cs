@@ -1590,18 +1590,16 @@ namespace Terminal.Gui {
 			if (Top != null)
 				return;
 
-			if (!UseSystemConsole) {
-				var p = Environment.OSVersion.Platform;
-				if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
-					UseSystemConsole = true;
-			}
-			//UseSystemConsole = true;
+			var p = Environment.OSVersion.Platform;
+
 			if (UseSystemConsole)
 				Driver = new NetDriver ();
+			else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+				Driver = new WindowsDriver();
 			else
 				Driver = new CursesDriver ();
 			Driver.Init (TerminalResized);
-			MainLoop = new Mono.Terminal.MainLoop (Driver is CursesDriver);
+			MainLoop = new Mono.Terminal.MainLoop (Driver is CursesDriver, UseSystemConsole);
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			Top = Toplevel.Create ();
 			Current = Top;
