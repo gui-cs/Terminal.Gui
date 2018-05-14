@@ -157,11 +157,10 @@ static class Demo {
 
 	// 
 	// Creates a nested editor
-	static void Editor (Toplevel top)
-	{
+	static void Editor(Toplevel top) {
 		var tframe = top.Frame;
-		var ntop = new Toplevel (tframe);
-		var menu = new MenuBar (new MenuBarItem [] {
+		var ntop = new Toplevel(tframe);
+		var menu = new MenuBar(new MenuBarItem[] {
 			new MenuBarItem ("_File", new MenuItem [] {
 				new MenuItem ("_Close", "", () => {Application.RequestStop ();}),
 			}),
@@ -171,18 +170,27 @@ static class Demo {
 				new MenuItem ("_Paste", "", null)
 			}),
 		});
-		ntop.Add (menu);
+		ntop.Add(menu);
 
-		var win = new Window ("/etc/passwd") {
+		string fname = null;
+		foreach (var s in new[] { "/etc/passwd", "c:\\windows\\win.ini" })
+			if (System.IO.File.Exists(s)) {
+				fname = s;
+				break;
+			}
+
+		var win = new Window(fname ?? "Untitled") {
 			X = 0,
-			Y = 0,
-			Width = Dim.Fill (),
-			Height = Dim.Fill ()
+			Y = 1,
+			Width = Dim.Fill(),
+			Height = Dim.Fill()
 		};
-		ntop.Add (win);
+		ntop.Add(win);
 
-		var text = new TextView (new Rect (0, 0, tframe.Width - 2, tframe.Height - 3));
-		text.Text = System.IO.File.ReadAllText ("/etc/passwd");
+		var text = new TextView(new Rect(0, 0, tframe.Width - 2, tframe.Height - 3));
+		
+		if (fname != null)
+			text.Text = System.IO.File.ReadAllText (fname);
 		win.Add (text);
 
 		Application.Run (ntop);
