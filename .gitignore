@@ -4,3 +4,4 @@ obj
 *.userprefs
 *~
 packages
+.vs
