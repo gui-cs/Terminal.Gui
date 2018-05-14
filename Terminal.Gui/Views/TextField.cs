@@ -199,6 +199,7 @@ namespace Terminal.Gui {
 				Adjust ();
 				break;
 
+			case Key.End:
 			case Key.ControlE: // End
 				point = text.Length;
 				Adjust ();

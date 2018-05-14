@@ -6,7 +6,7 @@
 //
 // 
 // TODO:
-// PageUp/PageDown
+// PageUp/PageDown	
 // Attributed text on spans
 // Replace insertion with Insert method
 // String accumulation (Control-k, control-k is not preserving the last new line, see StringToRunes
@@ -815,6 +815,7 @@ namespace Terminal.Gui {
 				}
 				break;
 
+			case Key.End:
 			case Key.ControlE: // End
 				currentLine = GetCurrentLine ();
 				currentColumn = currentLine.Count;
