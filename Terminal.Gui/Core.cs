@@ -1594,8 +1594,13 @@ namespace Terminal.Gui {
 
 			if (UseSystemConsole)
 				Driver = new NetDriver ();
-			else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
-				Driver = new WindowsDriver();
+			//
+			// The driver currently has a race and does not integrate into mainloop, so input
+			// only works at random.   I need to change the code to do proper polling on mainloop
+			// and then delegate the reading of events to WindowsConsole
+			//
+			//else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+			//	Driver = new WindowsDriver();
 			else
 				Driver = new CursesDriver ();
 			Driver.Init (TerminalResized);
