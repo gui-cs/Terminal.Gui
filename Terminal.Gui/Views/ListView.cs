@@ -299,11 +299,14 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (newcolor);
 					current = newcolor;
 				}
-				if (item >= source.Count)
+
+				if (item >= source.Count) {
+					Move(0, row);
 					for (int c = 0; c < f.Width; c++)
-						Driver.AddRune (' ');
-				else
-					Source.Render (isSelected, item, 0, row, f.Width);
+						Driver.AddRune(' ');
+				} else {
+					Source.Render(isSelected, item, 0, row, f.Width);
+				}
 			}
 		}
 
