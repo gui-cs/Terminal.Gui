@@ -32,6 +32,232 @@ using System.Threading;
 
 namespace Mono.Terminal {
 
+	public interface IMainLoopDriver {
+		void Setup (MainLoop mainLoop);
+		void Wakeup ();
+		bool EventsPending (bool wait);
+		void MainIteration ();
+	}
+
+	internal class UnixMainLoop : IMainLoopDriver {
+		[StructLayout (LayoutKind.Sequential)]
+		struct Pollfd {
+			public int fd;
+			public short events, revents;
+		}
+
+		class Watch {
+			public int File;
+			public Condition Condition;
+			public Func<MainLoop, bool> Callback;
+		}
+
+		Dictionary<int, Watch> descriptorWatchers = new Dictionary<int, Watch> ();
+
+		[DllImport ("libc")]
+		extern static int poll ([In, Out]Pollfd [] ufds, uint nfds, int timeout);
+
+		[DllImport ("libc")]
+		extern static int pipe ([In, Out]int [] pipes);
+
+		[DllImport ("libc")]
+		extern static int read (int fd, IntPtr buf, IntPtr n);
+
+		[DllImport ("libc")]
+		extern static int write (int fd, IntPtr buf, IntPtr n);
+
+		Pollfd [] pollmap;
+		bool poll_dirty = true;
+		int [] wakeupPipes = new int [2];
+		static IntPtr ignore = Marshal.AllocHGlobal (1);
+
+		void IMainLoopDriver.Wakeup ()
+		{
+			write (wakeupPipes [1], ignore, (IntPtr) 1);
+		}
+
+		void IMainLoopDriver.Setup (MainLoop mainLoop) {
+			pipe (wakeupPipes);
+			mainLoop.AddWatch (wakeupPipes [0], MainLoop.Condition.PollIn, ml => {
+				read (wakeupPipes [0], ignore, (IntPtr)1);
+				return true;
+			});			
+		}
+
+		/// <summary>
+		///   Removes an active watch from the mainloop.
+		/// </summary>
+		/// <remarks>
+		///   The token parameter is the value returned from AddWatch
+		/// </remarks>
+		public void RemoveWatch (object token)
+		{
+			var watch = token as Watch;
+			if (watch == null)
+				return;
+			descriptorWatchers.Remove (watch.File);
+		}
+
+		/// <summary>
+		///  Watches a file descriptor for activity.
+		/// </summary>
+		/// <remarks>
+		///  When the condition is met, the provided callback
+		///  is invoked.  If the callback returns false, the
+		///  watch is automatically removed.
+		///
+		///  The return value is a token that represents this watch, you can
+		///  use this token to remove the watch by calling RemoveWatch.
+		/// </remarks>
+		public object AddWatch (int fileDescriptor, MainLoop.Condition condition, Func<MainLoop, bool> callback)
+		{
+			if (callback == null)
+				throw new ArgumentNullException (nameof(callback));
+
+			var watch = new Watch () { Condition = condition, Callback = callback, File = fileDescriptor };
+			descriptorWatchers [fileDescriptor] = watch;
+			poll_dirty = true;
+			return watch;
+		}
+
+		void UpdatePollMap ()
+		{
+			if (!poll_dirty)
+				return;
+			poll_dirty = false;
+
+			pollmap = new Pollfd [descriptorWatchers.Count];
+			int i = 0;
+			foreach (var fd in descriptorWatchers.Keys) {
+				pollmap [i].fd = fd;
+				pollmap [i].events = (short)descriptorWatchers [fd].Condition;
+				i++;
+			}
+		}
+
+		bool IMainLoopDriver.EventsPending (bool wait) 
+		{
+			long now = DateTime.UtcNow.Ticks;
+
+			int pollTimeout, n;
+			if (timeouts.Count > 0) {
+				pollTimeout = (int)((timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+				if (pollTimeout < 0)
+					return true;
+
+			} else
+				pollTimeout = -1;
+
+			if (!wait)
+				pollTimeout = 0;
+
+			UpdatePollMap ();
+
+			n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
+			int ic;
+			lock (idleHandlers)
+				ic = idleHandlers.Count;
+			return n > 0 || timeouts.Count > 0 && ((timeouts.Keys [0] - DateTime.UtcNow.Ticks) < 0) || ic > 0;			
+		}
+
+		void IMainLoopDriver.MainIteration () 
+		{
+			if (pollmap != null) {
+				foreach (var p in pollmap) {
+					Watch watch;
+
+					if (p.revents == 0)
+						continue;
+
+					if (!descriptorWatchers.TryGetValue (p.fd, out watch))
+						continue;
+					if (!watch.Callback (this))
+						descriptorWatchers.Remove (p.fd);
+				}
+			}			
+		}
+	}
+
+	internal class NetMainLoop : IMainLoopDriver {
+		AutoResetEvent keyReady = new AutoResetEvent (false);
+		AutoResetEvent waitForProbe = new AutoResetEvent (false);
+		ConsoleKeyInfo? windowsKeyResult = null;
+		Action<ConsoleKeyInfo> keyCallback;
+
+		public NetMainLoop (Action<ConsoleKeyInfo> keyCallback) 
+		{
+			this.keyCallback = keyCallback;	
+		}
+
+		void WindowsKeyReader ()
+		{
+			while (true) {
+				waitForProbe.WaitOne ();
+				windowsKeyResult = Console.ReadKey (true);
+				keyReady.Set ();
+			}
+		}		
+
+		void IMainLoopDriver.Setup (MainLoop mainLoop)
+		{
+			Thread readThread = new Thread (WindowsKeyReader);
+			readThread.Start ();			
+		}
+
+		void IMainLoopDriver.Wakeup () 
+		{
+		}
+
+		bool IMainLoopDriver.EventsPending (bool wait)
+		{
+			long now = DateTime.UtcNow.Ticks;
+
+			int waitTimeout;
+			if (timeouts.Count > 0) {
+				waitTimeout = (int)((timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+				if (waitTimeout < 0)
+					return true;
+			} else
+				waitTimeout = -1;
+
+			if (!wait)
+				waitTimeout = 0;
+
+			windowsKeyResult = null;
+			waitForProbe.Set ();
+			keyReady.WaitOne (waitTimeout);
+			return windowsKeyResult.HasValue;
+		}
+
+		void IMainLoopDriver.MainIteration ()
+		{
+			if (windowsKeyResult.HasValue) {
+				if (keyCallback != null)
+					keyCallback (windowsKeyResult.Value);
+				windowsKeyResult = null;
+			}			
+		}
+	}
+
+	internal class WinConsoleLoop : IMainLoopDriver {
+		void IMainLoopDriver.Setup (MainLoop mainLoop)
+		{
+		}
+
+		void IMainLoopDriver.Wakeup () 
+		{
+		}
+
+		bool IMainLoopDriver.EventsPending (bool wait)
+		{
+			return false;
+		}
+
+		void IMainLoopDriver.MainIteration ()
+		{
+		}
+	}
+
 	/// <summary>
 	///   Simple main loop implementation that can be used to monitor
 	///   file descriptor, run timers and idle handlers.
@@ -74,71 +300,27 @@ namespace Mono.Terminal {
 			PollNval = 32
 		}
 
-		class Watch {
-			public int File;
-			public Condition Condition;
-			public Func<MainLoop,bool> Callback;
-		}
 
 		class Timeout {
 			public TimeSpan Span;
 			public Func<MainLoop,bool> Callback;
 		}
 
-		Dictionary <int, Watch> descriptorWatchers = new Dictionary<int,Watch>();
 		SortedList <long, Timeout> timeouts = new SortedList<long,Timeout> ();
 		List<Func<bool>> idleHandlers = new List<Func<bool>> ();
 
-		[StructLayout(LayoutKind.Sequential)]
-		struct Pollfd {
-			public int fd;
-			public short events, revents;
-		}
-
-		[DllImport ("libc")]
-		extern static int poll ([In,Out]Pollfd[] ufds, uint nfds, int timeout);
-
-		[DllImport ("libc")]
-		extern static int pipe ([In,Out]int [] pipes);
-
-		[DllImport ("libc")]
-		extern static int read (int fd, IntPtr buf, IntPtr n);
-
-		[DllImport ("libc")]
-		extern static int write (int fd, IntPtr buf, IntPtr n);
-
-		Pollfd [] pollmap;
-		bool poll_dirty = true;
-		int [] wakeupPipes = new int [2];
-		static IntPtr ignore = Marshal.AllocHGlobal (1);
+		IMainLoopDriver driver;
+		IMainLoopDriver Driver => driver;
 
 		/// <summary>
 		///  Default constructor
 		/// </summary>
-		public MainLoop () : this (useUnix: true)
+		public MainLoop (IMainLoopDriver driver)
 		{
+			this.driver = driver;
+			driver.Setup (this);
 		}
 
-		public MainLoop (bool useUnix, bool useNet=false)
-		{
-			this.useUnix = useUnix;
-			if (useUnix) {
-				pipe (wakeupPipes);
-				AddWatch (wakeupPipes [0], Condition.PollIn, ml => {
-					read (wakeupPipes [0], ignore, (IntPtr)1);
-					return true;
-				});
-			} else if (useNet) {
-				Thread readThread = new Thread (WindowsKeyReader);
-				readThread.Start ();
-			}
-		}
-
-		void Wakeup ()
-		{
-			write (wakeupPipes [1], ignore, (IntPtr) 1);
-		}
-		
 		/// <summary>
 		///   Runs @action on the thread that is processing events
 		/// </summary>
@@ -148,7 +330,7 @@ namespace Mono.Terminal {
 				action ();
 				return false;
 			});
-			Wakeup ();
+			driver.Wakeup ();
 		}
 
 		/// <summary>
@@ -169,50 +351,7 @@ namespace Mono.Terminal {
 			lock (idleHandler)
 				idleHandlers.Remove (idleHandler);
 		}
-		
-		/// <summary>
-		///  Watches a file descriptor for activity.
-		/// </summary>
-		/// <remarks>
-		///  When the condition is met, the provided callback
-		///  is invoked.  If the callback returns false, the
-		///  watch is automatically removed.
-		///
-		///  The return value is a token that represents this watch, you can
-		///  use this token to remove the watch by calling RemoveWatch.
-		/// </remarks>
-		public object AddWatch (int fileDescriptor, Condition condition, Func<MainLoop,bool> callback)
-		{
-			if (callback == null)
-				throw new ArgumentNullException ("callback");
-			if (!useUnix)
-				throw new Exception ("AddWatch is only supported for Unix");
-			
-			var watch = new Watch () { Condition = condition, Callback = callback, File = fileDescriptor };
-			descriptorWatchers [fileDescriptor] = watch;
-			poll_dirty = true;
-			return watch;
-		}
 
-		/// <summary>
-		/// This event is raised when a key is pressed when using the Windows driver.
-		/// </summary>
-		public Action<ConsoleKeyInfo> WindowsKeyPressed;
-
-		/// <summary>
-		///   Removes an active watch from the mainloop.
-		/// </summary>
-		/// <remarks>
-		///   The token parameter is the value returned from AddWatch
-		/// </remarks>
-		public void RemoveWatch (object token)
-		{
-			var watch = token as Watch;
-			if (watch == null)
-				return;
-			descriptorWatchers.Remove (watch.File);
-		}
-		
 		void AddTimeout (TimeSpan time, Timeout timeout)
 		{
 			timeouts.Add ((DateTime.UtcNow + time).Ticks, timeout);
@@ -232,7 +371,7 @@ namespace Mono.Terminal {
 		public object AddTimeout (TimeSpan time, Func<MainLoop,bool> callback)
 		{
 			if (callback == null)
-				throw new ArgumentNullException ("callback");
+				throw new ArgumentNullException (nameof (callback));
 			var timeout = new Timeout () {
 				Span = time,
 				Callback = callback
@@ -253,21 +392,6 @@ namespace Mono.Terminal {
 			if (idx == -1)
 				return;
 			timeouts.RemoveAt (idx);
-		}
-
-		void UpdatePollMap ()
-		{
-			if (!poll_dirty)
-				return;
-			poll_dirty = false;
-
-			pollmap = new Pollfd [descriptorWatchers.Count];
-			int i = 0;
-			foreach (var fd in descriptorWatchers.Keys){
-				pollmap [i].fd = fd;
-				pollmap [i].events = (short) descriptorWatchers [fd].Condition;
-				i++;
-			}
 		}
 
 		void RunTimers ()
@@ -308,19 +432,7 @@ namespace Mono.Terminal {
 		public void Stop ()
 		{
 			running = false;
-			Wakeup ();
-		}
-
-		AutoResetEvent keyReady = new AutoResetEvent (false);
-		AutoResetEvent waitForProbe = new AutoResetEvent (false);
-		ConsoleKeyInfo? windowsKeyResult = null;
-		void WindowsKeyReader ()
-		{
-			while (true) {
-				waitForProbe.WaitOne ();
-				windowsKeyResult = Console.ReadKey (true);
-				keyReady.Set ();
-			}
+			driver.Wakeup ();
 		}
 
 		/// <summary>
@@ -333,44 +445,7 @@ namespace Mono.Terminal {
 		/// </remarks>
 		public bool EventsPending (bool wait = false)
 		{
-			long now = DateTime.UtcNow.Ticks;
-			if (useUnix) {
-				int pollTimeout, n;
-				if (timeouts.Count > 0){
-					pollTimeout = (int)((timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-					if (pollTimeout < 0)
-						return true;
-
-				} else
-					pollTimeout = -1;
-
-				if (!wait)
-					pollTimeout = 0;
-
-				UpdatePollMap ();
-
-				n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
-				int ic;
-				lock (idleHandlers)
-					ic = idleHandlers.Count;
-				return n > 0 || timeouts.Count > 0 && ((timeouts.Keys [0] - DateTime.UtcNow.Ticks) < 0) || ic > 0;
-			} else {
-				int waitTimeout;
-				if (timeouts.Count > 0){
-					waitTimeout = (int)((timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-					if (waitTimeout < 0)
-						return true;
-				} else
-					waitTimeout = -1;
-
-				if (!wait)
-					waitTimeout = 0;
-				
-				windowsKeyResult = null;
-				waitForProbe.Set ();
-				keyReady.WaitOne (waitTimeout);
-				return windowsKeyResult.HasValue;
-			}
+			return driver.EventsPending (wait);
 		}
 
 		/// <summary>
@@ -387,27 +462,7 @@ namespace Mono.Terminal {
 			if (timeouts.Count > 0)
 				RunTimers ();
 
-			if (useUnix) {
-				if (pollmap != null) {
-					foreach (var p in pollmap) {
-						Watch watch;
-
-						if (p.revents == 0)
-							continue;
-
-						if (!descriptorWatchers.TryGetValue (p.fd, out watch))
-							continue;
-						if (!watch.Callback (this))
-							descriptorWatchers.Remove (p.fd);
-					}
-				}
-			} else {
-				if (windowsKeyResult.HasValue) {
-					if (WindowsKeyPressed != null)
-						WindowsKeyPressed (windowsKeyResult.Value);
-					windowsKeyResult = null;
-				}
-			}
+			driver.MainIteration ();
 
 			lock (idleHandlers){
 				if (idleHandlers.Count > 0)
