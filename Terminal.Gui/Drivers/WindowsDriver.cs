@@ -83,7 +83,7 @@ namespace Terminal.Gui {
 				ReadConsoleOutput (OutputHandle, OriginalStdOutChars, coords, new Coord () { X = 0, Y = 0 }, ref window);
 			}
 
-			return WriteConsoleOutput (ScreenBuffer, charInfoBuffer, coords, new Coord () { X = 0, Y = 0 }, ref window);
+			return WriteConsoleOutput (ScreenBuffer, charInfoBuffer, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
 		}
 
 		public bool SetCursorPosition (Coord position)
@@ -323,7 +323,7 @@ namespace Terminal.Gui {
 			public static void Update (ref SmallRect rect, short col, short row)
 			{
 				if (rect.Left == -1) {
-					System.Diagnostics.Debugger.Log (0, "debug", $"damager From Empty {col},{row}\n");
+					//System.Diagnostics.Debugger.Log (0, "debug", $"damager From Empty {col},{row}\n");
 					rect.Left = rect.Right = col;
 					rect.Bottom = rect.Top = row;
 					return;
@@ -338,7 +338,7 @@ namespace Terminal.Gui {
 					rect.Top = row;
 				if (row > rect.Bottom)
 					rect.Bottom = row;
-				System.Diagnostics.Debugger.Log (0, "debug", $"Expanding {rect.ToString ()}\n");
+				//System.Diagnostics.Debugger.Log (0, "debug", $"Expanding {rect.ToString ()}\n");
 			}
 
 			public override string ToString ()
@@ -826,6 +826,7 @@ namespace Terminal.Gui {
 
 			UpdateCursor();
 			winConsole.WriteToConsole (OutputBuffer, bufferCoords, damageRegion);
+			System.Diagnostics.Debugger.Log(0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 		}
 
