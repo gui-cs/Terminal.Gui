@@ -196,7 +196,7 @@ namespace Terminal.Gui {
 		{
 			Curses.timeout (-1);
 
-			mainLoop.AddWatch (0, Mono.Terminal.MainLoop.Condition.PollIn, x => {
+			(mainLoop.Driver as Mono.Terminal.UnixMainLoop).AddWatch (0, Mono.Terminal.UnixMainLoop.Condition.PollIn, x => {
 				ProcessInput (keyHandler, mouseHandler);
 				return true;
 			});
