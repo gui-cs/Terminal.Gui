@@ -32,242 +32,43 @@ using System.Threading;
 
 namespace Mono.Terminal {
 
+	/// <summary>
+	/// Public interface to create your own platform specific main loop driver.
+	/// </summary>
 	public interface IMainLoopDriver {
+		/// <summary>
+		/// Initializes the main loop driver, gets the calling main loop for the initialization.
+		/// </summary>
+		/// <param name="mainLoop">Main loop.</param>
 		void Setup (MainLoop mainLoop);
+
+		/// <summary>
+		/// Wakes up the mainloop that might be waiting on input, must be thread safe.
+		/// </summary>
 		void Wakeup ();
+
+		/// <summary>
+		/// Must report whether there are any events pending, or even block waiting for events.
+		/// </summary>
+		/// <returns><c>true</c>, if there were pending events, <c>false</c> otherwise.</returns>
+		/// <param name="wait">If set to <c>true</c> wait until an event is available, otherwise return immediately.</param>
 		bool EventsPending (bool wait);
 		void MainIteration ();
 	}
 
-	internal class UnixMainLoop : IMainLoopDriver {
+	/// <summary>
+	/// Unix main loop, suitable for using on Posix systems
+	/// </summary>
+	/// <remarks>
+	/// In addition to the general functions of the mainloop, the Unix version
+	/// can watch file descriptors using the AddWatch methods.
+	/// </remarks>
+	public class UnixMainLoop : IMainLoopDriver {
 		[StructLayout (LayoutKind.Sequential)]
 		struct Pollfd {
 			public int fd;
 			public short events, revents;
 		}
-
-		class Watch {
-			public int File;
-			public Condition Condition;
-			public Func<MainLoop, bool> Callback;
-		}
-
-		Dictionary<int, Watch> descriptorWatchers = new Dictionary<int, Watch> ();
-
-		[DllImport ("libc")]
-		extern static int poll ([In, Out]Pollfd [] ufds, uint nfds, int timeout);
-
-		[DllImport ("libc")]
-		extern static int pipe ([In, Out]int [] pipes);
-
-		[DllImport ("libc")]
-		extern static int read (int fd, IntPtr buf, IntPtr n);
-
-		[DllImport ("libc")]
-		extern static int write (int fd, IntPtr buf, IntPtr n);
-
-		Pollfd [] pollmap;
-		bool poll_dirty = true;
-		int [] wakeupPipes = new int [2];
-		static IntPtr ignore = Marshal.AllocHGlobal (1);
-
-		void IMainLoopDriver.Wakeup ()
-		{
-			write (wakeupPipes [1], ignore, (IntPtr) 1);
-		}
-
-		void IMainLoopDriver.Setup (MainLoop mainLoop) {
-			pipe (wakeupPipes);
-			mainLoop.AddWatch (wakeupPipes [0], MainLoop.Condition.PollIn, ml => {
-				read (wakeupPipes [0], ignore, (IntPtr)1);
-				return true;
-			});			
-		}
-
-		/// <summary>
-		///   Removes an active watch from the mainloop.
-		/// </summary>
-		/// <remarks>
-		///   The token parameter is the value returned from AddWatch
-		/// </remarks>
-		public void RemoveWatch (object token)
-		{
-			var watch = token as Watch;
-			if (watch == null)
-				return;
-			descriptorWatchers.Remove (watch.File);
-		}
-
-		/// <summary>
-		///  Watches a file descriptor for activity.
-		/// </summary>
-		/// <remarks>
-		///  When the condition is met, the provided callback
-		///  is invoked.  If the callback returns false, the
-		///  watch is automatically removed.
-		///
-		///  The return value is a token that represents this watch, you can
-		///  use this token to remove the watch by calling RemoveWatch.
-		/// </remarks>
-		public object AddWatch (int fileDescriptor, MainLoop.Condition condition, Func<MainLoop, bool> callback)
-		{
-			if (callback == null)
-				throw new ArgumentNullException (nameof(callback));
-
-			var watch = new Watch () { Condition = condition, Callback = callback, File = fileDescriptor };
-			descriptorWatchers [fileDescriptor] = watch;
-			poll_dirty = true;
-			return watch;
-		}
-
-		void UpdatePollMap ()
-		{
-			if (!poll_dirty)
-				return;
-			poll_dirty = false;
-
-			pollmap = new Pollfd [descriptorWatchers.Count];
-			int i = 0;
-			foreach (var fd in descriptorWatchers.Keys) {
-				pollmap [i].fd = fd;
-				pollmap [i].events = (short)descriptorWatchers [fd].Condition;
-				i++;
-			}
-		}
-
-		bool IMainLoopDriver.EventsPending (bool wait) 
-		{
-			long now = DateTime.UtcNow.Ticks;
-
-			int pollTimeout, n;
-			if (timeouts.Count > 0) {
-				pollTimeout = (int)((timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-				if (pollTimeout < 0)
-					return true;
-
-			} else
-				pollTimeout = -1;
-
-			if (!wait)
-				pollTimeout = 0;
-
-			UpdatePollMap ();
-
-			n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
-			int ic;
-			lock (idleHandlers)
-				ic = idleHandlers.Count;
-			return n > 0 || timeouts.Count > 0 && ((timeouts.Keys [0] - DateTime.UtcNow.Ticks) < 0) || ic > 0;			
-		}
-
-		void IMainLoopDriver.MainIteration () 
-		{
-			if (pollmap != null) {
-				foreach (var p in pollmap) {
-					Watch watch;
-
-					if (p.revents == 0)
-						continue;
-
-					if (!descriptorWatchers.TryGetValue (p.fd, out watch))
-						continue;
-					if (!watch.Callback (this))
-						descriptorWatchers.Remove (p.fd);
-				}
-			}			
-		}
-	}
-
-	internal class NetMainLoop : IMainLoopDriver {
-		AutoResetEvent keyReady = new AutoResetEvent (false);
-		AutoResetEvent waitForProbe = new AutoResetEvent (false);
-		ConsoleKeyInfo? windowsKeyResult = null;
-		Action<ConsoleKeyInfo> keyCallback;
-
-		public NetMainLoop (Action<ConsoleKeyInfo> keyCallback) 
-		{
-			this.keyCallback = keyCallback;	
-		}
-
-		void WindowsKeyReader ()
-		{
-			while (true) {
-				waitForProbe.WaitOne ();
-				windowsKeyResult = Console.ReadKey (true);
-				keyReady.Set ();
-			}
-		}		
-
-		void IMainLoopDriver.Setup (MainLoop mainLoop)
-		{
-			Thread readThread = new Thread (WindowsKeyReader);
-			readThread.Start ();			
-		}
-
-		void IMainLoopDriver.Wakeup () 
-		{
-		}
-
-		bool IMainLoopDriver.EventsPending (bool wait)
-		{
-			long now = DateTime.UtcNow.Ticks;
-
-			int waitTimeout;
-			if (timeouts.Count > 0) {
-				waitTimeout = (int)((timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-				if (waitTimeout < 0)
-					return true;
-			} else
-				waitTimeout = -1;
-
-			if (!wait)
-				waitTimeout = 0;
-
-			windowsKeyResult = null;
-			waitForProbe.Set ();
-			keyReady.WaitOne (waitTimeout);
-			return windowsKeyResult.HasValue;
-		}
-
-		void IMainLoopDriver.MainIteration ()
-		{
-			if (windowsKeyResult.HasValue) {
-				if (keyCallback != null)
-					keyCallback (windowsKeyResult.Value);
-				windowsKeyResult = null;
-			}			
-		}
-	}
-
-	internal class WinConsoleLoop : IMainLoopDriver {
-		void IMainLoopDriver.Setup (MainLoop mainLoop)
-		{
-		}
-
-		void IMainLoopDriver.Wakeup () 
-		{
-		}
-
-		bool IMainLoopDriver.EventsPending (bool wait)
-		{
-			return false;
-		}
-
-		void IMainLoopDriver.MainIteration ()
-		{
-		}
-	}
-
-	/// <summary>
-	///   Simple main loop implementation that can be used to monitor
-	///   file descriptor, run timers and idle handlers.
-	/// </summary>
-	/// <remarks>
-	///   Monitoring of file descriptors is only available on Unix, there
-	///   does not seem to be a way of supporting this on Windows.
-	/// </remarks>
-	public class MainLoop {
-		bool useUnix = true;
 
 		/// <summary>
 		///   Condition on which to wake up from file descriptor activity.  These match the Linux/BSD poll definitions.
@@ -300,20 +101,230 @@ namespace Mono.Terminal {
 			PollNval = 32
 		}
 
+		class Watch {
+			public int File;
+			public Condition Condition;
+			public Func<MainLoop, bool> Callback;
+		}
 
-		class Timeout {
+		Dictionary<int, Watch> descriptorWatchers = new Dictionary<int, Watch> ();
+
+		[DllImport ("libc")]
+		extern static int poll ([In, Out]Pollfd [] ufds, uint nfds, int timeout);
+
+		[DllImport ("libc")]
+		extern static int pipe ([In, Out]int [] pipes);
+
+		[DllImport ("libc")]
+		extern static int read (int fd, IntPtr buf, IntPtr n);
+
+		[DllImport ("libc")]
+		extern static int write (int fd, IntPtr buf, IntPtr n);
+
+		Pollfd [] pollmap;
+		bool poll_dirty = true;
+		int [] wakeupPipes = new int [2];
+		static IntPtr ignore = Marshal.AllocHGlobal (1);
+		MainLoop mainLoop;
+
+		void IMainLoopDriver.Wakeup ()
+		{
+			write (wakeupPipes [1], ignore, (IntPtr) 1);
+		}
+
+		void IMainLoopDriver.Setup (MainLoop mainLoop) {
+			this.mainLoop = mainLoop;
+			pipe (wakeupPipes);
+			AddWatch (wakeupPipes [0], Condition.PollIn, ml => {
+				read (wakeupPipes [0], ignore, (IntPtr)1);
+				return true;
+			});			
+		}
+
+		/// <summary>
+		///   Removes an active watch from the mainloop.
+		/// </summary>
+		/// <remarks>
+		///   The token parameter is the value returned from AddWatch
+		/// </remarks>
+		public void RemoveWatch (object token)
+		{
+			var watch = token as Watch;
+			if (watch == null)
+				return;
+			descriptorWatchers.Remove (watch.File);
+		}
+
+		/// <summary>
+		///  Watches a file descriptor for activity.
+		/// </summary>
+		/// <remarks>
+		///  When the condition is met, the provided callback
+		///  is invoked.  If the callback returns false, the
+		///  watch is automatically removed.
+		///
+		///  The return value is a token that represents this watch, you can
+		///  use this token to remove the watch by calling RemoveWatch.
+		/// </remarks>
+		public object AddWatch (int fileDescriptor, Condition condition, Func<MainLoop, bool> callback)
+		{
+			if (callback == null)
+				throw new ArgumentNullException (nameof(callback));
+
+			var watch = new Watch () { Condition = condition, Callback = callback, File = fileDescriptor };
+			descriptorWatchers [fileDescriptor] = watch;
+			poll_dirty = true;
+			return watch;
+		}
+
+		void UpdatePollMap ()
+		{
+			if (!poll_dirty)
+				return;
+			poll_dirty = false;
+
+			pollmap = new Pollfd [descriptorWatchers.Count];
+			int i = 0;
+			foreach (var fd in descriptorWatchers.Keys) {
+				pollmap [i].fd = fd;
+				pollmap [i].events = (short)descriptorWatchers [fd].Condition;
+				i++;
+			}
+		}
+
+		bool IMainLoopDriver.EventsPending (bool wait) 
+		{
+			long now = DateTime.UtcNow.Ticks;
+
+			int pollTimeout, n;
+			if (mainLoop.timeouts.Count > 0) {
+				pollTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+				if (pollTimeout < 0)
+					return true;
+
+			} else
+				pollTimeout = -1;
+
+			if (!wait)
+				pollTimeout = 0;
+
+			UpdatePollMap ();
+
+			n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
+			int ic;
+			lock (mainLoop.idleHandlers)
+				ic = mainLoop.idleHandlers.Count;
+			return n > 0 || mainLoop.timeouts.Count > 0 && ((mainLoop.timeouts.Keys [0] - DateTime.UtcNow.Ticks) < 0) || ic > 0;			
+		}
+
+		void IMainLoopDriver.MainIteration () 
+		{
+			if (pollmap != null) {
+				foreach (var p in pollmap) {
+					Watch watch;
+
+					if (p.revents == 0)
+						continue;
+
+					if (!descriptorWatchers.TryGetValue (p.fd, out watch))
+						continue;
+					if (!watch.Callback (this.mainLoop))
+						descriptorWatchers.Remove (p.fd);
+				}
+			}			
+		}
+	}
+
+	/// <summary>
+	/// Mainloop intended to be used with the .NET System.Console API, and can
+	/// be used on Windows and Unix, it is cross platform but lacks things like
+	/// file descriptor monitoring.
+	/// </summary>
+	class NetMainLoop : IMainLoopDriver {
+		AutoResetEvent keyReady = new AutoResetEvent (false);
+		AutoResetEvent waitForProbe = new AutoResetEvent (false);
+		ConsoleKeyInfo? windowsKeyResult = null;
+		public Action<ConsoleKeyInfo> WindowsKeyPressed;
+		MainLoop mainLoop;
+
+		public NetMainLoop () 
+		{
+		}
+
+		void WindowsKeyReader ()
+		{
+			while (true) {
+				waitForProbe.WaitOne ();
+				windowsKeyResult = Console.ReadKey (true);
+				keyReady.Set ();
+			}
+		}		
+
+		void IMainLoopDriver.Setup (MainLoop mainLoop)
+		{
+			this.mainLoop = mainLoop;
+			Thread readThread = new Thread (WindowsKeyReader);
+			readThread.Start ();			
+		}
+
+		void IMainLoopDriver.Wakeup () 
+		{
+		}
+
+		bool IMainLoopDriver.EventsPending (bool wait)
+		{
+			long now = DateTime.UtcNow.Ticks;
+
+			int waitTimeout;
+			if (mainLoop.timeouts.Count > 0) {
+				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+				if (waitTimeout < 0)
+					return true;
+			} else
+				waitTimeout = -1;
+
+			if (!wait)
+				waitTimeout = 0;
+
+			windowsKeyResult = null;
+			waitForProbe.Set ();
+			keyReady.WaitOne (waitTimeout);
+			return windowsKeyResult.HasValue;
+		}
+
+		void IMainLoopDriver.MainIteration ()
+		{
+			if (windowsKeyResult.HasValue) {
+				if (WindowsKeyPressed!= null)
+					WindowsKeyPressed (windowsKeyResult.Value);
+				windowsKeyResult = null;
+			}			
+		}
+	}
+
+	/// <summary>
+	///   Simple main loop implementation that can be used to monitor
+	///   file descriptor, run timers and idle handlers.
+	/// </summary>
+	/// <remarks>
+	///   Monitoring of file descriptors is only available on Unix, there
+	///   does not seem to be a way of supporting this on Windows.
+	/// </remarks>
+	public class 	MainLoop {
+		internal class Timeout {
 			public TimeSpan Span;
 			public Func<MainLoop,bool> Callback;
 		}
 
-		SortedList <long, Timeout> timeouts = new SortedList<long,Timeout> ();
-		List<Func<bool>> idleHandlers = new List<Func<bool>> ();
+		internal SortedList <long, Timeout> timeouts = new SortedList<long,Timeout> ();
+		internal List<Func<bool>> idleHandlers = new List<Func<bool>> ();
 
 		IMainLoopDriver driver;
-		IMainLoopDriver Driver => driver;
+		public IMainLoopDriver Driver => driver;
 
 		/// <summary>
-		///  Default constructor
+		///  Creates a new Mainloop, to run it you must provide a driver, and choose
+		///  one of the implementations UnixMainLoop, NetMainLoop or WindowsMainLoop.
 		/// </summary>
 		public MainLoop (IMainLoopDriver driver)
 		{

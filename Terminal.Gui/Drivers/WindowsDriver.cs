@@ -27,6 +27,7 @@
 //
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Mono.Terminal;
 using NStack;
@@ -38,14 +39,19 @@ namespace Terminal.Gui {
 		public const int STD_INPUT_HANDLE = -10;
 		public const int STD_ERROR_HANDLE = -12;
 
-		IntPtr InputHandle, OutputHandle;
-
+		internal IntPtr InputHandle, OutputHandle;
 		IntPtr ScreenBuffer;
+		uint originalConsoleMode;
 
 		public WindowsConsole ()
 		{
 			InputHandle = GetStdHandle (STD_INPUT_HANDLE);
 			OutputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
+			originalConsoleMode = ConsoleMode;
+			var newConsoleMode = originalConsoleMode;
+			newConsoleMode |= (uint)(ConsoleModes.EnableMouseInput | ConsoleModes.EnableExtendedFlags);
+			newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
+			ConsoleMode = newConsoleMode;
 		}
 
 		public CharInfo[] OriginalStdOutChars;
@@ -86,37 +92,9 @@ namespace Terminal.Gui {
 			return SetConsoleCursorPosition (ScreenBuffer, position);
 		}
 
-		public void PollEvents (Action<InputRecord> inputEventHandler)
-		{
-			if (OriginalConsoleMode != 0)
-				return;
-
-			OriginalConsoleMode = ConsoleMode;
-
-			ConsoleMode |= (uint)ConsoleModes.EnableMouseInput;
-			ConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
-			ConsoleMode |= (uint)ConsoleModes.EnableExtendedFlags;
-
-			Task.Run (() =>
-			{
-				uint numberEventsRead = 0;
-				uint length = 1;
-				InputRecord[] records = new InputRecord[length];
-
-				while (ContinueListeningForConsoleEvents &&
-					ReadConsoleInput(InputHandle, records, length, out numberEventsRead) &&
-				       numberEventsRead > 0){
-					inputEventHandler (records[0]);
-				}
-			});
-		}
-
 		public void Cleanup ()
 		{
 			ContinueListeningForConsoleEvents = false;
-			ConsoleMode = OriginalConsoleMode;
-			OriginalConsoleMode = 0;
-
 			if (!SetConsoleActiveScreenBuffer (OutputHandle)){
 				var err = Marshal.GetLastWin32Error ();
 				Console.WriteLine("Error: {0}", err);
@@ -124,8 +102,6 @@ namespace Terminal.Gui {
 		}
 
 		private bool ContinueListeningForConsoleEvents = true;
-
-		private uint OriginalConsoleMode = 0;
 
 		public uint ConsoleMode {
 			get {
@@ -401,31 +377,132 @@ namespace Terminal.Gui {
 		[DllImport("kernel32.dll", SetLastError = true)]
 		static extern bool SetConsoleActiveScreenBuffer(IntPtr Handle);
 
+		[DllImport ("kernel32.dll", SetLastError = true)]
+		static extern bool GetNumberOfConsoleInputEvents (IntPtr handle, out uint lpcNumberOfEvents);
+		public uint InputEventCount {
+			get {
+				uint v;
+				GetNumberOfConsoleInputEvents (InputHandle, out v);
+				return v;
+			}
+		}
 	}
 
-	internal class WindowsDriver : ConsoleDriver {
-
+	internal class WindowsDriver : ConsoleDriver, Mono.Terminal.IMainLoopDriver {
+		static bool sync;
+		AutoResetEvent eventReady = new AutoResetEvent (false);
+		AutoResetEvent waitForProbe = new AutoResetEvent (false);
+		MainLoop mainLoop;
 		Action TerminalResized;
-
-		WindowsConsole WinConsole;
-
 		WindowsConsole.CharInfo[] OutputBuffer;
-
 		int cols, rows;
+		WindowsConsole winConsole;
 
 		public override int Cols => cols;
-
 		public override int Rows => rows;
-
-		static bool sync;
 
 		public WindowsDriver ()
 		{
-			WinConsole = new WindowsConsole();
+			winConsole = new WindowsConsole();
+
 			cols = Console.WindowWidth;
 			rows = Console.WindowHeight - 1;
+
 			ResizeScreen ();
 			UpdateOffScreen ();
+
+			Task.Run ((Action)WindowsInputHandler);
+		}
+
+		// The records that we keep fetching
+		WindowsConsole.InputRecord [] result, records = new WindowsConsole.InputRecord [1];
+
+		void WindowsInputHandler () 
+		{
+			while (true) {
+				waitForProbe.WaitOne ();
+
+				uint numberEventsRead = 0;
+
+				WindowsConsole.ReadConsoleInput (winConsole.InputHandle, records, 1, out numberEventsRead);
+				if (numberEventsRead == 0)
+					result = null;
+				else
+					result = records;
+				
+				eventReady.Set ();
+			}
+		}
+
+		void IMainLoopDriver.Setup (MainLoop mainLoop)
+		{
+			this.mainLoop = mainLoop;
+		}
+
+		void IMainLoopDriver.Wakeup ()
+		{
+		}
+
+		bool IMainLoopDriver.EventsPending (bool wait)
+		{
+			long now = DateTime.UtcNow.Ticks;
+
+			int waitTimeout;
+			if (mainLoop.timeouts.Count > 0) {
+				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+				if (waitTimeout < 0)
+					return true;
+			} else
+				waitTimeout = -1;
+
+			if (!wait)
+				waitTimeout = 0;
+
+			result = null;
+			waitForProbe.Set ();
+			eventReady.WaitOne (waitTimeout);
+			return result != null;
+		}
+
+		Action<KeyEvent> keyHandler;
+		Action<MouseEvent> mouseHandler;
+
+		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler)
+		{
+			this.keyHandler = keyHandler;
+			this.mouseHandler = mouseHandler;
+		}
+		
+
+		void IMainLoopDriver.MainIteration ()
+		{
+			if (result == null)
+				return;
+
+			var inputEvent = result [0];
+			switch (inputEvent.EventType) {
+			case WindowsConsole.EventType.Key:
+				if (inputEvent.KeyEvent.bKeyDown == false)
+					return;
+				var map = MapKey (ToConsoleKeyInfo (inputEvent.KeyEvent));
+				if (map == (Key)0xffffffff)
+					return;
+				keyHandler (new KeyEvent (map));
+				break;
+
+			case WindowsConsole.EventType.Mouse:
+				mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
+				break;
+
+			case WindowsConsole.EventType.WindowBufferSize:
+				cols = inputEvent.WindowBufferSizeEvent.size.X;
+				rows = inputEvent.WindowBufferSizeEvent.size.Y - 1;
+				ResizeScreen ();
+				UpdateOffScreen ();
+				TerminalResized ();
+				break;
+			}
+			result = null;
 		}
 
 		private WindowsConsole.ButtonState? LastMouseButtonPressed = null;
@@ -572,35 +649,6 @@ namespace Terminal.Gui {
 			return (Key)(0xffffffff);
 		}
 
-		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler)
-		{
-			WinConsole.PollEvents (inputEvent =>
-			{
-				switch(inputEvent.EventType){
-				case WindowsConsole.EventType.Key:
-					if (inputEvent.KeyEvent.bKeyDown == false)
-						return;
-					var map = MapKey (ToConsoleKeyInfo (inputEvent.KeyEvent));
-					if (map == (Key) 0xffffffff)
-						return;
-					keyHandler (new KeyEvent (map));
-					break;
-
-				case WindowsConsole.EventType.Mouse:
-					mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
-					break;
-
-				case WindowsConsole.EventType.WindowBufferSize:
-					cols = inputEvent.WindowBufferSizeEvent.size.X;
-					rows = inputEvent.WindowBufferSizeEvent.size.Y - 1;
-					ResizeScreen ();
-					UpdateOffScreen ();
-					TerminalResized ();
-					break;
-				}
-			});
-		}
-		
 		public override void Init (Action terminalResized)
 		{
 			TerminalResized = terminalResized;
@@ -722,7 +770,7 @@ namespace Terminal.Gui {
 			};
 
 			UpdateCursor();
-			WinConsole.WriteToConsole (OutputBuffer, bufferCoords, window);
+			winConsole.WriteToConsole (OutputBuffer, bufferCoords, window);
 		}
 
 		public override void UpdateScreen ()
@@ -740,7 +788,7 @@ namespace Terminal.Gui {
 			};
 
 			UpdateCursor();
-			WinConsole.WriteToConsole (OutputBuffer, bufferCoords, window);
+			winConsole.WriteToConsole (OutputBuffer, bufferCoords, window);
 		}
 
 		public override void UpdateCursor()
@@ -749,11 +797,11 @@ namespace Terminal.Gui {
 				X = (short)ccol,
 				Y = (short)crow
 			};
-			WinConsole.SetCursorPosition(position);
+			winConsole.SetCursorPosition(position);
 		}
 		public override void End ()
 		{
-			WinConsole.Cleanup();
+			winConsole.Cleanup();
 		}
 
 		#region Unused
@@ -785,5 +833,8 @@ namespace Terminal.Gui {
 		{
 		}
 		#endregion
+
 	}
+
+	
 }

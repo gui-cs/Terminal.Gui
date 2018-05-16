@@ -316,7 +316,7 @@ namespace Terminal.Gui {
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler)
 		{
-			mainLoop.WindowsKeyPressed = delegate (ConsoleKeyInfo consoleKey) {
+			(mainLoop.Driver as NetMainLoop).WindowsKeyPressed = delegate (ConsoleKeyInfo consoleKey) {
 				var map = MapKey (consoleKey);
 				if (map == (Key)0xffffffff)
 					return;

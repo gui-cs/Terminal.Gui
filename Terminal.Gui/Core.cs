@@ -1591,20 +1591,21 @@ namespace Terminal.Gui {
 				return;
 
 			var p = Environment.OSVersion.Platform;
+			Mono.Terminal.IMainLoopDriver mainLoopDriver;
 
-			if (UseSystemConsole)
+			if (UseSystemConsole) {
+				mainLoopDriver = new Mono.Terminal.NetMainLoop ();
 				Driver = new NetDriver ();
-			//
-			// The driver currently has a race and does not integrate into mainloop, so input
-			// only works at random.   I need to change the code to do proper polling on mainloop
-			// and then delegate the reading of events to WindowsConsole
-			//
-			//else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
-			//	Driver = new WindowsDriver();
-			else
+			} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows){
+				var windowsDriver = new WindowsDriver ();
+				mainLoopDriver = windowsDriver;
+				Driver = windowsDriver;
+			} else {
+				mainLoopDriver = new Mono.Terminal.UnixMainLoop ();
 				Driver = new CursesDriver ();
+			}
 			Driver.Init (TerminalResized);
-			MainLoop = new Mono.Terminal.MainLoop (Driver is CursesDriver, UseSystemConsole);
+			MainLoop = new Mono.Terminal.MainLoop (mainLoopDriver);
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			Top = Toplevel.Create ();
 			Current = Top;
