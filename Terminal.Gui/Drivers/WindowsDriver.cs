@@ -54,12 +54,11 @@ namespace Terminal.Gui {
 			ConsoleMode = newConsoleMode;
 		}
 
-		public CharInfo[] OriginalStdOutChars;
+		public CharInfo [] OriginalStdOutChars;
 
-		public bool WriteToConsole (CharInfo[] charInfoBuffer, Coord coords, SmallRect window)
+		public bool WriteToConsole (CharInfo [] charInfoBuffer, Coord coords, SmallRect window)
 		{
-			if (ScreenBuffer == IntPtr.Zero)
-			{
+			if (ScreenBuffer == IntPtr.Zero) {
 				ScreenBuffer = CreateConsoleScreenBuffer (
 					DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
 					ShareMode.FileShareRead | ShareMode.FileShareWrite,
@@ -67,19 +66,19 @@ namespace Terminal.Gui {
 					1,
 					IntPtr.Zero
 				);
-				if (ScreenBuffer == INVALID_HANDLE_VALUE){
+				if (ScreenBuffer == INVALID_HANDLE_VALUE) {
 					var err = Marshal.GetLastWin32Error ();
 
 					if (err != 0)
-					throw new System.ComponentModel.Win32Exception(err);
+						throw new System.ComponentModel.Win32Exception (err);
 				}
 
-				if (!SetConsoleActiveScreenBuffer (ScreenBuffer)){
-					var err = Marshal.GetLastWin32Error();
-					throw new System.ComponentModel.Win32Exception(err);
+				if (!SetConsoleActiveScreenBuffer (ScreenBuffer)) {
+					var err = Marshal.GetLastWin32Error ();
+					throw new System.ComponentModel.Win32Exception (err);
 				}
 
-				OriginalStdOutChars = new CharInfo[Console.WindowHeight * Console.WindowWidth];
+				OriginalStdOutChars = new CharInfo [Console.WindowHeight * Console.WindowWidth];
 
 				ReadConsoleOutput (OutputHandle, OriginalStdOutChars, coords, new Coord () { X = 0, Y = 0 }, ref window);
 			}
@@ -87,7 +86,7 @@ namespace Terminal.Gui {
 			return WriteConsoleOutput (ScreenBuffer, charInfoBuffer, coords, new Coord () { X = 0, Y = 0 }, ref window);
 		}
 
-		public bool SetCursorPosition(Coord position)
+		public bool SetCursorPosition (Coord position)
 		{
 			return SetConsoleCursorPosition (ScreenBuffer, position);
 		}
@@ -95,9 +94,9 @@ namespace Terminal.Gui {
 		public void Cleanup ()
 		{
 			ContinueListeningForConsoleEvents = false;
-			if (!SetConsoleActiveScreenBuffer (OutputHandle)){
+			if (!SetConsoleActiveScreenBuffer (OutputHandle)) {
 				var err = Marshal.GetLastWin32Error ();
-				Console.WriteLine("Error: {0}", err);
+				Console.WriteLine ("Error: {0}", err);
 			}
 		}
 
@@ -116,8 +115,7 @@ namespace Terminal.Gui {
 		}
 
 		[Flags]
-		public enum ConsoleModes : uint
-		{
+		public enum ConsoleModes : uint {
 			EnableMouseInput = 16,
 			EnableQuickEditMode = 64,
 			EnableExtendedFlags = 128,
@@ -265,22 +263,19 @@ namespace Terminal.Gui {
 		};
 
 		[Flags]
-		enum ShareMode : uint
-		{
+		enum ShareMode : uint {
 			FileShareRead = 1,
 			FileShareWrite = 2,
 		}
 
 		[Flags]
-		enum DesiredAccess : uint
-		{
+		enum DesiredAccess : uint {
 			GenericRead = 2147483648,
 			GenericWrite = 1073741824,
 		}
 
-		[StructLayout(LayoutKind.Sequential)]
-		public struct ConsoleScreenBufferInfo
-		{
+		[StructLayout (LayoutKind.Sequential)]
+		public struct ConsoleScreenBufferInfo {
 			public Coord dwSize;
 			public Coord dwCursorPosition;
 			public ushort wAttributes;
@@ -288,40 +283,68 @@ namespace Terminal.Gui {
 			public Coord dwMaximumWindowSize;
 		}
 
-		[StructLayout(LayoutKind.Sequential)]
-		public struct Coord
-		{
+		[StructLayout (LayoutKind.Sequential)]
+		public struct Coord {
 			public short X;
 			public short Y;
 
-			public Coord(short X, short Y)
+			public Coord (short X, short Y)
 			{
 				this.X = X;
 				this.Y = Y;
 			}
+			public override string ToString () => $"({X},{Y})";
 		};
 
-		[StructLayout(LayoutKind.Explicit, CharSet=CharSet.Unicode)]
-		public struct CharUnion
-		{
-			[FieldOffset(0)] public char UnicodeChar;
-			[FieldOffset(0)] public byte AsciiChar;
+		[StructLayout (LayoutKind.Explicit, CharSet = CharSet.Unicode)]
+		public struct CharUnion {
+			[FieldOffset (0)] public char UnicodeChar;
+			[FieldOffset (0)] public byte AsciiChar;
 		}
 
-		[StructLayout(LayoutKind.Explicit, CharSet=CharSet.Unicode)]
-		public struct CharInfo
-		{
-			[FieldOffset(0)] public CharUnion Char;
-			[FieldOffset(2)] public ushort Attributes;
+		[StructLayout (LayoutKind.Explicit, CharSet = CharSet.Unicode)]
+		public struct CharInfo {
+			[FieldOffset (0)] public CharUnion Char;
+			[FieldOffset (2)] public ushort Attributes;
 		}
 
-		[StructLayout(LayoutKind.Sequential)]
-		public struct SmallRect
-		{
+		[StructLayout (LayoutKind.Sequential)]
+		public struct SmallRect {
 			public short Left;
 			public short Top;
 			public short Right;
 			public short Bottom;
+
+			public static void MakeEmpty (ref SmallRect rect)
+			{
+				rect.Left = -1;
+			}
+
+			public static void Update (ref SmallRect rect, short col, short row)
+			{
+				if (rect.Left == -1) {
+					System.Diagnostics.Debugger.Log (0, "debug", $"damager From Empty {col},{row}\n");
+					rect.Left = rect.Right = col;
+					rect.Bottom = rect.Top = row;
+					return;
+				}
+				if (col >= rect.Left && col <= rect.Right && row >= rect.Top && row <= rect.Bottom)
+					return;
+				if (col < rect.Left)
+					rect.Left = col;
+				if (col > rect.Right)
+					rect.Right = col;
+				if (row < rect.Top)
+					rect.Top = row;
+				if (row > rect.Bottom)
+					rect.Bottom = row;
+				System.Diagnostics.Debugger.Log (0, "debug", $"Expanding {rect.ToString ()}\n");
+			}
+
+			public override string ToString ()
+			{
+				return $"Left={Left},Top={Top},Right={Right},Bottom={Bottom}";
+			}
 		}
 
 		[DllImport ("kernel32.dll", SetLastError = true)]
@@ -334,26 +357,26 @@ namespace Terminal.Gui {
 			uint nLength,
 			out uint lpNumberOfEventsRead);
 
-		[DllImport("kernel32.dll", SetLastError=true, CharSet=CharSet.Unicode)]
-		static extern bool ReadConsoleOutput(
+		[DllImport ("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+		static extern bool ReadConsoleOutput (
 			IntPtr hConsoleOutput,
-			[Out] CharInfo[] lpBuffer,
+			[Out] CharInfo [] lpBuffer,
 			Coord dwBufferSize,
 			Coord dwBufferCoord,
 			ref SmallRect lpReadRegion
 		);
-		
-		[DllImport("kernel32.dll", EntryPoint="WriteConsoleOutput", SetLastError=true, CharSet=CharSet.Unicode)]
-		static extern bool WriteConsoleOutput(
+
+		[DllImport ("kernel32.dll", EntryPoint = "WriteConsoleOutput", SetLastError = true, CharSet = CharSet.Unicode)]
+		static extern bool WriteConsoleOutput (
 			IntPtr hConsoleOutput,
-			CharInfo[] lpBuffer,
+			CharInfo [] lpBuffer,
 			Coord dwBufferSize,
 			Coord dwBufferCoord,
 			ref SmallRect lpWriteRegion
 		);
 
 		[DllImport ("kernel32.dll")]
-		static extern bool SetConsoleCursorPosition(IntPtr hConsoleOutput, Coord dwCursorPosition);
+		static extern bool SetConsoleCursorPosition (IntPtr hConsoleOutput, Coord dwCursorPosition);
 
 		[DllImport ("kernel32.dll")]
 		static extern bool GetConsoleMode (IntPtr hConsoleHandle, out uint lpMode);
@@ -362,8 +385,8 @@ namespace Terminal.Gui {
 		[DllImport ("kernel32.dll")]
 		static extern bool SetConsoleMode (IntPtr hConsoleHandle, uint dwMode);
 
-		[DllImport("kernel32.dll", SetLastError = true)]
-		static extern IntPtr CreateConsoleScreenBuffer(
+		[DllImport ("kernel32.dll", SetLastError = true)]
+		static extern IntPtr CreateConsoleScreenBuffer (
 			DesiredAccess dwDesiredAccess,
 			ShareMode dwShareMode,
 			IntPtr secutiryAttributes,
@@ -374,8 +397,8 @@ namespace Terminal.Gui {
 		internal static IntPtr INVALID_HANDLE_VALUE = new IntPtr (-1);
 
 
-		[DllImport("kernel32.dll", SetLastError = true)]
-		static extern bool SetConsoleActiveScreenBuffer(IntPtr Handle);
+		[DllImport ("kernel32.dll", SetLastError = true)]
+		static extern bool SetConsoleActiveScreenBuffer (IntPtr Handle);
 
 		[DllImport ("kernel32.dll", SetLastError = true)]
 		static extern bool GetNumberOfConsoleInputEvents (IntPtr handle, out uint lpcNumberOfEvents);
@@ -394,19 +417,21 @@ namespace Terminal.Gui {
 		AutoResetEvent waitForProbe = new AutoResetEvent (false);
 		MainLoop mainLoop;
 		Action TerminalResized;
-		WindowsConsole.CharInfo[] OutputBuffer;
+		WindowsConsole.CharInfo [] OutputBuffer;
 		int cols, rows;
 		WindowsConsole winConsole;
+		WindowsConsole.SmallRect damageRegion;
 
 		public override int Cols => cols;
 		public override int Rows => rows;
 
 		public WindowsDriver ()
 		{
-			winConsole = new WindowsConsole();
+			winConsole = new WindowsConsole ();
 
 			cols = Console.WindowWidth;
 			rows = Console.WindowHeight - 1;
+			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 
 			ResizeScreen ();
 			UpdateOffScreen ();
@@ -417,7 +442,7 @@ namespace Terminal.Gui {
 		// The records that we keep fetching
 		WindowsConsole.InputRecord [] result, records = new WindowsConsole.InputRecord [1];
 
-		void WindowsInputHandler () 
+		void WindowsInputHandler ()
 		{
 			while (true) {
 				waitForProbe.WaitOne ();
@@ -429,7 +454,7 @@ namespace Terminal.Gui {
 					result = null;
 				else
 					result = records;
-				
+
 				eventReady.Set ();
 			}
 		}
@@ -472,7 +497,7 @@ namespace Terminal.Gui {
 			this.keyHandler = keyHandler;
 			this.mouseHandler = mouseHandler;
 		}
-		
+
 
 		void IMainLoopDriver.MainIteration ()
 		{
@@ -507,7 +532,7 @@ namespace Terminal.Gui {
 
 		private WindowsConsole.ButtonState? LastMouseButtonPressed = null;
 
-		private MouseEvent ToDriverMouse(WindowsConsole.MouseEventRecord mouseEvent)
+		private MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
 			MouseFlags mouseFlag = MouseFlags.AllEvents;
 
@@ -516,13 +541,12 @@ namespace Terminal.Gui {
 			// be fired with it's bit set to 0. So when the button is up ButtonState will be 0.
 			// To map to the correct driver events we save the last pressed mouse button so we can
 			// map to the correct clicked event.
-			if (LastMouseButtonPressed != null && mouseEvent.ButtonState != 0)
-			{
+			if (LastMouseButtonPressed != null && mouseEvent.ButtonState != 0) {
 				LastMouseButtonPressed = null;
 			}
 
-			if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null){
-				switch (mouseEvent.ButtonState){
+			if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null) {
+				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Pressed;
 					break;
@@ -536,8 +560,8 @@ namespace Terminal.Gui {
 					break;
 				}
 				LastMouseButtonPressed = mouseEvent.ButtonState;
-			} else if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed != null){
-				switch (LastMouseButtonPressed){
+			} else if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed != null) {
+				switch (LastMouseButtonPressed) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Clicked;
 					break;
@@ -551,7 +575,7 @@ namespace Terminal.Gui {
 					break;
 				}
 				LastMouseButtonPressed = null;
-			} else if(mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved){
+			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 				mouseFlag = MouseFlags.ReportMousePosition;
 			}
 
@@ -570,7 +594,7 @@ namespace Terminal.Gui {
 			bool alt = (state & (WindowsConsole.ControlKeyState.LeftAltPressed | WindowsConsole.ControlKeyState.RightAltPressed)) != 0;
 			bool control = (state & (WindowsConsole.ControlKeyState.LeftControlPressed | WindowsConsole.ControlKeyState.RightControlPressed)) != 0;
 
-			return new ConsoleKeyInfo(keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
+			return new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
 		}
 
 		public Key MapKey (ConsoleKeyInfo keyInfo)
@@ -695,17 +719,23 @@ namespace Terminal.Gui {
 
 		void ResizeScreen ()
 		{
-			OutputBuffer = new WindowsConsole.CharInfo[Rows * Cols];
+			OutputBuffer = new WindowsConsole.CharInfo [Rows * Cols];
 			Clip = new Rect (0, 0, Cols, Rows);
+			damageRegion = new WindowsConsole.SmallRect () {
+				Top = 0,
+				Left = 0,
+				Bottom = (short)Rows,
+				Right = (short)Cols
+			};
 		}
 
 		void UpdateOffScreen ()
 		{
 			for (int row = 0; row < rows; row++)
-				for (int col = 0; col < cols; col++){
+				for (int col = 0; col < cols; col++) {
 					int position = row * cols + col;
-					OutputBuffer[position].Attributes = (ushort)MakeColor(ConsoleColor.White, ConsoleColor.Blue);
-					OutputBuffer[position].Char.UnicodeChar = ' ';
+					OutputBuffer [position].Attributes = (ushort)MakeColor (ConsoleColor.White, ConsoleColor.Blue);
+					OutputBuffer [position].Char.UnicodeChar = ' ';
 				}
 		}
 
@@ -720,9 +750,10 @@ namespace Terminal.Gui {
 		{
 			var position = crow * Cols + ccol;
 
-			if (Clip.Contains (ccol, crow)){
-				OutputBuffer[position].Attributes = (ushort)currentAttribute;
-				OutputBuffer[position].Char.UnicodeChar = (char)rune;
+			if (Clip.Contains (ccol, crow)) {
+				OutputBuffer [position].Attributes = (ushort)currentAttribute;
+				OutputBuffer [position].Char.UnicodeChar = (char)rune;
+				WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
 			}
 
 			ccol++;
@@ -750,13 +781,15 @@ namespace Terminal.Gui {
 		private Attribute MakeColor (ConsoleColor f, ConsoleColor b)
 		{
 			// Encode the colors into the int value.
-			return new Attribute (){
+			return new Attribute () {
 				value = ((int)f | (int)b << 4)
 			};
 		}
 
-		public override void Refresh()
+		public override void Refresh ()
 		{
+			UpdateScreen ();
+#if false
 			var bufferCoords = new WindowsConsole.Coord (){
 				X = (short)Clip.Width,
 				Y = (short)Clip.Height
@@ -771,10 +804,14 @@ namespace Terminal.Gui {
 
 			UpdateCursor();
 			winConsole.WriteToConsole (OutputBuffer, bufferCoords, window);
+#endif
 		}
 
 		public override void UpdateScreen ()
 		{
+			if (damageRegion.Left == -1)
+				return;
+			
 			var bufferCoords = new WindowsConsole.Coord (){
 				X = (short)Clip.Width,
 				Y = (short)Clip.Height
@@ -788,7 +825,8 @@ namespace Terminal.Gui {
 			};
 
 			UpdateCursor();
-			winConsole.WriteToConsole (OutputBuffer, bufferCoords, window);
+			winConsole.WriteToConsole (OutputBuffer, bufferCoords, damageRegion);
+			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 		}
 
 		public override void UpdateCursor()
@@ -804,7 +842,7 @@ namespace Terminal.Gui {
 			winConsole.Cleanup();
 		}
 
-		#region Unused
+#region Unused
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
 		}
@@ -832,7 +870,7 @@ namespace Terminal.Gui {
 		public override void CookMouse ()
 		{
 		}
-		#endregion
+#endregion
 
 	}
 
