@@ -93,6 +93,7 @@ namespace Terminal.Gui {
 
 		public void Cleanup ()
 		{
+			ConsoleMode = originalConsoleMode;
 			ContinueListeningForConsoleEvents = false;
 			if (!SetConsoleActiveScreenBuffer (OutputHandle)) {
 				var err = Marshal.GetLastWin32Error ();
