@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 		public const int STD_OUTPUT_HANDLE = -11;
 		public const int STD_INPUT_HANDLE = -10;
 		public const int STD_ERROR_HANDLE = -12;
-
+		
 		internal IntPtr InputHandle, OutputHandle;
 		IntPtr ScreenBuffer;
 		uint originalConsoleMode;
@@ -659,6 +659,8 @@ namespace Terminal.Gui {
 			}
 			if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
 				var delta = key - ConsoleKey.D0;
+				if (keyInfo.Modifiers == (ConsoleModifiers.Control | ConsoleModifiers.Alt))
+					return (Key)((uint)keyInfo.KeyChar);
 				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
 					return (Key)(((uint)Key.AltMask) | ((uint)'0' + delta));
 				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
