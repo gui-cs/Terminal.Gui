@@ -110,7 +110,16 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor ()
 		{
-			Move (point - first, 0);
+			var x = first;
+			var col = 0;
+			foreach ((var idx, var rune) in text [first, null].Range ()) {
+				if (x == point)
+					break;
+				var cols = Rune.ColumnWidth (rune);
+				col += cols;
+				x++;
+			}
+			Move (col, 0);
 		}
 
 		public override void Redraw (Rect region)
@@ -118,14 +127,21 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (ColorScheme.Focus);
 			Move (0, 0);
 
-			for (int i = 0; i < Frame.Width; i++) {
-				int p = first + i;
-
-				if (p < text.Length) {
-					Driver.AddRune (Secret ? (Rune)'*' : text [p]);
-				} else
-					Driver.AddRune (' ');
+			int p = first;
+			int col = 0;
+			int width = Frame.Width;
+			foreach ((var idx, var rune) in text.Range ()) {
+				if (idx < first)
+					continue;
+				var cols = Rune.ColumnWidth (rune);
+				if (col + cols < width)
+					Driver.AddRune ((Rune)(Secret ? '*' : rune));
+				col += cols;
 			}
+
+			for (int i = col; i < Frame.Width; i++) 
+				Driver.AddRune (' ');
+			
 			PositionCursor ();
 		}
 
@@ -156,6 +172,19 @@ namespace Terminal.Gui {
 				Clipboard.Contents = text;
 		}
 
+		// Maps a rune index to the byte index inside the utf8 string
+		int RuneIndexToByteIndex (int index)
+		{
+			var blen = text.Length;
+			for (int byteIndex = 0, runeIndex = 0; byteIndex < blen; runeIndex++) {
+				if (index == runeIndex)
+					return byteIndex;
+				(var rune, var size) = Utf8.DecodeRune (text, byteIndex, byteIndex - blen);
+				byteIndex += size;
+			}
+			throw new InvalidOperationException ();
+		}
+
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			switch (kb.Key) {
@@ -163,7 +192,7 @@ namespace Terminal.Gui {
 				if (text.Length == 0 || text.Length == point)
 					return true;
 
-				SetText (text [0, point] + text [point + 1, null]);
+				SetText (text [0, RuneIndexToByteIndex (point)] + text [RuneIndexToByteIndex (point + 1), null]);
 				Adjust ();
 				break;
 
@@ -172,7 +201,7 @@ namespace Terminal.Gui {
 				if (point == 0)
 					return true;
 
-				SetText (text [0, point - 1] + text [point, null]);
+				SetText (text [0, RuneIndexToByteIndex (point - 1)] + text [RuneIndexToByteIndex (point), null]);
 				point--;
 				Adjust ();
 				break;
@@ -195,27 +224,27 @@ namespace Terminal.Gui {
 			case Key.ControlD: // Delete
 				if (point == text.Length)
 					break;
-				SetText (text [0, point] + text [point + 1, null]);
+				SetText (text [0, RuneIndexToByteIndex (point)] + text [RuneIndexToByteIndex (point + 1), null]);
 				Adjust ();
 				break;
 
 			case Key.End:
 			case Key.ControlE: // End
-				point = text.Length;
+				point = text.RuneCount;
 				Adjust ();
 				break;
 
 			case Key.CursorRight:
 			case Key.ControlF:
-				if (point == text.Length)
+				if (point == text.RuneCount)
 					break;
 				point++;
 				Adjust ();
 				break;
 
 			case Key.ControlK: // kill-to-end
-				SetClipboard (text.Substring (point));
-				SetText (text [0, point]);
+				SetClipboard (text.Substring (RuneIndexToByteIndex (point)));
+				SetText (text [0, RuneIndexToByteIndex (point)]);
 				Adjust ();
 				break;
 
@@ -224,11 +253,11 @@ namespace Terminal.Gui {
 				if (clip== null)
 					return true;
 
-				if (point == text.Length) {
+				if (point == text.RuneCount) {
 					SetText (text + clip);
-					point = text.Length;
+					point = text.RuneCount;
 				} else {
-					SetText (text [0, point] + clip + text.Substring (point));
+					SetText (text [0, RuneIndexToByteIndex (point)] + clip + text.Substring (RuneIndexToByteIndex (point)));
 					point += clip.RuneCount;
 				}
 				Adjust ();
@@ -260,10 +289,10 @@ namespace Terminal.Gui {
 
 				var kbstr = ustring.Make ((uint)kb.Key);
 				if (used) {
-					if (point == text.Length) {
+					if (point == text.RuneCount) {
 						SetText (text + kbstr);
 					} else {
-						SetText (text [0, point] + kbstr + text [point, null]);
+						SetText (text [0, RuneIndexToByteIndex (point)] + kbstr + text [RuneIndexToByteIndex (point), null]);
 					}
 					point++;
 				} else {

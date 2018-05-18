@@ -90,7 +90,7 @@ static class Demo {
 			return true;
 		}
 
-		Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
+		//Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
 
 
 		// A little convoluted, this is because I am using this to test the
