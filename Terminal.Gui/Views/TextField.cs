@@ -176,7 +176,7 @@ namespace Terminal.Gui {
 		int RuneIndexToByteIndex (int index)
 		{
 			var blen = text.Length;
-			for (int byteIndex = 0, runeIndex = 0; byteIndex < blen; runeIndex++) {
+			for (int byteIndex = 0, runeIndex = 0; byteIndex <= blen; runeIndex++) {
 				if (index == runeIndex)
 					return byteIndex;
 				(var rune, var size) = Utf8.DecodeRune (text, byteIndex, byteIndex - blen);
