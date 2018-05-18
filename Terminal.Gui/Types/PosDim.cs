@@ -158,6 +158,16 @@ namespace Terminal.Gui {
 			return new PosAbsolute (n);
 		}
 
+		/// <summary>
+		/// Creates an Absolute Pos from the specified integer value.
+		/// </summary>
+		/// <returns>The Absolute Pos.</returns>
+		/// <param name="n">The value to convert to the pos.</param>
+		public static Pos At (int n)
+		{
+			return new PosAbsolute (n);
+		}
+
 		class PosCombine : Pos {
 			Pos left, right;
 			bool add;
@@ -369,6 +379,16 @@ namespace Terminal.Gui {
 		/// <returns>The Absolute Pos.</returns>
 		/// <param name="n">The value to convert to the pos.</param>
 		public static implicit operator Dim (int n)
+		{
+			return new DimAbsolute (n);
+		}
+
+		/// <summary>
+		/// Creates an Absolute Pos from the specified integer value.
+		/// </summary>
+		/// <returns>The Absolute Pos.</returns>
+		/// <param name="n">The value to convert to the pos.</param>
+		public static Dim Sized (int n)
 		{
 			return new DimAbsolute (n);
 		}
