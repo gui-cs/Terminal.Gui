@@ -19,7 +19,7 @@ namespace Terminal.Gui {
 	///   functionality,  and mouse support.
 	/// </remarks>
 	public class TextField : View {
-		ustring text;
+		List<Rune> text;
 		int first, point;
 		bool used;
 
@@ -36,12 +36,21 @@ namespace Terminal.Gui {
 		///    Public constructor that creates a text field, with layout controlled with X, Y, Width and Height.
 		/// </summary>
 		/// <param name="text">Initial text contents.</param>
+		public TextField (string text) : this (ustring.Make (text))
+		{
+			
+		}
+
+		/// <summary>
+		///    Public constructor that creates a text field, with layout controlled with X, Y, Width and Height.
+		/// </summary>
+		/// <param name="text">Initial text contents.</param>
 		public TextField (ustring text)
 		{
 			if (text == null)
 				text = "";
 
-			this.text = text;
+			this.text = TextModel.ToRunes (text);
 			point = text.Length;
 			CanFocus = true;
 		}
@@ -58,7 +67,7 @@ namespace Terminal.Gui {
 			if (text == null)
 				text = "";
 
-			this.text = text;
+			this.text = TextModel.ToRunes (text);
 			point = text.Length;
 			first = point > w ? point - w : 0;
 			CanFocus = true;
@@ -80,13 +89,15 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public ustring Text {
 			get {
-				return text;
+				return ustring.Make (text);
 			}
 
 			set {
-				text = value;
-				if (point > text.Length)
-					point = text.Length;
+				text = TextModel.ToRunes (value);
+				if (point > text.Count)
+					point = text.Count;
+
+				// FIXME: this needs to be updated to use Rune.ColumnWidth
 				first = point > Frame.Width ? point - Frame.Width : 0;
 				SetNeedsDisplay ();
 			}
@@ -110,14 +121,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor ()
 		{
-			var x = first;
 			var col = 0;
-			foreach ((var idx, var rune) in text [first, null].Range ()) {
-				if (x == point)
+			for (int idx = first; idx < text.Count; idx++) {
+				if (idx == point)
 					break;
-				var cols = Rune.ColumnWidth (rune);
+				var cols = Rune.ColumnWidth (text [idx]);
 				col += cols;
-				x++;
 			}
 			Move (col, 0);
 		}
@@ -130,7 +139,9 @@ namespace Terminal.Gui {
 			int p = first;
 			int col = 0;
 			int width = Frame.Width;
-			foreach ((var idx, var rune) in text.Range ()) {
+			var tcount = text.Count;
+			for (int idx = 0; idx < tcount; idx++){
+				var rune = text [idx];
 				if (idx < first)
 					continue;
 				var cols = Rune.ColumnWidth (rune);
@@ -145,20 +156,38 @@ namespace Terminal.Gui {
 			PositionCursor ();
 		}
 
+		// Returns the size of the string starting at position start
+		int DisplaySize (List<Rune> t, int start)
+		{
+			int size = 0;
+			int tcount = text.Count;
+			for (int i = start; i < tcount; i++) {
+				var rune = text [i];
+				size += Rune.ColumnWidth (rune);
+			}
+			return size;
+		}
+
 		void Adjust ()
 		{
-			if (point < first)
+			if (point < first) 
 				first = point;
-			else if (first + point >= Frame.Width)
-				first = point - (Frame.Width / 3);
+			else if (first + point >= Frame.Width) {
+				first = point - (Frame.Width - 1);
+			}
 			SetNeedsDisplay ();
 		}
 
-		void SetText (ustring new_text)
+		void SetText (List<Rune> newText)
 		{
-			text = new_text;
+			text = newText;
 			if (Changed != null)
 				Changed (this, EventArgs.Empty);
+		}
+
+		void SetText (IEnumerable<Rune> newText)
+		{
+			SetText (newText.ToList ());
 		}
 
 		public override bool CanFocus {
@@ -166,33 +195,21 @@ namespace Terminal.Gui {
 			set { base.CanFocus = value; }
 		}
 
-		void SetClipboard (ustring text)
+		void SetClipboard (IEnumerable<Rune> text)
 		{
 			if (!Secret)
-				Clipboard.Contents = text;
-		}
-
-		// Maps a rune index to the byte index inside the utf8 string
-		int RuneIndexToByteIndex (int index)
-		{
-			var blen = text.Length;
-			for (int byteIndex = 0, runeIndex = 0; byteIndex <= blen; runeIndex++) {
-				if (index == runeIndex)
-					return byteIndex;
-				(var rune, var size) = Utf8.DecodeRune (text, byteIndex, byteIndex - blen);
-				byteIndex += size;
-			}
-			throw new InvalidOperationException ();
+				Clipboard.Contents = ustring.Make (text.ToList ());
 		}
 
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			switch (kb.Key) {
 			case Key.DeleteChar:
-				if (text.Length == 0 || text.Length == point)
+			case Key.ControlD:
+				if (text.Count == 0 || text.Count== point)
 					return true;
 
-				SetText (text [0, RuneIndexToByteIndex (point)] + text [RuneIndexToByteIndex (point + 1), null]);
+				SetText (text.GetRange (0, point).Concat (text.GetRange (point + 1, text.Count - (point + 1))));
 				Adjust ();
 				break;
 
@@ -201,7 +218,7 @@ namespace Terminal.Gui {
 				if (point == 0)
 					return true;
 
-				SetText (text [0, RuneIndexToByteIndex (point - 1)] + text [RuneIndexToByteIndex (point), null]);
+				SetText (text.GetRange (0, point - 1).Concat (text.GetRange (point, text.Count - (point))));
 				point--;
 				Adjust ();
 				break;
@@ -221,44 +238,39 @@ namespace Terminal.Gui {
 				}
 				break;
 
-			case Key.ControlD: // Delete
-				if (point == text.Length)
-					break;
-				SetText (text [0, RuneIndexToByteIndex (point)] + text [RuneIndexToByteIndex (point + 1), null]);
-				Adjust ();
-				break;
-
 			case Key.End:
 			case Key.ControlE: // End
-				point = text.RuneCount;
+				point = text.Count;
 				Adjust ();
 				break;
 
 			case Key.CursorRight:
 			case Key.ControlF:
-				if (point == text.RuneCount)
+				if (point == text.Count)
 					break;
 				point++;
 				Adjust ();
 				break;
 
 			case Key.ControlK: // kill-to-end
-				SetClipboard (text.Substring (RuneIndexToByteIndex (point)));
-				SetText (text [0, RuneIndexToByteIndex (point)]);
+				if (point >= text.Count)
+					return true;
+				SetClipboard (text.GetRange (point, text.Count - point));
+				SetText (text.GetRange (0, point));
 				Adjust ();
 				break;
 
 			case Key.ControlY: // Control-y, yank
-				var clip = Clipboard.Contents;
+				var clip = TextModel.ToRunes (Clipboard.Contents);
 				if (clip== null)
 					return true;
 
-				if (point == text.RuneCount) {
-					SetText (text + clip);
-					point = text.RuneCount;
+				if (point == text.Count) {
+					SetText (text.Concat (clip).ToList ());
+					point = text.Count;
 				} else {
-					SetText (text [0, RuneIndexToByteIndex (point)] + clip + text.Substring (RuneIndexToByteIndex (point)));
-					point += clip.RuneCount;
+					SetText (text.GetRange (0, point).Concat (clip).Concat (text.GetRange (point, text.Count - point)));
+					point += clip.Count;
 				}
 				Adjust ();
 				break;
@@ -287,12 +299,12 @@ namespace Terminal.Gui {
 				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
 					return false;
 
-				var kbstr = ustring.Make ((uint)kb.Key);
+				var kbstr = TextModel.ToRunes (ustring.Make ((uint)kb.Key));
 				if (used) {
-					if (point == text.RuneCount) {
-						SetText (text + kbstr);
+					if (point == text.Count) {
+						SetText (text.Concat (kbstr).ToList ());
 					} else {
-						SetText (text [0, RuneIndexToByteIndex (point)] + kbstr + text [RuneIndexToByteIndex (point), null]);
+						SetText (text.GetRange (0, point).Concat (kbstr).Concat (text.GetRange (point, text.Count - point)));
 					}
 					point++;
 				} else {
@@ -310,23 +322,23 @@ namespace Terminal.Gui {
 
 		int WordForward (int p)
 		{
-			if (p >= text.Length)
+			if (p >= text.Count)
 				return -1;
 
 			int i = p;
 			if (Rune.IsPunctuation (text [p]) || Rune.IsWhiteSpace(text [p])) {
-				for (; i < text.Length; i++) {
+				for (; i < text.Count; i++) {
 					var r = text [i];
 					if (Rune.IsLetterOrDigit(r))
 						break;
 				}
-				for (; i < text.Length; i++) {
+				for (; i < text.Count; i++) {
 					var r = text [i];
 					if (!Rune.IsLetterOrDigit (r))
 						break;
 				}
 			} else {
-				for (; i < text.Length; i++) {
+				for (; i < text.Count; i++) {
 					var r = text [i];
 					if (!Rune.IsLetterOrDigit (r))
 						break;
@@ -380,8 +392,8 @@ namespace Terminal.Gui {
 			
 			// We could also set the cursor position.
 			point = first + ev.X;
-			if (point > text.Length)
-				point = text.Length;
+			if (point > text.Count)
+				point = text.Count;
 			if (point < first)
 				point = 0;
 	

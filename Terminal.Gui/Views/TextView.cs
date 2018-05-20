@@ -49,7 +49,7 @@ namespace Terminal.Gui {
 
 		// Turns the ustring into runes, this does not split the 
 		// contents on a newline if it is present.
-		static List<Rune> ToRunes (ustring str)
+		internal static List<Rune> ToRunes (ustring str)
 		{
 			List<Rune> runes = new List<Rune> ();
 			foreach (var x in str.ToRunes ()) {
