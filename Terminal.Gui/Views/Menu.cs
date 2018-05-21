@@ -382,7 +382,7 @@ namespace Terminal.Gui {
 			selected = -1;
 			SetNeedsDisplay ();
 			SuperView.Remove (openMenu);
-			previousFocused.SuperView.SetFocus (previousFocused);
+			previousFocused?.SuperView.SetFocus (previousFocused);
 			openMenu = null;
 		}
 
