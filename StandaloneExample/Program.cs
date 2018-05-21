@@ -92,14 +92,32 @@ class Demo {
 
 		Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
 
+		// A little convoluted, this is because I am using this to test the
+		// layout based on referencing elements of another view:
+
+		var login = new Label ("Login: ") { X = 3, Y = 6 };
+		var password = new Label ("Password: ") {
+			X = Pos.Left (login),
+			Y = Pos.Bottom (login) + 1
+		};
+		var loginText = new TextField ("") {
+			X = Pos.Right (password),
+			Y = Pos.Top (login),
+			Width = 40
+		};
+		var passText = new TextField ("") {
+			Secret = true,
+			X = Pos.Left (loginText),
+			Y = Pos.Top (password),
+			Width = Dim.Width (loginText)
+		};
+		
 		// Add some content
 		container.Add (
-			//new Label (3, 6, "Login: "),
-			//new TextField (14, 6, 40, ""),
-			new Label ("Login: ") { X = 3, Y = 6 },
-			new TextField ("") { X = 14, Y = 6, Width = 40 },
-			new Label ("Password: ") { X = 3, Y = 8 },
-			new TextField ("") { X = 14, Y = 18, Width = 40, Secret = true },
+			login,
+			loginText,
+			password,
+			passText,
 			new FrameView (new Rect (3, 10, 25, 6), "Options"){
 				new CheckBox (1, 0, "Remember me"),
 				new RadioGroup (1, 2, new [] { "_Personal", "_Company" }),
