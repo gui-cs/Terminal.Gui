@@ -180,6 +180,8 @@ namespace Terminal.Gui {
 			if (source == null)
 				throw new ArgumentNullException (nameof (source));
 			Source = MakeWrapper (source);
+			((ListWrapper) Source).Container = this;
+			((ListWrapper) Source).Driver = Driver;
 		}
 
 		bool allowsMarking;
