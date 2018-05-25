@@ -136,7 +136,7 @@ class Demo {
 			new Button ("Ok") { X = 3, Y = 19 },
 			new Button ("Cancel") { X = 10, Y = 19 },
 			progress,
-			new Label ("Press ESC and 9 to activate the menubar") { X = 3, Y = 22 }
+			new Label ("Press F9 (on Unix ESC+9 is an alias) to activate the menubar") { X = 3, Y = 22 }
 		);
 
 	}
