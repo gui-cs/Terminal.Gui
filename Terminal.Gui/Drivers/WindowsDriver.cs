@@ -827,7 +827,7 @@ namespace Terminal.Gui {
 
 			UpdateCursor();
 			winConsole.WriteToConsole (OutputBuffer, bufferCoords, damageRegion);
-			System.Diagnostics.Debugger.Log(0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
+//			System.Diagnostics.Debugger.Log(0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 		}
 

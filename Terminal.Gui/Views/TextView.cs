@@ -778,6 +778,7 @@ namespace Terminal.Gui {
 					var prevRow = model.GetLine (prowIdx);
 					var prevCount = prevRow.Count;
 					model.GetLine (prowIdx).AddRange (GetCurrentLine ());
+					model.RemoveLine (currentRow);
 					currentRow--;
 					currentColumn = prevCount;
 					leftColumn = currentColumn - Frame.Width + 1;
