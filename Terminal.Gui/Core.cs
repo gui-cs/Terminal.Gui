@@ -21,8 +21,20 @@ using NStack;
 
 namespace Terminal.Gui {
 
+	/// <summary>
+	/// Responder base class implemented by objects that want to participate on keyboard and mouse input.
+	/// </summary>
 	public class Responder {
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Responder"/> can focus.
+		/// </summary>
+		/// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
 		public virtual bool CanFocus { get; set; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Responder"/> has focus.
+		/// </summary>
+		/// <value><c>true</c> if has focus; otherwise, <c>false</c>.</value>
 		public virtual bool HasFocus { get; internal set; }
 
 		// Key handling
