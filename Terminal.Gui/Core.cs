@@ -1006,7 +1006,6 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Computes the RelativeLayout for the view, given the frame for its container.
-
 		/// </summary>
 		/// <param name="hostFrame">The Frame for the host.</param>
 		internal void RelativeLayout (Rect hostFrame)

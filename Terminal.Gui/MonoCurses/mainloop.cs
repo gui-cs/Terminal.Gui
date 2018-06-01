@@ -320,6 +320,11 @@ namespace Mono.Terminal {
 		internal List<Func<bool>> idleHandlers = new List<Func<bool>> ();
 
 		IMainLoopDriver driver;
+
+		/// <summary>
+		/// The current IMainLoopDriver in use.
+		/// </summary>
+		/// <value>The driver.</value>
 		public IMainLoopDriver Driver => driver;
 
 		/// <summary>

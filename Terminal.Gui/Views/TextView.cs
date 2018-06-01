@@ -234,7 +234,6 @@ namespace Terminal.Gui {
 	///        </description>
 	///     </item>
 	///     <item>
-	///     <item>
 	///        <term>Control-y</term>
 	///        <description>
 	///           Pastes the content of the kill ring into the current position.

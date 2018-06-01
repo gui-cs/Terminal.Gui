@@ -438,6 +438,7 @@ namespace Terminal.Gui {
 	///   call Application.Run on the resulting instance.   This will run the dialog modally,
 	///   and when this returns, the FileName property will contain the selected value or 
 	///   null if the user canceled. 
+	/// </para>
 	/// </remarks>
 	public class SaveDialog : FileDialog {
 		public SaveDialog (ustring title, ustring message) : base (title, prompt: "Save", nameFieldLabel: "Save as:", message: message)
