@@ -510,6 +510,8 @@ namespace Terminal.Gui {
 			case WindowsConsole.EventType.Key:
 				if (inputEvent.KeyEvent.bKeyDown == false)
 					return;
+				if (inputEvent.KeyEvent.UnicodeChar == 0)
+					return;
 				var map = MapKey (ToConsoleKeyInfo (inputEvent.KeyEvent));
 				if (map == (Key)0xffffffff)
 					return;
@@ -662,9 +664,8 @@ namespace Terminal.Gui {
 				var delta = key - ConsoleKey.D0;
 				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
 					return (Key)(((uint)Key.AltMask) | ((uint)'0' + delta));
-				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
-					return (Key)((uint)keyInfo.KeyChar);
-				return (Key)((uint)'0' + delta);
+				
+				return (Key)((uint)keyInfo.KeyChar);
 			}
 			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
 				var delta = key - ConsoleKey.F1;
