@@ -73,6 +73,7 @@ items:
   - Terminal.Gui.Button
   - Terminal.Gui.CheckBox
   - Terminal.Gui.FrameView
+  - Terminal.Gui.HexView
   - Terminal.Gui.Label
   - Terminal.Gui.ListView
   - Terminal.Gui.MenuBar

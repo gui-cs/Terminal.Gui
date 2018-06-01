@@ -72,7 +72,8 @@
   
   <h1 id="Terminal_Gui_TextView" data-uid="Terminal.Gui.TextView">Class TextView
   </h1>
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>Multi-line text editing view</p>
+</div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
@@ -225,6 +226,46 @@
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class TextView : Terminal.Gui.View</code></pre>
   </div>
+  <h5 id="Terminal_Gui_TextView_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks"><p><p>
+                The text view provides a multi-line text view.   Users interact
+                with it with the standard Emacs commands for movement or the arrow
+                keys. 
+              </p>
+    <table><thead><tr><th>Shortcut</th><th>Action performed</th></tr></thead><tbody><tr><td>Left cursor, Control-b</td><td>
+                     Moves the editing point left.
+                   </td></tr><tr><td>Right cursor, Control-f</td><td>
+                     Moves the editing point right.
+                   </td></tr><tr><td>Alt-b</td><td>
+                     Moves one word back.
+                   </td></tr><tr><td>Alt-f</td><td>
+                     Moves one word forward.
+                   </td></tr><tr><td>Up cursor, Control-p</td><td>
+                     Moves the editing point one line up.
+                   </td></tr><tr><td>Down cursor, Control-n</td><td>
+                     Moves the editing point one line down
+                   </td></tr><tr><td>Home key, Control-a</td><td>
+                     Moves the cursor to the beginning of the line.
+                   </td></tr><tr><td>End key, Control-e</td><td>
+                     Moves the cursor to the end of the line.
+                   </td></tr><tr><td>Delete, Control-d</td><td>
+                     Deletes the character in front of the cursor.
+                   </td></tr><tr><td>Backspace</td><td>
+                     Deletes the character behind the cursor.
+                   </td></tr><tr><td>Control-k</td><td>
+                     Deletes the text until the end of the line and replaces the kill buffer
+                     with the deleted text.   You can paste this text in a different place by
+                     using Control-y.
+                   </td></tr><tr><td>Control-y</td><td>
+                      Pastes the content of the kill ring into the current position.
+                   </td></tr><tr><td>Alt-d</td><td>
+                      Deletes the word above the cursor and adds it to the kill ring.  You 
+                      can paste the contents of the kill ring with Control-y.
+                   </td></tr><tr><td>Control-q</td><td>
+                     Quotes the next input character, to prevent the normal processing of
+                     key handling to take place.
+                   </td></tr></tbody></table></p>
+</div>
   <h3 id="constructors">Constructors
   </h3>
   

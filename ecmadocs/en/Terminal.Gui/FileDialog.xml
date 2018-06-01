@@ -10,7 +10,9 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
+    <summary>
+            Base class for the OpenDialog and the SaveDialog
+            </summary>
     <remarks>To be added.</remarks>
   </Docs>
   <Members>
@@ -198,6 +200,22 @@
             Gets or sets the prompt label for the button displayed to the user
             </summary>
         <value>The prompt.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="WillPresent">
+      <MemberSignature Language="C#" Value="public override void WillPresent ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void WillPresent() cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters />
+      <Docs>
+        <summary>To be added.</summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

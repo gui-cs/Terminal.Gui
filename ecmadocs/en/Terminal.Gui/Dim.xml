@@ -173,6 +173,28 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="Sized">
+      <MemberSignature Language="C#" Value="public static Terminal.Gui.Dim Sized (int n);" />
+      <MemberSignature Language="ILAsm" Value=".method public static hidebysig class Terminal.Gui.Dim Sized(int32 n) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.Dim</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="n" Type="System.Int32" />
+      </Parameters>
+      <Docs>
+        <param name="n">The value to convert to the pos.</param>
+        <summary>
+            Creates an Absolute Pos from the specified integer value.
+            </summary>
+        <returns>The Absolute Pos.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="Width">
       <MemberSignature Language="C#" Value="public static Terminal.Gui.Dim Width (Terminal.Gui.View view);" />
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig class Terminal.Gui.Dim Width(class Terminal.Gui.View view) cil managed" />

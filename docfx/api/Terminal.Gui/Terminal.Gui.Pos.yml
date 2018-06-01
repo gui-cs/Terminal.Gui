@@ -5,6 +5,7 @@ items:
   children:
   - Terminal.Gui.Pos.#ctor
   - Terminal.Gui.Pos.AnchorEnd(System.Int32)
+  - Terminal.Gui.Pos.At(System.Int32)
   - Terminal.Gui.Pos.Bottom(Terminal.Gui.View)
   - Terminal.Gui.Pos.Center
   - Terminal.Gui.Pos.Left(Terminal.Gui.View)
@@ -87,6 +88,30 @@ items:
       type: Terminal.Gui.Pos
       description: The Pos object anchored to the end (the bottom or the right side).
   overload: Terminal.Gui.Pos.AnchorEnd*
+  exceptions: []
+- uid: Terminal.Gui.Pos.At(System.Int32)
+  id: At(System.Int32)
+  parent: Terminal.Gui.Pos
+  langs:
+  - csharp
+  name: At(Int32)
+  nameWithType: Pos.At(Int32)
+  fullName: Pos.At(Int32)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates an Absolute Pos from the specified integer value.
+  syntax:
+    content: public static Terminal.Gui.Pos At (int n);
+    parameters:
+    - id: n
+      type: System.Int32
+      description: The value to convert to the pos.
+    return:
+      type: Terminal.Gui.Pos
+      description: The Absolute Pos.
+  overload: Terminal.Gui.Pos.At*
   exceptions: []
 - uid: Terminal.Gui.Pos.Bottom(Terminal.Gui.View)
   id: Bottom(Terminal.Gui.View)
@@ -386,6 +411,12 @@ references:
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
+- uid: Terminal.Gui.Pos.At(System.Int32)
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: At(Int32)
+  nameWithType: Pos.At(Int32)
+  fullName: Pos.At(Int32)
 - uid: Terminal.Gui.Pos.Bottom(Terminal.Gui.View)
   parent: Terminal.Gui.Pos
   isExternal: false
@@ -476,6 +507,12 @@ references:
   name: AnchorEnd
   nameWithType: Pos.AnchorEnd
   fullName: Pos.AnchorEnd
+- uid: Terminal.Gui.Pos.At*
+  parent: Terminal.Gui.Pos
+  isExternal: false
+  name: At
+  nameWithType: Pos.At
+  fullName: Pos.At
 - uid: Terminal.Gui.Pos.Bottom*
   parent: Terminal.Gui.Pos
   isExternal: false

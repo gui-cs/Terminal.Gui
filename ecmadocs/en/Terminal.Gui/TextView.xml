@@ -10,8 +10,110 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>
+              Multi-line text editing view
+            </summary>
+    <remarks>
+      <para>
+                The text view provides a multi-line text view.   Users interact
+                with it with the standard Emacs commands for movement or the arrow
+                keys. 
+              </para>
+      <list type="table">
+        <listheader>
+          <term>Shortcut</term>
+          <description>Action performed</description>
+        </listheader>
+        <item>
+          <term>Left cursor, Control-b</term>
+          <description>
+                     Moves the editing point left.
+                   </description>
+        </item>
+        <item>
+          <term>Right cursor, Control-f</term>
+          <description>
+                     Moves the editing point right.
+                   </description>
+        </item>
+        <item>
+          <term>Alt-b</term>
+          <description>
+                     Moves one word back.
+                   </description>
+        </item>
+        <item>
+          <term>Alt-f</term>
+          <description>
+                     Moves one word forward.
+                   </description>
+        </item>
+        <item>
+          <term>Up cursor, Control-p</term>
+          <description>
+                     Moves the editing point one line up.
+                   </description>
+        </item>
+        <item>
+          <term>Down cursor, Control-n</term>
+          <description>
+                     Moves the editing point one line down
+                   </description>
+        </item>
+        <item>
+          <term>Home key, Control-a</term>
+          <description>
+                     Moves the cursor to the beginning of the line.
+                   </description>
+        </item>
+        <item>
+          <term>End key, Control-e</term>
+          <description>
+                     Moves the cursor to the end of the line.
+                   </description>
+        </item>
+        <item>
+          <term>Delete, Control-d</term>
+          <description>
+                     Deletes the character in front of the cursor.
+                   </description>
+        </item>
+        <item>
+          <term>Backspace</term>
+          <description>
+                     Deletes the character behind the cursor.
+                   </description>
+        </item>
+        <item>
+          <term>Control-k</term>
+          <description>
+                     Deletes the text until the end of the line and replaces the kill buffer
+                     with the deleted text.   You can paste this text in a different place by
+                     using Control-y.
+                   </description>
+        </item>
+        <item>
+          <term>Control-y</term>
+          <description>
+                      Pastes the content of the kill ring into the current position.
+                   </description>
+        </item>
+        <item>
+          <term>Alt-d</term>
+          <description>
+                      Deletes the word above the cursor and adds it to the kill ring.  You 
+                      can paste the contents of the kill ring with Control-y.
+                   </description>
+        </item>
+        <item>
+          <term>Control-q</term>
+          <description>
+                     Quotes the next input character, to prevent the normal processing of
+                     key handling to take place.
+                   </description>
+        </item>
+      </list>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">

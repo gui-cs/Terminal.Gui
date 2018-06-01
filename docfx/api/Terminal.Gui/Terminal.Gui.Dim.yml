@@ -10,6 +10,7 @@ items:
   - Terminal.Gui.Dim.op_Implicit(System.Int32 to Terminal.Gui.Dim)
   - Terminal.Gui.Dim.op_Subtraction(Terminal.Gui.Dim,Terminal.Gui.Dim)
   - Terminal.Gui.Dim.Percent(System.Single)
+  - Terminal.Gui.Dim.Sized(System.Int32)
   - Terminal.Gui.Dim.Width(Terminal.Gui.View)
   langs:
   - csharp
@@ -203,6 +204,30 @@ items:
       description: The percent Dim object.
   overload: Terminal.Gui.Dim.Percent*
   exceptions: []
+- uid: Terminal.Gui.Dim.Sized(System.Int32)
+  id: Sized(System.Int32)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  name: Sized(Int32)
+  nameWithType: Dim.Sized(Int32)
+  fullName: Dim.Sized(Int32)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates an Absolute Pos from the specified integer value.
+  syntax:
+    content: public static Terminal.Gui.Dim Sized (int n);
+    parameters:
+    - id: n
+      type: System.Int32
+      description: The value to convert to the pos.
+    return:
+      type: Terminal.Gui.Dim
+      description: The Absolute Pos.
+  overload: Terminal.Gui.Dim.Sized*
+  exceptions: []
 - uid: Terminal.Gui.Dim.Width(Terminal.Gui.View)
   id: Width(Terminal.Gui.View)
   parent: Terminal.Gui.Dim
@@ -300,6 +325,12 @@ references:
   name: Single
   nameWithType: Single
   fullName: System.Single
+- uid: Terminal.Gui.Dim.Sized(System.Int32)
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: Sized(Int32)
+  nameWithType: Dim.Sized(Int32)
+  fullName: Dim.Sized(Int32)
 - uid: Terminal.Gui.Dim.Width(Terminal.Gui.View)
   parent: Terminal.Gui.Dim
   isExternal: false
@@ -348,6 +379,12 @@ references:
   name: Percent
   nameWithType: Dim.Percent
   fullName: Dim.Percent
+- uid: Terminal.Gui.Dim.Sized*
+  parent: Terminal.Gui.Dim
+  isExternal: false
+  name: Sized
+  nameWithType: Dim.Sized
+  fullName: Dim.Sized
 - uid: Terminal.Gui.Dim.Width*
   parent: Terminal.Gui.Dim
   isExternal: false

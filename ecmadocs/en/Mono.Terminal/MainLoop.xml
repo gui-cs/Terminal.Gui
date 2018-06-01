@@ -24,9 +24,6 @@
       <MemberSignature Language="C#" Value="public MainLoop ();" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor() cil managed" />
       <MemberType>Constructor</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
       <Parameters />
       <Docs>
         <summary>
@@ -36,18 +33,21 @@
       </Docs>
     </Member>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public MainLoop (bool useUnix);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(bool useUnix) cil managed" />
+      <MemberSignature Language="C#" Value="public MainLoop (Mono.Terminal.IMainLoopDriver driver);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class Mono.Terminal.IMainLoopDriver driver) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
-        <Parameter Name="useUnix" Type="System.Boolean" />
+        <Parameter Name="driver" Type="Mono.Terminal.IMainLoopDriver" />
       </Parameters>
       <Docs>
-        <param name="useUnix">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="driver">To be added.</param>
+        <summary>
+             Creates a new Mainloop, to run it you must provide a driver, and choose
+             one of the implementations UnixMainLoop, NetMainLoop or WindowsMainLoop.
+            </summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -108,9 +108,6 @@
       <MemberSignature Language="C#" Value="public object AddWatch (int fileDescriptor, Mono.Terminal.MainLoop.Condition condition, Func&lt;Mono.Terminal.MainLoop,bool&gt; callback);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance object AddWatch(int32 fileDescriptor, valuetype Mono.Terminal.MainLoop/Condition condition, class System.Func`2&lt;class Mono.Terminal.MainLoop, bool&gt; callback) cil managed" />
       <MemberType>Method</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Object</ReturnType>
       </ReturnValue>
@@ -135,6 +132,24 @@
               The return value is a token that represents this watch, you can
               use this token to remove the watch by calling RemoveWatch.
              </remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Driver">
+      <MemberSignature Language="C#" Value="public Mono.Terminal.IMainLoopDriver Driver { get; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class Mono.Terminal.IMainLoopDriver Driver" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Mono.Terminal.IMainLoopDriver</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            The current IMainLoopDriver in use.
+            </summary>
+        <value>The driver.</value>
+        <remarks>To be added.</remarks>
       </Docs>
     </Member>
     <Member MemberName="EventsPending">
@@ -255,9 +270,6 @@
       <MemberSignature Language="C#" Value="public void RemoveWatch (object token);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void RemoveWatch(object token) cil managed" />
       <MemberType>Method</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
       </ReturnValue>
@@ -314,9 +326,6 @@
       <MemberSignature Language="C#" Value="public Action&lt;ConsoleKeyInfo&gt; WindowsKeyPressed;" />
       <MemberSignature Language="ILAsm" Value=".field public class System.Action`1&lt;valuetype System.ConsoleKeyInfo&gt; WindowsKeyPressed" />
       <MemberType>Field</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Action&lt;System.ConsoleKeyInfo&gt;</ReturnType>
       </ReturnValue>

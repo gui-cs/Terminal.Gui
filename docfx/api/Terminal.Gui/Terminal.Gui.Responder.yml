@@ -19,6 +19,7 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Responder base class implemented by objects that want to participate on keyboard and mouse input.
   syntax:
     content: public class Responder
   inheritance:
@@ -56,11 +57,12 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Gets or sets a value indicating whether this <xref href="Terminal.Gui.Responder"></xref> can focus.
   syntax:
     content: public virtual bool CanFocus { get; set; }
     return:
       type: System.Boolean
-      description: To be added.
+      description: <code>true</code> if can focus; otherwise, <code>false</code>.
   overload: Terminal.Gui.Responder.CanFocus*
   exceptions: []
 - uid: Terminal.Gui.Responder.HasFocus
@@ -75,11 +77,12 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Gets or sets a value indicating whether this <xref href="Terminal.Gui.Responder"></xref> has focus.
   syntax:
     content: public virtual bool HasFocus { get; }
     return:
       type: System.Boolean
-      description: To be added.
+      description: <code>true</code> if has focus; otherwise, <code>false</code>.
   overload: Terminal.Gui.Responder.HasFocus*
   exceptions: []
 - uid: Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)

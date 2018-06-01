@@ -39,6 +39,7 @@ items:
   - Terminal.Gui.Toplevel.Create
   - Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.Toplevel.Running
+  - Terminal.Gui.Toplevel.WillPresent
   - Terminal.Gui.View.Add(Terminal.Gui.View[])
   - Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
   - Terminal.Gui.View.Bounds
@@ -737,6 +738,12 @@ references:
   name: Running
   nameWithType: Toplevel.Running
   fullName: Toplevel.Running
+- uid: Terminal.Gui.Toplevel.WillPresent
+  parent: Terminal.Gui.Toplevel
+  isExternal: false
+  name: WillPresent()
+  nameWithType: Toplevel.WillPresent()
+  fullName: Toplevel.WillPresent()
 - uid: System.Collections.IEnumerable
   parent: System.Collections
   isExternal: true

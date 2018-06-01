@@ -4,6 +4,7 @@ items:
   id: SaveDialog
   children:
   - Terminal.Gui.SaveDialog.#ctor(NStack.ustring,NStack.ustring)
+  - Terminal.Gui.SaveDialog.FileName
   langs:
   - csharp
   name: SaveDialog
@@ -13,6 +14,8 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: "The save dialog provides an interactive dialog box for users to pick a file to \n             save."
+  remarks: "<p>\n              To use it, create an instance of the SaveDialog, and then\n              call Application.Run on the resulting instance.   This will run the dialog modally,\n              and when this returns, the FileName property will contain the selected value or \n              null if the user canceled. \n            </p>"
   syntax:
     content: 'public class SaveDialog : Terminal.Gui.FileDialog'
   inheritance:
@@ -37,6 +40,7 @@ items:
   - Terminal.Gui.FileDialog.Message
   - Terminal.Gui.FileDialog.NameFieldLabel
   - Terminal.Gui.FileDialog.Prompt
+  - Terminal.Gui.FileDialog.WillPresent
   - Terminal.Gui.Toplevel.CanFocus
   - Terminal.Gui.Toplevel.Create
   - Terminal.Gui.Toplevel.Running
@@ -111,6 +115,28 @@ items:
       description: To be added.
   overload: Terminal.Gui.SaveDialog.#ctor*
   exceptions: []
+- uid: Terminal.Gui.SaveDialog.FileName
+  id: FileName
+  parent: Terminal.Gui.SaveDialog
+  langs:
+  - csharp
+  name: FileName
+  nameWithType: SaveDialog.FileName
+  fullName: SaveDialog.FileName
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets the name of the file the user selected for saving, or null
+                if the user canceled the dialog box.
+  syntax:
+    content: public NStack.ustring FileName { get; }
+    return:
+      type: NStack.ustring
+      description: The name of the file.
+  overload: Terminal.Gui.SaveDialog.FileName*
+  exceptions: []
 references:
 - uid: Terminal.Gui.FileDialog
   parent: Terminal.Gui
@@ -130,12 +156,24 @@ references:
   name: ustring
   nameWithType: ustring
   fullName: NStack.ustring
+- uid: Terminal.Gui.SaveDialog.FileName
+  parent: Terminal.Gui.SaveDialog
+  isExternal: false
+  name: FileName
+  nameWithType: SaveDialog.FileName
+  fullName: SaveDialog.FileName
 - uid: Terminal.Gui.SaveDialog.#ctor*
   parent: Terminal.Gui.SaveDialog
   isExternal: false
   name: SaveDialog
   nameWithType: SaveDialog.SaveDialog
   fullName: SaveDialog.SaveDialog
+- uid: Terminal.Gui.SaveDialog.FileName*
+  parent: Terminal.Gui.SaveDialog
+  isExternal: false
+  name: FileName
+  nameWithType: SaveDialog.FileName
+  fullName: SaveDialog.FileName
 - uid: Terminal.Gui.Toplevel.CanFocus
   parent: Terminal.Gui.Toplevel
   isExternal: false
@@ -448,6 +486,12 @@ references:
   name: Running
   nameWithType: Toplevel.Running
   fullName: Toplevel.Running
+- uid: Terminal.Gui.FileDialog.WillPresent
+  parent: Terminal.Gui.FileDialog
+  isExternal: false
+  name: WillPresent()
+  nameWithType: FileDialog.WillPresent()
+  fullName: FileDialog.WillPresent()
 - uid: Terminal.Gui.Window.Title
   parent: Terminal.Gui.Window
   isExternal: false

@@ -4,6 +4,7 @@ items:
   id: TextField
   children:
   - Terminal.Gui.TextField.#ctor(NStack.ustring)
+  - Terminal.Gui.TextField.#ctor(System.String)
   - Terminal.Gui.TextField.#ctor(System.Int32,System.Int32,System.Int32,NStack.ustring)
   - Terminal.Gui.TextField.CanFocus
   - Terminal.Gui.TextField.Changed
@@ -98,6 +99,27 @@ items:
     parameters:
     - id: text
       type: NStack.ustring
+      description: Initial text contents.
+  overload: Terminal.Gui.TextField.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.TextField.#ctor(System.String)
+  id: '#ctor(System.String)'
+  parent: Terminal.Gui.TextField
+  langs:
+  - csharp
+  name: TextField(String)
+  nameWithType: TextField.TextField(String)
+  fullName: TextField.TextField(String)
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Public constructor that creates a text field, with layout controlled with X, Y, Width and Height.
+  syntax:
+    content: public TextField (string text);
+    parameters:
+    - id: text
+      type: System.String
       description: Initial text contents.
   overload: Terminal.Gui.TextField.#ctor*
   exceptions: []
@@ -355,6 +377,18 @@ references:
   name: ustring
   nameWithType: ustring
   fullName: NStack.ustring
+- uid: Terminal.Gui.TextField.#ctor(System.String)
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: TextField(String)
+  nameWithType: TextField.TextField(String)
+  fullName: TextField.TextField(String)
+- uid: System.String
+  parent: System
+  isExternal: true
+  name: String
+  nameWithType: String
+  fullName: System.String
 - uid: Terminal.Gui.TextField.#ctor(System.Int32,System.Int32,System.Int32,NStack.ustring)
   parent: Terminal.Gui.TextField
   isExternal: false

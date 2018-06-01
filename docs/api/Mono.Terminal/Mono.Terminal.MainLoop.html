@@ -107,12 +107,14 @@
   
   
   <a id="Mono_Terminal_MainLoop__ctor_" data-uid="Mono.Terminal.MainLoop.#ctor*"></a>
-  <h4 id="Mono_Terminal_MainLoop__ctor_System_Boolean_" data-uid="Mono.Terminal.MainLoop.#ctor(System.Boolean)">MainLoop(Boolean)</h4>
-  <div class="markdown level1 summary"></div>
+  <h4 id="Mono_Terminal_MainLoop__ctor_Mono_Terminal_IMainLoopDriver_" data-uid="Mono.Terminal.MainLoop.#ctor(Mono.Terminal.IMainLoopDriver)">MainLoop(IMainLoopDriver)</h4>
+  <div class="markdown level1 summary"><p>Creates a new Mainloop, to run it you must provide a driver, and choose
+             one of the implementations UnixMainLoop, NetMainLoop or WindowsMainLoop.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MainLoop (bool useUnix);</code></pre>
+    <pre><code class="lang-csharp hljs">public MainLoop (Mono.Terminal.IMainLoopDriver driver);</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -125,8 +127,8 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">useUnix</span></td>
+        <td><a class="xref" href="Mono.Terminal.IMainLoopDriver.html">IMainLoopDriver</a></td>
+        <td><span class="parametername">driver</span></td>
         <td><p>To be added.</p>
 </td>
       </tr>
@@ -156,6 +158,35 @@
       <tr>
         <td><span class="xref">System.Action</span>&lt;<span class="xref">System.ConsoleKeyInfo</span>&gt;</td>
         <td><p>To be added.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Mono_Terminal_MainLoop_Driver_" data-uid="Mono.Terminal.MainLoop.Driver*"></a>
+  <h4 id="Mono_Terminal_MainLoop_Driver" data-uid="Mono.Terminal.MainLoop.Driver">Driver</h4>
+  <div class="markdown level1 summary"><p>The current IMainLoopDriver in use.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Mono.Terminal.IMainLoopDriver Driver { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Mono.Terminal.IMainLoopDriver.html">IMainLoopDriver</a></td>
+        <td><p>The driver.</p>
 </td>
       </tr>
     </tbody>

@@ -4,10 +4,11 @@ items:
   id: MainLoop
   children:
   - Mono.Terminal.MainLoop.#ctor
-  - Mono.Terminal.MainLoop.#ctor(System.Boolean)
+  - Mono.Terminal.MainLoop.#ctor(Mono.Terminal.IMainLoopDriver)
   - Mono.Terminal.MainLoop.AddIdle(System.Func{System.Boolean})
   - Mono.Terminal.MainLoop.AddTimeout(System.TimeSpan,System.Func{Mono.Terminal.MainLoop,System.Boolean})
   - Mono.Terminal.MainLoop.AddWatch(System.Int32,Mono.Terminal.MainLoop.Condition,System.Func{Mono.Terminal.MainLoop,System.Boolean})
+  - Mono.Terminal.MainLoop.Driver
   - Mono.Terminal.MainLoop.EventsPending(System.Boolean)
   - Mono.Terminal.MainLoop.Invoke(System.Action)
   - Mono.Terminal.MainLoop.MainIteration
@@ -47,8 +48,7 @@ items:
   nameWithType: MainLoop.MainLoop()
   fullName: MainLoop.MainLoop()
   type: Constructor
-  assemblies:
-  - Terminal.Gui
+  assemblies: []
   namespace: Mono.Terminal
   summary: Default constructor
   syntax:
@@ -56,23 +56,26 @@ items:
     parameters: []
   overload: Mono.Terminal.MainLoop.#ctor*
   exceptions: []
-- uid: Mono.Terminal.MainLoop.#ctor(System.Boolean)
-  id: '#ctor(System.Boolean)'
+- uid: Mono.Terminal.MainLoop.#ctor(Mono.Terminal.IMainLoopDriver)
+  id: '#ctor(Mono.Terminal.IMainLoopDriver)'
   parent: Mono.Terminal.MainLoop
   langs:
   - csharp
-  name: MainLoop(Boolean)
-  nameWithType: MainLoop.MainLoop(Boolean)
-  fullName: MainLoop.MainLoop(Boolean)
+  name: MainLoop(IMainLoopDriver)
+  nameWithType: MainLoop.MainLoop(IMainLoopDriver)
+  fullName: MainLoop.MainLoop(IMainLoopDriver)
   type: Constructor
   assemblies:
   - Terminal.Gui
   namespace: Mono.Terminal
+  summary: >-
+    Creates a new Mainloop, to run it you must provide a driver, and choose
+                 one of the implementations UnixMainLoop, NetMainLoop or WindowsMainLoop.
   syntax:
-    content: public MainLoop (bool useUnix);
+    content: public MainLoop (Mono.Terminal.IMainLoopDriver driver);
     parameters:
-    - id: useUnix
-      type: System.Boolean
+    - id: driver
+      type: Mono.Terminal.IMainLoopDriver
       description: To be added.
   overload: Mono.Terminal.MainLoop.#ctor*
   exceptions: []
@@ -137,8 +140,7 @@ items:
   nameWithType: MainLoop.AddWatch(Int32, MainLoop+Condition, Func<MainLoop,Boolean>)
   fullName: MainLoop.AddWatch(Int32, MainLoop+Condition, Func<MainLoop,Boolean>)
   type: Method
-  assemblies:
-  - Terminal.Gui
+  assemblies: []
   namespace: Mono.Terminal
   summary: Watches a file descriptor for activity.
   remarks: "When the condition is met, the provided callback\n              is invoked.  If the callback returns false, the\n              watch is automatically removed.\n            \n              The return value is a token that represents this watch, you can\n              use this token to remove the watch by calling RemoveWatch."
@@ -158,6 +160,26 @@ items:
       type: System.Object
       description: To be added.
   overload: Mono.Terminal.MainLoop.AddWatch*
+  exceptions: []
+- uid: Mono.Terminal.MainLoop.Driver
+  id: Driver
+  parent: Mono.Terminal.MainLoop
+  langs:
+  - csharp
+  name: Driver
+  nameWithType: MainLoop.Driver
+  fullName: MainLoop.Driver
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Mono.Terminal
+  summary: The current IMainLoopDriver in use.
+  syntax:
+    content: public Mono.Terminal.IMainLoopDriver Driver { get; }
+    return:
+      type: Mono.Terminal.IMainLoopDriver
+      description: The driver.
+  overload: Mono.Terminal.MainLoop.Driver*
   exceptions: []
 - uid: Mono.Terminal.MainLoop.EventsPending(System.Boolean)
   id: EventsPending(System.Boolean)
@@ -279,8 +301,7 @@ items:
   nameWithType: MainLoop.RemoveWatch(Object)
   fullName: MainLoop.RemoveWatch(Object)
   type: Method
-  assemblies:
-  - Terminal.Gui
+  assemblies: []
   namespace: Mono.Terminal
   summary: Removes an active watch from the mainloop.
   remarks: The token parameter is the value returned from AddWatch
@@ -337,8 +358,7 @@ items:
   nameWithType: MainLoop.WindowsKeyPressed
   fullName: MainLoop.WindowsKeyPressed
   type: Field
-  assemblies:
-  - Terminal.Gui
+  assemblies: []
   namespace: Mono.Terminal
   summary: This event is raised when a key is pressed when using the Windows driver.
   syntax:
@@ -360,18 +380,18 @@ references:
   name: MainLoop()
   nameWithType: MainLoop.MainLoop()
   fullName: MainLoop.MainLoop()
-- uid: Mono.Terminal.MainLoop.#ctor(System.Boolean)
+- uid: Mono.Terminal.MainLoop.#ctor(Mono.Terminal.IMainLoopDriver)
   parent: Mono.Terminal.MainLoop
   isExternal: false
-  name: MainLoop(Boolean)
-  nameWithType: MainLoop.MainLoop(Boolean)
-  fullName: MainLoop.MainLoop(Boolean)
-- uid: System.Boolean
-  parent: System
-  isExternal: true
-  name: Boolean
-  nameWithType: Boolean
-  fullName: System.Boolean
+  name: MainLoop(IMainLoopDriver)
+  nameWithType: MainLoop.MainLoop(IMainLoopDriver)
+  fullName: MainLoop.MainLoop(IMainLoopDriver)
+- uid: Mono.Terminal.IMainLoopDriver
+  parent: Mono.Terminal
+  isExternal: false
+  name: IMainLoopDriver
+  nameWithType: IMainLoopDriver
+  fullName: Mono.Terminal.IMainLoopDriver
 - uid: Mono.Terminal.MainLoop.AddIdle(System.Func{System.Boolean})
   parent: Mono.Terminal.MainLoop
   isExternal: false
@@ -382,6 +402,10 @@ references:
   name: Func
   nameWithType: Func
   fullName: System.Func
+- uid: System.Boolean
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
 - uid: System.Func{System.Boolean}
   parent: System
   isExternal: true
@@ -463,6 +487,12 @@ references:
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
+- uid: Mono.Terminal.MainLoop.Driver
+  parent: Mono.Terminal.MainLoop
+  isExternal: false
+  name: Driver
+  nameWithType: MainLoop.Driver
+  fullName: MainLoop.Driver
 - uid: Mono.Terminal.MainLoop.EventsPending(System.Boolean)
   parent: Mono.Terminal.MainLoop
   isExternal: false
@@ -576,6 +606,12 @@ references:
   name: AddWatch
   nameWithType: MainLoop.AddWatch
   fullName: MainLoop.AddWatch
+- uid: Mono.Terminal.MainLoop.Driver*
+  parent: Mono.Terminal.MainLoop
+  isExternal: false
+  name: Driver
+  nameWithType: MainLoop.Driver
+  fullName: MainLoop.Driver
 - uid: Mono.Terminal.MainLoop.EventsPending*
   parent: Mono.Terminal.MainLoop
   isExternal: false

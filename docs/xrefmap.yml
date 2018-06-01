@@ -6,6 +6,51 @@ references:
   href: api/Mono.Terminal.html
   fullName: Mono.Terminal
   nameWithType: Mono.Terminal
+- uid: Mono.Terminal.IMainLoopDriver
+  name: IMainLoopDriver
+  href: api/Mono.Terminal/Mono.Terminal.IMainLoopDriver.html
+  fullName: Mono.Terminal.IMainLoopDriver
+  nameWithType: IMainLoopDriver
+- uid: Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
+  name: EventsPending(Boolean)
+  href: api/Mono.Terminal/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_EventsPending_System_Boolean_
+  fullName: IMainLoopDriver.EventsPending(Boolean)
+  nameWithType: IMainLoopDriver.EventsPending(Boolean)
+- uid: Mono.Terminal.IMainLoopDriver.EventsPending*
+  name: EventsPending
+  href: api/Mono.Terminal/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_EventsPending_
+  fullName: IMainLoopDriver.EventsPending
+  nameWithType: IMainLoopDriver.EventsPending
+- uid: Mono.Terminal.IMainLoopDriver.MainIteration
+  name: MainIteration()
+  href: api/Mono.Terminal/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_MainIteration
+  fullName: IMainLoopDriver.MainIteration()
+  nameWithType: IMainLoopDriver.MainIteration()
+- uid: Mono.Terminal.IMainLoopDriver.MainIteration*
+  name: MainIteration
+  href: api/Mono.Terminal/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_MainIteration_
+  fullName: IMainLoopDriver.MainIteration
+  nameWithType: IMainLoopDriver.MainIteration
+- uid: Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
+  name: Setup(MainLoop)
+  href: api/Mono.Terminal/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_Setup_Mono_Terminal_MainLoop_
+  fullName: IMainLoopDriver.Setup(MainLoop)
+  nameWithType: IMainLoopDriver.Setup(MainLoop)
+- uid: Mono.Terminal.IMainLoopDriver.Setup*
+  name: Setup
+  href: api/Mono.Terminal/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_Setup_
+  fullName: IMainLoopDriver.Setup
+  nameWithType: IMainLoopDriver.Setup
+- uid: Mono.Terminal.IMainLoopDriver.Wakeup
+  name: Wakeup()
+  href: api/Mono.Terminal/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_Wakeup
+  fullName: IMainLoopDriver.Wakeup()
+  nameWithType: IMainLoopDriver.Wakeup()
+- uid: Mono.Terminal.IMainLoopDriver.Wakeup*
+  name: Wakeup
+  href: api/Mono.Terminal/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_Wakeup_
+  fullName: IMainLoopDriver.Wakeup
+  nameWithType: IMainLoopDriver.Wakeup
 - uid: Mono.Terminal.MainLoop
   name: MainLoop
   href: api/Mono.Terminal/Mono.Terminal.MainLoop.html
@@ -16,11 +61,11 @@ references:
   href: api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop__ctor
   fullName: MainLoop.MainLoop()
   nameWithType: MainLoop.MainLoop()
-- uid: Mono.Terminal.MainLoop.#ctor(System.Boolean)
-  name: MainLoop(Boolean)
-  href: api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop__ctor_System_Boolean_
-  fullName: MainLoop.MainLoop(Boolean)
-  nameWithType: MainLoop.MainLoop(Boolean)
+- uid: Mono.Terminal.MainLoop.#ctor(Mono.Terminal.IMainLoopDriver)
+  name: MainLoop(IMainLoopDriver)
+  href: api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop__ctor_Mono_Terminal_IMainLoopDriver_
+  fullName: MainLoop.MainLoop(IMainLoopDriver)
+  nameWithType: MainLoop.MainLoop(IMainLoopDriver)
 - uid: Mono.Terminal.MainLoop.#ctor*
   name: MainLoop
   href: api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop__ctor_
@@ -91,6 +136,16 @@ references:
   href: api/Mono.Terminal/Mono.Terminal.MainLoop.Condition.html#Mono_Terminal_MainLoop_Condition_PollPri
   fullName: MainLoop.Condition.PollPri
   nameWithType: MainLoop.Condition.PollPri
+- uid: Mono.Terminal.MainLoop.Driver
+  name: Driver
+  href: api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_Driver
+  fullName: MainLoop.Driver
+  nameWithType: MainLoop.Driver
+- uid: Mono.Terminal.MainLoop.Driver*
+  name: Driver
+  href: api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_Driver_
+  fullName: MainLoop.Driver
+  nameWithType: MainLoop.Driver
 - uid: Mono.Terminal.MainLoop.EventsPending(System.Boolean)
   name: EventsPending(Boolean)
   href: api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_EventsPending_System_Boolean_
@@ -176,6 +231,116 @@ references:
   href: api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_WindowsKeyPressed
   fullName: MainLoop.WindowsKeyPressed
   nameWithType: MainLoop.WindowsKeyPressed
+- uid: Mono.Terminal.UnixMainLoop
+  name: UnixMainLoop
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html
+  fullName: Mono.Terminal.UnixMainLoop
+  nameWithType: UnixMainLoop
+- uid: Mono.Terminal.UnixMainLoop.#ctor
+  name: UnixMainLoop()
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop__ctor
+  fullName: UnixMainLoop.UnixMainLoop()
+  nameWithType: UnixMainLoop.UnixMainLoop()
+- uid: Mono.Terminal.UnixMainLoop.#ctor*
+  name: UnixMainLoop
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop__ctor_
+  fullName: UnixMainLoop.UnixMainLoop
+  nameWithType: UnixMainLoop.UnixMainLoop
+- uid: Mono.Terminal.UnixMainLoop.AddWatch(System.Int32,Mono.Terminal.UnixMainLoop.Condition,System.Func{Mono.Terminal.MainLoop,System.Boolean})
+  name: AddWatch(Int32, UnixMainLoop+Condition, Func<MainLoop,Boolean>)
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_AddWatch_System_Int32_Mono_Terminal_UnixMainLoop_Condition_System_Func_Mono_Terminal_MainLoop_System_Boolean__
+  fullName: UnixMainLoop.AddWatch(Int32, UnixMainLoop+Condition, Func<MainLoop,Boolean>)
+  nameWithType: UnixMainLoop.AddWatch(Int32, UnixMainLoop+Condition, Func<MainLoop,Boolean>)
+- uid: Mono.Terminal.UnixMainLoop.AddWatch*
+  name: AddWatch
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_AddWatch_
+  fullName: UnixMainLoop.AddWatch
+  nameWithType: UnixMainLoop.AddWatch
+- uid: Mono.Terminal.UnixMainLoop.Condition
+  name: UnixMainLoop.Condition
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.Condition.html
+  fullName: Mono.Terminal.UnixMainLoop.Condition
+  nameWithType: UnixMainLoop.Condition
+- uid: Mono.Terminal.UnixMainLoop.Condition.PollErr
+  name: PollErr
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.Condition.html#Mono_Terminal_UnixMainLoop_Condition_PollErr
+  fullName: UnixMainLoop.Condition.PollErr
+  nameWithType: UnixMainLoop.Condition.PollErr
+- uid: Mono.Terminal.UnixMainLoop.Condition.PollHup
+  name: PollHup
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.Condition.html#Mono_Terminal_UnixMainLoop_Condition_PollHup
+  fullName: UnixMainLoop.Condition.PollHup
+  nameWithType: UnixMainLoop.Condition.PollHup
+- uid: Mono.Terminal.UnixMainLoop.Condition.PollIn
+  name: PollIn
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.Condition.html#Mono_Terminal_UnixMainLoop_Condition_PollIn
+  fullName: UnixMainLoop.Condition.PollIn
+  nameWithType: UnixMainLoop.Condition.PollIn
+- uid: Mono.Terminal.UnixMainLoop.Condition.PollNval
+  name: PollNval
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.Condition.html#Mono_Terminal_UnixMainLoop_Condition_PollNval
+  fullName: UnixMainLoop.Condition.PollNval
+  nameWithType: UnixMainLoop.Condition.PollNval
+- uid: Mono.Terminal.UnixMainLoop.Condition.PollOut
+  name: PollOut
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.Condition.html#Mono_Terminal_UnixMainLoop_Condition_PollOut
+  fullName: UnixMainLoop.Condition.PollOut
+  nameWithType: UnixMainLoop.Condition.PollOut
+- uid: Mono.Terminal.UnixMainLoop.Condition.PollPri
+  name: PollPri
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.Condition.html#Mono_Terminal_UnixMainLoop_Condition_PollPri
+  fullName: UnixMainLoop.Condition.PollPri
+  nameWithType: UnixMainLoop.Condition.PollPri
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending(System.Boolean)
+  name: IMainLoopDriver.EventsPending(Boolean)
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_EventsPending_System_Boolean_
+  fullName: UnixMainLoop.IMainLoopDriver.EventsPending(Boolean)
+  nameWithType: UnixMainLoop.IMainLoopDriver.EventsPending(Boolean)
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending*
+  name: Mono.Terminal.IMainLoopDriver.EventsPending
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_EventsPending_
+  fullName: UnixMainLoop.Mono.Terminal.IMainLoopDriver.EventsPending
+  nameWithType: UnixMainLoop.Mono.Terminal.IMainLoopDriver.EventsPending
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration
+  name: IMainLoopDriver.MainIteration()
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_MainIteration
+  fullName: UnixMainLoop.IMainLoopDriver.MainIteration()
+  nameWithType: UnixMainLoop.IMainLoopDriver.MainIteration()
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration*
+  name: Mono.Terminal.IMainLoopDriver.MainIteration
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_MainIteration_
+  fullName: UnixMainLoop.Mono.Terminal.IMainLoopDriver.MainIteration
+  nameWithType: UnixMainLoop.Mono.Terminal.IMainLoopDriver.MainIteration
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup(Mono.Terminal.MainLoop)
+  name: IMainLoopDriver.Setup(MainLoop)
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_Setup_Mono_Terminal_MainLoop_
+  fullName: UnixMainLoop.IMainLoopDriver.Setup(MainLoop)
+  nameWithType: UnixMainLoop.IMainLoopDriver.Setup(MainLoop)
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup*
+  name: Mono.Terminal.IMainLoopDriver.Setup
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_Setup_
+  fullName: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Setup
+  nameWithType: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Setup
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup
+  name: IMainLoopDriver.Wakeup()
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_Wakeup
+  fullName: UnixMainLoop.IMainLoopDriver.Wakeup()
+  nameWithType: UnixMainLoop.IMainLoopDriver.Wakeup()
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup*
+  name: Mono.Terminal.IMainLoopDriver.Wakeup
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_Wakeup_
+  fullName: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Wakeup
+  nameWithType: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Wakeup
+- uid: Mono.Terminal.UnixMainLoop.RemoveWatch(System.Object)
+  name: RemoveWatch(Object)
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_RemoveWatch_System_Object_
+  fullName: UnixMainLoop.RemoveWatch(Object)
+  nameWithType: UnixMainLoop.RemoveWatch(Object)
+- uid: Mono.Terminal.UnixMainLoop.RemoveWatch*
+  name: RemoveWatch
+  href: api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_RemoveWatch_
+  fullName: UnixMainLoop.RemoveWatch
+  nameWithType: UnixMainLoop.RemoveWatch
 - uid: Terminal
   name: Terminal
   href: api/Terminal.html
@@ -2156,6 +2321,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Percent_
   fullName: Dim.Percent
   nameWithType: Dim.Percent
+- uid: Terminal.Gui.Dim.Sized(System.Int32)
+  name: Sized(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Sized_System_Int32_
+  fullName: Dim.Sized(Int32)
+  nameWithType: Dim.Sized(Int32)
+- uid: Terminal.Gui.Dim.Sized*
+  name: Sized
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Sized_
+  fullName: Dim.Sized
+  nameWithType: Dim.Sized
 - uid: Terminal.Gui.Dim.Width(Terminal.Gui.View)
   name: Width(View)
   href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Width_Terminal_Gui_View_
@@ -2271,6 +2446,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_Prompt_
   fullName: FileDialog.Prompt
   nameWithType: FileDialog.Prompt
+- uid: Terminal.Gui.FileDialog.WillPresent
+  name: WillPresent()
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_WillPresent
+  fullName: FileDialog.WillPresent()
+  nameWithType: FileDialog.WillPresent()
+- uid: Terminal.Gui.FileDialog.WillPresent*
+  name: WillPresent
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_WillPresent_
+  fullName: FileDialog.WillPresent
+  nameWithType: FileDialog.WillPresent
 - uid: Terminal.Gui.FrameView
   name: FrameView
   href: api/Terminal.Gui/Terminal.Gui.FrameView.html
@@ -2331,6 +2516,111 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Title_
   fullName: FrameView.Title
   nameWithType: FrameView.Title
+- uid: Terminal.Gui.HexView
+  name: HexView
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html
+  fullName: Terminal.Gui.HexView
+  nameWithType: HexView
+- uid: Terminal.Gui.HexView.#ctor(System.IO.Stream)
+  name: HexView(Stream)
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView__ctor_System_IO_Stream_
+  fullName: HexView.HexView(Stream)
+  nameWithType: HexView.HexView(Stream)
+- uid: Terminal.Gui.HexView.#ctor*
+  name: HexView
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView__ctor_
+  fullName: HexView.HexView
+  nameWithType: HexView.HexView
+- uid: Terminal.Gui.HexView.AllowEdits
+  name: AllowEdits
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_AllowEdits
+  fullName: HexView.AllowEdits
+  nameWithType: HexView.AllowEdits
+- uid: Terminal.Gui.HexView.AllowEdits*
+  name: AllowEdits
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_AllowEdits_
+  fullName: HexView.AllowEdits
+  nameWithType: HexView.AllowEdits
+- uid: Terminal.Gui.HexView.ApplyEdits
+  name: ApplyEdits()
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_ApplyEdits
+  fullName: HexView.ApplyEdits()
+  nameWithType: HexView.ApplyEdits()
+- uid: Terminal.Gui.HexView.ApplyEdits*
+  name: ApplyEdits
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_ApplyEdits_
+  fullName: HexView.ApplyEdits
+  nameWithType: HexView.ApplyEdits
+- uid: Terminal.Gui.HexView.DisplayStart
+  name: DisplayStart
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_DisplayStart
+  fullName: HexView.DisplayStart
+  nameWithType: HexView.DisplayStart
+- uid: Terminal.Gui.HexView.DisplayStart*
+  name: DisplayStart
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_DisplayStart_
+  fullName: HexView.DisplayStart
+  nameWithType: HexView.DisplayStart
+- uid: Terminal.Gui.HexView.Edits
+  name: Edits
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_Edits
+  fullName: HexView.Edits
+  nameWithType: HexView.Edits
+- uid: Terminal.Gui.HexView.Edits*
+  name: Edits
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_Edits_
+  fullName: HexView.Edits
+  nameWithType: HexView.Edits
+- uid: Terminal.Gui.HexView.Frame
+  name: Frame
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_Frame
+  fullName: HexView.Frame
+  nameWithType: HexView.Frame
+- uid: Terminal.Gui.HexView.Frame*
+  name: Frame
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_Frame_
+  fullName: HexView.Frame
+  nameWithType: HexView.Frame
+- uid: Terminal.Gui.HexView.PositionCursor
+  name: PositionCursor()
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_PositionCursor
+  fullName: HexView.PositionCursor()
+  nameWithType: HexView.PositionCursor()
+- uid: Terminal.Gui.HexView.PositionCursor*
+  name: PositionCursor
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_PositionCursor_
+  fullName: HexView.PositionCursor
+  nameWithType: HexView.PositionCursor
+- uid: Terminal.Gui.HexView.ProcessKey(Terminal.Gui.KeyEvent)
+  name: ProcessKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_ProcessKey_Terminal_Gui_KeyEvent_
+  fullName: HexView.ProcessKey(KeyEvent)
+  nameWithType: HexView.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.HexView.ProcessKey*
+  name: ProcessKey
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_ProcessKey_
+  fullName: HexView.ProcessKey
+  nameWithType: HexView.ProcessKey
+- uid: Terminal.Gui.HexView.Redraw(Terminal.Gui.Rect)
+  name: Redraw(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_Redraw_Terminal_Gui_Rect_
+  fullName: HexView.Redraw(Rect)
+  nameWithType: HexView.Redraw(Rect)
+- uid: Terminal.Gui.HexView.Redraw*
+  name: Redraw
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_Redraw_
+  fullName: HexView.Redraw
+  nameWithType: HexView.Redraw
+- uid: Terminal.Gui.HexView.Source
+  name: Source
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_Source
+  fullName: HexView.Source
+  nameWithType: HexView.Source
+- uid: Terminal.Gui.HexView.Source*
+  name: Source
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView_Source_
+  fullName: HexView.Source
+  nameWithType: HexView.Source
 - uid: Terminal.Gui.IListDataSource
   name: IListDataSource
   href: api/Terminal.Gui/Terminal.Gui.IListDataSource.html
@@ -3526,6 +3816,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_AnchorEnd_
   fullName: Pos.AnchorEnd
   nameWithType: Pos.AnchorEnd
+- uid: Terminal.Gui.Pos.At(System.Int32)
+  name: At(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_At_System_Int32_
+  fullName: Pos.At(Int32)
+  nameWithType: Pos.At(Int32)
+- uid: Terminal.Gui.Pos.At*
+  name: At
+  href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_At_
+  fullName: Pos.At
+  nameWithType: Pos.At
 - uid: Terminal.Gui.Pos.Bottom(Terminal.Gui.View)
   name: Bottom(View)
   href: api/Terminal.Gui/Terminal.Gui.Pos.html#Terminal_Gui_Pos_Bottom_Terminal_Gui_View_
@@ -4141,6 +4441,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.SaveDialog.html#Terminal_Gui_SaveDialog__ctor_
   fullName: SaveDialog.SaveDialog
   nameWithType: SaveDialog.SaveDialog
+- uid: Terminal.Gui.SaveDialog.FileName
+  name: FileName
+  href: api/Terminal.Gui/Terminal.Gui.SaveDialog.html#Terminal_Gui_SaveDialog_FileName
+  fullName: SaveDialog.FileName
+  nameWithType: SaveDialog.FileName
+- uid: Terminal.Gui.SaveDialog.FileName*
+  name: FileName
+  href: api/Terminal.Gui/Terminal.Gui.SaveDialog.html#Terminal_Gui_SaveDialog_FileName_
+  fullName: SaveDialog.FileName
+  nameWithType: SaveDialog.FileName
 - uid: Terminal.Gui.ScrollBarView
   name: ScrollBarView
   href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html
@@ -4601,6 +4911,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField__ctor_System_Int32_System_Int32_System_Int32_NStack_ustring_
   fullName: TextField.TextField(Int32, Int32, Int32, ustring)
   nameWithType: TextField.TextField(Int32, Int32, Int32, ustring)
+- uid: Terminal.Gui.TextField.#ctor(System.String)
+  name: TextField(String)
+  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField__ctor_System_String_
+  fullName: TextField.TextField(String)
+  nameWithType: TextField.TextField(String)
 - uid: Terminal.Gui.TextField.#ctor*
   name: TextField
   href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField__ctor_
@@ -4876,6 +5191,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Running
   fullName: Toplevel.Running
   nameWithType: Toplevel.Running
+- uid: Terminal.Gui.Toplevel.WillPresent
+  name: WillPresent()
+  href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_WillPresent
+  fullName: Toplevel.WillPresent()
+  nameWithType: Toplevel.WillPresent()
+- uid: Terminal.Gui.Toplevel.WillPresent*
+  name: WillPresent
+  href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_WillPresent_
+  fullName: Toplevel.WillPresent
+  nameWithType: Toplevel.WillPresent
 - uid: Terminal.Gui.View
   name: View
   href: api/Terminal.Gui/Terminal.Gui.View.html

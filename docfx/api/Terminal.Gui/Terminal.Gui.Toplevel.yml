@@ -9,6 +9,7 @@ items:
   - Terminal.Gui.Toplevel.Create
   - Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.Toplevel.Running
+  - Terminal.Gui.Toplevel.WillPresent
   langs:
   - csharp
   name: Toplevel
@@ -212,6 +213,26 @@ items:
       type: System.Boolean
       description: To be added.
   exceptions: []
+- uid: Terminal.Gui.Toplevel.WillPresent
+  id: WillPresent
+  parent: Terminal.Gui.Toplevel
+  langs:
+  - csharp
+  name: WillPresent()
+  nameWithType: Toplevel.WillPresent()
+  fullName: Toplevel.WillPresent()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    This method is invoked by Application.Begin as part of the Application.Run after
+                the views have been laid out, and before the views are drawn for the first time.
+  syntax:
+    content: public virtual void WillPresent ();
+    parameters: []
+  overload: Terminal.Gui.Toplevel.WillPresent*
+  exceptions: []
 references:
 - uid: Terminal.Gui.View
   parent: Terminal.Gui
@@ -279,6 +300,12 @@ references:
   name: Running
   nameWithType: Toplevel.Running
   fullName: Toplevel.Running
+- uid: Terminal.Gui.Toplevel.WillPresent
+  parent: Terminal.Gui.Toplevel
+  isExternal: false
+  name: WillPresent()
+  nameWithType: Toplevel.WillPresent()
+  fullName: Toplevel.WillPresent()
 - uid: Terminal.Gui.Toplevel.#ctor*
   parent: Terminal.Gui.Toplevel
   isExternal: false
@@ -303,6 +330,12 @@ references:
   name: ProcessKey
   nameWithType: Toplevel.ProcessKey
   fullName: Toplevel.ProcessKey
+- uid: Terminal.Gui.Toplevel.WillPresent*
+  parent: Terminal.Gui.Toplevel
+  isExternal: false
+  name: WillPresent
+  nameWithType: Toplevel.WillPresent
+  fullName: Toplevel.WillPresent
 - uid: Terminal.Gui.View.HasFocus
   parent: Terminal.Gui.View
   isExternal: false

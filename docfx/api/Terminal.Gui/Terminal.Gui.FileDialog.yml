@@ -13,6 +13,7 @@ items:
   - Terminal.Gui.FileDialog.Message
   - Terminal.Gui.FileDialog.NameFieldLabel
   - Terminal.Gui.FileDialog.Prompt
+  - Terminal.Gui.FileDialog.WillPresent
   langs:
   - csharp
   name: FileDialog
@@ -22,6 +23,7 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Base class for the OpenDialog and the SaveDialog
   syntax:
     content: 'public class FileDialog : Terminal.Gui.Dialog'
   inheritance:
@@ -299,6 +301,23 @@ items:
       description: The prompt.
   overload: Terminal.Gui.FileDialog.Prompt*
   exceptions: []
+- uid: Terminal.Gui.FileDialog.WillPresent
+  id: WillPresent
+  parent: Terminal.Gui.FileDialog
+  langs:
+  - csharp
+  name: WillPresent()
+  nameWithType: FileDialog.WillPresent()
+  fullName: FileDialog.WillPresent()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void WillPresent ();
+    parameters: []
+  overload: Terminal.Gui.FileDialog.WillPresent*
+  exceptions: []
 references:
 - uid: Terminal.Gui.Dialog
   parent: Terminal.Gui
@@ -396,6 +415,12 @@ references:
   name: Prompt
   nameWithType: FileDialog.Prompt
   fullName: FileDialog.Prompt
+- uid: Terminal.Gui.FileDialog.WillPresent
+  parent: Terminal.Gui.FileDialog
+  isExternal: false
+  name: WillPresent()
+  nameWithType: FileDialog.WillPresent()
+  fullName: FileDialog.WillPresent()
 - uid: Terminal.Gui.FileDialog.#ctor*
   parent: Terminal.Gui.FileDialog
   isExternal: false
@@ -456,6 +481,12 @@ references:
   name: Prompt
   nameWithType: FileDialog.Prompt
   fullName: FileDialog.Prompt
+- uid: Terminal.Gui.FileDialog.WillPresent*
+  parent: Terminal.Gui.FileDialog
+  isExternal: false
+  name: WillPresent
+  nameWithType: FileDialog.WillPresent
+  fullName: FileDialog.WillPresent
 - uid: Terminal.Gui.Toplevel.CanFocus
   parent: Terminal.Gui.Toplevel
   isExternal: false

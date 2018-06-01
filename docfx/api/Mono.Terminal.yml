@@ -3,8 +3,10 @@ items:
 - uid: Mono.Terminal
   id: Mono.Terminal
   children:
+  - Mono.Terminal.IMainLoopDriver
   - Mono.Terminal.MainLoop
-  - Mono.Terminal.MainLoop.Condition
+  - Mono.Terminal.UnixMainLoop
+  - Mono.Terminal.UnixMainLoop.Condition
   langs:
   - csharp
   name: Mono.Terminal
@@ -12,15 +14,27 @@ items:
   fullName: Mono.Terminal
   type: Namespace
 references:
+- uid: Mono.Terminal.IMainLoopDriver
+  parent: Mono.Terminal
+  isExternal: false
+  name: IMainLoopDriver
+  nameWithType: IMainLoopDriver
+  fullName: Mono.Terminal.IMainLoopDriver
 - uid: Mono.Terminal.MainLoop
   parent: Mono.Terminal
   isExternal: false
   name: MainLoop
   nameWithType: MainLoop
   fullName: Mono.Terminal.MainLoop
-- uid: Mono.Terminal.MainLoop.Condition
+- uid: Mono.Terminal.UnixMainLoop
   parent: Mono.Terminal
   isExternal: false
-  name: MainLoop.Condition
-  nameWithType: MainLoop.Condition
-  fullName: Mono.Terminal.MainLoop.Condition
+  name: UnixMainLoop
+  nameWithType: UnixMainLoop
+  fullName: Mono.Terminal.UnixMainLoop
+- uid: Mono.Terminal.UnixMainLoop.Condition
+  parent: Mono.Terminal
+  isExternal: false
+  name: UnixMainLoop.Condition
+  nameWithType: UnixMainLoop.Condition
+  fullName: Mono.Terminal.UnixMainLoop.Condition

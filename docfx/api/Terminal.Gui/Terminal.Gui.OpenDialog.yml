@@ -17,6 +17,21 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: The Open Dialog provides an interactive dialog box for users to select files or directories.
+  remarks: >-
+    <p>
+                  The open dialog can be used to select files for opening, it can be configured to allow
+                  multiple items to be selected (based on the AllowsMultipleSelection) variable and
+                  you can control whether this should allow files or directories to be selected.
+                </p>
+        <p>
+                  To use it, create an instance of the OpenDialog, configure its properties, and then
+                  call Application.Run on the resulting instance.   This will run the dialog modally,
+                  and when this returns, the list of filds will be available on the FilePaths property.
+                </p>
+        <p>
+                To select more than one file, users can use the spacebar, or control-t.
+                </p>
   syntax:
     content: 'public class OpenDialog : Terminal.Gui.FileDialog'
   inheritance:
@@ -41,6 +56,7 @@ items:
   - Terminal.Gui.FileDialog.Message
   - Terminal.Gui.FileDialog.NameFieldLabel
   - Terminal.Gui.FileDialog.Prompt
+  - Terminal.Gui.FileDialog.WillPresent
   - Terminal.Gui.Toplevel.CanFocus
   - Terminal.Gui.Toplevel.Create
   - Terminal.Gui.Toplevel.Running
@@ -132,7 +148,7 @@ items:
     content: public bool AllowsMultipleSelection { get; set; }
     return:
       type: System.Boolean
-      description: <code>true</code> if allows multiple selection; otherwise, <code>false</code>.
+      description: <code>true</code> if allows multiple selection; otherwise, <code>false</code>, defaults to false.
   overload: Terminal.Gui.OpenDialog.AllowsMultipleSelection*
   exceptions: []
 - uid: Terminal.Gui.OpenDialog.CanChooseDirectories
@@ -152,7 +168,7 @@ items:
     content: public bool CanChooseDirectories { get; set; }
     return:
       type: System.Boolean
-      description: <code>true</code> if can choose directories; otherwise, <code>false</code>.
+      description: <code>true</code> if can choose directories; otherwise, <code>false</code> defaults to <code>false</code>.
   overload: Terminal.Gui.OpenDialog.CanChooseDirectories*
   exceptions: []
 - uid: Terminal.Gui.OpenDialog.CanChooseFiles
@@ -172,7 +188,7 @@ items:
     content: public bool CanChooseFiles { get; set; }
     return:
       type: System.Boolean
-      description: <code>true</code> if can choose files; otherwise, <code>false</code>.
+      description: <code>true</code> if can choose files; otherwise, <code>false</code>.  Defaults to <code>true</code>
   overload: Terminal.Gui.OpenDialog.CanChooseFiles*
   exceptions: []
 - uid: Terminal.Gui.OpenDialog.FilePaths
@@ -187,11 +203,11 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Gets the file paths selected
+  summary: Returns the selected files, or an empty list if nothing has been selected
   syntax:
-    content: public System.Collections.Generic.IReadOnlyList<NStack.ustring> FilePaths { get; }
+    content: public System.Collections.Generic.IReadOnlyList<string> FilePaths { get; }
     return:
-      type: System.Collections.Generic.IReadOnlyList{NStack.ustring}
+      type: System.Collections.Generic.IReadOnlyList{System.String}
       description: The file paths.
   overload: Terminal.Gui.OpenDialog.FilePaths*
   exceptions: []
@@ -248,12 +264,16 @@ references:
   name: IReadOnlyList
   nameWithType: IReadOnlyList
   fullName: System.Collections.Generic.IReadOnlyList
-- uid: System.Collections.Generic.IReadOnlyList{NStack.ustring}
+- uid: System.String
+  name: String
+  nameWithType: String
+  fullName: System.String
+- uid: System.Collections.Generic.IReadOnlyList{System.String}
   parent: System.Collections.Generic
   isExternal: true
-  name: IReadOnlyList<ustring>
-  nameWithType: IReadOnlyList<ustring>
-  fullName: System.Collections.Generic.IReadOnlyList<NStack.ustring>
+  name: IReadOnlyList<String>
+  nameWithType: IReadOnlyList<String>
+  fullName: System.Collections.Generic.IReadOnlyList<System.String>
   spec.csharp:
   - uid: System.Collections.Generic.IReadOnlyList`1
     name: IReadOnlyList
@@ -262,10 +282,10 @@ references:
   - name: <
     nameWithType: <
     fullName: <
-  - uid: NStack.ustring
-    name: ustring
-    nameWithType: ustring
-    fullName: NStack.ustring
+  - uid: System.String
+    name: String
+    nameWithType: String
+    fullName: System.String
   - name: '>'
     nameWithType: '>'
     fullName: '>'
@@ -611,6 +631,12 @@ references:
   name: Running
   nameWithType: Toplevel.Running
   fullName: Toplevel.Running
+- uid: Terminal.Gui.FileDialog.WillPresent
+  parent: Terminal.Gui.FileDialog
+  isExternal: false
+  name: WillPresent()
+  nameWithType: FileDialog.WillPresent()
+  fullName: FileDialog.WillPresent()
 - uid: Terminal.Gui.Window.Title
   parent: Terminal.Gui.Window
   isExternal: false

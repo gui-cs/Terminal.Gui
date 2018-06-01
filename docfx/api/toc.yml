@@ -2,10 +2,14 @@
 - uid: Mono.Terminal
   name: Mono.Terminal
   items:
+  - uid: Mono.Terminal.IMainLoopDriver
+    name: IMainLoopDriver
   - uid: Mono.Terminal.MainLoop
     name: MainLoop
-  - uid: Mono.Terminal.MainLoop.Condition
-    name: MainLoop.Condition
+  - uid: Mono.Terminal.UnixMainLoop
+    name: UnixMainLoop
+  - uid: Mono.Terminal.UnixMainLoop.Condition
+    name: UnixMainLoop.Condition
 - uid: Terminal.Gui
   name: Terminal.Gui
   items:
@@ -37,6 +41,8 @@
     name: FileDialog
   - uid: Terminal.Gui.FrameView
     name: FrameView
+  - uid: Terminal.Gui.HexView
+    name: HexView
   - uid: Terminal.Gui.IListDataSource
     name: IListDataSource
   - uid: Terminal.Gui.Key

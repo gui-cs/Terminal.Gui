@@ -17,6 +17,7 @@ items:
   - Terminal.Gui.Dim
   - Terminal.Gui.FileDialog
   - Terminal.Gui.FrameView
+  - Terminal.Gui.HexView
   - Terminal.Gui.IListDataSource
   - Terminal.Gui.Key
   - Terminal.Gui.KeyEvent
@@ -138,6 +139,12 @@ references:
   name: FrameView
   nameWithType: FrameView
   fullName: Terminal.Gui.FrameView
+- uid: Terminal.Gui.HexView
+  parent: Terminal.Gui
+  isExternal: false
+  name: HexView
+  nameWithType: HexView
+  fullName: Terminal.Gui.HexView
 - uid: Terminal.Gui.IListDataSource
   parent: Terminal.Gui
   isExternal: false

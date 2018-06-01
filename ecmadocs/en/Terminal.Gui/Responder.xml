@@ -10,7 +10,9 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
+    <summary>
+            Responder base class implemented by objects that want to participate on keyboard and mouse input.
+            </summary>
     <remarks>To be added.</remarks>
   </Docs>
   <Members>
@@ -38,8 +40,11 @@
         <ReturnType>System.Boolean</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
+        <summary>
+            Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Responder" /> can focus.
+            </summary>
+        <value>
+          <c>true</c> if can focus; otherwise, <c>false</c>.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -54,8 +59,11 @@
         <ReturnType>System.Boolean</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
+        <summary>
+            Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Responder" /> has focus.
+            </summary>
+        <value>
+          <c>true</c> if has focus; otherwise, <c>false</c>.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

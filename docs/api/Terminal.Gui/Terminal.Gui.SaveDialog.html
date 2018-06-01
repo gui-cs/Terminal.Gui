@@ -72,7 +72,9 @@
   
   <h1 id="Terminal_Gui_SaveDialog" data-uid="Terminal.Gui.SaveDialog">Class SaveDialog
   </h1>
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>The save dialog provides an interactive dialog box for users to pick a file to 
+             save.</p>
+</div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
@@ -122,6 +124,9 @@
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_Prompt">FileDialog.Prompt</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_WillPresent">FileDialog.WillPresent()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_CanFocus">Toplevel.CanFocus</a>
@@ -283,6 +288,13 @@
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class SaveDialog : Terminal.Gui.FileDialog</code></pre>
   </div>
+  <h5 id="Terminal_Gui_SaveDialog_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks"><p>
+              To use it, create an instance of the SaveDialog, and then
+              call Application.Run on the resulting instance.   This will run the dialog modally,
+              and when this returns, the FileName property will contain the selected value or 
+              null if the user canceled. 
+            </p></div>
   <h3 id="constructors">Constructors
   </h3>
   
@@ -315,6 +327,36 @@
         <td><span class="xref">NStack.ustring</span></td>
         <td><span class="parametername">message</span></td>
         <td><p>To be added.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Terminal_Gui_SaveDialog_FileName_" data-uid="Terminal.Gui.SaveDialog.FileName*"></a>
+  <h4 id="Terminal_Gui_SaveDialog_FileName" data-uid="Terminal.Gui.SaveDialog.FileName">FileName</h4>
+  <div class="markdown level1 summary"><p>Gets the name of the file the user selected for saving, or null
+            if the user canceled the dialog box.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NStack.ustring FileName { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><p>The name of the file.</p>
 </td>
       </tr>
     </tbody>

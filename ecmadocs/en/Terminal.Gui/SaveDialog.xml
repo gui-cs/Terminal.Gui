@@ -10,8 +10,18 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>
+             The save dialog provides an interactive dialog box for users to pick a file to 
+             save.
+            </summary>
+    <remarks>
+      <para>
+              To use it, create an instance of the SaveDialog, and then
+              call Application.Run on the resulting instance.   This will run the dialog modally,
+              and when this returns, the FileName property will contain the selected value or 
+              null if the user canceled. 
+            </para>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -29,6 +39,25 @@
         <param name="title">To be added.</param>
         <param name="message">To be added.</param>
         <summary>To be added.</summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="FileName">
+      <MemberSignature Language="C#" Value="public NStack.ustring FileName { get; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class NStack.ustring FileName" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>NStack.ustring</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Gets the name of the file the user selected for saving, or null
+            if the user canceled the dialog box.
+            </summary>
+        <value>The name of the file.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
