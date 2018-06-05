@@ -320,6 +320,10 @@ namespace Terminal.Gui {
 			};
 
 			this.cancel = new Button ("Cancel");
+			this.cancel.Clicked += () => {
+				canceled = true;
+				Application.RequestStop ();
+			};
 			AddButton (cancel);
 
 			this.prompt = new Button (prompt) {
