@@ -166,7 +166,7 @@ namespace Terminal.Gui {
 			SuperView.SetFocus (this);
 
 			if (me.Y < radioLabels.Length) {
-				cursor = selected = me.Y;
+				cursor = Selected = me.Y;
 				SetNeedsDisplay ();
 			}
 			return true;
