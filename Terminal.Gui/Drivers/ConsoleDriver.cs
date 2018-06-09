@@ -82,7 +82,82 @@ namespace Terminal.Gui {
 		/// </summary>
 		White
 	}
+	
+	/// <summary>
+	/// 24bit color. Support translate it to 4bit(Windows) and 8bit(Linux) color
+	/// </summary>
+	public class FullColor {
+	    public int R { get; private set; }
+	    public int G { get; private set; }
+	    public int B { get; private set; }
+	    public FullColor(int r, int g, int b) {
+		R = r;
+		G = g;
+		B = b;
+	    }
 
+	    public static FullColor LinuxColor(int code) {
+		if (code == 7)
+		    code = 8;
+		else if (code == 8)
+		    code = 7;
+		if (code == 8)
+		    return new FullColor(192, 192, 192);
+		if (code <= 15) {
+		    int k = 128;
+		    if (code >= 9)
+			k = 255;
+		    return new FullColor(code % 2 * k, code / 2 % 2 * k, code / 4 % 2 * k);
+		}
+		if (code <= 231) {
+		    code -= 16;
+		    int b = code % 6 * 40;
+		    if (b > 0)
+			b += 45;
+		    int g = code / 6 % 6 * 40;
+		    if (g > 0)
+			g += 45;
+		    int r = code / 36 % 6 * 40;
+		    if (r > 0)
+			r += 45;
+		    return new FullColor(r, g, b);
+		}
+		{
+		    code -= 231;
+		    return new FullColor(8 + code * 10, 8 + code * 10, 8 + code * 10);
+		}
+	    }
+	    public static FullColor WindowsColor(int code) {
+		if (code == 7)
+		    code = 8;
+		else if (code == 8)
+		    code = 7;
+		if (code == 8)
+		    return new FullColor(192, 192, 192);
+		int k = 128;
+		if (code >= 9)
+		    k = 255;
+		return new FullColor(code / 4 % 2 * k, code / 2 % 2 * k, code % 2 * k);
+	    }
+	    public static int Dist(FullColor c1, FullColor c2) {
+		return (c1.R - c2.R) * (c1.R - c2.R) + (c1.G - c2.G) * (c1.G - c2.G) + (c1.B - c2.B) * (c1.B - c2.B);
+	    }
+	    public static int GetLinuxCode(FullColor c) {
+		int ans = 0;
+		for (int i = 1; i < 255; i++) 
+		    if (Dist(LinuxColor(i), c) < Dist(LinuxColor(ans), c))
+			ans = i;
+		return ans;
+	    }
+	    public static int GetWindowsCode(FullColor c) {
+		int ans = 0;
+		for (int i = 1; i < 16; i++)
+		    if (Dist(WindowsColor(i), c) < Dist(WindowsColor(ans), c))
+			ans = i;
+		return ans;
+	    }
+	}
+    
 	/// <summary>
 	/// Attributes are used as elements that contain both a foreground and a background or platform specific features
 	/// </summary>
@@ -91,7 +166,7 @@ namespace Terminal.Gui {
 	///   scenarios, they encode both the foreground and the background color and are used in the ColorScheme
 	///   class to define color schemes that can be used in your application.
 	/// </remarks>
-	public struct Attribute {
+	public class Attribute {
 		internal int value;
 
 		/// <summary>
@@ -103,8 +178,26 @@ namespace Terminal.Gui {
 			this.value = value;
 		}
 
+		public Attribute() { }
+
 		public static implicit operator int (Attribute c) => c.value;
 		public static implicit operator Attribute (int v) => new Attribute (v);
+	}
+
+	/// <summary>
+	/// Like attribute, but support 24bit color
+	/// </summary>
+	public class FullAttribute : Attribute {
+	    public FullColor For { get; private set; }
+	    public FullColor Back { get; private set; }
+	    public int LinuxCode { get; private set; }
+
+	    public FullAttribute (FullColor For, FullColor Back) {
+		this.For = For;
+		this.Back = Back;
+		value = FullColor.GetWindowsCode(For) + FullColor.GetLinuxCode(Back) * 16;
+		LinuxCode = FullColor.GetLinuxCode(For) + FullColor.GetLinuxCode(Back) * 256;
+	    }
 	}
 
 	/// <summary>
