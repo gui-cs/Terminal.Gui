@@ -823,7 +823,7 @@ namespace Terminal.Gui {
 			var position = crow * Cols + ccol;
 
 			if (Clip.Contains (ccol, crow)) {
-				OutputBuffer [position].Attributes = (ushort)currentAttribute;
+				OutputBuffer [position].Attributes = currentAttribute;
 				OutputBuffer [position].Char = (char)rune;
 				WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
 			}
@@ -844,10 +844,10 @@ namespace Terminal.Gui {
 				AddRune (rune);
 		}
 
-		int currentAttribute;
+		Attribute currentAttribute;
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c.value;
+			currentAttribute = c;
 		}
 
 		private Attribute MakeColor (ConsoleColor f, ConsoleColor b)

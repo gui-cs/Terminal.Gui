@@ -6,6 +6,9 @@ static class Demo {
 	class Box10x : View {
 		public Box10x (int x, int y) : base (new Rect (x, y, 10, 10))
 		{
+		    ColorScheme = new ColorScheme();
+		    ColorScheme.Focus = new FullAttribute(new FullColor(0, 0, 0),
+			new FullColor(255, 177, 177));
 		}
 
 		public override void Redraw (Rect region)
