@@ -156,6 +156,11 @@ namespace Terminal.Gui {
 			ans = i;
 		return ans;
 	    }
+	    public static int WinToLinux(int code) {
+		if (code == 0 || code == 7 || code == 8 || code == 15)
+		    return code;
+		return (code & 8) + (code & 2) + 4 * (code & 1) + (code & 4) / 4;
+	    }	   
 	}
     
 	/// <summary>

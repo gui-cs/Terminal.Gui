@@ -31,6 +31,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mono.Terminal;
 using NStack;
+using Microsoft.Win32;
+using System.Text;
 
 namespace Terminal.Gui {
 
@@ -38,10 +40,18 @@ namespace Terminal.Gui {
 		public const int STD_OUTPUT_HANDLE = -11;
 		public const int STD_INPUT_HANDLE = -10;
 		public const int STD_ERROR_HANDLE = -12;
-
+		
 		internal IntPtr InputHandle, OutputHandle;
 		IntPtr ScreenBuffer;
 		uint originalConsoleMode;
+
+		public bool SupportFullColor { get; private set; }
+		
+		void SetSupportFullColor() {
+		    SupportFullColor = true;
+		    //string CurrentBuild = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CurrentBuild", "").ToString();
+		    //SupportFullColor = CurrentBuild != "" && int.Parse(CurrentBuild) >= 14931;
+		}
 
 		public WindowsConsole ()
 		{
@@ -52,11 +62,14 @@ namespace Terminal.Gui {
 			newConsoleMode |= (uint)(ConsoleModes.EnableMouseInput | ConsoleModes.EnableExtendedFlags);
 			newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
 			ConsoleMode = newConsoleMode;
+			var ocm = OutputConsoleMode;
+			OutputConsoleMode = ocm | 7;
+			SetSupportFullColor();
 		}
 
 		public CharInfo [] OriginalStdOutChars;
 
-		public bool WriteToConsole (CharInfo [] charInfoBuffer, Coord coords, SmallRect window)
+		public bool WriteToConsole (FullCharInfo [] charInfoBuffer, Coord coords, SmallRect window)
 		{
 			if (ScreenBuffer == IntPtr.Zero) {
 				ScreenBuffer = CreateConsoleScreenBuffer (
@@ -82,10 +95,41 @@ namespace Terminal.Gui {
 
 				ReadConsoleOutput (OutputHandle, OriginalStdOutChars, coords, new Coord () { X = 0, Y = 0 }, ref window);
 			}
-
-			return WriteConsoleOutput (ScreenBuffer, charInfoBuffer, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
+			if (!SupportFullColor) {
+			    CharInfo[] ci = new CharInfo[charInfoBuffer.Length];
+			    for (int i = 0; i < ci.Length; i++) {
+				ci[i].Char.UnicodeChar = charInfoBuffer[i].Char;
+				ci[i].Attributes = (ushort)(charInfoBuffer[i].Attributes);
+			    }
+			    return WriteConsoleOutput(ScreenBuffer, ci, coords, new Coord() { X = window.Left, Y = window.Top }, ref window);
+			}
+			return FullWriteConsole (charInfoBuffer);
 		}
-
+		
+		public bool FullWriteConsole(FullCharInfo[] Buffer) {
+		    StringBuilder sb = new StringBuilder();
+		    for (int i = 0; i < Buffer.Length; i++) {
+			if (Buffer[i].Attributes is FullAttribute) {
+			    var a = (FullAttribute)(Buffer[i].Attributes);
+			    sb.AppendFormat("\x1b[38;2;{0};{1};{2};48;2;{3};{4};{5}m", a.For.R, a.For.G, a.For.B,
+				a.Back.R, a.Back.G, a.Back.B);
+			}
+			else {
+			    int a = (int)(Buffer[i].Attributes);
+			    sb.AppendFormat("\x1b[38;5;{0};48;5;{1}m", FullColor.WinToLinux(a % 16), FullColor.WinToLinux(a / 16));
+			}
+			if (Buffer[i].Char != '\x1b')
+			    sb.Append(Buffer[i].Char);
+			else
+			    sb.Append(' ');
+		    }
+		    SetCursorPosition(new Coord { X = 0, Y = 0 });
+		    uint trash;
+		    string s = sb.ToString();
+		    WriteConsole(ScreenBuffer, s, (uint)(s.Length), out trash, null);
+		    return true;
+		}
+	    
 		public bool SetCursorPosition (Coord position)
 		{
 			return SetConsoleCursorPosition (ScreenBuffer, position);
@@ -113,6 +157,17 @@ namespace Terminal.Gui {
 			set {
 				SetConsoleMode (InputHandle, value);
 			}
+		}
+
+		public uint OutputConsoleMode {
+		    get {
+			uint v;
+			GetConsoleMode(OutputHandle, out v);
+			return v;
+		    }
+		    set {
+			SetConsoleMode(OutputHandle, value);
+		    }
 		}
 
 		[Flags]
@@ -348,6 +403,15 @@ namespace Terminal.Gui {
 			}
 		}
 
+		[DllImport("kernel32.dll", EntryPoint = "WriteConsole", SetLastError = true, CharSet = CharSet.Unicode)]
+		static extern bool WriteConsole(
+		    IntPtr hConsoleOutput,
+		    String lpbufer,
+		    UInt32 NumberOfCharsToWriten,
+		    out UInt32 lpNumberOfCharsWritten,
+		    object lpReserved);
+
+
 		[DllImport ("kernel32.dll", SetLastError = true)]
 		static extern IntPtr GetStdHandle (int nStdHandle);
 
@@ -412,20 +476,25 @@ namespace Terminal.Gui {
 		}
 	}
 
+	struct FullCharInfo {
+	    public char Char { get; set; }
+	    public Attribute Attributes { get; set; }
+	}
+
 	internal class WindowsDriver : ConsoleDriver, Mono.Terminal.IMainLoopDriver {
 		static bool sync;
 		AutoResetEvent eventReady = new AutoResetEvent (false);
 		AutoResetEvent waitForProbe = new AutoResetEvent (false);
 		MainLoop mainLoop;
 		Action TerminalResized;
-		WindowsConsole.CharInfo [] OutputBuffer;
+		FullCharInfo [] OutputBuffer;
 		int cols, rows;
 		WindowsConsole winConsole;
 		WindowsConsole.SmallRect damageRegion;
 
 		public override int Cols => cols;
 		public override int Rows => rows;
-
+		
 		public WindowsDriver ()
 		{
 			winConsole = new WindowsConsole ();
@@ -436,7 +505,8 @@ namespace Terminal.Gui {
 
 			ResizeScreen ();
 			UpdateOffScreen ();
-
+			winConsole.ConsoleMode = winConsole.ConsoleMode;
+	    
 			Task.Run ((Action)WindowsInputHandler);
 		}
 
@@ -721,7 +791,7 @@ namespace Terminal.Gui {
 
 		void ResizeScreen ()
 		{
-			OutputBuffer = new WindowsConsole.CharInfo [Rows * Cols];
+			OutputBuffer = new FullCharInfo [Rows * Cols];
 			Clip = new Rect (0, 0, Cols, Rows);
 			damageRegion = new WindowsConsole.SmallRect () {
 				Top = 0,
@@ -737,7 +807,7 @@ namespace Terminal.Gui {
 				for (int col = 0; col < cols; col++) {
 					int position = row * cols + col;
 					OutputBuffer [position].Attributes = (ushort)MakeColor (ConsoleColor.White, ConsoleColor.Blue);
-					OutputBuffer [position].Char.UnicodeChar = ' ';
+					OutputBuffer [position].Char = ' ';
 				}
 		}
 
@@ -754,7 +824,7 @@ namespace Terminal.Gui {
 
 			if (Clip.Contains (ccol, crow)) {
 				OutputBuffer [position].Attributes = (ushort)currentAttribute;
-				OutputBuffer [position].Char.UnicodeChar = (char)rune;
+				OutputBuffer [position].Char = (char)rune;
 				WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
 			}
 
