@@ -281,7 +281,7 @@ namespace Terminal.Gui {
 		/// <returns>The enumerator.</returns>
 		public IEnumerator GetEnumerator ()
 		{
-			foreach (var v in subviews)
+			foreach (var v in Subviews)
 				yield return v;
 		}
 
@@ -512,7 +512,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void Remove (View view)
 		{
-			if (view == null)
+			if (view == null || subviews == null)
 				return;
 
 			SetNeedsDisplay ();
