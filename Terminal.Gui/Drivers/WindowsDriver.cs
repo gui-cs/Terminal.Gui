@@ -45,12 +45,14 @@ namespace Terminal.Gui {
 		IntPtr ScreenBuffer;
 		uint originalConsoleMode;
 
-		public bool SupportFullColor { get; private set; }
+		public bool SupportTrueColor { get; private set; }
 		
-		void SetSupportFullColor() {
-		    SupportFullColor = true;
-		    //string CurrentBuild = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CurrentBuild", "").ToString();
-		    //SupportFullColor = CurrentBuild != "" && int.Parse(CurrentBuild) >= 14931;
+		void SetSupportTrueColor() {
+			//work only for CMD
+			//TODO add supprot windows terminals
+			string ver = RuntimeInformation.OSDescription;
+			int num = int.Parse(ver.Substring(ver.LastIndexOf('.') + 1));
+			SupportTrueColor = num >= 14931;
 		}
 
 		public WindowsConsole ()
@@ -62,9 +64,12 @@ namespace Terminal.Gui {
 			newConsoleMode |= (uint)(ConsoleModes.EnableMouseInput | ConsoleModes.EnableExtendedFlags);
 			newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
 			ConsoleMode = newConsoleMode;
-			var ocm = OutputConsoleMode;
-			OutputConsoleMode = ocm | 7;
-			SetSupportFullColor();
+			uint ocm = OutputConsoleMode;
+			ocm = ocm | (uint)(ConsoleModes.EnableProcessedOutput | ConsoleModes.EnableVirtualTerminalProcessing
+				| ConsoleModes.DisableNewlineAutoReturn);
+			ocm -= ocm & (uint)(ConsoleModes.EnableWrapAtEolOutput);
+			OutputConsoleMode = ocm;
+			SetSupportTrueColor();
 		}
 
 		public CharInfo [] OriginalStdOutChars;
@@ -95,41 +100,42 @@ namespace Terminal.Gui {
 
 				ReadConsoleOutput (OutputHandle, OriginalStdOutChars, coords, new Coord () { X = 0, Y = 0 }, ref window);
 			}
-			if (!SupportFullColor) {
-			    CharInfo[] ci = new CharInfo[charInfoBuffer.Length];
-			    for (int i = 0; i < ci.Length; i++) {
-				ci[i].Char.UnicodeChar = charInfoBuffer[i].Char;
-				ci[i].Attributes = (ushort)(charInfoBuffer[i].Attributes);
-			    }
-			    return WriteConsoleOutput(ScreenBuffer, ci, coords, new Coord() { X = window.Left, Y = window.Top }, ref window);
+			if (!SupportTrueColor) {
+				CharInfo[] ci = new CharInfo[charInfoBuffer.Length];
+				for (int i = 0; i < ci.Length; i++) {
+					ci[i].Char.UnicodeChar = charInfoBuffer[i].Char;
+					ci[i].Attributes = (ushort)(charInfoBuffer[i].Attributes);
+				}
+				return WriteConsoleOutput(ScreenBuffer, ci, coords, new Coord() { X = window.Left, Y = window.Top }, ref window);
 			}
-			return FullWriteConsole (charInfoBuffer);
+			return WriteConsoleTrueColor (charInfoBuffer);
 		}
 		
-		public bool FullWriteConsole(FullCharInfo[] Buffer) {
-		    StringBuilder sb = new StringBuilder();
-		    for (int i = 0; i < Buffer.Length; i++) {
-			if (Buffer[i].Attributes is FullAttribute) {
-			    var a = (FullAttribute)(Buffer[i].Attributes);
-			    sb.AppendFormat("\x1b[38;2;{0};{1};{2};48;2;{3};{4};{5}m", a.For.R, a.For.G, a.For.B,
-				a.Back.R, a.Back.G, a.Back.B);
+		public bool WriteConsoleTrueColor(FullCharInfo[] Buffer) {
+			char esc = '\x1b';
+			StringBuilder sb = new StringBuilder();
+			//save cursor position (esc7) and move to (0,0)
+			sb.AppendFormat("{0}7{0}[0;0H", esc);
+			for (int i = 0; i < Buffer.Length; i++) {
+				var a = Buffer[i].Attributes;
+				if (Buffer[i].Attributes.Fg != null) {
+					sb.AppendFormat("{0}[38;2;{1};{2};{3};48;2;{4};{5};{6}m", esc, a.Fg.R, a.Fg.G, a.Fg.B,
+						a.Bg.R, a.Bg.G, a.Bg.B);
+				}
+				else {
+					sb.AppendFormat("{0}[38;5;{1};48;5;{2}m", esc, TrueColor.Code4ToCode8((int)a % 16), TrueColor.Code4ToCode8((int)a / 16));
+				}
+				if (Buffer[i].Char != esc)
+					sb.Append(Buffer[i].Char);
+				else
+					sb.Append(' ');
 			}
-			else {
-			    int a = (int)(Buffer[i].Attributes);
-			    sb.AppendFormat("\x1b[38;5;{0};48;5;{1}m", FullColor.WinToLinux(a % 16), FullColor.WinToLinux(a / 16));
-			}
-			if (Buffer[i].Char != '\x1b')
-			    sb.Append(Buffer[i].Char);
-			else
-			    sb.Append(' ');
-		    }
-		    SetCursorPosition(new Coord { X = 0, Y = 0 });
-		    uint trash;
-		    string s = sb.ToString();
-		    WriteConsole(ScreenBuffer, s, (uint)(s.Length), out trash, null);
-		    return true;
+			//restore cursore position
+			sb.AppendFormat("{0}8", esc);
+			string s = sb.ToString();
+			return WriteConsole(ScreenBuffer, s, (uint)(s.Length), out uint _, null);
 		}
-	    
+
 		public bool SetCursorPosition (Coord position)
 		{
 			return SetConsoleCursorPosition (ScreenBuffer, position);
@@ -160,14 +166,14 @@ namespace Terminal.Gui {
 		}
 
 		public uint OutputConsoleMode {
-		    get {
-			uint v;
-			GetConsoleMode(OutputHandle, out v);
-			return v;
-		    }
-		    set {
-			SetConsoleMode(OutputHandle, value);
-		    }
+			get {
+				uint v;
+				GetConsoleMode(OutputHandle, out v);
+				return v;
+			}
+			set {
+				SetConsoleMode(OutputHandle, value);
+			}
 		}
 
 		[Flags]
@@ -175,6 +181,10 @@ namespace Terminal.Gui {
 			EnableMouseInput = 16,
 			EnableQuickEditMode = 64,
 			EnableExtendedFlags = 128,
+			EnableProcessedOutput = 1,
+			EnableWrapAtEolOutput = 2,
+			EnableVirtualTerminalProcessing = 4,
+			DisableNewlineAutoReturn = 8
 		}
 
 		[StructLayout (LayoutKind.Explicit, CharSet = CharSet.Unicode)]
@@ -405,11 +415,11 @@ namespace Terminal.Gui {
 
 		[DllImport("kernel32.dll", EntryPoint = "WriteConsole", SetLastError = true, CharSet = CharSet.Unicode)]
 		static extern bool WriteConsole(
-		    IntPtr hConsoleOutput,
-		    String lpbufer,
-		    UInt32 NumberOfCharsToWriten,
-		    out UInt32 lpNumberOfCharsWritten,
-		    object lpReserved);
+			IntPtr hConsoleOutput,
+			String lpbufer,
+			UInt32 NumberOfCharsToWriten,
+			out UInt32 lpNumberOfCharsWritten,
+			object lpReserved);
 
 
 		[DllImport ("kernel32.dll", SetLastError = true)]
@@ -477,8 +487,8 @@ namespace Terminal.Gui {
 	}
 
 	struct FullCharInfo {
-	    public char Char { get; set; }
-	    public Attribute Attributes { get; set; }
+		public char Char { get; set; }
+		public Attribute Attributes { get; set; }
 	}
 
 	internal class WindowsDriver : ConsoleDriver, Mono.Terminal.IMainLoopDriver {
@@ -506,7 +516,7 @@ namespace Terminal.Gui {
 			ResizeScreen ();
 			UpdateOffScreen ();
 			winConsole.ConsoleMode = winConsole.ConsoleMode;
-	    
+
 			Task.Run ((Action)WindowsInputHandler);
 		}
 

@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using Mono.Terminal;
 using NStack;
 using Unix.Terminal;
+using System.Drawing;
 
 namespace Terminal.Gui {
 
@@ -86,83 +87,101 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// 24bit color. Support translate it to 4bit(Windows) and 8bit(Linux) color
 	/// </summary>
-	public class FullColor {
-	    public int R { get; private set; }
-	    public int G { get; private set; }
-	    public int B { get; private set; }
-	    public FullColor(int r, int g, int b) {
-		R = r;
-		G = g;
-		B = b;
-	    }
-
-	    public static FullColor LinuxColor(int code) {
-		if (code == 7)
-		    code = 8;
-		else if (code == 8)
-		    code = 7;
-		if (code == 8)
-		    return new FullColor(192, 192, 192);
-		if (code <= 15) {
-		    int k = 128;
-		    if (code >= 9)
-			k = 255;
-		    return new FullColor(code % 2 * k, code / 2 % 2 * k, code / 4 % 2 * k);
+	public class TrueColor {
+		public int R { get; private set; }
+		public int G { get; private set; }
+		public int B { get; private set; }
+		public TrueColor(int r, int g, int b) {
+			R = r;
+			G = g;
+			B = b;
 		}
-		if (code <= 231) {
-		    code -= 16;
-		    int b = code % 6 * 40;
-		    if (b > 0)
-			b += 45;
-		    int g = code / 6 % 6 * 40;
-		    if (g > 0)
-			g += 45;
-		    int r = code / 36 % 6 * 40;
-		    if (r > 0)
-			r += 45;
-		    return new FullColor(r, g, b);
+		/// <summary>
+		/// Get color by code in 256 colors palette
+		/// </summary>
+		public static TrueColor Color8(int code) {
+			if (code == 7)
+				code = 8;
+			else if (code == 8)
+				code = 7;
+			if (code == 8)
+				return new TrueColor(192, 192, 192);
+			if (code <= 15) {
+				int k = 128;
+				if (code >= 9)
+					k = 255;
+				return new TrueColor(code % 2 * k, code / 2 % 2 * k, code / 4 % 2 * k);
+			}
+			if (code <= 231) {
+				code -= 16;
+				int b = code % 6 * 40;
+				if (b > 0)
+					b += 45;
+				int g = code / 6 % 6 * 40;
+				if (g > 0)
+					g += 45;
+				int r = code / 36 % 6 * 40;
+				if (r > 0)
+					r += 45;
+				return new TrueColor(r, g, b);
+			}
+			{
+				code -= 231;
+				return new TrueColor(8 + code * 10, 8 + code * 10, 8 + code * 10);
+			}
 		}
-		{
-		    code -= 231;
-		    return new FullColor(8 + code * 10, 8 + code * 10, 8 + code * 10);
+		/// <summary>
+		/// Get color by 16 colors palette
+		/// </summary>
+		public static TrueColor Color4(int code) {
+			if (code == 7)
+				code = 8;
+			else if (code == 8)
+				code = 7;
+			if (code == 8)
+				return new TrueColor(192, 192, 192);
+			int k = 128;
+			if (code >= 9)
+				k = 255;
+			return new TrueColor(code / 4 % 2 * k, code / 2 % 2 * k, code % 2 * k);
 		}
-	    }
-	    public static FullColor WindowsColor(int code) {
-		if (code == 7)
-		    code = 8;
-		else if (code == 8)
-		    code = 7;
-		if (code == 8)
-		    return new FullColor(192, 192, 192);
-		int k = 128;
-		if (code >= 9)
-		    k = 255;
-		return new FullColor(code / 4 % 2 * k, code / 2 % 2 * k, code % 2 * k);
-	    }
-	    public static int Dist(FullColor c1, FullColor c2) {
-		return (c1.R - c2.R) * (c1.R - c2.R) + (c1.G - c2.G) * (c1.G - c2.G) + (c1.B - c2.B) * (c1.B - c2.B);
-	    }
-	    public static int GetLinuxCode(FullColor c) {
-		int ans = 0;
-		for (int i = 1; i < 255; i++) 
-		    if (Dist(LinuxColor(i), c) < Dist(LinuxColor(ans), c))
-			ans = i;
-		return ans;
-	    }
-	    public static int GetWindowsCode(FullColor c) {
-		int ans = 0;
-		for (int i = 1; i < 16; i++)
-		    if (Dist(WindowsColor(i), c) < Dist(WindowsColor(ans), c))
-			ans = i;
-		return ans;
-	    }
-	    public static int WinToLinux(int code) {
-		if (code == 0 || code == 7 || code == 8 || code == 15)
-		    return code;
-		return (code & 8) + (code & 2) + 4 * (code & 1) + (code & 4) / 4;
-	    }	   
+		/// <summary>
+		/// Return color diff
+		/// </summary>
+		public static int Diff(TrueColor c1, TrueColor c2) {
+			//TODO: upgrade to CIEDE2000
+			return (c1.R - c2.R) * (c1.R - c2.R) + (c1.G - c2.G) * (c1.G - c2.G) + (c1.B - c2.B) * (c1.B - c2.B);
+		}
+		/// <summary>
+		/// Get color code in 256 colors palette (use approximation)
+		/// </summary>
+		public static int GetCode8(TrueColor c) {
+			int ans = 0;
+			for (int i = 1; i < 255; i++) 
+				if (Diff(Color8(i), c) < Diff(Color8(ans), c))
+					ans = i;
+			return ans;
+		}
+		/// <summary>
+		/// Get color code in 16 colors palette (use approximation)
+		/// </summary>
+		public static int GetCode4(TrueColor c) {
+			int ans = 0;
+			for (int i = 1; i < 16; i++)
+				if (Diff(Color4(i), c) < Diff(Color4(ans), c))
+					ans = i;
+			return ans;
+		}
+		/// <summary>
+		/// Convert code in 16 colors palette to 256 colors palette
+		/// </summary>
+		public static int Code4ToCode8(int code) {
+			if (code == 0 || code == 7 || code == 8 || code == 15)
+				return code;
+			return (code & 8) + (code & 2) + 4 * (code & 1) + (code & 4) / 4;
+		}
 	}
-    
+
 	/// <summary>
 	/// Attributes are used as elements that contain both a foreground and a background or platform specific features
 	/// </summary>
@@ -171,9 +190,16 @@ namespace Terminal.Gui {
 	///   scenarios, they encode both the foreground and the background color and are used in the ColorScheme
 	///   class to define color schemes that can be used in your application.
 	/// </remarks>
-	public class Attribute {
+	public struct Attribute {
 		internal int value;
-
+		/// <summary>
+		/// Forground color
+		/// </summary>
+		public TrueColor Fg { get; private set; }
+		/// <summary>
+		/// Backgorund color
+		/// </summary>
+		public TrueColor Bg { get; private set; }
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Attribute"/> struct.
 		/// </summary>
@@ -181,28 +207,23 @@ namespace Terminal.Gui {
 		public Attribute (int value)
 		{
 			this.value = value;
+			Fg = Bg = null;
 		}
 
-		public Attribute() { }
+		/// <summary>
+		/// Build Attribute by two TrueColor
+		/// </summary>
+		/// <param name="fg">Forground color</param>
+		/// <param name="bg">Background color</param>
+		public Attribute(TrueColor fg, TrueColor bg)
+		{
+			value = TrueColor.GetCode4(fg) + TrueColor.GetCode4(bg) * 16;
+			Fg = fg;
+			Bg = bg;
+		}
 
 		public static implicit operator int (Attribute c) => c.value;
 		public static implicit operator Attribute (int v) => new Attribute (v);
-	}
-
-	/// <summary>
-	/// Like attribute, but support 24bit color
-	/// </summary>
-	public class FullAttribute : Attribute {
-	    public FullColor For { get; private set; }
-	    public FullColor Back { get; private set; }
-	    public int LinuxCode { get; private set; }
-
-	    public FullAttribute (FullColor For, FullColor Back) {
-		this.For = For;
-		this.Back = Back;
-		value = FullColor.GetWindowsCode(For) + FullColor.GetLinuxCode(Back) * 16;
-		LinuxCode = FullColor.GetLinuxCode(For) + FullColor.GetLinuxCode(Back) * 256;
-	    }
 	}
 
 	/// <summary>
