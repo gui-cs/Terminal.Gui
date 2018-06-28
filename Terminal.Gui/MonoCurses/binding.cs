@@ -81,11 +81,13 @@ namespace Unix.Terminal {
 			if (File.Exists ("/usr/lib/libncurses.dylib")){
 				curses_handle = DlOpen ("libncurses.dylib");
 				use_naked_driver = true;
-			} else 
+			} else if (File.Exists ("/usr/lib/libncursesw.so.6")) {
+				curses_handle = DlOpen ("libncursesw.so.6");
+			} else
 				curses_handle = DlOpen ("libncursesw.so.5");
-
+			
 			if (curses_handle == IntPtr.Zero) {
-				Console.WriteLine ("It is not possible to open the dynamic library ncurses, tried looking for libncurses.dylib on Mac, and libncursesw.so.5 on Linux");
+				Console.WriteLine ("It is not possible to open the dynamic library ncurses, tried looking for libncurses.dylib on Mac, and libncursesw.so.5 or libncursew.so.6 on Linux");
 				Environment.Exit (1);
 			}
 			
