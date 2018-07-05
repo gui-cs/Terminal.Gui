@@ -604,7 +604,7 @@ namespace Terminal.Gui {
 			case ConsoleKey.Escape:
 				return Key.Esc;
 			case ConsoleKey.Tab:
-				return Key.Tab;
+				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.BackTab : Key.Tab;
 			case ConsoleKey.Home:
 				return Key.Home;
 			case ConsoleKey.End:
