@@ -147,3 +147,11 @@ having a container/widget model, only uses Views (which can contain
 subviews) and changes the rendering model to rely on damage regions
 instead of burderning each view with the details.
 
+# Releases
+
+Recently, I setup VSTS to do the releases, for now, this requires a
+branch to be pushed with the name release/XXX, do this after the NuGet
+package version has been updated on the
+Terminal.Gui/Terminal.Gui.csproj, and push.
+
+Then once the package is built, VSTS will request an approval.
