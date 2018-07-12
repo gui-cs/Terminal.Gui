@@ -402,6 +402,8 @@ namespace Terminal.Gui {
 				return true;
 
 			selected = top + me.Y;
+			if (SelectedChanged != null)
+				SelectedChanged();
 			SetNeedsDisplay ();
 			return true;
 		}
