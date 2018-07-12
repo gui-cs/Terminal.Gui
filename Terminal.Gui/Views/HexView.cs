@@ -167,7 +167,7 @@ namespace Terminal.Gui {
 						else
 							SetAttribute (ColorScheme.Normal);
 
-						Driver.AddStr (offset >= n ? "   " : string.Format ("{0:x2}", value));
+						Driver.AddStr (offset >= n ? "  " : string.Format ("{0:x2}", value));
 						SetAttribute (ColorScheme.Normal);
 						Driver.AddRune (' ');
 					}
