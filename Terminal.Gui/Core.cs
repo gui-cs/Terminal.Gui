@@ -728,8 +728,15 @@ namespace Terminal.Gui {
 				if (base.HasFocus != value)
 					SetNeedsDisplay ();
 				base.HasFocus = value;
+
+				// Remove focus down the chain of subviews if focus is removed
+				if (value == false && focused != null) {
+					focused.HasFocus = false;
+					focused = null;
+				}
 			}
 		}
+
 		/// <summary>
 		/// Returns the currently focused view inside this view, or null if nothing is focused.
 		/// </summary>
@@ -847,9 +854,13 @@ namespace Terminal.Gui {
 
 			if (focused != null)
 				focused.HasFocus = false;
+
 			focused = view;
 			focused.HasFocus = true;
 			focused.EnsureFocus ();
+
+			// Send focus upwards
+			SuperView?.SetFocus(this);
 		}
 
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
@@ -1752,7 +1763,7 @@ namespace Terminal.Gui {
 			if (view != null) {
 				if (!view.WantMousePositionReports && me.Flags == MouseFlags.ReportMousePosition)
 					return;
-				
+
 				var nme = new MouseEvent () {
 					X = rx,
 					Y = ry,
