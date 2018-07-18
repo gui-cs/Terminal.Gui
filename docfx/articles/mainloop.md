@@ -39,7 +39,7 @@ can configure the MainLoop in response to events during the execution.
 
 The keyboard inputs is dispatched by the application class to the
 current TopLevel window this is covered in more detail in the
-[Keyboard Event Processing](keyboard.md) document.
+[Keyboard Event Processing](keyboard.html) document.
 
 
 Async Execution
