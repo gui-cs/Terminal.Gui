@@ -162,8 +162,6 @@ namespace Terminal.Gui {
 		public IListDataSource Source {
 			get => source;
 			set {
-				if (value == null)
-					throw new ArgumentNullException ("value");
 				source = value;
 				top = 0;
 				selected = 0;
@@ -178,10 +176,12 @@ namespace Terminal.Gui {
 		public void SetSource (IList source)
 		{
 			if (source == null)
-				throw new ArgumentNullException (nameof (source));
-			Source = MakeWrapper (source);
-			((ListWrapper) Source).Container = this;
-			((ListWrapper) Source).Driver = Driver;
+				Source = null;
+			else {
+				Source = MakeWrapper (source);
+				((ListWrapper)Source).Container = this;
+				((ListWrapper)Source).Driver = Driver;
+			}
 		}
 
 		bool allowsMarking;
@@ -204,6 +204,9 @@ namespace Terminal.Gui {
 		public int TopItem {
 			get => top;
 			set {
+				if (source == null)
+					return;
+				
 				if (top < 0 || top >= source.Count)
 					throw new ArgumentException ("value");
 				top = value;
@@ -218,6 +221,8 @@ namespace Terminal.Gui {
 		public int SelectedItem {
 			get => selected;
 			set {
+				if (source == null)
+					return;
 				if (selected < 0 || selected >= source.Count)
 					throw new ArgumentException ("value");
 				selected = value;
@@ -250,10 +255,15 @@ namespace Terminal.Gui {
 		/// <param name="source">IListDataSource object that provides a mechanism to render the data. The number of elements on the collection should not change, if you must change, set the "Source" property to reset the internal settings of the ListView.</param>
 		public ListView (IListDataSource source) : base ()
 		{
-			if (source == null)
-				throw new ArgumentNullException (nameof (source));
 			Source = source;
 			CanFocus = true;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.ListView"/> class.   You must set the Source property for this to show something.
+		/// </summary>
+		public ListView () : base ()
+		{
 		}
 
 		/// <summary>
@@ -274,8 +284,6 @@ namespace Terminal.Gui {
 		/// <param name="source">IListDataSource object that provides a mechanism to render the data. The number of elements on the collection should not change, if you must change, set the "Source" property to reset the internal settings of the ListView.</param>
 		public ListView (Rect rect, IListDataSource source) : base (rect)
 		{
-			if (source == null)
-				throw new ArgumentNullException (nameof (source));
 			Source = source;
 			CanFocus = true;
 		}
@@ -302,8 +310,8 @@ namespace Terminal.Gui {
 					current = newcolor;
 				}
 
-				if (item >= source.Count) {
-					Move(0, row);
+				if (source == null || item >= source.Count) {
+						Move(0, row);
 					for (int c = 0; c < f.Width; c++)
 						Driver.AddRune(' ');
 				} else {
@@ -324,6 +332,9 @@ namespace Terminal.Gui {
 		/// <param name="kb">Keyboard event.</param>
 		public override bool ProcessKey (KeyEvent kb)
 		{
+			if (source == null)
+				return base.ProcessKey (kb);
+			
 			switch (kb.Key) {
 			case Key.CursorUp:
 			case Key.ControlP:
@@ -398,6 +409,9 @@ namespace Terminal.Gui {
 			if (!HasFocus) 
 				SuperView.SetFocus (this);
 
+			if (source == null)
+				return false;
+			
 			if (me.Y + top >= source.Count)
 				return true;
 

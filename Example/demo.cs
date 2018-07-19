@@ -138,6 +138,7 @@ static class Demo {
 			new Button (10, 19, "Cancel"),
 			progress,
 			new Label (3, 22, "Press F9 (on Unix, ESC+9 is an alias) to activate the menubar")
+
 		);
 
 	}
