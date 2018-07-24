@@ -1,0 +1,748 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.HexView
+  id: HexView
+  children:
+  - Terminal.Gui.HexView.#ctor(System.IO.Stream)
+  - Terminal.Gui.HexView.AllowEdits
+  - Terminal.Gui.HexView.ApplyEdits
+  - Terminal.Gui.HexView.DisplayStart
+  - Terminal.Gui.HexView.Edits
+  - Terminal.Gui.HexView.Frame
+  - Terminal.Gui.HexView.PositionCursor
+  - Terminal.Gui.HexView.ProcessKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.HexView.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.HexView.Source
+  langs:
+  - csharp
+  name: HexView
+  nameWithType: HexView
+  fullName: Terminal.Gui.HexView
+  type: Class
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: An Hex viewer an editor view over a System.IO.Stream
+  remarks: "<p>\n            This provides a hex editor on top of a seekable stream with the left side showing an hex\n            dump of the values in the stream and the right side showing the contents (filterd to \n            non-control sequence ascii characters).    \n            </p>\n    <p>\n            Users can switch from one side to the other by using the tab key.  \n            </p>\n    <p>\n            If you want to enable editing, set the AllowsEdits property, once that is done, the user\n            can make changes to the hexadecimal values of the stream.   Any changes done are tracked\n            in the Edits property which is a sorted dictionary indicating the position where the \n            change was made and the new value.    A convenience ApplyEdits method can be used to c\n            apply the methods to the underlying stream.\n            </p>\n    <p>\n            It is possible to control the first byte shown by setting the DisplayStart property \n            to the offset that you want to start viewing.\n            </p>"
+  syntax:
+    content: 'public class HexView : Terminal.Gui.View'
+  inheritance:
+  - System.Object
+  - Terminal.Gui.Responder
+  - Terminal.Gui.View
+  implements: []
+  inheritedMembers:
+  - Terminal.Gui.Responder.CanFocus
+  - Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
+  - Terminal.Gui.View.Add(Terminal.Gui.View)
+  - Terminal.Gui.View.Add(Terminal.Gui.View[])
+  - Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+  - Terminal.Gui.View.Bounds
+  - Terminal.Gui.View.ChildNeedsDisplay
+  - Terminal.Gui.View.Clear
+  - Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+  - Terminal.Gui.View.ClearNeedsDisplay
+  - Terminal.Gui.View.ClipToBounds
+  - Terminal.Gui.View.ColorScheme
+  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  - Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  - Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  - Terminal.Gui.View.Driver
+  - Terminal.Gui.View.EnsureFocus
+  - Terminal.Gui.View.Focused
+  - Terminal.Gui.View.FocusFirst
+  - Terminal.Gui.View.FocusLast
+  - Terminal.Gui.View.FocusNext
+  - Terminal.Gui.View.FocusPrev
+  - Terminal.Gui.View.GetEnumerator
+  - Terminal.Gui.View.HasFocus
+  - Terminal.Gui.View.Height
+  - Terminal.Gui.View.Id
+  - Terminal.Gui.View.LayoutStyle
+  - Terminal.Gui.View.LayoutSubviews
+  - Terminal.Gui.View.MostFocused
+  - Terminal.Gui.View.Move(System.Int32,System.Int32)
+  - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.Remove(Terminal.Gui.View)
+  - Terminal.Gui.View.RemoveAll
+  - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  - Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+  - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  - Terminal.Gui.View.SetNeedsDisplay
+  - Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  - Terminal.Gui.View.Subviews
+  - Terminal.Gui.View.SuperView
+  - Terminal.Gui.View.ToString
+  - Terminal.Gui.View.WantMousePositionReports
+  - Terminal.Gui.View.Width
+  - Terminal.Gui.View.X
+  - Terminal.Gui.View.Y
+- uid: Terminal.Gui.HexView.#ctor(System.IO.Stream)
+  id: '#ctor(System.IO.Stream)'
+  parent: Terminal.Gui.HexView
+  langs:
+  - csharp
+  name: HexView(Stream)
+  nameWithType: HexView.HexView(Stream)
+  fullName: HexView.HexView(Stream)
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates and instance of the HexView that will render a seekable stream in hex on the allocated view region.
+  syntax:
+    content: public HexView (System.IO.Stream source);
+    parameters:
+    - id: source
+      type: System.IO.Stream
+      description: Source stream, this stream should support seeking, or this will raise an exceotion.
+  overload: Terminal.Gui.HexView.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.HexView.AllowEdits
+  id: AllowEdits
+  parent: Terminal.Gui.HexView
+  langs:
+  - csharp
+  name: AllowEdits
+  nameWithType: HexView.AllowEdits
+  fullName: HexView.AllowEdits
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets a value indicating whether this <xref href="Terminal.Gui.HexView"></xref> allow editing of the contents of the underlying stream.
+  syntax:
+    content: public bool AllowEdits { get; set; }
+    return:
+      type: System.Boolean
+      description: <code>true</code> if allow edits; otherwise, <code>false</code>.
+  overload: Terminal.Gui.HexView.AllowEdits*
+  exceptions: []
+- uid: Terminal.Gui.HexView.ApplyEdits
+  id: ApplyEdits
+  parent: Terminal.Gui.HexView
+  langs:
+  - csharp
+  name: ApplyEdits()
+  nameWithType: HexView.ApplyEdits()
+  fullName: HexView.ApplyEdits()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: This method applies the edits to the stream and resets the contents of the Edits property
+  syntax:
+    content: public void ApplyEdits ();
+    parameters: []
+  overload: Terminal.Gui.HexView.ApplyEdits*
+  exceptions: []
+- uid: Terminal.Gui.HexView.DisplayStart
+  id: DisplayStart
+  parent: Terminal.Gui.HexView
+  langs:
+  - csharp
+  name: DisplayStart
+  nameWithType: HexView.DisplayStart
+  fullName: HexView.DisplayStart
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Configures the initial offset to be displayed at the top
+  syntax:
+    content: public long DisplayStart { get; set; }
+    return:
+      type: System.Int64
+      description: The display start.
+  overload: Terminal.Gui.HexView.DisplayStart*
+  exceptions: []
+- uid: Terminal.Gui.HexView.Edits
+  id: Edits
+  parent: Terminal.Gui.HexView
+  langs:
+  - csharp
+  name: Edits
+  nameWithType: HexView.Edits
+  fullName: HexView.Edits
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets a list of the edits done to the buffer which is a sorted dictionary with the positions where the edit took place and the value that was set.
+  syntax:
+    content: public System.Collections.Generic.IReadOnlyDictionary<long,byte> Edits { get; }
+    return:
+      type: System.Collections.Generic.IReadOnlyDictionary{System.Int64,System.Byte}
+      description: The edits.
+  overload: Terminal.Gui.HexView.Edits*
+  exceptions: []
+- uid: Terminal.Gui.HexView.Frame
+  id: Frame
+  parent: Terminal.Gui.HexView
+  langs:
+  - csharp
+  name: Frame
+  nameWithType: HexView.Frame
+  fullName: HexView.Frame
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override Terminal.Gui.Rect Frame { get; set; }
+    return:
+      type: Terminal.Gui.Rect
+      description: To be added.
+  overload: Terminal.Gui.HexView.Frame*
+  exceptions: []
+- uid: Terminal.Gui.HexView.PositionCursor
+  id: PositionCursor
+  parent: Terminal.Gui.HexView
+  langs:
+  - csharp
+  name: PositionCursor()
+  nameWithType: HexView.PositionCursor()
+  fullName: HexView.PositionCursor()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Positions the cursor based for the hex view
+  syntax:
+    content: public override void PositionCursor ();
+    parameters: []
+  overload: Terminal.Gui.HexView.PositionCursor*
+  exceptions: []
+- uid: Terminal.Gui.HexView.ProcessKey(Terminal.Gui.KeyEvent)
+  id: ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.HexView
+  langs:
+  - csharp
+  name: ProcessKey(KeyEvent)
+  nameWithType: HexView.ProcessKey(KeyEvent)
+  fullName: HexView.ProcessKey(KeyEvent)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override bool ProcessKey (Terminal.Gui.KeyEvent keyEvent);
+    parameters:
+    - id: keyEvent
+      type: Terminal.Gui.KeyEvent
+      description: To be added.
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.HexView.ProcessKey*
+  exceptions: []
+- uid: Terminal.Gui.HexView.Redraw(Terminal.Gui.Rect)
+  id: Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.HexView
+  langs:
+  - csharp
+  name: Redraw(Rect)
+  nameWithType: HexView.Redraw(Rect)
+  fullName: HexView.Redraw(Rect)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void Redraw (Terminal.Gui.Rect region);
+    parameters:
+    - id: region
+      type: Terminal.Gui.Rect
+      description: To be added.
+  overload: Terminal.Gui.HexView.Redraw*
+  exceptions: []
+- uid: Terminal.Gui.HexView.Source
+  id: Source
+  parent: Terminal.Gui.HexView
+  langs:
+  - csharp
+  name: Source
+  nameWithType: HexView.Source
+  fullName: HexView.Source
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The source stream to display on the hex view, the stream should support seeking.
+  syntax:
+    content: public System.IO.Stream Source { get; set; }
+    return:
+      type: System.IO.Stream
+      description: The source.
+  overload: Terminal.Gui.HexView.Source*
+  exceptions: []
+references:
+- uid: Terminal.Gui.View
+  parent: Terminal.Gui
+  isExternal: false
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui.HexView.#ctor(System.IO.Stream)
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: HexView(Stream)
+  nameWithType: HexView.HexView(Stream)
+  fullName: HexView.HexView(Stream)
+- uid: System.IO.Stream
+  parent: System.IO
+  isExternal: true
+  name: Stream
+  nameWithType: Stream
+  fullName: System.IO.Stream
+- uid: Terminal.Gui.HexView.AllowEdits
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: AllowEdits
+  nameWithType: HexView.AllowEdits
+  fullName: HexView.AllowEdits
+- uid: System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.HexView.ApplyEdits
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: ApplyEdits()
+  nameWithType: HexView.ApplyEdits()
+  fullName: HexView.ApplyEdits()
+- uid: Terminal.Gui.HexView.DisplayStart
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: DisplayStart
+  nameWithType: HexView.DisplayStart
+  fullName: HexView.DisplayStart
+- uid: System.Int64
+  parent: System
+  isExternal: true
+  name: Int64
+  nameWithType: Int64
+  fullName: System.Int64
+- uid: Terminal.Gui.HexView.Edits
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: Edits
+  nameWithType: HexView.Edits
+  fullName: HexView.Edits
+- uid: System.Collections.Generic.IReadOnlyDictionary`2
+  name: IReadOnlyDictionary
+  nameWithType: IReadOnlyDictionary
+  fullName: System.Collections.Generic.IReadOnlyDictionary
+- uid: System.Byte
+  name: Byte
+  nameWithType: Byte
+  fullName: System.Byte
+- uid: System.Collections.Generic.IReadOnlyDictionary{System.Int64,System.Byte}
+  parent: System.Collections.Generic
+  isExternal: true
+  name: IReadOnlyDictionary<Int64,Byte>
+  nameWithType: IReadOnlyDictionary<Int64,Byte>
+  fullName: System.Collections.Generic.IReadOnlyDictionary<System.Int64,System.Byte>
+  spec.csharp:
+  - uid: System.Collections.Generic.IReadOnlyDictionary`2
+    name: IReadOnlyDictionary
+    nameWithType: IReadOnlyDictionary
+    fullName: System.Collections.Generic.IReadOnlyDictionary
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: System.Int64
+    name: Int64
+    nameWithType: Int64
+    fullName: System.Int64
+  - name: ','
+    nameWithType: ','
+    fullName: ','
+  - uid: System.Byte
+    name: Byte
+    nameWithType: Byte
+    fullName: System.Byte
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+- uid: Terminal.Gui.HexView.Frame
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: Frame
+  nameWithType: HexView.Frame
+  fullName: HexView.Frame
+- uid: Terminal.Gui.Rect
+  parent: Terminal.Gui
+  isExternal: false
+  name: Rect
+  nameWithType: Rect
+  fullName: Terminal.Gui.Rect
+- uid: Terminal.Gui.HexView.PositionCursor
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: PositionCursor()
+  nameWithType: HexView.PositionCursor()
+  fullName: HexView.PositionCursor()
+- uid: Terminal.Gui.HexView.ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: ProcessKey(KeyEvent)
+  nameWithType: HexView.ProcessKey(KeyEvent)
+  fullName: HexView.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.KeyEvent
+  parent: Terminal.Gui
+  isExternal: false
+  name: KeyEvent
+  nameWithType: KeyEvent
+  fullName: Terminal.Gui.KeyEvent
+- uid: Terminal.Gui.HexView.Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: Redraw(Rect)
+  nameWithType: HexView.Redraw(Rect)
+  fullName: HexView.Redraw(Rect)
+- uid: Terminal.Gui.HexView.Source
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: Source
+  nameWithType: HexView.Source
+  fullName: HexView.Source
+- uid: Terminal.Gui.HexView.#ctor*
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: HexView
+  nameWithType: HexView.HexView
+  fullName: HexView.HexView
+- uid: Terminal.Gui.HexView.AllowEdits*
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: AllowEdits
+  nameWithType: HexView.AllowEdits
+  fullName: HexView.AllowEdits
+- uid: Terminal.Gui.HexView.ApplyEdits*
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: ApplyEdits
+  nameWithType: HexView.ApplyEdits
+  fullName: HexView.ApplyEdits
+- uid: Terminal.Gui.HexView.DisplayStart*
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: DisplayStart
+  nameWithType: HexView.DisplayStart
+  fullName: HexView.DisplayStart
+- uid: Terminal.Gui.HexView.Edits*
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: Edits
+  nameWithType: HexView.Edits
+  fullName: HexView.Edits
+- uid: Terminal.Gui.HexView.Frame*
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: Frame
+  nameWithType: HexView.Frame
+  fullName: HexView.Frame
+- uid: Terminal.Gui.HexView.PositionCursor*
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: PositionCursor
+  nameWithType: HexView.PositionCursor
+  fullName: HexView.PositionCursor
+- uid: Terminal.Gui.HexView.ProcessKey*
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: ProcessKey
+  nameWithType: HexView.ProcessKey
+  fullName: HexView.ProcessKey
+- uid: Terminal.Gui.HexView.Redraw*
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: Redraw
+  nameWithType: HexView.Redraw
+  fullName: HexView.Redraw
+- uid: Terminal.Gui.HexView.Source*
+  parent: Terminal.Gui.HexView
+  isExternal: false
+  name: Source
+  nameWithType: HexView.Source
+  fullName: HexView.Source
+- uid: Terminal.Gui.Responder.CanFocus
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: CanFocus
+  nameWithType: Responder.CanFocus
+  fullName: Responder.CanFocus
+- uid: Terminal.Gui.View.HasFocus
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: HasFocus
+  nameWithType: View.HasFocus
+  fullName: View.HasFocus
+- uid: Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.Responder
+  isExternal: false
+  name: MouseEvent(MouseEvent)
+  nameWithType: Responder.MouseEvent(MouseEvent)
+  fullName: Responder.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ProcessColdKey(KeyEvent)
+  nameWithType: View.ProcessColdKey(KeyEvent)
+  fullName: View.ProcessColdKey(KeyEvent)
+- uid: Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ProcessHotKey(KeyEvent)
+  nameWithType: View.ProcessHotKey(KeyEvent)
+  fullName: View.ProcessHotKey(KeyEvent)
+- uid: Terminal.Gui.View.Add(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Add(View)
+  nameWithType: View.Add(View)
+  fullName: View.Add(View)
+- uid: Terminal.Gui.View.Add(Terminal.Gui.View[])
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Add(View[])
+  nameWithType: View.Add(View[])
+  fullName: View.Add(View[])
+- uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: AddRune(Int32, Int32, Rune)
+  nameWithType: View.AddRune(Int32, Int32, Rune)
+  fullName: View.AddRune(Int32, Int32, Rune)
+- uid: Terminal.Gui.View.Bounds
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Bounds
+  nameWithType: View.Bounds
+  fullName: View.Bounds
+- uid: Terminal.Gui.View.ChildNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ChildNeedsDisplay()
+  nameWithType: View.ChildNeedsDisplay()
+  fullName: View.ChildNeedsDisplay()
+- uid: Terminal.Gui.View.Clear
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Clear()
+  nameWithType: View.Clear()
+  fullName: View.Clear()
+- uid: Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Clear(Rect)
+  nameWithType: View.Clear(Rect)
+  fullName: View.Clear(Rect)
+- uid: Terminal.Gui.View.ClearNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ClearNeedsDisplay()
+  nameWithType: View.ClearNeedsDisplay()
+  fullName: View.ClearNeedsDisplay()
+- uid: Terminal.Gui.View.ClipToBounds
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ClipToBounds()
+  nameWithType: View.ClipToBounds()
+  fullName: View.ClipToBounds()
+- uid: Terminal.Gui.View.ColorScheme
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ColorScheme
+  nameWithType: View.ColorScheme
+  fullName: View.ColorScheme
+- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawFrame(Rect, Int32, Boolean)
+  nameWithType: View.DrawFrame(Rect, Int32, Boolean)
+  fullName: View.DrawFrame(Rect, Int32, Boolean)
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(ustring, Boolean, ColorScheme)
+  nameWithType: View.DrawHotString(ustring, Boolean, ColorScheme)
+  fullName: View.DrawHotString(ustring, Boolean, ColorScheme)
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: DrawHotString(ustring, Attribute, Attribute)
+  nameWithType: View.DrawHotString(ustring, Attribute, Attribute)
+  fullName: View.DrawHotString(ustring, Attribute, Attribute)
+- uid: Terminal.Gui.View.Driver
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Driver
+  nameWithType: View.Driver
+  fullName: View.Driver
+- uid: Terminal.Gui.View.EnsureFocus
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: EnsureFocus()
+  nameWithType: View.EnsureFocus()
+  fullName: View.EnsureFocus()
+- uid: Terminal.Gui.View.Focused
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Focused
+  nameWithType: View.Focused
+  fullName: View.Focused
+- uid: Terminal.Gui.View.FocusFirst
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusFirst()
+  nameWithType: View.FocusFirst()
+  fullName: View.FocusFirst()
+- uid: Terminal.Gui.View.FocusLast
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusLast()
+  nameWithType: View.FocusLast()
+  fullName: View.FocusLast()
+- uid: Terminal.Gui.View.FocusNext
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusNext()
+  nameWithType: View.FocusNext()
+  fullName: View.FocusNext()
+- uid: Terminal.Gui.View.FocusPrev
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: FocusPrev()
+  nameWithType: View.FocusPrev()
+  fullName: View.FocusPrev()
+- uid: Terminal.Gui.View.GetEnumerator
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: GetEnumerator()
+  nameWithType: View.GetEnumerator()
+  fullName: View.GetEnumerator()
+- uid: Terminal.Gui.View.Height
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Height
+  nameWithType: View.Height
+  fullName: View.Height
+- uid: Terminal.Gui.View.Id
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Id
+  nameWithType: View.Id
+  fullName: View.Id
+- uid: Terminal.Gui.View.LayoutStyle
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: LayoutStyle
+  nameWithType: View.LayoutStyle
+  fullName: View.LayoutStyle
+- uid: Terminal.Gui.View.LayoutSubviews
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: LayoutSubviews()
+  nameWithType: View.LayoutSubviews()
+  fullName: View.LayoutSubviews()
+- uid: Terminal.Gui.View.MostFocused
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: MostFocused
+  nameWithType: View.MostFocused
+  fullName: View.MostFocused
+- uid: Terminal.Gui.View.Move(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Move(Int32, Int32)
+  nameWithType: View.Move(Int32, Int32)
+  fullName: View.Move(Int32, Int32)
+- uid: Terminal.Gui.View.Remove(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Remove(View)
+  nameWithType: View.Remove(View)
+  fullName: View.Remove(View)
+- uid: Terminal.Gui.View.RemoveAll
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: RemoveAll()
+  nameWithType: View.RemoveAll()
+  fullName: View.RemoveAll()
+- uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ScreenToView(Int32, Int32)
+  nameWithType: View.ScreenToView(Int32, Int32)
+  fullName: View.ScreenToView(Int32, Int32)
+- uid: Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetClip(Rect)
+  nameWithType: View.SetClip(Rect)
+  fullName: View.SetClip(Rect)
+- uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetFocus(View)
+  nameWithType: View.SetFocus(View)
+  fullName: View.SetFocus(View)
+- uid: Terminal.Gui.View.SetNeedsDisplay
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetNeedsDisplay()
+  nameWithType: View.SetNeedsDisplay()
+  fullName: View.SetNeedsDisplay()
+- uid: Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SetNeedsDisplay(Rect)
+  nameWithType: View.SetNeedsDisplay(Rect)
+  fullName: View.SetNeedsDisplay(Rect)
+- uid: Terminal.Gui.View.Subviews
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Subviews
+  nameWithType: View.Subviews
+  fullName: View.Subviews
+- uid: Terminal.Gui.View.SuperView
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: SuperView
+  nameWithType: View.SuperView
+  fullName: View.SuperView
+- uid: Terminal.Gui.View.ToString
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: ToString()
+  nameWithType: View.ToString()
+  fullName: View.ToString()
+- uid: Terminal.Gui.View.WantMousePositionReports
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: WantMousePositionReports
+  nameWithType: View.WantMousePositionReports
+  fullName: View.WantMousePositionReports
+- uid: Terminal.Gui.View.Width
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Width
+  nameWithType: View.Width
+  fullName: View.Width
+- uid: Terminal.Gui.View.X
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: X
+  nameWithType: View.X
+  fullName: View.X
+- uid: Terminal.Gui.View.Y
+  parent: Terminal.Gui.View
+  isExternal: false
+  name: Y
+  nameWithType: View.Y
+  fullName: View.Y
