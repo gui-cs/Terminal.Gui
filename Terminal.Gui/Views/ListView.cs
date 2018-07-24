@@ -311,7 +311,7 @@ namespace Terminal.Gui {
 				}
 
 				if (source == null || item >= source.Count) {
-						Move(0, row);
+					Move(0, row);
 					for (int c = 0; c < f.Width; c++)
 						Driver.AddRune(' ');
 				} else {
