@@ -10,7 +10,6 @@ using System.Runtime.InteropServices;
 using Mono.Terminal;
 using NStack;
 using Unix.Terminal;
-using System.Drawing;
 
 namespace Terminal.Gui {
 
