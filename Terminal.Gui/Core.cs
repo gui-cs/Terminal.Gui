@@ -499,9 +499,7 @@ namespace Terminal.Gui {
 				return;
 
 			while (subviews.Count > 0) {
-				var view = subviews [0];
-				Remove (view);
-				subviews.RemoveAt (0);
+				Remove (subviews[0]);
 			}
 		}
 
