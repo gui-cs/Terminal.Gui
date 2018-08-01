@@ -1,4 +1,7 @@
 [![Build Status](https://travis-ci.org/migueldeicaza/gui.cs.svg?branch=master)](https://travis-ci.org/migueldeicaza/gui.cs)
+
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mono/mono?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) - This is the Mono Channel room
+
 # Gui.cs - Terminal UI toolkit for .NET
 
 This is a simple UI toolkit for .NET, .NET Core and Mono and works on
