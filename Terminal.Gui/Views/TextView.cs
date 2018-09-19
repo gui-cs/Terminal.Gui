@@ -392,11 +392,31 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (ColorScheme.Normal);
 		}
 
-		bool isReadOnly;
+		bool isReadOnly = false;
+
+		/// <summary>
+		/// Indicates readonly attribute of TextView
+		/// </summary>
+		/// <value>Boolean value(Default false)</value>
 		public bool ReadOnly {
 			get => isReadOnly;
 			set {
 				isReadOnly = value;
+			}
+		}
+
+		int nPageShift = 5;
+
+		/// <summary>
+		/// Number of lines to process for PageUp and PageDown keypress event
+		/// </summary>
+		/// <value>Number of lines(Default 5).</value>
+		public int PageShift 
+		{
+			get => nPageShift;
+			set 
+			{
+				nPageShift = value;
 			}
 		}
 
@@ -670,6 +690,8 @@ namespace Terminal.Gui {
 			case Key.CursorDown:
 			case Key.ControlP:
 			case Key.CursorUp:
+			case Key.PageUp:
+			case Key.PageDown:
 				lastWasKill = false;
 				break;
 			case Key.ControlK:
@@ -682,6 +704,34 @@ namespace Terminal.Gui {
 
 			// Dispatch the command.
 			switch (kb.Key) {
+			case Key.PageDown:
+				if (currentRow + nPageShift < model.Count) {
+					if (columnTrack == -1)
+						columnTrack = currentColumn;
+					currentRow += nPageShift;
+					if (currentRow >= topRow + Frame.Height) {
+						topRow += nPageShift;
+						SetNeedsDisplay ();
+					}
+					TrackColumn ();
+					PositionCursor ();
+				}
+				break;
+
+			case Key.PageUp:
+				if (currentRow > nPageShift) {
+					if (columnTrack == -1)
+						columnTrack = currentColumn;
+					currentRow -= nPageShift;
+					if (currentRow < topRow) {
+						topRow -= nPageShift;
+						SetNeedsDisplay ();
+					}
+					TrackColumn ();
+					PositionCursor ();
+				}
+				break;
+
 			case Key.ControlN:
 			case Key.CursorDown:
 				if (currentRow + 1 < model.Count) {
