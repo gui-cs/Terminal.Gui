@@ -1,4 +1,10 @@
-
+//
+// TODO:
+// * FindNCurses needs to remove the old probing code
+// * Removal of that proxy code
+// * Need to implement reading pointers with the new API
+// * Can remove the manual Dlopen features
+// * initscr() diagnostics based on DLL can be fixed
 //
 // binding.cs.in: Core binding for curses.
 //
@@ -154,6 +160,65 @@ namespace Unix.Terminal {
 		public readonly Delegates.getmouse getmouse;
 		public readonly Delegates.ungetmouse ungetmouse;
 		public readonly Delegates.mouseinterval mouseinterval;
+
+		public void NativeMethods (UnmanagedLibrary lib)
+		{
+			initscr = lib.GetMethodDelegate<Delegates.initscr> ("initscr");
+			endwin = lib.GetMethodDelegate<Delegates.endwin> ("endwin");
+			isendwin = lib.GetMethodDelegate<Delegates.isendwin> ("isendwin");
+			cbreak = lib.GetMethodDelegate<Delegates.cbreak> ("cbreak");
+			nocbreak = lib.GetMethodDelegate<Delegates.nocbreak> ("nocbreak");
+			echo = lib.GetMethodDelegate<Delegates.echo> ("echo");
+			noecho = lib.GetMethodDelegate<Delegates.noecho> ("noecho");
+			halfdelay = lib.GetMethodDelegate<Delegates.halfdelay> ("halfdelay");
+			raw = lib.GetMethodDelegate<Delegates.raw> ("raw");
+			noraw = lib.GetMethodDelegate<Delegates.noraw> ("noraw");
+			noqiflush = lib.GetMethodDelegate<Delegates.noqiflush> ("noqiflush");
+			qiflush = lib.GetMethodDelegate<Delegates.qiflush> ("qiflush");
+			typeahead = lib.GetMethodDelegate<Delegates.typeahead> ("typeahead");
+			timeout = lib.GetMethodDelegate<Delegates.timeout> ("timeout");
+			wtimeout = lib.GetMethodDelegate<Delegates.wtimeout> ("wtimeout");
+			notimeout = lib.GetMethodDelegate<Delegates.notimeout> ("notimeout");
+			keypad = lib.GetMethodDelegate<Delegates.keypad> ("keypad");
+			meta = lib.GetMethodDelegate<Delegates.meta> ("meta");
+			intrflush = lib.GetMethodDelegate<Delegates.intrflush> ("intrflush");
+			clearok = lib.GetMethodDelegate<Delegates.clearok> ("clearok");
+			idlok = lib.GetMethodDelegate<Delegates.idlok> ("idlok");
+			idcok = lib.GetMethodDelegate<Delegates.idcok> ("idcok");
+			immedok = lib.GetMethodDelegate<Delegates.immedok> ("immedok");
+			leaveok = lib.GetMethodDelegate<Delegates.leaveok> ("leaveok");
+			wsetscrreg = lib.GetMethodDelegate<Delegates.wsetscrreg> ("wsetscrreg");
+			scrollok = lib.GetMethodDelegate<Delegates.scrollok> ("scrollok");
+			nl = lib.GetMethodDelegate<Delegates.nl> ("nl");
+			nonl = lib.GetMethodDelegate<Delegates.nonl> ("nonl");
+			setscrreg = lib.GetMethodDelegate<Delegates.setscrreg> ("setscrreg");
+			refresh = lib.GetMethodDelegate<Delegates.refresh> ("refresh");
+			doupdate = lib.GetMethodDelegate<Delegates.doupdate> ("doupdate");
+			wrefresh = lib.GetMethodDelegate<Delegates.wrefresh> ("wrefresh");
+			redrawwin = lib.GetMethodDelegate<Delegates.redrawwin> ("redrawwin");
+			wredrawwin = lib.GetMethodDelegate<Delegates.wredrawwin> ("wredrawwin");
+			wnoutrefresh = lib.GetMethodDelegate<Delegates.wnoutrefresh> ("wnoutrefresh");
+			move = lib.GetMethodDelegate<Delegates.move> ("move");
+			addch = lib.GetMethodDelegate<Delegates.addch> ("addch");
+			addstr = lib.GetMethodDelegate<Delegates.addstr> ("addstr");
+			wmove = lib.GetMethodDelegate<Delegates.wmove> ("wmove");
+			waddch = lib.GetMethodDelegate<Delegates.waddch> ("waddch");
+			attron = lib.GetMethodDelegate<Delegates.attron> ("attron");
+			attroff = lib.GetMethodDelegate<Delegates.attroff> ("attroff");
+			attrset = lib.GetMethodDelegate<Delegates.attrset> ("attrset");
+			getch = lib.GetMethodDelegate<Delegates.getch> ("getch");
+			get_wch = lib.GetMethodDelegate<Delegates.get_wch> ("get_wch");
+			ungetch = lib.GetMethodDelegate<Delegates.ungetch> ("ungetch");
+			mvgetch = lib.GetMethodDelegate<Delegates.mvgetch> ("mvgetch");
+			has_colors = lib.GetMethodDelegate<Delegates.has_colors> ("has_colors");
+			start_color = lib.GetMethodDelegate<Delegates.start_color> ("start_color");
+			init_pair = lib.GetMethodDelegate<Delegates.init_pair> ("init_pair");
+			use_default_colors = lib.GetMethodDelegate<Delegates.use_default_colors> ("use_default_colors");
+			COLOR_PAIR = lib.GetMethodDelegate<Delegates.COLOR_PAIR> ("COLOR_PAIR");
+			getmouse = lib.GetMethodDelegate<Delegates.getmouse> ("getmouse");
+			ungetmouse = lib.GetMethodDelegate<Delegates.ungetmouse> ("ungetmouse");
+			mouseinterval = lib.GetMethodDelegate<Delegates.mouseinterval> ("mouseinterval");
+		}
 	}
 
 	internal partial class Curses {
@@ -171,10 +236,13 @@ namespace Unix.Terminal {
 		// If true, uses the DllImport into "ncurses", otherwise "libncursesw.so.5"
 		static bool use_naked_driver;
 
+		NativeMethods methods;
+		
 		static void LoadMethods ()
 		{
 			var libs = UnmanagedLibrary.IsMacOSPlatform ? new string [] { "libncurses.dylib" } : new string { "libncursesw.so.6", "libncursesw.so.5" };
 			var lib = new UnmanagedLibrary (libs);
+			methods = new NativeMethods (lib);
 		}
 		
 		//
@@ -220,9 +288,9 @@ namespace Unix.Terminal {
 		{
 			FindNCurses ();
 			
-			main_window = new Window (real_initscr ());
+			main_window = new Window (methods.initscr ());
 			try {
-				console_sharp_get_dims (out lines, out cols);
+				console_sharp_get_dims (out lines, out bcols);
 			} catch (DllNotFoundException){
 				endwin ();
 				Console.Error.WriteLine ("Unable to find the @MONO_CURSES@ native library\n" + 
@@ -333,7 +401,7 @@ namespace Unix.Terminal {
 		public static Event mousemask (Event newmask, out Event oldmask)
 		{
 			IntPtr e;
-			var ret = (Event) (use_naked_driver ? RegularCurses.call_mousemask ((IntPtr) newmask, out e) : CursesLinux.call_mousemask ((IntPtr) newmask, out e));
+			var ret = (Event) (methods.call_mousemask ((IntPtr) newmask, out e));
 			oldmask = (Event) e;
 			return ret;
 		}
@@ -348,74 +416,70 @@ namespace Unix.Terminal {
 				return key & ~KeyAlt;
 			return 0;
 		}
-		public static int StartColor () => start_color ();
-		public static bool HasColors => has_colors ();
-		public static int InitColorPair (short pair, short foreground, short background) => init_pair (pair, foreground, background);
-		public static int UseDefaultColors () => use_default_colors ();
-		public static int ColorPairs => COLOR_PAIRS();
-
+		public static int StartColor () => methods.start_color ();
+		public static bool HasColors => methods.has_colors ();
+		public static int InitColorPair (short pair, short foreground, short background) => methods.init_pair (pair, foreground, background);
+		public static int UseDefaultColors () => methods.use_default_colors ();
+		public static int ColorPairs => methods.COLOR_PAIRS();
 
 		//
 		// The proxy methods to call into each version
 		//
-		static public IntPtr real_initscr () => use_naked_driver ? RegularCurses.real_initscr () : CursesLinux.real_initscr ();
-		static public int endwin () => use_naked_driver ? RegularCurses.endwin () : CursesLinux.endwin ();
-		static public bool isendwin () => use_naked_driver ? RegularCurses.isendwin () : CursesLinux.isendwin ();
-		static public IntPtr internal_newterm (string type, IntPtr file_outfd, IntPtr file_infd) => use_naked_driver ? RegularCurses.internal_newterm (type, file_outfd, file_infd) : CursesLinux.internal_newterm (type, file_outfd, file_infd);
-		static public IntPtr internal_set_term (IntPtr newscreen) => use_naked_driver ? RegularCurses.internal_set_term (newscreen) : CursesLinux.internal_set_term (newscreen);
-		static public void internal_delscreen (IntPtr sp) { if (use_naked_driver) RegularCurses.internal_delscreen (sp); else CursesLinux.internal_delscreen (sp); }
-		static public int cbreak () => use_naked_driver ? RegularCurses.cbreak () : CursesLinux.cbreak ();
-		static public int nocbreak () => use_naked_driver ? RegularCurses.nocbreak () : CursesLinux.nocbreak ();
-		static public int echo () => use_naked_driver ? RegularCurses.echo () : CursesLinux.echo ();
-		static public int noecho () => use_naked_driver ? RegularCurses.noecho () : CursesLinux.noecho ();
-		static public int halfdelay (int t) => use_naked_driver ? RegularCurses.halfdelay (t) : CursesLinux.halfdelay (t);
-		static public int raw () => use_naked_driver ? RegularCurses.raw () : CursesLinux.raw ();
-		static public int noraw () => use_naked_driver ? RegularCurses.noraw () : CursesLinux.noraw ();
-		static public void noqiflush () { if (use_naked_driver) RegularCurses.noqiflush (); else CursesLinux.noqiflush (); }
-		static public void qiflush () { if (use_naked_driver) RegularCurses.qiflush (); else CursesLinux.qiflush (); }
-		static public int typeahead (IntPtr fd) => use_naked_driver ? RegularCurses.typeahead (fd) : CursesLinux.typeahead (fd);
-		static public int timeout (int delay) => use_naked_driver ? RegularCurses.timeout (delay) : CursesLinux.timeout (delay);
-		static public int wtimeout (IntPtr win, int delay) => use_naked_driver ? RegularCurses.wtimeout (win, delay) : CursesLinux.wtimeout (win, delay);
-		static public int notimeout (IntPtr win, bool bf) => use_naked_driver ? RegularCurses.notimeout (win, bf) : CursesLinux.notimeout (win, bf);
-		static public int keypad (IntPtr win, bool bf) => use_naked_driver ? RegularCurses.keypad (win, bf) : CursesLinux.keypad (win, bf);
-		static public int meta (IntPtr win, bool bf) => use_naked_driver ? RegularCurses.meta (win, bf) : CursesLinux.meta (win, bf);
-		static public int intrflush (IntPtr win, bool bf) => use_naked_driver ? RegularCurses.intrflush (win, bf) : CursesLinux.intrflush (win, bf);
-		static public int clearok (IntPtr win, bool bf) => use_naked_driver ? RegularCurses.clearok (win, bf) : CursesLinux.clearok (win, bf);
-		static public int idlok (IntPtr win, bool bf) => use_naked_driver ? RegularCurses.idlok (win, bf) : CursesLinux.idlok (win, bf);
+		static public IntPtr real_initscr () => methods.real_initscr ();
+		static public int endwin () => methods.endwin ();
+		static public bool isendwin () => methods.isendwin ();
+		static public int cbreak () => methods.cbreak ();
+		static public int nocbreak () => methods.nocbreak ();
+		static public int echo () => methods.echo ();
+		static public int noecho () => methods.noecho ();
+		static public int halfdelay (int t) => methods.halfdelay (t);
+		static public int raw () => methods.raw ();
+		static public int noraw () => methods.noraw ();
+		static public void noqiflush () => { methods.noqiflush (); };
+		static public void qiflush () => { methods.qiflush (); };
+		static public int typeahead (IntPtr fd) => methods.typeahead (fd);
+		static public int timeout (int delay) => methods.timeout (delay);
+		static public int wtimeout (IntPtr win, int delay) => methods.wtimeout (win, delay);
+		static public int notimeout (IntPtr win, bool bf) => methods.notimeout (win, bf);
+		static public int keypad (IntPtr win, bool bf) => methods.keypad (win, bf);
+		static public int meta (IntPtr win, bool bf) => methods.meta (win, bf);
+		static public int intrflush (IntPtr win, bool bf) => methods.intrflush (win, bf);
+		static public int clearok (IntPtr win, bool bf) => methods.clearok (win, bf);
+		static public int idlok (IntPtr win, bool bf) => methods.idlok (win, bf);
 		static public void idcok (IntPtr win, bool bf) { if (use_naked_driver) RegularCurses.idcok (win, bf); else CursesLinux.idcok (win, bf);}
 		static public void immedok (IntPtr win, bool bf) { if (use_naked_driver) RegularCurses.immedok (win, bf); else CursesLinux.immedok (win, bf);}
-		static public int leaveok (IntPtr win, bool bf) => use_naked_driver ? RegularCurses.leaveok (win, bf) : CursesLinux.leaveok (win, bf);
-		static public int wsetscrreg (IntPtr win, int top, int bot) => use_naked_driver ? RegularCurses.wsetscrreg (win, top, bot) : CursesLinux.wsetscrreg (win, top, bot);
-		static public int scrollok (IntPtr win, bool bf) => use_naked_driver ? RegularCurses.scrollok (win, bf) : CursesLinux.scrollok (win, bf);
-		static public int nl() => use_naked_driver ? RegularCurses.nl() : CursesLinux.nl();
-		static public int nonl() => use_naked_driver ? RegularCurses.nonl() : CursesLinux.nonl();
-		static public int setscrreg (int top, int bot) => use_naked_driver ? RegularCurses.setscrreg (top, bot) : CursesLinux.setscrreg (top, bot);
-		static public int refresh () => use_naked_driver ? RegularCurses.refresh () : CursesLinux.refresh ();
-		static public int doupdate() => use_naked_driver ? RegularCurses.doupdate() : CursesLinux.doupdate();
-		static public int wrefresh (IntPtr win) => use_naked_driver ? RegularCurses.wrefresh (win) : CursesLinux.wrefresh (win);
-		static public int redrawwin (IntPtr win) => use_naked_driver ? RegularCurses.redrawwin (win) : CursesLinux.redrawwin (win);
-		static public int wredrawwin (IntPtr win, int beg_line, int num_lines) => use_naked_driver ? RegularCurses.wredrawwin (win, beg_line, num_lines) : CursesLinux.wredrawwin (win, beg_line, lines);
-		static public int wnoutrefresh (IntPtr win) => use_naked_driver ? RegularCurses.wnoutrefresh (win) : CursesLinux.wnoutrefresh (win);
-		static public int move (int line, int col) => use_naked_driver ? RegularCurses.move (line, col) : CursesLinux.move (line, col);
-		static public int _addch (int ch) => use_naked_driver ? RegularCurses._addch (ch) : CursesLinux._addch (ch);
-		static public int addstr (string s) => use_naked_driver ? RegularCurses.addstr (s) : CursesLinux.addstr (s);
-		static public int wmove (IntPtr win, int line, int col) => use_naked_driver ? RegularCurses.wmove (win, line, col) : CursesLinux.wmove (win, line, col);
-		static public int waddch (IntPtr win, int ch) => use_naked_driver ? RegularCurses.waddch (win, ch) : CursesLinux.waddch (win, ch);
-		static public int attron (int attrs) => use_naked_driver ? RegularCurses.attron (attrs) : CursesLinux.attron (attrs);
-		static public int attroff (int attrs) => use_naked_driver ? RegularCurses.attroff (attrs) : CursesLinux.attroff (attrs);
-		static public int attrset (int attrs) => use_naked_driver ? RegularCurses.attrset (attrs) : CursesLinux.attrset (attrs);
-		static public int getch () => use_naked_driver ? RegularCurses.getch () : CursesLinux.getch ();
-		static public int get_wch (out int sequence) => use_naked_driver ? RegularCurses.get_wch (out sequence) : CursesLinux.get_wch (out sequence);
-		static public int ungetch (int ch) => use_naked_driver ? RegularCurses.ungetch (ch) : CursesLinux.ungetch (ch);
-		static public int mvgetch (int y, int x) => use_naked_driver ? RegularCurses.mvgetch (y, x) : CursesLinux.mvgetch (y, x);
-		static public bool has_colors () => use_naked_driver ? RegularCurses.has_colors () : CursesLinux.has_colors ();
-		static public int start_color () => use_naked_driver ? RegularCurses.start_color () : CursesLinux.start_color ();
-		static public int init_pair (short pair, short f, short b) => use_naked_driver ? RegularCurses.init_pair (pair, f, b) : CursesLinux.init_pair (pair, f, b);
-		static public int use_default_colors () => use_naked_driver ? RegularCurses.use_default_colors () : CursesLinux.use_default_colors ();
-		static public int COLOR_PAIRS() => use_naked_driver ? RegularCurses.COLOR_PAIRS() : CursesLinux.COLOR_PAIRS();
-		static public uint getmouse (out MouseEvent ev) => use_naked_driver ? RegularCurses.getmouse (out ev) : CursesLinux.getmouse (out ev);
-		static public uint ungetmouse (ref MouseEvent ev) => use_naked_driver ? RegularCurses.ungetmouse (ref ev) : CursesLinux.ungetmouse (ref ev);
-		static public int mouseinterval (int interval) => use_naked_driver ? RegularCurses.mouseinterval (interval) : CursesLinux.mouseinterval (interval);
+		static public int leaveok (IntPtr win, bool bf) => methods.leaveok (win, bf);
+		static public int wsetscrreg (IntPtr win, int top, int bot) => methods.wsetscrreg (win, top, bot);
+		static public int scrollok (IntPtr win, bool bf) => methods.scrollok (win, bf);
+		static public int nl() => methods.nl();
+		static public int nonl() => methods.nonl();
+		static public int setscrreg (int top, int bot) => methods.setscrreg (top, bot);
+		static public int refresh () => methods.refresh ();
+		static public int doupdate() => methods.doupdate();
+		static public int wrefresh (IntPtr win) => methods.wrefresh (win);
+		static public int redrawwin (IntPtr win) => methods.redrawwin (win);
+		static public int wredrawwin (IntPtr win, int beg_line, int num_lines) => methods.wredrawwin (win, beg_line, num_lines);
+		static public int wnoutrefresh (IntPtr win) => methods.wnoutrefresh (win);
+		static public int move (int line, int col) => methods.move (line, col);
+		static public int _addch (int ch) => methods._addch (ch);
+		static public int addstr (string s) => methods.addstr (s);
+		static public int wmove (IntPtr win, int line, int col) => methods.wmove (win, line, col);
+		static public int waddch (IntPtr win, int ch) => methods.waddch (win, ch);
+		static public int attron (int attrs) => methods.attron (attrs);
+		static public int attroff (int attrs) => methods.attroff (attrs);
+		static public int attrset (int attrs) => methods.attrset (attrs);
+		static public int getch () => methods.getch ();
+		static public int get_wch (out int sequence) => methods.get_wch (out sequence);
+		static public int ungetch (int ch) => methods.ungetch (ch);
+		static public int mvgetch (int y, int x) => methods.mvgetch (y, x);
+		static public bool has_colors () => methods.has_colors ();
+		static public int start_color () => methods.start_color ();
+		static public int init_pair (short pair, short f, short b) => methods.init_pair (pair, f, b);
+		static public int use_default_colors () => methods.use_default_colors ();
+		static public int COLOR_PAIRS() => methods.COLOR_PAIRS();
+		static public uint getmouse (out MouseEvent ev) => methods.getmouse (out ev);
+		static public uint ungetmouse (ref MouseEvent ev) => methods.ungetmouse (ref ev);
+		static public int mouseinterval (int interval) => methods.mouseinterval (interval);
 	}
 	
 	//
