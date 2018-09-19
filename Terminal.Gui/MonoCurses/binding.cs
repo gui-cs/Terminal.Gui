@@ -40,6 +40,121 @@ using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Unix.Terminal {
+	internal class Delegates {
+		public delegate IntPtr initscr ();
+		public delegate int endwin ();
+		public delegate bool isendwin ();
+		public delegate int cbreak ();
+		public delegate int nocbreak ();
+		public delegate int echo ();
+		public delegate int noecho ();
+		public delegate int halfdelay (int t);
+		public delegate int raw ();
+		public delegate int noraw ();
+		public delegate void noqiflush ();
+		public delegate void qiflush ();
+		public delegate int typeahead (IntPtr fd);
+		public delegate int timeout (int delay);
+		public delegate int wtimeout (IntPtr win, int delay);
+		public delegate int notimeout (IntPtr win, bool bf);
+		public delegate int keypad (IntPtr win, bool bf);
+		public delegate int meta (IntPtr win, bool bf);
+		public delegate int intrflush (IntPtr win, bool bf);
+		public delegate int clearok (IntPtr win, bool bf);
+		public delegate int idlok (IntPtr win, bool bf);
+		public delegate void idcok (IntPtr win, bool bf);
+		public delegate void immedok (IntPtr win, bool bf);
+		public delegate int leaveok (IntPtr win, bool bf);
+		public delegate int wsetscrreg (IntPtr win, int top, int bot);
+		public delegate int scrollok (IntPtr win, bool bf);
+		public delegate int nl();
+		public delegate int nonl();
+		public delegate int setscrreg (int top, int bot);
+		public delegate int refresh ();
+		public delegate int doupdate();
+		public delegate int wrefresh (IntPtr win);
+		public delegate int redrawwin (IntPtr win);
+		public delegate int wredrawwin (IntPtr win, int beg_line, int num_lines);
+		public delegate int wnoutrefresh (IntPtr win);
+		public delegate int move (int line, int col);
+		public delegate int addch (int ch);
+		public delegate int addstr (string s);
+		public delegate int wmove (IntPtr win, int line, int col);
+		public delegate int waddch (IntPtr win, int ch);
+		public delegate int attron (int attrs);
+		public delegate int attroff (int attrs);
+		public delegate int attrset (int attrs);
+		public delegate int getch ();
+		public delegate int get_wch (out int sequence);
+		public delegate int ungetch (int ch);
+		public delegate int mvgetch (int y, int x);
+		public delegate bool has_colors ();
+		public delegate int start_color ();
+		public delegate int init_pair (short pair, short f, short b);
+		public delegate int use_default_colors ();
+		public delegate int COLOR_PAIRS();
+		public delegate uint getmouse (out MouseEvent ev);
+		public delegate uint ungetmouse (ref MouseEvent ev);
+		public delegate int mouseinterval (int interval);
+	}
+
+	internal class NativeMethods {
+		public readonly Delegates.initscr initscr;
+		public readonly Delegates.endwin endwin;
+		public readonly Delegates.isendwin isendwin;
+		public readonly Delegates.cbreak cbreak;
+		public readonly Delegates.nocbreak nocbreak;
+		public readonly Delegates.echo echo;
+		public readonly Delegates.noecho noecho;
+		public readonly Delegates.halfdelay halfdelay;
+		public readonly Delegates.raw raw;
+		public readonly Delegates.noraw noraw;
+		public readonly Delegates.noqiflush noqiflush;
+		public readonly Delegates.qiflush qiflush;
+		public readonly Delegates.typeahead typeahead;
+		public readonly Delegates.timeout timeout;
+		public readonly Delegates.wtimeout wtimeout;
+		public readonly Delegates.notimeout notimeout;
+		public readonly Delegates.keypad keypad;
+		public readonly Delegates.meta meta;
+		public readonly Delegates.intrflush intrflush;
+		public readonly Delegates.clearok clearok;
+		public readonly Delegates.idlok idlok;
+		public readonly Delegates.idcok idcok;
+		public readonly Delegates.immedok immedok;
+		public readonly Delegates.leaveok leaveok;
+		public readonly Delegates.wsetscrreg wsetscrreg;
+		public readonly Delegates.scrollok scrollok;
+		public readonly Delegates.nl nl;
+		public readonly Delegates.nonl nonl;
+		public readonly Delegates.setscrreg setscrreg;
+		public readonly Delegates.refresh refresh;
+		public readonly Delegates.doupdate doupdate;
+		public readonly Delegates.wrefresh wrefresh;
+		public readonly Delegates.redrawwin redrawwin;
+		public readonly Delegates.wredrawwin wredrawwin;
+		public readonly Delegates.wnoutrefresh wnoutrefresh;
+		public readonly Delegates.move move;
+		public readonly Delegates.addch addch;
+		public readonly Delegates.addstr addstr;
+		public readonly Delegates.wmove wmove;
+		public readonly Delegates.waddch waddch;
+		public readonly Delegates.attron attron;
+		public readonly Delegates.attroff attroff;
+		public readonly Delegates.attrset attrset;
+		public readonly Delegates.getch getch;
+		public readonly Delegates.get_wch get_wch;
+		public readonly Delegates.ungetch ungetch;
+		public readonly Delegates.mvgetch mvgetch;
+		public readonly Delegates.has_colors has_colors;
+		public readonly Delegates.start_color start_color;
+		public readonly Delegates.init_pair init_pair;
+		public readonly Delegates.use_default_colors use_default_colors;
+		public readonly Delegates.COLOR_PAIR COLOR_PAIR;
+		public readonly Delegates.getmouse getmouse;
+		public readonly Delegates.ungetmouse ungetmouse;
+		public readonly Delegates.mouseinterval mouseinterval;
+	}
 
 	internal partial class Curses {
 		[StructLayout (LayoutKind.Sequential)]
@@ -56,6 +171,12 @@ namespace Unix.Terminal {
 		// If true, uses the DllImport into "ncurses", otherwise "libncursesw.so.5"
 		static bool use_naked_driver;
 
+		static void LoadMethods ()
+		{
+			var libs = UnmanagedLibrary.IsMacOSPlatform ? new string [] { "libncurses.dylib" } : new string { "libncursesw.so.6", "libncursesw.so.5" };
+			var lib = new UnmanagedLibrary (libs);
+		}
+		
 		//
 		// Ugly hack to P/Invoke into either libc, or libdl, again, because
 		// we can not have nice things - .NET Core in this day and age still

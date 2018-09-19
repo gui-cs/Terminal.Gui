@@ -141,6 +141,7 @@ namespace Terminal.Gui {
 		/// The base color scheme, for the default toplevel views.
 		/// </summary>
 		public static ColorScheme Base;
+		
 		/// <summary>
 		/// The dialog color scheme, for standard popup dialog boxes
 		/// </summary>
