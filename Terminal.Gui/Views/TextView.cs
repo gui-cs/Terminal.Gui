@@ -719,7 +719,7 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.PageUp:
-				if (currentRow > nPageShift) {
+				if (currentRow > 0) {
 					if (columnTrack == -1)
 						columnTrack = currentColumn;
 					currentRow -= nPageShift;
