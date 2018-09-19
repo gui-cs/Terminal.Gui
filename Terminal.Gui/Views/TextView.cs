@@ -938,11 +938,12 @@ namespace Terminal.Gui {
 				break;
 
 			default:
-				if (isReadOnly)
-					return true;
 				// Ignore control characters and other special keys
 				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
 					return false;
+				//So that special keys like tab can be processed
+				if (isReadOnly)
+					return true;
 				Insert ((uint)kb.Key);
 				currentColumn++;
 				if (currentColumn >= leftColumn + Frame.Width) {
