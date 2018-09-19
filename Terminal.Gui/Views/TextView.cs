@@ -7,6 +7,7 @@
 // 
 // TODO:
 // PageUp/PageDown	
+// In ReadOnly mode backspace/space behave like pageup/pagedown
 // Attributed text on spans
 // Replace insertion with Insert method
 // String accumulation (Control-k, control-k is not preserving the last new line, see StringToRunes
@@ -391,6 +392,14 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (ColorScheme.Normal);
 		}
 
+		bool isReadOnly;
+		public bool ReadOnly {
+			get => isReadOnly;
+			set {
+				isReadOnly = value;
+			}
+		}
+
 		// Returns an encoded region start..end (top 32 bits are the row, low32 the column)
 		void GetEncodedRegionBounds (out long start, out long end)
 		{
@@ -759,6 +768,8 @@ namespace Terminal.Gui {
 
 			case Key.Delete:
 			case Key.Backspace:
+				if (isReadOnly)
+					break;
 				if (currentColumn > 0) {
 					// Delete backwards 
 					currentLine = GetCurrentLine ();
@@ -799,6 +810,8 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.ControlD: // Delete
+				if (isReadOnly)
+					break;
 				currentLine = GetCurrentLine ();
 				if (currentColumn == currentLine.Count) {
 					if (currentRow + 1 == model.Count)
@@ -829,6 +842,8 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.ControlK: // kill-to-end
+				if (isReadOnly)
+					break;
 				currentLine = GetCurrentLine ();
 				if (currentLine.Count == 0) {
 					model.RemoveLine (currentRow);
@@ -852,6 +867,8 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.ControlY: // Control-y, yank
+				if (isReadOnly)
+					break;
 				InsertText (Clipboard.Contents);
 				selecting = false;
 				break;
@@ -869,7 +886,8 @@ namespace Terminal.Gui {
 
 			case Key.ControlW:
 				SetClipboard (GetRegion ());
-				ClearRegion ();
+				if (!isReadOnly)
+					ClearRegion ();
 				selecting = false;
 				break;
 
@@ -893,6 +911,8 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.Enter:
+				if (isReadOnly)
+					break;
 				var orow = currentRow;
 				currentLine = GetCurrentLine ();
 				restCount = currentLine.Count - currentColumn;
@@ -918,6 +938,8 @@ namespace Terminal.Gui {
 				break;
 
 			default:
+				if (isReadOnly)
+					return true;
 				// Ignore control characters and other special keys
 				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
 					return false;
