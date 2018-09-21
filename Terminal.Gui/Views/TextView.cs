@@ -6,7 +6,6 @@
 //
 // 
 // TODO:
-// PageUp/PageDown	
 // In ReadOnly mode backspace/space behave like pageup/pagedown
 // Attributed text on spans
 // Replace insertion with Insert method
@@ -130,7 +129,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>The line.</returns>
 		/// <param name="line">Line number to retrieve.</param>
-		public List<Rune> GetLine (int line) => lines [line];
+		public List<Rune> GetLine (int line) => line < Count ? lines [line]: lines[Count-1];
 
 		/// <summary>
 		/// Adds a line to the model at the specified position.
@@ -405,21 +404,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		int nPageShift = 5;
-
-		/// <summary>
-		/// Number of lines to process for PageUp and PageDown keypress event
-		/// </summary>
-		/// <value>Number of lines(Default 5).</value>
-		public int PageShift 
-		{
-			get => nPageShift;
-			set 
-			{
-				nPageShift = value;
-			}
-		}
-
 		// Returns an encoded region start..end (top 32 bits are the row, low32 the column)
 		void GetEncodedRegionBounds (out long start, out long end)
 		{
@@ -690,8 +674,6 @@ namespace Terminal.Gui {
 			case Key.CursorDown:
 			case Key.ControlP:
 			case Key.CursorUp:
-			case Key.PageUp:
-			case Key.PageDown:
 				lastWasKill = false;
 				break;
 			case Key.ControlK:
@@ -705,12 +687,14 @@ namespace Terminal.Gui {
 			// Dispatch the command.
 			switch (kb.Key) {
 			case Key.PageDown:
-				if (currentRow + nPageShift < model.Count) {
+			case Key.ControlV:
+				int nPageDnShift = Frame.Height - 1;
+				if (currentRow < model.Count) {
 					if (columnTrack == -1)
 						columnTrack = currentColumn;
-					currentRow += nPageShift;
-					if (currentRow >= topRow + Frame.Height) {
-						topRow += nPageShift;
+					currentRow = (currentRow + nPageDnShift) > model.Count ? model.Count : currentRow + nPageDnShift;
+					if (topRow < currentRow - nPageDnShift) {
+						topRow = currentRow >= model.Count ? currentRow - nPageDnShift : topRow + nPageDnShift;
 						SetNeedsDisplay ();
 					}
 					TrackColumn ();
@@ -719,12 +703,14 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.PageUp:
+			case ((int)'v' + Key.AltMask):
+				int nPageUpShift = Frame.Height - 1;
 				if (currentRow > 0) {
 					if (columnTrack == -1)
 						columnTrack = currentColumn;
-					currentRow -= nPageShift;
+					currentRow = currentRow - nPageUpShift < 0 ? 0 : currentRow - nPageUpShift;
 					if (currentRow < topRow) {
-						topRow -= nPageShift;
+						topRow = topRow - nPageUpShift < 0 ? 0 : topRow - nPageUpShift;
 						SetNeedsDisplay ();
 					}
 					TrackColumn ();
