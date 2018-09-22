@@ -96,10 +96,14 @@ namespace Terminal.Gui {
 
 		static ustring ClipAndJustify (ustring str, int width, TextAlignment talign)
 		{
-			int slen = str.Length;
-			if (slen > width)
-				return str [0, width];
-			else {
+			int slen = str.RuneCount;
+			if (slen > width){
+				var uints = str.ToRunes (width);
+				var runes = new Rune [uints.Length];
+				for (int i = 0; i < uints.Length; i++)
+					runes [i] = uints [i];
+				return ustring.Make (runes);
+			} else {
 				if (talign == TextAlignment.Justified) {
 					// TODO: ustring needs this
 			               	var words = str.ToString ().Split (whitespace, StringSplitOptions.RemoveEmptyEntries);
