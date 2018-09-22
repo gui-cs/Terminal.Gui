@@ -92,6 +92,8 @@ namespace Mono.Terminal.Internal {
 		readonly string libraryPath;
 		readonly IntPtr handle;
 
+		public IntPtr NativeLibraryHandle => handle;
+
 		//
 		// if isFullPath is set to true, the provided array of libraries are full paths
 		// and are tested for the file existing, otherwise the file is merely the name
@@ -120,8 +122,8 @@ namespace Mono.Terminal.Internal {
 		/// </summary>
 		/// <param name="symbolName"></param>
 		/// <returns></returns>
-		private IntPtr LoadSymbol (string symbolName)
-		{s
+		public IntPtr LoadSymbol (string symbolName)
+		{
 			if (IsWindows) {
 				// See http://stackoverflow.com/questions/10473310 for background on this.
 				if (Is64Bit) {

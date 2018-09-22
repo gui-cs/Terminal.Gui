@@ -44,182 +44,9 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Mono.Terminal.Internal;
 
 namespace Unix.Terminal {
-	internal class Delegates {
-		public delegate IntPtr initscr ();
-		public delegate int endwin ();
-		public delegate bool isendwin ();
-		public delegate int cbreak ();
-		public delegate int nocbreak ();
-		public delegate int echo ();
-		public delegate int noecho ();
-		public delegate int halfdelay (int t);
-		public delegate int raw ();
-		public delegate int noraw ();
-		public delegate void noqiflush ();
-		public delegate void qiflush ();
-		public delegate int typeahead (IntPtr fd);
-		public delegate int timeout (int delay);
-		public delegate int wtimeout (IntPtr win, int delay);
-		public delegate int notimeout (IntPtr win, bool bf);
-		public delegate int keypad (IntPtr win, bool bf);
-		public delegate int meta (IntPtr win, bool bf);
-		public delegate int intrflush (IntPtr win, bool bf);
-		public delegate int clearok (IntPtr win, bool bf);
-		public delegate int idlok (IntPtr win, bool bf);
-		public delegate void idcok (IntPtr win, bool bf);
-		public delegate void immedok (IntPtr win, bool bf);
-		public delegate int leaveok (IntPtr win, bool bf);
-		public delegate int wsetscrreg (IntPtr win, int top, int bot);
-		public delegate int scrollok (IntPtr win, bool bf);
-		public delegate int nl();
-		public delegate int nonl();
-		public delegate int setscrreg (int top, int bot);
-		public delegate int refresh ();
-		public delegate int doupdate();
-		public delegate int wrefresh (IntPtr win);
-		public delegate int redrawwin (IntPtr win);
-		public delegate int wredrawwin (IntPtr win, int beg_line, int num_lines);
-		public delegate int wnoutrefresh (IntPtr win);
-		public delegate int move (int line, int col);
-		public delegate int addch (int ch);
-		public delegate int addstr (string s);
-		public delegate int wmove (IntPtr win, int line, int col);
-		public delegate int waddch (IntPtr win, int ch);
-		public delegate int attron (int attrs);
-		public delegate int attroff (int attrs);
-		public delegate int attrset (int attrs);
-		public delegate int getch ();
-		public delegate int get_wch (out int sequence);
-		public delegate int ungetch (int ch);
-		public delegate int mvgetch (int y, int x);
-		public delegate bool has_colors ();
-		public delegate int start_color ();
-		public delegate int init_pair (short pair, short f, short b);
-		public delegate int use_default_colors ();
-		public delegate int COLOR_PAIRS();
-		public delegate uint getmouse (out MouseEvent ev);
-		public delegate uint ungetmouse (ref MouseEvent ev);
-		public delegate int mouseinterval (int interval);
-	}
-
-	internal class NativeMethods {
-		public readonly Delegates.initscr initscr;
-		public readonly Delegates.endwin endwin;
-		public readonly Delegates.isendwin isendwin;
-		public readonly Delegates.cbreak cbreak;
-		public readonly Delegates.nocbreak nocbreak;
-		public readonly Delegates.echo echo;
-		public readonly Delegates.noecho noecho;
-		public readonly Delegates.halfdelay halfdelay;
-		public readonly Delegates.raw raw;
-		public readonly Delegates.noraw noraw;
-		public readonly Delegates.noqiflush noqiflush;
-		public readonly Delegates.qiflush qiflush;
-		public readonly Delegates.typeahead typeahead;
-		public readonly Delegates.timeout timeout;
-		public readonly Delegates.wtimeout wtimeout;
-		public readonly Delegates.notimeout notimeout;
-		public readonly Delegates.keypad keypad;
-		public readonly Delegates.meta meta;
-		public readonly Delegates.intrflush intrflush;
-		public readonly Delegates.clearok clearok;
-		public readonly Delegates.idlok idlok;
-		public readonly Delegates.idcok idcok;
-		public readonly Delegates.immedok immedok;
-		public readonly Delegates.leaveok leaveok;
-		public readonly Delegates.wsetscrreg wsetscrreg;
-		public readonly Delegates.scrollok scrollok;
-		public readonly Delegates.nl nl;
-		public readonly Delegates.nonl nonl;
-		public readonly Delegates.setscrreg setscrreg;
-		public readonly Delegates.refresh refresh;
-		public readonly Delegates.doupdate doupdate;
-		public readonly Delegates.wrefresh wrefresh;
-		public readonly Delegates.redrawwin redrawwin;
-		public readonly Delegates.wredrawwin wredrawwin;
-		public readonly Delegates.wnoutrefresh wnoutrefresh;
-		public readonly Delegates.move move;
-		public readonly Delegates.addch addch;
-		public readonly Delegates.addstr addstr;
-		public readonly Delegates.wmove wmove;
-		public readonly Delegates.waddch waddch;
-		public readonly Delegates.attron attron;
-		public readonly Delegates.attroff attroff;
-		public readonly Delegates.attrset attrset;
-		public readonly Delegates.getch getch;
-		public readonly Delegates.get_wch get_wch;
-		public readonly Delegates.ungetch ungetch;
-		public readonly Delegates.mvgetch mvgetch;
-		public readonly Delegates.has_colors has_colors;
-		public readonly Delegates.start_color start_color;
-		public readonly Delegates.init_pair init_pair;
-		public readonly Delegates.use_default_colors use_default_colors;
-		public readonly Delegates.COLOR_PAIR COLOR_PAIR;
-		public readonly Delegates.getmouse getmouse;
-		public readonly Delegates.ungetmouse ungetmouse;
-		public readonly Delegates.mouseinterval mouseinterval;
-
-		public void NativeMethods (UnmanagedLibrary lib)
-		{
-			initscr = lib.GetMethodDelegate<Delegates.initscr> ("initscr");
-			endwin = lib.GetMethodDelegate<Delegates.endwin> ("endwin");
-			isendwin = lib.GetMethodDelegate<Delegates.isendwin> ("isendwin");
-			cbreak = lib.GetMethodDelegate<Delegates.cbreak> ("cbreak");
-			nocbreak = lib.GetMethodDelegate<Delegates.nocbreak> ("nocbreak");
-			echo = lib.GetMethodDelegate<Delegates.echo> ("echo");
-			noecho = lib.GetMethodDelegate<Delegates.noecho> ("noecho");
-			halfdelay = lib.GetMethodDelegate<Delegates.halfdelay> ("halfdelay");
-			raw = lib.GetMethodDelegate<Delegates.raw> ("raw");
-			noraw = lib.GetMethodDelegate<Delegates.noraw> ("noraw");
-			noqiflush = lib.GetMethodDelegate<Delegates.noqiflush> ("noqiflush");
-			qiflush = lib.GetMethodDelegate<Delegates.qiflush> ("qiflush");
-			typeahead = lib.GetMethodDelegate<Delegates.typeahead> ("typeahead");
-			timeout = lib.GetMethodDelegate<Delegates.timeout> ("timeout");
-			wtimeout = lib.GetMethodDelegate<Delegates.wtimeout> ("wtimeout");
-			notimeout = lib.GetMethodDelegate<Delegates.notimeout> ("notimeout");
-			keypad = lib.GetMethodDelegate<Delegates.keypad> ("keypad");
-			meta = lib.GetMethodDelegate<Delegates.meta> ("meta");
-			intrflush = lib.GetMethodDelegate<Delegates.intrflush> ("intrflush");
-			clearok = lib.GetMethodDelegate<Delegates.clearok> ("clearok");
-			idlok = lib.GetMethodDelegate<Delegates.idlok> ("idlok");
-			idcok = lib.GetMethodDelegate<Delegates.idcok> ("idcok");
-			immedok = lib.GetMethodDelegate<Delegates.immedok> ("immedok");
-			leaveok = lib.GetMethodDelegate<Delegates.leaveok> ("leaveok");
-			wsetscrreg = lib.GetMethodDelegate<Delegates.wsetscrreg> ("wsetscrreg");
-			scrollok = lib.GetMethodDelegate<Delegates.scrollok> ("scrollok");
-			nl = lib.GetMethodDelegate<Delegates.nl> ("nl");
-			nonl = lib.GetMethodDelegate<Delegates.nonl> ("nonl");
-			setscrreg = lib.GetMethodDelegate<Delegates.setscrreg> ("setscrreg");
-			refresh = lib.GetMethodDelegate<Delegates.refresh> ("refresh");
-			doupdate = lib.GetMethodDelegate<Delegates.doupdate> ("doupdate");
-			wrefresh = lib.GetMethodDelegate<Delegates.wrefresh> ("wrefresh");
-			redrawwin = lib.GetMethodDelegate<Delegates.redrawwin> ("redrawwin");
-			wredrawwin = lib.GetMethodDelegate<Delegates.wredrawwin> ("wredrawwin");
-			wnoutrefresh = lib.GetMethodDelegate<Delegates.wnoutrefresh> ("wnoutrefresh");
-			move = lib.GetMethodDelegate<Delegates.move> ("move");
-			addch = lib.GetMethodDelegate<Delegates.addch> ("addch");
-			addstr = lib.GetMethodDelegate<Delegates.addstr> ("addstr");
-			wmove = lib.GetMethodDelegate<Delegates.wmove> ("wmove");
-			waddch = lib.GetMethodDelegate<Delegates.waddch> ("waddch");
-			attron = lib.GetMethodDelegate<Delegates.attron> ("attron");
-			attroff = lib.GetMethodDelegate<Delegates.attroff> ("attroff");
-			attrset = lib.GetMethodDelegate<Delegates.attrset> ("attrset");
-			getch = lib.GetMethodDelegate<Delegates.getch> ("getch");
-			get_wch = lib.GetMethodDelegate<Delegates.get_wch> ("get_wch");
-			ungetch = lib.GetMethodDelegate<Delegates.ungetch> ("ungetch");
-			mvgetch = lib.GetMethodDelegate<Delegates.mvgetch> ("mvgetch");
-			has_colors = lib.GetMethodDelegate<Delegates.has_colors> ("has_colors");
-			start_color = lib.GetMethodDelegate<Delegates.start_color> ("start_color");
-			init_pair = lib.GetMethodDelegate<Delegates.init_pair> ("init_pair");
-			use_default_colors = lib.GetMethodDelegate<Delegates.use_default_colors> ("use_default_colors");
-			COLOR_PAIR = lib.GetMethodDelegate<Delegates.COLOR_PAIR> ("COLOR_PAIR");
-			getmouse = lib.GetMethodDelegate<Delegates.getmouse> ("getmouse");
-			ungetmouse = lib.GetMethodDelegate<Delegates.ungetmouse> ("ungetmouse");
-			mouseinterval = lib.GetMethodDelegate<Delegates.mouseinterval> ("mouseinterval");
-		}
-	}
 
 	internal partial class Curses {
 		[StructLayout (LayoutKind.Sequential)]
@@ -236,48 +63,21 @@ namespace Unix.Terminal {
 		// If true, uses the DllImport into "ncurses", otherwise "libncursesw.so.5"
 		static bool use_naked_driver;
 
-		NativeMethods methods;
+		static UnmanagedLibrary curses_library;
+		static NativeMethods methods;
 		
 		static void LoadMethods ()
 		{
-			var libs = UnmanagedLibrary.IsMacOSPlatform ? new string [] { "libncurses.dylib" } : new string { "libncursesw.so.6", "libncursesw.so.5" };
-			var lib = new UnmanagedLibrary (libs);
-			methods = new NativeMethods (lib);
+			var libs = UnmanagedLibrary.IsMacOSPlatform ? new string [] { "libncurses.dylib" } : new string [] { "libncursesw.so.6", "libncursesw.so.5" };
+			curses_library = new UnmanagedLibrary (libs, false);
+			methods = new NativeMethods (curses_library);
 		}
-		
-		//
-		// Ugly hack to P/Invoke into either libc, or libdl, again, because
-		// we can not have nice things - .NET Core in this day and age still
-		// does not have <dllmap>
-		//
-		static IntPtr DlOpen (string path)
-		{
-			if (!uselibc){
-				try {
-					var handle = dlopen (path, 1);
-					return handle;
-				} catch (DllNotFoundException){
-					uselibc = true;
-					return DlOpen (path);
-				}
-			} else {
-				return libc_dlopen (path, 1);
-			}
-		}
-		
+
 		static void FindNCurses ()
 		{
-			if (File.Exists ("/usr/lib/libncurses.dylib")){
-				curses_handle = DlOpen ("libncurses.dylib");
-				use_naked_driver = true;
-			} else 
-				curses_handle = DlOpen ("libncursesw.so.5");
+			LoadMethods ();
+			curses_handle = methods.UnmanagedLibrary.NativeLibraryHandle;
 
-			if (curses_handle == IntPtr.Zero) {
-				Console.WriteLine ("It is not possible to open the dynamic library ncurses, tried looking for libncurses.dylib on Mac, and libncursesw.so.5 on Linux");
-				Environment.Exit (1);
-			}
-			
 			stdscr = read_static_ptr ("stdscr");
 			curscr_ptr = get_ptr ("curscr");
 			lines_ptr = get_ptr ("LINES");
@@ -290,7 +90,7 @@ namespace Unix.Terminal {
 			
 			main_window = new Window (methods.initscr ());
 			try {
-				console_sharp_get_dims (out lines, out bcols);
+				console_sharp_get_dims (out lines, out cols);
 			} catch (DllNotFoundException){
 				endwin ();
 				Console.Error.WriteLine ("Unable to find the @MONO_CURSES@ native library\n" + 
@@ -348,30 +148,16 @@ namespace Unix.Terminal {
 		public static int addch (int ch)
 		{
 			if (ch < 127 || ch > 0xffff )
-				return _addch (ch);
+				return methods.addch (ch);
 			char c = (char) ch;
 			return addstr (new String (c, 1));
 		}
-		
-		[DllImport ("dl")]
-		extern static IntPtr dlopen (string file, int mode);
-
-		[DllImport ("dl")]
-		extern static IntPtr dlsym (IntPtr handle, string symbol);
-
-		[DllImport ("libc", EntryPoint="dlopen")]
-		extern static IntPtr libc_dlopen (string file, int mode);
-
-		[DllImport ("libc", EntryPoint ="dlsym")]
-		extern static IntPtr libc_dlsym (IntPtr handle, string symbol);
-
-		static bool uselibc;
 
 		static IntPtr stdscr;
 
 		static IntPtr get_ptr (string key)
 		{
-			var ptr = uselibc ? libc_dlsym (curses_handle, key) : dlsym (curses_handle, key);
+			var ptr = curses_library.LoadSymbol (key);
 
 			if (ptr == IntPtr.Zero)
 				throw new Exception ("Could not load the key " + key);
@@ -401,7 +187,7 @@ namespace Unix.Terminal {
 		public static Event mousemask (Event newmask, out Event oldmask)
 		{
 			IntPtr e;
-			var ret = (Event) (methods.call_mousemask ((IntPtr) newmask, out e));
+			var ret = (Event) (methods.mousemask ((IntPtr) newmask, out e));
 			oldmask = (Event) e;
 			return ret;
 		}
@@ -425,7 +211,6 @@ namespace Unix.Terminal {
 		//
 		// The proxy methods to call into each version
 		//
-		static public IntPtr real_initscr () => methods.real_initscr ();
 		static public int endwin () => methods.endwin ();
 		static public bool isendwin () => methods.isendwin ();
 		static public int cbreak () => methods.cbreak ();
@@ -435,8 +220,8 @@ namespace Unix.Terminal {
 		static public int halfdelay (int t) => methods.halfdelay (t);
 		static public int raw () => methods.raw ();
 		static public int noraw () => methods.noraw ();
-		static public void noqiflush () => { methods.noqiflush (); };
-		static public void qiflush () => { methods.qiflush (); };
+		static public void noqiflush () => methods.noqiflush ();
+		static public void qiflush () => methods.qiflush ();
 		static public int typeahead (IntPtr fd) => methods.typeahead (fd);
 		static public int timeout (int delay) => methods.timeout (delay);
 		static public int wtimeout (IntPtr win, int delay) => methods.wtimeout (win, delay);
@@ -446,8 +231,8 @@ namespace Unix.Terminal {
 		static public int intrflush (IntPtr win, bool bf) => methods.intrflush (win, bf);
 		static public int clearok (IntPtr win, bool bf) => methods.clearok (win, bf);
 		static public int idlok (IntPtr win, bool bf) => methods.idlok (win, bf);
-		static public void idcok (IntPtr win, bool bf) { if (use_naked_driver) RegularCurses.idcok (win, bf); else CursesLinux.idcok (win, bf);}
-		static public void immedok (IntPtr win, bool bf) { if (use_naked_driver) RegularCurses.immedok (win, bf); else CursesLinux.immedok (win, bf);}
+		static public void idcok (IntPtr win, bool bf) => methods.idcok (win, bf);
+		static public void immedok (IntPtr win, bool bf) => methods.immedok (win, bf);
 		static public int leaveok (IntPtr win, bool bf) => methods.leaveok (win, bf);
 		static public int wsetscrreg (IntPtr win, int top, int bot) => methods.wsetscrreg (win, top, bot);
 		static public int scrollok (IntPtr win, bool bf) => methods.scrollok (win, bf);
@@ -458,10 +243,10 @@ namespace Unix.Terminal {
 		static public int doupdate() => methods.doupdate();
 		static public int wrefresh (IntPtr win) => methods.wrefresh (win);
 		static public int redrawwin (IntPtr win) => methods.redrawwin (win);
-		static public int wredrawwin (IntPtr win, int beg_line, int num_lines) => methods.wredrawwin (win, beg_line, num_lines);
+		//static public int wredrawwin (IntPtr win, int beg_line, int num_lines) => methods.wredrawwin (win, beg_line, num_lines);
 		static public int wnoutrefresh (IntPtr win) => methods.wnoutrefresh (win);
 		static public int move (int line, int col) => methods.move (line, col);
-		static public int _addch (int ch) => methods._addch (ch);
+		//static public int addch (int ch) => methods.addch (ch);
 		static public int addstr (string s) => methods.addstr (s);
 		static public int wmove (IntPtr win, int line, int col) => methods.wmove (win, line, col);
 		static public int waddch (IntPtr win, int ch) => methods.waddch (win, ch);
@@ -481,360 +266,184 @@ namespace Unix.Terminal {
 		static public uint ungetmouse (ref MouseEvent ev) => methods.ungetmouse (ref ev);
 		static public int mouseinterval (int interval) => methods.mouseinterval (interval);
 	}
-	
-	//
-	// P/Invoke definitions for looking up symbols in the "ncurses" library, as resolved
-	// by the dynamic linker, different than CursesLinux that looksup by "libncursesw.so.5"
-	//
-	internal class RegularCurses {
-		[DllImport ("ncurses", EntryPoint="initscr")]
-		extern static internal IntPtr real_initscr ();
 
-		[DllImport ("ncurses")]
-		extern static public int endwin ();
-
-		[DllImport ("ncurses")]
-		extern static public bool isendwin ();
-
-		//
-		// Screen operations are flagged as internal, as we need to
-		// catch all changes so we can update newscr, curscr, stdscr
-		//
-		[DllImport ("ncurses")]
-		extern static public IntPtr internal_newterm (string type, IntPtr file_outfd, IntPtr file_infd);
-
-		[DllImport ("ncurses")]
-		extern static public IntPtr internal_set_term (IntPtr newscreen);
-
-		[DllImport ("ncurses")]
-	        extern static internal void internal_delscreen (IntPtr sp);
-
-		[DllImport ("ncurses")]
-		extern static public int cbreak ();
-		
-		[DllImport ("ncurses")]
-		extern static public int nocbreak ();
-		
-		[DllImport ("ncurses")]
-		extern static public int echo ();
-		
-		[DllImport ("ncurses")]
-		extern static public int noecho ();
-		
-		[DllImport ("ncurses")]
-		extern static public int halfdelay (int t);
-
-		[DllImport ("ncurses")]
-		extern static public int raw ();
-
-		[DllImport ("ncurses")]
-		extern static public int noraw ();
-		
-		[DllImport ("ncurses")]
-		extern static public void noqiflush ();
-		
-		[DllImport ("ncurses")]
-		extern static public void qiflush ();
-
-		[DllImport ("ncurses")]
-		extern static public int typeahead (IntPtr fd);
-
-		[DllImport ("ncurses")]
-		extern static public int timeout (int delay);
-
-		//
-		// Internal, as they are exposed in Window
-		//
-		[DllImport ("ncurses")]
-		extern static internal int wtimeout (IntPtr win, int delay);
-	       
-		[DllImport ("ncurses")]
-		extern static internal int notimeout (IntPtr win, bool bf);
-
-		[DllImport ("ncurses")]
-		extern static internal int keypad (IntPtr win, bool bf);
-		
-		[DllImport ("ncurses")]
-		extern static internal int meta (IntPtr win, bool bf);
-		
-		[DllImport ("ncurses")]
-		extern static internal int intrflush (IntPtr win, bool bf);
-
-		[DllImport ("ncurses")]
-		extern internal static int clearok (IntPtr win, bool bf);
-		[DllImport ("ncurses")]
-		extern internal static int idlok (IntPtr win, bool bf);
-		[DllImport ("ncurses")]
-		extern internal static void idcok (IntPtr win, bool bf);
-		[DllImport ("ncurses")]
-		extern internal static void immedok (IntPtr win, bool bf);
-		[DllImport ("ncurses")]
-		extern internal static int leaveok (IntPtr win, bool bf);
-		[DllImport ("ncurses")]
-		extern internal static int wsetscrreg (IntPtr win, int top, int bot);
-		[DllImport ("ncurses")]
-		extern internal static int scrollok (IntPtr win, bool bf);
-		
-		[DllImport ("ncurses")]
-		extern public static int nl();
-		[DllImport ("ncurses")]
-		extern public static int nonl();
-		[DllImport ("ncurses")]
-		extern public static int setscrreg (int top, int bot);
-		
-
-		[DllImport ("ncurses")]
-		extern public static int refresh ();
-		[DllImport ("ncurses")]
-		extern public static int doupdate();
-
-		[DllImport ("ncurses")]
-		extern internal static int wrefresh (IntPtr win);
-		[DllImport ("ncurses")]
-		extern internal static int redrawwin (IntPtr win);
-		[DllImport ("ncurses")]
-		extern internal static int wredrawwin (IntPtr win, int beg_line, int num_lines);
-		[DllImport ("ncurses")]
-		extern internal static int wnoutrefresh (IntPtr win);
-
-		[DllImport ("ncurses")]
-		extern public static int move (int line, int col);
-
-		[DllImport ("ncurses", EntryPoint="addch")]
-		extern internal static int _addch (int ch);
-		
-		[DllImport ("ncurses")]
-		extern public static int addstr (string s);
-
-		[DllImport ("ncurses")]
-		extern internal static int wmove (IntPtr win, int line, int col);
-
-		[DllImport ("ncurses")]
-		extern internal static int waddch (IntPtr win, int ch);
-
-		[DllImport ("ncurses")]
-		extern public static int attron (int attrs);
-		[DllImport ("ncurses")]
-		extern public static int attroff (int attrs);
-		[DllImport ("ncurses")]
-		extern public static int attrset (int attrs);
-
-		[DllImport ("ncurses")]
-		extern public static int getch ();
-		
-		[DllImport ("ncurses")]
-		extern public static int get_wch (out int sequence);
-
-		[DllImport ("ncurses")]
-		extern public static int ungetch (int ch);
-
-		[DllImport ("ncurses")]
-		extern public static int mvgetch (int y, int x);
-
-		[DllImport ("ncurses")]
-		extern internal static bool has_colors ();
-
-		[DllImport ("ncurses")]
-		extern internal static int start_color ();
-
-		[DllImport ("ncurses")]
-		extern internal static int init_pair (short pair, short f, short b);
-
-		[DllImport ("ncurses")]
-		extern internal static int use_default_colors ();
-
-		[DllImport ("ncurses")]
-		extern internal static int COLOR_PAIRS();
-		
-		[DllImport ("ncurses")]
-		public extern static uint getmouse (out Curses.MouseEvent ev);
-
-		[DllImport ("ncurses")]
-		public extern static uint ungetmouse (ref Curses.MouseEvent ev);
-
-		[DllImport ("ncurses")]
-		public extern static int mouseinterval (int interval);
-		
-		[DllImport ("ncurses", EntryPoint="mousemask")]
-		public extern static IntPtr call_mousemask (IntPtr newmask, out IntPtr oldmask);
-		
+	internal class Delegates {
+		public delegate IntPtr initscr ();
+		public delegate int endwin ();
+		public delegate bool isendwin ();
+		public delegate int cbreak ();
+		public delegate int nocbreak ();
+		public delegate int echo ();
+		public delegate int noecho ();
+		public delegate int halfdelay (int t);
+		public delegate int raw ();
+		public delegate int noraw ();
+		public delegate void noqiflush ();
+		public delegate void qiflush ();
+		public delegate int typeahead (IntPtr fd);
+		public delegate int timeout (int delay);
+		public delegate int wtimeout (IntPtr win, int delay);
+		public delegate int notimeout (IntPtr win, bool bf);
+		public delegate int keypad (IntPtr win, bool bf);
+		public delegate int meta (IntPtr win, bool bf);
+		public delegate int intrflush (IntPtr win, bool bf);
+		public delegate int clearok (IntPtr win, bool bf);
+		public delegate int idlok (IntPtr win, bool bf);
+		public delegate void idcok (IntPtr win, bool bf);
+		public delegate void immedok (IntPtr win, bool bf);
+		public delegate int leaveok (IntPtr win, bool bf);
+		public delegate int wsetscrreg (IntPtr win, int top, int bot);
+		public delegate int scrollok (IntPtr win, bool bf);
+		public delegate int nl ();
+		public delegate int nonl ();
+		public delegate int setscrreg (int top, int bot);
+		public delegate int refresh ();
+		public delegate int doupdate ();
+		public delegate int wrefresh (IntPtr win);
+		public delegate int redrawwin (IntPtr win);
+		//public delegate int wredrawwin (IntPtr win, int beg_line, int num_lines);
+		public delegate int wnoutrefresh (IntPtr win);
+		public delegate int move (int line, int col);
+		public delegate int addch (int ch);
+		public delegate int addstr (string s);
+		public delegate int wmove (IntPtr win, int line, int col);
+		public delegate int waddch (IntPtr win, int ch);
+		public delegate int attron (int attrs);
+		public delegate int attroff (int attrs);
+		public delegate int attrset (int attrs);
+		public delegate int getch ();
+		public delegate int get_wch (out int sequence);
+		public delegate int ungetch (int ch);
+		public delegate int mvgetch (int y, int x);
+		public delegate bool has_colors ();
+		public delegate int start_color ();
+		public delegate int init_pair (short pair, short f, short b);
+		public delegate int use_default_colors ();
+		public delegate int COLOR_PAIRS ();
+		public delegate uint getmouse (out Curses.MouseEvent ev);
+		public delegate uint ungetmouse (ref Curses.MouseEvent ev);
+		public delegate int mouseinterval (int interval);
+		public delegate IntPtr mousemask (IntPtr newmask, out IntPtr oldMask);
 	}
-	
-	//
-	// P/Invoke definitions for looking up symbols in the "libncursesw.so.5" library, as resolved
-	// by the dynamic linker, different than RegularCurses that looksup by "ncurses"
-	//
-	internal class CursesLinux {
-		[DllImport ("libncursesw.so.5", EntryPoint="mousemask")]
-		public extern static IntPtr call_mousemask (IntPtr newmask, out IntPtr oldmask);
-		
-		[DllImport ("libncursesw.so.5", EntryPoint="initscr")]
-		extern static internal IntPtr real_initscr ();
 
-		[DllImport ("libncursesw.so.5")]
-		extern static public int endwin ();
+	internal class NativeMethods {
+		public readonly Delegates.initscr initscr;
+		public readonly Delegates.endwin endwin;
+		public readonly Delegates.isendwin isendwin;
+		public readonly Delegates.cbreak cbreak;
+		public readonly Delegates.nocbreak nocbreak;
+		public readonly Delegates.echo echo;
+		public readonly Delegates.noecho noecho;
+		public readonly Delegates.halfdelay halfdelay;
+		public readonly Delegates.raw raw;
+		public readonly Delegates.noraw noraw;
+		public readonly Delegates.noqiflush noqiflush;
+		public readonly Delegates.qiflush qiflush;
+		public readonly Delegates.typeahead typeahead;
+		public readonly Delegates.timeout timeout;
+		public readonly Delegates.wtimeout wtimeout;
+		public readonly Delegates.notimeout notimeout;
+		public readonly Delegates.keypad keypad;
+		public readonly Delegates.meta meta;
+		public readonly Delegates.intrflush intrflush;
+		public readonly Delegates.clearok clearok;
+		public readonly Delegates.idlok idlok;
+		public readonly Delegates.idcok idcok;
+		public readonly Delegates.immedok immedok;
+		public readonly Delegates.leaveok leaveok;
+		public readonly Delegates.wsetscrreg wsetscrreg;
+		public readonly Delegates.scrollok scrollok;
+		public readonly Delegates.nl nl;
+		public readonly Delegates.nonl nonl;
+		public readonly Delegates.setscrreg setscrreg;
+		public readonly Delegates.refresh refresh;
+		public readonly Delegates.doupdate doupdate;
+		public readonly Delegates.wrefresh wrefresh;
+		public readonly Delegates.redrawwin redrawwin;
+		//public readonly Delegates.wredrawwin wredrawwin;
+		public readonly Delegates.wnoutrefresh wnoutrefresh;
+		public readonly Delegates.move move;
+		public readonly Delegates.addch addch;
+		public readonly Delegates.addstr addstr;
+		public readonly Delegates.wmove wmove;
+		public readonly Delegates.waddch waddch;
+		public readonly Delegates.attron attron;
+		public readonly Delegates.attroff attroff;
+		public readonly Delegates.attrset attrset;
+		public readonly Delegates.getch getch;
+		public readonly Delegates.get_wch get_wch;
+		public readonly Delegates.ungetch ungetch;
+		public readonly Delegates.mvgetch mvgetch;
+		public readonly Delegates.has_colors has_colors;
+		public readonly Delegates.start_color start_color;
+		public readonly Delegates.init_pair init_pair;
+		public readonly Delegates.use_default_colors use_default_colors;
+		public readonly Delegates.COLOR_PAIRS COLOR_PAIRS;
+		public readonly Delegates.getmouse getmouse;
+		public readonly Delegates.ungetmouse ungetmouse;
+		public readonly Delegates.mouseinterval mouseinterval;
+		public readonly Delegates.mousemask mousemask;
 
-		[DllImport ("libncursesw.so.5")]
-		extern static public bool isendwin ();
-
-		//
-		// Screen operations are flagged as internal, as we need to
-		// catch all changes so we can update newscr, curscr, stdscr
-		//
-		[DllImport ("libncursesw.so.5")]
-		extern static public IntPtr internal_newterm (string type, IntPtr file_outfd, IntPtr file_infd);
-
-		[DllImport ("libncursesw.so.5")]
-		extern static public IntPtr internal_set_term (IntPtr newscreen);
-
-		[DllImport ("libncursesw.so.5")]
-	        extern static internal void internal_delscreen (IntPtr sp);
-
-		[DllImport ("libncursesw.so.5")]
-		extern static public int cbreak ();
-		
-		[DllImport ("libncursesw.so.5")]
-		extern static public int nocbreak ();
-		
-		[DllImport ("libncursesw.so.5")]
-		extern static public int echo ();
-		
-		[DllImport ("libncursesw.so.5")]
-		extern static public int noecho ();
-		
-		[DllImport ("libncursesw.so.5")]
-		extern static public int halfdelay (int t);
-
-		[DllImport ("libncursesw.so.5")]
-		extern static public int raw ();
-
-		[DllImport ("libncursesw.so.5")]
-		extern static public int noraw ();
-		
-		[DllImport ("libncursesw.so.5")]
-		extern static public void noqiflush ();
-		
-		[DllImport ("libncursesw.so.5")]
-		extern static public void qiflush ();
-
-		[DllImport ("libncursesw.so.5")]
-		extern static public int typeahead (IntPtr fd);
-
-		[DllImport ("libncursesw.so.5")]
-		extern static public int timeout (int delay);
-
-		//
-		// Internal, as they are exposed in Window
-		//
-		[DllImport ("libncursesw.so.5")]
-		extern static internal int wtimeout (IntPtr win, int delay);
-	       
-		[DllImport ("libncursesw.so.5")]
-		extern static internal int notimeout (IntPtr win, bool bf);
-
-		[DllImport ("libncursesw.so.5")]
-		extern static internal int keypad (IntPtr win, bool bf);
-		
-		[DllImport ("libncursesw.so.5")]
-		extern static internal int meta (IntPtr win, bool bf);
-		
-		[DllImport ("libncursesw.so.5")]
-		extern static internal int intrflush (IntPtr win, bool bf);
-
-		[DllImport ("libncursesw.so.5")]
-		extern internal static int clearok (IntPtr win, bool bf);
-		[DllImport ("libncursesw.so.5")]
-		extern internal static int idlok (IntPtr win, bool bf);
-		[DllImport ("libncursesw.so.5")]
-		extern internal static void idcok (IntPtr win, bool bf);
-		[DllImport ("libncursesw.so.5")]
-		extern internal static void immedok (IntPtr win, bool bf);
-		[DllImport ("libncursesw.so.5")]
-		extern internal static int leaveok (IntPtr win, bool bf);
-		[DllImport ("libncursesw.so.5")]
-		extern internal static int wsetscrreg (IntPtr win, int top, int bot);
-		[DllImport ("libncursesw.so.5")]
-		extern internal static int scrollok (IntPtr win, bool bf);
-		
-		[DllImport ("libncursesw.so.5")]
-		extern public static int nl();
-		[DllImport ("libncursesw.so.5")]
-		extern public static int nonl();
-		[DllImport ("libncursesw.so.5")]
-		extern public static int setscrreg (int top, int bot);
-		
-
-		[DllImport ("libncursesw.so.5")]
-		extern public static int refresh ();
-		[DllImport ("libncursesw.so.5")]
-		extern public static int doupdate();
-
-		[DllImport ("libncursesw.so.5")]
-		extern internal static int wrefresh (IntPtr win);
-		[DllImport ("libncursesw.so.5")]
-		extern internal static int redrawwin (IntPtr win);
-		[DllImport ("libncursesw.so.5")]
-		extern internal static int wredrawwin (IntPtr win, int beg_line, int num_lines);
-		[DllImport ("libncursesw.so.5")]
-		extern internal static int wnoutrefresh (IntPtr win);
-
-		[DllImport ("libncursesw.so.5")]
-		extern public static int move (int line, int col);
-
-		[DllImport ("libncursesw.so.5", EntryPoint="addch")]
-		extern internal static int _addch (int ch);
-		
-		[DllImport ("libncursesw.so.5")]
-		extern public static int addstr (string s);
-
-		[DllImport ("libncursesw.so.5")]
-		extern internal static int wmove (IntPtr win, int line, int col);
-
-		[DllImport ("libncursesw.so.5")]
-		extern internal static int waddch (IntPtr win, int ch);
-
-		[DllImport ("libncursesw.so.5")]
-		extern public static int attron (int attrs);
-		[DllImport ("libncursesw.so.5")]
-		extern public static int attroff (int attrs);
-		[DllImport ("libncursesw.so.5")]
-		extern public static int attrset (int attrs);
-
-		[DllImport ("libncursesw.so.5")]
-		extern public static int getch ();
-		
-		[DllImport ("libncursesw.so.5")]
-		extern public static int get_wch (out int sequence);
-
-		[DllImport ("libncursesw.so.5")]
-		extern public static int ungetch (int ch);
-
-		[DllImport ("libncursesw.so.5")]
-		extern public static int mvgetch (int y, int x);
-
-		[DllImport ("libncursesw.so.5")]
-		extern internal static bool has_colors ();
-
-		[DllImport ("libncursesw.so.5")]
-		extern internal static int start_color ();
-
-		[DllImport ("libncursesw.so.5")]
-		extern internal static int init_pair (short pair, short f, short b);
-
-		[DllImport ("libncursesw.so.5")]
-		extern internal static int use_default_colors ();
-
-		[DllImport ("libncursesw.so.5")]
-		extern internal static int COLOR_PAIRS();
-		
-		[DllImport ("libncursesw.so.5")]
-		public extern static uint getmouse (out Curses.MouseEvent ev);
-
-		[DllImport ("libncursesw.so.5")]
-		public extern static uint ungetmouse (ref Curses.MouseEvent ev);
-
-		[DllImport ("libncursesw.so.5")]
-		public extern static int mouseinterval (int interval);
+		public UnmanagedLibrary UnmanagedLibrary;
+		public NativeMethods (UnmanagedLibrary lib)
+		{
+			this.UnmanagedLibrary = lib;
+			initscr = lib.GetNativeMethodDelegate<Delegates.initscr> ("initscr");
+			endwin = lib.GetNativeMethodDelegate<Delegates.endwin> ("endwin");
+			isendwin = lib.GetNativeMethodDelegate<Delegates.isendwin> ("isendwin");
+			cbreak = lib.GetNativeMethodDelegate<Delegates.cbreak> ("cbreak");
+			nocbreak = lib.GetNativeMethodDelegate<Delegates.nocbreak> ("nocbreak");
+			echo = lib.GetNativeMethodDelegate<Delegates.echo> ("echo");
+			noecho = lib.GetNativeMethodDelegate<Delegates.noecho> ("noecho");
+			halfdelay = lib.GetNativeMethodDelegate<Delegates.halfdelay> ("halfdelay");
+			raw = lib.GetNativeMethodDelegate<Delegates.raw> ("raw");
+			noraw = lib.GetNativeMethodDelegate<Delegates.noraw> ("noraw");
+			noqiflush = lib.GetNativeMethodDelegate<Delegates.noqiflush> ("noqiflush");
+			qiflush = lib.GetNativeMethodDelegate<Delegates.qiflush> ("qiflush");
+			typeahead = lib.GetNativeMethodDelegate<Delegates.typeahead> ("typeahead");
+			timeout = lib.GetNativeMethodDelegate<Delegates.timeout> ("timeout");
+			wtimeout = lib.GetNativeMethodDelegate<Delegates.wtimeout> ("wtimeout");
+			notimeout = lib.GetNativeMethodDelegate<Delegates.notimeout> ("notimeout");
+			keypad = lib.GetNativeMethodDelegate<Delegates.keypad> ("keypad");
+			meta = lib.GetNativeMethodDelegate<Delegates.meta> ("meta");
+			intrflush = lib.GetNativeMethodDelegate<Delegates.intrflush> ("intrflush");
+			clearok = lib.GetNativeMethodDelegate<Delegates.clearok> ("clearok");
+			idlok = lib.GetNativeMethodDelegate<Delegates.idlok> ("idlok");
+			idcok = lib.GetNativeMethodDelegate<Delegates.idcok> ("idcok");
+			immedok = lib.GetNativeMethodDelegate<Delegates.immedok> ("immedok");
+			leaveok = lib.GetNativeMethodDelegate<Delegates.leaveok> ("leaveok");
+			wsetscrreg = lib.GetNativeMethodDelegate<Delegates.wsetscrreg> ("wsetscrreg");
+			scrollok = lib.GetNativeMethodDelegate<Delegates.scrollok> ("scrollok");
+			nl = lib.GetNativeMethodDelegate<Delegates.nl> ("nl");
+			nonl = lib.GetNativeMethodDelegate<Delegates.nonl> ("nonl");
+			setscrreg = lib.GetNativeMethodDelegate<Delegates.setscrreg> ("setscrreg");
+			refresh = lib.GetNativeMethodDelegate<Delegates.refresh> ("refresh");
+			doupdate = lib.GetNativeMethodDelegate<Delegates.doupdate> ("doupdate");
+			wrefresh = lib.GetNativeMethodDelegate<Delegates.wrefresh> ("wrefresh");
+			redrawwin = lib.GetNativeMethodDelegate<Delegates.redrawwin> ("redrawwin");
+			//wredrawwin = lib.GetNativeMethodDelegate<Delegates.wredrawwin> ("wredrawwin");
+			wnoutrefresh = lib.GetNativeMethodDelegate<Delegates.wnoutrefresh> ("wnoutrefresh");
+			move = lib.GetNativeMethodDelegate<Delegates.move> ("move");
+			addch = lib.GetNativeMethodDelegate<Delegates.addch> ("addch");
+			addstr = lib.GetNativeMethodDelegate<Delegates.addstr> ("addstr");
+			wmove = lib.GetNativeMethodDelegate<Delegates.wmove> ("wmove");
+			waddch = lib.GetNativeMethodDelegate<Delegates.waddch> ("waddch");
+			attron = lib.GetNativeMethodDelegate<Delegates.attron> ("attron");
+			attroff = lib.GetNativeMethodDelegate<Delegates.attroff> ("attroff");
+			attrset = lib.GetNativeMethodDelegate<Delegates.attrset> ("attrset");
+			getch = lib.GetNativeMethodDelegate<Delegates.getch> ("getch");
+			get_wch = lib.GetNativeMethodDelegate<Delegates.get_wch> ("get_wch");
+			ungetch = lib.GetNativeMethodDelegate<Delegates.ungetch> ("ungetch");
+			mvgetch = lib.GetNativeMethodDelegate<Delegates.mvgetch> ("mvgetch");
+			has_colors = lib.GetNativeMethodDelegate<Delegates.has_colors> ("has_colors");
+			start_color = lib.GetNativeMethodDelegate<Delegates.start_color> ("start_color");
+			init_pair = lib.GetNativeMethodDelegate<Delegates.init_pair> ("init_pair");
+			use_default_colors = lib.GetNativeMethodDelegate<Delegates.use_default_colors> ("use_default_colors");
+			COLOR_PAIRS = lib.GetNativeMethodDelegate<Delegates.COLOR_PAIRS> ("COLOR_PAIRS");
+			getmouse = lib.GetNativeMethodDelegate<Delegates.getmouse> ("getmouse");
+			ungetmouse = lib.GetNativeMethodDelegate<Delegates.ungetmouse> ("ungetmouse");
+			mouseinterval = lib.GetNativeMethodDelegate<Delegates.mouseinterval> ("mouseinterval");
+			mousemask = lib.GetNativeMethodDelegate<Delegates.mousemask> ("mousemask");
+		}
 	}
-	
 }
