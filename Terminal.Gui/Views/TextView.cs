@@ -114,7 +114,7 @@ namespace Terminal.Gui {
 		{
 			var sb = new StringBuilder ();
 			foreach (var line in lines) {
-				sb.Append (line);
+				sb.Append (ustring.Make (line).ToString ());
 				sb.AppendLine ();
 			}
 			return sb.ToString ();
