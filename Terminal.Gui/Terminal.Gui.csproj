@@ -6,7 +6,6 @@
     <DebugType>full</DebugType>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
     <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
-    <TargetFramework>net47</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
