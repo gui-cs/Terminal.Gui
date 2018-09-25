@@ -423,8 +423,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="region">The region that must be flagged for repaint.</param>
 		public void SetNeedsDisplay (Rect region)
-		{			
-			SetNeedsLayout();
+		{
 			if (NeedDisplay.IsEmpty)
 				NeedDisplay = region;
 			else {

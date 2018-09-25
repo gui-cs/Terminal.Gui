@@ -34,6 +34,13 @@ namespace Terminal.Gui {
 	class TextModel {
 		List<List<Rune>> lines;
 
+		List<List<Rune>> unWrappedLines;
+
+		public List<List<Rune>> UnWrappedLines
+		{
+			get { return unWrappedLines; }
+		}
+
 		public bool LoadFile (string file)
 		{
 			if (file == null)
@@ -77,6 +84,28 @@ namespace Terminal.Gui {
 			return lines;
 		}
 
+		// Splits a string into a List that contains a List<Rune> for each line
+		public static List<List<Rune>> StringToRunes (ustring content, int nMaxRuneCount)
+		{
+			var lines = new List<List<Rune>> ();
+			int start = 0, i = 1;
+			for (; i < content.Length; i++)
+			{
+				if ((i % nMaxRuneCount).Equals(0) || content [i].Equals(10))
+				{
+					if (i - start > 0)
+					{
+						var c = content [start, i];
+						lines.Add (ToRunes (content [start, i]));
+					}
+					else
+						lines.Add (ToRunes (ustring.Empty));
+					start = i;
+				}
+			}
+			return lines;
+		}
+
 		void Append (List<byte> line)
 		{
 			var str = ustring.Make (line.ToArray ());
@@ -104,18 +133,32 @@ namespace Terminal.Gui {
 				Append (line);
 		}
 
-		public void LoadString (ustring content)
+		public void LoadString (ustring content, int nMaxRuneCount = -1)
 		{
-			lines = StringToRunes (content);
+			if (nMaxRuneCount > -1)
+				lines = StringToRunes(content, nMaxRuneCount);
+			else
+				lines = StringToRunes (content);
 		}
 
 		public override string ToString ()
 		{
 			var sb = new StringBuilder ();
-			foreach (var line in lines) 
+			if (unWrappedLines != null && unWrappedLines.Count > 0)
 			{
-				sb.Append (ustring.Make(line));
-				sb.AppendLine ();
+				foreach (var line in unWrappedLines) 
+				{
+					sb.Append (ustring.Make(line));
+					sb.AppendLine ();
+				}	
+			}
+			else
+			{
+				foreach (var line in lines) 
+				{
+					sb.Append (ustring.Make(line));
+					sb.AppendLine ();
+				}
 			}
 			return sb.ToString ();
 		}
@@ -137,18 +180,36 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="pos">Line number where the line will be inserted.</param>
 		/// <param name="runes">The line of text, as a List of Rune.</param>
-		public void AddLine (int pos, List<Rune> runes)
+		/// <param name="maxRuneCount">Maximum runes should be in the line as per width of the view</param>
+		public void AddLine (int pos, List<Rune> runes, int maxRuneCount = -1)
 		{
-			lines.Insert (pos, runes);
+			if (unWrappedLines != null && unWrappedLines.Count > 0 && maxRuneCount > -1)
+			{
+				unWrappedLines.Insert(pos, runes);
+				LoadString(ToString(), lines.Max(r => r.Count));
+			}
+			else
+			{
+				lines.Insert (pos, runes);
+			}
 		}
 
 		/// <summary>
 		/// Removes the line at the specified position
 		/// </summary>
 		/// <param name="pos">Position.</param>
-		public void RemoveLine (int pos)
+		/// <param name="maxRuneCount">Maximum runes should be in the line as per width of the view</param>
+		public void RemoveLine (int pos, int maxRuneCount = -1)
 		{
-			lines.RemoveAt (pos);
+			if (unWrappedLines != null && unWrappedLines.Count > 0 && maxRuneCount > -1)
+			{
+				unWrappedLines.RemoveAt(pos);
+				LoadString(ToString(), lines.Max(r => r.Count));
+			}
+			else
+			{
+				lines.RemoveAt (pos);
+			}
 		}
 	}
 
@@ -314,6 +375,18 @@ namespace Terminal.Gui {
 				model.LoadString (value);
 				SetNeedsDisplay ();
 			}
+		}
+
+		private bool isWordAutoWrapEnabled = true;
+		
+		/// <summary>
+		/// Gets or Sets enabling of word wrapping of the text 
+		/// </summary>
+		/// <value>Boolean value(Default true)</value>
+		public bool TextwrapEnabled
+		{
+			get { return isWordAutoWrapEnabled;}
+			set { isWordAutoWrapEnabled = value;}
 		}
 
 		/// <summary>
@@ -497,24 +570,33 @@ namespace Terminal.Gui {
 		{
 			ColorNormal ();
 
+			if (isWordAutoWrapEnabled && (model.UnWrappedLines == null || model.UnWrappedLines.Count.Equals(0)))
+			{
+				model.LoadString(model.ToString(), region.Right);
+			}
+
 			int bottom = region.Bottom;
 			int right = region.Right;
-			for (int row = region.Top; row < bottom; row++) {
+			for (int row = region.Top; row < bottom; row++) 
+			{
 				int textLine = topRow + row;
-				if (textLine >= model.Count) {
+				if (textLine >= model.Count) 
+				{
 					ColorNormal ();
 					ClearRegion (region.Left, row, region.Right, row + 1);
 					continue;
 				}
 				var line = model.GetLine (textLine);
 				int lineRuneCount = line.Count;
-				if (line.Count < region.Left){
+				if (line.Count < region.Left)
+				{
 					ClearRegion (region.Left, row, region.Right, row + 1);
 					continue;
 				}
 
 				Move (region.Left, row);
-				for (int col = region.Left; col < right; col++) {
+				for (int col = region.Left; col < right; col++) 
+				{
 					var lineCol = leftColumn + col;
 					var rune = lineCol >= lineRuneCount ? ' ' : line [lineCol];
 					if (selecting && PointInSelection (col, row))
@@ -1146,4 +1228,3 @@ namespace Terminal.Gui {
 	}
 
 }
-
