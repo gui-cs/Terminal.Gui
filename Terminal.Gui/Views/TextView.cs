@@ -1091,8 +1091,10 @@ namespace Terminal.Gui {
 			if (!HasFocus)
 				SuperView.SetFocus (this);
 
-			if (ev.Y + topRow >= model.Count) {
-				currentRow = model.Count - topRow;
+
+			var maxCursorPositionableLine = (model.Count - 1) - topRow;
+			if (ev.Y > maxCursorPositionableLine) {
+				currentRow = maxCursorPositionableLine;
 			} else {
 				currentRow = ev.Y + topRow;
 			}
