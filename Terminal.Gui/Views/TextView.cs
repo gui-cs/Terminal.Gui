@@ -95,7 +95,6 @@ namespace Terminal.Gui {
 				{
 					if (i - start > 0)
 					{
-						var c = content [start, i];
 						lines.Add (ToRunes (content [start, i]));
 					}
 					else
