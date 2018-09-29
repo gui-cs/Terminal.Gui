@@ -319,6 +319,15 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		///   Removes all widgets from this container.
+		/// </summary>
+		/// <remarks>
+		/// </remarks>
+		public override void RemoveAll()
+		{
+			contentView.RemoveAll();
+		}
 
 		/// <summary>
 		/// /// Gets or sets the visibility for the vertical scroll indicator.

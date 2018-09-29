@@ -1417,6 +1417,16 @@ namespace Terminal.Gui {
 				this.CanFocus = false;
 		}
 
+		/// <summary>
+		///   Removes all widgets from this container.
+		/// </summary>
+		/// <remarks>
+		/// </remarks>
+		public override void RemoveAll ()
+		{
+			contentView.RemoveAll ();
+		}
+
 		public override void Redraw (Rect bounds)
 		{
 			if (!NeedDisplay.IsEmpty) {
