@@ -216,6 +216,8 @@ static class Demo {
 	{
 		var d = new OpenDialog ("Open", "Open a file");
 		Application.Run (d);
+
+		MessageBox.Query (50, 7, "Selected File", string.Join (", ", d.FilePaths), "ok");
 	}
 
 	public static void ShowHex (Toplevel top)

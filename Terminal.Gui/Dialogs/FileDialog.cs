@@ -309,7 +309,7 @@ namespace Terminal.Gui {
 			dirListView = new DirListView () {
 				X = 1,
 				Y = 3 + msgLines + 2,
-				Width = Dim.Fill (),
+				Width = Dim.Fill () - 2,
 				Height = Dim.Fill () - 2,
 			};
 			DirectoryPath = Path.GetFullPath (Environment.CurrentDirectory);
