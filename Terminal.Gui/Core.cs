@@ -907,7 +907,7 @@ namespace Terminal.Gui {
 		public void FocusFirst ()
 		{
 			if (subviews == null) {
-				SuperView.SetFocus (this);
+				SuperView?.SetFocus (this);
 				return;
 			}
 
