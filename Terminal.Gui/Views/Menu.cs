@@ -35,7 +35,7 @@ namespace Terminal.Gui {
 					nextIsHot = true;
 				else {
 					if (nextIsHot) {
-						HotKey = x;
+						HotKey = Char.ToUpper ((char)x);
 						break;
 					}
 					nextIsHot = false;
