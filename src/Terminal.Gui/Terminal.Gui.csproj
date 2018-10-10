@@ -1,12 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Assembly and msbuild properties -->
   <PropertyGroup>
-    <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>
+      <!-- .NET Standard -->
+      <!--netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;-->
+      <!--netstandard1.5;netstandard1.6;-->
+      netstandard2.0;
+      <!-- .NET Core -->
+      <!--netcoreapp1.0;netcoreapp1.1;-->
+      netcoreapp2.0;netcoreapp2.1;
+      <!-- .NET Framework -->
+      <!--net35;net40;-->
+      <!--net45;net451;net452;-->
+      <!--net46;-->
+      net461;net462;
+      net47;net471;net472;
+    </TargetFrameworks>
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
-    <DebugType>full</DebugType>
-    <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
-    <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
+    <!-- Workaround for building with dotnet CLI and targeting .NET 3.5: https://github.com/Microsoft/msbuild/issues/1333#issuecomment-296346352 -->
+    <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net35'">C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
   </PropertyGroup>
+
+  <!-- Nuget specific tags -->
   <PropertyGroup>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <PackageId>Terminal.Gui</PackageId>
@@ -19,54 +37,50 @@
     <Owners>Miguel de Icaza</Owners>
     <Summary>Application framework for creating modern console applications using .NET </Summary>
     <Title>Gui.cs is a framework for creating console user interfaces</Title>
-    <PackageReleaseNotes>0.17: Unix, dynamically load ncurses library to support different configurations, and not require -dev on Linux, various bug fixes.
+    <PackageReleaseNotes>
+      0.17: Unix, dynamically load ncurses library to support different configurations, and not require -dev on Linux, various bug fixes.
 
-0.16: Support for Shift-Tab on Windows (fix by @mholo65) 
+      0.16: Support for Shift-Tab on Windows (fix by @mholo65)
 
-0.15: WindowsDriver fix for Legacy Console keyboard input (issue #105)
+      0.15: WindowsDriver fix for Legacy Console keyboard input (issue #105)
 
-0.14: WindowsDriver fix for EventType size.
+      0.14: WindowsDriver fix for EventType size.
 
-0.13: Fixes keyboard input for Alt-Gr and numbers.
+      0.13: Fixes keyboard input for Alt-Gr and numbers.
 
-0.12: Fixes the text editor merge line command.
+      0.12: Fixes the text editor merge line command.
 
-0.11: Simplify TextField implementation, fixes a couple of editing bugs.
+      0.11: Simplify TextField implementation, fixes a couple of editing bugs.
 
-0.10: Fix unicode rendering for TextField, and bring F# example
+      0.10: Fix unicode rendering for TextField, and bring F# example
 
-0.9: File Open/File Save dialogs, HexView, Windows Driver allows resizing, mouse events, faster (thanks to Nick Van Dyck, nickvdyck for the contribution!), smaller bug fixes,
+      0.9: File Open/File Save dialogs, HexView, Windows Driver allows resizing, mouse events, faster (thanks to Nick Van Dyck, nickvdyck for the contribution!), smaller bug fixes,
 
-0.8: Completes keyboard support on Windows;  Fixes delete on Windows, some layout fixes.
-0.7: terminal resizing on Linux propagates sizes with new layout system, and new features on the layout system (documented)
-0.6: new layout system, multi-line textview editor, Linux bug fix for .NET Core
-0.5: support Linux with .NET Core, Windows driver fixes.
-0.4: hotkey handling fix for RadioButtons
-0.3: Fix Windows key input to not echo characters on console, proper Fkey mapping
-0.2: Auto-detect the best console</PackageReleaseNotes>
+      0.8: Completes keyboard support on Windows;  Fixes delete on Windows, some layout fixes.
+      0.7: terminal resizing on Linux propagates sizes with new layout system, and new features on the layout system (documented)
+      0.6: new layout system, multi-line textview editor, Linux bug fix for .NET Core
+      0.5: support Linux with .NET Core, Windows driver fixes.
+      0.4: hotkey handling fix for RadioButtons
+      0.3: Fix Windows key input to not echo characters on console, proper Fkey mapping
+      0.2: Auto-detect the best console
+    </PackageReleaseNotes>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType></DebugType>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>..\..\artifacts\bin\$(Configuration)\$(TargetFramework)\Terminal.Gui.xml</DocumentationFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="NStack.Core" Version="0.11.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
-  <ItemGroup>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Dialogs\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="NStack">
-      <HintPath>..\..\..\Users\miguel\.nuget\packages\nstack.core\0.11.0\lib\netstandard1.5\NStack.dll</HintPath>
-    </Reference>
-    <Reference Include="NStack">
-      <HintPath>..\..\..\Users\miguel\.nuget\packages\nstack.core\0.11.0\lib\netstandard1.5\NStack.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Drivers\#ConsoleDriver.cs#" />
-  </ItemGroup>
+
 </Project>
