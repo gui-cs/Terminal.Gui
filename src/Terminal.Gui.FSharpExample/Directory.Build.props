@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+    <BaseIntermediateOutputPath>..\..\artifacts\obj\Terminal.Gui.FSharpExample\</BaseIntermediateOutputPath>
+    <BaseOutputPath>..\..\artifacts\bin\</BaseOutputPath>
+  </PropertyGroup>
+</Project>
