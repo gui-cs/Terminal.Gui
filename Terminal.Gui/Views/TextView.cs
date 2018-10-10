@@ -6,7 +6,6 @@
 //
 // 
 // TODO:
-// PageUp/PageDown	
 // In ReadOnly mode backspace/space behave like pageup/pagedown
 // Attributed text on spans
 // Replace insertion with Insert method
@@ -113,8 +112,9 @@ namespace Terminal.Gui {
 		public override string ToString ()
 		{
 			var sb = new StringBuilder ();
-			foreach (var line in lines) {
-				sb.Append (ustring.Make (line).ToString ());
+			foreach (var line in lines) 
+			{
+				sb.Append (ustring.Make(line));
 				sb.AppendLine ();
 			}
 			return sb.ToString ();
@@ -130,7 +130,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>The line.</returns>
 		/// <param name="line">Line number to retrieve.</param>
-		public List<Rune> GetLine (int line) => lines [line];
+		public List<Rune> GetLine (int line) => line < Count ? lines [line]: lines[Count-1];
 
 		/// <summary>
 		/// Adds a line to the model at the specified position.
@@ -392,7 +392,12 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (ColorScheme.Normal);
 		}
 
-		bool isReadOnly;
+		bool isReadOnly = false;
+
+		/// <summary>
+		/// Indicates readonly attribute of TextView
+		/// </summary>
+		/// <value>Boolean value(Default false)</value>
 		public bool ReadOnly {
 			get => isReadOnly;
 			set {
@@ -494,22 +499,26 @@ namespace Terminal.Gui {
 
 			int bottom = region.Bottom;
 			int right = region.Right;
-			for (int row = region.Top; row < bottom; row++) {
+			for (int row = region.Top; row < bottom; row++) 
+			{
 				int textLine = topRow + row;
-				if (textLine >= model.Count) {
+				if (textLine >= model.Count) 
+				{
 					ColorNormal ();
 					ClearRegion (region.Left, row, region.Right, row + 1);
 					continue;
 				}
 				var line = model.GetLine (textLine);
 				int lineRuneCount = line.Count;
-				if (line.Count < region.Left){
+				if (line.Count < region.Left)
+				{
 					ClearRegion (region.Left, row, region.Right, row + 1);
 					continue;
 				}
 
 				Move (region.Left, row);
-				for (int col = region.Left; col < right; col++) {
+				for (int col = region.Left; col < right; col++) 
+				{
 					var lineCol = leftColumn + col;
 					var rune = lineCol >= lineRuneCount ? ' ' : line [lineCol];
 					if (selecting && PointInSelection (col, row))
@@ -682,6 +691,38 @@ namespace Terminal.Gui {
 
 			// Dispatch the command.
 			switch (kb.Key) {
+			case Key.PageDown:
+			case Key.ControlV:
+				int nPageDnShift = Frame.Height - 1;
+				if (currentRow < model.Count) {
+					if (columnTrack == -1)
+						columnTrack = currentColumn;
+					currentRow = (currentRow + nPageDnShift) > model.Count ? model.Count : currentRow + nPageDnShift;
+					if (topRow < currentRow - nPageDnShift) {
+						topRow = currentRow >= model.Count ? currentRow - nPageDnShift : topRow + nPageDnShift;
+						SetNeedsDisplay ();
+					}
+					TrackColumn ();
+					PositionCursor ();
+				}
+				break;
+
+			case Key.PageUp:
+			case ((int)'v' + Key.AltMask):
+				int nPageUpShift = Frame.Height - 1;
+				if (currentRow > 0) {
+					if (columnTrack == -1)
+						columnTrack = currentColumn;
+					currentRow = currentRow - nPageUpShift < 0 ? 0 : currentRow - nPageUpShift;
+					if (currentRow < topRow) {
+						topRow = topRow - nPageUpShift < 0 ? 0 : topRow - nPageUpShift;
+						SetNeedsDisplay ();
+					}
+					TrackColumn ();
+					PositionCursor ();
+				}
+				break;
+
 			case Key.ControlN:
 			case Key.CursorDown:
 				if (currentRow + 1 < model.Count) {
@@ -938,11 +979,12 @@ namespace Terminal.Gui {
 				break;
 
 			default:
-				if (isReadOnly)
-					return true;
 				// Ignore control characters and other special keys
 				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
 					return false;
+				//So that special keys like tab can be processed
+				if (isReadOnly)
+					return true;
 				Insert ((uint)kb.Key);
 				currentColumn++;
 				if (currentColumn >= leftColumn + Frame.Width) {
@@ -1110,4 +1152,3 @@ namespace Terminal.Gui {
 	}
 
 }
-
