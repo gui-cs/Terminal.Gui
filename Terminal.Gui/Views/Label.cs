@@ -57,7 +57,10 @@ namespace Terminal.Gui {
 				} else
 					cols++;
 			}
-			return new Rect (x, y, cols, ml);
+			if (cols > mw)
+				mw = cols;
+
+			return new Rect (x, y, mw, ml);
 		}
 
 		/// <summary>
