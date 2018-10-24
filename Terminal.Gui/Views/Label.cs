@@ -57,7 +57,10 @@ namespace Terminal.Gui {
 				} else
 					cols++;
 			}
-			return new Rect (x, y, cols, ml);
+			if (cols > mw)
+				mw = cols;
+
+			return new Rect (x, y, mw, ml);
 		}
 
 		/// <summary>
@@ -154,6 +157,7 @@ namespace Terminal.Gui {
 					lp = i + 1;
 				}
 			}
+			lineResult.Add(ClipAndJustify(textStr[lp, textLen], width, talign));
 		}
 
 		public override void Redraw (Rect region)
@@ -169,7 +173,7 @@ namespace Terminal.Gui {
 			Clear ();
 			Move (Frame.X, Frame.Y);
 			for (int line = 0; line < lines.Count; line++) {
-				if (line < region.Top || line >= region.Bottom)
+				if (line < region.Top || line > region.Bottom)
 					continue;
 				var str = lines [line];
 				int x;
