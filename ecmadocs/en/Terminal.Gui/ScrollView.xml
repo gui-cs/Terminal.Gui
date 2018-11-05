@@ -151,6 +151,24 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="RemoveAll">
+      <MemberSignature Language="C#" Value="public override void RemoveAll ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void RemoveAll() cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters />
+      <Docs>
+        <summary>
+              Removes all widgets from this container.
+            </summary>
+        <remarks />
+      </Docs>
+    </Member>
     <Member MemberName="ScrollDown">
       <MemberSignature Language="C#" Value="public bool ScrollDown (int lines);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance bool ScrollDown(int32 lines) cil managed" />

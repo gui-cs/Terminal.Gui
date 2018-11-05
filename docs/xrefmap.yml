@@ -2506,6 +2506,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Remove_
   fullName: FrameView.Remove
   nameWithType: FrameView.Remove
+- uid: Terminal.Gui.FrameView.RemoveAll
+  name: RemoveAll()
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_RemoveAll
+  fullName: FrameView.RemoveAll()
+  nameWithType: FrameView.RemoveAll()
+- uid: Terminal.Gui.FrameView.RemoveAll*
+  name: RemoveAll
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_RemoveAll_
+  fullName: FrameView.RemoveAll
+  nameWithType: FrameView.RemoveAll
 - uid: Terminal.Gui.FrameView.Title
   name: Title
   href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Title
@@ -3106,6 +3116,11 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ListView.html
   fullName: Terminal.Gui.ListView
   nameWithType: ListView
+- uid: Terminal.Gui.ListView.#ctor
+  name: ListView()
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView__ctor
+  fullName: ListView.ListView()
+  nameWithType: ListView.ListView()
 - uid: Terminal.Gui.ListView.#ctor(System.Collections.IList)
   name: ListView(IList)
   href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView__ctor_System_Collections_IList_
@@ -4586,6 +4601,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_Redraw_
   fullName: ScrollView.Redraw
   nameWithType: ScrollView.Redraw
+- uid: Terminal.Gui.ScrollView.RemoveAll
+  name: RemoveAll()
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_RemoveAll
+  fullName: ScrollView.RemoveAll()
+  nameWithType: ScrollView.RemoveAll()
+- uid: Terminal.Gui.ScrollView.RemoveAll*
+  name: RemoveAll
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_RemoveAll_
+  fullName: ScrollView.RemoveAll
+  nameWithType: ScrollView.RemoveAll
 - uid: Terminal.Gui.ScrollView.ScrollDown(System.Int32)
   name: ScrollDown(Int32)
   href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ScrollDown_System_Int32_
@@ -5116,6 +5141,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ProcessKey_
   fullName: TextView.ProcessKey
   nameWithType: TextView.ProcessKey
+- uid: Terminal.Gui.TextView.ReadOnly
+  name: ReadOnly
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ReadOnly
+  fullName: TextView.ReadOnly
+  nameWithType: TextView.ReadOnly
+- uid: Terminal.Gui.TextView.ReadOnly*
+  name: ReadOnly
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ReadOnly_
+  fullName: TextView.ReadOnly
+  nameWithType: TextView.ReadOnly
 - uid: Terminal.Gui.TextView.Redraw(Terminal.Gui.Rect)
   name: Redraw(Rect)
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Redraw_Terminal_Gui_Rect_
@@ -5756,6 +5791,16 @@ references:
   href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_Remove_
   fullName: Window.Remove
   nameWithType: Window.Remove
+- uid: Terminal.Gui.Window.RemoveAll
+  name: RemoveAll()
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_RemoveAll
+  fullName: Window.RemoveAll()
+  nameWithType: Window.RemoveAll()
+- uid: Terminal.Gui.Window.RemoveAll*
+  name: RemoveAll
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_RemoveAll_
+  fullName: Window.RemoveAll
+  nameWithType: Window.RemoveAll
 - uid: Terminal.Gui.Window.Title
   name: Title
   href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_Title

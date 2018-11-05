@@ -8,6 +8,7 @@ items:
   - Terminal.Gui.FrameView.Add(Terminal.Gui.View)
   - Terminal.Gui.FrameView.Redraw(Terminal.Gui.Rect)
   - Terminal.Gui.FrameView.Remove(Terminal.Gui.View)
+  - Terminal.Gui.FrameView.RemoveAll
   - Terminal.Gui.FrameView.Title
   langs:
   - csharp
@@ -61,7 +62,6 @@ items:
   - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.ProcessKey(Terminal.Gui.KeyEvent)
-  - Terminal.Gui.View.RemoveAll
   - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
   - Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
   - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
@@ -185,6 +185,24 @@ items:
       description: To be added.
   overload: Terminal.Gui.FrameView.Remove*
   exceptions: []
+- uid: Terminal.Gui.FrameView.RemoveAll
+  id: RemoveAll
+  parent: Terminal.Gui.FrameView
+  langs:
+  - csharp
+  name: RemoveAll()
+  nameWithType: FrameView.RemoveAll()
+  fullName: FrameView.RemoveAll()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Removes all widgets from this container.
+  syntax:
+    content: public override void RemoveAll ();
+    parameters: []
+  overload: Terminal.Gui.FrameView.RemoveAll*
+  exceptions: []
 - uid: Terminal.Gui.FrameView.Title
   id: Title
   parent: Terminal.Gui.FrameView
@@ -254,6 +272,12 @@ references:
   name: Remove(View)
   nameWithType: FrameView.Remove(View)
   fullName: FrameView.Remove(View)
+- uid: Terminal.Gui.FrameView.RemoveAll
+  parent: Terminal.Gui.FrameView
+  isExternal: false
+  name: RemoveAll()
+  nameWithType: FrameView.RemoveAll()
+  fullName: FrameView.RemoveAll()
 - uid: Terminal.Gui.FrameView.Title
   parent: Terminal.Gui.FrameView
   isExternal: false
@@ -284,6 +308,12 @@ references:
   name: Remove
   nameWithType: FrameView.Remove
   fullName: FrameView.Remove
+- uid: Terminal.Gui.FrameView.RemoveAll*
+  parent: Terminal.Gui.FrameView
+  isExternal: false
+  name: RemoveAll
+  nameWithType: FrameView.RemoveAll
+  fullName: FrameView.RemoveAll
 - uid: Terminal.Gui.FrameView.Title*
   parent: Terminal.Gui.FrameView
   isExternal: false
@@ -494,12 +524,6 @@ references:
   name: PositionCursor()
   nameWithType: View.PositionCursor()
   fullName: View.PositionCursor()
-- uid: Terminal.Gui.View.RemoveAll
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: RemoveAll()
-  nameWithType: View.RemoveAll()
-  fullName: View.RemoveAll()
 - uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
   parent: Terminal.Gui.View
   isExternal: false

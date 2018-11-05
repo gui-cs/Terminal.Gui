@@ -384,6 +384,8 @@ Mouse events are processed in visual order, and the event will be sent to the
 view on the screen.   The only exception is that no mouse events are delivered
 to background views when a modal view is running.   
 
+More details are available on the [`Keyboard Event Processing`](keyboard.html) document.
+
 Color Schemes
 =============
 
@@ -400,4 +402,7 @@ a view is focused an the colors for the hot-keys both in focused and unfocused m
 By using `ColorSchemes` you ensure that your application will work correctbly both
 in color and black and white terminals.
 
+MainLoop, Threads and Input Handling
+====================================
 
+Detailed description of the mainlop is described on the [Event Processing and the Application Main Loop](mainloop.html) document.

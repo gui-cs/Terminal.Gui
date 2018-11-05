@@ -73,7 +73,6 @@ items:
   - Terminal.Gui.View.PositionCursor
   - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
-  - Terminal.Gui.View.RemoveAll
   - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
   - Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
   - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
@@ -91,6 +90,7 @@ items:
   - Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
   - Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
   - Terminal.Gui.Window.Remove(Terminal.Gui.View)
+  - Terminal.Gui.Window.RemoveAll
   - Terminal.Gui.Window.Title
 - uid: Terminal.Gui.SaveDialog.#ctor(NStack.ustring,NStack.ustring)
   id: '#ctor(NStack.ustring,NStack.ustring)'
@@ -396,12 +396,12 @@ references:
   name: Remove(View)
   nameWithType: Window.Remove(View)
   fullName: Window.Remove(View)
-- uid: Terminal.Gui.View.RemoveAll
-  parent: Terminal.Gui.View
+- uid: Terminal.Gui.Window.RemoveAll
+  parent: Terminal.Gui.Window
   isExternal: false
   name: RemoveAll()
-  nameWithType: View.RemoveAll()
-  fullName: View.RemoveAll()
+  nameWithType: Window.RemoveAll()
+  fullName: Window.RemoveAll()
 - uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
   parent: Terminal.Gui.View
   isExternal: false

@@ -10,6 +10,7 @@ items:
   - Terminal.Gui.ScrollView.PositionCursor
   - Terminal.Gui.ScrollView.ProcessKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.ScrollView.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.ScrollView.RemoveAll
   - Terminal.Gui.ScrollView.ScrollDown(System.Int32)
   - Terminal.Gui.ScrollView.Scrolled
   - Terminal.Gui.ScrollView.ScrollLeft(System.Int32)
@@ -69,7 +70,6 @@ items:
   - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.Remove(Terminal.Gui.View)
-  - Terminal.Gui.View.RemoveAll
   - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
   - Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
   - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
@@ -222,6 +222,24 @@ items:
       type: Terminal.Gui.Rect
       description: To be added.
   overload: Terminal.Gui.ScrollView.Redraw*
+  exceptions: []
+- uid: Terminal.Gui.ScrollView.RemoveAll
+  id: RemoveAll
+  parent: Terminal.Gui.ScrollView
+  langs:
+  - csharp
+  name: RemoveAll()
+  nameWithType: ScrollView.RemoveAll()
+  fullName: ScrollView.RemoveAll()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Removes all widgets from this container.
+  syntax:
+    content: public override void RemoveAll ();
+    parameters: []
+  overload: Terminal.Gui.ScrollView.RemoveAll*
   exceptions: []
 - uid: Terminal.Gui.ScrollView.ScrollDown(System.Int32)
   id: ScrollDown(System.Int32)
@@ -457,6 +475,12 @@ references:
   name: Redraw(Rect)
   nameWithType: ScrollView.Redraw(Rect)
   fullName: ScrollView.Redraw(Rect)
+- uid: Terminal.Gui.ScrollView.RemoveAll
+  parent: Terminal.Gui.ScrollView
+  isExternal: false
+  name: RemoveAll()
+  nameWithType: ScrollView.RemoveAll()
+  fullName: ScrollView.RemoveAll()
 - uid: Terminal.Gui.ScrollView.ScrollDown(System.Int32)
   parent: Terminal.Gui.ScrollView
   isExternal: false
@@ -576,6 +600,12 @@ references:
   name: Redraw
   nameWithType: ScrollView.Redraw
   fullName: ScrollView.Redraw
+- uid: Terminal.Gui.ScrollView.RemoveAll*
+  parent: Terminal.Gui.ScrollView
+  isExternal: false
+  name: RemoveAll
+  nameWithType: ScrollView.RemoveAll
+  fullName: ScrollView.RemoveAll
 - uid: Terminal.Gui.ScrollView.ScrollDown*
   parent: Terminal.Gui.ScrollView
   isExternal: false
@@ -810,12 +840,6 @@ references:
   name: Remove(View)
   nameWithType: View.Remove(View)
   fullName: View.Remove(View)
-- uid: Terminal.Gui.View.RemoveAll
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: RemoveAll()
-  nameWithType: View.RemoveAll()
-  fullName: View.RemoveAll()
 - uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
   parent: Terminal.Gui.View
   isExternal: false

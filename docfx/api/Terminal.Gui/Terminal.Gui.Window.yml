@@ -12,6 +12,7 @@ items:
   - Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
   - Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
   - Terminal.Gui.Window.Remove(Terminal.Gui.View)
+  - Terminal.Gui.Window.RemoveAll
   - Terminal.Gui.Window.Title
   langs:
   - csharp
@@ -70,7 +71,6 @@ items:
   - Terminal.Gui.View.PositionCursor
   - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
-  - Terminal.Gui.View.RemoveAll
   - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
   - Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
   - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
@@ -285,6 +285,24 @@ items:
       description: To be added.
   overload: Terminal.Gui.Window.Remove*
   exceptions: []
+- uid: Terminal.Gui.Window.RemoveAll
+  id: RemoveAll
+  parent: Terminal.Gui.Window
+  langs:
+  - csharp
+  name: RemoveAll()
+  nameWithType: Window.RemoveAll()
+  fullName: Window.RemoveAll()
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Removes all widgets from this container.
+  syntax:
+    content: public override void RemoveAll ();
+    parameters: []
+  overload: Terminal.Gui.Window.RemoveAll*
+  exceptions: []
 - uid: Terminal.Gui.Window.Title
   id: Title
   parent: Terminal.Gui.Window
@@ -408,6 +426,12 @@ references:
   name: Remove(View)
   nameWithType: Window.Remove(View)
   fullName: Window.Remove(View)
+- uid: Terminal.Gui.Window.RemoveAll
+  parent: Terminal.Gui.Window
+  isExternal: false
+  name: RemoveAll()
+  nameWithType: Window.RemoveAll()
+  fullName: Window.RemoveAll()
 - uid: Terminal.Gui.Window.Title
   parent: Terminal.Gui.Window
   isExternal: false
@@ -450,6 +474,12 @@ references:
   name: Remove
   nameWithType: Window.Remove
   fullName: Window.Remove
+- uid: Terminal.Gui.Window.RemoveAll*
+  parent: Terminal.Gui.Window
+  isExternal: false
+  name: RemoveAll
+  nameWithType: Window.RemoveAll
+  fullName: Window.RemoveAll
 - uid: Terminal.Gui.Window.Title*
   parent: Terminal.Gui.Window
   isExternal: false
@@ -648,12 +678,6 @@ references:
   name: PositionCursor()
   nameWithType: View.PositionCursor()
   fullName: View.PositionCursor()
-- uid: Terminal.Gui.View.RemoveAll
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: RemoveAll()
-  nameWithType: View.RemoveAll()
-  fullName: View.RemoveAll()
 - uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
   parent: Terminal.Gui.View
   isExternal: false

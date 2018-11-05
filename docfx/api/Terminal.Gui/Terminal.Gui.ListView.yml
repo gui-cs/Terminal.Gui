@@ -3,6 +3,7 @@ items:
 - uid: Terminal.Gui.ListView
   id: ListView
   children:
+  - Terminal.Gui.ListView.#ctor
   - Terminal.Gui.ListView.#ctor(System.Collections.IList)
   - Terminal.Gui.ListView.#ctor(Terminal.Gui.IListDataSource)
   - Terminal.Gui.ListView.#ctor(Terminal.Gui.Rect,System.Collections.IList)
@@ -82,6 +83,24 @@ items:
   - Terminal.Gui.View.Width
   - Terminal.Gui.View.X
   - Terminal.Gui.View.Y
+- uid: Terminal.Gui.ListView.#ctor
+  id: '#ctor'
+  parent: Terminal.Gui.ListView
+  langs:
+  - csharp
+  name: ListView()
+  nameWithType: ListView.ListView()
+  fullName: ListView.ListView()
+  type: Constructor
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Initializes a new instance of the <xref href="Terminal.Gui.ListView"></xref> class.   You must set the Source property for this to show something.
+  syntax:
+    content: public ListView ();
+    parameters: []
+  overload: Terminal.Gui.ListView.#ctor*
+  exceptions: []
 - uid: Terminal.Gui.ListView.#ctor(System.Collections.IList)
   id: '#ctor(System.Collections.IList)'
   parent: Terminal.Gui.ListView
@@ -385,6 +404,12 @@ references:
   name: View
   nameWithType: View
   fullName: Terminal.Gui.View
+- uid: Terminal.Gui.ListView.#ctor
+  parent: Terminal.Gui.ListView
+  isExternal: false
+  name: ListView()
+  nameWithType: ListView.ListView()
+  fullName: ListView.ListView()
 - uid: Terminal.Gui.ListView.#ctor(System.Collections.IList)
   parent: Terminal.Gui.ListView
   isExternal: false

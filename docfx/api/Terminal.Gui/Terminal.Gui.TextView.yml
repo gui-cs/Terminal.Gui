@@ -13,6 +13,7 @@ items:
   - Terminal.Gui.TextView.MouseEvent(Terminal.Gui.MouseEvent)
   - Terminal.Gui.TextView.PositionCursor
   - Terminal.Gui.TextView.ProcessKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.TextView.ReadOnly
   - Terminal.Gui.TextView.Redraw(Terminal.Gui.Rect)
   - Terminal.Gui.TextView.Text
   langs:
@@ -286,6 +287,25 @@ items:
       description: To be added.
   overload: Terminal.Gui.TextView.ProcessKey*
   exceptions: []
+- uid: Terminal.Gui.TextView.ReadOnly
+  id: ReadOnly
+  parent: Terminal.Gui.TextView
+  langs:
+  - csharp
+  name: ReadOnly
+  nameWithType: TextView.ReadOnly
+  fullName: TextView.ReadOnly
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public bool ReadOnly { get; set; }
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.TextView.ReadOnly*
+  exceptions: []
 - uid: Terminal.Gui.TextView.Redraw(Terminal.Gui.Rect)
   id: Redraw(Terminal.Gui.Rect)
   parent: Terminal.Gui.TextView
@@ -436,6 +456,12 @@ references:
   name: KeyEvent
   nameWithType: KeyEvent
   fullName: Terminal.Gui.KeyEvent
+- uid: Terminal.Gui.TextView.ReadOnly
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: ReadOnly
+  nameWithType: TextView.ReadOnly
+  fullName: TextView.ReadOnly
 - uid: Terminal.Gui.TextView.Redraw(Terminal.Gui.Rect)
   parent: Terminal.Gui.TextView
   isExternal: false
@@ -508,6 +534,12 @@ references:
   name: ProcessKey
   nameWithType: TextView.ProcessKey
   fullName: TextView.ProcessKey
+- uid: Terminal.Gui.TextView.ReadOnly*
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: ReadOnly
+  nameWithType: TextView.ReadOnly
+  fullName: TextView.ReadOnly
 - uid: Terminal.Gui.TextView.Redraw*
   parent: Terminal.Gui.TextView
   isExternal: false
