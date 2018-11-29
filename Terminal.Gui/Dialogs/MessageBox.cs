@@ -52,7 +52,7 @@ namespace Terminal.Gui {
 
 		static int QueryFull (bool useErrorColors, int width, int height, string title, string message, params string [] buttons)
 		{
-			int lines = Label.MeasureLines (message, width);
+			int textWidth = Label.MaxWidth (message, width);
 			int clicked = -1, count = 0;
 
 			var d = new Dialog (title, width, height);
@@ -69,7 +69,7 @@ namespace Terminal.Gui {
 				d.AddButton (b);
 			}
 			if (message != null) {
-				var l = new Label ((width - 4 - message.Length) / 2, 0, message);
+				var l = new Label ((width - 4 - textWidth) / 2, 0, message);
 				d.Add (l);
 			}
 
