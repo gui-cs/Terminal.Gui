@@ -106,6 +106,7 @@ static class Demo {
 			Y = Pos.Top (login),
 			Width = 40
 		};
+
 		var passText = new TextField ("") {
 			Secret = true,
 			X = Pos.Left (loginText),

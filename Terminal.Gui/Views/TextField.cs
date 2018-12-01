@@ -95,7 +95,7 @@ namespace Terminal.Gui {
 			set {
 				text = TextModel.ToRunes (value);
 				if (point > text.Count)
-					point = text.Count;
+					point = Math.Max (text.Count-1, 0);
 
 				// FIXME: this needs to be updated to use Rune.ColumnWidth
 				first = point > Frame.Width ? point - Frame.Width : 0;
