@@ -32,7 +32,7 @@ using NStack;
 
 namespace Terminal.Gui {
 	class TextModel {
-		List<List<Rune>> lines;
+		List<List<Rune>> lines = new List<List<Rune>> ();
 
 		public bool LoadFile (string file)
 		{
