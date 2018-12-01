@@ -849,7 +849,7 @@ namespace Terminal.Gui {
 				} else
 					PositionCursor ();
 				break;
-
+			case Key.DeleteChar:
 			case Key.ControlD: // Delete
 				if (isReadOnly)
 					break;
