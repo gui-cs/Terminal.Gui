@@ -1,0 +1,25 @@
+pool:
+  vmImage: 'Ubuntu 16.04'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- script: |
+    msbuild /t:Restore $TRAVIS_BUILD_DIR/Terminal.sln
+  displayName: Restore dependencies
+
+- script: |
+    if echo $BUILD_SOURCEBRANCH | grep /release/; then perl -pi -e "s/PackageVersion>.*</PackageVersion>${BUILD_SOURCEBRANCHNAME}</" Terminal.Gui/Terminal.Gui.csproj; fi
+  displayName: Update NuGet package version from branch name
+
+- script: |
+    msbuild /p:Configuration=Release Terminal.sln
+  displayName: Build
+
+- script: |
+    cp ./Terminal.Gui/bin/Release/Terminal.Gui.*.nupkg $BUILD_ARTIFACTSTAGINGDIRECTORY
+  displayName: Copy artifacts to staging directory
+
+- task: PublishBuildArtifacts@1
+  condition: and(succeeded(), ne(variables['system.pullrequest.isfork'], true))
