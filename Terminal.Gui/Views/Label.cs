@@ -210,6 +210,19 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Computes the the max width of a line or multilines needed to render by the Label control
+		/// </summary>
+		/// <returns>Max width of lines.</returns>
+		/// <param name="text">Text, may contain newlines.</param>
+		/// <param name="width">The width for the text.</param>
+		public static int MaxWidth(ustring text, int width)
+		{
+			var result = new List<ustring>();
+			Recalc(text, result, width, TextAlignment.Left);
+			return result.Max(s => s.RuneCount);
+		}
+
+		/// <summary>
 		///   The text displayed by this widget.
 		/// </summary>
 		public virtual ustring Text {
