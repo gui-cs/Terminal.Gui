@@ -44,7 +44,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   The default color will be set before this method is invoked, and will be based on whether the item is selected or not.
 		/// </remarks>
-		void Render (bool selected, int item, int col, int line, int width);
+		void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width);
 
 		/// <summary>
 		/// Should return whether the specified item is currently marked.
@@ -96,8 +96,6 @@ namespace Terminal.Gui {
 		//
 		class ListWrapper : IListDataSource {
 			IList src;
-			public ListView Container;
-			public ConsoleDriver Driver;
 			BitArray marks;
 			int count;
 
@@ -110,7 +108,7 @@ namespace Terminal.Gui {
 
 			public int Count => src.Count;
 
-			void RenderUstr (ustring ustr, int col, int line, int width)
+			void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width)
 			{
 				int byteLen = ustr.Length;
 				int used = 0;
@@ -119,25 +117,25 @@ namespace Terminal.Gui {
 					var count = Rune.ColumnWidth (rune);
 					if (used+count >= width)
 						break;
-					Driver.AddRune (rune);
+					driver.AddRune (rune);
 					used += count;
 					i += size;
 				}
 				for (; used < width; used++) {
-					Driver.AddRune (' ');
+					driver.AddRune (' ');
 				}
 			}
 
-			public void Render (bool marked, int item, int col, int line, int width)
+			public void Render (ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width)
 			{
-				Container.Move (col, line);
+				container.Move (col, line);
 				var t = src [item];
 				if (t is ustring) {
-					RenderUstr (t as ustring, col, line, width);
+					RenderUstr (driver, (ustring)t, col, line, width);
 				} else if (t is string) {
-					RenderUstr (t as string, col, line, width);
+					RenderUstr (driver, (string)t, col, line, width);
 				} else
-					RenderUstr (t.ToString (), col, line, width);
+					RenderUstr (driver, t.ToString (), col, line, width);
 			}
 
 			public bool IsMarked (int item)
@@ -179,8 +177,6 @@ namespace Terminal.Gui {
 				Source = null;
 			else {
 				Source = MakeWrapper (source);
-				((ListWrapper)Source).Container = this;
-				((ListWrapper)Source).Driver = Driver;
 			}
 		}
 
@@ -245,8 +241,6 @@ namespace Terminal.Gui {
 		/// <param name="source">An IList data source, if the elements of the IList are strings or ustrings, the string is rendered, otherwise the ToString() method is invoked on the result.</param>
 		public ListView (IList source) : this (MakeWrapper (source))
 		{
-			((ListWrapper)(Source)).Container = this;
-			((ListWrapper)(Source)).Driver = Driver;
 		}
 
 		/// <summary>
@@ -273,8 +267,6 @@ namespace Terminal.Gui {
 		/// <param name="source">An IList data source, if the elements of the IList are strings or ustrings, the string is rendered, otherwise the ToString() method is invoked on the result.</param>
 		public ListView (Rect rect, IList source) : this (rect, MakeWrapper (source))
 		{
-			((ListWrapper)(Source)).Container = this;
-			((ListWrapper)(Source)).Driver = Driver;
 		}
 
 		/// <summary>
@@ -315,7 +307,7 @@ namespace Terminal.Gui {
 					for (int c = 0; c < f.Width; c++)
 						Driver.AddRune(' ');
 				} else {
-					Source.Render(isSelected, item, 0, row, f.Width);
+					Source.Render(this, Driver, isSelected, item, 0, row, f.Width);
 				}
 			}
 		}
