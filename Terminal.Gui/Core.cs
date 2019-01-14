@@ -473,6 +473,7 @@ namespace Terminal.Gui {
 			view.container = this;
 			if (view.CanFocus)
 				CanFocus = true;
+			SetNeedsLayout ();
 			SetNeedsDisplay ();
 		}
 
@@ -513,6 +514,7 @@ namespace Terminal.Gui {
 			if (view == null || subviews == null)
 				return;
 
+			SetNeedsLayout ();
 			SetNeedsDisplay ();
 			var touched = view.Frame;
 			subviews.Remove (view);
