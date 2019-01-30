@@ -260,6 +260,20 @@ namespace Terminal.Gui {
 				Adjust ();
 				break;
 
+			case Key.ControlW:
+				if (text.Count == 0)
+					return true;
+				int oldPoint = point;
+				int startIdx = WordBackward(point);
+				if (startIdx != -1)
+					point = startIdx;
+				else
+					startIdx = 0;
+				text.RemoveRange(startIdx, oldPoint - startIdx);
+				SetText(text);
+				Adjust();
+				break;
+
 			case Key.ControlY: // Control-y, yank
 				var clip = TextModel.ToRunes (Clipboard.Contents);
 				if (clip== null)
