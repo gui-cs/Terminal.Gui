@@ -261,8 +261,10 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.ControlY: // Control-y, yank
+				if (Clipboard.Contents == null)
+					return true;
 				var clip = TextModel.ToRunes (Clipboard.Contents);
-				if (clip== null)
+				if (clip == null)
 					return true;
 
 				if (point == text.Count) {
