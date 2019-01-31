@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 		/// <param name="text">Initial text contents.</param>
 		public TextField (string text) : this (ustring.Make (text))
 		{
-			
+
 		}
 
 		/// <summary>
@@ -107,14 +107,21 @@ namespace Terminal.Gui {
 		///   Sets the secret property.
 		/// </summary>
 		/// <remarks>
-		///   This makes the text entry suitable for entering passwords. 
+		///   This makes the text entry suitable for entering passwords.
 		/// </remarks>
 		public bool Secret { get; set; }
 
 		/// <summary>
-		///    The current cursor position.
+		///    Sets or gets the current cursor position.
 		/// </summary>
-		public int CursorPosition { get { return point; } }
+		public int CursorPosition {
+			get { return point; }
+			set {
+				point = value;
+				Adjust ();
+				SetNeedsDisplay ();
+			}
+		}
 
 		/// <summary>
 		///   Sets the cursor position.
@@ -150,9 +157,9 @@ namespace Terminal.Gui {
 				col += cols;
 			}
 
-			for (int i = col; i < Frame.Width; i++) 
+			for (int i = col; i < Frame.Width; i++)
 				Driver.AddRune (' ');
-			
+
 			PositionCursor ();
 		}
 
@@ -170,7 +177,7 @@ namespace Terminal.Gui {
 
 		void Adjust ()
 		{
-			if (point < first) 
+			if (point < first)
 				first = point;
 			else if (first + point >= Frame.Width) {
 				first = point - (Frame.Width - 1);
@@ -387,16 +394,16 @@ namespace Terminal.Gui {
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked))
 				return false;
 
-			if (!HasFocus) 
+			if (!HasFocus)
 				SuperView.SetFocus (this);
-			
+
 			// We could also set the cursor position.
 			point = first + ev.X;
 			if (point > text.Count)
 				point = text.Count;
 			if (point < first)
 				point = 0;
-	
+
 			SetNeedsDisplay ();
 			return true;
 		}
