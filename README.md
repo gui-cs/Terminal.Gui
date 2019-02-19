@@ -61,7 +61,14 @@ class Demo {
         var top = Application.Top;
 
 	// Creates the top-level window to show
-        var win = new Window (new Rect (0, 1, top.Frame.Width, top.Frame.Height-1), "MyApp");
+        var win = new Window ("MyApp") {
+	    X = 0,
+	    Y = 1, // Leave one row for the toplevel menu
+
+	    // By using Dim.Fill(), it will automatically resize without manual intervention
+	    Width = Dim.Fill (),
+	    Heigh = Dim.Fill ()
+	};
         top.Add (win);
 
 	// Creates a menubar, the item "New" has a help menu.
@@ -79,12 +86,29 @@ class Demo {
         });
         top.Add (menu);
 
-	// Add some controls
+	var login = new Label ("Login: ") { X = 3, Y = 2 };
+	var password = new Label ("Password: ") {
+	    	X = Pos.Left (login),
+		Y = Pos.Top (login) + 1
+        };
+	var loginText = new TextField ("") {
+                X = Pos.Right (password),
+                Y = Pos.Top (login),
+                Width = 40
+        };
+        var passText = new TextField ("") {
+                Secret = true,
+                X = Pos.Left (loginText),
+                Y = Pos.Top (password),
+                Width = Dim.Width (loginText)
+        };
+	
+	// Add some controls, 
 	win.Add (
-            new Label (3, 2, "Login: "),
-            new TextField (14, 2, 40, ""),
-            new Label (3, 4, "Password: "),
-            new TextField (14, 4, 40, "") { Secret = true },
+	    // The ones with my favorite layout system
+  	    login, password, loginText, passText,
+
+	    // The ones laid out like an australopithecus, with absolute positions:
             new CheckBox (3, 6, "Remember me"),
             new RadioGroup (3, 8, new [] { "_Personal", "_Company" }),
             new Button (3, 14, "Ok"),
@@ -95,6 +119,11 @@ class Demo {
     }
 }
 ```
+
+The example above shows how to add views, two styles are used, a very
+nice layout system that I have no name for, but that [is
+documented](https://migueldeicaza.github.io/gui.cs/articles/overview.html#layout),
+and the absolute positioning.
 
 # Installing it
 
