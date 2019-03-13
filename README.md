@@ -67,7 +67,7 @@ class Demo {
 
 	    // By using Dim.Fill(), it will automatically resize without manual intervention
 	    Width = Dim.Fill (),
-	    Heigh = Dim.Fill ()
+	    Height = Dim.Fill ()
 	};
         top.Add (win);
 
