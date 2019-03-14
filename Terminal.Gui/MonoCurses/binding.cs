@@ -48,9 +48,9 @@ using Mono.Terminal.Internal;
 
 namespace Unix.Terminal {
 
-	internal partial class Curses {
+	public partial class Curses {
 		[StructLayout (LayoutKind.Sequential)]
-		internal struct MouseEvent {
+		public struct MouseEvent {
 			public short ID;
 			public int X, Y, Z;
 			public Event ButtonState;

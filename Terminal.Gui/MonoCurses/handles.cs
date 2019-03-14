@@ -30,8 +30,8 @@ using System.Runtime.InteropServices;
 
 namespace Unix.Terminal {
 
-	internal partial class Curses {
-		internal class Window {
+	public partial class Curses {
+		public class Window {
 			public readonly IntPtr Handle;
 			static Window curscr;
 			static Window stdscr;

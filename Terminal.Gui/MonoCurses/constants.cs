@@ -5,7 +5,7 @@
 using System;
 
 namespace Unix.Terminal {
-	internal partial class Curses {
+	public partial class Curses {
 		public const int A_NORMAL = unchecked((int)0x0);
 		public const int A_STANDOUT = unchecked((int)0x10000);
 		public const int A_UNDERLINE = unchecked((int)0x20000);
@@ -49,7 +49,7 @@ namespace Unix.Terminal {
 		public const int COLOR_CYAN = unchecked((int)0x6);
 		public const int COLOR_WHITE = unchecked((int)0x7);
 		public const int KEY_CODE_YES = unchecked((int)0x100);
-		internal enum Event : long {
+		public enum Event : long {
 			Button1Pressed = unchecked((int)0x2),
 			Button1Released = unchecked((int)0x1),
 			Button1Clicked = unchecked((int)0x4),

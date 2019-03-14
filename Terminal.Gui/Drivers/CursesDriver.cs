@@ -16,7 +16,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// This is the Curses driver for the gui.cs/Terminal framework.
 	/// </summary>
-	internal class CursesDriver : ConsoleDriver {
+	public class CursesDriver : ConsoleDriver {
 		Action terminalResized;
 
 		public override int Cols => Curses.Cols;
@@ -70,9 +70,16 @@ namespace Terminal.Gui {
 		public Curses.Window window;
 
 		static short last_color_pair = 16;
-		static Attribute MakeColor (short f, short b)
+
+		/// <summary>
+		/// Creates a curses color from the provided foreground and background colors
+		/// </summary>
+		/// <param name="foreground">Contains the curses attributes for the foreground (color, plus any attributes)</param>
+		/// <param name="background">Contains the curses attributes for the background (color, plus any attributes)</param>
+		/// <returns></returns>
+		public static Attribute MakeColor (short foreground, short background)
 		{
-			Curses.InitColorPair (++last_color_pair, f, b);
+			Curses.InitColorPair (++last_color_pair, foreground, background);
 			return new Attribute () { value = Curses.ColorPair (last_color_pair) };
 		}
 
