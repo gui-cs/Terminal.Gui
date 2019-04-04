@@ -135,7 +135,7 @@ https://www.nuget.org/packages/Terminal.Gui
 
 You can find a trivial .NET core sample application in the
 "StandaloneExample" directory.   You can execute it by running
-`dotnet core` in that directory.
+`dotnet run` in that directory.
 
 That sample relies on the distributed NuGet package, if you want to
 to use the code on GitHub, you can open the Example program which 
