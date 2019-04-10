@@ -295,6 +295,51 @@ namespace Terminal.Gui {
 			}
 		}
 
+		static int MapColor (Color color)
+		{
+			switch (color) {
+			case Color.Black:
+				return Curses.COLOR_BLACK;
+			case Color.Blue:
+				return Curses.COLOR_BLUE;
+			case Color.Green:
+				return Curses.COLOR_GREEN;
+			case Color.Cyan:
+				return Curses.COLOR_CYAN;
+			case Color.Red:
+				return Curses.COLOR_RED;
+			case Color.Magenta:
+				return Curses.COLOR_MAGENTA;
+			case Color.Brown:
+				return Curses.COLOR_YELLOW;
+			case Color.Gray:
+				return Curses.COLOR_WHITE;
+			case Color.DarkGray:
+				return Curses.COLOR_BLACK | Curses.A_BOLD;
+			case Color.BrightBlue:
+				return Curses.COLOR_BLUE | Curses.A_BOLD;
+			case Color.BrightGreen:
+				return Curses.COLOR_GREEN | Curses.A_BOLD;
+			case Color.BrighCyan:
+				return Curses.COLOR_CYAN | Curses.A_BOLD;
+			case Color.BrightRed:
+				return Curses.COLOR_RED | Curses.A_BOLD;
+			case Color.BrightMagenta:
+				return Curses.COLOR_MAGENTA | Curses.A_BOLD;
+			case Color.BrightYellow:
+				return Curses.COLOR_YELLOW | Curses.A_BOLD;
+			case Color.White:
+				return Curses.COLOR_WHITE | Curses.A_BOLD;
+			}
+			throw new ArgumentException ("Invalid color code");
+		}
+
+		public override Attribute MakeAttribute (Color fore, Color back)
+		{
+			var f = MapColor (fore);
+			return MakeColor ((short)(f & 0xffff), (short)MapColor (back)) | ((f & Curses.A_BOLD) != 0 ? Curses.A_BOLD : 0);
+		}
+
 		public override void Suspend ()
 		{
 			StopReportingMouseMoves ();

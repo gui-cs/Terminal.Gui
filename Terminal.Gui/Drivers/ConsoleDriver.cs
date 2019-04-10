@@ -103,8 +103,32 @@ namespace Terminal.Gui {
 			this.value = value;
 		}
 
+		/// <summary>
+		/// Implicit conversion from an attribute to the underlying Int32 representation
+		/// </summary>
+		/// <returns>The integer value stored in the attribute.</returns>
+		/// <param name="c">The attribute to convert</param>
 		public static implicit operator int (Attribute c) => c.value;
+
+		/// <summary>
+		/// Implicitly convert an integer value into an attribute
+		/// </summary>
+		/// <returns>An attribute with the specified integer value.</returns>
+		/// <param name="v">value</param>
 		public static implicit operator Attribute (int v) => new Attribute (v);
+
+		/// <summary>
+		/// Creates an attribute from the specified foreground and background.
+		/// </summary>
+		/// <returns>The make.</returns>
+		/// <param name="foreground">Foreground color to use.</param>
+		/// <param name="background">Background color to use.</param>
+		public static Attribute Make (Color foreground, Color background)
+		{
+			if (Application.Driver == null)
+				throw new InvalidOperationException ("The Application has not been initialized");
+			return Application.Driver.MakeAttribute (foreground, background);
+		}
 	}
 
 	/// <summary>
@@ -449,5 +473,7 @@ namespace Terminal.Gui {
 		/// The bottom tee.
 		/// </summary>
 		public Rune BottomTee;
+
+		public abstract Attribute MakeAttribute (Color fore, Color back);
 	}
 }

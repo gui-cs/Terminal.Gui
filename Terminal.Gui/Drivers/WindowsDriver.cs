@@ -786,6 +786,11 @@ namespace Terminal.Gui {
 			};
 		}
 
+		public override Attribute MakeAttribute (Color fore, Color back)
+		{
+			return MakeColor ((ConsoleColor)fore, (ConsoleColor)back);
+		}
+
 		public override void Refresh ()
 		{
 			UpdateScreen ();

@@ -157,6 +157,11 @@ namespace Terminal.Gui {
 			Console.Clear ();
 		}
 
+		public override Attribute MakeAttribute (Color fore, Color back)
+		{
+			return MakeColor ((ConsoleColor)fore, (ConsoleColor)back);
+		}
+
 		int redrawColor = -1;
 		void SetColor (int color)
 		{
