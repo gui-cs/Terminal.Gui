@@ -493,7 +493,7 @@ namespace Terminal.Gui {
 		public bool CanChooseFiles {
 			get => dirListView.canChooseFiles;
 			set {
-				dirListView.canChooseDirectories = value;
+				dirListView.canChooseFiles = value;
 				dirListView.Reload ();
 			}
 		}
