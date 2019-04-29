@@ -257,7 +257,9 @@ static class Demo {
 	{
 		//Application.UseSystemConsole = true;
 		Application.Init ();
+		
 		var top = Application.Top;
+		
 		var tframe = top.Frame;
 		//Open ();
 #if true
@@ -294,10 +296,11 @@ static class Demo {
 
 			ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
 		};
+		
 		var test = new Label (3, 18, "Se iniciará el análisis");
 		win.Add (test);
 		win.Add (ml);
-
+		
 		// ShowTextAlignments (win);
 		top.Add (win);
 		top.Add (menu);
