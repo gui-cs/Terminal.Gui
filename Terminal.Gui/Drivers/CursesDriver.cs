@@ -227,7 +227,8 @@ namespace Terminal.Gui {
 			Curses.Window.Standard.keypad (true);
 			reportableMouseEvents = Curses.mousemask (Curses.Event.AllEvents | Curses.Event.ReportMousePosition, out oldMouseEvents);
 			this.terminalResized = terminalResized;
-			StartReportingMouseMoves ();
+			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
+				StartReportingMouseMoves ();
 
 			HLine = Curses.ACS_HLINE;
 			VLine = Curses.ACS_VLINE;
@@ -342,11 +343,13 @@ namespace Terminal.Gui {
 
 		public override void Suspend ()
 		{
-			StopReportingMouseMoves ();
+			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
+				StopReportingMouseMoves ();
 			Platform.Suspend ();
 			Curses.Window.Standard.redrawwin ();
 			Curses.refresh ();
-			StartReportingMouseMoves ();
+			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
+				StartReportingMouseMoves ();
 		}
 
 		public override void StartReportingMouseMoves ()
