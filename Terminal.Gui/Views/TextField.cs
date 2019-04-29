@@ -24,6 +24,11 @@ namespace Terminal.Gui {
 		bool used;
 
 		/// <summary>
+		/// Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so new input should be appended at the cursor position, rather than clearing the entry
+		/// </summary>
+		public bool Used { get => used; set { used = value; } }
+
+		/// <summary>
 		///   Changed event, raised when the text has clicked.
 		/// </summary>
 		/// <remarks>

@@ -665,6 +665,18 @@ namespace Terminal.Gui {
 				PositionCursor ();
 		}
 
+		/// <summary>
+		/// Will scroll the view to display the specified row at the top
+		/// </summary>
+		/// <param name="row">Row that should be displayed at the top</param>
+		public void ScrollTo (int row)
+		{
+			if (row < 0)
+				row = 0;
+			topRow = row > model.Count ? model.Count - 1 : row;
+			SetNeedsDisplay ();
+		}
+
 		bool lastWasKill;
 
 		public override bool ProcessKey (KeyEvent kb)

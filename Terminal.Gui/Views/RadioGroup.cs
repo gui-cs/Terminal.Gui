@@ -22,6 +22,19 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// The location of the cursor in the radio group
+		/// </summary>
+		public int Cursor {
+			get => cursor;
+			set {
+				if (cursor < 0 || cursor >= radioLabels.Length)
+					return;
+				cursor = value;
+				SetNeedsDisplay ();
+			}
+		}
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.RadioGroup"/> class
 		/// setting up the initial set of radio labels and the item that should be selected.
 		/// </summary>
