@@ -208,7 +208,7 @@ namespace Terminal.Gui {
 				if (location == 0) {
 					if (pos > 0)
 						SetPosition (pos - 1);
-				} else if (location == Bounds.Width - 1){
+				} else if (location == barsize + 1){
 					if (pos + 1 + barsize < Size)
 						SetPosition (pos + 1);
 				} else {
