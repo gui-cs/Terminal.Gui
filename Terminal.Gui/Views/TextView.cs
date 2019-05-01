@@ -668,7 +668,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Will scroll the view to display the specified row at the top
 		/// </summary>
-		/// <param name="row">Row that should be displayed at the top</param>
+		/// <param name="row">Row that should be displayed at the top, if the value is negative it will be reset to zero</param>
 		public void ScrollTo (int row)
 		{
 			if (row < 0)
