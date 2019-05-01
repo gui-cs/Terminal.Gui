@@ -215,6 +215,11 @@ namespace Terminal.Gui {
 
 		public override bool ProcessKey (KeyEvent kb)
 		{
+			// remember current cursor position
+			// because the new calculated cursor position is needed to be set BEFORE the change event is triggert
+			// Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
+			var oldCursorPos = point;
+			
 			switch (kb.Key) {
 			case Key.DeleteChar:
 			case Key.ControlD:
@@ -230,8 +235,8 @@ namespace Terminal.Gui {
 				if (point == 0)
 					return true;
 
-				SetText (text.GetRange (0, point - 1).Concat (text.GetRange (point, text.Count - (point))));
 				point--;
+				SetText(text.GetRange(0, oldCursorPos - 1).Concat(text.GetRange(oldCursorPos, text.Count - (oldCursorPos))));
 				Adjust ();
 				break;
 
@@ -280,11 +285,11 @@ namespace Terminal.Gui {
 					return true;
 
 				if (point == text.Count) {
-					SetText (text.Concat (clip).ToList ());
 					point = text.Count;
+					SetText(text.Concat(clip).ToList());
 				} else {
-					SetText (text.GetRange (0, point).Concat (clip).Concat (text.GetRange (point, text.Count - point)));
 					point += clip.Count;
+					SetText(text.GetRange(0, oldCursorPos).Concat(clip).Concat(text.GetRange(oldCursorPos, text.Count - oldCursorPos)));
 				}
 				Adjust ();
 				break;
@@ -315,16 +320,16 @@ namespace Terminal.Gui {
 
 				var kbstr = TextModel.ToRunes (ustring.Make ((uint)kb.Key));
 				if (used) {
+					point++;
 					if (point == text.Count) {
 						SetText (text.Concat (kbstr).ToList ());
 					} else {
-						SetText (text.GetRange (0, point).Concat (kbstr).Concat (text.GetRange (point, text.Count - point)));
-					}
-					point++;
+						SetText(text.GetRange(0, oldCursorPos).Concat(kbstr).Concat(text.GetRange(oldCursorPos, text.Count - oldCursorPos)));
+					}					
 				} else {
-					SetText (kbstr);
-					first = 0;
 					point = 1;
+					SetText (kbstr);
+					first = 0;					
 				}
 				used = true;
 				Adjust ();
