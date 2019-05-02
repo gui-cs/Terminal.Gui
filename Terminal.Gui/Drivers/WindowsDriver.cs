@@ -440,22 +440,23 @@ namespace Terminal.Gui {
 			Task.Run ((Action)WindowsInputHandler);
 		}
 
-	[StructLayout(LayoutKind.Sequential)]
-	public struct ConsoleKeyInfoEx {
-	    public ConsoleKeyInfo consoleKeyInfo;
-	    public bool CapsLock;
-	    public bool NumLock;
+		[StructLayout(LayoutKind.Sequential)]
+		public struct ConsoleKeyInfoEx {
+		    public ConsoleKeyInfo consoleKeyInfo;
+		    public bool CapsLock;
+		    public bool NumLock;
 
-	    public ConsoleKeyInfoEx(ConsoleKeyInfo consoleKeyInfo, bool capslock, bool numlock)
-	    {
-		this.consoleKeyInfo = consoleKeyInfo;
-		CapsLock = capslock;
-		NumLock = numlock;
-	    }
-	}
+		    public ConsoleKeyInfoEx(ConsoleKeyInfo consoleKeyInfo, bool capslock, bool numlock)
+		    {
+			this.consoleKeyInfo = consoleKeyInfo;
+			CapsLock = capslock;
+			NumLock = numlock;
+		    }
+		}
 
 		// The records that we keep fetching
 		WindowsConsole.InputRecord [] result, records = new WindowsConsole.InputRecord [1];
+
 		void WindowsInputHandler ()
 		{
 			while (true) {
