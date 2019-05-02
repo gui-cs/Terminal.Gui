@@ -454,8 +454,8 @@ namespace Terminal.Gui {
 	    }
 	}
 
-	// The records that we keep fetching
-	WindowsConsole.InputRecord [] result, records = new WindowsConsole.InputRecord [1];
+		// The records that we keep fetching
+		WindowsConsole.InputRecord [] result, records = new WindowsConsole.InputRecord [1];
 		void WindowsInputHandler ()
 		{
 			while (true) {
