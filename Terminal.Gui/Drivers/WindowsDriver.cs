@@ -1,4 +1,4 @@
-﻿//
+//
 // WindowsDriver.cs: Windows specific driver 
 //
 // Authors:
@@ -440,6 +440,20 @@ namespace Terminal.Gui {
 			Task.Run ((Action)WindowsInputHandler);
 		}
 
+		[StructLayout(LayoutKind.Sequential)]
+		public struct ConsoleKeyInfoEx {
+			public ConsoleKeyInfo consoleKeyInfo;
+			public bool CapsLock;
+			public bool NumLock;
+
+			public ConsoleKeyInfoEx(ConsoleKeyInfo consoleKeyInfo, bool capslock, bool numlock)
+			{
+			this.consoleKeyInfo = consoleKeyInfo;
+			CapsLock = capslock;
+			NumLock = numlock;
+			}
+		}
+
 		// The records that we keep fetching
 		WindowsConsole.InputRecord [] result, records = new WindowsConsole.InputRecord [1];
 
@@ -510,7 +524,7 @@ namespace Terminal.Gui {
 			case WindowsConsole.EventType.Key:
 				if (inputEvent.KeyEvent.bKeyDown == false)
 					return;
-				var map = MapKey (ToConsoleKeyInfo (inputEvent.KeyEvent));
+				var map = MapKey (ToConsoleKeyInfoEx (inputEvent.KeyEvent));
 				if (inputEvent.KeyEvent.UnicodeChar == 0 && map == (Key)0xffffffff)
 					return;
 				keyHandler (new KeyEvent (map));
@@ -587,19 +601,23 @@ namespace Terminal.Gui {
 			};
 		}
 
-		private ConsoleKeyInfo ToConsoleKeyInfo (WindowsConsole.KeyEventRecord keyEvent)
+		public ConsoleKeyInfoEx ToConsoleKeyInfoEx (WindowsConsole.KeyEventRecord keyEvent)
 		{
 			var state = keyEvent.dwControlKeyState;
 
 			bool shift = (state & WindowsConsole.ControlKeyState.ShiftPressed) != 0;
 			bool alt = (state & (WindowsConsole.ControlKeyState.LeftAltPressed | WindowsConsole.ControlKeyState.RightAltPressed)) != 0;
 			bool control = (state & (WindowsConsole.ControlKeyState.LeftControlPressed | WindowsConsole.ControlKeyState.RightControlPressed)) != 0;
+			bool capslock = (state & (WindowsConsole.ControlKeyState.CapslockOn)) != 0;
+			bool numlock = (state & (WindowsConsole.ControlKeyState.NumlockOn)) != 0;
 
-			return new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
+			var ConsoleKeyInfo = new ConsoleKeyInfo(keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
+			return new ConsoleKeyInfoEx(ConsoleKeyInfo, capslock, numlock);
 		}
 
-		public Key MapKey (ConsoleKeyInfo keyInfo)
+		public Key MapKey (ConsoleKeyInfoEx keyInfoEx)
 		{
+			var keyInfo = keyInfoEx.consoleKeyInfo;
 			switch (keyInfo.Key) {
 			case ConsoleKey.Escape:
 				return Key.Esc;
@@ -630,6 +648,27 @@ namespace Terminal.Gui {
 			case ConsoleKey.Delete:
 				return Key.DeleteChar;
 
+			case ConsoleKey.NumPad0:
+				return keyInfoEx.NumLock ? (Key)(uint)'0' : Key.InsertChar;
+			case ConsoleKey.NumPad1:
+			        return keyInfoEx.NumLock ? (Key)(uint)'1' : Key.End;
+			case ConsoleKey.NumPad2:
+			        return keyInfoEx.NumLock ? (Key)(uint)'2' : Key.CursorDown;
+			case ConsoleKey.NumPad3:
+				return keyInfoEx.NumLock ? (Key)(uint)'3' : Key.PageDown;
+			case ConsoleKey.NumPad4:
+			        return keyInfoEx.NumLock ? (Key)(uint)'4' : Key.CursorLeft;
+			case ConsoleKey.NumPad5:
+			        return keyInfoEx.NumLock ? (Key)(uint)'5' : (Key)((uint)keyInfo.KeyChar);
+			case ConsoleKey.NumPad6:
+			        return keyInfoEx.NumLock ? (Key)(uint)'6' : Key.CursorRight;
+			case ConsoleKey.NumPad7:
+			        return keyInfoEx.NumLock ? (Key)(uint)'7' : Key.Home;
+			case ConsoleKey.NumPad8:
+			        return keyInfoEx.NumLock ? (Key)(uint)'8' : Key.CursorUp;
+			case ConsoleKey.NumPad9:
+			        return keyInfoEx.NumLock ? (Key)(uint)'9' : Key.PageUp;
+
 			case ConsoleKey.Oem1:
 			case ConsoleKey.Oem2:
 			case ConsoleKey.Oem3:
@@ -644,34 +683,33 @@ namespace Terminal.Gui {
 			case ConsoleKey.OemPlus:
 			case ConsoleKey.OemMinus:
 				return (Key)((uint)keyInfo.KeyChar);
-			}
-
-			var key = keyInfo.Key;
-			if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
-				var delta = key - ConsoleKey.A;
-				if (keyInfo.Modifiers == ConsoleModifiers.Control)
-					return (Key)((uint)Key.ControlA + delta);
-				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
-					return (Key)(((uint)Key.AltMask) | ((uint)'A' + delta));
-				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
-					return (Key)((uint)'A' + delta);
-				else
-					return (Key)((uint)'a' + delta);
-			}
-			if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
-				var delta = key - ConsoleKey.D0;
-				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
-					return (Key)(((uint)Key.AltMask) | ((uint)'0' + delta));
-				
-				return (Key)((uint)keyInfo.KeyChar);
-			}
-			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
-				var delta = key - ConsoleKey.F1;
-
-				return (Key)((int)Key.F1 + delta);
-			}
-			return (Key)(0xffffffff);
 		}
+
+		var key = keyInfo.Key;
+		var alphaBase = ((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock)) ? 'A' : 'a';
+
+		if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
+				    var delta = key - ConsoleKey.A;
+				    if (keyInfo.Modifiers == ConsoleModifiers.Control)
+					    return (Key)((uint)Key.ControlA + delta);
+				    if (keyInfo.Modifiers == ConsoleModifiers.Alt)
+					    return (Key)(((uint)Key.AltMask) | ((uint)'A' + delta));
+				    return (Key)((uint)alphaBase + delta);
+		}
+		if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
+		var delta = key - ConsoleKey.D0;
+		if (keyInfo.Modifiers == ConsoleModifiers.Alt)
+			return (Key)(((uint)Key.AltMask) | ((uint)'0' + delta));
+
+		return (Key)((uint)keyInfo.KeyChar);
+		}
+		if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
+		var delta = key - ConsoleKey.F1;
+
+		return (Key)((int)Key.F1 + delta);
+		}
+		return (Key)(0xffffffff);
+	}
 
 		public override void Init (Action terminalResized)
 		{
