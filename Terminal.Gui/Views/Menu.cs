@@ -407,12 +407,36 @@ namespace Terminal.Gui {
 			OpenMenu (selected);
 		}
 
-		public override bool ProcessHotKey (KeyEvent kb)
+                internal bool FindAndOpenMenuByHotkey(KeyEvent kb)
+                {
+                    int pos = 0;
+                    var c = ((uint)kb.Key & (uint)Key.CharMask);
+	            for (int i = 0; i < Menus.Length; i++)
+                    {
+			    // TODO: this code is duplicated, hotkey should be part of the MenuBarItem
+                            var mi = Menus[i];
+                            int p = mi.Title.IndexOf('_');
+                            if (p != -1 && p + 1 < mi.Title.Length) {
+                                    if (mi.Title[p + 1] == c) {
+			                    OpenMenu(i);
+			                    return true;
+                                    }
+                            }
+                    }
+	            return false;
+                }
+
+	        public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == Key.F9) {
 				StartMenu ();
 				return true;
 			}
+
+                        if (kb.IsAlt)
+                        {
+                            if (FindAndOpenMenuByHotkey(kb)) return true;
+                        }
 			var kc = kb.KeyValue;
 
 			return base.ProcessHotKey (kb);
