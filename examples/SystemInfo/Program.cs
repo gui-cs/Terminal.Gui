@@ -175,7 +175,7 @@ class Demo {
 		var top = Application.Top;
 		var tframe = top.Frame;
 
-		var win = new Window ("Hello"){
+		var win = new Window ("SystemInfo"){
 			X = 0,
 			Y = 1,
 			Width = Dim.Fill (),
@@ -183,16 +183,25 @@ class Demo {
 		};					
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-//				new MenuItem ("_New", "Creates new file", NewFile),
-//				new MenuItem ("_Open", "", null),
-//				new MenuItem ("_Close", "", () => Close ()),
-				new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
+				/* new MenuBarItem("_Recent", new MenuItem[] {
+					new MenuItem ("Last one", "", () => { if (Quit ()) top.Running = false; })
+				}), */
+				new MenuItem ("_New", "Creates new file", null),
+				new MenuItem ("_Open", "", null),
+				new MenuItem ("_Close", "", null),
+                null,
+                //new MenuItem ("", "", null),
+				new MenuItem ("_Quit", "Will quit the application", () => { if (Quit ()) top.Running = false; })
 			}),
-/*			new MenuBarItem ("_Edit", new MenuItem [] {
+			new MenuBarItem ("_Edit", new MenuItem [] {
 				new MenuItem ("_Copy", "", null),
 				new MenuItem ("C_ut", "", null),
 				new MenuItem ("_Paste", "", null)
-			}) */
+			}),
+            new MenuBarItem("_Help", new MenuItem[] {
+                new MenuItem ("_Help", "", null),
+                new MenuItem ("_About", "", null),
+            }),
 		});
 
 //		ShowEntries (win);
