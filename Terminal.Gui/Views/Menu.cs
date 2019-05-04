@@ -125,7 +125,9 @@ namespace Terminal.Gui {
 		{
 			int maxW = 0;
 
-			foreach (var item in items) {
+			foreach (var item in items)
+            {
+                if (item == null) continue;
 				var l = item.Width;
 				maxW = Math.Max (l, maxW);
 			}
@@ -148,18 +150,29 @@ namespace Terminal.Gui {
 
 			for (int i = 0; i < barItems.Children.Length; i++){
 				var item = barItems.Children [i];
-				Move (1, i+1);
-				Driver.SetAttribute (item == null ? Colors.Base.Focus : i == current ? ColorScheme.Focus : ColorScheme.Normal);
+                Driver.SetAttribute(item == null ? ColorScheme.Normal : i == current ? ColorScheme.Focus : ColorScheme.Normal);
+                if (item == null)
+                {
+                    Move(0, i + 1);
+                    Driver.AddRune(Driver.LeftTee);
+        		}
+                else
+				    Move(1, i+1);
+
 				for (int p = 0; p < Frame.Width-2; p++)
 					if (item == null)
 						Driver.AddRune (Driver.HLine);
 					else
 						Driver.AddRune (' ');
 
-				if (item == null)
-					continue;
+                if (item == null)
+                {
+                    Move(region.Right-1, i + 1);
+                    Driver.AddRune(Driver.RightTee);
+                    continue;
+                }
 
-				Move (2, i + 1);
+                Move (2, i + 1);
 				DrawHotString (item.Title,
 				               i == current? ColorScheme.HotFocus : ColorScheme.HotNormal,
 				               i == current ? ColorScheme.Focus : ColorScheme.Normal);
@@ -191,16 +204,22 @@ namespace Terminal.Gui {
 		{
 			switch (kb.Key) {
 			case Key.CursorUp:
-				current--;
-				if (current < 0)
-					current = barItems.Children.Length - 1;
-				SetNeedsDisplay ();
+                do
+                {
+                    current--;
+                    if (current < 0)
+                        current = barItems.Children.Length - 1;
+                } while (barItems.Children[current] == null);
+        		SetNeedsDisplay ();
 				break;
 			case Key.CursorDown:
-				current++;
-				if (current== barItems.Children.Length)
-					current = 0;
-				SetNeedsDisplay ();
+                do
+                {
+                    current++;
+                    if (current == barItems.Children.Length)
+                        current = 0;
+                } while (barItems.Children[current] == null);
+        		SetNeedsDisplay ();
 				break;
 			case Key.CursorLeft:
 				host.PreviousMenu ();
