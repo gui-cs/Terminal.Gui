@@ -127,6 +127,7 @@ namespace Terminal.Gui {
 			int maxW = 0;
 
 			foreach (var item in items) {
+				if (item == null) continue;
 				var l = item.Width;
 				maxW = Math.Max (l, maxW);
 			}
@@ -154,18 +155,27 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (ColorScheme.Normal);
 			DrawFrame (region, padding: 0, fill: true);
 
-			for (int i = 0; i < barItems.Children.Length; i++){
+			for (int i = 0; i < barItems.Children.Length; i++) {
 				var item = barItems.Children [i];
-				Move (1, i+1);
-				Driver.SetAttribute (item == null ? Colors.Base.Focus : i == current ? ColorScheme.Focus : ColorScheme.Normal);
+				Driver.SetAttribute(item == null ? ColorScheme.Normal : i == current ? ColorScheme.Focus : ColorScheme.Normal);
+				if (item == null) {
+					Move(0, i + 1);
+					Driver.AddRune(Driver.LeftTee);
+				}
+				else
+					Move(1, i+1);
+
 				for (int p = 0; p < Frame.Width-2; p++)
 					if (item == null)
 						Driver.AddRune (Driver.HLine);
 					else
 						Driver.AddRune (' ');
 
-				if (item == null)
+				if (item == null) {
+					Move(region.Right-1, i + 1);
+					Driver.AddRune(Driver.RightTee);
 					continue;
+				}
 
 				Move (2, i + 1);
 				DrawHotString (item.Title,
@@ -235,6 +245,7 @@ namespace Terminal.Gui {
 					var x = Char.ToUpper ((char)kb.KeyValue);
 
 					foreach (var item in barItems.Children) {
+						if (item == null) continue;
 						if (item.HotKey == x) {
 							host.CloseMenu ();
 							Run (item.Action);

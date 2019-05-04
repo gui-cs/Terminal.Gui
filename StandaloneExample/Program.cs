@@ -185,6 +185,7 @@ class Demo {
 				new MenuItem ("_New", "Creates new file", NewFile),
 				new MenuItem ("_Open", "", null),
 				new MenuItem ("_Close", "", () => Close ()),
+				null,
 				new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
