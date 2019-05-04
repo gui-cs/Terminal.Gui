@@ -24,11 +24,13 @@ namespace Terminal.Gui {
 		/// <param name="title">Title for the menu item.</param>
 		/// <param name="help">Help text to display.</param>
 		/// <param name="action">Action to invoke when the menu item is activated.</param>
-		public MenuItem (ustring title, string help, Action action)
+		/// <param name="canExecute">Function to determine if the action can currently be executred.</param>
+		public MenuItem (ustring title, string help, Action action, Func<bool> canExecute=null)
 		{
 			Title = title ?? "";
 			Help = help ?? "";
 			Action = action;
+                        CanExecute = canExecute;
 			bool nextIsHot = false;
 			foreach (var x in Title) {
 				if (x == '_')
@@ -75,6 +77,13 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>Method to invoke.</value>
 		public Action Action { get; set; }
+
+                /// <summary>
+                /// Gets or sets the action to be invoked if the menu can be triggered
+                /// </summary>
+                /// <value>Function to determine if action is ready to be executed.</value>
+                public Func<bool> CanExecute { get; set; }
+
 		internal int Width => Title.Length + Help.Length + 1 + 2;
 	}
 
@@ -126,8 +135,8 @@ namespace Terminal.Gui {
 			int maxW = 0;
 
 			foreach (var item in items)
-            {
-                if (item == null) continue;
+                        {
+                                if (item == null) continue;
 				var l = item.Width;
 				maxW = Math.Max (l, maxW);
 			}
@@ -143,6 +152,16 @@ namespace Terminal.Gui {
 			CanFocus = true;
 		}
 
+		internal Attribute DetermineColorSchemeFor(MenuItem item, int index) 
+		{
+			if (item!=null) 
+			{
+				if (index==current) return ColorScheme.Focus;
+				if (item.CanExecute!=null && !item.CanExecute()) return ColorScheme.Disabled;
+			}
+			return ColorScheme.Normal;
+		}
+
 		public override void Redraw (Rect region)
 		{
 			Driver.SetAttribute (ColorScheme.Normal);
@@ -150,14 +169,14 @@ namespace Terminal.Gui {
 
 			for (int i = 0; i < barItems.Children.Length; i++){
 				var item = barItems.Children [i];
-                Driver.SetAttribute(item == null ? ColorScheme.Normal : i == current ? ColorScheme.Focus : ColorScheme.Normal);
-                if (item == null)
-                {
-                    Move(0, i + 1);
-                    Driver.AddRune(Driver.LeftTee);
-        		}
-                else
-				    Move(1, i+1);
+                                Driver.SetAttribute( DetermineColorSchemeFor(item, i) );
+                                if (item == null)
+                                {
+                                        Move(0, i + 1);
+                                        Driver.AddRune(Driver.LeftTee);
+        		        }
+                                else
+				        Move(1, i+1);
 
 				for (int p = 0; p < Frame.Width-2; p++)
 					if (item == null)
@@ -165,15 +184,18 @@ namespace Terminal.Gui {
 					else
 						Driver.AddRune (' ');
 
-                if (item == null)
-                {
-                    Move(region.Right-1, i + 1);
-                    Driver.AddRune(Driver.RightTee);
-                    continue;
-                }
+                                if (item == null)
+                                {
+                                        Move(region.Right-1, i + 1);
+                                        Driver.AddRune(Driver.RightTee);
+                                        continue;
+                                }
 
-                Move (2, i + 1);
-				DrawHotString (item.Title,
+                                Move (2, i + 1);
+                                if (item.CanExecute != null && !item.CanExecute())
+                                        DrawHotString (item.Title, ColorScheme.Disabled, ColorScheme.Disabled);
+    		    	        else
+                			DrawHotString (item.Title,
 				               i == current? ColorScheme.HotFocus : ColorScheme.HotNormal,
 				               i == current ? ColorScheme.Focus : ColorScheme.Normal);
 
@@ -202,24 +224,30 @@ namespace Terminal.Gui {
 
 		public override bool ProcessKey (KeyEvent kb)
 		{
+                        bool disabled;
 			switch (kb.Key) {
 			case Key.CursorUp:
-                do
-                {
-                    current--;
-                    if (current < 0)
-                        current = barItems.Children.Length - 1;
-                } while (barItems.Children[current] == null);
-        		SetNeedsDisplay ();
-				break;
+                                do
+                                {
+		                        disabled = false;
+		                        current--;
+                                        if (current < 0)
+                                                current = barItems.Children.Length - 1;
+                                        var item = barItems.Children[current];
+                                        if (item!=null && item.CanExecute != null && !item.CanExecute()) disabled = true;
+                                } while (barItems.Children[current] == null || disabled);
+        		        SetNeedsDisplay ();
+			        break;
 			case Key.CursorDown:
-                do
-                {
-                    current++;
-                    if (current == barItems.Children.Length)
-                        current = 0;
-                } while (barItems.Children[current] == null);
-        		SetNeedsDisplay ();
+                                do {
+		                        disabled = false;
+		                        current++;
+                                        if (current == barItems.Children.Length)
+                                                current = 0;
+                                        var item = barItems.Children[current];
+                                        if (item !=null && item.CanExecute != null && !item.CanExecute()) disabled = true;
+                                } while (barItems.Children[current] == null || disabled);
+        		        SetNeedsDisplay ();
 				break;
 			case Key.CursorLeft:
 				host.PreviousMenu ();
@@ -426,12 +454,36 @@ namespace Terminal.Gui {
 			OpenMenu (selected);
 		}
 
-		public override bool ProcessHotKey (KeyEvent kb)
+                internal bool FindAndOpenMenuByHotkey(KeyEvent kb)
+                {
+                    int pos = 0;
+                    var c = ((uint)kb.Key & (uint)Key.CharMask);
+	            for (int i = 0; i < Menus.Length; i++)
+                    {
+			    // TODO: this code is duplicated, hotkey should be part of the MenuBarItem
+                            var mi = Menus[i];
+                            int p = mi.Title.IndexOf('_');
+                            if (p != -1 && p + 1 < mi.Title.Length) {
+                                    if (mi.Title[p + 1] == c) {
+			                    OpenMenu(i);
+			                    return true;
+                                    }
+                            }
+                    }
+	            return false;
+                }
+
+	        public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == Key.F9) {
 				StartMenu ();
 				return true;
 			}
+
+                        if (kb.IsAlt)
+                        {
+                            if (FindAndOpenMenuByHotkey(kb)) return true;
+                        }
 			var kc = kb.KeyValue;
 
 			return base.ProcessHotKey (kb);
