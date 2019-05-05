@@ -10,6 +10,7 @@
 
 using System;
 using NStack;
+using System.Linq;
 
 namespace Terminal.Gui {
 
@@ -131,8 +132,18 @@ namespace Terminal.Gui {
 				var l = item.Width;
 				maxW = Math.Max (l, maxW);
 			}
-
 			return new Rect (x, y, maxW + 2, items.Length + 2);
+		}
+
+		void CalculateCurrentItem(MenuItem [] items) 
+		{
+			current = -1;
+			for (int i = 0; i < items.Length; i++) {
+				if (items [i] != null) {
+					current = i;
+					return;
+				}
+			}
 		}
 
 		public Menu (MenuBar host, int x, int y, MenuBarItem barItems) : base (MakeFrame (x, y, barItems.Children))
@@ -141,6 +152,7 @@ namespace Terminal.Gui {
 			this.host = host;
 			ColorScheme = Colors.Menu;
 			CanFocus = true;
+			CalculateCurrentItem(barItems.Children);
 		}
 
 		public override void Redraw (Rect region)
@@ -202,20 +214,22 @@ namespace Terminal.Gui {
 		{
 			switch (kb.Key) {
 			case Key.CursorUp:
-        do {
-          current--;
-          if (current < 0)
-          	current = barItems.Children.Length - 1;
-        } while (barItems.Children[current] == null);
-        SetNeedsDisplay ();
+				if (current == -1)
+					break;
+				do {
+					current--;
+					if (current < 0)
+						current = barItems.Children.Length - 1;
+				} while (barItems.Children [current] == null);
+				SetNeedsDisplay ();
 				break;
 			case Key.CursorDown:
-        do {
-          current++;
-          if (current == barItems.Children.Length)
-          	current = 0;
-        } while (barItems.Children[current] == null);
-        SetNeedsDisplay ();
+				do {
+					current++;
+					if (current == barItems.Children.Length)
+						current = 0;
+				} while (barItems.Children [current] == null);
+				SetNeedsDisplay ();
 				break;
 			case Key.CursorLeft:
 				host.PreviousMenu ();
@@ -289,7 +303,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.MenuBar"/> class with the specified set of toplevel menu items.
 		/// </summary>
-		/// <param name="menus">Menus.</param>
+		/// <param name="menus">Individual menu items, if one of those contains a null, then a separator is drawn.</param>
 		public MenuBar (MenuBarItem [] menus) : base ()
 		{
 			X = 0;
@@ -422,14 +436,36 @@ namespace Terminal.Gui {
 			OpenMenu (selected);
 		}
 
-		public override bool ProcessHotKey (KeyEvent kb)
+    internal bool FindAndOpenMenuByHotkey(KeyEvent kb)
+    {
+    	int pos = 0;
+      var c = ((uint)kb.Key & (uint)Key.CharMask);
+	    for (int i = 0; i < Menus.Length; i++)
+      {
+			  // TODO: this code is duplicated, hotkey should be part of the MenuBarItem
+        var mi = Menus[i];
+        int p = mi.Title.IndexOf('_');
+        if (p != -1 && p + 1 < mi.Title.Length) {
+        	if (mi.Title[p + 1] == c) {
+				    OpenMenu(i);
+			  	  return true;
+        	}
+      	}
+      }
+	    return false;
+    }
+
+	  public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == Key.F9) {
 				StartMenu ();
 				return true;
 			}
-			var kc = kb.KeyValue;
 
+      if (kb.IsAlt) {
+        if (FindAndOpenMenuByHotkey(kb)) return true;
+      }
+			var kc = kb.KeyValue;
 			return base.ProcessHotKey (kb);
 		}
 
