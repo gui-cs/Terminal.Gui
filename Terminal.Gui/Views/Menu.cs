@@ -10,6 +10,7 @@
 
 using System;
 using NStack;
+using System.Linq;
 
 namespace Terminal.Gui {
 
@@ -130,6 +131,13 @@ namespace Terminal.Gui {
 				maxW = Math.Max (l, maxW);
 			}
 
+			current = -1;
+			for (int i = 0; i < items.Length; i++) {
+				if (items [i] != null) {
+					current = i;
+					break;
+				}
+			}
 			return new Rect (x, y, maxW + 2, items.Length + 2);
 		}
 
@@ -191,15 +199,21 @@ namespace Terminal.Gui {
 		{
 			switch (kb.Key) {
 			case Key.CursorUp:
-				current--;
-				if (current < 0)
-					current = barItems.Children.Length - 1;
+				if (current == -1)
+					break;
+				do {
+					current--;
+					if (current < 0)
+						current = barItems.Children.Length - 1;
+				} while (barItems.Children [current] == null)
 				SetNeedsDisplay ();
 				break;
 			case Key.CursorDown:
-				current++;
-				if (current== barItems.Children.Length)
-					current = 0;
+				do {
+					current++;
+					if (current == barItems.Children.Length)
+						current = 0;
+				} while (barItems.Children [current] == null)
 				SetNeedsDisplay ();
 				break;
 			case Key.CursorLeft:
@@ -274,7 +288,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.MenuBar"/> class with the specified set of toplevel menu items.
 		/// </summary>
-		/// <param name="menus">Menus.</param>
+		/// <param name="menus">Individual menu items, if one of those contains a null, then a separator is drawn.</param>
 		public MenuBar (MenuBarItem [] menus) : base ()
 		{
 			X = 0;
