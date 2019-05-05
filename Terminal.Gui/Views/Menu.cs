@@ -10,6 +10,7 @@
 
 using System;
 using NStack;
+using System.Linq;
 
 namespace Terminal.Gui {
 
@@ -140,8 +141,18 @@ namespace Terminal.Gui {
 				var l = item.Width;
 				maxW = Math.Max (l, maxW);
 			}
-
 			return new Rect (x, y, maxW + 2, items.Length + 2);
+		}
+
+		void CalculateCurrentItem(MenuItem [] items) 
+		{
+			current = -1;
+			for (int i = 0; i < items.Length; i++) {
+				if (items [i] != null) {
+					current = i;
+					return;
+				}
+			}
 		}
 
 		public Menu (MenuBar host, int x, int y, MenuBarItem barItems) : base (MakeFrame (x, y, barItems.Children))
@@ -150,6 +161,7 @@ namespace Terminal.Gui {
 			this.host = host;
 			ColorScheme = Colors.Menu;
 			CanFocus = true;
+			CalculateCurrentItem(barItems.Children);
 		}
 
 		internal Attribute DetermineColorSchemeFor(MenuItem item, int index) 
@@ -169,14 +181,13 @@ namespace Terminal.Gui {
 
 			for (int i = 0; i < barItems.Children.Length; i++){
 				var item = barItems.Children [i];
-                                Driver.SetAttribute( DetermineColorSchemeFor(item, i) );
-                                if (item == null)
-                                {
-                                        Move(0, i + 1);
-                                        Driver.AddRune(Driver.LeftTee);
-        		        }
-                                else
-				        Move(1, i+1);
+        Driver.SetAttribute(item == null ? ColorScheme.Normal : i == current ? ColorScheme.Focus : ColorScheme.Normal);
+        if (item == null) {
+        	Move(0, i + 1);
+          Driver.AddRune(Driver.LeftTee);
+        } else {
+					Move(1, i+1);
+				}
 
 				for (int p = 0; p < Frame.Width-2; p++)
 					if (item == null)
@@ -184,18 +195,17 @@ namespace Terminal.Gui {
 					else
 						Driver.AddRune (' ');
 
-                                if (item == null)
-                                {
-                                        Move(region.Right-1, i + 1);
-                                        Driver.AddRune(Driver.RightTee);
-                                        continue;
-                                }
+        if (item == null) {
+        	Move(region.Right-1, i + 1);
+          Driver.AddRune(Driver.RightTee);
+          continue;
+        }
 
-                                Move (2, i + 1);
-                                if (item.CanExecute != null && !item.CanExecute())
-                                        DrawHotString (item.Title, ColorScheme.Disabled, ColorScheme.Disabled);
-    		    	        else
-                			DrawHotString (item.Title,
+        Move (2, i + 1);
+				if (item.CanExecute != null && !item.CanExecute())
+        	DrawHotString (item.Title, ColorScheme.Disabled, ColorScheme.Disabled);
+				else
+					DrawHotString (item.Title,
 				               i == current? ColorScheme.HotFocus : ColorScheme.HotNormal,
 				               i == current ? ColorScheme.Focus : ColorScheme.Normal);
 
@@ -227,27 +237,28 @@ namespace Terminal.Gui {
                         bool disabled;
 			switch (kb.Key) {
 			case Key.CursorUp:
-                                do
-                                {
-		                        disabled = false;
-		                        current--;
-                                        if (current < 0)
-                                                current = barItems.Children.Length - 1;
-                                        var item = barItems.Children[current];
-                                        if (item!=null && item.CanExecute != null && !item.CanExecute()) disabled = true;
-                                } while (barItems.Children[current] == null || disabled);
-        		        SetNeedsDisplay ();
-			        break;
+				if (current == -1)
+					break;
+				do {
+		      disabled = false;
+					current--;
+					if (current < 0)
+						current = barItems.Children.Length - 1;
+          var item = barItems.Children[current];
+          if (item!=null && item.CanExecute != null && !item.CanExecute()) disabled = true;
+				} while (barItems.Children [current] == null || disabled);
+				SetNeedsDisplay ();
+				break;
 			case Key.CursorDown:
-                                do {
-		                        disabled = false;
-		                        current++;
-                                        if (current == barItems.Children.Length)
-                                                current = 0;
-                                        var item = barItems.Children[current];
-                                        if (item !=null && item.CanExecute != null && !item.CanExecute()) disabled = true;
-                                } while (barItems.Children[current] == null || disabled);
-        		        SetNeedsDisplay ();
+				do {
+					disabled = false;
+					current++;
+					if (current == barItems.Children.Length)
+						current = 0;
+					var item = barItems.Children[current];
+          if (item !=null && item.CanExecute != null && !item.CanExecute()) disabled = true;
+				} while (barItems.Children [current] == null || disabled);
+				SetNeedsDisplay ();
 				break;
 			case Key.CursorLeft:
 				host.PreviousMenu ();
@@ -321,7 +332,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.MenuBar"/> class with the specified set of toplevel menu items.
 		/// </summary>
-		/// <param name="menus">Menus.</param>
+		/// <param name="menus">Individual menu items, if one of those contains a null, then a separator is drawn.</param>
 		public MenuBar (MenuBarItem [] menus) : base ()
 		{
 			X = 0;
@@ -348,7 +359,7 @@ namespace Terminal.Gui {
 				var menu = Menus [i];
 				Move (pos, 0);
 				Attribute hotColor, normalColor;
-				if (i == selected){
+				if (i == selected) {
 					hotColor = i == selected ? ColorScheme.HotFocus : ColorScheme.HotNormal;
 					normalColor = i == selected ? ColorScheme.Focus : ColorScheme.Normal;
 				} else {
@@ -454,38 +465,37 @@ namespace Terminal.Gui {
 			OpenMenu (selected);
 		}
 
-                internal bool FindAndOpenMenuByHotkey(KeyEvent kb)
-                {
-                    int pos = 0;
-                    var c = ((uint)kb.Key & (uint)Key.CharMask);
-	            for (int i = 0; i < Menus.Length; i++)
-                    {
-			    // TODO: this code is duplicated, hotkey should be part of the MenuBarItem
-                            var mi = Menus[i];
-                            int p = mi.Title.IndexOf('_');
-                            if (p != -1 && p + 1 < mi.Title.Length) {
-                                    if (mi.Title[p + 1] == c) {
-			                    OpenMenu(i);
-			                    return true;
-                                    }
-                            }
-                    }
-	            return false;
-                }
+    internal bool FindAndOpenMenuByHotkey(KeyEvent kb)
+    {
+    	int pos = 0;
+      var c = ((uint)kb.Key & (uint)Key.CharMask);
+	    for (int i = 0; i < Menus.Length; i++)
+      {
+			  // TODO: this code is duplicated, hotkey should be part of the MenuBarItem
+        var mi = Menus[i];
+        int p = mi.Title.IndexOf('_');
+        if (p != -1 && p + 1 < mi.Title.Length) {
+        	if (mi.Title[p + 1] == c) {
+				    OpenMenu(i);
+			  	  return true;
+        	}
+      	}
+      }
+	    return false;
+    }
 
-	        public override bool ProcessHotKey (KeyEvent kb)
+	  public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == Key.F9) {
 				StartMenu ();
 				return true;
 			}
 
-                        if (kb.IsAlt)
-                        {
-                            if (FindAndOpenMenuByHotkey(kb)) return true;
-                        }
-			var kc = kb.KeyValue;
+			if (kb.IsAlt) {
+				if (FindAndOpenMenuByHotkey(kb)) return true;
+			}
 
+			var kc = kb.KeyValue;
 			return base.ProcessHotKey (kb);
 		}
 

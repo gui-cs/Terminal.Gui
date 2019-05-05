@@ -171,7 +171,6 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (ColorScheme.Normal);
 
 			Clear ();
-			Move (Frame.X, Frame.Y);
 			for (int line = 0; line < lines.Count; line++) {
 				if (line < region.Top || line > region.Bottom)
 					continue;
