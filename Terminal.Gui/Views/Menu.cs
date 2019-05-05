@@ -155,7 +155,7 @@ namespace Terminal.Gui {
 		{
 			current = -1;
 			for (int i = 0; i < items.Length; i++) {
-				if (items [i] != null) {
+				if (items [i] != null && items[i].IsEnabled()) {
 					current = i;
 					return;
 				}
@@ -288,7 +288,8 @@ namespace Terminal.Gui {
 					var x = Char.ToUpper ((char)kb.KeyValue);
 
 					foreach (var item in barItems.Children) {
-						if (item.HotKey == x) {
+						if(item==null) continue;
+						if (item.IsEnabled() && item.HotKey == x) {
 							host.CloseMenu ();
 							Run (item.Action);
 							return true;
