@@ -12,8 +12,14 @@ using NStack;
 namespace Terminal.Gui {
 	/// <summary>
 	/// The dialog box is a window that by default is centered and contains one 
-	/// or more buttons.
+	/// or more buttons.  It defaults to the Colors.Dialog color scheme and has a
+	///  1 cell padding around the edges.
 	/// </summary>
+	/// <remarks>
+	///  To run the dialog modally, create the Dialog, and pass this to Application.Run which
+	/// will execute the dialog until it terminates via the [ESC] key, or when one of the views
+	/// or buttons added to the dialog set the Running property on the Dialog to false.
+	/// </remarks>
 	public class Dialog : Window {
 		List<Button> buttons = new List<Button> ();
 		const int padding = 1;

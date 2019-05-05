@@ -10,6 +10,7 @@
 
 using System;
 using NStack;
+using System.Linq;
 
 namespace Terminal.Gui {
 
@@ -143,11 +144,22 @@ namespace Terminal.Gui {
 
 			foreach (var item in items) {
 				if (item == null) continue;
+
 				var l = item.Width;
 				maxW = Math.Max (l, maxW);
 			}
-
 			return new Rect (x, y, maxW + 2, items.Length + 2);
+		}
+
+		void CalculateCurrentItem(MenuItem [] items) 
+		{
+			current = -1;
+			for (int i = 0; i < items.Length; i++) {
+				if (items [i] != null) {
+					current = i;
+					return;
+				}
+			}
 		}
 
 		public Menu (MenuBar host, int x, int y, MenuBarItem barItems) : base (MakeFrame (x, y, barItems.Children))
@@ -156,6 +168,7 @@ namespace Terminal.Gui {
 			this.host = host;
 			ColorScheme = Colors.Menu;
 			CanFocus = true;
+			CalculateCurrentItem(barItems.Children);
 		}
 
 		internal Attribute DetermineColorSchemeFor(MenuItem item, int index) 
@@ -231,6 +244,8 @@ namespace Terminal.Gui {
       bool disabled;
 			switch (kb.Key) {
 			case Key.CursorUp:
+				if (current == -1)
+					break;
       	do {
 		    	disabled = false;
 					current--;
@@ -242,6 +257,8 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 				break;
 			case Key.CursorDown:
+				if (current == -1)
+					break;
         do {
 		    	disabled = false;
 		      current++;
@@ -324,7 +341,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.MenuBar"/> class with the specified set of toplevel menu items.
 		/// </summary>
-		/// <param name="menus">Menus.</param>
+		/// <param name="menus">Individual menu items, if one of those contains a null, then a separator is drawn.</param>
 		public MenuBar (MenuBarItem [] menus) : base ()
 		{
 			X = 0;
@@ -351,7 +368,7 @@ namespace Terminal.Gui {
 				var menu = Menus [i];
 				Move (pos, 0);
 				Attribute hotColor, normalColor;
-				if (i == selected){
+				if (i == selected) {
 					hotColor = i == selected ? ColorScheme.HotFocus : ColorScheme.HotNormal;
 					normalColor = i == selected ? ColorScheme.Focus : ColorScheme.Normal;
 				} else {
