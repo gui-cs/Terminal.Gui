@@ -131,13 +131,13 @@ namespace Terminal.Gui {
 				maxW = Math.Max (l, maxW);
 			}
 
-			current = -1;
+			/* current = -1;
 			for (int i = 0; i < items.Length; i++) {
 				if (items [i] != null) {
 					current = i;
 					break;
 				}
-			}
+			} */
 			return new Rect (x, y, maxW + 2, items.Length + 2);
 		}
 
@@ -205,7 +205,7 @@ namespace Terminal.Gui {
 					current--;
 					if (current < 0)
 						current = barItems.Children.Length - 1;
-				} while (barItems.Children [current] == null)
+				} while (barItems.Children [current] == null);
 				SetNeedsDisplay ();
 				break;
 			case Key.CursorDown:
@@ -213,7 +213,7 @@ namespace Terminal.Gui {
 					current++;
 					if (current == barItems.Children.Length)
 						current = 0;
-				} while (barItems.Children [current] == null)
+				} while (barItems.Children [current] == null);
 				SetNeedsDisplay ();
 				break;
 			case Key.CursorLeft:
