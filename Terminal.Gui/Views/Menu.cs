@@ -150,14 +150,13 @@ namespace Terminal.Gui {
 
 			for (int i = 0; i < barItems.Children.Length; i++){
 				var item = barItems.Children [i];
-                Driver.SetAttribute(item == null ? ColorScheme.Normal : i == current ? ColorScheme.Focus : ColorScheme.Normal);
-                if (item == null)
-                {
-                    Move(0, i + 1);
-                    Driver.AddRune(Driver.LeftTee);
-        		}
-                else
-				    Move(1, i+1);
+        Driver.SetAttribute(item == null ? ColorScheme.Normal : i == current ? ColorScheme.Focus : ColorScheme.Normal);
+        if (item == null) {
+        	Move(0, i + 1);
+          Driver.AddRune(Driver.LeftTee);
+        } else {
+					Move(1, i+1);
+				}
 
 				for (int p = 0; p < Frame.Width-2; p++)
 					if (item == null)
@@ -165,14 +164,13 @@ namespace Terminal.Gui {
 					else
 						Driver.AddRune (' ');
 
-                if (item == null)
-                {
-                    Move(region.Right-1, i + 1);
-                    Driver.AddRune(Driver.RightTee);
-                    continue;
-                }
+        if (item == null) {
+        	Move(region.Right-1, i + 1);
+          Driver.AddRune(Driver.RightTee);
+          continue;
+        }
 
-                Move (2, i + 1);
+        Move (2, i + 1);
 				DrawHotString (item.Title,
 				               i == current? ColorScheme.HotFocus : ColorScheme.HotNormal,
 				               i == current ? ColorScheme.Focus : ColorScheme.Normal);
@@ -204,22 +202,20 @@ namespace Terminal.Gui {
 		{
 			switch (kb.Key) {
 			case Key.CursorUp:
-                do
-                {
-                    current--;
-                    if (current < 0)
-                        current = barItems.Children.Length - 1;
-                } while (barItems.Children[current] == null);
-        		SetNeedsDisplay ();
+        do {
+          current--;
+          if (current < 0)
+          	current = barItems.Children.Length - 1;
+        } while (barItems.Children[current] == null);
+        SetNeedsDisplay ();
 				break;
 			case Key.CursorDown:
-                do
-                {
-                    current++;
-                    if (current == barItems.Children.Length)
-                        current = 0;
-                } while (barItems.Children[current] == null);
-        		SetNeedsDisplay ();
+        do {
+          current++;
+          if (current == barItems.Children.Length)
+          	current = 0;
+        } while (barItems.Children[current] == null);
+        SetNeedsDisplay ();
 				break;
 			case Key.CursorLeft:
 				host.PreviousMenu ();
@@ -320,7 +316,7 @@ namespace Terminal.Gui {
 				var menu = Menus [i];
 				Move (pos, 0);
 				Attribute hotColor, normalColor;
-				if (i == selected){
+				if (i == selected) {
 					hotColor = i == selected ? ColorScheme.HotFocus : ColorScheme.HotNormal;
 					normalColor = i == selected ? ColorScheme.Focus : ColorScheme.Normal;
 				} else {
