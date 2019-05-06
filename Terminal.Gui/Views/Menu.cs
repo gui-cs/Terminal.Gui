@@ -131,13 +131,13 @@ namespace Terminal.Gui {
 				maxW = Math.Max (l, maxW);
 			}
 
-			current = -1;
+			/* current = -1;
 			for (int i = 0; i < items.Length; i++) {
 				if (items [i] != null) {
 					current = i;
 					break;
 				}
-			}
+			} */
 			return new Rect (x, y, maxW + 2, items.Length + 2);
 		}
 
@@ -205,7 +205,7 @@ namespace Terminal.Gui {
 					current--;
 					if (current < 0)
 						current = barItems.Children.Length - 1;
-				} while (barItems.Children [current] == null)
+				} while (barItems.Children [current] == null);
 				SetNeedsDisplay ();
 				break;
 			case Key.CursorDown:
@@ -213,7 +213,7 @@ namespace Terminal.Gui {
 					current++;
 					if (current == barItems.Children.Length)
 						current = 0;
-				} while (barItems.Children [current] == null)
+				} while (barItems.Children [current] == null);
 				SetNeedsDisplay ();
 				break;
 			case Key.CursorLeft:
@@ -421,36 +421,36 @@ namespace Terminal.Gui {
 			OpenMenu (selected);
 		}
 
-                internal bool FindAndOpenMenuByHotkey(KeyEvent kb)
-                {
-                    int pos = 0;
-                    var c = ((uint)kb.Key & (uint)Key.CharMask);
-	            for (int i = 0; i < Menus.Length; i++)
-                    {
-			    // TODO: this code is duplicated, hotkey should be part of the MenuBarItem
-                            var mi = Menus[i];
-                            int p = mi.Title.IndexOf('_');
-                            if (p != -1 && p + 1 < mi.Title.Length) {
-                                    if (mi.Title[p + 1] == c) {
-			                    OpenMenu(i);
-			                    return true;
-                                    }
-                            }
-                    }
-	            return false;
-                }
+		internal bool FindAndOpenMenuByHotkey(KeyEvent kb)
+		{
+			int pos = 0;
+			var c = ((uint)kb.Key & (uint)Key.CharMask);
+			for (int i = 0; i < Menus.Length; i++)
+			{
+				// TODO: this code is duplicated, hotkey should be part of the MenuBarItem
+				var mi = Menus[i];
+				int p = mi.Title.IndexOf('_');
+				if (p != -1 && p + 1 < mi.Title.Length) {
+					if (mi.Title[p + 1] == c) {
+						OpenMenu(i);
+						return true;
+					}
+				}
+			}
+			return false;
+		}
 
-	        public override bool ProcessHotKey (KeyEvent kb)
+		public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == Key.F9) {
 				StartMenu ();
 				return true;
 			}
 
-                        if (kb.IsAlt)
-                        {
-                            if (FindAndOpenMenuByHotkey(kb)) return true;
-                        }
+			if (kb.IsAlt)
+			{
+				if (FindAndOpenMenuByHotkey(kb)) return true;
+			}
 			var kc = kb.KeyValue;
 
 			return base.ProcessHotKey (kb);
