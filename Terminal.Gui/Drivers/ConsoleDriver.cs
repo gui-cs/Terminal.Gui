@@ -142,6 +142,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Attribute Normal;
 		/// <summary>
+		/// The default color for text, when the view is disabled.
+		/// </summary>
+		public Attribute Disabled;
+		/// <summary>
 		/// The color for text when the view has the focus.
 		/// </summary>
 		public Attribute Focus;
