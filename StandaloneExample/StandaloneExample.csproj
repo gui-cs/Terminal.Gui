@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Terminal.Gui" Version="0.17.0" />
+    <ProjectReference Include="../Terminal.Gui/Terminal.Gui.csproj" />
+    <!-- PackageReference Include="Terminal.Gui" Version="0.17.0" / -->
   </ItemGroup>
 </Project>

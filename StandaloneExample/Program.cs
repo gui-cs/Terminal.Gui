@@ -64,6 +64,18 @@ class Demo {
 			new Label (new Rect (0, 12, 40, 3), "4-Hello world, how are you doing today") { TextAlignment = TextAlignment.Justified });
 	}
 
+	static void ShowPopupMenu() {
+		var popup = new PopupMenu(22, 4, "Popup", new MenuItem [] {
+				new MenuItem ("_Configuration", "Show configuration", NewFile),
+				new MenuItem ("_Setup", "Change settings", () => {
+					MessageBox.Query (50, 5, "Info", "This would open settings dialog", "Ok");
+				}),
+				new MenuItem ("_Maintenance", "Maintenance mode", null),
+				new MenuItem ("_Quit", "", () => { if (Quit ()) Application.Top.Running = false; })
+			});
+		Application.Run(popup);
+	}
+
 	static void ShowEntries (View container)
 	{
 		var scrollView = new ScrollView (new Rect (50, 10, 20, 8)) {
@@ -113,6 +125,8 @@ class Demo {
 		};
 		
 		// Add some content
+		var menuButton = new Button ("Menu") { X = 21, Y = 19 };
+		menuButton.Clicked += () => ShowPopupMenu();
 		container.Add (
 			login,
 			loginText,
@@ -135,6 +149,7 @@ class Demo {
 			//scrollView2,
 			new Button ("Ok") { X = 3, Y = 19 },
 			new Button ("Cancel") { X = 10, Y = 19 },
+			menuButton,
 			progress,
 			new Label ("Press F9 (on Unix ESC+9 is an alias) to activate the menubar") { X = 3, Y = 22 }
 		);
