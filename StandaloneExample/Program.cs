@@ -135,6 +135,8 @@ class Demo {
 			//scrollView2,
 			new Button ("Ok") { X = 3, Y = 19 },
 			new Button ("Cancel") { X = 10, Y = 19 },
+			new TimeField (3, 20, DateTime.Now),
+			new TimeField (23, 20, DateTime.Now, true),
 			progress,
 			new Label ("Press F9 (on Unix ESC+9 is an alias) to activate the menubar") { X = 3, Y = 22 }
 		);
