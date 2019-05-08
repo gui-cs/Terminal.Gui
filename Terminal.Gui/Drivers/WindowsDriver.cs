@@ -26,6 +26,7 @@
 // SOFTWARE.
 //
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -414,8 +415,8 @@ namespace Terminal.Gui {
 
 	internal class WindowsDriver : ConsoleDriver, Mono.Terminal.IMainLoopDriver {
 		static bool sync;
-		AutoResetEvent eventReady = new AutoResetEvent (false);
-		AutoResetEvent waitForProbe = new AutoResetEvent (false);
+		ManualResetEventSlim eventReady = new ManualResetEventSlim(false);
+		ManualResetEventSlim waitForProbe = new ManualResetEventSlim(false);
 		MainLoop mainLoop;
 		Action TerminalResized;
 		WindowsConsole.CharInfo [] OutputBuffer;
@@ -446,7 +447,8 @@ namespace Terminal.Gui {
 		void WindowsInputHandler ()
 		{
 			while (true) {
-				waitForProbe.WaitOne ();
+				waitForProbe.Wait();
+				waitForProbe.Reset();
 
 				uint numberEventsRead = 0;
 
@@ -456,7 +458,7 @@ namespace Terminal.Gui {
 				else
 					result = records;
 
-				eventReady.Set ();
+				eventReady.Set();
 			}
 		}
 
@@ -467,6 +469,7 @@ namespace Terminal.Gui {
 
 		void IMainLoopDriver.Wakeup ()
 		{
+			tokenSource.Cancel();
 		}
 
 		bool IMainLoopDriver.EventsPending (bool wait)
@@ -485,9 +488,18 @@ namespace Terminal.Gui {
 				waitTimeout = 0;
 
 			result = null;
-			waitForProbe.Set ();
-			eventReady.WaitOne (waitTimeout);
-			return result != null;
+			waitForProbe.Set();
+			tokenSource.Dispose();
+			tokenSource = new CancellationTokenSource();
+			try {
+				eventReady.Wait(waitTimeout, tokenSource.Token);
+			} catch (OperationCanceledException) {
+				return true;
+			} finally {
+				eventReady.Reset();
+			}
+			Debug.WriteLine("Events ready");
+			return result != null || tokenSource.IsCancellationRequested;
 		}
 
 		Action<KeyEvent> keyHandler;
@@ -773,6 +785,8 @@ namespace Terminal.Gui {
 		}
 
 		int currentAttribute;
+		CancellationTokenSource tokenSource = new CancellationTokenSource();
+
 		public override void SetAttribute (Attribute c)
 		{
 			currentAttribute = c.value;
