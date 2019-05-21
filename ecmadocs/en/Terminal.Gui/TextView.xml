@@ -316,8 +316,10 @@
         <ReturnType>System.Boolean</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
+        <summary>
+            Indicates readonly attribute of TextView
+            </summary>
+        <value>Boolean value(Default false)</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -338,6 +340,27 @@
         <param name="region">The region to redraw.</param>
         <summary>
             Redraw the text editor region 
+            </summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ScrollTo">
+      <MemberSignature Language="C#" Value="public void ScrollTo (int row);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void ScrollTo(int32 row) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="row" Type="System.Int32" />
+      </Parameters>
+      <Docs>
+        <param name="row">Row that should be displayed at the top, if the value is negative it will be reset to zero</param>
+        <summary>
+            Will scroll the view to display the specified row at the top
             </summary>
         <remarks>To be added.</remarks>
       </Docs>

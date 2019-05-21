@@ -6,6 +6,7 @@ items:
   - Terminal.Gui.RadioGroup.#ctor(System.String[],System.Int32)
   - Terminal.Gui.RadioGroup.#ctor(Terminal.Gui.Rect,System.String[],System.Int32)
   - Terminal.Gui.RadioGroup.#ctor(System.Int32,System.Int32,System.String[],System.Int32)
+  - Terminal.Gui.RadioGroup.Cursor
   - Terminal.Gui.RadioGroup.MouseEvent(Terminal.Gui.MouseEvent)
   - Terminal.Gui.RadioGroup.PositionCursor
   - Terminal.Gui.RadioGroup.ProcessColdKey(Terminal.Gui.KeyEvent)
@@ -162,6 +163,26 @@ items:
       type: System.Int32
       description: The item to be selected, the value is clamped to the number of items.
   overload: Terminal.Gui.RadioGroup.#ctor*
+  exceptions: []
+- uid: Terminal.Gui.RadioGroup.Cursor
+  id: Cursor
+  parent: Terminal.Gui.RadioGroup
+  langs:
+  - csharp
+  name: Cursor
+  nameWithType: RadioGroup.Cursor
+  fullName: RadioGroup.Cursor
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The location of the cursor in the radio group
+  syntax:
+    content: public int Cursor { get; set; }
+    return:
+      type: System.Int32
+      description: To be added.
+  overload: Terminal.Gui.RadioGroup.Cursor*
   exceptions: []
 - uid: Terminal.Gui.RadioGroup.MouseEvent(Terminal.Gui.MouseEvent)
   id: MouseEvent(Terminal.Gui.MouseEvent)
@@ -382,6 +403,12 @@ references:
   name: RadioGroup(Int32, Int32, String[], Int32)
   nameWithType: RadioGroup.RadioGroup(Int32, Int32, String[], Int32)
   fullName: RadioGroup.RadioGroup(Int32, Int32, String[], Int32)
+- uid: Terminal.Gui.RadioGroup.Cursor
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: Cursor
+  nameWithType: RadioGroup.Cursor
+  fullName: RadioGroup.Cursor
 - uid: Terminal.Gui.RadioGroup.MouseEvent(Terminal.Gui.MouseEvent)
   parent: Terminal.Gui.RadioGroup
   isExternal: false
@@ -479,6 +506,12 @@ references:
   name: RadioGroup
   nameWithType: RadioGroup.RadioGroup
   fullName: RadioGroup.RadioGroup
+- uid: Terminal.Gui.RadioGroup.Cursor*
+  parent: Terminal.Gui.RadioGroup
+  isExternal: false
+  name: Cursor
+  nameWithType: RadioGroup.Cursor
+  fullName: RadioGroup.Cursor
 - uid: Terminal.Gui.RadioGroup.MouseEvent*
   parent: Terminal.Gui.RadioGroup
   isExternal: false

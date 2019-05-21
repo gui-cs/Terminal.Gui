@@ -27,7 +27,7 @@
         <Parameter Name="menus" Type="Terminal.Gui.MenuBarItem[]" />
       </Parameters>
       <Docs>
-        <param name="menus">Menus.</param>
+        <param name="menus">Individual menu items, if one of those contains a null, then a separator is drawn.</param>
         <summary>
             Initializes a new instance of the <see cref="T:Terminal.Gui.MenuBar" /> class with the specified set of toplevel menu items.
             </summary>

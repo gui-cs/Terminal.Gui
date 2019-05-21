@@ -6,6 +6,7 @@ items:
   - Terminal.Gui.Label.#ctor(NStack.ustring)
   - Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,NStack.ustring)
   - Terminal.Gui.Label.#ctor(System.Int32,System.Int32,NStack.ustring)
+  - Terminal.Gui.Label.MaxWidth(NStack.ustring,System.Int32)
   - Terminal.Gui.Label.MeasureLines(NStack.ustring,System.Int32)
   - Terminal.Gui.Label.Redraw(Terminal.Gui.Rect)
   - Terminal.Gui.Label.Text
@@ -157,6 +158,33 @@ items:
       description: To be added.
   overload: Terminal.Gui.Label.#ctor*
   exceptions: []
+- uid: Terminal.Gui.Label.MaxWidth(NStack.ustring,System.Int32)
+  id: MaxWidth(NStack.ustring,System.Int32)
+  parent: Terminal.Gui.Label
+  langs:
+  - csharp
+  name: MaxWidth(ustring, Int32)
+  nameWithType: Label.MaxWidth(ustring, Int32)
+  fullName: Label.MaxWidth(ustring, Int32)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Computes the the max width of a line or multilines needed to render by the Label control
+  syntax:
+    content: public static int MaxWidth (NStack.ustring text, int width);
+    parameters:
+    - id: text
+      type: NStack.ustring
+      description: Text, may contain newlines.
+    - id: width
+      type: System.Int32
+      description: The width for the text.
+    return:
+      type: System.Int32
+      description: Max width of lines.
+  overload: Terminal.Gui.Label.MaxWidth*
+  exceptions: []
 - uid: Terminal.Gui.Label.MeasureLines(NStack.ustring,System.Int32)
   id: MeasureLines(NStack.ustring,System.Int32)
   parent: Terminal.Gui.Label
@@ -307,6 +335,12 @@ references:
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
+- uid: Terminal.Gui.Label.MaxWidth(NStack.ustring,System.Int32)
+  parent: Terminal.Gui.Label
+  isExternal: false
+  name: MaxWidth(ustring, Int32)
+  nameWithType: Label.MaxWidth(ustring, Int32)
+  fullName: Label.MaxWidth(ustring, Int32)
 - uid: Terminal.Gui.Label.MeasureLines(NStack.ustring,System.Int32)
   parent: Terminal.Gui.Label
   isExternal: false
@@ -355,6 +389,12 @@ references:
   name: Label
   nameWithType: Label.Label
   fullName: Label.Label
+- uid: Terminal.Gui.Label.MaxWidth*
+  parent: Terminal.Gui.Label
+  isExternal: false
+  name: MaxWidth
+  nameWithType: Label.MaxWidth
+  fullName: Label.MaxWidth
 - uid: Terminal.Gui.Label.MeasureLines*
   parent: Terminal.Gui.Label
   isExternal: false

@@ -6,6 +6,7 @@ items:
   - Terminal.Gui.IListDataSource.Count
   - Terminal.Gui.IListDataSource.IsMarked(System.Int32)
   - Terminal.Gui.IListDataSource.Render(System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  - Terminal.Gui.IListDataSource.Render(Terminal.Gui.ListView,Terminal.Gui.ConsoleDriver,System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
   - Terminal.Gui.IListDataSource.SetMark(System.Int32,System.Boolean)
   langs:
   - csharp
@@ -73,14 +74,53 @@ items:
   nameWithType: IListDataSource.Render(Boolean, Int32, Int32, Int32, Int32)
   fullName: IListDataSource.Render(Boolean, Int32, Int32, Int32, Int32)
   type: Method
-  assemblies:
-  - Terminal.Gui
+  assemblies: []
   namespace: Terminal.Gui
   summary: This method is invoked to render a specified item, the method should cover the entire provided width.
   remarks: The default color will be set before this method is invoked, and will be based on whether the item is selected or not.
   syntax:
     content: public void Render (bool selected, int item, int col, int line, int width);
     parameters:
+    - id: selected
+      type: System.Boolean
+      description: Describes whether the item being rendered is currently selected by the user.
+    - id: item
+      type: System.Int32
+      description: The index of the item to render, zero for the first item and so on.
+    - id: col
+      type: System.Int32
+      description: The column where the rendering will start
+    - id: line
+      type: System.Int32
+      description: The line where the rendering will be done.
+    - id: width
+      type: System.Int32
+      description: The width that must be filled out.
+  overload: Terminal.Gui.IListDataSource.Render*
+  exceptions: []
+- uid: Terminal.Gui.IListDataSource.Render(Terminal.Gui.ListView,Terminal.Gui.ConsoleDriver,System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  id: Render(Terminal.Gui.ListView,Terminal.Gui.ConsoleDriver,System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  parent: Terminal.Gui.IListDataSource
+  langs:
+  - csharp
+  name: Render(ListView, ConsoleDriver, Boolean, Int32, Int32, Int32, Int32)
+  nameWithType: IListDataSource.Render(ListView, ConsoleDriver, Boolean, Int32, Int32, Int32, Int32)
+  fullName: IListDataSource.Render(ListView, ConsoleDriver, Boolean, Int32, Int32, Int32, Int32)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: This method is invoked to render a specified item, the method should cover the entire provided width.
+  remarks: The default color will be set before this method is invoked, and will be based on whether the item is selected or not.
+  syntax:
+    content: public void Render (Terminal.Gui.ListView container, Terminal.Gui.ConsoleDriver driver, bool selected, int item, int col, int line, int width);
+    parameters:
+    - id: container
+      type: Terminal.Gui.ListView
+      description: To be added.
+    - id: driver
+      type: Terminal.Gui.ConsoleDriver
+      description: To be added.
     - id: selected
       type: System.Boolean
       description: Describes whether the item being rendered is currently selected by the user.
@@ -153,6 +193,24 @@ references:
   name: Render(Boolean, Int32, Int32, Int32, Int32)
   nameWithType: IListDataSource.Render(Boolean, Int32, Int32, Int32, Int32)
   fullName: IListDataSource.Render(Boolean, Int32, Int32, Int32, Int32)
+- uid: Terminal.Gui.IListDataSource.Render(Terminal.Gui.ListView,Terminal.Gui.ConsoleDriver,System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  parent: Terminal.Gui.IListDataSource
+  isExternal: false
+  name: Render(ListView, ConsoleDriver, Boolean, Int32, Int32, Int32, Int32)
+  nameWithType: IListDataSource.Render(ListView, ConsoleDriver, Boolean, Int32, Int32, Int32, Int32)
+  fullName: IListDataSource.Render(ListView, ConsoleDriver, Boolean, Int32, Int32, Int32, Int32)
+- uid: Terminal.Gui.ListView
+  parent: Terminal.Gui
+  isExternal: false
+  name: ListView
+  nameWithType: ListView
+  fullName: Terminal.Gui.ListView
+- uid: Terminal.Gui.ConsoleDriver
+  parent: Terminal.Gui
+  isExternal: false
+  name: ConsoleDriver
+  nameWithType: ConsoleDriver
+  fullName: Terminal.Gui.ConsoleDriver
 - uid: Terminal.Gui.IListDataSource.SetMark(System.Int32,System.Boolean)
   parent: Terminal.Gui.IListDataSource
   isExternal: false

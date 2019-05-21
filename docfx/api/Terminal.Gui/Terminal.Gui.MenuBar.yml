@@ -91,7 +91,7 @@ items:
     parameters:
     - id: menus
       type: Terminal.Gui.MenuBarItem[]
-      description: Menus.
+      description: Individual menu items, if one of those contains a null, then a separator is drawn.
   overload: Terminal.Gui.MenuBar.#ctor*
   exceptions: []
 - uid: Terminal.Gui.MenuBar.Menus

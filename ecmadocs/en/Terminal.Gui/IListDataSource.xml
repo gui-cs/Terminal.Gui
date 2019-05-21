@@ -58,9 +58,6 @@
       <MemberSignature Language="C#" Value="public void Render (bool selected, int item, int col, int line, int width);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void Render(bool selected, int32 item, int32 col, int32 line, int32 width) cil managed" />
       <MemberType>Method</MemberType>
-      <AssemblyInfo>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
-      </AssemblyInfo>
       <ReturnValue>
         <ReturnType>System.Void</ReturnType>
       </ReturnValue>
@@ -72,6 +69,42 @@
         <Parameter Name="width" Type="System.Int32" />
       </Parameters>
       <Docs>
+        <param name="selected">Describes whether the item being rendered is currently selected by the user.</param>
+        <param name="item">The index of the item to render, zero for the first item and so on.</param>
+        <param name="col">The column where the rendering will start</param>
+        <param name="line">The line where the rendering will be done.</param>
+        <param name="width">The width that must be filled out.</param>
+        <summary>
+            This method is invoked to render a specified item, the method should cover the entire provided width.
+            </summary>
+        <returns>The render.</returns>
+        <remarks>
+              The default color will be set before this method is invoked, and will be based on whether the item is selected or not.
+            </remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Render">
+      <MemberSignature Language="C#" Value="public void Render (Terminal.Gui.ListView container, Terminal.Gui.ConsoleDriver driver, bool selected, int item, int col, int line, int width);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void Render(class Terminal.Gui.ListView container, class Terminal.Gui.ConsoleDriver driver, bool selected, int32 item, int32 col, int32 line, int32 width) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="container" Type="Terminal.Gui.ListView" />
+        <Parameter Name="driver" Type="Terminal.Gui.ConsoleDriver" />
+        <Parameter Name="selected" Type="System.Boolean" />
+        <Parameter Name="item" Type="System.Int32" />
+        <Parameter Name="col" Type="System.Int32" />
+        <Parameter Name="line" Type="System.Int32" />
+        <Parameter Name="width" Type="System.Int32" />
+      </Parameters>
+      <Docs>
+        <param name="container">To be added.</param>
+        <param name="driver">To be added.</param>
         <param name="selected">Describes whether the item being rendered is currently selected by the user.</param>
         <param name="item">The index of the item to render, zero for the first item and so on.</param>
         <param name="col">The column where the rendering will start</param>

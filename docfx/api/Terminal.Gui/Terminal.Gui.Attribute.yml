@@ -4,6 +4,7 @@ items:
   id: Attribute
   children:
   - Terminal.Gui.Attribute.#ctor(System.Int32)
+  - Terminal.Gui.Attribute.Make(Terminal.Gui.Color,Terminal.Gui.Color)
   - Terminal.Gui.Attribute.op_Implicit(System.Int32 to Terminal.Gui.Attribute)
   - Terminal.Gui.Attribute.op_Implicit(Terminal.Gui.Attribute to System.Int32)
   langs:
@@ -46,6 +47,33 @@ items:
       description: Value.
   overload: Terminal.Gui.Attribute.#ctor*
   exceptions: []
+- uid: Terminal.Gui.Attribute.Make(Terminal.Gui.Color,Terminal.Gui.Color)
+  id: Make(Terminal.Gui.Color,Terminal.Gui.Color)
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  name: Make(Color, Color)
+  nameWithType: Attribute.Make(Color, Color)
+  fullName: Attribute.Make(Color, Color)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates an attribute from the specified foreground and background.
+  syntax:
+    content: public static Terminal.Gui.Attribute Make (Terminal.Gui.Color foreground, Terminal.Gui.Color background);
+    parameters:
+    - id: foreground
+      type: Terminal.Gui.Color
+      description: Foreground color to use.
+    - id: background
+      type: Terminal.Gui.Color
+      description: Background color to use.
+    return:
+      type: Terminal.Gui.Attribute
+      description: The make.
+  overload: Terminal.Gui.Attribute.Make*
+  exceptions: []
 - uid: Terminal.Gui.Attribute.op_Implicit(System.Int32 to Terminal.Gui.Attribute)
   id: op_Implicit(System.Int32 to Terminal.Gui.Attribute)
   parent: Terminal.Gui.Attribute
@@ -58,15 +86,16 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Implicitly convert an integer value into an attribute
   syntax:
     content: public static Terminal.Gui.Attribute op_Implicit (int v);
     parameters:
     - id: v
       type: System.Int32
-      description: To be added.
+      description: value
     return:
       type: Terminal.Gui.Attribute
-      description: To be added.
+      description: An attribute with the specified integer value.
   overload: Terminal.Gui.Attribute.op_Implicit*
   exceptions: []
 - uid: Terminal.Gui.Attribute.op_Implicit(Terminal.Gui.Attribute to System.Int32)
@@ -81,15 +110,16 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Implicit conversion from an attribute to the underlying Int32 representation
   syntax:
     content: public static int op_Implicit (Terminal.Gui.Attribute c);
     parameters:
     - id: c
       type: Terminal.Gui.Attribute
-      description: To be added.
+      description: The attribute to convert
     return:
       type: System.Int32
-      description: To be added.
+      description: The integer value stored in the attribute.
   overload: Terminal.Gui.Attribute.op_Implicit*
   exceptions: []
 references:
@@ -111,18 +141,30 @@ references:
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
-- uid: Terminal.Gui.Attribute.op_Implicit(System.Int32 to Terminal.Gui.Attribute)
+- uid: Terminal.Gui.Attribute.Make(Terminal.Gui.Color,Terminal.Gui.Color)
   parent: Terminal.Gui.Attribute
   isExternal: false
-  name: op_Implicit(Int32 to Attribute)
-  nameWithType: Attribute.op_Implicit(Int32 to Attribute)
-  fullName: Attribute.op_Implicit(Int32 to Attribute)
+  name: Make(Color, Color)
+  nameWithType: Attribute.Make(Color, Color)
+  fullName: Attribute.Make(Color, Color)
 - uid: Terminal.Gui.Attribute
   parent: Terminal.Gui
   isExternal: false
   name: Attribute
   nameWithType: Attribute
   fullName: Terminal.Gui.Attribute
+- uid: Terminal.Gui.Color
+  parent: Terminal.Gui
+  isExternal: false
+  name: Color
+  nameWithType: Color
+  fullName: Terminal.Gui.Color
+- uid: Terminal.Gui.Attribute.op_Implicit(System.Int32 to Terminal.Gui.Attribute)
+  parent: Terminal.Gui.Attribute
+  isExternal: false
+  name: op_Implicit(Int32 to Attribute)
+  nameWithType: Attribute.op_Implicit(Int32 to Attribute)
+  fullName: Attribute.op_Implicit(Int32 to Attribute)
 - uid: Terminal.Gui.Attribute.op_Implicit(Terminal.Gui.Attribute to System.Int32)
   parent: Terminal.Gui.Attribute
   isExternal: false
@@ -135,6 +177,12 @@ references:
   name: Attribute
   nameWithType: Attribute.Attribute
   fullName: Attribute.Attribute
+- uid: Terminal.Gui.Attribute.Make*
+  parent: Terminal.Gui.Attribute
+  isExternal: false
+  name: Make
+  nameWithType: Attribute.Make
+  fullName: Attribute.Make
 - uid: Terminal.Gui.Attribute.op_Implicit*
   parent: Terminal.Gui.Attribute
   isExternal: false

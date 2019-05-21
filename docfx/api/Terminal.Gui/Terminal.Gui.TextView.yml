@@ -15,6 +15,7 @@ items:
   - Terminal.Gui.TextView.ProcessKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.TextView.ReadOnly
   - Terminal.Gui.TextView.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.TextView.ScrollTo(System.Int32)
   - Terminal.Gui.TextView.Text
   langs:
   - csharp
@@ -299,11 +300,12 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: Indicates readonly attribute of TextView
   syntax:
     content: public bool ReadOnly { get; set; }
     return:
       type: System.Boolean
-      description: To be added.
+      description: Boolean value(Default false)
   overload: Terminal.Gui.TextView.ReadOnly*
   exceptions: []
 - uid: Terminal.Gui.TextView.Redraw(Terminal.Gui.Rect)
@@ -326,6 +328,27 @@ items:
       type: Terminal.Gui.Rect
       description: The region to redraw.
   overload: Terminal.Gui.TextView.Redraw*
+  exceptions: []
+- uid: Terminal.Gui.TextView.ScrollTo(System.Int32)
+  id: ScrollTo(System.Int32)
+  parent: Terminal.Gui.TextView
+  langs:
+  - csharp
+  name: ScrollTo(Int32)
+  nameWithType: TextView.ScrollTo(Int32)
+  fullName: TextView.ScrollTo(Int32)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Will scroll the view to display the specified row at the top
+  syntax:
+    content: public void ScrollTo (int row);
+    parameters:
+    - id: row
+      type: System.Int32
+      description: Row that should be displayed at the top, if the value is negative it will be reset to zero
+  overload: Terminal.Gui.TextView.ScrollTo*
   exceptions: []
 - uid: Terminal.Gui.TextView.Text
   id: Text
@@ -468,6 +491,12 @@ references:
   name: Redraw(Rect)
   nameWithType: TextView.Redraw(Rect)
   fullName: TextView.Redraw(Rect)
+- uid: Terminal.Gui.TextView.ScrollTo(System.Int32)
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: ScrollTo(Int32)
+  nameWithType: TextView.ScrollTo(Int32)
+  fullName: TextView.ScrollTo(Int32)
 - uid: Terminal.Gui.TextView.Text
   parent: Terminal.Gui.TextView
   isExternal: false
@@ -546,6 +575,12 @@ references:
   name: Redraw
   nameWithType: TextView.Redraw
   fullName: TextView.Redraw
+- uid: Terminal.Gui.TextView.ScrollTo*
+  parent: Terminal.Gui.TextView
+  isExternal: false
+  name: ScrollTo
+  nameWithType: TextView.ScrollTo
+  fullName: TextView.ScrollTo
 - uid: Terminal.Gui.TextView.Text*
   parent: Terminal.Gui.TextView
   isExternal: false

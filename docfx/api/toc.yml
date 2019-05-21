@@ -33,6 +33,8 @@
     name: ColorScheme
   - uid: Terminal.Gui.ConsoleDriver
     name: ConsoleDriver
+  - uid: Terminal.Gui.CursesDriver
+    name: CursesDriver
   - uid: Terminal.Gui.Dialog
     name: Dialog
   - uid: Terminal.Gui.Dim
@@ -97,9 +99,22 @@
     name: TextField
   - uid: Terminal.Gui.TextView
     name: TextView
+  - uid: Terminal.Gui.TimeField
+    name: TimeField
   - uid: Terminal.Gui.Toplevel
     name: Toplevel
   - uid: Terminal.Gui.View
     name: View
   - uid: Terminal.Gui.Window
     name: Window
+- uid: Unix.Terminal
+  name: Unix.Terminal
+  items:
+  - uid: Unix.Terminal.Curses
+    name: Curses
+  - uid: Unix.Terminal.Curses.Event
+    name: Curses.Event
+  - uid: Unix.Terminal.Curses.MouseEvent
+    name: Curses.MouseEvent
+  - uid: Unix.Terminal.Curses.Window
+    name: Curses.Window

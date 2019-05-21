@@ -87,6 +87,24 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="Cursor">
+      <MemberSignature Language="C#" Value="public int Cursor { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance int32 Cursor" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Int32</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            The location of the cursor in the radio group
+            </summary>
+        <value>To be added.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="MouseEvent">
       <MemberSignature Language="C#" Value="public override bool MouseEvent (Terminal.Gui.MouseEvent me);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool MouseEvent(valuetype Terminal.Gui.MouseEvent me) cil managed" />

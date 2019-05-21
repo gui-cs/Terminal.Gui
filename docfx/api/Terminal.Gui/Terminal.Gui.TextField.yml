@@ -16,6 +16,7 @@ items:
   - Terminal.Gui.TextField.Redraw(Terminal.Gui.Rect)
   - Terminal.Gui.TextField.Secret
   - Terminal.Gui.TextField.Text
+  - Terminal.Gui.TextField.Used
   langs:
   - csharp
   name: TextField
@@ -35,6 +36,8 @@ items:
   - System.Object
   - Terminal.Gui.Responder
   - Terminal.Gui.View
+  derivedClasses:
+  - Terminal.Gui.TimeField
   implements: []
   inheritedMembers:
   - Terminal.Gui.View.Add(Terminal.Gui.View)
@@ -206,9 +209,9 @@ items:
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The current cursor position.
+  summary: Sets or gets the current cursor position.
   syntax:
-    content: public int CursorPosition { get; }
+    content: public int CursorPosition { get; set; }
     return:
       type: System.Int32
       description: To be added.
@@ -358,6 +361,26 @@ items:
       description: To be added.
   overload: Terminal.Gui.TextField.Text*
   exceptions: []
+- uid: Terminal.Gui.TextField.Used
+  id: Used
+  parent: Terminal.Gui.TextField
+  langs:
+  - csharp
+  name: Used
+  nameWithType: TextField.Used
+  fullName: TextField.Used
+  type: Property
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so new input should be appended at the cursor position, rather than clearing the entry
+  syntax:
+    content: public bool Used { get; set; }
+    return:
+      type: System.Boolean
+      description: To be added.
+  overload: Terminal.Gui.TextField.Used*
+  exceptions: []
 references:
 - uid: Terminal.Gui.View
   parent: Terminal.Gui
@@ -491,6 +514,12 @@ references:
   name: Text
   nameWithType: TextField.Text
   fullName: TextField.Text
+- uid: Terminal.Gui.TextField.Used
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: Used
+  nameWithType: TextField.Used
+  fullName: TextField.Used
 - uid: Terminal.Gui.TextField.#ctor*
   parent: Terminal.Gui.TextField
   isExternal: false
@@ -551,6 +580,12 @@ references:
   name: Text
   nameWithType: TextField.Text
   fullName: TextField.Text
+- uid: Terminal.Gui.TextField.Used*
+  parent: Terminal.Gui.TextField
+  isExternal: false
+  name: Used
+  nameWithType: TextField.Used
+  fullName: TextField.Used
 - uid: Terminal.Gui.View.HasFocus
   parent: Terminal.Gui.View
   isExternal: false

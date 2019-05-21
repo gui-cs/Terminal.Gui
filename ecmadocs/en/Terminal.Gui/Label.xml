@@ -81,6 +81,30 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="MaxWidth">
+      <MemberSignature Language="C#" Value="public static int MaxWidth (NStack.ustring text, int width);" />
+      <MemberSignature Language="ILAsm" Value=".method public static hidebysig int32 MaxWidth(class NStack.ustring text, int32 width) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Int32</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="text" Type="NStack.ustring" />
+        <Parameter Name="width" Type="System.Int32" />
+      </Parameters>
+      <Docs>
+        <param name="text">Text, may contain newlines.</param>
+        <param name="width">The width for the text.</param>
+        <summary>
+            Computes the the max width of a line or multilines needed to render by the Label control
+            </summary>
+        <returns>Max width of lines.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="MeasureLines">
       <MemberSignature Language="C#" Value="public static int MeasureLines (NStack.ustring text, int width);" />
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig int32 MeasureLines(class NStack.ustring text, int32 width) cil managed" />

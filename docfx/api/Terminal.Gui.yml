@@ -13,6 +13,7 @@ items:
   - Terminal.Gui.Colors
   - Terminal.Gui.ColorScheme
   - Terminal.Gui.ConsoleDriver
+  - Terminal.Gui.CursesDriver
   - Terminal.Gui.Dialog
   - Terminal.Gui.Dim
   - Terminal.Gui.FileDialog
@@ -45,6 +46,7 @@ items:
   - Terminal.Gui.TextAlignment
   - Terminal.Gui.TextField
   - Terminal.Gui.TextView
+  - Terminal.Gui.TimeField
   - Terminal.Gui.Toplevel
   - Terminal.Gui.View
   - Terminal.Gui.Window
@@ -115,6 +117,12 @@ references:
   name: ConsoleDriver
   nameWithType: ConsoleDriver
   fullName: Terminal.Gui.ConsoleDriver
+- uid: Terminal.Gui.CursesDriver
+  parent: Terminal.Gui
+  isExternal: false
+  name: CursesDriver
+  nameWithType: CursesDriver
+  fullName: Terminal.Gui.CursesDriver
 - uid: Terminal.Gui.Dialog
   parent: Terminal.Gui
   isExternal: false
@@ -307,6 +315,12 @@ references:
   name: TextView
   nameWithType: TextView
   fullName: Terminal.Gui.TextView
+- uid: Terminal.Gui.TimeField
+  parent: Terminal.Gui
+  isExternal: false
+  name: TimeField
+  nameWithType: TimeField
+  fullName: Terminal.Gui.TimeField
 - uid: Terminal.Gui.Toplevel
   parent: Terminal.Gui
   isExternal: false

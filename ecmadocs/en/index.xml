@@ -60,6 +60,7 @@
       <Type Name="Colors" Kind="Class" />
       <Type Name="ColorScheme" Kind="Class" />
       <Type Name="ConsoleDriver" Kind="Class" />
+      <Type Name="CursesDriver" Kind="Class" />
       <Type Name="Dialog" Kind="Class" />
       <Type Name="Dim" Kind="Class" />
       <Type Name="FileDialog" Kind="Class" />
@@ -92,9 +93,16 @@
       <Type Name="TextAlignment" Kind="Enumeration" />
       <Type Name="TextField" Kind="Class" />
       <Type Name="TextView" Kind="Class" />
+      <Type Name="TimeField" Kind="Class" />
       <Type Name="Toplevel" Kind="Class" />
       <Type Name="View" Kind="Class" />
       <Type Name="Window" Kind="Class" />
+    </Namespace>
+    <Namespace Name="Unix.Terminal">
+      <Type Name="Curses" Kind="Class" />
+      <Type Name="Curses+Event" Kind="Enumeration" />
+      <Type Name="Curses+MouseEvent" Kind="Structure" />
+      <Type Name="Curses+Window" Kind="Class" />
     </Namespace>
   </Types>
   <Title>Terminal</Title>

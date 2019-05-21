@@ -116,7 +116,7 @@
       </Docs>
     </Member>
     <Member MemberName="CursorPosition">
-      <MemberSignature Language="C#" Value="public int CursorPosition { get; }" />
+      <MemberSignature Language="C#" Value="public int CursorPosition { get; set; }" />
       <MemberSignature Language="ILAsm" Value=".property instance int32 CursorPosition" />
       <MemberType>Property</MemberType>
       <AssemblyInfo>
@@ -127,7 +127,7 @@
       </ReturnValue>
       <Docs>
         <summary>
-               The current cursor position.
+               Sets or gets the current cursor position.
             </summary>
         <value>To be added.</value>
         <remarks>To be added.</remarks>
@@ -242,7 +242,7 @@
             </summary>
         <value>To be added.</value>
         <remarks>
-              This makes the text entry suitable for entering passwords. 
+              This makes the text entry suitable for entering passwords.
             </remarks>
       </Docs>
     </Member>
@@ -262,6 +262,24 @@
             </summary>
         <value>To be added.</value>
         <remarks />
+      </Docs>
+    </Member>
+    <Member MemberName="Used">
+      <MemberSignature Language="C#" Value="public bool Used { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance bool Used" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>
+            Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so new input should be appended at the cursor position, rather than clearing the entry
+            </summary>
+        <value>To be added.</value>
+        <remarks>To be added.</remarks>
       </Docs>
     </Member>
   </Members>

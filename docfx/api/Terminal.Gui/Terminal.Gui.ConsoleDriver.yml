@@ -18,6 +18,7 @@ items:
   - Terminal.Gui.ConsoleDriver.LeftTee
   - Terminal.Gui.ConsoleDriver.LLCorner
   - Terminal.Gui.ConsoleDriver.LRCorner
+  - Terminal.Gui.ConsoleDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
   - Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
   - Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
   - Terminal.Gui.ConsoleDriver.Refresh
@@ -51,6 +52,8 @@ items:
     content: public abstract class ConsoleDriver
   inheritance:
   - System.Object
+  derivedClasses:
+  - Terminal.Gui.CursesDriver
   implements: []
   inheritedMembers: []
 - uid: Terminal.Gui.ConsoleDriver.#ctor
@@ -349,6 +352,32 @@ items:
     return:
       type: System.Rune
       description: To be added.
+  exceptions: []
+- uid: Terminal.Gui.ConsoleDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
+  id: MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  name: MakeAttribute(Color, Color)
+  nameWithType: ConsoleDriver.MakeAttribute(Color, Color)
+  fullName: ConsoleDriver.MakeAttribute(Color, Color)
+  type: Method
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public abstract Terminal.Gui.Attribute MakeAttribute (Terminal.Gui.Color fore, Terminal.Gui.Color back);
+    parameters:
+    - id: fore
+      type: Terminal.Gui.Color
+      description: To be added.
+    - id: back
+      type: Terminal.Gui.Color
+      description: To be added.
+    return:
+      type: Terminal.Gui.Attribute
+      description: To be added.
+  overload: Terminal.Gui.ConsoleDriver.MakeAttribute*
   exceptions: []
 - uid: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
   id: Move(System.Int32,System.Int32)
@@ -859,6 +888,24 @@ references:
   name: LRCorner
   nameWithType: ConsoleDriver.LRCorner
   fullName: ConsoleDriver.LRCorner
+- uid: Terminal.Gui.ConsoleDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: MakeAttribute(Color, Color)
+  nameWithType: ConsoleDriver.MakeAttribute(Color, Color)
+  fullName: ConsoleDriver.MakeAttribute(Color, Color)
+- uid: Terminal.Gui.Attribute
+  parent: Terminal.Gui
+  isExternal: false
+  name: Attribute
+  nameWithType: Attribute
+  fullName: Terminal.Gui.Attribute
+- uid: Terminal.Gui.Color
+  parent: Terminal.Gui
+  isExternal: false
+  name: Color
+  nameWithType: Color
+  fullName: Terminal.Gui.Color
 - uid: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -955,12 +1002,6 @@ references:
   name: SetAttribute(Attribute)
   nameWithType: ConsoleDriver.SetAttribute(Attribute)
   fullName: ConsoleDriver.SetAttribute(Attribute)
-- uid: Terminal.Gui.Attribute
-  parent: Terminal.Gui
-  isExternal: false
-  name: Attribute
-  nameWithType: Attribute
-  fullName: Terminal.Gui.Attribute
 - uid: Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false
@@ -1105,6 +1146,12 @@ references:
   name: Init
   nameWithType: ConsoleDriver.Init
   fullName: ConsoleDriver.Init
+- uid: Terminal.Gui.ConsoleDriver.MakeAttribute*
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: false
+  name: MakeAttribute
+  nameWithType: ConsoleDriver.MakeAttribute
+  fullName: ConsoleDriver.MakeAttribute
 - uid: Terminal.Gui.ConsoleDriver.Move*
   parent: Terminal.Gui.ConsoleDriver
   isExternal: false

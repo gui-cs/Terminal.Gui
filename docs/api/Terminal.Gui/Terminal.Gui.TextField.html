@@ -82,6 +82,7 @@
     <div class="level2"><a class="xref" href="Terminal.Gui.View.html">View</a></div>
     <div class="level3"><span class="xref">TextField</span></div>
   </div>
+      <div class="level4"><a class="xref" href="Terminal.Gui.TimeField.html">TimeField</a></div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -366,12 +367,12 @@
   
   <a id="Terminal_Gui_TextField_CursorPosition_" data-uid="Terminal.Gui.TextField.CursorPosition*"></a>
   <h4 id="Terminal_Gui_TextField_CursorPosition" data-uid="Terminal.Gui.TextField.CursorPosition">CursorPosition</h4>
-  <div class="markdown level1 summary"><p>The current cursor position.</p>
+  <div class="markdown level1 summary"><p>Sets or gets the current cursor position.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int CursorPosition { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int CursorPosition { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -467,6 +468,33 @@
     <tbody>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
+        <td><p>To be added.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TextField_Used_" data-uid="Terminal.Gui.TextField.Used*"></a>
+  <h4 id="Terminal_Gui_TextField_Used" data-uid="Terminal.Gui.TextField.Used">Used</h4>
+  <div class="markdown level1 summary"><p>Tracks whether the text field should be considered &quot;used&quot;, that is, that the user has moved in the entry, so new input should be appended at the cursor position, rather than clearing the entry</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Used { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
         <td><p>To be added.</p>
 </td>
       </tr>

@@ -38,6 +38,30 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="Make">
+      <MemberSignature Language="C#" Value="public static Terminal.Gui.Attribute Make (Terminal.Gui.Color foreground, Terminal.Gui.Color background);" />
+      <MemberSignature Language="ILAsm" Value=".method public static hidebysig valuetype Terminal.Gui.Attribute Make(valuetype Terminal.Gui.Color foreground, valuetype Terminal.Gui.Color background) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>Terminal.Gui.Attribute</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="foreground" Type="Terminal.Gui.Color" />
+        <Parameter Name="background" Type="Terminal.Gui.Color" />
+      </Parameters>
+      <Docs>
+        <param name="foreground">Foreground color to use.</param>
+        <param name="background">Background color to use.</param>
+        <summary>
+            Creates an attribute from the specified foreground and background.
+            </summary>
+        <returns>The make.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="op_Implicit">
       <MemberSignature Language="C#" Value="public static Terminal.Gui.Attribute op_Implicit (int v);" />
       <MemberSignature Language="ILAsm" Value=".method public static hidebysig specialname valuetype Terminal.Gui.Attribute op_Implicit(int32 v) cil managed" />
@@ -52,9 +76,11 @@
         <Parameter Name="v" Type="System.Int32" />
       </Parameters>
       <Docs>
-        <param name="v">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
+        <param name="v">value</param>
+        <summary>
+            Implicitly convert an integer value into an attribute
+            </summary>
+        <returns>An attribute with the specified integer value.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -72,9 +98,11 @@
         <Parameter Name="c" Type="Terminal.Gui.Attribute" />
       </Parameters>
       <Docs>
-        <param name="c">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
+        <param name="c">The attribute to convert</param>
+        <summary>
+            Implicit conversion from an attribute to the underlying Int32 representation
+            </summary>
+        <returns>The integer value stored in the attribute.</returns>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
