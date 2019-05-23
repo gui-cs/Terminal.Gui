@@ -987,7 +987,7 @@ namespace Terminal.Gui {
 				if (fullNeedsDisplay)
 					SetNeedsDisplay ();
 				else
-					SetNeedsDisplay (new Rect (0, currentRow - topRow, 0, Frame.Height));
+					SetNeedsDisplay (new Rect (0, currentRow - topRow, 2, Frame.Height));
 				break;
 
 			default:
