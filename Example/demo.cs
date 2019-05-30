@@ -2,6 +2,7 @@ using Terminal.Gui;
 using System;
 using Mono.Terminal;
 
+
 static class Demo {
 	class Box10x : View {
 		public Box10x (int x, int y) : base (new Rect (x, y, 10, 10))
@@ -137,6 +138,8 @@ static class Demo {
 			//scrollView2,
 			new Button (3, 19, "Ok"),
 			new Button (10, 19, "Cancel"),
+			new TimeField (3, 20, DateTime.Now),
+			new TimeField (23, 20, DateTime.Now, true),
 			progress,
 			new Label (3, 22, "Press F9 (on Unix, ESC+9 is an alias) to activate the menubar")
 
