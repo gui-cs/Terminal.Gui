@@ -1,4 +1,7 @@
 [![Build Status](https://travis-ci.org/migueldeicaza/gui.cs.svg?branch=master)](https://travis-ci.org/migueldeicaza/gui.cs)
+[![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui)
+[![Downloads](https://img.shields.io/nuget/dt/Terminal.Gui)](https://www.nuget.org/packages/Terminal.Gui)
+[![License](https://img.shields.io/github/license/migueldeicaza/gui.cs.svg)](LICENSE)
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mono/mono?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) - This is the Mono Channel room
 
