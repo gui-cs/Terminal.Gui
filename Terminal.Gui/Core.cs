@@ -219,8 +219,24 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public class View : Responder, IEnumerable {
+		internal enum Direction {
+			Forward,
+			Backward
+		}
+
 		View container = null;
 		View focused = null;
+		Direction focusDirection;
+
+		internal Direction FocusDirection {
+			get => SuperView?.FocusDirection ?? focusDirection;
+			set {
+				if (SuperView != null)
+					SuperView.FocusDirection = value;
+				else
+					focusDirection = value;
+			}
+		}
 
 		/// <summary>
 		/// Points to the current driver in use by the view, it is a convenience property
@@ -900,7 +916,10 @@ namespace Terminal.Gui {
 		public void EnsureFocus ()
 		{
 			if (focused == null)
-				FocusFirst ();
+				if (FocusDirection == Direction.Forward)
+					FocusFirst ();
+				else
+					FocusLast ();
 		}
 
 		/// <summary>
@@ -926,8 +945,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void FocusLast ()
 		{
-			if (subviews == null)
+			if (subviews == null) {
+				SuperView?.SetFocus(this);
 				return;
+			}
 
 			for (int i = subviews.Count; i > 0;) {
 				i--;
@@ -946,12 +967,13 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c>, if previous was focused, <c>false</c> otherwise.</returns>
 		public bool FocusPrev ()
 		{
+			FocusDirection = Direction.Backward;
 			if (subviews == null || subviews.Count == 0)
 				return false;
 
 			if (focused == null) {
 				FocusLast ();
-				return true;
+				return focused != null;
 			}
 			int focused_idx = -1;
 			for (int i = subviews.Count; i > 0;) {
@@ -967,18 +989,13 @@ namespace Terminal.Gui {
 				if (w.CanFocus && focused_idx != -1) {
 					focused.HasFocus = false;
 
-					if (w.CanFocus)
+					if (w != null && w.CanFocus)
 						w.FocusLast ();
 
 					SetFocus (w);
-					return true;
+				return true;
 				}
 			}
-			if (focused_idx != -1) {
-				FocusLast ();
-				return true;
-			}
-
 			if (focused != null) {
 				focused.HasFocus = false;
 				focused = null;
@@ -992,6 +1009,7 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c>, if next was focused, <c>false</c> otherwise.</returns>
 		public bool FocusNext ()
 		{
+			FocusDirection = Direction.Forward;
 			if (subviews == null || subviews.Count == 0)
 				return false;
 
