@@ -124,6 +124,20 @@ class Demo {
 }
 ```
 
+Alternatively, you can encapsulate the app behavior in a new `Window`-derived class, 
+say `App.cs` containing the code above, and simplify your `Main` method to:
+
+```csharp
+using Terminal.Gui;
+
+class Demo {
+    static void Main ()
+    {
+        Application.Run<App> ();
+    }
+}
+```
+
 The example above shows how to add views, two styles are used, a very
 nice layout system that I have no name for, but that [is
 documented](https://migueldeicaza.github.io/gui.cs/articles/overview.html#layout),
