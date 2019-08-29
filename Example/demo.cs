@@ -1,6 +1,8 @@
 using Terminal.Gui;
 using System;
 using Mono.Terminal;
+using System.Collections;
+using System.Collections.Generic;
 
 
 static class Demo {
@@ -255,6 +257,43 @@ static class Demo {
 			
 	}
 
+	#region Selection Demo
+
+	static void ListSelectionDemo ()
+	{
+		var d = new Dialog ("Selection Demo", 60, 20,
+			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
+			new Button ("Cancel") { Clicked = () => { Application.RequestStop (); } });
+
+		var animals = new List<string> () { "Alpaca", "Llama", "Lion", "Shark", "Goat" };
+		var msg = new Label ("Use space bar or control-t to toggle selection") {
+			X = 1,
+			Y = 1,
+			Width = Dim.Fill () - 1,
+			Height = 1
+		};
+
+		var list = new ListView (animals) {
+			X = 1,
+			Y = 3,
+			Width = Dim.Fill () - 4,
+			Height = Dim.Fill () - 4,
+			AllowsMarking = true
+		};
+		d.Add (msg, list);
+		Application.Run (d);
+
+		var result = "";
+		for (int i = 0; i < animals.Count; i++) {
+			if (list.Source.IsMarked (i)) {
+				result += animals [i] + " ";
+			}
+		}
+		MessageBox.Query (60, 10, "Selected Animals", result == "" ? "No animals selected" : result, "Ok");
+	}
+	#endregion
+
+
 	public static Label ml;
 	static void Main ()
 	{
@@ -288,6 +327,9 @@ static class Demo {
 				new MenuItem ("_Copy", "", null),
 				new MenuItem ("C_ut", "", null),
 				new MenuItem ("_Paste", "", null)
+			}),
+			 new MenuBarItem ("_List Demos", new MenuItem [] {
+				new MenuItem ("Select Items", "", ListSelectionDemo),
 			}),
 		});
 

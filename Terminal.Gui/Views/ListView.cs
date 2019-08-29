@@ -85,6 +85,11 @@ namespace Terminal.Gui {
 	///   providing your own rendering via the IListDataSource implementation) or call SetSource
 	///   when you are providing an IList.
 	/// </para>
+	/// <para>
+	///   When AllowsMark is set to true, then the rendering will prefix the list rendering with
+	///   [x] or [ ] and bind the space character to toggle the selection.  If you desire a different
+	///   marking style do not set the property and provide your own custom rendering.   
+	/// </para>
 	/// </remarks>
 	public class ListView : View {
 		int top;
@@ -182,9 +187,15 @@ namespace Terminal.Gui {
 
 		bool allowsMarking;
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.ListView"/> allows items to be marked.
+		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.ListView"/> allows items to be marked. 
 		/// </summary>
-		/// <value><c>true</c> if allows marking elements of the list; otherwise, <c>false</c>.</value>
+		/// <value><c>true</c> if allows marking elements of the list; otherwise, <c>false</c>.
+		/// </value>
+		/// <remarks>
+		/// If set to true, this will default to rendering the marked with "[x]", and unmarked valued with "[ ]"
+		/// spaces.   If you desire a different rendering, you need to implement your own renderer.   This will
+		/// also by default process the space character as a toggle for the selection.
+		/// </remarks>
 		public bool AllowsMarking {
 			get => allowsMarking;
 			set {
@@ -292,6 +303,7 @@ namespace Terminal.Gui {
 			var f = Frame;
 			var item = top;
 			bool focused = HasFocus;
+			int col = allowsMarking ? 4 : 0;
 
 			for (int row = 0; row < f.Height; row++, item++) {
 				bool isSelected = item == selected;
@@ -302,12 +314,15 @@ namespace Terminal.Gui {
 					current = newcolor;
 				}
 
+				Move (0, row);
 				if (source == null || item >= source.Count) {
-					Move(0, row);
 					for (int c = 0; c < f.Width; c++)
 						Driver.AddRune(' ');
 				} else {
-					Source.Render(this, Driver, isSelected, item, 0, row, f.Width);
+					if (allowsMarking) {
+						Driver.AddStr (source.IsMarked (item) ? "[x] " : "[ ] ");
+					}
+					Source.Render(this, Driver, isSelected, item, col, row, f.Width-col);
 				}
 			}
 		}
@@ -381,6 +396,14 @@ namespace Terminal.Gui {
 					SetNeedsDisplay ();
 				}
 				return true;
+
+			case Key.Space:
+				if (allowsMarking) {
+					Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
+					SetNeedsDisplay ();
+					return true;
+				}
+				break;
 			}
 			return base.ProcessKey (kb);
 		}
