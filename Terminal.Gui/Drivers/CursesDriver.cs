@@ -17,8 +17,6 @@ namespace Terminal.Gui {
 	/// This is the Curses driver for the gui.cs/Terminal framework.
 	/// </summary>
 	public class CursesDriver : ConsoleDriver {
-		Action terminalResized;
-
 		public override int Cols => Curses.Cols;
 		public override int Rows => Curses.Lines;
 
@@ -159,7 +157,7 @@ namespace Terminal.Gui {
 			if (code == Curses.KEY_CODE_YES) {
 				if (wch == Curses.KeyResize) {
 					if (Curses.CheckWinChange ()) {
-						terminalResized ();
+						TerminalResized ();
 						return;
 					}
 				}
@@ -226,7 +224,7 @@ namespace Terminal.Gui {
 
 			Curses.Window.Standard.keypad (true);
 			reportableMouseEvents = Curses.mousemask (Curses.Event.AllEvents | Curses.Event.ReportMousePosition, out oldMouseEvents);
-			this.terminalResized = terminalResized;
+			TerminalResized = terminalResized;
 			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
 				StartReportingMouseMoves ();
 
