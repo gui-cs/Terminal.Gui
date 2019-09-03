@@ -157,7 +157,7 @@ namespace Terminal.Gui {
 			if (code == Curses.KEY_CODE_YES) {
 				if (wch == Curses.KeyResize) {
 					if (Curses.CheckWinChange ()) {
-						TerminalResized ();
+						TerminalResized?.Invoke ();
 						return;
 					}
 				}
