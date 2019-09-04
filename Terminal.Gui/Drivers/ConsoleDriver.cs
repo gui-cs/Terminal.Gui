@@ -253,6 +253,8 @@ namespace Terminal.Gui {
 	/// ConsoleDriver is an abstract class that defines the requirements for a console driver.   One implementation if the CursesDriver, and another one uses the .NET Console one.
 	/// </summary>
 	public abstract class ConsoleDriver {
+		protected Action TerminalResized;
+
 		/// <summary>
 		/// The current number of columns in the terminal.
 		/// </summary>
@@ -322,6 +324,11 @@ namespace Terminal.Gui {
 		/// <param name="foregroundColorId">Foreground color identifier.</param>
 		/// <param name="backgroundColorId">Background color identifier.</param>
 		public abstract void SetColors (short foregroundColorId, short backgroundColorId);
+
+		public void SetTerminalResized(Action terminalResized)
+		{
+			TerminalResized = terminalResized;
+		}
 
 		/// <summary>
 		/// Draws a frame on the specified region with the specified padding around the frame.
