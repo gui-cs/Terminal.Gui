@@ -418,7 +418,6 @@ namespace Terminal.Gui {
 		ManualResetEventSlim eventReady = new ManualResetEventSlim(false);
 		ManualResetEventSlim waitForProbe = new ManualResetEventSlim(false);
 		MainLoop mainLoop;
-		Action TerminalResized;
 		WindowsConsole.CharInfo [] OutputBuffer;
 		int cols, rows;
 		WindowsConsole winConsole;
@@ -551,7 +550,7 @@ namespace Terminal.Gui {
 				rows = inputEvent.WindowBufferSizeEvent.size.Y - 1;
 				ResizeScreen ();
 				UpdateOffScreen ();
-				TerminalResized ();
+				TerminalResized?.Invoke();
 				break;
 			}
 			result = null;
