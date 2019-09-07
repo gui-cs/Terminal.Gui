@@ -479,10 +479,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
-		public virtual void Add (View view)
+		public virtual TView Add<TView> (TView view) where TView : View
 		{
 			if (view == null)
-				return;
+				return null;
 			if (subviews == null)
 				subviews = new List<View> ();
 			subviews.Add (view);
@@ -491,6 +491,7 @@ namespace Terminal.Gui {
 				CanFocus = true;
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
+			return view;
 		}
 
 		/// <summary>
@@ -1411,11 +1412,12 @@ namespace Terminal.Gui {
 		/// Add the specified view to the ContentView.
 		/// </summary>
 		/// <param name="view">View to add to the window.</param>
-		public override void Add (View view)
+		public override TView Add<TView> (TView view)
 		{
 			contentView.Add (view);
 			if (view.CanFocus)
 				CanFocus = true;
+			return view;
 		}
 
 

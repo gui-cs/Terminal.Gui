@@ -295,9 +295,10 @@ namespace Terminal.Gui {
 		/// Adds the view to the scrollview.
 		/// </summary>
 		/// <param name="view">The view to add to the scrollview.</param>
-		public override void Add (View view)
+		public override TView Add<TView> (TView view)
 		{
 			contentView.Add (view);
+			return view;
 		}
 
 		/// <summary>
