@@ -503,8 +503,7 @@ namespace Terminal.Gui {
 
 			result = null;
 			waitForProbe.Set();
-			tokenSource.Dispose();
-			tokenSource = new CancellationTokenSource();
+
 			try {
 				eventReady.Wait(waitTimeout, tokenSource.Token);
 			} catch (OperationCanceledException) {
@@ -513,7 +512,13 @@ namespace Terminal.Gui {
 				eventReady.Reset();
 			}
 			Debug.WriteLine("Events ready");
-			return result != null || tokenSource.IsCancellationRequested;
+
+			if (!tokenSource.IsCancellationRequested)
+				return result != null;
+
+			tokenSource.Dispose();
+			tokenSource = new CancellationTokenSource();
+			return true;
 		}
 
 		Action<KeyEvent> keyHandler;
