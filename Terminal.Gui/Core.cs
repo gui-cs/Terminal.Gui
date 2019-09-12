@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 using NStack;
+using System.ComponentModel;
 
 namespace Terminal.Gui {
 
@@ -1827,6 +1828,14 @@ namespace Terminal.Gui {
 			var rs = new RunState (toplevel);
 
 			Init ();
+			if (toplevel is ISupportInitializeNotification initializableNotification && 
+			    !initializableNotification.IsInitialized) {
+				initializableNotification.BeginInit();
+				initializableNotification.EndInit();
+			} else if (toplevel is ISupportInitialize initializable) {
+				initializable.BeginInit();
+				initializable.EndInit();
+			}
 			toplevels.Push (toplevel);
 			Current = toplevel;
 			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessMouseEvent);
