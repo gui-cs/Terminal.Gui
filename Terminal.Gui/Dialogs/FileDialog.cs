@@ -425,9 +425,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The absolute file path for the file path entered.</value>
 		public ustring FilePath {
-			get => nameEntry.Text;
+			get => dirListView.MakePath(nameEntry.Text.ToString());
 			set {
-				nameEntry.Text = value;
+				nameEntry.Text = Path.GetFileName(value.ToString());
 			}
 		}
 	}
@@ -458,7 +458,7 @@ namespace Terminal.Gui {
 			get {
 				if (canceled)
 					return null;
-				return FilePath;
+				return Path.GetFileName(FilePath.ToString());
 			}
 		}
 	}
