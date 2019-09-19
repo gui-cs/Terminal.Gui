@@ -188,11 +188,8 @@ namespace Terminal.Gui {
 		{
 			if (action == null)
 				return;
-			
-			Application.MainLoop.AddIdle (() => {
-				action ();
-				return false;
-			});
+
+			Application.MainLoop.AddIdle(action);
 		}
 
 		public override bool ProcessKey (KeyEvent kb)
@@ -349,11 +346,14 @@ namespace Terminal.Gui {
 			action = item.Action;
 		}
 
+		public event EventHandler OnOpenMenu;
 		Menu openMenu;
 		View previousFocused;
 
 		void OpenMenu (int index)
 		{
+			OnOpenMenu?.Invoke(this, null);
+
 			if (openMenu != null)
 				SuperView.Remove (openMenu);
 			
