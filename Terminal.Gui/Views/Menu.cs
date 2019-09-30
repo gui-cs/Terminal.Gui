@@ -177,8 +177,8 @@ namespace Terminal.Gui {
 
 				Move (2, i + 1);
 				DrawHotString (item.Title,
-					   i == current? ColorScheme.HotFocus : ColorScheme.HotNormal,
-					   i == current ? ColorScheme.Focus : ColorScheme.Normal);
+				               i == current? ColorScheme.HotFocus : ColorScheme.HotNormal,
+				               i == current ? ColorScheme.Focus : ColorScheme.Normal);
 
 				// The help string
 				var l = item.Help.Length;
@@ -267,7 +267,8 @@ namespace Terminal.Gui {
 				Run (barItems.Children [item].Action);
 				return true;
 			}
-			if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.ReportMousePosition) {
+			if (me.Flags == MouseFlags.Button1Pressed || 
+				me.Flags == MouseFlags.ReportMousePosition) {
 				if (me.Y < 1)
 					return true;
 				if (me.Y - 1 >= barItems.Children.Length)
@@ -367,7 +368,7 @@ namespace Terminal.Gui {
 				SuperView.Remove (openMenu);
 
 			int pos = 0;
-			for (int i = 0; i < index; i++)
+			for (int i = 0; i < index; i++) 
 				pos += Menus [i].Title.Length + 3;
 
 			openMenu = new Menu (this, pos, 1, Menus [index]);
@@ -393,7 +394,7 @@ namespace Terminal.Gui {
 		void Activate (int idx)
 		{
 			selected = idx;
-			if (openMenu == null)
+			if (openMenu == null) 
 				previousFocused = SuperView.Focused;
 
 			OpenMenu (idx);
@@ -416,7 +417,7 @@ namespace Terminal.Gui {
 			else
 				selected--;
 
-			OpenMenu (selected);
+			OpenMenu (selected);				
 		}
 
 		internal void NextMenu ()
@@ -430,36 +431,36 @@ namespace Terminal.Gui {
 			OpenMenu (selected);
 		}
 
-		internal bool FindAndOpenMenuByHotkey(KeyEvent kb)
-		{
-			int pos = 0;
-			var c = ((uint)kb.Key & (uint)Key.CharMask);
-			for (int i = 0; i < Menus.Length; i++)
-				{
-				// TODO: this code is duplicated, hotkey should be part of the MenuBarItem
-				var mi = Menus[i];
-				int p = mi.Title.IndexOf('_');
-				if (p != -1 && p + 1 < mi.Title.Length) {
-					if (mi.Title[p + 1] == c) {
-						OpenMenu(i);
-						return true;
-					}
-				}
-			}
-			return false;
-		}
+                internal bool FindAndOpenMenuByHotkey(KeyEvent kb)
+                {
+                    int pos = 0;
+                    var c = ((uint)kb.Key & (uint)Key.CharMask);
+	            for (int i = 0; i < Menus.Length; i++)
+                    {
+			    // TODO: this code is duplicated, hotkey should be part of the MenuBarItem
+                            var mi = Menus[i];
+                            int p = mi.Title.IndexOf('_');
+                            if (p != -1 && p + 1 < mi.Title.Length) {
+                                    if (mi.Title[p + 1] == c) {
+			                    OpenMenu(i);
+			                    return true;
+                                    }
+                            }
+                    }
+	            return false;
+                }
 
-		public override bool ProcessHotKey (KeyEvent kb)
+	        public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == Key.F9) {
 				StartMenu ();
 				return true;
 			}
 
-			if (kb.IsAlt)
-			{
-				if (FindAndOpenMenuByHotkey(kb)) return true;
-			}
+                        if (kb.IsAlt)
+                        {
+                            if (FindAndOpenMenuByHotkey(kb)) return true;
+                        }
 			var kc = kb.KeyValue;
 
 			return base.ProcessHotKey (kb);
@@ -510,8 +511,8 @@ namespace Terminal.Gui {
 		public override bool MouseEvent(MouseEvent me)
 		{
 			if (me.Flags == MouseFlags.Button1Clicked ||
-			(me.Flags == MouseFlags.ReportMousePosition && selected > -1)) {
-				int pos = 1;
+				(me.Flags == MouseFlags.ReportMousePosition && selected > -1)) {
+ 				int pos = 1;
 				int cx = me.X;
 				for (int i = 0; i < Menus.Length; i++) {
 					if (cx > pos && me.X < pos + 1 + Menus [i].TitleLength) {
