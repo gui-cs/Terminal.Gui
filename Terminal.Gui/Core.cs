@@ -831,7 +831,7 @@ namespace Terminal.Gui {
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
 			if (subviews != null) {
-				foreach (var view in subviews) {
+				foreach (var view in subviews.ToList()) {
 					if (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay) {
 						if (view.Frame.IntersectsWith (clipRect) && view.Frame.IntersectsWith (region)) {
 

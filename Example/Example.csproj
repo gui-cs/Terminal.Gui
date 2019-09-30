@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -30,14 +30,11 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NStack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NStack.Core.0.12.0\lib\netstandard1.5\NStack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="NStack">
-      <HintPath>..\packages\NStack.Core.0.11.0\lib\netstandard1.5\NStack.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="NStack">
-      <HintPath>..\packages\NStack.Core.0.11.0\lib\netstandard1.5\NStack.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="demo.cs" />
