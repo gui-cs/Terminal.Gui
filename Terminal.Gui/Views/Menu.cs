@@ -1,4 +1,4 @@
-﻿//
+//
 // Menu.cs: application menus and submenus
 //
 // Authors:

@@ -1,4 +1,4 @@
-﻿//
+//
 // ListView.cs: ListView control
 //
 // Authors:
