@@ -3,7 +3,10 @@ using System;
 using Mono.Terminal;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Diagnostics;
+using System.Globalization;
+using System.Reflection;
+using NStack;
 
 static class Demo {
 	class Box10x : View {
@@ -60,11 +63,15 @@ static class Demo {
 
 	static void ShowTextAlignments (View container)
 	{
+		int i = 0;
+		string txt = "Hello world, how are you doing today";
 		container.Add (
-			new Label (new Rect (0, 0, 40, 3), "1-Hello world, how are you doing today") { TextAlignment = TextAlignment.Left },
-			new Label (new Rect (0, 4, 40, 3), "2-Hello world, how are you doing today") { TextAlignment = TextAlignment.Right },
-			new Label (new Rect (0, 8, 40, 3), "3-Hello world, how are you doing today") { TextAlignment = TextAlignment.Centered },
-			new Label (new Rect (0, 12, 40, 3), "4-Hello world, how are you doing today") { TextAlignment = TextAlignment.Justified });
+			    new FrameView (new Rect (75, 1, txt.Length + 6, 20), "Text Alignments") {
+			new Label(new Rect(0, 1, 40, 3), $"{i+1}-{txt}") { TextAlignment = TextAlignment.Left },
+			new Label(new Rect(0, 5, 40, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
+			new Label(new Rect(0, 9, 40, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
+			new Label(new Rect(0, 13, 40, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
+		    });
 	}
 
 	static void ShowEntries (View container)
@@ -143,7 +150,8 @@ static class Demo {
 			new TimeField (3, 20, DateTime.Now),
 			new TimeField (23, 20, DateTime.Now, true),
 			progress,
-			new Label (3, 22, "Press F9 (on Unix, ESC+9 is an alias) to activate the menubar")
+			new Label (3, 22, "Press F9 (on Unix, ESC+9 is an alias) to activate the menubar"),
+			menuKeysStyle
 
 		);
 
@@ -164,10 +172,11 @@ static class Demo {
 
 	// 
 	// Creates a nested editor
-	static void Editor(Toplevel top) {
+	static void Editor (Toplevel top)
+	{
 		var tframe = top.Frame;
-		var ntop = new Toplevel(tframe);
-		var menu = new MenuBar(new MenuBarItem[] {
+		var ntop = new Toplevel (tframe);
+		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
 				new MenuItem ("_Close", "", () => {Application.RequestStop ();}),
 			}),
@@ -177,25 +186,25 @@ static class Demo {
 				new MenuItem ("_Paste", "", null)
 			}),
 		});
-		ntop.Add(menu);
+		ntop.Add (menu);
 
 		string fname = null;
-		foreach (var s in new[] { "/etc/passwd", "c:\\windows\\win.ini" })
-			if (System.IO.File.Exists(s)) {
+		foreach (var s in new [] { "/etc/passwd", "c:\\windows\\win.ini" })
+			if (System.IO.File.Exists (s)) {
 				fname = s;
 				break;
 			}
 
-		var win = new Window(fname ?? "Untitled") {
+		var win = new Window (fname ?? "Untitled") {
 			X = 0,
 			Y = 1,
-			Width = Dim.Fill(),
-			Height = Dim.Fill()
+			Width = Dim.Fill (),
+			Height = Dim.Fill ()
 		};
-		ntop.Add(win);
+		ntop.Add (win);
 
-		var text = new TextView(new Rect(0, 0, tframe.Width - 2, tframe.Height - 3));
-		
+		var text = new TextView (new Rect (0, 0, tframe.Width - 2, tframe.Height - 3));
+
 		if (fname != null)
 			text.Text = System.IO.File.ReadAllText (fname);
 		win.Add (text);
@@ -211,7 +220,7 @@ static class Demo {
 
 	static void Close ()
 	{
-		MessageBox.ErrorQuery (50, 5, "Error", "There is nothing to close", "Ok");
+		MessageBox.ErrorQuery (50, 7, "Error", "There is nothing to close", "Ok");
 	}
 
 	// Watch what happens when I try to introduce a newline after the first open brace
@@ -254,8 +263,44 @@ static class Demo {
 		};
 		win.Add (hex);
 		Application.Run (ntop);
-			
+
 	}
+
+	public class MenuItemDetails : MenuItem {
+		ustring title;
+		string help;
+		Action action;
+
+		public MenuItemDetails (ustring title, string help, Action action) : base (title, help, action)
+		{
+			this.title = title;
+			this.help = help;
+			this.action = action;
+		}
+
+		public static MenuItemDetails Instance (MenuItem mi)
+		{
+			return (MenuItemDetails)mi.GetMenuItem ();
+		}
+	}
+
+	public delegate MenuItem MenuItemDelegate (MenuItemDetails menuItem);
+
+	public static void ShowMenuItem (MenuItem mi)
+	{
+		BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
+		MethodInfo minfo = typeof (MenuItemDetails).GetMethod ("Instance", flags);
+		MenuItemDelegate mid = (MenuItemDelegate)Delegate.CreateDelegate (typeof (MenuItemDelegate), minfo);
+		MessageBox.Query (70, 7, mi.Title.ToString (),
+			$"{mi.Title.ToString ()} selected. Is from submenu: {mi.GetMenuBarItem ()}", "ok");
+	}
+
+	private static void MenuKeysStyle_Toggled (object sender, EventArgs e)
+	{
+		menu.UseKeysUpDownAsKeysLeftRight = menuKeysStyle.Checked;
+	}
+
+
 
 	#region Selection Demo
 
@@ -295,13 +340,18 @@ static class Demo {
 
 
 	public static Label ml;
+	public static MenuBar menu;
+	public static CheckBox menuKeysStyle;
 	static void Main ()
 	{
+		if (Debugger.IsAttached)
+			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
+
 		//Application.UseSystemConsole = true;
 		Application.Init ();
-		
+
 		var top = Application.Top;
-		
+
 		var tframe = top.Frame;
 		//Open ();
 #if true
@@ -314,7 +364,19 @@ static class Demo {
 #else
 		var win = new Window (new Rect (0, 1, tframe.Width, tframe.Height - 1), "Hello");
 #endif
-		var menu = new MenuBar (new MenuBarItem [] {
+		MenuItemDetails [] menuItems = {
+			new MenuItemDetails ("F_ind", "", null),
+			new MenuItemDetails ("_Replace", "", null),
+			new MenuItemDetails ("_Item1", "", null),
+			new MenuItemDetails ("_Not From Sub Menu", "", null)
+		};
+
+		menuItems [0].Action = () => ShowMenuItem (menuItems [0]);
+		menuItems [1].Action = () => ShowMenuItem (menuItems [1]);
+		menuItems [2].Action = () => ShowMenuItem (menuItems [2]);
+		menuItems [3].Action = () => ShowMenuItem (menuItems [3]);
+
+		menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
 				new MenuItem ("Text Editor Demo", "", () => { Editor (top); }),
 				new MenuItem ("_New", "Creates new file", NewFile),
@@ -326,12 +388,31 @@ static class Demo {
 			new MenuBarItem ("_Edit", new MenuItem [] {
 				new MenuItem ("_Copy", "", null),
 				new MenuItem ("C_ut", "", null),
-				new MenuItem ("_Paste", "", null)
+				new MenuItem ("_Paste", "", null),
+				new MenuItem ("_Find and Replace",
+					new MenuBarItem (new MenuItem[] {menuItems [0], menuItems [1] })),
+				menuItems[3]
 			}),
-			 new MenuBarItem ("_List Demos", new MenuItem [] {
+			new MenuBarItem ("_List Demos", new MenuItem [] {
 				new MenuItem ("Select Items", "", ListSelectionDemo),
 			}),
+			new MenuBarItem ("Test Menu and SubMenus", new MenuItem [] {
+				new MenuItem ("SubMenu1Item1",
+					new MenuBarItem (new MenuItem[] {
+						new MenuItem ("SubMenu2Item1",
+							new MenuBarItem (new MenuItem [] {
+								new MenuItem ("SubMenu3Item1",
+									new MenuBarItem (new MenuItem [] { menuItems [2] })
+								)
+							})
+						)
+					})
+				)
+			}),
 		});
+
+		menuKeysStyle = new CheckBox (3, 23, "UseKeysUpDownAsKeysLeftRight", true);
+		menuKeysStyle.Toggled += MenuKeysStyle_Toggled;
 
 		ShowEntries (win);
 
@@ -341,12 +422,12 @@ static class Demo {
 
 			ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
 		};
-		
+
 		var test = new Label (3, 18, "Se iniciará el análisis");
 		win.Add (test);
 		win.Add (ml);
-		
-		// ShowTextAlignments (win);
+
+		ShowTextAlignments (win);
 		top.Add (win);
 		top.Add (menu);
 		Application.Run ();
