@@ -149,8 +149,10 @@ static class Demo {
 			new Button (10, 19, "Cancel"),
 			new TimeField (3, 20, DateTime.Now),
 			new TimeField (23, 20, DateTime.Now, true),
+			new DateField (3, 22, DateTime.Now),
+			new DateField (23, 22, DateTime.Now, true),
 			progress,
-			new Label (3, 22, "Press F9 (on Unix, ESC+9 is an alias) to activate the menubar"),
+			new Label (3, 24, "Press F9 (on Unix, ESC+9 is an alias) to activate the menubar"),
 			menuKeysStyle
 
 		);
@@ -411,7 +413,7 @@ static class Demo {
 			}),
 		});
 
-		menuKeysStyle = new CheckBox (3, 23, "UseKeysUpDownAsKeysLeftRight", true);
+		menuKeysStyle = new CheckBox (3, 25, "UseKeysUpDownAsKeysLeftRight", true);
 		menuKeysStyle.Toggled += MenuKeysStyle_Toggled;
 
 		ShowEntries (win);
