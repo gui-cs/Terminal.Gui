@@ -124,6 +124,20 @@ class Demo {
 }
 ```
 
+Alternatively, you can encapsulate the app behavior in a new `Window`-derived class, 
+say `App.cs` containing the code above, and simplify your `Main` method to:
+
+```csharp
+using Terminal.Gui;
+
+class Demo {
+    static void Main ()
+    {
+        Application.Run<App> ();
+    }
+}
+```
+
 The example above shows how to add views, two styles are used, a very
 nice layout system that I have no name for, but that [is
 documented](https://migueldeicaza.github.io/gui.cs/articles/overview.html#layout),
@@ -163,10 +177,16 @@ milliseconds, or you can press `ESC` twice.
 
 # Driver model
 
-Currently gui.cs has support for both ncurses and the `System.Console`
-front-ends.  ncurses is used on Unix, while `System.Console` is used
-on Windows, but you can force the use of `System.Console` on Unix as
-well, see `Core.cs`.
+Currently gui.cs has support for ncurses, `System.Console` and a full
+Win32 console front-end.
+
+ncurses is used on Unix with color support based on what your library
+is compiled with;   The windows driver supports full color and mouse, and
+an easy-to-debug `System.Console` can be used on Windows and Unix, but
+lacks mouse support.
+
+You can force the use of `System.Console` on Unix as
+well, see `Core.cs`.   
 
 # Tasks
 

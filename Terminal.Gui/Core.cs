@@ -831,7 +831,7 @@ namespace Terminal.Gui {
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
 			if (subviews != null) {
-				foreach (var view in subviews) {
+				foreach (var view in subviews.ToList()) {
 					if (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay) {
 						if (view.Frame.IntersectsWith (clipRect) && view.Frame.IntersectsWith (region)) {
 
@@ -1635,7 +1635,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes the Application
 		/// </summary>
-		public static void Init ()
+		public static void Init () => Init (() => Toplevel.Create ());
+
+		/// <summary>
+		/// Initializes the Application
+		/// </summary>
+		static void Init (Func<Toplevel> topLevelFactory)
 		{
 			if (Top != null)
 				return;
@@ -1657,7 +1662,7 @@ namespace Terminal.Gui {
 			Driver.Init (TerminalResized);
 			MainLoop = new Mono.Terminal.MainLoop (mainLoopDriver);
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
-			Top = Toplevel.Create ();
+			Top = topLevelFactory ();
 			Current = Top;
 		}
 
@@ -1945,6 +1950,15 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void Run ()
 		{
+			Run (Top);
+		}
+
+		/// <summary>
+		/// Runs the application with a new instance of the specified toplevel view
+		/// </summary>
+		public static void Run<T> () where T : Toplevel, new()
+		{
+			Init (() => new T());
 			Run (Top);
 		}
 

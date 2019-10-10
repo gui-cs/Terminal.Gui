@@ -194,7 +194,7 @@ namespace Terminal.Gui {
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			var c = kb.KeyValue;
-			if (c == '\n' || c == ' ' || Rune.ToUpper ((Rune)c) == hot_key) {
+			if (c == '\n' || c == ' ' || Rune.ToUpper ((uint)c) == hot_key) {
 				if (Clicked != null)
 					Clicked ();
 				return true;
