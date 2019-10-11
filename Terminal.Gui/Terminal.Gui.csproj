@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>net472;netcoreapp3.0</TargetFrameworks>
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DebugType>full</DebugType>
@@ -52,17 +52,11 @@
 0.4: hotkey handling fix for RadioButtons
 0.3: Fix Windows key input to not echo characters on console, proper Fkey mapping
 0.2: Auto-detect the best console</PackageReleaseNotes>
-    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
-
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType></DebugType>
   </PropertyGroup>
   <ItemGroup>
-	  <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.5">
-	    <PrivateAssets>all</PrivateAssets>
-	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	  </PackageReference>
 	  <PackageReference Include="NStack.Core" Version="0.12.0" />
 	  <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2">
@@ -75,10 +69,5 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Drivers\#ConsoleDriver.cs#" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Management">
-      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1\System.Management.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>
