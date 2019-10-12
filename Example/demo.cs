@@ -153,7 +153,8 @@ static class Demo {
 			new DateField (23, 22, DateTime.Now, true),
 			progress,
 			new Label (3, 24, "Press F9 (on Unix, ESC+9 is an alias) to activate the menubar"),
-			menuKeysStyle
+			menuKeysStyle,
+			menuAutoMouseNav
 
 		);
 
@@ -234,7 +235,7 @@ static class Demo {
 		var d = new OpenDialog ("Open", "Open a file");
 		Application.Run (d);
 
-		MessageBox.Query (50, 7, "Selected File", string.Join (", ", d.FilePaths), "ok");
+		MessageBox.Query (50, 7, "Selected File", string.Join (", ", d.FilePaths), "Ok");
 	}
 
 	public static void ShowHex (Toplevel top)
@@ -294,7 +295,7 @@ static class Demo {
 		MethodInfo minfo = typeof (MenuItemDetails).GetMethod ("Instance", flags);
 		MenuItemDelegate mid = (MenuItemDelegate)Delegate.CreateDelegate (typeof (MenuItemDelegate), minfo);
 		MessageBox.Query (70, 7, mi.Title.ToString (),
-			$"{mi.Title.ToString ()} selected. Is from submenu: {mi.GetMenuBarItem ()}", "ok");
+			$"{mi.Title.ToString ()} selected. Is from submenu: {mi.GetMenuBarItem ()}", "Ok");
 	}
 
 	private static void MenuKeysStyle_Toggled (object sender, EventArgs e)
@@ -302,6 +303,10 @@ static class Demo {
 		menu.UseKeysUpDownAsKeysLeftRight = menuKeysStyle.Checked;
 	}
 
+	private static void MenuAutoMouseNav_Toggled (object sender, EventArgs e)
+	{
+		menu.WantMousePositionReports = menuAutoMouseNav.Checked;
+	}
 
 
 	#region Selection Demo
@@ -344,6 +349,7 @@ static class Demo {
 	public static Label ml;
 	public static MenuBar menu;
 	public static CheckBox menuKeysStyle;
+	public static CheckBox menuAutoMouseNav;
 	static void Main ()
 	{
 		if (Debugger.IsAttached)
@@ -415,6 +421,8 @@ static class Demo {
 
 		menuKeysStyle = new CheckBox (3, 25, "UseKeysUpDownAsKeysLeftRight", true);
 		menuKeysStyle.Toggled += MenuKeysStyle_Toggled;
+		menuAutoMouseNav = new CheckBox (40, 25, "UseMenuAutoNavigation", true);
+		menuAutoMouseNav.Toggled += MenuAutoMouseNav_Toggled;
 
 		ShowEntries (win);
 

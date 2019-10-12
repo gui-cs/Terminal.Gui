@@ -201,7 +201,7 @@ namespace Terminal.Gui {
 			}
 			ColorScheme = Colors.Menu;
 			CanFocus = true;
-			WantMousePositionReports = true;
+			WantMousePositionReports = host.WantMousePositionReports;
 			selectedSub = -1;
 		}
 
