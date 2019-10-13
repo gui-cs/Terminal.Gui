@@ -162,7 +162,7 @@ class Demo {
 
 	static void Close ()
 	{
-		MessageBox.ErrorQuery (50, 5, "Error", "There is nothing to close", "Ok");
+		MessageBox.ErrorQuery (50, 7, "Error", "There is nothing to close", "Ok");
 	}
 
 	public static Label ml;

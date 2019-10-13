@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Designer", "Designer\Design
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StandaloneExample", "StandaloneExample\StandaloneExample.csproj", "{A37482CC-E3A9-4EE3-B3DB-8DAE3F937DF5}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Unicode", "examples\Unicode\Unicode.csproj", "{D80E7023-0307-4B3F-83BA-DFDE7E747FC8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +48,14 @@ Global
 		{A37482CC-E3A9-4EE3-B3DB-8DAE3F937DF5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A37482CC-E3A9-4EE3-B3DB-8DAE3F937DF5}.Release|x86.ActiveCfg = Release|Any CPU
 		{A37482CC-E3A9-4EE3-B3DB-8DAE3F937DF5}.Release|x86.Build.0 = Release|Any CPU
+		{D80E7023-0307-4B3F-83BA-DFDE7E747FC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D80E7023-0307-4B3F-83BA-DFDE7E747FC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D80E7023-0307-4B3F-83BA-DFDE7E747FC8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D80E7023-0307-4B3F-83BA-DFDE7E747FC8}.Debug|x86.Build.0 = Debug|Any CPU
+		{D80E7023-0307-4B3F-83BA-DFDE7E747FC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D80E7023-0307-4B3F-83BA-DFDE7E747FC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D80E7023-0307-4B3F-83BA-DFDE7E747FC8}.Release|x86.ActiveCfg = Release|Any CPU
+		{D80E7023-0307-4B3F-83BA-DFDE7E747FC8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
