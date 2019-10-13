@@ -165,6 +165,14 @@ class Demo {
 		MessageBox.ErrorQuery (50, 5, "Error", "There is nothing to close", "Ok");
 	}
 
+ 	static void Help() {
+		MessageBox.Query(50, 7, "Help", "This is a small help\nBe kind.", "Ok");
+ 	}
+
+	static void ExitProgram() {
+		if (Quit ()) Application.Top.Running = false;
+	}
+
 	public static Label ml;
 	static void Main ()
 	{
@@ -185,7 +193,7 @@ class Demo {
 				new MenuItem ("_New", "Creates new file", NewFile),
 				new MenuItem ("_Open", "", null),
 				new MenuItem ("_Close", "", () => Close ()),
-				new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
+				new MenuItem ("_Quit", "^X", () => ExitProgram())
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
 				new MenuItem ("_Copy", "", null),
@@ -193,6 +201,14 @@ class Demo {
 				new MenuItem ("_Paste", "", null)
 			})
 		});
+
+		var statusBar = new StatusBar(new StatusItem[] {
+			new StatusItem(Key.F1, "~F1~ Help", () => Help()),
+			new StatusItem(Key.F2, "~F2~ Load", null),
+			new StatusItem(Key.F3, "~F3~ Save", null),
+			new StatusItem(Key.ControlX, "~^X~ Quit", () => ExitProgram()),
+		});
+
 
 		ShowEntries (win);
 		int count = 0;
@@ -203,8 +219,8 @@ class Demo {
 
 		win.Add (ml);
 
-		top.Add (win, menu);
-		top.Add (menu);
+		top.Add (win, menu, statusBar);
+
 		Application.Run ();
 	}
 }
