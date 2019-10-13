@@ -396,6 +396,7 @@ static class Demo {
 				new MenuItem ("_Open", "", Open),
 				new MenuItem ("_Hex", "", () => ShowHex (top)),
 				new MenuItem ("_Close", "", () => Close ()),
+				null,
 				new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
