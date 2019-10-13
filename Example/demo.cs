@@ -45,6 +45,9 @@ static class Demo {
 					Rune r;
 					switch (x % 3) {
 					case 0:
+						Driver.AddRune (y.ToString ().ToCharArray (0, 1) [0]);
+						if (y > 9)
+							Driver.AddRune (y.ToString ().ToCharArray (1, 1) [0]);
 						r = '.';
 						break;
 					case 1:
@@ -82,9 +85,11 @@ static class Demo {
 			ShowVerticalScrollIndicator = true,
 			ShowHorizontalScrollIndicator = true
 		};
-
+#if false
 		scrollView.Add (new Box10x (0, 0));
-		//scrollView.Add (new Filler (new Rect (0, 0, 40, 40)));
+#else	
+		scrollView.Add (new Filler (new Rect (0, 0, 40, 40)));
+#endif
 
 		// This is just to debug the visuals of the scrollview when small
 		var scrollView2 = new ScrollView (new Rect (72, 10, 3, 3)) {

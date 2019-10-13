@@ -84,21 +84,38 @@ namespace Terminal.Gui {
 			//        for month/day/year. This has a 'good' chance of keeping things valid
 			ustring [] vals = text.Split (ustring.Make (sepChar));
 			ustring [] frm = ustring.Make (Format).Split (ustring.Make (sepChar));
+			bool isValidDate = true;
+			int month;
+			int day;
 			int idx = GetFormatIndex (frm, "M");
-			if (Int32.Parse (vals [idx].ToString ()) < 1 || Int32.Parse (vals [idx].ToString ()) > 12)
-				return false;
-			int month = Int32.Parse (vals [idx].ToString ());
+			if (Int32.Parse (vals [idx].ToString ()) < 1) {
+				isValidDate = false;
+				month = 1;
+				vals [idx] = "1";
+			} else if (Int32.Parse (vals [idx].ToString ()) > 12) {
+				isValidDate = false;
+				month = 12;
+				vals [idx] = "12";
+			} else
+				month = Int32.Parse (vals [idx].ToString ());
 			idx = GetFormatIndex (frm, "d");
-			if (Int32.Parse (vals [idx].ToString ()) < 1 || Int32.Parse (vals [idx].ToString ()) > 31)
-				return false;
-			int day = Int32.Parse (vals [idx].ToString ());
+			if (Int32.Parse (vals [idx].ToString ()) < 1) {
+				isValidDate = false;
+				day = 1;
+				vals [idx] = "1";
+			} else if (Int32.Parse (vals [idx].ToString ()) > 31) {
+				isValidDate = false;
+				day = 31;
+				vals [idx] = "31";
+			} else
+				day = Int32.Parse (vals [idx].ToString ());
 			idx = GetFormatIndex (frm, "y");
 			int year = Int32.Parse (vals [idx].ToString ());
 			string date = GetData (month, day, year, frm);
+			Text = date;
 
 			if (!DateTime.TryParseExact (date, Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result)) 
 				return false;
-			Text = date;
 			return true;
 		}
 
