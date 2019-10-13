@@ -506,7 +506,8 @@ namespace Terminal.Gui {
 			tokenSource.Dispose();
 			tokenSource = new CancellationTokenSource();
 			try {
-				eventReady.Wait(waitTimeout, tokenSource.Token);
+				if(!tokenSource.IsCancellationRequested)
+					eventReady.Wait(waitTimeout, tokenSource.Token);
 			} catch (OperationCanceledException) {
 				return true;
 			} finally {
