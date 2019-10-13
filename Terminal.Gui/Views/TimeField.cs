@@ -26,8 +26,8 @@ namespace Terminal.Gui {
 		int shortFieldLen = 5;
 		int FieldLen { get { return isShort ? shortFieldLen : longFieldLen; } }
 
-		string longFormat = " hh:mm:ss";
-		string shortFormat = " hh:mm";
+		string longFormat = " HH:mm:ss";
+		string shortFormat = " HH:mm";
 		string Format { get { return isShort ? shortFormat : longFormat; } }
 
 

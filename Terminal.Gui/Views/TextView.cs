@@ -27,7 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using NStack;
 
 namespace Terminal.Gui {
@@ -111,7 +110,7 @@ namespace Terminal.Gui {
 
 		public override string ToString ()
 		{
-			var sb = new StringBuilder ();
+			var sb = new System.Text.StringBuilder ();
 			foreach (var line in lines) 
 			{
 				sb.Append (ustring.Make(line));
