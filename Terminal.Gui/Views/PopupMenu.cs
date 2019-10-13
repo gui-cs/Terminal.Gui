@@ -17,6 +17,7 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			current = 0;
 			//previousFocused = SuperView.Focused;
+			WantMousePositionReports = true;
 		}
 
 		void SetTitle (ustring title)
@@ -74,6 +75,12 @@ namespace Terminal.Gui {
 				Move (Frame.Width - l - 2, 1 + i);
 				Driver.AddStr (item.Help);
 			}
+			PositionCursor ();
+		}
+
+		public override void PositionCursor ()
+		{
+			Move (2, 1 + current);
 		}
 
 		public override bool ProcessKey (KeyEvent kb)
@@ -90,6 +97,7 @@ namespace Terminal.Gui {
 				if (current== Children.Length)
 					current = 0;
 				SetNeedsDisplay ();
+
 				break;
 			case Key.Esc:
 				CloseMenu ();
@@ -134,7 +142,8 @@ namespace Terminal.Gui {
 				Run (Children [item].Action);
 				return true;
 			}
-			if (me.Flags == MouseFlags.Button1Pressed) {
+			if (me.Flags == MouseFlags.Button1Pressed ||
+				me.Flags == MouseFlags.ReportMousePosition) {
 				if (me.Y < 1)
 					return true;
 				if (me.Y - 1 >= Children.Length)

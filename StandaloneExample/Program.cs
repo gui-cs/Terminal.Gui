@@ -68,7 +68,7 @@ class Demo {
 		var popup = new PopupMenu(22, 4, "Popup", new MenuItem [] {
 				new MenuItem ("_Configuration", "Show configuration", NewFile),
 				new MenuItem ("_Setup", "Change settings", () => {
-					MessageBox.Query (50, 5, "Info", "This would open settings dialog", "Ok");
+					MessageBox.Query (50, 7, "Info", "This would open settings dialog", "Ok");
 				}),
 				new MenuItem ("_Maintenance", "Maintenance mode", null),
 				new MenuItem ("_Quit", "", () => { if (Quit ()) Application.Top.Running = false; })
