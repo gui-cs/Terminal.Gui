@@ -181,6 +181,7 @@ namespace Terminal.Gui {
 			int maxW = 0;
 
 			foreach (var item in items) {
+				if (item == null) continue;
 				var l = item.Width;
 				maxW = Math.Max (l, maxW);
 			}
@@ -218,10 +219,16 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (ColorScheme.Normal);
 			DrawFrame (region, padding: 0, fill: true);
 
-			for (int i = 0; i < barItems.Children.Length; i++){
+			for (int i = 0; i < barItems.Children.Length; i++) {
 				var item = barItems.Children [i];
-				Move (1, i+1);
-				Driver.SetAttribute (item == null ? Colors.Base.Focus : i == current ? ColorScheme.Focus : ColorScheme.Normal);
+				Driver.SetAttribute (item == null ? ColorScheme.Normal : i == current ? ColorScheme.Focus : ColorScheme.Normal);
+				if (item == null) {
+					Move (0, i + 1);
+					Driver.AddRune (Driver.LeftTee);
+				} else
+					Move (1, i+1);
+
+				//Driver.SetAttribute (item == null ? Colors.Base.Focus : i == current ? ColorScheme.Focus : ColorScheme.Normal);
 				for (int p = 0; p < Frame.Width - 2; p++)
 					if (item == null)
 						Driver.AddRune (Driver.HLine);
@@ -230,8 +237,11 @@ namespace Terminal.Gui {
 					else
 						Driver.AddRune (' ');
 
-				if (item == null)
+				if (item == null) {
+					Move (region.Right - 1, i + 1);
+					Driver.AddRune (Driver.RightTee);
 					continue;
+				}
 
 				Move (2, i + 1);
 				DrawHotString (item.Title,
@@ -290,12 +300,10 @@ namespace Terminal.Gui {
 					current++;
 					if (current == barItems.Children.Length)
 						current = 0;
-					if (host.UseKeysUpDownAsKeysLeftRight) {
+					if (host.UseKeysUpDownAsKeysLeftRight && barItems.Children [current] != null) {
 						CheckSubMenu ();
 						break;
 
-					}
-					if (barItems.Children [current].SubMenu != null) {
 					}
 				} while (barItems.Children [current] == null);
 				SetNeedsDisplay ();
@@ -320,6 +328,7 @@ namespace Terminal.Gui {
 					var x = Char.ToUpper ((char)kb.KeyValue);
 
 					foreach (var item in barItems.Children) {
+						if (item == null) continue;
 						if (item.HotKey == x) {
 							host.CloseMenu ();
 							Run (item.Action);
@@ -349,7 +358,8 @@ namespace Terminal.Gui {
 					return true;
 				if (me.Y - 1 >= barItems.Children.Length)
 					return true;
-				current = me.Y - 1;
+				if (barItems.Children [me.Y - 1] != null)
+					current = me.Y - 1;
 				HasFocus = true;
 				SetNeedsDisplay ();
 				CheckSubMenu ();
@@ -360,6 +370,8 @@ namespace Terminal.Gui {
 
 		private void CheckSubMenu ()
 		{
+			if (barItems.Children [current] == null)
+				return;
 			var subMenu = barItems.Children [current].SubMenu;
 			if (subMenu != null) {
 				int pos = -1;
