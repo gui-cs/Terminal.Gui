@@ -27,11 +27,13 @@ namespace Terminal.Gui {
 		/// <param name="title">Title for the menu item.</param>
 		/// <param name="help">Help text to display.</param>
 		/// <param name="action">Action to invoke when the menu item is activated.</param>
-		public MenuItem (ustring title, string help, Action action)
+		/// <param name="canExecute">Function to determine if the action can currently be executred.</param>
+		public MenuItem (ustring title, string help, Action action, Func<bool> canExecute = null)
 		{
 			Title = title ?? "";
 			Help = help ?? "";
 			Action = action;
+			CanExecute = canExecute;
 			bool nextIsHot = false;
 			foreach (var x in Title) {
 				if (x == '_')
@@ -84,6 +86,21 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>Method to invoke.</value>
 		public Action Action { get; set; }
+
+		/// <summary>
+		/// Gets or sets the action to be invoked if the menu can be triggered
+		/// </summary>
+		/// <value>Function to determine if action is ready to be executed.</value>
+		public Func<bool> CanExecute { get; set; }
+
+		/// <summary>
+		/// Shortcut to check if the menu item is enabled
+		/// </summary>
+		public bool IsEnabled ()
+		{
+			return CanExecute == null ? true : CanExecute ();
+		}
+
 		internal int Width => Title.Length + Help.Length + 1 + 2;
 
 		/// <summary>
@@ -206,6 +223,15 @@ namespace Terminal.Gui {
 			selectedSub = -1;
 		}
 
+		internal Attribute DetermineColorSchemeFor (MenuItem item, int index)
+		{
+			if (item != null) {
+				if (index == current) return ColorScheme.Focus;
+				if (!item.IsEnabled ()) return ColorScheme.Disabled;
+			}
+			return ColorScheme.Normal;
+		}
+
 		public override void Redraw (Rect region)
 		{
 			if ((!HasFocus && openSubMenu == null && GetSubMenuIndex (previousSubFocused) == -1) || !HasFocus && GetSubMenuIndex(previousSubFocused) == -1 && !host.HasFocus && openSubMenu != null) {
@@ -228,7 +254,7 @@ namespace Terminal.Gui {
 				} else
 					Move (1, i+1);
 
-				//Driver.SetAttribute (item == null ? Colors.Base.Focus : i == current ? ColorScheme.Focus : ColorScheme.Normal);
+				Driver.SetAttribute (DetermineColorSchemeFor (item, i));
 				for (int p = 0; p < Frame.Width - 2; p++)
 					if (item == null)
 						Driver.AddRune (Driver.HLine);
@@ -244,7 +270,10 @@ namespace Terminal.Gui {
 				}
 
 				Move (2, i + 1);
-				DrawHotString (item.Title,
+				if (!item.IsEnabled ())
+					DrawHotString (item.Title, ColorScheme.Disabled, ColorScheme.Disabled);
+				else
+					DrawHotString (item.Title,
 				               i == current? ColorScheme.HotFocus : ColorScheme.HotNormal,
 				               i == current ? ColorScheme.Focus : ColorScheme.Normal);
 
@@ -276,11 +305,13 @@ namespace Terminal.Gui {
 
 		public override bool ProcessKey (KeyEvent kb)
 		{
+			bool disabled;
 			switch (kb.Key) {
 			case Key.CursorUp:
 				if (current == -1)
 					break;
 				do {
+					disabled = false;
 					current--;
 					if (host.UseKeysUpDownAsKeysLeftRight) {
 						if (current == -1 && barItems.Children [current + 1].IsFromSubMenu && selectedSub > -1) {
@@ -289,23 +320,26 @@ namespace Terminal.Gui {
 							break;
 						}
 					}
-					if (current < 0) {
+					if (current < 0)
 						current = barItems.Children.Length - 1;
-					}
-				} while (barItems.Children [current] == null);
+					var item = barItems.Children [current];
+					if (!item.IsEnabled ()) disabled = true;
+				} while (barItems.Children [current] == null || disabled);
 				SetNeedsDisplay ();
 				break;
 			case Key.CursorDown:
 				do {
 					current++;
+					disabled = false;
 					if (current == barItems.Children.Length)
 						current = 0;
-					if (host.UseKeysUpDownAsKeysLeftRight && barItems.Children [current] != null) {
+					var item = barItems.Children [current];
+					if (!item.IsEnabled ()) disabled = true;
+					if (host.UseKeysUpDownAsKeysLeftRight && barItems.Children [current] != null && !disabled) {
 						CheckSubMenu ();
 						break;
-
 					}
-				} while (barItems.Children [current] == null);
+				} while (barItems.Children [current] == null || disabled);
 				SetNeedsDisplay ();
 				break;
 			case Key.CursorLeft:
@@ -329,7 +363,7 @@ namespace Terminal.Gui {
 
 					foreach (var item in barItems.Children) {
 						if (item == null) continue;
-						if (item.HotKey == x) {
+						if (item.IsEnabled () && item.HotKey == x) {
 							host.CloseMenu ();
 							Run (item.Action);
 							return true;
@@ -343,22 +377,30 @@ namespace Terminal.Gui {
 
 		public override bool MouseEvent(MouseEvent me)
 		{
+			bool disabled;
 			if (me.Flags == MouseFlags.Button1Clicked || me.Flags == MouseFlags.Button1Released) {
+				disabled = false;
 				if (me.Y < 1)
 					return true;
-				var item = me.Y - 1;
-				if (item >= barItems.Children.Length)
+				var meY = me.Y - 1;
+				if (meY >= barItems.Children.Length)
 					return true;
-				Run (barItems.Children [item].Action);
+				var item = barItems.Children [meY];
+				if (!item.IsEnabled ()) disabled = true;
+				if (item != null && !disabled)
+					Run (barItems.Children [meY].Action);
 				return true;
 			}
 			if (me.Flags == MouseFlags.Button1Pressed ||
 				me.Flags == MouseFlags.ReportMousePosition) {
+				disabled = false;
 				if (me.Y < 1)
 					return true;
 				if (me.Y - 1 >= barItems.Children.Length)
 					return true;
-				if (barItems.Children [me.Y - 1] != null)
+				var item = barItems.Children [me.Y - 1];
+				if (!item.IsEnabled ()) disabled = true;
+				if (item != null && !disabled)
 					current = me.Y - 1;
 				HasFocus = true;
 				SetNeedsDisplay ();

@@ -162,7 +162,7 @@ class Demo {
 
 	static void Close ()
 	{
-		MessageBox.ErrorQuery (50, 5, "Error", "There is nothing to close", "Ok");
+		MessageBox.ErrorQuery (50, 7, "Error", "There is nothing to close", "Ok");
 	}
 
  	static void Help() {
@@ -192,8 +192,8 @@ class Demo {
 			new MenuBarItem ("_File", new MenuItem [] {
 				new MenuItem ("_New", "Creates new file", NewFile),
 				new MenuItem ("_Open", "", null),
-				new MenuItem ("_Close", "", () => Close ()),
-				new MenuItem ("_Quit", "^X", () => ExitProgram())
+				new MenuItem ("_Close", "", () => Close (), () => false),
+					new MenuItem ("_Quit", "^X", () => ExitProgram())
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
 				new MenuItem ("_Copy", "", null),
