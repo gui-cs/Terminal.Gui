@@ -114,7 +114,8 @@ namespace Terminal.Gui {
 			string date = GetData (month, day, year, frm);
 			Text = date;
 
-			if (!DateTime.TryParseExact (date, Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result)) 
+			if (!DateTime.TryParseExact (date, Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result) ||
+				!isValidDate) 
 				return false;
 			return true;
 		}
