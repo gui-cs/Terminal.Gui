@@ -418,7 +418,6 @@ namespace Terminal.Gui {
 		ManualResetEventSlim eventReady = new ManualResetEventSlim(false);
 		ManualResetEventSlim waitForProbe = new ManualResetEventSlim(false);
 		MainLoop mainLoop;
-		Action TerminalResized;
 		WindowsConsole.CharInfo [] OutputBuffer;
 		int cols, rows;
 		WindowsConsole winConsole;
@@ -488,23 +487,15 @@ namespace Terminal.Gui {
 
 		bool IMainLoopDriver.EventsPending (bool wait)
 		{
-			long now = DateTime.UtcNow.Ticks;
-
-			int waitTimeout;
-			if (mainLoop.timeouts.Count > 0) {
-				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-				if (waitTimeout < 0)
-					return true;
-			} else
-				waitTimeout = -1;
+			if (mainLoop.IsTimeoutPending(out var waitTimeout))
+				return true;
 
 			if (!wait)
 				waitTimeout = 0;
 
 			result = null;
 			waitForProbe.Set();
-			tokenSource.Dispose();
-			tokenSource = new CancellationTokenSource();
+
 			try {
 				if(!tokenSource.IsCancellationRequested)
 					eventReady.Wait(waitTimeout, tokenSource.Token);
@@ -514,7 +505,13 @@ namespace Terminal.Gui {
 				eventReady.Reset();
 			}
 			Debug.WriteLine("Events ready");
-			return result != null || tokenSource.IsCancellationRequested;
+
+			if (!tokenSource.IsCancellationRequested)
+				return result != null;
+
+			tokenSource.Dispose();
+			tokenSource = new CancellationTokenSource();
+			return true;
 		}
 
 		Action<KeyEvent> keyHandler;
@@ -552,7 +549,7 @@ namespace Terminal.Gui {
 				rows = inputEvent.WindowBufferSizeEvent.size.Y - 1;
 				ResizeScreen ();
 				UpdateOffScreen ();
-				TerminalResized ();
+				TerminalResized?.Invoke();
 				break;
 			}
 			result = null;
