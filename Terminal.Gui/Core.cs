@@ -1708,15 +1708,22 @@ namespace Terminal.Gui {
 
 		static void ProcessKeyEvent (KeyEvent ke)
 		{
-			if (Current.ProcessHotKey (ke))
-				return;
+			var chain = toplevels.ToList();
+			foreach (var topLevel in chain) {
+				if (topLevel.ProcessHotKey (ke))
+					return;
+			}
 
-			if (Current.ProcessKey (ke))
-				return;
-			
-			// Process the key normally
-			if (Current.ProcessColdKey (ke))
-				return;
+			foreach (var topLevel in chain) {
+				if (topLevel.ProcessKey (ke))
+					return;
+			}
+
+			foreach (var topLevel in chain) {
+				// Process the key normally
+				if (topLevel.ProcessColdKey (ke))
+					return;
+			}
 		}
 
 		static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
