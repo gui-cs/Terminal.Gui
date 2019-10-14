@@ -165,11 +165,8 @@ namespace Terminal.Gui {
 		{
 			if (action == null)
 				return;
-			
-			Application.MainLoop.AddIdle (() => {
-				action ();
-				return false;
-			});
+
+			Application.MainLoop.AddIdle (action);
 		}
 
 		static Rect MakeFrame (int x, int y, MenuItem [] items)

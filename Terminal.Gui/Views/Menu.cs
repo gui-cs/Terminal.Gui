@@ -295,12 +295,9 @@ namespace Terminal.Gui {
 			if (action == null)
 				return;
 
-			Application.MainLoop.AddIdle (() => {
-				action ();
+			Application.MainLoop.AddIdle (action);
 				CloseSubMenu();
 				host.CloseMenu ();
-				return false;
-			});
 		}
 
 		public override bool ProcessKey (KeyEvent kb)
@@ -323,7 +320,7 @@ namespace Terminal.Gui {
 					if (current < 0)
 						current = barItems.Children.Length - 1;
 					var item = barItems.Children [current];
-					if (!item.IsEnabled ()) disabled = true;
+					if (item == null || !item.IsEnabled ()) disabled = true;
 				} while (barItems.Children [current] == null || disabled);
 				SetNeedsDisplay ();
 				break;
@@ -334,7 +331,7 @@ namespace Terminal.Gui {
 					if (current == barItems.Children.Length)
 						current = 0;
 					var item = barItems.Children [current];
-					if (!item.IsEnabled ()) disabled = true;
+					if (item == null || !item.IsEnabled ()) disabled = true;
 					if (host.UseKeysUpDownAsKeysLeftRight && barItems.Children [current] != null && !disabled) {
 						CheckSubMenu ();
 						break;
@@ -386,7 +383,7 @@ namespace Terminal.Gui {
 				if (meY >= barItems.Children.Length)
 					return true;
 				var item = barItems.Children [meY];
-				if (!item.IsEnabled ()) disabled = true;
+				if (item == null || !item.IsEnabled ()) disabled = true;
 				if (item != null && !disabled)
 					Run (barItems.Children [meY].Action);
 				return true;
@@ -399,7 +396,7 @@ namespace Terminal.Gui {
 				if (me.Y - 1 >= barItems.Children.Length)
 					return true;
 				var item = barItems.Children [me.Y - 1];
-				if (!item.IsEnabled ()) disabled = true;
+				if (item == null || !item.IsEnabled ()) disabled = true;
 				if (item != null && !disabled)
 					current = me.Y - 1;
 				HasFocus = true;
@@ -620,11 +617,14 @@ namespace Terminal.Gui {
 			action = item.Action;
 		}
 
+		public event EventHandler OnOpenMenu;
 		internal Menu openMenu;
 		View previousFocused;
 
 		void OpenMenu (int index)
 		{
+			OnOpenMenu?.Invoke (this, null);
+
 			if (openMenu != null) {
 				openMenu.CloseSubMenu ();
 				SuperView.Remove (openMenu);
