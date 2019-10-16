@@ -546,6 +546,82 @@ namespace Terminal.Gui {
 			}
 		}
 
+		void PerformActionForSubview (View subview, Action<View> action)
+		{
+			if (subviews.Contains (subview)) {
+				action (subview);
+			}
+
+			SetNeedsDisplay ();
+			subview.SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Brings the specified subview to the front so it is drawn on top of any other views.
+		/// </summary>
+		/// <param name="subview">The subview to send to the front</param>
+		/// <remarks>
+		///   <seealso cref="SendSubviewToBack"/>.
+		/// </remarks>
+		public void BringSubviewToFront (View subview)
+		{
+			PerformActionForSubview (subview, x => {
+				subviews.Remove (x);
+				subviews.Add (x);
+			});
+		}
+
+		/// <summary>
+		/// Sends the specified subview to the front so it is the first view drawn
+		/// </summary>
+		/// <param name="subview">The subview to send to the front</param>
+		/// <remarks>
+		///   <seealso cref="BringSubviewToFront(View)"/>.
+		/// </remarks>
+		public void SendSubviewToBack (View subview)
+		{
+			PerformActionForSubview (subview, x => {
+				subviews.Remove (x);
+				subviews.Insert (0, subview);
+			});
+		}
+
+		/// <summary>
+		/// Moves the subview backwards in the hierarchy, only one step
+		/// </summary>
+		/// <param name="subview">The subview to send backwards</param>
+		/// <remarks>
+		/// If you want to send the view all the way to the back use SendSubviewToBack.
+		/// </remarks>
+		public void SendSubviewBackwards (View subview)
+		{
+			PerformActionForSubview (subview, x => {
+				var idx = subviews.IndexOf (x);
+				if (idx > 0) {
+					subviews.Remove (x);
+					subviews.Insert (idx - 1, x);
+				}
+			});
+		}
+
+		/// <summary>
+		/// Moves the subview backwards in the hierarchy, only one step
+		/// </summary>
+		/// <param name="subview">The subview to send backwards</param>
+		/// <remarks>
+		/// If you want to send the view all the way to the back use SendSubviewToBack.
+		/// </remarks>
+		public void BringSubviewForward (View subview)
+		{
+			PerformActionForSubview (subview, x => {
+				var idx = subviews.IndexOf (x);
+				if (idx+1 < subviews.Count) {
+					subviews.Remove (x);
+					subviews.Insert (idx+1, x);
+				}
+			});
+		}
+
 		/// <summary>
 		///   Clears the view region with the current color.
 		/// </summary>
