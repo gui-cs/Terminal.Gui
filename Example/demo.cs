@@ -356,7 +356,7 @@ static class Demo {
 		TextField textField = menu.LastFocused as TextField;
 		if (textField != null) {
 			string actualText = textField.Text.ToString ();
-			int start = textField.SelStart == -1 ? 0 : textField.SelStart;
+			int start = textField.SelStart == -1 ? textField.CursorPosition : textField.SelStart;
 			string newText = actualText.Substring (0, start) + 
 				Clipboard.Contents.ToString() +
 				actualText.Substring (start + textField.SelLength, actualText.Length - start - textField.SelLength);
