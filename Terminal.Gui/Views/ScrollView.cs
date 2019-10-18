@@ -365,7 +365,7 @@ namespace Terminal.Gui {
 
 		public override void PositionCursor()
 		{
-			if (InternalSubviews.Count == 0)
+			if (Subviews.Count == 0)
 				Driver.Move (0, 0);
 			else
 				base.PositionCursor ();

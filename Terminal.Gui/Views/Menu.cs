@@ -295,9 +295,12 @@ namespace Terminal.Gui {
 			if (action == null)
 				return;
 
-			Application.MainLoop.AddIdle (action);
-				CloseSubMenu();
+			Application.MainLoop.AddIdle (() => {
+				action ();
+				CloseSubMenu ();
 				host.CloseMenu ();
+				return false;
+			});
 		}
 
 		public override bool ProcessKey (KeyEvent kb)

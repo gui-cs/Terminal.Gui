@@ -253,8 +253,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The subviews.</value>
 		public IList<View> Subviews => subviews == null ? empty : subviews.AsReadOnly ();
-		internal IList<View> InternalSubviews => subviews ?? empty;
-
 		internal Rect NeedDisplay { get; private set; } = Rect.Empty;
 
 		// The frame for the object
@@ -300,7 +298,7 @@ namespace Terminal.Gui {
 		/// <returns>The enumerator.</returns>
 		public IEnumerator GetEnumerator ()
 		{
-			foreach (var v in InternalSubviews)
+			foreach (var v in Subviews)
 				yield return v;
 		}
 
@@ -1147,7 +1145,7 @@ namespace Terminal.Gui {
 			var nodes = new HashSet<View> ();
 			var edges = new HashSet<(View, View)> ();
 
-			foreach (var v in InternalSubviews) {
+			foreach (var v in Subviews) {
 				nodes.Add (v);
 				if (v.LayoutStyle == LayoutStyle.Computed) {
 					if (v.X is Pos.PosView)
@@ -1436,7 +1434,7 @@ namespace Terminal.Gui {
 			var touched = view.Frame;
 			contentView.Remove (view);
 
-			if (contentView.InternalSubviews.Count < 1)
+			if (contentView.Subviews.Count < 1)
 				this.CanFocus = false;
 		}
 
@@ -1616,8 +1614,9 @@ namespace Terminal.Gui {
 
 			public override void Post (SendOrPostCallback d, object state)
 			{
-				mainLoop.AddIdle (() => { 
+				mainLoop.AddIdle (() => {
 					d (state);
+					return false;
 				});
 			}
 
@@ -1736,13 +1735,13 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			if (start.InternalSubviews != null){
-				int count = start.InternalSubviews.Count;
+			if (start.Subviews != null){
+				int count = start.Subviews.Count;
 				if (count > 0) {
 					var rx = x - startFrame.X;
 					var ry = y - startFrame.Y;
 					for (int i = count - 1; i >= 0; i--) {
-						View v = start.InternalSubviews [i];
+						View v = start.Subviews [i];
 						if (v.Frame.Contains (rx, ry)) {
 							var deep = FindDeepestView (v, rx, ry, out resx, out resy);
 							if (deep == null)
@@ -1957,8 +1956,8 @@ namespace Terminal.Gui {
 		static void DrawBounds (View v)
 		{
 			v.DrawFrame (v.Frame, padding: 0, fill: false);
-			if (v.InternalSubviews != null && v.InternalSubviews.Count > 0)
-				foreach (var sub in v.InternalSubviews)
+			if (v.Subviews != null && v.Subviews.Count > 0)
+				foreach (var sub in v.Subviews)
 					DrawBounds (sub);
 		}
 

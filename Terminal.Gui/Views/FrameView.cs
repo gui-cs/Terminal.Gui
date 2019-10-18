@@ -97,7 +97,7 @@ namespace Terminal.Gui {
 			var touched = view.Frame;
 			contentView.Remove (view);
 
-			if (contentView.InternalSubviews.Count < 1)
+			if (contentView.Subviews.Count < 1)
 				this.CanFocus = false;
 		}
 
