@@ -400,11 +400,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		Button4TripleClicked = unchecked((int)0x400000),
 		/// <summary>
-		/// The fourth button was pressed.
+		/// Flag: the shift key was pressed when the mouse button took place.
 		/// </summary>
 		ButtonShift = unchecked((int)0x2000000),
 		/// <summary>
-		/// Flag: the shift key was pressed when the mouse button took place.
+		/// Flag: the ctrl key was pressed when the mouse button took place.
 		/// </summary>
 		ButtonCtrl = unchecked((int)0x1000000),
 		/// <summary>
@@ -415,6 +415,10 @@ namespace Terminal.Gui {
 		/// The mouse position is being reported in this event.
 		/// </summary>
 		ReportMousePosition = unchecked((int)0x8000000),
+		/// <summary>
+		/// Vertical button wheeled.
+		/// </summary>
+		ButtonWheeled = unchecked((int)0x4040),
 		/// <summary>
 		/// Mask that captures all the events.
 		/// </summary>

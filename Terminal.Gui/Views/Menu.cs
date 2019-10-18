@@ -295,12 +295,15 @@ namespace Terminal.Gui {
 			if (action == null)
 				return;
 
+			CloseSubMenu ();
+			host.CloseMenu ();
+
 			Application.MainLoop.AddIdle (() => {
 				action ();
-				CloseSubMenu ();
-				host.CloseMenu ();
 				return false;
 			});
+
+
 		}
 
 		public override bool ProcessKey (KeyEvent kb)
@@ -624,8 +627,13 @@ namespace Terminal.Gui {
 		internal Menu openMenu;
 		View previousFocused;
 
+		View lastFocused;
+		public View LastFocused { get; set; }
+
 		void OpenMenu (int index)
 		{
+			lastFocused = lastFocused ?? SuperView.MostFocused;
+
 			OnOpenMenu?.Invoke (this, null);
 
 			if (openMenu != null) {
@@ -673,6 +681,9 @@ namespace Terminal.Gui {
 			SuperView.Remove (openMenu);
 			previousFocused?.SuperView?.SetFocus (previousFocused);
 			openMenu = null;
+			LastFocused = lastFocused;
+			lastFocused = null;
+			LastFocused?.SuperView?.SetFocus (LastFocused);
 		}
 
 		internal void PreviousMenu ()

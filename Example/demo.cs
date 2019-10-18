@@ -313,6 +313,59 @@ static class Demo {
 		menu.WantMousePositionReports = menuAutoMouseNav.Checked;
 	}
 
+	//private static TextField GetTextFieldSelText (View vt)
+	//{
+	//	TextField textField;
+	//	foreach (View v in vt.Subviews) {
+	//		if (v is TextField && ((TextField)v).SelText != "")
+	//			return v as TextField;
+	//		else
+	//			textField = GetTextFieldSelText (v);
+	//		if (textField != null)
+	//			return textField;
+	//	}
+	//	return null;
+	//}
+
+	private static void Copy ()
+	{
+		TextField textField = menu.LastFocused as TextField;
+		if (textField != null && textField.SelLength > 0) {
+			Clipboard.Contents = textField.SelText;
+			textField.SelLength = 0;
+			textField.SetNeedsDisplay ();
+		}
+	}
+
+	private static void Cut ()
+	{
+		TextField textField = menu.LastFocused as TextField;
+		if (textField != null && textField.SelLength > 0) {
+			Clipboard.Contents = textField.SelText;
+			string actualText = textField.Text.ToString ();
+			string newText = actualText.Substring (0, textField.SelStart) + 
+				actualText.Substring (textField.SelStart + textField.SelLength, actualText.Length - textField.SelStart - textField.SelLength);
+			textField.Text = newText;
+			textField.SelLength = 0;
+			textField.SetNeedsDisplay ();
+		}
+	}
+
+	private static void Paste ()
+	{
+		TextField textField = menu.LastFocused as TextField;
+		if (textField != null) {
+			string actualText = textField.Text.ToString ();
+			int start = textField.SelStart == -1 ? 0 : textField.SelStart;
+			string newText = actualText.Substring (0, start) + 
+				Clipboard.Contents.ToString() +
+				actualText.Substring (start + textField.SelLength, actualText.Length - start - textField.SelLength);
+			textField.Text = newText;
+			textField.SelLength = 0;
+			textField.SetNeedsDisplay ();
+		}
+	}
+
 
 	#region Selection Demo
 
@@ -400,9 +453,9 @@ static class Demo {
 				new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
-				new MenuItem ("_Copy", "", null),
-				new MenuItem ("C_ut", "", null),
-				new MenuItem ("_Paste", "", null),
+				new MenuItem ("_Copy", "", Copy),
+				new MenuItem ("C_ut", "", Cut),
+				new MenuItem ("_Paste", "", Paste),
 				new MenuItem ("_Find and Replace",
 					new MenuBarItem (new MenuItem[] {menuItems [0], menuItems [1] })),
 				menuItems[3]

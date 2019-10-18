@@ -46,6 +46,13 @@ namespace Terminal.Gui {
 			this.isShort = isShort;
 			CursorPosition = 1;
 			Date = date;
+			Changed += DateField_Changed;
+		}
+
+		private void DateField_Changed (object sender, ustring e)
+		{
+			if (!DateTime.TryParseExact (Text.ToString (), Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
+				Text = e;
 		}
 
 		string GetShortFormat (string lf)

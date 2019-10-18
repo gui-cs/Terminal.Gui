@@ -561,7 +561,9 @@ namespace Terminal.Gui {
 
 		private MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
-			MouseFlags mouseFlag = MouseFlags.AllEvents;
+			MouseFlags mouseFlag = 0;
+
+
 
 			// The ButtonState member of the MouseEvent structure has bit corresponding to each mouse button.
 			// This will tell when a mouse button is pressed. When the button is released this event will
@@ -572,7 +574,8 @@ namespace Terminal.Gui {
 				LastMouseButtonPressed = null;
 			}
 
-			if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null) {
+			if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null ||
+				mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved && mouseEvent.ButtonState != 0) {
 				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Pressed;
@@ -582,8 +585,8 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button2Pressed;
 					break;
 
-				case WindowsConsole.ButtonState.Button3Pressed:
-					mouseFlag = MouseFlags.Button3Pressed;
+				case WindowsConsole.ButtonState.RightmostButtonPressed:
+					mouseFlag = MouseFlags.Button4Pressed;
 					break;
 				}
 				LastMouseButtonPressed = mouseEvent.ButtonState;
@@ -597,10 +600,13 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button2Clicked;
 					break;
 
-				case WindowsConsole.ButtonState.Button3Pressed:
-					mouseFlag = MouseFlags.Button3Clicked;
+				case WindowsConsole.ButtonState.RightmostButtonPressed:
+					mouseFlag = MouseFlags.Button4Clicked;
 					break;
 				}
+				LastMouseButtonPressed = null;
+			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseWheeled) {
+				mouseFlag = MouseFlags.ButtonWheeled;
 				LastMouseButtonPressed = null;
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 				mouseFlag = MouseFlags.ReportMousePosition;

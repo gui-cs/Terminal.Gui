@@ -43,6 +43,13 @@ namespace Terminal.Gui {
 			this.isShort = isShort;
 			CursorPosition = 1;
 			Time = time;
+			Changed += TimeField_Changed;
+		}
+
+		private void TimeField_Changed (object sender, ustring e)
+		{
+			if (!DateTime.TryParseExact (Text.ToString (), Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
+				Text = e;
 		}
 
 		/// <summary>
