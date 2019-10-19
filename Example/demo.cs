@@ -347,6 +347,7 @@ static class Demo {
 				actualText.Substring (textField.SelStart + textField.SelLength, actualText.Length - textField.SelStart - textField.SelLength);
 			textField.Text = newText;
 			textField.SelLength = 0;
+			textField.CursorPosition = textField.SelStart == -1 ? textField.CursorPosition : textField.SelStart;
 			textField.SetNeedsDisplay ();
 		}
 	}
