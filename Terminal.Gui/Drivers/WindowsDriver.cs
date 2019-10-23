@@ -488,15 +488,8 @@ namespace Terminal.Gui {
 
 		bool IMainLoopDriver.EventsPending (bool wait)
 		{
-			long now = DateTime.UtcNow.Ticks;
-
-			int waitTimeout;
-			if (mainLoop.timeouts.Count > 0) {
-				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-				if (waitTimeout < 0)
-					return true;
-			} else
-				waitTimeout = -1;
+			if (mainLoop.IsTimeoutPending(out var waitTimeout))
+				return true;
 
 			if (!wait)
 				waitTimeout = 0;

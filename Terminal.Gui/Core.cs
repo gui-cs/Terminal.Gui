@@ -1691,7 +1691,6 @@ namespace Terminal.Gui {
 			{
 				mainLoop.AddIdle (() => { 
 					d (state);
-					return false;
 				});
 			}
 

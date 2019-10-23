@@ -192,29 +192,21 @@ namespace Mono.Terminal {
 			}
 		}
 
-		bool IMainLoopDriver.EventsPending (bool wait) 
+		bool IMainLoopDriver.EventsPending (bool wait)
 		{
-			long now = DateTime.UtcNow.Ticks;
-
-			int pollTimeout, n;
-			if (mainLoop.timeouts.Count > 0) {
-				pollTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-				if (pollTimeout < 0)
-					return true;
-
-			} else
-				pollTimeout = -1;
+			if (mainLoop.IsTimeoutPending(out var pollTimeout))
+				return true;
 
 			if (!wait)
 				pollTimeout = 0;
 
 			UpdatePollMap ();
 
-			n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
+			var n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
 			int ic;
-			lock (mainLoop.idleHandlers)
-				ic = mainLoop.idleHandlers.Count;
-			return n > 0 || mainLoop.timeouts.Count > 0 && ((mainLoop.timeouts.Keys [0] - DateTime.UtcNow.Ticks) < 0) || ic > 0;			
+			lock (mainLoop.IdleHandlers)
+				ic = mainLoop.IdleHandlers.Count;
+			return n > 0 || ic > 0;
 		}
 
 		void IMainLoopDriver.MainIteration () 
@@ -275,13 +267,8 @@ namespace Mono.Terminal {
 		{
 			long now = DateTime.UtcNow.Ticks;
 
-			int waitTimeout;
-			if (mainLoop.timeouts.Count > 0) {
-				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-				if (waitTimeout < 0)
-					return true;
-			} else
-				waitTimeout = -1;
+			if (mainLoop.IsTimeoutPending(out var waitTimeout))
+				return true;
 
 			if (!wait)
 				waitTimeout = 0;
@@ -311,13 +298,26 @@ namespace Mono.Terminal {
 	///   does not seem to be a way of supporting this on Windows.
 	/// </remarks>
 	public class 	MainLoop {
-		internal class Timeout {
+		internal struct Timeout
+		{
+			public long Id;
 			public TimeSpan Span;
 			public Func<MainLoop,bool> Callback;
 		}
 
-		internal SortedList <long, Timeout> timeouts = new SortedList<long,Timeout> ();
-		internal List<Func<bool>> idleHandlers = new List<Func<bool>> ();
+		internal SortedList<long, Timeout> Timeouts;
+		readonly SortedList<long, Timeout> _timeouts0;
+		readonly SortedList<long, Timeout> _timeouts1;
+		static long _incrementalTimeoutId = 0;
+		int _parityTimeoutsId;
+		readonly object _timeoutsLocker;
+
+		internal List<Action> IdleHandlers;
+		readonly List<Action> _idleHandlers0;
+		readonly List<Action> _idleHandlers1;
+		int _parityIdleHandlers;
+		readonly object _idleHandlersLocker;
+
 
 		IMainLoopDriver driver;
 
@@ -334,6 +334,19 @@ namespace Mono.Terminal {
 		public MainLoop (IMainLoopDriver driver)
 		{
 			this.driver = driver;
+
+			_timeouts0 = new SortedList<long, Timeout>();
+			_timeouts1 = new SortedList<long, Timeout>();
+			Timeouts = _timeouts0;
+			_parityTimeoutsId = 0;
+			_timeoutsLocker = new object();
+
+			_idleHandlers0 = new List<Action>();
+			_idleHandlers1 = new List<Action>();
+			IdleHandlers = _idleHandlers0;
+			_parityIdleHandlers = 0;
+			_idleHandlersLocker = new object();
+
 			driver.Setup (this);
 		}
 
@@ -342,37 +355,37 @@ namespace Mono.Terminal {
 		/// </summary>
 		public void Invoke (Action action)
 		{
-			AddIdle (()=> {
-				action ();
-				return false;
-			});
+			AddIdle (action);
 			driver.Wakeup ();
 		}
 
 		/// <summary>
 		///   Executes the specified @idleHandler on the idle loop.  The return value is a token to remove it.
 		/// </summary>
-		public Func<bool> AddIdle (Func<bool> idleHandler)
+		public Action AddIdle (Action idleHandler)
 		{
-			lock (idleHandlers)
-				idleHandlers.Add (idleHandler);
+			lock (IdleHandlers)
+				IdleHandlers.Add (idleHandler);
+
 			return idleHandler;
 		}
 
 		/// <summary>
 		///   Removes the specified idleHandler from processing.
 		/// </summary>
-		public void RemoveIdle (Func<bool> idleHandler)
+		public void RemoveIdle (Action idleHandler)
 		{
 			lock (idleHandler)
-				idleHandlers.Remove (idleHandler);
+				IdleHandlers.Remove (idleHandler);
 		}
 
 		void AddTimeout (TimeSpan time, Timeout timeout)
 		{
-			timeouts.Add ((DateTime.UtcNow + time).Ticks, timeout);
+			lock (_timeoutsLocker) {
+				Timeouts.Add((DateTime.UtcNow + time).Ticks, timeout);
+			}
 		}
-		
+
 		/// <summary>
 		///   Adds a timeout to the mainloop.
 		/// </summary>
@@ -384,16 +397,17 @@ namespace Mono.Terminal {
 		///   The returned value is a token that can be used to stop the timeout
 		///   by calling RemoveTimeout.
 		/// </remarks>
-		public object AddTimeout (TimeSpan time, Func<MainLoop,bool> callback)
+		public long AddTimeout (TimeSpan time, Func<MainLoop,bool> callback)
 		{
 			if (callback == null)
 				throw new ArgumentNullException (nameof (callback));
-			var timeout = new Timeout () {
+			var timeout = new Timeout {
+				Id = Interlocked.Increment(ref _incrementalTimeoutId),
 				Span = time,
 				Callback = callback
 			};
 			AddTimeout (time, timeout);
-			return timeout;
+			return timeout.Id;
 		}
 
 		/// <summary>
@@ -402,46 +416,87 @@ namespace Mono.Terminal {
 		/// <remarks>
 		///   The token parameter is the value returned by AddTimeout.
 		/// </remarks>
-		public void RemoveTimeout (object token)
+		public void RemoveTimeout (long timeoutId)
 		{
-			var idx = timeouts.IndexOfValue (token as Timeout);
-			if (idx == -1)
-				return;
-			timeouts.RemoveAt (idx);
+			lock (_timeoutsLocker) {
+				var timeoutsValues = Timeouts.Values;
+				for (var index = 0; index < timeoutsValues.Count; ++index) {
+					if (timeoutsValues[index].Id != timeoutId)
+						continue;
+					Timeouts.RemoveAt(index);
+					return;
+				}
+			}
 		}
 
 		void RunTimers ()
 		{
-			long now = DateTime.UtcNow.Ticks;
-			var copy = timeouts;
-			timeouts = new SortedList<long,Timeout> ();
-			foreach (var k in copy.Keys){
-				var timeout = copy [k];
-				if (k < now) {
-					if (timeout.Callback (this))
-						AddTimeout (timeout.Span, timeout);
-				} else
-					timeouts.Add (k, timeout);
+			lock (_timeoutsLocker) {
+
+				if (Timeouts.Count == 0)
+					return;
+
+				SortedList<long, Timeout> currentIterationTimeouts;
+
+				if (_parityTimeoutsId == 0) {
+					currentIterationTimeouts = _timeouts0;
+					Timeouts = _timeouts1;
+				} else {
+					currentIterationTimeouts = _timeouts1;
+					Timeouts = _timeouts0;
+				}
+
+				Timeouts.Clear();
+
+				foreach (var k in currentIterationTimeouts.Keys) {
+					var timeout = currentIterationTimeouts[k];
+					if (k < DateTime.UtcNow.Ticks) {
+						if (timeout.Callback(this))
+							Timeouts.Add((DateTime.UtcNow + timeout.Span).Ticks, timeout);
+					} else
+						Timeouts.Add(k, timeout);
+				}
+			}
+
+			_parityTimeoutsId ^= 1;
+		}
+
+		internal bool IsTimeoutPending(out int waitTimeout)
+		{
+			waitTimeout = -1;
+			lock (_timeoutsLocker) {
+				if (Timeouts.Count <= 0)
+					return false;
+
+				waitTimeout = (int) ((Timeouts.Keys[0] - DateTime.UtcNow.Ticks) / TimeSpan.TicksPerMillisecond);
+				return waitTimeout < 0;
 			}
 		}
 
 		void RunIdle ()
 		{
-			List<Func<bool>> iterate;
-			lock (idleHandlers){
-				iterate = idleHandlers;
-				idleHandlers = new List<Func<bool>> ();
+			List<Action> currentIdleHandlers;
+			lock (_idleHandlersLocker) {
+				if (_parityIdleHandlers == 0) {
+					currentIdleHandlers = _idleHandlers0;
+					IdleHandlers = _idleHandlers1;
+				} else {
+					currentIdleHandlers = _idleHandlers1;
+					IdleHandlers = _idleHandlers0;
+				}
+
+				IdleHandlers.Clear();
 			}
 
-			foreach (var idle in iterate){
-				if (idle ())
-					lock (idleHandlers)
-						idleHandlers.Add (idle);
+			foreach (var idle in currentIdleHandlers) {
+				idle();
 			}
+
+			_parityIdleHandlers ^= 1;
 		}
-		
+
 		bool running;
-		
+
 		/// <summary>
 		///   Stops the mainloop.
 		/// </summary>
@@ -475,13 +530,11 @@ namespace Mono.Terminal {
 		/// </remarks>
 		public void MainIteration ()
 		{
-			if (timeouts.Count > 0)
-				RunTimers ();
-
+			RunTimers ();
 			driver.MainIteration ();
 
-			lock (idleHandlers){
-				if (idleHandlers.Count > 0)
+			lock (IdleHandlers){
+				if (IdleHandlers.Count > 0)
 					RunIdle();
 			}
 		}
