@@ -311,6 +311,11 @@ namespace Terminal.Gui {
 			{
 				return $"Dim.Factor({factor})";
 			}
+
+			public override int GetHashCode () => factor.GetHashCode();
+
+			public override bool Equals (object other) => other is DimFactor f && f.factor == factor;
+
 		}
 
 		/// <summary>
@@ -339,6 +344,11 @@ namespace Terminal.Gui {
 			{
 				return n;
 			}
+
+			public override int GetHashCode () => n.GetHashCode();
+
+			public override bool Equals (object other) => other is DimAbsolute abs && abs.n == n;
+
 		}
 
 		class DimFill : Dim {
@@ -353,7 +363,11 @@ namespace Terminal.Gui {
 			internal override int Anchor (int width)
 			{
 				return width-margin;
-			}			
+			}
+
+			public override int GetHashCode () => margin.GetHashCode();
+
+			public override bool Equals (object other) => other is DimFill fill && fill.margin == margin;
 		}
 
 		static DimFill zeroMargin;
