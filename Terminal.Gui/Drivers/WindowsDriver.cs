@@ -504,7 +504,8 @@ namespace Terminal.Gui {
 			waitForProbe.Set();
 
 			try {
-				eventReady.Wait(waitTimeout, tokenSource.Token);
+				if(!tokenSource.IsCancellationRequested)
+					eventReady.Wait(waitTimeout, tokenSource.Token);
 			} catch (OperationCanceledException) {
 				return true;
 			} finally {
