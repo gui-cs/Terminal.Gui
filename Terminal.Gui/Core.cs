@@ -18,7 +18,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 using NStack;
-using System.ComponentModel;
 
 namespace Terminal.Gui {
 
@@ -246,6 +245,8 @@ namespace Terminal.Gui {
 		public static ConsoleDriver Driver = Application.Driver;
 
 		static IList<View> empty = new List<View> (0).AsReadOnly ();
+
+		// This is null, and allocated on demand.  
 		List<View> subviews;
 
 		/// <summary>
@@ -253,6 +254,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The subviews.</value>
 		public IList<View> Subviews => subviews == null ? empty : subviews.AsReadOnly ();
+
+		// Internally, we use InternalSubviews rather than subviews, as we do not expect us
+		// to make the same mistakes our users make when they poke at the Subviews.
+		internal IList<View> InternalSubviews => subviews ?? empty;
+
 		internal Rect NeedDisplay { get; private set; } = Rect.Empty;
 
 		// The frame for the object
@@ -298,7 +304,7 @@ namespace Terminal.Gui {
 		/// <returns>The enumerator.</returns>
 		public IEnumerator GetEnumerator ()
 		{
-			foreach (var v in Subviews)
+			foreach (var v in InternalSubviews)
 				yield return v;
 		}
 
@@ -908,7 +914,7 @@ namespace Terminal.Gui {
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
 			if (subviews != null) {
-				foreach (var view in subviews.ToList()) {
+				foreach (var view in subviews) {
 					if (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay) {
 						if (view.Frame.IntersectsWith (clipRect) && view.Frame.IntersectsWith (region)) {
 
@@ -1221,7 +1227,7 @@ namespace Terminal.Gui {
 			var nodes = new HashSet<View> ();
 			var edges = new HashSet<(View, View)> ();
 
-			foreach (var v in Subviews) {
+			foreach (var v in InternalSubviews) {
 				nodes.Add (v);
 				if (v.LayoutStyle == LayoutStyle.Computed) {
 					if (v.X is Pos.PosView)
@@ -1510,7 +1516,7 @@ namespace Terminal.Gui {
 			var touched = view.Frame;
 			contentView.Remove (view);
 
-			if (contentView.Subviews.Count < 1)
+			if (contentView.InternalSubviews.Count < 1)
 				this.CanFocus = false;
 		}
 
@@ -1690,7 +1696,7 @@ namespace Terminal.Gui {
 
 			public override void Post (SendOrPostCallback d, object state)
 			{
-				mainLoop.AddIdle (() => {
+				mainLoop.AddIdle (() => { 
 					d (state);
 					return false;
 				});
@@ -1783,22 +1789,15 @@ namespace Terminal.Gui {
 
 		static void ProcessKeyEvent (KeyEvent ke)
 		{
-			var chain = toplevels.ToList();
-			foreach (var topLevel in chain) {
-				if (topLevel.ProcessHotKey (ke))
-					return;
-			}
+			if (Current.ProcessHotKey (ke))
+				return;
 
-			foreach (var topLevel in chain) {
-				if (topLevel.ProcessKey (ke))
-					return;
-			}
-
-			foreach (var topLevel in chain) {
-				// Process the key normally
-				if (topLevel.ProcessColdKey (ke))
-					return;
-			}
+			if (Current.ProcessKey (ke))
+				return;
+			
+			// Process the key normally
+			if (Current.ProcessColdKey (ke))
+				return;
 		}
 
 		static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
@@ -1811,13 +1810,13 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			if (start.Subviews != null){
-				int count = start.Subviews.Count;
+			if (start.InternalSubviews != null){
+				int count = start.InternalSubviews.Count;
 				if (count > 0) {
 					var rx = x - startFrame.X;
 					var ry = y - startFrame.Y;
 					for (int i = count - 1; i >= 0; i--) {
-						View v = start.Subviews [i];
+						View v = start.InternalSubviews [i];
 						if (v.Frame.Contains (rx, ry)) {
 							var deep = FindDeepestView (v, rx, ry, out resx, out resy);
 							if (deep == null)
@@ -1911,14 +1910,6 @@ namespace Terminal.Gui {
 			var rs = new RunState (toplevel);
 
 			Init ();
-			if (toplevel is ISupportInitializeNotification initializableNotification && 
-			    !initializableNotification.IsInitialized) {
-				initializableNotification.BeginInit();
-				initializableNotification.EndInit();
-			} else if (toplevel is ISupportInitialize initializable) {
-				initializable.BeginInit();
-				initializable.EndInit();
-			}
 			toplevels.Push (toplevel);
 			Current = toplevel;
 			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessMouseEvent);
@@ -2032,8 +2023,8 @@ namespace Terminal.Gui {
 		static void DrawBounds (View v)
 		{
 			v.DrawFrame (v.Frame, padding: 0, fill: false);
-			if (v.Subviews != null && v.Subviews.Count > 0)
-				foreach (var sub in v.Subviews)
+			if (v.InternalSubviews != null && v.InternalSubviews.Count > 0)
+				foreach (var sub in v.InternalSubviews)
 					DrawBounds (sub);
 		}
 
