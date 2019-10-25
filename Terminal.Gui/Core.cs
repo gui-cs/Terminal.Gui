@@ -245,6 +245,8 @@ namespace Terminal.Gui {
 		public static ConsoleDriver Driver = Application.Driver;
 
 		static IList<View> empty = new List<View> (0).AsReadOnly ();
+
+		// This is null, and allocated on demand.  
 		List<View> subviews;
 
 		/// <summary>
@@ -252,6 +254,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The subviews.</value>
 		public IList<View> Subviews => subviews == null ? empty : subviews.AsReadOnly ();
+
+		// Internally, we use InternalSubviews rather than subviews, as we do not expect us
+		// to make the same mistakes our users make when they poke at the Subviews.
 		internal IList<View> InternalSubviews => subviews ?? empty;
 
 		internal Rect NeedDisplay { get; private set; } = Rect.Empty;
