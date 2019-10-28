@@ -37,8 +37,8 @@ namespace Designer {
 				Height = Dim.Fill ()
 			};
 
-			//Application.Top.Add (menu);
-			Application.Top.Add (login, password);
+			surface.Add (login, password);
+			Application.Top.Add (menu, surface);
 			Application.Run ();
 		}
 	}

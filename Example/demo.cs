@@ -419,7 +419,6 @@ static class Demo {
 
 		var top = Application.Top;
 
-		var tframe = top.Frame;
 		//Open ();
 #if true
 		var win = new Window ("Hello") {
@@ -429,6 +428,8 @@ static class Demo {
 			Height = Dim.Fill ()
 		};
 #else
+		var tframe = top.Frame;
+
 		var win = new Window (new Rect (0, 1, tframe.Width, tframe.Height - 1), "Hello");
 #endif
 		MenuItemDetails [] menuItems = {

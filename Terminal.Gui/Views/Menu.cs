@@ -221,6 +221,7 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			WantMousePositionReports = host.WantMousePositionReports;
 			selectedSub = -1;
+			OnLeave += Menu_OnLeave;
 		}
 
 		internal Attribute DetermineColorSchemeFor (MenuItem item, int index)
@@ -231,17 +232,9 @@ namespace Terminal.Gui {
 			}
 			return ColorScheme.Normal;
 		}
-
+		
 		public override void Redraw (Rect region)
 		{
-			if ((!HasFocus && openSubMenu == null && GetSubMenuIndex (previousSubFocused) == -1) || !HasFocus && GetSubMenuIndex(previousSubFocused) == -1 && !host.HasFocus && openSubMenu != null) {
-				CloseSubMenu ();
-				host.CloseMenu ();
-				//  Force menu repainting after losing focus through mouse
-				host.Redraw (Bounds);
-				return;
-			}
-
 			Driver.SetAttribute (ColorScheme.Normal);
 			DrawFrame (region, padding: 0, fill: true);
 
@@ -425,32 +418,20 @@ namespace Terminal.Gui {
 				Activate (pos);
 			} else if (openSubMenu != null && !barItems.Children [current].IsFromSubMenu)
 				CloseSubMenu ();
-			else {
-
-			}
-		}
-
-		private int GetSubMenuIndex (object subMenu)
-		{
-			if (subMenu == null || openSubMenu == null)
-				return -1;
-
-			int pos = -1;
-			if (host.openMenu?.ToString () == subMenu.ToString ())
-				return 0;
-
-			for (int i = 0; i < openSubMenu.Count; i++) {
-				if (openSubMenu[i].ToString () == subMenu.ToString ()) {
-					pos = i;
-					break;
-				}
-			}
-			return pos;
 		}
 
 		internal static List<Menu> openSubMenu;
 		View previousSubFocused;
 		static int selectedSub;
+
+		private void Menu_OnLeave (object sender, EventArgs e)
+		{
+			if (!host.isMenuOpening && !host.isMenuClosing) {
+				CloseSubMenu ();
+				if (openSubMenu == null)
+					host.CloseMenu ();
+			}
+		}
 
 		void Activate (int idx)
 		{
@@ -464,6 +445,7 @@ namespace Terminal.Gui {
 
 		void OpenSubMenu (int index)
 		{
+			host.isMenuOpening = true;
 			if (openSubMenu == null)
 				openSubMenu = new List<Menu> ();
 
@@ -475,28 +457,37 @@ namespace Terminal.Gui {
 			}
 			selectedSub = openSubMenu.Count - 1;
 			SuperView.SetFocus (openSubMenu.Last ());
+			host.isMenuOpening = false;
 		}
 
 		private void RemoveSubMenu (int index)
 		{
+			if (openSubMenu == null)
+				return;
 			for (int i = openSubMenu.Count - 1; i > index; i--) {
+				host.isMenuClosing = true;
 				if (openSubMenu.Count - 1 > 0)
 					SuperView.SetFocus (openSubMenu [i - 1]);
 				else
 					SuperView.SetFocus (host.openMenu);
-				SuperView.Remove (openSubMenu [i]);
-				openSubMenu.Remove (openSubMenu [i]);
+				if (openSubMenu != null) {
+					SuperView.Remove (openSubMenu [i]);
+					openSubMenu.Remove (openSubMenu [i]);
+				}
 				RemoveSubMenu (i);
 			}
+			host.isMenuClosing = false;
 		}
 
 		internal void CloseSubMenu ()
 		{
+			host.isMenuClosing = true;
 			selectedSub = -1;
 			SetNeedsDisplay ();
 			RemoveAllOpensSubMenus ();
 			previousSubFocused?.SuperView?.SetFocus (previousSubFocused);
 			openSubMenu = null;
+			host.isMenuClosing = false;
 		}
 
 		private void RemoveAllOpensSubMenus ()
@@ -573,10 +564,6 @@ namespace Terminal.Gui {
 
 		public override void Redraw (Rect region)
 		{
-			if (!HasFocus && openMenu != null && !openMenu.HasFocus && !openMenu.barItems.Children[openMenu.current].IsFromSubMenu) {
-				CloseMenu ();
-			}
-
 			Move (0, 0);
 			Driver.SetAttribute (Colors.Base.Focus);
 			for (int i = 0; i < Frame.Width; i++)
@@ -626,28 +613,29 @@ namespace Terminal.Gui {
 		public event EventHandler OnOpenMenu;
 		internal Menu openMenu;
 		View previousFocused;
+		internal bool isMenuOpening;
+		internal bool isMenuClosing;
 
 		View lastFocused;
 		public View LastFocused { get; set; }
 
 		void OpenMenu (int index)
 		{
+			isMenuOpening = true;
 			lastFocused = lastFocused ?? SuperView.MostFocused;
-
 			OnOpenMenu?.Invoke (this, null);
-
-			if (openMenu != null) {
+			if (Menu.openSubMenu != null)
 				openMenu.CloseSubMenu ();
+			if (openMenu != null)
 				SuperView.Remove (openMenu);
-			}
 			int pos = 0;
 			for (int i = 0; i < index; i++) 
 				pos += Menus [i].Title.Length + 3;
 
 			openMenu = new Menu (this, pos, 1, Menus [index]);
-
 			SuperView.Add (openMenu);
 			SuperView.SetFocus (openMenu);
+			isMenuOpening = false;
 		}
 
 		// Starts the menu from a hotkey
@@ -676,6 +664,7 @@ namespace Terminal.Gui {
 
 		internal void CloseMenu ()
 		{
+			isMenuClosing = true;
 			selected = -1;
 			SetNeedsDisplay ();
 			SuperView.Remove (openMenu);
@@ -684,6 +673,7 @@ namespace Terminal.Gui {
 			LastFocused = lastFocused;
 			lastFocused = null;
 			LastFocused?.SuperView?.SetFocus (LastFocused);
+			isMenuClosing = false;
 		}
 
 		internal void PreviousMenu ()
