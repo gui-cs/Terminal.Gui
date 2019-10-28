@@ -8,7 +8,6 @@
 //   Add accelerator support, but should also support chords (ShortCut in MenuItem)
 //   Allow menus inside menus
 
-
 using System;
 using NStack;
 using System.Linq;
@@ -189,9 +188,9 @@ namespace Terminal.Gui {
 	}
 
 	class Menu : View {
-		internal MenuBarItem barItems;
+		MenuBarItem barItems;
 		MenuBar host;
-		internal int current;
+		int current;
 
 		static Rect MakeFrame (int x, int y, MenuItem [] items)
 		{
@@ -295,8 +294,6 @@ namespace Terminal.Gui {
 				action ();
 				return false;
 			});
-
-
 		}
 
 		public override bool ProcessKey (KeyEvent kb)
