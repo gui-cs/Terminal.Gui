@@ -81,6 +81,7 @@ namespace Terminal.Gui {
 		public string [] RadioLabels { 
 			get => radioLabels;
 			set {
+				Update();
 				radioLabels = value;
 				selected = 0;
 				cursor = 0;
@@ -88,9 +89,18 @@ namespace Terminal.Gui {
 			}
 		}
 
+		private void Update()
+		{
+			for (int i = 0; i < radioLabels.Length; i++) {
+				Move(0, i);
+				Driver.SetAttribute(ColorScheme.Normal);
+				Driver.AddStr(new string(' ', radioLabels[i].Length + 4));
+			}
+		}
+
 		public override void Redraw (Rect region)
 		{
-			base.Redraw (region);
+			base.Redraw (region);			
 			for (int i = 0; i < radioLabels.Length; i++) {
 				Move (0, i);
 				Driver.SetAttribute (ColorScheme.Normal);
