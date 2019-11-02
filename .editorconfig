@@ -1,6 +1,7 @@
 [*.cs]
 indent_style = tab
-tab_width = 8 
+indent_size = 8
+tab_width = 8
 csharp_new_line_before_open_brace = methods,local_functions
 csharp_new_line_before_else = false
 csharp_new_line_before_catch = false
