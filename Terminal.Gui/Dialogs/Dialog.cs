@@ -38,6 +38,7 @@ namespace Terminal.Gui {
 			Width = width;
 			Height = height;
 			ColorScheme = Colors.Dialog;
+			Modal = true;
 
 			if (buttons != null) {
 				foreach (var b in buttons) {

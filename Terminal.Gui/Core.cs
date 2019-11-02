@@ -1323,6 +1323,13 @@ namespace Terminal.Gui {
 			get => true;
 		}
 
+		/// <summary>
+		/// Determines whether the <see cref="Toplevel"/> is modal or not. 
+		/// Causes <see cref="ProcessKey(KeyEvent)"/> to propagate keys upwards 
+		/// by default unless set to <see langword="true"/>.
+		/// </summary>
+		public bool Modal { get; set; }
+
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			if (base.ProcessKey (keyEvent))
@@ -1790,15 +1797,28 @@ namespace Terminal.Gui {
 
 		static void ProcessKeyEvent (KeyEvent ke)
 		{
-			if (Current.ProcessHotKey (ke))
-				return;
+			var chain = toplevels.ToList();
+			foreach (var topLevel in chain) {
+				if (topLevel.Modal)
+					break;
+				if (topLevel.ProcessHotKey (ke))
+					return;
+			}
 
-			if (Current.ProcessKey (ke))
-				return;
-			
-			// Process the key normally
-			if (Current.ProcessColdKey (ke))
-				return;
+			foreach (var topLevel in chain) {
+				if (topLevel.Modal)
+					break;
+				if (topLevel.ProcessKey (ke))
+					return;
+			}
+
+			foreach (var topLevel in chain) {
+				if (topLevel.Modal)
+					break;
+				// Process the key normally
+				if (topLevel.ProcessColdKey (ke))
+					return;
+			}
 		}
 
 		static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
