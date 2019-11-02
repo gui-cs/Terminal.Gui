@@ -5,6 +5,6 @@ script:
   - msbuild /t:Restore $TRAVIS_BUILD_DIR/Terminal.sln
   - cd $TRAVIS_BUILD_DIR/
   - msbuild /p:Configuration=Release Terminal.sln
-mono: "5.4.1"
+mono: "5.20.0"
 dotnet: "2.1.4"
 os: "osx"
