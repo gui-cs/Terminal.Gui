@@ -1,4 +1,4 @@
-﻿//
+//
 // TextView.cs: multi-line text editing
 //
 // Authors:
@@ -266,6 +266,8 @@ namespace Terminal.Gui {
 		bool selecting;
 		//bool used;
 
+		public event EventHandler TextChanged;
+
 #if false
 		/// <summary>
 		///   Changed event, raised when the text has clicked.
@@ -312,6 +314,7 @@ namespace Terminal.Gui {
 			set {
 				ResetPosition ();
 				model.LoadString (value);
+				TextChanged?.Invoke(this, new EventArgs());
 				SetNeedsDisplay ();
 			}
 		}
