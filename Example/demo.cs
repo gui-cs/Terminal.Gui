@@ -359,7 +359,7 @@ static class Demo {
 			string actualText = textField.Text.ToString ();
 			int start = textField.SelStart == -1 ? textField.CursorPosition : textField.SelStart;
 			string newText = actualText.Substring (0, start) + 
-				Clipboard.Contents.ToString() +
+				Clipboard.Contents?.ToString() +
 				actualText.Substring (start + textField.SelLength, actualText.Length - start - textField.SelLength);
 			textField.Text = newText;
 			textField.SelLength = 0;

@@ -233,6 +233,7 @@ namespace Terminal.Gui {
 			
 			switch (kb.Key) {
 			case Key.DeleteChar:
+			// TODO: If text length greater than 0 delete all selected text and reposition the cursor
 			case Key.ControlD:
 				if (text.Count == 0 || text.Count== point)
 					return true;
@@ -243,6 +244,7 @@ namespace Terminal.Gui {
 
 			case Key.Delete:
 			case Key.Backspace:
+				// TODO: If text length greater than 0 delete all selected text and reposition the cursor
 				if (point == 0)
 					return true;
 
