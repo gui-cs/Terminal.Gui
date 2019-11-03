@@ -1812,25 +1812,25 @@ namespace Terminal.Gui {
 		{
 			var chain = toplevels.ToList();
 			foreach (var topLevel in chain) {
-				if (topLevel.Modal)
-					break;
 				if (topLevel.ProcessHotKey (ke))
 					return;
+				if (topLevel.Modal)
+					break;
 			}
 
 			foreach (var topLevel in chain) {
-				if (topLevel.Modal)
-					break;
 				if (topLevel.ProcessKey (ke))
 					return;
+				if (topLevel.Modal)
+					break;
 			}
 
 			foreach (var topLevel in chain) {
-				if (topLevel.Modal)
-					break;
 				// Process the key normally
 				if (topLevel.ProcessColdKey (ke))
 					return;
+				if (topLevel.Modal)
+					break;
 			}
 		}
 
