@@ -6,7 +6,7 @@ variables:
 
 steps:
 - script: |
-    msbuild /t:Restore $TRAVIS_BUILD_DIR/Terminal.sln
+    msbuild /t:Restore Terminal.sln
   displayName: Restore dependencies
 
 - script: |
