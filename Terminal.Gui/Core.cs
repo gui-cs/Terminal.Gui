@@ -430,7 +430,7 @@ namespace Terminal.Gui {
 			SetNeedsDisplay (Bounds);
 		}
 
-		bool layoutNeeded = true;
+		internal bool layoutNeeded = true;
 
 		internal void SetNeedsLayout ()
 		{
@@ -2054,9 +2054,26 @@ namespace Terminal.Gui {
 						DrawBounds (state.Toplevel);
 					state.Toplevel.PositionCursor ();
 					Driver.Refresh ();
+				} else if (CheckLayoutNeeded (state.Toplevel)) {
+					TerminalResized ();
+					layoutNeeded = false;
 				} else
 					Driver.UpdateCursor ();
 			}
+		}
+
+		static bool layoutNeeded;
+		static bool CheckLayoutNeeded (View view)
+		{
+			if (view.layoutNeeded)
+				return layoutNeeded = view.layoutNeeded;		
+			
+			for (int i = 0; view.Subviews.Count > i; i++) {
+				CheckLayoutNeeded (view.Subviews [i]);
+				if (layoutNeeded)
+					return layoutNeeded;
+			}
+			return layoutNeeded;
 		}
 
 		internal static bool DebugDrawBounds;
