@@ -243,7 +243,7 @@ namespace Terminal.Gui {
 		/// Points to the current driver in use by the view, it is a convenience property
 		/// for simplifying the development of new views.
 		/// </summary>
-		public static ConsoleDriver Driver = Application.Driver;
+		public static ConsoleDriver Driver { get { return Application.Driver; } }
 
 		static IList<View> empty = new List<View> (0).AsReadOnly ();
 
@@ -1741,13 +1741,15 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void Init () => Init (() => Toplevel.Create ());
 
+		static bool _initialized = false;
+
 		/// <summary>
 		/// Initializes the Application
 		/// </summary>
 		static void Init (Func<Toplevel> topLevelFactory)
 		{
-			if (Top != null)
-				return;
+			if (_initialized) return;
+			_initialized = true;
 
 			var p = Environment.OSVersion.Platform;
 			Mono.Terminal.IMainLoopDriver mainLoopDriver;
@@ -1978,9 +1980,10 @@ namespace Terminal.Gui {
 			runState.Dispose ();
 		}
 
-		static void Shutdown ()
+		public static void Shutdown ()
 		{
 			Driver.End ();
+			_initialized = false;
 		}
 
 		static void Redraw (View view)
