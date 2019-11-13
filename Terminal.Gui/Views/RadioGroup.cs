@@ -42,13 +42,18 @@ namespace Terminal.Gui {
 		/// <param name="selected">The item to be selected, the value is clamped to the number of items.</param>
 		public RadioGroup (string [] radioLabels, int selected = 0) : base ()
 		{
-			var r = MakeRect (0, 0, radioLabels);
-			Width = r.Width;
-			Height = radioLabels.Length;
+			SetWidthHeight(radioLabels);
 
 			this.selected = selected;
 			this.radioLabels = radioLabels;
 			CanFocus = true;
+		}
+
+		private void SetWidthHeight(string[] radioLabels)
+		{
+			var r = MakeRect(0, 0, radioLabels);
+			Width = r.Width;
+			Height = radioLabels.Length;
 		}
 
 		static Rect MakeRect (int x, int y, string [] radioLabels)
@@ -81,7 +86,7 @@ namespace Terminal.Gui {
 		public string [] RadioLabels { 
 			get => radioLabels;
 			set {
-				Update();
+				Update(value);
 				radioLabels = value;
 				selected = 0;
 				cursor = 0;
@@ -89,12 +94,15 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void Update()
+		private void Update(string [] newRadioLabels)
 		{
 			for (int i = 0; i < radioLabels.Length; i++) {
 				Move(0, i);
 				Driver.SetAttribute(ColorScheme.Normal);
 				Driver.AddStr(new string(' ', radioLabels[i].Length + 4));
+			}
+			if (newRadioLabels.Length != radioLabels.Length) {
+				SetWidthHeight(newRadioLabels);
 			}
 		}
 

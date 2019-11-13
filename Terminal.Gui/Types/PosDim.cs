@@ -187,7 +187,15 @@ namespace Terminal.Gui {
 				else
 					return la - ra;
 			}
+
+			public override string ToString ()
+			{
+				return $"{((PosView)left).Target.ToString()},{right.ToString()}";
+			}
+
 		}
+
+		static PosCombine posCombine;
 
 		/// <summary>
 		/// Adds a <see cref="Terminal.Gui.Pos"/> to a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="T:Terminal.Gui.Pos"/>.
@@ -197,7 +205,10 @@ namespace Terminal.Gui {
 		/// <returns>The <see cref="T:Terminal.Gui.Pos"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
 		public static Pos operator + (Pos left, Pos right)
 		{
-			return new PosCombine (true, left, right);
+			PosCombine newPos = new PosCombine (true, left, right);
+			if (posCombine?.ToString () != newPos.ToString ())
+				((PosView)left).Target.SetNeedsLayout ();
+			return posCombine = newPos;
 		}
 
 		/// <summary>

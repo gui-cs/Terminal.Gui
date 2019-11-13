@@ -43,27 +43,59 @@ namespace Designer {
 			Application.Run ();
 		}
 	}
-#endif
+#elif false
 	class MainClass {
-		public static void Main(string[] args)
+		public static void Main (string [] args)
 		{
+			Application.Init ();
+
+			Window window = new Window ("Repaint Issue") { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+			RadioGroup radioGroup = new RadioGroup (1, 1, new [] { "Short", "Longer Text  --> Will not be repainted <--", "Short" });
+
+			Button replaceButtonLonger = new Button (1, 10, "Replace Texts above Longer") {
+				Clicked = () => { radioGroup.RadioLabels = new string [] { "Longer than before", "Shorter Text", "Longer than before" }; }
+			};
+
+			Button replaceButtonSmaller = new Button (35, 10, "Replace Texts above Smaller") {
+				Clicked = () => { radioGroup.RadioLabels = new string [] { "Short", "Longer Text  --> Will not be repainted <--", "Short" }; }
+			};
+
+			window.Add (radioGroup, replaceButtonLonger, replaceButtonSmaller);
+			Application.Top.Add (window);
+			Application.Run ();
+		}
+	}
+#elif true
+	class MainClass {
+		public static void Main (string [] args)
+		{
+
+			string[] radioLabels = { "First", "Second" };
 			Application.Init();
 
-			Window window = new Window("Repaint Issue") { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() };
-			RadioGroup radioGroup = new RadioGroup(1, 1, new[] { "Short", "Longer Text  --> Will not be repainted <--", "Short" });
+			Window window = new Window("Redraw issue when setting coordinates of label") { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() };
 
-			Button replaceButtonLonger = new Button(1, 10, "Replace Texts above Longer") {
-				Clicked = () => { radioGroup.RadioLabels = new string[] { "Longer than before", "Shorter Text", "Longer than before" }; }
+			Label radioLabel = new Label("Radio selection: ") { X = 1, Y = 1 };
+			Label otherLabel = new Label("Other label: ") { X = Pos.Left(radioLabel), Y = Pos.Top(radioLabel) + radioLabels.Length };
+
+			RadioGroup radioGroup = new RadioGroup(radioLabels) { X = Pos.Right(radioLabel), Y = Pos.Top(radioLabel) };
+			RadioGroup radioGroup2 = new RadioGroup(new[] { "Option 1 of the second radio group", "Option 2 of the second radio group" }) { X = Pos.Right(radioLabel), Y = Pos.Top(otherLabel) };
+
+			Button replaceButton = new Button(1, 10, "Add radio labels") {
+				Clicked = () =>
+				{
+					radioGroup.RadioLabels = new[] { "First", "Second", "Third                             <- Third ->", "Fourth                            <- Fourth ->" };
+					otherLabel.Y = Pos.Top(radioLabel) + radioGroup.RadioLabels.Length;
+					//Application.Refresh(); // Even this won't redraw the app correctly, only a terminal resize will re-render the view.
+					//typeof(Application).GetMethod("TerminalResized", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic).Invoke(null, null);
+				}
 			};
 
-			Button replaceButtonSmaller = new Button(35, 10, "Replace Texts above Smaller") {
-				Clicked = () => { radioGroup.RadioLabels = new string[] { "Short", "Longer Text  --> Will not be repainted <--", "Short" }; }
-			};
-
-			window.Add(radioGroup, replaceButtonLonger, replaceButtonSmaller);
+			window.Add(radioLabel, otherLabel, radioGroup, radioGroup2, replaceButton);
 			Application.Top.Add(window);
 			Application.Run();
 		}
 	}
 
+#endif
 }
