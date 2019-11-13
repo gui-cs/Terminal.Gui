@@ -553,7 +553,7 @@ namespace Terminal.Gui {
 
 			case WindowsConsole.EventType.WindowBufferSize:
 				cols = inputEvent.WindowBufferSizeEvent.size.X;
-				rows = inputEvent.WindowBufferSizeEvent.size.Y - 1;
+				rows = inputEvent.WindowBufferSizeEvent.size.Y;
 				ResizeScreen ();
 				UpdateOffScreen ();
 				TerminalResized?.Invoke();
