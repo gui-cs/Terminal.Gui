@@ -219,7 +219,10 @@ namespace Terminal.Gui {
 		/// <returns>The <see cref="T:Terminal.Gui.Pos"/> that is the <c>left</c> minus <c>right</c>.</returns>
 		public static Pos operator - (Pos left, Pos right)
 		{
-			return new PosCombine (false, left, right);
+			PosCombine newPos = new PosCombine (false, left, right);
+			if (posCombine?.ToString () != newPos.ToString ())
+				((PosView)left).Target.SetNeedsLayout ();
+			return posCombine = newPos;
 		}
 
 		internal class PosView : Pos {
