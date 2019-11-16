@@ -2,6 +2,7 @@
 using Terminal.Gui;
 
 namespace Designer {
+#if false
 	class Surface : Window {
 		public Surface () : base ("Designer")
 		{
@@ -42,4 +43,27 @@ namespace Designer {
 			Application.Run ();
 		}
 	}
+#elif true
+	class MainClass {
+		public static void Main(string[] args)
+		{
+			Application.Init();
+
+			Window window = new Window("Repaint Issue") { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() };
+			RadioGroup radioGroup = new RadioGroup(1, 1, new[] { "Short", "Longer Text  --> Will not be repainted <--", "Short" });
+
+			Button replaceButtonLonger = new Button(1, 10, "Replace Texts above Longer") {
+				Clicked = () => { radioGroup.RadioLabels = new string[] { "Longer than before", "Shorter Text", "Longer than before" }; }
+			};
+
+			Button replaceButtonSmaller = new Button(35, 10, "Replace Texts above Smaller") {
+				Clicked = () => { radioGroup.RadioLabels = new string[] { "Short", "Longer Text  --> Will not be repainted <--", "Short" }; }
+			};
+
+			window.Add(radioGroup, replaceButtonLonger, replaceButtonSmaller);
+			Application.Top.Add(window);
+			Application.Run();
+		}
+	}
+#endif
 }
