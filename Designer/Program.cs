@@ -2,6 +2,7 @@
 using Terminal.Gui;
 
 namespace Designer {
+#if false
 	class Surface : Window {
 		public Surface () : base ("Designer")
 		{
@@ -42,4 +43,37 @@ namespace Designer {
 			Application.Run ();
 		}
 	}
+#elif true
+	class MainClass {
+		public static void Main (string [] args)
+		{
+
+			string [] radioLabels = { "First", "Second" };
+			Application.Init ();
+
+			Window window = new Window ("Redraw issue when setting coordinates of label") { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+
+			Label radioLabel = new Label ("Radio selection: ") { X = 1, Y = 1 };
+			Label otherLabel = new Label ("Other label: ") { X = Pos.Left (radioLabel), Y = Pos.Top (radioLabel) + radioLabels.Length };
+
+			RadioGroup radioGroup = new RadioGroup (radioLabels) { X = Pos.Right (radioLabel), Y = Pos.Top (radioLabel) };
+			RadioGroup radioGroup2 = new RadioGroup (new [] { "Option 1 of the second radio group", "Option 2 of the second radio group" }) { X = Pos.Right (radioLabel), Y = Pos.Top (otherLabel) };
+
+			Button replaceButton = new Button (1, 10, "Add radio labels") {
+				Clicked = () => {
+					radioGroup.RadioLabels = new [] { "First", "Second", "Third                             <- Third ->", "Fourth                            <- Fourth ->" };
+					otherLabel.Y = Pos.Top (radioLabel) + radioGroup.RadioLabels.Length;
+					//Application.Refresh(); // Even this won't redraw the app correctly, only a terminal resize will re-render the view.
+					//typeof(Application).GetMethod("TerminalResized", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic).Invoke(null, null);
+				}
+			};
+
+			window.Add (radioLabel, otherLabel, radioGroup, radioGroup2, replaceButton);
+			Application.Top.Add (window);
+			Application.Top.Add (window);
+			Application.Run ();
+			Application.Run ();
+		}
+	}
+#endif
 }
