@@ -2077,7 +2077,7 @@ namespace Terminal.Gui {
 		{
 			if (view.layoutNeeded)
 				return layoutNeeded = view.layoutNeeded;		
-			
+
 			for (int i = 0; view.Subviews.Count > i; i++) {
 				CheckLayoutNeeded (view.Subviews [i]);
 				if (layoutNeeded)
