@@ -26,8 +26,8 @@ namespace Terminal.Gui {
 		int shortFieldLen = 5;
 		int FieldLen { get { return isShort ? shortFieldLen : longFieldLen; } }
 
-		string longFormat = " hh:mm:ss";
-		string shortFormat = " hh:mm";
+		string longFormat = " HH:mm:ss";
+		string shortFormat = " HH:mm";
 		string Format { get { return isShort ? shortFormat : longFormat; } }
 
 
@@ -43,6 +43,13 @@ namespace Terminal.Gui {
 			this.isShort = isShort;
 			CursorPosition = 1;
 			Time = time;
+			Changed += TimeField_Changed;
+		}
+
+		private void TimeField_Changed (object sender, ustring e)
+		{
+			if (!DateTime.TryParseExact (Text.ToString (), Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
+				Text = e;
 		}
 
 		/// <summary>

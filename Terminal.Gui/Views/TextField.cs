@@ -35,7 +35,7 @@ namespace Terminal.Gui {
 		///   Client code can hook up to this event, it is
 		///   raised when the text in the entry changes.
 		/// </remarks>
-		public event EventHandler Changed;
+		public event EventHandler<ustring> Changed;
 
 		/// <summary>
 		///    Public constructor that creates a text field, with layout controlled with X, Y, Width and Height.
@@ -98,7 +98,10 @@ namespace Terminal.Gui {
 			}
 
 			set {
+				ustring oldText = ustring.Make(text);
 				text = TextModel.ToRunes (value);
+				Changed?.Invoke(this, oldText);
+
 				if (point > text.Count)
 					point = Math.Max (text.Count-1, 0);
 
@@ -192,9 +195,7 @@ namespace Terminal.Gui {
 
 		void SetText (List<Rune> newText)
 		{
-			text = newText;
-			if (Changed != null)
-				Changed (this, EventArgs.Empty);
+			text = newText;			
 		}
 
 		void SetText (IEnumerable<Rune> newText)
