@@ -25,9 +25,9 @@ namespace Terminal.Gui {
 		int longFieldLen = 8;
 		int shortFieldLen = 5;
 		int FieldLen { get { return isShort ? shortFieldLen : longFieldLen; } }
-		char sepChar;
-		string longFormat = " HH:mm:ss";
-		string shortFormat = " HH:mm";
+		string sepChar;
+		string longFormat;
+		string shortFormat;
 		string Format { get { return isShort ? shortFormat : longFormat; } }
 
 
@@ -41,7 +41,9 @@ namespace Terminal.Gui {
 		public TimeField (int x, int y, DateTime time, bool isShort = false) : base (x, y, isShort ? 7 : 10, "")
 		{
 			CultureInfo cultureInfo = CultureInfo.CurrentCulture;
-			sepChar = cultureInfo.DateTimeFormat.TimeSeparator.ToCharArray () [0];
+			sepChar = cultureInfo.DateTimeFormat.TimeSeparator;
+			longFormat = $" HH{sepChar}mm{sepChar}ss";
+			shortFormat = $" HH{sepChar}mm";
 			this.isShort = isShort;
 			CursorPosition = 1;
 			Time = time;
