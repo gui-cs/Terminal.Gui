@@ -24,9 +24,9 @@ namespace Terminal.Gui {
 		int longFieldLen = 10;
 		int shortFieldLen = 8;
 		int FieldLen { get { return isShort ? shortFieldLen : longFieldLen; } }
-		char sepChar;           // = '/';
-		string longFormat;      // = " MM/dd/yyyy";
-		string shortFormat;     // = " MM/dd/yy";
+		string sepChar;
+		string longFormat;
+		string shortFormat;
 		string Format { get { return isShort ? shortFormat : longFormat; } }
 
 
@@ -40,7 +40,7 @@ namespace Terminal.Gui {
 		public DateField(int x, int y, DateTime date, bool isShort = false) : base(x, y, isShort ? 10 : 12, "")
 		{
 			CultureInfo cultureInfo = CultureInfo.CurrentCulture;
-			sepChar = cultureInfo.DateTimeFormat.DateSeparator.ToCharArray()[0];
+			sepChar = cultureInfo.DateTimeFormat.DateSeparator;
 			longFormat = $" {cultureInfo.DateTimeFormat.ShortDatePattern}";
 			shortFormat = GetShortFormat(longFormat);
 			this.isShort = isShort;
@@ -87,8 +87,6 @@ namespace Terminal.Gui {
 
 		bool SetText(ustring text)
 		{
-			// FIXED: This validation could be made better by calculating the actual min/max values
-			//        for month/day/year. This has a 'good' chance of keeping things valid
 			ustring[] vals = text.Split(ustring.Make(sepChar));
 			ustring[] frm = ustring.Make(Format).Split(ustring.Make(sepChar));
 			bool isValidDate = true;
@@ -159,7 +157,7 @@ namespace Terminal.Gui {
 		{
 			if (CursorPosition == FieldLen)
 				return;
-			if (Text[++CursorPosition] == sepChar)
+			if (Text[++CursorPosition] == sepChar.ToCharArray()[0])
 				CursorPosition++;
 		}
 
@@ -167,13 +165,13 @@ namespace Terminal.Gui {
 		{
 			if (CursorPosition == 1)
 				return;
-			if (Text[--CursorPosition] == sepChar)
+			if (Text[--CursorPosition] == sepChar.ToCharArray()[0])
 				CursorPosition--;
 		}
 
 		void AdjCursorPosition()
 		{
-			if (Text[CursorPosition] == sepChar)
+			if (Text[CursorPosition] == sepChar.ToCharArray()[0])
 				CursorPosition++;
 		}
 
