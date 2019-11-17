@@ -126,23 +126,23 @@ namespace Terminal.Gui {
 
 		void IncCursorPosition ()
 		{
-			if (CursorPosition == FieldLen) 
+			if (CursorPosition == FieldLen)
 				return;
-			if (Text [++CursorPosition] == ':') 
+			if (Text [++CursorPosition] == sepChar.ToCharArray () [0])
 				CursorPosition++;
 		}
 
 		void DecCursorPosition ()
 		{
-			if (CursorPosition == 1) 
+			if (CursorPosition == 1)
 				return;
-			if (Text [--CursorPosition] == ':') 
+			if (Text [--CursorPosition] == sepChar.ToCharArray () [0])
 				CursorPosition--;
 		}
 
 		void AdjCursorPosition ()
 		{
-			if (Text [CursorPosition] == ':') 
+			if (Text [CursorPosition] == sepChar.ToCharArray () [0])
 				CursorPosition++;
 		}
 
