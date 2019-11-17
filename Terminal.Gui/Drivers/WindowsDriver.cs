@@ -553,7 +553,7 @@ namespace Terminal.Gui {
 
 			case WindowsConsole.EventType.WindowBufferSize:
 				cols = inputEvent.WindowBufferSizeEvent.size.X;
-				rows = inputEvent.WindowBufferSizeEvent.size.Y - 1;
+				rows = inputEvent.WindowBufferSizeEvent.size.Y;
 				ResizeScreen ();
 				UpdateOffScreen ();
 				TerminalResized?.Invoke();
@@ -566,7 +566,9 @@ namespace Terminal.Gui {
 
 		private MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
-			MouseFlags mouseFlag = MouseFlags.AllEvents;
+			MouseFlags mouseFlag = 0;
+
+
 
 			// The ButtonState member of the MouseEvent structure has bit corresponding to each mouse button.
 			// This will tell when a mouse button is pressed. When the button is released this event will
@@ -577,7 +579,8 @@ namespace Terminal.Gui {
 				LastMouseButtonPressed = null;
 			}
 
-			if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null) {
+			if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null ||
+				mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved && mouseEvent.ButtonState != 0) {
 				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Pressed;
@@ -587,8 +590,8 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button2Pressed;
 					break;
 
-				case WindowsConsole.ButtonState.Button3Pressed:
-					mouseFlag = MouseFlags.Button3Pressed;
+				case WindowsConsole.ButtonState.RightmostButtonPressed:
+					mouseFlag = MouseFlags.Button4Pressed;
 					break;
 				}
 				LastMouseButtonPressed = mouseEvent.ButtonState;
@@ -602,10 +605,13 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button2Clicked;
 					break;
 
-				case WindowsConsole.ButtonState.Button3Pressed:
-					mouseFlag = MouseFlags.Button3Clicked;
+				case WindowsConsole.ButtonState.RightmostButtonPressed:
+					mouseFlag = MouseFlags.Button4Clicked;
 					break;
 				}
+				LastMouseButtonPressed = null;
+			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseWheeled) {
+				mouseFlag = MouseFlags.ButtonWheeled;
 				LastMouseButtonPressed = null;
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 				mouseFlag = MouseFlags.ReportMousePosition;
@@ -759,6 +765,7 @@ namespace Terminal.Gui {
 			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
 			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
 			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Cyan);
+			Colors.Menu.Disabled = MakeColor(ConsoleColor.DarkGray, ConsoleColor.Cyan);
 
 			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
 			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
