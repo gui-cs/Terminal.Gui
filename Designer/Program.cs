@@ -1,5 +1,6 @@
 ﻿using System;
 using Terminal.Gui;
+using Attribute = Terminal.Gui.Attribute;
 
 namespace Designer {
 	class Surface : Window {
@@ -37,8 +38,20 @@ namespace Designer {
 				Height = Dim.Fill ()
 			};
 
+			var loginText = new TextField("") {
+				X = Pos.Right(password),
+				Y = Pos.Top(login),
+				Width = 40,
+				ColorScheme = new ColorScheme() {
+					Focus = Attribute.Make(Color.BrightYellow, Color.DarkGray),
+					Normal = Attribute.Make(Color.Green, Color.BrightYellow),
+					HotFocus = Attribute.Make(Color.BrightBlue, Color.Brown),
+					HotNormal = Attribute.Make(Color.Red, Color.BrightRed),
+				},
+			};
+
 			//Application.Top.Add (menu);
-			Application.Top.Add (login, password);
+			Application.Top.Add (login, password, loginText);
 			Application.Run ();
 		}
 	}
