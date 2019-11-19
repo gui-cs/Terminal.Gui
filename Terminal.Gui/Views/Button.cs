@@ -68,10 +68,16 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			this.IsDefault = is_default;
 			Text = text;
+			int w = SetWidthHeight (text, is_default);
+			Frame = new Rect (0, 0, w, 1);
+		}
+
+		private int SetWidthHeight (ustring text, bool is_default)
+		{
 			int w = text.Length + 4 + (is_default ? 2 : 0);
 			Width = w;
 			Height = 1;
-			Frame = new Rect (0, 0, w, 1);
+			return w;
 		}
 
 		/// <summary>
@@ -146,6 +152,7 @@ namespace Terminal.Gui {
 
 		public override void Redraw (Rect region)
 		{
+			SetWidthHeight (text, is_default);
 			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			Move (0, 0);
 			Driver.AddStr (shown_text);
@@ -166,8 +173,7 @@ namespace Terminal.Gui {
 		{
 			if (Char.ToUpper ((char)key.KeyValue) == hot_key) {
 				this.SuperView.SetFocus (this);
-				if (Clicked != null)
-					Clicked ();
+				Clicked?.Invoke ();
 				return true;
 			}
 			return false;
