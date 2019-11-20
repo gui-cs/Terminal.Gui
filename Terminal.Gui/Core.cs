@@ -2031,8 +2031,7 @@ namespace Terminal.Gui {
 			for (state.Toplevel.Running = true; state.Toplevel.Running;) {
 				if (MainLoop.EventsPending (wait)) {
 					MainLoop.MainIteration ();
-					if (Iteration != null)
-						Iteration (null, EventArgs.Empty);
+					Iteration?.Invoke (null, EventArgs.Empty);
 				} else if (wait == false)
 					return;
 				if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.childNeedsDisplay) {
