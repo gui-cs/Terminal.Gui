@@ -359,14 +359,22 @@ namespace Terminal.Gui {
 				return MovePageUp();
 
 			case Key.Space:
-				if (allowsMarking) {
-					Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
-					SetNeedsDisplay ();
+				if (MarkUnmarkRow())
 					return true;
-				}
-				break;
+				else
+					break;
 			}
 			return base.ProcessKey (kb);
+		}
+
+		public virtual bool MarkUnmarkRow(){
+			if (allowsMarking){
+				Source.SetMark(SelectedItem, !Source.IsMarked(SelectedItem));
+				SetNeedsDisplay();
+				return true;
+			}
+
+			return false;
 		}
 
 		public virtual bool MovePageUp(){
