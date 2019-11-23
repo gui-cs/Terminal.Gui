@@ -356,17 +356,7 @@ namespace Terminal.Gui {
 				return MovePageDown();
 
 			case Key.PageUp:
-				n = (selected - Frame.Height);
-				if (n < 0)
-					n = 0;
-				if (n != selected) {
-					selected = n;
-					top = selected;
-					if (SelectedChanged != null)
-						SelectedChanged ();
-					SetNeedsDisplay ();
-				}
-				return true;
+				return MovePageUp();
 
 			case Key.Space:
 				if (allowsMarking) {
@@ -377,6 +367,21 @@ namespace Terminal.Gui {
 				break;
 			}
 			return base.ProcessKey (kb);
+		}
+
+		public virtual bool MovePageUp(){
+			int n = (selected - Frame.Height);
+			if (n < 0)
+				n = 0;
+			if (n != selected){
+				selected = n;
+				top = selected;
+				if (SelectedChanged != null)
+					SelectedChanged();
+				SetNeedsDisplay();
+			}
+
+			return true;
 		}
 
 		public virtual bool MovePageDown(){
