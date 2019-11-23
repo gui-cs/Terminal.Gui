@@ -353,20 +353,7 @@ namespace Terminal.Gui {
 
 			case Key.ControlV:
 			case Key.PageDown:
-				var n = (selected + Frame.Height);
-				if (n > source.Count)
-					n = source.Count - 1;
-				if (n != selected) {
-					selected = n;
-					if (source.Count >= Frame.Height)
-						top = selected;
-					else
-						top = 0;
-					if (SelectedChanged != null)
-						SelectedChanged ();
-					SetNeedsDisplay ();
-				}
-				return true;
+				return MovePageDown();
 
 			case Key.PageUp:
 				n = (selected - Frame.Height);
@@ -392,6 +379,23 @@ namespace Terminal.Gui {
 			return base.ProcessKey (kb);
 		}
 
+		public virtual bool MovePageDown(){
+			var n = (selected + Frame.Height);
+			if (n > source.Count)
+				n = source.Count - 1;
+			if (n != selected){
+				selected = n;
+				if (source.Count >= Frame.Height)
+					top = selected;
+				else
+					top = 0;
+				if (SelectedChanged != null)
+					SelectedChanged();
+				SetNeedsDisplay();
+			}
+
+			return true;
+		}
 
 		public virtual bool MoveDown(){
 			if (selected + 1 < source.Count){
