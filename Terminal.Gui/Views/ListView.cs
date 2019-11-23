@@ -349,15 +349,7 @@ namespace Terminal.Gui {
 
 			case Key.CursorDown:
 			case Key.ControlN:
-				if (selected + 1 < source.Count) {
-					selected++;
-					if (selected >= top + Frame.Height)
-						top++;
-					if (SelectedChanged != null)
-						SelectedChanged ();
-					SetNeedsDisplay ();
-				}
-				return true;
+				return MoveDown();
 
 			case Key.ControlV:
 			case Key.PageDown:
@@ -398,6 +390,20 @@ namespace Terminal.Gui {
 				break;
 			}
 			return base.ProcessKey (kb);
+		}
+
+
+		public virtual bool MoveDown(){
+			if (selected + 1 < source.Count){
+				selected++;
+				if (selected >= top + Frame.Height)
+					top++;
+				if (SelectedChanged != null)
+					SelectedChanged();
+				SetNeedsDisplay();
+			}
+
+			return true;
 		}
 
 		public virtual bool MoveUp(){
