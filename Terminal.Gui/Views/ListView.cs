@@ -345,15 +345,7 @@ namespace Terminal.Gui {
 			switch (kb.Key) {
 			case Key.CursorUp:
 			case Key.ControlP:
-				if (selected > 0) {
-					selected--;
-					if (selected < top)
-						top = selected;
-					if (SelectedChanged != null)
-						SelectedChanged ();
-					SetNeedsDisplay ();
-				}
-				return true;
+				return MoveUp();
 
 			case Key.CursorDown:
 			case Key.ControlN:
@@ -406,6 +398,19 @@ namespace Terminal.Gui {
 				break;
 			}
 			return base.ProcessKey (kb);
+		}
+
+		public virtual bool MoveUp(){
+			if (selected > 0){
+				selected--;
+				if (selected < top)
+					top = selected;
+				if (SelectedChanged != null)
+					SelectedChanged();
+				SetNeedsDisplay();
+			}
+
+			return true;
 		}
 
 		/// <summary>
