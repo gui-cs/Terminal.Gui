@@ -1704,10 +1704,8 @@ namespace Terminal.Gui {
 
 			public override void Post (SendOrPostCallback d, object state)
 			{
-				mainLoop.AddIdle (() => { 
-					d (state);
-					return false;
-				});
+				Send (d, state);
+				mainLoop.AddIdle (() => { return false; });
 			}
 
 			public override void Send (SendOrPostCallback d, object state)
