@@ -356,6 +356,7 @@ namespace Mono.Terminal {
 		{
 			lock (idleHandlers)
 				idleHandlers.Add (idleHandler);
+			driver.Wakeup ();
 			return idleHandler;
 		}
 
