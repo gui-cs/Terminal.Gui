@@ -95,11 +95,11 @@ namespace Terminal.Gui {
 		int top;
 		int selected;
 
-		//
-		// This class is the built-in IListDataSource that renders arbitrary
-		// IList instances
-		//
-		class ListWrapper : IListDataSource {
+		/// <summary>
+		/// This class is the built-in IListDataSource that renders arbitrary
+		/// IList instances
+		/// </summary>
+		public class ListWrapper : IListDataSource {
 			IList src;
 			BitArray marks;
 			int count;
