@@ -102,6 +102,10 @@ namespace Terminal.Gui {
 			}
 
 			set {
+				if (text?.Length != value?.Length) {
+					SetWidthHeight (value, is_default);
+					SetNeedsLayout ();
+				}
 				text = value;
 				Update ();
 			}
@@ -152,7 +156,6 @@ namespace Terminal.Gui {
 
 		public override void Redraw (Rect region)
 		{
-			SetWidthHeight (text, is_default);
 			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			Move (0, 0);
 			Driver.AddStr (shown_text);
