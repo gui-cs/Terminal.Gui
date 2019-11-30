@@ -9,7 +9,7 @@
   <PropertyGroup>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <PackageId>Terminal.Gui</PackageId>
-    <PackageVersion>0.25</PackageVersion>
+    <PackageVersion>0.24</PackageVersion>
     <Authors>Miguel de Icaza</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/migueldeicaza/gui.cs/</PackageProjectUrl>
@@ -18,7 +18,7 @@
     <Owners>Miguel de Icaza</Owners>
     <Summary>Application framework for creating modern console applications using .NET </Summary>
     <Title>Gui.cs is a framework for creating console user interfaces</Title>
-    <PackageReleaseNotes>0.24: the Windows driver implements WakeUp, allowing some scenarios like bug #207 to be fixed;
+    <PackageReleaseNotes>0.25: Added new TimeField from Jörg Preiß; Fixes for Backtab by Martin Björkström;  ListView now supports simple selection;  Bug fixes by giladlevi, Daniel Cazzulino and Marius Ungureanu;  New Application.Run of T entry point by Daniel Cazzulino;   Added various View methods to bring forward, backwards and move views in the hierarchy;  Switch to Portable PDBs by Daniel Cazzulino;  Dims can now be compared by Daniel Cazzulino; OnMenuOpen handler by giladlevi;  Various memory usage optimizations by giladlevi;  FileDialog.FilePath is now a full path by Yanwei Wang;  ISupportInitialize/ISupportInitializeNotification is now supported thanks to the work from Daniel Cazzulino; Support for non-modal TopLevels by Daniel Cazzulino and Adrian Alonso; 0.24: the Windows driver implements WakeUp, allowing some scenarios like bug #207 to be fixed;
 0.23: Better support for disabled menu items;  Raises text changed event after the internals have been updated; Fix Caps-NumLock;  Alt-HotKey now work on menus
 0.22: Correct vertical scrollview behavior, Small curses driver fix for terminals without mouse support, TextView support for scrolling, Surface Used property on TextField, Surface Cursor on RadioGroup.
 
@@ -68,6 +68,14 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Dialogs\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="NStack">
+      <HintPath>..\..\..\Users\miguel\.nuget\packages\nstack.core\0.11.0\lib\netstandard1.5\NStack.dll</HintPath>
+    </Reference>
+    <Reference Include="NStack">
+      <HintPath>..\..\..\Users\miguel\.nuget\packages\nstack.core\0.11.0\lib\netstandard1.5\NStack.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Remove="Drivers\#ConsoleDriver.cs#" />
