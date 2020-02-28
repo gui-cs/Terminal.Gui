@@ -65,7 +65,11 @@ namespace Unix.Terminal {
 
 		static UnmanagedLibrary curses_library;
 		static NativeMethods methods;
-		
+
+
+		[DllImport("libc")]
+		public extern static int setlocale(int cate, [MarshalAs(UnmanagedType.LPStr)] string locale);
+
 		static void LoadMethods ()
 		{
 			var libs = UnmanagedLibrary.IsMacOSPlatform ? new string [] { "libncurses.dylib" } : new string [] { "libncursesw.so.6", "libncursesw.so.5" };
@@ -86,6 +90,7 @@ namespace Unix.Terminal {
 		
 		static public Window initscr ()
 		{
+			setlocale(LC_ALL, "");
 			FindNCurses ();
 			
 			main_window = new Window (methods.initscr ());
@@ -134,7 +139,7 @@ namespace Unix.Terminal {
 		public static int addstr (string format, params object [] args)
 		{
 			var s = string.Format (format, args);
-			return addstr (s);
+			return addwstr (s);
 		}
 
 		static char [] r = new char [1];
@@ -150,7 +155,7 @@ namespace Unix.Terminal {
 			if (ch < 127 || ch > 0xffff )
 				return methods.addch (ch);
 			char c = (char) ch;
-			return addstr (new String (c, 1));
+			return addwstr (new String (c, 1));
 		}
 
 		static IntPtr stdscr;
@@ -247,7 +252,7 @@ namespace Unix.Terminal {
 		static public int wnoutrefresh (IntPtr win) => methods.wnoutrefresh (win);
 		static public int move (int line, int col) => methods.move (line, col);
 		//static public int addch (int ch) => methods.addch (ch);
-		static public int addstr (string s) => methods.addstr (s);
+		static public int addwstr (string s) => methods.addwstr (s);
 		static public int wmove (IntPtr win, int line, int col) => methods.wmove (win, line, col);
 		static public int waddch (IntPtr win, int ch) => methods.waddch (win, ch);
 		static public int attron (int attrs) => methods.attron (attrs);
@@ -305,7 +310,7 @@ namespace Unix.Terminal {
 		public delegate int wnoutrefresh (IntPtr win);
 		public delegate int move (int line, int col);
 		public delegate int addch (int ch);
-		public delegate int addstr (string s);
+		public delegate int addwstr([MarshalAs(UnmanagedType.LPWStr)]string s);
 		public delegate int wmove (IntPtr win, int line, int col);
 		public delegate int waddch (IntPtr win, int ch);
 		public delegate int attron (int attrs);
@@ -364,7 +369,7 @@ namespace Unix.Terminal {
 		public readonly Delegates.wnoutrefresh wnoutrefresh;
 		public readonly Delegates.move move;
 		public readonly Delegates.addch addch;
-		public readonly Delegates.addstr addstr;
+		public readonly Delegates.addwstr addwstr;
 		public readonly Delegates.wmove wmove;
 		public readonly Delegates.waddch waddch;
 		public readonly Delegates.attron attron;
@@ -383,8 +388,8 @@ namespace Unix.Terminal {
 		public readonly Delegates.ungetmouse ungetmouse;
 		public readonly Delegates.mouseinterval mouseinterval;
 		public readonly Delegates.mousemask mousemask;
-
 		public UnmanagedLibrary UnmanagedLibrary;
+
 		public NativeMethods (UnmanagedLibrary lib)
 		{
 			this.UnmanagedLibrary = lib;
@@ -424,8 +429,8 @@ namespace Unix.Terminal {
 			//wredrawwin = lib.GetNativeMethodDelegate<Delegates.wredrawwin> ("wredrawwin");
 			wnoutrefresh = lib.GetNativeMethodDelegate<Delegates.wnoutrefresh> ("wnoutrefresh");
 			move = lib.GetNativeMethodDelegate<Delegates.move> ("move");
-			addch = lib.GetNativeMethodDelegate<Delegates.addch> ("addch");
-			addstr = lib.GetNativeMethodDelegate<Delegates.addstr> ("addstr");
+			addch = lib.GetNativeMethodDelegate<Delegates.addch>("addch");
+			addwstr = lib.GetNativeMethodDelegate<Delegates.addwstr> ("addwstr");
 			wmove = lib.GetNativeMethodDelegate<Delegates.wmove> ("wmove");
 			waddch = lib.GetNativeMethodDelegate<Delegates.waddch> ("waddch");
 			attron = lib.GetNativeMethodDelegate<Delegates.attron> ("attron");
