@@ -151,7 +151,7 @@ namespace Terminal.Gui {
 			set {
 				if (source == null)
 					return;
-				
+
 				if (top < 0 || top >= source.Count)
 					throw new ArgumentException ("value");
 				top = value;
@@ -279,7 +279,7 @@ namespace Terminal.Gui {
 		{
 			if (source == null)
 				return base.ProcessKey (kb);
-			
+
 			switch (kb.Key) {
 			case Key.CursorUp:
 			case Key.ControlP:
@@ -379,7 +379,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor()
 		{
-			Move (0, selected-top);
+			if (allowsMarking)
+				Move (1, selected - top);
+			else
+				Move (0, selected - top);
 		}
 
 		public override bool MouseEvent(MouseEvent me)
@@ -387,16 +390,21 @@ namespace Terminal.Gui {
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked))
 				return false;
 
-			if (!HasFocus) 
+			if (!HasFocus)
 				SuperView.SetFocus (this);
 
 			if (source == null)
 				return false;
-			
+
 			if (me.Y + top >= source.Count)
 				return true;
 
 			selected = top + me.Y;
+			if (allowsMarking) {
+				Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
+				SetNeedsDisplay ();
+				return true;
+			}
 			if (SelectedChanged != null)
 				SelectedChanged();
 			SetNeedsDisplay ();
