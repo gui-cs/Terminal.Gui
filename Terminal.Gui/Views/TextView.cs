@@ -807,7 +807,7 @@ namespace Terminal.Gui {
 						currentRow--;
 						if (currentRow < topRow) {
 							topRow--;
-
+							SetNeedsDisplay ();
 						}
 						currentLine = GetCurrentLine ();
 						currentColumn = currentLine.Count;
@@ -1149,18 +1149,19 @@ namespace Terminal.Gui {
 				SuperView.SetFocus (this);
 
 
-			var maxCursorPositionableLine = (model.Count - 1) - topRow;
-			if (ev.Y > maxCursorPositionableLine) {
-				currentRow = maxCursorPositionableLine;
-			} else {
-				currentRow = ev.Y + topRow;
+			if (model.Count > 0) {
+				var maxCursorPositionableLine = (model.Count - 1) - topRow;
+				if (ev.Y > maxCursorPositionableLine) {
+					currentRow = maxCursorPositionableLine;
+				} else {
+					currentRow = ev.Y + topRow;
+				}
+				var r = GetCurrentLine ();
+				if (ev.X - leftColumn >= r.Count)
+					currentColumn = r.Count - leftColumn;
+				else
+					currentColumn = ev.X - leftColumn;
 			}
-			var r = GetCurrentLine ();
-			if (ev.X - leftColumn >= r.Count)
-				currentColumn = r.Count - leftColumn;
-			else
-				currentColumn = ev.X - leftColumn;
-
 			PositionCursor ();
 			return true;
 		}
