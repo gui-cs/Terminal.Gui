@@ -1,4 +1,4 @@
-﻿//
+﻿	//
 // TimeField.cs: text entry for time
 //
 // Author: Jörg Preiß
@@ -25,9 +25,9 @@ namespace Terminal.Gui {
 		int longFieldLen = 8;
 		int shortFieldLen = 5;
 		int FieldLen { get { return isShort ? shortFieldLen : longFieldLen; } }
-
-		string longFormat = " hh:mm:ss";
-		string shortFormat = " hh:mm";
+		string sepChar;
+		string longFormat;
+		string shortFormat;
 		string Format { get { return isShort ? shortFormat : longFormat; } }
 
 
@@ -40,9 +40,20 @@ namespace Terminal.Gui {
 		/// <param name="isShort">If true, the seconds are hidden.</param>
 		public TimeField (int x, int y, DateTime time, bool isShort = false) : base (x, y, isShort ? 7 : 10, "")
 		{
+			CultureInfo cultureInfo = CultureInfo.CurrentCulture;
+			sepChar = cultureInfo.DateTimeFormat.TimeSeparator;
+			longFormat = $" HH{sepChar}mm{sepChar}ss";
+			shortFormat = $" HH{sepChar}mm";
 			this.isShort = isShort;
 			CursorPosition = 1;
 			Time = time;
+			Changed += TimeField_Changed;
+		}
+
+		private void TimeField_Changed (object sender, ustring e)
+		{
+			if (!DateTime.TryParseExact (Text.ToString (), Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
+				Text = e;
 		}
 
 		/// <summary>
@@ -72,31 +83,66 @@ namespace Terminal.Gui {
 
 		bool SetText (ustring text)
 		{
-			if (!DateTime.TryParseExact (text.ToString (), Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result)) 
+			ustring [] vals = text.Split (ustring.Make (sepChar));
+			bool isValidTime = true;
+			int hour = Int32.Parse (vals [0].ToString ());
+			int minute = Int32.Parse (vals [1].ToString ());
+			int second = isShort ? 0 : Int32.Parse (vals [2].ToString ());
+			if (hour < 0) {
+				isValidTime = false;
+				hour = 0;
+				vals [0] = "0";
+			} else if (hour > 23) {
+				isValidTime = false;
+				hour = 23;
+				vals [0] = "23";
+			}
+			if (minute < 0) {
+				isValidTime = false;
+				minute = 0;
+				vals [1] = "0";
+			} else if (minute > 59) {
+				isValidTime = false;
+				minute = 59;
+				vals [1] = "59";
+			}
+			if (second < 0) {
+				isValidTime = false;
+				second = 0;
+				vals [2] = "0";
+			} else if (second > 59) {
+				isValidTime = false;
+				second = 59;
+				vals [2] = "59";
+			}
+			string time = isShort ? $" {hour,2:00}{sepChar}{minute,2:00}" : $" {hour,2:00}{sepChar}{minute,2:00}{sepChar}{second,2:00}";
+			Text = time;
+
+			if (!DateTime.TryParseExact (text.ToString (), Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result) ||
+				!isValidTime) 
 				return false;
-			Text = text;
 			return true;
 		}
 
 		void IncCursorPosition ()
 		{
-			if (CursorPosition == FieldLen) 
+			if (CursorPosition == FieldLen)
 				return;
-			if (Text [++CursorPosition] == ':') 
+			if (Text [++CursorPosition] == sepChar.ToCharArray () [0])
 				CursorPosition++;
 		}
 
 		void DecCursorPosition ()
 		{
-			if (CursorPosition == 1) 
+			if (CursorPosition == 1)
 				return;
-			if (Text [--CursorPosition] == ':') 
+			if (Text [--CursorPosition] == sepChar.ToCharArray () [0])
 				CursorPosition--;
 		}
 
 		void AdjCursorPosition ()
 		{
-			if (Text [CursorPosition] == ':') 
+			if (Text [CursorPosition] == sepChar.ToCharArray () [0])
 				CursorPosition++;
 		}
 
