@@ -124,12 +124,7 @@ namespace Terminal.Gui {
 
 		static Rect MakeFrame (int x, int y, MenuItem [] items)
 		{
-			int maxW = 0;
-
-			foreach (var item in items) {
-				var l = item.Width;
-				maxW = Math.Max (l, maxW);
-			}
+			int maxW = items.Max(z=>z?.Width) ?? 0;
 
 			return new Rect (x, y, maxW + 2, items.Length + 2);
 		}
