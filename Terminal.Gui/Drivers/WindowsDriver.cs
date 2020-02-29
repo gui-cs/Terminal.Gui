@@ -100,6 +100,11 @@ namespace Terminal.Gui {
 				var err = Marshal.GetLastWin32Error ();
 				Console.WriteLine ("Error: {0}", err);
 			}
+
+			if (ScreenBuffer != IntPtr.Zero)
+				CloseHandle(ScreenBuffer);
+
+			ScreenBuffer = IntPtr.Zero;
 		}
 
 		private bool ContinueListeningForConsoleEvents = true;
@@ -351,6 +356,9 @@ namespace Terminal.Gui {
 
 		[DllImport ("kernel32.dll", SetLastError = true)]
 		static extern IntPtr GetStdHandle (int nStdHandle);
+
+		[DllImport("kernel32.dll", SetLastError = true)]
+		static extern bool CloseHandle(IntPtr handle);
 
 		[DllImport ("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode)]
 		public static extern bool ReadConsoleInput (
