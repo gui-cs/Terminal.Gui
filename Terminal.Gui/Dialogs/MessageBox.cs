@@ -43,7 +43,7 @@ namespace Terminal.Gui {
 		/// <param name="width">Width for the window.</param>
 		/// <param name="height">Height for the window.</param>
 		/// <param name="title">Title for the query.</param>
-		/// <param name="message">Message to display, might contain multiple lines..</param>
+		/// <param name="message">Message to display, might contain multiple lines.</param>
 		/// <param name="buttons">Array of buttons to add.</param>
 		public static int ErrorQuery (int width, int height, string title, string message, params string [] buttons)
 		{
@@ -55,10 +55,10 @@ namespace Terminal.Gui {
 			int textWidth = Label.MaxWidth (message, width);
 			int clicked = -1, count = 0;
 
-			var d = new Dialog (title, width, height);
+			var d = new Dialog (title, Math.Max(width, textWidth) + 4, height);
 			if (useErrorColors)
 				d.ColorScheme = Colors.Error;
-			
+
 			foreach (var s in buttons) {
 				int n = count++;
 				var b = new Button (s);
@@ -69,7 +69,7 @@ namespace Terminal.Gui {
 				d.AddButton (b);
 			}
 			if (message != null) {
-				var l = new Label ((width - 4 - textWidth) / 2, 0, message);
+				var l = new Label (textWidth > width ? 0 : (width - 4 - textWidth) / 2, 0, message);
 				d.Add (l);
 			}
 
