@@ -230,7 +230,7 @@ namespace Terminal.Gui {
 			// because the new calculated cursor position is needed to be set BEFORE the change event is triggert
 			// Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
 			var oldCursorPos = point;
-			
+
 			switch (kb.Key) {
 			case Key.DeleteChar:
 			// TODO: If text length greater than 0 delete all selected text and reposition the cursor
@@ -465,7 +465,7 @@ namespace Terminal.Gui {
 		}
 
 		void SetSelStartSelLength ()
-		{			
+		{
 			if (SelLength < 0) {
 				start = SelLength + SelStart;
 				length = Math.Abs (SelLength);
