@@ -128,7 +128,7 @@ void SetupMyView (View myView)
         Y = 2,
         Width = 30,
         Height = 1
-    }
+    };
     myView.Add (username);
 }
 ```
