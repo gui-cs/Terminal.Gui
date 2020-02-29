@@ -283,67 +283,95 @@ namespace Terminal.Gui {
 			switch (kb.Key) {
 			case Key.CursorUp:
 			case Key.ControlP:
-				if (selected > 0) {
-					selected--;
-					if (selected < top)
-						top = selected;
-					if (SelectedChanged != null)
-						SelectedChanged ();
-					SetNeedsDisplay ();
-				}
-				return true;
+				return MoveUp();
 
 			case Key.CursorDown:
 			case Key.ControlN:
-				if (selected + 1 < source.Count) {
-					selected++;
-					if (selected >= top + Frame.Height)
-						top++;
-					if (SelectedChanged != null)
-						SelectedChanged ();
-					SetNeedsDisplay ();
-				}
-				return true;
+				return MoveDown();
 
 			case Key.ControlV:
 			case Key.PageDown:
-				var n = (selected + Frame.Height);
-				if (n > source.Count)
-					n = source.Count - 1;
-				if (n != selected) {
-					selected = n;
-					if (source.Count >= Frame.Height)
-						top = selected;
-					else
-						top = 0;
-					if (SelectedChanged != null)
-						SelectedChanged ();
-					SetNeedsDisplay ();
-				}
-				return true;
+				return MovePageDown();
 
 			case Key.PageUp:
-				n = (selected - Frame.Height);
-				if (n < 0)
-					n = 0;
-				if (n != selected) {
-					selected = n;
-					top = selected;
-					if (SelectedChanged != null)
-						SelectedChanged ();
-					SetNeedsDisplay ();
-				}
-				return true;
+				return MovePageUp();
 
 			case Key.Space:
-				if (allowsMarking) {
-					Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
-					SetNeedsDisplay ();
+				if (MarkUnmarkRow())
 					return true;
-				}
-				break;
+				else
+					break;
 			}
 			return base.ProcessKey (kb);
+		}
+
+		public virtual bool MarkUnmarkRow(){
+			if (allowsMarking){
+				Source.SetMark(SelectedItem, !Source.IsMarked(SelectedItem));
+				SetNeedsDisplay();
+				return true;
+			}
+
+			return false;
+		}
+
+		public virtual bool MovePageUp(){
+			int n = (selected - Frame.Height);
+			if (n < 0)
+				n = 0;
+			if (n != selected){
+				selected = n;
+				top = selected;
+				if (SelectedChanged != null)
+					SelectedChanged();
+				SetNeedsDisplay();
+			}
+
+			return true;
+		}
+
+		public virtual bool MovePageDown(){
+			var n = (selected + Frame.Height);
+			if (n > source.Count)
+				n = source.Count - 1;
+			if (n != selected){
+				selected = n;
+				if (source.Count >= Frame.Height)
+					top = selected;
+				else
+					top = 0;
+				if (SelectedChanged != null)
+					SelectedChanged();
+				SetNeedsDisplay();
+			}
+
+			return true;
+		}
+
+		public virtual bool MoveDown(){
+			if (selected + 1 < source.Count){
+				selected++;
+				if (selected >= top + Frame.Height)
+					top++;
+				if (SelectedChanged != null)
+					SelectedChanged();
+				SetNeedsDisplay();
+			}
+
+			return true;
+		}
+
+		public virtual bool MoveUp(){
+			if (selected > 0){
+				selected--;
+				if (selected < top)
+					top = selected;
+				if (SelectedChanged != null)
+					SelectedChanged();
+				SetNeedsDisplay();
+			}
+
+			return true;
 		}
 
 		/// <summary>
