@@ -1898,6 +1898,12 @@ namespace Terminal.Gui {
 
 		static void ProcessMouseEvent (MouseEvent me)
 		{
+			// Get deepest view
+			int rx, ry;
+			var view = FindDeepestView(Current, me.X, me.Y, out rx, out ry);
+			me.DeepestView = view;
+
+			// Invoke default event
 			RootMouseEvent?.Invoke (me);
 			if (mouseGrabView != null) {
 				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
@@ -1910,8 +1916,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			int rx, ry;
-			var view = FindDeepestView (Current, me.X, me.Y, out rx, out ry);
+			// Invoke view event if exists
 			if (view != null) {
 				if (!view.WantMousePositionReports && me.Flags == MouseFlags.ReportMousePosition)
 					return;

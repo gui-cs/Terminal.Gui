@@ -441,6 +441,11 @@ namespace Terminal.Gui {
 		public MouseFlags Flags;
 
 		/// <summary>
+		/// Deepest view involved in the event.
+		/// </summary>
+		public View DeepestView;
+
+		/// <summary>
 		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.MouseEvent"/>.
 		/// </summary>
 		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.MouseEvent"/>.</returns>
