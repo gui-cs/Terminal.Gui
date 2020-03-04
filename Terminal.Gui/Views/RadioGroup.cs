@@ -108,7 +108,7 @@ namespace Terminal.Gui {
 
 		public override void Redraw (Rect region)
 		{
-			base.Redraw (region);			
+			base.Redraw (region);
 			for (int i = 0; i < radioLabels.Length; i++) {
 				Move (0, i);
 				Driver.SetAttribute (ColorScheme.Normal);
