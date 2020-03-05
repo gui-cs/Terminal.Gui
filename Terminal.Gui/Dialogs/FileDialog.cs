@@ -23,11 +23,13 @@ namespace Terminal.Gui {
 		internal bool canChooseFiles = true;
 		internal bool canChooseDirectories = false;
 		internal bool allowsMultipleSelection = false;
+		FileDialog host;
 
-		public DirListView ()
+		public DirListView (FileDialog host)
 		{
 			infos = new List<(string,bool,bool)> ();
 			CanFocus = true;
+			this.host = host;
 		}
 
 		bool IsAllowed (FileSystemInfo fsi)
@@ -71,6 +73,70 @@ namespace Terminal.Gui {
 			Move (0, selected - top);
 		}
 
+		int lastSelected;
+		bool shiftOnWheel;
+		public override bool MouseEvent (MouseEvent me)
+		{
+			if ((me.Flags & (MouseFlags.Button1Clicked | MouseFlags.Button1DoubleClicked |
+				MouseFlags.WheeledUp | MouseFlags.WheeledDown)) == 0)
+				return false;
+
+			if (!HasFocus)
+				SuperView.SetFocus (this);
+
+			if (infos == null)
+				return false;
+
+			if (me.Y + top >= infos.Count)
+				return true;
+
+			int lastSelectedCopy = shiftOnWheel ? lastSelected : selected;
+			lastSelected = selected;
+			selected = top + me.Y;
+
+			switch (me.Flags) {
+			case MouseFlags.Button1DoubleClicked:
+				if (ExecuteSelection ()) {
+					host.canceled = false;
+					Application.RequestStop ();
+				}
+				return true;
+			case MouseFlags.Button1Clicked | MouseFlags.ButtonShift:
+				if (shiftOnWheel)
+					lastSelected = lastSelectedCopy;
+				shiftOnWheel = false;
+				PerformMultipleSelection (lastSelected);
+				return true;
+			case MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl:
+				PerformMultipleSelection ();
+				return true;
+			case MouseFlags.WheeledUp:
+				selected = lastSelected;
+				MoveUp ();
+				return true;
+			case MouseFlags.WheeledDown:
+				selected = lastSelected;
+				MoveDown ();
+				return true;
+			case MouseFlags.WheeledUp | MouseFlags.ButtonShift:
+				selected = lastSelected;
+				lastSelected = lastSelectedCopy;
+				shiftOnWheel = true;
+				MoveUp ();
+				return true;
+			case MouseFlags.WheeledDown | MouseFlags.ButtonShift:
+				selected = lastSelected;
+				lastSelected = lastSelectedCopy;
+				shiftOnWheel = true;
+				MoveDown ();
+				return true;
+			}
+
+			SelectionChanged ();
+			SetNeedsDisplay ();
+			return true;
+		}
+
 		void DrawString (int line, string str)
 		{
 			var f = Frame;
@@ -91,7 +157,7 @@ namespace Terminal.Gui {
 			}
 			for (; used < width; used++) {
 				Driver.AddRune (' ');
-			}			
+			}
 		}
 
 		public override void Redraw (Rect region)
@@ -123,7 +189,7 @@ namespace Terminal.Gui {
 
 				if (allowsMultipleSelection)
 					Driver.AddRune (fi.Item3 ? '*' : ' ');
-				
+
 				if (fi.Item2)
 					Driver.AddRune ('/');
 				else
@@ -138,10 +204,25 @@ namespace Terminal.Gui {
 
 		void SelectionChanged ()
 		{
+			if (FilePaths.Count > 0)
+				FileChanged?.Invoke (string.Join (", ", GetFilesName (FilePaths)));
+			else
+				FileChanged?.Invoke (infos [selected].Item2 ? "" : Path.GetFileName (infos [selected].Item1));
 			if (SelectedChanged != null) {
 				var sel = infos [selected];
 				SelectedChanged ((sel.Item1, sel.Item2));
 			}
+		}
+
+		List<string> GetFilesName (IReadOnlyList<string> files)
+		{
+			List<string> filesName = new List<string> ();
+
+			foreach (var file in files) {
+				filesName.Add (Path.GetFileName (file));
+			}
+
+			return filesName;
 		}
 
 		public override bool ProcessKey (KeyEvent keyEvent)
@@ -149,24 +230,12 @@ namespace Terminal.Gui {
 			switch (keyEvent.Key) {
 			case Key.CursorUp:
 			case Key.ControlP:
-				if (selected > 0) {
-					selected--;
-					if (selected < top)
-						top = selected;
-					SelectionChanged ();
-					SetNeedsDisplay ();
-				}
+				MoveUp ();
 				return true;
 
 			case Key.CursorDown:
 			case Key.ControlN:
-				if (selected + 1 < infos.Count) {
-					selected++;
-					if (selected >= top + Frame.Height)
-						top++;
-					SelectionChanged ();
-					SetNeedsDisplay ();
-				}
+				MoveDown ();
 				return true;
 
 			case Key.ControlV:
@@ -187,22 +256,10 @@ namespace Terminal.Gui {
 				return true;
 
 			case Key.Enter:
-				var isDir = infos [selected].Item2;
-
-				if (isDir) {
-					Directory = Path.GetFullPath (Path.Combine (Path.GetFullPath (Directory.ToString ()), infos [selected].Item1));
-					if (DirectoryChanged != null)
-						DirectoryChanged (Directory);
-				} else {
-					if (FileChanged != null)
-						FileChanged (infos [selected].Item1);
-					if (canChooseFiles) {
-						// Let the OK handler take it over
-						return false;
-					}
-					// No files allowed, do not let the default handler take it.
-				}
-				return true;
+				if (ExecuteSelection ())
+					return false;
+				else
+					return true;
 
 			case Key.PageUp:
 				n = (selected - Frame.Height);
@@ -217,19 +274,108 @@ namespace Terminal.Gui {
 				return true;
 
 			case Key.Space:
-			case Key.ControlT: 
-				if (allowsMultipleSelection) {
-					if ((canChooseFiles && infos [selected].Item2 == false) ||
-					    (canChooseDirectories && infos [selected].Item2 &&
-					     infos [selected].Item1 != "..")){
-						infos [selected] = (infos [selected].Item1, infos [selected].Item2, !infos [selected].Item3);
-						SelectionChanged ();
-						SetNeedsDisplay ();
-					}
-				}
+			case Key.ControlT:
+				PerformMultipleSelection ();
+				return true;
+
+			case Key.Home:
+				MoveFirst ();
+				return true;
+
+			case Key.End:
+				MoveLast ();
 				return true;
 			}
 			return base.ProcessKey (keyEvent);
+		}
+
+		private void MoveLast ()
+		{
+			selected = infos.Count - 1;
+			top = infos.Count () - 1;
+			SelectionChanged ();
+			SetNeedsDisplay ();
+		}
+
+		private void MoveFirst ()
+		{
+			selected = 0;
+			top = 0;
+			SelectionChanged ();
+			SetNeedsDisplay ();
+		}
+
+		private void MoveDown ()
+		{
+			if (selected + 1 < infos.Count) {
+				selected++;
+				if (selected >= top + Frame.Height)
+					top++;
+				SelectionChanged ();
+				SetNeedsDisplay ();
+			}
+		}
+
+		private void MoveUp ()
+		{
+			if (selected > 0) {
+				selected--;
+				if (selected < top)
+					top = selected;
+				SelectionChanged ();
+				SetNeedsDisplay ();
+			}
+		}
+
+		internal bool ExecuteSelection ()
+		{
+			var isDir = infos [selected].Item2;
+
+			if (isDir) {
+				Directory = Path.GetFullPath (Path.Combine (Path.GetFullPath (Directory.ToString ()), infos [selected].Item1));
+				DirectoryChanged?.Invoke (Directory);
+			} else {
+				FileChanged?.Invoke (infos [selected].Item1);
+				if (canChooseFiles) {
+					// Ensures that at least one file is selected.
+					if (FilePaths.Count == 0)
+						PerformMultipleSelection ();
+					// Let the OK handler take it over
+					return true;
+				}
+				// No files allowed, do not let the default handler take it.
+			}
+			return false;
+		}
+
+		//private void PerformSelection ()
+		//{
+		//	if (allowsMultipleSelection) {
+		//		if ((canChooseFiles && infos [selected].Item2 == false) ||
+		//		    (canChooseDirectories && infos [selected].Item2 &&
+		//		     infos [selected].Item1 != "..")){
+		//			infos [selected] = (infos [selected].Item1, infos [selected].Item2, !infos [selected].Item3);
+		//			SelectionChanged ();
+		//			SetNeedsDisplay ();
+		//		}
+		//	}
+		//}
+
+		private void PerformMultipleSelection (int? firstSelected = null)
+		{
+			if (allowsMultipleSelection) {
+				int first = Math.Min (firstSelected ?? selected, selected);
+				int last = Math.Max (selected, firstSelected ?? selected);
+				for (int i = first; i <= last; i++) {
+					if ((canChooseFiles && infos [i].Item2 == false) ||
+					    (canChooseDirectories && infos [i].Item2 &&
+					     infos [i].Item1 != "..")) {
+						infos [i] = (infos [i].Item1, infos [i].Item2, !infos [i].Item3);
+					}
+				}
+				SelectionChanged ();
+				SetNeedsDisplay ();
+			}
 		}
 
 		string [] allowedFileTypes;
@@ -306,18 +452,16 @@ namespace Terminal.Gui {
 			};
 			Add (this.nameFieldLabel, nameEntry);
 
-			dirListView = new DirListView () {
+			dirListView = new DirListView (this) {
 				X = 1,
 				Y = 3 + msgLines + 2,
-				Width = Dim.Fill () - 2,
+				Width = Dim.Fill () - 3,
 				Height = Dim.Fill () - 2,
 			};
 			DirectoryPath = Path.GetFullPath (Environment.CurrentDirectory);
 			Add (dirListView);
 			dirListView.DirectoryChanged = (dir) => dirEntry.Text = dir;
-			dirListView.FileChanged = (file) => {
-				nameEntry.Text = file;
-			};
+			dirListView.FileChanged = (file) => nameEntry.Text = file;
 
 			this.cancel = new Button ("Cancel");
 			this.cancel.Clicked += () => {
@@ -330,6 +474,7 @@ namespace Terminal.Gui {
 				IsDefault = true,
 			};
 			this.prompt.Clicked += () => {
+				dirListView.ExecuteSelection ();
 				canceled = false;
 				Application.RequestStop ();
 			};
@@ -430,6 +575,8 @@ namespace Terminal.Gui {
 				nameEntry.Text = Path.GetFileName(value.ToString());
 			}
 		}
+
+		public bool Canceled { get => canceled; }
 	}
 
 	/// <summary>
