@@ -575,7 +575,7 @@ namespace Terminal.Gui {
 
 		private MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
-			MouseFlags mouseFlag = 0;
+			MouseFlags mouseFlag = MouseFlags.AllEvents;
 
 			// The ButtonState member of the MouseEvent structure has bit corresponding to each mouse button.
 			// This will tell when a mouse button is pressed. When the button is released this event will
