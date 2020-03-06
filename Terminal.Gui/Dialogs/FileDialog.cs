@@ -348,19 +348,6 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		//private void PerformSelection ()
-		//{
-		//	if (allowsMultipleSelection) {
-		//		if ((canChooseFiles && infos [selected].Item2 == false) ||
-		//		    (canChooseDirectories && infos [selected].Item2 &&
-		//		     infos [selected].Item1 != "..")){
-		//			infos [selected] = (infos [selected].Item1, infos [selected].Item2, !infos [selected].Item3);
-		//			SelectionChanged ();
-		//			SetNeedsDisplay ();
-		//		}
-		//	}
-		//}
-
 		private void PerformMultipleSelection (int? firstSelected = null)
 		{
 			if (allowsMultipleSelection) {
