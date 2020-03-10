@@ -228,6 +228,8 @@ namespace Terminal.Gui {
 		View container = null;
 		View focused = null;
 		Direction focusDirection;
+		public event EventHandler OnEnter;
+		public event EventHandler OnLeave;
 
 		internal Direction FocusDirection {
 			get => SuperView?.FocusDirection ?? focusDirection;
@@ -826,11 +828,16 @@ namespace Terminal.Gui {
 			}
 			internal set {
 				if (base.HasFocus != value)
+					if (value == true)
+						OnEnter?.Invoke (this, new EventArgs ());
+					else
+						OnLeave?.Invoke (this, new EventArgs ());
 					SetNeedsDisplay ();
 				base.HasFocus = value;
 
 				// Remove focus down the chain of subviews if focus is removed
 				if (value == false && focused != null) {
+					OnLeave?.Invoke (focused, new EventArgs ());
 					focused.HasFocus = false;
 					focused = null;
 				}

@@ -813,7 +813,8 @@ namespace Terminal.Gui {
 			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Cyan);
 			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
 			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
-			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
+			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Cyan);
+			Colors.Menu.Disabled = MakeColor(ConsoleColor.DarkGray, ConsoleColor.Cyan);
 
 			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
 			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
