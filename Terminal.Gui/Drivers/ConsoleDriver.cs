@@ -159,28 +159,28 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The default color for text, when the view is not focused.
 		/// </summary>
-		public Attribute Normal { get { return _normal; } set { _normal = SetColorScheme (value); } }
+		public Attribute Normal { get { return _normal; } set { _normal = SetAttribute (value); } }
 
 		/// <summary>
 		/// The color for text when the view has the focus.
 		/// </summary>
-		public Attribute Focus { get { return _focus; } set { _focus = SetColorScheme (value); } }
+		public Attribute Focus { get { return _focus; } set { _focus = SetAttribute (value); } }
 
 		/// <summary>
 		/// The color for the hotkey when a view is not focused
 		/// </summary>
-		public Attribute HotNormal { get { return _hotNormal; } set { _hotNormal = SetColorScheme (value); } }
+		public Attribute HotNormal { get { return _hotNormal; } set { _hotNormal = SetAttribute (value); } }
 
 		/// <summary>
 		/// The color for the hotkey when the view is focused.
 		/// </summary>
-		public Attribute HotFocus { get { return _hotFocus; } set { _hotFocus = SetColorScheme (value); } }
+		public Attribute HotFocus { get { return _hotFocus; } set { _hotFocus = SetAttribute (value); } }
 
 		public string Caller = "";
 
 		private bool preparingScheme = false;
 
-		private Attribute SetColorScheme (Attribute attribute, [CallerMemberName]string callerMemberName = null)
+		private Attribute SetAttribute (Attribute attribute, [CallerMemberName]string callerMemberName = null)
 		{
 			if (!Application._initialized && !preparingScheme)
 				return attribute;
