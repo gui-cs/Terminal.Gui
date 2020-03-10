@@ -763,10 +763,10 @@ namespace Terminal.Gui {
 			Colors.Base.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Blue);
 			Colors.Base.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
 
-			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
+			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Cyan);
 			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
 			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
-			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Cyan);
+			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
 
 			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
 			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
@@ -847,7 +847,9 @@ namespace Terminal.Gui {
 		{
 			// Encode the colors into the int value.
 			return new Attribute () {
-				value = ((int)f | (int)b << 4)
+				value = ((int)f | (int)b << 4),
+				foreground = (Color)f,
+				background = (Color)b
 			};
 		}
 
@@ -881,7 +883,7 @@ namespace Terminal.Gui {
 		{
 			if (damageRegion.Left == -1)
 				return;
-			
+
 			var bufferCoords = new WindowsConsole.Coord (){
 				X = (short)Clip.Width,
 				Y = (short)Clip.Height
@@ -945,5 +947,4 @@ namespace Terminal.Gui {
 
 	}
 
-	
 }

@@ -1585,9 +1585,9 @@ namespace Terminal.Gui {
 			// a pending mouse event activated.
 			if (true)
 				return false;
-			
+
 			if ((mouseEvent.Flags == MouseFlags.Button1Pressed|| mouseEvent.Flags == MouseFlags.Button4Pressed)){
-				
+
 				if (dragPosition.HasValue) {
 					var dx = mouseEvent.X - dragPosition.Value.X;
 					var dy = mouseEvent.Y - dragPosition.Value.Y;
@@ -1741,7 +1741,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void Init () => Init (() => Toplevel.Create ());
 
-		static bool _initialized = false;
+		internal static bool _initialized = false;
 
 		/// <summary>
 		/// Initializes the Application
@@ -1749,7 +1749,6 @@ namespace Terminal.Gui {
 		static void Init (Func<Toplevel> topLevelFactory)
 		{
 			if (_initialized) return;
-			_initialized = true;
 
 			var p = Environment.OSVersion.Platform;
 			Mono.Terminal.IMainLoopDriver mainLoopDriver;
@@ -1770,6 +1769,7 @@ namespace Terminal.Gui {
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			Top = topLevelFactory ();
 			Current = Top;
+			_initialized = true;
 		}
 
 		/// <summary>
