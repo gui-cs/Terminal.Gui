@@ -1,4 +1,4 @@
-﻿//
+//
 // Menu.cs: application menus and submenus
 //
 // Authors:
@@ -194,13 +194,7 @@ namespace Terminal.Gui {
 
 		static Rect MakeFrame (int x, int y, MenuItem [] items)
 		{
-			int maxW = 0;
-
-			foreach (var item in items) {
-				if (item == null) continue;
-				var l = item.Width;
-				maxW = Math.Max (l, maxW);
-			}
+			int maxW = items.Max(z => z?.Width) ?? 0;
 
 			return new Rect (x, y, maxW + 2, items.Length + 2);
 		}
@@ -626,7 +620,7 @@ namespace Terminal.Gui {
 			if (openMenu != null)
 				SuperView.Remove (openMenu);
 			int pos = 0;
-			for (int i = 0; i < index; i++) 
+			for (int i = 0; i < index; i++)
 				pos += Menus [i].Title.Length + 3;
 
 			openMenu = new Menu (this, pos, 1, Menus [index]);
@@ -652,7 +646,7 @@ namespace Terminal.Gui {
 		void Activate (int idx)
 		{
 			selected = idx;
-			if (openMenu == null) 
+			if (openMenu == null)
 				previousFocused = SuperView.Focused;
 
 			OpenMenu (idx);

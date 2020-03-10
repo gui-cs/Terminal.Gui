@@ -166,6 +166,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Attribute Disabled;
 		/// <summary>
+		/// The default color for text, when the view is disabled.
+		/// </summary>
+		public Attribute Disabled;
+		/// <summary>
 		/// The color for text when the view has the focus.
 		/// </summary>
 		public Attribute Focus { get { return _focus; } set { _focus = SetAttribute (value); } }

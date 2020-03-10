@@ -575,7 +575,9 @@ namespace Terminal.Gui {
 
 		private MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
-			MouseFlags mouseFlag = MouseFlags.AllEvents;
+			MouseFlags mouseFlag = 0;
+
+
 
 			// The ButtonState member of the MouseEvent structure has bit corresponding to each mouse button.
 			// This will tell when a mouse button is pressed. When the button is released this event will
@@ -586,7 +588,8 @@ namespace Terminal.Gui {
 				LastMouseButtonPressed = null;
 			}
 
-			if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null) {
+			if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null ||
+				mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved && mouseEvent.ButtonState != 0) {
 				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Pressed;

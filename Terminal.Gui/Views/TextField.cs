@@ -58,6 +58,7 @@ namespace Terminal.Gui {
 			this.text = TextModel.ToRunes (text);
 			point = text.Length;
 			CanFocus = true;
+			WantMousePositionReports = true;
 		}
 
 		/// <summary>
@@ -98,9 +99,9 @@ namespace Terminal.Gui {
 			}
 
 			set {
-				ustring oldText = ustring.Make(text);
+				ustring oldText = ustring.Make (text);
 				text = TextModel.ToRunes (value);
-				Changed?.Invoke(this, oldText);
+				Changed?.Invoke (this, oldText);
 
 				if (point > text.Count)
 					point = Math.Max (text.Count-1, 0);
@@ -148,6 +149,9 @@ namespace Terminal.Gui {
 
 		public override void Redraw (Rect region)
 		{
+			ColorScheme color = Colors.Menu;
+			SetSelStartSelLength ();
+
 			Driver.SetAttribute (ColorScheme.Focus);
 			Move (0, 0);
 
@@ -160,11 +164,14 @@ namespace Terminal.Gui {
 				if (idx < first)
 					continue;
 				var cols = Rune.ColumnWidth (rune);
+				System.Diagnostics.Debug.WriteLine ($"SelStart: {SelStart}, SelLength: {SelLength} SelText: {SelText}");
+				Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : ColorScheme.Focus);
 				if (col + cols < width)
 					Driver.AddRune ((Rune)(Secret ? '*' : rune));
 				col += cols;
 			}
 
+			Driver.SetAttribute (ColorScheme.Focus);
 			for (int i = col; i < Frame.Width; i++)
 				Driver.AddRune (' ');
 
@@ -216,13 +223,17 @@ namespace Terminal.Gui {
 
 		public override bool ProcessKey (KeyEvent kb)
 		{
+			if (selResetNeeded || SelStart > -1)
+				ClearAllSelection ();
+
 			// remember current cursor position
 			// because the new calculated cursor position is needed to be set BEFORE the change event is triggert
 			// Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
 			var oldCursorPos = point;
-			
+
 			switch (kb.Key) {
 			case Key.DeleteChar:
+			// TODO: If text length greater than 0 delete all selected text and reposition the cursor
 			case Key.ControlD:
 				if (text.Count == 0 || text.Count== point)
 					return true;
@@ -233,6 +244,7 @@ namespace Terminal.Gui {
 
 			case Key.Delete:
 			case Key.Backspace:
+				// TODO: If text length greater than 0 delete all selected text and reposition the cursor
 				if (point == 0)
 					return true;
 
@@ -402,9 +414,18 @@ namespace Terminal.Gui {
 			return -1;
 		}
 
-        	public override bool MouseEvent (MouseEvent ev)
+		public int SelStart { get; set; } = -1;
+
+		public int SelLength { get; set; } = 0;
+
+		public ustring SelText { get; set; }
+
+		bool selResetNeeded;
+		int start, length;
+
+		public override bool MouseEvent (MouseEvent ev)
 		{
-			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked))
+			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked) && !ev.Flags.HasFlag (MouseFlags.Button1Pressed))
 				return false;
 
 			if (!HasFocus)
@@ -417,10 +438,41 @@ namespace Terminal.Gui {
 			if (point < first)
 				point = 0;
 
+			// FIXME: If mouse exits out of view with left button pressed I can't change selResetNeeded to true
+			if (ev.Flags.HasFlag (MouseFlags.Button1Clicked) && SelStart > -1)
+				selResetNeeded = true;
+			else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed)) {
+				if (selResetNeeded)
+					ClearAllSelection ();
+				selResetNeeded = false;
+				SelStart = SelStart == -1 && text.Count > 0 && ev.X >= 0 && ev.X <= text.Count ? ev.X : SelStart;
+				if (SelStart > -1) {
+					SelLength = SelStart > -1 && ev.X <= text.Count ? ev.X - SelStart : text.Count - SelStart;
+					SetSelStartSelLength ();
+					SelText = length > 0 ? ustring.Make (text).ToString ().Substring (start, length) : "";
+				}
+			}
+
 			SetNeedsDisplay ();
 			return true;
 		}
+
+		void ClearAllSelection ()
+		{
+			SelStart = -1;
+			SelLength = 0;
+			SelText = "";
+		}
+
+		void SetSelStartSelLength ()
+		{
+			if (SelLength < 0) {
+				start = SelLength + SelStart;
+				length = Math.Abs (SelLength);
+			} else {
+				start = SelStart;
+				length = SelLength;
+			}
+		}
 	}
-
-
 }
