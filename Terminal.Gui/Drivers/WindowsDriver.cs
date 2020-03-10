@@ -151,7 +151,8 @@ namespace Terminal.Gui {
 			Button3Pressed = 8,
 			Button4Pressed = 16,
 			RightmostButtonPressed = 2,
-
+			WheeledUp = unchecked((int)0x780000),
+			WheeledDown = unchecked((int)0xFF880000),
 		}
 
 		[Flags]
@@ -595,7 +596,7 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button2Pressed;
 					break;
 
-				case WindowsConsole.ButtonState.Button3Pressed:
+				case WindowsConsole.ButtonState.RightmostButtonPressed:
 					mouseFlag = MouseFlags.Button3Pressed;
 					break;
 				}
@@ -610,11 +611,57 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button2Clicked;
 					break;
 
-				case WindowsConsole.ButtonState.Button3Pressed:
+				case WindowsConsole.ButtonState.RightmostButtonPressed:
 					mouseFlag = MouseFlags.Button3Clicked;
 					break;
 				}
 				LastMouseButtonPressed = null;
+
+				switch (mouseEvent.ControlKeyState) {
+				case WindowsConsole.ControlKeyState.RightControlPressed:
+				case WindowsConsole.ControlKeyState.LeftControlPressed:
+					mouseFlag |= MouseFlags.ButtonCtrl;
+					break;
+
+				case WindowsConsole.ControlKeyState.ShiftPressed:
+					mouseFlag |= MouseFlags.ButtonShift;
+					break;
+				}
+			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.DoubleClick) {
+				switch (mouseEvent.ButtonState) {
+				case WindowsConsole.ButtonState.Button1Pressed:
+					mouseFlag = MouseFlags.Button1DoubleClicked;
+					break;
+
+				case WindowsConsole.ButtonState.Button2Pressed:
+					mouseFlag = MouseFlags.Button2DoubleClicked;
+					break;
+
+				case WindowsConsole.ButtonState.RightmostButtonPressed:
+					mouseFlag = MouseFlags.Button3DoubleClicked;
+					break;
+				}
+			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseWheeled) {
+				switch (mouseEvent.ButtonState) {
+				case WindowsConsole.ButtonState.WheeledUp:
+					mouseFlag = MouseFlags.WheeledUp;
+					break;
+
+				case WindowsConsole.ButtonState.WheeledDown:
+					mouseFlag = MouseFlags.WheeledDown;
+					break;
+				}
+
+				switch (mouseEvent.ControlKeyState) {
+				case WindowsConsole.ControlKeyState.RightControlPressed:
+				case WindowsConsole.ControlKeyState.LeftControlPressed:
+					mouseFlag |= MouseFlags.ButtonCtrl;
+					break;
+
+				case WindowsConsole.ControlKeyState.ShiftPressed:
+					mouseFlag |= MouseFlags.ButtonShift;
+					break;
+				}
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 				mouseFlag = MouseFlags.ReportMousePosition;
 			}

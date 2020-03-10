@@ -222,10 +222,13 @@ static class Demo {
 
 	public static void Open ()
 	{
-		var d = new OpenDialog ("Open", "Open a file");
+		var d = new OpenDialog ("Open", "Open a file") {
+			AllowsMultipleSelection = true
+		};
 		Application.Run (d);
 
-		MessageBox.Query (50, 7, "Selected File", string.Join (", ", d.FilePaths), "Ok");
+		if (!d.Canceled)
+			MessageBox.Query(50, 7, "Selected File", string.Join(", ", d.FilePaths), "Ok");
 	}
 
 	public static void ShowHex (Toplevel top)
