@@ -574,14 +574,16 @@ namespace Terminal.Gui {
 		private WindowsConsole.ButtonState? LastMouseButtonPressed = null;
 		private bool IsButtonReleased = false;
 		private bool IsButtonDoubleClicked = false;
+		private object token;
 
 		private MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
-			MouseFlags mouseFlag = MouseFlags.AllEvents; ;
+			MouseFlags mouseFlag = MouseFlags.AllEvents;
 
-			if (IsButtonDoubleClicked) {
-				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
-			}
+			if (token != null)
+				Application.MainLoop.RemoveTimeout (token);
+			if (IsButtonDoubleClicked)
+				token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
 
 			// The ButtonState member of the MouseEvent structure has bit corresponding to each mouse button.
 			// This will tell when a mouse button is pressed. When the button is released this event will
