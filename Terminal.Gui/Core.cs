@@ -1726,6 +1726,7 @@ namespace Terminal.Gui {
 			{
 				mainLoop.AddIdle (() => {
 					d (state);
+					mainLoop.Driver.Wakeup ();
 					return false;
 				});
 			}
