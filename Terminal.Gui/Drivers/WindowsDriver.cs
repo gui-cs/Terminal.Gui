@@ -573,13 +573,15 @@ namespace Terminal.Gui {
 
 		private WindowsConsole.ButtonState? LastMouseButtonPressed = null;
 		private bool IsButtonReleased = false;
+		private bool IsButtonDoubleClicked = false;
 
 		private MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
-			// MouseFlags.AllEvents have a behavior on double click with a extra click.
-			MouseFlags mouseFlag = 0;
+			MouseFlags mouseFlag = MouseFlags.AllEvents; ;
 
-
+			if (IsButtonDoubleClicked) {
+				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
+			}
 
 			// The ButtonState member of the MouseEvent structure has bit corresponding to each mouse button.
 			// This will tell when a mouse button is pressed. When the button is released this event will
@@ -590,10 +592,10 @@ namespace Terminal.Gui {
 				LastMouseButtonPressed = null;
 				IsButtonReleased = false;
 			}
-			Debug.WriteLine ($"ToDriverMouse: {mouseEvent}");
-			if ((mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null) ||
+			//Debug.WriteLine ($"MouseEventRecord: {mouseEvent}");
+			if ((mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null && !IsButtonDoubleClicked) ||
 				(mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved &&
-				mouseEvent.ButtonState != 0)) {
+				mouseEvent.ButtonState != 0 && !IsButtonDoubleClicked)) {
 				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Pressed;
@@ -611,7 +613,8 @@ namespace Terminal.Gui {
 				//if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved)
 				//	mouseFlag |= MouseFlags.ReportMousePosition;
 				LastMouseButtonPressed = mouseEvent.ButtonState;
-			} else if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed != null && !IsButtonReleased) {
+			} else if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed != null && !IsButtonReleased &&
+				!IsButtonDoubleClicked) {
 				switch (LastMouseButtonPressed) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Released;
@@ -668,6 +671,22 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button4DoubleClicked;
 					break;
 				}
+				IsButtonDoubleClicked = true;
+			} else if (mouseEvent.EventFlags == 0 && mouseEvent.ButtonState != 0 && IsButtonDoubleClicked) {
+				switch (mouseEvent.ButtonState) {
+				case WindowsConsole.ButtonState.Button1Pressed:
+					mouseFlag = MouseFlags.Button1TripleClicked;
+					break;
+
+				case WindowsConsole.ButtonState.Button2Pressed:
+					mouseFlag = MouseFlags.Button2TripleClicked;
+					break;
+
+				case WindowsConsole.ButtonState.RightmostButtonPressed:
+					mouseFlag = MouseFlags.Button4TripleClicked;
+					break;
+				}
+				IsButtonDoubleClicked = false;
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseWheeled) {
 				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.WheeledUp:
@@ -693,12 +712,18 @@ namespace Terminal.Gui {
 				mouseFlag = MouseFlags.ReportMousePosition;
 			}
 
-			Debug.WriteLine ($"MouseFlags: {mouseFlag}");
+			//Debug.WriteLine ($"MouseFlags: {mouseFlag}");
 			return new MouseEvent () {
 				X = mouseEvent.MousePosition.X,
 				Y = mouseEvent.MousePosition.Y,
 				Flags = mouseFlag
 			};
+		}
+
+		bool timer (MainLoop caller)
+		{
+			IsButtonDoubleClicked = false;
+			return false;
 		}
 
 		public ConsoleKeyInfoEx ToConsoleKeyInfoEx (WindowsConsole.KeyEventRecord keyEvent)

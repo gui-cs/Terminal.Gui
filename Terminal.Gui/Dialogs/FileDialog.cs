@@ -77,7 +77,7 @@ namespace Terminal.Gui {
 		bool shiftOnWheel;
 		public override bool MouseEvent (MouseEvent me)
 		{
-			System.Diagnostics.Debug.WriteLine ($"Flags: {me.Flags}");
+			//System.Diagnostics.Debug.WriteLine ($"Flags: {me.Flags}");
 			if ((me.Flags & (MouseFlags.Button1Clicked | MouseFlags.Button1DoubleClicked |
 				MouseFlags.WheeledUp | MouseFlags.WheeledDown)) == 0)
 				return false;
@@ -92,40 +92,50 @@ namespace Terminal.Gui {
 				return true;
 
 			int lastSelectedCopy = shiftOnWheel ? lastSelected : selected;
-			lastSelected = selected;
-			selected = top + me.Y;
 
 			switch (me.Flags) {
+			case MouseFlags.Button1Clicked:
+				SetSelected (me);
+				SelectionChanged ();
+				SetNeedsDisplay ();
+				break;
 			case MouseFlags.Button1DoubleClicked:
+				SetSelected (me);
 				if (ExecuteSelection ()) {
 					host.canceled = false;
 					Application.RequestStop ();
 				}
 				return true;
 			case MouseFlags.Button1Clicked | MouseFlags.ButtonShift:
+				SetSelected (me);
 				if (shiftOnWheel)
 					lastSelected = lastSelectedCopy;
 				shiftOnWheel = false;
 				PerformMultipleSelection (lastSelected);
 				return true;
 			case MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl:
+				SetSelected (me);
 				PerformMultipleSelection ();
 				return true;
 			case MouseFlags.WheeledUp:
+				SetSelected (me);
 				selected = lastSelected;
 				MoveUp ();
 				return true;
 			case MouseFlags.WheeledDown:
+				SetSelected (me);
 				selected = lastSelected;
 				MoveDown ();
 				return true;
 			case MouseFlags.WheeledUp | MouseFlags.ButtonShift:
+				SetSelected (me);
 				selected = lastSelected;
 				lastSelected = lastSelectedCopy;
 				shiftOnWheel = true;
 				MoveUp ();
 				return true;
 			case MouseFlags.WheeledDown | MouseFlags.ButtonShift:
+				SetSelected (me);
 				selected = lastSelected;
 				lastSelected = lastSelectedCopy;
 				shiftOnWheel = true;
@@ -133,9 +143,13 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			SelectionChanged ();
-			SetNeedsDisplay ();
 			return true;
+		}
+
+		private void SetSelected (MouseEvent me)
+		{
+			lastSelected = selected;
+			selected = top + me.Y;
 		}
 
 		void DrawString (int line, string str)

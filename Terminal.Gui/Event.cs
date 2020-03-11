@@ -358,7 +358,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The second mouse button was triple-clicked.
 		/// </summary>
-		Button2TrippleClicked = unchecked((int)0x400),
+		Button2TripleClicked = unchecked((int)0x400),
 		/// <summary>
 		/// The third mouse button was pressed.
 		/// </summary>
