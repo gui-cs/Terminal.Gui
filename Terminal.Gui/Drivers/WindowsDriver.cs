@@ -604,12 +604,12 @@ namespace Terminal.Gui {
 					break;
 
 				case WindowsConsole.ButtonState.RightmostButtonPressed:
-					mouseFlag = MouseFlags.Button3Pressed;
+					mouseFlag = MouseFlags.Button4Pressed;
 					break;
 				}
 
-				if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved)
-					mouseFlag |= MouseFlags.ReportMousePosition;
+				//if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved)
+				//	mouseFlag |= MouseFlags.ReportMousePosition;
 				LastMouseButtonPressed = mouseEvent.ButtonState;
 			} else if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed != null && !IsButtonReleased) {
 				switch (LastMouseButtonPressed) {
@@ -622,7 +622,7 @@ namespace Terminal.Gui {
 					break;
 
 				case WindowsConsole.ButtonState.RightmostButtonPressed:
-					mouseFlag = MouseFlags.Button3Released;
+					mouseFlag = MouseFlags.Button4Released;
 					break;
 				}
 				IsButtonReleased = true;
@@ -638,7 +638,7 @@ namespace Terminal.Gui {
 					break;
 
 				case WindowsConsole.ButtonState.RightmostButtonPressed:
-					mouseFlag = MouseFlags.Button3Clicked;
+					mouseFlag = MouseFlags.Button4Clicked;
 					break;
 				}
 				LastMouseButtonPressed = null;
@@ -665,7 +665,7 @@ namespace Terminal.Gui {
 					break;
 
 				case WindowsConsole.ButtonState.RightmostButtonPressed:
-					mouseFlag = MouseFlags.Button3DoubleClicked;
+					mouseFlag = MouseFlags.Button4DoubleClicked;
 					break;
 				}
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseWheeled) {

@@ -1590,10 +1590,10 @@ namespace Terminal.Gui {
 			// The code is currently disabled, because the
 			// Driver.UncookMouse does not seem to have an effect if there is
 			// a pending mouse event activated.
-			if (true)
-				return false;
+			//if (true)
+			//	return false;
 
-			if ((mouseEvent.Flags == MouseFlags.Button1Pressed|| mouseEvent.Flags == MouseFlags.Button4Pressed)){
+			if ((mouseEvent.Flags == MouseFlags.Button1Pressed || mouseEvent.Flags == MouseFlags.Button4Pressed)) {
 
 				if (dragPosition.HasValue) {
 					var dx = mouseEvent.X - dragPosition.Value.X;
