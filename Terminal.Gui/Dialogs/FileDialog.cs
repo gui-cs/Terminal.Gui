@@ -77,6 +77,7 @@ namespace Terminal.Gui {
 		bool shiftOnWheel;
 		public override bool MouseEvent (MouseEvent me)
 		{
+			System.Diagnostics.Debug.WriteLine ($"Flags: {me.Flags}");
 			if ((me.Flags & (MouseFlags.Button1Clicked | MouseFlags.Button1DoubleClicked |
 				MouseFlags.WheeledUp | MouseFlags.WheeledDown)) == 0)
 				return false;

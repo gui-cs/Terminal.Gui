@@ -155,16 +155,13 @@ namespace Terminal.Gui {
 		private Attribute _focus;
 		private Attribute _hotNormal;
 		private Attribute _hotFocus;
+		private Attribute _disabled;
 
 		/// <summary>
 		/// The default color for text, when the view is not focused.
 		/// </summary>
 		public Attribute Normal { get { return _normal; } set { _normal = SetAttribute (value); } }
 
-		/// <summary>
-		/// The default color for text, when the view is disabled.
-		/// </summary>
-		public Attribute Disabled;
 		/// <summary>
 		/// The color for text when the view has the focus.
 		/// </summary>
@@ -179,6 +176,11 @@ namespace Terminal.Gui {
 		/// The color for the hotkey when the view is focused.
 		/// </summary>
 		public Attribute HotFocus { get { return _hotFocus; } set { _hotFocus = SetAttribute (value); } }
+
+		/// <summary>
+		/// The default color for text, when the view is disabled.
+		/// </summary>
+		public Attribute Disabled { get { return _disabled; } set { _disabled = SetAttribute (value); } }
 
 		public string Caller = "";
 
@@ -220,6 +222,7 @@ namespace Terminal.Gui {
 					if (Focus.background != attribute.background)
 						Focus = Application.Driver.MakeAttribute (attribute.foreground, Focus.background);
 					HotNormal = Application.Driver.MakeAttribute (HotNormal.foreground, attribute.background);
+					Disabled = Application.Driver.MakeAttribute (Disabled.foreground, attribute.background);
 					break;
 				case "Focus":
 					Normal = Application.Driver.MakeAttribute (attribute.foreground, Normal.background);
@@ -229,12 +232,20 @@ namespace Terminal.Gui {
 					if (Focus.background != attribute.background)
 						HotFocus = Application.Driver.MakeAttribute (attribute.foreground, HotFocus.background);
 					Normal = Application.Driver.MakeAttribute (Normal.foreground, attribute.background);
+					Disabled = Application.Driver.MakeAttribute (Disabled.foreground, attribute.background);
 					break;
 				case "HotFocus":
 					HotNormal = Application.Driver.MakeAttribute (attribute.foreground, HotNormal.background);
 					if (Focus.foreground != attribute.background)
 						Focus = Application.Driver.MakeAttribute (Focus.foreground, attribute.background);
 					break;
+				case "Disabled":
+					if (Focus.background != attribute.background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.foreground, HotFocus.background);
+					Normal = Application.Driver.MakeAttribute (Normal.foreground, attribute.background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal.foreground, attribute.background);
+					break;
+
 				}
 				break;
 
@@ -374,7 +385,7 @@ namespace Terminal.Gui {
 		RightTee,
 
 		/// <summary>
-		/// Top tee 
+		/// Top tee
 		/// </summary>
 		TopTee,
 
@@ -416,7 +427,7 @@ namespace Terminal.Gui {
 		/// <param name="rune">Rune to add.</param>
 		public abstract void AddRune (Rune rune);
 		/// <summary>
-		/// Adds the specified 
+		/// Adds the specified
 		/// </summary>
 		/// <param name="str">String.</param>
 		public abstract void AddStr (ustring str);
@@ -454,7 +465,7 @@ namespace Terminal.Gui {
 		// Advanced uses - set colors to any pre-set pairs, you would need to init_color
 		// that independently with the R, G, B values.
 		/// <summary>
-		/// Advanced uses - set colors to any pre-set pairs, you would need to init_color 
+		/// Advanced uses - set colors to any pre-set pairs, you would need to init_color
 		/// that independently with the R, G, B values.
 		/// </summary>
 		/// <param name="foregroundColorId">Foreground color identifier.</param>
@@ -608,7 +619,7 @@ namespace Terminal.Gui {
 		public Rune RightTee;
 
 		/// <summary>
-		/// Top tee 
+		/// Top tee
 		/// </summary>
 		public Rune TopTee;
 

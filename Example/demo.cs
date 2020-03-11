@@ -87,7 +87,7 @@ static class Demo {
 		};
 #if false
 		scrollView.Add (new Box10x (0, 0));
-#else	
+#else
 		scrollView.Add (new Filler (new Rect (0, 0, 40, 40)));
 #endif
 
@@ -176,7 +176,7 @@ static class Demo {
 		Application.Run (d);
 	}
 
-	// 
+	//
 	// Creates a nested editor
 	static void Editor (Toplevel top)
 	{
@@ -235,10 +235,11 @@ static class Demo {
 
 	public static void Open ()
 	{
-		var d = new OpenDialog ("Open", "Open a file");
+		var d = new OpenDialog ("Open", "Open a file") { AllowsMultipleSelection = true };
 		Application.Run (d);
 
-		MessageBox.Query (50, 7, "Selected File", string.Join (", ", d.FilePaths), "Ok");
+		if (!d.Canceled)
+			MessageBox.Query (50, 7, "Selected File", string.Join (", ", d.FilePaths), "Ok");
 	}
 
 	public static void ShowHex (Toplevel top)
@@ -328,24 +329,24 @@ static class Demo {
 	private static void Copy ()
 	{
 		TextField textField = menu.LastFocused as TextField;
-		if (textField != null && textField.SelLength > 0) {
+		if (textField != null && textField.SelLength != 0) {
 			Clipboard.Contents = textField.SelText;
-			textField.SelLength = 0;
-			textField.SetNeedsDisplay ();
 		}
 	}
 
 	private static void Cut ()
 	{
 		TextField textField = menu.LastFocused as TextField;
-		if (textField != null && textField.SelLength > 0) {
+		if (textField != null && textField.SelLength != 0) {
 			Clipboard.Contents = textField.SelText;
 			string actualText = textField.Text.ToString ();
-			string newText = actualText.Substring (0, textField.SelStart) + 
-				actualText.Substring (textField.SelStart + textField.SelLength, actualText.Length - textField.SelStart - textField.SelLength);
+			int selStart = textField.SelLength < 0 ? textField.SelLength + textField.SelStart : textField.SelStart;
+			int selLength = Math.Abs (textField.SelLength);
+			string newText = actualText.Substring (0, selStart) +
+				actualText.Substring (selStart + selLength, actualText.Length - selStart - selLength);
 			textField.Text = newText;
-			textField.SelLength = 0;
-			textField.CursorPosition = textField.SelStart == -1 ? textField.CursorPosition : textField.SelStart;
+			textField.ClearAllSelection ();
+			textField.CursorPosition = selStart >= textField.Text.Length ? textField.Text.Length : textField.CursorPosition;
 			textField.SetNeedsDisplay ();
 		}
 	}
@@ -356,7 +357,7 @@ static class Demo {
 		if (textField != null) {
 			string actualText = textField.Text.ToString ();
 			int start = textField.SelStart == -1 ? textField.CursorPosition : textField.SelStart;
-			string newText = actualText.Substring (0, start) + 
+			string newText = actualText.Substring (0, start) +
 				Clipboard.Contents?.ToString() +
 				actualText.Substring (start + textField.SelLength, actualText.Length - start - textField.SelLength);
 			textField.Text = newText;
@@ -449,6 +450,7 @@ static class Demo {
 				new MenuItem ("_Open", "", Open),
 				new MenuItem ("_Hex", "", () => ShowHex (top)),
 				new MenuItem ("_Close", "", () => Close ()),
+				new MenuItem ("_Disabled", "",  () => { }, () => false),
 				null,
 				new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
 			}),

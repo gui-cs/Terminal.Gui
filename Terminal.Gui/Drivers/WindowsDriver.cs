@@ -1,5 +1,5 @@
 //
-// WindowsDriver.cs: Windows specific driver 
+// WindowsDriver.cs: Windows specific driver
 //
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
@@ -13,10 +13,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -520,7 +520,7 @@ namespace Terminal.Gui {
 			} finally {
 				eventReady.Reset();
 			}
-			Debug.WriteLine("Events ready");
+			//Debug.WriteLine("Events ready");
 
 			if (!tokenSource.IsCancellationRequested)
 				return result != null;
@@ -572,9 +572,11 @@ namespace Terminal.Gui {
 		}
 
 		private WindowsConsole.ButtonState? LastMouseButtonPressed = null;
+		private bool IsButtonReleased = false;
 
 		private MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
+			// MouseFlags.AllEvents have a behavior on double click with a extra click.
 			MouseFlags mouseFlag = 0;
 
 
@@ -584,12 +586,14 @@ namespace Terminal.Gui {
 			// be fired with it's bit set to 0. So when the button is up ButtonState will be 0.
 			// To map to the correct driver events we save the last pressed mouse button so we can
 			// map to the correct clicked event.
-			if (LastMouseButtonPressed != null && mouseEvent.ButtonState != 0) {
+			if ((LastMouseButtonPressed != null || IsButtonReleased) && mouseEvent.ButtonState != 0) {
 				LastMouseButtonPressed = null;
+				IsButtonReleased = false;
 			}
-
-			if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null ||
-				mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved && mouseEvent.ButtonState != 0) {
+			Debug.WriteLine ($"ToDriverMouse: {mouseEvent}");
+			if ((mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null) ||
+				(mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved &&
+				mouseEvent.ButtonState != 0)) {
 				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Pressed;
@@ -603,8 +607,27 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button3Pressed;
 					break;
 				}
+
+				if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved)
+					mouseFlag |= MouseFlags.ReportMousePosition;
 				LastMouseButtonPressed = mouseEvent.ButtonState;
-			} else if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed != null) {
+			} else if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed != null && !IsButtonReleased) {
+				switch (LastMouseButtonPressed) {
+				case WindowsConsole.ButtonState.Button1Pressed:
+					mouseFlag = MouseFlags.Button1Released;
+					break;
+
+				case WindowsConsole.ButtonState.Button2Pressed:
+					mouseFlag = MouseFlags.Button2Released;
+					break;
+
+				case WindowsConsole.ButtonState.RightmostButtonPressed:
+					mouseFlag = MouseFlags.Button3Released;
+					break;
+				}
+				IsButtonReleased = true;
+			} else if ((mouseEvent.EventFlags == 0 || mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) &&
+				IsButtonReleased) {
 				switch (LastMouseButtonPressed) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Clicked;
@@ -619,6 +642,7 @@ namespace Terminal.Gui {
 					break;
 				}
 				LastMouseButtonPressed = null;
+				IsButtonReleased = false;
 
 				switch (mouseEvent.ControlKeyState) {
 				case WindowsConsole.ControlKeyState.RightControlPressed:
@@ -669,6 +693,7 @@ namespace Terminal.Gui {
 				mouseFlag = MouseFlags.ReportMousePosition;
 			}
 
+			Debug.WriteLine ($"MouseFlags: {mouseFlag}");
 			return new MouseEvent () {
 				X = mouseEvent.MousePosition.X,
 				Y = mouseEvent.MousePosition.Y,
@@ -816,7 +841,7 @@ namespace Terminal.Gui {
 			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Cyan);
 			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
 			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
-			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Cyan);
+			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
 			Colors.Menu.Disabled = MakeColor(ConsoleColor.DarkGray, ConsoleColor.Cyan);
 
 			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
@@ -961,6 +986,7 @@ namespace Terminal.Gui {
 			};
 			winConsole.SetCursorPosition(position);
 		}
+
 		public override void End ()
 		{
 			winConsole.Cleanup();

@@ -164,7 +164,7 @@ namespace Terminal.Gui {
 				if (idx < first)
 					continue;
 				var cols = Rune.ColumnWidth (rune);
-				System.Diagnostics.Debug.WriteLine ($"SelStart: {SelStart}, SelLength: {SelLength} SelText: {SelText}");
+				//System.Diagnostics.Debug.WriteLine ($"SelStart: {SelStart}, SelLength: {SelLength} SelText: {SelText}");
 				Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : ColorScheme.Focus);
 				if (col + cols < width)
 					Driver.AddRune ((Rune)(Secret ? '*' : rune));
@@ -422,10 +422,13 @@ namespace Terminal.Gui {
 
 		bool selResetNeeded;
 		int start, length;
+		//bool isButtonReleased;
 
 		public override bool MouseEvent (MouseEvent ev)
 		{
-			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked) && !ev.Flags.HasFlag (MouseFlags.Button1Pressed))
+			System.Diagnostics.Debug.WriteLine ($"Flags: {ev.Flags}");
+			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked) && !ev.Flags.HasFlag (MouseFlags.Button1Pressed) &&
+				!ev.Flags.HasFlag (MouseFlags.Button1Released))
 				return false;
 
 			if (!HasFocus)
@@ -442,22 +445,28 @@ namespace Terminal.Gui {
 			if (ev.Flags.HasFlag (MouseFlags.Button1Clicked) && SelStart > -1)
 				selResetNeeded = true;
 			else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed)) {
+				//isButtonReleased = false;
 				if (selResetNeeded)
 					ClearAllSelection ();
 				selResetNeeded = false;
-				SelStart = SelStart == -1 && text.Count > 0 && ev.X >= 0 && ev.X <= text.Count ? ev.X : SelStart;
-				if (SelStart > -1) {
-					SelLength = SelStart > -1 && ev.X <= text.Count ? ev.X - SelStart : text.Count - SelStart;
-					SetSelStartSelLength ();
-					SelText = length > 0 ? ustring.Make (text).ToString ().Substring (start, length) : "";
-				}
+				PrepareSelection (ev);
 			}
 
 			SetNeedsDisplay ();
 			return true;
 		}
 
-		void ClearAllSelection ()
+		private void PrepareSelection (MouseEvent ev)
+		{
+			SelStart = SelStart == -1 && text.Count > 0 && ev.X >= 0 && ev.X <= text.Count ? ev.X : SelStart;
+			if (SelStart > -1) {
+				SelLength = SelStart > -1 && ev.X <= text.Count ? ev.X - SelStart : text.Count - SelStart;
+				SetSelStartSelLength ();
+				SelText = length > 0 ? ustring.Make (text).ToString ().Substring (start, length) : "";
+			}
+		}
+
+		public void ClearAllSelection ()
 		{
 			SelStart = -1;
 			SelLength = 0;
