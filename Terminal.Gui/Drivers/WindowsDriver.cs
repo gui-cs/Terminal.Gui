@@ -815,28 +815,31 @@ namespace Terminal.Gui {
 		var key = keyInfo.Key;
 		var alphaBase = ((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock)) ? 'A' : 'a';
 
-		if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
-				    var delta = key - ConsoleKey.A;
-				    if (keyInfo.Modifiers == ConsoleModifiers.Control)
-					    return (Key)((uint)Key.ControlA + delta);
-				    if (keyInfo.Modifiers == ConsoleModifiers.Alt)
-					    return (Key)(((uint)Key.AltMask) | ((uint)'A' + delta));
-				    return (Key)((uint)alphaBase + delta);
-		}
-		if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
-		var delta = key - ConsoleKey.D0;
-		if (keyInfo.Modifiers == ConsoleModifiers.Alt)
-			return (Key)(((uint)Key.AltMask) | ((uint)'0' + delta));
+			if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
+				var delta = key - ConsoleKey.A;
+				if (keyInfo.Modifiers == ConsoleModifiers.Control)
+					return (Key)((uint)Key.ControlA + delta);
+				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
+					return (Key)(((uint)Key.AltMask) | ((uint)'A' + delta));
+				// TODO: Only apply after pull requests at NStack are merged.
+				//if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0)
+				//	return (Key)((uint)keyInfo.KeyChar);
+				return (Key)((uint)alphaBase + delta);
+			}
+			if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
+				var delta = key - ConsoleKey.D0;
+				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
+					return (Key)(((uint)Key.AltMask) | ((uint)'0' + delta));
 
-		return (Key)((uint)keyInfo.KeyChar);
-		}
-		if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
-		var delta = key - ConsoleKey.F1;
+				return (Key)((uint)keyInfo.KeyChar);
+			}
+			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
+				var delta = key - ConsoleKey.F1;
 
-		return (Key)((int)Key.F1 + delta);
+				return (Key)((int)Key.F1 + delta);
+			}
+			return (Key)(0xffffffff);
 		}
-		return (Key)(0xffffffff);
-	}
 
 		public override void Init (Action terminalResized)
 		{
