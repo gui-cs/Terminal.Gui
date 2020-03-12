@@ -778,23 +778,23 @@ namespace Terminal.Gui {
 			case ConsoleKey.NumPad0:
 				return keyInfoEx.NumLock ? (Key)(uint)'0' : Key.InsertChar;
 			case ConsoleKey.NumPad1:
-			        return keyInfoEx.NumLock ? (Key)(uint)'1' : Key.End;
+				return keyInfoEx.NumLock ? (Key)(uint)'1' : Key.End;
 			case ConsoleKey.NumPad2:
-			        return keyInfoEx.NumLock ? (Key)(uint)'2' : Key.CursorDown;
+				return keyInfoEx.NumLock ? (Key)(uint)'2' : Key.CursorDown;
 			case ConsoleKey.NumPad3:
 				return keyInfoEx.NumLock ? (Key)(uint)'3' : Key.PageDown;
 			case ConsoleKey.NumPad4:
-			        return keyInfoEx.NumLock ? (Key)(uint)'4' : Key.CursorLeft;
+				return keyInfoEx.NumLock ? (Key)(uint)'4' : Key.CursorLeft;
 			case ConsoleKey.NumPad5:
-			        return keyInfoEx.NumLock ? (Key)(uint)'5' : (Key)((uint)keyInfo.KeyChar);
+				return keyInfoEx.NumLock ? (Key)(uint)'5' : (Key)((uint)keyInfo.KeyChar);
 			case ConsoleKey.NumPad6:
-			        return keyInfoEx.NumLock ? (Key)(uint)'6' : Key.CursorRight;
+				return keyInfoEx.NumLock ? (Key)(uint)'6' : Key.CursorRight;
 			case ConsoleKey.NumPad7:
-			        return keyInfoEx.NumLock ? (Key)(uint)'7' : Key.Home;
+				return keyInfoEx.NumLock ? (Key)(uint)'7' : Key.Home;
 			case ConsoleKey.NumPad8:
-			        return keyInfoEx.NumLock ? (Key)(uint)'8' : Key.CursorUp;
+				return keyInfoEx.NumLock ? (Key)(uint)'8' : Key.CursorUp;
 			case ConsoleKey.NumPad9:
-			        return keyInfoEx.NumLock ? (Key)(uint)'9' : Key.PageUp;
+				return keyInfoEx.NumLock ? (Key)(uint)'9' : Key.PageUp;
 
 			case ConsoleKey.Oem1:
 			case ConsoleKey.Oem2:
@@ -810,10 +810,10 @@ namespace Terminal.Gui {
 			case ConsoleKey.OemPlus:
 			case ConsoleKey.OemMinus:
 				return (Key)((uint)keyInfo.KeyChar);
-		}
+			}
 
-		var key = keyInfo.Key;
-		var alphaBase = ((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock)) ? 'A' : 'a';
+			var key = keyInfo.Key;
+			var alphaBase = ((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock)) ? 'A' : 'a';
 
 			if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
 				var delta = key - ConsoleKey.A;
