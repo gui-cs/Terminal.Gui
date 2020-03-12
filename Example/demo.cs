@@ -388,7 +388,8 @@ static class Demo {
 			Y = 3,
 			Width = Dim.Fill () - 4,
 			Height = Dim.Fill () - 4,
-			AllowsMarking = true
+			AllowsMarking = true,
+			AllowsMultipleSelection = false
 		};
 		d.Add (msg, list);
 		Application.Run (d);

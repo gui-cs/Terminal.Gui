@@ -142,6 +142,8 @@ namespace Terminal.Gui {
 			}
 		}
 
+		public bool AllowsMultipleSelection { get; set; } = true;
+
 		/// <summary>
 		/// Gets or sets the item that is displayed at the top of the listview
 		/// </summary>
@@ -305,8 +307,21 @@ namespace Terminal.Gui {
 			return base.ProcessKey (kb);
 		}
 
+		public virtual bool AllowsAll ()
+		{
+			if (!allowsMarking)
+				return false;
+			if (!AllowsMultipleSelection) {
+				for (int i = 0; i < Source.Count; i++) {
+					if (Source.IsMarked (i) && i != selected)
+						return false;
+				}
+			}
+			return true;
+		}
+
 		public virtual bool MarkUnmarkRow(){
-			if (allowsMarking){
+			if (AllowsAll ()) {
 				Source.SetMark(SelectedItem, !Source.IsMarked(SelectedItem));
 				SetNeedsDisplay();
 				return true;
@@ -400,7 +415,7 @@ namespace Terminal.Gui {
 				return true;
 
 			selected = top + me.Y;
-			if (allowsMarking) {
+			if (AllowsAll ()) {
 				Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
 				SetNeedsDisplay ();
 				return true;
