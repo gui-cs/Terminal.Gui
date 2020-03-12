@@ -612,8 +612,8 @@ namespace Terminal.Gui {
 					break;
 				}
 
-				//if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved)
-				//	mouseFlag |= MouseFlags.ReportMousePosition;
+				if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved)
+					mouseFlag |= MouseFlags.ReportMousePosition;
 				LastMouseButtonPressed = mouseEvent.ButtonState;
 			} else if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed != null && !IsButtonReleased &&
 				!IsButtonDoubleClicked) {
