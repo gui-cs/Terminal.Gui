@@ -1579,35 +1579,37 @@ namespace Terminal.Gui {
 			ClearNeedsDisplay ();
 		}
 
-#if true
 		//
-		// It does not look like the event is raised on clicked-drag
+		// FIXED:It does not look like the event is raised on clicked-drag
 		// need to figure that out.
 		//
 		Point? dragPosition;
+		int startX;
 		public override bool MouseEvent(MouseEvent mouseEvent)
 		{
-			// The code is currently disabled, because the
+			// FIXED:The code is currently disabled, because the
 			// Driver.UncookMouse does not seem to have an effect if there is
 			// a pending mouse event activated.
-			//if (true)
-			//	return false;
 
-			if ((mouseEvent.Flags == MouseFlags.Button1Pressed || mouseEvent.Flags == MouseFlags.Button4Pressed)) {
+			if ((mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) || 
+				mouseEvent.Flags == MouseFlags.Button4Pressed)) {
 
 				if (dragPosition.HasValue) {
-					var dx = mouseEvent.X - dragPosition.Value.X;
+					var dx = mouseEvent.X - dragPosition.Value.X - startX + Frame.Left;
 					var dy = mouseEvent.Y - dragPosition.Value.Y;
 
-					var nx = Frame.X + dx;
+					var nx = dx;
 					var ny = Frame.Y + dy;
 					if (nx < 0)
 						nx = 0;
-					if (ny < 0)
-						ny = 0;
+					if (ny < 1)
+						ny = Frame.Y;
 
+					//System.Diagnostics.Debug.WriteLine ($"dragging: {mouseEvent}");
+					//System.Diagnostics.Debug.WriteLine ($"dx: {dx}, dy: {dy}");
+					//System.Diagnostics.Debug.WriteLine ($"nx: {nx}, ny: {ny}");
 					//Demo.ml2.Text = $"{dx},{dy}";
-					dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
+					dragPosition = new Point (nx, ny);
 
 					// TODO: optimize, only SetNeedsDisplay on the before/after regions.
 					if (SuperView == null)
@@ -1620,10 +1622,12 @@ namespace Terminal.Gui {
 				} else {
 					// Only start grabbing if the user clicks on the title bar.
 					if (mouseEvent.Y == 0) {
+						startX = mouseEvent.X;
 						dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
 						Application.GrabMouse (this);
 					}
 
+					//System.Diagnostics.Debug.WriteLine ($"Starting at {dragPosition}");
 					//Demo.ml2.Text = $"Starting at {dragPosition}";
 					return true;
 				}
@@ -1637,10 +1641,10 @@ namespace Terminal.Gui {
 				//Driver.StopReportingMouseMoves ();
 			}
 
+			//System.Diagnostics.Debug.WriteLine ($"mouseEvent {mouseEvent.ToString ()}");
 			//Demo.ml.Text = me.ToString ();
 			return false;
 		}
-#endif
 	}
 
 	/// <summary>
@@ -1844,7 +1848,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
+		internal static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
 		{
 			var startFrame = start.Frame;
 
