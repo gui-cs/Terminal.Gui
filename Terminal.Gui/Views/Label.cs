@@ -227,6 +227,7 @@ namespace Terminal.Gui {
 		public virtual ustring Text {
 			get => text;
 			set {
+				Clear (new Rect (Frame.Location, new Size (text.Length, Frame.Height)));
 				text = value;
 				recalcPending = true;
 				SetNeedsDisplay ();
