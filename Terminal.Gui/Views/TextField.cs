@@ -202,7 +202,7 @@ namespace Terminal.Gui {
 
 		void SetText (List<Rune> newText)
 		{
-			text = newText;
+			Text = ustring.Make (newText);
 		}
 
 		void SetText (IEnumerable<Rune> newText)
