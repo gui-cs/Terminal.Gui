@@ -53,11 +53,11 @@ namespace Terminal.Gui {
 			IsFromSubMenu = true;
 		}
 
-		// 
-		// 
+		//
+		//
 
 		/// <summary>
-		/// The hotkey is used when the menu is active, the shortcut can be triggered when the menu is not active.   
+		/// The hotkey is used when the menu is active, the shortcut can be triggered when the menu is not active.
 		/// For example HotKey would be "N" when the File Menu is open (assuming there is a "_New" entry
 		/// if the ShortCut is set to "Control-N", this would be a global hotkey that would trigger as well
 		/// </summary>
@@ -214,6 +214,7 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			WantMousePositionReports = host.WantMousePositionReports;
 			selectedSub = -1;
+			OnEnter += Menu_OnEnter;
 			OnLeave += Menu_OnLeave;
 		}
 
@@ -362,10 +363,31 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		//Point? dragPosition;
+		int startX;
 		public override bool MouseEvent(MouseEvent me)
 		{
+			// For further feature if clicked outside of the menu it will closed.
+			//bool isMenu = false;
+			//var view = Application.FindDeepestView (Application.Current, me.X, me.Y, out _, out _);
+			//if (view != null && ((view is Menu) || (view is MenuBar))) {
+			//	isMenu = true;
+			//}
+			//int nx, ny;
+			//if (dragPosition.HasValue) {
+			//	GrabToView (me, startX, dragPosition, Frame, out nx, out ny);
+			//	dragPosition = new Point (nx, ny);
+			//}
 			bool disabled;
 			if (me.Flags == MouseFlags.Button1Clicked || me.Flags == MouseFlags.Button1Released) {
+				//if (!isMenu) {
+				//	Application.UngrabMouse ();
+				//	CloseAllMenus ();
+				//}
+				//if (!dragPosition.HasValue) {
+				//	startX = me.X;
+				//	dragPosition = new Point (me.X, me.Y);
+				//}
 				disabled = false;
 				if (me.Y < 1)
 					return true;
@@ -377,9 +399,11 @@ namespace Terminal.Gui {
 				if (item != null && !disabled)
 					Run (barItems.Children [meY].Action);
 				return true;
-			}
-			if (me.Flags == MouseFlags.Button1Pressed ||
-				me.Flags == MouseFlags.ReportMousePosition) {
+			} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.ReportMousePosition) { // && isMenu
+				//if (!dragPosition.HasValue) {
+				//	startX = me.X;
+				//	dragPosition = new Point (me.X, me.Y);
+				//}
 				disabled = false;
 				if (me.Y < 1)
 					return true;
@@ -415,12 +439,23 @@ namespace Terminal.Gui {
 		View previousSubFocused;
 		static int selectedSub;
 
+		private void Menu_OnEnter (object sender, EventArgs e)
+		{
+			//Application.GrabMouse (this);
+		}
+
 		private void Menu_OnLeave (object sender, EventArgs e)
+		{
+			CloseAllMenus ();
+		}
+
+		private void CloseAllMenus ()
 		{
 			if (!host.isMenuOpening && !host.isMenuClosing) {
 				CloseSubMenu ();
 				if (openSubMenu == null)
 					host.CloseMenu ();
+				host.selected = -1;
 			}
 		}
 
@@ -462,6 +497,7 @@ namespace Terminal.Gui {
 				else
 					SuperView.SetFocus (host.openMenu);
 				if (openSubMenu != null) {
+					ClearContainer (openSubMenu [i].Frame);
 					SuperView.Remove (openSubMenu [i]);
 					openSubMenu.Remove (openSubMenu [i]);
 				}
@@ -486,6 +522,8 @@ namespace Terminal.Gui {
 			if (openSubMenu != null) {
 				foreach (var item in openSubMenu) {
 					SuperView.Remove (item);
+					ClearContainer (item.Frame);
+					System.Diagnostics.Debug.WriteLine ($"({item.Frame}");
 				}
 			}
 		}
@@ -528,7 +566,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The menu array.</value>
 		public MenuBarItem [] Menus { get; set; }
-		int selected;
+		internal int selected;
 		Action action;
 
 		/// <summary>
@@ -616,7 +654,7 @@ namespace Terminal.Gui {
 			lastFocused = lastFocused ?? SuperView.MostFocused;
 			OnOpenMenu?.Invoke (this, null);
 			if (Menu.openSubMenu != null)
-				openMenu.CloseSubMenu ();
+				openMenu?.CloseSubMenu ();
 			if (openMenu != null)
 				SuperView.Remove (openMenu);
 			int pos = 0;
@@ -656,7 +694,9 @@ namespace Terminal.Gui {
 		internal void CloseMenu ()
 		{
 			isMenuClosing = true;
-			selected = -1;
+			//selected = -1;
+			if (openMenu != null)
+				ClearContainer (openMenu.Frame);
 			SetNeedsDisplay ();
 			SuperView.Remove (openMenu);
 			previousFocused?.SuperView?.SetFocus (previousFocused);
@@ -674,6 +714,8 @@ namespace Terminal.Gui {
 			else
 				selected--;
 
+			if (selected > -1)
+				CloseMenu ();
 			OpenMenu (selected);
 		}
 
@@ -685,6 +727,9 @@ namespace Terminal.Gui {
 				selected = 0;
 			else
 				selected++;
+
+			if (selected > -1)
+				CloseMenu ();
 			OpenMenu (selected);
 		}
 
@@ -775,6 +820,9 @@ namespace Terminal.Gui {
 					if (cx > pos && me.X < pos + 1 + Menus [i].TitleLength) {
 						if (selected == i && me.Flags == MouseFlags.Button1Clicked) {
 							CloseMenu ();
+						} else if (selected != i && selected > -1 && me.Flags == MouseFlags.ReportMousePosition) {
+							CloseMenu ();
+							Activate (i);
 						} else {
 							Activate (i);
 						}
