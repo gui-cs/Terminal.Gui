@@ -594,6 +594,7 @@ namespace Terminal.Gui {
 				LastMouseButtonPressed = null;
 				IsButtonReleased = false;
 			}
+
 			//Debug.WriteLine ($"MouseEventRecord: {mouseEvent}");
 			if ((mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null && !IsButtonDoubleClicked) ||
 				(mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved &&
@@ -648,18 +649,7 @@ namespace Terminal.Gui {
 				}
 				LastMouseButtonPressed = null;
 				IsButtonReleased = false;
-
-				switch (mouseEvent.ControlKeyState) {
-				case WindowsConsole.ControlKeyState.RightControlPressed:
-				case WindowsConsole.ControlKeyState.LeftControlPressed:
-					mouseFlag |= MouseFlags.ButtonCtrl;
-					break;
-
-				case WindowsConsole.ControlKeyState.ShiftPressed:
-					mouseFlag |= MouseFlags.ButtonShift;
-					break;
-				}
-			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.DoubleClick) {
+			} else if (mouseEvent.EventFlags.HasFlag (WindowsConsole.EventFlags.DoubleClick)) {
 				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1DoubleClicked;
@@ -700,26 +690,33 @@ namespace Terminal.Gui {
 					break;
 				}
 
-				switch (mouseEvent.ControlKeyState) {
-				case WindowsConsole.ControlKeyState.RightControlPressed:
-				case WindowsConsole.ControlKeyState.LeftControlPressed:
-					mouseFlag |= MouseFlags.ButtonCtrl;
-					break;
-
-				case WindowsConsole.ControlKeyState.ShiftPressed:
-					mouseFlag |= MouseFlags.ButtonShift;
-					break;
-				}
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 				mouseFlag = MouseFlags.ReportMousePosition;
 			}
 
-			//Debug.WriteLine ($"MouseFlags: {mouseFlag}");
+			mouseFlag = SetControlKeyStates (mouseEvent, mouseFlag);
+
+			Debug.WriteLine ($"MouseFlags: {mouseFlag}");
 			return new MouseEvent () {
 				X = mouseEvent.MousePosition.X,
 				Y = mouseEvent.MousePosition.Y,
 				Flags = mouseFlag
 			};
+		}
+
+		private static MouseFlags SetControlKeyStates (WindowsConsole.MouseEventRecord mouseEvent, MouseFlags mouseFlag)
+		{
+			if (mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.RightControlPressed) ||
+				mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.LeftControlPressed))
+				mouseFlag |= MouseFlags.ButtonCtrl;
+
+			if (mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.ShiftPressed))
+				mouseFlag |= MouseFlags.ButtonShift;
+
+			if (mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.RightAltPressed) ||
+				 mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.LeftAltPressed))
+				mouseFlag |= MouseFlags.ButtonAlt;
+			return mouseFlag;
 		}
 
 		bool timer (MainLoop caller)
