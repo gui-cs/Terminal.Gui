@@ -20,6 +20,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using NStack;
 
 namespace Terminal.Gui {
@@ -121,6 +123,21 @@ namespace Terminal.Gui {
 			else {
 				Source = MakeWrapper (source);
 			}
+		}
+
+		/// <summary>
+		/// Sets the source to an IList value asynchronously, if you want to set a full IListDataSource, use the Source property.
+		/// </summary>
+		/// <value>An item implementing the IList interface.</value>
+		public Task SetSourceAsync (IList source)
+		{
+			return Task.Factory.StartNew (() => {
+				if (source == null)
+					Source = null;
+				else
+					Source = MakeWrapper (source);
+				return source;
+			}, CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
 		}
 
 		bool allowsMarking;
