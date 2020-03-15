@@ -521,8 +521,8 @@ namespace Terminal.Gui {
 		{
 			if (openSubMenu != null) {
 				foreach (var item in openSubMenu) {
-					SuperView.Remove (item);
 					ClearContainer (item.Frame);
+					SuperView.Remove (item);
 					System.Diagnostics.Debug.WriteLine ($"({item.Frame}");
 				}
 			}
@@ -540,8 +540,9 @@ namespace Terminal.Gui {
 
 		void NextMenu ()
 		{
-			if (host.UseKeysUpDownAsKeysLeftRight)
-				host.NextMenu ();
+			if (host.UseKeysUpDownAsKeysLeftRight) {
+				CloseSubMenu ();
+				host.NextMenu ();		}
 			else {
 				if ((selectedSub == -1 || openSubMenu == null || openSubMenu?.Count == selectedSub) && barItems.Children [current].SubMenu == null) {
 					if (openSubMenu != null)
@@ -644,8 +645,9 @@ namespace Terminal.Gui {
 		View previousFocused;
 		internal bool isMenuOpening;
 		internal bool isMenuClosing;
-
+		bool isMenuClosed;
 		View lastFocused;
+
 		public View LastFocused { get; set; }
 
 		void OpenMenu (int index)
@@ -665,6 +667,7 @@ namespace Terminal.Gui {
 			SuperView.Add (openMenu);
 			SuperView.SetFocus (openMenu);
 			isMenuOpening = false;
+			isMenuClosed = false;
 		}
 
 		// Starts the menu from a hotkey
@@ -705,6 +708,7 @@ namespace Terminal.Gui {
 			lastFocused = null;
 			LastFocused?.SuperView?.SetFocus (LastFocused);
 			isMenuClosing = false;
+			isMenuClosed = true;
 		}
 
 		internal void PreviousMenu ()
@@ -818,13 +822,19 @@ namespace Terminal.Gui {
 				int cx = me.X;
 				for (int i = 0; i < Menus.Length; i++) {
 					if (cx > pos && me.X < pos + 1 + Menus [i].TitleLength) {
-						if (selected == i && me.Flags == MouseFlags.Button1Clicked) {
+						if (selected == i && me.Flags == MouseFlags.Button1Clicked && !isMenuClosed) {
 							CloseMenu ();
-						} else if (selected != i && selected > -1 && me.Flags == MouseFlags.ReportMousePosition) {
-							CloseMenu ();
+						} else if (me.Flags == MouseFlags.Button1Clicked && isMenuClosed) {
 							Activate (i);
+						}
+						else if (selected != i && selected > -1 && me.Flags == MouseFlags.ReportMousePosition) {
+							if (!isMenuClosed) {
+								CloseMenu ();
+								Activate (i);
+							}
 						} else {
-							Activate (i);
+							if (!isMenuClosed)
+								Activate (i);
 						}
 						return true;
 					}
