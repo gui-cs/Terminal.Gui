@@ -1,7 +1,6 @@
 using Terminal.Gui;
 using System;
 using Mono.Terminal;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -9,23 +8,42 @@ using System.Reflection;
 using NStack;
 
 static class Demo {
+	//class Box10x : View, IScrollView {
 	class Box10x : View {
-		public Box10x (int x, int y) : base (new Rect (x, y, 10, 10))
+		int w = 40;
+		int h = 50;
+
+		public bool WantCursorPosition { get; set; } = false;
+
+		public Box10x (int x, int y) : base (new Rect (x, y, 20, 10))
 		{
+		}
+
+		public Size GetContentSize ()
+		{
+			return new Size (w, h);
+		}
+
+		public void SetCursorPosition (Point pos)
+		{
+			throw new NotImplementedException ();
 		}
 
 		public override void Redraw (Rect region)
 		{
+			//Point pos = new Point (region.X, region.Y);
 			Driver.SetAttribute (ColorScheme.Focus);
 
-			for (int y = 0; y < 10; y++) {
+			for (int y = 0; y < h; y++) {
 				Move (0, y);
-				for (int x = 0; x < 10; x++) {
-
-					Driver.AddRune ((Rune)('0' + (x + y) % 10));
+				Driver.AddStr (y.ToString ());
+				for (int x = 0; x < w - y.ToString ().Length; x++) {
+					//Driver.AddRune ((Rune)('0' + (x + y) % 10));
+					if (y.ToString ().Length < w)
+						Driver.AddStr (" ");
 				}
 			}
-
+			//Move (pos.X, pos.Y);
 		}
 	}
 
@@ -69,19 +87,19 @@ static class Demo {
 		int i = 0;
 		string txt = "Hello world, how are you doing today";
 		container.Add (
-			    new FrameView (new Rect (75, 1, txt.Length + 6, 20), "Text Alignments") {
-			new Label(new Rect(0, 1, 40, 3), $"{i+1}-{txt}") { TextAlignment = TextAlignment.Left },
-			new Label(new Rect(0, 5, 40, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
-			new Label(new Rect(0, 9, 40, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
-			new Label(new Rect(0, 13, 40, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
-		    });
+			new FrameView (new Rect (75, 3, txt.Length + 6, 20), "Text Alignments") {
+				new Label(new Rect(0, 1, 40, 3), $"{i+1}-{txt}") { TextAlignment = TextAlignment.Left },
+				new Label(new Rect(0, 5, 40, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
+				new Label(new Rect(0, 9, 40, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
+				new Label(new Rect(0, 13, 40, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
+			});
 	}
 
 	static void ShowEntries (View container)
 	{
 		var scrollView = new ScrollView (new Rect (50, 10, 20, 8)) {
-			ContentSize = new Size (100, 100),
-			ContentOffset = new Point (-1, -1),
+			ContentSize = new Size (20, 50),
+			//ContentOffset = new Point (0, 0),
 			ShowVerticalScrollIndicator = true,
 			ShowHorizontalScrollIndicator = true
 		};
@@ -105,7 +123,7 @@ static class Demo {
 			return true;
 		}
 
-		//Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
+		Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
 
 
 		// A little convoluted, this is because I am using this to test the
@@ -129,6 +147,7 @@ static class Demo {
 			Width = Dim.Width (loginText)
 		};
 
+		var tf = new Button (3, 19, "Ok");
 		// Add some content
 		container.Add (
 			login,
@@ -139,7 +158,7 @@ static class Demo {
 				new CheckBox (1, 0, "Remember me"),
 				new RadioGroup (1, 2, new [] { "_Personal", "_Company" }),
 			},
-			new ListView (new Rect (60, 6, 16, 4), new string [] {
+			new ListView (new Rect (59, 6, 16, 4), new string [] {
 				"First row",
 				"<>",
 				"This is a very long row that should overflow what is shown",
@@ -149,18 +168,20 @@ static class Demo {
 				"This is so cool"
 			}),
 			scrollView,
-			//scrollView2,
-			new Button (3, 19, "Ok"),
+			scrollView2,
+			tf,
 			new Button (10, 19, "Cancel"),
 			new TimeField (3, 20, DateTime.Now),
 			new TimeField (23, 20, DateTime.Now, true),
+			new DateField (3, 22, DateTime.Now),
+			new DateField (23, 22, DateTime.Now, true),
 			progress,
 			new Label (3, 24, "Press F9 (on Unix, ESC+9 is an alias) to activate the menubar"),
 			menuKeysStyle,
 			menuAutoMouseNav
 
 		);
-
+		container.SendSubviewToBack (tf);
 	}
 
 	public static Label ml2;
@@ -302,67 +323,38 @@ static class Demo {
 			$"{mi.Title.ToString ()} selected. Is from submenu: {mi.GetMenuBarItem ()}", "Ok");
 	}
 
-	private static void MenuKeysStyle_Toggled (object sender, EventArgs e)
+	static void MenuKeysStyle_Toggled (object sender, EventArgs e)
 	{
 		menu.UseKeysUpDownAsKeysLeftRight = menuKeysStyle.Checked;
 	}
 
-	private static void MenuAutoMouseNav_Toggled (object sender, EventArgs e)
+	static void MenuAutoMouseNav_Toggled (object sender, EventArgs e)
 	{
 		menu.WantMousePositionReports = menuAutoMouseNav.Checked;
 	}
 
-	//private static TextField GetTextFieldSelText (View vt)
-	//{
-	//	TextField textField;
-	//	foreach (View v in vt.Subviews) {
-	//		if (v is TextField && ((TextField)v).SelText != "")
-	//			return v as TextField;
-	//		else
-	//			textField = GetTextFieldSelText (v);
-	//		if (textField != null)
-	//			return textField;
-	//	}
-	//	return null;
-	//}
 
-	private static void Copy ()
+	static void Copy ()
 	{
 		TextField textField = menu.LastFocused as TextField;
-		if (textField != null && textField.SelLength != 0) {
-			Clipboard.Contents = textField.SelText;
+		if (textField != null && textField.SelectedLength != 0) {
+			textField.Copy ();
 		}
 	}
 
-	private static void Cut ()
+	static void Cut ()
 	{
 		TextField textField = menu.LastFocused as TextField;
-		if (textField != null && textField.SelLength != 0) {
-			Clipboard.Contents = textField.SelText;
-			string actualText = textField.Text.ToString ();
-			int selStart = textField.SelLength < 0 ? textField.SelLength + textField.SelStart : textField.SelStart;
-			int selLength = Math.Abs (textField.SelLength);
-			string newText = actualText.Substring (0, selStart) +
-				actualText.Substring (selStart + selLength, actualText.Length - selStart - selLength);
-			textField.Text = newText;
-			textField.ClearAllSelection ();
-			textField.CursorPosition = selStart >= textField.Text.Length ? textField.Text.Length : textField.CursorPosition;
-			textField.SetNeedsDisplay ();
+		if (textField != null && textField.SelectedLength != 0) {
+			textField.Cut ();
 		}
 	}
 
-	private static void Paste ()
+	static void Paste ()
 	{
 		TextField textField = menu.LastFocused as TextField;
 		if (textField != null) {
-			string actualText = textField.Text.ToString ();
-			int start = textField.SelStart == -1 ? textField.CursorPosition : textField.SelStart;
-			string newText = actualText.Substring (0, start) +
-				Clipboard.Contents?.ToString() +
-				actualText.Substring (start + textField.SelLength, actualText.Length - start - textField.SelLength);
-			textField.Text = newText;
-			textField.SelLength = 0;
-			textField.SetNeedsDisplay ();
+			textField.Paste ();
 		}
 	}
 
@@ -451,7 +443,7 @@ static class Demo {
 				new MenuItem ("_Open", "", Open),
 				new MenuItem ("_Hex", "", () => ShowHex (top)),
 				new MenuItem ("_Close", "", () => Close ()),
-				new MenuItem ("_Disabled", "",  () => { }, () => false),
+				new MenuItem ("_Disabled", "", () => { }, () => false),
 				null,
 				new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
 			}),
@@ -489,9 +481,9 @@ static class Demo {
 		ShowEntries (win);
 
 		int count = 0;
-		ml = new Label (new Rect (3, 17, 47, 1), "Mouse: ");
+		ml = new Label (new Rect (3, 18, 47, 1), "Mouse: ");
 		Application.RootMouseEvent += delegate (MouseEvent me) {
-
+			ml.TextColor = Colors.TopLevel.Normal;
 			ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
 		};
 
@@ -500,8 +492,18 @@ static class Demo {
 		win.Add (ml);
 
 		ShowTextAlignments (win);
+
+		var drag = new Label ("Drag: ") { X = 70, Y = 24 };
+		var dragText = new TextField ("") {
+			X = Pos.Right (drag),
+			Y = Pos.Top (drag),
+			Width = 40
+		};
+		win.Add (drag, dragText);
+
 		top.Add (win);
-		top.Add (menu);
+		//top.Add (menu);
+		top.Add (menu, ml);
 		Application.Run ();
 	}
 }
