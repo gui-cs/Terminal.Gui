@@ -104,7 +104,6 @@ namespace Terminal.Gui {
 			set {
 				if (text?.Length != value?.Length) {
 					SetWidthHeight (value, is_default);
-					SetNeedsLayout ();
 				}
 				text = value;
 				Update ();
