@@ -72,7 +72,7 @@ namespace Terminal.Gui {
 			Frame = new Rect (0, 0, w, 1);
 		}
 
-		private int SetWidthHeight (ustring text, bool is_default)
+		int SetWidthHeight (ustring text, bool is_default)
 		{
 			int w = text.Length + 4 + (is_default ? 2 : 0);
 			Width = w;

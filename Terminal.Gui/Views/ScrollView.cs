@@ -364,7 +364,7 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (ColorScheme.Normal);
 		}
 
-		private void SetViewsNeedsDisplay ()
+		void SetViewsNeedsDisplay ()
 		{
 			foreach (View view in contentView) {
 				view.SetNeedsDisplay ();

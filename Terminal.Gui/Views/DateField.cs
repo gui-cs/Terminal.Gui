@@ -49,7 +49,7 @@ namespace Terminal.Gui {
 			Changed += DateField_Changed;
 		}
 
-		private void DateField_Changed(object sender, ustring e)
+		void DateField_Changed(object sender, ustring e)
 		{
 			if (!DateTime.TryParseExact(Text.ToString(), Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
 				Text = e;

@@ -290,6 +290,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
+	/// Dim properties of a view to control the position.
 	/// </summary>
 	/// <remarks>
 	///   <para>

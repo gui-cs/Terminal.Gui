@@ -49,7 +49,7 @@ namespace Terminal.Gui {
 			CanFocus = true;
 		}
 
-		private void SetWidthHeight(string[] radioLabels)
+		void SetWidthHeight(string[] radioLabels)
 		{
 			var r = MakeRect(0, 0, radioLabels);
 			Width = r.Width;
@@ -94,7 +94,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void Update(string [] newRadioLabels)
+		void Update(string [] newRadioLabels)
 		{
 			for (int i = 0; i < radioLabels.Length; i++) {
 				Move(0, i);

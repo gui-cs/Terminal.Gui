@@ -43,7 +43,7 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	An uninitialized Rectangle Structure.
 		/// </remarks>
-		
+
 		public static readonly Rect Empty;
 
 		/// <summary>
@@ -54,7 +54,7 @@ namespace Terminal.Gui
 		///	Produces a Rectangle structure from left, top, right
 		///	and bottom coordinates.
 		/// </remarks>
-		
+
 		public static Rect FromLTRB (int left, int top,
 						  int right, int bottom)
 		{
@@ -70,7 +70,7 @@ namespace Terminal.Gui
 		///	Produces a new Rectangle by inflating an existing 
 		///	Rectangle by the specified coordinate values.
 		/// </remarks>
-		
+
 		public static Rect Inflate (Rect rect, int x, int y)
 		{
 			Rect r = new Rect (rect.Location, rect.Size);
@@ -85,7 +85,7 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	Inflates the Rectangle by a specified width and height.
 		/// </remarks>
-		
+
 		public void Inflate (int width, int height)
 		{
 			Inflate (new Size (width, height));
@@ -98,7 +98,7 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	Inflates the Rectangle by a specified Size.
 		/// </remarks>
-		
+
 		public void Inflate (Size size)
 		{
 			X -= size.Width;
@@ -115,7 +115,7 @@ namespace Terminal.Gui
 		///	Produces a new Rectangle by intersecting 2 existing 
 		///	Rectangles. Returns null if there is no	intersection.
 		/// </remarks>
-		
+
 		public static Rect Intersect (Rect a, Rect b)
 		{
 			// MS.NET returns a non-empty rectangle if the two rectangles
@@ -138,7 +138,7 @@ namespace Terminal.Gui
 		///	Replaces the Rectangle with the intersection of itself
 		///	and another Rectangle.
 		/// </remarks>
-		
+
 		public void Intersect (Rect rect)
 		{
 			this = Rect.Intersect (this, rect);
@@ -152,7 +152,7 @@ namespace Terminal.Gui
 		///	Produces a new Rectangle from the union of 2 existing 
 		///	Rectangles.
 		/// </remarks>
-		
+
 		public static Rect Union (Rect a, Rect b)
 		{
 			return FromLTRB (Math.Min (a.Left, b.Left),
@@ -176,7 +176,7 @@ namespace Terminal.Gui
 			return ((left.Location == right.Location) && 
 				(left.Size == right.Size));
 		}
-		
+
 		/// <summary>
 		///	Inequality Operator
 		/// </summary>
@@ -192,7 +192,6 @@ namespace Terminal.Gui
 			return ((left.Location != right.Location) || 
 				(left.Size != right.Size));
 		}
-		
 
 		// -----------------------
 		// Public Constructors
@@ -205,7 +204,7 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	Creates a Rectangle from Point and Size values.
 		/// </remarks>
-		
+
 		public Rect (Point location, Size size)
 		{
 			X = location.X;
@@ -222,7 +221,7 @@ namespace Terminal.Gui
 		///	Creates a Rectangle from a specified x,y location and
 		///	width and height values.
 		/// </remarks>
-		
+
 		public Rect (int x, int y, int width, int height)
 		{
 			this.X = x;
@@ -268,7 +267,7 @@ namespace Terminal.Gui
 		///	The X coordinate of the left edge of the Rectangle.
 		///	Read only.
 		/// </remarks>
-		
+
 		public int Left {
 			get {
 				return X;
@@ -282,7 +281,7 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	The Location of the top-left corner of the Rectangle.
 		/// </remarks>
-		
+
 		public Point Location {
 			get {
 				return new Point (X, Y);
@@ -301,7 +300,7 @@ namespace Terminal.Gui
 		///	The X coordinate of the right edge of the Rectangle.
 		///	Read only.
 		/// </remarks>
-		
+
 		public int Right {
 			get {
 				return X + Width;
@@ -315,7 +314,7 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	The Size of the Rectangle.
 		/// </remarks>
-		
+
 		public Size Size {
 			get {
 				return new Size (Width, Height);
@@ -334,7 +333,7 @@ namespace Terminal.Gui
 		///	The Y coordinate of the top edge of the Rectangle.
 		///	Read only.
 		/// </remarks>
-		
+
 		public int Top {
 			get {
 				return Y;
@@ -348,7 +347,7 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	Checks if an x,y coordinate lies within this Rectangle.
 		/// </remarks>
-		
+
 		public bool Contains (int x, int y)
 		{
 			return ((x >= Left) && (x < Right) && 
@@ -362,7 +361,7 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	Checks if a Point lies within this Rectangle.
 		/// </remarks>
-		
+
 		public bool Contains (Point pt)
 		{
 			return Contains (pt.X, pt.Y);
@@ -376,7 +375,7 @@ namespace Terminal.Gui
 		///	Checks if a Rectangle lies entirely within this 
 		///	Rectangle.
 		/// </remarks>
-		
+
 		public bool Contains (Rect rect)
 		{
 			return (rect == Intersect (this, rect));
@@ -389,7 +388,7 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	Checks equivalence of this Rectangle and another object.
 		/// </remarks>
-		
+
 		public override bool Equals (object obj)
 		{
 			if (!(obj is Rect))
@@ -405,7 +404,7 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	Calculates a hashing value.
 		/// </remarks>
-		
+
 		public override int GetHashCode ()
 		{
 			return (Height + Width) ^ X + Y;
@@ -418,14 +417,14 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	Checks if a Rectangle intersects with this one.
 		/// </remarks>
-		
+
 		public bool IntersectsWith (Rect rect)
 		{
 			return !((Left >= rect.Right) || (Right <= rect.Left) ||
 			    (Top >= rect.Bottom) || (Bottom <= rect.Top));
 		}
 
-		private bool IntersectsWithInclusive (Rect r)
+		bool IntersectsWithInclusive (Rect r)
 		{
 			return !((Left > r.Right) || (Right < r.Left) ||
 			    (Top > r.Bottom) || (Bottom < r.Top));
@@ -444,7 +443,7 @@ namespace Terminal.Gui
 			this.X += x;
 			this.Y += y;
 		}
-		
+
 		/// <summary>
 		///	Offset Method
 		/// </summary>
@@ -458,7 +457,7 @@ namespace Terminal.Gui
 			X += pos.X;
 			Y += pos.Y;
 		}
-		
+
 		/// <summary>
 		///	ToString Method
 		/// </summary>
@@ -466,7 +465,7 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	Formats the Rectangle as a string in (x,y,w,h) notation.
 		/// </remarks>
-		
+
 		public override string ToString ()
 		{
 			return String.Format ("{{X={0},Y={1},Width={2},Height={3}}}",

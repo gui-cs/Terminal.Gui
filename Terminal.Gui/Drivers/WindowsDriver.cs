@@ -107,7 +107,7 @@ namespace Terminal.Gui {
 			ScreenBuffer = IntPtr.Zero;
 		}
 
-		private bool ContinueListeningForConsoleEvents = true;
+		bool ContinueListeningForConsoleEvents = true;
 
 		public uint ConsoleMode {
 			get {
@@ -577,11 +577,11 @@ namespace Terminal.Gui {
 			result = null;
 		}
 
-		private WindowsConsole.ButtonState? LastMouseButtonPressed = null;
-		private bool IsButtonReleased = false;
-		private bool IsButtonDoubleClicked = false;
+		WindowsConsole.ButtonState? LastMouseButtonPressed = null;
+		bool IsButtonReleased = false;
+		bool IsButtonDoubleClicked = false;
 
-		private MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
+		MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
 			MouseFlags mouseFlag = MouseFlags.AllEvents;
 
@@ -709,7 +709,7 @@ namespace Terminal.Gui {
 			};
 		}
 
-		private static MouseFlags SetControlKeyStates (WindowsConsole.MouseEventRecord mouseEvent, MouseFlags mouseFlag)
+		static MouseFlags SetControlKeyStates (WindowsConsole.MouseEventRecord mouseEvent, MouseFlags mouseFlag)
 		{
 			if (mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.RightControlPressed) ||
 				mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.LeftControlPressed))
@@ -948,7 +948,7 @@ namespace Terminal.Gui {
 			currentAttribute = c.value;
 		}
 
-		private Attribute MakeColor (ConsoleColor f, ConsoleColor b)
+		Attribute MakeColor (ConsoleColor f, ConsoleColor b)
 		{
 			// Encode the colors into the int value.
 			return new Attribute () {

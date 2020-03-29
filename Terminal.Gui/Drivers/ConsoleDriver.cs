@@ -156,11 +156,11 @@ namespace Terminal.Gui {
 	/// views contained inside.
 	/// </summary>
 	public class ColorScheme {
-		private Attribute _normal;
-		private Attribute _focus;
-		private Attribute _hotNormal;
-		private Attribute _hotFocus;
-		private Attribute _disabled;
+		Attribute _normal;
+		Attribute _focus;
+		Attribute _hotNormal;
+		Attribute _hotFocus;
+		Attribute _disabled;
 		internal string caller = "";
 
 		/// <summary>
@@ -188,9 +188,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Attribute Disabled { get { return _disabled; } set { _disabled = SetAttribute (value); } }
 
-		private bool preparingScheme = false;
+		bool preparingScheme = false;
 
-		private Attribute SetAttribute (Attribute attribute, [CallerMemberName]string callerMemberName = null)
+		Attribute SetAttribute (Attribute attribute, [CallerMemberName]string callerMemberName = null)
 		{
 			if (!Application._initialized && !preparingScheme)
 				return attribute;
@@ -321,11 +321,11 @@ namespace Terminal.Gui {
 	/// The default ColorSchemes for the application.
 	/// </summary>
 	public static class Colors {
-		private static ColorScheme _toplevel;
-		private static ColorScheme _base;
-		private static ColorScheme _dialog;
-		private static ColorScheme _menu;
-		private static ColorScheme _error;
+		static ColorScheme _toplevel;
+		static ColorScheme _base;
+		static ColorScheme _dialog;
+		static ColorScheme _menu;
+		static ColorScheme _error;
 
 		/// <summary>
 		/// The application toplevel color scheme, for the default toplevel views.
@@ -352,7 +352,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static ColorScheme Error { get { return _error; } set { _error = SetColorScheme (value); } }
 
-		private static ColorScheme SetColorScheme (ColorScheme colorScheme, [CallerMemberName]string callerMemberName = null)
+		static ColorScheme SetColorScheme (ColorScheme colorScheme, [CallerMemberName]string callerMemberName = null)
 		{
 			colorScheme.caller = callerMemberName;
 			return colorScheme;

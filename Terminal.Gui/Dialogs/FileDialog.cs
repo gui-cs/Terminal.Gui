@@ -77,7 +77,6 @@ namespace Terminal.Gui {
 		bool shiftOnWheel;
 		public override bool MouseEvent (MouseEvent me)
 		{
-			//System.Diagnostics.Debug.WriteLine ($"Flags: {me.Flags}");
 			if ((me.Flags & (MouseFlags.Button1Clicked | MouseFlags.Button1DoubleClicked |
 				MouseFlags.WheeledUp | MouseFlags.WheeledDown)) == 0)
 				return false;
@@ -146,7 +145,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		private void SetSelected (MouseEvent me)
+		void SetSelected (MouseEvent me)
 		{
 			lastSelected = selected;
 			selected = top + me.Y;
@@ -304,7 +303,7 @@ namespace Terminal.Gui {
 			return base.ProcessKey (keyEvent);
 		}
 
-		private void MoveLast ()
+		void MoveLast ()
 		{
 			selected = infos.Count - 1;
 			top = infos.Count () - 1;
@@ -312,7 +311,7 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
-		private void MoveFirst ()
+		void MoveFirst ()
 		{
 			selected = 0;
 			top = 0;
@@ -320,7 +319,7 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
-		private void MoveDown ()
+		void MoveDown ()
 		{
 			if (selected + 1 < infos.Count) {
 				selected++;
@@ -331,7 +330,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void MoveUp ()
+		void MoveUp ()
 		{
 			if (selected > 0) {
 				selected--;
@@ -363,7 +362,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		private void PerformMultipleSelection (int? firstSelected = null)
+		void PerformMultipleSelection (int? firstSelected = null)
 		{
 			if (allowsMultipleSelection) {
 				int first = Math.Min (firstSelected ?? selected, selected);
@@ -426,6 +425,13 @@ namespace Terminal.Gui {
 		TextField dirEntry, nameEntry;
 		internal DirListView dirListView;
 
+		/// <summary>
+		/// Constructor for the OpenDialog and the SaveDialog.
+		/// </summary>
+		/// <param name="title">The title.</param>
+		/// <param name="prompt">The prompt.</param>
+		/// <param name="nameFieldLabel">The name field label.</param>
+		/// <param name="message">The message.</param>
 		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message) : base (title, Driver.Cols - 20, Driver.Rows - 5, null)
 		{
 			this.message = new Label (Rect.Empty, "MESSAGE" + message);
@@ -578,6 +584,9 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Check if the dialog was or not canceled.
+		/// </summary>
 		public bool Canceled { get => canceled; }
 	}
 
@@ -594,6 +603,11 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public class SaveDialog : FileDialog {
+		/// <summary>
+		/// Constructor of the save dialog.
+		/// </summary>
+		/// <param name="title">The title.</param>
+		/// <param name="message">The message.</param>
 		public SaveDialog (ustring title, ustring message) : base (title, prompt: "Save", nameFieldLabel: "Save as:", message: message)
 		{
 		}
@@ -631,6 +645,11 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public class OpenDialog : FileDialog {
+		/// <summary>
+		/// Constructor of the Open Dialog.
+		/// </summary>
+		/// <param name="title"></param>
+		/// <param name="message"></param>
 		public OpenDialog (ustring title, ustring message) : base (title, prompt: "Open", nameFieldLabel: "Open", message: message)
 		{
 		}
