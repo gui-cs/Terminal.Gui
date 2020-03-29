@@ -437,10 +437,17 @@ namespace Terminal.Gui {
 
 		public WindowsDriver ()
 		{
+			Colors.TopLevel = new ColorScheme ();
+
+			Colors.TopLevel.Normal = MakeColor (ConsoleColor.Green, ConsoleColor.Black);
+			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
+			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
+			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.DarkCyan);
+
 			winConsole = new WindowsConsole ();
 
 			cols = Console.WindowWidth;
-			rows = Console.WindowHeight - 1;
+			rows = Console.WindowHeight;
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 
 			ResizeScreen ();
@@ -520,7 +527,6 @@ namespace Terminal.Gui {
 			} finally {
 				eventReady.Reset();
 			}
-			//Debug.WriteLine("Events ready");
 
 			if (!tokenSource.IsCancellationRequested)
 				return result != null;
@@ -574,16 +580,17 @@ namespace Terminal.Gui {
 		private WindowsConsole.ButtonState? LastMouseButtonPressed = null;
 		private bool IsButtonReleased = false;
 		private bool IsButtonDoubleClicked = false;
-		private object token;
 
 		private MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
 			MouseFlags mouseFlag = MouseFlags.AllEvents;
 
-			if (token != null)
-				Application.MainLoop.RemoveTimeout (token);
-			if (IsButtonDoubleClicked)
-				token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
+			if (IsButtonDoubleClicked) {
+				Task.Run (async () => {
+					await Task.Delay (300);
+					_ = new Action (() => IsButtonDoubleClicked = false);
+				});
+			}
 
 			// The ButtonState member of the MouseEvent structure has bit corresponding to each mouse button.
 			// This will tell when a mouse button is pressed. When the button is released this event will
@@ -595,7 +602,6 @@ namespace Terminal.Gui {
 				IsButtonReleased = false;
 			}
 
-			//Debug.WriteLine ($"MouseEventRecord: {mouseEvent}");
 			if ((mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null && !IsButtonDoubleClicked) ||
 				(mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved &&
 				mouseEvent.ButtonState != 0 && !IsButtonDoubleClicked)) {
@@ -696,7 +702,6 @@ namespace Terminal.Gui {
 
 			mouseFlag = SetControlKeyStates (mouseEvent, mouseFlag);
 
-			Debug.WriteLine ($"MouseFlags: {mouseFlag}");
 			return new MouseEvent () {
 				X = mouseEvent.MousePosition.X,
 				Y = mouseEvent.MousePosition.Y,
@@ -717,12 +722,6 @@ namespace Terminal.Gui {
 				 mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.LeftAltPressed))
 				mouseFlag |= MouseFlags.ButtonAlt;
 			return mouseFlag;
-		}
-
-		bool timer (MainLoop caller)
-		{
-			IsButtonDoubleClicked = false;
-			return false;
 		}
 
 		public ConsoleKeyInfoEx ToConsoleKeyInfoEx (WindowsConsole.KeyEventRecord keyEvent)
@@ -818,9 +817,12 @@ namespace Terminal.Gui {
 					return (Key)((uint)Key.ControlA + delta);
 				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
 					return (Key)(((uint)Key.AltMask) | ((uint)'A' + delta));
-				// TODO: Only apply after pull requests at NStack are merged.
-				//if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0)
-				//	return (Key)((uint)keyInfo.KeyChar);
+				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+					if (keyInfo.KeyChar == 0)
+						return (Key)(((uint)Key.AltMask) + ((uint)Key.ControlA + delta));
+					else
+						return (Key)((uint)keyInfo.KeyChar);
+				}
 				return (Key)((uint)alphaBase + delta);
 			}
 			if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
@@ -900,7 +902,7 @@ namespace Terminal.Gui {
 			for (int row = 0; row < rows; row++)
 				for (int col = 0; col < cols; col++) {
 					int position = row * cols + col;
-					OutputBuffer [position].Attributes = (ushort)MakeColor (ConsoleColor.White, ConsoleColor.Blue);
+					OutputBuffer [position].Attributes = (ushort)Colors.TopLevel.Normal;
 					OutputBuffer [position].Char.UnicodeChar = ' ';
 				}
 		}

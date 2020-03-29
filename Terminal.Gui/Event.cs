@@ -449,6 +449,21 @@ namespace Terminal.Gui {
 		public MouseFlags Flags;
 
 		/// <summary>
+		/// The offset X (column) location for the mouse event.
+		/// </summary>
+		public int OfX;
+
+		/// <summary>
+		/// The offset Y (column) location for the mouse event.
+		/// </summary>
+		public int OfY;
+
+		/// <summary>
+		/// The current view at the location for the mouse event.
+		/// </summary>
+		public View View;
+
+		/// <summary>
 		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.MouseEvent"/>.
 		/// </summary>
 		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.MouseEvent"/>.</returns>

@@ -110,6 +110,11 @@ namespace Terminal.Gui {
 			this.background = background;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Attribute"/> struct.
+		/// </summary>
+		/// <param name="foreground">Foreground</param>
+		/// <param name="background">Background</param>
 		public Attribute (Color foreground = new Color (), Color background = new Color ())
 		{
 			this.value = value = ((int)foreground | (int)background << 4);
@@ -156,6 +161,7 @@ namespace Terminal.Gui {
 		private Attribute _hotNormal;
 		private Attribute _hotFocus;
 		private Attribute _disabled;
+		internal string caller = "";
 
 		/// <summary>
 		/// The default color for text, when the view is not focused.
@@ -182,8 +188,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Attribute Disabled { get { return _disabled; } set { _disabled = SetAttribute (value); } }
 
-		public string Caller = "";
-
 		private bool preparingScheme = false;
 
 		private Attribute SetAttribute (Attribute attribute, [CallerMemberName]string callerMemberName = null)
@@ -195,7 +199,26 @@ namespace Terminal.Gui {
 				return attribute;
 
 			preparingScheme = true;
-			switch (Caller) {
+			switch (caller) {
+			case "TopLevel":
+				switch (callerMemberName) {
+				case "Normal":
+					HotNormal = Application.Driver.MakeAttribute (HotNormal.foreground, attribute.background);
+					break;
+				case "Focus":
+					HotFocus = Application.Driver.MakeAttribute (HotFocus.foreground, attribute.background);
+					break;
+				case "HotNormal":
+					HotFocus = Application.Driver.MakeAttribute (attribute.foreground, HotFocus.background);
+					break;
+				case "HotFocus":
+					HotNormal = Application.Driver.MakeAttribute (attribute.foreground, HotNormal.background);
+					if (Focus.foreground != attribute.background)
+						Focus = Application.Driver.MakeAttribute (Focus.foreground, attribute.background);
+					break;
+				}
+				break;
+
 			case "Base":
 				switch (callerMemberName) {
 				case "Normal":
@@ -298,10 +321,16 @@ namespace Terminal.Gui {
 	/// The default ColorSchemes for the application.
 	/// </summary>
 	public static class Colors {
+		private static ColorScheme _toplevel;
 		private static ColorScheme _base;
 		private static ColorScheme _dialog;
 		private static ColorScheme _menu;
 		private static ColorScheme _error;
+
+		/// <summary>
+		/// The application toplevel color scheme, for the default toplevel views.
+		/// </summary>
+		public static ColorScheme TopLevel { get { return _toplevel; } set { _toplevel = SetColorScheme (value); } }
 
 		/// <summary>
 		/// The base color scheme, for the default toplevel views.
@@ -325,7 +354,7 @@ namespace Terminal.Gui {
 
 		private static ColorScheme SetColorScheme (ColorScheme colorScheme, [CallerMemberName]string callerMemberName = null)
 		{
-			colorScheme.Caller = callerMemberName;
+			colorScheme.caller = callerMemberName;
 			return colorScheme;
 		}
 	}
@@ -400,6 +429,9 @@ namespace Terminal.Gui {
 	/// ConsoleDriver is an abstract class that defines the requirements for a console driver.   One implementation if the CursesDriver, and another one uses the .NET Console one.
 	/// </summary>
 	public abstract class ConsoleDriver {
+		/// <summary>
+		/// The handler fired when the terminal is resized.
+		/// </summary>
 		protected Action TerminalResized;
 
 		/// <summary>
@@ -431,6 +463,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="str">String.</param>
 		public abstract void AddStr (ustring str);
+		/// <summary>
+		/// Prepare the driver and set the key and mouse events handlers.
+		/// </summary>
+		/// <param name="mainLoop"></param>
+		/// <param name="keyHandler"></param>
+		/// <param name="mouseHandler"></param>
 		public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler);
 
 		/// <summary>
@@ -459,7 +497,11 @@ namespace Terminal.Gui {
 		/// <param name="c">C.</param>
 		public abstract void SetAttribute (Attribute c);
 
-		// Set Colors from limit sets of colors
+		/// <summary>
+		/// Set Colors from limit sets of colors.
+		/// </summary>
+		/// <param name="foreground">Foreground.</param>
+		/// <param name="background">Background.</param>
 		public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
 
 		// Advanced uses - set colors to any pre-set pairs, you would need to init_color
@@ -472,6 +514,10 @@ namespace Terminal.Gui {
 		/// <param name="backgroundColorId">Background color identifier.</param>
 		public abstract void SetColors (short foregroundColorId, short backgroundColorId);
 
+		/// <summary>
+		/// Set the handler when the terminal is resized.
+		/// </summary>
+		/// <param name="terminalResized"></param>
 		public void SetTerminalResized(Action terminalResized)
 		{
 			TerminalResized = terminalResized;
@@ -555,7 +601,14 @@ namespace Terminal.Gui {
 			set => this.clip = value;
 		}
 
+		/// <summary>
+		/// Start of mouse moves.
+		/// </summary>
 		public abstract void StartReportingMouseMoves ();
+
+		/// <summary>
+		/// Stop reporting mouses moves.
+		/// </summary>
 		public abstract void StopReportingMouseMoves ();
 
 		/// <summary>
@@ -628,6 +681,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Rune BottomTee;
 
+		/// <summary>
+		/// Make the attribute for the foreground and background colors.
+		/// </summary>
+		/// <param name="fore">Foreground.</param>
+		/// <param name="back">Background.</param>
+		/// <returns></returns>
 		public abstract Attribute MakeAttribute (Color fore, Color back);
 	}
 }
