@@ -57,25 +57,15 @@
     <DebugType></DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NStack.Core" Version="0.11.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2">
+    <PackageReference Include="NStack.Core" Version="0.13.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Dialogs\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="NStack">
-      <HintPath>..\..\..\Users\miguel\.nuget\packages\nstack.core\0.11.0\lib\netstandard1.5\NStack.dll</HintPath>
-    </Reference>
-    <Reference Include="NStack">
-      <HintPath>..\..\..\Users\miguel\.nuget\packages\nstack.core\0.11.0\lib\netstandard1.5\NStack.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Remove="Drivers\#ConsoleDriver.cs#" />
