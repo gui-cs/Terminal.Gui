@@ -10,6 +10,10 @@ steps:
   displayName: Restore dependencies
 
 - script: |
+    nuget restore
+  displayName: Nuget restore
+
+- script: |
     if echo $BUILD_SOURCEBRANCH | grep /release/; then perl -pi -e "s/PackageVersion>.*</PackageVersion>${BUILD_SOURCEBRANCHNAME}</" Terminal.Gui/Terminal.Gui.csproj; fi
   displayName: Update NuGet package version from branch name
 
