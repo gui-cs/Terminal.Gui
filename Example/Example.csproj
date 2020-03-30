@@ -30,10 +30,10 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="NStack">
-      <HintPath>..\packages\NStack.Core.0.14.0\lib\netstandard1.5\NStack.dll</HintPath>
+    <Reference Include="NStack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NStack.Core.0.14.0\lib\netstandard2.0\NStack.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="demo.cs" />
@@ -43,6 +43,9 @@
       <Project>{00F366F8-DEE4-482C-B9FD-6DB0200B79E5}</Project>
       <Name>Terminal.Gui</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
