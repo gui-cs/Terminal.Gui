@@ -34,9 +34,6 @@
     <Reference Include="NStack">
       <HintPath>..\packages\NStack.Core.0.13.0\lib\netstandard1.5\NStack.dll</HintPath>
     </Reference>
-    <Reference Include="NStack">
-      <HintPath>..\packages\NStack.Core.0.13.0\lib\netstandard1.5\NStack.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -49,7 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

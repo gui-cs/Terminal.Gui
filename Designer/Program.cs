@@ -10,12 +10,18 @@ namespace Designer {
 	}
 
 	class MainClass {
+		static void Close ()
+		{
+			MessageBox.ErrorQuery (50, 7, "Error", "There is nothing to close", "Ok");
+		}
+
 		public static void Main (string [] args)
 		{
 			Application.Init ();
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
+					new MenuItem ("_Close", "", () => Close ()),
 					new MenuItem ("_Quit", "", () => { Application.RequestStop (); })
 				}),
 				new MenuBarItem ("_Edit", new MenuItem [] {
@@ -50,8 +56,15 @@ namespace Designer {
 				},
 			};
 
-			//Application.Top.Add (menu);
-			Application.Top.Add (login, password, loginText);
+			var passText = new TextField ("") {
+				Secret = true,
+				X = Pos.Left (loginText),
+				Y = Pos.Top (password),
+				Width = Dim.Width (loginText)
+			};
+
+			surface.Add (login, password, loginText, passText);
+			Application.Top.Add (menu, surface);
 			Application.Run ();
 		}
 	}
