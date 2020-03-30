@@ -1475,7 +1475,6 @@ namespace Terminal.Gui {
 			ny = ny + top.Frame.Height > l ? Math.Max(l - top.Frame.Height, m ? 1 : 0) : ny;
 		}
 
-		//Dictionary<View, Rect> subViews;
 		internal void PositionToplevels ()
 		{
 			if (this != Application.Top) {
@@ -1491,6 +1490,10 @@ namespace Terminal.Gui {
 						if (nx != top.Frame.X || ny != top.Frame.Y) {
 							top.X = nx;
 							top.Y = ny;
+						}
+						if (HasStatusBar && ny + top.Frame.Height > Driver.Rows - 1) {
+							if (top.Height is Dim.DimFill)
+								top.Height = Dim.Fill () - 1;
 						}
 					}
 				}

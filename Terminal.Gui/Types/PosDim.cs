@@ -346,7 +346,7 @@ namespace Terminal.Gui {
 			return new DimFactor (n / 100);
 		}
 
-		class DimAbsolute : Dim {
+		internal class DimAbsolute : Dim {
 			int n;
 			public DimAbsolute (int n) { this.n = n; }
 
@@ -366,7 +366,7 @@ namespace Terminal.Gui {
 
 		}
 
-		class DimFill : Dim {
+		internal class DimFill : Dim {
 			int margin;
 			public DimFill (int margin) { this.margin = margin; }
 
