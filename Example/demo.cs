@@ -358,6 +358,10 @@ static class Demo {
 		}
 	}
 
+	static void Help ()
+	{
+		MessageBox.Query (50, 7, "Help", "This is a small help\nBe kind.", "Ok");
+	}
 
 	#region Selection Demo
 
@@ -415,7 +419,7 @@ static class Demo {
 #if true
 		var win = new Window ("Hello") {
 			X = 0,
-			Y = 1,
+			Y = 0,
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
@@ -499,11 +503,19 @@ static class Demo {
 			Y = Pos.Top (drag),
 			Width = 40
 		};
+
+		var statusBar = new StatusBar (new StatusItem [] {
+			new StatusItem(Key.F1, "~F1~ Help", () => Help()),
+			new StatusItem(Key.F2, "~F2~ Load", null),
+			new StatusItem(Key.F3, "~F3~ Save", null),
+			new StatusItem(Key.ControlX, "~^X~ Quit", () => Quit()),
+		});
+
 		win.Add (drag, dragText);
 
 		top.Add (win);
 		//top.Add (menu);
-		top.Add (menu, ml);
+		top.Add (menu, statusBar, ml);
 		Application.Run ();
 	}
 }
