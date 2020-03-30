@@ -1,7 +1,5 @@
 language: csharp
 solution: Terminal.sln
-install:
-  - dotnet nuget locals http-cache --clear
 script:
   - tsh_version=1.4.0-pre1
   - msbuild /t:Restore $TRAVIS_BUILD_DIR/Terminal.sln
