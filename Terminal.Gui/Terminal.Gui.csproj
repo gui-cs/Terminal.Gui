@@ -41,7 +41,7 @@
 * Replaced static driver initialization with property getter for reference passing in Core.cs::View class, this allows the library to be reinitialized at any time.
 * Made the Shutdown method on Core.cs::Application class public, since there is no reason to keep it private. Applications can shutdown the library and revert the console to the initial stage by calling it.
 * Fixed a memory-leak on Drivers/WindowsDriver class by destroying the generated screen buffers at library shutdown by calling CloseHandle.
-* Minor change to Core.cs::Application.Init(Func<Toplevel>) for better initialization status tracking, via backend property instead of relying on the Top field.
+* Minor change to Core.cs::Application.Init(Func) for better initialization status tracking, via backend property instead of relying on the Top field.
 * Moved `ListView.ListWrapper` out of `ListView` migueldeicaza/gui.cs#313` (#315)
 * Resizing the MessageBox width to accommodate all message text (#299)
 * Timefield format with bounds values (#303)
