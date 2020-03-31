@@ -925,6 +925,12 @@ namespace Terminal.Gui {
 			}
 
 			ccol++;
+			var runeWidth = Rune.ColumnWidth(rune);
+			if (runeWidth > 1) {
+				for (int i = 1; i < runeWidth; i++) {
+					AddStr(" ");
+				}
+			}
 			if (ccol == Cols) {
 				ccol = 0;
 				if (crow + 1 < Rows)

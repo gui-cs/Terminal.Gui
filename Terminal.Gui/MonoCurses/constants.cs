@@ -102,10 +102,9 @@ namespace Unix.Terminal {
 		public const int KeyF10 = unchecked((int)0x112);
 		public const int KeyResize = unchecked((int)0x19a);
 
-
+		public const int LC_ALL = 6;
 		static public int ColorPair(int n){
 			return 0 + n * 256;
 		}
-
 	}
 }

@@ -51,6 +51,12 @@ namespace Terminal.Gui {
 			if (sync)
 				Application.Driver.Refresh ();
 			ccol++;
+			var runeWidth = Rune.ColumnWidth(rune);
+			if (runeWidth > 1) {
+				for (int i = 1; i < runeWidth; i++) {
+					ccol++;
+				}
+			}
 		}
 
 		public override void AddStr (ustring str)
