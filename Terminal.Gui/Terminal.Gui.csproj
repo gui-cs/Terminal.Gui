@@ -18,7 +18,38 @@
     <Owners>Miguel de Icaza</Owners>
     <Summary>Application framework for creating modern console applications using .NET </Summary>
     <Title>Gui.cs is a framework for creating console user interfaces</Title>
-    <PackageReleaseNotes>0.70: Bug fixes (320, 321, 306, 304, 291, 299, 303);  Surface ListView.ListWrapper, surface various internal methods for use in ListView; Allow list item selection; ; 0.65: Added new TimeField from Jörg Preiß; Fixes for Backtab by Martin Björkström;  ListView now supports simple selection;  Bug fixes by giladlevi, Daniel Cazzulino and Marius Ungureanu;  New Application.Run of T entry point by Daniel Cazzulino;   Added various View methods to bring forward, backwards and move views in the hierarchy;  Switch to Portable PDBs by Daniel Cazzulino;  Dims can now be compared by Daniel Cazzulino; OnMenuOpen handler by giladlevi;  Various memory usage optimizations by giladlevi;  FileDialog.FilePath is now a full path by Yanwei Wang;  ISupportInitialize/ISupportInitializeNotification is now supported thanks to the work from Daniel Cazzulino; Support for non-modal TopLevels by Daniel Cazzulino and Adrian Alonso; 0.24: the Windows driver implements WakeUp, allowing some scenarios like bug #207 to be fixed;
+    <PackageReleaseNotes>0.80: Jumbo update from BDisp:
+
+* Fixed key events traversal for modal dialogs
+* Fixes culture info of DataField from pr
+* Fixes the rectangle drawing issue
+* Redraw issue when setting coordinates of label
+* Added sub menus into menu bar with mouse and key navigation
+* Added Colors.Menu.Disabled to CursesDriver.cs
+* Mouse text selection with cut, copy and paste on text fields
+* Change sepChar from char to string in DateField
+* Adding a disabled menu item in the demo file
+* Fixes Button repainting issue when changing the text length to one smaller
+* Fixes Redraw issue when setting coordinates of label
+* Fixes ScrollView does not render some content
+* Fixed bug in Button that caused a loop redraw calling TerminalResized
+* Fixes a repaint issue (282)
+* Mouse features added to FileDialog including wheel support.
+* Switch netcoreapp target to netstandard2.0
+* Added TextView.TextChanged event
+* Fixes issue #306 async/await hang (#312)
+* Replaced static driver initialization with property getter for reference passing in Core.cs::View class, this allows the library to be reinitialized at any time.
+* Made the Shutdown method on Core.cs::Application class public, since there is no reason to keep it private. Applications can shutdown the library and revert the console to the initial stage by calling it.
+* Fixed a memory-leak on Drivers/WindowsDriver class by destroying the generated screen buffers at library shutdown by calling CloseHandle.
+* Minor change to Core.cs::Application.Init(Func<Toplevel>) for better initialization status tracking, via backend property instead of relying on the Top field.
+* Moved `ListView.ListWrapper` out of `ListView` migueldeicaza/gui.cs#313` (#315)
+* Resizing the MessageBox width to accommodate all message text (#299)
+* Timefield format with bounds values (#303)
+* Implemented lower and upper bounds to TimeField
+* Passing old text to the Changed event handler
+* Extract methods on ListView to make it controlable from other controls
+
+0.70: Bug fixes (320, 321, 306, 304, 291, 299, 303);  Surface ListView.ListWrapper, surface various internal methods for use in ListView; Allow list item selection; ; 0.65: Added new TimeField from Jörg Preiß; Fixes for Backtab by Martin Björkström;  ListView now supports simple selection;  Bug fixes by giladlevi, Daniel Cazzulino and Marius Ungureanu;  New Application.Run of T entry point by Daniel Cazzulino;   Added various View methods to bring forward, backwards and move views in the hierarchy;  Switch to Portable PDBs by Daniel Cazzulino;  Dims can now be compared by Daniel Cazzulino; OnMenuOpen handler by giladlevi;  Various memory usage optimizations by giladlevi;  FileDialog.FilePath is now a full path by Yanwei Wang;  ISupportInitialize/ISupportInitializeNotification is now supported thanks to the work from Daniel Cazzulino; Support for non-modal TopLevels by Daniel Cazzulino and Adrian Alonso; 0.24: the Windows driver implements WakeUp, allowing some scenarios like bug #207 to be fixed;
 0.23: Better support for disabled menu items;  Raises text changed event after the internals have been updated; Fix Caps-NumLock;  Alt-HotKey now work on menus
 0.22: Correct vertical scrollview behavior, Small curses driver fix for terminals without mouse support, TextView support for scrolling, Surface Used property on TextField, Surface Cursor on RadioGroup.
 
