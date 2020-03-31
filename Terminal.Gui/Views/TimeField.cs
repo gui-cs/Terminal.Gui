@@ -50,7 +50,7 @@ namespace Terminal.Gui {
 			Changed += TimeField_Changed;
 		}
 
-		private void TimeField_Changed (object sender, ustring e)
+		void TimeField_Changed (object sender, ustring e)
 		{
 			if (!DateTime.TryParseExact (Text.ToString (), Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
 				Text = e;

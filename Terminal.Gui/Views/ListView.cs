@@ -20,6 +20,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using NStack;
 
 namespace Terminal.Gui {
@@ -123,6 +125,21 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Sets the source to an IList value asynchronously, if you want to set a full IListDataSource, use the Source property.
+		/// </summary>
+		/// <value>An item implementing the IList interface.</value>
+		public Task SetSourceAsync (IList source)
+		{
+			return Task.Factory.StartNew (() => {
+				if (source == null)
+					Source = null;
+				else
+					Source = MakeWrapper (source);
+				return source;
+			}, CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
+		}
+
 		bool allowsMarking;
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.ListView"/> allows items to be marked. 
@@ -141,6 +158,8 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 			}
 		}
+
+		public bool AllowsMultipleSelection { get; set; } = true;
 
 		/// <summary>
 		/// Gets or sets the item that is displayed at the top of the listview
@@ -305,8 +324,21 @@ namespace Terminal.Gui {
 			return base.ProcessKey (kb);
 		}
 
+		public virtual bool AllowsAll ()
+		{
+			if (!allowsMarking)
+				return false;
+			if (!AllowsMultipleSelection) {
+				for (int i = 0; i < Source.Count; i++) {
+					if (Source.IsMarked (i) && i != selected)
+						return false;
+				}
+			}
+			return true;
+		}
+
 		public virtual bool MarkUnmarkRow(){
-			if (allowsMarking){
+			if (AllowsAll ()) {
 				Source.SetMark(SelectedItem, !Source.IsMarked(SelectedItem));
 				SetNeedsDisplay();
 				return true;
@@ -400,7 +432,7 @@ namespace Terminal.Gui {
 				return true;
 
 			selected = top + me.Y;
-			if (allowsMarking) {
+			if (AllowsAll ()) {
 				Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
 				SetNeedsDisplay ();
 				return true;

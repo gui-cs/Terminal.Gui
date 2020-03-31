@@ -248,7 +248,7 @@ namespace Terminal.Gui {
 		Attribute textColor = -1;
 		/// <summary>
 		///   The color used for the label
-		/// </summary>        
+		/// </summary>
 		public Attribute TextColor {
 			get => textColor;
 			set {

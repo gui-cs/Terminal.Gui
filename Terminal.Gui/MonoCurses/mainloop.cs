@@ -354,10 +354,9 @@ namespace Mono.Terminal {
 		/// </summary>
 		public Func<bool> AddIdle (Func<bool> idleHandler)
 		{
-			lock (idleHandlers) {
+			lock (idleHandlers)
 				idleHandlers.Add (idleHandler);
-				driver.Wakeup ();
-			}
+
 			return idleHandler;
 		}
 

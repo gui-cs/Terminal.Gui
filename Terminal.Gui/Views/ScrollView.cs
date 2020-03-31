@@ -355,12 +355,20 @@ namespace Terminal.Gui {
 
 		public override void Redraw(Rect region)
 		{
+			SetViewsNeedsDisplay ();
 			var oldClip = ClipToBounds ();
 			Driver.SetAttribute (ColorScheme.Normal);
 			Clear ();
 			base.Redraw(region);
 			Driver.Clip = oldClip;
 			Driver.SetAttribute (ColorScheme.Normal);
+		}
+
+		void SetViewsNeedsDisplay ()
+		{
+			foreach (View view in contentView) {
+				view.SetNeedsDisplay ();
+			}
 		}
 
 		public override void PositionCursor()

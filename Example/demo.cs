@@ -1,28 +1,49 @@
 using Terminal.Gui;
 using System;
 using Mono.Terminal;
-using System.Collections;
 using System.Collections.Generic;
-
+using System.Diagnostics;
+using System.Globalization;
+using System.Reflection;
+using NStack;
 
 static class Demo {
+	//class Box10x : View, IScrollView {
 	class Box10x : View {
-		public Box10x (int x, int y) : base (new Rect (x, y, 10, 10))
+		int w = 40;
+		int h = 50;
+
+		public bool WantCursorPosition { get; set; } = false;
+
+		public Box10x (int x, int y) : base (new Rect (x, y, 20, 10))
 		{
+		}
+
+		public Size GetContentSize ()
+		{
+			return new Size (w, h);
+		}
+
+		public void SetCursorPosition (Point pos)
+		{
+			throw new NotImplementedException ();
 		}
 
 		public override void Redraw (Rect region)
 		{
+			//Point pos = new Point (region.X, region.Y);
 			Driver.SetAttribute (ColorScheme.Focus);
 
-			for (int y = 0; y < 10; y++) {
+			for (int y = 0; y < h; y++) {
 				Move (0, y);
-				for (int x = 0; x < 10; x++) {
-
-					Driver.AddRune ((Rune)('0' + (x + y) % 10));
+				Driver.AddStr (y.ToString ());
+				for (int x = 0; x < w - y.ToString ().Length; x++) {
+					//Driver.AddRune ((Rune)('0' + (x + y) % 10));
+					if (y.ToString ().Length < w)
+						Driver.AddStr (" ");
 				}
 			}
-
+			//Move (pos.X, pos.Y);
 		}
 	}
 
@@ -42,6 +63,9 @@ static class Demo {
 					Rune r;
 					switch (x % 3) {
 					case 0:
+						Driver.AddRune (y.ToString ().ToCharArray (0, 1) [0]);
+						if (y > 9)
+							Driver.AddRune (y.ToString ().ToCharArray (1, 1) [0]);
 						r = '.';
 						break;
 					case 1:
@@ -60,24 +84,30 @@ static class Demo {
 
 	static void ShowTextAlignments (View container)
 	{
+		int i = 0;
+		string txt = "Hello world, how are you doing today";
 		container.Add (
-			new Label (new Rect (0, 0, 40, 3), "1-Hello world, how are you doing today") { TextAlignment = TextAlignment.Left },
-			new Label (new Rect (0, 4, 40, 3), "2-Hello world, how are you doing today") { TextAlignment = TextAlignment.Right },
-			new Label (new Rect (0, 8, 40, 3), "3-Hello world, how are you doing today") { TextAlignment = TextAlignment.Centered },
-			new Label (new Rect (0, 12, 40, 3), "4-Hello world, how are you doing today") { TextAlignment = TextAlignment.Justified });
+			new FrameView (new Rect (75, 3, txt.Length + 6, 20), "Text Alignments") {
+				new Label(new Rect(0, 1, 40, 3), $"{i+1}-{txt}") { TextAlignment = TextAlignment.Left },
+				new Label(new Rect(0, 5, 40, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
+				new Label(new Rect(0, 9, 40, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
+				new Label(new Rect(0, 13, 40, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
+			});
 	}
 
 	static void ShowEntries (View container)
 	{
 		var scrollView = new ScrollView (new Rect (50, 10, 20, 8)) {
-			ContentSize = new Size (100, 100),
-			ContentOffset = new Point (-1, -1),
+			ContentSize = new Size (20, 50),
+			//ContentOffset = new Point (0, 0),
 			ShowVerticalScrollIndicator = true,
 			ShowHorizontalScrollIndicator = true
 		};
-
+#if false
 		scrollView.Add (new Box10x (0, 0));
-		//scrollView.Add (new Filler (new Rect (0, 0, 40, 40)));
+#else
+		scrollView.Add (new Filler (new Rect (0, 0, 40, 40)));
+#endif
 
 		// This is just to debug the visuals of the scrollview when small
 		var scrollView2 = new ScrollView (new Rect (72, 10, 3, 3)) {
@@ -93,7 +123,7 @@ static class Demo {
 			return true;
 		}
 
-		//Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
+		Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
 
 
 		// A little convoluted, this is because I am using this to test the
@@ -117,6 +147,7 @@ static class Demo {
 			Width = Dim.Width (loginText)
 		};
 
+		var tf = new Button (3, 19, "Ok");
 		// Add some content
 		container.Add (
 			login,
@@ -127,7 +158,7 @@ static class Demo {
 				new CheckBox (1, 0, "Remember me"),
 				new RadioGroup (1, 2, new [] { "_Personal", "_Company" }),
 			},
-			new ListView (new Rect (60, 6, 16, 4), new string [] {
+			new ListView (new Rect (59, 6, 16, 4), new string [] {
 				"First row",
 				"<>",
 				"This is a very long row that should overflow what is shown",
@@ -137,16 +168,20 @@ static class Demo {
 				"This is so cool"
 			}),
 			scrollView,
-			//scrollView2,
-			new Button (3, 19, "Ok"),
+			scrollView2,
+			tf,
 			new Button (10, 19, "Cancel"),
 			new TimeField (3, 20, DateTime.Now),
 			new TimeField (23, 20, DateTime.Now, true),
+			new DateField (3, 22, DateTime.Now),
+			new DateField (23, 22, DateTime.Now, true),
 			progress,
-			new Label (3, 22, "Press F9 (on Unix, ESC+9 is an alias) to activate the menubar")
+			new Label (3, 24, "Press F9 (on Unix, ESC+9 is an alias) to activate the menubar"),
+			menuKeysStyle,
+			menuAutoMouseNav
 
 		);
-
+		container.SendSubviewToBack (tf);
 	}
 
 	public static Label ml2;
@@ -162,12 +197,13 @@ static class Demo {
 		Application.Run (d);
 	}
 
-	// 
+	//
 	// Creates a nested editor
-	static void Editor(Toplevel top) {
+	static void Editor (Toplevel top)
+	{
 		var tframe = top.Frame;
-		var ntop = new Toplevel(tframe);
-		var menu = new MenuBar(new MenuBarItem[] {
+		var ntop = new Toplevel (tframe);
+		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
 				new MenuItem ("_Close", "", () => {Application.RequestStop ();}),
 			}),
@@ -177,25 +213,25 @@ static class Demo {
 				new MenuItem ("_Paste", "", null)
 			}),
 		});
-		ntop.Add(menu);
+		ntop.Add (menu);
 
 		string fname = null;
-		foreach (var s in new[] { "/etc/passwd", "c:\\windows\\win.ini" })
-			if (System.IO.File.Exists(s)) {
+		foreach (var s in new [] { "/etc/passwd", "c:\\windows\\win.ini" })
+			if (System.IO.File.Exists (s)) {
 				fname = s;
 				break;
 			}
 
-		var win = new Window(fname ?? "Untitled") {
+		var win = new Window (fname ?? "Untitled") {
 			X = 0,
 			Y = 1,
-			Width = Dim.Fill(),
-			Height = Dim.Fill()
+			Width = Dim.Fill (),
+			Height = Dim.Fill ()
 		};
-		ntop.Add(win);
+		ntop.Add (win);
 
-		var text = new TextView(new Rect(0, 0, tframe.Width - 2, tframe.Height - 3));
-		
+		var text = new TextView (new Rect (0, 0, tframe.Width - 2, tframe.Height - 3));
+
 		if (fname != null)
 			text.Text = System.IO.File.ReadAllText (fname);
 		win.Add (text);
@@ -211,7 +247,7 @@ static class Demo {
 
 	static void Close ()
 	{
-		MessageBox.ErrorQuery (50, 5, "Error", "There is nothing to close", "Ok");
+		MessageBox.ErrorQuery (50, 7, "Error", "There is nothing to close", "Ok");
 	}
 
 	// Watch what happens when I try to introduce a newline after the first open brace
@@ -220,10 +256,11 @@ static class Demo {
 
 	public static void Open ()
 	{
-		var d = new OpenDialog ("Open", "Open a file");
+		var d = new OpenDialog ("Open", "Open a file") { AllowsMultipleSelection = true };
 		Application.Run (d);
 
-		MessageBox.Query (50, 7, "Selected File", string.Join (", ", d.FilePaths), "Ok");
+		if (!d.Canceled)
+			MessageBox.Query (50, 7, "Selected File", string.Join (", ", d.FilePaths), "Ok");
 	}
 
 	public static void ShowHex (Toplevel top)
@@ -254,7 +291,76 @@ static class Demo {
 		};
 		win.Add (hex);
 		Application.Run (ntop);
-			
+
+	}
+
+	public class MenuItemDetails : MenuItem {
+		ustring title;
+		string help;
+		Action action;
+
+		public MenuItemDetails (ustring title, string help, Action action) : base (title, help, action)
+		{
+			this.title = title;
+			this.help = help;
+			this.action = action;
+		}
+
+		public static MenuItemDetails Instance (MenuItem mi)
+		{
+			return (MenuItemDetails)mi.GetMenuItem ();
+		}
+	}
+
+	public delegate MenuItem MenuItemDelegate (MenuItemDetails menuItem);
+
+	public static void ShowMenuItem (MenuItem mi)
+	{
+		BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
+		MethodInfo minfo = typeof (MenuItemDetails).GetMethod ("Instance", flags);
+		MenuItemDelegate mid = (MenuItemDelegate)Delegate.CreateDelegate (typeof (MenuItemDelegate), minfo);
+		MessageBox.Query (70, 7, mi.Title.ToString (),
+			$"{mi.Title.ToString ()} selected. Is from submenu: {mi.GetMenuBarItem ()}", "Ok");
+	}
+
+	static void MenuKeysStyle_Toggled (object sender, EventArgs e)
+	{
+		menu.UseKeysUpDownAsKeysLeftRight = menuKeysStyle.Checked;
+	}
+
+	static void MenuAutoMouseNav_Toggled (object sender, EventArgs e)
+	{
+		menu.WantMousePositionReports = menuAutoMouseNav.Checked;
+	}
+
+
+	static void Copy ()
+	{
+		TextField textField = menu.LastFocused as TextField;
+		if (textField != null && textField.SelectedLength != 0) {
+			textField.Copy ();
+		}
+	}
+
+	static void Cut ()
+	{
+		TextField textField = menu.LastFocused as TextField;
+		if (textField != null && textField.SelectedLength != 0) {
+			textField.Cut ();
+		}
+	}
+
+	static void Paste ()
+	{
+		TextField textField = menu.LastFocused as TextField;
+		if (textField != null) {
+			textField.Paste ();
+		}
+	}
+
+	static void Help ()
+	{
+		MessageBox.Query (50, 7, "Help", "This is a small help\nBe kind.", "Ok");
 	}
 
 	#region Selection Demo
@@ -278,7 +384,8 @@ static class Demo {
 			Y = 3,
 			Width = Dim.Fill () - 4,
 			Height = Dim.Fill () - 4,
-			AllowsMarking = true
+			AllowsMarking = true,
+			AllowsMultipleSelection = false
 		};
 		d.Add (msg, list);
 		Application.Run (d);
@@ -295,60 +402,120 @@ static class Demo {
 
 
 	public static Label ml;
+	public static MenuBar menu;
+	public static CheckBox menuKeysStyle;
+	public static CheckBox menuAutoMouseNav;
 	static void Main ()
 	{
+		if (Debugger.IsAttached)
+			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
+
 		//Application.UseSystemConsole = true;
 		Application.Init ();
-		
+
 		var top = Application.Top;
-		
-		var tframe = top.Frame;
+
 		//Open ();
 #if true
 		var win = new Window ("Hello") {
 			X = 0,
-			Y = 1,
+			Y = 0,
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
 #else
+		var tframe = top.Frame;
+
 		var win = new Window (new Rect (0, 1, tframe.Width, tframe.Height - 1), "Hello");
 #endif
-		var menu = new MenuBar (new MenuBarItem [] {
+		MenuItemDetails [] menuItems = {
+			new MenuItemDetails ("F_ind", "", null),
+			new MenuItemDetails ("_Replace", "", null),
+			new MenuItemDetails ("_Item1", "", null),
+			new MenuItemDetails ("_Not From Sub Menu", "", null)
+		};
+
+		menuItems [0].Action = () => ShowMenuItem (menuItems [0]);
+		menuItems [1].Action = () => ShowMenuItem (menuItems [1]);
+		menuItems [2].Action = () => ShowMenuItem (menuItems [2]);
+		menuItems [3].Action = () => ShowMenuItem (menuItems [3]);
+
+		menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
 				new MenuItem ("Text Editor Demo", "", () => { Editor (top); }),
 				new MenuItem ("_New", "Creates new file", NewFile),
 				new MenuItem ("_Open", "", Open),
 				new MenuItem ("_Hex", "", () => ShowHex (top)),
 				new MenuItem ("_Close", "", () => Close ()),
+				new MenuItem ("_Disabled", "", () => { }, () => false),
+				null,
 				new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
-				new MenuItem ("_Copy", "", null),
-				new MenuItem ("C_ut", "", null),
-				new MenuItem ("_Paste", "", null)
+				new MenuItem ("_Copy", "", Copy),
+				new MenuItem ("C_ut", "", Cut),
+				new MenuItem ("_Paste", "", Paste),
+				new MenuItem ("_Find and Replace",
+					new MenuBarItem (new MenuItem[] {menuItems [0], menuItems [1] })),
+				menuItems[3]
 			}),
-			 new MenuBarItem ("_List Demos", new MenuItem [] {
+			new MenuBarItem ("_List Demos", new MenuItem [] {
 				new MenuItem ("Select Items", "", ListSelectionDemo),
 			}),
+			new MenuBarItem ("Test Menu and SubMenus", new MenuItem [] {
+				new MenuItem ("SubMenu1Item1",
+					new MenuBarItem (new MenuItem[] {
+						new MenuItem ("SubMenu2Item1",
+							new MenuBarItem (new MenuItem [] {
+								new MenuItem ("SubMenu3Item1",
+									new MenuBarItem (new MenuItem [] { menuItems [2] })
+								)
+							})
+						)
+					})
+				)
+			}),
 		});
+
+		menuKeysStyle = new CheckBox (3, 25, "UseKeysUpDownAsKeysLeftRight", true);
+		menuKeysStyle.Toggled += MenuKeysStyle_Toggled;
+		menuAutoMouseNav = new CheckBox (40, 25, "UseMenuAutoNavigation", true);
+		menuAutoMouseNav.Toggled += MenuAutoMouseNav_Toggled;
 
 		ShowEntries (win);
 
 		int count = 0;
-		ml = new Label (new Rect (3, 17, 47, 1), "Mouse: ");
+		ml = new Label (new Rect (3, 18, 47, 1), "Mouse: ");
 		Application.RootMouseEvent += delegate (MouseEvent me) {
-
+			ml.TextColor = Colors.TopLevel.Normal;
 			ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
 		};
-		
+
 		var test = new Label (3, 18, "Se iniciará el análisis");
 		win.Add (test);
 		win.Add (ml);
-		
-		// ShowTextAlignments (win);
+
+		ShowTextAlignments (win);
+
+		var drag = new Label ("Drag: ") { X = 70, Y = 24 };
+		var dragText = new TextField ("") {
+			X = Pos.Right (drag),
+			Y = Pos.Top (drag),
+			Width = 40
+		};
+
+		var statusBar = new StatusBar (new StatusItem [] {
+			new StatusItem(Key.F1, "~F1~ Help", () => Help()),
+			new StatusItem(Key.F2, "~F2~ Load", null),
+			new StatusItem(Key.F3, "~F3~ Save", null),
+			new StatusItem(Key.ControlX, "~^X~ Quit", () => Quit()),
+		});
+
+		win.Add (drag, dragText);
+
 		top.Add (win);
-		top.Add (menu);
+		//top.Add (menu);
+		top.Add (menu, statusBar, ml);
 		Application.Run ();
 	}
 }

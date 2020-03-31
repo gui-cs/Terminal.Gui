@@ -255,7 +255,7 @@ namespace Terminal.Gui {
 				Colors.Base.HotNormal = Curses.A_BOLD | MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_BLUE);
 				Colors.Base.HotFocus = Curses.A_BOLD | MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_CYAN);
 
-				// Focused, 
+				// Focused,
 				//    Selected, Hot: Yellow on Black
 				//    Selected, text: white on black
 				//    Unselected, hot: yellow on cyan
@@ -264,6 +264,7 @@ namespace Terminal.Gui {
 				Colors.Menu.Focus = Curses.A_BOLD | MakeColor (Curses.COLOR_WHITE, Curses.COLOR_BLACK);
 				Colors.Menu.HotNormal = Curses.A_BOLD | MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_CYAN);
 				Colors.Menu.Normal = Curses.A_BOLD | MakeColor (Curses.COLOR_WHITE, Curses.COLOR_CYAN);
+				Colors.Menu.Disabled = MakeColor(Curses.COLOR_WHITE, Curses.COLOR_CYAN);
 
 				Colors.Dialog.Normal = MakeColor (Curses.COLOR_BLACK, Curses.COLOR_WHITE);
 				Colors.Dialog.Focus = MakeColor (Curses.COLOR_BLACK, Curses.COLOR_CYAN);
@@ -410,7 +411,7 @@ namespace Terminal.Gui {
 					suspendSignal = 18;
 					break;
 				case "Linux":
-					// TODO: should fetch the machine name and 
+					// TODO: should fetch the machine name and
 					// if it is MIPS return 24
 					suspendSignal = 20;
 					break;

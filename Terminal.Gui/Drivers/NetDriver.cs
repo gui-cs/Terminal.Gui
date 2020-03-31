@@ -135,7 +135,7 @@ namespace Terminal.Gui {
 			Colors.Base.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Blue);
 			Colors.Base.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
 
-			// Focused, 
+			// Focused,
 			//    Selected, Hot: Yellow on Black
 			//    Selected, text: white on black
 			//    Unselected, hot: yellow on cyan
@@ -144,6 +144,7 @@ namespace Terminal.Gui {
 			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
 			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
 			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Cyan);
+			Colors.Menu.Disabled = MakeColor(ConsoleColor.DarkGray, ConsoleColor.Cyan);
 
 			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
 			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
@@ -348,7 +349,7 @@ namespace Terminal.Gui {
 		}
 
 		//
-		// These are for the .NET driver, but running natively on Windows, wont run 
+		// These are for the .NET driver, but running natively on Windows, wont run
 		// on the Mono emulation
 		//
 

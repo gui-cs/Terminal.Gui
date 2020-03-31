@@ -6,6 +6,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Mono.Terminal;
 using NStack;
@@ -93,14 +94,32 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public struct Attribute {
 		internal int value;
+		internal Color foreground;
+		internal Color background;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Attribute"/> struct.
 		/// </summary>
 		/// <param name="value">Value.</param>
-		public Attribute (int value)
+		/// <param name="foreground">Foreground</param>
+		/// <param name="background">Background</param>
+		public Attribute (int value, Color foreground = new Color(), Color background = new Color())
 		{
 			this.value = value;
+			this.foreground = foreground;
+			this.background = background;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Attribute"/> struct.
+		/// </summary>
+		/// <param name="foreground">Foreground</param>
+		/// <param name="background">Background</param>
+		public Attribute (Color foreground = new Color (), Color background = new Color ())
+		{
+			this.value = value = ((int)foreground | (int)background << 4);
+			this.foreground = foreground;
+			this.background = background;
 		}
 
 		/// <summary>
@@ -137,50 +156,207 @@ namespace Terminal.Gui {
 	/// views contained inside.
 	/// </summary>
 	public class ColorScheme {
+		Attribute _normal;
+		Attribute _focus;
+		Attribute _hotNormal;
+		Attribute _hotFocus;
+		Attribute _disabled;
+		internal string caller = "";
+
 		/// <summary>
 		/// The default color for text, when the view is not focused.
 		/// </summary>
-		public Attribute Normal;
+		public Attribute Normal { get { return _normal; } set { _normal = SetAttribute (value); } }
+
 		/// <summary>
 		/// The color for text when the view has the focus.
 		/// </summary>
-		public Attribute Focus;
+		public Attribute Focus { get { return _focus; } set { _focus = SetAttribute (value); } }
 
 		/// <summary>
 		/// The color for the hotkey when a view is not focused
 		/// </summary>
-		public Attribute HotNormal;
+		public Attribute HotNormal { get { return _hotNormal; } set { _hotNormal = SetAttribute (value); } }
 
 		/// <summary>
 		/// The color for the hotkey when the view is focused.
 		/// </summary>
-		public Attribute HotFocus;
+		public Attribute HotFocus { get { return _hotFocus; } set { _hotFocus = SetAttribute (value); } }
+
+		/// <summary>
+		/// The default color for text, when the view is disabled.
+		/// </summary>
+		public Attribute Disabled { get { return _disabled; } set { _disabled = SetAttribute (value); } }
+
+		bool preparingScheme = false;
+
+		Attribute SetAttribute (Attribute attribute, [CallerMemberName]string callerMemberName = null)
+		{
+			if (!Application._initialized && !preparingScheme)
+				return attribute;
+
+			if (preparingScheme)
+				return attribute;
+
+			preparingScheme = true;
+			switch (caller) {
+			case "TopLevel":
+				switch (callerMemberName) {
+				case "Normal":
+					HotNormal = Application.Driver.MakeAttribute (HotNormal.foreground, attribute.background);
+					break;
+				case "Focus":
+					HotFocus = Application.Driver.MakeAttribute (HotFocus.foreground, attribute.background);
+					break;
+				case "HotNormal":
+					HotFocus = Application.Driver.MakeAttribute (attribute.foreground, HotFocus.background);
+					break;
+				case "HotFocus":
+					HotNormal = Application.Driver.MakeAttribute (attribute.foreground, HotNormal.background);
+					if (Focus.foreground != attribute.background)
+						Focus = Application.Driver.MakeAttribute (Focus.foreground, attribute.background);
+					break;
+				}
+				break;
+
+			case "Base":
+				switch (callerMemberName) {
+				case "Normal":
+					HotNormal = Application.Driver.MakeAttribute (HotNormal.foreground, attribute.background);
+					break;
+				case "Focus":
+					HotFocus = Application.Driver.MakeAttribute (HotFocus.foreground, attribute.background);
+					break;
+				case "HotNormal":
+					HotFocus = Application.Driver.MakeAttribute (attribute.foreground, HotFocus.background);
+					Normal = Application.Driver.MakeAttribute (Normal.foreground, attribute.background);
+					break;
+				case "HotFocus":
+					HotNormal = Application.Driver.MakeAttribute (attribute.foreground, HotNormal.background);
+					if (Focus.foreground != attribute.background)
+						Focus = Application.Driver.MakeAttribute (Focus.foreground, attribute.background);
+					break;
+				}
+				break;
+
+			case "Menu":
+				switch (callerMemberName) {
+				case "Normal":
+					if (Focus.background != attribute.background)
+						Focus = Application.Driver.MakeAttribute (attribute.foreground, Focus.background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal.foreground, attribute.background);
+					Disabled = Application.Driver.MakeAttribute (Disabled.foreground, attribute.background);
+					break;
+				case "Focus":
+					Normal = Application.Driver.MakeAttribute (attribute.foreground, Normal.background);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus.foreground, attribute.background);
+					break;
+				case "HotNormal":
+					if (Focus.background != attribute.background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.foreground, HotFocus.background);
+					Normal = Application.Driver.MakeAttribute (Normal.foreground, attribute.background);
+					Disabled = Application.Driver.MakeAttribute (Disabled.foreground, attribute.background);
+					break;
+				case "HotFocus":
+					HotNormal = Application.Driver.MakeAttribute (attribute.foreground, HotNormal.background);
+					if (Focus.foreground != attribute.background)
+						Focus = Application.Driver.MakeAttribute (Focus.foreground, attribute.background);
+					break;
+				case "Disabled":
+					if (Focus.background != attribute.background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.foreground, HotFocus.background);
+					Normal = Application.Driver.MakeAttribute (Normal.foreground, attribute.background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal.foreground, attribute.background);
+					break;
+
+				}
+				break;
+
+			case "Dialog":
+				switch (callerMemberName) {
+				case "Normal":
+					if (Focus.background != attribute.background)
+						Focus = Application.Driver.MakeAttribute (attribute.foreground, Focus.background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal.foreground, attribute.background);
+					break;
+				case "Focus":
+					Normal = Application.Driver.MakeAttribute (attribute.foreground, Normal.background);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus.foreground, attribute.background);
+					break;
+				case "HotNormal":
+					if (Focus.background != attribute.background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.foreground, HotFocus.background);
+					if (Normal.foreground != attribute.background)
+						Normal = Application.Driver.MakeAttribute (Normal.foreground, attribute.background);
+					break;
+				case "HotFocus":
+					HotNormal = Application.Driver.MakeAttribute (attribute.foreground, HotNormal.background);
+					if (Focus.foreground != attribute.background)
+						Focus = Application.Driver.MakeAttribute (Focus.foreground, attribute.background);
+					break;
+				}
+				break;
+
+			case "Error":
+				switch (callerMemberName) {
+				case "Normal":
+					HotNormal = Application.Driver.MakeAttribute (HotNormal.foreground, attribute.background);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus.foreground, attribute.background);
+					break;
+				case "HotNormal":
+				case "HotFocus":
+					HotFocus = Application.Driver.MakeAttribute (attribute.foreground, attribute.background);
+					Normal = Application.Driver.MakeAttribute (Normal.foreground, attribute.background);
+					break;
+				}
+				break;
+
+			}
+			preparingScheme = false;
+			return attribute;
+		}
 	}
 
 	/// <summary>
 	/// The default ColorSchemes for the application.
 	/// </summary>
 	public static class Colors {
+		static ColorScheme _toplevel;
+		static ColorScheme _base;
+		static ColorScheme _dialog;
+		static ColorScheme _menu;
+		static ColorScheme _error;
+
+		/// <summary>
+		/// The application toplevel color scheme, for the default toplevel views.
+		/// </summary>
+		public static ColorScheme TopLevel { get { return _toplevel; } set { _toplevel = SetColorScheme (value); } }
+
 		/// <summary>
 		/// The base color scheme, for the default toplevel views.
 		/// </summary>
-		public static ColorScheme Base;
-		
+		public static ColorScheme Base { get { return _base; } set { _base = SetColorScheme (value); } }
+
 		/// <summary>
 		/// The dialog color scheme, for standard popup dialog boxes
 		/// </summary>
-		public static ColorScheme Dialog;
+		public static ColorScheme Dialog { get { return _dialog; } set { _dialog = SetColorScheme (value); } }
 
 		/// <summary>
 		/// The menu bar color
 		/// </summary>
-		public static ColorScheme Menu;
+		public static ColorScheme Menu { get { return _menu; } set { _menu = SetColorScheme (value); } }
 
 		/// <summary>
 		/// The color scheme for showing errors.
 		/// </summary>
-		public static ColorScheme Error;
+		public static ColorScheme Error { get { return _error; } set { _error = SetColorScheme (value); } }
 
+		static ColorScheme SetColorScheme (ColorScheme colorScheme, [CallerMemberName]string callerMemberName = null)
+		{
+			colorScheme.caller = callerMemberName;
+			return colorScheme;
+		}
 	}
 
 	/// <summary>
@@ -238,7 +414,7 @@ namespace Terminal.Gui {
 		RightTee,
 
 		/// <summary>
-		/// Top tee 
+		/// Top tee
 		/// </summary>
 		TopTee,
 
@@ -253,6 +429,9 @@ namespace Terminal.Gui {
 	/// ConsoleDriver is an abstract class that defines the requirements for a console driver.   One implementation if the CursesDriver, and another one uses the .NET Console one.
 	/// </summary>
 	public abstract class ConsoleDriver {
+		/// <summary>
+		/// The handler fired when the terminal is resized.
+		/// </summary>
 		protected Action TerminalResized;
 
 		/// <summary>
@@ -280,10 +459,16 @@ namespace Terminal.Gui {
 		/// <param name="rune">Rune to add.</param>
 		public abstract void AddRune (Rune rune);
 		/// <summary>
-		/// Adds the specified 
+		/// Adds the specified
 		/// </summary>
 		/// <param name="str">String.</param>
 		public abstract void AddStr (ustring str);
+		/// <summary>
+		/// Prepare the driver and set the key and mouse events handlers.
+		/// </summary>
+		/// <param name="mainLoop"></param>
+		/// <param name="keyHandler"></param>
+		/// <param name="mouseHandler"></param>
 		public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler);
 
 		/// <summary>
@@ -312,19 +497,27 @@ namespace Terminal.Gui {
 		/// <param name="c">C.</param>
 		public abstract void SetAttribute (Attribute c);
 
-		// Set Colors from limit sets of colors
+		/// <summary>
+		/// Set Colors from limit sets of colors.
+		/// </summary>
+		/// <param name="foreground">Foreground.</param>
+		/// <param name="background">Background.</param>
 		public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
 
 		// Advanced uses - set colors to any pre-set pairs, you would need to init_color
 		// that independently with the R, G, B values.
 		/// <summary>
-		/// Advanced uses - set colors to any pre-set pairs, you would need to init_color 
+		/// Advanced uses - set colors to any pre-set pairs, you would need to init_color
 		/// that independently with the R, G, B values.
 		/// </summary>
 		/// <param name="foregroundColorId">Foreground color identifier.</param>
 		/// <param name="backgroundColorId">Background color identifier.</param>
 		public abstract void SetColors (short foregroundColorId, short backgroundColorId);
 
+		/// <summary>
+		/// Set the handler when the terminal is resized.
+		/// </summary>
+		/// <param name="terminalResized"></param>
 		public void SetTerminalResized(Action terminalResized)
 		{
 			TerminalResized = terminalResized;
@@ -388,7 +581,7 @@ namespace Terminal.Gui {
 				for (int l = 0; l < padding; l++)
 					for (b = 0; b < width; b++)
 						AddRune (' ');
-			}			
+			}
 		}
 
 
@@ -408,7 +601,14 @@ namespace Terminal.Gui {
 			set => this.clip = value;
 		}
 
+		/// <summary>
+		/// Start of mouse moves.
+		/// </summary>
 		public abstract void StartReportingMouseMoves ();
+
+		/// <summary>
+		/// Stop reporting mouses moves.
+		/// </summary>
 		public abstract void StopReportingMouseMoves ();
 
 		/// <summary>
@@ -472,7 +672,7 @@ namespace Terminal.Gui {
 		public Rune RightTee;
 
 		/// <summary>
-		/// Top tee 
+		/// Top tee
 		/// </summary>
 		public Rune TopTee;
 
@@ -481,6 +681,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Rune BottomTee;
 
+		/// <summary>
+		/// Make the attribute for the foreground and background colors.
+		/// </summary>
+		/// <param name="fore">Foreground.</param>
+		/// <param name="back">Background.</param>
+		/// <returns></returns>
 		public abstract Attribute MakeAttribute (Color fore, Color back);
 	}
 }

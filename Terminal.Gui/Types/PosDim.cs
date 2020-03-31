@@ -187,7 +187,15 @@ namespace Terminal.Gui {
 				else
 					return la - ra;
 			}
+
+			public override string ToString ()
+			{
+				return $"{((PosView)left).Target.ToString ()},{right.ToString ()}";
+			}
+
 		}
+
+		static PosCombine posCombine;
 
 		/// <summary>
 		/// Adds a <see cref="Terminal.Gui.Pos"/> to a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="T:Terminal.Gui.Pos"/>.
@@ -197,7 +205,10 @@ namespace Terminal.Gui {
 		/// <returns>The <see cref="T:Terminal.Gui.Pos"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
 		public static Pos operator + (Pos left, Pos right)
 		{
-			return new PosCombine (true, left, right);
+			PosCombine newPos = new PosCombine (true, left, right);
+			if (posCombine?.ToString () != newPos.ToString ())
+				((PosView)left).Target.SetNeedsLayout ();
+			return posCombine = newPos;
 		}
 
 		/// <summary>
@@ -208,7 +219,10 @@ namespace Terminal.Gui {
 		/// <returns>The <see cref="T:Terminal.Gui.Pos"/> that is the <c>left</c> minus <c>right</c>.</returns>
 		public static Pos operator - (Pos left, Pos right)
 		{
-			return new PosCombine (false, left, right);
+			PosCombine newPos = new PosCombine (false, left, right);
+			if (posCombine?.ToString () != newPos.ToString ())
+				((PosView)left).Target.SetNeedsLayout ();
+			return posCombine = newPos;
 		}
 
 		internal class PosView : Pos {
@@ -276,6 +290,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
+	/// Dim properties of a view to control the position.
 	/// </summary>
 	/// <remarks>
 	///   <para>
@@ -331,7 +346,7 @@ namespace Terminal.Gui {
 			return new DimFactor (n / 100);
 		}
 
-		class DimAbsolute : Dim {
+		internal class DimAbsolute : Dim {
 			int n;
 			public DimAbsolute (int n) { this.n = n; }
 
@@ -351,7 +366,7 @@ namespace Terminal.Gui {
 
 		}
 
-		class DimFill : Dim {
+		internal class DimFill : Dim {
 			int margin;
 			public DimFill (int margin) { this.margin = margin; }
 

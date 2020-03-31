@@ -336,7 +336,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		Button1DoubleClicked = unchecked((int)0x8),
 		/// <summary>
-		/// The first mouse button was tripple-clicked.
+		/// The first mouse button was triple-clicked.
 		/// </summary>
 		Button1TripleClicked = unchecked((int)0x10),
 		/// <summary>
@@ -356,9 +356,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		Button2DoubleClicked = unchecked((int)0x200),
 		/// <summary>
-		/// The second mouse button was tripple-clicked.
+		/// The second mouse button was triple-clicked.
 		/// </summary>
-		Button2TrippleClicked = unchecked((int)0x400),
+		Button2TripleClicked = unchecked((int)0x400),
 		/// <summary>
 		/// The third mouse button was pressed.
 		/// </summary>
@@ -376,7 +376,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		Button3DoubleClicked = unchecked((int)0x8000),
 		/// <summary>
-		/// The third mouse button was tripple-clicked.  
+		/// The third mouse button was triple-clicked.
 		/// </summary>
 		Button3TripleClicked = unchecked((int)0x10000),
 		/// <summary>
@@ -396,15 +396,15 @@ namespace Terminal.Gui {
 		/// </summary>
 		Button4DoubleClicked = unchecked((int)0x200000),
 		/// <summary>
-		/// The fourth button was tripple-clicked.
+		/// The fourth button was triple-clicked.
 		/// </summary>
 		Button4TripleClicked = unchecked((int)0x400000),
 		/// <summary>
-		/// The fourth button was pressed.
+		/// Flag: the shift key was pressed when the mouse button took place.
 		/// </summary>
 		ButtonShift = unchecked((int)0x2000000),
 		/// <summary>
-		/// Flag: the shift key was pressed when the mouse button took place.
+		/// Flag: the ctrl key was pressed when the mouse button took place.
 		/// </summary>
 		ButtonCtrl = unchecked((int)0x1000000),
 		/// <summary>
@@ -415,6 +415,14 @@ namespace Terminal.Gui {
 		/// The mouse position is being reported in this event.
 		/// </summary>
 		ReportMousePosition = unchecked((int)0x8000000),
+		/// <summary>
+		/// Vertical button wheeled up.
+		/// </summary>
+		WheeledUp = unchecked((int)0x10000000),
+		/// <summary>
+		/// Vertical button wheeled up.
+		/// </summary>
+		WheeledDown = unchecked((int)0x20000000),
 		/// <summary>
 		/// Mask that captures all the events.
 		/// </summary>
@@ -439,6 +447,21 @@ namespace Terminal.Gui {
 		/// Flags indicating the kind of mouse event that is being posted.
 		/// </summary>
 		public MouseFlags Flags;
+
+		/// <summary>
+		/// The offset X (column) location for the mouse event.
+		/// </summary>
+		public int OfX;
+
+		/// <summary>
+		/// The offset Y (column) location for the mouse event.
+		/// </summary>
+		public int OfY;
+
+		/// <summary>
+		/// The current view at the location for the mouse event.
+		/// </summary>
+		public View View;
 
 		/// <summary>
 		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.MouseEvent"/>.

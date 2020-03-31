@@ -134,8 +134,8 @@ namespace Terminal.Gui {
 
 	/// <summary>
 	/// Determines the LayoutStyle for a view, if Absolute, during LayoutSubviews, the
-	/// value from the Frame will be used, if the value is Computer, then the Frame 
-	/// will be updated from the X, Y Pos objets and the Width and Heigh Dim objects.
+	/// value from the Frame will be used, if the value is Computer, then the Frame
+	/// will be updated from the X, Y Pos objects and the Width and Height Dim objects.
 	/// </summary>
 	public enum LayoutStyle {
 		/// <summary>
@@ -228,6 +228,16 @@ namespace Terminal.Gui {
 		View container = null;
 		View focused = null;
 		Direction focusDirection;
+
+		/// <summary>
+		/// Event fired when the view get focus.
+		/// </summary>
+		public event EventHandler OnEnter;
+
+		/// <summary>
+		/// Event fired when the view lost focus.
+		/// </summary>
+		public event EventHandler OnLeave;
 
 		internal Direction FocusDirection {
 			get => SuperView?.FocusDirection ?? focusDirection;
@@ -430,7 +440,7 @@ namespace Terminal.Gui {
 			SetNeedsDisplay (Bounds);
 		}
 
-		bool layoutNeeded = true;
+		internal bool layoutNeeded = true;
 
 		internal void SetNeedsLayout ()
 		{
@@ -439,7 +449,7 @@ namespace Terminal.Gui {
 			layoutNeeded = true;
 			if (SuperView == null)
 				return;
-			SuperView.layoutNeeded = true;
+			SuperView.SetNeedsLayout ();
 		}
 
 		/// <summary>
@@ -649,14 +659,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Clears the specfied rectangular region with the current color
+		///   Clears the specified rectangular region with the current color
 		/// </summary>
 		public void Clear (Rect r)
 		{
 			var h = r.Height;
 			var w = r.Width;
-			for (int line = 0; line < h; line++) {
-				Move (0, line);
+			for (int line = r.Y; line < r.Y + h; line++) {
+				Driver.Move (r.X, line);
 				for (int col = 0; col < w; col++)
 					Driver.AddRune (' ');
 			}
@@ -826,11 +836,16 @@ namespace Terminal.Gui {
 			}
 			internal set {
 				if (base.HasFocus != value)
+					if (value == true)
+						OnEnter?.Invoke (this, new EventArgs ());
+					else
+						OnLeave?.Invoke (this, new EventArgs ());
 					SetNeedsDisplay ();
 				base.HasFocus = value;
 
 				// Remove focus down the chain of subviews if focus is removed
 				if (value == false && focused != null) {
+					OnLeave?.Invoke (focused, new EventArgs ());
 					focused.HasFocus = false;
 					focused = null;
 				}
@@ -919,7 +934,9 @@ namespace Terminal.Gui {
 					if (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay) {
 						if (view.Frame.IntersectsWith (clipRect) && view.Frame.IntersectsWith (region)) {
 
-							// TODO: optimize this by computing the intersection of region and view.Bounds
+							// FIXED: optimize this by computing the intersection of region and view.Bounds
+							if (view.layoutNeeded)
+								view.LayoutSubviews ();
 							view.Redraw (view.Bounds);
 						}
 						view.NeedDisplay = Rect.Empty;
@@ -1310,7 +1327,7 @@ namespace Terminal.Gui {
 		/// <param name="frame">Frame.</param>
 		public Toplevel (Rect frame) : base (frame)
 		{
-			ColorScheme = Colors.Base;
+			Initialize ();
 		}
 
 		/// <summary>
@@ -1318,9 +1335,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Toplevel () : base ()
 		{
-			ColorScheme = Colors.Base;
+			Initialize ();
 			Width = Dim.Fill ();
 			Height = Dim.Fill ();
+		}
+
+		void Initialize ()
+		{
+			ColorScheme = Colors.Base;
 		}
 
 		/// <summary>
@@ -1342,6 +1364,16 @@ namespace Terminal.Gui {
 		/// by default unless set to <see langword="true"/>.
 		/// </summary>
 		public bool Modal { get; set; }
+
+		/// <summary>
+		/// Check id current toplevel has menu bar
+		/// </summary>
+		public bool HasMenuBar { get; set; }
+
+		/// <summary>
+		/// Check id current toplevel has status bar
+		/// </summary>
+		public bool HasStatusBar { get; set; }
 
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
@@ -1390,6 +1422,103 @@ namespace Terminal.Gui {
 				return true;
 			}
 			return false;
+		}
+
+		public override void Add (View view)
+		{
+			if (this == Application.Top) {
+				if (view is MenuBar)
+					HasMenuBar = true;
+				if (view is StatusBar)
+					HasStatusBar = true;
+			}
+			base.Add (view);
+		}
+
+		public override void Remove (View view)
+		{
+			if (this == Application.Top) {
+				if (view is MenuBar)
+					HasMenuBar = true;
+				if (view is StatusBar)
+					HasStatusBar = true;
+			}
+			base.Remove (view);
+		}
+
+		public override void RemoveAll ()
+		{
+			if (this == Application.Top) {
+				HasMenuBar = false;
+				HasStatusBar = false;
+			}
+			base.RemoveAll ();
+		}
+
+		internal void EnsureVisibleBounds (Toplevel top, int x, int y, out int nx, out int ny)
+		{
+			nx = Math.Max (x, 0);
+			nx = nx + top.Frame.Width > Driver.Cols ? Math.Max(Driver.Cols - top.Frame.Width, 0) : nx;
+			bool m, s;
+			if (SuperView == null)
+				m = Application.Top.HasMenuBar;
+			else
+				m = ((Toplevel)SuperView).HasMenuBar;
+			int l = m ? 1 : 0;
+			ny = Math.Max (y, l);
+			if (SuperView == null)
+				s = Application.Top.HasStatusBar;
+			else
+				s = ((Toplevel)SuperView).HasStatusBar;
+			l = s ? Driver.Rows - 1 : Driver.Rows;
+			ny = Math.Min (ny, l);
+			ny = ny + top.Frame.Height > l ? Math.Max(l - top.Frame.Height, m ? 1 : 0) : ny;
+		}
+
+		internal void PositionToplevels ()
+		{
+			if (this != Application.Top) {
+				EnsureVisibleBounds (this, Frame.X, Frame.Y, out int nx, out int ny);
+				if (nx != Frame.X || ny != Frame.Y) {
+					X = nx;
+					Y = ny;
+				}
+			} else {
+				foreach (var top in Subviews) {
+					if (top is Toplevel) {
+						EnsureVisibleBounds ((Toplevel)top, top.Frame.X, top.Frame.Y, out int nx, out int ny);
+						if (nx != top.Frame.X || ny != top.Frame.Y) {
+							top.X = nx;
+							top.Y = ny;
+						}
+						if (HasStatusBar && ny + top.Frame.Height > Driver.Rows - 1) {
+							if (top.Height is Dim.DimFill)
+								top.Height = Dim.Fill () - 1;
+						}
+					}
+				}
+			}
+		}
+
+		public override void Redraw (Rect region)
+		{
+			if (this == Application.Top) {
+				if (!NeedDisplay.IsEmpty) {
+					Driver.SetAttribute (Colors.TopLevel.Normal);
+					Clear (region);
+					Driver.SetAttribute (Colors.Base.Normal);
+				}
+				foreach (var view in Subviews) {
+					if (view.Frame.IntersectsWith (region)) {
+						//view.SetNeedsLayout ();
+						view.SetNeedsDisplay (view.Bounds);
+					}
+				}
+
+				ClearNeedsDisplay ();
+			}
+
+			base.Redraw (base.Bounds);
 		}
 
 		/// <summary>
@@ -1572,48 +1701,48 @@ namespace Terminal.Gui {
 			ClearNeedsDisplay ();
 		}
 
-#if true
-		// 
-		// It does not look like the event is raised on clicked-drag
+		//
+		// FIXED:It does not look like the event is raised on clicked-drag
 		// need to figure that out.
 		//
-		Point? dragPosition;
-		public override bool MouseEvent(MouseEvent mouseEvent)
+		internal static Point? dragPosition;
+		Point start;
+		public override bool MouseEvent (MouseEvent mouseEvent)
 		{
-			// The code is currently disabled, because the 
-			// Driver.UncookMouse does not seem to have an effect if there is 
+			// FIXED:The code is currently disabled, because the
+			// Driver.UncookMouse does not seem to have an effect if there is
 			// a pending mouse event activated.
-			if (true)
-				return false;
-			
-			if ((mouseEvent.Flags == MouseFlags.Button1Pressed|| mouseEvent.Flags == MouseFlags.Button4Pressed)){
-				
+
+			int nx, ny;
+			if ((mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) ||
+				mouseEvent.Flags == MouseFlags.Button4Pressed)) {
 				if (dragPosition.HasValue) {
-					var dx = mouseEvent.X - dragPosition.Value.X;
-					var dy = mouseEvent.Y - dragPosition.Value.Y;
+					if (SuperView == null) {
+						Application.Top.SetNeedsDisplay (Frame);
+						Application.Top.Redraw (Frame);
+					} else {
+						SuperView.SetNeedsDisplay (Frame);
+					}
+					EnsureVisibleBounds (this, mouseEvent.X + mouseEvent.OfX - start.X,
+						mouseEvent.Y + mouseEvent.OfY, out nx, out ny);
 
-					var nx = Frame.X + dx;
-					var ny = Frame.Y + dy;
-					if (nx < 0)
-						nx = 0;
-					if (ny < 0)
-						ny = 0;
-
-					//Demo.ml2.Text = $"{dx},{dy}";
-					dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
-
-					// TODO: optimize, only SetNeedsDisplay on the before/after regions.
-					if (SuperView == null)
-						Application.Refresh ();
-					else
-						SuperView.SetNeedsDisplay ();
+					dragPosition = new Point (nx, ny);
 					Frame = new Rect (nx, ny, Frame.Width, Frame.Height);
+					X = nx;
+					Y = ny;
+					//Demo.ml2.Text = $"{dx},{dy}";
+
+					// FIXED: optimize, only SetNeedsDisplay on the before/after regions.
 					SetNeedsDisplay ();
 					return true;
 				} else {
 					// Only start grabbing if the user clicks on the title bar.
 					if (mouseEvent.Y == 0) {
-						dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
+						start = new Point (mouseEvent.X, mouseEvent.Y);
+						dragPosition = new Point ();
+						nx = mouseEvent.X - mouseEvent.OfX;
+						ny = mouseEvent.Y - mouseEvent.OfY;
+						dragPosition = new Point (nx, ny);
 						Application.GrabMouse (this);
 					}
 
@@ -1622,18 +1751,16 @@ namespace Terminal.Gui {
 				}
 			}
 
-			if (mouseEvent.Flags == MouseFlags.Button1Released) {
+			if (mouseEvent.Flags == MouseFlags.Button1Released && dragPosition.HasValue) {
 				Application.UngrabMouse ();
 				Driver.UncookMouse ();
-
 				dragPosition = null;
-				//Driver.StopReportingMouseMoves ();
 			}
 
 			//Demo.ml.Text = me.ToString ();
 			return false;
 		}
-#endif
+
 	}
 
 	/// <summary>
@@ -1721,6 +1848,7 @@ namespace Terminal.Gui {
 					d (state);
 					return false;
 				});
+				mainLoop.Driver.Wakeup ();
 			}
 
 			public override void Send (SendOrPostCallback d, object state)
@@ -1741,7 +1869,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void Init () => Init (() => Toplevel.Create ());
 
-		static bool _initialized = false;
+		internal static bool _initialized = false;
 
 		/// <summary>
 		/// Initializes the Application
@@ -1749,7 +1877,6 @@ namespace Terminal.Gui {
 		static void Init (Func<Toplevel> topLevelFactory)
 		{
 			if (_initialized) return;
-			_initialized = true;
 
 			var p = Environment.OSVersion.Platform;
 			Mono.Terminal.IMainLoopDriver mainLoopDriver;
@@ -1770,6 +1897,7 @@ namespace Terminal.Gui {
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			Top = topLevelFactory ();
 			Current = Top;
+			_initialized = true;
 		}
 
 		/// <summary>
@@ -1867,7 +1995,7 @@ namespace Terminal.Gui {
 			return start;
 		}
 
-		static View mouseGrabView;
+		internal static View mouseGrabView;
 
 		/// <summary>
 		/// Grabs the mouse, forcing all mouse events to be routed to the specified view until UngrabMouse is called.
@@ -1898,20 +2026,22 @@ namespace Terminal.Gui {
 
 		static void ProcessMouseEvent (MouseEvent me)
 		{
+			var view = FindDeepestView (Current, me.X, me.Y, out int rx, out int ry);
 			RootMouseEvent?.Invoke (me);
 			if (mouseGrabView != null) {
 				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
 				var nme = new MouseEvent () {
 					X = newxy.X,
 					Y = newxy.Y,
-					Flags = me.Flags
+					Flags = me.Flags,
+					OfX = me.X - newxy.X,
+					OfY = me.Y - newxy.Y,
+					View = view
 				};
-				mouseGrabView.MouseEvent (me);
+				mouseGrabView.MouseEvent (nme);
 				return;
 			}
 
-			int rx, ry;
-			var view = FindDeepestView (Current, me.X, me.Y, out rx, out ry);
 			if (view != null) {
 				if (!view.WantMousePositionReports && me.Flags == MouseFlags.ReportMousePosition)
 					return;
@@ -1919,7 +2049,10 @@ namespace Terminal.Gui {
 				var nme = new MouseEvent () {
 					X = rx,
 					Y = ry,
-					Flags = me.Flags
+					Flags = me.Flags,
+					OfX = rx,
+					OfY = ry,
+					View = view
 				};
 				// Should we bubbled up the event, if it is not handled?
 				view.MouseEvent (nme);
@@ -1969,7 +2102,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Building block API: completes the exection of a Toplevel that was started with Begin.
+		/// Building block API: completes the execution of a Toplevel that was started with Begin.
 		/// </summary>
 		/// <param name="runState">The runstate returned by the <see cref="Begin(Toplevel)"/> method.</param>
 		static public void End (RunState runState)
@@ -1980,6 +2113,9 @@ namespace Terminal.Gui {
 			runState.Dispose ();
 		}
 
+		/// <summary>
+		/// Finalize the driver.
+		/// </summary>
 		public static void Shutdown ()
 		{
 			Driver.End ();
@@ -2047,8 +2183,7 @@ namespace Terminal.Gui {
 			for (state.Toplevel.Running = true; state.Toplevel.Running;) {
 				if (MainLoop.EventsPending (wait)) {
 					MainLoop.MainIteration ();
-					if (Iteration != null)
-						Iteration (null, EventArgs.Empty);
+					Iteration?.Invoke (null, EventArgs.Empty);
 				} else if (wait == false)
 					return;
 				if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.childNeedsDisplay) {
@@ -2135,6 +2270,7 @@ namespace Terminal.Gui {
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
 			Driver.Clip = full;
 			foreach (var t in toplevels) {
+				t.PositionToplevels ();
 				t.RelativeLayout (full);
 				t.LayoutSubviews ();
 			}

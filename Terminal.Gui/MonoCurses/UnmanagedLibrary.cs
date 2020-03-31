@@ -172,7 +172,7 @@ namespace Mono.Terminal.Internal {
 		/// <summary>
 		/// Loads library in a platform specific way.
 		/// </summary>
-		private static IntPtr PlatformSpecificLoadLibrary (string libraryPath)
+		static IntPtr PlatformSpecificLoadLibrary (string libraryPath)
 		{
 			if (IsWindows) {
 				return Windows.LoadLibrary (libraryPath);
@@ -192,7 +192,7 @@ namespace Mono.Terminal.Internal {
 			throw new InvalidOperationException ("Unsupported platform.");
 		}
 
-		private static string FirstValidLibraryPath (string [] libraryPathAlternatives)
+		static string FirstValidLibraryPath (string [] libraryPathAlternatives)
 		{
 			foreach (var path in libraryPathAlternatives) {
 				if (File.Exists (path)) {
@@ -204,7 +204,7 @@ namespace Mono.Terminal.Internal {
 				string.Join (",", libraryPathAlternatives)));
 		}
 
-		private static class Windows
+		static class Windows
 		{
 			[DllImport ("kernel32.dll")]
 			internal static extern IntPtr LoadLibrary (string filename);
@@ -213,7 +213,7 @@ namespace Mono.Terminal.Internal {
 			internal static extern IntPtr GetProcAddress (IntPtr hModule, string procName);
 		}
 
-		private static class Linux
+		static class Linux
 		{
 			[DllImport ("libdl.so")]
 			internal static extern IntPtr dlopen (string filename, int flags);
@@ -222,7 +222,7 @@ namespace Mono.Terminal.Internal {
 			internal static extern IntPtr dlsym (IntPtr handle, string symbol);
 		}
 
-		private static class MacOSX
+		static class MacOSX
 		{
 			[DllImport ("libSystem.dylib")]
 			internal static extern IntPtr dlopen (string filename, int flags);
@@ -238,7 +238,7 @@ namespace Mono.Terminal.Internal {
 		/// dlopen and dlsym from the current process as on Linux
 		/// Mono sure is linked against these symbols.
 		/// </summary>
-		private static class Mono
+		static class Mono
 		{
 			[DllImport ("__Internal")]
 			internal static extern IntPtr dlopen (string filename, int flags);
@@ -252,7 +252,7 @@ namespace Mono.Terminal.Internal {
 		/// dlopen and dlsym from the "libcoreclr.so",
 		/// to avoid the dependency on libc-dev Linux.
 		/// </summary>
-		private static class CoreCLR
+		static class CoreCLR
 		{
 			[DllImport ("libcoreclr.so")]
 			internal static extern IntPtr dlopen (string filename, int flags);
