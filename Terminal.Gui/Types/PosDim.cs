@@ -224,8 +224,11 @@ namespace Terminal.Gui {
 		public static Pos operator - (Pos left, Pos right)
 		{
 			PosCombine newPos = new PosCombine (false, left, right);
-			if (posCombine?.ToString () != newPos.ToString ())
-				((PosView)left).Target.SetNeedsLayout ();
+			if (posCombine?.ToString () != newPos.ToString ()) {
+				var view = left as PosView;
+				if (view != null)
+					view.Target.SetNeedsLayout ();
+			}
 			return posCombine = newPos;
 		}
 
