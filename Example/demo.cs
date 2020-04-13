@@ -512,6 +512,18 @@ static class Demo {
 		});
 
 		win.Add (drag, dragText);
+#if false
+		var label = new Label ("Fitler") {
+			X = 2
+		};
+		var spacing = 20;
+
+		var button = new Button ("apply") {
+			X = Pos.Right (label) + spacing + 2,
+			Y = 0
+		};
+#endif
+
 
 		top.Add (win);
 		//top.Add (menu);
