@@ -517,7 +517,7 @@ static class Demo {
 			new StatusItem(Key.F1, "~F1~ Help", () => Help()),
 			new StatusItem(Key.F2, "~F2~ Load", null),
 			new StatusItem(Key.F3, "~F3~ Save", null),
-			new StatusItem(Key.ControlX, "~^X~ Quit", () => Quit()),
+			new StatusItem(Key.ControlX, "~^X~ Quit", () => { if (Quit ()) top.Running = false; }),
 		});
 
 		win.Add (drag, dragText);
