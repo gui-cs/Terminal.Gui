@@ -1268,8 +1268,10 @@ namespace Terminal.Gui {
 				if (v.LayoutStyle == LayoutStyle.Computed)
 					v.RelativeLayout (Frame);
 
+				
 				v.LayoutSubviews ();
 				v.layoutNeeded = false;
+
 			}
 			layoutNeeded = false;
 		}

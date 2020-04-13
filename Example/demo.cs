@@ -365,7 +365,7 @@ static class Demo {
 
 	#region Selection Demo
 
-	static void ListSelectionDemo ()
+	static void ListSelectionDemo (bool multiple)
 	{
 		var d = new Dialog ("Selection Demo", 60, 20,
 			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
@@ -385,7 +385,7 @@ static class Demo {
 			Width = Dim.Fill () - 4,
 			Height = Dim.Fill () - 4,
 			AllowsMarking = true,
-			AllowsMultipleSelection = false
+			AllowsMultipleSelection = multiple
 		};
 		d.Add (msg, list);
 		Application.Run (d);
@@ -460,7 +460,8 @@ static class Demo {
 				menuItems[3]
 			}),
 			new MenuBarItem ("_List Demos", new MenuItem [] {
-				new MenuItem ("Select Items", "", ListSelectionDemo),
+				new MenuItem ("Select Multiple Items", "", () => ListSelectionDemo (true)),
+				new MenuItem ("Select Single Item", "", () => ListSelectionDemo (false)),
 			}),
 			new MenuBarItem ("Test Menu and SubMenus", new MenuItem [] {
 				new MenuItem ("SubMenu1Item1",
@@ -513,17 +514,14 @@ static class Demo {
 
 		win.Add (drag, dragText);
 #if false
-		var label = new Label ("Fitler") {
-			X = 2
-		};
-		var spacing = 20;
+		// This currently causes a stack overflow, because it is referencing a window that has not had its size allocated yet
 
-		var button = new Button ("apply") {
-			X = Pos.Right (label) + spacing + 2,
-			Y = 0
+		var bottom = new Label ("This should go on the bottom!") {
+			X = Pos.Left (win),
+			Y = Pos.Bottom (win)
 		};
+		win.Add (bottom);
 #endif
-
 
 		top.Add (win);
 		//top.Add (menu);

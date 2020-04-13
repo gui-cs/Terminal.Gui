@@ -277,7 +277,7 @@ namespace Terminal.Gui {
 						Driver.AddRune(' ');
 				} else {
 					if (allowsMarking) {
-						Driver.AddStr (source.IsMarked (item) ? "[x] " : "[ ] ");
+						Driver.AddStr (source.IsMarked (item) ? (AllowsMultipleSelection ? "[x] " : "(o)") : (AllowsMultipleSelection ? "[ ] " : "( )"));
 					}
 					Source.Render(this, Driver, isSelected, item, col, row, f.Width-col);
 				}
