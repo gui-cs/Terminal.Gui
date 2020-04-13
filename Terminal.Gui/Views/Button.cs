@@ -168,7 +168,7 @@ namespace Terminal.Gui {
 
 		public override void PositionCursor ()
 		{
-			Move (hot_pos, 0);
+			Move (hot_pos == -1 ? 1 : hot_pos, 0);
 		}
 
 		bool CheckKey (KeyEvent key)
