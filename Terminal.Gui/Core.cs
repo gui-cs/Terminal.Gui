@@ -1188,6 +1188,7 @@ namespace Terminal.Gui {
 					h = height.Anchor (hostFrame.Height - _y);
 			}
 			Frame = new Rect (_x, _y, w, h);
+			// layoutNeeded = false;
 		}
 
 		// https://en.wikipedia.org/wiki/Topological_sorting

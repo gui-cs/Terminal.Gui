@@ -82,17 +82,24 @@ static class Demo {
 	}
 
 
-	static void ShowTextAlignments (View container)
+	static void ShowTextAlignments ()
 	{
+		var container = new Dialog (
+			"Text Alignments", 50, 20,
+			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
+			new Button ("Cancel") { Clicked = () => { Application.RequestStop (); } });
+		
+
 		int i = 0;
 		string txt = "Hello world, how are you doing today";
 		container.Add (
-			new FrameView (new Rect (75, 3, txt.Length + 6, 20), "Text Alignments") {
 				new Label(new Rect(0, 1, 40, 3), $"{i+1}-{txt}") { TextAlignment = TextAlignment.Left },
-				new Label(new Rect(0, 5, 40, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
-				new Label(new Rect(0, 9, 40, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
-				new Label(new Rect(0, 13, 40, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
-			});
+				new Label(new Rect(0, 3, 40, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
+				new Label(new Rect(0, 5, 40, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
+				new Label(new Rect(0, 7, 40, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
+			);
+
+		Application.Run (container);
 	}
 
 	static void ShowEntries (View container)
@@ -463,6 +470,9 @@ static class Demo {
 				new MenuItem ("Select Multiple Items", "", () => ListSelectionDemo (true)),
 				new MenuItem ("Select Single Item", "", () => ListSelectionDemo (false)),
 			}),
+			new MenuBarItem ("Assorted", new MenuItem [] {
+				new MenuItem ("Show text alignments", "", () => ShowTextAlignments ())
+			}),
 			new MenuBarItem ("Test Menu and SubMenus", new MenuItem [] {
 				new MenuItem ("SubMenu1Item1",
 					new MenuBarItem (new MenuItem[] {
@@ -495,8 +505,6 @@ static class Demo {
 		var test = new Label (3, 18, "Se iniciará el análisis");
 		win.Add (test);
 		win.Add (ml);
-
-		ShowTextAlignments (win);
 
 		var drag = new Label ("Drag: ") { X = 70, Y = 24 };
 		var dragText = new TextField ("") {
