@@ -26,6 +26,7 @@
 // SOFTWARE.
 //
 using System;
+using System.CodeDom;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -537,11 +538,15 @@ namespace Terminal.Gui {
 		}
 
 		Action<KeyEvent> keyHandler;
+		Action<KeyEvent> keyDownHandler;
+		Action<KeyEvent> keyUpHandler;
 		Action<MouseEvent> mouseHandler;
 
-		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler)
+		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			this.keyHandler = keyHandler;
+			this.keyDownHandler = keyDownHandler;
+			this.keyUpHandler = keyUpHandler;
 			this.mouseHandler = mouseHandler;
 		}
 
@@ -554,10 +559,14 @@ namespace Terminal.Gui {
 			var inputEvent = result [0];
 			switch (inputEvent.EventType) {
 			case WindowsConsole.EventType.Key:
+				// See how this relies on key up?
 				if (inputEvent.KeyEvent.bKeyDown == false)
 					return;
 				var map = MapKey (ToConsoleKeyInfoEx (inputEvent.KeyEvent));
-				if (inputEvent.KeyEvent.UnicodeChar == 0 && map == (Key)0xffffffff)
+				if (inputEvent.KeyEvent.UnicodeChar == 0)
+					keyDownHandler (new KeyEvent (map));
+					
+				if (map == (Key)0xffffffff)
 					return;
 				keyHandler (new KeyEvent (map));
 				break;
@@ -837,6 +846,16 @@ namespace Terminal.Gui {
 
 				return (Key)((int)Key.F1 + delta);
 			}
+
+			//if (keyInfo.KeyChar == 0) {
+			//	if (keyInfo.Modifiers == ConsoleModifiers.Control)
+			//		return (Key)(uint)Key.CharMask;
+			//	if (keyInfo.Modifiers == ConsoleModifiers.Alt)
+			//		return (Key)(uint)Key.AltMask;
+			//	if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+			//		return (Key)(uint)(Key.AltMask | Key.CharMask);
+			//	}
+			//}
 			return (Key)(0xffffffff);
 		}
 
