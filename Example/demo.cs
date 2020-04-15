@@ -93,10 +93,10 @@ static class Demo {
 		int i = 0;
 		string txt = "Hello world, how are you doing today";
 		container.Add (
-				new Label(new Rect(0, 1, 40, 3), $"{i+1}-{txt}") { TextAlignment = TextAlignment.Left },
-				new Label(new Rect(0, 3, 40, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
-				new Label(new Rect(0, 5, 40, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
-				new Label(new Rect(0, 7, 40, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
+				new Label (new Rect (0, 1, 40, 3), $"{i+1}-{txt}") { TextAlignment = TextAlignment.Left },
+				new Label (new Rect (0, 3, 40, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
+				new Label (new Rect (0, 5, 40, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
+				new Label (new Rect (0, 7, 40, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
 			);
 
 		Application.Run (container);
@@ -408,6 +408,34 @@ static class Demo {
 	#endregion
 
 
+	#region OnKeyDown / OnKeyUp Demo
+	private static void OnKeyDownUpDemo ()
+	{
+		var container = new Dialog (
+			"OnKeyDown & OnKeyUp demo", 50, 20,
+			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
+			new Button ("Cancel") { Clicked = () => { Application.RequestStop (); } });
+
+		var kl = new Label (new Rect (3, 3, 40, 1), "Keyboard: ");
+		container.OnKeyDown += (KeyEvent keyEvent) => KeyUpDown (keyEvent, kl, "Down");
+		container.OnKeyUp += (KeyEvent keyEvent) => KeyUpDown (keyEvent, kl, "Up");
+		container.Add (kl);
+		Application.Run (container);
+	}
+
+	private static void KeyUpDown (KeyEvent keyEvent, Label kl, string updown)
+	{
+		kl.TextColor = Colors.TopLevel.Normal;
+		if ((keyEvent.Key & Key.CtrlMask) != 0) {
+			kl.Text = $"Keyboard: Ctrl Key{updown}";
+		} else if ((keyEvent.Key & Key.AltMask) != 0) {
+			kl.Text = $"Keyboard: Alt Key{updown}";
+		} else {
+			kl.Text = $"Keyboard: {(char)keyEvent.KeyValue} Key{updown}";
+		}
+	}
+#endregion
+
 	public static Label ml;
 	public static MenuBar menu;
 	public static CheckBox menuKeysStyle;
@@ -430,7 +458,7 @@ static class Demo {
 			X = 1,
 			Y = 1,
 			Width = Dim.Fill (),
-			Height = Dim.Fill ()-1
+			Height = Dim.Fill () - 1
 		};
 #else
 		var tframe = top.Frame;
@@ -473,7 +501,8 @@ static class Demo {
 				new MenuItem ("Select Single Item", "", () => ListSelectionDemo (false)),
 			}),
 			new MenuBarItem ("Assorted", new MenuItem [] {
-				new MenuItem ("Show text alignments", "", () => ShowTextAlignments ())
+				new MenuItem ("Show text alignments", "", () => ShowTextAlignments ()),
+				new MenuItem ("OnKeyDown/Up", "", () => OnKeyDownUpDemo ())
 			}),
 			new MenuBarItem ("Test Menu and SubMenus", new MenuItem [] {
 				new MenuItem ("SubMenu1Item1",
@@ -534,6 +563,7 @@ static class Demo {
 			bottom.Y = Pos.Bottom (win);
 		};
 #endif
+
 
 		top.Add (win);
 		//top.Add (menu);

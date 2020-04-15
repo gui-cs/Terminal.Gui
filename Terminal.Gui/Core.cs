@@ -1032,9 +1032,15 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		/// <summary>
+		/// Invoked when a key is pressed
+		/// </summary>
+		public Action<KeyEvent> OnKeyDown;
+
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool KeyDown (KeyEvent keyEvent)
 		{
+			OnKeyDown?.Invoke (keyEvent);
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1044,9 +1050,16 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		/// <summary>
+		/// Invoked when a key is released
+		/// </summary>
+		public Action<KeyEvent> OnKeyUp;
+
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool KeyUp (KeyEvent keyEvent)
 		{
+			OnKeyUp?.Invoke (keyEvent);
+
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)

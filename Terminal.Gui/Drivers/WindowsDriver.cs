@@ -559,16 +559,16 @@ namespace Terminal.Gui {
 			var inputEvent = result [0];
 			switch (inputEvent.EventType) {
 			case WindowsConsole.EventType.Key:
-				// See how this relies on key up?
-				if (inputEvent.KeyEvent.bKeyDown == false)
-					return;
 				var map = MapKey (ToConsoleKeyInfoEx (inputEvent.KeyEvent));
-				if (inputEvent.KeyEvent.UnicodeChar == 0)
+				// Key Down - Fire KeyDown Event and KeyStroke (ProcessKey) Event
+				if (inputEvent.KeyEvent.bKeyDown) {
 					keyDownHandler (new KeyEvent (map));
-					
-				if (map == (Key)0xffffffff)
-					return;
-				keyHandler (new KeyEvent (map));
+					if (map == (Key)0xffffffff)
+						return;
+					keyHandler (new KeyEvent (map));
+				} else {
+					keyUpHandler (new KeyEvent (map));
+				}
 				break;
 
 			case WindowsConsole.EventType.Mouse:
@@ -847,15 +847,15 @@ namespace Terminal.Gui {
 				return (Key)((int)Key.F1 + delta);
 			}
 
-			//if (keyInfo.KeyChar == 0) {
-			//	if (keyInfo.Modifiers == ConsoleModifiers.Control)
-			//		return (Key)(uint)Key.CharMask;
-			//	if (keyInfo.Modifiers == ConsoleModifiers.Alt)
-			//		return (Key)(uint)Key.AltMask;
-			//	if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-			//		return (Key)(uint)(Key.AltMask | Key.CharMask);
-			//	}
-			//}
+			if (keyInfo.KeyChar == 0) {
+				if (keyInfo.Modifiers == ConsoleModifiers.Control)
+					return (Key)(uint)Key.CtrlMask;
+				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
+					return (Key)(uint)Key.AltMask;
+				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+					return (Key)(uint)(Key.AltMask | Key.CtrlMask);
+				}
+			}
 			return (Key)(0xffffffff);
 		}
 
