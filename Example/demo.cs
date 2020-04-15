@@ -425,10 +425,10 @@ static class Demo {
 		//Open ();
 #if true
 		var win = new Window ("Hello") {
-			X = 0,
-			Y = 0,
+			X = 1,
+			Y = 1,
 			Width = Dim.Fill (),
-			Height = Dim.Fill ()
+			Height = Dim.Fill ()-1
 		};
 #else
 		var tframe = top.Frame;
