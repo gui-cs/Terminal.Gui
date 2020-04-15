@@ -10,23 +10,21 @@
 using System;
 using NStack;
 
-namespace Terminal.Gui
-{
+namespace Terminal.Gui {
 	/// <summary>
 	/// A statusbar item has a title, a shortcut aka hotkey, and an action to execute on activation.
 	/// Such an item is ment to be as part of the global hotkeys of the application, which are available in the current context of the screen.
 	/// The colour of the text will be changed after each ~. Having an statusbar item with a text of `~F1~ Help` will draw *F1* as shortcut and 
 	/// *Help* as standard text.
 	/// </summary>
-	public class StatusItem
-	{
+	public class StatusItem {
 		/// <summary>
 		/// Initializes a new <see cref="T:Terminal.Gui.StatusItem"/>.
 		/// </summary>
 		/// <param name="shortcut">Shortcut to activate the item.</param>
 		/// <param name="title">Title for the statusbar item.</param>
 		/// <param name="action">Action to invoke when the staturbar item is activated.</param>
-		public StatusItem(Key shortcut, ustring title, Action action) 
+		public StatusItem (Key shortcut, ustring title, Action action)
 		{
 			Title = title ?? "";
 			Shortcut = shortcut;
@@ -57,16 +55,45 @@ namespace Terminal.Gui
 	/// be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. 
 	/// So for each context must be a new instance of a statusbar.  
 	/// </summary>
-	public class StatusBar : View
-	{
+	public class StatusBar : View {
+
+
+		/// <summary>
+		/// The style supported by StatusBar
+		/// </summary>
+		public enum StatusBarStyle {
+			/// <summary>
+			/// The StatusBar will snap at the the bottom line of the console window. 
+			/// If the console window is made larger while the app is runing, the StatusBar
+			/// will continue to snap to the bottom. If the console window is subsequently
+			/// made shorter, the status bar will be invisible. This is the default.
+			/// </summary>
+			SnapToConsoleBottom = 0,
+
+			/// <summary>
+			/// The StatusBar will snap at the the bottom line of the Application.Top view. 
+			/// If the console window is made larger while the app is runing, the StatusBar
+			/// will continue to snap to the bottom line of Application.Top, staying visible.
+			/// If the console window is subsequently made shorter, the status bar will remain visible 
+			/// at the last visible line. 
+			/// </summary>
+			SnapToAppBottom = 1,
+
+			/// <summary>
+			/// The StatusBar will act identically to MenuBar, snapping to the first line of the 
+			/// console window. 
+			/// </summary>
+			SnapToTop = 2,
+		}
+
 		public StatusItem [] Items { get; set; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.StatusBar"/> class with the specified set of statusbar items.
-		/// It will be drawn in the lowest column of the terminal.
+		/// It will be drawn in the lowest line of the terminal.
 		/// </summary>
 		/// <param name="items">A list of statusbar items.</param>
-		public StatusBar(StatusItem [] items) : base()
+		public StatusBar (StatusItem [] items) : base ()
 		{
 			X = 0;
 			Y = Application.Driver.Rows - 1; // TODO: using internals of Application
@@ -77,14 +104,15 @@ namespace Terminal.Gui
 			ColorScheme = Colors.Menu;
 		}
 
-		Attribute ToggleScheme(Attribute scheme)
+		Attribute ToggleScheme (Attribute scheme)
 		{
-			var result = scheme==ColorScheme.Normal ? ColorScheme.HotNormal : ColorScheme.Normal;
-			Driver.SetAttribute(result);
+			var result = scheme == ColorScheme.Normal ? ColorScheme.HotNormal : ColorScheme.Normal;
+			Driver.SetAttribute (result);
 			return result;
 		}
 
-		public override void Redraw(Rect region) {
+		public override void Redraw (Rect region)
+		{
 			if (Frame.Y != Driver.Rows - 1) {
 				Frame = new Rect (Frame.X, Driver.Rows - 1, Frame.Width, Frame.Height);
 				Y = Driver.Rows - 1;
@@ -98,15 +126,15 @@ namespace Terminal.Gui
 
 			Move (1, 0);
 			var scheme = ColorScheme.Normal;
-			Driver.SetAttribute(scheme);
-			for(int i=0; i<Items.Length; i++) {
-				var title = Items[i].Title;
-				for(int n=0; n<title.Length; n++) {
-					if(title[n]=='~') {
-						scheme = ToggleScheme(scheme);
+			Driver.SetAttribute (scheme);
+			for (int i = 0; i < Items.Length; i++) {
+				var title = Items [i].Title;
+				for (int n = 0; n < title.Length; n++) {
+					if (title [n] == '~') {
+						scheme = ToggleScheme (scheme);
 						continue;
 					}
-					Driver.AddRune(title[n]);
+					Driver.AddRune (title [n]);
 				}
 				Driver.AddRune (' ');
 			}
@@ -114,9 +142,9 @@ namespace Terminal.Gui
 
 		public override bool ProcessHotKey (KeyEvent kb)
 		{
-			foreach(var item in Items) {
-				if(kb.Key==item.Shortcut) {
-					if( item.Action!=null ) item.Action();
+			foreach (var item in Items) {
+				if (kb.Key == item.Shortcut) {
+					if (item.Action != null) item.Action ();
 					return true;
 				}
 			}
