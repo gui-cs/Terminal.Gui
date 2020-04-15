@@ -544,6 +544,7 @@ namespace Terminal.Gui {
 		}
 
 		public event EventHandler OnOpenMenu;
+		public event EventHandler OnCloseMenu;
 		internal Menu openMenu;
 		Menu openCurrentMenu;
 		internal List<Menu> openSubMenu;
@@ -551,6 +552,7 @@ namespace Terminal.Gui {
 		internal bool isMenuOpening;
 		internal bool isMenuClosing;
 		internal bool isMenuClosed;
+		public bool MenuOpen;
 		View lastFocused;
 
 		/// <summary>
@@ -597,6 +599,7 @@ namespace Terminal.Gui {
 			}
 			isMenuOpening = false;
 			isMenuClosed = false;
+			MenuOpen = true;
 		}
 
 		// Starts the menu from a hotkey
@@ -628,6 +631,7 @@ namespace Terminal.Gui {
 		internal void CloseMenu (bool reopen = false, bool isSubMenu = false)
 		{
 			isMenuClosing = true;
+			OnCloseMenu?.Invoke (this, null);
 			switch (isSubMenu) {
 			case false:
 				if (openMenu != null)
@@ -662,6 +666,7 @@ namespace Terminal.Gui {
 				break;
 			}
 			isMenuClosing = false;
+			MenuOpen = false;
 		}
 
 		void RemoveSubMenu (int index)

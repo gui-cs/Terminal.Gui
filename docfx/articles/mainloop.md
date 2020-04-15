@@ -30,7 +30,7 @@ provides access to these functions.
 
 When your code invokes `Application.Run (Toplevel)`, the application
 will prepare the current
-`Toplevel`[../api/Terminal.Gui/Terminal.Gui.Toplevel.html] instance by
+[`Toplevel`](../api/Terminal.Gui/Terminal.Gui.Toplevel.html) instance by
 redrawing the screen appropriately and then calling the mainloop to
 run.    
 

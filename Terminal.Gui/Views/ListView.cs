@@ -4,7 +4,7 @@
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
 //
-// 
+//
 // TODO:
 //   - Should we support multiple columns, if so, how should that be done?
 //   - Show mark for items that have been marked.
@@ -15,8 +15,8 @@
 //   - Would need a way to specify widths
 //   - Should it automatically extract data out of structs/classes based on public fields/properties?
 //   - It seems that this would be useful just for the "simple" API, not the IListDAtaSource, as that one has full support for it.
-//   - Should a function be specified that retrieves the individual elements?   
-// 
+//   - Should a function be specified that retrieves the individual elements?
+//
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -38,6 +38,8 @@ namespace Terminal.Gui {
 		/// This method is invoked to render a specified item, the method should cover the entire provided width.
 		/// </summary>
 		/// <returns>The render.</returns>
+		/// <param name="container">The list view to render.</param>
+		/// <param name="driver">The console driver to render.</param>
 		/// <param name="selected">Describes whether the item being rendered is currently selected by the user.</param>
 		/// <param name="item">The index of the item to render, zero for the first item and so on.</param>
 		/// <param name="col">The column where the rendering will start</param>
@@ -69,11 +71,11 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// <para>
 	///   The ListView displays lists of data and allows the user to scroll through the data
-	///   and optionally mark elements of the list (controlled by the AllowsMark property).  
+	///   and optionally mark elements of the list (controlled by the AllowsMark property).
 	/// </para>
 	/// <para>
 	///   The ListView can either render an arbitrary IList object (for example, arrays, List&lt;T&gt;
-	///   and other collections) which are drawn by drawing the string/ustring contents or the 
+	///   and other collections) which are drawn by drawing the string/ustring contents or the
 	///   result of calling ToString().   Alternatively, you can provide you own IListDataSource
 	///   object that gives you full control of what is rendered.
 	/// </para>
@@ -90,7 +92,7 @@ namespace Terminal.Gui {
 	/// <para>
 	///   When AllowsMark is set to true, then the rendering will prefix the list rendering with
 	///   [x] or [ ] and bind the space character to toggle the selection.  If you desire a different
-	///   marking style do not set the property and provide your own custom rendering.   
+	///   marking style do not set the property and provide your own custom rendering.
 	/// </para>
 	/// </remarks>
 	public class ListView : View {
@@ -142,7 +144,7 @@ namespace Terminal.Gui {
 
 		bool allowsMarking;
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.ListView"/> allows items to be marked. 
+		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.ListView"/> allows items to be marked.
 		/// </summary>
 		/// <value><c>true</c> if allows marking elements of the list; otherwise, <c>false</c>.
 		/// </value>
@@ -159,6 +161,9 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// If set to true allows more than one item to be selected. If false only allow one item selected.
+		/// </summary>
 		public bool AllowsMultipleSelection { get; set; } = true;
 
 		/// <summary>
@@ -179,7 +184,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the currently selecteded item.
+		/// Gets or sets the currently selected item.
 		/// </summary>
 		/// <value>The selected item.</value>
 		public int SelectedItem {
@@ -277,7 +282,7 @@ namespace Terminal.Gui {
 						Driver.AddRune(' ');
 				} else {
 					if (allowsMarking) {
-						Driver.AddStr (source.IsMarked (item) ? "[x] " : "[ ] ");
+						Driver.AddStr (source.IsMarked (item) ? (AllowsMultipleSelection ? "[x] " : "(o)") : (AllowsMultipleSelection ? "[ ] " : "( )"));
 					}
 					Source.Render(this, Driver, isSelected, item, col, row, f.Width-col);
 				}
@@ -330,8 +335,10 @@ namespace Terminal.Gui {
 				return false;
 			if (!AllowsMultipleSelection) {
 				for (int i = 0; i < Source.Count; i++) {
-					if (Source.IsMarked (i) && i != selected)
-						return false;
+					if (Source.IsMarked (i) && i != selected) {
+						Source.SetMark (i, false);
+						return true;
+					}
 				}
 			}
 			return true;

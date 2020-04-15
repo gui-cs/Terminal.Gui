@@ -190,7 +190,7 @@ namespace Terminal.Gui {
 
 			public override string ToString ()
 			{
-				return $"{((PosView)left).Target.ToString ()},{right.ToString ()}";
+				return $"Pos.Combine ({left.ToString ()}{(add?'+':'-')}{right.ToString ()})";
 			}
 
 		}
@@ -206,8 +206,12 @@ namespace Terminal.Gui {
 		public static Pos operator + (Pos left, Pos right)
 		{
 			PosCombine newPos = new PosCombine (true, left, right);
-			if (posCombine?.ToString () != newPos.ToString ())
-				((PosView)left).Target.SetNeedsLayout ();
+			if (posCombine?.ToString () != newPos.ToString ()) {
+				var view = left as PosView;
+				if (view != null) {
+					view.Target.SetNeedsLayout ();
+				}
+			}
 			return posCombine = newPos;
 		}
 
@@ -220,8 +224,11 @@ namespace Terminal.Gui {
 		public static Pos operator - (Pos left, Pos right)
 		{
 			PosCombine newPos = new PosCombine (false, left, right);
-			if (posCombine?.ToString () != newPos.ToString ())
-				((PosView)left).Target.SetNeedsLayout ();
+			if (posCombine?.ToString () != newPos.ToString ()) {
+				var view = left as PosView;
+				if (view != null)
+					view.Target.SetNeedsLayout ();
+			}
 			return posCombine = newPos;
 		}
 
@@ -243,6 +250,19 @@ namespace Terminal.Gui {
 				default:
 					return 0;
 				}
+			}
+
+			public override string ToString ()
+			{
+				string tside;
+				switch (side) {
+				case 0: tside = "x"; break;
+				case 1: tside = "y"; break;
+				case 2: tside = "right"; break;
+				case 3: tside = "bottom"; break;
+				default: tside = "unknown"; break;
+				}
+				return $"Pos.View(side={tside}, target={Target.ToString()}";
 			}
 		}
 

@@ -82,17 +82,24 @@ static class Demo {
 	}
 
 
-	static void ShowTextAlignments (View container)
+	static void ShowTextAlignments ()
 	{
+		var container = new Dialog (
+			"Text Alignments", 50, 20,
+			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
+			new Button ("Cancel") { Clicked = () => { Application.RequestStop (); } });
+
+
 		int i = 0;
 		string txt = "Hello world, how are you doing today";
 		container.Add (
-			new FrameView (new Rect (75, 3, txt.Length + 6, 20), "Text Alignments") {
 				new Label(new Rect(0, 1, 40, 3), $"{i+1}-{txt}") { TextAlignment = TextAlignment.Left },
-				new Label(new Rect(0, 5, 40, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
-				new Label(new Rect(0, 9, 40, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
-				new Label(new Rect(0, 13, 40, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
-			});
+				new Label(new Rect(0, 3, 40, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
+				new Label(new Rect(0, 5, 40, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
+				new Label(new Rect(0, 7, 40, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
+			);
+
+		Application.Run (container);
 	}
 
 	static void ShowEntries (View container)
@@ -365,7 +372,7 @@ static class Demo {
 
 	#region Selection Demo
 
-	static void ListSelectionDemo ()
+	static void ListSelectionDemo (bool multiple)
 	{
 		var d = new Dialog ("Selection Demo", 60, 20,
 			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
@@ -385,7 +392,7 @@ static class Demo {
 			Width = Dim.Fill () - 4,
 			Height = Dim.Fill () - 4,
 			AllowsMarking = true,
-			AllowsMultipleSelection = false
+			AllowsMultipleSelection = multiple
 		};
 		d.Add (msg, list);
 		Application.Run (d);
@@ -411,6 +418,8 @@ static class Demo {
 			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 
 		//Application.UseSystemConsole = true;
+		Console.WindowHeight = 35;
+
 		Application.Init ();
 
 		var top = Application.Top;
@@ -418,10 +427,10 @@ static class Demo {
 		//Open ();
 #if true
 		var win = new Window ("Hello") {
-			X = 0,
-			Y = 0,
+			X = 1,
+			Y = 1,
 			Width = Dim.Fill (),
-			Height = Dim.Fill ()
+			Height = Dim.Fill ()-1
 		};
 #else
 		var tframe = top.Frame;
@@ -460,7 +469,11 @@ static class Demo {
 				menuItems[3]
 			}),
 			new MenuBarItem ("_List Demos", new MenuItem [] {
-				new MenuItem ("Select Items", "", ListSelectionDemo),
+				new MenuItem ("Select Multiple Items", "", () => ListSelectionDemo (true)),
+				new MenuItem ("Select Single Item", "", () => ListSelectionDemo (false)),
+			}),
+			new MenuBarItem ("Assorted", new MenuItem [] {
+				new MenuItem ("Show text alignments", "", () => ShowTextAlignments ())
 			}),
 			new MenuBarItem ("Test Menu and SubMenus", new MenuItem [] {
 				new MenuItem ("SubMenu1Item1",
@@ -495,8 +508,6 @@ static class Demo {
 		win.Add (test);
 		win.Add (ml);
 
-		ShowTextAlignments (win);
-
 		var drag = new Label ("Drag: ") { X = 70, Y = 24 };
 		var dragText = new TextField ("") {
 			X = Pos.Right (drag),
@@ -508,10 +519,21 @@ static class Demo {
 			new StatusItem(Key.F1, "~F1~ Help", () => Help()),
 			new StatusItem(Key.F2, "~F2~ Load", null),
 			new StatusItem(Key.F3, "~F3~ Save", null),
-			new StatusItem(Key.ControlX, "~^X~ Quit", () => Quit()),
+			new StatusItem(Key.ControlX, "~^X~ Quit", () => { if (Quit ()) top.Running = false; }),
 		});
 
 		win.Add (drag, dragText);
+#if true
+		// This currently causes a stack overflow, because it is referencing a window that has not had its size allocated yet
+
+		var bottom = new Label ("This should go on the bottom!");
+		win.Add (bottom);
+
+		Application.OnResized = () => {
+			bottom.X = Pos.Left (win);
+			bottom.Y = Pos.Bottom (win);
+		};
+#endif
 
 		top.Add (win);
 		//top.Add (menu);
