@@ -68,7 +68,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		///   If the view is focused, gives the view a
-		///   chance to process the keystroke. 
+		///   chance to process the keystroke.
 		/// </summary>
 		/// <remarks>
 		///   <para>
@@ -83,7 +83,7 @@ namespace Terminal.Gui {
 		///   </para>
 		///   <para>
 		///     The View implementation does nothing but return false,
-		///     so it is not necessary to call base.ProcessKey if you 
+		///     so it is not necessary to call base.ProcessKey if you
 		///     derive directly from View, but you should if you derive
 		///     other View subclasses.
 		///   </para>
@@ -182,27 +182,27 @@ namespace Terminal.Gui {
 	/// <para>
 	///    Views can either be created with an absolute position, by calling the constructor that takes a
 	///    Rect parameter to specify the absolute position and size (the Frame of the View) or by setting the
-	///    X, Y, Width and Height properties on the view.    Both approaches use coordinates that are relative 
+	///    X, Y, Width and Height properties on the view.    Both approaches use coordinates that are relative
 	///    to the container they are being added to.
 	/// </para>
 	/// <para>
-	///    When you do not specify a Rect frame you can use the more flexible 
-	///    Dim and Pos objects that can dynamically update the position of a view.   
+	///    When you do not specify a Rect frame you can use the more flexible
+	///    Dim and Pos objects that can dynamically update the position of a view.
 	///    The X and Y properties are of type <see cref="T:Terminal.Gui.Pos"/>
 	///    and you can use either absolute positions, percentages or anchor
-	///    points.   The Width and Height properties are of type 
-	///    <see cref="T:Terminal.Gui.Dim"/> and can use absolute position, 
+	///    points.   The Width and Height properties are of type
+	///    <see cref="T:Terminal.Gui.Dim"/> and can use absolute position,
 	///    percentages and anchors.  These are useful as they will take
 	///    care of repositioning your views if your view's frames are resized
 	///    or if the terminal size changes.
 	/// </para>
 	/// <para>
-	///    When you specify the Rect parameter to a view, you are setting the LayoutStyle to Absolute, and the 
-	///    view will always stay in the position that you placed it.   To change the position change the 
+	///    When you specify the Rect parameter to a view, you are setting the LayoutStyle to Absolute, and the
+	///    view will always stay in the position that you placed it.   To change the position change the
 	///    Frame property to the new position.
 	/// </para>
 	/// <para>
-	///    Subviews can be added to a View by calling the Add method.   The container of a view is the 
+	///    Subviews can be added to a View by calling the Add method.   The container of a view is the
 	///    Superview.
 	/// </para>
 	/// <para>
@@ -213,7 +213,7 @@ namespace Terminal.Gui {
 	///    Views have a ColorScheme property that defines the default colors that subviews
 	///    should use for rendering.   This ensures that the views fit in the context where
 	///    they are being used, and allows for themes to be plugged in.   For example, the
-	///    default colors for windows and toplevels uses a blue background, while it uses 
+	///    default colors for windows and toplevels uses a blue background, while it uses
 	///    a white background for dialog boxes and a red background for errors.
 	/// </para>
 	/// <para>
@@ -229,7 +229,7 @@ namespace Terminal.Gui {
 	/// <para>
 	///    Views that are focusable should implement the PositionCursor to make sure that
 	///    the cursor is placed in a location that makes sense.   Unix terminals do not have
-	///    a way of hiding the cursor, so it can be distracting to have the cursor left at 
+	///    a way of hiding the cursor, so it can be distracting to have the cursor left at
 	///    the last focused view.   So views should make sure that they place the cursor
 	///    in a visually sensible place.
 	/// </para>
@@ -278,7 +278,7 @@ namespace Terminal.Gui {
 
 		static IList<View> empty = new List<View> (0).AsReadOnly ();
 
-		// This is null, and allocated on demand.  
+		// This is null, and allocated on demand.
 		List<View> subviews;
 
 		/// <summary>
@@ -313,7 +313,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The frame.</value>
 		/// <remarks>
-		///    Altering the Frame of a view will trigger the redrawing of the 
+		///    Altering the Frame of a view will trigger the redrawing of the
 		///    view as well as the redrawing of the affected regions in the superview.
 		/// </remarks>
 		public virtual Rect Frame {
@@ -443,7 +443,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.View"/> class and sets the
-		/// view up for Computed layout, which will use the values in X, Y, Width and Height to 
+		/// view up for Computed layout, which will use the values in X, Y, Width and Height to
 		/// compute the View's Frame.
 		/// </summary>
 		public View ()
@@ -1277,8 +1277,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// This virtual method is invoked when a view starts executing or 
-		/// when the dimensions of the view have changed, for example in 
+		/// This virtual method is invoked when a view starts executing or
+		/// when the dimensions of the view have changed, for example in
 		/// response to the container view or terminal resizing.
 		/// </summary>
 		public virtual void LayoutSubviews ()
@@ -1313,8 +1313,8 @@ namespace Terminal.Gui {
 				if (v.LayoutStyle == LayoutStyle.Computed)
 					v.RelativeLayout (Frame);
 
-				
-				v.LayoutSubviews ();
+				if (this?.SuperView != v)
+					v.LayoutSubviews ();
 				v.layoutNeeded = false;
 
 			}
@@ -1348,23 +1348,23 @@ namespace Terminal.Gui {
 	///     new toplevel.
 	///   </para>
 	///   <para>
-	///     TopLevels can also opt-in to more sophisticated initialization 
-	///     by implementing <see cref="ISupportInitialize"/>. When they do 
-	///     so, the <see cref="ISupportInitialize.BeginInit"/> and 
-	///     <see cref="ISupportInitialize.EndInit"/> methods will be called 
+	///     TopLevels can also opt-in to more sophisticated initialization
+	///     by implementing <see cref="ISupportInitialize"/>. When they do
+	///     so, the <see cref="ISupportInitialize.BeginInit"/> and
+	///     <see cref="ISupportInitialize.EndInit"/> methods will be called
 	///     before running the view.
-	///     If first-run-only initialization is preferred, the <see cref="ISupportInitializeNotification"/> 
-	///     can be implemented too, in which case the <see cref="ISupportInitialize"/> 
-	///     methods will only be called if <see cref="ISupportInitializeNotification.IsInitialized"/> 
-	///     is <see langword="false"/>. This allows proper View inheritance hierarchies 
-	///     to override base class layout code optimally by doing so only on first run, 
+	///     If first-run-only initialization is preferred, the <see cref="ISupportInitializeNotification"/>
+	///     can be implemented too, in which case the <see cref="ISupportInitialize"/>
+	///     methods will only be called if <see cref="ISupportInitializeNotification.IsInitialized"/>
+	///     is <see langword="false"/>. This allows proper View inheritance hierarchies
+	///     to override base class layout code optimally by doing so only on first run,
 	///     instead of on every run.
 	///   </para>
 	/// </remarks>
 	public class Toplevel : View {
 		/// <summary>
 		/// This flag is checked on each iteration of the mainloop and it continues
-		/// running until this flag is set to false.   
+		/// running until this flag is set to false.
 		/// </summary>
 		public bool Running;
 
@@ -1406,8 +1406,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Determines whether the <see cref="Toplevel"/> is modal or not. 
-		/// Causes <see cref="ProcessKey(KeyEvent)"/> to propagate keys upwards 
+		/// Determines whether the <see cref="Toplevel"/> is modal or not.
+		/// Causes <see cref="ProcessKey(KeyEvent)"/> to propagate keys upwards
 		/// by default unless set to <see langword="true"/>.
 		/// </summary>
 		public bool Modal { get; set; }
@@ -1636,7 +1636,7 @@ namespace Terminal.Gui {
 		int padding;
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Window"/> with
-		/// the specified frame for its location, with the specified border 
+		/// the specified frame for its location, with the specified border
 		/// an optional title.
 		/// </summary>
 		/// <param name="frame">Frame.</param>
@@ -1654,7 +1654,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Window"/> with
-		/// the specified frame for its location, with the specified border 
+		/// the specified frame for its location, with the specified border
 		/// an optional title.
 		/// </summary>
 		/// <param name="padding">Number of characters to use for padding of the drawn frame.</param>
@@ -1815,7 +1815,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	/// <remarks>
 	///   <para>
-	///     You can hook up to the Iteration event to have your method 
+	///     You can hook up to the Iteration event to have your method
 	///     invoked on each iteration of the mainloop.
 	///   </para>
 	///   <para>
@@ -1855,7 +1855,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		///   This event is raised on each iteration of the
-		///   main loop. 
+		///   main loop.
 		/// </summary>
 		/// <remarks>
 		///   See also <see cref="Timeout"/>
@@ -2137,7 +2137,7 @@ namespace Terminal.Gui {
 		/// <param name="toplevel">Toplevel to prepare execution for.</param>
 		/// <remarks>
 		///  This method prepares the provided toplevel for running with the focus,
-		///  it adds this to the list of toplevels, sets up the mainloop to process the 
+		///  it adds this to the list of toplevels, sets up the mainloop to process the
 		///  event, lays out the subviews, focuses the first element, and draws the
 		///  toplevel in the screen.   This is usually followed by executing
 		///  the <see cref="RunLoop"/> method, and then the <see cref="End(RunState)"/> method upon termination which will
@@ -2150,7 +2150,7 @@ namespace Terminal.Gui {
 			var rs = new RunState (toplevel);
 
 			Init ();
-			if (toplevel is ISupportInitializeNotification initializableNotification && 
+			if (toplevel is ISupportInitializeNotification initializableNotification &&
 			    !initializableNotification.IsInitialized) {
 				initializableNotification.BeginInit();
 				initializableNotification.EndInit();
@@ -2240,7 +2240,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		///   Use the wait parameter to control whether this is a
-		///   blocking or non-blocking call.   
+		///   blocking or non-blocking call.
 		/// </remarks>
 		/// <param name="state">The state returned by the Begin method.</param>
 		/// <param name="wait">By default this is true which will execute the runloop waiting for events, if you pass false, you can use this method to run a single iteration of the events.</param>
@@ -2314,7 +2314,7 @@ namespace Terminal.Gui {
 		///     returned value, and then calling end on the return value.
 		///   </para>
 		///   <para>
-		///     Alternatively, if your program needs to control the main loop and needs to 
+		///     Alternatively, if your program needs to control the main loop and needs to
 		///     process events manually, you can invoke Begin to set things up manually and then
 		///     repeatedly call RunLoop with the wait parameter set to false.   By doing this
 		///     the RunLoop method will only process any pending events, timers, idle handlers and
@@ -2336,8 +2336,14 @@ namespace Terminal.Gui {
 			Current.Running = false;
 		}
 
+		/// <summary>
+		/// Invoked when the terminal was resized.
+		/// </summary>
+		static public Action OnResized;
+
 		static void TerminalResized ()
 		{
+			OnResized?.Invoke ();
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
 			Driver.Clip = full;
 			foreach (var t in toplevels) {

@@ -9,7 +9,7 @@
   <PropertyGroup>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <PackageId>Terminal.Gui</PackageId>
-    <PackageVersion>0.80</PackageVersion>
+    <PackageVersion>0.81</PackageVersion>
     <Authors>Miguel de Icaza</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/migueldeicaza/gui.cs/</PackageProjectUrl>
@@ -18,7 +18,17 @@
     <Owners>Miguel de Icaza</Owners>
     <Summary>Application framework for creating modern console applications using .NET </Summary>
     <Title>Gui.cs is a framework for creating console user interfaces</Title>
-    <PackageReleaseNotes>0.80: Jumbo update from BDisp:
+    <PackageReleaseNotes>0.81: Fix ncurses engine for macOS/Linux, it works again
+
+* Fixes an issue with referencing views that have not been allocated yet causing a stack overflow
+* New OnCloseMenu event on menus
+* Button cursor position looks better
+* Listview in single-selection mode uses a radio-button look
+* Fixes a couple of crashes (356)
+* Default the samples to work on Catalina
+
+
+0.80: Jumbo update from BDisp:
 
 * Fixed key events traversal for modal dialogs
 * Fixes culture info of DataField from pr
