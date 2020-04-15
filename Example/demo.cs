@@ -88,7 +88,7 @@ static class Demo {
 			"Text Alignments", 50, 20,
 			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
 			new Button ("Cancel") { Clicked = () => { Application.RequestStop (); } });
-		
+
 
 		int i = 0;
 		string txt = "Hello world, how are you doing today";
@@ -418,6 +418,8 @@ static class Demo {
 			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 
 		//Application.UseSystemConsole = true;
+		Console.WindowHeight = 35;
+
 		Application.Init ();
 
 		var top = Application.Top;
@@ -521,14 +523,16 @@ static class Demo {
 		});
 
 		win.Add (drag, dragText);
-#if false
+#if true
 		// This currently causes a stack overflow, because it is referencing a window that has not had its size allocated yet
 
-		var bottom = new Label ("This should go on the bottom!") {
-			X = Pos.Left (win),
-			Y = Pos.Bottom (win)
-		};
+		var bottom = new Label ("This should go on the bottom!");
 		win.Add (bottom);
+
+		Application.OnResized = () => {
+			bottom.X = Pos.Left (win);
+			bottom.Y = Pos.Bottom (win);
+		};
 #endif
 
 		top.Add (win);
