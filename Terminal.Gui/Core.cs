@@ -1192,7 +1192,7 @@ namespace Terminal.Gui {
 		}
 
 		// https://en.wikipedia.org/wiki/Topological_sorting
-		static List<View> TopologicalSort (HashSet<View> nodes, HashSet<(View, View)> edges)
+		List<View> TopologicalSort (HashSet<View> nodes, HashSet<(View, View)> edges)
 		{
 			var result = new List<View> ();
 
@@ -1205,7 +1205,8 @@ namespace Terminal.Gui {
 				S.Remove (n);
 
 				// add n to tail of L
-				result.Add (n);
+				if (n != this?.SuperView)
+					result.Add (n);
 
 				// for each node m with an edge e from n to m do
 				foreach (var e in edges.Where (e => e.Item1.Equals (n)).ToList ()) {
@@ -1215,7 +1216,7 @@ namespace Terminal.Gui {
 					edges.Remove (e);
 
 					// if m has no other incoming edges then
-					if (edges.All (me => me.Item2.Equals (m) == false)) {
+					if (edges.All (me => me.Item2.Equals (m) == false) && m != this?.SuperView) {
 						// insert m into S
 						S.Add (m);
 					}
@@ -1269,8 +1270,7 @@ namespace Terminal.Gui {
 				if (v.LayoutStyle == LayoutStyle.Computed)
 					v.RelativeLayout (Frame);
 
-				if (this?.SuperView != v)
-					v.LayoutSubviews ();
+				v.LayoutSubviews ();
 				v.layoutNeeded = false;
 
 			}
@@ -2063,6 +2063,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Action that is invoked once at beginning.
+		/// </summary>
+		static public Action OnLoad;
+
+		/// <summary>
 		/// Building block API: Prepares the provided toplevel for execution.
 		/// </summary>
 		/// <returns>The runstate handle that needs to be passed to the End() method upon completion.</returns>
@@ -2096,6 +2101,7 @@ namespace Terminal.Gui {
 			if (toplevel.LayoutStyle == LayoutStyle.Computed)
 				toplevel.RelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
 			toplevel.LayoutSubviews ();
+			OnLoad?.Invoke ();
 			toplevel.WillPresent ();
 			Redraw (toplevel);
 			toplevel.PositionCursor ();

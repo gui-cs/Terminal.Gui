@@ -418,7 +418,6 @@ static class Demo {
 			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 
 		//Application.UseSystemConsole = true;
-		Console.WindowHeight = 35;
 
 		Application.Init ();
 
@@ -426,11 +425,12 @@ static class Demo {
 
 		//Open ();
 #if true
+		int margin = 3;
 		var win = new Window ("Hello") {
 			X = 1,
 			Y = 1,
-			Width = Dim.Fill (),
-			Height = Dim.Fill ()-1
+			Width = Dim.Fill () - margin,
+			Height = Dim.Fill () - margin
 		};
 #else
 		var tframe = top.Frame;
@@ -498,7 +498,7 @@ static class Demo {
 		ShowEntries (win);
 
 		int count = 0;
-		ml = new Label (new Rect (3, 18, 47, 1), "Mouse: ");
+		ml = new Label (new Rect (3, 17, 47, 1), "Mouse: ");
 		Application.RootMouseEvent += delegate (MouseEvent me) {
 			ml.TextColor = Colors.TopLevel.Normal;
 			ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
@@ -524,20 +524,19 @@ static class Demo {
 
 		win.Add (drag, dragText);
 #if true
-		// This currently causes a stack overflow, because it is referencing a window that has not had its size allocated yet
+		// FIXED: This currently causes a stack overflow, because it is referencing a window that has not had its size allocated yet
 
 		var bottom = new Label ("This should go on the bottom!");
 		win.Add (bottom);
 
-		Application.OnResized = () => {
-			bottom.X = Pos.Left (win);
-			bottom.Y = Pos.Bottom (win);
+		Application.OnLoad = () => {
+			bottom.X = win.X;
+			bottom.Y = Pos.Bottom (win) - Pos.Top (win) - margin;
 		};
 #endif
-
 		top.Add (win);
 		//top.Add (menu);
-		top.Add (menu, statusBar, ml);
+		top.Add (menu, statusBar);
 		Application.Run ();
 	}
 }
