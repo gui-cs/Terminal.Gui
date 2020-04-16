@@ -55,8 +55,10 @@ namespace Terminal.Gui {
 	/// So for each context must be a new instance of a statusbar.  
 	/// </summary>
 	public class StatusBar : View {
-
-
+// After attempting to implement this, I noticed that there are hard dependencies
+// on StatusBar and MenuBars within core. They will need to be refactored for having the
+// StatusBar work at the top
+#if SNAP_TO_TOP
 		/// <summary>
 		/// The style supported by StatusBar
 		/// </summary>
@@ -82,7 +84,7 @@ namespace Terminal.Gui {
 		}
 
 		public StatusBarStyle Style { get; set; } = StatusBarStyle.Default;
-
+#endif
 		public View Parent { get; set; }
 
 		public StatusItem [] Items { get; set; }
@@ -103,20 +105,23 @@ namespace Terminal.Gui {
 			Application.OnResized += () => {
 				X = 0;
 				Height = 1;
-
+#if SNAP_TO_TOP
 				switch (Style) {
+				case StatusBarStyle.SnapToTop:
+					X = 0;
+					Y = 0;
+					break;
 				case StatusBarStyle.SnapToBottom:
+#endif
 					if (Parent == null) {
 						Y = Application.Driver.Rows - 1; // TODO: using internals of Application
 					} else {
 						Y = Pos.Bottom (Parent);
 					}
-					break;
-				case StatusBarStyle.SnapToTop:
-					X = 0;
-					Y = 0;
+#if SNAP_TO_TOP
 					break;
 				}
+#endif
 			};
 		}
 
