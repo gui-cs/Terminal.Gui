@@ -500,6 +500,7 @@ namespace Terminal.Gui {
 		public MenuBarItem [] Menus { get; set; }
 		internal int selected;
 		internal int selectedSub;
+
 		Action action;
 
 		/// <summary>
@@ -518,7 +519,7 @@ namespace Terminal.Gui {
 			Width = Dim.Fill ();
 			Height = 1;
 			Menus = menus;
-			CanFocus = false;
+			CanFocus = true;
 			selected = -1;
 			selectedSub = -1;
 			ColorScheme = Colors.Menu;
@@ -529,18 +530,35 @@ namespace Terminal.Gui {
 		public override bool KeyDown (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
+				openedByHotKey = false;
 			}
 			return false;
 		}
 
+		/// <summary>
+		/// Track Alt key-up events. On Windows, when a user releases Alt (without another key), the menu gets focus but doesn't open.
+		/// We mimic that behavior here. 
+		/// </summary>
+		/// <param name="keyEvent"></param>
+		/// <returns></returns>
 		public override bool KeyUp (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
+				// User pressed Alt - this may be a precursor to a menu accellerator (e.g. Alt-F)
 				if (openMenu == null) {
-					OpenMenu (0);
+					// There's no open menu, the first menu item should be highlight. 
+					// The right way to do this is to SetFocus(MenuBar), but for some reason 
+					// that faults.
+
+					Activate (0);
 					SetNeedsDisplay ();
 				} else {
-					CloseAllMenus ();
+					// There's an open menu. If this Alt key-up is a pre-cursor to an acellerator
+					// we don't want to close the menu because it'll flash.
+					// How to deal with that?
+					if (!openedByHotKey) {
+						CloseAllMenus ();
+					}
 				}
 				return true;
 			}
@@ -565,11 +583,11 @@ namespace Terminal.Gui {
 					hotColor = i == selected ? ColorScheme.HotFocus : ColorScheme.HotNormal;
 					normalColor = i == selected ? ColorScheme.Focus : ColorScheme.Normal;
 				} else {
-					hotColor = ColorScheme.HotNormal; // Colors.Base.Focus;
-					normalColor = ColorScheme.Normal; // Colors.Base.Focus;
+					hotColor = ColorScheme.HotNormal; 
+					normalColor = ColorScheme.Normal; 
 				}
-				DrawHotString ("" + menu.Title + " " + "   ", hotColor, normalColor);
-				pos += menu.TitleLength + 3;
+				DrawHotString ($" {menu.Title}  ", hotColor, normalColor);
+				pos += 1 + menu.TitleLength + 2 ;
 			}
 			PositionCursor ();
 		}
@@ -587,7 +605,7 @@ namespace Terminal.Gui {
 					return;
 				} else {
 					if (!isMenuClosed)
-						pos += Menus [i].TitleLength + 4;
+						pos += 1 + Menus [i].TitleLength + 2 ;
 					else
 						pos += 2 + Menus [i].TitleLength + 1;
 				}
@@ -789,6 +807,7 @@ namespace Terminal.Gui {
 					selected = -1;
 			}
 			isMenuClosed = true;
+			openedByHotKey = false;
 		}
 
 		View FindDeepestMenu (View view, ref int count)
@@ -864,6 +883,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		bool openedByHotKey = false;
 		internal bool FindAndOpenMenuByHotkey (KeyEvent kb)
 		{
 			int pos = 0;
@@ -873,11 +893,12 @@ namespace Terminal.Gui {
 				var mi = Menus [i];
 				int p = mi.Title.IndexOf ('_');
 				if (p != -1 && p + 1 < mi.Title.Length) {
-					if (mi.Title [p + 1] == c) {
+					if (Char.ToUpperInvariant((char)mi.Title [p + 1]) == c) {
 						if (mi.Children == null) {
 							var menu = new Menu (this, i, 0, mi);
 							menu.Run (mi.Action);
 						} else {
+							openedByHotKey = true;
 							Application.GrabMouse (this);
 							selected = i;
 							OpenMenu (i);

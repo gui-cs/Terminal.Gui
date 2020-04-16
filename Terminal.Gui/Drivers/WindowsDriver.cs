@@ -563,7 +563,7 @@ namespace Terminal.Gui {
 				// Key Down - Fire KeyDown Event and KeyStroke (ProcessKey) Event
 				if (inputEvent.KeyEvent.bKeyDown) {
 					keyDownHandler (new KeyEvent (map));
-					if (map == (Key)0xffffffff)
+					if (inputEvent.KeyEvent.UnicodeChar == 0 || map == (Key)0xffffffff)
 						return;
 					keyHandler (new KeyEvent (map));
 				} else {
