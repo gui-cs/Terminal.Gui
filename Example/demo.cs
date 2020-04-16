@@ -562,7 +562,6 @@ static class Demo {
 			new StatusItem(Key.F3, "~F3~ Save", null),
 			new StatusItem(Key.ControlX, "~^X~ Quit", () => { if (Quit ()) top.Running = false; }),
 		}) {
-			Style = StatusBar.StatusBarStyle.SnapToBottom,
 			Parent = null,
 		};
 
