@@ -829,7 +829,10 @@ namespace Terminal.Gui {
 	        public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == Key.F9) {
-				StartMenu ();
+				if (isMenuClosed)
+					StartMenu ();
+				else
+					CloseAllMenus ();
 				return true;
 			}
 
