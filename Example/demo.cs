@@ -93,10 +93,10 @@ static class Demo {
 		int i = 0;
 		string txt = "Hello world, how are you doing today";
 		container.Add (
-				new Label (new Rect (0, 1, 40, 3), $"{i+1}-{txt}") { TextAlignment = TextAlignment.Left },
-				new Label (new Rect (0, 3, 40, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
-				new Label (new Rect (0, 5, 40, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
-				new Label (new Rect (0, 7, 40, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
+				new Label (new Rect (0, 1, 40, 3), $"{i + 1}-{txt}") { TextAlignment = TextAlignment.Left },
+				new Label (new Rect (0, 3, 40, 3), $"{i + 2}-{txt}") { TextAlignment = TextAlignment.Right },
+				new Label (new Rect (0, 5, 40, 3), $"{i + 3}-{txt}") { TextAlignment = TextAlignment.Centered },
+				new Label (new Rect (0, 7, 40, 3), $"{i + 4}-{txt}") { TextAlignment = TextAlignment.Justified }
 			);
 
 		Application.Run (container);
@@ -412,9 +412,8 @@ static class Demo {
 	private static void OnKeyDownUpDemo ()
 	{
 		var container = new Dialog (
-			"OnKeyDown & OnKeyUp demo", 80, 20,
-			new Button ("Close") { Clicked = () => { Application.RequestStop (); } }) {
-			Width = Dim.Fill (),
+			"OnKeyDown & OnKeyUp demo", 0, 0) {
+			Width = Dim.Fill () ,
 			Height = Dim.Fill (),
 		};
 
@@ -431,22 +430,23 @@ static class Demo {
 		void KeyUpDown (KeyEvent keyEvent, string updown)
 		{
 			if ((keyEvent.Key & Key.CtrlMask) != 0) {
-				list.Add ($"Key{updown, -4}: Ctrl ");
+				list.Add ($"Key{updown,-4}: Ctrl ");
 			} else if ((keyEvent.Key & Key.AltMask) != 0) {
-				list.Add ($"Key{updown, -4}: Alt ");
+				list.Add ($"Key{updown,-4}: Alt ");
 			} else {
-				list.Add ($"Key{updown, -4}: {(((uint)keyEvent.KeyValue & (uint)Key.CharMask) > 26 ? $"{(char)keyEvent.KeyValue}" : $"{keyEvent.Key}")}");
+				list.Add ($"Key{updown,-4}: {(((uint)keyEvent.KeyValue & (uint)Key.CharMask) > 26 ? $"{(char)keyEvent.KeyValue}" : $"{keyEvent.Key}")}");
 			}
 			listView.MoveDown ();
 		}
 
 		container.OnKeyDown += (KeyEvent keyEvent) => KeyUpDown (keyEvent, "Down");
 		container.OnKeyUp += (KeyEvent keyEvent) => KeyUpDown (keyEvent, "Up");
+
 		Application.Run (container);
 	}
 
 
-#endregion
+	#endregion
 
 	public static Label ml;
 	public static MenuBar menu;
@@ -561,16 +561,19 @@ static class Demo {
 			new StatusItem(Key.F2, "~F2~ Load", null),
 			new StatusItem(Key.F3, "~F3~ Save", null),
 			new StatusItem(Key.ControlX, "~^X~ Quit", () => { if (Quit ()) top.Running = false; }),
-		});
+		}) {
+			Style = StatusBar.StatusBarStyle.SnapToBottom,
+			Parent = null,
+		};
 
 		win.Add (drag, dragText);
-#if true
+#if false
 		// This currently causes a stack overflow, because it is referencing a window that has not had its size allocated yet
 
 		var bottom = new Label ("This should go on the bottom!");
 		win.Add (bottom);
 
-		Application.OnResized = () => {
+		Application.OnResized += () => {
 			bottom.X = Pos.Left (win);
 			bottom.Y = Pos.Bottom (win);
 		};
@@ -581,7 +584,7 @@ static class Demo {
 		//top.Add (menu);
 		top.Add (menu, statusBar, ml);
 
-		OnKeyDownUpDemo ();
+		//OnKeyDownUpDemo ();
 
 		Application.Run ();
 	}

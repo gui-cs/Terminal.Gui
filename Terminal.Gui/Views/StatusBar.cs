@@ -6,7 +6,6 @@
 //
 // TODO:
 //   Add mouse support
-//   Uses internals of Application
 using System;
 using NStack;
 
@@ -62,29 +61,29 @@ namespace Terminal.Gui {
 		/// The style supported by StatusBar
 		/// </summary>
 		public enum StatusBarStyle {
+			Default = 0,
 			/// <summary>
-			/// The StatusBar will snap at the the bottom line of the console window. 
+			/// The StatusBar will snap at the the bottom line of the Parent view. 
 			/// If the console window is made larger while the app is runing, the StatusBar
-			/// will continue to snap to the bottom. If the console window is subsequently
-			/// made shorter, the status bar will be invisible. This is the default.
+			/// will continue to snap to the bottom line of the Parent, staying visible.
+			/// On consoles that support resizing of console apps (e.g. Windows Terminal and ConEmu),
+			/// if the console window is subsequently made shorter, the status bar will remain visible 
+			/// as the Parent view resizes. If Parent is null, the StatusBar will snap to the bottom line
+			/// of the console window.
+			/// This is the default.
 			/// </summary>
-			SnapToConsoleBottom = 0,
-
-			/// <summary>
-			/// The StatusBar will snap at the the bottom line of the Application.Top view. 
-			/// If the console window is made larger while the app is runing, the StatusBar
-			/// will continue to snap to the bottom line of Application.Top, staying visible.
-			/// If the console window is subsequently made shorter, the status bar will remain visible 
-			/// at the last visible line. 
-			/// </summary>
-			SnapToAppBottom = 1,
+			SnapToBottom = Default,
 
 			/// <summary>
 			/// The StatusBar will act identically to MenuBar, snapping to the first line of the 
 			/// console window. 
 			/// </summary>
-			SnapToTop = 2,
+			SnapToTop = 1,
 		}
+
+		public StatusBarStyle Style { get; set; } = StatusBarStyle.Default;
+
+		public View Parent { get; set; }
 
 		public StatusItem [] Items { get; set; }
 
@@ -95,13 +94,30 @@ namespace Terminal.Gui {
 		/// <param name="items">A list of statusbar items.</param>
 		public StatusBar (StatusItem [] items) : base ()
 		{
-			X = 0;
-			Y = Application.Driver.Rows - 1; // TODO: using internals of Application
 			Width = Dim.Fill ();
 			Height = 1;
 			Items = items;
 			CanFocus = false;
 			ColorScheme = Colors.Menu;
+
+			Application.OnResized += () => {
+				X = 0;
+				Height = 1;
+
+				switch (Style) {
+				case StatusBarStyle.SnapToBottom:
+					if (Parent == null) {
+						Y = Application.Driver.Rows - 1; // TODO: using internals of Application
+					} else {
+						Y = Pos.Bottom (Parent);
+					}
+					break;
+				case StatusBarStyle.SnapToTop:
+					X = 0;
+					Y = 0;
+					break;
+				}
+			};
 		}
 
 		Attribute ToggleScheme (Attribute scheme)
@@ -113,11 +129,11 @@ namespace Terminal.Gui {
 
 		public override void Redraw (Rect region)
 		{
-			if (Frame.Y != Driver.Rows - 1) {
-				Frame = new Rect (Frame.X, Driver.Rows - 1, Frame.Width, Frame.Height);
-				Y = Driver.Rows - 1;
-				SetNeedsDisplay ();
-			}
+			//if (Frame.Y != Driver.Rows - 1) {
+			//	Frame = new Rect (Frame.X, Driver.Rows - 1, Frame.Width, Frame.Height);
+			//	Y = Driver.Rows - 1;
+			//	SetNeedsDisplay ();
+			//}
 
 			Move (0, 0);
 			Driver.SetAttribute (ColorScheme.Normal);
