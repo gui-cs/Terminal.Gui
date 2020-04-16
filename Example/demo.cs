@@ -479,7 +479,7 @@ static class Demo {
 
 		menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("Text Editor Demo", "", () => { Editor (top); }),
+				new MenuItem ("Text _Editor Demo", "", () => { Editor (top); }),
 				new MenuItem ("_New", "Creates new file", NewFile),
 				new MenuItem ("_Open", "", Open),
 				new MenuItem ("_Hex", "", () => ShowHex (top)),
@@ -497,19 +497,20 @@ static class Demo {
 				menuItems[3]
 			}),
 			new MenuBarItem ("_List Demos", new MenuItem [] {
-				new MenuItem ("Select Multiple Items", "", () => ListSelectionDemo (true)),
-				new MenuItem ("Select Single Item", "", () => ListSelectionDemo (false)),
+				new MenuItem ("Select _Multiple Items", "", () => ListSelectionDemo (true)),
+				new MenuItem ("Select _Single Item", "", () => ListSelectionDemo (false)),
 			}),
-			new MenuBarItem ("Assorted", new MenuItem [] {
-				new MenuItem ("Show text alignments", "", () => ShowTextAlignments ()),
-				new MenuItem ("OnKeyDown/Up", "", () => OnKeyDownUpDemo ())
+			new MenuBarItem ("A_ssorted", new MenuItem [] {
+				new MenuItem ("_Show text alignments", "", () => ShowTextAlignments ()),
+				new MenuItem ("_OnKeyDown/Up", "", () => OnKeyDownUpDemo ())
 			}),
-			new MenuBarItem ("Test Menu and SubMenus", new MenuItem [] {
-				new MenuItem ("SubMenu1Item1",
+			new MenuBarItem ("_About...", "help", () =>  MessageBox.ErrorQuery (50, 7, "About Demo", "This is a demo app for gui.cs", "Ok")),
+			new MenuBarItem ("_Test Menu and SubMenus", new MenuItem [] {
+				new MenuItem ("SubMenu1Item_1",
 					new MenuBarItem (new MenuItem[] {
-						new MenuItem ("SubMenu2Item1",
+						new MenuItem ("SubMenu2Item_1",
 							new MenuBarItem (new MenuItem [] {
-								new MenuItem ("SubMenu3Item1",
+								new MenuItem ("SubMenu3Item_1",
 									new MenuBarItem (new MenuItem [] { menuItems [2] })
 								)
 							})

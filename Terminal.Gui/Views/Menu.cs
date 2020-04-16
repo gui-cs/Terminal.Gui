@@ -12,6 +12,7 @@ using System;
 using NStack;
 using System.Linq;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Terminal.Gui {
 
@@ -19,6 +20,12 @@ namespace Terminal.Gui {
 	/// A menu item has a title, an associated help text, and an action to execute on activation.
 	/// </summary>
 	public class MenuItem {
+
+		public MenuItem ()
+		{
+			Title = "";
+			Help = "";
+		}
 
 		/// <summary>
 		/// Initializes a new <see cref="T:Terminal.Gui.MenuItem"/>.
@@ -134,7 +141,20 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// A menu bar item contains other menu items.
 	/// </summary>
-	public class MenuBarItem {
+	public class MenuBarItem : MenuItem {
+		/// <summary>
+		/// Initializes a new <see cref="T:Terminal.Gui.MenuBarItem"/> as a <see cref="T:Terminal.Gui.MenuItem"/>.
+		/// </summary>
+		/// <param name="title">Title for the menu item.</param>
+		/// <param name="help">Help text to display.</param>
+		/// <param name="action">Action to invoke when the menu item is activated.</param>
+		/// <param name="canExecute">Function to determine if the action can currently be executred.</param>
+		public MenuBarItem (ustring title, string help, Action action, Func<bool> canExecute = null) : base (title, help, action, canExecute)
+		{
+			SetTitle (title ?? "");
+			Children = null;
+		}
+
 		/// <summary>
 		/// Initializes a new <see cref="T:Terminal.Gui.MenuBarItem"/>.
 		/// </summary>
@@ -150,11 +170,11 @@ namespace Terminal.Gui {
 		/// Initializes a new <see cref="T:Terminal.Gui.MenuBarItem"/>.
 		/// </summary>
 		/// <param name="children">The items in the current menu.</param>
-		public MenuBarItem (MenuItem[] children) : this (new string (' ', GetMaxTitleLength (children)), children)
+		public MenuBarItem (MenuItem [] children) : this (new string (' ', GetMaxTitleLength (children)), children)
 		{
 		}
 
-		static int GetMaxTitleLength (MenuItem[] children)
+		static int GetMaxTitleLength (MenuItem [] children)
 		{
 			int maxLength = 0;
 			foreach (var item in children) {
@@ -172,10 +192,10 @@ namespace Terminal.Gui {
 			if (title == null)
 				title = "";
 			Title = title;
-			TitleLength = GetMenuBarItemLength(Title);
+			TitleLength = GetMenuBarItemLength (Title);
 		}
 
-		static int GetMenuBarItemLength(ustring title)
+		static int GetMenuBarItemLength (ustring title)
 		{
 			int len = 0;
 			foreach (var ch in title) {
@@ -191,7 +211,7 @@ namespace Terminal.Gui {
 		/// Gets or sets the title to display.
 		/// </summary>
 		/// <value>The title.</value>
-		public ustring Title { get; set; }
+		//public ustring Title { get; set; }
 
 		/// <summary>
 		/// Gets or sets the children for this MenuBarItem
@@ -209,7 +229,10 @@ namespace Terminal.Gui {
 
 		static Rect MakeFrame (int x, int y, MenuItem [] items)
 		{
-			int maxW = items.Max(z => z?.Width) ?? 0;
+			if (items == null || items.Length == 0) {
+				return new Rect ();
+			}
+			int maxW = items.Max (z => z?.Width) ?? 0;
 
 			return new Rect (x, y, maxW + 2, items.Length + 2);
 		}
@@ -218,16 +241,24 @@ namespace Terminal.Gui {
 		{
 			this.barItems = barItems;
 			this.host = host;
-			current = -1;
-			for (int i = 0; i < barItems.Children.Length; i++) {
-				if (barItems.Children[i] != null) {
-					current = i;
-					break;
+			if (barItems.Children == null || barItems.Children.Length == 0) {
+				// This is a standalone MenuItem on a MenuBar
+				ColorScheme = Colors.Menu;
+				CanFocus = true;
+			} else {
+
+				current = -1;
+				for (int i = 0; i < barItems.Children.Length; i++) {
+					if (barItems.Children [i] != null) {
+						current = i;
+						break;
+					}
 				}
+				ColorScheme = Colors.Menu;
+				CanFocus = true;
+				WantMousePositionReports = host.WantMousePositionReports;
 			}
-			ColorScheme = Colors.Menu;
-			CanFocus = true;
-			WantMousePositionReports = host.WantMousePositionReports;
+
 		}
 
 		internal Attribute DetermineColorSchemeFor (MenuItem item, int index)
@@ -286,13 +317,13 @@ namespace Terminal.Gui {
 
 		public override void PositionCursor ()
 		{
-			if (!host.isMenuClosed)
+			if (host == null || !host.isMenuClosed)
 				Move (2, 1 + current);
 			else
 				host.PositionCursor ();
 		}
 
-		void Run (Action action)
+		public void Run (Action action)
 		{
 			if (action == null)
 				return;
@@ -306,13 +337,12 @@ namespace Terminal.Gui {
 				return false;
 			});
 		}
-
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			bool disabled;
 			switch (kb.Key) {
 			case Key.CursorUp:
-				if (current == -1)
+				if (barItems.Children == null || current == -1)
 					break;
 				do {
 					disabled = false;
@@ -332,6 +362,10 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 				break;
 			case Key.CursorDown:
+				if (barItems.Children == null) {
+					break;
+				}
+
 				do {
 					current++;
 					disabled = false;
@@ -353,21 +387,24 @@ namespace Terminal.Gui {
 				host.PreviousMenu (true);
 				break;
 			case Key.CursorRight:
-				host.NextMenu (barItems.Children [current].IsFromSubMenu ? true : false);
+				host.NextMenu (barItems.Children == null || barItems.Children [current].IsFromSubMenu ? true : false);
 				break;
 			case Key.Esc:
 				Application.UngrabMouse ();
 				host.CloseAllMenus ();
 				break;
 			case Key.Enter:
-				CheckSubMenu ();
-				Run (barItems.Children [current].Action);
+				if (barItems.Children == null) {
+					Run (barItems.Action);
+				} else {
+					CheckSubMenu ();
+					Run (barItems.Children [current].Action);
+				}
 				break;
 			default:
 				// TODO: rune-ify
-				if (Char.IsLetterOrDigit ((char)kb.KeyValue)) {
+				if (barItems.Children != null && Char.IsLetterOrDigit ((char)kb.KeyValue)) {
 					var x = Char.ToUpper ((char)kb.KeyValue);
-
 					foreach (var item in barItems.Children) {
 						if (item == null) continue;
 						if (item.IsEnabled () && item.HotKey == x) {
@@ -382,7 +419,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		public override bool MouseEvent(MouseEvent me)
+		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!host.handled && !host.HandleGrabView (me, this)) {
 				return false;
@@ -489,6 +526,27 @@ namespace Terminal.Gui {
 			isMenuClosed = true;
 		}
 
+		public override bool KeyDown (KeyEvent keyEvent)
+		{
+			if (keyEvent.IsAlt) {
+			}
+			return false;
+		}
+
+		public override bool KeyUp (KeyEvent keyEvent)
+		{
+			if (keyEvent.IsAlt) {
+				if (openMenu == null) {
+					OpenMenu (0);
+					SetNeedsDisplay ();
+				} else {
+					CloseAllMenus ();
+				}
+				return true;
+			}
+			return false;
+		}
+
 		public override void Redraw (Rect region)
 		{
 			Move (0, 0);
@@ -507,10 +565,10 @@ namespace Terminal.Gui {
 					hotColor = i == selected ? ColorScheme.HotFocus : ColorScheme.HotNormal;
 					normalColor = i == selected ? ColorScheme.Focus : ColorScheme.Normal;
 				} else {
-					hotColor = Colors.Base.Focus;
-					normalColor = Colors.Base.Focus;
+					hotColor = ColorScheme.HotNormal; // Colors.Base.Focus;
+					normalColor = ColorScheme.Normal; // Colors.Base.Focus;
 				}
-				DrawHotString (" " + menu.Title + " " + "   ", hotColor, normalColor);
+				DrawHotString ("" + menu.Title + " " + "   ", hotColor, normalColor);
 				pos += menu.TitleLength + 3;
 			}
 			PositionCursor ();
@@ -578,6 +636,7 @@ namespace Terminal.Gui {
 				openMenu = new Menu (this, pos, 1, Menus [index]);
 				openCurrentMenu = openMenu;
 				openCurrentMenu.previousSubFocused = openMenu;
+
 				SuperView.Add (openMenu);
 				SuperView.SetFocus (openMenu);
 				break;
@@ -805,38 +864,41 @@ namespace Terminal.Gui {
 			}
 		}
 
-                internal bool FindAndOpenMenuByHotkey(KeyEvent kb)
-                {
-                    int pos = 0;
-                    var c = ((uint)kb.Key & (uint)Key.CharMask);
-	            for (int i = 0; i < Menus.Length; i++)
-                    {
-			    // TODO: this code is duplicated, hotkey should be part of the MenuBarItem
-                            var mi = Menus[i];
-                            int p = mi.Title.IndexOf('_');
-                            if (p != -1 && p + 1 < mi.Title.Length) {
-                                    if (mi.Title[p + 1] == c) {
-						Application.GrabMouse (this);
-						selected = i;
-						OpenMenu (i);
-			                    return true;
-                                    }
-                            }
-                    }
-	            return false;
-                }
+		internal bool FindAndOpenMenuByHotkey (KeyEvent kb)
+		{
+			int pos = 0;
+			var c = ((uint)kb.Key & (uint)Key.CharMask);
+			for (int i = 0; i < Menus.Length; i++) {
+				// TODO: this code is duplicated, hotkey should be part of the MenuBarItem
+				var mi = Menus [i];
+				int p = mi.Title.IndexOf ('_');
+				if (p != -1 && p + 1 < mi.Title.Length) {
+					if (mi.Title [p + 1] == c) {
+						if (mi.Children == null) {
+							var menu = new Menu (this, i, 0, mi);
+							menu.Run (mi.Action);
+						} else {
+							Application.GrabMouse (this);
+							selected = i;
+							OpenMenu (i);
+						}
+						return true;
+					}
+				}
+			}
+			return false;
+		}
 
-	        public override bool ProcessHotKey (KeyEvent kb)
+		public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == Key.F9) {
 				StartMenu ();
 				return true;
 			}
 
-                        if (kb.IsAlt)
-                        {
-                            if (FindAndOpenMenuByHotkey(kb)) return true;
-                        }
+			if (kb.IsAlt) {
+				if (FindAndOpenMenuByHotkey (kb)) return true;
+			}
 			var kc = kb.KeyValue;
 
 			return base.ProcessHotKey (kb);
@@ -885,7 +947,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		public override bool MouseEvent(MouseEvent me)
+		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!handled && !HandleGrabView (me, this)) {
 				return false;
@@ -894,17 +956,23 @@ namespace Terminal.Gui {
 
 			if (me.Flags == MouseFlags.Button1Clicked ||
 				(me.Flags == MouseFlags.ReportMousePosition && selected > -1)) {
- 				int pos = 1;
+				int pos = 1;
 				int cx = me.X;
 				for (int i = 0; i < Menus.Length; i++) {
 					if (cx > pos && me.X < pos + 1 + Menus [i].TitleLength) {
 						if (selected == i && me.Flags == MouseFlags.Button1Clicked && !isMenuClosed) {
 							Application.UngrabMouse ();
-							CloseMenu ();
+							if (Menus [i].Children == null) {
+								var menu = new Menu (this, i, 0, Menus [i]);
+								menu.Run (Menus [i].Action);
+							} else {
+								CloseMenu ();
+							}
 						} else if (me.Flags == MouseFlags.Button1Clicked && isMenuClosed) {
 							Activate (i);
-						}
-						else if (selected != i && selected > -1 && me.Flags == MouseFlags.ReportMousePosition) {
+
+
+						} else if (selected != i && selected > -1 && me.Flags == MouseFlags.ReportMousePosition) {
 							if (!isMenuClosed) {
 								CloseMenu ();
 								Activate (i);
@@ -927,7 +995,7 @@ namespace Terminal.Gui {
 		{
 			if (Application.mouseGrabView != null) {
 				if (me.View is MenuBar || me.View is Menu) {
-					if(me.View != current) {
+					if (me.View != current) {
 						Application.UngrabMouse ();
 						Application.GrabMouse (me.View);
 						me.View.MouseEvent (me);

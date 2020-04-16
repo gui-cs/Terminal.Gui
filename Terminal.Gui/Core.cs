@@ -1059,7 +1059,6 @@ namespace Terminal.Gui {
 		public override bool KeyUp (KeyEvent keyEvent)
 		{
 			OnKeyUp?.Invoke (keyEvent);
-
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
