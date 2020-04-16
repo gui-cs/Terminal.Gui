@@ -1275,10 +1275,8 @@ namespace Terminal.Gui {
 
 			}
 
-			if (layoutNeeded && ordered.Count == 0) {
-				if (LayoutStyle == LayoutStyle.Computed) {
-					RelativeLayout (Frame);
-				}
+			if (SuperView == Application.Top && layoutNeeded && ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
+				RelativeLayout (Frame);
 			}
 
 			layoutNeeded = false;
