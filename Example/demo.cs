@@ -526,12 +526,16 @@ static class Demo {
 #if true
 		// FIXED: This currently causes a stack overflow, because it is referencing a window that has not had its size allocated yet
 
-		var bottom = new Label ("This should go on the bottom!");
+		var bottom = new Label ("This should go on the bottom of the same top-level!");
 		win.Add (bottom);
+		var bottom2 = new Label ("This should go on the bottom of another top-level!");
+		top.Add (bottom2);
 
 		Application.OnLoad = () => {
 			bottom.X = win.X;
 			bottom.Y = Pos.Bottom (win) - Pos.Top (win) - margin;
+			bottom2.X = Pos.Left (win);
+			bottom2.Y = Pos.Bottom (win);
 		};
 #endif
 		top.Add (win);

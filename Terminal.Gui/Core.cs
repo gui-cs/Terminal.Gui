@@ -1274,6 +1274,13 @@ namespace Terminal.Gui {
 				v.layoutNeeded = false;
 
 			}
+
+			if (layoutNeeded && ordered.Count == 0) {
+				if (LayoutStyle == LayoutStyle.Computed) {
+					RelativeLayout (Frame);
+				}
+			}
+
 			layoutNeeded = false;
 		}
 
@@ -1513,7 +1520,7 @@ namespace Terminal.Gui {
 				}
 				foreach (var view in Subviews) {
 					if (view.Frame.IntersectsWith (region)) {
-						//view.SetNeedsLayout ();
+						view.SetNeedsLayout ();
 						view.SetNeedsDisplay (view.Bounds);
 					}
 				}
