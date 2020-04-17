@@ -219,6 +219,9 @@ namespace Terminal.Gui {
 		/// <value>The children.</value>
 		public MenuItem [] Children { get; set; }
 		internal int TitleLength { get; private set; }
+
+		internal bool IsTopLevel { get => (Children == null || Children.Length == 0); }
+
 	}
 
 	class Menu : View {
@@ -241,7 +244,7 @@ namespace Terminal.Gui {
 		{
 			this.barItems = barItems;
 			this.host = host;
-			if (barItems.Children == null || barItems.Children.Length == 0) {
+			if (barItems.IsTopLevel) {
 				// This is a standalone MenuItem on a MenuBar
 				ColorScheme = Colors.Menu;
 				CanFocus = true;
@@ -318,7 +321,10 @@ namespace Terminal.Gui {
 		public override void PositionCursor ()
 		{
 			if (host == null || !host.isMenuClosed)
-				Move (2, 1 + current);
+				if (barItems.IsTopLevel) {
+					host.PositionCursor ();
+				} else
+					Move (2, 1 + current);
 			else
 				host.PositionCursor ();
 		}
@@ -342,7 +348,7 @@ namespace Terminal.Gui {
 			bool disabled;
 			switch (kb.Key) {
 			case Key.CursorUp:
-				if (barItems.Children == null || current == -1)
+				if (barItems.IsTopLevel || current == -1)
 					break;
 				do {
 					disabled = false;
@@ -362,7 +368,7 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 				break;
 			case Key.CursorDown:
-				if (barItems.Children == null) {
+				if (barItems.IsTopLevel) {
 					break;
 				}
 
@@ -387,14 +393,14 @@ namespace Terminal.Gui {
 				host.PreviousMenu (true);
 				break;
 			case Key.CursorRight:
-				host.NextMenu (barItems.Children == null || barItems.Children [current].IsFromSubMenu ? true : false);
+				host.NextMenu (barItems.IsTopLevel || barItems.Children [current].IsFromSubMenu ? true : false);
 				break;
 			case Key.Esc:
 				Application.UngrabMouse ();
 				host.CloseAllMenus ();
 				break;
 			case Key.Enter:
-				if (barItems.Children == null) {
+				if (barItems.IsTopLevel) {
 					Run (barItems.Action);
 				} else {
 					CheckSubMenu ();
@@ -583,11 +589,11 @@ namespace Terminal.Gui {
 					hotColor = i == selected ? ColorScheme.HotFocus : ColorScheme.HotNormal;
 					normalColor = i == selected ? ColorScheme.Focus : ColorScheme.Normal;
 				} else {
-					hotColor = ColorScheme.HotNormal; 
-					normalColor = ColorScheme.Normal; 
+					hotColor = ColorScheme.HotNormal;
+					normalColor = ColorScheme.Normal;
 				}
 				DrawHotString ($" {menu.Title}  ", hotColor, normalColor);
-				pos += 1 + menu.TitleLength + 2 ;
+				pos += 1 + menu.TitleLength + 2;
 			}
 			PositionCursor ();
 		}
@@ -599,18 +605,18 @@ namespace Terminal.Gui {
 				if (i == selected) {
 					pos++;
 					if (!isMenuClosed)
-						Move (pos, 0);
+						Move (pos + 1, 0);
 					else
 						Move (pos + 1, 0);
 					return;
 				} else {
 					if (!isMenuClosed)
-						pos += 1 + Menus [i].TitleLength + 2 ;
+						pos += 1 + Menus [i].TitleLength + 2;
 					else
 						pos += 2 + Menus [i].TitleLength + 1;
 				}
 			}
-			Move (0, 0);
+			//Move (0, 0);
 		}
 
 		void Selected (MenuItem item)
@@ -893,8 +899,8 @@ namespace Terminal.Gui {
 				var mi = Menus [i];
 				int p = mi.Title.IndexOf ('_');
 				if (p != -1 && p + 1 < mi.Title.Length) {
-					if (Char.ToUpperInvariant((char)mi.Title [p + 1]) == c) {
-						if (mi.Children == null) {
+					if (Char.ToUpperInvariant ((char)mi.Title [p + 1]) == c) {
+						if (mi.IsTopLevel) {
 							var menu = new Menu (this, i, 0, mi);
 							menu.Run (mi.Action);
 						} else {
@@ -948,7 +954,7 @@ namespace Terminal.Gui {
 				if ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z') || (key >= '0' && key <= '9')) {
 					char c = Char.ToUpper ((char)key);
 
-					if (Menus [selected].Children == null)
+					if (Menus [selected].IsTopLevel)
 						return false;
 
 					foreach (var mi in Menus [selected].Children) {
@@ -983,16 +989,19 @@ namespace Terminal.Gui {
 					if (cx > pos && me.X < pos + 1 + Menus [i].TitleLength) {
 						if (selected == i && me.Flags == MouseFlags.Button1Clicked && !isMenuClosed) {
 							Application.UngrabMouse ();
-							if (Menus [i].Children == null) {
+							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
 								menu.Run (Menus [i].Action);
 							} else {
 								CloseMenu ();
 							}
 						} else if (me.Flags == MouseFlags.Button1Clicked && isMenuClosed) {
-							Activate (i);
-
-
+							if (Menus [i].IsTopLevel) {
+								var menu = new Menu (this, i, 0, Menus [i]);
+								menu.Run (Menus [i].Action);
+							} else {
+								Activate (i);
+							}
 						} else if (selected != i && selected > -1 && me.Flags == MouseFlags.ReportMousePosition) {
 							if (!isMenuClosed) {
 								CloseMenu ();
