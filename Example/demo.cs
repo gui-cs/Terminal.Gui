@@ -93,10 +93,10 @@ static class Demo {
 		int i = 0;
 		string txt = "Hello world, how are you doing today";
 		container.Add (
-				new Label (new Rect (0, 1, 40, 3), $"{i + 1}-{txt}") { TextAlignment = TextAlignment.Left },
-				new Label (new Rect (0, 3, 40, 3), $"{i + 2}-{txt}") { TextAlignment = TextAlignment.Right },
-				new Label (new Rect (0, 5, 40, 3), $"{i + 3}-{txt}") { TextAlignment = TextAlignment.Centered },
-				new Label (new Rect (0, 7, 40, 3), $"{i + 4}-{txt}") { TextAlignment = TextAlignment.Justified }
+				new Label (new Rect (0, 1, 40, 3), $"{i+1}-{txt}") { TextAlignment = TextAlignment.Left },
+				new Label (new Rect (0, 3, 40, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
+				new Label (new Rect (0, 5, 40, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
+				new Label (new Rect (0, 7, 40, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
 			);
 
 		Application.Run (container);
@@ -413,7 +413,7 @@ static class Demo {
 	{
 		var container = new Dialog (
 			"OnKeyDown & OnKeyUp demo", 0, 0) {
-			Width = Dim.Fill () ,
+			Width = Dim.Fill (),
 			Height = Dim.Fill (),
 		};
 
