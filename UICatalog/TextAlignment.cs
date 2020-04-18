@@ -24,14 +24,17 @@ namespace UICatalog {
 			};
 			ntop.Add (win);
 
-			int i = 0;
+			int i = 1;
 			string txt = "Hello world, how are you doing today";
-			win.Add (
-				new Label (new Rect (0, 1, 40, 3), $"{i+1}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left },
-				new Label (new Rect (0, 3, 40, 3), $"{i+2}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right },
-				new Label (new Rect (0, 5, 40, 3), $"{i+3}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered },
-				new Label (new Rect (0, 7, 40, 3), $"{i+4}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified }
-			);
+			var labelList = new List<Label> ();
+			labelList.Add (new Label ($"Label:"));
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1 });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1 });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1 });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1 });
+
+			win.Add (labelList.ToArray ());
+			win.LayoutSubviews ();
 
 			Application.Run (ntop);
 		}
