@@ -122,6 +122,27 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Method invoked when a key is pressed.
+		/// </summary>
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <returns>true if the event was handled</returns>
+		public virtual bool KeyDown (KeyEvent keyEvent)
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Method invoked when a key is released.
+		/// </summary>
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <returns>true if the event was handled</returns>
+		public virtual bool KeyUp (KeyEvent keyEvent)
+		{
+			return false;
+		}
+
+
+		/// <summary>
 		/// Method invoked when a mouse event is generated
 		/// </summary>
 		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
@@ -1012,6 +1033,41 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Invoked when a key is pressed
+		/// </summary>
+		public Action<KeyEvent> OnKeyDown;
+
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public override bool KeyDown (KeyEvent keyEvent)
+		{
+			OnKeyDown?.Invoke (keyEvent);
+			if (subviews == null || subviews.Count == 0)
+				return false;
+			foreach (var view in subviews)
+				if (view.KeyDown (keyEvent))
+					return true;
+
+			return false;
+		}
+
+		/// <summary>
+		/// Invoked when a key is released
+		/// </summary>
+		public Action<KeyEvent> OnKeyUp;
+
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public override bool KeyUp (KeyEvent keyEvent)
+		{
+			OnKeyUp?.Invoke (keyEvent);
+			if (subviews == null || subviews.Count == 0)
+				return false;
+			foreach (var view in subviews)
+				if (view.KeyUp (keyEvent))
+					return true;
+
+			return false;
+		}
+		/// <summary>
 		/// Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise, it does nothing.
 		/// </summary>
 		public void EnsureFocus ()
@@ -1487,7 +1543,7 @@ namespace Terminal.Gui {
 		{
 			if (this != Application.Top) {
 				EnsureVisibleBounds (this, Frame.X, Frame.Y, out int nx, out int ny);
-				if (nx != Frame.X || ny != Frame.Y) {
+				if ((nx != Frame.X || ny != Frame.Y) && LayoutStyle != LayoutStyle.Computed) {
 					X = nx;
 					Y = ny;
 				}
@@ -1495,7 +1551,7 @@ namespace Terminal.Gui {
 				foreach (var top in Subviews) {
 					if (top is Toplevel) {
 						EnsureVisibleBounds ((Toplevel)top, top.Frame.X, top.Frame.Y, out int nx, out int ny);
-						if (nx != top.Frame.X || ny != top.Frame.Y) {
+						if ((nx != top.Frame.X || ny != top.Frame.Y) && top.LayoutStyle != LayoutStyle.Computed) {
 							top.X = nx;
 							top.Y = ny;
 						}
@@ -1948,6 +2004,7 @@ namespace Terminal.Gui {
 
 		static void ProcessKeyEvent (KeyEvent ke)
 		{
+		
 			var chain = toplevels.ToList();
 			foreach (var topLevel in chain) {
 				if (topLevel.ProcessHotKey (ke))
@@ -1966,6 +2023,29 @@ namespace Terminal.Gui {
 			foreach (var topLevel in chain) {
 				// Process the key normally
 				if (topLevel.ProcessColdKey (ke))
+					return;
+				if (topLevel.Modal)
+					break;
+			}
+		}
+
+		static void ProcessKeyDownEvent (KeyEvent ke)
+		{
+			var chain = toplevels.ToList ();
+			foreach (var topLevel in chain) {
+				if (topLevel.KeyDown (ke))
+					return;
+				if (topLevel.Modal)
+					break;
+			}
+		}
+
+		
+		static void ProcessKeyUpEvent (KeyEvent ke)
+		{
+			var chain = toplevels.ToList ();
+			foreach (var topLevel in chain) {
+				if (topLevel.KeyUp (ke))
 					return;
 				if (topLevel.Modal)
 					break;
@@ -2102,7 +2182,7 @@ namespace Terminal.Gui {
 			}
 			toplevels.Push (toplevel);
 			Current = toplevel;
-			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessMouseEvent);
+			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessKeyDownEvent, ProcessKeyUpEvent, ProcessMouseEvent);
 			if (toplevel.LayoutStyle == LayoutStyle.Computed)
 				toplevel.RelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
 			toplevel.LayoutSubviews ();
