@@ -7,18 +7,43 @@ using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog {
+
+	/// <summary>
+	/// Base class for each demo/scenario. To define a new sceanrio simply 
+	/// 1) declare a class derived from Scenario, 
+	/// 2) Initializing Name and Description as appropriate,
+	/// 3) Implement Run.
+	/// The Main program uses reflection to find all sceanarios and adds them to the 
+	/// ListView. Press ENTER to run the selected sceanrio. Press ESC to exit it.
+	/// </summary>
+	public class Scenario {
+		public ustring Name { get; set; }
+		public ustring Description { get; set; }
+		public override string ToString () => $"{Name,-30}{Description}";
+
+		public virtual void Run (Toplevel top) { 
+		}
+
+		/// <summary>
+		/// https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class
+		/// </summary>
+		public static ICollection<Scenario> GetDerivedClassesCollection ()
+		{
+			List<Scenario> objects = new List<Scenario> ();
+			foreach (Type type in typeof (Scenario).Assembly.GetTypes ()
+			    .Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf (typeof (Scenario)))) {
+				objects.Add ((Scenario)Activator.CreateInstance (type));
+			}
+			return objects;
+		}
+	}
+
+
 	/// <summary>
 	/// Main program for the Terminal.gui UI Catalog app. This app provides a chooser that allows 
 	/// for a calalog of UI demos, examples, and tests. 
 	/// </summary>
 	class Program {
-
-		public class Scenario {
-			public ustring Name { get; set; }
-			public ustring Description { get; set; }
-			public override string ToString () => $"{Name, -30}{Description}";
-		}
-
 		internal class ScenarioListDataSource : IListDataSource {
 			public List<Scenario> Scenarios { get; set; }
 
@@ -34,9 +59,8 @@ namespace UICatalog {
 			public void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width)
 			{
 				container.Move (col, line);
-				int widestName = Scenarios.OrderByDescending (i => i.Name.Length).FirstOrDefault ().Name.Length;
 				// Equivalent to an interpolated string like $"{Scenarios[item].Name, -widtestname}"; if such a thing were possible
-				var s = String.Format (String.Format ("{{0,{0}}}", -widestName), Scenarios [item].Name);
+				var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenarios [item].Name);
 				RenderUstr (driver, $"{s}  {Scenarios [item].Description}" , col, line, width);
 			}
 
@@ -66,6 +90,7 @@ namespace UICatalog {
 			}
 		}
 
+		static int _nameColumnWidth;
 		static void Main (string [] args)
 		{
 			if (Debugger.IsAttached)
@@ -75,7 +100,7 @@ namespace UICatalog {
 
 			var top = Application.Top;
 
-			var win = new Window ("UI Catalog") {
+			var win = new Window ("Terminal.Gui UI Catalog") {
 				X = 1,
 				Y = 1,
 				Width = Dim.Fill (),
@@ -92,31 +117,49 @@ namespace UICatalog {
 			});
 			top.Add (menu);
 
-			List<Scenario> scenarios = new List<Scenario> () {
-				new Scenario() { Name = "Scenario 1", Description = "This is the decription for Scenario 1."},
-				new Scenario() { Name = "Scenario 2", Description = "Scenario 2 shows off x, y, and z." },
-				new Scenario() { Name = "Scenario Number 3", Description = "#3 is all about fun!" }
-			};
+			List<Scenario> scenarios = Scenario.GetDerivedClassesCollection ().ToList();
 
+			_nameColumnWidth = scenarios.OrderByDescending (i => i.Name.Length).FirstOrDefault ().Name.Length;
+			// Equivalent to an interpolated string like $"{str, -widtestname}"; if such a thing were possible
+			var header = new Label ($"{String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), "Scenario")}  Description") {
+				X = 1,
+				Y = 0,
+				Width = Dim.Fill (3),
+				Height = 1,
+			};
+			win.Add (header);
+
+			var headerSeparator = new Label ($"{new string('-', _nameColumnWidth)}  {new string ('-', "Description".Length)}") {
+				X = 1,
+				Y = 1,
+				Width = Dim.Fill (3),
+				Height = 1,
+			};
+			win.Add (headerSeparator);
 
 			var itemSource = new ScenarioListDataSource (scenarios);
-
-			var listView = new ListView (itemSource) {
-				X = Pos.Left(win) + 1,
-				Y = Pos.Top(win) + 1,
-				Width = Dim.Fill (2),
+			var listView = new ListView () {
+				X = 3,
+				Y = 4,
+				Width = header.Width,
 				Height = Dim.Fill (2),
-				//AllowsMarking = _applicationData.OutputMode != OutputModeOption.None,
+				AllowsMarking = false,
 			};
 			top.Add (listView);
 
+			listView.CanFocus = true;
+			listView.Source = itemSource;
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				//new StatusItem(Key.F1, "~F1~ Help", () => Help()),
 				new StatusItem(Key.Esc, "~ESC~ Quit", () => Application.RequestStop() ),
+				new StatusItem(Key.Enter, "~ENTER~ Run Selected Scenario", () => {
+					scenarios[listView.SelectedItem].Run(top);
+				}),
 			});
 			top.Add (statusBar);
 
+			top.SetFocus (listView);
 			Application.Run ();
 		}
 	}
