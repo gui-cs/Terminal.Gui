@@ -157,9 +157,10 @@ namespace UICatalog {
 					scenarios[listView.SelectedItem].Run(top);
 				}),
 			});
-			top.Add (statusBar);
+			//top.Add (statusBar);
 
 			top.SetFocus (listView);
+
 			Application.Run ();
 		}
 	}

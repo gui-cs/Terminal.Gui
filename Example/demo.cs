@@ -93,10 +93,10 @@ static class Demo {
 		int i = 0;
 		string txt = "Hello world, how are you doing today";
 		container.Add (
-				new Label(new Rect(0, 1, 40, 3), $"{i+1}-{txt}") { TextAlignment = TextAlignment.Left },
-				new Label(new Rect(0, 3, 40, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
-				new Label(new Rect(0, 5, 40, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
-				new Label(new Rect(0, 7, 40, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
+				new Label (new Rect (0, 1, 40, 3), $"{i+1}-{txt}") { TextAlignment = TextAlignment.Left },
+				new Label (new Rect (0, 3, 40, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
+				new Label (new Rect (0, 5, 40, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
+				new Label (new Rect (0, 7, 40, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
 			);
 
 		Application.Run (container);
@@ -408,6 +408,34 @@ static class Demo {
 	#endregion
 
 
+	#region OnKeyDown / OnKeyUp Demo
+	private static void OnKeyDownUpDemo ()
+	{
+		var container = new Dialog (
+			"OnKeyDown & OnKeyUp demo", 50, 20,
+			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
+			new Button ("Cancel") { Clicked = () => { Application.RequestStop (); } });
+
+		var kl = new Label (new Rect (3, 3, 40, 1), "Keyboard: ");
+		container.OnKeyDown += (KeyEvent keyEvent) => KeyUpDown (keyEvent, kl, "Down");
+		container.OnKeyUp += (KeyEvent keyEvent) => KeyUpDown (keyEvent, kl, "Up");
+		container.Add (kl);
+		Application.Run (container);
+	}
+
+	private static void KeyUpDown (KeyEvent keyEvent, Label kl, string updown)
+	{
+		kl.TextColor = Colors.TopLevel.Normal;
+		if ((keyEvent.Key & Key.CtrlMask) != 0) {
+			kl.Text = $"Keyboard: Ctrl Key{updown}";
+		} else if ((keyEvent.Key & Key.AltMask) != 0) {
+			kl.Text = $"Keyboard: Alt Key{updown}";
+		} else {
+			kl.Text = $"Keyboard: {(char)keyEvent.KeyValue} Key{updown}";
+		}
+	}
+#endregion
+
 	public static Label ml;
 	public static MenuBar menu;
 	public static CheckBox menuKeysStyle;
@@ -418,7 +446,6 @@ static class Demo {
 			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 
 		//Application.UseSystemConsole = true;
-		Console.WindowHeight = 35;
 
 		Application.Init ();
 
@@ -426,11 +453,13 @@ static class Demo {
 
 		//Open ();
 #if true
+		int margin = 3;
 		var win = new Window ("Hello") {
 			X = 1,
 			Y = 1,
-			Width = Dim.Fill (),
-			Height = Dim.Fill ()-1
+
+			Width = Dim.Fill () - margin,
+			Height = Dim.Fill () - margin
 		};
 #else
 		var tframe = top.Frame;
@@ -451,7 +480,7 @@ static class Demo {
 
 		menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("Text Editor Demo", "", () => { Editor (top); }),
+				new MenuItem ("Text _Editor Demo", "", () => { Editor (top); }),
 				new MenuItem ("_New", "Creates new file", NewFile),
 				new MenuItem ("_Open", "", Open),
 				new MenuItem ("_Hex", "", () => ShowHex (top)),
@@ -469,18 +498,19 @@ static class Demo {
 				menuItems[3]
 			}),
 			new MenuBarItem ("_List Demos", new MenuItem [] {
-				new MenuItem ("Select Multiple Items", "", () => ListSelectionDemo (true)),
-				new MenuItem ("Select Single Item", "", () => ListSelectionDemo (false)),
+				new MenuItem ("Select _Multiple Items", "", () => ListSelectionDemo (true)),
+				new MenuItem ("Select _Single Item", "", () => ListSelectionDemo (false)),
 			}),
-			new MenuBarItem ("Assorted", new MenuItem [] {
-				new MenuItem ("Show text alignments", "", () => ShowTextAlignments ())
+			new MenuBarItem ("A_ssorted", new MenuItem [] {
+				new MenuItem ("_Show text alignments", "", () => ShowTextAlignments ()),
+				new MenuItem ("_OnKeyDown/Up", "", () => OnKeyDownUpDemo ())
 			}),
-			new MenuBarItem ("Test Menu and SubMenus", new MenuItem [] {
-				new MenuItem ("SubMenu1Item1",
+			new MenuBarItem ("_Test Menu and SubMenus", new MenuItem [] {
+				new MenuItem ("SubMenu1Item_1",
 					new MenuBarItem (new MenuItem[] {
-						new MenuItem ("SubMenu2Item1",
+						new MenuItem ("SubMenu2Item_1",
 							new MenuBarItem (new MenuItem [] {
-								new MenuItem ("SubMenu3Item1",
+								new MenuItem ("SubMenu3Item_1",
 									new MenuBarItem (new MenuItem [] { menuItems [2] })
 								)
 							})
@@ -488,6 +518,7 @@ static class Demo {
 					})
 				)
 			}),
+			new MenuBarItem ("_About...", "Demonstrates top-level menu item", () =>  MessageBox.ErrorQuery (50, 7, "About Demo", "This is a demo app for gui.cs", "Ok")),
 		});
 
 		menuKeysStyle = new CheckBox (3, 25, "UseKeysUpDownAsKeysLeftRight", true);
@@ -498,7 +529,7 @@ static class Demo {
 		ShowEntries (win);
 
 		int count = 0;
-		ml = new Label (new Rect (3, 18, 47, 1), "Mouse: ");
+		ml = new Label (new Rect (3, 17, 47, 1), "Mouse: ");
 		Application.RootMouseEvent += delegate (MouseEvent me) {
 			ml.TextColor = Colors.TopLevel.Normal;
 			ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
@@ -524,20 +555,24 @@ static class Demo {
 
 		win.Add (drag, dragText);
 #if true
-		// This currently causes a stack overflow, because it is referencing a window that has not had its size allocated yet
+		// FIXED: This currently causes a stack overflow, because it is referencing a window that has not had its size allocated yet
 
-		var bottom = new Label ("This should go on the bottom!");
+		var bottom = new Label ("This should go on the bottom of the same top-level!");
 		win.Add (bottom);
+		var bottom2 = new Label ("This should go on the bottom of another top-level!");
+		top.Add (bottom2);
 
-		Application.OnResized = () => {
-			bottom.X = Pos.Left (win);
-			bottom.Y = Pos.Bottom (win);
+		Application.OnLoad = () => {
+			bottom.X = win.X;
+			bottom.Y = Pos.Bottom (win) - Pos.Top (win) - margin;
+			bottom2.X = Pos.Left (win);
+			bottom2.Y = Pos.Bottom (win);
 		};
 #endif
 
 		top.Add (win);
 		//top.Add (menu);
-		top.Add (menu, statusBar, ml);
+		top.Add (menu, statusBar);
 		Application.Run ();
 	}
 }
