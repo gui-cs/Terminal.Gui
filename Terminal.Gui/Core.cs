@@ -1482,7 +1482,7 @@ namespace Terminal.Gui {
 		{
 			if (this != Application.Top) {
 				EnsureVisibleBounds (this, Frame.X, Frame.Y, out int nx, out int ny);
-				if (nx != Frame.X || ny != Frame.Y && LayoutStyle != LayoutStyle.Computed) {
+				if ((nx != Frame.X || ny != Frame.Y) && LayoutStyle != LayoutStyle.Computed) {
 					X = nx;
 					Y = ny;
 				}
