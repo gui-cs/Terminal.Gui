@@ -13,7 +13,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// A statusbar item has a title, a shortcut aka hotkey, and an action to execute on activation.
 	/// Such an item is ment to be as part of the global hotkeys of the application, which are available in the current context of the screen.
-	/// The colour of the text will be changed after each ~. Having an statusbar item with a text of `~F1~ Help` will draw *F1* as shortcut and 
+	/// The colour of the text will be changed after each ~. Having an statusbar item with a text of `~F1~ Help` will draw *F1* as shortcut and
 	/// *Help* as standard text.
 	/// </summary>
 	public class StatusItem {
@@ -49,10 +49,10 @@ namespace Terminal.Gui {
 	};
 
 	/// <summary>
-	/// A statusbar for your application.  
+	/// A statusbar for your application.
 	/// The statusbar should be context sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will
-	/// be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. 
-	/// So for each context must be a new instance of a statusbar.  
+	/// be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help.
+	/// So for each context must be a new instance of a statusbar.
 	/// </summary>
 	public class StatusBar : View {
 // After attempting to implement this, I noticed that there are hard dependencies
@@ -65,11 +65,11 @@ namespace Terminal.Gui {
 		public enum StatusBarStyle {
 			Default = 0,
 			/// <summary>
-			/// The StatusBar will snap at the the bottom line of the Parent view. 
+			/// The StatusBar will snap at the the bottom line of the Parent view.
 			/// If the console window is made larger while the app is runing, the StatusBar
 			/// will continue to snap to the bottom line of the Parent, staying visible.
 			/// On consoles that support resizing of console apps (e.g. Windows Terminal and ConEmu),
-			/// if the console window is subsequently made shorter, the status bar will remain visible 
+			/// if the console window is subsequently made shorter, the status bar will remain visible
 			/// as the Parent view resizes. If Parent is null, the StatusBar will snap to the bottom line
 			/// of the console window.
 			/// This is the default.
@@ -77,8 +77,8 @@ namespace Terminal.Gui {
 			SnapToBottom = Default,
 
 			/// <summary>
-			/// The StatusBar will act identically to MenuBar, snapping to the first line of the 
-			/// console window. 
+			/// The StatusBar will act identically to MenuBar, snapping to the first line of the
+			/// console window.
 			/// </summary>
 			SnapToTop = 1,
 		}
@@ -102,7 +102,7 @@ namespace Terminal.Gui {
 			CanFocus = false;
 			ColorScheme = Colors.Menu;
 
-			Application.OnResized += () => {
+			Application.OnLoad += () => {
 				X = 0;
 				Height = 1;
 #if SNAP_TO_TOP
@@ -134,11 +134,11 @@ namespace Terminal.Gui {
 
 		public override void Redraw (Rect region)
 		{
-			//if (Frame.Y != Driver.Rows - 1) {
-			//	Frame = new Rect (Frame.X, Driver.Rows - 1, Frame.Width, Frame.Height);
-			//	Y = Driver.Rows - 1;
-			//	SetNeedsDisplay ();
-			//}
+			if (Frame.Y != Driver.Rows - 1) {
+				Frame = new Rect (Frame.X, Driver.Rows - 1, Frame.Width, Frame.Height);
+				Y = Driver.Rows - 1;
+				SetNeedsDisplay ();
+			}
 
 			Move (0, 0);
 			Driver.SetAttribute (ColorScheme.Normal);
