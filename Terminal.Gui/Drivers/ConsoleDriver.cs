@@ -469,7 +469,7 @@ namespace Terminal.Gui {
 		/// <param name="mainLoop"></param>
 		/// <param name="keyHandler"></param>
 		/// <param name="mouseHandler"></param>
-		public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler);
+		public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler);
 
 		/// <summary>
 		/// Updates the screen to reflect all the changes that have been done to the display buffer

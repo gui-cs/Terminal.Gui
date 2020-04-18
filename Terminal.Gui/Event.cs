@@ -179,6 +179,12 @@ namespace Terminal.Gui {
 		AltMask = 0x80000000,
 
 		/// <summary>
+		///   When this value is set, the Key encodes the sequence Ctrl-KeyValue.
+		///   And the actual value must be extracted by removing the CtrlMask.
+		/// </summary>
+		CtrlMask = 0x40000000,
+
+		/// <summary>
 		/// Backspace key.
 		/// </summary>
 		Backspace = 0x100000,
@@ -297,7 +303,7 @@ namespace Terminal.Gui {
 		public bool IsAlt => (Key & Key.AltMask) != 0;
 
 		/// <summary>
-		/// Determines whether the value is a control key
+		/// Determines whether the value is a control key (and NOT just the ctrl key)
 		/// </summary>
 		/// <value><c>true</c> if is ctrl; otherwise, <c>false</c>.</value>
 		public bool IsCtrl => ((uint)Key >= 1) && ((uint)Key <= 26);
