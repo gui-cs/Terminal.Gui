@@ -13,7 +13,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// A statusbar item has a title, a shortcut aka hotkey, and an action to execute on activation.
 	/// Such an item is ment to be as part of the global hotkeys of the application, which are available in the current context of the screen.
-	/// The colour of the text will be changed after each ~. Having an statusbar item with a text of `~F1~ Help` will draw *F1* as shortcut and 
+	/// The colour of the text will be changed after each ~. Having an statusbar item with a text of `~F1~ Help` will draw *F1* as shortcut and
 	/// *Help* as standard text.
 	/// </summary>
 	public class StatusItem {
@@ -49,10 +49,10 @@ namespace Terminal.Gui {
 	};
 
 	/// <summary>
-	/// A statusbar for your application.  
+	/// A statusbar for your application.
 	/// The statusbar should be context sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will
-	/// be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. 
-	/// So for each context must be a new instance of a statusbar.  
+	/// be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help.
+	/// So for each context must be a new instance of a statusbar.
 	/// </summary>
 	public class StatusBar : View {
 		public StatusItem [] Items { get; set; }
@@ -70,7 +70,7 @@ namespace Terminal.Gui {
 			CanFocus = false;
 			ColorScheme = Colors.Menu;
 
-			Application.OnResized += () => {
+			Application.OnLoad += () => {
 				this.X = Pos.Left (Application.Top);
 				this.Y = Pos.Bottom (Application.Top);
 			};
