@@ -478,8 +478,6 @@ static class Demo {
 		menuItems [3].Action = () => ShowMenuItem (menuItems [3]);
 
 		menu = new MenuBar (new MenuBarItem [] {
-			new MenuBarItem ("F_irst...", "First!", () =>  MessageBox.ErrorQuery (50, 7, "First Dialog", "Hello.", "Ok")),
-
 			new MenuBarItem ("_File", new MenuItem [] {
 				new MenuItem ("Text _Editor Demo", "", () => { Editor (top); }),
 				new MenuItem ("_New", "Creates new file", NewFile),
@@ -498,9 +496,6 @@ static class Demo {
 					new MenuBarItem (new MenuItem[] {menuItems [0], menuItems [1] })),
 				menuItems[3]
 			}),
-
-			new MenuBarItem ("_Middle...", "Middle!", () =>  MessageBox.ErrorQuery (50, 7, "Middle top-level menu item", "Hello.", "Ok")),
-
 			new MenuBarItem ("_List Demos", new MenuItem [] {
 				new MenuItem ("Select _Multiple Items", "", () => ListSelectionDemo (true)),
 				new MenuItem ("Select _Single Item", "", () => ListSelectionDemo (false)),
@@ -522,7 +517,7 @@ static class Demo {
 					})
 				)
 			}),
-			new MenuBarItem ("_About...", "help", () =>  MessageBox.ErrorQuery (50, 7, "About Demo", "This is a demo app for gui.cs", "Ok")),
+			new MenuBarItem ("_About...", "Demonstrates top-level menu item", () =>  MessageBox.ErrorQuery (50, 7, "About Demo", "This is a demo app for gui.cs", "Ok")),
 		});
 
 		menuKeysStyle = new CheckBox (3, 25, "UseKeysUpDownAsKeysLeftRight", true);
