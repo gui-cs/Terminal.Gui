@@ -1482,7 +1482,7 @@ namespace Terminal.Gui {
 		{
 			if (this != Application.Top) {
 				EnsureVisibleBounds (this, Frame.X, Frame.Y, out int nx, out int ny);
-				if (nx != Frame.X || ny != Frame.Y) {
+				if (nx != Frame.X || ny != Frame.Y && LayoutStyle != LayoutStyle.Computed) {
 					X = nx;
 					Y = ny;
 				}
@@ -1490,7 +1490,7 @@ namespace Terminal.Gui {
 				foreach (var top in Subviews) {
 					if (top is Toplevel) {
 						EnsureVisibleBounds ((Toplevel)top, top.Frame.X, top.Frame.Y, out int nx, out int ny);
-						if (nx != top.Frame.X || ny != top.Frame.Y) {
+						if ((nx != top.Frame.X || ny != top.Frame.Y) && top.LayoutStyle != LayoutStyle.Computed) {
 							top.X = nx;
 							top.Y = ny;
 						}
