@@ -5,9 +5,6 @@
 # native line endings on checkout.
 *.cs text
 
-# Convert to CRLF line endings on checkout.
-*.sln text eol=crlf
-
 # Convert to LF line endings on checkout.
 *.sh text eol=lf
 
