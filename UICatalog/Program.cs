@@ -104,7 +104,7 @@ namespace UICatalog {
 				X = 1,
 				Y = 1,
 				Width = Dim.Fill (),
-				Height = Dim.Fill () - 1
+				Height = Dim.Fill ()
 			};
 			top.Add (win);
 

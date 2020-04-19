@@ -17,7 +17,7 @@ namespace UICatalog {
 			var tframe = top.Frame;
 			var ntop = new Toplevel (tframe);
 
-			var win = new Window ($"ESC to Close - Scenario: {Name}") {
+			var win = new FrameView ($"ESC to Close - Scenario: {Name}") {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
@@ -25,8 +25,10 @@ namespace UICatalog {
 			};
 			ntop.Add (win);
 			win.OnKeyUp += (KeyEvent ke) => {
-				if (ke.Key == Key.Esc)
+				if (ke.Key == Key.Esc) {
+					// BUGBUG: This causes a StackOverflow 
 					ntop.Running = false;
+				}
 			};
 
 			// Demonstrate using Dim to create a ruler that always measures the top-level window's width
@@ -65,7 +67,7 @@ namespace UICatalog {
 			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1});
 
 			subWin.Add (labelList.ToArray ());
-			subWin.LayoutSubviews ();
+			//subWin.LayoutSubviews ();
 
 			Application.Run (ntop);
 		}
