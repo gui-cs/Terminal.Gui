@@ -5,6 +5,7 @@
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
     <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
