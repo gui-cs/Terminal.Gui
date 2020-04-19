@@ -12,18 +12,15 @@ namespace UICatalog {
 			Description = "Demonstrates using the Dim and Pos Layout System.";
 		}
 
-		public override void Run (Toplevel top)
+		public override void Run ()
 		{
-			var tframe = top.Frame;
-			var ntop = new Toplevel (tframe);
-
+			var ntop = new Toplevel (new Rect(0, 0, Application.Driver.Cols, Application.Driver.Rows));
 			var win = new FrameView ($"ESC to Close - Scenario: {Name}") {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
-			ntop.Add (win);
 			win.OnKeyUp += (KeyEvent ke) => {
 				if (ke.Key == Key.Esc) {
 					// BUGBUG: This causes a StackOverflow 
@@ -69,6 +66,7 @@ namespace UICatalog {
 			subWin.Add (labelList.ToArray ());
 			//subWin.LayoutSubviews ();
 
+			ntop.Add (win);
 			Application.Run (ntop);
 		}
 

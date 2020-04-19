@@ -12,13 +12,11 @@ namespace UICatalog {
 			Description = "Unicode menus per PR #204";
 		}
 
-		public override void Run (Toplevel top)
+		public override void Run ()
 		{
-			base.Run (top);
+			base.Run ();
 
-			var tframe = top.Frame;
-			var ntop = new Toplevel (tframe);
-
+			var ntop = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
 			var win = new Window ($"ESC to Close - Scenario: {Name}") {
 				X = 0,
 				Y = 0,
@@ -32,7 +30,7 @@ namespace UICatalog {
 					new MenuItem ("_Создать", "Creates new file", null),
 					new MenuItem ("_Открыть", "", null),
 					new MenuItem ("Со_хранить", "", null),
-					new MenuItem ("_Выход", "", () => top.Running = false )
+					new MenuItem ("_Выход", "", () => ntop.Running = false )
 				}),
 				new MenuBarItem ("_Edit", new MenuItem [] {
 					new MenuItem ("_Copy", "", null),

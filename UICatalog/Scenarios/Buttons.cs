@@ -11,10 +11,8 @@ namespace UICatalog {
 			Description = "Demonstrates all sorts of Buttons";
 		}
 
-		public override void Run (Toplevel top) {
-			var tframe = top.Frame;
-			var ntop = new Toplevel (tframe);
-
+		public override void Run () {
+			var ntop = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
 			var win = new Window ($"ESC to Close - Scenario: {Name}") {
 				X = 0,
 				Y = 0,

@@ -21,7 +21,7 @@ namespace UICatalog {
 		public ustring Description { get; set; }
 		public override string ToString () => $"{Name,-30}{Description}";
 
-		public virtual void Run (Toplevel top) { 
+		public virtual void Run () { 
 		}
 
 		/// <summary>
@@ -154,7 +154,7 @@ namespace UICatalog {
 				//new StatusItem(Key.F1, "~F1~ Help", () => Help()),
 				new StatusItem(Key.Esc, "~ESC~ Quit", () => Application.RequestStop() ),
 				new StatusItem(Key.Enter, "~ENTER~ Run Selected Scenario", () => {
-					scenarios[listView.SelectedItem].Run(top);
+					scenarios[listView.SelectedItem].Run();
 				}),
 			});
 			top.Add (statusBar);
@@ -163,7 +163,7 @@ namespace UICatalog {
 
 			if (args.Length > 0) {
 				listView.SelectedItem = scenarios.FindIndex (s => s.Name == args [0]);
-				scenarios [listView.SelectedItem].Run (top);
+				scenarios [listView.SelectedItem].Run ();
 			}
 
 			Application.Run ();

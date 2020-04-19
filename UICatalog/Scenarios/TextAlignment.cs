@@ -12,11 +12,9 @@ namespace UICatalog {
 			Description = "Demonstrates text alignment";
 		}
 
-		public override void Run (Toplevel top)
+		public override void Run ()
 		{
-			var tframe = top.Frame;
-			var ntop = new Toplevel (tframe);
-
+			var ntop = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
 			var win = new Window ($"ESC to Close - Scenario: {Name}") {
 				X = 0,
 				Y = 0,
