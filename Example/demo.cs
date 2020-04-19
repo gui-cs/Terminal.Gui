@@ -412,29 +412,39 @@ static class Demo {
 	private static void OnKeyDownUpDemo ()
 	{
 		var container = new Dialog (
-			"OnKeyDown & OnKeyUp demo", 50, 20,
-			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
-			new Button ("Cancel") { Clicked = () => { Application.RequestStop (); } });
+			"OnKeyDown & OnKeyUp demo", 80, 20,
+			new Button ("Close") { Clicked = () => { Application.RequestStop (); } }) {
+			Width = Dim.Fill (),
+			Height = Dim.Fill (),
+		};
 
-		var kl = new Label (new Rect (3, 3, 40, 1), "Keyboard: ");
-		container.OnKeyDown += (KeyEvent keyEvent) => KeyUpDown (keyEvent, kl, "Down");
-		container.OnKeyUp += (KeyEvent keyEvent) => KeyUpDown (keyEvent, kl, "Up");
-		container.Add (kl);
+		var list = new List<string> ();
+		var listView = new ListView (list) {
+			X = 0,
+			Y = 0,
+			Width = Dim.Fill () - 1,
+			Height = Dim.Fill () - 2,
+		};
+		listView.ColorScheme = Colors.TopLevel;
+		container.Add (listView);
+
+		void KeyUpDown (KeyEvent keyEvent, string updown)
+		{
+			if ((keyEvent.Key & Key.CtrlMask) != 0) {
+				list.Add ($"Key{updown,-4}: Ctrl ");
+			} else if ((keyEvent.Key & Key.AltMask) != 0) {
+				list.Add ($"Key{updown,-4}: Alt ");
+			} else {
+				list.Add ($"Key{updown,-4}: {(((uint)keyEvent.KeyValue & (uint)Key.CharMask) > 26 ? $"{(char)keyEvent.KeyValue}" : $"{keyEvent.Key}")}");
+			}
+			listView.MoveDown ();
+		}
+
+		container.OnKeyDown += (KeyEvent keyEvent) => KeyUpDown (keyEvent, "Down");
+		container.OnKeyUp += (KeyEvent keyEvent) => KeyUpDown (keyEvent, "Up");
 		Application.Run (container);
 	}
-
-	private static void KeyUpDown (KeyEvent keyEvent, Label kl, string updown)
-	{
-		kl.TextColor = Colors.TopLevel.Normal;
-		if ((keyEvent.Key & Key.CtrlMask) != 0) {
-			kl.Text = $"Keyboard: Ctrl Key{updown}";
-		} else if ((keyEvent.Key & Key.AltMask) != 0) {
-			kl.Text = $"Keyboard: Alt Key{updown}";
-		} else {
-			kl.Text = $"Keyboard: {(char)keyEvent.KeyValue} Key{updown}";
-		}
-	}
-#endregion
+	#endregion
 
 	public static Label ml;
 	public static MenuBar menu;
