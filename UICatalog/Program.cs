@@ -161,6 +161,11 @@ namespace UICatalog {
 
 			top.SetFocus (listView);
 
+			if (args.Length > 0) {
+				listView.SelectedItem = scenarios.FindIndex (s => s.Name == args [0]);
+				scenarios [listView.SelectedItem].Run (top);
+			}
+
 			Application.Run ();
 		}
 	}
