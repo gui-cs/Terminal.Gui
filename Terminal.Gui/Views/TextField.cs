@@ -85,6 +85,8 @@ namespace Terminal.Gui {
 		{
 			if (Application.mouseGrabView != null && Application.mouseGrabView == this)
 				Application.UngrabMouse ();
+			if (SelectedLength != 0)
+				ClearAllSelection ();
 		}
 
 		public override Rect Frame {
