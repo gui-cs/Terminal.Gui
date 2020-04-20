@@ -610,6 +610,7 @@ namespace Terminal.Gui {
 		WindowsConsole.ButtonState? LastMouseButtonPressed = null;
 		bool IsButtonReleased = false;
 		bool IsButtonDoubleClicked = false;
+		Point point;
 
 		MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
@@ -617,7 +618,7 @@ namespace Terminal.Gui {
 
 			if (IsButtonDoubleClicked) {
 				Task.Run (async () => {
-					await Task.Delay (300);
+					await Task.Delay (50);
 					_ = new Action (() => IsButtonDoubleClicked = false);
 				});
 			}
@@ -649,8 +650,15 @@ namespace Terminal.Gui {
 					break;
 				}
 
-				if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved)
+				if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 					mouseFlag |= MouseFlags.ReportMousePosition;
+					point = new Point ();
+				} else {
+					point = new Point () {
+						X = mouseEvent.MousePosition.X,
+						Y = mouseEvent.MousePosition.Y
+					};
+				}
 				LastMouseButtonPressed = mouseEvent.ButtonState;
 			} else if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed != null && !IsButtonReleased &&
 				!IsButtonDoubleClicked) {
@@ -670,18 +678,24 @@ namespace Terminal.Gui {
 				IsButtonReleased = true;
 			} else if ((mouseEvent.EventFlags == 0 || mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) &&
 				IsButtonReleased) {
-				switch (LastMouseButtonPressed) {
-				case WindowsConsole.ButtonState.Button1Pressed:
-					mouseFlag = MouseFlags.Button1Clicked;
-					break;
+				var p = new Point () {
+					X = mouseEvent.MousePosition.X,
+					Y = mouseEvent.MousePosition.Y
+				};
+				if (p == point) {
+					switch (LastMouseButtonPressed) {
+					case WindowsConsole.ButtonState.Button1Pressed:
+						mouseFlag = MouseFlags.Button1Clicked;
+						break;
 
-				case WindowsConsole.ButtonState.Button2Pressed:
-					mouseFlag = MouseFlags.Button2Clicked;
-					break;
+					case WindowsConsole.ButtonState.Button2Pressed:
+						mouseFlag = MouseFlags.Button2Clicked;
+						break;
 
-				case WindowsConsole.ButtonState.RightmostButtonPressed:
-					mouseFlag = MouseFlags.Button4Clicked;
-					break;
+					case WindowsConsole.ButtonState.RightmostButtonPressed:
+						mouseFlag = MouseFlags.Button4Clicked;
+						break;
+					}
 				}
 				LastMouseButtonPressed = null;
 				IsButtonReleased = false;
