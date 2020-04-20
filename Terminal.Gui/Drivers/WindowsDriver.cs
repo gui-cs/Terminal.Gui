@@ -618,8 +618,8 @@ namespace Terminal.Gui {
 
 			if (IsButtonDoubleClicked) {
 				Task.Run (async () => {
-					await Task.Delay (50);
-					_ = new Action (() => IsButtonDoubleClicked = false);
+					await Task.Delay (100);
+					IsButtonDoubleClicked = false;
 				});
 			}
 
