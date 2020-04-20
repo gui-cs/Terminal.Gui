@@ -43,7 +43,7 @@ namespace Terminal.Gui {
 		/// <param name="text">Initial text contents.</param>
 		public TextField (string text) : this (ustring.Make (text))
 		{
-
+			Height = 1;
 		}
 
 		/// <summary>
