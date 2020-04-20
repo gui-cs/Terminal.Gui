@@ -124,7 +124,7 @@ namespace Terminal.Gui {
 							for (int i = 0; i < spaces; i++)
 								s.Append (' ');
 						if (extras > 0) {
-							s.Append ('_');
+							//s.Append ('_');
 							extras--;
 						}
 					}
@@ -178,8 +178,11 @@ namespace Terminal.Gui {
 				int x;
 				switch (textAlignment) {
 				case TextAlignment.Left:
+					x = Frame.Left;
+					break;
 				case TextAlignment.Justified:
-					x = 0;
+					Recalc ();
+					x = Frame.Left;
 					break;
 				case TextAlignment.Right:
 					x = Frame.Right - str.Length;

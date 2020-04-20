@@ -14,7 +14,7 @@ namespace UICatalog {
 
 		public override void Run ()
 		{
-			var ntop = new Toplevel (new Rect(0, 0, Application.Driver.Cols, Application.Driver.Rows));
+			var ntop = new Toplevel (); // new Rect(0, 0, Application.Driver.Cols, Application.Driver.Rows));
 			var win = new FrameView ($"ESC to Close - Scenario: {Name}") {
 				X = 0,
 				Y = 0,
@@ -45,8 +45,8 @@ namespace UICatalog {
 			win.Add (labelRuler);
 
 			// Demonstrate using Dim to create a window that fills the parent with a margin
-			int margin = 8;
-			var subWin = new Window ($"Sub Windoww with 8 character margin") {
+			int margin = 20;
+			var subWin = new Window ($"Sub Windoww with {margin} character margin") {
 				X = margin,
 				Y = margin,
 				Width = Dim.Fill (margin),
@@ -58,14 +58,15 @@ namespace UICatalog {
 			string txt = "Hello world, how are you doing today";
 			var labelList = new List<Label> ();
 			labelList.Add (new Label ($"Label:"));
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1 });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1 });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1 });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1});
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1, ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1, ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1, ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1, ColorScheme = Colors.Dialog });
 
 			subWin.Add (labelList.ToArray ());
 			//subWin.LayoutSubviews ();
 
+			ntop.LayoutStyle = LayoutStyle.Computed;
 			ntop.Add (win);
 			Application.Run (ntop);
 		}
