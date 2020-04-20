@@ -551,7 +551,9 @@ static class Demo {
 			new StatusItem(Key.F2, "~F2~ Load", null),
 			new StatusItem(Key.F3, "~F3~ Save", null),
 			new StatusItem(Key.ControlX, "~^X~ Quit", () => { if (Quit ()) top.Running = false; }),
-		});
+		}) {
+			Parent = null,
+		};
 
 		win.Add (drag, dragText);
 #if true
@@ -569,6 +571,7 @@ static class Demo {
 			bottom2.Y = Pos.Bottom (win);
 		};
 #endif
+
 
 		top.Add (win);
 		//top.Add (menu);
