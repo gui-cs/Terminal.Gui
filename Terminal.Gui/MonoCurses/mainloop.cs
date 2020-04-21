@@ -13,10 +13,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -138,7 +138,7 @@ namespace Mono.Terminal {
 			AddWatch (wakeupPipes [0], Condition.PollIn, ml => {
 				read (wakeupPipes [0], ignore, (IntPtr)1);
 				return true;
-			});			
+			});
 		}
 
 		/// <summary>
@@ -192,7 +192,7 @@ namespace Mono.Terminal {
 			}
 		}
 
-		bool IMainLoopDriver.EventsPending (bool wait) 
+		bool IMainLoopDriver.EventsPending (bool wait)
 		{
 			long now = DateTime.UtcNow.Ticks;
 
@@ -214,10 +214,10 @@ namespace Mono.Terminal {
 			int ic;
 			lock (mainLoop.idleHandlers)
 				ic = mainLoop.idleHandlers.Count;
-			return n > 0 || mainLoop.timeouts.Count > 0 && ((mainLoop.timeouts.Keys [0] - DateTime.UtcNow.Ticks) < 0) || ic > 0;			
+			return n > 0 || mainLoop.timeouts.Count > 0 && ((mainLoop.timeouts.Keys [0] - DateTime.UtcNow.Ticks) < 0) || ic > 0;
 		}
 
-		void IMainLoopDriver.MainIteration () 
+		void IMainLoopDriver.MainIteration ()
 		{
 			if (pollmap != null) {
 				foreach (var p in pollmap) {
@@ -231,7 +231,7 @@ namespace Mono.Terminal {
 					if (!watch.Callback (this.mainLoop))
 						descriptorWatchers.Remove (p.fd);
 				}
-			}			
+			}
 		}
 	}
 
@@ -247,7 +247,7 @@ namespace Mono.Terminal {
 		public Action<ConsoleKeyInfo> WindowsKeyPressed;
 		MainLoop mainLoop;
 
-		public NetMainLoop () 
+		public NetMainLoop ()
 		{
 		}
 
@@ -258,16 +258,16 @@ namespace Mono.Terminal {
 				windowsKeyResult = Console.ReadKey (true);
 				keyReady.Set ();
 			}
-		}		
+		}
 
 		void IMainLoopDriver.Setup (MainLoop mainLoop)
 		{
 			this.mainLoop = mainLoop;
 			Thread readThread = new Thread (WindowsKeyReader);
-			readThread.Start ();			
+			readThread.Start ();
 		}
 
-		void IMainLoopDriver.Wakeup () 
+		void IMainLoopDriver.Wakeup ()
 		{
 		}
 
@@ -298,7 +298,7 @@ namespace Mono.Terminal {
 				if (WindowsKeyPressed!= null)
 					WindowsKeyPressed (windowsKeyResult.Value);
 				windowsKeyResult = null;
-			}			
+			}
 		}
 	}
 
@@ -346,7 +346,6 @@ namespace Mono.Terminal {
 				action ();
 				return false;
 			});
-			driver.Wakeup ();
 		}
 
 		/// <summary>
@@ -373,7 +372,7 @@ namespace Mono.Terminal {
 		{
 			timeouts.Add ((DateTime.UtcNow + time).Ticks, timeout);
 		}
-		
+
 		/// <summary>
 		///   Adds a timeout to the mainloop.
 		/// </summary>
@@ -440,9 +439,9 @@ namespace Mono.Terminal {
 						idleHandlers.Add (idle);
 			}
 		}
-		
+
 		bool running;
-		
+
 		/// <summary>
 		///   Stops the mainloop.
 		/// </summary>
@@ -458,7 +457,7 @@ namespace Mono.Terminal {
 		/// <remarks>
 		///   You can use this method if you want to probe if events are pending.
 		///   Typically used if you need to flush the input queue while still
-		///   running some of your own code in your main thread. 
+		///   running some of your own code in your main thread.
 		/// </remarks>
 		public bool EventsPending (bool wait = false)
 		{
@@ -486,7 +485,7 @@ namespace Mono.Terminal {
 					RunIdle();
 			}
 		}
-		
+
 		/// <summary>
 		///   Runs the mainloop.
 		/// </summary>

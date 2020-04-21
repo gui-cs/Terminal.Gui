@@ -432,7 +432,7 @@ namespace Terminal.Gui {
 			}
 			host.handled = false;
 			bool disabled;
-			if (me.Flags == MouseFlags.Button1Pressed) {
+			if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) {
 				disabled = false;
 				if (me.Y < 1)
 					return true;
@@ -444,7 +444,8 @@ namespace Terminal.Gui {
 				if (item != null && !disabled)
 					Run (barItems.Children [meY].Action);
 				return true;
-			} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.ReportMousePosition) {
+			} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked ||
+				me.Flags == MouseFlags.ReportMousePosition) {
 				disabled = false;
 				if (me.Y < 1)
 					return true;
@@ -984,13 +985,14 @@ namespace Terminal.Gui {
 			}
 			handled = false;
 
-			if (me.Flags == MouseFlags.Button1Pressed ||
+			if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked ||
 				(me.Flags == MouseFlags.ReportMousePosition && selected > -1)) {
 				int pos = 1;
 				int cx = me.X;
 				for (int i = 0; i < Menus.Length; i++) {
 					if (cx > pos && me.X < pos + 1 + Menus [i].TitleLength) {
-						if (selected == i && me.Flags == MouseFlags.Button1Pressed && !isMenuClosed) {
+						if (selected == i && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) &&
+							!isMenuClosed) {
 							Application.UngrabMouse ();
 							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
@@ -998,7 +1000,8 @@ namespace Terminal.Gui {
 							} else {
 								CloseMenu ();
 							}
-						} else if (me.Flags == MouseFlags.Button1Pressed && isMenuClosed) {
+						} else if ((me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) &&
+							isMenuClosed) {
 							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
 								menu.Run (Menus [i].Action);
@@ -1033,7 +1036,8 @@ namespace Terminal.Gui {
 						Application.GrabMouse (me.View);
 						me.View.MouseEvent (me);
 					}
-				} else if (!(me.View is MenuBar || me.View is Menu) && me.Flags.HasFlag (MouseFlags.Button1Pressed)) {
+				} else if (!(me.View is MenuBar || me.View is Menu) && (me.Flags.HasFlag (MouseFlags.Button1Pressed) ||
+					me.Flags == MouseFlags.Button1DoubleClicked)) {
 					Application.UngrabMouse ();
 					CloseAllMenus ();
 					handled = false;
@@ -1042,22 +1046,23 @@ namespace Terminal.Gui {
 					handled = false;
 					return false;
 				}
-			} else if (isMenuClosed && me.Flags.HasFlag (MouseFlags.Button1Pressed)) {
+			} else if (isMenuClosed && (me.Flags.HasFlag (MouseFlags.Button1Pressed) || me.Flags == MouseFlags.Button1DoubleClicked)) {
 				Application.GrabMouse (current);
 			} else {
 				handled = false;
 				return false;
 			}
-			//if (me.View != this && me.Flags != MouseFlags.Button1Pressed)
+			//if (me.View != this && (me.Flags != MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked))
 			//	return true;
-			//else if (me.View != this && me.Flags == MouseFlags.Button1Pressed) {
+			//else if (me.View != this && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked)) {
 			//	Application.UngrabMouse ();
 			//	host.CloseAllMenus ();
 			//	return true;
 			//}
 
 
-			//if (!(me.View is MenuBar) && !(me.View is Menu) && me.Flags != MouseFlags.Button1Pressed)
+			//if (!(me.View is MenuBar) && !(me.View is Menu) && (me.Flags != MouseFlags.Button1Pressed ||
+			// me.Flags != MouseFlags.Button1DoubleClicked))
 			//	return false;
 
 			//if (Application.mouseGrabView != null) {
@@ -1066,11 +1071,12 @@ namespace Terminal.Gui {
 			//		me.Y -= me.OfY;
 			//		me.View.MouseEvent (me);
 			//		return true;
-			//	} else if (!(me.View is MenuBar || me.View is Menu) && me.Flags == MouseFlags.Button1Pressed) {
+			//	} else if (!(me.View is MenuBar || me.View is Menu) && (me.Flags == MouseFlags.Button1Pressed ||
+			//		me.Flags == MouseFlags.Button1DoubleClicked)) {
 			//		Application.UngrabMouse ();
 			//		CloseAllMenus ();
 			//	}
-			//} else if (!isMenuClosed && selected == -1 && me.Flags == MouseFlags.Button1Pressed) {
+			//} else if (!isMenuClosed && selected == -1 && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked)) {
 			//	Application.GrabMouse (this);
 			//	return true;
 			//}
@@ -1082,7 +1088,7 @@ namespace Terminal.Gui {
 			//	} else if (me.View != current && me.View is MenuBar && me.View is Menu) {
 			//		Application.UngrabMouse ();
 			//		Application.GrabMouse (me.View);
-			//	} else if (me.Flags == MouseFlags.Button1Pressed) {
+			//	} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) {
 			//		Application.UngrabMouse ();
 			//		CloseMenu ();
 			//	}
