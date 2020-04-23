@@ -594,6 +594,8 @@ namespace Terminal.Gui {
 
 			case WindowsConsole.EventType.Mouse:
 				mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
+				if (IsButtonReleased)
+					mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
 				break;
 
 			case WindowsConsole.EventType.WindowBufferSize:
@@ -635,7 +637,7 @@ namespace Terminal.Gui {
 
 			if ((mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null && !IsButtonDoubleClicked) ||
 				(mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved &&
-				mouseEvent.ButtonState != 0 && !IsButtonDoubleClicked)) {
+				mouseEvent.ButtonState != 0 && !IsButtonReleased && !IsButtonDoubleClicked)) {
 				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Pressed;
@@ -653,6 +655,7 @@ namespace Terminal.Gui {
 				if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 					mouseFlag |= MouseFlags.ReportMousePosition;
 					point = new Point ();
+					IsButtonReleased = false;
 				} else {
 					point = new Point () {
 						X = mouseEvent.MousePosition.X,
@@ -660,8 +663,8 @@ namespace Terminal.Gui {
 					};
 				}
 				LastMouseButtonPressed = mouseEvent.ButtonState;
-			} else if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed != null && !IsButtonReleased &&
-				!IsButtonDoubleClicked) {
+			} else if ((mouseEvent.EventFlags == 0 || mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) &&
+				LastMouseButtonPressed != null && !IsButtonReleased && !IsButtonDoubleClicked) {
 				switch (LastMouseButtonPressed) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Released;
@@ -677,7 +680,7 @@ namespace Terminal.Gui {
 				}
 				IsButtonReleased = true;
 			} else if ((mouseEvent.EventFlags == 0 || mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) &&
-				IsButtonReleased) {
+				  IsButtonReleased) {
 				var p = new Point () {
 					X = mouseEvent.MousePosition.X,
 					Y = mouseEvent.MousePosition.Y
@@ -696,6 +699,8 @@ namespace Terminal.Gui {
 						mouseFlag = MouseFlags.Button4Clicked;
 						break;
 					}
+				} else {
+					mouseFlag = 0;
 				}
 				LastMouseButtonPressed = null;
 				IsButtonReleased = false;

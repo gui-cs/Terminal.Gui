@@ -85,7 +85,7 @@ namespace Terminal.Gui {
 		{
 			if (Application.mouseGrabView != null && Application.mouseGrabView == this)
 				Application.UngrabMouse ();
-			if (SelectedLength != 0)
+			if (SelectedLength != 0 && !(Application.mouseGrabView is MenuBar))
 				ClearAllSelection ();
 		}
 
