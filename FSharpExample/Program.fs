@@ -25,7 +25,6 @@ type Demo() = class end
         new(x : int, y : int) as this =
             (Box10x())
             then
-            this.Frame <- new Rect(x, y, 20, 10)
             ()
         member this.GetContentSize() =
             new Size(this.w, this.h)
@@ -36,7 +35,7 @@ type Demo() = class end
             do
             let mutable (y : int) = 0
             while (y < this.h) do
-            Application.Driver.Move (0, y)
+            this.Move (0, y)
             Application.Driver.AddStr (ustr (y.ToString()))
             do
             let mutable (x : int) = 0
