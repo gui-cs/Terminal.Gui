@@ -499,7 +499,9 @@ namespace Terminal.Gui {
 
 		void IMainLoopDriver.Wakeup ()
 		{
-			tokenSource.Cancel ();
+			//tokenSource.Cancel ();
+			eventReady.Reset ();
+			eventReady.Set ();
 		}
 
 		bool IMainLoopDriver.EventsPending (bool wait)
@@ -610,6 +612,7 @@ namespace Terminal.Gui {
 		}
 
 		WindowsConsole.ButtonState? LastMouseButtonPressed = null;
+		bool IsButtonPressed = false;
 		bool IsButtonReleased = false;
 		bool IsButtonDoubleClicked = false;
 		Point point;
@@ -632,6 +635,7 @@ namespace Terminal.Gui {
 			// map to the correct clicked event.
 			if ((LastMouseButtonPressed != null || IsButtonReleased) && mouseEvent.ButtonState != 0) {
 				LastMouseButtonPressed = null;
+				IsButtonPressed = false;
 				IsButtonReleased = false;
 			}
 
@@ -663,6 +667,26 @@ namespace Terminal.Gui {
 					};
 				}
 				LastMouseButtonPressed = mouseEvent.ButtonState;
+				IsButtonPressed = true;
+
+				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
+					Task.Run (async () => {
+						while (IsButtonPressed) {
+							await Task.Delay (200);
+							var me = new MouseEvent () {
+								X = mouseEvent.MousePosition.X,
+								Y = mouseEvent.MousePosition.Y,
+								Flags = mouseFlag
+							};
+
+							if (IsButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
+								mouseHandler (me);
+								mainLoop.Driver.Wakeup ();
+							}
+						}
+					});
+				}
+
 			} else if ((mouseEvent.EventFlags == 0 || mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) &&
 				LastMouseButtonPressed != null && !IsButtonReleased && !IsButtonDoubleClicked) {
 				switch (LastMouseButtonPressed) {
@@ -678,6 +702,7 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button4Released;
 					break;
 				}
+				IsButtonPressed = false;
 				IsButtonReleased = true;
 			} else if ((mouseEvent.EventFlags == 0 || mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) &&
 				  IsButtonReleased) {
