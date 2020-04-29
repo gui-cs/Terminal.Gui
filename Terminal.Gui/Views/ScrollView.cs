@@ -114,21 +114,19 @@ namespace Terminal.Gui {
 					var by1 = position * bh / Size;
 					var by2 = (position + bh) * bh / Size;
 
-					
 					Move (col, 0);
 					Driver.AddRune ('^');
 					Move (col, Bounds.Height - 1);
 					Driver.AddRune ('v');
 					for (int y = 0; y < bh; y++) {
 						Move (col, y+1);
-
-						if (y < by1 || y > by2)
+						if (y < by1 - 1 || y > by2)
 							special = Driver.Stipple;
 						else {
-							if (by2 - by1 == 0)
+							if (by2 - by1 == 0 && by1 < bh - 1)
 								special = Driver.Diamond;
 							else {
-								if (y == by1)
+								if (y == by1 - 1)
 									special = Driver.TopTee;
 								else if (y == by2)
 									special = Driver.BottomTee;
@@ -192,7 +190,8 @@ namespace Terminal.Gui {
 
 		public override bool MouseEvent(MouseEvent me)
 		{
-			if (me.Flags != MouseFlags.Button1Clicked)
+			if (me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
+				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
 				return false;
 
 			int location = vertical ? me.Y : me.X;
@@ -208,11 +207,23 @@ namespace Terminal.Gui {
 				if (location == 0) {
 					if (pos > 0)
 						SetPosition (pos - 1);
-				} else if (location == barsize + 1){
+				} else if (location == barsize + 1) {
 					if (pos + 1 + barsize < Size)
 						SetPosition (pos + 1);
 				} else {
-					Console.WriteLine ("TODO at ScrollBarView");
+					var b1 = pos * barsize / Size;
+					var b2 = (pos + barsize) * barsize / Size;
+
+					if (b2 == 0 && location == 1 && pos == 0 ||
+						(b2 == barsize && location == barsize) ||
+						(location > b1 && location < b2)) {
+						return true;
+					} else if (location <= barsize) {
+						if (location > 1 && location >= b2)
+							SetPosition (Math.Min (pos + barsize, Size));
+						else if (location <= b2 && pos > 0 || pos > 0)
+							SetPosition (Math.Max (pos - barsize, 0));
+					}
 				}
 			}
 
@@ -309,7 +320,7 @@ namespace Terminal.Gui {
 			set {
 				if (value == showHorizontalScrollIndicator)
 					return;
-				
+
 				showHorizontalScrollIndicator = value;
 				SetNeedsDisplay ();
 				if (value)
@@ -338,7 +349,7 @@ namespace Terminal.Gui {
 			set {
 				if (value == showVerticalScrollIndicator)
 					return;
-				
+
 				showVerticalScrollIndicator = value;
 				SetNeedsDisplay ();
 				if (value)
@@ -431,7 +442,7 @@ namespace Terminal.Gui {
 			var nx = Math.Max (-contentSize.Width, contentOffset.X - cols);
 			if (nx == contentOffset.X)
 				return false;
-			
+
 			ContentOffset = new Point (nx, contentOffset.Y);
 			return true;
 		}
@@ -460,6 +471,12 @@ namespace Terminal.Gui {
 
 			case Key.CursorRight:
 				return ScrollRight (1);
+
+			case Key.Home:
+				return ScrollUp (contentSize.Height);
+
+			case Key.End:
+				return ScrollDown (contentSize.Height);
 
 			}
 			return false;
