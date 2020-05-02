@@ -445,7 +445,8 @@ namespace Terminal.Gui {
 					Run (barItems.Children [meY].Action);
 				return true;
 			} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked ||
-				me.Flags == MouseFlags.ReportMousePosition) {
+				me.Flags == MouseFlags.ReportMousePosition ||
+				me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
 				disabled = false;
 				if (me.Y < 1)
 					return true;
@@ -557,7 +558,8 @@ namespace Terminal.Gui {
 					// The right way to do this is to SetFocus(MenuBar), but for some reason 
 					// that faults.
 
-					Activate (0);
+					//Activate (0);
+					StartMenu ();
 					SetNeedsDisplay ();
 				} else {
 					// There's an open menu. If this Alt key-up is a pre-cursor to an acellerator
@@ -986,13 +988,14 @@ namespace Terminal.Gui {
 			handled = false;
 
 			if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked ||
-				(me.Flags == MouseFlags.ReportMousePosition && selected > -1)) {
+				(me.Flags == MouseFlags.ReportMousePosition && selected > -1) ||
+				(me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && selected > -1)) {
 				int pos = 1;
 				int cx = me.X;
 				for (int i = 0; i < Menus.Length; i++) {
 					if (cx > pos && me.X < pos + 1 + Menus [i].TitleLength) {
 						if (selected == i && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) &&
-							!isMenuClosed) {
+											!isMenuClosed) {
 							Application.UngrabMouse ();
 							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
@@ -1036,7 +1039,7 @@ namespace Terminal.Gui {
 						Application.GrabMouse (me.View);
 						me.View.MouseEvent (me);
 					}
-				} else if (!(me.View is MenuBar || me.View is Menu) && (me.Flags.HasFlag (MouseFlags.Button1Pressed) ||
+				} else if (!(me.View is MenuBar || me.View is Menu) && (me.Flags.HasFlag (MouseFlags.Button1Clicked) ||
 					me.Flags == MouseFlags.Button1DoubleClicked)) {
 					Application.UngrabMouse ();
 					CloseAllMenus ();
@@ -1046,7 +1049,8 @@ namespace Terminal.Gui {
 					handled = false;
 					return false;
 				}
-			} else if (isMenuClosed && (me.Flags.HasFlag (MouseFlags.Button1Pressed) || me.Flags == MouseFlags.Button1DoubleClicked)) {
+			} else if (isMenuClosed && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked ||
+				me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
 				Application.GrabMouse (current);
 			} else {
 				handled = false;

@@ -435,6 +435,7 @@ namespace Terminal.Gui {
 
 		public override int Cols => cols;
 		public override int Rows => rows;
+		public override bool AllowNewLine { get; set; }
 
 		public WindowsDriver ()
 		{
@@ -679,6 +680,9 @@ namespace Terminal.Gui {
 								Flags = mouseFlag
 							};
 
+							var view = Application.wantContinuousButtonPressedView;
+							if (view == null)
+								break;
 							if (IsButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
 								mouseHandler (me);
 								mainLoop.Driver.Wakeup ();
@@ -991,6 +995,9 @@ namespace Terminal.Gui {
 
 		public override void AddRune (Rune rune)
 		{
+			if (IsOutBounds (rune))
+				return;
+
 			var position = crow * Cols + ccol;
 
 			if (Clip.Contains (ccol, crow)) {
@@ -1006,7 +1013,7 @@ namespace Terminal.Gui {
 					AddStr (" ");
 				}
 			}
-			if (ccol == Cols) {
+			if (AllowNewLine && ccol == Cols) {
 				ccol = 0;
 				if (crow + 1 < Rows)
 					crow++;
@@ -1017,8 +1024,49 @@ namespace Terminal.Gui {
 
 		public override void AddStr (ustring str)
 		{
-			foreach (var rune in str)
+			foreach (var rune in str) {
+				if (IsOutBounds (rune))
+					return;
 				AddRune (rune);
+			}
+		}
+
+		bool IsOutBounds (Rune rune)
+		{
+			View view = Application.CurrentView;
+			View top = view.SuperView;
+			int h, w;
+
+			if (view is Toplevel) {
+				top = view;
+			} else if (top == null) {
+				top = Application.Top;
+			} else {
+				while (top != null) {
+					if (top is Toplevel || top.SuperView == null)
+						break;
+					top = top.SuperView;
+				}
+			}
+
+			int runeWidth = Rune.ColumnWidth (rune);
+			int maxWidth = ccol + (runeWidth > 1 && !AllowNewLine ? runeWidth : 0);
+
+			if (top.SuperView == null && !((Toplevel)top).Modal)
+				return false;
+			else if (((Toplevel)top).Modal && maxWidth >= Cols)
+				return true;
+			else if (view == top && ((Toplevel)top).Modal && maxWidth < Cols)
+				return false;
+
+			h = top.Frame.Top + top.Frame.Height;
+			w = top.Frame.Left + top.Frame.Width;
+
+
+			if (crow < 0 || ccol < 0 || crow >= h || maxWidth >= w)
+				return true;
+			else
+				return false;
 		}
 
 		int currentAttribute;

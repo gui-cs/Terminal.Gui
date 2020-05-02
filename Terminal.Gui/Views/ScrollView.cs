@@ -79,6 +79,7 @@ namespace Terminal.Gui {
 			vertical = isVertical;
 			this.position = position;
 			this.size = size;
+			WantContinuousButtonPressed = true;
 		}
 
 		/// <summary>

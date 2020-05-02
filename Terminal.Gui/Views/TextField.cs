@@ -78,15 +78,16 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			Used = true;
 			WantMousePositionReports = true;
-			OnLeave += TextField_OnLeave;
 		}
 
-		void TextField_OnLeave (object sender, EventArgs e)
+		public override bool OnLeave ()
 		{
 			if (Application.mouseGrabView != null && Application.mouseGrabView == this)
 				Application.UngrabMouse ();
 			if (SelectedLength != 0 && !(Application.mouseGrabView is MenuBar))
 				ClearAllSelection ();
+
+			return base.OnLeave ();
 		}
 
 		public override Rect Frame {

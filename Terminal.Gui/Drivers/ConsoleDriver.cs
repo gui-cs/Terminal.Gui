@@ -443,6 +443,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public abstract int Rows { get; }
 		/// <summary>
+		/// If true, it allows to write at the beginning of the next line if it's exceed the column limit.
+		/// </summary>
+		public abstract bool AllowNewLine { get; set; }
+		/// <summary>
 		/// Initializes the driver
 		/// </summary>
 		/// <param name="terminalResized">Method to invoke when the terminal is resized.</param>
@@ -540,47 +544,73 @@ namespace Terminal.Gui {
 			Move (region.X, region.Y);
 			if (padding > 0) {
 				for (int l = 0; l < padding; l++)
-					for (b = 0; b < width; b++)
+					for (b = region.X; b < region.X + width; b++) {
 						AddRune (' ');
+						Move (b + 1, region.Y);
+					}
 			}
 			Move (region.X, region.Y + padding);
-			for (int c = 0; c < padding; c++)
+			for (int c = 0; c < padding; c++) {
 				AddRune (' ');
+				Move (region.X + 1, region.Y + padding);
+			}
 			AddRune (ULCorner);
-			for (b = 0; b < fwidth - 2; b++)
+			for (b = region.X; b < region.X + fwidth - 2; b++) {
 				AddRune (HLine);
+				Move (b + (padding > 0 ? padding + 2 : 2), region.Y + padding);
+			}
 			AddRune (URCorner);
-			for (int c = 0; c < padding; c++)
+			for (int c = 0; c < padding; c++) {
 				AddRune (' ');
-
+				Move (region.X + 1, region.Y + padding);
+			}
 			for (b = 1 + padding; b < fheight; b++) {
 				Move (region.X, region.Y + b);
-				for (int c = 0; c < padding; c++)
+				for (int c = 0; c < padding; c++) {
 					AddRune (' ');
+					Move (region.X + 1, region.Y + b);
+				}
 				AddRune (VLine);
 				if (fill) {
-					for (int x = 1; x < fwidth - 1; x++)
+					for (int x = region.X + 1; x < region.X + fwidth - 1; x++) {
 						AddRune (' ');
-				} else
-					Move (region.X + fwidth - 1, region.Y + b);
+						Move (x + (padding > 0 ? padding + 1 : 1), region.Y + b);
+					}
+				} else {
+					if (padding > 0)
+						Move (region.X + fwidth, region.Y + b);
+					else
+						Move (region.X + fwidth - 1, region.Y + b);
+				}
 				AddRune (VLine);
-				for (int c = 0; c < padding; c++)
+				for (int c = 0; c < padding; c++) {
 					AddRune (' ');
+					Move (region.X + 1, region.Y + b);
+				}
 			}
 			Move (region.X, region.Y + fheight);
-			for (int c = 0; c < padding; c++)
+			for (int c = 0; c < padding; c++) {
 				AddRune (' ');
+				Move (region.X + 1, region.Y + b);
+			}
 			AddRune (LLCorner);
-			for (b = 0; b < fwidth - 2; b++)
+			for (b = region.X; b < region.X + fwidth - 2; b++) {
 				AddRune (HLine);
+				Move (b + (padding > 0 ? padding + 2 : 2), region.Y + fheight);
+			}
 			AddRune (LRCorner);
-			for (int c = 0; c < padding; c++)
+			for (int c = 0; c < padding; c++) {
 				AddRune (' ');
+				Move (region.X + 1, region.Y);
+			}
 			if (padding > 0) {
 				Move (region.X, region.Y + height - padding);
-				for (int l = 0; l < padding; l++)
-					for (b = 0; b < width; b++)
+				for (int l = 0; l < padding; l++) {
+					for (b = region.X; b < region.X + width; b++) {
 						AddRune (' ');
+						Move (b + 1, region.Y + height - padding);
+					}
+				}
 			}
 		}
 
