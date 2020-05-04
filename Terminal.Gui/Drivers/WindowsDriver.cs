@@ -934,10 +934,9 @@ namespace Terminal.Gui {
 		private static Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 		{
 			Key keyMod = new Key ();
-			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift))
+			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift) &&
+				!(keyInfo.Key >= ConsoleKey.A && keyInfo.Key <= ConsoleKey.Z))
 				keyMod = Key.ShiftMask;
-			// Ignoring because special keys are already defined for these cases (ControlA_Z)
-			// and it can complicate who is not comparing with Key.CtrlMask.
 			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control) &&
 				!(keyInfo.Key >= ConsoleKey.A && keyInfo.Key <= ConsoleKey.Z))
 				keyMod |= Key.CtrlMask;
