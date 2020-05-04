@@ -203,8 +203,9 @@ namespace Terminal.Gui {
 				keyHandler (new KeyEvent ((Key)wch));
 		}
 
-		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler)
+		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
+			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			Curses.timeout (-1);
 
 			(mainLoop.Driver as Mono.Terminal.UnixMainLoop).AddWatch (0, Mono.Terminal.UnixMainLoop.Condition.PollIn, x => {
