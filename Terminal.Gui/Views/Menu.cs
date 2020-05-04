@@ -1040,7 +1040,7 @@ namespace Terminal.Gui {
 						me.View.MouseEvent (me);
 					}
 				} else if (!(me.View is MenuBar || me.View is Menu) && (me.Flags.HasFlag (MouseFlags.Button1Clicked) ||
-					me.Flags == MouseFlags.Button1DoubleClicked)) {
+					me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1Pressed)) {
 					Application.UngrabMouse ();
 					CloseAllMenus ();
 					handled = false;
