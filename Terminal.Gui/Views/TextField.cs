@@ -409,6 +409,7 @@ namespace Terminal.Gui {
 
 				break;
 
+			case Key.CursorLeft | Key.CtrlMask:
 			case (Key)((int)'b' + Key.AltMask):
 				ClearAllSelection ();
 				int bw = WordBackward (point);
@@ -417,6 +418,7 @@ namespace Terminal.Gui {
 				Adjust ();
 				break;
 
+			case Key.CursorRight | Key.CtrlMask:
 			case (Key)((int)'f' + Key.AltMask):
 				ClearAllSelection ();
 				int fw = WordForward (point);

@@ -1066,9 +1066,15 @@ namespace Terminal.Gui {
 			SuperView?.SetFocus(this);
 		}
 
+		/// <summary>
+		/// Invoked when a character key is pressed and occurs after the key down event.
+		/// </summary>
+		public Action<KeyEvent> OnKeyPress;
+
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
+			OnKeyPress?.Invoke (keyEvent);
 			if (Focused?.ProcessKey (keyEvent) == true)
 				return true;
 
@@ -1078,6 +1084,7 @@ namespace Terminal.Gui {
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
+			OnKeyPress?.Invoke (keyEvent);
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1089,6 +1096,7 @@ namespace Terminal.Gui {
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool ProcessColdKey (KeyEvent keyEvent)
 		{
+			OnKeyPress?.Invoke (keyEvent);
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1554,7 +1562,7 @@ namespace Terminal.Gui {
 				return true;
 			case Key.CursorLeft:
 			case Key.CursorUp:
-			case Key.BackTab:
+			case Key.BackTab | Key.ShiftMask:
 				old = Focused;
 				if (!FocusPrev ())
 					FocusPrev ();

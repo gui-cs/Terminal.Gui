@@ -318,7 +318,8 @@ namespace Terminal.Gui {
 		/// Determines whether the value is a control key (and NOT just the ctrl key)
 		/// </summary>
 		/// <value><c>true</c> if is ctrl; otherwise, <c>false</c>.</value>
-		public bool IsCtrl => ((uint)Key >= 1) && ((uint)Key <= 26);
+		//public bool IsCtrl => ((uint)Key >= 1) && ((uint)Key <= 26);
+		public bool IsCtrl => (Key & Key.CtrlMask) != 0;
 
 		/// <summary>
 		///   Constructs a new KeyEvent from the provided Key value - can be a rune cast into a Key value
