@@ -435,7 +435,9 @@ static class Demo {
 
 		void KeyUpDown (KeyEvent keyEvent, string updown)
 		{
-			if ((keyEvent.Key & Key.CtrlMask) != 0) {
+			if ((keyEvent.Key & Key.ShiftMask) != 0) {
+				list.Add ($"Key{updown,-4}: Shift ");
+			} else if ((keyEvent.Key & Key.CtrlMask) != 0) {
 				list.Add ($"Key{updown,-4}: Ctrl ");
 			} else if ((keyEvent.Key & Key.AltMask) != 0) {
 				list.Add ($"Key{updown,-4}: Alt ");
@@ -565,7 +567,7 @@ static class Demo {
 			new StatusItem(Key.F1, "~F1~ Help", () => Help()),
 			new StatusItem(Key.F2, "~F2~ Load", null),
 			new StatusItem(Key.F3, "~F3~ Save", null),
-			new StatusItem(Key.ControlX, "~^X~ Quit", () => { if (Quit ()) top.Running = false; }),
+			new StatusItem(Key.ControlQ, "~^Q~ Quit", () => { if (Quit ()) top.Running = false; }),
 		}) {
 			Parent = null,
 		};

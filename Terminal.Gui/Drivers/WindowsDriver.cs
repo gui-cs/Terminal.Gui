@@ -53,6 +53,7 @@ namespace Terminal.Gui {
 			var newConsoleMode = originalConsoleMode;
 			newConsoleMode |= (uint)(ConsoleModes.EnableMouseInput | ConsoleModes.EnableExtendedFlags);
 			newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
+			newConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
 			ConsoleMode = newConsoleMode;
 		}
 
@@ -124,6 +125,7 @@ namespace Terminal.Gui {
 
 		[Flags]
 		public enum ConsoleModes : uint {
+			EnableProcessedInput = 1,
 			EnableMouseInput = 16,
 			EnableQuickEditMode = 64,
 			EnableExtendedFlags = 128,
@@ -569,6 +571,9 @@ namespace Terminal.Gui {
 					// Ctrl = VK_CONTROL = 0x11
 					// Alt = VK_MENU = 0x12
 					switch (inputEvent.KeyEvent.wVirtualKeyCode) {
+					case 0x10:
+						key = new KeyEvent (Key.ShiftMask);
+						break;
 					case 0x11:
 						key = new KeyEvent (Key.CtrlMask);
 						break;
@@ -825,21 +830,21 @@ namespace Terminal.Gui {
 			case ConsoleKey.Tab:
 				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.BackTab : Key.Tab;
 			case ConsoleKey.Home:
-				return Key.Home;
+				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.ShiftMask | Key.Home : Key.Home;
 			case ConsoleKey.End:
-				return Key.End;
+				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.ShiftMask | Key.End : Key.End;
 			case ConsoleKey.LeftArrow:
-				return Key.CursorLeft;
+				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.ShiftMask | Key.CursorLeft : Key.CursorLeft;
 			case ConsoleKey.RightArrow:
-				return Key.CursorRight;
+				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.ShiftMask | Key.CursorRight : Key.CursorRight;
 			case ConsoleKey.UpArrow:
-				return Key.CursorUp;
+				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.ShiftMask | Key.CursorUp : Key.CursorUp;
 			case ConsoleKey.DownArrow:
-				return Key.CursorDown;
+				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.ShiftMask | Key.CursorDown : Key.CursorDown;
 			case ConsoleKey.PageUp:
-				return Key.PageUp;
+				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.ShiftMask | Key.PageUp : Key.PageUp;
 			case ConsoleKey.PageDown:
-				return Key.PageDown;
+				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.ShiftMask | Key.PageDown : Key.PageDown;
 			case ConsoleKey.Enter:
 				return Key.Enter;
 			case ConsoleKey.Spacebar:
@@ -848,6 +853,8 @@ namespace Terminal.Gui {
 				return Key.Backspace;
 			case ConsoleKey.Delete:
 				return Key.DeleteChar;
+			case ConsoleKey.Insert:
+				return Key.InsertChar;
 
 			case ConsoleKey.NumPad0:
 				return keyInfoEx.NumLock ? (Key)(uint)'0' : Key.InsertChar;

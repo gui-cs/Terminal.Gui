@@ -15,19 +15,45 @@ namespace Designer {
 			MessageBox.ErrorQuery (50, 7, "Error", "There is nothing to close", "Ok");
 		}
 
+		static void Copy ()
+		{
+			TextField textField = menu.LastFocused as TextField;
+			if (textField != null && textField.SelectedLength != 0) {
+				textField.Copy ();
+			}
+		}
+
+		static void Cut ()
+		{
+			TextField textField = menu.LastFocused as TextField;
+			if (textField != null && textField.SelectedLength != 0) {
+				textField.Cut ();
+			}
+		}
+
+		static void Paste ()
+		{
+			TextField textField = menu.LastFocused as TextField;
+			if (textField != null) {
+				textField.Paste ();
+			}
+		}
+
+		public static MenuBar menu;
+
 		public static void Main (string [] args)
 		{
 			Application.Init ();
 
-			var menu = new MenuBar (new MenuBarItem [] {
+			menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Close", "", () => Close ()),
 					new MenuItem ("_Quit", "", () => { Application.RequestStop (); })
 				}),
 				new MenuBarItem ("_Edit", new MenuItem [] {
-					new MenuItem ("_Copy", "", null),
-					new MenuItem ("C_ut", "", null),
-					new MenuItem ("_Paste", "", null)
+					new MenuItem ("_Copy", "", Copy),
+					new MenuItem ("C_ut", "", Cut),
+					new MenuItem ("_Paste", "", Paste)
 				}),
 			});
 

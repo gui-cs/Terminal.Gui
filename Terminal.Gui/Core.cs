@@ -2240,14 +2240,6 @@ namespace Terminal.Gui {
 			}
 
 			if (view != null) {
-				if (!view.WantMousePositionReports && me.Flags == MouseFlags.ReportMousePosition)
-					return;
-
-				if (view.WantContinuousButtonPressed)
-					wantContinuousButtonPressedView = view;
-				else
-					wantContinuousButtonPressedView = null;
-
 				var nme = new MouseEvent () {
 					X = rx,
 					Y = ry,
@@ -2257,19 +2249,25 @@ namespace Terminal.Gui {
 					View = view
 				};
 
-				// Should we bubbled up the event, if it is not handled?
 				if (lastMouseOwnerView == null) {
 					lastMouseOwnerView = view;
-					if (!view.OnMouseEnter (nme))
-						view.MouseEvent (nme);
-				} else if (lastMouseOwnerView == view) {
-					view.MouseEvent (nme);
+					view.OnMouseEnter (nme);
 				} else if (lastMouseOwnerView != view) {
 					lastMouseOwnerView.OnMouseLeave (nme);
 					view.OnMouseEnter (nme);
-					view.MouseEvent (nme);
 					lastMouseOwnerView = view;
 				}
+
+				if (!view.WantMousePositionReports && me.Flags == MouseFlags.ReportMousePosition)
+					return;
+
+				if (view.WantContinuousButtonPressed)
+					wantContinuousButtonPressedView = view;
+				else
+					wantContinuousButtonPressedView = null;
+
+				// Should we bubbled up the event, if it is not handled?
+				view.MouseEvent (nme);
 			}
 		}
 
