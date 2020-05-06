@@ -658,7 +658,7 @@ namespace Terminal.Gui {
 					break;
 
 				case WindowsConsole.ButtonState.RightmostButtonPressed:
-					mouseFlag = MouseFlags.Button4Pressed;
+					mouseFlag = MouseFlags.Button3Pressed;
 					break;
 				}
 
@@ -708,7 +708,7 @@ namespace Terminal.Gui {
 					break;
 
 				case WindowsConsole.ButtonState.RightmostButtonPressed:
-					mouseFlag = MouseFlags.Button4Released;
+					mouseFlag = MouseFlags.Button3Released;
 					break;
 				}
 				IsButtonPressed = false;
@@ -730,7 +730,7 @@ namespace Terminal.Gui {
 						break;
 
 					case WindowsConsole.ButtonState.RightmostButtonPressed:
-						mouseFlag = MouseFlags.Button4Clicked;
+						mouseFlag = MouseFlags.Button3Clicked;
 						break;
 					}
 				} else {
@@ -749,7 +749,7 @@ namespace Terminal.Gui {
 					break;
 
 				case WindowsConsole.ButtonState.RightmostButtonPressed:
-					mouseFlag = MouseFlags.Button4DoubleClicked;
+					mouseFlag = MouseFlags.Button3DoubleClicked;
 					break;
 				}
 				IsButtonDoubleClicked = true;
@@ -764,7 +764,7 @@ namespace Terminal.Gui {
 					break;
 
 				case WindowsConsole.ButtonState.RightmostButtonPressed:
-					mouseFlag = MouseFlags.Button4TripleClicked;
+					mouseFlag = MouseFlags.Button3TripleClicked;
 					break;
 				}
 				IsButtonDoubleClicked = false;

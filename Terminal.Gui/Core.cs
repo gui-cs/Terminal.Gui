@@ -1881,7 +1881,7 @@ namespace Terminal.Gui {
 
 			int nx, ny;
 			if ((mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) ||
-				mouseEvent.Flags == MouseFlags.Button4Pressed)) {
+				mouseEvent.Flags == MouseFlags.Button3Pressed)) {
 				if (dragPosition.HasValue) {
 					if (SuperView == null) {
 						Application.Top.SetNeedsDisplay (Frame);
