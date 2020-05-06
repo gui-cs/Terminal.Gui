@@ -289,21 +289,17 @@ namespace Terminal.Gui {
 
 			case Key.Home | Key.ShiftMask:
 				if (point > 0) {
-					for (int i = point; i >= 0; i--) {
-						if (point > 0)
-							point--;
-						PrepareSelection (i);
-					}
+					int x = point;
+					point = 0;
+					PrepareSelection (x, point - x);
 				}
 				break;
 
 			case Key.End | Key.ShiftMask:
 				if (point < text.Count) {
-					for (int i = point; i <= text.Count; i++) {
-						if (point < text.Count)
-							point++;
-						PrepareSelection (i);
-					}
+					int x = point;
+					point = text.Count;
+					PrepareSelection (x, point - x);
 				}
 				break;
 
@@ -326,6 +322,28 @@ namespace Terminal.Gui {
 			case Key.CursorDown | Key.ShiftMask:
 				if (point < text.Count) {
 					PrepareSelection (point++, 1);
+				}
+				break;
+
+			case Key.CursorLeft | Key.ShiftMask | Key.CtrlMask:
+			case Key.CursorUp | Key.ShiftMask | Key.CtrlMask:
+				if (point > 0) {
+					int x = start > -1 ? start : point;
+					int sbw = WordBackward (point);
+					if (sbw != -1)
+						point = sbw;
+					PrepareSelection (x, sbw - x);
+				}
+				break;
+
+			case Key.CursorRight | Key.ShiftMask | Key.CtrlMask:
+			case Key.CursorDown | Key.ShiftMask | Key.CtrlMask:
+				if (point < text.Count) {
+					int x = start > -1 ? start : point;
+					int sfw = WordForward (point);
+					if (sfw != -1)
+						point = sfw;
+					PrepareSelection (x, sfw - x);
 				}
 				break;
 
@@ -559,7 +577,8 @@ namespace Terminal.Gui {
 		public override bool MouseEvent (MouseEvent ev)
 		{
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed) && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition) &&
-				!ev.Flags.HasFlag (MouseFlags.Button1Released))
+				!ev.Flags.HasFlag (MouseFlags.Button1Released) && !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
+				!ev.Flags.HasFlag (MouseFlags.Button1TripleClicked))
 				return false;
 
 			if (ev.Flags == MouseFlags.Button1Pressed) {
@@ -576,13 +595,25 @@ namespace Terminal.Gui {
 				if (Application.mouseGrabView == null) {
 					Application.GrabMouse (this);
 				}
-			} else if (ev.Flags == MouseFlags.Button1Pressed) {
-				int x = PositionCursor (ev);
-				if (SelectedLength != 0)
-					ClearAllSelection ();
 			} else if (ev.Flags == MouseFlags.Button1Released) {
 				isButtonReleased = true;
 				Application.UngrabMouse ();
+			} else if (ev.Flags == MouseFlags.Button1DoubleClicked) {
+				int x = PositionCursor (ev);
+				int sbw = x;
+				if (x > 0 && (char)Text [x - 1] != ' ')
+					sbw = WordBackward (x);
+				if (sbw != -1) {
+					x = sbw;
+					PositionCursor (x);
+				}
+				int sfw = WordForward (x);
+				ClearAllSelection ();
+				PrepareSelection (sbw, sfw - sbw);
+			} else if (ev.Flags == MouseFlags.Button1TripleClicked) {
+				PositionCursor (0);
+				ClearAllSelection ();
+				PrepareSelection (0, text.Count);
 			}
 
 			SetNeedsDisplay ();
@@ -593,13 +624,16 @@ namespace Terminal.Gui {
 		{
 			// We could also set the cursor position.
 			int x;
-			//if (Application.mouseGrabView == null) {
-			//	x = ev.X;
-			//} else {
-			//	x = ev.X - (text.Count > Frame.Width ? text.Count - Frame.Width : 0);
-			//}
-			x = ev.X;
+			if (text.Count == 0)
+				x = ev.X - ev.OfX;
+			else
+				x = ev.X;
 
+			return PositionCursor (x);
+		}
+
+		private int PositionCursor (int x)
+		{
 			point = first + x;
 			if (point > text.Count)
 				point = text.Count;
@@ -685,10 +719,13 @@ namespace Terminal.Gui {
 		{
 			string actualText = Text.ToString ();
 			int start = SelectedStart == -1 ? CursorPosition : SelectedStart;
+			ustring cbTxt = Clipboard.Contents?.ToString ();
 			Text = actualText.Substring (0, start) +
-				Clipboard.Contents?.ToString () +
+				cbTxt +
 				actualText.Substring (start + SelectedLength, actualText.Length - start - SelectedLength);
+			point = start + cbTxt.Length;
 			SelectedLength = 0;
+			ClearAllSelection ();
 			SetNeedsDisplay ();
 		}
 
