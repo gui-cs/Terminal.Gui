@@ -14,7 +14,6 @@ namespace Terminal.Gui {
 		int cols, rows;
 		public override int Cols => cols;
 		public override int Rows => rows;
-		public override bool AllowWrap { get; set; }
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		int [,,] contents;
@@ -69,6 +68,9 @@ namespace Terminal.Gui {
 
 		public override void AddRune (Rune rune)
 		{
+			if (IsOutBounds (rune))
+				return;
+
 			if (Clip.Contains (ccol, crow)) {
 				if (needMove) {
 					//Console.CursorLeft = ccol;
@@ -93,8 +95,49 @@ namespace Terminal.Gui {
 
 		public override void AddStr (ustring str)
 		{
-			foreach (var rune in str)
+			foreach (var rune in str) {
+				if (IsOutBounds (rune))
+					return;
 				AddRune (rune);
+			}
+		}
+
+		bool IsOutBounds (Rune rune)
+		{
+			View view = Application.CurrentView;
+			View top = view.SuperView;
+			int h, w;
+
+			if (view is Toplevel) {
+				top = view;
+			} else if (top == null) {
+				top = Application.Top;
+			} else {
+				while (top != null) {
+					if (top is Toplevel || top.SuperView == null)
+						break;
+					top = top.SuperView;
+				}
+			}
+
+			int runeWidth = Rune.ColumnWidth (rune);
+			int maxWidth = ccol + (runeWidth > 1 ? runeWidth : 0);
+
+			if (top.SuperView == null && !((Toplevel)top).Modal)
+				return false;
+			else if (((Toplevel)top).Modal && maxWidth >= Cols)
+				return true;
+			else if (view == top && ((Toplevel)top).Modal && maxWidth < Cols)
+				return false;
+
+			h = top.Frame.Top + top.Frame.Height;
+			w = top.Frame.Left + top.Frame.Width;
+
+
+			if (crow < 0 || ccol < 0 || crow >= h || maxWidth >= w)
+				return true;
+			else
+				return false;
 		}
 
 		public override void End ()

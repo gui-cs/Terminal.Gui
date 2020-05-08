@@ -443,10 +443,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public abstract int Rows { get; }
 		/// <summary>
-		/// If true, it allows to write at the beginning of the next line if it's exceed the column limit.
-		/// </summary>
-		public abstract bool AllowWrap { get; set; }
-		/// <summary>
 		/// Initializes the driver
 		/// </summary>
 		/// <param name="terminalResized">Method to invoke when the terminal is resized.</param>

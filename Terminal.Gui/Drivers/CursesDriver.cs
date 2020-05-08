@@ -19,7 +19,6 @@ namespace Terminal.Gui {
 	public class CursesDriver : ConsoleDriver {
 		public override int Cols => Curses.Cols;
 		public override int Rows => Curses.Lines;
-		public override bool AllowWrap { get; set; }
 
 		// Current row, and current col, tracked by Move/AddRune only
 		int ccol, crow;
@@ -92,7 +91,7 @@ namespace Terminal.Gui {
 			}
 
 			int runeWidth = Rune.ColumnWidth (rune);
-			int maxWidth = ccol + (runeWidth > 1 && !AllowWrap ? runeWidth : 0);
+			int maxWidth = ccol + (runeWidth > 1 ? runeWidth : 0);
 
 			if (top.SuperView == null && !((Toplevel)top).Modal)
 				return false;

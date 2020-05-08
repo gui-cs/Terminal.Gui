@@ -1553,6 +1553,7 @@ namespace Terminal.Gui {
 			case Key.Tab:
 			case Key.CursorRight:
 			case Key.CursorDown:
+			case Key.ControlI: // Unix
 				var old = Focused;
 				if (!FocusNext ())
 					FocusNext ();
@@ -1563,7 +1564,7 @@ namespace Terminal.Gui {
 				return true;
 			case Key.CursorLeft:
 			case Key.CursorUp:
-			case Key.BackTab | Key.ShiftMask:
+			case Key.BackTab:
 				old = Focused;
 				if (!FocusPrev ())
 					FocusPrev ();

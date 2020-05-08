@@ -437,7 +437,6 @@ namespace Terminal.Gui {
 
 		public override int Cols => cols;
 		public override int Rows => rows;
-		public override bool AllowWrap { get; set; }
 
 		public WindowsDriver ()
 		{
@@ -828,9 +827,7 @@ namespace Terminal.Gui {
 			case ConsoleKey.Escape:
 				return MapKeyModifiers (keyInfo, Key.Esc);
 			case ConsoleKey.Tab:
-				if(keyInfo.Modifiers == ConsoleModifiers.Shift)
-					return MapKeyModifiers (keyInfo, Key.BackTab);
-				return MapKeyModifiers (keyInfo, Key.Tab);
+				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.BackTab : Key.Tab;
 			case ConsoleKey.Home:
 				return MapKeyModifiers (keyInfo, Key.Home);
 			case ConsoleKey.End:
@@ -1040,13 +1037,13 @@ namespace Terminal.Gui {
 					AddStr (" ");
 				}
 			}
-			if (AllowWrap && ccol == Cols) {
-				ccol = 0;
-				if (crow + 1 < Rows)
-					crow++;
-			}
-			if (sync)
-				UpdateScreen ();
+			//if (ccol == Cols) {
+			//	ccol = 0;
+			//	if (crow + 1 < Rows)
+			//		crow++;
+			//}
+			//if (sync)
+			//	UpdateScreen ();
 		}
 
 		public override void AddStr (ustring str)
@@ -1077,7 +1074,7 @@ namespace Terminal.Gui {
 			}
 
 			int runeWidth = Rune.ColumnWidth (rune);
-			int maxWidth = ccol + (runeWidth > 1 && !AllowWrap ? runeWidth : 0);
+			int maxWidth = ccol + (runeWidth > 1 ? runeWidth : 0);
 
 			if (top.SuperView == null && !((Toplevel)top).Modal)
 				return false;
