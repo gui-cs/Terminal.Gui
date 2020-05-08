@@ -1393,7 +1393,6 @@ namespace Terminal.Gui {
 			var ordered = TopologicalSort (nodes, edges);
 			if (ordered == null)
 				throw new Exception ("There is a recursive cycle in the relative Pos/Dim in the views of " + this);
-			ordered.Reverse ();
 
 			foreach (var v in ordered) {
 				if (v.LayoutStyle == LayoutStyle.Computed)
