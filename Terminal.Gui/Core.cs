@@ -1248,12 +1248,12 @@ namespace Terminal.Gui {
 		}
 
 		// https://en.wikipedia.org/wiki/Topological_sorting
-		List<View> TopologicalSort (HashSet<View> nodes, HashSet<(View, View)> edges)
+		List<View> TopologicalSort (HashSet<View> nodes, HashSet<(View From, View To)> edges)
 		{
 			var result = new List<View> ();
 
 			// Set of all nodes with no incoming edges
-			var S = new HashSet<View> (nodes.Where (n => edges.All (e => e.Item2.Equals (n) == false)));
+			var S = new HashSet<View> (nodes.Where (n => edges.All (e => e.To.Equals (n) == false)));
 
 			while (S.Any ()) {
 				//  remove a node n from S
@@ -1265,14 +1265,14 @@ namespace Terminal.Gui {
 					result.Add (n);
 
 				// for each node m with an edge e from n to m do
-				foreach (var e in edges.Where (e => e.Item1.Equals (n)).ToList ()) {
-					var m = e.Item2;
+				foreach (var e in edges.Where (e => e.From.Equals (n)).ToArray ()) {
+					var m = e.To;
 
 					// remove edge e from the graph
 					edges.Remove (e);
 
 					// if m has no other incoming edges then
-					if (edges.All (me => me.Item2.Equals (m) == false) && m != this?.SuperView) {
+					if (edges.All (me => me.To.Equals (m) == false) && m != this?.SuperView) {
 						// insert m into S
 						S.Add (m);
 					}
@@ -1306,19 +1306,18 @@ namespace Terminal.Gui {
 			foreach (var v in InternalSubviews) {
 				nodes.Add (v);
 				if (v.LayoutStyle == LayoutStyle.Computed) {
-					if (v.X is Pos.PosView)
-						edges.Add ((v, (v.X as Pos.PosView).Target));
-					if (v.Y is Pos.PosView)
-						edges.Add ((v, (v.Y as Pos.PosView).Target));
-					if (v.Width is Dim.DimView)
-						edges.Add ((v, (v.Width as Dim.DimView).Target));
-					if (v.Height is Dim.DimView)
-						edges.Add ((v, (v.Height as Dim.DimView).Target));
+					if (v.X is Pos.PosView vX)
+						edges.Add ((vX.Target, v));
+					if (v.Y is Pos.PosView vY)
+						edges.Add ((vY.Target, v));
+					if (v.Width is Dim.DimView vWidth)
+						edges.Add ((vWidth.Target, v));
+					if (v.Height is Dim.DimView vHeight)
+						edges.Add ((vHeight.Target, v));
 				}
 			}
 
 			var ordered = TopologicalSort (nodes, edges);
-			ordered.Reverse ();
 			if (ordered == null)
 				throw new Exception ("There is a recursive cycle in the relative Pos/Dim in the views of " + this);
 
