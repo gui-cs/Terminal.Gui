@@ -437,7 +437,7 @@ namespace Terminal.Gui {
 
 		public override int Cols => cols;
 		public override int Rows => rows;
-		public override bool AllowNewLine { get; set; }
+		public override bool AllowWrap { get; set; }
 
 		public WindowsDriver ()
 		{
@@ -1040,7 +1040,7 @@ namespace Terminal.Gui {
 					AddStr (" ");
 				}
 			}
-			if (AllowNewLine && ccol == Cols) {
+			if (AllowWrap && ccol == Cols) {
 				ccol = 0;
 				if (crow + 1 < Rows)
 					crow++;
@@ -1077,7 +1077,7 @@ namespace Terminal.Gui {
 			}
 
 			int runeWidth = Rune.ColumnWidth (rune);
-			int maxWidth = ccol + (runeWidth > 1 && !AllowNewLine ? runeWidth : 0);
+			int maxWidth = ccol + (runeWidth > 1 && !AllowWrap ? runeWidth : 0);
 
 			if (top.SuperView == null && !((Toplevel)top).Modal)
 				return false;

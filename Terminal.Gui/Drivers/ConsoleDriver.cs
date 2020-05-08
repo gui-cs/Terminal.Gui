@@ -445,7 +445,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// If true, it allows to write at the beginning of the next line if it's exceed the column limit.
 		/// </summary>
-		public abstract bool AllowNewLine { get; set; }
+		public abstract bool AllowWrap { get; set; }
 		/// <summary>
 		/// Initializes the driver
 		/// </summary>
