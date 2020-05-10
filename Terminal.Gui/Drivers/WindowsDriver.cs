@@ -856,25 +856,25 @@ namespace Terminal.Gui {
 				return MapKeyModifiers (keyInfo, Key.InsertChar);
 
 			case ConsoleKey.NumPad0:
-				return keyInfoEx.NumLock ? MapKeyModifiers (keyInfo, (Key)(uint)'0') : MapKeyModifiers (keyInfo, Key.InsertChar);
+				return keyInfoEx.NumLock ? (Key)(uint)'0' : Key.InsertChar;
 			case ConsoleKey.NumPad1:
-				return keyInfoEx.NumLock ? MapKeyModifiers (keyInfo, (Key)(uint)'1') : MapKeyModifiers (keyInfo, Key.End);
+				return keyInfoEx.NumLock ? (Key)(uint)'1' : Key.End;
 			case ConsoleKey.NumPad2:
-				return keyInfoEx.NumLock ? MapKeyModifiers (keyInfo, (Key)(uint)'2') : MapKeyModifiers (keyInfo, Key.CursorDown);
+				return keyInfoEx.NumLock ? (Key)(uint)'2' : Key.CursorDown;
 			case ConsoleKey.NumPad3:
-				return keyInfoEx.NumLock ? MapKeyModifiers (keyInfo, (Key)(uint)'3') : MapKeyModifiers (keyInfo, Key.PageDown);
+				return keyInfoEx.NumLock ? (Key)(uint)'3' : Key.PageDown;
 			case ConsoleKey.NumPad4:
-				return keyInfoEx.NumLock ? MapKeyModifiers (keyInfo, (Key)(uint)'4') : MapKeyModifiers (keyInfo, Key.CursorLeft);
+				return keyInfoEx.NumLock ? (Key)(uint)'4' : Key.CursorLeft;
 			case ConsoleKey.NumPad5:
-				return keyInfoEx.NumLock ? MapKeyModifiers (keyInfo, (Key)(uint)'5') : MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
+				return keyInfoEx.NumLock ? (Key)(uint)'5' : (Key)((uint)keyInfo.KeyChar);
 			case ConsoleKey.NumPad6:
-				return keyInfoEx.NumLock ? MapKeyModifiers (keyInfo, (Key)(uint)'6') : MapKeyModifiers (keyInfo, Key.CursorRight);
+				return keyInfoEx.NumLock ? (Key)(uint)'6' : Key.CursorRight;
 			case ConsoleKey.NumPad7:
-				return keyInfoEx.NumLock ? MapKeyModifiers (keyInfo, (Key)(uint)'7') : MapKeyModifiers (keyInfo, Key.Home);
+				return keyInfoEx.NumLock ? (Key)(uint)'7' : Key.Home;
 			case ConsoleKey.NumPad8:
-				return keyInfoEx.NumLock ? MapKeyModifiers (keyInfo, (Key)(uint)'8') : MapKeyModifiers (keyInfo, Key.CursorUp);
+				return keyInfoEx.NumLock ? (Key)(uint)'8' : Key.CursorUp;
 			case ConsoleKey.NumPad9:
-				return keyInfoEx.NumLock ? MapKeyModifiers (keyInfo, (Key)(uint)'9') : MapKeyModifiers (keyInfo, Key.PageUp);
+				return keyInfoEx.NumLock ? (Key)(uint)'9' : Key.PageUp;
 
 			case ConsoleKey.Oem1:
 			case ConsoleKey.Oem2:
@@ -889,7 +889,7 @@ namespace Terminal.Gui {
 			case ConsoleKey.OemComma:
 			case ConsoleKey.OemPlus:
 			case ConsoleKey.OemMinus:
-				return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
+				return (Key)((uint)keyInfo.KeyChar);
 			}
 
 			var key = keyInfo.Key;
@@ -898,44 +898,40 @@ namespace Terminal.Gui {
 			if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
 				var delta = key - ConsoleKey.A;
 				if (keyInfo.Modifiers == ConsoleModifiers.Control)
-					return MapKeyModifiers (keyInfo, (Key)((uint)Key.ControlA + delta));
+					return (Key)((uint)Key.ControlA + delta);
 				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
-					return MapKeyModifiers (keyInfo, (Key)(((uint)Key.AltMask) | ((uint)'A' + delta)));
-				//if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				//	if (keyInfo.KeyChar == 0)
-				//		return MapKeyModifiers (keyInfo, (Key)(((uint)Key.AltMask) + ((uint)Key.ControlA + delta)));
-				//	else
-				//		return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
-				//}
-				if ((Key)((uint)alphaBase + delta) == (Key)keyInfo.KeyChar)
-					return MapKeyModifiers (keyInfo, (Key)((uint)alphaBase + delta));
-				else
-					return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
+					return (Key)(((uint)Key.AltMask) | ((uint)'A' + delta));
+				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+					if (keyInfo.KeyChar == 0)
+						return (Key)(((uint)Key.AltMask) + ((uint)Key.ControlA + delta));
+					else
+						return (Key)((uint)keyInfo.KeyChar);
+				}
+
+				return (Key)((uint)keyInfo.KeyChar);
 			}
 			if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
 				var delta = key - ConsoleKey.D0;
 				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
-					return MapKeyModifiers (keyInfo, (Key)(((uint)Key.AltMask) | ((uint)'0' + delta)));
+					return (Key)(((uint)Key.AltMask) | ((uint)'0' + delta));
 
-				return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
+				return (Key)((uint)keyInfo.KeyChar);
 			}
 			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
 				var delta = key - ConsoleKey.F1;
 
-				return MapKeyModifiers (keyInfo, (Key)((int)Key.F1 + delta));
+				return (Key)((int)Key.F1 + delta);
 			}
 
-			return MapKeyModifiers (keyInfo, (Key)(0xffffffff));
+			return (Key)(0xffffffff);
 		}
 
 		private static Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 		{
 			Key keyMod = new Key ();
-			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift) &&
-				!(keyInfo.Key >= ConsoleKey.A && keyInfo.Key <= ConsoleKey.Z))
+			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift))
 				keyMod = Key.ShiftMask;
-			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control) &&
-				!(keyInfo.Key >= ConsoleKey.A && keyInfo.Key <= ConsoleKey.Z))
+			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
 				keyMod |= Key.CtrlMask;
 			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt))
 				keyMod |= Key.AltMask;
