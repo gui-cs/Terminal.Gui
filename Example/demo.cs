@@ -439,18 +439,6 @@ static class Demo {
 			switch (updown) {
 			case "Down":
 			case "Up":
-				if ((keyEvent.Key & Key.ShiftMask) != 0) {
-					list.Add ($"Key{updown,ident}: Shift ");
-				} else if ((keyEvent.Key & Key.CtrlMask) != 0) {
-					list.Add ($"Key{updown,ident}: Ctrl ");
-				} else if ((keyEvent.Key & Key.AltMask) != 0) {
-					list.Add ($"Key{updown,ident}: Alt ");
-				} else {
-					list.Add ($"Key{updown,ident}: {(((uint)keyEvent.KeyValue & (uint)Key.CharMask) > 26 ? $"{(char)keyEvent.KeyValue}" : $"{keyEvent.Key}")}");
-				}
-
-				break;
-
 			case "Press":
 				var msg = $"Key{updown,ident}: ";
 				if ((keyEvent.Key & Key.ShiftMask) != 0)
@@ -461,6 +449,19 @@ static class Demo {
 					msg += "Alt ";
 				msg += $"{(((uint)keyEvent.KeyValue & (uint)Key.CharMask) > 26 ? $"{(char)keyEvent.KeyValue}" : $"{keyEvent.Key}")}";
 				list.Add (msg);
+
+				break;
+
+			default:
+				if ((keyEvent.Key & Key.ShiftMask) != 0) {
+					list.Add ($"Key{updown,ident}: Shift ");
+				} else if ((keyEvent.Key & Key.CtrlMask) != 0) {
+					list.Add ($"Key{updown,ident}: Ctrl ");
+				} else if ((keyEvent.Key & Key.AltMask) != 0) {
+					list.Add ($"Key{updown,ident}: Alt ");
+				} else {
+					list.Add ($"Key{updown,ident}: {(((uint)keyEvent.KeyValue & (uint)Key.CharMask) > 26 ? $"{(char)keyEvent.KeyValue}" : $"{keyEvent.Key}")}");
+				}
 
 				break;
 			}

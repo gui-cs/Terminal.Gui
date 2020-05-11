@@ -554,7 +554,6 @@ namespace Terminal.Gui {
 			this.mouseHandler = mouseHandler;
 		}
 
-
 		void IMainLoopDriver.MainIteration ()
 		{
 			if (result == null)
@@ -565,22 +564,50 @@ namespace Terminal.Gui {
 			case WindowsConsole.EventType.Key:
 				var map = MapKey (ToConsoleKeyInfoEx (inputEvent.KeyEvent));
 				if (map == (Key)0xffffffff) {
-					KeyEvent key;
+					KeyEvent key = default;
 					// Shift = VK_SHIFT = 0x10
 					// Ctrl = VK_CONTROL = 0x11
 					// Alt = VK_MENU = 0x12
-					switch (inputEvent.KeyEvent.wVirtualKeyCode) {
-					case 0x10:
-						key = new KeyEvent (Key.ShiftMask);
+
+					switch (inputEvent.KeyEvent.dwControlKeyState) {
+					case WindowsConsole.ControlKeyState.RightAltPressed:
+					case WindowsConsole.ControlKeyState.RightAltPressed |
+						WindowsConsole.ControlKeyState.LeftControlPressed |
+						WindowsConsole.ControlKeyState.EnhancedKey:
+					case WindowsConsole.ControlKeyState.EnhancedKey:
+						key = new KeyEvent (Key.CtrlMask | Key.AltMask);
 						break;
-					case 0x11:
-						key = new KeyEvent (Key.CtrlMask);
-						break;
-					case 0x12:
+					case WindowsConsole.ControlKeyState.LeftAltPressed:
 						key = new KeyEvent (Key.AltMask);
 						break;
+					case WindowsConsole.ControlKeyState.RightControlPressed:
+					case WindowsConsole.ControlKeyState.LeftControlPressed:
+						key = new KeyEvent (Key.CtrlMask);
+						break;
+					case WindowsConsole.ControlKeyState.ShiftPressed:
+						key = new KeyEvent (Key.ShiftMask);
+						break;
+					case WindowsConsole.ControlKeyState.NumlockOn:
+						break;
+					case WindowsConsole.ControlKeyState.ScrolllockOn:
+						break;
+					case WindowsConsole.ControlKeyState.CapslockOn:
+						break;
 					default:
-						key = new KeyEvent (Key.Unknown);
+						switch (inputEvent.KeyEvent.wVirtualKeyCode) {
+						case 0x10:
+							key = new KeyEvent (Key.ShiftMask);
+							break;
+						case 0x11:
+							key = new KeyEvent (Key.CtrlMask);
+							break;
+						case 0x12:
+							key = new KeyEvent (Key.AltMask);
+							break;
+						default:
+							key = new KeyEvent (Key.Unknown);
+							break;
+						}
 						break;
 					}
 
@@ -893,7 +920,7 @@ namespace Terminal.Gui {
 			}
 
 			var key = keyInfo.Key;
-			var alphaBase = ((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock)) ? 'A' : 'a';
+			//var alphaBase = ((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock)) ? 'A' : 'a';
 
 			if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
 				var delta = key - ConsoleKey.A;
@@ -907,7 +934,7 @@ namespace Terminal.Gui {
 					else
 						return (Key)((uint)keyInfo.KeyChar);
 				}
-
+				//return (Key)((uint)alphaBase + delta);
 				return (Key)((uint)keyInfo.KeyChar);
 			}
 			if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
