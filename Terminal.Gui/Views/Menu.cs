@@ -587,7 +587,6 @@ namespace Terminal.Gui {
 					//Activate (0);
 					//StartMenu ();
 					isMenuClosed = false;
-					openedByAltKey = false;
 					selected = 0;
 					CanFocus = true;
 					lastFocused = SuperView.MostFocused;
