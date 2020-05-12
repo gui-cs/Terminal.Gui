@@ -719,7 +719,7 @@ namespace Terminal.Gui {
 		{
 			string actualText = Text.ToString ();
 			int start = SelectedStart == -1 ? CursorPosition : SelectedStart;
-			ustring cbTxt = Clipboard.Contents?.ToString ();
+			ustring cbTxt = Clipboard.Contents?.ToString () ?? "";
 			Text = actualText.Substring (0, start) +
 				cbTxt +
 				actualText.Substring (start + SelectedLength, actualText.Length - start - SelectedLength);

@@ -185,6 +185,38 @@ namespace Terminal.Gui {
 			case Curses.KeyInsertChar: return Key.InsertChar;
 			case Curses.KeyBackTab: return Key.BackTab;
 			case Curses.KeyBackspace: return Key.Backspace;
+			case Curses.ShiftKeyUp: return Key.CursorUp | Key.ShiftMask;
+			case Curses.ShiftKeyDown: return Key.CursorDown | Key.ShiftMask;
+			case Curses.ShiftKeyLeft: return Key.CursorLeft | Key.ShiftMask;
+			case Curses.ShiftKeyRight: return Key.CursorRight | Key.ShiftMask;
+			case Curses.ShiftKeyHome: return Key.Home | Key.ShiftMask;
+			case Curses.ShiftKeyEnd: return Key.End | Key.ShiftMask;
+			case Curses.ShiftKeyNPage: return Key.PageDown | Key.ShiftMask;
+			case Curses.ShiftKeyPPage: return Key.PageUp | Key.ShiftMask;
+			case Curses.AltKeyUp: return Key.CursorUp | Key.AltMask;
+			case Curses.AltKeyDown: return Key.CursorDown | Key.AltMask;
+			case Curses.AltKeyLeft: return Key.CursorLeft | Key.AltMask;
+			case Curses.AltKeyRight: return Key.CursorRight | Key.AltMask;
+			case Curses.AltKeyHome: return Key.Home | Key.AltMask;
+			case Curses.AltKeyEnd: return Key.End | Key.AltMask;
+			case Curses.AltKeyNPage: return Key.PageDown | Key.AltMask;
+			case Curses.AltKeyPPage: return Key.PageUp | Key.AltMask;
+			case Curses.CtrlKeyUp: return Key.CursorUp | Key.CtrlMask;
+			case Curses.CtrlKeyDown: return Key.CursorDown | Key.CtrlMask;
+			case Curses.CtrlKeyLeft: return Key.CursorLeft | Key.CtrlMask;
+			case Curses.CtrlKeyRight: return Key.CursorRight | Key.CtrlMask;
+			case Curses.CtrlKeyHome: return Key.Home | Key.CtrlMask;
+			case Curses.CtrlKeyEnd: return Key.End | Key.CtrlMask;
+			case Curses.CtrlKeyNPage: return Key.PageDown | Key.CtrlMask;
+			case Curses.CtrlKeyPPage: return Key.PageUp | Key.CtrlMask;
+			case Curses.ShiftCtrlKeyUp: return Key.CursorUp | Key.ShiftMask | Key.CtrlMask;
+			case Curses.ShiftCtrlKeyDown: return Key.CursorDown | Key.ShiftMask | Key.CtrlMask;
+			case Curses.ShiftCtrlKeyLeft: return Key.CursorLeft | Key.ShiftMask | Key.CtrlMask;
+			case Curses.ShiftCtrlKeyRight: return Key.CursorRight | Key.ShiftMask | Key.CtrlMask;
+			case Curses.ShiftCtrlKeyHome: return Key.Home | Key.ShiftMask | Key.CtrlMask;
+			case Curses.ShiftCtrlKeyEnd: return Key.End | Key.ShiftMask | Key.CtrlMask;
+			case Curses.ShiftCtrlKeyNPage: return Key.PageDown | Key.ShiftMask | Key.CtrlMask;
+			case Curses.ShiftCtrlKeyPPage: return Key.PageUp | Key.ShiftMask | Key.CtrlMask;
 			default: return Key.Unknown;
 			}
 		}
@@ -232,7 +264,12 @@ namespace Terminal.Gui {
 					KeyEvent key;
 
 					// The ESC-number handling, debatable.
-					if (wch >= '1' && wch <= '9')
+					// Simulates the AltMask itself by pressing Alt + Space.
+					if (wch == (int)Key.Space)
+						key = new KeyEvent (Key.AltMask);
+					else if (wch - (int)Key.Space >= 'A' && wch - (int)Key.Space <= 'Z')
+						key = new KeyEvent ((Key)((uint)Key.AltMask + (wch - (int)Key.Space)));
+					else if (wch >= '1' && wch <= '9')
 						key = new KeyEvent ((Key)((int)Key.F1 + (wch - '0' - 1)));
 					else if (wch == '0')
 						key = new KeyEvent (Key.F10);

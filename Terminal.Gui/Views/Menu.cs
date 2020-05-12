@@ -354,6 +354,18 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		public override bool ProcessHotKey (KeyEvent keyEvent)
+		{
+			// To ncurses simulate a AltMask key pressing Alt+Space because
+			// it can´t detect an alone special key down was pressed.
+			if (keyEvent.IsAlt && keyEvent.Key == Key.AltMask) {
+				KeyDown (keyEvent);
+				return true;
+			}
+
+			return false;
+		}
+
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			bool disabled;
@@ -968,10 +980,16 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (kb.IsAlt) {
+			// To ncurses simulate a AltMask key pressing Alt+Space because
+			// it can´t detect an alone special key down was pressed.
+			if (kb.IsAlt && kb.Key == Key.AltMask && openMenu == null) {
+				KeyDown (kb);
+				KeyUp (kb);
+				return true;
+			} else if (kb.IsAlt) {
 				if (FindAndOpenMenuByHotkey (kb)) return true;
 			}
-			var kc = kb.KeyValue;
+			//var kc = kb.KeyValue;
 
 			return base.ProcessHotKey (kb);
 		}
@@ -1008,10 +1026,12 @@ namespace Terminal.Gui {
 				if ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z') || (key >= '0' && key <= '9')) {
 					char c = Char.ToUpper ((char)key);
 
-					if (Menus [selected].IsTopLevel)
+					if (selected == -1 || Menus [selected].IsTopLevel)
 						return false;
 
 					foreach (var mi in Menus [selected].Children) {
+						if (mi == null)
+							continue;
 						int p = mi.Title.IndexOf ('_');
 						if (p != -1 && p + 1 < mi.Title.Length) {
 							if (mi.Title [p + 1] == c) {
