@@ -122,6 +122,27 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Method invoked when a key is pressed.
+		/// </summary>
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <returns>true if the event was handled</returns>
+		public virtual bool KeyDown (KeyEvent keyEvent)
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Method invoked when a key is released.
+		/// </summary>
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <returns>true if the event was handled</returns>
+		public virtual bool KeyUp (KeyEvent keyEvent)
+		{
+			return false;
+		}
+
+
+		/// <summary>
 		/// Method invoked when a mouse event is generated
 		/// </summary>
 		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
@@ -1012,6 +1033,41 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Invoked when a key is pressed
+		/// </summary>
+		public Action<KeyEvent> OnKeyDown;
+
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public override bool KeyDown (KeyEvent keyEvent)
+		{
+			OnKeyDown?.Invoke (keyEvent);
+			if (subviews == null || subviews.Count == 0)
+				return false;
+			foreach (var view in subviews)
+				if (view.KeyDown (keyEvent))
+					return true;
+
+			return false;
+		}
+
+		/// <summary>
+		/// Invoked when a key is released
+		/// </summary>
+		public Action<KeyEvent> OnKeyUp;
+
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public override bool KeyUp (KeyEvent keyEvent)
+		{
+			OnKeyUp?.Invoke (keyEvent);
+			if (subviews == null || subviews.Count == 0)
+				return false;
+			foreach (var view in subviews)
+				if (view.KeyUp (keyEvent))
+					return true;
+
+			return false;
+		}
+		/// <summary>
 		/// Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise, it does nothing.
 		/// </summary>
 		public void EnsureFocus ()
@@ -1192,12 +1248,12 @@ namespace Terminal.Gui {
 		}
 
 		// https://en.wikipedia.org/wiki/Topological_sorting
-		static List<View> TopologicalSort (HashSet<View> nodes, HashSet<(View, View)> edges)
+		List<View> TopologicalSort (HashSet<View> nodes, HashSet<(View From, View To)> edges)
 		{
 			var result = new List<View> ();
 
 			// Set of all nodes with no incoming edges
-			var S = new HashSet<View> (nodes.Where (n => edges.All (e => e.Item2.Equals (n) == false)));
+			var S = new HashSet<View> (nodes.Where (n => edges.All (e => e.To.Equals (n) == false)));
 
 			while (S.Any ()) {
 				//  remove a node n from S
@@ -1205,17 +1261,18 @@ namespace Terminal.Gui {
 				S.Remove (n);
 
 				// add n to tail of L
-				result.Add (n);
+				if (n != this?.SuperView)
+					result.Add (n);
 
 				// for each node m with an edge e from n to m do
-				foreach (var e in edges.Where (e => e.Item1.Equals (n)).ToList ()) {
-					var m = e.Item2;
+				foreach (var e in edges.Where (e => e.From.Equals (n)).ToArray ()) {
+					var m = e.To;
 
 					// remove edge e from the graph
 					edges.Remove (e);
 
 					// if m has no other incoming edges then
-					if (edges.All (me => me.Item2.Equals (m) == false)) {
+					if (edges.All (me => me.To.Equals (m) == false) && m != this?.SuperView) {
 						// insert m into S
 						S.Add (m);
 					}
@@ -1249,19 +1306,18 @@ namespace Terminal.Gui {
 			foreach (var v in InternalSubviews) {
 				nodes.Add (v);
 				if (v.LayoutStyle == LayoutStyle.Computed) {
-					if (v.X is Pos.PosView)
-						edges.Add ((v, (v.X as Pos.PosView).Target));
-					if (v.Y is Pos.PosView)
-						edges.Add ((v, (v.Y as Pos.PosView).Target));
-					if (v.Width is Dim.DimView)
-						edges.Add ((v, (v.Width as Dim.DimView).Target));
-					if (v.Height is Dim.DimView)
-						edges.Add ((v, (v.Height as Dim.DimView).Target));
+					if (v.X is Pos.PosView vX)
+						edges.Add ((vX.Target, v));
+					if (v.Y is Pos.PosView vY)
+						edges.Add ((vY.Target, v));
+					if (v.Width is Dim.DimView vWidth)
+						edges.Add ((vWidth.Target, v));
+					if (v.Height is Dim.DimView vHeight)
+						edges.Add ((vHeight.Target, v));
 				}
 			}
 
 			var ordered = TopologicalSort (nodes, edges);
-			ordered.Reverse ();
 			if (ordered == null)
 				throw new Exception ("There is a recursive cycle in the relative Pos/Dim in the views of " + this);
 
@@ -1269,11 +1325,15 @@ namespace Terminal.Gui {
 				if (v.LayoutStyle == LayoutStyle.Computed)
 					v.RelativeLayout (Frame);
 
-				if (this?.SuperView != v)
-					v.LayoutSubviews ();
+				v.LayoutSubviews ();
 				v.layoutNeeded = false;
 
 			}
+
+			if (SuperView == Application.Top && layoutNeeded && ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
+				RelativeLayout (Frame);
+			}
+
 			layoutNeeded = false;
 		}
 
@@ -1482,7 +1542,7 @@ namespace Terminal.Gui {
 		{
 			if (this != Application.Top) {
 				EnsureVisibleBounds (this, Frame.X, Frame.Y, out int nx, out int ny);
-				if (nx != Frame.X || ny != Frame.Y) {
+				if ((nx != Frame.X || ny != Frame.Y) && LayoutStyle != LayoutStyle.Computed) {
 					X = nx;
 					Y = ny;
 				}
@@ -1490,7 +1550,7 @@ namespace Terminal.Gui {
 				foreach (var top in Subviews) {
 					if (top is Toplevel) {
 						EnsureVisibleBounds ((Toplevel)top, top.Frame.X, top.Frame.Y, out int nx, out int ny);
-						if (nx != top.Frame.X || ny != top.Frame.Y) {
+						if ((nx != top.Frame.X || ny != top.Frame.Y) && top.LayoutStyle != LayoutStyle.Computed) {
 							top.X = nx;
 							top.Y = ny;
 						}
@@ -1513,7 +1573,7 @@ namespace Terminal.Gui {
 				}
 				foreach (var view in Subviews) {
 					if (view.Frame.IntersectsWith (region)) {
-						//view.SetNeedsLayout ();
+						view.SetNeedsLayout ();
 						view.SetNeedsDisplay (view.Bounds);
 					}
 				}
@@ -1943,6 +2003,7 @@ namespace Terminal.Gui {
 
 		static void ProcessKeyEvent (KeyEvent ke)
 		{
+		
 			var chain = toplevels.ToList();
 			foreach (var topLevel in chain) {
 				if (topLevel.ProcessHotKey (ke))
@@ -1961,6 +2022,29 @@ namespace Terminal.Gui {
 			foreach (var topLevel in chain) {
 				// Process the key normally
 				if (topLevel.ProcessColdKey (ke))
+					return;
+				if (topLevel.Modal)
+					break;
+			}
+		}
+
+		static void ProcessKeyDownEvent (KeyEvent ke)
+		{
+			var chain = toplevels.ToList ();
+			foreach (var topLevel in chain) {
+				if (topLevel.KeyDown (ke))
+					return;
+				if (topLevel.Modal)
+					break;
+			}
+		}
+
+		
+		static void ProcessKeyUpEvent (KeyEvent ke)
+		{
+			var chain = toplevels.ToList ();
+			foreach (var topLevel in chain) {
+				if (topLevel.KeyUp (ke))
 					return;
 				if (topLevel.Modal)
 					break;
@@ -2063,6 +2147,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Action that is invoked once at beginning.
+		/// </summary>
+		static public Action OnLoad;
+
+		/// <summary>
 		/// Building block API: Prepares the provided toplevel for execution.
 		/// </summary>
 		/// <returns>The runstate handle that needs to be passed to the End() method upon completion.</returns>
@@ -2092,10 +2181,11 @@ namespace Terminal.Gui {
 			}
 			toplevels.Push (toplevel);
 			Current = toplevel;
-			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessMouseEvent);
+			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessKeyDownEvent, ProcessKeyUpEvent, ProcessMouseEvent);
 			if (toplevel.LayoutStyle == LayoutStyle.Computed)
 				toplevel.RelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
 			toplevel.LayoutSubviews ();
+			OnLoad?.Invoke ();
 			toplevel.WillPresent ();
 			Redraw (toplevel);
 			toplevel.PositionCursor ();

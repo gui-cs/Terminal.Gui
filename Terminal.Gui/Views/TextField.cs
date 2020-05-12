@@ -43,7 +43,7 @@ namespace Terminal.Gui {
 		/// <param name="text">Initial text contents.</param>
 		public TextField (string text) : this (ustring.Make (text))
 		{
-
+			Height = 1;
 		}
 
 		/// <summary>
@@ -85,6 +85,8 @@ namespace Terminal.Gui {
 		{
 			if (Application.mouseGrabView != null && Application.mouseGrabView == this)
 				Application.UngrabMouse ();
+			if (SelectedLength != 0 && !(Application.mouseGrabView is MenuBar))
+				ClearAllSelection ();
 		}
 
 		public override Rect Frame {
@@ -473,18 +475,17 @@ namespace Terminal.Gui {
 
 		public override bool MouseEvent (MouseEvent ev)
 		{
-			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked) && !ev.Flags.HasFlag (MouseFlags.Button1Pressed) &&
-				!ev.Flags.HasFlag (MouseFlags.ReportMousePosition))
+			if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed) && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition) &&
+				!ev.Flags.HasFlag (MouseFlags.Button1Released))
 				return false;
 
-			if (ev.Flags == MouseFlags.Button1Clicked) {
+			if (ev.Flags == MouseFlags.Button1Pressed) {
 				if (!HasFocus)
 					SuperView.SetFocus (this);
-				int x = PositionCursor (ev);
+				PositionCursor (ev);
 				if (isButtonReleased)
 					ClearAllSelection ();
 				isButtonReleased = true;
-				Application.UngrabMouse ();
 			} else if (ev.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
 				int x = PositionCursor (ev);
 				isButtonReleased = false;
@@ -496,6 +497,9 @@ namespace Terminal.Gui {
 				int x = PositionCursor (ev);
 				if (SelectedLength != 0)
 					ClearAllSelection ();
+			} else if (ev.Flags == MouseFlags.Button1Released) {
+				isButtonReleased = true;
+				Application.UngrabMouse ();
 			}
 
 			SetNeedsDisplay ();
