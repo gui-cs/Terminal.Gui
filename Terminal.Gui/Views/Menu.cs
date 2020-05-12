@@ -590,7 +590,6 @@ namespace Terminal.Gui {
 					if (openMenu != null)
 						CloseAllMenus ();
 					openedByAltKey = false;
-					openedByHotKey = false;
 					isMenuClosed = true;
 					selected = -1;
 					CanFocus = false;
@@ -599,7 +598,6 @@ namespace Terminal.Gui {
 					SetNeedsDisplay ();
 					Application.UngrabMouse ();
 				}
-				openedByHotKey = false;
 
 				return true;
 			}
