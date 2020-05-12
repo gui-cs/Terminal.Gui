@@ -26,6 +26,7 @@
 // SOFTWARE.
 //
 using System;
+using System.CodeDom;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -102,7 +103,7 @@ namespace Terminal.Gui {
 			}
 
 			if (ScreenBuffer != IntPtr.Zero)
-				CloseHandle(ScreenBuffer);
+				CloseHandle (ScreenBuffer);
 
 			ScreenBuffer = IntPtr.Zero;
 		}
@@ -358,8 +359,8 @@ namespace Terminal.Gui {
 		[DllImport ("kernel32.dll", SetLastError = true)]
 		static extern IntPtr GetStdHandle (int nStdHandle);
 
-		[DllImport("kernel32.dll", SetLastError = true)]
-		static extern bool CloseHandle(IntPtr handle);
+		[DllImport ("kernel32.dll", SetLastError = true)]
+		static extern bool CloseHandle (IntPtr handle);
 
 		[DllImport ("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode)]
 		public static extern bool ReadConsoleInput (
@@ -424,8 +425,8 @@ namespace Terminal.Gui {
 
 	internal class WindowsDriver : ConsoleDriver, Mono.Terminal.IMainLoopDriver {
 		static bool sync;
-		ManualResetEventSlim eventReady = new ManualResetEventSlim(false);
-		ManualResetEventSlim waitForProbe = new ManualResetEventSlim(false);
+		ManualResetEventSlim eventReady = new ManualResetEventSlim (false);
+		ManualResetEventSlim waitForProbe = new ManualResetEventSlim (false);
 		MainLoop mainLoop;
 		WindowsConsole.CharInfo [] OutputBuffer;
 		int cols, rows;
@@ -456,17 +457,17 @@ namespace Terminal.Gui {
 			Task.Run ((Action)WindowsInputHandler);
 		}
 
-		[StructLayout(LayoutKind.Sequential)]
+		[StructLayout (LayoutKind.Sequential)]
 		public struct ConsoleKeyInfoEx {
 			public ConsoleKeyInfo consoleKeyInfo;
 			public bool CapsLock;
 			public bool NumLock;
 
-			public ConsoleKeyInfoEx(ConsoleKeyInfo consoleKeyInfo, bool capslock, bool numlock)
+			public ConsoleKeyInfoEx (ConsoleKeyInfo consoleKeyInfo, bool capslock, bool numlock)
 			{
-			this.consoleKeyInfo = consoleKeyInfo;
-			CapsLock = capslock;
-			NumLock = numlock;
+				this.consoleKeyInfo = consoleKeyInfo;
+				CapsLock = capslock;
+				NumLock = numlock;
 			}
 		}
 
@@ -476,8 +477,8 @@ namespace Terminal.Gui {
 		void WindowsInputHandler ()
 		{
 			while (true) {
-				waitForProbe.Wait();
-				waitForProbe.Reset();
+				waitForProbe.Wait ();
+				waitForProbe.Reset ();
 
 				uint numberEventsRead = 0;
 
@@ -487,7 +488,7 @@ namespace Terminal.Gui {
 				else
 					result = records;
 
-				eventReady.Set();
+				eventReady.Set ();
 			}
 		}
 
@@ -498,7 +499,9 @@ namespace Terminal.Gui {
 
 		void IMainLoopDriver.Wakeup ()
 		{
-			tokenSource.Cancel();
+			//tokenSource.Cancel ();
+			eventReady.Reset ();
+			eventReady.Set ();
 		}
 
 		bool IMainLoopDriver.EventsPending (bool wait)
@@ -517,31 +520,35 @@ namespace Terminal.Gui {
 				waitTimeout = 0;
 
 			result = null;
-			waitForProbe.Set();
+			waitForProbe.Set ();
 
 			try {
-				if(!tokenSource.IsCancellationRequested)
-					eventReady.Wait(waitTimeout, tokenSource.Token);
+				if (!tokenSource.IsCancellationRequested)
+					eventReady.Wait (waitTimeout, tokenSource.Token);
 			} catch (OperationCanceledException) {
 				return true;
 			} finally {
-				eventReady.Reset();
+				eventReady.Reset ();
 			}
 
 			if (!tokenSource.IsCancellationRequested)
 				return result != null;
 
-			tokenSource.Dispose();
-			tokenSource = new CancellationTokenSource();
+			tokenSource.Dispose ();
+			tokenSource = new CancellationTokenSource ();
 			return true;
 		}
 
 		Action<KeyEvent> keyHandler;
+		Action<KeyEvent> keyDownHandler;
+		Action<KeyEvent> keyUpHandler;
 		Action<MouseEvent> mouseHandler;
 
-		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler)
+		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			this.keyHandler = keyHandler;
+			this.keyDownHandler = keyDownHandler;
+			this.keyUpHandler = keyUpHandler;
 			this.mouseHandler = mouseHandler;
 		}
 
@@ -554,16 +561,43 @@ namespace Terminal.Gui {
 			var inputEvent = result [0];
 			switch (inputEvent.EventType) {
 			case WindowsConsole.EventType.Key:
-				if (inputEvent.KeyEvent.bKeyDown == false)
-					return;
 				var map = MapKey (ToConsoleKeyInfoEx (inputEvent.KeyEvent));
-				if (inputEvent.KeyEvent.UnicodeChar == 0 && map == (Key)0xffffffff)
-					return;
-				keyHandler (new KeyEvent (map));
+				if (map == (Key)0xffffffff) {
+					KeyEvent key;
+					// Shift = VK_SHIFT = 0x10
+					// Ctrl = VK_CONTROL = 0x11
+					// Alt = VK_MENU = 0x12
+					switch (inputEvent.KeyEvent.wVirtualKeyCode) {
+					case 0x11:
+						key = new KeyEvent (Key.CtrlMask);
+						break;
+					case 0x12:
+						key = new KeyEvent (Key.AltMask);
+						break;
+					default:
+						key = new KeyEvent (Key.Unknown);
+						break;
+					}
+
+					if (inputEvent.KeyEvent.bKeyDown)
+						keyDownHandler (key);
+					else
+						keyUpHandler (key);
+				} else {
+					if (inputEvent.KeyEvent.bKeyDown) {
+						// Key Down - Fire KeyDown Event and KeyStroke (ProcessKey) Event
+						keyDownHandler (new KeyEvent (map));
+						keyHandler (new KeyEvent (map));
+					} else {
+						keyUpHandler (new KeyEvent (map));
+					}
+				}
 				break;
 
 			case WindowsConsole.EventType.Mouse:
 				mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
+				if (IsButtonReleased)
+					mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
 				break;
 
 			case WindowsConsole.EventType.WindowBufferSize:
@@ -571,15 +605,17 @@ namespace Terminal.Gui {
 				rows = inputEvent.WindowBufferSizeEvent.size.Y;
 				ResizeScreen ();
 				UpdateOffScreen ();
-				TerminalResized?.Invoke();
+				TerminalResized?.Invoke ();
 				break;
 			}
 			result = null;
 		}
 
 		WindowsConsole.ButtonState? LastMouseButtonPressed = null;
+		bool IsButtonPressed = false;
 		bool IsButtonReleased = false;
 		bool IsButtonDoubleClicked = false;
+		Point point;
 
 		MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
@@ -587,8 +623,8 @@ namespace Terminal.Gui {
 
 			if (IsButtonDoubleClicked) {
 				Task.Run (async () => {
-					await Task.Delay (300);
-					_ = new Action (() => IsButtonDoubleClicked = false);
+					await Task.Delay (100);
+					IsButtonDoubleClicked = false;
 				});
 			}
 
@@ -599,12 +635,13 @@ namespace Terminal.Gui {
 			// map to the correct clicked event.
 			if ((LastMouseButtonPressed != null || IsButtonReleased) && mouseEvent.ButtonState != 0) {
 				LastMouseButtonPressed = null;
+				IsButtonPressed = false;
 				IsButtonReleased = false;
 			}
 
 			if ((mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null && !IsButtonDoubleClicked) ||
 				(mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved &&
-				mouseEvent.ButtonState != 0 && !IsButtonDoubleClicked)) {
+				mouseEvent.ButtonState != 0 && !IsButtonReleased && !IsButtonDoubleClicked)) {
 				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Pressed;
@@ -619,11 +656,39 @@ namespace Terminal.Gui {
 					break;
 				}
 
-				if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved)
+				if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 					mouseFlag |= MouseFlags.ReportMousePosition;
+					point = new Point ();
+					IsButtonReleased = false;
+				} else {
+					point = new Point () {
+						X = mouseEvent.MousePosition.X,
+						Y = mouseEvent.MousePosition.Y
+					};
+				}
 				LastMouseButtonPressed = mouseEvent.ButtonState;
-			} else if (mouseEvent.EventFlags == 0 && LastMouseButtonPressed != null && !IsButtonReleased &&
-				!IsButtonDoubleClicked) {
+				IsButtonPressed = true;
+
+				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
+					Task.Run (async () => {
+						while (IsButtonPressed) {
+							await Task.Delay (200);
+							var me = new MouseEvent () {
+								X = mouseEvent.MousePosition.X,
+								Y = mouseEvent.MousePosition.Y,
+								Flags = mouseFlag
+							};
+
+							if (IsButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
+								mouseHandler (me);
+								mainLoop.Driver.Wakeup ();
+							}
+						}
+					});
+				}
+
+			} else if ((mouseEvent.EventFlags == 0 || mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) &&
+				LastMouseButtonPressed != null && !IsButtonReleased && !IsButtonDoubleClicked) {
 				switch (LastMouseButtonPressed) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Released;
@@ -637,21 +702,30 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button4Released;
 					break;
 				}
+				IsButtonPressed = false;
 				IsButtonReleased = true;
 			} else if ((mouseEvent.EventFlags == 0 || mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) &&
-				IsButtonReleased) {
-				switch (LastMouseButtonPressed) {
-				case WindowsConsole.ButtonState.Button1Pressed:
-					mouseFlag = MouseFlags.Button1Clicked;
-					break;
+				  IsButtonReleased) {
+				var p = new Point () {
+					X = mouseEvent.MousePosition.X,
+					Y = mouseEvent.MousePosition.Y
+				};
+				if (p == point) {
+					switch (LastMouseButtonPressed) {
+					case WindowsConsole.ButtonState.Button1Pressed:
+						mouseFlag = MouseFlags.Button1Clicked;
+						break;
 
-				case WindowsConsole.ButtonState.Button2Pressed:
-					mouseFlag = MouseFlags.Button2Clicked;
-					break;
+					case WindowsConsole.ButtonState.Button2Pressed:
+						mouseFlag = MouseFlags.Button2Clicked;
+						break;
 
-				case WindowsConsole.ButtonState.RightmostButtonPressed:
-					mouseFlag = MouseFlags.Button4Clicked;
-					break;
+					case WindowsConsole.ButtonState.RightmostButtonPressed:
+						mouseFlag = MouseFlags.Button4Clicked;
+						break;
+					}
+				} else {
+					mouseFlag = 0;
 				}
 				LastMouseButtonPressed = null;
 				IsButtonReleased = false;
@@ -734,8 +808,8 @@ namespace Terminal.Gui {
 			bool capslock = (state & (WindowsConsole.ControlKeyState.CapslockOn)) != 0;
 			bool numlock = (state & (WindowsConsole.ControlKeyState.NumlockOn)) != 0;
 
-			var ConsoleKeyInfo = new ConsoleKeyInfo(keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
-			return new ConsoleKeyInfoEx(ConsoleKeyInfo, capslock, numlock);
+			var ConsoleKeyInfo = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
+			return new ConsoleKeyInfoEx (ConsoleKeyInfo, capslock, numlock);
 		}
 
 		public Key MapKey (ConsoleKeyInfoEx keyInfoEx)
@@ -837,6 +911,7 @@ namespace Terminal.Gui {
 
 				return (Key)((int)Key.F1 + delta);
 			}
+
 			return (Key)(0xffffffff);
 		}
 
@@ -871,7 +946,7 @@ namespace Terminal.Gui {
 			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
 			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
 			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
-			Colors.Menu.Disabled = MakeColor(ConsoleColor.DarkGray, ConsoleColor.Cyan);
+			Colors.Menu.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Cyan);
 
 			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
 			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
@@ -925,10 +1000,10 @@ namespace Terminal.Gui {
 			}
 
 			ccol++;
-			var runeWidth = Rune.ColumnWidth(rune);
+			var runeWidth = Rune.ColumnWidth (rune);
 			if (runeWidth > 1) {
 				for (int i = 1; i < runeWidth; i++) {
-					AddStr(" ");
+					AddStr (" ");
 				}
 			}
 			if (ccol == Cols) {
@@ -947,7 +1022,7 @@ namespace Terminal.Gui {
 		}
 
 		int currentAttribute;
-		CancellationTokenSource tokenSource = new CancellationTokenSource();
+		CancellationTokenSource tokenSource = new CancellationTokenSource ();
 
 		public override void SetAttribute (Attribute c)
 		{
@@ -995,39 +1070,39 @@ namespace Terminal.Gui {
 			if (damageRegion.Left == -1)
 				return;
 
-			var bufferCoords = new WindowsConsole.Coord (){
+			var bufferCoords = new WindowsConsole.Coord () {
 				X = (short)Clip.Width,
 				Y = (short)Clip.Height
 			};
 
-			var window = new WindowsConsole.SmallRect (){
+			var window = new WindowsConsole.SmallRect () {
 				Top = 0,
 				Left = 0,
 				Right = (short)Clip.Right,
 				Bottom = (short)Clip.Bottom
 			};
 
-			UpdateCursor();
+			UpdateCursor ();
 			winConsole.WriteToConsole (OutputBuffer, bufferCoords, damageRegion);
-//			System.Diagnostics.Debugger.Log(0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
+			//			System.Diagnostics.Debugger.Log(0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 		}
 
-		public override void UpdateCursor()
+		public override void UpdateCursor ()
 		{
-			var position = new WindowsConsole.Coord(){
+			var position = new WindowsConsole.Coord () {
 				X = (short)ccol,
 				Y = (short)crow
 			};
-			winConsole.SetCursorPosition(position);
+			winConsole.SetCursorPosition (position);
 		}
 
 		public override void End ()
 		{
-			winConsole.Cleanup();
+			winConsole.Cleanup ();
 		}
 
-#region Unused
+		#region Unused
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
 		}
@@ -1055,7 +1130,7 @@ namespace Terminal.Gui {
 		public override void CookMouse ()
 		{
 		}
-#endregion
+		#endregion
 
 	}
 

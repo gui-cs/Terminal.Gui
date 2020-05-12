@@ -1,0 +1,13 @@
+# Set the default behavior for all files.
+* text=auto
+
+# Normalized and converts to 
+# native line endings on checkout.
+*.cs text
+
+# Convert to LF line endings on checkout.
+*.sh text eol=lf
+
+# Binary files.
+*.png binary
+*.jpg binary

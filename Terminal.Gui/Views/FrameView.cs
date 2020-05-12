@@ -44,8 +44,22 @@ namespace Terminal.Gui {
 		{
 			var cFrame = new Rect (1, 1 , frame.Width - 2, frame.Height - 2);
 			contentView = new ContentView (cFrame);
-			base.Add (contentView);
-			Title = title;
+			Initialize ();
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Gui.FrameView"/> class with
+		/// an absolute position, a title and views.
+		/// </summary>
+		/// <param name="frame">Frame.</param>
+		/// <param name="title">Title.</param>
+		/// /// <param name="views">Views.</param>
+		public FrameView (Rect frame, ustring title, View[] views) : this (frame, title)
+		{
+			foreach (var view in views) {
+				contentView.Add (view);
+			}
+			Initialize ();
 		}
 
 		/// <summary>
@@ -61,10 +75,14 @@ namespace Terminal.Gui {
 				Width = Dim.Fill (2),
 				Height = Dim.Fill (2)
 			};
+			Initialize ();
+		}
+
+		void Initialize ()
+		{
 			base.Add (contentView);
 			Title = title;
 		}
-
 
 		void DrawFrame ()
 		{

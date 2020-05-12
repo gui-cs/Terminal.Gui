@@ -320,8 +320,9 @@ namespace Terminal.Gui {
 			return (Key)(0xffffffff);
 		}
 
-		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler)
+		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
+			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			(mainLoop.Driver as NetMainLoop).WindowsKeyPressed = delegate (ConsoleKeyInfo consoleKey) {
 				var map = MapKey (consoleKey);
 				if (map == (Key)0xffffffff)
