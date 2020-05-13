@@ -9,11 +9,11 @@ using Terminal.Gui;
 namespace UICatalog {
 
 	/// <summary>
-	/// Base class for each demo/scenario. To define a new sceanrio simply 
-	/// 1) declare a class derived from Scenario, 
+	/// Base class for each demo/scenario. To define a new sceanrio simply
+	/// 1) declare a class derived from Scenario,
 	/// 2) Initializing Name and Description as appropriate,
 	/// 3) Implement Run.
-	/// The Main program uses reflection to find all sceanarios and adds them to the 
+	/// The Main program uses reflection to find all sceanarios and adds them to the
 	/// ListView. Press ENTER to run the selected sceanrio. Press ESC to exit it.
 	/// </summary>
 	public class Scenario {
@@ -21,7 +21,7 @@ namespace UICatalog {
 		public ustring Description { get; set; }
 		public override string ToString () => $"{Name,-30}{Description}";
 
-		public virtual void Run () { 
+		public virtual void Run () {
 		}
 
 		/// <summary>
@@ -40,8 +40,8 @@ namespace UICatalog {
 
 
 	/// <summary>
-	/// Main program for the Terminal.gui UI Catalog app. This app provides a chooser that allows 
-	/// for a calalog of UI demos, examples, and tests. 
+	/// Main program for the Terminal.gui UI Catalog app. This app provides a chooser that allows
+	/// for a calalog of UI demos, examples, and tests.
 	/// </summary>
 	class Program {
 		internal class ScenarioListDataSource : IListDataSource {

@@ -84,6 +84,7 @@ static class Demo {
 
 	static void ShowTextAlignments ()
 	{
+<<<<<<< HEAD
 		var container = new Window ($"Show Text Alignments") {
 			X = 0,
 			Y = 0,
@@ -94,14 +95,28 @@ static class Demo {
 			if (ke.Key == Key.Esc)
 				container.Running = false;
 		};
+=======
+		var container = new Dialog (
+			"Text Alignments", 70, 20,
+			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
+			new Button ("Cancel") { Clicked = () => { Application.RequestStop (); } });
+
+>>>>>>> cb40c5c2491a559658481d20dd4b6a3343c0183f
 
 		int i = 0;
 		string txt = "Hello world, how are you doing today?";
 		container.Add (
+<<<<<<< HEAD
 				new Label ($"{i+1}-{txt}") { TextAlignment = TextAlignment.Left,      Y = 3, Width = Dim.Fill () },
 				new Label ($"{i+2}-{txt}") { TextAlignment = TextAlignment.Right,     Y = 5, Width = Dim.Fill () },
 				new Label ($"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered,  Y = 7, Width = Dim.Fill () },
 				new Label ($"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified, Y = 9, Width = Dim.Fill () }
+=======
+				new Label (new Rect (0, 1, 50, 3), $"{i+1}-{txt}") { TextAlignment = TextAlignment.Left },
+				new Label (new Rect (0, 3, 50, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
+				new Label (new Rect (0, 5, 50, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
+				new Label (new Rect (0, 7, 50, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
+>>>>>>> cb40c5c2491a559658481d20dd4b6a3343c0183f
 			);
 
 		Application.Run (container);
