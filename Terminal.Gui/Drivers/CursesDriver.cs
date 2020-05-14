@@ -245,7 +245,8 @@ namespace Terminal.Gui {
 			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			Curses.timeout (-1);
 
-			(mainLoop.Driver as Mono.Terminal.UnixMainLoop).AddWatch (0, Mono.Terminal.UnixMainLoop.Condition.PollIn, x => {
+			(mainLoop.Driver as Mono.Terminal.UnixMainLoop).AddWatch (0, Mono.Terminal.UnixMainLoop.Condition.PollIn |
+				Mono.Terminal.UnixMainLoop.Condition.PollOut, x => {
 				ProcessInput (keyHandler, mouseHandler);
 				return true;
 			});
