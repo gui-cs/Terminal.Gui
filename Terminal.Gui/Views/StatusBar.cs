@@ -101,7 +101,12 @@ namespace Terminal.Gui {
 			Items = items;
 			CanFocus = false;
 			ColorScheme = Colors.Menu;
+			X = 0;
+			Y = Driver.Rows - 1;
+			Width = Dim.Fill ();
+			Height = 1;
 
+			// This is never called if it is invoked later on another place.
 			Application.OnLoad += () => {
 				X = 0;
 				Height = 1;
@@ -134,11 +139,11 @@ namespace Terminal.Gui {
 
 		public override void Redraw (Rect region)
 		{
-			if (Frame.Y != Driver.Rows - 1) {
-				Frame = new Rect (Frame.X, Driver.Rows - 1, Frame.Width, Frame.Height);
-				Y = Driver.Rows - 1;
-				SetNeedsDisplay ();
-			}
+			//if (Frame.Y != Driver.Rows - 1) {
+			//	Frame = new Rect (Frame.X, Driver.Rows - 1, Frame.Width, Frame.Height);
+			//	Y = Driver.Rows - 1;
+			//	SetNeedsDisplay ();
+			//}
 
 			Move (0, 0);
 			Driver.SetAttribute (ColorScheme.Normal);
