@@ -437,7 +437,11 @@ namespace Terminal.Gui {
 			this.mainLoop = mainLoop;
 
 			(mainLoop.Driver as Mono.Terminal.UnixMainLoop).AddWatch (0, Mono.Terminal.UnixMainLoop.Condition.PollIn, x => {
+<<<<<<< HEAD
 				ProcessInput (keyHandler, keyUpHandler, mouseHandler);
+=======
+				ProcessInput (keyHandler, mouseHandler);
+>>>>>>> Revert "Updates screen on Unix window resizing."
 				return true;
 			});
 
