@@ -66,13 +66,17 @@ namespace Terminal.Gui {
 			this.Add(listview);
 			this.Add(search);
 			this.SetFocus(search);
-
-			this.Enter += (object sender, EventArgs e) => {
-				this.SetFocus(search);
-				search.CursorPosition = search.Text.Length;
-			};
 		}
 
+		public override bool OnEnter ()
+		{
+			if (!search.HasFocus)
+				this.SetFocus (search);
+
+			search.CursorPosition = search.Text.Length;
+
+			return true;
+		}
 		public override bool ProcessKey(KeyEvent e)
 		{
 			if (e.Key == Key.Tab)
