@@ -24,9 +24,10 @@ namespace Terminal.Gui {
 	///   Unicode runes are also stored here, the letter 'A" for example is encoded as a value 65 (not surfaced in the enum).
 	/// </para>
 	/// </remarks>
+	[Flags]
 	public enum Key : uint {
 		/// <summary>
-		/// Mask that indictes that this is a character value, values outside this range
+		/// Mask that indicates that this is a character value, values outside this range
 		/// indicate special characters like Alt-key combinations or special keys on the
 		/// keyboard like function keys, arrows keys and so on.
 		/// </summary>
@@ -42,7 +43,7 @@ namespace Terminal.Gui {
 		/// The key code for the user pressing Control-spacebar
 		/// </summary>
 		ControlSpace = 0,
-			
+
 		/// <summary>
 	        /// The key code for the user pressing Control-A
 		/// </summary>
@@ -79,10 +80,6 @@ namespace Terminal.Gui {
 		/// The key code for the user pressing Control-I (same as the tab key).
 		/// </summary>
 		ControlI,
-		/// <summary>
-		/// The key code for the user pressing the tab key (same as pressing Control-I).
-		/// </summary>
-		Tab = ControlI,
 		/// <summary>
 		/// The key code for the user pressing Control-J
 		/// </summary>
@@ -151,7 +148,7 @@ namespace Terminal.Gui {
 		/// The key code for the user pressing Control-Z
 		/// </summary>
 		ControlZ,
-			
+
 		/// <summary>
 		/// The key code for the user pressing the escape key
 		/// </summary>
@@ -171,6 +168,11 @@ namespace Terminal.Gui {
 		/// The key code for the user pressing the delete key.
 		/// </summary>
 		Delete = 127,
+
+		/// <summary>
+		/// When this value is set, the Key encodes the sequence Shift-KeyValue.
+		/// </summary>
+		ShiftMask = 0x10000000,
 
 		/// <summary>
 		///   When this value is set, the Key encodes the sequence Alt-KeyValue.
@@ -270,6 +272,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		F10,
 		/// <summary>
+		/// The key code for the user pressing the tab key (forwards tab key).
+		/// </summary>
+		Tab,
+		/// <summary>
 		/// Shift-tab key (backwards tab key).
 		/// </summary>
 		BackTab,
@@ -290,11 +296,17 @@ namespace Terminal.Gui {
 		public Key Key;
 
 		/// <summary>
-		///   The key value cast to an integer, you will typicall use this for
+		///   The key value cast to an integer, you will typical use this for
 		///   extracting the Unicode rune value out of a key, when none of the
 		///   symbolic options are in use.
 		/// </summary>
 		public int KeyValue => (int)Key;
+
+		/// <summary>
+		/// Gets a value indicating whether the Shift key was pressed.
+		/// </summary>
+		/// <value><c>true</c> if is shift; otherwise, <c>false</c>.</value>
+		public bool IsShift => (Key & Key.ShiftMask) != 0;
 
 		/// <summary>
 		/// Gets a value indicating whether the Alt key was pressed (real or synthesized)
@@ -306,7 +318,8 @@ namespace Terminal.Gui {
 		/// Determines whether the value is a control key (and NOT just the ctrl key)
 		/// </summary>
 		/// <value><c>true</c> if is ctrl; otherwise, <c>false</c>.</value>
-		public bool IsCtrl => ((uint)Key >= 1) && ((uint)Key <= 26);
+		//public bool IsCtrl => ((uint)Key >= 1) && ((uint)Key <= 26);
+		public bool IsCtrl => (Key & Key.CtrlMask) != 0;
 
 		/// <summary>
 		///   Constructs a new KeyEvent from the provided Key value - can be a rune cast into a Key value

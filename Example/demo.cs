@@ -427,11 +427,11 @@ static class Demo {
 	#endregion
 
 
-	#region OnKeyDown / OnKeyUp Demo
-	private static void OnKeyDownUpDemo ()
+	#region OnKeyDown / OnKeyPress / OnKeyUp Demo
+	private static void OnKeyDownPressUpDemo ()
 	{
 		var container = new Dialog (
-			"OnKeyDown & OnKeyUp demo", 80, 20,
+			"OnKeyDown & OnKeyPress & OnKeyUp demo", 80, 20,
 			new Button ("Close") { Clicked = () => { Application.RequestStop (); } }) {
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
@@ -447,20 +447,45 @@ static class Demo {
 		listView.ColorScheme = Colors.TopLevel;
 		container.Add (listView);
 
-		void KeyUpDown (KeyEvent keyEvent, string updown)
+		void KeyDownPressUp (KeyEvent keyEvent, string updown)
 		{
-			if ((keyEvent.Key & Key.CtrlMask) != 0) {
-				list.Add ($"Key{updown,-4}: Ctrl ");
-			} else if ((keyEvent.Key & Key.AltMask) != 0) {
-				list.Add ($"Key{updown,-4}: Alt ");
-			} else {
-				list.Add ($"Key{updown,-4}: {(((uint)keyEvent.KeyValue & (uint)Key.CharMask) > 26 ? $"{(char)keyEvent.KeyValue}" : $"{keyEvent.Key}")}");
+			const int ident = -5;
+			switch (updown) {
+			case "Down":
+			case "Up":
+			case "Press":
+				var msg = $"Key{updown,ident}: ";
+				if ((keyEvent.Key & Key.ShiftMask) != 0)
+					msg += "Shift ";
+				if ((keyEvent.Key & Key.CtrlMask) != 0)
+					msg += "Ctrl ";
+				if ((keyEvent.Key & Key.AltMask) != 0)
+					msg += "Alt ";
+				msg += $"{(((uint)keyEvent.KeyValue & (uint)Key.CharMask) > 26 ? $"{(char)keyEvent.KeyValue}" : $"{keyEvent.Key}")}";
+				list.Add (msg);
+
+				break;
+
+			default:
+				if ((keyEvent.Key & Key.ShiftMask) != 0) {
+					list.Add ($"Key{updown,ident}: Shift ");
+				} else if ((keyEvent.Key & Key.CtrlMask) != 0) {
+					list.Add ($"Key{updown,ident}: Ctrl ");
+				} else if ((keyEvent.Key & Key.AltMask) != 0) {
+					list.Add ($"Key{updown,ident}: Alt ");
+				} else {
+					list.Add ($"Key{updown,ident}: {(((uint)keyEvent.KeyValue & (uint)Key.CharMask) > 26 ? $"{(char)keyEvent.KeyValue}" : $"{keyEvent.Key}")}");
+				}
+
+				break;
 			}
 			listView.MoveDown ();
 		}
 
-		container.OnKeyDown += (KeyEvent keyEvent) => KeyUpDown (keyEvent, "Down");
-		container.OnKeyUp += (KeyEvent keyEvent) => KeyUpDown (keyEvent, "Up");
+
+		container.OnKeyDown += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Down");
+		container.OnKeyPress += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Press");
+		container.OnKeyUp += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Up");
 		Application.Run (container);
 	}
 	#endregion
@@ -533,7 +558,7 @@ static class Demo {
 			}),
 			new MenuBarItem ("A_ssorted", new MenuItem [] {
 				new MenuItem ("_Show text alignments", "", () => ShowTextAlignments ()),
-				new MenuItem ("_OnKeyDown/Up", "", () => OnKeyDownUpDemo ())
+				new MenuItem ("_OnKeyDown/Press/Up", "", () => OnKeyDownPressUpDemo ())
 			}),
 			new MenuBarItem ("_Test Menu and SubMenus", new MenuItem [] {
 				new MenuItem ("SubMenu1Item_1",
@@ -580,7 +605,7 @@ static class Demo {
 			new StatusItem(Key.F1, "~F1~ Help", () => Help()),
 			new StatusItem(Key.F2, "~F2~ Load", null),
 			new StatusItem(Key.F3, "~F3~ Save", null),
-			new StatusItem(Key.ControlX, "~^X~ Quit", () => { if (Quit ()) top.Running = false; }),
+			new StatusItem(Key.ControlQ, "~^Q~ Quit", () => { if (Quit ()) top.Running = false; }),
 		}) {
 			Parent = null,
 		};

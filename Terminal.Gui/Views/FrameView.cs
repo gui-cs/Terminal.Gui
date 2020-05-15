@@ -43,6 +43,7 @@ namespace Terminal.Gui {
 		public FrameView (Rect frame, ustring title) : base (frame)
 		{
 			var cFrame = new Rect (1, 1 , frame.Width - 2, frame.Height - 2);
+			this.title = title;
 			contentView = new ContentView (cFrame);
 			Initialize ();
 		}
@@ -69,6 +70,7 @@ namespace Terminal.Gui {
 		/// <param name="title">Title.</param>
 		public FrameView (ustring title)
 		{
+			this.title = title;
 			contentView = new ContentView () {
 				X = 1,
 				Y = 1,
@@ -81,7 +83,6 @@ namespace Terminal.Gui {
 		void Initialize ()
 		{
 			base.Add (contentView);
-			Title = title;
 		}
 
 		void DrawFrame ()
