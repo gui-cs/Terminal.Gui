@@ -422,7 +422,7 @@ static class Demo {
 		var d = new Dialog ("Select source file", 40, 12) { list };
 		Application.Run (d);
 
-		MessageBox.Query (60, 10, "Selected file", list.Text == null ? "Nothing selected" : list.Text, "Ok");
+		MessageBox.Query (60, 10, "Selected file", list.Text.ToString() == "" ? "Nothing selected" : list.Text.ToString(), "Ok");
 	}
 	#endregion
 
