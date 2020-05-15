@@ -67,7 +67,7 @@ namespace Terminal.Gui {
 			this.Add(search);
 			this.SetFocus(search);
 
-			this.OnEnter += (object sender, EventArgs e) => {
+			this.Enter += (object sender, EventArgs e) => {
 				this.SetFocus(search);
 				search.CursorPosition = search.Text.Length;
 			};
