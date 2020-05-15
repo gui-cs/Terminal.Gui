@@ -639,7 +639,7 @@ namespace Terminal.Gui {
 				point = text.Count;
 			if (point < first)
 				point = 0;
-			return x;
+			return point;
 		}
 
 		void PrepareSelection (int x, int direction = 0)
