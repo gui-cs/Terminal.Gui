@@ -343,6 +343,29 @@ namespace Terminal.Gui {
 				return false;
 			});
 		}
+
+		public override bool KeyDown (KeyEvent keyEvent)
+		{
+			if (keyEvent.IsAlt) {
+				host.CloseAllMenus ();
+				return true;
+			}
+
+			return false;
+		}
+
+		public override bool ProcessHotKey (KeyEvent keyEvent)
+		{
+			// To ncurses simulate a AltMask key pressing Alt+Space because
+			// it can´t detect an alone special key down was pressed.
+			if (keyEvent.IsAlt && keyEvent.Key == Key.AltMask) {
+				KeyDown (keyEvent);
+				return true;
+			}
+
+			return false;
+		}
+
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			bool disabled;
@@ -445,7 +468,8 @@ namespace Terminal.Gui {
 					Run (barItems.Children [meY].Action);
 				return true;
 			} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked ||
-				me.Flags == MouseFlags.ReportMousePosition) {
+				me.Flags == MouseFlags.ReportMousePosition ||
+				me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
 				disabled = false;
 				if (me.Y < 1)
 					return true;
@@ -534,9 +558,12 @@ namespace Terminal.Gui {
 			isMenuClosed = true;
 		}
 
+		bool openedByAltKey;
 		public override bool KeyDown (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
+				openedByAltKey = true;
+				SetNeedsDisplay ();
 				openedByHotKey = false;
 			}
 			return false;
@@ -544,29 +571,45 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Track Alt key-up events. On Windows, when a user releases Alt (without another key), the menu gets focus but doesn't open.
-		/// We mimic that behavior here. 
+		/// We mimic that behavior here.
 		/// </summary>
 		/// <param name="keyEvent"></param>
 		/// <returns></returns>
 		public override bool KeyUp (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
-				// User pressed Alt - this may be a precursor to a menu accellerator (e.g. Alt-F)
-				if (openMenu == null) {
-					// There's no open menu, the first menu item should be highlight. 
-					// The right way to do this is to SetFocus(MenuBar), but for some reason 
+				// User pressed Alt - this may be a precursor to a menu accelerator (e.g. Alt-F)
+				if (!keyEvent.IsCtrl && openedByAltKey && isMenuClosed && openMenu == null && ((uint)keyEvent.Key & (uint)Key.CharMask) == 0) {
+					// There's no open menu, the first menu item should be highlight.
+					// The right way to do this is to SetFocus(MenuBar), but for some reason
 					// that faults.
 
-					Activate (0);
+					//Activate (0);
+					//StartMenu ();
+					isMenuClosed = false;
+					selected = 0;
+					CanFocus = true;
+					lastFocused = SuperView.MostFocused;
+					SuperView.SetFocus (this);
 					SetNeedsDisplay ();
-				} else {
-					// There's an open menu. If this Alt key-up is a pre-cursor to an acellerator
+					Application.GrabMouse (this);
+				} else if (!openedByHotKey) {
+					// There's an open menu. If this Alt key-up is a pre-cursor to an accelerator
 					// we don't want to close the menu because it'll flash.
 					// How to deal with that?
-					if (!openedByHotKey) {
+
+					if (openMenu != null)
 						CloseAllMenus ();
-					}
+					openedByAltKey = false;
+					isMenuClosed = true;
+					selected = -1;
+					CanFocus = false;
+					if (lastFocused != null)
+						SuperView?.SetFocus (lastFocused);
+					SetNeedsDisplay ();
+					Application.UngrabMouse ();
 				}
+
 				return true;
 			}
 			return false;
@@ -589,8 +632,11 @@ namespace Terminal.Gui {
 				if (i == selected) {
 					hotColor = i == selected ? ColorScheme.HotFocus : ColorScheme.HotNormal;
 					normalColor = i == selected ? ColorScheme.Focus : ColorScheme.Normal;
-				} else {
+				} else if (openedByAltKey) {
 					hotColor = ColorScheme.HotNormal;
+					normalColor = ColorScheme.Normal;
+				} else {
+					hotColor = ColorScheme.Normal;
 					normalColor = ColorScheme.Normal;
 				}
 				DrawHotString ($" {menu.Title}  ", hotColor, normalColor);
@@ -815,6 +861,7 @@ namespace Terminal.Gui {
 			}
 			isMenuClosed = true;
 			openedByHotKey = false;
+			openedByAltKey = false;
 		}
 
 		View FindDeepestMenu (View view, ref int count)
@@ -890,7 +937,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		bool openedByHotKey = false;
+		bool openedByHotKey;
 		internal bool FindAndOpenMenuByHotkey (KeyEvent kb)
 		{
 			int pos = 0;
@@ -901,20 +948,25 @@ namespace Terminal.Gui {
 				int p = mi.Title.IndexOf ('_');
 				if (p != -1 && p + 1 < mi.Title.Length) {
 					if (Char.ToUpperInvariant ((char)mi.Title [p + 1]) == c) {
-						if (mi.IsTopLevel) {
-							var menu = new Menu (this, i, 0, mi);
-							menu.Run (mi.Action);
-						} else {
-							openedByHotKey = true;
-							Application.GrabMouse (this);
-							selected = i;
-							OpenMenu (i);
-						}
+						ProcessMenu (i, mi);
 						return true;
 					}
 				}
 			}
 			return false;
+		}
+
+		private void ProcessMenu (int i, MenuBarItem mi)
+		{
+			if (mi.IsTopLevel) {
+				var menu = new Menu (this, i, 0, mi);
+				menu.Run (mi.Action);
+			} else {
+				openedByHotKey = true;
+				Application.GrabMouse (this);
+				selected = i;
+				OpenMenu (i);
+			}
 		}
 
 		public override bool ProcessHotKey (KeyEvent kb)
@@ -927,10 +979,16 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (kb.IsAlt) {
+			// To ncurses simulate a AltMask key pressing Alt+Space because
+			// it can´t detect an alone special key down was pressed.
+			if (kb.IsAlt && kb.Key == Key.AltMask && openMenu == null) {
+				KeyDown (kb);
+				KeyUp (kb);
+				return true;
+			} else if (kb.IsAlt) {
 				if (FindAndOpenMenuByHotkey (kb)) return true;
 			}
-			var kc = kb.KeyValue;
+			//var kc = kb.KeyValue;
 
 			return base.ProcessHotKey (kb);
 		}
@@ -951,6 +1009,15 @@ namespace Terminal.Gui {
 			case Key.ControlC:
 				//TODO: Running = false;
 				CloseMenu ();
+				if (openedByAltKey) {
+					openedByAltKey = false;
+					LastFocused.SuperView?.SetFocus (LastFocused);
+				}
+				break;
+
+			case Key.CursorDown:
+			case Key.Enter:
+				ProcessMenu (selected, Menus [selected]);
 				break;
 
 			default:
@@ -958,10 +1025,12 @@ namespace Terminal.Gui {
 				if ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z') || (key >= '0' && key <= '9')) {
 					char c = Char.ToUpper ((char)key);
 
-					if (Menus [selected].IsTopLevel)
+					if (selected == -1 || Menus [selected].IsTopLevel)
 						return false;
 
 					foreach (var mi in Menus [selected].Children) {
+						if (mi == null)
+							continue;
 						int p = mi.Title.IndexOf ('_');
 						if (p != -1 && p + 1 < mi.Title.Length) {
 							if (mi.Title [p + 1] == c) {
@@ -985,14 +1054,15 @@ namespace Terminal.Gui {
 			}
 			handled = false;
 
-			if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked ||
-				(me.Flags == MouseFlags.ReportMousePosition && selected > -1)) {
+			if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1Clicked || me.Flags == MouseFlags.Button1DoubleClicked ||
+				(me.Flags == MouseFlags.ReportMousePosition && selected > -1) ||
+				(me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && selected > -1)) {
 				int pos = 1;
 				int cx = me.X;
 				for (int i = 0; i < Menus.Length; i++) {
 					if (cx > pos && me.X < pos + 1 + Menus [i].TitleLength) {
 						if (selected == i && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) &&
-							!isMenuClosed) {
+											!isMenuClosed) {
 							Application.UngrabMouse ();
 							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
@@ -1036,8 +1106,8 @@ namespace Terminal.Gui {
 						Application.GrabMouse (me.View);
 						me.View.MouseEvent (me);
 					}
-				} else if (!(me.View is MenuBar || me.View is Menu) && (me.Flags.HasFlag (MouseFlags.Button1Pressed) ||
-					me.Flags == MouseFlags.Button1DoubleClicked)) {
+				} else if (!(me.View is MenuBar || me.View is Menu) && (me.Flags.HasFlag (MouseFlags.Button1Clicked) ||
+					me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1Pressed)) {
 					Application.UngrabMouse ();
 					CloseAllMenus ();
 					handled = false;
@@ -1046,7 +1116,8 @@ namespace Terminal.Gui {
 					handled = false;
 					return false;
 				}
-			} else if (isMenuClosed && (me.Flags.HasFlag (MouseFlags.Button1Pressed) || me.Flags == MouseFlags.Button1DoubleClicked)) {
+			} else if (isMenuClosed && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked ||
+				me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
 				Application.GrabMouse (current);
 			} else {
 				handled = false;
