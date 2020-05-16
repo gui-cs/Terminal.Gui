@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Reflection;
 using NStack;
 using System.Text;
+using Rune = System.Rune;
 
 static class Demo {
 	//class Box10x : View, IScrollView {
