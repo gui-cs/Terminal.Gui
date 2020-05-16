@@ -81,11 +81,11 @@ namespace Terminal.Gui {
 			} else
 				needMove = true;
 			ccol++;
-			if (ccol == Cols) {
-				ccol = 0;
-				if (crow + 1 < Rows)
-					crow++;
-			}
+			//if (ccol == Cols) {
+			//	ccol = 0;
+			//	if (crow + 1 < Rows)
+			//		crow++;
+			//}
 			if (sync)
 				UpdateScreen ();
 		}

@@ -78,15 +78,16 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			Used = true;
 			WantMousePositionReports = true;
-			OnLeave += TextField_OnLeave;
 		}
 
-		void TextField_OnLeave (object sender, EventArgs e)
+		public override bool OnLeave ()
 		{
 			if (Application.mouseGrabView != null && Application.mouseGrabView == this)
 				Application.UngrabMouse ();
 			if (SelectedLength != 0 && !(Application.mouseGrabView is MenuBar))
 				ClearAllSelection ();
+
+			return base.OnLeave ();
 		}
 
 		public override Rect Frame {
@@ -94,9 +95,14 @@ namespace Terminal.Gui {
 			set {
 				base.Frame = value;
 				var w = base.Frame.Width;
-				first = point > w ? point - w : 0;
+				//first = point > w ? point - w : 0;
+				Adjust ();
 			}
 		}
+
+		List<ustring> historyText;
+		int idxhistoryText;
+		bool isFromHistory;
 
 		/// <summary>
 		///   Sets or gets the text in the entry.
@@ -109,15 +115,24 @@ namespace Terminal.Gui {
 			}
 
 			set {
-				ustring oldText = ustring.Make (text);
+				var oldText = ustring.Make (text);
 				text = TextModel.ToRunes (value);
+				if (!Secret && !isFromHistory) {
+					if (historyText == null)
+						historyText = new List<ustring> () { oldText };
+					if (idxhistoryText > 0 && idxhistoryText + 1 < historyText.Count)
+						historyText.RemoveRange (idxhistoryText + 1, historyText.Count - idxhistoryText - 1);
+					historyText.Add (ustring.Make (text));
+					idxhistoryText++;
+				}
 				Changed?.Invoke (this, oldText);
 
 				if (point > text.Count)
-					point = Math.Max (text.Count-1, 0);
+					point = Math.Max (DisplaySize (text, 0) - 1, 0);
 
 				// FIXME: this needs to be updated to use Rune.ColumnWidth
-				first = point > Frame.Width ? point - Frame.Width : 0;
+				//first = point > Frame.Width ? point - Frame.Width : 0;
+				Adjust ();
 				SetNeedsDisplay ();
 			}
 		}
@@ -171,14 +186,14 @@ namespace Terminal.Gui {
 			var tcount = text.Count;
 			for (int idx = 0; idx < tcount; idx++){
 				var rune = text [idx];
-				if (idx < first)
+				if (idx < p)
 					continue;
 				var cols = Rune.ColumnWidth (rune);
 				if (col == point && HasFocus && !Used && SelectedLength == 0)
 					Driver.SetAttribute (Colors.Menu.HotFocus);
 				else
 					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : ColorScheme.Focus);
-				if (col + cols < width)
+				if (col + cols <= width)
 					Driver.AddRune ((Rune)(Secret ? '*' : rune));
 				col += cols;
 			}
@@ -204,10 +219,13 @@ namespace Terminal.Gui {
 
 		void Adjust ()
 		{
+			int offB = 0;
+			if (SuperView != null && SuperView.Frame.Right - Frame.Right < 0)
+				offB = SuperView.Frame.Right - Frame.Right - 1;
 			if (point < first)
 				first = point;
-			else if (first + point >= Frame.Width) {
-				first = point - (Frame.Width - 1);
+			else if (first + point >= Frame.Width + offB) {
+				first = point - (Frame.Width - 1 + offB);
 			}
 			SetNeedsDisplay ();
 		}
@@ -269,12 +287,64 @@ namespace Terminal.Gui {
 				}
 				break;
 
+			case Key.Home | Key.ShiftMask:
+				if (point > 0) {
+					int x = point;
+					point = 0;
+					PrepareSelection (x, point - x);
+				}
+				break;
+
+			case Key.End | Key.ShiftMask:
+				if (point < text.Count) {
+					int x = point;
+					point = text.Count;
+					PrepareSelection (x, point - x);
+				}
+				break;
+
 			// Home, C-A
 			case Key.Home:
 			case Key.ControlA:
 				ClearAllSelection ();
 				point = 0;
 				Adjust ();
+				break;
+
+			case Key.CursorLeft | Key.ShiftMask:
+			case Key.CursorUp | Key.ShiftMask:
+				if (point > 0) {
+					PrepareSelection (point--, -1);
+				}
+				break;
+
+			case Key.CursorRight | Key.ShiftMask:
+			case Key.CursorDown | Key.ShiftMask:
+				if (point < text.Count) {
+					PrepareSelection (point++, 1);
+				}
+				break;
+
+			case Key.CursorLeft | Key.ShiftMask | Key.CtrlMask:
+			case Key.CursorUp | Key.ShiftMask | Key.CtrlMask:
+				if (point > 0) {
+					int x = start > -1 ? start : point;
+					int sbw = WordBackward (point);
+					if (sbw != -1)
+						point = sbw;
+					PrepareSelection (x, sbw - x);
+				}
+				break;
+
+			case Key.CursorRight | Key.ShiftMask | Key.CtrlMask:
+			case Key.CursorDown | Key.ShiftMask | Key.CtrlMask:
+				if (point < text.Count) {
+					int x = start > -1 ? start : point;
+					int sfw = WordForward (point);
+					if (sfw != -1)
+						point = sfw;
+					PrepareSelection (x, sfw - x);
+				}
 				break;
 
 			case Key.CursorLeft:
@@ -311,23 +381,53 @@ namespace Terminal.Gui {
 				Adjust ();
 				break;
 
-			case Key.ControlY: // Control-y, yank
-				if (Clipboard.Contents == null)
-					return true;
-				var clip = TextModel.ToRunes (Clipboard.Contents);
-				if (clip == null)
-					return true;
-
-				if (point == text.Count) {
+			// Undo
+			case Key.ControlZ:
+				if (historyText != null && historyText.Count > 0) {
+					isFromHistory = true;
+					if (idxhistoryText > 0)
+						idxhistoryText--;
+					if (idxhistoryText > -1)
+						Text = historyText [idxhistoryText];
 					point = text.Count;
-					SetText(text.Concat(clip).ToList());
-				} else {
-					point += clip.Count;
-					SetText(text.GetRange(0, oldCursorPos).Concat(clip).Concat(text.GetRange(oldCursorPos, text.Count - oldCursorPos)));
+					isFromHistory = false;
 				}
-				Adjust ();
 				break;
 
+			//Redo
+			case Key.ControlY: // Control-y, yank
+				if (historyText != null && historyText.Count > 0) {
+					isFromHistory = true;
+					if (idxhistoryText < historyText.Count - 1) {
+						idxhistoryText++;
+						if (idxhistoryText < historyText.Count) {
+							Text = historyText [idxhistoryText];
+						} else if (idxhistoryText == historyText.Count - 1) {
+							Text = historyText [historyText.Count - 1];
+						}
+						point = text.Count;
+					}
+					isFromHistory = false;
+				}
+
+				//if (Clipboard.Contents == null)
+				//	return true;
+				//var clip = TextModel.ToRunes (Clipboard.Contents);
+				//if (clip == null)
+				//	return true;
+
+				//if (point == text.Count) {
+				//	point = text.Count;
+				//	SetText(text.Concat(clip).ToList());
+				//} else {
+				//	point += clip.Count;
+				//	SetText(text.GetRange(0, oldCursorPos).Concat(clip).Concat(text.GetRange(oldCursorPos, text.Count - oldCursorPos)));
+				//}
+				//Adjust ();
+
+				break;
+
+			case Key.CursorLeft | Key.CtrlMask:
 			case (Key)((int)'b' + Key.AltMask):
 				ClearAllSelection ();
 				int bw = WordBackward (point);
@@ -336,6 +436,7 @@ namespace Terminal.Gui {
 				Adjust ();
 				break;
 
+			case Key.CursorRight | Key.CtrlMask:
 			case (Key)((int)'f' + Key.AltMask):
 				ClearAllSelection ();
 				int fw = WordForward (point);
@@ -344,20 +445,20 @@ namespace Terminal.Gui {
 				Adjust ();
 				break;
 
-			case Key.AltMask | Key.ControlI:
+			case Key.InsertChar:
 				Used = !Used;
 				SetNeedsDisplay ();
 				break;
 
-			case Key.AltMask | Key.ControlC:
+			case Key.ControlC:
 				Copy ();
 				break;
 
-			case Key.AltMask | Key.ControlX:
+			case Key.ControlX:
 				Cut ();
 				break;
 
-			case Key.AltMask | Key.ControlV:
+			case Key.ControlV:
 				Paste ();
 				break;
 
@@ -378,7 +479,7 @@ namespace Terminal.Gui {
 				var kbstr = TextModel.ToRunes (ustring.Make ((uint)kb.Key));
 				if (used) {
 					point++;
-					if (point == text.Count) {
+					if (point == text.Count + 1) {
 						SetText (text.Concat (kbstr).ToList ());
 					} else {
 						SetText (text.GetRange (0, oldCursorPos).Concat (kbstr).Concat (text.GetRange (oldCursorPos, Math.Min (text.Count - oldCursorPos, text.Count))));
@@ -476,7 +577,8 @@ namespace Terminal.Gui {
 		public override bool MouseEvent (MouseEvent ev)
 		{
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed) && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition) &&
-				!ev.Flags.HasFlag (MouseFlags.Button1Released))
+				!ev.Flags.HasFlag (MouseFlags.Button1Released) && !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
+				!ev.Flags.HasFlag (MouseFlags.Button1TripleClicked))
 				return false;
 
 			if (ev.Flags == MouseFlags.Button1Pressed) {
@@ -493,13 +595,25 @@ namespace Terminal.Gui {
 				if (Application.mouseGrabView == null) {
 					Application.GrabMouse (this);
 				}
-			} else if (ev.Flags == MouseFlags.Button1Pressed) {
-				int x = PositionCursor (ev);
-				if (SelectedLength != 0)
-					ClearAllSelection ();
 			} else if (ev.Flags == MouseFlags.Button1Released) {
 				isButtonReleased = true;
 				Application.UngrabMouse ();
+			} else if (ev.Flags == MouseFlags.Button1DoubleClicked) {
+				int x = PositionCursor (ev);
+				int sbw = x;
+				if (x > 0 && (char)Text [x - 1] != ' ')
+					sbw = WordBackward (x);
+				if (sbw != -1) {
+					x = sbw;
+					PositionCursor (x);
+				}
+				int sfw = WordForward (x);
+				ClearAllSelection ();
+				PrepareSelection (sbw, sfw - sbw);
+			} else if (ev.Flags == MouseFlags.Button1TripleClicked) {
+				PositionCursor (0);
+				ClearAllSelection ();
+				PrepareSelection (0, text.Count);
 			}
 
 			SetNeedsDisplay ();
@@ -510,12 +624,16 @@ namespace Terminal.Gui {
 		{
 			// We could also set the cursor position.
 			int x;
-			if (Application.mouseGrabView == null) {
+			if (text.Count == 0)
+				x = ev.X - ev.OfX;
+			else
 				x = ev.X;
-			} else {
-				x = ev.X;// - (text.Count > Frame.Width ? text.Count - Frame.Width : 0);
-			}
 
+			return PositionCursor (x);
+		}
+
+		private int PositionCursor (int x)
+		{
 			point = first + x;
 			if (point > text.Count)
 				point = text.Count;
@@ -524,12 +642,12 @@ namespace Terminal.Gui {
 			return x;
 		}
 
-		void PrepareSelection (int x)
+		void PrepareSelection (int x, int direction = 0)
 		{
-			x = x + first < 0 ? 0 : x + first;
+			x = x + first < 0 ? 0 : x;
 			SelectedStart = SelectedStart == -1 && text.Count > 0 && x >= 0 && x <= text.Count ? x : SelectedStart;
 			if (SelectedStart > -1) {
-				SelectedLength = x <= text.Count ? x - SelectedStart : text.Count - SelectedStart;
+				SelectedLength = x + direction <= text.Count ? x + direction - SelectedStart : text.Count - SelectedStart;
 				SetSelectedStartSelectedLength ();
 				SelectedText = length > 0 ? ustring.Make (text).ToString ().Substring (
 					start < 0 ? 0 : start, length > text.Count ? text.Count : length) : "";
@@ -542,7 +660,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ClearAllSelection ()
 		{
-			if (SelectedLength == 0)
+			if (SelectedStart == -1 && SelectedLength == 0)
 				return;
 			SelectedStart = -1;
 			SelectedLength = 0;
@@ -601,10 +719,13 @@ namespace Terminal.Gui {
 		{
 			string actualText = Text.ToString ();
 			int start = SelectedStart == -1 ? CursorPosition : SelectedStart;
+			ustring cbTxt = Clipboard.Contents?.ToString () ?? "";
 			Text = actualText.Substring (0, start) +
-				Clipboard.Contents?.ToString () +
+				cbTxt +
 				actualText.Substring (start + SelectedLength, actualText.Length - start - SelectedLength);
+			point = start + cbTxt.Length;
 			SelectedLength = 0;
+			ClearAllSelection ();
 			SetNeedsDisplay ();
 		}
 
