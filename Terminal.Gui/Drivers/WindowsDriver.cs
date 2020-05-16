@@ -61,9 +61,6 @@ namespace Terminal.Gui {
 		public bool WriteToConsole (CharInfo [] charInfoBuffer, Coord coords, SmallRect window)
 		{
 			if (ScreenBuffer == IntPtr.Zero) {
-				Console.WriteLine ("Use Alternate Screen Buffer.");
-				Console.Write ("\u001b[?1049h");
-
 				ScreenBuffer = CreateConsoleScreenBuffer (
 					DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
 					ShareMode.FileShareRead | ShareMode.FileShareWrite,
@@ -109,9 +106,6 @@ namespace Terminal.Gui {
 				CloseHandle (ScreenBuffer);
 
 			ScreenBuffer = IntPtr.Zero;
-			Console.WriteLine ("Use Main Screen Buffer.");
-			Console.Write ("\u001b[?1049l");
-			Console.WriteLine ("done.");
 		}
 
 		bool ContinueListeningForConsoleEvents = true;
@@ -923,8 +917,6 @@ namespace Terminal.Gui {
 
 		public override void Init (Action terminalResized)
 		{
-			Console.WriteLine ("Init.");
-
 			TerminalResized = terminalResized;
 
 			Colors.Base = new ColorScheme ();
@@ -965,7 +957,6 @@ namespace Terminal.Gui {
 			Colors.Error.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
 			Colors.Error.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Red);
 			Colors.Error.HotFocus = Colors.Error.HotNormal;
-			//Console.Clear ();
 		}
 
 		void ResizeScreen ()
