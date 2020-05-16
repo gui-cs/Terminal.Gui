@@ -988,25 +988,25 @@ namespace Terminal.Gui {
 			TopTee = '\u22a4';
 			BottomTee = '\u22a5';
 
-			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Blue);
-			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
-			Colors.Base.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Blue);
-			Colors.Base.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
+			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkBlue);
+			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkGray);
+			Colors.Base.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.DarkBlue);
+			Colors.Base.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.DarkGray);
 
-			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Cyan);
+			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
 			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
-			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
+			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.DarkGray);
 			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
-			Colors.Menu.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Cyan);
+			Colors.Menu.Disabled = MakeColor (ConsoleColor.Gray, ConsoleColor.DarkGray);
 
 			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
-			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
-			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Cyan);
+			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkGray);
+			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Gray);
+			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.DarkGray);
 
-			Colors.Error.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Red);
-			Colors.Error.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Error.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Red);
+			Colors.Error.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkRed);
+			Colors.Error.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkGray);
+			Colors.Error.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.DarkGray);
 			Colors.Error.HotFocus = Colors.Error.HotNormal;
 			Console.Clear ();
 		}
