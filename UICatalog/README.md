@@ -35,9 +35,10 @@ UICatalog.exe Buttons
 To add a new **Scenario** simply:
 
 1. Create a new `.cs` file in the `Scenarios` directory that derives from `Scenario`.
-2. Add a `[ScenarioMetaData()]` attribute to the class specifying the scenario's name and description.
+2. Add a `[ScenarioMetaData]` attribute to the class specifying the scenario's name and description.
 3. Add one or more `[ScenarioCategory]` attributes to the class specifying which categories the sceanrio belongs to. If you don't specify a category the sceanrio will show up in "All".
-3. implement the `Run` method which will be called when a user selects the scenario to run.
+4. Implement the `Setup` override which will be called when a user selects the scenario to run.
+5. Optionally, implement the `Run` override to provide a custom implementation of 
 
 ```csharp
 using Terminal.Gui;

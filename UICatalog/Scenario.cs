@@ -37,7 +37,7 @@ namespace UICatalog {
 				Height = Dim.Fill ()
 			};
 			Win.OnKeyPress += (KeyEvent ke) => {
-				if (ke.Key == Key.Esc) {
+				if (ke.Key == Key.F1) {
 					RequestStop ();
 				}
 			}; 
