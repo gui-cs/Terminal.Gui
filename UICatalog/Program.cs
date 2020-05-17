@@ -39,7 +39,7 @@ namespace UICatalog {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Application.RequestStop() )
 				}),
-				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query (0, 6, "About UI Catalog", "UI Catalog is a comprehensive sample library for gui.cs", "Ok")),
+				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query (0, 6, "About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok")),
 			});
 			_top.Add (menu);
 
@@ -129,6 +129,7 @@ namespace UICatalog {
 			_categoryListView.SelectedItem = 0;
 			CategoryListView_SelectedChanged ();
 
+			// BUGBUG: Uncomment this once we figure out how to not have StatusBar eat all ESCs #436
 			//var statusBar = new StatusBar (new StatusItem [] {
 			//	//new StatusItem(Key.F1, "~F1~ Help", () => Help()),
 			//	new StatusItem(Key.Esc, "~ESC~ Quit", () => {
@@ -169,7 +170,7 @@ namespace UICatalog {
 				//Scenarios [item].IsMarked = value;
 			}
 
-			// A slightly adapted method from gui.cs: https://github.com/migueldeicaza/gui.cs/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
+			// A slightly adapted method from: https://github.com/migueldeicaza/gui.cs/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
 			private void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width)
 			{
 				int used = 0;

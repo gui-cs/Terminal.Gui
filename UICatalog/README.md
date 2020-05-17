@@ -1,8 +1,8 @@
-# gui.cs UI Catalog
+# Terminal.Gui UI Catalog
 
-UI Catalog is a comprehensive sample library for gui.cs. It attempts to satisfy the following goals:
+UI Catalog is a comprehensive sample library for Terminal.Gui. It attempts to satisfy the following goals:
 
-1. Be an easy to use showcase for gui.cs concepts and features.
+1. Be an easy to use showcase for Terminal.Gui concepts and features.
 2. Provide sample code that illustrates how to properly implement said concepts & features.
 3. Make it easy for contributors to add additional samples in a structured way.
 
@@ -10,7 +10,7 @@ UI Catalog is a comprehensive sample library for gui.cs. It attempts to satisfy 
 
 ## Motivation
 
-The original `demo.cs` sample app for gui.cs is neither good to showcase, nor does it explain different concepts. In addition, because it is built on a single source file, it has proven to cause friction when multiple contributors are simultaneously working on different aspects of gui.cs. See [Issue #368](https://github.com/migueldeicaza/gui.cs/issues/368) for more background.
+The original `demo.cs` sample app for Terminal.Gui is neither good to showcase, nor does it explain different concepts. In addition, because it is built on a single source file, it has proven to cause friction when multiple contributors are simultaneously working on different aspects of Terminal.Gui. See [Issue #368](https://github.com/migueldeicaza/Terminal.Gui/issues/368) for more background.
 
 ## How To Use
 
@@ -30,7 +30,7 @@ e.g.
 UICatalog.exe Buttons
 ```
 
-## Contributing
+## Contributing by Adding Scenarios
 
 To add a new **Scenario** simply:
 
@@ -40,28 +40,70 @@ To add a new **Scenario** simply:
 4. Implement the `Setup` override which will be called when a user selects the scenario to run.
 5. Optionally, implement the `Run` override to provide a custom implementation of 
 
+The sample below is provided in the `Scenarios` directory as a generic sample that can be copied and re-named:
+
 ```csharp
 using Terminal.Gui;
 
 namespace UICatalog {
-	[ScenarioMetadata (Name: "MyScenario", Description: "<description>")]
+	[ScenarioMetadata (Name: "Generic", Description: "Generic sample - A template for creating new Scenarios")]
 	[ScenarioCategory ("Controls")]
 	class MyScenario : Scenario {
-		public override void Run () {
-			var top = new Toplevel ();
-			var win = new Window ($"ESC to Close - Scenario: {GetName()}") {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill ()
-			};
-			top.Add (win);
-			
-			// Put your scenario code here
-
-			Application.Run (top);
+		public override void Setup ()
+		{
+			// Put your scenario code here, e.g.
+			Win.Add (new Button ("Press me!") {
+				X = Pos.Center (),
+				Y = Pos.Center (),
+				Clicked = () => MessageBox.Query (20, 7, "Hi", "Neat?", "Yes", "No")
+			});
 		}
 	}
 }
-
 ```
+
+`Scenario` provides a `Toplevel` and `Window` the provides a canvas for the Scenario to operate. The default `Window` shows the Scenario name and supports exiting the Scenario through the `Esc` key. 
+
+![screenshot](generic_screenshot.png)
+
+To build a more advanced scenario, where control of the `Toplevel` and `Window` is needed (e.g. for scenarios using `MenuBar` or `StatusBar`), simply set the `Top` and `Window` properties as appropriate, as seen in the `UnicodeInMenu` scenario:
+
+```csharp
+using Terminal.Gui;
+
+namespace UICatalog {
+	[ScenarioMetadata (Name: "Unicode In Menu", Description: "Unicode menus per PR #204")]
+	[ScenarioCategory ("Text")]
+	[ScenarioCategory ("Controls")]
+	class UnicodeInMenu : Scenario {
+		public override void Setup ()
+		{
+			Top = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("_Файл", new MenuItem [] {
+					new MenuItem ("_Создать", "Creates new file", null),
+					new MenuItem ("_Открыть", "", null),
+					new MenuItem ("Со_хранить", "", null),
+					new MenuItem ("_Выход", "", () => Application.RequestStop() )
+				}),
+				new MenuBarItem ("_Edit", new MenuItem [] {
+					new MenuItem ("_Copy", "", null),
+					new MenuItem ("C_ut", "", null),
+					new MenuItem ("_Paste", "", null)
+				})
+			});
+			Top.Add (menu);
+
+			Win = new Window ($"Scenario: {GetName ()}") {
+				X = 0,
+				Y = 1,
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			Top.Add (Win);
+		}
+	}
+}
+```
+
+For complete control, the `Run` override can be implemented. The `base` simply calls `Application.Run(Top)`. 

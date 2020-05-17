@@ -11,10 +11,12 @@ namespace UICatalog {
 	/// 1) declare a class derived from Scenario,
 	/// 2) Set Name and Description as appropriate using [ScenarioMetadata] attribute
 	/// 3) Set one or more categories with the [ScenarioCategory] attribute
-	/// 4) Implement Run.
+	/// 4) Implement Setup.
+	/// 5) Optionally, implement Run.
 	/// 
 	/// The Main program uses reflection to find all sceanarios and adds them to the
-	/// ListViews. Press ENTER to run the selected sceanrio. Press ESC to exit it.
+	/// ListViews. Press ENTER to run the selected sceanrio. Press ESC to exit it (unless
+	/// overridden by Scenario).
 	/// </summary>
 	public class Scenario {
 		/// <summary>
@@ -37,7 +39,7 @@ namespace UICatalog {
 				Height = Dim.Fill ()
 			};
 			Win.OnKeyPress += (KeyEvent ke) => {
-				if (ke.Key == Key.F1) {
+				if (ke.Key == Key.Esc) {
 					RequestStop ();
 				}
 			}; 

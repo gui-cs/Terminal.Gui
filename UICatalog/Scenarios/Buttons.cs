@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Terminal.Gui;
+﻿using Terminal.Gui;
 
 namespace UICatalog {
 	[ScenarioMetadata (Name: "Buttons", Description: "Demonstrates all sorts of Buttons")]
