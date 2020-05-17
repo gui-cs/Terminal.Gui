@@ -5,17 +5,15 @@ using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog {
+	[ScenarioMetadata (Name: "DimAndPosLayout", Description: "Demonstrates using the Dim and Pos Layout System")]
+	[ScenarioCategory ("Layout")]
+
 	class DimAndPosLayout : Scenario {
-		public DimAndPosLayout ()
-		{
-			Name = "DimAndPosLayout";
-			Description = "Demonstrates using the Dim and Pos Layout System.";
-		}
 
 		public override void Run ()
 		{
 			var ntop = new Toplevel (); // new Rect(0, 0, Application.Driver.Cols, Application.Driver.Rows));
-			var win = new FrameView ($"ESC to Close - Scenario: {Name}") {
+			var win = new FrameView ($"ESC to Close - Scenario: {GetName()}") {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
@@ -30,27 +28,27 @@ namespace UICatalog {
 
 			// Demonstrate using Dim to create a ruler that always measures the top-level window's width
 			// BUGBUG: Dim.Fill returns too big a value sometimes.
-			var labelRuler = new Label ("ruler") {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (1),  // BUGBUG: I don't think this should be needed; DimFill() should respect container's frame. X does.
-				ColorScheme = Colors.Error
-			};
+			//const string rule = "|123456789";
+			//var labelRuler = new Label ("ruler") {
+			//	X = 0,
+			//	Y = 0,
+			//	Width = Dim.Fill (1),  // BUGBUG: I don't think this should be needed; DimFill() should respect container's frame. X does.
+			//	ColorScheme = Colors.Error
+			//};
 
-			Application.OnResized += () => {
-				const string rule = "|123456789";
-				labelRuler.Text = rule.Repeat ((int)Math.Ceiling((double)(labelRuler.Bounds.Width) / (double)rule.Length))[0..(labelRuler.Bounds.Width)];
-			};
+			//Application.OnResized += () => {
+			//	labelRuler.Text = rule.Repeat ((int)Math.Ceiling((double)(labelRuler.Bounds.Width) / (double)rule.Length))[0..(labelRuler.Bounds.Width)];
+			//};
 
-			win.Add (labelRuler);
+			//win.Add (labelRuler);
 
 			// Demonstrate using Dim to create a window that fills the parent with a margin
 			int margin = 20;
 			var subWin = new Window ($"Sub Windoww with {margin} character margin") {
 				X = margin,
-				Y = margin,
+				Y = 2,
 				Width = Dim.Fill (margin),
-				Height = Dim.Fill (margin)
+				Height = Dim.Fill ()
 			};
 			win.Add (subWin);
 

@@ -4,20 +4,18 @@ using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog {
-	class UnicodeInMenu : Scenario {
+	[ScenarioMetadata (Name: "Unicode In Menu", Description: "Unicode menus per PR #204")]
+	[ScenarioCategory ("Text")]
+	[ScenarioCategory ("Controls")]
 
-		public UnicodeInMenu ()
-		{
-			Name = "Unicode In Menu";
-			Description = "Unicode menus per PR #204";
-		}
+	class UnicodeInMenu : Scenario {
 
 		public override void Run ()
 		{
 			base.Run ();
 
 			var ntop = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
-			var win = new Window ($"ESC to Close - Scenario: {Name}") {
+			var win = new Window ($"ESC to Close - Scenario: {GetName()}") {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
