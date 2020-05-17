@@ -186,7 +186,7 @@ namespace Terminal.Gui {
 			};
 		}
 
-		void ProcessInput (Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler)
+		void ProcessInput (Action<KeyEvent> keyHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			int wch;
 			var code = Curses.get_wch (out wch);
@@ -206,6 +206,7 @@ namespace Terminal.Gui {
 					return;
 				}
 				keyHandler (new KeyEvent (MapCursesKey (wch)));
+				keyUpHandler (new KeyEvent (MapCursesKey (wch)));
 				return;
 			}
 
@@ -234,10 +235,15 @@ namespace Terminal.Gui {
 					else
 						key = new KeyEvent (Key.AltMask | (Key)wch);
 					keyHandler (key);
-				} else
+					keyUpHandler (key);
+				} else {
 					keyHandler (new KeyEvent (Key.Esc));
-			} else
+					keyUpHandler (new KeyEvent (Key.Esc));
+				}
+			} else {
 				keyHandler (new KeyEvent ((Key)wch));
+				keyUpHandler (new KeyEvent ((Key)wch));
+			}
 		}
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
@@ -246,7 +252,7 @@ namespace Terminal.Gui {
 			Curses.timeout (-1);
 
 			(mainLoop.Driver as Mono.Terminal.UnixMainLoop).AddWatch (0, Mono.Terminal.UnixMainLoop.Condition.PollIn, x => {
-				ProcessInput (keyHandler, mouseHandler);
+				ProcessInput (keyHandler, keyUpHandler, mouseHandler);
 				return true;
 			});
 
