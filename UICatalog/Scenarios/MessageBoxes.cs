@@ -7,6 +7,7 @@ namespace UICatalog {
 	[ScenarioMetadata (Name: "MessageBoxes", Description: "Demonstrates how to use MessageBoxes")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
+	[ScenarioCategory ("Bug Repro")]
 	class MessageBoxes : Scenario {
 		public override void Run () {
 			var top = new Toplevel ();
@@ -21,6 +22,7 @@ namespace UICatalog {
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_Simple Query...", "A simple query message box", () =>  MessageBox.Query (0, 6, "MessageBox.Query", "Minimum size was specified", "Ok")),
 				new MenuBarItem ("_Error Query...", "A error query message box", () =>  MessageBox.ErrorQuery (0, 6, "MessageBox.Query", "Minimum size was specified", "Ok")),
+				// BUGBUG: Illustrates MessageBoxes do not deal with long text gracefully. Issue #432
 				new MenuBarItem ("_Long Text...", "Demo long text", () =>  MessageBox.Query (0, 6, "About UI Catalog", "This is a very long title. It is longer than the width of the screen. Will it Wrap? I bet  it will not wrap", "Ok")),
 			});
 			top.Add (menu);

@@ -7,7 +7,6 @@ using Terminal.Gui;
 namespace UICatalog {
 	[ScenarioMetadata (Name: "Text Alignment", Description: "Demonstrates text alignment")]
 	[ScenarioCategory ("Text")]
-
 	class TextAlignment : Scenario {
 		public override void Run ()
 		{
