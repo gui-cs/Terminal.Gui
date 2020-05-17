@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Terminal.Gui;
+﻿using Terminal.Gui;
 
 namespace UICatalog {
-	[ScenarioMetadata (Name: "TopLevelNoWindowBug", Description: "Illustrates that not having a Window causes Application.Run to wedge. #")]
+	[ScenarioMetadata (Name: "TopLevelNoWindowBug", Description: "Illustrates that not having a Window causes Application.Run to wedge. #437")]
 	[ScenarioCategory ("Bug Repro")]
 
 	class TopLevelNoWindowBug : Scenario {
@@ -28,7 +25,7 @@ namespace UICatalog {
 			});
 			ntop.Add (menu);
 
-			// BUGBUG: This being commmented out causes Application.Run to wedge.
+			// BUGBUG: #437 This being commmented out causes Application.Run to wedge.
 			//var win = new Window ($"Scenario: {GetName ()}") {
 			//	X = 0,
 			//	Y = 1,
