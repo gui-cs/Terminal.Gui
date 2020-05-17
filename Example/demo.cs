@@ -415,7 +415,9 @@ static class Demo {
 
 	static void TextFieldAutoCompleteDemo ()
 	{
-		var items = Directory.GetFiles (@"..\..\..\Terminal.Gui", "*.cs", SearchOption.AllDirectories).Select (x => Path.GetFileName (x)).ToList ();
+		var items = Directory.GetFiles (@"..\..\..\Terminal.Gui", "*.cs", SearchOption.AllDirectories)
+						.Select (x => Path.GetFileName (x)).Where(x => !x.StartsWith(".")).Distinct().OrderBy(x => x).ToList ();
+
 		var list = new TextFieldAutoComplete (0, 0, 36, 7, items);
 		list.Changed += (object sender, ustring text) => { Application.RequestStop (); };
 
