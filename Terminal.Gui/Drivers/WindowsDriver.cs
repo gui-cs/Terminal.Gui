@@ -617,10 +617,10 @@ namespace Terminal.Gui {
 						keyUpHandler (key);
 				} else {
 					if (inputEvent.KeyEvent.bKeyDown) {
-						// Key Down - Fire KeyDown Event and KeyStroke (ProcessKey) Event
 						keyDownHandler (new KeyEvent (map));
-						keyHandler (new KeyEvent (map));
 					} else {
+						// Key Up - Fire KeyDown Event and KeyStroke (ProcessKey) Event
+						keyHandler (new KeyEvent (map));
 						keyUpHandler (new KeyEvent (map));
 					}
 				}
