@@ -33,7 +33,7 @@ namespace UICatalog {
 
 			_top = Application.Top;
 
-			_top.OnKeyDown += KeyDownHandler;
+			_top.OnKeyUp += KeyUpHandler;
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
@@ -61,6 +61,12 @@ namespace UICatalog {
 				AllowsMarking = false,
 				CanFocus = true,
 			};
+			_categoryListView.OnKeyPress += (KeyEvent ke) => {
+				if (_top.MostFocused == _categoryListView && ke.Key == Key.Enter) {
+					_top.SetFocus (_rightPane);
+				}
+			};
+
 			_categoryListView.SelectedChanged += CategoryListView_SelectedChanged;
 			_leftPane.Add (_categoryListView);
 
@@ -106,30 +112,32 @@ namespace UICatalog {
 				AllowsMarking = false,
 				CanFocus = true,
 			};
+			_scenarioListView.OnKeyPress += (KeyEvent ke) => {
+				if (_top.MostFocused == _scenarioListView && ke.Key == Key.Enter) {
+					if (_runningScenario is null) {
+						var source = _scenarioListView.Source as ScenarioListDataSource;
+						_runningScenario = (Scenario)Activator.CreateInstance (source.Scenarios [_scenarioListView.SelectedItem]);
+						_runningScenario.Setup ();
+						_runningScenario.Run ();
+						_runningScenario = null;
+					}
+				}
+			};
 
 			_rightPane.Add (_scenarioListView);
 
 			_categoryListView.SelectedItem = 0;
 			CategoryListView_SelectedChanged ();
 
-			var statusBar = new StatusBar (new StatusItem [] {
-				//new StatusItem(Key.F1, "~F1~ Help", () => Help()),
-				new StatusItem(Key.Esc, "~ESC~ Quit", () => {
-					if (_runningScenario is null){
-						Application.RequestStop();
-					}
-				}),
-				new StatusItem(Key.Enter, "~ENTER~ Run Selected Scenario", () => {
-					if (_runningScenario is null) {
-						var source = _scenarioListView.Source as ScenarioListDataSource;
-						_runningScenario = (Scenario)Activator.CreateInstance (source.Scenarios[_scenarioListView.SelectedItem]) ;
-						_runningScenario.Setup();
-						_runningScenario.Run();
-						_runningScenario = null;
-					}
-				}),
-			});
-			_top.Add (statusBar);
+			//var statusBar = new StatusBar (new StatusItem [] {
+			//	//new StatusItem(Key.F1, "~F1~ Help", () => Help()),
+			//	new StatusItem(Key.Esc, "~ESC~ Quit", () => {
+			//		if (_runningScenario is null){
+			//			Application.RequestStop();
+			//		}
+			//	}),
+			//});
+			//_top.Add (statusBar);
 
 			if (args.Length > 0) {
 				_startScenario = args [0];
@@ -188,12 +196,12 @@ namespace UICatalog {
 		/// to not be impacted. Same as for tabs.
 		/// </summary>
 		/// <param name="ke"></param>
-		private static void KeyDownHandler (KeyEvent ke)
+		private static void KeyUpHandler (KeyEvent ke)
 		{
 			if (_runningScenario != null) {
 				switch (ke.Key) {
 				case Key.Esc:
-					_runningScenario.RequestStop ();
+					//_runningScenario.RequestStop ();
 					break;
 				case Key.Enter:
 					break;

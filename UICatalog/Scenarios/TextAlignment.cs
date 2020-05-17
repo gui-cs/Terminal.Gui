@@ -1,24 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog {
 	[ScenarioMetadata (Name: "Text Alignment", Description: "Demonstrates text alignment")]
 	[ScenarioCategory ("Text")]
 	class TextAlignment : Scenario {
-		public override void Run ()
+		public override void Setup ()
 		{
-			var ntop = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
-			var win = new Window ($"ESC to Close - Scenario: {GetName()}") {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill ()
-			};
-			ntop.Add (win);
-
 			int i = 1;
 			string txt = "Hello world, how are you doing today";
 			var labelList = new List<Label> ();
@@ -30,11 +19,8 @@ namespace UICatalog {
 			txt += "\nSecond line";
 			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (1), Height = 4, X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1 });
 
-			win.Add (labelList.ToArray ());
-			win.LayoutSubviews ();
-
-			Application.Run (ntop);
+			Win.Add (labelList.ToArray ());
+			Win.LayoutSubviews ();
 		}
-
 	}
 }

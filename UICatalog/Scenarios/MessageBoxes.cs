@@ -11,7 +11,7 @@ namespace UICatalog {
 	class MessageBoxes : Scenario {
 		public override void Setup ()
 		{
-			var top = new Toplevel ();
+			Top = new Toplevel ();
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
@@ -22,17 +22,21 @@ namespace UICatalog {
 				// BUGBUG: Illustrates MessageBoxes do not deal with long text gracefully. Issue #432
 				new MenuBarItem ("_Long Text...", "Demo long text", () =>  MessageBox.Query (0, 6, "About UI Catalog", "This is a very long title. It is longer than the width of the screen. Will it Wrap? I bet  it will not wrap", "Ok")),
 			});
-			top.Add (menu);
+			Top.Add (menu);
 
-			var win = new Window ($"Scenario: {GetName ()}") {
+			Win = new Window ($"Scenario: {GetName ()}") {
 				X = 0,
 				Y = 1,
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
-			top.Add (win);
+			Top.Add (Win);
 
-			Application.Run (top);
+		}
+
+		public override void Run ()
+		{
+			Application.Run (Top);
 		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NStack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
@@ -25,6 +26,7 @@ namespace UICatalog {
 		/// </summary>
 		public Window Win { get; set; }
 
+
 		public Scenario ()
 		{
 			Top = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
@@ -34,7 +36,11 @@ namespace UICatalog {
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
-
+			Win.OnKeyPress += (KeyEvent ke) => {
+				if (ke.Key == Key.Esc) {
+					RequestStop ();
+				}
+			}; 
 			Top.Add (Win);
 		}
 
