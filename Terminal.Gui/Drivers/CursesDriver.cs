@@ -51,7 +51,7 @@ namespace Terminal.Gui {
 			if (sync)
 				Application.Driver.Refresh ();
 			ccol++;
-			var runeWidth = Rune.ColumnWidth(rune);
+			var runeWidth = Rune.ColumnWidth (rune);
 			if (runeWidth > 1) {
 				for (int i = 1; i < runeWidth; i++) {
 					ccol++;
@@ -235,15 +235,15 @@ namespace Terminal.Gui {
 					else
 						key = new KeyEvent (Key.AltMask | (Key)wch);
 					keyHandler (key);
-					keyUpHandler (key);
 				} else {
 					keyHandler (new KeyEvent (Key.Esc));
-					keyUpHandler (new KeyEvent (Key.Esc));
 				}
 			} else {
 				keyHandler (new KeyEvent ((Key)wch));
-				keyUpHandler (new KeyEvent ((Key)wch));
 			}
+			// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
+			// will not impact KeyUp.
+			keyUpHandler (new KeyEvent ((Key)wch));
 		}
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
@@ -314,7 +314,7 @@ namespace Terminal.Gui {
 				Colors.Menu.Focus = Curses.A_BOLD | MakeColor (Curses.COLOR_WHITE, Curses.COLOR_BLACK);
 				Colors.Menu.HotNormal = Curses.A_BOLD | MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_CYAN);
 				Colors.Menu.Normal = Curses.A_BOLD | MakeColor (Curses.COLOR_WHITE, Curses.COLOR_CYAN);
-				Colors.Menu.Disabled = MakeColor(Curses.COLOR_WHITE, Curses.COLOR_CYAN);
+				Colors.Menu.Disabled = MakeColor (Curses.COLOR_WHITE, Curses.COLOR_CYAN);
 
 				Colors.Dialog.Normal = MakeColor (Curses.COLOR_BLACK, Curses.COLOR_WHITE);
 				Colors.Dialog.Focus = MakeColor (Curses.COLOR_BLACK, Curses.COLOR_CYAN);
