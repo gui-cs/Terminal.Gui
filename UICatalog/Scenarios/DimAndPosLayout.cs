@@ -5,26 +5,39 @@ using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog {
+	/// <summary>
+	/// This Scenario demonstrates how to use Termina.gui's Dim and Pos Layout System. 
+	/// [x] - Using Dim.Fill to fill a window
+	/// [x] - Using Dim.Fill and Dim.Pos to automatically align controls based on an initial control
+	/// [ ] - ...
+	/// </summary>
 	[ScenarioMetadata (Name: "DimAndPosLayout", Description: "Demonstrates using the Dim and Pos Layout System")]
 	[ScenarioCategory ("Layout")]
-
 	class DimAndPosLayout : Scenario {
 
-		public override void Run ()
+		public override void Setup ()
 		{
-			var ntop = new Toplevel (); // new Rect(0, 0, Application.Driver.Cols, Application.Driver.Rows));
-			var win = new FrameView ($"ESC to Close - Scenario: {GetName()}") {
+			Top = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows)) {
+				LayoutStyle = LayoutStyle.Computed,
+			};
+
+			Win = new Window ($"ESC to Close - Scenario: {GetName ()}") {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
-				Height = Dim.Fill ()
+				Height = Dim.Fill (),
 			};
-			win.OnKeyUp += (KeyEvent ke) => {
+
+			// Implement our own exit logic
+			Win.OnKeyUp += (KeyEvent ke) => {
 				if (ke.Key == Key.Esc) {
 					// BUGBUG: This causes a StackOverflow 
-					ntop.Running = false;
+					Top.Running = false;
 				}
 			};
+
+			Top.Add (Win);
+
 
 			// Demonstrate using Dim to create a ruler that always measures the top-level window's width
 			// BUGBUG: Dim.Fill returns too big a value sometimes.
@@ -50,7 +63,7 @@ namespace UICatalog {
 				Width = Dim.Fill (margin),
 				Height = Dim.Fill ()
 			};
-			win.Add (subWin);
+			Win.Add (subWin);
 
 			int i = 1;
 			string txt = "Hello world, how are you doing today";
@@ -63,12 +76,12 @@ namespace UICatalog {
 
 			subWin.Add (labelList.ToArray ());
 			//subWin.LayoutSubviews ();
-
-			ntop.LayoutStyle = LayoutStyle.Computed;
-			ntop.Add (win);
-			Application.Run (ntop);
 		}
 
+		public override void Run ()
+		{
+			base.Run ();
+		}
 	}
 
 	public static class StringExtensions {
@@ -83,8 +96,8 @@ namespace UICatalog {
 			}
 
 			return new StringBuilder (instr.Length * n)
-									.Insert (0, instr, n)
-									.ToString ();
+				.Insert (0, instr, n)
+				.ToString ();
 		}
 	}
 }

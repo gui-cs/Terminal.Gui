@@ -4,11 +4,10 @@ using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog {
-	[ScenarioMetadata (Name: "Unicode In Menu", Description: "Unicode menus per PR #204")]
-	[ScenarioCategory ("Text")]
-	[ScenarioCategory ("Controls")]
+	[ScenarioMetadata (Name: "TopLevelNoWindowBug", Description: "Illustrates that not having a Window causes Application.Run to wedge. #")]
+	[ScenarioCategory ("Bug Repro")]
 
-	class UnicodeInMenu : Scenario {
+	class TopLevelNoWindowBug : Scenario {
 
 		public override void Run ()
 		{
@@ -29,13 +28,14 @@ namespace UICatalog {
 			});
 			ntop.Add (menu);
 
-			var win = new Window ($"Scenario: {GetName ()}") {
-				X = 0,
-				Y = 1,
-				Width = Dim.Fill (),
-				Height = Dim.Fill ()
-			};
-			ntop.Add (win);
+			// BUGBUG: This being commmented out causes Application.Run to wedge.
+			//var win = new Window ($"Scenario: {GetName ()}") {
+			//	X = 0,
+			//	Y = 1,
+			//	Width = Dim.Fill (),
+			//	Height = Dim.Fill ()
+			//};
+			//ntop.Add (win);
 
 			Application.Run (ntop);
 		}

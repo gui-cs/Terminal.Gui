@@ -12,58 +12,17 @@ namespace UICatalog {
 	/// for a calalog of UI demos, examples, and tests.
 	/// </summary>
 	class Program {
-		internal class ScenarioListDataSource : IListDataSource {
-			public List<Scenario> Scenarios { get; set; }
-
-			public bool IsMarked (int item) => false;//  Scenarios [item].IsMarked;
-
-			public int Count => Scenarios.Count;
-
-			public ScenarioListDataSource (List<Scenario> itemList)
-			{
-				Scenarios = itemList;
-			}
-
-			public void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width)
-			{
-				container.Move (col, line);
-				// Equivalent to an interpolated string like $"{Scenarios[item].Name, -widtestname}"; if such a thing were possible
-				var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenarios [item].GetName ());
-				RenderUstr (driver, $"{s}  {Scenarios [item].GetDescription ()}", col, line, width);
-			}
-
-			public void SetMark (int item, bool value)
-			{
-				//Scenarios [item].IsMarked = value;
-			}
-
-			// A slightly adapted method from gui.cs: https://github.com/migueldeicaza/gui.cs/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
-			private void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width)
-			{
-				int used = 0;
-				int index = 0;
-				while (index < ustr.Length) {
-					(var rune, var size) = Utf8.DecodeRune (ustr, index, index - ustr.Length);
-					var count = Rune.ColumnWidth (rune);
-					if (used + count >= width) break;
-					driver.AddRune (rune);
-					used += count;
-					index += size;
-				}
-
-				while (used < width) {
-					driver.AddRune (' ');
-					used++;
-				}
-			}
-		}
-
+		private static Toplevel _top;
 		private static int _nameColumnWidth;
+		private static Window _leftPane;
 		private static List<string> _categories;
 		private static ListView _categoryListView;
-		private static List<Scenario> _scenarios;
+		private static Window _rightPane;
+		private static List<Type> _scenarios;
 		private static ListView _scenarioListView;
 		private static string _startScenario;
+
+		private static Scenario _runningScenario = null;
 
 		static void Main (string [] args)
 		{
@@ -72,23 +31,26 @@ namespace UICatalog {
 
 			Application.Init ();
 
-			var top = Application.Top;
+			_top = Application.Top;
+
+			_top.OnKeyDown += KeyDownHandler;
+
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Application.RequestStop() )
 				}),
 				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query (0, 6, "About UI Catalog", "UI Catalog is a comprehensive sample library for gui.cs", "Ok")),
 			});
-			top.Add (menu);
+			_top.Add (menu);
 
-			var leftPane = new Window ("Categories") {
+			_leftPane = new Window ("Categories") {
 				X = 0,
 				Y = 1, // for menu
 				Width = 25,
 				Height = Dim.Fill (),
 				CanFocus = false,
 			};
-			top.Add (leftPane);
+			_top.Add (_leftPane);
 
 			_categories = Scenario.GetAllCategories ();
 			_categoryListView = new ListView (_categories) {
@@ -100,9 +62,9 @@ namespace UICatalog {
 				CanFocus = true,
 			};
 			_categoryListView.SelectedChanged += CategoryListView_SelectedChanged;
-			leftPane.Add (_categoryListView);
+			_leftPane.Add (_categoryListView);
 
-			var rightPane = new Window ("Scenarios") {
+			_rightPane = new Window ("Scenarios") {
 				X = 25,
 				Y = 1, // for menu
 				Width = Dim.Fill (),
@@ -110,11 +72,11 @@ namespace UICatalog {
 				CanFocus = false,
 
 			};
-			top.Add (rightPane);
+			_top.Add (_rightPane);
 
 			_scenarios = Scenario.GetDerivedClassesCollection ().ToList ();
 
-			_nameColumnWidth = _scenarios.OrderByDescending (i => i.GetName ().Length).FirstOrDefault ().GetName ().Length;
+			_nameColumnWidth = Scenario.ScenarioMetadata.GetName (_scenarios.OrderByDescending (t => Scenario.ScenarioMetadata.GetName (t)).FirstOrDefault ()).Length;
 			//// Equivalent to an interpolated string like $"{str, -widtestname}"; if such a thing were possible
 			//var header = new Label ($"{String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), "Scenario")}  Description") {
 			//	X = Pos.Right(categoryListView) + 1,
@@ -145,31 +107,105 @@ namespace UICatalog {
 				CanFocus = true,
 			};
 
-			rightPane.Add (_scenarioListView);
+			_rightPane.Add (_scenarioListView);
 
 			_categoryListView.SelectedItem = 0;
 			CategoryListView_SelectedChanged ();
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				//new StatusItem(Key.F1, "~F1~ Help", () => Help()),
-				new StatusItem(Key.Esc, "~ESC~ Quit", () => Application.RequestStop() ),
+				new StatusItem(Key.Esc, "~ESC~ Quit", () => {
+					if (_runningScenario is null){
+						Application.RequestStop();
+					}
+				}),
 				new StatusItem(Key.Enter, "~ENTER~ Run Selected Scenario", () => {
-					var source = _scenarioListView.Source as ScenarioListDataSource;
-					source.Scenarios[_scenarioListView.SelectedItem].Run();
+					if (_runningScenario is null) {
+						var source = _scenarioListView.Source as ScenarioListDataSource;
+						_runningScenario = (Scenario)Activator.CreateInstance (source.Scenarios[_scenarioListView.SelectedItem]) ;
+						_runningScenario.Setup();
+						_runningScenario.Run();
+						_runningScenario = null;
+					}
 				}),
-				new StatusItem(Key.Tab, "~TAB~ Tab", () => {
-					top.FocusNext();				
-				}),
-
 			});
-			top.Add (statusBar);
+			_top.Add (statusBar);
 
 			if (args.Length > 0) {
 				_startScenario = args [0];
 				Application.Iteration += StartCommandLineScenario;
 			}
 
-			Application.Run (top);
+			Application.Run (_top);
+		}
+
+		internal class ScenarioListDataSource : IListDataSource {
+			public List<Type> Scenarios { get; set; }
+
+			public bool IsMarked (int item) => false;//  Scenarios [item].IsMarked;
+
+			public int Count => Scenarios.Count;
+
+			public ScenarioListDataSource (List<Type> itemList) => Scenarios = itemList;
+
+			public void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width)
+			{
+				container.Move (col, line);
+				// Equivalent to an interpolated string like $"{Scenarios[item].Name, -widtestname}"; if such a thing were possible
+				var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenario.ScenarioMetadata.GetName (Scenarios [item]));
+				RenderUstr (driver, $"{s}  {Scenario.ScenarioMetadata.GetDescription (Scenarios [item])}", col, line, width);
+			}
+
+			public void SetMark (int item, bool value)
+			{
+				//Scenarios [item].IsMarked = value;
+			}
+
+			// A slightly adapted method from gui.cs: https://github.com/migueldeicaza/gui.cs/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
+			private void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width)
+			{
+				int used = 0;
+				int index = 0;
+				while (index < ustr.Length) {
+					(var rune, var size) = Utf8.DecodeRune (ustr, index, index - ustr.Length);
+					var count = Rune.ColumnWidth (rune);
+					if (used + count >= width) break;
+					driver.AddRune (rune);
+					used += count;
+					index += size;
+				}
+
+				while (used < width) {
+					driver.AddRune (' ');
+					used++;
+				}
+			}
+		}
+
+		/// <summary>
+		/// When Scenarios are running we need to override the behavior of the Menu 
+		/// and Statusbar to enable Scenarios that use those (or related key input)
+		/// to not be impacted. Same as for tabs.
+		/// </summary>
+		/// <param name="ke"></param>
+		private static void KeyDownHandler (KeyEvent ke)
+		{
+			if (_runningScenario != null) {
+				switch (ke.Key) {
+				case Key.Esc:
+					_runningScenario.RequestStop ();
+					break;
+				case Key.Enter:
+					break;
+				}
+
+			} else if (ke.Key == Key.Tab || ke.Key == Key.BackTab) {
+				// BUGBUG: Work around Issue #434 by implementing our own TAB navigation
+				if (_top.MostFocused == _categoryListView)
+					_top.SetFocus (_rightPane);
+				else
+					_top.SetFocus (_leftPane);
+			}
 		}
 
 		/// <summary>
@@ -181,19 +217,22 @@ namespace UICatalog {
 		{
 			Application.Iteration -= StartCommandLineScenario;
 			var source = _scenarioListView.Source as ScenarioListDataSource;
-			var item = source.Scenarios.FindIndex (s => s.GetName ().Equals (_startScenario, StringComparison.OrdinalIgnoreCase));
-			source.Scenarios [item].Run ();
+			var item = source.Scenarios.FindIndex (t => Scenario.ScenarioMetadata.GetName (t).Equals (_startScenario, StringComparison.OrdinalIgnoreCase));
+			_runningScenario = (Scenario)Activator.CreateInstance (source.Scenarios [item]);
+			_runningScenario.Setup ();
+			_runningScenario.Run ();
+			_runningScenario = null;
 		}
 
 		private static void CategoryListView_SelectedChanged ()
 		{
 			var item = _categories [_categoryListView.SelectedItem];
-			List<Scenario> newlist;
+			List<Type> newlist;
 			if (item.Equals ("All")) {
 				newlist = _scenarios;
 
 			} else {
-				newlist = _scenarios.Where (s => s.GetCategories ().Contains (item)).ToList ();
+				newlist = _scenarios.Where (t => Scenario.ScenarioCategory.GetCategories (t).Contains (item)).ToList ();
 			}
 			_scenarioListView.Source = new ScenarioListDataSource (newlist);
 			_scenarioListView.SelectedItem = 0;
