@@ -32,6 +32,7 @@ namespace UICatalog {
 			Application.Init ();
 
 			_top = Application.Top;
+			//_top = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
 
 			_top.OnKeyUp += KeyUpHandler;
 
@@ -42,6 +43,18 @@ namespace UICatalog {
 				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query (0, 6, "About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok")),
 			});
 			_top.Add (menu);
+
+			// BUGBUG: This being commmented out causes Application.Run to wedge.
+			var win = new Window ($"Hi") {
+				X = 0,
+				Y = 1,
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			//_top.Add (win);
+
+			//	Application.Run (_top);
+			//}
 
 			_leftPane = new Window ("Categories") {
 				X = 0,

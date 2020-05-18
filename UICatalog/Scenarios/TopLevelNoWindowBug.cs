@@ -1,7 +1,7 @@
 ﻿using Terminal.Gui;
 
 namespace UICatalog {
-	[ScenarioMetadata (Name: "TopLevelNoWindowBug", Description: "Illustrates that not having a Window causes Application.Run to wedge. #437")]
+	[ScenarioMetadata (Name: "TopLevelNoWindowBug", Description: "Illustrates that not having a Window causes MenuBar to misbehave. #437")]
 	[ScenarioCategory ("Bug Repro")]
 
 	class TopLevelNoWindowBug : Scenario {
@@ -25,14 +25,14 @@ namespace UICatalog {
 			});
 			ntop.Add (menu);
 
-			// BUGBUG: #437 This being commmented out causes Application.Run to wedge.
-			//var win = new Window ($"Scenario: {GetName ()}") {
-			//	X = 0,
-			//	Y = 1,
-			//	Width = Dim.Fill (),
-			//	Height = Dim.Fill ()
-			//};
-			//ntop.Add (win);
+			// BUGBUG: #437 This being commmented out causes menu to mis-behave
+			var win = new Window ($"Scenario: {GetName ()}") {
+				X = 0,
+				Y = 1,
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			ntop.Add (win);
 
 			Application.Run (ntop);
 		}
