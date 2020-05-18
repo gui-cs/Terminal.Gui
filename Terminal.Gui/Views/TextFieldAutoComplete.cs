@@ -44,7 +44,7 @@ namespace Terminal.Gui {
 		/// <param name="autoHide">Completetion list hidden until start of typing. Use when hosting in Window as opposed to a Dialog</param>
 		public TextFieldAutoComplete(int x, int y, int w, int h, IList<string> source, bool autoHide = false)
 		{
-			listsource = source;
+			listsource = new List<string>(source);
 			isAutoHide = autoHide;
 			searchset = isAutoHide ? new List<string> () : listsource;
 			height = h;
@@ -72,6 +72,18 @@ namespace Terminal.Gui {
 			this.Add(listview);
 			this.Add(search);
 			this.SetFocus(search);
+		}
+
+		public new Dim Width 
+		{
+			get { return base.Width; }
+			set { base.Width = value; }
+		}
+
+		public new Dim Height 
+		{
+			get { return base.Height-1; } 
+			set { base.Width = value+1; }
 		}
 
 		public override bool OnEnter ()
