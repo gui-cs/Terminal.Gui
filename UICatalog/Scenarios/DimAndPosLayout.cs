@@ -17,28 +17,7 @@ namespace UICatalog {
 
 		public override void Setup ()
 		{
-			Top = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows)) {
-				LayoutStyle = LayoutStyle.Computed,
-			};
-
-			Win = new Window ($"ESC to Close - Scenario: {GetName ()}") {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-			};
-
-			// Implement our own exit logic
-			Win.OnKeyUp += (KeyEvent ke) => {
-				if (ke.Key == Key.Esc) {
-					// BUGBUG: This causes a StackOverflow 
-					Top.Running = false;
-				}
-			};
-
-			Top.Add (Win);
-
-
+			Top.LayoutStyle = LayoutStyle.Computed;
 			// Demonstrate using Dim to create a ruler that always measures the top-level window's width
 			// BUGBUG: Dim.Fill returns too big a value sometimes.
 			//const string rule = "|123456789";

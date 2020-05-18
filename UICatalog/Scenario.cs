@@ -15,8 +15,7 @@ namespace UICatalog {
 	/// 5) Optionally, implement Run.
 	/// 
 	/// The Main program uses reflection to find all sceanarios and adds them to the
-	/// ListViews. Press ENTER to run the selected sceanrio. Press ESC to exit it (unless
-	/// overridden by Scenario).
+	/// ListViews. Press ENTER to run the selected sceanrio. Press CTRL-Q to exit it.
 	/// </summary>
 	public class Scenario {
 		/// <summary>
@@ -29,20 +28,15 @@ namespace UICatalog {
 		public Window Win { get; set; }
 
 
-		public Scenario ()
+		public virtual void Init(Toplevel top)
 		{
-			Top = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
-			Win = new Window ($"ESC to Close - Scenario: {GetName ()}") {
+			Top = top;
+			Win = new Window ($"CTRL-Q to Close - Scenario: {GetName ()}") {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
-			Win.OnKeyPress += (KeyEvent ke) => {
-				if (ke.Key == Key.Esc) {
-					RequestStop ();
-				}
-			}; 
 			Top.Add (Win);
 		}
 
