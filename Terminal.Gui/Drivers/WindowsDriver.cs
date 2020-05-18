@@ -564,10 +564,23 @@ namespace Terminal.Gui {
 			case WindowsConsole.EventType.Key:
 				var map = MapKey (ToConsoleKeyInfoEx (inputEvent.KeyEvent));
 				if (map == (Key)0xffffffff) {
-					KeyEvent key = default;
+					KeyEvent key = new KeyEvent ();
+
 					// Shift = VK_SHIFT = 0x10
 					// Ctrl = VK_CONTROL = 0x11
 					// Alt = VK_MENU = 0x12
+
+					if (inputEvent.KeyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.CapslockOn)) {
+						inputEvent.KeyEvent.dwControlKeyState &= ~WindowsConsole.ControlKeyState.CapslockOn;
+					}
+
+					if (inputEvent.KeyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.ScrolllockOn)) {
+						inputEvent.KeyEvent.dwControlKeyState &= ~WindowsConsole.ControlKeyState.ScrolllockOn;
+					}
+
+					if (inputEvent.KeyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.NumlockOn)) {
+						inputEvent.KeyEvent.dwControlKeyState &= ~WindowsConsole.ControlKeyState.NumlockOn;
+					}
 
 					switch (inputEvent.KeyEvent.dwControlKeyState) {
 					case WindowsConsole.ControlKeyState.RightAltPressed:
@@ -916,6 +929,9 @@ namespace Terminal.Gui {
 			case ConsoleKey.OemComma:
 			case ConsoleKey.OemPlus:
 			case ConsoleKey.OemMinus:
+				if (keyInfo.KeyChar == 0)
+					return Key.Unknown;
+
 				return (Key)((uint)keyInfo.KeyChar);
 			}
 
