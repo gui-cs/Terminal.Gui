@@ -63,6 +63,12 @@ namespace Terminal.Gui {
 		/// <param name="item">Item index.</param>
 		/// <param name="value">If set to <c>true</c> value.</param>
 		void SetMark (int item, bool value);
+
+		/// <summary>
+		/// Return the source as IList.
+		/// </summary>
+		/// <returns></returns>
+		IList ToList ();
 	}
 
 	/// <summary>
@@ -573,6 +579,11 @@ namespace Terminal.Gui {
 		{
 			if (item >= 0 && item < count)
 				marks [item] = value;
+		}
+
+		public IList ToList ()
+		{
+			return src;
 		}
 	}
 }
