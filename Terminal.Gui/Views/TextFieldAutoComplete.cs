@@ -74,18 +74,6 @@ namespace Terminal.Gui {
 			this.SetFocus(search);
 		}
 
-		public new Dim Width 
-		{
-			get { return base.Width; }
-			set { base.Width = value; }
-		}
-
-		public new Dim Height 
-		{
-			get { return base.Height-1; } 
-			set { base.Width = value+1; }
-		}
-
 		public override bool OnEnter ()
 		{
 			if (!search.HasFocus)
