@@ -21,7 +21,6 @@ namespace UICatalog {
 		private static Window _rightPane;
 		private static List<Type> _scenarios;
 		private static ListView _scenarioListView;
-		private static string _startScenario;
 		private static StatusBar _statusBar;
 
 		private static Scenario _runningScenario = null;
@@ -34,7 +33,6 @@ namespace UICatalog {
 			_scenarios = Scenario.GetDerivedClassesCollection ().ToList ();
 
 			if (args.Length > 0) {
-				_startScenario = args [0];
 				var item = _scenarios.FindIndex (t => Scenario.ScenarioMetadata.GetName (t).Equals (args [0], StringComparison.OrdinalIgnoreCase));
 				_runningScenario = (Scenario)Activator.CreateInstance (_scenarios [item]);
 				Application.Init ();
@@ -73,6 +71,9 @@ namespace UICatalog {
 				Width = 25,
 				Height = Dim.Fill (),
 				CanFocus = false,
+			};
+			_leftPane.Enter += (o,a) => { 
+
 			};
 
 			_categories = Scenario.GetAllCategories ();
@@ -145,8 +146,6 @@ namespace UICatalog {
 		/// <returns></returns>
 		private static Scenario GetScenarioToRun ()
 		{
-			_runningScenario = null;
-
 			Application.Init ();
 
 			if (_menu == null) {
@@ -155,14 +154,24 @@ namespace UICatalog {
 
 			_top = Application.Top;
 			_top.OnKeyUp += KeyUpHandler;
-
 			_top.Add (_menu);
 			_top.Add (_leftPane);
 			_top.Add (_rightPane);
 			_top.Add (_statusBar);
 
+			// HACK: There is no other way to SetFocus before Application.Run. See Issue #445
+			if (_runningScenario != null)
+				Application.Iteration += Application_Iteration;
+			_runningScenario = null;
+
 			Application.Run (_top);
 			return _runningScenario;
+		}
+
+		private static void Application_Iteration (object sender, EventArgs e)
+		{
+			Application.Iteration -= Application_Iteration;
+			_top.SetFocus (_rightPane);
 		}
 
 		private static void _scenarioListView_OpenSelectedItem (object sender, EventArgs e)
