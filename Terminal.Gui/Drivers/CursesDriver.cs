@@ -214,7 +214,7 @@ namespace Terminal.Gui {
 			if (wch == 27) {
 				Curses.timeout (200);
 
-				code = Curses.get_wch (out wch);
+				code = Curses.get_wch (out int wch2);
 				if (code == Curses.KEY_CODE_YES)
 					keyHandler (new KeyEvent (Key.AltMask | MapCursesKey (wch)));
 				if (code == 0) {
@@ -222,18 +222,18 @@ namespace Terminal.Gui {
 
 					// The ESC-number handling, debatable.
 					// Simulates the AltMask itself by pressing Alt + Space.
-					if (wch == (int)Key.Space)
+					if (wch2 == (int)Key.Space)
 						key = new KeyEvent (Key.AltMask);
-					else if (wch - (int)Key.Space >= 'A' && wch - (int)Key.Space <= 'Z')
-						key = new KeyEvent ((Key)((uint)Key.AltMask + (wch - (int)Key.Space)));
-					else if (wch >= '1' && wch <= '9')
-						key = new KeyEvent ((Key)((int)Key.F1 + (wch - '0' - 1)));
-					else if (wch == '0')
+					else if (wch2 - (int)Key.Space >= 'A' && wch2 - (int)Key.Space <= 'Z')
+						key = new KeyEvent ((Key)((uint)Key.AltMask + (wch2 - (int)Key.Space)));
+					else if (wch2 >= '1' && wch <= '9')
+						key = new KeyEvent ((Key)((int)Key.F1 + (wch2 - '0' - 1)));
+					else if (wch2 == '0')
 						key = new KeyEvent (Key.F10);
-					else if (wch == 27)
-						key = new KeyEvent ((Key)wch);
+					else if (wch2 == 27)
+						key = new KeyEvent ((Key)wch2);
 					else
-						key = new KeyEvent (Key.AltMask | (Key)wch);
+						key = new KeyEvent (Key.AltMask | (Key)wch2);
 					keyHandler (key);
 				} else {
 					keyHandler (new KeyEvent (Key.Esc));
