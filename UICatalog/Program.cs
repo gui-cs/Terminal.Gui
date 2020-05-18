@@ -79,7 +79,7 @@ namespace UICatalog {
 					_top.SetFocus (_rightPane);
 				}
 			};
-
+			_categoryListView.OpenSelectedItem += (o, a) => CategoryListView_SelectedChanged ();
 			_categoryListView.SelectedChanged += CategoryListView_SelectedChanged;
 			_leftPane.Add (_categoryListView);
 
@@ -127,31 +127,25 @@ namespace UICatalog {
 			};
 			_scenarioListView.OnKeyPress += (KeyEvent ke) => {
 				if (_top.MostFocused == _scenarioListView && ke.Key == Key.Enter) {
-					if (_runningScenario is null) {
-						var source = _scenarioListView.Source as ScenarioListDataSource;
-						_runningScenario = (Scenario)Activator.CreateInstance (source.Scenarios [_scenarioListView.SelectedItem]);
-						_runningScenario.Setup ();
-						_runningScenario.Run ();
-						_runningScenario = null;
-					}
+					_scenarioListView_OpenSelectedItem (null, null);
 				}
 			};
-
+			_scenarioListView.OpenSelectedItem += _scenarioListView_OpenSelectedItem;
 			_rightPane.Add (_scenarioListView);
 
 			_categoryListView.SelectedItem = 0;
 			CategoryListView_SelectedChanged ();
 
+			var statusBar = new StatusBar (new StatusItem [] {
+				//new StatusItem(Key.F1, "~F1~ Help", () => Help()),
+				new StatusItem(Key.Esc, "~ESC~ Quit", () => {
+					if (_runningScenario is null){
+						Application.RequestStop();
+					}
+				}),
+			});
 			// BUGBUG: Uncomment this once we figure out how to not have StatusBar eat all ESCs #436
-			//var statusBar = new StatusBar (new StatusItem [] {
-			//	//new StatusItem(Key.F1, "~F1~ Help", () => Help()),
-			//	new StatusItem(Key.Esc, "~ESC~ Quit", () => {
-			//		if (_runningScenario is null){
-			//			Application.RequestStop();
-			//		}
-			//	}),
-			//});
-			//_top.Add (statusBar);
+			_top.Add (statusBar);
 
 			if (args.Length > 0) {
 				_startScenario = args [0];
@@ -159,6 +153,17 @@ namespace UICatalog {
 			}
 
 			Application.Run (_top);
+		}
+
+		private static void _scenarioListView_OpenSelectedItem (object sender, EventArgs e)
+		{
+			if (_runningScenario is null) {
+				var source = _scenarioListView.Source as ScenarioListDataSource;
+				_runningScenario = (Scenario)Activator.CreateInstance (source.Scenarios [_scenarioListView.SelectedItem]);
+				_runningScenario.Setup ();
+				_runningScenario.Run ();
+				_runningScenario = null;
+			}
 		}
 
 		internal class ScenarioListDataSource : IListDataSource {
