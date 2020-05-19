@@ -1,14 +1,15 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog {
-	[ScenarioMetadata (Name: "Editor", Description: "A Terminal.Gui Text Editor via TextView")]
+	[ScenarioMetadata (Name: "HexEditor", Description: "A Terminal.Gui binary (hex) editor via HexView")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Text")]
-	class Editor : Scenario {
-		private string _fileName = "demo.txt";
-		private TextView _textView;
+	class HexEditor : Scenario {
+		private string _fileName = "demo.bin";
+		private HexView _hexView;
 		private bool _saved = true;
 
 
@@ -36,6 +37,7 @@ namespace UICatalog {
 			Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
+				//new StatusItem(Key.Enter, "~ENTER~ ApplyEdits", () => { _hexView.ApplyEdits(); }),
 				new StatusItem(Key.F2, "~F2~ Open", () => Open()),
 				new StatusItem(Key.F3, "~F3~ Save", () => Save()),
 				new StatusItem(Key.ControlQ, "~^Q~ Quit", () => Quit()),
@@ -52,17 +54,15 @@ namespace UICatalog {
 			};
 			Top.Add (Win);
 
-			_textView = new TextView () {
+			_hexView = new HexView (LoadFile()) {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				
 			};
 
-			LoadFile ();
 
-			Win.Add (_textView);
+			Win.Add (_hexView);
 		}
 
 		private void New ()
@@ -71,19 +71,20 @@ namespace UICatalog {
 			throw new NotImplementedException ();
 		}
 
-		private void LoadFile ()
+		private Stream LoadFile ()
 		{
+			MemoryStream stream = null;
 			if (!_saved) {
 				MessageBox.ErrorQuery (0, 10, "Not Implemented", "Functionality not yet implemented.", "Ok");
 			}
 
 			if (_fileName != null) {
-				// BUGBUG: #452 TextView.LoadFile keeps file open and provides no way of closing it
-				//_textView.LoadFile(_fileName);
-				_textView.Text = System.IO.File.ReadAllText (_fileName);
+				var bin = System.IO.File.ReadAllBytes (_fileName);
+				stream = new MemoryStream (bin);
 				Win.Title = _fileName;
 				_saved = true;
 			}
+			return stream;
 		}
 
 		private void Paste ()
@@ -111,16 +112,19 @@ namespace UICatalog {
 
 			if (!d.Canceled) {
 				_fileName = d.FilePaths [0];
-				LoadFile ();
+				_hexView.Source = LoadFile ();
+				_hexView.DisplayStart = 0;
 			}
 		}
 
 		private void Save ()
 		{
 			if (_fileName != null) {
-				// BUGBUG: #279 TextView does not know how to deal with \r\n, only \r 
-				// As a result files saved on Windows and then read back will show invalid chars.
-				System.IO.File.WriteAllText (_fileName, _textView.Text.ToString());
+				using (FileStream fs = new FileStream (_fileName, FileMode.OpenOrCreate)) {
+					_hexView.ApplyEdits ();
+					_hexView.Source.CopyTo (fs);
+					fs.Flush ();
+				}
 				_saved = true;
 			}
 		}
