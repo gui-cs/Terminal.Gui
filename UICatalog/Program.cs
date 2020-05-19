@@ -72,9 +72,7 @@ namespace UICatalog {
 				Height = Dim.Fill (),
 				CanFocus = false,
 			};
-			_leftPane.Enter += (o,a) => { 
 
-			};
 
 			_categories = Scenario.GetAllCategories ();
 			_categoryListView = new ListView (_categories) {
@@ -85,12 +83,9 @@ namespace UICatalog {
 				AllowsMarking = false,
 				CanFocus = true,
 			};
-			_categoryListView.OnKeyPress += (KeyEvent ke) => {
-				if (_top.MostFocused == _categoryListView && ke.Key == Key.Enter) {
-					_top.SetFocus (_rightPane);
-				}
+			_categoryListView.OpenSelectedItem += (o, a) => {
+				_top.SetFocus (_rightPane);
 			};
-			_categoryListView.OpenSelectedItem += (o, a) => CategoryListView_SelectedChanged ();
 			_categoryListView.SelectedChanged += CategoryListView_SelectedChanged;
 			_leftPane.Add (_categoryListView);
 
@@ -114,11 +109,11 @@ namespace UICatalog {
 				CanFocus = true,
 			};
 
-			_scenarioListView.OnKeyPress += (KeyEvent ke) => {
-				if (_top.MostFocused == _scenarioListView && ke.Key == Key.Enter) {
-					_scenarioListView_OpenSelectedItem (null, null);
-				}
-			};
+			//_scenarioListView.OnKeyPress += (KeyEvent ke) => {
+			//	if (_top.MostFocused == _scenarioListView && ke.Key == Key.Enter) {
+			//		_scenarioListView_OpenSelectedItem (null, null);
+			//	}
+			//};
 
 			_scenarioListView.OpenSelectedItem += _scenarioListView_OpenSelectedItem;
 			_rightPane.Add (_scenarioListView);
@@ -160,10 +155,18 @@ namespace UICatalog {
 			_top.Add (_statusBar);
 
 			// HACK: There is no other way to SetFocus before Application.Run. See Issue #445
+#if false
 			if (_runningScenario != null)
 				Application.Iteration += Application_Iteration;
-			_runningScenario = null;
-
+#else
+			_top.Ready += (o, a) => {
+				if (_runningScenario != null) {
+					_top.SetFocus (_rightPane);
+					_runningScenario = null;
+				}
+			};
+#endif
+			
 			Application.Run (_top);
 			return _runningScenario;
 		}

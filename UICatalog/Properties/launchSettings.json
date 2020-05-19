@@ -1,8 +1,7 @@
 {
   "profiles": {
     "UICatalog": {
-      "commandName": "Project",
-      "commandLineArgs": "Buttons"
+      "commandName": "Project"
     }
   }
 }

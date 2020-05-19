@@ -19,7 +19,7 @@ namespace UICatalog {
 	/// </summary>
 	public class Scenario {
 		/// <summary>
-		/// The Top level for the Scenario. 
+		/// The Top level for the Scenario. This should be set to `Application.Top` in most cases.
 		/// </summary>
 		public Toplevel Top { get; set; }
 
@@ -27,7 +27,13 @@ namespace UICatalog {
 		/// </summary>
 		public Window Win { get; set; }
 
-
+		/// <summary>
+		/// Helper that provides the default Window implementation with a frame and 
+		/// label showing the name of the Scenario and logic to exit back to 
+		/// the Scenario picker UI.
+		/// Override Init to provide any `Toplevel` behavior needed.
+		/// </summary>
+		/// <param name="top"></param>
 		public virtual void Init(Toplevel top)
 		{
 			Top = top;
@@ -121,9 +127,11 @@ namespace UICatalog {
 
 		public override string ToString () => $"{GetName (),-30}{GetDescription ()}";
 
-		public virtual void RequestStop ()
+		/// <summary>
+		/// Override this to implement the Scenario setup logic (create controls, etc...). 
+		/// </summary>
+		public virtual void Setup ()
 		{
-			Application.RequestStop ();
 		}
 
 		/// <summary>
@@ -135,16 +143,17 @@ namespace UICatalog {
 		}
 
 		/// <summary>
-		/// Override this to implement the Scenario setup logic (create controls, etc...). 
+		/// Stops the scenario. Override to implement shutdown behavior for the Scenario.
 		/// </summary>
-		public virtual void Setup ()
+		public virtual void RequestStop ()
 		{
+			Application.RequestStop ();
 		}
 
 		/// <summary>
 		/// Returns a list of all Categories set by all of the scenarios defined in the project.
 		/// </summary>
-			public static List<string> GetAllCategories ()
+		internal static List<string> GetAllCategories ()
 		{
 			List<string> categories = new List<string> () { "All" };
 			foreach (Type type in typeof (Scenario).Assembly.GetTypes ()
@@ -159,7 +168,7 @@ namespace UICatalog {
 		/// Returns an instance of each Scenario defined in the project. 
 		/// https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class
 		/// </summary>
-		public static List<Type> GetDerivedClassesCollection ()
+		internal static List<Type> GetDerivedClassesCollection ()
 		{
 			List<Type> objects = new List<Type> ();
 			foreach (Type type in typeof (Scenario).Assembly.GetTypes ()
