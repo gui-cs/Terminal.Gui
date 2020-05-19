@@ -90,8 +90,8 @@ static class Demo {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
-		container.OnKeyUp += (KeyEvent ke) => {
-			if (ke.Key == Key.Esc)
+		container.KeyUp += (sender, e) => {
+			if (e.KeyEvent.Key == Key.Esc)
 				container.Running = false;
 		};
 
@@ -469,9 +469,9 @@ static class Demo {
 		}
 
 
-		container.OnKeyDown += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Down");
-		container.OnKeyPress += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Press");
-		container.OnKeyUp += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Up");
+		container.KeyDown += (o, e) => KeyDownPressUp (e.KeyEvent, "Down");
+		container.KeyPress += (o, e) => KeyDownPressUp (e.KeyEvent, "Press");
+		container.KeyUp += (o, e) => KeyDownPressUp (e.KeyEvent, "Up");
 		Application.Run (container);
 	}
 	#endregion
