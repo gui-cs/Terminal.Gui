@@ -31,29 +31,25 @@ namespace Terminal.Gui {
 		readonly ListView listview;
 		readonly int height;
 		readonly int width;
-		readonly bool isAutoHide;
+		bool autoHide = true;
 
 		/// <summary>
 		/// Public constructor
 		/// </summary>
 		/// <param name="x">The x coordinate</param>
 		/// <param name="y">The y coordinate</param>
-		/// <param name="w">The width</param>		
+		/// <param name="w">The width</param>
 		/// <param name="h">The height</param>
 		/// <param name="source">Auto completetion source</param>
-		/// <param name="autoHide">Completetion list hidden until start of typing. Use when hosting in Window as opposed to a Dialog</param>
-		public TextFieldAutoComplete(int x, int y, int w, int h, IList<string> source, bool autoHide = false)
+		public TextFieldAutoComplete(int x, int y, int w, int h, IList<string> source)
 		{
 			listsource = new List<string>(source);
-			isAutoHide = autoHide;
-			searchset = isAutoHide ? new List<string> () : listsource;
 			height = h;
 			width = w;
-			isAutoHide = autoHide;
 			search = new TextField(x, y, w, "");
 			search.Changed += Search_Changed;
 
-			listview = new ListView(new Rect(x, y + 1, w, CalculatetHeight()), listsource.ToList())
+			listview = new ListView(new Rect(x, y + 1, w, 0), listsource.ToList())
 			{
 				LayoutStyle = LayoutStyle.Computed,
 				ColorScheme = Colors.Dialog
@@ -62,12 +58,23 @@ namespace Terminal.Gui {
 				SetValue (searchset [listview.SelectedItem]);
 			};
 
+			Application.OnLoad += () => {
+				// Determine if this view is hosted inside a dialog
+				for (View view = this.SuperView; view != null; view = view.SuperView) {
+					if (view is Dialog) {
+						autoHide = false;
+						break;
+					}
+				}
 
-			// Needs to be re-applied for LayoutStyle.Computed
-			listview.X = x;
-			listview.Y = y + 1;
-			listview.Width = w;
-			listview.Height = CalculatetHeight ();
+				searchset = autoHide ? new List<string> () : listsource;
+
+				// Needs to be re-applied for LayoutStyle.Computed
+				listview.X = x;
+				listview.Y = y + 1;
+				listview.Width = w;
+				listview.Height = CalculatetHeight ();
+			};
 
 			this.Add(listview);
 			this.Add(search);
@@ -169,7 +176,7 @@ namespace Terminal.Gui {
 		{
 			search.Text = text = "";
 			Changed?.Invoke (this, search.Text);
-			searchset = isAutoHide ? new List<string> () : listsource;
+			searchset = autoHide ? new List<string> () : listsource;
 
 			listview.SetSource(searchset.ToList());
 			listview.Height = CalculatetHeight ();
@@ -180,7 +187,7 @@ namespace Terminal.Gui {
 		private void Search_Changed (object sender, ustring text)
 		{
 			if (string.IsNullOrEmpty (search.Text.ToString())) {
-				searchset = isAutoHide ? new List<string> () : listsource;
+				searchset = autoHide ? new List<string> () : listsource;
 			} 
 			else
 				searchset = listsource.Where (x => x.StartsWith (search.Text.ToString (), StringComparison.CurrentCultureIgnoreCase)).ToList ();
