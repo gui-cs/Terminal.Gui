@@ -413,11 +413,11 @@ static class Demo {
 	#endregion
 
 
-	#region OnKeyDown / OnKeyPress / OnKeyUp Demo
+	#region KeyDown / KeyPress / KeyUp Demo
 	private static void OnKeyDownPressUpDemo ()
 	{
 		var container = new Dialog (
-			"OnKeyDown & OnKeyPress & OnKeyUp demo", 80, 20,
+			"KeyDown & KeyPress & KeyUp demo", 80, 20,
 			new Button ("Close") { Clicked = () => { Application.RequestStop (); } }) {
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
