@@ -30,6 +30,8 @@ e.g.
 UICatalog.exe Buttons
 ```
 
+When a **Scenario** is run, it runs as though it were a standalone `Terminal.Gui` app. However, scaffolding is provided (in the `Scenario` base class) that (optionally) takes care of `Terminal.Gui` initialization.
+
 ## Contributing by Adding Scenarios
 
 To add a new **Scenario** simply:
@@ -38,7 +40,7 @@ To add a new **Scenario** simply:
 2. Add a `[ScenarioMetaData]` attribute to the class specifying the scenario's name and description.
 3. Add one or more `[ScenarioCategory]` attributes to the class specifying which categories the sceanrio belongs to. If you don't specify a category the sceanrio will show up in "All".
 4. Implement the `Setup` override which will be called when a user selects the scenario to run.
-5. Optionally, implement the `Run` override to provide a custom implementation of 
+5. Optionally, implement the `Init` and/or `Run` overrides to provide a custom implementation.
 
 The sample below is provided in the `Scenarios` directory as a generic sample that can be copied and re-named:
 
@@ -106,4 +108,15 @@ namespace UICatalog {
 }
 ```
 
-For complete control, the `Init` and `Run` overrides can be implemented. The `base.Init` assigns `Application.Top` to `Top` and creates `Win`. The `base.Run` simply calls `Application.Run(Top)`. 
+For complete control, the `Init` and `Run` overrides can be implemented. The `base.Init` assigns `Application.Top` to `Top` and creates `Win`. The `base.Run` simply calls `Application.Run(Top)`.
+
+## Contribution Guidelines
+
+- Provide a terse, descriptive name for `Scenarios`. Keep them short; the `ListView` that displays them dynamically sizes the column width and long names will make it hard for people to use.
+- Provide a clear description.
+- Comment `Scenario` code to describe to others why it's a useful `Scenario`.
+- Annotate `Scenarios` with `[ScenarioCategory]` attributes. Try to minimize the number of new categories created.
+- Use the `Bug Rero` Category for `Scnarios` that reproduce bugs. 
+	- Include the Github Issue # in the Description.
+	- Once the bug has been fixed in `master` submit another PR to remove the `Scenario` (or modify it to provide a good regression test).
+- Tag bugs or suggestions for `UI Catalog` in the main `Terminal.Gui` Github Issues with "UICatalog: ".
