@@ -807,6 +807,8 @@ namespace Terminal.Gui {
 
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 				mouseFlag = MouseFlags.ReportMousePosition;
+			} else if (mouseEvent.ButtonState == 0 && mouseEvent.EventFlags == 0) {
+				mouseFlag = 0;
 			}
 
 			mouseFlag = SetControlKeyStates (mouseEvent, mouseFlag);
