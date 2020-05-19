@@ -454,16 +454,22 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		int lastSelectedItem = -1;
+
 		/// <summary>
 		/// Invokes the SelectedChanged event if it is defined.
 		/// </summary>
 		/// <returns></returns>
 		public virtual bool OnSelectedChanged ()
 		{
-			var value = source.ToList () [selected];
-			SelectedChanged?.Invoke (this, new ListViewItemEventArgs (selected, value));
+			if (selected != lastSelectedItem) {
+				var value = source.ToList () [selected];
+				SelectedChanged?.Invoke (this, new ListViewItemEventArgs (selected, value));
+				lastSelectedItem = selected;
+				return true;
+			}
 
-			return true;
+			return false;
 		}
 
 		/// <summary>
