@@ -338,7 +338,7 @@ namespace Terminal.Gui {
 					break;
 
 			case Key.Enter:
-				OpenSelectedItem?.Invoke (this, new EventArgs ());
+				OnOpenSelectedItem ();
 				break;
 
 			}
@@ -525,10 +525,10 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 				return true;
 			}
-			SelectedChanged?.Invoke ();
+			OnSelectedChanged ();
 			SetNeedsDisplay ();
 			if (me.Flags == MouseFlags.Button1DoubleClicked)
-				OpenSelectedItem?.Invoke (this, new EventArgs ());
+				OnOpenSelectedItem ();
 			return true;
 		}
 	}
