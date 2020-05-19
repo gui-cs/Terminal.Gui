@@ -344,7 +344,7 @@ namespace Terminal.Gui {
 			});
 		}
 
-		public override bool KeyDown (KeyEvent keyEvent)
+		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
 				host.CloseAllMenus ();
@@ -359,7 +359,7 @@ namespace Terminal.Gui {
 			// To ncurses simulate a AltMask key pressing Alt+Space because
 			// it can´t detect an alone special key down was pressed.
 			if (keyEvent.IsAlt && keyEvent.Key == Key.AltMask) {
-				KeyDown (keyEvent);
+				OnKeyDown (keyEvent);
 				return true;
 			}
 
@@ -559,7 +559,7 @@ namespace Terminal.Gui {
 		}
 
 		bool openedByAltKey;
-		public override bool KeyDown (KeyEvent keyEvent)
+		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
 				openedByAltKey = true;
@@ -575,7 +575,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="keyEvent"></param>
 		/// <returns></returns>
-		public override bool KeyUp (KeyEvent keyEvent)
+		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
 				// User pressed Alt - this may be a precursor to a menu accelerator (e.g. Alt-F)
@@ -982,8 +982,8 @@ namespace Terminal.Gui {
 			// To ncurses simulate a AltMask key pressing Alt+Space because
 			// it can´t detect an alone special key down was pressed.
 			if (kb.IsAlt && kb.Key == Key.AltMask && openMenu == null) {
-				KeyDown (kb);
-				KeyUp (kb);
+				OnKeyDown (kb);
+				OnKeyUp (kb);
 				return true;
 			} else if (kb.IsAlt) {
 				if (FindAndOpenMenuByHotkey (kb)) return true;
