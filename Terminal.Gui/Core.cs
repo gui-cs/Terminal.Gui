@@ -1070,6 +1070,11 @@ namespace Terminal.Gui {
 			public KeyEvent KeyEvent { get; set; }
 		}
 
+		public class KeyEventEventArgs : EventArgs {
+			public KeyEventEventArgs(KeyEvent ke) => KeyEvent = ke;
+			public KeyEvent KeyEvent { get; set; }
+		}
+
 		/// <summary>
 		/// Specifies the event arguments for <see cref="KeyEvent"/>
 		/// </summary>
