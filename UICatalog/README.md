@@ -106,4 +106,4 @@ namespace UICatalog {
 }
 ```
 
-For complete control, the `Run` override can be implemented. The `base` simply calls `Application.Run(Top)`. 
+For complete control, the `Init` and `Run` overrides can be implemented. The `base.Init` assigns `Application.Top` to `Top` and creates `Win`. The `base.Run` simply calls `Application.Run(Top)`. 
