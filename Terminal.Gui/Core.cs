@@ -925,12 +925,20 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// The event raising function for the <see cref="T:Terminal.Gui.View.Enter"/> event fired when the view get focus.
+		/// </summary>
+		/// <returns></returns>
 		public override bool OnEnter ()
 		{
 			Enter?.Invoke (this, new EventArgs ());
 			return base.OnEnter ();
 		}
 
+		/// <summary>
+		/// The event raising function for the <see cref="T:Terminal.Gui.View.Leave"/> event fired when the view loses focus.
+		/// </summary>
+		/// <returns></returns>
 		public override bool OnLeave ()
 		{
 			Leave?.Invoke (this, new EventArgs ());
@@ -1419,6 +1427,11 @@ namespace Terminal.Gui {
 			return $"{GetType ().Name}({Id})({Frame})";
 		}
 
+		/// <summary>
+		/// Event raising method for <see cref="MouseEnter"/>".
+		/// </summary>
+		/// <param name="mouseEvent"></param>
+		/// <returns></returns>
 		public override bool OnMouseEnter (MouseEvent mouseEvent)
 		{
 			if (!base.OnMouseEnter (mouseEvent)) {
@@ -1428,6 +1441,11 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <summary>
+		/// Event raising method for <see cref="MouseLeave"/>".
+		/// </summary>
+		/// <param name="mouseEvent"></param>
+		/// <returns></returns>
 		public override bool OnMouseLeave (MouseEvent mouseEvent)
 		{
 			if (!base.OnMouseLeave (mouseEvent)) {
@@ -1508,6 +1526,10 @@ namespace Terminal.Gui {
 			return new Toplevel (new Rect (0, 0, Driver.Cols, Driver.Rows));
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Toplevel"/> can focus.
+		/// </summary>
+		/// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
 		public override bool CanFocus {
 			get => true;
 		}
@@ -1529,6 +1551,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool HasStatusBar { get; set; }
 
+		///<inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			if (base.ProcessKey (keyEvent))
@@ -1580,6 +1603,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		///<inheritdoc cref="Add"/>
 		public override void Add (View view)
 		{
 			if (this == Application.Top) {
@@ -1591,6 +1615,7 @@ namespace Terminal.Gui {
 			base.Add (view);
 		}
 
+		///<inheritdoc cref="Remove"/>
 		public override void Remove (View view)
 		{
 			if (this == Application.Top) {
@@ -1602,6 +1627,7 @@ namespace Terminal.Gui {
 			base.Remove (view);
 		}
 
+		///<inheritdoc cref="RemoveAll"/>
 		public override void RemoveAll ()
 		{
 			if (this == Application.Top) {
@@ -1656,6 +1682,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc cref="Redraw"/>
 		public override void Redraw (Rect region)
 		{
 			Application.CurrentView = this;
@@ -1838,6 +1865,7 @@ namespace Terminal.Gui {
 			contentView.RemoveAll ();
 		}
 
+		///<inheritdoc cref="Redraw"/>
 		public override void Redraw (Rect bounds)
 		{
 			Application.CurrentView = this;
@@ -1873,6 +1901,7 @@ namespace Terminal.Gui {
 		//
 		internal static Point? dragPosition;
 		Point start;
+		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
 		public override bool MouseEvent (MouseEvent mouseEvent)
 		{
 			// FIXED:The code is currently disabled, because the
@@ -2426,7 +2455,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		internal static bool DebugDrawBounds;
+		internal static bool DebugDrawBounds = false;
 
 		// Need to look into why this does not work properly.
 		static void DrawBounds (View v)
