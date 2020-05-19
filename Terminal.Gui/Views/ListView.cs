@@ -338,7 +338,7 @@ namespace Terminal.Gui {
 					break;
 
 			case Key.Enter:
-				OpenSelectedItem?.Invoke (this, new EventArgs ());
+				OnOpenSelectedItem ();
 				break;
 
 			}
@@ -525,10 +525,10 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 				return true;
 			}
-			SelectedChanged?.Invoke ();
+			OnSelectedChanged ();
 			SetNeedsDisplay ();
 			if (me.Flags == MouseFlags.Button1DoubleClicked)
-				OpenSelectedItem?.Invoke (this, new EventArgs ());
+				OnOpenSelectedItem ();
 			return true;
 		}
 	}
@@ -602,7 +602,7 @@ namespace Terminal.Gui {
 		/// Returns true if the item is marked, false otherwise.
 		/// </summary>
 		/// <param name="item">The item.</param>
-		/// <returns></returns>
+		/// <returns><c>true</c>If is marked.<c>false</c>otherwise.</returns>
 		public bool IsMarked (int item)
 		{
 			if (item >= 0 && item < count)
