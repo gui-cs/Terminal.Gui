@@ -1666,7 +1666,7 @@ namespace Terminal.Gui {
 		{
 			Application.CurrentView = this;
 
-			if (this == Application.Top) {
+			if (this == Application.Top || this == Application.Current) {
 				if (!NeedDisplay.IsEmpty) {
 					Driver.SetAttribute (Colors.TopLevel.Normal);
 					Clear (region);
