@@ -126,7 +126,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		/// <returns>true if the event was handled</returns>
-		public virtual bool KeyDown (KeyEvent keyEvent)
+		public virtual bool OnKeyDown (KeyEvent keyEvent)
 		{
 			return false;
 		}
@@ -136,7 +136,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		/// <returns>true if the event was handled</returns>
-		public virtual bool KeyUp (KeyEvent keyEvent)
+		public virtual bool OnKeyUp (KeyEvent keyEvent)
 		{
 			return false;
 		}
@@ -1065,15 +1065,20 @@ namespace Terminal.Gui {
 			SuperView?.SetFocus(this);
 		}
 
+		public class KeyEventEventArgs : EventArgs {
+			public KeyEventEventArgs(KeyEvent ke) => KeyEvent = ke;
+			public KeyEvent KeyEvent { get; set; }
+		}
+
 		/// <summary>
 		/// Invoked when a character key is pressed and occurs after the key up event.
 		/// </summary>
-		public Action<KeyEvent> OnKeyPress;
+		public event EventHandler<KeyEventEventArgs> KeyPress;
 
 		/// <inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			OnKeyPress?.Invoke (keyEvent);
+			KeyPress?.Invoke (this, new KeyEventEventArgs(keyEvent));
 			if (Focused?.ProcessKey (keyEvent) == true)
 				return true;
 
@@ -1083,6 +1088,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc cref="ProcessHotKey"/>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
+			KeyPress?.Invoke (this, new KeyEventEventArgs (keyEvent));
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1094,6 +1100,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc cref="ProcessColdKey"/>
 		public override bool ProcessColdKey (KeyEvent keyEvent)
 		{
+			KeyPress?.Invoke (this, new KeyEventEventArgs(keyEvent));
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1105,16 +1112,16 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is pressed
 		/// </summary>
-		public Action<KeyEvent> OnKeyDown;
+		public event EventHandler<KeyEventEventArgs> KeyDown;
 
-		/// <inheritdoc cref="KeyDown"/>
-		public override bool KeyDown (KeyEvent keyEvent)
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
-			OnKeyDown?.Invoke (keyEvent);
+			KeyDown?.Invoke (this, new KeyEventEventArgs (keyEvent));
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.KeyDown (keyEvent))
+				if (view.OnKeyDown (keyEvent))
 					return true;
 
 			return false;
@@ -1123,16 +1130,16 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is released
 		/// </summary>
-		public Action<KeyEvent> OnKeyUp;
+		public event EventHandler<KeyEventEventArgs> KeyUp;
 
-		/// <inheritdoc cref="KeyUp"/>
-		public override bool KeyUp (KeyEvent keyEvent)
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
-			OnKeyUp?.Invoke (keyEvent);
+			KeyUp?.Invoke (this, new KeyEventEventArgs (keyEvent));
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.KeyUp (keyEvent))
+				if (view.OnKeyUp (keyEvent))
 					return true;
 
 			return false;
@@ -2171,7 +2178,7 @@ namespace Terminal.Gui {
 		{
 			var chain = toplevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.KeyDown (ke))
+				if (topLevel.OnKeyDown (ke))
 					return;
 				if (topLevel.Modal)
 					break;
@@ -2183,7 +2190,7 @@ namespace Terminal.Gui {
 		{
 			var chain = toplevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.KeyUp (ke))
+				if (topLevel.OnKeyUp (ke))
 					return;
 				if (topLevel.Modal)
 					break;
