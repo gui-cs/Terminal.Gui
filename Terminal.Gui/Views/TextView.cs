@@ -380,6 +380,18 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Closes the contents of the stream into the TextView.
+		/// </summary>
+		/// <returns><c>true</c>, if stream was closed, <c>false</c> otherwise.</returns>
+		public bool CloseFile()
+		{
+			ResetPosition ();
+			var res = model.CloseFile ();
+			SetNeedsDisplay ();
+			return res;
+		}
+
+		/// <summary>
 		///    The current cursor row.
 		/// </summary>
 		public int CurrentRow => currentRow;
