@@ -1075,6 +1075,11 @@ namespace Terminal.Gui {
 			public KeyEvent KeyEvent { get; set; }
 		}
 
+		public class KeyEventEventArgs : EventArgs {
+			public KeyEventEventArgs(KeyEvent ke) => KeyEvent = ke;
+			public KeyEvent KeyEvent { get; set; }
+		}
+
 		/// <summary>
 		/// Invoked when a character key is pressed and occurs after the key up event.
 		/// </summary>
