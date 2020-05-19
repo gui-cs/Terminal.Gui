@@ -2561,9 +2561,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoked when the terminal was resized.
+		/// Invoked when the terminal was resized. The new size of the terminal is provided.
 		/// </summary>
-		static public event EventHandler Resized;
+		static public event EventHandler<ResizedEventArgs> Resized;
 
 		static void TerminalResized ()
 		{
