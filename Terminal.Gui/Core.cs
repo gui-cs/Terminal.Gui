@@ -899,10 +899,7 @@ namespace Terminal.Gui {
 				Move (frame.X, frame.Y);
 		}
 
-		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.View"/> has focus.
-		/// </summary>
-		/// <value><c>true</c> if has focus; otherwise, <c>false</c>.</value>
+		/// <inheritdoc cref="HasFocus"/>
 		public override bool HasFocus {
 			get {
 				return base.HasFocus;
@@ -925,20 +922,14 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// The event raising function for the <see cref="T:Terminal.Gui.View.Enter"/> event fired when the view get focus.
-		/// </summary>
-		/// <returns></returns>
+		/// <inheritdoc cref="OnEnter"/>
 		public override bool OnEnter ()
 		{
 			Enter?.Invoke (this, new EventArgs ());
 			return base.OnEnter ();
 		}
 
-		/// <summary>
-		/// The event raising function for the <see cref="T:Terminal.Gui.View.Leave"/> event fired when the view loses focus.
-		/// </summary>
-		/// <returns></returns>
+		/// <inheritdoc cref="OnLeave"/>
 		public override bool OnLeave ()
 		{
 			Leave?.Invoke (this, new EventArgs ());
@@ -1079,7 +1070,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Action<KeyEvent> OnKeyPress;
 
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			OnKeyPress?.Invoke (keyEvent);
@@ -1089,7 +1080,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <inheritdoc cref="ProcessHotKey"/>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
 			OnKeyPress?.Invoke (keyEvent);
@@ -1101,7 +1092,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <inheritdoc cref="ProcessColdKey"/>
 		public override bool ProcessColdKey (KeyEvent keyEvent)
 		{
 			OnKeyPress?.Invoke (keyEvent);
@@ -1118,7 +1109,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Action<KeyEvent> OnKeyDown;
 
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <inheritdoc cref="KeyDown"/>
 		public override bool KeyDown (KeyEvent keyEvent)
 		{
 			OnKeyDown?.Invoke (keyEvent);
@@ -1136,7 +1127,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Action<KeyEvent> OnKeyUp;
 
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <inheritdoc cref="KeyUp"/>
 		public override bool KeyUp (KeyEvent keyEvent)
 		{
 			OnKeyUp?.Invoke (keyEvent);
@@ -1148,6 +1139,7 @@ namespace Terminal.Gui {
 
 			return false;
 		}
+
 		/// <summary>
 		/// Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise, it does nothing.
 		/// </summary>
@@ -1418,20 +1410,13 @@ namespace Terminal.Gui {
 			layoutNeeded = false;
 		}
 
-		/// <summary>
-		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.View"/>.
-		/// </summary>
-		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.View"/>.</returns>
+		/// <inheritdoc cref="ToString"/>
 		public override string ToString ()
 		{
 			return $"{GetType ().Name}({Id})({Frame})";
 		}
 
-		/// <summary>
-		/// Event raising method for <see cref="MouseEnter"/>".
-		/// </summary>
-		/// <param name="mouseEvent"></param>
-		/// <returns></returns>
+		/// <inheritdoc cref="OnMouseEnter(Gui.MouseEvent)"/>
 		public override bool OnMouseEnter (MouseEvent mouseEvent)
 		{
 			if (!base.OnMouseEnter (mouseEvent)) {
@@ -1441,11 +1426,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		/// <summary>
-		/// Event raising method for <see cref="MouseLeave"/>".
-		/// </summary>
-		/// <param name="mouseEvent"></param>
-		/// <returns></returns>
+		/// <inheritdoc cref="OnMouseLeave(Gui.MouseEvent)"/>
 		public override bool OnMouseLeave (MouseEvent mouseEvent)
 		{
 			if (!base.OnMouseLeave (mouseEvent)) {
