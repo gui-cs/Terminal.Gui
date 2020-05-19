@@ -39,11 +39,25 @@ namespace Terminal.Gui {
 			if (file == null)
 				throw new ArgumentNullException (nameof (file));
 			try {
+				FilePath = file;
 				var stream = File.OpenRead (file);
 			} catch {
 				return false;
 			}
 			LoadStream (File.OpenRead (file));
+			return true;
+		}
+
+		public bool CloseFile ()
+		{
+			if (FilePath == null)
+				throw new ArgumentNullException (nameof (FilePath));
+			try {
+				FilePath = null;
+				lines = new List<List<Rune>> ();
+			} catch {
+				return false;
+			}
 			return true;
 		}
 
@@ -119,6 +133,8 @@ namespace Terminal.Gui {
 			}
 			return sb.ToString ();
 		}
+
+		public string FilePath { get; set; }
 
 		/// <summary>
 		/// The number of text lines in the model
@@ -266,6 +282,9 @@ namespace Terminal.Gui {
 		bool selecting;
 		//bool used;
 
+		/// <summary>
+		/// Event invoked when text was changed.
+		/// </summary>
 		public event EventHandler TextChanged;
 
 #if false
@@ -346,6 +365,18 @@ namespace Terminal.Gui {
 			ResetPosition ();
 			model.LoadStream(stream);
 			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Closes the contents of the stream into the TextView.
+		/// </summary>
+		/// <returns><c>true</c>, if stream was closed, <c>false</c> otherwise.</returns>
+		public bool CloseFile()
+		{
+			ResetPosition ();
+			var res = model.CloseFile ();
+			SetNeedsDisplay ();
+			return res;
 		}
 
 		/// <summary>
@@ -535,6 +566,10 @@ namespace Terminal.Gui {
 			PositionCursor ();
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="Responder" /> can focus.
+		/// </summary>
+		/// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
 		public override bool CanFocus {
 			get => true;
 			set { base.CanFocus = value; }
@@ -682,6 +717,11 @@ namespace Terminal.Gui {
 
 		bool lastWasKill;
 
+		/// <summary>
+		/// Process the keys from the keyboard.
+		/// </summary>
+		/// <param name="kb">Contains the details about the key that produced the event.</param>
+		/// <returns><c>true</c>If the event was handled.<c>false</c>otherwise.</returns>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			int restCount;
@@ -1139,6 +1179,11 @@ namespace Terminal.Gui {
 			return null;
 		}
 
+		/// <summary>
+		/// Method invoked when a mouse event is generated
+		/// </summary>
+		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
+		/// <param name="ev">Contains the details about the mouse event.</param>
 		public override bool MouseEvent (MouseEvent ev)
 		{
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked)) {
