@@ -112,8 +112,7 @@ namespace Terminal.Gui {
 			Width = Dim.Fill ();
 			Height = 1;
 
-			// This is never called if it is invoked later on another place.
-			Application.OnLoad += () => {
+			Application.Loaded += (sender, e) => {
 				X = 0;
 				Height = 1;
 #if SNAP_TO_TOP
@@ -125,7 +124,7 @@ namespace Terminal.Gui {
 				case StatusBarStyle.SnapToBottom:
 #endif
 					if (Parent == null) {
-						Y = Application.Driver.Rows - 1; // TODO: using internals of Application
+						Y = e.Rows - 1; 
 					} else {
 						Y = Pos.Bottom (Parent);
 					}
