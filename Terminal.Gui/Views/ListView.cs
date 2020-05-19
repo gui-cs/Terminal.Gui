@@ -263,7 +263,7 @@ namespace Terminal.Gui {
 		/// Redraws the ListView
 		/// </summary>
 		/// <param name="region">Region.</param>
-		public override void Redraw(Rect region)
+		public override void Redraw (Rect region)
 		{
 			var current = ColorScheme.Focus;
 			Driver.SetAttribute (current);
@@ -285,12 +285,12 @@ namespace Terminal.Gui {
 				Move (0, row);
 				if (source == null || item >= source.Count) {
 					for (int c = 0; c < f.Width; c++)
-						Driver.AddRune(' ');
+						Driver.AddRune (' ');
 				} else {
 					if (allowsMarking) {
 						Driver.AddStr (source.IsMarked (item) ? (AllowsMultipleSelection ? "[x] " : "(o)") : (AllowsMultipleSelection ? "[ ] " : "( )"));
 					}
-					Source.Render(this, Driver, isSelected, item, col, row, f.Width-col);
+					Source.Render (this, Driver, isSelected, item, col, row, f.Width - col);
 				}
 			}
 		}
@@ -298,12 +298,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// This event is raised when the cursor selection has changed.
 		/// </summary>
-		public event Action SelectedChanged;
+		public event EventHandler<ListViewItemEventArgs> SelectedChanged;
 
 		/// <summary>
 		/// This event is raised on Enter key or Double Click to open the selected item.
 		/// </summary>
-		public event EventHandler OpenSelectedItem;
+		public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
 
 		/// <summary>
 		/// Handles cursor movement for this view, passes all other events.
@@ -318,33 +318,37 @@ namespace Terminal.Gui {
 			switch (kb.Key) {
 			case Key.CursorUp:
 			case Key.ControlP:
-				return MoveUp();
+				return MoveUp ();
 
 			case Key.CursorDown:
 			case Key.ControlN:
-				return MoveDown();
+				return MoveDown ();
 
 			case Key.ControlV:
 			case Key.PageDown:
-				return MovePageDown();
+				return MovePageDown ();
 
 			case Key.PageUp:
-				return MovePageUp();
+				return MovePageUp ();
 
 			case Key.Space:
-				if (MarkUnmarkRow())
+				if (MarkUnmarkRow ())
 					return true;
 				else
 					break;
 
 			case Key.Enter:
-				OpenSelectedItem?.Invoke (this, new EventArgs ());
+				OnOpenSelectedItem ();
 				break;
 
 			}
 			return base.ProcessKey (kb);
 		}
 
+		/// <summary>
+		/// Prevents marking if it's not allowed mark and if it's not allows multiple selection.
+		/// </summary>
+		/// <returns></returns>
 		public virtual bool AllowsAll ()
 		{
 			if (!allowsMarking)
@@ -360,71 +364,116 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		public virtual bool MarkUnmarkRow(){
+		/// <summary>
+		/// Marks an unmarked row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MarkUnmarkRow ()
+		{
 			if (AllowsAll ()) {
-				Source.SetMark(SelectedItem, !Source.IsMarked(SelectedItem));
-				SetNeedsDisplay();
+				Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
+				SetNeedsDisplay ();
 				return true;
 			}
 
 			return false;
 		}
 
-		public virtual bool MovePageUp(){
+		/// <summary>
+		/// Moves to the next page.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MovePageUp ()
+		{
 			int n = (selected - Frame.Height);
 			if (n < 0)
 				n = 0;
-			if (n != selected){
+			if (n != selected) {
 				selected = n;
 				top = selected;
-				if (SelectedChanged != null)
-					SelectedChanged();
-				SetNeedsDisplay();
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
 			}
 
 			return true;
 		}
 
-		public virtual bool MovePageDown(){
+		/// <summary>
+		/// Moves to the previous page.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MovePageDown ()
+		{
 			var n = (selected + Frame.Height);
 			if (n > source.Count)
 				n = source.Count - 1;
-			if (n != selected){
+			if (n != selected) {
 				selected = n;
 				if (source.Count >= Frame.Height)
 					top = selected;
 				else
 					top = 0;
-				if (SelectedChanged != null)
-					SelectedChanged();
-				SetNeedsDisplay();
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
 			}
 
 			return true;
 		}
 
-		public virtual bool MoveDown(){
-			if (selected + 1 < source.Count){
+		/// <summary>
+		/// Moves to the next row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MoveDown ()
+		{
+			if (selected + 1 < source.Count) {
 				selected++;
 				if (selected >= top + Frame.Height)
 					top++;
-				if (SelectedChanged != null)
-					SelectedChanged();
-				SetNeedsDisplay();
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
 			}
 
 			return true;
 		}
 
-		public virtual bool MoveUp(){
-			if (selected > 0){
+		/// <summary>
+		/// Moves to the previous row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MoveUp ()
+		{
+			if (selected > 0) {
 				selected--;
 				if (selected < top)
 					top = selected;
-				if (SelectedChanged != null)
-					SelectedChanged();
-				SetNeedsDisplay();
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
 			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Invokes the SelectedChanged event if it is defined.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool OnSelectedChanged ()
+		{
+			var value = source.ToList () [selected];
+			SelectedChanged?.Invoke (this, new ListViewItemEventArgs (selected, value));
+
+			return true;
+		}
+
+		/// <summary>
+		/// Invokes the OnOpenSelectedItem event if it is defined.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool OnOpenSelectedItem ()
+		{
+			var value = source.ToList () [selected];
+			OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (selected, value));
 
 			return true;
 		}
@@ -432,7 +481,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Positions the cursor in this view
 		/// </summary>
-		public override void PositionCursor()
+		public override void PositionCursor ()
 		{
 			if (allowsMarking)
 				Move (1, selected - top);
@@ -440,7 +489,7 @@ namespace Terminal.Gui {
 				Move (0, selected - top);
 		}
 
-		public override bool MouseEvent(MouseEvent me)
+		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
 				return false;
@@ -460,10 +509,10 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 				return true;
 			}
-			SelectedChanged?.Invoke ();
+			OnSelectedChanged ();
 			SetNeedsDisplay ();
 			if (me.Flags == MouseFlags.Button1DoubleClicked)
-				OpenSelectedItem?.Invoke (this, new EventArgs ());
+				OnOpenSelectedItem ();
 			return true;
 		}
 	}
@@ -477,6 +526,10 @@ namespace Terminal.Gui {
 		BitArray marks;
 		int count;
 
+		/// <summary>
+		/// Constructor based on a source.
+		/// </summary>
+		/// <param name="source"></param>
 		public ListWrapper (IList source)
 		{
 			count = source.Count;
@@ -484,6 +537,9 @@ namespace Terminal.Gui {
 			this.src = source;
 		}
 
+		/// <summary>
+		/// Returns the amount of items in the source.
+		/// </summary>
 		public int Count => src.Count;
 
 		void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width)
@@ -493,7 +549,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < byteLen;) {
 				(var rune, var size) = Utf8.DecodeRune (ustr, i, i - byteLen);
 				var count = Rune.ColumnWidth (rune);
-				if (used+count >= width)
+				if (used + count >= width)
 					break;
 				driver.AddRune (rune);
 				used += count;
@@ -504,6 +560,16 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Method that render to the appropriate type based on the type of the item passed to it.
+		/// </summary>
+		/// <param name="container">The ListView.</param>
+		/// <param name="driver">The driver used by the caller.</param>
+		/// <param name="marked">Informs if it's marked or not.</param>
+		/// <param name="item">The item.</param>
+		/// <param name="col">The col where to move.</param>
+		/// <param name="line">The line where to move.</param>
+		/// <param name="width">The item width.</param>
 		public void Render (ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width)
 		{
 			container.Move (col, line);
@@ -516,6 +582,11 @@ namespace Terminal.Gui {
 				RenderUstr (driver, t.ToString (), col, line, width);
 		}
 
+		/// <summary>
+		/// Returns true if the item is marked, false otherwise.
+		/// </summary>
+		/// <param name="item">The item.</param>
+		/// <returns></returns>
 		public bool IsMarked (int item)
 		{
 			if (item >= 0 && item < count)
@@ -523,15 +594,49 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		/// <summary>
+		/// Sets the item as marked or unmarked based on the value is true or false, respectively.
+		/// </summary>
+		/// <param name="item">The item</param>
+		/// <param name="value"><true>Marks the item.</true><false>Unmarked the item.</false>The value.</param>
 		public void SetMark (int item, bool value)
 		{
 			if (item >= 0 && item < count)
 				marks [item] = value;
 		}
 
+		/// <summary>
+		/// Returns the source as IList.
+		/// </summary>
+		/// <returns></returns>
 		public IList ToList ()
 		{
 			return src;
+		}
+	}
+
+	/// <summary>
+	/// Gets the item and value to use in an event handler.
+	/// </summary>
+	public class ListViewItemEventArgs : EventArgs {
+		/// <summary>
+		/// The item.
+		/// </summary>
+		public int Item { get; }
+		/// <summary>
+		/// The item value.
+		/// </summary>
+		public object Value { get; }
+
+		/// <summary>
+		/// Constructor to sets the item and value passed from.
+		/// </summary>
+		/// <param name="item">The item.</param>
+		/// <param name="value">The item value</param>
+		public ListViewItemEventArgs (int item, object value)
+		{
+			Item = item;
+			Value = value;
 		}
 	}
 }
