@@ -2015,7 +2015,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   See also <see cref="Timeout"/>
 		/// </remarks>
-		static public event EventHandler Iteration;
+		public static event EventHandler Iteration;
 
 		/// <summary>
 		/// Returns a rectangle that is centered in the screen for the provided size.
@@ -2249,7 +2249,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Merely a debugging aid to see the raw mouse events
 		/// </summary>
-		static public Action<MouseEvent> RootMouseEvent;
+		public static Action<MouseEvent> RootMouseEvent;
 
 		internal static View wantContinuousButtonPressedView;
 		static View lastMouseOwnerView;
@@ -2323,7 +2323,7 @@ namespace Terminal.Gui {
 		/// This event is fired once when the application is first loaded. The dimensions of the
 		/// terminal are provided.
 		/// </summary>
-		static public event EventHandler<ResizedEventArgs> Loaded;
+		public static event EventHandler<ResizedEventArgs> Loaded;
 
 		/// <summary>
 		/// Building block API: Prepares the provided toplevel for execution.
@@ -2338,7 +2338,7 @@ namespace Terminal.Gui {
 		///  the <see cref="RunLoop"/> method, and then the <see cref="End(RunState)"/> method upon termination which will
 		///   undo these changes.
 		/// </remarks>
-		static public RunState Begin (Toplevel toplevel)
+		public static RunState Begin (Toplevel toplevel)
 		{
 			if (toplevel == null)
 				throw new ArgumentNullException (nameof (toplevel));
@@ -2372,7 +2372,7 @@ namespace Terminal.Gui {
 		/// Building block API: completes the execution of a Toplevel that was started with Begin.
 		/// </summary>
 		/// <param name="runState">The runstate returned by the <see cref="Begin(Toplevel)"/> method.</param>
-		static public void End (RunState runState)
+		public static void End (RunState runState)
 		{
 			if (runState == null)
 				throw new ArgumentNullException (nameof (runState));
@@ -2557,7 +2557,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when the terminal was resized. The new size of the terminal is provided.
 		/// </summary>
-		static public event EventHandler<ResizedEventArgs> Resized;
+		public static event EventHandler<ResizedEventArgs> Resized;
 
 		static void TerminalResized ()
 		{
