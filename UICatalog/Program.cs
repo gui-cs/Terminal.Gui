@@ -171,12 +171,13 @@ namespace UICatalog {
 			return _runningScenario;
 		}
 
+#if false
 		private static void Application_Iteration (object sender, EventArgs e)
 		{
 			Application.Iteration -= Application_Iteration;
 			_top.SetFocus (_rightPane);
 		}
-
+#endif
 		private static void _scenarioListView_OpenSelectedItem (object sender, EventArgs e)
 		{
 			if (_runningScenario is null) {
