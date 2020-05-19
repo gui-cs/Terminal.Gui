@@ -562,9 +562,8 @@ namespace Terminal.Gui {
 		}
 
 		bool openedByAltKey;
-
 		///<inheritdoc cref="KeyDown"/>
-		public override bool KeyDown (KeyEvent keyEvent)
+		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
 				openedByAltKey = true;
