@@ -45,7 +45,7 @@ namespace Terminal.Gui {
 		ControlSpace = 0,
 
 		/// <summary>
-	        /// The key code for the user pressing Control-A
+		/// The key code for the user pressing Control-A
 		/// </summary>
 		ControlA = 1,
 		/// <summary>
@@ -288,8 +288,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Describes a keyboard event.
 	/// </summary>
-	public struct KeyEvent {
-
+	public class KeyEvent {
 		/// <summary>
 		/// Symb olid definition for the key.
 		/// </summary>
@@ -321,12 +320,38 @@ namespace Terminal.Gui {
 		//public bool IsCtrl => ((uint)Key >= 1) && ((uint)Key <= 26);
 		public bool IsCtrl => (Key & Key.CtrlMask) != 0;
 
+		public KeyEvent ()
+		{
+			Key = Key.Unknown;
+		}
 		/// <summary>
 		///   Constructs a new KeyEvent from the provided Key value - can be a rune cast into a Key value
 		/// </summary>
 		public KeyEvent (Key k)
 		{
 			Key = k;
+		}
+
+		public override string ToString ()
+		{
+			string msg = "";
+			var key = this.Key;
+			if ((this.Key & Key.ShiftMask) != 0) {
+				msg += "Shift-";
+			}
+			if ((this.Key & Key.CtrlMask) != 0) {
+				msg += "Ctrl-";
+			}
+			if ((this.Key & Key.AltMask) != 0) {
+				msg += "Alt-";
+			}
+
+			if (string.IsNullOrEmpty (msg)) {
+				msg += $"{(((uint)this.KeyValue & (uint)Key.CharMask) > 27 ? $"{(char)this.KeyValue}" : $"{key}")}";
+			} else {
+				msg += $"{(((uint)this.KeyValue & (uint)Key.CharMask) > 27 ? $"{(char)this.KeyValue}" : $"")}";
+			}
+			return msg;
 		}
 	}
 
@@ -486,7 +511,7 @@ namespace Terminal.Gui {
 		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.MouseEvent"/>.
 		/// </summary>
 		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.MouseEvent"/>.</returns>
-		public override string ToString()
+		public override string ToString ()
 		{
 			return $"({X},{Y}:{Flags}";
 		}

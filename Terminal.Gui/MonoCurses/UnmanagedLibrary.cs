@@ -37,7 +37,11 @@ namespace Mono.Terminal.Internal {
 		const string XamarinIOSObjectClassName = "Foundation.NSObject, Xamarin.iOS";
 		static bool IsWindows, IsLinux, IsMacOS;
 		static bool Is64Bit;
+#if GUICS
+		static bool IsMono;
+#else
 		static bool IsMono, IsUnity, IsXamarinIOS, IsXamarinAndroid, IsXamarin;
+#endif
 		static bool IsNetCore;
 
 		public static bool IsMacOSPlatform => IsMacOS;
@@ -75,7 +79,7 @@ namespace Mono.Terminal.Internal {
 				IsNetCore = Type.GetType ("System.MathF") != null;
 			}
 #if GUICS
-			IsUnity = IsXamarinIOS = IsXamarinAndroid = IsXamarin = false;
+			//IsUnity = IsXamarinIOS = IsXamarinAndroid = IsXamarin = false;
 #else
 			IsUnity = Type.GetType (UnityEngineApplicationClassName) != null;
 			IsXamarinIOS = Type.GetType (XamarinIOSObjectClassName) != null;

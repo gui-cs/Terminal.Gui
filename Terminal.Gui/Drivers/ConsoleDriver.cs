@@ -466,9 +466,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Prepare the driver and set the key and mouse events handlers.
 		/// </summary>
-		/// <param name="mainLoop"></param>
-		/// <param name="keyHandler"></param>
-		/// <param name="mouseHandler"></param>
+		/// <param name="mainLoop">The main loop.</param>
+		/// <param name="keyHandler">The handler for ProcessKey</param>
+		/// <param name="keyDownHandler">The handler for key down events</param>
+		/// <param name="keyUpHandler">The handler for key up events</param>
+		/// <param name="mouseHandler">The handler for mouse events</param>
 		public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler);
 
 		/// <summary>

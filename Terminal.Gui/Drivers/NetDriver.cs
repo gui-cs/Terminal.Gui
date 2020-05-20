@@ -37,7 +37,7 @@ namespace Terminal.Gui {
 				dirtyLine [row] = true;
 		}
 
-		static bool sync;
+		static bool sync = false;
 
 		public NetDriver ()
 		{
@@ -328,6 +328,7 @@ namespace Terminal.Gui {
 				if (map == (Key)0xffffffff)
 					return;
 				keyHandler (new KeyEvent (map));
+				keyUpHandler (new KeyEvent (map));
 			};
 		}
 
