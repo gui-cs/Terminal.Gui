@@ -266,6 +266,9 @@ namespace Terminal.Gui {
 		bool selecting;
 		//bool used;
 
+		/// <summary>
+		/// Raised when the Text of the TextView changes.
+		/// </summary>
 		public event EventHandler TextChanged;
 
 #if false
@@ -535,6 +538,7 @@ namespace Terminal.Gui {
 			PositionCursor ();
 		}
 
+		///<inheritdoc cref="CanFocus"/>
 		public override bool CanFocus {
 			get => true;
 			set { base.CanFocus = value; }
@@ -682,6 +686,7 @@ namespace Terminal.Gui {
 
 		bool lastWasKill;
 
+		///<inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			int restCount;
@@ -1139,6 +1144,7 @@ namespace Terminal.Gui {
 			return null;
 		}
 
+		///<inheritdoc cref="MouseEvent"/>
 		public override bool MouseEvent (MouseEvent ev)
 		{
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked)) {

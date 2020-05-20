@@ -61,7 +61,9 @@ namespace Terminal.Gui {
 			Add (button);
 		}
 
-
+		/// <summary>
+		/// Lays out the subviews for the Dialog. 
+		/// </summary>
 		public override void LayoutSubviews ()
 		{
 			base.LayoutSubviews ();
@@ -86,6 +88,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			switch (kb.Key) {
