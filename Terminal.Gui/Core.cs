@@ -2267,8 +2267,12 @@ namespace Terminal.Gui {
 					OfY = me.Y - newxy.Y,
 					View = view
 				};
-				mouseGrabView.MouseEvent (nme);
-				return;
+				if (OutsideFrame (new Point (nme.X, nme.Y), mouseGrabView.Frame))
+					lastMouseOwnerView.OnMouseLeave (me);
+				if (mouseGrabView != null) {
+					mouseGrabView.MouseEvent (nme);
+					return;
+				}
 			}
 
 			if (view != null) {
@@ -2301,6 +2305,11 @@ namespace Terminal.Gui {
 				// Should we bubbled up the event, if it is not handled?
 				view.MouseEvent (nme);
 			}
+		}
+
+		static bool OutsideFrame (Point p, Rect r)
+		{
+			return p.X < 0 || p.X > r.Width - 1 || p.Y < 0 || p.Y > r.Height - 1;
 		}
 
 		/// <summary>
