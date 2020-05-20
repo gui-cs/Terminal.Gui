@@ -15,19 +15,45 @@ namespace Designer {
 			MessageBox.ErrorQuery (50, 7, "Error", "There is nothing to close", "Ok");
 		}
 
+		static void Copy ()
+		{
+			TextField textField = menu.LastFocused as TextField;
+			if (textField != null && textField.SelectedLength != 0) {
+				textField.Copy ();
+			}
+		}
+
+		static void Cut ()
+		{
+			TextField textField = menu.LastFocused as TextField;
+			if (textField != null && textField.SelectedLength != 0) {
+				textField.Cut ();
+			}
+		}
+
+		static void Paste ()
+		{
+			TextField textField = menu.LastFocused as TextField;
+			if (textField != null) {
+				textField.Paste ();
+			}
+		}
+
+		public static MenuBar menu;
+
 		public static void Main (string [] args)
 		{
 			Application.Init ();
 
-			var menu = new MenuBar (new MenuBarItem [] {
+			menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Close", "", () => Close ()),
 					new MenuItem ("_Quit", "", () => { Application.RequestStop (); })
 				}),
 				new MenuBarItem ("_Edit", new MenuItem [] {
-					new MenuItem ("_Copy", "", null),
-					new MenuItem ("C_ut", "", null),
-					new MenuItem ("_Paste", "", null)
+					new MenuItem ("_Copy", "", Copy),
+					new MenuItem ("C_ut", "", Cut),
+					new MenuItem ("_Paste", "", Paste)
 				}),
 			});
 
@@ -36,18 +62,22 @@ namespace Designer {
 				X = Pos.Left (login),
 				Y = Pos.Bottom (login) + 1
 			};
+			var test = new Label ("Test: ") {
+				X = Pos.Left (login),
+				Y = Pos.Bottom (password) + 1
+			};
 
 			var surface = new Surface () {
 				X = 0,
 				Y = 1,
-				Width = Dim.Percent (80),
-				Height = Dim.Fill ()
+				Width = Dim.Percent (50),
+				Height = Dim.Percent (50)
 			};
 
 			var loginText = new TextField("") {
 				X = Pos.Right(password),
 				Y = Pos.Top(login),
-				Width = 40,
+				Width = Dim.Percent(90),
 				ColorScheme = new ColorScheme() {
 					Focus = Attribute.Make(Color.BrightYellow, Color.DarkGray),
 					Normal = Attribute.Make(Color.Green, Color.BrightYellow),
@@ -55,6 +85,10 @@ namespace Designer {
 					HotNormal = Attribute.Make(Color.Red, Color.BrightRed),
 				},
 			};
+			loginText.MouseEnter += LoginText_MouseEnter;
+			loginText.MouseLeave += LoginText_MouseLeave;
+			loginText.Enter += LoginText_Enter;
+			loginText.Leave += LoginText_Leave;
 
 			var passText = new TextField ("") {
 				Secret = true,
@@ -63,9 +97,35 @@ namespace Designer {
 				Width = Dim.Width (loginText)
 			};
 
-			surface.Add (login, password, loginText, passText);
+			var testText = new TextField ("") {
+				X = Pos.Left (loginText),
+				Y = Pos.Top (test),
+				Width = Dim.Width (loginText)
+			};
+
+			surface.Add (login, password, test, loginText, passText, testText);
 			Application.Top.Add (menu, surface);
 			Application.Run ();
+		}
+
+		private static void LoginText_Leave (object sender, EventArgs e)
+		{
+			((TextField)sender).Text = $"Leaving from: {sender}";
+		}
+
+		private static void LoginText_Enter (object sender, EventArgs e)
+		{
+			((TextField)sender).Text = $"Entering in: {sender}";
+		}
+
+		private static void LoginText_MouseLeave (object sender, MouseEvent e)
+		{
+			((TextField)sender).Text = $"Mouse leave at X: {e.X}; Y: {e.Y} HasFocus: {e.View.HasFocus}";
+		}
+
+		private static void LoginText_MouseEnter (object sender, MouseEvent e)
+		{
+			((TextField)sender).Text = $"Mouse enter at X: {e.X}; Y: {e.Y} HasFocus: {e.View.HasFocus}";
 		}
 	}
 }

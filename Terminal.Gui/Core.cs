@@ -151,6 +151,44 @@ namespace Terminal.Gui {
 		{
 			return false;
 		}
+
+		/// <summary>
+		/// Method invoked when a mouse event is generated for the first time.
+		/// </summary>
+		/// <param name="mouseEvent"></param>
+		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
+		public virtual bool OnMouseEnter (MouseEvent mouseEvent)
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Method invoked when a mouse event is generated for the last time.
+		/// </summary>
+		/// <param name="mouseEvent"></param>
+		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
+		public virtual bool OnMouseLeave (MouseEvent mouseEvent)
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Method invoked when a view gets focus.
+		/// </summary>
+		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
+		public virtual bool OnEnter ()
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Method invoked when a view loses focus.
+		/// </summary>
+		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
+		public virtual bool OnLeave ()
+		{
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -253,12 +291,22 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event fired when the view get focus.
 		/// </summary>
-		public event EventHandler OnEnter;
+		public event EventHandler Enter;
 
 		/// <summary>
 		/// Event fired when the view lost focus.
 		/// </summary>
-		public event EventHandler OnLeave;
+		public event EventHandler Leave;
+
+		/// <summary>
+		/// Event fired when the view receives the mouse event for the first time.
+		/// </summary>
+		public event EventHandler<MouseEvent> MouseEnter;
+
+		/// <summary>
+		/// Event fired when the view loses mouse event for the last time.
+		/// </summary>
+		public event EventHandler<MouseEvent> MouseLeave;
 
 		internal Direction FocusDirection {
 			get => SuperView?.FocusDirection ?? focusDirection;
@@ -308,6 +356,10 @@ namespace Terminal.Gui {
 		/// <value><c>true</c> if want mouse position reports; otherwise, <c>false</c>.</value>
 		public virtual bool WantMousePositionReports { get; set; } = false;
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.View"/> want continuous button pressed event.
+		/// </summary>
+		public virtual bool WantContinuousButtonPressed { get; set; } = false;
 		/// <summary>
 		/// Gets or sets the frame for the view.
 		/// </summary>
@@ -857,20 +909,32 @@ namespace Terminal.Gui {
 			}
 			internal set {
 				if (base.HasFocus != value)
-					if (value == true)
-						OnEnter?.Invoke (this, new EventArgs ());
+					if (value)
+						OnEnter ();
 					else
-						OnLeave?.Invoke (this, new EventArgs ());
+						OnLeave ();
 					SetNeedsDisplay ();
 				base.HasFocus = value;
 
 				// Remove focus down the chain of subviews if focus is removed
-				if (value == false && focused != null) {
-					OnLeave?.Invoke (focused, new EventArgs ());
+				if (!value && focused != null) {
+					focused.OnLeave ();
 					focused.HasFocus = false;
 					focused = null;
 				}
 			}
+		}
+
+		public override bool OnEnter ()
+		{
+			Enter?.Invoke (this, new EventArgs ());
+			return base.OnEnter ();
+		}
+
+		public override bool OnLeave ()
+		{
+			Leave?.Invoke (this, new EventArgs ());
+			return base.OnLeave ();
 		}
 
 		/// <summary>
@@ -958,6 +1022,7 @@ namespace Terminal.Gui {
 							// FIXED: optimize this by computing the intersection of region and view.Bounds
 							if (view.layoutNeeded)
 								view.LayoutSubviews ();
+							Application.CurrentView = view;
 							view.Redraw (view.Bounds);
 						}
 						view.NeedDisplay = Rect.Empty;
@@ -1001,9 +1066,15 @@ namespace Terminal.Gui {
 			SuperView?.SetFocus(this);
 		}
 
+		/// <summary>
+		/// Invoked when a character key is pressed and occurs after the key down event.
+		/// </summary>
+		public Action<KeyEvent> OnKeyPress;
+
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
+			OnKeyPress?.Invoke (keyEvent);
 			if (Focused?.ProcessKey (keyEvent) == true)
 				return true;
 
@@ -1013,6 +1084,7 @@ namespace Terminal.Gui {
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
+			OnKeyPress?.Invoke (keyEvent);
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1024,6 +1096,7 @@ namespace Terminal.Gui {
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool ProcessColdKey (KeyEvent keyEvent)
 		{
+			OnKeyPress?.Invoke (keyEvent);
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1248,12 +1321,12 @@ namespace Terminal.Gui {
 		}
 
 		// https://en.wikipedia.org/wiki/Topological_sorting
-		List<View> TopologicalSort (HashSet<View> nodes, HashSet<(View, View)> edges)
+		List<View> TopologicalSort (HashSet<View> nodes, HashSet<(View From, View To)> edges)
 		{
 			var result = new List<View> ();
 
 			// Set of all nodes with no incoming edges
-			var S = new HashSet<View> (nodes.Where (n => edges.All (e => e.Item2.Equals (n) == false)));
+			var S = new HashSet<View> (nodes.Where (n => edges.All (e => e.To.Equals (n) == false)));
 
 			while (S.Any ()) {
 				//  remove a node n from S
@@ -1265,14 +1338,14 @@ namespace Terminal.Gui {
 					result.Add (n);
 
 				// for each node m with an edge e from n to m do
-				foreach (var e in edges.Where (e => e.Item1.Equals (n)).ToList ()) {
-					var m = e.Item2;
+				foreach (var e in edges.Where (e => e.From.Equals (n)).ToArray ()) {
+					var m = e.To;
 
 					// remove edge e from the graph
 					edges.Remove (e);
 
 					// if m has no other incoming edges then
-					if (edges.All (me => me.Item2.Equals (m) == false) && m != this?.SuperView) {
+					if (edges.All (me => me.To.Equals (m) == false) && m != this?.SuperView) {
 						// insert m into S
 						S.Add (m);
 					}
@@ -1306,19 +1379,18 @@ namespace Terminal.Gui {
 			foreach (var v in InternalSubviews) {
 				nodes.Add (v);
 				if (v.LayoutStyle == LayoutStyle.Computed) {
-					if (v.X is Pos.PosView)
-						edges.Add ((v, (v.X as Pos.PosView).Target));
-					if (v.Y is Pos.PosView)
-						edges.Add ((v, (v.Y as Pos.PosView).Target));
-					if (v.Width is Dim.DimView)
-						edges.Add ((v, (v.Width as Dim.DimView).Target));
-					if (v.Height is Dim.DimView)
-						edges.Add ((v, (v.Height as Dim.DimView).Target));
+					if (v.X is Pos.PosView vX)
+						edges.Add ((vX.Target, v));
+					if (v.Y is Pos.PosView vY)
+						edges.Add ((vY.Target, v));
+					if (v.Width is Dim.DimView vWidth)
+						edges.Add ((vWidth.Target, v));
+					if (v.Height is Dim.DimView vHeight)
+						edges.Add ((vHeight.Target, v));
 				}
 			}
 
 			var ordered = TopologicalSort (nodes, edges);
-			ordered.Reverse ();
 			if (ordered == null)
 				throw new Exception ("There is a recursive cycle in the relative Pos/Dim in the views of " + this);
 
@@ -1345,6 +1417,24 @@ namespace Terminal.Gui {
 		public override string ToString ()
 		{
 			return $"{GetType ().Name}({Id})({Frame})";
+		}
+
+		public override bool OnMouseEnter (MouseEvent mouseEvent)
+		{
+			if (!base.OnMouseEnter (mouseEvent)) {
+				MouseEnter?.Invoke (this, mouseEvent);
+				return false;
+			}
+			return true;
+		}
+
+		public override bool OnMouseLeave (MouseEvent mouseEvent)
+		{
+			if (!base.OnMouseLeave (mouseEvent)) {
+				MouseLeave?.Invoke (this, mouseEvent);
+				return false;
+			}
+			return true;
 		}
 	}
 
@@ -1445,8 +1535,9 @@ namespace Terminal.Gui {
 				return true;
 
 			switch (keyEvent.Key) {
-			case Key.ControlC:
-				// TODO: stop current execution of this container
+			case Key.ControlQ:
+				// FIXED: stop current execution of this container
+				Application.RequestStop ();
 				break;
 			case Key.ControlZ:
 				Driver.Suspend ();
@@ -1461,6 +1552,7 @@ namespace Terminal.Gui {
 			case Key.Tab:
 			case Key.CursorRight:
 			case Key.CursorDown:
+			case Key.ControlI: // Unix
 				var old = Focused;
 				if (!FocusNext ())
 					FocusNext ();
@@ -1566,6 +1658,8 @@ namespace Terminal.Gui {
 
 		public override void Redraw (Rect region)
 		{
+			Application.CurrentView = this;
+
 			if (this == Application.Top) {
 				if (!NeedDisplay.IsEmpty) {
 					Driver.SetAttribute (Colors.TopLevel.Normal);
@@ -1699,9 +1793,9 @@ namespace Terminal.Gui {
 			return contentView.GetEnumerator ();
 		}
 
-		void DrawFrame ()
+		void DrawFrame (bool fill = true)
 		{
-			DrawFrame (new Rect (0, 0, Frame.Width, Frame.Height), padding, fill: true);
+			DrawFrame (new Rect (0, 0, Frame.Width, Frame.Height), padding, fill: fill);
 		}
 
 		/// <summary>
@@ -1746,23 +1840,31 @@ namespace Terminal.Gui {
 
 		public override void Redraw (Rect bounds)
 		{
+			Application.CurrentView = this;
+
 			if (!NeedDisplay.IsEmpty) {
+				DrawFrameWindow ();
+			}
+			contentView.Redraw (contentView.Bounds);
+			ClearNeedsDisplay ();
+			DrawFrameWindow (false);
+
+			void DrawFrameWindow (bool fill = true)
+			{
 				Driver.SetAttribute (ColorScheme.Normal);
-				DrawFrame ();
+				DrawFrame (fill);
 				if (HasFocus)
-					Driver.SetAttribute (ColorScheme.Normal);
-				var width = Frame.Width;
+					Driver.SetAttribute (ColorScheme.HotNormal);
+				var width = Frame.Width - (padding + 2) * 2;
 				if (Title != null && width > 4) {
-					Move (1+padding, padding);
+					Move (1 + padding, padding);
 					Driver.AddRune (' ');
-					var str = Title.Length > width ? Title [0, width-4] : Title;
+					var str = Title.Length >= width ? Title [0, width - 2] : Title;
 					Driver.AddStr (str);
 					Driver.AddRune (' ');
 				}
 				Driver.SetAttribute (ColorScheme.Normal);
 			}
-			contentView.Redraw (contentView.Bounds);
-			ClearNeedsDisplay ();
 		}
 
 		//
@@ -1779,7 +1881,7 @@ namespace Terminal.Gui {
 
 			int nx, ny;
 			if ((mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) ||
-				mouseEvent.Flags == MouseFlags.Button4Pressed)) {
+				mouseEvent.Flags == MouseFlags.Button3Pressed)) {
 				if (dragPosition.HasValue) {
 					if (SuperView == null) {
 						Application.Top.SetNeedsDisplay (Frame);
@@ -1857,10 +1959,16 @@ namespace Terminal.Gui {
 		public static Toplevel Top { get; private set; }
 
 		/// <summary>
-		/// The current toplevel object.   This is updated when Application.Run enters and leaves and points to the current toplevel.
+		/// The current toplevel object. This is updated when Application.Run enters and leaves and points to the current toplevel.
 		/// </summary>
 		/// <value>The current.</value>
 		public static Toplevel Current { get; private set; }
+
+		/// <summary>
+		/// TThe current view object being redrawn.
+		/// </summary>
+		/// /// <value>The current.</value>
+		public static View CurrentView { get; set; }
 
 		/// <summary>
 		/// The mainloop driver for the applicaiton
@@ -1961,6 +2069,7 @@ namespace Terminal.Gui {
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			Top = topLevelFactory ();
 			Current = Top;
+			CurrentView = Top;
 			_initialized = true;
 		}
 
@@ -2004,7 +2113,7 @@ namespace Terminal.Gui {
 
 		static void ProcessKeyEvent (KeyEvent ke)
 		{
-		
+
 			var chain = toplevels.ToList();
 			foreach (var topLevel in chain) {
 				if (topLevel.ProcessHotKey (ke))
@@ -2040,7 +2149,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		
+
 		static void ProcessKeyUpEvent (KeyEvent ke)
 		{
 			var chain = toplevels.ToList ();
@@ -2112,9 +2221,18 @@ namespace Terminal.Gui {
 		/// </summary>
 		static public Action<MouseEvent> RootMouseEvent;
 
+		internal static View wantContinuousButtonPressedView;
+		static View lastMouseOwnerView;
+
 		static void ProcessMouseEvent (MouseEvent me)
 		{
 			var view = FindDeepestView (Current, me.X, me.Y, out int rx, out int ry);
+
+			if (view != null && view.WantContinuousButtonPressed)
+				wantContinuousButtonPressedView = view;
+			else
+				wantContinuousButtonPressedView = null;
+
 			RootMouseEvent?.Invoke (me);
 			if (mouseGrabView != null) {
 				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
@@ -2131,9 +2249,6 @@ namespace Terminal.Gui {
 			}
 
 			if (view != null) {
-				if (!view.WantMousePositionReports && me.Flags == MouseFlags.ReportMousePosition)
-					return;
-
 				var nme = new MouseEvent () {
 					X = rx,
 					Y = ry,
@@ -2142,6 +2257,24 @@ namespace Terminal.Gui {
 					OfY = ry,
 					View = view
 				};
+
+				if (lastMouseOwnerView == null) {
+					lastMouseOwnerView = view;
+					view.OnMouseEnter (nme);
+				} else if (lastMouseOwnerView != view) {
+					lastMouseOwnerView.OnMouseLeave (nme);
+					view.OnMouseEnter (nme);
+					lastMouseOwnerView = view;
+				}
+
+				if (!view.WantMousePositionReports && me.Flags == MouseFlags.ReportMousePosition)
+					return;
+
+				if (view.WantContinuousButtonPressed)
+					wantContinuousButtonPressedView = view;
+				else
+					wantContinuousButtonPressedView = null;
+
 				// Should we bubbled up the event, if it is not handled?
 				view.MouseEvent (nme);
 			}
@@ -2218,6 +2351,8 @@ namespace Terminal.Gui {
 
 		static void Redraw (View view)
 		{
+			Application.CurrentView = view;
+
 			view.Redraw (view.Bounds);
 			Driver.Refresh ();
 		}

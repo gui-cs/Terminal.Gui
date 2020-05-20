@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using NStack;
+using System.Text;
 
 static class Demo {
 	//class Box10x : View, IScrollView {
@@ -81,22 +82,26 @@ static class Demo {
 		}
 	}
 
-
 	static void ShowTextAlignments ()
 	{
-		var container = new Dialog (
-			"Text Alignments", 50, 20,
-			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
-			new Button ("Cancel") { Clicked = () => { Application.RequestStop (); } });
-
+		var container = new Window ($"Show Text Alignments") {
+			X = 0,
+			Y = 0,
+			Width = Dim.Fill (),
+			Height = Dim.Fill ()
+		};
+		container.OnKeyUp += (KeyEvent ke) => {
+			if (ke.Key == Key.Esc)
+				container.Running = false;
+		};
 
 		int i = 0;
-		string txt = "Hello world, how are you doing today";
+		string txt = "Hello world, how are you doing today?";
 		container.Add (
-				new Label (new Rect (0, 1, 40, 3), $"{i+1}-{txt}") { TextAlignment = TextAlignment.Left },
-				new Label (new Rect (0, 3, 40, 3), $"{i+2}-{txt}") { TextAlignment = TextAlignment.Right },
-				new Label (new Rect (0, 5, 40, 3), $"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered },
-				new Label (new Rect (0, 7, 40, 3), $"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified }
+				new Label ($"{i+1}-{txt}") { TextAlignment = TextAlignment.Left,      Y = 3, Width = Dim.Fill () },
+				new Label ($"{i+2}-{txt}") { TextAlignment = TextAlignment.Right,     Y = 5, Width = Dim.Fill () },
+				new Label ($"{i+3}-{txt}") { TextAlignment = TextAlignment.Centered,  Y = 7, Width = Dim.Fill () },
+				new Label ($"{i+4}-{txt}") { TextAlignment = TextAlignment.Justified, Y = 9, Width = Dim.Fill () }
 			);
 
 		Application.Run (container);
@@ -408,33 +413,68 @@ static class Demo {
 	#endregion
 
 
-	#region OnKeyDown / OnKeyUp Demo
-	private static void OnKeyDownUpDemo ()
+	#region OnKeyDown / OnKeyPress / OnKeyUp Demo
+	private static void OnKeyDownPressUpDemo ()
 	{
 		var container = new Dialog (
-			"OnKeyDown & OnKeyUp demo", 50, 20,
-			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
-			new Button ("Cancel") { Clicked = () => { Application.RequestStop (); } });
+			"OnKeyDown & OnKeyPress & OnKeyUp demo", 80, 20,
+			new Button ("Close") { Clicked = () => { Application.RequestStop (); } }) {
+			Width = Dim.Fill (),
+			Height = Dim.Fill (),
+		};
 
-		var kl = new Label (new Rect (3, 3, 40, 1), "Keyboard: ");
-		container.OnKeyDown += (KeyEvent keyEvent) => KeyUpDown (keyEvent, kl, "Down");
-		container.OnKeyUp += (KeyEvent keyEvent) => KeyUpDown (keyEvent, kl, "Up");
-		container.Add (kl);
+		var list = new List<string> ();
+		var listView = new ListView (list) {
+			X = 0,
+			Y = 0,
+			Width = Dim.Fill () - 1,
+			Height = Dim.Fill () - 2,
+		};
+		listView.ColorScheme = Colors.TopLevel;
+		container.Add (listView);
+
+		void KeyDownPressUp (KeyEvent keyEvent, string updown)
+		{
+			const int ident = -5;
+			switch (updown) {
+			case "Down":
+			case "Up":
+			case "Press":
+				var msg = $"Key{updown,ident}: ";
+				if ((keyEvent.Key & Key.ShiftMask) != 0)
+					msg += "Shift ";
+				if ((keyEvent.Key & Key.CtrlMask) != 0)
+					msg += "Ctrl ";
+				if ((keyEvent.Key & Key.AltMask) != 0)
+					msg += "Alt ";
+				msg += $"{(((uint)keyEvent.KeyValue & (uint)Key.CharMask) > 26 ? $"{(char)keyEvent.KeyValue}" : $"{keyEvent.Key}")}";
+				list.Add (msg);
+
+				break;
+
+			default:
+				if ((keyEvent.Key & Key.ShiftMask) != 0) {
+					list.Add ($"Key{updown,ident}: Shift ");
+				} else if ((keyEvent.Key & Key.CtrlMask) != 0) {
+					list.Add ($"Key{updown,ident}: Ctrl ");
+				} else if ((keyEvent.Key & Key.AltMask) != 0) {
+					list.Add ($"Key{updown,ident}: Alt ");
+				} else {
+					list.Add ($"Key{updown,ident}: {(((uint)keyEvent.KeyValue & (uint)Key.CharMask) > 26 ? $"{(char)keyEvent.KeyValue}" : $"{keyEvent.Key}")}");
+				}
+
+				break;
+			}
+			listView.MoveDown ();
+		}
+
+
+		container.OnKeyDown += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Down");
+		container.OnKeyPress += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Press");
+		container.OnKeyUp += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Up");
 		Application.Run (container);
 	}
-
-	private static void KeyUpDown (KeyEvent keyEvent, Label kl, string updown)
-	{
-		kl.TextColor = Colors.TopLevel.Normal;
-		if ((keyEvent.Key & Key.CtrlMask) != 0) {
-			kl.Text = $"Keyboard: Ctrl Key{updown}";
-		} else if ((keyEvent.Key & Key.AltMask) != 0) {
-			kl.Text = $"Keyboard: Alt Key{updown}";
-		} else {
-			kl.Text = $"Keyboard: {(char)keyEvent.KeyValue} Key{updown}";
-		}
-	}
-#endregion
+	#endregion
 
 	public static Label ml;
 	public static MenuBar menu;
@@ -503,7 +543,7 @@ static class Demo {
 			}),
 			new MenuBarItem ("A_ssorted", new MenuItem [] {
 				new MenuItem ("_Show text alignments", "", () => ShowTextAlignments ()),
-				new MenuItem ("_OnKeyDown/Up", "", () => OnKeyDownUpDemo ())
+				new MenuItem ("_OnKeyDown/Press/Up", "", () => OnKeyDownPressUpDemo ())
 			}),
 			new MenuBarItem ("_Test Menu and SubMenus", new MenuItem [] {
 				new MenuItem ("SubMenu1Item_1",
@@ -550,8 +590,10 @@ static class Demo {
 			new StatusItem(Key.F1, "~F1~ Help", () => Help()),
 			new StatusItem(Key.F2, "~F2~ Load", null),
 			new StatusItem(Key.F3, "~F3~ Save", null),
-			new StatusItem(Key.ControlX, "~^X~ Quit", () => { if (Quit ()) top.Running = false; }),
-		});
+			new StatusItem(Key.ControlQ, "~^Q~ Quit", () => { if (Quit ()) top.Running = false; }),
+		}) {
+			Parent = null,
+		};
 
 		win.Add (drag, dragText);
 #if true
@@ -569,6 +611,7 @@ static class Demo {
 			bottom2.Y = Pos.Bottom (win);
 		};
 #endif
+
 
 		top.Add (win);
 		//top.Add (menu);
