@@ -67,8 +67,13 @@ namespace Terminal.Gui {
 				AddRune (rune);
 		}
 
-		public override void Refresh () => Curses.refresh ();
-		public override void UpdateCursor () => Curses.refresh ();
+		public override void Refresh () {
+			Curses.refresh ();
+			if (Curses.CheckWinChange ()) {
+				TerminalResized?.Invoke ();
+			}
+		}
+		public override void UpdateCursor () => Refresh ();
 		public override void End () => Curses.endwin ();
 		public override void UpdateScreen () => window.redrawwin ();
 		public override void SetAttribute (Attribute c) => Curses.attrset (c.value);
