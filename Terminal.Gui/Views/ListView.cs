@@ -306,11 +306,6 @@ namespace Terminal.Gui {
 		public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
 
 		/// <summary>
-		/// This event is raised on Enter key or Double Click to open the selected item.
-		/// </summary>
-		public event EventHandler OpenSelectedItem;
-
-		/// <summary>
 		/// Handles cursor movement for this view, passes all other events.
 		/// </summary>
 		/// <returns><c>true</c>, if key was processed, <c>false</c> otherwise.</returns>
