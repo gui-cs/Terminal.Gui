@@ -402,7 +402,7 @@ namespace Terminal.Gui {
 				break;
 
 			// Undo
-			case Key.ControlZ:
+			case Key.ControlU:
 				if (ReadOnly)
 					return true;
 
@@ -418,7 +418,7 @@ namespace Terminal.Gui {
 				break;
 
 			//Redo
-			case Key.ControlY: // Control-y, yank
+			case Key.ControlR: // Control-y, yank
 				if (ReadOnly)
 					return true;
 
