@@ -160,6 +160,7 @@ namespace Terminal.Gui {
 			lineResult.Add(ClipAndJustify(textStr[lp, textLen], width, talign));
 		}
 
+		///<inheritdoc cref="Redraw"/>
 		public override void Redraw (Rect region)
 		{
 			if (recalcPending)

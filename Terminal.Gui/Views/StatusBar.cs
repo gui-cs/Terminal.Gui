@@ -85,8 +85,14 @@ namespace Terminal.Gui {
 
 		public StatusBarStyle Style { get; set; } = StatusBarStyle.Default;
 #endif
+		/// <summary>
+		/// The parent view of the StatusBar.
+		/// </summary>
 		public View Parent { get; set; }
 
+		/// <summary>
+		/// The items that compose the StatusBar
+		/// </summary>
 		public StatusItem [] Items { get; set; }
 
 		/// <summary>
@@ -132,6 +138,7 @@ namespace Terminal.Gui {
 			return result;
 		}
 
+		///<inheritdoc cref="Redraw"/>
 		public override void Redraw (Rect region)
 		{
 			if (Frame.Y != Driver.Rows - 1) {
@@ -161,6 +168,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc cref="ProcessHotKey"/>
 		public override bool ProcessHotKey (KeyEvent kb)
 		{
 			foreach (var item in Items) {

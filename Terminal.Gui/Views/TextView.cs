@@ -566,10 +566,7 @@ namespace Terminal.Gui {
 			PositionCursor ();
 		}
 
-		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="Responder" /> can focus.
-		/// </summary>
-		/// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
+		///<inheritdoc cref="CanFocus"/>
 		public override bool CanFocus {
 			get => true;
 			set { base.CanFocus = value; }
@@ -717,11 +714,7 @@ namespace Terminal.Gui {
 
 		bool lastWasKill;
 
-		/// <summary>
-		/// Process the keys from the keyboard.
-		/// </summary>
-		/// <param name="kb">Contains the details about the key that produced the event.</param>
-		/// <returns><c>true</c>If the event was handled.<c>false</c>otherwise.</returns>
+		///<inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			int restCount;
@@ -1179,11 +1172,7 @@ namespace Terminal.Gui {
 			return null;
 		}
 
-		/// <summary>
-		/// Method invoked when a mouse event is generated
-		/// </summary>
-		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
-		/// <param name="ev">Contains the details about the mouse event.</param>
+		///<inheritdoc cref="MouseEvent"/>
 		public override bool MouseEvent (MouseEvent ev)
 		{
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked)) {
