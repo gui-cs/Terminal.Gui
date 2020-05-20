@@ -14,6 +14,8 @@
 // - Perhaps allow an option to not display the scrollbar arrow indicators?
 
 using System;
+using System.Reflection;
+
 namespace Terminal.Gui {
 	/// <summary>
 	/// ScrollBarViews are views that display a 1-character scrollbar, either horizontal or vertical
@@ -73,7 +75,7 @@ namespace Terminal.Gui {
 		/// <param name="rect">Frame for the scrollbar.</param>
 		/// <param name="size">The size that this scrollbar represents.</param>
 		/// <param name="position">The position within this scrollbar.</param>
-		/// <param name="isVertical">If set to <c>true</c> this is a vertical scrollbar, otherwize, the scrollbar is horizontal.</param>
+		/// <param name="isVertical">If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.</param>
 		public ScrollBarView (Rect rect, int size, int position, bool isVertical) : base (rect)
 		{
 			vertical = isVertical;
@@ -314,7 +316,33 @@ namespace Terminal.Gui {
 		/// <param name="view">The view to add to the scrollview.</param>
 		public override void Add (View view)
 		{
+			if (!IsOverridden (view)) {
+				view.MouseEnter += View_MouseEnter;
+				view.MouseLeave += View_MouseLeave;
+				vertical.MouseEnter += View_MouseEnter;
+				vertical.MouseLeave += View_MouseLeave;
+				horizontal.MouseEnter += View_MouseEnter;
+				horizontal.MouseLeave += View_MouseLeave;
+			}
 			contentView.Add (view);
+		}
+
+		void View_MouseLeave (object sender, MouseEvent e)
+		{
+			Application.UngrabMouse ();
+		}
+
+		void View_MouseEnter (object sender, MouseEvent e)
+		{
+			Application.GrabMouse (this);
+		}
+
+		bool IsOverridden (View view)
+		{
+			Type t = view.GetType ();
+			MethodInfo m = t.GetMethod ("MouseEvent");
+
+			return m.DeclaringType == t && m.GetBaseDefinition ().DeclaringType == typeof (Responder);
 		}
 
 		/// <summary>
@@ -463,7 +491,7 @@ namespace Terminal.Gui {
 			switch (kb.Key) {
 			case Key.CursorUp:
 				return ScrollUp (1);
-			case (Key) 'v' | Key.AltMask:
+			case (Key)'v' | Key.AltMask:
 			case Key.PageUp:
 				return ScrollUp (Bounds.Height);
 
@@ -488,6 +516,19 @@ namespace Terminal.Gui {
 
 			}
 			return false;
+		}
+
+		public override bool MouseEvent (MouseEvent me)
+		{
+			if (me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp)
+				return false;
+
+			if (me.Flags == MouseFlags.WheeledDown)
+				ScrollDown (1);
+			else if (me.Flags == MouseFlags.WheeledUp)
+				ScrollUp (1);
+
+			return true;
 		}
 	}
 }
