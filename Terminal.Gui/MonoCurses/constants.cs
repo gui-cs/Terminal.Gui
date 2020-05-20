@@ -7,6 +7,7 @@
 using System;
 
 namespace Unix.Terminal {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 	public partial class Curses {
 		public const int A_NORMAL = unchecked((int)0x0);
 		public const int A_STANDOUT = unchecked((int)0x10000);
@@ -150,4 +151,5 @@ namespace Unix.Terminal {
 			return 0 + n * 256;
 		}
 	}
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }

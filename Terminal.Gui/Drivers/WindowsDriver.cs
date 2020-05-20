@@ -97,7 +97,7 @@ namespace Terminal.Gui {
 		public void Cleanup ()
 		{
 			ConsoleMode = originalConsoleMode;
-			ContinueListeningForConsoleEvents = false;
+			//ContinueListeningForConsoleEvents = false;
 			if (!SetConsoleActiveScreenBuffer (OutputHandle)) {
 				var err = Marshal.GetLastWin32Error ();
 				Console.WriteLine ("Error: {0}", err);
@@ -109,7 +109,7 @@ namespace Terminal.Gui {
 			ScreenBuffer = IntPtr.Zero;
 		}
 
-		bool ContinueListeningForConsoleEvents = true;
+		//bool ContinueListeningForConsoleEvents = true;
 
 		public uint ConsoleMode {
 			get {
@@ -426,7 +426,7 @@ namespace Terminal.Gui {
 	}
 
 	internal class WindowsDriver : ConsoleDriver, Mono.Terminal.IMainLoopDriver {
-		static bool sync;
+		static bool sync = false;
 		ManualResetEventSlim eventReady = new ManualResetEventSlim (false);
 		ManualResetEventSlim waitForProbe = new ManualResetEventSlim (false);
 		MainLoop mainLoop;
