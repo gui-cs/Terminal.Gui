@@ -12,7 +12,7 @@ class.
 
 Mainloops are a common idiom in many user interface toolkits so many
 of the concepts will be familiar to you if you have used other
-toolkits before.   
+toolkits before.
 
 This class provides the following capabilities:
 
