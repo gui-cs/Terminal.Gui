@@ -212,9 +212,9 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public Action<(string,bool)> SelectedChanged;
-		public Action<ustring> DirectoryChanged;
-		public Action<ustring> FileChanged;
+		public Action<(string, bool)> SelectedChanged { get; set; }
+		public Action<ustring> DirectoryChanged { get; set; }
+		public Action<ustring> FileChanged { get; set; }
 
 		void SelectionChanged ()
 		{
@@ -494,6 +494,7 @@ namespace Terminal.Gui {
 
 		internal bool canceled;
 
+		///<inheritdoc cref="WillPresent"/>
 		public override void WillPresent ()
 		{
 			base.WillPresent ();
