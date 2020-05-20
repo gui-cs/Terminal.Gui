@@ -458,7 +458,7 @@ namespace Terminal.Gui {
 			}
 			host.handled = false;
 			bool disabled;
-			if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) {
+			if (me.Flags == MouseFlags.Button1Clicked) {
 				disabled = false;
 				if (me.Y < 1)
 					return true;
