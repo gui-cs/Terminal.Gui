@@ -194,7 +194,9 @@ namespace Terminal.Gui {
 
 			listview.SetSource (searchset.ToList ());
 			listview.Height = CalculatetHeight ();
+
 			listview.Redraw (new Rect (0, 0, width, height)); // for any view behind this
+			this.SuperView?.BringSubviewToFront (this);
 		}
 
 		/// <summary>
