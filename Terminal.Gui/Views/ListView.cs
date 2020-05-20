@@ -295,6 +295,11 @@ namespace Terminal.Gui {
 		public event Action SelectedChanged;
 
 		/// <summary>
+		/// This event is raised on Enter key or Double Click to open the selected item.
+		/// </summary>
+		public event EventHandler OpenSelectedItem;
+
+		/// <summary>
 		/// Handles cursor movement for this view, passes all other events.
 		/// </summary>
 		/// <returns><c>true</c>, if key was processed, <c>false</c> otherwise.</returns>
@@ -325,6 +330,11 @@ namespace Terminal.Gui {
 					return true;
 				else
 					break;
+
+			case Key.Enter:
+				OpenSelectedItem?.Invoke (this, new EventArgs ());
+				break;
+
 			}
 			return base.ProcessKey (kb);
 		}
@@ -451,7 +461,7 @@ namespace Terminal.Gui {
 		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
 		public override bool MouseEvent(MouseEvent me)
 		{
-			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked))
+			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
 				return false;
 
 			if (!HasFocus)
@@ -469,9 +479,10 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 				return true;
 			}
-			if (SelectedChanged != null)
-				SelectedChanged();
+			SelectedChanged?.Invoke ();
 			SetNeedsDisplay ();
+			if (me.Flags == MouseFlags.Button1DoubleClicked)
+				OpenSelectedItem?.Invoke (this, new EventArgs ());
 			return true;
 		}
 	}

@@ -1066,7 +1066,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoked when a character key is pressed and occurs after the key down event.
+		/// Invoked when a character key is pressed and occurs after the key up event.
 		/// </summary>
 		public Action<KeyEvent> OnKeyPress;
 
@@ -1083,7 +1083,6 @@ namespace Terminal.Gui {
 		/// <inheritdoc cref="ProcessHotKey"/>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
-			OnKeyPress?.Invoke (keyEvent);
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1095,7 +1094,6 @@ namespace Terminal.Gui {
 		/// <inheritdoc cref="ProcessColdKey"/>
 		public override bool ProcessColdKey (KeyEvent keyEvent)
 		{
-			OnKeyPress?.Invoke (keyEvent);
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
