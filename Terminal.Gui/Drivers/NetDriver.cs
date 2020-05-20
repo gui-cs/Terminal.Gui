@@ -328,6 +328,7 @@ namespace Terminal.Gui {
 				if (map == (Key)0xffffffff)
 					return;
 				keyHandler (new KeyEvent (map));
+				keyUpHandler (new KeyEvent (map));
 			};
 		}
 
