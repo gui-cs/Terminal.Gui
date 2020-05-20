@@ -37,7 +37,7 @@ namespace Terminal.Gui {
 				dirtyLine [row] = true;
 		}
 
-		static bool sync;
+		static bool sync = false;
 
 		public NetDriver ()
 		{
