@@ -11,10 +11,9 @@ A simple UI toolkit for .NET, .NET Core, and Mono that works on Windows, the Mac
 
 ![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.png)
 
-A presentation of this was part of the [Retro.NET](https://channel9.msdn.com/Events/dotnetConf/2018/S313) talk at .NET Conf 2018 [Slides](https://tirania.org/Retro.pdf)
+## Controls & Features
 
-## Controls 
-The toolkit contains various controls for building text user interfaces:
+The *Terminal.Gui* toolkit contains various controls for building text user interfaces:
 
 * [Buttons](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Button.html) 
 * [Checkboxes](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.CheckBox.html)
@@ -37,7 +36,7 @@ The toolkit contains various controls for building text user interfaces:
 
 In addition, a complete Xterm/Vt100 terminal emulator that you can embed is now part of [XtermSharp](https://github.com/migueldeicaza/XtermSharp/blob/master/GuiCsHost/TerminalView.cs) - you just need to pull the `TerminalView` linked here into your project.
 
-## Features
+### Features
 
 * **Cross Platform** - Terminal drivers for Curses, [Windows Console](https://github.com/migueldeicaza/gui.cs/issues/27), and the .NET Console mean **Terminal.Gui** works well on both color and monochrome terminals and has mouse support on terminal emulators that support it.
 * **Keyboard and Mouse Input** - Both keyboard and mouse input are supported, including limited support for drag & drop.
@@ -69,9 +68,11 @@ Currently **Terminal.Gui** has support for `[ncurses](https://github.com/migueld
 
 You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 
-## Showcase
+## Showcase & Examples
 
-The [UI Catalog project](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog) provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**.
+* **UI Catalog** - The [UI Catalog project](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog) provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run` in the `UICatalog` directory to run the UI Catalog.
+* **Example (aka `demo.cs`)** - Run `dotnet run` in the `Example` directory to run the simple demo.
+* **Standalone Example** - A trivial .NET core sample application can be found in the `StandaloneExample` directory. Run `dotnet run` in directory to test.
 
 ## Documentation
 
@@ -172,9 +173,6 @@ Use NuGet to install the `Terminal.Gui` NuGet package: https://www.nuget.org/pac
 ## Running and Building
 
 * *`Terminal.Gui`* - Build and run using the .NET SDK command line tools (`doetnet build` in the root directory) or with Visual Studio 2019.
-* *UI Catalog* - Run `dotnet run` in the `UICatalog` directory to run the UI Catalog.
-* *Example (aka `demo.cs`)* - Run `dotnet run` in the `Example` directory to run the simple demo.
-* *Standalone Example* - A trivial .NET core sample application can be found in the `StandaloneExample` directory. Run `dotnet run` in directory to test.
 
 ## Contributing
 
@@ -185,5 +183,7 @@ See [Issues](https://github.com/migueldeicaza/gui.cs/issues) for a list of open 
 This is an updated version of [gui.cs](http://tirania.org/blog/archive/2007/Apr-16.html) that Miguel wrote for [mono-curses](https://github.com/mono/mono-curses) in 2007.
 
 The original **gui.cs** was a UI toolkit in a single file and tied to curses. This version tries to be console-agnostic and instead of having a container/widget model, only uses Views (which can contain subviews) and changes the rendering model to rely on damage regions instead of burdening each view with the details.
+
+A presentation of this was part of the [Retro.NET](https://channel9.msdn.com/Events/dotnetConf/2018/S313) talk at .NET Conf 2018 [Slides](https://tirania.org/Retro.pdf)
 
 Release history can be found in the [Terminal.Gui.csproj](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Terminal.Gui.csproj) file.
