@@ -21,6 +21,9 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class MenuItem {
 
+		/// <summary>
+		/// constructor
+		/// </summary>
 		public MenuItem ()
 		{
 			Title = "";
@@ -207,10 +210,10 @@ namespace Terminal.Gui {
 			return len;
 		}
 
-		/// <summary>
-		/// Gets or sets the title to display.
-		/// </summary>
-		/// <value>The title.</value>
+		///// <summary>
+		///// Gets or sets the title to display.
+		///// </summary>
+		///// <value>The title.</value>
 		//public ustring Title { get; set; }
 
 		/// <summary>
@@ -357,7 +360,7 @@ namespace Terminal.Gui {
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
 			// To ncurses simulate a AltMask key pressing Alt+Space because
-			// it can´t detect an alone special key down was pressed.
+			// it canï¿½t detect an alone special key down was pressed.
 			if (keyEvent.IsAlt && keyEvent.Key == Key.AltMask) {
 				OnKeyDown (keyEvent);
 				return true;
@@ -455,7 +458,7 @@ namespace Terminal.Gui {
 			}
 			host.handled = false;
 			bool disabled;
-			if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) {
+			if (me.Flags == MouseFlags.Button1Clicked) {
 				disabled = false;
 				if (me.Y < 1)
 					return true;
@@ -559,6 +562,7 @@ namespace Terminal.Gui {
 		}
 
 		bool openedByAltKey;
+		///<inheritdoc cref="OnKeyDown"/>
 		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
@@ -569,12 +573,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <summary>
-		/// Track Alt key-up events. On Windows, when a user releases Alt (without another key), the menu gets focus but doesn't open.
-		/// We mimic that behavior here.
-		/// </summary>
-		/// <param name="keyEvent"></param>
-		/// <returns></returns>
+		///<inheritdoc cref="OnKeyUp"/>
 		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
@@ -615,6 +614,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		///<inheritdoc cref="Redraw"/>
 		public override void Redraw (Rect region)
 		{
 			Move (0, 0);
@@ -645,6 +645,7 @@ namespace Terminal.Gui {
 			PositionCursor ();
 		}
 
+		///<inheritdoc cref="PositionCursor"/>
 		public override void PositionCursor ()
 		{
 			int pos = 0;
@@ -672,8 +673,16 @@ namespace Terminal.Gui {
 			action = item.Action;
 		}
 
+		/// <summary>
+		/// Raised as a menu is opened.
+		/// </summary>
 		public event EventHandler OnOpenMenu;
+
+		/// <summary>
+		/// Raised when a menu is closing.
+		/// </summary>
 		public event EventHandler OnCloseMenu;
+
 		internal Menu openMenu;
 		Menu openCurrentMenu;
 		internal List<Menu> openSubMenu;
@@ -681,7 +690,12 @@ namespace Terminal.Gui {
 		internal bool isMenuOpening;
 		internal bool isMenuClosing;
 		internal bool isMenuClosed;
-		public bool MenuOpen;
+
+		/// <summary>
+		/// True of the menu is open; otherwise false.
+		/// </summary>
+		public bool MenuOpen { get; set; }
+
 		View lastFocused;
 
 		/// <summary>
@@ -940,7 +954,7 @@ namespace Terminal.Gui {
 		bool openedByHotKey;
 		internal bool FindAndOpenMenuByHotkey (KeyEvent kb)
 		{
-			int pos = 0;
+			//int pos = 0;
 			var c = ((uint)kb.Key & (uint)Key.CharMask);
 			for (int i = 0; i < Menus.Length; i++) {
 				// TODO: this code is duplicated, hotkey should be part of the MenuBarItem
@@ -969,6 +983,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc cref="ProcessHotKey"/>
 		public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == Key.F9) {
@@ -980,7 +995,7 @@ namespace Terminal.Gui {
 			}
 
 			// To ncurses simulate a AltMask key pressing Alt+Space because
-			// it can´t detect an alone special key down was pressed.
+			// it canï¿½t detect an alone special key down was pressed.
 			if (kb.IsAlt && kb.Key == Key.AltMask && openMenu == null) {
 				OnKeyDown (kb);
 				OnKeyUp (kb);
@@ -993,6 +1008,7 @@ namespace Terminal.Gui {
 			return base.ProcessHotKey (kb);
 		}
 
+		///<inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			switch (kb.Key) {
@@ -1047,6 +1063,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		///<inheritdoc cref="MouseEvent"/>
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!handled && !HandleGrabView (me, this)) {

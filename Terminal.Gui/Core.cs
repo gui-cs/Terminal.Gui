@@ -899,10 +899,7 @@ namespace Terminal.Gui {
 				Move (frame.X, frame.Y);
 		}
 
-		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.View"/> has focus.
-		/// </summary>
-		/// <value><c>true</c> if has focus; otherwise, <c>false</c>.</value>
+		/// <inheritdoc cref="HasFocus"/>
 		public override bool HasFocus {
 			get {
 				return base.HasFocus;
@@ -925,12 +922,14 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <inheritdoc cref="OnEnter"/>
 		public override bool OnEnter ()
 		{
 			Enter?.Invoke (this, new EventArgs ());
 			return base.OnEnter ();
 		}
 
+		/// <inheritdoc cref="OnLeave"/>
 		public override bool OnLeave ()
 		{
 			Leave?.Invoke (this, new EventArgs ());
@@ -1072,11 +1071,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoked when a character key is pressed and occurs after the key down event.
+		/// Invoked when a character key is pressed and occurs after the key up event.
 		/// </summary>
 		public event EventHandler<KeyEventEventArgs> KeyPress;
 
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			KeyPress?.Invoke (this, new KeyEventEventArgs(keyEvent));
@@ -1086,7 +1085,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <inheritdoc cref="ProcessHotKey"/>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
 			KeyPress?.Invoke (this, new KeyEventEventArgs (keyEvent));
@@ -1098,7 +1097,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <inheritdoc cref="ProcessColdKey"/>
 		public override bool ProcessColdKey (KeyEvent keyEvent)
 		{
 			KeyPress?.Invoke (this, new KeyEventEventArgs(keyEvent));
@@ -1145,6 +1144,7 @@ namespace Terminal.Gui {
 
 			return false;
 		}
+
 		/// <summary>
 		/// Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise, it does nothing.
 		/// </summary>
@@ -1415,15 +1415,13 @@ namespace Terminal.Gui {
 			layoutNeeded = false;
 		}
 
-		/// <summary>
-		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.View"/>.
-		/// </summary>
-		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.View"/>.</returns>
+		/// <inheritdoc cref="ToString"/>
 		public override string ToString ()
 		{
 			return $"{GetType ().Name}({Id})({Frame})";
 		}
 
+		/// <inheritdoc cref="OnMouseEnter(Gui.MouseEvent)"/>
 		public override bool OnMouseEnter (MouseEvent mouseEvent)
 		{
 			if (!base.OnMouseEnter (mouseEvent)) {
@@ -1433,6 +1431,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <inheritdoc cref="OnMouseLeave(Gui.MouseEvent)"/>
 		public override bool OnMouseLeave (MouseEvent mouseEvent)
 		{
 			if (!base.OnMouseLeave (mouseEvent)) {
@@ -1475,10 +1474,25 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class Toplevel : View {
 		/// <summary>
-		/// This flag is checked on each iteration of the mainloop and it continues
-		/// running until this flag is set to false.
+		/// Gets or sets whether the <see cref="T:Terminal.Gui.MainLoop"/> for this <see cref="T:Terminal.Gui.Toplevel"/> is running or not. Setting
+		/// this property to false will cause the MainLoop to exit. 
 		/// </summary>
-		public bool Running;
+		public bool Running { get; set; }
+
+		/// <summary>
+		/// Fired once the Toplevel's <see cref="T:Terminal.Gui.MainLoop"/> has started it's first iteration. 
+		/// Subscribe to this event to perform tasks when the <see cref="T:Terminal.Gui.Toplevel"/> has been laid out and focus has been set.
+		/// changes. A Ready event handler is a good place to finalize initialization after calling `<see cref="T:Terminal.Gui.Application.Run"/>(topLevel)`. 
+		/// </summary>
+		public event EventHandler Ready;
+
+		/// <summary>
+		/// Called from Application.RunLoop after the <see cref="T:Terminal.Gui.Toplevel"/> has entered it's first iteration of the loop. 
+		/// </summary>
+		internal virtual void OnReady ()
+		{
+			Ready?.Invoke (this, EventArgs.Empty);
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Toplevel"/> class with the specified absolute layout.
@@ -1513,6 +1527,10 @@ namespace Terminal.Gui {
 			return new Toplevel (new Rect (0, 0, Driver.Cols, Driver.Rows));
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Toplevel"/> can focus.
+		/// </summary>
+		/// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
 		public override bool CanFocus {
 			get => true;
 		}
@@ -1534,6 +1552,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool HasStatusBar { get; set; }
 
+		///<inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			if (base.ProcessKey (keyEvent))
@@ -1585,6 +1604,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		///<inheritdoc cref="Add"/>
 		public override void Add (View view)
 		{
 			if (this == Application.Top) {
@@ -1596,6 +1616,7 @@ namespace Terminal.Gui {
 			base.Add (view);
 		}
 
+		///<inheritdoc cref="Remove"/>
 		public override void Remove (View view)
 		{
 			if (this == Application.Top) {
@@ -1607,6 +1628,7 @@ namespace Terminal.Gui {
 			base.Remove (view);
 		}
 
+		///<inheritdoc cref="RemoveAll"/>
 		public override void RemoveAll ()
 		{
 			if (this == Application.Top) {
@@ -1661,6 +1683,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc cref="Redraw"/>
 		public override void Redraw (Rect region)
 		{
 			Application.CurrentView = this;
@@ -1843,6 +1866,7 @@ namespace Terminal.Gui {
 			contentView.RemoveAll ();
 		}
 
+		///<inheritdoc cref="Redraw"/>
 		public override void Redraw (Rect bounds)
 		{
 			Application.CurrentView = this;
@@ -1878,6 +1902,7 @@ namespace Terminal.Gui {
 		//
 		internal static Point? dragPosition;
 		Point start;
+		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
 		public override bool MouseEvent (MouseEvent mouseEvent)
 		{
 			// FIXED:The code is currently disabled, because the
@@ -2414,8 +2439,15 @@ namespace Terminal.Gui {
 			if (state.Toplevel == null)
 				throw new ObjectDisposedException ("state");
 
+			bool firstIteration = true;
 			for (state.Toplevel.Running = true; state.Toplevel.Running;) {
 				if (MainLoop.EventsPending (wait)) {
+					// Notify Toplevel it's ready
+					if (firstIteration) {
+						state.Toplevel.OnReady ();
+					}
+					firstIteration = false;
+
 					MainLoop.MainIteration ();
 					Iteration?.Invoke (null, EventArgs.Empty);
 				} else if (wait == false)
@@ -2431,7 +2463,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		internal static bool DebugDrawBounds;
+		internal static bool DebugDrawBounds = false;
 
 		// Need to look into why this does not work properly.
 		static void DrawBounds (View v)

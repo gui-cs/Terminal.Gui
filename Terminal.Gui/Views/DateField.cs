@@ -41,7 +41,7 @@ namespace Terminal.Gui {
 		{
 			CultureInfo cultureInfo = CultureInfo.CurrentCulture;
 			sepChar = cultureInfo.DateTimeFormat.DateSeparator;
-			longFormat = $" {cultureInfo.DateTimeFormat.ShortDatePattern}";
+			longFormat = GetLongFormat (cultureInfo.DateTimeFormat.ShortDatePattern);
 			shortFormat = GetShortFormat(longFormat);
 			this.isShort = isShort;
 			CursorPosition = 1;
@@ -55,7 +55,21 @@ namespace Terminal.Gui {
 				Text = e;
 		}
 
-		string GetShortFormat(string lf)
+		string GetLongFormat (string lf)
+		{
+			ustring [] frm = ustring.Make (lf).Split (ustring.Make (sepChar));
+			for (int i = 0; i < frm.Length; i++) {
+				if (frm [i].Contains ("M") && frm [i].Length < 2)
+					lf = lf.Replace ("M", "MM");
+				if (frm [i].Contains ("d") && frm [i].Length < 2)
+					lf = lf.Replace ("d", "dd");
+				if (frm [i].Contains ("y") && frm [i].Length < 4)
+					lf = lf.Replace ("yy", "yyyy");
+			}
+			return $" {lf}";
+		}
+
+		string GetShortFormat (string lf)
 		{
 			return lf.Replace("yyyy", "yy");
 		}

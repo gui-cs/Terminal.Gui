@@ -47,6 +47,7 @@ using System.Runtime.InteropServices;
 using Mono.Terminal.Internal;
 
 namespace Unix.Terminal {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 	public partial class Curses {
 		[StructLayout (LayoutKind.Sequential)]
@@ -61,7 +62,7 @@ namespace Unix.Terminal {
 		static IntPtr curses_handle, curscr_ptr, lines_ptr, cols_ptr;
 
 		// If true, uses the DllImport into "ncurses", otherwise "libncursesw.so.5"
-		static bool use_naked_driver;
+		//static bool use_naked_driver;
 
 		static UnmanagedLibrary curses_library;
 		static NativeMethods methods;
@@ -451,4 +452,5 @@ namespace Unix.Terminal {
 			mousemask = lib.GetNativeMethodDelegate<Delegates.mousemask> ("mousemask");
 		}
 	}
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }

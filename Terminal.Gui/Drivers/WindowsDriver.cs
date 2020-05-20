@@ -97,7 +97,7 @@ namespace Terminal.Gui {
 		public void Cleanup ()
 		{
 			ConsoleMode = originalConsoleMode;
-			ContinueListeningForConsoleEvents = false;
+			//ContinueListeningForConsoleEvents = false;
 			if (!SetConsoleActiveScreenBuffer (OutputHandle)) {
 				var err = Marshal.GetLastWin32Error ();
 				Console.WriteLine ("Error: {0}", err);
@@ -109,7 +109,7 @@ namespace Terminal.Gui {
 			ScreenBuffer = IntPtr.Zero;
 		}
 
-		bool ContinueListeningForConsoleEvents = true;
+		//bool ContinueListeningForConsoleEvents = true;
 
 		public uint ConsoleMode {
 			get {
@@ -426,7 +426,7 @@ namespace Terminal.Gui {
 	}
 
 	internal class WindowsDriver : ConsoleDriver, Mono.Terminal.IMainLoopDriver {
-		static bool sync;
+		static bool sync = false;
 		ManualResetEventSlim eventReady = new ManualResetEventSlim (false);
 		ManualResetEventSlim waitForProbe = new ManualResetEventSlim (false);
 		MainLoop mainLoop;
@@ -440,14 +440,9 @@ namespace Terminal.Gui {
 
 		public WindowsDriver ()
 		{
-			Colors.TopLevel = new ColorScheme ();
-
-			Colors.TopLevel.Normal = MakeColor (ConsoleColor.Green, ConsoleColor.Black);
-			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
-			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
-			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.DarkCyan);
-
 			winConsole = new WindowsConsole ();
+
+			SetupColorsAndBorders ();
 
 			cols = Console.WindowWidth;
 			rows = Console.WindowHeight;
@@ -457,6 +452,54 @@ namespace Terminal.Gui {
 			UpdateOffScreen ();
 
 			Task.Run ((Action)WindowsInputHandler);
+		}
+
+		private void SetupColorsAndBorders ()
+		{
+			Colors.TopLevel = new ColorScheme ();
+			Colors.Base = new ColorScheme ();
+			Colors.Dialog = new ColorScheme ();
+			Colors.Menu = new ColorScheme ();
+			Colors.Error = new ColorScheme ();
+
+			Colors.TopLevel.Normal = MakeColor (ConsoleColor.Green, ConsoleColor.Black);
+			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
+			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
+			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkCyan);
+
+			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkBlue);
+			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
+			Colors.Base.HotNormal = MakeColor (ConsoleColor.DarkCyan, ConsoleColor.DarkBlue);
+			Colors.Base.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
+
+			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
+			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
+			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.DarkGray);
+			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
+			Colors.Menu.Disabled = MakeColor (ConsoleColor.Gray, ConsoleColor.DarkGray);
+
+			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
+			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkGray);
+			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.Gray);
+			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkGray);
+
+			Colors.Error.Normal = MakeColor (ConsoleColor.DarkRed, ConsoleColor.White);
+			Colors.Error.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkRed);
+			Colors.Error.HotNormal = MakeColor (ConsoleColor.Black, ConsoleColor.White);
+			Colors.Error.HotFocus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkRed);
+
+			HLine = '\u2500';
+			VLine = '\u2502';
+			Stipple = '\u2592';
+			Diamond = '\u25c6';
+			ULCorner = '\u250C';
+			LLCorner = '\u2514';
+			URCorner = '\u2510';
+			LRCorner = '\u2518';
+			LeftTee = '\u251c';
+			RightTee = '\u2524';
+			TopTee = '\u22a4';
+			BottomTee = '\u22a5';
 		}
 
 		[StructLayout (LayoutKind.Sequential)]
@@ -564,10 +607,23 @@ namespace Terminal.Gui {
 			case WindowsConsole.EventType.Key:
 				var map = MapKey (ToConsoleKeyInfoEx (inputEvent.KeyEvent));
 				if (map == (Key)0xffffffff) {
-					KeyEvent key = default;
+					KeyEvent key = new KeyEvent ();
+
 					// Shift = VK_SHIFT = 0x10
 					// Ctrl = VK_CONTROL = 0x11
 					// Alt = VK_MENU = 0x12
+
+					if (inputEvent.KeyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.CapslockOn)) {
+						inputEvent.KeyEvent.dwControlKeyState &= ~WindowsConsole.ControlKeyState.CapslockOn;
+					}
+
+					if (inputEvent.KeyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.ScrolllockOn)) {
+						inputEvent.KeyEvent.dwControlKeyState &= ~WindowsConsole.ControlKeyState.ScrolllockOn;
+					}
+
+					if (inputEvent.KeyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.NumlockOn)) {
+						inputEvent.KeyEvent.dwControlKeyState &= ~WindowsConsole.ControlKeyState.NumlockOn;
+					}
 
 					switch (inputEvent.KeyEvent.dwControlKeyState) {
 					case WindowsConsole.ControlKeyState.RightAltPressed:
@@ -617,10 +673,10 @@ namespace Terminal.Gui {
 						keyUpHandler (key);
 				} else {
 					if (inputEvent.KeyEvent.bKeyDown) {
-						// Key Down - Fire KeyDown Event and KeyStroke (ProcessKey) Event
 						keyDownHandler (new KeyEvent (map));
-						keyHandler (new KeyEvent (map));
 					} else {
+						// Key Up - Fire KeyDown Event and KeyStroke (ProcessKey) Event
+						keyHandler (new KeyEvent (map));
 						keyUpHandler (new KeyEvent (map));
 					}
 				}
@@ -807,6 +863,8 @@ namespace Terminal.Gui {
 
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 				mouseFlag = MouseFlags.ReportMousePosition;
+			} else if (mouseEvent.ButtonState == 0 && mouseEvent.EventFlags == 0) {
+				mouseFlag = 0;
 			}
 
 			mouseFlag = SetControlKeyStates (mouseEvent, mouseFlag);
@@ -916,6 +974,9 @@ namespace Terminal.Gui {
 			case ConsoleKey.OemComma:
 			case ConsoleKey.OemPlus:
 			case ConsoleKey.OemMinus:
+				if (keyInfo.KeyChar == 0)
+					return Key.Unknown;
+
 				return (Key)((uint)keyInfo.KeyChar);
 			}
 
@@ -969,48 +1030,10 @@ namespace Terminal.Gui {
 		public override void Init (Action terminalResized)
 		{
 			TerminalResized = terminalResized;
-
-			Colors.Base = new ColorScheme ();
-			Colors.Dialog = new ColorScheme ();
-			Colors.Menu = new ColorScheme ();
-			Colors.Error = new ColorScheme ();
-
-			HLine = '\u2500';
-			VLine = '\u2502';
-			Stipple = '\u2592';
-			Diamond = '\u25c6';
-			ULCorner = '\u250C';
-			LLCorner = '\u2514';
-			URCorner = '\u2510';
-			LRCorner = '\u2518';
-			LeftTee = '\u251c';
-			RightTee = '\u2524';
-			TopTee = '\u22a4';
-			BottomTee = '\u22a5';
-
-			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Blue);
-			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
-			Colors.Base.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Blue);
-			Colors.Base.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
-
-			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Cyan);
-			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
-			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
-			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
-			Colors.Menu.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Cyan);
-
-			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
-			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
-			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Cyan);
-
-			Colors.Error.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Red);
-			Colors.Error.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Error.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Red);
-			Colors.Error.HotFocus = Colors.Error.HotNormal;
-			Console.Clear ();
+			SetupColorsAndBorders ();
 		}
 
+		
 		void ResizeScreen ()
 		{
 			OutputBuffer = new WindowsConsole.CharInfo [Rows * Cols];

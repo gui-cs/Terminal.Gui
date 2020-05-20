@@ -99,6 +99,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc cref="Redraw"/>
 		public override void Redraw (Rect region)
 		{
 			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
@@ -113,11 +114,13 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc cref="PositionCursor"/>
 		public override void PositionCursor ()
 		{
 			Move (1, 0);
 		}
 
+		///<inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			if (kb.KeyValue == ' ') {
@@ -132,6 +135,7 @@ namespace Terminal.Gui {
 			return base.ProcessKey (kb);
 		}
 
+		///<inheritdoc cref="MouseEvent"/>
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked))
