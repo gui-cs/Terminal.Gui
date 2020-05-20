@@ -498,7 +498,8 @@ namespace Terminal.Gui {
 		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
 		public override bool MouseEvent(MouseEvent me)
 		{
-			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
+			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
+				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp)
 				return false;
 
 			if (!HasFocus)
@@ -506,6 +507,14 @@ namespace Terminal.Gui {
 
 			if (source == null)
 				return false;
+
+			if (me.Flags == MouseFlags.WheeledDown) {
+				MoveDown ();
+				return true;
+			} else if (me.Flags == MouseFlags.WheeledUp) {
+				MoveUp ();
+				return true;
+			}
 
 			if (me.Y + top >= source.Count)
 				return true;
