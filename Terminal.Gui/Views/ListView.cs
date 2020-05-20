@@ -306,6 +306,11 @@ namespace Terminal.Gui {
 		public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
 
 		/// <summary>
+		/// This event is raised on Enter key or Double Click to open the selected item.
+		/// </summary>
+		public event EventHandler OpenSelectedItem;
+
+		/// <summary>
 		/// Handles cursor movement for this view, passes all other events.
 		/// </summary>
 		/// <returns><c>true</c>, if key was processed, <c>false</c> otherwise.</returns>
@@ -337,7 +342,7 @@ namespace Terminal.Gui {
 				else
 					break;
 
-			case Key.Enter:
+			case Key.Enter:        
 				OnOpenSelectedItem ();
 				break;
 
@@ -403,7 +408,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns></returns>
 		public virtual bool MovePageDown ()
-		{
+		{ 
 			var n = (selected + Frame.Height);
 			if (n > source.Count)
 				n = source.Count - 1;

@@ -233,7 +233,6 @@ namespace UICatalog {
 			{
 				return Scenarios;
 			}
-
 		}
 
 		/// <summary>
