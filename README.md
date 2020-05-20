@@ -5,56 +5,81 @@
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mono/mono?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) - This is the Mono Channel room
 
-# Gui.cs - Terminal UI toolkit for .NET
+# Terminal.Gui - Terminal UI toolkit for .NET
 
-This is a simple UI toolkit for .NET, .NET Core and Mono and works on
-both Windows and Linux/Unix.
+A simple UI toolkit for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
 
 ![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.png)
 
 A presentation of this was part of the [Retro.NET](https://channel9.msdn.com/Events/dotnetConf/2018/S313) talk at .NET Conf 2018 [Slides](https://tirania.org/Retro.pdf)
 
+## Controls 
 The toolkit contains various controls for building text user interfaces:
 
 * [Buttons](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Button.html) 
-* [Labels](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Label.html)
-* [Text entry](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextField.html)
-* [Text view](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextView.html)
-* [Time editing field](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TimeField.html)
-* [Radio buttons](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.RadioGroup.html)
 * [Checkboxes](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.CheckBox.html)
 * [Dialog boxes](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Dialog.html)
-  * [Message boxes](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MessageBox.html)
-* [Windows](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Window.html)
-* [Menus](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MenuBar.html)
-* [ListViews](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ListView.html)
 * [Frames](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.FrameView.html)
+* [Hex viewer/editor](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.HexView.html)
+* [Labels](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Label.html)
+* [ListViews](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ListView.html)
+* [Menus](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MenuBar.html)
+* [Message boxes](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.MessageBox.html)
 * [ProgressBars](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ProgressBar.html)
-* [Scroll views](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollView.html) and [Scrollbars](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollBarView.html)
-* Hexadecimal viewer/editor (HexView)
-* Terminal Emulator - a complete Xterm/Vt100 terminal emulator that you can embed is now part of [XtermSharp](https://github.com/migueldeicaza/XtermSharp/blob/master/GuiCsHost/TerminalView.cs) - you just need to pull the `TerminalView` linked here into your project.
+* [Time editing field](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TimeField.html)
+* [Text entry](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextField.html)
+* [Text view](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextView.html)
+* [Scroll views](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollView.html)
+* [Scrollbars](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollBarView.html)
+* [Status bars]()
+* [Radio buttons](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.RadioGroup.html)
+* [Windows](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Window.html)
 
-All visible UI elements are subclasses of the
-[View](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.View.html),
-and these in turn can contain an arbitrary number of subviews.   
+In addition, a complete Xterm/Vt100 terminal emulator that you can embed is now part of [XtermSharp](https://github.com/migueldeicaza/XtermSharp/blob/master/GuiCsHost/TerminalView.cs) - you just need to pull the `TerminalView` linked here into your project.
 
-It comes with a
-[mainloop](https://migueldeicaza.github.io/gui.cs/api/Mono.Terminal/Mono.Terminal.MainLoop.html)
-to process events, process idle handlers, timers and monitoring file
+## Features
+
+* **Cross Platform** - Terminal drivers for Curses, [Windows Console](https://github.com/migueldeicaza/gui.cs/issues/27), and the .NET Console mean **Terminal.Gui** works well on both color and monochrome terminals and has mouse support on terminal emulators that support it.
+* **Keyboard and Mouse Input** - Both keyboard and mouse input are supported, including limited support for drag & drop.
+* **[Flexible Layout](https://migueldeicaza.github.io/gui.cs/articles/overview.html#layout)** - **Terminal.Gui** supports both *Absolute layout* and an innovative UI layout system referred to as *Computed Layout*. *Computed Layout* makes it easy to layout controls relative to each other and enables dynamic console GUIs.
+* **Clipboard support** - Cut, Copy, and Paste of text provided through the `[Clipboard](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Clipboard.html)` class.
+* **[Arbitrary Views](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.View.html)** - All visible UI elements are subclasses of the `View` class, and these in turn can contain an arbitrary number of sub-views.
+* **Advanced App Features** - The [Mainloop](https://migueldeicaza.github.io/gui.cs/api/Mono.Terminal/Mono.Terminal.MainLoop.html) supports processing events, idle handlers, timers, and monitoring file
 descriptors.
 
-It is designed to work on Curses and the [Windows Console](https://github.com/migueldeicaza/gui.cs/issues/27), 
-works well on both color and monochrome terminals and has mouse support on
-terminal emulators that support it.
+### Keyboard Input Handling
 
-# Documentation
+The input handling of **Terminal.Gui** is similar in some ways to Emacs and the Midnight Commander, so you can expect some of the special key combinations to be active.
 
-* [API documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui.html) for details.
+The key `ESC` can act as an Alt modifier (or Meta in Emacs parlance), to allow input on terminals that do not have an alt key.  So to produce the sequence `Alt-F`, you can press either `Alt-F`, or `ESC` followed by the key `F`.
 
-* [Overview](https://migueldeicaza.github.io/gui.cs/articles/overview.html) contains the conceptual
-  documentation and a walkthrough of the core concepts of `gui.cs`
+To enter the key `ESC`, you can either press `ESC` and wait 100 milliseconds, or you can press `ESC` twice.
 
-# Sample Usage
+`ESC-0`, and `ESC-1` through `ESC-9` have a special meaning, they map to `F10`, and `F1` to `F9` respectively.
+
+**Terminal.Gui** respects common Mac and Windows keyboard idoms as well. For example, clipboard operations use the familiar `Control/Command-C, X, V` model.
+
+`CTRL-Q` is used for exiting views (and apps).
+
+### Driver model
+
+Currently **Terminal.Gui** has support for `[ncurses](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Drivers/CursesDriver.cs)`, [`System.Console`](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Drivers/NetDriver.cs), and a full [Win32 Console](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Drivers/WindowsDriver.cs) front-end.
+
+`ncurses` is used on Mac/Linux/Unix with color support based on what your library is compiled with; the Windows driver supports full color and mouse, and an easy-to-debug `System.Console` can be used on Windows and Unix, but lacks mouse support.
+
+You can force the use of `System.Console` on Unix as well; see `Core.cs`.
+
+## Showcase
+
+The [UI Catalog project](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog) provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**.
+
+## Documentation
+
+* [API documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui.html)
+
+* [Overview](https://migueldeicaza.github.io/gui.cs/articles/overview.html) contains the conceptual documentation and a walkthrough of the core concepts of **Terminal.Gui**.
+
+### Sample Usage
 
 ```csharp
 using Terminal.Gui;
@@ -125,8 +150,7 @@ class Demo {
 }
 ```
 
-Alternatively, you can encapsulate the app behavior in a new `Window`-derived class, 
-say `App.cs` containing the code above, and simplify your `Main` method to:
+Alternatively, you can encapsulate the app behavior in a new `Window`-derived class, say `App.cs` containing the code above, and simplify your `Main` method to:
 
 ```csharp
 using Terminal.Gui;
@@ -139,78 +163,27 @@ class Demo {
 }
 ```
 
-The example above shows how to add views, two styles are used, a very
-nice layout system that I have no name for, but that [is
-documented](https://migueldeicaza.github.io/gui.cs/articles/overview.html#layout),
-and the absolute positioning.
+The example above shows how to add views using both styles of layout supported by **Terminal.Gui**: **Absolute layout** and **[Computed layout](https://migueldeicaza.github.io/gui.cs/articles/overview.html#layout)**.
 
-# Installing it
+## Installing
 
-If you want to try Gui.cs, use NuGet to install the `Terminal.Gui` NuGet package:
+Use NuGet to install the `Terminal.Gui` NuGet package: https://www.nuget.org/packages/Terminal.Gui
 
-https://www.nuget.org/packages/Terminal.Gui
+## Running and Building
 
-# Running and Building
+* *`Terminal.Gui`* - Build and run using the .NET SDK command line tools (`doetnet build` in the root directory) or with Visual Studio 2019.
+* *UI Catalog* - Run `dotnet run` in the `UICatalog` directory to run the UI Catalog.
+* *Example (aka `demo.cs`)* - Run `dotnet run` in the `Example` directory to run the simple demo.
+* *Standalone Example* - A trivial .NET core sample application can be found in the `StandaloneExample` directory. Run `dotnet run` in directory to test.
 
-You can find a trivial .NET core sample application in the
-"StandaloneExample" directory.   You can execute it by running
-`dotnet run` in that directory.
+## Contributing
 
-That sample relies on the distributed NuGet package, if you want to
-to use the code on GitHub, you can open the Example program which 
-references the library built out of this tree.
+See [Issues](https://github.com/migueldeicaza/gui.cs/issues) for a list of open bugs and enhancements.
 
-# Input Handling
+## History
 
-The input handling of gui.cs is similar in some ways to Emacs and the
-Midnight Commander, so you can expect some of the special key
-combinations to be active.
+This is an updated version of [gui.cs](http://tirania.org/blog/archive/2007/Apr-16.html) that Miguel wrote for [mono-curses](https://github.com/mono/mono-curses) in 2007.
 
-The key `ESC` can act as an Alt modifier (or Meta in Emacs parlance), to
-allow input on terminals that do not have an alt key.  So to produce
-the sequence `Alt-F`, you can press either `Alt-F`, or `ESC` followed by the key `F`.
+The original **gui.cs** was a UI toolkit in a single file and tied to curses. This version tries to be console-agnostic and instead of having a container/widget model, only uses Views (which can contain subviews) and changes the rendering model to rely on damage regions instead of burdening each view with the details.
 
-To enter the key `ESC`, you can either press `ESC` and wait 100
-milliseconds, or you can press `ESC` twice.
-
-`ESC-0`, and `ESC-1` through `ESC-9` have a special meaning, they map to
-`F10`, and `F1` to `F9` respectively.
-
-# Driver model
-
-Currently gui.cs has support for ncurses, `System.Console` and a full
-Win32 console front-end.
-
-ncurses is used on Unix with color support based on what your library
-is compiled with;   The windows driver supports full color and mouse, and
-an easy-to-debug `System.Console` can be used on Windows and Unix, but
-lacks mouse support.
-
-You can force the use of `System.Console` on Unix as
-well, see `Core.cs`.   
-
-# Tasks
-
-There are some tasks in the github issues, and some others are being
-tracked in the TODO.md file.
-
-# History
-
-This is an updated version of
-[gui.cs](http://tirania.org/blog/archive/2007/Apr-16.html) that
-I wrote for [mono-curses](https://github.com/mono/mono-curses) in 2007.
-
-The original gui.cs was a UI toolkit in a single file and tied to
-curses.  This version tries to be console-agnostic and instead of
-having a container/widget model, only uses Views (which can contain
-subviews) and changes the rendering model to rely on damage regions
-instead of burderning each view with the details.
-
-# Releases
-
-Recently, I setup VSTS to do the releases, for now, this requires a
-branch to be pushed with the name release/XXX, do this after the NuGet
-package version has been updated on the
-Terminal.Gui/Terminal.Gui.csproj, and push.
-
-Then once the package is built, VSTS will request an approval.
+Release history can be found in the [Terminal.Gui.csproj](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Terminal.Gui.csproj) file.
