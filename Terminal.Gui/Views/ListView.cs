@@ -295,6 +295,11 @@ namespace Terminal.Gui {
 		public event Action SelectedChanged;
 
 		/// <summary>
+		/// This event is raised on Enter key or Double Click to open the selected item.
+		/// </summary>
+		public event EventHandler OpenSelectedItem;
+
+		/// <summary>
 		/// Handles cursor movement for this view, passes all other events.
 		/// </summary>
 		/// <returns><c>true</c>, if key was processed, <c>false</c> otherwise.</returns>
@@ -325,10 +330,19 @@ namespace Terminal.Gui {
 					return true;
 				else
 					break;
+
+			case Key.Enter:
+				OpenSelectedItem?.Invoke (this, new EventArgs ());
+				break;
+
 			}
 			return base.ProcessKey (kb);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public virtual bool AllowsAll ()
 		{
 			if (!allowsMarking)
@@ -344,6 +358,10 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public virtual bool MarkUnmarkRow(){
 			if (AllowsAll ()) {
 				Source.SetMark(SelectedItem, !Source.IsMarked(SelectedItem));
@@ -354,6 +372,10 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public virtual bool MovePageUp(){
 			int n = (selected - Frame.Height);
 			if (n < 0)
@@ -369,6 +391,10 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public virtual bool MovePageDown(){
 			var n = (selected + Frame.Height);
 			if (n > source.Count)
@@ -387,6 +413,10 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public virtual bool MoveDown(){
 			if (selected + 1 < source.Count){
 				selected++;
@@ -400,6 +430,10 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public virtual bool MoveUp(){
 			if (selected > 0){
 				selected--;
@@ -424,9 +458,10 @@ namespace Terminal.Gui {
 				Move (0, selected - top);
 		}
 
+		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
 		public override bool MouseEvent(MouseEvent me)
 		{
-			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked))
+			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
 				return false;
 
 			if (!HasFocus)
@@ -444,9 +479,10 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 				return true;
 			}
-			if (SelectedChanged != null)
-				SelectedChanged();
+			SelectedChanged?.Invoke ();
 			SetNeedsDisplay ();
+			if (me.Flags == MouseFlags.Button1DoubleClicked)
+				OpenSelectedItem?.Invoke (this, new EventArgs ());
 			return true;
 		}
 	}
@@ -460,6 +496,10 @@ namespace Terminal.Gui {
 		BitArray marks;
 		int count;
 
+		/// <summary>
+		/// constructor
+		/// </summary>
+		/// <param name="source"></param>
 		public ListWrapper (IList source)
 		{
 			count = source.Count;
@@ -467,6 +507,9 @@ namespace Terminal.Gui {
 			this.src = source;
 		}
 
+		/// <summary>
+		/// Count of items.
+		/// </summary>
 		public int Count => src.Count;
 
 		void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width)
@@ -487,6 +530,16 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Renders an item in the the list.
+		/// </summary>
+		/// <param name="container"></param>
+		/// <param name="driver"></param>
+		/// <param name="marked"></param>
+		/// <param name="item"></param>
+		/// <param name="col"></param>
+		/// <param name="line"></param>
+		/// <param name="width"></param>
 		public void Render (ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width)
 		{
 			container.Move (col, line);
@@ -499,6 +552,11 @@ namespace Terminal.Gui {
 				RenderUstr (driver, t.ToString (), col, line, width);
 		}
 
+		/// <summary>
+		/// Returns true of the item is marked. false if not.
+		/// </summary>
+		/// <param name="item"></param>
+		/// <returns></returns>
 		public bool IsMarked (int item)
 		{
 			if (item >= 0 && item < count)
@@ -506,6 +564,11 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		/// <summary>
+		/// Sets the marked state of an item.
+		/// </summary>
+		/// <param name="item"></param>
+		/// <param name="value"></param>
 		public void SetMark (int item, bool value)
 		{
 			if (item >= 0 && item < count)

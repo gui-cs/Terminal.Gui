@@ -189,6 +189,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc cref="MouseEvent"/>
 		public override bool MouseEvent(MouseEvent me)
 		{
 			if (me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
@@ -249,6 +250,10 @@ namespace Terminal.Gui {
 		View contentView;
 		ScrollBarView vertical, horizontal;
 
+		/// <summary>
+		/// Constructs a ScrollView
+		/// </summary>
+		/// <param name="frame"></param>
 		public ScrollView (Rect frame) : base (frame)
 		{
 			contentView = new View (frame);
@@ -363,7 +368,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// This event is raised when the contents have scrolled
 		/// </summary>
-		public event Action<ScrollView> Scrolled;
+		//public event Action<ScrollView> Scrolled;
 
 		public override void Redraw(Rect region)
 		{
@@ -383,6 +388,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc cref="PositionCursor"/>
 		public override void PositionCursor()
 		{
 			if (InternalSubviews.Count == 0)
@@ -448,6 +454,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		///<inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey(KeyEvent kb)
 		{
 			if (base.ProcessKey (kb))

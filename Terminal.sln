@@ -7,6 +7,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Designer", "Designer\Designer.csproj", "{1228D992-C801-49BB-839A-7BD28A3FFF0A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "Example\Example.csproj", "{F7889E4B-F6F2-40A5-8A06-83591EF4D6F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UICatalog", "UICatalog\UICatalog.csproj", "{88979F89-9A42-448F-AE3E-3060145F6375}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +45,14 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {143B8AF1-000C-431B-8C94-2A06CD5550D6}
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Debug|x86.Build.0 = Debug|Any CPU
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Release|x86.ActiveCfg = Release|Any CPU
+		{88979F89-9A42-448F-AE3E-3060145F6375}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
