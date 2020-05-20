@@ -283,7 +283,7 @@ namespace Terminal.Gui {
 		//bool used;
 
 		/// <summary>
-		/// Event invoked when text was changed.
+		/// Raised when the Text of the TextView changes.
 		/// </summary>
 		public event EventHandler TextChanged;
 
