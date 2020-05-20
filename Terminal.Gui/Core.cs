@@ -1469,10 +1469,25 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class Toplevel : View {
 		/// <summary>
-		/// This flag is checked on each iteration of the mainloop and it continues
-		/// running until this flag is set to false.
+		/// Gets or sets whether the <see cref="T:Terminal.Gui.MainLoop"/> for this <see cref="T:Terminal.Gui.Toplevel"/> is running or not. Setting
+		/// this property to false will cause the MainLoop to exit. 
 		/// </summary>
-		public bool Running;
+		public bool Running { get; set; }
+
+		/// <summary>
+		/// Fired once the Toplevel's <see cref="T:Terminal.Gui.MainLoop"/> has started it's first iteration. 
+		/// Subscribe to this event to perform tasks when the <see cref="T:Terminal.Gui.Toplevel"/> has been laid out and focus has been set.
+		/// changes. A Ready event handler is a good place to finalize initialization after calling `<see cref="T:Terminal.Gui.Application.Run"/>(topLevel)`. 
+		/// </summary>
+		public event EventHandler Ready;
+
+		/// <summary>
+		/// Called from Application.RunLoop after the <see cref="T:Terminal.Gui.Toplevel"/> has entered it's first iteration of the loop. 
+		/// </summary>
+		internal virtual void OnReady ()
+		{
+			Ready?.Invoke (this, EventArgs.Empty);
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Toplevel"/> class with the specified absolute layout.
@@ -2425,8 +2440,15 @@ namespace Terminal.Gui {
 			if (state.Toplevel == null)
 				throw new ObjectDisposedException ("state");
 
+			bool firstIteration = true;
 			for (state.Toplevel.Running = true; state.Toplevel.Running;) {
 				if (MainLoop.EventsPending (wait)) {
+					// Notify Toplevel it's ready
+					if (firstIteration) {
+						state.Toplevel.OnReady ();
+					}
+					firstIteration = false;
+
 					MainLoop.MainIteration ();
 					Iteration?.Invoke (null, EventArgs.Empty);
 				} else if (wait == false)
