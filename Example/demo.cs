@@ -90,8 +90,8 @@ static class Demo {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
-		container.OnKeyUp += (KeyEvent ke) => {
-			if (ke.Key == Key.Esc)
+		container.KeyUp += (sender, e) => {
+			if (e.KeyEvent.Key == Key.Esc)
 				container.Running = false;
 		};
 
@@ -413,11 +413,11 @@ static class Demo {
 	#endregion
 
 
-	#region OnKeyDown / OnKeyPress / OnKeyUp Demo
+	#region KeyDown / KeyPress / KeyUp Demo
 	private static void OnKeyDownPressUpDemo ()
 	{
 		var container = new Dialog (
-			"OnKeyDown & OnKeyPress & OnKeyUp demo", 80, 20,
+			"KeyDown & KeyPress & KeyUp demo", 80, 20,
 			new Button ("Close") { Clicked = () => { Application.RequestStop (); } }) {
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
@@ -469,9 +469,9 @@ static class Demo {
 		}
 
 
-		container.OnKeyDown += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Down");
-		container.OnKeyPress += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Press");
-		container.OnKeyUp += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Up");
+		container.KeyDown += (o, e) => KeyDownPressUp (e.KeyEvent, "Down");
+		container.KeyPress += (o, e) => KeyDownPressUp (e.KeyEvent, "Press");
+		container.KeyUp += (o, e) => KeyDownPressUp (e.KeyEvent, "Up");
 		Application.Run (container);
 	}
 	#endregion
@@ -604,7 +604,7 @@ static class Demo {
 		var bottom2 = new Label ("This should go on the bottom of another top-level!");
 		top.Add (bottom2);
 
-		Application.OnLoad = () => {
+		Application.Loaded += (sender, e) => {
 			bottom.X = win.X;
 			bottom.Y = Pos.Bottom (win) - Pos.Top (win) - margin;
 			bottom2.X = Pos.Left (win);
