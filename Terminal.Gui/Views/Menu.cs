@@ -360,7 +360,7 @@ namespace Terminal.Gui {
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
 			// To ncurses simulate a AltMask key pressing Alt+Space because
-			// it can´t detect an alone special key down was pressed.
+			// it canï¿½t detect an alone special key down was pressed.
 			if (keyEvent.IsAlt && keyEvent.Key == Key.AltMask) {
 				OnKeyDown (keyEvent);
 				return true;
@@ -562,7 +562,8 @@ namespace Terminal.Gui {
 		}
 
 		bool openedByAltKey;
-		///<inheritdoc cref="KeyDown"/>
+
+		///<inheritdoc cref="OnKeyDown"/>
 		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
@@ -573,12 +574,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <summary>
-		/// Track Alt key-up events. On Windows, when a user releases Alt (without another key), the menu gets focus but doesn't open.
-		/// We mimic that behavior here.
-		/// </summary>
-		/// <param name="keyEvent"></param>
-		/// <returns></returns>
+		///<inheritdoc cref="OnKeyUp"/>
 		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
@@ -1000,7 +996,7 @@ namespace Terminal.Gui {
 			}
 
 			// To ncurses simulate a AltMask key pressing Alt+Space because
-			// it can´t detect an alone special key down was pressed.
+			// it canï¿½t detect an alone special key down was pressed.
 			if (kb.IsAlt && kb.Key == Key.AltMask && openMenu == null) {
 				OnKeyDown (kb);
 				OnKeyUp (kb);
