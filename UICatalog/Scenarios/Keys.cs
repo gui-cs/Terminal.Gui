@@ -43,7 +43,7 @@ namespace UICatalog {
 			public override bool ProcessColdKey (KeyEvent keyEvent)
 			{
 				_processColdKeyList.Add (keyEvent.ToString ());
-				return base.ProcessHotKey (keyEvent);
+				return base.ProcessColdKey (keyEvent);
 
 			}
 		}
@@ -92,7 +92,7 @@ namespace UICatalog {
 			};
 			Win.Add (labelKeypress);
 
-			Win.OnKeyPress += (KeyEvent keyEvent) => labelKeypress.Text = keyEvent.ToString ();
+			Win.KeyPress += (sender, a) => labelKeypress.Text = a.KeyEvent.ToString ();
 
 			// Key stroke log:
 			var keyLogLabel = new Label ("Key stroke log:") {
@@ -119,9 +119,9 @@ namespace UICatalog {
 				keyStrokeListView.MoveDown ();
 			}
 
-			Win.OnKeyDown += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Down");
-			Win.OnKeyPress += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Press");
-			Win.OnKeyUp += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Up");
+			Win.KeyDown += (sender, a) => KeyDownPressUp (a.KeyEvent, "Down");
+			Win.KeyPress += (sender, a) => KeyDownPressUp (a.KeyEvent, "Press");
+			Win.KeyUp += (sender, a) => KeyDownPressUp (a.KeyEvent, "Up");
 
 			// ProcessKey log:
 			// BUGBUG: Label is not positioning right with Pos, so using TextField instead
