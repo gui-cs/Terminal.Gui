@@ -1643,7 +1643,7 @@ namespace Terminal.Gui {
 			nx = Math.Max (x, 0);
 			nx = nx + top.Frame.Width > Driver.Cols ? Math.Max (Driver.Cols - top.Frame.Width, 0) : nx;
 			bool m, s;
-			if (SuperView == null)
+			if (SuperView == null || SuperView.GetType() != typeof(Toplevel))
 				m = Application.Top.HasMenuBar;
 			else
 				m = ((Toplevel)SuperView).HasMenuBar;
