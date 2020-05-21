@@ -148,7 +148,7 @@ namespace UICatalog {
 			}
 
 			_top = Application.Top;
-			_top.OnKeyUp += KeyUpHandler;
+			_top.KeyUp += KeyUpHandler;
 			_top.Add (_menu);
 			_top.Add (_leftPane);
 			_top.Add (_rightPane);
@@ -235,7 +235,7 @@ namespace UICatalog {
 		/// to not be impacted. Same as for tabs.
 		/// </summary>
 		/// <param name="ke"></param>
-		private static void KeyUpHandler (KeyEvent ke)
+		private static void KeyUpHandler (object sender, View.KeyEventEventArgs a)
 		{
 			if (_runningScenario != null) {
 				//switch (ke.Key) {
@@ -245,7 +245,7 @@ namespace UICatalog {
 				//case Key.Enter:
 				//	break;
 				//}
-			} else if (ke.Key == Key.Tab || ke.Key == Key.BackTab) {
+			} else if (a.KeyEvent.Key == Key.Tab || a.KeyEvent.Key == Key.BackTab) {
 				// BUGBUG: Work around Issue #434 by implementing our own TAB navigation
 				if (_top.MostFocused == _categoryListView)
 					_top.SetFocus (_rightPane);
