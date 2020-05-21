@@ -53,6 +53,10 @@ namespace Mono.Terminal {
 		/// <returns><c>true</c>, if there were pending events, <c>false</c> otherwise.</returns>
 		/// <param name="wait">If set to <c>true</c> wait until an event is available, otherwise return immediately.</param>
 		bool EventsPending (bool wait);
+
+		/// <summary>
+		/// The interation function.
+		/// </summary>
 		void MainIteration ();
 	}
 
