@@ -28,7 +28,7 @@ namespace UICatalog {
 				ColorScheme = Colors.Error
 			};
 
-			Application.OnResized += () => {
+			Application.Resized += (sender, a) => {
 				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
 			};
 
