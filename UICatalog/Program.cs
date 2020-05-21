@@ -62,7 +62,7 @@ namespace UICatalog {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Application.RequestStop() )
 				}),
-				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query (0, 6, "About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok")),
+				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query (0, 10, "About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok")),
 			});
 
 			_leftPane = new Window ("Categories") {

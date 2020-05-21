@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Terminal.Gui;
 
 namespace UICatalog {
@@ -11,6 +12,8 @@ namespace UICatalog {
 
 		private ProgressBar _activityProgressBar;
 		private ProgressBar _pulseProgressBar;
+		private Timer _timer;
+
 		public override void Setup ()
 		{
 			Win.Add (new Button ("Start") {
@@ -50,24 +53,40 @@ namespace UICatalog {
 			Win.Add (_pulseProgressBar);
 		}
 
+		protected override void Dispose (bool disposing)
+		{
+			_timer?.Dispose ();
+			_timer = null;
+			base.Dispose (disposing);
+		}
+
 		private void Pulse ()
 		{
-			if (_activityProgressBar.Fraction + 0.1F >= 1) {
+			if (_activityProgressBar.Fraction + 0.01F >= 1) {
 				_activityProgressBar.Fraction = 0F;
 			} else {
-				_activityProgressBar.Fraction += 0.1F;
+				_activityProgressBar.Fraction += 0.01F;
 			}
 			_pulseProgressBar.Pulse ();
+			
 		}
 
 		private void Start ()
 		{
+			_timer?.Dispose ();
+			_timer = null;
+
 			_activityProgressBar.Fraction = 0F;
 			_pulseProgressBar.Fraction = 0F;
+
+			_timer = new Timer ((o) => Application.MainLoop.Invoke (() => Pulse ()), null, 0, 250);
 		}
 
 		private void Stop ()
 		{
+			_timer?.Dispose ();
+			_timer = null;
+
 			_activityProgressBar.Fraction = 1F;
 			_pulseProgressBar.Fraction = 1F;
 		}
