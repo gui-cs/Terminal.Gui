@@ -413,7 +413,7 @@ static class Demo {
 		MessageBox.Query (60, 10, "Selected Animals", result == "" ? "No animals selected" : result, "Ok");
 	}
 
-	static void TextFieldAutoCompleteDemo ()
+	static void ComboBoxDemo ()
 	{
 		IList<string> items = new List<string> ();
 		foreach (var dir in new [] { "/etc", @"\windows\System32" }) {
@@ -425,7 +425,7 @@ static class Demo {
 				.OrderBy (x => x).ToList ();
 			}
 		}
-		var list = new TextFieldAutoComplete (0, 0, 36, 7, items);
+		var list = new ComboBox (0, 0, 36, 7, items);
 		list.Changed += (object sender, ustring text) => { Application.RequestStop (); };
 
 		var d = new Dialog ("Select source file", 40, 12) { list };
@@ -563,7 +563,7 @@ static class Demo {
 			new MenuBarItem ("_List Demos", new MenuItem [] {
 				new MenuItem ("Select _Multiple Items", "", () => ListSelectionDemo (true)),
 				new MenuItem ("Select _Single Item", "", () => ListSelectionDemo (false)),
-				new MenuItem ("Search Single Item", "", TextFieldAutoCompleteDemo)
+				new MenuItem ("Search Single Item", "", ComboBoxDemo)
 			}),
 			new MenuBarItem ("A_ssorted", new MenuItem [] {
 				new MenuItem ("_Show text alignments", "", () => ShowTextAlignments ()),
