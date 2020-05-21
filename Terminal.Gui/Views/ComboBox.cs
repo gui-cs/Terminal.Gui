@@ -1,7 +1,7 @@
 ﻿//
-// TextFieldAutoComplete.cs: TextField with AutoComplete
+// ComboBox.cs: ComboBox control
 //
-// Author:
+// Authors:
 //   Ross Ferguson (ross.c.ferguson@btinternet.com)
 //
 
@@ -12,9 +12,9 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// TextField with AutoComplete
+	/// ComboBox control
 	/// </summary>
-	public class TextFieldAutoComplete : View {
+	public class ComboBox : View {
 		/// <summary>
 		///   Changed event, raised when the selection has been confirmed.
 		/// </summary>
@@ -41,7 +41,7 @@ namespace Terminal.Gui {
 		/// <param name="w">The width</param>
 		/// <param name="h">The height</param>
 		/// <param name="source">Auto completetion source</param>
-		public TextFieldAutoComplete(int x, int y, int w, int h, IList<string> source)
+		public ComboBox(int x, int y, int w, int h, IList<string> source)
 		{
 			listsource = new List<string>(source);
 			height = h;
@@ -55,7 +55,8 @@ namespace Terminal.Gui {
 				ColorScheme = Colors.Dialog
 			};
 			listview.SelectedChanged += () => {
-				SetValue (searchset [listview.SelectedItem]);
+				if(searchset.Count > 0)
+					SetValue (searchset [listview.SelectedItem]);
 			};
 
 			Application.OnLoad += () => {
@@ -90,6 +91,7 @@ namespace Terminal.Gui {
 
 			return true;
 		}
+
 		public override bool ProcessKey(KeyEvent e)
 		{
 			if (e.Key == Key.Tab)
@@ -117,13 +119,13 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (e.Key == Key.CursorDown && search.HasFocus && listview.SelectedItem == 0) { // jump to list
+			if (e.Key == Key.CursorDown && search.HasFocus && listview.SelectedItem == 0 && searchset.Count > 0) { // jump to list
 				this.SetFocus (listview);
 				SetValue (searchset [listview.SelectedItem]);
 				return true;
 			}
 
-			if (e.Key == Key.CursorUp && listview.HasFocus && listview.SelectedItem == 0) // jump back to search
+			if (e.Key == Key.CursorUp && listview.HasFocus && listview.SelectedItem == 0 && searchset.Count > 0) // jump back to search
 			{
 				search.CursorPosition = search.Text.Length;
 				this.SetFocus (search);
