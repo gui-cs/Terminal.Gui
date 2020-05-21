@@ -1,8 +1,8 @@
 {
   "profiles": {
     "UICatalog": {
-      "commandName": "Project",
-      "commandLineArgs": "HexEditor"
+      "commandName": "Project"
+
     }
   }
 }
