@@ -1650,7 +1650,7 @@ namespace Terminal.Gui {
 			int l = m ? 1 : 0;
 			ny = Math.Max (y, l);
 			if (SuperView == null || SuperView.GetType() != typeof(Toplevel))
-				s = Application.Top.HasStatusBar;
+				s = Application.Top.StatusBar != null;
 			else
 				s = ((Toplevel)SuperView).StatusBar != null;
 			l = s ? Driver.Rows - 1 : Driver.Rows;
