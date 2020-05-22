@@ -247,7 +247,6 @@ namespace Terminal.Gui {
 				case 1: return Target.Frame.Y;
 				case 2: return Target.Frame.Right;
 				case 3: return Target.Frame.Bottom;
-				case 4: return Target.Frame.Right - Target.Frame.Left;
 				default:
 					return 0;
 				}
@@ -261,7 +260,6 @@ namespace Terminal.Gui {
 				case 1: tside = "y"; break;
 				case 2: tside = "right"; break;
 				case 3: tside = "bottom"; break;
-				case 4: tside = "width"; break;
 				default: tside = "unknown"; break;
 				}
 				return $"Pos.View(side={tside}, target={Target.ToString()}";
@@ -309,13 +307,6 @@ namespace Terminal.Gui {
 		/// <returns>The Position that depends on the other view.</returns>
 		/// <param name="view">The view that will be tracked.</param>
 		public static Pos Bottom (View view) => new PosView (view, 3);
-
-		/// <summary>
-		/// Returns a Pos object tracks the Width (Right-Left) of the specified view.
-		/// </summary>
-		/// <returns>The Position that depends on the other view.</returns>
-		/// <param name="view">The view that will be tracked.</param>
-		public static Pos Width (View view) => new PosView (view, 4);
 	}
 
 	/// <summary>
