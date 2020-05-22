@@ -1,4 +1,4 @@
-﻿	//
+﻿//
 // TimeField.cs: text entry for time
 //
 // Author: Jörg Preiß
@@ -24,10 +24,11 @@ namespace Terminal.Gui {
 
 		int longFieldLen = 8;
 		int shortFieldLen = 5;
-		int FieldLen { get { return isShort ? shortFieldLen : longFieldLen; } }
 		string sepChar;
 		string longFormat;
 		string shortFormat;
+
+		int FieldLen { get { return isShort ? shortFieldLen : longFieldLen; } }
 		string Format { get { return isShort ? shortFormat : longFormat; } }
 
 
@@ -40,11 +41,23 @@ namespace Terminal.Gui {
 		/// <param name="isShort">If true, the seconds are hidden.</param>
 		public TimeField (int x, int y, DateTime time, bool isShort = false) : base (x, y, isShort ? 7 : 10, "")
 		{
+			this.isShort = isShort;
+			Initialize (time);
+		}
+
+		public TimeField (DateTime time) : base ("")
+		{
+			this.isShort = true;
+			Width = FieldLen + 2;
+			Initialize (time);
+		}
+
+		void Initialize (DateTime time)
+		{
 			CultureInfo cultureInfo = CultureInfo.CurrentCulture;
 			sepChar = cultureInfo.DateTimeFormat.TimeSeparator;
 			longFormat = $" HH{sepChar}mm{sepChar}ss";
 			shortFormat = $" HH{sepChar}mm";
-			this.isShort = isShort;
 			CursorPosition = 1;
 			Time = time;
 			Changed += TimeField_Changed;
@@ -71,6 +84,26 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Get or set the data format for the widget.
+		/// </summary>
+		public bool IsShortFormat {
+			get => isShort;
+			set {
+				isShort = value;
+				if (isShort)
+					Width = 7;
+				else
+					Width = 10;
+				var ro = ReadOnly;
+				if (ro)
+					ReadOnly = false;
+				SetText (Text);
+				ReadOnly = ro;
+				SetNeedsDisplay ();
+			}
+		}
+
 		bool SetText (Rune key)
 		{
 			var text = TextModel.ToRunes (Text);
@@ -87,7 +120,7 @@ namespace Terminal.Gui {
 			bool isValidTime = true;
 			int hour = Int32.Parse (vals [0].ToString ());
 			int minute = Int32.Parse (vals [1].ToString ());
-			int second = isShort ? 0 : Int32.Parse (vals [2].ToString ());
+			int second = isShort ? 0 : vals.Length > 2 ? Int32.Parse (vals [2].ToString ()) : 0;
 			if (hour < 0) {
 				isValidTime = false;
 				hour = 0;
@@ -119,7 +152,7 @@ namespace Terminal.Gui {
 			Text = time;
 
 			if (!DateTime.TryParseExact (text.ToString (), Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result) ||
-				!isValidTime) 
+				!isValidTime)
 				return false;
 			return true;
 		}
