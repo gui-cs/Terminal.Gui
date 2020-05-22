@@ -1065,8 +1065,18 @@ namespace Terminal.Gui {
 			SuperView?.SetFocus (this);
 		}
 
+		/// <summary>
+		/// Specifies the event arguments for <see cref="KeyEvent"/>
+		/// </summary>
 		public class KeyEventEventArgs : EventArgs {
+			/// <summary>
+			/// Constructs.
+			/// </summary>
+			/// <param name="ke"></param>
 			public KeyEventEventArgs(KeyEvent ke) => KeyEvent = ke;
+			/// <summary>
+			/// The <see cref="KeyEvent"/> for the event.
+			/// </summary>
 			public KeyEvent KeyEvent { get; set; }
 		}
 
