@@ -17,7 +17,9 @@ namespace UICatalog {
 	/// The Main program uses reflection to find all sceanarios and adds them to the
 	/// ListViews. Press ENTER to run the selected sceanrio. Press CTRL-Q to exit it.
 	/// </summary>
-	public class Scenario {
+	public class Scenario : IDisposable {
+		private bool _disposedValue;
+
 		/// <summary>
 		/// The Top level for the Scenario. This should be set to `Application.Top` in most cases.
 		/// </summary>
@@ -176,6 +178,26 @@ namespace UICatalog {
 				objects.Add (type);
 			}
 			return objects;
+		}
+
+		protected virtual void Dispose (bool disposing)
+		{
+			if (!_disposedValue) {
+				if (disposing) {
+					// TODO: dispose managed state (managed objects)
+				}
+
+				// TODO: free unmanaged resources (unmanaged objects) and override finalizer
+				// TODO: set large fields to null
+				_disposedValue = true;
+			}
+		}
+
+		public void Dispose ()
+		{
+			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+			Dispose (disposing: true);
+			GC.SuppressFinalize (this);
 		}
 	}
 }
