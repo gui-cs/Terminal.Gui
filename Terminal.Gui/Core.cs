@@ -1649,7 +1649,7 @@ namespace Terminal.Gui {
 				m = ((Toplevel)SuperView).HasMenuBar;
 			int l = m ? 1 : 0;
 			ny = Math.Max (y, l);
-			if (SuperView == null)
+			if (SuperView == null || SuperView.GetType() != typeof(Toplevel))
 				s = Application.Top.HasStatusBar;
 			else
 				s = ((Toplevel)SuperView).HasStatusBar;
