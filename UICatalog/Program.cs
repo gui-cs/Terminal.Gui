@@ -151,6 +151,7 @@ namespace UICatalog {
 			_top = Application.Top;
 
 			_top.KeyUp += KeyUpHandler;
+
 			_top.Add (_menu);
 			_top.Add (_leftPane);
 			_top.Add (_rightPane);
@@ -252,7 +253,7 @@ namespace UICatalog {
 				//	break;
 				//case Key.Enter:
 				//	break;
-				//}
+				//}<
 			} else if (a.KeyEvent.Key == Key.Tab || a.KeyEvent.Key == Key.BackTab) {
 				// BUGBUG: Work around Issue #434 by implementing our own TAB navigation
 				if (_top.MostFocused == _categoryListView)
