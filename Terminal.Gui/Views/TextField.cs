@@ -192,6 +192,7 @@ namespace Terminal.Gui {
 			int col = 0;
 			int width = Frame.Width;
 			var tcount = text.Count;
+			var roc = new Attribute (Color.DarkGray, Color.Gray);
 			for (int idx = 0; idx < tcount; idx++){
 				var rune = text [idx];
 				if (idx < p)
@@ -200,7 +201,7 @@ namespace Terminal.Gui {
 				if (col == point && HasFocus && !Used && SelectedLength == 0 && !ReadOnly)
 					Driver.SetAttribute (Colors.Menu.HotFocus);
 				else if (ReadOnly)
-					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : color.Disabled);
+					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : roc);
 				else
 					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : ColorScheme.Focus);
 				if (col + cols <= width)
@@ -713,7 +714,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Copy the selected text to the clipboard.
 		/// </summary>
-		public void Copy ()
+		public virtual void Copy ()
 		{
 			if (Secret)
 				return;
@@ -726,7 +727,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Cut the selected text to the clipboard.
 		/// </summary>
-		public void Cut ()
+		public virtual void Cut ()
 		{
 			if (SelectedLength != 0) {
 				Clipboard.Contents = SelectedText;
@@ -749,7 +750,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Paste the selected text from the clipboard.
 		/// </summary>
-		public void Paste ()
+		public virtual void Paste ()
 		{
 			if (ReadOnly)
 				return;
