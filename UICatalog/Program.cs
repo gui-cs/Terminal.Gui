@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -62,7 +63,7 @@ namespace UICatalog {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Application.RequestStop() )
 				}),
-				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query (0, 6, "About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok")),
+				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query (0, 10, "About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok")),
 			});
 
 			_leftPane = new Window ("Categories") {
@@ -119,7 +120,7 @@ namespace UICatalog {
 			_rightPane.Add (_scenarioListView);
 
 			_categoryListView.SelectedItem = 0;
-			CategoryListView_SelectedChanged ();
+			_categoryListView.OnSelectedChanged ();
 
 			_statusBar = new StatusBar (new StatusItem [] {
 				//new StatusItem(Key.F1, "~F1~ Help", () => Help()),
@@ -148,7 +149,9 @@ namespace UICatalog {
 			}
 
 			_top = Application.Top;
+
 			_top.KeyUp += KeyUpHandler;
+
 			_top.Add (_menu);
 			_top.Add (_leftPane);
 			_top.Add (_rightPane);
@@ -227,6 +230,12 @@ namespace UICatalog {
 					used++;
 				}
 			}
+
+			public IList ToList ()
+			{
+				return Scenarios;
+			}
+
 		}
 
 		/// <summary>
@@ -244,7 +253,7 @@ namespace UICatalog {
 				//	break;
 				//case Key.Enter:
 				//	break;
-				//}
+				//}<
 			} else if (a.KeyEvent.Key == Key.Tab || a.KeyEvent.Key == Key.BackTab) {
 				// BUGBUG: Work around Issue #434 by implementing our own TAB navigation
 				if (_top.MostFocused == _categoryListView)
@@ -254,7 +263,7 @@ namespace UICatalog {
 			}
 		}
 
-		private static void CategoryListView_SelectedChanged ()
+		private static void CategoryListView_SelectedChanged (object sender, ListViewItemEventArgs e)
 		{
 			var item = _categories [_categoryListView.SelectedItem];
 			List<Type> newlist;
