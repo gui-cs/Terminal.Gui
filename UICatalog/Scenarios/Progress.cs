@@ -13,27 +13,29 @@ namespace UICatalog {
 		private ProgressBar _activityProgressBar;
 		private ProgressBar _pulseProgressBar;
 		private Timer _timer;
+		private object _timeoutToken;
 
 		public override void Setup ()
 		{
-			Win.Add (new Button ("Start") {
-				X = Pos.Center () - 20,
+			var pulseButton = new Button ("Pulse") {
+				X = Pos.Center (),
 				Y = Pos.Center () - 5,
+				Clicked = () => Pulse ()
+			};
+
+			Win.Add (new Button ("Start Timer") {
+				X = Pos.Left(pulseButton) - 20,
+				Y = Pos.Y(pulseButton),
 				Clicked = () => Start ()
 			});
 
-			Win.Add (new Button ("Pulse") {
-				X = Pos.Center () - 5,
-				Y = Pos.Center () - 5,
-				Clicked = () => Pulse ()
-			}); 
-
-
-			Win.Add (new Button ("Stop") {
-				X = Pos.Center () + 10,
-				Y = Pos.Center () - 5,
+			Win.Add (new Button ("Stop Timer") {
+				X = Pos.Right (pulseButton) + 20, // BUGBUG: Right is somehow adding additional width
+				Y = Pos.Y (pulseButton),
 				Clicked = () => Stop()
 			});
+
+			Win.Add (pulseButton);
 
 			_activityProgressBar = new ProgressBar () {
 				X = Pos.Center (),
@@ -57,6 +59,7 @@ namespace UICatalog {
 		{
 			_timer?.Dispose ();
 			_timer = null;
+			Application.MainLoop.RemoveTimeout (_timeoutToken);
 			base.Dispose (disposing);
 		}
 
@@ -68,7 +71,6 @@ namespace UICatalog {
 				_activityProgressBar.Fraction += 0.01F;
 			}
 			_pulseProgressBar.Pulse ();
-			
 		}
 
 		private void Start ()
@@ -79,13 +81,19 @@ namespace UICatalog {
 			_activityProgressBar.Fraction = 0F;
 			_pulseProgressBar.Fraction = 0F;
 
-			_timer = new Timer ((o) => Application.MainLoop.Invoke (() => Pulse ()), null, 0, 250);
+			_timer = new Timer ((o) => Application.MainLoop.Invoke (() => Pulse ()), null, 0, 10);
+
+			// BUGBUG: This timeout does nothing but return true, however it trigger the Application.MainLoop
+			// to run the Action. Without this timeout, the display updates are random, 
+			// or triggered by user interaction with the UI. See #155
+			_timeoutToken = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (10), loop => true);
 		}
 
 		private void Stop ()
 		{
 			_timer?.Dispose ();
 			_timer = null;
+			Application.MainLoop.RemoveTimeout (_timeoutToken);
 
 			_activityProgressBar.Fraction = 1F;
 			_pulseProgressBar.Fraction = 1F;
