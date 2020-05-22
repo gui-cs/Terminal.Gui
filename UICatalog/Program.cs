@@ -148,6 +148,7 @@ namespace UICatalog {
 			}
 
 			_top = Application.Top;
+
 			_top.KeyUp += KeyUpHandler;
 			_top.Add (_menu);
 			_top.Add (_leftPane);
