@@ -83,14 +83,13 @@ namespace UICatalog {
 			textView.Text = "This text view should be half-way down the terminal,\n20% of its height, and 80% of its width.";
 			Win.Add (textView);
 
-			//// Demonstrate AnchorEnd - Button anchored to bottom of textView
-			//var clearButton = new Button ("Clear") {
-			//	X = Pos.AnchorEnd (),
-			//	Y = Pos.AnchorEnd (),
-			//	Width = 15,
-			//	Height = 1
-			//};
-			//Win.Add (clearButton);
+			// Demonstrate AnchorEnd - Button anchored to bottom of textView
+			var clearButton = new Button ("Anchor End") {
+				Y = Pos.AnchorEnd () - 1
+			};
+			clearButton.X = Pos.AnchorEnd () - clearButton.Text.Length + 4;
+
+			Win.Add (clearButton);
 
 			// Demonstrate At - Absolute Layout using Pos
 			var absoluteButton = new Button ("At(10,10)") {
@@ -98,6 +97,36 @@ namespace UICatalog {
 				Y = Pos.At(10)
 			};
 			Win.Add (absoluteButton);
+
+			// Centering multiple controls horizontally. 
+			// This is intentionally convoluted to illustrate potential bugs.
+			var bottomLabel = new Label ("This should be the 2nd to last line (Bug #xxx).") {
+				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				ColorScheme = Colors.TopLevel,
+				Width = Dim.Fill (),
+				X = Pos.Center (),
+				Y = Pos.Bottom (Win) - 4  // BUGBUG: -2 should be two lines above border; but it has to be -4
+			};
+			Win.Add (bottomLabel);
+
+			var leftButton = new Button ("Left") {
+				Y = Pos.Bottom (Win) - 2
+			};
+			var centerButton = new Button ("Center") {
+				X = Pos.Center (),
+				Y = Pos.AnchorEnd () - 1
+			};
+			var rightButton = new Button ("Right") {
+				Y = Pos.Y(centerButton)
+			};
+
+			leftButton.X = Pos.Left (centerButton) - leftButton.Frame.Width - 5;
+			rightButton.X = Pos.Right (centerButton) + 5;
+
+			Win.Add (leftButton);
+			Win.Add (centerButton);
+			Win.Add (rightButton);
+
 		}
 
 		public override void Run ()
