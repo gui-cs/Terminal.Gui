@@ -1545,12 +1545,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Check id current toplevel has menu bar
 		/// </summary>
-		public bool HasMenuBar { get; set; }
+		public MenuBar MenuBar { get; set; }
 
 		/// <summary>
 		/// Check id current toplevel has status bar
 		/// </summary>
-		public bool HasStatusBar { get; set; }
+		public StatusBar StatusBar { get; set; }
 
 		///<inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent keyEvent)
@@ -1609,9 +1609,9 @@ namespace Terminal.Gui {
 		{
 			if (this == Application.Top) {
 				if (view is MenuBar)
-					HasMenuBar = true;
+					MenuBar = view as MenuBar;
 				if (view is StatusBar)
-					HasStatusBar = true;
+					StatusBar = view as StatusBar;
 			}
 			base.Add (view);
 		}
@@ -1621,9 +1621,9 @@ namespace Terminal.Gui {
 		{
 			if (this == Application.Top) {
 				if (view is MenuBar)
-					HasMenuBar = true;
+					MenuBar = null;
 				if (view is StatusBar)
-					HasStatusBar = true;
+					StatusBar = null;
 			}
 			base.Remove (view);
 		}
@@ -1632,8 +1632,8 @@ namespace Terminal.Gui {
 		public override void RemoveAll ()
 		{
 			if (this == Application.Top) {
-				HasMenuBar = false;
-				HasStatusBar = false;
+				MenuBar = null;
+				StatusBar = null;
 			}
 			base.RemoveAll ();
 		}
@@ -1644,15 +1644,15 @@ namespace Terminal.Gui {
 			nx = nx + top.Frame.Width > Driver.Cols ? Math.Max (Driver.Cols - top.Frame.Width, 0) : nx;
 			bool m, s;
 			if (SuperView == null || SuperView.GetType() != typeof(Toplevel))
-				m = Application.Top.HasMenuBar;
+				m = Application.Top.MenuBar != null;
 			else
-				m = ((Toplevel)SuperView).HasMenuBar;
+				m = ((Toplevel)SuperView).MenuBar != null;
 			int l = m ? 1 : 0;
 			ny = Math.Max (y, l);
-			if (SuperView == null)
+			if (SuperView == null || SuperView.GetType() != typeof(Toplevel))
 				s = Application.Top.HasStatusBar;
 			else
-				s = ((Toplevel)SuperView).HasStatusBar;
+				s = ((Toplevel)SuperView).StatusBar != null;
 			l = s ? Driver.Rows - 1 : Driver.Rows;
 			ny = Math.Min (ny, l);
 			ny = ny + top.Frame.Height > l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
@@ -1674,9 +1674,15 @@ namespace Terminal.Gui {
 							top.X = nx;
 							top.Y = ny;
 						}
-						if (HasStatusBar && ny + top.Frame.Height > Driver.Rows - 1) {
-							if (top.Height is Dim.DimFill)
-								top.Height = Dim.Fill () - 1;
+						if (StatusBar != null) {
+							if (ny + top.Frame.Height > Driver.Rows - 1) {
+								if (top.Height is Dim.DimFill)
+									top.Height = Dim.Fill () - 1;
+							}
+							if (StatusBar.Frame.Y != Driver.Rows - 1) {
+								StatusBar.Y = Driver.Rows - 1;
+								SetNeedsDisplay ();
+							}
 						}
 					}
 				}
@@ -1688,7 +1694,7 @@ namespace Terminal.Gui {
 		{
 			Application.CurrentView = this;
 
-			if (this == Application.Top) {
+			if (this == Application.Top || this == Application.Current) {
 				if (!NeedDisplay.IsEmpty) {
 					Driver.SetAttribute (Colors.TopLevel.Normal);
 					Clear (region);
