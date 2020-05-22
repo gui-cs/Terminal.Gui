@@ -35,7 +35,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (lbListView) + 1,
 				Width = 30
 			};
-			listview.OpenSelectedItem += (object sender, EventArgs text) => lbListView.Text = items [listview.SelectedItem];
+			listview.OpenSelectedItem += (object sender, ListViewItemEventArgs e) => lbListView.Text = items [listview.SelectedItem];
 			Win.Add (lbListView, listview);
 
 			// ComboBox

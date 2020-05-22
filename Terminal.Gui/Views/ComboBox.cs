@@ -54,12 +54,12 @@ namespace Terminal.Gui {
 				LayoutStyle = LayoutStyle.Computed,
 				ColorScheme = Colors.Dialog
 			};
-			listview.SelectedChanged += () => {
+			listview.SelectedChanged += (object sender, ListViewItemEventArgs e) => {
 				if(searchset.Count > 0)
 					SetValue (searchset [listview.SelectedItem]);
 			};
 
-			Application.OnLoad += () => {
+			Application.Loaded += (object sender, Application.ResizedEventArgs e) => {
 				// Determine if this view is hosted inside a dialog
 				for (View view = this.SuperView; view != null; view = view.SuperView) {
 					if (view is Dialog) {
