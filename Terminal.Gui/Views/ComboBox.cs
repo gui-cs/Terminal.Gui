@@ -52,7 +52,7 @@ namespace Terminal.Gui {
 			listview = new ListView(new Rect(x, y + 1, w, 0), listsource.ToList())
 			{
 				LayoutStyle = LayoutStyle.Computed,
-				ColorScheme = Colors.Dialog
+				ColorScheme = Colors.Menu
 			};
 			listview.SelectedChanged += (object sender, ListViewItemEventArgs e) => {
 				if(searchset.Count > 0)
@@ -109,6 +109,7 @@ namespace Terminal.Gui {
 
 				SetValue( searchset [listview.SelectedItem]);
 				search.CursorPosition = search.Text.Length;
+				Search_Changed (search, search.Text);
 				Changed?.Invoke (this, text);
 
 				searchset.Clear();
