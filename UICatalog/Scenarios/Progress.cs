@@ -13,7 +13,7 @@ namespace UICatalog {
 		private ProgressBar _activityProgressBar;
 		private ProgressBar _pulseProgressBar;
 		private Timer _timer;
-		private object _timeoutToken;
+		private object _timeoutToken = null;
 
 		public override void Setup ()
 		{
@@ -59,7 +59,9 @@ namespace UICatalog {
 		{
 			_timer?.Dispose ();
 			_timer = null;
-			Application.MainLoop.RemoveTimeout (_timeoutToken);
+			if (_timeoutToken != null) {
+				Application.MainLoop.RemoveTimeout (_timeoutToken);
+			}
 			base.Dispose (disposing);
 		}
 
@@ -93,7 +95,9 @@ namespace UICatalog {
 		{
 			_timer?.Dispose ();
 			_timer = null;
-			Application.MainLoop.RemoveTimeout (_timeoutToken);
+			if (_timeoutToken != null) {
+				Application.MainLoop.RemoveTimeout (_timeoutToken);
+			}
 
 			_activityProgressBar.Fraction = 1F;
 			_pulseProgressBar.Fraction = 1F;
