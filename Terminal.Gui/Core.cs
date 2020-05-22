@@ -1643,13 +1643,13 @@ namespace Terminal.Gui {
 			nx = Math.Max (x, 0);
 			nx = nx + top.Frame.Width > Driver.Cols ? Math.Max (Driver.Cols - top.Frame.Width, 0) : nx;
 			bool m, s;
-			if (SuperView == null)
+			if (SuperView == null || SuperView.GetType() != typeof(Toplevel))
 				m = Application.Top.MenuBar != null;
 			else
 				m = ((Toplevel)SuperView).MenuBar != null;
 			int l = m ? 1 : 0;
 			ny = Math.Max (y, l);
-			if (SuperView == null)
+			if (SuperView == null || SuperView.GetType() != typeof(Toplevel))
 				s = Application.Top.StatusBar != null;
 			else
 				s = ((Toplevel)SuperView).StatusBar != null;
