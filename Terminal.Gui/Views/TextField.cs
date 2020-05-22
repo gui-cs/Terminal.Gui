@@ -29,6 +29,11 @@ namespace Terminal.Gui {
 		public bool Used { get => used; set { used = value; } }
 
 		/// <summary>
+		/// If set to true its not allow any changes in the text.
+		/// </summary>
+		public bool ReadOnly { get; set; } = false;
+
+		/// <summary>
 		///   Changed event, raised when the text has clicked.
 		/// </summary>
 		/// <remarks>
@@ -95,7 +100,7 @@ namespace Terminal.Gui {
 			set {
 				base.Frame = value;
 				var w = base.Frame.Width;
-				//first = point > w ? point - w : 0;
+				first = point > w ? point - w : 0;
 				Adjust ();
 			}
 		}
@@ -115,6 +120,9 @@ namespace Terminal.Gui {
 			}
 
 			set {
+				if (ReadOnly)
+					return;
+
 				var oldText = ustring.Make (text);
 				text = TextModel.ToRunes (value);
 				if (!Secret && !isFromHistory) {
@@ -184,13 +192,16 @@ namespace Terminal.Gui {
 			int col = 0;
 			int width = Frame.Width;
 			var tcount = text.Count;
+			var roc = new Attribute (Color.DarkGray, Color.Gray);
 			for (int idx = 0; idx < tcount; idx++){
 				var rune = text [idx];
 				if (idx < p)
 					continue;
 				var cols = Rune.ColumnWidth (rune);
-				if (col == point && HasFocus && !Used && SelectedLength == 0)
+				if (col == point && HasFocus && !Used && SelectedLength == 0 && !ReadOnly)
 					Driver.SetAttribute (Colors.Menu.HotFocus);
+				else if (ReadOnly)
+					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : roc);
 				else
 					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : ColorScheme.Focus);
 				if (col + cols <= width)
@@ -261,6 +272,9 @@ namespace Terminal.Gui {
 			switch (kb.Key) {
 			case Key.DeleteChar:
 			case Key.ControlD:
+				if (ReadOnly)
+					return true;
+
 				if (SelectedLength == 0) {
 					if (text.Count == 0 || text.Count == point)
 						return true;
@@ -275,6 +289,9 @@ namespace Terminal.Gui {
 
 			case Key.Delete:
 			case Key.Backspace:
+				if (ReadOnly)
+					return true;
+
 				if (SelectedLength == 0) {
 					if (point == 0)
 						return true;
@@ -373,6 +390,9 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.ControlK: // kill-to-end
+				if (ReadOnly)
+					return true;
+
 				ClearAllSelection ();
 				if (point >= text.Count)
 					return true;
@@ -383,6 +403,9 @@ namespace Terminal.Gui {
 
 			// Undo
 			case Key.ControlZ:
+				if (ReadOnly)
+					return true;
+
 				if (historyText != null && historyText.Count > 0) {
 					isFromHistory = true;
 					if (idxhistoryText > 0)
@@ -396,6 +419,9 @@ namespace Terminal.Gui {
 
 			//Redo
 			case Key.ControlY: // Control-y, yank
+				if (ReadOnly)
+					return true;
+
 				if (historyText != null && historyText.Count > 0) {
 					isFromHistory = true;
 					if (idxhistoryText < historyText.Count - 1) {
@@ -455,6 +481,9 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.ControlX:
+				if (ReadOnly)
+					return true;
+
 				Cut ();
 				break;
 
@@ -471,6 +500,9 @@ namespace Terminal.Gui {
 				// Ignore other control characters.
 				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
 					return false;
+
+				if (ReadOnly)
+					return true;
 
 				if (SelectedLength != 0) {
 					DeleteSelectedText ();
@@ -639,7 +671,7 @@ namespace Terminal.Gui {
 				point = text.Count;
 			if (point < first)
 				point = 0;
-			return x;
+			return point;
 		}
 
 		void PrepareSelection (int x, int direction = 0)
@@ -682,8 +714,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Copy the selected text to the clipboard.
 		/// </summary>
-		public void Copy ()
+		public virtual void Copy ()
 		{
+			if (Secret)
+				return;
+
 			if (SelectedLength != 0) {
 				Clipboard.Contents = SelectedText;
 			}
@@ -692,7 +727,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Cut the selected text to the clipboard.
 		/// </summary>
-		public void Cut ()
+		public virtual void Cut ()
 		{
 			if (SelectedLength != 0) {
 				Clipboard.Contents = SelectedText;
@@ -715,8 +750,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Paste the selected text from the clipboard.
 		/// </summary>
-		public void Paste ()
+		public virtual void Paste ()
 		{
+			if (ReadOnly)
+				return;
+
 			string actualText = Text.ToString ();
 			int start = SelectedStart == -1 ? CursorPosition : SelectedStart;
 			ustring cbTxt = Clipboard.Contents?.ToString () ?? "";
