@@ -98,6 +98,36 @@ namespace UICatalog {
 				Y = Pos.At(10)
 			};
 			Win.Add (absoluteButton);
+
+			// Centering multiple controls horizontally. 
+			// This is intentionally convoluted to illustrate potential bugs.
+			var bottomLabel = new Label ("This should be the last line (Bug #xxx).") {
+				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				ColorScheme = Colors.TopLevel,
+				Width = Dim.Fill (),
+				X = Pos.Center (),
+				Y = Pos.Bottom (Win) - 3  // BUGBUG: -1 should be just above border; but it has to be -3
+			};
+
+			var centerButton = new Button ("Center") {
+				X = Pos.Center (),
+				Y = Pos.Top(bottomLabel) - 1
+			};
+			var leftButton = new Button ("Left") {
+				Y = Pos.Top (bottomLabel) - 1
+			};
+			var rightButton = new Button ("Right") {
+				Y = Pos.Top (bottomLabel) - 1
+			};
+
+			leftButton.X = Pos.Left (centerButton) - leftButton.Frame.Width - 5;
+			rightButton.X = Pos.Right (centerButton) + 5;
+
+			Win.Add (bottomLabel);
+			Win.Add (leftButton);
+			Win.Add (centerButton);
+			Win.Add (rightButton);
+
 		}
 
 		public override void Run ()
