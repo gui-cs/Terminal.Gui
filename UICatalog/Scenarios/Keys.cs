@@ -43,8 +43,8 @@ namespace UICatalog {
 			public override bool ProcessColdKey (KeyEvent keyEvent)
 			{
 				_processColdKeyList.Add (keyEvent.ToString ());
-				return base.ProcessColdKey (keyEvent);
 
+				return base.ProcessColdKey (keyEvent);
 			}
 		}
 
