@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -119,7 +120,7 @@ namespace UICatalog {
 			_rightPane.Add (_scenarioListView);
 
 			_categoryListView.SelectedItem = 0;
-			CategoryListView_SelectedChanged ();
+			_categoryListView.OnSelectedChanged ();
 
 			_statusBar = new StatusBar (new StatusItem [] {
 				//new StatusItem(Key.F1, "~F1~ Help", () => Help()),
@@ -228,6 +229,12 @@ namespace UICatalog {
 					used++;
 				}
 			}
+
+			public IList ToList ()
+			{
+				return Scenarios;
+			}
+
 		}
 
 		/// <summary>
@@ -255,7 +262,7 @@ namespace UICatalog {
 			}
 		}
 
-		private static void CategoryListView_SelectedChanged ()
+		private static void CategoryListView_SelectedChanged (object sender, ListViewItemEventArgs e)
 		{
 			var item = _categories [_categoryListView.SelectedItem];
 			List<Type> newlist;
