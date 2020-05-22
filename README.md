@@ -40,7 +40,7 @@ In addition, a complete Xterm/Vt100 terminal emulator that you can embed is now 
 * **Cross Platform** - Terminal drivers for Curses, [Windows Console](https://github.com/migueldeicaza/gui.cs/issues/27), and the .NET Console mean **Terminal.Gui** works well on both color and monochrome terminals and has mouse support on terminal emulators that support it.
 * **Keyboard and Mouse Input** - Both keyboard and mouse input are supported, including limited support for drag & drop.
 * **[Flexible Layout](https://migueldeicaza.github.io/gui.cs/articles/overview.html#layout)** - **Terminal.Gui** supports both *Absolute layout* and an innovative UI layout system referred to as *Computed Layout*. *Computed Layout* makes it easy to layout controls relative to each other and enables dynamic console GUIs.
-* **Clipboard support** - Cut, Copy, and Paste of text provided through the `[Clipboard](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Clipboard.html)` class.
+* **Clipboard support** - Cut, Copy, and Paste of text provided through the [`Clipboard`](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Clipboard.html) class.
 * **[Arbitrary Views](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.View.html)** - All visible UI elements are subclasses of the `View` class, and these in turn can contain an arbitrary number of sub-views.
 * **Advanced App Features** - The [Mainloop](https://migueldeicaza.github.io/gui.cs/api/Mono.Terminal/Mono.Terminal.MainLoop.html) supports processing events, idle handlers, timers, and monitoring file
 descriptors.
