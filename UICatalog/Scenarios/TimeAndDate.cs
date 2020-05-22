@@ -49,14 +49,14 @@ namespace UICatalog {
 					longTime.ReadOnly = !longTime.ReadOnly;
 					shortTime.ReadOnly = !shortTime.ReadOnly;
 
-					longTime.IsShortFormat = !longTime.IsShortFormat;
-					shortTime.IsShortFormat = !shortTime.IsShortFormat;
+					//longTime.IsShortFormat = !longTime.IsShortFormat;
+					//shortTime.IsShortFormat = !shortTime.IsShortFormat;
 
 					longDate.ReadOnly = !longDate.ReadOnly;
 					shortDate.ReadOnly = !shortDate.ReadOnly;
 
-					longDate.IsShortFormat = !longDate.IsShortFormat;
-					shortDate.IsShortFormat = !shortDate.IsShortFormat;
+					//longDate.IsShortFormat = !longDate.IsShortFormat;
+					//shortDate.IsShortFormat = !shortDate.IsShortFormat;
 				}
 			});
 		}
