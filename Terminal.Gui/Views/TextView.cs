@@ -39,11 +39,25 @@ namespace Terminal.Gui {
 			if (file == null)
 				throw new ArgumentNullException (nameof (file));
 			try {
+				FilePath = file;
 				var stream = File.OpenRead (file);
 			} catch {
 				return false;
 			}
 			LoadStream (File.OpenRead (file));
+			return true;
+		}
+
+		public bool CloseFile ()
+		{
+			if (FilePath == null)
+				throw new ArgumentNullException (nameof (FilePath));
+			try {
+				FilePath = null;
+				lines = new List<List<Rune>> ();
+			} catch {
+				return false;
+			}
 			return true;
 		}
 
@@ -119,6 +133,8 @@ namespace Terminal.Gui {
 			}
 			return sb.ToString ();
 		}
+
+		public string FilePath { get; set; }
 
 		/// <summary>
 		/// The number of text lines in the model
@@ -349,6 +365,18 @@ namespace Terminal.Gui {
 			ResetPosition ();
 			model.LoadStream(stream);
 			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Closes the contents of the stream into the TextView.
+		/// </summary>
+		/// <returns><c>true</c>, if stream was closed, <c>false</c> otherwise.</returns>
+		public bool CloseFile()
+		{
+			ResetPosition ();
+			var res = model.CloseFile ();
+			SetNeedsDisplay ();
+			return res;
 		}
 
 		/// <summary>

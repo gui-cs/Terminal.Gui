@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Mono.Terminal;
 using NStack;
 using Unix.Terminal;
@@ -183,12 +184,185 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static MouseEvent ToDriverMouse (Curses.MouseEvent cev)
+		Curses.Event? LastMouseButtonPressed = null;
+		bool IsButtonPressed = false;
+		bool cancelButtonClicked = false;
+		Point point;
+
+		MouseEvent ToDriverMouse (Curses.MouseEvent cev)
+		{
+			MouseFlags mouseFlag = MouseFlags.AllEvents;
+
+			if (LastMouseButtonPressed != null && cev.ButtonState != Curses.Event.ReportMousePosition) {
+				LastMouseButtonPressed = null;
+				IsButtonPressed = false;
+			}
+
+
+			if ((cev.ButtonState == Curses.Event.Button1Clicked || cev.ButtonState == Curses.Event.Button2Clicked ||
+				cev.ButtonState == Curses.Event.Button3Clicked) &&
+				LastMouseButtonPressed == null) {
+
+				IsButtonPressed = false;
+				mouseFlag = ProcessButtonClickedEvent (cev, mouseFlag);
+
+			} else if (((cev.ButtonState == Curses.Event.Button1Pressed || cev.ButtonState == Curses.Event.Button2Pressed ||
+				cev.ButtonState == Curses.Event.Button3Pressed) && LastMouseButtonPressed == null) ||
+				IsButtonPressed && cev.ButtonState == Curses.Event.ReportMousePosition) {
+
+				mouseFlag = (MouseFlags)cev.ButtonState;
+				if (cev.ButtonState != Curses.Event.ReportMousePosition)
+					LastMouseButtonPressed = cev.ButtonState;
+				IsButtonPressed = true;
+
+				if (cev.ButtonState == Curses.Event.ReportMousePosition) {
+					mouseFlag = (MouseFlags)LastMouseButtonPressed | MouseFlags.ReportMousePosition;
+					point = new Point ();
+					cancelButtonClicked = true;
+				} else {
+					point = new Point () {
+						X = cev.X,
+						Y = cev.Y
+					};
+				}
+
+				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
+					Task.Run (async () => {
+						while (IsButtonPressed && LastMouseButtonPressed != null) {
+							await Task.Delay (200);
+							var me = new MouseEvent () {
+								X = cev.X,
+								Y = cev.Y,
+								Flags = mouseFlag
+							};
+
+							var view = Application.wantContinuousButtonPressedView;
+							if (view == null)
+								break;
+							if (IsButtonPressed && LastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
+								mouseHandler (me);
+								mainLoop.Driver.Wakeup ();
+							}
+						}
+					});
+				}
+
+
+			} else if ((cev.ButtonState == Curses.Event.Button1Released || cev.ButtonState == Curses.Event.Button2Released ||
+				cev.ButtonState == Curses.Event.Button3Released)) {
+
+				mouseFlag = ProcessButtonReleasedEvent (cev, mouseFlag);
+				IsButtonPressed = false;
+
+			} else if (cev.ButtonState == Curses.Event.Button4Pressed) {
+
+				mouseFlag = MouseFlags.WheeledUp;
+
+			} else if (cev.ButtonState == Curses.Event.ReportMousePosition && cev.X == point.X && cev.Y == point.Y) {
+
+				mouseFlag = MouseFlags.WheeledDown;
+
+			}
+			else if (cev.ButtonState == Curses.Event.ReportMousePosition) {
+
+				mouseFlag = MouseFlags.ReportMousePosition;
+			} else {
+				mouseFlag = (MouseFlags)cev.ButtonState;
+			}
+
+			point = new Point () {
+				X = cev.X,
+				Y = cev.Y
+			};
+
+
+
+			if (cev.ID != 0)
+				mouseFlag = MouseFlags.WheeledDown;
+
+			return new MouseEvent () {
+				X = cev.X,
+				Y = cev.Y,
+				//Flags = (MouseFlags)cev.ButtonState
+				Flags = mouseFlag
+			};
+		}
+
+		private MouseFlags ProcessButtonClickedEvent (Curses.MouseEvent cev, MouseFlags mf)
+		{
+			LastMouseButtonPressed = cev.ButtonState;
+			mf = GetButtonState (cev, true);
+			mouseHandler (ProcessButtonState (cev, mf));
+			if (LastMouseButtonPressed != null && LastMouseButtonPressed == cev.ButtonState) {
+				mf = GetButtonState (cev, false);
+				mouseHandler (ProcessButtonState (cev, mf));
+				if (LastMouseButtonPressed != null && LastMouseButtonPressed == cev.ButtonState) {
+					mf = (MouseFlags)cev.ButtonState;
+				}
+			}
+			LastMouseButtonPressed = null;
+			return mf;
+		}
+
+		private MouseFlags ProcessButtonReleasedEvent (Curses.MouseEvent cev, MouseFlags mf)
+		{			
+			mf = (MouseFlags)cev.ButtonState;
+			mouseHandler (ProcessButtonState (cev, mf));
+			if (!cancelButtonClicked && LastMouseButtonPressed == null)
+				mf = GetButtonState (cev);
+			else
+				cancelButtonClicked = false;
+			return mf;
+		}
+
+		MouseFlags GetButtonState (Curses.MouseEvent cev, bool pressed = false)
+		{
+			MouseFlags mf = default;
+			switch (cev.ButtonState) {
+			case Curses.Event.Button1Clicked:
+				if (pressed)
+					mf = MouseFlags.Button1Pressed;
+				else
+					mf = MouseFlags.Button1Released;
+				break;
+
+			case Curses.Event.Button2Clicked:
+				if (pressed)
+					mf = MouseFlags.Button2Pressed;
+				else
+					mf = MouseFlags.Button2Released;
+				break;
+
+			case Curses.Event.Button3Clicked:
+				if (pressed)
+					mf = MouseFlags.Button3Pressed;
+				else
+					mf = MouseFlags.Button3Released;
+				break;
+
+			case Curses.Event.Button1Released:
+				mf = MouseFlags.Button1Clicked;
+				break;
+
+			case Curses.Event.Button2Released:
+				mf = MouseFlags.Button2Clicked;
+				break;
+
+			case Curses.Event.Button3Released:
+				mf = MouseFlags.Button3Clicked;
+				break;
+
+
+			}
+			return mf;
+		}
+
+		MouseEvent ProcessButtonState (Curses.MouseEvent cev, MouseFlags mf)
 		{
 			return new MouseEvent () {
 				X = cev.X,
 				Y = cev.Y,
-				Flags = (MouseFlags)cev.ButtonState
+				Flags = mf
 			};
 		}
 
@@ -252,10 +426,15 @@ namespace Terminal.Gui {
 			keyUpHandler (new KeyEvent ((Key)wch));
 		}
 
+		Action<MouseEvent> mouseHandler;
+		MainLoop mainLoop;
+
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-			Curses.timeout (-1);
+			Curses.timeout (0);
+			this.mouseHandler = mouseHandler;
+			this.mainLoop = mainLoop;
 
 			(mainLoop.Driver as Mono.Terminal.UnixMainLoop).AddWatch (0, Mono.Terminal.UnixMainLoop.Condition.PollIn, x => {
 				ProcessInput (keyHandler, keyUpHandler, mouseHandler);
@@ -425,21 +604,21 @@ namespace Terminal.Gui {
 			Console.Out.Flush ();
 		}
 
-		int lastMouseInterval;
-		bool mouseGrabbed;
+		//int lastMouseInterval;
+		//bool mouseGrabbed;
 
 		public override void UncookMouse ()
 		{
-			if (mouseGrabbed)
-				return;
-			lastMouseInterval = Curses.mouseinterval (0);
-			mouseGrabbed = true;
+			//if (mouseGrabbed)
+			//	return;
+			//lastMouseInterval = Curses.mouseinterval (0);
+			//mouseGrabbed = true;
 		}
 
 		public override void CookMouse ()
 		{
-			mouseGrabbed = false;
-			Curses.mouseinterval (lastMouseInterval);
+			//mouseGrabbed = false;
+			//Curses.mouseinterval (lastMouseInterval);
 		}
 	}
 

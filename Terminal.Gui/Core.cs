@@ -126,7 +126,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		/// <returns>true if the event was handled</returns>
-		public virtual bool KeyDown (KeyEvent keyEvent)
+		public virtual bool OnKeyDown (KeyEvent keyEvent)
 		{
 			return false;
 		}
@@ -136,7 +136,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		/// <returns>true if the event was handled</returns>
-		public virtual bool KeyUp (KeyEvent keyEvent)
+		public virtual bool OnKeyUp (KeyEvent keyEvent)
 		{
 			return false;
 		}
@@ -607,7 +607,7 @@ namespace Terminal.Gui {
 				return;
 
 			while (subviews.Count > 0) {
-				Remove (subviews[0]);
+				Remove (subviews [0]);
 			}
 		}
 
@@ -705,9 +705,9 @@ namespace Terminal.Gui {
 		{
 			PerformActionForSubview (subview, x => {
 				var idx = subviews.IndexOf (x);
-				if (idx+1 < subviews.Count) {
+				if (idx + 1 < subviews.Count) {
 					subviews.Remove (x);
-					subviews.Insert (idx+1, x);
+					subviews.Insert (idx + 1, x);
 				}
 			});
 		}
@@ -910,7 +910,7 @@ namespace Terminal.Gui {
 						OnEnter ();
 					else
 						OnLeave ();
-					SetNeedsDisplay ();
+				SetNeedsDisplay ();
 				base.HasFocus = value;
 
 				// Remove focus down the chain of subviews if focus is removed
@@ -1062,18 +1062,33 @@ namespace Terminal.Gui {
 			focused.EnsureFocus ();
 
 			// Send focus upwards
-			SuperView?.SetFocus(this);
+			SuperView?.SetFocus (this);
+		}
+
+		/// <summary>
+		/// Specifies the event arguments for <see cref="KeyEvent"/>
+		/// </summary>
+		public class KeyEventEventArgs : EventArgs {
+			/// <summary>
+			/// Constructs.
+			/// </summary>
+			/// <param name="ke"></param>
+			public KeyEventEventArgs(KeyEvent ke) => KeyEvent = ke;
+			/// <summary>
+			/// The <see cref="KeyEvent"/> for the event.
+			/// </summary>
+			public KeyEvent KeyEvent { get; set; }
 		}
 
 		/// <summary>
 		/// Invoked when a character key is pressed and occurs after the key up event.
 		/// </summary>
-		public Action<KeyEvent> OnKeyPress;
+		public event EventHandler<KeyEventEventArgs> KeyPress;
 
 		/// <inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			OnKeyPress?.Invoke (keyEvent);
+			KeyPress?.Invoke (this, new KeyEventEventArgs(keyEvent));
 			if (Focused?.ProcessKey (keyEvent) == true)
 				return true;
 
@@ -1083,6 +1098,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc cref="ProcessHotKey"/>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
+			KeyPress?.Invoke (this, new KeyEventEventArgs (keyEvent));
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1094,6 +1110,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc cref="ProcessColdKey"/>
 		public override bool ProcessColdKey (KeyEvent keyEvent)
 		{
+			KeyPress?.Invoke (this, new KeyEventEventArgs(keyEvent));
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1105,16 +1122,16 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is pressed
 		/// </summary>
-		public Action<KeyEvent> OnKeyDown;
+		public event EventHandler<KeyEventEventArgs> KeyDown;
 
-		/// <inheritdoc cref="KeyDown"/>
-		public override bool KeyDown (KeyEvent keyEvent)
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
-			OnKeyDown?.Invoke (keyEvent);
+			KeyDown?.Invoke (this, new KeyEventEventArgs (keyEvent));
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.KeyDown (keyEvent))
+				if (view.OnKeyDown (keyEvent))
 					return true;
 
 			return false;
@@ -1123,16 +1140,16 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is released
 		/// </summary>
-		public Action<KeyEvent> OnKeyUp;
+		public event EventHandler<KeyEventEventArgs> KeyUp;
 
-		/// <inheritdoc cref="KeyUp"/>
-		public override bool KeyUp (KeyEvent keyEvent)
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
-			OnKeyUp?.Invoke (keyEvent);
+			KeyUp?.Invoke (this, new KeyEventEventArgs (keyEvent));
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.KeyUp (keyEvent))
+				if (view.OnKeyUp (keyEvent))
 					return true;
 
 			return false;
@@ -1174,7 +1191,7 @@ namespace Terminal.Gui {
 		public void FocusLast ()
 		{
 			if (subviews == null) {
-				SuperView?.SetFocus(this);
+				SuperView?.SetFocus (this);
 				return;
 			}
 
@@ -1221,7 +1238,7 @@ namespace Terminal.Gui {
 						w.FocusLast ();
 
 					SetFocus (w);
-				return true;
+					return true;
 				}
 			}
 			if (focused != null) {
@@ -1538,12 +1555,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Check id current toplevel has menu bar
 		/// </summary>
-		public bool HasMenuBar { get; set; }
+		public MenuBar MenuBar { get; set; }
 
 		/// <summary>
 		/// Check id current toplevel has status bar
 		/// </summary>
-		public bool HasStatusBar { get; set; }
+		public StatusBar StatusBar { get; set; }
 
 		///<inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent keyEvent)
@@ -1602,9 +1619,9 @@ namespace Terminal.Gui {
 		{
 			if (this == Application.Top) {
 				if (view is MenuBar)
-					HasMenuBar = true;
+					MenuBar = view as MenuBar;
 				if (view is StatusBar)
-					HasStatusBar = true;
+					StatusBar = view as StatusBar;
 			}
 			base.Add (view);
 		}
@@ -1614,9 +1631,9 @@ namespace Terminal.Gui {
 		{
 			if (this == Application.Top) {
 				if (view is MenuBar)
-					HasMenuBar = true;
+					MenuBar = null;
 				if (view is StatusBar)
-					HasStatusBar = true;
+					StatusBar = null;
 			}
 			base.Remove (view);
 		}
@@ -1625,8 +1642,8 @@ namespace Terminal.Gui {
 		public override void RemoveAll ()
 		{
 			if (this == Application.Top) {
-				HasMenuBar = false;
-				HasStatusBar = false;
+				MenuBar = null;
+				StatusBar = null;
 			}
 			base.RemoveAll ();
 		}
@@ -1634,21 +1651,21 @@ namespace Terminal.Gui {
 		internal void EnsureVisibleBounds (Toplevel top, int x, int y, out int nx, out int ny)
 		{
 			nx = Math.Max (x, 0);
-			nx = nx + top.Frame.Width > Driver.Cols ? Math.Max(Driver.Cols - top.Frame.Width, 0) : nx;
+			nx = nx + top.Frame.Width > Driver.Cols ? Math.Max (Driver.Cols - top.Frame.Width, 0) : nx;
 			bool m, s;
-			if (SuperView == null)
-				m = Application.Top.HasMenuBar;
+			if (SuperView == null || SuperView.GetType() != typeof(Toplevel))
+				m = Application.Top.MenuBar != null;
 			else
-				m = ((Toplevel)SuperView).HasMenuBar;
+				m = ((Toplevel)SuperView).MenuBar != null;
 			int l = m ? 1 : 0;
 			ny = Math.Max (y, l);
-			if (SuperView == null)
-				s = Application.Top.HasStatusBar;
+			if (SuperView == null || SuperView.GetType() != typeof(Toplevel))
+				s = Application.Top.StatusBar != null;
 			else
-				s = ((Toplevel)SuperView).HasStatusBar;
+				s = ((Toplevel)SuperView).StatusBar != null;
 			l = s ? Driver.Rows - 1 : Driver.Rows;
 			ny = Math.Min (ny, l);
-			ny = ny + top.Frame.Height > l ? Math.Max(l - top.Frame.Height, m ? 1 : 0) : ny;
+			ny = ny + top.Frame.Height > l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
 		}
 
 		internal void PositionToplevels ()
@@ -1667,9 +1684,15 @@ namespace Terminal.Gui {
 							top.X = nx;
 							top.Y = ny;
 						}
-						if (HasStatusBar && ny + top.Frame.Height > Driver.Rows - 1) {
-							if (top.Height is Dim.DimFill)
-								top.Height = Dim.Fill () - 1;
+						if (StatusBar != null) {
+							if (ny + top.Frame.Height > Driver.Rows - 1) {
+								if (top.Height is Dim.DimFill)
+									top.Height = Dim.Fill () - 1;
+							}
+							if (StatusBar.Frame.Y != Driver.Rows - 1) {
+								StatusBar.Y = Driver.Rows - 1;
+								SetNeedsDisplay ();
+							}
 						}
 					}
 				}
@@ -1681,7 +1704,7 @@ namespace Terminal.Gui {
 		{
 			Application.CurrentView = this;
 
-			if (this == Application.Top) {
+			if (this == Application.Top || this == Application.Current) {
 				if (!NeedDisplay.IsEmpty) {
 					Driver.SetAttribute (Colors.TopLevel.Normal);
 					Clear (region);
@@ -1796,7 +1819,7 @@ namespace Terminal.Gui {
 			this.Title = title;
 			int wb = 1 + padding;
 			this.padding = padding;
- 			contentView = new ContentView () {
+			contentView = new ContentView () {
 				X = wb,
 				Y = wb,
 				Width = Dim.Fill (wb),
@@ -2008,7 +2031,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   See also <see cref="Timeout"/>
 		/// </remarks>
-		static public event EventHandler Iteration;
+		public static event EventHandler Iteration;
 
 		/// <summary>
 		/// Returns a rectangle that is centered in the screen for the provided size.
@@ -2079,7 +2102,7 @@ namespace Terminal.Gui {
 			if (UseSystemConsole) {
 				mainLoopDriver = new Mono.Terminal.NetMainLoop ();
 				Driver = new NetDriver ();
-			} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows){
+			} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 				var windowsDriver = new WindowsDriver ();
 				mainLoopDriver = windowsDriver;
 				Driver = windowsDriver;
@@ -2137,7 +2160,7 @@ namespace Terminal.Gui {
 		static void ProcessKeyEvent (KeyEvent ke)
 		{
 
-			var chain = toplevels.ToList();
+			var chain = toplevels.ToList ();
 			foreach (var topLevel in chain) {
 				if (topLevel.ProcessHotKey (ke))
 					return;
@@ -2165,7 +2188,7 @@ namespace Terminal.Gui {
 		{
 			var chain = toplevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.KeyDown (ke))
+				if (topLevel.OnKeyDown (ke))
 					return;
 				if (topLevel.Modal)
 					break;
@@ -2177,7 +2200,7 @@ namespace Terminal.Gui {
 		{
 			var chain = toplevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.KeyUp (ke))
+				if (topLevel.OnKeyUp (ke))
 					return;
 				if (topLevel.Modal)
 					break;
@@ -2194,7 +2217,7 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			if (start.InternalSubviews != null){
+			if (start.InternalSubviews != null) {
 				int count = start.InternalSubviews.Count;
 				if (count > 0) {
 					var rx = x - startFrame.X;
@@ -2210,8 +2233,8 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			resx = x-startFrame.X;
-			resy = y-startFrame.Y;
+			resx = x - startFrame.X;
+			resy = y - startFrame.Y;
 			return start;
 		}
 
@@ -2242,7 +2265,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Merely a debugging aid to see the raw mouse events
 		/// </summary>
-		static public Action<MouseEvent> RootMouseEvent;
+		public static Action<MouseEvent> RootMouseEvent;
 
 		internal static View wantContinuousButtonPressedView;
 		static View lastMouseOwnerView;
@@ -2267,8 +2290,12 @@ namespace Terminal.Gui {
 					OfY = me.Y - newxy.Y,
 					View = view
 				};
-				mouseGrabView.MouseEvent (nme);
-				return;
+				if (OutsideFrame (new Point (nme.X, nme.Y), mouseGrabView.Frame))
+					lastMouseOwnerView.OnMouseLeave (me);
+				if (mouseGrabView != null) {
+					mouseGrabView.MouseEvent (nme);
+					return;
+				}
 			}
 
 			if (view != null) {
@@ -2303,10 +2330,16 @@ namespace Terminal.Gui {
 			}
 		}
 
+		static bool OutsideFrame (Point p, Rect r)
+		{
+			return p.X < 0 || p.X > r.Width - 1 || p.Y < 0 || p.Y > r.Height - 1;
+		}
+
 		/// <summary>
-		/// Action that is invoked once at beginning.
+		/// This event is fired once when the application is first loaded. The dimensions of the
+		/// terminal are provided.
 		/// </summary>
-		static public Action OnLoad;
+		public static event EventHandler<ResizedEventArgs> Loaded;
 
 		/// <summary>
 		/// Building block API: Prepares the provided toplevel for execution.
@@ -2321,7 +2354,7 @@ namespace Terminal.Gui {
 		///  the <see cref="RunLoop"/> method, and then the <see cref="End(RunState)"/> method upon termination which will
 		///   undo these changes.
 		/// </remarks>
-		static public RunState Begin (Toplevel toplevel)
+		public static RunState Begin (Toplevel toplevel)
 		{
 			if (toplevel == null)
 				throw new ArgumentNullException (nameof (toplevel));
@@ -2330,11 +2363,11 @@ namespace Terminal.Gui {
 			Init ();
 			if (toplevel is ISupportInitializeNotification initializableNotification &&
 			    !initializableNotification.IsInitialized) {
-				initializableNotification.BeginInit();
-				initializableNotification.EndInit();
+				initializableNotification.BeginInit ();
+				initializableNotification.EndInit ();
 			} else if (toplevel is ISupportInitialize initializable) {
-				initializable.BeginInit();
-				initializable.EndInit();
+				initializable.BeginInit ();
+				initializable.EndInit ();
 			}
 			toplevels.Push (toplevel);
 			Current = toplevel;
@@ -2342,7 +2375,7 @@ namespace Terminal.Gui {
 			if (toplevel.LayoutStyle == LayoutStyle.Computed)
 				toplevel.RelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
 			toplevel.LayoutSubviews ();
-			OnLoad?.Invoke ();
+			Loaded?.Invoke (null, new ResizedEventArgs () { Rows = Driver.Rows, Cols = Driver.Cols } );
 			toplevel.WillPresent ();
 			Redraw (toplevel);
 			toplevel.PositionCursor ();
@@ -2355,7 +2388,7 @@ namespace Terminal.Gui {
 		/// Building block API: completes the execution of a Toplevel that was started with Begin.
 		/// </summary>
 		/// <param name="runState">The runstate returned by the <see cref="Begin(Toplevel)"/> method.</param>
-		static public void End (RunState runState)
+		public static void End (RunState runState)
 		{
 			if (runState == null)
 				throw new ArgumentNullException (nameof (runState));
@@ -2409,9 +2442,8 @@ namespace Terminal.Gui {
 			toplevels.Pop ();
 			if (toplevels.Count == 0)
 				Shutdown ();
-			else
-			{
-				Current = toplevels.Peek();
+			else {
+				Current = toplevels.Peek ();
 				Refresh ();
 			}
 		}
@@ -2480,7 +2512,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void Run<T> () where T : Toplevel, new()
 		{
-			Init (() => new T());
+			Init (() => new T ());
 			Run (Top);
 		}
 
@@ -2525,14 +2557,28 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoked when the terminal was resized.
+		/// Event arguments for the <see cref="T:Terminal.Gui.Application.Resized"/> event.
 		/// </summary>
-		static public Action OnResized;
+		public class ResizedEventArgs : EventArgs {
+			/// <summary>
+			/// The number of rows in the resized terminal.
+			/// </summary>
+			public int Rows { get; set; }
+			/// <summary>
+			/// The number of columns in the resized terminal.
+			/// </summary>
+			public int Cols { get; set; }
+		}
+
+		/// <summary>
+		/// Invoked when the terminal was resized. The new size of the terminal is provided.
+		/// </summary>
+		public static event EventHandler<ResizedEventArgs> Resized;
 
 		static void TerminalResized ()
 		{
-			OnResized?.Invoke ();
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
+			Resized?.Invoke (null, new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
 			Driver.Clip = full;
 			foreach (var t in toplevels) {
 				t.PositionToplevels ();
