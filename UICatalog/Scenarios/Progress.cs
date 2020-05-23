@@ -6,8 +6,9 @@ namespace UICatalog {
 	// 
 	// This would be a great scenario to show of threading (Issue #471)
 	//
-	[ScenarioMetadata (Name: "Progress", Description: "Shows off ProgressBar.")]
+	[ScenarioMetadata (Name: "Progress", Description: "Shows off ProgressBar and Threading")]
 	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Threading")]
 	class Progress : Scenario {
 
 		private ProgressBar _activityProgressBar;
@@ -19,23 +20,28 @@ namespace UICatalog {
 		{
 			var pulseButton = new Button ("Pulse") {
 				X = Pos.Center (),
-				Y = Pos.Center () - 5,
+				Y = Pos.Center () - 3,
 				Clicked = () => Pulse ()
 			};
 
-			Win.Add (new Button ("Start Timer") {
-				X = Pos.Left(pulseButton) - 20,
+			var startButton = new Button ("Start Timer") {
 				Y = Pos.Y(pulseButton),
 				Clicked = () => Start ()
-			});
+			};
 
-			Win.Add (new Button ("Stop Timer") {
-				X = Pos.Right (pulseButton) + 20, // BUGBUG: Right is somehow adding additional width
+			var stopbutton = new Button ("Stop Timer") {
 				Y = Pos.Y (pulseButton),
 				Clicked = () => Stop()
-			});
+			};
 
+			// Center three buttons with 5 spaces between them
+			// TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
+			startButton.X = Pos.Left (pulseButton) - (Pos.Right (startButton) - Pos.Left (startButton)) - 5;
+			stopbutton.X = Pos.Right (pulseButton) + 5;
+
+			Win.Add (startButton);
 			Win.Add (pulseButton);
+			Win.Add (stopbutton);
 
 			_activityProgressBar = new ProgressBar () {
 				X = Pos.Center (),
@@ -86,7 +92,7 @@ namespace UICatalog {
 			_timer = new Timer ((o) => {
 				// BUGBUG: #409 - Invoke does not cause Wakeup as it should
 				Application.MainLoop.Invoke (() => Pulse ());
-			}, null, 0, 250);
+			}, null, 0, 20);
 		}
 
 		private void Stop ()

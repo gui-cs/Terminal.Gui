@@ -6,7 +6,7 @@ using Terminal.Gui;
 using NStack;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Lists", Description: "Demonstrates list selections")]
+	[ScenarioMetadata (Name: "ListView & ComboBox", Description: "Demonstrates a ListView populating a ComboBox that acts as a filter.")]
 	[ScenarioCategory ("Controls")]
 	class ListsAndCombos : Scenario {
 
