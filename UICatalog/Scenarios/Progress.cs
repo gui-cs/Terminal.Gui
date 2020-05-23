@@ -90,7 +90,6 @@ namespace UICatalog {
 			_pulseProgressBar.Fraction = 0F;
 
 			_timer = new Timer ((o) => {
-				// BUGBUG: #409 - Invoke does not cause Wakeup as it should
 				Application.MainLoop.Invoke (() => Pulse ());
 			}, null, 0, 20);
 		}
