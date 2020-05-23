@@ -83,11 +83,11 @@ namespace UICatalog {
 			};
 			Win.Add (keyPressedLabel);
 			// BUGBUG: Label is not positioning right with Pos, so using TextField instead
-			var labelKeypress = new TextField ("") {
-				X = Pos.Right (keyPressedLabel) + 1,
+			var labelKeypress = new Label ("") {
+				X = Pos.Left (edit),
 				Y = Pos.Top (keyPressedLabel),
 				Width = 20,
-				//TextAlignment = Terminal.Gui.TextAlignment.Left,
+				TextAlignment = Terminal.Gui.TextAlignment.Centered,
 				ColorScheme = Colors.Error,
 			};
 			Win.Add (labelKeypress);
