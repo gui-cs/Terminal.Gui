@@ -162,6 +162,9 @@ namespace Terminal.Gui {
 		/// <param name="children">The items in the current menu.</param>
 		public MenuBarItem (ustring title, MenuItem [] children)
 		{
+			if (children == null)
+				throw new ArgumentNullException (nameof (children), "The parameter cannot be null. Use an empty array instead.");
+
 			SetTitle (title ?? "");
 			Children = children;
 		}
