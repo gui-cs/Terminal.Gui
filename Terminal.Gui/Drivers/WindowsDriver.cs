@@ -522,9 +522,9 @@ namespace Terminal.Gui {
 		void WindowsInputHandler ()
 		{
 			while (true) {
-				waitForProbe.Wait ();
+				waitForProbe.Wait ();				
 				waitForProbe.Reset ();
-
+				
 				uint numberEventsRead = 0;
 
 				WindowsConsole.ReadConsoleInput (winConsole.InputHandle, records, 1, out numberEventsRead);
@@ -568,8 +568,19 @@ namespace Terminal.Gui {
 			waitForProbe.Set ();
 
 			try {
-				if (!tokenSource.IsCancellationRequested)
-					eventReady.Wait (waitTimeout, tokenSource.Token);
+				while (result == null) {
+					if (wait && waitTimeout == -1) {
+						waitTimeout = 0;
+					}
+					if (!tokenSource.IsCancellationRequested)
+						eventReady.Wait (waitTimeout, tokenSource.Token);
+					if (result != null) {
+						break;
+					}
+					if (mainLoop.timeouts.Count > 0 || mainLoop.idleHandlers.Count > 0) {
+						return true;
+					}
+				}
 			} catch (OperationCanceledException) {
 				return true;
 			} finally {
