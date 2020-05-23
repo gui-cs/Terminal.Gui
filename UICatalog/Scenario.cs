@@ -6,7 +6,7 @@ using Terminal.Gui;
 
 namespace UICatalog {
 	/// <summary>
-	/// Base class for each demo/scenario. To define a new sceanrio simply
+	/// Base class for each demo/scenario. To define a new scenario simply
 	/// 
 	/// 1) declare a class derived from Scenario,
 	/// 2) Set Name and Description as appropriate using [ScenarioMetadata] attribute
@@ -14,8 +14,8 @@ namespace UICatalog {
 	/// 4) Implement Setup.
 	/// 5) Optionally, implement Run.
 	/// 
-	/// The Main program uses reflection to find all sceanarios and adds them to the
-	/// ListViews. Press ENTER to run the selected sceanrio. Press CTRL-Q to exit it.
+	/// The Main program uses reflection to find all scenarios and adds them to the
+	/// ListViews. Press ENTER to run the selected scenario. Press CTRL-Q to exit it.
 	/// </summary>
 	public class Scenario : IDisposable {
 		private bool _disposedValue;
@@ -26,6 +26,7 @@ namespace UICatalog {
 		public Toplevel Top { get; set; }
 
 		/// <summary>
+		/// The Window for the Scenario. This should be set within the `Application.Top` in most cases.
 		/// </summary>
 		public Window Win { get; set; }
 
@@ -88,7 +89,7 @@ namespace UICatalog {
 		public string GetName () => ScenarioMetadata.GetName (this.GetType ());
 
 		/// <summary>
-		/// Helper to get the Scenario Descripiton
+		/// Helper to get the Scenario Description
 		/// </summary>
 		/// <returns></returns>
 		public string GetDescription () => ScenarioMetadata.GetDescription (this.GetType ());
@@ -137,7 +138,7 @@ namespace UICatalog {
 		}
 
 		/// <summary>
-		/// Runs the scenario. Override to start the scearnio using a Top level different than `Top`.
+		/// Runs the scenario. Override to start the scenario using a Top level different than `Top`.
 		/// </summary>
 		public virtual void Run ()
 		{
