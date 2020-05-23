@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
 
@@ -9,18 +10,24 @@ namespace UICatalog {
 		public override void Setup ()
 		{
 			int i = 1;
-			string txt = "Hello world, how are you doing today";
-			var labelList = new List<Label> ();
-			labelList.Add (new Label ($"Label:"));
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1 });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1 });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1 });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1 });
-			txt += "\nSecond line";
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (1), Height = 4, X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()) + 1 });
+			string txt = "Hello world, how are you doing today?";
 
-			Win.Add (labelList.ToArray ());
-			Win.LayoutSubviews ();
+			var alignments = Enum.GetValues (typeof (Terminal.Gui.TextAlignment)).Cast<Terminal.Gui.TextAlignment> ().ToList();
+
+			foreach (var alignment in alignments) {
+				Win.Add (new Label ($"{alignment}:") { Y = ++i });
+				Win.Add (new Label (txt) { TextAlignment = alignment, Y = i++, Width = Dim.Fill(), ColorScheme = Colors.Dialog });
+			}
+
+			// Demonstrate that wrapping labels are not yet implemented (#352)
+			txt += "\nSecond line";
+			Win.Add (new Label ($"Demonstrating multi-line (note wrap is not yet implemented):") { Y = ++i });
+
+			foreach (var alignment in alignments) {
+				Win.Add (new Label ($"{alignment}:") { Y = ++i });
+				Win.Add (new Label (txt) { TextAlignment = alignment, Y = ++i, Width = Dim.Fill (), Height = 2, ColorScheme = Colors.Dialog });
+				i += 2;
+			}
 		}
 	}
 }

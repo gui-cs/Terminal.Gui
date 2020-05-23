@@ -9,7 +9,7 @@ using System;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// The Key enumeration contains special encoding for some keys, but can also
+	/// The <see cref="Key"/> enumeration contains special encoding for some keys, but can also
 	/// encode all the unicode values that can be passed.   
 	/// </summary>
 	/// <remarks>
@@ -320,18 +320,23 @@ namespace Terminal.Gui {
 		//public bool IsCtrl => ((uint)Key >= 1) && ((uint)Key <= 26);
 		public bool IsCtrl => (Key & Key.CtrlMask) != 0;
 
+		/// <summary>
+		/// Constructs a new <see cref="KeyEvent"/>
+		/// </summary>
 		public KeyEvent ()
 		{
 			Key = Key.Unknown;
 		}
+
 		/// <summary>
-		///   Constructs a new KeyEvent from the provided Key value - can be a rune cast into a Key value
+		///   Constructs a new <see cref="KeyEvent"/> from the provided Key value - can be a rune cast into a Key value
 		/// </summary>
 		public KeyEvent (Key k)
 		{
 			Key = k;
 		}
 
+		///<inheritdoc cref="ToString"/>
 		public override string ToString ()
 		{
 			string msg = "";
@@ -508,9 +513,9 @@ namespace Terminal.Gui {
 		public View View;
 
 		/// <summary>
-		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.MouseEvent"/>.
+		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.
 		/// </summary>
-		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.MouseEvent"/>.</returns>
+		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</returns>
 		public override string ToString ()
 		{
 			return $"({X},{Y}:{Flags}";

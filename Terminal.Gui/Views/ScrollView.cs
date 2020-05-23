@@ -70,7 +70,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Gui.ScrollBarView"/> class.
+		/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class.
 		/// </summary>
 		/// <param name="rect">Frame for the scrollbar.</param>
 		/// <param name="size">The size that this scrollbar represents.</param>
@@ -518,6 +518,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp)

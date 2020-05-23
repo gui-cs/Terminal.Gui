@@ -10,18 +10,18 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	///   Button is a view that provides an item that invokes a callback when activated.
+	///   Button is a <see cref="View"/> that provides an item that invokes an <see cref="Action"/> when activated by the user.
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	///   Provides a button that can be clicked, or pressed with
-	///   the enter key and processes hotkeys (the first uppercase
-	///   letter in the button becomes the hotkey).
+	///   Provides a button showing text invokes an <see cref="Action"/> when clicked on with a mouse
+	///   or when the user presses SPACE, ENTER, or hotkey. The hotkey is specified by the first uppercase
+	///   letter in the button.
 	/// </para>
 	/// <para>
-	///   If the button is configured as the default (IsDefault) the button
-	///   will respond to the return key is no other view processes it, and
-	///   turns this into a clicked event.
+	///   When the button is configured as the default (<see cref="IsDefault"/>) and the user presses
+	///   the ENTER key, if no other <see cref="View"/> processes the <see cref="KeyEvent"/>, the <see cref="Button"/>'s
+	///   <see cref="Action"/> will be invoked.
 	/// </para>
 	/// </remarks>
 	public class Button : View {
@@ -32,7 +32,7 @@ namespace Terminal.Gui {
 		bool is_default;
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Button"/> is the default action to activate on return on a dialog.
+		/// Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.
 		/// </summary>
 		/// <value><c>true</c> if is default; otherwise, <c>false</c>.</value>
 		public bool IsDefault {
@@ -44,7 +44,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Clicked event, raised when the button is clicked.
+		///   Clicked <see cref="Action"/>, raised when the button is clicked.
 		/// </summary>
 		/// <remarks>
 		///   Client code can hook up to this event, it is
@@ -54,15 +54,14 @@ namespace Terminal.Gui {
 		public Action Clicked;
 
 		/// <summary>
-		///   Public constructor, creates a button based on
-		///   the given text at position 0,0
+		///   Initializes a new instance of <see cref="Button"/> based on the given text at position 0,0
 		/// </summary>
 		/// <remarks>
-		///   The size of the button is computed based on the
-		///   text length.   This button is not a default button.
+		///   The size of the <see cref="Button"/> is computed based on the
+		///   text length. 
 		/// </remarks>
 		/// <param name="text">The button's text</param>
-		/// <param name="is_default">If set, this makes the button the default button in the current view, which means that if the user presses return on a view that does not handle return, it will be treated as if he had clicked on the button</param>
+		/// <param name="is_default">If set, this makes the button the default button in the current view. <seealso cref="IsDefault"/></param>
 		public Button (ustring text, bool is_default = false) : base ()
 		{
 			CanFocus = true;
@@ -81,12 +80,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Public constructor, creates a button based on
-		///   the given text at the given position.
+		///   Initializes a new instance of <see cref="Button"/> at the given coordinates, based on the given text
 		/// </summary>
 		/// <remarks>
-		///   The size of the button is computed based on the
-		///   text length.   This button is not a default button.
+		///   The size of the <see cref="Button"/> is computed based on the
+		///   text length. 
 		/// </remarks>
 		/// <param name="x">X position where the button will be shown.</param>
 		/// <param name="y">Y position where the button will be shown.</param>
@@ -94,7 +92,7 @@ namespace Terminal.Gui {
 		public Button (int x, int y, ustring text) : this (x, y, text, false) { }
 
 		/// <summary>
-		///   The text displayed by this widget.
+		///   The text displayed by this <see cref="Button"/>.
 		/// </summary>
 		public ustring Text {
 			get {
@@ -132,8 +130,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Public constructor, creates a button based on
-		///   the given text at the given position.
+		///   Initializes a new instance of <see cref="Button"/> at the given coordinates, based on the given text, and with the specified <see cref="IsDefault"/> value
 		/// </summary>
 		/// <remarks>
 		///   If the value for is_default is true, a special

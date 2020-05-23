@@ -24,9 +24,8 @@ namespace UICatalog {
 			// the scenario will quit
 			var defaultButton = new Button ("Quit") {
 				X = Pos.Center (),
-				// BUGBUG: Throws an exception
-				//Y= Pos.Bottom(Win),
-				Y = 20,
+				//TODO: Change to use Pos.AnchorEnd()
+				Y= Pos.Bottom(Win) - 3,
 				IsDefault = true,
 				Clicked = () => Application.RequestStop (),
 			};

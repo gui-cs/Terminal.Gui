@@ -11,21 +11,20 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// The dialog box is a window that by default is centered and contains one 
-	/// or more buttons.  It defaults to the Colors.Dialog color scheme and has a
-	///  1 cell padding around the edges.
+	/// The <see cref="Dialog"/> <see cref="View"/> is a <see cref="Window"/> that by default is centered and contains one 
+	/// or more <see cref="Button"/>. It defaults to the <see cref="Colors.Dialog"/> color scheme and has a 1 cell padding around the edges.
 	/// </summary>
 	/// <remarks>
-	///  To run the dialog modally, create the Dialog, and pass this to Application.Run which
-	/// will execute the dialog until it terminates via the [ESC] key, or when one of the views
-	/// or buttons added to the dialog set the Running property on the Dialog to false.
+	///  To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to <see cref="Application.Run()"/>. 
+	///  This will execute the dialog until it terminates via the [ESC] or [CTRL-Q] key, or when one of the views
+	///  or buttons added to the dialog calls <see cref="Application.RequestStop"/>.
 	/// </remarks>
 	public class Dialog : Window {
 		List<Button> buttons = new List<Button> ();
 		const int padding = 1;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Dialog"/> class with an optional set of buttons to display
+		/// Initializes a new instance of the <see cref="Dialog"/> class with an optional set of <see cref="Button"/>s to display
 		/// </summary>
 		/// <param name="title">Title for the dialog.</param>
 		/// <param name="width">Width for the dialog.</param>
@@ -49,7 +48,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Adds a button to the dialog, its layout will be controled by the dialog
+		/// Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controled by the <see cref="Dialog"/>
 		/// </summary>
 		/// <param name="button">Button to add.</param>
 		public void AddButton (Button button)
@@ -61,9 +60,7 @@ namespace Terminal.Gui {
 			Add (button);
 		}
 
-		/// <summary>
-		/// Lays out the subviews for the Dialog. 
-		/// </summary>
+		///<inheritdoc cref="LayoutSubviews"/>
 		public override void LayoutSubviews ()
 		{
 			base.LayoutSubviews ();

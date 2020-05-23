@@ -12,11 +12,10 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	///   Text data entry widget
+	///   Single-line text entry <see cref="View"/>
 	/// </summary>
 	/// <remarks>
-	///   The Entry widget provides Emacs-like editing
-	///   functionality,  and mouse support.
+	///   The <see cref="TextField"/> <see cref="View"/> provides editing functionality and mouse support.
 	/// </remarks>
 	public class TextField : View {
 		List<Rune> text;
@@ -85,6 +84,7 @@ namespace Terminal.Gui {
 			WantMousePositionReports = true;
 		}
 
+		///<inheritdoc cref="OnLeave"/>
 		public override bool OnLeave ()
 		{
 			if (Application.mouseGrabView != null && Application.mouseGrabView == this)
@@ -95,6 +95,7 @@ namespace Terminal.Gui {
 			return base.OnLeave ();
 		}
 
+		///<inheritdoc cref="Frame"/>
 		public override Rect Frame {
 			get => base.Frame;
 			set {
@@ -110,7 +111,7 @@ namespace Terminal.Gui {
 		bool isFromHistory;
 
 		/// <summary>
-		///   Sets or gets the text in the entry.
+		///   Sets or gets the text held by the view.
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
@@ -180,6 +181,7 @@ namespace Terminal.Gui {
 			Move (col, 0);
 		}
 
+		///<inheritdoc cref="Redraw(Rect)"/>
 		public override void Redraw (Rect region)
 		{
 			ColorScheme color = Colors.Menu;
@@ -193,7 +195,7 @@ namespace Terminal.Gui {
 			int width = Frame.Width;
 			var tcount = text.Count;
 			var roc = new Attribute (Color.DarkGray, Color.Gray);
-			for (int idx = 0; idx < tcount; idx++){
+			for (int idx = 0; idx < tcount; idx++) {
 				var rune = text [idx];
 				if (idx < p)
 					continue;
@@ -251,6 +253,7 @@ namespace Terminal.Gui {
 			SetText (newText.ToList ());
 		}
 
+		///<inheritdoc cref="CanFocus"/>
 		public override bool CanFocus {
 			get => true;
 			set { base.CanFocus = value; }
@@ -262,6 +265,24 @@ namespace Terminal.Gui {
 				Clipboard.Contents = ustring.Make (text.ToList ());
 		}
 
+		/// <summary>
+		/// Processes key presses for the <see cref="TextField"/>.
+		/// </summary>
+		/// <param name="kb"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// The <see cref="TextField"/> control responds to the following keys:
+		/// <list type="table">
+		///    <listheader>
+		///        <term>Keys</term>
+		///        <description>Function</description>
+		///    </listheader>
+		///    <item>
+		///        <term><see cref="Key.Delete"/>, <see cref="Key.Backspace"/></term>
+		///        <description>Deletes the character before cursor.</description>
+		///    </item>
+		/// </list>
+		/// </remarks>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			// remember current cursor position
@@ -532,10 +553,10 @@ namespace Terminal.Gui {
 				return -1;
 
 			int i = p;
-			if (Rune.IsPunctuation (text [p]) || Rune.IsWhiteSpace(text [p])) {
+			if (Rune.IsPunctuation (text [p]) || Rune.IsWhiteSpace (text [p])) {
 				for (; i < text.Count; i++) {
 					var r = text [i];
-					if (Rune.IsLetterOrDigit(r))
+					if (Rune.IsLetterOrDigit (r))
 						break;
 				}
 				for (; i < text.Count; i++) {
@@ -565,7 +586,7 @@ namespace Terminal.Gui {
 				return 0;
 
 			var ti = text [i];
-			if (Rune.IsPunctuation (ti) || Rune.IsSymbol(ti) || Rune.IsWhiteSpace(ti)) {
+			if (Rune.IsPunctuation (ti) || Rune.IsSymbol (ti) || Rune.IsWhiteSpace (ti)) {
 				for (; i >= 0; i--) {
 					if (Rune.IsLetterOrDigit (text [i]))
 						break;
@@ -606,6 +627,7 @@ namespace Terminal.Gui {
 		int start, length;
 		bool isButtonReleased = true;
 
+		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
 		public override bool MouseEvent (MouseEvent ev)
 		{
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed) && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition) &&
