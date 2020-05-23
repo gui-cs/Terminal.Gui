@@ -229,11 +229,11 @@ namespace Terminal.Gui {
 		static PosCombine posCombine;
 
 		/// <summary>
-		/// Adds a <see cref="Terminal.Gui.Pos"/> to a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="T:Terminal.Gui.Pos"/>.
+		/// Adds a <see cref="Terminal.Gui.Pos"/> to a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="Pos"/>.
 		/// </summary>
 		/// <param name="left">The first <see cref="Terminal.Gui.Pos"/> to add.</param>
 		/// <param name="right">The second <see cref="Terminal.Gui.Pos"/> to add.</param>
-		/// <returns>The <see cref="T:Terminal.Gui.Pos"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
+		/// <returns>The <see cref="Pos"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
 		public static Pos operator + (Pos left, Pos right)
 		{
 			PosCombine newPos = new PosCombine (true, left, right);
@@ -247,11 +247,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Subtracts a <see cref="Terminal.Gui.Pos"/> from a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="T:Terminal.Gui.Pos"/>.
+		/// Subtracts a <see cref="Terminal.Gui.Pos"/> from a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="Pos"/>.
 		/// </summary>
 		/// <param name="left">The <see cref="Terminal.Gui.Pos"/> to subtract from (the minuend).</param>
 		/// <param name="right">The <see cref="Terminal.Gui.Pos"/> to subtract (the subtrahend).</param>
-		/// <returns>The <see cref="T:Terminal.Gui.Pos"/> that is the <c>left</c> minus <c>right</c>.</returns>
+		/// <returns>The <see cref="Pos"/> that is the <c>left</c> minus <c>right</c>.</returns>
 		public static Pos operator - (Pos left, Pos right)
 		{
 			PosCombine newPos = new PosCombine (false, left, right);
@@ -390,7 +390,7 @@ namespace Terminal.Gui {
 		/// <returns>The percent <see cref="Dim"/> object.</returns>
 		/// <param name="n">A value between 0 and 100 representing the percentage.</param>
 		/// <example>
-		/// This creates a <see cref="TextField"/>that is centered horizontally, is 50% of the way down, 
+		/// This initializes a <see cref="TextField"/>that is centered horizontally, is 50% of the way down, 
 		/// is 30% the height, and is 80% the width of the <see cref="View"/> it added to.
 		/// <code>
 		/// var textView = new TextView () {
@@ -451,7 +451,7 @@ namespace Terminal.Gui {
 		static DimFill zeroMargin;
 
 		/// <summary>
-		/// Creates a <see cref="Dim"/> object that fills the dimension, but leaves the specified number of colums for a margin.
+		/// Initializes a new instance of the <see cref="Dim"/> class that fills the dimension, but leaves the specified number of colums for a margin.
 		/// </summary>
 		/// <returns>The Fill dimension.</returns>
 		/// <param name="margin">Margin to use.</param>
@@ -507,22 +507,22 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Adds a <see cref="Terminal.Gui.Dim"/> to a <see cref="Terminal.Gui.Dim"/>, yielding a new <see cref="T:Terminal.Gui.Dim"/>.
+		/// Adds a <see cref="Terminal.Gui.Dim"/> to a <see cref="Terminal.Gui.Dim"/>, yielding a new <see cref="Dim"/>.
 		/// </summary>
 		/// <param name="left">The first <see cref="Terminal.Gui.Dim"/> to add.</param>
 		/// <param name="right">The second <see cref="Terminal.Gui.Dim"/> to add.</param>
-		/// <returns>The <see cref="T:Terminal.Gui.Dim"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
+		/// <returns>The <see cref="Dim"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
 		public static Dim operator + (Dim left, Dim right)
 		{
 			return new DimCombine (true, left, right);
 		}
 
 		/// <summary>
-		/// Subtracts a <see cref="Terminal.Gui.Dim"/> from a <see cref="Terminal.Gui.Dim"/>, yielding a new <see cref="T:Terminal.Gui.Dim"/>.
+		/// Subtracts a <see cref="Terminal.Gui.Dim"/> from a <see cref="Terminal.Gui.Dim"/>, yielding a new <see cref="Dim"/>.
 		/// </summary>
 		/// <param name="left">The <see cref="Terminal.Gui.Dim"/> to subtract from (the minuend).</param>
 		/// <param name="right">The <see cref="Terminal.Gui.Dim"/> to subtract (the subtrahend).</param>
-		/// <returns>The <see cref="T:Terminal.Gui.Dim"/> that is the <c>left</c> minus <c>right</c>.</returns>
+		/// <returns>The <see cref="Dim"/> that is the <c>left</c> minus <c>right</c>.</returns>
 		public static Dim operator - (Dim left, Dim right)
 		{
 			return new DimCombine (false, left, right);

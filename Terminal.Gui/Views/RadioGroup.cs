@@ -1,19 +1,19 @@
 ﻿using System;
 namespace Terminal.Gui {
 	/// <summary>
-	/// Radio group shows a group of labels, only one of those can be selected at a given time
+	/// <see cref="RadioGroup"/> shows a group of radio labels, only one of those can be selected at a given time
 	/// </summary>
 	public class RadioGroup : View {
 		int selected, cursor;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.RadioGroup"/> class
+		/// Initializes a new instance of the <see cref="RadioGroup"/> class
 		/// setting up the initial set of radio labels and the item that should be selected and uses
 		/// an absolute layout for the result.
 		/// </summary>
 		/// <param name="rect">Boundaries for the radio group.</param>
-		/// <param name="radioLabels">Radio labels, the strings can contain hotkeys using an undermine before the letter.</param>
-		/// <param name="selected">The item to be selected, the value is clamped to the number of items.</param>
+		/// <param name="radioLabels">The radio labels; an array of strings that can contain hotkeys using an underscore before the letter.</param>
+		/// <param name="selected">The index of item to be selected, the value is clamped to the number of items.</param>
 		public RadioGroup (Rect rect, string [] radioLabels, int selected = 0) : base (rect)
 		{
 			this.selected = selected;
@@ -22,7 +22,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The location of the cursor in the radio group
+		/// The location of the cursor in the <see cref="RadioGroup"/>
 		/// </summary>
 		public int Cursor {
 			get => cursor;
@@ -35,11 +35,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.RadioGroup"/> class
+		/// Initializes a new instance of the <see cref="RadioGroup"/> class
 		/// setting up the initial set of radio labels and the item that should be selected.
 		/// </summary>
-		/// <param name="radioLabels">Radio labels, the strings can contain hotkeys using an undermine before the letter.</param>
-		/// <param name="selected">The item to be selected, the value is clamped to the number of items.</param>
+		/// <param name="radioLabels">The radio labels; an array of strings that can contain hotkeys using an underscore before the letter.</param>
+		/// <param name="selected">The index of the item to be selected, the value is clamped to the number of items.</param>
 		public RadioGroup (string [] radioLabels, int selected = 0) : base ()
 		{
 			SetWidthHeight(radioLabels);
@@ -64,14 +64,15 @@ namespace Terminal.Gui {
 				width = Math.Max (s.Length + 4, width);
 			return new Rect (x, y, width, radioLabels.Length);
 		}
+
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.RadioGroup"/> class
-		/// setting up the initial set of radio labels and the item that should be selected, 
-		/// the view frame is computed from the provided radioLabels.
+		/// Initializes a new instance of the <see cref="RadioGroup"/> class
+		/// setting up the initial set of radio labels and the item that should be selected.
+		/// The <see cref="View"/> frame is computed from the provided radio labels.
 		/// </summary>
 		/// <param name="x">The x coordinate.</param>
 		/// <param name="y">The y coordinate.</param>
-		/// <param name="radioLabels">Radio labels, the strings can contain hotkeys using an undermine before the letter.</param>
+		/// <param name="radioLabels">The radio labels; an array of strings that can contain hotkeys using an underscore before the letter.</param>
 		/// <param name="selected">The item to be selected, the value is clamped to the number of items.</param>		
 		public RadioGroup (int x, int y, string [] radioLabels, int selected = 0) : this (MakeRect (x, y, radioLabels), radioLabels, selected)
 		{
@@ -106,6 +107,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc cref="Redraw(Rect)"/>
 		public override void Redraw (Rect region)
 		{
 			base.Redraw (region);
@@ -117,11 +119,13 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc cref="PositionCursor"/>
 		public override void PositionCursor ()
 		{
 			Move (1, cursor);
 		}
 
+		///<inheritdoc cref="SelectionChanged"/>
 		public Action<int> SelectionChanged;
 
 		/// <summary>
@@ -137,6 +141,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc cref="ProcessColdKey"/>
 		public override bool ProcessColdKey (KeyEvent kb)
 		{
 			var key = kb.KeyValue;
@@ -165,6 +170,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		///<inheritdoc cref="ProcessKey(KeyEvent)"/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			switch (kb.Key) {
@@ -189,6 +195,7 @@ namespace Terminal.Gui {
 			return base.ProcessKey (kb);
 		}
 
+		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked))

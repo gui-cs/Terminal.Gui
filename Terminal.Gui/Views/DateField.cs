@@ -11,12 +11,11 @@ using System.Linq;
 using NStack;
 
 namespace Terminal.Gui {
-
 	/// <summary>
-	///   Date edit widget
+	///   Date editing <see cref="View"/>
 	/// </summary>
 	/// <remarks>
-	///   This widget provides date editing functionality, and mouse support.
+	///   The <see cref="DateField"/> <see cref="View"/> provides date editing functionality with mouse support.
 	/// </remarks>
 	public class DateField : TextField {
 		bool isShort;
@@ -31,13 +30,13 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		///    Public constructor that creates a date edit field at an absolute position and fixed size.
+		///    Initializes a new instance of <see cref="DateField"/> at an absolute position and fixed size.
 		/// </summary>
 		/// <param name="x">The x coordinate.</param>
 		/// <param name="y">The y coordinate.</param>
 		/// <param name="date">Initial date contents.</param>
 		/// <param name="isShort">If true, shows only two digits for the year.</param>
-		public DateField(int x, int y, DateTime date, bool isShort = false) : base(x, y, isShort ? 10 : 12, "")
+		public DateField (int x, int y, DateTime date, bool isShort = false) : base(x, y, isShort ? 10 : 12, "")
 		{
 			CultureInfo cultureInfo = CultureInfo.CurrentCulture;
 			sepChar = cultureInfo.DateTimeFormat.DateSeparator;
@@ -75,7 +74,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Gets or sets the date in the widget.
+		///   Gets or sets the date of the <see cref="DateField"/>.
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
@@ -189,6 +188,7 @@ namespace Terminal.Gui {
 				CursorPosition++;
 		}
 
+		///<inheritdoc cref="ProcessKey(KeyEvent)"/>
 		public override bool ProcessKey(KeyEvent kb)
 		{
 			switch (kb.Key) {
@@ -235,6 +235,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
 		public override bool MouseEvent(MouseEvent ev)
 		{
 			if (!ev.Flags.HasFlag(MouseFlags.Button1Clicked))

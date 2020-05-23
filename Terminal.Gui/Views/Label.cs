@@ -28,13 +28,13 @@ namespace Terminal.Gui {
 		/// </summary>
 		Centered, 
 		/// <summary>
-		/// Shows the line as justified text in the line.
+		/// Shows the text as justified text in the frame.
 		/// </summary>
 		Justified
 	}
 
 	/// <summary>
-	/// Label view, displays a string at a given position, can include multiple lines.
+	/// The Label <see cref="View"/> displays a string at a given position and supports multiple lines separted by newline characters.
 	/// </summary>
 	public class Label : View {
 		List<ustring> lines = new List<ustring> ();
@@ -64,7 +64,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Public constructor: creates a label at the given
+		///   Initializes a new instance of <see cref="Label"/> at the given
 		///   coordinate with the given string, computes the bounding box
 		///   based on the size of the string, assumes that the string contains
 		///   newlines for multiple lines, no special breaking rules are used.
@@ -74,7 +74,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Public constructor: creates a label at the given
+		///   Initializes a new instance of <see cref="Label"/> at the given
 		///   coordinate with the given string and uses the specified
 		///   frame for the string.
 		/// </summary>
@@ -84,7 +84,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Public constructor: creates a label and configures the default Width and Height based on the text, the result is suitable for Computed layout.
+		/// Initializes a new instance of <see cref="Label"/> and configures the default Width and Height based on the text, the result is suitable for Computed layout.
 		/// </summary>
 		/// <param name="text">Text.</param>
 		public Label (ustring text) : base ()
@@ -200,7 +200,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Computes the number of lines needed to render the specified text by the Label control
+		/// Computes the number of lines needed to render the specified text by the <see cref="Label"/> view
 		/// </summary>
 		/// <returns>Number of lines.</returns>
 		/// <param name="text">Text, may contain newlines.</param>
@@ -226,7 +226,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   The text displayed by this widget.
+		///   The text displayed by the <see cref="Label"/>.
 		/// </summary>
 		public virtual ustring Text {
 			get => text;
@@ -238,7 +238,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Controls the text-alignemtn property of the label, changing it will redisplay the label.
+		/// Controls the text-alignemtn property of the label, changing it will redisplay the <see cref="Label"/>.
 		/// </summary>
 		/// <value>The text alignment.</value>
 		public TextAlignment TextAlignment {
@@ -251,7 +251,7 @@ namespace Terminal.Gui {
 
 		Attribute textColor = -1;
 		/// <summary>
-		///   The color used for the label
+		///   The color used for the <see cref="Label"/>.
 		/// </summary>
 		public Attribute TextColor {
 			get => textColor;

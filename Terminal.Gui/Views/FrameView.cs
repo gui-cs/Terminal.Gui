@@ -11,14 +11,15 @@
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// The FrameView is a container frame that draws a frame around the contents
+	/// The FrameView is a container frame that draws a frame around the contents. It is similar to
+	/// a GroupBox in Windows.
 	/// </summary>
 	public class FrameView : View {
 		View contentView;
 		ustring title;
 
 		/// <summary>
-		/// The title to be displayed for this window.
+		/// The title to be displayed for this <see cref="FrameView"/>.
 		/// </summary>
 		/// <value>The title.</value>
 		public ustring Title {
@@ -35,7 +36,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Gui.FrameView"/> class with
+		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class with
 		/// an absolute position and a title.
 		/// </summary>
 		/// <param name="frame">Frame.</param>
@@ -49,8 +50,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Gui.FrameView"/> class with
-		/// an absolute position, a title and views.
+		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class with
+		/// an absolute position, a title and <see cref="View"/>s.
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		/// <param name="title">Title.</param>
@@ -64,7 +65,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Gui.FrameView"/> class with
+		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class with
 		/// a title and the result is suitable to have its X, Y, Width and Height properties computed.
 		/// </summary>
 		/// <param name="title">Title.</param>
@@ -91,9 +92,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Add the specified view to the ContentView.
+		/// Add the specified <see cref="View"/> to this container.
 		/// </summary>
-		/// <param name="view">View to add to the window.</param>
+		/// <param name="view"><see cref="View"/> to add to this container</param>
 		public override void Add (View view)
 		{
 			contentView.Add (view);
@@ -103,7 +104,7 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		///   Removes a widget from this container.
+		///   Removes a <see cref="View"/> from this container.
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
@@ -121,7 +122,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Removes all widgets from this container.
+		///   Removes all <see cref="View"/>s from this container.
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
@@ -130,6 +131,7 @@ namespace Terminal.Gui {
 			contentView.RemoveAll();
 		}
 
+		///<inheritdoc cref="Redraw(Rect)"/>
 		public override void Redraw (Rect bounds)
 		{
 			if (!NeedDisplay.IsEmpty) {
