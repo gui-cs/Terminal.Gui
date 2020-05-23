@@ -52,7 +52,6 @@ namespace Terminal.Gui {
 			listview = new ListView(new Rect(x, y + 1, w, 0), listsource.ToList())
 			{
 				LayoutStyle = LayoutStyle.Computed,
-				ColorScheme = Colors.Menu
 			};
 			listview.SelectedChanged += (object sender, ListViewItemEventArgs e) => {
 				if(searchset.Count > 0)
@@ -73,8 +72,13 @@ namespace Terminal.Gui {
 				// Needs to be re-applied for LayoutStyle.Computed
 				listview.X = x;
 				listview.Y = y + 1;
-				listview.Width = w;
+				listview.Width = CalculateWidth();
 				listview.Height = CalculatetHeight ();
+
+				if (autoHide)
+					listview.ColorScheme = Colors.Menu;
+				else
+					search.ColorScheme = Colors.Menu;
 			};
 
 			this.Add(listview);
@@ -82,6 +86,7 @@ namespace Terminal.Gui {
 			this.SetFocus(search);
 		}
 
+		///<inheritdoc cref="OnEnter"/>
 		public override bool OnEnter ()
 		{
 			if (!search.HasFocus)
@@ -92,6 +97,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		///<inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey(KeyEvent e)
 		{
 			if (e.Key == Key.Tab)
@@ -101,7 +107,6 @@ namespace Terminal.Gui {
 			}
 
 			if (e.Key == Key.Enter && listview.HasFocus) {
-
 				if (listview.Source.Count == 0 || searchset.Count == 0) {
 					text = "";
 					return true;
@@ -189,9 +194,8 @@ namespace Terminal.Gui {
 
 		private void Search_Changed (object sender, ustring text)
 		{
-			if (string.IsNullOrEmpty (search.Text.ToString())) {
+			if (string.IsNullOrEmpty (search.Text.ToString()))
 				searchset = autoHide ? new List<string> () : listsource;
-			} 
 			else
 				searchset = listsource.Where (x => x.StartsWith (search.Text.ToString (), StringComparison.CurrentCultureIgnoreCase)).ToList ();
 
@@ -209,6 +213,15 @@ namespace Terminal.Gui {
 		private int CalculatetHeight ()
 		{
 			return Math.Min (height, searchset.Count);
+		}
+
+		/// <summary>
+		/// Internal width
+		/// </summary>
+		/// <returns></returns>
+		private int CalculateWidth()
+		{
+			return autoHide? Math.Max (1, width - 1) : width;
 		}
 	}
 }

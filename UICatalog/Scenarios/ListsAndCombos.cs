@@ -41,7 +41,7 @@ namespace UICatalog.Scenarios {
 			// ComboBox
 			var lbComboBox = new Label ("ComboBox") {
 				ColorScheme = Colors.TopLevel,
-				X = Pos.Right (lbListView) + 1, // <== Broken?!?
+				X = Pos.Right (lbListView) + 1,
 				Width = 30
 			};
 
