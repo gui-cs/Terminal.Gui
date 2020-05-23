@@ -61,8 +61,13 @@ namespace Terminal.Gui {
 
 		void DateField_Changed (object sender, ustring e)
 		{
-			if (!DateTime.TryParseExact (Text.ToString (), Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
+			if (!DateTime.TryParseExact (GetDate (Text).ToString(), GetInvarianteFormat (), CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
 				Text = e;
+		}
+
+		string GetInvarianteFormat ()
+		{
+			return $"MM{sepChar}dd{sepChar}yyyy";
 		}
 
 		string GetLongFormat (string lf)
@@ -189,6 +194,31 @@ namespace Terminal.Gui {
 					date += $"{sepChar}";
 			}
 			return date;
+		}
+
+		ustring GetDate (ustring text)
+		{
+			ustring [] vals = text.Split (ustring.Make (sepChar));
+			ustring [] frm = ustring.Make (Format).Split (ustring.Make (sepChar));
+			ustring [] date = { null, null, null };
+
+			for (int i = 0; i < frm.Length; i++) {
+				if (frm [i].Contains ("M")) {
+					date [0] = vals [i].TrimSpace ();
+				} else if (frm [i].Contains ("d")) {
+					date [1] = vals [i].TrimSpace ();
+				} else {
+					var year = vals [i].TrimSpace ();
+					if (year.Length == 2) {
+						var y = DateTime.Now.Year.ToString ();
+						date [2] = y.Substring (0, 2) + year.ToString ();
+					} else {
+						date [2] = vals [i].TrimSpace ();
+					}
+				}
+			}
+			return date [0] + ustring.Make (sepChar) + date [1] + ustring.Make (sepChar) + date [2];
+
 		}
 
 		int GetFormatIndex (ustring [] fm, string t)
