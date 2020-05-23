@@ -1,0 +1,872 @@
+### YamlMime:ManagedReference
+items:
+- uid: Unix.Terminal.Curses.Event
+  commentId: T:Unix.Terminal.Curses.Event
+  id: Curses.Event
+  parent: Unix.Terminal
+  children:
+  - Unix.Terminal.Curses.Event.AllEvents
+  - Unix.Terminal.Curses.Event.Button1Clicked
+  - Unix.Terminal.Curses.Event.Button1DoubleClicked
+  - Unix.Terminal.Curses.Event.Button1Pressed
+  - Unix.Terminal.Curses.Event.Button1Released
+  - Unix.Terminal.Curses.Event.Button1TripleClicked
+  - Unix.Terminal.Curses.Event.Button2Clicked
+  - Unix.Terminal.Curses.Event.Button2DoubleClicked
+  - Unix.Terminal.Curses.Event.Button2Pressed
+  - Unix.Terminal.Curses.Event.Button2Released
+  - Unix.Terminal.Curses.Event.Button2TrippleClicked
+  - Unix.Terminal.Curses.Event.Button3Clicked
+  - Unix.Terminal.Curses.Event.Button3DoubleClicked
+  - Unix.Terminal.Curses.Event.Button3Pressed
+  - Unix.Terminal.Curses.Event.Button3Released
+  - Unix.Terminal.Curses.Event.Button3TripleClicked
+  - Unix.Terminal.Curses.Event.Button4Clicked
+  - Unix.Terminal.Curses.Event.Button4DoubleClicked
+  - Unix.Terminal.Curses.Event.Button4Pressed
+  - Unix.Terminal.Curses.Event.Button4Released
+  - Unix.Terminal.Curses.Event.Button4TripleClicked
+  - Unix.Terminal.Curses.Event.ButtonAlt
+  - Unix.Terminal.Curses.Event.ButtonCtrl
+  - Unix.Terminal.Curses.Event.ButtonShift
+  - Unix.Terminal.Curses.Event.ReportMousePosition
+  langs:
+  - csharp
+  - vb
+  name: Curses.Event
+  nameWithType: Curses.Event
+  fullName: Unix.Terminal.Curses.Event
+  type: Enum
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Event
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 54
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: 'public enum Event : long'
+    content.vb: Public Enum Event As Long
+  modifiers.csharp:
+  - public
+  - enum
+  modifiers.vb:
+  - Public
+  - Enum
+- uid: Unix.Terminal.Curses.Event.Button1Pressed
+  commentId: F:Unix.Terminal.Curses.Event.Button1Pressed
+  id: Button1Pressed
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button1Pressed
+  nameWithType: Curses.Event.Button1Pressed
+  fullName: Unix.Terminal.Curses.Event.Button1Pressed
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button1Pressed
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 55
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button1Pressed = 2L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button1Released
+  commentId: F:Unix.Terminal.Curses.Event.Button1Released
+  id: Button1Released
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button1Released
+  nameWithType: Curses.Event.Button1Released
+  fullName: Unix.Terminal.Curses.Event.Button1Released
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button1Released
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 56
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button1Released = 1L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button1Clicked
+  commentId: F:Unix.Terminal.Curses.Event.Button1Clicked
+  id: Button1Clicked
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button1Clicked
+  nameWithType: Curses.Event.Button1Clicked
+  fullName: Unix.Terminal.Curses.Event.Button1Clicked
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button1Clicked
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 57
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button1Clicked = 4L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button1DoubleClicked
+  commentId: F:Unix.Terminal.Curses.Event.Button1DoubleClicked
+  id: Button1DoubleClicked
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button1DoubleClicked
+  nameWithType: Curses.Event.Button1DoubleClicked
+  fullName: Unix.Terminal.Curses.Event.Button1DoubleClicked
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button1DoubleClicked
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 58
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button1DoubleClicked = 8L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button1TripleClicked
+  commentId: F:Unix.Terminal.Curses.Event.Button1TripleClicked
+  id: Button1TripleClicked
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button1TripleClicked
+  nameWithType: Curses.Event.Button1TripleClicked
+  fullName: Unix.Terminal.Curses.Event.Button1TripleClicked
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button1TripleClicked
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 59
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button1TripleClicked = 16L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button2Pressed
+  commentId: F:Unix.Terminal.Curses.Event.Button2Pressed
+  id: Button2Pressed
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button2Pressed
+  nameWithType: Curses.Event.Button2Pressed
+  fullName: Unix.Terminal.Curses.Event.Button2Pressed
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button2Pressed
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 60
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button2Pressed = 128L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button2Released
+  commentId: F:Unix.Terminal.Curses.Event.Button2Released
+  id: Button2Released
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button2Released
+  nameWithType: Curses.Event.Button2Released
+  fullName: Unix.Terminal.Curses.Event.Button2Released
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button2Released
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 61
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button2Released = 64L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button2Clicked
+  commentId: F:Unix.Terminal.Curses.Event.Button2Clicked
+  id: Button2Clicked
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button2Clicked
+  nameWithType: Curses.Event.Button2Clicked
+  fullName: Unix.Terminal.Curses.Event.Button2Clicked
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button2Clicked
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 62
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button2Clicked = 256L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button2DoubleClicked
+  commentId: F:Unix.Terminal.Curses.Event.Button2DoubleClicked
+  id: Button2DoubleClicked
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button2DoubleClicked
+  nameWithType: Curses.Event.Button2DoubleClicked
+  fullName: Unix.Terminal.Curses.Event.Button2DoubleClicked
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button2DoubleClicked
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 63
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button2DoubleClicked = 512L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button2TrippleClicked
+  commentId: F:Unix.Terminal.Curses.Event.Button2TrippleClicked
+  id: Button2TrippleClicked
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button2TrippleClicked
+  nameWithType: Curses.Event.Button2TrippleClicked
+  fullName: Unix.Terminal.Curses.Event.Button2TrippleClicked
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button2TrippleClicked
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 64
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button2TrippleClicked = 1024L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button3Pressed
+  commentId: F:Unix.Terminal.Curses.Event.Button3Pressed
+  id: Button3Pressed
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button3Pressed
+  nameWithType: Curses.Event.Button3Pressed
+  fullName: Unix.Terminal.Curses.Event.Button3Pressed
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button3Pressed
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 65
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button3Pressed = 8192L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button3Released
+  commentId: F:Unix.Terminal.Curses.Event.Button3Released
+  id: Button3Released
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button3Released
+  nameWithType: Curses.Event.Button3Released
+  fullName: Unix.Terminal.Curses.Event.Button3Released
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button3Released
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 66
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button3Released = 4096L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button3Clicked
+  commentId: F:Unix.Terminal.Curses.Event.Button3Clicked
+  id: Button3Clicked
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button3Clicked
+  nameWithType: Curses.Event.Button3Clicked
+  fullName: Unix.Terminal.Curses.Event.Button3Clicked
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button3Clicked
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 67
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button3Clicked = 16384L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button3DoubleClicked
+  commentId: F:Unix.Terminal.Curses.Event.Button3DoubleClicked
+  id: Button3DoubleClicked
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button3DoubleClicked
+  nameWithType: Curses.Event.Button3DoubleClicked
+  fullName: Unix.Terminal.Curses.Event.Button3DoubleClicked
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button3DoubleClicked
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 68
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button3DoubleClicked = 32768L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button3TripleClicked
+  commentId: F:Unix.Terminal.Curses.Event.Button3TripleClicked
+  id: Button3TripleClicked
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button3TripleClicked
+  nameWithType: Curses.Event.Button3TripleClicked
+  fullName: Unix.Terminal.Curses.Event.Button3TripleClicked
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button3TripleClicked
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 69
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button3TripleClicked = 65536L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button4Pressed
+  commentId: F:Unix.Terminal.Curses.Event.Button4Pressed
+  id: Button4Pressed
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button4Pressed
+  nameWithType: Curses.Event.Button4Pressed
+  fullName: Unix.Terminal.Curses.Event.Button4Pressed
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button4Pressed
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 70
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button4Pressed = 524288L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button4Released
+  commentId: F:Unix.Terminal.Curses.Event.Button4Released
+  id: Button4Released
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button4Released
+  nameWithType: Curses.Event.Button4Released
+  fullName: Unix.Terminal.Curses.Event.Button4Released
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button4Released
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 71
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button4Released = 262144L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button4Clicked
+  commentId: F:Unix.Terminal.Curses.Event.Button4Clicked
+  id: Button4Clicked
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button4Clicked
+  nameWithType: Curses.Event.Button4Clicked
+  fullName: Unix.Terminal.Curses.Event.Button4Clicked
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button4Clicked
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 72
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button4Clicked = 1048576L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button4DoubleClicked
+  commentId: F:Unix.Terminal.Curses.Event.Button4DoubleClicked
+  id: Button4DoubleClicked
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button4DoubleClicked
+  nameWithType: Curses.Event.Button4DoubleClicked
+  fullName: Unix.Terminal.Curses.Event.Button4DoubleClicked
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button4DoubleClicked
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 73
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button4DoubleClicked = 2097152L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.Button4TripleClicked
+  commentId: F:Unix.Terminal.Curses.Event.Button4TripleClicked
+  id: Button4TripleClicked
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: Button4TripleClicked
+  nameWithType: Curses.Event.Button4TripleClicked
+  fullName: Unix.Terminal.Curses.Event.Button4TripleClicked
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Button4TripleClicked
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 74
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: Button4TripleClicked = 4194304L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.ButtonShift
+  commentId: F:Unix.Terminal.Curses.Event.ButtonShift
+  id: ButtonShift
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: ButtonShift
+  nameWithType: Curses.Event.ButtonShift
+  fullName: Unix.Terminal.Curses.Event.ButtonShift
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: ButtonShift
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 75
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: ButtonShift = 33554432L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.ButtonCtrl
+  commentId: F:Unix.Terminal.Curses.Event.ButtonCtrl
+  id: ButtonCtrl
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: ButtonCtrl
+  nameWithType: Curses.Event.ButtonCtrl
+  fullName: Unix.Terminal.Curses.Event.ButtonCtrl
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: ButtonCtrl
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 76
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: ButtonCtrl = 16777216L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.ButtonAlt
+  commentId: F:Unix.Terminal.Curses.Event.ButtonAlt
+  id: ButtonAlt
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: ButtonAlt
+  nameWithType: Curses.Event.ButtonAlt
+  fullName: Unix.Terminal.Curses.Event.ButtonAlt
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: ButtonAlt
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 77
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: ButtonAlt = 67108864L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.ReportMousePosition
+  commentId: F:Unix.Terminal.Curses.Event.ReportMousePosition
+  id: ReportMousePosition
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: ReportMousePosition
+  nameWithType: Curses.Event.ReportMousePosition
+  fullName: Unix.Terminal.Curses.Event.ReportMousePosition
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: ReportMousePosition
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 78
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: ReportMousePosition = 134217728L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Unix.Terminal.Curses.Event.AllEvents
+  commentId: F:Unix.Terminal.Curses.Event.AllEvents
+  id: AllEvents
+  parent: Unix.Terminal.Curses.Event
+  langs:
+  - csharp
+  - vb
+  name: AllEvents
+  nameWithType: Curses.Event.AllEvents
+  fullName: Unix.Terminal.Curses.Event.AllEvents
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/constants.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: AllEvents
+    path: ../Terminal.Gui/MonoCurses/constants.cs
+    startLine: 79
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: AllEvents = 134217727L
+    return:
+      type: Unix.Terminal.Curses.Event
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+references:
+- uid: Unix.Terminal
+  commentId: N:Unix.Terminal
+  name: Unix.Terminal
+  nameWithType: Unix.Terminal
+  fullName: Unix.Terminal
+- uid: Unix.Terminal.Curses.Event
+  commentId: T:Unix.Terminal.Curses.Event
+  parent: Unix.Terminal
+  name: Curses.Event
+  nameWithType: Curses.Event
+  fullName: Unix.Terminal.Curses.Event
+shouldSkipMarkup: true

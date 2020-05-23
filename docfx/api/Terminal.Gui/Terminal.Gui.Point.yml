@@ -1,10 +1,12 @@
 ### YamlMime:ManagedReference
 items:
 - uid: Terminal.Gui.Point
+  commentId: T:Terminal.Gui.Point
   id: Point
+  parent: Terminal.Gui
   children:
-  - Terminal.Gui.Point.#ctor(Terminal.Gui.Size)
   - Terminal.Gui.Point.#ctor(System.Int32,System.Int32)
+  - Terminal.Gui.Point.#ctor(Terminal.Gui.Size)
   - Terminal.Gui.Point.Add(Terminal.Gui.Point,Terminal.Gui.Size)
   - Terminal.Gui.Point.Empty
   - Terminal.Gui.Point.Equals(System.Object)
@@ -14,7 +16,7 @@ items:
   - Terminal.Gui.Point.Offset(Terminal.Gui.Point)
   - Terminal.Gui.Point.op_Addition(Terminal.Gui.Point,Terminal.Gui.Size)
   - Terminal.Gui.Point.op_Equality(Terminal.Gui.Point,Terminal.Gui.Point)
-  - Terminal.Gui.Point.op_Explicit(Terminal.Gui.Point to Terminal.Gui.Size)
+  - Terminal.Gui.Point.op_Explicit(Terminal.Gui.Point)~Terminal.Gui.Size
   - Terminal.Gui.Point.op_Inequality(Terminal.Gui.Point,Terminal.Gui.Point)
   - Terminal.Gui.Point.op_Subtraction(Terminal.Gui.Point,Terminal.Gui.Size)
   - Terminal.Gui.Point.Subtract(Terminal.Gui.Point,Terminal.Gui.Size)
@@ -23,81 +25,645 @@ items:
   - Terminal.Gui.Point.Y
   langs:
   - csharp
+  - vb
   name: Point
   nameWithType: Point
   fullName: Terminal.Gui.Point
   type: Struct
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Point
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 18
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Represents an ordered pair of integer x- and y-coordinates that defines a point in a two-dimensional plane.
+  summary: "\nRepresents an ordered pair of integer x- and y-coordinates that defines a point in a two-dimensional plane.\n"
+  example: []
   syntax:
     content: public struct Point
-  inheritance:
-  - System.ValueType
-  implements: []
+    content.vb: Public Structure Point
+  inheritedMembers:
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetType
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  modifiers.csharp:
+  - public
+  - struct
+  modifiers.vb:
+  - Public
+  - Structure
+- uid: Terminal.Gui.Point.X
+  commentId: F:Terminal.Gui.Point.X
+  id: X
+  parent: Terminal.Gui.Point
+  langs:
+  - csharp
+  - vb
+  name: X
+  nameWithType: Point.X
+  fullName: Terminal.Gui.Point.X
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: X
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 23
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nGets or sets the x-coordinate of this Point.\n"
+  example: []
+  syntax:
+    content: public int X
+    return:
+      type: System.Int32
+    content.vb: Public X As Integer
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.Point.Y
+  commentId: F:Terminal.Gui.Point.Y
+  id: Y
+  parent: Terminal.Gui.Point
+  langs:
+  - csharp
+  - vb
+  name: Y
+  nameWithType: Point.Y
+  fullName: Terminal.Gui.Point.Y
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Y
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 28
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nGets or sets the y-coordinate of this Point.\n"
+  example: []
+  syntax:
+    content: public int Y
+    return:
+      type: System.Int32
+    content.vb: Public Y As Integer
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.Point.Empty
+  commentId: F:Terminal.Gui.Point.Empty
+  id: Empty
+  parent: Terminal.Gui.Point
+  langs:
+  - csharp
+  - vb
+  name: Empty
+  nameWithType: Point.Empty
+  fullName: Terminal.Gui.Point.Empty
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Empty
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 42
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nEmpty Shared Field\n"
+  remarks: "\nAn uninitialized Point Structure.\n"
+  example: []
+  syntax:
+    content: public static readonly Point Empty
+    return:
+      type: Terminal.Gui.Point
+    content.vb: Public Shared ReadOnly Empty As Point
+  modifiers.csharp:
+  - public
+  - static
+  - readonly
+  modifiers.vb:
+  - Public
+  - Shared
+  - ReadOnly
+- uid: Terminal.Gui.Point.op_Addition(Terminal.Gui.Point,Terminal.Gui.Size)
+  commentId: M:Terminal.Gui.Point.op_Addition(Terminal.Gui.Point,Terminal.Gui.Size)
+  id: op_Addition(Terminal.Gui.Point,Terminal.Gui.Size)
+  parent: Terminal.Gui.Point
+  langs:
+  - csharp
+  - vb
+  name: Addition(Point, Size)
+  nameWithType: Point.Addition(Point, Size)
+  fullName: Terminal.Gui.Point.Addition(Terminal.Gui.Point, Terminal.Gui.Size)
+  type: Operator
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: op_Addition
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 53
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nAddition Operator\n"
+  remarks: "\nTranslates a Point using the Width and Height\nproperties of the given <typeref>Size</typeref>.\n"
+  example: []
+  syntax:
+    content: public static Point operator +(Point pt, Size sz)
+    parameters:
+    - id: pt
+      type: Terminal.Gui.Point
+    - id: sz
+      type: Terminal.Gui.Size
+    return:
+      type: Terminal.Gui.Point
+    content.vb: Public Shared Operator +(pt As Point, sz As Size) As Point
+  overload: Terminal.Gui.Point.op_Addition*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Point.op_Equality(Terminal.Gui.Point,Terminal.Gui.Point)
+  commentId: M:Terminal.Gui.Point.op_Equality(Terminal.Gui.Point,Terminal.Gui.Point)
+  id: op_Equality(Terminal.Gui.Point,Terminal.Gui.Point)
+  parent: Terminal.Gui.Point
+  langs:
+  - csharp
+  - vb
+  name: Equality(Point, Point)
+  nameWithType: Point.Equality(Point, Point)
+  fullName: Terminal.Gui.Point.Equality(Terminal.Gui.Point, Terminal.Gui.Point)
+  type: Operator
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: op_Equality
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 68
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nEquality Operator\n"
+  remarks: "\nCompares two Point objects. The return value is\nbased on the equivalence of the X and Y properties \nof the two points.\n"
+  example: []
+  syntax:
+    content: public static bool operator ==(Point left, Point right)
+    parameters:
+    - id: left
+      type: Terminal.Gui.Point
+    - id: right
+      type: Terminal.Gui.Point
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Operator =(left As Point, right As Point) As Boolean
+  overload: Terminal.Gui.Point.op_Equality*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Point.op_Inequality(Terminal.Gui.Point,Terminal.Gui.Point)
+  commentId: M:Terminal.Gui.Point.op_Inequality(Terminal.Gui.Point,Terminal.Gui.Point)
+  id: op_Inequality(Terminal.Gui.Point,Terminal.Gui.Point)
+  parent: Terminal.Gui.Point
+  langs:
+  - csharp
+  - vb
+  name: Inequality(Point, Point)
+  nameWithType: Point.Inequality(Point, Point)
+  fullName: Terminal.Gui.Point.Inequality(Terminal.Gui.Point, Terminal.Gui.Point)
+  type: Operator
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: op_Inequality
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 83
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nInequality Operator\n"
+  remarks: "\nCompares two Point objects. The return value is\nbased on the equivalence of the X and Y properties \nof the two points.\n"
+  example: []
+  syntax:
+    content: public static bool operator !=(Point left, Point right)
+    parameters:
+    - id: left
+      type: Terminal.Gui.Point
+    - id: right
+      type: Terminal.Gui.Point
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Operator <>(left As Point, right As Point) As Boolean
+  overload: Terminal.Gui.Point.op_Inequality*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Point.op_Subtraction(Terminal.Gui.Point,Terminal.Gui.Size)
+  commentId: M:Terminal.Gui.Point.op_Subtraction(Terminal.Gui.Point,Terminal.Gui.Size)
+  id: op_Subtraction(Terminal.Gui.Point,Terminal.Gui.Size)
+  parent: Terminal.Gui.Point
+  langs:
+  - csharp
+  - vb
+  name: Subtraction(Point, Size)
+  nameWithType: Point.Subtraction(Point, Size)
+  fullName: Terminal.Gui.Point.Subtraction(Terminal.Gui.Point, Terminal.Gui.Size)
+  type: Operator
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: op_Subtraction
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 97
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nSubtraction Operator\n"
+  remarks: "\nTranslates a Point using the negation of the Width \nand Height properties of the given Size.\n"
+  example: []
+  syntax:
+    content: public static Point operator -(Point pt, Size sz)
+    parameters:
+    - id: pt
+      type: Terminal.Gui.Point
+    - id: sz
+      type: Terminal.Gui.Size
+    return:
+      type: Terminal.Gui.Point
+    content.vb: Public Shared Operator -(pt As Point, sz As Size) As Point
+  overload: Terminal.Gui.Point.op_Subtraction*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Point.op_Explicit(Terminal.Gui.Point)~Terminal.Gui.Size
+  commentId: M:Terminal.Gui.Point.op_Explicit(Terminal.Gui.Point)~Terminal.Gui.Size
+  id: op_Explicit(Terminal.Gui.Point)~Terminal.Gui.Size
+  parent: Terminal.Gui.Point
+  langs:
+  - csharp
+  - vb
+  name: Explicit(Point to Size)
+  nameWithType: Point.Explicit(Point to Size)
+  fullName: Terminal.Gui.Point.Explicit(Terminal.Gui.Point to Terminal.Gui.Size)
+  type: Operator
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: op_Explicit
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 111
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nPoint to Size Conversion\n"
+  remarks: "\nReturns a Size based on the Coordinates of a given \nPoint. Requires explicit cast.\n"
+  example: []
+  syntax:
+    content: public static explicit operator Size(Point p)
+    parameters:
+    - id: p
+      type: Terminal.Gui.Point
+    return:
+      type: Terminal.Gui.Size
+    content.vb: Public Shared Narrowing Operator CType(p As Point) As Size
+  overload: Terminal.Gui.Point.op_Explicit*
+  nameWithType.vb: Point.Narrowing(Point to Size)
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+  fullName.vb: Terminal.Gui.Point.Narrowing(Terminal.Gui.Point to Terminal.Gui.Size)
+  name.vb: Narrowing(Point to Size)
 - uid: Terminal.Gui.Point.#ctor(Terminal.Gui.Size)
+  commentId: M:Terminal.Gui.Point.#ctor(Terminal.Gui.Size)
   id: '#ctor(Terminal.Gui.Size)'
   parent: Terminal.Gui.Point
   langs:
   - csharp
+  - vb
   name: Point(Size)
   nameWithType: Point.Point(Size)
-  fullName: Point.Point(Size)
+  fullName: Terminal.Gui.Point.Point(Terminal.Gui.Size)
   type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: .ctor
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 127
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Point Constructor
-  remarks: Creates a Point from a Size value.
+  summary: "\nPoint Constructor\n"
+  remarks: "\nCreates a Point from a Size value.\n"
+  example: []
   syntax:
-    content: public Point (Terminal.Gui.Size sz);
+    content: public Point(Size sz)
     parameters:
     - id: sz
       type: Terminal.Gui.Size
-      description: To be added.
+    content.vb: Public Sub New(sz As Size)
   overload: Terminal.Gui.Point.#ctor*
-  exceptions: []
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
 - uid: Terminal.Gui.Point.#ctor(System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.Point.#ctor(System.Int32,System.Int32)
   id: '#ctor(System.Int32,System.Int32)'
   parent: Terminal.Gui.Point
   langs:
   - csharp
+  - vb
   name: Point(Int32, Int32)
   nameWithType: Point.Point(Int32, Int32)
-  fullName: Point.Point(Int32, Int32)
+  fullName: Terminal.Gui.Point.Point(System.Int32, System.Int32)
   type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: .ctor
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 141
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Point Constructor
-  remarks: Creates a Point from a specified x,y coordinate pair.
+  summary: "\nPoint Constructor\n"
+  remarks: "\nCreates a Point from a specified x,y coordinate pair.\n"
+  example: []
   syntax:
-    content: public Point (int x, int y);
+    content: public Point(int x, int y)
     parameters:
     - id: x
       type: System.Int32
-      description: To be added.
     - id: y
       type: System.Int32
-      description: To be added.
+    content.vb: Public Sub New(x As Integer, y As Integer)
   overload: Terminal.Gui.Point.#ctor*
-  exceptions: []
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.Point.IsEmpty
+  commentId: P:Terminal.Gui.Point.IsEmpty
+  id: IsEmpty
+  parent: Terminal.Gui.Point
+  langs:
+  - csharp
+  - vb
+  name: IsEmpty
+  nameWithType: Point.IsEmpty
+  fullName: Terminal.Gui.Point.IsEmpty
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: IsEmpty
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 158
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nIsEmpty Property\n"
+  remarks: "\nIndicates if both X and Y are zero.\n"
+  example: []
+  syntax:
+    content: public bool IsEmpty { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public ReadOnly Property IsEmpty As Boolean
+  overload: Terminal.Gui.Point.IsEmpty*
+  modifiers.csharp:
+  - public
+  - get
+  modifiers.vb:
+  - Public
+  - ReadOnly
+- uid: Terminal.Gui.Point.Equals(System.Object)
+  commentId: M:Terminal.Gui.Point.Equals(System.Object)
+  id: Equals(System.Object)
+  parent: Terminal.Gui.Point
+  langs:
+  - csharp
+  - vb
+  name: Equals(Object)
+  nameWithType: Point.Equals(Object)
+  fullName: Terminal.Gui.Point.Equals(System.Object)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Equals
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 172
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nEquals Method\n"
+  remarks: "\nChecks equivalence of this Point and another object.\n"
+  example: []
+  syntax:
+    content: public override bool Equals(object obj)
+    parameters:
+    - id: obj
+      type: System.Object
+    return:
+      type: System.Boolean
+    content.vb: Public Overrides Function Equals(obj As Object) As Boolean
+  overridden: System.ValueType.Equals(System.Object)
+  overload: Terminal.Gui.Point.Equals*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.Point.GetHashCode
+  commentId: M:Terminal.Gui.Point.GetHashCode
+  id: GetHashCode
+  parent: Terminal.Gui.Point
+  langs:
+  - csharp
+  - vb
+  name: GetHashCode()
+  nameWithType: Point.GetHashCode()
+  fullName: Terminal.Gui.Point.GetHashCode()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: GetHashCode
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 188
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nGetHashCode Method\n"
+  remarks: "\nCalculates a hashing value.\n"
+  example: []
+  syntax:
+    content: public override int GetHashCode()
+    return:
+      type: System.Int32
+    content.vb: Public Overrides Function GetHashCode As Integer
+  overridden: System.ValueType.GetHashCode
+  overload: Terminal.Gui.Point.GetHashCode*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.Point.Offset(System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.Point.Offset(System.Int32,System.Int32)
+  id: Offset(System.Int32,System.Int32)
+  parent: Terminal.Gui.Point
+  langs:
+  - csharp
+  - vb
+  name: Offset(Int32, Int32)
+  nameWithType: Point.Offset(Int32, Int32)
+  fullName: Terminal.Gui.Point.Offset(System.Int32, System.Int32)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Offset
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 201
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nOffset Method\n"
+  remarks: "\nMoves the Point a specified distance.\n"
+  example: []
+  syntax:
+    content: public void Offset(int dx, int dy)
+    parameters:
+    - id: dx
+      type: System.Int32
+    - id: dy
+      type: System.Int32
+    content.vb: Public Sub Offset(dx As Integer, dy As Integer)
+  overload: Terminal.Gui.Point.Offset*
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.Point.ToString
+  commentId: M:Terminal.Gui.Point.ToString
+  id: ToString
+  parent: Terminal.Gui.Point
+  langs:
+  - csharp
+  - vb
+  name: ToString()
+  nameWithType: Point.ToString()
+  fullName: Terminal.Gui.Point.ToString()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: ToString
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 215
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nToString Method\n"
+  remarks: "\nFormats the Point as a string in coordinate notation.\n"
+  example: []
+  syntax:
+    content: public override string ToString()
+    return:
+      type: System.String
+    content.vb: Public Overrides Function ToString As String
+  overridden: System.ValueType.ToString
+  overload: Terminal.Gui.Point.ToString*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
 - uid: Terminal.Gui.Point.Add(Terminal.Gui.Point,Terminal.Gui.Size)
+  commentId: M:Terminal.Gui.Point.Add(Terminal.Gui.Point,Terminal.Gui.Size)
   id: Add(Terminal.Gui.Point,Terminal.Gui.Size)
   parent: Terminal.Gui.Point
   langs:
   - csharp
+  - vb
   name: Add(Point, Size)
   nameWithType: Point.Add(Point, Size)
-  fullName: Point.Add(Point, Size)
+  fullName: Terminal.Gui.Point.Add(Terminal.Gui.Point, Terminal.Gui.Size)
   type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Add
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 227
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Adds the specified Size to the specified Point.
+  summary: "\nAdds the specified Size to the specified Point.\n"
+  example: []
   syntax:
-    content: public static Terminal.Gui.Point Add (Terminal.Gui.Point pt, Terminal.Gui.Size sz);
+    content: public static Point Add(Point pt, Size sz)
     parameters:
     - id: pt
       type: Terminal.Gui.Point
@@ -108,296 +674,76 @@ items:
     return:
       type: Terminal.Gui.Point
       description: The Point that is the result of the addition operation.
+    content.vb: Public Shared Function Add(pt As Point, sz As Size) As Point
   overload: Terminal.Gui.Point.Add*
-  exceptions: []
-- uid: Terminal.Gui.Point.Empty
-  id: Empty
-  parent: Terminal.Gui.Point
-  langs:
-  - csharp
-  name: Empty
-  nameWithType: Point.Empty
-  fullName: Point.Empty
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Empty Shared Field
-  remarks: An uninitialized Point Structure.
-  syntax:
-    content: public static readonly Terminal.Gui.Point Empty;
-    return:
-      type: Terminal.Gui.Point
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Point.Equals(System.Object)
-  id: Equals(System.Object)
-  parent: Terminal.Gui.Point
-  langs:
-  - csharp
-  name: Equals(Object)
-  nameWithType: Point.Equals(Object)
-  fullName: Point.Equals(Object)
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Equals Method
-  remarks: Checks equivalence of this Point and another object.
-  syntax:
-    content: public override bool Equals (object obj);
-    parameters:
-    - id: obj
-      type: System.Object
-      description: To be added.
-    return:
-      type: System.Boolean
-      description: To be added.
-  overload: Terminal.Gui.Point.Equals*
-  exceptions: []
-- uid: Terminal.Gui.Point.GetHashCode
-  id: GetHashCode
-  parent: Terminal.Gui.Point
-  langs:
-  - csharp
-  name: GetHashCode()
-  nameWithType: Point.GetHashCode()
-  fullName: Point.GetHashCode()
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: GetHashCode Method
-  remarks: Calculates a hashing value.
-  syntax:
-    content: public override int GetHashCode ();
-    parameters: []
-    return:
-      type: System.Int32
-      description: To be added.
-  overload: Terminal.Gui.Point.GetHashCode*
-  exceptions: []
-- uid: Terminal.Gui.Point.IsEmpty
-  id: IsEmpty
-  parent: Terminal.Gui.Point
-  langs:
-  - csharp
-  name: IsEmpty
-  nameWithType: Point.IsEmpty
-  fullName: Point.IsEmpty
-  type: Property
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: IsEmpty Property
-  remarks: Indicates if both X and Y are zero.
-  syntax:
-    content: public bool IsEmpty { get; }
-    return:
-      type: System.Boolean
-      description: To be added.
-  overload: Terminal.Gui.Point.IsEmpty*
-  exceptions: []
-- uid: Terminal.Gui.Point.Offset(System.Int32,System.Int32)
-  id: Offset(System.Int32,System.Int32)
-  parent: Terminal.Gui.Point
-  langs:
-  - csharp
-  name: Offset(Int32, Int32)
-  nameWithType: Point.Offset(Int32, Int32)
-  fullName: Point.Offset(Int32, Int32)
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Offset Method
-  remarks: Moves the Point a specified distance.
-  syntax:
-    content: public void Offset (int dx, int dy);
-    parameters:
-    - id: dx
-      type: System.Int32
-      description: To be added.
-    - id: dy
-      type: System.Int32
-      description: To be added.
-  overload: Terminal.Gui.Point.Offset*
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
 - uid: Terminal.Gui.Point.Offset(Terminal.Gui.Point)
+  commentId: M:Terminal.Gui.Point.Offset(Terminal.Gui.Point)
   id: Offset(Terminal.Gui.Point)
   parent: Terminal.Gui.Point
   langs:
   - csharp
+  - vb
   name: Offset(Point)
   nameWithType: Point.Offset(Point)
-  fullName: Point.Offset(Point)
+  fullName: Terminal.Gui.Point.Offset(Terminal.Gui.Point)
   type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Offset
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 237
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Translates this Point by the specified Point.
+  summary: "\nTranslates this Point by the specified Point.\n"
+  example: []
   syntax:
-    content: public void Offset (Terminal.Gui.Point p);
+    content: public void Offset(Point p)
     parameters:
     - id: p
       type: Terminal.Gui.Point
       description: The Point used offset this Point.
+    content.vb: Public Sub Offset(p As Point)
   overload: Terminal.Gui.Point.Offset*
-  exceptions: []
-- uid: Terminal.Gui.Point.op_Addition(Terminal.Gui.Point,Terminal.Gui.Size)
-  id: op_Addition(Terminal.Gui.Point,Terminal.Gui.Size)
-  parent: Terminal.Gui.Point
-  langs:
-  - csharp
-  name: op_Addition(Point, Size)
-  nameWithType: Point.op_Addition(Point, Size)
-  fullName: Point.op_Addition(Point, Size)
-  type: Operator
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Addition Operator
-  remarks: >-
-    Translates a Point using the Width and Height
-                	properties of the given <typeref>Size</typeref>.
-  syntax:
-    content: public static Terminal.Gui.Point op_Addition (Terminal.Gui.Point pt, Terminal.Gui.Size sz);
-    parameters:
-    - id: pt
-      type: Terminal.Gui.Point
-      description: To be added.
-    - id: sz
-      type: Terminal.Gui.Size
-      description: To be added.
-    return:
-      type: Terminal.Gui.Point
-      description: To be added.
-  overload: Terminal.Gui.Point.op_Addition*
-  exceptions: []
-- uid: Terminal.Gui.Point.op_Equality(Terminal.Gui.Point,Terminal.Gui.Point)
-  id: op_Equality(Terminal.Gui.Point,Terminal.Gui.Point)
-  parent: Terminal.Gui.Point
-  langs:
-  - csharp
-  name: op_Equality(Point, Point)
-  nameWithType: Point.op_Equality(Point, Point)
-  fullName: Point.op_Equality(Point, Point)
-  type: Operator
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Equality Operator
-  remarks: "Compares two Point objects. The return value is\n            	based on the equivalence of the X and Y properties \n            	of the two points."
-  syntax:
-    content: public static bool op_Equality (Terminal.Gui.Point left, Terminal.Gui.Point right);
-    parameters:
-    - id: left
-      type: Terminal.Gui.Point
-      description: To be added.
-    - id: right
-      type: Terminal.Gui.Point
-      description: To be added.
-    return:
-      type: System.Boolean
-      description: To be added.
-  overload: Terminal.Gui.Point.op_Equality*
-  exceptions: []
-- uid: Terminal.Gui.Point.op_Explicit(Terminal.Gui.Point to Terminal.Gui.Size)
-  id: op_Explicit(Terminal.Gui.Point to Terminal.Gui.Size)
-  parent: Terminal.Gui.Point
-  langs:
-  - csharp
-  name: op_Explicit(Point to Size)
-  nameWithType: Point.op_Explicit(Point to Size)
-  fullName: Point.op_Explicit(Point to Size)
-  type: Operator
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Point to Size Conversion
-  remarks: "Returns a Size based on the Coordinates of a given \n            	Point. Requires explicit cast."
-  syntax:
-    content: public static Terminal.Gui.Size op_Explicit (Terminal.Gui.Point p);
-    parameters:
-    - id: p
-      type: Terminal.Gui.Point
-      description: To be added.
-    return:
-      type: Terminal.Gui.Size
-      description: To be added.
-  overload: Terminal.Gui.Point.op_Explicit*
-  exceptions: []
-- uid: Terminal.Gui.Point.op_Inequality(Terminal.Gui.Point,Terminal.Gui.Point)
-  id: op_Inequality(Terminal.Gui.Point,Terminal.Gui.Point)
-  parent: Terminal.Gui.Point
-  langs:
-  - csharp
-  name: op_Inequality(Point, Point)
-  nameWithType: Point.op_Inequality(Point, Point)
-  fullName: Point.op_Inequality(Point, Point)
-  type: Operator
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Inequality Operator
-  remarks: "Compares two Point objects. The return value is\n            	based on the equivalence of the X and Y properties \n            	of the two points."
-  syntax:
-    content: public static bool op_Inequality (Terminal.Gui.Point left, Terminal.Gui.Point right);
-    parameters:
-    - id: left
-      type: Terminal.Gui.Point
-      description: To be added.
-    - id: right
-      type: Terminal.Gui.Point
-      description: To be added.
-    return:
-      type: System.Boolean
-      description: To be added.
-  overload: Terminal.Gui.Point.op_Inequality*
-  exceptions: []
-- uid: Terminal.Gui.Point.op_Subtraction(Terminal.Gui.Point,Terminal.Gui.Size)
-  id: op_Subtraction(Terminal.Gui.Point,Terminal.Gui.Size)
-  parent: Terminal.Gui.Point
-  langs:
-  - csharp
-  name: op_Subtraction(Point, Size)
-  nameWithType: Point.op_Subtraction(Point, Size)
-  fullName: Point.op_Subtraction(Point, Size)
-  type: Operator
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Subtraction Operator
-  remarks: "Translates a Point using the negation of the Width \n            	and Height properties of the given Size."
-  syntax:
-    content: public static Terminal.Gui.Point op_Subtraction (Terminal.Gui.Point pt, Terminal.Gui.Size sz);
-    parameters:
-    - id: pt
-      type: Terminal.Gui.Point
-      description: To be added.
-    - id: sz
-      type: Terminal.Gui.Size
-      description: To be added.
-    return:
-      type: Terminal.Gui.Point
-      description: To be added.
-  overload: Terminal.Gui.Point.op_Subtraction*
-  exceptions: []
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
 - uid: Terminal.Gui.Point.Subtract(Terminal.Gui.Point,Terminal.Gui.Size)
+  commentId: M:Terminal.Gui.Point.Subtract(Terminal.Gui.Point,Terminal.Gui.Size)
   id: Subtract(Terminal.Gui.Point,Terminal.Gui.Size)
   parent: Terminal.Gui.Point
   langs:
   - csharp
+  - vb
   name: Subtract(Point, Size)
   nameWithType: Point.Subtract(Point, Size)
-  fullName: Point.Subtract(Point, Size)
+  fullName: Terminal.Gui.Point.Subtract(Terminal.Gui.Point, Terminal.Gui.Size)
   type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/Point.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Subtract
+    path: ../Terminal.Gui/Types/Point.cs
+    startLine: 248
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Returns the result of subtracting specified Size from the specified Point.
+  summary: "\nReturns the result of subtracting specified Size from the specified Point.\n"
+  example: []
   syntax:
-    content: public static Terminal.Gui.Point Subtract (Terminal.Gui.Point pt, Terminal.Gui.Size sz);
+    content: public static Point Subtract(Point pt, Size sz)
     parameters:
     - id: pt
       type: Terminal.Gui.Point
@@ -408,294 +754,387 @@ items:
     return:
       type: Terminal.Gui.Point
       description: The Point that is the result of the subtraction operation.
+    content.vb: Public Shared Function Subtract(pt As Point, sz As Size) As Point
   overload: Terminal.Gui.Point.Subtract*
-  exceptions: []
-- uid: Terminal.Gui.Point.ToString
-  id: ToString
-  parent: Terminal.Gui.Point
-  langs:
-  - csharp
-  name: ToString()
-  nameWithType: Point.ToString()
-  fullName: Point.ToString()
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: ToString Method
-  remarks: Formats the Point as a string in coordinate notation.
-  syntax:
-    content: public override string ToString ();
-    parameters: []
-    return:
-      type: System.String
-      description: To be added.
-  overload: Terminal.Gui.Point.ToString*
-  exceptions: []
-- uid: Terminal.Gui.Point.X
-  id: X
-  parent: Terminal.Gui.Point
-  langs:
-  - csharp
-  name: X
-  nameWithType: Point.X
-  fullName: Point.X
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Gets or sets the x-coordinate of this Point.
-  syntax:
-    content: public int X;
-    return:
-      type: System.Int32
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Point.Y
-  id: Y
-  parent: Terminal.Gui.Point
-  langs:
-  - csharp
-  name: Y
-  nameWithType: Point.Y
-  fullName: Point.Y
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Gets or sets the y-coordinate of this Point.
-  syntax:
-    content: public int Y;
-    return:
-      type: System.Int32
-      description: To be added.
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
 references:
-- uid: System.ValueType
-  parent: System
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
   isExternal: true
-  name: ValueType
-  nameWithType: ValueType
-  fullName: System.ValueType
-- uid: Terminal.Gui.Point.#ctor(Terminal.Gui.Size)
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: Point(Size)
-  nameWithType: Point.Point(Size)
-  fullName: Point.Point(Size)
-- uid: Terminal.Gui.Size
-  parent: Terminal.Gui
-  isExternal: false
-  name: Size
-  nameWithType: Size
-  fullName: Terminal.Gui.Size
-- uid: Terminal.Gui.Point.#ctor(System.Int32,System.Int32)
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: Point(Int32, Int32)
-  nameWithType: Point.Point(Int32, Int32)
-  fullName: Point.Point(Int32, Int32)
-- uid: System.Int32
-  parent: System
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
   isExternal: true
-  name: Int32
-  nameWithType: Int32
-  fullName: System.Int32
-- uid: Terminal.Gui.Point.Add(Terminal.Gui.Point,Terminal.Gui.Size)
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: Add(Point, Size)
-  nameWithType: Point.Add(Point, Size)
-  fullName: Point.Add(Point, Size)
-- uid: Terminal.Gui.Point
-  parent: Terminal.Gui
-  isExternal: false
-  name: Point
-  nameWithType: Point
-  fullName: Terminal.Gui.Point
-- uid: Terminal.Gui.Point.Empty
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: Empty
-  nameWithType: Point.Empty
-  fullName: Point.Empty
-- uid: Terminal.Gui.Point.Equals(System.Object)
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: Equals(Object)
-  nameWithType: Point.Equals(Object)
-  fullName: Point.Equals(Object)
-- uid: System.Boolean
-  parent: System
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
   isExternal: true
-  name: Boolean
-  nameWithType: Boolean
-  fullName: System.Boolean
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
 - uid: System.Object
+  commentId: T:System.Object
   parent: System
   isExternal: true
   name: Object
   nameWithType: Object
   fullName: System.Object
-- uid: Terminal.Gui.Point.GetHashCode
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: GetHashCode()
-  nameWithType: Point.GetHashCode()
-  fullName: Point.GetHashCode()
-- uid: Terminal.Gui.Point.IsEmpty
-  parent: Terminal.Gui.Point
-  isExternal: false
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: Terminal.Gui.Point
+  commentId: T:Terminal.Gui.Point
+  parent: Terminal.Gui
+  name: Point
+  nameWithType: Point
+  fullName: Terminal.Gui.Point
+- uid: Terminal.Gui.Point.op_Addition*
+  commentId: Overload:Terminal.Gui.Point.op_Addition
+  name: Addition
+  nameWithType: Point.Addition
+  fullName: Terminal.Gui.Point.Addition
+- uid: Terminal.Gui.Size
+  commentId: T:Terminal.Gui.Size
+  parent: Terminal.Gui
+  name: Size
+  nameWithType: Size
+  fullName: Terminal.Gui.Size
+- uid: Terminal.Gui.Point.op_Equality*
+  commentId: Overload:Terminal.Gui.Point.op_Equality
+  name: Equality
+  nameWithType: Point.Equality
+  fullName: Terminal.Gui.Point.Equality
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.Point.op_Inequality*
+  commentId: Overload:Terminal.Gui.Point.op_Inequality
+  name: Inequality
+  nameWithType: Point.Inequality
+  fullName: Terminal.Gui.Point.Inequality
+- uid: Terminal.Gui.Point.op_Subtraction*
+  commentId: Overload:Terminal.Gui.Point.op_Subtraction
+  name: Subtraction
+  nameWithType: Point.Subtraction
+  fullName: Terminal.Gui.Point.Subtraction
+- uid: Terminal.Gui.Point.op_Explicit*
+  commentId: Overload:Terminal.Gui.Point.op_Explicit
+  name: Explicit
+  nameWithType: Point.Explicit
+  fullName: Terminal.Gui.Point.Explicit
+  nameWithType.vb: Point.Narrowing
+  fullName.vb: Terminal.Gui.Point.Narrowing
+  name.vb: Narrowing
+- uid: Terminal.Gui.Point.#ctor*
+  commentId: Overload:Terminal.Gui.Point.#ctor
+  name: Point
+  nameWithType: Point.Point
+  fullName: Terminal.Gui.Point.Point
+- uid: Terminal.Gui.Point.IsEmpty*
+  commentId: Overload:Terminal.Gui.Point.IsEmpty
   name: IsEmpty
   nameWithType: Point.IsEmpty
-  fullName: Point.IsEmpty
-- uid: Terminal.Gui.Point.Offset(System.Int32,System.Int32)
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: Offset(Int32, Int32)
-  nameWithType: Point.Offset(Int32, Int32)
-  fullName: Point.Offset(Int32, Int32)
-- uid: Terminal.Gui.Point.Offset(Terminal.Gui.Point)
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: Offset(Point)
-  nameWithType: Point.Offset(Point)
-  fullName: Point.Offset(Point)
-- uid: Terminal.Gui.Point.op_Addition(Terminal.Gui.Point,Terminal.Gui.Size)
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: op_Addition(Point, Size)
-  nameWithType: Point.op_Addition(Point, Size)
-  fullName: Point.op_Addition(Point, Size)
-- uid: Terminal.Gui.Point.op_Equality(Terminal.Gui.Point,Terminal.Gui.Point)
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: op_Equality(Point, Point)
-  nameWithType: Point.op_Equality(Point, Point)
-  fullName: Point.op_Equality(Point, Point)
-- uid: Terminal.Gui.Point.op_Explicit(Terminal.Gui.Point to Terminal.Gui.Size)
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: op_Explicit(Point to Size)
-  nameWithType: Point.op_Explicit(Point to Size)
-  fullName: Point.op_Explicit(Point to Size)
-- uid: Terminal.Gui.Point.op_Inequality(Terminal.Gui.Point,Terminal.Gui.Point)
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: op_Inequality(Point, Point)
-  nameWithType: Point.op_Inequality(Point, Point)
-  fullName: Point.op_Inequality(Point, Point)
-- uid: Terminal.Gui.Point.op_Subtraction(Terminal.Gui.Point,Terminal.Gui.Size)
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: op_Subtraction(Point, Size)
-  nameWithType: Point.op_Subtraction(Point, Size)
-  fullName: Point.op_Subtraction(Point, Size)
-- uid: Terminal.Gui.Point.Subtract(Terminal.Gui.Point,Terminal.Gui.Size)
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: Subtract(Point, Size)
-  nameWithType: Point.Subtract(Point, Size)
-  fullName: Point.Subtract(Point, Size)
-- uid: Terminal.Gui.Point.ToString
-  parent: Terminal.Gui.Point
-  isExternal: false
+  fullName: Terminal.Gui.Point.IsEmpty
+- uid: System.ValueType.Equals(System.Object)
+  commentId: M:System.ValueType.Equals(System.Object)
+  parent: System.ValueType
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: ValueType.Equals(Object)
+  fullName: System.ValueType.Equals(System.Object)
+  spec.csharp:
+  - uid: System.ValueType.Equals(System.Object)
+    name: Equals
+    nameWithType: ValueType.Equals
+    fullName: System.ValueType.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.ValueType.Equals(System.Object)
+    name: Equals
+    nameWithType: ValueType.Equals
+    fullName: System.ValueType.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.Point.Equals*
+  commentId: Overload:Terminal.Gui.Point.Equals
+  name: Equals
+  nameWithType: Point.Equals
+  fullName: Terminal.Gui.Point.Equals
+- uid: System.ValueType
+  commentId: T:System.ValueType
+  parent: System
+  isExternal: true
+  name: ValueType
+  nameWithType: ValueType
+  fullName: System.ValueType
+- uid: System.ValueType.GetHashCode
+  commentId: M:System.ValueType.GetHashCode
+  parent: System.ValueType
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: ValueType.GetHashCode()
+  fullName: System.ValueType.GetHashCode()
+  spec.csharp:
+  - uid: System.ValueType.GetHashCode
+    name: GetHashCode
+    nameWithType: ValueType.GetHashCode
+    fullName: System.ValueType.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.ValueType.GetHashCode
+    name: GetHashCode
+    nameWithType: ValueType.GetHashCode
+    fullName: System.ValueType.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.Point.GetHashCode*
+  commentId: Overload:Terminal.Gui.Point.GetHashCode
+  name: GetHashCode
+  nameWithType: Point.GetHashCode
+  fullName: Terminal.Gui.Point.GetHashCode
+- uid: Terminal.Gui.Point.Offset*
+  commentId: Overload:Terminal.Gui.Point.Offset
+  name: Offset
+  nameWithType: Point.Offset
+  fullName: Terminal.Gui.Point.Offset
+- uid: System.ValueType.ToString
+  commentId: M:System.ValueType.ToString
+  parent: System.ValueType
+  isExternal: true
   name: ToString()
-  nameWithType: Point.ToString()
-  fullName: Point.ToString()
+  nameWithType: ValueType.ToString()
+  fullName: System.ValueType.ToString()
+  spec.csharp:
+  - uid: System.ValueType.ToString
+    name: ToString
+    nameWithType: ValueType.ToString
+    fullName: System.ValueType.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.ValueType.ToString
+    name: ToString
+    nameWithType: ValueType.ToString
+    fullName: System.ValueType.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.Point.ToString*
+  commentId: Overload:Terminal.Gui.Point.ToString
+  name: ToString
+  nameWithType: Point.ToString
+  fullName: Terminal.Gui.Point.ToString
 - uid: System.String
+  commentId: T:System.String
   parent: System
   isExternal: true
   name: String
   nameWithType: String
   fullName: System.String
-- uid: Terminal.Gui.Point.X
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: X
-  nameWithType: Point.X
-  fullName: Point.X
-- uid: Terminal.Gui.Point.Y
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: Y
-  nameWithType: Point.Y
-  fullName: Point.Y
-- uid: Terminal.Gui.Point.#ctor*
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: Point
-  nameWithType: Point.Point
-  fullName: Point.Point
 - uid: Terminal.Gui.Point.Add*
-  parent: Terminal.Gui.Point
-  isExternal: false
+  commentId: Overload:Terminal.Gui.Point.Add
   name: Add
   nameWithType: Point.Add
-  fullName: Point.Add
-- uid: Terminal.Gui.Point.Equals*
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: Equals
-  nameWithType: Point.Equals
-  fullName: Point.Equals
-- uid: Terminal.Gui.Point.GetHashCode*
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: GetHashCode
-  nameWithType: Point.GetHashCode
-  fullName: Point.GetHashCode
-- uid: Terminal.Gui.Point.IsEmpty*
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: IsEmpty
-  nameWithType: Point.IsEmpty
-  fullName: Point.IsEmpty
-- uid: Terminal.Gui.Point.Offset*
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: Offset
-  nameWithType: Point.Offset
-  fullName: Point.Offset
-- uid: Terminal.Gui.Point.op_Addition*
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: op_Addition
-  nameWithType: Point.op_Addition
-  fullName: Point.op_Addition
-- uid: Terminal.Gui.Point.op_Equality*
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: op_Equality
-  nameWithType: Point.op_Equality
-  fullName: Point.op_Equality
-- uid: Terminal.Gui.Point.op_Explicit*
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: op_Explicit
-  nameWithType: Point.op_Explicit
-  fullName: Point.op_Explicit
-- uid: Terminal.Gui.Point.op_Inequality*
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: op_Inequality
-  nameWithType: Point.op_Inequality
-  fullName: Point.op_Inequality
-- uid: Terminal.Gui.Point.op_Subtraction*
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: op_Subtraction
-  nameWithType: Point.op_Subtraction
-  fullName: Point.op_Subtraction
+  fullName: Terminal.Gui.Point.Add
 - uid: Terminal.Gui.Point.Subtract*
-  parent: Terminal.Gui.Point
-  isExternal: false
+  commentId: Overload:Terminal.Gui.Point.Subtract
   name: Subtract
   nameWithType: Point.Subtract
-  fullName: Point.Subtract
-- uid: Terminal.Gui.Point.ToString*
-  parent: Terminal.Gui.Point
-  isExternal: false
-  name: ToString
-  nameWithType: Point.ToString
-  fullName: Point.ToString
+  fullName: Terminal.Gui.Point.Subtract
+shouldSkipMarkup: true

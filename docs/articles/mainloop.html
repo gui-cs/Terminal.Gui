@@ -8,18 +8,19 @@
     <title>Event Processing and the Application Main Loop </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Event Processing and the Application Main Loop ">
-    <meta name="generator" content="docfx 2.18.2.0">
+    <meta name="generator" content="docfx 2.53.1.0">
     
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../styles/docfx.css">
     <link rel="stylesheet" href="../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="">
     <meta property="docfx:tocrel" content="">
     
+    <meta property="docfx:rel" content="../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -34,7 +35,7 @@
               </button>
               
               <a class="navbar-brand" href="../index.html">
-                <img id="logo" class="svg" src="../logo.svg" alt="">
+                <img id="logo" class="svg" src="../images/logo48.png" alt="">
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
@@ -55,6 +56,16 @@
           </div>
         </div>
       </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
       <div role="main" class="container body-content hide-when-search">
         <div class="article row grid">
           <div class="col-md-10">
@@ -66,11 +77,11 @@ events from either the keyboard or mouse and route those events to the
 proper view.</p>
 <p>The job of waiting for events and dispatching them in the
 <code>Application</code> is implemented by an instance of the
-<a href="docs/api/Mono.Terminal/Mono.Terminal.MainLoop.html"><code>MainLoop</code></a>
+<a href=""><code>MainLoop</code></a>
 class.</p>
 <p>Mainloops are a common idiom in many user interface toolkits so many
 of the concepts will be familiar to you if you have used other
-toolkits before.   </p>
+toolkits before.</p>
 <p>This class provides the following capabilities:</p>
 <ul>
 <li>Keyboard and mouse processing</li>
@@ -86,7 +97,7 @@ toolkits before.   </p>
 provides access to these functions.</p>
 <p>When your code invokes <code>Application.Run (Toplevel)</code>, the application
 will prepare the current
-<code>Toplevel</code>[../api/Terminal.Gui/Terminal.Gui.Toplevel.html] instance by
+<a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.html"><code>Toplevel</code></a> instance by
 redrawing the screen appropriately and then calling the mainloop to
 run.    </p>
 <p>You can configure the Mainloop before calling Application.Run, or you
@@ -105,7 +116,7 @@ thread, and the awaited code will resume execution on the main
 thread. </p>
 <h2 id="timers-processing">Timers Processing</h2>
 <p>You can register timers to be executed at specified intervals by
-calling the <a href="https://migueldeicaza.github.io/gui.cs/api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_AddTimeout_System_TimeSpan_System_Func_Mono_Terminal_MainLoop_System_Boolean__"><code>AddTimeout</code></a> method, like this:</p>
+calling the <a href=""><code>AddTimeout</code></a> method, like this:</p>
 <pre><code class="lang-csharp">void UpdateTimer ()
 {
     time.Text = DateTime.Now.ToString ();
@@ -118,7 +129,7 @@ you desire to cancel the timer before it runs:</p>
 </code></pre><h2 id="idle-handlers">Idle Handlers</h2>
 <p>You can register code to be executed when the application is idling
 and there are no events to process by calling the
-<a href="https://migueldeicaza.github.io/gui.cs/api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_AddIdle_System_Func_System_Boolean__"><code>AddIdle</code></a>
+<a href=""><code>AddIdle</code></a>
 method.  This method takes as a parameter a function that will be
 invoked when the application is idling.  </p>
 <p>Idle functions should return <code>true</code> if they should be invoked again,
@@ -168,7 +179,7 @@ completing the process  by calling <code>End</code>.</p>
 available, or for the file descriptor being available for data to be
 written without blocking the application.</p>
 <p>To do this, you on Unix, you can cast the <code>MainLoop</code> instance to a
-<a href="docs/api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html"><code>UnixMainLoop</code></a>
+<a href=""><code>UnixMainLoop</code></a>
 and use the <code>AddWatch</code> method to register an interest on a particular
 condition.</p>
 </article>
@@ -178,9 +189,6 @@ condition.</p>
             <div class="sideaffix">
               <div class="contribution">
                 <ul class="nav">
-                  <li>
-                    <a href="https://github.com/migueldeicaza/gui.cs/blob/master/docfx/articles/mainloop.md/#L1" class="contribution-link">Improve this Doc</a>
-                  </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
@@ -199,7 +207,7 @@ condition.</p>
               <a href="#top">Back to top</a>
             </span>
             
-            <span>Copyright © 2015-2017 Microsoft<br>Generated by <strong>DocFX</strong></span>
+            <span>Generated by <strong>DocFX</strong></span>
           </div>
         </div>
       </footer>

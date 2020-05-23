@@ -1,67 +1,247 @@
 ### YamlMime:ManagedReference
 items:
 - uid: Terminal.Gui.Attribute
+  commentId: T:Terminal.Gui.Attribute
   id: Attribute
+  parent: Terminal.Gui
   children:
-  - Terminal.Gui.Attribute.#ctor(System.Int32)
+  - Terminal.Gui.Attribute.#ctor(System.Int32,Terminal.Gui.Color,Terminal.Gui.Color)
+  - Terminal.Gui.Attribute.#ctor(Terminal.Gui.Color,Terminal.Gui.Color)
   - Terminal.Gui.Attribute.Make(Terminal.Gui.Color,Terminal.Gui.Color)
-  - Terminal.Gui.Attribute.op_Implicit(System.Int32 to Terminal.Gui.Attribute)
-  - Terminal.Gui.Attribute.op_Implicit(Terminal.Gui.Attribute to System.Int32)
+  - Terminal.Gui.Attribute.op_Implicit(System.Int32)~Terminal.Gui.Attribute
+  - Terminal.Gui.Attribute.op_Implicit(Terminal.Gui.Attribute)~System.Int32
   langs:
   - csharp
+  - vb
   name: Attribute
   nameWithType: Attribute
   fullName: Terminal.Gui.Attribute
   type: Struct
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Attribute
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 94
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Attributes are used as elements that contain both a foreground and a background or platform specific features
-  remarks: >-
-    Attributes are needed to map colors to terminal capabilities that might lack colors, on color
-                  scenarios, they encode both the foreground and the background color and are used in the ColorScheme
-                  class to define color schemes that can be used in your application.
+  summary: "\nAttributes are used as elements that contain both a foreground and a background or platform specific features\n"
+  remarks: "\nAttributes are needed to map colors to terminal capabilities that might lack colors, on color\nscenarios, they encode both the foreground and the background color and are used in the ColorScheme\nclass to define color schemes that can be used in your application.\n"
+  example: []
   syntax:
     content: public struct Attribute
-  inheritance:
-  - System.ValueType
-  implements: []
-- uid: Terminal.Gui.Attribute.#ctor(System.Int32)
-  id: '#ctor(System.Int32)'
+    content.vb: Public Structure Attribute
+  inheritedMembers:
+  - System.ValueType.Equals(System.Object)
+  - System.ValueType.GetHashCode
+  - System.ValueType.ToString
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetType
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  modifiers.csharp:
+  - public
+  - struct
+  modifiers.vb:
+  - Public
+  - Structure
+- uid: Terminal.Gui.Attribute.#ctor(System.Int32,Terminal.Gui.Color,Terminal.Gui.Color)
+  commentId: M:Terminal.Gui.Attribute.#ctor(System.Int32,Terminal.Gui.Color,Terminal.Gui.Color)
+  id: '#ctor(System.Int32,Terminal.Gui.Color,Terminal.Gui.Color)'
   parent: Terminal.Gui.Attribute
   langs:
   - csharp
-  name: Attribute(Int32)
-  nameWithType: Attribute.Attribute(Int32)
-  fullName: Attribute.Attribute(Int32)
+  - vb
+  name: Attribute(Int32, Color, Color)
+  nameWithType: Attribute.Attribute(Int32, Color, Color)
+  fullName: Terminal.Gui.Attribute.Attribute(System.Int32, Terminal.Gui.Color, Terminal.Gui.Color)
   type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: .ctor
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 105
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Initializes a new instance of the <xref href="Terminal.Gui.Attribute"></xref> struct.
+  summary: "\nInitializes a new instance of the <xref href=\"Terminal.Gui.Attribute\" data-throw-if-not-resolved=\"false\"></xref> struct.\n"
+  example: []
   syntax:
-    content: public Attribute (int value);
+    content: public Attribute(int value, Color foreground = Color.Black, Color background = Color.Black)
     parameters:
     - id: value
       type: System.Int32
       description: Value.
+    - id: foreground
+      type: Terminal.Gui.Color
+      description: Foreground
+    - id: background
+      type: Terminal.Gui.Color
+      description: Background
+    content.vb: Public Sub New(value As Integer, foreground As Color = Color.Black, background As Color = Color.Black)
   overload: Terminal.Gui.Attribute.#ctor*
-  exceptions: []
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.Attribute.#ctor(Terminal.Gui.Color,Terminal.Gui.Color)
+  commentId: M:Terminal.Gui.Attribute.#ctor(Terminal.Gui.Color,Terminal.Gui.Color)
+  id: '#ctor(Terminal.Gui.Color,Terminal.Gui.Color)'
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: Attribute(Color, Color)
+  nameWithType: Attribute.Attribute(Color, Color)
+  fullName: Terminal.Gui.Attribute.Attribute(Terminal.Gui.Color, Terminal.Gui.Color)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: .ctor
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 117
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nInitializes a new instance of the <xref href=\"Terminal.Gui.Attribute\" data-throw-if-not-resolved=\"false\"></xref> struct.\n"
+  example: []
+  syntax:
+    content: public Attribute(Color foreground = Color.Black, Color background = Color.Black)
+    parameters:
+    - id: foreground
+      type: Terminal.Gui.Color
+      description: Foreground
+    - id: background
+      type: Terminal.Gui.Color
+      description: Background
+    content.vb: Public Sub New(foreground As Color = Color.Black, background As Color = Color.Black)
+  overload: Terminal.Gui.Attribute.#ctor*
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.Attribute.op_Implicit(Terminal.Gui.Attribute)~System.Int32
+  commentId: M:Terminal.Gui.Attribute.op_Implicit(Terminal.Gui.Attribute)~System.Int32
+  id: op_Implicit(Terminal.Gui.Attribute)~System.Int32
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: Implicit(Attribute to Int32)
+  nameWithType: Attribute.Implicit(Attribute to Int32)
+  fullName: Terminal.Gui.Attribute.Implicit(Terminal.Gui.Attribute to System.Int32)
+  type: Operator
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: op_Implicit
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 129
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nImplicit conversion from an attribute to the underlying Int32 representation\n"
+  example: []
+  syntax:
+    content: public static implicit operator int (Attribute c)
+    parameters:
+    - id: c
+      type: Terminal.Gui.Attribute
+      description: The attribute to convert
+    return:
+      type: System.Int32
+      description: The integer value stored in the attribute.
+    content.vb: Public Shared Widening Operator CType(c As Attribute) As Integer
+  overload: Terminal.Gui.Attribute.op_Implicit*
+  nameWithType.vb: Attribute.Widening(Attribute to Int32)
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+  fullName.vb: Terminal.Gui.Attribute.Widening(Terminal.Gui.Attribute to System.Int32)
+  name.vb: Widening(Attribute to Int32)
+- uid: Terminal.Gui.Attribute.op_Implicit(System.Int32)~Terminal.Gui.Attribute
+  commentId: M:Terminal.Gui.Attribute.op_Implicit(System.Int32)~Terminal.Gui.Attribute
+  id: op_Implicit(System.Int32)~Terminal.Gui.Attribute
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: Implicit(Int32 to Attribute)
+  nameWithType: Attribute.Implicit(Int32 to Attribute)
+  fullName: Terminal.Gui.Attribute.Implicit(System.Int32 to Terminal.Gui.Attribute)
+  type: Operator
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: op_Implicit
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 136
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nImplicitly convert an integer value into an attribute\n"
+  example: []
+  syntax:
+    content: public static implicit operator Attribute(int v)
+    parameters:
+    - id: v
+      type: System.Int32
+      description: value
+    return:
+      type: Terminal.Gui.Attribute
+      description: An attribute with the specified integer value.
+    content.vb: Public Shared Widening Operator CType(v As Integer) As Attribute
+  overload: Terminal.Gui.Attribute.op_Implicit*
+  nameWithType.vb: Attribute.Widening(Int32 to Attribute)
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+  fullName.vb: Terminal.Gui.Attribute.Widening(System.Int32 to Terminal.Gui.Attribute)
+  name.vb: Widening(Int32 to Attribute)
 - uid: Terminal.Gui.Attribute.Make(Terminal.Gui.Color,Terminal.Gui.Color)
+  commentId: M:Terminal.Gui.Attribute.Make(Terminal.Gui.Color,Terminal.Gui.Color)
   id: Make(Terminal.Gui.Color,Terminal.Gui.Color)
   parent: Terminal.Gui.Attribute
   langs:
   - csharp
+  - vb
   name: Make(Color, Color)
   nameWithType: Attribute.Make(Color, Color)
-  fullName: Attribute.Make(Color, Color)
+  fullName: Terminal.Gui.Attribute.Make(Terminal.Gui.Color, Terminal.Gui.Color)
   type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Make
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 144
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Creates an attribute from the specified foreground and background.
+  summary: "\nCreates an attribute from the specified foreground and background.\n"
+  example: []
   syntax:
-    content: public static Terminal.Gui.Attribute Make (Terminal.Gui.Color foreground, Terminal.Gui.Color background);
+    content: public static Attribute Make(Color foreground, Color background)
     parameters:
     - id: foreground
       type: Terminal.Gui.Color
@@ -72,120 +252,323 @@ items:
     return:
       type: Terminal.Gui.Attribute
       description: The make.
+    content.vb: Public Shared Function Make(foreground As Color, background As Color) As Attribute
   overload: Terminal.Gui.Attribute.Make*
-  exceptions: []
-- uid: Terminal.Gui.Attribute.op_Implicit(System.Int32 to Terminal.Gui.Attribute)
-  id: op_Implicit(System.Int32 to Terminal.Gui.Attribute)
-  parent: Terminal.Gui.Attribute
-  langs:
-  - csharp
-  name: op_Implicit(Int32 to Attribute)
-  nameWithType: Attribute.op_Implicit(Int32 to Attribute)
-  fullName: Attribute.op_Implicit(Int32 to Attribute)
-  type: Operator
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Implicitly convert an integer value into an attribute
-  syntax:
-    content: public static Terminal.Gui.Attribute op_Implicit (int v);
-    parameters:
-    - id: v
-      type: System.Int32
-      description: value
-    return:
-      type: Terminal.Gui.Attribute
-      description: An attribute with the specified integer value.
-  overload: Terminal.Gui.Attribute.op_Implicit*
-  exceptions: []
-- uid: Terminal.Gui.Attribute.op_Implicit(Terminal.Gui.Attribute to System.Int32)
-  id: op_Implicit(Terminal.Gui.Attribute to System.Int32)
-  parent: Terminal.Gui.Attribute
-  langs:
-  - csharp
-  name: op_Implicit(Attribute to Int32)
-  nameWithType: Attribute.op_Implicit(Attribute to Int32)
-  fullName: Attribute.op_Implicit(Attribute to Int32)
-  type: Operator
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Implicit conversion from an attribute to the underlying Int32 representation
-  syntax:
-    content: public static int op_Implicit (Terminal.Gui.Attribute c);
-    parameters:
-    - id: c
-      type: Terminal.Gui.Attribute
-      description: The attribute to convert
-    return:
-      type: System.Int32
-      description: The integer value stored in the attribute.
-  overload: Terminal.Gui.Attribute.op_Implicit*
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
 references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+- uid: System.ValueType.Equals(System.Object)
+  commentId: M:System.ValueType.Equals(System.Object)
+  parent: System.ValueType
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: ValueType.Equals(Object)
+  fullName: System.ValueType.Equals(System.Object)
+  spec.csharp:
+  - uid: System.ValueType.Equals(System.Object)
+    name: Equals
+    nameWithType: ValueType.Equals
+    fullName: System.ValueType.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.ValueType.Equals(System.Object)
+    name: Equals
+    nameWithType: ValueType.Equals
+    fullName: System.ValueType.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.ValueType.GetHashCode
+  commentId: M:System.ValueType.GetHashCode
+  parent: System.ValueType
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: ValueType.GetHashCode()
+  fullName: System.ValueType.GetHashCode()
+  spec.csharp:
+  - uid: System.ValueType.GetHashCode
+    name: GetHashCode
+    nameWithType: ValueType.GetHashCode
+    fullName: System.ValueType.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.ValueType.GetHashCode
+    name: GetHashCode
+    nameWithType: ValueType.GetHashCode
+    fullName: System.ValueType.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.ValueType.ToString
+  commentId: M:System.ValueType.ToString
+  parent: System.ValueType
+  isExternal: true
+  name: ToString()
+  nameWithType: ValueType.ToString()
+  fullName: System.ValueType.ToString()
+  spec.csharp:
+  - uid: System.ValueType.ToString
+    name: ToString
+    nameWithType: ValueType.ToString
+    fullName: System.ValueType.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.ValueType.ToString
+    name: ToString
+    nameWithType: ValueType.ToString
+    fullName: System.ValueType.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
 - uid: System.ValueType
+  commentId: T:System.ValueType
   parent: System
   isExternal: true
   name: ValueType
   nameWithType: ValueType
   fullName: System.ValueType
-- uid: Terminal.Gui.Attribute.#ctor(System.Int32)
-  parent: Terminal.Gui.Attribute
-  isExternal: false
-  name: Attribute(Int32)
-  nameWithType: Attribute.Attribute(Int32)
-  fullName: Attribute.Attribute(Int32)
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.Attribute
+  commentId: T:Terminal.Gui.Attribute
+  parent: Terminal.Gui
+  name: Attribute
+  nameWithType: Attribute
+  fullName: Terminal.Gui.Attribute
+- uid: Terminal.Gui.Attribute.#ctor*
+  commentId: Overload:Terminal.Gui.Attribute.#ctor
+  name: Attribute
+  nameWithType: Attribute.Attribute
+  fullName: Terminal.Gui.Attribute.Attribute
 - uid: System.Int32
+  commentId: T:System.Int32
   parent: System
   isExternal: true
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
-- uid: Terminal.Gui.Attribute.Make(Terminal.Gui.Color,Terminal.Gui.Color)
-  parent: Terminal.Gui.Attribute
-  isExternal: false
-  name: Make(Color, Color)
-  nameWithType: Attribute.Make(Color, Color)
-  fullName: Attribute.Make(Color, Color)
-- uid: Terminal.Gui.Attribute
-  parent: Terminal.Gui
-  isExternal: false
-  name: Attribute
-  nameWithType: Attribute
-  fullName: Terminal.Gui.Attribute
 - uid: Terminal.Gui.Color
+  commentId: T:Terminal.Gui.Color
   parent: Terminal.Gui
-  isExternal: false
   name: Color
   nameWithType: Color
   fullName: Terminal.Gui.Color
-- uid: Terminal.Gui.Attribute.op_Implicit(System.Int32 to Terminal.Gui.Attribute)
-  parent: Terminal.Gui.Attribute
-  isExternal: false
-  name: op_Implicit(Int32 to Attribute)
-  nameWithType: Attribute.op_Implicit(Int32 to Attribute)
-  fullName: Attribute.op_Implicit(Int32 to Attribute)
-- uid: Terminal.Gui.Attribute.op_Implicit(Terminal.Gui.Attribute to System.Int32)
-  parent: Terminal.Gui.Attribute
-  isExternal: false
-  name: op_Implicit(Attribute to Int32)
-  nameWithType: Attribute.op_Implicit(Attribute to Int32)
-  fullName: Attribute.op_Implicit(Attribute to Int32)
-- uid: Terminal.Gui.Attribute.#ctor*
-  parent: Terminal.Gui.Attribute
-  isExternal: false
-  name: Attribute
-  nameWithType: Attribute.Attribute
-  fullName: Attribute.Attribute
+- uid: Terminal.Gui.Attribute.op_Implicit*
+  commentId: Overload:Terminal.Gui.Attribute.op_Implicit
+  name: Implicit
+  nameWithType: Attribute.Implicit
+  fullName: Terminal.Gui.Attribute.Implicit
+  nameWithType.vb: Attribute.Widening
+  fullName.vb: Terminal.Gui.Attribute.Widening
+  name.vb: Widening
 - uid: Terminal.Gui.Attribute.Make*
-  parent: Terminal.Gui.Attribute
-  isExternal: false
+  commentId: Overload:Terminal.Gui.Attribute.Make
   name: Make
   nameWithType: Attribute.Make
-  fullName: Attribute.Make
-- uid: Terminal.Gui.Attribute.op_Implicit*
-  parent: Terminal.Gui.Attribute
-  isExternal: false
-  name: op_Implicit
-  nameWithType: Attribute.op_Implicit
-  fullName: Attribute.op_Implicit
+  fullName: Terminal.Gui.Attribute.Make
+shouldSkipMarkup: true

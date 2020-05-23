@@ -1,7 +1,9 @@
 ### YamlMime:ManagedReference
 items:
 - uid: Terminal.Gui.Color
+  commentId: T:Terminal.Gui.Color
   id: Color
+  parent: Terminal.Gui
   children:
   - Terminal.Gui.Color.Black
   - Terminal.Gui.Color.Blue
@@ -21,428 +23,587 @@ items:
   - Terminal.Gui.Color.White
   langs:
   - csharp
+  - vb
   name: Color
   nameWithType: Color
   fullName: Terminal.Gui.Color
   type: Enum
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Color
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 19
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Basic colors that can be used to set the foreground and background colors in console applications.  These can only be
+  summary: "\nBasic colors that can be used to set the foreground and background colors in console applications.  These can only be\n"
+  example: []
   syntax:
     content: public enum Color
-  inheritance:
-  - System.Enum
+    content.vb: Public Enum Color
+  modifiers.csharp:
+  - public
+  - enum
+  modifiers.vb:
+  - Public
+  - Enum
 - uid: Terminal.Gui.Color.Black
+  commentId: F:Terminal.Gui.Color.Black
   id: Black
   parent: Terminal.Gui.Color
   langs:
   - csharp
+  - vb
   name: Black
   nameWithType: Color.Black
-  fullName: Color.Black
+  fullName: Terminal.Gui.Color.Black
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Black
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 23
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The black color.
+  summary: "\nThe black color.\n"
+  example: []
   syntax:
-    content: Black
+    content: Black = 0
     return:
       type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
 - uid: Terminal.Gui.Color.Blue
+  commentId: F:Terminal.Gui.Color.Blue
   id: Blue
   parent: Terminal.Gui.Color
   langs:
   - csharp
+  - vb
   name: Blue
   nameWithType: Color.Blue
-  fullName: Color.Blue
+  fullName: Terminal.Gui.Color.Blue
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Blue
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 27
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The blue color.
+  summary: "\nThe blue color.\n"
+  example: []
   syntax:
-    content: Blue
+    content: Blue = 1
     return:
       type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Color.BrighCyan
-  id: BrighCyan
-  parent: Terminal.Gui.Color
-  langs:
-  - csharp
-  name: BrighCyan
-  nameWithType: Color.BrighCyan
-  fullName: Color.BrighCyan
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The brigh cyan color.
-  syntax:
-    content: BrighCyan
-    return:
-      type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Color.BrightBlue
-  id: BrightBlue
-  parent: Terminal.Gui.Color
-  langs:
-  - csharp
-  name: BrightBlue
-  nameWithType: Color.BrightBlue
-  fullName: Color.BrightBlue
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The bright bBlue color.
-  syntax:
-    content: BrightBlue
-    return:
-      type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Color.BrightGreen
-  id: BrightGreen
-  parent: Terminal.Gui.Color
-  langs:
-  - csharp
-  name: BrightGreen
-  nameWithType: Color.BrightGreen
-  fullName: Color.BrightGreen
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The bright green color.
-  syntax:
-    content: BrightGreen
-    return:
-      type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Color.BrightMagenta
-  id: BrightMagenta
-  parent: Terminal.Gui.Color
-  langs:
-  - csharp
-  name: BrightMagenta
-  nameWithType: Color.BrightMagenta
-  fullName: Color.BrightMagenta
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The bright magenta color.
-  syntax:
-    content: BrightMagenta
-    return:
-      type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Color.BrightRed
-  id: BrightRed
-  parent: Terminal.Gui.Color
-  langs:
-  - csharp
-  name: BrightRed
-  nameWithType: Color.BrightRed
-  fullName: Color.BrightRed
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The bright red color.
-  syntax:
-    content: BrightRed
-    return:
-      type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Color.BrightYellow
-  id: BrightYellow
-  parent: Terminal.Gui.Color
-  langs:
-  - csharp
-  name: BrightYellow
-  nameWithType: Color.BrightYellow
-  fullName: Color.BrightYellow
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The bright yellow color.
-  syntax:
-    content: BrightYellow
-    return:
-      type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Color.Brown
-  id: Brown
-  parent: Terminal.Gui.Color
-  langs:
-  - csharp
-  name: Brown
-  nameWithType: Color.Brown
-  fullName: Color.Brown
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The brown color.
-  syntax:
-    content: Brown
-    return:
-      type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Color.Cyan
-  id: Cyan
-  parent: Terminal.Gui.Color
-  langs:
-  - csharp
-  name: Cyan
-  nameWithType: Color.Cyan
-  fullName: Color.Cyan
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The cyan color.
-  syntax:
-    content: Cyan
-    return:
-      type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Color.DarkGray
-  id: DarkGray
-  parent: Terminal.Gui.Color
-  langs:
-  - csharp
-  name: DarkGray
-  nameWithType: Color.DarkGray
-  fullName: Color.DarkGray
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The dark gray color.
-  syntax:
-    content: DarkGray
-    return:
-      type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Color.Gray
-  id: Gray
-  parent: Terminal.Gui.Color
-  langs:
-  - csharp
-  name: Gray
-  nameWithType: Color.Gray
-  fullName: Color.Gray
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The gray color.
-  syntax:
-    content: Gray
-    return:
-      type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
 - uid: Terminal.Gui.Color.Green
+  commentId: F:Terminal.Gui.Color.Green
   id: Green
   parent: Terminal.Gui.Color
   langs:
   - csharp
+  - vb
   name: Green
   nameWithType: Color.Green
-  fullName: Color.Green
+  fullName: Terminal.Gui.Color.Green
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Green
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 31
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The green color.
+  summary: "\nThe green color.\n"
+  example: []
   syntax:
-    content: Green
+    content: Green = 2
     return:
       type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Color.Magenta
-  id: Magenta
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.Color.Cyan
+  commentId: F:Terminal.Gui.Color.Cyan
+  id: Cyan
   parent: Terminal.Gui.Color
   langs:
   - csharp
-  name: Magenta
-  nameWithType: Color.Magenta
-  fullName: Color.Magenta
+  - vb
+  name: Cyan
+  nameWithType: Color.Cyan
+  fullName: Terminal.Gui.Color.Cyan
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Cyan
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 35
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The magenta color.
+  summary: "\nThe cyan color.\n"
+  example: []
   syntax:
-    content: Magenta
+    content: Cyan = 3
     return:
       type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
 - uid: Terminal.Gui.Color.Red
+  commentId: F:Terminal.Gui.Color.Red
   id: Red
   parent: Terminal.Gui.Color
   langs:
   - csharp
+  - vb
   name: Red
   nameWithType: Color.Red
-  fullName: Color.Red
+  fullName: Terminal.Gui.Color.Red
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Red
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 39
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The red color.
+  summary: "\nThe red color.\n"
+  example: []
   syntax:
-    content: Red
+    content: Red = 4
     return:
       type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.Color.Magenta
+  commentId: F:Terminal.Gui.Color.Magenta
+  id: Magenta
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  - vb
+  name: Magenta
+  nameWithType: Color.Magenta
+  fullName: Terminal.Gui.Color.Magenta
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Magenta
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 43
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe magenta color.\n"
+  example: []
+  syntax:
+    content: Magenta = 5
+    return:
+      type: Terminal.Gui.Color
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.Color.Brown
+  commentId: F:Terminal.Gui.Color.Brown
+  id: Brown
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  - vb
+  name: Brown
+  nameWithType: Color.Brown
+  fullName: Terminal.Gui.Color.Brown
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Brown
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 47
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe brown color.\n"
+  example: []
+  syntax:
+    content: Brown = 6
+    return:
+      type: Terminal.Gui.Color
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.Color.Gray
+  commentId: F:Terminal.Gui.Color.Gray
+  id: Gray
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  - vb
+  name: Gray
+  nameWithType: Color.Gray
+  fullName: Terminal.Gui.Color.Gray
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Gray
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 51
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe gray color.\n"
+  example: []
+  syntax:
+    content: Gray = 7
+    return:
+      type: Terminal.Gui.Color
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.Color.DarkGray
+  commentId: F:Terminal.Gui.Color.DarkGray
+  id: DarkGray
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  - vb
+  name: DarkGray
+  nameWithType: Color.DarkGray
+  fullName: Terminal.Gui.Color.DarkGray
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: DarkGray
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 55
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe dark gray color.\n"
+  example: []
+  syntax:
+    content: DarkGray = 8
+    return:
+      type: Terminal.Gui.Color
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.Color.BrightBlue
+  commentId: F:Terminal.Gui.Color.BrightBlue
+  id: BrightBlue
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  - vb
+  name: BrightBlue
+  nameWithType: Color.BrightBlue
+  fullName: Terminal.Gui.Color.BrightBlue
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: BrightBlue
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 59
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe bright bBlue color.\n"
+  example: []
+  syntax:
+    content: BrightBlue = 9
+    return:
+      type: Terminal.Gui.Color
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.Color.BrightGreen
+  commentId: F:Terminal.Gui.Color.BrightGreen
+  id: BrightGreen
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  - vb
+  name: BrightGreen
+  nameWithType: Color.BrightGreen
+  fullName: Terminal.Gui.Color.BrightGreen
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: BrightGreen
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 63
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe bright green color.\n"
+  example: []
+  syntax:
+    content: BrightGreen = 10
+    return:
+      type: Terminal.Gui.Color
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.Color.BrighCyan
+  commentId: F:Terminal.Gui.Color.BrighCyan
+  id: BrighCyan
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  - vb
+  name: BrighCyan
+  nameWithType: Color.BrighCyan
+  fullName: Terminal.Gui.Color.BrighCyan
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: BrighCyan
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 67
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe brigh cyan color.\n"
+  example: []
+  syntax:
+    content: BrighCyan = 11
+    return:
+      type: Terminal.Gui.Color
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.Color.BrightRed
+  commentId: F:Terminal.Gui.Color.BrightRed
+  id: BrightRed
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  - vb
+  name: BrightRed
+  nameWithType: Color.BrightRed
+  fullName: Terminal.Gui.Color.BrightRed
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: BrightRed
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 71
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe bright red color.\n"
+  example: []
+  syntax:
+    content: BrightRed = 12
+    return:
+      type: Terminal.Gui.Color
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.Color.BrightMagenta
+  commentId: F:Terminal.Gui.Color.BrightMagenta
+  id: BrightMagenta
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  - vb
+  name: BrightMagenta
+  nameWithType: Color.BrightMagenta
+  fullName: Terminal.Gui.Color.BrightMagenta
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: BrightMagenta
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 75
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe bright magenta color.\n"
+  example: []
+  syntax:
+    content: BrightMagenta = 13
+    return:
+      type: Terminal.Gui.Color
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.Color.BrightYellow
+  commentId: F:Terminal.Gui.Color.BrightYellow
+  id: BrightYellow
+  parent: Terminal.Gui.Color
+  langs:
+  - csharp
+  - vb
+  name: BrightYellow
+  nameWithType: Color.BrightYellow
+  fullName: Terminal.Gui.Color.BrightYellow
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: BrightYellow
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 79
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe bright yellow color.\n"
+  example: []
+  syntax:
+    content: BrightYellow = 14
+    return:
+      type: Terminal.Gui.Color
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
 - uid: Terminal.Gui.Color.White
+  commentId: F:Terminal.Gui.Color.White
   id: White
   parent: Terminal.Gui.Color
   langs:
   - csharp
+  - vb
   name: White
   nameWithType: Color.White
-  fullName: Color.White
+  fullName: Terminal.Gui.Color.White
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: White
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 83
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The White color.
+  summary: "\nThe White color.\n"
+  example: []
   syntax:
-    content: White
+    content: White = 15
     return:
       type: Terminal.Gui.Color
-      description: To be added.
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
 references:
-- uid: System.Enum
-  parent: System
-  isExternal: true
-  name: Enum
-  nameWithType: Enum
-  fullName: System.Enum
-- uid: Terminal.Gui.Color.Black
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: Black
-  nameWithType: Color.Black
-  fullName: Color.Black
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
 - uid: Terminal.Gui.Color
+  commentId: T:Terminal.Gui.Color
   parent: Terminal.Gui
-  isExternal: false
   name: Color
   nameWithType: Color
   fullName: Terminal.Gui.Color
-- uid: Terminal.Gui.Color.Blue
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: Blue
-  nameWithType: Color.Blue
-  fullName: Color.Blue
-- uid: Terminal.Gui.Color.BrighCyan
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: BrighCyan
-  nameWithType: Color.BrighCyan
-  fullName: Color.BrighCyan
-- uid: Terminal.Gui.Color.BrightBlue
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: BrightBlue
-  nameWithType: Color.BrightBlue
-  fullName: Color.BrightBlue
-- uid: Terminal.Gui.Color.BrightGreen
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: BrightGreen
-  nameWithType: Color.BrightGreen
-  fullName: Color.BrightGreen
-- uid: Terminal.Gui.Color.BrightMagenta
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: BrightMagenta
-  nameWithType: Color.BrightMagenta
-  fullName: Color.BrightMagenta
-- uid: Terminal.Gui.Color.BrightRed
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: BrightRed
-  nameWithType: Color.BrightRed
-  fullName: Color.BrightRed
-- uid: Terminal.Gui.Color.BrightYellow
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: BrightYellow
-  nameWithType: Color.BrightYellow
-  fullName: Color.BrightYellow
-- uid: Terminal.Gui.Color.Brown
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: Brown
-  nameWithType: Color.Brown
-  fullName: Color.Brown
-- uid: Terminal.Gui.Color.Cyan
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: Cyan
-  nameWithType: Color.Cyan
-  fullName: Color.Cyan
-- uid: Terminal.Gui.Color.DarkGray
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: DarkGray
-  nameWithType: Color.DarkGray
-  fullName: Color.DarkGray
-- uid: Terminal.Gui.Color.Gray
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: Gray
-  nameWithType: Color.Gray
-  fullName: Color.Gray
-- uid: Terminal.Gui.Color.Green
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: Green
-  nameWithType: Color.Green
-  fullName: Color.Green
-- uid: Terminal.Gui.Color.Magenta
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: Magenta
-  nameWithType: Color.Magenta
-  fullName: Color.Magenta
-- uid: Terminal.Gui.Color.Red
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: Red
-  nameWithType: Color.Red
-  fullName: Color.Red
-- uid: Terminal.Gui.Color.White
-  parent: Terminal.Gui.Color
-  isExternal: false
-  name: White
-  nameWithType: Color.White
-  fullName: Color.White
+shouldSkipMarkup: true

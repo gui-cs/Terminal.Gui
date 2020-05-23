@@ -1,11 +1,14 @@
 ### YamlMime:ManagedReference
 items:
 - uid: Terminal.Gui.FileDialog
+  commentId: T:Terminal.Gui.FileDialog
   id: FileDialog
+  parent: Terminal.Gui
   children:
   - Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring)
   - Terminal.Gui.FileDialog.AllowedFileTypes
   - Terminal.Gui.FileDialog.AllowsOtherFileTypes
+  - Terminal.Gui.FileDialog.Canceled
   - Terminal.Gui.FileDialog.CanCreateDirectories
   - Terminal.Gui.FileDialog.DirectoryPath
   - Terminal.Gui.FileDialog.FilePath
@@ -16,16 +19,32 @@ items:
   - Terminal.Gui.FileDialog.WillPresent
   langs:
   - csharp
+  - vb
   name: FileDialog
   nameWithType: FileDialog
   fullName: Terminal.Gui.FileDialog
   type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Dialogs/FileDialog.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: FileDialog
+    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    startLine: 421
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Base class for the OpenDialog and the SaveDialog
+  summary: "\nBase class for the <xref href=\"Terminal.Gui.OpenDialog\" data-throw-if-not-resolved=\"false\"></xref> and the <xref href=\"Terminal.Gui.SaveDialog\" data-throw-if-not-resolved=\"false\"></xref>\n"
+  example: []
   syntax:
-    content: 'public class FileDialog : Terminal.Gui.Dialog'
+    content: 'public class FileDialog : Dialog, IEnumerable'
+    content.vb: >-
+      Public Class FileDialog
+
+          Inherits Dialog
+
+          Implements IEnumerable
   inheritance:
   - System.Object
   - Terminal.Gui.Responder
@@ -36,778 +55,2888 @@ items:
   derivedClasses:
   - Terminal.Gui.OpenDialog
   - Terminal.Gui.SaveDialog
-  implements: []
+  implements:
+  - System.Collections.IEnumerable
   inheritedMembers:
   - Terminal.Gui.Dialog.AddButton(Terminal.Gui.Button)
   - Terminal.Gui.Dialog.LayoutSubviews
   - Terminal.Gui.Dialog.ProcessKey(Terminal.Gui.KeyEvent)
-  - Terminal.Gui.Toplevel.CanFocus
-  - Terminal.Gui.Toplevel.Create
-  - Terminal.Gui.Toplevel.Running
-  - Terminal.Gui.View.Add(Terminal.Gui.View[])
-  - Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
-  - Terminal.Gui.View.Bounds
-  - Terminal.Gui.View.ChildNeedsDisplay
-  - Terminal.Gui.View.Clear
-  - Terminal.Gui.View.Clear(Terminal.Gui.Rect)
-  - Terminal.Gui.View.ClearNeedsDisplay
-  - Terminal.Gui.View.ClipToBounds
-  - Terminal.Gui.View.ColorScheme
-  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
-  - Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
-  - Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
-  - Terminal.Gui.View.Driver
-  - Terminal.Gui.View.EnsureFocus
-  - Terminal.Gui.View.Focused
-  - Terminal.Gui.View.FocusFirst
-  - Terminal.Gui.View.FocusLast
-  - Terminal.Gui.View.FocusNext
-  - Terminal.Gui.View.FocusPrev
-  - Terminal.Gui.View.Frame
-  - Terminal.Gui.View.HasFocus
-  - Terminal.Gui.View.Height
-  - Terminal.Gui.View.Id
-  - Terminal.Gui.View.LayoutStyle
-  - Terminal.Gui.View.MostFocused
-  - Terminal.Gui.View.Move(System.Int32,System.Int32)
-  - Terminal.Gui.View.PositionCursor
-  - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
-  - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
-  - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
-  - Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
-  - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
-  - Terminal.Gui.View.SetNeedsDisplay
-  - Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
-  - Terminal.Gui.View.Subviews
-  - Terminal.Gui.View.SuperView
-  - Terminal.Gui.View.ToString
-  - Terminal.Gui.View.WantMousePositionReports
-  - Terminal.Gui.View.Width
-  - Terminal.Gui.View.X
-  - Terminal.Gui.View.Y
-  - Terminal.Gui.Window.Add(Terminal.Gui.View)
+  - Terminal.Gui.Window.Title
   - Terminal.Gui.Window.GetEnumerator
-  - Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
-  - Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.Window.Add(Terminal.Gui.View)
   - Terminal.Gui.Window.Remove(Terminal.Gui.View)
   - Terminal.Gui.Window.RemoveAll
-  - Terminal.Gui.Window.Title
+  - Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
+  - Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
+  - Terminal.Gui.Toplevel.Running
+  - Terminal.Gui.Toplevel.Ready
+  - Terminal.Gui.Toplevel.Create
+  - Terminal.Gui.Toplevel.CanFocus
+  - Terminal.Gui.Toplevel.Modal
+  - Terminal.Gui.Toplevel.MenuBar
+  - Terminal.Gui.Toplevel.StatusBar
+  - Terminal.Gui.View.Enter
+  - Terminal.Gui.View.Leave
+  - Terminal.Gui.View.MouseEnter
+  - Terminal.Gui.View.MouseLeave
+  - Terminal.Gui.View.Driver
+  - Terminal.Gui.View.Subviews
+  - Terminal.Gui.View.Id
+  - Terminal.Gui.View.WantMousePositionReports
+  - Terminal.Gui.View.WantContinuousButtonPressed
+  - Terminal.Gui.View.Frame
+  - Terminal.Gui.View.LayoutStyle
+  - Terminal.Gui.View.Bounds
+  - Terminal.Gui.View.X
+  - Terminal.Gui.View.Y
+  - Terminal.Gui.View.Width
+  - Terminal.Gui.View.Height
+  - Terminal.Gui.View.SuperView
+  - Terminal.Gui.View.SetNeedsDisplay
+  - Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  - Terminal.Gui.View.ChildNeedsDisplay
+  - Terminal.Gui.View.Add(Terminal.Gui.View[])
+  - Terminal.Gui.View.BringSubviewToFront(Terminal.Gui.View)
+  - Terminal.Gui.View.SendSubviewToBack(Terminal.Gui.View)
+  - Terminal.Gui.View.SendSubviewBackwards(Terminal.Gui.View)
+  - Terminal.Gui.View.BringSubviewForward(Terminal.Gui.View)
+  - Terminal.Gui.View.Clear
+  - Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+  - Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  - Terminal.Gui.View.ClipToBounds
+  - Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+  - Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  - Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  - Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  - Terminal.Gui.View.Move(System.Int32,System.Int32)
+  - Terminal.Gui.View.PositionCursor
+  - Terminal.Gui.View.HasFocus
+  - Terminal.Gui.View.OnEnter
+  - Terminal.Gui.View.OnLeave
+  - Terminal.Gui.View.Focused
+  - Terminal.Gui.View.MostFocused
+  - Terminal.Gui.View.ColorScheme
+  - Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+  - Terminal.Gui.View.ClearNeedsDisplay
+  - Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  - Terminal.Gui.View.KeyPress
+  - Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.KeyDown
+  - Terminal.Gui.View.OnKeyDown(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.KeyUp
+  - Terminal.Gui.View.OnKeyUp(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.EnsureFocus
+  - Terminal.Gui.View.FocusFirst
+  - Terminal.Gui.View.FocusLast
+  - Terminal.Gui.View.FocusPrev
+  - Terminal.Gui.View.FocusNext
+  - Terminal.Gui.View.ToString
+  - Terminal.Gui.View.OnMouseEnter(Terminal.Gui.MouseEvent)
+  - Terminal.Gui.View.OnMouseLeave(Terminal.Gui.MouseEvent)
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  modifiers.csharp:
+  - public
+  - class
+  modifiers.vb:
+  - Public
+  - Class
 - uid: Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring)
+  commentId: M:Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring)
   id: '#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring)'
   parent: Terminal.Gui.FileDialog
   langs:
   - csharp
+  - vb
   name: FileDialog(ustring, ustring, ustring, ustring)
   nameWithType: FileDialog.FileDialog(ustring, ustring, ustring, ustring)
-  fullName: FileDialog.FileDialog(ustring, ustring, ustring, ustring)
+  fullName: Terminal.Gui.FileDialog.FileDialog(NStack.ustring, NStack.ustring, NStack.ustring, NStack.ustring)
   type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Dialogs/FileDialog.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: .ctor
+    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    startLine: 434
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: "\nInitializes a new instance of <xref href=\"Terminal.Gui.FileDialog\" data-throw-if-not-resolved=\"false\"></xref>\n"
+  example: []
   syntax:
-    content: public FileDialog (NStack.ustring title, NStack.ustring prompt, NStack.ustring nameFieldLabel, NStack.ustring message);
+    content: public FileDialog(ustring title, ustring prompt, ustring nameFieldLabel, ustring message)
     parameters:
     - id: title
       type: NStack.ustring
-      description: To be added.
+      description: The title.
     - id: prompt
       type: NStack.ustring
-      description: To be added.
+      description: The prompt.
     - id: nameFieldLabel
       type: NStack.ustring
-      description: To be added.
+      description: The name field label.
     - id: message
       type: NStack.ustring
-      description: To be added.
-  overload: Terminal.Gui.FileDialog.#ctor*
-  exceptions: []
-- uid: Terminal.Gui.FileDialog.AllowedFileTypes
-  id: AllowedFileTypes
-  parent: Terminal.Gui.FileDialog
-  langs:
-  - csharp
-  name: AllowedFileTypes
-  nameWithType: FileDialog.AllowedFileTypes
-  fullName: FileDialog.AllowedFileTypes
-  type: Property
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The array of filename extensions allowed, or null if all file extensions are allowed.
-  syntax:
-    content: public string[] AllowedFileTypes { get; set; }
-    return:
-      type: System.String[]
-      description: The allowed file types.
-  overload: Terminal.Gui.FileDialog.AllowedFileTypes*
-  exceptions: []
-- uid: Terminal.Gui.FileDialog.AllowsOtherFileTypes
-  id: AllowsOtherFileTypes
-  parent: Terminal.Gui.FileDialog
-  langs:
-  - csharp
-  name: AllowsOtherFileTypes
-  nameWithType: FileDialog.AllowsOtherFileTypes
-  fullName: FileDialog.AllowsOtherFileTypes
-  type: Property
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Gets or sets a value indicating whether this <xref href="Terminal.Gui.FileDialog"></xref> allows the file to be saved with a different extension
-  syntax:
-    content: public bool AllowsOtherFileTypes { get; set; }
-    return:
-      type: System.Boolean
-      description: <code>true</code> if allows other file types; otherwise, <code>false</code>.
-  overload: Terminal.Gui.FileDialog.AllowsOtherFileTypes*
-  exceptions: []
-- uid: Terminal.Gui.FileDialog.CanCreateDirectories
-  id: CanCreateDirectories
-  parent: Terminal.Gui.FileDialog
-  langs:
-  - csharp
-  name: CanCreateDirectories
-  nameWithType: FileDialog.CanCreateDirectories
-  fullName: FileDialog.CanCreateDirectories
-  type: Property
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Gets or sets a value indicating whether this <xref href="Terminal.Gui.FileDialog"></xref> can create directories.
-  syntax:
-    content: public bool CanCreateDirectories { get; set; }
-    return:
-      type: System.Boolean
-      description: <code>true</code> if can create directories; otherwise, <code>false</code>.
-  overload: Terminal.Gui.FileDialog.CanCreateDirectories*
-  exceptions: []
-- uid: Terminal.Gui.FileDialog.DirectoryPath
-  id: DirectoryPath
-  parent: Terminal.Gui.FileDialog
-  langs:
-  - csharp
-  name: DirectoryPath
-  nameWithType: FileDialog.DirectoryPath
-  fullName: FileDialog.DirectoryPath
-  type: Property
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Gets or sets the directory path for this panel
-  syntax:
-    content: public NStack.ustring DirectoryPath { get; set; }
-    return:
-      type: NStack.ustring
-      description: The directory path.
-  overload: Terminal.Gui.FileDialog.DirectoryPath*
-  exceptions: []
-- uid: Terminal.Gui.FileDialog.FilePath
-  id: FilePath
-  parent: Terminal.Gui.FileDialog
-  langs:
-  - csharp
-  name: FilePath
-  nameWithType: FileDialog.FilePath
-  fullName: FileDialog.FilePath
-  type: Property
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The File path that is currently shown on the panel
-  syntax:
-    content: public NStack.ustring FilePath { get; set; }
-    return:
-      type: NStack.ustring
-      description: The absolute file path for the file path entered.
-  overload: Terminal.Gui.FileDialog.FilePath*
-  exceptions: []
-- uid: Terminal.Gui.FileDialog.IsExtensionHidden
-  id: IsExtensionHidden
-  parent: Terminal.Gui.FileDialog
-  langs:
-  - csharp
-  name: IsExtensionHidden
-  nameWithType: FileDialog.IsExtensionHidden
-  fullName: FileDialog.IsExtensionHidden
-  type: Property
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Gets or sets a value indicating whether this <xref href="Terminal.Gui.FileDialog"></xref> is extension hidden.
-  syntax:
-    content: public bool IsExtensionHidden { get; set; }
-    return:
-      type: System.Boolean
-      description: <code>true</code> if is extension hidden; otherwise, <code>false</code>.
-  overload: Terminal.Gui.FileDialog.IsExtensionHidden*
-  exceptions: []
-- uid: Terminal.Gui.FileDialog.Message
-  id: Message
-  parent: Terminal.Gui.FileDialog
-  langs:
-  - csharp
-  name: Message
-  nameWithType: FileDialog.Message
-  fullName: FileDialog.Message
-  type: Property
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Gets or sets the message displayed to the user, defaults to nothing
-  syntax:
-    content: public NStack.ustring Message { get; set; }
-    return:
-      type: NStack.ustring
       description: The message.
-  overload: Terminal.Gui.FileDialog.Message*
-  exceptions: []
-- uid: Terminal.Gui.FileDialog.NameFieldLabel
-  id: NameFieldLabel
-  parent: Terminal.Gui.FileDialog
-  langs:
-  - csharp
-  name: NameFieldLabel
-  nameWithType: FileDialog.NameFieldLabel
-  fullName: FileDialog.NameFieldLabel
-  type: Property
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Gets or sets the name field label.
-  syntax:
-    content: public NStack.ustring NameFieldLabel { get; set; }
-    return:
-      type: NStack.ustring
-      description: The name field label.
-  overload: Terminal.Gui.FileDialog.NameFieldLabel*
-  exceptions: []
-- uid: Terminal.Gui.FileDialog.Prompt
-  id: Prompt
-  parent: Terminal.Gui.FileDialog
-  langs:
-  - csharp
-  name: Prompt
-  nameWithType: FileDialog.Prompt
-  fullName: FileDialog.Prompt
-  type: Property
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Gets or sets the prompt label for the button displayed to the user
-  syntax:
-    content: public NStack.ustring Prompt { get; set; }
-    return:
-      type: NStack.ustring
-      description: The prompt.
-  overload: Terminal.Gui.FileDialog.Prompt*
-  exceptions: []
+    content.vb: Public Sub New(title As ustring, prompt As ustring, nameFieldLabel As ustring, message As ustring)
+  overload: Terminal.Gui.FileDialog.#ctor*
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
 - uid: Terminal.Gui.FileDialog.WillPresent
+  commentId: M:Terminal.Gui.FileDialog.WillPresent
   id: WillPresent
   parent: Terminal.Gui.FileDialog
   langs:
   - csharp
+  - vb
   name: WillPresent()
   nameWithType: FileDialog.WillPresent()
-  fullName: FileDialog.WillPresent()
+  fullName: Terminal.Gui.FileDialog.WillPresent()
   type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Dialogs/FileDialog.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: WillPresent
+    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    startLine: 497
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  example: []
   syntax:
-    content: public override void WillPresent ();
-    parameters: []
+    content: public override void WillPresent()
+    content.vb: Public Overrides Sub WillPresent
+  overridden: Terminal.Gui.Toplevel.WillPresent
   overload: Terminal.Gui.FileDialog.WillPresent*
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.FileDialog.Prompt
+  commentId: P:Terminal.Gui.FileDialog.Prompt
+  id: Prompt
+  parent: Terminal.Gui.FileDialog
+  langs:
+  - csharp
+  - vb
+  name: Prompt
+  nameWithType: FileDialog.Prompt
+  fullName: Terminal.Gui.FileDialog.Prompt
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Dialogs/FileDialog.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Prompt
+    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    startLine: 507
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nGets or sets the prompt label for the <xref href=\"Terminal.Gui.Button\" data-throw-if-not-resolved=\"false\"></xref> displayed to the user\n"
+  example: []
+  syntax:
+    content: public ustring Prompt { get; set; }
+    parameters: []
+    return:
+      type: NStack.ustring
+      description: The prompt.
+    content.vb: Public Property Prompt As ustring
+  overload: Terminal.Gui.FileDialog.Prompt*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.FileDialog.NameFieldLabel
+  commentId: P:Terminal.Gui.FileDialog.NameFieldLabel
+  id: NameFieldLabel
+  parent: Terminal.Gui.FileDialog
+  langs:
+  - csharp
+  - vb
+  name: NameFieldLabel
+  nameWithType: FileDialog.NameFieldLabel
+  fullName: Terminal.Gui.FileDialog.NameFieldLabel
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Dialogs/FileDialog.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: NameFieldLabel
+    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    startLine: 518
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nGets or sets the name field label.\n"
+  example: []
+  syntax:
+    content: public ustring NameFieldLabel { get; set; }
+    parameters: []
+    return:
+      type: NStack.ustring
+      description: The name field label.
+    content.vb: Public Property NameFieldLabel As ustring
+  overload: Terminal.Gui.FileDialog.NameFieldLabel*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.FileDialog.Message
+  commentId: P:Terminal.Gui.FileDialog.Message
+  id: Message
+  parent: Terminal.Gui.FileDialog
+  langs:
+  - csharp
+  - vb
+  name: Message
+  nameWithType: FileDialog.Message
+  fullName: Terminal.Gui.FileDialog.Message
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Dialogs/FileDialog.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Message
+    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    startLine: 529
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nGets or sets the message displayed to the user, defaults to nothing\n"
+  example: []
+  syntax:
+    content: public ustring Message { get; set; }
+    parameters: []
+    return:
+      type: NStack.ustring
+      description: The message.
+    content.vb: Public Property Message As ustring
+  overload: Terminal.Gui.FileDialog.Message*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.FileDialog.CanCreateDirectories
+  commentId: P:Terminal.Gui.FileDialog.CanCreateDirectories
+  id: CanCreateDirectories
+  parent: Terminal.Gui.FileDialog
+  langs:
+  - csharp
+  - vb
+  name: CanCreateDirectories
+  nameWithType: FileDialog.CanCreateDirectories
+  fullName: Terminal.Gui.FileDialog.CanCreateDirectories
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Dialogs/FileDialog.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: CanCreateDirectories
+    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    startLine: 540
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nGets or sets a value indicating whether this <xref href=\"Terminal.Gui.FileDialog\" data-throw-if-not-resolved=\"false\"></xref> can create directories.\n"
+  example: []
+  syntax:
+    content: public bool CanCreateDirectories { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: <code>true</code> if can create directories; otherwise, <code>false</code>.
+    content.vb: Public Property CanCreateDirectories As Boolean
+  overload: Terminal.Gui.FileDialog.CanCreateDirectories*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.FileDialog.IsExtensionHidden
+  commentId: P:Terminal.Gui.FileDialog.IsExtensionHidden
+  id: IsExtensionHidden
+  parent: Terminal.Gui.FileDialog
+  langs:
+  - csharp
+  - vb
+  name: IsExtensionHidden
+  nameWithType: FileDialog.IsExtensionHidden
+  fullName: Terminal.Gui.FileDialog.IsExtensionHidden
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Dialogs/FileDialog.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: IsExtensionHidden
+    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    startLine: 546
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nGets or sets a value indicating whether this <xref href=\"Terminal.Gui.FileDialog\" data-throw-if-not-resolved=\"false\"></xref> is extension hidden.\n"
+  example: []
+  syntax:
+    content: public bool IsExtensionHidden { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: <code>true</code> if is extension hidden; otherwise, <code>false</code>.
+    content.vb: Public Property IsExtensionHidden As Boolean
+  overload: Terminal.Gui.FileDialog.IsExtensionHidden*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.FileDialog.DirectoryPath
+  commentId: P:Terminal.Gui.FileDialog.DirectoryPath
+  id: DirectoryPath
+  parent: Terminal.Gui.FileDialog
+  langs:
+  - csharp
+  - vb
+  name: DirectoryPath
+  nameWithType: FileDialog.DirectoryPath
+  fullName: Terminal.Gui.FileDialog.DirectoryPath
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Dialogs/FileDialog.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: DirectoryPath
+    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    startLine: 552
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nGets or sets the directory path for this panel\n"
+  example: []
+  syntax:
+    content: public ustring DirectoryPath { get; set; }
+    parameters: []
+    return:
+      type: NStack.ustring
+      description: The directory path.
+    content.vb: Public Property DirectoryPath As ustring
+  overload: Terminal.Gui.FileDialog.DirectoryPath*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.FileDialog.AllowedFileTypes
+  commentId: P:Terminal.Gui.FileDialog.AllowedFileTypes
+  id: AllowedFileTypes
+  parent: Terminal.Gui.FileDialog
+  langs:
+  - csharp
+  - vb
+  name: AllowedFileTypes
+  nameWithType: FileDialog.AllowedFileTypes
+  fullName: Terminal.Gui.FileDialog.AllowedFileTypes
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Dialogs/FileDialog.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: AllowedFileTypes
+    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    startLine: 564
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe array of filename extensions allowed, or null if all file extensions are allowed.\n"
+  example: []
+  syntax:
+    content: public string[] AllowedFileTypes { get; set; }
+    parameters: []
+    return:
+      type: System.String[]
+      description: The allowed file types.
+    content.vb: Public Property AllowedFileTypes As String()
+  overload: Terminal.Gui.FileDialog.AllowedFileTypes*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.FileDialog.AllowsOtherFileTypes
+  commentId: P:Terminal.Gui.FileDialog.AllowsOtherFileTypes
+  id: AllowsOtherFileTypes
+  parent: Terminal.Gui.FileDialog
+  langs:
+  - csharp
+  - vb
+  name: AllowsOtherFileTypes
+  nameWithType: FileDialog.AllowsOtherFileTypes
+  fullName: Terminal.Gui.FileDialog.AllowsOtherFileTypes
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Dialogs/FileDialog.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: AllowsOtherFileTypes
+    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    startLine: 574
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nGets or sets a value indicating whether this <xref href=\"Terminal.Gui.FileDialog\" data-throw-if-not-resolved=\"false\"></xref> allows the file to be saved with a different extension\n"
+  example: []
+  syntax:
+    content: public bool AllowsOtherFileTypes { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: <code>true</code> if allows other file types; otherwise, <code>false</code>.
+    content.vb: Public Property AllowsOtherFileTypes As Boolean
+  overload: Terminal.Gui.FileDialog.AllowsOtherFileTypes*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.FileDialog.FilePath
+  commentId: P:Terminal.Gui.FileDialog.FilePath
+  id: FilePath
+  parent: Terminal.Gui.FileDialog
+  langs:
+  - csharp
+  - vb
+  name: FilePath
+  nameWithType: FileDialog.FilePath
+  fullName: Terminal.Gui.FileDialog.FilePath
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Dialogs/FileDialog.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: FilePath
+    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    startLine: 580
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe File path that is currently shown on the panel\n"
+  example: []
+  syntax:
+    content: public ustring FilePath { get; set; }
+    parameters: []
+    return:
+      type: NStack.ustring
+      description: The absolute file path for the file path entered.
+    content.vb: Public Property FilePath As ustring
+  overload: Terminal.Gui.FileDialog.FilePath*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.FileDialog.Canceled
+  commentId: P:Terminal.Gui.FileDialog.Canceled
+  id: Canceled
+  parent: Terminal.Gui.FileDialog
+  langs:
+  - csharp
+  - vb
+  name: Canceled
+  nameWithType: FileDialog.Canceled
+  fullName: Terminal.Gui.FileDialog.Canceled
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Dialogs/FileDialog.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Canceled
+    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    startLine: 590
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nCheck if the dialog was or not canceled.\n"
+  example: []
+  syntax:
+    content: public bool Canceled { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public ReadOnly Property Canceled As Boolean
+  overload: Terminal.Gui.FileDialog.Canceled*
+  modifiers.csharp:
+  - public
+  - get
+  modifiers.vb:
+  - Public
+  - ReadOnly
 references:
-- uid: Terminal.Gui.Dialog
+- uid: Terminal.Gui.OpenDialog
+  commentId: T:Terminal.Gui.OpenDialog
+  name: OpenDialog
+  nameWithType: OpenDialog
+  fullName: Terminal.Gui.OpenDialog
+- uid: Terminal.Gui.SaveDialog
+  commentId: T:Terminal.Gui.SaveDialog
+  name: SaveDialog
+  nameWithType: SaveDialog
+  fullName: Terminal.Gui.SaveDialog
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: Terminal.Gui.Responder
+  commentId: T:Terminal.Gui.Responder
   parent: Terminal.Gui
-  isExternal: false
+  name: Responder
+  nameWithType: Responder
+  fullName: Terminal.Gui.Responder
+- uid: Terminal.Gui.View
+  commentId: T:Terminal.Gui.View
+  parent: Terminal.Gui
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui.Toplevel
+  commentId: T:Terminal.Gui.Toplevel
+  parent: Terminal.Gui
+  name: Toplevel
+  nameWithType: Toplevel
+  fullName: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.Window
+  commentId: T:Terminal.Gui.Window
+  parent: Terminal.Gui
+  name: Window
+  nameWithType: Window
+  fullName: Terminal.Gui.Window
+- uid: Terminal.Gui.Dialog
+  commentId: T:Terminal.Gui.Dialog
+  parent: Terminal.Gui
   name: Dialog
   nameWithType: Dialog
   fullName: Terminal.Gui.Dialog
-- uid: Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring)
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: FileDialog(ustring, ustring, ustring, ustring)
-  nameWithType: FileDialog.FileDialog(ustring, ustring, ustring, ustring)
-  fullName: FileDialog.FileDialog(ustring, ustring, ustring, ustring)
+- uid: System.Collections.IEnumerable
+  commentId: T:System.Collections.IEnumerable
+  parent: System.Collections
+  isExternal: true
+  name: IEnumerable
+  nameWithType: IEnumerable
+  fullName: System.Collections.IEnumerable
+- uid: Terminal.Gui.Dialog.AddButton(Terminal.Gui.Button)
+  commentId: M:Terminal.Gui.Dialog.AddButton(Terminal.Gui.Button)
+  parent: Terminal.Gui.Dialog
+  name: AddButton(Button)
+  nameWithType: Dialog.AddButton(Button)
+  fullName: Terminal.Gui.Dialog.AddButton(Terminal.Gui.Button)
+  spec.csharp:
+  - uid: Terminal.Gui.Dialog.AddButton(Terminal.Gui.Button)
+    name: AddButton
+    nameWithType: Dialog.AddButton
+    fullName: Terminal.Gui.Dialog.AddButton
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Button
+    name: Button
+    nameWithType: Button
+    fullName: Terminal.Gui.Button
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.Dialog.AddButton(Terminal.Gui.Button)
+    name: AddButton
+    nameWithType: Dialog.AddButton
+    fullName: Terminal.Gui.Dialog.AddButton
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Button
+    name: Button
+    nameWithType: Button
+    fullName: Terminal.Gui.Button
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.Dialog.LayoutSubviews
+  commentId: M:Terminal.Gui.Dialog.LayoutSubviews
+  parent: Terminal.Gui.Dialog
+  name: LayoutSubviews()
+  nameWithType: Dialog.LayoutSubviews()
+  fullName: Terminal.Gui.Dialog.LayoutSubviews()
+  spec.csharp:
+  - uid: Terminal.Gui.Dialog.LayoutSubviews
+    name: LayoutSubviews
+    nameWithType: Dialog.LayoutSubviews
+    fullName: Terminal.Gui.Dialog.LayoutSubviews
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.Dialog.LayoutSubviews
+    name: LayoutSubviews
+    nameWithType: Dialog.LayoutSubviews
+    fullName: Terminal.Gui.Dialog.LayoutSubviews
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.Dialog.ProcessKey(Terminal.Gui.KeyEvent)
+  commentId: M:Terminal.Gui.Dialog.ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.Dialog
+  name: ProcessKey(KeyEvent)
+  nameWithType: Dialog.ProcessKey(KeyEvent)
+  fullName: Terminal.Gui.Dialog.ProcessKey(Terminal.Gui.KeyEvent)
+  spec.csharp:
+  - uid: Terminal.Gui.Dialog.ProcessKey(Terminal.Gui.KeyEvent)
+    name: ProcessKey
+    nameWithType: Dialog.ProcessKey
+    fullName: Terminal.Gui.Dialog.ProcessKey
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.Dialog.ProcessKey(Terminal.Gui.KeyEvent)
+    name: ProcessKey
+    nameWithType: Dialog.ProcessKey
+    fullName: Terminal.Gui.Dialog.ProcessKey
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.Window.Title
+  commentId: P:Terminal.Gui.Window.Title
+  parent: Terminal.Gui.Window
+  name: Title
+  nameWithType: Window.Title
+  fullName: Terminal.Gui.Window.Title
+- uid: Terminal.Gui.Window.GetEnumerator
+  commentId: M:Terminal.Gui.Window.GetEnumerator
+  parent: Terminal.Gui.Window
+  name: GetEnumerator()
+  nameWithType: Window.GetEnumerator()
+  fullName: Terminal.Gui.Window.GetEnumerator()
+  spec.csharp:
+  - uid: Terminal.Gui.Window.GetEnumerator
+    name: GetEnumerator
+    nameWithType: Window.GetEnumerator
+    fullName: Terminal.Gui.Window.GetEnumerator
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.Window.GetEnumerator
+    name: GetEnumerator
+    nameWithType: Window.GetEnumerator
+    fullName: Terminal.Gui.Window.GetEnumerator
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.Window.Add(Terminal.Gui.View)
+  commentId: M:Terminal.Gui.Window.Add(Terminal.Gui.View)
+  parent: Terminal.Gui.Window
+  name: Add(View)
+  nameWithType: Window.Add(View)
+  fullName: Terminal.Gui.Window.Add(Terminal.Gui.View)
+  spec.csharp:
+  - uid: Terminal.Gui.Window.Add(Terminal.Gui.View)
+    name: Add
+    nameWithType: Window.Add
+    fullName: Terminal.Gui.Window.Add
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.Window.Add(Terminal.Gui.View)
+    name: Add
+    nameWithType: Window.Add
+    fullName: Terminal.Gui.Window.Add
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.Window.Remove(Terminal.Gui.View)
+  commentId: M:Terminal.Gui.Window.Remove(Terminal.Gui.View)
+  parent: Terminal.Gui.Window
+  name: Remove(View)
+  nameWithType: Window.Remove(View)
+  fullName: Terminal.Gui.Window.Remove(Terminal.Gui.View)
+  spec.csharp:
+  - uid: Terminal.Gui.Window.Remove(Terminal.Gui.View)
+    name: Remove
+    nameWithType: Window.Remove
+    fullName: Terminal.Gui.Window.Remove
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.Window.Remove(Terminal.Gui.View)
+    name: Remove
+    nameWithType: Window.Remove
+    fullName: Terminal.Gui.Window.Remove
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.Window.RemoveAll
+  commentId: M:Terminal.Gui.Window.RemoveAll
+  parent: Terminal.Gui.Window
+  name: RemoveAll()
+  nameWithType: Window.RemoveAll()
+  fullName: Terminal.Gui.Window.RemoveAll()
+  spec.csharp:
+  - uid: Terminal.Gui.Window.RemoveAll
+    name: RemoveAll
+    nameWithType: Window.RemoveAll
+    fullName: Terminal.Gui.Window.RemoveAll
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.Window.RemoveAll
+    name: RemoveAll
+    nameWithType: Window.RemoveAll
+    fullName: Terminal.Gui.Window.RemoveAll
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
+  commentId: M:Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
+  parent: Terminal.Gui.Window
+  name: Redraw(Rect)
+  nameWithType: Window.Redraw(Rect)
+  fullName: Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
+  spec.csharp:
+  - uid: Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
+    name: Redraw
+    nameWithType: Window.Redraw
+    fullName: Terminal.Gui.Window.Redraw
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    nameWithType: Rect
+    fullName: Terminal.Gui.Rect
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
+    name: Redraw
+    nameWithType: Window.Redraw
+    fullName: Terminal.Gui.Window.Redraw
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    nameWithType: Rect
+    fullName: Terminal.Gui.Rect
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
+  commentId: M:Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.Window
+  name: MouseEvent(MouseEvent)
+  nameWithType: Window.MouseEvent(MouseEvent)
+  fullName: Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
+  spec.csharp:
+  - uid: Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
+    name: MouseEvent
+    nameWithType: Window.MouseEvent
+    fullName: Terminal.Gui.Window.MouseEvent
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.MouseEvent
+    name: MouseEvent
+    nameWithType: MouseEvent
+    fullName: Terminal.Gui.MouseEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
+    name: MouseEvent
+    nameWithType: Window.MouseEvent
+    fullName: Terminal.Gui.Window.MouseEvent
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.MouseEvent
+    name: MouseEvent
+    nameWithType: MouseEvent
+    fullName: Terminal.Gui.MouseEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.Toplevel.Running
+  commentId: P:Terminal.Gui.Toplevel.Running
+  parent: Terminal.Gui.Toplevel
+  name: Running
+  nameWithType: Toplevel.Running
+  fullName: Terminal.Gui.Toplevel.Running
+- uid: Terminal.Gui.Toplevel.Ready
+  commentId: E:Terminal.Gui.Toplevel.Ready
+  parent: Terminal.Gui.Toplevel
+  name: Ready
+  nameWithType: Toplevel.Ready
+  fullName: Terminal.Gui.Toplevel.Ready
+- uid: Terminal.Gui.Toplevel.Create
+  commentId: M:Terminal.Gui.Toplevel.Create
+  parent: Terminal.Gui.Toplevel
+  name: Create()
+  nameWithType: Toplevel.Create()
+  fullName: Terminal.Gui.Toplevel.Create()
+  spec.csharp:
+  - uid: Terminal.Gui.Toplevel.Create
+    name: Create
+    nameWithType: Toplevel.Create
+    fullName: Terminal.Gui.Toplevel.Create
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.Toplevel.Create
+    name: Create
+    nameWithType: Toplevel.Create
+    fullName: Terminal.Gui.Toplevel.Create
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.Toplevel.CanFocus
+  commentId: P:Terminal.Gui.Toplevel.CanFocus
+  parent: Terminal.Gui.Toplevel
+  name: CanFocus
+  nameWithType: Toplevel.CanFocus
+  fullName: Terminal.Gui.Toplevel.CanFocus
+- uid: Terminal.Gui.Toplevel.Modal
+  commentId: P:Terminal.Gui.Toplevel.Modal
+  parent: Terminal.Gui.Toplevel
+  name: Modal
+  nameWithType: Toplevel.Modal
+  fullName: Terminal.Gui.Toplevel.Modal
+- uid: Terminal.Gui.Toplevel.MenuBar
+  commentId: P:Terminal.Gui.Toplevel.MenuBar
+  parent: Terminal.Gui.Toplevel
+  name: MenuBar
+  nameWithType: Toplevel.MenuBar
+  fullName: Terminal.Gui.Toplevel.MenuBar
+- uid: Terminal.Gui.Toplevel.StatusBar
+  commentId: P:Terminal.Gui.Toplevel.StatusBar
+  parent: Terminal.Gui.Toplevel
+  name: StatusBar
+  nameWithType: Toplevel.StatusBar
+  fullName: Terminal.Gui.Toplevel.StatusBar
+- uid: Terminal.Gui.View.Enter
+  commentId: E:Terminal.Gui.View.Enter
+  parent: Terminal.Gui.View
+  name: Enter
+  nameWithType: View.Enter
+  fullName: Terminal.Gui.View.Enter
+- uid: Terminal.Gui.View.Leave
+  commentId: E:Terminal.Gui.View.Leave
+  parent: Terminal.Gui.View
+  name: Leave
+  nameWithType: View.Leave
+  fullName: Terminal.Gui.View.Leave
+- uid: Terminal.Gui.View.MouseEnter
+  commentId: E:Terminal.Gui.View.MouseEnter
+  parent: Terminal.Gui.View
+  name: MouseEnter
+  nameWithType: View.MouseEnter
+  fullName: Terminal.Gui.View.MouseEnter
+- uid: Terminal.Gui.View.MouseLeave
+  commentId: E:Terminal.Gui.View.MouseLeave
+  parent: Terminal.Gui.View
+  name: MouseLeave
+  nameWithType: View.MouseLeave
+  fullName: Terminal.Gui.View.MouseLeave
+- uid: Terminal.Gui.View.Driver
+  commentId: P:Terminal.Gui.View.Driver
+  parent: Terminal.Gui.View
+  name: Driver
+  nameWithType: View.Driver
+  fullName: Terminal.Gui.View.Driver
+- uid: Terminal.Gui.View.Subviews
+  commentId: P:Terminal.Gui.View.Subviews
+  parent: Terminal.Gui.View
+  name: Subviews
+  nameWithType: View.Subviews
+  fullName: Terminal.Gui.View.Subviews
+- uid: Terminal.Gui.View.Id
+  commentId: P:Terminal.Gui.View.Id
+  parent: Terminal.Gui.View
+  name: Id
+  nameWithType: View.Id
+  fullName: Terminal.Gui.View.Id
+- uid: Terminal.Gui.View.WantMousePositionReports
+  commentId: P:Terminal.Gui.View.WantMousePositionReports
+  parent: Terminal.Gui.View
+  name: WantMousePositionReports
+  nameWithType: View.WantMousePositionReports
+  fullName: Terminal.Gui.View.WantMousePositionReports
+- uid: Terminal.Gui.View.WantContinuousButtonPressed
+  commentId: P:Terminal.Gui.View.WantContinuousButtonPressed
+  parent: Terminal.Gui.View
+  name: WantContinuousButtonPressed
+  nameWithType: View.WantContinuousButtonPressed
+  fullName: Terminal.Gui.View.WantContinuousButtonPressed
+- uid: Terminal.Gui.View.Frame
+  commentId: P:Terminal.Gui.View.Frame
+  parent: Terminal.Gui.View
+  name: Frame
+  nameWithType: View.Frame
+  fullName: Terminal.Gui.View.Frame
+- uid: Terminal.Gui.View.LayoutStyle
+  commentId: P:Terminal.Gui.View.LayoutStyle
+  parent: Terminal.Gui.View
+  name: LayoutStyle
+  nameWithType: View.LayoutStyle
+  fullName: Terminal.Gui.View.LayoutStyle
+- uid: Terminal.Gui.View.Bounds
+  commentId: P:Terminal.Gui.View.Bounds
+  parent: Terminal.Gui.View
+  name: Bounds
+  nameWithType: View.Bounds
+  fullName: Terminal.Gui.View.Bounds
+- uid: Terminal.Gui.View.X
+  commentId: P:Terminal.Gui.View.X
+  parent: Terminal.Gui.View
+  name: X
+  nameWithType: View.X
+  fullName: Terminal.Gui.View.X
+- uid: Terminal.Gui.View.Y
+  commentId: P:Terminal.Gui.View.Y
+  parent: Terminal.Gui.View
+  name: Y
+  nameWithType: View.Y
+  fullName: Terminal.Gui.View.Y
+- uid: Terminal.Gui.View.Width
+  commentId: P:Terminal.Gui.View.Width
+  parent: Terminal.Gui.View
+  name: Width
+  nameWithType: View.Width
+  fullName: Terminal.Gui.View.Width
+- uid: Terminal.Gui.View.Height
+  commentId: P:Terminal.Gui.View.Height
+  parent: Terminal.Gui.View
+  name: Height
+  nameWithType: View.Height
+  fullName: Terminal.Gui.View.Height
+- uid: Terminal.Gui.View.SuperView
+  commentId: P:Terminal.Gui.View.SuperView
+  parent: Terminal.Gui.View
+  name: SuperView
+  nameWithType: View.SuperView
+  fullName: Terminal.Gui.View.SuperView
+- uid: Terminal.Gui.View.SetNeedsDisplay
+  commentId: M:Terminal.Gui.View.SetNeedsDisplay
+  parent: Terminal.Gui.View
+  name: SetNeedsDisplay()
+  nameWithType: View.SetNeedsDisplay()
+  fullName: Terminal.Gui.View.SetNeedsDisplay()
+  spec.csharp:
+  - uid: Terminal.Gui.View.SetNeedsDisplay
+    name: SetNeedsDisplay
+    nameWithType: View.SetNeedsDisplay
+    fullName: Terminal.Gui.View.SetNeedsDisplay
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.SetNeedsDisplay
+    name: SetNeedsDisplay
+    nameWithType: View.SetNeedsDisplay
+    fullName: Terminal.Gui.View.SetNeedsDisplay
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  commentId: M:Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  name: SetNeedsDisplay(Rect)
+  nameWithType: View.SetNeedsDisplay(Rect)
+  fullName: Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+  spec.csharp:
+  - uid: Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+    name: SetNeedsDisplay
+    nameWithType: View.SetNeedsDisplay
+    fullName: Terminal.Gui.View.SetNeedsDisplay
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    nameWithType: Rect
+    fullName: Terminal.Gui.Rect
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
+    name: SetNeedsDisplay
+    nameWithType: View.SetNeedsDisplay
+    fullName: Terminal.Gui.View.SetNeedsDisplay
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    nameWithType: Rect
+    fullName: Terminal.Gui.Rect
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.ChildNeedsDisplay
+  commentId: M:Terminal.Gui.View.ChildNeedsDisplay
+  parent: Terminal.Gui.View
+  name: ChildNeedsDisplay()
+  nameWithType: View.ChildNeedsDisplay()
+  fullName: Terminal.Gui.View.ChildNeedsDisplay()
+  spec.csharp:
+  - uid: Terminal.Gui.View.ChildNeedsDisplay
+    name: ChildNeedsDisplay
+    nameWithType: View.ChildNeedsDisplay
+    fullName: Terminal.Gui.View.ChildNeedsDisplay
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.ChildNeedsDisplay
+    name: ChildNeedsDisplay
+    nameWithType: View.ChildNeedsDisplay
+    fullName: Terminal.Gui.View.ChildNeedsDisplay
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.Add(Terminal.Gui.View[])
+  commentId: M:Terminal.Gui.View.Add(Terminal.Gui.View[])
+  parent: Terminal.Gui.View
+  name: Add(View[])
+  nameWithType: View.Add(View[])
+  fullName: Terminal.Gui.View.Add(Terminal.Gui.View[])
+  nameWithType.vb: View.Add(View())
+  fullName.vb: Terminal.Gui.View.Add(Terminal.Gui.View())
+  name.vb: Add(View())
+  spec.csharp:
+  - uid: Terminal.Gui.View.Add(Terminal.Gui.View[])
+    name: Add
+    nameWithType: View.Add
+    fullName: Terminal.Gui.View.Add
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: '[]'
+    nameWithType: '[]'
+    fullName: '[]'
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.Add(Terminal.Gui.View[])
+    name: Add
+    nameWithType: View.Add
+    fullName: Terminal.Gui.View.Add
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: ()
+    nameWithType: ()
+    fullName: ()
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.BringSubviewToFront(Terminal.Gui.View)
+  commentId: M:Terminal.Gui.View.BringSubviewToFront(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  name: BringSubviewToFront(View)
+  nameWithType: View.BringSubviewToFront(View)
+  fullName: Terminal.Gui.View.BringSubviewToFront(Terminal.Gui.View)
+  spec.csharp:
+  - uid: Terminal.Gui.View.BringSubviewToFront(Terminal.Gui.View)
+    name: BringSubviewToFront
+    nameWithType: View.BringSubviewToFront
+    fullName: Terminal.Gui.View.BringSubviewToFront
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.BringSubviewToFront(Terminal.Gui.View)
+    name: BringSubviewToFront
+    nameWithType: View.BringSubviewToFront
+    fullName: Terminal.Gui.View.BringSubviewToFront
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.SendSubviewToBack(Terminal.Gui.View)
+  commentId: M:Terminal.Gui.View.SendSubviewToBack(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  name: SendSubviewToBack(View)
+  nameWithType: View.SendSubviewToBack(View)
+  fullName: Terminal.Gui.View.SendSubviewToBack(Terminal.Gui.View)
+  spec.csharp:
+  - uid: Terminal.Gui.View.SendSubviewToBack(Terminal.Gui.View)
+    name: SendSubviewToBack
+    nameWithType: View.SendSubviewToBack
+    fullName: Terminal.Gui.View.SendSubviewToBack
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.SendSubviewToBack(Terminal.Gui.View)
+    name: SendSubviewToBack
+    nameWithType: View.SendSubviewToBack
+    fullName: Terminal.Gui.View.SendSubviewToBack
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.SendSubviewBackwards(Terminal.Gui.View)
+  commentId: M:Terminal.Gui.View.SendSubviewBackwards(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  name: SendSubviewBackwards(View)
+  nameWithType: View.SendSubviewBackwards(View)
+  fullName: Terminal.Gui.View.SendSubviewBackwards(Terminal.Gui.View)
+  spec.csharp:
+  - uid: Terminal.Gui.View.SendSubviewBackwards(Terminal.Gui.View)
+    name: SendSubviewBackwards
+    nameWithType: View.SendSubviewBackwards
+    fullName: Terminal.Gui.View.SendSubviewBackwards
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.SendSubviewBackwards(Terminal.Gui.View)
+    name: SendSubviewBackwards
+    nameWithType: View.SendSubviewBackwards
+    fullName: Terminal.Gui.View.SendSubviewBackwards
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.BringSubviewForward(Terminal.Gui.View)
+  commentId: M:Terminal.Gui.View.BringSubviewForward(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  name: BringSubviewForward(View)
+  nameWithType: View.BringSubviewForward(View)
+  fullName: Terminal.Gui.View.BringSubviewForward(Terminal.Gui.View)
+  spec.csharp:
+  - uid: Terminal.Gui.View.BringSubviewForward(Terminal.Gui.View)
+    name: BringSubviewForward
+    nameWithType: View.BringSubviewForward
+    fullName: Terminal.Gui.View.BringSubviewForward
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.BringSubviewForward(Terminal.Gui.View)
+    name: BringSubviewForward
+    nameWithType: View.BringSubviewForward
+    fullName: Terminal.Gui.View.BringSubviewForward
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.Clear
+  commentId: M:Terminal.Gui.View.Clear
+  parent: Terminal.Gui.View
+  name: Clear()
+  nameWithType: View.Clear()
+  fullName: Terminal.Gui.View.Clear()
+  spec.csharp:
+  - uid: Terminal.Gui.View.Clear
+    name: Clear
+    nameWithType: View.Clear
+    fullName: Terminal.Gui.View.Clear
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.Clear
+    name: Clear
+    nameWithType: View.Clear
+    fullName: Terminal.Gui.View.Clear
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+  commentId: M:Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  name: Clear(Rect)
+  nameWithType: View.Clear(Rect)
+  fullName: Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+  spec.csharp:
+  - uid: Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+    name: Clear
+    nameWithType: View.Clear
+    fullName: Terminal.Gui.View.Clear
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    nameWithType: Rect
+    fullName: Terminal.Gui.Rect
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.Clear(Terminal.Gui.Rect)
+    name: Clear
+    nameWithType: View.Clear
+    fullName: Terminal.Gui.View.Clear
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    nameWithType: Rect
+    fullName: Terminal.Gui.Rect
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: true
+  name: ScreenToView(Int32, Int32)
+  nameWithType: View.ScreenToView(Int32, Int32)
+  fullName: Terminal.Gui.View.ScreenToView(System.Int32, System.Int32)
+  spec.csharp:
+  - uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+    name: ScreenToView
+    nameWithType: View.ScreenToView
+    fullName: Terminal.Gui.View.ScreenToView
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
+    name: ScreenToView
+    nameWithType: View.ScreenToView
+    fullName: Terminal.Gui.View.ScreenToView
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.ClipToBounds
+  commentId: M:Terminal.Gui.View.ClipToBounds
+  parent: Terminal.Gui.View
+  name: ClipToBounds()
+  nameWithType: View.ClipToBounds()
+  fullName: Terminal.Gui.View.ClipToBounds()
+  spec.csharp:
+  - uid: Terminal.Gui.View.ClipToBounds
+    name: ClipToBounds
+    nameWithType: View.ClipToBounds
+    fullName: Terminal.Gui.View.ClipToBounds
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.ClipToBounds
+    name: ClipToBounds
+    nameWithType: View.ClipToBounds
+    fullName: Terminal.Gui.View.ClipToBounds
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+  commentId: M:Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+  parent: Terminal.Gui.View
+  name: SetClip(Rect)
+  nameWithType: View.SetClip(Rect)
+  fullName: Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+  spec.csharp:
+  - uid: Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+    name: SetClip
+    nameWithType: View.SetClip
+    fullName: Terminal.Gui.View.SetClip
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    nameWithType: Rect
+    fullName: Terminal.Gui.Rect
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
+    name: SetClip
+    nameWithType: View.SetClip
+    fullName: Terminal.Gui.View.SetClip
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    nameWithType: Rect
+    fullName: Terminal.Gui.Rect
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  commentId: M:Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  parent: Terminal.Gui.View
+  isExternal: true
+  name: DrawFrame(Rect, Int32, Boolean)
+  nameWithType: View.DrawFrame(Rect, Int32, Boolean)
+  fullName: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect, System.Int32, System.Boolean)
+  spec.csharp:
+  - uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+    name: DrawFrame
+    nameWithType: View.DrawFrame
+    fullName: Terminal.Gui.View.DrawFrame
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    nameWithType: Rect
+    fullName: Terminal.Gui.Rect
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+    name: DrawFrame
+    nameWithType: View.DrawFrame
+    fullName: Terminal.Gui.View.DrawFrame
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    nameWithType: Rect
+    fullName: Terminal.Gui.Rect
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  commentId: M:Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.View
+  isExternal: true
+  name: DrawHotString(ustring, Attribute, Attribute)
+  nameWithType: View.DrawHotString(ustring, Attribute, Attribute)
+  fullName: Terminal.Gui.View.DrawHotString(NStack.ustring, Terminal.Gui.Attribute, Terminal.Gui.Attribute)
+  spec.csharp:
+  - uid: Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+    name: DrawHotString
+    nameWithType: View.DrawHotString
+    fullName: Terminal.Gui.View.DrawHotString
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: NStack.ustring
+    name: ustring
+    nameWithType: ustring
+    fullName: NStack.ustring
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    nameWithType: Attribute
+    fullName: Terminal.Gui.Attribute
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    nameWithType: Attribute
+    fullName: Terminal.Gui.Attribute
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+    name: DrawHotString
+    nameWithType: View.DrawHotString
+    fullName: Terminal.Gui.View.DrawHotString
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: NStack.ustring
+    name: ustring
+    nameWithType: ustring
+    fullName: NStack.ustring
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    nameWithType: Attribute
+    fullName: Terminal.Gui.Attribute
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    nameWithType: Attribute
+    fullName: Terminal.Gui.Attribute
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  commentId: M:Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+  parent: Terminal.Gui.View
+  isExternal: true
+  name: DrawHotString(ustring, Boolean, ColorScheme)
+  nameWithType: View.DrawHotString(ustring, Boolean, ColorScheme)
+  fullName: Terminal.Gui.View.DrawHotString(NStack.ustring, System.Boolean, Terminal.Gui.ColorScheme)
+  spec.csharp:
+  - uid: Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+    name: DrawHotString
+    nameWithType: View.DrawHotString
+    fullName: Terminal.Gui.View.DrawHotString
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: NStack.ustring
+    name: ustring
+    nameWithType: ustring
+    fullName: NStack.ustring
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: Terminal.Gui.ColorScheme
+    name: ColorScheme
+    nameWithType: ColorScheme
+    fullName: Terminal.Gui.ColorScheme
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
+    name: DrawHotString
+    nameWithType: View.DrawHotString
+    fullName: Terminal.Gui.View.DrawHotString
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: NStack.ustring
+    name: ustring
+    nameWithType: ustring
+    fullName: NStack.ustring
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: Terminal.Gui.ColorScheme
+    name: ColorScheme
+    nameWithType: ColorScheme
+    fullName: Terminal.Gui.ColorScheme
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.Move(System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.View.Move(System.Int32,System.Int32)
+  parent: Terminal.Gui.View
+  isExternal: true
+  name: Move(Int32, Int32)
+  nameWithType: View.Move(Int32, Int32)
+  fullName: Terminal.Gui.View.Move(System.Int32, System.Int32)
+  spec.csharp:
+  - uid: Terminal.Gui.View.Move(System.Int32,System.Int32)
+    name: Move
+    nameWithType: View.Move
+    fullName: Terminal.Gui.View.Move
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.Move(System.Int32,System.Int32)
+    name: Move
+    nameWithType: View.Move
+    fullName: Terminal.Gui.View.Move
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.PositionCursor
+  commentId: M:Terminal.Gui.View.PositionCursor
+  parent: Terminal.Gui.View
+  name: PositionCursor()
+  nameWithType: View.PositionCursor()
+  fullName: Terminal.Gui.View.PositionCursor()
+  spec.csharp:
+  - uid: Terminal.Gui.View.PositionCursor
+    name: PositionCursor
+    nameWithType: View.PositionCursor
+    fullName: Terminal.Gui.View.PositionCursor
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.PositionCursor
+    name: PositionCursor
+    nameWithType: View.PositionCursor
+    fullName: Terminal.Gui.View.PositionCursor
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.HasFocus
+  commentId: P:Terminal.Gui.View.HasFocus
+  parent: Terminal.Gui.View
+  name: HasFocus
+  nameWithType: View.HasFocus
+  fullName: Terminal.Gui.View.HasFocus
+- uid: Terminal.Gui.View.OnEnter
+  commentId: M:Terminal.Gui.View.OnEnter
+  parent: Terminal.Gui.View
+  name: OnEnter()
+  nameWithType: View.OnEnter()
+  fullName: Terminal.Gui.View.OnEnter()
+  spec.csharp:
+  - uid: Terminal.Gui.View.OnEnter
+    name: OnEnter
+    nameWithType: View.OnEnter
+    fullName: Terminal.Gui.View.OnEnter
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.OnEnter
+    name: OnEnter
+    nameWithType: View.OnEnter
+    fullName: Terminal.Gui.View.OnEnter
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.OnLeave
+  commentId: M:Terminal.Gui.View.OnLeave
+  parent: Terminal.Gui.View
+  name: OnLeave()
+  nameWithType: View.OnLeave()
+  fullName: Terminal.Gui.View.OnLeave()
+  spec.csharp:
+  - uid: Terminal.Gui.View.OnLeave
+    name: OnLeave
+    nameWithType: View.OnLeave
+    fullName: Terminal.Gui.View.OnLeave
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.OnLeave
+    name: OnLeave
+    nameWithType: View.OnLeave
+    fullName: Terminal.Gui.View.OnLeave
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.Focused
+  commentId: P:Terminal.Gui.View.Focused
+  parent: Terminal.Gui.View
+  name: Focused
+  nameWithType: View.Focused
+  fullName: Terminal.Gui.View.Focused
+- uid: Terminal.Gui.View.MostFocused
+  commentId: P:Terminal.Gui.View.MostFocused
+  parent: Terminal.Gui.View
+  name: MostFocused
+  nameWithType: View.MostFocused
+  fullName: Terminal.Gui.View.MostFocused
+- uid: Terminal.Gui.View.ColorScheme
+  commentId: P:Terminal.Gui.View.ColorScheme
+  parent: Terminal.Gui.View
+  name: ColorScheme
+  nameWithType: View.ColorScheme
+  fullName: Terminal.Gui.View.ColorScheme
+- uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+  commentId: M:Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+  parent: Terminal.Gui.View
+  isExternal: true
+  name: AddRune(Int32, Int32, Rune)
+  nameWithType: View.AddRune(Int32, Int32, Rune)
+  fullName: Terminal.Gui.View.AddRune(System.Int32, System.Int32, System.Rune)
+  spec.csharp:
+  - uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+    name: AddRune
+    nameWithType: View.AddRune
+    fullName: Terminal.Gui.View.AddRune
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Rune
+    name: Rune
+    nameWithType: Rune
+    fullName: System.Rune
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
+    name: AddRune
+    nameWithType: View.AddRune
+    fullName: Terminal.Gui.View.AddRune
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Rune
+    name: Rune
+    nameWithType: Rune
+    fullName: System.Rune
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.ClearNeedsDisplay
+  commentId: M:Terminal.Gui.View.ClearNeedsDisplay
+  parent: Terminal.Gui.View
+  name: ClearNeedsDisplay()
+  nameWithType: View.ClearNeedsDisplay()
+  fullName: Terminal.Gui.View.ClearNeedsDisplay()
+  spec.csharp:
+  - uid: Terminal.Gui.View.ClearNeedsDisplay
+    name: ClearNeedsDisplay
+    nameWithType: View.ClearNeedsDisplay
+    fullName: Terminal.Gui.View.ClearNeedsDisplay
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.ClearNeedsDisplay
+    name: ClearNeedsDisplay
+    nameWithType: View.ClearNeedsDisplay
+    fullName: Terminal.Gui.View.ClearNeedsDisplay
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  commentId: M:Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  name: SetFocus(View)
+  nameWithType: View.SetFocus(View)
+  fullName: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+  spec.csharp:
+  - uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+    name: SetFocus
+    nameWithType: View.SetFocus
+    fullName: Terminal.Gui.View.SetFocus
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
+    name: SetFocus
+    nameWithType: View.SetFocus
+    fullName: Terminal.Gui.View.SetFocus
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.View
+    name: View
+    nameWithType: View
+    fullName: Terminal.Gui.View
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.KeyPress
+  commentId: E:Terminal.Gui.View.KeyPress
+  parent: Terminal.Gui.View
+  name: KeyPress
+  nameWithType: View.KeyPress
+  fullName: Terminal.Gui.View.KeyPress
+- uid: Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+  commentId: M:Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  name: ProcessHotKey(KeyEvent)
+  nameWithType: View.ProcessHotKey(KeyEvent)
+  fullName: Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+  spec.csharp:
+  - uid: Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+    name: ProcessHotKey
+    nameWithType: View.ProcessHotKey
+    fullName: Terminal.Gui.View.ProcessHotKey
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
+    name: ProcessHotKey
+    nameWithType: View.ProcessHotKey
+    fullName: Terminal.Gui.View.ProcessHotKey
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  commentId: M:Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  name: ProcessColdKey(KeyEvent)
+  nameWithType: View.ProcessColdKey(KeyEvent)
+  fullName: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+  spec.csharp:
+  - uid: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+    name: ProcessColdKey
+    nameWithType: View.ProcessColdKey
+    fullName: Terminal.Gui.View.ProcessColdKey
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
+    name: ProcessColdKey
+    nameWithType: View.ProcessColdKey
+    fullName: Terminal.Gui.View.ProcessColdKey
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.KeyDown
+  commentId: E:Terminal.Gui.View.KeyDown
+  parent: Terminal.Gui.View
+  name: KeyDown
+  nameWithType: View.KeyDown
+  fullName: Terminal.Gui.View.KeyDown
+- uid: Terminal.Gui.View.OnKeyDown(Terminal.Gui.KeyEvent)
+  commentId: M:Terminal.Gui.View.OnKeyDown(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  name: OnKeyDown(KeyEvent)
+  nameWithType: View.OnKeyDown(KeyEvent)
+  fullName: Terminal.Gui.View.OnKeyDown(Terminal.Gui.KeyEvent)
+  spec.csharp:
+  - uid: Terminal.Gui.View.OnKeyDown(Terminal.Gui.KeyEvent)
+    name: OnKeyDown
+    nameWithType: View.OnKeyDown
+    fullName: Terminal.Gui.View.OnKeyDown
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.OnKeyDown(Terminal.Gui.KeyEvent)
+    name: OnKeyDown
+    nameWithType: View.OnKeyDown
+    fullName: Terminal.Gui.View.OnKeyDown
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.KeyUp
+  commentId: E:Terminal.Gui.View.KeyUp
+  parent: Terminal.Gui.View
+  name: KeyUp
+  nameWithType: View.KeyUp
+  fullName: Terminal.Gui.View.KeyUp
+- uid: Terminal.Gui.View.OnKeyUp(Terminal.Gui.KeyEvent)
+  commentId: M:Terminal.Gui.View.OnKeyUp(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.View
+  name: OnKeyUp(KeyEvent)
+  nameWithType: View.OnKeyUp(KeyEvent)
+  fullName: Terminal.Gui.View.OnKeyUp(Terminal.Gui.KeyEvent)
+  spec.csharp:
+  - uid: Terminal.Gui.View.OnKeyUp(Terminal.Gui.KeyEvent)
+    name: OnKeyUp
+    nameWithType: View.OnKeyUp
+    fullName: Terminal.Gui.View.OnKeyUp
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.OnKeyUp(Terminal.Gui.KeyEvent)
+    name: OnKeyUp
+    nameWithType: View.OnKeyUp
+    fullName: Terminal.Gui.View.OnKeyUp
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.EnsureFocus
+  commentId: M:Terminal.Gui.View.EnsureFocus
+  parent: Terminal.Gui.View
+  name: EnsureFocus()
+  nameWithType: View.EnsureFocus()
+  fullName: Terminal.Gui.View.EnsureFocus()
+  spec.csharp:
+  - uid: Terminal.Gui.View.EnsureFocus
+    name: EnsureFocus
+    nameWithType: View.EnsureFocus
+    fullName: Terminal.Gui.View.EnsureFocus
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.EnsureFocus
+    name: EnsureFocus
+    nameWithType: View.EnsureFocus
+    fullName: Terminal.Gui.View.EnsureFocus
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.FocusFirst
+  commentId: M:Terminal.Gui.View.FocusFirst
+  parent: Terminal.Gui.View
+  name: FocusFirst()
+  nameWithType: View.FocusFirst()
+  fullName: Terminal.Gui.View.FocusFirst()
+  spec.csharp:
+  - uid: Terminal.Gui.View.FocusFirst
+    name: FocusFirst
+    nameWithType: View.FocusFirst
+    fullName: Terminal.Gui.View.FocusFirst
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.FocusFirst
+    name: FocusFirst
+    nameWithType: View.FocusFirst
+    fullName: Terminal.Gui.View.FocusFirst
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.FocusLast
+  commentId: M:Terminal.Gui.View.FocusLast
+  parent: Terminal.Gui.View
+  name: FocusLast()
+  nameWithType: View.FocusLast()
+  fullName: Terminal.Gui.View.FocusLast()
+  spec.csharp:
+  - uid: Terminal.Gui.View.FocusLast
+    name: FocusLast
+    nameWithType: View.FocusLast
+    fullName: Terminal.Gui.View.FocusLast
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.FocusLast
+    name: FocusLast
+    nameWithType: View.FocusLast
+    fullName: Terminal.Gui.View.FocusLast
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.FocusPrev
+  commentId: M:Terminal.Gui.View.FocusPrev
+  parent: Terminal.Gui.View
+  name: FocusPrev()
+  nameWithType: View.FocusPrev()
+  fullName: Terminal.Gui.View.FocusPrev()
+  spec.csharp:
+  - uid: Terminal.Gui.View.FocusPrev
+    name: FocusPrev
+    nameWithType: View.FocusPrev
+    fullName: Terminal.Gui.View.FocusPrev
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.FocusPrev
+    name: FocusPrev
+    nameWithType: View.FocusPrev
+    fullName: Terminal.Gui.View.FocusPrev
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.FocusNext
+  commentId: M:Terminal.Gui.View.FocusNext
+  parent: Terminal.Gui.View
+  name: FocusNext()
+  nameWithType: View.FocusNext()
+  fullName: Terminal.Gui.View.FocusNext()
+  spec.csharp:
+  - uid: Terminal.Gui.View.FocusNext
+    name: FocusNext
+    nameWithType: View.FocusNext
+    fullName: Terminal.Gui.View.FocusNext
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.FocusNext
+    name: FocusNext
+    nameWithType: View.FocusNext
+    fullName: Terminal.Gui.View.FocusNext
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.ToString
+  commentId: M:Terminal.Gui.View.ToString
+  parent: Terminal.Gui.View
+  name: ToString()
+  nameWithType: View.ToString()
+  fullName: Terminal.Gui.View.ToString()
+  spec.csharp:
+  - uid: Terminal.Gui.View.ToString
+    name: ToString
+    nameWithType: View.ToString
+    fullName: Terminal.Gui.View.ToString
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.ToString
+    name: ToString
+    nameWithType: View.ToString
+    fullName: Terminal.Gui.View.ToString
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.OnMouseEnter(Terminal.Gui.MouseEvent)
+  commentId: M:Terminal.Gui.View.OnMouseEnter(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.View
+  name: OnMouseEnter(MouseEvent)
+  nameWithType: View.OnMouseEnter(MouseEvent)
+  fullName: Terminal.Gui.View.OnMouseEnter(Terminal.Gui.MouseEvent)
+  spec.csharp:
+  - uid: Terminal.Gui.View.OnMouseEnter(Terminal.Gui.MouseEvent)
+    name: OnMouseEnter
+    nameWithType: View.OnMouseEnter
+    fullName: Terminal.Gui.View.OnMouseEnter
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.MouseEvent
+    name: MouseEvent
+    nameWithType: MouseEvent
+    fullName: Terminal.Gui.MouseEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.OnMouseEnter(Terminal.Gui.MouseEvent)
+    name: OnMouseEnter
+    nameWithType: View.OnMouseEnter
+    fullName: Terminal.Gui.View.OnMouseEnter
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.MouseEvent
+    name: MouseEvent
+    nameWithType: MouseEvent
+    fullName: Terminal.Gui.MouseEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.View.OnMouseLeave(Terminal.Gui.MouseEvent)
+  commentId: M:Terminal.Gui.View.OnMouseLeave(Terminal.Gui.MouseEvent)
+  parent: Terminal.Gui.View
+  name: OnMouseLeave(MouseEvent)
+  nameWithType: View.OnMouseLeave(MouseEvent)
+  fullName: Terminal.Gui.View.OnMouseLeave(Terminal.Gui.MouseEvent)
+  spec.csharp:
+  - uid: Terminal.Gui.View.OnMouseLeave(Terminal.Gui.MouseEvent)
+    name: OnMouseLeave
+    nameWithType: View.OnMouseLeave
+    fullName: Terminal.Gui.View.OnMouseLeave
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.MouseEvent
+    name: MouseEvent
+    nameWithType: MouseEvent
+    fullName: Terminal.Gui.MouseEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.View.OnMouseLeave(Terminal.Gui.MouseEvent)
+    name: OnMouseLeave
+    nameWithType: View.OnMouseLeave
+    fullName: Terminal.Gui.View.OnMouseLeave
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.MouseEvent
+    name: MouseEvent
+    nameWithType: MouseEvent
+    fullName: Terminal.Gui.MouseEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: Object.Equals(Object)
+  fullName: System.Object.Equals(System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: Object.GetHashCode()
+  fullName: System.Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  name: MemberwiseClone()
+  nameWithType: Object.MemberwiseClone()
+  fullName: System.Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Collections
+  commentId: N:System.Collections
+  isExternal: true
+  name: System.Collections
+  nameWithType: System.Collections
+  fullName: System.Collections
+- uid: Terminal.Gui.FileDialog
+  commentId: T:Terminal.Gui.FileDialog
+  parent: Terminal.Gui
+  name: FileDialog
+  nameWithType: FileDialog
+  fullName: Terminal.Gui.FileDialog
+- uid: Terminal.Gui.FileDialog.#ctor*
+  commentId: Overload:Terminal.Gui.FileDialog.#ctor
+  name: FileDialog
+  nameWithType: FileDialog.FileDialog
+  fullName: Terminal.Gui.FileDialog.FileDialog
 - uid: NStack.ustring
+  commentId: T:NStack.ustring
   parent: NStack
   isExternal: true
   name: ustring
   nameWithType: ustring
   fullName: NStack.ustring
-- uid: Terminal.Gui.FileDialog.AllowedFileTypes
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: AllowedFileTypes
-  nameWithType: FileDialog.AllowedFileTypes
-  fullName: FileDialog.AllowedFileTypes
-- uid: System.String
-  name: String
-  nameWithType: String
-  fullName: System.String
-- uid: System.String[]
-  parent: System
+- uid: NStack
+  commentId: N:NStack
   isExternal: true
-  name: String[]
-  nameWithType: String[]
-  fullName: System.String[]
-  spec.csharp:
-  - uid: System.String
-    name: String
-    nameWithType: String
-    fullName: System.String
-  - name: '[]'
-    nameWithType: '[]'
-    fullName: '[]'
-- uid: Terminal.Gui.FileDialog.AllowsOtherFileTypes
+  name: NStack
+  nameWithType: NStack
+  fullName: NStack
+- uid: Terminal.Gui.FileDialog.WillPresent
+  commentId: M:Terminal.Gui.FileDialog.WillPresent
   parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: AllowsOtherFileTypes
-  nameWithType: FileDialog.AllowsOtherFileTypes
-  fullName: FileDialog.AllowsOtherFileTypes
+  name: WillPresent()
+  nameWithType: FileDialog.WillPresent()
+  fullName: Terminal.Gui.FileDialog.WillPresent()
+  spec.csharp:
+  - uid: Terminal.Gui.FileDialog.WillPresent
+    name: WillPresent
+    nameWithType: FileDialog.WillPresent
+    fullName: Terminal.Gui.FileDialog.WillPresent
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.FileDialog.WillPresent
+    name: WillPresent
+    nameWithType: FileDialog.WillPresent
+    fullName: Terminal.Gui.FileDialog.WillPresent
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.Toplevel.WillPresent
+  commentId: M:Terminal.Gui.Toplevel.WillPresent
+  parent: Terminal.Gui.Toplevel
+  name: WillPresent()
+  nameWithType: Toplevel.WillPresent()
+  fullName: Terminal.Gui.Toplevel.WillPresent()
+  spec.csharp:
+  - uid: Terminal.Gui.Toplevel.WillPresent
+    name: WillPresent
+    nameWithType: Toplevel.WillPresent
+    fullName: Terminal.Gui.Toplevel.WillPresent
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.Toplevel.WillPresent
+    name: WillPresent
+    nameWithType: Toplevel.WillPresent
+    fullName: Terminal.Gui.Toplevel.WillPresent
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.FileDialog.WillPresent*
+  commentId: Overload:Terminal.Gui.FileDialog.WillPresent
+  name: WillPresent
+  nameWithType: FileDialog.WillPresent
+  fullName: Terminal.Gui.FileDialog.WillPresent
+- uid: Terminal.Gui.Button
+  commentId: T:Terminal.Gui.Button
+  parent: Terminal.Gui
+  name: Button
+  nameWithType: Button
+  fullName: Terminal.Gui.Button
+- uid: Terminal.Gui.FileDialog.Prompt*
+  commentId: Overload:Terminal.Gui.FileDialog.Prompt
+  name: Prompt
+  nameWithType: FileDialog.Prompt
+  fullName: Terminal.Gui.FileDialog.Prompt
+- uid: Terminal.Gui.FileDialog.NameFieldLabel*
+  commentId: Overload:Terminal.Gui.FileDialog.NameFieldLabel
+  name: NameFieldLabel
+  nameWithType: FileDialog.NameFieldLabel
+  fullName: Terminal.Gui.FileDialog.NameFieldLabel
+- uid: Terminal.Gui.FileDialog.Message*
+  commentId: Overload:Terminal.Gui.FileDialog.Message
+  name: Message
+  nameWithType: FileDialog.Message
+  fullName: Terminal.Gui.FileDialog.Message
+- uid: Terminal.Gui.FileDialog.CanCreateDirectories*
+  commentId: Overload:Terminal.Gui.FileDialog.CanCreateDirectories
+  name: CanCreateDirectories
+  nameWithType: FileDialog.CanCreateDirectories
+  fullName: Terminal.Gui.FileDialog.CanCreateDirectories
 - uid: System.Boolean
+  commentId: T:System.Boolean
   parent: System
   isExternal: true
   name: Boolean
   nameWithType: Boolean
   fullName: System.Boolean
-- uid: Terminal.Gui.FileDialog.CanCreateDirectories
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: CanCreateDirectories
-  nameWithType: FileDialog.CanCreateDirectories
-  fullName: FileDialog.CanCreateDirectories
-- uid: Terminal.Gui.FileDialog.DirectoryPath
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: DirectoryPath
-  nameWithType: FileDialog.DirectoryPath
-  fullName: FileDialog.DirectoryPath
-- uid: Terminal.Gui.FileDialog.FilePath
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: FilePath
-  nameWithType: FileDialog.FilePath
-  fullName: FileDialog.FilePath
-- uid: Terminal.Gui.FileDialog.IsExtensionHidden
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
+- uid: Terminal.Gui.FileDialog.IsExtensionHidden*
+  commentId: Overload:Terminal.Gui.FileDialog.IsExtensionHidden
   name: IsExtensionHidden
   nameWithType: FileDialog.IsExtensionHidden
-  fullName: FileDialog.IsExtensionHidden
-- uid: Terminal.Gui.FileDialog.Message
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: Message
-  nameWithType: FileDialog.Message
-  fullName: FileDialog.Message
-- uid: Terminal.Gui.FileDialog.NameFieldLabel
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: NameFieldLabel
-  nameWithType: FileDialog.NameFieldLabel
-  fullName: FileDialog.NameFieldLabel
-- uid: Terminal.Gui.FileDialog.Prompt
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: Prompt
-  nameWithType: FileDialog.Prompt
-  fullName: FileDialog.Prompt
-- uid: Terminal.Gui.FileDialog.WillPresent
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: WillPresent()
-  nameWithType: FileDialog.WillPresent()
-  fullName: FileDialog.WillPresent()
-- uid: Terminal.Gui.FileDialog.#ctor*
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: FileDialog
-  nameWithType: FileDialog.FileDialog
-  fullName: FileDialog.FileDialog
+  fullName: Terminal.Gui.FileDialog.IsExtensionHidden
+- uid: Terminal.Gui.FileDialog.DirectoryPath*
+  commentId: Overload:Terminal.Gui.FileDialog.DirectoryPath
+  name: DirectoryPath
+  nameWithType: FileDialog.DirectoryPath
+  fullName: Terminal.Gui.FileDialog.DirectoryPath
 - uid: Terminal.Gui.FileDialog.AllowedFileTypes*
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
+  commentId: Overload:Terminal.Gui.FileDialog.AllowedFileTypes
   name: AllowedFileTypes
   nameWithType: FileDialog.AllowedFileTypes
-  fullName: FileDialog.AllowedFileTypes
+  fullName: Terminal.Gui.FileDialog.AllowedFileTypes
+- uid: System.String[]
+  isExternal: true
+  name: String[]
+  nameWithType: String[]
+  fullName: System.String[]
+  nameWithType.vb: String()
+  fullName.vb: System.String()
+  name.vb: String()
+  spec.csharp:
+  - uid: System.String
+    name: String
+    nameWithType: String
+    fullName: System.String
+    isExternal: true
+  - name: '[]'
+    nameWithType: '[]'
+    fullName: '[]'
+  spec.vb:
+  - uid: System.String
+    name: String
+    nameWithType: String
+    fullName: System.String
+    isExternal: true
+  - name: ()
+    nameWithType: ()
+    fullName: ()
 - uid: Terminal.Gui.FileDialog.AllowsOtherFileTypes*
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
+  commentId: Overload:Terminal.Gui.FileDialog.AllowsOtherFileTypes
   name: AllowsOtherFileTypes
   nameWithType: FileDialog.AllowsOtherFileTypes
-  fullName: FileDialog.AllowsOtherFileTypes
-- uid: Terminal.Gui.FileDialog.CanCreateDirectories*
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: CanCreateDirectories
-  nameWithType: FileDialog.CanCreateDirectories
-  fullName: FileDialog.CanCreateDirectories
-- uid: Terminal.Gui.FileDialog.DirectoryPath*
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: DirectoryPath
-  nameWithType: FileDialog.DirectoryPath
-  fullName: FileDialog.DirectoryPath
+  fullName: Terminal.Gui.FileDialog.AllowsOtherFileTypes
 - uid: Terminal.Gui.FileDialog.FilePath*
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
+  commentId: Overload:Terminal.Gui.FileDialog.FilePath
   name: FilePath
   nameWithType: FileDialog.FilePath
-  fullName: FileDialog.FilePath
-- uid: Terminal.Gui.FileDialog.IsExtensionHidden*
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: IsExtensionHidden
-  nameWithType: FileDialog.IsExtensionHidden
-  fullName: FileDialog.IsExtensionHidden
-- uid: Terminal.Gui.FileDialog.Message*
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: Message
-  nameWithType: FileDialog.Message
-  fullName: FileDialog.Message
-- uid: Terminal.Gui.FileDialog.NameFieldLabel*
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: NameFieldLabel
-  nameWithType: FileDialog.NameFieldLabel
-  fullName: FileDialog.NameFieldLabel
-- uid: Terminal.Gui.FileDialog.Prompt*
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: Prompt
-  nameWithType: FileDialog.Prompt
-  fullName: FileDialog.Prompt
-- uid: Terminal.Gui.FileDialog.WillPresent*
-  parent: Terminal.Gui.FileDialog
-  isExternal: false
-  name: WillPresent
-  nameWithType: FileDialog.WillPresent
-  fullName: FileDialog.WillPresent
-- uid: Terminal.Gui.Toplevel.CanFocus
-  parent: Terminal.Gui.Toplevel
-  isExternal: false
-  name: CanFocus
-  nameWithType: Toplevel.CanFocus
-  fullName: Toplevel.CanFocus
-- uid: Terminal.Gui.View.HasFocus
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: HasFocus
-  nameWithType: View.HasFocus
-  fullName: View.HasFocus
-- uid: Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)
-  parent: Terminal.Gui.Window
-  isExternal: false
-  name: MouseEvent(MouseEvent)
-  nameWithType: Window.MouseEvent(MouseEvent)
-  fullName: Window.MouseEvent(MouseEvent)
-- uid: Terminal.Gui.View.ProcessColdKey(Terminal.Gui.KeyEvent)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: ProcessColdKey(KeyEvent)
-  nameWithType: View.ProcessColdKey(KeyEvent)
-  fullName: View.ProcessColdKey(KeyEvent)
-- uid: Terminal.Gui.View.ProcessHotKey(Terminal.Gui.KeyEvent)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: ProcessHotKey(KeyEvent)
-  nameWithType: View.ProcessHotKey(KeyEvent)
-  fullName: View.ProcessHotKey(KeyEvent)
-- uid: Terminal.Gui.Dialog.ProcessKey(Terminal.Gui.KeyEvent)
-  parent: Terminal.Gui.Dialog
-  isExternal: false
-  name: ProcessKey(KeyEvent)
-  nameWithType: Dialog.ProcessKey(KeyEvent)
-  fullName: Dialog.ProcessKey(KeyEvent)
-- uid: Terminal.Gui.Window.Add(Terminal.Gui.View)
-  parent: Terminal.Gui.Window
-  isExternal: false
-  name: Add(View)
-  nameWithType: Window.Add(View)
-  fullName: Window.Add(View)
-- uid: Terminal.Gui.View.Add(Terminal.Gui.View[])
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Add(View[])
-  nameWithType: View.Add(View[])
-  fullName: View.Add(View[])
-- uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: AddRune(Int32, Int32, Rune)
-  nameWithType: View.AddRune(Int32, Int32, Rune)
-  fullName: View.AddRune(Int32, Int32, Rune)
-- uid: Terminal.Gui.View.Bounds
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Bounds
-  nameWithType: View.Bounds
-  fullName: View.Bounds
-- uid: Terminal.Gui.View.ChildNeedsDisplay
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: ChildNeedsDisplay()
-  nameWithType: View.ChildNeedsDisplay()
-  fullName: View.ChildNeedsDisplay()
-- uid: Terminal.Gui.View.Clear
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Clear()
-  nameWithType: View.Clear()
-  fullName: View.Clear()
-- uid: Terminal.Gui.View.Clear(Terminal.Gui.Rect)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Clear(Rect)
-  nameWithType: View.Clear(Rect)
-  fullName: View.Clear(Rect)
-- uid: Terminal.Gui.View.ClearNeedsDisplay
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: ClearNeedsDisplay()
-  nameWithType: View.ClearNeedsDisplay()
-  fullName: View.ClearNeedsDisplay()
-- uid: Terminal.Gui.View.ClipToBounds
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: ClipToBounds()
-  nameWithType: View.ClipToBounds()
-  fullName: View.ClipToBounds()
-- uid: Terminal.Gui.View.ColorScheme
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: ColorScheme
-  nameWithType: View.ColorScheme
-  fullName: View.ColorScheme
-- uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: DrawFrame(Rect, Int32, Boolean)
-  nameWithType: View.DrawFrame(Rect, Int32, Boolean)
-  fullName: View.DrawFrame(Rect, Int32, Boolean)
-- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,System.Boolean,Terminal.Gui.ColorScheme)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: DrawHotString(ustring, Boolean, ColorScheme)
-  nameWithType: View.DrawHotString(ustring, Boolean, ColorScheme)
-  fullName: View.DrawHotString(ustring, Boolean, ColorScheme)
-- uid: Terminal.Gui.View.DrawHotString(NStack.ustring,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: DrawHotString(ustring, Attribute, Attribute)
-  nameWithType: View.DrawHotString(ustring, Attribute, Attribute)
-  fullName: View.DrawHotString(ustring, Attribute, Attribute)
-- uid: Terminal.Gui.View.Driver
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Driver
-  nameWithType: View.Driver
-  fullName: View.Driver
-- uid: Terminal.Gui.View.EnsureFocus
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: EnsureFocus()
-  nameWithType: View.EnsureFocus()
-  fullName: View.EnsureFocus()
-- uid: Terminal.Gui.View.Focused
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Focused
-  nameWithType: View.Focused
-  fullName: View.Focused
-- uid: Terminal.Gui.View.FocusFirst
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: FocusFirst()
-  nameWithType: View.FocusFirst()
-  fullName: View.FocusFirst()
-- uid: Terminal.Gui.View.FocusLast
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: FocusLast()
-  nameWithType: View.FocusLast()
-  fullName: View.FocusLast()
-- uid: Terminal.Gui.View.FocusNext
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: FocusNext()
-  nameWithType: View.FocusNext()
-  fullName: View.FocusNext()
-- uid: Terminal.Gui.View.FocusPrev
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: FocusPrev()
-  nameWithType: View.FocusPrev()
-  fullName: View.FocusPrev()
-- uid: Terminal.Gui.View.Frame
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Frame
-  nameWithType: View.Frame
-  fullName: View.Frame
-- uid: Terminal.Gui.Window.GetEnumerator
-  parent: Terminal.Gui.Window
-  isExternal: false
-  name: GetEnumerator()
-  nameWithType: Window.GetEnumerator()
-  fullName: Window.GetEnumerator()
-- uid: Terminal.Gui.View.Height
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Height
-  nameWithType: View.Height
-  fullName: View.Height
-- uid: Terminal.Gui.View.Id
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Id
-  nameWithType: View.Id
-  fullName: View.Id
-- uid: Terminal.Gui.View.LayoutStyle
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: LayoutStyle
-  nameWithType: View.LayoutStyle
-  fullName: View.LayoutStyle
-- uid: Terminal.Gui.Dialog.LayoutSubviews
-  parent: Terminal.Gui.Dialog
-  isExternal: false
-  name: LayoutSubviews()
-  nameWithType: Dialog.LayoutSubviews()
-  fullName: Dialog.LayoutSubviews()
-- uid: Terminal.Gui.View.MostFocused
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: MostFocused
-  nameWithType: View.MostFocused
-  fullName: View.MostFocused
-- uid: Terminal.Gui.View.Move(System.Int32,System.Int32)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Move(Int32, Int32)
-  nameWithType: View.Move(Int32, Int32)
-  fullName: View.Move(Int32, Int32)
-- uid: Terminal.Gui.View.PositionCursor
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: PositionCursor()
-  nameWithType: View.PositionCursor()
-  fullName: View.PositionCursor()
-- uid: Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)
-  parent: Terminal.Gui.Window
-  isExternal: false
-  name: Redraw(Rect)
-  nameWithType: Window.Redraw(Rect)
-  fullName: Window.Redraw(Rect)
-- uid: Terminal.Gui.Window.Remove(Terminal.Gui.View)
-  parent: Terminal.Gui.Window
-  isExternal: false
-  name: Remove(View)
-  nameWithType: Window.Remove(View)
-  fullName: Window.Remove(View)
-- uid: Terminal.Gui.Window.RemoveAll
-  parent: Terminal.Gui.Window
-  isExternal: false
-  name: RemoveAll()
-  nameWithType: Window.RemoveAll()
-  fullName: Window.RemoveAll()
-- uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: ScreenToView(Int32, Int32)
-  nameWithType: View.ScreenToView(Int32, Int32)
-  fullName: View.ScreenToView(Int32, Int32)
-- uid: Terminal.Gui.View.SetClip(Terminal.Gui.Rect)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: SetClip(Rect)
-  nameWithType: View.SetClip(Rect)
-  fullName: View.SetClip(Rect)
-- uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: SetFocus(View)
-  nameWithType: View.SetFocus(View)
-  fullName: View.SetFocus(View)
-- uid: Terminal.Gui.View.SetNeedsDisplay
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: SetNeedsDisplay()
-  nameWithType: View.SetNeedsDisplay()
-  fullName: View.SetNeedsDisplay()
-- uid: Terminal.Gui.View.SetNeedsDisplay(Terminal.Gui.Rect)
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: SetNeedsDisplay(Rect)
-  nameWithType: View.SetNeedsDisplay(Rect)
-  fullName: View.SetNeedsDisplay(Rect)
-- uid: Terminal.Gui.View.Subviews
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Subviews
-  nameWithType: View.Subviews
-  fullName: View.Subviews
-- uid: Terminal.Gui.View.SuperView
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: SuperView
-  nameWithType: View.SuperView
-  fullName: View.SuperView
-- uid: Terminal.Gui.View.ToString
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: ToString()
-  nameWithType: View.ToString()
-  fullName: View.ToString()
-- uid: Terminal.Gui.View.WantMousePositionReports
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: WantMousePositionReports
-  nameWithType: View.WantMousePositionReports
-  fullName: View.WantMousePositionReports
-- uid: Terminal.Gui.View.Width
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Width
-  nameWithType: View.Width
-  fullName: View.Width
-- uid: Terminal.Gui.View.X
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: X
-  nameWithType: View.X
-  fullName: View.X
-- uid: Terminal.Gui.View.Y
-  parent: Terminal.Gui.View
-  isExternal: false
-  name: Y
-  nameWithType: View.Y
-  fullName: View.Y
-- uid: Terminal.Gui.Toplevel.Create
-  parent: Terminal.Gui.Toplevel
-  isExternal: false
-  name: Create()
-  nameWithType: Toplevel.Create()
-  fullName: Toplevel.Create()
-- uid: Terminal.Gui.Toplevel.Running
-  parent: Terminal.Gui.Toplevel
-  isExternal: false
-  name: Running
-  nameWithType: Toplevel.Running
-  fullName: Toplevel.Running
-- uid: Terminal.Gui.Window.Title
-  parent: Terminal.Gui.Window
-  isExternal: false
-  name: Title
-  nameWithType: Window.Title
-  fullName: Window.Title
-- uid: Terminal.Gui.Dialog.AddButton(Terminal.Gui.Button)
-  parent: Terminal.Gui.Dialog
-  isExternal: false
-  name: AddButton(Button)
-  nameWithType: Dialog.AddButton(Button)
-  fullName: Dialog.AddButton(Button)
+  fullName: Terminal.Gui.FileDialog.FilePath
+- uid: Terminal.Gui.FileDialog.Canceled*
+  commentId: Overload:Terminal.Gui.FileDialog.Canceled
+  name: Canceled
+  nameWithType: FileDialog.Canceled
+  fullName: Terminal.Gui.FileDialog.Canceled
+shouldSkipMarkup: true

@@ -1,224 +1,331 @@
 ### YamlMime:ManagedReference
 items:
 - uid: Terminal.Gui.Application
+  commentId: T:Terminal.Gui.Application
   id: Application
+  parent: Terminal.Gui
   children:
   - Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)
   - Terminal.Gui.Application.Current
+  - Terminal.Gui.Application.CurrentView
   - Terminal.Gui.Application.Driver
   - Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
   - Terminal.Gui.Application.GrabMouse(Terminal.Gui.View)
   - Terminal.Gui.Application.Init
   - Terminal.Gui.Application.Iteration
+  - Terminal.Gui.Application.Loaded
   - Terminal.Gui.Application.MainLoop
   - Terminal.Gui.Application.MakeCenteredRect(Terminal.Gui.Size)
   - Terminal.Gui.Application.Refresh
   - Terminal.Gui.Application.RequestStop
+  - Terminal.Gui.Application.Resized
   - Terminal.Gui.Application.RootMouseEvent
   - Terminal.Gui.Application.Run
   - Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
+  - Terminal.Gui.Application.Run``1
   - Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)
+  - Terminal.Gui.Application.Shutdown
   - Terminal.Gui.Application.Top
   - Terminal.Gui.Application.UngrabMouse
   - Terminal.Gui.Application.UseSystemConsole
   langs:
   - csharp
+  - vb
   name: Application
   nameWithType: Application
   fullName: Terminal.Gui.Application
   type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Application
+    path: ../Terminal.Gui/Core.cs
+    startLine: 1994
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The application driver for gui.cs
-  remarks: "<p>\n                You can hook up to the Iteration event to have your method \n                invoked on each iteration of the mainloop.\n              </p>\n    <p>\n                Creates a mainloop to process input events, handle timers and\n                other sources of data.   It is accessible via the MainLoop property.\n              </p>\n    <p>\n                When invoked sets the SynchronizationContext to one that is tied\n                to the mainloop, allowing user code to use async/await.\n              </p>"
+  summary: "\nThe application driver for Terminal.Gui.\n"
+  remarks: "\n<p>\n  You can hook up to the Iteration event to have your method\n  invoked on each iteration of the mainloop.\n</p>\n<p>\n  Creates a mainloop to process input events, handle timers and\n  other sources of data.   It is accessible via the MainLoop property.\n</p>\n<p>\n  When invoked sets the SynchronizationContext to one that is tied\n  to the mainloop, allowing user code to use async/await.\n</p>\n"
+  example: []
   syntax:
     content: public static class Application
+    content.vb: Public Module Application
   inheritance:
   - System.Object
-  implements: []
-  inheritedMembers: []
-- uid: Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)
-  id: Begin(Terminal.Gui.Toplevel)
-  parent: Terminal.Gui.Application
-  langs:
-  - csharp
-  name: Begin(Toplevel)
-  nameWithType: Application.Begin(Toplevel)
-  fullName: Application.Begin(Toplevel)
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: 'Building block API: Prepares the provided toplevel for execution.'
-  remarks: "This method prepares the provided toplevel for running with the focus,\n             it adds this to the list of toplevels, sets up the mainloop to process the \n             event, lays out the subviews, focuses the first element, and draws the\n             toplevel in the screen.   This is usually followed by executing\n             the <xref href=\"Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)\"></xref> method, and then the <xref href=\"Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)\"></xref> method upon termination which will\n              undo these changes."
-  syntax:
-    content: public static Terminal.Gui.Application.RunState Begin (Terminal.Gui.Toplevel toplevel);
-    parameters:
-    - id: toplevel
-      type: Terminal.Gui.Toplevel
-      description: Toplevel to prepare execution for.
-    return:
-      type: Terminal.Gui.Application+RunState
-      description: The runstate handle that needs to be passed to the End() method upon completion.
-  overload: Terminal.Gui.Application.Begin*
-  exceptions: []
-- uid: Terminal.Gui.Application.Current
-  id: Current
-  parent: Terminal.Gui.Application
-  langs:
-  - csharp
-  name: Current
-  nameWithType: Application.Current
-  fullName: Application.Current
-  type: Property
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The current toplevel object.   This is updated when Application.Run enters and leaves and points to the current toplevel.
-  syntax:
-    content: public static Terminal.Gui.Toplevel Current { get; }
-    return:
-      type: Terminal.Gui.Toplevel
-      description: The current.
-  overload: Terminal.Gui.Application.Current*
-  exceptions: []
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  modifiers.csharp:
+  - public
+  - static
+  - class
+  modifiers.vb:
+  - Public
+  - Module
 - uid: Terminal.Gui.Application.Driver
+  commentId: F:Terminal.Gui.Application.Driver
   id: Driver
   parent: Terminal.Gui.Application
   langs:
   - csharp
+  - vb
   name: Driver
   nameWithType: Application.Driver
-  fullName: Application.Driver
+  fullName: Terminal.Gui.Application.Driver
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Driver
+    path: ../Terminal.Gui/Core.cs
+    startLine: 1998
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The current Console Driver in use.
+  summary: "\nThe current <xref href=\"Terminal.Gui.ConsoleDriver\" data-throw-if-not-resolved=\"false\"></xref> in use.\n"
+  example: []
   syntax:
-    content: public static Terminal.Gui.ConsoleDriver Driver;
+    content: public static ConsoleDriver Driver
     return:
       type: Terminal.Gui.ConsoleDriver
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
-  id: End(Terminal.Gui.Application.RunState)
+    content.vb: Public Shared Driver As ConsoleDriver
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Application.Top
+  commentId: P:Terminal.Gui.Application.Top
+  id: Top
   parent: Terminal.Gui.Application
   langs:
   - csharp
-  name: End(Application+RunState)
-  nameWithType: Application.End(Application+RunState)
-  fullName: Application.End(Application+RunState)
-  type: Method
+  - vb
+  name: Top
+  nameWithType: Application.Top
+  fullName: Terminal.Gui.Application.Top
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Top
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2004
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: 'Building block API: completes the exection of a Toplevel that was started with Begin.'
+  summary: "\nThe <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref> object used for the application on startup (<xref href=\"Terminal.Gui.Application.Top\" data-throw-if-not-resolved=\"false\"></xref>)\n"
+  example: []
   syntax:
-    content: public static void End (Terminal.Gui.Application.RunState runState);
-    parameters:
-    - id: runState
-      type: Terminal.Gui.Application+RunState
-      description: The runstate returned by the <xref href="Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)"></xref> method.
-  overload: Terminal.Gui.Application.End*
-  exceptions: []
-- uid: Terminal.Gui.Application.GrabMouse(Terminal.Gui.View)
-  id: GrabMouse(Terminal.Gui.View)
-  parent: Terminal.Gui.Application
-  langs:
-  - csharp
-  name: GrabMouse(View)
-  nameWithType: Application.GrabMouse(View)
-  fullName: Application.GrabMouse(View)
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Grabs the mouse, forcing all mouse events to be routed to the specified view until UngrabMouse is called.
-  syntax:
-    content: public static void GrabMouse (Terminal.Gui.View view);
-    parameters:
-    - id: view
-      type: Terminal.Gui.View
-      description: View that will receive all mouse events until UngrabMouse is invoked.
-  overload: Terminal.Gui.Application.GrabMouse*
-  exceptions: []
-- uid: Terminal.Gui.Application.Init
-  id: Init
-  parent: Terminal.Gui.Application
-  langs:
-  - csharp
-  name: Init()
-  nameWithType: Application.Init()
-  fullName: Application.Init()
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Initializes the Application
-  syntax:
-    content: public static void Init ();
+    content: public static Toplevel Top { get; }
     parameters: []
-  overload: Terminal.Gui.Application.Init*
-  exceptions: []
-- uid: Terminal.Gui.Application.Iteration
-  id: Iteration
+    return:
+      type: Terminal.Gui.Toplevel
+      description: The top.
+    content.vb: Public Shared ReadOnly Property Top As Toplevel
+  overload: Terminal.Gui.Application.Top*
+  modifiers.csharp:
+  - public
+  - static
+  - get
+  modifiers.vb:
+  - Public
+  - Shared
+  - ReadOnly
+- uid: Terminal.Gui.Application.Current
+  commentId: P:Terminal.Gui.Application.Current
+  id: Current
   parent: Terminal.Gui.Application
   langs:
   - csharp
-  name: Iteration
-  nameWithType: Application.Iteration
-  fullName: Application.Iteration
-  type: Event
+  - vb
+  name: Current
+  nameWithType: Application.Current
+  fullName: Terminal.Gui.Application.Current
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Current
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2010
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: >-
-    This event is raised on each iteration of the
-                  main loop.
-  remarks: See also <xref href="System.Threading.Timeout"></xref>
+  summary: "\nThe current <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref> object. This is updated when <xref href=\"Terminal.Gui.Application.Run\" data-throw-if-not-resolved=\"false\"></xref> enters and leaves to point to the current <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref> .\n"
+  example: []
   syntax:
-    content: public static event EventHandler Iteration;
+    content: public static Toplevel Current { get; }
+    parameters: []
     return:
-      type: System.EventHandler
-      description: To be added.
-  exceptions: []
+      type: Terminal.Gui.Toplevel
+      description: The current.
+    content.vb: Public Shared ReadOnly Property Current As Toplevel
+  overload: Terminal.Gui.Application.Current*
+  modifiers.csharp:
+  - public
+  - static
+  - get
+  modifiers.vb:
+  - Public
+  - Shared
+  - ReadOnly
+- uid: Terminal.Gui.Application.CurrentView
+  commentId: P:Terminal.Gui.Application.CurrentView
+  id: CurrentView
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: CurrentView
+  nameWithType: Application.CurrentView
+  fullName: Terminal.Gui.Application.CurrentView
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: CurrentView
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2016
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nTThe current <xref href=\"Terminal.Gui.View\" data-throw-if-not-resolved=\"false\"></xref> object being redrawn.\n"
+  example: []
+  syntax:
+    content: public static View CurrentView { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.View
+      description: The current.
+    content.vb: Public Shared Property CurrentView As View
+  overload: Terminal.Gui.Application.CurrentView*
+  modifiers.csharp:
+  - public
+  - static
+  - get
+  - set
+  modifiers.vb:
+  - Public
+  - Shared
 - uid: Terminal.Gui.Application.MainLoop
+  commentId: P:Terminal.Gui.Application.MainLoop
   id: MainLoop
   parent: Terminal.Gui.Application
   langs:
   - csharp
+  - vb
   name: MainLoop
   nameWithType: Application.MainLoop
-  fullName: Application.MainLoop
+  fullName: Terminal.Gui.Application.MainLoop
   type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: MainLoop
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2022
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The mainloop driver for the applicaiton
+  summary: "\nThe <xref href=\"Terminal.Gui.Application.MainLoop\" data-throw-if-not-resolved=\"false\"></xref>  driver for the applicaiton\n"
+  example: []
   syntax:
-    content: public static Mono.Terminal.MainLoop MainLoop { get; }
+    content: public static MainLoop MainLoop { get; }
+    parameters: []
     return:
       type: Mono.Terminal.MainLoop
       description: The main loop.
+    content.vb: Public Shared ReadOnly Property MainLoop As MainLoop
   overload: Terminal.Gui.Application.MainLoop*
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - static
+  - get
+  modifiers.vb:
+  - Public
+  - Shared
+  - ReadOnly
+- uid: Terminal.Gui.Application.Iteration
+  commentId: E:Terminal.Gui.Application.Iteration
+  id: Iteration
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: Iteration
+  nameWithType: Application.Iteration
+  fullName: Terminal.Gui.Application.Iteration
+  type: Event
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Iteration
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2032
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThis event is raised on each iteration of the <xref href=\"Terminal.Gui.Application.MainLoop\" data-throw-if-not-resolved=\"false\"></xref> \n"
+  remarks: "\nSee also <xref href=\"System.Threading.Timeout\" data-throw-if-not-resolved=\"false\"></xref>\n"
+  example: []
+  syntax:
+    content: public static event EventHandler Iteration
+    return:
+      type: System.EventHandler
+    content.vb: Public Shared Event Iteration As EventHandler
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
 - uid: Terminal.Gui.Application.MakeCenteredRect(Terminal.Gui.Size)
+  commentId: M:Terminal.Gui.Application.MakeCenteredRect(Terminal.Gui.Size)
   id: MakeCenteredRect(Terminal.Gui.Size)
   parent: Terminal.Gui.Application
   langs:
   - csharp
+  - vb
   name: MakeCenteredRect(Size)
   nameWithType: Application.MakeCenteredRect(Size)
-  fullName: Application.MakeCenteredRect(Size)
+  fullName: Terminal.Gui.Application.MakeCenteredRect(Terminal.Gui.Size)
   type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: MakeCenteredRect
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2039
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Returns a rectangle that is centered in the screen for the provided size.
+  summary: "\nReturns a rectangle that is centered in the screen for the provided size.\n"
+  example: []
   syntax:
-    content: public static Terminal.Gui.Rect MakeCenteredRect (Terminal.Gui.Size size);
+    content: public static Rect MakeCenteredRect(Size size)
     parameters:
     - id: size
       type: Terminal.Gui.Size
@@ -226,333 +333,1027 @@ items:
     return:
       type: Terminal.Gui.Rect
       description: The centered rect.
+    content.vb: Public Shared Function MakeCenteredRect(size As Size) As Rect
   overload: Terminal.Gui.Application.MakeCenteredRect*
-  exceptions: []
-- uid: Terminal.Gui.Application.Refresh
-  id: Refresh
-  parent: Terminal.Gui.Application
-  langs:
-  - csharp
-  name: Refresh()
-  nameWithType: Application.Refresh()
-  fullName: Application.Refresh()
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Triggers a refresh of the entire display.
-  syntax:
-    content: public static void Refresh ();
-    parameters: []
-  overload: Terminal.Gui.Application.Refresh*
-  exceptions: []
-- uid: Terminal.Gui.Application.RequestStop
-  id: RequestStop
-  parent: Terminal.Gui.Application
-  langs:
-  - csharp
-  name: RequestStop()
-  nameWithType: Application.RequestStop()
-  fullName: Application.RequestStop()
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Stops running the most recent toplevel
-  syntax:
-    content: public static void RequestStop ();
-    parameters: []
-  overload: Terminal.Gui.Application.RequestStop*
-  exceptions: []
-- uid: Terminal.Gui.Application.RootMouseEvent
-  id: RootMouseEvent
-  parent: Terminal.Gui.Application
-  langs:
-  - csharp
-  name: RootMouseEvent
-  nameWithType: Application.RootMouseEvent
-  fullName: Application.RootMouseEvent
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Merely a debugging aid to see the raw mouse events
-  syntax:
-    content: public static Action<Terminal.Gui.MouseEvent> RootMouseEvent;
-    return:
-      type: System.Action{Terminal.Gui.MouseEvent}
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Application.Run
-  id: Run
-  parent: Terminal.Gui.Application
-  langs:
-  - csharp
-  name: Run()
-  nameWithType: Application.Run()
-  fullName: Application.Run()
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Runs the application with the built-in toplevel view
-  syntax:
-    content: public static void Run ();
-    parameters: []
-  overload: Terminal.Gui.Application.Run*
-  exceptions: []
-- uid: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
-  id: Run(Terminal.Gui.Toplevel)
-  parent: Terminal.Gui.Application
-  langs:
-  - csharp
-  name: Run(Toplevel)
-  nameWithType: Application.Run(Toplevel)
-  fullName: Application.Run(Toplevel)
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Runs the main loop on the given container.
-  remarks: "<p>\n                This method is used to start processing events\n                for the main application, but it is also used to\n                run modal dialog boxes.\n              </p>\n    <p>\n                To make a toplevel stop execution, set the \"Running\"\n                property to false.\n              </p>\n    <p>\n                This is equivalent to calling Begin on the toplevel view, followed by RunLoop with the\n                returned value, and then calling end on the return value.\n              </p>\n    <p>\n                Alternatively, if your program needs to control the main loop and needs to \n                process events manually, you can invoke Begin to set things up manually and then\n                repeatedly call RunLoop with the wait parameter set to false.   By doing this\n                the RunLoop method will only process any pending events, timers, idle handlers and\n                then return control immediately.\n              </p>"
-  syntax:
-    content: public static void Run (Terminal.Gui.Toplevel view);
-    parameters:
-    - id: view
-      type: Terminal.Gui.Toplevel
-      description: To be added.
-  overload: Terminal.Gui.Application.Run*
-  exceptions: []
-- uid: Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)
-  id: RunLoop(Terminal.Gui.Application.RunState,System.Boolean)
-  parent: Terminal.Gui.Application
-  langs:
-  - csharp
-  name: RunLoop(Application+RunState, Boolean)
-  nameWithType: Application.RunLoop(Application+RunState, Boolean)
-  fullName: Application.RunLoop(Application+RunState, Boolean)
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: 'Building block API: Runs the main loop for the created dialog'
-  remarks: >-
-    Use the wait parameter to control whether this is a
-                  blocking or non-blocking call.
-  syntax:
-    content: public static void RunLoop (Terminal.Gui.Application.RunState state, bool wait = true);
-    parameters:
-    - id: state
-      type: Terminal.Gui.Application+RunState
-      description: The state returned by the Begin method.
-    - id: wait
-      type: System.Boolean
-      description: By default this is true which will execute the runloop waiting for events, if you pass false, you can use this method to run a single iteration of the events.
-  overload: Terminal.Gui.Application.RunLoop*
-  exceptions: []
-- uid: Terminal.Gui.Application.Top
-  id: Top
-  parent: Terminal.Gui.Application
-  langs:
-  - csharp
-  name: Top
-  nameWithType: Application.Top
-  fullName: Application.Top
-  type: Property
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The Toplevel object used for the application on startup.
-  syntax:
-    content: public static Terminal.Gui.Toplevel Top { get; }
-    return:
-      type: Terminal.Gui.Toplevel
-      description: The top.
-  overload: Terminal.Gui.Application.Top*
-  exceptions: []
-- uid: Terminal.Gui.Application.UngrabMouse
-  id: UngrabMouse
-  parent: Terminal.Gui.Application
-  langs:
-  - csharp
-  name: UngrabMouse()
-  nameWithType: Application.UngrabMouse()
-  fullName: Application.UngrabMouse()
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Releases the mouse grab, so mouse events will be routed to the view on which the mouse is.
-  syntax:
-    content: public static void UngrabMouse ();
-    parameters: []
-  overload: Terminal.Gui.Application.UngrabMouse*
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
 - uid: Terminal.Gui.Application.UseSystemConsole
+  commentId: F:Terminal.Gui.Application.UseSystemConsole
   id: UseSystemConsole
   parent: Terminal.Gui.Application
   langs:
   - csharp
+  - vb
   name: UseSystemConsole
   nameWithType: Application.UseSystemConsole
-  fullName: Application.UseSystemConsole
+  fullName: Terminal.Gui.Application.UseSystemConsole
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: UseSystemConsole
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2081
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: If set, it forces the use of the System.Console-based driver.
+  summary: "\nIf set, it forces the use of the System.Console-based driver.\n"
+  example: []
   syntax:
-    content: public static bool UseSystemConsole;
+    content: public static bool UseSystemConsole
     return:
       type: System.Boolean
-      description: To be added.
-  exceptions: []
+    content.vb: Public Shared UseSystemConsole As Boolean
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Application.Init
+  commentId: M:Terminal.Gui.Application.Init
+  id: Init
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: Init()
+  nameWithType: Application.Init()
+  fullName: Terminal.Gui.Application.Init()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Init
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2097
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nInitializes a new instance of <xref href=\"Terminal.Gui\" data-throw-if-not-resolved=\"false\"></xref> Application. \n"
+  remarks: "\n<p>\nCall this method once per instance (or after <xref href=\"Terminal.Gui.Application.Shutdown\" data-throw-if-not-resolved=\"false\"></xref> has been called).\n</p>\n<p>\nLoads the right <xref href=\"Terminal.Gui.ConsoleDriver\" data-throw-if-not-resolved=\"false\"></xref> for the platform.\n</p>\n<p>\nCreates a <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref> and assigns it to <xref href=\"Terminal.Gui.Application.Top\" data-throw-if-not-resolved=\"false\"></xref> and <xref href=\"Terminal.Gui.Application.CurrentView\" data-throw-if-not-resolved=\"false\"></xref>\n</p>\n"
+  example: []
+  syntax:
+    content: public static void Init()
+    content.vb: Public Shared Sub Init
+  overload: Terminal.Gui.Application.Init*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Application.GrabMouse(Terminal.Gui.View)
+  commentId: M:Terminal.Gui.Application.GrabMouse(Terminal.Gui.View)
+  id: GrabMouse(Terminal.Gui.View)
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: GrabMouse(View)
+  nameWithType: Application.GrabMouse(View)
+  fullName: Terminal.Gui.Application.GrabMouse(Terminal.Gui.View)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: GrabMouse
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2257
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nGrabs the mouse, forcing all mouse events to be routed to the specified view until UngrabMouse is called.\n"
+  example: []
+  syntax:
+    content: public static void GrabMouse(View view)
+    parameters:
+    - id: view
+      type: Terminal.Gui.View
+      description: View that will receive all mouse events until UngrabMouse is invoked.
+    content.vb: Public Shared Sub GrabMouse(view As View)
+  overload: Terminal.Gui.Application.GrabMouse*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Application.UngrabMouse
+  commentId: M:Terminal.Gui.Application.UngrabMouse
+  id: UngrabMouse
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: UngrabMouse()
+  nameWithType: Application.UngrabMouse()
+  fullName: Terminal.Gui.Application.UngrabMouse()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: UngrabMouse
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2268
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nReleases the mouse grab, so mouse events will be routed to the view on which the mouse is.\n"
+  example: []
+  syntax:
+    content: public static void UngrabMouse()
+    content.vb: Public Shared Sub UngrabMouse
+  overload: Terminal.Gui.Application.UngrabMouse*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Application.RootMouseEvent
+  commentId: F:Terminal.Gui.Application.RootMouseEvent
+  id: RootMouseEvent
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: RootMouseEvent
+  nameWithType: Application.RootMouseEvent
+  fullName: Terminal.Gui.Application.RootMouseEvent
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: RootMouseEvent
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2277
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nMerely a debugging aid to see the raw mouse events\n"
+  example: []
+  syntax:
+    content: public static Action<MouseEvent> RootMouseEvent
+    return:
+      type: System.Action{Terminal.Gui.MouseEvent}
+    content.vb: Public Shared RootMouseEvent As Action(Of MouseEvent)
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Application.Loaded
+  commentId: E:Terminal.Gui.Application.Loaded
+  id: Loaded
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: Loaded
+  nameWithType: Application.Loaded
+  fullName: Terminal.Gui.Application.Loaded
+  type: Event
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Loaded
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2351
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThis event is fired once when the application is first loaded. The dimensions of the\nterminal are provided.\n"
+  example: []
+  syntax:
+    content: public static event EventHandler<Application.ResizedEventArgs> Loaded
+    return:
+      type: System.EventHandler{Terminal.Gui.Application.ResizedEventArgs}
+    content.vb: Public Shared Event Loaded As EventHandler(Of Application.ResizedEventArgs)
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)
+  commentId: M:Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)
+  id: Begin(Terminal.Gui.Toplevel)
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: Begin(Toplevel)
+  nameWithType: Application.Begin(Toplevel)
+  fullName: Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Begin
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2366
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nBuilding block API: Prepares the provided <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref>  for execution.\n"
+  remarks: "\nThis method prepares the provided toplevel for running with the focus,\nit adds this to the list of toplevels, sets up the mainloop to process the\nevent, lays out the subviews, focuses the first element, and draws the\ntoplevel in the screen. This is usually followed by executing\nthe <xref href=\"Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> method, and then the <xref href=\"Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)\" data-throw-if-not-resolved=\"false\"></xref> method upon termination which will\nundo these changes.\n"
+  example: []
+  syntax:
+    content: public static Application.RunState Begin(Toplevel toplevel)
+    parameters:
+    - id: toplevel
+      type: Terminal.Gui.Toplevel
+      description: Toplevel to prepare execution for.
+    return:
+      type: Terminal.Gui.Application.RunState
+      description: The runstate handle that needs to be passed to the <xref href="Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)" data-throw-if-not-resolved="false"></xref> method upon completion.
+    content.vb: Public Shared Function Begin(toplevel As Toplevel) As Application.RunState
+  overload: Terminal.Gui.Application.Begin*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
+  commentId: M:Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
+  id: End(Terminal.Gui.Application.RunState)
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: End(Application.RunState)
+  nameWithType: Application.End(Application.RunState)
+  fullName: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: End
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2400
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nBuilding block API: completes the execution of a <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref>  that was started with <xref href=\"Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref> .\n"
+  example: []
+  syntax:
+    content: public static void End(Application.RunState runState)
+    parameters:
+    - id: runState
+      type: Terminal.Gui.Application.RunState
+      description: The runstate returned by the <xref href="Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)" data-throw-if-not-resolved="false"></xref> method.
+    content.vb: Public Shared Sub End(runState As Application.RunState)
+  overload: Terminal.Gui.Application.End*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Application.Shutdown
+  commentId: M:Terminal.Gui.Application.Shutdown
+  id: Shutdown
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: Shutdown()
+  nameWithType: Application.Shutdown()
+  fullName: Terminal.Gui.Application.Shutdown()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Shutdown
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2411
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nShutdown an application initalized with <xref href=\"Terminal.Gui.Application.Init\" data-throw-if-not-resolved=\"false\"></xref>\n"
+  example: []
+  syntax:
+    content: public static void Shutdown()
+    content.vb: Public Shared Sub Shutdown
+  overload: Terminal.Gui.Application.Shutdown*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Application.Refresh
+  commentId: M:Terminal.Gui.Application.Refresh
+  id: Refresh
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: Refresh()
+  nameWithType: Application.Refresh()
+  fullName: Terminal.Gui.Application.Refresh()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Refresh
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2434
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nTriggers a refresh of the entire display.\n"
+  example: []
+  syntax:
+    content: public static void Refresh()
+    content.vb: Public Shared Sub Refresh
+  overload: Terminal.Gui.Application.Refresh*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)
+  commentId: M:Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)
+  id: RunLoop(Terminal.Gui.Application.RunState,System.Boolean)
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: RunLoop(Application.RunState, Boolean)
+  nameWithType: Application.RunLoop(Application.RunState, Boolean)
+  fullName: Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState, System.Boolean)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: RunLoop
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2469
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nBuilding block API: Runs the main loop for the created dialog\n"
+  remarks: "\nUse the wait parameter to control whether this is a\nblocking or non-blocking call.\n"
+  example: []
+  syntax:
+    content: public static void RunLoop(Application.RunState state, bool wait = true)
+    parameters:
+    - id: state
+      type: Terminal.Gui.Application.RunState
+      description: The state returned by the Begin method.
+    - id: wait
+      type: System.Boolean
+      description: By default this is true which will execute the runloop waiting for events, if you pass false, you can use this method to run a single iteration of the events.
+    content.vb: Public Shared Sub RunLoop(state As Application.RunState, wait As Boolean = True)
+  overload: Terminal.Gui.Application.RunLoop*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Application.Run
+  commentId: M:Terminal.Gui.Application.Run
+  id: Run
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: Run()
+  nameWithType: Application.Run()
+  fullName: Terminal.Gui.Application.Run()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Run
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2514
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nRuns the application by calling <xref href=\"Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref> with the value of <xref href=\"Terminal.Gui.Application.Top\" data-throw-if-not-resolved=\"false\"></xref>\n"
+  example: []
+  syntax:
+    content: public static void Run()
+    content.vb: Public Shared Sub Run
+  overload: Terminal.Gui.Application.Run*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Application.Run``1
+  commentId: M:Terminal.Gui.Application.Run``1
+  id: Run``1
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: Run<T>()
+  nameWithType: Application.Run<T>()
+  fullName: Terminal.Gui.Application.Run<T>()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Run
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2522
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nRuns the application by calling <xref href=\"Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref> with a new instance of the specified <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref>-derived class\n"
+  example: []
+  syntax:
+    content: >-
+      public static void Run<T>()
+
+          where T : Toplevel, new()
+    typeParameters:
+    - id: T
+    content.vb: Public Shared Sub Run(Of T As {Toplevel, New})
+  overload: Terminal.Gui.Application.Run*
+  nameWithType.vb: Application.Run(Of T)()
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+  fullName.vb: Terminal.Gui.Application.Run(Of T)()
+  name.vb: Run(Of T)()
+- uid: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
+  commentId: M:Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
+  id: Run(Terminal.Gui.Toplevel)
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: Run(Toplevel)
+  nameWithType: Application.Run(Toplevel)
+  fullName: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Run
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2552
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nRuns the main loop on the given <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref> container.\n"
+  remarks: "\n<p>\n  This method is used to start processing events\n  for the main application, but it is also used to\n  run other modal <xref href=\"Terminal.Gui.View\" data-throw-if-not-resolved=\"false\"></xref>s such as <xref href=\"Terminal.Gui.Dialog\" data-throw-if-not-resolved=\"false\"></xref> boxes.\n</p>\n<p>\n  To make a <xref href=\"Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref> stop execution, call <xref href=\"Terminal.Gui.Application.RequestStop\" data-throw-if-not-resolved=\"false\"></xref>.\n</p>\n<p>\n  Calling <xref href=\"Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref> is equivalent to calling <xref href=\"Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref>, followed by <xref href=\"Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref>,\n  and then calling <xref href=\"Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)\" data-throw-if-not-resolved=\"false\"></xref>.\n</p>\n<p>\n  Alternatively, to have a program control the main loop and \n  process events manually, call <xref href=\"Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref> to set things up manually and then\n  repeatedly call <xref href=\"Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> with the wait parameter set to false.   By doing this\n  the <xref href=\"Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> method will only process any pending events, timers, idle handlers and\n  then return control immediately.\n</p>\n"
+  example: []
+  syntax:
+    content: public static void Run(Toplevel view)
+    parameters:
+    - id: view
+      type: Terminal.Gui.Toplevel
+    content.vb: Public Shared Sub Run(view As Toplevel)
+  overload: Terminal.Gui.Application.Run*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Application.RequestStop
+  commentId: M:Terminal.Gui.Application.RequestStop
+  id: RequestStop
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: RequestStop()
+  nameWithType: Application.RequestStop()
+  fullName: Terminal.Gui.Application.RequestStop()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: RequestStop
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2570
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nStops running the most recent <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref>. \n"
+  remarks: "\n<p>\nThis will cause <xref href=\"Terminal.Gui.Application.Run\" data-throw-if-not-resolved=\"false\"></xref> to return.\n</p>\n<p>\n  Calling <xref href=\"Terminal.Gui.Application.RequestStop\" data-throw-if-not-resolved=\"false\"></xref> is equivalent to setting the <xref href=\"Terminal.Gui.Toplevel.Running\" data-throw-if-not-resolved=\"false\"></xref> property on the curently running <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref> to false.\n</p>\n"
+  example: []
+  syntax:
+    content: public static void RequestStop()
+    content.vb: Public Shared Sub RequestStop
+  overload: Terminal.Gui.Application.RequestStop*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Application.Resized
+  commentId: E:Terminal.Gui.Application.Resized
+  id: Resized
+  parent: Terminal.Gui.Application
+  langs:
+  - csharp
+  - vb
+  name: Resized
+  nameWithType: Application.Resized
+  fullName: Terminal.Gui.Application.Resized
+  type: Event
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Resized
+    path: ../Terminal.Gui/Core.cs
+    startLine: 2592
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nInvoked when the terminal was resized. The new size of the terminal is provided.\n"
+  example: []
+  syntax:
+    content: public static event EventHandler<Application.ResizedEventArgs> Resized
+    return:
+      type: System.EventHandler{Terminal.Gui.Application.ResizedEventArgs}
+    content.vb: Public Shared Event Resized As EventHandler(Of Application.ResizedEventArgs)
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
 references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
 - uid: System.Object
+  commentId: T:System.Object
   parent: System
   isExternal: true
   name: Object
   nameWithType: Object
   fullName: System.Object
-- uid: Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: Begin(Toplevel)
-  nameWithType: Application.Begin(Toplevel)
-  fullName: Application.Begin(Toplevel)
-- uid: Terminal.Gui.Application
-  parent: Terminal.Gui
-  isExternal: false
-  name: Application
-  nameWithType: Application
-  fullName: Terminal.Gui.Application+RunState
-- uid: Terminal.Gui.Toplevel
-  parent: Terminal.Gui
-  isExternal: false
-  name: Toplevel
-  nameWithType: Toplevel
-  fullName: Terminal.Gui.Toplevel
-- uid: Terminal.Gui.Application.Current
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: Current
-  nameWithType: Application.Current
-  fullName: Application.Current
-- uid: Terminal.Gui.Application.Driver
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: Driver
-  nameWithType: Application.Driver
-  fullName: Application.Driver
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: Object.Equals(Object)
+  fullName: System.Object.Equals(System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: Object.GetHashCode()
+  fullName: System.Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  name: MemberwiseClone()
+  nameWithType: Object.MemberwiseClone()
+  fullName: System.Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  name: ToString()
+  nameWithType: Object.ToString()
+  fullName: System.Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
 - uid: Terminal.Gui.ConsoleDriver
+  commentId: T:Terminal.Gui.ConsoleDriver
   parent: Terminal.Gui
-  isExternal: false
   name: ConsoleDriver
   nameWithType: ConsoleDriver
   fullName: Terminal.Gui.ConsoleDriver
-- uid: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: End(Application+RunState)
-  nameWithType: Application.End(Application+RunState)
-  fullName: Application.End(Application+RunState)
-- uid: Terminal.Gui.Application.GrabMouse(Terminal.Gui.View)
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: GrabMouse(View)
-  nameWithType: Application.GrabMouse(View)
-  fullName: Application.GrabMouse(View)
-- uid: Terminal.Gui.View
+- uid: Terminal.Gui.Toplevel
+  commentId: T:Terminal.Gui.Toplevel
   parent: Terminal.Gui
-  isExternal: false
+  name: Toplevel
+  nameWithType: Toplevel
+  fullName: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.Application.Top
+  commentId: P:Terminal.Gui.Application.Top
+  isExternal: true
+- uid: Terminal.Gui.Application.Top*
+  commentId: Overload:Terminal.Gui.Application.Top
+  name: Top
+  nameWithType: Application.Top
+  fullName: Terminal.Gui.Application.Top
+- uid: Terminal.Gui.Application.Run
+  commentId: M:Terminal.Gui.Application.Run
+  isExternal: true
+- uid: Terminal.Gui.Application.Current*
+  commentId: Overload:Terminal.Gui.Application.Current
+  name: Current
+  nameWithType: Application.Current
+  fullName: Terminal.Gui.Application.Current
+- uid: Terminal.Gui.View
+  commentId: T:Terminal.Gui.View
+  parent: Terminal.Gui
   name: View
   nameWithType: View
   fullName: Terminal.Gui.View
-- uid: Terminal.Gui.Application.Init
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: Init()
-  nameWithType: Application.Init()
-  fullName: Application.Init()
-- uid: Terminal.Gui.Application.Iteration
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: Iteration
-  nameWithType: Application.Iteration
-  fullName: Application.Iteration
+- uid: Terminal.Gui.Application.CurrentView*
+  commentId: Overload:Terminal.Gui.Application.CurrentView
+  name: CurrentView
+  nameWithType: Application.CurrentView
+  fullName: Terminal.Gui.Application.CurrentView
+- uid: Terminal.Gui.Application.MainLoop
+  commentId: P:Terminal.Gui.Application.MainLoop
+  isExternal: true
+- uid: Terminal.Gui.Application.MainLoop*
+  commentId: Overload:Terminal.Gui.Application.MainLoop
+  name: MainLoop
+  nameWithType: Application.MainLoop
+  fullName: Terminal.Gui.Application.MainLoop
+- uid: Mono.Terminal.MainLoop
+  commentId: T:Mono.Terminal.MainLoop
+  parent: Mono.Terminal
+  name: MainLoop
+  nameWithType: MainLoop
+  fullName: Mono.Terminal.MainLoop
+- uid: Mono.Terminal
+  commentId: N:Mono.Terminal
+  name: Mono.Terminal
+  nameWithType: Mono.Terminal
+  fullName: Mono.Terminal
+- uid: System.Threading.Timeout
+  commentId: T:System.Threading.Timeout
+  isExternal: true
 - uid: System.EventHandler
+  commentId: T:System.EventHandler
   parent: System
   isExternal: true
   name: EventHandler
   nameWithType: EventHandler
   fullName: System.EventHandler
-- uid: Terminal.Gui.Application.MainLoop
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: MainLoop
-  nameWithType: Application.MainLoop
-  fullName: Application.MainLoop
-- uid: Mono.Terminal.MainLoop
-  parent: Mono.Terminal
-  isExternal: false
-  name: MainLoop
-  nameWithType: MainLoop
-  fullName: Mono.Terminal.MainLoop
-- uid: Terminal.Gui.Application.MakeCenteredRect(Terminal.Gui.Size)
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: MakeCenteredRect(Size)
-  nameWithType: Application.MakeCenteredRect(Size)
-  fullName: Application.MakeCenteredRect(Size)
-- uid: Terminal.Gui.Rect
-  parent: Terminal.Gui
-  isExternal: false
-  name: Rect
-  nameWithType: Rect
-  fullName: Terminal.Gui.Rect
+- uid: Terminal.Gui.Application.MakeCenteredRect*
+  commentId: Overload:Terminal.Gui.Application.MakeCenteredRect
+  name: MakeCenteredRect
+  nameWithType: Application.MakeCenteredRect
+  fullName: Terminal.Gui.Application.MakeCenteredRect
 - uid: Terminal.Gui.Size
+  commentId: T:Terminal.Gui.Size
   parent: Terminal.Gui
-  isExternal: false
   name: Size
   nameWithType: Size
   fullName: Terminal.Gui.Size
-- uid: Terminal.Gui.Application.Refresh
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: Refresh()
-  nameWithType: Application.Refresh()
-  fullName: Application.Refresh()
-- uid: Terminal.Gui.Application.RequestStop
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: RequestStop()
-  nameWithType: Application.RequestStop()
-  fullName: Application.RequestStop()
-- uid: Terminal.Gui.Application.RootMouseEvent
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: RootMouseEvent
-  nameWithType: Application.RootMouseEvent
-  fullName: Application.RootMouseEvent
-- uid: System.Action`1
-  name: Action
-  nameWithType: Action
-  fullName: System.Action
-- uid: Terminal.Gui.MouseEvent
-  name: MouseEvent
-  nameWithType: MouseEvent
-  fullName: Terminal.Gui.MouseEvent
-- uid: System.Action{Terminal.Gui.MouseEvent}
+- uid: Terminal.Gui.Rect
+  commentId: T:Terminal.Gui.Rect
+  parent: Terminal.Gui
+  name: Rect
+  nameWithType: Rect
+  fullName: Terminal.Gui.Rect
+- uid: System.Boolean
+  commentId: T:System.Boolean
   parent: System
   isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.Application.Shutdown
+  commentId: M:Terminal.Gui.Application.Shutdown
+  isExternal: true
+- uid: Terminal.Gui.Application.CurrentView
+  commentId: P:Terminal.Gui.Application.CurrentView
+  isExternal: true
+- uid: Terminal.Gui.Application.Init*
+  commentId: Overload:Terminal.Gui.Application.Init
+  name: Init
+  nameWithType: Application.Init
+  fullName: Terminal.Gui.Application.Init
+- uid: Terminal.Gui.Application.GrabMouse*
+  commentId: Overload:Terminal.Gui.Application.GrabMouse
+  name: GrabMouse
+  nameWithType: Application.GrabMouse
+  fullName: Terminal.Gui.Application.GrabMouse
+- uid: Terminal.Gui.Application.UngrabMouse*
+  commentId: Overload:Terminal.Gui.Application.UngrabMouse
+  name: UngrabMouse
+  nameWithType: Application.UngrabMouse
+  fullName: Terminal.Gui.Application.UngrabMouse
+- uid: System.Action{Terminal.Gui.MouseEvent}
+  commentId: T:System.Action{Terminal.Gui.MouseEvent}
+  parent: System
+  definition: System.Action`1
   name: Action<MouseEvent>
   nameWithType: Action<MouseEvent>
   fullName: System.Action<Terminal.Gui.MouseEvent>
+  nameWithType.vb: Action(Of MouseEvent)
+  fullName.vb: System.Action(Of Terminal.Gui.MouseEvent)
+  name.vb: Action(Of MouseEvent)
   spec.csharp:
   - uid: System.Action`1
     name: Action
     nameWithType: Action
     fullName: System.Action
+    isExternal: true
   - name: <
     nameWithType: <
     fullName: <
@@ -563,123 +1364,211 @@ references:
   - name: '>'
     nameWithType: '>'
     fullName: '>'
-- uid: Terminal.Gui.Application.Run
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: Run()
-  nameWithType: Application.Run()
-  fullName: Application.Run()
-- uid: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: Run(Toplevel)
-  nameWithType: Application.Run(Toplevel)
-  fullName: Application.Run(Toplevel)
-- uid: Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: RunLoop(Application+RunState, Boolean)
-  nameWithType: Application.RunLoop(Application+RunState, Boolean)
-  fullName: Application.RunLoop(Application+RunState, Boolean)
-- uid: System.Boolean
-  parent: System
+  spec.vb:
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: '(Of '
+    nameWithType: '(Of '
+    fullName: '(Of '
+  - uid: Terminal.Gui.MouseEvent
+    name: MouseEvent
+    nameWithType: MouseEvent
+    fullName: Terminal.Gui.MouseEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Action`1
+  commentId: T:System.Action`1
   isExternal: true
-  name: Boolean
-  nameWithType: Boolean
-  fullName: System.Boolean
-- uid: Terminal.Gui.Application.Top
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: Top
-  nameWithType: Application.Top
-  fullName: Application.Top
-- uid: Terminal.Gui.Application.UngrabMouse
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: UngrabMouse()
-  nameWithType: Application.UngrabMouse()
-  fullName: Application.UngrabMouse()
-- uid: Terminal.Gui.Application.UseSystemConsole
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: UseSystemConsole
-  nameWithType: Application.UseSystemConsole
-  fullName: Application.UseSystemConsole
+  name: Action<T>
+  nameWithType: Action<T>
+  fullName: System.Action<T>
+  nameWithType.vb: Action(Of T)
+  fullName.vb: System.Action(Of T)
+  name.vb: Action(Of T)
+  spec.csharp:
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: <
+    nameWithType: <
+    fullName: <
+  - name: T
+    nameWithType: T
+    fullName: T
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+  spec.vb:
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: '(Of '
+    nameWithType: '(Of '
+    fullName: '(Of '
+  - name: T
+    nameWithType: T
+    fullName: T
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.EventHandler{Terminal.Gui.Application.ResizedEventArgs}
+  commentId: T:System.EventHandler{Terminal.Gui.Application.ResizedEventArgs}
+  parent: System
+  definition: System.EventHandler`1
+  name: EventHandler<Application.ResizedEventArgs>
+  nameWithType: EventHandler<Application.ResizedEventArgs>
+  fullName: System.EventHandler<Terminal.Gui.Application.ResizedEventArgs>
+  nameWithType.vb: EventHandler(Of Application.ResizedEventArgs)
+  fullName.vb: System.EventHandler(Of Terminal.Gui.Application.ResizedEventArgs)
+  name.vb: EventHandler(Of Application.ResizedEventArgs)
+  spec.csharp:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    nameWithType: EventHandler
+    fullName: System.EventHandler
+    isExternal: true
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: Terminal.Gui.Application.ResizedEventArgs
+    name: Application.ResizedEventArgs
+    nameWithType: Application.ResizedEventArgs
+    fullName: Terminal.Gui.Application.ResizedEventArgs
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+  spec.vb:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    nameWithType: EventHandler
+    fullName: System.EventHandler
+    isExternal: true
+  - name: '(Of '
+    nameWithType: '(Of '
+    fullName: '(Of '
+  - uid: Terminal.Gui.Application.ResizedEventArgs
+    name: Application.ResizedEventArgs
+    nameWithType: Application.ResizedEventArgs
+    fullName: Terminal.Gui.Application.ResizedEventArgs
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.EventHandler`1
+  commentId: T:System.EventHandler`1
+  isExternal: true
+  name: EventHandler<TEventArgs>
+  nameWithType: EventHandler<TEventArgs>
+  fullName: System.EventHandler<TEventArgs>
+  nameWithType.vb: EventHandler(Of TEventArgs)
+  fullName.vb: System.EventHandler(Of TEventArgs)
+  name.vb: EventHandler(Of TEventArgs)
+  spec.csharp:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    nameWithType: EventHandler
+    fullName: System.EventHandler
+    isExternal: true
+  - name: <
+    nameWithType: <
+    fullName: <
+  - name: TEventArgs
+    nameWithType: TEventArgs
+    fullName: TEventArgs
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+  spec.vb:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    nameWithType: EventHandler
+    fullName: System.EventHandler
+    isExternal: true
+  - name: '(Of '
+    nameWithType: '(Of '
+    fullName: '(Of '
+  - name: TEventArgs
+    nameWithType: TEventArgs
+    fullName: TEventArgs
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
+  commentId: M:Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
+  isExternal: true
+- uid: Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)
+  commentId: M:Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)
+  isExternal: true
 - uid: Terminal.Gui.Application.Begin*
-  parent: Terminal.Gui.Application
-  isExternal: false
+  commentId: Overload:Terminal.Gui.Application.Begin
   name: Begin
   nameWithType: Application.Begin
-  fullName: Application.Begin
-- uid: Terminal.Gui.Application.Current*
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: Current
-  nameWithType: Application.Current
-  fullName: Application.Current
+  fullName: Terminal.Gui.Application.Begin
+- uid: Terminal.Gui.Application.RunState
+  commentId: T:Terminal.Gui.Application.RunState
+  parent: Terminal.Gui
+  name: Application.RunState
+  nameWithType: Application.RunState
+  fullName: Terminal.Gui.Application.RunState
+- uid: Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)
+  commentId: M:Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)
+  isExternal: true
 - uid: Terminal.Gui.Application.End*
-  parent: Terminal.Gui.Application
-  isExternal: false
+  commentId: Overload:Terminal.Gui.Application.End
   name: End
   nameWithType: Application.End
-  fullName: Application.End
-- uid: Terminal.Gui.Application.GrabMouse*
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: GrabMouse
-  nameWithType: Application.GrabMouse
-  fullName: Application.GrabMouse
-- uid: Terminal.Gui.Application.Init*
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: Init
-  nameWithType: Application.Init
-  fullName: Application.Init
-- uid: Terminal.Gui.Application.MainLoop*
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: MainLoop
-  nameWithType: Application.MainLoop
-  fullName: Application.MainLoop
-- uid: Terminal.Gui.Application.MakeCenteredRect*
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: MakeCenteredRect
-  nameWithType: Application.MakeCenteredRect
-  fullName: Application.MakeCenteredRect
+  fullName: Terminal.Gui.Application.End
+- uid: Terminal.Gui.Application.Init
+  commentId: M:Terminal.Gui.Application.Init
+  isExternal: true
+- uid: Terminal.Gui.Application.Shutdown*
+  commentId: Overload:Terminal.Gui.Application.Shutdown
+  name: Shutdown
+  nameWithType: Application.Shutdown
+  fullName: Terminal.Gui.Application.Shutdown
 - uid: Terminal.Gui.Application.Refresh*
-  parent: Terminal.Gui.Application
-  isExternal: false
+  commentId: Overload:Terminal.Gui.Application.Refresh
   name: Refresh
   nameWithType: Application.Refresh
-  fullName: Application.Refresh
-- uid: Terminal.Gui.Application.RequestStop*
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: RequestStop
-  nameWithType: Application.RequestStop
-  fullName: Application.RequestStop
-- uid: Terminal.Gui.Application.Run*
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: Run
-  nameWithType: Application.Run
-  fullName: Application.Run
+  fullName: Terminal.Gui.Application.Refresh
 - uid: Terminal.Gui.Application.RunLoop*
-  parent: Terminal.Gui.Application
-  isExternal: false
+  commentId: Overload:Terminal.Gui.Application.RunLoop
   name: RunLoop
   nameWithType: Application.RunLoop
-  fullName: Application.RunLoop
-- uid: Terminal.Gui.Application.Top*
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: Top
-  nameWithType: Application.Top
-  fullName: Application.Top
-- uid: Terminal.Gui.Application.UngrabMouse*
-  parent: Terminal.Gui.Application
-  isExternal: false
-  name: UngrabMouse
-  nameWithType: Application.UngrabMouse
-  fullName: Application.UngrabMouse
+  fullName: Terminal.Gui.Application.RunLoop
+- uid: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
+  commentId: M:Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
+  isExternal: true
+- uid: Terminal.Gui.Application.Run*
+  commentId: Overload:Terminal.Gui.Application.Run
+  name: Run
+  nameWithType: Application.Run
+  fullName: Terminal.Gui.Application.Run
+- uid: Terminal.Gui.Dialog
+  commentId: T:Terminal.Gui.Dialog
+  parent: Terminal.Gui
+  name: Dialog
+  nameWithType: Dialog
+  fullName: Terminal.Gui.Dialog
+- uid: Terminal.Gui.Application.RequestStop
+  commentId: M:Terminal.Gui.Application.RequestStop
+  isExternal: true
+- uid: Terminal.Gui.Toplevel.Running
+  commentId: P:Terminal.Gui.Toplevel.Running
+  parent: Terminal.Gui.Toplevel
+  name: Running
+  nameWithType: Toplevel.Running
+  fullName: Terminal.Gui.Toplevel.Running
+- uid: Terminal.Gui.Application.RequestStop*
+  commentId: Overload:Terminal.Gui.Application.RequestStop
+  name: RequestStop
+  nameWithType: Application.RequestStop
+  fullName: Terminal.Gui.Application.RequestStop
+shouldSkipMarkup: true

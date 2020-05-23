@@ -4,16 +4,21 @@
       "src": [
         {
           "files": [
-            "Terminal.csproj"
+            "Terminal.Gui.csproj"
           ],
           "exclude": [
             "**/obj/**",
             "**/bin/**",
             "_site/**"
-          ]
+          ],
+          "src": "../Terminal.Gui"
         }
       ],
-      "dest": "api"
+      "dest": "api/Terminal.Gui",
+      "shouldSkipMarkup": true,
+      "properties": {
+          "TargetFramework": "netstandard2.0"
+      }
     }
   ],
   "build": {
@@ -40,7 +45,7 @@
     "resource": [
       {
         "files": [
-          "images/**"
+          "images/**",
         ],
         "exclude": [
           "obj/**",
@@ -60,12 +65,15 @@
       }
     ],
     "dest": "../docs",
+    "globalMetadata": {
+      "_enableSearch": "true",
+      "_appLogoPath": "images/logo48.png"
+    },
     "globalMetadataFiles": [],
     "fileMetadataFiles": [],
-    "template": [
-      "default"
+    "template": ["default", "templates/material"
     ],
-    "postProcessors": [],
+    "postProcessors": ["ExtractSearchIndex"],
     "noLangKeyword": false,
     "keepFileLink": false
   }
