@@ -214,7 +214,18 @@ namespace Mono.Terminal {
 
 			UpdatePollMap ();
 
-			n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
+			while (true) {
+				if (wait && pollTimeout == -1) {
+					pollTimeout = 0;
+				}
+				n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
+				if (pollmap != null) {
+					break;
+				}
+				if (mainLoop.timeouts.Count > 0 || mainLoop.idleHandlers.Count > 0) {
+					return true;
+				}
+			}
 			int ic;
 			lock (mainLoop.idleHandlers)
 				ic = mainLoop.idleHandlers.Count;
@@ -454,7 +465,7 @@ namespace Mono.Terminal {
 			running = false;
 			driver.Wakeup ();
 		}
-
+		
 		/// <summary>
 		///   Determines whether there are pending events to be processed.
 		/// </summary>

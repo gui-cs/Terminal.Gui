@@ -521,13 +521,19 @@ namespace Terminal.Gui {
 		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
 		public override bool MouseEvent (MouseEvent me)
 		{
-			if (me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp)
+			if (me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp &&
+				me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
+				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
 				return false;
 
 			if (me.Flags == MouseFlags.WheeledDown)
 				ScrollDown (1);
 			else if (me.Flags == MouseFlags.WheeledUp)
 				ScrollUp (1);
+			else if (me.X == vertical.Frame.X)
+				vertical.MouseEvent (me);
+			else if (me.Y == horizontal.Frame.Y)
+				horizontal.MouseEvent (me);
 
 			return true;
 		}
