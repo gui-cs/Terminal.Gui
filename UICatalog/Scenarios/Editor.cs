@@ -14,7 +14,7 @@ namespace UICatalog {
 
 		public override void Init (Toplevel top)
 		{
-			Top = top;
+			base.Init (top);
 		}
 
 		public override void Setup ()
@@ -144,7 +144,7 @@ namespace UICatalog {
 
 		public override void Run ()
 		{
-			Application.Run (Top);
+			base.Run ();
 		}
 	}
 }

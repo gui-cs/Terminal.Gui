@@ -50,6 +50,7 @@ namespace UICatalog {
 
 		public override void Init (Toplevel top)
 		{
+			Application.Init ();
 			Top = top;
 
 			Win = new TestWindow ($"CTRL-Q to Close - Scenario: {GetName ()}") {
