@@ -179,7 +179,7 @@ namespace Terminal.Gui {
 				int x;
 				switch (textAlignment) {
 				case TextAlignment.Left:
-					x = Frame.Left;
+					x = 0;
 					break;
 				case TextAlignment.Justified:
 					Recalc ();
