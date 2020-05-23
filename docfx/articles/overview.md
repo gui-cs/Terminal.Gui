@@ -1,8 +1,7 @@
-Overview
-========
+# Terminal.Gui API Overview
 
 `Terminal.Gui` is a library intended to create console-based
-applications using C#.  The framework has been designed to make it
+applications using C#. The framework has been designed to make it
 easy to write applications that will work on monochrome terminals, as
 well as modern color terminals with mouse support.
 

@@ -1,0 +1,2499 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.CursesDriver
+  commentId: T:Terminal.Gui.CursesDriver
+  id: CursesDriver
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.CursesDriver.AddRune(System.Rune)
+  - Terminal.Gui.CursesDriver.AddStr(NStack.ustring)
+  - Terminal.Gui.CursesDriver.Cols
+  - Terminal.Gui.CursesDriver.CookMouse
+  - Terminal.Gui.CursesDriver.End
+  - Terminal.Gui.CursesDriver.Init(System.Action)
+  - Terminal.Gui.CursesDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
+  - Terminal.Gui.CursesDriver.MakeColor(System.Int16,System.Int16)
+  - Terminal.Gui.CursesDriver.Move(System.Int32,System.Int32)
+  - Terminal.Gui.CursesDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  - Terminal.Gui.CursesDriver.Refresh
+  - Terminal.Gui.CursesDriver.Rows
+  - Terminal.Gui.CursesDriver.SetAttribute(Terminal.Gui.Attribute)
+  - Terminal.Gui.CursesDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+  - Terminal.Gui.CursesDriver.SetColors(System.Int16,System.Int16)
+  - Terminal.Gui.CursesDriver.StartReportingMouseMoves
+  - Terminal.Gui.CursesDriver.StopReportingMouseMoves
+  - Terminal.Gui.CursesDriver.Suspend
+  - Terminal.Gui.CursesDriver.UncookMouse
+  - Terminal.Gui.CursesDriver.UpdateCursor
+  - Terminal.Gui.CursesDriver.UpdateScreen
+  - Terminal.Gui.CursesDriver.window
+  langs:
+  - csharp
+  - vb
+  name: CursesDriver
+  nameWithType: CursesDriver
+  fullName: Terminal.Gui.CursesDriver
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: CursesDriver
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 19
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThis is the Curses driver for the gui.cs/Terminal framework.\n"
+  example: []
+  syntax:
+    content: 'public class CursesDriver : ConsoleDriver'
+    content.vb: >-
+      Public Class CursesDriver
+
+          Inherits ConsoleDriver
+  inheritance:
+  - System.Object
+  - Terminal.Gui.ConsoleDriver
+  inheritedMembers:
+  - Terminal.Gui.ConsoleDriver.TerminalResized
+  - Terminal.Gui.ConsoleDriver.SetTerminalResized(System.Action)
+  - Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  - Terminal.Gui.ConsoleDriver.Clip
+  - Terminal.Gui.ConsoleDriver.HLine
+  - Terminal.Gui.ConsoleDriver.VLine
+  - Terminal.Gui.ConsoleDriver.Stipple
+  - Terminal.Gui.ConsoleDriver.Diamond
+  - Terminal.Gui.ConsoleDriver.ULCorner
+  - Terminal.Gui.ConsoleDriver.LLCorner
+  - Terminal.Gui.ConsoleDriver.URCorner
+  - Terminal.Gui.ConsoleDriver.LRCorner
+  - Terminal.Gui.ConsoleDriver.LeftTee
+  - Terminal.Gui.ConsoleDriver.RightTee
+  - Terminal.Gui.ConsoleDriver.TopTee
+  - Terminal.Gui.ConsoleDriver.BottomTee
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  modifiers.csharp:
+  - public
+  - class
+  modifiers.vb:
+  - Public
+  - Class
+- uid: Terminal.Gui.CursesDriver.Cols
+  commentId: P:Terminal.Gui.CursesDriver.Cols
+  id: Cols
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: Cols
+  nameWithType: CursesDriver.Cols
+  fullName: Terminal.Gui.CursesDriver.Cols
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Cols
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 21
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override int Cols { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Overrides ReadOnly Property Cols As Integer
+  overridden: Terminal.Gui.ConsoleDriver.Cols
+  overload: Terminal.Gui.CursesDriver.Cols*
+  modifiers.csharp:
+  - public
+  - override
+  - get
+  modifiers.vb:
+  - Public
+  - Overrides
+  - ReadOnly
+- uid: Terminal.Gui.CursesDriver.Rows
+  commentId: P:Terminal.Gui.CursesDriver.Rows
+  id: Rows
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: Rows
+  nameWithType: CursesDriver.Rows
+  fullName: Terminal.Gui.CursesDriver.Rows
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Rows
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 22
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override int Rows { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Overrides ReadOnly Property Rows As Integer
+  overridden: Terminal.Gui.ConsoleDriver.Rows
+  overload: Terminal.Gui.CursesDriver.Rows*
+  modifiers.csharp:
+  - public
+  - override
+  - get
+  modifiers.vb:
+  - Public
+  - Overrides
+  - ReadOnly
+- uid: Terminal.Gui.CursesDriver.Move(System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.CursesDriver.Move(System.Int32,System.Int32)
+  id: Move(System.Int32,System.Int32)
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: Move(Int32, Int32)
+  nameWithType: CursesDriver.Move(Int32, Int32)
+  fullName: Terminal.Gui.CursesDriver.Move(System.Int32, System.Int32)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Move
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 27
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void Move(int col, int row)
+    parameters:
+    - id: col
+      type: System.Int32
+    - id: row
+      type: System.Int32
+    content.vb: Public Overrides Sub Move(col As Integer, row As Integer)
+  overridden: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+  overload: Terminal.Gui.CursesDriver.Move*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.AddRune(System.Rune)
+  commentId: M:Terminal.Gui.CursesDriver.AddRune(System.Rune)
+  id: AddRune(System.Rune)
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: AddRune(Rune)
+  nameWithType: CursesDriver.AddRune(Rune)
+  fullName: Terminal.Gui.CursesDriver.AddRune(System.Rune)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: AddRune
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 42
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void AddRune(Rune rune)
+    parameters:
+    - id: rune
+      type: System.Rune
+    content.vb: Public Overrides Sub AddRune(rune As Rune)
+  overridden: Terminal.Gui.ConsoleDriver.AddRune(System.Rune)
+  overload: Terminal.Gui.CursesDriver.AddRune*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.AddStr(NStack.ustring)
+  commentId: M:Terminal.Gui.CursesDriver.AddStr(NStack.ustring)
+  id: AddStr(NStack.ustring)
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: AddStr(ustring)
+  nameWithType: CursesDriver.AddStr(ustring)
+  fullName: Terminal.Gui.CursesDriver.AddStr(NStack.ustring)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: AddStr
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 63
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void AddStr(ustring str)
+    parameters:
+    - id: str
+      type: NStack.ustring
+    content.vb: Public Overrides Sub AddStr(str As ustring)
+  overridden: Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)
+  overload: Terminal.Gui.CursesDriver.AddStr*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.Refresh
+  commentId: M:Terminal.Gui.CursesDriver.Refresh
+  id: Refresh
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: Refresh()
+  nameWithType: CursesDriver.Refresh()
+  fullName: Terminal.Gui.CursesDriver.Refresh()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Refresh
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 70
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void Refresh()
+    content.vb: Public Overrides Sub Refresh
+  overridden: Terminal.Gui.ConsoleDriver.Refresh
+  overload: Terminal.Gui.CursesDriver.Refresh*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.UpdateCursor
+  commentId: M:Terminal.Gui.CursesDriver.UpdateCursor
+  id: UpdateCursor
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: UpdateCursor()
+  nameWithType: CursesDriver.UpdateCursor()
+  fullName: Terminal.Gui.CursesDriver.UpdateCursor()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: UpdateCursor
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 76
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void UpdateCursor()
+    content.vb: Public Overrides Sub UpdateCursor
+  overridden: Terminal.Gui.ConsoleDriver.UpdateCursor
+  overload: Terminal.Gui.CursesDriver.UpdateCursor*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.End
+  commentId: M:Terminal.Gui.CursesDriver.End
+  id: End
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: End()
+  nameWithType: CursesDriver.End()
+  fullName: Terminal.Gui.CursesDriver.End()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: End
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 77
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void End()
+    content.vb: Public Overrides Sub
+  overridden: Terminal.Gui.ConsoleDriver.End
+  overload: Terminal.Gui.CursesDriver.End*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.UpdateScreen
+  commentId: M:Terminal.Gui.CursesDriver.UpdateScreen
+  id: UpdateScreen
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: UpdateScreen()
+  nameWithType: CursesDriver.UpdateScreen()
+  fullName: Terminal.Gui.CursesDriver.UpdateScreen()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: UpdateScreen
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 78
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void UpdateScreen()
+    content.vb: Public Overrides Sub UpdateScreen
+  overridden: Terminal.Gui.ConsoleDriver.UpdateScreen
+  overload: Terminal.Gui.CursesDriver.UpdateScreen*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.SetAttribute(Terminal.Gui.Attribute)
+  commentId: M:Terminal.Gui.CursesDriver.SetAttribute(Terminal.Gui.Attribute)
+  id: SetAttribute(Terminal.Gui.Attribute)
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: SetAttribute(Attribute)
+  nameWithType: CursesDriver.SetAttribute(Attribute)
+  fullName: Terminal.Gui.CursesDriver.SetAttribute(Terminal.Gui.Attribute)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: SetAttribute
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 79
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void SetAttribute(Attribute c)
+    parameters:
+    - id: c
+      type: Terminal.Gui.Attribute
+    content.vb: Public Overrides Sub SetAttribute(c As Attribute)
+  overridden: Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+  overload: Terminal.Gui.CursesDriver.SetAttribute*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.window
+  commentId: F:Terminal.Gui.CursesDriver.window
+  id: window
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: window
+  nameWithType: CursesDriver.window
+  fullName: Terminal.Gui.CursesDriver.window
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: window
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 80
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public Curses.Window window
+    return:
+      type: Unix.Terminal.Curses.Window
+    content.vb: Public window As Curses.Window
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.CursesDriver.MakeColor(System.Int16,System.Int16)
+  commentId: M:Terminal.Gui.CursesDriver.MakeColor(System.Int16,System.Int16)
+  id: MakeColor(System.Int16,System.Int16)
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: MakeColor(Int16, Int16)
+  nameWithType: CursesDriver.MakeColor(Int16, Int16)
+  fullName: Terminal.Gui.CursesDriver.MakeColor(System.Int16, System.Int16)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: MakeColor
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 90
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nCreates a curses color from the provided foreground and background colors\n"
+  example: []
+  syntax:
+    content: public static Attribute MakeColor(short foreground, short background)
+    parameters:
+    - id: foreground
+      type: System.Int16
+      description: Contains the curses attributes for the foreground (color, plus any attributes)
+    - id: background
+      type: System.Int16
+      description: Contains the curses attributes for the background (color, plus any attributes)
+    return:
+      type: Terminal.Gui.Attribute
+      description: ''
+    content.vb: Public Shared Function MakeColor(foreground As Short, background As Short) As Attribute
+  overload: Terminal.Gui.CursesDriver.MakeColor*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.CursesDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+  commentId: M:Terminal.Gui.CursesDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+  id: SetColors(System.ConsoleColor,System.ConsoleColor)
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: SetColors(ConsoleColor, ConsoleColor)
+  nameWithType: CursesDriver.SetColors(ConsoleColor, ConsoleColor)
+  fullName: Terminal.Gui.CursesDriver.SetColors(System.ConsoleColor, System.ConsoleColor)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: SetColors
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 98
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void SetColors(ConsoleColor foreground, ConsoleColor background)
+    parameters:
+    - id: foreground
+      type: System.ConsoleColor
+    - id: background
+      type: System.ConsoleColor
+    content.vb: Public Overrides Sub SetColors(foreground As ConsoleColor, background As ConsoleColor)
+  overridden: Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+  overload: Terminal.Gui.CursesDriver.SetColors*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.SetColors(System.Int16,System.Int16)
+  commentId: M:Terminal.Gui.CursesDriver.SetColors(System.Int16,System.Int16)
+  id: SetColors(System.Int16,System.Int16)
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: SetColors(Int16, Int16)
+  nameWithType: CursesDriver.SetColors(Int16, Int16)
+  fullName: Terminal.Gui.CursesDriver.SetColors(System.Int16, System.Int16)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: SetColors
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 115
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void SetColors(short foreColorId, short backgroundColorId)
+    parameters:
+    - id: foreColorId
+      type: System.Int16
+    - id: backgroundColorId
+      type: System.Int16
+    content.vb: Public Overrides Sub SetColors(foreColorId As Short, backgroundColorId As Short)
+  overridden: Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
+  overload: Terminal.Gui.CursesDriver.SetColors*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  commentId: M:Terminal.Gui.CursesDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  id: PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: PrepareToRun(MainLoop, Action<KeyEvent>, Action<KeyEvent>, Action<KeyEvent>, Action<MouseEvent>)
+  nameWithType: CursesDriver.PrepareToRun(MainLoop, Action<KeyEvent>, Action<KeyEvent>, Action<KeyEvent>, Action<MouseEvent>)
+  fullName: Terminal.Gui.CursesDriver.PrepareToRun(Mono.Terminal.MainLoop, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.MouseEvent>)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: PrepareToRun
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 431
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void PrepareToRun(MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
+    parameters:
+    - id: mainLoop
+      type: Mono.Terminal.MainLoop
+    - id: keyHandler
+      type: System.Action{Terminal.Gui.KeyEvent}
+    - id: keyDownHandler
+      type: System.Action{Terminal.Gui.KeyEvent}
+    - id: keyUpHandler
+      type: System.Action{Terminal.Gui.KeyEvent}
+    - id: mouseHandler
+      type: System.Action{Terminal.Gui.MouseEvent}
+    content.vb: Public Overrides Sub PrepareToRun(mainLoop As MainLoop, keyHandler As Action(Of KeyEvent), keyDownHandler As Action(Of KeyEvent), keyUpHandler As Action(Of KeyEvent), mouseHandler As Action(Of MouseEvent))
+  overridden: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  overload: Terminal.Gui.CursesDriver.PrepareToRun*
+  nameWithType.vb: CursesDriver.PrepareToRun(MainLoop, Action(Of KeyEvent), Action(Of KeyEvent), Action(Of KeyEvent), Action(Of MouseEvent))
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+  fullName.vb: Terminal.Gui.CursesDriver.PrepareToRun(Mono.Terminal.MainLoop, System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.MouseEvent))
+  name.vb: PrepareToRun(MainLoop, Action(Of KeyEvent), Action(Of KeyEvent), Action(Of KeyEvent), Action(Of MouseEvent))
+- uid: Terminal.Gui.CursesDriver.Init(System.Action)
+  commentId: M:Terminal.Gui.CursesDriver.Init(System.Action)
+  id: Init(System.Action)
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: Init(Action)
+  nameWithType: CursesDriver.Init(Action)
+  fullName: Terminal.Gui.CursesDriver.Init(System.Action)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Init
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 446
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void Init(Action terminalResized)
+    parameters:
+    - id: terminalResized
+      type: System.Action
+    content.vb: Public Overrides Sub Init(terminalResized As Action)
+  overridden: Terminal.Gui.ConsoleDriver.Init(System.Action)
+  overload: Terminal.Gui.CursesDriver.Init*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
+  commentId: M:Terminal.Gui.CursesDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
+  id: MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: MakeAttribute(Color, Color)
+  nameWithType: CursesDriver.MakeAttribute(Color, Color)
+  fullName: Terminal.Gui.CursesDriver.MakeAttribute(Terminal.Gui.Color, Terminal.Gui.Color)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: MakeAttribute
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 577
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override Attribute MakeAttribute(Color fore, Color back)
+    parameters:
+    - id: fore
+      type: Terminal.Gui.Color
+    - id: back
+      type: Terminal.Gui.Color
+    return:
+      type: Terminal.Gui.Attribute
+    content.vb: Public Overrides Function MakeAttribute(fore As Color, back As Color) As Attribute
+  overridden: Terminal.Gui.ConsoleDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
+  overload: Terminal.Gui.CursesDriver.MakeAttribute*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.Suspend
+  commentId: M:Terminal.Gui.CursesDriver.Suspend
+  id: Suspend
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: Suspend()
+  nameWithType: CursesDriver.Suspend()
+  fullName: Terminal.Gui.CursesDriver.Suspend()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Suspend
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 583
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void Suspend()
+    content.vb: Public Overrides Sub Suspend
+  overridden: Terminal.Gui.ConsoleDriver.Suspend
+  overload: Terminal.Gui.CursesDriver.Suspend*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.StartReportingMouseMoves
+  commentId: M:Terminal.Gui.CursesDriver.StartReportingMouseMoves
+  id: StartReportingMouseMoves
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: StartReportingMouseMoves()
+  nameWithType: CursesDriver.StartReportingMouseMoves()
+  fullName: Terminal.Gui.CursesDriver.StartReportingMouseMoves()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: StartReportingMouseMoves
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 594
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void StartReportingMouseMoves()
+    content.vb: Public Overrides Sub StartReportingMouseMoves
+  overridden: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
+  overload: Terminal.Gui.CursesDriver.StartReportingMouseMoves*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.StopReportingMouseMoves
+  commentId: M:Terminal.Gui.CursesDriver.StopReportingMouseMoves
+  id: StopReportingMouseMoves
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: StopReportingMouseMoves()
+  nameWithType: CursesDriver.StopReportingMouseMoves()
+  fullName: Terminal.Gui.CursesDriver.StopReportingMouseMoves()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: StopReportingMouseMoves
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 600
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void StopReportingMouseMoves()
+    content.vb: Public Overrides Sub StopReportingMouseMoves
+  overridden: Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
+  overload: Terminal.Gui.CursesDriver.StopReportingMouseMoves*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.UncookMouse
+  commentId: M:Terminal.Gui.CursesDriver.UncookMouse
+  id: UncookMouse
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: UncookMouse()
+  nameWithType: CursesDriver.UncookMouse()
+  fullName: Terminal.Gui.CursesDriver.UncookMouse()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: UncookMouse
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 609
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void UncookMouse()
+    content.vb: Public Overrides Sub UncookMouse
+  overridden: Terminal.Gui.ConsoleDriver.UncookMouse
+  overload: Terminal.Gui.CursesDriver.UncookMouse*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+- uid: Terminal.Gui.CursesDriver.CookMouse
+  commentId: M:Terminal.Gui.CursesDriver.CookMouse
+  id: CookMouse
+  parent: Terminal.Gui.CursesDriver
+  langs:
+  - csharp
+  - vb
+  name: CookMouse()
+  nameWithType: CursesDriver.CookMouse()
+  fullName: Terminal.Gui.CursesDriver.CookMouse()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/CursesDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: CookMouse
+    path: ../Terminal.Gui/Drivers/CursesDriver.cs
+    startLine: 617
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public override void CookMouse()
+    content.vb: Public Overrides Sub CookMouse
+  overridden: Terminal.Gui.ConsoleDriver.CookMouse
+  overload: Terminal.Gui.CursesDriver.CookMouse*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: Terminal.Gui.ConsoleDriver
+  commentId: T:Terminal.Gui.ConsoleDriver
+  parent: Terminal.Gui
+  name: ConsoleDriver
+  nameWithType: ConsoleDriver
+  fullName: Terminal.Gui.ConsoleDriver
+- uid: Terminal.Gui.ConsoleDriver.TerminalResized
+  commentId: F:Terminal.Gui.ConsoleDriver.TerminalResized
+  parent: Terminal.Gui.ConsoleDriver
+  name: TerminalResized
+  nameWithType: ConsoleDriver.TerminalResized
+  fullName: Terminal.Gui.ConsoleDriver.TerminalResized
+- uid: Terminal.Gui.ConsoleDriver.SetTerminalResized(System.Action)
+  commentId: M:Terminal.Gui.ConsoleDriver.SetTerminalResized(System.Action)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  name: SetTerminalResized(Action)
+  nameWithType: ConsoleDriver.SetTerminalResized(Action)
+  fullName: Terminal.Gui.ConsoleDriver.SetTerminalResized(System.Action)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.SetTerminalResized(System.Action)
+    name: SetTerminalResized
+    nameWithType: ConsoleDriver.SetTerminalResized
+    fullName: Terminal.Gui.ConsoleDriver.SetTerminalResized
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Action
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.SetTerminalResized(System.Action)
+    name: SetTerminalResized
+    nameWithType: ConsoleDriver.SetTerminalResized
+    fullName: Terminal.Gui.ConsoleDriver.SetTerminalResized
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Action
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  commentId: M:Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  name: DrawFrame(Rect, Int32, Boolean)
+  nameWithType: ConsoleDriver.DrawFrame(Rect, Int32, Boolean)
+  fullName: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect, System.Int32, System.Boolean)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+    name: DrawFrame
+    nameWithType: ConsoleDriver.DrawFrame
+    fullName: Terminal.Gui.ConsoleDriver.DrawFrame
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    nameWithType: Rect
+    fullName: Terminal.Gui.Rect
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+    name: DrawFrame
+    nameWithType: ConsoleDriver.DrawFrame
+    fullName: Terminal.Gui.ConsoleDriver.DrawFrame
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    nameWithType: Rect
+    fullName: Terminal.Gui.Rect
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.ConsoleDriver.Clip
+  commentId: P:Terminal.Gui.ConsoleDriver.Clip
+  parent: Terminal.Gui.ConsoleDriver
+  name: Clip
+  nameWithType: ConsoleDriver.Clip
+  fullName: Terminal.Gui.ConsoleDriver.Clip
+- uid: Terminal.Gui.ConsoleDriver.HLine
+  commentId: F:Terminal.Gui.ConsoleDriver.HLine
+  parent: Terminal.Gui.ConsoleDriver
+  name: HLine
+  nameWithType: ConsoleDriver.HLine
+  fullName: Terminal.Gui.ConsoleDriver.HLine
+- uid: Terminal.Gui.ConsoleDriver.VLine
+  commentId: F:Terminal.Gui.ConsoleDriver.VLine
+  parent: Terminal.Gui.ConsoleDriver
+  name: VLine
+  nameWithType: ConsoleDriver.VLine
+  fullName: Terminal.Gui.ConsoleDriver.VLine
+- uid: Terminal.Gui.ConsoleDriver.Stipple
+  commentId: F:Terminal.Gui.ConsoleDriver.Stipple
+  parent: Terminal.Gui.ConsoleDriver
+  name: Stipple
+  nameWithType: ConsoleDriver.Stipple
+  fullName: Terminal.Gui.ConsoleDriver.Stipple
+- uid: Terminal.Gui.ConsoleDriver.Diamond
+  commentId: F:Terminal.Gui.ConsoleDriver.Diamond
+  parent: Terminal.Gui.ConsoleDriver
+  name: Diamond
+  nameWithType: ConsoleDriver.Diamond
+  fullName: Terminal.Gui.ConsoleDriver.Diamond
+- uid: Terminal.Gui.ConsoleDriver.ULCorner
+  commentId: F:Terminal.Gui.ConsoleDriver.ULCorner
+  parent: Terminal.Gui.ConsoleDriver
+  name: ULCorner
+  nameWithType: ConsoleDriver.ULCorner
+  fullName: Terminal.Gui.ConsoleDriver.ULCorner
+- uid: Terminal.Gui.ConsoleDriver.LLCorner
+  commentId: F:Terminal.Gui.ConsoleDriver.LLCorner
+  parent: Terminal.Gui.ConsoleDriver
+  name: LLCorner
+  nameWithType: ConsoleDriver.LLCorner
+  fullName: Terminal.Gui.ConsoleDriver.LLCorner
+- uid: Terminal.Gui.ConsoleDriver.URCorner
+  commentId: F:Terminal.Gui.ConsoleDriver.URCorner
+  parent: Terminal.Gui.ConsoleDriver
+  name: URCorner
+  nameWithType: ConsoleDriver.URCorner
+  fullName: Terminal.Gui.ConsoleDriver.URCorner
+- uid: Terminal.Gui.ConsoleDriver.LRCorner
+  commentId: F:Terminal.Gui.ConsoleDriver.LRCorner
+  parent: Terminal.Gui.ConsoleDriver
+  name: LRCorner
+  nameWithType: ConsoleDriver.LRCorner
+  fullName: Terminal.Gui.ConsoleDriver.LRCorner
+- uid: Terminal.Gui.ConsoleDriver.LeftTee
+  commentId: F:Terminal.Gui.ConsoleDriver.LeftTee
+  parent: Terminal.Gui.ConsoleDriver
+  name: LeftTee
+  nameWithType: ConsoleDriver.LeftTee
+  fullName: Terminal.Gui.ConsoleDriver.LeftTee
+- uid: Terminal.Gui.ConsoleDriver.RightTee
+  commentId: F:Terminal.Gui.ConsoleDriver.RightTee
+  parent: Terminal.Gui.ConsoleDriver
+  name: RightTee
+  nameWithType: ConsoleDriver.RightTee
+  fullName: Terminal.Gui.ConsoleDriver.RightTee
+- uid: Terminal.Gui.ConsoleDriver.TopTee
+  commentId: F:Terminal.Gui.ConsoleDriver.TopTee
+  parent: Terminal.Gui.ConsoleDriver
+  name: TopTee
+  nameWithType: ConsoleDriver.TopTee
+  fullName: Terminal.Gui.ConsoleDriver.TopTee
+- uid: Terminal.Gui.ConsoleDriver.BottomTee
+  commentId: F:Terminal.Gui.ConsoleDriver.BottomTee
+  parent: Terminal.Gui.ConsoleDriver
+  name: BottomTee
+  nameWithType: ConsoleDriver.BottomTee
+  fullName: Terminal.Gui.ConsoleDriver.BottomTee
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: Object.Equals(Object)
+  fullName: System.Object.Equals(System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: Object.GetHashCode()
+  fullName: System.Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  name: MemberwiseClone()
+  nameWithType: Object.MemberwiseClone()
+  fullName: System.Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  name: ToString()
+  nameWithType: Object.ToString()
+  fullName: System.Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.ConsoleDriver.Cols
+  commentId: P:Terminal.Gui.ConsoleDriver.Cols
+  parent: Terminal.Gui.ConsoleDriver
+  name: Cols
+  nameWithType: ConsoleDriver.Cols
+  fullName: Terminal.Gui.ConsoleDriver.Cols
+- uid: Terminal.Gui.CursesDriver.Cols*
+  commentId: Overload:Terminal.Gui.CursesDriver.Cols
+  name: Cols
+  nameWithType: CursesDriver.Cols
+  fullName: Terminal.Gui.CursesDriver.Cols
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: Terminal.Gui.ConsoleDriver.Rows
+  commentId: P:Terminal.Gui.ConsoleDriver.Rows
+  parent: Terminal.Gui.ConsoleDriver
+  name: Rows
+  nameWithType: ConsoleDriver.Rows
+  fullName: Terminal.Gui.ConsoleDriver.Rows
+- uid: Terminal.Gui.CursesDriver.Rows*
+  commentId: Overload:Terminal.Gui.CursesDriver.Rows
+  name: Rows
+  nameWithType: CursesDriver.Rows
+  fullName: Terminal.Gui.CursesDriver.Rows
+- uid: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  name: Move(Int32, Int32)
+  nameWithType: ConsoleDriver.Move(Int32, Int32)
+  fullName: Terminal.Gui.ConsoleDriver.Move(System.Int32, System.Int32)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+    name: Move
+    nameWithType: ConsoleDriver.Move
+    fullName: Terminal.Gui.ConsoleDriver.Move
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+    name: Move
+    nameWithType: ConsoleDriver.Move
+    fullName: Terminal.Gui.ConsoleDriver.Move
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.Move*
+  commentId: Overload:Terminal.Gui.CursesDriver.Move
+  name: Move
+  nameWithType: CursesDriver.Move
+  fullName: Terminal.Gui.CursesDriver.Move
+- uid: Terminal.Gui.ConsoleDriver.AddRune(System.Rune)
+  commentId: M:Terminal.Gui.ConsoleDriver.AddRune(System.Rune)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  name: AddRune(Rune)
+  nameWithType: ConsoleDriver.AddRune(Rune)
+  fullName: Terminal.Gui.ConsoleDriver.AddRune(System.Rune)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.AddRune(System.Rune)
+    name: AddRune
+    nameWithType: ConsoleDriver.AddRune
+    fullName: Terminal.Gui.ConsoleDriver.AddRune
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Rune
+    name: Rune
+    nameWithType: Rune
+    fullName: System.Rune
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.AddRune(System.Rune)
+    name: AddRune
+    nameWithType: ConsoleDriver.AddRune
+    fullName: Terminal.Gui.ConsoleDriver.AddRune
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Rune
+    name: Rune
+    nameWithType: Rune
+    fullName: System.Rune
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.AddRune*
+  commentId: Overload:Terminal.Gui.CursesDriver.AddRune
+  name: AddRune
+  nameWithType: CursesDriver.AddRune
+  fullName: Terminal.Gui.CursesDriver.AddRune
+- uid: System.Rune
+  commentId: T:System.Rune
+  parent: System
+  isExternal: true
+  name: Rune
+  nameWithType: Rune
+  fullName: System.Rune
+- uid: Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)
+  commentId: M:Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  name: AddStr(ustring)
+  nameWithType: ConsoleDriver.AddStr(ustring)
+  fullName: Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)
+    name: AddStr
+    nameWithType: ConsoleDriver.AddStr
+    fullName: Terminal.Gui.ConsoleDriver.AddStr
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: NStack.ustring
+    name: ustring
+    nameWithType: ustring
+    fullName: NStack.ustring
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.AddStr(NStack.ustring)
+    name: AddStr
+    nameWithType: ConsoleDriver.AddStr
+    fullName: Terminal.Gui.ConsoleDriver.AddStr
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: NStack.ustring
+    name: ustring
+    nameWithType: ustring
+    fullName: NStack.ustring
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.AddStr*
+  commentId: Overload:Terminal.Gui.CursesDriver.AddStr
+  name: AddStr
+  nameWithType: CursesDriver.AddStr
+  fullName: Terminal.Gui.CursesDriver.AddStr
+- uid: NStack.ustring
+  commentId: T:NStack.ustring
+  parent: NStack
+  isExternal: true
+  name: ustring
+  nameWithType: ustring
+  fullName: NStack.ustring
+- uid: NStack
+  commentId: N:NStack
+  isExternal: true
+  name: NStack
+  nameWithType: NStack
+  fullName: NStack
+- uid: Terminal.Gui.ConsoleDriver.Refresh
+  commentId: M:Terminal.Gui.ConsoleDriver.Refresh
+  parent: Terminal.Gui.ConsoleDriver
+  name: Refresh()
+  nameWithType: ConsoleDriver.Refresh()
+  fullName: Terminal.Gui.ConsoleDriver.Refresh()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.Refresh
+    name: Refresh
+    nameWithType: ConsoleDriver.Refresh
+    fullName: Terminal.Gui.ConsoleDriver.Refresh
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.Refresh
+    name: Refresh
+    nameWithType: ConsoleDriver.Refresh
+    fullName: Terminal.Gui.ConsoleDriver.Refresh
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.Refresh*
+  commentId: Overload:Terminal.Gui.CursesDriver.Refresh
+  name: Refresh
+  nameWithType: CursesDriver.Refresh
+  fullName: Terminal.Gui.CursesDriver.Refresh
+- uid: Terminal.Gui.ConsoleDriver.UpdateCursor
+  commentId: M:Terminal.Gui.ConsoleDriver.UpdateCursor
+  parent: Terminal.Gui.ConsoleDriver
+  name: UpdateCursor()
+  nameWithType: ConsoleDriver.UpdateCursor()
+  fullName: Terminal.Gui.ConsoleDriver.UpdateCursor()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.UpdateCursor
+    name: UpdateCursor
+    nameWithType: ConsoleDriver.UpdateCursor
+    fullName: Terminal.Gui.ConsoleDriver.UpdateCursor
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.UpdateCursor
+    name: UpdateCursor
+    nameWithType: ConsoleDriver.UpdateCursor
+    fullName: Terminal.Gui.ConsoleDriver.UpdateCursor
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.UpdateCursor*
+  commentId: Overload:Terminal.Gui.CursesDriver.UpdateCursor
+  name: UpdateCursor
+  nameWithType: CursesDriver.UpdateCursor
+  fullName: Terminal.Gui.CursesDriver.UpdateCursor
+- uid: Terminal.Gui.ConsoleDriver.End
+  commentId: M:Terminal.Gui.ConsoleDriver.End
+  parent: Terminal.Gui.ConsoleDriver
+  name: End()
+  nameWithType: ConsoleDriver.End()
+  fullName: Terminal.Gui.ConsoleDriver.End()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.End
+    name: End
+    nameWithType: ConsoleDriver.End
+    fullName: Terminal.Gui.ConsoleDriver.End
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.End
+    name: End
+    nameWithType: ConsoleDriver.End
+    fullName: Terminal.Gui.ConsoleDriver.End
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.End*
+  commentId: Overload:Terminal.Gui.CursesDriver.End
+  name: End
+  nameWithType: CursesDriver.End
+  fullName: Terminal.Gui.CursesDriver.End
+- uid: Terminal.Gui.ConsoleDriver.UpdateScreen
+  commentId: M:Terminal.Gui.ConsoleDriver.UpdateScreen
+  parent: Terminal.Gui.ConsoleDriver
+  name: UpdateScreen()
+  nameWithType: ConsoleDriver.UpdateScreen()
+  fullName: Terminal.Gui.ConsoleDriver.UpdateScreen()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.UpdateScreen
+    name: UpdateScreen
+    nameWithType: ConsoleDriver.UpdateScreen
+    fullName: Terminal.Gui.ConsoleDriver.UpdateScreen
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.UpdateScreen
+    name: UpdateScreen
+    nameWithType: ConsoleDriver.UpdateScreen
+    fullName: Terminal.Gui.ConsoleDriver.UpdateScreen
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.UpdateScreen*
+  commentId: Overload:Terminal.Gui.CursesDriver.UpdateScreen
+  name: UpdateScreen
+  nameWithType: CursesDriver.UpdateScreen
+  fullName: Terminal.Gui.CursesDriver.UpdateScreen
+- uid: Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+  commentId: M:Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+  parent: Terminal.Gui.ConsoleDriver
+  name: SetAttribute(Attribute)
+  nameWithType: ConsoleDriver.SetAttribute(Attribute)
+  fullName: Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+    name: SetAttribute
+    nameWithType: ConsoleDriver.SetAttribute
+    fullName: Terminal.Gui.ConsoleDriver.SetAttribute
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    nameWithType: Attribute
+    fullName: Terminal.Gui.Attribute
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+    name: SetAttribute
+    nameWithType: ConsoleDriver.SetAttribute
+    fullName: Terminal.Gui.ConsoleDriver.SetAttribute
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    nameWithType: Attribute
+    fullName: Terminal.Gui.Attribute
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.SetAttribute*
+  commentId: Overload:Terminal.Gui.CursesDriver.SetAttribute
+  name: SetAttribute
+  nameWithType: CursesDriver.SetAttribute
+  fullName: Terminal.Gui.CursesDriver.SetAttribute
+- uid: Terminal.Gui.Attribute
+  commentId: T:Terminal.Gui.Attribute
+  parent: Terminal.Gui
+  name: Attribute
+  nameWithType: Attribute
+  fullName: Terminal.Gui.Attribute
+- uid: Unix.Terminal.Curses.Window
+  commentId: T:Unix.Terminal.Curses.Window
+  parent: Unix.Terminal
+  name: Curses.Window
+  nameWithType: Curses.Window
+  fullName: Unix.Terminal.Curses.Window
+- uid: Unix.Terminal
+  commentId: N:Unix.Terminal
+  name: Unix.Terminal
+  nameWithType: Unix.Terminal
+  fullName: Unix.Terminal
+- uid: Terminal.Gui.CursesDriver.MakeColor*
+  commentId: Overload:Terminal.Gui.CursesDriver.MakeColor
+  name: MakeColor
+  nameWithType: CursesDriver.MakeColor
+  fullName: Terminal.Gui.CursesDriver.MakeColor
+- uid: System.Int16
+  commentId: T:System.Int16
+  parent: System
+  isExternal: true
+  name: Int16
+  nameWithType: Int16
+  fullName: System.Int16
+- uid: Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+  commentId: M:Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  name: SetColors(ConsoleColor, ConsoleColor)
+  nameWithType: ConsoleDriver.SetColors(ConsoleColor, ConsoleColor)
+  fullName: Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor, System.ConsoleColor)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+    name: SetColors
+    nameWithType: ConsoleDriver.SetColors
+    fullName: Terminal.Gui.ConsoleDriver.SetColors
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.ConsoleColor
+    name: ConsoleColor
+    nameWithType: ConsoleColor
+    fullName: System.ConsoleColor
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.ConsoleColor
+    name: ConsoleColor
+    nameWithType: ConsoleColor
+    fullName: System.ConsoleColor
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+    name: SetColors
+    nameWithType: ConsoleDriver.SetColors
+    fullName: Terminal.Gui.ConsoleDriver.SetColors
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.ConsoleColor
+    name: ConsoleColor
+    nameWithType: ConsoleColor
+    fullName: System.ConsoleColor
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.ConsoleColor
+    name: ConsoleColor
+    nameWithType: ConsoleColor
+    fullName: System.ConsoleColor
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.SetColors*
+  commentId: Overload:Terminal.Gui.CursesDriver.SetColors
+  name: SetColors
+  nameWithType: CursesDriver.SetColors
+  fullName: Terminal.Gui.CursesDriver.SetColors
+- uid: System.ConsoleColor
+  commentId: T:System.ConsoleColor
+  parent: System
+  isExternal: true
+  name: ConsoleColor
+  nameWithType: ConsoleColor
+  fullName: System.ConsoleColor
+- uid: Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
+  commentId: M:Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  name: SetColors(Int16, Int16)
+  nameWithType: ConsoleDriver.SetColors(Int16, Int16)
+  fullName: Terminal.Gui.ConsoleDriver.SetColors(System.Int16, System.Int16)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
+    name: SetColors
+    nameWithType: ConsoleDriver.SetColors
+    fullName: Terminal.Gui.ConsoleDriver.SetColors
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Int16
+    name: Int16
+    nameWithType: Int16
+    fullName: System.Int16
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int16
+    name: Int16
+    nameWithType: Int16
+    fullName: System.Int16
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.SetColors(System.Int16,System.Int16)
+    name: SetColors
+    nameWithType: ConsoleDriver.SetColors
+    fullName: Terminal.Gui.ConsoleDriver.SetColors
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Int16
+    name: Int16
+    nameWithType: Int16
+    fullName: System.Int16
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int16
+    name: Int16
+    nameWithType: Int16
+    fullName: System.Int16
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  commentId: M:Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  name: PrepareToRun(MainLoop, Action<KeyEvent>, Action<KeyEvent>, Action<KeyEvent>, Action<MouseEvent>)
+  nameWithType: ConsoleDriver.PrepareToRun(MainLoop, Action<KeyEvent>, Action<KeyEvent>, Action<KeyEvent>, Action<MouseEvent>)
+  fullName: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.MouseEvent>)
+  nameWithType.vb: ConsoleDriver.PrepareToRun(MainLoop, Action(Of KeyEvent), Action(Of KeyEvent), Action(Of KeyEvent), Action(Of MouseEvent))
+  fullName.vb: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop, System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.MouseEvent))
+  name.vb: PrepareToRun(MainLoop, Action(Of KeyEvent), Action(Of KeyEvent), Action(Of KeyEvent), Action(Of MouseEvent))
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+    name: PrepareToRun
+    nameWithType: ConsoleDriver.PrepareToRun
+    fullName: Terminal.Gui.ConsoleDriver.PrepareToRun
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Mono.Terminal.MainLoop
+    name: MainLoop
+    nameWithType: MainLoop
+    fullName: Mono.Terminal.MainLoop
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: Terminal.Gui.MouseEvent
+    name: MouseEvent
+    nameWithType: MouseEvent
+    fullName: Terminal.Gui.MouseEvent
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+    name: PrepareToRun
+    nameWithType: ConsoleDriver.PrepareToRun
+    fullName: Terminal.Gui.ConsoleDriver.PrepareToRun
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Mono.Terminal.MainLoop
+    name: MainLoop
+    nameWithType: MainLoop
+    fullName: Mono.Terminal.MainLoop
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: '(Of '
+    nameWithType: '(Of '
+    fullName: '(Of '
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: '(Of '
+    nameWithType: '(Of '
+    fullName: '(Of '
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: '(Of '
+    nameWithType: '(Of '
+    fullName: '(Of '
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: '(Of '
+    nameWithType: '(Of '
+    fullName: '(Of '
+  - uid: Terminal.Gui.MouseEvent
+    name: MouseEvent
+    nameWithType: MouseEvent
+    fullName: Terminal.Gui.MouseEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.PrepareToRun*
+  commentId: Overload:Terminal.Gui.CursesDriver.PrepareToRun
+  name: PrepareToRun
+  nameWithType: CursesDriver.PrepareToRun
+  fullName: Terminal.Gui.CursesDriver.PrepareToRun
+- uid: Mono.Terminal.MainLoop
+  commentId: T:Mono.Terminal.MainLoop
+  parent: Mono.Terminal
+  name: MainLoop
+  nameWithType: MainLoop
+  fullName: Mono.Terminal.MainLoop
+- uid: System.Action{Terminal.Gui.KeyEvent}
+  commentId: T:System.Action{Terminal.Gui.KeyEvent}
+  parent: System
+  definition: System.Action`1
+  name: Action<KeyEvent>
+  nameWithType: Action<KeyEvent>
+  fullName: System.Action<Terminal.Gui.KeyEvent>
+  nameWithType.vb: Action(Of KeyEvent)
+  fullName.vb: System.Action(Of Terminal.Gui.KeyEvent)
+  name.vb: Action(Of KeyEvent)
+  spec.csharp:
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+  spec.vb:
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: '(Of '
+    nameWithType: '(Of '
+    fullName: '(Of '
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+    nameWithType: KeyEvent
+    fullName: Terminal.Gui.KeyEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Action{Terminal.Gui.MouseEvent}
+  commentId: T:System.Action{Terminal.Gui.MouseEvent}
+  parent: System
+  definition: System.Action`1
+  name: Action<MouseEvent>
+  nameWithType: Action<MouseEvent>
+  fullName: System.Action<Terminal.Gui.MouseEvent>
+  nameWithType.vb: Action(Of MouseEvent)
+  fullName.vb: System.Action(Of Terminal.Gui.MouseEvent)
+  name.vb: Action(Of MouseEvent)
+  spec.csharp:
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: Terminal.Gui.MouseEvent
+    name: MouseEvent
+    nameWithType: MouseEvent
+    fullName: Terminal.Gui.MouseEvent
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+  spec.vb:
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: '(Of '
+    nameWithType: '(Of '
+    fullName: '(Of '
+  - uid: Terminal.Gui.MouseEvent
+    name: MouseEvent
+    nameWithType: MouseEvent
+    fullName: Terminal.Gui.MouseEvent
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Mono.Terminal
+  commentId: N:Mono.Terminal
+  name: Mono.Terminal
+  nameWithType: Mono.Terminal
+  fullName: Mono.Terminal
+- uid: System.Action`1
+  commentId: T:System.Action`1
+  isExternal: true
+  name: Action<T>
+  nameWithType: Action<T>
+  fullName: System.Action<T>
+  nameWithType.vb: Action(Of T)
+  fullName.vb: System.Action(Of T)
+  name.vb: Action(Of T)
+  spec.csharp:
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: <
+    nameWithType: <
+    fullName: <
+  - name: T
+    nameWithType: T
+    fullName: T
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+  spec.vb:
+  - uid: System.Action`1
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: '(Of '
+    nameWithType: '(Of '
+    fullName: '(Of '
+  - name: T
+    nameWithType: T
+    fullName: T
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.ConsoleDriver.Init(System.Action)
+  commentId: M:Terminal.Gui.ConsoleDriver.Init(System.Action)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  name: Init(Action)
+  nameWithType: ConsoleDriver.Init(Action)
+  fullName: Terminal.Gui.ConsoleDriver.Init(System.Action)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.Init(System.Action)
+    name: Init
+    nameWithType: ConsoleDriver.Init
+    fullName: Terminal.Gui.ConsoleDriver.Init
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Action
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.Init(System.Action)
+    name: Init
+    nameWithType: ConsoleDriver.Init
+    fullName: Terminal.Gui.ConsoleDriver.Init
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Action
+    name: Action
+    nameWithType: Action
+    fullName: System.Action
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.Init*
+  commentId: Overload:Terminal.Gui.CursesDriver.Init
+  name: Init
+  nameWithType: CursesDriver.Init
+  fullName: Terminal.Gui.CursesDriver.Init
+- uid: System.Action
+  commentId: T:System.Action
+  parent: System
+  isExternal: true
+  name: Action
+  nameWithType: Action
+  fullName: System.Action
+- uid: Terminal.Gui.ConsoleDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
+  commentId: M:Terminal.Gui.ConsoleDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
+  parent: Terminal.Gui.ConsoleDriver
+  name: MakeAttribute(Color, Color)
+  nameWithType: ConsoleDriver.MakeAttribute(Color, Color)
+  fullName: Terminal.Gui.ConsoleDriver.MakeAttribute(Terminal.Gui.Color, Terminal.Gui.Color)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
+    name: MakeAttribute
+    nameWithType: ConsoleDriver.MakeAttribute
+    fullName: Terminal.Gui.ConsoleDriver.MakeAttribute
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Color
+    name: Color
+    nameWithType: Color
+    fullName: Terminal.Gui.Color
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: Terminal.Gui.Color
+    name: Color
+    nameWithType: Color
+    fullName: Terminal.Gui.Color
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
+    name: MakeAttribute
+    nameWithType: ConsoleDriver.MakeAttribute
+    fullName: Terminal.Gui.ConsoleDriver.MakeAttribute
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Color
+    name: Color
+    nameWithType: Color
+    fullName: Terminal.Gui.Color
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: Terminal.Gui.Color
+    name: Color
+    nameWithType: Color
+    fullName: Terminal.Gui.Color
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.MakeAttribute*
+  commentId: Overload:Terminal.Gui.CursesDriver.MakeAttribute
+  name: MakeAttribute
+  nameWithType: CursesDriver.MakeAttribute
+  fullName: Terminal.Gui.CursesDriver.MakeAttribute
+- uid: Terminal.Gui.Color
+  commentId: T:Terminal.Gui.Color
+  parent: Terminal.Gui
+  name: Color
+  nameWithType: Color
+  fullName: Terminal.Gui.Color
+- uid: Terminal.Gui.ConsoleDriver.Suspend
+  commentId: M:Terminal.Gui.ConsoleDriver.Suspend
+  parent: Terminal.Gui.ConsoleDriver
+  name: Suspend()
+  nameWithType: ConsoleDriver.Suspend()
+  fullName: Terminal.Gui.ConsoleDriver.Suspend()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.Suspend
+    name: Suspend
+    nameWithType: ConsoleDriver.Suspend
+    fullName: Terminal.Gui.ConsoleDriver.Suspend
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.Suspend
+    name: Suspend
+    nameWithType: ConsoleDriver.Suspend
+    fullName: Terminal.Gui.ConsoleDriver.Suspend
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.Suspend*
+  commentId: Overload:Terminal.Gui.CursesDriver.Suspend
+  name: Suspend
+  nameWithType: CursesDriver.Suspend
+  fullName: Terminal.Gui.CursesDriver.Suspend
+- uid: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
+  commentId: M:Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
+  parent: Terminal.Gui.ConsoleDriver
+  name: StartReportingMouseMoves()
+  nameWithType: ConsoleDriver.StartReportingMouseMoves()
+  fullName: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
+    name: StartReportingMouseMoves
+    nameWithType: ConsoleDriver.StartReportingMouseMoves
+    fullName: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
+    name: StartReportingMouseMoves
+    nameWithType: ConsoleDriver.StartReportingMouseMoves
+    fullName: Terminal.Gui.ConsoleDriver.StartReportingMouseMoves
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.StartReportingMouseMoves*
+  commentId: Overload:Terminal.Gui.CursesDriver.StartReportingMouseMoves
+  name: StartReportingMouseMoves
+  nameWithType: CursesDriver.StartReportingMouseMoves
+  fullName: Terminal.Gui.CursesDriver.StartReportingMouseMoves
+- uid: Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
+  commentId: M:Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
+  parent: Terminal.Gui.ConsoleDriver
+  name: StopReportingMouseMoves()
+  nameWithType: ConsoleDriver.StopReportingMouseMoves()
+  fullName: Terminal.Gui.ConsoleDriver.StopReportingMouseMoves()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
+    name: StopReportingMouseMoves
+    nameWithType: ConsoleDriver.StopReportingMouseMoves
+    fullName: Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
+    name: StopReportingMouseMoves
+    nameWithType: ConsoleDriver.StopReportingMouseMoves
+    fullName: Terminal.Gui.ConsoleDriver.StopReportingMouseMoves
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.StopReportingMouseMoves*
+  commentId: Overload:Terminal.Gui.CursesDriver.StopReportingMouseMoves
+  name: StopReportingMouseMoves
+  nameWithType: CursesDriver.StopReportingMouseMoves
+  fullName: Terminal.Gui.CursesDriver.StopReportingMouseMoves
+- uid: Terminal.Gui.ConsoleDriver.UncookMouse
+  commentId: M:Terminal.Gui.ConsoleDriver.UncookMouse
+  parent: Terminal.Gui.ConsoleDriver
+  name: UncookMouse()
+  nameWithType: ConsoleDriver.UncookMouse()
+  fullName: Terminal.Gui.ConsoleDriver.UncookMouse()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.UncookMouse
+    name: UncookMouse
+    nameWithType: ConsoleDriver.UncookMouse
+    fullName: Terminal.Gui.ConsoleDriver.UncookMouse
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.UncookMouse
+    name: UncookMouse
+    nameWithType: ConsoleDriver.UncookMouse
+    fullName: Terminal.Gui.ConsoleDriver.UncookMouse
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.UncookMouse*
+  commentId: Overload:Terminal.Gui.CursesDriver.UncookMouse
+  name: UncookMouse
+  nameWithType: CursesDriver.UncookMouse
+  fullName: Terminal.Gui.CursesDriver.UncookMouse
+- uid: Terminal.Gui.ConsoleDriver.CookMouse
+  commentId: M:Terminal.Gui.ConsoleDriver.CookMouse
+  parent: Terminal.Gui.ConsoleDriver
+  name: CookMouse()
+  nameWithType: ConsoleDriver.CookMouse()
+  fullName: Terminal.Gui.ConsoleDriver.CookMouse()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.CookMouse
+    name: CookMouse
+    nameWithType: ConsoleDriver.CookMouse
+    fullName: Terminal.Gui.ConsoleDriver.CookMouse
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.CookMouse
+    name: CookMouse
+    nameWithType: ConsoleDriver.CookMouse
+    fullName: Terminal.Gui.ConsoleDriver.CookMouse
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.CursesDriver.CookMouse*
+  commentId: Overload:Terminal.Gui.CursesDriver.CookMouse
+  name: CookMouse
+  nameWithType: CursesDriver.CookMouse
+  fullName: Terminal.Gui.CursesDriver.CookMouse
+shouldSkipMarkup: true

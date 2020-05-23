@@ -10,18 +10,19 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Struct MouseEvent
    ">
-    <meta name="generator" content="docfx 2.18.2.0">
+    <meta name="generator" content="docfx 2.53.1.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="">
-    <meta property="docfx:tocrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
     
+    <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -36,7 +37,7 @@
               </button>
               
               <a class="navbar-brand" href="../../index.html">
-                <img id="logo" class="svg" src="../../logo.svg" alt="">
+                <img id="logo" class="svg" src="../../images/logo48.png" alt="">
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
@@ -57,6 +58,16 @@
           </div>
         </div>
       </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -70,12 +81,31 @@
             <article class="content wrap" id="_content" data-uid="Terminal.Gui.MouseEvent">
   
   
-  <h1 id="Terminal_Gui_MouseEvent" data-uid="Terminal.Gui.MouseEvent">Struct MouseEvent
+  <h1 id="Terminal_Gui_MouseEvent" data-uid="Terminal.Gui.MouseEvent" class="text-break">Struct MouseEvent
   </h1>
-  <div class="markdown level0 summary"><p>Describes a mouse event</p>
+  <div class="markdown level0 summary">
+Describes a mouse event
 </div>
   <div class="markdown level0 conceptual"></div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="../Terminal.Gui.html">Terminal.Gui</a></h6>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.ValueType.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.ValueType.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_MouseEvent_syntax">Syntax</h5>
   <div class="codewrapper">
@@ -86,12 +116,13 @@
   
   
   <h4 id="Terminal_Gui_MouseEvent_Flags" data-uid="Terminal.Gui.MouseEvent.Flags">Flags</h4>
-  <div class="markdown level1 summary"><p>Flags indicating the kind of mouse event that is being posted.</p>
+  <div class="markdown level1 summary">
+Flags indicating the kind of mouse event that is being posted.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Terminal.Gui.MouseFlags Flags;</code></pre>
+    <pre><code class="lang-csharp hljs">public MouseFlags Flags</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -104,20 +135,98 @@
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.MouseFlags.html">MouseFlags</a></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_MouseEvent_OfX" data-uid="Terminal.Gui.MouseEvent.OfX">OfX</h4>
+  <div class="markdown level1 summary">
+The offset X (column) location for the mouse event.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int OfX</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_MouseEvent_OfY" data-uid="Terminal.Gui.MouseEvent.OfY">OfY</h4>
+  <div class="markdown level1 summary">
+The offset Y (column) location for the mouse event.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int OfY</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_MouseEvent_View" data-uid="Terminal.Gui.MouseEvent.View">View</h4>
+  <div class="markdown level1 summary">
+The current view at the location for the mouse event.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public View View</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   
   
   <h4 id="Terminal_Gui_MouseEvent_X" data-uid="Terminal.Gui.MouseEvent.X">X</h4>
-  <div class="markdown level1 summary"><p>The X (column) location for the mouse event.</p>
+  <div class="markdown level1 summary">
+The X (column) location for the mouse event.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int X;</code></pre>
+    <pre><code class="lang-csharp hljs">public int X</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -130,20 +239,20 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Int32</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   
   
   <h4 id="Terminal_Gui_MouseEvent_Y" data-uid="Terminal.Gui.MouseEvent.Y">Y</h4>
-  <div class="markdown level1 summary"><p>The Y (column) location for the mouse event.</p>
+  <div class="markdown level1 summary">
+The Y (column) location for the mouse event.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int Y;</code></pre>
+    <pre><code class="lang-csharp hljs">public int Y</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -156,8 +265,7 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Int32</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -167,12 +275,13 @@
   
   <a id="Terminal_Gui_MouseEvent_ToString_" data-uid="Terminal.Gui.MouseEvent.ToString*"></a>
   <h4 id="Terminal_Gui_MouseEvent_ToString" data-uid="Terminal.Gui.MouseEvent.ToString">ToString()</h4>
-  <div class="markdown level1 summary"><p>Returns a <span class="xref">System.String</span> that represents the current <a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a>.</p>
+  <div class="markdown level1 summary">
+Returns a <span class="xref">System.String</span> that represents the current <a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override string ToString ();</code></pre>
+    <pre><code class="lang-csharp hljs">public override string ToString()</code></pre>
   </div>
   <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -185,11 +294,12 @@
     <tbody>
       <tr>
         <td><span class="xref">System.String</span></td>
-        <td><p>A <span class="xref">System.String</span> that represents the current <a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a>.</p>
-</td>
+        <td>A <span class="xref">System.String</span> that represents the current <a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a>.</td>
       </tr>
     </tbody>
   </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.ValueType.ToString()</span></div>
 </article>
           </div>
           
@@ -215,7 +325,7 @@
               <a href="#top">Back to top</a>
             </span>
             
-            <span>Copyright © 2015-2017 Microsoft<br>Generated by <strong>DocFX</strong></span>
+            <span>Generated by <strong>DocFX</strong></span>
           </div>
         </div>
       </footer>
