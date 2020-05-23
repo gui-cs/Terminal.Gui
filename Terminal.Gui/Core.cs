@@ -2404,6 +2404,7 @@ namespace Terminal.Gui {
 				throw new ArgumentNullException (nameof (runState));
 
 			runState.Dispose ();
+			runState = null;
 		}
 
 		/// <summary>
@@ -2411,6 +2412,15 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void Shutdown ()
 		{
+			foreach (var t in toplevels) {
+				t.Running = false;
+			}
+			toplevels.Clear ();
+			Current = null;
+			CurrentView = null;
+			Top = null;
+			MainLoop = null;
+
 			Driver.End ();
 			_initialized = false;
 		}
