@@ -169,11 +169,11 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	///   Multi-line text editing view
+	///   Multi-line text editing <see cref="View"/>
 	/// </summary>
 	/// <remarks>
 	///   <para>
-	///     The text view provides a multi-line text view.   Users interact
+	///     <see cref="TextView"/> provides a multi-line text editor. Users interact
 	///     with it with the standard Emacs commands for movement or the arrow
 	///     keys. 
 	///   </para> 
@@ -283,7 +283,7 @@ namespace Terminal.Gui {
 		//bool used;
 
 		/// <summary>
-		/// Raised when the Text of the TextView changes.
+		/// Raised when the <see cref="Text"/> of the <see cref="TextView"/> changes.
 		/// </summary>
 		public event EventHandler TextChanged;
 
@@ -298,7 +298,7 @@ namespace Terminal.Gui {
 		public event EventHandler Changed;
 #endif
 		/// <summary>
-		///   Public constructor, creates a view on the specified area, with absolute position and size.
+		///   Initalizes a <see cref="TextView"/> on the specified area, with absolute position and size.
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
@@ -308,7 +308,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Public constructor, creates a view on the specified area, with dimensions controlled with the X, Y, Width and Height properties.
+		///   Initalizes a <see cref="TextView"/> on the specified area, 
+		///   with dimensions controlled with the X, Y, Width and Height properties.
 		/// </summary>
 		public TextView () : base ()
 		{
@@ -321,7 +322,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Sets or gets the text in the entry.
+		///   Sets or gets the text in the <see cref="TextView"/>.
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
@@ -339,7 +340,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Loads the contents of the file into the TextView.
+		/// Loads the contents of the file into the  <see cref="TextView"/>.
 		/// </summary>
 		/// <returns><c>true</c>, if file was loaded, <c>false</c> otherwise.</returns>
 		/// <param name="path">Path to the file to load.</param>
@@ -354,7 +355,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Loads the contents of the stream into the TextView.
+		/// Loads the contents of the stream into the  <see cref="TextView"/>.
 		/// </summary>
 		/// <returns><c>true</c>, if stream was loaded, <c>false</c> otherwise.</returns>
 		/// <param name="stream">Stream to load the contents from.</param>
@@ -368,7 +369,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Closes the contents of the stream into the TextView.
+		/// Closes the contents of the stream into the  <see cref="TextView"/>.
 		/// </summary>
 		/// <returns><c>true</c>, if stream was closed, <c>false</c> otherwise.</returns>
 		public bool CloseFile()
@@ -380,7 +381,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///    The current cursor row.
+		///    Gets the current cursor row.
 		/// </summary>
 		public int CurrentRow => currentRow;
 
@@ -429,7 +430,7 @@ namespace Terminal.Gui {
 		bool isReadOnly = false;
 
 		/// <summary>
-		/// Indicates readonly attribute of TextView
+		/// Gets or sets whether the  <see cref="TextView"/> is in read-only mode or not
 		/// </summary>
 		/// <value>Boolean value(Default false)</value>
 		public bool ReadOnly {
@@ -523,10 +524,7 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
-		/// <summary>
-		/// Redraw the text editor region 
-		/// </summary>
-		/// <param name="region">The region to redraw.</param>
+		///<inheritdoc cref="Redraw(Rect)"/>
 		public override void Redraw (Rect region)
 		{
 			ColorNormal ();
@@ -701,7 +699,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Will scroll the view to display the specified row at the top
+		/// Will scroll the <see cref="TextView"/> to display the specified row at the top
 		/// </summary>
 		/// <param name="row">Row that should be displayed at the top, if the value is negative it will be reset to zero</param>
 		public void ScrollTo (int row)

@@ -11,18 +11,21 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// A statusbar item has a title, a shortcut aka hotkey, and an action to execute on activation.
-	/// Such an item is ment to be as part of the global hotkeys of the application, which are available in the current context of the screen.
-	/// The colour of the text will be changed after each ~. Having an statusbar item with a text of `~F1~ Help` will draw *F1* as shortcut and
-	/// *Help* as standard text.
+	/// <see cref="StatusItem"/> objects are contained by <see cref="StatusBar"/> <see cref="View"/>s. 
+	/// Each <see cref="StatusItem"/> has a title, a shortcut (hotkey), and an <see cref="Action"/> that will be invoked when the 
+	/// <see cref="StatusItem.Shortcut"/> is pressed.
+	/// The <see cref="StatusItem.Shortcut"/> will be a global hotkey for the application in the current context of the screen.
+	/// The colour of the <see cref="StatusItem.Title"/> will be changed after each ~. 
+	/// A <see cref="StatusItem.Title"/> set to `~F1~ Help` will render as *F1* using <see cref="ColorScheme.HotNormal"/> and
+	/// *Help* as <see cref="ColorScheme.HotNormal"/>.
 	/// </summary>
 	public class StatusItem {
 		/// <summary>
-		/// Initializes a new <see cref="T:Terminal.Gui.StatusItem"/>.
+		/// Initializes a new <see cref="StatusItem"/>.
 		/// </summary>
-		/// <param name="shortcut">Shortcut to activate the item.</param>
-		/// <param name="title">Title for the statusbar item.</param>
-		/// <param name="action">Action to invoke when the staturbar item is activated.</param>
+		/// <param name="shortcut">Shortcut to activate the <see cref="StatusItem"/>.</param>
+		/// <param name="title">Title for the <see cref="StatusItem"/>.</param>
+		/// <param name="action">Action to invoke when the <see cref="StatusItem"/> is activated.</param>
 		public StatusItem (Key shortcut, ustring title, Action action)
 		{
 			Title = title ?? "";
@@ -31,7 +34,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// This is the global setting that can be used as a global shortcut to invoke the action on the menu.
+		/// Gets the global shortcut to invoke the action on the menu.
 		/// </summary>
 		public Key Shortcut { get; }
 
@@ -39,25 +42,30 @@ namespace Terminal.Gui {
 		/// Gets or sets the title.
 		/// </summary>
 		/// <value>The title.</value>
+		/// <remarks>
+		/// The colour of the <see cref="StatusItem.Title"/> will be changed after each ~. 
+		/// A <see cref="StatusItem.Title"/> set to `~F1~ Help` will render as *F1* using <see cref="ColorScheme.HotNormal"/> and
+		/// *Help* as <see cref="ColorScheme.HotNormal"/>.
+		/// </remarks>
 		public ustring Title { get; }
 
 		/// <summary>
 		/// Gets or sets the action to be invoked when the statusbar item is triggered
 		/// </summary>
-		/// <value>Method to invoke.</value>
+		/// <value>Action to invoke.</value>
 		public Action Action { get; }
 	};
 
 	/// <summary>
-	/// A statusbar for your application.
-	/// The statusbar should be context sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will
+	/// A status bar is a <see cref="View"/> that snaps to the bottom of a <see cref="Toplevel"/> displaying set of <see cref="StatusItem"/>s.
+	/// The <see cref="StatusBar"/> should be context sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will
 	/// be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help.
 	/// So for each context must be a new instance of a statusbar.
 	/// </summary>
 	public class StatusBar : View {
-// After attempting to implement this, I noticed that there are hard dependencies
-// on StatusBar and MenuBars within core. They will need to be refactored for having the
-// StatusBar work at the top
+		// After attempting to implement this, I noticed that there are hard dependencies
+		// on StatusBar and MenuBars within core. They will need to be refactored for having the
+		// StatusBar work at the top
 #if SNAP_TO_TOP
 		/// <summary>
 		/// The style supported by StatusBar
@@ -86,18 +94,18 @@ namespace Terminal.Gui {
 		public StatusBarStyle Style { get; set; } = StatusBarStyle.Default;
 #endif
 		/// <summary>
-		/// The parent view of the StatusBar.
+		/// The parent view of the <see cref="StatusBar"/>.
 		/// </summary>
 		public View Parent { get; set; }
 
 		/// <summary>
-		/// The items that compose the StatusBar
+		/// The items that compose the <see cref="StatusBar"/>
 		/// </summary>
 		public StatusItem [] Items { get; set; }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.StatusBar"/> class with the specified set of statusbar items.
-		/// It will be drawn in the lowest line of the terminal.
+		/// Initializes a new instance of the <see cref="StatusBar"/> class with the specified set of <see cref="StatusItem"/>s.
+		/// The <see cref="StatusBar"/> will be drawn on the lowest line of the terminal or <see cref="StatusBar.Parent"/> (if not null).
 		/// </summary>
 		/// <param name="items">A list of statusbar items.</param>
 		public StatusBar (StatusItem [] items) : base ()

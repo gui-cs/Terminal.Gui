@@ -17,12 +17,12 @@ using System.Reflection;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// A menu item has a title, an associated help text, and an action to execute on activation.
+	/// A <see cref="MenuItem"/> has a title, an associated help text, and an action to execute on activation.
 	/// </summary>
 	public class MenuItem {
 
 		/// <summary>
-		/// constructor
+		/// Initializes a new instance of <see cref="MenuItem"/>
 		/// </summary>
 		public MenuItem ()
 		{
@@ -31,7 +31,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new <see cref="T:Terminal.Gui.MenuItem"/>.
+		/// Initializes a new instance of <see cref="MenuItem"/>.
 		/// </summary>
 		/// <param name="title">Title for the menu item.</param>
 		/// <param name="help">Help text to display.</param>
@@ -58,7 +58,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new <see cref="T:Terminal.Gui.MenuItem"/>.
+		/// Initializes a new instance of <see cref="MenuItem"/>
 		/// </summary>
 		/// <param name="title">Title for the menu item.</param>
 		/// <param name="subMenu">The menu sub-menu.</param>
@@ -68,11 +68,8 @@ namespace Terminal.Gui {
 			IsFromSubMenu = true;
 		}
 
-		//
-		//
-
 		/// <summary>
-		/// The hotkey is used when the menu is active, the shortcut can be triggered when the menu is not active.
+		/// The HotKey is used when the menu is active, the shortcut can be triggered when the menu is not active.
 		/// For example HotKey would be "N" when the File Menu is open (assuming there is a "_New" entry
 		/// if the ShortCut is set to "Control-N", this would be a global hotkey that would trigger as well
 		/// </summary>
@@ -84,7 +81,7 @@ namespace Terminal.Gui {
 		public Key ShortCut;
 
 		/// <summary>
-		/// Gets or sets the title.
+		/// Gets or sets the title. 
 		/// </summary>
 		/// <value>The title.</value>
 		public ustring Title { get; set; }
@@ -118,7 +115,7 @@ namespace Terminal.Gui {
 		internal int Width => Title.Length + Help.Length + 1 + 2;
 
 		/// <summary>
-		/// Gets or sets the parent for this MenuBarItem
+		/// Gets or sets the parent for this <see cref="MenuItem"/>
 		/// </summary>
 		/// <value>The parent.</value>
 		internal MenuBarItem SubMenu { get; set; }
@@ -142,11 +139,11 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// A menu bar item contains other menu items.
+	/// A <see cref="MenuBarItem"/> contains <see cref="MenuBarItem"/>s or <see cref="MenuItem"/>s.
 	/// </summary>
 	public class MenuBarItem : MenuItem {
 		/// <summary>
-		/// Initializes a new <see cref="T:Terminal.Gui.MenuBarItem"/> as a <see cref="T:Terminal.Gui.MenuItem"/>.
+		/// Initializes a new <see cref="MenuBarItem"/> as a <see cref="MenuItem"/>.
 		/// </summary>
 		/// <param name="title">Title for the menu item.</param>
 		/// <param name="help">Help text to display.</param>
@@ -159,7 +156,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new <see cref="T:Terminal.Gui.MenuBarItem"/>.
+		/// Initializes a new <see cref="MenuBarItem"/>.
 		/// </summary>
 		/// <param name="title">Title for the menu item.</param>
 		/// <param name="children">The items in the current menu.</param>
@@ -170,7 +167,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new <see cref="T:Terminal.Gui.MenuBarItem"/>.
+		/// Initializes a new <see cref="MenuBarItem"/>.
 		/// </summary>
 		/// <param name="children">The items in the current menu.</param>
 		public MenuBarItem (MenuItem [] children) : this (new string (' ', GetMaxTitleLength (children)), children)
@@ -217,7 +214,7 @@ namespace Terminal.Gui {
 		//public ustring Title { get; set; }
 
 		/// <summary>
-		/// Gets or sets the children for this MenuBarItem
+		/// Gets or sets an array of <see cref="MenuItem"/> objects that are the children of this <see cref="MenuBarItem"/>
 		/// </summary>
 		/// <value>The children.</value>
 		public MenuItem [] Children { get; set; }
@@ -524,11 +521,19 @@ namespace Terminal.Gui {
 
 
 	/// <summary>
-	/// A menu bar for your application.
+	/// The MenuBar provides a menu for Terminal.Gui applications. 
 	/// </summary>
+	/// <remarks>
+	///	<para>
+	///	The <see cref="MenuBar"/> appears on the first row of the terminal.
+	///	</para>
+	///	<para>
+	///	The <see cref="MenuBar"/> provides global hotkeys for the application.
+	///	</para>
+	/// </remarks>
 	public class MenuBar : View {
 		/// <summary>
-		/// The menus that were defined when the menubar was created.   This can be updated if the menu is not currently visible.
+		/// Gets or sets the array of <see cref="MenuBarItem"/>s for the menu. Only set this when the <see cref="MenuBar"/> is vislble.
 		/// </summary>
 		/// <value>The menu array.</value>
 		public MenuBarItem [] Menus { get; set; }
@@ -543,9 +548,9 @@ namespace Terminal.Gui {
 		public bool UseKeysUpDownAsKeysLeftRight { get; set; } = true;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.MenuBar"/> class with the specified set of toplevel menu items.
+		/// Initializes a new instance of the <see cref="MenuBar"/> class with the specified set of toplevel menu items.
 		/// </summary>
-		/// <param name="menus">Individual menu items, if one of those contains a null, then a separator is drawn.</param>
+		/// <param name="menus">Individual menu items; a null item will result in a separator being drawn.</param>
 		public MenuBar (MenuBarItem [] menus) : base ()
 		{
 			X = 0;

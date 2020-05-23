@@ -1,15 +1,14 @@
 ﻿using System;
 namespace Terminal.Gui {
-
 	/// <summary>
-	/// Message box displays a modal message to the user, with a title, a message and a series of options that the user can choose from.
+	/// MessageBox displays a modal message to the user, with a title, a message and a series of options that the user can choose from.
 	/// </summary>
 	/// <para>
-	///   The difference between the Query and ErrorQuery method is the default set of colors used for the message box.
+	///   The difference between the <see cref="Query"/> and <see cref="ErrorQuery"/> method is the default set of colors used for the message box.
 	/// </para>
 	/// <para>
-	/// The following example pops up a Message Box with 50 columns, and 7 lines, with the specified title and text, plus two buttons.
-	/// The value -1 is returned when the user cancels the dialog by pressing the ESC key.
+	/// The following example pops up a <see cref="MessageBox"/> with 50 columns, and 7 lines, with the specified title and text, plus two <see cref="Button"/>s.
+	/// The value -1 is returned when the user cancels the <see cref="MessageBox"/> by pressing the ESC key.
 	/// </para>
 	/// <example>
 	/// <code lang="c#">
@@ -18,12 +17,11 @@ namespace Terminal.Gui {
 	///    quit = true;
 	/// else
 	///    quit = false;
-	/// 
 	/// </code>
 	/// </example>
 	public static class MessageBox {
 		/// <summary>
-		/// Presents a message with the specified title and message and a list of buttons to show to the user.
+		/// Presents a normal <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to the user.
 		/// </summary>
 		/// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
 		/// <param name="width">Width for the window.</param>
@@ -37,7 +35,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Presents an error message box with the specified title and message and a list of buttons to show to the user.
+		/// Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to the user.
 		/// </summary>
 		/// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
 		/// <param name="width">Width for the window.</param>

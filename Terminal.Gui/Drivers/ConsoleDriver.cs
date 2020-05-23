@@ -98,7 +98,7 @@ namespace Terminal.Gui {
 		internal Color background;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Attribute"/> struct.
+		/// Initializes a new instance of the <see cref="Attribute"/> struct.
 		/// </summary>
 		/// <param name="value">Value.</param>
 		/// <param name="foreground">Foreground</param>
@@ -111,7 +111,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Attribute"/> struct.
+		/// Initializes a new instance of the <see cref="Attribute"/> struct.
 		/// </summary>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
