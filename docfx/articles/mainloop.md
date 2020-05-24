@@ -7,12 +7,12 @@ proper view.
 
 The job of waiting for events and dispatching them in the
 `Application` is implemented by an instance of the
-[`MainLoop`](docs/api/Mono.Terminal/Mono.Terminal.MainLoop.html)
+[`MainLoop`]()
 class.
 
 Mainloops are a common idiom in many user interface toolkits so many
 of the concepts will be familiar to you if you have used other
-toolkits before.   
+toolkits before.
 
 This class provides the following capabilities:
 
@@ -59,7 +59,7 @@ Timers Processing
 -----------------
 
 You can register timers to be executed at specified intervals by
-calling the [`AddTimeout`](https://migueldeicaza.github.io/gui.cs/api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_AddTimeout_System_TimeSpan_System_Func_Mono_Terminal_MainLoop_System_Boolean__) method, like this:
+calling the [`AddTimeout`]() method, like this:
 
 ```csharp
 void UpdateTimer ()
@@ -82,7 +82,7 @@ Idle Handlers
 
 You can register code to be executed when the application is idling
 and there are no events to process by calling the
-[`AddIdle`](https://migueldeicaza.github.io/gui.cs/api/Mono.Terminal/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_AddIdle_System_Func_System_Boolean__)
+[`AddIdle`]()
 method.  This method takes as a parameter a function that will be
 invoked when the application is idling.  
 
@@ -156,6 +156,6 @@ available, or for the file descriptor being available for data to be
 written without blocking the application.
 
 To do this, you on Unix, you can cast the `MainLoop` instance to a
-[`UnixMainLoop`](docs/api/Mono.Terminal/Mono.Terminal.UnixMainLoop.html)
+[`UnixMainLoop`]()
 and use the `AddWatch` method to register an interest on a particular
 condition.

@@ -1,0 +1,946 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ListWrapper
+  commentId: T:Terminal.Gui.ListWrapper
+  id: ListWrapper
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.ListWrapper.#ctor(System.Collections.IList)
+  - Terminal.Gui.ListWrapper.Count
+  - Terminal.Gui.ListWrapper.IsMarked(System.Int32)
+  - Terminal.Gui.ListWrapper.Render(Terminal.Gui.ListView,Terminal.Gui.ConsoleDriver,System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  - Terminal.Gui.ListWrapper.SetMark(System.Int32,System.Boolean)
+  - Terminal.Gui.ListWrapper.ToList
+  langs:
+  - csharp
+  - vb
+  name: ListWrapper
+  nameWithType: ListWrapper
+  fullName: Terminal.Gui.ListWrapper
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/ListView.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: ListWrapper
+    path: ../Terminal.Gui/Views/ListView.cs
+    startLine: 542
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nImplements an <xref href=\"Terminal.Gui.IListDataSource\" data-throw-if-not-resolved=\"false\"></xref> that renders arbitrary <xref href=\"System.Collections.IList\" data-throw-if-not-resolved=\"false\"></xref> instances for <xref href=\"Terminal.Gui.ListView\" data-throw-if-not-resolved=\"false\"></xref>.\n"
+  remarks: Implements support for rendering marked items.
+  example: []
+  syntax:
+    content: 'public class ListWrapper : IListDataSource'
+    content.vb: >-
+      Public Class ListWrapper
+
+          Implements IListDataSource
+  inheritance:
+  - System.Object
+  implements:
+  - Terminal.Gui.IListDataSource
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  modifiers.csharp:
+  - public
+  - class
+  modifiers.vb:
+  - Public
+  - Class
+- uid: Terminal.Gui.ListWrapper.#ctor(System.Collections.IList)
+  commentId: M:Terminal.Gui.ListWrapper.#ctor(System.Collections.IList)
+  id: '#ctor(System.Collections.IList)'
+  parent: Terminal.Gui.ListWrapper
+  langs:
+  - csharp
+  - vb
+  name: ListWrapper(IList)
+  nameWithType: ListWrapper.ListWrapper(IList)
+  fullName: Terminal.Gui.ListWrapper.ListWrapper(System.Collections.IList)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/ListView.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/ListView.cs
+    startLine: 551
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nInitializes a new instance of <xref href=\"Terminal.Gui.ListWrapper\" data-throw-if-not-resolved=\"false\"></xref> given an <xref href=\"System.Collections.IList\" data-throw-if-not-resolved=\"false\"></xref>\n"
+  example: []
+  syntax:
+    content: public ListWrapper(IList source)
+    parameters:
+    - id: source
+      type: System.Collections.IList
+      description: ''
+    content.vb: Public Sub New(source As IList)
+  overload: Terminal.Gui.ListWrapper.#ctor*
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.ListWrapper.Count
+  commentId: P:Terminal.Gui.ListWrapper.Count
+  id: Count
+  parent: Terminal.Gui.ListWrapper
+  langs:
+  - csharp
+  - vb
+  name: Count
+  nameWithType: ListWrapper.Count
+  fullName: Terminal.Gui.ListWrapper.Count
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/ListView.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Count
+    path: ../Terminal.Gui/Views/ListView.cs
+    startLine: 561
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nGets the number of items in the <xref href=\"System.Collections.IList\" data-throw-if-not-resolved=\"false\"></xref>.\n"
+  example: []
+  syntax:
+    content: public int Count { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public ReadOnly Property Count As Integer
+  overload: Terminal.Gui.ListWrapper.Count*
+  implements:
+  - Terminal.Gui.IListDataSource.Count
+  modifiers.csharp:
+  - public
+  - get
+  modifiers.vb:
+  - Public
+  - ReadOnly
+- uid: Terminal.Gui.ListWrapper.Render(Terminal.Gui.ListView,Terminal.Gui.ConsoleDriver,System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.ListWrapper.Render(Terminal.Gui.ListView,Terminal.Gui.ConsoleDriver,System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  id: Render(Terminal.Gui.ListView,Terminal.Gui.ConsoleDriver,System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  parent: Terminal.Gui.ListWrapper
+  langs:
+  - csharp
+  - vb
+  name: Render(ListView, ConsoleDriver, Boolean, Int32, Int32, Int32, Int32)
+  nameWithType: ListWrapper.Render(ListView, ConsoleDriver, Boolean, Int32, Int32, Int32, Int32)
+  fullName: Terminal.Gui.ListWrapper.Render(Terminal.Gui.ListView, Terminal.Gui.ConsoleDriver, System.Boolean, System.Int32, System.Int32, System.Int32, System.Int32)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/ListView.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Render
+    path: ../Terminal.Gui/Views/ListView.cs
+    startLine: 591
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nRenders a <xref href=\"Terminal.Gui.ListView\" data-throw-if-not-resolved=\"false\"></xref> item to the appropriate type.\n"
+  example: []
+  syntax:
+    content: public void Render(ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width)
+    parameters:
+    - id: container
+      type: Terminal.Gui.ListView
+      description: The ListView.
+    - id: driver
+      type: Terminal.Gui.ConsoleDriver
+      description: The driver used by the caller.
+    - id: marked
+      type: System.Boolean
+      description: Informs if it&apos;s marked or not.
+    - id: item
+      type: System.Int32
+      description: The item.
+    - id: col
+      type: System.Int32
+      description: The col where to move.
+    - id: line
+      type: System.Int32
+      description: The line where to move.
+    - id: width
+      type: System.Int32
+      description: The item width.
+    content.vb: Public Sub Render(container As ListView, driver As ConsoleDriver, marked As Boolean, item As Integer, col As Integer, line As Integer, width As Integer)
+  overload: Terminal.Gui.ListWrapper.Render*
+  implements:
+  - Terminal.Gui.IListDataSource.Render(Terminal.Gui.ListView,Terminal.Gui.ConsoleDriver,System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.ListWrapper.IsMarked(System.Int32)
+  commentId: M:Terminal.Gui.ListWrapper.IsMarked(System.Int32)
+  id: IsMarked(System.Int32)
+  parent: Terminal.Gui.ListWrapper
+  langs:
+  - csharp
+  - vb
+  name: IsMarked(Int32)
+  nameWithType: ListWrapper.IsMarked(Int32)
+  fullName: Terminal.Gui.ListWrapper.IsMarked(System.Int32)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/ListView.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: IsMarked
+    path: ../Terminal.Gui/Views/ListView.cs
+    startLine: 612
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nReturns true if the item is marked, false otherwise.\n"
+  example: []
+  syntax:
+    content: public bool IsMarked(int item)
+    parameters:
+    - id: item
+      type: System.Int32
+      description: The item.
+    return:
+      type: System.Boolean
+      description: <code>true</code>If is marked.<code>false</code>otherwise.
+    content.vb: Public Function IsMarked(item As Integer) As Boolean
+  overload: Terminal.Gui.ListWrapper.IsMarked*
+  implements:
+  - Terminal.Gui.IListDataSource.IsMarked(System.Int32)
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.ListWrapper.SetMark(System.Int32,System.Boolean)
+  commentId: M:Terminal.Gui.ListWrapper.SetMark(System.Int32,System.Boolean)
+  id: SetMark(System.Int32,System.Boolean)
+  parent: Terminal.Gui.ListWrapper
+  langs:
+  - csharp
+  - vb
+  name: SetMark(Int32, Boolean)
+  nameWithType: ListWrapper.SetMark(Int32, Boolean)
+  fullName: Terminal.Gui.ListWrapper.SetMark(System.Int32, System.Boolean)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/ListView.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: SetMark
+    path: ../Terminal.Gui/Views/ListView.cs
+    startLine: 624
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nSets the item as marked or unmarked based on the value is true or false, respectively.\n"
+  example: []
+  syntax:
+    content: public void SetMark(int item, bool value)
+    parameters:
+    - id: item
+      type: System.Int32
+      description: The item
+    - id: value
+      type: System.Boolean
+      description: <true>Marks the item.</true><false>Unmarked the item.</false>The value.
+    content.vb: Public Sub SetMark(item As Integer, value As Boolean)
+  overload: Terminal.Gui.ListWrapper.SetMark*
+  implements:
+  - Terminal.Gui.IListDataSource.SetMark(System.Int32,System.Boolean)
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.ListWrapper.ToList
+  commentId: M:Terminal.Gui.ListWrapper.ToList
+  id: ToList
+  parent: Terminal.Gui.ListWrapper
+  langs:
+  - csharp
+  - vb
+  name: ToList()
+  nameWithType: ListWrapper.ToList()
+  fullName: Terminal.Gui.ListWrapper.ToList()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/ListView.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: ToList
+    path: ../Terminal.Gui/Views/ListView.cs
+    startLine: 634
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nReturns the source as IList.\n"
+  example: []
+  syntax:
+    content: public IList ToList()
+    return:
+      type: System.Collections.IList
+      description: ''
+    content.vb: Public Function ToList As IList
+  overload: Terminal.Gui.ListWrapper.ToList*
+  implements:
+  - Terminal.Gui.IListDataSource.ToList
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+references:
+- uid: Terminal.Gui.IListDataSource
+  commentId: T:Terminal.Gui.IListDataSource
+  parent: Terminal.Gui
+  name: IListDataSource
+  nameWithType: IListDataSource
+  fullName: Terminal.Gui.IListDataSource
+- uid: System.Collections.IList
+  commentId: T:System.Collections.IList
+  parent: System.Collections
+  isExternal: true
+  name: IList
+  nameWithType: IList
+  fullName: System.Collections.IList
+- uid: Terminal.Gui.ListView
+  commentId: T:Terminal.Gui.ListView
+  parent: Terminal.Gui
+  name: ListView
+  nameWithType: ListView
+  fullName: Terminal.Gui.ListView
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: Object.Equals(Object)
+  fullName: System.Object.Equals(System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: Object.GetHashCode()
+  fullName: System.Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  name: MemberwiseClone()
+  nameWithType: Object.MemberwiseClone()
+  fullName: System.Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  name: ToString()
+  nameWithType: Object.ToString()
+  fullName: System.Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Collections
+  commentId: N:System.Collections
+  isExternal: true
+  name: System.Collections
+  nameWithType: System.Collections
+  fullName: System.Collections
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.ListWrapper
+  commentId: T:Terminal.Gui.ListWrapper
+  name: ListWrapper
+  nameWithType: ListWrapper
+  fullName: Terminal.Gui.ListWrapper
+- uid: Terminal.Gui.ListWrapper.#ctor*
+  commentId: Overload:Terminal.Gui.ListWrapper.#ctor
+  name: ListWrapper
+  nameWithType: ListWrapper.ListWrapper
+  fullName: Terminal.Gui.ListWrapper.ListWrapper
+- uid: Terminal.Gui.ListWrapper.Count*
+  commentId: Overload:Terminal.Gui.ListWrapper.Count
+  name: Count
+  nameWithType: ListWrapper.Count
+  fullName: Terminal.Gui.ListWrapper.Count
+- uid: Terminal.Gui.IListDataSource.Count
+  commentId: P:Terminal.Gui.IListDataSource.Count
+  parent: Terminal.Gui.IListDataSource
+  name: Count
+  nameWithType: IListDataSource.Count
+  fullName: Terminal.Gui.IListDataSource.Count
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: Terminal.Gui.ListWrapper.Render*
+  commentId: Overload:Terminal.Gui.ListWrapper.Render
+  name: Render
+  nameWithType: ListWrapper.Render
+  fullName: Terminal.Gui.ListWrapper.Render
+- uid: Terminal.Gui.IListDataSource.Render(Terminal.Gui.ListView,Terminal.Gui.ConsoleDriver,System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.IListDataSource.Render(Terminal.Gui.ListView,Terminal.Gui.ConsoleDriver,System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+  parent: Terminal.Gui.IListDataSource
+  isExternal: true
+  name: Render(ListView, ConsoleDriver, Boolean, Int32, Int32, Int32, Int32)
+  nameWithType: IListDataSource.Render(ListView, ConsoleDriver, Boolean, Int32, Int32, Int32, Int32)
+  fullName: Terminal.Gui.IListDataSource.Render(Terminal.Gui.ListView, Terminal.Gui.ConsoleDriver, System.Boolean, System.Int32, System.Int32, System.Int32, System.Int32)
+  spec.csharp:
+  - uid: Terminal.Gui.IListDataSource.Render(Terminal.Gui.ListView,Terminal.Gui.ConsoleDriver,System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+    name: Render
+    nameWithType: IListDataSource.Render
+    fullName: Terminal.Gui.IListDataSource.Render
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.ListView
+    name: ListView
+    nameWithType: ListView
+    fullName: Terminal.Gui.ListView
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: Terminal.Gui.ConsoleDriver
+    name: ConsoleDriver
+    nameWithType: ConsoleDriver
+    fullName: Terminal.Gui.ConsoleDriver
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.IListDataSource.Render(Terminal.Gui.ListView,Terminal.Gui.ConsoleDriver,System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32)
+    name: Render
+    nameWithType: IListDataSource.Render
+    fullName: Terminal.Gui.IListDataSource.Render
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.ListView
+    name: ListView
+    nameWithType: ListView
+    fullName: Terminal.Gui.ListView
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: Terminal.Gui.ConsoleDriver
+    name: ConsoleDriver
+    nameWithType: ConsoleDriver
+    fullName: Terminal.Gui.ConsoleDriver
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.ConsoleDriver
+  commentId: T:Terminal.Gui.ConsoleDriver
+  parent: Terminal.Gui
+  name: ConsoleDriver
+  nameWithType: ConsoleDriver
+  fullName: Terminal.Gui.ConsoleDriver
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Terminal.Gui.ListWrapper.IsMarked*
+  commentId: Overload:Terminal.Gui.ListWrapper.IsMarked
+  name: IsMarked
+  nameWithType: ListWrapper.IsMarked
+  fullName: Terminal.Gui.ListWrapper.IsMarked
+- uid: Terminal.Gui.IListDataSource.IsMarked(System.Int32)
+  commentId: M:Terminal.Gui.IListDataSource.IsMarked(System.Int32)
+  parent: Terminal.Gui.IListDataSource
+  isExternal: true
+  name: IsMarked(Int32)
+  nameWithType: IListDataSource.IsMarked(Int32)
+  fullName: Terminal.Gui.IListDataSource.IsMarked(System.Int32)
+  spec.csharp:
+  - uid: Terminal.Gui.IListDataSource.IsMarked(System.Int32)
+    name: IsMarked
+    nameWithType: IListDataSource.IsMarked
+    fullName: Terminal.Gui.IListDataSource.IsMarked
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.IListDataSource.IsMarked(System.Int32)
+    name: IsMarked
+    nameWithType: IListDataSource.IsMarked
+    fullName: Terminal.Gui.IListDataSource.IsMarked
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.ListWrapper.SetMark*
+  commentId: Overload:Terminal.Gui.ListWrapper.SetMark
+  name: SetMark
+  nameWithType: ListWrapper.SetMark
+  fullName: Terminal.Gui.ListWrapper.SetMark
+- uid: Terminal.Gui.IListDataSource.SetMark(System.Int32,System.Boolean)
+  commentId: M:Terminal.Gui.IListDataSource.SetMark(System.Int32,System.Boolean)
+  parent: Terminal.Gui.IListDataSource
+  isExternal: true
+  name: SetMark(Int32, Boolean)
+  nameWithType: IListDataSource.SetMark(Int32, Boolean)
+  fullName: Terminal.Gui.IListDataSource.SetMark(System.Int32, System.Boolean)
+  spec.csharp:
+  - uid: Terminal.Gui.IListDataSource.SetMark(System.Int32,System.Boolean)
+    name: SetMark
+    nameWithType: IListDataSource.SetMark
+    fullName: Terminal.Gui.IListDataSource.SetMark
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.IListDataSource.SetMark(System.Int32,System.Boolean)
+    name: SetMark
+    nameWithType: IListDataSource.SetMark
+    fullName: Terminal.Gui.IListDataSource.SetMark
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.ListWrapper.ToList*
+  commentId: Overload:Terminal.Gui.ListWrapper.ToList
+  name: ToList
+  nameWithType: ListWrapper.ToList
+  fullName: Terminal.Gui.ListWrapper.ToList
+- uid: Terminal.Gui.IListDataSource.ToList
+  commentId: M:Terminal.Gui.IListDataSource.ToList
+  parent: Terminal.Gui.IListDataSource
+  name: ToList()
+  nameWithType: IListDataSource.ToList()
+  fullName: Terminal.Gui.IListDataSource.ToList()
+  spec.csharp:
+  - uid: Terminal.Gui.IListDataSource.ToList
+    name: ToList
+    nameWithType: IListDataSource.ToList
+    fullName: Terminal.Gui.IListDataSource.ToList
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.IListDataSource.ToList
+    name: ToList
+    nameWithType: IListDataSource.ToList
+    fullName: Terminal.Gui.IListDataSource.ToList
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+shouldSkipMarkup: true

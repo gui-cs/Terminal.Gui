@@ -1,7 +1,9 @@
 ### YamlMime:ManagedReference
 items:
 - uid: Terminal.Gui.TextAlignment
+  commentId: T:Terminal.Gui.TextAlignment
   id: TextAlignment
+  parent: Terminal.Gui
   children:
   - Terminal.Gui.TextAlignment.Centered
   - Terminal.Gui.TextAlignment.Justified
@@ -9,128 +11,179 @@ items:
   - Terminal.Gui.TextAlignment.Right
   langs:
   - csharp
+  - vb
   name: TextAlignment
   nameWithType: TextAlignment
   fullName: Terminal.Gui.TextAlignment
   type: Enum
+  source:
+    remote:
+      path: Terminal.Gui/Views/Label.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: TextAlignment
+    path: ../Terminal.Gui/Views/Label.cs
+    startLine: 16
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Text alignment enumeration, controls how text is displayed.
+  summary: "\nText alignment enumeration, controls how text is displayed.\n"
+  example: []
   syntax:
     content: public enum TextAlignment
-  inheritance:
-  - System.Enum
-- uid: Terminal.Gui.TextAlignment.Centered
-  id: Centered
-  parent: Terminal.Gui.TextAlignment
-  langs:
-  - csharp
-  name: Centered
-  nameWithType: TextAlignment.Centered
-  fullName: TextAlignment.Centered
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Centers the text in the frame.
-  syntax:
-    content: Centered
-    return:
-      type: Terminal.Gui.TextAlignment
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.TextAlignment.Justified
-  id: Justified
-  parent: Terminal.Gui.TextAlignment
-  langs:
-  - csharp
-  name: Justified
-  nameWithType: TextAlignment.Justified
-  fullName: TextAlignment.Justified
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Shows the line as justified text in the line.
-  syntax:
-    content: Justified
-    return:
-      type: Terminal.Gui.TextAlignment
-      description: To be added.
-  exceptions: []
+    content.vb: Public Enum TextAlignment
+  modifiers.csharp:
+  - public
+  - enum
+  modifiers.vb:
+  - Public
+  - Enum
 - uid: Terminal.Gui.TextAlignment.Left
+  commentId: F:Terminal.Gui.TextAlignment.Left
   id: Left
   parent: Terminal.Gui.TextAlignment
   langs:
   - csharp
+  - vb
   name: Left
   nameWithType: TextAlignment.Left
-  fullName: TextAlignment.Left
+  fullName: Terminal.Gui.TextAlignment.Left
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Views/Label.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Left
+    path: ../Terminal.Gui/Views/Label.cs
+    startLine: 20
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Aligns the text to the left of the frame.
+  summary: "\nAligns the text to the left of the frame.\n"
+  example: []
   syntax:
-    content: Left
+    content: Left = 0
     return:
       type: Terminal.Gui.TextAlignment
-      description: To be added.
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
 - uid: Terminal.Gui.TextAlignment.Right
+  commentId: F:Terminal.Gui.TextAlignment.Right
   id: Right
   parent: Terminal.Gui.TextAlignment
   langs:
   - csharp
+  - vb
   name: Right
   nameWithType: TextAlignment.Right
-  fullName: TextAlignment.Right
+  fullName: Terminal.Gui.TextAlignment.Right
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Views/Label.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Right
+    path: ../Terminal.Gui/Views/Label.cs
+    startLine: 24
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Aligns the text to the right side of the frame.
+  summary: "\nAligns the text to the right side of the frame.\n"
+  example: []
   syntax:
-    content: Right
+    content: Right = 1
     return:
       type: Terminal.Gui.TextAlignment
-      description: To be added.
-  exceptions: []
-references:
-- uid: System.Enum
-  parent: System
-  isExternal: true
-  name: Enum
-  nameWithType: Enum
-  fullName: System.Enum
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
 - uid: Terminal.Gui.TextAlignment.Centered
+  commentId: F:Terminal.Gui.TextAlignment.Centered
+  id: Centered
   parent: Terminal.Gui.TextAlignment
-  isExternal: false
+  langs:
+  - csharp
+  - vb
   name: Centered
   nameWithType: TextAlignment.Centered
-  fullName: TextAlignment.Centered
+  fullName: Terminal.Gui.TextAlignment.Centered
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Views/Label.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Centered
+    path: ../Terminal.Gui/Views/Label.cs
+    startLine: 28
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nCenters the text in the frame.\n"
+  example: []
+  syntax:
+    content: Centered = 2
+    return:
+      type: Terminal.Gui.TextAlignment
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.TextAlignment.Justified
+  commentId: F:Terminal.Gui.TextAlignment.Justified
+  id: Justified
+  parent: Terminal.Gui.TextAlignment
+  langs:
+  - csharp
+  - vb
+  name: Justified
+  nameWithType: TextAlignment.Justified
+  fullName: Terminal.Gui.TextAlignment.Justified
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Views/Label.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Justified
+    path: ../Terminal.Gui/Views/Label.cs
+    startLine: 32
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nShows the text as justified text in the frame.\n"
+  example: []
+  syntax:
+    content: Justified = 3
+    return:
+      type: Terminal.Gui.TextAlignment
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
 - uid: Terminal.Gui.TextAlignment
+  commentId: T:Terminal.Gui.TextAlignment
   parent: Terminal.Gui
-  isExternal: false
   name: TextAlignment
   nameWithType: TextAlignment
   fullName: Terminal.Gui.TextAlignment
-- uid: Terminal.Gui.TextAlignment.Justified
-  parent: Terminal.Gui.TextAlignment
-  isExternal: false
-  name: Justified
-  nameWithType: TextAlignment.Justified
-  fullName: TextAlignment.Justified
-- uid: Terminal.Gui.TextAlignment.Left
-  parent: Terminal.Gui.TextAlignment
-  isExternal: false
-  name: Left
-  nameWithType: TextAlignment.Left
-  fullName: TextAlignment.Left
-- uid: Terminal.Gui.TextAlignment.Right
-  parent: Terminal.Gui.TextAlignment
-  isExternal: false
-  name: Right
-  nameWithType: TextAlignment.Right
-  fullName: TextAlignment.Right
+shouldSkipMarkup: true

@@ -1,138 +1,577 @@
 ### YamlMime:ManagedReference
 items:
 - uid: Terminal.Gui.Colors
+  commentId: T:Terminal.Gui.Colors
   id: Colors
+  parent: Terminal.Gui
   children:
   - Terminal.Gui.Colors.Base
   - Terminal.Gui.Colors.Dialog
   - Terminal.Gui.Colors.Error
   - Terminal.Gui.Colors.Menu
+  - Terminal.Gui.Colors.TopLevel
   langs:
   - csharp
+  - vb
   name: Colors
   nameWithType: Colors
   fullName: Terminal.Gui.Colors
   type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Colors
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 322
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The default ColorSchemes for the application.
+  summary: "\nThe default ColorSchemes for the application.\n"
+  example: []
   syntax:
     content: public static class Colors
+    content.vb: Public Module Colors
   inheritance:
   - System.Object
-  implements: []
-  inheritedMembers: []
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  modifiers.csharp:
+  - public
+  - static
+  - class
+  modifiers.vb:
+  - Public
+  - Module
+- uid: Terminal.Gui.Colors.TopLevel
+  commentId: P:Terminal.Gui.Colors.TopLevel
+  id: TopLevel
+  parent: Terminal.Gui.Colors
+  langs:
+  - csharp
+  - vb
+  name: TopLevel
+  nameWithType: Colors.TopLevel
+  fullName: Terminal.Gui.Colors.TopLevel
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: TopLevel
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 332
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe application toplevel color scheme, for the default toplevel views.\n"
+  example: []
+  syntax:
+    content: public static ColorScheme TopLevel { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.ColorScheme
+    content.vb: Public Shared Property TopLevel As ColorScheme
+  overload: Terminal.Gui.Colors.TopLevel*
+  modifiers.csharp:
+  - public
+  - static
+  - get
+  - set
+  modifiers.vb:
+  - Public
+  - Shared
 - uid: Terminal.Gui.Colors.Base
+  commentId: P:Terminal.Gui.Colors.Base
   id: Base
   parent: Terminal.Gui.Colors
   langs:
   - csharp
+  - vb
   name: Base
   nameWithType: Colors.Base
-  fullName: Colors.Base
-  type: Field
+  fullName: Terminal.Gui.Colors.Base
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Base
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 337
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The base color scheme, for the default toplevel views.
+  summary: "\nThe base color scheme, for the default toplevel views.\n"
+  example: []
   syntax:
-    content: public static Terminal.Gui.ColorScheme Base;
+    content: public static ColorScheme Base { get; set; }
+    parameters: []
     return:
       type: Terminal.Gui.ColorScheme
-      description: To be added.
-  exceptions: []
+    content.vb: Public Shared Property Base As ColorScheme
+  overload: Terminal.Gui.Colors.Base*
+  modifiers.csharp:
+  - public
+  - static
+  - get
+  - set
+  modifiers.vb:
+  - Public
+  - Shared
 - uid: Terminal.Gui.Colors.Dialog
+  commentId: P:Terminal.Gui.Colors.Dialog
   id: Dialog
   parent: Terminal.Gui.Colors
   langs:
   - csharp
+  - vb
   name: Dialog
   nameWithType: Colors.Dialog
-  fullName: Colors.Dialog
-  type: Field
+  fullName: Terminal.Gui.Colors.Dialog
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Dialog
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 342
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The dialog color scheme, for standard popup dialog boxes
+  summary: "\nThe dialog color scheme, for standard popup dialog boxes\n"
+  example: []
   syntax:
-    content: public static Terminal.Gui.ColorScheme Dialog;
+    content: public static ColorScheme Dialog { get; set; }
+    parameters: []
     return:
       type: Terminal.Gui.ColorScheme
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.Colors.Error
-  id: Error
-  parent: Terminal.Gui.Colors
-  langs:
-  - csharp
-  name: Error
-  nameWithType: Colors.Error
-  fullName: Colors.Error
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The color scheme for showing errors.
-  syntax:
-    content: public static Terminal.Gui.ColorScheme Error;
-    return:
-      type: Terminal.Gui.ColorScheme
-      description: To be added.
-  exceptions: []
+    content.vb: Public Shared Property Dialog As ColorScheme
+  overload: Terminal.Gui.Colors.Dialog*
+  modifiers.csharp:
+  - public
+  - static
+  - get
+  - set
+  modifiers.vb:
+  - Public
+  - Shared
 - uid: Terminal.Gui.Colors.Menu
+  commentId: P:Terminal.Gui.Colors.Menu
   id: Menu
   parent: Terminal.Gui.Colors
   langs:
   - csharp
+  - vb
   name: Menu
   nameWithType: Colors.Menu
-  fullName: Colors.Menu
-  type: Field
+  fullName: Terminal.Gui.Colors.Menu
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Menu
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 347
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The menu bar color
+  summary: "\nThe menu bar color\n"
+  example: []
   syntax:
-    content: public static Terminal.Gui.ColorScheme Menu;
+    content: public static ColorScheme Menu { get; set; }
+    parameters: []
     return:
       type: Terminal.Gui.ColorScheme
-      description: To be added.
-  exceptions: []
+    content.vb: Public Shared Property Menu As ColorScheme
+  overload: Terminal.Gui.Colors.Menu*
+  modifiers.csharp:
+  - public
+  - static
+  - get
+  - set
+  modifiers.vb:
+  - Public
+  - Shared
+- uid: Terminal.Gui.Colors.Error
+  commentId: P:Terminal.Gui.Colors.Error
+  id: Error
+  parent: Terminal.Gui.Colors
+  langs:
+  - csharp
+  - vb
+  name: Error
+  nameWithType: Colors.Error
+  fullName: Terminal.Gui.Colors.Error
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Error
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 352
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe color scheme for showing errors.\n"
+  example: []
+  syntax:
+    content: public static ColorScheme Error { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.ColorScheme
+    content.vb: Public Shared Property Error As ColorScheme
+  overload: Terminal.Gui.Colors.Error*
+  modifiers.csharp:
+  - public
+  - static
+  - get
+  - set
+  modifiers.vb:
+  - Public
+  - Shared
 references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
 - uid: System.Object
+  commentId: T:System.Object
   parent: System
   isExternal: true
   name: Object
   nameWithType: Object
   fullName: System.Object
-- uid: Terminal.Gui.Colors.Base
-  parent: Terminal.Gui.Colors
-  isExternal: false
-  name: Base
-  nameWithType: Colors.Base
-  fullName: Colors.Base
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: Object.Equals(Object)
+  fullName: System.Object.Equals(System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: Object.GetHashCode()
+  fullName: System.Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  name: MemberwiseClone()
+  nameWithType: Object.MemberwiseClone()
+  fullName: System.Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  name: ToString()
+  nameWithType: Object.ToString()
+  fullName: System.Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.Colors.TopLevel*
+  commentId: Overload:Terminal.Gui.Colors.TopLevel
+  name: TopLevel
+  nameWithType: Colors.TopLevel
+  fullName: Terminal.Gui.Colors.TopLevel
 - uid: Terminal.Gui.ColorScheme
+  commentId: T:Terminal.Gui.ColorScheme
   parent: Terminal.Gui
-  isExternal: false
   name: ColorScheme
   nameWithType: ColorScheme
   fullName: Terminal.Gui.ColorScheme
-- uid: Terminal.Gui.Colors.Dialog
-  parent: Terminal.Gui.Colors
-  isExternal: false
+- uid: Terminal.Gui.Colors.Base*
+  commentId: Overload:Terminal.Gui.Colors.Base
+  name: Base
+  nameWithType: Colors.Base
+  fullName: Terminal.Gui.Colors.Base
+- uid: Terminal.Gui.Colors.Dialog*
+  commentId: Overload:Terminal.Gui.Colors.Dialog
   name: Dialog
   nameWithType: Colors.Dialog
-  fullName: Colors.Dialog
-- uid: Terminal.Gui.Colors.Error
-  parent: Terminal.Gui.Colors
-  isExternal: false
-  name: Error
-  nameWithType: Colors.Error
-  fullName: Colors.Error
-- uid: Terminal.Gui.Colors.Menu
-  parent: Terminal.Gui.Colors
-  isExternal: false
+  fullName: Terminal.Gui.Colors.Dialog
+- uid: Terminal.Gui.Colors.Menu*
+  commentId: Overload:Terminal.Gui.Colors.Menu
   name: Menu
   nameWithType: Colors.Menu
-  fullName: Colors.Menu
+  fullName: Terminal.Gui.Colors.Menu
+- uid: Terminal.Gui.Colors.Error*
+  commentId: Overload:Terminal.Gui.Colors.Error
+  name: Error
+  nameWithType: Colors.Error
+  fullName: Terminal.Gui.Colors.Error
+shouldSkipMarkup: true

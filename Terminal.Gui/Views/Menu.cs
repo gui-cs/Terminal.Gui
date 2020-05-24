@@ -17,10 +17,13 @@ using System.Reflection;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// A menu item has a title, an associated help text, and an action to execute on activation.
+	/// A <see cref="MenuItem"/> has a title, an associated help text, and an action to execute on activation.
 	/// </summary>
 	public class MenuItem {
 
+		/// <summary>
+		/// Initializes a new instance of <see cref="MenuItem"/>
+		/// </summary>
 		public MenuItem ()
 		{
 			Title = "";
@@ -28,7 +31,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new <see cref="T:Terminal.Gui.MenuItem"/>.
+		/// Initializes a new instance of <see cref="MenuItem"/>.
 		/// </summary>
 		/// <param name="title">Title for the menu item.</param>
 		/// <param name="help">Help text to display.</param>
@@ -55,7 +58,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new <see cref="T:Terminal.Gui.MenuItem"/>.
+		/// Initializes a new instance of <see cref="MenuItem"/>
 		/// </summary>
 		/// <param name="title">Title for the menu item.</param>
 		/// <param name="subMenu">The menu sub-menu.</param>
@@ -65,11 +68,8 @@ namespace Terminal.Gui {
 			IsFromSubMenu = true;
 		}
 
-		//
-		//
-
 		/// <summary>
-		/// The hotkey is used when the menu is active, the shortcut can be triggered when the menu is not active.
+		/// The HotKey is used when the menu is active, the shortcut can be triggered when the menu is not active.
 		/// For example HotKey would be "N" when the File Menu is open (assuming there is a "_New" entry
 		/// if the ShortCut is set to "Control-N", this would be a global hotkey that would trigger as well
 		/// </summary>
@@ -81,7 +81,7 @@ namespace Terminal.Gui {
 		public Key ShortCut;
 
 		/// <summary>
-		/// Gets or sets the title.
+		/// Gets or sets the title. 
 		/// </summary>
 		/// <value>The title.</value>
 		public ustring Title { get; set; }
@@ -115,7 +115,7 @@ namespace Terminal.Gui {
 		internal int Width => Title.Length + Help.Length + 1 + 2;
 
 		/// <summary>
-		/// Gets or sets the parent for this MenuBarItem
+		/// Gets or sets the parent for this <see cref="MenuItem"/>
 		/// </summary>
 		/// <value>The parent.</value>
 		internal MenuBarItem SubMenu { get; set; }
@@ -139,11 +139,11 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// A menu bar item contains other menu items.
+	/// A <see cref="MenuBarItem"/> contains <see cref="MenuBarItem"/>s or <see cref="MenuItem"/>s.
 	/// </summary>
 	public class MenuBarItem : MenuItem {
 		/// <summary>
-		/// Initializes a new <see cref="T:Terminal.Gui.MenuBarItem"/> as a <see cref="T:Terminal.Gui.MenuItem"/>.
+		/// Initializes a new <see cref="MenuBarItem"/> as a <see cref="MenuItem"/>.
 		/// </summary>
 		/// <param name="title">Title for the menu item.</param>
 		/// <param name="help">Help text to display.</param>
@@ -156,18 +156,21 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new <see cref="T:Terminal.Gui.MenuBarItem"/>.
+		/// Initializes a new <see cref="MenuBarItem"/>.
 		/// </summary>
 		/// <param name="title">Title for the menu item.</param>
 		/// <param name="children">The items in the current menu.</param>
 		public MenuBarItem (ustring title, MenuItem [] children)
 		{
+			if (children == null)
+				throw new ArgumentNullException (nameof (children), "The parameter cannot be null. Use an empty array instead.");
+
 			SetTitle (title ?? "");
 			Children = children;
 		}
 
 		/// <summary>
-		/// Initializes a new <see cref="T:Terminal.Gui.MenuBarItem"/>.
+		/// Initializes a new <see cref="MenuBarItem"/>.
 		/// </summary>
 		/// <param name="children">The items in the current menu.</param>
 		public MenuBarItem (MenuItem [] children) : this (new string (' ', GetMaxTitleLength (children)), children)
@@ -207,14 +210,14 @@ namespace Terminal.Gui {
 			return len;
 		}
 
-		/// <summary>
-		/// Gets or sets the title to display.
-		/// </summary>
-		/// <value>The title.</value>
+		///// <summary>
+		///// Gets or sets the title to display.
+		///// </summary>
+		///// <value>The title.</value>
 		//public ustring Title { get; set; }
 
 		/// <summary>
-		/// Gets or sets the children for this MenuBarItem
+		/// Gets or sets an array of <see cref="MenuItem"/> objects that are the children of this <see cref="MenuBarItem"/>
 		/// </summary>
 		/// <value>The children.</value>
 		public MenuItem [] Children { get; set; }
@@ -320,7 +323,7 @@ namespace Terminal.Gui {
 
 		public override void PositionCursor ()
 		{
-			if (host == null || !host.isMenuClosed)
+			if (host == null || host.IsMenuOpen)
 				if (barItems.IsTopLevel) {
 					host.PositionCursor ();
 				} else
@@ -344,7 +347,7 @@ namespace Terminal.Gui {
 			});
 		}
 
-		public override bool KeyDown (KeyEvent keyEvent)
+		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
 				host.CloseAllMenus ();
@@ -357,9 +360,9 @@ namespace Terminal.Gui {
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
 			// To ncurses simulate a AltMask key pressing Alt+Space because
-			// it can´t detect an alone special key down was pressed.
+			// it canï¿½t detect an alone special key down was pressed.
 			if (keyEvent.IsAlt && keyEvent.Key == Key.AltMask) {
-				KeyDown (keyEvent);
+				OnKeyDown (keyEvent);
 				return true;
 			}
 
@@ -403,11 +406,11 @@ namespace Terminal.Gui {
 					var item = barItems.Children [current];
 					if (item == null || !item.IsEnabled ()) disabled = true;
 					if (host.UseKeysUpDownAsKeysLeftRight && barItems.Children [current]?.SubMenu != null &&
-						!disabled && !host.isMenuClosed) {
+						!disabled && host.IsMenuOpen) {
 						CheckSubMenu ();
 						break;
 					}
-					if (host.isMenuClosed)
+					if (!host.IsMenuOpen)
 						host.OpenMenu (host.selected);
 				} while (barItems.Children [current] == null || disabled);
 				SetNeedsDisplay ();
@@ -455,7 +458,7 @@ namespace Terminal.Gui {
 			}
 			host.handled = false;
 			bool disabled;
-			if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) {
+			if (me.Flags == MouseFlags.Button1Clicked) {
 				disabled = false;
 				if (me.Y < 1)
 					return true;
@@ -521,11 +524,19 @@ namespace Terminal.Gui {
 
 
 	/// <summary>
-	/// A menu bar for your application.
+	/// The MenuBar provides a menu for Terminal.Gui applications. 
 	/// </summary>
+	/// <remarks>
+	///	<para>
+	///	The <see cref="MenuBar"/> appears on the first row of the terminal.
+	///	</para>
+	///	<para>
+	///	The <see cref="MenuBar"/> provides global hotkeys for the application.
+	///	</para>
+	/// </remarks>
 	public class MenuBar : View {
 		/// <summary>
-		/// The menus that were defined when the menubar was created.   This can be updated if the menu is not currently visible.
+		/// Gets or sets the array of <see cref="MenuBarItem"/>s for the menu. Only set this when the <see cref="MenuBar"/> is vislble.
 		/// </summary>
 		/// <value>The menu array.</value>
 		public MenuBarItem [] Menus { get; set; }
@@ -540,9 +551,9 @@ namespace Terminal.Gui {
 		public bool UseKeysUpDownAsKeysLeftRight { get; set; } = true;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.MenuBar"/> class with the specified set of toplevel menu items.
+		/// Initializes a new instance of the <see cref="MenuBar"/> class with the specified set of toplevel menu items.
 		/// </summary>
-		/// <param name="menus">Individual menu items, if one of those contains a null, then a separator is drawn.</param>
+		/// <param name="menus">Individual menu items; a null item will result in a separator being drawn.</param>
 		public MenuBar (MenuBarItem [] menus) : base ()
 		{
 			X = 0;
@@ -555,11 +566,13 @@ namespace Terminal.Gui {
 			selectedSub = -1;
 			ColorScheme = Colors.Menu;
 			WantMousePositionReports = true;
-			isMenuClosed = true;
+			IsMenuOpen = false;
 		}
 
 		bool openedByAltKey;
-		public override bool KeyDown (KeyEvent keyEvent)
+
+		///<inheritdoc cref="OnKeyDown"/>
+		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
 				openedByAltKey = true;
@@ -569,24 +582,19 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <summary>
-		/// Track Alt key-up events. On Windows, when a user releases Alt (without another key), the menu gets focus but doesn't open.
-		/// We mimic that behavior here.
-		/// </summary>
-		/// <param name="keyEvent"></param>
-		/// <returns></returns>
-		public override bool KeyUp (KeyEvent keyEvent)
+		///<inheritdoc cref="OnKeyUp"/>
+		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
 				// User pressed Alt - this may be a precursor to a menu accelerator (e.g. Alt-F)
-				if (!keyEvent.IsCtrl && openedByAltKey && isMenuClosed && openMenu == null && ((uint)keyEvent.Key & (uint)Key.CharMask) == 0) {
+				if (!keyEvent.IsCtrl && openedByAltKey && !IsMenuOpen && openMenu == null && ((uint)keyEvent.Key & (uint)Key.CharMask) == 0) {
 					// There's no open menu, the first menu item should be highlight.
 					// The right way to do this is to SetFocus(MenuBar), but for some reason
 					// that faults.
 
 					//Activate (0);
 					//StartMenu ();
-					isMenuClosed = false;
+					IsMenuOpen = true;
 					selected = 0;
 					CanFocus = true;
 					lastFocused = SuperView.MostFocused;
@@ -601,7 +609,7 @@ namespace Terminal.Gui {
 					if (openMenu != null)
 						CloseAllMenus ();
 					openedByAltKey = false;
-					isMenuClosed = true;
+					IsMenuOpen = false;
 					selected = -1;
 					CanFocus = false;
 					if (lastFocused != null)
@@ -615,6 +623,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		///<inheritdoc cref="Redraw"/>
 		public override void Redraw (Rect region)
 		{
 			Move (0, 0);
@@ -645,19 +654,20 @@ namespace Terminal.Gui {
 			PositionCursor ();
 		}
 
+		///<inheritdoc cref="PositionCursor"/>
 		public override void PositionCursor ()
 		{
 			int pos = 0;
 			for (int i = 0; i < Menus.Length; i++) {
 				if (i == selected) {
 					pos++;
-					if (!isMenuClosed)
+					if (IsMenuOpen)
 						Move (pos + 1, 0);
 					else
 						Move (pos + 1, 0);
 					return;
 				} else {
-					if (!isMenuClosed)
+					if (IsMenuOpen)
 						pos += 1 + Menus [i].TitleLength + 2;
 					else
 						pos += 2 + Menus [i].TitleLength + 1;
@@ -672,16 +682,28 @@ namespace Terminal.Gui {
 			action = item.Action;
 		}
 
+		/// <summary>
+		/// Raised as a menu is opened.
+		/// </summary>
 		public event EventHandler OnOpenMenu;
+
+		/// <summary>
+		/// Raised when a menu is closing.
+		/// </summary>
 		public event EventHandler OnCloseMenu;
+
 		internal Menu openMenu;
 		Menu openCurrentMenu;
 		internal List<Menu> openSubMenu;
 		View previousFocused;
 		internal bool isMenuOpening;
 		internal bool isMenuClosing;
-		internal bool isMenuClosed;
-		public bool MenuOpen;
+
+		/// <summary>
+		/// True if the menu is open; otherwise false.
+		/// </summary>
+		public bool IsMenuOpen { get; protected set; }
+
 		View lastFocused;
 
 		/// <summary>
@@ -728,12 +750,13 @@ namespace Terminal.Gui {
 				break;
 			}
 			isMenuOpening = false;
-			isMenuClosed = false;
-			MenuOpen = true;
+			IsMenuOpen = true;
 		}
 
-		// Starts the menu from a hotkey
-		void StartMenu ()
+		/// <summary>
+		/// Opens the current Menu programatically.
+		/// </summary>
+		public void OpenMenu ()
 		{
 			if (openMenu != null)
 				return;
@@ -758,6 +781,13 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
+		/// <summary>
+		/// Closes the current Menu programatically, if open.
+		/// </summary>
+		public void CloseMenu()
+		{
+			CloseMenu (false, false);
+		}
 		internal void CloseMenu (bool reopen = false, bool isSubMenu = false)
 		{
 			isMenuClosing = true;
@@ -779,12 +809,12 @@ namespace Terminal.Gui {
 					if (!reopen)
 						selected = -1;
 					LastFocused.SuperView?.SetFocus (LastFocused);
+					IsMenuOpen = false;
 				} else {
 					SuperView.SetFocus (this);
-					isMenuClosed = true;
+					IsMenuOpen = false;
 					PositionCursor ();
 				}
-				isMenuClosed = true;
 				break;
 
 			case true:
@@ -796,7 +826,7 @@ namespace Terminal.Gui {
 				break;
 			}
 			isMenuClosing = false;
-			MenuOpen = false;
+			IsMenuOpen = false;
 		}
 
 		void RemoveSubMenu (int index)
@@ -859,7 +889,7 @@ namespace Terminal.Gui {
 				if (LastFocused != null && LastFocused != this)
 					selected = -1;
 			}
-			isMenuClosed = true;
+			IsMenuOpen = false;
 			openedByHotKey = false;
 			openedByAltKey = false;
 		}
@@ -940,7 +970,7 @@ namespace Terminal.Gui {
 		bool openedByHotKey;
 		internal bool FindAndOpenMenuByHotkey (KeyEvent kb)
 		{
-			int pos = 0;
+			//int pos = 0;
 			var c = ((uint)kb.Key & (uint)Key.CharMask);
 			for (int i = 0; i < Menus.Length; i++) {
 				// TODO: this code is duplicated, hotkey should be part of the MenuBarItem
@@ -969,21 +999,22 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc cref="ProcessHotKey"/>
 		public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == Key.F9) {
-				if (isMenuClosed)
-					StartMenu ();
+				if (!IsMenuOpen)
+					OpenMenu ();
 				else
 					CloseAllMenus ();
 				return true;
 			}
 
 			// To ncurses simulate a AltMask key pressing Alt+Space because
-			// it can´t detect an alone special key down was pressed.
+			// it canï¿½t detect an alone special key down was pressed.
 			if (kb.IsAlt && kb.Key == Key.AltMask && openMenu == null) {
-				KeyDown (kb);
-				KeyUp (kb);
+				OnKeyDown (kb);
+				OnKeyUp (kb);
 				return true;
 			} else if (kb.IsAlt) {
 				if (FindAndOpenMenuByHotkey (kb)) return true;
@@ -993,6 +1024,7 @@ namespace Terminal.Gui {
 			return base.ProcessHotKey (kb);
 		}
 
+		///<inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			switch (kb.Key) {
@@ -1047,6 +1079,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		///<inheritdoc cref="MouseEvent"/>
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!handled && !HandleGrabView (me, this)) {
@@ -1062,7 +1095,7 @@ namespace Terminal.Gui {
 				for (int i = 0; i < Menus.Length; i++) {
 					if (cx > pos && me.X < pos + 1 + Menus [i].TitleLength) {
 						if (selected == i && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) &&
-											!isMenuClosed) {
+											IsMenuOpen) {
 							Application.UngrabMouse ();
 							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
@@ -1071,7 +1104,7 @@ namespace Terminal.Gui {
 								CloseMenu ();
 							}
 						} else if ((me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) &&
-							isMenuClosed) {
+							!IsMenuOpen) {
 							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
 								menu.Run (Menus [i].Action);
@@ -1079,12 +1112,12 @@ namespace Terminal.Gui {
 								Activate (i);
 							}
 						} else if (selected != i && selected > -1 && me.Flags == MouseFlags.ReportMousePosition) {
-							if (!isMenuClosed) {
+							if (IsMenuOpen) {
 								CloseMenu ();
 								Activate (i);
 							}
 						} else {
-							if (!isMenuClosed)
+							if (IsMenuOpen)
 								Activate (i);
 						}
 						return true;
@@ -1116,7 +1149,7 @@ namespace Terminal.Gui {
 					handled = false;
 					return false;
 				}
-			} else if (isMenuClosed && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked ||
+			} else if (!IsMenuOpen && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked ||
 				me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
 				Application.GrabMouse (current);
 			} else {

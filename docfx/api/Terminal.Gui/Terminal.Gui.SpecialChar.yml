@@ -1,7 +1,9 @@
 ### YamlMime:ManagedReference
 items:
 - uid: Terminal.Gui.SpecialChar
+  commentId: T:Terminal.Gui.SpecialChar
   id: SpecialChar
+  parent: Terminal.Gui
   children:
   - Terminal.Gui.SpecialChar.BottomTee
   - Terminal.Gui.SpecialChar.Diamond
@@ -17,328 +19,451 @@ items:
   - Terminal.Gui.SpecialChar.VLine
   langs:
   - csharp
+  - vb
   name: SpecialChar
   nameWithType: SpecialChar
   fullName: Terminal.Gui.SpecialChar
   type: Enum
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: SpecialChar
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 364
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Special characters that can be drawn with Driver.AddSpecial.
+  summary: "\nSpecial characters that can be drawn with Driver.AddSpecial.\n"
+  example: []
   syntax:
     content: public enum SpecialChar
-  inheritance:
-  - System.Enum
-- uid: Terminal.Gui.SpecialChar.BottomTee
-  id: BottomTee
-  parent: Terminal.Gui.SpecialChar
-  langs:
-  - csharp
-  name: BottomTee
-  nameWithType: SpecialChar.BottomTee
-  fullName: SpecialChar.BottomTee
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The bottom tee.
-  syntax:
-    content: BottomTee
-    return:
-      type: Terminal.Gui.SpecialChar
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.SpecialChar.Diamond
-  id: Diamond
-  parent: Terminal.Gui.SpecialChar
-  langs:
-  - csharp
-  name: Diamond
-  nameWithType: SpecialChar.Diamond
-  fullName: SpecialChar.Diamond
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Diamond character
-  syntax:
-    content: Diamond
-    return:
-      type: Terminal.Gui.SpecialChar
-      description: To be added.
-  exceptions: []
+    content.vb: Public Enum SpecialChar
+  modifiers.csharp:
+  - public
+  - enum
+  modifiers.vb:
+  - Public
+  - Enum
 - uid: Terminal.Gui.SpecialChar.HLine
+  commentId: F:Terminal.Gui.SpecialChar.HLine
   id: HLine
   parent: Terminal.Gui.SpecialChar
   langs:
   - csharp
+  - vb
   name: HLine
   nameWithType: SpecialChar.HLine
-  fullName: SpecialChar.HLine
+  fullName: Terminal.Gui.SpecialChar.HLine
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: HLine
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 368
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Horizontal line character.
+  summary: "\nHorizontal line character.\n"
+  example: []
   syntax:
-    content: HLine
+    content: HLine = 0
     return:
       type: Terminal.Gui.SpecialChar
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.SpecialChar.LeftTee
-  id: LeftTee
-  parent: Terminal.Gui.SpecialChar
-  langs:
-  - csharp
-  name: LeftTee
-  nameWithType: SpecialChar.LeftTee
-  fullName: SpecialChar.LeftTee
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Left tee
-  syntax:
-    content: LeftTee
-    return:
-      type: Terminal.Gui.SpecialChar
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.SpecialChar.LLCorner
-  id: LLCorner
-  parent: Terminal.Gui.SpecialChar
-  langs:
-  - csharp
-  name: LLCorner
-  nameWithType: SpecialChar.LLCorner
-  fullName: SpecialChar.LLCorner
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Lower left corner
-  syntax:
-    content: LLCorner
-    return:
-      type: Terminal.Gui.SpecialChar
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.SpecialChar.LRCorner
-  id: LRCorner
-  parent: Terminal.Gui.SpecialChar
-  langs:
-  - csharp
-  name: LRCorner
-  nameWithType: SpecialChar.LRCorner
-  fullName: SpecialChar.LRCorner
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Lower right corner
-  syntax:
-    content: LRCorner
-    return:
-      type: Terminal.Gui.SpecialChar
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.SpecialChar.RightTee
-  id: RightTee
-  parent: Terminal.Gui.SpecialChar
-  langs:
-  - csharp
-  name: RightTee
-  nameWithType: SpecialChar.RightTee
-  fullName: SpecialChar.RightTee
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Right tee
-  syntax:
-    content: RightTee
-    return:
-      type: Terminal.Gui.SpecialChar
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.SpecialChar.Stipple
-  id: Stipple
-  parent: Terminal.Gui.SpecialChar
-  langs:
-  - csharp
-  name: Stipple
-  nameWithType: SpecialChar.Stipple
-  fullName: SpecialChar.Stipple
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Stipple pattern
-  syntax:
-    content: Stipple
-    return:
-      type: Terminal.Gui.SpecialChar
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.SpecialChar.TopTee
-  id: TopTee
-  parent: Terminal.Gui.SpecialChar
-  langs:
-  - csharp
-  name: TopTee
-  nameWithType: SpecialChar.TopTee
-  fullName: SpecialChar.TopTee
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Top tee
-  syntax:
-    content: TopTee
-    return:
-      type: Terminal.Gui.SpecialChar
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.SpecialChar.ULCorner
-  id: ULCorner
-  parent: Terminal.Gui.SpecialChar
-  langs:
-  - csharp
-  name: ULCorner
-  nameWithType: SpecialChar.ULCorner
-  fullName: SpecialChar.ULCorner
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Upper left corner
-  syntax:
-    content: ULCorner
-    return:
-      type: Terminal.Gui.SpecialChar
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.SpecialChar.URCorner
-  id: URCorner
-  parent: Terminal.Gui.SpecialChar
-  langs:
-  - csharp
-  name: URCorner
-  nameWithType: SpecialChar.URCorner
-  fullName: SpecialChar.URCorner
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Upper right corner
-  syntax:
-    content: URCorner
-    return:
-      type: Terminal.Gui.SpecialChar
-      description: To be added.
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
 - uid: Terminal.Gui.SpecialChar.VLine
+  commentId: F:Terminal.Gui.SpecialChar.VLine
   id: VLine
   parent: Terminal.Gui.SpecialChar
   langs:
   - csharp
+  - vb
   name: VLine
   nameWithType: SpecialChar.VLine
-  fullName: SpecialChar.VLine
+  fullName: Terminal.Gui.SpecialChar.VLine
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: VLine
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 373
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Vertical line character.
+  summary: "\nVertical line character.\n"
+  example: []
   syntax:
-    content: VLine
+    content: VLine = 1
     return:
       type: Terminal.Gui.SpecialChar
-      description: To be added.
-  exceptions: []
-references:
-- uid: System.Enum
-  parent: System
-  isExternal: true
-  name: Enum
-  nameWithType: Enum
-  fullName: System.Enum
-- uid: Terminal.Gui.SpecialChar.BottomTee
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.SpecialChar.Stipple
+  commentId: F:Terminal.Gui.SpecialChar.Stipple
+  id: Stipple
   parent: Terminal.Gui.SpecialChar
-  isExternal: false
+  langs:
+  - csharp
+  - vb
+  name: Stipple
+  nameWithType: SpecialChar.Stipple
+  fullName: Terminal.Gui.SpecialChar.Stipple
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Stipple
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 378
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nStipple pattern\n"
+  example: []
+  syntax:
+    content: Stipple = 2
+    return:
+      type: Terminal.Gui.SpecialChar
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.SpecialChar.Diamond
+  commentId: F:Terminal.Gui.SpecialChar.Diamond
+  id: Diamond
+  parent: Terminal.Gui.SpecialChar
+  langs:
+  - csharp
+  - vb
+  name: Diamond
+  nameWithType: SpecialChar.Diamond
+  fullName: Terminal.Gui.SpecialChar.Diamond
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Diamond
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 383
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nDiamond character\n"
+  example: []
+  syntax:
+    content: Diamond = 3
+    return:
+      type: Terminal.Gui.SpecialChar
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.SpecialChar.ULCorner
+  commentId: F:Terminal.Gui.SpecialChar.ULCorner
+  id: ULCorner
+  parent: Terminal.Gui.SpecialChar
+  langs:
+  - csharp
+  - vb
+  name: ULCorner
+  nameWithType: SpecialChar.ULCorner
+  fullName: Terminal.Gui.SpecialChar.ULCorner
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: ULCorner
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 388
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nUpper left corner\n"
+  example: []
+  syntax:
+    content: ULCorner = 4
+    return:
+      type: Terminal.Gui.SpecialChar
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.SpecialChar.LLCorner
+  commentId: F:Terminal.Gui.SpecialChar.LLCorner
+  id: LLCorner
+  parent: Terminal.Gui.SpecialChar
+  langs:
+  - csharp
+  - vb
+  name: LLCorner
+  nameWithType: SpecialChar.LLCorner
+  fullName: Terminal.Gui.SpecialChar.LLCorner
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: LLCorner
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 393
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nLower left corner\n"
+  example: []
+  syntax:
+    content: LLCorner = 5
+    return:
+      type: Terminal.Gui.SpecialChar
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.SpecialChar.URCorner
+  commentId: F:Terminal.Gui.SpecialChar.URCorner
+  id: URCorner
+  parent: Terminal.Gui.SpecialChar
+  langs:
+  - csharp
+  - vb
+  name: URCorner
+  nameWithType: SpecialChar.URCorner
+  fullName: Terminal.Gui.SpecialChar.URCorner
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: URCorner
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 398
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nUpper right corner\n"
+  example: []
+  syntax:
+    content: URCorner = 6
+    return:
+      type: Terminal.Gui.SpecialChar
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.SpecialChar.LRCorner
+  commentId: F:Terminal.Gui.SpecialChar.LRCorner
+  id: LRCorner
+  parent: Terminal.Gui.SpecialChar
+  langs:
+  - csharp
+  - vb
+  name: LRCorner
+  nameWithType: SpecialChar.LRCorner
+  fullName: Terminal.Gui.SpecialChar.LRCorner
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: LRCorner
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 403
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nLower right corner\n"
+  example: []
+  syntax:
+    content: LRCorner = 7
+    return:
+      type: Terminal.Gui.SpecialChar
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.SpecialChar.LeftTee
+  commentId: F:Terminal.Gui.SpecialChar.LeftTee
+  id: LeftTee
+  parent: Terminal.Gui.SpecialChar
+  langs:
+  - csharp
+  - vb
+  name: LeftTee
+  nameWithType: SpecialChar.LeftTee
+  fullName: Terminal.Gui.SpecialChar.LeftTee
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: LeftTee
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 408
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nLeft tee\n"
+  example: []
+  syntax:
+    content: LeftTee = 8
+    return:
+      type: Terminal.Gui.SpecialChar
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.SpecialChar.RightTee
+  commentId: F:Terminal.Gui.SpecialChar.RightTee
+  id: RightTee
+  parent: Terminal.Gui.SpecialChar
+  langs:
+  - csharp
+  - vb
+  name: RightTee
+  nameWithType: SpecialChar.RightTee
+  fullName: Terminal.Gui.SpecialChar.RightTee
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: RightTee
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 413
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nRight tee\n"
+  example: []
+  syntax:
+    content: RightTee = 9
+    return:
+      type: Terminal.Gui.SpecialChar
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.SpecialChar.TopTee
+  commentId: F:Terminal.Gui.SpecialChar.TopTee
+  id: TopTee
+  parent: Terminal.Gui.SpecialChar
+  langs:
+  - csharp
+  - vb
+  name: TopTee
+  nameWithType: SpecialChar.TopTee
+  fullName: Terminal.Gui.SpecialChar.TopTee
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: TopTee
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 418
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nTop tee\n"
+  example: []
+  syntax:
+    content: TopTee = 10
+    return:
+      type: Terminal.Gui.SpecialChar
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+- uid: Terminal.Gui.SpecialChar.BottomTee
+  commentId: F:Terminal.Gui.SpecialChar.BottomTee
+  id: BottomTee
+  parent: Terminal.Gui.SpecialChar
+  langs:
+  - csharp
+  - vb
   name: BottomTee
   nameWithType: SpecialChar.BottomTee
-  fullName: SpecialChar.BottomTee
+  fullName: Terminal.Gui.SpecialChar.BottomTee
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: BottomTee
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 423
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe bottom tee.\n"
+  example: []
+  syntax:
+    content: BottomTee = 11
+    return:
+      type: Terminal.Gui.SpecialChar
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
 - uid: Terminal.Gui.SpecialChar
+  commentId: T:Terminal.Gui.SpecialChar
   parent: Terminal.Gui
-  isExternal: false
   name: SpecialChar
   nameWithType: SpecialChar
   fullName: Terminal.Gui.SpecialChar
-- uid: Terminal.Gui.SpecialChar.Diamond
-  parent: Terminal.Gui.SpecialChar
-  isExternal: false
-  name: Diamond
-  nameWithType: SpecialChar.Diamond
-  fullName: SpecialChar.Diamond
-- uid: Terminal.Gui.SpecialChar.HLine
-  parent: Terminal.Gui.SpecialChar
-  isExternal: false
-  name: HLine
-  nameWithType: SpecialChar.HLine
-  fullName: SpecialChar.HLine
-- uid: Terminal.Gui.SpecialChar.LeftTee
-  parent: Terminal.Gui.SpecialChar
-  isExternal: false
-  name: LeftTee
-  nameWithType: SpecialChar.LeftTee
-  fullName: SpecialChar.LeftTee
-- uid: Terminal.Gui.SpecialChar.LLCorner
-  parent: Terminal.Gui.SpecialChar
-  isExternal: false
-  name: LLCorner
-  nameWithType: SpecialChar.LLCorner
-  fullName: SpecialChar.LLCorner
-- uid: Terminal.Gui.SpecialChar.LRCorner
-  parent: Terminal.Gui.SpecialChar
-  isExternal: false
-  name: LRCorner
-  nameWithType: SpecialChar.LRCorner
-  fullName: SpecialChar.LRCorner
-- uid: Terminal.Gui.SpecialChar.RightTee
-  parent: Terminal.Gui.SpecialChar
-  isExternal: false
-  name: RightTee
-  nameWithType: SpecialChar.RightTee
-  fullName: SpecialChar.RightTee
-- uid: Terminal.Gui.SpecialChar.Stipple
-  parent: Terminal.Gui.SpecialChar
-  isExternal: false
-  name: Stipple
-  nameWithType: SpecialChar.Stipple
-  fullName: SpecialChar.Stipple
-- uid: Terminal.Gui.SpecialChar.TopTee
-  parent: Terminal.Gui.SpecialChar
-  isExternal: false
-  name: TopTee
-  nameWithType: SpecialChar.TopTee
-  fullName: SpecialChar.TopTee
-- uid: Terminal.Gui.SpecialChar.ULCorner
-  parent: Terminal.Gui.SpecialChar
-  isExternal: false
-  name: ULCorner
-  nameWithType: SpecialChar.ULCorner
-  fullName: SpecialChar.ULCorner
-- uid: Terminal.Gui.SpecialChar.URCorner
-  parent: Terminal.Gui.SpecialChar
-  isExternal: false
-  name: URCorner
-  nameWithType: SpecialChar.URCorner
-  fullName: SpecialChar.URCorner
-- uid: Terminal.Gui.SpecialChar.VLine
-  parent: Terminal.Gui.SpecialChar
-  isExternal: false
-  name: VLine
-  nameWithType: SpecialChar.VLine
-  fullName: SpecialChar.VLine
+shouldSkipMarkup: true

@@ -10,7 +10,7 @@ using NStack;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// The Checkbox View shows an on/off toggle that the user can set
+	/// The <see cref="CheckBox"/> <see cref="View"/> shows an on/off toggle that the user can set
 	/// </summary>
 	public class CheckBox : View {
 		ustring text;
@@ -18,17 +18,17 @@ namespace Terminal.Gui {
 		Rune hot_key;
 
 		/// <summary>
-		///   Toggled event, raised when the CheckButton is toggled.
+		///   Toggled event, raised when the <see cref="CheckBox"/>  is toggled.
 		/// </summary>
 		/// <remarks>
 		///   Client code can hook up to this event, it is
-		///   raised when the checkbutton is activated either with
+		///   raised when the <see cref="CheckBox"/> is activated either with
 		///   the mouse or the keyboard.
 		/// </remarks>
 		public event EventHandler Toggled;
 
 		/// <summary>
-		/// Public constructor, creates a CheckButton based on the given text, uses Computed layout and sets the height and width.
+		/// Initializes a new instance of <see cref="CheckBox"/> based on the given text, uses Computed layout and sets the height and width.
 		/// </summary>
 		/// <param name="s">S.</param>
 		/// <param name="is_checked">If set to <c>true</c> is checked.</param>
@@ -42,23 +42,21 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Public constructor, creates a CheckButton based on
-		///   the given text at an absolute position.
+		/// Initializes a new instance of <see cref="CheckBox"/> based on the given text at the given position and a state.
 		/// </summary>
 		/// <remarks>
-		///   The size of CheckButton is computed based on the
-		///   text length. This CheckButton is not toggled.
+		///   The size of <see cref="CheckBox"/> is computed based on the
+		///   text length. This <see cref="CheckBox"/> is not toggled.
 		/// </remarks>
 		public CheckBox (int x, int y, ustring s) : this (x, y, s, false)
 		{
 		}
 
 		/// <summary>
-		///   Public constructor, creates a CheckButton based on
-		///   the given text at the given position and a state.
+		/// Initializes a new instance of <see cref="CheckBox"/> based on the given text at the given position and a state.
 		/// </summary>
 		/// <remarks>
-		///   The size of CheckButton is computed based on the
+		///   The size of <see cref="CheckBox"/> is computed based on the
 		///   text length. 
 		/// </remarks>
 		public CheckBox (int x, int y, ustring s, bool is_checked) : base (new Rect (x, y, s.Length + 4, 1))
@@ -70,12 +68,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///    The state of the checkbox.
+		///    The state of the <see cref="CheckBox"/>
 		/// </summary>
 		public bool Checked { get; set; }
 
 		/// <summary>
-		///   The text displayed by this widget.
+		///   The text displayed by this <see cref="CheckBox"/>
 		/// </summary>
 		public ustring Text {
 			get {
@@ -99,6 +97,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc cref="Redraw"/>
 		public override void Redraw (Rect region)
 		{
 			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
@@ -113,11 +112,13 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc cref="PositionCursor"/>
 		public override void PositionCursor ()
 		{
 			Move (1, 0);
 		}
 
+		///<inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			if (kb.KeyValue == ' ') {
@@ -132,6 +133,7 @@ namespace Terminal.Gui {
 			return base.ProcessKey (kb);
 		}
 
+		///<inheritdoc cref="MouseEvent"/>
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked))

@@ -10,18 +10,19 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Struct Point
    ">
-    <meta name="generator" content="docfx 2.18.2.0">
+    <meta name="generator" content="docfx 2.53.1.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="">
-    <meta property="docfx:tocrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
     
+    <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -36,7 +37,7 @@
               </button>
               
               <a class="navbar-brand" href="../../index.html">
-                <img id="logo" class="svg" src="../../logo.svg" alt="">
+                <img id="logo" class="svg" src="../../images/logo48.png" alt="">
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
@@ -57,6 +58,16 @@
           </div>
         </div>
       </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -70,12 +81,25 @@
             <article class="content wrap" id="_content" data-uid="Terminal.Gui.Point">
   
   
-  <h1 id="Terminal_Gui_Point" data-uid="Terminal.Gui.Point">Struct Point
+  <h1 id="Terminal_Gui_Point" data-uid="Terminal.Gui.Point" class="text-break">Struct Point
   </h1>
-  <div class="markdown level0 summary"><p>Represents an ordered pair of integer x- and y-coordinates that defines a point in a two-dimensional plane.</p>
+  <div class="markdown level0 summary">
+Represents an ordered pair of integer x- and y-coordinates that defines a point in a two-dimensional plane.
 </div>
   <div class="markdown level0 conceptual"></div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="../Terminal.Gui.html">Terminal.Gui</a></h6>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Point_syntax">Syntax</h5>
   <div class="codewrapper">
@@ -86,45 +110,14 @@
   
   
   <a id="Terminal_Gui_Point__ctor_" data-uid="Terminal.Gui.Point.#ctor*"></a>
-  <h4 id="Terminal_Gui_Point__ctor_Terminal_Gui_Size_" data-uid="Terminal.Gui.Point.#ctor(Terminal.Gui.Size)">Point(Size)</h4>
-  <div class="markdown level1 summary"><p>Point Constructor</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Point (Terminal.Gui.Size sz);</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.Size.html">Size</a></td>
-        <td><span class="parametername">sz</span></td>
-        <td><p>To be added.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 id="Terminal_Gui_Point__ctor_Terminal_Gui_Size__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Creates a Point from a Size value.</p>
-</div>
-  
-  
-  <a id="Terminal_Gui_Point__ctor_" data-uid="Terminal.Gui.Point.#ctor*"></a>
   <h4 id="Terminal_Gui_Point__ctor_System_Int32_System_Int32_" data-uid="Terminal.Gui.Point.#ctor(System.Int32,System.Int32)">Point(Int32, Int32)</h4>
-  <div class="markdown level1 summary"><p>Point Constructor</p>
+  <div class="markdown level1 summary">
+Point Constructor
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Point (int x, int y);</code></pre>
+    <pre><code class="lang-csharp hljs">public Point(int x, int y)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -139,31 +132,64 @@
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">x</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">y</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 id="Terminal_Gui_Point__ctor_System_Int32_System_Int32__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Creates a Point from a specified x,y coordinate pair.</p>
+  <div class="markdown level1 remarks">
+Creates a Point from a specified x,y coordinate pair.
+</div>
+  
+  
+  <a id="Terminal_Gui_Point__ctor_" data-uid="Terminal.Gui.Point.#ctor*"></a>
+  <h4 id="Terminal_Gui_Point__ctor_Terminal_Gui_Size_" data-uid="Terminal.Gui.Point.#ctor(Terminal.Gui.Size)">Point(Size)</h4>
+  <div class="markdown level1 summary">
+Point Constructor
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Point(Size sz)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Size.html">Size</a></td>
+        <td><span class="parametername">sz</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_Point__ctor_Terminal_Gui_Size__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+Creates a Point from a Size value.
 </div>
   <h3 id="fields">Fields
   </h3>
   
   
   <h4 id="Terminal_Gui_Point_Empty" data-uid="Terminal.Gui.Point.Empty">Empty</h4>
-  <div class="markdown level1 summary"><p>Empty Shared Field</p>
+  <div class="markdown level1 summary">
+Empty Shared Field
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static readonly Terminal.Gui.Point Empty;</code></pre>
+    <pre><code class="lang-csharp hljs">public static readonly Point Empty</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -176,23 +202,24 @@
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 id="Terminal_Gui_Point_Empty_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>An uninitialized Point Structure.</p>
+  <div class="markdown level1 remarks">
+An uninitialized Point Structure.
 </div>
   
   
   <h4 id="Terminal_Gui_Point_X" data-uid="Terminal.Gui.Point.X">X</h4>
-  <div class="markdown level1 summary"><p>Gets or sets the x-coordinate of this Point.</p>
+  <div class="markdown level1 summary">
+Gets or sets the x-coordinate of this Point.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int X;</code></pre>
+    <pre><code class="lang-csharp hljs">public int X</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -205,20 +232,20 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Int32</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   
   
   <h4 id="Terminal_Gui_Point_Y" data-uid="Terminal.Gui.Point.Y">Y</h4>
-  <div class="markdown level1 summary"><p>Gets or sets the y-coordinate of this Point.</p>
+  <div class="markdown level1 summary">
+Gets or sets the y-coordinate of this Point.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int Y;</code></pre>
+    <pre><code class="lang-csharp hljs">public int Y</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -231,8 +258,7 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Int32</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -242,7 +268,8 @@
   
   <a id="Terminal_Gui_Point_IsEmpty_" data-uid="Terminal.Gui.Point.IsEmpty*"></a>
   <h4 id="Terminal_Gui_Point_IsEmpty" data-uid="Terminal.Gui.Point.IsEmpty">IsEmpty</h4>
-  <div class="markdown level1 summary"><p>IsEmpty Property</p>
+  <div class="markdown level1 summary">
+IsEmpty Property
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -260,13 +287,13 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 id="Terminal_Gui_Point_IsEmpty_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Indicates if both X and Y are zero.</p>
+  <div class="markdown level1 remarks">
+Indicates if both X and Y are zero.
 </div>
   <h3 id="methods">Methods
   </h3>
@@ -274,12 +301,13 @@
   
   <a id="Terminal_Gui_Point_Add_" data-uid="Terminal.Gui.Point.Add*"></a>
   <h4 id="Terminal_Gui_Point_Add_Terminal_Gui_Point_Terminal_Gui_Size_" data-uid="Terminal.Gui.Point.Add(Terminal.Gui.Point,Terminal.Gui.Size)">Add(Point, Size)</h4>
-  <div class="markdown level1 summary"><p>Adds the specified Size to the specified Point.</p>
+  <div class="markdown level1 summary">
+Adds the specified Size to the specified Point.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Terminal.Gui.Point Add (Terminal.Gui.Point pt, Terminal.Gui.Size sz);</code></pre>
+    <pre><code class="lang-csharp hljs">public static Point Add(Point pt, Size sz)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -294,14 +322,12 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
         <td><span class="parametername">pt</span></td>
-        <td><p>The Point to add.</p>
-</td>
+        <td>The Point to add.</td>
       </tr>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Size.html">Size</a></td>
         <td><span class="parametername">sz</span></td>
-        <td><p>The Size to add.</p>
-</td>
+        <td>The Size to add.</td>
       </tr>
     </tbody>
   </table>
@@ -316,8 +342,7 @@
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
-        <td><p>The Point that is the result of the addition operation.</p>
-</td>
+        <td>The Point that is the result of the addition operation.</td>
       </tr>
     </tbody>
   </table>
@@ -325,12 +350,13 @@
   
   <a id="Terminal_Gui_Point_Equals_" data-uid="Terminal.Gui.Point.Equals*"></a>
   <h4 id="Terminal_Gui_Point_Equals_System_Object_" data-uid="Terminal.Gui.Point.Equals(System.Object)">Equals(Object)</h4>
-  <div class="markdown level1 summary"><p>Equals Method</p>
+  <div class="markdown level1 summary">
+Equals Method
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override bool Equals (object obj);</code></pre>
+    <pre><code class="lang-csharp hljs">public override bool Equals(object obj)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -345,8 +371,7 @@
       <tr>
         <td><span class="xref">System.Object</span></td>
         <td><span class="parametername">obj</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -361,24 +386,27 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.ValueType.Equals(System.Object)</span></div>
   <h5 id="Terminal_Gui_Point_Equals_System_Object__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Checks equivalence of this Point and another object.</p>
+  <div class="markdown level1 remarks">
+Checks equivalence of this Point and another object.
 </div>
   
   
   <a id="Terminal_Gui_Point_GetHashCode_" data-uid="Terminal.Gui.Point.GetHashCode*"></a>
   <h4 id="Terminal_Gui_Point_GetHashCode" data-uid="Terminal.Gui.Point.GetHashCode">GetHashCode()</h4>
-  <div class="markdown level1 summary"><p>GetHashCode Method</p>
+  <div class="markdown level1 summary">
+GetHashCode Method
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override int GetHashCode ();</code></pre>
+    <pre><code class="lang-csharp hljs">public override int GetHashCode()</code></pre>
   </div>
   <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -391,24 +419,27 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Int32</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.ValueType.GetHashCode()</span></div>
   <h5 id="Terminal_Gui_Point_GetHashCode_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Calculates a hashing value.</p>
+  <div class="markdown level1 remarks">
+Calculates a hashing value.
 </div>
   
   
   <a id="Terminal_Gui_Point_Offset_" data-uid="Terminal.Gui.Point.Offset*"></a>
   <h4 id="Terminal_Gui_Point_Offset_System_Int32_System_Int32_" data-uid="Terminal.Gui.Point.Offset(System.Int32,System.Int32)">Offset(Int32, Int32)</h4>
-  <div class="markdown level1 summary"><p>Offset Method</p>
+  <div class="markdown level1 summary">
+Offset Method
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Offset (int dx, int dy);</code></pre>
+    <pre><code class="lang-csharp hljs">public void Offset(int dx, int dy)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -423,30 +454,30 @@
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">dx</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">dy</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 id="Terminal_Gui_Point_Offset_System_Int32_System_Int32__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Moves the Point a specified distance.</p>
+  <div class="markdown level1 remarks">
+Moves the Point a specified distance.
 </div>
   
   
   <a id="Terminal_Gui_Point_Offset_" data-uid="Terminal.Gui.Point.Offset*"></a>
   <h4 id="Terminal_Gui_Point_Offset_Terminal_Gui_Point_" data-uid="Terminal.Gui.Point.Offset(Terminal.Gui.Point)">Offset(Point)</h4>
-  <div class="markdown level1 summary"><p>Translates this Point by the specified Point.</p>
+  <div class="markdown level1 summary">
+Translates this Point by the specified Point.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Offset (Terminal.Gui.Point p);</code></pre>
+    <pre><code class="lang-csharp hljs">public void Offset(Point p)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -461,8 +492,7 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
         <td><span class="parametername">p</span></td>
-        <td><p>The Point used offset this Point.</p>
-</td>
+        <td>The Point used offset this Point.</td>
       </tr>
     </tbody>
   </table>
@@ -470,12 +500,13 @@
   
   <a id="Terminal_Gui_Point_Subtract_" data-uid="Terminal.Gui.Point.Subtract*"></a>
   <h4 id="Terminal_Gui_Point_Subtract_Terminal_Gui_Point_Terminal_Gui_Size_" data-uid="Terminal.Gui.Point.Subtract(Terminal.Gui.Point,Terminal.Gui.Size)">Subtract(Point, Size)</h4>
-  <div class="markdown level1 summary"><p>Returns the result of subtracting specified Size from the specified Point.</p>
+  <div class="markdown level1 summary">
+Returns the result of subtracting specified Size from the specified Point.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Terminal.Gui.Point Subtract (Terminal.Gui.Point pt, Terminal.Gui.Size sz);</code></pre>
+    <pre><code class="lang-csharp hljs">public static Point Subtract(Point pt, Size sz)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -490,14 +521,12 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
         <td><span class="parametername">pt</span></td>
-        <td><p>The Point to be subtracted from.</p>
-</td>
+        <td>The Point to be subtracted from.</td>
       </tr>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Size.html">Size</a></td>
         <td><span class="parametername">sz</span></td>
-        <td><p>The Size to subtract from the Point.</p>
-</td>
+        <td>The Size to subtract from the Point.</td>
       </tr>
     </tbody>
   </table>
@@ -512,8 +541,7 @@
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
-        <td><p>The Point that is the result of the subtraction operation.</p>
-</td>
+        <td>The Point that is the result of the subtraction operation.</td>
       </tr>
     </tbody>
   </table>
@@ -521,12 +549,13 @@
   
   <a id="Terminal_Gui_Point_ToString_" data-uid="Terminal.Gui.Point.ToString*"></a>
   <h4 id="Terminal_Gui_Point_ToString" data-uid="Terminal.Gui.Point.ToString">ToString()</h4>
-  <div class="markdown level1 summary"><p>ToString Method</p>
+  <div class="markdown level1 summary">
+ToString Method
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override string ToString ();</code></pre>
+    <pre><code class="lang-csharp hljs">public override string ToString()</code></pre>
   </div>
   <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -539,26 +568,29 @@
     <tbody>
       <tr>
         <td><span class="xref">System.String</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.ValueType.ToString()</span></div>
   <h5 id="Terminal_Gui_Point_ToString_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Formats the Point as a string in coordinate notation.</p>
+  <div class="markdown level1 remarks">
+Formats the Point as a string in coordinate notation.
 </div>
   <h3 id="operators">Operators
   </h3>
   
   
   <a id="Terminal_Gui_Point_op_Addition_" data-uid="Terminal.Gui.Point.op_Addition*"></a>
-  <h4 id="Terminal_Gui_Point_op_Addition_Terminal_Gui_Point_Terminal_Gui_Size_" data-uid="Terminal.Gui.Point.op_Addition(Terminal.Gui.Point,Terminal.Gui.Size)">op_Addition(Point, Size)</h4>
-  <div class="markdown level1 summary"><p>Addition Operator</p>
+  <h4 id="Terminal_Gui_Point_op_Addition_Terminal_Gui_Point_Terminal_Gui_Size_" data-uid="Terminal.Gui.Point.op_Addition(Terminal.Gui.Point,Terminal.Gui.Size)">Addition(Point, Size)</h4>
+  <div class="markdown level1 summary">
+Addition Operator
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Terminal.Gui.Point op_Addition (Terminal.Gui.Point pt, Terminal.Gui.Size sz);</code></pre>
+    <pre><code class="lang-csharp hljs">public static Point operator +(Point pt, Size sz)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -573,14 +605,12 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
         <td><span class="parametername">pt</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Size.html">Size</a></td>
         <td><span class="parametername">sz</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -595,25 +625,26 @@
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 id="Terminal_Gui_Point_op_Addition_Terminal_Gui_Point_Terminal_Gui_Size__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Translates a Point using the Width and Height
-                properties of the given <typeref>Size</typeref>.</p>
+  <div class="markdown level1 remarks">
+Translates a Point using the Width and Height
+properties of the given <typeref>Size</typeref>.
 </div>
   
   
   <a id="Terminal_Gui_Point_op_Equality_" data-uid="Terminal.Gui.Point.op_Equality*"></a>
-  <h4 id="Terminal_Gui_Point_op_Equality_Terminal_Gui_Point_Terminal_Gui_Point_" data-uid="Terminal.Gui.Point.op_Equality(Terminal.Gui.Point,Terminal.Gui.Point)">op_Equality(Point, Point)</h4>
-  <div class="markdown level1 summary"><p>Equality Operator</p>
+  <h4 id="Terminal_Gui_Point_op_Equality_Terminal_Gui_Point_Terminal_Gui_Point_" data-uid="Terminal.Gui.Point.op_Equality(Terminal.Gui.Point,Terminal.Gui.Point)">Equality(Point, Point)</h4>
+  <div class="markdown level1 summary">
+Equality Operator
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static bool op_Equality (Terminal.Gui.Point left, Terminal.Gui.Point right);</code></pre>
+    <pre><code class="lang-csharp hljs">public static bool operator ==(Point left, Point right)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -628,14 +659,12 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
         <td><span class="parametername">left</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
         <td><span class="parametername">right</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -650,26 +679,27 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 id="Terminal_Gui_Point_op_Equality_Terminal_Gui_Point_Terminal_Gui_Point__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Compares two Point objects. The return value is
-                based on the equivalence of the X and Y properties 
-                of the two points.</p>
+  <div class="markdown level1 remarks">
+Compares two Point objects. The return value is
+based on the equivalence of the X and Y properties 
+of the two points.
 </div>
   
   
   <a id="Terminal_Gui_Point_op_Explicit_" data-uid="Terminal.Gui.Point.op_Explicit*"></a>
-  <h4 id="Terminal_Gui_Point_op_Explicit_Terminal_Gui_Point_to_Terminal_Gui_Size_" data-uid="Terminal.Gui.Point.op_Explicit(Terminal.Gui.Point to Terminal.Gui.Size)">op_Explicit(Point to Size)</h4>
-  <div class="markdown level1 summary"><p>Point to Size Conversion</p>
+  <h4 id="Terminal_Gui_Point_op_Explicit_Terminal_Gui_Point__Terminal_Gui_Size" data-uid="Terminal.Gui.Point.op_Explicit(Terminal.Gui.Point)~Terminal.Gui.Size">Explicit(Point to Size)</h4>
+  <div class="markdown level1 summary">
+Point to Size Conversion
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Terminal.Gui.Size op_Explicit (Terminal.Gui.Point p);</code></pre>
+    <pre><code class="lang-csharp hljs">public static explicit operator Size(Point p)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -684,8 +714,7 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
         <td><span class="parametername">p</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -700,25 +729,26 @@
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Size.html">Size</a></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Point_op_Explicit_Terminal_Gui_Point_to_Terminal_Gui_Size__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Returns a Size based on the Coordinates of a given 
-                Point. Requires explicit cast.</p>
+  <h5 id="Terminal_Gui_Point_op_Explicit_Terminal_Gui_Point__Terminal_Gui_Size_remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+Returns a Size based on the Coordinates of a given 
+Point. Requires explicit cast.
 </div>
   
   
   <a id="Terminal_Gui_Point_op_Inequality_" data-uid="Terminal.Gui.Point.op_Inequality*"></a>
-  <h4 id="Terminal_Gui_Point_op_Inequality_Terminal_Gui_Point_Terminal_Gui_Point_" data-uid="Terminal.Gui.Point.op_Inequality(Terminal.Gui.Point,Terminal.Gui.Point)">op_Inequality(Point, Point)</h4>
-  <div class="markdown level1 summary"><p>Inequality Operator</p>
+  <h4 id="Terminal_Gui_Point_op_Inequality_Terminal_Gui_Point_Terminal_Gui_Point_" data-uid="Terminal.Gui.Point.op_Inequality(Terminal.Gui.Point,Terminal.Gui.Point)">Inequality(Point, Point)</h4>
+  <div class="markdown level1 summary">
+Inequality Operator
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static bool op_Inequality (Terminal.Gui.Point left, Terminal.Gui.Point right);</code></pre>
+    <pre><code class="lang-csharp hljs">public static bool operator !=(Point left, Point right)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -733,14 +763,12 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
         <td><span class="parametername">left</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
         <td><span class="parametername">right</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -755,26 +783,27 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 id="Terminal_Gui_Point_op_Inequality_Terminal_Gui_Point_Terminal_Gui_Point__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Compares two Point objects. The return value is
-                based on the equivalence of the X and Y properties 
-                of the two points.</p>
+  <div class="markdown level1 remarks">
+Compares two Point objects. The return value is
+based on the equivalence of the X and Y properties 
+of the two points.
 </div>
   
   
   <a id="Terminal_Gui_Point_op_Subtraction_" data-uid="Terminal.Gui.Point.op_Subtraction*"></a>
-  <h4 id="Terminal_Gui_Point_op_Subtraction_Terminal_Gui_Point_Terminal_Gui_Size_" data-uid="Terminal.Gui.Point.op_Subtraction(Terminal.Gui.Point,Terminal.Gui.Size)">op_Subtraction(Point, Size)</h4>
-  <div class="markdown level1 summary"><p>Subtraction Operator</p>
+  <h4 id="Terminal_Gui_Point_op_Subtraction_Terminal_Gui_Point_Terminal_Gui_Size_" data-uid="Terminal.Gui.Point.op_Subtraction(Terminal.Gui.Point,Terminal.Gui.Size)">Subtraction(Point, Size)</h4>
+  <div class="markdown level1 summary">
+Subtraction Operator
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Terminal.Gui.Point op_Subtraction (Terminal.Gui.Point pt, Terminal.Gui.Size sz);</code></pre>
+    <pre><code class="lang-csharp hljs">public static Point operator -(Point pt, Size sz)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -789,14 +818,12 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
         <td><span class="parametername">pt</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Size.html">Size</a></td>
         <td><span class="parametername">sz</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -811,14 +838,14 @@
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 id="Terminal_Gui_Point_op_Subtraction_Terminal_Gui_Point_Terminal_Gui_Size__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Translates a Point using the negation of the Width 
-                and Height properties of the given Size.</p>
+  <div class="markdown level1 remarks">
+Translates a Point using the negation of the Width 
+and Height properties of the given Size.
 </div>
 </article>
           </div>
@@ -845,7 +872,7 @@
               <a href="#top">Back to top</a>
             </span>
             
-            <span>Copyright © 2015-2017 Microsoft<br>Generated by <strong>DocFX</strong></span>
+            <span>Generated by <strong>DocFX</strong></span>
           </div>
         </div>
       </footer>

@@ -1,0 +1,458 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.View.KeyEventEventArgs
+  commentId: T:Terminal.Gui.View.KeyEventEventArgs
+  id: View.KeyEventEventArgs
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.View.KeyEventEventArgs.#ctor(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.KeyEventEventArgs.KeyEvent
+  langs:
+  - csharp
+  - vb
+  name: View.KeyEventEventArgs
+  nameWithType: View.KeyEventEventArgs
+  fullName: Terminal.Gui.View.KeyEventEventArgs
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: KeyEventEventArgs
+    path: ../Terminal.Gui/Core.cs
+    startLine: 1079
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nSpecifies the event arguments for <xref href=\"Terminal.Gui.View.KeyEventEventArgs.KeyEvent\" data-throw-if-not-resolved=\"false\"></xref>\n"
+  example: []
+  syntax:
+    content: 'public class KeyEventEventArgs : EventArgs'
+    content.vb: >-
+      Public Class KeyEventEventArgs
+
+          Inherits EventArgs
+  inheritance:
+  - System.Object
+  - System.EventArgs
+  inheritedMembers:
+  - System.EventArgs.Empty
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  modifiers.csharp:
+  - public
+  - class
+  modifiers.vb:
+  - Public
+  - Class
+- uid: Terminal.Gui.View.KeyEventEventArgs.#ctor(Terminal.Gui.KeyEvent)
+  commentId: M:Terminal.Gui.View.KeyEventEventArgs.#ctor(Terminal.Gui.KeyEvent)
+  id: '#ctor(Terminal.Gui.KeyEvent)'
+  parent: Terminal.Gui.View.KeyEventEventArgs
+  langs:
+  - csharp
+  - vb
+  name: KeyEventEventArgs(KeyEvent)
+  nameWithType: View.KeyEventEventArgs.KeyEventEventArgs(KeyEvent)
+  fullName: Terminal.Gui.View.KeyEventEventArgs.KeyEventEventArgs(Terminal.Gui.KeyEvent)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: .ctor
+    path: ../Terminal.Gui/Core.cs
+    startLine: 1084
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nConstructs.\n"
+  example: []
+  syntax:
+    content: public KeyEventEventArgs(KeyEvent ke)
+    parameters:
+    - id: ke
+      type: Terminal.Gui.KeyEvent
+      description: ''
+    content.vb: Public Sub New(ke As KeyEvent)
+  overload: Terminal.Gui.View.KeyEventEventArgs.#ctor*
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.View.KeyEventEventArgs.KeyEvent
+  commentId: P:Terminal.Gui.View.KeyEventEventArgs.KeyEvent
+  id: KeyEvent
+  parent: Terminal.Gui.View.KeyEventEventArgs
+  langs:
+  - csharp
+  - vb
+  name: KeyEvent
+  nameWithType: View.KeyEventEventArgs.KeyEvent
+  fullName: Terminal.Gui.View.KeyEventEventArgs.KeyEvent
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: KeyEvent
+    path: ../Terminal.Gui/Core.cs
+    startLine: 1088
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe <xref href=\"Terminal.Gui.View.KeyEventEventArgs.KeyEvent\" data-throw-if-not-resolved=\"false\"></xref> for the event.\n"
+  example: []
+  syntax:
+    content: public KeyEvent KeyEvent { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.KeyEvent
+    content.vb: Public Property KeyEvent As KeyEvent
+  overload: Terminal.Gui.View.KeyEventEventArgs.KeyEvent*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+references:
+- uid: Terminal.Gui.View.KeyEventEventArgs.KeyEvent
+  commentId: P:Terminal.Gui.View.KeyEventEventArgs.KeyEvent
+  isExternal: true
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: System.EventArgs
+  commentId: T:System.EventArgs
+  parent: System
+  isExternal: true
+  name: EventArgs
+  nameWithType: EventArgs
+  fullName: System.EventArgs
+- uid: System.EventArgs.Empty
+  commentId: F:System.EventArgs.Empty
+  parent: System.EventArgs
+  isExternal: true
+  name: Empty
+  nameWithType: EventArgs.Empty
+  fullName: System.EventArgs.Empty
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: Object.Equals(Object)
+  fullName: System.Object.Equals(System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: Object.GetHashCode()
+  fullName: System.Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  name: MemberwiseClone()
+  nameWithType: Object.MemberwiseClone()
+  fullName: System.Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  name: ToString()
+  nameWithType: Object.ToString()
+  fullName: System.Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.View.KeyEventEventArgs.#ctor*
+  commentId: Overload:Terminal.Gui.View.KeyEventEventArgs.#ctor
+  name: KeyEventEventArgs
+  nameWithType: View.KeyEventEventArgs.KeyEventEventArgs
+  fullName: Terminal.Gui.View.KeyEventEventArgs.KeyEventEventArgs
+- uid: Terminal.Gui.KeyEvent
+  commentId: T:Terminal.Gui.KeyEvent
+  parent: Terminal.Gui
+  name: KeyEvent
+  nameWithType: KeyEvent
+  fullName: Terminal.Gui.KeyEvent
+- uid: Terminal.Gui.View.KeyEventEventArgs.KeyEvent*
+  commentId: Overload:Terminal.Gui.View.KeyEventEventArgs.KeyEvent
+  name: KeyEvent
+  nameWithType: View.KeyEventEventArgs.KeyEvent
+  fullName: Terminal.Gui.View.KeyEventEventArgs.KeyEvent
+shouldSkipMarkup: true

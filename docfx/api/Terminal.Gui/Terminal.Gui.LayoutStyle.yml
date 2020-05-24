@@ -1,86 +1,119 @@
 ### YamlMime:ManagedReference
 items:
 - uid: Terminal.Gui.LayoutStyle
+  commentId: T:Terminal.Gui.LayoutStyle
   id: LayoutStyle
+  parent: Terminal.Gui
   children:
   - Terminal.Gui.LayoutStyle.Absolute
   - Terminal.Gui.LayoutStyle.Computed
   langs:
   - csharp
+  - vb
   name: LayoutStyle
   nameWithType: LayoutStyle
   fullName: Terminal.Gui.LayoutStyle
   type: Enum
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: LayoutStyle
+    path: ../Terminal.Gui/Core.cs
+    startLine: 198
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: "Determines the LayoutStyle for a view, if Absolute, during LayoutSubviews, the\n            value from the Frame will be used, if the value is Computer, then the Frame \n            will be updated from the X, Y Pos objets and the Width and Heigh Dim objects."
+  summary: "\nDetermines the LayoutStyle for a view, if Absolute, during LayoutSubviews, the\nvalue from the Frame will be used, if the value is Computer, then the Frame\nwill be updated from the X, Y Pos objects and the Width and Height Dim objects.\n"
+  example: []
   syntax:
     content: public enum LayoutStyle
-  inheritance:
-  - System.Enum
+    content.vb: Public Enum LayoutStyle
+  modifiers.csharp:
+  - public
+  - enum
+  modifiers.vb:
+  - Public
+  - Enum
 - uid: Terminal.Gui.LayoutStyle.Absolute
+  commentId: F:Terminal.Gui.LayoutStyle.Absolute
   id: Absolute
   parent: Terminal.Gui.LayoutStyle
   langs:
   - csharp
+  - vb
   name: Absolute
   nameWithType: LayoutStyle.Absolute
-  fullName: LayoutStyle.Absolute
+  fullName: Terminal.Gui.LayoutStyle.Absolute
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Absolute
+    path: ../Terminal.Gui/Core.cs
+    startLine: 202
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The position and size of the view are based on the Frame value.
+  summary: "\nThe position and size of the view are based on the Frame value.\n"
+  example: []
   syntax:
-    content: Absolute
+    content: Absolute = 0
     return:
       type: Terminal.Gui.LayoutStyle
-      description: To be added.
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
 - uid: Terminal.Gui.LayoutStyle.Computed
+  commentId: F:Terminal.Gui.LayoutStyle.Computed
   id: Computed
   parent: Terminal.Gui.LayoutStyle
   langs:
   - csharp
+  - vb
   name: Computed
   nameWithType: LayoutStyle.Computed
-  fullName: LayoutStyle.Computed
+  fullName: Terminal.Gui.LayoutStyle.Computed
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Core.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Computed
+    path: ../Terminal.Gui/Core.cs
+    startLine: 208
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: >-
-    The position and size of the view will be computed based on the
-                X, Y, Width and Height properties and set on the Frame.
+  summary: "\nThe position and size of the view will be computed based on the\nX, Y, Width and Height properties and set on the Frame.\n"
+  example: []
   syntax:
-    content: Computed
+    content: Computed = 1
     return:
       type: Terminal.Gui.LayoutStyle
-      description: To be added.
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - const
+  modifiers.vb:
+  - Public
+  - Const
 references:
-- uid: System.Enum
-  parent: System
-  isExternal: true
-  name: Enum
-  nameWithType: Enum
-  fullName: System.Enum
-- uid: Terminal.Gui.LayoutStyle.Absolute
-  parent: Terminal.Gui.LayoutStyle
-  isExternal: false
-  name: Absolute
-  nameWithType: LayoutStyle.Absolute
-  fullName: LayoutStyle.Absolute
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
 - uid: Terminal.Gui.LayoutStyle
+  commentId: T:Terminal.Gui.LayoutStyle
   parent: Terminal.Gui
-  isExternal: false
   name: LayoutStyle
   nameWithType: LayoutStyle
   fullName: Terminal.Gui.LayoutStyle
-- uid: Terminal.Gui.LayoutStyle.Computed
-  parent: Terminal.Gui.LayoutStyle
-  isExternal: false
-  name: Computed
-  nameWithType: LayoutStyle.Computed
-  fullName: LayoutStyle.Computed
+shouldSkipMarkup: true

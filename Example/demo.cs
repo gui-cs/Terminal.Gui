@@ -1,5 +1,7 @@
 using Terminal.Gui;
 using System;
+using System.Linq;
+using System.IO;
 using Mono.Terminal;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -91,8 +93,8 @@ static class Demo {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
-		container.OnKeyUp += (KeyEvent ke) => {
-			if (ke.Key == Key.Esc)
+		container.KeyUp += (sender, e) => {
+			if (e.KeyEvent.Key == Key.Esc)
 				container.Running = false;
 		};
 
@@ -411,14 +413,35 @@ static class Demo {
 		}
 		MessageBox.Query (60, 10, "Selected Animals", result == "" ? "No animals selected" : result, "Ok");
 	}
+
+	static void ComboBoxDemo ()
+	{
+		IList<string> items = new List<string> ();
+		foreach (var dir in new [] { "/etc", @"\windows\System32" }) {
+			if (Directory.Exists (dir)) {
+				items = Directory.GetFiles (dir)
+				.Select (Path.GetFileName)
+				.Where (x => char.IsLetterOrDigit (x [0]))
+				.Distinct ()
+				.OrderBy (x => x).ToList ();
+			}
+		}
+		var list = new ComboBox (0, 0, 36, 7, items);
+		list.Changed += (object sender, ustring text) => { Application.RequestStop (); };
+
+		var d = new Dialog ("Select source file", 40, 12) { list };
+		Application.Run (d);
+
+		MessageBox.Query (60, 10, "Selected file", list.Text.ToString() == "" ? "Nothing selected" : list.Text.ToString(), "Ok");
+	}
 	#endregion
 
 
-	#region OnKeyDown / OnKeyPress / OnKeyUp Demo
+	#region KeyDown / KeyPress / KeyUp Demo
 	private static void OnKeyDownPressUpDemo ()
 	{
 		var container = new Dialog (
-			"OnKeyDown & OnKeyPress & OnKeyUp demo", 80, 20,
+			"KeyDown & KeyPress & KeyUp demo", 80, 20,
 			new Button ("Close") { Clicked = () => { Application.RequestStop (); } }) {
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
@@ -470,9 +493,9 @@ static class Demo {
 		}
 
 
-		container.OnKeyDown += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Down");
-		container.OnKeyPress += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Press");
-		container.OnKeyUp += (KeyEvent keyEvent) => KeyDownPressUp (keyEvent, "Up");
+		container.KeyDown += (o, e) => KeyDownPressUp (e.KeyEvent, "Down");
+		container.KeyPress += (o, e) => KeyDownPressUp (e.KeyEvent, "Press");
+		container.KeyUp += (o, e) => KeyDownPressUp (e.KeyEvent, "Up");
 		Application.Run (container);
 	}
 	#endregion
@@ -541,6 +564,7 @@ static class Demo {
 			new MenuBarItem ("_List Demos", new MenuItem [] {
 				new MenuItem ("Select _Multiple Items", "", () => ListSelectionDemo (true)),
 				new MenuItem ("Select _Single Item", "", () => ListSelectionDemo (false)),
+				new MenuItem ("Search Single Item", "", ComboBoxDemo)
 			}),
 			new MenuBarItem ("A_ssorted", new MenuItem [] {
 				new MenuItem ("_Show text alignments", "", () => ShowTextAlignments ()),
@@ -605,7 +629,7 @@ static class Demo {
 		var bottom2 = new Label ("This should go on the bottom of another top-level!");
 		top.Add (bottom2);
 
-		Application.OnLoad = () => {
+		Application.Loaded += (sender, e) => {
 			bottom.X = win.X;
 			bottom.Y = Pos.Bottom (win) - Pos.Top (win) - margin;
 			bottom2.X = Pos.Left (win);

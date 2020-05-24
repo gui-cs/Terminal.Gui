@@ -12,11 +12,10 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	///   Text data entry widget
+	///   Single-line text entry <see cref="View"/>
 	/// </summary>
 	/// <remarks>
-	///   The Entry widget provides Emacs-like editing
-	///   functionality,  and mouse support.
+	///   The <see cref="TextField"/> <see cref="View"/> provides editing functionality and mouse support.
 	/// </remarks>
 	public class TextField : View {
 		List<Rune> text;
@@ -27,6 +26,11 @@ namespace Terminal.Gui {
 		/// Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so new input should be appended at the cursor position, rather than clearing the entry
 		/// </summary>
 		public bool Used { get => used; set { used = value; } }
+
+		/// <summary>
+		/// If set to true its not allow any changes in the text.
+		/// </summary>
+		public bool ReadOnly { get; set; } = false;
 
 		/// <summary>
 		///   Changed event, raised when the text has clicked.
@@ -80,6 +84,7 @@ namespace Terminal.Gui {
 			WantMousePositionReports = true;
 		}
 
+		///<inheritdoc cref="OnLeave"/>
 		public override bool OnLeave ()
 		{
 			if (Application.mouseGrabView != null && Application.mouseGrabView == this)
@@ -90,12 +95,13 @@ namespace Terminal.Gui {
 			return base.OnLeave ();
 		}
 
+		///<inheritdoc cref="Frame"/>
 		public override Rect Frame {
 			get => base.Frame;
 			set {
 				base.Frame = value;
 				var w = base.Frame.Width;
-				//first = point > w ? point - w : 0;
+				first = point > w ? point - w : 0;
 				Adjust ();
 			}
 		}
@@ -105,7 +111,7 @@ namespace Terminal.Gui {
 		bool isFromHistory;
 
 		/// <summary>
-		///   Sets or gets the text in the entry.
+		///   Sets or gets the text held by the view.
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
@@ -115,6 +121,9 @@ namespace Terminal.Gui {
 			}
 
 			set {
+				if (ReadOnly)
+					return;
+
 				var oldText = ustring.Make (text);
 				text = TextModel.ToRunes (value);
 				if (!Secret && !isFromHistory) {
@@ -172,6 +181,7 @@ namespace Terminal.Gui {
 			Move (col, 0);
 		}
 
+		///<inheritdoc cref="Redraw(Rect)"/>
 		public override void Redraw (Rect region)
 		{
 			ColorScheme color = Colors.Menu;
@@ -184,13 +194,16 @@ namespace Terminal.Gui {
 			int col = 0;
 			int width = Frame.Width;
 			var tcount = text.Count;
-			for (int idx = 0; idx < tcount; idx++){
+			var roc = new Attribute (Color.DarkGray, Color.Gray);
+			for (int idx = 0; idx < tcount; idx++) {
 				var rune = text [idx];
 				if (idx < p)
 					continue;
 				var cols = Rune.ColumnWidth (rune);
-				if (col == point && HasFocus && !Used && SelectedLength == 0)
+				if (col == point && HasFocus && !Used && SelectedLength == 0 && !ReadOnly)
 					Driver.SetAttribute (Colors.Menu.HotFocus);
+				else if (ReadOnly)
+					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : roc);
 				else
 					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : ColorScheme.Focus);
 				if (col + cols <= width)
@@ -240,6 +253,7 @@ namespace Terminal.Gui {
 			SetText (newText.ToList ());
 		}
 
+		///<inheritdoc cref="CanFocus"/>
 		public override bool CanFocus {
 			get => true;
 			set { base.CanFocus = value; }
@@ -251,6 +265,24 @@ namespace Terminal.Gui {
 				Clipboard.Contents = ustring.Make (text.ToList ());
 		}
 
+		/// <summary>
+		/// Processes key presses for the <see cref="TextField"/>.
+		/// </summary>
+		/// <param name="kb"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// The <see cref="TextField"/> control responds to the following keys:
+		/// <list type="table">
+		///    <listheader>
+		///        <term>Keys</term>
+		///        <description>Function</description>
+		///    </listheader>
+		///    <item>
+		///        <term><see cref="Key.Delete"/>, <see cref="Key.Backspace"/></term>
+		///        <description>Deletes the character before cursor.</description>
+		///    </item>
+		/// </list>
+		/// </remarks>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			// remember current cursor position
@@ -261,6 +293,9 @@ namespace Terminal.Gui {
 			switch (kb.Key) {
 			case Key.DeleteChar:
 			case Key.ControlD:
+				if (ReadOnly)
+					return true;
+
 				if (SelectedLength == 0) {
 					if (text.Count == 0 || text.Count == point)
 						return true;
@@ -275,6 +310,9 @@ namespace Terminal.Gui {
 
 			case Key.Delete:
 			case Key.Backspace:
+				if (ReadOnly)
+					return true;
+
 				if (SelectedLength == 0) {
 					if (point == 0)
 						return true;
@@ -373,6 +411,9 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.ControlK: // kill-to-end
+				if (ReadOnly)
+					return true;
+
 				ClearAllSelection ();
 				if (point >= text.Count)
 					return true;
@@ -383,6 +424,9 @@ namespace Terminal.Gui {
 
 			// Undo
 			case Key.ControlZ:
+				if (ReadOnly)
+					return true;
+
 				if (historyText != null && historyText.Count > 0) {
 					isFromHistory = true;
 					if (idxhistoryText > 0)
@@ -396,6 +440,9 @@ namespace Terminal.Gui {
 
 			//Redo
 			case Key.ControlY: // Control-y, yank
+				if (ReadOnly)
+					return true;
+
 				if (historyText != null && historyText.Count > 0) {
 					isFromHistory = true;
 					if (idxhistoryText < historyText.Count - 1) {
@@ -455,6 +502,9 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.ControlX:
+				if (ReadOnly)
+					return true;
+
 				Cut ();
 				break;
 
@@ -471,6 +521,9 @@ namespace Terminal.Gui {
 				// Ignore other control characters.
 				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
 					return false;
+
+				if (ReadOnly)
+					return true;
 
 				if (SelectedLength != 0) {
 					DeleteSelectedText ();
@@ -500,10 +553,10 @@ namespace Terminal.Gui {
 				return -1;
 
 			int i = p;
-			if (Rune.IsPunctuation (text [p]) || Rune.IsWhiteSpace(text [p])) {
+			if (Rune.IsPunctuation (text [p]) || Rune.IsWhiteSpace (text [p])) {
 				for (; i < text.Count; i++) {
 					var r = text [i];
-					if (Rune.IsLetterOrDigit(r))
+					if (Rune.IsLetterOrDigit (r))
 						break;
 				}
 				for (; i < text.Count; i++) {
@@ -533,7 +586,7 @@ namespace Terminal.Gui {
 				return 0;
 
 			var ti = text [i];
-			if (Rune.IsPunctuation (ti) || Rune.IsSymbol(ti) || Rune.IsWhiteSpace(ti)) {
+			if (Rune.IsPunctuation (ti) || Rune.IsSymbol (ti) || Rune.IsWhiteSpace (ti)) {
 				for (; i >= 0; i--) {
 					if (Rune.IsLetterOrDigit (text [i]))
 						break;
@@ -574,6 +627,7 @@ namespace Terminal.Gui {
 		int start, length;
 		bool isButtonReleased = true;
 
+		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
 		public override bool MouseEvent (MouseEvent ev)
 		{
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed) && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition) &&
@@ -639,7 +693,7 @@ namespace Terminal.Gui {
 				point = text.Count;
 			if (point < first)
 				point = 0;
-			return x;
+			return point;
 		}
 
 		void PrepareSelection (int x, int direction = 0)
@@ -682,8 +736,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Copy the selected text to the clipboard.
 		/// </summary>
-		public void Copy ()
+		public virtual void Copy ()
 		{
+			if (Secret)
+				return;
+
 			if (SelectedLength != 0) {
 				Clipboard.Contents = SelectedText;
 			}
@@ -692,7 +749,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Cut the selected text to the clipboard.
 		/// </summary>
-		public void Cut ()
+		public virtual void Cut ()
 		{
 			if (SelectedLength != 0) {
 				Clipboard.Contents = SelectedText;
@@ -715,8 +772,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Paste the selected text from the clipboard.
 		/// </summary>
-		public void Paste ()
+		public virtual void Paste ()
 		{
+			if (ReadOnly)
+				return;
+
 			string actualText = Text.ToString ();
 			int start = SelectedStart == -1 ? CursorPosition : SelectedStart;
 			ustring cbTxt = Clipboard.Contents?.ToString () ?? "";

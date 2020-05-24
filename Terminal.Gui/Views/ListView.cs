@@ -26,7 +26,7 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Implement this interface to provide your own custom rendering for a list.
+	/// Implement <see cref="IListDataSource"/> to provide custom rendering for a <see cref="ListView"/>.
 	/// </summary>
 	public interface IListDataSource {
 		/// <summary>
@@ -63,36 +63,43 @@ namespace Terminal.Gui {
 		/// <param name="item">Item index.</param>
 		/// <param name="value">If set to <c>true</c> value.</param>
 		void SetMark (int item, bool value);
+
+		/// <summary>
+		/// Return the source as IList.
+		/// </summary>
+		/// <returns></returns>
+		IList ToList ();
 	}
 
 	/// <summary>
-	/// ListView widget renders a list of data.
+	/// ListView <see cref="View"/> renders a scrollable list of data where each item can be activated to perform an action.
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	///   The ListView displays lists of data and allows the user to scroll through the data
-	///   and optionally mark elements of the list (controlled by the AllowsMark property).
+	///   The <see cref="ListView"/> displays lists of data and allows the user to scroll through the data.
+	///   Items in the can be activated firing an event (with the ENTER key or a mouse double-click). 
+	///   If the <see cref="AllowsMarking"/> property is true, elements of the list can be marked by the user.
 	/// </para>
 	/// <para>
-	///   The ListView can either render an arbitrary IList object (for example, arrays, List&lt;T&gt;
-	///   and other collections) which are drawn by drawing the string/ustring contents or the
-	///   result of calling ToString().   Alternatively, you can provide you own IListDataSource
-	///   object that gives you full control of what is rendered.
+	///   By default <see cref="ListView"/> uses <see cref="object.ToString"/> to render the items of any
+	///   <see cref="IList"/> object (e.g. arrays, <see cref="List{T}"/>,
+	///   and other collections). Alternatively, an object that implements the <see cref="IListDataSource"/>
+	///   interface can be provided giving full control of what is rendered.
 	/// </para>
 	/// <para>
-	///   The ListView can display any object that implements the System.Collection.IList interface,
-	///   string values are converted into ustring values before rendering, and other values are
-	///   converted into ustrings by calling ToString() and then converting to ustring.
+	///   <see cref="ListView"/> can display any object that implements the <see cref="IList"/> interface.
+	///   <see cref="string"/> values are converted into <see cref="ustring"/> values before rendering, and other values are
+	///   converted into <see cref="string"/> by calling <see cref="object.ToString"/> and then converting to <see cref="ustring"/> .
 	/// </para>
 	/// <para>
-	///   If you must change the contents of the ListView, set the Source property (when you are
-	///   providing your own rendering via the IListDataSource implementation) or call SetSource
-	///   when you are providing an IList.
+	///   To change the contents of the ListView, set the <see cref="Source"/> property (when 
+	///   providing custom rendering via <see cref="IListDataSource"/>) or call <see cref="SetSource"/>
+	///   an <see cref="IList"/> is being used.
 	/// </para>
 	/// <para>
-	///   When AllowsMark is set to true, then the rendering will prefix the list rendering with
-	///   [x] or [ ] and bind the space character to toggle the selection.  If you desire a different
-	///   marking style do not set the property and provide your own custom rendering.
+	///   When <see cref="AllowsMarking"/> is set to true the rendering will prefix the rendered items with
+	///   [x] or [ ] and bind the SPACE key to toggle the selection. To implement a different
+	///   marking style set <see cref="AllowsMarking"/> to false and implement custom rendering.
 	/// </para>
 	/// </remarks>
 	public class ListView : View {
@@ -101,9 +108,12 @@ namespace Terminal.Gui {
 
 		IListDataSource source;
 		/// <summary>
-		/// Gets or sets the IListDataSource backing this view, use SetSource() if you want to set a new IList source.
+		/// Gets or sets the <see cref="IListDataSource"/> backing this <see cref="ListView"/>, enabling custom rendering.
 		/// </summary>
 		/// <value>The source.</value>
+		/// <remarks>
+		///  Use <see cref="SetSource"/> to set a new <see cref="IList"/> source.
+		/// </remarks>
 		public IListDataSource Source {
 			get => source;
 			set {
@@ -115,9 +125,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets the source to an IList value, if you want to set a full IListDataSource, use the Source property.
+		/// Sets the source of the <see cref="ListView"/> to an <see cref="IList"/>.
 		/// </summary>
-		/// <value>An item implementing the IList interface.</value>
+		/// <value>An object implementing the IList interface.</value>
+		/// <remarks>
+		///  Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custome rendering.
+		/// </remarks>
 		public void SetSource (IList source)
 		{
 			if (source == null)
@@ -128,9 +141,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets the source to an IList value asynchronously, if you want to set a full IListDataSource, use the Source property.
+		/// Sets the source to an <see cref="IList"/> value asynchronously.
 		/// </summary>
 		/// <value>An item implementing the IList interface.</value>
+		/// <remarks>
+		///  Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custome rendering.
+		/// </remarks>
 		public Task SetSourceAsync (IList source)
 		{
 			return Task.Factory.StartNew (() => {
@@ -144,14 +160,13 @@ namespace Terminal.Gui {
 
 		bool allowsMarking;
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.ListView"/> allows items to be marked.
+		/// Gets or sets whether this <see cref="ListView"/> allows items to be marked.
 		/// </summary>
 		/// <value><c>true</c> if allows marking elements of the list; otherwise, <c>false</c>.
 		/// </value>
 		/// <remarks>
-		/// If set to true, this will default to rendering the marked with "[x]", and unmarked valued with "[ ]"
-		/// spaces.   If you desire a different rendering, you need to implement your own renderer.   This will
-		/// also by default process the space character as a toggle for the selection.
+		/// If set to true, <see cref="ListView"/> will render items marked items with "[x]", and unmarked items with "[ ]"
+		/// spaces. SPACE key will toggle marking.
 		/// </remarks>
 		public bool AllowsMarking {
 			get => allowsMarking;
@@ -167,7 +182,7 @@ namespace Terminal.Gui {
 		public bool AllowsMultipleSelection { get; set; } = true;
 
 		/// <summary>
-		/// Gets or sets the item that is displayed at the top of the listview
+		/// Gets or sets the item that is displayed at the top of the <see cref="ListView"/>.
 		/// </summary>
 		/// <value>The top item.</value>
 		public int TopItem {
@@ -184,7 +199,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the currently selected item.
+		/// Gets or sets the index of the currently selected item.
 		/// </summary>
 		/// <value>The selected item.</value>
 		public int SelectedItem {
@@ -209,17 +224,20 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new ListView that will display the contents of the object implementing the IList interface, with relative positioning
+		/// Initializes a new instance of <see cref="ListView"/> that will display the contents of the object implementing the <see cref="IList"/> interface, 
+		/// with relative positioning.
 		/// </summary>
-		/// <param name="source">An IList data source, if the elements of the IList are strings or ustrings, the string is rendered, otherwise the ToString() method is invoked on the result.</param>
+		/// <param name="source">An <see cref="IList"/> data source, if the elements are strings or ustrings, the string is rendered, otherwise the ToString() method is invoked on the result.</param>
 		public ListView (IList source) : this (MakeWrapper (source))
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new ListView that will display the provided data source, uses relative positioning.
+		/// Initializes a new instance of <see cref="ListView"/> that will display the provided data source, using relative positioning.
 		/// </summary>
-		/// <param name="source">IListDataSource object that provides a mechanism to render the data. The number of elements on the collection should not change, if you must change, set the "Source" property to reset the internal settings of the ListView.</param>
+		/// <param name="source"><see cref="IListDataSource"/> object that provides a mechanism to render the data. 
+		/// The number of elements on the collection should not change, if you must change, set 
+		/// the "Source" property to reset the internal settings of the ListView.</param>
 		public ListView (IListDataSource source) : base ()
 		{
 			Source = source;
@@ -227,14 +245,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.ListView"/> class.   You must set the Source property for this to show something.
+		/// Initializes a new instance of <see cref="ListView"/>. Set the <see cref="Source"/> property to display something.
 		/// </summary>
 		public ListView () : base ()
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new ListView that will display the contents of the object implementing the IList interface with an absolute position.
+		/// Initializes a new instance of <see cref="ListView"/> that will display the contents of the object implementing the <see cref="IList"/> interface with an absolute position.
 		/// </summary>
 		/// <param name="rect">Frame for the listview.</param>
 		/// <param name="source">An IList data source, if the elements of the IList are strings or ustrings, the string is rendered, otherwise the ToString() method is invoked on the result.</param>
@@ -243,7 +261,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new ListView that will display the provided data source  with an absolute position
+		/// Initializes a new instance of <see cref="ListView"/> with the provided data source and an absolute position
 		/// </summary>
 		/// <param name="rect">Frame for the listview.</param>
 		/// <param name="source">IListDataSource object that provides a mechanism to render the data. The number of elements on the collection should not change, if you must change, set the "Source" property to reset the internal settings of the ListView.</param>
@@ -253,11 +271,8 @@ namespace Terminal.Gui {
 			CanFocus = true;
 		}
 
-		/// <summary>
-		/// Redraws the ListView
-		/// </summary>
-		/// <param name="region">Region.</param>
-		public override void Redraw(Rect region)
+		///<inheritdoc cref="Redraw(Rect)"/>
+		public override void Redraw (Rect region)
 		{
 			var current = ColorScheme.Focus;
 			Driver.SetAttribute (current);
@@ -279,26 +294,27 @@ namespace Terminal.Gui {
 				Move (0, row);
 				if (source == null || item >= source.Count) {
 					for (int c = 0; c < f.Width; c++)
-						Driver.AddRune(' ');
+						Driver.AddRune (' ');
 				} else {
 					if (allowsMarking) {
 						Driver.AddStr (source.IsMarked (item) ? (AllowsMultipleSelection ? "[x] " : "(o)") : (AllowsMultipleSelection ? "[ ] " : "( )"));
 					}
-					Source.Render(this, Driver, isSelected, item, col, row, f.Width-col);
+					Source.Render (this, Driver, isSelected, item, col, row, f.Width - col);
 				}
 			}
 		}
 
 		/// <summary>
-		/// This event is raised when the cursor selection has changed.
+		/// This event is raised when the selected item in the <see cref="ListView"/> has changed.
 		/// </summary>
-		public event Action SelectedChanged;
+		public event EventHandler<ListViewItemEventArgs> SelectedChanged;
 
 		/// <summary>
-		/// Handles cursor movement for this view, passes all other events.
+		/// This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
 		/// </summary>
-		/// <returns><c>true</c>, if key was processed, <c>false</c> otherwise.</returns>
-		/// <param name="kb">Keyboard event.</param>
+		public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
+
+		///<inheritdoc cref="ProcessKey(KeyEvent)"/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			if (source == null)
@@ -307,28 +323,37 @@ namespace Terminal.Gui {
 			switch (kb.Key) {
 			case Key.CursorUp:
 			case Key.ControlP:
-				return MoveUp();
+				return MoveUp ();
 
 			case Key.CursorDown:
 			case Key.ControlN:
-				return MoveDown();
+				return MoveDown ();
 
 			case Key.ControlV:
 			case Key.PageDown:
-				return MovePageDown();
+				return MovePageDown ();
 
 			case Key.PageUp:
-				return MovePageUp();
+				return MovePageUp ();
 
 			case Key.Space:
-				if (MarkUnmarkRow())
+				if (MarkUnmarkRow ())
 					return true;
 				else
 					break;
+
+			case Key.Enter:
+				OnOpenSelectedItem ();
+				break;
+
 			}
 			return base.ProcessKey (kb);
 		}
 
+		/// <summary>
+		/// Prevents marking if it's not allowed mark and if it's not allows multiple selection.
+		/// </summary>
+		/// <returns></returns>
 		public virtual bool AllowsAll ()
 		{
 			if (!allowsMarking)
@@ -344,79 +369,128 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		public virtual bool MarkUnmarkRow(){
+		/// <summary>
+		/// Marks an unmarked row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MarkUnmarkRow ()
+		{
 			if (AllowsAll ()) {
-				Source.SetMark(SelectedItem, !Source.IsMarked(SelectedItem));
-				SetNeedsDisplay();
+				Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
+				SetNeedsDisplay ();
 				return true;
 			}
 
 			return false;
 		}
 
-		public virtual bool MovePageUp(){
+		/// <summary>
+		/// Moves the selected item index to the next page.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MovePageUp ()
+		{
 			int n = (selected - Frame.Height);
 			if (n < 0)
 				n = 0;
-			if (n != selected){
+			if (n != selected) {
 				selected = n;
 				top = selected;
-				if (SelectedChanged != null)
-					SelectedChanged();
-				SetNeedsDisplay();
-			}
-
-			return true;
-		}
-
-		public virtual bool MovePageDown(){
-			var n = (selected + Frame.Height);
-			if (n > source.Count)
-				n = source.Count - 1;
-			if (n != selected){
-				selected = n;
-				if (source.Count >= Frame.Height)
-					top = selected;
-				else
-					top = 0;
-				if (SelectedChanged != null)
-					SelectedChanged();
-				SetNeedsDisplay();
-			}
-
-			return true;
-		}
-
-		public virtual bool MoveDown(){
-			if (selected + 1 < source.Count){
-				selected++;
-				if (selected >= top + Frame.Height)
-					top++;
-				if (SelectedChanged != null)
-					SelectedChanged();
-				SetNeedsDisplay();
-			}
-
-			return true;
-		}
-
-		public virtual bool MoveUp(){
-			if (selected > 0){
-				selected--;
-				if (selected < top)
-					top = selected;
-				if (SelectedChanged != null)
-					SelectedChanged();
-				SetNeedsDisplay();
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
 			}
 
 			return true;
 		}
 
 		/// <summary>
-		/// Positions the cursor in this view
+		/// Moves the selected item index to the previous page.
 		/// </summary>
-		public override void PositionCursor()
+		/// <returns></returns>
+		public virtual bool MovePageDown ()
+		{
+			var n = (selected + Frame.Height);
+			if (n > source.Count)
+				n = source.Count - 1;
+			if (n != selected) {
+				selected = n;
+				if (source.Count >= Frame.Height)
+					top = selected;
+				else
+					top = 0;
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Moves the selected item index to the next row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MoveDown ()
+		{
+			if (selected + 1 < source.Count) {
+				selected++;
+				if (selected >= top + Frame.Height)
+					top++;
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Moves the selected item index to the previous row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MoveUp ()
+		{
+			if (selected > 0) {
+				selected--;
+				if (selected < top)
+					top = selected;
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
+			}
+
+			return true;
+		}
+
+		int lastSelectedItem = -1;
+
+		/// <summary>
+		/// Invokes the SelectedChanged event if it is defined.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool OnSelectedChanged ()
+		{
+			if (selected != lastSelectedItem) {
+				var value = source.ToList () [selected];
+				SelectedChanged?.Invoke (this, new ListViewItemEventArgs (selected, value));
+				lastSelectedItem = selected;
+				return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Invokes the OnOpenSelectedItem event if it is defined.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool OnOpenSelectedItem ()
+		{
+			var value = source.ToList () [selected];
+			OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (selected, value));
+
+			return true;
+		}
+
+		///<inheritdoc cref="PositionCursor"/>
+		public override void PositionCursor ()
 		{
 			if (allowsMarking)
 				Move (1, selected - top);
@@ -424,9 +498,11 @@ namespace Terminal.Gui {
 				Move (0, selected - top);
 		}
 
+		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
 		public override bool MouseEvent(MouseEvent me)
 		{
-			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked))
+			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
+				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp)
 				return false;
 
 			if (!HasFocus)
@@ -434,6 +510,14 @@ namespace Terminal.Gui {
 
 			if (source == null)
 				return false;
+
+			if (me.Flags == MouseFlags.WheeledDown) {
+				MoveDown ();
+				return true;
+			} else if (me.Flags == MouseFlags.WheeledUp) {
+				MoveUp ();
+				return true;
+			}
 
 			if (me.Y + top >= source.Count)
 				return true;
@@ -444,22 +528,27 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 				return true;
 			}
-			if (SelectedChanged != null)
-				SelectedChanged();
+			OnSelectedChanged ();
 			SetNeedsDisplay ();
+			if (me.Flags == MouseFlags.Button1DoubleClicked)
+				OnOpenSelectedItem ();
 			return true;
 		}
 	}
 
 	/// <summary>
-	/// This class is the built-in IListDataSource that renders arbitrary
-	/// IList instances
+	/// Implements an <see cref="IListDataSource"/> that renders arbitrary <see cref="IList"/> instances for <see cref="ListView"/>.
 	/// </summary>
+	/// <remarks>Implements support for rendering marked items.</remarks>
 	public class ListWrapper : IListDataSource {
 		IList src;
 		BitArray marks;
 		int count;
 
+		/// <summary>
+		/// Initializes a new instance of <see cref="ListWrapper"/> given an <see cref="IList"/>
+		/// </summary>
+		/// <param name="source"></param>
 		public ListWrapper (IList source)
 		{
 			count = source.Count;
@@ -467,6 +556,9 @@ namespace Terminal.Gui {
 			this.src = source;
 		}
 
+		/// <summary>
+		/// Gets the number of items in the <see cref="IList"/>.
+		/// </summary>
 		public int Count => src.Count;
 
 		void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width)
@@ -476,7 +568,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < byteLen;) {
 				(var rune, var size) = Utf8.DecodeRune (ustr, i, i - byteLen);
 				var count = Rune.ColumnWidth (rune);
-				if (used+count >= width)
+				if (used + count >= width)
 					break;
 				driver.AddRune (rune);
 				used += count;
@@ -487,18 +579,37 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Renders a <see cref="ListView"/> item to the appropriate type.
+		/// </summary>
+		/// <param name="container">The ListView.</param>
+		/// <param name="driver">The driver used by the caller.</param>
+		/// <param name="marked">Informs if it's marked or not.</param>
+		/// <param name="item">The item.</param>
+		/// <param name="col">The col where to move.</param>
+		/// <param name="line">The line where to move.</param>
+		/// <param name="width">The item width.</param>
 		public void Render (ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width)
 		{
 			container.Move (col, line);
 			var t = src [item];
-			if (t is ustring) {
-				RenderUstr (driver, (ustring)t, col, line, width);
-			} else if (t is string) {
-				RenderUstr (driver, (string)t, col, line, width);
-			} else
-				RenderUstr (driver, t.ToString (), col, line, width);
+			if (t == null) {
+				RenderUstr (driver, ustring.Make(""), col, line, width);
+			} else {
+				if (t is ustring) {
+					RenderUstr (driver, (ustring)t, col, line, width);
+				} else if (t is string) {
+					RenderUstr (driver, (string)t, col, line, width);
+				} else
+					RenderUstr (driver, t.ToString (), col, line, width);
+			}
 		}
 
+		/// <summary>
+		/// Returns true if the item is marked, false otherwise.
+		/// </summary>
+		/// <param name="item">The item.</param>
+		/// <returns><c>true</c>If is marked.<c>false</c>otherwise.</returns>
 		public bool IsMarked (int item)
 		{
 			if (item >= 0 && item < count)
@@ -506,10 +617,49 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		/// <summary>
+		/// Sets the item as marked or unmarked based on the value is true or false, respectively.
+		/// </summary>
+		/// <param name="item">The item</param>
+		/// <param name="value"><true>Marks the item.</true><false>Unmarked the item.</false>The value.</param>
 		public void SetMark (int item, bool value)
 		{
 			if (item >= 0 && item < count)
 				marks [item] = value;
+		}
+
+		/// <summary>
+		/// Returns the source as IList.
+		/// </summary>
+		/// <returns></returns>
+		public IList ToList ()
+		{
+			return src;
+		}
+	}
+
+	/// <summary>
+	/// <see cref="EventArgs"/> for <see cref="ListView"/> events.
+	/// </summary>
+	public class ListViewItemEventArgs : EventArgs {
+		/// <summary>
+		/// The index of the <see cref="ListView"/> item.
+		/// </summary>
+		public int Item { get; }
+		/// <summary>
+		/// The the <see cref="ListView"/> item.
+		/// </summary>
+		public object Value { get; }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="ListViewItemEventArgs"/>
+		/// </summary>
+		/// <param name="item">The index of the the <see cref="ListView"/> item.</param>
+		/// <param name="value">The <see cref="ListView"/> item</param>
+		public ListViewItemEventArgs (int item, object value)
+		{
+			Item = item;
+			Value = value;
 		}
 	}
 }

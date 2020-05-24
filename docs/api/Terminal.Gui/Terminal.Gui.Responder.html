@@ -10,18 +10,19 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Responder
    ">
-    <meta name="generator" content="docfx 2.18.2.0">
+    <meta name="generator" content="docfx 2.53.1.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="">
-    <meta property="docfx:tocrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
     
+    <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -36,7 +37,7 @@
               </button>
               
               <a class="navbar-brand" href="../../index.html">
-                <img id="logo" class="svg" src="../../logo.svg" alt="">
+                <img id="logo" class="svg" src="../../images/logo48.png" alt="">
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
@@ -57,6 +58,16 @@
           </div>
         </div>
       </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -70,34 +81,47 @@
             <article class="content wrap" id="_content" data-uid="Terminal.Gui.Responder">
   
   
-  <h1 id="Terminal_Gui_Responder" data-uid="Terminal.Gui.Responder">Class Responder
+  <h1 id="Terminal_Gui_Responder" data-uid="Terminal.Gui.Responder" class="text-break">Class Responder
   </h1>
-  <div class="markdown level0 summary"><p>Responder base class implemented by objects that want to participate on keyboard and mouse input.</p>
+  <div class="markdown level0 summary">
+Responder base class implemented by objects that want to participate on keyboard and mouse input.
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">Responder</span></div>
-  </div>
       <div class="level2"><a class="xref" href="Terminal.Gui.View.html">View</a></div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="../Terminal.Gui.html">Terminal.Gui</a></h6>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Responder_syntax">Syntax</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class Responder</code></pre>
-  </div>
-  <h3 id="constructors">Constructors
-  </h3>
-  
-  
-  <a id="Terminal_Gui_Responder__ctor_" data-uid="Terminal.Gui.Responder.#ctor*"></a>
-  <h4 id="Terminal_Gui_Responder__ctor" data-uid="Terminal.Gui.Responder.#ctor">Responder()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Responder ();</code></pre>
   </div>
   <h3 id="properties">Properties
   </h3>
@@ -105,7 +129,8 @@
   
   <a id="Terminal_Gui_Responder_CanFocus_" data-uid="Terminal.Gui.Responder.CanFocus*"></a>
   <h4 id="Terminal_Gui_Responder_CanFocus" data-uid="Terminal.Gui.Responder.CanFocus">CanFocus</h4>
-  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.Responder.html">Responder</a> can focus.</p>
+  <div class="markdown level1 summary">
+Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.Responder.html">Responder</a> can focus.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -123,8 +148,7 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><p><code>true</code> if can focus; otherwise, <code>false</code>.</p>
-</td>
+        <td><code>true</code> if can focus; otherwise, <code>false</code>.</td>
       </tr>
     </tbody>
   </table>
@@ -132,7 +156,8 @@
   
   <a id="Terminal_Gui_Responder_HasFocus_" data-uid="Terminal.Gui.Responder.HasFocus*"></a>
   <h4 id="Terminal_Gui_Responder_HasFocus" data-uid="Terminal.Gui.Responder.HasFocus">HasFocus</h4>
-  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.Responder.html">Responder</a> has focus.</p>
+  <div class="markdown level1 summary">
+Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.Responder.html">Responder</a> has focus.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -150,8 +175,7 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><p><code>true</code> if has focus; otherwise, <code>false</code>.</p>
-</td>
+        <td><code>true</code> if has focus; otherwise, <code>false</code>.</td>
       </tr>
     </tbody>
   </table>
@@ -161,12 +185,13 @@
   
   <a id="Terminal_Gui_Responder_MouseEvent_" data-uid="Terminal.Gui.Responder.MouseEvent*"></a>
   <h4 id="Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
-  <div class="markdown level1 summary"><p>Method invoked when a mouse event is generated</p>
+  <div class="markdown level1 summary">
+Method invoked when a mouse event is generated
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual bool MouseEvent (Terminal.Gui.MouseEvent mouseEvent);</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual bool MouseEvent(MouseEvent mouseEvent)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -181,8 +206,7 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></td>
         <td><span class="parametername">mouseEvent</span></td>
-        <td><p>Contains the details about the mouse event.</p>
-</td>
+        <td>Contains the details about the mouse event.</td>
       </tr>
     </tbody>
   </table>
@@ -197,24 +221,48 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><p><code>true</code>, if the event was handled, <code>false</code> otherwise.</p>
-</td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_Responder_ProcessColdKey_" data-uid="Terminal.Gui.Responder.ProcessColdKey*"></a>
-  <h4 id="Terminal_Gui_Responder_ProcessColdKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Responder.ProcessColdKey(Terminal.Gui.KeyEvent)">ProcessColdKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"><p>This method can be overwritten by views that
-                want to provide accelerator functionality
-                (Alt-key for example), but without
-                interefering with normal ProcessKey behavior.</p>
+  <a id="Terminal_Gui_Responder_OnEnter_" data-uid="Terminal.Gui.Responder.OnEnter*"></a>
+  <h4 id="Terminal_Gui_Responder_OnEnter" data-uid="Terminal.Gui.Responder.OnEnter">OnEnter()</h4>
+  <div class="markdown level1 summary">
+Method invoked when a view gets focus.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual bool ProcessColdKey (Terminal.Gui.KeyEvent keyEvent);</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual bool OnEnter()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Responder_OnKeyDown_" data-uid="Terminal.Gui.Responder.OnKeyDown*"></a>
+  <h4 id="Terminal_Gui_Responder_OnKeyDown_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Responder.OnKeyDown(Terminal.Gui.KeyEvent)">OnKeyDown(KeyEvent)</h4>
+  <div class="markdown level1 summary">
+Method invoked when a key is pressed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool OnKeyDown(KeyEvent keyEvent)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -229,8 +277,7 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td><p>Contains the details about the key that produced the event.</p>
-</td>
+        <td>Contains the details about the key that produced the event.</td>
       </tr>
     </tbody>
   </table>
@@ -245,37 +292,245 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td>true if the event was handled</td>
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Responder_ProcessColdKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>
-                After keys are sent to the subviews on the
-                current view, all the view are
-                processed and the key is passed to the views
-                to allow some of them to process the keystroke
-                as a cold-key. </p>
-    <p>
-               This functionality is used, for example, by
-               default buttons to act on the enter key.
-               Processing this as a hot-key would prevent
-               non-default buttons from consuming the enter
-               keypress when they have the focus.
-             </p></div>
   
   
-  <a id="Terminal_Gui_Responder_ProcessHotKey_" data-uid="Terminal.Gui.Responder.ProcessHotKey*"></a>
-  <h4 id="Terminal_Gui_Responder_ProcessHotKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Responder.ProcessHotKey(Terminal.Gui.KeyEvent)">ProcessHotKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"><p>This method can be overwritten by view that
-                want to provide accelerator functionality
-                (Alt-key for example).</p>
+  <a id="Terminal_Gui_Responder_OnKeyUp_" data-uid="Terminal.Gui.Responder.OnKeyUp*"></a>
+  <h4 id="Terminal_Gui_Responder_OnKeyUp_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Responder.OnKeyUp(Terminal.Gui.KeyEvent)">OnKeyUp(KeyEvent)</h4>
+  <div class="markdown level1 summary">
+Method invoked when a key is released.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual bool ProcessHotKey (Terminal.Gui.KeyEvent kb);</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual bool OnKeyUp(KeyEvent keyEvent)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
+        <td><span class="parametername">keyEvent</span></td>
+        <td>Contains the details about the key that produced the event.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>true if the event was handled</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Responder_OnLeave_" data-uid="Terminal.Gui.Responder.OnLeave*"></a>
+  <h4 id="Terminal_Gui_Responder_OnLeave" data-uid="Terminal.Gui.Responder.OnLeave">OnLeave()</h4>
+  <div class="markdown level1 summary">
+Method invoked when a view loses focus.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool OnLeave()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Responder_OnMouseEnter_" data-uid="Terminal.Gui.Responder.OnMouseEnter*"></a>
+  <h4 id="Terminal_Gui_Responder_OnMouseEnter_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.Responder.OnMouseEnter(Terminal.Gui.MouseEvent)">OnMouseEnter(MouseEvent)</h4>
+  <div class="markdown level1 summary">
+Method invoked when a mouse event is generated for the first time.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool OnMouseEnter(MouseEvent mouseEvent)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></td>
+        <td><span class="parametername">mouseEvent</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Responder_OnMouseLeave_" data-uid="Terminal.Gui.Responder.OnMouseLeave*"></a>
+  <h4 id="Terminal_Gui_Responder_OnMouseLeave_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.Responder.OnMouseLeave(Terminal.Gui.MouseEvent)">OnMouseLeave(MouseEvent)</h4>
+  <div class="markdown level1 summary">
+Method invoked when a mouse event is generated for the last time.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool OnMouseLeave(MouseEvent mouseEvent)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></td>
+        <td><span class="parametername">mouseEvent</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Responder_ProcessColdKey_" data-uid="Terminal.Gui.Responder.ProcessColdKey*"></a>
+  <h4 id="Terminal_Gui_Responder_ProcessColdKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Responder.ProcessColdKey(Terminal.Gui.KeyEvent)">ProcessColdKey(KeyEvent)</h4>
+  <div class="markdown level1 summary">
+This method can be overwritten by views that
+want to provide accelerator functionality
+(Alt-key for example), but without
+interefering with normal ProcessKey behavior.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool ProcessColdKey(KeyEvent keyEvent)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
+        <td><span class="parametername">keyEvent</span></td>
+        <td>Contains the details about the key that produced the event.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_Responder_ProcessColdKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  After keys are sent to the subviews on the
+  current view, all the view are
+  processed and the key is passed to the views
+  to allow some of them to process the keystroke
+  as a cold-key. </p>
+<p>
+  This functionality is used, for example, by
+  default buttons to act on the enter key.
+  Processing this as a hot-key would prevent
+  non-default buttons from consuming the enter
+  keypress when they have the focus.
+</p>
+</div>
+  
+  
+  <a id="Terminal_Gui_Responder_ProcessHotKey_" data-uid="Terminal.Gui.Responder.ProcessHotKey*"></a>
+  <h4 id="Terminal_Gui_Responder_ProcessHotKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Responder.ProcessHotKey(Terminal.Gui.KeyEvent)">ProcessHotKey(KeyEvent)</h4>
+  <div class="markdown level1 summary">
+This method can be overwritten by view that
+want to provide accelerator functionality
+(Alt-key for example).
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool ProcessHotKey(KeyEvent kb)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -290,8 +545,7 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">kb</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -306,37 +560,39 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 id="Terminal_Gui_Responder_ProcessHotKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>
-                Before keys are sent to the subview on the
-                current view, all the views are
-                processed and the key is passed to the widgets
-                to allow some of them to process the keystroke
-                as a hot-key. </p>
-    <p>
-                For example, if you implement a button that
-                has a hotkey ok &quot;o&quot;, you would catch the
-                combination Alt-o here.  If the event is
-                caught, you must return true to stop the
-                keystroke from being dispatched to other
-                views.
-             </p></div>
+  <div class="markdown level1 remarks">
+<p>
+  Before keys are sent to the subview on the
+  current view, all the views are
+  processed and the key is passed to the widgets
+  to allow some of them to process the keystroke
+  as a hot-key. </p>
+<p>
+   For example, if you implement a button that
+   has a hotkey ok &quot;o&quot;, you would catch the
+   combination Alt-o here.  If the event is
+   caught, you must return true to stop the
+   keystroke from being dispatched to other
+   views.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_Responder_ProcessKey_" data-uid="Terminal.Gui.Responder.ProcessKey*"></a>
   <h4 id="Terminal_Gui_Responder_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Responder.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"><p>If the view is focused, gives the view a
-              chance to process the keystroke.</p>
+  <div class="markdown level1 summary">
+If the view is focused, gives the view a
+chance to process the keystroke.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual bool ProcessKey (Terminal.Gui.KeyEvent keyEvent);</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual bool ProcessKey(KeyEvent keyEvent)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -351,8 +607,7 @@
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td><p>Contains the details about the key that produced the event.</p>
-</td>
+        <td>Contains the details about the key that produced the event.</td>
       </tr>
     </tbody>
   </table>
@@ -367,28 +622,29 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 id="Terminal_Gui_Responder_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>
-                Views can override this method if they are
-                interested in processing the given keystroke.
-                If they consume the keystroke, they must
-                return true to stop the keystroke from being
-                processed by other widgets or consumed by the
-                widget engine.    If they return false, the
-                keystroke will be passed using the ProcessColdKey
-                method to other views to process.
-              </p>
-    <p>
-                The View implementation does nothing but return false,
-                so it is not necessary to call base.ProcessKey if you 
-                derive directly from View, but you should if you derive
-                other View subclasses.
-              </p></div>
+  <div class="markdown level1 remarks">
+<p>
+  Views can override this method if they are
+  interested in processing the given keystroke.
+  If they consume the keystroke, they must
+  return true to stop the keystroke from being
+  processed by other widgets or consumed by the
+  widget engine.    If they return false, the
+  keystroke will be passed using the ProcessColdKey
+  method to other views to process.
+</p>
+<p>
+  The View implementation does nothing but return false,
+  so it is not necessary to call base.ProcessKey if you
+  derive directly from View, but you should if you derive
+  other View subclasses.
+</p>
+</div>
 </article>
           </div>
           
@@ -414,7 +670,7 @@
               <a href="#top">Back to top</a>
             </span>
             
-            <span>Copyright © 2015-2017 Microsoft<br>Generated by <strong>DocFX</strong></span>
+            <span>Generated by <strong>DocFX</strong></span>
           </div>
         </div>
       </footer>

@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Mono.Terminal;
 using NStack;
 using Unix.Terminal;
@@ -17,6 +18,7 @@ namespace Terminal.Gui {
 	/// This is the Curses driver for the gui.cs/Terminal framework.
 	/// </summary>
 	public class CursesDriver : ConsoleDriver {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 		public override int Cols => Curses.Cols;
 		public override int Rows => Curses.Lines;
 
@@ -37,7 +39,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static bool sync;
+		static bool sync = false;
 		public override void AddRune (Rune rune)
 		{
 			if (Clip.Contains (ccol, crow)) {
@@ -51,7 +53,7 @@ namespace Terminal.Gui {
 			if (sync)
 				Application.Driver.Refresh ();
 			ccol++;
-			var runeWidth = Rune.ColumnWidth(rune);
+			var runeWidth = Rune.ColumnWidth (rune);
 			if (runeWidth > 1) {
 				for (int i = 1; i < runeWidth; i++) {
 					ccol++;
@@ -66,8 +68,13 @@ namespace Terminal.Gui {
 				AddRune (rune);
 		}
 
-		public override void Refresh () => Curses.refresh ();
-		public override void UpdateCursor () => Curses.refresh ();
+		public override void Refresh () {
+			Curses.refresh ();
+			if (Curses.CheckWinChange ()) {
+				TerminalResized?.Invoke ();
+			}
+		}
+		public override void UpdateCursor () => Refresh ();
 		public override void End () => Curses.endwin ();
 		public override void UpdateScreen () => window.redrawwin ();
 		public override void SetAttribute (Attribute c) => Curses.attrset (c.value);
@@ -177,16 +184,189 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static MouseEvent ToDriverMouse (Curses.MouseEvent cev)
+		Curses.Event? LastMouseButtonPressed = null;
+		bool IsButtonPressed = false;
+		bool cancelButtonClicked = false;
+		Point point;
+
+		MouseEvent ToDriverMouse (Curses.MouseEvent cev)
+		{
+			MouseFlags mouseFlag = MouseFlags.AllEvents;
+
+			if (LastMouseButtonPressed != null && cev.ButtonState != Curses.Event.ReportMousePosition) {
+				LastMouseButtonPressed = null;
+				IsButtonPressed = false;
+			}
+
+
+			if ((cev.ButtonState == Curses.Event.Button1Clicked || cev.ButtonState == Curses.Event.Button2Clicked ||
+				cev.ButtonState == Curses.Event.Button3Clicked) &&
+				LastMouseButtonPressed == null) {
+
+				IsButtonPressed = false;
+				mouseFlag = ProcessButtonClickedEvent (cev, mouseFlag);
+
+			} else if (((cev.ButtonState == Curses.Event.Button1Pressed || cev.ButtonState == Curses.Event.Button2Pressed ||
+				cev.ButtonState == Curses.Event.Button3Pressed) && LastMouseButtonPressed == null) ||
+				IsButtonPressed && cev.ButtonState == Curses.Event.ReportMousePosition) {
+
+				mouseFlag = (MouseFlags)cev.ButtonState;
+				if (cev.ButtonState != Curses.Event.ReportMousePosition)
+					LastMouseButtonPressed = cev.ButtonState;
+				IsButtonPressed = true;
+
+				if (cev.ButtonState == Curses.Event.ReportMousePosition) {
+					mouseFlag = (MouseFlags)LastMouseButtonPressed | MouseFlags.ReportMousePosition;
+					point = new Point ();
+					cancelButtonClicked = true;
+				} else {
+					point = new Point () {
+						X = cev.X,
+						Y = cev.Y
+					};
+				}
+
+				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
+					Task.Run (async () => {
+						while (IsButtonPressed && LastMouseButtonPressed != null) {
+							await Task.Delay (200);
+							var me = new MouseEvent () {
+								X = cev.X,
+								Y = cev.Y,
+								Flags = mouseFlag
+							};
+
+							var view = Application.wantContinuousButtonPressedView;
+							if (view == null)
+								break;
+							if (IsButtonPressed && LastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
+								mouseHandler (me);
+								mainLoop.Driver.Wakeup ();
+							}
+						}
+					});
+				}
+
+
+			} else if ((cev.ButtonState == Curses.Event.Button1Released || cev.ButtonState == Curses.Event.Button2Released ||
+				cev.ButtonState == Curses.Event.Button3Released)) {
+
+				mouseFlag = ProcessButtonReleasedEvent (cev, mouseFlag);
+				IsButtonPressed = false;
+
+			} else if (cev.ButtonState == Curses.Event.Button4Pressed) {
+
+				mouseFlag = MouseFlags.WheeledUp;
+
+			} else if (cev.ButtonState == Curses.Event.ReportMousePosition && cev.X == point.X && cev.Y == point.Y) {
+
+				mouseFlag = MouseFlags.WheeledDown;
+
+			}
+			else if (cev.ButtonState == Curses.Event.ReportMousePosition) {
+
+				mouseFlag = MouseFlags.ReportMousePosition;
+			} else {
+				mouseFlag = (MouseFlags)cev.ButtonState;
+			}
+
+			point = new Point () {
+				X = cev.X,
+				Y = cev.Y
+			};
+
+
+
+			if (cev.ID != 0)
+				mouseFlag = MouseFlags.WheeledDown;
+
+			return new MouseEvent () {
+				X = cev.X,
+				Y = cev.Y,
+				//Flags = (MouseFlags)cev.ButtonState
+				Flags = mouseFlag
+			};
+		}
+
+		private MouseFlags ProcessButtonClickedEvent (Curses.MouseEvent cev, MouseFlags mf)
+		{
+			LastMouseButtonPressed = cev.ButtonState;
+			mf = GetButtonState (cev, true);
+			mouseHandler (ProcessButtonState (cev, mf));
+			if (LastMouseButtonPressed != null && LastMouseButtonPressed == cev.ButtonState) {
+				mf = GetButtonState (cev, false);
+				mouseHandler (ProcessButtonState (cev, mf));
+				if (LastMouseButtonPressed != null && LastMouseButtonPressed == cev.ButtonState) {
+					mf = (MouseFlags)cev.ButtonState;
+				}
+			}
+			LastMouseButtonPressed = null;
+			return mf;
+		}
+
+		private MouseFlags ProcessButtonReleasedEvent (Curses.MouseEvent cev, MouseFlags mf)
+		{			
+			mf = (MouseFlags)cev.ButtonState;
+			mouseHandler (ProcessButtonState (cev, mf));
+			if (!cancelButtonClicked && LastMouseButtonPressed == null)
+				mf = GetButtonState (cev);
+			else
+				cancelButtonClicked = false;
+			return mf;
+		}
+
+		MouseFlags GetButtonState (Curses.MouseEvent cev, bool pressed = false)
+		{
+			MouseFlags mf = default;
+			switch (cev.ButtonState) {
+			case Curses.Event.Button1Clicked:
+				if (pressed)
+					mf = MouseFlags.Button1Pressed;
+				else
+					mf = MouseFlags.Button1Released;
+				break;
+
+			case Curses.Event.Button2Clicked:
+				if (pressed)
+					mf = MouseFlags.Button2Pressed;
+				else
+					mf = MouseFlags.Button2Released;
+				break;
+
+			case Curses.Event.Button3Clicked:
+				if (pressed)
+					mf = MouseFlags.Button3Pressed;
+				else
+					mf = MouseFlags.Button3Released;
+				break;
+
+			case Curses.Event.Button1Released:
+				mf = MouseFlags.Button1Clicked;
+				break;
+
+			case Curses.Event.Button2Released:
+				mf = MouseFlags.Button2Clicked;
+				break;
+
+			case Curses.Event.Button3Released:
+				mf = MouseFlags.Button3Clicked;
+				break;
+
+
+			}
+			return mf;
+		}
+
+		MouseEvent ProcessButtonState (Curses.MouseEvent cev, MouseFlags mf)
 		{
 			return new MouseEvent () {
 				X = cev.X,
 				Y = cev.Y,
-				Flags = (MouseFlags)cev.ButtonState
+				Flags = mf
 			};
 		}
 
-		void ProcessInput (Action<KeyEvent> keyHandler, Action<MouseEvent> mouseHandler)
+		void ProcessInput (Action<KeyEvent> keyHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			int wch;
 			var code = Curses.get_wch (out wch);
@@ -206,6 +386,7 @@ namespace Terminal.Gui {
 					return;
 				}
 				keyHandler (new KeyEvent (MapCursesKey (wch)));
+				keyUpHandler (new KeyEvent (MapCursesKey (wch)));
 				return;
 			}
 
@@ -213,7 +394,7 @@ namespace Terminal.Gui {
 			if (wch == 27) {
 				Curses.timeout (200);
 
-				code = Curses.get_wch (out wch);
+				code = Curses.get_wch (out int wch2);
 				if (code == Curses.KEY_CODE_YES)
 					keyHandler (new KeyEvent (Key.AltMask | MapCursesKey (wch)));
 				if (code == 0) {
@@ -221,32 +402,42 @@ namespace Terminal.Gui {
 
 					// The ESC-number handling, debatable.
 					// Simulates the AltMask itself by pressing Alt + Space.
-					if (wch == (int)Key.Space)
+					if (wch2 == (int)Key.Space)
 						key = new KeyEvent (Key.AltMask);
-					else if (wch - (int)Key.Space >= 'A' && wch - (int)Key.Space <= 'Z')
-						key = new KeyEvent ((Key)((uint)Key.AltMask + (wch - (int)Key.Space)));
-					else if (wch >= '1' && wch <= '9')
-						key = new KeyEvent ((Key)((int)Key.F1 + (wch - '0' - 1)));
-					else if (wch == '0')
+					else if (wch2 - (int)Key.Space >= 'A' && wch2 - (int)Key.Space <= 'Z')
+						key = new KeyEvent ((Key)((uint)Key.AltMask + (wch2 - (int)Key.Space)));
+					else if (wch2 >= '1' && wch <= '9')
+						key = new KeyEvent ((Key)((int)Key.F1 + (wch2 - '0' - 1)));
+					else if (wch2 == '0')
 						key = new KeyEvent (Key.F10);
-					else if (wch == 27)
-						key = new KeyEvent ((Key)wch);
+					else if (wch2 == 27)
+						key = new KeyEvent ((Key)wch2);
 					else
-						key = new KeyEvent (Key.AltMask | (Key)wch);
+						key = new KeyEvent (Key.AltMask | (Key)wch2);
 					keyHandler (key);
-				} else
+				} else {
 					keyHandler (new KeyEvent (Key.Esc));
-			} else
+				}
+			} else {
 				keyHandler (new KeyEvent ((Key)wch));
+			}
+			// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
+			// will not impact KeyUp.
+			keyUpHandler (new KeyEvent ((Key)wch));
 		}
+
+		Action<MouseEvent> mouseHandler;
+		MainLoop mainLoop;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-			Curses.timeout (-1);
+			Curses.timeout (0);
+			this.mouseHandler = mouseHandler;
+			this.mainLoop = mainLoop;
 
 			(mainLoop.Driver as Mono.Terminal.UnixMainLoop).AddWatch (0, Mono.Terminal.UnixMainLoop.Condition.PollIn, x => {
-				ProcessInput (keyHandler, mouseHandler);
+				ProcessInput (keyHandler, keyUpHandler, mouseHandler);
 				return true;
 			});
 
@@ -308,7 +499,7 @@ namespace Terminal.Gui {
 				Colors.Menu.Focus = Curses.A_BOLD | MakeColor (Curses.COLOR_WHITE, Curses.COLOR_BLACK);
 				Colors.Menu.HotNormal = Curses.A_BOLD | MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_CYAN);
 				Colors.Menu.Normal = Curses.A_BOLD | MakeColor (Curses.COLOR_WHITE, Curses.COLOR_CYAN);
-				Colors.Menu.Disabled = MakeColor(Curses.COLOR_WHITE, Curses.COLOR_CYAN);
+				Colors.Menu.Disabled = MakeColor (Curses.COLOR_WHITE, Curses.COLOR_CYAN);
 
 				Colors.Dialog.Normal = MakeColor (Curses.COLOR_BLACK, Curses.COLOR_WHITE);
 				Colors.Dialog.Focus = MakeColor (Curses.COLOR_BLACK, Curses.COLOR_CYAN);
@@ -413,21 +604,21 @@ namespace Terminal.Gui {
 			Console.Out.Flush ();
 		}
 
-		int lastMouseInterval;
-		bool mouseGrabbed;
+		//int lastMouseInterval;
+		//bool mouseGrabbed;
 
 		public override void UncookMouse ()
 		{
-			if (mouseGrabbed)
-				return;
-			lastMouseInterval = Curses.mouseinterval (0);
-			mouseGrabbed = true;
+			//if (mouseGrabbed)
+			//	return;
+			//lastMouseInterval = Curses.mouseinterval (0);
+			//mouseGrabbed = true;
 		}
 
 		public override void CookMouse ()
 		{
-			mouseGrabbed = false;
-			Curses.mouseinterval (lastMouseInterval);
+			//mouseGrabbed = false;
+			//Curses.mouseinterval (lastMouseInterval);
 		}
 	}
 
@@ -490,6 +681,7 @@ namespace Terminal.Gui {
 			killpg (0, signal);
 			return true;
 		}
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 	}
 
 }

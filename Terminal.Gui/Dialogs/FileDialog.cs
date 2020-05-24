@@ -212,9 +212,9 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public Action<(string,bool)> SelectedChanged;
-		public Action<ustring> DirectoryChanged;
-		public Action<ustring> FileChanged;
+		public Action<(string, bool)> SelectedChanged { get; set; }
+		public Action<ustring> DirectoryChanged { get; set; }
+		public Action<ustring> FileChanged { get; set; }
 
 		void SelectionChanged ()
 		{
@@ -417,7 +417,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Base class for the OpenDialog and the SaveDialog
+	/// Base class for the <see cref="OpenDialog"/> and the <see cref="SaveDialog"/>
 	/// </summary>
 	public class FileDialog : Dialog {
 		Button prompt, cancel;
@@ -426,7 +426,7 @@ namespace Terminal.Gui {
 		internal DirListView dirListView;
 
 		/// <summary>
-		/// Constructor for the OpenDialog and the SaveDialog.
+		/// Initializes a new instance of <see cref="FileDialog"/>
 		/// </summary>
 		/// <param name="title">The title.</param>
 		/// <param name="prompt">The prompt.</param>
@@ -494,6 +494,7 @@ namespace Terminal.Gui {
 
 		internal bool canceled;
 
+		///<inheritdoc cref="WillPresent"/>
 		public override void WillPresent ()
 		{
 			base.WillPresent ();
@@ -501,7 +502,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the prompt label for the button displayed to the user
+		/// Gets or sets the prompt label for the <see cref="Button"/> displayed to the user
 		/// </summary>
 		/// <value>The prompt.</value>
 		public ustring Prompt {
@@ -534,13 +535,13 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.FileDialog"/> can create directories.
+		/// Gets or sets a value indicating whether this <see cref="FileDialog"/> can create directories.
 		/// </summary>
 		/// <value><c>true</c> if can create directories; otherwise, <c>false</c>.</value>
 		public bool CanCreateDirectories { get; set; }
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.FileDialog"/> is extension hidden.
+		/// Gets or sets a value indicating whether this <see cref="FileDialog"/> is extension hidden.
 		/// </summary>
 		/// <value><c>true</c> if is extension hidden; otherwise, <c>false</c>.</value>
 		public bool IsExtensionHidden { get; set; }
@@ -568,7 +569,7 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.FileDialog"/> allows the file to be saved with a different extension
+		/// Gets or sets a value indicating whether this <see cref="FileDialog"/> allows the file to be saved with a different extension
 		/// </summary>
 		/// <value><c>true</c> if allows other file types; otherwise, <c>false</c>.</value>
 		public bool AllowsOtherFileTypes { get; set; }
@@ -591,20 +592,20 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	///  The save dialog provides an interactive dialog box for users to pick a file to 
+	///  The <see cref="SaveDialog"/> provides an interactive dialog box for users to pick a file to 
 	///  save.
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	///   To use it, create an instance of the SaveDialog, and then
-	///   call Application.Run on the resulting instance.   This will run the dialog modally,
-	///   and when this returns, the FileName property will contain the selected value or 
+	///   To use, create an instance of <see cref="SaveDialog"/>, and pass it to
+	///   <see cref="Application.Run()"/>. This will run the dialog modally,
+	///   and when this returns, the <see cref="FileName"/>property will contain the selected file name or 
 	///   null if the user canceled. 
 	/// </para>
 	/// </remarks>
 	public class SaveDialog : FileDialog {
 		/// <summary>
-		/// Constructor of the save dialog.
+		/// Initializes a new <see cref="SaveDialog"/>
 		/// </summary>
 		/// <param name="title">The title.</param>
 		/// <param name="message">The message.</param>
@@ -614,7 +615,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets the name of the file the user selected for saving, or null
-		/// if the user canceled the dialog box.
+		/// if the user canceled the <see cref="SaveDialog"/>.
 		/// </summary>
 		/// <value>The name of the file.</value>
 		public ustring FileName {
@@ -627,7 +628,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// The Open Dialog provides an interactive dialog box for users to select files or directories.
+	/// The <see cref="OpenDialog"/>provides an interactive dialog box for users to select files or directories.
 	/// </summary>
 	/// <remarks>
 	/// <para>
@@ -636,9 +637,9 @@ namespace Terminal.Gui {
 	///   you can control whether this should allow files or directories to be selected.
 	/// </para>
 	/// <para>
-	///   To use it, create an instance of the OpenDialog, configure its properties, and then
-	///   call Application.Run on the resulting instance.   This will run the dialog modally,
-	///   and when this returns, the list of filds will be available on the FilePaths property.
+	///   To use, create an instance of <see cref="OpenDialog"/>, and pass it to
+	///   <see cref="Application.Run()"/>. This will run the dialog modally,
+	///   and when this returns, the list of filds will be available on the <see cref="FilePaths"/> property.
 	/// </para>
 	/// <para>
 	/// To select more than one file, users can use the spacebar, or control-t.
@@ -646,7 +647,7 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class OpenDialog : FileDialog {
 		/// <summary>
-		/// Constructor of the Open Dialog.
+		/// Initializes a new <see cref="OpenDialog"/>
 		/// </summary>
 		/// <param name="title"></param>
 		/// <param name="message"></param>
@@ -655,7 +656,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.OpenDialog"/> can choose files.
+		/// Gets or sets a value indicating whether this <see cref="Terminal.Gui.OpenDialog"/> can choose files.
 		/// </summary>
 		/// <value><c>true</c> if can choose files; otherwise, <c>false</c>.  Defaults to <c>true</c></value>
 		public bool CanChooseFiles {
@@ -667,7 +668,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.OpenDialog"/> can choose directories.
+		/// Gets or sets a value indicating whether this <see cref="OpenDialog"/> can choose directories.
 		/// </summary>
 		/// <value><c>true</c> if can choose directories; otherwise, <c>false</c> defaults to <c>false</c>.</value>
 		public bool CanChooseDirectories {
@@ -679,7 +680,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.OpenDialog"/> allows multiple selection.
+		/// Gets or sets a value indicating whether this <see cref="OpenDialog"/> allows multiple selection.
 		/// </summary>
 		/// <value><c>true</c> if allows multiple selection; otherwise, <c>false</c>, defaults to false.</value>
 		public bool AllowsMultipleSelection {

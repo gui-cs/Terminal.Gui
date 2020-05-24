@@ -9,7 +9,7 @@ using System;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// The Key enumeration contains special encoding for some keys, but can also
+	/// The <see cref="Key"/> enumeration contains special encoding for some keys, but can also
 	/// encode all the unicode values that can be passed.   
 	/// </summary>
 	/// <remarks>
@@ -45,7 +45,7 @@ namespace Terminal.Gui {
 		ControlSpace = 0,
 
 		/// <summary>
-	        /// The key code for the user pressing Control-A
+		/// The key code for the user pressing Control-A
 		/// </summary>
 		ControlA = 1,
 		/// <summary>
@@ -288,8 +288,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Describes a keyboard event.
 	/// </summary>
-	public struct KeyEvent {
-
+	public class KeyEvent {
 		/// <summary>
 		/// Symb olid definition for the key.
 		/// </summary>
@@ -322,11 +321,42 @@ namespace Terminal.Gui {
 		public bool IsCtrl => (Key & Key.CtrlMask) != 0;
 
 		/// <summary>
-		///   Constructs a new KeyEvent from the provided Key value - can be a rune cast into a Key value
+		/// Constructs a new <see cref="KeyEvent"/>
+		/// </summary>
+		public KeyEvent ()
+		{
+			Key = Key.Unknown;
+		}
+
+		/// <summary>
+		///   Constructs a new <see cref="KeyEvent"/> from the provided Key value - can be a rune cast into a Key value
 		/// </summary>
 		public KeyEvent (Key k)
 		{
 			Key = k;
+		}
+
+		///<inheritdoc cref="ToString"/>
+		public override string ToString ()
+		{
+			string msg = "";
+			var key = this.Key;
+			if ((this.Key & Key.ShiftMask) != 0) {
+				msg += "Shift-";
+			}
+			if ((this.Key & Key.CtrlMask) != 0) {
+				msg += "Ctrl-";
+			}
+			if ((this.Key & Key.AltMask) != 0) {
+				msg += "Alt-";
+			}
+
+			if (string.IsNullOrEmpty (msg)) {
+				msg += $"{(((uint)this.KeyValue & (uint)Key.CharMask) > 27 ? $"{(char)this.KeyValue}" : $"{key}")}";
+			} else {
+				msg += $"{(((uint)this.KeyValue & (uint)Key.CharMask) > 27 ? $"{(char)this.KeyValue}" : $"")}";
+			}
+			return msg;
 		}
 	}
 
@@ -483,10 +513,10 @@ namespace Terminal.Gui {
 		public View View;
 
 		/// <summary>
-		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.MouseEvent"/>.
+		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.
 		/// </summary>
-		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.MouseEvent"/>.</returns>
-		public override string ToString()
+		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</returns>
+		public override string ToString ()
 		{
 			return $"({X},{Y}:{Flags}";
 		}

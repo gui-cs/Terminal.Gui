@@ -31,6 +31,7 @@ using System.Runtime.InteropServices;
 namespace Unix.Terminal {
 
 	public partial class Curses {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 		public class Window {
 			public readonly IntPtr Handle;
 			static Window curscr;
@@ -167,7 +168,8 @@ namespace Unix.Terminal {
 	 			Handle = handle;
 	 		}
 	 	}
-	 
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 	}
 
 }

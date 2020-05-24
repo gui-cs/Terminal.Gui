@@ -1,119 +1,786 @@
 ### YamlMime:ManagedReference
 items:
 - uid: Terminal.Gui.MenuBarItem
+  commentId: T:Terminal.Gui.MenuBarItem
   id: MenuBarItem
+  parent: Terminal.Gui
   children:
+  - Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,System.String,System.Action,System.Func{System.Boolean})
   - Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,Terminal.Gui.MenuItem[])
+  - Terminal.Gui.MenuBarItem.#ctor(Terminal.Gui.MenuItem[])
   - Terminal.Gui.MenuBarItem.Children
-  - Terminal.Gui.MenuBarItem.Title
   langs:
   - csharp
+  - vb
   name: MenuBarItem
   nameWithType: MenuBarItem
   fullName: Terminal.Gui.MenuBarItem
   type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/Menu.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: MenuBarItem
+    path: ../Terminal.Gui/Views/Menu.cs
+    startLine: 143
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: A menu bar item contains other menu items.
+  summary: "\nA <xref href=\"Terminal.Gui.MenuBarItem\" data-throw-if-not-resolved=\"false\"></xref> contains <xref href=\"Terminal.Gui.MenuBarItem\" data-throw-if-not-resolved=\"false\"></xref>s or <xref href=\"Terminal.Gui.MenuItem\" data-throw-if-not-resolved=\"false\"></xref>s.\n"
+  example: []
   syntax:
-    content: public class MenuBarItem
+    content: 'public class MenuBarItem : MenuItem'
+    content.vb: >-
+      Public Class MenuBarItem
+
+          Inherits MenuItem
   inheritance:
   - System.Object
-  implements: []
-  inheritedMembers: []
+  - Terminal.Gui.MenuItem
+  inheritedMembers:
+  - Terminal.Gui.MenuItem.HotKey
+  - Terminal.Gui.MenuItem.ShortCut
+  - Terminal.Gui.MenuItem.Title
+  - Terminal.Gui.MenuItem.Help
+  - Terminal.Gui.MenuItem.Action
+  - Terminal.Gui.MenuItem.CanExecute
+  - Terminal.Gui.MenuItem.IsEnabled
+  - Terminal.Gui.MenuItem.GetMenuItem
+  - Terminal.Gui.MenuItem.GetMenuBarItem
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  modifiers.csharp:
+  - public
+  - class
+  modifiers.vb:
+  - Public
+  - Class
+- uid: Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,System.String,System.Action,System.Func{System.Boolean})
+  commentId: M:Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,System.String,System.Action,System.Func{System.Boolean})
+  id: '#ctor(NStack.ustring,System.String,System.Action,System.Func{System.Boolean})'
+  parent: Terminal.Gui.MenuBarItem
+  langs:
+  - csharp
+  - vb
+  name: MenuBarItem(ustring, String, Action, Func<Boolean>)
+  nameWithType: MenuBarItem.MenuBarItem(ustring, String, Action, Func<Boolean>)
+  fullName: Terminal.Gui.MenuBarItem.MenuBarItem(NStack.ustring, System.String, System.Action, System.Func<System.Boolean>)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/Menu.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/Menu.cs
+    startLine: 151
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nInitializes a new <xref href=\"Terminal.Gui.MenuBarItem\" data-throw-if-not-resolved=\"false\"></xref> as a <xref href=\"Terminal.Gui.MenuItem\" data-throw-if-not-resolved=\"false\"></xref>.\n"
+  example: []
+  syntax:
+    content: public MenuBarItem(ustring title, string help, Action action, Func<bool> canExecute = null)
+    parameters:
+    - id: title
+      type: NStack.ustring
+      description: Title for the menu item.
+    - id: help
+      type: System.String
+      description: Help text to display.
+    - id: action
+      type: System.Action
+      description: Action to invoke when the menu item is activated.
+    - id: canExecute
+      type: System.Func{System.Boolean}
+      description: Function to determine if the action can currently be executred.
+    content.vb: Public Sub New(title As ustring, help As String, action As Action, canExecute As Func(Of Boolean) = Nothing)
+  overload: Terminal.Gui.MenuBarItem.#ctor*
+  nameWithType.vb: MenuBarItem.MenuBarItem(ustring, String, Action, Func(Of Boolean))
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+  fullName.vb: Terminal.Gui.MenuBarItem.MenuBarItem(NStack.ustring, System.String, System.Action, System.Func(Of System.Boolean))
+  name.vb: MenuBarItem(ustring, String, Action, Func(Of Boolean))
 - uid: Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,Terminal.Gui.MenuItem[])
+  commentId: M:Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,Terminal.Gui.MenuItem[])
   id: '#ctor(NStack.ustring,Terminal.Gui.MenuItem[])'
   parent: Terminal.Gui.MenuBarItem
   langs:
   - csharp
+  - vb
   name: MenuBarItem(ustring, MenuItem[])
   nameWithType: MenuBarItem.MenuBarItem(ustring, MenuItem[])
-  fullName: MenuBarItem.MenuBarItem(ustring, MenuItem[])
+  fullName: Terminal.Gui.MenuBarItem.MenuBarItem(NStack.ustring, Terminal.Gui.MenuItem[])
   type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/Menu.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/Menu.cs
+    startLine: 162
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
+  summary: "\nInitializes a new <xref href=\"Terminal.Gui.MenuBarItem\" data-throw-if-not-resolved=\"false\"></xref>.\n"
+  example: []
   syntax:
-    content: public MenuBarItem (NStack.ustring title, Terminal.Gui.MenuItem[] children);
+    content: public MenuBarItem(ustring title, MenuItem[] children)
     parameters:
     - id: title
       type: NStack.ustring
-      description: To be added.
+      description: Title for the menu item.
     - id: children
       type: Terminal.Gui.MenuItem[]
-      description: To be added.
+      description: The items in the current menu.
+    content.vb: Public Sub New(title As ustring, children As MenuItem())
   overload: Terminal.Gui.MenuBarItem.#ctor*
-  exceptions: []
+  nameWithType.vb: MenuBarItem.MenuBarItem(ustring, MenuItem())
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+  fullName.vb: Terminal.Gui.MenuBarItem.MenuBarItem(NStack.ustring, Terminal.Gui.MenuItem())
+  name.vb: MenuBarItem(ustring, MenuItem())
+- uid: Terminal.Gui.MenuBarItem.#ctor(Terminal.Gui.MenuItem[])
+  commentId: M:Terminal.Gui.MenuBarItem.#ctor(Terminal.Gui.MenuItem[])
+  id: '#ctor(Terminal.Gui.MenuItem[])'
+  parent: Terminal.Gui.MenuBarItem
+  langs:
+  - csharp
+  - vb
+  name: MenuBarItem(MenuItem[])
+  nameWithType: MenuBarItem.MenuBarItem(MenuItem[])
+  fullName: Terminal.Gui.MenuBarItem.MenuBarItem(Terminal.Gui.MenuItem[])
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/Menu.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/Menu.cs
+    startLine: 175
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nInitializes a new <xref href=\"Terminal.Gui.MenuBarItem\" data-throw-if-not-resolved=\"false\"></xref>.\n"
+  example: []
+  syntax:
+    content: public MenuBarItem(MenuItem[] children)
+    parameters:
+    - id: children
+      type: Terminal.Gui.MenuItem[]
+      description: The items in the current menu.
+    content.vb: Public Sub New(children As MenuItem())
+  overload: Terminal.Gui.MenuBarItem.#ctor*
+  nameWithType.vb: MenuBarItem.MenuBarItem(MenuItem())
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+  fullName.vb: Terminal.Gui.MenuBarItem.MenuBarItem(Terminal.Gui.MenuItem())
+  name.vb: MenuBarItem(MenuItem())
 - uid: Terminal.Gui.MenuBarItem.Children
+  commentId: P:Terminal.Gui.MenuBarItem.Children
   id: Children
   parent: Terminal.Gui.MenuBarItem
   langs:
   - csharp
+  - vb
   name: Children
   nameWithType: MenuBarItem.Children
-  fullName: MenuBarItem.Children
+  fullName: Terminal.Gui.MenuBarItem.Children
   type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/Menu.cs
+      branch: docs_tweaks
+      repo: tig:tig/gui.cs.git
+    id: Children
+    path: ../Terminal.Gui/Views/Menu.cs
+    startLine: 222
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Gets or sets the children for this MenuBarItem
+  summary: "\nGets or sets an array of <xref href=\"Terminal.Gui.MenuItem\" data-throw-if-not-resolved=\"false\"></xref> objects that are the children of this <xref href=\"Terminal.Gui.MenuBarItem\" data-throw-if-not-resolved=\"false\"></xref>\n"
+  example: []
   syntax:
-    content: public Terminal.Gui.MenuItem[] Children { get; set; }
+    content: public MenuItem[] Children { get; set; }
+    parameters: []
     return:
       type: Terminal.Gui.MenuItem[]
       description: The children.
+    content.vb: Public Property Children As MenuItem()
   overload: Terminal.Gui.MenuBarItem.Children*
-  exceptions: []
-- uid: Terminal.Gui.MenuBarItem.Title
-  id: Title
-  parent: Terminal.Gui.MenuBarItem
-  langs:
-  - csharp
-  name: Title
-  nameWithType: MenuBarItem.Title
-  fullName: MenuBarItem.Title
-  type: Property
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Gets or sets the title to display.
-  syntax:
-    content: public NStack.ustring Title { get; set; }
-    return:
-      type: NStack.ustring
-      description: The title.
-  overload: Terminal.Gui.MenuBarItem.Title*
-  exceptions: []
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
 references:
+- uid: Terminal.Gui.MenuBarItem
+  commentId: T:Terminal.Gui.MenuBarItem
+  parent: Terminal.Gui
+  name: MenuBarItem
+  nameWithType: MenuBarItem
+  fullName: Terminal.Gui.MenuBarItem
+- uid: Terminal.Gui.MenuItem
+  commentId: T:Terminal.Gui.MenuItem
+  parent: Terminal.Gui
+  name: MenuItem
+  nameWithType: MenuItem
+  fullName: Terminal.Gui.MenuItem
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
 - uid: System.Object
+  commentId: T:System.Object
   parent: System
   isExternal: true
   name: Object
   nameWithType: Object
   fullName: System.Object
-- uid: Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,Terminal.Gui.MenuItem[])
-  parent: Terminal.Gui.MenuBarItem
-  isExternal: false
-  name: MenuBarItem(ustring, MenuItem[])
-  nameWithType: MenuBarItem.MenuBarItem(ustring, MenuItem[])
-  fullName: MenuBarItem.MenuBarItem(ustring, MenuItem[])
+- uid: Terminal.Gui.MenuItem.HotKey
+  commentId: F:Terminal.Gui.MenuItem.HotKey
+  parent: Terminal.Gui.MenuItem
+  name: HotKey
+  nameWithType: MenuItem.HotKey
+  fullName: Terminal.Gui.MenuItem.HotKey
+- uid: Terminal.Gui.MenuItem.ShortCut
+  commentId: F:Terminal.Gui.MenuItem.ShortCut
+  parent: Terminal.Gui.MenuItem
+  name: ShortCut
+  nameWithType: MenuItem.ShortCut
+  fullName: Terminal.Gui.MenuItem.ShortCut
+- uid: Terminal.Gui.MenuItem.Title
+  commentId: P:Terminal.Gui.MenuItem.Title
+  parent: Terminal.Gui.MenuItem
+  name: Title
+  nameWithType: MenuItem.Title
+  fullName: Terminal.Gui.MenuItem.Title
+- uid: Terminal.Gui.MenuItem.Help
+  commentId: P:Terminal.Gui.MenuItem.Help
+  parent: Terminal.Gui.MenuItem
+  name: Help
+  nameWithType: MenuItem.Help
+  fullName: Terminal.Gui.MenuItem.Help
+- uid: Terminal.Gui.MenuItem.Action
+  commentId: P:Terminal.Gui.MenuItem.Action
+  parent: Terminal.Gui.MenuItem
+  name: Action
+  nameWithType: MenuItem.Action
+  fullName: Terminal.Gui.MenuItem.Action
+- uid: Terminal.Gui.MenuItem.CanExecute
+  commentId: P:Terminal.Gui.MenuItem.CanExecute
+  parent: Terminal.Gui.MenuItem
+  name: CanExecute
+  nameWithType: MenuItem.CanExecute
+  fullName: Terminal.Gui.MenuItem.CanExecute
+- uid: Terminal.Gui.MenuItem.IsEnabled
+  commentId: M:Terminal.Gui.MenuItem.IsEnabled
+  parent: Terminal.Gui.MenuItem
+  name: IsEnabled()
+  nameWithType: MenuItem.IsEnabled()
+  fullName: Terminal.Gui.MenuItem.IsEnabled()
+  spec.csharp:
+  - uid: Terminal.Gui.MenuItem.IsEnabled
+    name: IsEnabled
+    nameWithType: MenuItem.IsEnabled
+    fullName: Terminal.Gui.MenuItem.IsEnabled
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.MenuItem.IsEnabled
+    name: IsEnabled
+    nameWithType: MenuItem.IsEnabled
+    fullName: Terminal.Gui.MenuItem.IsEnabled
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.MenuItem.GetMenuItem
+  commentId: M:Terminal.Gui.MenuItem.GetMenuItem
+  parent: Terminal.Gui.MenuItem
+  name: GetMenuItem()
+  nameWithType: MenuItem.GetMenuItem()
+  fullName: Terminal.Gui.MenuItem.GetMenuItem()
+  spec.csharp:
+  - uid: Terminal.Gui.MenuItem.GetMenuItem
+    name: GetMenuItem
+    nameWithType: MenuItem.GetMenuItem
+    fullName: Terminal.Gui.MenuItem.GetMenuItem
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.MenuItem.GetMenuItem
+    name: GetMenuItem
+    nameWithType: MenuItem.GetMenuItem
+    fullName: Terminal.Gui.MenuItem.GetMenuItem
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.MenuItem.GetMenuBarItem
+  commentId: M:Terminal.Gui.MenuItem.GetMenuBarItem
+  parent: Terminal.Gui.MenuItem
+  name: GetMenuBarItem()
+  nameWithType: MenuItem.GetMenuBarItem()
+  fullName: Terminal.Gui.MenuItem.GetMenuBarItem()
+  spec.csharp:
+  - uid: Terminal.Gui.MenuItem.GetMenuBarItem
+    name: GetMenuBarItem
+    nameWithType: MenuItem.GetMenuBarItem
+    fullName: Terminal.Gui.MenuItem.GetMenuBarItem
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.MenuItem.GetMenuBarItem
+    name: GetMenuBarItem
+    nameWithType: MenuItem.GetMenuBarItem
+    fullName: Terminal.Gui.MenuItem.GetMenuBarItem
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: Object.Equals(Object)
+  fullName: System.Object.Equals(System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: Object.GetHashCode()
+  fullName: System.Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  name: MemberwiseClone()
+  nameWithType: Object.MemberwiseClone()
+  fullName: System.Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  name: ToString()
+  nameWithType: Object.ToString()
+  fullName: System.Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.MenuBarItem.#ctor*
+  commentId: Overload:Terminal.Gui.MenuBarItem.#ctor
+  name: MenuBarItem
+  nameWithType: MenuBarItem.MenuBarItem
+  fullName: Terminal.Gui.MenuBarItem.MenuBarItem
 - uid: NStack.ustring
+  commentId: T:NStack.ustring
   parent: NStack
   isExternal: true
   name: ustring
   nameWithType: ustring
   fullName: NStack.ustring
-- uid: Terminal.Gui.MenuItem
-  name: MenuItem
-  nameWithType: MenuItem
-  fullName: Terminal.Gui.MenuItem
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: String
+  nameWithType: String
+  fullName: System.String
+- uid: System.Action
+  commentId: T:System.Action
+  parent: System
+  isExternal: true
+  name: Action
+  nameWithType: Action
+  fullName: System.Action
+- uid: System.Func{System.Boolean}
+  commentId: T:System.Func{System.Boolean}
+  parent: System
+  definition: System.Func`1
+  name: Func<Boolean>
+  nameWithType: Func<Boolean>
+  fullName: System.Func<System.Boolean>
+  nameWithType.vb: Func(Of Boolean)
+  fullName.vb: System.Func(Of System.Boolean)
+  name.vb: Func(Of Boolean)
+  spec.csharp:
+  - uid: System.Func`1
+    name: Func
+    nameWithType: Func
+    fullName: System.Func
+    isExternal: true
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+  spec.vb:
+  - uid: System.Func`1
+    name: Func
+    nameWithType: Func
+    fullName: System.Func
+    isExternal: true
+  - name: '(Of '
+    nameWithType: '(Of '
+    fullName: '(Of '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: NStack
+  commentId: N:NStack
+  isExternal: true
+  name: NStack
+  nameWithType: NStack
+  fullName: NStack
+- uid: System.Func`1
+  commentId: T:System.Func`1
+  isExternal: true
+  name: Func<TResult>
+  nameWithType: Func<TResult>
+  fullName: System.Func<TResult>
+  nameWithType.vb: Func(Of TResult)
+  fullName.vb: System.Func(Of TResult)
+  name.vb: Func(Of TResult)
+  spec.csharp:
+  - uid: System.Func`1
+    name: Func
+    nameWithType: Func
+    fullName: System.Func
+    isExternal: true
+  - name: <
+    nameWithType: <
+    fullName: <
+  - name: TResult
+    nameWithType: TResult
+    fullName: TResult
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+  spec.vb:
+  - uid: System.Func`1
+    name: Func
+    nameWithType: Func
+    fullName: System.Func
+    isExternal: true
+  - name: '(Of '
+    nameWithType: '(Of '
+    fullName: '(Of '
+  - name: TResult
+    nameWithType: TResult
+    fullName: TResult
+  - name: )
+    nameWithType: )
+    fullName: )
 - uid: Terminal.Gui.MenuItem[]
-  parent: Terminal.Gui
-  isExternal: false
+  isExternal: true
   name: MenuItem[]
   nameWithType: MenuItem[]
   fullName: Terminal.Gui.MenuItem[]
+  nameWithType.vb: MenuItem()
+  fullName.vb: Terminal.Gui.MenuItem()
+  name.vb: MenuItem()
   spec.csharp:
   - uid: Terminal.Gui.MenuItem
     name: MenuItem
@@ -122,33 +789,17 @@ references:
   - name: '[]'
     nameWithType: '[]'
     fullName: '[]'
-- uid: Terminal.Gui.MenuBarItem.Children
-  parent: Terminal.Gui.MenuBarItem
-  isExternal: false
-  name: Children
-  nameWithType: MenuBarItem.Children
-  fullName: MenuBarItem.Children
-- uid: Terminal.Gui.MenuBarItem.Title
-  parent: Terminal.Gui.MenuBarItem
-  isExternal: false
-  name: Title
-  nameWithType: MenuBarItem.Title
-  fullName: MenuBarItem.Title
-- uid: Terminal.Gui.MenuBarItem.#ctor*
-  parent: Terminal.Gui.MenuBarItem
-  isExternal: false
-  name: MenuBarItem
-  nameWithType: MenuBarItem.MenuBarItem
-  fullName: MenuBarItem.MenuBarItem
+  spec.vb:
+  - uid: Terminal.Gui.MenuItem
+    name: MenuItem
+    nameWithType: MenuItem
+    fullName: Terminal.Gui.MenuItem
+  - name: ()
+    nameWithType: ()
+    fullName: ()
 - uid: Terminal.Gui.MenuBarItem.Children*
-  parent: Terminal.Gui.MenuBarItem
-  isExternal: false
+  commentId: Overload:Terminal.Gui.MenuBarItem.Children
   name: Children
   nameWithType: MenuBarItem.Children
-  fullName: MenuBarItem.Children
-- uid: Terminal.Gui.MenuBarItem.Title*
-  parent: Terminal.Gui.MenuBarItem
-  isExternal: false
-  name: Title
-  nameWithType: MenuBarItem.Title
-  fullName: MenuBarItem.Title
+  fullName: Terminal.Gui.MenuBarItem.Children
+shouldSkipMarkup: true

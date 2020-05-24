@@ -27,13 +27,13 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class Responder {
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Responder"/> can focus.
+		/// Gets or sets a value indicating whether this <see cref="Responder"/> can focus.
 		/// </summary>
 		/// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
 		public virtual bool CanFocus { get; set; }
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Responder"/> has focus.
+		/// Gets or sets a value indicating whether this <see cref="Responder"/> has focus.
 		/// </summary>
 		/// <value><c>true</c> if has focus; otherwise, <c>false</c>.</value>
 		public virtual bool HasFocus { get; internal set; }
@@ -126,7 +126,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		/// <returns>true if the event was handled</returns>
-		public virtual bool KeyDown (KeyEvent keyEvent)
+		public virtual bool OnKeyDown (KeyEvent keyEvent)
 		{
 			return false;
 		}
@@ -136,7 +136,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		/// <returns>true if the event was handled</returns>
-		public virtual bool KeyUp (KeyEvent keyEvent)
+		public virtual bool OnKeyUp (KeyEvent keyEvent)
 		{
 			return false;
 		}
@@ -226,10 +226,10 @@ namespace Terminal.Gui {
 	/// <para>
 	///    When you do not specify a Rect frame you can use the more flexible
 	///    Dim and Pos objects that can dynamically update the position of a view.
-	///    The X and Y properties are of type <see cref="T:Terminal.Gui.Pos"/>
+	///    The X and Y properties are of type <see cref="Pos"/>
 	///    and you can use either absolute positions, percentages or anchor
 	///    points.   The Width and Height properties are of type
-	///    <see cref="T:Terminal.Gui.Dim"/> and can use absolute position,
+	///    <see cref="Dim"/> and can use absolute position,
 	///    percentages and anchors.  These are useful as they will take
 	///    care of repositioning your views if your view's frames are resized
 	///    or if the terminal size changes.
@@ -351,13 +351,22 @@ namespace Terminal.Gui {
 		public ustring Id { get; set; } = "";
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.View"/> want mouse position reports.
+		/// Returns a value indicating if this View is currently on Top (Active)
+		/// </summary>
+		public bool IsCurrentTop {
+			get {
+				return Application.Current == this;
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="View"/> want mouse position reports.
 		/// </summary>
 		/// <value><c>true</c> if want mouse position reports; otherwise, <c>false</c>.</value>
 		public virtual bool WantMousePositionReports { get; set; } = false;
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.View"/> want continuous button pressed event.
+		/// Gets or sets a value indicating whether this <see cref="View"/> want continuous button pressed event.
 		/// </summary>
 		public virtual bool WantContinuousButtonPressed { get; set; } = false;
 		/// <summary>
@@ -481,7 +490,7 @@ namespace Terminal.Gui {
 		public View SuperView => container;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.View"/> class with the absolute
+		/// Initializes a new instance of the <see cref="View"/> class with the absolute
 		/// dimensions specified in the frame.   If you want to have Views that can be positioned with
 		/// Pos and Dim properties on X, Y, Width and Height, use the empty constructor.
 		/// </summary>
@@ -494,7 +503,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.View"/> class and sets the
+		/// Initializes a new instance of the <see cref="View"/> class and sets the
 		/// view up for Computed layout, which will use the values in X, Y, Width and Height to
 		/// compute the View's Frame.
 		/// </summary>
@@ -531,7 +540,7 @@ namespace Terminal.Gui {
 		/// <param name="region">The region that must be flagged for repaint.</param>
 		public void SetNeedsDisplay (Rect region)
 		{
-			if (NeedDisplay.IsEmpty)
+			if (NeedDisplay == null || NeedDisplay.IsEmpty)
 				NeedDisplay = region;
 			else {
 				var x = Math.Min (NeedDisplay.X, region.X);
@@ -607,7 +616,7 @@ namespace Terminal.Gui {
 				return;
 
 			while (subviews.Count > 0) {
-				Remove (subviews[0]);
+				Remove (subviews [0]);
 			}
 		}
 
@@ -705,9 +714,9 @@ namespace Terminal.Gui {
 		{
 			PerformActionForSubview (subview, x => {
 				var idx = subviews.IndexOf (x);
-				if (idx+1 < subviews.Count) {
+				if (idx + 1 < subviews.Count) {
 					subviews.Remove (x);
-					subviews.Insert (idx+1, x);
+					subviews.Insert (idx + 1, x);
 				}
 			});
 		}
@@ -899,10 +908,7 @@ namespace Terminal.Gui {
 				Move (frame.X, frame.Y);
 		}
 
-		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.View"/> has focus.
-		/// </summary>
-		/// <value><c>true</c> if has focus; otherwise, <c>false</c>.</value>
+		/// <inheritdoc cref="HasFocus"/>
 		public override bool HasFocus {
 			get {
 				return base.HasFocus;
@@ -913,7 +919,7 @@ namespace Terminal.Gui {
 						OnEnter ();
 					else
 						OnLeave ();
-					SetNeedsDisplay ();
+				SetNeedsDisplay ();
 				base.HasFocus = value;
 
 				// Remove focus down the chain of subviews if focus is removed
@@ -925,12 +931,14 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <inheritdoc cref="OnEnter"/>
 		public override bool OnEnter ()
 		{
 			Enter?.Invoke (this, new EventArgs ());
 			return base.OnEnter ();
 		}
 
+		/// <inheritdoc cref="OnLeave"/>
 		public override bool OnLeave ()
 		{
 			Leave?.Invoke (this, new EventArgs ());
@@ -1016,7 +1024,7 @@ namespace Terminal.Gui {
 
 			if (subviews != null) {
 				foreach (var view in subviews) {
-					if (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay) {
+					if (view.NeedDisplay != null && (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay)) {
 						if (view.Frame.IntersectsWith (clipRect) && view.Frame.IntersectsWith (region)) {
 
 							// FIXED: optimize this by computing the intersection of region and view.Bounds
@@ -1063,28 +1071,43 @@ namespace Terminal.Gui {
 			focused.EnsureFocus ();
 
 			// Send focus upwards
-			SuperView?.SetFocus(this);
+			SuperView?.SetFocus (this);
 		}
 
 		/// <summary>
-		/// Invoked when a character key is pressed and occurs after the key down event.
+		/// Specifies the event arguments for <see cref="KeyEvent"/>
 		/// </summary>
-		public Action<KeyEvent> OnKeyPress;
+		public class KeyEventEventArgs : EventArgs {
+			/// <summary>
+			/// Constructs.
+			/// </summary>
+			/// <param name="ke"></param>
+			public KeyEventEventArgs(KeyEvent ke) => KeyEvent = ke;
+			/// <summary>
+			/// The <see cref="KeyEvent"/> for the event.
+			/// </summary>
+			public KeyEvent KeyEvent { get; set; }
+		}
 
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <summary>
+		/// Invoked when a character key is pressed and occurs after the key up event.
+		/// </summary>
+		public event EventHandler<KeyEventEventArgs> KeyPress;
+
+		/// <inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			OnKeyPress?.Invoke (keyEvent);
+			KeyPress?.Invoke (this, new KeyEventEventArgs(keyEvent));
 			if (Focused?.ProcessKey (keyEvent) == true)
 				return true;
 
 			return false;
 		}
 
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <inheritdoc cref="ProcessHotKey"/>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
-			OnKeyPress?.Invoke (keyEvent);
+			KeyPress?.Invoke (this, new KeyEventEventArgs (keyEvent));
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1093,10 +1116,10 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <inheritdoc cref="ProcessColdKey"/>
 		public override bool ProcessColdKey (KeyEvent keyEvent)
 		{
-			OnKeyPress?.Invoke (keyEvent);
+			KeyPress?.Invoke (this, new KeyEventEventArgs(keyEvent));
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1108,16 +1131,16 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is pressed
 		/// </summary>
-		public Action<KeyEvent> OnKeyDown;
+		public event EventHandler<KeyEventEventArgs> KeyDown;
 
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-		public override bool KeyDown (KeyEvent keyEvent)
+		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
-			OnKeyDown?.Invoke (keyEvent);
+			KeyDown?.Invoke (this, new KeyEventEventArgs (keyEvent));
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.KeyDown (keyEvent))
+				if (view.OnKeyDown (keyEvent))
 					return true;
 
 			return false;
@@ -1126,20 +1149,21 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is released
 		/// </summary>
-		public Action<KeyEvent> OnKeyUp;
+		public event EventHandler<KeyEventEventArgs> KeyUp;
 
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-		public override bool KeyUp (KeyEvent keyEvent)
+		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
-			OnKeyUp?.Invoke (keyEvent);
+			KeyUp?.Invoke (this, new KeyEventEventArgs (keyEvent));
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.KeyUp (keyEvent))
+				if (view.OnKeyUp (keyEvent))
 					return true;
 
 			return false;
 		}
+
 		/// <summary>
 		/// Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise, it does nothing.
 		/// </summary>
@@ -1176,7 +1200,7 @@ namespace Terminal.Gui {
 		public void FocusLast ()
 		{
 			if (subviews == null) {
-				SuperView?.SetFocus(this);
+				SuperView?.SetFocus (this);
 				return;
 			}
 
@@ -1223,7 +1247,7 @@ namespace Terminal.Gui {
 						w.FocusLast ();
 
 					SetFocus (w);
-				return true;
+					return true;
 				}
 			}
 			if (focused != null) {
@@ -1410,15 +1434,13 @@ namespace Terminal.Gui {
 			layoutNeeded = false;
 		}
 
-		/// <summary>
-		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.View"/>.
-		/// </summary>
-		/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Terminal.Gui.View"/>.</returns>
+		/// <inheritdoc cref="ToString"/>
 		public override string ToString ()
 		{
 			return $"{GetType ().Name}({Id})({Frame})";
 		}
 
+		/// <inheritdoc cref="OnMouseEnter(Gui.MouseEvent)"/>
 		public override bool OnMouseEnter (MouseEvent mouseEvent)
 		{
 			if (!base.OnMouseEnter (mouseEvent)) {
@@ -1428,6 +1450,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <inheritdoc cref="OnMouseLeave(Gui.MouseEvent)"/>
 		public override bool OnMouseLeave (MouseEvent mouseEvent)
 		{
 			if (!base.OnMouseLeave (mouseEvent)) {
@@ -1470,13 +1493,28 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class Toplevel : View {
 		/// <summary>
-		/// This flag is checked on each iteration of the mainloop and it continues
-		/// running until this flag is set to false.
+		/// Gets or sets whether the Mainloop for this <see cref="Toplevel"/> is running or not. Setting
+		/// this property to false will cause the MainLoop to exit. 
 		/// </summary>
-		public bool Running;
+		public bool Running { get; set; }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Toplevel"/> class with the specified absolute layout.
+		/// Fired once the Toplevel's MainLoop has started it's first iteration. 
+		/// Subscribe to this event to perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set.
+		/// changes. A Ready event handler is a good place to finalize initialization after calling `<see cref="Application.Run()"/>(topLevel)`. 
+		/// </summary>
+		public event EventHandler Ready;
+
+		/// <summary>
+		/// Called from Application.RunLoop after the <see cref="Toplevel"/> has entered it's first iteration of the loop. 
+		/// </summary>
+		internal virtual void OnReady ()
+		{
+			Ready?.Invoke (this, EventArgs.Empty);
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Toplevel"/> class with the specified absolute layout.
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		public Toplevel (Rect frame) : base (frame)
@@ -1485,7 +1523,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Toplevel"/> class with Computed layout, defaulting to <see langword="async"/> full screen.
+		/// Initializes a new instance of the <see cref="Toplevel"/> class with Computed layout, defaulting to <see langword="async"/> full screen.
 		/// </summary>
 		public Toplevel () : base ()
 		{
@@ -1508,6 +1546,10 @@ namespace Terminal.Gui {
 			return new Toplevel (new Rect (0, 0, Driver.Cols, Driver.Rows));
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="Toplevel"/> can focus.
+		/// </summary>
+		/// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
 		public override bool CanFocus {
 			get => true;
 		}
@@ -1522,13 +1564,14 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Check id current toplevel has menu bar
 		/// </summary>
-		public bool HasMenuBar { get; set; }
+		public MenuBar MenuBar { get; set; }
 
 		/// <summary>
 		/// Check id current toplevel has status bar
 		/// </summary>
-		public bool HasStatusBar { get; set; }
+		public StatusBar StatusBar { get; set; }
 
+		///<inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			if (base.ProcessKey (keyEvent))
@@ -1580,33 +1623,36 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		///<inheritdoc cref="Add"/>
 		public override void Add (View view)
 		{
 			if (this == Application.Top) {
 				if (view is MenuBar)
-					HasMenuBar = true;
+					MenuBar = view as MenuBar;
 				if (view is StatusBar)
-					HasStatusBar = true;
+					StatusBar = view as StatusBar;
 			}
 			base.Add (view);
 		}
 
+		///<inheritdoc cref="Remove"/>
 		public override void Remove (View view)
 		{
 			if (this == Application.Top) {
 				if (view is MenuBar)
-					HasMenuBar = true;
+					MenuBar = null;
 				if (view is StatusBar)
-					HasStatusBar = true;
+					StatusBar = null;
 			}
 			base.Remove (view);
 		}
 
+		///<inheritdoc cref="RemoveAll"/>
 		public override void RemoveAll ()
 		{
 			if (this == Application.Top) {
-				HasMenuBar = false;
-				HasStatusBar = false;
+				MenuBar = null;
+				StatusBar = null;
 			}
 			base.RemoveAll ();
 		}
@@ -1614,21 +1660,21 @@ namespace Terminal.Gui {
 		internal void EnsureVisibleBounds (Toplevel top, int x, int y, out int nx, out int ny)
 		{
 			nx = Math.Max (x, 0);
-			nx = nx + top.Frame.Width > Driver.Cols ? Math.Max(Driver.Cols - top.Frame.Width, 0) : nx;
+			nx = nx + top.Frame.Width > Driver.Cols ? Math.Max (Driver.Cols - top.Frame.Width, 0) : nx;
 			bool m, s;
-			if (SuperView == null)
-				m = Application.Top.HasMenuBar;
+			if (SuperView == null || SuperView.GetType() != typeof(Toplevel))
+				m = Application.Top.MenuBar != null;
 			else
-				m = ((Toplevel)SuperView).HasMenuBar;
+				m = ((Toplevel)SuperView).MenuBar != null;
 			int l = m ? 1 : 0;
 			ny = Math.Max (y, l);
-			if (SuperView == null)
-				s = Application.Top.HasStatusBar;
+			if (SuperView == null || SuperView.GetType() != typeof(Toplevel))
+				s = Application.Top.StatusBar != null;
 			else
-				s = ((Toplevel)SuperView).HasStatusBar;
+				s = ((Toplevel)SuperView).StatusBar != null;
 			l = s ? Driver.Rows - 1 : Driver.Rows;
 			ny = Math.Min (ny, l);
-			ny = ny + top.Frame.Height > l ? Math.Max(l - top.Frame.Height, m ? 1 : 0) : ny;
+			ny = ny + top.Frame.Height > l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
 		}
 
 		internal void PositionToplevels ()
@@ -1647,21 +1693,28 @@ namespace Terminal.Gui {
 							top.X = nx;
 							top.Y = ny;
 						}
-						if (HasStatusBar && ny + top.Frame.Height > Driver.Rows - 1) {
-							if (top.Height is Dim.DimFill)
-								top.Height = Dim.Fill () - 1;
+						if (StatusBar != null) {
+							if (ny + top.Frame.Height > Driver.Rows - 1) {
+								if (top.Height is Dim.DimFill)
+									top.Height = Dim.Fill () - 1;
+							}
+							if (StatusBar.Frame.Y != Driver.Rows - 1) {
+								StatusBar.Y = Driver.Rows - 1;
+								SetNeedsDisplay ();
+							}
 						}
 					}
 				}
 			}
 		}
 
+		///<inheritdoc cref="Redraw"/>
 		public override void Redraw (Rect region)
 		{
 			Application.CurrentView = this;
 
-			if (this == Application.Top) {
-				if (!NeedDisplay.IsEmpty) {
+			if (IsCurrentTop) {
+				if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
 					Driver.SetAttribute (Colors.TopLevel.Normal);
 					Clear (region);
 					Driver.SetAttribute (Colors.Base.Normal);
@@ -1690,7 +1743,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// A toplevel view that draws a frame around its region and has a "ContentView" subview where the contents are added.
+	/// A <see cref="Toplevel"/> <see cref="View"/> that draws a frame around its region and has a "ContentView" subview where the contents are added.
 	/// </summary>
 	public class Window : Toplevel, IEnumerable {
 		View contentView;
@@ -1728,7 +1781,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Gui.Window"/> class with an optional title and a set frame.
+		/// Initializes a new instance of the <see cref="Gui.Window"/> class with an optional title and a set frame.
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		/// <param name="title">Title.</param>
@@ -1737,7 +1790,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Window"/> class with an optional title.
+		/// Initializes a new instance of the <see cref="Window"/> class with an optional title.
 		/// </summary>
 		/// <param name="title">Title.</param>
 		public Window (ustring title = null) : this (title, padding: 0)
@@ -1746,7 +1799,7 @@ namespace Terminal.Gui {
 
 		int padding;
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Window"/> with
+		/// Initializes a new instance of the <see cref="Window"/> with
 		/// the specified frame for its location, with the specified border
 		/// an optional title.
 		/// </summary>
@@ -1764,7 +1817,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Terminal.Gui.Window"/> with
+		/// Initializes a new instance of the <see cref="Window"/> with
 		/// the specified frame for its location, with the specified border
 		/// an optional title.
 		/// </summary>
@@ -1775,7 +1828,7 @@ namespace Terminal.Gui {
 			this.Title = title;
 			int wb = 1 + padding;
 			this.padding = padding;
- 			contentView = new ContentView () {
+			contentView = new ContentView () {
 				X = wb,
 				Y = wb,
 				Width = Dim.Fill (wb),
@@ -1785,7 +1838,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Enumerates the various views in the ContentView.
+		/// Enumerates the various <see cref="View"/>s in the embedded <see cref="ContentView"/>.
 		/// </summary>
 		/// <returns>The enumerator.</returns>
 		public new IEnumerator GetEnumerator ()
@@ -1799,7 +1852,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Add the specified view to the ContentView.
+		/// Add the specified view to the <see cref="ContentView"/>.
 		/// </summary>
 		/// <param name="view">View to add to the window.</param>
 		public override void Add (View view)
@@ -1838,11 +1891,12 @@ namespace Terminal.Gui {
 			contentView.RemoveAll ();
 		}
 
+		///<inheritdoc cref="Redraw"/>
 		public override void Redraw (Rect bounds)
 		{
 			Application.CurrentView = this;
 
-			if (!NeedDisplay.IsEmpty) {
+			if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
 				DrawFrameWindow ();
 			}
 			contentView.Redraw (contentView.Bounds);
@@ -1873,6 +1927,7 @@ namespace Terminal.Gui {
 		//
 		internal static Point? dragPosition;
 		Point start;
+		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
 		public override bool MouseEvent (MouseEvent mouseEvent)
 		{
 			// FIXED:The code is currently disabled, because the
@@ -1930,7 +1985,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// The application driver for gui.cs
+	/// The application driver for Terminal.Gui.
 	/// </summary>
 	/// <remarks>
 	///   <para>
@@ -1948,30 +2003,30 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public static class Application {
 		/// <summary>
-		/// The current Console Driver in use.
+		/// The current <see cref="ConsoleDriver"/> in use.
 		/// </summary>
 		public static ConsoleDriver Driver;
 
 		/// <summary>
-		/// The Toplevel object used for the application on startup.
+		/// The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Application.Top"/>)
 		/// </summary>
 		/// <value>The top.</value>
 		public static Toplevel Top { get; private set; }
 
 		/// <summary>
-		/// The current toplevel object. This is updated when Application.Run enters and leaves and points to the current toplevel.
+		/// The current <see cref="Toplevel"/> object. This is updated when <see cref="Application.Run()"/> enters and leaves to point to the current <see cref="Toplevel"/> .
 		/// </summary>
 		/// <value>The current.</value>
 		public static Toplevel Current { get; private set; }
 
 		/// <summary>
-		/// TThe current view object being redrawn.
+		/// TThe current <see cref="View"/> object being redrawn.
 		/// </summary>
 		/// /// <value>The current.</value>
 		public static View CurrentView { get; set; }
 
 		/// <summary>
-		/// The mainloop driver for the applicaiton
+		/// The <see cref="MainLoop"/>  driver for the applicaiton
 		/// </summary>
 		/// <value>The main loop.</value>
 		public static Mono.Terminal.MainLoop MainLoop { get; private set; }
@@ -1979,13 +2034,12 @@ namespace Terminal.Gui {
 		static Stack<Toplevel> toplevels = new Stack<Toplevel> ();
 
 		/// <summary>
-		///   This event is raised on each iteration of the
-		///   main loop.
+		///   This event is raised on each iteration of the <see cref="MainLoop"/> 
 		/// </summary>
 		/// <remarks>
 		///   See also <see cref="Timeout"/>
 		/// </remarks>
-		static public event EventHandler Iteration;
+		public static event EventHandler Iteration;
 
 		/// <summary>
 		/// Returns a rectangle that is centered in the screen for the provided size.
@@ -1998,7 +2052,7 @@ namespace Terminal.Gui {
 		}
 
 		//
-		// provides the sync context set while executing code in gui.cs, to let
+		// provides the sync context set while executing code in Terminal.Gui, to let
 		// users use async/await on their code
 		//
 		class MainLoopSyncContext : SynchronizationContext {
@@ -2037,14 +2091,25 @@ namespace Terminal.Gui {
 		public static bool UseSystemConsole;
 
 		/// <summary>
-		/// Initializes the Application
+		/// Initializes a new instance of <see cref="Terminal.Gui"/> Application. 
 		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// Call this method once per instance (or after <see cref="Shutdown"/> has been called).
+		/// </para>
+		/// <para>
+		/// Loads the right <see cref="ConsoleDriver"/> for the platform.
+		/// </para>
+		/// <para>
+		/// Creates a <see cref="Toplevel"/> and assigns it to <see cref="Top"/> and <see cref="CurrentView"/>
+		/// </para>
+		/// </remarks>
 		public static void Init () => Init (() => Toplevel.Create ());
 
 		internal static bool _initialized = false;
 
 		/// <summary>
-		/// Initializes the Application
+		/// Initializes the Terminal.Gui application
 		/// </summary>
 		static void Init (Func<Toplevel> topLevelFactory)
 		{
@@ -2056,7 +2121,7 @@ namespace Terminal.Gui {
 			if (UseSystemConsole) {
 				mainLoopDriver = new Mono.Terminal.NetMainLoop ();
 				Driver = new NetDriver ();
-			} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows){
+			} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 				var windowsDriver = new WindowsDriver ();
 				mainLoopDriver = windowsDriver;
 				Driver = windowsDriver;
@@ -2074,7 +2139,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Captures the execution state for the provided TopLevel view.
+		/// Captures the execution state for the provided <see cref="Toplevel"/>  view.
 		/// </summary>
 		public class RunState : IDisposable {
 			internal RunState (Toplevel view)
@@ -2084,13 +2149,13 @@ namespace Terminal.Gui {
 			internal Toplevel Toplevel;
 
 			/// <summary>
-			/// Releases alTop = l resource used by the <see cref="T:Terminal.Gui.Application.RunState"/> object.
+			/// Releases alTop = l resource used by the <see cref="Application.RunState"/> object.
 			/// </summary>
-			/// <remarks>Call <see cref="Dispose()"/> when you are finished using the <see cref="T:Terminal.Gui.Application.RunState"/>. The
-			/// <see cref="Dispose()"/> method leaves the <see cref="T:Terminal.Gui.Application.RunState"/> in an unusable state. After
+			/// <remarks>Call <see cref="Dispose()"/> when you are finished using the <see cref="Application.RunState"/>. The
+			/// <see cref="Dispose()"/> method leaves the <see cref="Application.RunState"/> in an unusable state. After
 			/// calling <see cref="Dispose()"/>, you must release all references to the
-			/// <see cref="T:Terminal.Gui.Application.RunState"/> so the garbage collector can reclaim the memory that the
-			/// <see cref="T:Terminal.Gui.Application.RunState"/> was occupying.</remarks>
+			/// <see cref="Application.RunState"/> so the garbage collector can reclaim the memory that the
+			/// <see cref="Application.RunState"/> was occupying.</remarks>
 			public void Dispose ()
 			{
 				Dispose (true);
@@ -2114,7 +2179,7 @@ namespace Terminal.Gui {
 		static void ProcessKeyEvent (KeyEvent ke)
 		{
 
-			var chain = toplevels.ToList();
+			var chain = toplevels.ToList ();
 			foreach (var topLevel in chain) {
 				if (topLevel.ProcessHotKey (ke))
 					return;
@@ -2142,7 +2207,7 @@ namespace Terminal.Gui {
 		{
 			var chain = toplevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.KeyDown (ke))
+				if (topLevel.OnKeyDown (ke))
 					return;
 				if (topLevel.Modal)
 					break;
@@ -2154,7 +2219,7 @@ namespace Terminal.Gui {
 		{
 			var chain = toplevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.KeyUp (ke))
+				if (topLevel.OnKeyUp (ke))
 					return;
 				if (topLevel.Modal)
 					break;
@@ -2171,7 +2236,7 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			if (start.InternalSubviews != null){
+			if (start.InternalSubviews != null) {
 				int count = start.InternalSubviews.Count;
 				if (count > 0) {
 					var rx = x - startFrame.X;
@@ -2187,8 +2252,8 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			resx = x-startFrame.X;
-			resy = y-startFrame.Y;
+			resx = x - startFrame.X;
+			resy = y - startFrame.Y;
 			return start;
 		}
 
@@ -2219,7 +2284,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Merely a debugging aid to see the raw mouse events
 		/// </summary>
-		static public Action<MouseEvent> RootMouseEvent;
+		public static Action<MouseEvent> RootMouseEvent;
 
 		internal static View wantContinuousButtonPressedView;
 		static View lastMouseOwnerView;
@@ -2244,8 +2309,12 @@ namespace Terminal.Gui {
 					OfY = me.Y - newxy.Y,
 					View = view
 				};
-				mouseGrabView.MouseEvent (nme);
-				return;
+				if (OutsideFrame (new Point (nme.X, nme.Y), mouseGrabView.Frame))
+					lastMouseOwnerView.OnMouseLeave (me);
+				if (mouseGrabView != null) {
+					mouseGrabView.MouseEvent (nme);
+					return;
+				}
 			}
 
 			if (view != null) {
@@ -2280,25 +2349,31 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// Action that is invoked once at beginning.
-		/// </summary>
-		static public Action OnLoad;
+		static bool OutsideFrame (Point p, Rect r)
+		{
+			return p.X < 0 || p.X > r.Width - 1 || p.Y < 0 || p.Y > r.Height - 1;
+		}
 
 		/// <summary>
-		/// Building block API: Prepares the provided toplevel for execution.
+		/// This event is fired once when the application is first loaded. The dimensions of the
+		/// terminal are provided.
 		/// </summary>
-		/// <returns>The runstate handle that needs to be passed to the End() method upon completion.</returns>
+		public static event EventHandler<ResizedEventArgs> Loaded;
+
+		/// <summary>
+		/// Building block API: Prepares the provided <see cref="Toplevel"/>  for execution.
+		/// </summary>
+		/// <returns>The runstate handle that needs to be passed to the <see cref="End(RunState)"/> method upon completion.</returns>
 		/// <param name="toplevel">Toplevel to prepare execution for.</param>
 		/// <remarks>
 		///  This method prepares the provided toplevel for running with the focus,
 		///  it adds this to the list of toplevels, sets up the mainloop to process the
 		///  event, lays out the subviews, focuses the first element, and draws the
-		///  toplevel in the screen.   This is usually followed by executing
+		///  toplevel in the screen. This is usually followed by executing
 		///  the <see cref="RunLoop"/> method, and then the <see cref="End(RunState)"/> method upon termination which will
 		///   undo these changes.
 		/// </remarks>
-		static public RunState Begin (Toplevel toplevel)
+		public static RunState Begin (Toplevel toplevel)
 		{
 			if (toplevel == null)
 				throw new ArgumentNullException (nameof (toplevel));
@@ -2307,11 +2382,11 @@ namespace Terminal.Gui {
 			Init ();
 			if (toplevel is ISupportInitializeNotification initializableNotification &&
 			    !initializableNotification.IsInitialized) {
-				initializableNotification.BeginInit();
-				initializableNotification.EndInit();
+				initializableNotification.BeginInit ();
+				initializableNotification.EndInit ();
 			} else if (toplevel is ISupportInitialize initializable) {
-				initializable.BeginInit();
-				initializable.EndInit();
+				initializable.BeginInit ();
+				initializable.EndInit ();
 			}
 			toplevels.Push (toplevel);
 			Current = toplevel;
@@ -2319,7 +2394,7 @@ namespace Terminal.Gui {
 			if (toplevel.LayoutStyle == LayoutStyle.Computed)
 				toplevel.RelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
 			toplevel.LayoutSubviews ();
-			OnLoad?.Invoke ();
+			Loaded?.Invoke (null, new ResizedEventArgs () { Rows = Driver.Rows, Cols = Driver.Cols } );
 			toplevel.WillPresent ();
 			Redraw (toplevel);
 			toplevel.PositionCursor ();
@@ -2329,22 +2404,32 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Building block API: completes the execution of a Toplevel that was started with Begin.
+		/// Building block API: completes the execution of a <see cref="Toplevel"/>  that was started with <see cref="Begin(Toplevel)"/> .
 		/// </summary>
 		/// <param name="runState">The runstate returned by the <see cref="Begin(Toplevel)"/> method.</param>
-		static public void End (RunState runState)
+		public static void End (RunState runState)
 		{
 			if (runState == null)
 				throw new ArgumentNullException (nameof (runState));
 
 			runState.Dispose ();
+			runState = null;
 		}
 
 		/// <summary>
-		/// Finalize the driver.
+		/// Shutdown an application initalized with <see cref="Init()"/>
 		/// </summary>
 		public static void Shutdown ()
 		{
+			foreach (var t in toplevels) {
+				t.Running = false;
+			}
+			toplevels.Clear ();
+			Current = null;
+			CurrentView = null;
+			Top = null;
+			MainLoop = null;
+
 			Driver.End ();
 			_initialized = false;
 		}
@@ -2386,9 +2471,8 @@ namespace Terminal.Gui {
 			toplevels.Pop ();
 			if (toplevels.Count == 0)
 				Shutdown ();
-			else
-			{
-				Current = toplevels.Peek();
+			else {
+				Current = toplevels.Peek ();
 				Refresh ();
 			}
 		}
@@ -2409,13 +2493,20 @@ namespace Terminal.Gui {
 			if (state.Toplevel == null)
 				throw new ObjectDisposedException ("state");
 
+			bool firstIteration = true;
 			for (state.Toplevel.Running = true; state.Toplevel.Running;) {
 				if (MainLoop.EventsPending (wait)) {
+					// Notify Toplevel it's ready
+					if (firstIteration) {
+						state.Toplevel.OnReady ();
+					}
+					firstIteration = false;
+
 					MainLoop.MainIteration ();
 					Iteration?.Invoke (null, EventArgs.Empty);
 				} else if (wait == false)
 					return;
-				if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.childNeedsDisplay) {
+				if (state.Toplevel.NeedDisplay != null && (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.childNeedsDisplay)) {
 					state.Toplevel.Redraw (state.Toplevel.Bounds);
 					if (DebugDrawBounds)
 						DrawBounds (state.Toplevel);
@@ -2426,7 +2517,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		internal static bool DebugDrawBounds;
+		internal static bool DebugDrawBounds = false;
 
 		// Need to look into why this does not work properly.
 		static void DrawBounds (View v)
@@ -2438,7 +2529,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Runs the application with the built-in toplevel view
+		/// Runs the application by calling <see cref="Run(Toplevel)"/> with the value of <see cref="Top"/>
 		/// </summary>
 		public static void Run ()
 		{
@@ -2446,36 +2537,35 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Runs the application with a new instance of the specified toplevel view
+		/// Runs the application by calling <see cref="Run(Toplevel)"/> with a new instance of the specified <see cref="Toplevel"/>-derived class
 		/// </summary>
 		public static void Run<T> () where T : Toplevel, new()
 		{
-			Init (() => new T());
+			Init (() => new T ());
 			Run (Top);
 		}
 
 		/// <summary>
-		///   Runs the main loop on the given container.
+		///   Runs the main loop on the given <see cref="Toplevel"/> container.
 		/// </summary>
 		/// <remarks>
 		///   <para>
 		///     This method is used to start processing events
 		///     for the main application, but it is also used to
-		///     run modal dialog boxes.
+		///     run other modal <see cref="View"/>s such as <see cref="Dialog"/> boxes.
 		///   </para>
 		///   <para>
-		///     To make a toplevel stop execution, set the "Running"
-		///     property to false.
+		///     To make a <see cref="Run(Toplevel)"/> stop execution, call <see cref="Application.RequestStop"/>.
 		///   </para>
 		///   <para>
-		///     This is equivalent to calling Begin on the toplevel view, followed by RunLoop with the
-		///     returned value, and then calling end on the return value.
+		///     Calling <see cref="Run(Toplevel)"/> is equivalent to calling <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState, bool)"/>,
+		///     and then calling <see cref="End(RunState)"/>.
 		///   </para>
 		///   <para>
-		///     Alternatively, if your program needs to control the main loop and needs to
-		///     process events manually, you can invoke Begin to set things up manually and then
-		///     repeatedly call RunLoop with the wait parameter set to false.   By doing this
-		///     the RunLoop method will only process any pending events, timers, idle handlers and
+		///     Alternatively, to have a program control the main loop and 
+		///     process events manually, call <see cref="Begin(Toplevel)"/> to set things up manually and then
+		///     repeatedly call <see cref="RunLoop(RunState, bool)"/> with the wait parameter set to false.   By doing this
+		///     the <see cref="RunLoop(RunState, bool)"/> method will only process any pending events, timers, idle handlers and
 		///     then return control immediately.
 		///   </para>
 		/// </remarks>
@@ -2487,22 +2577,44 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Stops running the most recent toplevel
+		/// Stops running the most recent <see cref="Toplevel"/>. 
 		/// </summary>
+		/// <remarks>
+		///   <para>
+		///   This will cause <see cref="Application.Run()"/> to return.
+		///   </para>
+		///   <para>
+		///     Calling <see cref="Application.RequestStop"/> is equivalent to setting the <see cref="Toplevel.Running"/> property on the curently running <see cref="Toplevel"/> to false.
+		///   </para>
+		/// </remarks>
 		public static void RequestStop ()
 		{
 			Current.Running = false;
 		}
 
 		/// <summary>
-		/// Invoked when the terminal was resized.
+		/// Event arguments for the <see cref="Application.Resized"/> event.
 		/// </summary>
-		static public Action OnResized;
+		public class ResizedEventArgs : EventArgs {
+			/// <summary>
+			/// The number of rows in the resized terminal.
+			/// </summary>
+			public int Rows { get; set; }
+			/// <summary>
+			/// The number of columns in the resized terminal.
+			/// </summary>
+			public int Cols { get; set; }
+		}
+
+		/// <summary>
+		/// Invoked when the terminal was resized. The new size of the terminal is provided.
+		/// </summary>
+		public static event EventHandler<ResizedEventArgs> Resized;
 
 		static void TerminalResized ()
 		{
-			OnResized?.Invoke ();
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
+			Resized?.Invoke (null, new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
 			Driver.Clip = full;
 			foreach (var t in toplevels) {
 				t.PositionToplevels ();
