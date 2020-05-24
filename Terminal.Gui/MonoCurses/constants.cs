@@ -101,6 +101,7 @@ namespace Unix.Terminal {
 		public const int KeyEnd = unchecked((int)0x168);
 		public const int KeyDeleteChar = unchecked((int)0x14a);
 		public const int KeyInsertChar = unchecked((int)0x14b);
+		public const int KeyTab = unchecked((int)0x009);
 		public const int KeyBackTab = unchecked((int)0x161);
 		public const int KeyF1 = unchecked((int)0x109);
 		public const int KeyF2 = unchecked((int)0x10a);
@@ -112,6 +113,8 @@ namespace Unix.Terminal {
 		public const int KeyF8 = unchecked((int)0x110);
 		public const int KeyF9 = unchecked((int)0x111);
 		public const int KeyF10 = unchecked((int)0x112);
+		public const int KeyF11 = unchecked((int)0x113);
+		public const int KeyF12 = unchecked((int)0x114);
 		public const int KeyResize = unchecked((int)0x19a);
 		public const int ShiftKeyUp = unchecked((int)0x151);
 		public const int ShiftKeyDown = unchecked((int)0x150);
