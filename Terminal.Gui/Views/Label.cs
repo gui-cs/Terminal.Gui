@@ -183,13 +183,13 @@ namespace Terminal.Gui {
 					break;
 				case TextAlignment.Justified:
 					Recalc ();
-					x = Frame.Left;
+					x = Bounds.Left;
 					break;
 				case TextAlignment.Right:
-					x = Frame.Right - str.Length;
+					x = Bounds.Right - str.Length;
 					break;
 				case TextAlignment.Centered:
-					x = Frame.Left + (Frame.Width - str.Length) / 2;
+					x = Bounds.Left + (Bounds.Width - str.Length) / 2;
 					break;
 				default:
 					throw new ArgumentOutOfRangeException ();
