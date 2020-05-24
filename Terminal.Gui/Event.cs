@@ -272,6 +272,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		F10,
 		/// <summary>
+		/// F11 key.
+		/// </summary>
+		F11,
+		/// <summary>
+		/// F12 key.
+		/// </summary>
+		F12,
+		/// <summary>
 		/// The key code for the user pressing the tab key (forwards tab key).
 		/// </summary>
 		Tab,
