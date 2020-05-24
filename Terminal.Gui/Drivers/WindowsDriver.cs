@@ -685,8 +685,8 @@ namespace Terminal.Gui {
 				} else {
 					if (inputEvent.KeyEvent.bKeyDown) {
 						// Key Down - Fire KeyDown Event and KeyStroke (ProcessKey) Event
-						keyHandler (new KeyEvent (map));
 						keyDownHandler (new KeyEvent (map));
+						keyHandler (new KeyEvent (map));
 					} else {
 						keyUpHandler (new KeyEvent (map));
 					}
@@ -1016,7 +1016,7 @@ namespace Terminal.Gui {
 
 				return (Key)((uint)keyInfo.KeyChar);
 			}
-			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
+			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F12) {
 				var delta = key - ConsoleKey.F1;
 
 				return (Key)((int)Key.F1 + delta);

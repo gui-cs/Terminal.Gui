@@ -112,6 +112,8 @@ namespace Unix.Terminal {
 		public const int KeyF8 = unchecked((int)0x110);
 		public const int KeyF9 = unchecked((int)0x111);
 		public const int KeyF10 = unchecked((int)0x112);
+		public const int KeyF11 = unchecked((int)0x113);
+		public const int KeyF12 = unchecked((int)0x114);
 		public const int KeyResize = unchecked((int)0x19a);
 		public const int ShiftKeyUp = unchecked((int)0x151);
 		public const int ShiftKeyDown = unchecked((int)0x150);

@@ -136,6 +136,8 @@ namespace Terminal.Gui {
 			case Curses.KeyF8: return Key.F8;
 			case Curses.KeyF9: return Key.F9;
 			case Curses.KeyF10: return Key.F10;
+			case Curses.KeyF11: return Key.F11;
+			case Curses.KeyF12: return Key.F12;
 			case Curses.KeyUp: return Key.CursorUp;
 			case Curses.KeyDown: return Key.CursorDown;
 			case Curses.KeyLeft: return Key.CursorLeft;
