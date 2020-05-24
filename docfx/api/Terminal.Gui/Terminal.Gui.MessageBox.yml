@@ -17,7 +17,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/MessageBox.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MessageBox
     path: ../Terminal.Gui/Dialogs/MessageBox.cs
@@ -62,7 +62,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/MessageBox.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Query
     path: ../Terminal.Gui/Dialogs/MessageBox.cs
@@ -118,7 +118,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/MessageBox.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ErrorQuery
     path: ../Terminal.Gui/Dialogs/MessageBox.cs

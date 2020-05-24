@@ -23,7 +23,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyEvent
     path: ../Terminal.Gui/Event.cs
@@ -65,7 +65,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Key
     path: ../Terminal.Gui/Event.cs
@@ -98,7 +98,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyValue
     path: ../Terminal.Gui/Event.cs
@@ -135,7 +135,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: IsShift
     path: ../Terminal.Gui/Event.cs
@@ -173,7 +173,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: IsAlt
     path: ../Terminal.Gui/Event.cs
@@ -211,7 +211,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: IsCtrl
     path: ../Terminal.Gui/Event.cs
@@ -249,7 +249,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Event.cs
@@ -281,7 +281,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Event.cs
@@ -316,7 +316,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ToString
     path: ../Terminal.Gui/Event.cs

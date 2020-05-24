@@ -23,7 +23,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/FrameView.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: FrameView
     path: ../Terminal.Gui/Views/FrameView.cs
@@ -55,6 +55,7 @@ items:
   - Terminal.Gui.View.Driver
   - Terminal.Gui.View.Subviews
   - Terminal.Gui.View.Id
+  - Terminal.Gui.View.IsCurrentTop
   - Terminal.Gui.View.WantMousePositionReports
   - Terminal.Gui.View.WantContinuousButtonPressed
   - Terminal.Gui.View.Frame
@@ -138,7 +139,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/FrameView.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Title
     path: ../Terminal.Gui/Views/FrameView.cs
@@ -176,7 +177,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/FrameView.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/FrameView.cs
@@ -215,7 +216,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/FrameView.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/FrameView.cs
@@ -260,7 +261,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/FrameView.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/FrameView.cs
@@ -296,7 +297,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/FrameView.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Add
     path: ../Terminal.Gui/Views/FrameView.cs
@@ -335,7 +336,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/FrameView.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Remove
     path: ../Terminal.Gui/Views/FrameView.cs
@@ -374,7 +375,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/FrameView.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: RemoveAll
     path: ../Terminal.Gui/Views/FrameView.cs
@@ -410,7 +411,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/FrameView.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Redraw
     path: ../Terminal.Gui/Views/FrameView.cs
@@ -507,6 +508,12 @@ references:
   name: Id
   nameWithType: View.Id
   fullName: Terminal.Gui.View.Id
+- uid: Terminal.Gui.View.IsCurrentTop
+  commentId: P:Terminal.Gui.View.IsCurrentTop
+  parent: Terminal.Gui.View
+  name: IsCurrentTop
+  nameWithType: View.IsCurrentTop
+  fullName: Terminal.Gui.View.IsCurrentTop
 - uid: Terminal.Gui.View.WantMousePositionReports
   commentId: P:Terminal.Gui.View.WantMousePositionReports
   parent: Terminal.Gui.View

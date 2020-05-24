@@ -27,7 +27,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: FileDialog
     path: ../Terminal.Gui/Dialogs/FileDialog.cs
@@ -82,6 +82,7 @@ items:
   - Terminal.Gui.View.Driver
   - Terminal.Gui.View.Subviews
   - Terminal.Gui.View.Id
+  - Terminal.Gui.View.IsCurrentTop
   - Terminal.Gui.View.WantMousePositionReports
   - Terminal.Gui.View.WantContinuousButtonPressed
   - Terminal.Gui.View.Frame
@@ -160,7 +161,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Dialogs/FileDialog.cs
@@ -205,7 +206,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: WillPresent
     path: ../Terminal.Gui/Dialogs/FileDialog.cs
@@ -239,7 +240,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Prompt
     path: ../Terminal.Gui/Dialogs/FileDialog.cs
@@ -277,7 +278,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: NameFieldLabel
     path: ../Terminal.Gui/Dialogs/FileDialog.cs
@@ -315,7 +316,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Message
     path: ../Terminal.Gui/Dialogs/FileDialog.cs
@@ -353,7 +354,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: CanCreateDirectories
     path: ../Terminal.Gui/Dialogs/FileDialog.cs
@@ -391,7 +392,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: IsExtensionHidden
     path: ../Terminal.Gui/Dialogs/FileDialog.cs
@@ -429,7 +430,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: DirectoryPath
     path: ../Terminal.Gui/Dialogs/FileDialog.cs
@@ -467,7 +468,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AllowedFileTypes
     path: ../Terminal.Gui/Dialogs/FileDialog.cs
@@ -505,7 +506,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AllowsOtherFileTypes
     path: ../Terminal.Gui/Dialogs/FileDialog.cs
@@ -543,7 +544,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: FilePath
     path: ../Terminal.Gui/Dialogs/FileDialog.cs
@@ -581,7 +582,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Canceled
     path: ../Terminal.Gui/Dialogs/FileDialog.cs
@@ -1076,6 +1077,12 @@ references:
   name: Id
   nameWithType: View.Id
   fullName: Terminal.Gui.View.Id
+- uid: Terminal.Gui.View.IsCurrentTop
+  commentId: P:Terminal.Gui.View.IsCurrentTop
+  parent: Terminal.Gui.View
+  name: IsCurrentTop
+  nameWithType: View.IsCurrentTop
+  fullName: Terminal.Gui.View.IsCurrentTop
 - uid: Terminal.Gui.View.WantMousePositionReports
   commentId: P:Terminal.Gui.View.WantMousePositionReports
   parent: Terminal.Gui.View

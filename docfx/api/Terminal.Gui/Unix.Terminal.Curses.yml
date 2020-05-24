@@ -187,7 +187,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Curses
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -262,7 +262,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: initscr
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -296,7 +296,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Lines
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -333,7 +333,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Cols
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -370,7 +370,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: CheckWinChange
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -404,7 +404,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: addstr
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -446,7 +446,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: addch
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -483,7 +483,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: mousemask
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -525,7 +525,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyAlt
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -558,7 +558,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: IsAlt
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -595,7 +595,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: StartColor
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -629,7 +629,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: HasColors
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -666,7 +666,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: InitColorPair
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -707,7 +707,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: UseDefaultColors
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -741,7 +741,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ColorPairs
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -778,7 +778,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: endwin
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -812,7 +812,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: isendwin
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -846,7 +846,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: cbreak
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -880,7 +880,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: nocbreak
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -914,7 +914,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: echo
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -948,7 +948,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: noecho
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -982,7 +982,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: halfdelay
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1019,7 +1019,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: raw
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1053,7 +1053,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: noraw
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1087,7 +1087,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: noqiflush
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1119,7 +1119,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: qiflush
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1151,7 +1151,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: typeahead
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1188,7 +1188,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: timeout
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1225,7 +1225,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: wtimeout
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1264,7 +1264,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: notimeout
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1303,7 +1303,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: keypad
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1342,7 +1342,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: meta
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1381,7 +1381,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: intrflush
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1420,7 +1420,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: clearok
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1459,7 +1459,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: idlok
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1498,7 +1498,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: idcok
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1535,7 +1535,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: immedok
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1572,7 +1572,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: leaveok
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1611,7 +1611,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: wsetscrreg
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1652,7 +1652,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: scrollok
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1691,7 +1691,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: nl
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1725,7 +1725,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: nonl
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1759,7 +1759,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: setscrreg
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1798,7 +1798,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: refresh
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1832,7 +1832,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: doupdate
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1866,7 +1866,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: wrefresh
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1903,7 +1903,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: redrawwin
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1940,7 +1940,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: wnoutrefresh
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -1977,7 +1977,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: move
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2016,7 +2016,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: addwstr
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2053,7 +2053,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: wmove
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2094,7 +2094,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: waddch
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2133,7 +2133,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: attron
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2170,7 +2170,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: attroff
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2207,7 +2207,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: attrset
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2244,7 +2244,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: getch
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2278,7 +2278,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: get_wch
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2318,7 +2318,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ungetch
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2355,7 +2355,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: mvgetch
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2394,7 +2394,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: has_colors
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2428,7 +2428,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: start_color
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2462,7 +2462,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: init_pair
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2503,7 +2503,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: use_default_colors
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2537,7 +2537,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: COLOR_PAIRS
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2571,7 +2571,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: getmouse
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2611,7 +2611,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ungetmouse
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2651,7 +2651,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: mouseinterval
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -2688,7 +2688,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: A_NORMAL
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -2721,7 +2721,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: A_STANDOUT
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -2754,7 +2754,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: A_UNDERLINE
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -2787,7 +2787,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: A_REVERSE
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -2820,7 +2820,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: A_BLINK
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -2853,7 +2853,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: A_DIM
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -2886,7 +2886,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: A_BOLD
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -2919,7 +2919,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: A_PROTECT
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -2952,7 +2952,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: A_INVIS
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -2985,7 +2985,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_LLCORNER
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3018,7 +3018,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_LRCORNER
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3051,7 +3051,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_HLINE
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3084,7 +3084,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_ULCORNER
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3117,7 +3117,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_URCORNER
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3150,7 +3150,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_VLINE
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3183,7 +3183,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_LTEE
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3216,7 +3216,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_RTEE
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3249,7 +3249,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_BTEE
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3282,7 +3282,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_TTEE
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3315,7 +3315,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_PLUS
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3348,7 +3348,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_S1
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3381,7 +3381,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_S9
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3414,7 +3414,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_DIAMOND
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3447,7 +3447,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_CKBOARD
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3480,7 +3480,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_DEGREE
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3513,7 +3513,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_PLMINUS
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3546,7 +3546,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_BULLET
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3579,7 +3579,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_LARROW
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3612,7 +3612,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_RARROW
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3645,7 +3645,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_DARROW
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3678,7 +3678,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_UARROW
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3711,7 +3711,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_BOARD
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3744,7 +3744,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_LANTERN
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3777,7 +3777,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ACS_BLOCK
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3810,7 +3810,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: COLOR_BLACK
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3843,7 +3843,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: COLOR_RED
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3876,7 +3876,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: COLOR_GREEN
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3909,7 +3909,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: COLOR_YELLOW
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3942,7 +3942,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: COLOR_BLUE
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -3975,7 +3975,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: COLOR_MAGENTA
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4008,7 +4008,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: COLOR_CYAN
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4041,7 +4041,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: COLOR_WHITE
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4074,7 +4074,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KEY_CODE_YES
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4107,7 +4107,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: LeftRightUpNPagePPage
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4140,7 +4140,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: DownEnd
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4173,7 +4173,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Home
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4206,7 +4206,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ERR
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4239,7 +4239,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyBackspace
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4272,7 +4272,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyUp
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4305,7 +4305,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyDown
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4338,7 +4338,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyLeft
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4371,7 +4371,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyRight
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4404,7 +4404,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyNPage
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4437,7 +4437,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyPPage
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4470,7 +4470,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyHome
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4503,7 +4503,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyMouse
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4536,7 +4536,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyEnd
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4569,7 +4569,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyDeleteChar
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4602,7 +4602,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyInsertChar
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4635,7 +4635,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyBackTab
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4668,7 +4668,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyF1
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4701,7 +4701,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyF2
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4734,7 +4734,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyF3
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4767,7 +4767,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyF4
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4800,7 +4800,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyF5
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4833,7 +4833,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyF6
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4866,7 +4866,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyF7
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4899,7 +4899,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyF8
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4932,7 +4932,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyF9
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4965,7 +4965,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyF10
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -4998,7 +4998,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyResize
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5031,7 +5031,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftKeyUp
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5064,7 +5064,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftKeyDown
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5097,7 +5097,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftKeyLeft
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5130,7 +5130,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftKeyRight
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5163,7 +5163,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftKeyNPage
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5196,7 +5196,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftKeyPPage
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5229,7 +5229,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftKeyHome
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5262,7 +5262,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftKeyEnd
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5295,7 +5295,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AltKeyUp
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5328,7 +5328,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AltKeyDown
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5361,7 +5361,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AltKeyLeft
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5394,7 +5394,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AltKeyRight
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5427,7 +5427,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AltKeyNPage
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5460,7 +5460,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AltKeyPPage
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5493,7 +5493,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AltKeyHome
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5526,7 +5526,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AltKeyEnd
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5559,7 +5559,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: CtrlKeyUp
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5592,7 +5592,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: CtrlKeyDown
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5625,7 +5625,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: CtrlKeyLeft
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5658,7 +5658,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: CtrlKeyRight
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5691,7 +5691,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: CtrlKeyNPage
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5724,7 +5724,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: CtrlKeyPPage
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5757,7 +5757,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: CtrlKeyHome
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5790,7 +5790,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: CtrlKeyEnd
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5823,7 +5823,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftCtrlKeyUp
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5856,7 +5856,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftCtrlKeyDown
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5889,7 +5889,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftCtrlKeyLeft
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5922,7 +5922,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftCtrlKeyRight
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5955,7 +5955,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftCtrlKeyNPage
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -5988,7 +5988,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftCtrlKeyPPage
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -6021,7 +6021,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftCtrlKeyHome
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -6054,7 +6054,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ShiftCtrlKeyEnd
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -6087,7 +6087,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: LC_ALL
     path: ../Terminal.Gui/MonoCurses/constants.cs
@@ -6120,7 +6120,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ColorPair
     path: ../Terminal.Gui/MonoCurses/constants.cs

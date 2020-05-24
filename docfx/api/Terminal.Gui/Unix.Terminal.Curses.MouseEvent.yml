@@ -20,7 +20,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MouseEvent
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -58,7 +58,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ID
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -89,7 +89,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: X
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -120,7 +120,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Y
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -151,7 +151,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Z
     path: ../Terminal.Gui/MonoCurses/binding.cs
@@ -182,7 +182,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ButtonState
     path: ../Terminal.Gui/MonoCurses/binding.cs

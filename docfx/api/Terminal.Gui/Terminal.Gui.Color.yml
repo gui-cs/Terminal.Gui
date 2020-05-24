@@ -31,7 +31,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Color
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -64,7 +64,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Black
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -98,7 +98,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Blue
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -132,7 +132,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Green
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -166,7 +166,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Cyan
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -200,7 +200,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Red
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -234,7 +234,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Magenta
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -268,7 +268,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Brown
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -302,7 +302,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Gray
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -336,7 +336,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: DarkGray
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -370,7 +370,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: BrightBlue
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -404,7 +404,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: BrightGreen
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -438,7 +438,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: BrighCyan
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -472,7 +472,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: BrightRed
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -506,7 +506,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: BrightMagenta
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -540,7 +540,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: BrightYellow
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -574,7 +574,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: White
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs

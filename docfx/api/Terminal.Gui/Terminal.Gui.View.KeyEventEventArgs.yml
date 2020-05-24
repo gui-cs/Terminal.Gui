@@ -17,11 +17,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyEventEventArgs
     path: ../Terminal.Gui/Core.cs
-    startLine: 1070
+    startLine: 1079
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -65,11 +65,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Core.cs
-    startLine: 1075
+    startLine: 1084
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -101,11 +101,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: KeyEvent
     path: ../Terminal.Gui/Core.cs
-    startLine: 1079
+    startLine: 1088
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui

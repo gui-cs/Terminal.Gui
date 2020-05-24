@@ -17,7 +17,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: LayoutStyle
     path: ../Terminal.Gui/Core.cs
@@ -50,7 +50,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Absolute
     path: ../Terminal.Gui/Core.cs
@@ -84,7 +84,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Computed
     path: ../Terminal.Gui/Core.cs

@@ -20,7 +20,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ColorScheme
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -63,7 +63,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Normal
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -100,7 +100,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Focus
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -137,7 +137,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: HotNormal
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -174,7 +174,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: HotFocus
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -211,7 +211,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Disabled
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs

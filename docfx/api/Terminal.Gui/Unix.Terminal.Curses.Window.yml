@@ -36,7 +36,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Window
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -77,7 +77,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Handle
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -110,7 +110,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Standard
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -147,7 +147,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Current
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -184,7 +184,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: wtimeout
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -219,7 +219,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: notimeout
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -254,7 +254,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: keypad
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -289,7 +289,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: meta
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -324,7 +324,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: intrflush
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -359,7 +359,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: clearok
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -394,7 +394,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: idlok
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -429,7 +429,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: idcok
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -462,7 +462,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: immedok
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -495,7 +495,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: leaveok
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -530,7 +530,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: setscrreg
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -567,7 +567,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: scrollok
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -602,7 +602,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: wrefresh
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -634,7 +634,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: redrawwin
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -666,7 +666,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: wnoutrefresh
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -698,7 +698,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: move
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -735,7 +735,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: addch
     path: ../Terminal.Gui/MonoCurses/handles.cs
@@ -770,7 +770,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: refresh
     path: ../Terminal.Gui/MonoCurses/handles.cs

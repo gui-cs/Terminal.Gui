@@ -27,7 +27,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Scenario
     path: ../UICatalog/Scenario.cs
@@ -75,7 +75,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Top
     path: ../UICatalog/Scenario.cs
@@ -112,7 +112,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Win
     path: ../UICatalog/Scenario.cs
@@ -149,7 +149,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Init
     path: ../UICatalog/Scenario.cs
@@ -188,7 +188,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: GetName
     path: ../UICatalog/Scenario.cs
@@ -223,7 +223,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: GetDescription
     path: ../UICatalog/Scenario.cs
@@ -258,7 +258,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: GetCategories
     path: ../UICatalog/Scenario.cs
@@ -293,7 +293,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ToString
     path: ../UICatalog/Scenario.cs
@@ -329,7 +329,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Setup
     path: ../UICatalog/Scenario.cs
@@ -364,7 +364,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Run
     path: ../UICatalog/Scenario.cs
@@ -399,7 +399,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: RequestStop
     path: ../UICatalog/Scenario.cs
@@ -433,7 +433,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Dispose
     path: ../UICatalog/Scenario.cs
@@ -468,7 +468,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Dispose
     path: ../UICatalog/Scenario.cs

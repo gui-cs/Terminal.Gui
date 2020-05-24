@@ -19,7 +19,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/Dialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Dialog
     path: ../Terminal.Gui/Dialogs/Dialog.cs
@@ -71,6 +71,7 @@ items:
   - Terminal.Gui.View.Driver
   - Terminal.Gui.View.Subviews
   - Terminal.Gui.View.Id
+  - Terminal.Gui.View.IsCurrentTop
   - Terminal.Gui.View.WantMousePositionReports
   - Terminal.Gui.View.WantContinuousButtonPressed
   - Terminal.Gui.View.Frame
@@ -149,7 +150,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/Dialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Dialogs/Dialog.cs
@@ -197,7 +198,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/Dialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AddButton
     path: ../Terminal.Gui/Dialogs/Dialog.cs
@@ -233,7 +234,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/Dialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: LayoutSubviews
     path: ../Terminal.Gui/Dialogs/Dialog.cs
@@ -267,7 +268,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Dialogs/Dialog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ProcessKey
     path: ../Terminal.Gui/Dialogs/Dialog.cs
@@ -697,6 +698,12 @@ references:
   name: Id
   nameWithType: View.Id
   fullName: Terminal.Gui.View.Id
+- uid: Terminal.Gui.View.IsCurrentTop
+  commentId: P:Terminal.Gui.View.IsCurrentTop
+  parent: Terminal.Gui.View
+  name: IsCurrentTop
+  nameWithType: View.IsCurrentTop
+  fullName: Terminal.Gui.View.IsCurrentTop
 - uid: Terminal.Gui.View.WantMousePositionReports
   commentId: P:Terminal.Gui.View.WantMousePositionReports
   parent: Terminal.Gui.View

@@ -37,7 +37,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: CursesDriver
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -100,7 +100,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Cols
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -138,7 +138,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Rows
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -176,7 +176,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Move
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -214,7 +214,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AddRune
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -250,7 +250,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AddStr
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -286,7 +286,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Refresh
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -319,7 +319,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: UpdateCursor
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -352,7 +352,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: End
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -385,7 +385,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: UpdateScreen
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -418,7 +418,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: SetAttribute
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -454,7 +454,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: window
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -485,7 +485,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MakeColor
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -529,7 +529,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: SetColors
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -567,7 +567,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: SetColors
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -605,7 +605,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: PrepareToRun
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -652,7 +652,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Init
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -688,7 +688,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MakeAttribute
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -728,7 +728,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Suspend
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -761,7 +761,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: StartReportingMouseMoves
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -794,7 +794,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: StopReportingMouseMoves
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -827,7 +827,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: UncookMouse
     path: ../Terminal.Gui/Drivers/CursesDriver.cs
@@ -860,7 +860,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/CursesDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: CookMouse
     path: ../Terminal.Gui/Drivers/CursesDriver.cs

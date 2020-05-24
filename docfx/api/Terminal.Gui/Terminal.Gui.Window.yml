@@ -26,11 +26,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Window
     path: ../Terminal.Gui/Core.cs
-    startLine: 1738
+    startLine: 1747
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -70,6 +70,7 @@ items:
   - Terminal.Gui.View.Driver
   - Terminal.Gui.View.Subviews
   - Terminal.Gui.View.Id
+  - Terminal.Gui.View.IsCurrentTop
   - Terminal.Gui.View.WantMousePositionReports
   - Terminal.Gui.View.WantContinuousButtonPressed
   - Terminal.Gui.View.Frame
@@ -149,11 +150,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Title
     path: ../Terminal.Gui/Core.cs
-    startLine: 1746
+    startLine: 1755
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -187,11 +188,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Core.cs
-    startLine: 1778
+    startLine: 1787
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -226,11 +227,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Core.cs
-    startLine: 1786
+    startLine: 1795
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -262,11 +263,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Core.cs
-    startLine: 1799
+    startLine: 1808
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -304,11 +305,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Core.cs
-    startLine: 1816
+    startLine: 1825
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -343,11 +344,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: GetEnumerator
     path: ../Terminal.Gui/Core.cs
-    startLine: 1834
+    startLine: 1843
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -380,11 +381,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Add
     path: ../Terminal.Gui/Core.cs
-    startLine: 1848
+    startLine: 1857
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -419,11 +420,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Remove
     path: ../Terminal.Gui/Core.cs
-    startLine: 1861
+    startLine: 1870
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -458,11 +459,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: RemoveAll
     path: ../Terminal.Gui/Core.cs
-    startLine: 1879
+    startLine: 1888
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -494,11 +495,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Redraw
     path: ../Terminal.Gui/Core.cs
-    startLine: 1885
+    startLine: 1894
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -531,11 +532,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MouseEvent
     path: ../Terminal.Gui/Core.cs
-    startLine: 1921
+    startLine: 1930
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -764,6 +765,12 @@ references:
   name: Id
   nameWithType: View.Id
   fullName: Terminal.Gui.View.Id
+- uid: Terminal.Gui.View.IsCurrentTop
+  commentId: P:Terminal.Gui.View.IsCurrentTop
+  parent: Terminal.Gui.View
+  name: IsCurrentTop
+  nameWithType: View.IsCurrentTop
+  fullName: Terminal.Gui.View.IsCurrentTop
 - uid: Terminal.Gui.View.WantMousePositionReports
   commentId: P:Terminal.Gui.View.WantMousePositionReports
   parent: Terminal.Gui.View

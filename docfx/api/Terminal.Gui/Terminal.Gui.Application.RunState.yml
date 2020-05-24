@@ -17,11 +17,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: RunState
     path: ../Terminal.Gui/Core.cs
-    startLine: 2134
+    startLine: 2143
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -65,11 +65,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Dispose
     path: ../Terminal.Gui/Core.cs
-    startLine: 2149
+    startLine: 2158
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -109,11 +109,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Dispose
     path: ../Terminal.Gui/Core.cs
-    startLine: 2160
+    startLine: 2169
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui

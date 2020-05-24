@@ -20,7 +20,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Attribute
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -61,7 +61,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -103,7 +103,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -142,7 +142,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: op_Implicit
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -186,7 +186,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: op_Implicit
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -230,7 +230,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Make
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs

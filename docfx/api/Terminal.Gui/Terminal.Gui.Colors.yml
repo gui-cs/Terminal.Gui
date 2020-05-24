@@ -20,7 +20,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Colors
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -64,7 +64,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: TopLevel
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -103,7 +103,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Base
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -142,7 +142,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Dialog
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -181,7 +181,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Menu
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -220,7 +220,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Error
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs

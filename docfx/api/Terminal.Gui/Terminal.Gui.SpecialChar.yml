@@ -27,7 +27,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: SpecialChar
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -60,7 +60,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: HLine
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -94,7 +94,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: VLine
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -128,7 +128,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Stipple
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -162,7 +162,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Diamond
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -196,7 +196,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ULCorner
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -230,7 +230,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: LLCorner
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -264,7 +264,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: URCorner
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -298,7 +298,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: LRCorner
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -332,7 +332,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: LeftTee
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -366,7 +366,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: RightTee
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -400,7 +400,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: TopTee
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
@@ -434,7 +434,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: BottomTee
     path: ../Terminal.Gui/Drivers/ConsoleDriver.cs

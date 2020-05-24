@@ -19,7 +19,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Menu.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MenuBarItem
     path: ../Terminal.Gui/Views/Menu.cs
@@ -75,7 +75,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Menu.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/Menu.cs
@@ -123,7 +123,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Menu.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/Menu.cs
@@ -165,11 +165,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Menu.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/Menu.cs
-    startLine: 172
+    startLine: 175
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -204,11 +204,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Menu.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Children
     path: ../Terminal.Gui/Views/Menu.cs
-    startLine: 219
+    startLine: 222
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui

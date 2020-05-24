@@ -22,7 +22,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MouseEvent
     path: ../Terminal.Gui/Event.cs
@@ -61,7 +61,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: X
     path: ../Terminal.Gui/Event.cs
@@ -94,7 +94,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Y
     path: ../Terminal.Gui/Event.cs
@@ -127,7 +127,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Flags
     path: ../Terminal.Gui/Event.cs
@@ -160,7 +160,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: OfX
     path: ../Terminal.Gui/Event.cs
@@ -193,7 +193,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: OfY
     path: ../Terminal.Gui/Event.cs
@@ -226,7 +226,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: View
     path: ../Terminal.Gui/Event.cs
@@ -259,7 +259,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ToString
     path: ../Terminal.Gui/Event.cs
