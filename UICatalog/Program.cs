@@ -12,7 +12,7 @@ namespace UICatalog {
 	/// Main program for the Terminal.gui UI Catalog app. This app provides a chooser that allows
 	/// for a calalog of UI demos, examples, and tests.
 	/// </summary>
-	class Program {
+	internal class Program {
 		private static Toplevel _top;
 		private static MenuBar _menu;
 		private static int _nameColumnWidth;
@@ -24,34 +24,33 @@ namespace UICatalog {
 		private static ListView _scenarioListView;
 		private static StatusBar _statusBar;
 
-		private static Scenario _runningScenario = null;
+		private static Scenario _selectedScenario = null;
 
 		static void Main (string [] args)
 		{
 			if (Debugger.IsAttached)
 				CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 
-			_scenarios = Scenario.GetDerivedClassesCollection ().ToList ();
+			_scenarios = Scenario.GetDerivedClassesCollection ().OrderBy (t => Scenario.ScenarioMetadata.GetName (t)).ToList();
 
 			if (args.Length > 0) {
 				var item = _scenarios.FindIndex (t => Scenario.ScenarioMetadata.GetName (t).Equals (args [0], StringComparison.OrdinalIgnoreCase));
-				_runningScenario = (Scenario)Activator.CreateInstance (_scenarios [item]);
-				Application.Init ();
-				_runningScenario.Init (Application.Top);
-				_runningScenario.Setup ();
-				_runningScenario.Run ();
-				_runningScenario = null;
+				_selectedScenario = (Scenario)Activator.CreateInstance (_scenarios [item]);
+				_selectedScenario.Init (Application.Top);
+				_selectedScenario.Setup ();
+				_selectedScenario.Run ();
+				_selectedScenario = null;
 				return;
 			}
 
 			Scenario scenario = GetScenarioToRun ();
 			while (scenario != null) {
-				Application.Init ();
 				scenario.Init (Application.Top);
 				scenario.Setup ();
 				scenario.Run ();
 				scenario = GetScenarioToRun ();
 			}
+
 		}
 
 		/// <summary>
@@ -75,7 +74,7 @@ namespace UICatalog {
 			};
 
 
-			_categories = Scenario.GetAllCategories ();
+			_categories = Scenario.GetAllCategories ().OrderBy(c => c).ToList();
 			_categoryListView = new ListView (_categories) {
 				X = 1,
 				Y = 0,
@@ -125,12 +124,12 @@ namespace UICatalog {
 			_statusBar = new StatusBar (new StatusItem [] {
 				//new StatusItem(Key.F1, "~F1~ Help", () => Help()),
 				new StatusItem(Key.ControlQ, "~CTRL-Q~ Quit", () => {
-					if (_runningScenario is null){
+					if (_selectedScenario is null){
 						// This causes GetScenarioToRun to return null
-						_runningScenario = null;
+						_selectedScenario = null;
 						Application.RequestStop();
 					} else {
-						_runningScenario.RequestStop();
+						_selectedScenario.RequestStop();
 					}
 				}),
 			});
@@ -163,15 +162,16 @@ namespace UICatalog {
 				Application.Iteration += Application_Iteration;
 #else
 			_top.Ready += (o, a) => {
-				if (_runningScenario != null) {
+				if (_selectedScenario != null) {
 					_top.SetFocus (_rightPane);
-					_runningScenario = null;
+					_selectedScenario = null;
 				}
 			};
 #endif
 			
 			Application.Run (_top);
-			return _runningScenario;
+			Application.Shutdown ();
+			return _selectedScenario;
 		}
 
 #if false
@@ -183,9 +183,9 @@ namespace UICatalog {
 #endif
 		private static void _scenarioListView_OpenSelectedItem (object sender, EventArgs e)
 		{
-			if (_runningScenario is null) {
+			if (_selectedScenario is null) {
 				var source = _scenarioListView.Source as ScenarioListDataSource;
-				_runningScenario = (Scenario)Activator.CreateInstance (source.Scenarios [_scenarioListView.SelectedItem]);
+				_selectedScenario = (Scenario)Activator.CreateInstance (source.Scenarios [_scenarioListView.SelectedItem]);
 				Application.RequestStop ();
 			}
 		}
@@ -246,7 +246,7 @@ namespace UICatalog {
 		/// <param name="ke"></param>
 		private static void KeyUpHandler (object sender, View.KeyEventEventArgs a)
 		{
-			if (_runningScenario != null) {
+			if (_selectedScenario != null) {
 				//switch (ke.Key) {
 				//case Key.Esc:
 				//	//_runningScenario.RequestStop ();

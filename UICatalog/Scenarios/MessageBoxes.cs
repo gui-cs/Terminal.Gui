@@ -33,10 +33,5 @@ namespace UICatalog {
 			Top.Add (Win);
 
 		}
-
-		public override void Run ()
-		{
-			Application.Run (Top);
-		}
 	}
 }
