@@ -33,6 +33,8 @@
     name: Colors
   - uid: Terminal.Gui.ColorScheme
     name: ColorScheme
+  - uid: Terminal.Gui.ComboBox
+    name: ComboBox
   - uid: Terminal.Gui.ConsoleDriver
     name: ConsoleDriver
   - uid: Terminal.Gui.CursesDriver

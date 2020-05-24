@@ -41,6 +41,10 @@ namespace Terminal.Gui {
 			Initialize (date);
 		}
 
+		/// <summary>
+		///  Initializes a new instance of <see cref="DateField"/> 
+		/// </summary>
+		/// <param name="date"></param>
 		public DateField (DateTime date) : base ("")
 		{
 			this.isShort = true;

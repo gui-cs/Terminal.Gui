@@ -30,7 +30,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: MainLoop
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 316
+    startLine: 327
   assemblies:
   - Terminal.Gui
   namespace: Mono.Terminal
@@ -74,7 +74,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: Driver
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 331
+    startLine: 342
   assemblies:
   - Terminal.Gui
   namespace: Mono.Terminal
@@ -112,7 +112,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 337
+    startLine: 348
   assemblies:
   - Terminal.Gui
   namespace: Mono.Terminal
@@ -147,7 +147,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: Invoke
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 346
+    startLine: 357
   assemblies:
   - Terminal.Gui
   namespace: Mono.Terminal
@@ -182,7 +182,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: AddIdle
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 357
+    startLine: 368
   assemblies:
   - Terminal.Gui
   namespace: Mono.Terminal
@@ -222,7 +222,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: RemoveIdle
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 368
+    startLine: 379
   assemblies:
   - Terminal.Gui
   namespace: Mono.Terminal
@@ -260,7 +260,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: AddTimeout
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 390
+    startLine: 401
   assemblies:
   - Terminal.Gui
   namespace: Mono.Terminal
@@ -303,7 +303,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: RemoveTimeout
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 408
+    startLine: 419
   assemblies:
   - Terminal.Gui
   namespace: Mono.Terminal
@@ -339,7 +339,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: Stop
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 451
+    startLine: 462
   assemblies:
   - Terminal.Gui
   namespace: Mono.Terminal
@@ -371,7 +371,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: EventsPending
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 465
+    startLine: 476
   assemblies:
   - Terminal.Gui
   namespace: Mono.Terminal
@@ -409,7 +409,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: MainIteration
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 479
+    startLine: 490
   assemblies:
   - Terminal.Gui
   namespace: Mono.Terminal
@@ -442,7 +442,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: Run
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 495
+    startLine: 506
   assemblies:
   - Terminal.Gui
   namespace: Mono.Terminal

@@ -108,6 +108,7 @@ items:
   derivedClasses:
   - Terminal.Gui.Button
   - Terminal.Gui.CheckBox
+  - Terminal.Gui.ComboBox
   - Terminal.Gui.FrameView
   - Terminal.Gui.HexView
   - Terminal.Gui.Label

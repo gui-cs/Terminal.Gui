@@ -257,7 +257,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: Mono.Terminal.IMainLoopDriver.MainIteration
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 223
+    startLine: 234
   assemblies:
   - Terminal.Gui
   namespace: Mono.Terminal

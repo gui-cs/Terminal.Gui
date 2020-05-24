@@ -176,7 +176,7 @@ namespace UICatalog {
 		}
 	}
 
-	public static class StringExtensions {
+	internal static class StringExtensions {
 		public static string Repeat (this string instr, int n)
 		{
 			if (n <= 0) {

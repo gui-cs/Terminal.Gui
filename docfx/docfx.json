@@ -19,6 +19,26 @@
       "properties": {
           "TargetFramework": "netstandard2.0"
       }
+    },
+    {
+      "src": [
+        {
+          "files": [
+            "UICatalog.csproj"
+          ],
+          "exclude": [
+            "**/obj/**",
+            "**/bin/**",
+            "_site/**"
+          ],
+          "src": "../UICatalog"
+        }
+      ],
+      "dest": "api/UICatalog",
+      "shouldSkipMarkup": false,
+      "properties": {
+          "TargetFramework": "netstandard2.1"
+      }
     }
   ],
   "build": {

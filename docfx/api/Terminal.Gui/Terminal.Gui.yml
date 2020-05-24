@@ -14,6 +14,7 @@ items:
   - Terminal.Gui.Color
   - Terminal.Gui.Colors
   - Terminal.Gui.ColorScheme
+  - Terminal.Gui.ComboBox
   - Terminal.Gui.ConsoleDriver
   - Terminal.Gui.CursesDriver
   - Terminal.Gui.DateField
@@ -256,6 +257,11 @@ references:
   name: Clipboard
   nameWithType: Clipboard
   fullName: Terminal.Gui.Clipboard
+- uid: Terminal.Gui.ComboBox
+  commentId: T:Terminal.Gui.ComboBox
+  name: ComboBox
+  nameWithType: ComboBox
+  fullName: Terminal.Gui.ComboBox
 - uid: Terminal.Gui.DateField
   commentId: T:Terminal.Gui.DateField
   name: DateField

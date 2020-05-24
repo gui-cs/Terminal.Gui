@@ -1268,6 +1268,73 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ColorScheme.Normal
   nameWithType: ColorScheme.Normal
+- uid: Terminal.Gui.ComboBox
+  name: ComboBox
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html
+  commentId: T:Terminal.Gui.ComboBox
+  fullName: Terminal.Gui.ComboBox
+  nameWithType: ComboBox
+- uid: Terminal.Gui.ComboBox.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Collections.Generic.IList{System.String})
+  name: ComboBox(Int32, Int32, Int32, Int32, IList<String>)
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox__ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Collections_Generic_IList_System_String__
+  commentId: M:Terminal.Gui.ComboBox.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Collections.Generic.IList{System.String})
+  name.vb: ComboBox(Int32, Int32, Int32, Int32, IList(Of String))
+  fullName: Terminal.Gui.ComboBox.ComboBox(System.Int32, System.Int32, System.Int32, System.Int32, System.Collections.Generic.IList<System.String>)
+  fullName.vb: Terminal.Gui.ComboBox.ComboBox(System.Int32, System.Int32, System.Int32, System.Int32, System.Collections.Generic.IList(Of System.String))
+  nameWithType: ComboBox.ComboBox(Int32, Int32, Int32, Int32, IList<String>)
+  nameWithType.vb: ComboBox.ComboBox(Int32, Int32, Int32, Int32, IList(Of String))
+- uid: Terminal.Gui.ComboBox.#ctor*
+  name: ComboBox
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox__ctor_
+  commentId: Overload:Terminal.Gui.ComboBox.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.ComboBox
+  nameWithType: ComboBox.ComboBox
+- uid: Terminal.Gui.ComboBox.Changed
+  name: Changed
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Changed
+  commentId: E:Terminal.Gui.ComboBox.Changed
+  fullName: Terminal.Gui.ComboBox.Changed
+  nameWithType: ComboBox.Changed
+- uid: Terminal.Gui.ComboBox.OnEnter
+  name: OnEnter()
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnEnter
+  commentId: M:Terminal.Gui.ComboBox.OnEnter
+  fullName: Terminal.Gui.ComboBox.OnEnter()
+  nameWithType: ComboBox.OnEnter()
+- uid: Terminal.Gui.ComboBox.OnEnter*
+  name: OnEnter
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnEnter_
+  commentId: Overload:Terminal.Gui.ComboBox.OnEnter
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.OnEnter
+  nameWithType: ComboBox.OnEnter
+- uid: Terminal.Gui.ComboBox.ProcessKey(Terminal.Gui.KeyEvent)
+  name: ProcessKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_ProcessKey_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.ComboBox.ProcessKey(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.ComboBox.ProcessKey(Terminal.Gui.KeyEvent)
+  nameWithType: ComboBox.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.ComboBox.ProcessKey*
+  name: ProcessKey
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_ProcessKey_
+  commentId: Overload:Terminal.Gui.ComboBox.ProcessKey
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.ProcessKey
+  nameWithType: ComboBox.ProcessKey
+- uid: Terminal.Gui.ComboBox.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Text
+  commentId: P:Terminal.Gui.ComboBox.Text
+  fullName: Terminal.Gui.ComboBox.Text
+  nameWithType: ComboBox.Text
+- uid: Terminal.Gui.ComboBox.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Text_
+  commentId: Overload:Terminal.Gui.ComboBox.Text
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.Text
+  nameWithType: ComboBox.Text
 - uid: Terminal.Gui.ConsoleDriver
   name: ConsoleDriver
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html
@@ -1934,6 +2001,12 @@ references:
   commentId: T:Terminal.Gui.DateField
   fullName: Terminal.Gui.DateField
   nameWithType: DateField
+- uid: Terminal.Gui.DateField.#ctor(System.DateTime)
+  name: DateField(DateTime)
+  href: api/Terminal.Gui/Terminal.Gui.DateField.html#Terminal_Gui_DateField__ctor_System_DateTime_
+  commentId: M:Terminal.Gui.DateField.#ctor(System.DateTime)
+  fullName: Terminal.Gui.DateField.DateField(System.DateTime)
+  nameWithType: DateField.DateField(DateTime)
 - uid: Terminal.Gui.DateField.#ctor(System.Int32,System.Int32,System.DateTime,System.Boolean)
   name: DateField(Int32, Int32, DateTime, Boolean)
   href: api/Terminal.Gui/Terminal.Gui.DateField.html#Terminal_Gui_DateField__ctor_System_Int32_System_Int32_System_DateTime_System_Boolean_
@@ -1960,6 +2033,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.DateField.Date
   nameWithType: DateField.Date
+- uid: Terminal.Gui.DateField.IsShortFormat
+  name: IsShortFormat
+  href: api/Terminal.Gui/Terminal.Gui.DateField.html#Terminal_Gui_DateField_IsShortFormat
+  commentId: P:Terminal.Gui.DateField.IsShortFormat
+  fullName: Terminal.Gui.DateField.IsShortFormat
+  nameWithType: DateField.IsShortFormat
+- uid: Terminal.Gui.DateField.IsShortFormat*
+  name: IsShortFormat
+  href: api/Terminal.Gui/Terminal.Gui.DateField.html#Terminal_Gui_DateField_IsShortFormat_
+  commentId: Overload:Terminal.Gui.DateField.IsShortFormat
+  isSpec: "True"
+  fullName: Terminal.Gui.DateField.IsShortFormat
+  nameWithType: DateField.IsShortFormat
 - uid: Terminal.Gui.DateField.MouseEvent(Terminal.Gui.MouseEvent)
   name: MouseEvent(MouseEvent)
   href: api/Terminal.Gui/Terminal.Gui.DateField.html#Terminal_Gui_DateField_MouseEvent_Terminal_Gui_MouseEvent_
@@ -6702,6 +6788,12 @@ references:
   commentId: T:Terminal.Gui.TimeField
   fullName: Terminal.Gui.TimeField
   nameWithType: TimeField
+- uid: Terminal.Gui.TimeField.#ctor(System.DateTime)
+  name: TimeField(DateTime)
+  href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField__ctor_System_DateTime_
+  commentId: M:Terminal.Gui.TimeField.#ctor(System.DateTime)
+  fullName: Terminal.Gui.TimeField.TimeField(System.DateTime)
+  nameWithType: TimeField.TimeField(DateTime)
 - uid: Terminal.Gui.TimeField.#ctor(System.Int32,System.Int32,System.DateTime,System.Boolean)
   name: TimeField(Int32, Int32, DateTime, Boolean)
   href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField__ctor_System_Int32_System_Int32_System_DateTime_System_Boolean_
@@ -6715,6 +6807,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TimeField.TimeField
   nameWithType: TimeField.TimeField
+- uid: Terminal.Gui.TimeField.IsShortFormat
+  name: IsShortFormat
+  href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField_IsShortFormat
+  commentId: P:Terminal.Gui.TimeField.IsShortFormat
+  fullName: Terminal.Gui.TimeField.IsShortFormat
+  nameWithType: TimeField.IsShortFormat
+- uid: Terminal.Gui.TimeField.IsShortFormat*
+  name: IsShortFormat
+  href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField_IsShortFormat_
+  commentId: Overload:Terminal.Gui.TimeField.IsShortFormat
+  isSpec: "True"
+  fullName: Terminal.Gui.TimeField.IsShortFormat
+  nameWithType: TimeField.IsShortFormat
 - uid: Terminal.Gui.TimeField.MouseEvent(Terminal.Gui.MouseEvent)
   name: MouseEvent(MouseEvent)
   href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField_MouseEvent_Terminal_Gui_MouseEvent_
@@ -7910,6 +8015,302 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Window.Title
   nameWithType: Window.Title
+- uid: UICatalog
+  name: UICatalog
+  href: api/UICatalog/UICatalog.html
+  commentId: N:UICatalog
+  fullName: UICatalog
+  nameWithType: UICatalog
+- uid: UICatalog.Scenario
+  name: Scenario
+  href: api/UICatalog/UICatalog.Scenario.html
+  commentId: T:UICatalog.Scenario
+  fullName: UICatalog.Scenario
+  nameWithType: Scenario
+- uid: UICatalog.Scenario.Dispose
+  name: Dispose()
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Dispose
+  commentId: M:UICatalog.Scenario.Dispose
+  fullName: UICatalog.Scenario.Dispose()
+  nameWithType: Scenario.Dispose()
+- uid: UICatalog.Scenario.Dispose(System.Boolean)
+  name: Dispose(Boolean)
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Dispose_System_Boolean_
+  commentId: M:UICatalog.Scenario.Dispose(System.Boolean)
+  fullName: UICatalog.Scenario.Dispose(System.Boolean)
+  nameWithType: Scenario.Dispose(Boolean)
+- uid: UICatalog.Scenario.Dispose*
+  name: Dispose
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Dispose_
+  commentId: Overload:UICatalog.Scenario.Dispose
+  isSpec: "True"
+  fullName: UICatalog.Scenario.Dispose
+  nameWithType: Scenario.Dispose
+- uid: UICatalog.Scenario.GetCategories
+  name: GetCategories()
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_GetCategories
+  commentId: M:UICatalog.Scenario.GetCategories
+  fullName: UICatalog.Scenario.GetCategories()
+  nameWithType: Scenario.GetCategories()
+- uid: UICatalog.Scenario.GetCategories*
+  name: GetCategories
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_GetCategories_
+  commentId: Overload:UICatalog.Scenario.GetCategories
+  isSpec: "True"
+  fullName: UICatalog.Scenario.GetCategories
+  nameWithType: Scenario.GetCategories
+- uid: UICatalog.Scenario.GetDescription
+  name: GetDescription()
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_GetDescription
+  commentId: M:UICatalog.Scenario.GetDescription
+  fullName: UICatalog.Scenario.GetDescription()
+  nameWithType: Scenario.GetDescription()
+- uid: UICatalog.Scenario.GetDescription*
+  name: GetDescription
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_GetDescription_
+  commentId: Overload:UICatalog.Scenario.GetDescription
+  isSpec: "True"
+  fullName: UICatalog.Scenario.GetDescription
+  nameWithType: Scenario.GetDescription
+- uid: UICatalog.Scenario.GetName
+  name: GetName()
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_GetName
+  commentId: M:UICatalog.Scenario.GetName
+  fullName: UICatalog.Scenario.GetName()
+  nameWithType: Scenario.GetName()
+- uid: UICatalog.Scenario.GetName*
+  name: GetName
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_GetName_
+  commentId: Overload:UICatalog.Scenario.GetName
+  isSpec: "True"
+  fullName: UICatalog.Scenario.GetName
+  nameWithType: Scenario.GetName
+- uid: UICatalog.Scenario.Init(Terminal.Gui.Toplevel)
+  name: Init(Toplevel)
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Init_Terminal_Gui_Toplevel_
+  commentId: M:UICatalog.Scenario.Init(Terminal.Gui.Toplevel)
+  fullName: UICatalog.Scenario.Init(Terminal.Gui.Toplevel)
+  nameWithType: Scenario.Init(Toplevel)
+- uid: UICatalog.Scenario.Init*
+  name: Init
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Init_
+  commentId: Overload:UICatalog.Scenario.Init
+  isSpec: "True"
+  fullName: UICatalog.Scenario.Init
+  nameWithType: Scenario.Init
+- uid: UICatalog.Scenario.RequestStop
+  name: RequestStop()
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_RequestStop
+  commentId: M:UICatalog.Scenario.RequestStop
+  fullName: UICatalog.Scenario.RequestStop()
+  nameWithType: Scenario.RequestStop()
+- uid: UICatalog.Scenario.RequestStop*
+  name: RequestStop
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_RequestStop_
+  commentId: Overload:UICatalog.Scenario.RequestStop
+  isSpec: "True"
+  fullName: UICatalog.Scenario.RequestStop
+  nameWithType: Scenario.RequestStop
+- uid: UICatalog.Scenario.Run
+  name: Run()
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Run
+  commentId: M:UICatalog.Scenario.Run
+  fullName: UICatalog.Scenario.Run()
+  nameWithType: Scenario.Run()
+- uid: UICatalog.Scenario.Run*
+  name: Run
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Run_
+  commentId: Overload:UICatalog.Scenario.Run
+  isSpec: "True"
+  fullName: UICatalog.Scenario.Run
+  nameWithType: Scenario.Run
+- uid: UICatalog.Scenario.ScenarioCategory
+  name: Scenario.ScenarioCategory
+  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html
+  commentId: T:UICatalog.Scenario.ScenarioCategory
+  fullName: UICatalog.Scenario.ScenarioCategory
+  nameWithType: Scenario.ScenarioCategory
+- uid: UICatalog.Scenario.ScenarioCategory.#ctor(System.String)
+  name: ScenarioCategory(String)
+  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory__ctor_System_String_
+  commentId: M:UICatalog.Scenario.ScenarioCategory.#ctor(System.String)
+  fullName: UICatalog.Scenario.ScenarioCategory.ScenarioCategory(System.String)
+  nameWithType: Scenario.ScenarioCategory.ScenarioCategory(String)
+- uid: UICatalog.Scenario.ScenarioCategory.#ctor*
+  name: ScenarioCategory
+  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory__ctor_
+  commentId: Overload:UICatalog.Scenario.ScenarioCategory.#ctor
+  isSpec: "True"
+  fullName: UICatalog.Scenario.ScenarioCategory.ScenarioCategory
+  nameWithType: Scenario.ScenarioCategory.ScenarioCategory
+- uid: UICatalog.Scenario.ScenarioCategory.GetCategories(System.Type)
+  name: GetCategories(Type)
+  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory_GetCategories_System_Type_
+  commentId: M:UICatalog.Scenario.ScenarioCategory.GetCategories(System.Type)
+  fullName: UICatalog.Scenario.ScenarioCategory.GetCategories(System.Type)
+  nameWithType: Scenario.ScenarioCategory.GetCategories(Type)
+- uid: UICatalog.Scenario.ScenarioCategory.GetCategories*
+  name: GetCategories
+  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory_GetCategories_
+  commentId: Overload:UICatalog.Scenario.ScenarioCategory.GetCategories
+  isSpec: "True"
+  fullName: UICatalog.Scenario.ScenarioCategory.GetCategories
+  nameWithType: Scenario.ScenarioCategory.GetCategories
+- uid: UICatalog.Scenario.ScenarioCategory.GetName(System.Type)
+  name: GetName(Type)
+  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory_GetName_System_Type_
+  commentId: M:UICatalog.Scenario.ScenarioCategory.GetName(System.Type)
+  fullName: UICatalog.Scenario.ScenarioCategory.GetName(System.Type)
+  nameWithType: Scenario.ScenarioCategory.GetName(Type)
+- uid: UICatalog.Scenario.ScenarioCategory.GetName*
+  name: GetName
+  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory_GetName_
+  commentId: Overload:UICatalog.Scenario.ScenarioCategory.GetName
+  isSpec: "True"
+  fullName: UICatalog.Scenario.ScenarioCategory.GetName
+  nameWithType: Scenario.ScenarioCategory.GetName
+- uid: UICatalog.Scenario.ScenarioCategory.Name
+  name: Name
+  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory_Name
+  commentId: P:UICatalog.Scenario.ScenarioCategory.Name
+  fullName: UICatalog.Scenario.ScenarioCategory.Name
+  nameWithType: Scenario.ScenarioCategory.Name
+- uid: UICatalog.Scenario.ScenarioCategory.Name*
+  name: Name
+  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory_Name_
+  commentId: Overload:UICatalog.Scenario.ScenarioCategory.Name
+  isSpec: "True"
+  fullName: UICatalog.Scenario.ScenarioCategory.Name
+  nameWithType: Scenario.ScenarioCategory.Name
+- uid: UICatalog.Scenario.ScenarioMetadata
+  name: Scenario.ScenarioMetadata
+  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html
+  commentId: T:UICatalog.Scenario.ScenarioMetadata
+  fullName: UICatalog.Scenario.ScenarioMetadata
+  nameWithType: Scenario.ScenarioMetadata
+- uid: UICatalog.Scenario.ScenarioMetadata.#ctor(System.String,System.String)
+  name: ScenarioMetadata(String, String)
+  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata__ctor_System_String_System_String_
+  commentId: M:UICatalog.Scenario.ScenarioMetadata.#ctor(System.String,System.String)
+  fullName: UICatalog.Scenario.ScenarioMetadata.ScenarioMetadata(System.String, System.String)
+  nameWithType: Scenario.ScenarioMetadata.ScenarioMetadata(String, String)
+- uid: UICatalog.Scenario.ScenarioMetadata.#ctor*
+  name: ScenarioMetadata
+  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata__ctor_
+  commentId: Overload:UICatalog.Scenario.ScenarioMetadata.#ctor
+  isSpec: "True"
+  fullName: UICatalog.Scenario.ScenarioMetadata.ScenarioMetadata
+  nameWithType: Scenario.ScenarioMetadata.ScenarioMetadata
+- uid: UICatalog.Scenario.ScenarioMetadata.Description
+  name: Description
+  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_Description
+  commentId: P:UICatalog.Scenario.ScenarioMetadata.Description
+  fullName: UICatalog.Scenario.ScenarioMetadata.Description
+  nameWithType: Scenario.ScenarioMetadata.Description
+- uid: UICatalog.Scenario.ScenarioMetadata.Description*
+  name: Description
+  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_Description_
+  commentId: Overload:UICatalog.Scenario.ScenarioMetadata.Description
+  isSpec: "True"
+  fullName: UICatalog.Scenario.ScenarioMetadata.Description
+  nameWithType: Scenario.ScenarioMetadata.Description
+- uid: UICatalog.Scenario.ScenarioMetadata.GetDescription(System.Type)
+  name: GetDescription(Type)
+  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_GetDescription_System_Type_
+  commentId: M:UICatalog.Scenario.ScenarioMetadata.GetDescription(System.Type)
+  fullName: UICatalog.Scenario.ScenarioMetadata.GetDescription(System.Type)
+  nameWithType: Scenario.ScenarioMetadata.GetDescription(Type)
+- uid: UICatalog.Scenario.ScenarioMetadata.GetDescription*
+  name: GetDescription
+  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_GetDescription_
+  commentId: Overload:UICatalog.Scenario.ScenarioMetadata.GetDescription
+  isSpec: "True"
+  fullName: UICatalog.Scenario.ScenarioMetadata.GetDescription
+  nameWithType: Scenario.ScenarioMetadata.GetDescription
+- uid: UICatalog.Scenario.ScenarioMetadata.GetName(System.Type)
+  name: GetName(Type)
+  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_GetName_System_Type_
+  commentId: M:UICatalog.Scenario.ScenarioMetadata.GetName(System.Type)
+  fullName: UICatalog.Scenario.ScenarioMetadata.GetName(System.Type)
+  nameWithType: Scenario.ScenarioMetadata.GetName(Type)
+- uid: UICatalog.Scenario.ScenarioMetadata.GetName*
+  name: GetName
+  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_GetName_
+  commentId: Overload:UICatalog.Scenario.ScenarioMetadata.GetName
+  isSpec: "True"
+  fullName: UICatalog.Scenario.ScenarioMetadata.GetName
+  nameWithType: Scenario.ScenarioMetadata.GetName
+- uid: UICatalog.Scenario.ScenarioMetadata.Name
+  name: Name
+  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_Name
+  commentId: P:UICatalog.Scenario.ScenarioMetadata.Name
+  fullName: UICatalog.Scenario.ScenarioMetadata.Name
+  nameWithType: Scenario.ScenarioMetadata.Name
+- uid: UICatalog.Scenario.ScenarioMetadata.Name*
+  name: Name
+  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_Name_
+  commentId: Overload:UICatalog.Scenario.ScenarioMetadata.Name
+  isSpec: "True"
+  fullName: UICatalog.Scenario.ScenarioMetadata.Name
+  nameWithType: Scenario.ScenarioMetadata.Name
+- uid: UICatalog.Scenario.Setup
+  name: Setup()
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Setup
+  commentId: M:UICatalog.Scenario.Setup
+  fullName: UICatalog.Scenario.Setup()
+  nameWithType: Scenario.Setup()
+- uid: UICatalog.Scenario.Setup*
+  name: Setup
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Setup_
+  commentId: Overload:UICatalog.Scenario.Setup
+  isSpec: "True"
+  fullName: UICatalog.Scenario.Setup
+  nameWithType: Scenario.Setup
+- uid: UICatalog.Scenario.Top
+  name: Top
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Top
+  commentId: P:UICatalog.Scenario.Top
+  fullName: UICatalog.Scenario.Top
+  nameWithType: Scenario.Top
+- uid: UICatalog.Scenario.Top*
+  name: Top
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Top_
+  commentId: Overload:UICatalog.Scenario.Top
+  isSpec: "True"
+  fullName: UICatalog.Scenario.Top
+  nameWithType: Scenario.Top
+- uid: UICatalog.Scenario.ToString
+  name: ToString()
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_ToString
+  commentId: M:UICatalog.Scenario.ToString
+  fullName: UICatalog.Scenario.ToString()
+  nameWithType: Scenario.ToString()
+- uid: UICatalog.Scenario.ToString*
+  name: ToString
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_ToString_
+  commentId: Overload:UICatalog.Scenario.ToString
+  isSpec: "True"
+  fullName: UICatalog.Scenario.ToString
+  nameWithType: Scenario.ToString
+- uid: UICatalog.Scenario.Win
+  name: Win
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Win
+  commentId: P:UICatalog.Scenario.Win
+  fullName: UICatalog.Scenario.Win
+  nameWithType: Scenario.Win
+- uid: UICatalog.Scenario.Win*
+  name: Win
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Win_
+  commentId: Overload:UICatalog.Scenario.Win
+  isSpec: "True"
+  fullName: UICatalog.Scenario.Win
+  nameWithType: Scenario.Win
+- uid: UICatalog.UICatalogApp
+  name: UICatalogApp
+  href: api/UICatalog/UICatalog.UICatalogApp.html
+  commentId: T:UICatalog.UICatalogApp
+  fullName: UICatalog.UICatalogApp
+  nameWithType: UICatalogApp
 - uid: Unix.Terminal
   name: Unix.Terminal
   href: api/Terminal.Gui/Unix.Terminal.html

@@ -5,7 +5,9 @@ items:
   id: TimeField
   parent: Terminal.Gui
   children:
+  - Terminal.Gui.TimeField.#ctor(System.DateTime)
   - Terminal.Gui.TimeField.#ctor(System.Int32,System.Int32,System.DateTime,System.Boolean)
+  - Terminal.Gui.TimeField.IsShortFormat
   - Terminal.Gui.TimeField.MouseEvent(Terminal.Gui.MouseEvent)
   - Terminal.Gui.TimeField.ProcessKey(Terminal.Gui.KeyEvent)
   - Terminal.Gui.TimeField.Time
@@ -155,7 +157,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/TimeField.cs
-    startLine: 37
+    startLine: 38
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -182,6 +184,42 @@ items:
   - public
   modifiers.vb:
   - Public
+- uid: Terminal.Gui.TimeField.#ctor(System.DateTime)
+  commentId: M:Terminal.Gui.TimeField.#ctor(System.DateTime)
+  id: '#ctor(System.DateTime)'
+  parent: Terminal.Gui.TimeField
+  langs:
+  - csharp
+  - vb
+  name: TimeField(DateTime)
+  nameWithType: TimeField.TimeField(DateTime)
+  fullName: Terminal.Gui.TimeField.TimeField(System.DateTime)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/TimeField.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/TimeField.cs
+    startLine: 48
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nInitializes a new instance of <xref href=\"Terminal.Gui.TimeField\" data-throw-if-not-resolved=\"false\"></xref> \n"
+  example: []
+  syntax:
+    content: public TimeField(DateTime time)
+    parameters:
+    - id: time
+      type: System.DateTime
+      description: ''
+    content.vb: Public Sub New(time As Date)
+  overload: Terminal.Gui.TimeField.#ctor*
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
 - uid: Terminal.Gui.TimeField.Time
   commentId: P:Terminal.Gui.TimeField.Time
   id: Time
@@ -200,7 +238,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: Time
     path: ../Terminal.Gui/Views/TimeField.cs
-    startLine: 60
+    startLine: 77
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -214,6 +252,43 @@ items:
       type: System.DateTime
     content.vb: Public Property Time As Date
   overload: Terminal.Gui.TimeField.Time*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.TimeField.IsShortFormat
+  commentId: P:Terminal.Gui.TimeField.IsShortFormat
+  id: IsShortFormat
+  parent: Terminal.Gui.TimeField
+  langs:
+  - csharp
+  - vb
+  name: IsShortFormat
+  nameWithType: TimeField.IsShortFormat
+  fullName: Terminal.Gui.TimeField.IsShortFormat
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TimeField.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: IsShortFormat
+    path: ../Terminal.Gui/Views/TimeField.cs
+    startLine: 90
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nGet or set the data format for the widget.\n"
+  example: []
+  syntax:
+    content: public bool IsShortFormat { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property IsShortFormat As Boolean
+  overload: Terminal.Gui.TimeField.IsShortFormat*
   modifiers.csharp:
   - public
   - get
@@ -238,7 +313,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: ProcessKey
     path: ../Terminal.Gui/Views/TimeField.cs
-    startLine: 146
+    startLine: 183
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -277,7 +352,7 @@ items:
       repo: tig:tig/gui.cs.git
     id: MouseEvent
     path: ../Terminal.Gui/Views/TimeField.cs
-    startLine: 193
+    startLine: 230
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -2467,6 +2542,11 @@ references:
   name: Time
   nameWithType: TimeField.Time
   fullName: Terminal.Gui.TimeField.Time
+- uid: Terminal.Gui.TimeField.IsShortFormat*
+  commentId: Overload:Terminal.Gui.TimeField.IsShortFormat
+  name: IsShortFormat
+  nameWithType: TimeField.IsShortFormat
+  fullName: Terminal.Gui.TimeField.IsShortFormat
 - uid: Terminal.Gui.TimeField.ProcessKey(Terminal.Gui.KeyEvent)
   commentId: M:Terminal.Gui.TimeField.ProcessKey(Terminal.Gui.KeyEvent)
   isExternal: true
