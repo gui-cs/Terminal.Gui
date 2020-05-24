@@ -3759,6 +3759,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.MenuBar.MenuBar
   nameWithType: MenuBar.MenuBar
+- uid: Terminal.Gui.MenuBar.CloseMenu
+  name: CloseMenu()
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_CloseMenu
+  commentId: M:Terminal.Gui.MenuBar.CloseMenu
+  fullName: Terminal.Gui.MenuBar.CloseMenu()
+  nameWithType: MenuBar.CloseMenu()
+- uid: Terminal.Gui.MenuBar.CloseMenu*
+  name: CloseMenu
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_CloseMenu_
+  commentId: Overload:Terminal.Gui.MenuBar.CloseMenu
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuBar.CloseMenu
+  nameWithType: MenuBar.CloseMenu
+- uid: Terminal.Gui.MenuBar.IsMenuOpen
+  name: IsMenuOpen
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_IsMenuOpen
+  commentId: P:Terminal.Gui.MenuBar.IsMenuOpen
+  fullName: Terminal.Gui.MenuBar.IsMenuOpen
+  nameWithType: MenuBar.IsMenuOpen
+- uid: Terminal.Gui.MenuBar.IsMenuOpen*
+  name: IsMenuOpen
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_IsMenuOpen_
+  commentId: Overload:Terminal.Gui.MenuBar.IsMenuOpen
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuBar.IsMenuOpen
+  nameWithType: MenuBar.IsMenuOpen
 - uid: Terminal.Gui.MenuBar.LastFocused
   name: LastFocused
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_LastFocused
@@ -3772,19 +3798,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.MenuBar.LastFocused
   nameWithType: MenuBar.LastFocused
-- uid: Terminal.Gui.MenuBar.MenuOpen
-  name: MenuOpen
-  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_MenuOpen
-  commentId: P:Terminal.Gui.MenuBar.MenuOpen
-  fullName: Terminal.Gui.MenuBar.MenuOpen
-  nameWithType: MenuBar.MenuOpen
-- uid: Terminal.Gui.MenuBar.MenuOpen*
-  name: MenuOpen
-  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_MenuOpen_
-  commentId: Overload:Terminal.Gui.MenuBar.MenuOpen
-  isSpec: "True"
-  fullName: Terminal.Gui.MenuBar.MenuOpen
-  nameWithType: MenuBar.MenuOpen
 - uid: Terminal.Gui.MenuBar.Menus
   name: Menus
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_Menus
@@ -3849,6 +3862,19 @@ references:
   commentId: E:Terminal.Gui.MenuBar.OnOpenMenu
   fullName: Terminal.Gui.MenuBar.OnOpenMenu
   nameWithType: MenuBar.OnOpenMenu
+- uid: Terminal.Gui.MenuBar.OpenMenu
+  name: OpenMenu()
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_OpenMenu
+  commentId: M:Terminal.Gui.MenuBar.OpenMenu
+  fullName: Terminal.Gui.MenuBar.OpenMenu()
+  nameWithType: MenuBar.OpenMenu()
+- uid: Terminal.Gui.MenuBar.OpenMenu*
+  name: OpenMenu
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_OpenMenu_
+  commentId: Overload:Terminal.Gui.MenuBar.OpenMenu
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuBar.OpenMenu
+  nameWithType: MenuBar.OpenMenu
 - uid: Terminal.Gui.MenuBar.PositionCursor
   name: PositionCursor()
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_PositionCursor
@@ -7410,6 +7436,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.Id
   nameWithType: View.Id
+- uid: Terminal.Gui.View.IsCurrentTop
+  name: IsCurrentTop
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_IsCurrentTop
+  commentId: P:Terminal.Gui.View.IsCurrentTop
+  fullName: Terminal.Gui.View.IsCurrentTop
+  nameWithType: View.IsCurrentTop
+- uid: Terminal.Gui.View.IsCurrentTop*
+  name: IsCurrentTop
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_IsCurrentTop_
+  commentId: Overload:Terminal.Gui.View.IsCurrentTop
+  isSpec: "True"
+  fullName: Terminal.Gui.View.IsCurrentTop
+  nameWithType: View.IsCurrentTop
 - uid: Terminal.Gui.View.KeyDown
   name: KeyDown
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_KeyDown
