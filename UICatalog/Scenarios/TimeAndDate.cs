@@ -8,36 +8,34 @@ namespace UICatalog {
 	class TimeAndDate : Scenario {
 		public override void Setup ()
 		{
-			// NOTE: The TimeField control is not ready for prime-time. See #246
-
-			var longTime = new TimeField (0, 0, DateTime.Now, isShort: false) {
-				// BUGBUG: TimeField does not support Computed Layout
+			var longTime = new TimeField (DateTime.Now) {
 				X = Pos.Center (),
 				Y = 2,
+				IsShortFormat = false,
 				ReadOnly = false,
 			};
 			Win.Add (longTime);
 
-			var shortTime = new TimeField (0, 2, DateTime.Now, isShort: true) {
-				// BUGBUG: TimeField does not support Computed Layout
+			var shortTime = new TimeField (DateTime.Now) {
 				X = Pos.Center (),
 				Y = Pos.Bottom(longTime) + 1,
-				ReadOnly = true,
+				IsShortFormat = true,
+				ReadOnly = false,
 			};
 			Win.Add (shortTime);
 
-			var shortDate = new DateField (0, 2, DateTime.Now, isShort: true) {
-				// BUGBUG: TimeField does not support Computed Layout
+			var shortDate = new DateField (DateTime.Now) {
 				X = Pos.Center (),
 				Y = Pos.Bottom (shortTime) + 1,
+				IsShortFormat = true,
 				ReadOnly = true,
 			};
 			Win.Add (shortDate);
 
-			var longDate = new TimeField (0, 2, DateTime.Now, isShort: true) {
-				// BUGBUG: TimeField does not support Computed Layout
+			var longDate = new DateField (DateTime.Now) {
 				X = Pos.Center (),
 				Y = Pos.Bottom (shortDate) + 1,
+				IsShortFormat = false,
 				ReadOnly = true,
 			};
 			Win.Add (longDate);
@@ -49,14 +47,14 @@ namespace UICatalog {
 					longTime.ReadOnly = !longTime.ReadOnly;
 					shortTime.ReadOnly = !shortTime.ReadOnly;
 
-					//longTime.IsShortFormat = !longTime.IsShortFormat;
-					//shortTime.IsShortFormat = !shortTime.IsShortFormat;
+					longTime.IsShortFormat = !longTime.IsShortFormat;
+					shortTime.IsShortFormat = !shortTime.IsShortFormat;
 
 					longDate.ReadOnly = !longDate.ReadOnly;
 					shortDate.ReadOnly = !shortDate.ReadOnly;
 
-					//longDate.IsShortFormat = !longDate.IsShortFormat;
-					//shortDate.IsShortFormat = !shortDate.IsShortFormat;
+					longDate.IsShortFormat = !longDate.IsShortFormat;
+					shortDate.IsShortFormat = !shortDate.IsShortFormat;
 				}
 			});
 		}
