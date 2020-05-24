@@ -34,7 +34,7 @@ namespace UICatalog {
 			};
 			ntop.Add (win);
 
-			Application.Run (ntop);
+			base.Run ();
 		}
 	}
 }

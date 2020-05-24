@@ -12,12 +12,6 @@ namespace UICatalog {
 		private HexView _hexView;
 		private bool _saved = true;
 
-
-		public override void Init (Toplevel top)
-		{
-			Top = top;
-		}
-
 		public override void Setup ()
 		{
 			var menu = new MenuBar (new MenuBarItem [] {
@@ -144,11 +138,6 @@ namespace UICatalog {
 			var sw = System.IO.File.CreateText (fileName);
 			sw.Write (sb.ToString ());
 			sw.Close ();
-		}
-
-		public override void Run ()
-		{
-			Application.Run (Top);
 		}
 	}
 }

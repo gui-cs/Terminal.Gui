@@ -1,157 +1,597 @@
 ### YamlMime:ManagedReference
 items:
 - uid: Terminal.Gui.MouseEvent
+  commentId: T:Terminal.Gui.MouseEvent
   id: MouseEvent
+  parent: Terminal.Gui
   children:
   - Terminal.Gui.MouseEvent.Flags
+  - Terminal.Gui.MouseEvent.OfX
+  - Terminal.Gui.MouseEvent.OfY
   - Terminal.Gui.MouseEvent.ToString
+  - Terminal.Gui.MouseEvent.View
   - Terminal.Gui.MouseEvent.X
   - Terminal.Gui.MouseEvent.Y
   langs:
   - csharp
+  - vb
   name: MouseEvent
   nameWithType: MouseEvent
   fullName: Terminal.Gui.MouseEvent
   type: Struct
+  source:
+    remote:
+      path: Terminal.Gui/Event.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: MouseEvent
+    path: ../Terminal.Gui/Event.cs
+    startLine: 483
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: Describes a mouse event
+  summary: "\nDescribes a mouse event\n"
+  example: []
   syntax:
     content: public struct MouseEvent
-  inheritance:
-  - System.ValueType
-  implements: []
-- uid: Terminal.Gui.MouseEvent.Flags
-  id: Flags
-  parent: Terminal.Gui.MouseEvent
-  langs:
-  - csharp
-  name: Flags
-  nameWithType: MouseEvent.Flags
-  fullName: MouseEvent.Flags
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Flags indicating the kind of mouse event that is being posted.
-  syntax:
-    content: public Terminal.Gui.MouseFlags Flags;
-    return:
-      type: Terminal.Gui.MouseFlags
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.MouseEvent.ToString
-  id: ToString
-  parent: Terminal.Gui.MouseEvent
-  langs:
-  - csharp
-  name: ToString()
-  nameWithType: MouseEvent.ToString()
-  fullName: MouseEvent.ToString()
-  type: Method
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: Returns a <xref href="System.String"></xref> that represents the current <xref href="Terminal.Gui.MouseEvent"></xref>.
-  syntax:
-    content: public override string ToString ();
-    parameters: []
-    return:
-      type: System.String
-      description: A <xref href="System.String"></xref> that represents the current <xref href="Terminal.Gui.MouseEvent"></xref>.
-  overload: Terminal.Gui.MouseEvent.ToString*
-  exceptions: []
+    content.vb: Public Structure MouseEvent
+  inheritedMembers:
+  - System.ValueType.Equals(System.Object)
+  - System.ValueType.GetHashCode
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetType
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  modifiers.csharp:
+  - public
+  - struct
+  modifiers.vb:
+  - Public
+  - Structure
 - uid: Terminal.Gui.MouseEvent.X
+  commentId: F:Terminal.Gui.MouseEvent.X
   id: X
   parent: Terminal.Gui.MouseEvent
   langs:
   - csharp
+  - vb
   name: X
   nameWithType: MouseEvent.X
-  fullName: MouseEvent.X
+  fullName: Terminal.Gui.MouseEvent.X
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Event.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: X
+    path: ../Terminal.Gui/Event.cs
+    startLine: 487
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The X (column) location for the mouse event.
+  summary: "\nThe X (column) location for the mouse event.\n"
+  example: []
   syntax:
-    content: public int X;
+    content: public int X
     return:
       type: System.Int32
-      description: To be added.
-  exceptions: []
+    content.vb: Public X As Integer
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
 - uid: Terminal.Gui.MouseEvent.Y
+  commentId: F:Terminal.Gui.MouseEvent.Y
   id: Y
   parent: Terminal.Gui.MouseEvent
   langs:
   - csharp
+  - vb
   name: Y
   nameWithType: MouseEvent.Y
-  fullName: MouseEvent.Y
+  fullName: Terminal.Gui.MouseEvent.Y
   type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Event.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Y
+    path: ../Terminal.Gui/Event.cs
+    startLine: 492
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The Y (column) location for the mouse event.
+  summary: "\nThe Y (column) location for the mouse event.\n"
+  example: []
   syntax:
-    content: public int Y;
+    content: public int Y
     return:
       type: System.Int32
-      description: To be added.
-  exceptions: []
+    content.vb: Public Y As Integer
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.MouseEvent.Flags
+  commentId: F:Terminal.Gui.MouseEvent.Flags
+  id: Flags
+  parent: Terminal.Gui.MouseEvent
+  langs:
+  - csharp
+  - vb
+  name: Flags
+  nameWithType: MouseEvent.Flags
+  fullName: Terminal.Gui.MouseEvent.Flags
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Event.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Flags
+    path: ../Terminal.Gui/Event.cs
+    startLine: 497
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nFlags indicating the kind of mouse event that is being posted.\n"
+  example: []
+  syntax:
+    content: public MouseFlags Flags
+    return:
+      type: Terminal.Gui.MouseFlags
+    content.vb: Public Flags As MouseFlags
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.MouseEvent.OfX
+  commentId: F:Terminal.Gui.MouseEvent.OfX
+  id: OfX
+  parent: Terminal.Gui.MouseEvent
+  langs:
+  - csharp
+  - vb
+  name: OfX
+  nameWithType: MouseEvent.OfX
+  fullName: Terminal.Gui.MouseEvent.OfX
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Event.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: OfX
+    path: ../Terminal.Gui/Event.cs
+    startLine: 502
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe offset X (column) location for the mouse event.\n"
+  example: []
+  syntax:
+    content: public int OfX
+    return:
+      type: System.Int32
+    content.vb: Public OfX As Integer
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.MouseEvent.OfY
+  commentId: F:Terminal.Gui.MouseEvent.OfY
+  id: OfY
+  parent: Terminal.Gui.MouseEvent
+  langs:
+  - csharp
+  - vb
+  name: OfY
+  nameWithType: MouseEvent.OfY
+  fullName: Terminal.Gui.MouseEvent.OfY
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Event.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: OfY
+    path: ../Terminal.Gui/Event.cs
+    startLine: 507
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe offset Y (column) location for the mouse event.\n"
+  example: []
+  syntax:
+    content: public int OfY
+    return:
+      type: System.Int32
+    content.vb: Public OfY As Integer
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.MouseEvent.View
+  commentId: F:Terminal.Gui.MouseEvent.View
+  id: View
+  parent: Terminal.Gui.MouseEvent
+  langs:
+  - csharp
+  - vb
+  name: View
+  nameWithType: MouseEvent.View
+  fullName: Terminal.Gui.MouseEvent.View
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Event.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: View
+    path: ../Terminal.Gui/Event.cs
+    startLine: 512
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe current view at the location for the mouse event.\n"
+  example: []
+  syntax:
+    content: public View View
+    return:
+      type: Terminal.Gui.View
+    content.vb: Public View As View
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.MouseEvent.ToString
+  commentId: M:Terminal.Gui.MouseEvent.ToString
+  id: ToString
+  parent: Terminal.Gui.MouseEvent
+  langs:
+  - csharp
+  - vb
+  name: ToString()
+  nameWithType: MouseEvent.ToString()
+  fullName: Terminal.Gui.MouseEvent.ToString()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Event.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: ToString
+    path: ../Terminal.Gui/Event.cs
+    startLine: 518
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nReturns a <xref href=\"System.String\" data-throw-if-not-resolved=\"false\"></xref> that represents the current <xref href=\"Terminal.Gui.MouseEvent\" data-throw-if-not-resolved=\"false\"></xref>.\n"
+  example: []
+  syntax:
+    content: public override string ToString()
+    return:
+      type: System.String
+      description: A <xref href="System.String" data-throw-if-not-resolved="false"></xref> that represents the current <xref href="Terminal.Gui.MouseEvent" data-throw-if-not-resolved="false"></xref>.
+    content.vb: Public Overrides Function ToString As String
+  overridden: System.ValueType.ToString
+  overload: Terminal.Gui.MouseEvent.ToString*
+  modifiers.csharp:
+  - public
+  - override
+  modifiers.vb:
+  - Public
+  - Overrides
 references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+- uid: System.ValueType.Equals(System.Object)
+  commentId: M:System.ValueType.Equals(System.Object)
+  parent: System.ValueType
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: ValueType.Equals(Object)
+  fullName: System.ValueType.Equals(System.Object)
+  spec.csharp:
+  - uid: System.ValueType.Equals(System.Object)
+    name: Equals
+    nameWithType: ValueType.Equals
+    fullName: System.ValueType.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.ValueType.Equals(System.Object)
+    name: Equals
+    nameWithType: ValueType.Equals
+    fullName: System.ValueType.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.ValueType.GetHashCode
+  commentId: M:System.ValueType.GetHashCode
+  parent: System.ValueType
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: ValueType.GetHashCode()
+  fullName: System.ValueType.GetHashCode()
+  spec.csharp:
+  - uid: System.ValueType.GetHashCode
+    name: GetHashCode
+    nameWithType: ValueType.GetHashCode
+    fullName: System.ValueType.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.ValueType.GetHashCode
+    name: GetHashCode
+    nameWithType: ValueType.GetHashCode
+    fullName: System.ValueType.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
 - uid: System.ValueType
+  commentId: T:System.ValueType
   parent: System
   isExternal: true
   name: ValueType
   nameWithType: ValueType
   fullName: System.ValueType
-- uid: Terminal.Gui.MouseEvent.Flags
-  parent: Terminal.Gui.MouseEvent
-  isExternal: false
-  name: Flags
-  nameWithType: MouseEvent.Flags
-  fullName: MouseEvent.Flags
-- uid: Terminal.Gui.MouseFlags
-  parent: Terminal.Gui
-  isExternal: false
-  name: MouseFlags
-  nameWithType: MouseFlags
-  fullName: Terminal.Gui.MouseFlags
-- uid: Terminal.Gui.MouseEvent.ToString
-  parent: Terminal.Gui.MouseEvent
-  isExternal: false
-  name: ToString()
-  nameWithType: MouseEvent.ToString()
-  fullName: MouseEvent.ToString()
-- uid: System.String
+- uid: System.Object
+  commentId: T:System.Object
   parent: System
   isExternal: true
-  name: String
-  nameWithType: String
-  fullName: System.String
-- uid: Terminal.Gui.MouseEvent.X
-  parent: Terminal.Gui.MouseEvent
-  isExternal: false
-  name: X
-  nameWithType: MouseEvent.X
-  fullName: MouseEvent.X
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
 - uid: System.Int32
+  commentId: T:System.Int32
   parent: System
   isExternal: true
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
-- uid: Terminal.Gui.MouseEvent.Y
-  parent: Terminal.Gui.MouseEvent
-  isExternal: false
-  name: Y
-  nameWithType: MouseEvent.Y
-  fullName: MouseEvent.Y
+- uid: Terminal.Gui.MouseFlags
+  commentId: T:Terminal.Gui.MouseFlags
+  parent: Terminal.Gui
+  name: MouseFlags
+  nameWithType: MouseFlags
+  fullName: Terminal.Gui.MouseFlags
+- uid: Terminal.Gui.View
+  commentId: T:Terminal.Gui.View
+  parent: Terminal.Gui
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: String
+  nameWithType: String
+  fullName: System.String
+- uid: Terminal.Gui.MouseEvent
+  commentId: T:Terminal.Gui.MouseEvent
+  parent: Terminal.Gui
+  name: MouseEvent
+  nameWithType: MouseEvent
+  fullName: Terminal.Gui.MouseEvent
+- uid: System.ValueType.ToString
+  commentId: M:System.ValueType.ToString
+  parent: System.ValueType
+  isExternal: true
+  name: ToString()
+  nameWithType: ValueType.ToString()
+  fullName: System.ValueType.ToString()
+  spec.csharp:
+  - uid: System.ValueType.ToString
+    name: ToString
+    nameWithType: ValueType.ToString
+    fullName: System.ValueType.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.ValueType.ToString
+    name: ToString
+    nameWithType: ValueType.ToString
+    fullName: System.ValueType.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
 - uid: Terminal.Gui.MouseEvent.ToString*
-  parent: Terminal.Gui.MouseEvent
-  isExternal: false
+  commentId: Overload:Terminal.Gui.MouseEvent.ToString
   name: ToString
   nameWithType: MouseEvent.ToString
-  fullName: MouseEvent.ToString
+  fullName: Terminal.Gui.MouseEvent.ToString
+shouldSkipMarkup: true

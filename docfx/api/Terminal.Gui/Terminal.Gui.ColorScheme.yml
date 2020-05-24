@@ -1,171 +1,566 @@
 ### YamlMime:ManagedReference
 items:
 - uid: Terminal.Gui.ColorScheme
+  commentId: T:Terminal.Gui.ColorScheme
   id: ColorScheme
+  parent: Terminal.Gui
   children:
-  - Terminal.Gui.ColorScheme.#ctor
+  - Terminal.Gui.ColorScheme.Disabled
   - Terminal.Gui.ColorScheme.Focus
   - Terminal.Gui.ColorScheme.HotFocus
   - Terminal.Gui.ColorScheme.HotNormal
   - Terminal.Gui.ColorScheme.Normal
   langs:
   - csharp
+  - vb
   name: ColorScheme
   nameWithType: ColorScheme
   fullName: Terminal.Gui.ColorScheme
   type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: ColorScheme
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 157
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: >-
-    Color scheme definitions, they cover some common scenarios and are used
-                typically in toplevel containers to set the scheme that is used by all the
-                views contained inside.
+  summary: "\nColor scheme definitions, they cover some common scenarios and are used\ntypically in toplevel containers to set the scheme that is used by all the\nviews contained inside.\n"
+  example: []
   syntax:
     content: public class ColorScheme
+    content.vb: Public Class ColorScheme
   inheritance:
   - System.Object
-  implements: []
-  inheritedMembers: []
-- uid: Terminal.Gui.ColorScheme.#ctor
-  id: '#ctor'
-  parent: Terminal.Gui.ColorScheme
-  langs:
-  - csharp
-  name: ColorScheme()
-  nameWithType: ColorScheme.ColorScheme()
-  fullName: ColorScheme.ColorScheme()
-  type: Constructor
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  syntax:
-    content: public ColorScheme ();
-    parameters: []
-  overload: Terminal.Gui.ColorScheme.#ctor*
-  exceptions: []
-- uid: Terminal.Gui.ColorScheme.Focus
-  id: Focus
-  parent: Terminal.Gui.ColorScheme
-  langs:
-  - csharp
-  name: Focus
-  nameWithType: ColorScheme.Focus
-  fullName: ColorScheme.Focus
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The color for text when the view has the focus.
-  syntax:
-    content: public Terminal.Gui.Attribute Focus;
-    return:
-      type: Terminal.Gui.Attribute
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.ColorScheme.HotFocus
-  id: HotFocus
-  parent: Terminal.Gui.ColorScheme
-  langs:
-  - csharp
-  name: HotFocus
-  nameWithType: ColorScheme.HotFocus
-  fullName: ColorScheme.HotFocus
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The color for the hotkey when the view is focused.
-  syntax:
-    content: public Terminal.Gui.Attribute HotFocus;
-    return:
-      type: Terminal.Gui.Attribute
-      description: To be added.
-  exceptions: []
-- uid: Terminal.Gui.ColorScheme.HotNormal
-  id: HotNormal
-  parent: Terminal.Gui.ColorScheme
-  langs:
-  - csharp
-  name: HotNormal
-  nameWithType: ColorScheme.HotNormal
-  fullName: ColorScheme.HotNormal
-  type: Field
-  assemblies:
-  - Terminal.Gui
-  namespace: Terminal.Gui
-  summary: The color for the hotkey when a view is not focused
-  syntax:
-    content: public Terminal.Gui.Attribute HotNormal;
-    return:
-      type: Terminal.Gui.Attribute
-      description: To be added.
-  exceptions: []
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  modifiers.csharp:
+  - public
+  - class
+  modifiers.vb:
+  - Public
+  - Class
 - uid: Terminal.Gui.ColorScheme.Normal
+  commentId: P:Terminal.Gui.ColorScheme.Normal
   id: Normal
   parent: Terminal.Gui.ColorScheme
   langs:
   - csharp
+  - vb
   name: Normal
   nameWithType: ColorScheme.Normal
-  fullName: ColorScheme.Normal
-  type: Field
+  fullName: Terminal.Gui.ColorScheme.Normal
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Normal
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 168
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: The default color for text, when the view is not focused.
+  summary: "\nThe default color for text, when the view is not focused.\n"
+  example: []
   syntax:
-    content: public Terminal.Gui.Attribute Normal;
+    content: public Attribute Normal { get; set; }
+    parameters: []
     return:
       type: Terminal.Gui.Attribute
-      description: To be added.
-  exceptions: []
+    content.vb: Public Property Normal As Attribute
+  overload: Terminal.Gui.ColorScheme.Normal*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.ColorScheme.Focus
+  commentId: P:Terminal.Gui.ColorScheme.Focus
+  id: Focus
+  parent: Terminal.Gui.ColorScheme
+  langs:
+  - csharp
+  - vb
+  name: Focus
+  nameWithType: ColorScheme.Focus
+  fullName: Terminal.Gui.ColorScheme.Focus
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Focus
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 173
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe color for text when the view has the focus.\n"
+  example: []
+  syntax:
+    content: public Attribute Focus { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Attribute
+    content.vb: Public Property Focus As Attribute
+  overload: Terminal.Gui.ColorScheme.Focus*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.ColorScheme.HotNormal
+  commentId: P:Terminal.Gui.ColorScheme.HotNormal
+  id: HotNormal
+  parent: Terminal.Gui.ColorScheme
+  langs:
+  - csharp
+  - vb
+  name: HotNormal
+  nameWithType: ColorScheme.HotNormal
+  fullName: Terminal.Gui.ColorScheme.HotNormal
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: HotNormal
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 178
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe color for the hotkey when a view is not focused\n"
+  example: []
+  syntax:
+    content: public Attribute HotNormal { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Attribute
+    content.vb: Public Property HotNormal As Attribute
+  overload: Terminal.Gui.ColorScheme.HotNormal*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.ColorScheme.HotFocus
+  commentId: P:Terminal.Gui.ColorScheme.HotFocus
+  id: HotFocus
+  parent: Terminal.Gui.ColorScheme
+  langs:
+  - csharp
+  - vb
+  name: HotFocus
+  nameWithType: ColorScheme.HotFocus
+  fullName: Terminal.Gui.ColorScheme.HotFocus
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: HotFocus
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 183
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe color for the hotkey when the view is focused.\n"
+  example: []
+  syntax:
+    content: public Attribute HotFocus { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Attribute
+    content.vb: Public Property HotFocus As Attribute
+  overload: Terminal.Gui.ColorScheme.HotFocus*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.ColorScheme.Disabled
+  commentId: P:Terminal.Gui.ColorScheme.Disabled
+  id: Disabled
+  parent: Terminal.Gui.ColorScheme
+  langs:
+  - csharp
+  - vb
+  name: Disabled
+  nameWithType: ColorScheme.Disabled
+  fullName: Terminal.Gui.ColorScheme.Disabled
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drivers/ConsoleDriver.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Disabled
+    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
+    startLine: 188
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe default color for text, when the view is disabled.\n"
+  example: []
+  syntax:
+    content: public Attribute Disabled { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Attribute
+    content.vb: Public Property Disabled As Attribute
+  overload: Terminal.Gui.ColorScheme.Disabled*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
 references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
 - uid: System.Object
+  commentId: T:System.Object
   parent: System
   isExternal: true
   name: Object
   nameWithType: Object
   fullName: System.Object
-- uid: Terminal.Gui.ColorScheme.#ctor
-  parent: Terminal.Gui.ColorScheme
-  isExternal: false
-  name: ColorScheme()
-  nameWithType: ColorScheme.ColorScheme()
-  fullName: ColorScheme.ColorScheme()
-- uid: Terminal.Gui.ColorScheme.Focus
-  parent: Terminal.Gui.ColorScheme
-  isExternal: false
-  name: Focus
-  nameWithType: ColorScheme.Focus
-  fullName: ColorScheme.Focus
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: Object.Equals(Object)
+  fullName: System.Object.Equals(System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: Object.GetHashCode()
+  fullName: System.Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  name: MemberwiseClone()
+  nameWithType: Object.MemberwiseClone()
+  fullName: System.Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  name: ToString()
+  nameWithType: Object.ToString()
+  fullName: System.Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.ColorScheme.Normal*
+  commentId: Overload:Terminal.Gui.ColorScheme.Normal
+  name: Normal
+  nameWithType: ColorScheme.Normal
+  fullName: Terminal.Gui.ColorScheme.Normal
 - uid: Terminal.Gui.Attribute
+  commentId: T:Terminal.Gui.Attribute
   parent: Terminal.Gui
-  isExternal: false
   name: Attribute
   nameWithType: Attribute
   fullName: Terminal.Gui.Attribute
-- uid: Terminal.Gui.ColorScheme.HotFocus
-  parent: Terminal.Gui.ColorScheme
-  isExternal: false
-  name: HotFocus
-  nameWithType: ColorScheme.HotFocus
-  fullName: ColorScheme.HotFocus
-- uid: Terminal.Gui.ColorScheme.HotNormal
-  parent: Terminal.Gui.ColorScheme
-  isExternal: false
+- uid: Terminal.Gui.ColorScheme.Focus*
+  commentId: Overload:Terminal.Gui.ColorScheme.Focus
+  name: Focus
+  nameWithType: ColorScheme.Focus
+  fullName: Terminal.Gui.ColorScheme.Focus
+- uid: Terminal.Gui.ColorScheme.HotNormal*
+  commentId: Overload:Terminal.Gui.ColorScheme.HotNormal
   name: HotNormal
   nameWithType: ColorScheme.HotNormal
-  fullName: ColorScheme.HotNormal
-- uid: Terminal.Gui.ColorScheme.Normal
-  parent: Terminal.Gui.ColorScheme
-  isExternal: false
-  name: Normal
-  nameWithType: ColorScheme.Normal
-  fullName: ColorScheme.Normal
-- uid: Terminal.Gui.ColorScheme.#ctor*
-  parent: Terminal.Gui.ColorScheme
-  isExternal: false
-  name: ColorScheme
-  nameWithType: ColorScheme.ColorScheme
-  fullName: ColorScheme.ColorScheme
+  fullName: Terminal.Gui.ColorScheme.HotNormal
+- uid: Terminal.Gui.ColorScheme.HotFocus*
+  commentId: Overload:Terminal.Gui.ColorScheme.HotFocus
+  name: HotFocus
+  nameWithType: ColorScheme.HotFocus
+  fullName: Terminal.Gui.ColorScheme.HotFocus
+- uid: Terminal.Gui.ColorScheme.Disabled*
+  commentId: Overload:Terminal.Gui.ColorScheme.Disabled
+  name: Disabled
+  nameWithType: ColorScheme.Disabled
+  fullName: Terminal.Gui.ColorScheme.Disabled
+shouldSkipMarkup: true

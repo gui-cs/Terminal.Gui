@@ -12,9 +12,15 @@ UI Catalog is a comprehensive sample library for Terminal.Gui. It attempts to sa
 
 The original `demo.cs` sample app for Terminal.Gui is neither good to showcase, nor does it explain different concepts. In addition, because it is built on a single source file, it has proven to cause friction when multiple contributors are simultaneously working on different aspects of Terminal.Gui. See [Issue #368](https://github.com/migueldeicaza/Terminal.Gui/issues/368) for more background.
 
+# API Reference
+
+* [UI Catalog API Reference](https://migueldeicaza.github.io/gui.cs/api/UICatalog/UICatalog.html)
+
 ## How To Use
 
-`Program.cs` is the main app and provides a UI for selecting and running **Scenarios**. Each **Scenario* is implemented as a class derived from `Scenario` and `Program.cs` uses reflection to dynamically build the UI.
+Build and run UI Catalog by typing `dotnet run` from the `UI Catalog` folder or by using the `Terminal.Gui` Visual Studio solution.
+
+`Program.cs` is the main **UI Catalog** app and provides a UI for selecting and running **Scenarios**. Each **Scenario* is implemented as a class derived from `Scenario` and `Program.cs` uses reflection to dynamically build the UI.
 
 **Scenarios** are tagged with categories using the `[ScenarioCategory]` attribute. The left pane of the main screen lists the categories. Clicking on a category shows all the scenarios in that category.
 
@@ -29,6 +35,8 @@ e.g.
 ```
 UICatalog.exe Buttons
 ```
+
+Hitting ENTER on a selected Scenario or double-clicking on a Scenario runs that scenario as though it were a stand-alone Terminal.Gui app.
 
 When a **Scenario** is run, it runs as though it were a standalone `Terminal.Gui` app. However, scaffolding is provided (in the `Scenario` base class) that (optionally) takes care of `Terminal.Gui` initialization.
 

@@ -1,0 +1,880 @@
+### YamlMime:ManagedReference
+items:
+- uid: Mono.Terminal.UnixMainLoop
+  commentId: T:Mono.Terminal.UnixMainLoop
+  id: UnixMainLoop
+  parent: Mono.Terminal
+  children:
+  - Mono.Terminal.UnixMainLoop.AddWatch(System.Int32,Mono.Terminal.UnixMainLoop.Condition,System.Func{Mono.Terminal.MainLoop,System.Boolean})
+  - Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending(System.Boolean)
+  - Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration
+  - Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup(Mono.Terminal.MainLoop)
+  - Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup
+  - Mono.Terminal.UnixMainLoop.RemoveWatch(System.Object)
+  langs:
+  - csharp
+  - vb
+  name: UnixMainLoop
+  nameWithType: UnixMainLoop
+  fullName: Mono.Terminal.UnixMainLoop
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/mainloop.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: UnixMainLoop
+    path: ../Terminal.Gui/MonoCurses/mainloop.cs
+    startLine: 69
+  assemblies:
+  - Terminal.Gui
+  namespace: Mono.Terminal
+  summary: "\nUnix main loop, suitable for using on Posix systems\n"
+  remarks: "\nIn addition to the general functions of the mainloop, the Unix version\ncan watch file descriptors using the AddWatch methods.\n"
+  example: []
+  syntax:
+    content: 'public class UnixMainLoop : IMainLoopDriver'
+    content.vb: >-
+      Public Class UnixMainLoop
+
+          Implements IMainLoopDriver
+  inheritance:
+  - System.Object
+  implements:
+  - Mono.Terminal.IMainLoopDriver
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  modifiers.csharp:
+  - public
+  - class
+  modifiers.vb:
+  - Public
+  - Class
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup
+  commentId: M:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup
+  id: Mono#Terminal#IMainLoopDriver#Wakeup
+  isEii: true
+  parent: Mono.Terminal.UnixMainLoop
+  langs:
+  - csharp
+  - vb
+  name: IMainLoopDriver.Wakeup()
+  nameWithType: UnixMainLoop.IMainLoopDriver.Wakeup()
+  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.Wakeup()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/mainloop.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Mono.Terminal.IMainLoopDriver.Wakeup
+    path: ../Terminal.Gui/MonoCurses/mainloop.cs
+    startLine: 133
+  assemblies:
+  - Terminal.Gui
+  namespace: Mono.Terminal
+  syntax:
+    content: void IMainLoopDriver.Wakeup()
+    content.vb: Sub Mono.Terminal.IMainLoopDriver.Wakeup Implements IMainLoopDriver.Wakeup
+  overload: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup*
+  implements:
+  - Mono.Terminal.IMainLoopDriver.Wakeup
+  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Wakeup()
+  name.vb: Mono.Terminal.IMainLoopDriver.Wakeup()
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup(Mono.Terminal.MainLoop)
+  commentId: M:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup(Mono.Terminal.MainLoop)
+  id: Mono#Terminal#IMainLoopDriver#Setup(Mono.Terminal.MainLoop)
+  isEii: true
+  parent: Mono.Terminal.UnixMainLoop
+  langs:
+  - csharp
+  - vb
+  name: IMainLoopDriver.Setup(MainLoop)
+  nameWithType: UnixMainLoop.IMainLoopDriver.Setup(MainLoop)
+  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/mainloop.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Mono.Terminal.IMainLoopDriver.Setup
+    path: ../Terminal.Gui/MonoCurses/mainloop.cs
+    startLine: 138
+  assemblies:
+  - Terminal.Gui
+  namespace: Mono.Terminal
+  syntax:
+    content: void IMainLoopDriver.Setup(MainLoop mainLoop)
+    parameters:
+    - id: mainLoop
+      type: Mono.Terminal.MainLoop
+    content.vb: Sub Mono.Terminal.IMainLoopDriver.Setup(mainLoop As MainLoop) Implements IMainLoopDriver.Setup
+  overload: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup*
+  implements:
+  - Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
+  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Setup(MainLoop)
+  name.vb: Mono.Terminal.IMainLoopDriver.Setup(MainLoop)
+- uid: Mono.Terminal.UnixMainLoop.RemoveWatch(System.Object)
+  commentId: M:Mono.Terminal.UnixMainLoop.RemoveWatch(System.Object)
+  id: RemoveWatch(System.Object)
+  parent: Mono.Terminal.UnixMainLoop
+  langs:
+  - csharp
+  - vb
+  name: RemoveWatch(Object)
+  nameWithType: UnixMainLoop.RemoveWatch(Object)
+  fullName: Mono.Terminal.UnixMainLoop.RemoveWatch(System.Object)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/mainloop.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: RemoveWatch
+    path: ../Terminal.Gui/MonoCurses/mainloop.cs
+    startLine: 153
+  assemblies:
+  - Terminal.Gui
+  namespace: Mono.Terminal
+  summary: "\nRemoves an active watch from the mainloop.\n"
+  remarks: "\nThe token parameter is the value returned from AddWatch\n"
+  example: []
+  syntax:
+    content: public void RemoveWatch(object token)
+    parameters:
+    - id: token
+      type: System.Object
+    content.vb: Public Sub RemoveWatch(token As Object)
+  overload: Mono.Terminal.UnixMainLoop.RemoveWatch*
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: Mono.Terminal.UnixMainLoop.AddWatch(System.Int32,Mono.Terminal.UnixMainLoop.Condition,System.Func{Mono.Terminal.MainLoop,System.Boolean})
+  commentId: M:Mono.Terminal.UnixMainLoop.AddWatch(System.Int32,Mono.Terminal.UnixMainLoop.Condition,System.Func{Mono.Terminal.MainLoop,System.Boolean})
+  id: AddWatch(System.Int32,Mono.Terminal.UnixMainLoop.Condition,System.Func{Mono.Terminal.MainLoop,System.Boolean})
+  parent: Mono.Terminal.UnixMainLoop
+  langs:
+  - csharp
+  - vb
+  name: AddWatch(Int32, UnixMainLoop.Condition, Func<MainLoop, Boolean>)
+  nameWithType: UnixMainLoop.AddWatch(Int32, UnixMainLoop.Condition, Func<MainLoop, Boolean>)
+  fullName: Mono.Terminal.UnixMainLoop.AddWatch(System.Int32, Mono.Terminal.UnixMainLoop.Condition, System.Func<Mono.Terminal.MainLoop, System.Boolean>)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/mainloop.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: AddWatch
+    path: ../Terminal.Gui/MonoCurses/mainloop.cs
+    startLine: 172
+  assemblies:
+  - Terminal.Gui
+  namespace: Mono.Terminal
+  summary: "\nWatches a file descriptor for activity.\n"
+  remarks: "\nWhen the condition is met, the provided callback\nis invoked.  If the callback returns false, the\nwatch is automatically removed.\n\nThe return value is a token that represents this watch, you can\nuse this token to remove the watch by calling RemoveWatch.\n"
+  example: []
+  syntax:
+    content: public object AddWatch(int fileDescriptor, UnixMainLoop.Condition condition, Func<MainLoop, bool> callback)
+    parameters:
+    - id: fileDescriptor
+      type: System.Int32
+    - id: condition
+      type: Mono.Terminal.UnixMainLoop.Condition
+    - id: callback
+      type: System.Func{Mono.Terminal.MainLoop,System.Boolean}
+    return:
+      type: System.Object
+    content.vb: Public Function AddWatch(fileDescriptor As Integer, condition As UnixMainLoop.Condition, callback As Func(Of MainLoop, Boolean)) As Object
+  overload: Mono.Terminal.UnixMainLoop.AddWatch*
+  nameWithType.vb: UnixMainLoop.AddWatch(Int32, UnixMainLoop.Condition, Func(Of MainLoop, Boolean))
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+  fullName.vb: Mono.Terminal.UnixMainLoop.AddWatch(System.Int32, Mono.Terminal.UnixMainLoop.Condition, System.Func(Of Mono.Terminal.MainLoop, System.Boolean))
+  name.vb: AddWatch(Int32, UnixMainLoop.Condition, Func(Of MainLoop, Boolean))
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending(System.Boolean)
+  commentId: M:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending(System.Boolean)
+  id: Mono#Terminal#IMainLoopDriver#EventsPending(System.Boolean)
+  isEii: true
+  parent: Mono.Terminal.UnixMainLoop
+  langs:
+  - csharp
+  - vb
+  name: IMainLoopDriver.EventsPending(Boolean)
+  nameWithType: UnixMainLoop.IMainLoopDriver.EventsPending(Boolean)
+  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/mainloop.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Mono.Terminal.IMainLoopDriver.EventsPending
+    path: ../Terminal.Gui/MonoCurses/mainloop.cs
+    startLine: 198
+  assemblies:
+  - Terminal.Gui
+  namespace: Mono.Terminal
+  syntax:
+    content: bool IMainLoopDriver.EventsPending(bool wait)
+    parameters:
+    - id: wait
+      type: System.Boolean
+    return:
+      type: System.Boolean
+    content.vb: Function Mono.Terminal.IMainLoopDriver.EventsPending(wait As Boolean) As Boolean Implements IMainLoopDriver.EventsPending
+  overload: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending*
+  implements:
+  - Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
+  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.EventsPending(Boolean)
+  name.vb: Mono.Terminal.IMainLoopDriver.EventsPending(Boolean)
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration
+  commentId: M:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration
+  id: Mono#Terminal#IMainLoopDriver#MainIteration
+  isEii: true
+  parent: Mono.Terminal.UnixMainLoop
+  langs:
+  - csharp
+  - vb
+  name: IMainLoopDriver.MainIteration()
+  nameWithType: UnixMainLoop.IMainLoopDriver.MainIteration()
+  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.MainIteration()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/MonoCurses/mainloop.cs
+      branch: docs
+      repo: tig:tig/gui.cs.git
+    id: Mono.Terminal.IMainLoopDriver.MainIteration
+    path: ../Terminal.Gui/MonoCurses/mainloop.cs
+    startLine: 234
+  assemblies:
+  - Terminal.Gui
+  namespace: Mono.Terminal
+  syntax:
+    content: void IMainLoopDriver.MainIteration()
+    content.vb: Sub Mono.Terminal.IMainLoopDriver.MainIteration Implements IMainLoopDriver.MainIteration
+  overload: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration*
+  implements:
+  - Mono.Terminal.IMainLoopDriver.MainIteration
+  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.MainIteration()
+  name.vb: Mono.Terminal.IMainLoopDriver.MainIteration()
+references:
+- uid: Mono.Terminal
+  commentId: N:Mono.Terminal
+  name: Mono.Terminal
+  nameWithType: Mono.Terminal
+  fullName: Mono.Terminal
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: Mono.Terminal.IMainLoopDriver
+  commentId: T:Mono.Terminal.IMainLoopDriver
+  parent: Mono.Terminal
+  name: IMainLoopDriver
+  nameWithType: IMainLoopDriver
+  fullName: Mono.Terminal.IMainLoopDriver
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: Object.Equals(Object)
+  fullName: System.Object.Equals(System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: Object.GetHashCode()
+  fullName: System.Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  name: MemberwiseClone()
+  nameWithType: Object.MemberwiseClone()
+  fullName: System.Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  name: ToString()
+  nameWithType: Object.ToString()
+  fullName: System.Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup*
+  commentId: Overload:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup
+  name: IMainLoopDriver.Wakeup
+  nameWithType: UnixMainLoop.IMainLoopDriver.Wakeup
+  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.Wakeup
+  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Wakeup
+  name.vb: Mono.Terminal.IMainLoopDriver.Wakeup
+- uid: Mono.Terminal.IMainLoopDriver.Wakeup
+  commentId: M:Mono.Terminal.IMainLoopDriver.Wakeup
+  parent: Mono.Terminal.IMainLoopDriver
+  name: Wakeup()
+  nameWithType: IMainLoopDriver.Wakeup()
+  fullName: Mono.Terminal.IMainLoopDriver.Wakeup()
+  spec.csharp:
+  - uid: Mono.Terminal.IMainLoopDriver.Wakeup
+    name: Wakeup
+    nameWithType: IMainLoopDriver.Wakeup
+    fullName: Mono.Terminal.IMainLoopDriver.Wakeup
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Mono.Terminal.IMainLoopDriver.Wakeup
+    name: Wakeup
+    nameWithType: IMainLoopDriver.Wakeup
+    fullName: Mono.Terminal.IMainLoopDriver.Wakeup
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup*
+  commentId: Overload:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup
+  name: IMainLoopDriver.Setup
+  nameWithType: UnixMainLoop.IMainLoopDriver.Setup
+  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.Setup
+  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Setup
+  name.vb: Mono.Terminal.IMainLoopDriver.Setup
+- uid: Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
+  commentId: M:Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
+  parent: Mono.Terminal.IMainLoopDriver
+  name: Setup(MainLoop)
+  nameWithType: IMainLoopDriver.Setup(MainLoop)
+  fullName: Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
+  spec.csharp:
+  - uid: Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
+    name: Setup
+    nameWithType: IMainLoopDriver.Setup
+    fullName: Mono.Terminal.IMainLoopDriver.Setup
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Mono.Terminal.MainLoop
+    name: MainLoop
+    nameWithType: MainLoop
+    fullName: Mono.Terminal.MainLoop
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
+    name: Setup
+    nameWithType: IMainLoopDriver.Setup
+    fullName: Mono.Terminal.IMainLoopDriver.Setup
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Mono.Terminal.MainLoop
+    name: MainLoop
+    nameWithType: MainLoop
+    fullName: Mono.Terminal.MainLoop
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Mono.Terminal.MainLoop
+  commentId: T:Mono.Terminal.MainLoop
+  parent: Mono.Terminal
+  name: MainLoop
+  nameWithType: MainLoop
+  fullName: Mono.Terminal.MainLoop
+- uid: Mono.Terminal.UnixMainLoop.RemoveWatch*
+  commentId: Overload:Mono.Terminal.UnixMainLoop.RemoveWatch
+  name: RemoveWatch
+  nameWithType: UnixMainLoop.RemoveWatch
+  fullName: Mono.Terminal.UnixMainLoop.RemoveWatch
+- uid: Mono.Terminal.UnixMainLoop.AddWatch*
+  commentId: Overload:Mono.Terminal.UnixMainLoop.AddWatch
+  name: AddWatch
+  nameWithType: UnixMainLoop.AddWatch
+  fullName: Mono.Terminal.UnixMainLoop.AddWatch
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: Mono.Terminal.UnixMainLoop.Condition
+  commentId: T:Mono.Terminal.UnixMainLoop.Condition
+  parent: Mono.Terminal
+  name: UnixMainLoop.Condition
+  nameWithType: UnixMainLoop.Condition
+  fullName: Mono.Terminal.UnixMainLoop.Condition
+- uid: System.Func{Mono.Terminal.MainLoop,System.Boolean}
+  commentId: T:System.Func{Mono.Terminal.MainLoop,System.Boolean}
+  parent: System
+  definition: System.Func`2
+  name: Func<MainLoop, Boolean>
+  nameWithType: Func<MainLoop, Boolean>
+  fullName: System.Func<Mono.Terminal.MainLoop, System.Boolean>
+  nameWithType.vb: Func(Of MainLoop, Boolean)
+  fullName.vb: System.Func(Of Mono.Terminal.MainLoop, System.Boolean)
+  name.vb: Func(Of MainLoop, Boolean)
+  spec.csharp:
+  - uid: System.Func`2
+    name: Func
+    nameWithType: Func
+    fullName: System.Func
+    isExternal: true
+  - name: <
+    nameWithType: <
+    fullName: <
+  - uid: Mono.Terminal.MainLoop
+    name: MainLoop
+    nameWithType: MainLoop
+    fullName: Mono.Terminal.MainLoop
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+  spec.vb:
+  - uid: System.Func`2
+    name: Func
+    nameWithType: Func
+    fullName: System.Func
+    isExternal: true
+  - name: '(Of '
+    nameWithType: '(Of '
+    fullName: '(Of '
+  - uid: Mono.Terminal.MainLoop
+    name: MainLoop
+    nameWithType: MainLoop
+    fullName: Mono.Terminal.MainLoop
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Func`2
+  commentId: T:System.Func`2
+  isExternal: true
+  name: Func<T, TResult>
+  nameWithType: Func<T, TResult>
+  fullName: System.Func<T, TResult>
+  nameWithType.vb: Func(Of T, TResult)
+  fullName.vb: System.Func(Of T, TResult)
+  name.vb: Func(Of T, TResult)
+  spec.csharp:
+  - uid: System.Func`2
+    name: Func
+    nameWithType: Func
+    fullName: System.Func
+    isExternal: true
+  - name: <
+    nameWithType: <
+    fullName: <
+  - name: T
+    nameWithType: T
+    fullName: T
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - name: TResult
+    nameWithType: TResult
+    fullName: TResult
+  - name: '>'
+    nameWithType: '>'
+    fullName: '>'
+  spec.vb:
+  - uid: System.Func`2
+    name: Func
+    nameWithType: Func
+    fullName: System.Func
+    isExternal: true
+  - name: '(Of '
+    nameWithType: '(Of '
+    fullName: '(Of '
+  - name: T
+    nameWithType: T
+    fullName: T
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - name: TResult
+    nameWithType: TResult
+    fullName: TResult
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending*
+  commentId: Overload:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending
+  name: IMainLoopDriver.EventsPending
+  nameWithType: UnixMainLoop.IMainLoopDriver.EventsPending
+  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.EventsPending
+  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.EventsPending
+  name.vb: Mono.Terminal.IMainLoopDriver.EventsPending
+- uid: Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
+  commentId: M:Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
+  parent: Mono.Terminal.IMainLoopDriver
+  isExternal: true
+  name: EventsPending(Boolean)
+  nameWithType: IMainLoopDriver.EventsPending(Boolean)
+  fullName: Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
+  spec.csharp:
+  - uid: Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
+    name: EventsPending
+    nameWithType: IMainLoopDriver.EventsPending
+    fullName: Mono.Terminal.IMainLoopDriver.EventsPending
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
+    name: EventsPending
+    nameWithType: IMainLoopDriver.EventsPending
+    fullName: Mono.Terminal.IMainLoopDriver.EventsPending
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration*
+  commentId: Overload:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration
+  name: IMainLoopDriver.MainIteration
+  nameWithType: UnixMainLoop.IMainLoopDriver.MainIteration
+  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.MainIteration
+  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.MainIteration
+  name.vb: Mono.Terminal.IMainLoopDriver.MainIteration
+- uid: Mono.Terminal.IMainLoopDriver.MainIteration
+  commentId: M:Mono.Terminal.IMainLoopDriver.MainIteration
+  parent: Mono.Terminal.IMainLoopDriver
+  name: MainIteration()
+  nameWithType: IMainLoopDriver.MainIteration()
+  fullName: Mono.Terminal.IMainLoopDriver.MainIteration()
+  spec.csharp:
+  - uid: Mono.Terminal.IMainLoopDriver.MainIteration
+    name: MainIteration
+    nameWithType: IMainLoopDriver.MainIteration
+    fullName: Mono.Terminal.IMainLoopDriver.MainIteration
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Mono.Terminal.IMainLoopDriver.MainIteration
+    name: MainIteration
+    nameWithType: IMainLoopDriver.MainIteration
+    fullName: Mono.Terminal.IMainLoopDriver.MainIteration
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+shouldSkipMarkup: true

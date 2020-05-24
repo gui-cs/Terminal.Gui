@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <StartupObject>UICatalog.Program</StartupObject>
+    <StartupObject>UICatalog.UICatalogApp</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

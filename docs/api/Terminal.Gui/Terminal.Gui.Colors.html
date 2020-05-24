@@ -10,18 +10,19 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Colors
    ">
-    <meta name="generator" content="docfx 2.18.2.0">
+    <meta name="generator" content="docfx 2.53.1.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="">
-    <meta property="docfx:tocrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
     
+    <meta property="docfx:rel" content="../../">
     
-  </head>
-  <body data-spy="scroll" data-target="#affix">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -36,7 +37,7 @@
               </button>
               
               <a class="navbar-brand" href="../../index.html">
-                <img id="logo" class="svg" src="../../logo.svg" alt="">
+                <img id="logo" class="svg" src="../../images/logo48.png" alt="">
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
@@ -57,6 +58,16 @@
           </div>
         </div>
       </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list"></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination"></ul>
+        </div>
+      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -70,9 +81,10 @@
             <article class="content wrap" id="_content" data-uid="Terminal.Gui.Colors">
   
   
-  <h1 id="Terminal_Gui_Colors" data-uid="Terminal.Gui.Colors">Class Colors
+  <h1 id="Terminal_Gui_Colors" data-uid="Terminal.Gui.Colors" class="text-break">Class Colors
   </h1>
-  <div class="markdown level0 summary"><p>The default ColorSchemes for the application.</p>
+  <div class="markdown level0 summary">
+The default ColorSchemes for the application.
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -80,25 +92,51 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">Colors</span></div>
   </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="../Terminal.Gui.html">Terminal.Gui</a></h6>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Colors_syntax">Syntax</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static class Colors</code></pre>
   </div>
-  <h3 id="fields">Fields
+  <h3 id="properties">Properties
   </h3>
   
   
+  <a id="Terminal_Gui_Colors_Base_" data-uid="Terminal.Gui.Colors.Base*"></a>
   <h4 id="Terminal_Gui_Colors_Base" data-uid="Terminal.Gui.Colors.Base">Base</h4>
-  <div class="markdown level1 summary"><p>The base color scheme, for the default toplevel views.</p>
+  <div class="markdown level1 summary">
+The base color scheme, for the default toplevel views.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Terminal.Gui.ColorScheme Base;</code></pre>
+    <pre><code class="lang-csharp hljs">public static ColorScheme Base { get; set; }</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
+  <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -109,22 +147,23 @@
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   
   
+  <a id="Terminal_Gui_Colors_Dialog_" data-uid="Terminal.Gui.Colors.Dialog*"></a>
   <h4 id="Terminal_Gui_Colors_Dialog" data-uid="Terminal.Gui.Colors.Dialog">Dialog</h4>
-  <div class="markdown level1 summary"><p>The dialog color scheme, for standard popup dialog boxes</p>
+  <div class="markdown level1 summary">
+The dialog color scheme, for standard popup dialog boxes
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Terminal.Gui.ColorScheme Dialog;</code></pre>
+    <pre><code class="lang-csharp hljs">public static ColorScheme Dialog { get; set; }</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
+  <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -135,22 +174,23 @@
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   
   
+  <a id="Terminal_Gui_Colors_Error_" data-uid="Terminal.Gui.Colors.Error*"></a>
   <h4 id="Terminal_Gui_Colors_Error" data-uid="Terminal.Gui.Colors.Error">Error</h4>
-  <div class="markdown level1 summary"><p>The color scheme for showing errors.</p>
+  <div class="markdown level1 summary">
+The color scheme for showing errors.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Terminal.Gui.ColorScheme Error;</code></pre>
+    <pre><code class="lang-csharp hljs">public static ColorScheme Error { get; set; }</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
+  <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -161,22 +201,23 @@
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   
   
+  <a id="Terminal_Gui_Colors_Menu_" data-uid="Terminal.Gui.Colors.Menu*"></a>
   <h4 id="Terminal_Gui_Colors_Menu" data-uid="Terminal.Gui.Colors.Menu">Menu</h4>
-  <div class="markdown level1 summary"><p>The menu bar color</p>
+  <div class="markdown level1 summary">
+The menu bar color
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Terminal.Gui.ColorScheme Menu;</code></pre>
+    <pre><code class="lang-csharp hljs">public static ColorScheme Menu { get; set; }</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
+  <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -187,8 +228,34 @@
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
-        <td><p>To be added.</p>
-</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_Colors_TopLevel_" data-uid="Terminal.Gui.Colors.TopLevel*"></a>
+  <h4 id="Terminal_Gui_Colors_TopLevel" data-uid="Terminal.Gui.Colors.TopLevel">TopLevel</h4>
+  <div class="markdown level1 summary">
+The application toplevel color scheme, for the default toplevel views.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ColorScheme TopLevel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -217,7 +284,7 @@
               <a href="#top">Back to top</a>
             </span>
             
-            <span>Copyright © 2015-2017 Microsoft<br>Generated by <strong>DocFX</strong></span>
+            <span>Generated by <strong>DocFX</strong></span>
           </div>
         </div>
       </footer>
