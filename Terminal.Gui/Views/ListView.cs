@@ -593,12 +593,16 @@ namespace Terminal.Gui {
 		{
 			container.Move (col, line);
 			var t = src [item];
-			if (t is ustring) {
-				RenderUstr (driver, (ustring)t, col, line, width);
-			} else if (t is string) {
-				RenderUstr (driver, (string)t, col, line, width);
-			} else
-				RenderUstr (driver, t.ToString (), col, line, width);
+			if (t == null) {
+				RenderUstr (driver, ustring.Make(""), col, line, width);
+			} else {
+				if (t is ustring) {
+					RenderUstr (driver, (ustring)t, col, line, width);
+				} else if (t is string) {
+					RenderUstr (driver, (string)t, col, line, width);
+				} else
+					RenderUstr (driver, t.ToString (), col, line, width);
+			}
 		}
 
 		/// <summary>
