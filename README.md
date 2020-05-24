@@ -45,7 +45,7 @@ In addition, a complete Xterm/Vt100 terminal emulator that you can embed is now 
 * **[Flexible Layout](https://migueldeicaza.github.io/gui.cs/articles/overview.html#layout)** - **Terminal.Gui** supports both *Absolute layout* and an innovative UI layout system referred to as *Computed Layout*. *Computed Layout* makes it easy to layout controls relative to each other and enables dynamic console GUIs.
 * **Clipboard support** - Cut, Copy, and Paste of text provided through the [`Clipboard`](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Clipboard.html) class.
 * **[Arbitrary Views](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.View.html)** - All visible UI elements are subclasses of the `View` class, and these in turn can contain an arbitrary number of sub-views.
-* **Advanced App Features** - The [Mainloop](https://migueldeicaza.github.io/gui.cs/api/Mono.Terminal/Mono.Terminal.MainLoop.html) supports processing events, idle handlers, timers, and monitoring file
+* **Advanced App Features** - The [Mainloop](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Mono.Terminal.MainLoop.html) supports processing events, idle handlers, timers, and monitoring file
 descriptors.
 
 ### Keyboard Input Handling
@@ -78,7 +78,7 @@ You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 
 ## Documentation
 
-* [API documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui.html)
+* [API documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html)
 
 * [Overview](https://migueldeicaza.github.io/gui.cs/articles/overview.html) contains the conceptual documentation and a walkthrough of the core concepts of **Terminal.Gui**.
 
