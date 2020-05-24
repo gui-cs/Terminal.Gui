@@ -148,6 +148,7 @@ namespace Terminal.Gui {
 			case Curses.KeyPPage: return Key.PageUp;
 			case Curses.KeyDeleteChar: return Key.DeleteChar;
 			case Curses.KeyInsertChar: return Key.InsertChar;
+			case Curses.KeyTab: return Key.Tab;
 			case Curses.KeyBackTab: return Key.BackTab;
 			case Curses.KeyBackspace: return Key.Backspace;
 			case Curses.ShiftKeyUp: return Key.CursorUp | Key.ShiftMask;
@@ -420,12 +421,18 @@ namespace Terminal.Gui {
 				} else {
 					keyHandler (new KeyEvent (Key.Esc));
 				}
+			} else if (wch == Curses.KeyTab) {
+				keyHandler (new KeyEvent (MapCursesKey (wch)));
 			} else {
 				keyHandler (new KeyEvent ((Key)wch));
 			}
 			// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
 			// will not impact KeyUp.
-			keyUpHandler (new KeyEvent ((Key)wch));
+			if (wch == Curses.KeyTab) {
+				keyUpHandler (new KeyEvent (MapCursesKey (wch)));
+			} else {
+				keyUpHandler (new KeyEvent ((Key)wch));
+			}
 		}
 
 		Action<MouseEvent> mouseHandler;

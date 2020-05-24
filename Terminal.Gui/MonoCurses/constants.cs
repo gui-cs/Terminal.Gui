@@ -101,6 +101,7 @@ namespace Unix.Terminal {
 		public const int KeyEnd = unchecked((int)0x168);
 		public const int KeyDeleteChar = unchecked((int)0x14a);
 		public const int KeyInsertChar = unchecked((int)0x14b);
+		public const int KeyTab = unchecked((int)0x009);
 		public const int KeyBackTab = unchecked((int)0x161);
 		public const int KeyF1 = unchecked((int)0x109);
 		public const int KeyF2 = unchecked((int)0x10a);
