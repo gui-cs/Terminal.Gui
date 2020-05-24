@@ -23,7 +23,7 @@ namespace UICatalog {
 			const string rule = "|123456789";
 			var horizontalRuler = new Label ("") {
 				X = 0,
-				Y = 0,
+				Y = 0,		
 				Width = Dim.Fill (1),  // BUGBUG: I don't think this should be needed; DimFill() should respect container's frame. X does.
 				ColorScheme = Colors.Error
 			};
