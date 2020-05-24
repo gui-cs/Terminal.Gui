@@ -323,7 +323,7 @@ namespace Terminal.Gui {
 
 		public override void PositionCursor ()
 		{
-			if (host == null || !host.isMenuClosed)
+			if (host == null || host.IsMenuOpen)
 				if (barItems.IsTopLevel) {
 					host.PositionCursor ();
 				} else
@@ -406,11 +406,11 @@ namespace Terminal.Gui {
 					var item = barItems.Children [current];
 					if (item == null || !item.IsEnabled ()) disabled = true;
 					if (host.UseKeysUpDownAsKeysLeftRight && barItems.Children [current]?.SubMenu != null &&
-						!disabled && !host.isMenuClosed) {
+						!disabled && host.IsMenuOpen) {
 						CheckSubMenu ();
 						break;
 					}
-					if (host.isMenuClosed)
+					if (!host.IsMenuOpen)
 						host.OpenMenu (host.selected);
 				} while (barItems.Children [current] == null || disabled);
 				SetNeedsDisplay ();
@@ -566,7 +566,7 @@ namespace Terminal.Gui {
 			selectedSub = -1;
 			ColorScheme = Colors.Menu;
 			WantMousePositionReports = true;
-			isMenuClosed = true;
+			IsMenuOpen = false;
 		}
 
 		bool openedByAltKey;
@@ -587,14 +587,14 @@ namespace Terminal.Gui {
 		{
 			if (keyEvent.IsAlt) {
 				// User pressed Alt - this may be a precursor to a menu accelerator (e.g. Alt-F)
-				if (!keyEvent.IsCtrl && openedByAltKey && isMenuClosed && openMenu == null && ((uint)keyEvent.Key & (uint)Key.CharMask) == 0) {
+				if (!keyEvent.IsCtrl && openedByAltKey && !IsMenuOpen && openMenu == null && ((uint)keyEvent.Key & (uint)Key.CharMask) == 0) {
 					// There's no open menu, the first menu item should be highlight.
 					// The right way to do this is to SetFocus(MenuBar), but for some reason
 					// that faults.
 
 					//Activate (0);
 					//StartMenu ();
-					isMenuClosed = false;
+					IsMenuOpen = true;
 					selected = 0;
 					CanFocus = true;
 					lastFocused = SuperView.MostFocused;
@@ -609,7 +609,7 @@ namespace Terminal.Gui {
 					if (openMenu != null)
 						CloseAllMenus ();
 					openedByAltKey = false;
-					isMenuClosed = true;
+					IsMenuOpen = false;
 					selected = -1;
 					CanFocus = false;
 					if (lastFocused != null)
@@ -661,13 +661,13 @@ namespace Terminal.Gui {
 			for (int i = 0; i < Menus.Length; i++) {
 				if (i == selected) {
 					pos++;
-					if (!isMenuClosed)
+					if (IsMenuOpen)
 						Move (pos + 1, 0);
 					else
 						Move (pos + 1, 0);
 					return;
 				} else {
-					if (!isMenuClosed)
+					if (IsMenuOpen)
 						pos += 1 + Menus [i].TitleLength + 2;
 					else
 						pos += 2 + Menus [i].TitleLength + 1;
@@ -698,12 +698,11 @@ namespace Terminal.Gui {
 		View previousFocused;
 		internal bool isMenuOpening;
 		internal bool isMenuClosing;
-		internal bool isMenuClosed;
 
 		/// <summary>
-		/// True of the menu is open; otherwise false.
+		/// True if the menu is open; otherwise false.
 		/// </summary>
-		public bool MenuOpen { get; set; }
+		public bool IsMenuOpen { get; protected set; }
 
 		View lastFocused;
 
@@ -751,12 +750,13 @@ namespace Terminal.Gui {
 				break;
 			}
 			isMenuOpening = false;
-			isMenuClosed = false;
-			MenuOpen = true;
+			IsMenuOpen = true;
 		}
 
-		// Starts the menu from a hotkey
-		void StartMenu ()
+		/// <summary>
+		/// Opens the current Menu programatically.
+		/// </summary>
+		public void OpenMenu ()
 		{
 			if (openMenu != null)
 				return;
@@ -781,6 +781,13 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
+		/// <summary>
+		/// Closes the current Menu programatically, if open.
+		/// </summary>
+		public void CloseMenu()
+		{
+			CloseMenu (false, false);
+		}
 		internal void CloseMenu (bool reopen = false, bool isSubMenu = false)
 		{
 			isMenuClosing = true;
@@ -802,12 +809,12 @@ namespace Terminal.Gui {
 					if (!reopen)
 						selected = -1;
 					LastFocused.SuperView?.SetFocus (LastFocused);
+					IsMenuOpen = false;
 				} else {
 					SuperView.SetFocus (this);
-					isMenuClosed = true;
+					IsMenuOpen = false;
 					PositionCursor ();
 				}
-				isMenuClosed = true;
 				break;
 
 			case true:
@@ -819,7 +826,7 @@ namespace Terminal.Gui {
 				break;
 			}
 			isMenuClosing = false;
-			MenuOpen = false;
+			IsMenuOpen = false;
 		}
 
 		void RemoveSubMenu (int index)
@@ -882,7 +889,7 @@ namespace Terminal.Gui {
 				if (LastFocused != null && LastFocused != this)
 					selected = -1;
 			}
-			isMenuClosed = true;
+			IsMenuOpen = false;
 			openedByHotKey = false;
 			openedByAltKey = false;
 		}
@@ -996,8 +1003,8 @@ namespace Terminal.Gui {
 		public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == Key.F9) {
-				if (isMenuClosed)
-					StartMenu ();
+				if (!IsMenuOpen)
+					OpenMenu ();
 				else
 					CloseAllMenus ();
 				return true;
@@ -1088,7 +1095,7 @@ namespace Terminal.Gui {
 				for (int i = 0; i < Menus.Length; i++) {
 					if (cx > pos && me.X < pos + 1 + Menus [i].TitleLength) {
 						if (selected == i && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) &&
-											!isMenuClosed) {
+											IsMenuOpen) {
 							Application.UngrabMouse ();
 							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
@@ -1097,7 +1104,7 @@ namespace Terminal.Gui {
 								CloseMenu ();
 							}
 						} else if ((me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) &&
-							isMenuClosed) {
+							!IsMenuOpen) {
 							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
 								menu.Run (Menus [i].Action);
@@ -1105,12 +1112,12 @@ namespace Terminal.Gui {
 								Activate (i);
 							}
 						} else if (selected != i && selected > -1 && me.Flags == MouseFlags.ReportMousePosition) {
-							if (!isMenuClosed) {
+							if (IsMenuOpen) {
 								CloseMenu ();
 								Activate (i);
 							}
 						} else {
-							if (!isMenuClosed)
+							if (IsMenuOpen)
 								Activate (i);
 						}
 						return true;
@@ -1142,7 +1149,7 @@ namespace Terminal.Gui {
 					handled = false;
 					return false;
 				}
-			} else if (isMenuClosed && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked ||
+			} else if (!IsMenuOpen && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked ||
 				me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
 				Application.GrabMouse (current);
 			} else {
