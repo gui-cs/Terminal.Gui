@@ -351,6 +351,15 @@ namespace Terminal.Gui {
 		public ustring Id { get; set; } = "";
 
 		/// <summary>
+		/// Returns a value indicating if this View is currently on Top (Active)
+		/// </summary>
+		public bool IsCurrentTop {
+			get {
+				return Application.Current == this;
+			}
+		}
+
+		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="View"/> want mouse position reports.
 		/// </summary>
 		/// <value><c>true</c> if want mouse position reports; otherwise, <c>false</c>.</value>
@@ -531,7 +540,7 @@ namespace Terminal.Gui {
 		/// <param name="region">The region that must be flagged for repaint.</param>
 		public void SetNeedsDisplay (Rect region)
 		{
-			if (NeedDisplay.IsEmpty)
+			if (NeedDisplay == null || NeedDisplay.IsEmpty)
 				NeedDisplay = region;
 			else {
 				var x = Math.Min (NeedDisplay.X, region.X);
@@ -1015,7 +1024,7 @@ namespace Terminal.Gui {
 
 			if (subviews != null) {
 				foreach (var view in subviews) {
-					if (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay) {
+					if (view.NeedDisplay != null && (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay)) {
 						if (view.Frame.IntersectsWith (clipRect) && view.Frame.IntersectsWith (region)) {
 
 							// FIXED: optimize this by computing the intersection of region and view.Bounds
@@ -1704,8 +1713,8 @@ namespace Terminal.Gui {
 		{
 			Application.CurrentView = this;
 
-			if (this == Application.Top || this == Application.Current) {
-				if (!NeedDisplay.IsEmpty) {
+			if (IsCurrentTop) {
+				if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
 					Driver.SetAttribute (Colors.TopLevel.Normal);
 					Clear (region);
 					Driver.SetAttribute (Colors.Base.Normal);
@@ -1887,7 +1896,7 @@ namespace Terminal.Gui {
 		{
 			Application.CurrentView = this;
 
-			if (!NeedDisplay.IsEmpty) {
+			if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
 				DrawFrameWindow ();
 			}
 			contentView.Redraw (contentView.Bounds);
@@ -2487,7 +2496,7 @@ namespace Terminal.Gui {
 					Iteration?.Invoke (null, EventArgs.Empty);
 				} else if (wait == false)
 					return;
-				if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.childNeedsDisplay) {
+				if (state.Toplevel.NeedDisplay != null && (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.childNeedsDisplay)) {
 					state.Toplevel.Redraw (state.Toplevel.Bounds);
 					if (DebugDrawBounds)
 						DrawBounds (state.Toplevel);
