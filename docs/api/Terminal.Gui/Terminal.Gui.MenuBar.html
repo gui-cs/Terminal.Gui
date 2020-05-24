@@ -122,6 +122,9 @@ The MenuBar provides a menu for Terminal.Gui applications.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Id">View.Id</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsCurrentTop">View.IsCurrentTop</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_WantMousePositionReports">View.WantMousePositionReports</a>
     </div>
     <div>
@@ -352,6 +355,33 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.MenuBar.htm
   </h3>
   
   
+  <a id="Terminal_Gui_MenuBar_IsMenuOpen_" data-uid="Terminal.Gui.MenuBar.IsMenuOpen*"></a>
+  <h4 id="Terminal_Gui_MenuBar_IsMenuOpen" data-uid="Terminal.Gui.MenuBar.IsMenuOpen">IsMenuOpen</h4>
+  <div class="markdown level1 summary">
+True if the menu is open; otherwise false.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsMenuOpen { get; protected set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_MenuBar_LastFocused_" data-uid="Terminal.Gui.MenuBar.LastFocused*"></a>
   <h4 id="Terminal_Gui_MenuBar_LastFocused" data-uid="Terminal.Gui.MenuBar.LastFocused">LastFocused</h4>
   <div class="markdown level1 summary">
@@ -373,33 +403,6 @@ Get the lasted focused view before open the menu.
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_MenuBar_MenuOpen_" data-uid="Terminal.Gui.MenuBar.MenuOpen*"></a>
-  <h4 id="Terminal_Gui_MenuBar_MenuOpen" data-uid="Terminal.Gui.MenuBar.MenuOpen">MenuOpen</h4>
-  <div class="markdown level1 summary">
-True of the menu is open; otherwise false.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool MenuOpen { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -460,6 +463,18 @@ Used for change the navigation key style.
   </table>
   <h3 id="methods">Methods
   </h3>
+  
+  
+  <a id="Terminal_Gui_MenuBar_CloseMenu_" data-uid="Terminal.Gui.MenuBar.CloseMenu*"></a>
+  <h4 id="Terminal_Gui_MenuBar_CloseMenu" data-uid="Terminal.Gui.MenuBar.CloseMenu">CloseMenu()</h4>
+  <div class="markdown level1 summary">
+Closes the current Menu programatically, if open.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void CloseMenu()</code></pre>
+  </div>
   
   
   <a id="Terminal_Gui_MenuBar_MouseEvent_" data-uid="Terminal.Gui.MenuBar.MouseEvent*"></a>
@@ -592,6 +607,18 @@ Used for change the navigation key style.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnKeyUp_Terminal_Gui_KeyEvent_">View.OnKeyUp(KeyEvent)</a></div>
+  
+  
+  <a id="Terminal_Gui_MenuBar_OpenMenu_" data-uid="Terminal.Gui.MenuBar.OpenMenu*"></a>
+  <h4 id="Terminal_Gui_MenuBar_OpenMenu" data-uid="Terminal.Gui.MenuBar.OpenMenu">OpenMenu()</h4>
+  <div class="markdown level1 summary">
+Opens the current Menu programatically.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void OpenMenu()</code></pre>
+  </div>
   
   
   <a id="Terminal_Gui_MenuBar_PositionCursor_" data-uid="Terminal.Gui.MenuBar.PositionCursor*"></a>
