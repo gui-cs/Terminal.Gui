@@ -24,7 +24,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Label.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Label
     path: ../Terminal.Gui/Views/Label.cs
@@ -56,6 +56,7 @@ items:
   - Terminal.Gui.View.Driver
   - Terminal.Gui.View.Subviews
   - Terminal.Gui.View.Id
+  - Terminal.Gui.View.IsCurrentTop
   - Terminal.Gui.View.WantMousePositionReports
   - Terminal.Gui.View.WantContinuousButtonPressed
   - Terminal.Gui.View.Frame
@@ -142,7 +143,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Label.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/Label.cs
@@ -181,7 +182,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Label.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/Label.cs
@@ -218,7 +219,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Label.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/Label.cs
@@ -254,7 +255,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Label.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Redraw
     path: ../Terminal.Gui/Views/Label.cs
@@ -291,7 +292,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Label.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MeasureLines
     path: ../Terminal.Gui/Views/Label.cs
@@ -335,7 +336,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Label.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MaxWidth
     path: ../Terminal.Gui/Views/Label.cs
@@ -379,7 +380,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Label.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Text
     path: ../Terminal.Gui/Views/Label.cs
@@ -418,7 +419,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Label.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: TextAlignment
     path: ../Terminal.Gui/Views/Label.cs
@@ -456,7 +457,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Label.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: TextColor
     path: ../Terminal.Gui/Views/Label.cs
@@ -553,6 +554,12 @@ references:
   name: Id
   nameWithType: View.Id
   fullName: Terminal.Gui.View.Id
+- uid: Terminal.Gui.View.IsCurrentTop
+  commentId: P:Terminal.Gui.View.IsCurrentTop
+  parent: Terminal.Gui.View
+  name: IsCurrentTop
+  nameWithType: View.IsCurrentTop
+  fullName: Terminal.Gui.View.IsCurrentTop
 - uid: Terminal.Gui.View.WantMousePositionReports
   commentId: P:Terminal.Gui.View.WantMousePositionReports
   parent: Terminal.Gui.View

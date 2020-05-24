@@ -38,11 +38,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Application
     path: ../Terminal.Gui/Core.cs
-    startLine: 1994
+    startLine: 2003
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -83,11 +83,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Driver
     path: ../Terminal.Gui/Core.cs
-    startLine: 1998
+    startLine: 2007
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -118,11 +118,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Top
     path: ../Terminal.Gui/Core.cs
-    startLine: 2004
+    startLine: 2013
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -158,11 +158,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Current
     path: ../Terminal.Gui/Core.cs
-    startLine: 2010
+    startLine: 2019
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -198,11 +198,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: CurrentView
     path: ../Terminal.Gui/Core.cs
-    startLine: 2016
+    startLine: 2025
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -238,11 +238,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MainLoop
     path: ../Terminal.Gui/Core.cs
-    startLine: 2022
+    startLine: 2031
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -278,11 +278,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Iteration
     path: ../Terminal.Gui/Core.cs
-    startLine: 2032
+    startLine: 2041
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -314,11 +314,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MakeCenteredRect
     path: ../Terminal.Gui/Core.cs
-    startLine: 2039
+    startLine: 2048
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -355,11 +355,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: UseSystemConsole
     path: ../Terminal.Gui/Core.cs
-    startLine: 2081
+    startLine: 2090
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -390,11 +390,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Init
     path: ../Terminal.Gui/Core.cs
-    startLine: 2097
+    startLine: 2106
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -425,11 +425,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: GrabMouse
     path: ../Terminal.Gui/Core.cs
-    startLine: 2257
+    startLine: 2266
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -463,11 +463,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: UngrabMouse
     path: ../Terminal.Gui/Core.cs
-    startLine: 2268
+    startLine: 2277
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -497,11 +497,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: RootMouseEvent
     path: ../Terminal.Gui/Core.cs
-    startLine: 2277
+    startLine: 2286
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -532,11 +532,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Loaded
     path: ../Terminal.Gui/Core.cs
-    startLine: 2351
+    startLine: 2360
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -567,11 +567,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Begin
     path: ../Terminal.Gui/Core.cs
-    startLine: 2366
+    startLine: 2375
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -609,11 +609,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: End
     path: ../Terminal.Gui/Core.cs
-    startLine: 2400
+    startLine: 2409
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -647,11 +647,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Shutdown
     path: ../Terminal.Gui/Core.cs
-    startLine: 2411
+    startLine: 2420
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -681,11 +681,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Refresh
     path: ../Terminal.Gui/Core.cs
-    startLine: 2434
+    startLine: 2443
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -715,11 +715,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: RunLoop
     path: ../Terminal.Gui/Core.cs
-    startLine: 2469
+    startLine: 2478
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -757,11 +757,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Run
     path: ../Terminal.Gui/Core.cs
-    startLine: 2514
+    startLine: 2523
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -791,11 +791,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Run
     path: ../Terminal.Gui/Core.cs
-    startLine: 2522
+    startLine: 2531
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -833,11 +833,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Run
     path: ../Terminal.Gui/Core.cs
-    startLine: 2552
+    startLine: 2561
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -871,11 +871,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: RequestStop
     path: ../Terminal.Gui/Core.cs
-    startLine: 2570
+    startLine: 2579
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -906,11 +906,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Resized
     path: ../Terminal.Gui/Core.cs
-    startLine: 2592
+    startLine: 2601
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui

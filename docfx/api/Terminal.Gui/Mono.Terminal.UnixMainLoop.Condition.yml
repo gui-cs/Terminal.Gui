@@ -21,7 +21,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Condition
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -64,7 +64,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: PollIn
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -98,7 +98,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: PollOut
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -132,7 +132,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: PollPri
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -166,7 +166,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: PollErr
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -200,7 +200,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: PollHup
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -234,7 +234,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: PollNval
     path: ../Terminal.Gui/MonoCurses/mainloop.cs

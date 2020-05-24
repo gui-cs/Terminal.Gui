@@ -27,7 +27,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button
     path: ../Terminal.Gui/Views/Button.cs
@@ -60,6 +60,7 @@ items:
   - Terminal.Gui.View.Driver
   - Terminal.Gui.View.Subviews
   - Terminal.Gui.View.Id
+  - Terminal.Gui.View.IsCurrentTop
   - Terminal.Gui.View.WantMousePositionReports
   - Terminal.Gui.View.WantContinuousButtonPressed
   - Terminal.Gui.View.Frame
@@ -141,7 +142,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: IsDefault
     path: ../Terminal.Gui/Views/Button.cs
@@ -179,7 +180,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Clicked
     path: ../Terminal.Gui/Views/Button.cs
@@ -213,7 +214,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/Button.cs
@@ -253,7 +254,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/Button.cs
@@ -296,7 +297,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Text
     path: ../Terminal.Gui/Views/Button.cs
@@ -333,7 +334,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/Button.cs
@@ -379,7 +380,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Redraw
     path: ../Terminal.Gui/Views/Button.cs
@@ -416,7 +417,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: PositionCursor
     path: ../Terminal.Gui/Views/Button.cs
@@ -450,7 +451,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ProcessHotKey
     path: ../Terminal.Gui/Views/Button.cs
@@ -489,7 +490,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ProcessColdKey
     path: ../Terminal.Gui/Views/Button.cs
@@ -528,7 +529,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ProcessKey
     path: ../Terminal.Gui/Views/Button.cs
@@ -567,7 +568,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MouseEvent
     path: ../Terminal.Gui/Views/Button.cs
@@ -688,6 +689,12 @@ references:
   name: Id
   nameWithType: View.Id
   fullName: Terminal.Gui.View.Id
+- uid: Terminal.Gui.View.IsCurrentTop
+  commentId: P:Terminal.Gui.View.IsCurrentTop
+  parent: Terminal.Gui.View
+  name: IsCurrentTop
+  nameWithType: View.IsCurrentTop
+  fullName: Terminal.Gui.View.IsCurrentTop
 - uid: Terminal.Gui.View.WantMousePositionReports
   commentId: P:Terminal.Gui.View.WantMousePositionReports
   parent: Terminal.Gui.View

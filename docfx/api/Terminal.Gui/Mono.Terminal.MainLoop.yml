@@ -26,7 +26,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MainLoop
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -70,7 +70,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Driver
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -108,7 +108,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -143,7 +143,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Invoke
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -178,7 +178,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AddIdle
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -218,7 +218,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: RemoveIdle
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -256,7 +256,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AddTimeout
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -299,7 +299,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: RemoveTimeout
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -335,7 +335,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Stop
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -367,7 +367,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: EventsPending
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -405,7 +405,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MainIteration
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -438,7 +438,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Run
     path: ../Terminal.Gui/MonoCurses/mainloop.cs

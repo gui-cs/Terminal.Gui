@@ -17,11 +17,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ResizedEventArgs
     path: ../Terminal.Gui/Core.cs
-    startLine: 2578
+    startLine: 2587
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -65,11 +65,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Rows
     path: ../Terminal.Gui/Core.cs
-    startLine: 2582
+    startLine: 2591
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -102,11 +102,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Cols
     path: ../Terminal.Gui/Core.cs
-    startLine: 2586
+    startLine: 2595
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui

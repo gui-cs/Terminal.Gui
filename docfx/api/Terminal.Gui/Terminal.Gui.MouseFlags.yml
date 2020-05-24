@@ -42,7 +42,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MouseFlags
     path: ../Terminal.Gui/Event.cs
@@ -86,7 +86,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button1Pressed
     path: ../Terminal.Gui/Event.cs
@@ -120,7 +120,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button1Released
     path: ../Terminal.Gui/Event.cs
@@ -154,7 +154,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button1Clicked
     path: ../Terminal.Gui/Event.cs
@@ -188,7 +188,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button1DoubleClicked
     path: ../Terminal.Gui/Event.cs
@@ -222,7 +222,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button1TripleClicked
     path: ../Terminal.Gui/Event.cs
@@ -256,7 +256,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button2Pressed
     path: ../Terminal.Gui/Event.cs
@@ -290,7 +290,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button2Released
     path: ../Terminal.Gui/Event.cs
@@ -324,7 +324,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button2Clicked
     path: ../Terminal.Gui/Event.cs
@@ -358,7 +358,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button2DoubleClicked
     path: ../Terminal.Gui/Event.cs
@@ -392,7 +392,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button2TripleClicked
     path: ../Terminal.Gui/Event.cs
@@ -426,7 +426,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button3Pressed
     path: ../Terminal.Gui/Event.cs
@@ -460,7 +460,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button3Released
     path: ../Terminal.Gui/Event.cs
@@ -494,7 +494,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button3Clicked
     path: ../Terminal.Gui/Event.cs
@@ -528,7 +528,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button3DoubleClicked
     path: ../Terminal.Gui/Event.cs
@@ -562,7 +562,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button3TripleClicked
     path: ../Terminal.Gui/Event.cs
@@ -596,7 +596,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button4Pressed
     path: ../Terminal.Gui/Event.cs
@@ -630,7 +630,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button4Released
     path: ../Terminal.Gui/Event.cs
@@ -664,7 +664,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button4Clicked
     path: ../Terminal.Gui/Event.cs
@@ -698,7 +698,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button4DoubleClicked
     path: ../Terminal.Gui/Event.cs
@@ -732,7 +732,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Button4TripleClicked
     path: ../Terminal.Gui/Event.cs
@@ -766,7 +766,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ButtonShift
     path: ../Terminal.Gui/Event.cs
@@ -800,7 +800,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ButtonCtrl
     path: ../Terminal.Gui/Event.cs
@@ -834,7 +834,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ButtonAlt
     path: ../Terminal.Gui/Event.cs
@@ -868,7 +868,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ReportMousePosition
     path: ../Terminal.Gui/Event.cs
@@ -902,7 +902,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: WheeledUp
     path: ../Terminal.Gui/Event.cs
@@ -936,7 +936,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: WheeledDown
     path: ../Terminal.Gui/Event.cs
@@ -970,7 +970,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Event.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AllEvents
     path: ../Terminal.Gui/Event.cs

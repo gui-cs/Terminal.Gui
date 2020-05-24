@@ -27,7 +27,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Responder
     path: ../Terminal.Gui/Core.cs
@@ -72,7 +72,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: CanFocus
     path: ../Terminal.Gui/Core.cs
@@ -112,7 +112,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: HasFocus
     path: ../Terminal.Gui/Core.cs
@@ -152,7 +152,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ProcessHotKey
     path: ../Terminal.Gui/Core.cs
@@ -192,7 +192,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ProcessKey
     path: ../Terminal.Gui/Core.cs
@@ -233,7 +233,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ProcessColdKey
     path: ../Terminal.Gui/Core.cs
@@ -274,7 +274,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: OnKeyDown
     path: ../Terminal.Gui/Core.cs
@@ -315,7 +315,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: OnKeyUp
     path: ../Terminal.Gui/Core.cs
@@ -356,7 +356,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: MouseEvent
     path: ../Terminal.Gui/Core.cs
@@ -397,7 +397,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: OnMouseEnter
     path: ../Terminal.Gui/Core.cs
@@ -438,7 +438,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: OnMouseLeave
     path: ../Terminal.Gui/Core.cs
@@ -479,7 +479,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: OnEnter
     path: ../Terminal.Gui/Core.cs
@@ -516,7 +516,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Core.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: OnLeave
     path: ../Terminal.Gui/Core.cs

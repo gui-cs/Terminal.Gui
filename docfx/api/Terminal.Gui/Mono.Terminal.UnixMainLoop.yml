@@ -21,7 +21,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: UnixMainLoop
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -71,7 +71,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Mono.Terminal.IMainLoopDriver.Wakeup
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -102,7 +102,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Mono.Terminal.IMainLoopDriver.Setup
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -135,7 +135,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: RemoveWatch
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -171,7 +171,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: AddWatch
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -217,7 +217,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Mono.Terminal.IMainLoopDriver.EventsPending
     path: ../Terminal.Gui/MonoCurses/mainloop.cs
@@ -253,7 +253,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Mono.Terminal.IMainLoopDriver.MainIteration
     path: ../Terminal.Gui/MonoCurses/mainloop.cs

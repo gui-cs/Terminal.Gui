@@ -15,7 +15,7 @@ items:
   source:
     remote:
       path: UICatalog/UICatalog.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: UICatalogApp
     path: ../UICatalog/UICatalog.cs

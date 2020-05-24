@@ -31,7 +31,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Size
     path: ../Terminal.Gui/Types/Size.cs
@@ -68,7 +68,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Empty
     path: ../Terminal.Gui/Types/Size.cs
@@ -105,7 +105,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: op_Addition
     path: ../Terminal.Gui/Types/Size.cs
@@ -147,7 +147,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: op_Equality
     path: ../Terminal.Gui/Types/Size.cs
@@ -189,7 +189,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: op_Inequality
     path: ../Terminal.Gui/Types/Size.cs
@@ -231,7 +231,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: op_Subtraction
     path: ../Terminal.Gui/Types/Size.cs
@@ -273,7 +273,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: op_Explicit
     path: ../Terminal.Gui/Types/Size.cs
@@ -316,7 +316,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Types/Size.cs
@@ -352,7 +352,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Types/Size.cs
@@ -390,7 +390,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: IsEmpty
     path: ../Terminal.Gui/Types/Size.cs
@@ -428,7 +428,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Width
     path: ../Terminal.Gui/Types/Size.cs
@@ -466,7 +466,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Height
     path: ../Terminal.Gui/Types/Size.cs
@@ -504,7 +504,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Equals
     path: ../Terminal.Gui/Types/Size.cs
@@ -545,7 +545,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: GetHashCode
     path: ../Terminal.Gui/Types/Size.cs
@@ -583,7 +583,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: ToString
     path: ../Terminal.Gui/Types/Size.cs
@@ -621,7 +621,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Add
     path: ../Terminal.Gui/Types/Size.cs
@@ -665,7 +665,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Types/Size.cs
-      branch: docs
+      branch: docs_tweaks
       repo: tig:tig/gui.cs.git
     id: Subtract
     path: ../Terminal.Gui/Types/Size.cs
