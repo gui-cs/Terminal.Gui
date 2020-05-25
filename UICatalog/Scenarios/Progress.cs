@@ -164,10 +164,8 @@ namespace UICatalog {
 
 		protected override void Dispose (bool disposing)
 		{
-			Win.GetEnumerator ().Reset ();
-			while (Win.GetEnumerator ().MoveNext ()) {
-				var cur = (ProgressDemo)Win.GetEnumerator ().Current;
-				cur?.StopBtnClick ();
+			foreach (var v in Win.Subviews.OfType<ProgressDemo>()) {
+				v?.StopBtnClick ();
 			}
 			base.Dispose (disposing);
 		}
