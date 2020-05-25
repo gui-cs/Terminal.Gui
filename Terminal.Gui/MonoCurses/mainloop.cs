@@ -198,9 +198,33 @@ namespace Mono.Terminal {
 
 		bool IMainLoopDriver.EventsPending (bool wait)
 		{
+			int pollTimeout = 0;
+			int n;
+
+			if (CkeckTimeout (wait, ref pollTimeout))
+				return true;
+
+			UpdatePollMap ();
+
+			while (true) {
+				n = poll (pollmap, (uint)pollmap.Length, 0);
+				if (pollmap != null) {
+					break;
+				}
+				if (mainLoop.idleHandlers.Count > 0 || CkeckTimeout (wait, ref pollTimeout)) {
+					return true;
+				}
+			}
+			int ic;
+			lock (mainLoop.idleHandlers)
+				ic = mainLoop.idleHandlers.Count;
+			return n > 0 || mainLoop.timeouts.Count > 0 && ((mainLoop.timeouts.Keys [0] - DateTime.UtcNow.Ticks) < 0) || ic > 0;
+		}
+
+		bool CkeckTimeout (bool wait, ref int pollTimeout)
+		{
 			long now = DateTime.UtcNow.Ticks;
 
-			int pollTimeout, n;
 			if (mainLoop.timeouts.Count > 0) {
 				pollTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
 				if (pollTimeout < 0)
@@ -212,24 +236,7 @@ namespace Mono.Terminal {
 			if (!wait)
 				pollTimeout = 0;
 
-			UpdatePollMap ();
-
-			while (true) {
-				if (wait && pollTimeout == -1) {
-					pollTimeout = 0;
-				}
-				n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
-				if (pollmap != null) {
-					break;
-				}
-				if (mainLoop.timeouts.Count > 0 || mainLoop.idleHandlers.Count > 0) {
-					return true;
-				}
-			}
-			int ic;
-			lock (mainLoop.idleHandlers)
-				ic = mainLoop.idleHandlers.Count;
-			return n > 0 || mainLoop.timeouts.Count > 0 && ((mainLoop.timeouts.Keys [0] - DateTime.UtcNow.Ticks) < 0) || ic > 0;
+			return false;
 		}
 
 		void IMainLoopDriver.MainIteration ()

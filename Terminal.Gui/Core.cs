@@ -2095,7 +2095,7 @@ namespace Terminal.Gui {
 					d (state);
 					return false;
 				});
-				mainLoop.Driver.Wakeup ();
+				//mainLoop.Driver.Wakeup ();
 			}
 
 			public override void Send (SendOrPostCallback d, object state)

@@ -522,9 +522,9 @@ namespace Terminal.Gui {
 		void WindowsInputHandler ()
 		{
 			while (true) {
-				waitForProbe.Wait ();				
+				waitForProbe.Wait ();
 				waitForProbe.Reset ();
-				
+
 				uint numberEventsRead = 0;
 
 				WindowsConsole.ReadConsoleInput (winConsole.InputHandle, records, 1, out numberEventsRead);
@@ -544,40 +544,29 @@ namespace Terminal.Gui {
 
 		void IMainLoopDriver.Wakeup ()
 		{
-			//tokenSource.Cancel ();
-			eventReady.Reset ();
-			eventReady.Set ();
+			tokenSource.Cancel ();
+			//eventReady.Reset ();
+			//eventReady.Set ();
 		}
 
 		bool IMainLoopDriver.EventsPending (bool wait)
 		{
-			long now = DateTime.UtcNow.Ticks;
+			int waitTimeout = 0;
 
-			int waitTimeout;
-			if (mainLoop.timeouts.Count > 0) {
-				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-				if (waitTimeout < 0)
-					return true;
-			} else
-				waitTimeout = -1;
-
-			if (!wait)
-				waitTimeout = 0;
+			if (CkeckTimeout (wait, ref waitTimeout))
+				return true;
 
 			result = null;
 			waitForProbe.Set ();
 
 			try {
 				while (result == null) {
-					if (wait && waitTimeout == -1) {
-						waitTimeout = 0;
-					}
 					if (!tokenSource.IsCancellationRequested)
-						eventReady.Wait (waitTimeout, tokenSource.Token);
+						eventReady.Wait (0, tokenSource.Token);
 					if (result != null) {
 						break;
 					}
-					if (mainLoop.timeouts.Count > 0 || mainLoop.idleHandlers.Count > 0) {
+					if (mainLoop.idleHandlers.Count > 0 || CkeckTimeout (wait, ref waitTimeout)) {
 						return true;
 					}
 				}
@@ -593,6 +582,24 @@ namespace Terminal.Gui {
 			tokenSource.Dispose ();
 			tokenSource = new CancellationTokenSource ();
 			return true;
+		}
+
+		bool CkeckTimeout (bool wait, ref int waitTimeout)
+		{
+			long now = DateTime.UtcNow.Ticks;
+
+			if (mainLoop.timeouts.Count > 0) {
+				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+				if (waitTimeout < 0)
+					return true;
+			} else {
+				waitTimeout = -1;
+			}
+
+			if (!wait)
+				waitTimeout = 0;
+
+			return false;
 		}
 
 		Action<KeyEvent> keyHandler;
@@ -783,7 +790,7 @@ namespace Terminal.Gui {
 								break;
 							if (IsButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
 								mouseHandler (me);
-								mainLoop.Driver.Wakeup ();
+								//mainLoop.Driver.Wakeup ();
 							}
 						}
 					});

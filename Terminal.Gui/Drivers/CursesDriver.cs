@@ -244,7 +244,7 @@ namespace Terminal.Gui {
 								break;
 							if (IsButtonPressed && LastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
 								mouseHandler (me);
-								mainLoop.Driver.Wakeup ();
+								//mainLoop.Driver.Wakeup ();
 							}
 						}
 					});
