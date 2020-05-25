@@ -5,6 +5,8 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using NStack;
 
@@ -111,24 +113,17 @@ namespace Terminal.Gui {
 
 		public override void Init (Action terminalResized)
 		{
+			Colors.TopLevel = new ColorScheme ();
 			Colors.Base = new ColorScheme ();
 			Colors.Dialog = new ColorScheme ();
 			Colors.Menu = new ColorScheme ();
 			Colors.Error = new ColorScheme ();
 			Clip = new Rect (0, 0, Cols, Rows);
 
-			HLine = '\u2500';
-			VLine = '\u2502';
-			Stipple = '\u2592';
-			Diamond = '\u25c6';
-			ULCorner = '\u250C';
-			LLCorner = '\u2514';
-			URCorner = '\u2510';
-			LRCorner = '\u2518';
-			LeftTee = '\u251c';
-			RightTee = '\u2524';
-			TopTee = '\u22a4';
-			BottomTee = '\u22a5';
+			Colors.TopLevel.Normal = MakeColor (ConsoleColor.Green, ConsoleColor.Black);
+			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
+			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
+			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkCyan);
 
 			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Blue);
 			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
@@ -156,6 +151,19 @@ namespace Terminal.Gui {
 			Colors.Error.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Red);
 			Colors.Error.HotFocus = Colors.Error.HotNormal;
 			Console.Clear ();
+
+			HLine = '\u2500';
+			VLine = '\u2502';
+			Stipple = '\u2592';
+			Diamond = '\u25c6';
+			ULCorner = '\u250C';
+			LLCorner = '\u2514';
+			URCorner = '\u2510';
+			LRCorner = '\u2518';
+			LeftTee = '\u251c';
+			RightTee = '\u2524';
+			TopTee = '\u22a4';
+			BottomTee = '\u22a5';
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)
@@ -167,8 +175,15 @@ namespace Terminal.Gui {
 		void SetColor (int color)
 		{
 			redrawColor = color;
-			Console.BackgroundColor = (ConsoleColor)(color & 0xffff);
-			Console.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
+			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
+			      .OfType<ConsoleColor> ()
+			      .Select (s => (int)s);
+			if (values.Contains (color & 0xffff)) {
+				Console.BackgroundColor = (ConsoleColor)(color & 0xffff);
+			}
+			if (values.Contains ((color >> 16) & 0xffff)) {
+				Console.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
+			}
 		}
 
 		public override void UpdateScreen ()
