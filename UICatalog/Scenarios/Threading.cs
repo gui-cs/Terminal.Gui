@@ -44,23 +44,34 @@ namespace UICatalog {
 				_itemsList.SetSource (items);
 			};
 
-			Application.Init ();
 
 			_btnActionCancel = new Button (1, 1, "Cancelable Load Items");
 			_btnActionCancel.Clicked += () => Application.MainLoop.Invoke (CallLoadItemsAsync);
 
-			_itemsList = new ListView {
+			Win.Add (new Label ("Data Items:") {
 				X = Pos.X (_btnActionCancel),
 				Y = Pos.Y (_btnActionCancel) + 4,
+			});
+
+			_itemsList = new ListView {
+				X = Pos.X (_btnActionCancel),
+				Y = Pos.Y (_btnActionCancel) + 6,
 				Width = 10,
-				Height = 10
+				Height = 10,
+				ColorScheme = Colors.TopLevel
 			};
+
+			Win.Add (new Label ("Task Logs:") {
+				X = Pos.Right (_itemsList) + 10,
+				Y = Pos.Y (_btnActionCancel) + 4,
+			});
 
 			_logJob = new ListView (log) {
 				X = Pos.Right (_itemsList) + 10,
 				Y = Pos.Y (_itemsList),
 				Width = 50,
-				Height = Dim.Fill ()
+				Height = Dim.Fill (),
+				ColorScheme = Colors.TopLevel
 			};
 
 			var text = new TextField (1, 3, 100, "Type anything after press the button");
@@ -76,13 +87,11 @@ namespace UICatalog {
 			var _btnMethod = new Button (80, 18, "Load Data Method");
 			_btnMethod.Clicked += async () => await MethodAsync ();
 			var _btnClearData = new Button (80, 20, "Clear Data");
-				_btnClearData.Clicked += () => { _itemsList.Source = null; LogJob ("Cleaning Data"); };
+			_btnClearData.Clicked += () => { _itemsList.Source = null; LogJob ("Cleaning Data"); };
 			var _btnQuit = new Button (80, 22, "Quit");
 			_btnQuit.Clicked += Application.RequestStop;
 
 			Win.Add (_itemsList, _btnActionCancel, _logJob, text, _btnAction, _btnLambda, _btnHandler, _btnSync, _btnMethod, _btnClearData, _btnQuit);
-			Application.Top.Add (Win);
-			Application.Run ();
 
 		}
 
