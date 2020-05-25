@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Mono.Terminal;
 using NStack;
 using Unix.Terminal;
 
@@ -445,7 +444,7 @@ namespace Terminal.Gui {
 			this.mouseHandler = mouseHandler;
 			this.mainLoop = mainLoop;
 
-			(mainLoop.Driver as Mono.Terminal.UnixMainLoop).AddWatch (0, Mono.Terminal.UnixMainLoop.Condition.PollIn, x => {
+			(mainLoop.Driver as  UnixMainLoop).AddWatch (0,  UnixMainLoop.Condition.PollIn, x => {
 				ProcessInput (keyHandler, keyUpHandler, mouseHandler);
 				return true;
 			});

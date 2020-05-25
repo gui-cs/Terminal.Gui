@@ -14,8 +14,8 @@ namespace Terminal.Gui {
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	///   If the SpecialMask is set, then the value is that of the special mask,
-	///   otherwise, the value is the one of the lower bits (as extracted by CharMask)
+	///   If the <see cref="SpecialMask"/> is set, then the value is that of the special mask,
+	///   otherwise, the value is the one of the lower bits (as extracted by <see cref="CharMask"/>)
 	/// </para>
 	/// <para>
 	///   Control keys are the values between 1 and 26 corresponding to Control-A to Control-Z
@@ -34,8 +34,8 @@ namespace Terminal.Gui {
 		CharMask = 0xfffff,
 
 		/// <summary>
-		/// If the SpecialMask is set, then the value is that of the special mask,
-		/// otherwise, the value is the one of the lower bits (as extracted by CharMask).
+		/// If the <see cref="SpecialMask"/> is set, then the value is that of the special mask,
+		/// otherwise, the value is the one of the lower bits (as extracted by <see cref="CharMask"/>).
 		/// </summary>
 		SpecialMask = 0xfff00000,
 
@@ -369,7 +369,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Mouse flags reported in MouseEvent.
+	/// Mouse flags reported in <see cref="MouseEvent"/>.
 	/// </summary>
 	/// <remarks>
 	/// They just happen to map to the ncurses ones.

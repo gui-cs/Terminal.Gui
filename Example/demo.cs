@@ -2,13 +2,11 @@ using Terminal.Gui;
 using System;
 using System.Linq;
 using System.IO;
-using Mono.Terminal;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using NStack;
-using System.Text;
 
 static class Demo {
 	//class Box10x : View, IScrollView {

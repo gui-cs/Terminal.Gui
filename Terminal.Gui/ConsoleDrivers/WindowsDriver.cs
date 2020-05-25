@@ -26,12 +26,9 @@
 // SOFTWARE.
 //
 using System;
-using System.CodeDom;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Mono.Terminal;
 using NStack;
 
 namespace Terminal.Gui {
@@ -425,7 +422,7 @@ namespace Terminal.Gui {
 		}
 	}
 
-	internal class WindowsDriver : ConsoleDriver, Mono.Terminal.IMainLoopDriver {
+	internal class WindowsDriver : ConsoleDriver, IMainLoopDriver {
 		static bool sync = false;
 		ManualResetEventSlim eventReady = new ManualResetEventSlim (false);
 		ManualResetEventSlim waitForProbe = new ManualResetEventSlim (false);
@@ -522,9 +519,9 @@ namespace Terminal.Gui {
 		void WindowsInputHandler ()
 		{
 			while (true) {
-				waitForProbe.Wait ();				
+				waitForProbe.Wait ();
 				waitForProbe.Reset ();
-				
+
 				uint numberEventsRead = 0;
 
 				WindowsConsole.ReadConsoleInput (winConsole.InputHandle, records, 1, out numberEventsRead);
@@ -1044,7 +1041,7 @@ namespace Terminal.Gui {
 			SetupColorsAndBorders ();
 		}
 
-		
+
 		void ResizeScreen ()
 		{
 			OutputBuffer = new WindowsConsole.CharInfo [Rows * Cols];
