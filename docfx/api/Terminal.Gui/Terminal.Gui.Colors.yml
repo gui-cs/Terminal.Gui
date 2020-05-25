@@ -19,16 +19,16 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Colors
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 322
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 318
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: "\nThe default ColorSchemes for the application.\n"
+  summary: "\nThe default <xref href=\"Terminal.Gui.ColorScheme\" data-throw-if-not-resolved=\"false\"></xref>s for the application.\n"
   example: []
   syntax:
     content: public static class Colors
@@ -63,12 +63,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: TopLevel
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 332
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 328
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -102,12 +102,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Base
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 337
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 333
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -141,12 +141,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Dialog
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 342
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 338
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -180,12 +180,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Menu
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 347
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 343
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -219,12 +219,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Error
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 352
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 348
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -246,6 +246,12 @@ items:
   - Public
   - Shared
 references:
+- uid: Terminal.Gui.ColorScheme
+  commentId: T:Terminal.Gui.ColorScheme
+  parent: Terminal.Gui
+  name: ColorScheme
+  nameWithType: ColorScheme
+  fullName: Terminal.Gui.ColorScheme
 - uid: Terminal.Gui
   commentId: N:Terminal.Gui
   name: Terminal.Gui
@@ -548,12 +554,6 @@ references:
   name: TopLevel
   nameWithType: Colors.TopLevel
   fullName: Terminal.Gui.Colors.TopLevel
-- uid: Terminal.Gui.ColorScheme
-  commentId: T:Terminal.Gui.ColorScheme
-  parent: Terminal.Gui
-  name: ColorScheme
-  nameWithType: ColorScheme
-  fullName: Terminal.Gui.ColorScheme
 - uid: Terminal.Gui.Colors.Base*
   commentId: Overload:Terminal.Gui.Colors.Base
   name: Base

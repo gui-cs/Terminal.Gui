@@ -16,12 +16,12 @@ items:
   type: Enum
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/View.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: LayoutStyle
-    path: ../Terminal.Gui/Core.cs
-    startLine: 198
+    path: ../Terminal.Gui/Core/View.cs
+    startLine: 25
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -49,12 +49,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/View.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Absolute
-    path: ../Terminal.Gui/Core.cs
-    startLine: 202
+    path: ../Terminal.Gui/Core/View.cs
+    startLine: 29
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -83,12 +83,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/View.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Computed
-    path: ../Terminal.Gui/Core.cs
-    startLine: 208
+    path: ../Terminal.Gui/Core/View.cs
+    startLine: 35
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui

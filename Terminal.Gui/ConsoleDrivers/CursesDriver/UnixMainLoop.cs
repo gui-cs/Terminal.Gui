@@ -37,7 +37,7 @@ namespace Terminal.Gui {
 	/// In addition to the general functions of the mainloop, the Unix version
 	/// can watch file descriptors using the AddWatch methods.
 	/// </remarks>
-	public class UnixMainLoop : IMainLoopDriver {
+	internal class UnixMainLoop : IMainLoopDriver {
 		[StructLayout (LayoutKind.Sequential)]
 		struct Pollfd {
 			public int fd;

@@ -19,16 +19,16 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ColorScheme
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 157
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 153
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: "\nColor scheme definitions, they cover some common scenarios and are used\ntypically in toplevel containers to set the scheme that is used by all the\nviews contained inside.\n"
+  summary: "\nColor scheme definitions, they cover some common scenarios and are used\ntypically in containers such as <xref href=\"Terminal.Gui.Window\" data-throw-if-not-resolved=\"false\"></xref> and <xref href=\"Terminal.Gui.FrameView\" data-throw-if-not-resolved=\"false\"></xref> to set the scheme that is used by all the\nviews contained inside.\n"
   example: []
   syntax:
     content: public class ColorScheme
@@ -62,12 +62,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Normal
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 168
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 164
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -99,12 +99,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Focus
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 173
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 169
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -136,12 +136,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: HotNormal
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 178
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 174
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -173,12 +173,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: HotFocus
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 183
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 179
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -210,12 +210,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Disabled
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 188
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 184
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -235,6 +235,17 @@ items:
   modifiers.vb:
   - Public
 references:
+- uid: Terminal.Gui.Window
+  commentId: T:Terminal.Gui.Window
+  parent: Terminal.Gui
+  name: Window
+  nameWithType: Window
+  fullName: Terminal.Gui.Window
+- uid: Terminal.Gui.FrameView
+  commentId: T:Terminal.Gui.FrameView
+  name: FrameView
+  nameWithType: FrameView
+  fullName: Terminal.Gui.FrameView
 - uid: Terminal.Gui
   commentId: N:Terminal.Gui
   name: Terminal.Gui

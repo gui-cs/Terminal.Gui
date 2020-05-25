@@ -26,11 +26,11 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: FileDialog
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 421
   assemblies:
   - Terminal.Gui
@@ -160,11 +160,11 @@ items:
   type: Constructor
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 434
   assemblies:
   - Terminal.Gui
@@ -205,11 +205,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: WillPresent
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 497
   assemblies:
   - Terminal.Gui
@@ -239,11 +239,11 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Prompt
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 507
   assemblies:
   - Terminal.Gui
@@ -277,11 +277,11 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: NameFieldLabel
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 518
   assemblies:
   - Terminal.Gui
@@ -315,11 +315,11 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Message
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 529
   assemblies:
   - Terminal.Gui
@@ -353,11 +353,11 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: CanCreateDirectories
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 540
   assemblies:
   - Terminal.Gui
@@ -391,11 +391,11 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: IsExtensionHidden
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 546
   assemblies:
   - Terminal.Gui
@@ -429,11 +429,11 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: DirectoryPath
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 552
   assemblies:
   - Terminal.Gui
@@ -467,11 +467,11 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: AllowedFileTypes
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 564
   assemblies:
   - Terminal.Gui
@@ -505,11 +505,11 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: AllowsOtherFileTypes
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 574
   assemblies:
   - Terminal.Gui
@@ -543,11 +543,11 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: FilePath
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 580
   assemblies:
   - Terminal.Gui
@@ -581,11 +581,11 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Canceled
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 590
   assemblies:
   - Terminal.Gui

@@ -16,7 +16,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Clipboard.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Clipboard
     path: ../Terminal.Gui/Views/Clipboard.cs
@@ -60,7 +60,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Clipboard.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Contents
     path: ../Terminal.Gui/Views/Clipboard.cs

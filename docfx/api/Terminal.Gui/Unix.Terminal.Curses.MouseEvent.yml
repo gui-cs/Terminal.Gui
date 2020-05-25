@@ -19,11 +19,11 @@ items:
   type: Struct
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: MouseEvent
-    path: ../Terminal.Gui/MonoCurses/binding.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
     startLine: 52
   assemblies:
   - Terminal.Gui
@@ -57,11 +57,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ID
-    path: ../Terminal.Gui/MonoCurses/binding.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
     startLine: 54
   assemblies:
   - Terminal.Gui
@@ -88,11 +88,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: X
-    path: ../Terminal.Gui/MonoCurses/binding.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
     startLine: 55
   assemblies:
   - Terminal.Gui
@@ -119,11 +119,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Y
-    path: ../Terminal.Gui/MonoCurses/binding.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
     startLine: 55
   assemblies:
   - Terminal.Gui
@@ -150,11 +150,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Z
-    path: ../Terminal.Gui/MonoCurses/binding.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
     startLine: 55
   assemblies:
   - Terminal.Gui
@@ -181,11 +181,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ButtonState
-    path: ../Terminal.Gui/MonoCurses/binding.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
     startLine: 56
   assemblies:
   - Terminal.Gui

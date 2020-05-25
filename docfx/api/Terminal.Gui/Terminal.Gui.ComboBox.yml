@@ -20,7 +20,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ComboBox.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ComboBox
     path: ../Terminal.Gui/Views/ComboBox.cs
@@ -138,7 +138,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ComboBox.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Changed
     path: ../Terminal.Gui/Views/ComboBox.cs
@@ -172,7 +172,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ComboBox.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/ComboBox.cs
@@ -223,7 +223,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ComboBox.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: OnEnter
     path: ../Terminal.Gui/Views/ComboBox.cs
@@ -259,7 +259,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ComboBox.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ProcessKey
     path: ../Terminal.Gui/Views/ComboBox.cs
@@ -298,7 +298,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ComboBox.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Text
     path: ../Terminal.Gui/Views/ComboBox.cs

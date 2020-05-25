@@ -19,7 +19,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Menu.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: MenuBarItem
     path: ../Terminal.Gui/Views/Menu.cs
@@ -75,7 +75,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Menu.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/Menu.cs
@@ -123,7 +123,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Menu.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/Menu.cs
@@ -165,7 +165,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Menu.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/Menu.cs
@@ -204,7 +204,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Menu.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Children
     path: ../Terminal.Gui/Views/Menu.cs

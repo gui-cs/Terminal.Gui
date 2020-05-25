@@ -27,11 +27,11 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Pos
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 32
   assemblies:
   - Terminal.Gui
@@ -71,11 +71,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Percent
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 74
   assemblies:
   - Terminal.Gui
@@ -113,11 +113,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: AnchorEnd
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 116
   assemblies:
   - Terminal.Gui
@@ -155,11 +155,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Center
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 159
   assemblies:
   - Terminal.Gui
@@ -193,11 +193,11 @@ items:
   type: Operator
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: op_Implicit
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 186
   assemblies:
   - Terminal.Gui
@@ -237,11 +237,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: At
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 196
   assemblies:
   - Terminal.Gui
@@ -278,11 +278,11 @@ items:
   type: Operator
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: op_Addition
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 236
   assemblies:
   - Terminal.Gui
@@ -322,11 +322,11 @@ items:
   type: Operator
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: op_Subtraction
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 254
   assemblies:
   - Terminal.Gui
@@ -366,11 +366,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Left
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 304
   assemblies:
   - Terminal.Gui
@@ -407,11 +407,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: X
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 311
   assemblies:
   - Terminal.Gui
@@ -448,11 +448,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Top
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 318
   assemblies:
   - Terminal.Gui
@@ -489,11 +489,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Y
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 325
   assemblies:
   - Terminal.Gui
@@ -530,11 +530,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Right
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 332
   assemblies:
   - Terminal.Gui
@@ -571,11 +571,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Bottom
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 339
   assemblies:
   - Terminal.Gui

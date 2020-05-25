@@ -18,7 +18,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ListView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ListViewItemEventArgs
     path: ../Terminal.Gui/Views/ListView.cs
@@ -66,7 +66,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ListView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Item
     path: ../Terminal.Gui/Views/ListView.cs
@@ -103,7 +103,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ListView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Value
     path: ../Terminal.Gui/Views/ListView.cs
@@ -140,7 +140,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ListView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/ListView.cs

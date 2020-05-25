@@ -16,11 +16,11 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: SaveDialog
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 605
   assemblies:
   - Terminal.Gui
@@ -160,11 +160,11 @@ items:
   type: Constructor
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 611
   assemblies:
   - Terminal.Gui
@@ -199,11 +199,11 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Dialogs/FileDialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/FileDialog.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: FileName
-    path: ../Terminal.Gui/Dialogs/FileDialog.cs
+    path: ../Terminal.Gui/Windows/FileDialog.cs
     startLine: 620
   assemblies:
   - Terminal.Gui

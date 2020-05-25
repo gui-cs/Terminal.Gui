@@ -78,10 +78,10 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Mono.Terminal.UnixMainLoop">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.UnixMainLoop">
   
   
-  <h1 id="Mono_Terminal_UnixMainLoop" data-uid="Mono.Terminal.UnixMainLoop" class="text-break">Class UnixMainLoop
+  <h1 id="Terminal_Gui_UnixMainLoop" data-uid="Terminal.Gui.UnixMainLoop" class="text-break">Class UnixMainLoop
   </h1>
   <div class="markdown level0 summary">
 Unix main loop, suitable for using on Posix systems
@@ -94,7 +94,7 @@ Unix main loop, suitable for using on Posix systems
   </div>
   <div classs="implements">
     <h5>Implements</h5>
-    <div><a class="xref" href="Mono.Terminal.IMainLoopDriver.html">IMainLoopDriver</a></div>
+    <div><a class="xref" href="Terminal.Gui.IMainLoopDriver.html">IMainLoopDriver</a></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -120,13 +120,13 @@ Unix main loop, suitable for using on Posix systems
       <span class="xref">System.Object.ToString()</span>
     </div>
   </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="Mono.Terminal.html">Mono.Terminal</a></h6>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Mono_Terminal_UnixMainLoop_syntax">Syntax</h5>
+  <h5 id="Terminal_Gui_UnixMainLoop_syntax">Syntax</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class UnixMainLoop : IMainLoopDriver</code></pre>
   </div>
-  <h5 id="Mono_Terminal_UnixMainLoop_remarks"><strong>Remarks</strong></h5>
+  <h5 id="Terminal_Gui_UnixMainLoop_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks">
 In addition to the general functions of the mainloop, the Unix version
 can watch file descriptors using the AddWatch methods.
@@ -135,8 +135,8 @@ can watch file descriptors using the AddWatch methods.
   </h3>
   
   
-  <a id="Mono_Terminal_UnixMainLoop_AddWatch_" data-uid="Mono.Terminal.UnixMainLoop.AddWatch*"></a>
-  <h4 id="Mono_Terminal_UnixMainLoop_AddWatch_System_Int32_Mono_Terminal_UnixMainLoop_Condition_System_Func_Mono_Terminal_MainLoop_System_Boolean__" data-uid="Mono.Terminal.UnixMainLoop.AddWatch(System.Int32,Mono.Terminal.UnixMainLoop.Condition,System.Func{Mono.Terminal.MainLoop,System.Boolean})">AddWatch(Int32, UnixMainLoop.Condition, Func&lt;MainLoop, Boolean&gt;)</h4>
+  <a id="Terminal_Gui_UnixMainLoop_AddWatch_" data-uid="Terminal.Gui.UnixMainLoop.AddWatch*"></a>
+  <h4 id="Terminal_Gui_UnixMainLoop_AddWatch_System_Int32_Terminal_Gui_UnixMainLoop_Condition_System_Func_Terminal_Gui_MainLoop_System_Boolean__" data-uid="Terminal.Gui.UnixMainLoop.AddWatch(System.Int32,Terminal.Gui.UnixMainLoop.Condition,System.Func{Terminal.Gui.MainLoop,System.Boolean})">AddWatch(Int32, UnixMainLoop.Condition, Func&lt;MainLoop, Boolean&gt;)</h4>
   <div class="markdown level1 summary">
 Watches a file descriptor for activity.
 </div>
@@ -161,12 +161,12 @@ Watches a file descriptor for activity.
         <td></td>
       </tr>
       <tr>
-        <td><a class="xref" href="Mono.Terminal.UnixMainLoop.Condition.html">UnixMainLoop.Condition</a></td>
+        <td><a class="xref" href="Terminal.Gui.UnixMainLoop.Condition.html">UnixMainLoop.Condition</a></td>
         <td><span class="parametername">condition</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Func</span>&lt;<a class="xref" href="Mono.Terminal.MainLoop.html">MainLoop</a>, <span class="xref">System.Boolean</span>&gt;</td>
+        <td><span class="xref">System.Func</span>&lt;<a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a>, <span class="xref">System.Boolean</span>&gt;</td>
         <td><span class="parametername">callback</span></td>
         <td></td>
       </tr>
@@ -187,7 +187,7 @@ Watches a file descriptor for activity.
       </tr>
     </tbody>
   </table>
-  <h5 id="Mono_Terminal_UnixMainLoop_AddWatch_System_Int32_Mono_Terminal_UnixMainLoop_Condition_System_Func_Mono_Terminal_MainLoop_System_Boolean___remarks">Remarks</h5>
+  <h5 id="Terminal_Gui_UnixMainLoop_AddWatch_System_Int32_Terminal_Gui_UnixMainLoop_Condition_System_Func_Terminal_Gui_MainLoop_System_Boolean___remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 When the condition is met, the provided callback
 is invoked.  If the callback returns false, the
@@ -198,8 +198,8 @@ use this token to remove the watch by calling RemoveWatch.
 </div>
   
   
-  <a id="Mono_Terminal_UnixMainLoop_RemoveWatch_" data-uid="Mono.Terminal.UnixMainLoop.RemoveWatch*"></a>
-  <h4 id="Mono_Terminal_UnixMainLoop_RemoveWatch_System_Object_" data-uid="Mono.Terminal.UnixMainLoop.RemoveWatch(System.Object)">RemoveWatch(Object)</h4>
+  <a id="Terminal_Gui_UnixMainLoop_RemoveWatch_" data-uid="Terminal.Gui.UnixMainLoop.RemoveWatch*"></a>
+  <h4 id="Terminal_Gui_UnixMainLoop_RemoveWatch_System_Object_" data-uid="Terminal.Gui.UnixMainLoop.RemoveWatch(System.Object)">RemoveWatch(Object)</h4>
   <div class="markdown level1 summary">
 Removes an active watch from the mainloop.
 </div>
@@ -225,7 +225,7 @@ Removes an active watch from the mainloop.
       </tr>
     </tbody>
   </table>
-  <h5 id="Mono_Terminal_UnixMainLoop_RemoveWatch_System_Object__remarks">Remarks</h5>
+  <h5 id="Terminal_Gui_UnixMainLoop_RemoveWatch_System_Object__remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 The token parameter is the value returned from AddWatch
 </div>
@@ -233,8 +233,8 @@ The token parameter is the value returned from AddWatch
   </h3>
   
   
-  <a id="Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_EventsPending_" data-uid="Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending*"></a>
-  <h4 id="Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_EventsPending_System_Boolean_" data-uid="Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending(System.Boolean)">IMainLoopDriver.EventsPending(Boolean)</h4>
+  <a id="Terminal_Gui_UnixMainLoop_Terminal_Gui_IMainLoopDriver_EventsPending_" data-uid="Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending*"></a>
+  <h4 id="Terminal_Gui_UnixMainLoop_Terminal_Gui_IMainLoopDriver_EventsPending_System_Boolean_" data-uid="Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending(System.Boolean)">IMainLoopDriver.EventsPending(Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -275,8 +275,8 @@ The token parameter is the value returned from AddWatch
   </table>
   
   
-  <a id="Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_MainIteration_" data-uid="Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration*"></a>
-  <h4 id="Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_MainIteration" data-uid="Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration">IMainLoopDriver.MainIteration()</h4>
+  <a id="Terminal_Gui_UnixMainLoop_Terminal_Gui_IMainLoopDriver_MainIteration_" data-uid="Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration*"></a>
+  <h4 id="Terminal_Gui_UnixMainLoop_Terminal_Gui_IMainLoopDriver_MainIteration" data-uid="Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration">IMainLoopDriver.MainIteration()</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -285,8 +285,8 @@ The token parameter is the value returned from AddWatch
   </div>
   
   
-  <a id="Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_Setup_" data-uid="Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup*"></a>
-  <h4 id="Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_Setup_Mono_Terminal_MainLoop_" data-uid="Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup(Mono.Terminal.MainLoop)">IMainLoopDriver.Setup(MainLoop)</h4>
+  <a id="Terminal_Gui_UnixMainLoop_Terminal_Gui_IMainLoopDriver_Setup_" data-uid="Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Setup*"></a>
+  <h4 id="Terminal_Gui_UnixMainLoop_Terminal_Gui_IMainLoopDriver_Setup_Terminal_Gui_MainLoop_" data-uid="Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Setup(Terminal.Gui.MainLoop)">IMainLoopDriver.Setup(MainLoop)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -304,7 +304,7 @@ The token parameter is the value returned from AddWatch
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Mono.Terminal.MainLoop.html">MainLoop</a></td>
+        <td><a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a></td>
         <td><span class="parametername">mainLoop</span></td>
         <td></td>
       </tr>
@@ -312,8 +312,8 @@ The token parameter is the value returned from AddWatch
   </table>
   
   
-  <a id="Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_Wakeup_" data-uid="Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup*"></a>
-  <h4 id="Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_Wakeup" data-uid="Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup">IMainLoopDriver.Wakeup()</h4>
+  <a id="Terminal_Gui_UnixMainLoop_Terminal_Gui_IMainLoopDriver_Wakeup_" data-uid="Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup*"></a>
+  <h4 id="Terminal_Gui_UnixMainLoop_Terminal_Gui_IMainLoopDriver_Wakeup" data-uid="Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup">IMainLoopDriver.Wakeup()</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -322,7 +322,7 @@ The token parameter is the value returned from AddWatch
   </div>
   <h3 id="implements">Implements</h3>
   <div>
-      <a class="xref" href="Mono.Terminal.IMainLoopDriver.html">IMainLoopDriver</a>
+      <a class="xref" href="Terminal.Gui.IMainLoopDriver.html">IMainLoopDriver</a>
   </div>
 </article>
           </div>

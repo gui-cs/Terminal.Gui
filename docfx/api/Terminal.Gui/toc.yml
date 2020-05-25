@@ -1,15 +1,4 @@
 ### YamlMime:TableOfContent
-- uid: Mono.Terminal
-  name: Mono.Terminal
-  items:
-  - uid: Mono.Terminal.IMainLoopDriver
-    name: IMainLoopDriver
-  - uid: Mono.Terminal.MainLoop
-    name: MainLoop
-  - uid: Mono.Terminal.UnixMainLoop
-    name: UnixMainLoop
-  - uid: Mono.Terminal.UnixMainLoop.Condition
-    name: UnixMainLoop.Condition
 - uid: Terminal.Gui
   name: Terminal.Gui
   items:
@@ -37,8 +26,6 @@
     name: ComboBox
   - uid: Terminal.Gui.ConsoleDriver
     name: ConsoleDriver
-  - uid: Terminal.Gui.CursesDriver
-    name: CursesDriver
   - uid: Terminal.Gui.DateField
     name: DateField
   - uid: Terminal.Gui.Dialog
@@ -53,6 +40,8 @@
     name: HexView
   - uid: Terminal.Gui.IListDataSource
     name: IListDataSource
+  - uid: Terminal.Gui.IMainLoopDriver
+    name: IMainLoopDriver
   - uid: Terminal.Gui.Key
     name: Key
   - uid: Terminal.Gui.KeyEvent
@@ -67,6 +56,8 @@
     name: ListViewItemEventArgs
   - uid: Terminal.Gui.ListWrapper
     name: ListWrapper
+  - uid: Terminal.Gui.MainLoop
+    name: MainLoop
   - uid: Terminal.Gui.MenuBar
     name: MenuBar
   - uid: Terminal.Gui.MenuBarItem
@@ -101,8 +92,6 @@
     name: ScrollView
   - uid: Terminal.Gui.Size
     name: Size
-  - uid: Terminal.Gui.SpecialChar
-    name: SpecialChar
   - uid: Terminal.Gui.StatusBar
     name: StatusBar
   - uid: Terminal.Gui.StatusItem

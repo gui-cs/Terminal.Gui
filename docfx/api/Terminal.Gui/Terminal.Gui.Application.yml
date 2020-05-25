@@ -37,17 +37,17 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Application
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2003
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 36
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
   summary: "\nThe application driver for Terminal.Gui.\n"
-  remarks: "\n<p>\n  You can hook up to the Iteration event to have your method\n  invoked on each iteration of the mainloop.\n</p>\n<p>\n  Creates a mainloop to process input events, handle timers and\n  other sources of data.   It is accessible via the MainLoop property.\n</p>\n<p>\n  When invoked sets the SynchronizationContext to one that is tied\n  to the mainloop, allowing user code to use async/await.\n</p>\n"
+  remarks: "\n<p>\n  You can hook up to the <xref href=\"Terminal.Gui.Application.Iteration\" data-throw-if-not-resolved=\"false\"></xref> event to have your method\n  invoked on each iteration of the <xref href=\"Terminal.Gui.MainLoop\" data-throw-if-not-resolved=\"false\"></xref>.\n</p>\n<p>\n  Creates a instance of <xref href=\"Terminal.Gui.MainLoop\" data-throw-if-not-resolved=\"false\"></xref> to process input events, handle timers and\n  other sources of data. It is accessible via the <xref href=\"Terminal.Gui.Application.MainLoop\" data-throw-if-not-resolved=\"false\"></xref> property.\n</p>\n<p>\n  When invoked sets the SynchronizationContext to one that is tied\n  to the mainloop, allowing user code to use async/await.\n</p>\n"
   example: []
   syntax:
     content: public static class Application
@@ -82,12 +82,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Driver
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2007
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 40
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -117,12 +117,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Top
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2013
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 46
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -157,12 +157,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Current
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2019
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 52
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -197,12 +197,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: CurrentView
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2025
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 58
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -237,12 +237,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: MainLoop
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2031
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 64
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -252,7 +252,7 @@ items:
     content: public static MainLoop MainLoop { get; }
     parameters: []
     return:
-      type: Mono.Terminal.MainLoop
+      type: Terminal.Gui.MainLoop
       description: The main loop.
     content.vb: Public Shared ReadOnly Property MainLoop As MainLoop
   overload: Terminal.Gui.Application.MainLoop*
@@ -277,12 +277,12 @@ items:
   type: Event
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Iteration
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2041
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 74
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -313,12 +313,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: MakeCenteredRect
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2048
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 81
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -354,12 +354,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: UseSystemConsole
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2090
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 123
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -389,12 +389,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Init
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2106
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 139
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -424,12 +424,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: GrabMouse
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2266
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 299
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -462,12 +462,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: UngrabMouse
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2277
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 310
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -496,12 +496,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: RootMouseEvent
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2286
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 319
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -531,12 +531,12 @@ items:
   type: Event
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Loaded
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2360
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 393
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -566,12 +566,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Begin
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2375
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 408
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -608,12 +608,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: End
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2409
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 442
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -646,12 +646,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Shutdown
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2420
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 454
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -680,12 +680,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Refresh
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2443
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 486
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -714,12 +714,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: RunLoop
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2478
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 521
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -756,12 +756,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Run
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2523
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 566
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -790,12 +790,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Run
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2531
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 574
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -832,12 +832,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Run
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2561
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 604
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -870,12 +870,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: RequestStop
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2579
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 622
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -905,12 +905,12 @@ items:
   type: Event
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Resized
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2601
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 644
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -928,6 +928,18 @@ items:
   - Public
   - Shared
 references:
+- uid: Terminal.Gui.Application.Iteration
+  commentId: E:Terminal.Gui.Application.Iteration
+  isExternal: true
+- uid: Terminal.Gui.MainLoop
+  commentId: T:Terminal.Gui.MainLoop
+  parent: Terminal.Gui
+  name: MainLoop
+  nameWithType: MainLoop
+  fullName: Terminal.Gui.MainLoop
+- uid: Terminal.Gui.Application.MainLoop
+  commentId: P:Terminal.Gui.Application.MainLoop
+  isExternal: true
 - uid: Terminal.Gui
   commentId: N:Terminal.Gui
   name: Terminal.Gui
@@ -1264,25 +1276,11 @@ references:
   name: CurrentView
   nameWithType: Application.CurrentView
   fullName: Terminal.Gui.Application.CurrentView
-- uid: Terminal.Gui.Application.MainLoop
-  commentId: P:Terminal.Gui.Application.MainLoop
-  isExternal: true
 - uid: Terminal.Gui.Application.MainLoop*
   commentId: Overload:Terminal.Gui.Application.MainLoop
   name: MainLoop
   nameWithType: Application.MainLoop
   fullName: Terminal.Gui.Application.MainLoop
-- uid: Mono.Terminal.MainLoop
-  commentId: T:Mono.Terminal.MainLoop
-  parent: Mono.Terminal
-  name: MainLoop
-  nameWithType: MainLoop
-  fullName: Mono.Terminal.MainLoop
-- uid: Mono.Terminal
-  commentId: N:Mono.Terminal
-  name: Mono.Terminal
-  nameWithType: Mono.Terminal
-  fullName: Mono.Terminal
 - uid: System.Threading.Timeout
   commentId: T:System.Threading.Timeout
   isExternal: true

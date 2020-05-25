@@ -19,7 +19,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ScenarioCategory
     path: ../UICatalog/Scenario.cs
@@ -116,7 +116,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Name
     path: ../UICatalog/Scenario.cs
@@ -153,7 +153,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../UICatalog/Scenario.cs
@@ -186,7 +186,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: GetName
     path: ../UICatalog/Scenario.cs
@@ -227,7 +227,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: GetCategories
     path: ../UICatalog/Scenario.cs

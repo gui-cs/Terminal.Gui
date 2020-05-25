@@ -21,7 +21,7 @@ items:
   - Terminal.Gui.ConsoleDriver.LRCorner
   - Terminal.Gui.ConsoleDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
   - Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
-  - Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  - Terminal.Gui.ConsoleDriver.PrepareToRun(Terminal.Gui.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
   - Terminal.Gui.ConsoleDriver.Refresh
   - Terminal.Gui.ConsoleDriver.RightTee
   - Terminal.Gui.ConsoleDriver.Rows
@@ -50,24 +50,22 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ConsoleDriver
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 430
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 426
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: "\nConsoleDriver is an abstract class that defines the requirements for a console driver.   One implementation if the CursesDriver, and another one uses the .NET Console one.\n"
+  summary: "\nConsoleDriver is an abstract class that defines the requirements for a console driver.  \nThere are currently three implementations: <xref href=\"Terminal.Gui.CursesDriver\" data-throw-if-not-resolved=\"false\"></xref> (for Unix and Mac), <xref href=\"Terminal.Gui.WindowsDriver\" data-throw-if-not-resolved=\"false\"></xref>, and <xref href=\"Terminal.Gui.NetDriver\" data-throw-if-not-resolved=\"false\"></xref> that uses the .NET Console API.\n"
   example: []
   syntax:
     content: public abstract class ConsoleDriver
     content.vb: Public MustInherit Class ConsoleDriver
   inheritance:
   - System.Object
-  derivedClasses:
-  - Terminal.Gui.CursesDriver
   inheritedMembers:
   - System.Object.Equals(System.Object)
   - System.Object.Equals(System.Object,System.Object)
@@ -97,12 +95,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: TerminalResized
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 434
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 430
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -130,12 +128,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Cols
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 439
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 435
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -169,12 +167,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Rows
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 443
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 439
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -208,12 +206,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Init
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 448
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 444
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -246,12 +244,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Move
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 454
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 450
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -287,12 +285,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: AddRune
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 459
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 455
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -325,12 +323,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: AddStr
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 464
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 460
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -350,25 +348,25 @@ items:
   modifiers.vb:
   - Public
   - MustOverride
-- uid: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
-  commentId: M:Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
-  id: PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+- uid: Terminal.Gui.ConsoleDriver.PrepareToRun(Terminal.Gui.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  commentId: M:Terminal.Gui.ConsoleDriver.PrepareToRun(Terminal.Gui.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  id: PrepareToRun(Terminal.Gui.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
   parent: Terminal.Gui.ConsoleDriver
   langs:
   - csharp
   - vb
   name: PrepareToRun(MainLoop, Action<KeyEvent>, Action<KeyEvent>, Action<KeyEvent>, Action<MouseEvent>)
   nameWithType: ConsoleDriver.PrepareToRun(MainLoop, Action<KeyEvent>, Action<KeyEvent>, Action<KeyEvent>, Action<MouseEvent>)
-  fullName: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.MouseEvent>)
+  fullName: Terminal.Gui.ConsoleDriver.PrepareToRun(Terminal.Gui.MainLoop, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.MouseEvent>)
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: PrepareToRun
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 473
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 469
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -378,7 +376,7 @@ items:
     content: public abstract void PrepareToRun(MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
     parameters:
     - id: mainLoop
-      type: Mono.Terminal.MainLoop
+      type: Terminal.Gui.MainLoop
       description: The main loop.
     - id: keyHandler
       type: System.Action{Terminal.Gui.KeyEvent}
@@ -401,7 +399,7 @@ items:
   modifiers.vb:
   - Public
   - MustOverride
-  fullName.vb: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop, System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.MouseEvent))
+  fullName.vb: Terminal.Gui.ConsoleDriver.PrepareToRun(Terminal.Gui.MainLoop, System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.MouseEvent))
   name.vb: PrepareToRun(MainLoop, Action(Of KeyEvent), Action(Of KeyEvent), Action(Of KeyEvent), Action(Of MouseEvent))
 - uid: Terminal.Gui.ConsoleDriver.Refresh
   commentId: M:Terminal.Gui.ConsoleDriver.Refresh
@@ -416,12 +414,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Refresh
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 478
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 474
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -450,12 +448,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: UpdateCursor
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 483
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 479
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -484,12 +482,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: End
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 488
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 484
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -518,12 +516,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: UpdateScreen
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 493
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 489
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -552,12 +550,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: SetAttribute
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 499
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 495
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -590,12 +588,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: SetColors
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 506
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 502
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -631,12 +629,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: SetColors
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 516
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 512
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -672,12 +670,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: SetTerminalResized
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 522
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 518
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -708,12 +706,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: DrawFrame
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 533
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 529
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -752,12 +750,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Suspend
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 618
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 614
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -786,12 +784,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Clip
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 626
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 622
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -824,12 +822,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: StartReportingMouseMoves
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 634
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 630
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -858,12 +856,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: StopReportingMouseMoves
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 639
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 635
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -892,12 +890,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: UncookMouse
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 644
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 640
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -926,12 +924,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: CookMouse
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 649
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 645
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -960,12 +958,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: HLine
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 654
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 650
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -993,12 +991,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: VLine
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 659
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 655
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1026,12 +1024,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Stipple
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 664
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 660
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1059,12 +1057,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Diamond
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 669
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 665
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1092,12 +1090,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ULCorner
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 674
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 670
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1125,12 +1123,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: LLCorner
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 679
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 675
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1158,12 +1156,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: URCorner
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 684
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 680
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1191,12 +1189,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: LRCorner
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 689
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 685
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1224,12 +1222,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: LeftTee
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 694
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 690
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1257,12 +1255,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: RightTee
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 699
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 695
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1290,12 +1288,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: TopTee
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 704
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 700
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1323,12 +1321,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: BottomTee
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 709
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 705
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1356,12 +1354,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: MakeAttribute
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 717
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 713
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1388,6 +1386,15 @@ items:
   - Public
   - MustOverride
 references:
+- uid: Terminal.Gui.CursesDriver
+  commentId: T:Terminal.Gui.CursesDriver
+  isExternal: true
+- uid: Terminal.Gui.WindowsDriver
+  commentId: T:Terminal.Gui.WindowsDriver
+  isExternal: true
+- uid: Terminal.Gui.NetDriver
+  commentId: T:Terminal.Gui.NetDriver
+  isExternal: true
 - uid: Terminal.Gui
   commentId: N:Terminal.Gui
   name: Terminal.Gui
@@ -1754,12 +1761,12 @@ references:
   name: PrepareToRun
   nameWithType: ConsoleDriver.PrepareToRun
   fullName: Terminal.Gui.ConsoleDriver.PrepareToRun
-- uid: Mono.Terminal.MainLoop
-  commentId: T:Mono.Terminal.MainLoop
-  parent: Mono.Terminal
+- uid: Terminal.Gui.MainLoop
+  commentId: T:Terminal.Gui.MainLoop
+  parent: Terminal.Gui
   name: MainLoop
   nameWithType: MainLoop
-  fullName: Mono.Terminal.MainLoop
+  fullName: Terminal.Gui.MainLoop
 - uid: System.Action{Terminal.Gui.KeyEvent}
   commentId: T:System.Action{Terminal.Gui.KeyEvent}
   parent: System
@@ -1844,11 +1851,6 @@ references:
   - name: )
     nameWithType: )
     fullName: )
-- uid: Mono.Terminal
-  commentId: N:Mono.Terminal
-  name: Mono.Terminal
-  nameWithType: Mono.Terminal
-  fullName: Mono.Terminal
 - uid: System.Action`1
   commentId: T:System.Action`1
   isExternal: true

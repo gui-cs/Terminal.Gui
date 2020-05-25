@@ -19,17 +19,17 @@ items:
   type: Struct
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Attribute
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 94
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 90
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
   summary: "\nAttributes are used as elements that contain both a foreground and a background or platform specific features\n"
-  remarks: "\nAttributes are needed to map colors to terminal capabilities that might lack colors, on color\nscenarios, they encode both the foreground and the background color and are used in the ColorScheme\nclass to define color schemes that can be used in your application.\n"
+  remarks: "\n<xref href=\"Terminal.Gui.Attribute\" data-throw-if-not-resolved=\"false\"></xref>s are needed to map colors to terminal capabilities that might lack colors, on color\nscenarios, they encode both the foreground and the background color and are used in the <xref href=\"Terminal.Gui.ColorScheme\" data-throw-if-not-resolved=\"false\"></xref>\nclass to define color schemes that can be used in your application.\n"
   example: []
   syntax:
     content: public struct Attribute
@@ -60,12 +60,12 @@ items:
   type: Constructor
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 105
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 101
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -102,12 +102,12 @@ items:
   type: Constructor
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 117
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 113
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -141,16 +141,16 @@ items:
   type: Operator
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: op_Implicit
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 129
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 125
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: "\nImplicit conversion from an attribute to the underlying Int32 representation\n"
+  summary: "\nImplicit conversion from an <xref href=\"Terminal.Gui.Attribute\" data-throw-if-not-resolved=\"false\"></xref> to the underlying Int32 representation\n"
   example: []
   syntax:
     content: public static implicit operator int (Attribute c)
@@ -185,16 +185,16 @@ items:
   type: Operator
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: op_Implicit
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 136
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 132
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: "\nImplicitly convert an integer value into an attribute\n"
+  summary: "\nImplicitly convert an integer value into an <xref href=\"Terminal.Gui.Attribute\" data-throw-if-not-resolved=\"false\"></xref>\n"
   example: []
   syntax:
     content: public static implicit operator Attribute(int v)
@@ -229,16 +229,16 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Make
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 144
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 140
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: "\nCreates an attribute from the specified foreground and background.\n"
+  summary: "\nCreates an <xref href=\"Terminal.Gui.Attribute\" data-throw-if-not-resolved=\"false\"></xref> from the specified foreground and background.\n"
   example: []
   syntax:
     content: public static Attribute Make(Color foreground, Color background)
@@ -261,6 +261,18 @@ items:
   - Public
   - Shared
 references:
+- uid: Terminal.Gui.Attribute
+  commentId: T:Terminal.Gui.Attribute
+  parent: Terminal.Gui
+  name: Attribute
+  nameWithType: Attribute
+  fullName: Terminal.Gui.Attribute
+- uid: Terminal.Gui.ColorScheme
+  commentId: T:Terminal.Gui.ColorScheme
+  parent: Terminal.Gui
+  name: ColorScheme
+  nameWithType: ColorScheme
+  fullName: Terminal.Gui.ColorScheme
 - uid: Terminal.Gui
   commentId: N:Terminal.Gui
   name: Terminal.Gui
@@ -534,12 +546,6 @@ references:
   name: System
   nameWithType: System
   fullName: System
-- uid: Terminal.Gui.Attribute
-  commentId: T:Terminal.Gui.Attribute
-  parent: Terminal.Gui
-  name: Attribute
-  nameWithType: Attribute
-  fullName: Terminal.Gui.Attribute
 - uid: Terminal.Gui.Attribute.#ctor*
   commentId: Overload:Terminal.Gui.Attribute.#ctor
   name: Attribute

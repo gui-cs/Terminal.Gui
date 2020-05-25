@@ -25,12 +25,12 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Window.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Window
-    path: ../Terminal.Gui/Core.cs
-    startLine: 1747
+    path: ../Terminal.Gui/Core/Window.cs
+    startLine: 11
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -149,12 +149,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Window.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Title
-    path: ../Terminal.Gui/Core.cs
-    startLine: 1755
+    path: ../Terminal.Gui/Core/Window.cs
+    startLine: 19
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -187,12 +187,12 @@ items:
   type: Constructor
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Window.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
-    path: ../Terminal.Gui/Core.cs
-    startLine: 1787
+    path: ../Terminal.Gui/Core/Window.cs
+    startLine: 51
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -226,12 +226,12 @@ items:
   type: Constructor
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Window.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
-    path: ../Terminal.Gui/Core.cs
-    startLine: 1795
+    path: ../Terminal.Gui/Core/Window.cs
+    startLine: 59
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -262,12 +262,12 @@ items:
   type: Constructor
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Window.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
-    path: ../Terminal.Gui/Core.cs
-    startLine: 1808
+    path: ../Terminal.Gui/Core/Window.cs
+    startLine: 72
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -304,12 +304,12 @@ items:
   type: Constructor
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Window.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
-    path: ../Terminal.Gui/Core.cs
-    startLine: 1825
+    path: ../Terminal.Gui/Core/Window.cs
+    startLine: 89
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -343,12 +343,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Window.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: GetEnumerator
-    path: ../Terminal.Gui/Core.cs
-    startLine: 1843
+    path: ../Terminal.Gui/Core/Window.cs
+    startLine: 107
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -380,12 +380,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Window.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Add
-    path: ../Terminal.Gui/Core.cs
-    startLine: 1857
+    path: ../Terminal.Gui/Core/Window.cs
+    startLine: 121
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -419,12 +419,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Window.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Remove
-    path: ../Terminal.Gui/Core.cs
-    startLine: 1870
+    path: ../Terminal.Gui/Core/Window.cs
+    startLine: 134
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -458,12 +458,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Window.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: RemoveAll
-    path: ../Terminal.Gui/Core.cs
-    startLine: 1888
+    path: ../Terminal.Gui/Core/Window.cs
+    startLine: 152
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -494,12 +494,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Window.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Redraw
-    path: ../Terminal.Gui/Core.cs
-    startLine: 1894
+    path: ../Terminal.Gui/Core/Window.cs
+    startLine: 158
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -531,12 +531,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Window.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: MouseEvent
-    path: ../Terminal.Gui/Core.cs
-    startLine: 1930
+    path: ../Terminal.Gui/Core/Window.cs
+    startLine: 194
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui

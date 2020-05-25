@@ -19,7 +19,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Label.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: TextAlignment
     path: ../Terminal.Gui/Views/Label.cs
@@ -52,7 +52,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Label.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Left
     path: ../Terminal.Gui/Views/Label.cs
@@ -86,7 +86,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Label.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Right
     path: ../Terminal.Gui/Views/Label.cs
@@ -120,7 +120,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Label.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Centered
     path: ../Terminal.Gui/Views/Label.cs
@@ -154,7 +154,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Label.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Justified
     path: ../Terminal.Gui/Views/Label.cs

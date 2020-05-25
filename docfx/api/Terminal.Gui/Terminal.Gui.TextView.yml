@@ -31,7 +31,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: TextView
     path: ../Terminal.Gui/Views/TextView.cs
@@ -147,7 +147,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: TextChanged
     path: ../Terminal.Gui/Views/TextView.cs
@@ -180,7 +180,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/TextView.cs
@@ -216,7 +216,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/TextView.cs
@@ -248,7 +248,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Text
     path: ../Terminal.Gui/Views/TextView.cs
@@ -286,7 +286,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: LoadFile
     path: ../Terminal.Gui/Views/TextView.cs
@@ -325,7 +325,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: LoadStream
     path: ../Terminal.Gui/Views/TextView.cs
@@ -361,7 +361,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: CloseFile
     path: ../Terminal.Gui/Views/TextView.cs
@@ -396,7 +396,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: CurrentRow
     path: ../Terminal.Gui/Views/TextView.cs
@@ -433,7 +433,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: CurrentColumn
     path: ../Terminal.Gui/Views/TextView.cs
@@ -471,7 +471,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: PositionCursor
     path: ../Terminal.Gui/Views/TextView.cs
@@ -506,7 +506,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ReadOnly
     path: ../Terminal.Gui/Views/TextView.cs
@@ -544,7 +544,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Redraw
     path: ../Terminal.Gui/Views/TextView.cs
@@ -581,7 +581,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: CanFocus
     path: ../Terminal.Gui/Views/TextView.cs
@@ -620,7 +620,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ScrollTo
     path: ../Terminal.Gui/Views/TextView.cs
@@ -656,7 +656,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ProcessKey
     path: ../Terminal.Gui/Views/TextView.cs
@@ -695,7 +695,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: MouseEvent
     path: ../Terminal.Gui/Views/TextView.cs

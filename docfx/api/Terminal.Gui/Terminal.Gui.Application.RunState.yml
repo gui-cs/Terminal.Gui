@@ -16,12 +16,12 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: RunState
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2143
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 176
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -64,12 +64,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Dispose
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2158
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 191
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -108,12 +108,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Dispose
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2169
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 202
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui

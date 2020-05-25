@@ -35,11 +35,11 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Window
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 34
   assemblies:
   - Terminal.Gui
@@ -76,11 +76,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Handle
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 35
   assemblies:
   - Terminal.Gui
@@ -109,11 +109,11 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Standard
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 51
   assemblies:
   - Terminal.Gui
@@ -146,11 +146,11 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Current
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 57
   assemblies:
   - Terminal.Gui
@@ -183,11 +183,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: wtimeout
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 64
   assemblies:
   - Terminal.Gui
@@ -218,11 +218,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: notimeout
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 69
   assemblies:
   - Terminal.Gui
@@ -253,11 +253,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: keypad
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 74
   assemblies:
   - Terminal.Gui
@@ -288,11 +288,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: meta
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 79
   assemblies:
   - Terminal.Gui
@@ -323,11 +323,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: intrflush
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 84
   assemblies:
   - Terminal.Gui
@@ -358,11 +358,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: clearok
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 89
   assemblies:
   - Terminal.Gui
@@ -393,11 +393,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: idlok
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 94
   assemblies:
   - Terminal.Gui
@@ -428,11 +428,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: idcok
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 99
   assemblies:
   - Terminal.Gui
@@ -461,11 +461,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: immedok
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 104
   assemblies:
   - Terminal.Gui
@@ -494,11 +494,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: leaveok
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 109
   assemblies:
   - Terminal.Gui
@@ -529,11 +529,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: setscrreg
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 114
   assemblies:
   - Terminal.Gui
@@ -566,11 +566,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: scrollok
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 119
   assemblies:
   - Terminal.Gui
@@ -601,11 +601,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: wrefresh
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 124
   assemblies:
   - Terminal.Gui
@@ -633,11 +633,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: redrawwin
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 129
   assemblies:
   - Terminal.Gui
@@ -665,11 +665,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: wnoutrefresh
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 140
   assemblies:
   - Terminal.Gui
@@ -697,11 +697,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: move
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 145
   assemblies:
   - Terminal.Gui
@@ -734,11 +734,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: addch
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 150
   assemblies:
   - Terminal.Gui
@@ -769,11 +769,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/handles.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: refresh
-    path: ../Terminal.Gui/MonoCurses/handles.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
     startLine: 155
   assemblies:
   - Terminal.Gui

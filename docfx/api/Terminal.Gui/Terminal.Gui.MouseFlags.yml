@@ -41,16 +41,16 @@ items:
   type: Enum
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: MouseFlags
-    path: ../Terminal.Gui/Event.cs
-    startLine: 368
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 376
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: "\nMouse flags reported in MouseEvent.\n"
+  summary: "\nMouse flags reported in <xref href=\"Terminal.Gui.MouseEvent\" data-throw-if-not-resolved=\"false\"></xref>.\n"
   remarks: "\nThey just happen to map to the ncurses ones.\n"
   example: []
   syntax:
@@ -85,12 +85,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button1Pressed
-    path: ../Terminal.Gui/Event.cs
-    startLine: 373
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 381
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -119,12 +119,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button1Released
-    path: ../Terminal.Gui/Event.cs
-    startLine: 377
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 385
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -153,12 +153,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button1Clicked
-    path: ../Terminal.Gui/Event.cs
-    startLine: 381
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 389
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -187,12 +187,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button1DoubleClicked
-    path: ../Terminal.Gui/Event.cs
-    startLine: 385
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 393
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -221,12 +221,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button1TripleClicked
-    path: ../Terminal.Gui/Event.cs
-    startLine: 389
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 397
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -255,12 +255,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button2Pressed
-    path: ../Terminal.Gui/Event.cs
-    startLine: 393
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 401
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -289,12 +289,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button2Released
-    path: ../Terminal.Gui/Event.cs
-    startLine: 397
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 405
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -323,12 +323,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button2Clicked
-    path: ../Terminal.Gui/Event.cs
-    startLine: 401
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 409
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -357,12 +357,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button2DoubleClicked
-    path: ../Terminal.Gui/Event.cs
-    startLine: 405
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 413
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -391,12 +391,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button2TripleClicked
-    path: ../Terminal.Gui/Event.cs
-    startLine: 409
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 417
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -425,12 +425,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button3Pressed
-    path: ../Terminal.Gui/Event.cs
-    startLine: 413
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 421
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -459,12 +459,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button3Released
-    path: ../Terminal.Gui/Event.cs
-    startLine: 417
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 425
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -493,12 +493,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button3Clicked
-    path: ../Terminal.Gui/Event.cs
-    startLine: 421
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 429
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -527,12 +527,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button3DoubleClicked
-    path: ../Terminal.Gui/Event.cs
-    startLine: 425
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 433
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -561,12 +561,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button3TripleClicked
-    path: ../Terminal.Gui/Event.cs
-    startLine: 429
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 437
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -595,12 +595,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button4Pressed
-    path: ../Terminal.Gui/Event.cs
-    startLine: 433
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 441
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -629,12 +629,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button4Released
-    path: ../Terminal.Gui/Event.cs
-    startLine: 437
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 445
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -663,12 +663,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button4Clicked
-    path: ../Terminal.Gui/Event.cs
-    startLine: 441
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 449
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -697,12 +697,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button4DoubleClicked
-    path: ../Terminal.Gui/Event.cs
-    startLine: 445
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 453
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -731,12 +731,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Button4TripleClicked
-    path: ../Terminal.Gui/Event.cs
-    startLine: 449
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 457
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -765,12 +765,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ButtonShift
-    path: ../Terminal.Gui/Event.cs
-    startLine: 453
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 461
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -799,12 +799,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ButtonCtrl
-    path: ../Terminal.Gui/Event.cs
-    startLine: 457
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 465
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -833,12 +833,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ButtonAlt
-    path: ../Terminal.Gui/Event.cs
-    startLine: 461
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 469
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -867,12 +867,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ReportMousePosition
-    path: ../Terminal.Gui/Event.cs
-    startLine: 465
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 473
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -901,12 +901,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: WheeledUp
-    path: ../Terminal.Gui/Event.cs
-    startLine: 469
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 477
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -935,12 +935,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: WheeledDown
-    path: ../Terminal.Gui/Event.cs
-    startLine: 473
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 481
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -969,12 +969,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: AllEvents
-    path: ../Terminal.Gui/Event.cs
-    startLine: 477
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 485
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -991,6 +991,12 @@ items:
   - Public
   - Const
 references:
+- uid: Terminal.Gui.MouseEvent
+  commentId: T:Terminal.Gui.MouseEvent
+  parent: Terminal.Gui
+  name: MouseEvent
+  nameWithType: MouseEvent
+  fullName: Terminal.Gui.MouseEvent
 - uid: Terminal.Gui
   commentId: N:Terminal.Gui
   name: Terminal.Gui

@@ -25,7 +25,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/HexView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: HexView
     path: ../Terminal.Gui/Views/HexView.cs
@@ -142,7 +142,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/HexView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/HexView.cs
@@ -178,7 +178,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/HexView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Source
     path: ../Terminal.Gui/Views/HexView.cs
@@ -216,7 +216,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/HexView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: DisplayStart
     path: ../Terminal.Gui/Views/HexView.cs
@@ -254,7 +254,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/HexView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Frame
     path: ../Terminal.Gui/Views/HexView.cs
@@ -293,7 +293,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/HexView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Redraw
     path: ../Terminal.Gui/Views/HexView.cs
@@ -330,7 +330,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/HexView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: PositionCursor
     path: ../Terminal.Gui/Views/HexView.cs
@@ -364,7 +364,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/HexView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ProcessKey
     path: ../Terminal.Gui/Views/HexView.cs
@@ -403,7 +403,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/HexView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: AllowEdits
     path: ../Terminal.Gui/Views/HexView.cs
@@ -441,7 +441,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/HexView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: Edits
     path: ../Terminal.Gui/Views/HexView.cs
@@ -479,7 +479,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/HexView.cs
-      branch: docs_tweaks
+      branch: refactor_core
       repo: tig:tig/gui.cs.git
     id: ApplyEdits
     path: ../Terminal.Gui/Views/HexView.cs
