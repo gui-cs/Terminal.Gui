@@ -544,9 +544,9 @@ namespace Terminal.Gui {
 
 		void IMainLoopDriver.Wakeup ()
 		{
-			//tokenSource.Cancel ();
-			eventReady.Reset ();
-			eventReady.Set ();
+			tokenSource.Cancel ();
+			//eventReady.Reset ();
+			//eventReady.Set ();
 		}
 
 		bool IMainLoopDriver.EventsPending (bool wait)
@@ -790,7 +790,7 @@ namespace Terminal.Gui {
 								break;
 							if (IsButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
 								mouseHandler (me);
-								mainLoop.Driver.Wakeup ();
+								//mainLoop.Driver.Wakeup ();
 							}
 						}
 					});
