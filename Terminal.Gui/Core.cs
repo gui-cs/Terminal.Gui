@@ -1087,6 +1087,11 @@ namespace Terminal.Gui {
 			/// The <see cref="KeyEvent"/> for the event.
 			/// </summary>
 			public KeyEvent KeyEvent { get; set; }
+			/// <summary>
+			/// Indicates if the current Key event has already been processed and the driver should stop notifying any other event subscriber.
+			/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
+			/// </summary>
+			public bool Handled { get; set; } = false;
 		}
 
 		/// <summary>
@@ -1097,7 +1102,11 @@ namespace Terminal.Gui {
 		/// <inheritdoc cref="ProcessKey"/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			KeyPress?.Invoke (this, new KeyEventEventArgs(keyEvent));
+
+			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
+			KeyPress?.Invoke (this, args);
+			if (args.Handled)
+				return true;
 			if (Focused?.ProcessKey (keyEvent) == true)
 				return true;
 
@@ -1107,7 +1116,10 @@ namespace Terminal.Gui {
 		/// <inheritdoc cref="ProcessHotKey"/>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
-			KeyPress?.Invoke (this, new KeyEventEventArgs (keyEvent));
+			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
+			KeyPress?.Invoke (this, args);
+			if (args.Handled)
+				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1119,7 +1131,10 @@ namespace Terminal.Gui {
 		/// <inheritdoc cref="ProcessColdKey"/>
 		public override bool ProcessColdKey (KeyEvent keyEvent)
 		{
-			KeyPress?.Invoke (this, new KeyEventEventArgs(keyEvent));
+			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
+			KeyPress?.Invoke (this, args);
+			if (args.Handled)
+				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1136,7 +1151,10 @@ namespace Terminal.Gui {
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
-			KeyDown?.Invoke (this, new KeyEventEventArgs (keyEvent));
+			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
+			KeyDown?.Invoke (this, args);
+			if (args.Handled)
+				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1154,7 +1172,10 @@ namespace Terminal.Gui {
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
-			KeyUp?.Invoke (this, new KeyEventEventArgs (keyEvent));
+			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
+			KeyUp?.Invoke (this, args);
+			if (args.Handled)
+				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
