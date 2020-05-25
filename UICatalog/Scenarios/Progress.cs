@@ -154,7 +154,7 @@ namespace UICatalog {
 				mainLoopTimeoutDemo.ActivityProgressBar.Fraction = 0F;
 				mainLoopTimeoutDemo.PulseProgressBar.Fraction = 0F;
 
-				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (_mainLooopTimeoutTick), (loop) => {
+				_mainLoopTimeout = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (_mainLooopTimeoutTick), (loop) => {
 					mainLoopTimeoutDemo?.PulseBtnClick ();
 					return true;
 				});
