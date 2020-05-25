@@ -13,12 +13,11 @@ namespace UICatalog {
 	[ScenarioCategory ("Threading")]
 	class Progress : Scenario {
 
-		class ProgressDemo : FrameView, IDisposable {
-			internal ProgressBar ActivityProgressBar { get; private set; }
-			internal ProgressBar PulseProgressBar { get; private set; }
-			bool _disposedValue;
+		class ProgressDemo : FrameView {
 			const int _verticalSpace = 1;
 
+			internal ProgressBar ActivityProgressBar { get; private set; }
+			internal ProgressBar PulseProgressBar { get; private set; }
 			internal Action StartBtnClick;
 			internal Action StopBtnClick;
 			internal Action PulseBtnClick;
@@ -77,23 +76,6 @@ namespace UICatalog {
 				// Set height to height of controls + spacing + frame
 				Height = 2 + _verticalSpace + Dim.Height (startButton) + _verticalSpace + Dim.Height (ActivityProgressBar) + _verticalSpace + Dim.Height (PulseProgressBar) + _verticalSpace;
 
-			}
-
-			protected virtual void Dispose (bool disposing)
-			{
-				if (!_disposedValue) {
-					if (disposing) {
-
-					}
-					_disposedValue = true;
-				}
-			}
-
-			public void Dispose ()
-			{
-				// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-				Dispose (disposing: true);
-				GC.SuppressFinalize (this);
 			}
 		}
 
@@ -186,7 +168,6 @@ namespace UICatalog {
 			while (Win.GetEnumerator ().MoveNext ()) {
 				var cur = (ProgressDemo)Win.GetEnumerator ().Current;
 				cur?.StopBtnClick ();
-				cur.Dispose ();
 			}
 			base.Dispose (disposing);
 		}
