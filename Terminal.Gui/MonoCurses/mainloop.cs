@@ -208,7 +208,7 @@ namespace Mono.Terminal {
 
 			while (true) {
 				n = poll (pollmap, (uint)pollmap.Length, 0);
-				if (pollmap != null) {
+				if (n > 0) {
 					break;
 				}
 				if (mainLoop.idleHandlers.Count > 0 || CkeckTimeout (wait, ref pollTimeout)) {
@@ -472,7 +472,7 @@ namespace Mono.Terminal {
 			running = false;
 			driver.Wakeup ();
 		}
-		
+
 		/// <summary>
 		///   Determines whether there are pending events to be processed.
 		/// </summary>
