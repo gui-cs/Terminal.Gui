@@ -177,7 +177,7 @@ namespace UICatalog {
 
 			_top = Application.Top;
 
-			_top.KeyUp += KeyUpHandler;
+			_top.KeyDown += KeyDownHandler;
 
 			_top.Add (_menu);
 			_top.Add (_leftPane);
@@ -271,7 +271,7 @@ namespace UICatalog {
 		/// to not be impacted. Same as for tabs.
 		/// </summary>
 		/// <param name="ke"></param>
-		private static void KeyUpHandler (object sender, View.KeyEventEventArgs a)
+		private static void KeyDownHandler (object sender, View.KeyEventEventArgs a)
 		{
 			if (_runningScenario != null) {
 				//switch (ke.Key) {

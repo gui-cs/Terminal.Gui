@@ -189,7 +189,7 @@ namespace Terminal.Gui {
 					pollTimeout = 0;
 				}
 				n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
-				if (pollmap != null) {
+				if (n > 0) {
 					break;
 				}
 				if (mainLoop.timeouts.Count > 0 || mainLoop.idleHandlers.Count > 0) {

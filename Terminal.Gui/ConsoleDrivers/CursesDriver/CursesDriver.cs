@@ -243,7 +243,7 @@ namespace Terminal.Gui {
 								break;
 							if (IsButtonPressed && LastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
 								mouseHandler (me);
-								mainLoop.Driver.Wakeup ();
+								//mainLoop.Driver.Wakeup ();
 							}
 						}
 					});
@@ -368,7 +368,7 @@ namespace Terminal.Gui {
 			};
 		}
 
-		void ProcessInput (Action<KeyEvent> keyHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
+		void ProcessInput (Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			int wch;
 			var code = Curses.get_wch (out wch);
@@ -421,8 +421,10 @@ namespace Terminal.Gui {
 					keyHandler (new KeyEvent (Key.Esc));
 				}
 			} else if (wch == Curses.KeyTab) {
+				keyDownHandler (new KeyEvent (MapCursesKey (wch)));
 				keyHandler (new KeyEvent (MapCursesKey (wch)));
 			} else {
+				keyDownHandler (new KeyEvent ((Key)wch));
 				keyHandler (new KeyEvent ((Key)wch));
 			}
 			// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
@@ -445,7 +447,7 @@ namespace Terminal.Gui {
 			this.mainLoop = mainLoop;
 
 			(mainLoop.Driver as  UnixMainLoop).AddWatch (0,  UnixMainLoop.Condition.PollIn, x => {
-				ProcessInput (keyHandler, keyUpHandler, mouseHandler);
+				ProcessInput (keyHandler, keyDownHandler, keyUpHandler, mouseHandler);
 				return true;
 			});
 
