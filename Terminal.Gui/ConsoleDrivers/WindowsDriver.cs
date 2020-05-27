@@ -25,13 +25,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+using NStack;
 using System;
-using System.CodeDom;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using NStack;
 
 namespace Terminal.Gui {
 

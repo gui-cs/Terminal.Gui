@@ -25,10 +25,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -224,73 +223,6 @@ namespace Terminal.Gui {
 					if (!watch.Callback (this.mainLoop))
 						descriptorWatchers.Remove (p.fd);
 				}
-			}
-		}
-	}
-
-	/// <summary>
-	/// Mainloop intended to be used with the .NET System.Console API, and can
-	/// be used on Windows and Unix, it is cross platform but lacks things like
-	/// file descriptor monitoring.
-	/// </summary>
-	class NetMainLoop : IMainLoopDriver {
-		AutoResetEvent keyReady = new AutoResetEvent (false);
-		AutoResetEvent waitForProbe = new AutoResetEvent (false);
-		ConsoleKeyInfo? windowsKeyResult = null;
-		public Action<ConsoleKeyInfo> WindowsKeyPressed;
-		MainLoop mainLoop;
-
-		public NetMainLoop ()
-		{
-		}
-
-		void WindowsKeyReader ()
-		{
-			while (true) {
-				waitForProbe.WaitOne ();
-				windowsKeyResult = Console.ReadKey (true);
-				keyReady.Set ();
-			}
-		}
-
-		void IMainLoopDriver.Setup (MainLoop mainLoop)
-		{
-			this.mainLoop = mainLoop;
-			Thread readThread = new Thread (WindowsKeyReader);
-			readThread.Start ();
-		}
-
-		void IMainLoopDriver.Wakeup ()
-		{
-		}
-
-		bool IMainLoopDriver.EventsPending (bool wait)
-		{
-			long now = DateTime.UtcNow.Ticks;
-
-			int waitTimeout;
-			if (mainLoop.timeouts.Count > 0) {
-				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-				if (waitTimeout < 0)
-					return true;
-			} else
-				waitTimeout = -1;
-
-			if (!wait)
-				waitTimeout = 0;
-
-			windowsKeyResult = null;
-			waitForProbe.Set ();
-			keyReady.WaitOne (waitTimeout);
-			return windowsKeyResult.HasValue;
-		}
-
-		void IMainLoopDriver.MainIteration ()
-		{
-			if (windowsKeyResult.HasValue) {
-				if (WindowsKeyPressed!= null)
-					WindowsKeyPressed (windowsKeyResult.Value);
-				windowsKeyResult = null;
 			}
 		}
 	}

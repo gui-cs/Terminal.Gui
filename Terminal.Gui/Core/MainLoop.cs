@@ -1,9 +1,13 @@
-﻿
+﻿//
+// MainLoop.cs: IMainLoopDriver and MainLoop for Terminal.Gui
+//
+// Authors:
+//   Miguel de Icaza (miguel@gnome.org)
+//
 using System;
 using System.Collections.Generic;
 
 namespace Terminal.Gui {
-
 	/// <summary>
 	/// Public interface to create your own platform specific main loop driver.
 	/// </summary>
