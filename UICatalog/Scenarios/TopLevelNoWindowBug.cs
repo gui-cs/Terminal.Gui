@@ -15,7 +15,7 @@ namespace UICatalog {
 					new MenuItem ("_Создать", "Creates new file", null),
 					new MenuItem ("_Открыть", "", null),
 					new MenuItem ("Со_хранить", "", null),
-					new MenuItem ("_Выход", "", () => Top.Running = false )
+					new MenuItem ("_Выход", "", () => Application.RequestStop())
 				}),
 				new MenuBarItem ("_Edit", new MenuItem [] {
 					new MenuItem ("_Copy", "", null),
