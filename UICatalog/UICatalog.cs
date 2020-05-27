@@ -79,6 +79,8 @@ namespace UICatalog {
 				scenario.Run ();
 				scenario = GetScenarioToRun ();
 			}
+			// Now closes the driver too.
+			Application.Shutdown ();
 		}
 
 		/// <summary>
@@ -197,7 +199,7 @@ namespace UICatalog {
 			};
 #endif
 			
-			Application.Run (_top);
+			Application.Run (_top, false);
 			return _runningScenario;
 		}
 
