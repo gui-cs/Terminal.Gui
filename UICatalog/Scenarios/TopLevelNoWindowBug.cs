@@ -8,14 +8,14 @@ namespace UICatalog {
 
 		public override void Run ()
 		{
-			var ntop = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
+			Top = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_Файл", new MenuItem [] {
 					new MenuItem ("_Создать", "Creates new file", null),
 					new MenuItem ("_Открыть", "", null),
 					new MenuItem ("Со_хранить", "", null),
-					new MenuItem ("_Выход", "", () => ntop.Running = false )
+					new MenuItem ("_Выход", "", () => Application.RequestStop())
 				}),
 				new MenuBarItem ("_Edit", new MenuItem [] {
 					new MenuItem ("_Copy", "", null),
@@ -23,16 +23,16 @@ namespace UICatalog {
 					new MenuItem ("_Paste", "", null)
 				})
 			});
-			ntop.Add (menu);
+			Top.Add (menu);
 
-			// BUGBUG: #437 This being commmented out causes menu to mis-behave
-			var win = new Window ($"Scenario: {GetName ()}") {
-				X = 0,
-				Y = 1,
-				Width = Dim.Fill (),
-				Height = Dim.Fill ()
-			};
-			ntop.Add (win);
+			// BUGBUG: #437 This being commented out causes menu to mis-behave
+			//var win = new Window ($"Scenario: {GetName ()}") {
+			//	X = 0,
+			//	Y = 1,
+			//	Width = Dim.Fill (),
+			//	Height = Dim.Fill ()
+			//};
+			//ntop.Add (win);
 
 			base.Run ();
 		}
