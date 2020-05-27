@@ -538,12 +538,12 @@ namespace Terminal.Gui {
 		/// <param name="paddingTop">Number of rows to pad on the top (if 0 the border and title will not appear on the top).</param>
 		/// <param name="paddingRight">Number of columns to pad on the right (if 0 the border will not appear on the right).</param>
 		/// <param name="paddingBottom">Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).</param>
+		/// <param name="textAlignment">Not yet immplemented.</param>
 		/// <remarks></remarks>
-		public void DrawWindowTitle (Rect region, ustring title, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom)
+		public void DrawWindowTitle (Rect region, ustring title, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom, TextAlignment textAlignment = TextAlignment.Left)
 		{
 			var width = region.Width - (paddingLeft + 2) * 2;
-			if (!ustring.IsNullOrEmpty(title) && width > 4) {
-				
+			if (!ustring.IsNullOrEmpty(title) && width > 4 && region.Y + paddingTop <= region.Y + paddingBottom) {
 				Move (region.X + 1 + paddingLeft, region.Y + paddingTop);
 				AddRune (' ');
 				var str = title.Length >= width ? title [0, width - 2] : title;
