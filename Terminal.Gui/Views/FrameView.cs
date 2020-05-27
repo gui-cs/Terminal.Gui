@@ -134,23 +134,26 @@ namespace Terminal.Gui {
 		///<inheritdoc cref="Redraw(Rect)"/>
 		public override void Redraw (Rect bounds)
 		{
-			if (!NeedDisplay.IsEmpty) {
+			var padding = 0;
+			Application.CurrentView = this;
+			var scrRect = RectToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
+			var savedClip = Driver.Clip;
+			Driver.Clip = ScreenClip (RectToScreen (Bounds));
+
+			if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
 				Driver.SetAttribute (ColorScheme.Normal);
-				DrawFrame ();
-				if (HasFocus)
-					Driver.SetAttribute (ColorScheme.Normal);
-				var width = Frame.Width;
-				if (Title != null && width > 4) {
-					Move (1, 0);
-					Driver.AddRune (' ');
-					var str = Title.Length > width ? Title [0, width - 4] : Title;
-					Driver.AddStr (str);
-					Driver.AddRune (' ');
-				}
-				Driver.SetAttribute (ColorScheme.Normal);
+				Driver.DrawFrame (scrRect, padding, true);
 			}
 			contentView.Redraw (contentView.Bounds);
 			ClearNeedsDisplay ();
+			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.DrawFrame (scrRect, padding, false);
+
+			if (HasFocus)
+				Driver.SetAttribute (ColorScheme.HotNormal);
+			Driver.DrawWindowTitle (scrRect, Title, padding, padding, padding, padding);
+			Driver.Clip = savedClip;
+			Driver.SetAttribute (ColorScheme.Normal);
 		}
 	}
 }

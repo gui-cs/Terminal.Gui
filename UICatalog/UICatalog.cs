@@ -104,10 +104,10 @@ namespace UICatalog {
 
 			_categories = Scenario.GetAllCategories ();
 			_categoryListView = new ListView (_categories) {
-				X = 1,
+				X = 0,
 				Y = 0,
 				Width = Dim.Fill (0),
-				Height = Dim.Fill (2),
+				Height = Dim.Fill (0),
 				AllowsMarking = false,
 				CanFocus = true,
 			};

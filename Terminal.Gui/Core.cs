@@ -798,14 +798,14 @@ namespace Terminal.Gui {
 		}
 
 		// Converts a rectangle in view coordinates to screen coordinates.
-		Rect RectToScreen (Rect rect)
+		internal Rect RectToScreen (Rect rect)
 		{
 			ViewToScreen (rect.X, rect.Y, out var x, out var y, clipped: false);
 			return new Rect (x, y, rect.Width, rect.Height);
 		}
 
 		// Clips a rectangle in screen coordinates to the dimensions currently available on the screen
-		Rect ScreenClip (Rect rect)
+		internal Rect ScreenClip (Rect rect)
 		{
 			var x = rect.X < 0 ? 0 : rect.X;
 			var y = rect.Y < 0 ? 0 : rect.Y;
@@ -1082,7 +1082,7 @@ namespace Terminal.Gui {
 			/// Constructs.
 			/// </summary>
 			/// <param name="ke"></param>
-			public KeyEventEventArgs(KeyEvent ke) => KeyEvent = ke;
+			public KeyEventEventArgs (KeyEvent ke) => KeyEvent = ke;
 			/// <summary>
 			/// The <see cref="KeyEvent"/> for the event.
 			/// </summary>
@@ -1683,13 +1683,13 @@ namespace Terminal.Gui {
 			nx = Math.Max (x, 0);
 			nx = nx + top.Frame.Width > Driver.Cols ? Math.Max (Driver.Cols - top.Frame.Width, 0) : nx;
 			bool m, s;
-			if (SuperView == null || SuperView.GetType() != typeof(Toplevel))
+			if (SuperView == null || SuperView.GetType () != typeof (Toplevel))
 				m = Application.Top.MenuBar != null;
 			else
 				m = ((Toplevel)SuperView).MenuBar != null;
 			int l = m ? 1 : 0;
 			ny = Math.Max (y, l);
-			if (SuperView == null || SuperView.GetType() != typeof(Toplevel))
+			if (SuperView == null || SuperView.GetType () != typeof (Toplevel))
 				s = Application.Top.StatusBar != null;
 			else
 				s = ((Toplevel)SuperView).StatusBar != null;
@@ -1867,11 +1867,6 @@ namespace Terminal.Gui {
 			return contentView.GetEnumerator ();
 		}
 
-		void DrawFrame (bool fill = true)
-		{
-			DrawFrame (new Rect (0, 0, Frame.Width, Frame.Height), padding, fill: fill);
-		}
-
 		/// <summary>
 		/// Add the specified view to the <see cref="ContentView"/>.
 		/// </summary>
@@ -1916,30 +1911,24 @@ namespace Terminal.Gui {
 		public override void Redraw (Rect bounds)
 		{
 			Application.CurrentView = this;
+			var scrRect = RectToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
+			var savedClip = Driver.Clip;
+			Driver.Clip = ScreenClip (RectToScreen (Bounds));
 
 			if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
-				DrawFrameWindow ();
+				Driver.SetAttribute (ColorScheme.Normal);
+				Driver.DrawFrame (scrRect, padding, true);
 			}
 			contentView.Redraw (contentView.Bounds);
 			ClearNeedsDisplay ();
-			DrawFrameWindow (false);
+			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.DrawFrame (scrRect, padding, false);
 
-			void DrawFrameWindow (bool fill = true)
-			{
-				Driver.SetAttribute (ColorScheme.Normal);
-				DrawFrame (fill);
-				if (HasFocus)
-					Driver.SetAttribute (ColorScheme.HotNormal);
-				var width = Frame.Width - (padding + 2) * 2;
-				if (Title != null && width > 4) {
-					Move (1 + padding, padding);
-					Driver.AddRune (' ');
-					var str = Title.Length >= width ? Title [0, width - 2] : Title;
-					Driver.AddStr (str);
-					Driver.AddRune (' ');
-				}
-				Driver.SetAttribute (ColorScheme.Normal);
-			}
+			if (HasFocus)
+				Driver.SetAttribute (ColorScheme.HotNormal);
+			Driver.DrawWindowTitle (scrRect, Title, padding, padding, padding, padding);
+			Driver.Clip = savedClip;
+			Driver.SetAttribute (ColorScheme.Normal);
 		}
 
 		//
@@ -2415,7 +2404,7 @@ namespace Terminal.Gui {
 			if (toplevel.LayoutStyle == LayoutStyle.Computed)
 				toplevel.RelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
 			toplevel.LayoutSubviews ();
-			Loaded?.Invoke (null, new ResizedEventArgs () { Rows = Driver.Rows, Cols = Driver.Cols } );
+			Loaded?.Invoke (null, new ResizedEventArgs () { Rows = Driver.Rows, Cols = Driver.Cols });
 			toplevel.WillPresent ();
 			Redraw (toplevel);
 			toplevel.PositionCursor ();
