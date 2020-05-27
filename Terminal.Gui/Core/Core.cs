@@ -2039,7 +2039,7 @@ namespace Terminal.Gui {
 		/// The <see cref="MainLoop"/>  driver for the applicaiton
 		/// </summary>
 		/// <value>The main loop.</value>
-		public static Mono.Terminal.MainLoop MainLoop { get; private set; }
+		public static MainLoop MainLoop { get; private set; }
 
 		static Stack<Toplevel> toplevels = new Stack<Toplevel> ();
 
@@ -2066,9 +2066,9 @@ namespace Terminal.Gui {
 		// users use async/await on their code
 		//
 		class MainLoopSyncContext : SynchronizationContext {
-			Mono.Terminal.MainLoop mainLoop;
+			MainLoop mainLoop;
 
-			public MainLoopSyncContext (Mono.Terminal.MainLoop mainLoop)
+			public MainLoopSyncContext (MainLoop mainLoop)
 			{
 				this.mainLoop = mainLoop;
 			}
@@ -2127,21 +2127,21 @@ namespace Terminal.Gui {
 
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
-				Mono.Terminal.IMainLoopDriver mainLoopDriver;
+				IMainLoopDriver mainLoopDriver;
 
 				if (UseSystemConsole) {
-					mainLoopDriver = new Mono.Terminal.NetMainLoop ();
+					mainLoopDriver = new NetMainLoop ();
 					Driver = new NetDriver ();
 				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 					var windowsDriver = new WindowsDriver ();
 					mainLoopDriver = windowsDriver;
 					Driver = windowsDriver;
 				} else {
-					mainLoopDriver = new Mono.Terminal.UnixMainLoop ();
+					mainLoopDriver = new UnixMainLoop ();
 					Driver = new CursesDriver ();
 				}
 				Driver.Init (TerminalResized);
-				MainLoop = new Mono.Terminal.MainLoop (mainLoopDriver);
+				MainLoop = new MainLoop (mainLoopDriver);
 				SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			}
 			Top = topLevelFactory ();

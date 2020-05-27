@@ -23,7 +23,7 @@ using System.Threading;
 
 
 
-namespace Mono.Terminal.Internal {
+namespace Unix.Terminal {
 	/// <summary>
 	/// Represents a dynamically loaded unmanaged library in a (partially) platform independent manner.
 	/// First, the native library is loaded using dlopen (on Unix systems) or using LoadLibrary (on Windows).

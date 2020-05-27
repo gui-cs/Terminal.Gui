@@ -7,7 +7,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mono.Terminal;
 using NStack;
 
 namespace Terminal.Gui {

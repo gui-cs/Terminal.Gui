@@ -4,14 +4,9 @@
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
 //
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using Mono.Terminal;
 using NStack;
-using Unix.Terminal;
+using System;
+using System.Runtime.CompilerServices;
 
 namespace Terminal.Gui {
 
