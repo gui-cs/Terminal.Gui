@@ -101,9 +101,9 @@
     <PackageReference Include="NStack.Core" Version="0.14.0" />
   </ItemGroup>
   <ItemGroup>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Dialogs\" />
+    <Compile Remove="Dialogs\**" />
+    <EmbeddedResource Remove="Dialogs\**" />
+    <None Remove="Dialogs\**" />
   </ItemGroup>
   <!--<ItemGroup>
     <Reference Include="NStack">
