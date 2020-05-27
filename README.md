@@ -174,7 +174,7 @@ Use NuGet to install the `Terminal.Gui` NuGet package: https://www.nuget.org/pac
 
 ## Running and Building
 
-* *`Terminal.Gui`* - Build and run using the .NET SDK command line tools (`doetnet build` in the root directory) or with Visual Studio 2019.
+* *`Terminal.Gui`* - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory) or with Visual Studio 2019.
 
 ## Contributing
 

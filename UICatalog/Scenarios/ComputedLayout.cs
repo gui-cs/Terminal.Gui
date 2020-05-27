@@ -36,19 +36,21 @@ namespace UICatalog {
 
 			// Demonstrate using Dim to create a vertical ruler that always measures the parent window's height
 			// TODO: Either build a custom control for this or implement linewrap in Label #352
-			//var verticalRuler = new Label ("") {
-			//	X = 0,
-			//	Y = 0,
-			//	Width = 1,
-			//	Height = Dim.Fill (),
-			//	ColorScheme = Colors.Error
-			//};
+			const string vrule = "|\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
-			//Application.OnResized += () => {
-			//	verticalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height)];
-			//};
+			var verticalRuler = new Label ("") {
+				X = 0,
+				Y = 0,
+				Width = 1,
+				Height = Dim.Fill (),
+				ColorScheme = Colors.Error
+			};
 
-			//Win.Add (verticalRuler);
+			Application.Resized += (sender, a) => {
+				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height*2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height*2)];
+			};
+
+			Win.Add (verticalRuler);
 
 			// Demonstrate At - Absolute Layout using Pos
 			var absoluteButton = new Button ("Absolute At(2,1)") {
