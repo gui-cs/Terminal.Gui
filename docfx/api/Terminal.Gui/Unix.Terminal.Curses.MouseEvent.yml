@@ -19,12 +19,12 @@ items:
   type: Struct
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: MouseEvent
-    path: ../Terminal.Gui/MonoCurses/binding.cs
-    startLine: 52
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+    startLine: 50
   assemblies:
   - Terminal.Gui
   namespace: Unix.Terminal
@@ -57,12 +57,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ID
-    path: ../Terminal.Gui/MonoCurses/binding.cs
-    startLine: 54
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+    startLine: 52
   assemblies:
   - Terminal.Gui
   namespace: Unix.Terminal
@@ -88,12 +88,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: X
-    path: ../Terminal.Gui/MonoCurses/binding.cs
-    startLine: 55
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+    startLine: 53
   assemblies:
   - Terminal.Gui
   namespace: Unix.Terminal
@@ -119,12 +119,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Y
-    path: ../Terminal.Gui/MonoCurses/binding.cs
-    startLine: 55
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+    startLine: 53
   assemblies:
   - Terminal.Gui
   namespace: Unix.Terminal
@@ -150,12 +150,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Z
-    path: ../Terminal.Gui/MonoCurses/binding.cs
-    startLine: 55
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+    startLine: 53
   assemblies:
   - Terminal.Gui
   namespace: Unix.Terminal
@@ -181,12 +181,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/binding.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ButtonState
-    path: ../Terminal.Gui/MonoCurses/binding.cs
-    startLine: 56
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/binding.cs
+    startLine: 54
   assemblies:
   - Terminal.Gui
   namespace: Unix.Terminal

@@ -21,12 +21,12 @@ items:
   type: Struct
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: MouseEvent
-    path: ../Terminal.Gui/Event.cs
-    startLine: 483
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 491
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -60,12 +60,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: X
-    path: ../Terminal.Gui/Event.cs
-    startLine: 487
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 495
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -93,12 +93,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Y
-    path: ../Terminal.Gui/Event.cs
-    startLine: 492
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 500
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -126,12 +126,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Flags
-    path: ../Terminal.Gui/Event.cs
-    startLine: 497
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 505
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -159,12 +159,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: OfX
-    path: ../Terminal.Gui/Event.cs
-    startLine: 502
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 510
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -192,12 +192,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: OfY
-    path: ../Terminal.Gui/Event.cs
-    startLine: 507
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 515
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -225,12 +225,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: View
-    path: ../Terminal.Gui/Event.cs
-    startLine: 512
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 520
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -258,12 +258,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ToString
-    path: ../Terminal.Gui/Event.cs
-    startLine: 518
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 526
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui

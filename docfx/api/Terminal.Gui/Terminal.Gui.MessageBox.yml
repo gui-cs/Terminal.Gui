@@ -16,11 +16,11 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Dialogs/MessageBox.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/MessageBox.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: MessageBox
-    path: ../Terminal.Gui/Dialogs/MessageBox.cs
+    path: ../Terminal.Gui/Windows/MessageBox.cs
     startLine: 21
   assemblies:
   - Terminal.Gui
@@ -61,11 +61,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Dialogs/MessageBox.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/MessageBox.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Query
-    path: ../Terminal.Gui/Dialogs/MessageBox.cs
+    path: ../Terminal.Gui/Windows/MessageBox.cs
     startLine: 31
   assemblies:
   - Terminal.Gui
@@ -117,11 +117,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Dialogs/MessageBox.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/MessageBox.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ErrorQuery
-    path: ../Terminal.Gui/Dialogs/MessageBox.cs
+    path: ../Terminal.Gui/Windows/MessageBox.cs
     startLine: 45
   assemblies:
   - Terminal.Gui

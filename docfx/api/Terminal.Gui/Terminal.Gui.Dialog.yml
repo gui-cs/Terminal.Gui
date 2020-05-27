@@ -18,11 +18,11 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Dialogs/Dialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/Dialog.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Dialog
-    path: ../Terminal.Gui/Dialogs/Dialog.cs
+    path: ../Terminal.Gui/Windows/Dialog.cs
     startLine: 21
   assemblies:
   - Terminal.Gui
@@ -149,11 +149,11 @@ items:
   type: Constructor
   source:
     remote:
-      path: Terminal.Gui/Dialogs/Dialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/Dialog.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
-    path: ../Terminal.Gui/Dialogs/Dialog.cs
+    path: ../Terminal.Gui/Windows/Dialog.cs
     startLine: 32
   assemblies:
   - Terminal.Gui
@@ -197,11 +197,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Dialogs/Dialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/Dialog.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: AddButton
-    path: ../Terminal.Gui/Dialogs/Dialog.cs
+    path: ../Terminal.Gui/Windows/Dialog.cs
     startLine: 53
   assemblies:
   - Terminal.Gui
@@ -233,11 +233,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Dialogs/Dialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/Dialog.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: LayoutSubviews
-    path: ../Terminal.Gui/Dialogs/Dialog.cs
+    path: ../Terminal.Gui/Windows/Dialog.cs
     startLine: 63
   assemblies:
   - Terminal.Gui
@@ -267,11 +267,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Dialogs/Dialog.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Windows/Dialog.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ProcessKey
-    path: ../Terminal.Gui/Dialogs/Dialog.cs
+    path: ../Terminal.Gui/Windows/Dialog.cs
     startLine: 88
   assemblies:
   - Terminal.Gui

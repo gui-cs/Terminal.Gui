@@ -21,7 +21,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ScrollView.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ScrollBarView
     path: ../Terminal.Gui/Views/ScrollView.cs
@@ -140,7 +140,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ScrollView.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Size
     path: ../Terminal.Gui/Views/ScrollView.cs
@@ -178,7 +178,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ScrollView.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ChangedPosition
     path: ../Terminal.Gui/Views/ScrollView.cs
@@ -211,7 +211,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ScrollView.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Position
     path: ../Terminal.Gui/Views/ScrollView.cs
@@ -249,7 +249,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ScrollView.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/ScrollView.cs
@@ -294,7 +294,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ScrollView.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Redraw
     path: ../Terminal.Gui/Views/ScrollView.cs
@@ -333,7 +333,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ScrollView.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: MouseEvent
     path: ../Terminal.Gui/Views/ScrollView.cs

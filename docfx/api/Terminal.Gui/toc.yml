@@ -1,15 +1,4 @@
 ### YamlMime:TableOfContent
-- uid: Mono.Terminal
-  name: Mono.Terminal
-  items:
-  - uid: Mono.Terminal.IMainLoopDriver
-    name: IMainLoopDriver
-  - uid: Mono.Terminal.MainLoop
-    name: MainLoop
-  - uid: Mono.Terminal.UnixMainLoop
-    name: UnixMainLoop
-  - uid: Mono.Terminal.UnixMainLoop.Condition
-    name: UnixMainLoop.Condition
 - uid: Terminal.Gui
   name: Terminal.Gui
   items:
@@ -53,6 +42,8 @@
     name: HexView
   - uid: Terminal.Gui.IListDataSource
     name: IListDataSource
+  - uid: Terminal.Gui.IMainLoopDriver
+    name: IMainLoopDriver
   - uid: Terminal.Gui.Key
     name: Key
   - uid: Terminal.Gui.KeyEvent
@@ -67,6 +58,8 @@
     name: ListViewItemEventArgs
   - uid: Terminal.Gui.ListWrapper
     name: ListWrapper
+  - uid: Terminal.Gui.MainLoop
+    name: MainLoop
   - uid: Terminal.Gui.MenuBar
     name: MenuBar
   - uid: Terminal.Gui.MenuBarItem
@@ -117,6 +110,10 @@
     name: TimeField
   - uid: Terminal.Gui.Toplevel
     name: Toplevel
+  - uid: Terminal.Gui.UnixMainLoop
+    name: UnixMainLoop
+  - uid: Terminal.Gui.UnixMainLoop.Condition
+    name: UnixMainLoop.Condition
   - uid: Terminal.Gui.View
     name: View
   - uid: Terminal.Gui.View.KeyEventEventArgs

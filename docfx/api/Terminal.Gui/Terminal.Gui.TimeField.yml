@@ -21,7 +21,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TimeField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: TimeField
     path: ../Terminal.Gui/Views/TimeField.cs
@@ -154,7 +154,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TimeField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/TimeField.cs
@@ -199,7 +199,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TimeField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/TimeField.cs
@@ -235,7 +235,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TimeField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Time
     path: ../Terminal.Gui/Views/TimeField.cs
@@ -273,7 +273,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TimeField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: IsShortFormat
     path: ../Terminal.Gui/Views/TimeField.cs
@@ -310,7 +310,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TimeField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ProcessKey
     path: ../Terminal.Gui/Views/TimeField.cs
@@ -349,7 +349,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TimeField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: MouseEvent
     path: ../Terminal.Gui/Views/TimeField.cs

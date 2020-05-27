@@ -27,7 +27,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/RadioGroup.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: RadioGroup
     path: ../Terminal.Gui/Views/RadioGroup.cs
@@ -142,7 +142,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/RadioGroup.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/RadioGroup.cs
@@ -187,7 +187,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/RadioGroup.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Cursor
     path: ../Terminal.Gui/Views/RadioGroup.cs
@@ -224,7 +224,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/RadioGroup.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/RadioGroup.cs
@@ -266,7 +266,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/RadioGroup.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/RadioGroup.cs
@@ -314,7 +314,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/RadioGroup.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: RadioLabels
     path: ../Terminal.Gui/Views/RadioGroup.cs
@@ -352,7 +352,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/RadioGroup.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Redraw
     path: ../Terminal.Gui/Views/RadioGroup.cs
@@ -389,7 +389,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/RadioGroup.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: PositionCursor
     path: ../Terminal.Gui/Views/RadioGroup.cs
@@ -423,7 +423,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/RadioGroup.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: SelectionChanged
     path: ../Terminal.Gui/Views/RadioGroup.cs
@@ -455,7 +455,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/RadioGroup.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Selected
     path: ../Terminal.Gui/Views/RadioGroup.cs
@@ -493,7 +493,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/RadioGroup.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ProcessColdKey
     path: ../Terminal.Gui/Views/RadioGroup.cs
@@ -532,7 +532,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/RadioGroup.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ProcessKey
     path: ../Terminal.Gui/Views/RadioGroup.cs
@@ -571,7 +571,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/RadioGroup.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: MouseEvent
     path: ../Terminal.Gui/Views/RadioGroup.cs

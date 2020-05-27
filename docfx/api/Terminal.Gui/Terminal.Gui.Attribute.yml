@@ -19,12 +19,12 @@ items:
   type: Struct
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Attribute
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 94
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 90
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -60,12 +60,12 @@ items:
   type: Constructor
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 105
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 101
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -102,12 +102,12 @@ items:
   type: Constructor
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 117
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 113
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -141,12 +141,12 @@ items:
   type: Operator
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: op_Implicit
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 129
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 125
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -185,12 +185,12 @@ items:
   type: Operator
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: op_Implicit
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 136
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 132
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -229,12 +229,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Make
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 144
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 140
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui

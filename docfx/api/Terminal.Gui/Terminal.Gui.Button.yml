@@ -27,7 +27,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button
     path: ../Terminal.Gui/Views/Button.cs
@@ -142,7 +142,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: IsDefault
     path: ../Terminal.Gui/Views/Button.cs
@@ -180,7 +180,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Clicked
     path: ../Terminal.Gui/Views/Button.cs
@@ -214,7 +214,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/Button.cs
@@ -254,7 +254,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/Button.cs
@@ -297,7 +297,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Text
     path: ../Terminal.Gui/Views/Button.cs
@@ -334,7 +334,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/Button.cs
@@ -380,7 +380,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Redraw
     path: ../Terminal.Gui/Views/Button.cs
@@ -417,7 +417,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: PositionCursor
     path: ../Terminal.Gui/Views/Button.cs
@@ -451,7 +451,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ProcessHotKey
     path: ../Terminal.Gui/Views/Button.cs
@@ -490,7 +490,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ProcessColdKey
     path: ../Terminal.Gui/Views/Button.cs
@@ -529,7 +529,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ProcessKey
     path: ../Terminal.Gui/Views/Button.cs
@@ -568,7 +568,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/Button.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: MouseEvent
     path: ../Terminal.Gui/Views/Button.cs

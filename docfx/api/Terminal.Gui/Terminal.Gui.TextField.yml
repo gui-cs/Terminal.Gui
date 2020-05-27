@@ -38,7 +38,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: TextField
     path: ../Terminal.Gui/Views/TextField.cs
@@ -155,7 +155,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Used
     path: ../Terminal.Gui/Views/TextField.cs
@@ -192,7 +192,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ReadOnly
     path: ../Terminal.Gui/Views/TextField.cs
@@ -229,16 +229,16 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Changed
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 41
+    startLine: 43
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
   summary: "\nChanged event, raised when the text has clicked.\n"
-  remarks: "\nClient code can hook up to this event, it is\nraised when the text in the entry changes.\n"
+  remarks: "\nThis event is raised when the <xref href=\"Terminal.Gui.TextField.Text\" data-throw-if-not-resolved=\"false\"></xref> changes. \n"
   example: []
   syntax:
     content: public event EventHandler<ustring> Changed
@@ -263,11 +263,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 47
+    startLine: 49
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -299,11 +299,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 56
+    startLine: 58
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -335,11 +335,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 68
+    startLine: 70
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -380,11 +380,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: OnLeave
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 87
+    startLine: 89
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -416,11 +416,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Frame
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 98
+    startLine: 100
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -455,11 +455,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Text
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 117
+    startLine: 119
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -493,11 +493,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Secret
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 154
+    startLine: 156
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -531,11 +531,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: CursorPosition
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 159
+    startLine: 161
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -568,11 +568,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: PositionCursor
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 171
+    startLine: 173
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -603,11 +603,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Redraw
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 184
+    startLine: 186
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -640,11 +640,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: CanFocus
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 256
+    startLine: 258
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -679,11 +679,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ProcessKey
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 285
+    startLine: 287
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -722,11 +722,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: SelectedStart
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 614
+    startLine: 616
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -759,11 +759,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: SelectedLength
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 619
+    startLine: 621
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -796,11 +796,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: SelectedText
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 624
+    startLine: 626
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -833,11 +833,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: MouseEvent
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 630
+    startLine: 632
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -872,11 +872,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ClearAllSelection
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 714
+    startLine: 716
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -904,11 +904,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Copy
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 738
+    startLine: 740
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -938,11 +938,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Cut
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 751
+    startLine: 753
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -972,11 +972,11 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/TextField.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Paste
     path: ../Terminal.Gui/Views/TextField.cs
-    startLine: 774
+    startLine: 776
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -2878,6 +2878,26 @@ references:
   name: ReadOnly
   nameWithType: TextField.ReadOnly
   fullName: Terminal.Gui.TextField.ReadOnly
+- uid: Terminal.Gui.TextField.Text
+  commentId: P:Terminal.Gui.TextField.Text
+  parent: Terminal.Gui.TextField
+  name: Text
+  nameWithType: TextField.Text
+  fullName: Terminal.Gui.TextField.Text
+- uid: System.EventArgs
+  commentId: T:System.EventArgs
+  parent: System
+  isExternal: true
+  name: EventArgs
+  nameWithType: EventArgs
+  fullName: System.EventArgs
+- uid: NStack.ustring
+  commentId: T:NStack.ustring
+  parent: NStack
+  isExternal: true
+  name: ustring
+  nameWithType: ustring
+  fullName: NStack.ustring
 - uid: System.EventHandler{NStack.ustring}
   commentId: T:System.EventHandler{NStack.ustring}
   parent: System
@@ -2922,6 +2942,12 @@ references:
   - name: )
     nameWithType: )
     fullName: )
+- uid: NStack
+  commentId: N:NStack
+  isExternal: true
+  name: NStack
+  nameWithType: NStack
+  fullName: NStack
 - uid: System.EventHandler`1
   commentId: T:System.EventHandler`1
   isExternal: true
@@ -2973,19 +2999,6 @@ references:
   name: String
   nameWithType: String
   fullName: System.String
-- uid: NStack.ustring
-  commentId: T:NStack.ustring
-  parent: NStack
-  isExternal: true
-  name: ustring
-  nameWithType: ustring
-  fullName: NStack.ustring
-- uid: NStack
-  commentId: N:NStack
-  isExternal: true
-  name: NStack
-  nameWithType: NStack
-  fullName: NStack
 - uid: System.Int32
   commentId: T:System.Int32
   parent: System

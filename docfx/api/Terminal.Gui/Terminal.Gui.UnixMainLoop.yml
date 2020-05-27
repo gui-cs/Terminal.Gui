@@ -1,34 +1,34 @@
 ### YamlMime:ManagedReference
 items:
-- uid: Mono.Terminal.UnixMainLoop
-  commentId: T:Mono.Terminal.UnixMainLoop
+- uid: Terminal.Gui.UnixMainLoop
+  commentId: T:Terminal.Gui.UnixMainLoop
   id: UnixMainLoop
-  parent: Mono.Terminal
+  parent: Terminal.Gui
   children:
-  - Mono.Terminal.UnixMainLoop.AddWatch(System.Int32,Mono.Terminal.UnixMainLoop.Condition,System.Func{Mono.Terminal.MainLoop,System.Boolean})
-  - Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending(System.Boolean)
-  - Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration
-  - Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup(Mono.Terminal.MainLoop)
-  - Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup
-  - Mono.Terminal.UnixMainLoop.RemoveWatch(System.Object)
+  - Terminal.Gui.UnixMainLoop.AddWatch(System.Int32,Terminal.Gui.UnixMainLoop.Condition,System.Func{Terminal.Gui.MainLoop,System.Boolean})
+  - Terminal.Gui.UnixMainLoop.RemoveWatch(System.Object)
+  - Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending(System.Boolean)
+  - Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration
+  - Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Setup(Terminal.Gui.MainLoop)
+  - Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup
   langs:
   - csharp
   - vb
   name: UnixMainLoop
   nameWithType: UnixMainLoop
-  fullName: Mono.Terminal.UnixMainLoop
+  fullName: Terminal.Gui.UnixMainLoop
   type: Class
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/UnixMainLoop.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: UnixMainLoop
-    path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 69
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/UnixMainLoop.cs
+    startLine: 39
   assemblies:
   - Terminal.Gui
-  namespace: Mono.Terminal
+  namespace: Terminal.Gui
   summary: "\nUnix main loop, suitable for using on Posix systems\n"
   remarks: "\nIn addition to the general functions of the mainloop, the Unix version\ncan watch file descriptors using the AddWatch methods.\n"
   example: []
@@ -41,7 +41,7 @@ items:
   inheritance:
   - System.Object
   implements:
-  - Mono.Terminal.IMainLoopDriver
+  - Terminal.Gui.IMainLoopDriver
   inheritedMembers:
   - System.Object.Equals(System.Object)
   - System.Object.Equals(System.Object,System.Object)
@@ -56,93 +56,93 @@ items:
   modifiers.vb:
   - Public
   - Class
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup
-  commentId: M:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup
-  id: Mono#Terminal#IMainLoopDriver#Wakeup
+- uid: Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup
+  commentId: M:Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup
+  id: Terminal#Gui#IMainLoopDriver#Wakeup
   isEii: true
-  parent: Mono.Terminal.UnixMainLoop
+  parent: Terminal.Gui.UnixMainLoop
   langs:
   - csharp
   - vb
   name: IMainLoopDriver.Wakeup()
   nameWithType: UnixMainLoop.IMainLoopDriver.Wakeup()
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.Wakeup()
+  fullName: Terminal.Gui.UnixMainLoop.Terminal.Gui.IMainLoopDriver.Wakeup()
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/UnixMainLoop.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
-    id: Mono.Terminal.IMainLoopDriver.Wakeup
-    path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 133
+    id: Terminal.Gui.IMainLoopDriver.Wakeup
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/UnixMainLoop.cs
+    startLine: 103
   assemblies:
   - Terminal.Gui
-  namespace: Mono.Terminal
+  namespace: Terminal.Gui
   syntax:
     content: void IMainLoopDriver.Wakeup()
-    content.vb: Sub Mono.Terminal.IMainLoopDriver.Wakeup Implements IMainLoopDriver.Wakeup
-  overload: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup*
+    content.vb: Sub Terminal.Gui.IMainLoopDriver.Wakeup Implements IMainLoopDriver.Wakeup
+  overload: Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup*
   implements:
-  - Mono.Terminal.IMainLoopDriver.Wakeup
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Wakeup()
-  name.vb: Mono.Terminal.IMainLoopDriver.Wakeup()
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup(Mono.Terminal.MainLoop)
-  commentId: M:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup(Mono.Terminal.MainLoop)
-  id: Mono#Terminal#IMainLoopDriver#Setup(Mono.Terminal.MainLoop)
+  - Terminal.Gui.IMainLoopDriver.Wakeup
+  nameWithType.vb: UnixMainLoop.Terminal.Gui.IMainLoopDriver.Wakeup()
+  name.vb: Terminal.Gui.IMainLoopDriver.Wakeup()
+- uid: Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Setup(Terminal.Gui.MainLoop)
+  commentId: M:Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Setup(Terminal.Gui.MainLoop)
+  id: Terminal#Gui#IMainLoopDriver#Setup(Terminal.Gui.MainLoop)
   isEii: true
-  parent: Mono.Terminal.UnixMainLoop
+  parent: Terminal.Gui.UnixMainLoop
   langs:
   - csharp
   - vb
   name: IMainLoopDriver.Setup(MainLoop)
   nameWithType: UnixMainLoop.IMainLoopDriver.Setup(MainLoop)
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
+  fullName: Terminal.Gui.UnixMainLoop.Terminal.Gui.IMainLoopDriver.Setup(Terminal.Gui.MainLoop)
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/UnixMainLoop.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
-    id: Mono.Terminal.IMainLoopDriver.Setup
-    path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 138
+    id: Terminal.Gui.IMainLoopDriver.Setup
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/UnixMainLoop.cs
+    startLine: 108
   assemblies:
   - Terminal.Gui
-  namespace: Mono.Terminal
+  namespace: Terminal.Gui
   syntax:
     content: void IMainLoopDriver.Setup(MainLoop mainLoop)
     parameters:
     - id: mainLoop
-      type: Mono.Terminal.MainLoop
-    content.vb: Sub Mono.Terminal.IMainLoopDriver.Setup(mainLoop As MainLoop) Implements IMainLoopDriver.Setup
-  overload: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup*
+      type: Terminal.Gui.MainLoop
+    content.vb: Sub Terminal.Gui.IMainLoopDriver.Setup(mainLoop As MainLoop) Implements IMainLoopDriver.Setup
+  overload: Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Setup*
   implements:
-  - Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Setup(MainLoop)
-  name.vb: Mono.Terminal.IMainLoopDriver.Setup(MainLoop)
-- uid: Mono.Terminal.UnixMainLoop.RemoveWatch(System.Object)
-  commentId: M:Mono.Terminal.UnixMainLoop.RemoveWatch(System.Object)
+  - Terminal.Gui.IMainLoopDriver.Setup(Terminal.Gui.MainLoop)
+  nameWithType.vb: UnixMainLoop.Terminal.Gui.IMainLoopDriver.Setup(MainLoop)
+  name.vb: Terminal.Gui.IMainLoopDriver.Setup(MainLoop)
+- uid: Terminal.Gui.UnixMainLoop.RemoveWatch(System.Object)
+  commentId: M:Terminal.Gui.UnixMainLoop.RemoveWatch(System.Object)
   id: RemoveWatch(System.Object)
-  parent: Mono.Terminal.UnixMainLoop
+  parent: Terminal.Gui.UnixMainLoop
   langs:
   - csharp
   - vb
   name: RemoveWatch(Object)
   nameWithType: UnixMainLoop.RemoveWatch(Object)
-  fullName: Mono.Terminal.UnixMainLoop.RemoveWatch(System.Object)
+  fullName: Terminal.Gui.UnixMainLoop.RemoveWatch(System.Object)
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/UnixMainLoop.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: RemoveWatch
-    path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 153
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/UnixMainLoop.cs
+    startLine: 123
   assemblies:
   - Terminal.Gui
-  namespace: Mono.Terminal
+  namespace: Terminal.Gui
   summary: "\nRemoves an active watch from the mainloop.\n"
   remarks: "\nThe token parameter is the value returned from AddWatch\n"
   example: []
@@ -152,33 +152,33 @@ items:
     - id: token
       type: System.Object
     content.vb: Public Sub RemoveWatch(token As Object)
-  overload: Mono.Terminal.UnixMainLoop.RemoveWatch*
+  overload: Terminal.Gui.UnixMainLoop.RemoveWatch*
   modifiers.csharp:
   - public
   modifiers.vb:
   - Public
-- uid: Mono.Terminal.UnixMainLoop.AddWatch(System.Int32,Mono.Terminal.UnixMainLoop.Condition,System.Func{Mono.Terminal.MainLoop,System.Boolean})
-  commentId: M:Mono.Terminal.UnixMainLoop.AddWatch(System.Int32,Mono.Terminal.UnixMainLoop.Condition,System.Func{Mono.Terminal.MainLoop,System.Boolean})
-  id: AddWatch(System.Int32,Mono.Terminal.UnixMainLoop.Condition,System.Func{Mono.Terminal.MainLoop,System.Boolean})
-  parent: Mono.Terminal.UnixMainLoop
+- uid: Terminal.Gui.UnixMainLoop.AddWatch(System.Int32,Terminal.Gui.UnixMainLoop.Condition,System.Func{Terminal.Gui.MainLoop,System.Boolean})
+  commentId: M:Terminal.Gui.UnixMainLoop.AddWatch(System.Int32,Terminal.Gui.UnixMainLoop.Condition,System.Func{Terminal.Gui.MainLoop,System.Boolean})
+  id: AddWatch(System.Int32,Terminal.Gui.UnixMainLoop.Condition,System.Func{Terminal.Gui.MainLoop,System.Boolean})
+  parent: Terminal.Gui.UnixMainLoop
   langs:
   - csharp
   - vb
   name: AddWatch(Int32, UnixMainLoop.Condition, Func<MainLoop, Boolean>)
   nameWithType: UnixMainLoop.AddWatch(Int32, UnixMainLoop.Condition, Func<MainLoop, Boolean>)
-  fullName: Mono.Terminal.UnixMainLoop.AddWatch(System.Int32, Mono.Terminal.UnixMainLoop.Condition, System.Func<Mono.Terminal.MainLoop, System.Boolean>)
+  fullName: Terminal.Gui.UnixMainLoop.AddWatch(System.Int32, Terminal.Gui.UnixMainLoop.Condition, System.Func<Terminal.Gui.MainLoop, System.Boolean>)
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/UnixMainLoop.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: AddWatch
-    path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 172
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/UnixMainLoop.cs
+    startLine: 142
   assemblies:
   - Terminal.Gui
-  namespace: Mono.Terminal
+  namespace: Terminal.Gui
   summary: "\nWatches a file descriptor for activity.\n"
   remarks: "\nWhen the condition is met, the provided callback\nis invoked.  If the callback returns false, the\nwatch is automatically removed.\n\nThe return value is a token that represents this watch, you can\nuse this token to remove the watch by calling RemoveWatch.\n"
   example: []
@@ -188,43 +188,43 @@ items:
     - id: fileDescriptor
       type: System.Int32
     - id: condition
-      type: Mono.Terminal.UnixMainLoop.Condition
+      type: Terminal.Gui.UnixMainLoop.Condition
     - id: callback
-      type: System.Func{Mono.Terminal.MainLoop,System.Boolean}
+      type: System.Func{Terminal.Gui.MainLoop,System.Boolean}
     return:
       type: System.Object
     content.vb: Public Function AddWatch(fileDescriptor As Integer, condition As UnixMainLoop.Condition, callback As Func(Of MainLoop, Boolean)) As Object
-  overload: Mono.Terminal.UnixMainLoop.AddWatch*
+  overload: Terminal.Gui.UnixMainLoop.AddWatch*
   nameWithType.vb: UnixMainLoop.AddWatch(Int32, UnixMainLoop.Condition, Func(Of MainLoop, Boolean))
   modifiers.csharp:
   - public
   modifiers.vb:
   - Public
-  fullName.vb: Mono.Terminal.UnixMainLoop.AddWatch(System.Int32, Mono.Terminal.UnixMainLoop.Condition, System.Func(Of Mono.Terminal.MainLoop, System.Boolean))
+  fullName.vb: Terminal.Gui.UnixMainLoop.AddWatch(System.Int32, Terminal.Gui.UnixMainLoop.Condition, System.Func(Of Terminal.Gui.MainLoop, System.Boolean))
   name.vb: AddWatch(Int32, UnixMainLoop.Condition, Func(Of MainLoop, Boolean))
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending(System.Boolean)
-  commentId: M:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending(System.Boolean)
-  id: Mono#Terminal#IMainLoopDriver#EventsPending(System.Boolean)
+- uid: Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending(System.Boolean)
+  commentId: M:Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending(System.Boolean)
+  id: Terminal#Gui#IMainLoopDriver#EventsPending(System.Boolean)
   isEii: true
-  parent: Mono.Terminal.UnixMainLoop
+  parent: Terminal.Gui.UnixMainLoop
   langs:
   - csharp
   - vb
   name: IMainLoopDriver.EventsPending(Boolean)
   nameWithType: UnixMainLoop.IMainLoopDriver.EventsPending(Boolean)
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
+  fullName: Terminal.Gui.UnixMainLoop.Terminal.Gui.IMainLoopDriver.EventsPending(System.Boolean)
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/UnixMainLoop.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
-    id: Mono.Terminal.IMainLoopDriver.EventsPending
-    path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 198
+    id: Terminal.Gui.IMainLoopDriver.EventsPending
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/UnixMainLoop.cs
+    startLine: 168
   assemblies:
   - Terminal.Gui
-  namespace: Mono.Terminal
+  namespace: Terminal.Gui
   syntax:
     content: bool IMainLoopDriver.EventsPending(bool wait)
     parameters:
@@ -232,49 +232,49 @@ items:
       type: System.Boolean
     return:
       type: System.Boolean
-    content.vb: Function Mono.Terminal.IMainLoopDriver.EventsPending(wait As Boolean) As Boolean Implements IMainLoopDriver.EventsPending
-  overload: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending*
+    content.vb: Function Terminal.Gui.IMainLoopDriver.EventsPending(wait As Boolean) As Boolean Implements IMainLoopDriver.EventsPending
+  overload: Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending*
   implements:
-  - Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.EventsPending(Boolean)
-  name.vb: Mono.Terminal.IMainLoopDriver.EventsPending(Boolean)
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration
-  commentId: M:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration
-  id: Mono#Terminal#IMainLoopDriver#MainIteration
+  - Terminal.Gui.IMainLoopDriver.EventsPending(System.Boolean)
+  nameWithType.vb: UnixMainLoop.Terminal.Gui.IMainLoopDriver.EventsPending(Boolean)
+  name.vb: Terminal.Gui.IMainLoopDriver.EventsPending(Boolean)
+- uid: Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration
+  commentId: M:Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration
+  id: Terminal#Gui#IMainLoopDriver#MainIteration
   isEii: true
-  parent: Mono.Terminal.UnixMainLoop
+  parent: Terminal.Gui.UnixMainLoop
   langs:
   - csharp
   - vb
   name: IMainLoopDriver.MainIteration()
   nameWithType: UnixMainLoop.IMainLoopDriver.MainIteration()
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.MainIteration()
+  fullName: Terminal.Gui.UnixMainLoop.Terminal.Gui.IMainLoopDriver.MainIteration()
   type: Method
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/mainloop.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/UnixMainLoop.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
-    id: Mono.Terminal.IMainLoopDriver.MainIteration
-    path: ../Terminal.Gui/MonoCurses/mainloop.cs
-    startLine: 234
+    id: Terminal.Gui.IMainLoopDriver.MainIteration
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/UnixMainLoop.cs
+    startLine: 211
   assemblies:
   - Terminal.Gui
-  namespace: Mono.Terminal
+  namespace: Terminal.Gui
   syntax:
     content: void IMainLoopDriver.MainIteration()
-    content.vb: Sub Mono.Terminal.IMainLoopDriver.MainIteration Implements IMainLoopDriver.MainIteration
-  overload: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration*
+    content.vb: Sub Terminal.Gui.IMainLoopDriver.MainIteration Implements IMainLoopDriver.MainIteration
+  overload: Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration*
   implements:
-  - Mono.Terminal.IMainLoopDriver.MainIteration
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.MainIteration()
-  name.vb: Mono.Terminal.IMainLoopDriver.MainIteration()
+  - Terminal.Gui.IMainLoopDriver.MainIteration
+  nameWithType.vb: UnixMainLoop.Terminal.Gui.IMainLoopDriver.MainIteration()
+  name.vb: Terminal.Gui.IMainLoopDriver.MainIteration()
 references:
-- uid: Mono.Terminal
-  commentId: N:Mono.Terminal
-  name: Mono.Terminal
-  nameWithType: Mono.Terminal
-  fullName: Mono.Terminal
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
 - uid: System.Object
   commentId: T:System.Object
   parent: System
@@ -282,12 +282,12 @@ references:
   name: Object
   nameWithType: Object
   fullName: System.Object
-- uid: Mono.Terminal.IMainLoopDriver
-  commentId: T:Mono.Terminal.IMainLoopDriver
-  parent: Mono.Terminal
+- uid: Terminal.Gui.IMainLoopDriver
+  commentId: T:Terminal.Gui.IMainLoopDriver
+  parent: Terminal.Gui
   name: IMainLoopDriver
   nameWithType: IMainLoopDriver
-  fullName: Mono.Terminal.IMainLoopDriver
+  fullName: Terminal.Gui.IMainLoopDriver
 - uid: System.Object.Equals(System.Object)
   commentId: M:System.Object.Equals(System.Object)
   parent: System.Object
@@ -573,24 +573,24 @@ references:
   name: System
   nameWithType: System
   fullName: System
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup*
-  commentId: Overload:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup
+- uid: Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup*
+  commentId: Overload:Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup
   name: IMainLoopDriver.Wakeup
   nameWithType: UnixMainLoop.IMainLoopDriver.Wakeup
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.Wakeup
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Wakeup
-  name.vb: Mono.Terminal.IMainLoopDriver.Wakeup
-- uid: Mono.Terminal.IMainLoopDriver.Wakeup
-  commentId: M:Mono.Terminal.IMainLoopDriver.Wakeup
-  parent: Mono.Terminal.IMainLoopDriver
+  fullName: Terminal.Gui.UnixMainLoop.Terminal.Gui.IMainLoopDriver.Wakeup
+  nameWithType.vb: UnixMainLoop.Terminal.Gui.IMainLoopDriver.Wakeup
+  name.vb: Terminal.Gui.IMainLoopDriver.Wakeup
+- uid: Terminal.Gui.IMainLoopDriver.Wakeup
+  commentId: M:Terminal.Gui.IMainLoopDriver.Wakeup
+  parent: Terminal.Gui.IMainLoopDriver
   name: Wakeup()
   nameWithType: IMainLoopDriver.Wakeup()
-  fullName: Mono.Terminal.IMainLoopDriver.Wakeup()
+  fullName: Terminal.Gui.IMainLoopDriver.Wakeup()
   spec.csharp:
-  - uid: Mono.Terminal.IMainLoopDriver.Wakeup
+  - uid: Terminal.Gui.IMainLoopDriver.Wakeup
     name: Wakeup
     nameWithType: IMainLoopDriver.Wakeup
-    fullName: Mono.Terminal.IMainLoopDriver.Wakeup
+    fullName: Terminal.Gui.IMainLoopDriver.Wakeup
   - name: (
     nameWithType: (
     fullName: (
@@ -598,75 +598,75 @@ references:
     nameWithType: )
     fullName: )
   spec.vb:
-  - uid: Mono.Terminal.IMainLoopDriver.Wakeup
+  - uid: Terminal.Gui.IMainLoopDriver.Wakeup
     name: Wakeup
     nameWithType: IMainLoopDriver.Wakeup
-    fullName: Mono.Terminal.IMainLoopDriver.Wakeup
+    fullName: Terminal.Gui.IMainLoopDriver.Wakeup
   - name: (
     nameWithType: (
     fullName: (
   - name: )
     nameWithType: )
     fullName: )
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup*
-  commentId: Overload:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup
+- uid: Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Setup*
+  commentId: Overload:Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#Setup
   name: IMainLoopDriver.Setup
   nameWithType: UnixMainLoop.IMainLoopDriver.Setup
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.Setup
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Setup
-  name.vb: Mono.Terminal.IMainLoopDriver.Setup
-- uid: Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
-  commentId: M:Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
-  parent: Mono.Terminal.IMainLoopDriver
+  fullName: Terminal.Gui.UnixMainLoop.Terminal.Gui.IMainLoopDriver.Setup
+  nameWithType.vb: UnixMainLoop.Terminal.Gui.IMainLoopDriver.Setup
+  name.vb: Terminal.Gui.IMainLoopDriver.Setup
+- uid: Terminal.Gui.IMainLoopDriver.Setup(Terminal.Gui.MainLoop)
+  commentId: M:Terminal.Gui.IMainLoopDriver.Setup(Terminal.Gui.MainLoop)
+  parent: Terminal.Gui.IMainLoopDriver
   name: Setup(MainLoop)
   nameWithType: IMainLoopDriver.Setup(MainLoop)
-  fullName: Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
+  fullName: Terminal.Gui.IMainLoopDriver.Setup(Terminal.Gui.MainLoop)
   spec.csharp:
-  - uid: Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
+  - uid: Terminal.Gui.IMainLoopDriver.Setup(Terminal.Gui.MainLoop)
     name: Setup
     nameWithType: IMainLoopDriver.Setup
-    fullName: Mono.Terminal.IMainLoopDriver.Setup
+    fullName: Terminal.Gui.IMainLoopDriver.Setup
   - name: (
     nameWithType: (
     fullName: (
-  - uid: Mono.Terminal.MainLoop
+  - uid: Terminal.Gui.MainLoop
     name: MainLoop
     nameWithType: MainLoop
-    fullName: Mono.Terminal.MainLoop
+    fullName: Terminal.Gui.MainLoop
   - name: )
     nameWithType: )
     fullName: )
   spec.vb:
-  - uid: Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
+  - uid: Terminal.Gui.IMainLoopDriver.Setup(Terminal.Gui.MainLoop)
     name: Setup
     nameWithType: IMainLoopDriver.Setup
-    fullName: Mono.Terminal.IMainLoopDriver.Setup
+    fullName: Terminal.Gui.IMainLoopDriver.Setup
   - name: (
     nameWithType: (
     fullName: (
-  - uid: Mono.Terminal.MainLoop
+  - uid: Terminal.Gui.MainLoop
     name: MainLoop
     nameWithType: MainLoop
-    fullName: Mono.Terminal.MainLoop
+    fullName: Terminal.Gui.MainLoop
   - name: )
     nameWithType: )
     fullName: )
-- uid: Mono.Terminal.MainLoop
-  commentId: T:Mono.Terminal.MainLoop
-  parent: Mono.Terminal
+- uid: Terminal.Gui.MainLoop
+  commentId: T:Terminal.Gui.MainLoop
+  parent: Terminal.Gui
   name: MainLoop
   nameWithType: MainLoop
-  fullName: Mono.Terminal.MainLoop
-- uid: Mono.Terminal.UnixMainLoop.RemoveWatch*
-  commentId: Overload:Mono.Terminal.UnixMainLoop.RemoveWatch
+  fullName: Terminal.Gui.MainLoop
+- uid: Terminal.Gui.UnixMainLoop.RemoveWatch*
+  commentId: Overload:Terminal.Gui.UnixMainLoop.RemoveWatch
   name: RemoveWatch
   nameWithType: UnixMainLoop.RemoveWatch
-  fullName: Mono.Terminal.UnixMainLoop.RemoveWatch
-- uid: Mono.Terminal.UnixMainLoop.AddWatch*
-  commentId: Overload:Mono.Terminal.UnixMainLoop.AddWatch
+  fullName: Terminal.Gui.UnixMainLoop.RemoveWatch
+- uid: Terminal.Gui.UnixMainLoop.AddWatch*
+  commentId: Overload:Terminal.Gui.UnixMainLoop.AddWatch
   name: AddWatch
   nameWithType: UnixMainLoop.AddWatch
-  fullName: Mono.Terminal.UnixMainLoop.AddWatch
+  fullName: Terminal.Gui.UnixMainLoop.AddWatch
 - uid: System.Int32
   commentId: T:System.Int32
   parent: System
@@ -674,21 +674,21 @@ references:
   name: Int32
   nameWithType: Int32
   fullName: System.Int32
-- uid: Mono.Terminal.UnixMainLoop.Condition
-  commentId: T:Mono.Terminal.UnixMainLoop.Condition
-  parent: Mono.Terminal
+- uid: Terminal.Gui.UnixMainLoop.Condition
+  commentId: T:Terminal.Gui.UnixMainLoop.Condition
+  parent: Terminal.Gui
   name: UnixMainLoop.Condition
   nameWithType: UnixMainLoop.Condition
-  fullName: Mono.Terminal.UnixMainLoop.Condition
-- uid: System.Func{Mono.Terminal.MainLoop,System.Boolean}
-  commentId: T:System.Func{Mono.Terminal.MainLoop,System.Boolean}
+  fullName: Terminal.Gui.UnixMainLoop.Condition
+- uid: System.Func{Terminal.Gui.MainLoop,System.Boolean}
+  commentId: T:System.Func{Terminal.Gui.MainLoop,System.Boolean}
   parent: System
   definition: System.Func`2
   name: Func<MainLoop, Boolean>
   nameWithType: Func<MainLoop, Boolean>
-  fullName: System.Func<Mono.Terminal.MainLoop, System.Boolean>
+  fullName: System.Func<Terminal.Gui.MainLoop, System.Boolean>
   nameWithType.vb: Func(Of MainLoop, Boolean)
-  fullName.vb: System.Func(Of Mono.Terminal.MainLoop, System.Boolean)
+  fullName.vb: System.Func(Of Terminal.Gui.MainLoop, System.Boolean)
   name.vb: Func(Of MainLoop, Boolean)
   spec.csharp:
   - uid: System.Func`2
@@ -699,10 +699,10 @@ references:
   - name: <
     nameWithType: <
     fullName: <
-  - uid: Mono.Terminal.MainLoop
+  - uid: Terminal.Gui.MainLoop
     name: MainLoop
     nameWithType: MainLoop
-    fullName: Mono.Terminal.MainLoop
+    fullName: Terminal.Gui.MainLoop
   - name: ', '
     nameWithType: ', '
     fullName: ', '
@@ -723,10 +723,10 @@ references:
   - name: '(Of '
     nameWithType: '(Of '
     fullName: '(Of '
-  - uid: Mono.Terminal.MainLoop
+  - uid: Terminal.Gui.MainLoop
     name: MainLoop
     nameWithType: MainLoop
-    fullName: Mono.Terminal.MainLoop
+    fullName: Terminal.Gui.MainLoop
   - name: ', '
     nameWithType: ', '
     fullName: ', '
@@ -789,25 +789,25 @@ references:
   - name: )
     nameWithType: )
     fullName: )
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending*
-  commentId: Overload:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending
+- uid: Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending*
+  commentId: Overload:Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending
   name: IMainLoopDriver.EventsPending
   nameWithType: UnixMainLoop.IMainLoopDriver.EventsPending
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.EventsPending
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.EventsPending
-  name.vb: Mono.Terminal.IMainLoopDriver.EventsPending
-- uid: Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
-  commentId: M:Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
-  parent: Mono.Terminal.IMainLoopDriver
+  fullName: Terminal.Gui.UnixMainLoop.Terminal.Gui.IMainLoopDriver.EventsPending
+  nameWithType.vb: UnixMainLoop.Terminal.Gui.IMainLoopDriver.EventsPending
+  name.vb: Terminal.Gui.IMainLoopDriver.EventsPending
+- uid: Terminal.Gui.IMainLoopDriver.EventsPending(System.Boolean)
+  commentId: M:Terminal.Gui.IMainLoopDriver.EventsPending(System.Boolean)
+  parent: Terminal.Gui.IMainLoopDriver
   isExternal: true
   name: EventsPending(Boolean)
   nameWithType: IMainLoopDriver.EventsPending(Boolean)
-  fullName: Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
+  fullName: Terminal.Gui.IMainLoopDriver.EventsPending(System.Boolean)
   spec.csharp:
-  - uid: Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
+  - uid: Terminal.Gui.IMainLoopDriver.EventsPending(System.Boolean)
     name: EventsPending
     nameWithType: IMainLoopDriver.EventsPending
-    fullName: Mono.Terminal.IMainLoopDriver.EventsPending
+    fullName: Terminal.Gui.IMainLoopDriver.EventsPending
   - name: (
     nameWithType: (
     fullName: (
@@ -820,10 +820,10 @@ references:
     nameWithType: )
     fullName: )
   spec.vb:
-  - uid: Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
+  - uid: Terminal.Gui.IMainLoopDriver.EventsPending(System.Boolean)
     name: EventsPending
     nameWithType: IMainLoopDriver.EventsPending
-    fullName: Mono.Terminal.IMainLoopDriver.EventsPending
+    fullName: Terminal.Gui.IMainLoopDriver.EventsPending
   - name: (
     nameWithType: (
     fullName: (
@@ -842,24 +842,24 @@ references:
   name: Boolean
   nameWithType: Boolean
   fullName: System.Boolean
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration*
-  commentId: Overload:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration
+- uid: Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration*
+  commentId: Overload:Terminal.Gui.UnixMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration
   name: IMainLoopDriver.MainIteration
   nameWithType: UnixMainLoop.IMainLoopDriver.MainIteration
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.MainIteration
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.MainIteration
-  name.vb: Mono.Terminal.IMainLoopDriver.MainIteration
-- uid: Mono.Terminal.IMainLoopDriver.MainIteration
-  commentId: M:Mono.Terminal.IMainLoopDriver.MainIteration
-  parent: Mono.Terminal.IMainLoopDriver
+  fullName: Terminal.Gui.UnixMainLoop.Terminal.Gui.IMainLoopDriver.MainIteration
+  nameWithType.vb: UnixMainLoop.Terminal.Gui.IMainLoopDriver.MainIteration
+  name.vb: Terminal.Gui.IMainLoopDriver.MainIteration
+- uid: Terminal.Gui.IMainLoopDriver.MainIteration
+  commentId: M:Terminal.Gui.IMainLoopDriver.MainIteration
+  parent: Terminal.Gui.IMainLoopDriver
   name: MainIteration()
   nameWithType: IMainLoopDriver.MainIteration()
-  fullName: Mono.Terminal.IMainLoopDriver.MainIteration()
+  fullName: Terminal.Gui.IMainLoopDriver.MainIteration()
   spec.csharp:
-  - uid: Mono.Terminal.IMainLoopDriver.MainIteration
+  - uid: Terminal.Gui.IMainLoopDriver.MainIteration
     name: MainIteration
     nameWithType: IMainLoopDriver.MainIteration
-    fullName: Mono.Terminal.IMainLoopDriver.MainIteration
+    fullName: Terminal.Gui.IMainLoopDriver.MainIteration
   - name: (
     nameWithType: (
     fullName: (
@@ -867,10 +867,10 @@ references:
     nameWithType: )
     fullName: )
   spec.vb:
-  - uid: Mono.Terminal.IMainLoopDriver.MainIteration
+  - uid: Terminal.Gui.IMainLoopDriver.MainIteration
     name: MainIteration
     nameWithType: IMainLoopDriver.MainIteration
-    fullName: Mono.Terminal.IMainLoopDriver.MainIteration
+    fullName: Terminal.Gui.IMainLoopDriver.MainIteration
   - name: (
     nameWithType: (
     fullName: (

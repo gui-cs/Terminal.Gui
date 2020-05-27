@@ -6,6 +6,7 @@ items:
   parent: Terminal.Gui
   children:
   - Terminal.Gui.View.KeyEventEventArgs.#ctor(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.View.KeyEventEventArgs.Handled
   - Terminal.Gui.View.KeyEventEventArgs.KeyEvent
   langs:
   - csharp
@@ -16,12 +17,12 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/View.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: KeyEventEventArgs
-    path: ../Terminal.Gui/Core.cs
-    startLine: 1079
+    path: ../Terminal.Gui/Core/View.cs
+    startLine: 908
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -64,12 +65,12 @@ items:
   type: Constructor
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/View.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
-    path: ../Terminal.Gui/Core.cs
-    startLine: 1084
+    path: ../Terminal.Gui/Core/View.cs
+    startLine: 913
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -100,12 +101,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/View.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: KeyEvent
-    path: ../Terminal.Gui/Core.cs
-    startLine: 1088
+    path: ../Terminal.Gui/Core/View.cs
+    startLine: 917
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -118,6 +119,43 @@ items:
       type: Terminal.Gui.KeyEvent
     content.vb: Public Property KeyEvent As KeyEvent
   overload: Terminal.Gui.View.KeyEventEventArgs.KeyEvent*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: Terminal.Gui.View.KeyEventEventArgs.Handled
+  commentId: P:Terminal.Gui.View.KeyEventEventArgs.Handled
+  id: Handled
+  parent: Terminal.Gui.View.KeyEventEventArgs
+  langs:
+  - csharp
+  - vb
+  name: Handled
+  nameWithType: View.KeyEventEventArgs.Handled
+  fullName: Terminal.Gui.View.KeyEventEventArgs.Handled
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Core/View.cs
+      branch: reorg
+      repo: tig:tig/gui.cs.git
+    id: Handled
+    path: ../Terminal.Gui/Core/View.cs
+    startLine: 922
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nIndicates if the current Key event has already been processed and the driver should stop notifying any other event subscriber.\nIts important to set this value to true specially when updating any View&apos;s layout from inside the subscriber method.\n"
+  example: []
+  syntax:
+    content: public bool Handled { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property Handled As Boolean
+  overload: Terminal.Gui.View.KeyEventEventArgs.Handled*
   modifiers.csharp:
   - public
   - get
@@ -455,4 +493,16 @@ references:
   name: KeyEvent
   nameWithType: View.KeyEventEventArgs.KeyEvent
   fullName: Terminal.Gui.View.KeyEventEventArgs.KeyEvent
+- uid: Terminal.Gui.View.KeyEventEventArgs.Handled*
+  commentId: Overload:Terminal.Gui.View.KeyEventEventArgs.Handled
+  name: Handled
+  nameWithType: View.KeyEventEventArgs.Handled
+  fullName: Terminal.Gui.View.KeyEventEventArgs.Handled
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
 shouldSkipMarkup: true

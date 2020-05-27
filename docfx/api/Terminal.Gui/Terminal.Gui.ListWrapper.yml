@@ -21,7 +21,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ListView.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ListWrapper
     path: ../Terminal.Gui/Views/ListView.cs
@@ -70,7 +70,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ListView.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/ListView.cs
@@ -106,7 +106,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ListView.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Count
     path: ../Terminal.Gui/Views/ListView.cs
@@ -145,7 +145,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ListView.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Render
     path: ../Terminal.Gui/Views/ListView.cs
@@ -201,7 +201,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ListView.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: IsMarked
     path: ../Terminal.Gui/Views/ListView.cs
@@ -242,7 +242,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ListView.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: SetMark
     path: ../Terminal.Gui/Views/ListView.cs
@@ -283,7 +283,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ListView.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ToList
     path: ../Terminal.Gui/Views/ListView.cs

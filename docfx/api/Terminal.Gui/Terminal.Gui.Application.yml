@@ -9,7 +9,7 @@ items:
   - Terminal.Gui.Application.Current
   - Terminal.Gui.Application.CurrentView
   - Terminal.Gui.Application.Driver
-  - Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
+  - Terminal.Gui.Application.End(Terminal.Gui.Application.RunState,System.Boolean)
   - Terminal.Gui.Application.GrabMouse(Terminal.Gui.View)
   - Terminal.Gui.Application.Init
   - Terminal.Gui.Application.Iteration
@@ -21,10 +21,10 @@ items:
   - Terminal.Gui.Application.Resized
   - Terminal.Gui.Application.RootMouseEvent
   - Terminal.Gui.Application.Run
-  - Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
+  - Terminal.Gui.Application.Run(Terminal.Gui.Toplevel,System.Boolean)
   - Terminal.Gui.Application.Run``1
   - Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)
-  - Terminal.Gui.Application.Shutdown
+  - Terminal.Gui.Application.Shutdown(System.Boolean)
   - Terminal.Gui.Application.Top
   - Terminal.Gui.Application.UngrabMouse
   - Terminal.Gui.Application.UseSystemConsole
@@ -37,12 +37,12 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Application
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2003
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 41
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -82,12 +82,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Driver
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2007
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 45
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -117,12 +117,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Top
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2013
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 51
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -157,12 +157,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Current
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2019
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 57
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -197,12 +197,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: CurrentView
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2025
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 63
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -237,12 +237,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: MainLoop
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2031
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 69
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -252,7 +252,7 @@ items:
     content: public static MainLoop MainLoop { get; }
     parameters: []
     return:
-      type: Mono.Terminal.MainLoop
+      type: Terminal.Gui.MainLoop
       description: The main loop.
     content.vb: Public Shared ReadOnly Property MainLoop As MainLoop
   overload: Terminal.Gui.Application.MainLoop*
@@ -277,12 +277,12 @@ items:
   type: Event
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Iteration
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2041
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 79
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -313,12 +313,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: MakeCenteredRect
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2048
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 86
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -354,12 +354,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: UseSystemConsole
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2090
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 128
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -389,17 +389,17 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Init
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2106
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 144
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
   summary: "\nInitializes a new instance of <xref href=\"Terminal.Gui\" data-throw-if-not-resolved=\"false\"></xref> Application. \n"
-  remarks: "\n<p>\nCall this method once per instance (or after <xref href=\"Terminal.Gui.Application.Shutdown\" data-throw-if-not-resolved=\"false\"></xref> has been called).\n</p>\n<p>\nLoads the right <xref href=\"Terminal.Gui.ConsoleDriver\" data-throw-if-not-resolved=\"false\"></xref> for the platform.\n</p>\n<p>\nCreates a <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref> and assigns it to <xref href=\"Terminal.Gui.Application.Top\" data-throw-if-not-resolved=\"false\"></xref> and <xref href=\"Terminal.Gui.Application.CurrentView\" data-throw-if-not-resolved=\"false\"></xref>\n</p>\n"
+  remarks: "\n<p>\nCall this method once per instance (or after <xref href=\"Terminal.Gui.Application.Shutdown(System.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> has been called).\n</p>\n<p>\nLoads the right <xref href=\"Terminal.Gui.ConsoleDriver\" data-throw-if-not-resolved=\"false\"></xref> for the platform.\n</p>\n<p>\nCreates a <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref> and assigns it to <xref href=\"Terminal.Gui.Application.Top\" data-throw-if-not-resolved=\"false\"></xref> and <xref href=\"Terminal.Gui.Application.CurrentView\" data-throw-if-not-resolved=\"false\"></xref>\n</p>\n"
   example: []
   syntax:
     content: public static void Init()
@@ -424,12 +424,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: GrabMouse
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2266
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 308
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -462,12 +462,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: UngrabMouse
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2277
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 319
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -496,12 +496,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: RootMouseEvent
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2286
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 328
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -531,12 +531,12 @@ items:
   type: Event
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Loaded
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2360
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 402
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -566,17 +566,17 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Begin
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2375
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 417
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
   summary: "\nBuilding block API: Prepares the provided <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref>  for execution.\n"
-  remarks: "\nThis method prepares the provided toplevel for running with the focus,\nit adds this to the list of toplevels, sets up the mainloop to process the\nevent, lays out the subviews, focuses the first element, and draws the\ntoplevel in the screen. This is usually followed by executing\nthe <xref href=\"Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> method, and then the <xref href=\"Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)\" data-throw-if-not-resolved=\"false\"></xref> method upon termination which will\nundo these changes.\n"
+  remarks: "\nThis method prepares the provided toplevel for running with the focus,\nit adds this to the list of toplevels, sets up the mainloop to process the\nevent, lays out the subviews, focuses the first element, and draws the\ntoplevel in the screen. This is usually followed by executing\nthe <xref href=\"Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> method, and then the <xref href=\"Terminal.Gui.Application.End(Terminal.Gui.Application.RunState%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> method upon termination which will\nundo these changes.\n"
   example: []
   syntax:
     content: public static Application.RunState Begin(Toplevel toplevel)
@@ -586,7 +586,7 @@ items:
       description: Toplevel to prepare execution for.
     return:
       type: Terminal.Gui.Application.RunState
-      description: The runstate handle that needs to be passed to the <xref href="Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)" data-throw-if-not-resolved="false"></xref> method upon completion.
+      description: The runstate handle that needs to be passed to the <xref href="Terminal.Gui.Application.End(Terminal.Gui.Application.RunState%2cSystem.Boolean)" data-throw-if-not-resolved="false"></xref> method upon completion.
     content.vb: Public Shared Function Begin(toplevel As Toplevel) As Application.RunState
   overload: Terminal.Gui.Application.Begin*
   modifiers.csharp:
@@ -595,37 +595,40 @@ items:
   modifiers.vb:
   - Public
   - Shared
-- uid: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
-  commentId: M:Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
-  id: End(Terminal.Gui.Application.RunState)
+- uid: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState,System.Boolean)
+  commentId: M:Terminal.Gui.Application.End(Terminal.Gui.Application.RunState,System.Boolean)
+  id: End(Terminal.Gui.Application.RunState,System.Boolean)
   parent: Terminal.Gui.Application
   langs:
   - csharp
   - vb
-  name: End(Application.RunState)
-  nameWithType: Application.End(Application.RunState)
-  fullName: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
+  name: End(Application.RunState, Boolean)
+  nameWithType: Application.End(Application.RunState, Boolean)
+  fullName: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState, System.Boolean)
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: End
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2409
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 452
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
   summary: "\nBuilding block API: completes the execution of a <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref>  that was started with <xref href=\"Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref> .\n"
   example: []
   syntax:
-    content: public static void End(Application.RunState runState)
+    content: public static void End(Application.RunState runState, bool closeDriver = true)
     parameters:
     - id: runState
       type: Terminal.Gui.Application.RunState
       description: The runstate returned by the <xref href="Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)" data-throw-if-not-resolved="false"></xref> method.
-    content.vb: Public Shared Sub End(runState As Application.RunState)
+    - id: closeDriver
+      type: System.Boolean
+      description: <code>true</code>Closes the application.<code>false</code>Closes the toplevels only.
+    content.vb: Public Shared Sub End(runState As Application.RunState, closeDriver As Boolean = True)
   overload: Terminal.Gui.Application.End*
   modifiers.csharp:
   - public
@@ -633,33 +636,37 @@ items:
   modifiers.vb:
   - Public
   - Shared
-- uid: Terminal.Gui.Application.Shutdown
-  commentId: M:Terminal.Gui.Application.Shutdown
-  id: Shutdown
+- uid: Terminal.Gui.Application.Shutdown(System.Boolean)
+  commentId: M:Terminal.Gui.Application.Shutdown(System.Boolean)
+  id: Shutdown(System.Boolean)
   parent: Terminal.Gui.Application
   langs:
   - csharp
   - vb
-  name: Shutdown()
-  nameWithType: Application.Shutdown()
-  fullName: Terminal.Gui.Application.Shutdown()
+  name: Shutdown(Boolean)
+  nameWithType: Application.Shutdown(Boolean)
+  fullName: Terminal.Gui.Application.Shutdown(System.Boolean)
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Shutdown
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2420
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 465
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: "\nShutdown an application initalized with <xref href=\"Terminal.Gui.Application.Init\" data-throw-if-not-resolved=\"false\"></xref>\n"
+  summary: "\nShutdown an application initialized with <xref href=\"Terminal.Gui.Application.Init\" data-throw-if-not-resolved=\"false\"></xref>\n"
   example: []
   syntax:
-    content: public static void Shutdown()
-    content.vb: Public Shared Sub Shutdown
+    content: public static void Shutdown(bool closeDriver = true)
+    parameters:
+    - id: closeDriver
+      type: System.Boolean
+      description: <code>true</code>Closes the application.<code>false</code>Closes toplevels only.
+    content.vb: Public Shared Sub Shutdown(closeDriver As Boolean = True)
   overload: Terminal.Gui.Application.Shutdown*
   modifiers.csharp:
   - public
@@ -680,12 +687,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Refresh
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2443
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 505
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -714,12 +721,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: RunLoop
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2478
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 540
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -756,16 +763,16 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Run
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2523
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 585
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: "\nRuns the application by calling <xref href=\"Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref> with the value of <xref href=\"Terminal.Gui.Application.Top\" data-throw-if-not-resolved=\"false\"></xref>\n"
+  summary: "\nRuns the application by calling <xref href=\"Terminal.Gui.Application.Run(Terminal.Gui.Toplevel%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> with the value of <xref href=\"Terminal.Gui.Application.Top\" data-throw-if-not-resolved=\"false\"></xref>\n"
   example: []
   syntax:
     content: public static void Run()
@@ -790,16 +797,16 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Run
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2531
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 593
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
-  summary: "\nRuns the application by calling <xref href=\"Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref> with a new instance of the specified <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref>-derived class\n"
+  summary: "\nRuns the application by calling <xref href=\"Terminal.Gui.Application.Run(Terminal.Gui.Toplevel%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> with a new instance of the specified <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref>-derived class\n"
   example: []
   syntax:
     content: >-
@@ -819,37 +826,39 @@ items:
   - Shared
   fullName.vb: Terminal.Gui.Application.Run(Of T)()
   name.vb: Run(Of T)()
-- uid: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
-  commentId: M:Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
-  id: Run(Terminal.Gui.Toplevel)
+- uid: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel,System.Boolean)
+  commentId: M:Terminal.Gui.Application.Run(Terminal.Gui.Toplevel,System.Boolean)
+  id: Run(Terminal.Gui.Toplevel,System.Boolean)
   parent: Terminal.Gui.Application
   langs:
   - csharp
   - vb
-  name: Run(Toplevel)
-  nameWithType: Application.Run(Toplevel)
-  fullName: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
+  name: Run(Toplevel, Boolean)
+  nameWithType: Application.Run(Toplevel, Boolean)
+  fullName: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel, System.Boolean)
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Run
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2561
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 623
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
   summary: "\nRuns the main loop on the given <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref> container.\n"
-  remarks: "\n<p>\n  This method is used to start processing events\n  for the main application, but it is also used to\n  run other modal <xref href=\"Terminal.Gui.View\" data-throw-if-not-resolved=\"false\"></xref>s such as <xref href=\"Terminal.Gui.Dialog\" data-throw-if-not-resolved=\"false\"></xref> boxes.\n</p>\n<p>\n  To make a <xref href=\"Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref> stop execution, call <xref href=\"Terminal.Gui.Application.RequestStop\" data-throw-if-not-resolved=\"false\"></xref>.\n</p>\n<p>\n  Calling <xref href=\"Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref> is equivalent to calling <xref href=\"Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref>, followed by <xref href=\"Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref>,\n  and then calling <xref href=\"Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)\" data-throw-if-not-resolved=\"false\"></xref>.\n</p>\n<p>\n  Alternatively, to have a program control the main loop and \n  process events manually, call <xref href=\"Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref> to set things up manually and then\n  repeatedly call <xref href=\"Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> with the wait parameter set to false.   By doing this\n  the <xref href=\"Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> method will only process any pending events, timers, idle handlers and\n  then return control immediately.\n</p>\n"
+  remarks: "\n<p>\n  This method is used to start processing events\n  for the main application, but it is also used to\n  run other modal <xref href=\"Terminal.Gui.View\" data-throw-if-not-resolved=\"false\"></xref>s such as <xref href=\"Terminal.Gui.Dialog\" data-throw-if-not-resolved=\"false\"></xref> boxes.\n</p>\n<p>\n  To make a <xref href=\"Terminal.Gui.Application.Run(Terminal.Gui.Toplevel%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> stop execution, call <xref href=\"Terminal.Gui.Application.RequestStop\" data-throw-if-not-resolved=\"false\"></xref>.\n</p>\n<p>\n  Calling <xref href=\"Terminal.Gui.Application.Run(Terminal.Gui.Toplevel%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> is equivalent to calling <xref href=\"Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref>, followed by <xref href=\"Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref>,\n  and then calling <xref href=\"Terminal.Gui.Application.End(Terminal.Gui.Application.RunState%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref>.\n</p>\n<p>\n  Alternatively, to have a program control the main loop and \n  process events manually, call <xref href=\"Terminal.Gui.Application.Begin(Terminal.Gui.Toplevel)\" data-throw-if-not-resolved=\"false\"></xref> to set things up manually and then\n  repeatedly call <xref href=\"Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> with the wait parameter set to false.   By doing this\n  the <xref href=\"Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState%2cSystem.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> method will only process any pending events, timers, idle handlers and\n  then return control immediately.\n</p>\n"
   example: []
   syntax:
-    content: public static void Run(Toplevel view)
+    content: public static void Run(Toplevel view, bool closeDriver = true)
     parameters:
     - id: view
       type: Terminal.Gui.Toplevel
-    content.vb: Public Shared Sub Run(view As Toplevel)
+    - id: closeDriver
+      type: System.Boolean
+    content.vb: Public Shared Sub Run(view As Toplevel, closeDriver As Boolean = True)
   overload: Terminal.Gui.Application.Run*
   modifiers.csharp:
   - public
@@ -870,12 +879,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: RequestStop
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2579
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 641
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -905,12 +914,12 @@ items:
   type: Event
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Resized
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2601
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 663
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1272,17 +1281,12 @@ references:
   name: MainLoop
   nameWithType: Application.MainLoop
   fullName: Terminal.Gui.Application.MainLoop
-- uid: Mono.Terminal.MainLoop
-  commentId: T:Mono.Terminal.MainLoop
-  parent: Mono.Terminal
+- uid: Terminal.Gui.MainLoop
+  commentId: T:Terminal.Gui.MainLoop
+  parent: Terminal.Gui
   name: MainLoop
   nameWithType: MainLoop
-  fullName: Mono.Terminal.MainLoop
-- uid: Mono.Terminal
-  commentId: N:Mono.Terminal
-  name: Mono.Terminal
-  nameWithType: Mono.Terminal
-  fullName: Mono.Terminal
+  fullName: Terminal.Gui.MainLoop
 - uid: System.Threading.Timeout
   commentId: T:System.Threading.Timeout
   isExternal: true
@@ -1317,8 +1321,8 @@ references:
   name: Boolean
   nameWithType: Boolean
   fullName: System.Boolean
-- uid: Terminal.Gui.Application.Shutdown
-  commentId: M:Terminal.Gui.Application.Shutdown
+- uid: Terminal.Gui.Application.Shutdown(System.Boolean)
+  commentId: M:Terminal.Gui.Application.Shutdown(System.Boolean)
   isExternal: true
 - uid: Terminal.Gui.Application.CurrentView
   commentId: P:Terminal.Gui.Application.CurrentView
@@ -1500,8 +1504,8 @@ references:
   - name: )
     nameWithType: )
     fullName: )
-- uid: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
-  commentId: M:Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
+- uid: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState,System.Boolean)
+  commentId: M:Terminal.Gui.Application.End(Terminal.Gui.Application.RunState,System.Boolean)
   isExternal: true
 - uid: Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)
   commentId: M:Terminal.Gui.Application.RunLoop(Terminal.Gui.Application.RunState,System.Boolean)
@@ -1543,8 +1547,8 @@ references:
   name: RunLoop
   nameWithType: Application.RunLoop
   fullName: Terminal.Gui.Application.RunLoop
-- uid: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
-  commentId: M:Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
+- uid: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel,System.Boolean)
+  commentId: M:Terminal.Gui.Application.Run(Terminal.Gui.Toplevel,System.Boolean)
   isExternal: true
 - uid: Terminal.Gui.Application.Run*
   commentId: Overload:Terminal.Gui.Application.Run

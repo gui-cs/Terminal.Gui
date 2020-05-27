@@ -22,11 +22,11 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Dim
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 356
   assemblies:
   - Terminal.Gui
@@ -66,11 +66,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Percent
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 403
   assemblies:
   - Terminal.Gui
@@ -108,11 +108,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Fill
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 457
   assemblies:
   - Terminal.Gui
@@ -149,11 +149,11 @@ items:
   type: Operator
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: op_Implicit
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 472
   assemblies:
   - Terminal.Gui
@@ -193,11 +193,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Sized
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 482
   assemblies:
   - Terminal.Gui
@@ -234,11 +234,11 @@ items:
   type: Operator
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: op_Addition
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 514
   assemblies:
   - Terminal.Gui
@@ -278,11 +278,11 @@ items:
   type: Operator
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: op_Subtraction
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 525
   assemblies:
   - Terminal.Gui
@@ -322,11 +322,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Width
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 554
   assemblies:
   - Terminal.Gui
@@ -363,11 +363,11 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Types/PosDim.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/PosDim.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Height
-    path: ../Terminal.Gui/Types/PosDim.cs
+    path: ../Terminal.Gui/Core/PosDim.cs
     startLine: 561
   assemblies:
   - Terminal.Gui

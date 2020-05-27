@@ -19,12 +19,12 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ColorScheme
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 157
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 153
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -62,12 +62,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Normal
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 168
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 164
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -99,12 +99,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Focus
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 173
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 169
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -136,12 +136,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: HotNormal
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 178
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 174
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -173,12 +173,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: HotFocus
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 183
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 179
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -210,12 +210,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Disabled
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 188
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 184
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui

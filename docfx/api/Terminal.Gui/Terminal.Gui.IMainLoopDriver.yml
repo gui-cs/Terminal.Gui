@@ -1,0 +1,209 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.IMainLoopDriver
+  commentId: T:Terminal.Gui.IMainLoopDriver
+  id: IMainLoopDriver
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.IMainLoopDriver.EventsPending(System.Boolean)
+  - Terminal.Gui.IMainLoopDriver.MainIteration
+  - Terminal.Gui.IMainLoopDriver.Setup(Terminal.Gui.MainLoop)
+  - Terminal.Gui.IMainLoopDriver.Wakeup
+  langs:
+  - csharp
+  - vb
+  name: IMainLoopDriver
+  nameWithType: IMainLoopDriver
+  fullName: Terminal.Gui.IMainLoopDriver
+  type: Interface
+  source:
+    remote:
+      path: Terminal.Gui/Core/MainLoop.cs
+      branch: reorg
+      repo: tig:tig/gui.cs.git
+    id: IMainLoopDriver
+    path: ../Terminal.Gui/Core/MainLoop.cs
+    startLine: 13
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nPublic interface to create your own platform specific main loop driver.\n"
+  example: []
+  syntax:
+    content: public interface IMainLoopDriver
+    content.vb: Public Interface IMainLoopDriver
+  modifiers.csharp:
+  - public
+  - interface
+  modifiers.vb:
+  - Public
+  - Interface
+- uid: Terminal.Gui.IMainLoopDriver.Setup(Terminal.Gui.MainLoop)
+  commentId: M:Terminal.Gui.IMainLoopDriver.Setup(Terminal.Gui.MainLoop)
+  id: Setup(Terminal.Gui.MainLoop)
+  parent: Terminal.Gui.IMainLoopDriver
+  langs:
+  - csharp
+  - vb
+  name: Setup(MainLoop)
+  nameWithType: IMainLoopDriver.Setup(MainLoop)
+  fullName: Terminal.Gui.IMainLoopDriver.Setup(Terminal.Gui.MainLoop)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core/MainLoop.cs
+      branch: reorg
+      repo: tig:tig/gui.cs.git
+    id: Setup
+    path: ../Terminal.Gui/Core/MainLoop.cs
+    startLine: 18
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nInitializes the main loop driver, gets the calling main loop for the initialization.\n"
+  example: []
+  syntax:
+    content: void Setup(MainLoop mainLoop)
+    parameters:
+    - id: mainLoop
+      type: Terminal.Gui.MainLoop
+      description: Main loop.
+    content.vb: Sub Setup(mainLoop As MainLoop)
+  overload: Terminal.Gui.IMainLoopDriver.Setup*
+- uid: Terminal.Gui.IMainLoopDriver.Wakeup
+  commentId: M:Terminal.Gui.IMainLoopDriver.Wakeup
+  id: Wakeup
+  parent: Terminal.Gui.IMainLoopDriver
+  langs:
+  - csharp
+  - vb
+  name: Wakeup()
+  nameWithType: IMainLoopDriver.Wakeup()
+  fullName: Terminal.Gui.IMainLoopDriver.Wakeup()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core/MainLoop.cs
+      branch: reorg
+      repo: tig:tig/gui.cs.git
+    id: Wakeup
+    path: ../Terminal.Gui/Core/MainLoop.cs
+    startLine: 23
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nWakes up the mainloop that might be waiting on input, must be thread safe.\n"
+  example: []
+  syntax:
+    content: void Wakeup()
+    content.vb: Sub Wakeup
+  overload: Terminal.Gui.IMainLoopDriver.Wakeup*
+- uid: Terminal.Gui.IMainLoopDriver.EventsPending(System.Boolean)
+  commentId: M:Terminal.Gui.IMainLoopDriver.EventsPending(System.Boolean)
+  id: EventsPending(System.Boolean)
+  parent: Terminal.Gui.IMainLoopDriver
+  langs:
+  - csharp
+  - vb
+  name: EventsPending(Boolean)
+  nameWithType: IMainLoopDriver.EventsPending(Boolean)
+  fullName: Terminal.Gui.IMainLoopDriver.EventsPending(System.Boolean)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core/MainLoop.cs
+      branch: reorg
+      repo: tig:tig/gui.cs.git
+    id: EventsPending
+    path: ../Terminal.Gui/Core/MainLoop.cs
+    startLine: 30
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nMust report whether there are any events pending, or even block waiting for events.\n"
+  example: []
+  syntax:
+    content: bool EventsPending(bool wait)
+    parameters:
+    - id: wait
+      type: System.Boolean
+      description: If set to <code>true</code> wait until an event is available, otherwise return immediately.
+    return:
+      type: System.Boolean
+      description: <code>true</code>, if there were pending events, <code>false</code> otherwise.
+    content.vb: Function EventsPending(wait As Boolean) As Boolean
+  overload: Terminal.Gui.IMainLoopDriver.EventsPending*
+- uid: Terminal.Gui.IMainLoopDriver.MainIteration
+  commentId: M:Terminal.Gui.IMainLoopDriver.MainIteration
+  id: MainIteration
+  parent: Terminal.Gui.IMainLoopDriver
+  langs:
+  - csharp
+  - vb
+  name: MainIteration()
+  nameWithType: IMainLoopDriver.MainIteration()
+  fullName: Terminal.Gui.IMainLoopDriver.MainIteration()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core/MainLoop.cs
+      branch: reorg
+      repo: tig:tig/gui.cs.git
+    id: MainIteration
+    path: ../Terminal.Gui/Core/MainLoop.cs
+    startLine: 35
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nThe interation function.\n"
+  example: []
+  syntax:
+    content: void MainIteration()
+    content.vb: Sub MainIteration
+  overload: Terminal.Gui.IMainLoopDriver.MainIteration*
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+- uid: Terminal.Gui.IMainLoopDriver.Setup*
+  commentId: Overload:Terminal.Gui.IMainLoopDriver.Setup
+  name: Setup
+  nameWithType: IMainLoopDriver.Setup
+  fullName: Terminal.Gui.IMainLoopDriver.Setup
+- uid: Terminal.Gui.MainLoop
+  commentId: T:Terminal.Gui.MainLoop
+  parent: Terminal.Gui
+  name: MainLoop
+  nameWithType: MainLoop
+  fullName: Terminal.Gui.MainLoop
+- uid: Terminal.Gui.IMainLoopDriver.Wakeup*
+  commentId: Overload:Terminal.Gui.IMainLoopDriver.Wakeup
+  name: Wakeup
+  nameWithType: IMainLoopDriver.Wakeup
+  fullName: Terminal.Gui.IMainLoopDriver.Wakeup
+- uid: Terminal.Gui.IMainLoopDriver.EventsPending*
+  commentId: Overload:Terminal.Gui.IMainLoopDriver.EventsPending
+  name: EventsPending
+  nameWithType: IMainLoopDriver.EventsPending
+  fullName: Terminal.Gui.IMainLoopDriver.EventsPending
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.IMainLoopDriver.MainIteration*
+  commentId: Overload:Terminal.Gui.IMainLoopDriver.MainIteration
+  name: MainIteration
+  nameWithType: IMainLoopDriver.MainIteration
+  fullName: Terminal.Gui.IMainLoopDriver.MainIteration
+shouldSkipMarkup: true

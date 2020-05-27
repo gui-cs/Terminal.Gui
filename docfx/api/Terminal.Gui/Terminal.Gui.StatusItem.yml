@@ -19,7 +19,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/StatusBar.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: StatusItem
     path: ../Terminal.Gui/Views/StatusBar.cs
@@ -62,7 +62,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/StatusBar.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/StatusBar.cs
@@ -104,7 +104,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/StatusBar.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Shortcut
     path: ../Terminal.Gui/Views/StatusBar.cs
@@ -141,7 +141,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/StatusBar.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Title
     path: ../Terminal.Gui/Views/StatusBar.cs
@@ -180,7 +180,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/StatusBar.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Action
     path: ../Terminal.Gui/Views/StatusBar.cs

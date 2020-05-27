@@ -24,6 +24,7 @@ items:
   - Terminal.Gui.FrameView
   - Terminal.Gui.HexView
   - Terminal.Gui.IListDataSource
+  - Terminal.Gui.IMainLoopDriver
   - Terminal.Gui.Key
   - Terminal.Gui.KeyEvent
   - Terminal.Gui.Label
@@ -31,6 +32,7 @@ items:
   - Terminal.Gui.ListView
   - Terminal.Gui.ListViewItemEventArgs
   - Terminal.Gui.ListWrapper
+  - Terminal.Gui.MainLoop
   - Terminal.Gui.MenuBar
   - Terminal.Gui.MenuBarItem
   - Terminal.Gui.MenuItem
@@ -56,6 +58,8 @@ items:
   - Terminal.Gui.TextView
   - Terminal.Gui.TimeField
   - Terminal.Gui.Toplevel
+  - Terminal.Gui.UnixMainLoop
+  - Terminal.Gui.UnixMainLoop.Condition
   - Terminal.Gui.View
   - Terminal.Gui.View.KeyEventEventArgs
   - Terminal.Gui.Window
@@ -69,41 +73,22 @@ items:
   assemblies:
   - Terminal.Gui
 references:
-- uid: Terminal.Gui.Responder
-  commentId: T:Terminal.Gui.Responder
+- uid: Terminal.Gui.CursesDriver
+  commentId: T:Terminal.Gui.CursesDriver
+  name: CursesDriver
+  nameWithType: CursesDriver
+  fullName: Terminal.Gui.CursesDriver
+- uid: Terminal.Gui.UnixMainLoop
+  commentId: T:Terminal.Gui.UnixMainLoop
+  name: UnixMainLoop
+  nameWithType: UnixMainLoop
+  fullName: Terminal.Gui.UnixMainLoop
+- uid: Terminal.Gui.UnixMainLoop.Condition
+  commentId: T:Terminal.Gui.UnixMainLoop.Condition
   parent: Terminal.Gui
-  name: Responder
-  nameWithType: Responder
-  fullName: Terminal.Gui.Responder
-- uid: Terminal.Gui.LayoutStyle
-  commentId: T:Terminal.Gui.LayoutStyle
-  parent: Terminal.Gui
-  name: LayoutStyle
-  nameWithType: LayoutStyle
-  fullName: Terminal.Gui.LayoutStyle
-- uid: Terminal.Gui.View
-  commentId: T:Terminal.Gui.View
-  parent: Terminal.Gui
-  name: View
-  nameWithType: View
-  fullName: Terminal.Gui.View
-- uid: Terminal.Gui.View.KeyEventEventArgs
-  commentId: T:Terminal.Gui.View.KeyEventEventArgs
-  name: View.KeyEventEventArgs
-  nameWithType: View.KeyEventEventArgs
-  fullName: Terminal.Gui.View.KeyEventEventArgs
-- uid: Terminal.Gui.Toplevel
-  commentId: T:Terminal.Gui.Toplevel
-  parent: Terminal.Gui
-  name: Toplevel
-  nameWithType: Toplevel
-  fullName: Terminal.Gui.Toplevel
-- uid: Terminal.Gui.Window
-  commentId: T:Terminal.Gui.Window
-  parent: Terminal.Gui
-  name: Window
-  nameWithType: Window
-  fullName: Terminal.Gui.Window
+  name: UnixMainLoop.Condition
+  nameWithType: UnixMainLoop.Condition
+  fullName: Terminal.Gui.UnixMainLoop.Condition
 - uid: Terminal.Gui.Application
   commentId: T:Terminal.Gui.Application
   name: Application
@@ -120,33 +105,6 @@ references:
   name: Application.ResizedEventArgs
   nameWithType: Application.ResizedEventArgs
   fullName: Terminal.Gui.Application.ResizedEventArgs
-- uid: Terminal.Gui.Dialog
-  commentId: T:Terminal.Gui.Dialog
-  parent: Terminal.Gui
-  name: Dialog
-  nameWithType: Dialog
-  fullName: Terminal.Gui.Dialog
-- uid: Terminal.Gui.FileDialog
-  commentId: T:Terminal.Gui.FileDialog
-  parent: Terminal.Gui
-  name: FileDialog
-  nameWithType: FileDialog
-  fullName: Terminal.Gui.FileDialog
-- uid: Terminal.Gui.SaveDialog
-  commentId: T:Terminal.Gui.SaveDialog
-  name: SaveDialog
-  nameWithType: SaveDialog
-  fullName: Terminal.Gui.SaveDialog
-- uid: Terminal.Gui.OpenDialog
-  commentId: T:Terminal.Gui.OpenDialog
-  name: OpenDialog
-  nameWithType: OpenDialog
-  fullName: Terminal.Gui.OpenDialog
-- uid: Terminal.Gui.MessageBox
-  commentId: T:Terminal.Gui.MessageBox
-  name: MessageBox
-  nameWithType: MessageBox
-  fullName: Terminal.Gui.MessageBox
 - uid: Terminal.Gui.Color
   commentId: T:Terminal.Gui.Color
   parent: Terminal.Gui
@@ -182,11 +140,6 @@ references:
   name: ConsoleDriver
   nameWithType: ConsoleDriver
   fullName: Terminal.Gui.ConsoleDriver
-- uid: Terminal.Gui.CursesDriver
-  commentId: T:Terminal.Gui.CursesDriver
-  name: CursesDriver
-  nameWithType: CursesDriver
-  fullName: Terminal.Gui.CursesDriver
 - uid: Terminal.Gui.Key
   commentId: T:Terminal.Gui.Key
   parent: Terminal.Gui
@@ -211,12 +164,18 @@ references:
   name: MouseEvent
   nameWithType: MouseEvent
   fullName: Terminal.Gui.MouseEvent
-- uid: Terminal.Gui.Point
-  commentId: T:Terminal.Gui.Point
+- uid: Terminal.Gui.IMainLoopDriver
+  commentId: T:Terminal.Gui.IMainLoopDriver
   parent: Terminal.Gui
-  name: Point
-  nameWithType: Point
-  fullName: Terminal.Gui.Point
+  name: IMainLoopDriver
+  nameWithType: IMainLoopDriver
+  fullName: Terminal.Gui.IMainLoopDriver
+- uid: Terminal.Gui.MainLoop
+  commentId: T:Terminal.Gui.MainLoop
+  parent: Terminal.Gui
+  name: MainLoop
+  nameWithType: MainLoop
+  fullName: Terminal.Gui.MainLoop
 - uid: Terminal.Gui.Pos
   commentId: T:Terminal.Gui.Pos
   parent: Terminal.Gui
@@ -229,6 +188,47 @@ references:
   name: Dim
   nameWithType: Dim
   fullName: Terminal.Gui.Dim
+- uid: Terminal.Gui.Responder
+  commentId: T:Terminal.Gui.Responder
+  parent: Terminal.Gui
+  name: Responder
+  nameWithType: Responder
+  fullName: Terminal.Gui.Responder
+- uid: Terminal.Gui.Toplevel
+  commentId: T:Terminal.Gui.Toplevel
+  parent: Terminal.Gui
+  name: Toplevel
+  nameWithType: Toplevel
+  fullName: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.LayoutStyle
+  commentId: T:Terminal.Gui.LayoutStyle
+  parent: Terminal.Gui
+  name: LayoutStyle
+  nameWithType: LayoutStyle
+  fullName: Terminal.Gui.LayoutStyle
+- uid: Terminal.Gui.View
+  commentId: T:Terminal.Gui.View
+  parent: Terminal.Gui
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui.View.KeyEventEventArgs
+  commentId: T:Terminal.Gui.View.KeyEventEventArgs
+  name: View.KeyEventEventArgs
+  nameWithType: View.KeyEventEventArgs
+  fullName: Terminal.Gui.View.KeyEventEventArgs
+- uid: Terminal.Gui.Window
+  commentId: T:Terminal.Gui.Window
+  parent: Terminal.Gui
+  name: Window
+  nameWithType: Window
+  fullName: Terminal.Gui.Window
+- uid: Terminal.Gui.Point
+  commentId: T:Terminal.Gui.Point
+  parent: Terminal.Gui
+  name: Point
+  nameWithType: Point
+  fullName: Terminal.Gui.Point
 - uid: Terminal.Gui.Rect
   commentId: T:Terminal.Gui.Rect
   parent: Terminal.Gui
@@ -375,6 +375,33 @@ references:
   name: TimeField
   nameWithType: TimeField
   fullName: Terminal.Gui.TimeField
+- uid: Terminal.Gui.Dialog
+  commentId: T:Terminal.Gui.Dialog
+  parent: Terminal.Gui
+  name: Dialog
+  nameWithType: Dialog
+  fullName: Terminal.Gui.Dialog
+- uid: Terminal.Gui.FileDialog
+  commentId: T:Terminal.Gui.FileDialog
+  parent: Terminal.Gui
+  name: FileDialog
+  nameWithType: FileDialog
+  fullName: Terminal.Gui.FileDialog
+- uid: Terminal.Gui.SaveDialog
+  commentId: T:Terminal.Gui.SaveDialog
+  name: SaveDialog
+  nameWithType: SaveDialog
+  fullName: Terminal.Gui.SaveDialog
+- uid: Terminal.Gui.OpenDialog
+  commentId: T:Terminal.Gui.OpenDialog
+  name: OpenDialog
+  nameWithType: OpenDialog
+  fullName: Terminal.Gui.OpenDialog
+- uid: Terminal.Gui.MessageBox
+  commentId: T:Terminal.Gui.MessageBox
+  name: MessageBox
+  nameWithType: MessageBox
+  fullName: Terminal.Gui.MessageBox
 - uid: Terminal.Gui
   commentId: N:Terminal.Gui
   name: Terminal.Gui

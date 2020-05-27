@@ -26,12 +26,12 @@ items:
   type: Enum
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: SpecialChar
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 364
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 360
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -59,12 +59,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: HLine
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 368
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 364
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -93,12 +93,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: VLine
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 373
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 369
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -127,12 +127,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Stipple
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 378
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 374
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -161,12 +161,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Diamond
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 383
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 379
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -195,12 +195,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ULCorner
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 388
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 384
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -229,12 +229,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: LLCorner
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 393
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 389
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -263,12 +263,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: URCorner
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 398
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 394
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -297,12 +297,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: LRCorner
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 403
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 399
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -331,12 +331,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: LeftTee
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 408
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 404
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -365,12 +365,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: RightTee
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 413
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 409
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -399,12 +399,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: TopTee
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 418
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 414
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -433,12 +433,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: BottomTee
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 423
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 419
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui

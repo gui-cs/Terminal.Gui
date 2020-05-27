@@ -22,12 +22,12 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: KeyEvent
-    path: ../Terminal.Gui/Event.cs
-    startLine: 290
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 298
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -64,12 +64,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Key
-    path: ../Terminal.Gui/Event.cs
-    startLine: 294
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 302
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -97,12 +97,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: KeyValue
-    path: ../Terminal.Gui/Event.cs
-    startLine: 301
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 309
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -134,12 +134,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: IsShift
-    path: ../Terminal.Gui/Event.cs
-    startLine: 307
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 315
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -172,12 +172,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: IsAlt
-    path: ../Terminal.Gui/Event.cs
-    startLine: 313
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 321
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -210,12 +210,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: IsCtrl
-    path: ../Terminal.Gui/Event.cs
-    startLine: 320
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 328
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -248,12 +248,12 @@ items:
   type: Constructor
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
-    path: ../Terminal.Gui/Event.cs
-    startLine: 325
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 333
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -280,12 +280,12 @@ items:
   type: Constructor
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
-    path: ../Terminal.Gui/Event.cs
-    startLine: 333
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 341
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -315,12 +315,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Event.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Event.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ToString
-    path: ../Terminal.Gui/Event.cs
-    startLine: 339
+    path: ../Terminal.Gui/Core/Event.cs
+    startLine: 347
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui

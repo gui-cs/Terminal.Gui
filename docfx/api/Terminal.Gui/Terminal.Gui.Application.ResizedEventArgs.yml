@@ -16,12 +16,12 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ResizedEventArgs
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2587
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 649
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -64,12 +64,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Rows
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2591
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 653
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -101,12 +101,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Application.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Cols
-    path: ../Terminal.Gui/Core.cs
-    startLine: 2595
+    path: ../Terminal.Gui/Core/Application.cs
+    startLine: 657
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui

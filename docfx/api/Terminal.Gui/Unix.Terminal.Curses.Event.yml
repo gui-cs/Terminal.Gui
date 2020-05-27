@@ -39,11 +39,11 @@ items:
   type: Enum
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Event
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 54
   assemblies:
   - Terminal.Gui
@@ -70,11 +70,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button1Pressed
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 55
   assemblies:
   - Terminal.Gui
@@ -102,11 +102,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button1Released
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 56
   assemblies:
   - Terminal.Gui
@@ -134,11 +134,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button1Clicked
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 57
   assemblies:
   - Terminal.Gui
@@ -166,11 +166,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button1DoubleClicked
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 58
   assemblies:
   - Terminal.Gui
@@ -198,11 +198,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button1TripleClicked
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 59
   assemblies:
   - Terminal.Gui
@@ -230,11 +230,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button2Pressed
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 60
   assemblies:
   - Terminal.Gui
@@ -262,11 +262,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button2Released
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 61
   assemblies:
   - Terminal.Gui
@@ -294,11 +294,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button2Clicked
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 62
   assemblies:
   - Terminal.Gui
@@ -326,11 +326,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button2DoubleClicked
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 63
   assemblies:
   - Terminal.Gui
@@ -358,11 +358,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button2TrippleClicked
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 64
   assemblies:
   - Terminal.Gui
@@ -390,11 +390,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button3Pressed
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 65
   assemblies:
   - Terminal.Gui
@@ -422,11 +422,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button3Released
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 66
   assemblies:
   - Terminal.Gui
@@ -454,11 +454,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button3Clicked
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 67
   assemblies:
   - Terminal.Gui
@@ -486,11 +486,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button3DoubleClicked
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 68
   assemblies:
   - Terminal.Gui
@@ -518,11 +518,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button3TripleClicked
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 69
   assemblies:
   - Terminal.Gui
@@ -550,11 +550,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button4Pressed
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 70
   assemblies:
   - Terminal.Gui
@@ -582,11 +582,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button4Released
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 71
   assemblies:
   - Terminal.Gui
@@ -614,11 +614,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button4Clicked
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 72
   assemblies:
   - Terminal.Gui
@@ -646,11 +646,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button4DoubleClicked
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 73
   assemblies:
   - Terminal.Gui
@@ -678,11 +678,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Button4TripleClicked
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 74
   assemblies:
   - Terminal.Gui
@@ -710,11 +710,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ButtonShift
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 75
   assemblies:
   - Terminal.Gui
@@ -742,11 +742,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ButtonCtrl
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 76
   assemblies:
   - Terminal.Gui
@@ -774,11 +774,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ButtonAlt
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 77
   assemblies:
   - Terminal.Gui
@@ -806,11 +806,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ReportMousePosition
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 78
   assemblies:
   - Terminal.Gui
@@ -838,11 +838,11 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/MonoCurses/constants.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: AllEvents
-    path: ../Terminal.Gui/MonoCurses/constants.cs
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/constants.cs
     startLine: 79
   assemblies:
   - Terminal.Gui

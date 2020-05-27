@@ -20,7 +20,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ProgressBar.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ProgressBar
     path: ../Terminal.Gui/Views/ProgressBar.cs
@@ -140,7 +140,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ProgressBar.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/ProgressBar.cs
@@ -176,7 +176,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ProgressBar.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: .ctor
     path: ../Terminal.Gui/Views/ProgressBar.cs
@@ -208,7 +208,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ProgressBar.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Fraction
     path: ../Terminal.Gui/Views/ProgressBar.cs
@@ -246,7 +246,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ProgressBar.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Pulse
     path: ../Terminal.Gui/Views/ProgressBar.cs
@@ -279,7 +279,7 @@ items:
   source:
     remote:
       path: Terminal.Gui/Views/ProgressBar.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Redraw
     path: ../Terminal.Gui/Views/ProgressBar.cs

@@ -27,7 +27,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Scenario
     path: ../UICatalog/Scenario.cs
@@ -75,7 +75,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Top
     path: ../UICatalog/Scenario.cs
@@ -112,7 +112,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Win
     path: ../UICatalog/Scenario.cs
@@ -149,7 +149,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Init
     path: ../UICatalog/Scenario.cs
@@ -188,7 +188,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: GetName
     path: ../UICatalog/Scenario.cs
@@ -223,7 +223,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: GetDescription
     path: ../UICatalog/Scenario.cs
@@ -258,7 +258,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: GetCategories
     path: ../UICatalog/Scenario.cs
@@ -293,7 +293,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ToString
     path: ../UICatalog/Scenario.cs
@@ -329,7 +329,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Setup
     path: ../UICatalog/Scenario.cs
@@ -364,7 +364,7 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Run
     path: ../UICatalog/Scenario.cs
@@ -373,7 +373,7 @@ items:
   - UICatalog
   namespace: UICatalog
   summary: "\nRuns the <xref href=\"UICatalog.Scenario\" data-throw-if-not-resolved=\"false\"></xref>. Override to start the <xref href=\"UICatalog.Scenario\" data-throw-if-not-resolved=\"false\"></xref> using a <xref href=\"Terminal.Gui.Toplevel\" data-throw-if-not-resolved=\"false\"></xref> different than `Top`.\n\n"
-  remarks: "\nOverrides that do not call the base.<xref href=\"UICatalog.Scenario.Run\" data-throw-if-not-resolved=\"false\"></xref>, must call <xref href=\"Terminal.Gui.Application.Shutdown\" data-throw-if-not-resolved=\"false\"></xref> before returning.\n"
+  remarks: "\nOverrides that do not call the base.<xref href=\"UICatalog.Scenario.Run\" data-throw-if-not-resolved=\"false\"></xref>, must call <xref href=\"Terminal.Gui.Application.Shutdown(System.Boolean)\" data-throw-if-not-resolved=\"false\"></xref> before returning.\n"
   example: []
   syntax:
     content: public virtual void Run()
@@ -399,11 +399,11 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: RequestStop
     path: ../UICatalog/Scenario.cs
-    startLine: 207
+    startLine: 204
   assemblies:
   - UICatalog
   namespace: UICatalog
@@ -433,11 +433,11 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Dispose
     path: ../UICatalog/Scenario.cs
-    startLine: 240
+    startLine: 237
   assemblies:
   - UICatalog
   namespace: UICatalog
@@ -468,11 +468,11 @@ items:
   source:
     remote:
       path: UICatalog/Scenario.cs
-      branch: docs_tweaks
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Dispose
     path: ../UICatalog/Scenario.cs
-    startLine: 253
+    startLine: 250
   assemblies:
   - UICatalog
   namespace: UICatalog
@@ -983,8 +983,8 @@ references:
   name: Setup
   nameWithType: Scenario.Setup
   fullName: UICatalog.Scenario.Setup
-- uid: Terminal.Gui.Application.Shutdown
-  commentId: M:Terminal.Gui.Application.Shutdown
+- uid: Terminal.Gui.Application.Shutdown(System.Boolean)
+  commentId: M:Terminal.Gui.Application.Shutdown(System.Boolean)
   isExternal: true
 - uid: UICatalog.Scenario.Run*
   commentId: Overload:UICatalog.Scenario.Run

@@ -26,12 +26,12 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Responder.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Responder
-    path: ../Terminal.Gui/Core.cs
-    startLine: 27
+    path: ../Terminal.Gui/Core/Responder.cs
+    startLine: 19
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -71,12 +71,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Responder.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: CanFocus
-    path: ../Terminal.Gui/Core.cs
-    startLine: 32
+    path: ../Terminal.Gui/Core/Responder.cs
+    startLine: 24
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -111,12 +111,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Responder.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: HasFocus
-    path: ../Terminal.Gui/Core.cs
-    startLine: 38
+    path: ../Terminal.Gui/Core/Responder.cs
+    startLine: 30
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -151,12 +151,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Responder.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ProcessHotKey
-    path: ../Terminal.Gui/Core.cs
-    startLine: 63
+    path: ../Terminal.Gui/Core/Responder.cs
+    startLine: 55
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -191,12 +191,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Responder.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ProcessKey
-    path: ../Terminal.Gui/Core.cs
-    startLine: 91
+    path: ../Terminal.Gui/Core/Responder.cs
+    startLine: 83
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -232,12 +232,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Responder.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ProcessColdKey
-    path: ../Terminal.Gui/Core.cs
-    startLine: 118
+    path: ../Terminal.Gui/Core/Responder.cs
+    startLine: 110
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -273,12 +273,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Responder.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: OnKeyDown
-    path: ../Terminal.Gui/Core.cs
-    startLine: 128
+    path: ../Terminal.Gui/Core/Responder.cs
+    startLine: 120
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -314,12 +314,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Responder.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: OnKeyUp
-    path: ../Terminal.Gui/Core.cs
-    startLine: 138
+    path: ../Terminal.Gui/Core/Responder.cs
+    startLine: 130
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -355,12 +355,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Responder.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: MouseEvent
-    path: ../Terminal.Gui/Core.cs
-    startLine: 149
+    path: ../Terminal.Gui/Core/Responder.cs
+    startLine: 141
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -396,12 +396,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Responder.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: OnMouseEnter
-    path: ../Terminal.Gui/Core.cs
-    startLine: 159
+    path: ../Terminal.Gui/Core/Responder.cs
+    startLine: 151
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -437,12 +437,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Responder.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: OnMouseLeave
-    path: ../Terminal.Gui/Core.cs
-    startLine: 169
+    path: ../Terminal.Gui/Core/Responder.cs
+    startLine: 161
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -478,12 +478,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Responder.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: OnEnter
-    path: ../Terminal.Gui/Core.cs
-    startLine: 178
+    path: ../Terminal.Gui/Core/Responder.cs
+    startLine: 170
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -515,12 +515,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Core.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/Responder.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: OnLeave
-    path: ../Terminal.Gui/Core.cs
-    startLine: 187
+    path: ../Terminal.Gui/Core/Responder.cs
+    startLine: 179
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui

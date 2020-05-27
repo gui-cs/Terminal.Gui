@@ -13,6 +13,8 @@ items:
   - Terminal.Gui.ConsoleDriver.CookMouse
   - Terminal.Gui.ConsoleDriver.Diamond
   - Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
+  - Terminal.Gui.ConsoleDriver.DrawWindowFrame(Terminal.Gui.Rect,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)
+  - Terminal.Gui.ConsoleDriver.DrawWindowTitle(Terminal.Gui.Rect,NStack.ustring,System.Int32,System.Int32,System.Int32,System.Int32,Terminal.Gui.TextAlignment)
   - Terminal.Gui.ConsoleDriver.End
   - Terminal.Gui.ConsoleDriver.HLine
   - Terminal.Gui.ConsoleDriver.Init(System.Action)
@@ -21,7 +23,7 @@ items:
   - Terminal.Gui.ConsoleDriver.LRCorner
   - Terminal.Gui.ConsoleDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
   - Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
-  - Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  - Terminal.Gui.ConsoleDriver.PrepareToRun(Terminal.Gui.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
   - Terminal.Gui.ConsoleDriver.Refresh
   - Terminal.Gui.ConsoleDriver.RightTee
   - Terminal.Gui.ConsoleDriver.Rows
@@ -50,12 +52,12 @@ items:
   type: Class
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ConsoleDriver
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 430
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 426
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -97,12 +99,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: TerminalResized
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 434
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 430
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -130,12 +132,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Cols
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 439
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 435
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -169,12 +171,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Rows
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 443
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 439
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -208,12 +210,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Init
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 448
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 444
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -246,12 +248,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Move
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 454
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 450
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -287,12 +289,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: AddRune
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 459
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 455
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -325,12 +327,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: AddStr
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 464
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 460
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -350,25 +352,25 @@ items:
   modifiers.vb:
   - Public
   - MustOverride
-- uid: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
-  commentId: M:Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
-  id: PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+- uid: Terminal.Gui.ConsoleDriver.PrepareToRun(Terminal.Gui.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  commentId: M:Terminal.Gui.ConsoleDriver.PrepareToRun(Terminal.Gui.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  id: PrepareToRun(Terminal.Gui.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
   parent: Terminal.Gui.ConsoleDriver
   langs:
   - csharp
   - vb
   name: PrepareToRun(MainLoop, Action<KeyEvent>, Action<KeyEvent>, Action<KeyEvent>, Action<MouseEvent>)
   nameWithType: ConsoleDriver.PrepareToRun(MainLoop, Action<KeyEvent>, Action<KeyEvent>, Action<KeyEvent>, Action<MouseEvent>)
-  fullName: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.MouseEvent>)
+  fullName: Terminal.Gui.ConsoleDriver.PrepareToRun(Terminal.Gui.MainLoop, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.MouseEvent>)
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: PrepareToRun
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 473
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 469
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -378,7 +380,7 @@ items:
     content: public abstract void PrepareToRun(MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
     parameters:
     - id: mainLoop
-      type: Mono.Terminal.MainLoop
+      type: Terminal.Gui.MainLoop
       description: The main loop.
     - id: keyHandler
       type: System.Action{Terminal.Gui.KeyEvent}
@@ -401,7 +403,7 @@ items:
   modifiers.vb:
   - Public
   - MustOverride
-  fullName.vb: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop, System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.MouseEvent))
+  fullName.vb: Terminal.Gui.ConsoleDriver.PrepareToRun(Terminal.Gui.MainLoop, System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.MouseEvent))
   name.vb: PrepareToRun(MainLoop, Action(Of KeyEvent), Action(Of KeyEvent), Action(Of KeyEvent), Action(Of MouseEvent))
 - uid: Terminal.Gui.ConsoleDriver.Refresh
   commentId: M:Terminal.Gui.ConsoleDriver.Refresh
@@ -416,12 +418,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Refresh
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 478
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 474
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -450,12 +452,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: UpdateCursor
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 483
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 479
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -484,12 +486,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: End
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 488
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 484
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -518,12 +520,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: UpdateScreen
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 493
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 489
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -552,12 +554,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: SetAttribute
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 499
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 495
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -590,12 +592,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: SetColors
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 506
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 502
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -631,12 +633,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: SetColors
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 516
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 512
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -672,12 +674,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: SetTerminalResized
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 522
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 518
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -695,6 +697,119 @@ items:
   - public
   modifiers.vb:
   - Public
+- uid: Terminal.Gui.ConsoleDriver.DrawWindowTitle(Terminal.Gui.Rect,NStack.ustring,System.Int32,System.Int32,System.Int32,System.Int32,Terminal.Gui.TextAlignment)
+  commentId: M:Terminal.Gui.ConsoleDriver.DrawWindowTitle(Terminal.Gui.Rect,NStack.ustring,System.Int32,System.Int32,System.Int32,System.Int32,Terminal.Gui.TextAlignment)
+  id: DrawWindowTitle(Terminal.Gui.Rect,NStack.ustring,System.Int32,System.Int32,System.Int32,System.Int32,Terminal.Gui.TextAlignment)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  - vb
+  name: DrawWindowTitle(Rect, ustring, Int32, Int32, Int32, Int32, TextAlignment)
+  nameWithType: ConsoleDriver.DrawWindowTitle(Rect, ustring, Int32, Int32, Int32, Int32, TextAlignment)
+  fullName: Terminal.Gui.ConsoleDriver.DrawWindowTitle(Terminal.Gui.Rect, NStack.ustring, System.Int32, System.Int32, System.Int32, System.Int32, Terminal.Gui.TextAlignment)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
+      repo: tig:tig/gui.cs.git
+    id: DrawWindowTitle
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 537
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nDraws the title for a Window-style view incorporating padding. \n"
+  remarks: ''
+  example: []
+  syntax:
+    content: public virtual void DrawWindowTitle(Rect region, ustring title, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom, TextAlignment textAlignment = TextAlignment.Left)
+    parameters:
+    - id: region
+      type: Terminal.Gui.Rect
+      description: Screen relative region where the frame will be drawn.
+    - id: title
+      type: NStack.ustring
+      description: The title for the window. The title will only be drawn if <code>title</code> is not null or empty and paddingTop is greater than 0.
+    - id: paddingLeft
+      type: System.Int32
+      description: Number of columns to pad on the left (if 0 the border will not appear on the left).
+    - id: paddingTop
+      type: System.Int32
+      description: Number of rows to pad on the top (if 0 the border and title will not appear on the top).
+    - id: paddingRight
+      type: System.Int32
+      description: Number of columns to pad on the right (if 0 the border will not appear on the right).
+    - id: paddingBottom
+      type: System.Int32
+      description: Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).
+    - id: textAlignment
+      type: Terminal.Gui.TextAlignment
+      description: Not yet immplemented.
+    content.vb: Public Overridable Sub DrawWindowTitle(region As Rect, title As ustring, paddingLeft As Integer, paddingTop As Integer, paddingRight As Integer, paddingBottom As Integer, textAlignment As TextAlignment = TextAlignment.Left)
+  overload: Terminal.Gui.ConsoleDriver.DrawWindowTitle*
+  modifiers.csharp:
+  - public
+  - virtual
+  modifiers.vb:
+  - Public
+  - Overridable
+- uid: Terminal.Gui.ConsoleDriver.DrawWindowFrame(Terminal.Gui.Rect,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)
+  commentId: M:Terminal.Gui.ConsoleDriver.DrawWindowFrame(Terminal.Gui.Rect,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)
+  id: DrawWindowFrame(Terminal.Gui.Rect,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)
+  parent: Terminal.Gui.ConsoleDriver
+  langs:
+  - csharp
+  - vb
+  name: DrawWindowFrame(Rect, Int32, Int32, Int32, Int32, Boolean, Boolean)
+  nameWithType: ConsoleDriver.DrawWindowFrame(Rect, Int32, Int32, Int32, Int32, Boolean, Boolean)
+  fullName: Terminal.Gui.ConsoleDriver.DrawWindowFrame(Terminal.Gui.Rect, System.Int32, System.Int32, System.Int32, System.Int32, System.Boolean, System.Boolean)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
+      repo: tig:tig/gui.cs.git
+    id: DrawWindowFrame
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 559
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "\nDraws a frame for a window with padding aand n optional visible border inside the padding. \n"
+  example: []
+  syntax:
+    content: public virtual void DrawWindowFrame(Rect region, int paddingLeft = 0, int paddingTop = 0, int paddingRight = 0, int paddingBottom = 0, bool border = true, bool fill = false)
+    parameters:
+    - id: region
+      type: Terminal.Gui.Rect
+      description: Screen relative region where the frame will be drawn.
+    - id: paddingLeft
+      type: System.Int32
+      description: Number of columns to pad on the left (if 0 the border will not appear on the left).
+    - id: paddingTop
+      type: System.Int32
+      description: Number of rows to pad on the top (if 0 the border and title will not appear on the top).
+    - id: paddingRight
+      type: System.Int32
+      description: Number of columns to pad on the right (if 0 the border will not appear on the right).
+    - id: paddingBottom
+      type: System.Int32
+      description: Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).
+    - id: border
+      type: System.Boolean
+      description: If set to <code>true</code> and any padding dimension is > 0 the border will be drawn.
+    - id: fill
+      type: System.Boolean
+      description: If set to <code>true</code> it will clear the content area (the area inside the padding) with the current color, otherwise the content area will be left untouched.
+    content.vb: Public Overridable Sub DrawWindowFrame(region As Rect, paddingLeft As Integer = 0, paddingTop As Integer = 0, paddingRight As Integer = 0, paddingBottom As Integer = 0, border As Boolean = True, fill As Boolean = False)
+  overload: Terminal.Gui.ConsoleDriver.DrawWindowFrame*
+  modifiers.csharp:
+  - public
+  - virtual
+  modifiers.vb:
+  - Public
+  - Overridable
 - uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   commentId: M:Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   id: DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
@@ -708,16 +823,17 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: DrawFrame
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 533
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 684
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
   summary: "\nDraws a frame on the specified region with the specified padding around the frame.\n"
+  remarks: This is a legacy/depcrecated API. Use <xref href="Terminal.Gui.ConsoleDriver.DrawWindowFrame(Terminal.Gui.Rect%2cSystem.Int32%2cSystem.Int32%2cSystem.Int32%2cSystem.Int32%2cSystem.Boolean%2cSystem.Boolean)" data-throw-if-not-resolved="false"></xref>.
   example: []
   syntax:
     content: public virtual void DrawFrame(Rect region, int padding, bool fill)
@@ -752,12 +868,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Suspend
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 618
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 696
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -786,12 +902,12 @@ items:
   type: Property
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Clip
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 626
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 704
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -824,12 +940,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: StartReportingMouseMoves
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 634
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 712
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -858,12 +974,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: StopReportingMouseMoves
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 639
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 717
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -892,12 +1008,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: UncookMouse
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 644
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 722
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -926,12 +1042,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: CookMouse
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 649
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 727
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -960,12 +1076,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: HLine
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 654
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 732
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -993,12 +1109,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: VLine
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 659
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 737
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1026,12 +1142,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Stipple
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 664
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 742
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1059,12 +1175,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: Diamond
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 669
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 747
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1092,12 +1208,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: ULCorner
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 674
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 752
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1125,12 +1241,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: LLCorner
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 679
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 757
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1158,12 +1274,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: URCorner
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 684
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 762
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1191,12 +1307,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: LRCorner
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 689
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 767
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1224,12 +1340,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: LeftTee
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 694
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 772
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1257,12 +1373,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: RightTee
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 699
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 777
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1290,12 +1406,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: TopTee
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 704
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 782
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1323,12 +1439,12 @@ items:
   type: Field
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: BottomTee
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 709
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 787
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1356,12 +1472,12 @@ items:
   type: Method
   source:
     remote:
-      path: Terminal.Gui/Drivers/ConsoleDriver.cs
-      branch: docs_tweaks
+      path: Terminal.Gui/Core/ConsoleDriver.cs
+      branch: reorg
       repo: tig:tig/gui.cs.git
     id: MakeAttribute
-    path: ../Terminal.Gui/Drivers/ConsoleDriver.cs
-    startLine: 717
+    path: ../Terminal.Gui/Core/ConsoleDriver.cs
+    startLine: 795
   assemblies:
   - Terminal.Gui
   namespace: Terminal.Gui
@@ -1754,12 +1870,12 @@ references:
   name: PrepareToRun
   nameWithType: ConsoleDriver.PrepareToRun
   fullName: Terminal.Gui.ConsoleDriver.PrepareToRun
-- uid: Mono.Terminal.MainLoop
-  commentId: T:Mono.Terminal.MainLoop
-  parent: Mono.Terminal
+- uid: Terminal.Gui.MainLoop
+  commentId: T:Terminal.Gui.MainLoop
+  parent: Terminal.Gui
   name: MainLoop
   nameWithType: MainLoop
-  fullName: Mono.Terminal.MainLoop
+  fullName: Terminal.Gui.MainLoop
 - uid: System.Action{Terminal.Gui.KeyEvent}
   commentId: T:System.Action{Terminal.Gui.KeyEvent}
   parent: System
@@ -1844,11 +1960,6 @@ references:
   - name: )
     nameWithType: )
     fullName: )
-- uid: Mono.Terminal
-  commentId: N:Mono.Terminal
-  name: Mono.Terminal
-  nameWithType: Mono.Terminal
-  fullName: Mono.Terminal
 - uid: System.Action`1
   commentId: T:System.Action`1
   isExternal: true
@@ -1943,17 +2054,28 @@ references:
   name: SetTerminalResized
   nameWithType: ConsoleDriver.SetTerminalResized
   fullName: Terminal.Gui.ConsoleDriver.SetTerminalResized
-- uid: Terminal.Gui.ConsoleDriver.DrawFrame*
-  commentId: Overload:Terminal.Gui.ConsoleDriver.DrawFrame
-  name: DrawFrame
-  nameWithType: ConsoleDriver.DrawFrame
-  fullName: Terminal.Gui.ConsoleDriver.DrawFrame
+- uid: Terminal.Gui.ConsoleDriver.DrawWindowTitle*
+  commentId: Overload:Terminal.Gui.ConsoleDriver.DrawWindowTitle
+  name: DrawWindowTitle
+  nameWithType: ConsoleDriver.DrawWindowTitle
+  fullName: Terminal.Gui.ConsoleDriver.DrawWindowTitle
 - uid: Terminal.Gui.Rect
   commentId: T:Terminal.Gui.Rect
   parent: Terminal.Gui
   name: Rect
   nameWithType: Rect
   fullName: Terminal.Gui.Rect
+- uid: Terminal.Gui.TextAlignment
+  commentId: T:Terminal.Gui.TextAlignment
+  parent: Terminal.Gui
+  name: TextAlignment
+  nameWithType: TextAlignment
+  fullName: Terminal.Gui.TextAlignment
+- uid: Terminal.Gui.ConsoleDriver.DrawWindowFrame*
+  commentId: Overload:Terminal.Gui.ConsoleDriver.DrawWindowFrame
+  name: DrawWindowFrame
+  nameWithType: ConsoleDriver.DrawWindowFrame
+  fullName: Terminal.Gui.ConsoleDriver.DrawWindowFrame
 - uid: System.Boolean
   commentId: T:System.Boolean
   parent: System
@@ -1961,6 +2083,150 @@ references:
   name: Boolean
   nameWithType: Boolean
   fullName: System.Boolean
+- uid: Terminal.Gui.ConsoleDriver.DrawWindowFrame(Terminal.Gui.Rect,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)
+  commentId: M:Terminal.Gui.ConsoleDriver.DrawWindowFrame(Terminal.Gui.Rect,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  name: DrawWindowFrame(Rect, Int32, Int32, Int32, Int32, Boolean, Boolean)
+  nameWithType: ConsoleDriver.DrawWindowFrame(Rect, Int32, Int32, Int32, Int32, Boolean, Boolean)
+  fullName: Terminal.Gui.ConsoleDriver.DrawWindowFrame(Terminal.Gui.Rect, System.Int32, System.Int32, System.Int32, System.Int32, System.Boolean, System.Boolean)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.DrawWindowFrame(Terminal.Gui.Rect,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)
+    name: DrawWindowFrame
+    nameWithType: ConsoleDriver.DrawWindowFrame
+    fullName: Terminal.Gui.ConsoleDriver.DrawWindowFrame
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    nameWithType: Rect
+    fullName: Terminal.Gui.Rect
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.DrawWindowFrame(Terminal.Gui.Rect,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)
+    name: DrawWindowFrame
+    nameWithType: ConsoleDriver.DrawWindowFrame
+    fullName: Terminal.Gui.ConsoleDriver.DrawWindowFrame
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    nameWithType: Rect
+    fullName: Terminal.Gui.Rect
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Int32
+    name: Int32
+    nameWithType: Int32
+    fullName: System.Int32
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Boolean
+    name: Boolean
+    nameWithType: Boolean
+    fullName: System.Boolean
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: Terminal.Gui.ConsoleDriver.DrawFrame*
+  commentId: Overload:Terminal.Gui.ConsoleDriver.DrawFrame
+  name: DrawFrame
+  nameWithType: ConsoleDriver.DrawFrame
+  fullName: Terminal.Gui.ConsoleDriver.DrawFrame
+- uid: Terminal.Gui.ConsoleDriver
+  commentId: T:Terminal.Gui.ConsoleDriver
+  parent: Terminal.Gui
+  name: ConsoleDriver
+  nameWithType: ConsoleDriver
+  fullName: Terminal.Gui.ConsoleDriver
 - uid: Terminal.Gui.ConsoleDriver.Suspend*
   commentId: Overload:Terminal.Gui.ConsoleDriver.Suspend
   name: Suspend
