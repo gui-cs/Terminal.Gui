@@ -588,14 +588,14 @@ namespace Terminal.Gui {
 			if (paddingTop > 1) {
 				for (int r = region.Y; r < ftop; r++) {
 					for (int c = region.X; c <= fright + paddingRight; c++) {
-						AddRuneAt (c, r, 'T');
+						AddRuneAt (c, r, clearChar);
 					}
 				}
 			}
 
 			// Outside top-left
 			for (int c = region.X; c <= fleft; c++) {
-				AddRuneAt (c, ftop, 'L');
+				AddRuneAt (c, ftop, clearChar);
 			}
 
 			// Frame top-left corner
@@ -613,7 +613,7 @@ namespace Terminal.Gui {
 
 			// Outside top-right corner
 			for (int c = fright + 1; c < fright + paddingRight; c++) {
-				AddRuneAt (c, ftop, 'R');
+				AddRuneAt (c, ftop, clearChar);
 			}
 
 			// Left, Fill, Right
@@ -621,7 +621,7 @@ namespace Terminal.Gui {
 				for (int r = ftop + 1; r < fbottom; r++) {
 					// Outside left
 					for (int c = region.X; c < fleft; c++) {
-						AddRuneAt (c, r, 'L');
+						AddRuneAt (c, r, clearChar);
 					}
 
 					// Frame left
@@ -641,13 +641,13 @@ namespace Terminal.Gui {
 
 					// Outside right
 					for (int c = fright + 1; c < fright + paddingRight; c++) {
-						AddRuneAt (c, r, 'R');
+						AddRuneAt (c, r, clearChar);
 					}
 				}
 
 				// Outside Bottom
 				for (int c = region.X; c < fleft; c++) {
-					AddRuneAt (c, fbottom, 'L');
+					AddRuneAt (c, fbottom, clearChar);
 				}
 
 				// Frame bottom-left
@@ -665,7 +665,7 @@ namespace Terminal.Gui {
 
 				// Outside right
 				for (int c = fright + 1; c < fright + paddingRight; c++) {
-					AddRuneAt (c, fbottom, 'R');
+					AddRuneAt (c, fbottom, clearChar);
 				}
 			}
 
@@ -673,7 +673,7 @@ namespace Terminal.Gui {
 			if (paddingBottom > 0) {
 				for (int r = fbottom + 1; r < fbottom + paddingBottom; r++) {
 					for (int c = region.X; c <= fright + paddingRight; c++) {
-						AddRuneAt (c, r, 'B');
+						AddRuneAt (c, r, clearChar);
 					}
 				}
 			}
