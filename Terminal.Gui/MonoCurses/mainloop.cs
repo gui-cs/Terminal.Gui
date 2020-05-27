@@ -188,7 +188,7 @@ namespace Mono.Terminal {
 			poll_dirty = false;
 
 			pollmap = new Pollfd [descriptorWatchers.Count];
-			int i = 0;
+			int i = 0;	
 			foreach (var fd in descriptorWatchers.Keys) {
 				pollmap [i].fd = fd;
 				pollmap [i].events = (short)descriptorWatchers [fd].Condition;
@@ -208,7 +208,7 @@ namespace Mono.Terminal {
 
 			while (true) {
 				n = poll (pollmap, (uint)pollmap.Length, 0);
-				if (n > 0) {
+				if (pollmap != null) {
 					break;
 				}
 				if (mainLoop.idleHandlers.Count > 0 || CkeckTimeout (wait, ref pollTimeout)) {

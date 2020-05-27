@@ -487,6 +487,7 @@ namespace Terminal.Gui {
 			TopTee = Curses.ACS_TTEE;
 			BottomTee = Curses.ACS_BTEE;
 
+			Colors.TopLevel = new ColorScheme ();
 			Colors.Base = new ColorScheme ();
 			Colors.Dialog = new ColorScheme ();
 			Colors.Menu = new ColorScheme ();
@@ -495,6 +496,11 @@ namespace Terminal.Gui {
 			if (Curses.HasColors) {
 				Curses.StartColor ();
 				Curses.UseDefaultColors ();
+
+				Colors.TopLevel.Normal = MakeColor (Curses.COLOR_GREEN, Curses.COLOR_BLACK);
+				Colors.TopLevel.Focus = MakeColor (Curses.COLOR_WHITE, Curses.COLOR_CYAN);
+				Colors.TopLevel.HotNormal = MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_BLACK);
+				Colors.TopLevel.HotFocus = MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_CYAN);
 
 				Colors.Base.Normal = MakeColor (Curses.COLOR_WHITE, Curses.COLOR_BLUE);
 				Colors.Base.Focus = MakeColor (Curses.COLOR_BLACK, Curses.COLOR_CYAN);
@@ -522,6 +528,10 @@ namespace Terminal.Gui {
 				Colors.Error.HotNormal = Curses.A_BOLD | MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_RED);
 				Colors.Error.HotFocus = Colors.Error.HotNormal;
 			} else {
+				Colors.TopLevel.Normal = Curses.COLOR_GREEN;
+				Colors.TopLevel.Focus = Curses.COLOR_WHITE;
+				Colors.TopLevel.HotNormal = Curses.COLOR_YELLOW;
+				Colors.TopLevel.HotFocus = Curses.COLOR_YELLOW;
 				Colors.Base.Normal = Curses.A_NORMAL;
 				Colors.Base.Focus = Curses.A_REVERSE;
 				Colors.Base.HotNormal = Curses.A_BOLD;
@@ -539,12 +549,6 @@ namespace Terminal.Gui {
 				Colors.Error.HotNormal = Curses.A_BOLD | Curses.A_REVERSE;
 				Colors.Error.HotFocus = Curses.A_REVERSE;
 			}
-			Colors.TopLevel = new ColorScheme ();
-
-			Colors.TopLevel.Normal = MakeColor (Curses.COLOR_GREEN, Curses.COLOR_BLACK);
-			Colors.TopLevel.Focus = MakeColor (Curses.COLOR_WHITE, Curses.COLOR_CYAN);
-			Colors.TopLevel.HotNormal = MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_BLACK);
-			Colors.TopLevel.HotFocus = MakeColor (Curses.COLOR_YELLOW, Curses.COLOR_CYAN);
 		}
 
 		static int MapColor (Color color)
