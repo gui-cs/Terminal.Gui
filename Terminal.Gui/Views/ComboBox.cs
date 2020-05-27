@@ -90,7 +90,7 @@ namespace Terminal.Gui {
 
 		private void Search_MouseClick (object sender, MouseEventEventArgs e)
 		{
-			if (e.mouseEvent.Flags != MouseFlags.Button1Clicked)
+			if (e.MouseEvent.Flags != MouseFlags.Button1Clicked)
 				return;
 
 			SuperView.SetFocus (((View)sender));
