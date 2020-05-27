@@ -10,14 +10,14 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Namespace Terminal.Gui
    ">
-    <meta name="generator" content="docfx 2.53.1.0">
+    <meta name="generator" content="docfx 2.54.0.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
-    <meta property="docfx:navrel" content="">
+    <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
@@ -180,6 +180,11 @@ ListView <a class="xref" href="Terminal.Gui.View.html">View</a> renders a scroll
       <section>
 Implements an <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a> that renders arbitrary <span class="xref">System.Collections.IList</span> instances for <a class="xref" href="Terminal.Gui.ListView.html">ListView</a>.
 </section>
+      <h4><a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a></h4>
+      <section>
+Simple main loop implementation that can be used to monitor
+file descriptor, run timers and idle handlers.
+</section>
       <h4><a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a></h4>
       <section>
 The MenuBar provides a menu for Terminal.Gui applications. 
@@ -266,6 +271,10 @@ Time editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <section>
 Toplevel views can be modally executed.
 </section>
+      <h4><a class="xref" href="Terminal.Gui.UnixMainLoop.html">UnixMainLoop</a></h4>
+      <section>
+Unix main loop, suitable for using on Posix systems
+</section>
       <h4><a class="xref" href="Terminal.Gui.View.html">View</a></h4>
       <section>
 View is the base class for all views on the screen and represents a visible element that can render itself and contains zero or more nested views.
@@ -306,6 +315,10 @@ Stores an ordered pair of integers, which specify a Height and Width.
       <section>
 Implement <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a> to provide custom rendering for a <a class="xref" href="Terminal.Gui.ListView.html">ListView</a>.
 </section>
+      <h4><a class="xref" href="Terminal.Gui.IMainLoopDriver.html">IMainLoopDriver</a></h4>
+      <section>
+Public interface to create your own platform specific main loop driver.
+</section>
     <h3 id="enums">Enums
   </h3>
       <h4><a class="xref" href="Terminal.Gui.Color.html">Color</a></h4>
@@ -334,6 +347,10 @@ Special characters that can be drawn with Driver.AddSpecial.
       <h4><a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a></h4>
       <section>
 Text alignment enumeration, controls how text is displayed.
+</section>
+      <h4><a class="xref" href="Terminal.Gui.UnixMainLoop.Condition.html">UnixMainLoop.Condition</a></h4>
+      <section>
+Condition on which to wake up from file descriptor activity.  These match the Linux/BSD poll definitions.
 </section>
 </article>
           </div>
