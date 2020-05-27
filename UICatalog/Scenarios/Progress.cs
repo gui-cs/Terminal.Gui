@@ -23,7 +23,7 @@ namespace UICatalog {
 			internal ProgressBar PulseProgressBar { get; private set; }
 			internal Action StartBtnClick;
 			internal Action StopBtnClick;
-			internal Action PulseBtnClick;
+			internal Action PulseBtnClick = null;
 			private Label _startedLabel;
 			internal bool Started { 
 				get { 

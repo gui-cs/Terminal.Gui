@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using Mono.Terminal;
 using NStack;
 using Unix.Terminal;
@@ -525,91 +526,173 @@ namespace Terminal.Gui {
 			TerminalResized = terminalResized;
 		}
 
+		// Useful for debugging (e.g. change to `*`
+		const char clearChar = ' ';
+
+		/// <summary>
+		/// Draws the title for a Window-style view incorporating padding. 
+		/// </summary>
+		/// <param name="region">Screen relative region where the frame will be drawn.</param>
+		/// <param name="title">The title for the window. The title will only be drawn if <c>title</c> is not null or empty and paddingTop is greater than 0.</param>
+		/// <param name="paddingLeft">Number of columns to pad on the left (if 0 the border will not appear on the left).</param>
+		/// <param name="paddingTop">Number of rows to pad on the top (if 0 the border and title will not appear on the top).</param>
+		/// <param name="paddingRight">Number of columns to pad on the right (if 0 the border will not appear on the right).</param>
+		/// <param name="paddingBottom">Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).</param>
+		/// <param name="textAlignment">Not yet immplemented.</param>
+		/// <remarks></remarks>
+		public virtual void DrawWindowTitle (Rect region, ustring title, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom, TextAlignment textAlignment = TextAlignment.Left)
+		{
+			var width = region.Width - (paddingLeft + 2) * 2;
+			if (!ustring.IsNullOrEmpty(title) && width > 4 && region.Y + paddingTop <= region.Y + paddingBottom) {
+				Move (region.X + 1 + paddingLeft, region.Y + paddingTop);
+				AddRune (' ');
+				var str = title.Length >= width ? title [0, width - 2] : title;
+				AddStr (str);
+				AddRune (' ');
+			}
+		}
+
+		/// <summary>
+		/// Draws a frame for a window with padding aand n optional visible border inside the padding. 
+		/// </summary>
+		/// <param name="region">Screen relative region where the frame will be drawn.</param>
+		/// <param name="paddingLeft">Number of columns to pad on the left (if 0 the border will not appear on the left).</param>
+		/// <param name="paddingTop">Number of rows to pad on the top (if 0 the border and title will not appear on the top).</param>
+		/// <param name="paddingRight">Number of columns to pad on the right (if 0 the border will not appear on the right).</param>
+		/// <param name="paddingBottom">Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).</param>
+		/// <param name="border">If set to <c>true</c> and any padding dimension is > 0 the border will be drawn.</param>
+		/// <param name="fill">If set to <c>true</c> it will clear the content area (the area inside the padding) with the current color, otherwise the content area will be left untouched.</param>
+		public virtual void DrawWindowFrame (Rect region, int paddingLeft = 0, int paddingTop = 0, int paddingRight = 0, int paddingBottom = 0, bool border = true, bool fill = false)
+		{
+			void AddRuneAt (int col, int row, Rune ch)
+			{
+				Move (col, row);
+				AddRune (ch);
+			}
+
+			int fwidth = (int)(region.Width - (paddingRight + paddingLeft));
+			int fheight = (int)(region.Height - (paddingBottom + paddingTop));
+			int fleft = region.X + paddingLeft;
+			int fright = fleft + fwidth + 1;
+			int ftop = region.Y + paddingTop;
+			int fbottom = ftop + fheight + 1;
+
+			Rune hLine = border ? HLine : clearChar;
+			Rune vLine = border ? VLine : clearChar;
+			Rune uRCorner = border ? URCorner : clearChar;
+			Rune uLCorner = border ? ULCorner : clearChar;
+			Rune lLCorner = border ? LLCorner : clearChar;
+			Rune lRCorner = border ? LRCorner : clearChar;
+
+			// Outside top
+			if (paddingTop > 1) {
+				for (int r = region.Y; r < ftop; r++) {
+					for (int c = region.X; c <= fright + paddingRight; c++) {
+						AddRuneAt (c, r, clearChar);
+					}
+				}
+			}
+
+			// Outside top-left
+			for (int c = region.X; c <= fleft; c++) {
+				AddRuneAt (c, ftop, clearChar);
+			}
+
+			// Frame top-left corner
+			AddRuneAt (fleft, ftop, paddingTop >= 0 ? (paddingLeft >= 0 ? uLCorner : hLine) : clearChar);
+
+			// Frame top
+			for (int c = fleft + 1; c <= fright; c++) {
+				AddRuneAt (c, ftop, paddingTop > 0 ? hLine : clearChar);
+			}
+
+			// Frame top-right corner
+			if (fright > fleft) {
+				AddRuneAt (fright, ftop, paddingTop >= 0 ? (paddingRight >= 0 ? uRCorner : hLine) : clearChar);
+			}
+
+			// Outside top-right corner
+			for (int c = fright + 1; c < fright + paddingRight; c++) {
+				AddRuneAt (c, ftop, clearChar);
+			}
+
+			// Left, Fill, Right
+			if (fbottom > ftop) {
+				for (int r = ftop + 1; r < fbottom; r++) {
+					// Outside left
+					for (int c = region.X; c < fleft; c++) {
+						AddRuneAt (c, r, clearChar);
+					}
+
+					// Frame left
+					AddRuneAt (fleft, r, paddingLeft > 0 ? vLine : clearChar);
+
+					// Fill
+					if (fill) {
+						for (int x = fleft + 1; x < fright; x++) {
+							AddRuneAt (x, r, clearChar);
+						}
+					}
+
+					// Frame right
+					if (fright > fleft) {
+						AddRuneAt (fright, r, paddingRight > 0 ? vLine : clearChar);
+					}
+
+					// Outside right
+					for (int c = fright + 1; c < fright + paddingRight; c++) {
+						AddRuneAt (c, r, clearChar);
+					}
+				}
+
+				// Outside Bottom
+				for (int c = region.X; c < fleft; c++) {
+					AddRuneAt (c, fbottom, clearChar);
+				}
+
+				// Frame bottom-left
+				AddRuneAt (fleft, fbottom, paddingLeft > 0 ? lLCorner : clearChar);
+
+				if (fright > fleft) {
+					// Frame bottom
+					for (int c = fleft + 1; c < fright; c++) {
+						AddRuneAt (c, fbottom, paddingBottom > 0 ? hLine : clearChar);
+					}
+
+					// Frame bottom-right
+					AddRuneAt (fright, fbottom, paddingRight > 0 ? (paddingBottom > 0 ? lRCorner : hLine) : clearChar);
+				}
+
+				// Outside right
+				for (int c = fright + 1; c < fright + paddingRight; c++) {
+					AddRuneAt (c, fbottom, clearChar);
+				}
+			}
+
+			// Out bottom - ensure top is always drawn if we overlap
+			if (paddingBottom > 0) {
+				for (int r = fbottom + 1; r < fbottom + paddingBottom; r++) {
+					for (int c = region.X; c <= fright + paddingRight; c++) {
+						AddRuneAt (c, r, clearChar);
+					}
+				}
+			}
+		}
+
 		/// <summary>
 		/// Draws a frame on the specified region with the specified padding around the frame.
 		/// </summary>
 		/// <param name="region">Region where the frame will be drawn..</param>
 		/// <param name="padding">Padding to add on the sides.</param>
 		/// <param name="fill">If set to <c>true</c> it will clear the contents with the current color, otherwise the contents will be left untouched.</param>
+		/// <remarks>This is a legacy/depcrecated API. Use <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/>.</remarks>
+		/// <remarks>A padding value of 0 means there is actually a 1 cell border.</remarks>
 		public virtual void DrawFrame (Rect region, int padding, bool fill)
 		{
-			int width = region.Width;
-			int height = region.Height;
-			int b;
-			int fwidth = width - padding * 2;
-			int fheight = height - 1 - padding;
-
-			Move (region.X, region.Y);
-			if (padding > 0) {
-				for (int l = 0; l < padding; l++)
-					for (b = region.X; b < region.X + width; b++) {
-						AddRune (' ');
-						Move (b + 1, region.Y);
-					}
-			}
-			Move (region.X, region.Y + padding);
-			for (int c = 0; c < padding; c++) {
-				AddRune (' ');
-				Move (region.X + 1, region.Y + padding);
-			}
-			AddRune (ULCorner);
-			for (b = region.X; b < region.X + fwidth - 2; b++) {
-				AddRune (HLine);
-				Move (b + (padding > 0 ? padding + 2 : 2), region.Y + padding);
-			}
-			AddRune (URCorner);
-			for (int c = 0; c < padding; c++) {
-				AddRune (' ');
-				Move (region.X + 1, region.Y + padding);
-			}
-			for (b = 1 + padding; b < fheight; b++) {
-				Move (region.X, region.Y + b);
-				for (int c = 0; c < padding; c++) {
-					AddRune (' ');
-					Move (region.X + 1, region.Y + b);
-				}
-				AddRune (VLine);
-				if (fill) {
-					for (int x = region.X + 1; x < region.X + fwidth - 1; x++) {
-						AddRune (' ');
-						Move (x + (padding > 0 ? padding + 1 : 1), region.Y + b);
-					}
-				} else {
-					if (padding > 0)
-						Move (region.X + fwidth, region.Y + b);
-					else
-						Move (region.X + fwidth - 1, region.Y + b);
-				}
-				AddRune (VLine);
-				for (int c = 0; c < padding; c++) {
-					AddRune (' ');
-					Move (region.X + 1, region.Y + b);
-				}
-			}
-			Move (region.X, region.Y + fheight);
-			for (int c = 0; c < padding; c++) {
-				AddRune (' ');
-				Move (region.X + 1, region.Y + b);
-			}
-			AddRune (LLCorner);
-			for (b = region.X; b < region.X + fwidth - 2; b++) {
-				AddRune (HLine);
-				Move (b + (padding > 0 ? padding + 2 : 2), region.Y + fheight);
-			}
-			AddRune (LRCorner);
-			for (int c = 0; c < padding; c++) {
-				AddRune (' ');
-				Move (region.X + 1, region.Y);
-			}
-			if (padding > 0) {
-				Move (region.X, region.Y + height - padding);
-				for (int l = 0; l < padding; l++) {
-					for (b = region.X; b < region.X + width; b++) {
-						AddRune (' ');
-						Move (b + 1, region.Y + height - padding);
-					}
-				}
-			}
+			// DrawFrame assumes the frame is always at least one row/col thick
+			// DrawWindowFrame assumes a padding of 0 means NO padding
+			padding++;
+			DrawWindowFrame (new Rect (region.X - 1, region.Y - 1, region.Width, region.Height), padding, padding, padding, padding, fill: fill);
 		}
 
 
