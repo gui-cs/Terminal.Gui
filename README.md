@@ -4,9 +4,9 @@
 [![License](https://img.shields.io/github/license/migueldeicaza/gui.cs.svg)](LICENSE)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mono/mono?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) - The Mono Channel room
 
-# Terminal.Gui - Terminal UI toolkit for .NET
+# Terminal.Gui - Terminal GUI toolkit for .NET
 
-A simple UI toolkit for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
+A simple toolkit for buiding console GUI apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
 
 ![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.gif)
 
@@ -36,7 +36,7 @@ The *Terminal.Gui* toolkit contains various controls for building text user inte
 * [StatusBar](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.StatusBar.html)
 * [Window](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Window.html)
 
-In addition, a complete Xterm/Vt100 terminal emulator that you can embed is now part of [XtermSharp](https://github.com/migueldeicaza/XtermSharp/blob/master/GuiCsHost/TerminalView.cs) - you just need to pull the `TerminalView` linked here into your project.
+In addition, a complete Xterm/Vt100 terminal emulator that you can embed is now part of [XtermSharp](https://github.com/migueldeicaza/XtermSharp/blob/master/GuiCsHost/TerminalView.cs) - you just need to pull [`TerminalView.cs`](https://github.com/migueldeicaza/XtermSharp/blob/master/GuiCsHost/TerminalView.cs) into your project.
 
 ### Features
 
@@ -69,6 +69,12 @@ Currently **Terminal.Gui** has support for [ncurses](https://github.com/miguelde
 `ncurses` is used on Mac/Linux/Unix with color support based on what your library is compiled with; the Windows driver supports full color and mouse, and an easy-to-debug `System.Console` can be used on Windows and Unix, but lacks mouse support.
 
 You can force the use of `System.Console` on Unix as well; see `Core.cs`.
+
+### Design
+
+See the [`Terminal.Gui/` README](https://github.com/migueldeicaza/gui.cs/tree/master/Terminal.Gui) for an overview of how the library is structured. The [Conceptual Documentation](https://migueldeicaza.github.io/gui.cs/articles/index.html) provides insight into core concepts.
+
+Debates on architecture and design can be found in Issues tagged with [design](https://github.com/migueldeicaza/gui.cs/issues?q=is%3Aopen+is%3Aissue+label%3Adesign).
 
 ## Showcase & Examples
 
@@ -174,11 +180,13 @@ Use NuGet to install the `Terminal.Gui` NuGet package: https://www.nuget.org/pac
 
 ## Running and Building
 
-* *`Terminal.Gui`* - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory) or with Visual Studio 2019.
+* Windows - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory) or open `Terminal.Gui.sln` with Visual Studio 2019.
+* Mac - ???
+* Linux - (see: https://github.com/migueldeicaza/gui.cs/issues/421)
 
 ## Contributing
 
-See [Issues](https://github.com/migueldeicaza/gui.cs/issues) for a list of open bugs and enhancements.
+See [CONTRIBUTING.md](https://github.com/migueldeicaza/gui.cs/blob/master/CONTRIBUTING.md).
 
 ## History
 
