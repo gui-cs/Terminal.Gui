@@ -118,14 +118,14 @@ namespace Designer {
 			((TextField)sender).Text = $"Entering in: {sender}";
 		}
 
-		private static void LoginText_MouseLeave (object sender, MouseEvent e)
+		private static void LoginText_MouseLeave (object sender, View.MouseEventEventArgs e)
 		{
-			((TextField)sender).Text = $"Mouse leave at X: {e.X}; Y: {e.Y} HasFocus: {e.View.HasFocus}";
+			((TextField)sender).Text = $"Mouse leave at X: {e.MouseEvent.X}; Y: {e.MouseEvent.Y} HasFocus: {e.MouseEvent.View.HasFocus}";
 		}
 
-		private static void LoginText_MouseEnter (object sender, MouseEvent e)
+		private static void LoginText_MouseEnter (object sender, View.MouseEventEventArgs e)
 		{
-			((TextField)sender).Text = $"Mouse enter at X: {e.X}; Y: {e.Y} HasFocus: {e.View.HasFocus}";
+			((TextField)sender).Text = $"Mouse enter at X: {e.MouseEvent.X}; Y: {e.MouseEvent.Y} HasFocus: {e.MouseEvent.View.HasFocus}";
 		}
 	}
 }

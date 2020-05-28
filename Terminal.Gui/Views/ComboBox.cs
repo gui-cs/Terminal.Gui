@@ -40,7 +40,7 @@ namespace Terminal.Gui {
 		/// <param name="y">The y coordinate</param>
 		/// <param name="w">The width</param>
 		/// <param name="h">The height</param>
-		/// <param name="source">Auto completetion source</param>
+		/// <param name="source">Auto completion source</param>
 		public ComboBox(int x, int y, int w, int h, IList<string> source)
 		{
 			listsource = new List<string>(source);
@@ -81,9 +81,19 @@ namespace Terminal.Gui {
 					search.ColorScheme = Colors.Menu;
 			};
 
+			search.MouseClick += Search_MouseClick;
+
 			this.Add(listview);
 			this.Add(search);
 			this.SetFocus(search);
+		}
+
+		private void Search_MouseClick (object sender, MouseEventEventArgs e)
+		{
+			if (e.MouseEvent.Flags != MouseFlags.Button1Clicked)
+				return;
+
+			SuperView.SetFocus (((View)sender));
 		}
 
 		///<inheritdoc cref="OnEnter"/>
@@ -156,7 +166,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The currenlty selected list item
+		/// The currently selected list item
 		/// </summary>
 		public ustring Text
 		{

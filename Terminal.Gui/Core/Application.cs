@@ -354,7 +354,7 @@ namespace Terminal.Gui {
 				if (OutsideFrame (new Point (nme.X, nme.Y), mouseGrabView.Frame))
 					lastMouseOwnerView.OnMouseLeave (me);
 				if (mouseGrabView != null) {
-					mouseGrabView.MouseEvent (nme);
+					mouseGrabView.OnMouseEvent (nme);
 					return;
 				}
 			}
@@ -387,7 +387,7 @@ namespace Terminal.Gui {
 					wantContinuousButtonPressedView = null;
 
 				// Should we bubbled up the event, if it is not handled?
-				view.MouseEvent (nme);
+				view.OnMouseEvent (nme);
 			}
 		}
 
