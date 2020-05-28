@@ -5,6 +5,7 @@ using Terminal.Gui;
 namespace UICatalog {
 	[ScenarioMetadata (Name: "Windows & FrameViews", Description: "Shows Windows, sub-Windows, FrameViews, and how TAB doesn't work right (#434, #522)")]
 	[ScenarioCategory ("Views")]
+	[ScenarioCategory ("Layout")]
 	class WindowExperiment : Scenario {
 		public override void Init (Toplevel top)
 		{
