@@ -7,11 +7,12 @@ namespace UICatalog {
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Text")]
+	[ScenarioCategory ("Dialogs")]
+	[ScenarioCategory ("TopLevel")]
 	class Editor : Scenario {
 		private string _fileName = "demo.txt";
 		private TextView _textView;
 		private bool _saved = true;
-
 
 		public override void Init (Toplevel top)
 		{
