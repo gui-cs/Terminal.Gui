@@ -4,9 +4,9 @@
 [![License](https://img.shields.io/github/license/migueldeicaza/gui.cs.svg)](LICENSE)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mono/mono?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) - The Mono Channel room
 
-# Terminal.Gui - Terminal UI toolkit for .NET
+# Terminal.Gui - Terminal GUI toolkit for .NET
 
-A simple UI toolkit for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
+A simple toolkit for buiding console GUI apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
 
 ![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.gif)
 
@@ -18,8 +18,8 @@ The *Terminal.Gui* toolkit contains various controls for building text user inte
 * [CheckBox](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.CheckBox.html)
 * [ComboBox](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ComboBox.html)
 * [Dialog](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Dialog.html)
-    * [OpenDialog](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.OpenDialog.html)
-    * [SaveDialog](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.SaveDialog.html)
+	* [OpenDialog](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.OpenDialog.html)
+	* [SaveDialog](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.SaveDialog.html)
 * [FrameView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.FrameView.html)
 * [Hex viewer/editor](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.HexView.html)
 * [Label](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Label.html)
@@ -36,7 +36,7 @@ The *Terminal.Gui* toolkit contains various controls for building text user inte
 * [StatusBar](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.StatusBar.html)
 * [Window](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Window.html)
 
-In addition, a complete Xterm/Vt100 terminal emulator that you can embed is now part of [XtermSharp](https://github.com/migueldeicaza/XtermSharp/blob/master/GuiCsHost/TerminalView.cs) - you just need to pull the `TerminalView` linked here into your project.
+In addition, a complete Xterm/Vt100 terminal emulator that you can embed is now part of [XtermSharp](https://github.com/migueldeicaza/XtermSharp/blob/master/GuiCsHost/TerminalView.cs) - you just need to pull [`TerminalView.cs`](https://github.com/migueldeicaza/XtermSharp/blob/master/GuiCsHost/TerminalView.cs) into your project.
 
 ### Features
 
@@ -70,6 +70,12 @@ Currently **Terminal.Gui** has support for [ncurses](https://github.com/miguelde
 
 You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 
+### Design
+
+See the [`Terminal.Gui/` README](https://github.com/migueldeicaza/gui.cs/tree/master/Terminal.Gui) for an overview of how the library is structured. The [Conceptual Documentation](https://migueldeicaza.github.io/gui.cs/articles/index.html) provides insight into core concepts.
+
+Debates on architecture and design can be found in Issues tagged with [design](https://github.com/migueldeicaza/gui.cs/issues?q=is%3Aopen+is%3Aissue+label%3Adesign).
+
 ## Showcase & Examples
 
 * **UI Catalog** - The [UI Catalog project](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog) provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run` in the `UICatalog` directory to run the UI Catalog.
@@ -78,9 +84,9 @@ You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 
 ## Documentation
 
-* [API documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html)
-
-* [Overview](https://migueldeicaza.github.io/gui.cs/articles/overview.html) contains the conceptual documentation and a walkthrough of the core concepts of **Terminal.Gui**.
+* [Overview](https://migueldeicaza.github.io/gui.cs/articles/overview.html)
+* [Conceptual Documenation](https://migueldeicaza.github.io/gui.cs/articles/index.html)
+* [API Documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html)
 
 ### Sample Usage
 
@@ -88,68 +94,68 @@ You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 using Terminal.Gui;
 
 class Demo {
-    static void Main ()
-    {
-        Application.Init ();
-        var top = Application.Top;
+	static void Main ()
+	{
+		Application.Init ();
+		var top = Application.Top;
 
 	// Creates the top-level window to show
-        var win = new Window ("MyApp") {
-	    X = 0,
-	    Y = 1, // Leave one row for the toplevel menu
+		var win = new Window ("MyApp") {
+		X = 0,
+		Y = 1, // Leave one row for the toplevel menu
 
-	    // By using Dim.Fill(), it will automatically resize without manual intervention
-	    Width = Dim.Fill (),
-	    Height = Dim.Fill ()
+		// By using Dim.Fill(), it will automatically resize without manual intervention
+		Width = Dim.Fill (),
+		Height = Dim.Fill ()
 	};
-        top.Add (win);
+		top.Add (win);
 
 	// Creates a menubar, the item "New" has a help menu.
-        var menu = new MenuBar (new MenuBarItem [] {
-            new MenuBarItem ("_File", new MenuItem [] {
-                new MenuItem ("_New", "Creates new file", NewFile),
-                new MenuItem ("_Close", "", () => Close ()),
-                new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
-            }),
-            new MenuBarItem ("_Edit", new MenuItem [] {
-                new MenuItem ("_Copy", "", null),
-                new MenuItem ("C_ut", "", null),
-                new MenuItem ("_Paste", "", null)
-            })
-        });
-        top.Add (menu);
+		var menu = new MenuBar (new MenuBarItem [] {
+			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuItem ("_New", "Creates new file", NewFile),
+				new MenuItem ("_Close", "", () => Close ()),
+				new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
+			}),
+			new MenuBarItem ("_Edit", new MenuItem [] {
+				new MenuItem ("_Copy", "", null),
+				new MenuItem ("C_ut", "", null),
+				new MenuItem ("_Paste", "", null)
+			})
+		});
+		top.Add (menu);
 
 	var login = new Label ("Login: ") { X = 3, Y = 2 };
 	var password = new Label ("Password: ") {
-	    	X = Pos.Left (login),
+			X = Pos.Left (login),
 		Y = Pos.Top (login) + 1
-        };
+		};
 	var loginText = new TextField ("") {
-                X = Pos.Right (password),
-                Y = Pos.Top (login),
-                Width = 40
-        };
-        var passText = new TextField ("") {
-                Secret = true,
-                X = Pos.Left (loginText),
-                Y = Pos.Top (password),
-                Width = Dim.Width (loginText)
-        };
+				X = Pos.Right (password),
+				Y = Pos.Top (login),
+				Width = 40
+		};
+		var passText = new TextField ("") {
+				Secret = true,
+				X = Pos.Left (loginText),
+				Y = Pos.Top (password),
+				Width = Dim.Width (loginText)
+		};
 	
 	// Add some controls, 
 	win.Add (
-	    // The ones with my favorite layout system
-  	    login, password, loginText, passText,
+		// The ones with my favorite layout system
+  		login, password, loginText, passText,
 
-	    // The ones laid out like an australopithecus, with absolute positions:
-            new CheckBox (3, 6, "Remember me"),
-            new RadioGroup (3, 8, new [] { "_Personal", "_Company" }),
-            new Button (3, 14, "Ok"),
-            new Button (10, 14, "Cancel"),
-            new Label (3, 18, "Press F9 or ESC plus 9 to activate the menubar"));
+		// The ones laid out like an australopithecus, with absolute positions:
+			new CheckBox (3, 6, "Remember me"),
+			new RadioGroup (3, 8, new [] { "_Personal", "_Company" }),
+			new Button (3, 14, "Ok"),
+			new Button (10, 14, "Cancel"),
+			new Label (3, 18, "Press F9 or ESC plus 9 to activate the menubar"));
 
-        Application.Run ();
-    }
+		Application.Run ();
+	}
 }
 ```
 
@@ -159,10 +165,10 @@ Alternatively, you can encapsulate the app behavior in a new `Window`-derived cl
 using Terminal.Gui;
 
 class Demo {
-    static void Main ()
-    {
-        Application.Run<App> ();
-    }
+	static void Main ()
+	{
+		Application.Run<App> ();
+	}
 }
 ```
 
@@ -174,11 +180,13 @@ Use NuGet to install the `Terminal.Gui` NuGet package: https://www.nuget.org/pac
 
 ## Running and Building
 
-* *`Terminal.Gui`* - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory) or with Visual Studio 2019.
+* Windows - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory) or open `Terminal.Gui.sln` with Visual Studio 2019.
+* Mac - ???
+* Linux - (see: https://github.com/migueldeicaza/gui.cs/issues/421)
 
 ## Contributing
 
-See [Issues](https://github.com/migueldeicaza/gui.cs/issues) for a list of open bugs and enhancements.
+See [CONTRIBUTING.md](https://github.com/migueldeicaza/gui.cs/blob/master/CONTRIBUTING.md).
 
 ## History
 
