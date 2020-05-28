@@ -7,6 +7,8 @@ namespace UICatalog {
 	[ScenarioMetadata (Name: "HexEditor", Description: "A Terminal.Gui binary (hex) editor via HexView")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Text")]
+	[ScenarioCategory ("Dialogs")]
+	[ScenarioCategory ("TopLevel")]
 	class HexEditor : Scenario {
 		private string _fileName = "demo.bin";
 		private HexView _hexView;
@@ -16,6 +18,7 @@ namespace UICatalog {
 		{
 			Win.Title = this.GetName() + "-" + _fileName ?? "Untitled";
 			Win.Y = 1;
+			Win.Height = Dim.Fill (1);
 			Top.LayoutSubviews ();
 
 			var menu = new MenuBar (new MenuBarItem [] {

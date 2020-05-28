@@ -58,7 +58,7 @@ namespace UICatalog {
 			if (Debugger.IsAttached)
 				CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 
-			_scenarios = Scenario.GetDerivedClassesCollection ().ToList ();
+			_scenarios = Scenario.GetDerivedClassesCollection ().OrderBy (t => Scenario.ScenarioMetadata.GetName (t)).ToList ();
 
 			if (args.Length > 0) {
 				var item = _scenarios.FindIndex (t => Scenario.ScenarioMetadata.GetName (t).Equals (args [0], StringComparison.OrdinalIgnoreCase));
@@ -104,7 +104,7 @@ namespace UICatalog {
 			};
 
 
-			_categories = Scenario.GetAllCategories ();
+			_categories = Scenario.GetAllCategories ().OrderBy (c => c).ToList ();
 			_categoryListView = new ListView (_categories) {
 				X = 0,
 				Y = 0,
