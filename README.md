@@ -84,9 +84,9 @@ Debates on architecture and design can be found in Issues tagged with [design](h
 
 ## Documentation
 
-* [API documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html)
-
-* [Overview](https://migueldeicaza.github.io/gui.cs/articles/overview.html) contains the conceptual documentation and a walkthrough of the core concepts of **Terminal.Gui**.
+* [Overview](https://migueldeicaza.github.io/gui.cs/articles/overview.html)
+* [Conceptual Documenation](https://migueldeicaza.github.io/gui.cs/articles/index.html)
+* [API Documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html)
 
 ### Sample Usage
 

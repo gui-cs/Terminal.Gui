@@ -32,7 +32,18 @@ We welcome contributions from the community. See [Issues](https://github.com/mig
 3. **Fail-fast.** Fail-fast makes bugs and failures appear sooner, leading to a higher-quality framework and API.
 4. **Standards Reduce Complexity**. We strive to adopt standard API idoms because doing so reduces complexity for users of the API. For example, see Tenet #1 above. A counter example is [Issue #447](https://github.com/migueldeicaza/gui.cs/issues/447).
 
-### Events
+### Include API Documentation
+
+Great care has been provided thus far in ensuring **Terminal.Gui** has great [API Documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html). Contributors have a responsiblity for continously improving the API Documentation.
+
+- All public APIs must have clear, concise, and complete documentation in the form of [XML Documentation](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/).
+- Keep the `<summary></summary>` terse.
+- Use `<see cref=""/>` liberally to cross-link topics.
+- Use `<remarks></remarks>` to add more context and explaination.
+- For complex topics, provide conceptual documentation in the `docfx/articles` folder as a `.md` file. It will automatically get picked up and be added to [Conceptual Documenation](https://migueldeicaza.github.io/gui.cs/articles/index.html).
+- Use proper English and good grammar.
+
+### Defining Events
 
 The [Microsoft .NET Framework Design Guidelines](https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/) provides these guideliens for defining events:
 
@@ -70,6 +81,12 @@ We are not currently consistent along these lines in `Terminal.Gui` at all. This
 4. Where possible, a subclass of `EventArgs` should be provided and the old and new state should be included. By doing this, event handler methods do not have to query the sender for state.
 
 See also: https://www.codeproject.com/Articles/20550/C-Event-Implementation-Fundamentals-Best-Practices
+
+### Defining new `View` classes
+
+- Support parameterless constructors (see [Issue 102](Parameterless constructors #102)). Do not require callers to use a parametrized constructor except when forcing `Absolute Layout`).
+- Avoid doing initialization via constructors. Instead use a property so consumers can use object initialization (e.g. `var foo = new Foo() { a = b };`).
+- Ensure the `UICatalog` demo for the new class illustrates both `Absolutle Layout` and `Computed Layout`.
 
 ## Breaking Changes to User Behavior or the Public API
 
