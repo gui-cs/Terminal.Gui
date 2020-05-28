@@ -10,14 +10,14 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Namespace Terminal.Gui
    ">
-    <meta name="generator" content="docfx 2.53.1.0">
+    <meta name="generator" content="docfx 2.54.0.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
-    <meta property="docfx:navrel" content="">
+    <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
@@ -114,12 +114,12 @@ NOTE: Currently not implemented.
 </section>
       <h4><a class="xref" href="Terminal.Gui.Colors.html">Colors</a></h4>
       <section>
-The default ColorSchemes for the application.
+The default <a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a>s for the application.
 </section>
       <h4><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></h4>
       <section>
 Color scheme definitions, they cover some common scenarios and are used
-typically in toplevel containers to set the scheme that is used by all the
+typically in containers such as <a class="xref" href="Terminal.Gui.Window.html">Window</a> and <a class="xref" href="Terminal.Gui.FrameView.html">FrameView</a> to set the scheme that is used by all the
 views contained inside.
 </section>
       <h4><a class="xref" href="Terminal.Gui.ComboBox.html">ComboBox</a></h4>
@@ -128,11 +128,8 @@ ComboBox control
 </section>
       <h4><a class="xref" href="Terminal.Gui.ConsoleDriver.html">ConsoleDriver</a></h4>
       <section>
-ConsoleDriver is an abstract class that defines the requirements for a console driver.   One implementation if the CursesDriver, and another one uses the .NET Console one.
-</section>
-      <h4><a class="xref" href="Terminal.Gui.CursesDriver.html">CursesDriver</a></h4>
-      <section>
-This is the Curses driver for the gui.cs/Terminal framework.
+ConsoleDriver is an abstract class that defines the requirements for a console driver.  
+There are currently three implementations: <span class="xref">Terminal.Gui.CursesDriver</span> (for Unix and Mac), <span class="xref">Terminal.Gui.WindowsDriver</span>, and <span class="xref">Terminal.Gui.NetDriver</span> that uses the .NET Console API.
 </section>
       <h4><a class="xref" href="Terminal.Gui.DateField.html">DateField</a></h4>
       <section>
@@ -179,6 +176,11 @@ ListView <a class="xref" href="Terminal.Gui.View.html">View</a> renders a scroll
       <h4><a class="xref" href="Terminal.Gui.ListWrapper.html">ListWrapper</a></h4>
       <section>
 Implements an <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a> that renders arbitrary <span class="xref">System.Collections.IList</span> instances for <a class="xref" href="Terminal.Gui.ListView.html">ListView</a>.
+</section>
+      <h4><a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a></h4>
+      <section>
+Simple main loop implementation that can be used to monitor
+file descriptor, run timers and idle handlers.
 </section>
       <h4><a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a></h4>
       <section>
@@ -306,6 +308,10 @@ Stores an ordered pair of integers, which specify a Height and Width.
       <section>
 Implement <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a> to provide custom rendering for a <a class="xref" href="Terminal.Gui.ListView.html">ListView</a>.
 </section>
+      <h4><a class="xref" href="Terminal.Gui.IMainLoopDriver.html">IMainLoopDriver</a></h4>
+      <section>
+Public interface to create your own platform specific main loop driver.
+</section>
     <h3 id="enums">Enums
   </h3>
       <h4><a class="xref" href="Terminal.Gui.Color.html">Color</a></h4>
@@ -325,11 +331,7 @@ will be updated from the X, Y Pos objects and the Width and Height Dim objects.
 </section>
       <h4><a class="xref" href="Terminal.Gui.MouseFlags.html">MouseFlags</a></h4>
       <section>
-Mouse flags reported in MouseEvent.
-</section>
-      <h4><a class="xref" href="Terminal.Gui.SpecialChar.html">SpecialChar</a></h4>
-      <section>
-Special characters that can be drawn with Driver.AddSpecial.
+Mouse flags reported in <a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a>.
 </section>
       <h4><a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a></h4>
       <section>

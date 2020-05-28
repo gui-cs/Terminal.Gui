@@ -1,373 +1,6 @@
 ### YamlMime:XRefMap
 sorted: true
 references:
-- uid: Mono.Terminal
-  name: Mono.Terminal
-  href: api/Terminal.Gui/Mono.Terminal.html
-  commentId: N:Mono.Terminal
-  fullName: Mono.Terminal
-  nameWithType: Mono.Terminal
-- uid: Mono.Terminal.IMainLoopDriver
-  name: IMainLoopDriver
-  href: api/Terminal.Gui/Mono.Terminal.IMainLoopDriver.html
-  commentId: T:Mono.Terminal.IMainLoopDriver
-  fullName: Mono.Terminal.IMainLoopDriver
-  nameWithType: IMainLoopDriver
-- uid: Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
-  name: EventsPending(Boolean)
-  href: api/Terminal.Gui/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_EventsPending_System_Boolean_
-  commentId: M:Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
-  fullName: Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
-  nameWithType: IMainLoopDriver.EventsPending(Boolean)
-- uid: Mono.Terminal.IMainLoopDriver.EventsPending*
-  name: EventsPending
-  href: api/Terminal.Gui/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_EventsPending_
-  commentId: Overload:Mono.Terminal.IMainLoopDriver.EventsPending
-  isSpec: "True"
-  fullName: Mono.Terminal.IMainLoopDriver.EventsPending
-  nameWithType: IMainLoopDriver.EventsPending
-- uid: Mono.Terminal.IMainLoopDriver.MainIteration
-  name: MainIteration()
-  href: api/Terminal.Gui/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_MainIteration
-  commentId: M:Mono.Terminal.IMainLoopDriver.MainIteration
-  fullName: Mono.Terminal.IMainLoopDriver.MainIteration()
-  nameWithType: IMainLoopDriver.MainIteration()
-- uid: Mono.Terminal.IMainLoopDriver.MainIteration*
-  name: MainIteration
-  href: api/Terminal.Gui/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_MainIteration_
-  commentId: Overload:Mono.Terminal.IMainLoopDriver.MainIteration
-  isSpec: "True"
-  fullName: Mono.Terminal.IMainLoopDriver.MainIteration
-  nameWithType: IMainLoopDriver.MainIteration
-- uid: Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
-  name: Setup(MainLoop)
-  href: api/Terminal.Gui/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_Setup_Mono_Terminal_MainLoop_
-  commentId: M:Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
-  fullName: Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
-  nameWithType: IMainLoopDriver.Setup(MainLoop)
-- uid: Mono.Terminal.IMainLoopDriver.Setup*
-  name: Setup
-  href: api/Terminal.Gui/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_Setup_
-  commentId: Overload:Mono.Terminal.IMainLoopDriver.Setup
-  isSpec: "True"
-  fullName: Mono.Terminal.IMainLoopDriver.Setup
-  nameWithType: IMainLoopDriver.Setup
-- uid: Mono.Terminal.IMainLoopDriver.Wakeup
-  name: Wakeup()
-  href: api/Terminal.Gui/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_Wakeup
-  commentId: M:Mono.Terminal.IMainLoopDriver.Wakeup
-  fullName: Mono.Terminal.IMainLoopDriver.Wakeup()
-  nameWithType: IMainLoopDriver.Wakeup()
-- uid: Mono.Terminal.IMainLoopDriver.Wakeup*
-  name: Wakeup
-  href: api/Terminal.Gui/Mono.Terminal.IMainLoopDriver.html#Mono_Terminal_IMainLoopDriver_Wakeup_
-  commentId: Overload:Mono.Terminal.IMainLoopDriver.Wakeup
-  isSpec: "True"
-  fullName: Mono.Terminal.IMainLoopDriver.Wakeup
-  nameWithType: IMainLoopDriver.Wakeup
-- uid: Mono.Terminal.MainLoop
-  name: MainLoop
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html
-  commentId: T:Mono.Terminal.MainLoop
-  fullName: Mono.Terminal.MainLoop
-  nameWithType: MainLoop
-- uid: Mono.Terminal.MainLoop.#ctor(Mono.Terminal.IMainLoopDriver)
-  name: MainLoop(IMainLoopDriver)
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop__ctor_Mono_Terminal_IMainLoopDriver_
-  commentId: M:Mono.Terminal.MainLoop.#ctor(Mono.Terminal.IMainLoopDriver)
-  fullName: Mono.Terminal.MainLoop.MainLoop(Mono.Terminal.IMainLoopDriver)
-  nameWithType: MainLoop.MainLoop(IMainLoopDriver)
-- uid: Mono.Terminal.MainLoop.#ctor*
-  name: MainLoop
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop__ctor_
-  commentId: Overload:Mono.Terminal.MainLoop.#ctor
-  isSpec: "True"
-  fullName: Mono.Terminal.MainLoop.MainLoop
-  nameWithType: MainLoop.MainLoop
-- uid: Mono.Terminal.MainLoop.AddIdle(System.Func{System.Boolean})
-  name: AddIdle(Func<Boolean>)
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_AddIdle_System_Func_System_Boolean__
-  commentId: M:Mono.Terminal.MainLoop.AddIdle(System.Func{System.Boolean})
-  name.vb: AddIdle(Func(Of Boolean))
-  fullName: Mono.Terminal.MainLoop.AddIdle(System.Func<System.Boolean>)
-  fullName.vb: Mono.Terminal.MainLoop.AddIdle(System.Func(Of System.Boolean))
-  nameWithType: MainLoop.AddIdle(Func<Boolean>)
-  nameWithType.vb: MainLoop.AddIdle(Func(Of Boolean))
-- uid: Mono.Terminal.MainLoop.AddIdle*
-  name: AddIdle
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_AddIdle_
-  commentId: Overload:Mono.Terminal.MainLoop.AddIdle
-  isSpec: "True"
-  fullName: Mono.Terminal.MainLoop.AddIdle
-  nameWithType: MainLoop.AddIdle
-- uid: Mono.Terminal.MainLoop.AddTimeout(System.TimeSpan,System.Func{Mono.Terminal.MainLoop,System.Boolean})
-  name: AddTimeout(TimeSpan, Func<MainLoop, Boolean>)
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_AddTimeout_System_TimeSpan_System_Func_Mono_Terminal_MainLoop_System_Boolean__
-  commentId: M:Mono.Terminal.MainLoop.AddTimeout(System.TimeSpan,System.Func{Mono.Terminal.MainLoop,System.Boolean})
-  name.vb: AddTimeout(TimeSpan, Func(Of MainLoop, Boolean))
-  fullName: Mono.Terminal.MainLoop.AddTimeout(System.TimeSpan, System.Func<Mono.Terminal.MainLoop, System.Boolean>)
-  fullName.vb: Mono.Terminal.MainLoop.AddTimeout(System.TimeSpan, System.Func(Of Mono.Terminal.MainLoop, System.Boolean))
-  nameWithType: MainLoop.AddTimeout(TimeSpan, Func<MainLoop, Boolean>)
-  nameWithType.vb: MainLoop.AddTimeout(TimeSpan, Func(Of MainLoop, Boolean))
-- uid: Mono.Terminal.MainLoop.AddTimeout*
-  name: AddTimeout
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_AddTimeout_
-  commentId: Overload:Mono.Terminal.MainLoop.AddTimeout
-  isSpec: "True"
-  fullName: Mono.Terminal.MainLoop.AddTimeout
-  nameWithType: MainLoop.AddTimeout
-- uid: Mono.Terminal.MainLoop.Driver
-  name: Driver
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_Driver
-  commentId: P:Mono.Terminal.MainLoop.Driver
-  fullName: Mono.Terminal.MainLoop.Driver
-  nameWithType: MainLoop.Driver
-- uid: Mono.Terminal.MainLoop.Driver*
-  name: Driver
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_Driver_
-  commentId: Overload:Mono.Terminal.MainLoop.Driver
-  isSpec: "True"
-  fullName: Mono.Terminal.MainLoop.Driver
-  nameWithType: MainLoop.Driver
-- uid: Mono.Terminal.MainLoop.EventsPending(System.Boolean)
-  name: EventsPending(Boolean)
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_EventsPending_System_Boolean_
-  commentId: M:Mono.Terminal.MainLoop.EventsPending(System.Boolean)
-  fullName: Mono.Terminal.MainLoop.EventsPending(System.Boolean)
-  nameWithType: MainLoop.EventsPending(Boolean)
-- uid: Mono.Terminal.MainLoop.EventsPending*
-  name: EventsPending
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_EventsPending_
-  commentId: Overload:Mono.Terminal.MainLoop.EventsPending
-  isSpec: "True"
-  fullName: Mono.Terminal.MainLoop.EventsPending
-  nameWithType: MainLoop.EventsPending
-- uid: Mono.Terminal.MainLoop.Invoke(System.Action)
-  name: Invoke(Action)
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_Invoke_System_Action_
-  commentId: M:Mono.Terminal.MainLoop.Invoke(System.Action)
-  fullName: Mono.Terminal.MainLoop.Invoke(System.Action)
-  nameWithType: MainLoop.Invoke(Action)
-- uid: Mono.Terminal.MainLoop.Invoke*
-  name: Invoke
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_Invoke_
-  commentId: Overload:Mono.Terminal.MainLoop.Invoke
-  isSpec: "True"
-  fullName: Mono.Terminal.MainLoop.Invoke
-  nameWithType: MainLoop.Invoke
-- uid: Mono.Terminal.MainLoop.MainIteration
-  name: MainIteration()
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_MainIteration
-  commentId: M:Mono.Terminal.MainLoop.MainIteration
-  fullName: Mono.Terminal.MainLoop.MainIteration()
-  nameWithType: MainLoop.MainIteration()
-- uid: Mono.Terminal.MainLoop.MainIteration*
-  name: MainIteration
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_MainIteration_
-  commentId: Overload:Mono.Terminal.MainLoop.MainIteration
-  isSpec: "True"
-  fullName: Mono.Terminal.MainLoop.MainIteration
-  nameWithType: MainLoop.MainIteration
-- uid: Mono.Terminal.MainLoop.RemoveIdle(System.Func{System.Boolean})
-  name: RemoveIdle(Func<Boolean>)
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_RemoveIdle_System_Func_System_Boolean__
-  commentId: M:Mono.Terminal.MainLoop.RemoveIdle(System.Func{System.Boolean})
-  name.vb: RemoveIdle(Func(Of Boolean))
-  fullName: Mono.Terminal.MainLoop.RemoveIdle(System.Func<System.Boolean>)
-  fullName.vb: Mono.Terminal.MainLoop.RemoveIdle(System.Func(Of System.Boolean))
-  nameWithType: MainLoop.RemoveIdle(Func<Boolean>)
-  nameWithType.vb: MainLoop.RemoveIdle(Func(Of Boolean))
-- uid: Mono.Terminal.MainLoop.RemoveIdle*
-  name: RemoveIdle
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_RemoveIdle_
-  commentId: Overload:Mono.Terminal.MainLoop.RemoveIdle
-  isSpec: "True"
-  fullName: Mono.Terminal.MainLoop.RemoveIdle
-  nameWithType: MainLoop.RemoveIdle
-- uid: Mono.Terminal.MainLoop.RemoveTimeout(System.Object)
-  name: RemoveTimeout(Object)
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_RemoveTimeout_System_Object_
-  commentId: M:Mono.Terminal.MainLoop.RemoveTimeout(System.Object)
-  fullName: Mono.Terminal.MainLoop.RemoveTimeout(System.Object)
-  nameWithType: MainLoop.RemoveTimeout(Object)
-- uid: Mono.Terminal.MainLoop.RemoveTimeout*
-  name: RemoveTimeout
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_RemoveTimeout_
-  commentId: Overload:Mono.Terminal.MainLoop.RemoveTimeout
-  isSpec: "True"
-  fullName: Mono.Terminal.MainLoop.RemoveTimeout
-  nameWithType: MainLoop.RemoveTimeout
-- uid: Mono.Terminal.MainLoop.Run
-  name: Run()
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_Run
-  commentId: M:Mono.Terminal.MainLoop.Run
-  fullName: Mono.Terminal.MainLoop.Run()
-  nameWithType: MainLoop.Run()
-- uid: Mono.Terminal.MainLoop.Run*
-  name: Run
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_Run_
-  commentId: Overload:Mono.Terminal.MainLoop.Run
-  isSpec: "True"
-  fullName: Mono.Terminal.MainLoop.Run
-  nameWithType: MainLoop.Run
-- uid: Mono.Terminal.MainLoop.Stop
-  name: Stop()
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_Stop
-  commentId: M:Mono.Terminal.MainLoop.Stop
-  fullName: Mono.Terminal.MainLoop.Stop()
-  nameWithType: MainLoop.Stop()
-- uid: Mono.Terminal.MainLoop.Stop*
-  name: Stop
-  href: api/Terminal.Gui/Mono.Terminal.MainLoop.html#Mono_Terminal_MainLoop_Stop_
-  commentId: Overload:Mono.Terminal.MainLoop.Stop
-  isSpec: "True"
-  fullName: Mono.Terminal.MainLoop.Stop
-  nameWithType: MainLoop.Stop
-- uid: Mono.Terminal.UnixMainLoop
-  name: UnixMainLoop
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.html
-  commentId: T:Mono.Terminal.UnixMainLoop
-  fullName: Mono.Terminal.UnixMainLoop
-  nameWithType: UnixMainLoop
-- uid: Mono.Terminal.UnixMainLoop.AddWatch(System.Int32,Mono.Terminal.UnixMainLoop.Condition,System.Func{Mono.Terminal.MainLoop,System.Boolean})
-  name: AddWatch(Int32, UnixMainLoop.Condition, Func<MainLoop, Boolean>)
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_AddWatch_System_Int32_Mono_Terminal_UnixMainLoop_Condition_System_Func_Mono_Terminal_MainLoop_System_Boolean__
-  commentId: M:Mono.Terminal.UnixMainLoop.AddWatch(System.Int32,Mono.Terminal.UnixMainLoop.Condition,System.Func{Mono.Terminal.MainLoop,System.Boolean})
-  name.vb: AddWatch(Int32, UnixMainLoop.Condition, Func(Of MainLoop, Boolean))
-  fullName: Mono.Terminal.UnixMainLoop.AddWatch(System.Int32, Mono.Terminal.UnixMainLoop.Condition, System.Func<Mono.Terminal.MainLoop, System.Boolean>)
-  fullName.vb: Mono.Terminal.UnixMainLoop.AddWatch(System.Int32, Mono.Terminal.UnixMainLoop.Condition, System.Func(Of Mono.Terminal.MainLoop, System.Boolean))
-  nameWithType: UnixMainLoop.AddWatch(Int32, UnixMainLoop.Condition, Func<MainLoop, Boolean>)
-  nameWithType.vb: UnixMainLoop.AddWatch(Int32, UnixMainLoop.Condition, Func(Of MainLoop, Boolean))
-- uid: Mono.Terminal.UnixMainLoop.AddWatch*
-  name: AddWatch
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_AddWatch_
-  commentId: Overload:Mono.Terminal.UnixMainLoop.AddWatch
-  isSpec: "True"
-  fullName: Mono.Terminal.UnixMainLoop.AddWatch
-  nameWithType: UnixMainLoop.AddWatch
-- uid: Mono.Terminal.UnixMainLoop.Condition
-  name: UnixMainLoop.Condition
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.Condition.html
-  commentId: T:Mono.Terminal.UnixMainLoop.Condition
-  fullName: Mono.Terminal.UnixMainLoop.Condition
-  nameWithType: UnixMainLoop.Condition
-- uid: Mono.Terminal.UnixMainLoop.Condition.PollErr
-  name: PollErr
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.Condition.html#Mono_Terminal_UnixMainLoop_Condition_PollErr
-  commentId: F:Mono.Terminal.UnixMainLoop.Condition.PollErr
-  fullName: Mono.Terminal.UnixMainLoop.Condition.PollErr
-  nameWithType: UnixMainLoop.Condition.PollErr
-- uid: Mono.Terminal.UnixMainLoop.Condition.PollHup
-  name: PollHup
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.Condition.html#Mono_Terminal_UnixMainLoop_Condition_PollHup
-  commentId: F:Mono.Terminal.UnixMainLoop.Condition.PollHup
-  fullName: Mono.Terminal.UnixMainLoop.Condition.PollHup
-  nameWithType: UnixMainLoop.Condition.PollHup
-- uid: Mono.Terminal.UnixMainLoop.Condition.PollIn
-  name: PollIn
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.Condition.html#Mono_Terminal_UnixMainLoop_Condition_PollIn
-  commentId: F:Mono.Terminal.UnixMainLoop.Condition.PollIn
-  fullName: Mono.Terminal.UnixMainLoop.Condition.PollIn
-  nameWithType: UnixMainLoop.Condition.PollIn
-- uid: Mono.Terminal.UnixMainLoop.Condition.PollNval
-  name: PollNval
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.Condition.html#Mono_Terminal_UnixMainLoop_Condition_PollNval
-  commentId: F:Mono.Terminal.UnixMainLoop.Condition.PollNval
-  fullName: Mono.Terminal.UnixMainLoop.Condition.PollNval
-  nameWithType: UnixMainLoop.Condition.PollNval
-- uid: Mono.Terminal.UnixMainLoop.Condition.PollOut
-  name: PollOut
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.Condition.html#Mono_Terminal_UnixMainLoop_Condition_PollOut
-  commentId: F:Mono.Terminal.UnixMainLoop.Condition.PollOut
-  fullName: Mono.Terminal.UnixMainLoop.Condition.PollOut
-  nameWithType: UnixMainLoop.Condition.PollOut
-- uid: Mono.Terminal.UnixMainLoop.Condition.PollPri
-  name: PollPri
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.Condition.html#Mono_Terminal_UnixMainLoop_Condition_PollPri
-  commentId: F:Mono.Terminal.UnixMainLoop.Condition.PollPri
-  fullName: Mono.Terminal.UnixMainLoop.Condition.PollPri
-  nameWithType: UnixMainLoop.Condition.PollPri
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending(System.Boolean)
-  name: IMainLoopDriver.EventsPending(Boolean)
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_EventsPending_System_Boolean_
-  commentId: M:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending(System.Boolean)
-  name.vb: Mono.Terminal.IMainLoopDriver.EventsPending(Boolean)
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.EventsPending(System.Boolean)
-  nameWithType: UnixMainLoop.IMainLoopDriver.EventsPending(Boolean)
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.EventsPending(Boolean)
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending*
-  name: IMainLoopDriver.EventsPending
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_EventsPending_
-  commentId: Overload:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#EventsPending
-  isSpec: "True"
-  name.vb: Mono.Terminal.IMainLoopDriver.EventsPending
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.EventsPending
-  nameWithType: UnixMainLoop.IMainLoopDriver.EventsPending
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.EventsPending
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration
-  name: IMainLoopDriver.MainIteration()
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_MainIteration
-  commentId: M:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration
-  name.vb: Mono.Terminal.IMainLoopDriver.MainIteration()
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.MainIteration()
-  nameWithType: UnixMainLoop.IMainLoopDriver.MainIteration()
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.MainIteration()
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration*
-  name: IMainLoopDriver.MainIteration
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_MainIteration_
-  commentId: Overload:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#MainIteration
-  isSpec: "True"
-  name.vb: Mono.Terminal.IMainLoopDriver.MainIteration
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.MainIteration
-  nameWithType: UnixMainLoop.IMainLoopDriver.MainIteration
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.MainIteration
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup(Mono.Terminal.MainLoop)
-  name: IMainLoopDriver.Setup(MainLoop)
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_Setup_Mono_Terminal_MainLoop_
-  commentId: M:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup(Mono.Terminal.MainLoop)
-  name.vb: Mono.Terminal.IMainLoopDriver.Setup(MainLoop)
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.Setup(Mono.Terminal.MainLoop)
-  nameWithType: UnixMainLoop.IMainLoopDriver.Setup(MainLoop)
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Setup(MainLoop)
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup*
-  name: IMainLoopDriver.Setup
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_Setup_
-  commentId: Overload:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Setup
-  isSpec: "True"
-  name.vb: Mono.Terminal.IMainLoopDriver.Setup
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.Setup
-  nameWithType: UnixMainLoop.IMainLoopDriver.Setup
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Setup
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup
-  name: IMainLoopDriver.Wakeup()
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_Wakeup
-  commentId: M:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup
-  name.vb: Mono.Terminal.IMainLoopDriver.Wakeup()
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.Wakeup()
-  nameWithType: UnixMainLoop.IMainLoopDriver.Wakeup()
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Wakeup()
-- uid: Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup*
-  name: IMainLoopDriver.Wakeup
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_Mono_Terminal_IMainLoopDriver_Wakeup_
-  commentId: Overload:Mono.Terminal.UnixMainLoop.Mono#Terminal#IMainLoopDriver#Wakeup
-  isSpec: "True"
-  name.vb: Mono.Terminal.IMainLoopDriver.Wakeup
-  fullName: Mono.Terminal.UnixMainLoop.Mono.Terminal.IMainLoopDriver.Wakeup
-  nameWithType: UnixMainLoop.IMainLoopDriver.Wakeup
-  nameWithType.vb: UnixMainLoop.Mono.Terminal.IMainLoopDriver.Wakeup
-- uid: Mono.Terminal.UnixMainLoop.RemoveWatch(System.Object)
-  name: RemoveWatch(Object)
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_RemoveWatch_System_Object_
-  commentId: M:Mono.Terminal.UnixMainLoop.RemoveWatch(System.Object)
-  fullName: Mono.Terminal.UnixMainLoop.RemoveWatch(System.Object)
-  nameWithType: UnixMainLoop.RemoveWatch(Object)
-- uid: Mono.Terminal.UnixMainLoop.RemoveWatch*
-  name: RemoveWatch
-  href: api/Terminal.Gui/Mono.Terminal.UnixMainLoop.html#Mono_Terminal_UnixMainLoop_RemoveWatch_
-  commentId: Overload:Mono.Terminal.UnixMainLoop.RemoveWatch
-  isSpec: "True"
-  fullName: Mono.Terminal.UnixMainLoop.RemoveWatch
-  nameWithType: UnixMainLoop.RemoveWatch
 - uid: Terminal.Gui
   name: Terminal.Gui
   href: api/Terminal.Gui/Terminal.Gui.html
@@ -425,12 +58,12 @@ references:
   commentId: F:Terminal.Gui.Application.Driver
   fullName: Terminal.Gui.Application.Driver
   nameWithType: Application.Driver
-- uid: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
-  name: End(Application.RunState)
-  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_
-  commentId: M:Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
-  fullName: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
-  nameWithType: Application.End(Application.RunState)
+- uid: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState,System.Boolean)
+  name: End(Application.RunState, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_System_Boolean_
+  commentId: M:Terminal.Gui.Application.End(Terminal.Gui.Application.RunState,System.Boolean)
+  fullName: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState, System.Boolean)
+  nameWithType: Application.End(Application.RunState, Boolean)
 - uid: Terminal.Gui.Application.End*
   name: End
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_End_
@@ -578,12 +211,12 @@ references:
   commentId: M:Terminal.Gui.Application.Run
   fullName: Terminal.Gui.Application.Run()
   nameWithType: Application.Run()
-- uid: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
-  name: Run(Toplevel)
-  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_
-  commentId: M:Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
-  fullName: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
-  nameWithType: Application.Run(Toplevel)
+- uid: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel,System.Boolean)
+  name: Run(Toplevel, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Boolean_
+  commentId: M:Terminal.Gui.Application.Run(Terminal.Gui.Toplevel,System.Boolean)
+  fullName: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel, System.Boolean)
+  nameWithType: Application.Run(Toplevel, Boolean)
 - uid: Terminal.Gui.Application.Run*
   name: Run
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Run_
@@ -638,12 +271,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Application.RunState.Dispose
   nameWithType: Application.RunState.Dispose
-- uid: Terminal.Gui.Application.Shutdown
-  name: Shutdown()
-  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Shutdown
-  commentId: M:Terminal.Gui.Application.Shutdown
-  fullName: Terminal.Gui.Application.Shutdown()
-  nameWithType: Application.Shutdown()
+- uid: Terminal.Gui.Application.Shutdown(System.Boolean)
+  name: Shutdown(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Shutdown_System_Boolean_
+  commentId: M:Terminal.Gui.Application.Shutdown(System.Boolean)
+  fullName: Terminal.Gui.Application.Shutdown(System.Boolean)
+  nameWithType: Application.Shutdown(Boolean)
 - uid: Terminal.Gui.Application.Shutdown*
   name: Shutdown
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Shutdown_
@@ -1431,6 +1064,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ConsoleDriver.DrawFrame
   nameWithType: ConsoleDriver.DrawFrame
+- uid: Terminal.Gui.ConsoleDriver.DrawWindowFrame(Terminal.Gui.Rect,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)
+  name: DrawWindowFrame(Rect, Int32, Int32, Int32, Int32, Boolean, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawWindowFrame_Terminal_Gui_Rect_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_
+  commentId: M:Terminal.Gui.ConsoleDriver.DrawWindowFrame(Terminal.Gui.Rect,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)
+  fullName: Terminal.Gui.ConsoleDriver.DrawWindowFrame(Terminal.Gui.Rect, System.Int32, System.Int32, System.Int32, System.Int32, System.Boolean, System.Boolean)
+  nameWithType: ConsoleDriver.DrawWindowFrame(Rect, Int32, Int32, Int32, Int32, Boolean, Boolean)
+- uid: Terminal.Gui.ConsoleDriver.DrawWindowFrame*
+  name: DrawWindowFrame
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawWindowFrame_
+  commentId: Overload:Terminal.Gui.ConsoleDriver.DrawWindowFrame
+  isSpec: "True"
+  fullName: Terminal.Gui.ConsoleDriver.DrawWindowFrame
+  nameWithType: ConsoleDriver.DrawWindowFrame
+- uid: Terminal.Gui.ConsoleDriver.DrawWindowTitle(Terminal.Gui.Rect,NStack.ustring,System.Int32,System.Int32,System.Int32,System.Int32,Terminal.Gui.TextAlignment)
+  name: DrawWindowTitle(Rect, ustring, Int32, Int32, Int32, Int32, TextAlignment)
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawWindowTitle_Terminal_Gui_Rect_NStack_ustring_System_Int32_System_Int32_System_Int32_System_Int32_Terminal_Gui_TextAlignment_
+  commentId: M:Terminal.Gui.ConsoleDriver.DrawWindowTitle(Terminal.Gui.Rect,NStack.ustring,System.Int32,System.Int32,System.Int32,System.Int32,Terminal.Gui.TextAlignment)
+  fullName: Terminal.Gui.ConsoleDriver.DrawWindowTitle(Terminal.Gui.Rect, NStack.ustring, System.Int32, System.Int32, System.Int32, System.Int32, Terminal.Gui.TextAlignment)
+  nameWithType: ConsoleDriver.DrawWindowTitle(Rect, ustring, Int32, Int32, Int32, Int32, TextAlignment)
+- uid: Terminal.Gui.ConsoleDriver.DrawWindowTitle*
+  name: DrawWindowTitle
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawWindowTitle_
+  commentId: Overload:Terminal.Gui.ConsoleDriver.DrawWindowTitle
+  isSpec: "True"
+  fullName: Terminal.Gui.ConsoleDriver.DrawWindowTitle
+  nameWithType: ConsoleDriver.DrawWindowTitle
 - uid: Terminal.Gui.ConsoleDriver.End
   name: End()
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_End
@@ -1507,13 +1166,13 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ConsoleDriver.Move
   nameWithType: ConsoleDriver.Move
-- uid: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+- uid: Terminal.Gui.ConsoleDriver.PrepareToRun(Terminal.Gui.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
   name: PrepareToRun(MainLoop, Action<KeyEvent>, Action<KeyEvent>, Action<KeyEvent>, Action<MouseEvent>)
-  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_PrepareToRun_Mono_Terminal_MainLoop_System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_MouseEvent__
-  commentId: M:Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_PrepareToRun_Terminal_Gui_MainLoop_System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_MouseEvent__
+  commentId: M:Terminal.Gui.ConsoleDriver.PrepareToRun(Terminal.Gui.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
   name.vb: PrepareToRun(MainLoop, Action(Of KeyEvent), Action(Of KeyEvent), Action(Of KeyEvent), Action(Of MouseEvent))
-  fullName: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.MouseEvent>)
-  fullName.vb: Terminal.Gui.ConsoleDriver.PrepareToRun(Mono.Terminal.MainLoop, System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.MouseEvent))
+  fullName: Terminal.Gui.ConsoleDriver.PrepareToRun(Terminal.Gui.MainLoop, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.MouseEvent>)
+  fullName.vb: Terminal.Gui.ConsoleDriver.PrepareToRun(Terminal.Gui.MainLoop, System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.MouseEvent))
   nameWithType: ConsoleDriver.PrepareToRun(MainLoop, Action<KeyEvent>, Action<KeyEvent>, Action<KeyEvent>, Action<MouseEvent>)
   nameWithType.vb: ConsoleDriver.PrepareToRun(MainLoop, Action(Of KeyEvent), Action(Of KeyEvent), Action(Of KeyEvent), Action(Of MouseEvent))
 - uid: Terminal.Gui.ConsoleDriver.PrepareToRun*
@@ -1714,287 +1373,6 @@ references:
   commentId: F:Terminal.Gui.ConsoleDriver.VLine
   fullName: Terminal.Gui.ConsoleDriver.VLine
   nameWithType: ConsoleDriver.VLine
-- uid: Terminal.Gui.CursesDriver
-  name: CursesDriver
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html
-  commentId: T:Terminal.Gui.CursesDriver
-  fullName: Terminal.Gui.CursesDriver
-  nameWithType: CursesDriver
-- uid: Terminal.Gui.CursesDriver.AddRune(System.Rune)
-  name: AddRune(Rune)
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_AddRune_System_Rune_
-  commentId: M:Terminal.Gui.CursesDriver.AddRune(System.Rune)
-  fullName: Terminal.Gui.CursesDriver.AddRune(System.Rune)
-  nameWithType: CursesDriver.AddRune(Rune)
-- uid: Terminal.Gui.CursesDriver.AddRune*
-  name: AddRune
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_AddRune_
-  commentId: Overload:Terminal.Gui.CursesDriver.AddRune
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.AddRune
-  nameWithType: CursesDriver.AddRune
-- uid: Terminal.Gui.CursesDriver.AddStr(NStack.ustring)
-  name: AddStr(ustring)
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_AddStr_NStack_ustring_
-  commentId: M:Terminal.Gui.CursesDriver.AddStr(NStack.ustring)
-  fullName: Terminal.Gui.CursesDriver.AddStr(NStack.ustring)
-  nameWithType: CursesDriver.AddStr(ustring)
-- uid: Terminal.Gui.CursesDriver.AddStr*
-  name: AddStr
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_AddStr_
-  commentId: Overload:Terminal.Gui.CursesDriver.AddStr
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.AddStr
-  nameWithType: CursesDriver.AddStr
-- uid: Terminal.Gui.CursesDriver.Cols
-  name: Cols
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_Cols
-  commentId: P:Terminal.Gui.CursesDriver.Cols
-  fullName: Terminal.Gui.CursesDriver.Cols
-  nameWithType: CursesDriver.Cols
-- uid: Terminal.Gui.CursesDriver.Cols*
-  name: Cols
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_Cols_
-  commentId: Overload:Terminal.Gui.CursesDriver.Cols
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.Cols
-  nameWithType: CursesDriver.Cols
-- uid: Terminal.Gui.CursesDriver.CookMouse
-  name: CookMouse()
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_CookMouse
-  commentId: M:Terminal.Gui.CursesDriver.CookMouse
-  fullName: Terminal.Gui.CursesDriver.CookMouse()
-  nameWithType: CursesDriver.CookMouse()
-- uid: Terminal.Gui.CursesDriver.CookMouse*
-  name: CookMouse
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_CookMouse_
-  commentId: Overload:Terminal.Gui.CursesDriver.CookMouse
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.CookMouse
-  nameWithType: CursesDriver.CookMouse
-- uid: Terminal.Gui.CursesDriver.End
-  name: End()
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_End
-  commentId: M:Terminal.Gui.CursesDriver.End
-  fullName: Terminal.Gui.CursesDriver.End()
-  nameWithType: CursesDriver.End()
-- uid: Terminal.Gui.CursesDriver.End*
-  name: End
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_End_
-  commentId: Overload:Terminal.Gui.CursesDriver.End
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.End
-  nameWithType: CursesDriver.End
-- uid: Terminal.Gui.CursesDriver.Init(System.Action)
-  name: Init(Action)
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_Init_System_Action_
-  commentId: M:Terminal.Gui.CursesDriver.Init(System.Action)
-  fullName: Terminal.Gui.CursesDriver.Init(System.Action)
-  nameWithType: CursesDriver.Init(Action)
-- uid: Terminal.Gui.CursesDriver.Init*
-  name: Init
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_Init_
-  commentId: Overload:Terminal.Gui.CursesDriver.Init
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.Init
-  nameWithType: CursesDriver.Init
-- uid: Terminal.Gui.CursesDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
-  name: MakeAttribute(Color, Color)
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_MakeAttribute_Terminal_Gui_Color_Terminal_Gui_Color_
-  commentId: M:Terminal.Gui.CursesDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
-  fullName: Terminal.Gui.CursesDriver.MakeAttribute(Terminal.Gui.Color, Terminal.Gui.Color)
-  nameWithType: CursesDriver.MakeAttribute(Color, Color)
-- uid: Terminal.Gui.CursesDriver.MakeAttribute*
-  name: MakeAttribute
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_MakeAttribute_
-  commentId: Overload:Terminal.Gui.CursesDriver.MakeAttribute
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.MakeAttribute
-  nameWithType: CursesDriver.MakeAttribute
-- uid: Terminal.Gui.CursesDriver.MakeColor(System.Int16,System.Int16)
-  name: MakeColor(Int16, Int16)
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_MakeColor_System_Int16_System_Int16_
-  commentId: M:Terminal.Gui.CursesDriver.MakeColor(System.Int16,System.Int16)
-  fullName: Terminal.Gui.CursesDriver.MakeColor(System.Int16, System.Int16)
-  nameWithType: CursesDriver.MakeColor(Int16, Int16)
-- uid: Terminal.Gui.CursesDriver.MakeColor*
-  name: MakeColor
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_MakeColor_
-  commentId: Overload:Terminal.Gui.CursesDriver.MakeColor
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.MakeColor
-  nameWithType: CursesDriver.MakeColor
-- uid: Terminal.Gui.CursesDriver.Move(System.Int32,System.Int32)
-  name: Move(Int32, Int32)
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_Move_System_Int32_System_Int32_
-  commentId: M:Terminal.Gui.CursesDriver.Move(System.Int32,System.Int32)
-  fullName: Terminal.Gui.CursesDriver.Move(System.Int32, System.Int32)
-  nameWithType: CursesDriver.Move(Int32, Int32)
-- uid: Terminal.Gui.CursesDriver.Move*
-  name: Move
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_Move_
-  commentId: Overload:Terminal.Gui.CursesDriver.Move
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.Move
-  nameWithType: CursesDriver.Move
-- uid: Terminal.Gui.CursesDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
-  name: PrepareToRun(MainLoop, Action<KeyEvent>, Action<KeyEvent>, Action<KeyEvent>, Action<MouseEvent>)
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_PrepareToRun_Mono_Terminal_MainLoop_System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_MouseEvent__
-  commentId: M:Terminal.Gui.CursesDriver.PrepareToRun(Mono.Terminal.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
-  name.vb: PrepareToRun(MainLoop, Action(Of KeyEvent), Action(Of KeyEvent), Action(Of KeyEvent), Action(Of MouseEvent))
-  fullName: Terminal.Gui.CursesDriver.PrepareToRun(Mono.Terminal.MainLoop, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.MouseEvent>)
-  fullName.vb: Terminal.Gui.CursesDriver.PrepareToRun(Mono.Terminal.MainLoop, System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.MouseEvent))
-  nameWithType: CursesDriver.PrepareToRun(MainLoop, Action<KeyEvent>, Action<KeyEvent>, Action<KeyEvent>, Action<MouseEvent>)
-  nameWithType.vb: CursesDriver.PrepareToRun(MainLoop, Action(Of KeyEvent), Action(Of KeyEvent), Action(Of KeyEvent), Action(Of MouseEvent))
-- uid: Terminal.Gui.CursesDriver.PrepareToRun*
-  name: PrepareToRun
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_PrepareToRun_
-  commentId: Overload:Terminal.Gui.CursesDriver.PrepareToRun
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.PrepareToRun
-  nameWithType: CursesDriver.PrepareToRun
-- uid: Terminal.Gui.CursesDriver.Refresh
-  name: Refresh()
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_Refresh
-  commentId: M:Terminal.Gui.CursesDriver.Refresh
-  fullName: Terminal.Gui.CursesDriver.Refresh()
-  nameWithType: CursesDriver.Refresh()
-- uid: Terminal.Gui.CursesDriver.Refresh*
-  name: Refresh
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_Refresh_
-  commentId: Overload:Terminal.Gui.CursesDriver.Refresh
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.Refresh
-  nameWithType: CursesDriver.Refresh
-- uid: Terminal.Gui.CursesDriver.Rows
-  name: Rows
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_Rows
-  commentId: P:Terminal.Gui.CursesDriver.Rows
-  fullName: Terminal.Gui.CursesDriver.Rows
-  nameWithType: CursesDriver.Rows
-- uid: Terminal.Gui.CursesDriver.Rows*
-  name: Rows
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_Rows_
-  commentId: Overload:Terminal.Gui.CursesDriver.Rows
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.Rows
-  nameWithType: CursesDriver.Rows
-- uid: Terminal.Gui.CursesDriver.SetAttribute(Terminal.Gui.Attribute)
-  name: SetAttribute(Attribute)
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_SetAttribute_Terminal_Gui_Attribute_
-  commentId: M:Terminal.Gui.CursesDriver.SetAttribute(Terminal.Gui.Attribute)
-  fullName: Terminal.Gui.CursesDriver.SetAttribute(Terminal.Gui.Attribute)
-  nameWithType: CursesDriver.SetAttribute(Attribute)
-- uid: Terminal.Gui.CursesDriver.SetAttribute*
-  name: SetAttribute
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_SetAttribute_
-  commentId: Overload:Terminal.Gui.CursesDriver.SetAttribute
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.SetAttribute
-  nameWithType: CursesDriver.SetAttribute
-- uid: Terminal.Gui.CursesDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
-  name: SetColors(ConsoleColor, ConsoleColor)
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_SetColors_System_ConsoleColor_System_ConsoleColor_
-  commentId: M:Terminal.Gui.CursesDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
-  fullName: Terminal.Gui.CursesDriver.SetColors(System.ConsoleColor, System.ConsoleColor)
-  nameWithType: CursesDriver.SetColors(ConsoleColor, ConsoleColor)
-- uid: Terminal.Gui.CursesDriver.SetColors(System.Int16,System.Int16)
-  name: SetColors(Int16, Int16)
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_SetColors_System_Int16_System_Int16_
-  commentId: M:Terminal.Gui.CursesDriver.SetColors(System.Int16,System.Int16)
-  fullName: Terminal.Gui.CursesDriver.SetColors(System.Int16, System.Int16)
-  nameWithType: CursesDriver.SetColors(Int16, Int16)
-- uid: Terminal.Gui.CursesDriver.SetColors*
-  name: SetColors
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_SetColors_
-  commentId: Overload:Terminal.Gui.CursesDriver.SetColors
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.SetColors
-  nameWithType: CursesDriver.SetColors
-- uid: Terminal.Gui.CursesDriver.StartReportingMouseMoves
-  name: StartReportingMouseMoves()
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_StartReportingMouseMoves
-  commentId: M:Terminal.Gui.CursesDriver.StartReportingMouseMoves
-  fullName: Terminal.Gui.CursesDriver.StartReportingMouseMoves()
-  nameWithType: CursesDriver.StartReportingMouseMoves()
-- uid: Terminal.Gui.CursesDriver.StartReportingMouseMoves*
-  name: StartReportingMouseMoves
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_StartReportingMouseMoves_
-  commentId: Overload:Terminal.Gui.CursesDriver.StartReportingMouseMoves
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.StartReportingMouseMoves
-  nameWithType: CursesDriver.StartReportingMouseMoves
-- uid: Terminal.Gui.CursesDriver.StopReportingMouseMoves
-  name: StopReportingMouseMoves()
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_StopReportingMouseMoves
-  commentId: M:Terminal.Gui.CursesDriver.StopReportingMouseMoves
-  fullName: Terminal.Gui.CursesDriver.StopReportingMouseMoves()
-  nameWithType: CursesDriver.StopReportingMouseMoves()
-- uid: Terminal.Gui.CursesDriver.StopReportingMouseMoves*
-  name: StopReportingMouseMoves
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_StopReportingMouseMoves_
-  commentId: Overload:Terminal.Gui.CursesDriver.StopReportingMouseMoves
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.StopReportingMouseMoves
-  nameWithType: CursesDriver.StopReportingMouseMoves
-- uid: Terminal.Gui.CursesDriver.Suspend
-  name: Suspend()
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_Suspend
-  commentId: M:Terminal.Gui.CursesDriver.Suspend
-  fullName: Terminal.Gui.CursesDriver.Suspend()
-  nameWithType: CursesDriver.Suspend()
-- uid: Terminal.Gui.CursesDriver.Suspend*
-  name: Suspend
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_Suspend_
-  commentId: Overload:Terminal.Gui.CursesDriver.Suspend
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.Suspend
-  nameWithType: CursesDriver.Suspend
-- uid: Terminal.Gui.CursesDriver.UncookMouse
-  name: UncookMouse()
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_UncookMouse
-  commentId: M:Terminal.Gui.CursesDriver.UncookMouse
-  fullName: Terminal.Gui.CursesDriver.UncookMouse()
-  nameWithType: CursesDriver.UncookMouse()
-- uid: Terminal.Gui.CursesDriver.UncookMouse*
-  name: UncookMouse
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_UncookMouse_
-  commentId: Overload:Terminal.Gui.CursesDriver.UncookMouse
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.UncookMouse
-  nameWithType: CursesDriver.UncookMouse
-- uid: Terminal.Gui.CursesDriver.UpdateCursor
-  name: UpdateCursor()
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_UpdateCursor
-  commentId: M:Terminal.Gui.CursesDriver.UpdateCursor
-  fullName: Terminal.Gui.CursesDriver.UpdateCursor()
-  nameWithType: CursesDriver.UpdateCursor()
-- uid: Terminal.Gui.CursesDriver.UpdateCursor*
-  name: UpdateCursor
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_UpdateCursor_
-  commentId: Overload:Terminal.Gui.CursesDriver.UpdateCursor
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.UpdateCursor
-  nameWithType: CursesDriver.UpdateCursor
-- uid: Terminal.Gui.CursesDriver.UpdateScreen
-  name: UpdateScreen()
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_UpdateScreen
-  commentId: M:Terminal.Gui.CursesDriver.UpdateScreen
-  fullName: Terminal.Gui.CursesDriver.UpdateScreen()
-  nameWithType: CursesDriver.UpdateScreen()
-- uid: Terminal.Gui.CursesDriver.UpdateScreen*
-  name: UpdateScreen
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_UpdateScreen_
-  commentId: Overload:Terminal.Gui.CursesDriver.UpdateScreen
-  isSpec: "True"
-  fullName: Terminal.Gui.CursesDriver.UpdateScreen
-  nameWithType: CursesDriver.UpdateScreen
-- uid: Terminal.Gui.CursesDriver.window
-  name: window
-  href: api/Terminal.Gui/Terminal.Gui.CursesDriver.html#Terminal_Gui_CursesDriver_window
-  commentId: F:Terminal.Gui.CursesDriver.window
-  fullName: Terminal.Gui.CursesDriver.window
-  nameWithType: CursesDriver.window
 - uid: Terminal.Gui.DateField
   name: DateField
   href: api/Terminal.Gui/Terminal.Gui.DateField.html
@@ -2717,6 +2095,64 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.IListDataSource.ToList
   nameWithType: IListDataSource.ToList
+- uid: Terminal.Gui.IMainLoopDriver
+  name: IMainLoopDriver
+  href: api/Terminal.Gui/Terminal.Gui.IMainLoopDriver.html
+  commentId: T:Terminal.Gui.IMainLoopDriver
+  fullName: Terminal.Gui.IMainLoopDriver
+  nameWithType: IMainLoopDriver
+- uid: Terminal.Gui.IMainLoopDriver.EventsPending(System.Boolean)
+  name: EventsPending(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.IMainLoopDriver.html#Terminal_Gui_IMainLoopDriver_EventsPending_System_Boolean_
+  commentId: M:Terminal.Gui.IMainLoopDriver.EventsPending(System.Boolean)
+  fullName: Terminal.Gui.IMainLoopDriver.EventsPending(System.Boolean)
+  nameWithType: IMainLoopDriver.EventsPending(Boolean)
+- uid: Terminal.Gui.IMainLoopDriver.EventsPending*
+  name: EventsPending
+  href: api/Terminal.Gui/Terminal.Gui.IMainLoopDriver.html#Terminal_Gui_IMainLoopDriver_EventsPending_
+  commentId: Overload:Terminal.Gui.IMainLoopDriver.EventsPending
+  isSpec: "True"
+  fullName: Terminal.Gui.IMainLoopDriver.EventsPending
+  nameWithType: IMainLoopDriver.EventsPending
+- uid: Terminal.Gui.IMainLoopDriver.MainIteration
+  name: MainIteration()
+  href: api/Terminal.Gui/Terminal.Gui.IMainLoopDriver.html#Terminal_Gui_IMainLoopDriver_MainIteration
+  commentId: M:Terminal.Gui.IMainLoopDriver.MainIteration
+  fullName: Terminal.Gui.IMainLoopDriver.MainIteration()
+  nameWithType: IMainLoopDriver.MainIteration()
+- uid: Terminal.Gui.IMainLoopDriver.MainIteration*
+  name: MainIteration
+  href: api/Terminal.Gui/Terminal.Gui.IMainLoopDriver.html#Terminal_Gui_IMainLoopDriver_MainIteration_
+  commentId: Overload:Terminal.Gui.IMainLoopDriver.MainIteration
+  isSpec: "True"
+  fullName: Terminal.Gui.IMainLoopDriver.MainIteration
+  nameWithType: IMainLoopDriver.MainIteration
+- uid: Terminal.Gui.IMainLoopDriver.Setup(Terminal.Gui.MainLoop)
+  name: Setup(MainLoop)
+  href: api/Terminal.Gui/Terminal.Gui.IMainLoopDriver.html#Terminal_Gui_IMainLoopDriver_Setup_Terminal_Gui_MainLoop_
+  commentId: M:Terminal.Gui.IMainLoopDriver.Setup(Terminal.Gui.MainLoop)
+  fullName: Terminal.Gui.IMainLoopDriver.Setup(Terminal.Gui.MainLoop)
+  nameWithType: IMainLoopDriver.Setup(MainLoop)
+- uid: Terminal.Gui.IMainLoopDriver.Setup*
+  name: Setup
+  href: api/Terminal.Gui/Terminal.Gui.IMainLoopDriver.html#Terminal_Gui_IMainLoopDriver_Setup_
+  commentId: Overload:Terminal.Gui.IMainLoopDriver.Setup
+  isSpec: "True"
+  fullName: Terminal.Gui.IMainLoopDriver.Setup
+  nameWithType: IMainLoopDriver.Setup
+- uid: Terminal.Gui.IMainLoopDriver.Wakeup
+  name: Wakeup()
+  href: api/Terminal.Gui/Terminal.Gui.IMainLoopDriver.html#Terminal_Gui_IMainLoopDriver_Wakeup
+  commentId: M:Terminal.Gui.IMainLoopDriver.Wakeup
+  fullName: Terminal.Gui.IMainLoopDriver.Wakeup()
+  nameWithType: IMainLoopDriver.Wakeup()
+- uid: Terminal.Gui.IMainLoopDriver.Wakeup*
+  name: Wakeup
+  href: api/Terminal.Gui/Terminal.Gui.IMainLoopDriver.html#Terminal_Gui_IMainLoopDriver_Wakeup_
+  commentId: Overload:Terminal.Gui.IMainLoopDriver.Wakeup
+  isSpec: "True"
+  fullName: Terminal.Gui.IMainLoopDriver.Wakeup
+  nameWithType: IMainLoopDriver.Wakeup
 - uid: Terminal.Gui.Key
   name: Key
   href: api/Terminal.Gui/Terminal.Gui.Key.html
@@ -2981,6 +2417,18 @@ references:
   commentId: F:Terminal.Gui.Key.F10
   fullName: Terminal.Gui.Key.F10
   nameWithType: Key.F10
+- uid: Terminal.Gui.Key.F11
+  name: F11
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_F11
+  commentId: F:Terminal.Gui.Key.F11
+  fullName: Terminal.Gui.Key.F11
+  nameWithType: Key.F11
+- uid: Terminal.Gui.Key.F12
+  name: F12
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_F12
+  commentId: F:Terminal.Gui.Key.F12
+  fullName: Terminal.Gui.Key.F12
+  nameWithType: Key.F12
 - uid: Terminal.Gui.Key.F2
   name: F2
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_F2
@@ -3737,6 +3185,164 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ListWrapper.ToList
   nameWithType: ListWrapper.ToList
+- uid: Terminal.Gui.MainLoop
+  name: MainLoop
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html
+  commentId: T:Terminal.Gui.MainLoop
+  fullName: Terminal.Gui.MainLoop
+  nameWithType: MainLoop
+- uid: Terminal.Gui.MainLoop.#ctor(Terminal.Gui.IMainLoopDriver)
+  name: MainLoop(IMainLoopDriver)
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop__ctor_Terminal_Gui_IMainLoopDriver_
+  commentId: M:Terminal.Gui.MainLoop.#ctor(Terminal.Gui.IMainLoopDriver)
+  fullName: Terminal.Gui.MainLoop.MainLoop(Terminal.Gui.IMainLoopDriver)
+  nameWithType: MainLoop.MainLoop(IMainLoopDriver)
+- uid: Terminal.Gui.MainLoop.#ctor*
+  name: MainLoop
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop__ctor_
+  commentId: Overload:Terminal.Gui.MainLoop.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.MainLoop.MainLoop
+  nameWithType: MainLoop.MainLoop
+- uid: Terminal.Gui.MainLoop.AddIdle(System.Func{System.Boolean})
+  name: AddIdle(Func<Boolean>)
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_AddIdle_System_Func_System_Boolean__
+  commentId: M:Terminal.Gui.MainLoop.AddIdle(System.Func{System.Boolean})
+  name.vb: AddIdle(Func(Of Boolean))
+  fullName: Terminal.Gui.MainLoop.AddIdle(System.Func<System.Boolean>)
+  fullName.vb: Terminal.Gui.MainLoop.AddIdle(System.Func(Of System.Boolean))
+  nameWithType: MainLoop.AddIdle(Func<Boolean>)
+  nameWithType.vb: MainLoop.AddIdle(Func(Of Boolean))
+- uid: Terminal.Gui.MainLoop.AddIdle*
+  name: AddIdle
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_AddIdle_
+  commentId: Overload:Terminal.Gui.MainLoop.AddIdle
+  isSpec: "True"
+  fullName: Terminal.Gui.MainLoop.AddIdle
+  nameWithType: MainLoop.AddIdle
+- uid: Terminal.Gui.MainLoop.AddTimeout(System.TimeSpan,System.Func{Terminal.Gui.MainLoop,System.Boolean})
+  name: AddTimeout(TimeSpan, Func<MainLoop, Boolean>)
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_AddTimeout_System_TimeSpan_System_Func_Terminal_Gui_MainLoop_System_Boolean__
+  commentId: M:Terminal.Gui.MainLoop.AddTimeout(System.TimeSpan,System.Func{Terminal.Gui.MainLoop,System.Boolean})
+  name.vb: AddTimeout(TimeSpan, Func(Of MainLoop, Boolean))
+  fullName: Terminal.Gui.MainLoop.AddTimeout(System.TimeSpan, System.Func<Terminal.Gui.MainLoop, System.Boolean>)
+  fullName.vb: Terminal.Gui.MainLoop.AddTimeout(System.TimeSpan, System.Func(Of Terminal.Gui.MainLoop, System.Boolean))
+  nameWithType: MainLoop.AddTimeout(TimeSpan, Func<MainLoop, Boolean>)
+  nameWithType.vb: MainLoop.AddTimeout(TimeSpan, Func(Of MainLoop, Boolean))
+- uid: Terminal.Gui.MainLoop.AddTimeout*
+  name: AddTimeout
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_AddTimeout_
+  commentId: Overload:Terminal.Gui.MainLoop.AddTimeout
+  isSpec: "True"
+  fullName: Terminal.Gui.MainLoop.AddTimeout
+  nameWithType: MainLoop.AddTimeout
+- uid: Terminal.Gui.MainLoop.Driver
+  name: Driver
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_Driver
+  commentId: P:Terminal.Gui.MainLoop.Driver
+  fullName: Terminal.Gui.MainLoop.Driver
+  nameWithType: MainLoop.Driver
+- uid: Terminal.Gui.MainLoop.Driver*
+  name: Driver
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_Driver_
+  commentId: Overload:Terminal.Gui.MainLoop.Driver
+  isSpec: "True"
+  fullName: Terminal.Gui.MainLoop.Driver
+  nameWithType: MainLoop.Driver
+- uid: Terminal.Gui.MainLoop.EventsPending(System.Boolean)
+  name: EventsPending(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_EventsPending_System_Boolean_
+  commentId: M:Terminal.Gui.MainLoop.EventsPending(System.Boolean)
+  fullName: Terminal.Gui.MainLoop.EventsPending(System.Boolean)
+  nameWithType: MainLoop.EventsPending(Boolean)
+- uid: Terminal.Gui.MainLoop.EventsPending*
+  name: EventsPending
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_EventsPending_
+  commentId: Overload:Terminal.Gui.MainLoop.EventsPending
+  isSpec: "True"
+  fullName: Terminal.Gui.MainLoop.EventsPending
+  nameWithType: MainLoop.EventsPending
+- uid: Terminal.Gui.MainLoop.Invoke(System.Action)
+  name: Invoke(Action)
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_Invoke_System_Action_
+  commentId: M:Terminal.Gui.MainLoop.Invoke(System.Action)
+  fullName: Terminal.Gui.MainLoop.Invoke(System.Action)
+  nameWithType: MainLoop.Invoke(Action)
+- uid: Terminal.Gui.MainLoop.Invoke*
+  name: Invoke
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_Invoke_
+  commentId: Overload:Terminal.Gui.MainLoop.Invoke
+  isSpec: "True"
+  fullName: Terminal.Gui.MainLoop.Invoke
+  nameWithType: MainLoop.Invoke
+- uid: Terminal.Gui.MainLoop.MainIteration
+  name: MainIteration()
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_MainIteration
+  commentId: M:Terminal.Gui.MainLoop.MainIteration
+  fullName: Terminal.Gui.MainLoop.MainIteration()
+  nameWithType: MainLoop.MainIteration()
+- uid: Terminal.Gui.MainLoop.MainIteration*
+  name: MainIteration
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_MainIteration_
+  commentId: Overload:Terminal.Gui.MainLoop.MainIteration
+  isSpec: "True"
+  fullName: Terminal.Gui.MainLoop.MainIteration
+  nameWithType: MainLoop.MainIteration
+- uid: Terminal.Gui.MainLoop.RemoveIdle(System.Func{System.Boolean})
+  name: RemoveIdle(Func<Boolean>)
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_RemoveIdle_System_Func_System_Boolean__
+  commentId: M:Terminal.Gui.MainLoop.RemoveIdle(System.Func{System.Boolean})
+  name.vb: RemoveIdle(Func(Of Boolean))
+  fullName: Terminal.Gui.MainLoop.RemoveIdle(System.Func<System.Boolean>)
+  fullName.vb: Terminal.Gui.MainLoop.RemoveIdle(System.Func(Of System.Boolean))
+  nameWithType: MainLoop.RemoveIdle(Func<Boolean>)
+  nameWithType.vb: MainLoop.RemoveIdle(Func(Of Boolean))
+- uid: Terminal.Gui.MainLoop.RemoveIdle*
+  name: RemoveIdle
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_RemoveIdle_
+  commentId: Overload:Terminal.Gui.MainLoop.RemoveIdle
+  isSpec: "True"
+  fullName: Terminal.Gui.MainLoop.RemoveIdle
+  nameWithType: MainLoop.RemoveIdle
+- uid: Terminal.Gui.MainLoop.RemoveTimeout(System.Object)
+  name: RemoveTimeout(Object)
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_RemoveTimeout_System_Object_
+  commentId: M:Terminal.Gui.MainLoop.RemoveTimeout(System.Object)
+  fullName: Terminal.Gui.MainLoop.RemoveTimeout(System.Object)
+  nameWithType: MainLoop.RemoveTimeout(Object)
+- uid: Terminal.Gui.MainLoop.RemoveTimeout*
+  name: RemoveTimeout
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_RemoveTimeout_
+  commentId: Overload:Terminal.Gui.MainLoop.RemoveTimeout
+  isSpec: "True"
+  fullName: Terminal.Gui.MainLoop.RemoveTimeout
+  nameWithType: MainLoop.RemoveTimeout
+- uid: Terminal.Gui.MainLoop.Run
+  name: Run()
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_Run
+  commentId: M:Terminal.Gui.MainLoop.Run
+  fullName: Terminal.Gui.MainLoop.Run()
+  nameWithType: MainLoop.Run()
+- uid: Terminal.Gui.MainLoop.Run*
+  name: Run
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_Run_
+  commentId: Overload:Terminal.Gui.MainLoop.Run
+  isSpec: "True"
+  fullName: Terminal.Gui.MainLoop.Run
+  nameWithType: MainLoop.Run
+- uid: Terminal.Gui.MainLoop.Stop
+  name: Stop()
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_Stop
+  commentId: M:Terminal.Gui.MainLoop.Stop
+  fullName: Terminal.Gui.MainLoop.Stop()
+  nameWithType: MainLoop.Stop()
+- uid: Terminal.Gui.MainLoop.Stop*
+  name: Stop
+  href: api/Terminal.Gui/Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_Stop_
+  commentId: Overload:Terminal.Gui.MainLoop.Stop
+  isSpec: "True"
+  fullName: Terminal.Gui.MainLoop.Stop
+  nameWithType: MainLoop.Stop
 - uid: Terminal.Gui.MenuBar
   name: MenuBar
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html
@@ -6084,84 +5690,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Size.Width
   nameWithType: Size.Width
-- uid: Terminal.Gui.SpecialChar
-  name: SpecialChar
-  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html
-  commentId: T:Terminal.Gui.SpecialChar
-  fullName: Terminal.Gui.SpecialChar
-  nameWithType: SpecialChar
-- uid: Terminal.Gui.SpecialChar.BottomTee
-  name: BottomTee
-  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_BottomTee
-  commentId: F:Terminal.Gui.SpecialChar.BottomTee
-  fullName: Terminal.Gui.SpecialChar.BottomTee
-  nameWithType: SpecialChar.BottomTee
-- uid: Terminal.Gui.SpecialChar.Diamond
-  name: Diamond
-  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_Diamond
-  commentId: F:Terminal.Gui.SpecialChar.Diamond
-  fullName: Terminal.Gui.SpecialChar.Diamond
-  nameWithType: SpecialChar.Diamond
-- uid: Terminal.Gui.SpecialChar.HLine
-  name: HLine
-  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_HLine
-  commentId: F:Terminal.Gui.SpecialChar.HLine
-  fullName: Terminal.Gui.SpecialChar.HLine
-  nameWithType: SpecialChar.HLine
-- uid: Terminal.Gui.SpecialChar.LeftTee
-  name: LeftTee
-  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_LeftTee
-  commentId: F:Terminal.Gui.SpecialChar.LeftTee
-  fullName: Terminal.Gui.SpecialChar.LeftTee
-  nameWithType: SpecialChar.LeftTee
-- uid: Terminal.Gui.SpecialChar.LLCorner
-  name: LLCorner
-  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_LLCorner
-  commentId: F:Terminal.Gui.SpecialChar.LLCorner
-  fullName: Terminal.Gui.SpecialChar.LLCorner
-  nameWithType: SpecialChar.LLCorner
-- uid: Terminal.Gui.SpecialChar.LRCorner
-  name: LRCorner
-  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_LRCorner
-  commentId: F:Terminal.Gui.SpecialChar.LRCorner
-  fullName: Terminal.Gui.SpecialChar.LRCorner
-  nameWithType: SpecialChar.LRCorner
-- uid: Terminal.Gui.SpecialChar.RightTee
-  name: RightTee
-  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_RightTee
-  commentId: F:Terminal.Gui.SpecialChar.RightTee
-  fullName: Terminal.Gui.SpecialChar.RightTee
-  nameWithType: SpecialChar.RightTee
-- uid: Terminal.Gui.SpecialChar.Stipple
-  name: Stipple
-  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_Stipple
-  commentId: F:Terminal.Gui.SpecialChar.Stipple
-  fullName: Terminal.Gui.SpecialChar.Stipple
-  nameWithType: SpecialChar.Stipple
-- uid: Terminal.Gui.SpecialChar.TopTee
-  name: TopTee
-  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_TopTee
-  commentId: F:Terminal.Gui.SpecialChar.TopTee
-  fullName: Terminal.Gui.SpecialChar.TopTee
-  nameWithType: SpecialChar.TopTee
-- uid: Terminal.Gui.SpecialChar.ULCorner
-  name: ULCorner
-  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_ULCorner
-  commentId: F:Terminal.Gui.SpecialChar.ULCorner
-  fullName: Terminal.Gui.SpecialChar.ULCorner
-  nameWithType: SpecialChar.ULCorner
-- uid: Terminal.Gui.SpecialChar.URCorner
-  name: URCorner
-  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_URCorner
-  commentId: F:Terminal.Gui.SpecialChar.URCorner
-  fullName: Terminal.Gui.SpecialChar.URCorner
-  nameWithType: SpecialChar.URCorner
-- uid: Terminal.Gui.SpecialChar.VLine
-  name: VLine
-  href: api/Terminal.Gui/Terminal.Gui.SpecialChar.html#Terminal_Gui_SpecialChar_VLine
-  commentId: F:Terminal.Gui.SpecialChar.VLine
-  fullName: Terminal.Gui.SpecialChar.VLine
-  nameWithType: SpecialChar.VLine
 - uid: Terminal.Gui.StatusBar
   name: StatusBar
   href: api/Terminal.Gui/Terminal.Gui.StatusBar.html
@@ -7474,6 +7002,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.KeyEventEventArgs.KeyEventEventArgs
   nameWithType: View.KeyEventEventArgs.KeyEventEventArgs
+- uid: Terminal.Gui.View.KeyEventEventArgs.Handled
+  name: Handled
+  href: api/Terminal.Gui/Terminal.Gui.View.KeyEventEventArgs.html#Terminal_Gui_View_KeyEventEventArgs_Handled
+  commentId: P:Terminal.Gui.View.KeyEventEventArgs.Handled
+  fullName: Terminal.Gui.View.KeyEventEventArgs.Handled
+  nameWithType: View.KeyEventEventArgs.Handled
+- uid: Terminal.Gui.View.KeyEventEventArgs.Handled*
+  name: Handled
+  href: api/Terminal.Gui/Terminal.Gui.View.KeyEventEventArgs.html#Terminal_Gui_View_KeyEventEventArgs_Handled_
+  commentId: Overload:Terminal.Gui.View.KeyEventEventArgs.Handled
+  isSpec: "True"
+  fullName: Terminal.Gui.View.KeyEventEventArgs.Handled
+  nameWithType: View.KeyEventEventArgs.Handled
 - uid: Terminal.Gui.View.KeyEventEventArgs.KeyEvent
   name: KeyEvent
   href: api/Terminal.Gui/Terminal.Gui.View.KeyEventEventArgs.html#Terminal_Gui_View_KeyEventEventArgs_KeyEvent
@@ -9350,6 +8891,18 @@ references:
   commentId: F:Unix.Terminal.Curses.KeyF10
   fullName: Unix.Terminal.Curses.KeyF10
   nameWithType: Curses.KeyF10
+- uid: Unix.Terminal.Curses.KeyF11
+  name: KeyF11
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_KeyF11
+  commentId: F:Unix.Terminal.Curses.KeyF11
+  fullName: Unix.Terminal.Curses.KeyF11
+  nameWithType: Curses.KeyF11
+- uid: Unix.Terminal.Curses.KeyF12
+  name: KeyF12
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_KeyF12
+  commentId: F:Unix.Terminal.Curses.KeyF12
+  fullName: Unix.Terminal.Curses.KeyF12
+  nameWithType: Curses.KeyF12
 - uid: Unix.Terminal.Curses.KeyF2
   name: KeyF2
   href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_KeyF2
@@ -9459,6 +9012,12 @@ references:
   commentId: F:Unix.Terminal.Curses.KeyRight
   fullName: Unix.Terminal.Curses.KeyRight
   nameWithType: Curses.KeyRight
+- uid: Unix.Terminal.Curses.KeyTab
+  name: KeyTab
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_KeyTab
+  commentId: F:Unix.Terminal.Curses.KeyTab
+  fullName: Unix.Terminal.Curses.KeyTab
+  nameWithType: Curses.KeyTab
 - uid: Unix.Terminal.Curses.KeyUp
   name: KeyUp
   href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_KeyUp

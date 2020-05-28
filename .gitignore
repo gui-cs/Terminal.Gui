@@ -7,3 +7,5 @@ packages
 .vs
 # User-specific files
 *.user
+
+docfx/api
