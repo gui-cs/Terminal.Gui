@@ -32,6 +32,45 @@ We welcome contributions from the community. See [Issues](https://github.com/mig
 3. **Fail-fast.** Fail-fast makes bugs and failures appear sooner, leading to a higher-quality framework and API.
 4. **Standards Reduce Complexity**. We strive to adopt standard API idoms because doing so reduces complexity for users of the API. For example, see Tenet #1 above. A counter example is [Issue #447](https://github.com/migueldeicaza/gui.cs/issues/447).
 
+### Events
+
+The [Microsoft .NET Framework Design Guidelines](https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/) provides these guideliens for defining events:
+
+> Events always refer to some action, either one that is happening or one that has occurred. Therefore, as with methods, events are named with verbs, and verb tense is used to indicate the time when the event is raised.
+>
+> ✔️ DO name events with a verb or a verb phrase.
+> 
+> Examples include Clicked, Painting, DroppedDown, and so on.
+> 
+> ✔️ DO give events names with a concept of before and after, using the present and past tenses.
+> 
+> For example, a close event that is raised before a window is closed would be called Closing, and one that is raised after the window is closed would be called Closed.
+> 
+> ❌ DO NOT use "Before" or "After" prefixes or postfixes to indicate pre- and post-events. Use present and past tenses as just described.
+> 
+> ✔️ DO name event handlers (delegates used as types of events) with the "EventHandler" suffix, as shown in the following example:
+> 
+> public delegate void ClickedEventHandler(object sender, ClickedEventArgs e);
+> 
+> ✔️ DO use two parameters named sender and e in event handlers.
+> 
+> The sender parameter represents the object that raised the event. The sender parameter is typically of type object, even if it is possible to employ a more specific type.
+> 
+> ✔️ DO name event argument classes with the "EventArgs" suffix.
+
+We are not currently consistent along these lines in `Terminal.Gui` at all. This leads to friction for adopters and bugs. As we take on fixing this we use the following guidelines:
+
+1. We follow the naming guidelines provided in https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-type-members?redirectedfrom=MSDN
+2. We use the `Action<T>` idiom for internal APIs, not for public APIs. For public APIs we use the `event/EventHandler` model.
+3. For public APIs, the class that can raise the event will implement:
+   - A `virtual` event raising function, named as `OnEventToRaise`. Typical implementations will simply do a `EventToRaise?.Invoke(this, eventArgs)`.
+   - An `event` as in `public event EventHandler<EventToRaiseArgs> EventToRaise`
+   - Consumers of the event can do `theobject.EventToRaise += (sender, e) => {};`
+   - Sub-classes of the class implementing `EventToRaise` can override `OnEventToRaise` as needed.
+4. Where possible, a subclass of `EventArgs` should be provided and the old and new state should be included. By doing this, event handler methods do not have to query the sender for state.
+
+See also: https://www.codeproject.com/Articles/20550/C-Event-Implementation-Fundamentals-Best-Practices
+
 ## Breaking Changes to User Behavior or the Public API
 
 - Tag all pull requests that cause breaking changes to user behavior or the public API with the [breaking-change](https://github.com/migueldeicaza/gui.cs/issues?q=is%3Aopen+is%3Aissue+label%3Abreaking-change) tag. This will help project maintainers track and document these.
