@@ -118,22 +118,27 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event fired when the view get focus.
 		/// </summary>
-		public event EventHandler Enter;
+		public event EventHandler<FocusEventArgs> Enter;
 
 		/// <summary>
 		/// Event fired when the view lost focus.
 		/// </summary>
-		public event EventHandler Leave;
+		public event EventHandler<FocusEventArgs> Leave;
 
 		/// <summary>
 		/// Event fired when the view receives the mouse event for the first time.
 		/// </summary>
-		public event EventHandler<MouseEvent> MouseEnter;
+		public event EventHandler<MouseEventEventArgs> MouseEnter;
 
 		/// <summary>
 		/// Event fired when the view loses mouse event for the last time.
 		/// </summary>
-		public event EventHandler<MouseEvent> MouseLeave;
+		public event EventHandler<MouseEventEventArgs> MouseLeave;
+
+		/// <summary>
+		/// Event fired when a mouse event is generated.
+		/// </summary>
+		public event EventHandler<MouseEventEventArgs> MouseClick;
 
 		internal Direction FocusDirection {
 			get => SuperView?.FocusDirection ?? focusDirection;
@@ -758,18 +763,45 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Specifies the event arguments for <see cref="SetFocus(View)"/>
+		/// </summary>
+		public class FocusEventArgs : EventArgs {
+			/// <summary>
+			/// Constructs.
+			/// </summary>
+			public FocusEventArgs () { }
+			/// <summary>
+			/// Indicates if the current focus event has already been processed and the driver should stop notifying any other event subscriber.
+			/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
+			/// </summary>
+			public bool Handled { get; set; }
+		}
+
 		/// <inheritdoc cref="OnEnter"/>
 		public override bool OnEnter ()
 		{
-			Enter?.Invoke (this, new EventArgs ());
-			return base.OnEnter ();
+			FocusEventArgs args = new FocusEventArgs ();
+			Enter?.Invoke (this, args);
+			if (args.Handled)
+				return true;
+			if (base.OnEnter ())
+				return true;
+
+			return false;
 		}
 
 		/// <inheritdoc cref="OnLeave"/>
 		public override bool OnLeave ()
 		{
-			Leave?.Invoke (this, new EventArgs ());
-			return base.OnLeave ();
+			FocusEventArgs args = new FocusEventArgs ();
+			Leave?.Invoke (this, args);
+			if (args.Handled)
+				return true;
+			if (base.OnLeave ())
+				return true;
+
+			return false;
 		}
 
 		/// <summary>
@@ -1288,24 +1320,68 @@ namespace Terminal.Gui {
 			return $"{GetType ().Name}({Id})({Frame})";
 		}
 
+		/// <summary>
+		/// Specifies the event arguments for <see cref="MouseEvent"/>
+		/// </summary>
+		public class MouseEventEventArgs : EventArgs {
+			/// <summary>
+			/// Constructs.
+			/// </summary>
+			/// <param name="me"></param>
+			public MouseEventEventArgs (MouseEvent me) => MouseEvent = me;
+			/// <summary>
+			/// The <see cref="MouseEvent"/> for the event.
+			/// </summary>
+			public MouseEvent MouseEvent { get; set; }
+			/// <summary>
+			/// Indicates if the current mouse event has already been processed and the driver should stop notifying any other event subscriber.
+			/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
+			/// </summary>
+			public bool Handled { get; set; }
+		}
+
 		/// <inheritdoc cref="OnMouseEnter(Gui.MouseEvent)"/>
 		public override bool OnMouseEnter (MouseEvent mouseEvent)
 		{
-			if (!base.OnMouseEnter (mouseEvent)) {
-				MouseEnter?.Invoke (this, mouseEvent);
-				return false;
-			}
-			return true;
+			MouseEventEventArgs args = new MouseEventEventArgs (mouseEvent);
+			MouseEnter?.Invoke (this, args);
+			if (args.Handled)
+				return true;
+			if (base.OnMouseEnter (mouseEvent))
+				return true;
+
+			return false;
 		}
 
 		/// <inheritdoc cref="OnMouseLeave(Gui.MouseEvent)"/>
 		public override bool OnMouseLeave (MouseEvent mouseEvent)
 		{
-			if (!base.OnMouseLeave (mouseEvent)) {
-				MouseLeave?.Invoke (this, mouseEvent);
-				return false;
-			}
-			return true;
+			MouseEventEventArgs args = new MouseEventEventArgs (mouseEvent);
+			MouseLeave?.Invoke (this, args);
+			if (args.Handled)
+				return true;
+			if (base.OnMouseLeave (mouseEvent))
+				return true;
+
+			return false;
+		}
+
+
+		/// <summary>
+		/// Method invoked when a mouse event is generated
+		/// </summary>
+		/// <param name="mouseEvent"></param>
+		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
+		public virtual bool OnMouseEvent (MouseEvent mouseEvent)
+		{
+			MouseEventEventArgs args = new MouseEventEventArgs (mouseEvent);
+			MouseClick?.Invoke (this, args);
+			if (args.Handled)
+				return true;
+			if (MouseEvent (mouseEvent))
+				return true;
+
+			return false;
 		}
 	}
 }
