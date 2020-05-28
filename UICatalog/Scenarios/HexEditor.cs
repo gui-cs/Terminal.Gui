@@ -6,6 +6,7 @@ using Terminal.Gui;
 namespace UICatalog {
 	[ScenarioMetadata (Name: "HexEditor", Description: "A Terminal.Gui binary (hex) editor via HexView")]
 	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Text")]
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("TopLevel")]
@@ -17,8 +18,8 @@ namespace UICatalog {
 		public override void Setup ()
 		{
 			Win.Title = this.GetName() + "-" + _fileName ?? "Untitled";
-			Win.Y = 1;
-			Win.Height = Dim.Fill (1);
+			Win.Y = 1; // menu
+			Win.Height = Dim.Fill (1); // status bar
 			Top.LayoutSubviews ();
 
 			var menu = new MenuBar (new MenuBarItem [] {

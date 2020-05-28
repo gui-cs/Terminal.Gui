@@ -75,8 +75,8 @@ namespace Terminal.Gui {
 			contentView = new ContentView () {
 				X = 1,
 				Y = 1,
-				Width = Dim.Fill (2),
-				Height = Dim.Fill (2)
+				Width = Dim.Fill (1),
+				Height = Dim.Fill (1)
 			};
 			Initialize ();
 		}
