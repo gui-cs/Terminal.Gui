@@ -11,27 +11,154 @@ namespace UICatalog {
 	class MessageBoxes : Scenario {
 		public override void Setup ()
 		{
-			Top = new Toplevel ();
-
-			var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_Quit", "", () => Application.RequestStop() )
-				}),
-				new MenuBarItem ("_Simple Query...", "A simple query message box", () =>  MessageBox.Query (0, 6, "MessageBox.Query", "Minimum size was specified", "Ok")),
-				new MenuBarItem ("_Error Query...", "A error query message box", () =>  MessageBox.ErrorQuery (0, 6, "MessageBox.Query", "Minimum size was specified", "Ok")),
-				// BUGBUG: Illustrates MessageBoxes do not deal with long text gracefully. Issue #432
-				new MenuBarItem ("_Long Text...", "Demo long text", () =>  MessageBox.Query (0, 6, "About UI Catalog", "This is a very long title. It is longer than the width of the screen. Will it Wrap? I bet  it will not wrap", "Ok")),
-			});
-			Top.Add (menu);
-
-			Win = new Window ($"Scenario: {GetName ()}") {
-				X = 0,
+			var frame = new FrameView ("MessageBox Options") {
+				X = Pos.Center(),
 				Y = 1,
-				Width = Dim.Fill (),
-				Height = Dim.Fill ()
+				Width = Dim.Percent(75),
+				Height = 10
 			};
-			Top.Add (Win);
+			Win.Add (frame);
 
+			var label = new Label ("Width:") {
+				X = 0,
+				Y = 0,
+				Width = 15,
+				Height = 1,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
+			};
+			frame.Add (label);
+			var widthEdit = new TextField ("50") {
+				X = Pos.Right (label) + 1,
+				Y = Pos.Top (label),
+				Width = 5,
+				Height = 1
+			};
+			frame.Add (widthEdit);
+
+			label = new Label ("Height:") {
+				X = 0,
+				Y = Pos.Bottom (label),
+				Width = Dim.Width(label),
+				Height = 1,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
+			};
+			frame.Add (label);
+			var heightEdit = new TextField ("6") {
+				X = Pos.Right (label) + 1,
+				Y = Pos.Top (label),
+				Width = 5,
+				Height = 1
+			};
+			frame.Add (heightEdit);
+
+			label = new Label ("Title:") {
+				X = 0,
+				Y = Pos.Bottom (label),
+				Width = Dim.Width (label),
+				Height = 1,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
+			};
+			frame.Add (label);
+			var titleEdit = new TextField ("Title") {
+				X = Pos.Right (label) + 1,
+				Y = Pos.Top (label),
+				Width = Dim.Fill(),
+				Height = 1
+			};
+			frame.Add (titleEdit);
+
+			label = new Label ("Message:") {
+				X = 0,
+				Y = Pos.Bottom (label),
+				Width = Dim.Width (label),
+				Height = 1,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
+			};
+			frame.Add (label);
+			var messageEdit = new TextField ("Message") {
+				X = Pos.Right (label) + 1,
+				Y = Pos.Top (label),
+				Width = Dim.Fill (),
+				Height = 1
+			};
+			frame.Add (messageEdit);
+
+			label = new Label ("Num Buttons:") {
+				X = 0,
+				Y = Pos.Bottom (label),
+				Width = Dim.Width (label),
+				Height = 1,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
+			};
+			frame.Add (label);
+			var numButtonsEdit = new TextField ("3") {
+				X = Pos.Right (label) + 1,
+				Y = Pos.Top (label),
+				Width = 5,
+				Height = 1
+			};
+			frame.Add (numButtonsEdit);
+
+			label = new Label ("Style:") {
+				X = 0,
+				Y = Pos.Bottom (label),
+				Width = Dim.Width (label),
+				Height = 1,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
+			};
+			frame.Add (label);
+			var styleRadioGroup = new RadioGroup (new [] { "Query", "Error" } ) {
+				X = Pos.Right (label) + 1,
+				Y = Pos.Top (label),
+				Width = 5,
+				Height = 1
+			};
+			frame.Add (styleRadioGroup);
+
+			frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (messageEdit) 
+				+ Dim.Height(numButtonsEdit) + Dim.Height (styleRadioGroup) + 3;
+
+			label = new Label ("Button Pressed:") {
+				X = Pos.Center (),
+				Y = Pos.Bottom (frame) + 2,
+				Height = 1,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
+			};
+			Win.Add (label);
+			var buttonPressedLabel = new Label ("") {
+				X = Pos.Center (),
+				Y = Pos.Bottom (frame) + 4,
+				Width = 25,
+				Height = 1,
+				ColorScheme = Colors.Error,
+			};
+
+			// BUGBUG: Why is this button not centered???
+			var showMessageBoxButton = new Button ("Show MessageBox") {
+				X = Pos.Center(),
+				Y = Pos.Bottom (frame) + 2			,
+				IsDefault = true,
+				Clicked = () => {
+					try {
+						int width = int.Parse (widthEdit.Text.ToString ());
+						int height = int.Parse (heightEdit.Text.ToString ());
+						int numButtons = int.Parse (numButtonsEdit.Text.ToString ());
+						var btns = new List<string> ();
+						for (int i = 0; i < numButtons; i++) {
+							btns.Add($"Btn {i}");
+						}
+						if (styleRadioGroup.Selected == 0) {
+							buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), btns.ToArray ())}";
+						} else {
+							buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), btns.ToArray ())}";
+						}
+					} catch {
+						buttonPressedLabel.Text = "Invalid Options";
+					}
+				},
+			};
+			Win.Add (showMessageBoxButton);
+			Win.Add (buttonPressedLabel);
 		}
 	}
 }
