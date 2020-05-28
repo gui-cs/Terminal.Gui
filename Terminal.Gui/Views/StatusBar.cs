@@ -120,7 +120,7 @@ namespace Terminal.Gui {
 			Width = Dim.Fill ();
 			Height = 1;
 
-			LayoutComplete += (sender, e) => {
+			Application.Loaded += (sender, e) => {
 				X = 0;
 				Height = 1;
 #if SNAP_TO_TOP
@@ -132,7 +132,7 @@ namespace Terminal.Gui {
 				case StatusBarStyle.SnapToBottom:
 #endif
 					if (Parent == null) {
-						Y = Driver.Rows - 1; 
+						Y = e.Rows - 1; 
 					} else {
 						Y = Pos.Bottom (Parent);
 					}
