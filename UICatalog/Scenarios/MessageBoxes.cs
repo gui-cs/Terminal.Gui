@@ -107,16 +107,15 @@ namespace UICatalog {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
-			var styleRadioGroup = new RadioGroup (new [] { "Query", "Error" } ) {
+			var styleRadioGroup = new RadioGroup (new [] { "_Query", "_Error" } ) {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
-				Width = 5,
-				Height = 1
+				Width = 5, // BUGBUG: This should cause clipping!
 			};
 			frame.Add (styleRadioGroup);
 
 			frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (messageEdit) 
-				+ Dim.Height(numButtonsEdit) + Dim.Height (styleRadioGroup) + 3;
+				+ Dim.Height(numButtonsEdit) + Dim.Height (styleRadioGroup) + 2;
 
 			label = new Label ("Button Pressed:") {
 				X = Pos.Center (),
