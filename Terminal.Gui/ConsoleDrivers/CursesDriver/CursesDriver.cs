@@ -16,7 +16,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// This is the Curses driver for the gui.cs/Terminal framework.
 	/// </summary>
-	public class CursesDriver : ConsoleDriver {
+	internal class CursesDriver : ConsoleDriver {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 		public override int Cols => Curses.Cols;
 		public override int Rows => Curses.Lines;

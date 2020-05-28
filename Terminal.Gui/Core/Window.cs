@@ -1,19 +1,8 @@
 ﻿//
-// Core.cs: The core engine for gui.cs
-//
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
 //
-// Pending:
-//   - Check for NeedDisplay on the hierarchy and repaint
-//   - Layout support
-//   - "Colors" type or "Attributes" type?
-//   - What to surface as "BackgroundCOlor" when clearing a window, an attribute or colors?
-//
-// Optimziations
-//   - Add rendering limitation to the exposed area
 using System.Collections;
-using System.Linq;
 using NStack;
 
 namespace Terminal.Gui {

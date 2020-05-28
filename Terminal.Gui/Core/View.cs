@@ -1,5 +1,3 @@
-﻿//
-// Core.cs: The core engine for gui.cs
 //
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)

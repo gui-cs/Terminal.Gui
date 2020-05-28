@@ -27,12 +27,12 @@ namespace Terminal.Gui {
 	/// </summary>
 	/// <remarks>
 	///   <para>
-	///     You can hook up to the Iteration event to have your method
-	///     invoked on each iteration of the mainloop.
+	///     You can hook up to the <see cref="Iteration"/> event to have your method
+	///     invoked on each iteration of the <see cref="Terminal.Gui.MainLoop"/>.
 	///   </para>
 	///   <para>
-	///     Creates a mainloop to process input events, handle timers and
-	///     other sources of data.   It is accessible via the MainLoop property.
+	///     Creates a instance of <see cref="Terminal.Gui.MainLoop"/> to process input events, handle timers and
+	///     other sources of data. It is accessible via the <see cref="MainLoop"/> property.
 	///   </para>
 	///   <para>
 	///     When invoked sets the SynchronizationContext to one that is tied

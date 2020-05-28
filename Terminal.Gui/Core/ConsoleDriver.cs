@@ -1,5 +1,5 @@
 //
-// Driver.cs: Definition for the Console Driver API
+// ConsoleDriver.cs: Definition for the Console Driver API
 //
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
@@ -84,8 +84,8 @@ namespace Terminal.Gui {
 	/// Attributes are used as elements that contain both a foreground and a background or platform specific features
 	/// </summary>
 	/// <remarks>
-	///   Attributes are needed to map colors to terminal capabilities that might lack colors, on color
-	///   scenarios, they encode both the foreground and the background color and are used in the ColorScheme
+	///   <see cref="Attribute"/>s are needed to map colors to terminal capabilities that might lack colors, on color
+	///   scenarios, they encode both the foreground and the background color and are used in the <see cref="ColorScheme"/>
 	///   class to define color schemes that can be used in your application.
 	/// </remarks>
 	public struct Attribute {
@@ -99,7 +99,7 @@ namespace Terminal.Gui {
 		/// <param name="value">Value.</param>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
-		public Attribute (int value, Color foreground = new Color(), Color background = new Color())
+		public Attribute (int value, Color foreground = new Color (), Color background = new Color ())
 		{
 			this.value = value;
 			this.foreground = foreground;
@@ -119,21 +119,21 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Implicit conversion from an attribute to the underlying Int32 representation
+		/// Implicit conversion from an <see cref="Attribute"/> to the underlying Int32 representation
 		/// </summary>
 		/// <returns>The integer value stored in the attribute.</returns>
 		/// <param name="c">The attribute to convert</param>
 		public static implicit operator int (Attribute c) => c.value;
 
 		/// <summary>
-		/// Implicitly convert an integer value into an attribute
+		/// Implicitly convert an integer value into an <see cref="Attribute"/>
 		/// </summary>
 		/// <returns>An attribute with the specified integer value.</returns>
 		/// <param name="v">value</param>
 		public static implicit operator Attribute (int v) => new Attribute (v);
 
 		/// <summary>
-		/// Creates an attribute from the specified foreground and background.
+		/// Creates an <see cref="Attribute"/> from the specified foreground and background.
 		/// </summary>
 		/// <returns>The make.</returns>
 		/// <param name="foreground">Foreground color to use.</param>
@@ -148,7 +148,7 @@ namespace Terminal.Gui {
 
 	/// <summary>
 	/// Color scheme definitions, they cover some common scenarios and are used
-	/// typically in toplevel containers to set the scheme that is used by all the
+	/// typically in containers such as <see cref="Window"/> and <see cref="FrameView"/> to set the scheme that is used by all the
 	/// views contained inside.
 	/// </summary>
 	public class ColorScheme {
@@ -186,7 +186,7 @@ namespace Terminal.Gui {
 
 		bool preparingScheme = false;
 
-		Attribute SetAttribute (Attribute attribute, [CallerMemberName]string callerMemberName = null)
+		Attribute SetAttribute (Attribute attribute, [CallerMemberName] string callerMemberName = null)
 		{
 			if (!Application._initialized && !preparingScheme)
 				return attribute;
@@ -314,7 +314,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// The default ColorSchemes for the application.
+	/// The default <see cref="ColorScheme"/>s for the application.
 	/// </summary>
 	public static class Colors {
 		static ColorScheme _toplevel;
@@ -348,81 +348,81 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static ColorScheme Error { get { return _error; } set { _error = SetColorScheme (value); } }
 
-		static ColorScheme SetColorScheme (ColorScheme colorScheme, [CallerMemberName]string callerMemberName = null)
+		static ColorScheme SetColorScheme (ColorScheme colorScheme, [CallerMemberName] string callerMemberName = null)
 		{
 			colorScheme.caller = callerMemberName;
 			return colorScheme;
 		}
 	}
 
+	///// <summary>
+	///// Special characters that can be drawn with 
+	///// </summary>
+	//public enum SpecialChar {
+	//	/// <summary>
+	//	/// Horizontal line character.
+	//	/// </summary>
+	//	HLine,
+
+	//	/// <summary>
+	//	/// Vertical line character.
+	//	/// </summary>
+	//	VLine,
+
+	//	/// <summary>
+	//	/// Stipple pattern
+	//	/// </summary>
+	//	Stipple,
+
+	//	/// <summary>
+	//	/// Diamond character
+	//	/// </summary>
+	//	Diamond,
+
+	//	/// <summary>
+	//	/// Upper left corner
+	//	/// </summary>
+	//	ULCorner,
+
+	//	/// <summary>
+	//	/// Lower left corner
+	//	/// </summary>
+	//	LLCorner,
+
+	//	/// <summary>
+	//	/// Upper right corner
+	//	/// </summary>
+	//	URCorner,
+
+	//	/// <summary>
+	//	/// Lower right corner
+	//	/// </summary>
+	//	LRCorner,
+
+	//	/// <summary>
+	//	/// Left tee
+	//	/// </summary>
+	//	LeftTee,
+
+	//	/// <summary>
+	//	/// Right tee
+	//	/// </summary>
+	//	RightTee,
+
+	//	/// <summary>
+	//	/// Top tee
+	//	/// </summary>
+	//	TopTee,
+
+	//	/// <summary>
+	//	/// The bottom tee.
+	//	/// </summary>
+	//	BottomTee,
+	//}
+
 	/// <summary>
-	/// Special characters that can be drawn with Driver.AddSpecial.
-	/// </summary>
-	public enum SpecialChar {
-		/// <summary>
-		/// Horizontal line character.
-		/// </summary>
-		HLine,
-
-		/// <summary>
-		/// Vertical line character.
-		/// </summary>
-		VLine,
-
-		/// <summary>
-		/// Stipple pattern
-		/// </summary>
-		Stipple,
-
-		/// <summary>
-		/// Diamond character
-		/// </summary>
-		Diamond,
-
-		/// <summary>
-		/// Upper left corner
-		/// </summary>
-		ULCorner,
-
-		/// <summary>
-		/// Lower left corner
-		/// </summary>
-		LLCorner,
-
-		/// <summary>
-		/// Upper right corner
-		/// </summary>
-		URCorner,
-
-		/// <summary>
-		/// Lower right corner
-		/// </summary>
-		LRCorner,
-
-		/// <summary>
-		/// Left tee
-		/// </summary>
-		LeftTee,
-
-		/// <summary>
-		/// Right tee
-		/// </summary>
-		RightTee,
-
-		/// <summary>
-		/// Top tee
-		/// </summary>
-		TopTee,
-
-		/// <summary>
-		/// The bottom tee.
-		/// </summary>
-		BottomTee,
-
-	}
-
-	/// <summary>
-	/// ConsoleDriver is an abstract class that defines the requirements for a console driver.   One implementation if the CursesDriver, and another one uses the .NET Console one.
+	/// ConsoleDriver is an abstract class that defines the requirements for a console driver.  
+	/// There are currently three implementations: <see cref="CursesDriver"/> (for Unix and Mac), <see cref="WindowsDriver"/>, and <see cref="NetDriver"/> that uses the .NET Console API.
 	/// </summary>
 	public abstract class ConsoleDriver {
 		/// <summary>
@@ -516,7 +516,7 @@ namespace Terminal.Gui {
 		/// Set the handler when the terminal is resized.
 		/// </summary>
 		/// <param name="terminalResized"></param>
-		public void SetTerminalResized(Action terminalResized)
+		public void SetTerminalResized (Action terminalResized)
 		{
 			TerminalResized = terminalResized;
 		}

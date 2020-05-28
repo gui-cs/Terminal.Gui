@@ -37,7 +37,7 @@ namespace Terminal.Gui {
 	/// In addition to the general functions of the mainloop, the Unix version
 	/// can watch file descriptors using the AddWatch methods.
 	/// </remarks>
-	public class UnixMainLoop : IMainLoopDriver {
+	internal class UnixMainLoop : IMainLoopDriver {
 		[StructLayout (LayoutKind.Sequential)]
 		struct Pollfd {
 			public int fd;
@@ -158,7 +158,7 @@ namespace Terminal.Gui {
 			poll_dirty = false;
 
 			pollmap = new Pollfd [descriptorWatchers.Count];
-			int i = 0;	
+			int i = 0;
 			foreach (var fd in descriptorWatchers.Keys) {
 				pollmap [i].fd = fd;
 				pollmap [i].events = (short)descriptorWatchers [fd].Condition;

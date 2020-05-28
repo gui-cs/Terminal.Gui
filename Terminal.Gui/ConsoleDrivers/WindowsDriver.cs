@@ -1048,7 +1048,7 @@ namespace Terminal.Gui {
 			SetupColorsAndBorders ();
 		}
 
-		
+
 		void ResizeScreen ()
 		{
 			OutputBuffer = new WindowsConsole.CharInfo [Rows * Cols];
