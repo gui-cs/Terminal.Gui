@@ -62,6 +62,7 @@ namespace Terminal.Gui {
 			Add (button);
 		}
 
+		// TODO: Dialog should use Computed Layout to layout buttons #570
 		public void AdjustButtonLayout ()
 		{
 			int buttonSpace = 0;

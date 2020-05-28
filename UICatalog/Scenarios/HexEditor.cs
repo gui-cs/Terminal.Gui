@@ -6,6 +6,7 @@ using Terminal.Gui;
 namespace UICatalog {
 	[ScenarioMetadata (Name: "HexEditor", Description: "A Terminal.Gui binary (hex) editor via HexView")]
 	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Text")]
 	class HexEditor : Scenario {
 		private string _fileName = "demo.bin";

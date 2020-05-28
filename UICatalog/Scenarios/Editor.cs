@@ -5,6 +5,7 @@ using Terminal.Gui;
 namespace UICatalog {
 	[ScenarioMetadata (Name: "Editor", Description: "A Terminal.Gui Text Editor via TextView")]
 	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Text")]
 	class Editor : Scenario {
 		private string _fileName = "demo.txt";
