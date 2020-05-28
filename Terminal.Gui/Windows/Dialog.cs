@@ -45,6 +45,8 @@ namespace Terminal.Gui {
 					Add (b);
 				}
 			}
+
+			LayoutComplete += (sender, a) => AdjustButtonLayout ();
 		}
 
 		/// <summary>
@@ -60,11 +62,8 @@ namespace Terminal.Gui {
 			Add (button);
 		}
 
-		///<inheritdoc cref="LayoutSubviews"/>
-		public override void LayoutSubviews ()
+		public void AdjustButtonLayout ()
 		{
-			base.LayoutSubviews ();
-
 			int buttonSpace = 0;
 			int maxHeight = 0;
 

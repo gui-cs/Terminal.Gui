@@ -58,7 +58,7 @@ namespace Terminal.Gui {
 					SetValue (searchset [listview.SelectedItem]);
 			};
 
-			Application.Loaded += (object sender, Application.ResizedEventArgs e) => {
+			LayoutComplete += (sender, a) => {
 				// Determine if this view is hosted inside a dialog
 				for (View view = this.SuperView; view != null; view = view.SuperView) {
 					if (view is Dialog) {
