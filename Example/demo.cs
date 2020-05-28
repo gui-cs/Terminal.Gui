@@ -626,7 +626,7 @@ static class Demo {
 		var bottom2 = new Label ("This should go on the bottom of another top-level!");
 		top.Add (bottom2);
 
-		top.LayoutComplete += (sender, e) => {
+		Application.Loaded += (sender, e) => {
 			bottom.X = win.X;
 			bottom.Y = Pos.Bottom (win) - Pos.Top (win) - margin;
 			bottom2.X = Pos.Left (win);
