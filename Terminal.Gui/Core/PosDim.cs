@@ -110,8 +110,9 @@ namespace Terminal.Gui {
 		/// <example>
 		/// This sample shows how align a <see cref="Button"/> to the bottom-right of a <see cref="View"/>.
 		/// <code>
+		/// // See Issue #502 
 		/// anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
-		/// anchorButton.Y = Pos.AnchorEnd () - 1;
+		/// anchorButton.Y = Pos.AnchorEnd (1);
 		/// </code>
 		/// </example>
 		public static Pos AnchorEnd (int margin = 0)
