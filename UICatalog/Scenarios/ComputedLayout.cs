@@ -23,7 +23,7 @@ namespace UICatalog {
 			const string rule = "|123456789";
 			var horizontalRuler = new Label ("") {
 				X = 0,
-				Y = 0,
+				Y = 0,		
 				Width = Dim.Fill (1),  // BUGBUG: I don't think this should be needed; DimFill() should respect container's frame. X does.
 				ColorScheme = Colors.Error
 			};
@@ -36,19 +36,21 @@ namespace UICatalog {
 
 			// Demonstrate using Dim to create a vertical ruler that always measures the parent window's height
 			// TODO: Either build a custom control for this or implement linewrap in Label #352
-			//var verticalRuler = new Label ("") {
-			//	X = 0,
-			//	Y = 0,
-			//	Width = 1,
-			//	Height = Dim.Fill (),
-			//	ColorScheme = Colors.Error
-			//};
+			const string vrule = "|\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
-			//Application.OnResized += () => {
-			//	verticalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height)];
-			//};
+			var verticalRuler = new Label ("") {
+				X = 0,
+				Y = 0,
+				Width = 1,
+				Height = Dim.Fill (),
+				ColorScheme = Colors.Error
+			};
 
-			//Win.Add (verticalRuler);
+			Application.Resized += (sender, a) => {
+				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height*2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height*2)];
+			};
+
+			Win.Add (verticalRuler);
 
 			// Demonstrate At - Absolute Layout using Pos
 			var absoluteButton = new Button ("Absolute At(2,1)") {
@@ -71,10 +73,10 @@ namespace UICatalog {
 			string txt = "Resize the terminal to see computed layout in action.";
 			var labelList = new List<Label> ();
 			labelList.Add (new Label ($"The lines below show different TextAlignments"));
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (1), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
 
 			subWin.Add (labelList.ToArray ());
 

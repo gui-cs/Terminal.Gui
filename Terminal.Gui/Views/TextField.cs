@@ -36,8 +36,10 @@ namespace Terminal.Gui {
 		///   Changed event, raised when the text has clicked.
 		/// </summary>
 		/// <remarks>
-		///   Client code can hook up to this event, it is
-		///   raised when the text in the entry changes.
+		///   This event is raised when the <see cref="Text"/> changes. 
+		/// </remarks>
+		/// <remarks>
+		///   The passed <see cref="EventArgs"/> is a <see cref="ustring"/> containing the old value. 
 		/// </remarks>
 		public event EventHandler<ustring> Changed;
 

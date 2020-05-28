@@ -79,6 +79,8 @@ namespace UICatalog {
 				scenario.Run ();
 				scenario = GetScenarioToRun ();
 			}
+			// Now closes the driver too.
+			Application.Shutdown ();
 		}
 
 		/// <summary>
@@ -104,10 +106,10 @@ namespace UICatalog {
 
 			_categories = Scenario.GetAllCategories ();
 			_categoryListView = new ListView (_categories) {
-				X = 1,
+				X = 0,
 				Y = 0,
 				Width = Dim.Fill (0),
-				Height = Dim.Fill (2),
+				Height = Dim.Fill (0),
 				AllowsMarking = false,
 				CanFocus = true,
 			};
@@ -177,7 +179,7 @@ namespace UICatalog {
 
 			_top = Application.Top;
 
-			_top.KeyUp += KeyUpHandler;
+			_top.KeyDown += KeyDownHandler;
 
 			_top.Add (_menu);
 			_top.Add (_leftPane);
@@ -197,7 +199,7 @@ namespace UICatalog {
 			};
 #endif
 			
-			Application.Run (_top);
+			Application.Run (_top, false);
 			return _runningScenario;
 		}
 
@@ -271,7 +273,7 @@ namespace UICatalog {
 		/// to not be impacted. Same as for tabs.
 		/// </summary>
 		/// <param name="ke"></param>
-		private static void KeyUpHandler (object sender, View.KeyEventEventArgs a)
+		private static void KeyDownHandler (object sender, View.KeyEventEventArgs a)
 		{
 			if (_runningScenario != null) {
 				//switch (ke.Key) {

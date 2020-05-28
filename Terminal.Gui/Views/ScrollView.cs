@@ -327,12 +327,12 @@ namespace Terminal.Gui {
 			contentView.Add (view);
 		}
 
-		void View_MouseLeave (object sender, MouseEvent e)
+		void View_MouseLeave (object sender, MouseEventEventArgs e)
 		{
 			Application.UngrabMouse ();
 		}
 
-		void View_MouseEnter (object sender, MouseEvent e)
+		void View_MouseEnter (object sender, MouseEventEventArgs e)
 		{
 			Application.GrabMouse (this);
 		}

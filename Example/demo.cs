@@ -1,15 +1,12 @@
-using Terminal.Gui;
+using NStack;
 using System;
-using System.Linq;
-using System.IO;
-using Mono.Terminal;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Reflection;
-using NStack;
-using System.Text;
-using Rune = System.Rune;
+using Terminal.Gui;
 
 static class Demo {
 	//class Box10x : View, IScrollView {
@@ -191,7 +188,7 @@ static class Demo {
 			new DateField (3, 22, DateTime.Now),
 			new DateField (23, 22, DateTime.Now, true),
 			progress,
-			new Label (3, 24, "Press F9 (on Unix, ESC+9 is an alias) to activate the menubar"),
+			new Label (3, 24, "Press F9 (on Unix, ESC+9 is an alias) or Ctrl+T to activate the menubar"),
 			menuKeysStyle,
 			menuAutoMouseNav
 
@@ -637,10 +634,23 @@ static class Demo {
 		};
 #endif
 
+		win.KeyPress += Win_KeyPress;
+
 
 		top.Add (win);
 		//top.Add (menu);
 		top.Add (menu, statusBar);
 		Application.Run ();
+	}
+
+	private static void Win_KeyPress (object sender, View.KeyEventEventArgs e)
+	{
+		if (e.KeyEvent.Key == Key.ControlT) {
+			if (menu.IsMenuOpen)
+				menu.CloseMenu ();
+			else
+				menu.OpenMenu ();
+			e.Handled = true;
+		}
 	}
 }

@@ -195,11 +195,8 @@ namespace UICatalog {
 		/// </remarks>
 		public virtual void Run ()
 		{
-			Application.Run (Top);
-
-			// Every call to Application.Init must be bound by a call to Shutdown
-			// or Init doesn't do anything
-			Application.Shutdown ();
+			// This method already performs a later automatic shutdown.
+			Application.Run (Top, false);
 		}
 
 		/// <summary>

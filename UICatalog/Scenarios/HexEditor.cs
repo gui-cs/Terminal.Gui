@@ -14,6 +14,10 @@ namespace UICatalog {
 
 		public override void Setup ()
 		{
+			Win.Title = this.GetName() + "-" + _fileName ?? "Untitled";
+			Win.Y = 1;
+			Top.LayoutSubviews ();
+
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_New", "", () => New()),
@@ -40,28 +44,20 @@ namespace UICatalog {
 
 			CreateDemoFile (_fileName);
 
-			Win = new Window (_fileName ?? "Untitled") {
-				X = 0,
-				Y = 1,
-				Width = Dim.Fill (),
-				Height = Dim.Fill ()
-			};
-			Top.Add (Win);
-
 			_hexView = new HexView (LoadFile()) {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
-
-
+			_hexView.CanFocus = true;
 			Win.Add (_hexView);
 		}
 
 		private void New ()
 		{
-			Win.Title = _fileName = "Untitled";
+			_fileName = null;
+			Win.Title = this.GetName () + "-" + _fileName ?? "Untitled";
 			throw new NotImplementedException ();
 		}
 
@@ -75,7 +71,7 @@ namespace UICatalog {
 			if (_fileName != null) {
 				var bin = System.IO.File.ReadAllBytes (_fileName);
 				stream = new MemoryStream (bin);
-				Win.Title = _fileName;
+				Win.Title = this.GetName () + "-" + _fileName;
 				_saved = true;
 			}
 			return stream;

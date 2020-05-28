@@ -784,7 +784,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Closes the current Menu programatically, if open.
 		/// </summary>
-		public void CloseMenu()
+		public void CloseMenu ()
 		{
 			CloseMenu (false, false);
 		}

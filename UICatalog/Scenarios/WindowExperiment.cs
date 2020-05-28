@@ -28,15 +28,15 @@ namespace UICatalog {
 
 		public override void Setup ()
 		{
-			int margin = 3;
-			int padding = 1;
+			int margin = 2;
+			int padding = 0;
 			int height = 10;
 			var listWin = new List<View> ();
 			Win = new Window ($"{listWin.Count} - Scenario: {GetName ()}", padding) {
-				X = margin,
-				Y = margin,
-				Width = Dim.Fill (margin),
-				Height = height,
+				X = Pos.Center (),
+				Y = 1,
+				Width = Dim.Fill (10),
+				Height = Dim.Percent (20),
 			};
 			Win.ColorScheme = Colors.Dialog;
 			Win.Add (new Button ("Press me!") {
@@ -52,7 +52,7 @@ namespace UICatalog {
 				Window win = null;
 				win = new Window ($"{listWin.Count} - Scenario: {GetName ()}", padding) {
 					X = margin,
-					Y = Pos.Bottom(listWin.Last()) + (margin/2),
+					Y = Pos.Bottom (listWin.Last ()) + (margin),
 					Width = Dim.Fill (margin),
 					Height = height,
 				};
@@ -63,17 +63,19 @@ namespace UICatalog {
 					ColorScheme = Colors.Error,
 					Clicked = () => MessageBox.ErrorQuery (30, 10, win.Title.ToString (), "Neat?", "Yes", "No")
 				});
-				var subWin = new Window("Sub Window") {
+				var subWin = new Window ("Sub Window") {
 					X = Pos.Percent (0),
-					Y = Pos.AnchorEnd() - 5,
+					Y = Pos.AnchorEnd () - 5,
 					Width = Dim.Percent (50),
 					Height = 5,
 					ColorScheme = Colors.Base,
 				};
-				subWin.Add (new TextField (win.Title.ToString ()));
+				subWin.Add (new TextField (win.Title.ToString ()) {
+					ColorScheme = Colors.Error
+				});
 				win.Add (subWin);
 				var frameView = new FrameView ("This is a Sub-FrameView") {
-					X = Pos.Percent(50),
+					X = Pos.Percent (50),
 					Y = Pos.AnchorEnd () - 5,
 					Width = Dim.Percent (100),
 					Height = 5,
@@ -108,13 +110,15 @@ namespace UICatalog {
 				Height = Dim.Fill () - 1,
 				ColorScheme = Colors.Base,
 			};
-			subWinFV.Add (new TextField (frame.Title.ToString ()));
+			subWinFV.Add (new TextField (frame.Title.ToString ()) {
+				ColorScheme = Colors.Error
+			});
 			frame.Add (subWinFV);
 			var frameViewFV = new FrameView ("this is a Sub-FrameView") {
 				X = Pos.Percent (50),
 				Y = Pos.AnchorEnd () - (height - 4),
 				Width = Dim.Percent (100),
-				Height = Dim.Fill() - 1, 
+				Height = Dim.Fill () - 1,
 				ColorScheme = Colors.Base,
 			};
 			frameViewFV.Add (new TextField ("Edit Me"));
@@ -124,12 +128,12 @@ namespace UICatalog {
 			// it's client area. #522
 			frameViewFV.Add (new CheckBox (0, 2, "Or, Check me"));
 
-			frame.Add (new CheckBox ("No, Check me!") { 
+			frame.Add (new CheckBox ("No, Check me!") {
 				X = 0,
-				Y = Pos.AnchorEnd() - 1, // BUGBUG: #522 If I don't do the -1 it doesn't draw, but it should!
+				Y = Pos.AnchorEnd () - 1, // BUGBUG: #522 If I don't do the -1 it doesn't draw, but it should!
 			});
 			frame.Add (new CheckBox ("Really, Check me!") {
-				X = Pos.Percent(50),
+				X = Pos.Percent (50),
 				Y = Pos.AnchorEnd () - 1, // BUGBUG: #522 If I don't do the -1 it doesn't draw, but it should!
 			});
 
