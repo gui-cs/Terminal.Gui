@@ -665,7 +665,7 @@ namespace Terminal.Gui {
 		{
 			var bscreen = RectToScreen (rect);
 			var previous = Driver.Clip;
-			Driver.Clip = ScreenClip (RectToScreen (Bounds));
+			Driver.Clip = ScreenClip (RectToScreen (Bounds)); 
 			return previous;
 		}
 
@@ -678,8 +678,7 @@ namespace Terminal.Gui {
 		public void DrawFrame (Rect rect, int padding = 0, bool fill = false)
 		{
 			var scrRect = RectToScreen (rect);
-			var savedClip = Driver.Clip;
-			Driver.Clip = ScreenClip (RectToScreen (Bounds));
+			var savedClip = ClipToBounds ();
 			Driver.DrawFrame (scrRect, padding, fill);
 			Driver.Clip = savedClip;
 		}
@@ -892,8 +891,8 @@ namespace Terminal.Gui {
 							Application.CurrentView = view;
 
 							// Ensure we don't make the Driver's clip rect any bigger
-							if (Driver.Clip.IsEmpty || Driver.Clip.Contains(RectToScreen (view.Bounds))) {
-								var savedClip = ClipToBounds ();
+							if (Driver.Clip.IsEmpty || Driver.Clip.Contains(RectToScreen (view.Frame))) {
+								var savedClip = view.ClipToBounds ();
 								view.Redraw (view.Bounds);
 								Driver.Clip = savedClip;
 							} else {

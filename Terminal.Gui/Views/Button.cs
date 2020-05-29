@@ -39,6 +39,7 @@ namespace Terminal.Gui {
 			get => is_default;
 			set {
 				is_default = value;
+				SetWidthHeight (Text, is_default);
 				Update ();
 			}
 		}
@@ -65,18 +66,10 @@ namespace Terminal.Gui {
 		public Button (ustring text, bool is_default = false) : base ()
 		{
 			CanFocus = true;
+			Text = text ?? string.Empty;
 			this.IsDefault = is_default;
-			Text = text;
 			int w = SetWidthHeight (text, is_default);
 			Frame = new Rect (0, 0, w, 1);
-		}
-
-		int SetWidthHeight (ustring text, bool is_default)
-		{
-			int w = text.Length + 4 + (is_default ? 2 : 0);
-			Width = w;
-			Height = 1;
-			return w;
 		}
 
 		/// <summary>
@@ -90,6 +83,35 @@ namespace Terminal.Gui {
 		/// <param name="y">Y position where the button will be shown.</param>
 		/// <param name="text">The button's text</param>
 		public Button (int x, int y, ustring text) : this (x, y, text, false) { }
+
+		/// <summary>
+		///   Initializes a new instance of <see cref="Button"/> at the given coordinates, based on the given text, and with the specified <see cref="IsDefault"/> value
+		/// </summary>
+		/// <remarks>
+		///   If the value for is_default is true, a special
+		///   decoration is used, and the enter key on a
+		///   dialog would implicitly activate this button.
+		/// </remarks>
+		/// <param name="x">X position where the button will be shown.</param>
+		/// <param name="y">Y position where the button will be shown.</param>
+		/// <param name="text">The button's text</param>
+		/// <param name="is_default">If set, this makes the button the default button in the current view, which means that if the user presses return on a view that does not handle return, it will be treated as if he had clicked on the button</param>
+		public Button (int x, int y, ustring text, bool is_default)
+		    : base (new Rect (x, y, text.Length + 4 + (is_default ? 2 : 0), 1))
+		{
+			CanFocus = true;
+			Text = text ?? string.Empty;
+			this.IsDefault = is_default;
+		}
+
+
+		int SetWidthHeight (ustring text, bool is_default)
+		{
+			int w = text.Length + 4 + (is_default ? 2 : 0);
+			Width = w;
+			Height = 1;
+			return w;
+		}
 
 		/// <summary>
 		///   The text displayed by this <see cref="Button"/>.
@@ -127,27 +149,6 @@ namespace Terminal.Gui {
 				i++;
 			}
 			SetNeedsDisplay ();
-		}
-
-		/// <summary>
-		///   Initializes a new instance of <see cref="Button"/> at the given coordinates, based on the given text, and with the specified <see cref="IsDefault"/> value
-		/// </summary>
-		/// <remarks>
-		///   If the value for is_default is true, a special
-		///   decoration is used, and the enter key on a
-		///   dialog would implicitly activate this button.
-		/// </remarks>
-		/// <param name="x">X position where the button will be shown.</param>
-		/// <param name="y">Y position where the button will be shown.</param>
-		/// <param name="text">The button's text</param>
-		/// <param name="is_default">If set, this makes the button the default button in the current view, which means that if the user presses return on a view that does not handle return, it will be treated as if he had clicked on the button</param>
-		public Button (int x, int y, ustring text, bool is_default)
-		    : base (new Rect (x, y, text.Length + 4 + (is_default ? 2 : 0), 1))
-		{
-			CanFocus = true;
-
-			this.IsDefault = is_default;
-			Text = text;
 		}
 
 		///<inheritdoc cref="Redraw(Rect)"/>
