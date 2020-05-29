@@ -665,7 +665,7 @@ namespace Terminal.Gui {
 		{
 			var bscreen = RectToScreen (rect);
 			var previous = Driver.Clip;
-			Driver.Clip = ScreenClip (RectToScreen (Bounds)); // BUGBUG: I think this should be Frame not bounds (tig)
+			Driver.Clip = ScreenClip (RectToScreen (Bounds)); 
 			return previous;
 		}
 

@@ -41,7 +41,7 @@ namespace UICatalog {
 				LeftFrame = new FrameView ("Settings") {
 					X = 0,
 					Y = 0,
-					Height = Dim.Percent (100), // BUGBUG: This +1 should not be needed
+					Height = Dim.Percent (100), 
 					Width = Dim.Percent (25)
 				};
 				var lbl = new Label (1, 1, "Tick every (ms):");

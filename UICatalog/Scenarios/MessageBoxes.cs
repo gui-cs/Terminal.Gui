@@ -7,7 +7,6 @@ namespace UICatalog {
 	[ScenarioMetadata (Name: "MessageBoxes", Description: "Demonstrates how to use MessageBoxes")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
-	[ScenarioCategory ("Bug Repro")]
 	class MessageBoxes : Scenario {
 		public override void Setup ()
 		{
@@ -110,7 +109,6 @@ namespace UICatalog {
 			var styleRadioGroup = new RadioGroup (new [] { "_Query", "_Error" } ) {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
-				//Width = 5, // BUGBUG: This should cause clipping! #399
 			};
 			frame.Add (styleRadioGroup);
 
@@ -132,7 +130,6 @@ namespace UICatalog {
 				ColorScheme = Colors.Error,
 			};
 
-			// BUGBUG: Why is this button not centered???
 			var showMessageBoxButton = new Button ("Show MessageBox") {
 				X = Pos.Center(),
 				Y = Pos.Bottom (frame) + 2			,

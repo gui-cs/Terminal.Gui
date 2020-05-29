@@ -164,7 +164,7 @@ namespace Terminal.Gui {
 				Driver.DrawFrame (scrRect, padding, true);
 			}
 
-			if (Driver.Clip.IsEmpty || Driver.Clip.Contains (contentView.RectToScreen (contentView.Frame))) { // BUGBUG: shouldn't Bounds be Frame? Yes. (tig)
+			if (Driver.Clip.IsEmpty || Driver.Clip.Contains (contentView.RectToScreen (contentView.Frame))) { 
 				var savedClip = ClipToBounds ();
 				contentView.Redraw (contentView.Bounds);
 				Driver.Clip = savedClip;
