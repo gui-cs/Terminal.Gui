@@ -110,7 +110,7 @@ namespace UICatalog {
 			var styleRadioGroup = new RadioGroup (new [] { "_Query", "_Error" } ) {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
-				Width = 5, // BUGBUG: This should cause clipping! #399
+				//Width = 5, // BUGBUG: This should cause clipping! #399
 			};
 			frame.Add (styleRadioGroup);
 

@@ -40,6 +40,7 @@ namespace Terminal.Gui {
 						Driver.AddRune ('x');
 					}
 				}
+				base.Redraw (region);
 			}
 #endif
 		}
@@ -155,17 +156,16 @@ namespace Terminal.Gui {
 		{
 			//var padding = 0;
 			Application.CurrentView = this;
-			var scrRect = RectToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
+			var scrRect = RectToScreen (new Rect(0, 0, Frame.Width, Frame.Height));
 
+			// BUGBUG: Why do we draw the frame twice? This call is here to clear the content area, I think. Why not just clear that area?
 			if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
 				Driver.SetAttribute (ColorScheme.Normal);
 				Driver.DrawFrame (scrRect, padding, true);
 			}
 
-			
-			if (Driver.Clip.IsEmpty || Driver.Clip.Contains (RectToScreen (contentView.Bounds))) {
-				var savedClip = Driver.Clip;
-				Driver.Clip = ClipToBounds();
+			if (Driver.Clip.IsEmpty || Driver.Clip.Contains (contentView.RectToScreen (contentView.Frame))) { // BUGBUG: shouldn't Bounds be Frame? Yes. (tig)
+				var savedClip = ClipToBounds ();
 				contentView.Redraw (contentView.Bounds);
 				Driver.Clip = savedClip;
 			} else {

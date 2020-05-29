@@ -143,9 +143,8 @@ namespace Terminal.Gui {
 				Driver.DrawFrame (scrRect, padding, true);
 			}
 
-			if (Driver.Clip.IsEmpty || Driver.Clip.Contains (contentView.RectToScreen (contentView.Bounds))) {
-				var savedClip = Driver.Clip;
-				Driver.Clip = ScreenClip (RectToScreen (Bounds));
+			if (Driver.Clip.IsEmpty || Driver.Clip.Contains (contentView.RectToScreen (contentView.Frame))) { // BUGBUG: Should Bounds be Frame? Yes. (tig)
+				var savedClip = ClipToBounds (); // BUGBUG: Should Bounds be Frame? No. (tig)
 				contentView.Redraw (contentView.Bounds);
 				Driver.Clip = savedClip;
 			} else {
