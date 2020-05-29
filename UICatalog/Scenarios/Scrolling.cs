@@ -28,22 +28,24 @@ namespace UICatalog {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (1),  // BUGBUG: I don't think this should be needed; DimFill() should respect container's frame. X does.
+				Height = 2,
 				ColorScheme = Colors.Error
 			};
 			scrollView.Add (horizontalRuler);
 			const string vrule = "|\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
 			var verticalRuler = new Label ("") {
-				X = 0,
+				X = 2,
 				Y = 0,
-				Width = 1,
+				Width = 2,
 				Height = Dim.Fill (),
 				ColorScheme = Colors.Error
 			};
 			scrollView.Add (verticalRuler);
 
-			Application.Resized += (sender, a) => {
-				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
+			Win.LayoutComplete += (sender, a) => {
+				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)] +
+				"\n" + "|         ".Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
 				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height * 2)];
 			};
 
