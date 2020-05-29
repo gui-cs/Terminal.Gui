@@ -104,11 +104,11 @@ namespace UICatalog {
 				Height = height,
 			};
 			frame.ColorScheme = Colors.Dialog;
-			frame.Add (new Button ("Press me! (Y = 0)") {
+			frame.Add (new Label ("This is a Label! (Y = 0)") {
 				X = Pos.Center (),
 				Y = 0,
 				ColorScheme = Colors.Error,
-				Clicked = () => MessageBox.ErrorQuery (30, 10, frame.Title.ToString (), "Neat?", "Yes", "No")
+				//Clicked = () => MessageBox.ErrorQuery (30, 10, frame.Title.ToString (), "Neat?", "Yes", "No")
 			});
 			var subWinofFV = new Window ("this is a Sub-Window") {
 				X = Pos.Percent (0),

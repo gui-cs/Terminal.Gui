@@ -401,11 +401,21 @@ namespace Terminal.Gui {
 		public override void Redraw(Rect region)
 		{
 			SetViewsNeedsDisplay ();
-			var oldClip = ClipToBounds ();
 			Driver.SetAttribute (ColorScheme.Normal);
 			Clear ();
-			base.Redraw(region);
-			Driver.Clip = oldClip;
+
+			//if (Driver.Clip.IsEmpty || Driver.Clip.Contains (RectToScreen (Bounds)) || Driver.Clip.Contains (contentView.RectToScreen (contentView.Bounds))) {
+				var savedClip = Driver.Clip;
+				Driver.Clip = ClipToBounds ();
+				//vertical.Redraw (vertical.Bounds);
+				//horizontal.Redraw (vertical.Bounds);
+				contentView.Redraw (contentView.Bounds);
+				Driver.Clip = savedClip;
+			//} else {
+			//	vertical.Redraw (vertical.Bounds);
+			//	horizontal.Redraw (vertical.Bounds);
+			//	contentView.Redraw (contentView.Bounds);
+			//}
 			Driver.SetAttribute (ColorScheme.Normal);
 		}
 

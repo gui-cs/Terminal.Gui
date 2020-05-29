@@ -890,7 +890,15 @@ namespace Terminal.Gui {
 							if (view.layoutNeeded)
 								view.LayoutSubviews ();
 							Application.CurrentView = view;
-							view.Redraw (view.Bounds);
+
+							// Ensure we don't make the Driver's clip rect any bigger
+							if (Driver.Clip.IsEmpty || Driver.Clip.Contains(RectToScreen (view.Bounds))) {
+								var savedClip = ClipToBounds ();
+								view.Redraw (view.Bounds);
+								Driver.Clip = savedClip;
+							} else {
+								view.Redraw (view.Bounds);
+							}
 						}
 						view.NeedDisplay = Rect.Empty;
 						view.childNeedsDisplay = false;
