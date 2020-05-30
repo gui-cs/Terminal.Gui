@@ -186,9 +186,11 @@ namespace Terminal.Gui {
 			}
 		}
 
-		Curses.Event? LastMouseButtonPressed = null;
-		bool IsButtonPressed = false;
-		bool cancelButtonClicked = false;
+		Curses.Event? LastMouseButtonPressed;
+		bool IsButtonPressed;
+		bool cancelButtonClicked;
+		bool canWheeledDown;
+		bool isReportMousePosition;
 		Point point;
 
 		MouseEvent ToDriverMouse (Curses.MouseEvent cev)
@@ -206,7 +208,7 @@ namespace Terminal.Gui {
 				LastMouseButtonPressed == null) {
 
 				IsButtonPressed = false;
-				mouseFlag = ProcessButtonClickedEvent (cev, mouseFlag);
+				mouseFlag = ProcessButtonClickedEvent (cev);
 
 			} else if (((cev.ButtonState == Curses.Event.Button1Pressed || cev.ButtonState == Curses.Event.Button2Pressed ||
 				cev.ButtonState == Curses.Event.Button3Pressed) && LastMouseButtonPressed == null) ||
@@ -216,6 +218,7 @@ namespace Terminal.Gui {
 				if (cev.ButtonState != Curses.Event.ReportMousePosition)
 					LastMouseButtonPressed = cev.ButtonState;
 				IsButtonPressed = true;
+				isReportMousePosition = false;
 
 				if (cev.ButtonState == Curses.Event.ReportMousePosition) {
 					mouseFlag = (MouseFlags)LastMouseButtonPressed | MouseFlags.ReportMousePosition;
@@ -231,7 +234,7 @@ namespace Terminal.Gui {
 				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
 					Task.Run (async () => {
 						while (IsButtonPressed && LastMouseButtonPressed != null) {
-							await Task.Delay (200);
+							await Task.Delay (100);
 							var me = new MouseEvent () {
 								X = cev.X,
 								Y = cev.Y,
@@ -253,34 +256,38 @@ namespace Terminal.Gui {
 			} else if ((cev.ButtonState == Curses.Event.Button1Released || cev.ButtonState == Curses.Event.Button2Released ||
 				cev.ButtonState == Curses.Event.Button3Released)) {
 
-				mouseFlag = ProcessButtonReleasedEvent (cev, mouseFlag);
+				mouseFlag = ProcessButtonReleasedEvent (cev);
 				IsButtonPressed = false;
+				canWheeledDown = false;
 
 			} else if (cev.ButtonState == Curses.Event.Button4Pressed) {
 
 				mouseFlag = MouseFlags.WheeledUp;
 
-			} else if (cev.ButtonState == Curses.Event.ReportMousePosition && cev.X == point.X && cev.Y == point.Y) {
+			} else if (cev.ButtonState == Curses.Event.ReportMousePosition && cev.X == point.X && cev.Y == point.Y &&
+				canWheeledDown) {
 
 				mouseFlag = MouseFlags.WheeledDown;
+				canWheeledDown = true;
 
 			}
-			else if (cev.ButtonState == Curses.Event.ReportMousePosition) {
+			else if (cev.ButtonState == Curses.Event.ReportMousePosition && !canWheeledDown) {
 
 				mouseFlag = MouseFlags.ReportMousePosition;
+				canWheeledDown = true;
+				isReportMousePosition = true;
+
 			} else {
 				mouseFlag = (MouseFlags)cev.ButtonState;
+				canWheeledDown = false;
+				if (cev.ButtonState == Curses.Event.ReportMousePosition)
+					isReportMousePosition = true;
 			}
 
 			point = new Point () {
 				X = cev.X,
 				Y = cev.Y
 			};
-
-
-
-			if (cev.ID != 0)
-				mouseFlag = MouseFlags.WheeledDown;
 
 			return new MouseEvent () {
 				X = cev.X,
@@ -290,10 +297,10 @@ namespace Terminal.Gui {
 			};
 		}
 
-		private MouseFlags ProcessButtonClickedEvent (Curses.MouseEvent cev, MouseFlags mf)
+		private MouseFlags ProcessButtonClickedEvent (Curses.MouseEvent cev)
 		{
 			LastMouseButtonPressed = cev.ButtonState;
-			mf = GetButtonState (cev, true);
+			var mf = GetButtonState (cev, true);
 			mouseHandler (ProcessButtonState (cev, mf));
 			if (LastMouseButtonPressed != null && LastMouseButtonPressed == cev.ButtonState) {
 				mf = GetButtonState (cev, false);
@@ -303,17 +310,21 @@ namespace Terminal.Gui {
 				}
 			}
 			LastMouseButtonPressed = null;
+			canWheeledDown = false;
 			return mf;
 		}
 
-		private MouseFlags ProcessButtonReleasedEvent (Curses.MouseEvent cev, MouseFlags mf)
-		{			
-			mf = (MouseFlags)cev.ButtonState;
-			mouseHandler (ProcessButtonState (cev, mf));
-			if (!cancelButtonClicked && LastMouseButtonPressed == null)
+		private MouseFlags ProcessButtonReleasedEvent (Curses.MouseEvent cev)
+		{
+			var mf = (MouseFlags)cev.ButtonState;
+			if (!cancelButtonClicked && LastMouseButtonPressed == null && !isReportMousePosition) {
+				mouseHandler (ProcessButtonState (cev, mf));
 				mf = GetButtonState (cev);
-			else
-				cancelButtonClicked = false;
+			} else if (isReportMousePosition) {
+				mf = MouseFlags.ReportMousePosition;
+			}
+			cancelButtonClicked = false;
+			canWheeledDown = false;
 			return mf;
 		}
 
