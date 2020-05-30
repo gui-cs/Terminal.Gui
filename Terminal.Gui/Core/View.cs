@@ -891,7 +891,8 @@ namespace Terminal.Gui {
 							Application.CurrentView = view;
 
 							// Ensure we don't make the Driver's clip rect any bigger
-							if (Driver.Clip.IsEmpty || Driver.Clip.Contains(RectToScreen (view.Frame))) {
+							if (SuperView != null && SuperView.Bounds.Contains (RectToScreen (Frame))) {
+							//if (Driver.Clip.IsEmpty || Driver.Clip.Contains(RectToScreen (view.Frame))) {
 								var savedClip = view.ClipToBounds ();
 								view.Redraw (view.Bounds);
 								Driver.Clip = savedClip;

@@ -5,7 +5,7 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 // Define this to enable diagnostics drawing for Window Frames
-//#define DRAW_WINDOW_FRAME_DIAGNOSTICS
+#define DRAW_WINDOW_FRAME_DIAGNOSTICS
 using NStack;
 using System;
 using System.Runtime.CompilerServices;

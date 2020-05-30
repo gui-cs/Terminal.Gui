@@ -9,6 +9,10 @@ namespace UICatalog {
 	class Scrolling : Scenario {
 		public override void Setup ()
 		{
+			Win.X = 1;
+			Win.Y = 2;
+			Win.Width = Dim.Fill () - 4;
+			Win.Height = Dim.Fill () - 2;
 			var label = new Label ("ScrollView (new Rect (2, 2, 50, 20)) with a 200, 100 ContentSize...") {
 				X = 0, Y = 0,
 				ColorScheme = Colors.Dialog
