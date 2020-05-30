@@ -537,7 +537,10 @@ namespace Terminal.Gui {
 				vertical.MouseEvent (me);
 			else if (me.Y == horizontal.Frame.Y)
 				horizontal.MouseEvent (me);
-
+			else if (IsOverridden (me.View)) {
+				Application.UngrabMouse ();
+				return false;
+			}
 			return true;
 		}
 	}
