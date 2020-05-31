@@ -508,7 +508,7 @@ static class Demo {
 
 		//Application.UseSystemConsole = true;
 
-		Application.Init ();
+		Application.Init();
 
 		var top = Application.Top;
 
