@@ -392,12 +392,6 @@ namespace Terminal.Gui {
 				keyModifiers.Alt = true;
 			if (!keyModifiers.Ctrl && key.HasFlag (Key.CtrlMask))
 				keyModifiers.Ctrl = true;
-			//if (!keyModifiers.Capslock)
-			//	keyModifiers.Capslock = true;
-			//if (!keyModifiers.Numlock)
-			//	keyModifiers.Numlock = true;
-			//if (!keyModifiers.Scrolllock)
-			//	keyModifiers.Scrolllock = true;
 
 			return keyModifiers;
 		}

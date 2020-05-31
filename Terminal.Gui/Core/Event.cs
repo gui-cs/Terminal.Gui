@@ -9,7 +9,7 @@ using System;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// Manage the keys modifiers within a key event.
+	/// Identifies the state of the "shift"-keys within a event.
 	/// </summary>
 	public class KeyModifiers {
 		/// <summary>
@@ -333,7 +333,7 @@ namespace Terminal.Gui {
 		public Key Key;
 
 		/// <summary>
-		/// Check if the Shift key was pressed or not.
+		/// Indicates the "shift" state of the various shift-keys (e.g. Shift, Alt, Ctrl, NumLock, ...).
 		/// </summary>
 		public KeyModifiers KeyModifiers;
 
