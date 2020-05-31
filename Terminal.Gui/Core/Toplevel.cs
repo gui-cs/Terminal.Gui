@@ -13,19 +13,18 @@ namespace Terminal.Gui {
 	/// </summary>
 	/// <remarks>
 	///   <para>
-	///     Toplevels can be modally executing views, and they return control
-	///     to the caller when the "Running" property is set to false, or
-	///     by calling <see cref="M:Terminal.Gui.Application.RequestStop()"/>
+	///     Toplevels can be modally executing views, started by calling <see cref="Application.Run(Toplevel, bool)"/>. 
+	///     They return control to the caller when <see cref="Application.RequestStop()"/> has 
+	///     been called (which sets the <see cref="Toplevel.Running"/> property to false). 
 	///   </para>
 	///   <para>
-	///     There will be a toplevel created for you on the first time use
-	///     and can be accessed from the property <see cref="P:Terminal.Gui.Application.Top"/>,
-	///     but new toplevels can be created and ran on top of it.   To run, create the
-	///     toplevel and then invoke <see cref="M:Terminal.Gui.Application.Run"/> with the
-	///     new toplevel.
+	///     A Toplevel is created when an application initialzies Terminal.Gui by callling <see cref="Application.Init()"/>.
+	///     The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created 
+	///     and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and 
+	///     call <see cref="Application.Run(Toplevel, bool)"/>.
 	///   </para>
 	///   <para>
-	///     TopLevels can also opt-in to more sophisticated initialization
+	///     Toplevels can also opt-in to more sophisticated initialization
 	///     by implementing <see cref="ISupportInitialize"/>. When they do
 	///     so, the <see cref="ISupportInitialize.BeginInit"/> and
 	///     <see cref="ISupportInitialize.EndInit"/> methods will be called
@@ -33,27 +32,29 @@ namespace Terminal.Gui {
 	///     If first-run-only initialization is preferred, the <see cref="ISupportInitializeNotification"/>
 	///     can be implemented too, in which case the <see cref="ISupportInitialize"/>
 	///     methods will only be called if <see cref="ISupportInitializeNotification.IsInitialized"/>
-	///     is <see langword="false"/>. This allows proper View inheritance hierarchies
+	///     is <see langword="false"/>. This allows proper <see cref="View"/> inheritance hierarchies
 	///     to override base class layout code optimally by doing so only on first run,
 	///     instead of on every run.
 	///   </para>
 	/// </remarks>
 	public class Toplevel : View {
 		/// <summary>
-		/// Gets or sets whether the Mainloop for this <see cref="Toplevel"/> is running or not. Setting
-		/// this property to false will cause the MainLoop to exit. 
+		/// Gets or sets whether the <see cref="MainLoop"/> for this <see cref="Toplevel"/> is running or not. 
 		/// </summary>
+		/// <remarks>
+		///    Setting this property directly is discouraged. Use <see cref="Application.RequestStop"/> instead. 
+		/// </remarks>
 		public bool Running { get; set; }
 
 		/// <summary>
-		/// Fired once the Toplevel's MainLoop has started it's first iteration. 
+		/// Fired once the Toplevel's <see cref="MainLoop"/> has started it's first iteration. 
 		/// Subscribe to this event to perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set.
 		/// changes. A Ready event handler is a good place to finalize initialization after calling `<see cref="Application.Run()"/>(topLevel)`. 
 		/// </summary>
 		public event EventHandler Ready;
 
 		/// <summary>
-		/// Called from Application.RunLoop after the <see cref="Toplevel"/> has entered it's first iteration of the loop. 
+		/// Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered it's first iteration of the loop. 
 		/// </summary>
 		internal virtual void OnReady ()
 		{
@@ -70,7 +71,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Toplevel"/> class with Computed layout, defaulting to <see langword="async"/> full screen.
+		/// Initializes a new instance of the <see cref="Toplevel"/> class with <see cref="LayoutStyle.Computed"/> layout, defaulting to full screen.
 		/// </summary>
 		public Toplevel () : base ()
 		{
@@ -85,7 +86,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Convenience factory method that creates a new toplevel with the current terminal dimensions.
+		/// Convenience factory method that creates a new Toplevel with the current terminal dimensions.
 		/// </summary>
 		/// <returns>The create.</returns>
 		public static Toplevel Create ()
@@ -109,12 +110,12 @@ namespace Terminal.Gui {
 		public bool Modal { get; set; }
 
 		/// <summary>
-		/// Check id current toplevel has menu bar
+		/// Gets or sets the menu for this Toplevel
 		/// </summary>
 		public MenuBar MenuBar { get; set; }
 
 		/// <summary>
-		/// Check id current toplevel has status bar
+		/// Gets or sets the status bar for this Toplevel
 		/// </summary>
 		public StatusBar StatusBar { get; set; }
 
@@ -280,7 +281,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// This method is invoked by Application.Begin as part of the Application.Run after
+		/// Invoked by <see cref="Application.Begin"/> as part of the <see cref="Application.Run(Toplevel, bool)"/> after
 		/// the views have been laid out, and before the views are drawn for the first time.
 		/// </summary>
 		public virtual void WillPresent ()

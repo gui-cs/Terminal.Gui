@@ -7,7 +7,7 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// A <see cref="Toplevel"/> <see cref="View"/> that draws a frame around its region and has a "ContentView" subview where the contents are added.
+	/// A <see cref="Toplevel"/> <see cref="View"/> that draws a frame around its region and has a "Content" subview where the contents are added.
 	/// </summary>
 	public class Window : Toplevel, IEnumerable {
 		View contentView;
@@ -50,6 +50,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		/// <param name="title">Title.</param>
+		/// <remarks>
+		/// This constructor intitalizes a Window with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use constructors
+		/// that do not take <c>Rect</c> parameters to initialize a Window with  <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/> 
+		/// </remarks>
 		public Window (Rect frame, ustring title = null) : this (frame, title, padding: 0)
 		{
 		}
@@ -58,19 +62,26 @@ namespace Terminal.Gui {
 		/// Initializes a new instance of the <see cref="Window"/> class with an optional title.
 		/// </summary>
 		/// <param name="title">Title.</param>
+		/// <remarks>
+		///   This constructor intitalize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
+		///   Use <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> properties to dynamically control the size and location of the view.
+		/// </remarks>
 		public Window (ustring title = null) : this (title, padding: 0)
 		{
 		}
 
 		int padding;
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Window"/> with
-		/// the specified frame for its location, with the specified border
-		/// an optional title.
+		/// Initializes a new instance of the <see cref="Window"/> with the specified frame for its location, with the specified border,
+		/// and an optional title.
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		/// <param name="padding">Number of characters to use for padding of the drawn frame.</param>
 		/// <param name="title">Title.</param>
+		/// <remarks>
+		/// This constructor intitalizes a Window with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use constructors
+		/// that do not take <c>Rect</c> parameters to initialize a Window with  <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/> 
+		/// </remarks>
 		public Window (Rect frame, ustring title = null, int padding = 0) : base (frame)
 		{
 			this.Title = title;
@@ -82,12 +93,15 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Window"/> with
-		/// the specified frame for its location, with the specified border
-		/// an optional title.
+		/// Initializes a new instance of the <see cref="Window"/> with the specified frame for its location, with the specified border,
+		/// and an optional title.
 		/// </summary>
 		/// <param name="padding">Number of characters to use for padding of the drawn frame.</param>
 		/// <param name="title">Title.</param>
+		/// <remarks>
+		///   This constructor intitalize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
+		///   Use <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> properties to dynamically control the size and location of the view.
+		/// </remarks>
 		public Window (ustring title = null, int padding = 0) : base ()
 		{
 			this.Title = title;
@@ -111,10 +125,7 @@ namespace Terminal.Gui {
 			return contentView.GetEnumerator ();
 		}
 
-		/// <summary>
-		/// Add the specified view to the <see cref="ContentView"/>.
-		/// </summary>
-		/// <param name="view">View to add to the window.</param>
+		/// <inheritdoc cref="Add(View)"/>
 		public override void Add (View view)
 		{
 			contentView.Add (view);
@@ -123,11 +134,7 @@ namespace Terminal.Gui {
 		}
 
 
-		/// <summary>
-		///   Removes a widget from this container.
-		/// </summary>
-		/// <remarks>
-		/// </remarks>
+		/// <inheritdoc cref="Remove(View)"/>
 		public override void Remove (View view)
 		{
 			if (view == null)
@@ -141,11 +148,7 @@ namespace Terminal.Gui {
 				this.CanFocus = false;
 		}
 
-		/// <summary>
-		///   Removes all widgets from this container.
-		/// </summary>
-		/// <remarks>
-		/// </remarks>
+		/// <inheritdoc cref="RemoveAll()"/>
 		public override void RemoveAll ()
 		{
 			contentView.RemoveAll ();
@@ -187,6 +190,7 @@ namespace Terminal.Gui {
 		//
 		internal static Point? dragPosition;
 		Point start;
+
 		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
 		public override bool MouseEvent (MouseEvent mouseEvent)
 		{
@@ -241,6 +245,5 @@ namespace Terminal.Gui {
 			//Demo.ml.Text = me.ToString ();
 			return false;
 		}
-
 	}
 }

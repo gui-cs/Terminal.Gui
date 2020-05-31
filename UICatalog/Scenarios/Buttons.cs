@@ -13,11 +13,8 @@ namespace UICatalog {
 				Y = 0,
 			};
 			Win.Add (editLabel);
-			var edit = new TextField ("") {
-				X = Pos.Right (editLabel) + 1,
-				Y = Pos.Top (editLabel),
-				Width = Dim.Fill (2),
-			};
+			// Add a TextField using Absolute layout. Use buttons to move/grow.
+			var edit = new TextField (31, 0, 25, "");
 			Win.Add (edit);
 
 			// This is the default button (IsDefault = true); if user presses ENTER in the TextField
@@ -100,6 +97,26 @@ namespace UICatalog {
 				},
 			});
 
+			// Demonstrates how changing the View.Frame property can move Views
+			y += 2;
+			var moveBtn = new Button (10, y, "Move TextField via Frame") {
+				ColorScheme = Colors.Error,
+			};
+			moveBtn.Clicked = () => {
+				edit.Frame = new Rect (edit.Frame.X + 5, edit.Frame.Y, edit.Frame.Width, edit.Frame.Height);
+			};
+			Win.Add (moveBtn);
+
+			// Demonstrates how changing the View.Frame property can NOT resize Views
+			y += 2;
+			var sizeBtn = new Button (10, y, "Grow TextField via Frame") {
+				ColorScheme = Colors.Error,
+			};
+			sizeBtn.Clicked = () => {
+				edit.Frame = new Rect (edit.Frame.X, edit.Frame.Y, edit.Frame.Width + 2, edit.Frame.Height);
+				Win.LayoutSubviews ();
+			};
+			Win.Add (sizeBtn);
 
 		}
 	}

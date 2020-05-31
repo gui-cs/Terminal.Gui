@@ -404,13 +404,13 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (ColorScheme.Normal);
 			Clear ();
 
-			if (Driver.Clip.IsEmpty || Driver.Clip.Contains (RectToScreen (Frame))) {
-			var savedClip = ClipToBounds ();
-			contentView.Redraw (contentView.Frame);
-			Driver.Clip = savedClip;
-			} else {
+			//if (Driver.Clip.IsEmpty || Driver.Clip.Contains (RectToScreen (contentView.Frame))) {
+			//	var savedClip = ClipToBounds ();
+			//	contentView.Redraw (contentView.Frame);
+			//	Driver.Clip = savedClip;
+			//} else {
 				contentView.Redraw (contentView.Bounds);
-			}
+			//}
 			vertical.Redraw (vertical.Bounds);
 			horizontal.Redraw (vertical.Bounds);
 			Driver.SetAttribute (ColorScheme.Normal);

@@ -434,7 +434,7 @@ namespace Terminal.Gui {
 			Current = toplevel;
 			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessKeyDownEvent, ProcessKeyUpEvent, ProcessMouseEvent);
 			if (toplevel.LayoutStyle == LayoutStyle.Computed)
-				toplevel.RelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
+				toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
 			toplevel.LayoutSubviews ();
 			Loaded?.Invoke (null, new ResizedEventArgs () { Rows = Driver.Rows, Cols = Driver.Cols });
 			toplevel.WillPresent ();
@@ -670,7 +670,7 @@ namespace Terminal.Gui {
 			Driver.Clip = full;
 			foreach (var t in toplevels) {
 				t.PositionToplevels ();
-				t.RelativeLayout (full);
+				t.SetRelativeLayout (full);
 				t.LayoutSubviews ();
 			}
 			Refresh ();
