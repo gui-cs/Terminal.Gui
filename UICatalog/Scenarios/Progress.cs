@@ -41,7 +41,7 @@ namespace UICatalog {
 				LeftFrame = new FrameView ("Settings") {
 					X = 0,
 					Y = 0,
-					Height = Dim.Percent (100) + 1, // BUGBUG: This +1 should not be needed
+					Height = Dim.Percent (100), 
 					Width = Dim.Percent (25)
 				};
 				var lbl = new Label (1, 1, "Tick every (ms):");
@@ -223,14 +223,13 @@ namespace UICatalog {
 
 			var startBoth = new Button ("Start Both") {
 				X = Pos.Center (),
-				Y = Pos.AnchorEnd () - 1,
+				Y = Pos.Bottom(mainLoopTimeoutDemo) + 1,
 			};
 			startBoth.Clicked = () => {
 				systemTimerDemo.Start ();
 				mainLoopTimeoutDemo.Start ();
 			};
 			Win.Add (startBoth);
-
 		}
 
 		protected override void Dispose (bool disposing)

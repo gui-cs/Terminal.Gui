@@ -30,22 +30,42 @@ namespace UICatalog {
 
 		public override void Setup ()
 		{
+			static int About ()
+			{
+				//return MessageBox.Query (50, 10, "About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok")
+
+				var about = new Window (new Rect (0, 0, 50, 10), "About UI catalog", 0) {
+					X = Pos.Center (),
+					Y = Pos.Center (),
+					Width = 50,
+					Height = 10,
+					LayoutStyle = LayoutStyle.Computed,
+					ColorScheme = Colors.Error,
+
+				};
+				//about.Add (new Label ("UI Catalog is a comprehensive sample library for Terminal.Gui"));
+
+				Application.Run (about);
+				return 0;
+
+			}
+
 			int margin = 2;
-			int padding = 0;
-			int height = 10;
+			int padding = 1;
+			int contentHeight = 7;
 			var listWin = new List<View> ();
 			Win = new Window ($"{listWin.Count} - Scenario: {GetName ()}", padding) {
 				X = Pos.Center (),
 				Y = 1,
 				Width = Dim.Fill (10),
-				Height = Dim.Percent (15),
+				Height = Dim.Percent (15)
 			};
 			Win.ColorScheme = Colors.Dialog;
-			Win.Add (new Button ("Press me! (Y = 0)") {
+			Win.Add (new Button ($"Padding of container is {padding}") {
 				X = Pos.Center (),
 				Y = 0,
 				ColorScheme = Colors.Error,
-				Clicked = () => MessageBox.ErrorQuery (30, 10, Win.Title.ToString (), "Neat?", "Yes", "No")
+				Clicked = () => About()
 			});
 			Win.Add (new Button ("Press ME! (Y = Pos.AnchorEnd(1))") {
 				X = Pos.Center (),
@@ -55,13 +75,13 @@ namespace UICatalog {
 			Top.Add (Win);
 			listWin.Add (Win);
 
-			for (var i = 0; i < 2; i++) {
+			for (var i = 0; i < 3; i++) {
 				Window win = null;
-				win = new Window ($"{listWin.Count} - Loop {i}", padding) {
+				win = new Window ($"{listWin.Count} - Window Loop - padding = {i}", i) {
 					X = margin,
 					Y = Pos.Bottom (listWin.Last ()) + (margin),
 					Width = Dim.Fill (margin),
-					Height = height,
+					Height = contentHeight + (i*2) + 2,
 				};
 				win.ColorScheme = Colors.Dialog;
 				win.Add (new Button ("Press me! (Y = 0)") {
@@ -101,14 +121,14 @@ namespace UICatalog {
 				X = margin,
 				Y = Pos.Bottom (listWin.Last ()) + (margin / 2),
 				Width = Dim.Fill (margin),
-				Height = height,
+				Height = contentHeight + 2,  // 2 for default padding
 			};
 			frame.ColorScheme = Colors.Dialog;
-			frame.Add (new Button ("Press me! (Y = 0)") {
+			frame.Add (new Label ("This is a Label! (Y = 0)") {
 				X = Pos.Center (),
 				Y = 0,
 				ColorScheme = Colors.Error,
-				Clicked = () => MessageBox.ErrorQuery (30, 10, frame.Title.ToString (), "Neat?", "Yes", "No")
+				//Clicked = () => MessageBox.ErrorQuery (30, 10, frame.Title.ToString (), "Neat?", "Yes", "No")
 			});
 			var subWinofFV = new Window ("this is a Sub-Window") {
 				X = Pos.Percent (0),

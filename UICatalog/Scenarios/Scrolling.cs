@@ -9,7 +9,11 @@ namespace UICatalog {
 	class Scrolling : Scenario {
 		public override void Setup ()
 		{
-			var label = new Label ("ScrollView (new Rect (2, 2, 50, 20)) with a 100, 100 ContentSize...") {
+			Win.X = 1;
+			Win.Y = 2;
+			Win.Width = Dim.Fill () - 4;
+			Win.Height = Dim.Fill () - 2;
+			var label = new Label ("ScrollView (new Rect (2, 2, 50, 20)) with a 200, 100 ContentSize...") {
 				X = 0, Y = 0,
 				ColorScheme = Colors.Dialog
 			};
@@ -18,7 +22,7 @@ namespace UICatalog {
 			// BUGBUG: ScrollView only supports Absolute Positioning (#72)
 			var scrollView = new ScrollView (new Rect (2, 2, 50, 20));
 			scrollView.ColorScheme = Colors.TopLevel;
-			scrollView.ContentSize = new Size (100, 100);
+			scrollView.ContentSize = new Size (200, 100);
 			//ContentOffset = new Point (0, 0),
 			scrollView.ShowVerticalScrollIndicator = true;
 			scrollView.ShowHorizontalScrollIndicator = true;
@@ -28,16 +32,15 @@ namespace UICatalog {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (1),  // BUGBUG: I don't think this should be needed; DimFill() should respect container's frame. X does.
-				Height = 2,
 				ColorScheme = Colors.Error
 			};
 			scrollView.Add (horizontalRuler);
 			const string vrule = "|\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
 			var verticalRuler = new Label ("") {
-				X = 2,
+				X = 0,
 				Y = 0,
-				Width = 2,
+				Width = 1,
 				Height = Dim.Fill (),
 				ColorScheme = Colors.Error
 			};
@@ -52,6 +55,13 @@ namespace UICatalog {
 			scrollView.Add (new Button ("Press me!") {
 				X = 3,
 				Y = 3,
+				Clicked = () => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No")
+			});
+
+			scrollView.Add (new Button ("A very long button. Should be wide enough to demo clipping!") {
+				X = 3,
+				Y = 4,
+				Width = 50,
 				Clicked = () => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No")
 			});
 

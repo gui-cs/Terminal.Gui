@@ -401,11 +401,18 @@ namespace Terminal.Gui {
 		public override void Redraw(Rect region)
 		{
 			SetViewsNeedsDisplay ();
-			var oldClip = ClipToBounds ();
 			Driver.SetAttribute (ColorScheme.Normal);
 			Clear ();
-			base.Redraw(region);
-			Driver.Clip = oldClip;
+
+			if (Driver.Clip.IsEmpty || Driver.Clip.Contains (RectToScreen (Frame))) {
+			var savedClip = ClipToBounds ();
+			contentView.Redraw (contentView.Frame);
+			Driver.Clip = savedClip;
+			} else {
+				contentView.Redraw (contentView.Bounds);
+			}
+			vertical.Redraw (vertical.Bounds);
+			horizontal.Redraw (vertical.Bounds);
 			Driver.SetAttribute (ColorScheme.Normal);
 		}
 
@@ -534,7 +541,10 @@ namespace Terminal.Gui {
 				vertical.MouseEvent (me);
 			else if (me.Y == horizontal.Frame.Y)
 				horizontal.MouseEvent (me);
-
+			else if (IsOverridden (me.View)) {
+				Application.UngrabMouse ();
+				return false;
+			}
 			return true;
 		}
 	}

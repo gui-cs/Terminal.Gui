@@ -2,7 +2,6 @@
 
 open Terminal.Gui
 open System
-open Mono.Terminal
 open System.Collections.Generic
 open System.Diagnostics
 open System.Globalization
@@ -322,24 +321,53 @@ type Demo() = class end
             ()
         MessageBox.Query (60, 10, "Selected Animals", (if result = "" then "No animals selected" else result), "Ok") |> ignore
 
-    let KeyUpDown(keyEvent : KeyEvent, kl : Label, updown : string) =
-        kl.TextColor <- Colors.TopLevel.Normal
-        if keyEvent.Key &&& Key.CtrlMask <> Key.Unknown
-        then kl.Text <- ustr (sprintf "Keyboard: Ctrl Key%O" updown)
-        else
-            if keyEvent.Key &&& Key.AltMask <> Key.Unknown
-            then kl.Text <- ustr (sprintf "Keyboard: Alt Key%O" updown)
-            else kl.Text <- ustr (sprintf "Keyboard: %O Key%O" (char keyEvent.KeyValue) updown)
-
-    let OnKeyDownUpDemo() =
-        let mutable container = new Dialog(ustr "OnKeyDown & OnKeyUp demo", 50, 20,
-            new Button (ustr "Ok", true, Clicked = fun () -> Application.RequestStop ()),
-            new Button (ustr "Cancel", Clicked = fun () -> Application.RequestStop ())
+    let OnKeyDownPressUpDemo() =
+        let mutable container = new Dialog (ustr "KeyDown & KeyPress & KeyUp demo", 80, 20,            
+            new Button (ustr "Close", Clicked = fun () -> Application.RequestStop ()),
+                Width = Dim.Fill (),
+                Height = Dim.Fill ()
             )
-        let mutable kl = new Label(new Rect(3, 3, 40, 1), ustr "Keyboard: ")
-        container.OnKeyDown <- Action<KeyEvent>(fun (keyEvent : KeyEvent) -> KeyUpDown (keyEvent, kl, "Down"))
-        container.OnKeyUp <- Action<KeyEvent>(fun (keyEvent : KeyEvent) -> KeyUpDown (keyEvent, kl, "Up"))
-        container.Add (kl)
+        
+        let mutable list = new List<string> ()
+        let mutable listView = new ListView (list,
+            X = Pos.At(0),
+            Y = Pos.At(0),
+            Width = Dim.Fill () - Dim.op_Implicit(1),
+            Height = Dim.Fill () - Dim.op_Implicit(2)
+            )
+        listView.ColorScheme <- Colors.TopLevel
+        container.Add (listView)
+        
+        let KeyDownPressUp(keyEvent : KeyEvent, updown : string) =
+            let ident : int = -5
+            match updown with
+            | "Down"
+            | "Up"
+            | "Press" -> 
+                let mutable (msg : string) = sprintf "Key %5s : " updown
+                if (keyEvent.Key &&& Key.ShiftMask) <> Key.Unknown
+                then msg <- msg + "Shift "
+                if (keyEvent.Key &&& Key.CtrlMask) <> Key.Unknown
+                then msg <- msg + "Ctrl "
+                if (keyEvent.Key &&& Key.AltMask) <> Key.Unknown
+                then msg <- msg + "Alt "
+                msg <-  msg + if (keyEvent.KeyValue &&& (int)Key.CharMask) > 26 then (string)keyEvent.KeyValue else (string)keyEvent.Key
+                list.Add (msg)    
+            | _ ->
+                if (keyEvent.Key &&& Key.ShiftMask) <> Key.Unknown
+                then list.Add (sprintf "Key %s : Shift " updown)
+                else if (keyEvent.Key &&& Key.CtrlMask) <> Key.Unknown
+                then list.Add (sprintf "Key %s : Ctrl " updown)
+                else if (keyEvent.Key &&& Key.AltMask) <> Key.Unknown
+                then list.Add (sprintf "Key %s : Alt " updown)
+                else if ((int)keyEvent.KeyValue &&& (int)Key.CharMask) > 26
+                then list.Add (sprintf "Key %s : %s" updown (keyEvent.KeyValue.ToString()))
+                else list.Add (sprintf "Key %s : %s" updown (keyEvent.Key.ToString()))
+            listView.MoveDown ();
+    
+        container.KeyDown.Add(fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Down") |> ignore)
+        container.KeyPress.Add(fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Press") |> ignore)
+        container.KeyUp.Add(fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Up") |> ignore)
         Application.Run (container)
 
     let Main() =
@@ -380,7 +408,7 @@ type Demo() = class end
                 new MenuBarItem(ustr "_List Demos", [|new MenuItem(ustr "Select _Multiple Items", "", (fun () -> ListSelectionDemo (true)));
                     new MenuItem(ustr "Select _Single Item", "", (fun () -> ListSelectionDemo (false)))|]);
                     new MenuBarItem(ustr "A_ssorted", [|new MenuItem(ustr "_Show text alignments", "", (fun () -> ShowTextAlignments ()));
-                new MenuItem(ustr "_OnKeyDown/Up", "", (fun () -> OnKeyDownUpDemo ()))|]);
+                new MenuItem(ustr "_OnKeyDown/Press/Up", "", (fun () -> OnKeyDownPressUpDemo ()))|]);
                 new MenuBarItem(ustr "_Test Menu and SubMenus",
                     [|new MenuItem(ustr "SubMenu1Item_1", new MenuBarItem([|new MenuItem(ustr "SubMenu2Item_1",
                     new MenuBarItem([|new MenuItem(ustr "SubMenu3Item_1", new MenuBarItem([|(menuItems.[2])|]))|]))|]))|]);
@@ -423,8 +451,8 @@ type Demo() = class end
         win.Add (bottom)
         let mutable bottom2 = new Label(ustr "This should go on the bottom of another top-level!")
         top.Add (bottom2)
-        Application.OnLoad <- Action (
-            fun () ->
+        Application.Loaded.Add (
+            fun (_) ->
                 bottom.X <- win.X
                 bottom.Y <- Pos.Bottom (win) - Pos.Top (win) - Pos.At(margin)
                 bottom2.X <- Pos.Left (win)

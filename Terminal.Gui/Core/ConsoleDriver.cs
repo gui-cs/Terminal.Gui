@@ -4,9 +4,12 @@
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
 //
+// Define this to enable diagnostics drawing for Window Frames
+//#define DRAW_WINDOW_FRAME_DIAGNOSTICS
 using NStack;
 using System;
 using System.Runtime.CompilerServices;
+
 
 namespace Terminal.Gui {
 
@@ -547,6 +550,17 @@ namespace Terminal.Gui {
 			}
 		}
 
+#if DRAW_WINDOW_FRAME_DIAGNOSTICS
+		const char leftChar = 'L';
+		const char rightChar = 'R';
+		const char topChar = 'T';
+		const char bottomChar = 'B';
+#else
+		const char leftChar = clearChar;
+		const char rightChar = clearChar;
+		const char topChar = clearChar;
+		const char bottomChar = clearChar;
+#endif
 		/// <summary>
 		/// Draws a frame for a window with padding aand n optional visible border inside the padding. 
 		/// </summary>
@@ -565,11 +579,22 @@ namespace Terminal.Gui {
 				AddRune (ch);
 			}
 
+			// fwidth is count of hLine chars
 			int fwidth = (int)(region.Width - (paddingRight + paddingLeft));
+
+			// fheight is count of vLine chars
 			int fheight = (int)(region.Height - (paddingBottom + paddingTop));
-			int fleft = region.X + paddingLeft;
+
+			// fleft is location of left frame line
+			int fleft = region.X + paddingLeft - 1;
+
+			// fright is location of right frame line
 			int fright = fleft + fwidth + 1;
-			int ftop = region.Y + paddingTop;
+
+			// ftop is location of top frame line
+			int ftop = region.Y + paddingTop - 1;
+
+			// fbottom is locaiton of bottom frame line
 			int fbottom = ftop + fheight + 1;
 
 			Rune hLine = border ? HLine : clearChar;
@@ -582,33 +607,33 @@ namespace Terminal.Gui {
 			// Outside top
 			if (paddingTop > 1) {
 				for (int r = region.Y; r < ftop; r++) {
-					for (int c = region.X; c <= fright + paddingRight; c++) {
-						AddRuneAt (c, r, clearChar);
+					for (int c = region.X; c < region.X + region.Width; c++) {
+						AddRuneAt (c, r, topChar);
 					}
 				}
 			}
 
 			// Outside top-left
-			for (int c = region.X; c <= fleft; c++) {
-				AddRuneAt (c, ftop, clearChar);
+			for (int c = region.X; c < fleft; c++) {
+				AddRuneAt (c, ftop, leftChar);
 			}
 
 			// Frame top-left corner
-			AddRuneAt (fleft, ftop, paddingTop >= 0 ? (paddingLeft >= 0 ? uLCorner : hLine) : clearChar);
+			AddRuneAt (fleft, ftop, paddingTop >= 0 ? (paddingLeft >= 0 ? uLCorner : hLine) : leftChar);
 
 			// Frame top
-			for (int c = fleft + 1; c <= fright; c++) {
-				AddRuneAt (c, ftop, paddingTop > 0 ? hLine : clearChar);
+			for (int c = fleft + 1; c < fleft + 1 + fwidth; c++) {
+				AddRuneAt (c, ftop, paddingTop > 0 ? hLine : topChar);
 			}
 
 			// Frame top-right corner
 			if (fright > fleft) {
-				AddRuneAt (fright, ftop, paddingTop >= 0 ? (paddingRight >= 0 ? uRCorner : hLine) : clearChar);
+				AddRuneAt (fright, ftop, paddingTop >= 0 ? (paddingRight >= 0 ? uRCorner : hLine) : rightChar);
 			}
 
 			// Outside top-right corner
 			for (int c = fright + 1; c < fright + paddingRight; c++) {
-				AddRuneAt (c, ftop, clearChar);
+				AddRuneAt (c, ftop, rightChar);
 			}
 
 			// Left, Fill, Right
@@ -616,11 +641,11 @@ namespace Terminal.Gui {
 				for (int r = ftop + 1; r < fbottom; r++) {
 					// Outside left
 					for (int c = region.X; c < fleft; c++) {
-						AddRuneAt (c, r, clearChar);
+						AddRuneAt (c, r, leftChar);
 					}
 
 					// Frame left
-					AddRuneAt (fleft, r, paddingLeft > 0 ? vLine : clearChar);
+					AddRuneAt (fleft, r, paddingLeft > 0 ? vLine : leftChar);
 
 					// Fill
 					if (fill) {
@@ -631,44 +656,54 @@ namespace Terminal.Gui {
 
 					// Frame right
 					if (fright > fleft) {
-						AddRuneAt (fright, r, paddingRight > 0 ? vLine : clearChar);
+#if DRAW_WINDOW_FRAME_DIAGNOSTICS
+						var v = (char)(((int)'0') + ((r - ftop) % 10)); // vLine;
+#else
+						var v = vLine;
+#endif
+						AddRuneAt (fright, r, paddingRight > 0 ? v : rightChar);
 					}
 
 					// Outside right
 					for (int c = fright + 1; c < fright + paddingRight; c++) {
-						AddRuneAt (c, r, clearChar);
+						AddRuneAt (c, r, rightChar);
 					}
 				}
 
 				// Outside Bottom
-				for (int c = region.X; c < fleft; c++) {
-					AddRuneAt (c, fbottom, clearChar);
+				for (int c = region.X; c < region.X + region.Width; c++) {
+					AddRuneAt (c, fbottom, leftChar);
 				}
 
 				// Frame bottom-left
-				AddRuneAt (fleft, fbottom, paddingLeft > 0 ? lLCorner : clearChar);
+				AddRuneAt (fleft, fbottom, paddingLeft > 0 ? lLCorner : leftChar);
 
 				if (fright > fleft) {
 					// Frame bottom
 					for (int c = fleft + 1; c < fright; c++) {
-						AddRuneAt (c, fbottom, paddingBottom > 0 ? hLine : clearChar);
+#if DRAW_WINDOW_FRAME_DIAGNOSTICS
+						var h = (char)(((int)'0') + ((c - fleft) % 10)); // hLine;
+#else
+						var h = hLine;
+#endif	
+						AddRuneAt (c, fbottom, paddingBottom > 0 ? h : bottomChar);
 					}
 
 					// Frame bottom-right
-					AddRuneAt (fright, fbottom, paddingRight > 0 ? (paddingBottom > 0 ? lRCorner : hLine) : clearChar);
+					AddRuneAt (fright, fbottom, paddingRight > 0 ? (paddingBottom > 0 ? lRCorner : hLine) : rightChar);
 				}
 
 				// Outside right
 				for (int c = fright + 1; c < fright + paddingRight; c++) {
-					AddRuneAt (c, fbottom, clearChar);
+					AddRuneAt (c, fbottom, rightChar);
 				}
 			}
 
 			// Out bottom - ensure top is always drawn if we overlap
 			if (paddingBottom > 0) {
 				for (int r = fbottom + 1; r < fbottom + paddingBottom; r++) {
-					for (int c = region.X; c <= fright + paddingRight; c++) {
-						AddRuneAt (c, r, clearChar);
+					for (int c = region.X; c < region.X + region.Width; c++) {
+						AddRuneAt (c, r, bottomChar);
 					}
 				}
 			}
@@ -677,17 +712,19 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Draws a frame on the specified region with the specified padding around the frame.
 		/// </summary>
-		/// <param name="region">Region where the frame will be drawn..</param>
+		/// <param name="region">Screen relative region where the frame will be drawn.</param>
 		/// <param name="padding">Padding to add on the sides.</param>
 		/// <param name="fill">If set to <c>true</c> it will clear the contents with the current color, otherwise the contents will be left untouched.</param>
-		/// <remarks>This is a legacy/depcrecated API. Use <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/>.</remarks>
-		/// <remarks>A padding value of 0 means there is actually a 1 cell border.</remarks>
+		/// <remarks>This API has been superceded by <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/>.</remarks>
+		/// <remarks>This API is equivlalent to calling <c>DrawWindowFrame(Rect, p - 1, p - 1, p - 1, p - 1)</c>. In other words,
+		/// A padding value of 0 means there is actually a one cell border.
+		/// </remarks>
 		public virtual void DrawFrame (Rect region, int padding, bool fill)
 		{
-			// DrawFrame assumes the frame is always at least one row/col thick
-			// DrawWindowFrame assumes a padding of 0 means NO padding
-			padding++;
-			DrawWindowFrame (new Rect (region.X - 1, region.Y - 1, region.Width, region.Height), padding, padding, padding, padding, fill: fill);
+			// DrawFrame assumes the border is always at least one row/col thick
+			// DrawWindowFrame assumes a padding of 0 means NO padding and no frame
+			DrawWindowFrame (new Rect (region.X, region.Y, region.Width, region.Height), 
+				padding + 1, padding + 1, padding + 1, padding + 1, fill: fill);
 		}
 
 

@@ -75,7 +75,9 @@ namespace UICatalog {
 
 			y += 2;
 			// BUGBUG: Buttons don't support specifying hotkeys with _?!?
-			Win.Add (button = new Button (10, y, "Te_xt Changer") {
+			Win.Add (button = new Button ("Te_xt Changer") {
+				X = 10, 
+				Y = y
 			});
 			button.Clicked = () => button.Text += $"{y++}";
 
