@@ -276,10 +276,10 @@ namespace Terminal.Gui {
 			return ColorScheme.Normal;
 		}
 
-		public override void Redraw (Rect region)
+		public override void Redraw (Rect bounds)
 		{
 			Driver.SetAttribute (ColorScheme.Normal);
-			DrawFrame (region, padding: 0, fill: true);
+			DrawFrame (bounds, padding: 0, fill: true);
 
 			for (int i = 0; i < barItems.Children.Length; i++) {
 				var item = barItems.Children [i];
@@ -624,7 +624,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc cref="Redraw"/>
-		public override void Redraw (Rect region)
+		public override void Redraw (Rect bounds)
 		{
 			Move (0, 0);
 			Driver.SetAttribute (Colors.Menu.Normal);

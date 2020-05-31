@@ -29,7 +29,7 @@ namespace Terminal.Gui {
 			public ContentView (Rect frame) : base (frame) { }
 			public ContentView () : base () { }
 #if false
-			public override void Redraw (Rect region)
+			public override void Redraw (Rect bounds)
 			{
 				Driver.SetAttribute (ColorScheme.Focus);
 
@@ -159,7 +159,7 @@ namespace Terminal.Gui {
 		{
 			//var padding = 0;
 			Application.CurrentView = this;
-			var scrRect = RectToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
+			var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
 
 			// BUGBUG: Why do we draw the frame twice? This call is here to clear the content area, I think. Why not just clear that area?
 			if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
@@ -167,13 +167,10 @@ namespace Terminal.Gui {
 				Driver.DrawFrame (scrRect, padding, true);
 			}
 
-			if (Driver.Clip.IsEmpty || Driver.Clip.Contains (contentView.RectToScreen (contentView.Frame))) { 
-				var savedClip = ClipToBounds ();
-				contentView.Redraw (contentView.Bounds);
-				Driver.Clip = savedClip;
-			} else {
-				contentView.Redraw (contentView.Bounds);
-			}
+			var savedClip = ClipToBounds ();
+			contentView.Redraw (contentView.Bounds);
+			Driver.Clip = savedClip;
+
 			ClearNeedsDisplay ();
 			Driver.SetAttribute (ColorScheme.Normal);
 			Driver.DrawFrame (scrRect, padding, false);
@@ -204,7 +201,7 @@ namespace Terminal.Gui {
 				if (dragPosition.HasValue) {
 					if (SuperView == null) {
 						Application.Top.SetNeedsDisplay (Frame);
-						Application.Top.Redraw (Frame);
+						Application.Top.Redraw (Bounds);
 					} else {
 						SuperView.SetNeedsDisplay (Frame);
 					}

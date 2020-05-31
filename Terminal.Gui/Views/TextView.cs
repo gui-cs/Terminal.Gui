@@ -525,31 +525,31 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc cref="Redraw(Rect)"/>
-		public override void Redraw (Rect region)
+		public override void Redraw (Rect bounds)
 		{
 			ColorNormal ();
 
-			int bottom = region.Bottom;
-			int right = region.Right;
-			for (int row = region.Top; row < bottom; row++) 
+			int bottom = bounds.Bottom;
+			int right = bounds.Right;
+			for (int row = bounds.Top; row < bottom; row++) 
 			{
 				int textLine = topRow + row;
 				if (textLine >= model.Count) 
 				{
 					ColorNormal ();
-					ClearRegion (region.Left, row, region.Right, row + 1);
+					ClearRegion (bounds.Left, row, bounds.Right, row + 1);
 					continue;
 				}
 				var line = model.GetLine (textLine);
 				int lineRuneCount = line.Count;
-				if (line.Count < region.Left)
+				if (line.Count < bounds.Left)
 				{
-					ClearRegion (region.Left, row, region.Right, row + 1);
+					ClearRegion (bounds.Left, row, bounds.Right, row + 1);
 					continue;
 				}
 
-				Move (region.Left, row);
-				for (int col = region.Left; col < right; col++) 
+				Move (bounds.Left, row);
+				for (int col = bounds.Left; col < right; col++) 
 				{
 					var lineCol = leftColumn + col;
 					var rune = lineCol >= lineRuneCount ? ' ' : line [lineCol];

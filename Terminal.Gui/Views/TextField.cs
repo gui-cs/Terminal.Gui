@@ -184,7 +184,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc cref="Redraw(Rect)"/>
-		public override void Redraw (Rect region)
+		public override void Redraw (Rect bounds)
 		{
 			ColorScheme color = Colors.Menu;
 			SetSelectedStartSelectedLength ();

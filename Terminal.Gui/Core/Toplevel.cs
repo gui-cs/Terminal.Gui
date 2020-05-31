@@ -257,18 +257,18 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc cref="Redraw"/>
-		public override void Redraw (Rect region)
+		public override void Redraw (Rect bounds)
 		{
 			Application.CurrentView = this;
 
 			if (IsCurrentTop || this == Application.Top) {
 				if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
 					Driver.SetAttribute (Colors.TopLevel.Normal);
-					Clear (region);
+					Clear (bounds);
 					Driver.SetAttribute (Colors.Base.Normal);
 				}
 				foreach (var view in Subviews) {
-					if (view.Frame.IntersectsWith (region)) {
+					if (view.Frame.IntersectsWith (bounds)) {
 						view.SetNeedsLayout ();
 						view.SetNeedsDisplay (view.Bounds);
 					}

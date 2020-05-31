@@ -9,10 +9,10 @@ namespace UICatalog {
 	class Scrolling : Scenario {
 		public override void Setup ()
 		{
-			Win.X = 1;
-			Win.Y = 2;
-			Win.Width = Dim.Fill () - 4;
-			Win.Height = Dim.Fill () - 2;
+			Win.X = 3;
+			Win.Y = 3;
+			Win.Width = Dim.Fill () - 3;
+			Win.Height = Dim.Fill () - 3;
 			var label = new Label ("ScrollView (new Rect (2, 2, 50, 20)) with a 200, 100 ContentSize...") {
 				X = 0, Y = 0,
 				ColorScheme = Colors.Dialog
@@ -60,7 +60,7 @@ namespace UICatalog {
 			scrollView.Add (new Button ("A very long button. Should be wide enough to demo clipping!") {
 				X = 3,
 				Y = 4,
-				Width = 50,
+				Width = Dim.Fill(6),
 				Clicked = () => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No")
 			});
 

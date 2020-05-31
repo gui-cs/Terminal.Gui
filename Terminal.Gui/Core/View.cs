@@ -618,7 +618,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Converts a view-relative (col,row) position to a screen-relative positino (col,row). The values are optionally clamped to the screen dimensions.
+		/// Converts a view-relative (col,row) position to a screen-relative position (col,row). The values are optionally clamped to the screen dimensions.
 		/// </summary>
 		/// <param name="col">View-relative column.</param>
 		/// <param name="row">View-relative row.</param>
@@ -660,11 +660,13 @@ namespace Terminal.Gui {
 			}
 		}
 
-		// Converts a rectangle in view-relative coordinates to screen-relative coordinates.
-		internal Rect RectToScreen (Rect rect)
+		/// <summary>
+		/// Converts a region in view-relative coordinates to screen-relative coordinates.
+		/// </summary>
+		internal Rect ViewToScreen (Rect region)
 		{
-			ViewToScreen (rect.X, rect.Y, out var x, out var y, clipped: false);
-			return new Rect (x, y, rect.Width, rect.Height);
+			ViewToScreen (region.X, region.Y, out var x, out var y, clipped: false);
+			return new Rect (x, y, region.Width, region.Height);
 		}
 
 		// Clips a rectangle in screen coordinates to the dimensions currently available on the screen
@@ -697,9 +699,8 @@ namespace Terminal.Gui {
 		/// <param name="region">View-relative clip region.</param>
 		public Rect SetClip (Rect region)
 		{
-			var bscreen = RectToScreen (region);
 			var previous = Driver.Clip;
-			Driver.Clip = ScreenClip (RectToScreen (Bounds)); 
+			Driver.Clip = Rect.Intersect (previous, ViewToScreen (region));
 			return previous;
 		}
 
@@ -711,7 +712,7 @@ namespace Terminal.Gui {
 		/// <param name="fill">If set to <c>true</c> it fill will the contents.</param>
 		public void DrawFrame (Rect region, int padding = 0, bool fill = false)
 		{
-			var scrRect = RectToScreen (region);
+			var scrRect = ViewToScreen (region);
 			var savedClip = ClipToBounds ();
 			Driver.DrawFrame (scrRect, padding, fill);
 			Driver.Clip = savedClip;
@@ -910,7 +911,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
 		/// </summary>
-		/// <param name="region">The view-relative region to redraw.</param>
+		/// <param name="bounds">The view-relative region to redraw.</param>
 		/// <remarks>
 		/// <para>
 		///    Views should set the color that they want to use on entry, as otherwise this will inherit
@@ -921,28 +922,24 @@ namespace Terminal.Gui {
 		///    larger than the <c>region</c> parameter.
 		/// </para>
 		/// </remarks>
-		public virtual void Redraw (Rect region)
+		public virtual void Redraw (Rect bounds)
 		{
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
 			if (subviews != null) {
 				foreach (var view in subviews) {
 					if (view.NeedDisplay != null && (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay)) {
-						if (view.Frame.IntersectsWith (clipRect) && view.Frame.IntersectsWith (region)) {
+						if (view.Frame.IntersectsWith (clipRect) && view.Frame.IntersectsWith (bounds)) {
 
 							// FIXED: optimize this by computing the intersection of region and view.Bounds
 							if (view.layoutNeeded)
 								view.LayoutSubviews ();
 							Application.CurrentView = view;
 
-							// Ensure we don't make the Driver's clip rect any bigger
-							if (Driver.Clip.IsEmpty || Driver.Clip.Contains(RectToScreen (view.Frame))) {
-								var savedClip = view.ClipToBounds ();
-								view.Redraw (view.Bounds);
-								Driver.Clip = savedClip;
-							} else {
-								view.Redraw (view.Bounds);
-							}
+							// Clip the sub-view
+							var savedClip = ClipToBounds ();
+							view.Redraw (view.Bounds);
+							Driver.Clip = savedClip;
 						}
 						view.NeedDisplay = Rect.Empty;
 						view.childNeedsDisplay = false;
