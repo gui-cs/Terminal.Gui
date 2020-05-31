@@ -379,12 +379,39 @@ namespace Terminal.Gui {
 			};
 		}
 
+		KeyModifiers keyModifiers;
+
+		KeyModifiers MapKeyModifiers (Key key)
+		{
+			if (keyModifiers == null)
+				keyModifiers = new KeyModifiers ();
+
+			if (!keyModifiers.Shift && key.HasFlag (Key.ShiftMask))
+				keyModifiers.Shift = true;
+			if (!keyModifiers.Alt && key.HasFlag (Key.AltMask))
+				keyModifiers.Alt = true;
+			if (!keyModifiers.Ctrl && key.HasFlag (Key.CtrlMask))
+				keyModifiers.Ctrl = true;
+			//if (!keyModifiers.Capslock)
+			//	keyModifiers.Capslock = true;
+			//if (!keyModifiers.Numlock)
+			//	keyModifiers.Numlock = true;
+			//if (!keyModifiers.Scrolllock)
+			//	keyModifiers.Scrolllock = true;
+
+			return keyModifiers;
+		}
+
 		void ProcessInput (Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			int wch;
 			var code = Curses.get_wch (out wch);
 			if (code == Curses.ERR)
 				return;
+
+			keyModifiers = new KeyModifiers ();
+			Key k;
+
 			if (code == Curses.KEY_CODE_YES) {
 				if (wch == Curses.KeyResize) {
 					if (Curses.CheckWinChange ()) {
@@ -398,8 +425,8 @@ namespace Terminal.Gui {
 					mouseHandler (ToDriverMouse (ev));
 					return;
 				}
-				keyHandler (new KeyEvent (MapCursesKey (wch)));
-				keyUpHandler (new KeyEvent (MapCursesKey (wch)));
+				keyHandler (new KeyEvent (MapCursesKey (wch), keyModifiers));
+				keyUpHandler (new KeyEvent (MapCursesKey (wch), keyModifiers));
 				return;
 			}
 
@@ -408,43 +435,57 @@ namespace Terminal.Gui {
 				Curses.timeout (200);
 
 				code = Curses.get_wch (out int wch2);
-				if (code == Curses.KEY_CODE_YES)
-					keyHandler (new KeyEvent (Key.AltMask | MapCursesKey (wch)));
+
+				if (code == Curses.KEY_CODE_YES) {
+					k = Key.AltMask | MapCursesKey (wch);
+					keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				}
 				if (code == 0) {
 					KeyEvent key;
 
 					// The ESC-number handling, debatable.
 					// Simulates the AltMask itself by pressing Alt + Space.
-					if (wch2 == (int)Key.Space)
-						key = new KeyEvent (Key.AltMask);
-					else if (wch2 - (int)Key.Space >= 'A' && wch2 - (int)Key.Space <= 'Z')
-						key = new KeyEvent ((Key)((uint)Key.AltMask + (wch2 - (int)Key.Space)));
-					else if (wch2 >= '1' && wch <= '9')
-						key = new KeyEvent ((Key)((int)Key.F1 + (wch2 - '0' - 1)));
-					else if (wch2 == '0')
-						key = new KeyEvent (Key.F10);
-					else if (wch2 == 27)
-						key = new KeyEvent ((Key)wch2);
-					else
-						key = new KeyEvent (Key.AltMask | (Key)wch2);
+					if (wch2 == (int)Key.Space) {
+						k = Key.AltMask;
+						key = new KeyEvent (k, MapKeyModifiers (k));
+					} else if (wch2 - (int)Key.Space >= 'A' && wch2 - (int)Key.Space <= 'Z') {
+						k = (Key)((uint)Key.AltMask + (wch2 - (int)Key.Space));
+						key = new KeyEvent (k, MapKeyModifiers (k));
+					} else if (wch2 >= '1' && wch <= '9') {
+						k = (Key)((int)Key.F1 + (wch2 - '0' - 1));
+						key = new KeyEvent (k, MapKeyModifiers (k));
+					} else if (wch2 == '0') {
+						k = Key.F10;
+						key = new KeyEvent (k, MapKeyModifiers (k));
+					} else if (wch2 == 27) {
+						k = (Key)wch2;
+						key = new KeyEvent (k, MapKeyModifiers (k));
+					} else {
+						k = Key.AltMask | (Key)wch2;
+						key = new KeyEvent (k, MapKeyModifiers (k));
+					}
 					keyHandler (key);
 				} else {
-					keyHandler (new KeyEvent (Key.Esc));
+					k = Key.Esc;
+					keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				}
 			} else if (wch == Curses.KeyTab) {
-				keyDownHandler (new KeyEvent (MapCursesKey (wch)));
-				keyHandler (new KeyEvent (MapCursesKey (wch)));
+				k = MapCursesKey (wch);
+				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 			} else {
-				keyDownHandler (new KeyEvent ((Key)wch));
-				keyHandler (new KeyEvent ((Key)wch));
+				k = (Key)wch;
+				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 			}
 			// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
 			// will not impact KeyUp.
-			if (wch == Curses.KeyTab) {
-				keyUpHandler (new KeyEvent (MapCursesKey (wch)));
-			} else {
-				keyUpHandler (new KeyEvent ((Key)wch));
-			}
+			// This is causing ESC firing even if another keystroke was handled.
+			//if (wch == Curses.KeyTab) {
+			//	keyUpHandler (new KeyEvent (MapCursesKey (wch), keyModifiers));
+			//} else {
+			//	keyUpHandler (new KeyEvent ((Key)wch, keyModifiers));
+			//}
 		}
 
 		Action<MouseEvent> mouseHandler;
