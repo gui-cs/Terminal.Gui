@@ -135,11 +135,7 @@ namespace UICatalog {
 			scrollView.Add (new Button ("A very long button. Should be wide enough to demo clipping!") {
 				X = 3,
 				Y = 4,
-<<<<<<< Updated upstream
-				Width = 50,
-=======
 				Width = Dim.Fill (6),
->>>>>>> Stashed changes
 				Clicked = () => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No")
 			});
 
