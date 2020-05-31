@@ -9,3 +9,6 @@ packages
 *.user
 
 docfx/api
+
+#git merge files
+*.orig
