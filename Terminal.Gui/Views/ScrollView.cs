@@ -407,13 +407,6 @@ namespace Terminal.Gui {
 			contentView.Redraw (contentView.Bounds);
 			Driver.Clip = savedClip;
 
-			//if (Driver.Clip.IsEmpty || Driver.Clip.Contains (ViewToScreen (contentView.Frame))) { 
-			//	var savedClip = ClipToBounds ();
-			//	contentView.Redraw (contentView.Bounds);
-			//	Driver.Clip = savedClip;
-			//} else {
-			//	contentView.Redraw (contentView.Bounds);
-			//}
 			vertical.Redraw (vertical.Bounds);
 			horizontal.Redraw (vertical.Bounds);
 			Driver.SetAttribute (ColorScheme.Normal);
