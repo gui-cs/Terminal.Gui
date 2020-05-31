@@ -405,9 +405,9 @@ namespace Terminal.Gui {
 			Clear ();
 
 			if (Driver.Clip.IsEmpty || Driver.Clip.Contains (RectToScreen (Frame))) {
-			var savedClip = ClipToBounds ();
-			contentView.Redraw (contentView.Frame);
-			Driver.Clip = savedClip;
+				var savedClip = ClipToBounds ();
+				contentView.Redraw (contentView.Frame);
+				Driver.Clip = savedClip;
 			} else {
 				contentView.Redraw (contentView.Bounds);
 			}
