@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NStack;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Terminal.Gui;
@@ -153,7 +154,7 @@ namespace UICatalog {
 						int height = int.Parse (heightEdit.Text.ToString ());
 						int numButtons = int.Parse (numButtonsEdit.Text.ToString ());
 
-						var btns = new List<string> ();
+						var btns = new List<ustring> ();
 						for (int i = 0; i < numButtons; i++) {
 							btns.Add(btnText[i % 10]);
 						}

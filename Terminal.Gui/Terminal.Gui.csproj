@@ -77,6 +77,7 @@
       * Fixes the functions of the Edit->Copy-Cut-Paste menu for the TextField that was not working well. (Thanks @bdisp!)
       * More robust error handing in Pos/Dim. Fixes #355 stack overflow with Pos based on the size of windows at startup. Added a OnResized action to set the Pos after the terminal are resized. (Thanks @bdisp!)
       * Fixes #389 Window layouting breaks when resizing. (Thanks @bdisp!)
+      * Fixes #557 MessageBox needs to take ustrings (BREAKING CHANGE). (Thanks @tig!)
 
       0.81:
       * Fix ncurses engine for macOS/Linux, it works again
