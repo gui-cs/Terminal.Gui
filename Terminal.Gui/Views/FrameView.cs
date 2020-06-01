@@ -140,7 +140,7 @@ namespace Terminal.Gui {
 
 			if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
 				Driver.SetAttribute (ColorScheme.Normal);
-				Driver.DrawFrame (scrRect, padding, true);
+				Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: true);
 			}
 
 			var savedClip = ClipToBounds ();
@@ -149,7 +149,7 @@ namespace Terminal.Gui {
 
 			ClearNeedsDisplay ();
 			Driver.SetAttribute (ColorScheme.Normal);
-			Driver.DrawFrame (scrRect, padding, false);
+			Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
 
 			if (HasFocus)
 				Driver.SetAttribute (ColorScheme.HotNormal);

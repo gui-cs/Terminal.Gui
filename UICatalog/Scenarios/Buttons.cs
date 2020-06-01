@@ -1,4 +1,6 @@
-﻿using Terminal.Gui;
+﻿using NStack;
+using System;
+using Terminal.Gui;
 
 namespace UICatalog {
 	[ScenarioMetadata (Name: "Buttons", Description: "Demonstrates all sorts of Buttons")]
@@ -19,50 +21,58 @@ namespace UICatalog {
 
 			// This is the default button (IsDefault = true); if user presses ENTER in the TextField
 			// the scenario will quit
-			var defaultButton = new Button ("Quit") {
+			var defaultButton = new Button ("_Quit") {
 				X = Pos.Center (),
 				//TODO: Change to use Pos.AnchorEnd()
-				Y= Pos.Bottom(Win) - 3,
+				Y = Pos.Bottom (Win) - 3,
 				IsDefault = true,
 				Clicked = () => Application.RequestStop (),
 			};
 			Win.Add (defaultButton);
 
+			static void DoMessage (Button button, ustring txt)
+			{
+				button.Clicked = () => {
+					var btnText = button.Text.ToString ();
+					MessageBox.Query (30, 7, "Message", $"Did you click {txt.ToString ()}?", "Yes", "No");
+				};
+			}
+
 			var y = 2;
-			var button = new Button (10, y, "Base Color") {
+			var button = new Button (10, y, "Ba_se Color") {
 				ColorScheme = Colors.Base,
-				Clicked = () => MessageBox.Query (30, 7, "Message", "Question?", "Yes", "No") 
 			};
+			DoMessage (button, button.Text);
 			Win.Add (button);
 
 			y += 2;
-			Win.Add (new Button (10, y, "Error Color") { 
+			Win.Add (button = new Button (10, y, "Error Color") {
 				ColorScheme = Colors.Error,
-				Clicked = () => MessageBox.Query (30, 7, "Message", "Question?", "Yes", "No") 
 			});
+			DoMessage (button, button.Text);
 
 			y += 2;
-			Win.Add (new Button (10, y, "Dialog Color") {
+			Win.Add (button = new Button (10, y, "Dialog Color") {
 				ColorScheme = Colors.Dialog,
-				Clicked = () => MessageBox.Query (30, 7, "Message", "Question?", "Yes", "No")
 			});
+			DoMessage (button, button.Text);
 
 			y += 2;
-			Win.Add (new Button (10, y, "Menu Color") {
+			Win.Add (button = new Button (10, y, "Menu Color") {
 				ColorScheme = Colors.Menu,
-				Clicked = () => MessageBox.Query (30, 7, "Message", "Question?", "Yes", "No")
 			});
+			DoMessage (button, button.Text);
 
 			y += 2;
-			Win.Add (new Button (10, y, "TopLevel Color") {
+			Win.Add (button = new Button (10, y, "TopLevel Color") {
 				ColorScheme = Colors.TopLevel,
-				Clicked = () => MessageBox.Query (30, 7, "Message", "Question?", "Yes", "No")
 			});
+			DoMessage (button, button.Text);
 
 			y += 2;
-			Win.Add (new Button (10, y, "A super long button that will probably expose a bug in clipping or wrapping of text. Will it?") {
-				Clicked = () => MessageBox.Query (30, 7, "Message", "Question?", "Yes", "No")
+			Win.Add (button = new Button (10, y, "A super long _Button that will probably expose a bug in clipping or wrapping of text. Will it?") {
 			});
+			DoMessage (button, button.Text);
 
 			y += 2;
 			// Note the 'N' in 'Newline' will be the hotkey
@@ -73,13 +83,14 @@ namespace UICatalog {
 			y += 2;
 			// BUGBUG: Buttons don't support specifying hotkeys with _?!?
 			Win.Add (button = new Button ("Te_xt Changer") {
-				X = 10, 
+				X = 10,
 				Y = y
 			});
-			button.Clicked = () => button.Text += $"{y++}";
+
+			button.Clicked = () => button.Text += "!"; 
 
 			Win.Add (new Button ("Lets see if this will move as \"Text Changer\" grows") {
-				X = Pos.Right(button) + 10,
+				X = Pos.Right (button) + 10,
 				Y = y,
 			});
 
@@ -99,25 +110,43 @@ namespace UICatalog {
 
 			// Demonstrates how changing the View.Frame property can move Views
 			y += 2;
-			var moveBtn = new Button (10, y, "Move TextField via Frame") {
+			var moveBtn = new Button (10, y, "Move This Button via Frame") {
 				ColorScheme = Colors.Error,
 			};
 			moveBtn.Clicked = () => {
-				edit.Frame = new Rect (edit.Frame.X + 5, edit.Frame.Y, edit.Frame.Width, edit.Frame.Height);
+				moveBtn.Frame = new Rect (moveBtn.Frame.X + 5, moveBtn.Frame.Y, moveBtn.Frame.Width, moveBtn.Frame.Height);
 			};
 			Win.Add (moveBtn);
 
-			// Demonstrates how changing the View.Frame property can NOT resize Views
-			y += 2;
-			var sizeBtn = new Button (10, y, "Grow TextField via Frame") {
-				ColorScheme = Colors.Error,
-			};
-			sizeBtn.Clicked = () => {
-				edit.Frame = new Rect (edit.Frame.X, edit.Frame.Y, edit.Frame.Width + 2, edit.Frame.Height);
-				Win.LayoutSubviews ();
-			};
-			Win.Add (sizeBtn);
+			// Demo changing hotkey
+			ustring MoveHotkey (ustring txt)
+			{
+				// Remove the '_'
+				var i = txt.IndexOf ('_');
+				var start = txt [0, i];
+				txt = start + txt [i + 1, txt.Length];
 
+				// Move over one or go to start
+				i++;
+				if (i >= txt.Length) {
+					i = 0;
+				}
+
+				// Slip in the '_'
+				start = txt [0, i];
+				txt = start + ustring.Make ('_') + txt [i, txt.Length];
+
+				return txt;
+			}
+
+			y += 2;
+			var moveHotKeyBtn = new Button (10, y, "Click to Change th_is Button's Hotkey") {
+				ColorScheme = Colors.TopLevel,
+			};
+			moveHotKeyBtn.Clicked = () => {
+				moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
+			};
+			Win.Add (moveHotKeyBtn);
 		}
 	}
 }

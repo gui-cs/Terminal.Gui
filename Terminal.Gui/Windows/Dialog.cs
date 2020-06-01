@@ -4,15 +4,15 @@
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
 //
-
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
 	/// The <see cref="Dialog"/> <see cref="View"/> is a <see cref="Window"/> that by default is centered and contains one 
-	/// or more <see cref="Button"/>. It defaults to the <see cref="Colors.Dialog"/> color scheme and has a 1 cell padding around the edges.
+	/// or more <see cref="Button"/>s. It defaults to the <see cref="Colors.Dialog"/> color scheme and has a 1 cell padding around the edges.
 	/// </summary>
 	/// <remarks>
 	///  To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to <see cref="Application.Run()"/>. 
@@ -21,21 +21,37 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class Dialog : Window {
 		List<Button> buttons = new List<Button> ();
-		const int padding = 1;
+		const int padding = 0;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Dialog"/> class with an optional set of <see cref="Button"/>s to display
+		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Absolute"/> positioning 
+		/// and an optional set of <see cref="Button"/>s to display
 		/// </summary>
 		/// <param name="title">Title for the dialog.</param>
 		/// <param name="width">Width for the dialog.</param>
 		/// <param name="height">Height for the dialog.</param>
 		/// <param name="buttons">Optional buttons to lay out at the bottom of the dialog.</param>
+		/// <remarks>
+		/// if <c>width</c> and <c>height</c> are both 0, the Dialog will be vertically and horizontally centered in the
+		/// container and the size will be 85% of the container. 
+		/// After initialzation use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
+		/// </remarks>
+		/// <remarks>
+		/// Use the constructor that does not take a <c>width</c> and <c>height</c> instead.
+		/// </remarks>
 		public Dialog (ustring title, int width, int height, params Button [] buttons) : base (title, padding: padding)
 		{
 			X = Pos.Center ();
 			Y = Pos.Center ();
-			Width = width;
-			Height = height;
+
+			if (width == 0 & height == 0) {
+				Width = Dim.Percent (85);
+				Height = Dim.Percent (85);
+			} else {
+				Width = width;
+				Height = height;
+			}
+
 			ColorScheme = Colors.Dialog;
 			Modal = true;
 
@@ -45,6 +61,20 @@ namespace Terminal.Gui {
 					Add (b);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/> positioning 
+		/// and with an optional set of <see cref="Button"/>s to display
+		/// </summary>
+		/// <param name="title">Title for the dialog.</param>
+		/// <param name="buttons">Optional buttons to lay out at the bottom of the dialog.</param>
+		/// <remarks>
+		/// if <c>width</c> and <c>height</c> are both 0, the Dialog will be vertically and horizontally centered in the
+		/// container and the size will be 85% of the container. 
+		/// After initialzation use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
+		/// </remarks>
+		public Dialog (ustring title, params Button [] buttons) : this (title: title, width: 0, height: 0, buttons: buttons) { 
 		}
 
 		/// <summary>
@@ -58,31 +88,31 @@ namespace Terminal.Gui {
 
 			buttons.Add (button);
 			Add (button);
+			LayoutSubviews ();
+		}
+
+		internal int GetButtonsWidth ()
+		{
+			if (buttons.Count == 0) {
+				return 0;
+			}
+			return buttons.Select (b => b.Bounds.Width).Sum () + buttons.Count() - 1;
 		}
 
 		///<inheritdoc cref="LayoutSubviews"/>
 		public override void LayoutSubviews ()
 		{
+			int buttonsWidth = GetButtonsWidth ();
+
+			int shiftLeft = Math.Max((Bounds.Width - buttonsWidth) / 2 - 2, 0);
+			for (int i = buttons.Count - 1; i >= 0 ; i--) {
+				Button button = buttons [i];
+				shiftLeft += button.Frame.Width + 1;
+				button.X = Pos.AnchorEnd (shiftLeft);
+				button.Y = Pos.AnchorEnd (1);
+			}
+
 			base.LayoutSubviews ();
-
-			int buttonSpace = 0;
-			int maxHeight = 0;
-
-			foreach (var b in buttons) {
-				buttonSpace += b.Frame.Width + 1;
-				maxHeight = Math.Max (maxHeight, b.Frame.Height);
-			}
-			const int borderWidth = 2;
-			var start = (Frame.Width-borderWidth - buttonSpace) / 2;
-
-			var y = Frame.Height - borderWidth  - maxHeight-1-padding;
-			foreach (var b in buttons) {
-				var bf = b.Frame;
-
-				b.Frame = new Rect (start, y, bf.Width, bf.Height);
-
-				start += bf.Width + 1;
-			}
 		}
 
 		///<inheritdoc cref="ProcessKey"/>

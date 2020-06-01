@@ -5,7 +5,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using Terminal.Gui;
+using Rune = System.Rune;
 
 /// <remarks>
 /// <para>
@@ -88,11 +91,16 @@ namespace UICatalog {
 		/// </summary>
 		private static void Setup ()
 		{
+			StringBuilder aboutMessage = new StringBuilder ();
+			aboutMessage.AppendLine ("UI Catalog is a comprehensive sample library for Terminal.Gui\n");
+			aboutMessage.AppendLine ($"Version: {typeof(UICatalogApp).Assembly.GetName ().Version}");
+			aboutMessage.Append ($"Using Terminal.Gui Version: {typeof (Terminal.Gui.Application).Assembly.GetName ().Version}\n");
+
 			_menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Application.RequestStop() )
 				}),
-				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query (50, 10, "About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok")),
+				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "Ok")),
 			});
 
 			_leftPane = new Window ("Categories") {
