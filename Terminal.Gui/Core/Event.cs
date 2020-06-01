@@ -327,15 +327,12 @@ namespace Terminal.Gui {
 	/// Describes a keyboard event.
 	/// </summary>
 	public class KeyEvent {
+		KeyModifiers keyModifiers;
+
 		/// <summary>
 		/// Symb olid definition for the key.
 		/// </summary>
 		public Key Key;
-
-		/// <summary>
-		/// Indicates the "shift" state of the various shift-keys (e.g. Shift, Alt, Ctrl, NumLock, ...).
-		/// </summary>
-		public KeyModifiers KeyModifiers;
 
 		/// <summary>
 		///   The key value cast to an integer, you will typical use this for
@@ -348,38 +345,38 @@ namespace Terminal.Gui {
 		/// Gets a value indicating whether the Shift key was pressed.
 		/// </summary>
 		/// <value><c>true</c> if is shift; otherwise, <c>false</c>.</value>
-		public bool IsShift => KeyModifiers.Shift;
+		public bool IsShift => keyModifiers.Shift;
 
 		/// <summary>
 		/// Gets a value indicating whether the Alt key was pressed (real or synthesized)
 		/// </summary>
 		/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-		public bool IsAlt => KeyModifiers.Alt;
+		public bool IsAlt => keyModifiers.Alt;
 
 		/// <summary>
 		/// Determines whether the value is a control key (and NOT just the ctrl key)
 		/// </summary>
 		/// <value><c>true</c> if is ctrl; otherwise, <c>false</c>.</value>
 		//public bool IsCtrl => ((uint)Key >= 1) && ((uint)Key <= 26);
-		public bool IsCtrl => KeyModifiers.Ctrl;
+		public bool IsCtrl => keyModifiers.Ctrl;
 
 		/// <summary>
 		/// Gets a value indicating whether the Caps lock key was pressed (real or synthesized)
 		/// </summary>
 		/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-		public bool IsCapslock => KeyModifiers.Capslock;
+		public bool IsCapslock => keyModifiers.Capslock;
 
 		/// <summary>
 		/// Gets a value indicating whether the Num lock key was pressed (real or synthesized)
 		/// </summary>
 		/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-		public bool IsNumlock => KeyModifiers.Numlock;
+		public bool IsNumlock => keyModifiers.Numlock;
 
 		/// <summary>
 		/// Gets a value indicating whether the Scroll lock key was pressed (real or synthesized)
 		/// </summary>
 		/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-		public bool IsScrolllock => KeyModifiers.Scrolllock;
+		public bool IsScrolllock => keyModifiers.Scrolllock;
 
 		/// <summary>
 		/// Constructs a new <see cref="KeyEvent"/>
@@ -387,7 +384,7 @@ namespace Terminal.Gui {
 		public KeyEvent ()
 		{
 			Key = Key.Unknown;
-			KeyModifiers = new KeyModifiers ();
+			keyModifiers = new KeyModifiers ();
 		}
 
 		/// <summary>
@@ -396,7 +393,7 @@ namespace Terminal.Gui {
 		public KeyEvent (Key k, KeyModifiers km)
 		{
 			Key = k;
-			KeyModifiers = km;
+			keyModifiers = km;
 		}
 
 		///<inheritdoc cref="ToString"/>
@@ -404,22 +401,22 @@ namespace Terminal.Gui {
 		{
 			string msg = "";
 			var key = this.Key;
-			if (KeyModifiers.Shift) {
+			if (keyModifiers.Shift) {
 				msg += "Shift-";
 			}
-			if (KeyModifiers.Alt) {
+			if (keyModifiers.Alt) {
 				msg += "Alt-";
 			}
-			if (KeyModifiers.Ctrl) {
+			if (keyModifiers.Ctrl) {
 				msg += "Ctrl-";
 			}
-			if (KeyModifiers.Capslock) {
+			if (keyModifiers.Capslock) {
 				msg += "Capslock-";
 			}
-			if (KeyModifiers.Numlock) {
+			if (keyModifiers.Numlock) {
 				msg += "Numlock-";
 			}
-			if (KeyModifiers.Scrolllock) {
+			if (keyModifiers.Scrolllock) {
 				msg += "Scrolllock-";
 			}
 
