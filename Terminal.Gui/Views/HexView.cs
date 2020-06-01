@@ -312,9 +312,13 @@ namespace Terminal.Gui {
 				MoveUp (bytesPerLine);
 				break;
 			case Key.Tab:
-				leftSide = !leftSide;
-				RedisplayLine (position);
-				firstNibble = true;
+				if (keyEvent.IsCtrl) {
+					SuperView.FocusNext ();
+				} else {
+					leftSide = !leftSide;
+					RedisplayLine (position);
+					firstNibble = true;
+				}
 				break;
 			case ((int)'v' + Key.AltMask):
 			case Key.PageUp:

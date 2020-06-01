@@ -335,6 +335,8 @@ namespace Terminal.Gui {
 			return (Key)(0xffffffff);
 		}
 
+		KeyModifiers keyModifiers = new KeyModifiers ();
+
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
@@ -342,8 +344,8 @@ namespace Terminal.Gui {
 				var map = MapKey (consoleKey);
 				if (map == (Key)0xffffffff)
 					return;
-				keyHandler (new KeyEvent (map));
-				keyUpHandler (new KeyEvent (map));
+				keyHandler (new KeyEvent (map, keyModifiers));
+				keyUpHandler (new KeyEvent (map, keyModifiers));
 			};
 		}
 

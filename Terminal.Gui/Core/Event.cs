@@ -9,6 +9,36 @@ using System;
 namespace Terminal.Gui {
 
 	/// <summary>
+	/// Identifies the state of the "shift"-keys within a event.
+	/// </summary>
+	public class KeyModifiers {
+		/// <summary>
+		/// Check if the Shift key was pressed or not.
+		/// </summary>
+		public bool Shift;
+		/// <summary>
+		/// Check if the Alt key was pressed or not.
+		/// </summary>
+		public bool Alt;
+		/// <summary>
+		/// Check if the Ctrl key was pressed or not.
+		/// </summary>
+		public bool Ctrl;
+		/// <summary>
+		/// Check if the Caps lock key was pressed or not.
+		/// </summary>
+		public bool Capslock;
+		/// <summary>
+		/// Check if the Num lock key was pressed or not.
+		/// </summary>
+		public bool Numlock;
+		/// <summary>
+		/// Check if the Scroll lock key was pressed or not.
+		/// </summary>
+		public bool Scrolllock;
+	}
+
+	/// <summary>
 	/// The <see cref="Key"/> enumeration contains special encoding for some keys, but can also
 	/// encode all the unicode values that can be passed.   
 	/// </summary>
@@ -297,6 +327,8 @@ namespace Terminal.Gui {
 	/// Describes a keyboard event.
 	/// </summary>
 	public class KeyEvent {
+		KeyModifiers keyModifiers;
+
 		/// <summary>
 		/// Symb olid definition for the key.
 		/// </summary>
@@ -313,20 +345,38 @@ namespace Terminal.Gui {
 		/// Gets a value indicating whether the Shift key was pressed.
 		/// </summary>
 		/// <value><c>true</c> if is shift; otherwise, <c>false</c>.</value>
-		public bool IsShift => (Key & Key.ShiftMask) != 0;
+		public bool IsShift => keyModifiers.Shift;
 
 		/// <summary>
 		/// Gets a value indicating whether the Alt key was pressed (real or synthesized)
 		/// </summary>
 		/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-		public bool IsAlt => (Key & Key.AltMask) != 0;
+		public bool IsAlt => keyModifiers.Alt;
 
 		/// <summary>
 		/// Determines whether the value is a control key (and NOT just the ctrl key)
 		/// </summary>
 		/// <value><c>true</c> if is ctrl; otherwise, <c>false</c>.</value>
 		//public bool IsCtrl => ((uint)Key >= 1) && ((uint)Key <= 26);
-		public bool IsCtrl => (Key & Key.CtrlMask) != 0;
+		public bool IsCtrl => keyModifiers.Ctrl;
+
+		/// <summary>
+		/// Gets a value indicating whether the Caps lock key was pressed (real or synthesized)
+		/// </summary>
+		/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
+		public bool IsCapslock => keyModifiers.Capslock;
+
+		/// <summary>
+		/// Gets a value indicating whether the Num lock key was pressed (real or synthesized)
+		/// </summary>
+		/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
+		public bool IsNumlock => keyModifiers.Numlock;
+
+		/// <summary>
+		/// Gets a value indicating whether the Scroll lock key was pressed (real or synthesized)
+		/// </summary>
+		/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
+		public bool IsScrolllock => keyModifiers.Scrolllock;
 
 		/// <summary>
 		/// Constructs a new <see cref="KeyEvent"/>
@@ -334,14 +384,16 @@ namespace Terminal.Gui {
 		public KeyEvent ()
 		{
 			Key = Key.Unknown;
+			keyModifiers = new KeyModifiers ();
 		}
 
 		/// <summary>
 		///   Constructs a new <see cref="KeyEvent"/> from the provided Key value - can be a rune cast into a Key value
 		/// </summary>
-		public KeyEvent (Key k)
+		public KeyEvent (Key k, KeyModifiers km)
 		{
 			Key = k;
+			keyModifiers = km;
 		}
 
 		///<inheritdoc cref="ToString"/>
@@ -349,21 +401,27 @@ namespace Terminal.Gui {
 		{
 			string msg = "";
 			var key = this.Key;
-			if ((this.Key & Key.ShiftMask) != 0) {
+			if (keyModifiers.Shift) {
 				msg += "Shift-";
 			}
-			if ((this.Key & Key.CtrlMask) != 0) {
-				msg += "Ctrl-";
-			}
-			if ((this.Key & Key.AltMask) != 0) {
+			if (keyModifiers.Alt) {
 				msg += "Alt-";
 			}
-
-			if (string.IsNullOrEmpty (msg)) {
-				msg += $"{(((uint)this.KeyValue & (uint)Key.CharMask) > 27 ? $"{(char)this.KeyValue}" : $"{key}")}";
-			} else {
-				msg += $"{(((uint)this.KeyValue & (uint)Key.CharMask) > 27 ? $"{(char)this.KeyValue}" : $"")}";
+			if (keyModifiers.Ctrl) {
+				msg += "Ctrl-";
 			}
+			if (keyModifiers.Capslock) {
+				msg += "Capslock-";
+			}
+			if (keyModifiers.Numlock) {
+				msg += "Numlock-";
+			}
+			if (keyModifiers.Scrolllock) {
+				msg += "Scrolllock-";
+			}
+
+			msg += $"{(((uint)this.KeyValue & (uint)Key.CharMask) > 27 ? $"{(char)this.KeyValue}" : $"{key}")}";
+
 			return msg;
 		}
 	}

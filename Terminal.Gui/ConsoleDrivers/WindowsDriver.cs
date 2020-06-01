@@ -646,17 +646,17 @@ namespace Terminal.Gui {
 						WindowsConsole.ControlKeyState.LeftControlPressed |
 						WindowsConsole.ControlKeyState.EnhancedKey:
 					case WindowsConsole.ControlKeyState.EnhancedKey:
-						key = new KeyEvent (Key.CtrlMask | Key.AltMask);
+						key = new KeyEvent (Key.CtrlMask | Key.AltMask, keyModifiers);
 						break;
 					case WindowsConsole.ControlKeyState.LeftAltPressed:
-						key = new KeyEvent (Key.AltMask);
+						key = new KeyEvent (Key.AltMask, keyModifiers);
 						break;
 					case WindowsConsole.ControlKeyState.RightControlPressed:
 					case WindowsConsole.ControlKeyState.LeftControlPressed:
-						key = new KeyEvent (Key.CtrlMask);
+						key = new KeyEvent (Key.CtrlMask, keyModifiers);
 						break;
 					case WindowsConsole.ControlKeyState.ShiftPressed:
-						key = new KeyEvent (Key.ShiftMask);
+						key = new KeyEvent (Key.ShiftMask, keyModifiers);
 						break;
 					case WindowsConsole.ControlKeyState.NumlockOn:
 						break;
@@ -667,16 +667,16 @@ namespace Terminal.Gui {
 					default:
 						switch (inputEvent.KeyEvent.wVirtualKeyCode) {
 						case 0x10:
-							key = new KeyEvent (Key.ShiftMask);
+							key = new KeyEvent (Key.ShiftMask, keyModifiers);
 							break;
 						case 0x11:
-							key = new KeyEvent (Key.CtrlMask);
+							key = new KeyEvent (Key.CtrlMask, keyModifiers);
 							break;
 						case 0x12:
-							key = new KeyEvent (Key.AltMask);
+							key = new KeyEvent (Key.AltMask, keyModifiers);
 							break;
 						default:
-							key = new KeyEvent (Key.Unknown);
+							key = new KeyEvent (Key.Unknown, keyModifiers);
 							break;
 						}
 						break;
@@ -689,12 +689,13 @@ namespace Terminal.Gui {
 				} else {
 					if (inputEvent.KeyEvent.bKeyDown) {
 						// Key Down - Fire KeyDown Event and KeyStroke (ProcessKey) Event
-						keyDownHandler (new KeyEvent (map));
-						keyHandler (new KeyEvent (map));
+						keyDownHandler (new KeyEvent (map, keyModifiers));
+						keyHandler (new KeyEvent (map, keyModifiers));
 					} else {
-						keyUpHandler (new KeyEvent (map));
+						keyUpHandler (new KeyEvent (map, keyModifiers));
 					}
 				}
+				keyModifiers = null;
 				break;
 
 			case WindowsConsole.EventType.Mouse:
@@ -906,6 +907,8 @@ namespace Terminal.Gui {
 			return mouseFlag;
 		}
 
+		KeyModifiers keyModifiers;
+
 		public ConsoleKeyInfoEx ToConsoleKeyInfoEx (WindowsConsole.KeyEventRecord keyEvent)
 		{
 			var state = keyEvent.dwControlKeyState;
@@ -915,6 +918,22 @@ namespace Terminal.Gui {
 			bool control = (state & (WindowsConsole.ControlKeyState.LeftControlPressed | WindowsConsole.ControlKeyState.RightControlPressed)) != 0;
 			bool capslock = (state & (WindowsConsole.ControlKeyState.CapslockOn)) != 0;
 			bool numlock = (state & (WindowsConsole.ControlKeyState.NumlockOn)) != 0;
+			bool scrolllock = (state & (WindowsConsole.ControlKeyState.ScrolllockOn)) != 0;
+
+			if (keyModifiers == null)
+				keyModifiers = new KeyModifiers ();
+			if (shift)
+				keyModifiers.Shift = shift;
+			if (alt)
+				keyModifiers.Alt = alt;
+			if (control)
+				keyModifiers.Ctrl = control;
+			if (capslock)
+				keyModifiers.Capslock = capslock;
+			if (numlock)
+				keyModifiers.Numlock = numlock;
+			if (scrolllock)
+				keyModifiers.Scrolllock = scrolllock;
 
 			var ConsoleKeyInfo = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
 			return new ConsoleKeyInfoEx (ConsoleKeyInfo, capslock, numlock);
@@ -1029,7 +1048,7 @@ namespace Terminal.Gui {
 			return (Key)(0xffffffff);
 		}
 
-		private static Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
+		private Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 		{
 			Key keyMod = new Key ();
 			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift))
@@ -1047,7 +1066,6 @@ namespace Terminal.Gui {
 			TerminalResized = terminalResized;
 			SetupColorsAndBorders ();
 		}
-
 
 		void ResizeScreen ()
 		{
