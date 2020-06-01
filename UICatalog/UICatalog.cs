@@ -141,7 +141,7 @@ namespace UICatalog {
 					new MenuItem ("_Quit", "", () => Application.RequestStop() )
 				}),
 				new MenuBarItem ("_Settings", new MenuItem [] { _sysConsoleMenu }),
-				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query (50, 10, "About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok")),
+				new MenuBarItem ("_About...", "", () =>  MessageBox.Query (50, 10, "About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok")),
 			});
 
 			_leftPane = new Window ("Categories") {
@@ -287,26 +287,26 @@ namespace UICatalog {
 			}
 
 			if (a.KeyEvent.IsCapslock) {
-				_capslock.Title = "Capslock On";
+				_capslock.Title = "Capslock: On";
 				_statusBar.SetNeedsDisplay ();
 			} else {
-				_capslock.Title = "Capslock Off";
+				_capslock.Title = "Capslock: Off";
 				_statusBar.SetNeedsDisplay ();
 			}
 
 			if (a.KeyEvent.IsNumlock) {
-				_numlock.Title = "Numlock On";
+				_numlock.Title = "Numlock: On";
 				_statusBar.SetNeedsDisplay ();
 			} else {
-				_numlock.Title = "Numlock Off";
+				_numlock.Title = "Numlock: Off";
 				_statusBar.SetNeedsDisplay ();
 			}
 
 			if (a.KeyEvent.IsScrolllock) {
-				_scrolllock.Title = "Scrolllock On";
+				_scrolllock.Title = "Scrolllock: On";
 				_statusBar.SetNeedsDisplay ();
 			} else {
-				_scrolllock.Title = "Scrolllock Off";
+				_scrolllock.Title = "Scrolllock: Off";
 				_statusBar.SetNeedsDisplay ();
 			}
 		}
