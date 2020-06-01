@@ -469,7 +469,8 @@ static class Demo {
 				if ((keyEvent.Key & Key.AltMask) != 0)
 					msg += "Alt ";
 				msg += $"{(((uint)keyEvent.KeyValue & (uint)Key.CharMask) > 26 ? $"{(char)keyEvent.KeyValue}" : $"{keyEvent.Key}")}";
-				list.Add (msg);
+				//list.Add (msg);
+				list.Add (keyEvent.ToString ());
 
 				break;
 

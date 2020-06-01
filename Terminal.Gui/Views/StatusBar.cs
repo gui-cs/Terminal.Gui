@@ -47,7 +47,7 @@ namespace Terminal.Gui {
 		/// A <see cref="StatusItem.Title"/> set to `~F1~ Help` will render as *F1* using <see cref="ColorScheme.HotNormal"/> and
 		/// *Help* as <see cref="ColorScheme.HotNormal"/>.
 		/// </remarks>
-		public ustring Title { get; }
+		public ustring Title { get; set;}
 
 		/// <summary>
 		/// Gets or sets the action to be invoked when the statusbar item is triggered

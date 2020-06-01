@@ -83,7 +83,6 @@ namespace UICatalog {
 				Y = Pos.Top (editLabel) + 2,
 			};
 			Win.Add (keyPressedLabel);
-			// BUGBUG: Label is not positioning right with Pos, so using TextField instead
 			var labelKeypress = new Label ("") {
 				X = Pos.Left (edit),
 				Y = Pos.Top (keyPressedLabel),
@@ -107,25 +106,13 @@ namespace UICatalog {
 			var keyStrokeListView = new ListView (keyStrokelist) {
 				X = 0,
 				Y = Pos.Top (keyLogLabel) + yOffset,
-				Width = 25,
+				Width = Dim.Percent (40),
 				Height = Dim.Fill (),
 			};
 			keyStrokeListView.ColorScheme = Colors.TopLevel;
 			Win.Add (keyStrokeListView);
 
-			void KeyDownPressUp (KeyEvent keyEvent, string updown)
-			{
-				var msg = $"Key{updown,-5}: {keyEvent.ToString ()}";
-				keyStrokelist.Add (msg);
-				keyStrokeListView.MoveDown ();
-			}
-
-			Win.KeyDown += (sender, a) => KeyDownPressUp (a.KeyEvent, "Down");
-			Win.KeyPress += (sender, a) => KeyDownPressUp (a.KeyEvent, "Press");
-			Win.KeyUp += (sender, a) => KeyDownPressUp (a.KeyEvent, "Up");
-
 			// ProcessKey log:
-			// BUGBUG: Label is not positioning right with Pos, so using TextField instead
 			var processKeyLogLabel = new Label ("ProcessKey log:") {
 				X = Pos.Right (keyStrokeListView) + 1,
 				Y = Pos.Top (editLabel) + 4,
@@ -136,7 +123,7 @@ namespace UICatalog {
 			var processKeyListView = new ListView (_processKeyList) {
 				X = Pos.Left (processKeyLogLabel),
 				Y = Pos.Top (processKeyLogLabel) + yOffset,
-				Width = 25,
+				Width = Dim.Percent (60),
 				Height = Dim.Fill (),
 			};
 			processKeyListView.ColorScheme = Colors.TopLevel;
@@ -154,7 +141,7 @@ namespace UICatalog {
 			var processHotKeyListView = new ListView (_processHotKeyList) {
 				X = Pos.Left (processHotKeyLogLabel),
 				Y = Pos.Top (processHotKeyLogLabel) + yOffset,
-				Width = 25,
+				Width = Dim.Percent (50),
 				Height = Dim.Fill (),
 			};
 			processHotKeyListView.ColorScheme = Colors.TopLevel;
@@ -172,9 +159,24 @@ namespace UICatalog {
 			var processColdKeyListView = new ListView (_processColdKeyList) {
 				X = Pos.Left (processColdKeyLogLabel),
 				Y = Pos.Top (processColdKeyLogLabel) + yOffset,
-				Width = 25,
+				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
+
+			Win.KeyDown += (sender, a) => KeyDownPressUp (a.KeyEvent, "Down");
+			Win.KeyPress += (sender, a) => KeyDownPressUp (a.KeyEvent, "Press");
+			Win.KeyUp += (sender, a) => KeyDownPressUp (a.KeyEvent, "Up");
+
+			void KeyDownPressUp (KeyEvent keyEvent, string updown)
+			{
+				var msg = $"Key{updown,-5}: {keyEvent}";
+				keyStrokelist.Add (msg);
+				keyStrokeListView.MoveDown ();
+				processKeyListView.MoveDown ();
+				processColdKeyListView.MoveDown ();
+				processHotKeyListView.MoveDown ();
+			}
+
 			processColdKeyListView.ColorScheme = Colors.TopLevel;
 			Win.Add (processColdKeyListView);
 		}
