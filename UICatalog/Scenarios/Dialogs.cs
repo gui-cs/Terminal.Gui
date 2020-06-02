@@ -1,17 +1,18 @@
 ﻿using NStack;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog {
-	[ScenarioMetadata (Name: "MessageBoxes", Description: "Demonstrates how to use MessageBoxes")]
+	[ScenarioMetadata (Name: "Dialogs", Description: "Demonstrates how to the Dialog class")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
-	class MessageBoxes : Scenario {
+	class Dialogs : Scenario {
 		public override void Setup ()
 		{
-			var frame = new FrameView ("MessageBox Options") {
+			var frame = new FrameView ("Dialog Options") {
 				X = Pos.Center(),
 				Y = 1,
 				Width = Dim.Percent(75),
@@ -55,7 +56,7 @@ namespace UICatalog {
 				X = Pos.Right (widthEdit) + 2,
 				Y = Pos.Top (widthEdit),
 			});
-			frame.Add (new Label ("the MessageBox will be sized automatically.") {
+			frame.Add (new Label ("the Dialog will size to 80% of container.") {
 				X = Pos.Right (heightEdit) + 2,
 				Y = Pos.Top (heightEdit),
 			});
@@ -76,27 +77,9 @@ namespace UICatalog {
 			};
 			frame.Add (titleEdit);
 
-			label = new Label ("Message:") {
-				X = 0,
-				Y = Pos.Bottom (label),
-				Width = Dim.Width (label),
-				Height = 1,
-				TextAlignment = Terminal.Gui.TextAlignment.Right,
-			};
-			frame.Add (label);
-			var messageEdit = new TextView () {
-				Text = "Message",
-				X = Pos.Right (label) + 1,
-				Y = Pos.Top (label),
-				Width = Dim.Fill (),
-				Height = 5,
-				ColorScheme = Colors.Dialog,
-			};
-			frame.Add (messageEdit);
-
 			label = new Label ("Num Buttons:") {
 				X = 0,
-				Y = Pos.Bottom (messageEdit),
+				Y = Pos.Bottom (titleEdit),
 				Width = Dim.Width (label),
 				Height = 1,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
@@ -110,22 +93,8 @@ namespace UICatalog {
 			};
 			frame.Add (numButtonsEdit);
 
-			label = new Label ("Style:") {
-				X = 0,
-				Y = Pos.Bottom (label),
-				Width = Dim.Width (label),
-				Height = 1,
-				TextAlignment = Terminal.Gui.TextAlignment.Right,
-			};
-			frame.Add (label);
-			var styleRadioGroup = new RadioGroup (new [] { "_Query", "_Error" } ) {
-				X = Pos.Right (label) + 1,
-				Y = Pos.Top (label),
-			};
-			frame.Add (styleRadioGroup);
-
-			frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (messageEdit) 
-				+ Dim.Height(numButtonsEdit) + Dim.Height (styleRadioGroup) + 2;
+			frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) 
+				+ Dim.Height(numButtonsEdit) + 2;
 
 			label = new Label ("Button Pressed:") {
 				X = Pos.Center (),
@@ -143,8 +112,7 @@ namespace UICatalog {
 			};
 
 			var btnText = new [] { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine" };
-
-			var showMessageBoxButton = new Button ("Show MessageBox") {
+			var showDialogButton = new Button ("Show Dialog") {
 				X = Pos.Center(),
 				Y = Pos.Bottom (frame) + 2			,
 				IsDefault = true,
@@ -154,21 +122,48 @@ namespace UICatalog {
 						int height = int.Parse (heightEdit.Text.ToString ());
 						int numButtons = int.Parse (numButtonsEdit.Text.ToString ());
 
-						var btns = new List<ustring> ();
+						var buttons = new List<Button> ();
+						var clicked = -1;
 						for (int i = 0; i < numButtons; i++) {
-							btns.Add(btnText[i % 10]);
+							var buttonId = i;
+							var button = new Button (btnText [buttonId % 10], is_default: buttonId == 0) {
+								Clicked = () => {
+									clicked = buttonId;
+									Application.RequestStop ();
+								},
+							};
+							buttons.Add(button);
 						}
-						if (styleRadioGroup.Selected == 0) {
-							buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), btns.ToArray ())}";
-						} else {
-							buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), btns.ToArray ())}";
-						}
+
+						// This tests dynamically adding buttons; ensuring the dialog resizes if needed and 
+						// the buttons are laid out correctly
+						var dialog = new Dialog (titleEdit.Text, width, height, buttons.ToArray ());
+						var add = new Button ("Add a button") {
+							X = Pos.Center (),
+							Y = Pos.Center (),
+							Clicked = () => {
+								var buttonId = buttons.Count;
+								var button = new Button (btnText [buttonId % 10], is_default: buttonId == 0) {
+									Clicked = () => {
+										clicked = buttonId;
+										Application.RequestStop ();
+									},
+								};
+								buttons.Add (button);
+								dialog.AddButton (button);
+							},
+						};
+						dialog.Add (add);
+
+						Application.Run (dialog);
+						buttonPressedLabel.Text = $"{clicked}";
+
 					} catch (FormatException) {
 						buttonPressedLabel.Text = "Invalid Options";
 					}
 				},
 			};
-			Win.Add (showMessageBoxButton);
+			Win.Add (showDialogButton);
 
 			Win.Add (buttonPressedLabel);
 		}

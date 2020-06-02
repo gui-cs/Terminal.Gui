@@ -714,7 +714,7 @@ namespace Terminal.Gui {
 		{
 			var scrRect = ViewToScreen (region);
 			var savedClip = ClipToBounds ();
-			Driver.DrawFrame (scrRect, padding, fill);
+			Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: fill);
 			Driver.Clip = savedClip;
 		}
 

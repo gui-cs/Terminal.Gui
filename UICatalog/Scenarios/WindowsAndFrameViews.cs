@@ -32,21 +32,20 @@ namespace UICatalog {
 		{
 			static int About ()
 			{
-				//return MessageBox.Query (50, 10, "About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok")
+				return MessageBox.Query ("About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok");
 
-				var about = new Window (new Rect (0, 0, 50, 10), "About UI catalog", 0) {
-					X = Pos.Center (),
-					Y = Pos.Center (),
-					Width = 50,
-					Height = 10,
-					LayoutStyle = LayoutStyle.Computed,
-					ColorScheme = Colors.Error,
+				//var about = new Window (new Rect (0, 0, 50, 10), "About UI catalog", 0) {
+				//	X = Pos.Center (),
+				//	Y = Pos.Center (),
+				//	Width = 50,
+				//	Height = 10,
+				//	LayoutStyle = LayoutStyle.Computed,
+				//	ColorScheme = Colors.Error,
 
-				};
-				//about.Add (new Label ("UI Catalog is a comprehensive sample library for Terminal.Gui"));
+				//};
 
-				Application.Run (about);
-				return 0;
+				//Application.Run (about);
+				//return 0;
 
 			}
 
@@ -88,7 +87,7 @@ namespace UICatalog {
 					X = Pos.Center (),
 					Y = 0,
 					ColorScheme = Colors.Error,
-					Clicked = () => MessageBox.ErrorQuery (30, 10, win.Title.ToString (), "Neat?", "Yes", "No")
+					Clicked = () => MessageBox.ErrorQuery (win.Title.ToString (), "Neat?", "Yes", "No")
 				});
 				var subWin = new Window ("Sub Window") {
 					X = Pos.Percent (0),
@@ -128,7 +127,7 @@ namespace UICatalog {
 				X = Pos.Center (),
 				Y = 0,
 				ColorScheme = Colors.Error,
-				//Clicked = () => MessageBox.ErrorQuery (30, 10, frame.Title.ToString (), "Neat?", "Yes", "No")
+				//Clicked = () => MessageBox.ErrorQuery (frame.Title.ToString (), "Neat?", "Yes", "No")
 			});
 			var subWinofFV = new Window ("this is a Sub-Window") {
 				X = Pos.Percent (0),

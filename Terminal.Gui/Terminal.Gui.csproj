@@ -5,11 +5,12 @@
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
     <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
+    <AssemblyVersion>0.82.0.0</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <PackageId>Terminal.Gui</PackageId>
-    <PackageVersion>0.81</PackageVersion>
+    <PackageVersion>0.82</PackageVersion>
     <Authors>Miguel de Icaza</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/migueldeicaza/gui.cs/</PackageProjectUrl>
@@ -18,80 +19,141 @@
     <Owners>Miguel de Icaza</Owners>
     <Summary>Application framework for creating modern console applications using .NET </Summary>
     <Title>Gui.cs is a framework for creating console user interfaces</Title>
-    <PackageReleaseNotes>0.81: Fix ncurses engine for macOS/Linux, it works again
+    <PackageReleaseNotes>
+      0.82: Many fixes
+      * API documentation completely revamped and updated. Readme upated. Contributors guide added (Thanks @tig!)
+      * New sample/demo app - UI Catalog - Replaces demo.cs with an easy to use and extend set of demo scenarios. (Thanks @tig!)
+      * MenuBar can now have MenuItems directly (enables top-level menu items with no submenu). (Thanks @tig!)
+      * Apps can now get KeyUp/KeyDown events.  (Thanks @tig!)
+      * Fixes #396 - Text alignnment issues.  (Thanks @tig!)
+      * Fixes #423 - Fix putting results of ocgv on command line erases cursor. (Thanks @tig!)
+      * Example/Designer csproj files updated to latest Visual Studio model. (Thanks @tig!)
+      * Adjusted the default colors for Windows to make more readable. (Thanks @tig!)
+      * Toplevel.Ready event - Fired once the Toplevel's MainLoop has started (#445). (Thanks @tig!)
+      * Refactored several events to use event vs. Action. (BREAKING CHANGE) (Thanks @tig!)
+      * All compile warnings fixed. (Thanks @tig!)
+      * Fixed a crash in EnsureVisibleBounds. (Thanks @tig!)
+      * Application.Init/Shutdown are more robust. (Thanks @tig!)
+      * New "Draw Window Frame" code; consistent across Window, FrameView, and Menu. Fixes many drawing bugs. (Thanks @tig!)
+      * The project has been refactored an reorganized to reduce risk of bugs and make it easier to contribute #541. (Thanks @tig!)
+      * Fixes #522 - Last view of Frameview not drawn. (Thanks @tig!)
+      * Clipping has been fixed/restored - it now works properly. (#586) (Thanks @tig!)
+      * Added a View.LayoutComplete event (#569). (Thanks @tig!)
+      * Fixes #299 - MessageBox now auto sizes. (Thanks @tig!)
+      * Fixes #557 - MessageBoxes on small screens. (Thanks @tig!)
+      * Fixes #432 - MessageBox does not deal with long text; width/height params are goofy. (Thanks @tig!)
+      * Fixes #35 - Dialog should have 1 char padding. (Thanks @tig!)
+      * `MessageBox.Query` called with `width` and `height` == 0 get auto-size behavior. A new constructor is added making this easy to use. (Thanks @tig!)
+      * Multi-line `MessageBox`es are now supported. Just use `\n` to add lines. The height of the MessageBox will adjust automatically. (Thanks @tig!)
+      * The `MessageBoxes` Scenario in UI Catalog provides a full demo/test-case. (Thanks @tig!)
+      * `Dialog` called with `width` and `height` == 0 are sized to 85% container. A new constructor is added making this easy to use. (Thanks @tig!)
+      * Dialog (and MessageBox `Buttons` are now dynamically laid out using Computed layout. (Thanks @tig!)
+      * A `Dialogs` Scenario has been added to UI Catalog making it easy to test the API. (Thanks @tig!)
+      * `Button` now supports BOTH specifying a hotkey with '_' and the old behavior of using the first uppercase char (if '_' is not found). (Thanks @tig!)
+      * All UI Catalog scenarios that use `Dialog` or `MessageBox` now use the simplified API. (Thanks @tig!)
+      * `Terminal.Gui.dll` now has version metadata and UI Catalog's about box displays it as a test case. (Thanks @tig!)
+      * Button, Dialog, and MessageBox API documentation has been updated/revised. (Thanks @tig!)
+      * `View`, `Window`, `FrameView`, and `Dialog` have been upgraded to use the new `ConsoleDriver.DrawFrameWindow` API directly. (Thanks @tig!)
+      * New ComboBox control (Thanks @fergusonr!)
+      * ConsoleDriver now supports improved KeyModifers (shift keys) with an expanded Keys Sceanrio in UI Catalog. (Thanks @bdisp!)
+      * Tons of mouse handling improvements. (Thanks @bdisp!)
+      * Fsharp sample updated. (Thanks @bdisp!)
+      * Fixes #562 - Background drawing issue. (Thanks @bdisp!)
+      * Fixes #517 - Focus and mouse handlers enahced (BREAKING CHANGE). (Thanks @bdisp!)
+      * Fixed resizing update and correct Toplevel colors without colors. (Thanks @bdisp!)
+      * Fixed #515, #518, #536, #540. (Thanks @bdisp!)
+      * Added Threading Scenario to UI catalog. (Thanks @bdisp!)
+      * Added support for F11 and F12 keys. (Thanks @bdisp!)
+      * Multiple improvements to Date/TimeField. (Thanks @bdisp!)
+      * Fixes #409 - Invoke does not cause Wakeup #501. (Thanks @bdisp!)
+      * Fixed Label text alignemnt. (Thanks @bdisp!)
+      * Added mouse features in the Unix version. Supports xterm-1006. (Thanks @bdisp!)
+      * Several StatusBar fixes. (Thanks @bdisp!)
+      * Tons of mouse improvements including mouse wheel support (e.g. #404, #409). (Thanks @bdisp!)
+      * Added a CloseFile method to the TextView as stated in #452. (Thanks @bdisp)
+      * Added a OpenSelectedItem event to the ListView #429. (Thanks @bdisp!)
+      * Fixes the return value of the position cursor in the TextField. (Thanks @bdisp!)
+      * Updates screen on Unix window resizing. (Thanks @bdisp!)
+      * Fixes the functions of the Edit->Copy-Cut-Paste menu for the TextField that was not working well. (Thanks @bdisp!)
+      * More robust error handing in Pos/Dim. Fixes #355 stack overflow with Pos based on the size of windows at startup. Added a OnResized action to set the Pos after the terminal are resized. (Thanks @bdisp!)
+      * Fixes #389 Window layouting breaks when resizing. (Thanks @bdisp!)
+      * Fixes #557 MessageBox needs to take ustrings (BREAKING CHANGE). (Thanks @tig!)
 
-* Fixes an issue with referencing views that have not been allocated yet causing a stack overflow
-* New OnCloseMenu event on menus
-* Button cursor position looks better
-* Listview in single-selection mode uses a radio-button look
-* Fixes a couple of crashes (356)
-* Default the samples to work on Catalina
+      0.81:
+      * Fix ncurses engine for macOS/Linux, it works again
+      * Fixes an issue with referencing views that have not been allocated yet causing a stack overflow
+      * New OnCloseMenu event on menus
+      * Button cursor position looks better
+      * Listview in single-selection mode uses a radio-button look
+      * Fixes a couple of crashes (356)
+      * Default the samples to work on Catalina
 
 
-0.80: Jumbo update from BDisp:
+      0.80: Jumbo update from BDisp:
 
-* Fixed key events traversal for modal dialogs
-* Fixes culture info of DataField from pr
-* Fixes the rectangle drawing issue
-* Redraw issue when setting coordinates of label
-* Added sub menus into menu bar with mouse and key navigation
-* Added Colors.Menu.Disabled to CursesDriver.cs
-* Mouse text selection with cut, copy and paste on text fields
-* Change sepChar from char to string in DateField
-* Adding a disabled menu item in the demo file
-* Fixes Button repainting issue when changing the text length to one smaller
-* Fixes Redraw issue when setting coordinates of label
-* Fixes ScrollView does not render some content
-* Fixed bug in Button that caused a loop redraw calling TerminalResized
-* Fixes a repaint issue (282)
-* Mouse features added to FileDialog including wheel support.
-* Switch netcoreapp target to netstandard2.0
-* Added TextView.TextChanged event
-* Fixes issue #306 async/await hang (#312)
-* Replaced static driver initialization with property getter for reference passing in Core.cs::View class, this allows the library to be reinitialized at any time.
-* Made the Shutdown method on Core.cs::Application class public, since there is no reason to keep it private. Applications can shutdown the library and revert the console to the initial stage by calling it.
-* Fixed a memory-leak on Drivers/WindowsDriver class by destroying the generated screen buffers at library shutdown by calling CloseHandle.
-* Minor change to Core.cs::Application.Init(Func) for better initialization status tracking, via backend property instead of relying on the Top field.
-* Moved `ListView.ListWrapper` out of `ListView` migueldeicaza/gui.cs#313` (#315)
-* Resizing the MessageBox width to accommodate all message text (#299)
-* Timefield format with bounds values (#303)
-* Implemented lower and upper bounds to TimeField
-* Passing old text to the Changed event handler
-* Extract methods on ListView to make it controlable from other controls
+      * Fixed key events traversal for modal dialogs
+      * Fixes culture info of DataField from pr
+      * Fixes the rectangle drawing issue
+      * Redraw issue when setting coordinates of label
+      * Added sub menus into menu bar with mouse and key navigation
+      * Added Colors.Menu.Disabled to CursesDriver.cs
+      * Mouse text selection with cut, copy and paste on text fields
+      * Change sepChar from char to string in DateField
+      * Adding a disabled menu item in the demo file
+      * Fixes Button repainting issue when changing the text length to one smaller
+      * Fixes Redraw issue when setting coordinates of label
+      * Fixes ScrollView does not render some content
+      * Fixed bug in Button that caused a loop redraw calling TerminalResized
+      * Fixes a repaint issue (282)
+      * Mouse features added to FileDialog including wheel support.
+      * Switch netcoreapp target to netstandard2.0
+      * Added TextView.TextChanged event
+      * Fixes issue #306 async/await hang (#312)
+      * Replaced static driver initialization with property getter for reference passing in Core.cs::View class, this allows the library to be reinitialized at any time.
+      * Made the Shutdown method on Core.cs::Application class public, since there is no reason to keep it private. Applications can shutdown the library and revert the console to the initial stage by calling it.
+      * Fixed a memory-leak on Drivers/WindowsDriver class by destroying the generated screen buffers at library shutdown by calling CloseHandle.
+      * Minor change to Core.cs::Application.Init(Func) for better initialization status tracking, via backend property instead of relying on the Top field.
+      * Moved `ListView.ListWrapper` out of `ListView` migueldeicaza/gui.cs#313` (#315)
+      * Resizing the MessageBox width to accommodate all message text (#299)
+      * Timefield format with bounds values (#303)
+      * Implemented lower and upper bounds to TimeField
+      * Passing old text to the Changed event handler
+      * Extract methods on ListView to make it controlable from other controls
 
-0.70: Bug fixes (320, 321, 306, 304, 291, 299, 303);  Surface ListView.ListWrapper, surface various internal methods for use in ListView; Allow list item selection; ; 0.65: Added new TimeField from Jörg Preiß; Fixes for Backtab by Martin Björkström;  ListView now supports simple selection;  Bug fixes by giladlevi, Daniel Cazzulino and Marius Ungureanu;  New Application.Run of T entry point by Daniel Cazzulino;   Added various View methods to bring forward, backwards and move views in the hierarchy;  Switch to Portable PDBs by Daniel Cazzulino;  Dims can now be compared by Daniel Cazzulino; OnMenuOpen handler by giladlevi;  Various memory usage optimizations by giladlevi;  FileDialog.FilePath is now a full path by Yanwei Wang;  ISupportInitialize/ISupportInitializeNotification is now supported thanks to the work from Daniel Cazzulino; Support for non-modal TopLevels by Daniel Cazzulino and Adrian Alonso; 0.24: the Windows driver implements WakeUp, allowing some scenarios like bug #207 to be fixed;
-0.23: Better support for disabled menu items;  Raises text changed event after the internals have been updated; Fix Caps-NumLock;  Alt-HotKey now work on menus
-0.22: Correct vertical scrollview behavior, Small curses driver fix for terminals without mouse support, TextView support for scrolling, Surface Used property on TextField, Surface Cursor on RadioGroup.
+      0.70: Bug fixes (320, 321, 306, 304, 291, 299, 303);  Surface ListView.ListWrapper, surface various internal methods for use in ListView; Allow list item selection; ; 0.65: Added new TimeField from Jörg Preiß; Fixes for Backtab by Martin Björkström;  ListView now supports simple selection;  Bug fixes by giladlevi, Daniel Cazzulino and Marius Ungureanu;  New Application.Run of T entry point by Daniel Cazzulino;   Added various View methods to bring forward, backwards and move views in the hierarchy;  Switch to Portable PDBs by Daniel Cazzulino;  Dims can now be compared by Daniel Cazzulino; OnMenuOpen handler by giladlevi;  Various memory usage optimizations by giladlevi;  FileDialog.FilePath is now a full path by Yanwei Wang;  ISupportInitialize/ISupportInitializeNotification is now supported thanks to the work from Daniel Cazzulino; Support for non-modal TopLevels by Daniel Cazzulino and Adrian Alonso; 0.24: the Windows driver implements WakeUp, allowing some scenarios like bug #207 to be fixed;
+      0.23: Better support for disabled menu items;  Raises text changed event after the internals have been updated; Fix Caps-NumLock;  Alt-HotKey now work on menus
+      0.22: Correct vertical scrollview behavior, Small curses driver fix for terminals without mouse support, TextView support for scrolling, Surface Used property on TextField, Surface Cursor on RadioGroup.
 
-0.21: Introudce Attribute.Make to more easily create attributes, and fix a bug in the file panel.
-0.20: Expose some of the CursesDriver APIs
-0.19: PageUpDown updates (GaikwadPratik); Fixes in multi-line labels (hlfrye@gmail.com);  Support Delete char in TextView (Greg Amidon); Prevent empty TextViews from crashing;  Allow TextFields to be updated on the Changed event.
-0.18: Fixes hotkeys for menus (Sang Kil); Fixes RemoveAll for all containers;  Allows Toplevels with no views; Fixes FileDialog layout; Prevent crash in TextView
-0.17: Unix, dynamically load ncurses library to support different configurations, and not require -dev on Linux, various bug fixes.
+      0.21: Introudce Attribute.Make to more easily create attributes, and fix a bug in the file panel.
+      0.20: Expose some of the CursesDriver APIs
+      0.19: PageUpDown updates (GaikwadPratik); Fixes in multi-line labels (hlfrye@gmail.com);  Support Delete char in TextView (Greg Amidon); Prevent empty TextViews from crashing;  Allow TextFields to be updated on the Changed event.
+      0.18: Fixes hotkeys for menus (Sang Kil); Fixes RemoveAll for all containers;  Allows Toplevels with no views; Fixes FileDialog layout; Prevent crash in TextView
+      0.17: Unix, dynamically load ncurses library to support different configurations, and not require -dev on Linux, various bug fixes.
 
-0.16: Support for Shift-Tab on Windows (fix by @mholo65) 
+      0.16: Support for Shift-Tab on Windows (fix by @mholo65)
 
-0.15: WindowsDriver fix for Legacy Console keyboard input (issue #105)
+      0.15: WindowsDriver fix for Legacy Console keyboard input (issue #105)
 
-0.14: WindowsDriver fix for EventType size.
+      0.14: WindowsDriver fix for EventType size.
 
-0.13: Fixes keyboard input for Alt-Gr and numbers.
+      0.13: Fixes keyboard input for Alt-Gr and numbers.
 
-0.12: Fixes the text editor merge line command.
+      0.12: Fixes the text editor merge line command.
 
-0.11: Simplify TextField implementation, fixes a couple of editing bugs.
+      0.11: Simplify TextField implementation, fixes a couple of editing bugs.
 
-0.10: Fix unicode rendering for TextField, and bring F# example
+      0.10: Fix unicode rendering for TextField, and bring F# example
 
-0.9: File Open/File Save dialogs, HexView, Windows Driver allows resizing, mouse events, faster (thanks to Nick Van Dyck, nickvdyck for the contribution!), smaller bug fixes,
+      0.9: File Open/File Save dialogs, HexView, Windows Driver allows resizing, mouse events, faster (thanks to Nick Van Dyck, nickvdyck for the contribution!), smaller bug fixes,
 
-0.8: Completes keyboard support on Windows;  Fixes delete on Windows, some layout fixes.
-0.7: terminal resizing on Linux propagates sizes with new layout system, and new features on the layout system (documented)
-0.6: new layout system, multi-line textview editor, Linux bug fix for .NET Core
-0.5: support Linux with .NET Core, Windows driver fixes.
-0.4: hotkey handling fix for RadioButtons
-0.3: Fix Windows key input to not echo characters on console, proper Fkey mapping
-0.2: Auto-detect the best console</PackageReleaseNotes>
+      0.8: Completes keyboard support on Windows;  Fixes delete on Windows, some layout fixes.
+      0.7: terminal resizing on Linux propagates sizes with new layout system, and new features on the layout system (documented)
+      0.6: new layout system, multi-line textview editor, Linux bug fix for .NET Core
+      0.5: support Linux with .NET Core, Windows driver fixes.
+      0.4: hotkey handling fix for RadioButtons
+      0.3: Fix Windows key input to not echo characters on console, proper Fkey mapping
+      0.2: Auto-detect the best console
+    </PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
