@@ -728,7 +728,7 @@ namespace Terminal.Gui {
 
 			if (IsButtonDoubleClicked) {
 				Application.MainLoop.AddIdle (() => {
-					ProcessButtonDoubleClicked ().ConfigureAwait (false);
+					ProcessButtonDoubleClickedAsync ().ConfigureAwait (false);
 					return false;
 				});
 			}
@@ -879,7 +879,7 @@ namespace Terminal.Gui {
 			};
 		}
 
-		private async Task ProcessButtonDoubleClicked ()
+		private async Task ProcessButtonDoubleClickedAsync ()
 		{
 			await Task.Delay (200);
 			IsButtonDoubleClicked = false;
