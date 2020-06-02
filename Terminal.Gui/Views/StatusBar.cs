@@ -151,7 +151,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc cref="Redraw"/>
-		public override void Redraw (Rect region)
+		public override void Redraw (Rect bounds)
 		{
 			//if (Frame.Y != Driver.Rows - 1) {
 			//	Frame = new Rect (Frame.X, Driver.Rows - 1, Frame.Width, Frame.Height);

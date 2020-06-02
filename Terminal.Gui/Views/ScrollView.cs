@@ -397,20 +397,16 @@ namespace Terminal.Gui {
 		/// This event is raised when the contents have scrolled
 		/// </summary>
 		//public event Action<ScrollView> Scrolled;
-
 		public override void Redraw(Rect region)
 		{
 			SetViewsNeedsDisplay ();
 			Driver.SetAttribute (ColorScheme.Normal);
 			Clear ();
 
-			if (Driver.Clip.IsEmpty || Driver.Clip.Contains (RectToScreen (Frame))) {
 			var savedClip = ClipToBounds ();
-			contentView.Redraw (contentView.Frame);
+			contentView.Redraw (contentView.Bounds);
 			Driver.Clip = savedClip;
-			} else {
-				contentView.Redraw (contentView.Bounds);
-			}
+
 			vertical.Redraw (vertical.Bounds);
 			horizontal.Redraw (vertical.Bounds);
 			Driver.SetAttribute (ColorScheme.Normal);

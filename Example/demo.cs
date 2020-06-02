@@ -30,7 +30,7 @@ static class Demo {
 			throw new NotImplementedException ();
 		}
 
-		public override void Redraw (Rect region)
+		public override void Redraw (Rect bounds)
 		{
 			//Point pos = new Point (region.X, region.Y);
 			Driver.SetAttribute (ColorScheme.Focus);
@@ -53,7 +53,7 @@ static class Demo {
 		{
 		}
 
-		public override void Redraw (Rect region)
+		public override void Redraw (Rect bounds)
 		{
 			Driver.SetAttribute (ColorScheme.Focus);
 			var f = Frame;
@@ -509,7 +509,7 @@ static class Demo {
 
 		//Application.UseSystemConsole = true;
 
-		Application.Init ();
+		Application.Init();
 
 		var top = Application.Top;
 
