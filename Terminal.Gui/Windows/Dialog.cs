@@ -61,6 +61,8 @@ namespace Terminal.Gui {
 					Add (b);
 				}
 			}
+
+			//LayoutComplete += (sender, a) => AdjustButtonLayout ();
 		}
 
 		/// <summary>
@@ -98,14 +100,13 @@ namespace Terminal.Gui {
 			}
 			return buttons.Select (b => b.Bounds.Width).Sum () + buttons.Count() - 1;
 		}
-
 		///<inheritdoc cref="LayoutSubviews"/>
 		public override void LayoutSubviews ()
 		{
 			int buttonsWidth = GetButtonsWidth ();
 
-			int shiftLeft = Math.Max((Bounds.Width - buttonsWidth) / 2 - 2, 0);
-			for (int i = buttons.Count - 1; i >= 0 ; i--) {
+			int shiftLeft = Math.Max ((Bounds.Width - buttonsWidth) / 2 - 2, 0);
+			for (int i = buttons.Count - 1; i >= 0; i--) {
 				Button button = buttons [i];
 				shiftLeft += button.Frame.Width + 1;
 				button.X = Pos.AnchorEnd (shiftLeft);
