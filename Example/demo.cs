@@ -375,6 +375,17 @@ static class Demo {
 		MessageBox.Query (50, 7, "Help", "This is a small help\nBe kind.", "Ok");
 	}
 
+	static void Load ()
+	{
+		MessageBox.Query (50, 7, "Load", "This is a small load\nBe kind.", "Ok");
+	}
+
+	static void Save ()
+	{
+		MessageBox.Query (50, 7, "Save", "This is a small save\nBe kind.", "Ok");
+	}
+
+
 	#region Selection Demo
 
 	static void ListSelectionDemo (bool multiple)
@@ -611,8 +622,8 @@ static class Demo {
 
 		var statusBar = new StatusBar (new StatusItem [] {
 			new StatusItem(Key.F1, "~F1~ Help", () => Help()),
-			new StatusItem(Key.F2, "~F2~ Load", null),
-			new StatusItem(Key.F3, "~F3~ Save", null),
+			new StatusItem(Key.F2, "~F2~ Load", Load),
+			new StatusItem(Key.F3, "~F3~ Save", Save),
 			new StatusItem(Key.ControlQ, "~^Q~ Quit", () => { if (Quit ()) top.Running = false; }),
 		}) {
 			Parent = null,
