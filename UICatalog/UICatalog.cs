@@ -95,9 +95,11 @@ namespace UICatalog {
 		private static void Setup ()
 		{
 			StringBuilder aboutMessage = new StringBuilder ();
-			aboutMessage.AppendLine ("UI Catalog is a comprehensive sample library for Terminal.Gui\n");
+			aboutMessage.AppendLine ("UI Catalog is a comprehensive sample library for Terminal.Gui");
+			aboutMessage.AppendLine ("");
 			aboutMessage.AppendLine ($"Version: {typeof(UICatalogApp).Assembly.GetName ().Version}");
-			aboutMessage.Append ($"Using Terminal.Gui Version: {typeof (Terminal.Gui.Application).Assembly.GetName ().Version}\n");
+			aboutMessage.AppendLine ($"Using Terminal.Gui Version: {typeof (Terminal.Gui.Application).Assembly.GetName ().Version}");
+			aboutMessage.AppendLine ("");
 
 			_menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {

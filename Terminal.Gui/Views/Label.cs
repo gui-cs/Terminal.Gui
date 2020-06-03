@@ -99,6 +99,8 @@ namespace Terminal.Gui {
 
 		static ustring ClipAndJustify (ustring str, int width, TextAlignment talign)
 		{
+			// Get rid of any '\r' added by Windows
+			str = str.Replace ("\r", ustring.Empty);
 			int slen = str.RuneCount;
 			if (slen > width){
 				var uints = str.ToRunes (width);
