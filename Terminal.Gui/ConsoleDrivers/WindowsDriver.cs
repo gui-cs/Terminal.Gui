@@ -695,8 +695,9 @@ namespace Terminal.Gui {
 						keyUpHandler (new KeyEvent (map, keyModifiers));
 					}
 				}
-				if (!inputEvent.KeyEvent.bKeyDown)
+				if (!inputEvent.KeyEvent.bKeyDown) {
 					keyModifiers = null;
+				}
 				break;
 
 			case WindowsConsole.EventType.Mouse:
@@ -879,7 +880,7 @@ namespace Terminal.Gui {
 			};
 		}
 
-		private async Task ProcessButtonDoubleClickedAsync ()
+		async Task ProcessButtonDoubleClickedAsync ()
 		{
 			await Task.Delay (200);
 			IsButtonDoubleClicked = false;
@@ -896,11 +897,11 @@ namespace Terminal.Gui {
 				};
 
 				var view = Application.wantContinuousButtonPressedView;
-				if (view == null)
+				if (view == null) {
 					break;
+				}
 				if (IsButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
 					mouseHandler (me);
-					//mainLoop.Driver.Wakeup ();
 				}
 			}
 		}

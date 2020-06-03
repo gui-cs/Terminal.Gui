@@ -810,10 +810,8 @@ namespace Terminal.Gui {
 					if (!reopen)
 						selected = -1;
 					LastFocused.SuperView?.SetFocus (LastFocused);
-					IsMenuOpen = false;
 				} else {
 					SuperView.SetFocus (this);
-					IsMenuOpen = false;
 					PositionCursor ();
 				}
 				IsMenuOpen = false;
