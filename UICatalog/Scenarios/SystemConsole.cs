@@ -14,6 +14,7 @@ namespace UICatalog {
 		public override void RequestStop ()
 		{
 			base.RequestStop ();
+			Application.UseSystemConsole = false;
 		}
 
 		public override void Run ()

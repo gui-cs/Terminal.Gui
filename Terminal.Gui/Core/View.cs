@@ -911,8 +911,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
 		/// </summary>
-		/// <param name="bounds">The view-relative region to redraw.</param>
+		/// <param name="bounds">The bounds (view-relative region) to redraw.</param>
 		/// <remarks>
+		/// <para>
+		///    Always use <see cref="Bounds"/> (view-relative) when calling <see cref="Redraw(Rect)"/>, NOT <see cref="Frame"/> (superview-relative).
+		/// </para>
 		/// <para>
 		///    Views should set the color that they want to use on entry, as otherwise this will inherit
 		///    the last color that was set globaly on the driver.
@@ -1318,14 +1321,44 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoked when a view starts executing or
-		/// when the dimensions of the view have changed, for example in
+		/// Event arguments for the <see cref="LayoutComplete"/> event.
+		/// </summary>
+		public class LayoutEventArgs : EventArgs {
+			/// <summary>
+			/// The view-relative bounds of the <see cref="View"/> before it was laid out.
+			/// </summary>
+			public Rect OldBounds { get; set; }
+		}
+
+		/// <summary>
+		/// Fired after the Views's <see cref="LayoutSubviews"/> method has completed. 
+		/// </summary>
+		/// <remarks>
+		/// Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.
+		/// </remarks>
+		public event EventHandler<LayoutEventArgs> LayoutComplete;
+
+		/// <summary>
+		/// Raises the <see cref="LayoutComplete"/> event. Called from  <see cref="LayoutSubviews"/> after all sub-views have been laid out.
+		/// </summary>
+		internal virtual void OnLayoutComplete (LayoutEventArgs args)
+		{
+			LayoutComplete?.Invoke (this, args);
+		}
+
+		/// <summary>
+		/// Invoked when a view starts executing or when the dimensions of the view have changed, for example in
 		/// response to the container view or terminal resizing.
 		/// </summary>
+		/// <remarks>
+		/// Calls <see cref="OnLayoutComplete"/> (which raises the <see cref="LayoutComplete"/> event) before it returns.
+		/// </remarks>
 		public virtual void LayoutSubviews ()
 		{
 			if (!layoutNeeded)
 				return;
+
+			Rect oldBounds = Bounds;
 
 			// Sort out the dependencies of the X, Y, Width, Height properties
 			var nodes = new HashSet<View> ();
@@ -1363,6 +1396,8 @@ namespace Terminal.Gui {
 			}
 
 			layoutNeeded = false;
+
+			OnLayoutComplete (new LayoutEventArgs () { OldBounds = oldBounds });
 		}
 
 		/// <inheritdoc cref="ToString"/>
