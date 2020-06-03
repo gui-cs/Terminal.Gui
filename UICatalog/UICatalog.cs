@@ -88,8 +88,6 @@ namespace UICatalog {
 				scenario.Run ();
 				scenario = GetScenarioToRun ();
 			}
-			// Now closes the driver too.
-			Application.Shutdown ();
 		}
 
 		/// <summary>

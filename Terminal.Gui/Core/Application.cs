@@ -352,7 +352,7 @@ namespace Terminal.Gui {
 					View = view
 				};
 				if (OutsideFrame (new Point (nme.X, nme.Y), mouseGrabView.Frame))
-					lastMouseOwnerView.OnMouseLeave (me);
+					lastMouseOwnerView?.OnMouseLeave (me);
 				if (mouseGrabView != null) {
 					mouseGrabView.OnMouseEvent (nme);
 					return;
@@ -480,7 +480,7 @@ namespace Terminal.Gui {
 			// Closes the application if it's true.
 			if (closeDriver) {
 				MainLoop = null;
-				Driver.End ();
+				Driver?.End ();
 				Driver = null;
 			}
 
