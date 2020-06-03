@@ -185,11 +185,50 @@ namespace Terminal.Gui {
 		{
 			foreach (var item in Items) {
 				if (kb.Key == item.Shortcut) {
-					if (item.Action != null) item.Action ();
+					item.Action?.Invoke ();
 					return true;
 				}
 			}
 			return false;
+		}
+
+		///<inheritdoc cref="MouseEvent"/>
+		public override bool MouseEvent (MouseEvent me)
+		{
+			if (me.Flags != MouseFlags.Button1Clicked)
+				return false;
+
+			int pos = 1;
+			for (int i = 0; i < Items.Length; i++) {
+				if (me.X >= pos && me.X < pos + GetItemTitleLength (Items [i].Title)) {
+					Run (Items [i].Action);
+				}
+				pos += GetItemTitleLength (Items [i].Title) + 1;
+			}
+			return true;
+		}
+
+		int GetItemTitleLength (ustring title)
+		{
+			int len = 0;
+			foreach (var ch in title) {
+				if (ch == '~')
+					continue;
+				len++;
+			}
+
+			return len;
+		}
+
+		void Run (Action action)
+		{
+			if (action == null)
+				return;
+
+			Application.MainLoop.AddIdle (() => {
+				action ();
+				return false;
+			});
 		}
 	}
 }
