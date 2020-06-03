@@ -20,7 +20,7 @@ namespace Terminal.Gui {
 
 	/// <summary>
 	/// Determines the LayoutStyle for a view, if Absolute, during LayoutSubviews, the
-	/// value from the Frame will be used, if the value is Computer, then the Frame
+	/// value from the Frame will be used, if the value is Computed, then the Frame
 	/// will be updated from the X, Y Pos objects and the Width and Height Dim objects.
 	/// </summary>
 	public enum LayoutStyle {
@@ -41,68 +41,73 @@ namespace Terminal.Gui {
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	///    The View defines the base functionality for user interface elements in Terminal/gui.cs.  Views
+	///    The View defines the base functionality for user interface elements in Terminal.Gui.  Views
 	///    can contain one or more subviews, can respond to user input and render themselves on the screen.
 	/// </para>
 	/// <para>
-	///    Views can either be created with an absolute position, by calling the constructor that takes a
-	///    Rect parameter to specify the absolute position and size (the Frame of the View) or by setting the
-	///    X, Y, Width and Height properties on the view.    Both approaches use coordinates that are relative
-	///    to the container they are being added to.
+	///    Views supports two layout styles: Absolute or Computed. The choice as to which layout style is used by the View 
+	///    is determined when the View is initizlied. To create a View using Absolute layout, call a constructor that takes a
+	///    Rect parameter to specify the absolute position and size (the <c>View.<see cref="Frame "/></c>)/. To create a View 
+	///    using Computed layout use a constructor that does not take a Rect parametr and set the X, Y, Width and Height 
+	///    properties on the view. Both approaches use coordinates that are relative to the container they are being added to. 
 	/// </para>
 	/// <para>
-	///    When you do not specify a Rect frame you can use the more flexible
-	///    Dim and Pos objects that can dynamically update the position of a view.
+	///    To switch between Absolute and Computed layout, use the <see cref="LayoutStyle"/> property. 
+	/// </para>
+	/// <para>
+	///    Computed layout is more flexible and supports dynamic console apps where controls adjust layout
+	///    as the terminal resizes or other Views change size or position. The X, Y, Width and Height 
+	///    properties are Dim and Pos objects that dynamically update the position of a view.
 	///    The X and Y properties are of type <see cref="Pos"/>
 	///    and you can use either absolute positions, percentages or anchor
 	///    points.   The Width and Height properties are of type
 	///    <see cref="Dim"/> and can use absolute position,
 	///    percentages and anchors.  These are useful as they will take
-	///    care of repositioning your views if your view's frames are resized
-	///    or if the terminal size changes.
+	///    care of repositioning views when view's frames are resized or
+	///    if the terminal size changes.
 	/// </para>
 	/// <para>
-	///    When you specify the Rect parameter to a view, you are setting the LayoutStyle to Absolute, and the
-	///    view will always stay in the position that you placed it.   To change the position change the
-	///    Frame property to the new position.
+	///    Absolute layout requires specifying coordiantes and sizes of Views explicitly, and the
+	///    View will typcialy stay in a fixed position and size. To change the position and size use the
+	///    <see cref="Frame"/> property.
 	/// </para>
 	/// <para>
-	///    Subviews can be added to a View by calling the Add method.   The container of a view is the
-	///    Superview.
+	///    Subviews (child views) can be added to a View by calling the <see cref="Add(View)"/> method.   
+	///    The container of a View can be accessed with the <see cref="SuperView"/> property.
 	/// </para>
 	/// <para>
-	///    Developers can call the SetNeedsDisplay method on the view to flag a region or the entire view
+	///    The <see cref="SetNeedsDisplay(Rect)"/> method flags a region or the entire view
 	///    as requiring to be redrawn.
 	/// </para>
 	/// <para>
-	///    Views have a ColorScheme property that defines the default colors that subviews
+	///    Views have a <see cref="ColorScheme"/> property that defines the default colors that subviews
 	///    should use for rendering.   This ensures that the views fit in the context where
 	///    they are being used, and allows for themes to be plugged in.   For example, the
 	///    default colors for windows and toplevels uses a blue background, while it uses
 	///    a white background for dialog boxes and a red background for errors.
 	/// </para>
 	/// <para>
-	///    If a ColorScheme is not set on a view, the result of the ColorScheme is the
-	///    value of the SuperView and the value might only be valid once a view has been
-	///    added to a SuperView, so your subclasses should not rely on ColorScheme being
-	///    set at construction time.
+	///    Subclasses should not rely on <see cref="ColorScheme"/> being
+	///    set at construction time. If a <see cref="ColorScheme"/> is not set on a view, the view will inherit the
+	///    value from its <see cref="SuperView"/> and the value might only be valid once a view has been
+	///    added to a SuperView. 
 	/// </para>
 	/// <para>
-	///    Using ColorSchemes has the advantage that your application will work both
+	///    By using  <see cref="ColorScheme"/> applications will work both
 	///    in color as well as black and white displays.
 	/// </para>
 	/// <para>
-	///    Views that are focusable should implement the PositionCursor to make sure that
-	///    the cursor is placed in a location that makes sense.   Unix terminals do not have
+	///    Views that are focusable should implement the <see cref="PositionCursor"/> to make sure that
+	///    the cursor is placed in a location that makes sense.  Unix terminals do not have
 	///    a way of hiding the cursor, so it can be distracting to have the cursor left at
 	///    the last focused view.   So views should make sure that they place the cursor
 	///    in a visually sensible place.
 	/// </para>
 	/// <para>
-	///    The metnod LayoutSubviews is invoked when the size or layout of a view has
+	///    The <see cref="LayoutSubviews"/> method is invoked when the size or layout of a view has
 	///    changed.   The default processing system will keep the size and dimensions
-	///    for views that use the LayoutKind.Absolute, and will recompute the
-	///    frames for the vies that use LayoutKind.Computed.
+	///    for views that use the <see cref="LayoutStyle.Absolute"/>, and will recompute the
+	///    frames for the vies that use <see cref="LayoutStyle.Computed"/>.
 	/// </para>
 	/// </remarks>
 	public class View : Responder, IEnumerable {
@@ -111,17 +116,18 @@ namespace Terminal.Gui {
 			Backward
 		}
 
+		// container == SuperView
 		View container = null;
 		View focused = null;
 		Direction focusDirection;
 
 		/// <summary>
-		/// Event fired when the view get focus.
+		/// Event fired when the view gets focus.
 		/// </summary>
 		public event EventHandler<FocusEventArgs> Enter;
 
 		/// <summary>
-		/// Event fired when the view lost focus.
+		/// Event fired when the view looses focus.
 		/// </summary>
 		public event EventHandler<FocusEventArgs> Leave;
 
@@ -131,7 +137,7 @@ namespace Terminal.Gui {
 		public event EventHandler<MouseEventEventArgs> MouseEnter;
 
 		/// <summary>
-		/// Event fired when the view loses mouse event for the last time.
+		/// Event fired when the view receives a mouse event for the last time.
 		/// </summary>
 		public event EventHandler<MouseEventEventArgs> MouseLeave;
 
@@ -173,13 +179,14 @@ namespace Terminal.Gui {
 
 		internal Rect NeedDisplay { get; private set; } = Rect.Empty;
 
-		// The frame for the object
+		// The frame for the object. Superview relative.
 		Rect frame;
 
 		/// <summary>
 		/// Gets or sets an identifier for the view;
 		/// </summary>
 		/// <value>The identifier.</value>
+		/// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
 		public ustring Id { get; set; } = "";
 
 		/// <summary>
@@ -192,7 +199,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="View"/> want mouse position reports.
+		/// Gets or sets a value indicating whether this <see cref="View"/> wants mouse position reports.
 		/// </summary>
 		/// <value><c>true</c> if want mouse position reports; otherwise, <c>false</c>.</value>
 		public virtual bool WantMousePositionReports { get; set; } = false;
@@ -201,13 +208,19 @@ namespace Terminal.Gui {
 		/// Gets or sets a value indicating whether this <see cref="View"/> want continuous button pressed event.
 		/// </summary>
 		public virtual bool WantContinuousButtonPressed { get; set; } = false;
+
 		/// <summary>
-		/// Gets or sets the frame for the view.
+		/// Gets or sets the frame for the view. The frame is relative to the <see cref="SuperView"/>.
 		/// </summary>
 		/// <value>The frame.</value>
 		/// <remarks>
+		/// <para>
+		///    Change the Frame when using the <see cref="LayoutStyle.Absolute"/> layout style to move or resize views. 
+		/// </para>
+		/// <para>
 		///    Altering the Frame of a view will trigger the redrawing of the
-		///    view as well as the redrawing of the affected regions in the superview.
+		///    view as well as the redrawing of the affected regions in the <see cref="SuperView"/>.
+		/// </para>
 		/// </remarks>
 		public virtual Rect Frame {
 			get => frame;
@@ -236,9 +249,9 @@ namespace Terminal.Gui {
 		LayoutStyle layoutStyle;
 
 		/// <summary>
-		/// Controls how the view's Frame is computed during the LayoutSubviews method, if Absolute, then
-		/// LayoutSubviews does not change the Frame properties, otherwise the Frame is updated from the
-		/// values in X, Y, Width and Height properties.
+		/// Controls how the View's <see cref="Frame"/> is computed during the LayoutSubviews method, if the style is set to <see cref="LayoutStyle.Absolute"/>, 
+		/// LayoutSubviews does not change the <see cref="Frame"/>. If the style is <see cref="LayoutStyle.Computed"/> the <see cref="Frame"/> is updated using
+		/// the <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties.
 		/// </summary>
 		/// <value>The layout style.</value>
 		public LayoutStyle LayoutStyle {
@@ -250,7 +263,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The bounds represent the View-relative rectangle used for this view.   Updates to the Bounds update the Frame, and has the same side effects as updating the frame.
+		/// The bounds represent the View-relative rectangle used for this view. Updates to the Bounds update the <see cref="Frame"/>, and has the same side effects as updating the <see cref="Frame"/>.
 		/// </summary>
 		/// <value>The bounds.</value>
 		public Rect Bounds {
@@ -262,10 +275,12 @@ namespace Terminal.Gui {
 
 		Pos x, y;
 		/// <summary>
-		/// Gets or sets the X position for the view (the column).  This is only used when the LayoutStyle is Computed, if the
-		/// LayoutStyle is set to Absolute, this value is ignored.
+		/// Gets or sets the X position for the view (the column). Only used whe <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The X Position.</value>
+		/// <remarks>
+		/// If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		/// </remarks>
 		public Pos X {
 			get => x;
 			set {
@@ -275,10 +290,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the Y position for the view (line).  This is only used when the LayoutStyle is Computed, if the
-		/// LayoutStyle is set to Absolute, this value is ignored.
+		/// Gets or sets the Y position for the view (the row). Only used whe <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The y position (line).</value>
+		/// <remarks>
+		/// If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		/// </remarks>
 		public Pos Y {
 			get => y;
 			set {
@@ -290,10 +307,12 @@ namespace Terminal.Gui {
 		Dim width, height;
 
 		/// <summary>
-		/// Gets or sets the width for the view. This is only used when the LayoutStyle is Computed, if the
-		/// LayoutStyle is set to Absolute, this value is ignored.
+		/// Gets or sets the width of the view. Only used whe <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The width.</value>
+		/// <remarks>
+		/// If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		/// </remarks>
 		public Dim Width {
 			get => width;
 			set {
@@ -303,10 +322,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the height for the view. This is only used when the LayoutStyle is Computed, if the
-		/// LayoutStyle is set to Absolute, this value is ignored.
+		/// Gets or sets the height of the view. Only used whe <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The height.</value>
+		/// If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		public Dim Height {
 			get => height;
 			set {
@@ -322,11 +341,14 @@ namespace Terminal.Gui {
 		public View SuperView => container;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="View"/> class with the absolute
-		/// dimensions specified in the frame.   If you want to have Views that can be positioned with
-		/// Pos and Dim properties on X, Y, Width and Height, use the empty constructor.
+		/// Initializes a new instance of a <see cref="LayoutStyle.Absolute"/> <see cref="View"/> class with the absolute
+		/// dimensions specified in the <c>frame</c> parameter. 
 		/// </summary>
 		/// <param name="frame">The region covered by this view.</param>
+		/// <remarks>
+		/// This constructor intitalize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use <see cref="View()"/> to 
+		/// initialize a View with  <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/> 
+		/// </remarks>
 		public View (Rect frame)
 		{
 			this.Frame = frame;
@@ -335,10 +357,15 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="View"/> class and sets the
-		/// view up for Computed layout, which will use the values in X, Y, Width and Height to
-		/// compute the View's Frame.
+		/// Initializes a new instance of <see cref="LayoutStyle.Computed"/> <see cref="View"/> class.
 		/// </summary>
+		/// <remarks>
+		///   Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically control the size and location of the view.
+		/// </remarks>
+		/// <remarks>
+		///   This constructor intitalize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
+		///   Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically control the size and location of the view.
+		/// </remarks>
 		public View ()
 		{
 			CanFocus = false;
@@ -346,8 +373,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoke to flag that this view needs to be redisplayed, by any code
-		/// that alters the state of the view.
+		/// Sets a flag indicating this view needs to be redisplayed because its state has changed.
 		/// </summary>
 		public void SetNeedsDisplay ()
 		{
@@ -367,9 +393,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Flags the specified rectangle region on this view as needing to be repainted.
+		/// Flags the view-relative region on this View as needing to be repainted.
 		/// </summary>
-		/// <param name="region">The region that must be flagged for repaint.</param>
+		/// <param name="region">The view-relative region that must be flagged for repaint.</param>
 		public void SetNeedsDisplay (Rect region)
 		{
 			if (NeedDisplay == null || NeedDisplay.IsEmpty)
@@ -397,7 +423,7 @@ namespace Terminal.Gui {
 		internal bool childNeedsDisplay;
 
 		/// <summary>
-		/// Flags this view for requiring the children views to be repainted.
+		/// Indicates that any child views (in the <see cref="Subviews"/> list) need to be repainted.
 		/// </summary>
 		public void ChildNeedsDisplay ()
 		{
@@ -407,9 +433,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Adds a subview to this view.
+		///   Adds a subview (child) to this view.
 		/// </summary>
 		/// <remarks>
+		/// The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/> 
 		/// </remarks>
 		public virtual void Add (View view)
 		{
@@ -426,9 +453,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Adds the specified views to the view.
+		/// Adds the specified views (children) to the view.
 		/// </summary>
 		/// <param name="views">Array of one or more views (can be optional parameter).</param>
+		/// <remarks>
+		/// The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/> 
+		/// </remarks>
 		public void Add (params View [] views)
 		{
 			if (views == null)
@@ -438,10 +468,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Removes all the widgets from this container.
+		///   Removes all subviews (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
 		/// </summary>
-		/// <remarks>
-		/// </remarks>
 		public virtual void RemoveAll ()
 		{
 			if (subviews == null)
@@ -453,7 +481,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Removes a widget from this container.
+		///   Removes a subview added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
@@ -573,27 +601,30 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Clears the specified rectangular region with the current color
+		///   Clears the specified region with the current color. 
 		/// </summary>
-		public void Clear (Rect r)
+		/// <remarks>
+		/// </remarks>
+		/// <param name="regionScreen">The screen-relative region to clear.</param>
+		public void Clear (Rect regionScreen)
 		{
-			var h = r.Height;
-			var w = r.Width;
-			for (int line = r.Y; line < r.Y + h; line++) {
-				Driver.Move (r.X, line);
+			var h = regionScreen.Height;
+			var w = regionScreen.Width;
+			for (int line = regionScreen.Y; line < regionScreen.Y + h; line++) {
+				Driver.Move (regionScreen.X, line);
 				for (int col = 0; col < w; col++)
 					Driver.AddRune (' ');
 			}
 		}
 
 		/// <summary>
-		/// Converts the (col,row) position from the view into a screen (col,row).  The values are clamped to (0..ScreenDim-1)
+		/// Converts a view-relative (col,row) position to a screen-relative position (col,row). The values are optionally clamped to the screen dimensions.
 		/// </summary>
-		/// <param name="col">View-based column.</param>
-		/// <param name="row">View-based row.</param>
-		/// <param name="rcol">Absolute column, display relative.</param>
-		/// <param name="rrow">Absolute row, display relative.</param>
-		/// <param name="clipped">Whether to clip the result of the ViewToScreen method, if set to true, the rcol, rrow values are clamped to the screen dimensions.</param>
+		/// <param name="col">View-relative column.</param>
+		/// <param name="row">View-relative row.</param>
+		/// <param name="rcol">Absolute column; screen-relative.</param>
+		/// <param name="rrow">Absolute row; screen-relative.</param>
+		/// <param name="clipped">Whether to clip the result of the ViewToScreen method, if set to <c>true</c>, the rcol, rrow values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
 		internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Computes the real row, col relative to the screen.
@@ -614,7 +645,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Converts a point from screen coordinates into the view coordinate space.
+		/// Converts a point from screen-relative coordinates to view-relative coordinates.
 		/// </summary>
 		/// <returns>The mapped point.</returns>
 		/// <param name="x">X screen-coordinate point.</param>
@@ -629,66 +660,72 @@ namespace Terminal.Gui {
 			}
 		}
 
-		// Converts a rectangle in view coordinates to screen coordinates.
-		internal Rect RectToScreen (Rect rect)
+		/// <summary>
+		/// Converts a region in view-relative coordinates to screen-relative coordinates.
+		/// </summary>
+		internal Rect ViewToScreen (Rect region)
 		{
-			ViewToScreen (rect.X, rect.Y, out var x, out var y, clipped: false);
-			return new Rect (x, y, rect.Width, rect.Height);
+			ViewToScreen (region.X, region.Y, out var x, out var y, clipped: false);
+			return new Rect (x, y, region.Width, region.Height);
 		}
 
 		// Clips a rectangle in screen coordinates to the dimensions currently available on the screen
-		internal Rect ScreenClip (Rect rect)
+		internal Rect ScreenClip (Rect regionScreen)
 		{
-			var x = rect.X < 0 ? 0 : rect.X;
-			var y = rect.Y < 0 ? 0 : rect.Y;
-			var w = rect.X + rect.Width >= Driver.Cols ? Driver.Cols - rect.X : rect.Width;
-			var h = rect.Y + rect.Height >= Driver.Rows ? Driver.Rows - rect.Y : rect.Height;
+			var x = regionScreen.X < 0 ? 0 : regionScreen.X;
+			var y = regionScreen.Y < 0 ? 0 : regionScreen.Y;
+			var w = regionScreen.X + regionScreen.Width >= Driver.Cols ? Driver.Cols - regionScreen.X : regionScreen.Width;
+			var h = regionScreen.Y + regionScreen.Height >= Driver.Rows ? Driver.Rows - regionScreen.Y : regionScreen.Height;
 
 			return new Rect (x, y, w, h);
 		}
 
 		/// <summary>
-		/// Sets the Console driver's clip region to the current View's Bounds.
+		/// Sets the <see cref="ConsoleDriver"/>'s clip region to the current View's <see cref="Bounds"/>.
 		/// </summary>
-		/// <returns>The existing driver's Clip region, which can be then set by setting the Driver.Clip property.</returns>
+		/// <returns>The existing driver's clip region, which can be then re-eapplied by setting <c><see cref="Driver"/>.Clip</c> (<see cref="ConsoleDriver.Clip"/>).</returns>
+		/// <remarks>
+		/// <see cref="Bounds"/> is View-relative.
+		/// </remarks>
 		public Rect ClipToBounds ()
 		{
 			return SetClip (Bounds);
 		}
 
 		/// <summary>
-		/// Sets the clipping region to the specified region, the region is view-relative
+		/// Sets the clip region to the specified view-relative region.
 		/// </summary>
-		/// <returns>The previous clip region.</returns>
-		/// <param name="rect">Rectangle region to clip into, the region is view-relative.</param>
-		public Rect SetClip (Rect rect)
+		/// <returns>The previous screen-relative clip region.</returns>
+		/// <param name="region">View-relative clip region.</param>
+		public Rect SetClip (Rect region)
 		{
-			var bscreen = RectToScreen (rect);
 			var previous = Driver.Clip;
-			Driver.Clip = ScreenClip (RectToScreen (Bounds)); 
+			Driver.Clip = Rect.Intersect (previous, ViewToScreen (region));
 			return previous;
 		}
 
 		/// <summary>
 		/// Draws a frame in the current view, clipped by the boundary of this view
 		/// </summary>
-		/// <param name="rect">Rectangular region for the frame to be drawn.</param>
-		/// <param name="padding">The padding to add to the drawn frame.</param>
+		/// <param name="region">View-relative region for the frame to be drawn.</param>
+		/// <param name="padding">The padding to add around the outside of the drawn frame.</param>
 		/// <param name="fill">If set to <c>true</c> it fill will the contents.</param>
-		public void DrawFrame (Rect rect, int padding = 0, bool fill = false)
+		public void DrawFrame (Rect region, int padding = 0, bool fill = false)
 		{
-			var scrRect = RectToScreen (rect);
+			var scrRect = ViewToScreen (region);
 			var savedClip = ClipToBounds ();
-			Driver.DrawFrame (scrRect, padding, fill);
+			Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: fill);
 			Driver.Clip = savedClip;
 		}
 
 		/// <summary>
-		/// Utility function to draw strings that contain a hotkey
+		/// Utility function to draw strings that contain a hotkey.
 		/// </summary>
 		/// <param name="text">String to display, the underscoore before a letter flags the next letter as the hotkey.</param>
 		/// <param name="hotColor">Hot color.</param>
 		/// <param name="normalColor">Normal color.</param>
+		/// <remarks>
+		/// The hotkey is any character following an underscore ('_') character.</remarks>
 		public void DrawHotString (ustring text, Attribute hotColor, Attribute normalColor)
 		{
 			Driver.SetAttribute (normalColor);
@@ -703,7 +740,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Utility function to draw strings that contains a hotkey using a colorscheme and the "focused" state.
+		/// Utility function to draw strings that contains a hotkey using a <see cref="ColorScheme"/> and the "focused" state.
 		/// </summary>
 		/// <param name="text">String to display, the underscoore before a letter flags the next letter as the hotkey.</param>
 		/// <param name="focused">If set to <c>true</c> this uses the focused colors from the color scheme, otherwise the regular ones.</param>
@@ -720,8 +757,8 @@ namespace Terminal.Gui {
 		/// This moves the cursor to the specified column and row in the view.
 		/// </summary>
 		/// <returns>The move.</returns>
-		/// <param name="col">Col.</param>
-		/// <param name="row">Row.</param>
+		/// <param name="col">Col (view-relative).</param>
+		/// <param name="row">Row (view-relative).</param>
 		public void Move (int col, int row)
 		{
 			ViewToScreen (col, row, out var rcol, out var rrow);
@@ -731,6 +768,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		///   Positions the cursor in the right position based on the currently focused view in the chain.
 		/// </summary>
+		///    Views that are focusable should override <see cref="PositionCursor"/> to ensure
+		///    the cursor is placed in a location that makes sense. Unix terminals do not have
+		///    a way of hiding the cursor, so it can be distracting to have the cursor left at
+		///    the last focused view. Views should make sure that they place the cursor
+		///    in a visually sensible place.
 		public virtual void PositionCursor ()
 		{
 			if (focused != null)
@@ -763,7 +805,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Specifies the event arguments for <see cref="SetFocus(View)"/>
+		/// Defines the event arguments for <see cref="SetFocus(View)"/>
 		/// </summary>
 		public class FocusEventArgs : EventArgs {
 			/// <summary>
@@ -825,7 +867,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The color scheme for this view, if it is not defined, it returns the parent's
+		/// The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s
 		/// color scheme.
 		/// </summary>
 		public ColorScheme ColorScheme {
@@ -842,10 +884,10 @@ namespace Terminal.Gui {
 		ColorScheme colorScheme;
 
 		/// <summary>
-		/// Displays the specified character in the specified column and row.
+		/// Displays the specified character in the specified column and row of the View.
 		/// </summary>
-		/// <param name="col">Col.</param>
-		/// <param name="row">Row.</param>
+		/// <param name="col">Column (view-relative).</param>
+		/// <param name="row">Row (view-relative).</param>
 		/// <param name="ch">Ch.</param>
 		public void AddRune (int col, int row, Rune ch)
 		{
@@ -858,7 +900,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Removes the SetNeedsDisplay and the ChildNeedsDisplay setting on this view.
+		/// Removes the <see cref="SetNeedsDisplay()"/> and the <see cref="ChildNeedsDisplay"/> setting on this view.
 		/// </summary>
 		protected void ClearNeedsDisplay ()
 		{
@@ -867,37 +909,40 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Performs a redraw of this view and its subviews, only redraws the views that have been flagged for a re-display.
+		/// Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
 		/// </summary>
-		/// <param name="region">The region to redraw, this is relative to the view itself.</param>
+		/// <param name="bounds">The bounds (view-relative region) to redraw.</param>
 		/// <remarks>
+		/// <para>
+		///    Always use <see cref="Bounds"/> (view-relative) when calling <see cref="Redraw(Rect)"/>, NOT <see cref="Frame"/> (superview-relative).
+		/// </para>
 		/// <para>
 		///    Views should set the color that they want to use on entry, as otherwise this will inherit
 		///    the last color that was set globaly on the driver.
 		/// </para>
+		/// <para>
+		///    Overrides of <see cref="Redraw"/> must ensure they do not set <c>Driver.Clip</c> to a clip region
+		///    larger than the <c>region</c> parameter.
+		/// </para>
 		/// </remarks>
-		public virtual void Redraw (Rect region)
+		public virtual void Redraw (Rect bounds)
 		{
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
 			if (subviews != null) {
 				foreach (var view in subviews) {
 					if (view.NeedDisplay != null && (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay)) {
-						if (view.Frame.IntersectsWith (clipRect) && view.Frame.IntersectsWith (region)) {
+						if (view.Frame.IntersectsWith (clipRect) && view.Frame.IntersectsWith (bounds)) {
 
 							// FIXED: optimize this by computing the intersection of region and view.Bounds
 							if (view.layoutNeeded)
 								view.LayoutSubviews ();
 							Application.CurrentView = view;
 
-							// Ensure we don't make the Driver's clip rect any bigger
-							if (Driver.Clip.IsEmpty || Driver.Clip.Contains(RectToScreen (view.Frame))) {
-								var savedClip = view.ClipToBounds ();
-								view.Redraw (view.Bounds);
-								Driver.Clip = savedClip;
-							} else {
-								view.Redraw (view.Bounds);
-							}
+							// Clip the sub-view
+							var savedClip = ClipToBounds ();
+							view.Redraw (view.Bounds);
+							Driver.Clip = savedClip;
 						}
 						view.NeedDisplay = Rect.Empty;
 						view.childNeedsDisplay = false;
@@ -908,7 +953,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Focuses the specified sub-view.
+		/// Causes the specified subview to have focus.
 		/// </summary>
 		/// <param name="view">View.</param>
 		public void SetFocus (View view)
@@ -941,7 +986,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Specifies the event arguments for <see cref="KeyEvent"/>
+		/// Defines the event arguments for <see cref="KeyEvent"/>
 		/// </summary>
 		public class KeyEventEventArgs : EventArgs {
 			/// <summary>
@@ -1187,10 +1232,13 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Computes the RelativeLayout for the view, given the frame for its container.
+		/// Sets the View's <see cref="Frame"/> to the relative coordinates if its container, given the <see cref="Frame"/> for its container.
 		/// </summary>
-		/// <param name="hostFrame">The Frame for the host.</param>
-		internal void RelativeLayout (Rect hostFrame)
+		/// <param name="hostFrame">The screen-relative frame for the host.</param>
+		/// <remarks>
+		/// Reminder: <see cref="Frame"/> is superview-relative; <see cref="Bounds"/> is view-relative.
+		/// </remarks>
+		internal void SetRelativeLayout (Rect hostFrame)
 		{
 			int w, h, _x, _y;
 
@@ -1228,7 +1276,6 @@ namespace Terminal.Gui {
 					h = height.Anchor (hostFrame.Height - _y);
 			}
 			Frame = new Rect (_x, _y, w, h);
-			// layoutNeeded = false;
 		}
 
 		// https://en.wikipedia.org/wiki/Topological_sorting
@@ -1274,14 +1321,44 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// This virtual method is invoked when a view starts executing or
-		/// when the dimensions of the view have changed, for example in
+		/// Event arguments for the <see cref="LayoutComplete"/> event.
+		/// </summary>
+		public class LayoutEventArgs : EventArgs {
+			/// <summary>
+			/// The view-relative bounds of the <see cref="View"/> before it was laid out.
+			/// </summary>
+			public Rect OldBounds { get; set; }
+		}
+
+		/// <summary>
+		/// Fired after the Views's <see cref="LayoutSubviews"/> method has completed. 
+		/// </summary>
+		/// <remarks>
+		/// Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.
+		/// </remarks>
+		public event EventHandler<LayoutEventArgs> LayoutComplete;
+
+		/// <summary>
+		/// Raises the <see cref="LayoutComplete"/> event. Called from  <see cref="LayoutSubviews"/> after all sub-views have been laid out.
+		/// </summary>
+		internal virtual void OnLayoutComplete (LayoutEventArgs args)
+		{
+			LayoutComplete?.Invoke (this, args);
+		}
+
+		/// <summary>
+		/// Invoked when a view starts executing or when the dimensions of the view have changed, for example in
 		/// response to the container view or terminal resizing.
 		/// </summary>
+		/// <remarks>
+		/// Calls <see cref="OnLayoutComplete"/> (which raises the <see cref="LayoutComplete"/> event) before it returns.
+		/// </remarks>
 		public virtual void LayoutSubviews ()
 		{
 			if (!layoutNeeded)
 				return;
+
+			Rect oldBounds = Bounds;
 
 			// Sort out the dependencies of the X, Y, Width, Height properties
 			var nodes = new HashSet<View> ();
@@ -1307,7 +1384,7 @@ namespace Terminal.Gui {
 
 			foreach (var v in ordered) {
 				if (v.LayoutStyle == LayoutStyle.Computed)
-					v.RelativeLayout (Frame);
+					v.SetRelativeLayout (Frame);
 
 				v.LayoutSubviews ();
 				v.layoutNeeded = false;
@@ -1315,10 +1392,12 @@ namespace Terminal.Gui {
 			}
 
 			if (SuperView == Application.Top && layoutNeeded && ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
-				RelativeLayout (Frame);
+				SetRelativeLayout (Frame);
 			}
 
 			layoutNeeded = false;
+
+			OnLayoutComplete (new LayoutEventArgs () { OldBounds = oldBounds });
 		}
 
 		/// <inheritdoc cref="ToString"/>

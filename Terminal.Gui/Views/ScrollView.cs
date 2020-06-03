@@ -400,7 +400,6 @@ namespace Terminal.Gui {
 		/// This event is raised when the contents have scrolled
 		/// </summary>
 		//public event Action<ScrollView> Scrolled;
-
 		public override void Redraw(Rect region)
 		{
 			SetViewsNeedsDisplay ();
@@ -409,6 +408,8 @@ namespace Terminal.Gui {
 
 			var savedClip = ClipToBounds ();
 			contentView.Redraw (contentView.Bounds);
+			Driver.Clip = savedClip;
+
 			vertical.Redraw (vertical.Bounds);
 			horizontal.Redraw (horizontal.Bounds);
 			Driver.Clip = savedClip;

@@ -120,7 +120,7 @@ namespace Terminal.Gui {
 			Width = Dim.Fill ();
 			Height = 1;
 
-			Application.Loaded += (sender, e) => {
+			LayoutComplete += (sender, e) => {
 				X = 0;
 				Height = 1;
 #if SNAP_TO_TOP
@@ -132,7 +132,7 @@ namespace Terminal.Gui {
 				case StatusBarStyle.SnapToBottom:
 #endif
 					if (Parent == null) {
-						Y = e.Rows - 1; 
+						Y = Driver.Rows - 1; 
 					} else {
 						Y = Pos.Bottom (Parent);
 					}
@@ -151,7 +151,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc cref="Redraw"/>
-		public override void Redraw (Rect region)
+		public override void Redraw (Rect bounds)
 		{
 			//if (Frame.Y != Driver.Rows - 1) {
 			//	Frame = new Rect (Frame.X, Driver.Rows - 1, Frame.Width, Frame.Height);

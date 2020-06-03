@@ -5,7 +5,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using Terminal.Gui;
+using Rune = System.Rune;
 
 /// <remarks>
 /// <para>
@@ -55,6 +58,8 @@ namespace UICatalog {
 		private static StatusItem _scrolllock;
 
 		private static Scenario _runningScenario = null;
+		private static bool _useSystemConsole = false;
+		private static MenuItem _sysConsoleMenu;
 
 		static void Main (string [] args)
 		{
@@ -76,6 +81,7 @@ namespace UICatalog {
 
 			Scenario scenario = GetScenarioToRun ();
 			while (scenario != null) {
+				Application.UseSystemConsole = _useSystemConsole;
 				Application.Init ();
 				scenario.Init (Application.Top);
 				scenario.Setup ();
@@ -87,15 +93,65 @@ namespace UICatalog {
 		}
 
 		/// <summary>
+		/// This shows the selection UI. Each time it is run, it calls Application.Init to reset everything.
+		/// </summary>
+		/// <returns></returns>
+		private static Scenario GetScenarioToRun ()
+		{
+			Application.UseSystemConsole = false;
+			Application.Init ();
+
+			if (_menu == null) {
+				Setup ();
+			}
+
+			_top = Application.Top;
+
+			_top.KeyDown += KeyDownHandler;
+
+			_top.Add (_menu);
+			_top.Add (_leftPane);
+			_top.Add (_rightPane);
+			_top.Add (_statusBar);
+
+			_top.Ready += (o, a) => {
+				if (_runningScenario != null) {
+					_top.SetFocus (_rightPane);
+					_runningScenario = null;
+				}
+			};
+
+			Application.Run (_top, false);
+			Application.Shutdown ();
+			return _runningScenario;
+		}
+
+
+		/// <summary>
 		/// Create all controls. This gets called once and the controls remain with their state between Sceanrio runs.
 		/// </summary>
 		private static void Setup ()
 		{
+			StringBuilder aboutMessage = new StringBuilder ();
+			aboutMessage.AppendLine ("UI Catalog is a comprehensive sample library for Terminal.Gui");
+			aboutMessage.AppendLine ("");
+			aboutMessage.AppendLine ($"Version: {typeof(UICatalogApp).Assembly.GetName ().Version}");
+			aboutMessage.AppendLine ($"Using Terminal.Gui Version: {typeof (Terminal.Gui.Application).Assembly.GetName ().Version}");
+			aboutMessage.AppendLine ("");
+
+			void HandleSysConsoleMenuChange ()
+			{
+				_useSystemConsole = !_useSystemConsole;
+				_sysConsoleMenu.Title = $"[{(_useSystemConsole ? 'x' : ' ')}] _Use System Console";
+			}
+			_sysConsoleMenu = new MenuItem ($"[{(_useSystemConsole ? 'x' : ' ')}] _Use System Console", "", () => HandleSysConsoleMenuChange ());
+
 			_menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Application.RequestStop() )
 				}),
-				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query (50, 10, "About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok")),
+				new MenuBarItem ("_Settings", new MenuItem [] { _sysConsoleMenu }),
+				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "Ok")),
 			});
 
 			_leftPane = new Window ("Categories") {
@@ -142,24 +198,17 @@ namespace UICatalog {
 				CanFocus = true,
 			};
 
-			//_scenarioListView.OnKeyPress += (KeyEvent ke) => {
-			//	if (_top.MostFocused == _scenarioListView && ke.Key == Key.Enter) {
-			//		_scenarioListView_OpenSelectedItem (null, null);
-			//	}
-			//};
-
 			_scenarioListView.OpenSelectedItem += _scenarioListView_OpenSelectedItem;
 			_rightPane.Add (_scenarioListView);
 
 			_categoryListView.SelectedItem = 0;
 			_categoryListView.OnSelectedChanged ();
 
-			_capslock = new StatusItem (Key.CharMask, "CapslockOff", null);
-			_numlock = new StatusItem (Key.CharMask, "NumlockOff", null);
-			_scrolllock = new StatusItem (Key.CharMask, "ScrolllockOff", null);
+			_capslock = new StatusItem (Key.CharMask, "Capslock", null);
+			_numlock = new StatusItem (Key.CharMask, "Numlock", null);
+			_scrolllock = new StatusItem (Key.CharMask, "Scrolllock", null);
 
 			_statusBar = new StatusBar (new StatusItem [] {
-				//new StatusItem(Key.F1, "~F1~ Help", () => Help()),
 				new StatusItem(Key.ControlQ, "~CTRL-Q~ Quit", () => {
 					if (_runningScenario is null){
 						// This causes GetScenarioToRun to return null
@@ -175,51 +224,6 @@ namespace UICatalog {
 			});
 		}
 
-		/// <summary>
-		/// This shows the selection UI. Each time it is run, it calls Application.Init to reset everything.
-		/// </summary>
-		/// <returns></returns>
-		private static Scenario GetScenarioToRun ()
-		{
-			Application.Init ();
-
-			if (_menu == null) {
-				Setup ();
-			}
-
-			_top = Application.Top;
-
-			_top.KeyDown += KeyDownHandler;
-
-			_top.Add (_menu);
-			_top.Add (_leftPane);
-			_top.Add (_rightPane);
-			_top.Add (_statusBar);
-
-			// HACK: There is no other way to SetFocus before Application.Run. See Issue #445
-#if false
-			if (_runningScenario != null)
-				Application.Iteration += Application_Iteration;
-#else
-			_top.Ready += (o, a) => {
-				if (_runningScenario != null) {
-					_top.SetFocus (_rightPane);
-					_runningScenario = null;
-				}
-			};
-#endif
-			
-			Application.Run (_top, false);
-			return _runningScenario;
-		}
-
-#if false
-		private static void Application_Iteration (object sender, EventArgs e)
-		{
-			Application.Iteration -= Application_Iteration;
-			_top.SetFocus (_rightPane);
-		}
-#endif
 		private static void _scenarioListView_OpenSelectedItem (object sender, EventArgs e)
 		{
 			if (_runningScenario is null) {
@@ -232,7 +236,7 @@ namespace UICatalog {
 		internal class ScenarioListDataSource : IListDataSource {
 			public List<Type> Scenarios { get; set; }
 
-			public bool IsMarked (int item) => false;//  Scenarios [item].IsMarked;
+			public bool IsMarked (int item) => false;
 
 			public int Count => Scenarios.Count;
 
@@ -274,7 +278,6 @@ namespace UICatalog {
 			{
 				return Scenarios;
 			}
-
 		}
 
 		/// <summary>
@@ -285,15 +288,7 @@ namespace UICatalog {
 		/// <param name="ke"></param>
 		private static void KeyDownHandler (object sender, View.KeyEventEventArgs a)
 		{
-			if (_runningScenario != null) {
-				//switch (ke.Key) {
-				//case Key.Esc:
-				//	//_runningScenario.RequestStop ();
-				//	break;
-				//case Key.Enter:
-				//	break;
-				//}<
-			} else if (a.KeyEvent.Key == Key.Tab || a.KeyEvent.Key == Key.BackTab) {
+			if (a.KeyEvent.Key == Key.Tab || a.KeyEvent.Key == Key.BackTab) {
 				// BUGBUG: Work around Issue #434 by implementing our own TAB navigation
 				if (_top.MostFocused == _categoryListView)
 					_top.SetFocus (_rightPane);
@@ -302,26 +297,26 @@ namespace UICatalog {
 			}
 
 			if (a.KeyEvent.IsCapslock) {
-				_capslock.Title = "CapslockOn";
+				_capslock.Title = "Capslock: On";
 				_statusBar.SetNeedsDisplay ();
 			} else {
-				_capslock.Title = "CapslockOff";
+				_capslock.Title = "Capslock: Off";
 				_statusBar.SetNeedsDisplay ();
 			}
 
 			if (a.KeyEvent.IsNumlock) {
-				_numlock.Title = "NumlockOn";
+				_numlock.Title = "Numlock: On";
 				_statusBar.SetNeedsDisplay ();
 			} else {
-				_numlock.Title = "NumlockOff";
+				_numlock.Title = "Numlock: Off";
 				_statusBar.SetNeedsDisplay ();
 			}
 
 			if (a.KeyEvent.IsScrolllock) {
-				_scrolllock.Title = "ScrolllockOn";
+				_scrolllock.Title = "Scrolllock: On";
 				_statusBar.SetNeedsDisplay ();
 			} else {
-				_scrolllock.Title = "ScrolllockOff";
+				_scrolllock.Title = "Scrolllock: Off";
 				_statusBar.SetNeedsDisplay ();
 			}
 		}

@@ -562,7 +562,7 @@ namespace Terminal.Gui {
 		const char bottomChar = clearChar;
 #endif
 		/// <summary>
-		/// Draws a frame for a window with padding aand n optional visible border inside the padding. 
+		/// Draws a frame for a window with padding and an optional visible border inside the padding. 
 		/// </summary>
 		/// <param name="region">Screen relative region where the frame will be drawn.</param>
 		/// <param name="paddingLeft">Number of columns to pad on the left (if 0 the border will not appear on the left).</param>
@@ -724,7 +724,7 @@ namespace Terminal.Gui {
 			// DrawFrame assumes the border is always at least one row/col thick
 			// DrawWindowFrame assumes a padding of 0 means NO padding and no frame
 			DrawWindowFrame (new Rect (region.X, region.Y, region.Width, region.Height), 
-				padding + 1, padding + 1, padding + 1, padding + 1, fill: fill);
+				padding + 1, padding + 1, padding + 1, padding + 1, border: false, fill: fill);
 		}
 
 

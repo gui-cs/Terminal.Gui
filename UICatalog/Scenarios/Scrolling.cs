@@ -7,10 +7,89 @@ namespace UICatalog {
 	[ScenarioCategory ("Bug Repro")]
 
 	class Scrolling : Scenario {
+
+		//class Box10x : View, IScrollView {
+		class Box10x : View {
+			int w = 40;
+			int h = 50;
+
+			public bool WantCursorPosition { get; set; } = false;
+
+			public Box10x (int x, int y) : base (new Rect (x, y, 20, 10))
+			{
+			}
+
+			public Size GetContentSize ()
+			{
+				return new Size (w, h);
+			}
+
+			public void SetCursorPosition (Point pos)
+			{
+				throw new NotImplementedException ();
+			}
+
+			public override void Redraw (Rect bounds)
+			{
+				//Point pos = new Point (region.X, region.Y);
+				Driver.SetAttribute (ColorScheme.Focus);
+
+				for (int y = 0; y < h; y++) {
+					Move (0, y);
+					Driver.AddStr (y.ToString ());
+					for (int x = 0; x < w - y.ToString ().Length; x++) {
+						//Driver.AddRune ((Rune)('0' + (x + y) % 10));
+						if (y.ToString ().Length < w)
+							Driver.AddStr (" ");
+					}
+				}
+				//Move (pos.X, pos.Y);
+			}
+		}
+
+		class Filler : View {
+			public Filler (Rect rect) : base (rect)
+			{
+			}
+
+			public override void Redraw (Rect bounds)
+			{
+				Driver.SetAttribute (ColorScheme.Focus);
+				var f = Frame;
+
+				for (int y = 0; y < f.Width; y++) {
+					Move (0, y);
+					for (int x = 0; x < f.Height; x++) {
+						Rune r;
+						switch (x % 3) {
+						case 0:
+							Driver.AddRune (y.ToString ().ToCharArray (0, 1) [0]);
+							if (y > 9)
+								Driver.AddRune (y.ToString ().ToCharArray (1, 1) [0]);
+							r = '.';
+							break;
+						case 1:
+							r = 'o';
+							break;
+						default:
+							r = 'O';
+							break;
+						}
+						Driver.AddRune (r);
+					}
+				}
+			}
+		}
+
 		public override void Setup ()
 		{
+			Win.X = 3;
+			Win.Y = 3;
+			Win.Width = Dim.Fill () - 3;
+			Win.Height = Dim.Fill () - 3;
 			var label = new Label ("ScrollView (new Rect (2, 2, 50, 20)) with a 200, 100 ContentSize...") {
-				X = 0, Y = 0,
+				X = 0,
+				Y = 0,
 				ColorScheme = Colors.Dialog
 			};
 			Win.Add (label);
@@ -42,8 +121,9 @@ namespace UICatalog {
 			};
 			scrollView.Add (verticalRuler);
 
-			Application.Resized += (sender, a) => {
-				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
+			Win.LayoutComplete += (sender, a) => {
+				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)] +
+				"\n" + "|         ".Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
 				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height * 2)];
 			};
 
@@ -56,7 +136,7 @@ namespace UICatalog {
 			scrollView.Add (new Button ("A very long button. Should be wide enough to demo clipping!") {
 				X = 3,
 				Y = 4,
-				Width = 50,
+				Width = Dim.Fill (6),
 				Clicked = () => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No")
 			});
 
@@ -97,7 +177,44 @@ namespace UICatalog {
 			};
 			scrollView.Add (anchorButton);
 
-			Win.Add (scrollView);
+			var scrollView2 = new ScrollView (new Rect (55, 2, 20, 8)) {
+				ContentSize = new Size (20, 50),
+				//ContentOffset = new Point (0, 0),
+				ShowVerticalScrollIndicator = true,
+				ShowHorizontalScrollIndicator = true
+			};
+			scrollView2.Add (new Filler(new Rect (0, 0, 60, 40)));
+
+			// This is just to debug the visuals of the scrollview when small
+			var scrollView3 = new ScrollView (new Rect (55, 15, 3, 3)) {
+				ContentSize = new Size (100, 100),
+				ShowVerticalScrollIndicator = true,
+				ShowHorizontalScrollIndicator = true
+			};
+			scrollView3.Add (new Box10x (0, 0));
+
+			int count = 0;
+			var mousePos = new Label ("Mouse: ");
+			mousePos.X = Pos.Center ();
+			mousePos.Y = Pos.AnchorEnd (1);
+			mousePos.Width = 50;
+			Application.RootMouseEvent += delegate (MouseEvent me) {
+				mousePos.TextColor = Colors.TopLevel.Normal;
+				mousePos.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
+			};
+
+			var progress = new ProgressBar ();
+			progress.X = 5;
+			progress.Y = Pos.AnchorEnd (3);
+			progress.Width = 50;
+			bool timer (MainLoop caller)
+			{
+				progress.Pulse ();
+				return true;
+			}
+			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
+
+			Win.Add (scrollView, scrollView2, scrollView3, mousePos, progress);
 		}
 	}
 }

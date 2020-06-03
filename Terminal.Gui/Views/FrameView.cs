@@ -136,23 +136,20 @@ namespace Terminal.Gui {
 		{
 			var padding = 0;
 			Application.CurrentView = this;
-			var scrRect = RectToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
+			var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
 
 			if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
 				Driver.SetAttribute (ColorScheme.Normal);
-				Driver.DrawFrame (scrRect, padding, true);
+				Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: true);
 			}
 
-			if (Driver.Clip.IsEmpty || Driver.Clip.Contains (contentView.RectToScreen (contentView.Frame))) {
-				var savedClip = ClipToBounds (); 
-				contentView.Redraw (contentView.Bounds);
-				Driver.Clip = savedClip;
-			} else {
-				contentView.Redraw (contentView.Bounds);
-			}
+			var savedClip = ClipToBounds ();
+			contentView.Redraw (contentView.Bounds);
+			Driver.Clip = savedClip;
+
 			ClearNeedsDisplay ();
 			Driver.SetAttribute (ColorScheme.Normal);
-			Driver.DrawFrame (scrRect, padding, false);
+			Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
 
 			if (HasFocus)
 				Driver.SetAttribute (ColorScheme.HotNormal);
