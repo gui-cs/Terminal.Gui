@@ -91,12 +91,11 @@ namespace Terminal.Gui {
 			return QueryFull (true, 0, 0, title, message, buttons);
 		}
 
-
 		static int QueryFull (bool useErrorColors, int width, int height, ustring title, ustring message, params ustring [] buttons)
 		{
 			const int defaultWidth = 30;
 			int textWidth = Label.MaxWidth (message, width);
-			int textHeight = message.Count(ustring.Make('\n')) + 1;
+			int textHeight = message.Count (ustring.Make ('\n')) + 1;
 			int msgboxHeight = Math.Max (1, textHeight) + 4; // textHeight + (top + top padding + buttons + bottom)
 
 			// Create button array for Dialog
@@ -126,15 +125,12 @@ namespace Terminal.Gui {
 
 			if (message != null) {
 				var l = new Label (textWidth > width ? 0 : (width - 4 - textWidth) / 2, 1, message);
-				//l.ColorScheme = Colors.Menu;
-				if (true) { //width == 0 & height == 0) {
-					l.LayoutStyle = LayoutStyle.Computed;
-					l.TextAlignment = TextAlignment.Centered;
-					l.X = Pos.Center ();
-					l.Y = Pos.Center ();
-					l.Width = Dim.Fill (2);
-					l.Height = Dim.Fill (2);
-				}
+				l.LayoutStyle = LayoutStyle.Computed;
+				l.TextAlignment = TextAlignment.Centered;
+				l.X = Pos.Center ();
+				l.Y = Pos.Center ();
+				l.Width = Dim.Fill (2);
+				l.Height = Dim.Fill (2);
 				d.Add (l);
 			}
 

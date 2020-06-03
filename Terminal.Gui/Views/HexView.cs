@@ -311,14 +311,10 @@ namespace Terminal.Gui {
 			case Key.CursorUp:
 				MoveUp (bytesPerLine);
 				break;
-			case Key.Tab:
-				if (keyEvent.IsCtrl) {
-					SuperView.FocusNext ();
-				} else {
-					leftSide = !leftSide;
-					RedisplayLine (position);
-					firstNibble = true;
-				}
+			case Key.Enter:
+				leftSide = !leftSide;
+				RedisplayLine (position);
+				firstNibble = true;
 				break;
 			case ((int)'v' + Key.AltMask):
 			case Key.PageUp:

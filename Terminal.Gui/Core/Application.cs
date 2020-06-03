@@ -481,6 +481,7 @@ namespace Terminal.Gui {
 			if (closeDriver) {
 				MainLoop = null;
 				Driver.End ();
+				Driver = null;
 			}
 
 			_initialized = false;
