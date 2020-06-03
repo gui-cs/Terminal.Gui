@@ -480,7 +480,7 @@ namespace Terminal.Gui {
 			// Closes the application if it's true.
 			if (closeDriver) {
 				MainLoop = null;
-				Driver.End ();
+				Driver?.End ();
 				Driver = null;
 			}
 
