@@ -15,10 +15,9 @@ namespace UICatalog.Scenarios {
 			List<string> items = new List<string> ();
 			foreach (var dir in new [] { "/etc", @"\windows\System32" }) {
 				if (Directory.Exists (dir)) {
-					items = Directory.GetFiles (dir)
+					items = Directory.GetFiles (dir).Union(Directory.GetDirectories(dir))
 					.Select (Path.GetFileName)
 					.Where (x => char.IsLetterOrDigit (x [0]))
-					.Distinct ()
 					.OrderBy (x => x).ToList ();
 				}
 			}
@@ -45,11 +44,14 @@ namespace UICatalog.Scenarios {
 				Width = 30
 			};
 
-			var comboBox = new ComboBox (0, 0, 30, 10, items) {
+			var comboBox = new ComboBox() {
 				X = Pos.Right(listview) + 1 , 
 				Y = Pos.Bottom (lbListView) +1,
+				Height = 10,
 				Width = 30
 			};
+			comboBox.SetSource (items);
+
 			comboBox.Changed += (object sender, ustring text) => lbComboBox.Text = text;
 			Win.Add (lbComboBox, comboBox);
 		}
