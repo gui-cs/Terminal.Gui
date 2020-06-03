@@ -159,7 +159,7 @@ namespace Terminal.Gui {
 
 			Move (allowsMultipleSelection ? 3 : 2, line);
 			int byteLen = ustr.Length;
-			int used = 0;
+			int used = allowsMultipleSelection ? 2 : 1;
 			for (int i = 0; i < byteLen;) {
 				(var rune, var size) = Utf8.DecodeRune (ustr, i, i - byteLen);
 				var count = Rune.ColumnWidth (rune);
@@ -169,12 +169,12 @@ namespace Terminal.Gui {
 				used += count;
 				i += size;
 			}
-			for (; used < width; used++) {
+			for (; used < width - 1; used++) {
 				Driver.AddRune (' ');
 			}
 		}
 
-		public override void Redraw (Rect region)
+		public override void Redraw (Rect bounds)
 		{
 			var current = ColorScheme.Focus;
 			Driver.SetAttribute (current);
@@ -182,7 +182,7 @@ namespace Terminal.Gui {
 			var f = Frame;
 			var item = top;
 			bool focused = HasFocus;
-			var width = region.Width;
+			var width = bounds.Width;
 
 			for (int row = 0; row < f.Height; row++, item++) {
 				bool isSelected = item == selected;
@@ -463,7 +463,7 @@ namespace Terminal.Gui {
 			dirListView = new DirListView (this) {
 				X = 1,
 				Y = 3 + msgLines + 2,
-				Width = Dim.Fill () - 3,
+				Width = Dim.Fill () - 1,
 				Height = Dim.Fill () - 2,
 			};
 			DirectoryPath = Path.GetFullPath (Environment.CurrentDirectory);
@@ -487,6 +487,9 @@ namespace Terminal.Gui {
 				Application.RequestStop ();
 			};
 			AddButton (this.prompt);
+
+			Width = Dim.Percent (80);
+			Height = Dim.Percent (80);
 
 			// On success, we will set this to false.
 			canceled = true;

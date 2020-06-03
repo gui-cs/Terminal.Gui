@@ -291,7 +291,7 @@ namespace Terminal.Gui {
 		ScrollBarView vertical, horizontal;
 
 		/// <summary>
-		///  Initializes a new instance of the <see cref="Gui.ScrollView"/> class
+		///  Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Absolute"/> positioning.
 		/// </summary>
 		/// <param name="frame"></param>
 		public ScrollView (Rect frame) : base (frame)
@@ -299,6 +299,10 @@ namespace Terminal.Gui {
 			Init (frame);
 		}
 
+
+		/// <summary>
+		///  Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Computed"/> positioning.
+		/// </summary>
 		public ScrollView () : base ()
 		{
 			Init (new Rect (0, 0, 0, 0));
@@ -463,13 +467,13 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <inheritdoc cref="Redraw(Rect)"/>
 		public override void Redraw (Rect region)
 		{
 			Driver.SetAttribute (ColorScheme.Normal);
 			SetViewsNeedsDisplay ();
 			Clear ();
 
-			if (Driver.Clip.IsEmpty || Driver.Clip.Contains (RectToScreen (Frame))) {
 			var savedClip = ClipToBounds ();
 			OnDrawContent (new Rect (ContentOffset,
 				new Size (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0),

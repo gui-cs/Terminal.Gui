@@ -69,7 +69,7 @@ namespace UICatalog {
 		{
 			MemoryStream stream = null;
 			if (!_saved) {
-				MessageBox.ErrorQuery (0, 10, "Not Implemented", "Functionality not yet implemented.", "Ok");
+				MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok");
 			}
 
 			if (_fileName != null) {
@@ -83,17 +83,17 @@ namespace UICatalog {
 
 		private void Paste ()
 		{
-			MessageBox.ErrorQuery (0, 10, "Not Implemented", "Functionality not yet implemented.", "Ok");
+			MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok");
 		}
 
 		private void Cut ()
 		{
-			MessageBox.ErrorQuery (0, 10, "Not Implemented", "Functionality not yet implemented.", "Ok");
+			MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok");
 		}
 
 		private void Copy ()
 		{
-			MessageBox.ErrorQuery (0, 10, "Not Implemented", "Functionality not yet implemented.", "Ok");
+			MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok");
 			//if (_textView != null && _textView.SelectedLength != 0) {
 			//	_textView.Copy ();
 			//}

@@ -30,7 +30,7 @@ static class Demo {
 			throw new NotImplementedException ();
 		}
 
-		public override void Redraw (Rect region)
+		public override void Redraw (Rect bounds)
 		{
 			//Point pos = new Point (region.X, region.Y);
 			Driver.SetAttribute (ColorScheme.Focus);
@@ -53,7 +53,7 @@ static class Demo {
 		{
 		}
 
-		public override void Redraw (Rect region)
+		public override void Redraw (Rect bounds)
 		{
 			Driver.SetAttribute (ColorScheme.Focus);
 			var f = Frame;
@@ -509,7 +509,7 @@ static class Demo {
 
 		//Application.UseSystemConsole = true;
 
-		Application.Init ();
+		Application.Init();
 
 		var top = Application.Top;
 
@@ -627,7 +627,7 @@ static class Demo {
 		var bottom2 = new Label ("This should go on the bottom of another top-level!");
 		top.Add (bottom2);
 
-		Application.Loaded += (sender, e) => {
+		top.LayoutComplete += (sender, e) => {
 			bottom.X = win.X;
 			bottom.Y = Pos.Bottom (win) - Pos.Top (win) - margin;
 			bottom2.X = Pos.Left (win);

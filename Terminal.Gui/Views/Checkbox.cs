@@ -105,7 +105,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc cref="Redraw"/>
-		public override void Redraw (Rect region)
+		public override void Redraw (Rect bounds)
 		{
 			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			Move (0, 0);

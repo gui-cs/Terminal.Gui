@@ -161,7 +161,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc cref="Redraw"/>
-		public override void Redraw (Rect region)
+		public override void Redraw (Rect bounds)
 		{
 			if (recalcPending)
 				Recalc ();
@@ -173,7 +173,7 @@ namespace Terminal.Gui {
 
 			Clear ();
 			for (int line = 0; line < lines.Count; line++) {
-				if (line < region.Top || line > region.Bottom)
+				if (line < bounds.Top || line > bounds.Bottom)
 					continue;
 				var str = lines [line];
 				int x;

@@ -55,29 +55,32 @@ namespace Terminal.Gui {
 		public Action Clicked;
 
 		/// <summary>
-		///   Initializes a new instance of <see cref="Button"/> based on the given text at position 0,0
+		///   Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <remarks>
-		///   The size of the <see cref="Button"/> is computed based on the
-		///   text length. 
+		///   The width of the <see cref="Button"/> is computed based on the
+		///   text length. The height will always be 1.
 		/// </remarks>
 		/// <param name="text">The button's text</param>
-		/// <param name="is_default">If set, this makes the button the default button in the current view. <seealso cref="IsDefault"/></param>
+		/// <param name="is_default">
+		///   If <c>true</c>, a special decoration is used, and the user pressing the enter key 
+		///   in a <see cref="Dialog"/> will implicitly activate this button.
+		/// </param>
 		public Button (ustring text, bool is_default = false) : base ()
 		{
 			CanFocus = true;
 			Text = text ?? string.Empty;
 			this.IsDefault = is_default;
 			int w = SetWidthHeight (text, is_default);
-			Frame = new Rect (0, 0, w, 1);
+			Frame = new Rect (Frame.Location, new Size (w, 1));
 		}
 
 		/// <summary>
-		///   Initializes a new instance of <see cref="Button"/> at the given coordinates, based on the given text
+		///   Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Absolute"/> layout, based on the given text
 		/// </summary>
 		/// <remarks>
-		///   The size of the <see cref="Button"/> is computed based on the
-		///   text length. 
+		///   The width of the <see cref="Button"/> is computed based on the
+		///   text length. The height will always be 1.
 		/// </remarks>
 		/// <param name="x">X position where the button will be shown.</param>
 		/// <param name="y">Y position where the button will be shown.</param>
@@ -85,17 +88,19 @@ namespace Terminal.Gui {
 		public Button (int x, int y, ustring text) : this (x, y, text, false) { }
 
 		/// <summary>
-		///   Initializes a new instance of <see cref="Button"/> at the given coordinates, based on the given text, and with the specified <see cref="IsDefault"/> value
+		///   Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Absolute"/> layout, based on the given text.
 		/// </summary>
 		/// <remarks>
-		///   If the value for is_default is true, a special
-		///   decoration is used, and the enter key on a
-		///   dialog would implicitly activate this button.
+		///   The width of the <see cref="Button"/> is computed based on the
+		///   text length. The height will always be 1.
 		/// </remarks>
 		/// <param name="x">X position where the button will be shown.</param>
 		/// <param name="y">Y position where the button will be shown.</param>
 		/// <param name="text">The button's text</param>
-		/// <param name="is_default">If set, this makes the button the default button in the current view, which means that if the user presses return on a view that does not handle return, it will be treated as if he had clicked on the button</param>
+		/// <param name="is_default">
+		///   If <c>true</c>, a special decoration is used, and the user pressing the enter key 
+		///   in a <see cref="Dialog"/> will implicitly activate this button.
+		/// </param>
 		public Button (int x, int y, ustring text, bool is_default)
 		    : base (new Rect (x, y, text.Length + 4 + (is_default ? 2 : 0), 1))
 		{
@@ -110,6 +115,7 @@ namespace Terminal.Gui {
 			int w = text.Length + 4 + (is_default ? 2 : 0);
 			Width = w;
 			Height = 1;
+			Frame = new Rect (Frame.Location, new Size (w, 1));
 			return w;
 		}
 
@@ -137,22 +143,32 @@ namespace Terminal.Gui {
 			else
 				shown_text = "[ " + text + " ]";
 
-			hot_pos = -1;
 			hot_key = (Rune)0;
-			int i = 0;
-			foreach (Rune c in shown_text) {
-				if (Rune.IsUpper (c)) {
-					hot_key = c;
-					hot_pos = i;
-					break;
+			hot_pos = shown_text.IndexOf ('_');
+
+			if (hot_pos == -1) {
+				// Use first upper-case char
+				int i = 0;
+				foreach (Rune c in shown_text) {
+					if (Rune.IsUpper (c)) {
+						hot_key = c;
+						hot_pos = i;
+						break;
+					}
+					i++;
 				}
-				i++;
+			} else {
+				// Use char after '_'
+				var start = shown_text [0, hot_pos];
+				shown_text = start + shown_text [hot_pos + 1, shown_text.Length];
+				hot_key = Char.ToUpper((char)shown_text [hot_pos]);
 			}
+
 			SetNeedsDisplay ();
 		}
 
 		///<inheritdoc cref="Redraw(Rect)"/>
-		public override void Redraw (Rect region)
+		public override void Redraw (Rect bounds)
 		{
 			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			Move (0, 0);
@@ -214,7 +230,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc cref="MouseEvent"/>
-		public override bool MouseEvent(MouseEvent me)
+		public override bool MouseEvent (MouseEvent me)
 		{
 			if (me.Flags == MouseFlags.Button1Clicked) {
 				SuperView.SetFocus (this);

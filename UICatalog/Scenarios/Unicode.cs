@@ -10,8 +10,6 @@ namespace UICatalog {
 	class UnicodeInMenu : Scenario {
 		public override void Setup ()
 		{
-			const int margin = 1;
-
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_Файл", new MenuItem [] {
 					new MenuItem ("_Создать", "Creates new file", null),
