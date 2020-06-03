@@ -90,6 +90,9 @@ namespace Terminal.Gui {
 		/// <param name="region">Region to be redrawn.</param>
 		public override void Redraw(Rect region)
 		{
+			if (ColorScheme == null)
+				return;
+
 			Driver.SetAttribute (ColorScheme.Normal);
 
 			if (vertical) {
@@ -407,7 +410,7 @@ namespace Terminal.Gui {
 			var savedClip = ClipToBounds ();
 			contentView.Redraw (contentView.Bounds);
 			vertical.Redraw (vertical.Bounds);
-			horizontal.Redraw (vertical.Bounds);
+			horizontal.Redraw (horizontal.Bounds);
 			Driver.Clip = savedClip;
 			Driver.SetAttribute (ColorScheme.Normal);
 		}
