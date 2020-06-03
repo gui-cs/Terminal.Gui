@@ -118,6 +118,16 @@ namespace UICatalog {
 			};
 			Win.Add (moveBtn);
 
+			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
+			y += 2;
+			var sizeBtn = new Button (10, y, "Size This Button via Frame") {
+				ColorScheme = Colors.Error,
+			};
+			moveBtn.Clicked = () => {
+				sizeBtn.Frame = new Rect (sizeBtn.Frame.X, sizeBtn.Frame.Y, sizeBtn.Frame.Width + 5, sizeBtn.Frame.Height);
+			};
+			Win.Add (sizeBtn);
+
 			// Demo changing hotkey
 			ustring MoveHotkey (ustring txt)
 			{

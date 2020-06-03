@@ -929,6 +929,9 @@ namespace Terminal.Gui {
 		{
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
+			// Invoke DrawContentEvent
+			OnDrawContent (bounds);
+
 			if (subviews != null) {
 				foreach (var view in subviews) {
 					if (view.NeedDisplay != null && (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay)) {
@@ -941,7 +944,11 @@ namespace Terminal.Gui {
 
 							// Clip the sub-view
 							var savedClip = ClipToBounds ();
+
+							// Draw the subview
 							view.Redraw (view.Bounds);
+
+							// Undo the clip
 							Driver.Clip = savedClip;
 						}
 						view.NeedDisplay = Rect.Empty;
@@ -950,6 +957,31 @@ namespace Terminal.Gui {
 				}
 			}
 			ClearNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Event invoked when the content area of the View is to be drawn.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// Will be invoked before any subviews added with <see cref="Add(View)"/> have been drawn.
+		/// </para>
+		/// <para>
+		/// Rect provides the view-relative rectangle describing the currently visible viewport into the <see cref="View"/>.
+		/// </para>
+		/// </remarks>
+		public event EventHandler<Rect> DrawContent;
+
+		/// <summary>
+		/// Enables overrides to draw infinitely scrolled content and/or a background behind added controls. 
+		/// </summary>
+		/// <param name="viewport">The view-relative rectangle describing the currently visible viewport into the <see cref="View"/></param>
+		/// <remarks>
+		/// This method will be called before any subviews added with <see cref="Add(View)"/> have been drawn. 
+		/// </remarks>
+		public virtual void OnDrawContent (Rect viewport)
+		{
+			DrawContent?.Invoke (this, viewport);
 		}
 
 		/// <summary>

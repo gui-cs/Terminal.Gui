@@ -335,12 +335,12 @@ static class Demo {
 			$"{mi.Title.ToString ()} selected. Is from submenu: {mi.GetMenuBarItem ()}", "Ok");
 	}
 
-	static void MenuKeysStyle_Toggled (object sender, EventArgs e)
+	static void MenuKeysStyle_Toggled (object sender, bool e)
 	{
 		menu.UseKeysUpDownAsKeysLeftRight = menuKeysStyle.Checked;
 	}
 
-	static void MenuAutoMouseNav_Toggled (object sender, EventArgs e)
+	static void MenuAutoMouseNav_Toggled (object sender, bool e)
 	{
 		menu.WantMousePositionReports = menuAutoMouseNav.Checked;
 	}

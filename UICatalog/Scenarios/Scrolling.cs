@@ -95,12 +95,13 @@ namespace UICatalog {
 			Win.Add (label);
 
 			// BUGBUG: ScrollView only supports Absolute Positioning (#72)
-			var scrollView = new ScrollView (new Rect (2, 2, 50, 20));
-			scrollView.ColorScheme = Colors.TopLevel;
-			scrollView.ContentSize = new Size (200, 100);
-			//ContentOffset = new Point (0, 0),
-			scrollView.ShowVerticalScrollIndicator = true;
-			scrollView.ShowHorizontalScrollIndicator = true;
+			var scrollView = new ScrollView (new Rect (2, 2, 50, 20)) {
+				ColorScheme = Colors.TopLevel,
+				ContentSize = new Size (200, 100),
+				//ContentOffset = new Point (0, 0),
+				ShowVerticalScrollIndicator = true,
+				ShowHorizontalScrollIndicator = true,
+			};
 
 			const string rule = "|123456789";
 			var horizontalRuler = new Label ("") {
@@ -177,13 +178,31 @@ namespace UICatalog {
 			};
 			scrollView.Add (anchorButton);
 
+			var hCheckBox = new CheckBox ("Horizontal Scrollbar", scrollView.ShowHorizontalScrollIndicator) {
+				X = Pos.X(scrollView),
+				Y = Pos.Bottom(scrollView) + 1,
+			};
+			hCheckBox.Toggled += (sender, previousChecked) => {
+				scrollView.ShowHorizontalScrollIndicator = ((CheckBox)sender).Checked;
+			};
+			Win.Add (hCheckBox);
+
+			var vCheckBox = new CheckBox ("Vertical Scrollbar", scrollView.ShowVerticalScrollIndicator) {
+				X = Pos.Right (hCheckBox) + 3,
+				Y = Pos.Bottom (scrollView) + 1,
+			};
+			vCheckBox.Toggled += (sender, previousChecked) => {
+				scrollView.ShowVerticalScrollIndicator = ((CheckBox)sender).Checked;
+			};
+			Win.Add (vCheckBox);
+
 			var scrollView2 = new ScrollView (new Rect (55, 2, 20, 8)) {
 				ContentSize = new Size (20, 50),
 				//ContentOffset = new Point (0, 0),
 				ShowVerticalScrollIndicator = true,
 				ShowHorizontalScrollIndicator = true
 			};
-			scrollView2.Add (new Filler(new Rect (0, 0, 60, 40)));
+			scrollView2.Add (new Filler (new Rect (0, 0, 60, 40)));
 
 			// This is just to debug the visuals of the scrollview when small
 			var scrollView3 = new ScrollView (new Rect (55, 15, 3, 3)) {
@@ -205,7 +224,7 @@ namespace UICatalog {
 
 			var progress = new ProgressBar ();
 			progress.X = 5;
-			progress.Y = Pos.AnchorEnd (3);
+			progress.Y = Pos.AnchorEnd (2);
 			progress.Width = 50;
 			bool timer (MainLoop caller)
 			{
