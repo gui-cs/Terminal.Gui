@@ -695,7 +695,8 @@ namespace Terminal.Gui {
 						keyUpHandler (new KeyEvent (map, keyModifiers));
 					}
 				}
-				keyModifiers = null;
+				if (!inputEvent.KeyEvent.bKeyDown)
+					keyModifiers = null;
 				break;
 
 			case WindowsConsole.EventType.Mouse:
@@ -726,9 +727,9 @@ namespace Terminal.Gui {
 			MouseFlags mouseFlag = MouseFlags.AllEvents;
 
 			if (IsButtonDoubleClicked) {
-				Task.Run (async () => {
-					await Task.Delay (100);
-					IsButtonDoubleClicked = false;
+				Application.MainLoop.AddIdle (() => {
+					ProcessButtonDoubleClickedAsync ().ConfigureAwait (false);
+					return false;
 				});
 			}
 
@@ -774,23 +775,9 @@ namespace Terminal.Gui {
 				IsButtonPressed = true;
 
 				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-					Task.Run (async () => {
-						while (IsButtonPressed) {
-							await Task.Delay (200);
-							var me = new MouseEvent () {
-								X = mouseEvent.MousePosition.X,
-								Y = mouseEvent.MousePosition.Y,
-								Flags = mouseFlag
-							};
-
-							var view = Application.wantContinuousButtonPressedView;
-							if (view == null)
-								break;
-							if (IsButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-								mouseHandler (me);
-								//mainLoop.Driver.Wakeup ();
-							}
-						}
+					Application.MainLoop.AddIdle (() => {
+						ProcessContinuousButtonPressedAsync (mouseEvent, mouseFlag).ConfigureAwait (false);
+						return false;
 					});
 				}
 
@@ -890,6 +877,32 @@ namespace Terminal.Gui {
 				Y = mouseEvent.MousePosition.Y,
 				Flags = mouseFlag
 			};
+		}
+
+		private async Task ProcessButtonDoubleClickedAsync ()
+		{
+			await Task.Delay (200);
+			IsButtonDoubleClicked = false;
+		}
+
+		async Task ProcessContinuousButtonPressedAsync (WindowsConsole.MouseEventRecord mouseEvent, MouseFlags mouseFlag)
+		{
+			while (IsButtonPressed) {
+				await Task.Delay (200);
+				var me = new MouseEvent () {
+					X = mouseEvent.MousePosition.X,
+					Y = mouseEvent.MousePosition.Y,
+					Flags = mouseFlag
+				};
+
+				var view = Application.wantContinuousButtonPressedView;
+				if (view == null)
+					break;
+				if (IsButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
+					mouseHandler (me);
+					//mainLoop.Driver.Wakeup ();
+				}
+			}
 		}
 
 		static MouseFlags SetControlKeyStates (WindowsConsole.MouseEventRecord mouseEvent, MouseFlags mouseFlag)
