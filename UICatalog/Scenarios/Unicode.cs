@@ -27,14 +27,9 @@ namespace UICatalog {
 			});
 			Top.Add (menu);
 
-			var label = new Label ("Button:") { X = margin, Y = margin };
+			var label = new Label ("Button:") { X = 0, Y = 1 };
 			Win.Add (label);
-			var button = new Button (" ~  s  gui.cs   master ↑10") { X = 15, Y = Pos.Y (label) };
-			Win.Add (button);
-
-			label = new Label ("Button:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
-			Win.Add (label);
-			var button2 = new Button ("Со_хранить") { X = 15, Y = Pos.Y (label), Width = Dim.Percent (50) };
+			var button2 = new Button ("Со_хранить") { X = 15, Y = Pos.Y (label), Width = Dim.Percent (50), };
 			Win.Add (button2);
 
 			label = new Label ("CheckBox:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };

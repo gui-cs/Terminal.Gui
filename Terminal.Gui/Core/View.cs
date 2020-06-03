@@ -909,7 +909,32 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Focuses the specified sub-view.
+		/// Event invoked when the content area of the View is to be drawn.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// Will be invoked before any subviews added with <see cref="Add(View)"/> have been drawn.
+		/// </para>
+		/// <para>
+		/// Rect provides the view-relative rectangle describing the currently visible viewport into the <see cref="View"/>.
+		/// </para>
+		/// </remarks>
+		public event EventHandler<Rect> DrawContent;
+
+		/// <summary>
+		/// Enables overrides to draw infinitely scrolled content and/or a background behind added controls. 
+		/// </summary>
+		/// <param name="viewport">The view-relative rectangle describing the currently visible viewport into the <see cref="View"/></param>
+		/// <remarks>
+		/// This method will be called before any subviews added with <see cref="Add(View)"/> have been drawn. 
+		/// </remarks>
+		public virtual void OnDrawContent (Rect viewport)
+		{
+			DrawContent?.Invoke (this, viewport);
+		}
+
+		/// <summary>
+		/// Causes the specified subview to have focus.
 		/// </summary>
 		/// <param name="view">View.</param>
 		public void SetFocus (View view)
