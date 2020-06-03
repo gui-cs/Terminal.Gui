@@ -78,6 +78,15 @@
       * More robust error handing in Pos/Dim. Fixes #355 stack overflow with Pos based on the size of windows at startup. Added a OnResized action to set the Pos after the terminal are resized. (Thanks @bdisp!)
       * Fixes #389 Window layouting breaks when resizing. (Thanks @bdisp!)
       * Fixes #557 MessageBox needs to take ustrings (BREAKING CHANGE). (Thanks @tig!)
+      * Fixes ScrollView in several key ways. (Thanks @tig!)
+      *   Now supports Computed layout and has constructors that don't require parameters.
+      *   ScrollBarViews are now positioned using Computed layout versus error prone absoulte
+      *   ScrollBarViews now correctly position themselves when one, either, or both are on/off.
+      *   IsVertical is now a public property that does the expected thing when changed
+      *   Mouse handling is better; there's still a bug where the mouse doesn't get grabbed by the ScrollView initially but I think this is a broader problem. I need @BDisp's help on this.
+      *   Supports "infinite scrolling" via the new OnDrawContent/DrawContent event on the View class.
+      *   The Scrolling Scenario was enhanced to demo dynamically adding/removing horizontal/vertical scrollbars (and to prove it was working right).
+      * The Checkbox.Toggled event is now an EventHandler event and passes previous state. (Thanks @tig!)
 
       0.81:
       * Fix ncurses engine for macOS/Linux, it works again

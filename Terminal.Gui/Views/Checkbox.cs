@@ -23,9 +23,16 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   Client code can hook up to this event, it is
 		///   raised when the <see cref="CheckBox"/> is activated either with
-		///   the mouse or the keyboard.
+		///   the mouse or the keyboard. The passed <c>bool</c> contains the previous state. 
 		/// </remarks>
-		public event EventHandler Toggled;
+		public event EventHandler<bool> Toggled;
+
+		/// <summary>
+		/// Called when the <see cref="Checked"/> property changes. Invokes the <see cref="Toggled"/> event.
+		/// </summary>
+		public virtual void OnToggled (bool previousChecked) {
+			Toggled?.Invoke (this, previousChecked);
+		}
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="CheckBox"/> based on the given text, uses Computed layout and sets the height and width.
@@ -122,11 +129,9 @@ namespace Terminal.Gui {
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			if (kb.KeyValue == ' ') {
+				var previousChecked = Checked;
 				Checked = !Checked;
-
-				if (Toggled != null)
-					Toggled (this, EventArgs.Empty);
-
+				OnToggled (previousChecked);
 				SetNeedsDisplay ();
 				return true;
 			}
@@ -140,11 +145,11 @@ namespace Terminal.Gui {
 				return false;
 
 			SuperView.SetFocus (this);
+			var previousChecked = Checked;
 			Checked = !Checked;
+			OnToggled (previousChecked);
 			SetNeedsDisplay ();
 
-			if (Toggled != null)
-				Toggled (this, EventArgs.Empty);
 			return true;
 		}
 	}
