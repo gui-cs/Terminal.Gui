@@ -911,8 +911,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
 		/// </summary>
-		/// <param name="bounds">The view-relative region to redraw.</param>
+		/// <param name="bounds">The bounds (view-relative region) to redraw.</param>
 		/// <remarks>
+		/// <para>
+		///    Always use <see cref="Bounds"/> (view-relative) when calling <see cref="Redraw(Rect)"/>, NOT <see cref="Frame"/> (superview-relative).
+		/// </para>
 		/// <para>
 		///    Views should set the color that they want to use on entry, as otherwise this will inherit
 		///    the last color that was set globaly on the driver.
