@@ -771,32 +771,12 @@ namespace Terminal.Gui {
 
 			case Key.ControlN:
 			case Key.CursorDown:
-				if (currentRow + 1 < model.Count) {
-					if (columnTrack == -1)
-						columnTrack = currentColumn;
-					currentRow++;
-					if (currentRow >= topRow + Frame.Height) {
-						topRow++;
-						SetNeedsDisplay ();
-					}
-					TrackColumn ();
-					PositionCursor ();
-				}
+				MoveDown ();
 				break;
 
 			case Key.ControlP:
 			case Key.CursorUp:
-				if (currentRow > 0) {
-					if (columnTrack == -1)
-						columnTrack = currentColumn;
-					currentRow--;
-					if (currentRow < topRow) {
-						topRow--;
-						SetNeedsDisplay ();
-					}
-					TrackColumn ();
-					PositionCursor ();
-				}
+				MoveUp ();
 				break;
 
 			case Key.ControlF:
@@ -1024,6 +1004,18 @@ namespace Terminal.Gui {
 					SetNeedsDisplay (new Rect (0, currentRow - topRow, 2, Frame.Height));
 				break;
 
+			case Key.CtrlMask | Key.End:
+				currentRow = model.Count;
+				TrackColumn ();
+				PositionCursor ();
+				break;
+
+			case Key.CtrlMask | Key.Home:
+				currentRow = 0;
+				TrackColumn ();
+				PositionCursor ();
+				break;
+
 			default:
 				// Ignore control characters and other special keys
 				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
@@ -1041,6 +1033,36 @@ namespace Terminal.Gui {
 				return true;
 			}
 			return true;
+		}
+
+		private void MoveUp ()
+		{
+			if (currentRow > 0) {
+				if (columnTrack == -1)
+					columnTrack = currentColumn;
+				currentRow--;
+				if (currentRow < topRow) {
+					topRow--;
+					SetNeedsDisplay ();
+				}
+				TrackColumn ();
+				PositionCursor ();
+			}
+		}
+
+		private void MoveDown ()
+		{
+			if (currentRow + 1 < model.Count) {
+				if (columnTrack == -1)
+					columnTrack = currentColumn;
+				currentRow++;
+				if (currentRow >= topRow + Frame.Height) {
+					topRow++;
+					SetNeedsDisplay ();
+				}
+				TrackColumn ();
+				PositionCursor ();
+			}
 		}
 
 		IEnumerable<(int col, int row, Rune rune)> ForwardIterator (int col, int row)
@@ -1173,28 +1195,37 @@ namespace Terminal.Gui {
 		///<inheritdoc cref="MouseEvent"/>
 		public override bool MouseEvent (MouseEvent ev)
 		{
-			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked)) {
+			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked) &&
+				!ev.Flags.HasFlag (MouseFlags.WheeledDown) && !ev.Flags.HasFlag (MouseFlags.WheeledUp)) {
 				return false;
 			}
 
 			if (!HasFocus)
 				SuperView.SetFocus (this);
 
-
-			if (model.Count > 0) {
-				var maxCursorPositionableLine = (model.Count - 1) - topRow;
-				if (ev.Y > maxCursorPositionableLine) {
-					currentRow = maxCursorPositionableLine;
-				} else {
-					currentRow = ev.Y + topRow;
+			if (ev.Flags == MouseFlags.Button1Clicked) {
+				if (model.Count > 0) {
+					var maxCursorPositionableLine = (model.Count - 1) - topRow;
+					if (ev.Y > maxCursorPositionableLine) {
+						currentRow = maxCursorPositionableLine;
+					} else {
+						currentRow = ev.Y + topRow;
+					}
+					var r = GetCurrentLine ();
+					if (ev.X - leftColumn >= r.Count)
+						currentColumn = r.Count - leftColumn;
+					else
+						currentColumn = ev.X - leftColumn;
 				}
-				var r = GetCurrentLine ();
-				if (ev.X - leftColumn >= r.Count)
-					currentColumn = r.Count - leftColumn;
-				else
-					currentColumn = ev.X - leftColumn;
+				PositionCursor ();
+			} else if (ev.Flags == MouseFlags.WheeledDown) {
+				lastWasKill = false;
+				MoveDown ();
+			} else if (ev.Flags == MouseFlags.WheeledUp) {
+				lastWasKill = false;
+				MoveUp ();
 			}
-			PositionCursor ();
+
 			return true;
 		}
 	}
