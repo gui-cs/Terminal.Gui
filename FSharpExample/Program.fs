@@ -333,9 +333,9 @@ type Demo() = class end
             X = Pos.At(0),
             Y = Pos.At(0),
             Width = Dim.Fill () - Dim.op_Implicit(1),
-            Height = Dim.Fill () - Dim.op_Implicit(2)
+            Height = Dim.Fill () - Dim.op_Implicit(2),
+            ColorScheme = Colors.TopLevel
             )
-        listView.ColorScheme <- Colors.TopLevel
         container.Add (listView)
         
         let KeyDownPressUp(keyEvent : KeyEvent, updown : string) =
@@ -344,25 +344,7 @@ type Demo() = class end
             | "Down"
             | "Up"
             | "Press" -> 
-                let mutable (msg : string) = sprintf "Key %5s : " updown
-                if (keyEvent.Key &&& Key.ShiftMask) <> Key.Unknown
-                then msg <- msg + "Shift "
-                if (keyEvent.Key &&& Key.CtrlMask) <> Key.Unknown
-                then msg <- msg + "Ctrl "
-                if (keyEvent.Key &&& Key.AltMask) <> Key.Unknown
-                then msg <- msg + "Alt "
-                msg <-  msg + if (keyEvent.KeyValue &&& (int)Key.CharMask) > 26 then (string)keyEvent.KeyValue else (string)keyEvent.Key
-                list.Add (msg)    
-            | _ ->
-                if (keyEvent.Key &&& Key.ShiftMask) <> Key.Unknown
-                then list.Add (sprintf "Key %s : Shift " updown)
-                else if (keyEvent.Key &&& Key.CtrlMask) <> Key.Unknown
-                then list.Add (sprintf "Key %s : Ctrl " updown)
-                else if (keyEvent.Key &&& Key.AltMask) <> Key.Unknown
-                then list.Add (sprintf "Key %s : Alt " updown)
-                else if ((int)keyEvent.KeyValue &&& (int)Key.CharMask) > 26
-                then list.Add (sprintf "Key %s : %s" updown (keyEvent.KeyValue.ToString()))
-                else list.Add (sprintf "Key %s : %s" updown (keyEvent.Key.ToString()))
+                list.Add (keyEvent.ToString ())    
             listView.MoveDown ();
     
         container.KeyDown.Add(fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Down") |> ignore)
