@@ -201,6 +201,9 @@ namespace Terminal.Gui {
 				if (dragPosition.HasValue) {
 					if (SuperView == null) {
 						Application.Top.SetNeedsDisplay (Frame);
+						// Redraw the entire app window using just our Frame. Since we are 
+						// Application.Top, and our Frame always == our Bounds (Location is always (0,0))
+						// our Frame is actually view-relative (which is what Redraw takes).
 						Application.Top.Redraw (Frame);
 					} else {
 						SuperView.SetNeedsDisplay (Frame);
