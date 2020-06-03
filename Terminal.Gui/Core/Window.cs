@@ -201,7 +201,7 @@ namespace Terminal.Gui {
 				if (dragPosition.HasValue) {
 					if (SuperView == null) {
 						Application.Top.SetNeedsDisplay (Frame);
-						Application.Top.Redraw (Bounds);
+						Application.Top.Redraw (Frame);
 					} else {
 						SuperView.SetNeedsDisplay (Frame);
 					}

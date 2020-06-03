@@ -264,7 +264,7 @@ namespace Terminal.Gui {
 			if (IsCurrentTop || this == Application.Top) {
 				if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
 					Driver.SetAttribute (Colors.TopLevel.Normal);
-					Clear (Frame);
+					Clear (bounds);
 					Driver.SetAttribute (Colors.Base.Normal);
 				}
 				foreach (var view in Subviews) {
