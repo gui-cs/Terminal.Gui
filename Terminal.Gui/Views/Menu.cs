@@ -575,13 +575,23 @@ namespace Terminal.Gui {
 		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
+				openedByAltKey = true;
+				SetNeedsDisplay ();
+				openedByHotKey = false;
+			}
+			return false;
+		}
+
+		///<inheritdoc cref="OnKeyUp"/>
+		public override bool OnKeyUp (KeyEvent keyEvent)
+		{
+			if (keyEvent.IsAlt) {
 				// User pressed Alt - this may be a precursor to a menu accelerator (e.g. Alt-F)
-				if (!keyEvent.IsCtrl && !openedByAltKey && !IsMenuOpen && openMenu == null && ((uint)keyEvent.Key & (uint)Key.CharMask) == 0) {
+				if (!keyEvent.IsCtrl && openedByAltKey && !IsMenuOpen && openMenu == null && ((uint)keyEvent.Key & (uint)Key.CharMask) == 0) {
 					// There's no open menu, the first menu item should be highlight.
 					// The right way to do this is to SetFocus(MenuBar), but for some reason
 					// that faults.
 
-					openedByAltKey = true;
 					//Activate (0);
 					//StartMenu ();
 					IsMenuOpen = true;
@@ -591,7 +601,7 @@ namespace Terminal.Gui {
 					SuperView.SetFocus (this);
 					SetNeedsDisplay ();
 					Application.GrabMouse (this);
-				} else if (IsMenuOpen && !openedByAltKey) {
+				} else if (!openedByHotKey) {
 					// There's an open menu. If this Alt key-up is a pre-cursor to an accelerator
 					// we don't want to close the menu because it'll flash.
 					// How to deal with that?
@@ -609,16 +619,6 @@ namespace Terminal.Gui {
 				}
 
 				return true;
-			}
-			return false;
-		}
-
-		///<inheritdoc cref="OnKeyUp"/>
-		public override bool OnKeyUp (KeyEvent keyEvent)
-		{
-			if (keyEvent.IsAlt) {
-				openedByAltKey = false;
-				SetNeedsDisplay ();
 			}
 			return false;
 		}
