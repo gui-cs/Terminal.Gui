@@ -35,16 +35,16 @@ namespace UICatalog {
 			var checkBox = new CheckBox (" ~  s  gui.cs   master ↑10") { X = 15, Y = Pos.Y (label), Width = Dim.Percent (50) };
 			Win.Add (checkBox);
 
-			label = new Label ("ComboBox:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
-			Win.Add (label);
-			var comboBox = new ComboBox (1, 1, 30, 5, new List<string> () { "item #1", " ~  s  gui.cs   master ↑10", "Со_хранить" }) {
-				X = 15,
-				Y = Pos.Y (label),
-				Width = 30,
-				ColorScheme = Colors.Error
-			};
-			Win.Add (comboBox);
-			comboBox.Text = " ~  s  gui.cs   master ↑10";
+			//label = new Label ("ComboBox:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
+			//Win.Add (label);
+			//var comboBox = new ComboBox (1, 1, 30, 5, new List<string> () { "item #1", " ~  s  gui.cs   master ↑10", "Со_хранить" }) {
+			//	X = 15,
+			//	Y = Pos.Y (label),
+			//	Width = 30,
+			//	ColorScheme = Colors.Error
+			//};
+			//Win.Add (comboBox);
+			//comboBox.Text = " ~  s  gui.cs   master ↑10";
 
 			label = new Label ("HexView:") { X = Pos.X (label), Y = Pos.Bottom (label) + 2 };
 			Win.Add (label);

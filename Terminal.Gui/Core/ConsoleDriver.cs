@@ -5,14 +5,11 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 // Define this to enable diagnostics drawing for Window Frames
-//#define DRAW_WINDOW_FRAME_DIAGNOSTICS
 using NStack;
 using System;
 using System.Runtime.CompilerServices;
 
-
 namespace Terminal.Gui {
-
 	/// <summary>
 	/// Basic colors that can be used to set the foreground and background colors in console applications.
 	/// </summary>
@@ -524,9 +521,6 @@ namespace Terminal.Gui {
 			TerminalResized = terminalResized;
 		}
 
-		// Useful for debugging (e.g. change to `*`
-		const char clearChar = ' ';
-
 		/// <summary>
 		/// Draws the title for a Window-style view incorporating padding. 
 		/// </summary>
@@ -550,17 +544,32 @@ namespace Terminal.Gui {
 			}
 		}
 
-#if DRAW_WINDOW_FRAME_DIAGNOSTICS
-		const char leftChar = 'L';
-		const char rightChar = 'R';
-		const char topChar = 'T';
-		const char bottomChar = 'B';
-#else
-		const char leftChar = clearChar;
-		const char rightChar = clearChar;
-		const char topChar = clearChar;
-		const char bottomChar = clearChar;
-#endif
+		/// <summary>
+		/// Enables diagnostic funcions
+		/// </summary>
+		[Flags]
+		public enum DiagnosticFlags : uint { 
+			/// <summary>
+			/// All diagnostics off
+			/// </summary>
+			Off		= 0b_0000_0000,
+			/// <summary>
+			/// When enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/> will draw a 
+			/// ruler in the frame for any side with a padding value greater than 0.
+			/// </summary>
+			FrameRuler	= 0b_0000_0001,
+			/// <summary>
+			/// When Enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/> will use
+			/// 'L', 'R', 'T', and 'B' for padding instead of ' '.
+			/// </summary>
+			FramePadding = 0b_0000_0010,
+		}
+
+		/// <summary>
+		/// Set flags to enable/disable <see cref="ConsoleDriver"/> diagnostics.
+		/// </summary>
+		public static DiagnosticFlags Diagnostics { get; set; }
+
 		/// <summary>
 		/// Draws a frame for a window with padding and an optional visible border inside the padding. 
 		/// </summary>
@@ -573,6 +582,20 @@ namespace Terminal.Gui {
 		/// <param name="fill">If set to <c>true</c> it will clear the content area (the area inside the padding) with the current color, otherwise the content area will be left untouched.</param>
 		public virtual void DrawWindowFrame (Rect region, int paddingLeft = 0, int paddingTop = 0, int paddingRight = 0, int paddingBottom = 0, bool border = true, bool fill = false)
 		{
+			char clearChar = ' ';
+			char leftChar = clearChar;
+			char rightChar = clearChar;
+			char topChar = clearChar;
+			char bottomChar = clearChar;
+
+			if ((Diagnostics & DiagnosticFlags.FramePadding) == DiagnosticFlags.FramePadding) {
+				leftChar = 'L';
+				rightChar = 'R';
+				topChar = 'T';
+				bottomChar = 'B';
+				clearChar = 'C';
+			}
+
 			void AddRuneAt (int col, int row, Rune ch)
 			{
 				Move (col, row);
@@ -656,11 +679,10 @@ namespace Terminal.Gui {
 
 					// Frame right
 					if (fright > fleft) {
-#if DRAW_WINDOW_FRAME_DIAGNOSTICS
-						var v = (char)(((int)'0') + ((r - ftop) % 10)); // vLine;
-#else
 						var v = vLine;
-#endif
+						if ((Diagnostics & DiagnosticFlags.FrameRuler) == DiagnosticFlags.FrameRuler) {
+							v = (char)(((int)'0') + ((r - ftop) % 10)); // vLine;
+						}
 						AddRuneAt (fright, r, paddingRight > 0 ? v : rightChar);
 					}
 
@@ -681,11 +703,10 @@ namespace Terminal.Gui {
 				if (fright > fleft) {
 					// Frame bottom
 					for (int c = fleft + 1; c < fright; c++) {
-#if DRAW_WINDOW_FRAME_DIAGNOSTICS
-						var h = (char)(((int)'0') + ((c - fleft) % 10)); // hLine;
-#else
 						var h = hLine;
-#endif	
+						if ((Diagnostics & DiagnosticFlags.FrameRuler) == DiagnosticFlags.FrameRuler) {
+							h = (char)(((int)'0') + ((c - fleft) % 10)); // hLine;
+						}
 						AddRuneAt (c, fbottom, paddingBottom > 0 ? h : bottomChar);
 					}
 

@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Scenarios\ListsAndCombos.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
   </ItemGroup>
 
