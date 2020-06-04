@@ -98,7 +98,7 @@ namespace Terminal.Gui {
 		const int bsize = 4;
 		int bytesPerLine;
 
-		/// <inheritdoc cref="Frame"/>
+		/// <inheritdoc/>
 		public override Rect Frame {
 			get => base.Frame;
 			set {
@@ -129,7 +129,7 @@ namespace Terminal.Gui {
 			return buffer [offset];
 		}
 
-		///<inheritdoc cref="Redraw"/>
+		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
 			Attribute currentAttribute;
@@ -212,7 +212,7 @@ namespace Terminal.Gui {
 
 		}
 
-		///<inheritdoc cref="PositionCursor"/>
+		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
 			var delta = (int)(position - displayStart);
@@ -280,7 +280,7 @@ namespace Terminal.Gui {
 				RedisplayLine (position);			
 		}
 
-		/// <inheritdoc cref="ProcessKey"/>
+		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			switch (keyEvent.Key) {

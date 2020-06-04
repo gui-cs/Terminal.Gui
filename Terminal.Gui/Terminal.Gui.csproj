@@ -74,7 +74,7 @@
       * Added a OpenSelectedItem event to the ListView #429. (Thanks @bdisp!)
       * Fixes the return value of the position cursor in the TextField. (Thanks @bdisp!)
       * Updates screen on Unix window resizing. (Thanks @bdisp!)
-      * Fixes the functions of the Edit->Copy-Cut-Paste menu for the TextField that was not working well. (Thanks @bdisp!)
+      * Fixes the functions of the Edit-&gt;Copy-Cut-Paste menu for the TextField that was not working well. (Thanks @bdisp!)
       * More robust error handing in Pos/Dim. Fixes #355 stack overflow with Pos based on the size of windows at startup. Added a OnResized action to set the Pos after the terminal are resized. (Thanks @bdisp!)
       * Fixes #389 Window layouting breaks when resizing. (Thanks @bdisp!)
       * Fixes #557 MessageBox needs to take ustrings (BREAKING CHANGE). (Thanks @tig!)
@@ -180,5 +180,11 @@
   </ItemGroup>-->
   <ItemGroup>
     <None Remove="ConsoleDrivers\#ConsoleDriver.cs#" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="SauceControl.InheritDoc" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>

@@ -14,7 +14,7 @@ using System.Runtime.CompilerServices;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// Basic colors that can be used to set the foreground and background colors in console applications.  These can only be
+	/// Basic colors that can be used to set the foreground and background colors in console applications.
 	/// </summary>
 	public enum Color {
 		/// <summary>

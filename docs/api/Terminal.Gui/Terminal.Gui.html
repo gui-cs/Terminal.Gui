@@ -16,13 +16,13 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -89,7 +89,7 @@
   </h3>
       <h4><a class="xref" href="Terminal.Gui.Application.html">Application</a></h4>
       <section>
-The application driver for Terminal.Gui.
+A static, singelton class provding the main application driver for Terminal.Gui apps. 
 </section>
       <h4><a class="xref" href="Terminal.Gui.Application.ResizedEventArgs.html">Application.ResizedEventArgs</a></h4>
       <section>
@@ -138,7 +138,7 @@ Date editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <h4><a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a></h4>
       <section>
 The <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> <a class="xref" href="Terminal.Gui.View.html">View</a> is a <a class="xref" href="Terminal.Gui.Window.html">Window</a> that by default is centered and contains one 
-or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>. It defaults to the <a class="xref" href="Terminal.Gui.Colors.html#Terminal_Gui_Colors_Dialog">Dialog</a> color scheme and has a 1 cell padding around the edges.
+or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults to the <a class="xref" href="Terminal.Gui.Colors.html#Terminal_Gui_Colors_Dialog">Dialog</a> color scheme and has a 1 cell padding around the edges.
 </section>
       <h4><a class="xref" href="Terminal.Gui.Dim.html">Dim</a></h4>
       <section>
@@ -160,6 +160,10 @@ An hex viewer and editor <a class="xref" href="Terminal.Gui.View.html">View</a> 
       <h4><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></h4>
       <section>
 Describes a keyboard event.
+</section>
+      <h4><a class="xref" href="Terminal.Gui.KeyModifiers.html">KeyModifiers</a></h4>
+      <section>
+Identifies the state of the &quot;shift&quot;-keys within a event.
 </section>
       <h4><a class="xref" href="Terminal.Gui.Label.html">Label</a></h4>
       <section>
@@ -233,7 +237,7 @@ ScrollBarViews are views that display a 1-character scrollbar, either horizontal
 </section>
       <h4><a class="xref" href="Terminal.Gui.ScrollView.html">ScrollView</a></h4>
       <section>
-Scrollviews are views that present a window into a virtual space where children views are added.  Similar to the iOS UIScrollView.
+Scrollviews are views that present a window into a virtual space where subviews are added.  Similar to the iOS UIScrollView.
 </section>
       <h4><a class="xref" href="Terminal.Gui.StatusBar.html">StatusBar</a></h4>
       <section>
@@ -272,13 +276,25 @@ Toplevel views can be modally executed.
       <section>
 View is the base class for all views on the screen and represents a visible element that can render itself and contains zero or more nested views.
 </section>
+      <h4><a class="xref" href="Terminal.Gui.View.FocusEventArgs.html">View.FocusEventArgs</a></h4>
+      <section>
+Defines the event arguments for <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus_Terminal_Gui_View_">SetFocus(View)</a>
+</section>
       <h4><a class="xref" href="Terminal.Gui.View.KeyEventEventArgs.html">View.KeyEventEventArgs</a></h4>
       <section>
-Specifies the event arguments for <a class="xref" href="Terminal.Gui.View.KeyEventEventArgs.html#Terminal_Gui_View_KeyEventEventArgs_KeyEvent">KeyEvent</a>
+Defines the event arguments for <a class="xref" href="Terminal.Gui.View.KeyEventEventArgs.html#Terminal_Gui_View_KeyEventEventArgs_KeyEvent">KeyEvent</a>
+</section>
+      <h4><a class="xref" href="Terminal.Gui.View.LayoutEventArgs.html">View.LayoutEventArgs</a></h4>
+      <section>
+Event arguments for the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutComplete">LayoutComplete</a> event.
+</section>
+      <h4><a class="xref" href="Terminal.Gui.View.MouseEventEventArgs.html">View.MouseEventEventArgs</a></h4>
+      <section>
+Specifies the event arguments for <a class="xref" href="Terminal.Gui.View.MouseEventEventArgs.html#Terminal_Gui_View_MouseEventEventArgs_MouseEvent">MouseEvent</a>
 </section>
       <h4><a class="xref" href="Terminal.Gui.Window.html">Window</a></h4>
       <section>
-A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref" href="Terminal.Gui.View.html">View</a> that draws a frame around its region and has a &quot;ContentView&quot; subview where the contents are added.
+A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref" href="Terminal.Gui.View.html">View</a> that draws a border around its <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> with a <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Title">Title</a> at the top.
 </section>
     <h3 id="structs">Structs
   </h3>
@@ -316,7 +332,7 @@ Public interface to create your own platform specific main loop driver.
   </h3>
       <h4><a class="xref" href="Terminal.Gui.Color.html">Color</a></h4>
       <section>
-Basic colors that can be used to set the foreground and background colors in console applications.  These can only be
+Basic colors that can be used to set the foreground and background colors in console applications.
 </section>
       <h4><a class="xref" href="Terminal.Gui.Key.html">Key</a></h4>
       <section>
@@ -326,7 +342,7 @@ encode all the unicode values that can be passed.
       <h4><a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a></h4>
       <section>
 Determines the LayoutStyle for a view, if Absolute, during LayoutSubviews, the
-value from the Frame will be used, if the value is Computer, then the Frame
+value from the Frame will be used, if the value is Computed, then the Frame
 will be updated from the X, Y Pos objects and the Width and Height Dim objects.
 </section>
       <h4><a class="xref" href="Terminal.Gui.MouseFlags.html">MouseFlags</a></h4>

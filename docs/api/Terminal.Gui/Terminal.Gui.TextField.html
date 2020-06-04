@@ -16,13 +16,13 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -113,6 +113,9 @@ Single-line text entry <a class="xref" href="Terminal.Gui.View.html">View</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseLeave">View.MouseLeave</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
@@ -238,6 +241,12 @@ Single-line text entry <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearNeedsDisplay">View.ClearNeedsDisplay()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContent">View.DrawContent</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus_Terminal_Gui_View_">View.SetFocus(View)</a>
     </div>
     <div>
@@ -277,6 +286,9 @@ Single-line text entry <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusNext">View.FocusNext()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutComplete">View.LayoutComplete</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
     </div>
     <div>
@@ -287,6 +299,9 @@ Single-line text entry <a class="xref" href="Terminal.Gui.View.html">View</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseLeave_Terminal_Gui_MouseEvent_">View.OnMouseLeave(MouseEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
       <span class="xref">System.Object.Equals(System.Object)</span>
@@ -427,7 +442,9 @@ Public constructor that creates a text field, with layout controlled with X, Y, 
   
   <a id="Terminal_Gui_TextField_CanFocus_" data-uid="Terminal.Gui.TextField.CanFocus*"></a>
   <h4 id="Terminal_Gui_TextField_CanFocus" data-uid="Terminal.Gui.TextField.CanFocus">CanFocus</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.Responder.html">Responder</a> can focus.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -444,7 +461,7 @@ Public constructor that creates a text field, with layout controlled with X, Y, 
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code> if can focus; otherwise, <code>false</code>.</td>
       </tr>
     </tbody>
   </table>
@@ -481,7 +498,9 @@ Sets or gets the current cursor position.
   
   <a id="Terminal_Gui_TextField_Frame_" data-uid="Terminal.Gui.TextField.Frame*"></a>
   <h4 id="Terminal_Gui_TextField_Frame" data-uid="Terminal.Gui.TextField.Frame">Frame</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Gets or sets the frame for the view. The frame is relative to the view&apos;s container (<a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SuperView">SuperView</a>).
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -498,12 +517,22 @@ Sets or gets the current cursor position.
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
-        <td></td>
+        <td>The frame.</td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">View.Frame</a></div>
+  <h5 id="Terminal_Gui_TextField_Frame_remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+   Change the Frame when using the <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> layout style to move or resize views. 
+</p>
+<p>
+   Altering the Frame of a view will trigger the redrawing of the
+   view as well as the redrawing of the affected regions of the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SuperView">SuperView</a>.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_TextField_ReadOnly_" data-uid="Terminal.Gui.TextField.ReadOnly*"></a>
@@ -742,7 +771,9 @@ Cut the selected text to the clipboard.
   
   <a id="Terminal_Gui_TextField_MouseEvent_" data-uid="Terminal.Gui.TextField.MouseEvent*"></a>
   <h4 id="Terminal_Gui_TextField_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.TextField.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a mouse event is generated
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -776,7 +807,7 @@ Cut the selected text to the clipboard.
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -786,7 +817,9 @@ Cut the selected text to the clipboard.
   
   <a id="Terminal_Gui_TextField_OnLeave_" data-uid="Terminal.Gui.TextField.OnLeave*"></a>
   <h4 id="Terminal_Gui_TextField_OnLeave" data-uid="Terminal.Gui.TextField.OnLeave">OnLeave()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a view loses focus.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -803,7 +836,7 @@ Cut the selected text to the clipboard.
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -890,11 +923,13 @@ The <a class="xref" href="Terminal.Gui.TextField.html">TextField</a> control res
   
   <a id="Terminal_Gui_TextField_Redraw_" data-uid="Terminal.Gui.TextField.Redraw*"></a>
   <h4 id="Terminal_Gui_TextField_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.TextField.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override void Redraw(Rect region)</code></pre>
+    <pre><code class="lang-csharp hljs">public override void Redraw(Rect bounds)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -908,13 +943,27 @@ The <a class="xref" href="Terminal.Gui.TextField.html">TextField</a> control res
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
-        <td><span class="parametername">region</span></td>
-        <td></td>
+        <td><span class="parametername">bounds</span></td>
+        <td>The bounds (view-relative region) to redraw.</td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
+  <h5 id="Terminal_Gui_TextField_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
+</p>
+<p>
+   Views should set the color that they want to use on entry, as otherwise this will inherit
+   the last color that was set globaly on the driver.
+</p>
+<p>
+   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
+   larger than the <code>region</code> parameter.
+</p>
+</div>
   <h3 id="events">Events
   </h3>
   

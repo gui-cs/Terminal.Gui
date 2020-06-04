@@ -16,13 +16,13 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -111,6 +111,9 @@ ScrollBarViews are views that display a 1-character scrollbar, either horizontal
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseLeave">View.MouseLeave</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
@@ -245,6 +248,12 @@ ScrollBarViews are views that display a 1-character scrollbar, either horizontal
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearNeedsDisplay">View.ClearNeedsDisplay()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContent">View.DrawContent</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus_Terminal_Gui_View_">View.SetFocus(View)</a>
     </div>
     <div>
@@ -287,6 +296,9 @@ ScrollBarViews are views that display a 1-character scrollbar, either horizontal
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusNext">View.FocusNext()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutComplete">View.LayoutComplete</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
     </div>
     <div>
@@ -297,6 +309,9 @@ ScrollBarViews are views that display a 1-character scrollbar, either horizontal
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseLeave_Terminal_Gui_MouseEvent_">View.OnMouseLeave(MouseEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_CanFocus">Responder.CanFocus</a>
@@ -342,9 +357,89 @@ ScrollBarViews are views that display a 1-character scrollbar, either horizontal
   
   
   <a id="Terminal_Gui_ScrollBarView__ctor_" data-uid="Terminal.Gui.ScrollBarView.#ctor*"></a>
+  <h4 id="Terminal_Gui_ScrollBarView__ctor" data-uid="Terminal.Gui.ScrollBarView.#ctor">ScrollBarView()</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.ScrollBarView.html">ScrollBarView</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ScrollBarView()</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_ScrollBarView__ctor_" data-uid="Terminal.Gui.ScrollBarView.#ctor*"></a>
+  <h4 id="Terminal_Gui_ScrollBarView__ctor_System_Int32_System_Int32_System_Boolean_" data-uid="Terminal.Gui.ScrollBarView.#ctor(System.Int32,System.Int32,System.Boolean)">ScrollBarView(Int32, Int32, Boolean)</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.ScrollBarView.html">ScrollBarView</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ScrollBarView(int size, int position, bool isVertical)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">size</span></td>
+        <td>The size that this scrollbar represents.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">position</span></td>
+        <td>The position within this scrollbar.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">isVertical</span></td>
+        <td>If set to <code>true</code> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ScrollBarView__ctor_" data-uid="Terminal.Gui.ScrollBarView.#ctor*"></a>
+  <h4 id="Terminal_Gui_ScrollBarView__ctor_Terminal_Gui_Rect_" data-uid="Terminal.Gui.ScrollBarView.#ctor(Terminal.Gui.Rect)">ScrollBarView(Rect)</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.ScrollBarView.html">ScrollBarView</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> layout.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ScrollBarView(Rect rect)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><span class="parametername">rect</span></td>
+        <td>Frame for the scrollbar.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ScrollBarView__ctor_" data-uid="Terminal.Gui.ScrollBarView.#ctor*"></a>
   <h4 id="Terminal_Gui_ScrollBarView__ctor_Terminal_Gui_Rect_System_Int32_System_Int32_System_Boolean_" data-uid="Terminal.Gui.ScrollBarView.#ctor(Terminal.Gui.Rect,System.Int32,System.Int32,System.Boolean)">ScrollBarView(Rect, Int32, Int32, Boolean)</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of the <a class="xref" href="Terminal.Gui.ScrollBarView.html">ScrollBarView</a> class.
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.ScrollBarView.html">ScrollBarView</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> layout.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -369,17 +464,17 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.ScrollBarVi
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">size</span></td>
-        <td>The size that this scrollbar represents.</td>
+        <td>The size that this scrollbar represents. Sets the <a class="xref" href="Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_Size">Size</a> property.</td>
       </tr>
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">position</span></td>
-        <td>The position within this scrollbar.</td>
+        <td>The position within this scrollbar. Sets the <a class="xref" href="Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_Position">Position</a> property.</td>
       </tr>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
         <td><span class="parametername">isVertical</span></td>
-        <td>If set to <code>true</code> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.</td>
+        <td>If set to <code>true</code> this is a vertical scrollbar, otherwise, the scrollbar is horizontal. Sets the <a class="xref" href="Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_IsVertical">IsVertical</a> property.</td>
       </tr>
     </tbody>
   </table>
@@ -387,10 +482,37 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.ScrollBarVi
   </h3>
   
   
+  <a id="Terminal_Gui_ScrollBarView_IsVertical_" data-uid="Terminal.Gui.ScrollBarView.IsVertical*"></a>
+  <h4 id="Terminal_Gui_ScrollBarView_IsVertical" data-uid="Terminal.Gui.ScrollBarView.IsVertical">IsVertical</h4>
+  <div class="markdown level1 summary">
+If set to <code>true</code> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsVertical { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_ScrollBarView_Position_" data-uid="Terminal.Gui.ScrollBarView.Position*"></a>
   <h4 id="Terminal_Gui_ScrollBarView_Position" data-uid="Terminal.Gui.ScrollBarView.Position">Position</h4>
   <div class="markdown level1 summary">
-The position to show the scrollbar at.
+The position, relative to <a class="xref" href="Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_Size">Size</a>, to set the scrollbar at.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -417,7 +539,7 @@ The position to show the scrollbar at.
   <a id="Terminal_Gui_ScrollBarView_Size_" data-uid="Terminal.Gui.ScrollBarView.Size*"></a>
   <h4 id="Terminal_Gui_ScrollBarView_Size" data-uid="Terminal.Gui.ScrollBarView.Size">Size</h4>
   <div class="markdown level1 summary">
-The size that this scrollbar represents
+The size of content the scrollbar represents. 
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -439,13 +561,18 @@ The size that this scrollbar represents
       </tr>
     </tbody>
   </table>
+  <h5 id="Terminal_Gui_ScrollBarView_Size_remarks">Remarks</h5>
+  <div class="markdown level1 remarks">The <a class="xref" href="Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_Size">Size</a> is typically the size of the virtual content. E.g. when a Scrollbar is
+part of a <a class="xref" href="Terminal.Gui.ScrollView.html">ScrollView</a> the Size is set to the appropriate dimension of <a class="xref" href="Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ContentSize">ContentSize</a>.</div>
   <h3 id="methods">Methods
   </h3>
   
   
   <a id="Terminal_Gui_ScrollBarView_MouseEvent_" data-uid="Terminal.Gui.ScrollBarView.MouseEvent*"></a>
   <h4 id="Terminal_Gui_ScrollBarView_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.ScrollBarView.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a mouse event is generated
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -479,7 +606,7 @@ The size that this scrollbar represents
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -490,7 +617,7 @@ The size that this scrollbar represents
   <a id="Terminal_Gui_ScrollBarView_Redraw_" data-uid="Terminal.Gui.ScrollBarView.Redraw*"></a>
   <h4 id="Terminal_Gui_ScrollBarView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.ScrollBarView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary">
-Redraw the scrollbar
+Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -510,12 +637,26 @@ Redraw the scrollbar
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">region</span></td>
-        <td>Region to be redrawn.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
+  <h5 id="Terminal_Gui_ScrollBarView_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
+</p>
+<p>
+   Views should set the color that they want to use on entry, as otherwise this will inherit
+   the last color that was set globaly on the driver.
+</p>
+<p>
+   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
+   larger than the <code>region</code> parameter.
+</p>
+</div>
   <h3 id="events">Events
   </h3>
   

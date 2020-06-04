@@ -259,7 +259,7 @@ namespace Terminal.Gui {
 				CursorPosition++;
 		}
 
-		///<inheritdoc cref="ProcessKey(KeyEvent)"/>
+		///<inheritdoc/>
 		public override bool ProcessKey(KeyEvent kb)
 		{
 			switch (kb.Key) {
@@ -306,7 +306,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
+		///<inheritdoc/>
 		public override bool MouseEvent(MouseEvent ev)
 		{
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked))

@@ -64,7 +64,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Toplevel"/> class with the specified absolute layout.
 		/// </summary>
-		/// <param name="frame">Frame.</param>
+		/// <param name="frame">A superview-relative rectangle specifying the location and size for the new Toplevel</param>
 		public Toplevel (Rect frame) : base (frame)
 		{
 			Initialize ();
@@ -119,7 +119,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public StatusBar StatusBar { get; set; }
 
-		///<inheritdoc cref="ProcessKey"/>
+		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			if (base.ProcessKey (keyEvent))
@@ -171,7 +171,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		///<inheritdoc cref="Add"/>
+		///<inheritdoc/>
 		public override void Add (View view)
 		{
 			if (this == Application.Top) {
@@ -183,7 +183,7 @@ namespace Terminal.Gui {
 			base.Add (view);
 		}
 
-		///<inheritdoc cref="Remove"/>
+		///<inheritdoc/>
 		public override void Remove (View view)
 		{
 			if (this == Application.Top) {
@@ -195,7 +195,7 @@ namespace Terminal.Gui {
 			base.Remove (view);
 		}
 
-		///<inheritdoc cref="RemoveAll"/>
+		///<inheritdoc/>
 		public override void RemoveAll ()
 		{
 			if (this == Application.Top) {
@@ -256,7 +256,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///<inheritdoc cref="Redraw"/>
+		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
 			Application.CurrentView = this;
@@ -264,6 +264,9 @@ namespace Terminal.Gui {
 			if (IsCurrentTop || this == Application.Top) {
 				if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
 					Driver.SetAttribute (Colors.TopLevel.Normal);
+
+					// This is the Application.Top. Clear just the region we're being asked to redraw 
+					// (the bounds passed to us).
 					Clear (bounds);
 					Driver.SetAttribute (Colors.Base.Normal);
 				}

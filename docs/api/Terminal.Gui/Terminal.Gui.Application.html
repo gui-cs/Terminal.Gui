@@ -16,13 +16,13 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -84,7 +84,7 @@
   <h1 id="Terminal_Gui_Application" data-uid="Terminal.Gui.Application" class="text-break">Class Application
   </h1>
   <div class="markdown level0 summary">
-The application driver for Terminal.Gui.
+A static, singelton class provding the main application driver for Terminal.Gui apps. 
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -125,18 +125,32 @@ The application driver for Terminal.Gui.
   <h5 id="Terminal_Gui_Application_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks">
 <p>
-  You can hook up to the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Iteration">Iteration</a> event to have your method
-  invoked on each iteration of the <a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a>.
-</p>
-<p>
   Creates a instance of <a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a> to process input events, handle timers and
   other sources of data. It is accessible via the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_MainLoop">MainLoop</a> property.
+</p>
+<p>
+  You can hook up to the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Iteration">Iteration</a> event to have your method
+  invoked on each iteration of the <a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a>.
 </p>
 <p>
   When invoked sets the SynchronizationContext to one that is tied
   to the mainloop, allowing user code to use async/await.
 </p>
 </div>
+  <h5 id="Terminal_Gui_Application_examples"><strong>Examples</strong></h5>
+  
+<pre><code>// A simple Terminal.Gui app that creates a window with a frame and title with 
+// 5 rows/columns of padding.
+Application.Init();
+var win = new Window (&quot;Hello World - CTRL-Q to quit&quot;) {
+    X = 5,
+    Y = 5,
+    Width = Dim.Fill (5),
+    Height = Dim.Fill (5)
+};
+Application.Top.Add(win);
+Application.Run();</code></pre>
+
   <h3 id="fields">Fields
   </h3>
   
@@ -625,7 +639,6 @@ Runs the application by calling <a class="xref" href="Terminal.Gui.Application.h
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static void Run&lt;T&gt;()
-
     where T : Toplevel, new()</code></pre>
   </div>
   <h5 class="typeParameters">Type Parameters</h5>

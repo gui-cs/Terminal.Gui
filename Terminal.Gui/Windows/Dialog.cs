@@ -100,7 +100,7 @@ namespace Terminal.Gui {
 			}
 			return buttons.Select (b => b.Bounds.Width).Sum () + buttons.Count() - 1;
 		}
-		///<inheritdoc cref="LayoutSubviews"/>
+		///<inheritdoc/>
 		public override void LayoutSubviews ()
 		{
 			int buttonsWidth = GetButtonsWidth ();
@@ -116,7 +116,7 @@ namespace Terminal.Gui {
 			base.LayoutSubviews ();
 		}
 
-		///<inheritdoc cref="ProcessKey"/>
+		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			switch (kb.Key) {

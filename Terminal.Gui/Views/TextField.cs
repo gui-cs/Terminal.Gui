@@ -86,7 +86,7 @@ namespace Terminal.Gui {
 			WantMousePositionReports = true;
 		}
 
-		///<inheritdoc cref="OnLeave"/>
+		///<inheritdoc/>
 		public override bool OnLeave ()
 		{
 			if (Application.mouseGrabView != null && Application.mouseGrabView == this)
@@ -97,7 +97,7 @@ namespace Terminal.Gui {
 			return base.OnLeave ();
 		}
 
-		///<inheritdoc cref="Frame"/>
+		///<inheritdoc/>
 		public override Rect Frame {
 			get => base.Frame;
 			set {
@@ -183,7 +183,7 @@ namespace Terminal.Gui {
 			Move (col, 0);
 		}
 
-		///<inheritdoc cref="Redraw(Rect)"/>
+		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
 			ColorScheme color = Colors.Menu;
@@ -255,7 +255,7 @@ namespace Terminal.Gui {
 			SetText (newText.ToList ());
 		}
 
-		///<inheritdoc cref="CanFocus"/>
+		///<inheritdoc/>
 		public override bool CanFocus {
 			get => true;
 			set { base.CanFocus = value; }
@@ -629,7 +629,7 @@ namespace Terminal.Gui {
 		int start, length;
 		bool isButtonReleased = true;
 
-		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
+		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent ev)
 		{
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed) && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition) &&

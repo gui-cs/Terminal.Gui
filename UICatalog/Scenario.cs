@@ -175,7 +175,7 @@ namespace UICatalog {
 		/// <returns>list of catagory names</returns>
 		public List<string> GetCategories () => ScenarioCategory.GetCategories (this.GetType ());
 
-		/// <inheritdoc cref="ToString"/>
+		/// <inheritdoc/>
 		public override string ToString () => $"{GetName (),-30}{GetDescription ()}";
 
 		/// <summary>

@@ -16,13 +16,13 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -193,8 +193,9 @@ useful to flush the layout from the right or bottom.
   <h5 id="Terminal_Gui_Pos_AnchorEnd_System_Int32__examples">Examples</h5>
   
 This sample shows how align a <a class="xref" href="Terminal.Gui.Button.html">Button</a> to the bottom-right of a <a class="xref" href="Terminal.Gui.View.html">View</a>.
-<pre><code>anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
-anchorButton.Y = Pos.AnchorEnd () - 1;</code></pre>
+<pre><code>// See Issue #502 
+anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
+anchorButton.Y = Pos.AnchorEnd (1);</code></pre>
 
   
   

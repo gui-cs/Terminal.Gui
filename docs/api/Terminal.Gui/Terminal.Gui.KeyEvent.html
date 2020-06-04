@@ -16,13 +16,13 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -136,14 +136,14 @@ Constructs a new <a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a>
   
   
   <a id="Terminal_Gui_KeyEvent__ctor_" data-uid="Terminal.Gui.KeyEvent.#ctor*"></a>
-  <h4 id="Terminal_Gui_KeyEvent__ctor_Terminal_Gui_Key_" data-uid="Terminal.Gui.KeyEvent.#ctor(Terminal.Gui.Key)">KeyEvent(Key)</h4>
+  <h4 id="Terminal_Gui_KeyEvent__ctor_Terminal_Gui_Key_Terminal_Gui_KeyModifiers_" data-uid="Terminal.Gui.KeyEvent.#ctor(Terminal.Gui.Key,Terminal.Gui.KeyModifiers)">KeyEvent(Key, KeyModifiers)</h4>
   <div class="markdown level1 summary">
 Constructs a new <a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a> from the provided Key value - can be a rune cast into a Key value
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public KeyEvent(Key k)</code></pre>
+    <pre><code class="lang-csharp hljs">public KeyEvent(Key k, KeyModifiers km)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -158,6 +158,11 @@ Constructs a new <a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a> 
       <tr>
         <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
         <td><span class="parametername">k</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.KeyModifiers.html">KeyModifiers</a></td>
+        <td><span class="parametername">km</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -221,6 +226,33 @@ Gets a value indicating whether the Alt key was pressed (real or synthesized)
   </table>
   
   
+  <a id="Terminal_Gui_KeyEvent_IsCapslock_" data-uid="Terminal.Gui.KeyEvent.IsCapslock*"></a>
+  <h4 id="Terminal_Gui_KeyEvent_IsCapslock" data-uid="Terminal.Gui.KeyEvent.IsCapslock">IsCapslock</h4>
+  <div class="markdown level1 summary">
+Gets a value indicating whether the Caps lock key was pressed (real or synthesized)
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsCapslock { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><code>true</code> if is alternate; otherwise, <code>false</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_KeyEvent_IsCtrl_" data-uid="Terminal.Gui.KeyEvent.IsCtrl*"></a>
   <h4 id="Terminal_Gui_KeyEvent_IsCtrl" data-uid="Terminal.Gui.KeyEvent.IsCtrl">IsCtrl</h4>
   <div class="markdown level1 summary">
@@ -243,6 +275,60 @@ Determines whether the value is a control key (and NOT just the ctrl key)
       <tr>
         <td><span class="xref">System.Boolean</span></td>
         <td><code>true</code> if is ctrl; otherwise, <code>false</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_KeyEvent_IsNumlock_" data-uid="Terminal.Gui.KeyEvent.IsNumlock*"></a>
+  <h4 id="Terminal_Gui_KeyEvent_IsNumlock" data-uid="Terminal.Gui.KeyEvent.IsNumlock">IsNumlock</h4>
+  <div class="markdown level1 summary">
+Gets a value indicating whether the Num lock key was pressed (real or synthesized)
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsNumlock { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><code>true</code> if is alternate; otherwise, <code>false</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_KeyEvent_IsScrolllock_" data-uid="Terminal.Gui.KeyEvent.IsScrolllock*"></a>
+  <h4 id="Terminal_Gui_KeyEvent_IsScrolllock" data-uid="Terminal.Gui.KeyEvent.IsScrolllock">IsScrolllock</h4>
+  <div class="markdown level1 summary">
+Gets a value indicating whether the Scroll lock key was pressed (real or synthesized)
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsScrolllock { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><code>true</code> if is alternate; otherwise, <code>false</code>.</td>
       </tr>
     </tbody>
   </table>
@@ -308,7 +394,9 @@ symbolic options are in use.
   
   <a id="Terminal_Gui_KeyEvent_ToString_" data-uid="Terminal.Gui.KeyEvent.ToString*"></a>
   <h4 id="Terminal_Gui_KeyEvent_ToString" data-uid="Terminal.Gui.KeyEvent.ToString">ToString()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Pretty prints the KeyEvent
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">

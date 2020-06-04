@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class ColorScheme
+    <title>Class KeyModifiers
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class ColorScheme
+    <meta name="title" content="Class KeyModifiers
    ">
     <meta name="generator" content="docfx 2.54.0.0">
     
@@ -78,21 +78,19 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Terminal.Gui.ColorScheme">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.KeyModifiers">
   
   
-  <h1 id="Terminal_Gui_ColorScheme" data-uid="Terminal.Gui.ColorScheme" class="text-break">Class ColorScheme
+  <h1 id="Terminal_Gui_KeyModifiers" data-uid="Terminal.Gui.KeyModifiers" class="text-break">Class KeyModifiers
   </h1>
   <div class="markdown level0 summary">
-Color scheme definitions, they cover some common scenarios and are used
-typically in containers such as <a class="xref" href="Terminal.Gui.Window.html">Window</a> and <a class="xref" href="Terminal.Gui.FrameView.html">FrameView</a> to set the scheme that is used by all the
-views contained inside.
+Identifies the state of the &quot;shift&quot;-keys within a event.
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><span class="xref">System.Object</span></div>
-    <div class="level1"><span class="xref">ColorScheme</span></div>
+    <div class="level1"><span class="xref">KeyModifiers</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -120,25 +118,24 @@ views contained inside.
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Terminal_Gui_ColorScheme_syntax">Syntax</h5>
+  <h5 id="Terminal_Gui_KeyModifiers_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ColorScheme</code></pre>
+    <pre><code class="lang-csharp hljs">public class KeyModifiers</code></pre>
   </div>
-  <h3 id="properties">Properties
+  <h3 id="fields">Fields
   </h3>
   
   
-  <a id="Terminal_Gui_ColorScheme_Disabled_" data-uid="Terminal.Gui.ColorScheme.Disabled*"></a>
-  <h4 id="Terminal_Gui_ColorScheme_Disabled" data-uid="Terminal.Gui.ColorScheme.Disabled">Disabled</h4>
+  <h4 id="Terminal_Gui_KeyModifiers_Alt" data-uid="Terminal.Gui.KeyModifiers.Alt">Alt</h4>
   <div class="markdown level1 summary">
-The default color for text, when the view is disabled.
+Check if the Alt key was pressed or not.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Attribute Disabled { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool Alt</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
+  <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -148,24 +145,23 @@ The default color for text, when the view is disabled.
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a></td>
+        <td><span class="xref">System.Boolean</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_ColorScheme_Focus_" data-uid="Terminal.Gui.ColorScheme.Focus*"></a>
-  <h4 id="Terminal_Gui_ColorScheme_Focus" data-uid="Terminal.Gui.ColorScheme.Focus">Focus</h4>
+  <h4 id="Terminal_Gui_KeyModifiers_Capslock" data-uid="Terminal.Gui.KeyModifiers.Capslock">Capslock</h4>
   <div class="markdown level1 summary">
-The color for text when the view has the focus.
+Check if the Caps lock key was pressed or not.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Attribute Focus { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool Capslock</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
+  <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -175,24 +171,23 @@ The color for text when the view has the focus.
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a></td>
+        <td><span class="xref">System.Boolean</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_ColorScheme_HotFocus_" data-uid="Terminal.Gui.ColorScheme.HotFocus*"></a>
-  <h4 id="Terminal_Gui_ColorScheme_HotFocus" data-uid="Terminal.Gui.ColorScheme.HotFocus">HotFocus</h4>
+  <h4 id="Terminal_Gui_KeyModifiers_Ctrl" data-uid="Terminal.Gui.KeyModifiers.Ctrl">Ctrl</h4>
   <div class="markdown level1 summary">
-The color for the hotkey when the view is focused.
+Check if the Ctrl key was pressed or not.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Attribute HotFocus { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool Ctrl</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
+  <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -202,24 +197,23 @@ The color for the hotkey when the view is focused.
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a></td>
+        <td><span class="xref">System.Boolean</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_ColorScheme_HotNormal_" data-uid="Terminal.Gui.ColorScheme.HotNormal*"></a>
-  <h4 id="Terminal_Gui_ColorScheme_HotNormal" data-uid="Terminal.Gui.ColorScheme.HotNormal">HotNormal</h4>
+  <h4 id="Terminal_Gui_KeyModifiers_Numlock" data-uid="Terminal.Gui.KeyModifiers.Numlock">Numlock</h4>
   <div class="markdown level1 summary">
-The color for the hotkey when a view is not focused
+Check if the Num lock key was pressed or not.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Attribute HotNormal { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool Numlock</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
+  <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -229,24 +223,23 @@ The color for the hotkey when a view is not focused
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a></td>
+        <td><span class="xref">System.Boolean</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_ColorScheme_Normal_" data-uid="Terminal.Gui.ColorScheme.Normal*"></a>
-  <h4 id="Terminal_Gui_ColorScheme_Normal" data-uid="Terminal.Gui.ColorScheme.Normal">Normal</h4>
+  <h4 id="Terminal_Gui_KeyModifiers_Scrolllock" data-uid="Terminal.Gui.KeyModifiers.Scrolllock">Scrolllock</h4>
   <div class="markdown level1 summary">
-The default color for text, when the view is not focused.
+Check if the Scroll lock key was pressed or not.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Attribute Normal { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool Scrolllock</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
+  <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -256,7 +249,33 @@ The default color for text, when the view is not focused.
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a></td>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_KeyModifiers_Shift" data-uid="Terminal.Gui.KeyModifiers.Shift">Shift</h4>
+  <div class="markdown level1 summary">
+Check if the Shift key was pressed or not.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Shift</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
         <td></td>
       </tr>
     </tbody>

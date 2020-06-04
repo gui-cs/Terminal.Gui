@@ -107,7 +107,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///<inheritdoc cref="Redraw(Rect)"/>
+		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
 			for (int i = 0; i < radioLabels.Length; i++) {
@@ -119,13 +119,15 @@ namespace Terminal.Gui {
 			base.Redraw (bounds);
 		}
 
-		///<inheritdoc cref="PositionCursor"/>
+		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
 			Move (1, cursor);
 		}
 
-		///<inheritdoc cref="SelectionChanged"/>
+		/// <summary>
+		/// Invoked when the selected radio label has changed
+		/// </summary>
 		public Action<int> SelectionChanged;
 
 		/// <summary>
@@ -141,7 +143,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///<inheritdoc cref="ProcessColdKey"/>
+		///<inheritdoc/>
 		public override bool ProcessColdKey (KeyEvent kb)
 		{
 			var key = kb.KeyValue;
@@ -170,7 +172,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		///<inheritdoc cref="ProcessKey(KeyEvent)"/>
+		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			switch (kb.Key) {
@@ -195,7 +197,7 @@ namespace Terminal.Gui {
 			return base.ProcessKey (kb);
 		}
 
-		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
+		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked))

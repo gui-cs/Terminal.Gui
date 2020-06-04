@@ -571,7 +571,7 @@ namespace Terminal.Gui {
 
 		bool openedByAltKey;
 
-		///<inheritdoc cref="OnKeyDown"/>
+		///<inheritdoc/>
 		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
@@ -582,7 +582,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		///<inheritdoc cref="OnKeyUp"/>
+		///<inheritdoc/>
 		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
@@ -623,7 +623,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		///<inheritdoc cref="Redraw"/>
+		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
 			Move (0, 0);
@@ -654,7 +654,7 @@ namespace Terminal.Gui {
 			PositionCursor ();
 		}
 
-		///<inheritdoc cref="PositionCursor"/>
+		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
 			int pos = 0;
@@ -999,7 +999,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///<inheritdoc cref="ProcessHotKey"/>
+		///<inheritdoc/>
 		public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == Key.F9) {
@@ -1024,7 +1024,7 @@ namespace Terminal.Gui {
 			return base.ProcessHotKey (kb);
 		}
 
-		///<inheritdoc cref="ProcessKey"/>
+		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			switch (kb.Key) {
@@ -1079,7 +1079,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		///<inheritdoc cref="MouseEvent"/>
+		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!handled && !HandleGrabView (me, this)) {

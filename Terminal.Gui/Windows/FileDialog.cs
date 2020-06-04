@@ -497,7 +497,7 @@ namespace Terminal.Gui {
 
 		internal bool canceled;
 
-		///<inheritdoc cref="WillPresent"/>
+		///<inheritdoc/>
 		public override void WillPresent ()
 		{
 			base.WillPresent ();

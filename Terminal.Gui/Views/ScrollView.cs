@@ -122,7 +122,7 @@ namespace Terminal.Gui {
 			WantContinuousButtonPressed = true;
 		}
 
-		///<inheritdoc cref="Redraw(Rect)"/>
+		///<inheritdoc/>
 		public override void Redraw (Rect region)
 		{
 			if (ColorScheme == null)
@@ -229,7 +229,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///<inheritdoc cref="MouseEvent"/>
+		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
@@ -467,7 +467,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <inheritdoc cref="Redraw(Rect)"/>
+		/// <inheritdoc/>
 		public override void Redraw (Rect region)
 		{
 			Driver.SetAttribute (ColorScheme.Normal);
@@ -503,7 +503,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///<inheritdoc cref="PositionCursor"/>
+		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
 			if (InternalSubviews.Count == 0)
@@ -569,7 +569,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		///<inheritdoc cref="ProcessKey"/>
+		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			if (base.ProcessKey (kb))
@@ -605,7 +605,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
+		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp &&

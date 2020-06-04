@@ -23,16 +23,31 @@ using System.ComponentModel;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// The application driver for Terminal.Gui.
+	/// A static, singelton class provding the main application driver for Terminal.Gui apps. 
 	/// </summary>
+	/// <example>
+	/// <code>
+	/// // A simple Terminal.Gui app that creates a window with a frame and title with 
+	/// // 5 rows/columns of padding.
+	/// Application.Init();
+	/// var win = new Window ("Hello World - CTRL-Q to quit") {
+	///     X = 5,
+	///     Y = 5,
+	///     Width = Dim.Fill (5),
+	///     Height = Dim.Fill (5)
+	/// };
+	/// Application.Top.Add(win);
+	/// Application.Run();
+	/// </code>
+	/// </example>
 	/// <remarks>
-	///   <para>
-	///     You can hook up to the <see cref="Iteration"/> event to have your method
-	///     invoked on each iteration of the <see cref="Terminal.Gui.MainLoop"/>.
-	///   </para>
 	///   <para>
 	///     Creates a instance of <see cref="Terminal.Gui.MainLoop"/> to process input events, handle timers and
 	///     other sources of data. It is accessible via the <see cref="MainLoop"/> property.
+	///   </para>
+	///   <para>
+	///     You can hook up to the <see cref="Iteration"/> event to have your method
+	///     invoked on each iteration of the <see cref="Terminal.Gui.MainLoop"/>.
 	///   </para>
 	///   <para>
 	///     When invoked sets the SynchronizationContext to one that is tied
