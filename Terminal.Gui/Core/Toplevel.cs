@@ -5,7 +5,9 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -150,6 +152,8 @@ namespace Terminal.Gui {
 				if (old != Focused) {
 					old?.SetNeedsDisplay ();
 					Focused?.SetNeedsDisplay ();
+				} else {
+					FocusNearestView (GetSuperViewSubviews (true), true);
 				}
 				return true;
 			case Key.CursorLeft:
@@ -161,12 +165,15 @@ namespace Terminal.Gui {
 				if (old != Focused) {
 					old?.SetNeedsDisplay ();
 					Focused?.SetNeedsDisplay ();
+				} else {
+					FocusNearestView (GetSuperViewSubviews (false), false);
 				}
 				return true;
 
 			case Key.ControlL:
 				Application.Refresh ();
 				return true;
+
 			}
 			return false;
 		}
