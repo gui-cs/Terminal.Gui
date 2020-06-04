@@ -366,8 +366,9 @@ namespace Terminal.Gui {
 					OfY = me.Y - newxy.Y,
 					View = view
 				};
-				if (OutsideFrame (new Point (nme.X, nme.Y), mouseGrabView.Frame))
+				if (OutsideFrame (new Point (nme.X, nme.Y), mouseGrabView.Frame)) {
 					lastMouseOwnerView?.OnMouseLeave (me);
+				}
 				if (mouseGrabView != null) {
 					mouseGrabView.OnMouseEvent (nme);
 					return;

@@ -788,6 +788,7 @@ namespace Terminal.Gui {
 		{
 			CloseMenu (false, false);
 		}
+
 		internal void CloseMenu (bool reopen = false, bool isSubMenu = false)
 		{
 			isMenuClosing = true;
@@ -809,12 +810,11 @@ namespace Terminal.Gui {
 					if (!reopen)
 						selected = -1;
 					LastFocused.SuperView?.SetFocus (LastFocused);
-					IsMenuOpen = false;
 				} else {
 					SuperView.SetFocus (this);
-					IsMenuOpen = false;
 					PositionCursor ();
 				}
+				IsMenuOpen = false;
 				break;
 
 			case true:
@@ -823,10 +823,10 @@ namespace Terminal.Gui {
 				RemoveAllOpensSubMenus ();
 				openCurrentMenu.previousSubFocused?.SuperView?.SetFocus (openCurrentMenu.previousSubFocused);
 				openSubMenu = null;
+				IsMenuOpen = true;
 				break;
 			}
 			isMenuClosing = false;
-			IsMenuOpen = false;
 		}
 
 		void RemoveSubMenu (int index)
@@ -1087,31 +1087,26 @@ namespace Terminal.Gui {
 			}
 			handled = false;
 
-			if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1Clicked || me.Flags == MouseFlags.Button1DoubleClicked ||
+			if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1Clicked ||
 				(me.Flags == MouseFlags.ReportMousePosition && selected > -1) ||
 				(me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && selected > -1)) {
 				int pos = 1;
 				int cx = me.X;
 				for (int i = 0; i < Menus.Length; i++) {
 					if (cx > pos && me.X < pos + 1 + Menus [i].TitleLength) {
-						if (selected == i && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) &&
-											IsMenuOpen) {
-							Application.UngrabMouse ();
+						if (me.Flags == MouseFlags.Button1Clicked) {
 							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
 								menu.Run (Menus [i].Action);
-							} else {
-								CloseMenu ();
 							}
-						} else if ((me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) &&
-							!IsMenuOpen) {
-							if (Menus [i].IsTopLevel) {
-								var menu = new Menu (this, i, 0, Menus [i]);
-								menu.Run (Menus [i].Action);
+						} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) {
+							if (IsMenuOpen) {
+								CloseAllMenus ();
 							} else {
 								Activate (i);
 							}
-						} else if (selected != i && selected > -1 && me.Flags == MouseFlags.ReportMousePosition) {
+						} else if (selected != i && selected > -1 && (me.Flags == MouseFlags.ReportMousePosition ||
+							me.Flags == MouseFlags.Button1Pressed && me.Flags == MouseFlags.ReportMousePosition)) {
 							if (IsMenuOpen) {
 								CloseMenu ();
 								Activate (i);
@@ -1140,7 +1135,7 @@ namespace Terminal.Gui {
 						me.View.MouseEvent (me);
 					}
 				} else if (!(me.View is MenuBar || me.View is Menu) && (me.Flags.HasFlag (MouseFlags.Button1Clicked) ||
-					me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1Pressed)) {
+					me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked)) {
 					Application.UngrabMouse ();
 					CloseAllMenus ();
 					handled = false;
@@ -1149,24 +1144,25 @@ namespace Terminal.Gui {
 					handled = false;
 					return false;
 				}
-			} else if (!IsMenuOpen && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked ||
-				me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
+			} else if (!IsMenuOpen && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
 				Application.GrabMouse (current);
-			} else {
+			} else if (IsMenuOpen && (me.View is MenuBar || me.View is Menu)) {
+				Application.GrabMouse (me.View);
+			}
+			else {
 				handled = false;
 				return false;
 			}
-			//if (me.View != this && (me.Flags != MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked))
+			//if (me.View != this && me.Flags != MouseFlags.Button1Pressed)
 			//	return true;
-			//else if (me.View != this && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked)) {
+			//else if (me.View != this && me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) {
 			//	Application.UngrabMouse ();
 			//	host.CloseAllMenus ();
 			//	return true;
 			//}
 
 
-			//if (!(me.View is MenuBar) && !(me.View is Menu) && (me.Flags != MouseFlags.Button1Pressed ||
-			// me.Flags != MouseFlags.Button1DoubleClicked))
+			//if (!(me.View is MenuBar) && !(me.View is Menu) && me.Flags != MouseFlags.Button1Pressed))
 			//	return false;
 
 			//if (Application.mouseGrabView != null) {
@@ -1175,12 +1171,11 @@ namespace Terminal.Gui {
 			//		me.Y -= me.OfY;
 			//		me.View.MouseEvent (me);
 			//		return true;
-			//	} else if (!(me.View is MenuBar || me.View is Menu) && (me.Flags == MouseFlags.Button1Pressed ||
-			//		me.Flags == MouseFlags.Button1DoubleClicked)) {
+			//	} else if (!(me.View is MenuBar || me.View is Menu) && me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) {
 			//		Application.UngrabMouse ();
 			//		CloseAllMenus ();
 			//	}
-			//} else if (!isMenuClosed && selected == -1 && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked)) {
+			//} else if (!isMenuClosed && selected == -1 && me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) {
 			//	Application.GrabMouse (this);
 			//	return true;
 			//}
