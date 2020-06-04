@@ -504,7 +504,10 @@ Adds a <a class="xref" href="Terminal.Gui.Button.html">Button</a> to the <a clas
   
   <a id="Terminal_Gui_Dialog_LayoutSubviews_" data-uid="Terminal.Gui.Dialog.LayoutSubviews*"></a>
   <h4 id="Terminal_Gui_Dialog_LayoutSubviews" data-uid="Terminal.Gui.Dialog.LayoutSubviews">LayoutSubviews()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Invoked when a view starts executing or when the dimensions of the view have changed, for example in
+response to the container view or terminal resizing.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -512,11 +515,18 @@ Adds a <a class="xref" href="Terminal.Gui.Button.html">Button</a> to the <a clas
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a></div>
+  <h5 id="Terminal_Gui_Dialog_LayoutSubviews_remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+Calls <span class="xref">Terminal.Gui.View.OnLayoutComplete(Terminal.Gui.View.LayoutEventArgs)</span> (which raises the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutComplete">LayoutComplete</a> event) before it returns.
+</div>
   
   
   <a id="Terminal_Gui_Dialog_ProcessKey_" data-uid="Terminal.Gui.Dialog.ProcessKey*"></a>
   <h4 id="Terminal_Gui_Dialog_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Dialog.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+If the view is focused, gives the view a
+chance to process the keystroke.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -556,6 +566,25 @@ Adds a <a class="xref" href="Terminal.Gui.Button.html">Button</a> to the <a clas
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_">Toplevel.ProcessKey(KeyEvent)</a></div>
+  <h5 id="Terminal_Gui_Dialog_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  Views can override this method if they are
+  interested in processing the given keystroke.
+  If they consume the keystroke, they must
+  return true to stop the keystroke from being
+  processed by other widgets or consumed by the
+  widget engine.    If they return false, the
+  keystroke will be passed using the ProcessColdKey
+  method to other views to process.
+</p>
+<p>
+  The View implementation does nothing but return false,
+  so it is not necessary to call base.ProcessKey if you
+  derive directly from View, but you should if you derive
+  other View subclasses.
+</p>
+</div>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.Collections.IEnumerable</span>
