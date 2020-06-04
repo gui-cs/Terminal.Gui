@@ -131,7 +131,7 @@ namespace Terminal.Gui {
 			contentView.RemoveAll();
 		}
 
-		///<inheritdoc cref="Redraw(Rect)"/>
+		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
 			var padding = 0;

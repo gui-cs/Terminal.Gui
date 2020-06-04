@@ -16,13 +16,13 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -84,7 +84,7 @@
   <h1 id="Terminal_Gui_Window" data-uid="Terminal.Gui.Window" class="text-break">Class Window
   </h1>
   <div class="markdown level0 summary">
-A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref" href="Terminal.Gui.View.html">View</a> that draws a frame around its region and has a &quot;ContentView&quot; subview where the contents are added.
+A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref" href="Terminal.Gui.View.html">View</a> that draws a border around its <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> with a <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Title">Title</a> at the top.
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -140,6 +140,9 @@ A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref"
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseLeave">View.MouseLeave</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
@@ -262,6 +265,12 @@ A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref"
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearNeedsDisplay">View.ClearNeedsDisplay()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContent">View.DrawContent</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus_Terminal_Gui_View_">View.SetFocus(View)</a>
     </div>
     <div>
@@ -301,6 +310,9 @@ A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref"
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusNext">View.FocusNext()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutComplete">View.LayoutComplete</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
     </div>
     <div>
@@ -311,6 +323,9 @@ A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref"
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseLeave_Terminal_Gui_MouseEvent_">View.OnMouseLeave(MouseEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
       <span class="xref">System.Object.Equals(System.Object)</span>
@@ -337,6 +352,11 @@ A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref"
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class Window : Toplevel, IEnumerable</code></pre>
   </div>
+  <h5 id="Terminal_Gui_Window_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks">
+The &apos;client area&apos; of a <a class="xref" href="Terminal.Gui.Window.html">Window</a> is a rectangle deflated by one or more rows/columns from <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a>. A this time there is no
+API to determine this rectangle.
+</div>
   <h3 id="constructors">Constructors
   </h3>
   
@@ -368,14 +388,18 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Window.html
       </tr>
     </tbody>
   </table>
+  <h5 id="Terminal_Gui_Window__ctor_NStack_ustring__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+This constructor intitalize a View with a <a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a> of <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a>. 
+Use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_X">X</a>, <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Y">Y</a>, <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">Width</a>, and <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">Height</a> properties to dynamically control the size and location of the view.
+</div>
   
   
   <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
   <h4 id="Terminal_Gui_Window__ctor_NStack_ustring_System_Int32_" data-uid="Terminal.Gui.Window.#ctor(NStack.ustring,System.Int32)">Window(ustring, Int32)</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of the <a class="xref" href="Terminal.Gui.Window.html">Window</a> with
-the specified frame for its location, with the specified border
-an optional title.
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.Window.html">Window</a> with the specified frame for its location, with the specified border,
+and an optional title.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -404,12 +428,17 @@ an optional title.
       </tr>
     </tbody>
   </table>
+  <h5 id="Terminal_Gui_Window__ctor_NStack_ustring_System_Int32__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+This constructor intitalize a View with a <a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a> of <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a>. 
+Use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_X">X</a>, <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Y">Y</a>, <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">Width</a>, and <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">Height</a> properties to dynamically control the size and location of the view.
+</div>
   
   
   <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
   <h4 id="Terminal_Gui_Window__ctor_Terminal_Gui_Rect_NStack_ustring_" data-uid="Terminal.Gui.Window.#ctor(Terminal.Gui.Rect,NStack.ustring)">Window(Rect, ustring)</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of the <a class="xref" href="Terminal.Gui.Window.html">Window</a> class with an optional title and a set frame.
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.Window.html">Window</a> class with an optional title using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> positioning.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -429,23 +458,27 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Window.html
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">frame</span></td>
-        <td>Frame.</td>
+        <td>Superview-relatie rectangle specifying the location and size</td>
       </tr>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
         <td><span class="parametername">title</span></td>
-        <td>Title.</td>
+        <td>Title</td>
       </tr>
     </tbody>
   </table>
+  <h5 id="Terminal_Gui_Window__ctor_Terminal_Gui_Rect_NStack_ustring__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+This constructor intitalizes a Window with a <a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a> of <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a>. Use constructors
+that do not take <code>Rect</code> parameters to initialize a Window with <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a>. 
+</div>
   
   
   <a id="Terminal_Gui_Window__ctor_" data-uid="Terminal.Gui.Window.#ctor*"></a>
   <h4 id="Terminal_Gui_Window__ctor_Terminal_Gui_Rect_NStack_ustring_System_Int32_" data-uid="Terminal.Gui.Window.#ctor(Terminal.Gui.Rect,NStack.ustring,System.Int32)">Window(Rect, ustring, Int32)</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of the <a class="xref" href="Terminal.Gui.Window.html">Window</a> with
-the specified frame for its location, with the specified border
-an optional title.
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.Window.html">Window</a> with the specified frame for its location, with the specified border,
+and an optional title.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -465,12 +498,12 @@ an optional title.
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">frame</span></td>
-        <td>Frame.</td>
+        <td>Superview-relatie rectangle specifying the location and size</td>
       </tr>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
         <td><span class="parametername">title</span></td>
-        <td>Title.</td>
+        <td>Title</td>
       </tr>
       <tr>
         <td><span class="xref">System.Int32</span></td>
@@ -479,6 +512,11 @@ an optional title.
       </tr>
     </tbody>
   </table>
+  <h5 id="Terminal_Gui_Window__ctor_Terminal_Gui_Rect_NStack_ustring_System_Int32__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+This constructor intitalizes a Window with a <a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a> of <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a>. Use constructors
+that do not take <code>Rect</code> parameters to initialize a Window with  <a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a> of <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> 
+</div>
   <h3 id="properties">Properties
   </h3>
   
@@ -504,7 +542,7 @@ The title to be displayed for this window.
     <tbody>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
-        <td>The title.</td>
+        <td>The title</td>
       </tr>
     </tbody>
   </table>
@@ -515,7 +553,7 @@ The title to be displayed for this window.
   <a id="Terminal_Gui_Window_Add_" data-uid="Terminal.Gui.Window.Add*"></a>
   <h4 id="Terminal_Gui_Window_Add_Terminal_Gui_View_" data-uid="Terminal.Gui.Window.Add(Terminal.Gui.View)">Add(View)</h4>
   <div class="markdown level1 summary">
-Add the specified view to the <span class="xref">Terminal.Gui.Window.ContentView</span>.
+Adds a subview (child) to this view.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -535,12 +573,16 @@ Add the specified view to the <span class="xref">Terminal.Gui.Window.ContentView
       <tr>
         <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
         <td><span class="parametername">view</span></td>
-        <td>View to add to the window.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Add_Terminal_Gui_View_">Toplevel.Add(View)</a></div>
+  <h5 id="Terminal_Gui_Window_Add_Terminal_Gui_View__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+The Views that have been added to this view can be retrieved via the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Subviews">Subviews</a> property. See also <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Remove_Terminal_Gui_View_">Remove(View)</a> <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_RemoveAll">RemoveAll()</a> 
+</div>
   
   
   <a id="Terminal_Gui_Window_GetEnumerator_" data-uid="Terminal.Gui.Window.GetEnumerator*"></a>
@@ -572,7 +614,9 @@ Enumerates the various <a class="xref" href="Terminal.Gui.View.html">View</a>s i
   
   <a id="Terminal_Gui_Window_MouseEvent_" data-uid="Terminal.Gui.Window.MouseEvent*"></a>
   <h4 id="Terminal_Gui_Window_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.Window.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a mouse event is generated
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -591,7 +635,7 @@ Enumerates the various <a class="xref" href="Terminal.Gui.View.html">View</a>s i
       <tr>
         <td><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></td>
         <td><span class="parametername">mouseEvent</span></td>
-        <td></td>
+        <td>Contains the details about the mouse event.</td>
       </tr>
     </tbody>
   </table>
@@ -606,7 +650,7 @@ Enumerates the various <a class="xref" href="Terminal.Gui.View.html">View</a>s i
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -616,7 +660,9 @@ Enumerates the various <a class="xref" href="Terminal.Gui.View.html">View</a>s i
   
   <a id="Terminal_Gui_Window_Redraw_" data-uid="Terminal.Gui.Window.Redraw*"></a>
   <h4 id="Terminal_Gui_Window_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.Window.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -635,18 +681,32 @@ Enumerates the various <a class="xref" href="Terminal.Gui.View.html">View</a>s i
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">bounds</span></td>
-        <td></td>
+        <td>The bounds (view-relative region) to redraw.</td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Redraw_Terminal_Gui_Rect_">Toplevel.Redraw(Rect)</a></div>
+  <h5 id="Terminal_Gui_Window_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
+</p>
+<p>
+   Views should set the color that they want to use on entry, as otherwise this will inherit
+   the last color that was set globaly on the driver.
+</p>
+<p>
+   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
+   larger than the <code>region</code> parameter.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_Window_Remove_" data-uid="Terminal.Gui.Window.Remove*"></a>
   <h4 id="Terminal_Gui_Window_Remove_Terminal_Gui_View_" data-uid="Terminal.Gui.Window.Remove(Terminal.Gui.View)">Remove(View)</h4>
   <div class="markdown level1 summary">
-Removes a widget from this container.
+Removes a subview added via <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">Add(View)</a> or <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">Add(View[])</a> from this View.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -680,7 +740,7 @@ Removes a widget from this container.
   <a id="Terminal_Gui_Window_RemoveAll_" data-uid="Terminal.Gui.Window.RemoveAll*"></a>
   <h4 id="Terminal_Gui_Window_RemoveAll" data-uid="Terminal.Gui.Window.RemoveAll">RemoveAll()</h4>
   <div class="markdown level1 summary">
-Removes all widgets from this container.
+Removes all subviews (children) added via <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">Add(View)</a> or <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">Add(View[])</a> from this View.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -689,9 +749,6 @@ Removes all widgets from this container.
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_RemoveAll">Toplevel.RemoveAll()</a></div>
-  <h5 id="Terminal_Gui_Window_RemoveAll_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-</div>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.Collections.IEnumerable</span>

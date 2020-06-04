@@ -96,7 +96,7 @@ namespace Terminal.Gui {
 			SuperView.SetFocus (((View)sender));
 		}
 
-		///<inheritdoc cref="OnEnter"/>
+		///<inheritdoc/>
 		public override bool OnEnter ()
 		{
 			if (!search.HasFocus)
@@ -107,7 +107,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		///<inheritdoc cref="ProcessKey"/>
+		///<inheritdoc/>
 		public override bool ProcessKey(KeyEvent e)
 		{
 			if (e.Key == Key.Tab)

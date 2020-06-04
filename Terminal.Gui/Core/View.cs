@@ -76,8 +76,8 @@ namespace Terminal.Gui {
 	///    The container of a View can be accessed with the <see cref="SuperView"/> property.
 	/// </para>
 	/// <para>
-	///    The <see cref="SetNeedsDisplay(Rect)"/> method flags a region or the entire view
-	///    as requiring to be redrawn.
+	///    To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rect)"/>. To flag the entire view
+	///    for redraw call <see cref="SetNeedsDisplay()"/>.
 	/// </para>
 	/// <para>
 	///    Views have a <see cref="ColorScheme"/> property that defines the default colors that subviews
@@ -210,7 +210,7 @@ namespace Terminal.Gui {
 		public virtual bool WantContinuousButtonPressed { get; set; } = false;
 
 		/// <summary>
-		/// Gets or sets the frame for the view. The frame is relative to the <see cref="SuperView"/>.
+		/// Gets or sets the frame for the view. The frame is relative to the view's container (<see cref="SuperView"/>).
 		/// </summary>
 		/// <value>The frame.</value>
 		/// <remarks>
@@ -219,7 +219,7 @@ namespace Terminal.Gui {
 		/// </para>
 		/// <para>
 		///    Altering the Frame of a view will trigger the redrawing of the
-		///    view as well as the redrawing of the affected regions in the <see cref="SuperView"/>.
+		///    view as well as the redrawing of the affected regions of the <see cref="SuperView"/>.
 		/// </para>
 		/// </remarks>
 		public virtual Rect Frame {
@@ -263,9 +263,21 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The bounds represent the View-relative rectangle used for this view. Updates to the Bounds update the <see cref="Frame"/>, and has the same side effects as updating the <see cref="Frame"/>.
+		/// The bounds represent the View-relative rectangle used for this view; the area inside of the view.
 		/// </summary>
 		/// <value>The bounds.</value>
+		/// <remarks>
+		/// <para>
+		/// Updates to the Bounds update the <see cref="Frame"/>,
+		/// and has the same side effects as updating the <see cref="Frame"/>.
+		/// </para>
+		/// <para>
+		/// Because <see cref="Bounds"/> coordinates are relative to the upper-left corner of the <see cref="View"/>, 
+		/// the coordinates of the upper-left corner of the rectangle returned by this property are (0,0). 
+		/// Use this property to obtain the size and coordinates of the client area of the 
+		/// control for tasks such as drawing on the surface of the control.
+		/// </para>
+		/// </remarks>
 		public Rect Bounds {
 			get => new Rect (Point.Empty, Frame.Size);
 			set {
@@ -781,7 +793,7 @@ namespace Terminal.Gui {
 				Move (frame.X, frame.Y);
 		}
 
-		/// <inheritdoc cref="HasFocus"/>
+		/// <inheritdoc/>
 		public override bool HasFocus {
 			get {
 				return base.HasFocus;
@@ -819,7 +831,7 @@ namespace Terminal.Gui {
 			public bool Handled { get; set; }
 		}
 
-		/// <inheritdoc cref="OnEnter"/>
+		/// <inheritdoc/>
 		public override bool OnEnter ()
 		{
 			FocusEventArgs args = new FocusEventArgs ();
@@ -832,7 +844,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <inheritdoc cref="OnLeave"/>
+		/// <inheritdoc/>
 		public override bool OnLeave ()
 		{
 			FocusEventArgs args = new FocusEventArgs ();
@@ -946,6 +958,7 @@ namespace Terminal.Gui {
 							var savedClip = ClipToBounds ();
 
 							// Draw the subview
+							// Use the view's bounds (view-relative; Location will always be (0,0) because
 							view.Redraw (view.Bounds);
 
 							// Undo the clip
@@ -1042,7 +1055,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event EventHandler<KeyEventEventArgs> KeyPress;
 
-		/// <inheritdoc cref="ProcessKey"/>
+		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 
@@ -1056,7 +1069,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <inheritdoc cref="ProcessHotKey"/>
+		/// <inheritdoc/>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
@@ -1071,7 +1084,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <inheritdoc cref="ProcessColdKey"/>
+		/// <inheritdoc/>
 		public override bool ProcessColdKey (KeyEvent keyEvent)
 		{
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
@@ -1432,7 +1445,10 @@ namespace Terminal.Gui {
 			OnLayoutComplete (new LayoutEventArgs () { OldBounds = oldBounds });
 		}
 
-		/// <inheritdoc cref="ToString"/>
+		/// <summary>
+		/// Pretty prints the View
+		/// </summary>
+		/// <returns></returns>
 		public override string ToString ()
 		{
 			return $"{GetType ().Name}({Id})({Frame})";
@@ -1458,7 +1474,7 @@ namespace Terminal.Gui {
 			public bool Handled { get; set; }
 		}
 
-		/// <inheritdoc cref="OnMouseEnter(Gui.MouseEvent)"/>
+		/// <inheritdoc/>
 		public override bool OnMouseEnter (MouseEvent mouseEvent)
 		{
 			MouseEventEventArgs args = new MouseEventEventArgs (mouseEvent);
@@ -1471,7 +1487,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <inheritdoc cref="OnMouseLeave(Gui.MouseEvent)"/>
+		/// <inheritdoc/>
 		public override bool OnMouseLeave (MouseEvent mouseEvent)
 		{
 			MouseEventEventArgs args = new MouseEventEventArgs (mouseEvent);

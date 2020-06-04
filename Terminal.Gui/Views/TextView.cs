@@ -524,7 +524,7 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
-		///<inheritdoc cref="Redraw(Rect)"/>
+		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
 			ColorNormal ();
@@ -564,7 +564,7 @@ namespace Terminal.Gui {
 			PositionCursor ();
 		}
 
-		///<inheritdoc cref="CanFocus"/>
+		///<inheritdoc/>
 		public override bool CanFocus {
 			get => true;
 			set { base.CanFocus = value; }
@@ -712,7 +712,7 @@ namespace Terminal.Gui {
 
 		bool lastWasKill;
 
-		///<inheritdoc cref="ProcessKey"/>
+		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			int restCount;
@@ -1192,7 +1192,7 @@ namespace Terminal.Gui {
 			return null;
 		}
 
-		///<inheritdoc cref="MouseEvent"/>
+		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent ev)
 		{
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked) &&

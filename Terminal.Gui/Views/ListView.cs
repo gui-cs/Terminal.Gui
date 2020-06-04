@@ -271,7 +271,7 @@ namespace Terminal.Gui {
 			CanFocus = true;
 		}
 
-		///<inheritdoc cref="Redraw(Rect)"/>
+		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
 			var current = ColorScheme.Focus;
@@ -314,7 +314,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
 
-		///<inheritdoc cref="ProcessKey(KeyEvent)"/>
+		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			if (source == null)
@@ -489,7 +489,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		///<inheritdoc cref="PositionCursor"/>
+		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
 			if (allowsMarking)
@@ -498,7 +498,7 @@ namespace Terminal.Gui {
 				Move (0, selected - top);
 		}
 
-		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
+		///<inheritdoc/>
 		public override bool MouseEvent(MouseEvent me)
 		{
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&

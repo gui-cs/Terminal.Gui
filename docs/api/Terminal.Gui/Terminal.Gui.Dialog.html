@@ -16,13 +16,13 @@
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../../styles/docfx.css">
     <link rel="stylesheet" href="../../styles/main.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     <meta property="docfx:rel" content="../../">
     
-  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -85,7 +85,7 @@
   </h1>
   <div class="markdown level0 summary">
 The <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> <a class="xref" href="Terminal.Gui.View.html">View</a> is a <a class="xref" href="Terminal.Gui.Window.html">Window</a> that by default is centered and contains one 
-or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>. It defaults to the <a class="xref" href="Terminal.Gui.Colors.html#Terminal_Gui_Colors_Dialog">Dialog</a> color scheme and has a 1 cell padding around the edges.
+or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults to the <a class="xref" href="Terminal.Gui.Colors.html#Terminal_Gui_Colors_Dialog">Dialog</a> color scheme and has a 1 cell padding around the edges.
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -160,6 +160,9 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>. It defaults 
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseLeave">View.MouseLeave</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">View.MouseClick</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
@@ -282,6 +285,12 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>. It defaults 
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearNeedsDisplay">View.ClearNeedsDisplay()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_DrawContent">View.DrawContent</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus_Terminal_Gui_View_">View.SetFocus(View)</a>
     </div>
     <div>
@@ -321,6 +330,9 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>. It defaults 
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_FocusNext">View.FocusNext()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutComplete">View.LayoutComplete</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
     </div>
     <div>
@@ -328,6 +340,9 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>. It defaults 
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseLeave_Terminal_Gui_MouseEvent_">View.OnMouseLeave(MouseEvent)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
       <span class="xref">System.Object.Equals(System.Object)</span>
@@ -367,7 +382,8 @@ or buttons added to the dialog calls <a class="xref" href="Terminal.Gui.Applicat
   <a id="Terminal_Gui_Dialog__ctor_" data-uid="Terminal.Gui.Dialog.#ctor*"></a>
   <h4 id="Terminal_Gui_Dialog__ctor_NStack_ustring_System_Int32_System_Int32_Terminal_Gui_Button___" data-uid="Terminal.Gui.Dialog.#ctor(NStack.ustring,System.Int32,System.Int32,Terminal.Gui.Button[])">Dialog(ustring, Int32, Int32, Button[])</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of the <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> class with an optional set of <a class="xref" href="Terminal.Gui.Button.html">Button</a>s to display
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> positioning 
+and an optional set of <a class="xref" href="Terminal.Gui.Button.html">Button</a>s to display
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -406,6 +422,53 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Dialog.html
       </tr>
     </tbody>
   </table>
+  <h5 id="Terminal_Gui_Dialog__ctor_NStack_ustring_System_Int32_System_Int32_Terminal_Gui_Button____remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+if <code>width</code> and <code>height</code> are both 0, the Dialog will be vertically and horizontally centered in the
+container and the size will be 85% of the container. 
+After initialzation use <code>X</code>, <code>Y</code>, <code>Width</code>, and <code>Height</code> to override this with a location or size.
+</div>
+  
+  
+  <a id="Terminal_Gui_Dialog__ctor_" data-uid="Terminal.Gui.Dialog.#ctor*"></a>
+  <h4 id="Terminal_Gui_Dialog__ctor_NStack_ustring_Terminal_Gui_Button___" data-uid="Terminal.Gui.Dialog.#ctor(NStack.ustring,Terminal.Gui.Button[])">Dialog(ustring, Button[])</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> positioning 
+and with an optional set of <a class="xref" href="Terminal.Gui.Button.html">Button</a>s to display
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dialog(ustring title, params Button[] buttons)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">title</span></td>
+        <td>Title for the dialog.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Button.html">Button</a>[]</td>
+        <td><span class="parametername">buttons</span></td>
+        <td>Optional buttons to lay out at the bottom of the dialog.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_Dialog__ctor_NStack_ustring_Terminal_Gui_Button____remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+if <code>width</code> and <code>height</code> are both 0, the Dialog will be vertically and horizontally centered in the
+container and the size will be 85% of the container. 
+After initialzation use <code>X</code>, <code>Y</code>, <code>Width</code>, and <code>Height</code> to override this with a location or size.
+</div>
   <h3 id="methods">Methods
   </h3>
   
@@ -441,7 +504,10 @@ Adds a <a class="xref" href="Terminal.Gui.Button.html">Button</a> to the <a clas
   
   <a id="Terminal_Gui_Dialog_LayoutSubviews_" data-uid="Terminal.Gui.Dialog.LayoutSubviews*"></a>
   <h4 id="Terminal_Gui_Dialog_LayoutSubviews" data-uid="Terminal.Gui.Dialog.LayoutSubviews">LayoutSubviews()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Invoked when a view starts executing or when the dimensions of the view have changed, for example in
+response to the container view or terminal resizing.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -449,11 +515,18 @@ Adds a <a class="xref" href="Terminal.Gui.Button.html">Button</a> to the <a clas
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a></div>
+  <h5 id="Terminal_Gui_Dialog_LayoutSubviews_remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+Calls <span class="xref">Terminal.Gui.View.OnLayoutComplete(Terminal.Gui.View.LayoutEventArgs)</span> (which raises the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutComplete">LayoutComplete</a> event) before it returns.
+</div>
   
   
   <a id="Terminal_Gui_Dialog_ProcessKey_" data-uid="Terminal.Gui.Dialog.ProcessKey*"></a>
   <h4 id="Terminal_Gui_Dialog_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Dialog.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+If the view is focused, gives the view a
+chance to process the keystroke.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -493,6 +566,25 @@ Adds a <a class="xref" href="Terminal.Gui.Button.html">Button</a> to the <a clas
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_">Toplevel.ProcessKey(KeyEvent)</a></div>
+  <h5 id="Terminal_Gui_Dialog_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  Views can override this method if they are
+  interested in processing the given keystroke.
+  If they consume the keystroke, they must
+  return true to stop the keystroke from being
+  processed by other widgets or consumed by the
+  widget engine.    If they return false, the
+  keystroke will be passed using the ProcessColdKey
+  method to other views to process.
+</p>
+<p>
+  The View implementation does nothing but return false,
+  so it is not necessary to call base.ProcessKey if you
+  derive directly from View, but you should if you derive
+  other View subclasses.
+</p>
+</div>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.Collections.IEnumerable</span>

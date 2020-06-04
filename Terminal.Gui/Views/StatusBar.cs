@@ -150,7 +150,7 @@ namespace Terminal.Gui {
 			return result;
 		}
 
-		///<inheritdoc cref="Redraw"/>
+		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
 			//if (Frame.Y != Driver.Rows - 1) {
@@ -180,7 +180,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///<inheritdoc cref="ProcessHotKey"/>
+		///<inheritdoc/>
 		public override bool ProcessHotKey (KeyEvent kb)
 		{
 			foreach (var item in Items) {
@@ -192,7 +192,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		///<inheritdoc cref="MouseEvent"/>
+		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (me.Flags != MouseFlags.Button1Clicked)

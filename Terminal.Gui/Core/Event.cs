@@ -396,7 +396,10 @@ namespace Terminal.Gui {
 			keyModifiers = km;
 		}
 
-		///<inheritdoc cref="ToString"/>
+		/// <summary>
+		/// Pretty prints the KeyEvent
+		/// </summary>
+		/// <returns></returns>
 		public override string ToString ()
 		{
 			string msg = "";

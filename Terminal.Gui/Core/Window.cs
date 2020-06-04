@@ -7,8 +7,12 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// A <see cref="Toplevel"/> <see cref="View"/> that draws a frame around its region and has a "Content" subview where the contents are added.
+	/// A <see cref="Toplevel"/> <see cref="View"/> that draws a border around its <see cref="View.Frame"/> with a <see cref="Title"/> at the top.
 	/// </summary>
+	/// <remarks>
+	/// The 'client area' of a <see cref="Window"/> is a rectangle deflated by one or more rows/columns from <see cref="View.Bounds"/>. A this time there is no
+	/// API to determine this rectangle.
+	/// </remarks>
 	public class Window : Toplevel, IEnumerable {
 		View contentView;
 		ustring title;
@@ -16,7 +20,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The title to be displayed for this window.
 		/// </summary>
-		/// <value>The title.</value>
+		/// <value>The title</value>
 		public ustring Title {
 			get => title;
 			set {
@@ -25,6 +29,12 @@ namespace Terminal.Gui {
 			}
 		}
 
+
+		/// <summary>
+		/// ContentView is an internal implementation detail of Window. It is used to host Views added with <see cref="Add(View)"/>. 
+		/// Its ONLY reason for being is to provide a simple way for Window to expose to those SubViews that the Window's Bounds 
+		/// are actually deflated due to the border. 
+		/// </summary>
 		class ContentView : View {
 			public ContentView (Rect frame) : base (frame) { }
 			public ContentView () : base () { }
@@ -46,13 +56,13 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Gui.Window"/> class with an optional title and a set frame.
+		/// Initializes a new instance of the <see cref="Gui.Window"/> class with an optional title using <see cref="LayoutStyle.Absolute"/> positioning.
 		/// </summary>
-		/// <param name="frame">Frame.</param>
-		/// <param name="title">Title.</param>
+		/// <param name="frame">Superview-relatie rectangle specifying the location and size</param>
+		/// <param name="title">Title</param>
 		/// <remarks>
 		/// This constructor intitalizes a Window with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use constructors
-		/// that do not take <c>Rect</c> parameters to initialize a Window with  <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/> 
+		/// that do not take <c>Rect</c> parameters to initialize a Window with <see cref="LayoutStyle.Computed"/>. 
 		/// </remarks>
 		public Window (Rect frame, ustring title = null) : this (frame, title, padding: 0)
 		{
@@ -75,9 +85,9 @@ namespace Terminal.Gui {
 		/// Initializes a new instance of the <see cref="Window"/> with the specified frame for its location, with the specified border,
 		/// and an optional title.
 		/// </summary>
-		/// <param name="frame">Frame.</param>
+		/// <param name="frame">Superview-relatie rectangle specifying the location and size</param>
 		/// <param name="padding">Number of characters to use for padding of the drawn frame.</param>
-		/// <param name="title">Title.</param>
+		/// <param name="title">Title</param>
 		/// <remarks>
 		/// This constructor intitalizes a Window with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use constructors
 		/// that do not take <c>Rect</c> parameters to initialize a Window with  <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/> 
@@ -125,7 +135,7 @@ namespace Terminal.Gui {
 			return contentView.GetEnumerator ();
 		}
 
-		/// <inheritdoc cref="Add(View)"/>
+		/// <inheritdoc/>
 		public override void Add (View view)
 		{
 			contentView.Add (view);
@@ -134,7 +144,7 @@ namespace Terminal.Gui {
 		}
 
 
-		/// <inheritdoc cref="Remove(View)"/>
+		/// <inheritdoc/>
 		public override void Remove (View view)
 		{
 			if (view == null)
@@ -148,13 +158,13 @@ namespace Terminal.Gui {
 				this.CanFocus = false;
 		}
 
-		/// <inheritdoc cref="RemoveAll()"/>
+		/// <inheritdoc/>
 		public override void RemoveAll ()
 		{
 			contentView.RemoveAll ();
 		}
 
-		///<inheritdoc cref="Redraw"/>
+		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
 			//var padding = 0;
@@ -168,6 +178,9 @@ namespace Terminal.Gui {
 			}
 
 			var savedClip = ClipToBounds ();
+
+			// Redraw our contenetView
+			// TODO: smartly constrict contentView.Bounds to just be what intersects with the 'bounds' we were passed
 			contentView.Redraw (contentView.Bounds);
 			Driver.Clip = savedClip;
 
@@ -188,7 +201,7 @@ namespace Terminal.Gui {
 		internal static Point? dragPosition;
 		Point start;
 
-		///<inheritdoc cref="MouseEvent(Gui.MouseEvent)"/>
+		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent mouseEvent)
 		{
 			// FIXED:The code is currently disabled, because the
