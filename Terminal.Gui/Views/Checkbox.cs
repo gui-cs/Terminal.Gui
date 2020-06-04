@@ -30,12 +30,18 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Called when the <see cref="Checked"/> property changes. Invokes the <see cref="Toggled"/> event.
 		/// </summary>
-		public virtual void OnToggled (bool previousChecked) {
+		public virtual void OnToggled (bool previousChecked)
+		{
 			Toggled?.Invoke (this, previousChecked);
 		}
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="CheckBox"/> based on the given text, uses Computed layout and sets the height and width.
+		/// Initializes a new instance of <see cref="CheckBox"/> based on the given text, using <see cref="LayoutStyle.Computed"/> layout.
+		/// </summary>
+		public CheckBox () : this (string.Empty) { }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="CheckBox"/> based on the given text, using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <param name="s">S.</param>
 		/// <param name="is_checked">If set to <c>true</c> is checked.</param>
@@ -49,7 +55,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="CheckBox"/> based on the given text at the given position and a state.
+		/// Initializes a new instance of <see cref="CheckBox"/> using <see cref="LayoutStyle.Absolute"/> layout.
 		/// </summary>
 		/// <remarks>
 		///   The size of <see cref="CheckBox"/> is computed based on the
@@ -60,7 +66,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="CheckBox"/> based on the given text at the given position and a state.
+		/// Initializes a new instance of <see cref="CheckBox"/> using <see cref="LayoutStyle.Absolute"/> layout.
 		/// </summary>
 		/// <remarks>
 		///   The size of <see cref="CheckBox"/> is computed based on the

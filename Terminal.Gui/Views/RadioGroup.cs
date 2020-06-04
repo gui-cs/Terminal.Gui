@@ -7,9 +7,7 @@ namespace Terminal.Gui {
 		int selected, cursor;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="RadioGroup"/> class
-		/// setting up the initial set of radio labels and the item that should be selected and uses
-		/// an absolute layout for the result.
+		/// Initializes a new instance of the <see cref="RadioGroup"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <param name="rect">Boundaries for the radio group.</param>
 		/// <param name="radioLabels">The radio labels; an array of strings that can contain hotkeys using an underscore before the letter.</param>
@@ -35,8 +33,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="RadioGroup"/> class
-		/// setting up the initial set of radio labels and the item that should be selected.
+		/// Initializes a new instance of the <see cref="RadioGroup"/> class using <see cref="LayoutStyle.Computed"/> layout.
+		/// </summary>
+		public RadioGroup () : this (radioLabels: new string [] { }) { }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="RadioGroup"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <param name="radioLabels">The radio labels; an array of strings that can contain hotkeys using an underscore before the letter.</param>
 		/// <param name="selected">The index of the item to be selected, the value is clamped to the number of items.</param>
@@ -66,17 +68,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="RadioGroup"/> class
-		/// setting up the initial set of radio labels and the item that should be selected.
+		/// Initializes a new instance of the <see cref="RadioGroup"/> class using <see cref="LayoutStyle.Absolute"/> layout.
 		/// The <see cref="View"/> frame is computed from the provided radio labels.
 		/// </summary>
 		/// <param name="x">The x coordinate.</param>
 		/// <param name="y">The y coordinate.</param>
 		/// <param name="radioLabels">The radio labels; an array of strings that can contain hotkeys using an underscore before the letter.</param>
 		/// <param name="selected">The item to be selected, the value is clamped to the number of items.</param>		
-		public RadioGroup (int x, int y, string [] radioLabels, int selected = 0) : this (MakeRect (x, y, radioLabels), radioLabels, selected)
-		{
-		}
+		public RadioGroup (int x, int y, string [] radioLabels, int selected = 0) : this (MakeRect (x, y, radioLabels), radioLabels, selected) { }
 
 		string [] radioLabels;
 

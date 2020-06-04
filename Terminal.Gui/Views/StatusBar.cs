@@ -47,7 +47,7 @@ namespace Terminal.Gui {
 		/// A <see cref="StatusItem.Title"/> set to `~F1~ Help` will render as *F1* using <see cref="ColorScheme.HotNormal"/> and
 		/// *Help* as <see cref="ColorScheme.HotNormal"/>.
 		/// </remarks>
-		public ustring Title { get; set;}
+		public ustring Title { get; set; }
 
 		/// <summary>
 		/// Gets or sets the action to be invoked when the statusbar item is triggered
@@ -104,6 +104,11 @@ namespace Terminal.Gui {
 		public StatusItem [] Items { get; set; }
 
 		/// <summary>
+		/// Initializes a new instance of the <see cref="StatusBar"/> class.
+		/// </summary>
+		public StatusBar () : this (items: new StatusItem [] { }) { }
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="StatusBar"/> class with the specified set of <see cref="StatusItem"/>s.
 		/// The <see cref="StatusBar"/> will be drawn on the lowest line of the terminal or <see cref="StatusBar.Parent"/> (if not null).
 		/// </summary>
@@ -131,11 +136,11 @@ namespace Terminal.Gui {
 					break;
 				case StatusBarStyle.SnapToBottom:
 #endif
-					if (Parent == null) {
-						Y = Driver.Rows - 1; 
-					} else {
-						Y = Pos.Bottom (Parent);
-					}
+				if (Parent == null) {
+					Y = Driver.Rows - 1;
+				} else {
+					Y = Pos.Bottom (Parent);
+				}
 #if SNAP_TO_TOP
 					break;
 				}

@@ -1,6 +1,8 @@
-﻿using System;
+﻿using NStack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Terminal.Gui;
 
@@ -17,13 +19,27 @@ namespace UICatalog {
 
 		public override void Setup ()
 		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("_Settings", new MenuItem [] {
+					null,
+					new MenuItem ("_Quit", "", () => Quit()),
+				}),
+				new MenuBarItem ("_All Controls", "Tests all controls", () => DemoAllViewClasses() ),
+			});
+			Top.Add (menu);
+
+			var statusBar = new StatusBar (new StatusItem [] {
+				new StatusItem(Key.ControlQ, "~^Q~ Quit", () => Quit()),
+			});
+			Top.Add (statusBar);
+
 			//Top.LayoutStyle = LayoutStyle.Computed;
 			// Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width
 			// BUGBUG: Dim.Fill returns too big a value sometimes.
 			const string rule = "|123456789";
 			var horizontalRuler = new Label ("") {
 				X = 0,
-				Y = 0,		
+				Y = 0,
 				Width = Dim.Fill (1),  // BUGBUG: I don't think this should be needed; DimFill() should respect container's frame. X does.
 				ColorScheme = Colors.Error
 			};
@@ -44,7 +60,7 @@ namespace UICatalog {
 
 			Win.LayoutComplete += (sender, a) => {
 				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
-				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height*2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height*2)];
+				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height * 2)];
 			};
 
 			Win.Add (verticalRuler);
@@ -59,7 +75,7 @@ namespace UICatalog {
 			// Demonstrate using Dim to create a window that fills the parent with a margin
 			int margin = 10;
 			var subWin = new Window ($"Centered Sub Window with {margin} character margin") {
-				X = Pos.Center(),
+				X = Pos.Center (),
 				Y = 2,
 				Width = Dim.Fill (margin),
 				Height = 7
@@ -79,7 +95,7 @@ namespace UICatalog {
 			// #522 repro?
 			var frameView = new FrameView ($"Centered FrameView with {margin} character margin") {
 				X = Pos.Center (),
-				Y = Pos.Bottom(subWin),
+				Y = Pos.Bottom (subWin),
 				Width = Dim.Fill (margin),
 				Height = 7
 			};
@@ -176,7 +192,7 @@ namespace UICatalog {
 
 			// Center three buttons with 5 spaces between them
 			// TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
-			leftButton.X = Pos.Left (centerButton) - (Pos.Right(leftButton) - Pos.Left (leftButton)) - 5;
+			leftButton.X = Pos.Left (centerButton) - (Pos.Right (leftButton) - Pos.Left (leftButton)) - 5;
 			rightButton.X = Pos.Right (centerButton) + 5;
 
 			Win.Add (leftButton);
@@ -184,9 +200,109 @@ namespace UICatalog {
 			Win.Add (rightButton);
 		}
 
+		/// <summary>
+		/// Displays a Dialog that uses a wizard (next/prev) idom to step through each class derived from View
+		/// testing various Computed layout scenarios
+		/// </summary>
+		private void DemoAllViewClasses ()
+		{
+			List<Type> GetAllViewClassesCollection ()
+			{
+				List<Type> objects = new List<Type> ();
+				foreach (Type type in typeof (View).Assembly.GetTypes ()
+				 .Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View)))) {
+					objects.Add (type);
+				}
+				return objects;
+			}
+
+			var viewClasses = GetAllViewClassesCollection ().OrderByDescending (c => c.Name).ToList ();
+			var curClass = 0;
+
+			var closeBtn = new Button ("_Close") {
+				Clicked = () => {
+					Application.RequestStop ();
+				},
+			};
+			var nextBtn = new Button ("_Next");
+			var prevBtn = new Button ("_Previous");
+			var dialog = new Dialog ("Demoing all View classs", new [] { prevBtn, nextBtn, closeBtn });
+
+			var label = new Label ("Class:") {
+				X = 0,
+				Y = 0,
+			};
+			dialog.Add (label);
+			var currentClassLabel = new Label ("") {
+				X = Pos.Right (label) + 1,
+				Y = Pos.Y (label),
+			};
+			dialog.Add (currentClassLabel);
+
+			View curView = null;
+			void SetCurrentClass ()
+			{
+				currentClassLabel.Text = $"{viewClasses [curClass].Name}";
+
+				// Remove existing class, if any
+				if (curView != null) {
+					dialog.Remove (curView);
+					curView = null;
+				}
+
+				// Instantiate view
+				curView = (View)Activator.CreateInstance (viewClasses [curClass]);
+
+				curView.X = Pos.Center ();
+				curView.Y = Pos.Center ();
+				curView.Width = Dim.Fill (5);
+				curView.Height = Dim.Fill (5);
+
+				// If the view supports a Text property, set it so we have something to look at
+				if (viewClasses [curClass].GetProperty("Text") != null) {
+					curView.GetType ().GetProperty ("Text")?.GetSetMethod ()?.Invoke (curView, new [] { ustring.Make("09/10/1966") });
+				}
+
+				// If the view supports a Title property, set it so we have something to look at
+				if (viewClasses [curClass].GetProperty ("Title") != null) {
+					curView.GetType ().GetProperty ("Title")?.GetSetMethod ()?.Invoke (curView, new [] { ustring.Make ("Test Title") });
+				}
+
+
+				dialog.Add (curView);
+				dialog.LayoutSubviews ();
+			}
+
+			nextBtn.Clicked = () => {
+				curClass++;
+				if (curClass >= viewClasses.Count) {
+					curClass = 0;
+				}
+				SetCurrentClass ();
+			};
+
+			prevBtn.Clicked = () => {
+				if (curClass == 0) {
+					curClass = viewClasses.Count - 1;
+				} else {
+					curClass--;
+				}
+				SetCurrentClass ();
+			};
+
+			SetCurrentClass ();
+
+			Application.Run (dialog);
+		}
+
 		public override void Run ()
 		{
 			base.Run ();
+		}
+
+		private void Quit ()
+		{
+			Application.RequestStop ();
 		}
 	}
 

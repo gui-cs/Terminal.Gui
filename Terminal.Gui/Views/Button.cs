@@ -61,6 +61,15 @@ namespace Terminal.Gui {
 		///   The width of the <see cref="Button"/> is computed based on the
 		///   text length. The height will always be 1.
 		/// </remarks>
+		public Button () : this (string.Empty) { }
+
+		/// <summary>
+		///   Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.
+		/// </summary>
+		/// <remarks>
+		///   The width of the <see cref="Button"/> is computed based on the
+		///   text length. The height will always be 1.
+		/// </remarks>
 		/// <param name="text">The button's text</param>
 		/// <param name="is_default">
 		///   If <c>true</c>, a special decoration is used, and the user pressing the enter key 

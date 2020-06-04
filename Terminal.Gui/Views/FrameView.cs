@@ -4,10 +4,10 @@
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
 //
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using NStack;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -36,27 +36,25 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class with
-		/// an absolute position and a title.
+		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class using <see cref="LayoutStyle.Absolute"/> layout.
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		/// <param name="title">Title.</param>
 		public FrameView (Rect frame, ustring title) : base (frame)
 		{
-			var cFrame = new Rect (1, 1 , frame.Width - 2, frame.Height - 2);
+			var cFrame = new Rect (1, 1, frame.Width - 2, frame.Height - 2);
 			this.title = title;
 			contentView = new ContentView (cFrame);
 			Initialize ();
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class with
-		/// an absolute position, a title and <see cref="View"/>s.
+		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <param name="frame">Frame.</param>
 		/// <param name="title">Title.</param>
 		/// /// <param name="views">Views.</param>
-		public FrameView (Rect frame, ustring title, View[] views) : this (frame, title)
+		public FrameView (Rect frame, ustring title, View [] views) : this (frame, title)
 		{
 			foreach (var view in views) {
 				contentView.Add (view);
@@ -65,8 +63,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class with
-		/// a title and the result is suitable to have its X, Y, Width and Height properties computed.
+		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <param name="title">Title.</param>
 		public FrameView (ustring title)
@@ -80,6 +77,11 @@ namespace Terminal.Gui {
 			};
 			Initialize ();
 		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class using <see cref="LayoutStyle.Computed"/> layout.
+		/// </summary>
+		public FrameView () : this (title: string.Empty) { }
 
 		void Initialize ()
 		{
@@ -126,9 +128,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
-		public override void RemoveAll()
+		public override void RemoveAll ()
 		{
-			contentView.RemoveAll();
+			contentView.RemoveAll ();
 		}
 
 		///<inheritdoc/>

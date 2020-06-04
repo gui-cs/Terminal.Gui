@@ -30,12 +30,12 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		///    Initializes a new instance of <see cref="TimeField"/> at an absolute position and fixed size.
+		///    Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Absolute"/> positioning.
 		/// </summary>
 		/// <param name="x">The x coordinate.</param>
 		/// <param name="y">The y coordinate.</param>
-		/// <param name="time">Initial time contents.</param>
-		/// <param name="isShort">If true, the seconds are hidden.</param>
+		/// <param name="time">Initial time.</param>
+		/// <param name="isShort">If true, the seconds are hidden. Sets the <see cref="IsShortFormat"/> property.</param>
 		public TimeField (int x, int y, DateTime time, bool isShort = false) : base (x, y, isShort ? 7 : 10, "")
 		{
 			this.isShort = isShort;
@@ -43,15 +43,20 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="TimeField"/> 
+		///    Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
-		/// <param name="time"></param>
-		public TimeField (DateTime time) : base ("")
+		/// <param name="time">Initial time</param>
+		public TimeField (DateTime time) : base (string.Empty)
 		{
 			this.isShort = true;
 			Width = FieldLen + 2;
 			Initialize (time);
 		}
+
+		/// <summary>
+		///    Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Computed"/> positioning.
+		/// </summary>
+		public TimeField () : this (time: DateTime.MinValue) { }
 
 		void Initialize (DateTime time)
 		{
@@ -86,7 +91,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Get or set the data format for the widget.
+		/// Get or sets whether <see cref="TimeField"/> uses the short or long time format.
 		/// </summary>
 		public bool IsShortFormat {
 			get => isShort;

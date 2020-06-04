@@ -19,7 +19,7 @@ namespace Terminal.Gui {
 	internal class DirListView : View {
 		int top, selected;
 		DirectoryInfo dirInfo;
-		List<(string,bool,bool)> infos;
+		List<(string, bool, bool)> infos;
 		internal bool canChooseFiles = true;
 		internal bool canChooseDirectories = false;
 		internal bool allowsMultipleSelection = false;
@@ -27,7 +27,7 @@ namespace Terminal.Gui {
 
 		public DirListView (FileDialog host)
 		{
-			infos = new List<(string,bool,bool)> ();
+			infos = new List<(string, bool, bool)> ();
 			CanFocus = true;
 			this.host = host;
 		}
@@ -35,7 +35,7 @@ namespace Terminal.Gui {
 		bool IsAllowed (FileSystemInfo fsi)
 		{
 			if (fsi.Attributes.HasFlag (FileAttributes.Directory))
-			    return true;
+				return true;
 			if (allowedFileTypes == null)
 				return true;
 			foreach (var ft in allowedFileTypes)
@@ -48,9 +48,9 @@ namespace Terminal.Gui {
 		{
 			dirInfo = new DirectoryInfo (directory.ToString ());
 			infos = (from x in dirInfo.GetFileSystemInfos ()
-			         where IsAllowed (x)
-			         orderby (!x.Attributes.HasFlag (FileAttributes.Directory)) + x.Name
-			         select (x.Name, x.Attributes.HasFlag (FileAttributes.Directory), false)).ToList ();
+				 where IsAllowed (x)
+				 orderby (!x.Attributes.HasFlag (FileAttributes.Directory)) + x.Name
+				 select (x.Name, x.Attributes.HasFlag (FileAttributes.Directory), false)).ToList ();
 			infos.Insert (0, ("..", true, false));
 			top = 0;
 			selected = 0;
@@ -407,7 +407,7 @@ namespace Terminal.Gui {
 							return new List<string> () { MakePath (infos [selected].Item1) };
 						return Array.Empty<string> ();
 					} else {
-						if (canChooseFiles) 
+						if (canChooseFiles)
 							return new List<string> () { MakePath (infos [selected].Item1) };
 						return Array.Empty<string> ();
 					}
@@ -424,6 +424,11 @@ namespace Terminal.Gui {
 		Label nameFieldLabel, message, dirLabel;
 		TextField dirEntry, nameEntry;
 		internal DirListView dirListView;
+
+		/// <summary>
+		/// Initializes a new <see cref="FileDialog"/>.
+		/// </summary>
+		public FileDialog () : this (title: string.Empty, prompt: string.Empty, nameFieldLabel: string.Empty, message: string.Empty) { }
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="FileDialog"/>
@@ -582,9 +587,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The absolute file path for the file path entered.</value>
 		public ustring FilePath {
-			get => dirListView.MakePath(nameEntry.Text.ToString());
+			get => dirListView.MakePath (nameEntry.Text.ToString ());
 			set {
-				nameEntry.Text = Path.GetFileName(value.ToString());
+				nameEntry.Text = Path.GetFileName (value.ToString ());
 			}
 		}
 
@@ -608,13 +613,16 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class SaveDialog : FileDialog {
 		/// <summary>
-		/// Initializes a new <see cref="SaveDialog"/>
+		/// Initializes a new <see cref="SaveDialog"/>.
+		/// </summary>
+		public SaveDialog () : this (title: string.Empty, message: string.Empty) { }
+
+		/// <summary>
+		/// Initializes a new <see cref="SaveDialog"/>.
 		/// </summary>
 		/// <param name="title">The title.</param>
 		/// <param name="message">The message.</param>
-		public SaveDialog (ustring title, ustring message) : base (title, prompt: "Save", nameFieldLabel: "Save as:", message: message)
-		{
-		}
+		public SaveDialog (ustring title, ustring message) : base (title, prompt: "Save", nameFieldLabel: "Save as:", message: message) { }
 
 		/// <summary>
 		/// Gets the name of the file the user selected for saving, or null
@@ -625,7 +633,7 @@ namespace Terminal.Gui {
 			get {
 				if (canceled)
 					return null;
-				return Path.GetFileName(FilePath.ToString());
+				return Path.GetFileName (FilePath.ToString ());
 			}
 		}
 	}
@@ -650,7 +658,12 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class OpenDialog : FileDialog {
 		/// <summary>
-		/// Initializes a new <see cref="OpenDialog"/>
+		/// Initializes a new <see cref="OpenDialog"/>.
+		/// </summary>
+		public OpenDialog () : this (title: string.Empty, message: string.Empty) { }
+
+		/// <summary>
+		/// Initializes a new <see cref="OpenDialog"/>.
 		/// </summary>
 		/// <param name="title"></param>
 		/// <param name="message"></param>

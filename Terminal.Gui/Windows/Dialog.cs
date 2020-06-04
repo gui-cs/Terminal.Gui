@@ -24,7 +24,7 @@ namespace Terminal.Gui {
 		const int padding = 0;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Absolute"/> positioning 
+		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/> positioning 
 		/// and an optional set of <see cref="Button"/>s to display
 		/// </summary>
 		/// <param name="title">Title for the dialog.</param>
@@ -61,9 +61,21 @@ namespace Terminal.Gui {
 					Add (b);
 				}
 			}
-
-			//LayoutComplete += (sender, a) => AdjustButtonLayout ();
 		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/>.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// Te Dialog will be vertically and horizontally centered in the container and the size will be 85% of the container. 
+		/// After initialzation use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
+		/// </para>
+		/// <para>
+		/// Use <see cref="AddButton(Button)"/> to add buttons to the dialog.
+		/// </para>
+		/// </remarks>
+		public Dialog () : this (title: string.Empty, width: 0, height: 0, buttons: null) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/> positioning 
@@ -72,12 +84,10 @@ namespace Terminal.Gui {
 		/// <param name="title">Title for the dialog.</param>
 		/// <param name="buttons">Optional buttons to lay out at the bottom of the dialog.</param>
 		/// <remarks>
-		/// if <c>width</c> and <c>height</c> are both 0, the Dialog will be vertically and horizontally centered in the
-		/// container and the size will be 85% of the container. 
+		/// Te Dialog will be vertically and horizontally centered in the container and the size will be 85% of the container. 
 		/// After initialzation use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
 		/// </remarks>
-		public Dialog (ustring title, params Button [] buttons) : this (title: title, width: 0, height: 0, buttons: buttons) { 
-		}
+		public Dialog (ustring title, params Button [] buttons) : this (title: title, width: 0, height: 0, buttons: buttons) { }
 
 		/// <summary>
 		/// Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controled by the <see cref="Dialog"/>

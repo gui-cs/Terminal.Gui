@@ -125,7 +125,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect region)
 		{
-			if (ColorScheme == null)
+			if (ColorScheme == null || Size == 0)
 				return;
 
 			Driver.SetAttribute (ColorScheme.Normal);

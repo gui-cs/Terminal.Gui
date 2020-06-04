@@ -44,7 +44,7 @@ namespace Terminal.Gui {
 		public event EventHandler<ustring> Changed;
 
 		/// <summary>
-		///    Public constructor that creates a text field, with layout controlled with X, Y, Width and Height.
+		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
 		/// <param name="text">Initial text contents.</param>
 		public TextField (string text) : this (ustring.Make (text))
@@ -53,7 +53,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///    Public constructor that creates a text field, with layout controlled with X, Y, Width and Height.
+		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
+		/// </summary>
+		public TextField () : this (string.Empty) { }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
 		/// <param name="text">Initial text contents.</param>
 		public TextField (ustring text)
@@ -62,7 +67,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///    Public constructor that creates a text field at an absolute position and size.
+		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Absolute"/> positioning.
 		/// </summary>
 		/// <param name="x">The x coordinate.</param>
 		/// <param name="y">The y coordinate.</param>

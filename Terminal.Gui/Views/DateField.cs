@@ -29,20 +29,25 @@ namespace Terminal.Gui {
 		string Format { get { return isShort ? shortFormat : longFormat; } }
 
 		/// <summary>
-		///    Initializes a new instance of <see cref="DateField"/> at an absolute position and fixed size.
+		///    Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Absolute"/> layout.
 		/// </summary>
 		/// <param name="x">The x coordinate.</param>
 		/// <param name="y">The y coordinate.</param>
 		/// <param name="date">Initial date contents.</param>
 		/// <param name="isShort">If true, shows only two digits for the year.</param>
-		public DateField (int x, int y, DateTime date, bool isShort = false) : base(x, y, isShort ? 10 : 12, "")
+		public DateField (int x, int y, DateTime date, bool isShort = false) : base (x, y, isShort ? 10 : 12, "")
 		{
 			this.isShort = isShort;
 			Initialize (date);
 		}
 
 		/// <summary>
-		///  Initializes a new instance of <see cref="DateField"/> 
+		///  Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Computed"/> layout.
+		/// </summary>
+		public DateField () : this (DateTime.MinValue) { }
+
+		/// <summary>
+		///  Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <param name="date"></param>
 		public DateField (DateTime date) : base ("")
@@ -65,7 +70,7 @@ namespace Terminal.Gui {
 
 		void DateField_Changed (object sender, ustring e)
 		{
-			if (!DateTime.TryParseExact (GetDate (Text).ToString(), GetInvarianteFormat (), CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
+			if (!DateTime.TryParseExact (GetDate (Text).ToString (), GetInvarianteFormat (), CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
 				Text = e;
 		}
 
@@ -259,8 +264,8 @@ namespace Terminal.Gui {
 				CursorPosition++;
 		}
 
-		///<inheritdoc/>
-		public override bool ProcessKey(KeyEvent kb)
+		/// <inheritdoc/>
+		public override bool ProcessKey (KeyEvent kb)
 		{
 			switch (kb.Key) {
 			case Key.DeleteChar:
@@ -306,8 +311,8 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		///<inheritdoc/>
-		public override bool MouseEvent(MouseEvent ev)
+		/// <inheritdoc/>
+		public override bool MouseEvent (MouseEvent ev)
 		{
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked))
 				return false;
