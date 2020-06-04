@@ -173,7 +173,6 @@ namespace Terminal.Gui {
 			case Key.ControlL:
 				Application.Refresh ();
 				return true;
-
 			}
 			return false;
 		}
