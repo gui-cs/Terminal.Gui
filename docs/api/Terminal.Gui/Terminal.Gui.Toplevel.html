@@ -551,9 +551,7 @@ Gets or sets the status bar for this Toplevel
   
   <a id="Terminal_Gui_Toplevel_Add_" data-uid="Terminal.Gui.Toplevel.Add*"></a>
   <h4 id="Terminal_Gui_Toplevel_Add_Terminal_Gui_View_" data-uid="Terminal.Gui.Toplevel.Add(Terminal.Gui.View)">Add(View)</h4>
-  <div class="markdown level1 summary">
-Adds a subview (child) to this view.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -578,10 +576,6 @@ Adds a subview (child) to this view.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">View.Add(View)</a></div>
-  <h5 id="Terminal_Gui_Toplevel_Add_Terminal_Gui_View__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-The Views that have been added to this view can be retrieved via the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Subviews">Subviews</a> property. See also <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Remove_Terminal_Gui_View_">Remove(View)</a> <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_RemoveAll">RemoveAll()</a> 
-</div>
   
   
   <a id="Terminal_Gui_Toplevel_Create_" data-uid="Terminal.Gui.Toplevel.Create*"></a>
@@ -613,10 +607,7 @@ Convenience factory method that creates a new Toplevel with the current terminal
   
   <a id="Terminal_Gui_Toplevel_ProcessKey_" data-uid="Terminal.Gui.Toplevel.ProcessKey*"></a>
   <h4 id="Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary">
-If the view is focused, gives the view a
-chance to process the keystroke.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -635,7 +626,7 @@ chance to process the keystroke.
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td>Contains the details about the key that produced the event.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -656,32 +647,11 @@ chance to process the keystroke.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Views can override this method if they are
-  interested in processing the given keystroke.
-  If they consume the keystroke, they must
-  return true to stop the keystroke from being
-  processed by other widgets or consumed by the
-  widget engine.    If they return false, the
-  keystroke will be passed using the ProcessColdKey
-  method to other views to process.
-</p>
-<p>
-  The View implementation does nothing but return false,
-  so it is not necessary to call base.ProcessKey if you
-  derive directly from View, but you should if you derive
-  other View subclasses.
-</p>
-</div>
   
   
   <a id="Terminal_Gui_Toplevel_Redraw_" data-uid="Terminal.Gui.Toplevel.Redraw*"></a>
   <h4 id="Terminal_Gui_Toplevel_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.Toplevel.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
-  <div class="markdown level1 summary">
-Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -700,33 +670,17 @@ Redraws this view and its subviews; only redraws the views that have been flagge
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">bounds</span></td>
-        <td>The bounds (view-relative region) to redraw.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  <h5 id="Terminal_Gui_Toplevel_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
-</p>
-<p>
-   Views should set the color that they want to use on entry, as otherwise this will inherit
-   the last color that was set globaly on the driver.
-</p>
-<p>
-   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
-   larger than the <code>region</code> parameter.
-</p>
-</div>
   
   
   <a id="Terminal_Gui_Toplevel_Remove_" data-uid="Terminal.Gui.Toplevel.Remove*"></a>
   <h4 id="Terminal_Gui_Toplevel_Remove_Terminal_Gui_View_" data-uid="Terminal.Gui.Toplevel.Remove(Terminal.Gui.View)">Remove(View)</h4>
-  <div class="markdown level1 summary">
-Removes a subview added via <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">Add(View)</a> or <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">Add(View[])</a> from this View.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -751,16 +705,11 @@ Removes a subview added via <a class="xref" href="Terminal.Gui.View.html#Termina
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Remove_Terminal_Gui_View_">View.Remove(View)</a></div>
-  <h5 id="Terminal_Gui_Toplevel_Remove_Terminal_Gui_View__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-</div>
   
   
   <a id="Terminal_Gui_Toplevel_RemoveAll_" data-uid="Terminal.Gui.Toplevel.RemoveAll*"></a>
   <h4 id="Terminal_Gui_Toplevel_RemoveAll" data-uid="Terminal.Gui.Toplevel.RemoveAll">RemoveAll()</h4>
-  <div class="markdown level1 summary">
-Removes all subviews (children) added via <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">Add(View)</a> or <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">Add(View[])</a> from this View.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">

@@ -435,9 +435,7 @@ The parent view of the <a class="xref" href="Terminal.Gui.StatusBar.html">Status
   
   <a id="Terminal_Gui_StatusBar_MouseEvent_" data-uid="Terminal.Gui.StatusBar.MouseEvent*"></a>
   <h4 id="Terminal_Gui_StatusBar_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.StatusBar.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
-  <div class="markdown level1 summary">
-Method invoked when a mouse event is generated
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -471,7 +469,7 @@ Method invoked when a mouse event is generated
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -481,11 +479,7 @@ Method invoked when a mouse event is generated
   
   <a id="Terminal_Gui_StatusBar_ProcessHotKey_" data-uid="Terminal.Gui.StatusBar.ProcessHotKey*"></a>
   <h4 id="Terminal_Gui_StatusBar_ProcessHotKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.StatusBar.ProcessHotKey(Terminal.Gui.KeyEvent)">ProcessHotKey(KeyEvent)</h4>
-  <div class="markdown level1 summary">
-This method can be overwritten by view that
-want to provide accelerator functionality
-(Alt-key for example).
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -525,30 +519,11 @@ want to provide accelerator functionality
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_StatusBar_ProcessHotKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Before keys are sent to the subview on the
-  current view, all the views are
-  processed and the key is passed to the widgets
-  to allow some of them to process the keystroke
-  as a hot-key. </p>
-<p>
-   For example, if you implement a button that
-   has a hotkey ok &quot;o&quot;, you would catch the
-   combination Alt-o here.  If the event is
-   caught, you must return true to stop the
-   keystroke from being dispatched to other
-   views.
-</p>
-</div>
   
   
   <a id="Terminal_Gui_StatusBar_Redraw_" data-uid="Terminal.Gui.StatusBar.Redraw*"></a>
   <h4 id="Terminal_Gui_StatusBar_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.StatusBar.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
-  <div class="markdown level1 summary">
-Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -567,26 +542,12 @@ Redraws this view and its subviews; only redraws the views that have been flagge
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">bounds</span></td>
-        <td>The bounds (view-relative region) to redraw.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  <h5 id="Terminal_Gui_StatusBar_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
-</p>
-<p>
-   Views should set the color that they want to use on entry, as otherwise this will inherit
-   the last color that was set globaly on the driver.
-</p>
-<p>
-   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
-   larger than the <code>region</code> parameter.
-</p>
-</div>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.Collections.IEnumerable</span>
