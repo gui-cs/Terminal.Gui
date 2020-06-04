@@ -199,6 +199,101 @@ namespace UICatalog {
 			Win.Add (rightButton);
 		}
 
+		/// <summary>
+		/// Displays a Dialog that uses a wizard (next/prev) idom to step through each class derived from View
+		/// testing various Computed layout scenarios
+		/// </summary>
+		private void DemoAllViewClasses ()
+		{
+			List<Type> GetAllViewClassesCollection ()
+			{
+				List<Type> objects = new List<Type> ();
+				foreach (Type type in typeof (View).Assembly.GetTypes ()
+				 .Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View)))) {
+					objects.Add (type);
+				}
+				return objects;
+			}
+
+			var viewClasses = GetAllViewClassesCollection ().OrderByDescending (c => c.Name).ToList ();
+			var curClass = 0;
+
+			var closeBtn = new Button ("_Close") {
+				Clicked = () => {
+					Application.RequestStop ();
+				},
+			};
+			var nextBtn = new Button ("_Next");
+			var prevBtn = new Button ("_Previous");
+			var dialog = new Dialog ("Demoing all View classs", new [] { prevBtn, nextBtn, closeBtn });
+
+			var label = new Label ("Class:") {
+				X = 0,
+				Y = 0,
+			};
+			dialog.Add (label);
+			var currentClassLabel = new Label ("") {
+				X = Pos.Right (label) + 1,
+				Y = Pos.Y (label),
+			};
+			dialog.Add (currentClassLabel);
+
+			View curView = null;
+			void SetCurrentClass ()
+			{
+				currentClassLabel.Text = $"{viewClasses [curClass].Name}";
+
+				// Remove existing class, if any
+				if (curView != null) {
+					dialog.Remove (curView);
+					curView = null;
+				}
+
+				// Instantiate view
+				curView = (View)Activator.CreateInstance (viewClasses [curClass]);
+
+				curView.X = Pos.Center ();
+				curView.Y = Pos.Center ();
+				curView.Width = Dim.Fill (5);
+				curView.Height = Dim.Fill (5);
+
+				// If the view supports a Text property, set it so we have something to look at
+				if (viewClasses [curClass].GetProperty("Text") != null) {
+					curView.GetType ().GetProperty ("Text")?.GetSetMethod ()?.Invoke (curView, new [] { ustring.Make("09/10/1966") });
+				}
+
+				// If the view supports a Title property, set it so we have something to look at
+				if (viewClasses [curClass].GetProperty ("Title") != null) {
+					curView.GetType ().GetProperty ("Title")?.GetSetMethod ()?.Invoke (curView, new [] { ustring.Make ("Test Title") });
+				}
+
+
+				dialog.Add (curView);
+				dialog.LayoutSubviews ();
+			}
+
+			nextBtn.Clicked = () => {
+				curClass++;
+				if (curClass >= viewClasses.Count) {
+					curClass = 0;
+				}
+				SetCurrentClass ();
+			};
+
+			prevBtn.Clicked = () => {
+				if (curClass == 0) {
+					curClass = viewClasses.Count - 1;
+				} else {
+					curClass--;
+				}
+				SetCurrentClass ();
+			};
+
+			SetCurrentClass ();
+
+			Application.Run (dialog);
+		}
+
 		public override void Run ()
 		{
 			base.Run ();
