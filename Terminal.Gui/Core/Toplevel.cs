@@ -153,7 +153,7 @@ namespace Terminal.Gui {
 					old?.SetNeedsDisplay ();
 					Focused?.SetNeedsDisplay ();
 				} else {
-					FocusNearestView (GetSuperViewSubviews (true), true);
+					FocusNearestView (GetToplevelSubviews (true));
 				}
 				return true;
 			case Key.CursorLeft:
@@ -166,7 +166,7 @@ namespace Terminal.Gui {
 					old?.SetNeedsDisplay ();
 					Focused?.SetNeedsDisplay ();
 				} else {
-					FocusNearestView (GetSuperViewSubviews (false), false);
+					FocusNearestView (GetToplevelSubviews (false));
 				}
 				return true;
 
@@ -178,7 +178,35 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		///<inheritdoc/>
+		IEnumerable<View> GetToplevelSubviews (bool isForward)
+		{
+			HashSet<View> views = new HashSet<View> ();
+
+			foreach (var v in SuperView.Subviews) {
+				views.Add (v);
+			}
+
+			return isForward ? views : views.Reverse ();
+		}
+
+		void FocusNearestView (IEnumerable<View> views)
+		{
+			bool found = false;
+
+			foreach (var v in views) {
+				if (v == this) {
+					found = true;
+				}
+				if (found && v != this) {
+					v.EnsureFocus ();
+					if (SuperView.Focused != null && SuperView.Focused != this) {
+						return;
+					}
+				}
+			}
+		}
+
+		///<inheritdoc cref="Add"/>
 		public override void Add (View view)
 		{
 			if (this == Application.Top) {
