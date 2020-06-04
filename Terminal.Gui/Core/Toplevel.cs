@@ -179,6 +179,10 @@ namespace Terminal.Gui {
 
 		IEnumerable<View> GetToplevelSubviews (bool isForward)
 		{
+			if (SuperView == null) {
+				return null;
+			}
+
 			HashSet<View> views = new HashSet<View> ();
 
 			foreach (var v in SuperView.Subviews) {
@@ -190,6 +194,10 @@ namespace Terminal.Gui {
 
 		void FocusNearestView (IEnumerable<View> views)
 		{
+			if (views == null) {
+				return;
+			}
+
 			bool found = false;
 
 			foreach (var v in views) {
