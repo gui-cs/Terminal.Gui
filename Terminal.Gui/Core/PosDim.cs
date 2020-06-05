@@ -361,7 +361,7 @@ namespace Terminal.Gui {
 			return 0;
 		}
 
-		class DimFactor : Dim {
+		internal class DimFactor : Dim {
 			float factor;
 
 			public DimFactor (float n)
