@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System;
+using System.Collections.Generic;
 using Terminal.Gui;
 
 namespace UICatalog {
@@ -26,13 +27,13 @@ namespace UICatalog {
 				//TODO: Change to use Pos.AnchorEnd()
 				Y = Pos.Bottom (Win) - 3,
 				IsDefault = true,
-				Clicked = () => Application.RequestStop (),
+				Clicked = (o, e) => Application.RequestStop (),
 			};
 			Win.Add (defaultButton);
 
 			static void DoMessage (Button button, ustring txt)
 			{
-				button.Clicked = () => {
+				button.Clicked = (o, e) => {
 					var btnText = button.Text.ToString ();
 					MessageBox.Query (30, 7, "Message", $"Did you click {txt.ToString ()}?", "Yes", "No");
 				};
@@ -77,7 +78,7 @@ namespace UICatalog {
 			y += 2;
 			// Note the 'N' in 'Newline' will be the hotkey
 			Win.Add (new Button (10, y, "a Newline\nin the button") {
-				Clicked = () => MessageBox.Query (30, 7, "Message", "Question?", "Yes", "No")
+				Clicked = (o, e) => MessageBox.Query (30, 7, "Message", "Question?", "Yes", "No")
 			});
 
 			y += 2;
@@ -87,7 +88,7 @@ namespace UICatalog {
 				Y = y
 			});
 
-			button.Clicked = () => button.Text += "!"; 
+			button.Clicked = (o, e) => button.Text += "!"; 
 
 			Win.Add (new Button ("Lets see if this will move as \"Text Changer\" grows") {
 				X = Pos.Right (button) + 10,
@@ -97,12 +98,12 @@ namespace UICatalog {
 			y += 2;
 			Win.Add (new Button (10, y, "Delete") {
 				ColorScheme = Colors.Error,
-				Clicked = () => Win.Remove (button)
+				Clicked = (o, e) => Win.Remove (button)
 			});
 
 			y += 2;
 			Win.Add (new Button (10, y, "Change Default") {
-				Clicked = () => {
+				Clicked = (o, e) => {
 					defaultButton.IsDefault = !defaultButton.IsDefault;
 					button.IsDefault = !button.IsDefault;
 				},
@@ -113,7 +114,7 @@ namespace UICatalog {
 			var moveBtn = new Button (10, y, "Move This Button via Frame") {
 				ColorScheme = Colors.Error,
 			};
-			moveBtn.Clicked = () => {
+			moveBtn.Clicked = (o, e) => {
 				moveBtn.Frame = new Rect (moveBtn.Frame.X + 5, moveBtn.Frame.Y, moveBtn.Frame.Width, moveBtn.Frame.Height);
 			};
 			Win.Add (moveBtn);
@@ -121,12 +122,51 @@ namespace UICatalog {
 			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
 			y += 2;
 			var sizeBtn = new Button (10, y, "Size This Button via Frame") {
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.Error
 			};
-			moveBtn.Clicked = () => {
+			moveBtn.Clicked = (o, e) => {
 				sizeBtn.Frame = new Rect (sizeBtn.Frame.X, sizeBtn.Frame.Y, sizeBtn.Frame.Width + 5, sizeBtn.Frame.Height);
 			};
 			Win.Add (sizeBtn);
+
+			Win.Add (new Label ("Size This Button via Frame 'Text Alignment'") {
+				X = Pos.Right (moveBtn) + 20,
+				Y = Pos.Top (moveBtn) - 4,
+			});
+
+			List<string> txtAligs = new List<string> () {
+				"Left",
+				"Right",
+				"Centered",
+				"Justified"
+			};
+
+			var lvTextAlig = new ListView (txtAligs) {
+				X = Pos.Right (moveBtn) + 20,
+				Y = Pos.Top (moveBtn) - 3,
+				Width = 20,
+				Height = 4,
+				ColorScheme = Colors.TopLevel
+			};
+
+			lvTextAlig.SelectedChanged += (o, e) => {
+				switch (e.Value) {
+				case "Left":
+					sizeBtn.TextAlignment = TextAlignment.Left;
+					break;
+				case "Right":
+					sizeBtn.TextAlignment = TextAlignment.Right;
+					break;
+				case "Centered":
+					sizeBtn.TextAlignment = TextAlignment.Centered;
+					break;
+				case "Justified":
+					sizeBtn.TextAlignment = TextAlignment.Justified;
+					break;
+				}
+			};
+
+			Win.Add (lvTextAlig);
 
 			// Demo changing hotkey
 			ustring MoveHotkey (ustring txt)
@@ -153,7 +193,7 @@ namespace UICatalog {
 			var moveHotKeyBtn = new Button (10, y, "Click to Change th_is Button's Hotkey") {
 				ColorScheme = Colors.TopLevel,
 			};
-			moveHotKeyBtn.Clicked = () => {
+			moveHotKeyBtn.Clicked = (o, e) => {
 				moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
 			};
 			Win.Add (moveHotKeyBtn);

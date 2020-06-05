@@ -27,7 +27,7 @@ namespace UICatalog {
 		       Win.Add (new Button ("Press me!") {
 			       X = Pos.Center (),
 			       Y = Pos.Center (),
-			       Clicked = () => MessageBox.Query (20, 7, "Hi", "Neat?", "Yes", "No")
+			       Clicked = (o, e) => MessageBox.Query (20, 7, "Hi", "Neat?", "Yes", "No")
 		       });
 		}
 	}

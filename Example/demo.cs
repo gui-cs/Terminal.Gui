@@ -202,8 +202,8 @@ static class Demo {
 	{
 		var d = new Dialog (
 			"New File", 50, 20,
-			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
-			new Button ("Cancel") { Clicked = () => { Application.RequestStop (); } });
+			new Button ("Ok", is_default: true) { Clicked = (o, e) => { Application.RequestStop (); } },
+			new Button ("Cancel") { Clicked = (o, e) => { Application.RequestStop (); } });
 		ml2 = new Label (1, 1, "Mouse Debug Line");
 		d.Add (ml2);
 		Application.Run (d);
@@ -391,8 +391,8 @@ static class Demo {
 	static void ListSelectionDemo (bool multiple)
 	{
 		var d = new Dialog ("Selection Demo", 60, 20,
-			new Button ("Ok", is_default: true) { Clicked = () => { Application.RequestStop (); } },
-			new Button ("Cancel") { Clicked = () => { Application.RequestStop (); } });
+			new Button ("Ok", is_default: true) { Clicked = (o, e) => { Application.RequestStop (); } },
+			new Button ("Cancel") { Clicked = (o, e) => { Application.RequestStop (); } });
 
 		var animals = new List<string> () { "Alpaca", "Llama", "Lion", "Shark", "Goat" };
 		var msg = new Label ("Use space bar or control-t to toggle selection") {
@@ -450,7 +450,7 @@ static class Demo {
 	{
 		var container = new Dialog (
 			"KeyDown & KeyPress & KeyUp demo", 80, 20,
-			new Button ("Close") { Clicked = () => { Application.RequestStop (); } }) {
+			new Button ("Close") { Clicked = (o, e) => { Application.RequestStop (); } }) {
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
 		};

@@ -116,7 +116,7 @@ namespace UICatalog {
 				X = Pos.Center(),
 				Y = Pos.Bottom (frame) + 2			,
 				IsDefault = true,
-				Clicked = () => {
+				Clicked = (o, e) => {
 					try {
 						int width = int.Parse (widthEdit.Text.ToString ());
 						int height = int.Parse (heightEdit.Text.ToString ());
@@ -127,7 +127,7 @@ namespace UICatalog {
 						for (int i = 0; i < numButtons; i++) {
 							var buttonId = i;
 							var button = new Button (btnText [buttonId % 10], is_default: buttonId == 0) {
-								Clicked = () => {
+								Clicked = (o, e) => {
 									clicked = buttonId;
 									Application.RequestStop ();
 								},
@@ -141,10 +141,10 @@ namespace UICatalog {
 						var add = new Button ("Add a button") {
 							X = Pos.Center (),
 							Y = Pos.Center (),
-							Clicked = () => {
+							Clicked = (o, e) => {
 								var buttonId = buttons.Count;
 								var button = new Button (btnText [buttonId % 10], is_default: buttonId == 0) {
-									Clicked = () => {
+									Clicked = (o, e) => {
 										clicked = buttonId;
 										Application.RequestStop ();
 									},

@@ -26,7 +26,7 @@ namespace UICatalog {
 				var button = new Button ($"{title} (U+{start:x5}-{end:x5})") {
 					X = Pos.X (align),
 					Y = Pos.Bottom (align),
-					Clicked = () => {
+					Clicked = (o, e) => {
 						charMap.Start = start;
 					},
 				};

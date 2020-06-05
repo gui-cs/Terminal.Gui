@@ -148,7 +148,7 @@ namespace UICatalog {
 				X = Pos.Center(),
 				Y = Pos.Bottom (frame) + 2			,
 				IsDefault = true,
-				Clicked = () => {
+				Clicked = (o, e) => {
 					try {
 						int width = int.Parse (widthEdit.Text.ToString ());
 						int height = int.Parse (heightEdit.Text.ToString ());

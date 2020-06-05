@@ -64,7 +64,7 @@ namespace UICatalog {
 				X = Pos.Center (),
 				Y = 0,
 				ColorScheme = Colors.Error,
-				Clicked = () => About()
+				Clicked = (o, e) => About()
 			});
 			Win.Add (new Button ("Press ME! (Y = Pos.AnchorEnd(1))") {
 				X = Pos.Center (),
@@ -87,7 +87,7 @@ namespace UICatalog {
 					X = Pos.Center (),
 					Y = 0,
 					ColorScheme = Colors.Error,
-					Clicked = () => MessageBox.ErrorQuery (win.Title.ToString (), "Neat?", "Yes", "No")
+					Clicked = (o, e) => MessageBox.ErrorQuery (win.Title.ToString (), "Neat?", "Yes", "No")
 				});
 				var subWin = new Window ("Sub Window") {
 					X = Pos.Percent (0),

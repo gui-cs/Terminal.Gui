@@ -142,7 +142,7 @@ namespace Terminal.Gui {
 			int clicked = -1;
 			for (int n = 0; n < buttonList.Count; n++) {
 				int buttonId = n;
-				buttonList [n].Clicked += () => {
+				buttonList [n].Clicked += (o, e) => {
 					clicked = buttonId;
 					Application.RequestStop ();
 				};

@@ -477,7 +477,7 @@ namespace Terminal.Gui {
 			dirListView.FileChanged = (file) => nameEntry.Text = file;
 
 			this.cancel = new Button ("Cancel");
-			this.cancel.Clicked += () => {
+			this.cancel.Clicked += (o, e) => {
 				canceled = true;
 				Application.RequestStop ();
 			};
@@ -486,7 +486,7 @@ namespace Terminal.Gui {
 			this.prompt = new Button (prompt) {
 				IsDefault = true,
 			};
-			this.prompt.Clicked += () => {
+			this.prompt.Clicked += (o, e) => {
 				dirListView.ExecuteSelection ();
 				canceled = false;
 				Application.RequestStop ();

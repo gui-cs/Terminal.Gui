@@ -84,8 +84,8 @@ type Demo() = class end
     let ShowTextAlignments() =
         let mutable container = new Dialog(
             ustr "Text Alignments", 50, 20,
-            new Button (ustr "Ok", true, Clicked = Action(Application.RequestStop)),
-            new Button (ustr "Cancel", true, Clicked = Action(Application.RequestStop))
+            new Button (ustr "Ok", true, Clicked = fun o e -> Application.RequestStop ()),
+            new Button (ustr "Cancel", true, Clicked = fun o e -> Application.RequestStop ())
             )
         let mutable (i : int) = 0
         let mutable (txt : string) = "Hello world, how are you doing today"
@@ -166,8 +166,8 @@ type Demo() = class end
         ()
     let NewFile() =
         let mutable d = new Dialog (ustr "New File", 50, 20,
-                            new Button (ustr "Ok", true, Clicked = Action(Application.RequestStop)),
-                            new Button (ustr "Cancel", true, Clicked = Action(Application.RequestStop))
+                            new Button (ustr "Ok", true, Clicked = fun o e -> Application.RequestStop ()),
+                            new Button (ustr "Cancel", true, Clicked = fun o e -> Application.RequestStop ())
         )
         ml2 <- new Label(1, 1, ustr "Mouse Debug Line")
         d.Add (ml2)
@@ -202,18 +202,18 @@ type Demo() = class end
         Application.Run (ntop)
 
     let Quit() =
-        let mutable n = MessageBox.Query (50, 7, "Quit Demo", "Are you sure you want to quit this demo?", "Yes", "No")
+        let mutable n = MessageBox.Query (50, 7, ustr "Quit Demo", ustr "Are you sure you want to quit this demo?", ustr "Yes", ustr "No")
         n = 0
 
     let Close() =
-        MessageBox.ErrorQuery (50, 7, "Error", "There is nothing to close", "Ok")
+        MessageBox.ErrorQuery (50, 7, ustr "Error", ustr "There is nothing to close", ustr "Ok")
         |> ignore
 
     let Open() =
         let mutable d = new OpenDialog (ustr "Open", ustr "Open a file", AllowsMultipleSelection = true)
         Application.Run (d)
         if not d.Canceled
-            then MessageBox.Query (50, 7, "Selected File", (String.Join (", ", d.FilePaths)), "Ok") |> ignore
+            then MessageBox.Query (50, 7, ustr "Selected File", ustr (String.Join (", ", d.FilePaths)), ustr "Ok") |> ignore
 
     let ShowHex(top : Toplevel) =
         let mutable tframe = top.Frame
@@ -255,14 +255,14 @@ type Demo() = class end
         let mutable (flags : BindingFlags) = BindingFlags.Public ||| BindingFlags.Static
         let mutable (minfo : MethodInfo) = typeof<MenuItemDetails>.GetMethod ("Instance", flags)
         let mutable (mid : Delegate) = Delegate.CreateDelegate (typeof<MenuItemDelegate>, minfo)
-        MessageBox.Query (70, 7, (mi.Title.ToString ()),
-            ((sprintf "%O selected. Is from submenu: %O" (mi.Title.ToString ())) (mi.GetMenuBarItem ())), "Ok")
+        MessageBox.Query (70, 7, ustr (mi.Title.ToString ()),
+            ustr ((sprintf "%O selected. Is from submenu: %O" (mi.Title.ToString ())) (mi.GetMenuBarItem ())), ustr "Ok")
         |> ignore
 
-    let MenuKeysStyle_Toggled(e : EventArgs) =
+    let MenuKeysStyle_Toggled(e : bool) =
         menu.UseKeysUpDownAsKeysLeftRight <- menuKeysStyle.Checked
 
-    let MenuAutoMouseNav_Toggled(e : EventArgs) =
+    let MenuAutoMouseNav_Toggled(e : bool) =
         menu.WantMousePositionReports <- menuAutoMouseNav.Checked
 
     let Copy() =
@@ -284,13 +284,13 @@ type Demo() = class end
         ()
 
     let Help() =
-        MessageBox.Query (50, 7, "Help", "This is a small help\nBe kind.", "Ok")
+        MessageBox.Query (50, 7, ustr "Help", ustr "This is a small help\nBe kind.", ustr "Ok")
         |> ignore
 
     let ListSelectionDemo(multiple : System.Boolean) =
         let mutable d = new Dialog (ustr "Selection Demo", 60, 20,
-            new Button (ustr "Ok", true, Clicked = fun () -> Application.RequestStop ()),
-            new Button (ustr "Cancel", Clicked = fun () -> Application.RequestStop ())
+            new Button (ustr "Ok", true, Clicked = fun o e -> Application.RequestStop ()),
+            new Button (ustr "Cancel", Clicked = fun o e -> Application.RequestStop ())
             )
         let mutable animals = new List<string> ()
         animals.AddRange([|"Alpaca"; "Llama"; "Lion"; "Shark"; "Goat"|])
@@ -319,11 +319,11 @@ type Demo() = class end
             i <- i + 1
             i
             ()
-        MessageBox.Query (60, 10, "Selected Animals", (if result = "" then "No animals selected" else result), "Ok") |> ignore
+        MessageBox.Query (60, 10, ustr "Selected Animals", ustr (if result = "" then "No animals selected" else result), ustr "Ok") |> ignore
 
     let OnKeyDownPressUpDemo() =
         let mutable container = new Dialog (ustr "KeyDown & KeyPress & KeyUp demo", 80, 20,            
-            new Button (ustr "Close", Clicked = fun () -> Application.RequestStop ()),
+            new Button (ustr "Close", Clicked = fun o e -> Application.RequestStop ()),
                 Width = Dim.Fill (),
                 Height = Dim.Fill ()
             )
@@ -395,11 +395,11 @@ type Demo() = class end
                     [|new MenuItem(ustr "SubMenu1Item_1", new MenuBarItem([|new MenuItem(ustr "SubMenu2Item_1",
                     new MenuBarItem([|new MenuItem(ustr "SubMenu3Item_1", new MenuBarItem([|(menuItems.[2])|]))|]))|]))|]);
                 new MenuBarItem(ustr "_About...", "Demonstrates top-level menu item",
-                    (fun () -> MessageBox.ErrorQuery (50, 7, "About Demo", "This is a demo app for gui.cs", "Ok") |> ignore))|])
+                    (fun () -> MessageBox.ErrorQuery (50, 7, ustr "About Demo", ustr "This is a demo app for gui.cs", ustr "Ok") |> ignore))|])
         menuKeysStyle <- new CheckBox(3, 25, ustr "UseKeysUpDownAsKeysLeftRight", true)
-        menuKeysStyle.Toggled.Add(MenuKeysStyle_Toggled)
+        menuKeysStyle.Toggled.Add (MenuKeysStyle_Toggled)
         menuAutoMouseNav <- new CheckBox(40, 25, ustr "UseMenuAutoNavigation", true)
-        menuAutoMouseNav.Toggled.Add(MenuAutoMouseNav_Toggled)
+        menuAutoMouseNav.Toggled.Add (MenuAutoMouseNav_Toggled)
         ShowEntries (win)
         let mutable (count : int) = 0
         ml <- new Label(new Rect(3, 17, 47, 1), ustr "Mouse: ")
