@@ -22,17 +22,20 @@ namespace UICatalog.Scenarios {
 				}
 			}
 
+			Dim width = 30;
+
 			// ListView
 			var lbListView = new Label ("Listview") {
 				ColorScheme = Colors.TopLevel,
 				X = 0,
-				Width = 30
+				Width = width
 			};
 
 			var listview = new ListView (items) {
 				X = 0,
 				Y = Pos.Bottom (lbListView) + 1,
-				Width = 30
+				Height = Dim.Fill(2),
+				Width = width
 			};
 			listview.OpenSelectedItem += (object sender, ListViewItemEventArgs e) => lbListView.Text = items [listview.SelectedItem];
 			Win.Add (lbListView, listview);
@@ -41,14 +44,14 @@ namespace UICatalog.Scenarios {
 			var lbComboBox = new Label ("ComboBox") {
 				ColorScheme = Colors.TopLevel,
 				X = Pos.Right (lbListView) + 1,
-				Width = 30
+				Width = width
 			};
 
-			var comboBox = new ComboBox() {
-				X = Pos.Right(listview) + 1 , 
-				Y = Pos.Bottom (lbListView) +1,
-				Height = 10,
-				Width = 30
+			var comboBox = new ComboBox () {
+				X = Pos.Right (listview) + 1,
+				Y = Pos.Bottom (lbListView) + 1,
+				Height = Dim.Fill (2),
+				Width = width
 			};
 			comboBox.SetSource (items);
 
