@@ -285,7 +285,8 @@ namespace Terminal.Gui {
 			}
 		}
 
-		Pos x, y;
+		Pos x = Pos.At (0);
+		Pos y = Pos.At (0);
 		/// <summary>
 		/// Gets or sets the X position for the view (the column). Only used whe <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
 		/// </summary>
@@ -382,6 +383,8 @@ namespace Terminal.Gui {
 		{
 			CanFocus = false;
 			LayoutStyle = LayoutStyle.Computed;
+			Height = 0;
+			Width = 0;
 		}
 
 		/// <summary>

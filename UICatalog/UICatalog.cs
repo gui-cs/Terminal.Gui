@@ -59,7 +59,6 @@ namespace UICatalog {
 
 		private static Scenario _runningScenario = null;
 		private static bool _useSystemConsole = false;
-		private static MenuItem _consoleFramePaddingMenu;
 
 		static void Main (string [] args)
 		{
@@ -150,14 +149,6 @@ namespace UICatalog {
 
 
 			var framePaddingMenuText = "Diagnostics: _Frame Padding";
-			void HandleFramePaddingMenuChange ()
-			{
-				ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FramePadding;
-				_consoleFramePaddingMenu.Title = $"[{((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FramePadding) == ConsoleDriver.DiagnosticFlags.FramePadding ? 'x' : ' ')}] {framePaddingMenuText}";
-				_top.SetNeedsDisplay ();
-			}
-			_consoleFramePaddingMenu = new MenuItem ($"[{((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FramePadding) == ConsoleDriver.DiagnosticFlags.FramePadding ? 'x' : ' ')}] {framePaddingMenuText}", "", () => HandleFramePaddingMenuChange ());
-
 			_menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Application.RequestStop() )
