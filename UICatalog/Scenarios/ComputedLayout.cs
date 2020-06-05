@@ -219,7 +219,7 @@ namespace UICatalog {
 			var curClass = 0;
 
 			var closeBtn = new Button ("_Close") {
-				Clicked = () => {
+				Clicked = (o, e) => {
 					Application.RequestStop ();
 				},
 			};
@@ -272,7 +272,7 @@ namespace UICatalog {
 				dialog.LayoutSubviews ();
 			}
 
-			nextBtn.Clicked = () => {
+			nextBtn.Clicked = (o, e) => {
 				curClass++;
 				if (curClass >= viewClasses.Count) {
 					curClass = 0;
@@ -280,7 +280,7 @@ namespace UICatalog {
 				SetCurrentClass ();
 			};
 
-			prevBtn.Clicked = () => {
+			prevBtn.Clicked = (o, e) => {
 				if (curClass == 0) {
 					curClass = viewClasses.Count - 1;
 				} else {
