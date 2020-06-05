@@ -176,12 +176,6 @@
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="true" />
     <PackageReference Include="NStack.Core" Version="0.14.0" />
   </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)'!='Debug'">
-    <PackageReference Include="SauceControl.InheritDoc" Version="1.0.0" PrivateAssets="all" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Views\ComboBox.cs" />
-  </ItemGroup>
   <!--<ItemGroup>
     <Reference Include="NStack">
       <HintPath>..\..\..\Users\miguel\.nuget\packages\nstack.core\0.14.0\lib\netstandard2.0\NStack.dll</HintPath>

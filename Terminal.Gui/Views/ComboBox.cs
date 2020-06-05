@@ -40,8 +40,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		public ComboBox () : base()
 		{
-			search = new TextField ("") { LayoutStyle = LayoutStyle.Computed };
-			listview = new ListView () { LayoutStyle = LayoutStyle.Computed, CanFocus = true /* why? */ };
+			search = new TextField ("");
+			listview = new ListView () { LayoutStyle = LayoutStyle.Computed, CanFocus = true };
 
 			Initialize ();
 		}
@@ -62,7 +62,7 @@ namespace Terminal.Gui {
 			height = h;
 			width = w;
 
-			search = new TextField (x, y, w, "");
+			search = new TextField ("") { X = x, Y = y, Width = w };
 
 			listview = new ListView (new Rect (x, y + 1, w, 0), listsource.ToList ()) {
 				LayoutStyle = LayoutStyle.Computed,
@@ -81,7 +81,7 @@ namespace Terminal.Gui {
 			};
 
 			// TODO: LayoutComplete event breaks cursor up/down. Revert to Application.Loaded 
-			Application.Loaded += (sender, a) => {
+			Application.Loaded += (object sender, Application.ResizedEventArgs a) => {
 				// Determine if this view is hosted inside a dialog
 				for (View view = this.SuperView; view != null; view = view.SuperView) {
 					if (view is Dialog) {
@@ -102,18 +102,25 @@ namespace Terminal.Gui {
 				else
 					listview.Y = Pos.Bottom (search);
 
-				if (Width == null)
+				if (Width == null) {
 					listview.Width = CalculateWidth ();
-				else {
-					width = GetDimAsInt (Width);
+					search.Width = width;
+				} else {
+					width = GetDimAsInt (Width, a, vertical: false);
+					search.Width = width;
 					listview.Width = CalculateWidth ();
 				}
 
-				if (Height == null)
+				if (Height == null) {
+					var h = CalculatetHeight ();
+					listview.Height = h;
+					this.Height = h + 1; // adjust view to account for search box
+				} else {
+					if (height == 0)
+						height = GetDimAsInt (Height, a, vertical: true);
+
 					listview.Height = CalculatetHeight ();
-				else {
-					height = GetDimAsInt (Height);
-					listview.Height = CalculatetHeight ();
+					this.Height = height + 1; // adjust view to account for search box
 				}
 
 				if (this.Text != null)
@@ -161,8 +168,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessKey(KeyEvent e)
 		{
-			if (e.Key == Key.Tab)
-			{
+			if (e.Key == Key.Tab) {
 				base.ProcessKey(e);
 				return false; // allow tab-out to next control
 			}
@@ -295,18 +301,18 @@ namespace Terminal.Gui {
 		/// Get DimAbsolute as integer value
 		/// </summary>
 		/// <param name="dim"></param>
+		/// <param name="a"></param>
+		/// <param name="vertical"></param>
 		/// <returns></returns>
-		private int GetDimAsInt(Dim dim)
+		private int GetDimAsInt (Dim dim, Application.ResizedEventArgs a, bool vertical)
 		{
-			if (!(dim is Dim.DimAbsolute))
-				throw new ArgumentException ("Dim must be an absolute value");
+			if (dim is Dim.DimAbsolute)
+				return dim.Anchor (0);
 
-			// Anchor in the case of DimAbsolute returns absolute value. No documentation on what Anchor() does so not sure if this will change in the future.
-			//
-			// TODO: Does Dim need:- 
-			//		public static implicit operator int (Dim d)
-			//
-			return dim.Anchor (0);
+			if (dim is Dim.DimFill || dim is Dim.DimFactor)
+				return vertical ? dim.Anchor (a.Rows) : dim.Anchor (a.Cols);
+
+			return 0;
 		}
 	}
 }
