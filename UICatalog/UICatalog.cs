@@ -59,7 +59,6 @@ namespace UICatalog {
 
 		private static Scenario _runningScenario = null;
 		private static bool _useSystemConsole = false;
-		private static MenuItem _sysConsoleMenu;
 
 		static void Main (string [] args)
 		{
@@ -124,6 +123,17 @@ namespace UICatalog {
 			return _runningScenario;
 		}
 
+		static MenuItem CheckedMenuMenuItem(ustring menuItem, Action action, Func<bool> checkFunction)
+		{
+			var mi = new MenuItem ();
+			mi.Title = $"[{(checkFunction () ? 'x' : ' ')}] {menuItem}"; 
+			mi.Action = () => {
+				action?.Invoke ();
+				mi.Title = $"[{(checkFunction () ? 'x' : ' ')}] {menuItem}";
+			};
+			return mi;
+		}
+
 
 		/// <summary>
 		/// Create all controls. This gets called once and the controls remain with their state between Sceanrio runs.
@@ -137,18 +147,32 @@ namespace UICatalog {
 			aboutMessage.AppendLine ($"Using Terminal.Gui Version: {typeof (Terminal.Gui.Application).Assembly.GetName ().Version}");
 			aboutMessage.AppendLine ("");
 
-			void HandleSysConsoleMenuChange ()
-			{
-				_useSystemConsole = !_useSystemConsole;
-				_sysConsoleMenu.Title = $"[{(_useSystemConsole ? 'x' : ' ')}] _Use System Console";
-			}
-			_sysConsoleMenu = new MenuItem ($"[{(_useSystemConsole ? 'x' : ' ')}] _Use System Console", "", () => HandleSysConsoleMenuChange ());
 
+			var framePaddingMenuText = "Diagnostics: _Frame Padding";
 			_menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Application.RequestStop() )
 				}),
-				new MenuBarItem ("_Settings", new MenuItem [] { _sysConsoleMenu }),
+				new MenuBarItem ("_Settings", new MenuItem [] { 
+					CheckedMenuMenuItem ("Use _System Console", 
+						() => {
+							_useSystemConsole = !_useSystemConsole;
+						},
+						() => _useSystemConsole),
+					CheckedMenuMenuItem ("Diagnostics: _Frame Padding",
+						() => {
+							ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FramePadding;
+							_top.SetNeedsDisplay ();
+						},
+						() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FramePadding) == ConsoleDriver.DiagnosticFlags.FramePadding),
+					CheckedMenuMenuItem ("Diagnostics: Frame _Ruler",
+						() => {
+							ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
+							_top.SetNeedsDisplay ();
+						},
+						() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler),
+
+				}),
 				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "Ok")),
 			});
 

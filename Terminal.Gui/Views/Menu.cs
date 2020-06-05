@@ -173,9 +173,12 @@ namespace Terminal.Gui {
 		/// Initializes a new <see cref="MenuBarItem"/>.
 		/// </summary>
 		/// <param name="children">The items in the current menu.</param>
-		public MenuBarItem (MenuItem [] children) : this (new string (' ', GetMaxTitleLength (children)), children)
-		{
-		}
+		public MenuBarItem (MenuItem [] children) : this (new string (' ', GetMaxTitleLength (children)), children) { }
+
+		/// <summary>
+		/// Initializes a new <see cref="MenuBarItem"/>.
+		/// </summary>
+		public MenuBarItem () : this (children: new MenuItem [] { }) { }
 
 		static int GetMaxTitleLength (MenuItem [] children)
 		{
@@ -549,6 +552,11 @@ namespace Terminal.Gui {
 		/// Used for change the navigation key style.
 		/// </summary>
 		public bool UseKeysUpDownAsKeysLeftRight { get; set; } = true;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MenuBar"/>.
+		/// </summary>
+		public MenuBar () : this (new MenuBarItem [] { }) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MenuBar"/> class with the specified set of toplevel menu items.

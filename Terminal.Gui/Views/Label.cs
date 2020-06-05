@@ -64,29 +64,59 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Initializes a new instance of <see cref="Label"/> at the given
-		///   coordinate with the given string, computes the bounding box
-		///   based on the size of the string, assumes that the string contains
-		///   newlines for multiple lines, no special breaking rules are used.
+		///   Initializes a new instance of <see cref="Label"/> using <see cref="LayoutStyle.Absolute"/> layout.
 		/// </summary>
+		/// <remarks>
+		/// <para>
+		///   The <see cref="Label"/> will be created at the given
+		///   coordinates with the given string. The size (<see cref="View.Frame"/> will be 
+		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
+		/// </para>
+		/// <para>
+		///   No line wraping is provided.
+		/// </para>
+		/// </remarks>
+		/// <param name="x">column to locate the Label.</param>
+		/// <param name="y">row to locate the Label.</param>
+		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
 		public Label (int x, int y, ustring text) : this (CalcRect (x, y, text), text)
 		{
 		}
 
 		/// <summary>
-		///   Initializes a new instance of <see cref="Label"/> at the given
-		///   coordinate with the given string and uses the specified
-		///   frame for the string.
+		///   Initializes a new instance of <see cref="Label"/> using <see cref="LayoutStyle.Absolute"/> layout.
 		/// </summary>
+		/// <remarks>
+		/// <para>
+		///   The <see cref="Label"/> will be created at the given
+		///   coordinates with the given string. The initial size (<see cref="View.Frame"/> will be 
+		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
+		/// </para>
+		/// <para>
+		///   No line wraping is provided.
+		/// </para>
+		/// </remarks>
+		/// <param name="rect">Location.</param>
+		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
 		public Label (Rect rect, ustring text) : base (rect)
 		{
 			this.text = text;
 		}
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="Label"/> and configures the default Width and Height based on the text, the result is suitable for Computed layout.
+		///   Initializes a new instance of <see cref="Label"/> using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
-		/// <param name="text">Text.</param>
+		/// <remarks>
+		/// <para>
+		///   The <see cref="Label"/> will be created using <see cref="LayoutStyle.Computed"/>
+		///   coordinates with the given string. The initial size (<see cref="View.Frame"/> will be 
+		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
+		/// </para>
+		/// <para>
+		///   No line wraping is provided.
+		/// </para>
+		/// </remarks>
+		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
 		public Label (ustring text) : base ()
 		{
 			this.text = text;
@@ -94,6 +124,21 @@ namespace Terminal.Gui {
 			Width = r.Width;
 			Height = r.Height;
 		}
+
+		/// <summary>
+		///   Initializes a new instance of <see cref="Label"/> using <see cref="LayoutStyle.Computed"/> layout.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		///   The <see cref="Label"/> will be created using <see cref="LayoutStyle.Computed"/>
+		///   coordinates. The initial size (<see cref="View.Frame"/> will be 
+		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
+		/// </para>
+		/// <para>
+		///   No line wraping is provided.
+		/// </para>
+		/// </remarks>
+		public Label () : this (text: string.Empty) { }
 
 		static char [] whitespace = new char [] { ' ', '\t' };
 

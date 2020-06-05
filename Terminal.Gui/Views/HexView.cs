@@ -41,10 +41,10 @@ namespace Terminal.Gui {
 		bool firstNibble, leftSide;
 
 		/// <summary>
-		/// Initialzies a <see cref="HexView"/>
+		/// Initialzies a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <param name="source">The <see cref="Stream"/> to view and edit as hex, this <see cref="Stream"/> must support seeking, or an exception will be thrown.</param>
-		public HexView (Stream source) : base()
+		public HexView (Stream source) : base ()
 		{
 			Source = source;
 			this.source = source;
@@ -52,6 +52,11 @@ namespace Terminal.Gui {
 			leftSide = true;
 			firstNibble = true;
 		}
+
+		/// <summary>
+		/// Initialzies a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.
+		/// </summary>
+		public HexView () : this (source: new MemoryStream ()) { }
 
 		/// <summary>
 		/// Sets or gets the <see cref="Stream"/> the <see cref="HexView"/> is operating on; the stream must support seeking (<see cref="Stream.CanSeek"/> == true).
@@ -151,7 +156,7 @@ namespace Terminal.Gui {
 				var lineRect = new Rect (0, line, frame.Width, 1);
 				if (!bounds.Contains (lineRect))
 					continue;
-				
+
 				Move (0, line);
 				Driver.SetAttribute (ColorScheme.HotNormal);
 				Driver.AddStr (string.Format ("{0:x8} ", displayStart + line * nblocks * 4));
@@ -197,7 +202,7 @@ namespace Terminal.Gui {
 						SetAttribute (leftSide ? trackingColor : activeColor);
 					else
 						SetAttribute (ColorScheme.Normal);
-					
+
 					Driver.AddRune (c);
 				}
 			}
@@ -229,7 +234,7 @@ namespace Terminal.Gui {
 
 		void RedisplayLine (long pos)
 		{
-			var delta = (int) (pos - DisplayStart);
+			var delta = (int)(pos - DisplayStart);
 			var line = delta / bytesPerLine;
 
 			SetNeedsDisplay (new Rect (0, line, Frame.Width, 1));
@@ -277,7 +282,7 @@ namespace Terminal.Gui {
 				SetDisplayStart (DisplayStart + bytes);
 				SetNeedsDisplay ();
 			} else
-				RedisplayLine (position);			
+				RedisplayLine (position);
 		}
 
 		/// <inheritdoc/>
@@ -376,7 +381,7 @@ namespace Terminal.Gui {
 		/// Each Key indicates an offset where an edit was made and the Value is the changed byte.
 		/// </summary>
 		/// <value>The edits.</value>
-		public IReadOnlyDictionary<long,byte> Edits => edits;
+		public IReadOnlyDictionary<long, byte> Edits => edits;
 
 		/// <summary>
 		/// This method applies andy edits made to the <see cref="Stream"/> and resets the 

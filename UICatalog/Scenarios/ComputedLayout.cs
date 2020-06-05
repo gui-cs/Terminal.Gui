@@ -1,6 +1,8 @@
-﻿using System;
+﻿using NStack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Terminal.Gui;
 
@@ -17,13 +19,26 @@ namespace UICatalog {
 
 		public override void Setup ()
 		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("_Settings", new MenuItem [] {
+					null,
+					new MenuItem ("_Quit", "", () => Quit()),
+				}),
+			});
+			Top.Add (menu);
+
+			var statusBar = new StatusBar (new StatusItem [] {
+				new StatusItem(Key.ControlQ, "~^Q~ Quit", () => Quit()),
+			});
+			Top.Add (statusBar);
+
 			//Top.LayoutStyle = LayoutStyle.Computed;
 			// Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width
 			// BUGBUG: Dim.Fill returns too big a value sometimes.
 			const string rule = "|123456789";
 			var horizontalRuler = new Label ("") {
 				X = 0,
-				Y = 0,		
+				Y = 0,
 				Width = Dim.Fill (1),  // BUGBUG: I don't think this should be needed; DimFill() should respect container's frame. X does.
 				ColorScheme = Colors.Error
 			};
@@ -44,7 +59,7 @@ namespace UICatalog {
 
 			Win.LayoutComplete += (sender, a) => {
 				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
-				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height*2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height*2)];
+				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height * 2)];
 			};
 
 			Win.Add (verticalRuler);
@@ -59,7 +74,7 @@ namespace UICatalog {
 			// Demonstrate using Dim to create a window that fills the parent with a margin
 			int margin = 10;
 			var subWin = new Window ($"Centered Sub Window with {margin} character margin") {
-				X = Pos.Center(),
+				X = Pos.Center (),
 				Y = 2,
 				Width = Dim.Fill (margin),
 				Height = 7
@@ -79,7 +94,7 @@ namespace UICatalog {
 			// #522 repro?
 			var frameView = new FrameView ($"Centered FrameView with {margin} character margin") {
 				X = Pos.Center (),
-				Y = Pos.Bottom(subWin),
+				Y = Pos.Bottom (subWin),
 				Width = Dim.Fill (margin),
 				Height = 7
 			};
@@ -176,7 +191,7 @@ namespace UICatalog {
 
 			// Center three buttons with 5 spaces between them
 			// TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
-			leftButton.X = Pos.Left (centerButton) - (Pos.Right(leftButton) - Pos.Left (leftButton)) - 5;
+			leftButton.X = Pos.Left (centerButton) - (Pos.Right (leftButton) - Pos.Left (leftButton)) - 5;
 			rightButton.X = Pos.Right (centerButton) + 5;
 
 			Win.Add (leftButton);
@@ -187,6 +202,11 @@ namespace UICatalog {
 		public override void Run ()
 		{
 			base.Run ();
+		}
+
+		private void Quit ()
+		{
+			Application.RequestStop ();
 		}
 	}
 

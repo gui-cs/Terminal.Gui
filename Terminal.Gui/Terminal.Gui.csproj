@@ -172,6 +172,7 @@
     <PackageReference Include="NStack.Core" Version="0.14.0" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="Views\ComboBox.cs" />
   </ItemGroup>
   <!--<ItemGroup>
     <Reference Include="NStack">

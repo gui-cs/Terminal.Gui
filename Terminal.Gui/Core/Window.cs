@@ -69,7 +69,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Window"/> class with an optional title.
+		/// Initializes a new instance of the <see cref="Window"/> class with an optional title using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
 		/// <param name="title">Title.</param>
 		/// <remarks>
@@ -80,9 +80,14 @@ namespace Terminal.Gui {
 		{
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Window"/> class using <see cref="LayoutStyle.Computed"/> positioning.
+		/// </summary>
+		public Window () : this (title: null) { }
+
 		int padding;
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Window"/> with the specified frame for its location, with the specified border,
+		/// Initializes a new instance of the <see cref="Window"/> using <see cref="LayoutStyle.Absolute"/> positioning with the specified frame for its location, with the specified frame padding,
 		/// and an optional title.
 		/// </summary>
 		/// <param name="frame">Superview-relatie rectangle specifying the location and size</param>
@@ -103,7 +108,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Window"/> with the specified frame for its location, with the specified border,
+		/// Initializes a new instance of the <see cref="Window"/> using <see cref="LayoutStyle.Absolute"/> positioning with the specified frame for its location, with the specified frame padding,
 		/// and an optional title.
 		/// </summary>
 		/// <param name="padding">Number of characters to use for padding of the drawn frame.</param>

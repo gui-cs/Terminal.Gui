@@ -63,7 +63,7 @@ namespace UICatalog {
 				var pulseButton = new Button ("Pulse") {
 					X = Pos.Right (startButton) + 2,
 					Y = Pos.Y (startButton),
-					Clicked = () => PulseBtnClick.Invoke ()
+					Clicked = () => Pulse()
 				};
 				var stopbutton = new Button ("Stop Timer") {
 					X = Pos.Right (pulseButton) + 2,

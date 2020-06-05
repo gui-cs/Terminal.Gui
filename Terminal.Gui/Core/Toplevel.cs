@@ -213,7 +213,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///<inheritdoc cref="Add"/>
+		///<inheritdoc/>
 		public override void Add (View view)
 		{
 			if (this == Application.Top) {
