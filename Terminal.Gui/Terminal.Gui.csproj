@@ -181,10 +181,4 @@
   <ItemGroup>
     <None Remove="ConsoleDrivers\#ConsoleDriver.cs#" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="SauceControl.InheritDoc" Version="1.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
 </Project>
