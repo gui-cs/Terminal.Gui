@@ -307,12 +307,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// This event is raised when the selected item in the <see cref="ListView"/> has changed.
 		/// </summary>
-		public event Action<ListViewItemEventArgs> SelectedChanged;
+		public Action<ListViewItemEventArgs> SelectedChanged;
 
 		/// <summary>
 		/// This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
 		/// </summary>
-		public event Action<ListViewItemEventArgs> OpenSelectedItem;
+		public Action<ListViewItemEventArgs> OpenSelectedItem;
 
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)

@@ -92,7 +92,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   See also <see cref="Timeout"/>
 		/// </remarks>
-		public static event Action Iteration;
+		public static Action Iteration;
 
 		/// <summary>
 		/// Returns a rectangle that is centered in the screen for the provided size.
@@ -416,7 +416,7 @@ namespace Terminal.Gui {
 		/// This event is fired once when the application is first loaded. The dimensions of the
 		/// terminal are provided.
 		/// </summary>
-		public static event Action<ResizedEventArgs> Loaded;
+		public static Action<ResizedEventArgs> Loaded;
 
 		/// <summary>
 		/// Building block API: Prepares the provided <see cref="Toplevel"/>  for execution.
@@ -678,7 +678,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when the terminal was resized. The new size of the terminal is provided.
 		/// </summary>
-		public static event Action<ResizedEventArgs> Resized;
+		public static Action<ResizedEventArgs> Resized;
 
 		static void TerminalResized ()
 		{

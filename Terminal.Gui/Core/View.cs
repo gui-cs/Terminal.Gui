@@ -124,27 +124,27 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event fired when the view gets focus.
 		/// </summary>
-		public event Action<FocusEventArgs> Enter;
+		public Action<FocusEventArgs> Enter;
 
 		/// <summary>
 		/// Event fired when the view looses focus.
 		/// </summary>
-		public event Action<FocusEventArgs> Leave;
+		public Action<FocusEventArgs> Leave;
 
 		/// <summary>
 		/// Event fired when the view receives the mouse event for the first time.
 		/// </summary>
-		public event Action<MouseEventEventArgs> MouseEnter;
+		public Action<MouseEventEventArgs> MouseEnter;
 
 		/// <summary>
 		/// Event fired when the view receives a mouse event for the last time.
 		/// </summary>
-		public event Action<MouseEventEventArgs> MouseLeave;
+		public Action<MouseEventEventArgs> MouseLeave;
 
 		/// <summary>
 		/// Event fired when a mouse event is generated.
 		/// </summary>
-		public event Action<MouseEventEventArgs> MouseClick;
+		public Action<MouseEventEventArgs> MouseClick;
 
 		internal Direction FocusDirection {
 			get => SuperView?.FocusDirection ?? focusDirection;
@@ -988,7 +988,7 @@ namespace Terminal.Gui {
 		/// Rect provides the view-relative rectangle describing the currently visible viewport into the <see cref="View"/>.
 		/// </para>
 		/// </remarks>
-		public event Action<Rect> DrawContent;
+		public Action<Rect> DrawContent;
 
 		/// <summary>
 		/// Enables overrides to draw infinitely scrolled content and/or a background behind added controls. 
@@ -1058,7 +1058,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a character key is pressed and occurs after the key up event.
 		/// </summary>
-		public event Action<KeyEventEventArgs> KeyPress;
+		public Action<KeyEventEventArgs> KeyPress;
 
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
@@ -1107,7 +1107,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is pressed
 		/// </summary>
-		public event Action<KeyEventEventArgs> KeyDown;
+		public Action<KeyEventEventArgs> KeyDown;
 
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool OnKeyDown (KeyEvent keyEvent)
@@ -1128,7 +1128,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is released
 		/// </summary>
-		public event Action<KeyEventEventArgs> KeyUp;
+		public Action<KeyEventEventArgs> KeyUp;
 
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool OnKeyUp (KeyEvent keyEvent)
@@ -1386,7 +1386,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.
 		/// </remarks>
-		public event Action<LayoutEventArgs> LayoutComplete;
+		public Action<LayoutEventArgs> LayoutComplete;
 
 		/// <summary>
 		/// Raises the <see cref="LayoutComplete"/> event. Called from  <see cref="LayoutSubviews"/> after all sub-views have been laid out.

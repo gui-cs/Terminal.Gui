@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   The passed <see cref="EventArgs"/> is a <see cref="DateTimeEventArgs"/> containing the old, new value and format.
 		/// </remarks>
-		public event Action<DateTimeEventArgs<TimeSpan>> TimeChanged;
+		public Action<DateTimeEventArgs<TimeSpan>> TimeChanged;
 
 		/// <summary>
 		///    Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Absolute"/> positioning.

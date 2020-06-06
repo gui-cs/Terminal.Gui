@@ -693,12 +693,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Raised as a menu is opening.
 		/// </summary>
-		public event Action MenuOpening;
+		public Action MenuOpening;
 
 		/// <summary>
 		/// Raised when a menu is closing.
 		/// </summary>
-		public event Action MenuClosing;
+		public Action MenuClosing;
 
 		internal Menu openMenu;
 		Menu openCurrentMenu;

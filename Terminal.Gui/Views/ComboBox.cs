@@ -22,7 +22,7 @@ namespace Terminal.Gui {
 		///   Client code can hook up to this event, it is
 		///   raised when the selection has been confirmed.
 		/// </remarks>
-		public event Action<ustring> Changed;
+		public Action<ustring> Changed;
 
 		IList<string> listsource;
 		IList<string> searchset;

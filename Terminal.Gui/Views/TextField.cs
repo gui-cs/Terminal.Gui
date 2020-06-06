@@ -41,7 +41,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   The passed <see cref="EventArgs"/> is a <see cref="ustring"/> containing the old value. 
 		/// </remarks>
-		public event Action<ustring> Changed;
+		public Action<ustring> Changed;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
