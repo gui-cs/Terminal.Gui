@@ -147,8 +147,6 @@ namespace UICatalog {
 			aboutMessage.AppendLine ($"Using Terminal.Gui Version: {typeof (Terminal.Gui.Application).Assembly.GetName ().Version}");
 			aboutMessage.AppendLine ("");
 
-
-			var framePaddingMenuText = "Diagnostics: _Frame Padding";
 			_menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Application.RequestStop() )
