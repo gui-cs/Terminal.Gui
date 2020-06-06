@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   The passed event arguments containing the old value, new value, and format string.
 		/// </remarks>
-		public event Action<DateTimeEventArgs<DateTime>> DateChanged;
+		public Action<DateTimeEventArgs<DateTime>> DateChanged;
 
 		/// <summary>
 		///    Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Absolute"/> layout.
@@ -77,10 +77,10 @@ namespace Terminal.Gui {
 			shortFormat = GetShortFormat (longFormat);
 			CursorPosition = 1;
 			Date = date;
-			Changed += DateField_Changed;
+			TextChanged += DateField_Changed;
 		}
 
-		void DateField_Changed (object sender, ustring e)
+		void DateField_Changed (ustring e)
 		{
 			try {
 				if (!DateTime.TryParseExact (GetDate (Text).ToString (), GetInvarianteFormat (), CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))

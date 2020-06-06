@@ -307,12 +307,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// This event is raised when the selected item in the <see cref="ListView"/> has changed.
 		/// </summary>
-		public event EventHandler<ListViewItemEventArgs> SelectedChanged;
+		public Action<ListViewItemEventArgs> SelectedItemChanged;
 
 		/// <summary>
 		/// This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
 		/// </summary>
-		public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
+		public Action<ListViewItemEventArgs> OpenSelectedItem;
 
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
@@ -469,7 +469,7 @@ namespace Terminal.Gui {
 		{
 			if (selected != lastSelectedItem) {
 				var value = source.ToList () [selected];
-				SelectedChanged?.Invoke (this, new ListViewItemEventArgs (selected, value));
+				SelectedItemChanged?.Invoke (new ListViewItemEventArgs (selected, value));
 				lastSelectedItem = selected;
 				return true;
 			}
@@ -484,7 +484,7 @@ namespace Terminal.Gui {
 		public virtual bool OnOpenSelectedItem ()
 		{
 			var value = source.ToList () [selected];
-			OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (selected, value));
+			OpenSelectedItem?.Invoke (new ListViewItemEventArgs (selected, value));
 
 			return true;
 		}

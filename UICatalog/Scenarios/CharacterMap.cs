@@ -81,7 +81,7 @@ namespace UICatalog {
 			ContentSize = new Size (CharMap.RowWidth, MaxCodePointVal / 16);
 			ShowVerticalScrollIndicator = true;
 			ShowHorizontalScrollIndicator = false;
-			LayoutComplete += (sender, args) => {
+			LayoutComplete += (args) => {
 				if (Bounds.Width <= RowWidth) {
 					ShowHorizontalScrollIndicator = true;
 				} else {
@@ -93,7 +93,7 @@ namespace UICatalog {
 		}
 
 #if true
-		private void CharMap_DrawContent (object sender, Rect viewport)
+		private void CharMap_DrawContent (Rect viewport)
 		{
 			for (int header = 0; header < 16; header++) {
 				Move (viewport.X + RowHeaderWidth + 1 + (header * 3), 0);

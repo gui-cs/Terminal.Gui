@@ -149,7 +149,7 @@ namespace UICatalog {
 				ColorScheme = Colors.TopLevel
 			};
 
-			lvTextAlig.SelectedChanged += (o, e) => {
+			lvTextAlig.SelectedItemChanged += (e) => {
 				switch (e.Value) {
 				case "Left":
 					sizeBtn.TextAlignment = TextAlignment.Left;

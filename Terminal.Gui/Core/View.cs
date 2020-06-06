@@ -124,27 +124,27 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event fired when the view gets focus.
 		/// </summary>
-		public event EventHandler<FocusEventArgs> Enter;
+		public Action<FocusEventArgs> Enter;
 
 		/// <summary>
 		/// Event fired when the view looses focus.
 		/// </summary>
-		public event EventHandler<FocusEventArgs> Leave;
+		public Action<FocusEventArgs> Leave;
 
 		/// <summary>
 		/// Event fired when the view receives the mouse event for the first time.
 		/// </summary>
-		public event EventHandler<MouseEventEventArgs> MouseEnter;
+		public Action<MouseEventArgs> MouseEnter;
 
 		/// <summary>
 		/// Event fired when the view receives a mouse event for the last time.
 		/// </summary>
-		public event EventHandler<MouseEventEventArgs> MouseLeave;
+		public Action<MouseEventArgs> MouseLeave;
 
 		/// <summary>
 		/// Event fired when a mouse event is generated.
 		/// </summary>
-		public event EventHandler<MouseEventEventArgs> MouseClick;
+		public Action<MouseEventArgs> MouseClick;
 
 		internal Direction FocusDirection {
 			get => SuperView?.FocusDirection ?? focusDirection;
@@ -840,7 +840,7 @@ namespace Terminal.Gui {
 		public override bool OnEnter ()
 		{
 			FocusEventArgs args = new FocusEventArgs ();
-			Enter?.Invoke (this, args);
+			Enter?.Invoke (args);
 			if (args.Handled)
 				return true;
 			if (base.OnEnter ())
@@ -853,7 +853,7 @@ namespace Terminal.Gui {
 		public override bool OnLeave ()
 		{
 			FocusEventArgs args = new FocusEventArgs ();
-			Leave?.Invoke (this, args);
+			Leave?.Invoke (args);
 			if (args.Handled)
 				return true;
 			if (base.OnLeave ())
@@ -988,7 +988,7 @@ namespace Terminal.Gui {
 		/// Rect provides the view-relative rectangle describing the currently visible viewport into the <see cref="View"/>.
 		/// </para>
 		/// </remarks>
-		public event EventHandler<Rect> DrawContent;
+		public Action<Rect> DrawContent;
 
 		/// <summary>
 		/// Enables overrides to draw infinitely scrolled content and/or a background behind added controls. 
@@ -999,7 +999,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void OnDrawContent (Rect viewport)
 		{
-			DrawContent?.Invoke (this, viewport);
+			DrawContent?.Invoke (viewport);
 		}
 
 		/// <summary>
@@ -1058,14 +1058,14 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a character key is pressed and occurs after the key up event.
 		/// </summary>
-		public event EventHandler<KeyEventEventArgs> KeyPress;
+		public Action<KeyEventEventArgs> KeyPress;
 
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
-			KeyPress?.Invoke (this, args);
+			KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
 			if (Focused?.ProcessKey (keyEvent) == true)
@@ -1078,7 +1078,7 @@ namespace Terminal.Gui {
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
-			KeyPress?.Invoke (this, args);
+			KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
 			if (subviews == null || subviews.Count == 0)
@@ -1093,7 +1093,7 @@ namespace Terminal.Gui {
 		public override bool ProcessColdKey (KeyEvent keyEvent)
 		{
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
-			KeyPress?.Invoke (this, args);
+			KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
 			if (subviews == null || subviews.Count == 0)
@@ -1107,13 +1107,13 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is pressed
 		/// </summary>
-		public event EventHandler<KeyEventEventArgs> KeyDown;
+		public Action<KeyEventEventArgs> KeyDown;
 
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
-			KeyDown?.Invoke (this, args);
+			KeyDown?.Invoke (args);
 			if (args.Handled)
 				return true;
 			if (subviews == null || subviews.Count == 0)
@@ -1128,13 +1128,13 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is released
 		/// </summary>
-		public event EventHandler<KeyEventEventArgs> KeyUp;
+		public Action<KeyEventEventArgs> KeyUp;
 
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
-			KeyUp?.Invoke (this, args);
+			KeyUp?.Invoke (args);
 			if (args.Handled)
 				return true;
 			if (subviews == null || subviews.Count == 0)
@@ -1386,14 +1386,14 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.
 		/// </remarks>
-		public event EventHandler<LayoutEventArgs> LayoutComplete;
+		public Action<LayoutEventArgs> LayoutComplete;
 
 		/// <summary>
 		/// Raises the <see cref="LayoutComplete"/> event. Called from  <see cref="LayoutSubviews"/> after all sub-views have been laid out.
 		/// </summary>
 		internal virtual void OnLayoutComplete (LayoutEventArgs args)
 		{
-			LayoutComplete?.Invoke (this, args);
+			LayoutComplete?.Invoke (args);
 		}
 
 		/// <summary>
@@ -1462,12 +1462,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Specifies the event arguments for <see cref="MouseEvent"/>
 		/// </summary>
-		public class MouseEventEventArgs : EventArgs {
+		public class MouseEventArgs : EventArgs {
 			/// <summary>
 			/// Constructs.
 			/// </summary>
 			/// <param name="me"></param>
-			public MouseEventEventArgs (MouseEvent me) => MouseEvent = me;
+			public MouseEventArgs (MouseEvent me) => MouseEvent = me;
 			/// <summary>
 			/// The <see cref="MouseEvent"/> for the event.
 			/// </summary>
@@ -1482,8 +1482,8 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool OnMouseEnter (MouseEvent mouseEvent)
 		{
-			MouseEventEventArgs args = new MouseEventEventArgs (mouseEvent);
-			MouseEnter?.Invoke (this, args);
+			MouseEventArgs args = new MouseEventArgs (mouseEvent);
+			MouseEnter?.Invoke (args);
 			if (args.Handled)
 				return true;
 			if (base.OnMouseEnter (mouseEvent))
@@ -1495,8 +1495,8 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool OnMouseLeave (MouseEvent mouseEvent)
 		{
-			MouseEventEventArgs args = new MouseEventEventArgs (mouseEvent);
-			MouseLeave?.Invoke (this, args);
+			MouseEventArgs args = new MouseEventArgs (mouseEvent);
+			MouseLeave?.Invoke (args);
 			if (args.Handled)
 				return true;
 			if (base.OnMouseLeave (mouseEvent))
@@ -1513,8 +1513,8 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
 		public virtual bool OnMouseEvent (MouseEvent mouseEvent)
 		{
-			MouseEventEventArgs args = new MouseEventEventArgs (mouseEvent);
-			MouseClick?.Invoke (this, args);
+			MouseEventArgs args = new MouseEventArgs (mouseEvent);
+			MouseClick?.Invoke (args);
 			if (args.Handled)
 				return true;
 			if (MouseEvent (mouseEvent))
