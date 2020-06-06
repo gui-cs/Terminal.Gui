@@ -434,7 +434,7 @@ static class Demo {
 			}
 		}
 		var list = new ComboBox () { X = 0, Y = 0, Width = 36, Height = 7 };
-		list.SetSource(items);
+		list.SetSource(items.ToList());
 		list.Changed += (object sender, ustring text) => { Application.RequestStop (); };
 
 		var d = new Dialog ("Select source file", 40, 12) { list };
