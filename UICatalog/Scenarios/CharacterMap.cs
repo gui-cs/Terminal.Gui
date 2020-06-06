@@ -99,14 +99,14 @@ namespace UICatalog {
 				Move (viewport.X + RowHeaderWidth + 1 + (header * 3), 0);
 				Driver.AddStr ($" {header:x} ");
 			}
-			for (int row = 0, y = 0; row < viewport.Height / 2 - 1; row++, y += 2) {
+			for (int row = 0; row < viewport.Height - 1; row++) {
 				int val = (-viewport.Y + row) * 16;
 				if (val < MaxCodePointVal) {
 					var rowLabel = $"U+{val / 16:x4}x";
-					Move (0, y + 1);
+					Move (0, row + 1);
 					Driver.AddStr (rowLabel);
 					for (int col = 0; col < 16; col++) {
-						Move (viewport.X + RowHeaderWidth + 1 + (col * 3), 0 + y + 1);
+						Move (viewport.X + RowHeaderWidth + 1 + (col * 3), 0 + row + 1);
 						Driver.AddStr ($" {(char)((-viewport.Y + row) * 16 + col)} ");
 					}
 				}
