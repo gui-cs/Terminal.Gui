@@ -92,7 +92,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   See also <see cref="Timeout"/>
 		/// </remarks>
-		public static event EventHandler Iteration;
+		public static event Action Iteration;
 
 		/// <summary>
 		/// Returns a rectangle that is centered in the screen for the provided size.
@@ -416,7 +416,7 @@ namespace Terminal.Gui {
 		/// This event is fired once when the application is first loaded. The dimensions of the
 		/// terminal are provided.
 		/// </summary>
-		public static event EventHandler<ResizedEventArgs> Loaded;
+		public static event Action<ResizedEventArgs> Loaded;
 
 		/// <summary>
 		/// Building block API: Prepares the provided <see cref="Toplevel"/>  for execution.
@@ -452,7 +452,7 @@ namespace Terminal.Gui {
 			if (toplevel.LayoutStyle == LayoutStyle.Computed)
 				toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
 			toplevel.LayoutSubviews ();
-			Loaded?.Invoke (null, new ResizedEventArgs () { Rows = Driver.Rows, Cols = Driver.Cols });
+			Loaded?.Invoke (new ResizedEventArgs () { Rows = Driver.Rows, Cols = Driver.Cols });
 			toplevel.WillPresent ();
 			Redraw (toplevel);
 			toplevel.PositionCursor ();
@@ -572,7 +572,7 @@ namespace Terminal.Gui {
 					firstIteration = false;
 
 					MainLoop.MainIteration ();
-					Iteration?.Invoke (null, EventArgs.Empty);
+					Iteration?.Invoke ();
 				} else if (wait == false)
 					return;
 				if (state.Toplevel.NeedDisplay != null && (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.childNeedsDisplay)) {
@@ -678,12 +678,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when the terminal was resized. The new size of the terminal is provided.
 		/// </summary>
-		public static event EventHandler<ResizedEventArgs> Resized;
+		public static event Action<ResizedEventArgs> Resized;
 
 		static void TerminalResized ()
 		{
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
-			Resized?.Invoke (null, new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
+			Resized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
 			Driver.Clip = full;
 			foreach (var t in toplevels) {
 				t.PositionToplevels ();

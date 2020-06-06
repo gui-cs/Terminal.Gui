@@ -80,7 +80,7 @@ namespace Terminal.Gui {
 			Changed += DateField_Changed;
 		}
 
-		void DateField_Changed (object sender, ustring e)
+		void DateField_Changed (ustring e)
 		{
 			try {
 				if (!DateTime.TryParseExact (GetDate (Text).ToString (), GetInvarianteFormat (), CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))

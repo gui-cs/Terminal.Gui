@@ -80,7 +80,7 @@ namespace Terminal.Gui {
 			Changed += TimeField_Changed;
 		}
 
-		void TimeField_Changed (object sender, ustring e)
+		void TimeField_Changed (ustring e)
 		{
 			try {
 				if (!TimeSpan.TryParseExact (Text.ToString ().Trim (), Format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result))

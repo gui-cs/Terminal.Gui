@@ -125,7 +125,7 @@ namespace Terminal.Gui {
 			Width = Dim.Fill ();
 			Height = 1;
 
-			LayoutComplete += (sender, e) => {
+			LayoutComplete += (e) => {
 				X = 0;
 				Height = 1;
 #if SNAP_TO_TOP

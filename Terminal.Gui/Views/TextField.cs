@@ -41,7 +41,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   The passed <see cref="EventArgs"/> is a <see cref="ustring"/> containing the old value. 
 		/// </remarks>
-		public event EventHandler<ustring> Changed;
+		public event Action<ustring> Changed;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
@@ -145,7 +145,7 @@ namespace Terminal.Gui {
 					historyText.Add (ustring.Make (text));
 					idxhistoryText++;
 				}
-				Changed?.Invoke (this, oldText);
+				Changed?.Invoke (oldText);
 
 				if (point > text.Count)
 					point = Math.Max (DisplaySize (text, 0) - 1, 0);

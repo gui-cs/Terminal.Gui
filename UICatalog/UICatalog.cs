@@ -111,7 +111,7 @@ namespace UICatalog {
 			_top.Add (_rightPane);
 			_top.Add (_statusBar);
 
-			_top.Ready += (o, a) => {
+			_top.Ready += () => {
 				if (_runningScenario != null) {
 					_top.SetFocus (_rightPane);
 					_runningScenario = null;
@@ -192,7 +192,7 @@ namespace UICatalog {
 				AllowsMarking = false,
 				CanFocus = true,
 			};
-			_categoryListView.OpenSelectedItem += (o, a) => {
+			_categoryListView.OpenSelectedItem += (a) => {
 				_top.SetFocus (_rightPane);
 			};
 			_categoryListView.SelectedChanged += CategoryListView_SelectedChanged;
@@ -244,7 +244,7 @@ namespace UICatalog {
 			});
 		}
 
-		private static void _scenarioListView_OpenSelectedItem (object sender, EventArgs e)
+		private static void _scenarioListView_OpenSelectedItem (EventArgs e)
 		{
 			if (_runningScenario is null) {
 				var source = _scenarioListView.Source as ScenarioListDataSource;
@@ -306,7 +306,7 @@ namespace UICatalog {
 		/// to not be impacted. Same as for tabs.
 		/// </summary>
 		/// <param name="ke"></param>
-		private static void KeyDownHandler (object sender, View.KeyEventEventArgs a)
+		private static void KeyDownHandler (View.KeyEventEventArgs a)
 		{
 			if (a.KeyEvent.Key == Key.Tab || a.KeyEvent.Key == Key.BackTab) {
 				// BUGBUG: Work around Issue #434 by implementing our own TAB navigation
@@ -341,7 +341,7 @@ namespace UICatalog {
 			}
 		}
 
-		private static void CategoryListView_SelectedChanged (object sender, ListViewItemEventArgs e)
+		private static void CategoryListView_SelectedChanged (ListViewItemEventArgs e)
 		{
 			var item = _categories [_categoryListView.SelectedItem];
 			List<Type> newlist;

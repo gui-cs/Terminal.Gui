@@ -90,7 +90,7 @@ static class Demo {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
-		container.KeyUp += (sender, e) => {
+		container.KeyUp += (e) => {
 			if (e.KeyEvent.Key == Key.Esc)
 				container.Running = false;
 		};
@@ -335,16 +335,15 @@ static class Demo {
 			$"{mi.Title.ToString ()} selected. Is from submenu: {mi.GetMenuBarItem ()}", "Ok");
 	}
 
-	static void MenuKeysStyle_Toggled (object sender, bool e)
+	static void MenuKeysStyle_Toggled (bool e)
 	{
 		menu.UseKeysUpDownAsKeysLeftRight = menuKeysStyle.Checked;
 	}
 
-	static void MenuAutoMouseNav_Toggled (object sender, bool e)
+	static void MenuAutoMouseNav_Toggled (bool e)
 	{
 		menu.WantMousePositionReports = menuAutoMouseNav.Checked;
 	}
-
 
 	static void Copy ()
 	{
@@ -501,10 +500,9 @@ static class Demo {
 			listView.MoveDown ();
 		}
 
-
-		container.KeyDown += (o, e) => KeyDownPressUp (e.KeyEvent, "Down");
-		container.KeyPress += (o, e) => KeyDownPressUp (e.KeyEvent, "Press");
-		container.KeyUp += (o, e) => KeyDownPressUp (e.KeyEvent, "Up");
+		container.KeyDown += (e) => KeyDownPressUp (e.KeyEvent, "Down");
+		container.KeyPress += (e) => KeyDownPressUp (e.KeyEvent, "Press");
+		container.KeyUp += (e) => KeyDownPressUp (e.KeyEvent, "Up");
 		Application.Run (container);
 	}
 	#endregion
@@ -638,7 +636,7 @@ static class Demo {
 		var bottom2 = new Label ("This should go on the bottom of another top-level!");
 		top.Add (bottom2);
 
-		top.LayoutComplete += (sender, e) => {
+		top.LayoutComplete += (e) => {
 			bottom.X = win.X;
 			bottom.Y = Pos.Bottom (win) - Pos.Top (win) - margin;
 			bottom2.X = Pos.Left (win);
@@ -648,14 +646,13 @@ static class Demo {
 
 		win.KeyPress += Win_KeyPress;
 
-
 		top.Add (win);
 		//top.Add (menu);
 		top.Add (menu, statusBar);
 		Application.Run ();
 	}
 
-	private static void Win_KeyPress (object sender, View.KeyEventEventArgs e)
+	private static void Win_KeyPress (View.KeyEventEventArgs e)
 	{
 		if (e.KeyEvent.Key == Key.ControlT) {
 			if (menu.IsMenuOpen)

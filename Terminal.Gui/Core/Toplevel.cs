@@ -53,14 +53,14 @@ namespace Terminal.Gui {
 		/// Subscribe to this event to perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set.
 		/// changes. A Ready event handler is a good place to finalize initialization after calling `<see cref="Application.Run()"/>(topLevel)`. 
 		/// </summary>
-		public event EventHandler Ready;
+		public event Action Ready;
 
 		/// <summary>
 		/// Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered it's first iteration of the loop. 
 		/// </summary>
 		internal virtual void OnReady ()
 		{
-			Ready?.Invoke (this, EventArgs.Empty);
+			Ready?.Invoke ();
 		}
 
 		/// <summary>

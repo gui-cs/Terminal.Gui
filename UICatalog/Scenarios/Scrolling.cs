@@ -122,7 +122,7 @@ namespace UICatalog {
 			};
 			scrollView.Add (verticalRuler);
 
-			Win.LayoutComplete += (sender, a) => {
+			Win.LayoutComplete += (a) => {
 				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)] +
 				"\n" + "|         ".Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
 				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height * 2)];
@@ -182,8 +182,8 @@ namespace UICatalog {
 				X = Pos.X(scrollView),
 				Y = Pos.Bottom(scrollView) + 1,
 			};
-			hCheckBox.Toggled += (sender, previousChecked) => {
-				scrollView.ShowHorizontalScrollIndicator = ((CheckBox)sender).Checked;
+			hCheckBox.Toggled += (previousChecked) => {
+				scrollView.ShowHorizontalScrollIndicator = hCheckBox.Checked;
 			};
 			Win.Add (hCheckBox);
 
@@ -191,8 +191,8 @@ namespace UICatalog {
 				X = Pos.Right (hCheckBox) + 3,
 				Y = Pos.Bottom (scrollView) + 1,
 			};
-			vCheckBox.Toggled += (sender, previousChecked) => {
-				scrollView.ShowVerticalScrollIndicator = ((CheckBox)sender).Checked;
+			vCheckBox.Toggled += (previousChecked) => {
+				scrollView.ShowVerticalScrollIndicator = vCheckBox.Checked;
 			};
 			Win.Add (vCheckBox);
 
