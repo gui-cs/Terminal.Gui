@@ -17,7 +17,7 @@ namespace Terminal.Gui {
 	///   The <see cref="TimeField"/> <see cref="View"/> provides time editing functionality with mouse support.
 	/// </remarks>
 	public class TimeField : TextField {
-		DateTime time;
+		TimeSpan time;
 		bool isShort;
 
 		int longFieldLen = 8;
@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   The passed <see cref="EventArgs"/> is a <see cref="DateTimeEventArgs"/> containing the old, new value and format.
 		/// </remarks>
-		public event EventHandler<DateTimeEventArgs> TimeChanged;
+		public event Action<DateTimeEventArgs<TimeSpan>> TimeChanged;
 
 		/// <summary>
 		///    Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Absolute"/> positioning.
@@ -47,7 +47,7 @@ namespace Terminal.Gui {
 		/// <param name="y">The y coordinate.</param>
 		/// <param name="time">Initial time.</param>
 		/// <param name="isShort">If true, the seconds are hidden. Sets the <see cref="IsShortFormat"/> property.</param>
-		public TimeField (int x, int y, DateTime time, bool isShort = false) : base (x, y, isShort ? 7 : 10, "")
+		public TimeField (int x, int y, TimeSpan time, bool isShort = false) : base (x, y, isShort ? 7 : 10, "")
 		{
 			this.isShort = isShort;
 			Initialize (time);
@@ -57,7 +57,7 @@ namespace Terminal.Gui {
 		///    Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
 		/// <param name="time">Initial time</param>
-		public TimeField (DateTime time) : base (string.Empty)
+		public TimeField (TimeSpan time) : base (string.Empty)
 		{
 			this.isShort = true;
 			Width = FieldLen + 2;
@@ -67,24 +67,23 @@ namespace Terminal.Gui {
 		/// <summary>
 		///    Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
-		public TimeField () : this (time: DateTime.MinValue) { }
+		public TimeField () : this (time: TimeSpan.MinValue) { }
 
-		void Initialize (DateTime time)
+		void Initialize (TimeSpan time)
 		{
 			CultureInfo cultureInfo = CultureInfo.CurrentCulture;
 			sepChar = cultureInfo.DateTimeFormat.TimeSeparator;
-			longFormat = $" HH{sepChar}mm{sepChar}ss";
-			shortFormat = $" HH{sepChar}mm";
+			longFormat = $" hh\\{sepChar}mm\\{sepChar}ss";
+			shortFormat = $" hh\\{sepChar}mm";
 			CursorPosition = 1;
-			this.time = time;
-			Text = time.ToString (Format);
+			Time = time;
 			Changed += TimeField_Changed;
 		}
 
 		void TimeField_Changed (object sender, ustring e)
 		{
 			try {
-				if (!DateTime.TryParseExact (Text.ToString (), Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
+				if (!TimeSpan.TryParseExact (Text.ToString ().Trim (), Format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result))
 					Text = e;
 			} catch (Exception) {
 				Text = e;
@@ -96,7 +95,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
-		public DateTime Time {
+		public TimeSpan Time {
 			get {
 				return time;
 			}
@@ -106,8 +105,8 @@ namespace Terminal.Gui {
 
 				var oldTime = time;
 				time = value;
-				this.Text = value.ToString (Format);
-				var args = new DateTimeEventArgs (oldTime, value, Format);
+				this.Text = " " + value.ToString (Format.Trim ());
+				var args = new DateTimeEventArgs<TimeSpan> (oldTime, value, Format);
 				if (oldTime != value) {
 					OnTimeChanged (args);
 				}
@@ -184,7 +183,7 @@ namespace Terminal.Gui {
 			}
 			string t = isShort ? $" {hour,2:00}{sepChar}{minute,2:00}" : $" {hour,2:00}{sepChar}{minute,2:00}{sepChar}{second,2:00}";
 
-			if (!DateTime.TryParseExact (t, Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result) ||
+			if (!TimeSpan.TryParseExact (t.Trim (), Format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result) ||
 				!isValidTime)
 				return false;
 			Time = result;
@@ -292,9 +291,9 @@ namespace Terminal.Gui {
 		/// Virtual method that will invoke the <see cref="TimeChanged"/>  with a <see cref="DateTimeEventArgs"/>.
 		/// </summary>
 		/// <param name="args">The arguments of the <see cref="DateTimeEventArgs"/></param>
-		public virtual void OnTimeChanged (DateTimeEventArgs args)
+		public virtual void OnTimeChanged (DateTimeEventArgs<TimeSpan> args)
 		{
-			TimeChanged?.Invoke (this, args);
+			TimeChanged?.Invoke (args);
 		}
 	}
 }

@@ -132,6 +132,10 @@ namespace Terminal.Gui {
 					return;
 
 				var oldText = ustring.Make (text);
+
+				if (oldText == value)
+					return;
+
 				text = TextModel.ToRunes (value);
 				if (!Secret && !isFromHistory) {
 					if (historyText == null)

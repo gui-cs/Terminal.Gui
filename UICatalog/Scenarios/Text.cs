@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog {
@@ -45,8 +46,8 @@ namespace UICatalog {
 			};
 			Win.Add (dateField);
 
-			var timeField = new TimeField (System.DateTime.Now) {
-				X = Pos.Right(dateField) + 5,
+			var timeField = new TimeField (DateTime.Now.TimeOfDay) {
+				X = Pos.Right (dateField) + 5,
 				Y = Pos.Bottom (hexView) + 1,
 				Width = Dim.Percent (40),
 				ColorScheme = Colors.Dialog,

@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   The passed <see cref="EventArgs"/> is a <see cref="DateTimeEventArgs"/> containing the old, new value and format.
 		/// </remarks>
-		public event EventHandler<DateTimeEventArgs> DateChanged;
+		public event Action<DateTimeEventArgs<DateTime>> DateChanged;
 
 		/// <summary>
 		///    Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Absolute"/> layout.
@@ -76,8 +76,7 @@ namespace Terminal.Gui {
 			longFormat = GetLongFormat (cultureInfo.DateTimeFormat.ShortDatePattern);
 			shortFormat = GetShortFormat (longFormat);
 			CursorPosition = 1;
-			this.date = date;
-			Text = date.ToString (Format);
+			Date = date;
 			Changed += DateField_Changed;
 		}
 
@@ -131,7 +130,7 @@ namespace Terminal.Gui {
 				var oldData = date;
 				date = value;
 				this.Text = value.ToString (Format);
-				var args = new DateTimeEventArgs (oldData, value, Format);
+				var args = new DateTimeEventArgs<DateTime> (oldData, value, Format);
 				if (oldData != value) {
 					OnDateChanged (args);
 				}
@@ -374,25 +373,25 @@ namespace Terminal.Gui {
 		/// Virtual method that will invoke the <see cref="DateChanged"/>  with a <see cref="DateTimeEventArgs"/>.
 		/// </summary>
 		/// <param name="args">The arguments of the <see cref="DateTimeEventArgs"/></param>
-		public virtual void OnDateChanged (DateTimeEventArgs args)
+		public virtual void OnDateChanged (DateTimeEventArgs<DateTime> args)
 		{
-			DateChanged?.Invoke (this, args);
+			DateChanged?.Invoke (args);
 		}
 	}
 
 	/// <summary>
 	/// Handled the <see cref="EventArgs"/> for <see cref="DateField"/> or <see cref="TimeField"/> events.
 	/// </summary>
-	public class DateTimeEventArgs : EventArgs {
+	public class DateTimeEventArgs<T> : EventArgs {
 		/// <summary>
 		/// The old <see cref="DateField"/> or <see cref="TimeField"/> value.
 		/// </summary>
-		public DateTime OldValue {get;}
+		public T OldValue {get;}
 
 		/// <summary>
 		/// The new <see cref="DateField"/> or <see cref="TimeField"/> value.
 		/// </summary>
-		public DateTime NewValue { get; }
+		public T NewValue { get; }
 
 		/// <summary>
 		/// The <see cref="DateField"/> or <see cref="TimeField"/> format.
@@ -405,7 +404,7 @@ namespace Terminal.Gui {
 		/// <param name="oldValue">The old <see cref="DateField"/> or <see cref="TimeField"/> value.</param>
 		/// <param name="newValue">The new <see cref="DateField"/> or <see cref="TimeField"/> value.</param>
 		/// <param name="format">The <see cref="DateField"/> or <see cref="TimeField"/> format.</param>
-		public DateTimeEventArgs (DateTime oldValue, DateTime newValue, string format)
+		public DateTimeEventArgs (T oldValue, T newValue, string format)
 		{
 			OldValue = oldValue;
 			NewValue = newValue;

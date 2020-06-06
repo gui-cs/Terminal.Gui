@@ -15,7 +15,7 @@ namespace UICatalog {
 
 		public override void Setup ()
 		{
-			var longTime = new TimeField (DateTime.Now) {
+			var longTime = new TimeField (DateTime.Now.TimeOfDay) {
 				X = Pos.Center (),
 				Y = 2,
 				IsShortFormat = false,
@@ -24,9 +24,9 @@ namespace UICatalog {
 			longTime.TimeChanged += TimeChanged;
 			Win.Add (longTime);
 
-			var shortTime = new TimeField (DateTime.Now) {
+			var shortTime = new TimeField (DateTime.Now.TimeOfDay) {
 				X = Pos.Center (),
-				Y = Pos.Bottom(longTime) + 1,
+				Y = Pos.Bottom (longTime) + 1,
 				IsShortFormat = true,
 				ReadOnly = false,
 			};
@@ -106,14 +106,14 @@ namespace UICatalog {
 			});
 		}
 
-		private void TimeChanged (object sender, DateTimeEventArgs e)
+		private void TimeChanged (DateTimeEventArgs<TimeSpan> e)
 		{
 			lblOldTime.Text = $"Old Time: {e.OldValue}";
 			lblNewTime.Text = $"New Time: {e.NewValue}";
 			lblTimeFmt.Text = $"Time Format: {e.Format}";
 		}
 
-		private void DateChanged (object sender, DateTimeEventArgs e)
+		private void DateChanged (DateTimeEventArgs<DateTime> e)
 		{
 			lblOldDate.Text = $"Old Date: {e.OldValue}";
 			lblNewDate.Text = $"New Date: {e.NewValue}";
