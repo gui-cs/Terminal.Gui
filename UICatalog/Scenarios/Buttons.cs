@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System;
+using System.Collections.Generic;
 using Terminal.Gui;
 
 namespace UICatalog {
@@ -87,7 +88,7 @@ namespace UICatalog {
 				Y = y
 			});
 
-			button.Clicked = () => button.Text += "!"; 
+			button.Clicked = () => button.Text += "!";
 
 			Win.Add (new Button ("Lets see if this will move as \"Text Changer\" grows") {
 				X = Pos.Right (button) + 10,
@@ -127,6 +128,45 @@ namespace UICatalog {
 				sizeBtn.Frame = new Rect (sizeBtn.Frame.X, sizeBtn.Frame.Y, sizeBtn.Frame.Width + 5, sizeBtn.Frame.Height);
 			};
 			Win.Add (sizeBtn);
+
+			Win.Add (new Label ("Size This Button via Frame 'Text Alignment'") {
+				X = Pos.Right (moveBtn) + 20,
+				Y = Pos.Top (moveBtn) - 4,
+			});
+
+			List<string> txtAligs = new List<string> () {
+				"Left",
+				"Right",
+				"Centered",
+				"Justified"
+			};
+
+			var lvTextAlig = new ListView (txtAligs) {
+				X = Pos.Right (moveBtn) + 20,
+				Y = Pos.Top (moveBtn) - 3,
+				Width = 20,
+				Height = 4,
+				ColorScheme = Colors.TopLevel
+			};
+
+			lvTextAlig.SelectedChanged += (o, e) => {
+				switch (e.Value) {
+				case "Left":
+					sizeBtn.TextAlignment = TextAlignment.Left;
+					break;
+				case "Right":
+					sizeBtn.TextAlignment = TextAlignment.Right;
+					break;
+				case "Centered":
+					sizeBtn.TextAlignment = TextAlignment.Centered;
+					break;
+				case "Justified":
+					sizeBtn.TextAlignment = TextAlignment.Justified;
+					break;
+				}
+			};
+
+			Win.Add (lvTextAlig);
 
 			// Demo changing hotkey
 			ustring MoveHotkey (ustring txt)

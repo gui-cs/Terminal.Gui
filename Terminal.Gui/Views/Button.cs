@@ -30,6 +30,7 @@ namespace Terminal.Gui {
 		Rune hot_key;
 		int hot_pos = -1;
 		bool is_default;
+		TextAlignment textAlignment = TextAlignment.Centered;
 
 		/// <summary>
 		/// Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.
@@ -118,7 +119,6 @@ namespace Terminal.Gui {
 			this.IsDefault = is_default;
 		}
 
-
 		int SetWidthHeight (ustring text, bool is_default)
 		{
 			int w = text.Length + 4 + (is_default ? 2 : 0);
@@ -142,6 +142,15 @@ namespace Terminal.Gui {
 				}
 				text = value;
 				Update ();
+			}
+		}
+
+		///<inheritdoc/>
+		public TextAlignment TextAlignment {
+			get => textAlignment;
+			set {
+				textAlignment = value;
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -176,24 +185,84 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
+		int c_hot_pos;
+
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
 			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			Move (0, 0);
-			Driver.AddStr (shown_text);
 
-			if (hot_pos != -1) {
-				Move (hot_pos, 0);
+			var caption = shown_text;
+			c_hot_pos = hot_pos;
+			int start;
+
+			if (Frame.Width > shown_text.Length + 1) {
+				switch (TextAlignment) {
+				case TextAlignment.Left:
+					caption += new string (' ', Frame.Width - caption.Length);
+					break;
+				case TextAlignment.Right:
+					start = Frame.Width - caption.Length;
+					caption = $"{new string (' ', Frame.Width - caption.Length)}{caption}";
+					if (c_hot_pos > -1) {
+						c_hot_pos += start;
+					}
+					break;
+				case TextAlignment.Centered:
+					start = Frame.Width / 2 - caption.Length / 2;
+					caption = $"{new string (' ', start)}{caption}{new string (' ', Frame.Width - caption.Length - start)}";
+					if (c_hot_pos > -1) {
+						c_hot_pos += start;
+					}
+					break;
+				case TextAlignment.Justified:
+					var words = caption.ToString ().Split (new string [] { " " }, StringSplitOptions.RemoveEmptyEntries);
+					var wLen = GetWordsLength (words);
+					var space = (Frame.Width - wLen) / (caption.Length - wLen);
+					caption = "";
+					for (int i = 0; i < words.Length; i++) {
+						if (i == words.Length - 1) {
+							caption += new string (' ', Frame.Width - caption.Length - 1);
+							caption += words [i];
+						} else {
+							caption += words [i];
+						}
+						if (i < words.Length - 1) {
+							caption += new string (' ', space);
+						}
+					}
+					if (c_hot_pos > -1) {
+						c_hot_pos += space - 1;
+					}
+					break;
+				}
+			}
+
+			Driver.AddStr (caption);
+
+			if (c_hot_pos != -1) {
+				Move (c_hot_pos, 0);
 				Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
 				Driver.AddRune (hot_key);
 			}
 		}
 
+		int GetWordsLength (string[] words)
+		{
+			int length = 0;
+
+			for (int i = 0; i < words.Length; i++) {
+				length += words [i].Length;
+			}
+
+			return length;
+		}
+
 		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
-			Move (hot_pos == -1 ? 1 : hot_pos, 0);
+			Move (c_hot_pos == -1 ? 1 : c_hot_pos, 0);
 		}
 
 		bool CheckKey (KeyEvent key)
@@ -219,8 +288,7 @@ namespace Terminal.Gui {
 		public override bool ProcessColdKey (KeyEvent kb)
 		{
 			if (IsDefault && kb.KeyValue == '\n') {
-				if (Clicked != null)
-					Clicked ();
+				Clicked?.Invoke ();
 				return true;
 			}
 			return CheckKey (kb);
@@ -231,8 +299,7 @@ namespace Terminal.Gui {
 		{
 			var c = kb.KeyValue;
 			if (c == '\n' || c == ' ' || Rune.ToUpper ((uint)c) == hot_key) {
-				if (Clicked != null)
-					Clicked ();
+				Clicked?.Invoke ();
 				return true;
 			}
 			return base.ProcessKey (kb);
@@ -242,11 +309,12 @@ namespace Terminal.Gui {
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (me.Flags == MouseFlags.Button1Clicked) {
-				SuperView.SetFocus (this);
-				SetNeedsDisplay ();
+				if (!HasFocus) {
+					SuperView.SetFocus (this);
+					SetNeedsDisplay ();
+				}
 
-				if (Clicked != null)
-					Clicked ();
+				Clicked?.Invoke ();
 				return true;
 			}
 			return false;
