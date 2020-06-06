@@ -16,12 +16,18 @@ namespace UICatalog {
 	class CharacterMap : Scenario {
 		public override void Setup ()
 		{
-			var charMap = new CharMap () { X = 0, Y = 0, Width = CharMap.RowWidth + 2, Height = Dim.Fill(), Start = 0x2500, 
-				ColorScheme = Colors.Dialog};
+			var charMap = new CharMap () {
+				X = 0,
+				Y = 0,
+				Width = CharMap.RowWidth + 2,
+				Height = Dim.Fill (),
+				Start = 0x2500,
+				ColorScheme = Colors.Dialog
+			};
 
 			Win.Add (charMap);
 
-			Button CreateBlock(Window win, ustring title, int start, int end, View align)
+			Button CreateBlock (Window win, ustring title, int start, int end, View align)
 			{
 				var button = new Button ($"{title} (U+{start:x5}-{end:x5})") {
 					X = Pos.X (align),
@@ -99,14 +105,14 @@ namespace UICatalog {
 				Move (viewport.X + RowHeaderWidth + 1 + (header * 3), 0);
 				Driver.AddStr ($" {header:x} ");
 			}
-			for (int row = 0; row < viewport.Height - 1; row++) {
+			for (int row = 0, y = 0; row < viewport.Height / 2 - 1; row++, y += 2) {
 				int val = (-viewport.Y + row) * 16;
 				if (val < MaxCodePointVal) {
 					var rowLabel = $"U+{val / 16:x4}x";
-					Move (0, row + 1);
+					Move (0, y + 1);
 					Driver.AddStr (rowLabel);
 					for (int col = 0; col < 16; col++) {
-						Move (viewport.X + RowHeaderWidth + 1 + (col * 3), 0 + row + 1);
+						Move (viewport.X + RowHeaderWidth + 1 + (col * 3), 0 + y + 1);
 						Driver.AddStr ($" {(char)((-viewport.Y + row) * 16 + col)} ");
 					}
 				}
