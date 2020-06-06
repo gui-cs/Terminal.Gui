@@ -195,7 +195,7 @@ namespace UICatalog {
 			_categoryListView.OpenSelectedItem += (a) => {
 				_top.SetFocus (_rightPane);
 			};
-			_categoryListView.SelectedChanged += CategoryListView_SelectedChanged;
+			_categoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
 			_leftPane.Add (_categoryListView);
 
 			_rightPane = new Window ("Scenarios") {

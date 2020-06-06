@@ -77,7 +77,7 @@ namespace Terminal.Gui {
 			shortFormat = $" hh\\{sepChar}mm";
 			CursorPosition = 1;
 			Time = time;
-			Changed += TimeField_Changed;
+			TextChanged += TimeField_Changed;
 		}
 
 		void TimeField_Changed (ustring e)

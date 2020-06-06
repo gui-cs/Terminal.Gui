@@ -127,7 +127,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when the selected radio label has changed
 		/// </summary>
-		public Action<int> SelectionChanged;
+		public Action<int> SelectedItemChanged;
 
 		/// <summary>
 		/// The currently selected item from the list of radio labels
@@ -137,7 +137,7 @@ namespace Terminal.Gui {
 			get => selected;
 			set {
 				selected = value;
-				SelectionChanged?.Invoke (selected);
+				SelectedItemChanged?.Invoke (selected);
 				SetNeedsDisplay ();
 			}
 		}

@@ -389,12 +389,12 @@ namespace Terminal.Gui {
 			SetNeedsLayout ();
 		}
 
-		void View_MouseLeave (MouseEventEventArgs e)
+		void View_MouseLeave (MouseEventArgs e)
 		{
 			Application.UngrabMouse ();
 		}
 
-		void View_MouseEnter (MouseEventEventArgs e)
+		void View_MouseEnter (MouseEventArgs e)
 		{
 			Application.GrabMouse (this);
 		}

@@ -22,7 +22,7 @@ namespace Terminal.Gui {
 		///   Client code can hook up to this event, it is
 		///   raised when the selection has been confirmed.
 		/// </remarks>
-		public Action<ustring> Changed;
+		public Action<ustring> SelectedItemChanged;
 
 		IList<string> listsource;
 		IList<string> searchset;
@@ -139,7 +139,7 @@ namespace Terminal.Gui {
 			listsource = new List<string> (source);
 		}
 
-		private void Search_MouseClick (object sender, MouseEventEventArgs e)
+		private void Search_MouseClick (object sender, MouseEventArgs e)
 		{
 			if (e.MouseEvent.Flags != MouseFlags.Button1Clicked)
 				return;

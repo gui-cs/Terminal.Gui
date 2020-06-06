@@ -134,17 +134,17 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event fired when the view receives the mouse event for the first time.
 		/// </summary>
-		public Action<MouseEventEventArgs> MouseEnter;
+		public Action<MouseEventArgs> MouseEnter;
 
 		/// <summary>
 		/// Event fired when the view receives a mouse event for the last time.
 		/// </summary>
-		public Action<MouseEventEventArgs> MouseLeave;
+		public Action<MouseEventArgs> MouseLeave;
 
 		/// <summary>
 		/// Event fired when a mouse event is generated.
 		/// </summary>
-		public Action<MouseEventEventArgs> MouseClick;
+		public Action<MouseEventArgs> MouseClick;
 
 		internal Direction FocusDirection {
 			get => SuperView?.FocusDirection ?? focusDirection;
@@ -1462,12 +1462,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Specifies the event arguments for <see cref="MouseEvent"/>
 		/// </summary>
-		public class MouseEventEventArgs : EventArgs {
+		public class MouseEventArgs : EventArgs {
 			/// <summary>
 			/// Constructs.
 			/// </summary>
 			/// <param name="me"></param>
-			public MouseEventEventArgs (MouseEvent me) => MouseEvent = me;
+			public MouseEventArgs (MouseEvent me) => MouseEvent = me;
 			/// <summary>
 			/// The <see cref="MouseEvent"/> for the event.
 			/// </summary>
@@ -1482,7 +1482,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool OnMouseEnter (MouseEvent mouseEvent)
 		{
-			MouseEventEventArgs args = new MouseEventEventArgs (mouseEvent);
+			MouseEventArgs args = new MouseEventArgs (mouseEvent);
 			MouseEnter?.Invoke (args);
 			if (args.Handled)
 				return true;
@@ -1495,7 +1495,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool OnMouseLeave (MouseEvent mouseEvent)
 		{
-			MouseEventEventArgs args = new MouseEventEventArgs (mouseEvent);
+			MouseEventArgs args = new MouseEventArgs (mouseEvent);
 			MouseLeave?.Invoke (args);
 			if (args.Handled)
 				return true;
@@ -1513,7 +1513,7 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
 		public virtual bool OnMouseEvent (MouseEvent mouseEvent)
 		{
-			MouseEventEventArgs args = new MouseEventEventArgs (mouseEvent);
+			MouseEventArgs args = new MouseEventArgs (mouseEvent);
 			MouseClick?.Invoke (args);
 			if (args.Handled)
 				return true;

@@ -122,12 +122,12 @@ namespace Designer {
 			view.Text = $"Entering in: {view}";
 		}
 
-		private static void Text_MouseLeave (View.MouseEventEventArgs e, TextField view)
+		private static void Text_MouseLeave (View.MouseEventArgs e, TextField view)
 		{
 			view.Text = $"Mouse leave at X: {e.MouseEvent.X}; Y: {e.MouseEvent.Y} HasFocus: {e.MouseEvent.View.HasFocus}";
 		}
 
-		private static void Text_MouseEnter (View.MouseEventEventArgs e, TextField view)
+		private static void Text_MouseEnter (View.MouseEventArgs e, TextField view)
 		{
 			view.Text = $"Mouse enter at X: {e.MouseEvent.X}; Y: {e.MouseEvent.Y} HasFocus: {e.MouseEvent.View.HasFocus}";
 		}

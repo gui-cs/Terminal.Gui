@@ -307,7 +307,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// This event is raised when the selected item in the <see cref="ListView"/> has changed.
 		/// </summary>
-		public Action<ListViewItemEventArgs> SelectedChanged;
+		public Action<ListViewItemEventArgs> SelectedItemChanged;
 
 		/// <summary>
 		/// This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
@@ -469,7 +469,7 @@ namespace Terminal.Gui {
 		{
 			if (selected != lastSelectedItem) {
 				var value = source.ToList () [selected];
-				SelectedChanged?.Invoke (new ListViewItemEventArgs (selected, value));
+				SelectedItemChanged?.Invoke (new ListViewItemEventArgs (selected, value));
 				lastSelectedItem = selected;
 				return true;
 			}

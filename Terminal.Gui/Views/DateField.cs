@@ -77,7 +77,7 @@ namespace Terminal.Gui {
 			shortFormat = GetShortFormat (longFormat);
 			CursorPosition = 1;
 			Date = date;
-			Changed += DateField_Changed;
+			TextChanged += DateField_Changed;
 		}
 
 		void DateField_Changed (ustring e)
