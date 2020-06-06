@@ -81,7 +81,7 @@ namespace UICatalog {
 			ContentSize = new Size (CharMap.RowWidth, MaxCodePointVal / 16);
 			ShowVerticalScrollIndicator = true;
 			ShowHorizontalScrollIndicator = false;
-			LayoutComplete += (sender, args) => {
+			LayoutComplete += (args) => {
 				if (Bounds.Width <= RowWidth) {
 					ShowHorizontalScrollIndicator = true;
 				} else {
@@ -93,20 +93,20 @@ namespace UICatalog {
 		}
 
 #if true
-		private void CharMap_DrawContent (object sender, Rect viewport)
+		private void CharMap_DrawContent (Rect viewport)
 		{
 			for (int header = 0; header < 16; header++) {
 				Move (viewport.X + RowHeaderWidth + 1 + (header * 3), 0);
 				Driver.AddStr ($" {header:x} ");
 			}
-			for (int row = 0; row < viewport.Height - 1; row++) {
+			for (int row = 0, y = 0; row < viewport.Height / 2 - 1; row++, y += 2) {
 				int val = (-viewport.Y + row) * 16;
 				if (val < MaxCodePointVal) {
 					var rowLabel = $"U+{val / 16:x4}x";
-					Move (0, row + 1);
+					Move (0, y + 1);
 					Driver.AddStr (rowLabel);
 					for (int col = 0; col < 16; col++) {
-						Move (viewport.X + RowHeaderWidth + 1 + (col * 3), 0 + row + 1);
+						Move (viewport.X + RowHeaderWidth + 1 + (col * 3), 0 + y + 1);
 						Driver.AddStr ($" {(char)((-viewport.Y + row) * 16 + col)} ");
 					}
 				}

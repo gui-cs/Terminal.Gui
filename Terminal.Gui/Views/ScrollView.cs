@@ -60,7 +60,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// This event is raised when the position on the scrollbar has changed.
 		/// </summary>
-		public event Action ChangedPosition;
+		public Action ChangedPosition;
 
 		/// <summary>
 		/// The position, relative to <see cref="Size"/>, to set the scrollbar at.
@@ -389,12 +389,12 @@ namespace Terminal.Gui {
 			SetNeedsLayout ();
 		}
 
-		void View_MouseLeave (object sender, MouseEventEventArgs e)
+		void View_MouseLeave (MouseEventArgs e)
 		{
 			Application.UngrabMouse ();
 		}
 
-		void View_MouseEnter (object sender, MouseEventEventArgs e)
+		void View_MouseEnter (MouseEventArgs e)
 		{
 			Application.GrabMouse (this);
 		}

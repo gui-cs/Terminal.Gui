@@ -285,7 +285,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Raised when the <see cref="Text"/> of the <see cref="TextView"/> changes.
 		/// </summary>
-		public event EventHandler TextChanged;
+		public Action TextChanged;
 
 #if false
 		/// <summary>
@@ -295,7 +295,7 @@ namespace Terminal.Gui {
 		///   Client code can hook up to this event, it is
 		///   raised when the text in the entry changes.
 		/// </remarks>
-		public event EventHandler Changed;
+		public Action Changed;
 #endif
 		/// <summary>
 		///   Initalizes a <see cref="TextView"/> on the specified area, with absolute position and size.
@@ -334,7 +334,7 @@ namespace Terminal.Gui {
 			set {
 				ResetPosition ();
 				model.LoadString (value);
-				TextChanged?.Invoke(this, new EventArgs());
+				TextChanged?.Invoke ();
 				SetNeedsDisplay ();
 			}
 		}

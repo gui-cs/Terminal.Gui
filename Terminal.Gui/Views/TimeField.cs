@@ -36,9 +36,9 @@ namespace Terminal.Gui {
 		///   This event is raised when the <see cref="Time"/> changes.
 		/// </remarks>
 		/// <remarks>
-		///   The passed <see cref="EventArgs"/> is a <see cref="DateTimeEventArgs"/> containing the old, new value and format.
+		///   The passed <see cref="EventArgs"/> is a <see cref="DateTimeEventArgs{T}"/> containing the old value, new value, and format string.
 		/// </remarks>
-		public event Action<DateTimeEventArgs<TimeSpan>> TimeChanged;
+		public Action<DateTimeEventArgs<TimeSpan>> TimeChanged;
 
 		/// <summary>
 		///    Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Absolute"/> positioning.
@@ -77,10 +77,10 @@ namespace Terminal.Gui {
 			shortFormat = $" hh\\{sepChar}mm";
 			CursorPosition = 1;
 			Time = time;
-			Changed += TimeField_Changed;
+			TextChanged += TimeField_Changed;
 		}
 
-		void TimeField_Changed (object sender, ustring e)
+		void TimeField_Changed (ustring e)
 		{
 			try {
 				if (!TimeSpan.TryParseExact (Text.ToString ().Trim (), Format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result))
@@ -288,9 +288,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Virtual method that will invoke the <see cref="TimeChanged"/>  with a <see cref="DateTimeEventArgs"/>.
+		/// Event firing method that invokes the <see cref="TimeChanged"/> event.
 		/// </summary>
-		/// <param name="args">The arguments of the <see cref="DateTimeEventArgs"/></param>
+		/// <param name="args">The event arguments</param>
 		public virtual void OnTimeChanged (DateTimeEventArgs<TimeSpan> args)
 		{
 			TimeChanged?.Invoke (args);

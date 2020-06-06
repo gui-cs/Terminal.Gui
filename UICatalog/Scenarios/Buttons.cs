@@ -18,7 +18,7 @@ namespace UICatalog {
 				Y = 0,
 			};
 			Win.Add (editLabel);
-			// Add a TextField using Absolute layout. Use buttons to move/grow.
+			// Add a TextField using Absolute layout. 
 			var edit = new TextField (31, 0, 15, "");
 			Win.Add (edit);
 
@@ -44,7 +44,7 @@ namespace UICatalog {
 			{
 				button.Clicked = () => {
 					var btnText = button.Text.ToString ();
-					MessageBox.Query (30, 7, "Message", $"Did you click {txt.ToString ()}?", "Yes", "No");
+					MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
 				};
 			}
 
@@ -65,6 +65,7 @@ namespace UICatalog {
 				Win.Add (colorButton);
 				prev = colorButton;
 			}
+			// BUGBUG: For some reason these buttons don't move to correct locations initially. 
 
 			Button button;
 			Win.Add (button = new Button ("A super long _Button that will probably expose a bug in clipping or wrapping of text. Will it?") {
@@ -118,7 +119,7 @@ namespace UICatalog {
 			};
 			moveBtn.Clicked = () => {
 				moveBtn.X = moveBtn.Frame.X + 5;
-				computedFrame.LayoutSubviews (); // BUGBUG: This call should not be neededd. View.X is not causing relayout correctly
+				computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
 			};
 			computedFrame.Add (moveBtn);
 
@@ -131,7 +132,7 @@ namespace UICatalog {
 			};
 			sizeBtn.Clicked = () => {
 				sizeBtn.Width = sizeBtn.Frame.Width + 5;
-				computedFrame.LayoutSubviews (); // BUGBUG: This call should not be neededd. View.X is not causing relayout correctly
+				computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
 			};
 			computedFrame.Add (sizeBtn);
 
@@ -171,7 +172,7 @@ namespace UICatalog {
 				X = 4,
 				Y = Pos.Bottom (label) + 1,
 				Selected = 2,
-				SelectionChanged = (selected) => {
+				SelectedItemChanged = (selected) => {
 					switch (selected) {
 					case 0:
 						moveBtn.TextAlignment = TextAlignment.Left;

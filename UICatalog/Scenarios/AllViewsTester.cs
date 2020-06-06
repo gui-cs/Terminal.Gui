@@ -91,10 +91,10 @@ namespace UICatalog {
 				AllowsMarking = false,
 				ColorScheme = Colors.TopLevel,
 			};
-			_classListView.OpenSelectedItem += (o, a) => {
+			_classListView.OpenSelectedItem += (a) => {
 				Top.SetFocus (_settingsPane);
 			};
-			_classListView.SelectedChanged += (sender, args) => {
+			_classListView.SelectedItemChanged += (args) => {
 				ClearClass (_curView);
 				_curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
 			};
@@ -109,7 +109,7 @@ namespace UICatalog {
 				ColorScheme = Colors.TopLevel,
 			};
 			_computedCheckBox = new CheckBox ("Computed Layout", true) { X = 0, Y = 0 };
-			_computedCheckBox.Toggled += (sender, previousState) => {
+			_computedCheckBox.Toggled += (previousState) => {
 				if (_curView != null) {
 					_curView.LayoutStyle = previousState ? LayoutStyle.Absolute : LayoutStyle.Computed;
 					_hostPane.LayoutSubviews ();
@@ -131,10 +131,10 @@ namespace UICatalog {
 			_xRadioGroup = new RadioGroup (radioItems) {
 				X = 0,
 				Y = Pos.Bottom (label),
-				SelectionChanged = (selected) => DimPosChanged (_curView),
+				SelectedItemChanged = (selected) => DimPosChanged (_curView),
 			};
 			_xText = new TextField ($"{_xVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_xText.Changed += (sender, args) => {
+			_xText.TextChanged += (args) => {
 				try {
 					_xVal = int.Parse (_xText.Text.ToString ());
 					DimPosChanged (_curView);
@@ -150,7 +150,7 @@ namespace UICatalog {
 			label = new Label ("y:") { X = Pos.Right (_xRadioGroup) + 1, Y = 0 };
 			_locationFrame.Add (label);
 			_yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_yText.Changed += (sender, args) => {
+			_yText.TextChanged += (args) => {
 				try {
 					_yVal = int.Parse (_yText.Text.ToString ());
 					DimPosChanged (_curView);
@@ -162,7 +162,7 @@ namespace UICatalog {
 			_yRadioGroup = new RadioGroup (radioItems) {
 				X = Pos.X (label),
 				Y = Pos.Bottom (label),
-				SelectionChanged = (selected) => DimPosChanged (_curView),
+				SelectedItemChanged = (selected) => DimPosChanged (_curView),
 			};
 			_locationFrame.Add (_yRadioGroup);
 
@@ -179,10 +179,10 @@ namespace UICatalog {
 			_wRadioGroup = new RadioGroup (radioItems) {
 				X = 0,
 				Y = Pos.Bottom (label),
-				SelectionChanged = (selected) => DimPosChanged (_curView)
+				SelectedItemChanged = (selected) => DimPosChanged (_curView)
 			};
 			_wText = new TextField ($"{_wVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_wText.Changed += (sender, args) => {
+			_wText.TextChanged += (args) => {
 				try {
 					_wVal = int.Parse (_wText.Text.ToString ());
 					DimPosChanged (_curView);
@@ -197,7 +197,7 @@ namespace UICatalog {
 			label = new Label ("height:") { X = Pos.Right (_wRadioGroup) + 1, Y = 0 };
 			_sizeFrame.Add (label);
 			_hText = new TextField ($"{_hVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_hText.Changed += (sender, args) => {
+			_hText.TextChanged += (args) => {
 				try {
 					_hVal = int.Parse (_hText.Text.ToString ());
 					DimPosChanged (_curView);
@@ -210,7 +210,7 @@ namespace UICatalog {
 			_hRadioGroup = new RadioGroup (radioItems) {
 				X = Pos.X (label),
 				Y = Pos.Bottom (label),
-				SelectionChanged = (selected) => DimPosChanged (_curView),
+				SelectedItemChanged = (selected) => DimPosChanged (_curView),
 			};
 			_sizeFrame.Add (_hRadioGroup);
 

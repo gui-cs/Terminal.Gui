@@ -691,14 +691,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Raised as a menu is opened.
+		/// Raised as a menu is opening.
 		/// </summary>
-		public event EventHandler OnOpenMenu;
+		public Action MenuOpening;
 
 		/// <summary>
 		/// Raised when a menu is closing.
 		/// </summary>
-		public event EventHandler OnCloseMenu;
+		public Action MenuClosing;
 
 		internal Menu openMenu;
 		Menu openCurrentMenu;
@@ -712,6 +712,22 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool IsMenuOpen { get; protected set; }
 
+		/// <summary>
+		/// Virtual method that will invoke the <see cref="MenuOpening"/>
+		/// </summary>
+		public virtual void OnMenuOpening ()
+		{
+			MenuOpening?.Invoke ();
+		}
+
+		/// <summary>
+		/// Virtual method that will invoke the <see cref="MenuClosing"/>
+		/// </summary>
+		public virtual void OnMenuClosing ()
+		{
+			MenuClosing?.Invoke ();
+		}
+
 		View lastFocused;
 
 		/// <summary>
@@ -722,7 +738,7 @@ namespace Terminal.Gui {
 		internal void OpenMenu (int index, int sIndex = -1, MenuBarItem subMenu = null)
 		{
 			isMenuOpening = true;
-			OnOpenMenu?.Invoke (this, null);
+			OnMenuOpening ();
 			int pos = 0;
 			switch (subMenu) {
 			case null:
@@ -800,7 +816,7 @@ namespace Terminal.Gui {
 		internal void CloseMenu (bool reopen = false, bool isSubMenu = false)
 		{
 			isMenuClosing = true;
-			OnCloseMenu?.Invoke (this, null);
+			OnMenuClosing ();
 			switch (isSubMenu) {
 			case false:
 				if (openMenu != null)

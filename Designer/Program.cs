@@ -85,10 +85,10 @@ namespace Designer {
 					HotNormal = Attribute.Make(Color.Red, Color.BrightRed),
 				},
 			};
-			loginText.MouseEnter += LoginText_MouseEnter;
-			loginText.MouseLeave += LoginText_MouseLeave;
-			loginText.Enter += LoginText_Enter;
-			loginText.Leave += LoginText_Leave;
+			loginText.MouseEnter += (e) => Text_MouseEnter (e, loginText);
+			loginText.MouseLeave += (e) => Text_MouseLeave (e, loginText);
+			loginText.Enter += (e) => Text_Enter (e, loginText);
+			loginText.Leave += (e) => Text_Leave (e, loginText);
 
 			var passText = new TextField ("") {
 				Secret = true,
@@ -102,30 +102,34 @@ namespace Designer {
 				Y = Pos.Top (test),
 				Width = Dim.Width (loginText)
 			};
+			testText.MouseEnter += (e) => Text_MouseEnter (e, testText);
+			testText.MouseLeave += (e) => Text_MouseLeave (e, testText);
+			testText.Enter += (e) => Text_Enter (e, testText);
+			testText.Leave += (e) => Text_Leave (e, testText);
 
 			surface.Add (login, password, test, loginText, passText, testText);
 			Application.Top.Add (menu, surface);
 			Application.Run ();
 		}
 
-		private static void LoginText_Leave (object sender, EventArgs e)
+		private static void Text_Leave (View.FocusEventArgs e, TextField view)
 		{
-			((TextField)sender).Text = $"Leaving from: {sender}";
+			view.Text = $"Leaving from: {view}";
 		}
 
-		private static void LoginText_Enter (object sender, EventArgs e)
+		private static void Text_Enter (View.FocusEventArgs e, TextField view)
 		{
-			((TextField)sender).Text = $"Entering in: {sender}";
+			view.Text = $"Entering in: {view}";
 		}
 
-		private static void LoginText_MouseLeave (object sender, View.MouseEventEventArgs e)
+		private static void Text_MouseLeave (View.MouseEventArgs e, TextField view)
 		{
-			((TextField)sender).Text = $"Mouse leave at X: {e.MouseEvent.X}; Y: {e.MouseEvent.Y} HasFocus: {e.MouseEvent.View.HasFocus}";
+			view.Text = $"Mouse leave at X: {e.MouseEvent.X}; Y: {e.MouseEvent.Y} HasFocus: {e.MouseEvent.View.HasFocus}";
 		}
 
-		private static void LoginText_MouseEnter (object sender, View.MouseEventEventArgs e)
+		private static void Text_MouseEnter (View.MouseEventArgs e, TextField view)
 		{
-			((TextField)sender).Text = $"Mouse enter at X: {e.MouseEvent.X}; Y: {e.MouseEvent.Y} HasFocus: {e.MouseEvent.View.HasFocus}";
+			view.Text = $"Mouse enter at X: {e.MouseEvent.X}; Y: {e.MouseEvent.Y} HasFocus: {e.MouseEvent.View.HasFocus}";
 		}
 	}
 }

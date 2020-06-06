@@ -12,7 +12,7 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	///   Date editing <see cref="View"/>
+	///   Simple Date editing <see cref="View"/>
 	/// </summary>
 	/// <remarks>
 	///   The <see cref="DateField"/> <see cref="View"/> provides date editing functionality with mouse support.
@@ -30,15 +30,15 @@ namespace Terminal.Gui {
 		string Format { get { return isShort ? shortFormat : longFormat; } }
 
 		/// <summary>
-		///   DateChanged event, raised when the Date has changed.
+		///   DateChanged event, raised when the <see cref="Date"/> property has changed.
 		/// </summary>
 		/// <remarks>
-		///   This event is raised when the <see cref="Date"/> changes.
+		///   This event is raised when the <see cref="Date"/> property changes.
 		/// </remarks>
 		/// <remarks>
-		///   The passed <see cref="EventArgs"/> is a <see cref="DateTimeEventArgs"/> containing the old, new value and format.
+		///   The passed event arguments containing the old value, new value, and format string.
 		/// </remarks>
-		public event Action<DateTimeEventArgs<DateTime>> DateChanged;
+		public Action<DateTimeEventArgs<DateTime>> DateChanged;
 
 		/// <summary>
 		///    Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Absolute"/> layout.
@@ -77,10 +77,10 @@ namespace Terminal.Gui {
 			shortFormat = GetShortFormat (longFormat);
 			CursorPosition = 1;
 			Date = date;
-			Changed += DateField_Changed;
+			TextChanged += DateField_Changed;
 		}
 
-		void DateField_Changed (object sender, ustring e)
+		void DateField_Changed (ustring e)
 		{
 			try {
 				if (!DateTime.TryParseExact (GetDate (Text).ToString (), GetInvarianteFormat (), CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
@@ -138,7 +138,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Get or set the data format for the widget.
+		/// Get or set the date format for the widget.
 		/// </summary>
 		public bool IsShortFormat {
 			get => isShort;
@@ -370,9 +370,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Virtual method that will invoke the <see cref="DateChanged"/>  with a <see cref="DateTimeEventArgs"/>.
+		/// Event firing method for the <see cref="DateChanged"/> event.
 		/// </summary>
-		/// <param name="args">The arguments of the <see cref="DateTimeEventArgs"/></param>
+		/// <param name="args">Event arguments</param>
 		public virtual void OnDateChanged (DateTimeEventArgs<DateTime> args)
 		{
 			DateChanged?.Invoke (args);
@@ -380,7 +380,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Handled the <see cref="EventArgs"/> for <see cref="DateField"/> or <see cref="TimeField"/> events.
+	/// Defines the event arguments for <see cref="DateField.DateChanged"/> and <see cref="TimeField.TimeChanged"/> events.
 	/// </summary>
 	public class DateTimeEventArgs<T> : EventArgs {
 		/// <summary>
@@ -399,11 +399,11 @@ namespace Terminal.Gui {
 		public string Format { get; }
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="DateTimeEventArgs"/>
+		/// Initializes a new instance of <see cref="DateTimeEventArgs{T}"/>
 		/// </summary>
 		/// <param name="oldValue">The old <see cref="DateField"/> or <see cref="TimeField"/> value.</param>
 		/// <param name="newValue">The new <see cref="DateField"/> or <see cref="TimeField"/> value.</param>
-		/// <param name="format">The <see cref="DateField"/> or <see cref="TimeField"/> format.</param>
+		/// <param name="format">The <see cref="DateField"/> or <see cref="TimeField"/> format string.</param>
 		public DateTimeEventArgs (T oldValue, T newValue, string format)
 		{
 			OldValue = oldValue;
