@@ -260,7 +260,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Computes the the max width of a line or multilines needed to render by the Label control
+		/// Computes the max width of a line or multilines needed to render by the Label control
 		/// </summary>
 		/// <returns>Max width of lines.</returns>
 		/// <param name="text">Text, may contain newlines.</param>
@@ -285,7 +285,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Controls the text-alignemtn property of the label, changing it will redisplay the <see cref="Label"/>.
+		/// Controls the text-alignment property of the label, changing it will redisplay the <see cref="Label"/>.
 		/// </summary>
 		/// <value>The text alignment.</value>
 		public TextAlignment TextAlignment {
