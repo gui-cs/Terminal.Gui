@@ -101,58 +101,104 @@ namespace UICatalog {
 			// This in intresting test case because `moveBtn` and below are laid out relative to this one!
 			removeButton.Clicked = () => Win.Remove (removeButton);
 
-			// Demonstrates how changing the View.Frame property can move Views
-			var moveBtn = new Button ("Move This Button via Frame") {
-				X = 2,
+			var computedFrame = new FrameView ("Computed Layout") {
+				X = 0,
 				Y = Pos.Bottom (removeButton) + 1,
+				Width = Dim.Percent(50),
+				Height = 5
+			};
+			Win.Add (computedFrame);
+
+			// Demonstrates how changing the View.Frame property can move Views
+			var moveBtn = new Button ("Move This Button via Pos") {
+				X = 0,
+				Y = Pos.Center() - 1,
+				Width = 30,
 				ColorScheme = Colors.Error,
 			};
 			moveBtn.Clicked = () => {
-				moveBtn.Frame = new Rect (moveBtn.Frame.X + 5, moveBtn.Frame.Y, moveBtn.Frame.Width, moveBtn.Frame.Height);
+				moveBtn.X = moveBtn.Frame.X + 5;
+				computedFrame.LayoutSubviews (); // BUGBUG: This call should not be neededd. View.X is not causing relayout correctly
 			};
-			Win.Add (moveBtn);
+			computedFrame.Add (moveBtn);
 
 			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
-			var sizeBtn = new Button ("Size This Button via Frame") {
-				X = Pos.Right(moveBtn) + 2,
-				Y = Pos.Y (moveBtn),
+			var sizeBtn = new Button ("Size This Button via Pos") {
+				X = 0,
+				Y = Pos.Center () + 1,
 				Width = 30,
 				ColorScheme = Colors.Error,
 			};
 			sizeBtn.Clicked = () => {
-				sizeBtn.Frame = new Rect (sizeBtn.Frame.X, sizeBtn.Frame.Y, sizeBtn.Frame.Width + 5, sizeBtn.Frame.Height);
+				sizeBtn.Width = sizeBtn.Frame.Width + 5;
+				computedFrame.LayoutSubviews (); // BUGBUG: This call should not be neededd. View.X is not causing relayout correctly
 			};
-			Win.Add (sizeBtn);
+			computedFrame.Add (sizeBtn);
 
-			var label = new Label ("Text Alignment (changes the two buttons above): ") {
+			var absoluteFrame = new FrameView ("Absolute Layout") {
+				X = Pos.Right(computedFrame),
+				Y = Pos.Bottom (removeButton) + 1,
+				Width = Dim.Fill(),
+				Height = 5
+			};
+			Win.Add (absoluteFrame);
+
+			// Demonstrates how changing the View.Frame property can move Views
+			var moveBtnA = new Button (0, 0, "Move This Button via Frame") {
+				ColorScheme = Colors.Error,
+			};
+			moveBtnA.Clicked = () => {
+				moveBtnA.Frame = new Rect (moveBtnA.Frame.X + 5, moveBtnA.Frame.Y, moveBtnA.Frame.Width, moveBtnA.Frame.Height);
+			};
+			absoluteFrame.Add (moveBtnA);
+
+			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
+			var sizeBtnA = new Button (0, 2, "Size This Button via Frame") {
+				ColorScheme = Colors.Error,
+			};
+			sizeBtnA.Clicked = () => {
+				sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5, sizeBtnA.Frame.Height);
+			};
+			absoluteFrame.Add (sizeBtnA);
+
+			var label = new Label ("Text Alignment (changes the four buttons above): ") {
 				X = 2,
-				Y = Pos.Bottom (sizeBtn) + 1,
+				Y = Pos.Bottom (computedFrame) + 1,
 			};
 			Win.Add (label);
 
 			var radioGroup = new RadioGroup (new [] { "Left", "Right", "Centered", "Justified" }) {
 				X = 4,
 				Y = Pos.Bottom (label) + 1,
-				//SelectionChanged = (selected) => {
-				//	switch (selected) {
-				//	case 0:
-				//		moveBtn.TextAlignment = TextAlignment.Left;
-				//		sizeBtn.TextAlignment = TextAlignment.Left;
-				//		break;
-				//	case 1:
-				//		moveBtn.TextAlignment = TextAlignment.Right;
-				//		sizeBtn.TextAlignment = TextAlignment.Right;
-				//		break;
-				//	case 2:
-				//		moveBtn.TextAlignment = TextAlignment.Centered;
-				//		sizeBtn.TextAlignment = TextAlignment.Centered;
-				//		break;
-				//	case 3:
-				//		moveBtn.TextAlignment = TextAlignment.Justified;
-				//		sizeBtn.TextAlignment = TextAlignment.Justified;
-				//		break;
-				//	}
-				//}
+				Selected = 2,
+				SelectionChanged = (selected) => {
+					switch (selected) {
+					case 0:
+						moveBtn.TextAlignment = TextAlignment.Left;
+						sizeBtn.TextAlignment = TextAlignment.Left;
+						moveBtnA.TextAlignment = TextAlignment.Left;
+						sizeBtnA.TextAlignment = TextAlignment.Left;
+						break;
+					case 1:
+						moveBtn.TextAlignment = TextAlignment.Right;
+						sizeBtn.TextAlignment = TextAlignment.Right;
+						moveBtnA.TextAlignment = TextAlignment.Right;
+						sizeBtnA.TextAlignment = TextAlignment.Right;
+						break;
+					case 2:
+						moveBtn.TextAlignment = TextAlignment.Centered;
+						sizeBtn.TextAlignment = TextAlignment.Centered;
+						moveBtnA.TextAlignment = TextAlignment.Centered;
+						sizeBtnA.TextAlignment = TextAlignment.Centered;
+						break;
+					case 3:
+						moveBtn.TextAlignment = TextAlignment.Justified;
+						sizeBtn.TextAlignment = TextAlignment.Justified;
+						moveBtnA.TextAlignment = TextAlignment.Justified;
+						sizeBtnA.TextAlignment = TextAlignment.Justified;
+						break;
+					}
+				}
 			};
 			Win.Add (radioGroup);
 
