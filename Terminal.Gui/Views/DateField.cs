@@ -18,6 +18,7 @@ namespace Terminal.Gui {
 	///   The <see cref="DateField"/> <see cref="View"/> provides date editing functionality with mouse support.
 	/// </remarks>
 	public class DateField : TextField {
+		DateTime date;
 		bool isShort;
 		int longFieldLen = 10;
 		int shortFieldLen = 8;
@@ -27,6 +28,17 @@ namespace Terminal.Gui {
 
 		int FieldLen { get { return isShort ? shortFieldLen : longFieldLen; } }
 		string Format { get { return isShort ? shortFormat : longFormat; } }
+
+		/// <summary>
+		///   DateChanged event, raised when the Date has changed.
+		/// </summary>
+		/// <remarks>
+		///   This event is raised when the <see cref="Date"/> changes.
+		/// </remarks>
+		/// <remarks>
+		///   The passed <see cref="EventArgs"/> is a <see cref="DateTimeEventArgs"/> containing the old, new value and format.
+		/// </remarks>
+		public event Action<DateTimeEventArgs<DateTime>> DateChanged;
 
 		/// <summary>
 		///    Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Absolute"/> layout.
@@ -70,8 +82,12 @@ namespace Terminal.Gui {
 
 		void DateField_Changed (object sender, ustring e)
 		{
-			if (!DateTime.TryParseExact (GetDate (Text).ToString (), GetInvarianteFormat (), CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
+			try {
+				if (!DateTime.TryParseExact (GetDate (Text).ToString (), GetInvarianteFormat (), CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
+					Text = e;
+			} catch (Exception) {
 				Text = e;
+			}
 		}
 
 		string GetInvarianteFormat ()
@@ -105,11 +121,19 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public DateTime Date {
 			get {
-				if (!DateTime.TryParseExact (Text.ToString (), Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result)) return new DateTime ();
-				return result;
+				return date;
 			}
 			set {
+				if (ReadOnly)
+					return;
+
+				var oldData = date;
+				date = value;
 				this.Text = value.ToString (Format);
+				var args = new DateTimeEventArgs<DateTime> (oldData, value, Format);
+				if (oldData != value) {
+					OnDateChanged (args);
+				}
 			}
 		}
 
@@ -145,6 +169,10 @@ namespace Terminal.Gui {
 
 		bool SetText (ustring text)
 		{
+			if (text.IsEmpty) {
+				return false;
+			}
+
 			ustring [] vals = text.Split (ustring.Make (sepChar));
 			ustring [] frm = ustring.Make (Format).Split (ustring.Make (sepChar));
 			bool isValidDate = true;
@@ -174,12 +202,12 @@ namespace Terminal.Gui {
 				vals [idx] = day.ToString ();
 			} else
 				day = Int32.Parse (vals [idx].ToString ());
-			string date = GetDate (month, day, year, frm);
-			Text = date;
+			string d = GetDate (month, day, year, frm);
 
-			if (!DateTime.TryParseExact (date, Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result) ||
+			if (!DateTime.TryParseExact (d, Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result) ||
 				!isValidDate)
 				return false;
+			Date = result;
 			return true;
 		}
 
@@ -195,6 +223,8 @@ namespace Terminal.Gui {
 					if (!isShort && year.ToString ().Length == 2) {
 						var y = DateTime.Now.Year.ToString ();
 						date += y.Substring (0, 2) + year.ToString ();
+					} else if (isShort && year.ToString ().Length == 4) {
+						date += $"{year.ToString ().Substring (2, 2)}";
 					} else {
 						date += $"{year,2:00}";
 					}
@@ -270,11 +300,17 @@ namespace Terminal.Gui {
 			switch (kb.Key) {
 			case Key.DeleteChar:
 			case Key.ControlD:
+				if (ReadOnly)
+					return true;
+
 				SetText ('0');
 				break;
 
 			case Key.Delete:
 			case Key.Backspace:
+				if (ReadOnly)
+					return true;
+
 				SetText ('0');
 				DecCursorPosition ();
 				break;
@@ -304,6 +340,10 @@ namespace Terminal.Gui {
 				// Ignore non-numeric characters.
 				if (kb.Key < (Key)((int)'0') || kb.Key > (Key)((int)'9'))
 					return false;
+
+				if (ReadOnly)
+					return true;
+
 				if (SetText (TextModel.ToRunes (ustring.Make ((uint)kb.Key)).First ()))
 					IncCursorPosition ();
 				return true;
@@ -327,6 +367,48 @@ namespace Terminal.Gui {
 			CursorPosition = point;
 			AdjCursorPosition ();
 			return true;
+		}
+
+		/// <summary>
+		/// Virtual method that will invoke the <see cref="DateChanged"/>  with a <see cref="DateTimeEventArgs"/>.
+		/// </summary>
+		/// <param name="args">The arguments of the <see cref="DateTimeEventArgs"/></param>
+		public virtual void OnDateChanged (DateTimeEventArgs<DateTime> args)
+		{
+			DateChanged?.Invoke (args);
+		}
+	}
+
+	/// <summary>
+	/// Handled the <see cref="EventArgs"/> for <see cref="DateField"/> or <see cref="TimeField"/> events.
+	/// </summary>
+	public class DateTimeEventArgs<T> : EventArgs {
+		/// <summary>
+		/// The old <see cref="DateField"/> or <see cref="TimeField"/> value.
+		/// </summary>
+		public T OldValue {get;}
+
+		/// <summary>
+		/// The new <see cref="DateField"/> or <see cref="TimeField"/> value.
+		/// </summary>
+		public T NewValue { get; }
+
+		/// <summary>
+		/// The <see cref="DateField"/> or <see cref="TimeField"/> format.
+		/// </summary>
+		public string Format { get; }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="DateTimeEventArgs"/>
+		/// </summary>
+		/// <param name="oldValue">The old <see cref="DateField"/> or <see cref="TimeField"/> value.</param>
+		/// <param name="newValue">The new <see cref="DateField"/> or <see cref="TimeField"/> value.</param>
+		/// <param name="format">The <see cref="DateField"/> or <see cref="TimeField"/> format.</param>
+		public DateTimeEventArgs (T oldValue, T newValue, string format)
+		{
+			OldValue = oldValue;
+			NewValue = newValue;
+			Format = format;
 		}
 	}
 }

@@ -17,6 +17,7 @@ namespace Terminal.Gui {
 	///   The <see cref="TimeField"/> <see cref="View"/> provides time editing functionality with mouse support.
 	/// </remarks>
 	public class TimeField : TextField {
+		TimeSpan time;
 		bool isShort;
 
 		int longFieldLen = 8;
@@ -28,6 +29,16 @@ namespace Terminal.Gui {
 		int FieldLen { get { return isShort ? shortFieldLen : longFieldLen; } }
 		string Format { get { return isShort ? shortFormat : longFormat; } }
 
+		/// <summary>
+		///   TimeChanged event, raised when the Date has changed.
+		/// </summary>
+		/// <remarks>
+		///   This event is raised when the <see cref="Time"/> changes.
+		/// </remarks>
+		/// <remarks>
+		///   The passed <see cref="EventArgs"/> is a <see cref="DateTimeEventArgs"/> containing the old, new value and format.
+		/// </remarks>
+		public event Action<DateTimeEventArgs<TimeSpan>> TimeChanged;
 
 		/// <summary>
 		///    Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Absolute"/> positioning.
@@ -36,7 +47,7 @@ namespace Terminal.Gui {
 		/// <param name="y">The y coordinate.</param>
 		/// <param name="time">Initial time.</param>
 		/// <param name="isShort">If true, the seconds are hidden. Sets the <see cref="IsShortFormat"/> property.</param>
-		public TimeField (int x, int y, DateTime time, bool isShort = false) : base (x, y, isShort ? 7 : 10, "")
+		public TimeField (int x, int y, TimeSpan time, bool isShort = false) : base (x, y, isShort ? 7 : 10, "")
 		{
 			this.isShort = isShort;
 			Initialize (time);
@@ -46,7 +57,7 @@ namespace Terminal.Gui {
 		///    Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
 		/// <param name="time">Initial time</param>
-		public TimeField (DateTime time) : base (string.Empty)
+		public TimeField (TimeSpan time) : base (string.Empty)
 		{
 			this.isShort = true;
 			Width = FieldLen + 2;
@@ -56,14 +67,14 @@ namespace Terminal.Gui {
 		/// <summary>
 		///    Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
-		public TimeField () : this (time: DateTime.MinValue) { }
+		public TimeField () : this (time: TimeSpan.MinValue) { }
 
-		void Initialize (DateTime time)
+		void Initialize (TimeSpan time)
 		{
 			CultureInfo cultureInfo = CultureInfo.CurrentCulture;
 			sepChar = cultureInfo.DateTimeFormat.TimeSeparator;
-			longFormat = $" HH{sepChar}mm{sepChar}ss";
-			shortFormat = $" HH{sepChar}mm";
+			longFormat = $" hh\\{sepChar}mm\\{sepChar}ss";
+			shortFormat = $" hh\\{sepChar}mm";
 			CursorPosition = 1;
 			Time = time;
 			Changed += TimeField_Changed;
@@ -71,8 +82,12 @@ namespace Terminal.Gui {
 
 		void TimeField_Changed (object sender, ustring e)
 		{
-			if (!DateTime.TryParseExact (Text.ToString (), Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
+			try {
+				if (!TimeSpan.TryParseExact (Text.ToString ().Trim (), Format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result))
+					Text = e;
+			} catch (Exception) {
 				Text = e;
+			}
 		}
 
 		/// <summary>
@@ -80,13 +95,21 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
-		public DateTime Time {
+		public TimeSpan Time {
 			get {
-				if (!DateTime.TryParseExact (Text.ToString (), Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result)) return new DateTime ();
-				return result;
+				return time;
 			}
 			set {
-				this.Text = value.ToString (Format);
+				if (ReadOnly)
+					return;
+
+				var oldTime = time;
+				time = value;
+				this.Text = " " + value.ToString (Format.Trim ());
+				var args = new DateTimeEventArgs<TimeSpan> (oldTime, value, Format);
+				if (oldTime != value) {
+					OnTimeChanged (args);
+				}
 			}
 		}
 
@@ -122,6 +145,10 @@ namespace Terminal.Gui {
 
 		bool SetText (ustring text)
 		{
+			if (text.IsEmpty) {
+				return false;
+			}
+
 			ustring [] vals = text.Split (ustring.Make (sepChar));
 			bool isValidTime = true;
 			int hour = Int32.Parse (vals [0].ToString ());
@@ -154,12 +181,12 @@ namespace Terminal.Gui {
 				second = 59;
 				vals [2] = "59";
 			}
-			string time = isShort ? $" {hour,2:00}{sepChar}{minute,2:00}" : $" {hour,2:00}{sepChar}{minute,2:00}{sepChar}{second,2:00}";
-			Text = time;
+			string t = isShort ? $" {hour,2:00}{sepChar}{minute,2:00}" : $" {hour,2:00}{sepChar}{minute,2:00}{sepChar}{second,2:00}";
 
-			if (!DateTime.TryParseExact (text.ToString (), Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result) ||
+			if (!TimeSpan.TryParseExact (t.Trim (), Format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result) ||
 				!isValidTime)
 				return false;
+			Time = result;
 			return true;
 		}
 
@@ -191,11 +218,17 @@ namespace Terminal.Gui {
 			switch (kb.Key) {
 			case Key.DeleteChar:
 			case Key.ControlD:
+				if (ReadOnly)
+					return true;
+
 				SetText ('0');
 				break;
 
 			case Key.Delete:
 			case Key.Backspace:
+				if (ReadOnly)
+					return true;
+
 				SetText ('0');
 				DecCursorPosition ();
 				break;
@@ -225,6 +258,10 @@ namespace Terminal.Gui {
 				// Ignore non-numeric characters.
 				if (kb.Key < (Key)((int)'0') || kb.Key > (Key)((int)'9'))
 					return false;
+
+				if (ReadOnly)
+					return true;
+
 				if (SetText (TextModel.ToRunes (ustring.Make ((uint)kb.Key)).First ()))
 					IncCursorPosition ();
 				return true;
@@ -248,6 +285,15 @@ namespace Terminal.Gui {
 			CursorPosition = point;
 			AdjCursorPosition ();
 			return true;
+		}
+
+		/// <summary>
+		/// Virtual method that will invoke the <see cref="TimeChanged"/>  with a <see cref="DateTimeEventArgs"/>.
+		/// </summary>
+		/// <param name="args">The arguments of the <see cref="DateTimeEventArgs"/></param>
+		public virtual void OnTimeChanged (DateTimeEventArgs<TimeSpan> args)
+		{
+			TimeChanged?.Invoke (args);
 		}
 	}
 }
