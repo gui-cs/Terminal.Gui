@@ -9,12 +9,46 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using NStack;
+using System.Collections;
 
 namespace Terminal.Gui {
 	/// <summary>
 	/// ComboBox control
 	/// </summary>
 	public class ComboBox : View {
+
+		IListDataSource source;
+		/// <summary>
+		/// Gets or sets the <see cref="IListDataSource"/> backing this <see cref="ComboBox"/>, enabling custom rendering.
+		/// </summary>
+		/// <value>The source.</value>
+		/// <remarks>
+		///  Use <see cref="SetSource"/> to set a new <see cref="IList"/> source.
+		/// </remarks>
+		public IListDataSource Source {
+			get => source;
+			set {
+				source = value;
+				SetNeedsDisplay ();
+			}
+		}
+
+		/// <summary>
+		/// Sets the source of the <see cref="ComboBox"/> to an <see cref="IList"/>.
+		/// </summary>
+		/// <value>An object implementing the IList interface.</value>
+		/// <remarks>
+		///  Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custome rendering.
+		/// </remarks>
+		public void SetSource (IList source)
+		{
+			if (source == null)
+				Source = null;
+			else {
+				Source = MakeWrapper (source);
+			}
+		}
+
 		/// <summary>
 		///   Changed event, raised when the selection has been confirmed.
 		/// </summary>
@@ -22,10 +56,10 @@ namespace Terminal.Gui {
 		///   Client code can hook up to this event, it is
 		///   raised when the selection has been confirmed.
 		/// </remarks>
-		public Action<ustring> SelectedItemChanged;
+		public event EventHandler<ustring> Changed;
 
-		IList<string> listsource;
-		IList<string> searchset;
+		//IList<string> listsource;
+		IList searchset;
 		ustring text = "";
 		TextField search;
 		ListView listview;
@@ -46,42 +80,49 @@ namespace Terminal.Gui {
 			Initialize ();
 		}
 
-		/// <summary>
-		/// Public constructor
-		/// </summary>
-		/// <param name="x">The x coordinate</param>
-		/// <param name="y">The y coordinate</param>
-		/// <param name="w">The width</param>
-		/// <param name="h">The height</param>
-		/// <param name="source">Auto completion source</param>
-		public ComboBox (int x, int y, int w, int h, IList<string> source)
+		///// <summary>
+		///// Public constructor
+		///// </summary>
+		///// <param name="rect"></param>
+		///// <param name="source"></param>
+		//public ComboBox (Rect rect, IList source) : base (rect)
+		//{
+		//	SetSource (source);
+		//	this.x = rect.X;
+		//	this.y = rect.Y;
+		//	this.height = rect.Height;
+		//	this.width = rect.Width;
+
+		//	search = new TextField ("") { X = rect.X, Y = rect.Y, Width = width };
+
+		//	listview = new ListView (new Rect (rect.X, rect.Y + 1, width, 0), source) { LayoutStyle = LayoutStyle.Computed};
+
+		//	Initialize ();
+		//}
+
+		static IListDataSource MakeWrapper (IList source)
 		{
-			SetSource (source);
-			this.x = x;
-			this.y = y;
-			height = h;
-			width = w;
-
-			search = new TextField ("") { X = x, Y = y, Width = w };
-
-			listview = new ListView (new Rect (x, y + 1, w, 0), listsource.ToList ()) {
-				LayoutStyle = LayoutStyle.Computed,
-			};
-
-			Initialize ();
+			return new ListWrapper (source);
 		}
 
 		private void Initialize()
 		{
-			search.Changed += Search_Changed;
+			search.TextChanged += Search_Changed;
 
-			listview.SelectedChanged += (object sender, ListViewItemEventArgs e) => {
+			LayoutComplete += (LayoutEventArgs a) => {
+
+				search.Width = Frame.Width;
+				listview.Width = Frame.Width - 1;
+			};
+
+			listview.SelectedItemChanged += (ListViewItemEventArgs e) => {
+
 				if(searchset.Count > 0)
-					SetValue (searchset [listview.SelectedItem]);
+					SetValue ((string)searchset [listview.SelectedItem]);
 			};
 
 			// TODO: LayoutComplete event breaks cursor up/down. Revert to Application.Loaded 
-			Application.Loaded += (object sender, Application.ResizedEventArgs a) => {
+			Application.Loaded += (Application.ResizedEventArgs a) => {
 				// Determine if this view is hosted inside a dialog
 				for (View view = this.SuperView; view != null; view = view.SuperView) {
 					if (view is Dialog) {
@@ -90,7 +131,7 @@ namespace Terminal.Gui {
 					}
 				}
 
-				searchset = autoHide ? new List<string> () : listsource;
+				ResetSearchSet ();
 
 				// Needs to be re-applied for LayoutStyle.Computed
 				// If Dim or Pos are null, these are the from the parametrized constructor
@@ -124,7 +165,7 @@ namespace Terminal.Gui {
 				}
 
 				if (this.Text != null)
-					Search_Changed (search, Text);
+					Search_Changed (Text);
 
 				if (autoHide)
 					listview.ColorScheme = Colors.Menu;
@@ -138,20 +179,12 @@ namespace Terminal.Gui {
 			this.SetFocus(search);
 		}
 
-		/// <summary>
-		/// Set search list source
-		/// </summary>
-		public void SetSource(IList<string> source)
-		{
-			listsource = new List<string> (source);
-		}
-
-		private void Search_MouseClick (object sender, MouseEventArgs e)
+		private void Search_MouseClick (MouseEventArgs e)
 		{
 			if (e.MouseEvent.Flags != MouseFlags.Button1Clicked)
 				return;
 
-			SuperView.SetFocus ((View)sender);
+			SuperView.SetFocus ((View)search);
 		}
 
 		///<inheritdoc/>
@@ -179,9 +212,9 @@ namespace Terminal.Gui {
 					return true;
 				}
 
-				SetValue( searchset [listview.SelectedItem]);
+				SetValue((string)searchset [listview.SelectedItem]);
 				search.CursorPosition = search.Text.Length;
-				Search_Changed (search, search.Text);
+				Search_Changed (search.Text);
 				Changed?.Invoke (this, text);
 
 				searchset.Clear();
@@ -194,7 +227,7 @@ namespace Terminal.Gui {
 
 			if (e.Key == Key.CursorDown && search.HasFocus && listview.SelectedItem == 0 && searchset.Count > 0) { // jump to list
 				this.SetFocus (listview);
-				SetValue (searchset [listview.SelectedItem]);
+				SetValue ((string)searchset [listview.SelectedItem]);
 				return true;
 			}
 
@@ -241,10 +274,10 @@ namespace Terminal.Gui {
 
 		private void SetValue(ustring text)
 		{
-			search.Changed -= Search_Changed;
+			search.TextChanged -= Search_Changed;
 			this.text = search.Text = text;
 			search.CursorPosition = 0;
-			search.Changed += Search_Changed;
+			search.TextChanged += Search_Changed;
 		}
 
 		/// <summary>
@@ -254,25 +287,37 @@ namespace Terminal.Gui {
 		{
 			search.Text = text = "";
 			Changed?.Invoke (this, search.Text);
-			searchset = autoHide ? new List<string> () : listsource;
 
-			listview.SetSource(searchset.ToList());
+			ResetSearchSet ();
+
+			listview.SetSource(searchset);
 			listview.Height = CalculatetHeight ();
 
 			this.SetFocus(search);
 		}
 
-		private void Search_Changed (object sender, ustring text)
+		private void ResetSearchSet()
 		{
-			if (listsource == null) // Object initialization
+			if (autoHide) {
+				if (searchset == null)
+					searchset = new List<string> ();
+				else
+					searchset.Clear ();
+			} else
+				searchset = source.ToList ();
+		}
+
+		private void Search_Changed (ustring text)
+		{
+			if (source == null) // Object initialization
 				return;
 
-			if (string.IsNullOrEmpty (search.Text.ToString()))
-				searchset = autoHide ? new List<string> () : listsource;
+			if (string.IsNullOrEmpty (search.Text.ToString ()))
+				ResetSearchSet ();
 			else
-				searchset = listsource.Where (x => x.StartsWith (search.Text.ToString (), StringComparison.CurrentCultureIgnoreCase)).ToList ();
+				searchset = source.ToList().Cast<string>().Where (x => x.StartsWith (search.Text.ToString (), StringComparison.CurrentCultureIgnoreCase)).ToList();
 
-			listview.SetSource (searchset.ToList ());
+			listview.SetSource (searchset);
 			listview.Height = CalculatetHeight ();
 
 			listview.Redraw (new Rect (0, 0, width, height)); // for any view behind this
@@ -308,11 +353,8 @@ namespace Terminal.Gui {
 		{
 			if (dim is Dim.DimAbsolute)
 				return dim.Anchor (0);
-
-			if (dim is Dim.DimFill || dim is Dim.DimFactor)
+			else
 				return vertical ? dim.Anchor (a.Rows) : dim.Anchor (a.Cols);
-
-			return 0;
 		}
 	}
 }
