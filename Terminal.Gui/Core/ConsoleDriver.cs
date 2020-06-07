@@ -153,7 +153,7 @@ namespace Terminal.Gui {
 	/// typically in containers such as <see cref="Window"/> and <see cref="FrameView"/> to set the scheme that is used by all the
 	/// views contained inside.
 	/// </summary>
-	public class ColorScheme {
+	public class ColorScheme : IEquatable<ColorScheme> {
 		Attribute _normal;
 		Attribute _focus;
 		Attribute _hotNormal;
@@ -312,6 +312,42 @@ namespace Terminal.Gui {
 			}
 			preparingScheme = false;
 			return attribute;
+		}
+
+		public override bool Equals (object obj)
+		{
+			return Equals (obj as ColorScheme);
+		}
+
+		public bool Equals (ColorScheme other)
+		{
+			return other != null &&
+			       EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
+			       EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
+			       EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
+			       EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
+			       EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
+		}
+
+		public override int GetHashCode ()
+		{
+			int hashCode = -1242460230;
+			hashCode = hashCode * -1521134295 + _normal.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _focus.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _hotNormal.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _hotFocus.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _disabled.GetHashCode ();
+			return hashCode;
+		}
+
+		public static bool operator == (ColorScheme left, ColorScheme right)
+		{
+			return EqualityComparer<ColorScheme>.Default.Equals (left, right);
+		}
+
+		public static bool operator != (ColorScheme left, ColorScheme right)
+		{
+			return !(left == right);
 		}
 	}
 
