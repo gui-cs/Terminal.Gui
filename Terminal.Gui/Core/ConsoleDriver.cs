@@ -989,12 +989,12 @@ namespace Terminal.Gui {
 		public Rune UpArrow;
 
 		/// <summary>
-		/// Left indicator for default action (e.g. '<' for <see cref="Button"/>).
+		/// Left indicator for default action (e.g. for <see cref="Button"/>).
 		/// </summary>
 		public Rune LeftDefaultIndicator;
 
 		/// <summary>
-		/// Right indicator for default action (e.g. '>' for <see cref="Button"/>).
+		/// Right indicator for default action (e.g. for <see cref="Button"/>).
 		/// </summary>
 		public Rune RightDefaultIndicator;
 
