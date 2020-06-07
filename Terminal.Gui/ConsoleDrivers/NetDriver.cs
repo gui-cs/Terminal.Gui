@@ -164,6 +164,20 @@ namespace Terminal.Gui {
 			RightTee = '\u2524';
 			TopTee = '\u22a4';
 			BottomTee = '\u22a5';
+			Checked = '\u221a';
+			UnChecked = ' ';
+			Selected = '\u25cf';
+			UnSelected = '\u25cc';
+			RightArrow = '\u25ba';
+			LeftArrow = '\u25c4';
+			UpArrow = '\u25b2';
+			DownArrow = '\u25bc';
+			LeftDefaultIndicator = '\u25e6';
+			RightDefaultIndicator = '\u25e6';
+			LeftBracket = '[';
+			RightBracket = ']';
+			OnMeterSegment = '\u258c';
+			OffMeterSegement = ' ';
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)

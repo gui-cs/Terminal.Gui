@@ -531,6 +531,20 @@ namespace Terminal.Gui {
 			RightTee = Curses.ACS_RTEE;
 			TopTee = Curses.ACS_TTEE;
 			BottomTee = Curses.ACS_BTEE;
+			Checked = '\u221a';
+			UnChecked = ' ';
+			Selected = '\u25cf';
+			UnSelected = '\u25cc';
+			RightArrow = Curses.ACS_RARROW;
+			LeftArrow = Curses.ACS_LARROW;
+			UpArrow = Curses.ACS_UARROW;
+			DownArrow = Curses.ACS_DARROW;
+			LeftDefaultIndicator = '\u25e6';
+			RightDefaultIndicator = '\u25e6';
+			LeftBracket = '[';
+			RightBracket = ']';
+			OnMeterSegment = '\u258c';
+			OffMeterSegement = ' ';
 
 			Colors.TopLevel = new ColorScheme ();
 			Colors.Base = new ColorScheme ();

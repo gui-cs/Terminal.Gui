@@ -949,6 +949,40 @@ namespace Terminal.Gui {
 		public Rune BottomTee;
 
 		/// <summary>
+		/// Checkmark.
+		/// </summary>
+		public Rune Checked;
+
+		/// <summary>
+		/// Un-checked checkmark.
+		/// </summary>
+		public Rune UnChecked;
+
+		/// <summary>
+		/// Selected mark.
+		/// </summary>
+		public Rune Selected;
+
+		/// <summary>
+		/// Un-selected selected mark.
+		/// </summary>
+		public Rune UnSelected;
+
+		public Rune RightArrow;
+		public Rune LeftArrow;
+		public Rune DownArrow;
+		public Rune UpArrow;
+
+		public Rune LeftDefaultIndicator;
+		public Rune RightDefaultIndicator;
+
+		public Rune LeftBracket;
+		public Rune RightBracket;
+
+		public Rune OnMeterSegment;
+		public Rune OffMeterSegement;
+
+		/// <summary>
 		/// Make the attribute for the foreground and background colors.
 		/// </summary>
 		/// <param name="fore">Foreground.</param>

@@ -118,7 +118,7 @@ namespace UICatalog {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
-			var styleRadioGroup = new RadioGroup (new [] { "_Query", "_Error" } ) {
+			var styleRadioGroup = new RadioGroup (new ustring [] { "_Query", "_Error" } ) {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 			};
