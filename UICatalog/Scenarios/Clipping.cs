@@ -7,7 +7,7 @@ namespace UICatalog {
 
 	class Clipping : Scenario {
 
-		public override void Init (Toplevel top)
+		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
 			Application.Init ();
 

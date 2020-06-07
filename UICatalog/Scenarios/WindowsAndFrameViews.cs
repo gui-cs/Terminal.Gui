@@ -8,7 +8,7 @@ namespace UICatalog {
 	[ScenarioCategory ("Layout")]
 	[ScenarioCategory ("Bug Repro")]
 	class WindowsAndFrameViews : Scenario {
-		public override void Init (Toplevel top)
+		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
 			Application.Init ();
 

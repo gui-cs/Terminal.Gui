@@ -63,7 +63,8 @@ namespace UICatalog {
 		/// the Scenario picker UI.
 		/// Override <see cref="Init(Toplevel)"/> to provide any <see cref="Terminal.Gui.Toplevel"/> behavior needed.
 		/// </summary>
-		/// <param name="top"></param>
+		/// <param name="top">The Toplevel created by the UI Catalog host.</param>
+		/// <param name="colorScheme">The colorscheme to use.</param>
 		/// <remarks>
 		/// <para>
 		/// Thg base implementation calls <see cref="Application.Init"/>, sets <see cref="Top"/> to the passed in <see cref="Toplevel"/>, creates a <see cref="Window"/> for <see cref="Win"/> and adds it to <see cref="Top"/>.
@@ -72,7 +73,7 @@ namespace UICatalog {
 		/// Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Init "/> before creating any views or calling other Terminal.Gui APIs.
 		/// </para>
 		/// </remarks>
-		public virtual void Init(Toplevel top)
+		public virtual void Init(Toplevel top, ColorScheme colorScheme)
 		{
 			Application.Init ();
 
@@ -85,7 +86,8 @@ namespace UICatalog {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
-				Height = Dim.Fill ()
+				Height = Dim.Fill (),
+				ColorScheme = colorScheme,
 			};
 			Top.Add (Win);
 		}
