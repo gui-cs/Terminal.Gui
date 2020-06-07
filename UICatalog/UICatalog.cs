@@ -129,7 +129,7 @@ namespace UICatalog {
 			{
 				var mi = new MenuItem ();
 				mi.Title = menuItem;
-				mi.CheckType |= MenuItem.MenuItemCheckType.Checked;
+				mi.CheckType |= MenuItemCheckStyle.Checked;
 				mi.Checked = checkFunction ();
 				mi.Action = () => {
 					action?.Invoke ();
@@ -174,7 +174,7 @@ namespace UICatalog {
 			foreach (var sc in Colors.ColorSchemes) {
 				var item = new MenuItem ();
 				item.Title = sc.Key;
-				item.CheckType |= MenuItem.MenuItemCheckType.Radio;
+				item.CheckType |= MenuItemCheckStyle.Radio;
 				item.Checked = sc.Value == _baseColorScheme;
 				item.Action += () => {
 					_baseColorScheme = sc.Value;

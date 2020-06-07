@@ -86,7 +86,7 @@
   <div class="markdown level0 summary"><p>Base class for each demo/scenario.</p>
 <p>
  To define a new scenario:
-<ol><li>Create a new <code>.cs</code> file in the <cs>Scenarios</cs> directory that derives from <a class="xref" href="UICatalog.Scenario.html">Scenario</a>.</li><li>Annotate the <a class="xref" href="UICatalog.Scenario.html">Scenario</a> derived class with a <see cref="!:Scenario.ScenarioMetaData"></see> attribute specifying the scenario&apos;s name and description.</li><li>Add one or more <a class="xref" href="UICatalog.Scenario.ScenarioCategory.html">Scenario.ScenarioCategory</a> attributes to the class specifying which categories the sceanrio belongs to. If you don&apos;t specify a category the sceanrio will show up in &quot;All&quot;.</li><li>Implement the <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Setup">Setup()</a> override which will be called when a user selects the scenario to run.</li><li>Optionally, implement the <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Init_Terminal_Gui_Toplevel_">Init(Toplevel)</a> and/or <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Run">Run()</a> overrides to provide a custom implementation.</li></ol>
+<ol><li>Create a new <code>.cs</code> file in the <cs>Scenarios</cs> directory that derives from <a class="xref" href="UICatalog.Scenario.html">Scenario</a>.</li><li>Annotate the <a class="xref" href="UICatalog.Scenario.html">Scenario</a> derived class with a <see cref="!:Scenario.ScenarioMetaData"></see> attribute specifying the scenario&apos;s name and description.</li><li>Add one or more <a class="xref" href="UICatalog.Scenario.ScenarioCategory.html">Scenario.ScenarioCategory</a> attributes to the class specifying which categories the sceanrio belongs to. If you don&apos;t specify a category the sceanrio will show up in &quot;All&quot;.</li><li>Implement the <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Setup">Setup()</a> override which will be called when a user selects the scenario to run.</li><li>Optionally, implement the <see cref="!:Init(Toplevel)"></see> and/or <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Run">Run()</a> overrides to provide a custom implementation.</li></ol>
 </p>
 <p>
 The UI Catalog program uses reflection to find all scenarios and adds them to the
@@ -325,16 +325,16 @@ namespace UICatalog {
   
   
   <a id="UICatalog_Scenario_Init_" data-uid="UICatalog.Scenario.Init*"></a>
-  <h4 id="UICatalog_Scenario_Init_Terminal_Gui_Toplevel_" data-uid="UICatalog.Scenario.Init(Terminal.Gui.Toplevel)">Init(Toplevel)</h4>
+  <h4 id="UICatalog_Scenario_Init_Terminal_Gui_Toplevel_Terminal_Gui_ColorScheme_" data-uid="UICatalog.Scenario.Init(Terminal.Gui.Toplevel,Terminal.Gui.ColorScheme)">Init(Toplevel, ColorScheme)</h4>
   <div class="markdown level1 summary"><p>Helper that provides the default <a class="xref" href="../Terminal.Gui/Terminal.Gui.Window.html">Window</a> implementation with a frame and 
 label showing the name of the <a class="xref" href="UICatalog.Scenario.html">Scenario</a> and logic to exit back to 
 the Scenario picker UI.
-Override <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Init_Terminal_Gui_Toplevel_">Init(Toplevel)</a> to provide any <a class="xref" href="../Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a> behavior needed.</p>
+Override <see cref="!:Init(Toplevel)"></see> to provide any <a class="xref" href="../Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a> behavior needed.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual void Init(Toplevel top)</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual void Init(Toplevel top, ColorScheme colorScheme)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -349,11 +349,18 @@ Override <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Init_T
       <tr>
         <td><a class="xref" href="../Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a></td>
         <td><span class="parametername">top</span></td>
-        <td></td>
+        <td><p>The Toplevel created by the UI Catalog host.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="../Terminal.Gui/Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
+        <td><span class="parametername">colorScheme</span></td>
+        <td><p>The colorscheme to use.</p>
+</td>
       </tr>
     </tbody>
   </table>
-  <h5 id="UICatalog_Scenario_Init_Terminal_Gui_Toplevel__remarks">Remarks</h5>
+  <h5 id="UICatalog_Scenario_Init_Terminal_Gui_Toplevel_Terminal_Gui_ColorScheme__remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>
 Thg base implementation calls <a class="xref" href="../Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init">Init()</a>, sets <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Top">Top</a> to the passed in <a class="xref" href="../Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a>, creates a <a class="xref" href="../Terminal.Gui/Terminal.Gui.Window.html">Window</a> for <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Win">Win</a> and adds it to <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Top">Top</a>.
 </p>
