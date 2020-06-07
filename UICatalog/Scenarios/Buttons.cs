@@ -171,9 +171,9 @@ namespace UICatalog {
 			var radioGroup = new RadioGroup (new ustring [] { "Left", "Right", "Centered", "Justified" }) {
 				X = 4,
 				Y = Pos.Bottom (label) + 1,
-				Selected = 2,
-				SelectedItemChanged = (selected) => {
-					switch (selected) {
+				SelectedItem = 2,
+				SelectedItemChanged = (args) => {
+					switch (args.SelectedItem) {
 					case 0:
 						moveBtn.TextAlignment = TextAlignment.Left;
 						sizeBtn.TextAlignment = TextAlignment.Left;

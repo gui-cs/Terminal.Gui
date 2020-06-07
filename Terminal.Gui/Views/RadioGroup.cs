@@ -8,7 +8,8 @@ namespace Terminal.Gui {
 	/// <see cref="RadioGroup"/> shows a group of radio labels, only one of those can be selected at a given time
 	/// </summary>
 	public class RadioGroup : View {
-		int selected, cursor;
+		int selected = -1;
+		int cursor;
 
 		void Init(Rect rect, ustring [] radioLabels, int selected)
 		{
@@ -113,7 +114,7 @@ namespace Terminal.Gui {
 				if (prevCount != radioLabels.Count) {
 					SetWidthHeight (radioLabels);
 				}
-				Selected = 0;
+				SelectedItem = 0;
 				cursor = 0;
 				SetNeedsDisplay ();
 			}
@@ -152,22 +153,59 @@ namespace Terminal.Gui {
 			Move (0, cursor);
 		}
 
+		// TODO: Make this a global class
 		/// <summary>
-		/// Invoked when the selected radio label has changed. The passed <c>int</c> indicates the newly selected item.
+		/// Event arguments for the SelectedItemChagned event.
 		/// </summary>
-		public Action<int> SelectedItemChanged;
+		public class SelectedItemChangedEventArgs : EventArgs {
+			/// <summary>
+			/// Gets the index of the item that was previously selected. -1 if there was no previous selection.
+			/// </summary>
+			public int PreviousSelectedItem { get;  }
+
+			/// <summary>
+			/// Gets the index of the item that is now selected. -1 if there is no selection.
+			/// </summary>
+			public int SelectedItem { get; }
+
+			/// <summary>
+			/// Initializes a new <see cref="SelectedItemChangedEventArgs"/> class.
+			/// </summary>
+			/// <param name="selectedItem"></param>
+			/// <param name="previousSelectedItem"></param>
+			public SelectedItemChangedEventArgs(int selectedItem, int previousSelectedItem)
+			{
+				PreviousSelectedItem = previousSelectedItem;
+				SelectedItem = selectedItem;
+			}
+		}
+
+		/// <summary>
+		/// Invoked when the selected radio label has changed.
+		/// </summary>
+		public Action<SelectedItemChangedEventArgs> SelectedItemChanged;
 
 		/// <summary>
 		/// The currently selected item from the list of radio labels
 		/// </summary>
 		/// <value>The selected.</value>
-		public int Selected {
+		public int SelectedItem {
 			get => selected;
 			set {
-				selected = value;
-				SelectedItemChanged?.Invoke (selected);
+				OnSelectedItemChanged (value, SelectedItem);
 				SetNeedsDisplay ();
 			}
+		}
+
+		/// <summary>
+		/// Called whenever the current selected item changes. Invokes the <see cref="SelectedItemChanged"/> event.
+		/// </summary>
+		/// <param name="selectedItem"></param>
+		/// <param name="previousSelectedItem"></param>
+		public virtual void OnSelectedItemChanged (int selectedItem, int previousSelectedItem)
+		{
+			selected = selectedItem;
+			SelectedItemChanged?.Invoke (new SelectedItemChangedEventArgs (selectedItem, previousSelectedItem));
 		}
 
 		///<inheritdoc/>
@@ -184,7 +222,7 @@ namespace Terminal.Gui {
 							nextIsHot = true;
 						else {
 							if (nextIsHot && c == key) {
-								Selected = i;
+								SelectedItem = i;
 								cursor = i;
 								if (!HasFocus)
 									SuperView.SetFocus (this);
@@ -218,7 +256,7 @@ namespace Terminal.Gui {
 				}
 				break;
 			case Key.Space:
-				Selected = cursor;
+				SelectedItem = cursor;
 				return true;
 			}
 			return base.ProcessKey (kb);
@@ -233,7 +271,7 @@ namespace Terminal.Gui {
 			SuperView.SetFocus (this);
 
 			if (me.Y < radioLabels.Count) {
-				cursor = Selected = me.Y;
+				cursor = SelectedItem = me.Y;
 				SetNeedsDisplay ();
 			}
 			return true;
