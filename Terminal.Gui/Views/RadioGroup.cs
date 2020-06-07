@@ -157,7 +157,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event arguments for the SelectedItemChagned event.
 		/// </summary>
-		public class SelectedItemChangedEventArgs : EventArgs {
+		public class SelectedItemChangedArgs : EventArgs {
 			/// <summary>
 			/// Gets the index of the item that was previously selected. -1 if there was no previous selection.
 			/// </summary>
@@ -169,11 +169,11 @@ namespace Terminal.Gui {
 			public int SelectedItem { get; }
 
 			/// <summary>
-			/// Initializes a new <see cref="SelectedItemChangedEventArgs"/> class.
+			/// Initializes a new <see cref="SelectedItemChangedArgs"/> class.
 			/// </summary>
 			/// <param name="selectedItem"></param>
 			/// <param name="previousSelectedItem"></param>
-			public SelectedItemChangedEventArgs(int selectedItem, int previousSelectedItem)
+			public SelectedItemChangedArgs(int selectedItem, int previousSelectedItem)
 			{
 				PreviousSelectedItem = previousSelectedItem;
 				SelectedItem = selectedItem;
@@ -183,7 +183,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when the selected radio label has changed.
 		/// </summary>
-		public Action<SelectedItemChangedEventArgs> SelectedItemChanged;
+		public Action<SelectedItemChangedArgs> SelectedItemChanged;
 
 		/// <summary>
 		/// The currently selected item from the list of radio labels
@@ -205,7 +205,7 @@ namespace Terminal.Gui {
 		public virtual void OnSelectedItemChanged (int selectedItem, int previousSelectedItem)
 		{
 			selected = selectedItem;
-			SelectedItemChanged?.Invoke (new SelectedItemChangedEventArgs (selectedItem, previousSelectedItem));
+			SelectedItemChanged?.Invoke (new SelectedItemChangedArgs (selectedItem, previousSelectedItem));
 		}
 
 		///<inheritdoc/>
