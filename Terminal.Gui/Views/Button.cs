@@ -145,7 +145,9 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///<inheritdoc/>
+		/// <summary>
+		/// Sets or gets the text alignment for the <see cref="Button"/>.
+		/// </summary>
 		public TextAlignment TextAlignment {
 			get => textAlignment;
 			set {

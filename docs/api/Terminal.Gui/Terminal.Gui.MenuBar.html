@@ -340,6 +340,18 @@ The <a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a> provides global
   
   
   <a id="Terminal_Gui_MenuBar__ctor_" data-uid="Terminal.Gui.MenuBar.#ctor*"></a>
+  <h4 id="Terminal_Gui_MenuBar__ctor" data-uid="Terminal.Gui.MenuBar.#ctor">MenuBar()</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MenuBar()</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_MenuBar__ctor_" data-uid="Terminal.Gui.MenuBar.#ctor*"></a>
   <h4 id="Terminal_Gui_MenuBar__ctor_Terminal_Gui_MenuBarItem___" data-uid="Terminal.Gui.MenuBar.#ctor(Terminal.Gui.MenuBarItem[])">MenuBar(MenuBarItem[])</h4>
   <div class="markdown level1 summary">
 Initializes a new instance of the <a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a> class with the specified set of toplevel menu items.
@@ -363,6 +375,60 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.MenuBar.htm
         <td><a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a>[]</td>
         <td><span class="parametername">menus</span></td>
         <td>Individual menu items; a null item will result in a separator being drawn.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_MenuBar_MenuClosing" data-uid="Terminal.Gui.MenuBar.MenuClosing">MenuClosing</h4>
+  <div class="markdown level1 summary">
+Raised when a menu is closing.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Action MenuClosing</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_MenuBar_MenuOpening" data-uid="Terminal.Gui.MenuBar.MenuOpening">MenuOpening</h4>
+  <div class="markdown level1 summary">
+Raised as a menu is opening.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Action MenuOpening</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -626,6 +692,30 @@ Method invoked when a mouse event is generated
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnKeyUp_Terminal_Gui_KeyEvent_">View.OnKeyUp(KeyEvent)</a></div>
   
   
+  <a id="Terminal_Gui_MenuBar_OnMenuClosing_" data-uid="Terminal.Gui.MenuBar.OnMenuClosing*"></a>
+  <h4 id="Terminal_Gui_MenuBar_OnMenuClosing" data-uid="Terminal.Gui.MenuBar.OnMenuClosing">OnMenuClosing()</h4>
+  <div class="markdown level1 summary">
+Virtual method that will invoke the <a class="xref" href="Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_MenuClosing">MenuClosing</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnMenuClosing()</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_MenuBar_OnMenuOpening_" data-uid="Terminal.Gui.MenuBar.OnMenuOpening*"></a>
+  <h4 id="Terminal_Gui_MenuBar_OnMenuOpening" data-uid="Terminal.Gui.MenuBar.OnMenuOpening">OnMenuOpening()</h4>
+  <div class="markdown level1 summary">
+Virtual method that will invoke the <a class="xref" href="Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_MenuOpening">MenuOpening</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnMenuOpening()</code></pre>
+  </div>
+  
+  
   <a id="Terminal_Gui_MenuBar_OpenMenu_" data-uid="Terminal.Gui.MenuBar.OpenMenu*"></a>
   <h4 id="Terminal_Gui_MenuBar_OpenMenu" data-uid="Terminal.Gui.MenuBar.OpenMenu">OpenMenu()</h4>
   <div class="markdown level1 summary">
@@ -826,60 +916,6 @@ Redraws this view and its subviews; only redraws the views that have been flagge
    larger than the <code>region</code> parameter.
 </p>
 </div>
-  <h3 id="events">Events
-  </h3>
-  
-  
-  <h4 id="Terminal_Gui_MenuBar_OnCloseMenu" data-uid="Terminal.Gui.MenuBar.OnCloseMenu">OnCloseMenu</h4>
-  <div class="markdown level1 summary">
-Raised when a menu is closing.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public event EventHandler OnCloseMenu</code></pre>
-  </div>
-  <h5 class="eventType">Event Type</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.EventHandler</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <h4 id="Terminal_Gui_MenuBar_OnOpenMenu" data-uid="Terminal.Gui.MenuBar.OnOpenMenu">OnOpenMenu</h4>
-  <div class="markdown level1 summary">
-Raised as a menu is opened.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public event EventHandler OnOpenMenu</code></pre>
-  </div>
-  <h5 class="eventType">Event Type</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.EventHandler</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.Collections.IEnumerable</span>

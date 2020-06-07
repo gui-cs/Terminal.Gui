@@ -100,13 +100,13 @@ references:
 - uid: Terminal.Gui.Application.Iteration
   name: Iteration
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Iteration
-  commentId: E:Terminal.Gui.Application.Iteration
+  commentId: F:Terminal.Gui.Application.Iteration
   fullName: Terminal.Gui.Application.Iteration
   nameWithType: Application.Iteration
 - uid: Terminal.Gui.Application.Loaded
   name: Loaded
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Loaded
-  commentId: E:Terminal.Gui.Application.Loaded
+  commentId: F:Terminal.Gui.Application.Loaded
   fullName: Terminal.Gui.Application.Loaded
   nameWithType: Application.Loaded
 - uid: Terminal.Gui.Application.MainLoop
@@ -164,7 +164,7 @@ references:
 - uid: Terminal.Gui.Application.Resized
   name: Resized
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Resized
-  commentId: E:Terminal.Gui.Application.Resized
+  commentId: F:Terminal.Gui.Application.Resized
   fullName: Terminal.Gui.Application.Resized
   nameWithType: Application.Resized
 - uid: Terminal.Gui.Application.ResizedEventArgs
@@ -388,6 +388,12 @@ references:
   commentId: T:Terminal.Gui.Button
   fullName: Terminal.Gui.Button
   nameWithType: Button
+- uid: Terminal.Gui.Button.#ctor
+  name: Button()
+  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button__ctor
+  commentId: M:Terminal.Gui.Button.#ctor
+  fullName: Terminal.Gui.Button.Button()
+  nameWithType: Button.Button()
 - uid: Terminal.Gui.Button.#ctor(NStack.ustring,System.Boolean)
   name: Button(ustring, Boolean)
   href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button__ctor_NStack_ustring_System_Boolean_
@@ -523,12 +529,31 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Button.Text
   nameWithType: Button.Text
+- uid: Terminal.Gui.Button.TextAlignment
+  name: TextAlignment
+  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_TextAlignment
+  commentId: P:Terminal.Gui.Button.TextAlignment
+  fullName: Terminal.Gui.Button.TextAlignment
+  nameWithType: Button.TextAlignment
+- uid: Terminal.Gui.Button.TextAlignment*
+  name: TextAlignment
+  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_TextAlignment_
+  commentId: Overload:Terminal.Gui.Button.TextAlignment
+  isSpec: "True"
+  fullName: Terminal.Gui.Button.TextAlignment
+  nameWithType: Button.TextAlignment
 - uid: Terminal.Gui.CheckBox
   name: CheckBox
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html
   commentId: T:Terminal.Gui.CheckBox
   fullName: Terminal.Gui.CheckBox
   nameWithType: CheckBox
+- uid: Terminal.Gui.CheckBox.#ctor
+  name: CheckBox()
+  href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox__ctor
+  commentId: M:Terminal.Gui.CheckBox.#ctor
+  fullName: Terminal.Gui.CheckBox.CheckBox()
+  nameWithType: CheckBox.CheckBox()
 - uid: Terminal.Gui.CheckBox.#ctor(NStack.ustring,System.Boolean)
   name: CheckBox(ustring, Boolean)
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox__ctor_NStack_ustring_System_Boolean_
@@ -648,7 +673,7 @@ references:
 - uid: Terminal.Gui.CheckBox.Toggled
   name: Toggled
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox_Toggled
-  commentId: E:Terminal.Gui.CheckBox.Toggled
+  commentId: F:Terminal.Gui.CheckBox.Toggled
   fullName: Terminal.Gui.CheckBox.Toggled
   nameWithType: CheckBox.Toggled
 - uid: Terminal.Gui.Clipboard
@@ -791,6 +816,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Colors.Base
   nameWithType: Colors.Base
+- uid: Terminal.Gui.Colors.ColorSchemes
+  name: ColorSchemes
+  href: api/Terminal.Gui/Terminal.Gui.Colors.html#Terminal_Gui_Colors_ColorSchemes
+  commentId: P:Terminal.Gui.Colors.ColorSchemes
+  fullName: Terminal.Gui.Colors.ColorSchemes
+  nameWithType: Colors.ColorSchemes
+- uid: Terminal.Gui.Colors.ColorSchemes*
+  name: ColorSchemes
+  href: api/Terminal.Gui/Terminal.Gui.Colors.html#Terminal_Gui_Colors_ColorSchemes_
+  commentId: Overload:Terminal.Gui.Colors.ColorSchemes
+  isSpec: "True"
+  fullName: Terminal.Gui.Colors.ColorSchemes
+  nameWithType: Colors.ColorSchemes
 - uid: Terminal.Gui.Colors.Dialog
   name: Dialog
   href: api/Terminal.Gui/Terminal.Gui.Colors.html#Terminal_Gui_Colors_Dialog
@@ -914,73 +952,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ColorScheme.Normal
   nameWithType: ColorScheme.Normal
-- uid: Terminal.Gui.ComboBox
-  name: ComboBox
-  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html
-  commentId: T:Terminal.Gui.ComboBox
-  fullName: Terminal.Gui.ComboBox
-  nameWithType: ComboBox
-- uid: Terminal.Gui.ComboBox.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Collections.Generic.IList{System.String})
-  name: ComboBox(Int32, Int32, Int32, Int32, IList<String>)
-  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox__ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Collections_Generic_IList_System_String__
-  commentId: M:Terminal.Gui.ComboBox.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Collections.Generic.IList{System.String})
-  name.vb: ComboBox(Int32, Int32, Int32, Int32, IList(Of String))
-  fullName: Terminal.Gui.ComboBox.ComboBox(System.Int32, System.Int32, System.Int32, System.Int32, System.Collections.Generic.IList<System.String>)
-  fullName.vb: Terminal.Gui.ComboBox.ComboBox(System.Int32, System.Int32, System.Int32, System.Int32, System.Collections.Generic.IList(Of System.String))
-  nameWithType: ComboBox.ComboBox(Int32, Int32, Int32, Int32, IList<String>)
-  nameWithType.vb: ComboBox.ComboBox(Int32, Int32, Int32, Int32, IList(Of String))
-- uid: Terminal.Gui.ComboBox.#ctor*
-  name: ComboBox
-  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox__ctor_
-  commentId: Overload:Terminal.Gui.ComboBox.#ctor
-  isSpec: "True"
-  fullName: Terminal.Gui.ComboBox.ComboBox
-  nameWithType: ComboBox.ComboBox
-- uid: Terminal.Gui.ComboBox.Changed
-  name: Changed
-  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Changed
-  commentId: E:Terminal.Gui.ComboBox.Changed
-  fullName: Terminal.Gui.ComboBox.Changed
-  nameWithType: ComboBox.Changed
-- uid: Terminal.Gui.ComboBox.OnEnter
-  name: OnEnter()
-  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnEnter
-  commentId: M:Terminal.Gui.ComboBox.OnEnter
-  fullName: Terminal.Gui.ComboBox.OnEnter()
-  nameWithType: ComboBox.OnEnter()
-- uid: Terminal.Gui.ComboBox.OnEnter*
-  name: OnEnter
-  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnEnter_
-  commentId: Overload:Terminal.Gui.ComboBox.OnEnter
-  isSpec: "True"
-  fullName: Terminal.Gui.ComboBox.OnEnter
-  nameWithType: ComboBox.OnEnter
-- uid: Terminal.Gui.ComboBox.ProcessKey(Terminal.Gui.KeyEvent)
-  name: ProcessKey(KeyEvent)
-  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_ProcessKey_Terminal_Gui_KeyEvent_
-  commentId: M:Terminal.Gui.ComboBox.ProcessKey(Terminal.Gui.KeyEvent)
-  fullName: Terminal.Gui.ComboBox.ProcessKey(Terminal.Gui.KeyEvent)
-  nameWithType: ComboBox.ProcessKey(KeyEvent)
-- uid: Terminal.Gui.ComboBox.ProcessKey*
-  name: ProcessKey
-  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_ProcessKey_
-  commentId: Overload:Terminal.Gui.ComboBox.ProcessKey
-  isSpec: "True"
-  fullName: Terminal.Gui.ComboBox.ProcessKey
-  nameWithType: ComboBox.ProcessKey
-- uid: Terminal.Gui.ComboBox.Text
-  name: Text
-  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Text
-  commentId: P:Terminal.Gui.ComboBox.Text
-  fullName: Terminal.Gui.ComboBox.Text
-  nameWithType: ComboBox.Text
-- uid: Terminal.Gui.ComboBox.Text*
-  name: Text
-  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Text_
-  commentId: Overload:Terminal.Gui.ComboBox.Text
-  isSpec: "True"
-  fullName: Terminal.Gui.ComboBox.Text
-  nameWithType: ComboBox.Text
 - uid: Terminal.Gui.ConsoleDriver
   name: ConsoleDriver
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html
@@ -1058,6 +1029,43 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ConsoleDriver.CookMouse
   nameWithType: ConsoleDriver.CookMouse
+- uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  name: ConsoleDriver.DiagnosticFlags
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.DiagnosticFlags.html
+  commentId: T:Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  fullName: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  nameWithType: ConsoleDriver.DiagnosticFlags
+- uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags.FramePadding
+  name: FramePadding
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.DiagnosticFlags.html#Terminal_Gui_ConsoleDriver_DiagnosticFlags_FramePadding
+  commentId: F:Terminal.Gui.ConsoleDriver.DiagnosticFlags.FramePadding
+  fullName: Terminal.Gui.ConsoleDriver.DiagnosticFlags.FramePadding
+  nameWithType: ConsoleDriver.DiagnosticFlags.FramePadding
+- uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags.FrameRuler
+  name: FrameRuler
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.DiagnosticFlags.html#Terminal_Gui_ConsoleDriver_DiagnosticFlags_FrameRuler
+  commentId: F:Terminal.Gui.ConsoleDriver.DiagnosticFlags.FrameRuler
+  fullName: Terminal.Gui.ConsoleDriver.DiagnosticFlags.FrameRuler
+  nameWithType: ConsoleDriver.DiagnosticFlags.FrameRuler
+- uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags.Off
+  name: Off
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.DiagnosticFlags.html#Terminal_Gui_ConsoleDriver_DiagnosticFlags_Off
+  commentId: F:Terminal.Gui.ConsoleDriver.DiagnosticFlags.Off
+  fullName: Terminal.Gui.ConsoleDriver.DiagnosticFlags.Off
+  nameWithType: ConsoleDriver.DiagnosticFlags.Off
+- uid: Terminal.Gui.ConsoleDriver.Diagnostics
+  name: Diagnostics
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Diagnostics
+  commentId: P:Terminal.Gui.ConsoleDriver.Diagnostics
+  fullName: Terminal.Gui.ConsoleDriver.Diagnostics
+  nameWithType: ConsoleDriver.Diagnostics
+- uid: Terminal.Gui.ConsoleDriver.Diagnostics*
+  name: Diagnostics
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Diagnostics_
+  commentId: Overload:Terminal.Gui.ConsoleDriver.Diagnostics
+  isSpec: "True"
+  fullName: Terminal.Gui.ConsoleDriver.Diagnostics
+  nameWithType: ConsoleDriver.Diagnostics
 - uid: Terminal.Gui.ConsoleDriver.Diamond
   name: Diamond
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Diamond
@@ -1392,6 +1400,12 @@ references:
   commentId: T:Terminal.Gui.DateField
   fullName: Terminal.Gui.DateField
   nameWithType: DateField
+- uid: Terminal.Gui.DateField.#ctor
+  name: DateField()
+  href: api/Terminal.Gui/Terminal.Gui.DateField.html#Terminal_Gui_DateField__ctor
+  commentId: M:Terminal.Gui.DateField.#ctor
+  fullName: Terminal.Gui.DateField.DateField()
+  nameWithType: DateField.DateField()
 - uid: Terminal.Gui.DateField.#ctor(System.DateTime)
   name: DateField(DateTime)
   href: api/Terminal.Gui/Terminal.Gui.DateField.html#Terminal_Gui_DateField__ctor_System_DateTime_
@@ -1424,6 +1438,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.DateField.Date
   nameWithType: DateField.Date
+- uid: Terminal.Gui.DateField.DateChanged
+  name: DateChanged
+  href: api/Terminal.Gui/Terminal.Gui.DateField.html#Terminal_Gui_DateField_DateChanged
+  commentId: F:Terminal.Gui.DateField.DateChanged
+  fullName: Terminal.Gui.DateField.DateChanged
+  nameWithType: DateField.DateChanged
 - uid: Terminal.Gui.DateField.IsShortFormat
   name: IsShortFormat
   href: api/Terminal.Gui/Terminal.Gui.DateField.html#Terminal_Gui_DateField_IsShortFormat
@@ -1450,6 +1470,22 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.DateField.MouseEvent
   nameWithType: DateField.MouseEvent
+- uid: Terminal.Gui.DateField.OnDateChanged(Terminal.Gui.DateTimeEventArgs{System.DateTime})
+  name: OnDateChanged(DateTimeEventArgs<DateTime>)
+  href: api/Terminal.Gui/Terminal.Gui.DateField.html#Terminal_Gui_DateField_OnDateChanged_Terminal_Gui_DateTimeEventArgs_System_DateTime__
+  commentId: M:Terminal.Gui.DateField.OnDateChanged(Terminal.Gui.DateTimeEventArgs{System.DateTime})
+  name.vb: OnDateChanged(DateTimeEventArgs(Of DateTime))
+  fullName: Terminal.Gui.DateField.OnDateChanged(Terminal.Gui.DateTimeEventArgs<System.DateTime>)
+  fullName.vb: Terminal.Gui.DateField.OnDateChanged(Terminal.Gui.DateTimeEventArgs(Of System.DateTime))
+  nameWithType: DateField.OnDateChanged(DateTimeEventArgs<DateTime>)
+  nameWithType.vb: DateField.OnDateChanged(DateTimeEventArgs(Of DateTime))
+- uid: Terminal.Gui.DateField.OnDateChanged*
+  name: OnDateChanged
+  href: api/Terminal.Gui/Terminal.Gui.DateField.html#Terminal_Gui_DateField_OnDateChanged_
+  commentId: Overload:Terminal.Gui.DateField.OnDateChanged
+  isSpec: "True"
+  fullName: Terminal.Gui.DateField.OnDateChanged
+  nameWithType: DateField.OnDateChanged
 - uid: Terminal.Gui.DateField.ProcessKey(Terminal.Gui.KeyEvent)
   name: ProcessKey(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.DateField.html#Terminal_Gui_DateField_ProcessKey_Terminal_Gui_KeyEvent_
@@ -1463,12 +1499,95 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.DateField.ProcessKey
   nameWithType: DateField.ProcessKey
+- uid: Terminal.Gui.DateTimeEventArgs`1
+  name: DateTimeEventArgs<T>
+  href: api/Terminal.Gui/Terminal.Gui.DateTimeEventArgs-1.html
+  commentId: T:Terminal.Gui.DateTimeEventArgs`1
+  name.vb: DateTimeEventArgs(Of T)
+  fullName: Terminal.Gui.DateTimeEventArgs<T>
+  fullName.vb: Terminal.Gui.DateTimeEventArgs(Of T)
+  nameWithType: DateTimeEventArgs<T>
+  nameWithType.vb: DateTimeEventArgs(Of T)
+- uid: Terminal.Gui.DateTimeEventArgs`1.#ctor(`0,`0,System.String)
+  name: DateTimeEventArgs(T, T, String)
+  href: api/Terminal.Gui/Terminal.Gui.DateTimeEventArgs-1.html#Terminal_Gui_DateTimeEventArgs_1__ctor__0__0_System_String_
+  commentId: M:Terminal.Gui.DateTimeEventArgs`1.#ctor(`0,`0,System.String)
+  fullName: Terminal.Gui.DateTimeEventArgs<T>.DateTimeEventArgs(T, T, System.String)
+  fullName.vb: Terminal.Gui.DateTimeEventArgs(Of T).DateTimeEventArgs(T, T, System.String)
+  nameWithType: DateTimeEventArgs<T>.DateTimeEventArgs(T, T, String)
+  nameWithType.vb: DateTimeEventArgs(Of T).DateTimeEventArgs(T, T, String)
+- uid: Terminal.Gui.DateTimeEventArgs`1.#ctor*
+  name: DateTimeEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.DateTimeEventArgs-1.html#Terminal_Gui_DateTimeEventArgs_1__ctor_
+  commentId: Overload:Terminal.Gui.DateTimeEventArgs`1.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.DateTimeEventArgs<T>.DateTimeEventArgs
+  fullName.vb: Terminal.Gui.DateTimeEventArgs(Of T).DateTimeEventArgs
+  nameWithType: DateTimeEventArgs<T>.DateTimeEventArgs
+  nameWithType.vb: DateTimeEventArgs(Of T).DateTimeEventArgs
+- uid: Terminal.Gui.DateTimeEventArgs`1.Format
+  name: Format
+  href: api/Terminal.Gui/Terminal.Gui.DateTimeEventArgs-1.html#Terminal_Gui_DateTimeEventArgs_1_Format
+  commentId: P:Terminal.Gui.DateTimeEventArgs`1.Format
+  fullName: Terminal.Gui.DateTimeEventArgs<T>.Format
+  fullName.vb: Terminal.Gui.DateTimeEventArgs(Of T).Format
+  nameWithType: DateTimeEventArgs<T>.Format
+  nameWithType.vb: DateTimeEventArgs(Of T).Format
+- uid: Terminal.Gui.DateTimeEventArgs`1.Format*
+  name: Format
+  href: api/Terminal.Gui/Terminal.Gui.DateTimeEventArgs-1.html#Terminal_Gui_DateTimeEventArgs_1_Format_
+  commentId: Overload:Terminal.Gui.DateTimeEventArgs`1.Format
+  isSpec: "True"
+  fullName: Terminal.Gui.DateTimeEventArgs<T>.Format
+  fullName.vb: Terminal.Gui.DateTimeEventArgs(Of T).Format
+  nameWithType: DateTimeEventArgs<T>.Format
+  nameWithType.vb: DateTimeEventArgs(Of T).Format
+- uid: Terminal.Gui.DateTimeEventArgs`1.NewValue
+  name: NewValue
+  href: api/Terminal.Gui/Terminal.Gui.DateTimeEventArgs-1.html#Terminal_Gui_DateTimeEventArgs_1_NewValue
+  commentId: P:Terminal.Gui.DateTimeEventArgs`1.NewValue
+  fullName: Terminal.Gui.DateTimeEventArgs<T>.NewValue
+  fullName.vb: Terminal.Gui.DateTimeEventArgs(Of T).NewValue
+  nameWithType: DateTimeEventArgs<T>.NewValue
+  nameWithType.vb: DateTimeEventArgs(Of T).NewValue
+- uid: Terminal.Gui.DateTimeEventArgs`1.NewValue*
+  name: NewValue
+  href: api/Terminal.Gui/Terminal.Gui.DateTimeEventArgs-1.html#Terminal_Gui_DateTimeEventArgs_1_NewValue_
+  commentId: Overload:Terminal.Gui.DateTimeEventArgs`1.NewValue
+  isSpec: "True"
+  fullName: Terminal.Gui.DateTimeEventArgs<T>.NewValue
+  fullName.vb: Terminal.Gui.DateTimeEventArgs(Of T).NewValue
+  nameWithType: DateTimeEventArgs<T>.NewValue
+  nameWithType.vb: DateTimeEventArgs(Of T).NewValue
+- uid: Terminal.Gui.DateTimeEventArgs`1.OldValue
+  name: OldValue
+  href: api/Terminal.Gui/Terminal.Gui.DateTimeEventArgs-1.html#Terminal_Gui_DateTimeEventArgs_1_OldValue
+  commentId: P:Terminal.Gui.DateTimeEventArgs`1.OldValue
+  fullName: Terminal.Gui.DateTimeEventArgs<T>.OldValue
+  fullName.vb: Terminal.Gui.DateTimeEventArgs(Of T).OldValue
+  nameWithType: DateTimeEventArgs<T>.OldValue
+  nameWithType.vb: DateTimeEventArgs(Of T).OldValue
+- uid: Terminal.Gui.DateTimeEventArgs`1.OldValue*
+  name: OldValue
+  href: api/Terminal.Gui/Terminal.Gui.DateTimeEventArgs-1.html#Terminal_Gui_DateTimeEventArgs_1_OldValue_
+  commentId: Overload:Terminal.Gui.DateTimeEventArgs`1.OldValue
+  isSpec: "True"
+  fullName: Terminal.Gui.DateTimeEventArgs<T>.OldValue
+  fullName.vb: Terminal.Gui.DateTimeEventArgs(Of T).OldValue
+  nameWithType: DateTimeEventArgs<T>.OldValue
+  nameWithType.vb: DateTimeEventArgs(Of T).OldValue
 - uid: Terminal.Gui.Dialog
   name: Dialog
   href: api/Terminal.Gui/Terminal.Gui.Dialog.html
   commentId: T:Terminal.Gui.Dialog
   fullName: Terminal.Gui.Dialog
   nameWithType: Dialog
+- uid: Terminal.Gui.Dialog.#ctor
+  name: Dialog()
+  href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog__ctor
+  commentId: M:Terminal.Gui.Dialog.#ctor
+  fullName: Terminal.Gui.Dialog.Dialog()
+  nameWithType: Dialog.Dialog()
 - uid: Terminal.Gui.Dialog.#ctor(NStack.ustring,System.Int32,System.Int32,Terminal.Gui.Button[])
   name: Dialog(ustring, Int32, Int32, Button[])
   href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog__ctor_NStack_ustring_System_Int32_System_Int32_Terminal_Gui_Button___
@@ -1655,6 +1774,12 @@ references:
   commentId: T:Terminal.Gui.FileDialog
   fullName: Terminal.Gui.FileDialog
   nameWithType: FileDialog
+- uid: Terminal.Gui.FileDialog.#ctor
+  name: FileDialog()
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog__ctor
+  commentId: M:Terminal.Gui.FileDialog.#ctor
+  fullName: Terminal.Gui.FileDialog.FileDialog()
+  nameWithType: FileDialog.FileDialog()
 - uid: Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring)
   name: FileDialog(ustring, ustring, ustring, ustring)
   href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog__ctor_NStack_ustring_NStack_ustring_NStack_ustring_NStack_ustring_
@@ -1817,6 +1942,12 @@ references:
   commentId: T:Terminal.Gui.FrameView
   fullName: Terminal.Gui.FrameView
   nameWithType: FrameView
+- uid: Terminal.Gui.FrameView.#ctor
+  name: FrameView()
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView__ctor
+  commentId: M:Terminal.Gui.FrameView.#ctor
+  fullName: Terminal.Gui.FrameView.FrameView()
+  nameWithType: FrameView.FrameView()
 - uid: Terminal.Gui.FrameView.#ctor(NStack.ustring)
   name: FrameView(ustring)
   href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView__ctor_NStack_ustring_
@@ -1916,6 +2047,12 @@ references:
   commentId: T:Terminal.Gui.HexView
   fullName: Terminal.Gui.HexView
   nameWithType: HexView
+- uid: Terminal.Gui.HexView.#ctor
+  name: HexView()
+  href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView__ctor
+  commentId: M:Terminal.Gui.HexView.#ctor
+  fullName: Terminal.Gui.HexView.HexView()
+  nameWithType: HexView.HexView()
 - uid: Terminal.Gui.HexView.#ctor(System.IO.Stream)
   name: HexView(Stream)
   href: api/Terminal.Gui/Terminal.Gui.HexView.html#Terminal_Gui_HexView__ctor_System_IO_Stream_
@@ -2736,6 +2873,12 @@ references:
   commentId: T:Terminal.Gui.Label
   fullName: Terminal.Gui.Label
   nameWithType: Label
+- uid: Terminal.Gui.Label.#ctor
+  name: Label()
+  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label__ctor
+  commentId: M:Terminal.Gui.Label.#ctor
+  fullName: Terminal.Gui.Label.Label()
+  nameWithType: Label.Label()
 - uid: Terminal.Gui.Label.#ctor(NStack.ustring)
   name: Label(ustring)
   href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label__ctor_NStack_ustring_
@@ -3046,7 +3189,7 @@ references:
 - uid: Terminal.Gui.ListView.OpenSelectedItem
   name: OpenSelectedItem
   href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_OpenSelectedItem
-  commentId: E:Terminal.Gui.ListView.OpenSelectedItem
+  commentId: F:Terminal.Gui.ListView.OpenSelectedItem
   fullName: Terminal.Gui.ListView.OpenSelectedItem
   nameWithType: ListView.OpenSelectedItem
 - uid: Terminal.Gui.ListView.PositionCursor
@@ -3088,12 +3231,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ListView.Redraw
   nameWithType: ListView.Redraw
-- uid: Terminal.Gui.ListView.SelectedChanged
-  name: SelectedChanged
-  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_SelectedChanged
-  commentId: E:Terminal.Gui.ListView.SelectedChanged
-  fullName: Terminal.Gui.ListView.SelectedChanged
-  nameWithType: ListView.SelectedChanged
 - uid: Terminal.Gui.ListView.SelectedItem
   name: SelectedItem
   href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_SelectedItem
@@ -3107,6 +3244,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ListView.SelectedItem
   nameWithType: ListView.SelectedItem
+- uid: Terminal.Gui.ListView.SelectedItemChanged
+  name: SelectedItemChanged
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_SelectedItemChanged
+  commentId: F:Terminal.Gui.ListView.SelectedItemChanged
+  fullName: Terminal.Gui.ListView.SelectedItemChanged
+  nameWithType: ListView.SelectedItemChanged
 - uid: Terminal.Gui.ListView.SetSource(System.Collections.IList)
   name: SetSource(IList)
   href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_SetSource_System_Collections_IList_
@@ -3452,6 +3595,12 @@ references:
   commentId: T:Terminal.Gui.MenuBar
   fullName: Terminal.Gui.MenuBar
   nameWithType: MenuBar
+- uid: Terminal.Gui.MenuBar.#ctor
+  name: MenuBar()
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar__ctor
+  commentId: M:Terminal.Gui.MenuBar.#ctor
+  fullName: Terminal.Gui.MenuBar.MenuBar()
+  nameWithType: MenuBar.MenuBar()
 - uid: Terminal.Gui.MenuBar.#ctor(Terminal.Gui.MenuBarItem[])
   name: MenuBar(MenuBarItem[])
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar__ctor_Terminal_Gui_MenuBarItem___
@@ -3507,6 +3656,18 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.MenuBar.LastFocused
   nameWithType: MenuBar.LastFocused
+- uid: Terminal.Gui.MenuBar.MenuClosing
+  name: MenuClosing
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_MenuClosing
+  commentId: F:Terminal.Gui.MenuBar.MenuClosing
+  fullName: Terminal.Gui.MenuBar.MenuClosing
+  nameWithType: MenuBar.MenuClosing
+- uid: Terminal.Gui.MenuBar.MenuOpening
+  name: MenuOpening
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_MenuOpening
+  commentId: F:Terminal.Gui.MenuBar.MenuOpening
+  fullName: Terminal.Gui.MenuBar.MenuOpening
+  nameWithType: MenuBar.MenuOpening
 - uid: Terminal.Gui.MenuBar.Menus
   name: Menus
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_Menus
@@ -3533,12 +3694,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.MenuBar.MouseEvent
   nameWithType: MenuBar.MouseEvent
-- uid: Terminal.Gui.MenuBar.OnCloseMenu
-  name: OnCloseMenu
-  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_OnCloseMenu
-  commentId: E:Terminal.Gui.MenuBar.OnCloseMenu
-  fullName: Terminal.Gui.MenuBar.OnCloseMenu
-  nameWithType: MenuBar.OnCloseMenu
 - uid: Terminal.Gui.MenuBar.OnKeyDown(Terminal.Gui.KeyEvent)
   name: OnKeyDown(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_OnKeyDown_Terminal_Gui_KeyEvent_
@@ -3565,12 +3720,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.MenuBar.OnKeyUp
   nameWithType: MenuBar.OnKeyUp
-- uid: Terminal.Gui.MenuBar.OnOpenMenu
-  name: OnOpenMenu
-  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_OnOpenMenu
-  commentId: E:Terminal.Gui.MenuBar.OnOpenMenu
-  fullName: Terminal.Gui.MenuBar.OnOpenMenu
-  nameWithType: MenuBar.OnOpenMenu
+- uid: Terminal.Gui.MenuBar.OnMenuClosing
+  name: OnMenuClosing()
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_OnMenuClosing
+  commentId: M:Terminal.Gui.MenuBar.OnMenuClosing
+  fullName: Terminal.Gui.MenuBar.OnMenuClosing()
+  nameWithType: MenuBar.OnMenuClosing()
+- uid: Terminal.Gui.MenuBar.OnMenuClosing*
+  name: OnMenuClosing
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_OnMenuClosing_
+  commentId: Overload:Terminal.Gui.MenuBar.OnMenuClosing
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuBar.OnMenuClosing
+  nameWithType: MenuBar.OnMenuClosing
+- uid: Terminal.Gui.MenuBar.OnMenuOpening
+  name: OnMenuOpening()
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_OnMenuOpening
+  commentId: M:Terminal.Gui.MenuBar.OnMenuOpening
+  fullName: Terminal.Gui.MenuBar.OnMenuOpening()
+  nameWithType: MenuBar.OnMenuOpening()
+- uid: Terminal.Gui.MenuBar.OnMenuOpening*
+  name: OnMenuOpening
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_OnMenuOpening_
+  commentId: Overload:Terminal.Gui.MenuBar.OnMenuOpening
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuBar.OnMenuOpening
+  nameWithType: MenuBar.OnMenuOpening
 - uid: Terminal.Gui.MenuBar.OpenMenu
   name: OpenMenu()
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_OpenMenu
@@ -3655,6 +3830,12 @@ references:
   commentId: T:Terminal.Gui.MenuBarItem
   fullName: Terminal.Gui.MenuBarItem
   nameWithType: MenuBarItem
+- uid: Terminal.Gui.MenuBarItem.#ctor
+  name: MenuBarItem()
+  href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem__ctor
+  commentId: M:Terminal.Gui.MenuBarItem.#ctor
+  fullName: Terminal.Gui.MenuBarItem.MenuBarItem()
+  nameWithType: MenuBarItem.MenuBarItem()
 - uid: Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,System.String,System.Action,System.Func{System.Boolean})
   name: MenuBarItem(ustring, String, Action, Func<Boolean>)
   href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem__ctor_NStack_ustring_System_String_System_Action_System_Func_System_Boolean__
@@ -4124,6 +4305,12 @@ references:
   commentId: T:Terminal.Gui.OpenDialog
   fullName: Terminal.Gui.OpenDialog
   nameWithType: OpenDialog
+- uid: Terminal.Gui.OpenDialog.#ctor
+  name: OpenDialog()
+  href: api/Terminal.Gui/Terminal.Gui.OpenDialog.html#Terminal_Gui_OpenDialog__ctor
+  commentId: M:Terminal.Gui.OpenDialog.#ctor
+  fullName: Terminal.Gui.OpenDialog.OpenDialog()
+  nameWithType: OpenDialog.OpenDialog()
 - uid: Terminal.Gui.OpenDialog.#ctor(NStack.ustring,NStack.ustring)
   name: OpenDialog(ustring, ustring)
   href: api/Terminal.Gui/Terminal.Gui.OpenDialog.html#Terminal_Gui_OpenDialog__ctor_NStack_ustring_NStack_ustring_
@@ -4651,6 +4838,12 @@ references:
   commentId: T:Terminal.Gui.RadioGroup
   fullName: Terminal.Gui.RadioGroup
   nameWithType: RadioGroup
+- uid: Terminal.Gui.RadioGroup.#ctor
+  name: RadioGroup()
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup__ctor
+  commentId: M:Terminal.Gui.RadioGroup.#ctor
+  fullName: Terminal.Gui.RadioGroup.RadioGroup()
+  nameWithType: RadioGroup.RadioGroup()
 - uid: Terminal.Gui.RadioGroup.#ctor(System.Int32,System.Int32,System.String[],System.Int32)
   name: RadioGroup(Int32, Int32, String[], Int32)
   href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup__ctor_System_Int32_System_Int32_System_String___System_Int32_
@@ -4789,12 +4982,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.RadioGroup.Selected
   nameWithType: RadioGroup.Selected
-- uid: Terminal.Gui.RadioGroup.SelectionChanged
-  name: SelectionChanged
-  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_SelectionChanged
-  commentId: F:Terminal.Gui.RadioGroup.SelectionChanged
-  fullName: Terminal.Gui.RadioGroup.SelectionChanged
-  nameWithType: RadioGroup.SelectionChanged
+- uid: Terminal.Gui.RadioGroup.SelectedItemChanged
+  name: SelectedItemChanged
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_SelectedItemChanged
+  commentId: F:Terminal.Gui.RadioGroup.SelectedItemChanged
+  fullName: Terminal.Gui.RadioGroup.SelectedItemChanged
+  nameWithType: RadioGroup.SelectedItemChanged
 - uid: Terminal.Gui.Rect
   name: Rect
   href: api/Terminal.Gui/Terminal.Gui.Rect.html
@@ -5301,6 +5494,12 @@ references:
   commentId: T:Terminal.Gui.SaveDialog
   fullName: Terminal.Gui.SaveDialog
   nameWithType: SaveDialog
+- uid: Terminal.Gui.SaveDialog.#ctor
+  name: SaveDialog()
+  href: api/Terminal.Gui/Terminal.Gui.SaveDialog.html#Terminal_Gui_SaveDialog__ctor
+  commentId: M:Terminal.Gui.SaveDialog.#ctor
+  fullName: Terminal.Gui.SaveDialog.SaveDialog()
+  nameWithType: SaveDialog.SaveDialog()
 - uid: Terminal.Gui.SaveDialog.#ctor(NStack.ustring,NStack.ustring)
   name: SaveDialog(ustring, ustring)
   href: api/Terminal.Gui/Terminal.Gui.SaveDialog.html#Terminal_Gui_SaveDialog__ctor_NStack_ustring_NStack_ustring_
@@ -5367,7 +5566,7 @@ references:
 - uid: Terminal.Gui.ScrollBarView.ChangedPosition
   name: ChangedPosition
   href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_ChangedPosition
-  commentId: E:Terminal.Gui.ScrollBarView.ChangedPosition
+  commentId: F:Terminal.Gui.ScrollBarView.ChangedPosition
   fullName: Terminal.Gui.ScrollBarView.ChangedPosition
   nameWithType: ScrollBarView.ChangedPosition
 - uid: Terminal.Gui.ScrollBarView.IsVertical
@@ -5854,6 +6053,12 @@ references:
   commentId: T:Terminal.Gui.StatusBar
   fullName: Terminal.Gui.StatusBar
   nameWithType: StatusBar
+- uid: Terminal.Gui.StatusBar.#ctor
+  name: StatusBar()
+  href: api/Terminal.Gui/Terminal.Gui.StatusBar.html#Terminal_Gui_StatusBar__ctor
+  commentId: M:Terminal.Gui.StatusBar.#ctor
+  fullName: Terminal.Gui.StatusBar.StatusBar()
+  nameWithType: StatusBar.StatusBar()
 - uid: Terminal.Gui.StatusBar.#ctor(Terminal.Gui.StatusItem[])
   name: StatusBar(StatusItem[])
   href: api/Terminal.Gui/Terminal.Gui.StatusBar.html#Terminal_Gui_StatusBar__ctor_Terminal_Gui_StatusItem___
@@ -6029,6 +6234,12 @@ references:
   commentId: T:Terminal.Gui.TextField
   fullName: Terminal.Gui.TextField
   nameWithType: TextField
+- uid: Terminal.Gui.TextField.#ctor
+  name: TextField()
+  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField__ctor
+  commentId: M:Terminal.Gui.TextField.#ctor
+  fullName: Terminal.Gui.TextField.TextField()
+  nameWithType: TextField.TextField()
 - uid: Terminal.Gui.TextField.#ctor(NStack.ustring)
   name: TextField(ustring)
   href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField__ctor_NStack_ustring_
@@ -6067,12 +6278,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextField.CanFocus
   nameWithType: TextField.CanFocus
-- uid: Terminal.Gui.TextField.Changed
-  name: Changed
-  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_Changed
-  commentId: E:Terminal.Gui.TextField.Changed
-  fullName: Terminal.Gui.TextField.Changed
-  nameWithType: TextField.Changed
 - uid: Terminal.Gui.TextField.ClearAllSelection
   name: ClearAllSelection()
   href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_ClearAllSelection
@@ -6294,6 +6499,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextField.Text
   nameWithType: TextField.Text
+- uid: Terminal.Gui.TextField.TextChanged
+  name: TextChanged
+  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_TextChanged
+  commentId: F:Terminal.Gui.TextField.TextChanged
+  fullName: Terminal.Gui.TextField.TextChanged
+  nameWithType: TextField.TextChanged
 - uid: Terminal.Gui.TextField.Used
   name: Used
   href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_Used
@@ -6504,7 +6715,7 @@ references:
 - uid: Terminal.Gui.TextView.TextChanged
   name: TextChanged
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_TextChanged
-  commentId: E:Terminal.Gui.TextView.TextChanged
+  commentId: F:Terminal.Gui.TextView.TextChanged
   fullName: Terminal.Gui.TextView.TextChanged
   nameWithType: TextView.TextChanged
 - uid: Terminal.Gui.TimeField
@@ -6513,18 +6724,24 @@ references:
   commentId: T:Terminal.Gui.TimeField
   fullName: Terminal.Gui.TimeField
   nameWithType: TimeField
-- uid: Terminal.Gui.TimeField.#ctor(System.DateTime)
-  name: TimeField(DateTime)
-  href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField__ctor_System_DateTime_
-  commentId: M:Terminal.Gui.TimeField.#ctor(System.DateTime)
-  fullName: Terminal.Gui.TimeField.TimeField(System.DateTime)
-  nameWithType: TimeField.TimeField(DateTime)
-- uid: Terminal.Gui.TimeField.#ctor(System.Int32,System.Int32,System.DateTime,System.Boolean)
-  name: TimeField(Int32, Int32, DateTime, Boolean)
-  href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField__ctor_System_Int32_System_Int32_System_DateTime_System_Boolean_
-  commentId: M:Terminal.Gui.TimeField.#ctor(System.Int32,System.Int32,System.DateTime,System.Boolean)
-  fullName: Terminal.Gui.TimeField.TimeField(System.Int32, System.Int32, System.DateTime, System.Boolean)
-  nameWithType: TimeField.TimeField(Int32, Int32, DateTime, Boolean)
+- uid: Terminal.Gui.TimeField.#ctor
+  name: TimeField()
+  href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField__ctor
+  commentId: M:Terminal.Gui.TimeField.#ctor
+  fullName: Terminal.Gui.TimeField.TimeField()
+  nameWithType: TimeField.TimeField()
+- uid: Terminal.Gui.TimeField.#ctor(System.Int32,System.Int32,System.TimeSpan,System.Boolean)
+  name: TimeField(Int32, Int32, TimeSpan, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField__ctor_System_Int32_System_Int32_System_TimeSpan_System_Boolean_
+  commentId: M:Terminal.Gui.TimeField.#ctor(System.Int32,System.Int32,System.TimeSpan,System.Boolean)
+  fullName: Terminal.Gui.TimeField.TimeField(System.Int32, System.Int32, System.TimeSpan, System.Boolean)
+  nameWithType: TimeField.TimeField(Int32, Int32, TimeSpan, Boolean)
+- uid: Terminal.Gui.TimeField.#ctor(System.TimeSpan)
+  name: TimeField(TimeSpan)
+  href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField__ctor_System_TimeSpan_
+  commentId: M:Terminal.Gui.TimeField.#ctor(System.TimeSpan)
+  fullName: Terminal.Gui.TimeField.TimeField(System.TimeSpan)
+  nameWithType: TimeField.TimeField(TimeSpan)
 - uid: Terminal.Gui.TimeField.#ctor*
   name: TimeField
   href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField__ctor_
@@ -6558,6 +6775,22 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TimeField.MouseEvent
   nameWithType: TimeField.MouseEvent
+- uid: Terminal.Gui.TimeField.OnTimeChanged(Terminal.Gui.DateTimeEventArgs{System.TimeSpan})
+  name: OnTimeChanged(DateTimeEventArgs<TimeSpan>)
+  href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField_OnTimeChanged_Terminal_Gui_DateTimeEventArgs_System_TimeSpan__
+  commentId: M:Terminal.Gui.TimeField.OnTimeChanged(Terminal.Gui.DateTimeEventArgs{System.TimeSpan})
+  name.vb: OnTimeChanged(DateTimeEventArgs(Of TimeSpan))
+  fullName: Terminal.Gui.TimeField.OnTimeChanged(Terminal.Gui.DateTimeEventArgs<System.TimeSpan>)
+  fullName.vb: Terminal.Gui.TimeField.OnTimeChanged(Terminal.Gui.DateTimeEventArgs(Of System.TimeSpan))
+  nameWithType: TimeField.OnTimeChanged(DateTimeEventArgs<TimeSpan>)
+  nameWithType.vb: TimeField.OnTimeChanged(DateTimeEventArgs(Of TimeSpan))
+- uid: Terminal.Gui.TimeField.OnTimeChanged*
+  name: OnTimeChanged
+  href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField_OnTimeChanged_
+  commentId: Overload:Terminal.Gui.TimeField.OnTimeChanged
+  isSpec: "True"
+  fullName: Terminal.Gui.TimeField.OnTimeChanged
+  nameWithType: TimeField.OnTimeChanged
 - uid: Terminal.Gui.TimeField.ProcessKey(Terminal.Gui.KeyEvent)
   name: ProcessKey(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField_ProcessKey_Terminal_Gui_KeyEvent_
@@ -6584,6 +6817,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TimeField.Time
   nameWithType: TimeField.Time
+- uid: Terminal.Gui.TimeField.TimeChanged
+  name: TimeChanged
+  href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField_TimeChanged
+  commentId: F:Terminal.Gui.TimeField.TimeChanged
+  fullName: Terminal.Gui.TimeField.TimeChanged
+  nameWithType: TimeField.TimeChanged
 - uid: Terminal.Gui.Toplevel
   name: Toplevel
   href: api/Terminal.Gui/Terminal.Gui.Toplevel.html
@@ -6690,7 +6929,7 @@ references:
 - uid: Terminal.Gui.Toplevel.Ready
   name: Ready
   href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Ready
-  commentId: E:Terminal.Gui.Toplevel.Ready
+  commentId: F:Terminal.Gui.Toplevel.Ready
   fullName: Terminal.Gui.Toplevel.Ready
   nameWithType: Toplevel.Ready
 - uid: Terminal.Gui.Toplevel.Redraw(Terminal.Gui.Rect)
@@ -6944,7 +7183,7 @@ references:
 - uid: Terminal.Gui.View.DrawContent
   name: DrawContent
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_DrawContent
-  commentId: E:Terminal.Gui.View.DrawContent
+  commentId: F:Terminal.Gui.View.DrawContent
   fullName: Terminal.Gui.View.DrawContent
   nameWithType: View.DrawContent
 - uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
@@ -7008,7 +7247,7 @@ references:
 - uid: Terminal.Gui.View.Enter
   name: Enter
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Enter
-  commentId: E:Terminal.Gui.View.Enter
+  commentId: F:Terminal.Gui.View.Enter
   fullName: Terminal.Gui.View.Enter
   nameWithType: View.Enter
 - uid: Terminal.Gui.View.Focused
@@ -7189,7 +7428,7 @@ references:
 - uid: Terminal.Gui.View.KeyDown
   name: KeyDown
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_KeyDown
-  commentId: E:Terminal.Gui.View.KeyDown
+  commentId: F:Terminal.Gui.View.KeyDown
   fullName: Terminal.Gui.View.KeyDown
   nameWithType: View.KeyDown
 - uid: Terminal.Gui.View.KeyEventEventArgs
@@ -7240,19 +7479,19 @@ references:
 - uid: Terminal.Gui.View.KeyPress
   name: KeyPress
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_KeyPress
-  commentId: E:Terminal.Gui.View.KeyPress
+  commentId: F:Terminal.Gui.View.KeyPress
   fullName: Terminal.Gui.View.KeyPress
   nameWithType: View.KeyPress
 - uid: Terminal.Gui.View.KeyUp
   name: KeyUp
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_KeyUp
-  commentId: E:Terminal.Gui.View.KeyUp
+  commentId: F:Terminal.Gui.View.KeyUp
   fullName: Terminal.Gui.View.KeyUp
   nameWithType: View.KeyUp
 - uid: Terminal.Gui.View.LayoutComplete
   name: LayoutComplete
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_LayoutComplete
-  commentId: E:Terminal.Gui.View.LayoutComplete
+  commentId: F:Terminal.Gui.View.LayoutComplete
   fullName: Terminal.Gui.View.LayoutComplete
   nameWithType: View.LayoutComplete
 - uid: Terminal.Gui.View.LayoutEventArgs
@@ -7303,7 +7542,7 @@ references:
 - uid: Terminal.Gui.View.Leave
   name: Leave
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Leave
-  commentId: E:Terminal.Gui.View.Leave
+  commentId: F:Terminal.Gui.View.Leave
   fullName: Terminal.Gui.View.Leave
   nameWithType: View.Leave
 - uid: Terminal.Gui.View.MostFocused
@@ -7322,64 +7561,64 @@ references:
 - uid: Terminal.Gui.View.MouseClick
   name: MouseClick
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_MouseClick
-  commentId: E:Terminal.Gui.View.MouseClick
+  commentId: F:Terminal.Gui.View.MouseClick
   fullName: Terminal.Gui.View.MouseClick
   nameWithType: View.MouseClick
 - uid: Terminal.Gui.View.MouseEnter
   name: MouseEnter
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_MouseEnter
-  commentId: E:Terminal.Gui.View.MouseEnter
+  commentId: F:Terminal.Gui.View.MouseEnter
   fullName: Terminal.Gui.View.MouseEnter
   nameWithType: View.MouseEnter
-- uid: Terminal.Gui.View.MouseEventEventArgs
-  name: View.MouseEventEventArgs
-  href: api/Terminal.Gui/Terminal.Gui.View.MouseEventEventArgs.html
-  commentId: T:Terminal.Gui.View.MouseEventEventArgs
-  fullName: Terminal.Gui.View.MouseEventEventArgs
-  nameWithType: View.MouseEventEventArgs
-- uid: Terminal.Gui.View.MouseEventEventArgs.#ctor(Terminal.Gui.MouseEvent)
-  name: MouseEventEventArgs(MouseEvent)
-  href: api/Terminal.Gui/Terminal.Gui.View.MouseEventEventArgs.html#Terminal_Gui_View_MouseEventEventArgs__ctor_Terminal_Gui_MouseEvent_
-  commentId: M:Terminal.Gui.View.MouseEventEventArgs.#ctor(Terminal.Gui.MouseEvent)
-  fullName: Terminal.Gui.View.MouseEventEventArgs.MouseEventEventArgs(Terminal.Gui.MouseEvent)
-  nameWithType: View.MouseEventEventArgs.MouseEventEventArgs(MouseEvent)
-- uid: Terminal.Gui.View.MouseEventEventArgs.#ctor*
-  name: MouseEventEventArgs
-  href: api/Terminal.Gui/Terminal.Gui.View.MouseEventEventArgs.html#Terminal_Gui_View_MouseEventEventArgs__ctor_
-  commentId: Overload:Terminal.Gui.View.MouseEventEventArgs.#ctor
+- uid: Terminal.Gui.View.MouseEventArgs
+  name: View.MouseEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.View.MouseEventArgs.html
+  commentId: T:Terminal.Gui.View.MouseEventArgs
+  fullName: Terminal.Gui.View.MouseEventArgs
+  nameWithType: View.MouseEventArgs
+- uid: Terminal.Gui.View.MouseEventArgs.#ctor(Terminal.Gui.MouseEvent)
+  name: MouseEventArgs(MouseEvent)
+  href: api/Terminal.Gui/Terminal.Gui.View.MouseEventArgs.html#Terminal_Gui_View_MouseEventArgs__ctor_Terminal_Gui_MouseEvent_
+  commentId: M:Terminal.Gui.View.MouseEventArgs.#ctor(Terminal.Gui.MouseEvent)
+  fullName: Terminal.Gui.View.MouseEventArgs.MouseEventArgs(Terminal.Gui.MouseEvent)
+  nameWithType: View.MouseEventArgs.MouseEventArgs(MouseEvent)
+- uid: Terminal.Gui.View.MouseEventArgs.#ctor*
+  name: MouseEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.View.MouseEventArgs.html#Terminal_Gui_View_MouseEventArgs__ctor_
+  commentId: Overload:Terminal.Gui.View.MouseEventArgs.#ctor
   isSpec: "True"
-  fullName: Terminal.Gui.View.MouseEventEventArgs.MouseEventEventArgs
-  nameWithType: View.MouseEventEventArgs.MouseEventEventArgs
-- uid: Terminal.Gui.View.MouseEventEventArgs.Handled
+  fullName: Terminal.Gui.View.MouseEventArgs.MouseEventArgs
+  nameWithType: View.MouseEventArgs.MouseEventArgs
+- uid: Terminal.Gui.View.MouseEventArgs.Handled
   name: Handled
-  href: api/Terminal.Gui/Terminal.Gui.View.MouseEventEventArgs.html#Terminal_Gui_View_MouseEventEventArgs_Handled
-  commentId: P:Terminal.Gui.View.MouseEventEventArgs.Handled
-  fullName: Terminal.Gui.View.MouseEventEventArgs.Handled
-  nameWithType: View.MouseEventEventArgs.Handled
-- uid: Terminal.Gui.View.MouseEventEventArgs.Handled*
+  href: api/Terminal.Gui/Terminal.Gui.View.MouseEventArgs.html#Terminal_Gui_View_MouseEventArgs_Handled
+  commentId: P:Terminal.Gui.View.MouseEventArgs.Handled
+  fullName: Terminal.Gui.View.MouseEventArgs.Handled
+  nameWithType: View.MouseEventArgs.Handled
+- uid: Terminal.Gui.View.MouseEventArgs.Handled*
   name: Handled
-  href: api/Terminal.Gui/Terminal.Gui.View.MouseEventEventArgs.html#Terminal_Gui_View_MouseEventEventArgs_Handled_
-  commentId: Overload:Terminal.Gui.View.MouseEventEventArgs.Handled
+  href: api/Terminal.Gui/Terminal.Gui.View.MouseEventArgs.html#Terminal_Gui_View_MouseEventArgs_Handled_
+  commentId: Overload:Terminal.Gui.View.MouseEventArgs.Handled
   isSpec: "True"
-  fullName: Terminal.Gui.View.MouseEventEventArgs.Handled
-  nameWithType: View.MouseEventEventArgs.Handled
-- uid: Terminal.Gui.View.MouseEventEventArgs.MouseEvent
+  fullName: Terminal.Gui.View.MouseEventArgs.Handled
+  nameWithType: View.MouseEventArgs.Handled
+- uid: Terminal.Gui.View.MouseEventArgs.MouseEvent
   name: MouseEvent
-  href: api/Terminal.Gui/Terminal.Gui.View.MouseEventEventArgs.html#Terminal_Gui_View_MouseEventEventArgs_MouseEvent
-  commentId: P:Terminal.Gui.View.MouseEventEventArgs.MouseEvent
-  fullName: Terminal.Gui.View.MouseEventEventArgs.MouseEvent
-  nameWithType: View.MouseEventEventArgs.MouseEvent
-- uid: Terminal.Gui.View.MouseEventEventArgs.MouseEvent*
+  href: api/Terminal.Gui/Terminal.Gui.View.MouseEventArgs.html#Terminal_Gui_View_MouseEventArgs_MouseEvent
+  commentId: P:Terminal.Gui.View.MouseEventArgs.MouseEvent
+  fullName: Terminal.Gui.View.MouseEventArgs.MouseEvent
+  nameWithType: View.MouseEventArgs.MouseEvent
+- uid: Terminal.Gui.View.MouseEventArgs.MouseEvent*
   name: MouseEvent
-  href: api/Terminal.Gui/Terminal.Gui.View.MouseEventEventArgs.html#Terminal_Gui_View_MouseEventEventArgs_MouseEvent_
-  commentId: Overload:Terminal.Gui.View.MouseEventEventArgs.MouseEvent
+  href: api/Terminal.Gui/Terminal.Gui.View.MouseEventArgs.html#Terminal_Gui_View_MouseEventArgs_MouseEvent_
+  commentId: Overload:Terminal.Gui.View.MouseEventArgs.MouseEvent
   isSpec: "True"
-  fullName: Terminal.Gui.View.MouseEventEventArgs.MouseEvent
-  nameWithType: View.MouseEventEventArgs.MouseEvent
+  fullName: Terminal.Gui.View.MouseEventArgs.MouseEvent
+  nameWithType: View.MouseEventArgs.MouseEvent
 - uid: Terminal.Gui.View.MouseLeave
   name: MouseLeave
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_MouseLeave
-  commentId: E:Terminal.Gui.View.MouseLeave
+  commentId: F:Terminal.Gui.View.MouseLeave
   fullName: Terminal.Gui.View.MouseLeave
   nameWithType: View.MouseLeave
 - uid: Terminal.Gui.View.Move(System.Int32,System.Int32)
@@ -7784,6 +8023,12 @@ references:
   commentId: T:Terminal.Gui.Window
   fullName: Terminal.Gui.Window
   nameWithType: Window
+- uid: Terminal.Gui.Window.#ctor
+  name: Window()
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window__ctor
+  commentId: M:Terminal.Gui.Window.#ctor
+  fullName: Terminal.Gui.Window.Window()
+  nameWithType: Window.Window()
 - uid: Terminal.Gui.Window.#ctor(NStack.ustring)
   name: Window(ustring)
   href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window__ctor_NStack_ustring_
