@@ -16,30 +16,30 @@ type Demo() = class end
     let mutable menuKeysStyle = Unchecked.defaultof<CheckBox>
     let mutable menuAutoMouseNav = Unchecked.defaultof<CheckBox>
 
-    type Box10x() =
-        inherit View()
-        member val w = 40 with get, set
-        member val h = 50 with get, set
+    type Box10x(x : int, y : int) =
+        inherit View(new Rect(x, y, 20, 10))
+        let w = 40
+        let h = 50
         member val WantCursorPosition = Unchecked.defaultof<System.Boolean> with get, set
-        new(x : int, y : int) as this =
+        new() as _this =
             (Box10x())
             then
             ()
         member this.GetContentSize() =
-            new Size(this.w, this.h)
+            new Size(w, h)
         member this.SetCursorPosition(pos : Point) =
             raise (new NotImplementedException())
         override this.Redraw(region : Rect) =
             Application.Driver.SetAttribute (Application.Current.ColorScheme.Focus)
             do
             let mutable (y : int) = 0
-            while (y < this.h) do
+            while (y < h) do
             this.Move (0, y)
             Application.Driver.AddStr (ustr (y.ToString()))
             do
             let mutable (x : int) = 0
-            while (x < this.w - (y.ToString ()).Length) do
-                if (y.ToString ()).Length < this.w
+            while (x < w - (y.ToString ()).Length) do
+                if (y.ToString ()).Length < w
                 then Application.Driver.AddStr (ustr " ")
                 x <- x + 1
             x
@@ -47,9 +47,9 @@ type Demo() = class end
             y
             ()
 
-    type Filler() =
-        inherit View()
-        new(rect : Rect) as this =
+    type Filler(rect : Rect) =
+        inherit View(rect)
+        new() as _this =
             (Filler ())
             then
             ()
@@ -153,8 +153,8 @@ type Demo() = class end
                 ),
             scrollView, scrollView2, tf,
             new Button(10, 19, ustr "Cancel"),
-            new TimeField(3, 20, DateTime.Now),
-            new TimeField(23, 20, DateTime.Now, true),
+            new TimeField(3, 20, DateTime.Now.TimeOfDay),
+            new TimeField(23, 20, DateTime.Now.TimeOfDay, true),
             new DateField(3, 22, DateTime.Now),
             new DateField(23, 22, DateTime.Now, true),
             progress,
@@ -164,6 +164,7 @@ type Demo() = class end
         )
         container.SendSubviewToBack (tf)
         ()
+
     let NewFile() =
         let mutable d = new Dialog (ustr "New File", 50, 20,
                             new Button (ustr "Ok", true, Clicked = Action(Application.RequestStop)),
@@ -202,18 +203,18 @@ type Demo() = class end
         Application.Run (ntop)
 
     let Quit() =
-        let mutable n = MessageBox.Query (50, 7, "Quit Demo", "Are you sure you want to quit this demo?", "Yes", "No")
+        let mutable n = MessageBox.Query (50, 7, ustr "Quit Demo", ustr "Are you sure you want to quit this demo?", ustr "Yes", ustr "No")
         n = 0
 
     let Close() =
-        MessageBox.ErrorQuery (50, 7, "Error", "There is nothing to close", "Ok")
+        MessageBox.ErrorQuery (50, 7, ustr "Error", ustr "There is nothing to close", ustr "Ok")
         |> ignore
 
     let Open() =
         let mutable d = new OpenDialog (ustr "Open", ustr "Open a file", AllowsMultipleSelection = true)
         Application.Run (d)
         if not d.Canceled
-            then MessageBox.Query (50, 7, "Selected File", (String.Join (", ", d.FilePaths)), "Ok") |> ignore
+            then MessageBox.Query (50, 7, ustr "Selected File", ustr (String.Join (", ", d.FilePaths)), ustr "Ok") |> ignore
 
     let ShowHex(top : Toplevel) =
         let mutable tframe = top.Frame
@@ -255,14 +256,14 @@ type Demo() = class end
         let mutable (flags : BindingFlags) = BindingFlags.Public ||| BindingFlags.Static
         let mutable (minfo : MethodInfo) = typeof<MenuItemDetails>.GetMethod ("Instance", flags)
         let mutable (mid : Delegate) = Delegate.CreateDelegate (typeof<MenuItemDelegate>, minfo)
-        MessageBox.Query (70, 7, (mi.Title.ToString ()),
-            ((sprintf "%O selected. Is from submenu: %O" (mi.Title.ToString ())) (mi.GetMenuBarItem ())), "Ok")
+        MessageBox.Query (70, 7, ustr (mi.Title.ToString ()),
+            ustr ((sprintf "%O selected. Is from submenu: %O" (mi.Title.ToString ())) (mi.GetMenuBarItem ())), ustr "Ok")
         |> ignore
 
-    let MenuKeysStyle_Toggled(e : EventArgs) =
+    let MenuKeysStyle_Toggled(e : bool) =
         menu.UseKeysUpDownAsKeysLeftRight <- menuKeysStyle.Checked
 
-    let MenuAutoMouseNav_Toggled(e : EventArgs) =
+    let MenuAutoMouseNav_Toggled(e : bool) =
         menu.WantMousePositionReports <- menuAutoMouseNav.Checked
 
     let Copy() =
@@ -284,7 +285,15 @@ type Demo() = class end
         ()
 
     let Help() =
-        MessageBox.Query (50, 7, "Help", "This is a small help\nBe kind.", "Ok")
+        MessageBox.Query (50, 7, ustr "Help", ustr "This is a small help\nBe kind.", ustr "Ok")
+        |> ignore
+
+    let Load () =
+        MessageBox.Query (50, 7, ustr "Load", ustr "This is a small load\nBe kind.", ustr "Ok")
+        |> ignore
+
+    let Save () =
+        MessageBox.Query (50, 7, ustr "Save ", ustr "This is a small save\nBe kind.", ustr "Ok")
         |> ignore
 
     let ListSelectionDemo(multiple : System.Boolean) =
@@ -319,7 +328,7 @@ type Demo() = class end
             i <- i + 1
             i
             ()
-        MessageBox.Query (60, 10, "Selected Animals", (if result = "" then "No animals selected" else result), "Ok") |> ignore
+        MessageBox.Query (60, 10, ustr "Selected Animals", ustr (if result = "" then "No animals selected" else result), ustr "Ok") |> ignore
 
     let OnKeyDownPressUpDemo() =
         let mutable container = new Dialog (ustr "KeyDown & KeyPress & KeyUp demo", 80, 20,            
@@ -347,9 +356,9 @@ type Demo() = class end
                 list.Add (keyEvent.ToString ())    
             listView.MoveDown ();
     
-        container.KeyDown.Add(fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Down") |> ignore)
-        container.KeyPress.Add(fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Press") |> ignore)
-        container.KeyUp.Add(fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Up") |> ignore)
+        container.KeyDown <- Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Down") |> ignore)
+        container.KeyPress <- Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Press") |> ignore)
+        container.KeyUp <- Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Up") |> ignore)
         Application.Run (container)
 
     let Main() =
@@ -395,11 +404,11 @@ type Demo() = class end
                     [|new MenuItem(ustr "SubMenu1Item_1", new MenuBarItem([|new MenuItem(ustr "SubMenu2Item_1",
                     new MenuBarItem([|new MenuItem(ustr "SubMenu3Item_1", new MenuBarItem([|(menuItems.[2])|]))|]))|]))|]);
                 new MenuBarItem(ustr "_About...", "Demonstrates top-level menu item",
-                    (fun () -> MessageBox.ErrorQuery (50, 7, "About Demo", "This is a demo app for gui.cs", "Ok") |> ignore))|])
+                    (fun () -> MessageBox.ErrorQuery (50, 7, ustr "About Demo", ustr "This is a demo app for gui.cs", ustr "Ok") |> ignore))|])
         menuKeysStyle <- new CheckBox(3, 25, ustr "UseKeysUpDownAsKeysLeftRight", true)
-        menuKeysStyle.Toggled.Add(MenuKeysStyle_Toggled)
+        menuKeysStyle.Toggled <- Action<bool> (MenuKeysStyle_Toggled)
         menuAutoMouseNav <- new CheckBox(40, 25, ustr "UseMenuAutoNavigation", true)
-        menuAutoMouseNav.Toggled.Add(MenuAutoMouseNav_Toggled)
+        menuAutoMouseNav.Toggled <- Action<bool> (MenuAutoMouseNav_Toggled)
         ShowEntries (win)
         let mutable (count : int) = 0
         ml <- new Label(new Rect(3, 17, 47, 1), ustr "Mouse: ")
@@ -422,8 +431,8 @@ type Demo() = class end
             )
         let mutable statusBar = new StatusBar ([|
             new StatusItem(Key.F1, ustr "~F1~ Help", Action(Help));
-            new StatusItem(Key.F2, ustr "~F2~ Load", null);
-            new StatusItem(Key.F3, ustr "~F3~ Save", null);
+            new StatusItem(Key.F2, ustr "~F2~ Load", Action(Load));
+            new StatusItem(Key.F3, ustr "~F3~ Save", Action(Save));
             new StatusItem(Key.ControlX, ustr "~^X~ Quit", fun () -> if (Quit ()) then top.Running <- false)
             |],
             Parent = null
@@ -433,7 +442,7 @@ type Demo() = class end
         win.Add (bottom)
         let mutable bottom2 = new Label(ustr "This should go on the bottom of another top-level!")
         top.Add (bottom2)
-        Application.Loaded.Add (
+        Application.Loaded <- Action<Application.ResizedEventArgs> (
             fun (_) ->
                 bottom.X <- win.X
                 bottom.Y <- Pos.Bottom (win) - Pos.Top (win) - Pos.At(margin)

@@ -14,13 +14,14 @@ namespace UICatalog {
 		private TextView _textView;
 		private bool _saved = true;
 
-		public override void Init (Toplevel top)
+		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
-			base.Init (top);
-		}
+			Application.Init ();
+			Top = top;
+			if (Top == null) {
+				Top = Application.Top;
+			}
 
-		public override void Setup ()
-		{
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_New", "", () => New()),
@@ -50,7 +51,8 @@ namespace UICatalog {
 				X = 0,
 				Y = 1,
 				Width = Dim.Fill (),
-				Height = Dim.Fill ()
+				Height = Dim.Fill (),
+				ColorScheme = colorScheme,
 			};
 			Top.Add (Win);
 
@@ -59,12 +61,16 @@ namespace UICatalog {
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				
+
 			};
 
 			LoadFile ();
 
 			Win.Add (_textView);
+		}
+
+		public override void Setup ()
+		{
 		}
 
 		private void New ()

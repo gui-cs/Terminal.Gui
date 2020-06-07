@@ -48,7 +48,7 @@ namespace UICatalog {
 			}
 		}
 
-		public override void Init (Toplevel top)
+		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
 			Application.Init ();
 			Top = top;
@@ -57,7 +57,8 @@ namespace UICatalog {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
-				Height = Dim.Fill ()
+				Height = Dim.Fill (),
+				ColorScheme = colorScheme,
 			};
 			Top.Add (Win);
 		}
@@ -100,13 +101,18 @@ namespace UICatalog {
 				Y = Pos.Top (editLabel) + 4,
 			};
 			Win.Add (keyLogLabel);
-
+			var fakeKeyPress = new KeyEvent (Key.ControlA, new KeyModifiers () {
+				Alt = true,
+				Ctrl = true,
+				Shift = true
+			});
+			var maxLogEntry = $"Key{"",-5}: {fakeKeyPress}".Length;
 			var yOffset = (Top == Application.Top ? 1 : 6);
 			var keyStrokelist = new List<string> ();
 			var keyStrokeListView = new ListView (keyStrokelist) {
 				X = 0,
 				Y = Pos.Top (keyLogLabel) + yOffset,
-				Width = Dim.Percent (40),
+				Width = maxLogEntry,
 				Height = Dim.Fill (),
 			};
 			keyStrokeListView.ColorScheme = Colors.TopLevel;
@@ -119,11 +125,12 @@ namespace UICatalog {
 			};
 			Win.Add (processKeyLogLabel);
 
+			maxLogEntry = $"{fakeKeyPress}".Length;
 			yOffset = (Top == Application.Top ? 1 : 6);
 			var processKeyListView = new ListView (_processKeyList) {
 				X = Pos.Left (processKeyLogLabel),
 				Y = Pos.Top (processKeyLogLabel) + yOffset,
-				Width = Dim.Percent (60),
+				Width = maxLogEntry,
 				Height = Dim.Fill (),
 			};
 			processKeyListView.ColorScheme = Colors.TopLevel;
@@ -141,7 +148,7 @@ namespace UICatalog {
 			var processHotKeyListView = new ListView (_processHotKeyList) {
 				X = Pos.Left (processHotKeyLogLabel),
 				Y = Pos.Top (processHotKeyLogLabel) + yOffset,
-				Width = Dim.Percent (50),
+				Width = maxLogEntry,
 				Height = Dim.Fill (),
 			};
 			processHotKeyListView.ColorScheme = Colors.TopLevel;
@@ -159,7 +166,7 @@ namespace UICatalog {
 			var processColdKeyListView = new ListView (_processColdKeyList) {
 				X = Pos.Left (processColdKeyLogLabel),
 				Y = Pos.Top (processColdKeyLogLabel) + yOffset,
-				Width = Dim.Fill (),
+				Width = maxLogEntry,
 				Height = Dim.Fill (),
 			};
 

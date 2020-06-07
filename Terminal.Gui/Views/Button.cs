@@ -145,7 +145,9 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///<inheritdoc/>
+		/// <summary>
+		/// Sets or gets the text alignment for the <see cref="Button"/>.
+		/// </summary>
 		public TextAlignment TextAlignment {
 			get => textAlignment;
 			set {
@@ -154,12 +156,17 @@ namespace Terminal.Gui {
 			}
 		}
 
+		Rune _leftBracket = new Rune ('[');
+		Rune _rightBracket = new Rune (']');
+		Rune _leftDefault = new Rune ('<');
+		Rune _rightDefault = new Rune ('>');
+
 		internal void Update ()
 		{
 			if (IsDefault)
-				shown_text = "[< " + text + " >]";
+				shown_text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
 			else
-				shown_text = "[ " + text + " ]";
+				shown_text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
 
 			hot_key = (Rune)0;
 			hot_pos = shown_text.IndexOf ('_');

@@ -84,7 +84,7 @@
   <h1 id="Terminal_Gui_DateField" data-uid="Terminal.Gui.DateField" class="text-break">Class DateField
   </h1>
   <div class="markdown level0 summary">
-Date editing <a class="xref" href="Terminal.Gui.View.html">View</a>
+Simple Date editing <a class="xref" href="Terminal.Gui.View.html">View</a>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -108,7 +108,7 @@ Date editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_ReadOnly">TextField.ReadOnly</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_Changed">TextField.Changed</a>
+      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_TextChanged">TextField.TextChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_OnLeave">TextField.OnLeave()</a>
@@ -390,9 +390,21 @@ The <a class="xref" href="Terminal.Gui.DateField.html">DateField</a> <a class="x
   
   
   <a id="Terminal_Gui_DateField__ctor_" data-uid="Terminal.Gui.DateField.#ctor*"></a>
+  <h4 id="Terminal_Gui_DateField__ctor" data-uid="Terminal.Gui.DateField.#ctor">DateField()</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of <a class="xref" href="Terminal.Gui.DateField.html">DateField</a> using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DateField()</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_DateField__ctor_" data-uid="Terminal.Gui.DateField.#ctor*"></a>
   <h4 id="Terminal_Gui_DateField__ctor_System_DateTime_" data-uid="Terminal.Gui.DateField.#ctor(System.DateTime)">DateField(DateTime)</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of <a class="xref" href="Terminal.Gui.DateField.html">DateField</a> 
+Initializes a new instance of <a class="xref" href="Terminal.Gui.DateField.html">DateField</a> using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -421,7 +433,7 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.DateField.html"
   <a id="Terminal_Gui_DateField__ctor_" data-uid="Terminal.Gui.DateField.#ctor*"></a>
   <h4 id="Terminal_Gui_DateField__ctor_System_Int32_System_Int32_System_DateTime_System_Boolean_" data-uid="Terminal.Gui.DateField.#ctor(System.Int32,System.Int32,System.DateTime,System.Boolean)">DateField(Int32, Int32, DateTime, Boolean)</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of <a class="xref" href="Terminal.Gui.DateField.html">DateField</a> at an absolute position and fixed size.
+Initializes a new instance of <a class="xref" href="Terminal.Gui.DateField.html">DateField</a> using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> layout.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -460,6 +472,38 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.DateField.html"
       </tr>
     </tbody>
   </table>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_DateField_DateChanged" data-uid="Terminal.Gui.DateField.DateChanged">DateChanged</h4>
+  <div class="markdown level1 summary">
+DateChanged event, raised when the <a class="xref" href="Terminal.Gui.DateField.html#Terminal_Gui_DateField_Date">Date</a> property has changed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Action&lt;DateTimeEventArgs&lt;DateTime&gt;&gt; DateChanged</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.DateTimeEventArgs-1.html">DateTimeEventArgs</a>&lt;<span class="xref">System.DateTime</span>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_DateField_DateChanged_remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+This event is raised when the <a class="xref" href="Terminal.Gui.DateField.html#Terminal_Gui_DateField_Date">Date</a> property changes.
+</div>
   <h3 id="properties">Properties
   </h3>
   
@@ -497,7 +541,7 @@ Gets or sets the date of the <a class="xref" href="Terminal.Gui.DateField.html">
   <a id="Terminal_Gui_DateField_IsShortFormat_" data-uid="Terminal.Gui.DateField.IsShortFormat*"></a>
   <h4 id="Terminal_Gui_DateField_IsShortFormat" data-uid="Terminal.Gui.DateField.IsShortFormat">IsShortFormat</h4>
   <div class="markdown level1 summary">
-Get or set the data format for the widget.
+Get or set the date format for the widget.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -567,6 +611,35 @@ Method invoked when a mouse event is generated
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_MouseEvent_Terminal_Gui_MouseEvent_">TextField.MouseEvent(MouseEvent)</a></div>
+  
+  
+  <a id="Terminal_Gui_DateField_OnDateChanged_" data-uid="Terminal.Gui.DateField.OnDateChanged*"></a>
+  <h4 id="Terminal_Gui_DateField_OnDateChanged_Terminal_Gui_DateTimeEventArgs_System_DateTime__" data-uid="Terminal.Gui.DateField.OnDateChanged(Terminal.Gui.DateTimeEventArgs{System.DateTime})">OnDateChanged(DateTimeEventArgs&lt;DateTime&gt;)</h4>
+  <div class="markdown level1 summary">
+Event firing method for the <a class="xref" href="Terminal.Gui.DateField.html#Terminal_Gui_DateField_DateChanged">DateChanged</a> event.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnDateChanged(DateTimeEventArgs&lt;DateTime&gt; args)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.DateTimeEventArgs-1.html">DateTimeEventArgs</a>&lt;<span class="xref">System.DateTime</span>&gt;</td>
+        <td><span class="parametername">args</span></td>
+        <td>Event arguments</td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="Terminal_Gui_DateField_ProcessKey_" data-uid="Terminal.Gui.DateField.ProcessKey*"></a>

@@ -94,16 +94,14 @@ views contained inside.
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">ColorScheme</span></div>
   </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><span class="xref">System.IEquatable</span>&lt;<a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a>&gt;</div>
+  </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
       <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
     </div>
     <div>
       <span class="xref">System.Object.GetType()</span>
@@ -122,7 +120,7 @@ views contained inside.
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_ColorScheme_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ColorScheme</code></pre>
+    <pre><code class="lang-csharp hljs">public class ColorScheme : IEquatable&lt;ColorScheme&gt;</code></pre>
   </div>
   <h3 id="properties">Properties
   </h3>
@@ -261,6 +259,231 @@ The default color for text, when the view is not focused.
       </tr>
     </tbody>
   </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Terminal_Gui_ColorScheme_Equals_" data-uid="Terminal.Gui.ColorScheme.Equals*"></a>
+  <h4 id="Terminal_Gui_ColorScheme_Equals_System_Object_" data-uid="Terminal.Gui.ColorScheme.Equals(System.Object)">Equals(Object)</h4>
+  <div class="markdown level1 summary">
+Compares two <a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a> objects for equality.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool Equals(object obj)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>true if the two objects are equal</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.Object.Equals(System.Object)</span></div>
+  
+  
+  <a id="Terminal_Gui_ColorScheme_Equals_" data-uid="Terminal.Gui.ColorScheme.Equals*"></a>
+  <h4 id="Terminal_Gui_ColorScheme_Equals_Terminal_Gui_ColorScheme_" data-uid="Terminal.Gui.ColorScheme.Equals(Terminal.Gui.ColorScheme)">Equals(ColorScheme)</h4>
+  <div class="markdown level1 summary">
+Compares two <a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a> objects for equality.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Equals(ColorScheme other)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
+        <td><span class="parametername">other</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>true if the two objects are equal</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ColorScheme_GetHashCode_" data-uid="Terminal.Gui.ColorScheme.GetHashCode*"></a>
+  <h4 id="Terminal_Gui_ColorScheme_GetHashCode" data-uid="Terminal.Gui.ColorScheme.GetHashCode">GetHashCode()</h4>
+  <div class="markdown level1 summary">
+Returns a hashcode for this instance.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override int GetHashCode()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td>hashcode for this instance</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.Object.GetHashCode()</span></div>
+  <h3 id="operators">Operators
+  </h3>
+  
+  
+  <a id="Terminal_Gui_ColorScheme_op_Equality_" data-uid="Terminal.Gui.ColorScheme.op_Equality*"></a>
+  <h4 id="Terminal_Gui_ColorScheme_op_Equality_Terminal_Gui_ColorScheme_Terminal_Gui_ColorScheme_" data-uid="Terminal.Gui.ColorScheme.op_Equality(Terminal.Gui.ColorScheme,Terminal.Gui.ColorScheme)">Equality(ColorScheme, ColorScheme)</h4>
+  <div class="markdown level1 summary">
+Compares two <a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a> objects for equality.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator ==(ColorScheme left, ColorScheme right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><code>true</code> if the two objects are equivalent</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ColorScheme_op_Inequality_" data-uid="Terminal.Gui.ColorScheme.op_Inequality*"></a>
+  <h4 id="Terminal_Gui_ColorScheme_op_Inequality_Terminal_Gui_ColorScheme_Terminal_Gui_ColorScheme_" data-uid="Terminal.Gui.ColorScheme.op_Inequality(Terminal.Gui.ColorScheme,Terminal.Gui.ColorScheme)">Inequality(ColorScheme, ColorScheme)</h4>
+  <div class="markdown level1 summary">
+Compares two <a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a> objects for inequality.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator !=(ColorScheme left, ColorScheme right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><code>true</code> if the two objects are not equivalent</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <span class="xref">System.IEquatable&lt;T&gt;</span>
+  </div>
 </article>
           </div>
           

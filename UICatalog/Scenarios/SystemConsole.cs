@@ -5,10 +5,10 @@ namespace UICatalog {
 	[ScenarioCategory ("Bug Repro")]
 	[ScenarioCategory ("Console")]
 	class UseSystemConsole : Scenario {
-		public override void Init (Toplevel top)
+		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
 			Application.UseSystemConsole = true;
-			base.Init (top);
+			base.Init (top, colorScheme);
 		}
 
 		public override void RequestStop ()

@@ -7,6 +7,8 @@
 // Define this to enable diagnostics drawing for Window Frames
 using NStack;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Terminal.Gui {
@@ -151,7 +153,7 @@ namespace Terminal.Gui {
 	/// typically in containers such as <see cref="Window"/> and <see cref="FrameView"/> to set the scheme that is used by all the
 	/// views contained inside.
 	/// </summary>
-	public class ColorScheme {
+	public class ColorScheme : IEquatable<ColorScheme> {
 		Attribute _normal;
 		Attribute _focus;
 		Attribute _hotNormal;
@@ -311,48 +313,149 @@ namespace Terminal.Gui {
 			preparingScheme = false;
 			return attribute;
 		}
+
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for equality.
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <returns>true if the two objects are equal</returns>
+		public override bool Equals (object obj)
+		{
+			return Equals (obj as ColorScheme);
+		}
+
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for equality.
+		/// </summary>
+		/// <param name="other"></param>
+		/// <returns>true if the two objects are equal</returns>
+		public bool Equals (ColorScheme other)
+		{
+			return other != null &&
+			       EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
+			       EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
+			       EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
+			       EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
+			       EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
+		}
+
+		/// <summary>
+		/// Returns a hashcode for this instance.
+		/// </summary>
+		/// <returns>hashcode for this instance</returns>
+		public override int GetHashCode ()
+		{
+			int hashCode = -1242460230;
+			hashCode = hashCode * -1521134295 + _normal.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _focus.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _hotNormal.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _hotFocus.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _disabled.GetHashCode ();
+			return hashCode;
+		}
+
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for equality.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns><c>true</c> if the two objects are equivalent</returns>
+		public static bool operator == (ColorScheme left, ColorScheme right)
+		{
+			return EqualityComparer<ColorScheme>.Default.Equals (left, right);
+		}
+
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for inequality.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns><c>true</c> if the two objects are not equivalent</returns>
+		public static bool operator != (ColorScheme left, ColorScheme right)
+		{
+			return !(left == right);
+		}
 	}
 
 	/// <summary>
 	/// The default <see cref="ColorScheme"/>s for the application.
 	/// </summary>
 	public static class Colors {
-		static ColorScheme _toplevel;
-		static ColorScheme _base;
-		static ColorScheme _dialog;
-		static ColorScheme _menu;
-		static ColorScheme _error;
+		static Colors ()
+		{
+			// Use reflection to dynamically create the default set of ColorSchemes from the list defiined 
+			// by the class. 
+			ColorSchemes = typeof (Colors).GetProperties ()
+				.Where (p => p.PropertyType == typeof (ColorScheme))
+				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme ())) // (ColorScheme)p.GetValue (p)))
+				.ToDictionary (t => t.Key, t => t.Value);
+		}
 
 		/// <summary>
 		/// The application toplevel color scheme, for the default toplevel views.
 		/// </summary>
-		public static ColorScheme TopLevel { get { return _toplevel; } set { _toplevel = SetColorScheme (value); } }
+		/// <remarks>
+		/// <para>
+		///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["TopLevel"];</c>
+		/// </para>
+		/// </remarks>
+		public static ColorScheme TopLevel { get => GetColorScheme (); set => SetColorScheme (value); }
 
 		/// <summary>
 		/// The base color scheme, for the default toplevel views.
 		/// </summary>
-		public static ColorScheme Base { get { return _base; } set { _base = SetColorScheme (value); } }
+		/// <remarks>
+		/// <para>
+		///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["Base"];</c>
+		/// </para>
+		/// </remarks>
+		public static ColorScheme Base { get => GetColorScheme (); set => SetColorScheme (value); }
 
 		/// <summary>
 		/// The dialog color scheme, for standard popup dialog boxes
 		/// </summary>
-		public static ColorScheme Dialog { get { return _dialog; } set { _dialog = SetColorScheme (value); } }
+		/// <remarks>
+		/// <para>
+		///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["Dialog"];</c>
+		/// </para>
+		/// </remarks>
+		public static ColorScheme Dialog { get => GetColorScheme (); set => SetColorScheme (value); }
 
 		/// <summary>
 		/// The menu bar color
 		/// </summary>
-		public static ColorScheme Menu { get { return _menu; } set { _menu = SetColorScheme (value); } }
+		/// <remarks>
+		/// <para>
+		///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["Menu"];</c>
+		/// </para>
+		/// </remarks>
+		public static ColorScheme Menu { get => GetColorScheme (); set => SetColorScheme (value); }
 
 		/// <summary>
 		/// The color scheme for showing errors.
 		/// </summary>
-		public static ColorScheme Error { get { return _error; } set { _error = SetColorScheme (value); } }
+		/// <remarks>
+		/// <para>
+		///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["Error"];</c>
+		/// </para>
+		/// </remarks>
+		public static ColorScheme Error { get => GetColorScheme (); set => SetColorScheme (value); }
 
-		static ColorScheme SetColorScheme (ColorScheme colorScheme, [CallerMemberName] string callerMemberName = null)
+		static ColorScheme GetColorScheme ([CallerMemberName] string callerMemberName = null)
 		{
-			colorScheme.caller = callerMemberName;
-			return colorScheme;
+			return ColorSchemes [callerMemberName];
 		}
+
+		static void SetColorScheme (ColorScheme colorScheme, [CallerMemberName] string callerMemberName = null)
+		{
+			ColorSchemes [callerMemberName] = colorScheme;
+			colorScheme.caller = callerMemberName;
+		}
+
+		/// <summary>
+		/// Provides the defined <see cref="ColorScheme"/>s.
+		/// </summary>
+		public static Dictionary<string, ColorScheme> ColorSchemes { get; }
 	}
 
 	///// <summary>
@@ -535,7 +638,7 @@ namespace Terminal.Gui {
 		public virtual void DrawWindowTitle (Rect region, ustring title, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom, TextAlignment textAlignment = TextAlignment.Left)
 		{
 			var width = region.Width - (paddingLeft + 2) * 2;
-			if (!ustring.IsNullOrEmpty(title) && width > 4 && region.Y + paddingTop <= region.Y + paddingBottom) {
+			if (!ustring.IsNullOrEmpty (title) && width > 4 && region.Y + paddingTop <= region.Y + paddingBottom) {
 				Move (region.X + 1 + paddingLeft, region.Y + paddingTop);
 				AddRune (' ');
 				var str = title.Length >= width ? title [0, width - 2] : title;
@@ -548,16 +651,16 @@ namespace Terminal.Gui {
 		/// Enables diagnostic funcions
 		/// </summary>
 		[Flags]
-		public enum DiagnosticFlags : uint { 
+		public enum DiagnosticFlags : uint {
 			/// <summary>
 			/// All diagnostics off
 			/// </summary>
-			Off		= 0b_0000_0000,
+			Off = 0b_0000_0000,
 			/// <summary>
 			/// When enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/> will draw a 
 			/// ruler in the frame for any side with a padding value greater than 0.
 			/// </summary>
-			FrameRuler	= 0b_0000_0001,
+			FrameRuler = 0b_0000_0001,
 			/// <summary>
 			/// When Enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/> will use
 			/// 'L', 'R', 'T', and 'B' for padding instead of ' '.
@@ -744,7 +847,7 @@ namespace Terminal.Gui {
 		{
 			// DrawFrame assumes the border is always at least one row/col thick
 			// DrawWindowFrame assumes a padding of 0 means NO padding and no frame
-			DrawWindowFrame (new Rect (region.X, region.Y, region.Width, region.Height), 
+			DrawWindowFrame (new Rect (region.X, region.Y, region.Width, region.Height),
 				padding + 1, padding + 1, padding + 1, padding + 1, border: false, fill: fill);
 		}
 

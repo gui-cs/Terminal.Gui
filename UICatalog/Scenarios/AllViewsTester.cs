@@ -36,7 +36,7 @@ namespace UICatalog {
 		TextField _hText;
 		int _hVal = 0;
 
-		public override void Init (Toplevel top)
+		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
 			Application.Init ();
 

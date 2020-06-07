@@ -340,9 +340,21 @@ The <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> <a class="xre
   
   
   <a id="Terminal_Gui_CheckBox__ctor_" data-uid="Terminal.Gui.CheckBox.#ctor*"></a>
+  <h4 id="Terminal_Gui_CheckBox__ctor" data-uid="Terminal.Gui.CheckBox.#ctor">CheckBox()</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> based on the given text, using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CheckBox()</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_CheckBox__ctor_" data-uid="Terminal.Gui.CheckBox.#ctor*"></a>
   <h4 id="Terminal_Gui_CheckBox__ctor_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.CheckBox.#ctor(NStack.ustring,System.Boolean)">CheckBox(ustring, Boolean)</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> based on the given text, uses Computed layout and sets the height and width.
+Initializes a new instance of <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> based on the given text, using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -376,7 +388,7 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.CheckBox.html">
   <a id="Terminal_Gui_CheckBox__ctor_" data-uid="Terminal.Gui.CheckBox.#ctor*"></a>
   <h4 id="Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_NStack_ustring_" data-uid="Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,NStack.ustring)">CheckBox(Int32, Int32, ustring)</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> based on the given text at the given position and a state.
+Initializes a new instance of <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> layout.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -420,7 +432,7 @@ text length. This <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a>
   <a id="Terminal_Gui_CheckBox__ctor_" data-uid="Terminal.Gui.CheckBox.#ctor*"></a>
   <h4 id="Terminal_Gui_CheckBox__ctor_System_Int32_System_Int32_NStack_ustring_System_Boolean_" data-uid="Terminal.Gui.CheckBox.#ctor(System.Int32,System.Int32,NStack.ustring,System.Boolean)">CheckBox(Int32, Int32, ustring, Boolean)</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> based on the given text at the given position and a state.
+Initializes a new instance of <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> layout.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -463,6 +475,40 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.CheckBox.html">
   <div class="markdown level1 remarks">
 The size of <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> is computed based on the
 text length. 
+</div>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_CheckBox_Toggled" data-uid="Terminal.Gui.CheckBox.Toggled">Toggled</h4>
+  <div class="markdown level1 summary">
+Toggled event, raised when the <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a>  is toggled.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Action&lt;bool&gt; Toggled</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<span class="xref">System.Boolean</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_CheckBox_Toggled_remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+Client code can hook up to this event, it is
+raised when the <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> is activated either with
+the mouse or the keyboard. The passed <code>bool</code> contains the previous state. 
 </div>
   <h3 id="properties">Properties
   </h3>
@@ -721,40 +767,6 @@ Redraws this view and its subviews; only redraws the views that have been flagge
    Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
    larger than the <code>region</code> parameter.
 </p>
-</div>
-  <h3 id="events">Events
-  </h3>
-  
-  
-  <h4 id="Terminal_Gui_CheckBox_Toggled" data-uid="Terminal.Gui.CheckBox.Toggled">Toggled</h4>
-  <div class="markdown level1 summary">
-Toggled event, raised when the <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a>  is toggled.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public event EventHandler&lt;bool&gt; Toggled</code></pre>
-  </div>
-  <h5 class="eventType">Event Type</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.EventHandler</span>&lt;<span class="xref">System.Boolean</span>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 id="Terminal_Gui_CheckBox_Toggled_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Client code can hook up to this event, it is
-raised when the <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> is activated either with
-the mouse or the keyboard. The passed <code>bool</code> contains the previous state. 
 </div>
   <h3 id="implements">Implements</h3>
   <div>

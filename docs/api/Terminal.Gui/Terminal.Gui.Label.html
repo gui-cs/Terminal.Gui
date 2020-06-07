@@ -349,9 +349,32 @@ The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a stri
   
   
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
+  <h4 id="Terminal_Gui_Label__ctor" data-uid="Terminal.Gui.Label.#ctor">Label()</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of <a class="xref" href="Terminal.Gui.Label.html">Label</a> using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Label()</code></pre>
+  </div>
+  <h5 id="Terminal_Gui_Label__ctor_remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  The <a class="xref" href="Terminal.Gui.Label.html">Label</a> will be created using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a>
+  coordinates. The initial size (<a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> will be 
+  adjusted to fit the contents of <a class="xref" href="Terminal.Gui.Label.html#Terminal_Gui_Label_Text">Text</a>, including newlines (&apos;\n&apos;) for multiple lines. 
+</p>
+<p>
+  No line wraping is provided.
+</p>
+</div>
+  
+  
+  <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
   <h4 id="Terminal_Gui_Label__ctor_NStack_ustring_" data-uid="Terminal.Gui.Label.#ctor(NStack.ustring)">Label(ustring)</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of <a class="xref" href="Terminal.Gui.Label.html">Label</a> and configures the default Width and Height based on the text, the result is suitable for Computed layout.
+Initializes a new instance of <a class="xref" href="Terminal.Gui.Label.html">Label</a> using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -371,19 +394,27 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.Label.html">Lab
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
         <td><span class="parametername">text</span></td>
-        <td>Text.</td>
+        <td>text to initialize the <a class="xref" href="Terminal.Gui.Label.html#Terminal_Gui_Label_Text">Text</a> property with.</td>
       </tr>
     </tbody>
   </table>
+  <h5 id="Terminal_Gui_Label__ctor_NStack_ustring__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  The <a class="xref" href="Terminal.Gui.Label.html">Label</a> will be created using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a>
+  coordinates with the given string. The initial size (<a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> will be 
+  adjusted to fit the contents of <a class="xref" href="Terminal.Gui.Label.html#Terminal_Gui_Label_Text">Text</a>, including newlines (&apos;\n&apos;) for multiple lines. 
+</p>
+<p>
+  No line wraping is provided.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
   <h4 id="Terminal_Gui_Label__ctor_System_Int32_System_Int32_NStack_ustring_" data-uid="Terminal.Gui.Label.#ctor(System.Int32,System.Int32,NStack.ustring)">Label(Int32, Int32, ustring)</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of <a class="xref" href="Terminal.Gui.Label.html">Label</a> at the given
-coordinate with the given string, computes the bounding box
-based on the size of the string, assumes that the string contains
-newlines for multiple lines, no special breaking rules are used.
+Initializes a new instance of <a class="xref" href="Terminal.Gui.Label.html">Label</a> using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> layout.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -403,28 +434,37 @@ newlines for multiple lines, no special breaking rules are used.
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">x</span></td>
-        <td></td>
+        <td>column to locate the Label.</td>
       </tr>
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">y</span></td>
-        <td></td>
+        <td>row to locate the Label.</td>
       </tr>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
         <td><span class="parametername">text</span></td>
-        <td></td>
+        <td>text to initialize the <a class="xref" href="Terminal.Gui.Label.html#Terminal_Gui_Label_Text">Text</a> property with.</td>
       </tr>
     </tbody>
   </table>
+  <h5 id="Terminal_Gui_Label__ctor_System_Int32_System_Int32_NStack_ustring__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  The <a class="xref" href="Terminal.Gui.Label.html">Label</a> will be created at the given
+  coordinates with the given string. The size (<a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> will be 
+  adjusted to fit the contents of <a class="xref" href="Terminal.Gui.Label.html#Terminal_Gui_Label_Text">Text</a>, including newlines (&apos;\n&apos;) for multiple lines. 
+</p>
+<p>
+  No line wraping is provided.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
   <h4 id="Terminal_Gui_Label__ctor_Terminal_Gui_Rect_NStack_ustring_" data-uid="Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,NStack.ustring)">Label(Rect, ustring)</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of <a class="xref" href="Terminal.Gui.Label.html">Label</a> at the given
-coordinate with the given string and uses the specified
-frame for the string.
+Initializes a new instance of <a class="xref" href="Terminal.Gui.Label.html">Label</a> using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> layout.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -444,15 +484,26 @@ frame for the string.
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">rect</span></td>
-        <td></td>
+        <td>Location.</td>
       </tr>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
         <td><span class="parametername">text</span></td>
-        <td></td>
+        <td>text to initialize the <a class="xref" href="Terminal.Gui.Label.html#Terminal_Gui_Label_Text">Text</a> property with.</td>
       </tr>
     </tbody>
   </table>
+  <h5 id="Terminal_Gui_Label__ctor_Terminal_Gui_Rect_NStack_ustring__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  The <a class="xref" href="Terminal.Gui.Label.html">Label</a> will be created at the given
+  coordinates with the given string. The initial size (<a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> will be 
+  adjusted to fit the contents of <a class="xref" href="Terminal.Gui.Label.html#Terminal_Gui_Label_Text">Text</a>, including newlines (&apos;\n&apos;) for multiple lines. 
+</p>
+<p>
+  No line wraping is provided.
+</p>
+</div>
   <h3 id="properties">Properties
   </h3>
   
@@ -487,7 +538,7 @@ The text displayed by the <a class="xref" href="Terminal.Gui.Label.html">Label</
   <a id="Terminal_Gui_Label_TextAlignment_" data-uid="Terminal.Gui.Label.TextAlignment*"></a>
   <h4 id="Terminal_Gui_Label_TextAlignment" data-uid="Terminal.Gui.Label.TextAlignment">TextAlignment</h4>
   <div class="markdown level1 summary">
-Controls the text-alignemtn property of the label, changing it will redisplay the <a class="xref" href="Terminal.Gui.Label.html">Label</a>.
+Controls the text-alignment property of the label, changing it will redisplay the <a class="xref" href="Terminal.Gui.Label.html">Label</a>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -543,7 +594,7 @@ The color used for the <a class="xref" href="Terminal.Gui.Label.html">Label</a>.
   <a id="Terminal_Gui_Label_MaxWidth_" data-uid="Terminal.Gui.Label.MaxWidth*"></a>
   <h4 id="Terminal_Gui_Label_MaxWidth_NStack_ustring_System_Int32_" data-uid="Terminal.Gui.Label.MaxWidth(NStack.ustring,System.Int32)">MaxWidth(ustring, Int32)</h4>
   <div class="markdown level1 summary">
-Computes the the max width of a line or multilines needed to render by the Label control
+Computes the max width of a line or multilines needed to render by the Label control
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>

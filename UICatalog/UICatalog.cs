@@ -65,13 +65,13 @@ namespace UICatalog {
 			if (Debugger.IsAttached)
 				CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 
-			_scenarios = Scenario.GetDerivedClassesCollection ().OrderBy (t => Scenario.ScenarioMetadata.GetName (t)).ToList ();
+			_scenarios = Scenario.GetDerivedClasses<Scenario> ().OrderBy (t => Scenario.ScenarioMetadata.GetName (t)).ToList ();
 
 			if (args.Length > 0) {
 				var item = _scenarios.FindIndex (t => Scenario.ScenarioMetadata.GetName (t).Equals (args [0], StringComparison.OrdinalIgnoreCase));
 				_runningScenario = (Scenario)Activator.CreateInstance (_scenarios [item]);
 				Application.Init ();
-				_runningScenario.Init (Application.Top);
+				_runningScenario.Init (Application.Top, _baseColorScheme);
 				_runningScenario.Setup ();
 				_runningScenario.Run ();
 				_runningScenario = null;
@@ -82,7 +82,7 @@ namespace UICatalog {
 			while (scenario != null) {
 				Application.UseSystemConsole = _useSystemConsole;
 				Application.Init ();
-				scenario.Init (Application.Top);
+				scenario.Init (Application.Top, _baseColorScheme);
 				scenario.Setup ();
 				scenario.Run ();
 				scenario = GetScenarioToRun ();
@@ -123,27 +123,83 @@ namespace UICatalog {
 			return _runningScenario;
 		}
 
-		static MenuItem CheckedMenuMenuItem(ustring menuItem, Action action, Func<bool> checkFunction)
+		static MenuItem [] CreateDiagnosticMenuItems ()
 		{
-			var mi = new MenuItem ();
-			mi.Title = $"[{(checkFunction () ? 'x' : ' ')}] {menuItem}"; 
-			mi.Action = () => {
-				action?.Invoke ();
-				mi.Title = $"[{(checkFunction () ? 'x' : ' ')}] {menuItem}";
+			MenuItem CheckedMenuMenuItem (ustring menuItem, Action action, Func<bool> checkFunction)
+			{
+				var mi = new MenuItem ();
+				mi.Title = menuItem;
+				mi.CheckType |= MenuItemCheckStyle.Checked;
+				mi.Checked = checkFunction ();
+				mi.Action = () => {
+					action?.Invoke ();
+					mi.Title = menuItem;
+					mi.Checked = checkFunction ();
+				};
+				return mi;
+			}
+
+			return new MenuItem [] {
+				CheckedMenuMenuItem ("Use _System Console",
+					() => {
+						_useSystemConsole = !_useSystemConsole;
+					},
+					() => _useSystemConsole),
+				CheckedMenuMenuItem ("Diagnostics: _Frame Padding",
+					() => {
+						ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FramePadding;
+						_top.SetNeedsDisplay ();
+					},
+					() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FramePadding) == ConsoleDriver.DiagnosticFlags.FramePadding),
+				CheckedMenuMenuItem ("Diagnostics: Frame _Ruler",
+					() => {
+						ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
+						_top.SetNeedsDisplay ();
+					},
+					() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler),
 			};
-			return mi;
 		}
 
+		static void SetColorScheme ()
+		{
+			_leftPane.ColorScheme = _baseColorScheme;
+			_rightPane.ColorScheme = _baseColorScheme;
+			_top?.SetNeedsDisplay ();
+		}
+
+		static ColorScheme _baseColorScheme;
+		static MenuItem [] CreateColorSchemeMenuItems ()
+		{
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			foreach (var sc in Colors.ColorSchemes) {
+				var item = new MenuItem ();
+				item.Title = sc.Key;
+				item.CheckType |= MenuItemCheckStyle.Radio;
+				item.Checked = sc.Value == _baseColorScheme;
+				item.Action += () => {
+					_baseColorScheme = sc.Value;
+					SetColorScheme ();
+					foreach (var menuItem in menuItems) {
+						menuItem.Checked = menuItem.Title.Equals (sc.Key) && sc.Value == _baseColorScheme;
+					}
+				};
+				menuItems.Add (item);
+			}
+			return menuItems.ToArray ();
+		}
 
 		/// <summary>
 		/// Create all controls. This gets called once and the controls remain with their state between Sceanrio runs.
 		/// </summary>
 		private static void Setup ()
 		{
+			// Set this here because not initilzied until driver is loaded
+			_baseColorScheme = Colors.Base;
+
 			StringBuilder aboutMessage = new StringBuilder ();
 			aboutMessage.AppendLine ("UI Catalog is a comprehensive sample library for Terminal.Gui");
 			aboutMessage.AppendLine ("");
-			aboutMessage.AppendLine ($"Version: {typeof(UICatalogApp).Assembly.GetName ().Version}");
+			aboutMessage.AppendLine ($"Version: {typeof (UICatalogApp).Assembly.GetName ().Version}");
 			aboutMessage.AppendLine ($"Using Terminal.Gui Version: {typeof (Terminal.Gui.Application).Assembly.GetName ().Version}");
 			aboutMessage.AppendLine ("");
 
@@ -151,26 +207,8 @@ namespace UICatalog {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Application.RequestStop() )
 				}),
-				new MenuBarItem ("_Settings", new MenuItem [] { 
-					CheckedMenuMenuItem ("Use _System Console", 
-						() => {
-							_useSystemConsole = !_useSystemConsole;
-						},
-						() => _useSystemConsole),
-					CheckedMenuMenuItem ("Diagnostics: _Frame Padding",
-						() => {
-							ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FramePadding;
-							_top.SetNeedsDisplay ();
-						},
-						() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FramePadding) == ConsoleDriver.DiagnosticFlags.FramePadding),
-					CheckedMenuMenuItem ("Diagnostics: Frame _Ruler",
-						() => {
-							ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
-							_top.SetNeedsDisplay ();
-						},
-						() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler),
-
-				}),
+				new MenuBarItem ("_Color Scheme", CreateColorSchemeMenuItems()),
+				new MenuBarItem ("_Diagostics", CreateDiagnosticMenuItems()),
 				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "Ok")),
 			});
 
@@ -242,6 +280,8 @@ namespace UICatalog {
 				_numlock,
 				_scrolllock
 			});
+
+			SetColorScheme ();
 		}
 
 		private static void _scenarioListView_OpenSelectedItem (EventArgs e)

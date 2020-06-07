@@ -13,6 +13,18 @@
       "is_incremental": false
     },
     {
+      "type": "Conceptual",
+      "source_relative_path": "README.md",
+      "output": {
+        ".html": {
+          "relative_path": "README.html",
+          "hash": "ZNWj7Keb9nnimeEnyAOYUA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
       "type": "ManagedReference",
       "source_relative_path": "api/Terminal.Gui/Terminal.Gui.Application.ResizedEventArgs.yml",
       "output": {
@@ -42,7 +54,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.Application.html",
-          "hash": "yPT23nVjyZPKhFMNBFXA/Q=="
+          "hash": "fARh1sAi9mVvDO4njhQoVQ=="
         }
       },
       "is_incremental": false,
@@ -66,7 +78,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.Button.html",
-          "hash": "Ogiqw8WWs3e+tiBkNjtoaA=="
+          "hash": "JP7JSVQ+ZEdPirUWmKM3Ig=="
         }
       },
       "is_incremental": false,
@@ -78,7 +90,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.CheckBox.html",
-          "hash": "auuTn/N2r9yNW5gVjlaxBQ=="
+          "hash": "2f+GTmKh3LS4mYNW+RRgzg=="
         }
       },
       "is_incremental": false,
@@ -114,7 +126,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.ColorScheme.html",
-          "hash": "/m1p7mkCfhxfWF/1g4FKGg=="
+          "hash": "ikJdUUFpWNGP19zLelgwpA=="
         }
       },
       "is_incremental": false,
@@ -126,7 +138,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.Colors.html",
-          "hash": "Bx9dNWviBgnJM/d5WbDiKA=="
+          "hash": "jdvghEaPgQ43Q0Y+0fGx3A=="
         }
       },
       "is_incremental": false,
@@ -134,11 +146,11 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/Terminal.Gui/Terminal.Gui.ComboBox.yml",
+      "source_relative_path": "api/Terminal.Gui/Terminal.Gui.ConsoleDriver.DiagnosticFlags.yml",
       "output": {
         ".html": {
-          "relative_path": "api/Terminal.Gui/Terminal.Gui.ComboBox.html",
-          "hash": "4cdRAEyCUS1eq3/oAy6x4A=="
+          "relative_path": "api/Terminal.Gui/Terminal.Gui.ConsoleDriver.DiagnosticFlags.html",
+          "hash": "Gjak4HZYvUEGplSOOJkrPA=="
         }
       },
       "is_incremental": false,
@@ -150,7 +162,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html",
-          "hash": "X+nt7JANZ9ERlUPPbFhEbA=="
+          "hash": "dhoJEMO0bOaS0UbKmKmQiA=="
         }
       },
       "is_incremental": false,
@@ -162,7 +174,19 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.DateField.html",
-          "hash": "0ZzeifsaibVtiJrH53dOtQ=="
+          "hash": "LtjPFFVJqQ2swG72M1oFPw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Terminal.Gui/Terminal.Gui.DateTimeEventArgs-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Terminal.Gui/Terminal.Gui.DateTimeEventArgs-1.html",
+          "hash": "EWjyC9dagGbxsKhy4/3CwQ=="
         }
       },
       "is_incremental": false,
@@ -174,7 +198,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.Dialog.html",
-          "hash": "8IkU8xj3u5Np/IOe2kBDMg=="
+          "hash": "nRDxJCg4pxKPaLR6nfhqhg=="
         }
       },
       "is_incremental": false,
@@ -198,7 +222,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.FileDialog.html",
-          "hash": "id0zrYgEoIqU5dH1N5xnLA=="
+          "hash": "6oZtG06CR3XvxkqNHt0xKg=="
         }
       },
       "is_incremental": false,
@@ -210,7 +234,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.FrameView.html",
-          "hash": "4Q6FKv69/GJr9tWj2vJ2eA=="
+          "hash": "kYKDr+eFa+9jcRHQsa8Cbw=="
         }
       },
       "is_incremental": false,
@@ -222,7 +246,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.HexView.html",
-          "hash": "vEBheuK6RqqBCFPRz/YL9Q=="
+          "hash": "cu93iigonJelPkYGL/2hSQ=="
         }
       },
       "is_incremental": false,
@@ -294,7 +318,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.Label.html",
-          "hash": "cOTYMYU6aH58f+TUm8kjZw=="
+          "hash": "NEqw4H6e+i0RDOEYl0fvfQ=="
         }
       },
       "is_incremental": false,
@@ -318,7 +342,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.ListView.html",
-          "hash": "0QkPauXHsAQht7uuiECH/g=="
+          "hash": "qzUlc3yC1U6B73xqSasS4g=="
         }
       },
       "is_incremental": false,
@@ -366,7 +390,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.MenuBar.html",
-          "hash": "AMuhNj4f31WAXMYfYJfXmA=="
+          "hash": "FU2YbkrcJuSAaDQEp80hEw=="
         }
       },
       "is_incremental": false,
@@ -378,7 +402,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.MenuBarItem.html",
-          "hash": "tfd6DeqkD85Ld073N5IrPQ=="
+          "hash": "3fOiQK8zgoAWL6jZZs4KwQ=="
         }
       },
       "is_incremental": false,
@@ -390,7 +414,19 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.MenuItem.html",
-          "hash": "xjtvXspzEBQ01Okag72ieQ=="
+          "hash": "bXs4I5zGjIJ2PW5F4rfWFw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Terminal.Gui/Terminal.Gui.MenuItemCheckStyle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Terminal.Gui/Terminal.Gui.MenuItemCheckStyle.html",
+          "hash": "5nz1fNDNWRvy3XLHjizpAg=="
         }
       },
       "is_incremental": false,
@@ -438,7 +474,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.OpenDialog.html",
-          "hash": "tzugxtbiVumOB/XMJdOlhQ=="
+          "hash": "KF54W477DjtoSNTxAEfVKQ=="
         }
       },
       "is_incremental": false,
@@ -486,7 +522,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.RadioGroup.html",
-          "hash": "/BRdhsdF75VLMpGQ343/Pw=="
+          "hash": "vBINNYcovVZsPCeeQJ6hkg=="
         }
       },
       "is_incremental": false,
@@ -522,7 +558,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.SaveDialog.html",
-          "hash": "GLqBSO8BXFaL9XtwPDLFMQ=="
+          "hash": "VeJI6dg9oMDQoljq2mMmaw=="
         }
       },
       "is_incremental": false,
@@ -534,7 +570,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.ScrollBarView.html",
-          "hash": "DXaxZYGJtmaSfHa3Jk+gyA=="
+          "hash": "cKcQrIjTipLfa12zUmaGIw=="
         }
       },
       "is_incremental": false,
@@ -570,7 +606,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.StatusBar.html",
-          "hash": "aQwab8aCzg9DO76j0n0Lug=="
+          "hash": "F2an0YhK+5E90fIox4ZQbQ=="
         }
       },
       "is_incremental": false,
@@ -606,7 +642,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.TextField.html",
-          "hash": "8gROGNtihilMdFc8s8+RwQ=="
+          "hash": "gGuMEPA6DpdBQhOqRiT9tg=="
         }
       },
       "is_incremental": false,
@@ -618,7 +654,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.TextView.html",
-          "hash": "m3SbJApjDnN5g23jI+i4Qg=="
+          "hash": "cSi0H6iy456dpV1NewZX8g=="
         }
       },
       "is_incremental": false,
@@ -630,7 +666,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.TimeField.html",
-          "hash": "6GP1VF2MyslnpnjVPryQ6w=="
+          "hash": "psuavSpiD7buDIXC/Tck/g=="
         }
       },
       "is_incremental": false,
@@ -642,7 +678,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.Toplevel.html",
-          "hash": "WW9db75HQNY0g8B19rcKlQ=="
+          "hash": "QUT/pHW9oW3ZC6H9B9Dx5Q=="
         }
       },
       "is_incremental": false,
@@ -686,11 +722,11 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/Terminal.Gui/Terminal.Gui.View.MouseEventEventArgs.yml",
+      "source_relative_path": "api/Terminal.Gui/Terminal.Gui.View.MouseEventArgs.yml",
       "output": {
         ".html": {
-          "relative_path": "api/Terminal.Gui/Terminal.Gui.View.MouseEventEventArgs.html",
-          "hash": "R/fGr5MHs5ViyZLr9vWTew=="
+          "relative_path": "api/Terminal.Gui/Terminal.Gui.View.MouseEventArgs.html",
+          "hash": "R2Pu4hBP/n1Vxx6ZLK2TMg=="
         }
       },
       "is_incremental": false,
@@ -702,7 +738,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.View.html",
-          "hash": "ikbU1rHcs2278LHBdTs0fA=="
+          "hash": "9eKYIhhrWETCAB+q/eq/7g=="
         }
       },
       "is_incremental": false,
@@ -714,7 +750,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.Window.html",
-          "hash": "zCor4GcEaC6RRQktnRbrSw=="
+          "hash": "M2AZrjvx0KyFwrVYRvesZQ=="
         }
       },
       "is_incremental": false,
@@ -726,7 +762,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.html",
-          "hash": "wZ1rqO5BrtIBjwKdmWfilw=="
+          "hash": "+KEWr9JtXCbQPqPQdw+4VA=="
         }
       },
       "is_incremental": false,
@@ -798,7 +834,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/toc.html",
-          "hash": "AeVJEcZauvo0OGUU2pTugA=="
+          "hash": "9QEYOK/IUcWRgIsSiRS48g=="
         }
       },
       "is_incremental": false,
@@ -834,7 +870,7 @@
       "output": {
         ".html": {
           "relative_path": "api/UICatalog/UICatalog.Scenario.html",
-          "hash": "eD4XtFKWa75qkI0x4AAPQA=="
+          "hash": "ZtOB4RKijHt3z8AVd/Mokg=="
         }
       },
       "is_incremental": false,
@@ -858,7 +894,7 @@
       "output": {
         ".html": {
           "relative_path": "api/UICatalog/UICatalog.html",
-          "hash": "GlhimAyigvEtjpSbjREqVw=="
+          "hash": "mrr60lZ3RQ5d0uEMORxsMQ=="
         }
       },
       "is_incremental": false,
@@ -979,7 +1015,7 @@
       "output": {
         ".html": {
           "relative_path": "index.html",
-          "hash": "LJXc9TSmTbQr+X1vAQ+VbA=="
+          "hash": "OA0N92augX9lyGKkxcGmWg=="
         }
       },
       "is_incremental": false,
@@ -1010,14 +1046,14 @@
         "ConceptualDocumentProcessor": {
           "can_incremental": true,
           "incrementalPhase": "build",
-          "total_file_count": 6,
-          "skipped_file_count": 6
+          "total_file_count": 7,
+          "skipped_file_count": 7
         },
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": true,
           "incrementalPhase": "build",
-          "total_file_count": 70,
-          "skipped_file_count": 70
+          "total_file_count": 72,
+          "skipped_file_count": 72
         },
         "ResourceDocumentProcessor": {
           "can_incremental": false,
