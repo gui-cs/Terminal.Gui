@@ -126,12 +126,41 @@ namespace UICatalog {
 		static MenuItem CheckedMenuMenuItem(ustring menuItem, Action action, Func<bool> checkFunction)
 		{
 			var mi = new MenuItem ();
-			mi.Title = $"[{(checkFunction () ? 'x' : ' ')}] {menuItem}"; 
+			mi.Title = $"{(checkFunction () ? (char)0x25cf : (char)0x25cc)} {menuItem}"; 
 			mi.Action = () => {
 				action?.Invoke ();
-				mi.Title = $"[{(checkFunction () ? 'x' : ' ')}] {menuItem}";
+				mi.Title = $"{(checkFunction () ? (char)0x25cf : (char)0x25cc)} {menuItem}";
 			};
 			return mi;
+		}
+
+
+		static MenuItem RadioMenuItem (ustring menuItem, Action action, Func<bool> checkFunction)
+		{
+			var mi = new MenuItem ();
+			mi.Title = $"{(checkFunction () ? (char)0x25cf : (char)0x25cc)} {menuItem}";
+			mi.Action = () => {
+				action?.Invoke ();
+				mi.Title = $"{(checkFunction () ? (char)0x25cf : (char)0x25cc)} {menuItem}";
+			};
+			return mi;
+		}
+		static ColorScheme _defaultColorScheme = Colors.ColorSchemes.Values.First ();
+		static MenuItem[] GetColorSchemeMenuItems ()
+		{
+			var menuItems = Colors.ColorSchemes.Select (s => RadioMenuItem (s.Key, () => {
+				_defaultColorScheme = s.Value;
+			//	SetSelection (s.Key, s.Value);
+			}, () => _defaultColorScheme == s.Value)).ToArray ();
+
+			//void SetSelection (string key, ColorScheme cs)
+			//{
+			//	foreach(var menu in menuItems) {
+			//		menu.Title = $"{(cs == _defaultColorScheme ? (char)0x25cf : (char)0x25cc)} {key}";
+			//	}
+			//}
+
+			return menuItems;
 		}
 
 
@@ -152,6 +181,7 @@ namespace UICatalog {
 					new MenuItem ("_Quit", "", () => Application.RequestStop() )
 				}),
 				new MenuBarItem ("_Settings", new MenuItem [] { 
+					new MenuItem("Primary Color Scheme", new MenuBarItem(GetColorSchemeMenuItems())),
 					CheckedMenuMenuItem ("Use _System Console", 
 						() => {
 							_useSystemConsole = !_useSystemConsole;
