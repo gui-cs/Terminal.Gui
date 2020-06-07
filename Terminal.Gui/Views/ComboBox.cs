@@ -6,16 +6,18 @@
 //
 
 using System;
-using System.Linq;
-using System.Collections.Generic;
-using NStack;
 using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
 	/// ComboBox control
 	/// </summary>
 	public class ComboBox : View {
+
 
 		IListDataSource source;
 		/// <summary>
@@ -56,9 +58,8 @@ namespace Terminal.Gui {
 		///   Client code can hook up to this event, it is
 		///   raised when the selection has been confirmed.
 		/// </remarks>
-		public event EventHandler<ustring> Changed;
+		public event EventHandler<ustring> SelectedItemChanged;
 
-		//IList<string> listsource;
 		IList searchset;
 		ustring text = "";
 		TextField search;
@@ -109,10 +110,11 @@ namespace Terminal.Gui {
 		{
 			search.TextChanged += Search_Changed;
 
+			// On resize
 			LayoutComplete += (LayoutEventArgs a) => {
 
-				search.Width = Frame.Width;
-				listview.Width = Frame.Width - 1;
+				search.Width = Bounds.Width;
+				listview.Width = Bounds.Width - 1;
 			};
 
 			listview.SelectedItemChanged += (ListViewItemEventArgs e) => {
@@ -121,7 +123,6 @@ namespace Terminal.Gui {
 					SetValue ((string)searchset [listview.SelectedItem]);
 			};
 
-			// TODO: LayoutComplete event breaks cursor up/down. Revert to Application.Loaded 
 			Application.Loaded += (Application.ResizedEventArgs a) => {
 				// Determine if this view is hosted inside a dialog
 				for (View view = this.SuperView; view != null; view = view.SuperView) {
@@ -184,7 +185,7 @@ namespace Terminal.Gui {
 			if (e.MouseEvent.Flags != MouseFlags.Button1Clicked)
 				return;
 
-			SuperView.SetFocus ((View)search);
+			SuperView.SetFocus (search);
 		}
 
 		///<inheritdoc/>
@@ -194,6 +195,19 @@ namespace Terminal.Gui {
 				this.SetFocus (search);
 
 			search.CursorPosition = search.Text.Length;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Invokes the SelectedChanged event if it is defined.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool OnSelectedChanged ()
+		{
+			// Note: Cannot rely on "listview.SelectedItem != lastSelectedItem" because the list is dynamic. 
+			// So we cannot optimize. Ie: Don't call if not changed
+			SelectedItemChanged?.Invoke (this, search.Text);
 
 			return true;
 		}
@@ -215,7 +229,7 @@ namespace Terminal.Gui {
 				SetValue((string)searchset [listview.SelectedItem]);
 				search.CursorPosition = search.Text.Length;
 				Search_Changed (search.Text);
-				Changed?.Invoke (this, text);
+				OnSelectedChanged ();
 
 				searchset.Clear();
 				listview.Clear ();
@@ -244,7 +258,7 @@ namespace Terminal.Gui {
 			if (e.Key == Key.Esc) {
 				this.SetFocus (search);
 				search.Text = text = "";
-				Changed?.Invoke (this, search.Text);
+				OnSelectedChanged ();
 				return true;
 			}
 
@@ -286,7 +300,7 @@ namespace Terminal.Gui {
 		private void Reset()
 		{
 			search.Text = text = "";
-			Changed?.Invoke (this, search.Text);
+			OnSelectedChanged();
 
 			ResetSearchSet ();
 

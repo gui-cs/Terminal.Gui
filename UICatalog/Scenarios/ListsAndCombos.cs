@@ -53,7 +53,7 @@ namespace UICatalog.Scenarios {
 			};
 			comboBox.SetSource (items);
 
-			comboBox.Changed += (object sender, ustring text) => lbComboBox.Text = text;
+			comboBox.SelectedItemChanged += (object sender, ustring text) => lbComboBox.Text = text;
 			Win.Add (lbComboBox, comboBox);
 		}
 	}
