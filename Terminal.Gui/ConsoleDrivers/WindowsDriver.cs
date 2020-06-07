@@ -487,16 +487,16 @@ namespace Terminal.Gui {
 
 			HLine = '\u2500';
 			VLine = '\u2502';
-			Stipple = '\u2592';
-			Diamond = '\u25c6';
+			Stipple = '\u2591';
+			Diamond = '\u25ca';
 			ULCorner = '\u250C';
 			LLCorner = '\u2514';
 			URCorner = '\u2510';
 			LRCorner = '\u2518';
 			LeftTee = '\u251c';
 			RightTee = '\u2524';
-			TopTee = '\u22a4';
-			BottomTee = '\u22a5';
+			TopTee = '\u252c';
+			BottomTee = '\u2534';
 			Checked = '\u221a';
 			UnChecked = ' ';
 			Selected = '\u25cf';
