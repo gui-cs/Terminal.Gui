@@ -10,6 +10,10 @@ A simple toolkit for buiding console GUI apps for .NET, .NET Core, and Mono that
 
 ![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.gif)
 
+## IMPORTANT RELEASE INFO
+
+We are actively converging on a major update to Terminal.Gui. The most recent released Nuget package is version `0.81` which is way behind `master`. This README and the API Documentation refers to the latest build from `master`. If you want the latest and greatest functionality, clone and build locally. Otherwise `0.81` is quite stable, but the documentation may not match.
+
 ## Controls & Features
 
 The *Terminal.Gui* toolkit contains various controls for building text user interfaces:
@@ -176,13 +180,14 @@ The example above shows how to add views using both styles of layout supported b
 
 ## Installing
 
+*We are actively converging on a major update to Terminal.Gui. The most recent released Nuget package is version `0.81` which is way behind `master`. This README and the API Documentation refers to the latest build from `master`. If you want the latest and greatest functionality, clone and build locally. Otherwise `0.81` is quite stable, but the documentation may not match.*
+
 Use NuGet to install the `Terminal.Gui` NuGet package: https://www.nuget.org/packages/Terminal.Gui
 
 ## Running and Building
 
-* Windows - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory) or open `Terminal.Gui.sln` with Visual Studio 2019.
-* Mac - ???
-* Linux - (see: https://github.com/migueldeicaza/gui.cs/issues/421)
+* Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory) 
+* Windows - Open `Terminal.Gui.sln` with Visual Studio 2019.
 
 ## Contributing
 

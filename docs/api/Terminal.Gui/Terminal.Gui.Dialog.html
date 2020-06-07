@@ -380,9 +380,31 @@ or buttons added to the dialog calls <a class="xref" href="Terminal.Gui.Applicat
   
   
   <a id="Terminal_Gui_Dialog__ctor_" data-uid="Terminal.Gui.Dialog.#ctor*"></a>
+  <h4 id="Terminal_Gui_Dialog__ctor" data-uid="Terminal.Gui.Dialog.#ctor">Dialog()</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dialog()</code></pre>
+  </div>
+  <h5 id="Terminal_Gui_Dialog__ctor_remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+Te Dialog will be vertically and horizontally centered in the container and the size will be 85% of the container. 
+After initialzation use <code>X</code>, <code>Y</code>, <code>Width</code>, and <code>Height</code> to override this with a location or size.
+</p>
+<p>
+Use <a class="xref" href="Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_AddButton_Terminal_Gui_Button_">AddButton(Button)</a> to add buttons to the dialog.
+</p>
+</div>
+  
+  
+  <a id="Terminal_Gui_Dialog__ctor_" data-uid="Terminal.Gui.Dialog.#ctor*"></a>
   <h4 id="Terminal_Gui_Dialog__ctor_NStack_ustring_System_Int32_System_Int32_Terminal_Gui_Button___" data-uid="Terminal.Gui.Dialog.#ctor(NStack.ustring,System.Int32,System.Int32,Terminal.Gui.Button[])">Dialog(ustring, Int32, Int32, Button[])</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of the <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> positioning 
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> positioning 
 and an optional set of <a class="xref" href="Terminal.Gui.Button.html">Button</a>s to display
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -465,8 +487,7 @@ and with an optional set of <a class="xref" href="Terminal.Gui.Button.html">Butt
   </table>
   <h5 id="Terminal_Gui_Dialog__ctor_NStack_ustring_Terminal_Gui_Button____remarks">Remarks</h5>
   <div class="markdown level1 remarks">
-if <code>width</code> and <code>height</code> are both 0, the Dialog will be vertically and horizontally centered in the
-container and the size will be 85% of the container. 
+Te Dialog will be vertically and horizontally centered in the container and the size will be 85% of the container. 
 After initialzation use <code>X</code>, <code>Y</code>, <code>Width</code>, and <code>Height</code> to override this with a location or size.
 </div>
   <h3 id="methods">Methods

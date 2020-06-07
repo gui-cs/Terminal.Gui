@@ -5,22 +5,22 @@
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
     <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
-    <AssemblyVersion>0.82.0.0</AssemblyVersion>
+    <AssemblyVersion>0.90.0.0</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <PackageId>Terminal.Gui</PackageId>
-    <PackageVersion>0.82</PackageVersion>
-    <Authors>Miguel de Icaza</Authors>
+    <PackageVersion>0.90</PackageVersion>
+    <Authors>Miguel de Icaza, Charlie Kindel (@tig), @BDisp</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/migueldeicaza/gui.cs/</PackageProjectUrl>
     <PackageTags>csharp, terminal, c#, f#, gui, toolkit, console</PackageTags>
     <Description>Console-based user interface toolkit for .NET applications.</Description>
     <Owners>Miguel de Icaza</Owners>
-    <Summary>Application framework for creating modern console applications using .NET </Summary>
-    <Title>Gui.cs is a framework for creating console user interfaces</Title>
+    <Summary>Application framework for creating modern console applications using .NET</Summary>
+    <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
     <PackageReleaseNotes>
-      0.82: Many fixes
+      0.90: (Still Under Construction - Will be Feature Complete release for 1.0)
       * API documentation completely revamped and updated. Readme upated. Contributors guide added (Thanks @tig!)
       * New sample/demo app - UI Catalog - Replaces demo.cs with an easy to use and extend set of demo scenarios. (Thanks @tig!)
       * MenuBar can now have MenuItems directly (enables top-level menu items with no submenu). (Thanks @tig!)
@@ -87,6 +87,12 @@
       *   Supports "infinite scrolling" via the new OnDrawContent/DrawContent event on the View class.
       *   The Scrolling Scenario was enhanced to demo dynamically adding/removing horizontal/vertical scrollbars (and to prove it was working right).
       * The Checkbox.Toggled event is now an EventHandler event and passes previous state. (Thanks @tig!)
+      * Fixes #102 All Views now support parameterless constructors. (Thanks @Bdisp and @tig!)
+      * Fixes #583 Button can now be sized. Button now supports TextAlignment. (Thanks @Bdisp!)
+      * Fixes #447 All events are now defined in terms of Action instead of EventHanlder. BREAKING CHANGE. (Thanks @bdisp and @tig!)
+      * Fixes #421 Now builds on Linux with "dotnet build". (Thanks @AArnott!)
+      * MenuItem now supports checked/selected items. (Thanks @tig!)
+      * Label no longer incorreclty displays formfeed char. (Thanks @tig!)
 
       0.81:
       * Fix ncurses engine for macOS/Linux, it works again
@@ -97,9 +103,7 @@
       * Fixes a couple of crashes (356)
       * Default the samples to work on Catalina
 
-
       0.80: Jumbo update from BDisp:
-
       * Fixed key events traversal for modal dialogs
       * Fixes culture info of DataField from pr
       * Fixes the rectangle drawing issue
@@ -171,6 +175,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="true" />
     <PackageReference Include="NStack.Core" Version="0.14.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'!='Debug'">
+    <PackageReference Include="SauceControl.InheritDoc" Version="1.0.0" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Views\ComboBox.cs" />

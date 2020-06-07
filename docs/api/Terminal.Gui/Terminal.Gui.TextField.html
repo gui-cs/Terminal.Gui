@@ -337,9 +337,21 @@ The <a class="xref" href="Terminal.Gui.TextField.html">TextField</a> <a class="x
   
   
   <a id="Terminal_Gui_TextField__ctor_" data-uid="Terminal.Gui.TextField.#ctor*"></a>
+  <h4 id="Terminal_Gui_TextField__ctor" data-uid="Terminal.Gui.TextField.#ctor">TextField()</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.TextField.html">TextField</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> positioning.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TextField()</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_TextField__ctor_" data-uid="Terminal.Gui.TextField.#ctor*"></a>
   <h4 id="Terminal_Gui_TextField__ctor_NStack_ustring_" data-uid="Terminal.Gui.TextField.#ctor(NStack.ustring)">TextField(ustring)</h4>
   <div class="markdown level1 summary">
-Public constructor that creates a text field, with layout controlled with X, Y, Width and Height.
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.TextField.html">TextField</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> positioning.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -368,7 +380,7 @@ Public constructor that creates a text field, with layout controlled with X, Y, 
   <a id="Terminal_Gui_TextField__ctor_" data-uid="Terminal.Gui.TextField.#ctor*"></a>
   <h4 id="Terminal_Gui_TextField__ctor_System_Int32_System_Int32_System_Int32_NStack_ustring_" data-uid="Terminal.Gui.TextField.#ctor(System.Int32,System.Int32,System.Int32,NStack.ustring)">TextField(Int32, Int32, Int32, ustring)</h4>
   <div class="markdown level1 summary">
-Public constructor that creates a text field at an absolute position and size.
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.TextField.html">TextField</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> positioning.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -412,7 +424,7 @@ Public constructor that creates a text field at an absolute position and size.
   <a id="Terminal_Gui_TextField__ctor_" data-uid="Terminal.Gui.TextField.#ctor*"></a>
   <h4 id="Terminal_Gui_TextField__ctor_System_String_" data-uid="Terminal.Gui.TextField.#ctor(System.String)">TextField(String)</h4>
   <div class="markdown level1 summary">
-Public constructor that creates a text field, with layout controlled with X, Y, Width and Height.
+Initializes a new instance of the <a class="xref" href="Terminal.Gui.TextField.html">TextField</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> positioning.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -436,6 +448,38 @@ Public constructor that creates a text field, with layout controlled with X, Y, 
       </tr>
     </tbody>
   </table>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_TextField_TextChanged" data-uid="Terminal.Gui.TextField.TextChanged">TextChanged</h4>
+  <div class="markdown level1 summary">
+Changed event, raised when the text has clicked.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Action&lt;ustring&gt; TextChanged</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<span class="xref">NStack.ustring</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_TextField_TextChanged_remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+This event is raised when the <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_Text">Text</a> changes. 
+</div>
   <h3 id="properties">Properties
   </h3>
   
@@ -963,38 +1007,6 @@ Redraws this view and its subviews; only redraws the views that have been flagge
    Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
    larger than the <code>region</code> parameter.
 </p>
-</div>
-  <h3 id="events">Events
-  </h3>
-  
-  
-  <h4 id="Terminal_Gui_TextField_Changed" data-uid="Terminal.Gui.TextField.Changed">Changed</h4>
-  <div class="markdown level1 summary">
-Changed event, raised when the text has clicked.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public event EventHandler&lt;ustring&gt; Changed</code></pre>
-  </div>
-  <h5 class="eventType">Event Type</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.EventHandler</span>&lt;<span class="xref">NStack.ustring</span>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 id="Terminal_Gui_TextField_Changed_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-This event is raised when the <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_Text">Text</a> changes. 
 </div>
   <h3 id="implements">Implements</h3>
   <div>

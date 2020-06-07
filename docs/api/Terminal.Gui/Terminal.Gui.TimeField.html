@@ -108,7 +108,7 @@ Time editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_ReadOnly">TextField.ReadOnly</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_Changed">TextField.Changed</a>
+      <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_TextChanged">TextField.TextChanged</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_OnLeave">TextField.OnLeave()</a>
@@ -390,43 +390,26 @@ The <a class="xref" href="Terminal.Gui.TimeField.html">TimeField</a> <a class="x
   
   
   <a id="Terminal_Gui_TimeField__ctor_" data-uid="Terminal.Gui.TimeField.#ctor*"></a>
-  <h4 id="Terminal_Gui_TimeField__ctor_System_DateTime_" data-uid="Terminal.Gui.TimeField.#ctor(System.DateTime)">TimeField(DateTime)</h4>
+  <h4 id="Terminal_Gui_TimeField__ctor" data-uid="Terminal.Gui.TimeField.#ctor">TimeField()</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of <a class="xref" href="Terminal.Gui.TimeField.html">TimeField</a> 
+Initializes a new instance of <a class="xref" href="Terminal.Gui.TimeField.html">TimeField</a> using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> positioning.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TimeField(DateTime time)</code></pre>
+    <pre><code class="lang-csharp hljs">public TimeField()</code></pre>
   </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.DateTime</span></td>
-        <td><span class="parametername">time</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
   
   
   <a id="Terminal_Gui_TimeField__ctor_" data-uid="Terminal.Gui.TimeField.#ctor*"></a>
-  <h4 id="Terminal_Gui_TimeField__ctor_System_Int32_System_Int32_System_DateTime_System_Boolean_" data-uid="Terminal.Gui.TimeField.#ctor(System.Int32,System.Int32,System.DateTime,System.Boolean)">TimeField(Int32, Int32, DateTime, Boolean)</h4>
+  <h4 id="Terminal_Gui_TimeField__ctor_System_Int32_System_Int32_System_TimeSpan_System_Boolean_" data-uid="Terminal.Gui.TimeField.#ctor(System.Int32,System.Int32,System.TimeSpan,System.Boolean)">TimeField(Int32, Int32, TimeSpan, Boolean)</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of <a class="xref" href="Terminal.Gui.TimeField.html">TimeField</a> at an absolute position and fixed size.
+Initializes a new instance of <a class="xref" href="Terminal.Gui.TimeField.html">TimeField</a> using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> positioning.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TimeField(int x, int y, DateTime time, bool isShort = false)</code></pre>
+    <pre><code class="lang-csharp hljs">public TimeField(int x, int y, TimeSpan time, bool isShort = false)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -449,17 +432,78 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.TimeField.html"
         <td>The y coordinate.</td>
       </tr>
       <tr>
-        <td><span class="xref">System.DateTime</span></td>
+        <td><span class="xref">System.TimeSpan</span></td>
         <td><span class="parametername">time</span></td>
-        <td>Initial time contents.</td>
+        <td>Initial time.</td>
       </tr>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
         <td><span class="parametername">isShort</span></td>
-        <td>If true, the seconds are hidden.</td>
+        <td>If true, the seconds are hidden. Sets the <a class="xref" href="Terminal.Gui.TimeField.html#Terminal_Gui_TimeField_IsShortFormat">IsShortFormat</a> property.</td>
       </tr>
     </tbody>
   </table>
+  
+  
+  <a id="Terminal_Gui_TimeField__ctor_" data-uid="Terminal.Gui.TimeField.#ctor*"></a>
+  <h4 id="Terminal_Gui_TimeField__ctor_System_TimeSpan_" data-uid="Terminal.Gui.TimeField.#ctor(System.TimeSpan)">TimeField(TimeSpan)</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of <a class="xref" href="Terminal.Gui.TimeField.html">TimeField</a> using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> positioning.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeField(TimeSpan time)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.TimeSpan</span></td>
+        <td><span class="parametername">time</span></td>
+        <td>Initial time</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_TimeField_TimeChanged" data-uid="Terminal.Gui.TimeField.TimeChanged">TimeChanged</h4>
+  <div class="markdown level1 summary">
+TimeChanged event, raised when the Date has changed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Action&lt;DateTimeEventArgs&lt;TimeSpan&gt;&gt; TimeChanged</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.DateTimeEventArgs-1.html">DateTimeEventArgs</a>&lt;<span class="xref">System.TimeSpan</span>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_TimeField_TimeChanged_remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+This event is raised when the <a class="xref" href="Terminal.Gui.TimeField.html#Terminal_Gui_TimeField_Time">Time</a> changes.
+</div>
   <h3 id="properties">Properties
   </h3>
   
@@ -467,7 +511,7 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.TimeField.html"
   <a id="Terminal_Gui_TimeField_IsShortFormat_" data-uid="Terminal.Gui.TimeField.IsShortFormat*"></a>
   <h4 id="Terminal_Gui_TimeField_IsShortFormat" data-uid="Terminal.Gui.TimeField.IsShortFormat">IsShortFormat</h4>
   <div class="markdown level1 summary">
-Get or set the data format for the widget.
+Get or sets whether <a class="xref" href="Terminal.Gui.TimeField.html">TimeField</a> uses the short or long time format.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -499,7 +543,7 @@ Gets or sets the time of the <a class="xref" href="Terminal.Gui.TimeField.html">
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DateTime Time { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public TimeSpan Time { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -511,7 +555,7 @@ Gets or sets the time of the <a class="xref" href="Terminal.Gui.TimeField.html">
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.DateTime</span></td>
+        <td><span class="xref">System.TimeSpan</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -567,6 +611,35 @@ Method invoked when a mouse event is generated
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_MouseEvent_Terminal_Gui_MouseEvent_">TextField.MouseEvent(MouseEvent)</a></div>
+  
+  
+  <a id="Terminal_Gui_TimeField_OnTimeChanged_" data-uid="Terminal.Gui.TimeField.OnTimeChanged*"></a>
+  <h4 id="Terminal_Gui_TimeField_OnTimeChanged_Terminal_Gui_DateTimeEventArgs_System_TimeSpan__" data-uid="Terminal.Gui.TimeField.OnTimeChanged(Terminal.Gui.DateTimeEventArgs{System.TimeSpan})">OnTimeChanged(DateTimeEventArgs&lt;TimeSpan&gt;)</h4>
+  <div class="markdown level1 summary">
+Event firing method that invokes the <a class="xref" href="Terminal.Gui.TimeField.html#Terminal_Gui_TimeField_TimeChanged">TimeChanged</a> event.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnTimeChanged(DateTimeEventArgs&lt;TimeSpan&gt; args)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.DateTimeEventArgs-1.html">DateTimeEventArgs</a>&lt;<span class="xref">System.TimeSpan</span>&gt;</td>
+        <td><span class="parametername">args</span></td>
+        <td>The event arguments</td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="Terminal_Gui_TimeField_ProcessKey_" data-uid="Terminal.Gui.TimeField.ProcessKey*"></a>
