@@ -158,7 +158,7 @@ namespace UICatalog {
 						for (int i = 0; i < numButtons; i++) {
 							btns.Add(btnText[i % 10]);
 						}
-						if (styleRadioGroup.Selected == 0) {
+						if (styleRadioGroup.SelectedItem == 0) {
 							buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), btns.ToArray ())}";
 						} else {
 							buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), btns.ToArray ())}";

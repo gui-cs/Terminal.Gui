@@ -56,8 +56,8 @@ namespace UICatalog {
 			jumpList.X = Pos.X (label);
 			jumpList.Y = Pos.Bottom (label);
 			jumpList.Width = Dim.Fill ();
-			jumpList.SelectedItemChanged = (selected) => {
-				charMap.Start = radioItems[selected].start;
+			jumpList.SelectedItemChanged = (args) => {
+				charMap.Start = radioItems[args.SelectedItem].start;
 			};
 
 			Win.Add (jumpList);
