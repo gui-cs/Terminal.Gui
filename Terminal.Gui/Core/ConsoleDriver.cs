@@ -153,7 +153,7 @@ namespace Terminal.Gui {
 	/// typically in containers such as <see cref="Window"/> and <see cref="FrameView"/> to set the scheme that is used by all the
 	/// views contained inside.
 	/// </summary>
-	public class ColorScheme {
+	public class ColorScheme : IEquatable<ColorScheme> {
 		Attribute _normal;
 		Attribute _focus;
 		Attribute _hotNormal;
@@ -313,6 +313,61 @@ namespace Terminal.Gui {
 			preparingScheme = false;
 			return attribute;
 		}
+
+		/// <inheritdoc/>
+		public override bool Equals (object obj)
+		{
+			return Equals (obj as ColorScheme);
+		}
+
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for equality.
+		/// </summary>
+		/// <param name="other"></param>
+		/// <returns>true if the two objects are equal</returns>
+		public bool Equals (ColorScheme other)
+		{
+			return other != null &&
+			       EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
+			       EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
+			       EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
+			       EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
+			       EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode ()
+		{
+			int hashCode = -1242460230;
+			hashCode = hashCode * -1521134295 + _normal.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _focus.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _hotNormal.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _hotFocus.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _disabled.GetHashCode ();
+			return hashCode;
+		}
+
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for equality.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns><c>true</c> if the two objects are equivalent</returns>
+		public static bool operator == (ColorScheme left, ColorScheme right)
+		{
+			return EqualityComparer<ColorScheme>.Default.Equals (left, right);
+		}
+
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for inequality.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns><c>true</c> if the two objects are not equivalent</returns>
+		public static bool operator != (ColorScheme left, ColorScheme right)
+		{
+			return !(left == right);
+		}
 	}
 
 	/// <summary>
@@ -324,8 +379,8 @@ namespace Terminal.Gui {
 			// Use reflection to dynamically create the default set of ColorSchemes from the list defiined 
 			// by the class. 
 			ColorSchemes = typeof (Colors).GetProperties ()
-				.Where(p => p.PropertyType == typeof(ColorScheme))
-				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme())) // (ColorScheme)p.GetValue (p)))
+				.Where (p => p.PropertyType == typeof (ColorScheme))
+				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme ())) // (ColorScheme)p.GetValue (p)))
 				.ToDictionary (t => t.Key, t => t.Value);
 		}
 
@@ -377,9 +432,9 @@ namespace Terminal.Gui {
 		///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["Error"];</c>
 		/// </para>
 		/// </remarks>
-		public static ColorScheme Error { get => GetColorScheme (); set => SetColorScheme (value);  }
+		public static ColorScheme Error { get => GetColorScheme (); set => SetColorScheme (value); }
 
-		static ColorScheme GetColorScheme([CallerMemberName] string callerMemberName = null)
+		static ColorScheme GetColorScheme ([CallerMemberName] string callerMemberName = null)
 		{
 			return ColorSchemes [callerMemberName];
 		}

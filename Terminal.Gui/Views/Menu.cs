@@ -12,12 +12,11 @@ using System;
 using NStack;
 using System.Linq;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// A <see cref="MenuItem"/> has a title, an associated help text, and an action to execute on activation.
+	/// A <see cref="MenuItemCheckType"/> has a title, an associated help text, and an action to execute on activation.
 	/// </summary>
 	public class MenuItem {
 
@@ -112,7 +111,39 @@ namespace Terminal.Gui {
 			return CanExecute == null ? true : CanExecute ();
 		}
 
-		internal int Width => Title.Length + Help.Length + 1 + 2;
+		internal int Width => Title.Length + Help.Length + 1 + 2 +
+			(Checked || CheckType.HasFlag (MenuItemCheckType.Checked) || CheckType.HasFlag (MenuItemCheckType.Radio) ? 2 : 0);
+
+		/// <summary>
+		/// Sets or gets whether the <see cref="MenuItem"/> shows a check indicator or not. See <see cref="MenuItemCheckType"/>.
+		/// </summary>
+		public bool Checked { set; get; }
+
+		/// <summary>
+		/// Specifies how a <see cref="MenuItem"/> shows selection state. 
+		/// </summary>
+		[Flags]
+		public enum MenuItemCheckType : uint {
+			/// <summary>
+			/// The menu item will be shown normally, with no check indicator.
+			/// </summary>
+			NoCheck = 0b_0000_0000,
+
+			/// <summary>
+			/// The menu item will indicate checked/un-checked state (see <see cref="Checked"/>.
+			/// </summary>
+			Checked = 0b_0000_0001,
+
+			/// <summary>
+			/// The menu item is part of a menu radio group (see <see cref="Checked"/> and will indicate selected state.
+			/// </summary>
+			Radio = 0b_0000_0010,
+		};
+
+		/// <summary>
+		/// Sets or gets the type selection indicator the menu item will be displayed with.
+		/// </summary>
+		public MenuItemCheckType CheckType { get; set; }
 
 		/// <summary>
 		/// Gets or sets the parent for this <see cref="MenuItem"/>
@@ -308,11 +339,30 @@ namespace Terminal.Gui {
 					continue;
 				}
 
+				ustring textToDraw;
+				var checkChar = (char)0x25cf;
+				var uncheckedChar = (char)0x25cc;
+
+				if (item.CheckType.HasFlag (MenuItem.MenuItemCheckType.Checked)) {
+					checkChar = (char)0x221a;
+					uncheckedChar = ' ';
+				}
+
+				// Support Checked even though CHeckType wasn't set
+				if (item.Checked) {
+					textToDraw = checkChar + " " + item.Title;
+				} else if (item.CheckType.HasFlag (MenuItem.MenuItemCheckType.Checked) ||
+					item.CheckType.HasFlag (MenuItem.MenuItemCheckType.Radio)) {
+					textToDraw = uncheckedChar + " " + item.Title;
+				} else {
+					textToDraw = item.Title;
+				}
+
 				Move (2, i + 1);
 				if (!item.IsEnabled ())
-					DrawHotString (item.Title, ColorScheme.Disabled, ColorScheme.Disabled);
+					DrawHotString (textToDraw, ColorScheme.Disabled, ColorScheme.Disabled);
 				else
-					DrawHotString (item.Title,
+					DrawHotString (textToDraw,
 					       i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal,
 					       i == current ? ColorScheme.Focus : ColorScheme.Normal);
 
@@ -1172,8 +1222,7 @@ namespace Terminal.Gui {
 				Application.GrabMouse (current);
 			} else if (IsMenuOpen && (me.View is MenuBar || me.View is Menu)) {
 				Application.GrabMouse (me.View);
-			}
-			else {
+			} else {
 				handled = false;
 				return false;
 			}
