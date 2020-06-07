@@ -1,6 +1,8 @@
 ﻿using NStack;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Terminal.Gui;
 
 namespace UICatalog {
@@ -16,8 +18,8 @@ namespace UICatalog {
 				Y = 0,
 			};
 			Win.Add (editLabel);
-			// Add a TextField using Absolute layout. Use buttons to move/grow.
-			var edit = new TextField (31, 0, 25, "");
+			// Add a TextField using Absolute layout. 
+			var edit = new TextField (31, 0, 15, "");
 			Win.Add (edit);
 
 			// This is the default button (IsDefault = true); if user presses ENTER in the TextField
@@ -31,142 +33,175 @@ namespace UICatalog {
 			};
 			Win.Add (defaultButton);
 
+			var swapButton = new Button (50, 0, "Swap Default (Absolute Layout)");
+			swapButton.Clicked = () => {
+				defaultButton.IsDefault = !defaultButton.IsDefault;
+				swapButton.IsDefault = !swapButton.IsDefault;
+			};
+			Win.Add (swapButton);
+
 			static void DoMessage (Button button, ustring txt)
 			{
 				button.Clicked = () => {
 					var btnText = button.Text.ToString ();
-					MessageBox.Query (30, 7, "Message", $"Did you click {txt.ToString ()}?", "Yes", "No");
+					MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
 				};
 			}
 
-			var y = 2;
-			var button = new Button (10, y, "Ba_se Color") {
-				ColorScheme = Colors.Base,
+			var colorButtonsLabel = new Label ("Color Buttons:") {
+				X = 0,
+				Y = Pos.Bottom (editLabel) + 1,
 			};
-			DoMessage (button, button.Text);
-			Win.Add (button);
+			Win.Add (colorButtonsLabel);
 
-			y += 2;
-			Win.Add (button = new Button (10, y, "Error Color") {
-				ColorScheme = Colors.Error,
+			View prev = colorButtonsLabel;
+			foreach (var colorScheme in Colors.ColorSchemes) {
+				var colorButton = new Button ($"{colorScheme.Key}") {
+					ColorScheme = colorScheme.Value,
+					X = Pos.Right (prev) + 2,
+					Y = Pos.Y (colorButtonsLabel),
+				};
+				DoMessage (colorButton, colorButton.Text);
+				Win.Add (colorButton);
+				prev = colorButton;
+			}
+			// BUGBUG: For some reason these buttons don't move to correct locations initially. 
+
+			Button button;
+			Win.Add (button = new Button ("A super long _Button that will probably expose a bug in clipping or wrapping of text. Will it?") {
+				X = 2,
+				Y = Pos.Bottom (colorButtonsLabel) + 1,
 			});
 			DoMessage (button, button.Text);
 
-			y += 2;
-			Win.Add (button = new Button (10, y, "Dialog Color") {
-				ColorScheme = Colors.Dialog,
-			});
-			DoMessage (button, button.Text);
-
-			y += 2;
-			Win.Add (button = new Button (10, y, "Menu Color") {
-				ColorScheme = Colors.Menu,
-			});
-			DoMessage (button, button.Text);
-
-			y += 2;
-			Win.Add (button = new Button (10, y, "TopLevel Color") {
-				ColorScheme = Colors.TopLevel,
-			});
-			DoMessage (button, button.Text);
-
-			y += 2;
-			Win.Add (button = new Button (10, y, "A super long _Button that will probably expose a bug in clipping or wrapping of text. Will it?") {
-			});
-			DoMessage (button, button.Text);
-
-			y += 2;
 			// Note the 'N' in 'Newline' will be the hotkey
-			Win.Add (new Button (10, y, "a Newline\nin the button") {
-				Clicked = () => MessageBox.Query (30, 7, "Message", "Question?", "Yes", "No")
+			Win.Add (button = new Button ("a Newline\nin the button") {
+				X = 2,
+				Y = Pos.Bottom (button) + 1,
+				Clicked = () => MessageBox.Query ("Message", "Question?", "Yes", "No")
 			});
 
-			y += 2;
-			// BUGBUG: Buttons don't support specifying hotkeys with _?!?
-			Win.Add (button = new Button ("Te_xt Changer") {
-				X = 10,
-				Y = y
+			var textChanger = new Button ("Te_xt Changer") {
+				X = 2,
+				Y = Pos.Bottom (button) + 1,
+			};
+			Win.Add (textChanger);
+			textChanger.Clicked = () => textChanger.Text += "!";
+
+			Win.Add (button = new Button ("Lets see if this will move as \"Text Changer\" grows") {
+				X = Pos.Right(textChanger) + 2,
+				Y = Pos.Y (textChanger),
 			});
 
-			button.Clicked = () => button.Text += "!";
+			var removeButton = new Button ("Remove this button") {
+				X = 2,
+				Y = Pos.Bottom (button) + 1,
+				ColorScheme = Colors.Error
+			};
+			Win.Add (removeButton);
+			// This in intresting test case because `moveBtn` and below are laid out relative to this one!
+			removeButton.Clicked = () => Win.Remove (removeButton);
 
-			Win.Add (new Button ("Lets see if this will move as \"Text Changer\" grows") {
-				X = Pos.Right (button) + 10,
-				Y = y,
-			});
-
-			y += 2;
-			Win.Add (new Button (10, y, "Delete") {
-				ColorScheme = Colors.Error,
-				Clicked = () => Win.Remove (button)
-			});
-
-			y += 2;
-			Win.Add (new Button (10, y, "Change Default") {
-				Clicked = () => {
-					defaultButton.IsDefault = !defaultButton.IsDefault;
-					button.IsDefault = !button.IsDefault;
-				},
-			});
+			var computedFrame = new FrameView ("Computed Layout") {
+				X = 0,
+				Y = Pos.Bottom (removeButton) + 1,
+				Width = Dim.Percent(50),
+				Height = 5
+			};
+			Win.Add (computedFrame);
 
 			// Demonstrates how changing the View.Frame property can move Views
-			y += 2;
-			var moveBtn = new Button (10, y, "Move This Button via Frame") {
+			var moveBtn = new Button ("Move This Button via Pos") {
+				X = 0,
+				Y = Pos.Center() - 1,
+				Width = 30,
 				ColorScheme = Colors.Error,
 			};
 			moveBtn.Clicked = () => {
-				moveBtn.Frame = new Rect (moveBtn.Frame.X + 5, moveBtn.Frame.Y, moveBtn.Frame.Width, moveBtn.Frame.Height);
+				moveBtn.X = moveBtn.Frame.X + 5;
+				computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
 			};
-			Win.Add (moveBtn);
+			computedFrame.Add (moveBtn);
 
 			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
-			y += 2;
-			var sizeBtn = new Button (10, y, "Size This Button via Frame") {
+			var sizeBtn = new Button ("Size This Button via Pos") {
+				X = 0,
+				Y = Pos.Center () + 1,
+				Width = 30,
 				ColorScheme = Colors.Error,
 			};
-			moveBtn.Clicked = () => {
-				sizeBtn.Frame = new Rect (sizeBtn.Frame.X, sizeBtn.Frame.Y, sizeBtn.Frame.Width + 5, sizeBtn.Frame.Height);
+			sizeBtn.Clicked = () => {
+				sizeBtn.Width = sizeBtn.Frame.Width + 5;
+				computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
 			};
-			Win.Add (sizeBtn);
+			computedFrame.Add (sizeBtn);
 
-			Win.Add (new Label ("Size This Button via Frame 'Text Alignment'") {
-				X = Pos.Right (moveBtn) + 20,
-				Y = Pos.Top (moveBtn) - 4,
-			});
-
-			List<string> txtAligs = new List<string> () {
-				"Left",
-				"Right",
-				"Centered",
-				"Justified"
+			var absoluteFrame = new FrameView ("Absolute Layout") {
+				X = Pos.Right(computedFrame),
+				Y = Pos.Bottom (removeButton) + 1,
+				Width = Dim.Fill(),
+				Height = 5
 			};
+			Win.Add (absoluteFrame);
 
-			var lvTextAlig = new ListView (txtAligs) {
-				X = Pos.Right (moveBtn) + 20,
-				Y = Pos.Top (moveBtn) - 3,
-				Width = 20,
-				Height = 4,
-				ColorScheme = Colors.TopLevel
+			// Demonstrates how changing the View.Frame property can move Views
+			var moveBtnA = new Button (0, 0, "Move This Button via Frame") {
+				ColorScheme = Colors.Error,
 			};
+			moveBtnA.Clicked = () => {
+				moveBtnA.Frame = new Rect (moveBtnA.Frame.X + 5, moveBtnA.Frame.Y, moveBtnA.Frame.Width, moveBtnA.Frame.Height);
+			};
+			absoluteFrame.Add (moveBtnA);
 
-			lvTextAlig.SelectedItemChanged += (e) => {
-				switch (e.Value) {
-				case "Left":
-					sizeBtn.TextAlignment = TextAlignment.Left;
-					break;
-				case "Right":
-					sizeBtn.TextAlignment = TextAlignment.Right;
-					break;
-				case "Centered":
-					sizeBtn.TextAlignment = TextAlignment.Centered;
-					break;
-				case "Justified":
-					sizeBtn.TextAlignment = TextAlignment.Justified;
-					break;
+			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
+			var sizeBtnA = new Button (0, 2, "Size This Button via Frame") {
+				ColorScheme = Colors.Error,
+			};
+			sizeBtnA.Clicked = () => {
+				sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5, sizeBtnA.Frame.Height);
+			};
+			absoluteFrame.Add (sizeBtnA);
+
+			var label = new Label ("Text Alignment (changes the four buttons above): ") {
+				X = 2,
+				Y = Pos.Bottom (computedFrame) + 1,
+			};
+			Win.Add (label);
+
+			var radioGroup = new RadioGroup (new [] { "Left", "Right", "Centered", "Justified" }) {
+				X = 4,
+				Y = Pos.Bottom (label) + 1,
+				Selected = 2,
+				SelectedItemChanged = (selected) => {
+					switch (selected) {
+					case 0:
+						moveBtn.TextAlignment = TextAlignment.Left;
+						sizeBtn.TextAlignment = TextAlignment.Left;
+						moveBtnA.TextAlignment = TextAlignment.Left;
+						sizeBtnA.TextAlignment = TextAlignment.Left;
+						break;
+					case 1:
+						moveBtn.TextAlignment = TextAlignment.Right;
+						sizeBtn.TextAlignment = TextAlignment.Right;
+						moveBtnA.TextAlignment = TextAlignment.Right;
+						sizeBtnA.TextAlignment = TextAlignment.Right;
+						break;
+					case 2:
+						moveBtn.TextAlignment = TextAlignment.Centered;
+						sizeBtn.TextAlignment = TextAlignment.Centered;
+						moveBtnA.TextAlignment = TextAlignment.Centered;
+						sizeBtnA.TextAlignment = TextAlignment.Centered;
+						break;
+					case 3:
+						moveBtn.TextAlignment = TextAlignment.Justified;
+						sizeBtn.TextAlignment = TextAlignment.Justified;
+						moveBtnA.TextAlignment = TextAlignment.Justified;
+						sizeBtnA.TextAlignment = TextAlignment.Justified;
+						break;
+					}
 				}
 			};
-
-			Win.Add (lvTextAlig);
+			Win.Add (radioGroup);
 
 			// Demo changing hotkey
 			ustring MoveHotkey (ustring txt)
@@ -189,8 +224,9 @@ namespace UICatalog {
 				return txt;
 			}
 
-			y += 2;
-			var moveHotKeyBtn = new Button (10, y, "Click to Change th_is Button's Hotkey") {
+			var moveHotKeyBtn = new Button ("Click to Change th_is Button's Hotkey") {
+				X = 2,
+				Y = Pos.Bottom (radioGroup) + 1,
 				ColorScheme = Colors.TopLevel,
 			};
 			moveHotKeyBtn.Clicked = () => {

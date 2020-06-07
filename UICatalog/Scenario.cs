@@ -225,11 +225,11 @@ namespace UICatalog {
 		/// Returns an instance of each <see cref="Scenario"/> defined in the project. 
 		/// https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class
 		/// </summary>
-		internal static List<Type> GetDerivedClassesCollection ()
+		internal static List<Type> GetDerivedClasses<T> ()
 		{
 			List<Type> objects = new List<Type> ();
-			foreach (Type type in typeof (Scenario).Assembly.GetTypes ()
-			 .Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf (typeof (Scenario)))) {
+			foreach (Type type in typeof (T).Assembly.GetTypes ()
+			 .Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf (typeof (T)))) {
 				objects.Add (type);
 			}
 			return objects;
