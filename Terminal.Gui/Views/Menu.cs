@@ -329,7 +329,7 @@ namespace Terminal.Gui {
 					if (item == null)
 						Driver.AddRune (Driver.HLine);
 					else if (p == Frame.Width - 3 && barItems.Children [i].SubMenu != null)
-						Driver.AddRune ('>');
+						Driver.AddRune (Driver.RightArrow);
 					else
 						Driver.AddRune (' ');
 
@@ -340,20 +340,20 @@ namespace Terminal.Gui {
 				}
 
 				ustring textToDraw;
-				var checkChar = (char)0x25cf;
-				var uncheckedChar = (char)0x25cc;
+				var checkChar = Driver.Selected;
+				var uncheckedChar = Driver.UnSelected;
 
 				if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked)) {
-					checkChar = (char)0x221a;
-					uncheckedChar = ' ';
+					checkChar = Driver.Checked; 
+					uncheckedChar = Driver.UnChecked;
 				}
 
 				// Support Checked even though CHeckType wasn't set
 				if (item.Checked) {
-					textToDraw = checkChar + " " + item.Title;
+					textToDraw = ustring.Make(new Rune [] { checkChar, ' ' }) + item.Title;
 				} else if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked) ||
 					item.CheckType.HasFlag (MenuItemCheckStyle.Radio)) {
-					textToDraw = uncheckedChar + " " + item.Title;
+					textToDraw = ustring.Make (new Rune [] { uncheckedChar, ' ' }) + item.Title;
 				} else {
 					textToDraw = item.Title;
 				}

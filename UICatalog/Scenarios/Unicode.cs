@@ -69,7 +69,7 @@ namespace UICatalog {
 
 			label = new Label ("RadioGroup:") { X = Pos.X (label), Y = Pos.Bottom (listView) + 1 };
 			Win.Add (label);
-			var radioGroup = new RadioGroup (new [] { "item #1", " ~  s  gui.cs   master ↑10", "Со_хранить" }, selected: 0) {
+			var radioGroup = new RadioGroup (new ustring [] { "item #1", " ~  s  gui.cs   master ↑10", "Со_хранить" }, selected: 0) {
 				X = 15,
 				Y = Pos.Y (label),
 				Width = Dim.Percent (60),

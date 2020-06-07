@@ -111,7 +111,7 @@ namespace UICatalog {
 			Win.Add (computedFrame);
 
 			// Demonstrates how changing the View.Frame property can move Views
-			var moveBtn = new Button ("Move This Button via Pos") {
+			var moveBtn = new Button ("Move This \u263b Button _via Pos") {
 				X = 0,
 				Y = Pos.Center() - 1,
 				Width = 30,
@@ -124,7 +124,7 @@ namespace UICatalog {
 			computedFrame.Add (moveBtn);
 
 			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
-			var sizeBtn = new Button ("Size This Button via Pos") {
+			var sizeBtn = new Button ("Size This \u263a Button _via Pos") {
 				X = 0,
 				Y = Pos.Center () + 1,
 				Width = 30,
@@ -168,7 +168,7 @@ namespace UICatalog {
 			};
 			Win.Add (label);
 
-			var radioGroup = new RadioGroup (new [] { "Left", "Right", "Centered", "Justified" }) {
+			var radioGroup = new RadioGroup (new ustring [] { "Left", "Right", "Centered", "Justified" }) {
 				X = 4,
 				Y = Pos.Bottom (label) + 1,
 				Selected = 2,

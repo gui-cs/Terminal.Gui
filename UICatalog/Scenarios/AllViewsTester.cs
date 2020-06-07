@@ -117,7 +117,7 @@ namespace UICatalog {
 			};
 			_settingsPane.Add (_computedCheckBox);
 
-			var radioItems = new [] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };
+			var radioItems = new ustring [] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };
 			_locationFrame = new FrameView ("Location (Pos)") {
 				X = Pos.Left (_computedCheckBox),
 				Y = Pos.Bottom (_computedCheckBox),
@@ -146,7 +146,7 @@ namespace UICatalog {
 
 			_locationFrame.Add (_xRadioGroup);
 
-			radioItems = new [] { "Percent(y)", "AnchorEnd(y)", "Center", "At(y)" };
+			radioItems = new ustring [] { "Percent(y)", "AnchorEnd(y)", "Center", "At(y)" };
 			label = new Label ("y:") { X = Pos.Right (_xRadioGroup) + 1, Y = 0 };
 			_locationFrame.Add (label);
 			_yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
@@ -173,7 +173,7 @@ namespace UICatalog {
 				Width = 40,
 			};
 
-			radioItems = new [] { "Percent(width)", "Fill(width)", "Sized(width)" };
+			radioItems = new ustring [] { "Percent(width)", "Fill(width)", "Sized(width)" };
 			label = new Label ("width:") { X = 0, Y = 0 };
 			_sizeFrame.Add (label);
 			_wRadioGroup = new RadioGroup (radioItems) {
@@ -193,7 +193,7 @@ namespace UICatalog {
 			_sizeFrame.Add (_wText);
 			_sizeFrame.Add (_wRadioGroup);
 
-			radioItems = new [] { "Percent(height)", "Fill(height)", "Sized(height)" };
+			radioItems = new ustring [] { "Percent(height)", "Fill(height)", "Sized(height)" };
 			label = new Label ("height:") { X = Pos.Right (_wRadioGroup) + 1, Y = 0 };
 			_sizeFrame.Add (label);
 			_hText = new TextField ($"{_hVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
