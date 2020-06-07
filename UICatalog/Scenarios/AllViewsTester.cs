@@ -117,7 +117,7 @@ namespace UICatalog {
 			};
 			_settingsPane.Add (_computedCheckBox);
 
-			var radioItems = new [] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };
+			var radioItems = new ustring [] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };
 			_locationFrame = new FrameView ("Location (Pos)") {
 				X = Pos.Left (_computedCheckBox),
 				Y = Pos.Bottom (_computedCheckBox),
@@ -146,7 +146,7 @@ namespace UICatalog {
 
 			_locationFrame.Add (_xRadioGroup);
 
-			radioItems = new [] { "Percent(y)", "AnchorEnd(y)", "Center", "At(y)" };
+			radioItems = new ustring [] { "Percent(y)", "AnchorEnd(y)", "Center", "At(y)" };
 			label = new Label ("y:") { X = Pos.Right (_xRadioGroup) + 1, Y = 0 };
 			_locationFrame.Add (label);
 			_yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
@@ -173,7 +173,7 @@ namespace UICatalog {
 				Width = 40,
 			};
 
-			radioItems = new [] { "Percent(width)", "Fill(width)", "Sized(width)" };
+			radioItems = new ustring [] { "Percent(width)", "Fill(width)", "Sized(width)" };
 			label = new Label ("width:") { X = 0, Y = 0 };
 			_sizeFrame.Add (label);
 			_wRadioGroup = new RadioGroup (radioItems) {
@@ -193,7 +193,7 @@ namespace UICatalog {
 			_sizeFrame.Add (_wText);
 			_sizeFrame.Add (_wRadioGroup);
 
-			radioItems = new [] { "Percent(height)", "Fill(height)", "Sized(height)" };
+			radioItems = new ustring [] { "Percent(height)", "Fill(height)", "Sized(height)" };
 			label = new Label ("height:") { X = Pos.Right (_wRadioGroup) + 1, Y = 0 };
 			_sizeFrame.Add (label);
 			_hText = new TextField ($"{_hVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
@@ -235,7 +235,7 @@ namespace UICatalog {
 				return;
 			}
 			try {
-				switch (_xRadioGroup.Selected) {
+				switch (_xRadioGroup.SelectedItem) {
 				case 0:
 					view.X = Pos.Percent (_xVal);
 					break;
@@ -250,7 +250,7 @@ namespace UICatalog {
 					break;
 				}
 
-				switch (_yRadioGroup.Selected) {
+				switch (_yRadioGroup.SelectedItem) {
 				case 0:
 					view.Y = Pos.Percent (_yVal);
 					break;
@@ -265,7 +265,7 @@ namespace UICatalog {
 					break;
 				}
 
-				switch (_wRadioGroup.Selected) {
+				switch (_wRadioGroup.SelectedItem) {
 				case 0:
 					view.Width = Dim.Percent (_wVal);
 					break;
@@ -277,7 +277,7 @@ namespace UICatalog {
 					break;
 				}
 
-				switch (_hRadioGroup.Selected) {
+				switch (_hRadioGroup.SelectedItem) {
 				case 0:
 					view.Height = Dim.Percent (_hVal);
 					break;
@@ -301,15 +301,15 @@ namespace UICatalog {
 		{
 			var x = view.X.ToString ();
 			var y = view.Y.ToString ();
-			_xRadioGroup.Selected = posNames.IndexOf (posNames.Where (s => x.Contains (s)).First ());
-			_yRadioGroup.Selected = posNames.IndexOf (posNames.Where (s => y.Contains (s)).First ());
+			_xRadioGroup.SelectedItem = posNames.IndexOf (posNames.Where (s => x.Contains (s)).First ());
+			_yRadioGroup.SelectedItem = posNames.IndexOf (posNames.Where (s => y.Contains (s)).First ());
 			_xText.Text = $"{view.Frame.X}";
 			_yText.Text = $"{view.Frame.Y}";
 
 			var w = view.Width.ToString ();
 			var h = view.Height.ToString ();
-			_wRadioGroup.Selected = dimNames.IndexOf (dimNames.Where (s => w.Contains (s)).First ());
-			_hRadioGroup.Selected = dimNames.IndexOf (dimNames.Where (s => h.Contains (s)).First ());
+			_wRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.Where (s => w.Contains (s)).First ());
+			_hRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.Where (s => h.Contains (s)).First ());
 			_wText.Text = $"{view.Frame.Width}";
 			_hText.Text = $"{view.Frame.Height}";
 		}

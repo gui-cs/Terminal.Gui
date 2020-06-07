@@ -949,6 +949,76 @@ namespace Terminal.Gui {
 		public Rune BottomTee;
 
 		/// <summary>
+		/// Checkmark.
+		/// </summary>
+		public Rune Checked;
+
+		/// <summary>
+		/// Un-checked checkmark.
+		/// </summary>
+		public Rune UnChecked;
+
+		/// <summary>
+		/// Selected mark.
+		/// </summary>
+		public Rune Selected;
+
+		/// <summary>
+		/// Un-selected selected mark.
+		/// </summary>
+		public Rune UnSelected;
+
+		/// <summary>
+		/// Right Arrow.
+		/// </summary>
+		public Rune RightArrow;
+
+		/// <summary>
+		/// Left Arrow.
+		/// </summary>
+		public Rune LeftArrow;
+
+		/// <summary>
+		/// Down Arrow.
+		/// </summary>
+		public Rune DownArrow;
+
+		/// <summary>
+		/// Up Arrow.
+		/// </summary>
+		public Rune UpArrow;
+
+		/// <summary>
+		/// Left indicator for default action (e.g. for <see cref="Button"/>).
+		/// </summary>
+		public Rune LeftDefaultIndicator;
+
+		/// <summary>
+		/// Right indicator for default action (e.g. for <see cref="Button"/>).
+		/// </summary>
+		public Rune RightDefaultIndicator;
+
+		/// <summary>
+		/// Left frame/bracket (e.g. '[' for <see cref="Button"/>).
+		/// </summary>
+		public Rune LeftBracket;
+
+		/// <summary>
+		/// Right frame/bracket (e.g. ']' for <see cref="Button"/>).
+		/// </summary>
+		public Rune RightBracket;
+
+		/// <summary>
+		/// On Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
+		/// </summary>
+		public Rune OnMeterSegment;
+
+		/// <summary>
+		/// Off Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
+		/// </summary>
+		public Rune OffMeterSegement;
+
+		/// <summary>
 		/// Make the attribute for the foreground and background colors.
 		/// </summary>
 		/// <param name="fore">Foreground.</param>

@@ -168,7 +168,7 @@ static class Demo {
 			passText,
 			new FrameView (new Rect (3, 10, 25, 6), "Options"){
 				new CheckBox (1, 0, "Remember me"),
-				new RadioGroup (1, 2, new [] { "_Personal", "_Company" }),
+				new RadioGroup (1, 2, new ustring [] { "_Personal", "_Company" }),
 			},
 			new ListView (new Rect (59, 6, 16, 4), new string [] {
 				"First row",

@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <StartupObject>UICatalog.UICatalogApp</StartupObject>
     <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

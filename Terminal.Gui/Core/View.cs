@@ -960,7 +960,7 @@ namespace Terminal.Gui {
 							Application.CurrentView = view;
 
 							// Clip the sub-view
-							var savedClip = ClipToBounds ();
+							var savedClip = view.ClipToBounds ();
 
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0) because

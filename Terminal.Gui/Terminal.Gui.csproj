@@ -93,6 +93,13 @@
       * Fixes #421 Now builds on Linux with "dotnet build". (Thanks @AArnott!)
       * MenuItem now supports checked/selected items. (Thanks @tig!)
       * Label no longer incorreclty displays formfeed char. (Thanks @tig!)
+      * Fixes #645 - RadioGroup now supports unicode. (Thanks @tig!)
+      * Fixes #573 - RadioGroup supports Computed Layout. (Thanks @tig!)
+      * RadioGroup now uses a single, good looking, glyph. (Thanks @tig!)
+      * RadioGroup now supportrs the Action-based event pattern correctly. BREAKING CHANGE. (Thanks @tig!)
+      * ConsoleDriver and Drivers have new standard glyph definitions for things like right arrow. (Thanks @tig!)
+      * ScrollView updated to use pretty glyphs. (Thanks @tig!)
+      * Menubar now uses pretty arrow glyph for sub-menus. (Thanks @tig!)
 
       0.81:
       * Fix ncurses engine for macOS/Linux, it works again

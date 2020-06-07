@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Terminal.Gui;
 
@@ -16,40 +17,50 @@ namespace UICatalog {
 	class CharacterMap : Scenario {
 		public override void Setup ()
 		{
-			var charMap = new CharMap () { X = 0, Y = 0, Width = CharMap.RowWidth + 2, Height = Dim.Fill(), Start = 0x2500, 
-				ColorScheme = Colors.Dialog};
-
-			Win.Add (charMap);
-
-			Button CreateBlock(Window win, ustring title, int start, int end, View align)
-			{
-				var button = new Button ($"{title} (U+{start:x5}-{end:x5})") {
-					X = Pos.X (align),
-					Y = Pos.Bottom (align),
-					Clicked = () => {
-						charMap.Start = start;
-					},
-				};
-				win.Add (button);
-				return button;
+			var charMap = new CharMap () {
+				X = 0,
+				Y = 0,
+				Width = CharMap.RowWidth + 2,
+				Height = Dim.Fill (),
+				Start = 0x2500,
+				ColorScheme = Colors.Dialog
 			};
 
-			var label = new Label ("Unicode Blocks:") { X = Pos.Right (charMap) + 2, Y = Pos.Y (charMap) };
+			Win.Add (charMap);
+			var label = new Label ("Jump To Unicode Block:") { X = Pos.Right (charMap) + 1, Y = Pos.Y (charMap) };
 			Win.Add (label);
-			var button = CreateBlock (Win, "Currency Symbols", 0x20A0, 0x20CF, label);
-			button = CreateBlock (Win, "Letterlike Symbols", 0x2100, 0x214F, button);
-			button = CreateBlock (Win, "Arrows", 0x2190, 0x21ff, button);
-			button = CreateBlock (Win, "Mathematical symbols", 0x2200, 0x22ff, button);
-			button = CreateBlock (Win, "Miscellaneous Technical", 0x2300, 0x23ff, button);
-			button = CreateBlock (Win, "Box Drawing & Geometric Shapes", 0x2500, 0x25ff, button);
-			button = CreateBlock (Win, "Miscellaneous Symbols", 0x2600, 0x26ff, button);
-			button = CreateBlock (Win, "Dingbats", 0x2700, 0x27ff, button);
-			button = CreateBlock (Win, "Braille", 0x2800, 0x28ff, button);
-			button = CreateBlock (Win, "Miscellaneous Symbols and Arrows", 0x2b00, 0x2bff, button);
-			button = CreateBlock (Win, "Alphabetic Presentation Forms", 0xFB00, 0xFb4f, button);
-			button = CreateBlock (Win, "Cuneiform Numbers and Punctuation[1", 0x12400, 0x1240f, button);
-			button = CreateBlock (Win, "Chess Symbols", 0x1FA00, 0x1FA0f, button);
-			button = CreateBlock (Win, "End", CharMap.MaxCodePointVal - 16, CharMap.MaxCodePointVal, button);
+
+			(ustring radioLabel, int start, int end) CreateRadio (ustring title, int start, int end)
+			{
+				return ($"{title} (U+{start:x5}-{end:x5})", start, end);
+			}
+
+			var radioItems = new (ustring radioLabel, int start, int end) [] {
+				CreateRadio("Currency Symbols", 0x20A0, 0x20CF),
+				CreateRadio("Letterlike Symbols", 0x2100, 0x214F),
+				CreateRadio("Arrows", 0x2190, 0x21ff),
+				CreateRadio("Mathematical symbols", 0x2200, 0x22ff),
+				CreateRadio("Miscellaneous Technical", 0x2300, 0x23ff),
+				CreateRadio("Box Drawing & Geometric Shapes", 0x2500, 0x25ff),
+				CreateRadio("Miscellaneous Symbols", 0x2600, 0x26ff),
+				CreateRadio("Dingbats", 0x2700, 0x27ff),
+				CreateRadio("Braille", 0x2800, 0x28ff),
+				CreateRadio("Miscellaneous Symbols and Arrows", 0x2b00, 0x2bff),
+				CreateRadio("Alphabetic Presentation Forms", 0xFB00, 0xFb4f),
+				CreateRadio("Cuneiform Numbers and Punctuation", 0x12400, 0x1240f),
+				CreateRadio("Chess Symbols", 0x1FA00, 0x1FA0f),
+				CreateRadio("End", CharMap.MaxCodePointVal - 16, CharMap.MaxCodePointVal),
+			};
+
+			var jumpList = new RadioGroup (radioItems.Select (t => t.radioLabel).ToArray ());
+			jumpList.X = Pos.X (label);
+			jumpList.Y = Pos.Bottom (label);
+			jumpList.Width = Dim.Fill ();
+			jumpList.SelectedItemChanged = (args) => {
+				charMap.Start = radioItems[args.SelectedItem].start;
+			};
+
+			Win.Add (jumpList);
 		}
 	}
 
@@ -64,7 +75,6 @@ namespace UICatalog {
 			set {
 				_start = value;
 				ContentOffset = new Point (0, _start / 16);
-
 				SetNeedsDisplay ();
 			}
 		}
@@ -74,7 +84,7 @@ namespace UICatalog {
 
 		// Row Header + space + (space + char + space)
 		public static int RowHeaderWidth => $"U+{MaxCodePointVal:x5}".Length;
-		public static int RowWidth => RowHeaderWidth + 1 + (" c ".Length * 16);
+		public static int RowWidth => RowHeaderWidth + (" c".Length * 16);
 
 		public CharMap ()
 		{
@@ -96,18 +106,18 @@ namespace UICatalog {
 		private void CharMap_DrawContent (Rect viewport)
 		{
 			for (int header = 0; header < 16; header++) {
-				Move (viewport.X + RowHeaderWidth + 1 + (header * 3), 0);
+				Move (viewport.X + RowHeaderWidth + (header * 2), 0);
 				Driver.AddStr ($" {header:x} ");
 			}
-			for (int row = 0; row < viewport.Height - 1; row++) {
+			for (int row = 0, y = 0; row < viewport.Height / 2 - 1; row++, y += 2) {
 				int val = (-viewport.Y + row) * 16;
 				if (val < MaxCodePointVal) {
 					var rowLabel = $"U+{val / 16:x4}x";
-					Move (0, row + 1);
+					Move (0, y + 1);
 					Driver.AddStr (rowLabel);
 					for (int col = 0; col < 16; col++) {
-						Move (viewport.X + RowHeaderWidth + 1 + (col * 3), 0 + row + 1);
-						Driver.AddStr ($" {(char)((-viewport.Y + row) * 16 + col)} ");
+						Move (viewport.X + RowHeaderWidth + (col * 2), 0 + y + 1);
+						Driver.AddStr ($" {(char)((-viewport.Y + row) * 16 + col)}");
 					}
 				}
 			}

@@ -118,7 +118,7 @@ namespace UICatalog {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
-			var styleRadioGroup = new RadioGroup (new [] { "_Query", "_Error" } ) {
+			var styleRadioGroup = new RadioGroup (new ustring [] { "_Query", "_Error" } ) {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 			};
@@ -158,7 +158,7 @@ namespace UICatalog {
 						for (int i = 0; i < numButtons; i++) {
 							btns.Add(btnText[i % 10]);
 						}
-						if (styleRadioGroup.Selected == 0) {
+						if (styleRadioGroup.SelectedItem == 0) {
 							buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), btns.ToArray ())}";
 						} else {
 							buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), btns.ToArray ())}";

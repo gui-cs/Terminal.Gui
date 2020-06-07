@@ -156,9 +156,9 @@ namespace Terminal.Gui {
 					var by2 = (position + bh) * bh / Size;
 
 					Move (col, 0);
-					Driver.AddRune ('^');
+					Driver.AddRune (Driver.UpArrow);
 					Move (col, Bounds.Height - 1);
-					Driver.AddRune ('v');
+					Driver.AddRune (Driver.DownArrow);
 					for (int y = 0; y < bh; y++) {
 						Move (col, y + 1);
 						if (y < by1 - 1 || y > by2)
@@ -204,7 +204,7 @@ namespace Terminal.Gui {
 					var bx2 = (position + bw) * bw / Size;
 
 					Move (0, row);
-					Driver.AddRune ('<');
+					Driver.AddRune (Driver.LeftArrow);
 
 					for (int x = 0; x < bw; x++) {
 
@@ -224,7 +224,7 @@ namespace Terminal.Gui {
 						}
 						Driver.AddRune (special);
 					}
-					Driver.AddRune ('>');
+					Driver.AddRune (Driver.RightArrow);
 				}
 			}
 		}
