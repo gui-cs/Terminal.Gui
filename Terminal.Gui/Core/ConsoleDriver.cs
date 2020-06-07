@@ -314,7 +314,11 @@ namespace Terminal.Gui {
 			return attribute;
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for equality.
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <returns>true if the two objects are equal</returns>
 		public override bool Equals (object obj)
 		{
 			return Equals (obj as ColorScheme);
@@ -335,7 +339,10 @@ namespace Terminal.Gui {
 			       EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Returns a hashcode for this instance.
+		/// </summary>
+		/// <returns>hashcode for this instance</returns>
 		public override int GetHashCode ()
 		{
 			int hashCode = -1242460230;

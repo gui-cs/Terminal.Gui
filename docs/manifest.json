@@ -13,6 +13,18 @@
       "is_incremental": false
     },
     {
+      "type": "Conceptual",
+      "source_relative_path": "README.md",
+      "output": {
+        ".html": {
+          "relative_path": "README.html",
+          "hash": "ZNWj7Keb9nnimeEnyAOYUA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
       "type": "ManagedReference",
       "source_relative_path": "api/Terminal.Gui/Terminal.Gui.Application.ResizedEventArgs.yml",
       "output": {
@@ -114,7 +126,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.ColorScheme.html",
-          "hash": "/m1p7mkCfhxfWF/1g4FKGg=="
+          "hash": "ikJdUUFpWNGP19zLelgwpA=="
         }
       },
       "is_incremental": false,
@@ -390,7 +402,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.MenuBarItem.html",
-          "hash": "VGBgJy3Lg1J5MuXgsiw2jQ=="
+          "hash": "3fOiQK8zgoAWL6jZZs4KwQ=="
         }
       },
       "is_incremental": false,
@@ -402,7 +414,19 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.MenuItem.html",
-          "hash": "xjtvXspzEBQ01Okag72ieQ=="
+          "hash": "bXs4I5zGjIJ2PW5F4rfWFw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Terminal.Gui/Terminal.Gui.MenuItemCheckStyle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Terminal.Gui/Terminal.Gui.MenuItemCheckStyle.html",
+          "hash": "5nz1fNDNWRvy3XLHjizpAg=="
         }
       },
       "is_incremental": false,
@@ -738,7 +762,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/Terminal.Gui.html",
-          "hash": "TczBP62PS4fT7rlRK/X/Dg=="
+          "hash": "+KEWr9JtXCbQPqPQdw+4VA=="
         }
       },
       "is_incremental": false,
@@ -810,7 +834,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Terminal.Gui/toc.html",
-          "hash": "DDKLrBSDSxQcNDkgCLnUmA=="
+          "hash": "9QEYOK/IUcWRgIsSiRS48g=="
         }
       },
       "is_incremental": false,
@@ -846,7 +870,7 @@
       "output": {
         ".html": {
           "relative_path": "api/UICatalog/UICatalog.Scenario.html",
-          "hash": "eD4XtFKWa75qkI0x4AAPQA=="
+          "hash": "ZtOB4RKijHt3z8AVd/Mokg=="
         }
       },
       "is_incremental": false,
@@ -870,7 +894,7 @@
       "output": {
         ".html": {
           "relative_path": "api/UICatalog/UICatalog.html",
-          "hash": "GlhimAyigvEtjpSbjREqVw=="
+          "hash": "mrr60lZ3RQ5d0uEMORxsMQ=="
         }
       },
       "is_incremental": false,
@@ -1022,14 +1046,14 @@
         "ConceptualDocumentProcessor": {
           "can_incremental": true,
           "incrementalPhase": "build",
-          "total_file_count": 6,
-          "skipped_file_count": 6
+          "total_file_count": 7,
+          "skipped_file_count": 7
         },
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": true,
           "incrementalPhase": "build",
-          "total_file_count": 71,
-          "skipped_file_count": 71
+          "total_file_count": 72,
+          "skipped_file_count": 72
         },
         "ResourceDocumentProcessor": {
           "can_incremental": false,

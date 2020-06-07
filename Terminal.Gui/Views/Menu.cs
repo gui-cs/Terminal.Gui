@@ -16,7 +16,28 @@ using System.Collections.Generic;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// A <see cref="MenuItemCheckType"/> has a title, an associated help text, and an action to execute on activation.
+	/// Specifies how a <see cref="MenuItem"/> shows selection state. 
+	/// </summary>
+	[Flags]
+	public enum MenuItemCheckStyle {
+		/// <summary>
+		/// The menu item will be shown normally, with no check indicator.
+		/// </summary>
+		NoCheck = 0b_0000_0000,
+
+		/// <summary>
+		/// The menu item will indicate checked/un-checked state (see <see cref="Checked"/>.
+		/// </summary>
+		Checked = 0b_0000_0001,
+
+		/// <summary>
+		/// The menu item is part of a menu radio group (see <see cref="Checked"/> and will indicate selected state.
+		/// </summary>
+		Radio = 0b_0000_0010,
+	};
+
+	/// <summary>
+	/// A <see cref="MenuItem"/> has a title, an associated help text, and an action to execute on activation.
 	/// </summary>
 	public class MenuItem {
 
@@ -112,38 +133,17 @@ namespace Terminal.Gui {
 		}
 
 		internal int Width => Title.Length + Help.Length + 1 + 2 +
-			(Checked || CheckType.HasFlag (MenuItemCheckType.Checked) || CheckType.HasFlag (MenuItemCheckType.Radio) ? 2 : 0);
+			(Checked || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0);
 
 		/// <summary>
-		/// Sets or gets whether the <see cref="MenuItem"/> shows a check indicator or not. See <see cref="MenuItemCheckType"/>.
+		/// Sets or gets whether the <see cref="MenuItem"/> shows a check indicator or not. See <see cref="MenuItemCheckStyle"/>.
 		/// </summary>
 		public bool Checked { set; get; }
 
 		/// <summary>
-		/// Specifies how a <see cref="MenuItem"/> shows selection state. 
-		/// </summary>
-		[Flags]
-		public enum MenuItemCheckType : uint {
-			/// <summary>
-			/// The menu item will be shown normally, with no check indicator.
-			/// </summary>
-			NoCheck = 0b_0000_0000,
-
-			/// <summary>
-			/// The menu item will indicate checked/un-checked state (see <see cref="Checked"/>.
-			/// </summary>
-			Checked = 0b_0000_0001,
-
-			/// <summary>
-			/// The menu item is part of a menu radio group (see <see cref="Checked"/> and will indicate selected state.
-			/// </summary>
-			Radio = 0b_0000_0010,
-		};
-
-		/// <summary>
 		/// Sets or gets the type selection indicator the menu item will be displayed with.
 		/// </summary>
-		public MenuItemCheckType CheckType { get; set; }
+		public MenuItemCheckStyle CheckType { get; set; }
 
 		/// <summary>
 		/// Gets or sets the parent for this <see cref="MenuItem"/>
@@ -343,7 +343,7 @@ namespace Terminal.Gui {
 				var checkChar = (char)0x25cf;
 				var uncheckedChar = (char)0x25cc;
 
-				if (item.CheckType.HasFlag (MenuItem.MenuItemCheckType.Checked)) {
+				if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked)) {
 					checkChar = (char)0x221a;
 					uncheckedChar = ' ';
 				}
@@ -351,8 +351,8 @@ namespace Terminal.Gui {
 				// Support Checked even though CHeckType wasn't set
 				if (item.Checked) {
 					textToDraw = checkChar + " " + item.Title;
-				} else if (item.CheckType.HasFlag (MenuItem.MenuItemCheckType.Checked) ||
-					item.CheckType.HasFlag (MenuItem.MenuItemCheckType.Radio)) {
+				} else if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked) ||
+					item.CheckType.HasFlag (MenuItemCheckStyle.Radio)) {
 					textToDraw = uncheckedChar + " " + item.Title;
 				} else {
 					textToDraw = item.Title;

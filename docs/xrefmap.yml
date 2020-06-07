@@ -900,6 +900,25 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ColorScheme.Disabled
   nameWithType: ColorScheme.Disabled
+- uid: Terminal.Gui.ColorScheme.Equals(System.Object)
+  name: Equals(Object)
+  href: api/Terminal.Gui/Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_Equals_System_Object_
+  commentId: M:Terminal.Gui.ColorScheme.Equals(System.Object)
+  fullName: Terminal.Gui.ColorScheme.Equals(System.Object)
+  nameWithType: ColorScheme.Equals(Object)
+- uid: Terminal.Gui.ColorScheme.Equals(Terminal.Gui.ColorScheme)
+  name: Equals(ColorScheme)
+  href: api/Terminal.Gui/Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_Equals_Terminal_Gui_ColorScheme_
+  commentId: M:Terminal.Gui.ColorScheme.Equals(Terminal.Gui.ColorScheme)
+  fullName: Terminal.Gui.ColorScheme.Equals(Terminal.Gui.ColorScheme)
+  nameWithType: ColorScheme.Equals(ColorScheme)
+- uid: Terminal.Gui.ColorScheme.Equals*
+  name: Equals
+  href: api/Terminal.Gui/Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_Equals_
+  commentId: Overload:Terminal.Gui.ColorScheme.Equals
+  isSpec: "True"
+  fullName: Terminal.Gui.ColorScheme.Equals
+  nameWithType: ColorScheme.Equals
 - uid: Terminal.Gui.ColorScheme.Focus
   name: Focus
   href: api/Terminal.Gui/Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_Focus
@@ -913,6 +932,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ColorScheme.Focus
   nameWithType: ColorScheme.Focus
+- uid: Terminal.Gui.ColorScheme.GetHashCode
+  name: GetHashCode()
+  href: api/Terminal.Gui/Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_GetHashCode
+  commentId: M:Terminal.Gui.ColorScheme.GetHashCode
+  fullName: Terminal.Gui.ColorScheme.GetHashCode()
+  nameWithType: ColorScheme.GetHashCode()
+- uid: Terminal.Gui.ColorScheme.GetHashCode*
+  name: GetHashCode
+  href: api/Terminal.Gui/Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_GetHashCode_
+  commentId: Overload:Terminal.Gui.ColorScheme.GetHashCode
+  isSpec: "True"
+  fullName: Terminal.Gui.ColorScheme.GetHashCode
+  nameWithType: ColorScheme.GetHashCode
 - uid: Terminal.Gui.ColorScheme.HotFocus
   name: HotFocus
   href: api/Terminal.Gui/Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_HotFocus
@@ -952,6 +984,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ColorScheme.Normal
   nameWithType: ColorScheme.Normal
+- uid: Terminal.Gui.ColorScheme.op_Equality(Terminal.Gui.ColorScheme,Terminal.Gui.ColorScheme)
+  name: Equality(ColorScheme, ColorScheme)
+  href: api/Terminal.Gui/Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_op_Equality_Terminal_Gui_ColorScheme_Terminal_Gui_ColorScheme_
+  commentId: M:Terminal.Gui.ColorScheme.op_Equality(Terminal.Gui.ColorScheme,Terminal.Gui.ColorScheme)
+  fullName: Terminal.Gui.ColorScheme.Equality(Terminal.Gui.ColorScheme, Terminal.Gui.ColorScheme)
+  nameWithType: ColorScheme.Equality(ColorScheme, ColorScheme)
+- uid: Terminal.Gui.ColorScheme.op_Equality*
+  name: Equality
+  href: api/Terminal.Gui/Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_op_Equality_
+  commentId: Overload:Terminal.Gui.ColorScheme.op_Equality
+  isSpec: "True"
+  fullName: Terminal.Gui.ColorScheme.Equality
+  nameWithType: ColorScheme.Equality
+- uid: Terminal.Gui.ColorScheme.op_Inequality(Terminal.Gui.ColorScheme,Terminal.Gui.ColorScheme)
+  name: Inequality(ColorScheme, ColorScheme)
+  href: api/Terminal.Gui/Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_op_Inequality_Terminal_Gui_ColorScheme_Terminal_Gui_ColorScheme_
+  commentId: M:Terminal.Gui.ColorScheme.op_Inequality(Terminal.Gui.ColorScheme,Terminal.Gui.ColorScheme)
+  fullName: Terminal.Gui.ColorScheme.Inequality(Terminal.Gui.ColorScheme, Terminal.Gui.ColorScheme)
+  nameWithType: ColorScheme.Inequality(ColorScheme, ColorScheme)
+- uid: Terminal.Gui.ColorScheme.op_Inequality*
+  name: Inequality
+  href: api/Terminal.Gui/Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_op_Inequality_
+  commentId: Overload:Terminal.Gui.ColorScheme.op_Inequality
+  isSpec: "True"
+  fullName: Terminal.Gui.ColorScheme.Inequality
+  nameWithType: ColorScheme.Inequality
 - uid: Terminal.Gui.ConsoleDriver
   name: ConsoleDriver
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html
@@ -3943,6 +4001,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.MenuItem.CanExecute
   nameWithType: MenuItem.CanExecute
+- uid: Terminal.Gui.MenuItem.Checked
+  name: Checked
+  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_Checked
+  commentId: P:Terminal.Gui.MenuItem.Checked
+  fullName: Terminal.Gui.MenuItem.Checked
+  nameWithType: MenuItem.Checked
+- uid: Terminal.Gui.MenuItem.Checked*
+  name: Checked
+  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_Checked_
+  commentId: Overload:Terminal.Gui.MenuItem.Checked
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuItem.Checked
+  nameWithType: MenuItem.Checked
+- uid: Terminal.Gui.MenuItem.CheckType
+  name: CheckType
+  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_CheckType
+  commentId: P:Terminal.Gui.MenuItem.CheckType
+  fullName: Terminal.Gui.MenuItem.CheckType
+  nameWithType: MenuItem.CheckType
+- uid: Terminal.Gui.MenuItem.CheckType*
+  name: CheckType
+  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_CheckType_
+  commentId: Overload:Terminal.Gui.MenuItem.CheckType
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuItem.CheckType
+  nameWithType: MenuItem.CheckType
 - uid: Terminal.Gui.MenuItem.GetMenuBarItem
   name: GetMenuBarItem()
   href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_GetMenuBarItem
@@ -4020,6 +4104,30 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.MenuItem.Title
   nameWithType: MenuItem.Title
+- uid: Terminal.Gui.MenuItemCheckStyle
+  name: MenuItemCheckStyle
+  href: api/Terminal.Gui/Terminal.Gui.MenuItemCheckStyle.html
+  commentId: T:Terminal.Gui.MenuItemCheckStyle
+  fullName: Terminal.Gui.MenuItemCheckStyle
+  nameWithType: MenuItemCheckStyle
+- uid: Terminal.Gui.MenuItemCheckStyle.Checked
+  name: Checked
+  href: api/Terminal.Gui/Terminal.Gui.MenuItemCheckStyle.html#Terminal_Gui_MenuItemCheckStyle_Checked
+  commentId: F:Terminal.Gui.MenuItemCheckStyle.Checked
+  fullName: Terminal.Gui.MenuItemCheckStyle.Checked
+  nameWithType: MenuItemCheckStyle.Checked
+- uid: Terminal.Gui.MenuItemCheckStyle.NoCheck
+  name: NoCheck
+  href: api/Terminal.Gui/Terminal.Gui.MenuItemCheckStyle.html#Terminal_Gui_MenuItemCheckStyle_NoCheck
+  commentId: F:Terminal.Gui.MenuItemCheckStyle.NoCheck
+  fullName: Terminal.Gui.MenuItemCheckStyle.NoCheck
+  nameWithType: MenuItemCheckStyle.NoCheck
+- uid: Terminal.Gui.MenuItemCheckStyle.Radio
+  name: Radio
+  href: api/Terminal.Gui/Terminal.Gui.MenuItemCheckStyle.html#Terminal_Gui_MenuItemCheckStyle_Radio
+  commentId: F:Terminal.Gui.MenuItemCheckStyle.Radio
+  fullName: Terminal.Gui.MenuItemCheckStyle.Radio
+  nameWithType: MenuItemCheckStyle.Radio
 - uid: Terminal.Gui.MessageBox
   name: MessageBox
   href: api/Terminal.Gui/Terminal.Gui.MessageBox.html
@@ -8221,12 +8329,12 @@ references:
   isSpec: "True"
   fullName: UICatalog.Scenario.GetName
   nameWithType: Scenario.GetName
-- uid: UICatalog.Scenario.Init(Terminal.Gui.Toplevel)
-  name: Init(Toplevel)
-  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Init_Terminal_Gui_Toplevel_
-  commentId: M:UICatalog.Scenario.Init(Terminal.Gui.Toplevel)
-  fullName: UICatalog.Scenario.Init(Terminal.Gui.Toplevel)
-  nameWithType: Scenario.Init(Toplevel)
+- uid: UICatalog.Scenario.Init(Terminal.Gui.Toplevel,Terminal.Gui.ColorScheme)
+  name: Init(Toplevel, ColorScheme)
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Init_Terminal_Gui_Toplevel_Terminal_Gui_ColorScheme_
+  commentId: M:UICatalog.Scenario.Init(Terminal.Gui.Toplevel,Terminal.Gui.ColorScheme)
+  fullName: UICatalog.Scenario.Init(Terminal.Gui.Toplevel, Terminal.Gui.ColorScheme)
+  nameWithType: Scenario.Init(Toplevel, ColorScheme)
 - uid: UICatalog.Scenario.Init*
   name: Init
   href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_Init_
