@@ -314,11 +314,17 @@ namespace Terminal.Gui {
 			return attribute;
 		}
 
+		/// <inheritdoc/>
 		public override bool Equals (object obj)
 		{
 			return Equals (obj as ColorScheme);
 		}
 
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for equality.
+		/// </summary>
+		/// <param name="other"></param>
+		/// <returns>true if the two objects are equal</returns>
 		public bool Equals (ColorScheme other)
 		{
 			return other != null &&
@@ -329,6 +335,7 @@ namespace Terminal.Gui {
 			       EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
 		}
 
+		/// <inheritdoc/>
 		public override int GetHashCode ()
 		{
 			int hashCode = -1242460230;
@@ -340,11 +347,23 @@ namespace Terminal.Gui {
 			return hashCode;
 		}
 
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for equality.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns><c>true</c> if the two objects are equivalent</returns>
 		public static bool operator == (ColorScheme left, ColorScheme right)
 		{
 			return EqualityComparer<ColorScheme>.Default.Equals (left, right);
 		}
 
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for inequality.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns><c>true</c> if the two objects are not equivalent</returns>
 		public static bool operator != (ColorScheme left, ColorScheme right)
 		{
 			return !(left == right);
@@ -360,8 +379,8 @@ namespace Terminal.Gui {
 			// Use reflection to dynamically create the default set of ColorSchemes from the list defiined 
 			// by the class. 
 			ColorSchemes = typeof (Colors).GetProperties ()
-				.Where(p => p.PropertyType == typeof(ColorScheme))
-				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme())) // (ColorScheme)p.GetValue (p)))
+				.Where (p => p.PropertyType == typeof (ColorScheme))
+				.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme ())) // (ColorScheme)p.GetValue (p)))
 				.ToDictionary (t => t.Key, t => t.Value);
 		}
 
@@ -413,9 +432,9 @@ namespace Terminal.Gui {
 		///	This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g. <c>edit.ColorScheme = Colors.ColorSchemes["Error"];</c>
 		/// </para>
 		/// </remarks>
-		public static ColorScheme Error { get => GetColorScheme (); set => SetColorScheme (value);  }
+		public static ColorScheme Error { get => GetColorScheme (); set => SetColorScheme (value); }
 
-		static ColorScheme GetColorScheme([CallerMemberName] string callerMemberName = null)
+		static ColorScheme GetColorScheme ([CallerMemberName] string callerMemberName = null)
 		{
 			return ColorSchemes [callerMemberName];
 		}
