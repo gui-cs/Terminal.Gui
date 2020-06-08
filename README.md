@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/{owner}/{repo}/workflows/{workflow_name}/badge.svg)](https://github.com/{owner}/{repo}/actions)
+![.NET Core](https://github.com/migueldeicaza/gui.cs/workflows/.NET%20Core/badge.svg?branch=master)
 [![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui)
 [![Downloads](https://img.shields.io/nuget/dt/Terminal.Gui)](https://www.nuget.org/packages/Terminal.Gui)
 [![License](https://img.shields.io/github/license/migueldeicaza/gui.cs.svg)](LICENSE)
