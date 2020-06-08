@@ -89,7 +89,7 @@ namespace UICatalog {
 			textChanger.Clicked = () => textChanger.Text += "!";
 
 			Win.Add (button = new Button ("Lets see if this will move as \"Text Changer\" grows") {
-				X = Pos.Right(textChanger) + 2,
+				X = Pos.Right (textChanger) + 2,
 				Y = Pos.Y (textChanger),
 			});
 
@@ -105,7 +105,7 @@ namespace UICatalog {
 			var computedFrame = new FrameView ("Computed Layout") {
 				X = 0,
 				Y = Pos.Bottom (removeButton) + 1,
-				Width = Dim.Percent(50),
+				Width = Dim.Percent (50),
 				Height = 5
 			};
 			Win.Add (computedFrame);
@@ -113,7 +113,7 @@ namespace UICatalog {
 			// Demonstrates how changing the View.Frame property can move Views
 			var moveBtn = new Button ("Move This \u263b Button _via Pos") {
 				X = 0,
-				Y = Pos.Center() - 1,
+				Y = Pos.Center () - 1,
 				Width = 30,
 				ColorScheme = Colors.Error,
 			};
@@ -124,7 +124,7 @@ namespace UICatalog {
 			computedFrame.Add (moveBtn);
 
 			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
-			var sizeBtn = new Button ("Size This \u263a Button _via Pos") {
+			var sizeBtn = new Button ("Size This Button _via Pos") {
 				X = 0,
 				Y = Pos.Center () + 1,
 				Width = 30,
@@ -132,14 +132,14 @@ namespace UICatalog {
 			};
 			sizeBtn.Clicked = () => {
 				sizeBtn.Width = sizeBtn.Frame.Width + 5;
-				computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
+				//computedFrame.LayoutSubviews (); // FIXED: This call should not be needed. View.X is not causing relayout correctly
 			};
 			computedFrame.Add (sizeBtn);
 
 			var absoluteFrame = new FrameView ("Absolute Layout") {
-				X = Pos.Right(computedFrame),
+				X = Pos.Right (computedFrame),
 				Y = Pos.Bottom (removeButton) + 1,
-				Width = Dim.Fill(),
+				Width = Dim.Fill (),
 				Height = 5
 			};
 			Win.Add (absoluteFrame);
@@ -172,34 +172,6 @@ namespace UICatalog {
 				X = 4,
 				Y = Pos.Bottom (label) + 1,
 				SelectedItem = 2,
-				SelectedItemChanged = (args) => {
-					switch (args.SelectedItem) {
-					case 0:
-						moveBtn.TextAlignment = TextAlignment.Left;
-						sizeBtn.TextAlignment = TextAlignment.Left;
-						moveBtnA.TextAlignment = TextAlignment.Left;
-						sizeBtnA.TextAlignment = TextAlignment.Left;
-						break;
-					case 1:
-						moveBtn.TextAlignment = TextAlignment.Right;
-						sizeBtn.TextAlignment = TextAlignment.Right;
-						moveBtnA.TextAlignment = TextAlignment.Right;
-						sizeBtnA.TextAlignment = TextAlignment.Right;
-						break;
-					case 2:
-						moveBtn.TextAlignment = TextAlignment.Centered;
-						sizeBtn.TextAlignment = TextAlignment.Centered;
-						moveBtnA.TextAlignment = TextAlignment.Centered;
-						sizeBtnA.TextAlignment = TextAlignment.Centered;
-						break;
-					case 3:
-						moveBtn.TextAlignment = TextAlignment.Justified;
-						sizeBtn.TextAlignment = TextAlignment.Justified;
-						moveBtnA.TextAlignment = TextAlignment.Justified;
-						sizeBtnA.TextAlignment = TextAlignment.Justified;
-						break;
-					}
-				}
 			};
 			Win.Add (radioGroup);
 
@@ -208,7 +180,9 @@ namespace UICatalog {
 			{
 				// Remove the '_'
 				var i = txt.IndexOf ('_');
-				var start = txt [0, i];
+				ustring start = "";
+				if (i > -1)
+					start = txt [0, i];
 				txt = start + txt [i + 1, txt.Length];
 
 				// Move over one or go to start
@@ -224,9 +198,11 @@ namespace UICatalog {
 				return txt;
 			}
 
-			var moveHotKeyBtn = new Button ("Click to Change th_is Button's Hotkey") {
+			var mhkb = "Click to Change th_is Button's Hotkey";
+			var moveHotKeyBtn = new Button (mhkb) {
 				X = 2,
 				Y = Pos.Bottom (radioGroup) + 1,
+				Width = mhkb.Length + 10,
 				ColorScheme = Colors.TopLevel,
 			};
 			moveHotKeyBtn.Clicked = () => {
@@ -234,15 +210,54 @@ namespace UICatalog {
 			};
 			Win.Add (moveHotKeyBtn);
 
-			var moveUnicodeHotKeyBtn = new Button (" ~  s  gui.cs   master ↑10 = Сохранить") {
+			var muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
+			var moveUnicodeHotKeyBtn = new Button (muhkb) {
 				X = Pos.Right (moveHotKeyBtn) + 6,
 				Y = Pos.Bottom (radioGroup) + 1,
+				Width = muhkb.Length + 30,
 				ColorScheme = Colors.TopLevel,
 			};
 			moveUnicodeHotKeyBtn.Clicked = () => {
 				moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
 			};
 			Win.Add (moveUnicodeHotKeyBtn);
+
+			radioGroup.SelectedItemChanged += (args) => {
+				switch (args.SelectedItem) {
+				case 0:
+					moveBtn.TextAlignment = TextAlignment.Left;
+					sizeBtn.TextAlignment = TextAlignment.Left;
+					moveBtnA.TextAlignment = TextAlignment.Left;
+					sizeBtnA.TextAlignment = TextAlignment.Left;
+					moveHotKeyBtn.TextAlignment = TextAlignment.Left;
+					moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Left;
+					break;
+				case 1:
+					moveBtn.TextAlignment = TextAlignment.Right;
+					sizeBtn.TextAlignment = TextAlignment.Right;
+					moveBtnA.TextAlignment = TextAlignment.Right;
+					sizeBtnA.TextAlignment = TextAlignment.Right;
+					moveHotKeyBtn.TextAlignment = TextAlignment.Right;
+					moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Right;
+					break;
+				case 2:
+					moveBtn.TextAlignment = TextAlignment.Centered;
+					sizeBtn.TextAlignment = TextAlignment.Centered;
+					moveBtnA.TextAlignment = TextAlignment.Centered;
+					sizeBtnA.TextAlignment = TextAlignment.Centered;
+					moveHotKeyBtn.TextAlignment = TextAlignment.Centered;
+					moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Centered;
+					break;
+				case 3:
+					moveBtn.TextAlignment = TextAlignment.Justified;
+					sizeBtn.TextAlignment = TextAlignment.Justified;
+					moveBtnA.TextAlignment = TextAlignment.Justified;
+					sizeBtnA.TextAlignment = TextAlignment.Justified;
+					moveHotKeyBtn.TextAlignment = TextAlignment.Justified;
+					moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Justified;
+					break;
+				}
+			};
 		}
 	}
 }

@@ -6,6 +6,7 @@
 //
 
 using System;
+using System.Net.Sockets;
 using NStack;
 
 namespace Terminal.Gui {
@@ -137,9 +138,7 @@ namespace Terminal.Gui {
 			}
 
 			set {
-				if (text?.Length != value?.Length) {
-					SetWidthHeight (value, is_default);
-				}
+				SetWidthHeight (value, is_default);
 				text = value;
 				Update ();
 			}
@@ -152,7 +151,7 @@ namespace Terminal.Gui {
 			get => textAlignment;
 			set {
 				textAlignment = value;
-				SetNeedsDisplay ();
+				Update ();
 			}
 		}
 
@@ -181,51 +180,8 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			Move (0, 0);
 
-			var caption = shown_text;
-			c_hot_pos = hot_pos;
-			int start;
-
-			if (Frame.Width > shown_text.Length + 1) {
-				switch (TextAlignment) {
-				case TextAlignment.Left:
-					caption += new string (' ', Frame.Width - caption.RuneCount);
-					break;
-				case TextAlignment.Right:
-					start = Frame.Width - caption.RuneCount;
-					caption = $"{new string (' ', Frame.Width - caption.RuneCount)}{caption}";
-					if (c_hot_pos > -1) {
-						c_hot_pos += start;
-					}
-					break;
-				case TextAlignment.Centered:
-					start = Frame.Width / 2 - caption.RuneCount / 2;
-					caption = $"{new string (' ', start)}{caption}{new string (' ', Frame.Width - caption.RuneCount - start)}";
-					if (c_hot_pos > -1) {
-						c_hot_pos += start;
-					}
-					break;
-				case TextAlignment.Justified:
-					var words = caption.Split (" ");
-					var wLen = GetWordsLength (words, out int runeCount);
-					var space = (Frame.Width - runeCount) / (caption.Length - wLen);
-					caption = "";
-					for (int i = 0; i < words.Length; i++) {
-						if (i == words.Length - 1) {
-							caption += new string (' ', Frame.Width - caption.RuneCount - 1);
-							caption += words [i];
-						} else {
-							caption += words [i];
-						}
-						if (i < words.Length - 1) {
-							caption += new string (' ', space);
-						}
-					}
-					if (c_hot_pos > -1) {
-						c_hot_pos += space - 1 + (wLen - runeCount == 0 ? 0 : wLen - runeCount + 1);
-					}
-					break;
-				}
-			}
+			var caption = GetTextAlignment (shown_text, hot_pos, out int s_hot_pos, TextAlignment);
+			c_hot_pos = s_hot_pos;
 
 			Driver.AddStr (caption);
 
@@ -234,18 +190,6 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
 				Driver.AddRune (hot_key);
 			}
-		}
-
-		int GetWordsLength (ustring [] words, out int runeCount)
-		{
-			int length = 0;
-			int rCount = 0;
-			for (int i = 0; i < words.Length; i++) {
-				length += words [i].Length;
-				rCount += words [i].RuneCount;
-			}
-			runeCount = rCount;
-			return length;
 		}
 
 		///<inheritdoc/>
