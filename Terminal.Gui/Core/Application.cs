@@ -157,21 +157,28 @@ namespace Terminal.Gui {
 		/// Creates a <see cref="Toplevel"/> and assigns it to <see cref="Top"/> and <see cref="CurrentView"/>
 		/// </para>
 		/// </remarks>
-		public static void Init () => Init (() => Toplevel.Create ());
+		public static void Init (ConsoleDriver driver = null) => Init (() => Toplevel.Create (), driver);
 
 		internal static bool _initialized = false;
 
 		/// <summary>
 		/// Initializes the Terminal.Gui application
 		/// </summary>
-		static void Init (Func<Toplevel> topLevelFactory)
+		static void Init (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null)
 		{
 			if (_initialized) return;
+
+			// This supports Unit Tests and the passing of a mock driver/loopdriver
+			if (driver != null) {
+				Driver = driver;
+				Driver.Init (TerminalResized);
+				MainLoop = new MainLoop ((IMainLoopDriver)driver);
+				SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
+			}
 
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
 				IMainLoopDriver mainLoopDriver;
-
 				if (UseSystemConsole) {
 					mainLoopDriver = new NetMainLoop ();
 					Driver = new NetDriver ();
@@ -199,7 +206,11 @@ namespace Terminal.Gui {
 		public class RunState : IDisposable {
 			internal bool closeDriver = true;
 
-			internal RunState (Toplevel view)
+			/// <summary>
+			/// Initializes a new <see cref="RunState"/> class.
+			/// </summary>
+			/// <param name="view"></param>
+			public RunState (Toplevel view)
 			{
 				Toplevel = view;
 			}
@@ -476,7 +487,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Shutdown an application initialized with <see cref="Init()"/>
+		/// Shutdown an application initialized with <see cref="Init(ConsoleDriver)"/>
 		/// </summary>
 		/// /// <param name="closeDriver"><c>true</c>Closes the application.<c>false</c>Closes toplevels only.</param>
 		public static void Shutdown (bool closeDriver = true)
