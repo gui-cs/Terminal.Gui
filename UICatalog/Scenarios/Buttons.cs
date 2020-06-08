@@ -124,7 +124,7 @@ namespace UICatalog {
 			computedFrame.Add (moveBtn);
 
 			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
-			var sizeBtn = new Button ("Size This Button _via Pos") {
+			var sizeBtn = new Button ("Size This \u263a Button _via Pos") {
 				X = 0,
 				Y = Pos.Center () + 1,
 				Width = 30,
