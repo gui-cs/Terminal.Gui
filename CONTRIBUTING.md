@@ -95,6 +95,8 @@ See also: https://www.codeproject.com/Articles/20550/C-Event-Implementation-Fund
 
 ## Examples & Tests
 
-**Terminal.Gui** does an automated unit or regression test suite ([please feel free to help build one](https://github.com/migueldeicaza/gui.cs/issues/566)). Until such a suite is available, the best we have is the [UICatalog](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog) sample app. 
+**Terminal.Gui** has an automated unit or regression test suite. See the [Testing wiki](https://github.com/migueldeicaza/gui.cs/wiki/Testing) 
+
+In addition [UI Catalog](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog) is a great sample app for manual testing.
 
 When adding new functionality, fixing bugs, or changing things, please either add a new `Scenario` to **UICatalog** or update an existing `Scenario` to fully illustrate your work and provide a test-case.
