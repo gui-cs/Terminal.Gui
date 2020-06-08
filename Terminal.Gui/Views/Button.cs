@@ -168,26 +168,7 @@ namespace Terminal.Gui {
 			else
 				shown_text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
 
-			hot_key = (Rune)0;
-			hot_pos = shown_text.IndexOf ('_');
-
-			if (hot_pos == -1) {
-				// Use first upper-case char
-				int i = 0;
-				foreach (Rune c in shown_text) {
-					if (Rune.IsUpper (c)) {
-						hot_key = c;
-						hot_pos = i;
-						break;
-					}
-					i++;
-				}
-			} else {
-				// Use char after '_'
-				var start = shown_text [0, hot_pos];
-				shown_text = start + shown_text [hot_pos + 1, shown_text.Length];
-				hot_key = Char.ToUpper((char)shown_text [hot_pos]);
-			}
+			shown_text = GetTextFromHotKey (shown_text, '_', out hot_pos, out hot_key);
 
 			SetNeedsDisplay ();
 		}
@@ -207,30 +188,30 @@ namespace Terminal.Gui {
 			if (Frame.Width > shown_text.Length + 1) {
 				switch (TextAlignment) {
 				case TextAlignment.Left:
-					caption += new string (' ', Frame.Width - caption.Length);
+					caption += new string (' ', Frame.Width - caption.RuneCount);
 					break;
 				case TextAlignment.Right:
-					start = Frame.Width - caption.Length;
-					caption = $"{new string (' ', Frame.Width - caption.Length)}{caption}";
+					start = Frame.Width - caption.RuneCount;
+					caption = $"{new string (' ', Frame.Width - caption.RuneCount)}{caption}";
 					if (c_hot_pos > -1) {
 						c_hot_pos += start;
 					}
 					break;
 				case TextAlignment.Centered:
-					start = Frame.Width / 2 - caption.Length / 2;
-					caption = $"{new string (' ', start)}{caption}{new string (' ', Frame.Width - caption.Length - start)}";
+					start = Frame.Width / 2 - caption.RuneCount / 2;
+					caption = $"{new string (' ', start)}{caption}{new string (' ', Frame.Width - caption.RuneCount - start)}";
 					if (c_hot_pos > -1) {
 						c_hot_pos += start;
 					}
 					break;
 				case TextAlignment.Justified:
-					var words = caption.ToString ().Split (new string [] { " " }, StringSplitOptions.RemoveEmptyEntries);
-					var wLen = GetWordsLength (words);
-					var space = (Frame.Width - wLen) / (caption.Length - wLen);
+					var words = caption.Split (" ");
+					var wLen = GetWordsLength (words, out int runeCount);
+					var space = (Frame.Width - runeCount) / (caption.Length - wLen);
 					caption = "";
 					for (int i = 0; i < words.Length; i++) {
 						if (i == words.Length - 1) {
-							caption += new string (' ', Frame.Width - caption.Length - 1);
+							caption += new string (' ', Frame.Width - caption.RuneCount - 1);
 							caption += words [i];
 						} else {
 							caption += words [i];
@@ -240,7 +221,7 @@ namespace Terminal.Gui {
 						}
 					}
 					if (c_hot_pos > -1) {
-						c_hot_pos += space - 1;
+						c_hot_pos += space - 1 + (wLen - runeCount == 0 ? 0 : wLen - runeCount + 1);
 					}
 					break;
 				}
@@ -255,14 +236,15 @@ namespace Terminal.Gui {
 			}
 		}
 
-		int GetWordsLength (string[] words)
+		int GetWordsLength (ustring [] words, out int runeCount)
 		{
 			int length = 0;
-
+			int rCount = 0;
 			for (int i = 0; i < words.Length; i++) {
 				length += words [i].Length;
+				rCount += words [i].RuneCount;
 			}
-
+			runeCount = rCount;
 			return length;
 		}
 
@@ -274,7 +256,7 @@ namespace Terminal.Gui {
 
 		bool CheckKey (KeyEvent key)
 		{
-			if (Char.ToUpper ((char)key.KeyValue) == hot_key) {
+			if ((char)key.KeyValue == hot_key) {
 				this.SuperView.SetFocus (this);
 				Clicked?.Invoke ();
 				return true;

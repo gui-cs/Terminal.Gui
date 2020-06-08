@@ -1451,6 +1451,70 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// A generic virtual method at the level of View to manipulate any hot-keys.
+		/// </summary>
+		/// <param name="text">The text to manipulate.</param>
+		/// <param name="hotKey">The hot-key to look for.</param>
+		/// <param name="hotPos">The returning hot-key position.</param>
+		/// <param name="showHotKey">The character immediately to the right relative to the hot-key position</param>
+		/// <returns></returns>
+		public virtual ustring GetTextFromHotKey(ustring text, Rune hotKey, out int hotPos, out Rune showHotKey)
+		{
+			Rune hot_key = (Rune)0;
+			int hot_pos = -1;
+			ustring shown_text = text;
+
+			// Use first hot_key char passed into 'hotKey'.
+			int i = 0;
+			foreach (Rune c in shown_text) {
+				if ((char)c != 0xFFFD) {
+					if (c == hotKey) {
+						hot_pos = i;
+					} else if (hot_pos > -1) {
+						hot_key = (char)c;
+						break;
+					}
+				}
+				i++;
+			}
+
+			if (hot_pos == -1) {
+				// Use first upper-case char if there are no hot-key in the text.
+				i = 0;
+				foreach (Rune c in shown_text) {
+					if (Rune.IsUpper (c)) {
+						hot_key = (char)c;
+						hot_pos = i;
+						break;
+					}
+					i++;
+				}
+			} else {
+				// Use char after 'hotKey'
+				ustring start = "";
+				i = 0;
+				foreach (Rune c in shown_text) {
+					start += ustring.Make (c);
+					i++;
+					if (i == hot_pos)
+						break;
+				}
+				var st = shown_text;
+				shown_text = start;
+				i = 0;
+				foreach (Rune c in st) {
+					i++;
+					if (i > hot_pos + 1) {
+						shown_text += ustring.Make (c);
+					}
+				}
+			}
+			hotPos = hot_pos;
+			showHotKey = hot_key;
+			return shown_text;
+		}
+
+		/// <summary>
 		/// Pretty prints the View
 		/// </summary>
 		/// <returns></returns>
@@ -1504,7 +1568,6 @@ namespace Terminal.Gui {
 
 			return false;
 		}
-
 
 		/// <summary>
 		/// Method invoked when a mouse event is generated

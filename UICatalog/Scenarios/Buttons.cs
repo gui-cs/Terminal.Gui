@@ -154,7 +154,7 @@ namespace UICatalog {
 			absoluteFrame.Add (moveBtnA);
 
 			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
-			var sizeBtnA = new Button (0, 2, "Size This Button via Frame") {
+			var sizeBtnA = new Button (0, 2, " ~  s  gui.cs   master ↑10 = Со_хранить") {
 				ColorScheme = Colors.Error,
 			};
 			sizeBtnA.Clicked = () => {
@@ -233,6 +233,16 @@ namespace UICatalog {
 				moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
 			};
 			Win.Add (moveHotKeyBtn);
+
+			var moveUnicodeHotKeyBtn = new Button (" ~  s  gui.cs   master ↑10 = Сохранить") {
+				X = Pos.Right (moveHotKeyBtn) + 6,
+				Y = Pos.Bottom (radioGroup) + 1,
+				ColorScheme = Colors.TopLevel,
+			};
+			moveUnicodeHotKeyBtn.Clicked = () => {
+				moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
+			};
+			Win.Add (moveUnicodeHotKeyBtn);
 		}
 	}
 }
