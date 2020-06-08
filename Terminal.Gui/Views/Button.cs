@@ -6,7 +6,6 @@
 //
 
 using System;
-using System.Net.Sockets;
 using NStack;
 
 namespace Terminal.Gui {
