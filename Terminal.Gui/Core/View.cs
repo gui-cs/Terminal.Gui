@@ -17,6 +17,27 @@ using System.Linq;
 using NStack;
 
 namespace Terminal.Gui {
+	/// <summary>
+	/// Text alignment enumeration, controls how text is displayed.
+	/// </summary>
+	public enum TextAlignment {
+		/// <summary>
+		/// Aligns the text to the left of the frame.
+		/// </summary>
+		Left,
+		/// <summary>
+		/// Aligns the text to the right side of the frame.
+		/// </summary>
+		Right,
+		/// <summary>
+		/// Centers the text in the frame.
+		/// </summary>
+		Centered,
+		/// <summary>
+		/// Shows the text as justified text in the frame.
+		/// </summary>
+		Justified
+	}
 
 	/// <summary>
 	/// Determines the LayoutStyle for a view, if Absolute, during LayoutSubviews, the
@@ -299,6 +320,7 @@ namespace Terminal.Gui {
 			set {
 				x = value;
 				SetNeedsLayout ();
+				SetNeedsDisplay (frame);
 			}
 		}
 
@@ -314,6 +336,7 @@ namespace Terminal.Gui {
 			set {
 				y = value;
 				SetNeedsLayout ();
+				SetNeedsDisplay (frame);
 			}
 		}
 
@@ -331,6 +354,7 @@ namespace Terminal.Gui {
 			set {
 				width = value;
 				SetNeedsLayout ();
+				SetNeedsDisplay (frame);
 			}
 		}
 
@@ -344,6 +368,7 @@ namespace Terminal.Gui {
 			set {
 				height = value;
 				SetNeedsLayout ();
+				SetNeedsDisplay (frame);
 			}
 		}
 
@@ -1451,6 +1476,153 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// A generic virtual method at the level of View to manipulate any hot-keys.
+		/// </summary>
+		/// <param name="text">The text to manipulate.</param>
+		/// <param name="hotKey">The hot-key to look for.</param>
+		/// <param name="hotPos">The returning hot-key position.</param>
+		/// <param name="showHotKey">The character immediately to the right relative to the hot-key position</param>
+		/// <returns>It aims to facilitate the preparation for <see cref="TextAlignment"/> procedures.</returns>
+		public virtual ustring GetTextFromHotKey(ustring text, Rune hotKey, out int hotPos, out Rune showHotKey)
+		{
+			Rune hot_key = (Rune)0;
+			int hot_pos = -1;
+			ustring shown_text = text;
+
+			// Use first hot_key char passed into 'hotKey'.
+			int i = 0;
+			foreach (Rune c in shown_text) {
+				if ((char)c != 0xFFFD) {
+					if (c == hotKey) {
+						hot_pos = i;
+					} else if (hot_pos > -1) {
+						hot_key = c;
+						break;
+					}
+				}
+				i++;
+			}
+
+			if (hot_pos == -1) {
+				// Use first upper-case char if there are no hot-key in the text.
+				i = 0;
+				foreach (Rune c in shown_text) {
+					if ((char)c != 0xFFFD) {
+						if (Rune.IsUpper (c)) {
+							hot_key = c;
+							hot_pos = i;
+							break;
+						}
+					}
+					i++;
+				}
+			} else {
+				// Use char after 'hotKey'
+				ustring start = "";
+				i = 0;
+				foreach (Rune c in shown_text) {
+					start += ustring.Make (c);
+					i++;
+					if (i == hot_pos)
+						break;
+				}
+				var st = shown_text;
+				shown_text = start;
+				i = 0;
+				foreach (Rune c in st) {
+					i++;
+					if (i > hot_pos + 1) {
+						shown_text += ustring.Make (c);
+					}
+				}
+			}
+			hotPos = hot_pos;
+			showHotKey = hot_key;
+			return shown_text;
+		}
+
+		/// <summary>
+		/// A generic virtual method at the level of View to manipulate any hot-keys with <see cref="TextAlignment"/> process.
+		/// </summary>
+		/// <param name="shown_text">The text to manipulate to align.</param>
+		/// <param name="hot_pos">The passed in hot-key position.</param>
+		/// <param name="c_hot_pos">The returning hot-key position.</param>
+		/// <param name="textAlignment">The <see cref="TextAlignment"/> to align to.</param>
+		/// <returns>It performs the <see cref="TextAlignment"/> process to the caller.</returns>
+		public virtual ustring GetTextAlignment (ustring shown_text, int hot_pos, out int c_hot_pos, TextAlignment textAlignment)
+		{
+			int start;
+			var caption = shown_text;
+			c_hot_pos = hot_pos;
+
+			if (Frame.Width > shown_text.Length + 1) {
+				switch (textAlignment) {
+				case TextAlignment.Left:
+					caption += new string (' ', Frame.Width - caption.RuneCount);
+					break;
+				case TextAlignment.Right:
+					start = Frame.Width - caption.RuneCount;
+					caption = $"{new string (' ', Frame.Width - caption.RuneCount)}{caption}";
+					if (c_hot_pos > -1) {
+						c_hot_pos += start;
+					}
+					break;
+				case TextAlignment.Centered:
+					start = Frame.Width / 2 - caption.RuneCount / 2;
+					caption = $"{new string (' ', start)}{caption}{new string (' ', Frame.Width - caption.RuneCount - start)}";
+					if (c_hot_pos > -1) {
+						c_hot_pos += start;
+					}
+					break;
+				case TextAlignment.Justified:
+					var words = caption.Split (" ");
+					var wLen = GetWordsLength (words, c_hot_pos, out int runeCount, out int w_hot_pos);
+					var space = (Frame.Width - runeCount) / (caption.Length - wLen);
+					caption = "";
+					for (int i = 0; i < words.Length; i++) {
+						if (i == words.Length - 1) {
+							caption += new string (' ', Frame.Width - caption.RuneCount - 1);
+							caption += words [i];
+						} else {
+							caption += words [i];
+						}
+						if (i < words.Length - 1) {
+							caption += new string (' ', space);
+						}
+					}
+					if (c_hot_pos > -1) {
+						if (wLen - runeCount == 0) {
+							c_hot_pos += (wLen - runeCount == 0 ? w_hot_pos * (space) - space - w_hot_pos + 1 : space + wLen - runeCount);
+						} else {
+							c_hot_pos += space + wLen - runeCount;
+						}
+					}
+					break;
+				}
+			}
+
+			return caption;
+		}
+
+		int GetWordsLength (ustring [] words, int hotPos, out int runeCount, out int wordHotPos)
+		{
+			int length = 0;
+			int rCount = 0;
+			int wHotPos = -1;
+			for (int i = 0; i < words.Length; i++) {
+				if (wHotPos == -1 && rCount + words [i].RuneCount >= hotPos)
+					wHotPos = i;
+				length += words [i].Length;
+				rCount += words [i].RuneCount;
+			}
+			if (wHotPos == -1 && hotPos > -1)
+				wHotPos = words.Length;
+			runeCount = rCount;
+			wordHotPos = wHotPos;
+			return length;
+		}
+
+		/// <summary>
 		/// Pretty prints the View
 		/// </summary>
 		/// <returns></returns>
@@ -1504,7 +1676,6 @@ namespace Terminal.Gui {
 
 			return false;
 		}
-
 
 		/// <summary>
 		/// Method invoked when a mouse event is generated
