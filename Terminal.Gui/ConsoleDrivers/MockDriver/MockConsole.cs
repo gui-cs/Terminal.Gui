@@ -36,6 +36,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     Error reading or writing information.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int WindowWidth { get; set; } = 80;
 		//
 		// Summary:
@@ -44,6 +47,9 @@ namespace Terminal.Gui {
 		//
 		// Returns:
 		//     true if output is redirected; otherwise, false.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static bool IsOutputRedirected { get; }
 		//
 		// Summary:
@@ -52,6 +58,9 @@ namespace Terminal.Gui {
 		//
 		// Returns:
 		//     true if error output is redirected; otherwise, false.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static bool IsErrorRedirected { get; }
 		//
 		// Summary:
@@ -59,6 +68,9 @@ namespace Terminal.Gui {
 		//
 		// Returns:
 		//     A System.IO.TextReader that represents the standard input stream.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static TextReader In { get; }
 		//
 		// Summary:
@@ -66,6 +78,9 @@ namespace Terminal.Gui {
 		//
 		// Returns:
 		//     A System.IO.TextWriter that represents the standard output stream.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static TextWriter Out { get; }
 		//
 		// Summary:
@@ -73,6 +88,9 @@ namespace Terminal.Gui {
 		//
 		// Returns:
 		//     A System.IO.TextWriter that represents the standard error output stream.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static TextWriter Error { get; }
 		//
 		// Summary:
@@ -90,6 +108,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.Security.SecurityException:
 		//     Your application does not have permission to perform this operation.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static Encoding InputEncoding { get; set; }
 		//
 		// Summary:
@@ -107,6 +128,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.Security.SecurityException:
 		//     Your application does not have permission to perform this operation.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static Encoding OutputEncoding { get; set; }
 		//
 		// Summary:
@@ -171,6 +195,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int BufferHeight { get; set; } = 25;
 		//
 		// Summary:
@@ -190,6 +217,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int BufferWidth { get; set; } = 80;
 		//
 		// Summary:
@@ -210,6 +240,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     Error reading or writing information.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int WindowHeight { get; set; } = 25;
 		//
 		// Summary:
@@ -223,6 +256,9 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     Unable to get or set the input mode of the console input buffer.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static bool TreatControlCAsInput { get; set; }
 		//
 		// Summary:
@@ -231,6 +267,9 @@ namespace Terminal.Gui {
 		//
 		// Returns:
 		//     The width of the largest possible console window measured in columns.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int LargestWindowWidth { get; }
 		//
 		// Summary:
@@ -239,6 +278,9 @@ namespace Terminal.Gui {
 		//
 		// Returns:
 		//     The height of the largest possible console window measured in rows.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int LargestWindowHeight { get; }
 		//
 		// Summary:
@@ -256,6 +298,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     Error reading or writing information.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int WindowLeft { get; set; }
 		//
 		// Summary:
@@ -273,6 +318,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     Error reading or writing information.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int WindowTop { get; set; }
 		//
 		// Summary:
@@ -291,6 +339,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int CursorLeft { get; set; }
 		//
 		// Summary:
@@ -309,6 +360,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int CursorTop { get; set; }
 		//
 		// Summary:
@@ -327,6 +381,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int CursorSize { get; set; }
 		//
 		// Summary:
@@ -341,6 +398,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static bool CursorVisible { get; set; }
 		//
 		// Summary:
@@ -362,6 +422,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static string Title { get; set; }
 		//
 		// Summary:
@@ -376,6 +439,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.InvalidOperationException:
 		//     Standard input is redirected to a file instead of the keyboard.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static bool KeyAvailable { get; }
 		//
 		// Summary:
@@ -384,6 +450,9 @@ namespace Terminal.Gui {
 		//
 		// Returns:
 		//     true if NUM LOCK is turned on; false if NUM LOCK is turned off.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static bool NumberLock { get; }
 		//
 		// Summary:
@@ -392,6 +461,9 @@ namespace Terminal.Gui {
 		//
 		// Returns:
 		//     true if CAPS LOCK is turned on; false if CAPS LOCK is turned off.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static bool CapsLock { get; }
 		//
 		// Summary:
@@ -400,14 +472,10 @@ namespace Terminal.Gui {
 		//
 		// Returns:
 		//     true if input is redirected; otherwise, false.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static bool IsInputRedirected { get; }
-
-		//
-		// Summary:
-		//     Occurs when the System.ConsoleModifiers.Control modifier key (Ctrl) and either
-		//     the System.ConsoleKey.C console key (C) or the Break key are pressed simultaneously
-		//     (Ctrl+C or Ctrl+Break).
-		//public static event ConsoleCancelEventHandler CancelKeyPress;
 
 		//
 		// Summary:
@@ -417,6 +485,9 @@ namespace Terminal.Gui {
 		//   T:System.Security.HostProtectionException:
 		//     This method was executed on a server, such as SQL Server, that does not permit
 		//     access to a user interface.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static void Beep ()
 		{
 			throw new NotImplementedException ();
@@ -441,6 +512,9 @@ namespace Terminal.Gui {
 		//   T:System.Security.HostProtectionException:
 		//     This method was executed on a server, such as SQL Server, that does not permit
 		//     access to the console.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static void Beep (int frequency, int duration)
 		{
 			throw new NotImplementedException ();
@@ -452,6 +526,9 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static void Clear ()
 		{
 			_buffer = new char [WindowWidth, WindowHeight];
@@ -497,6 +574,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static void MoveBufferArea (int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight, int targetLeft, int targetTop)
 		{
 			throw new NotImplementedException ();
@@ -553,6 +633,9 @@ namespace Terminal.Gui {
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
 		//[SecuritySafeCritical]
+		/// <summary>
+		/// 
+		/// </summary>
 		public static void MoveBufferArea (int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight, int targetLeft, int targetTop, char sourceChar, ConsoleColor sourceForeColor, ConsoleColor sourceBackColor)
 		{
 			throw new NotImplementedException ();
@@ -564,6 +647,9 @@ namespace Terminal.Gui {
 		//
 		// Returns:
 		//     The standard error stream.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static Stream OpenStandardError ()
 		{
 			throw new NotImplementedException ();
@@ -583,6 +669,9 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.ArgumentOutOfRangeException:
 		//     bufferSize is less than or equal to zero.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static Stream OpenStandardError (int bufferSize)
 		{
 			throw new NotImplementedException ();
@@ -602,6 +691,9 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.ArgumentOutOfRangeException:
 		//     bufferSize is less than or equal to zero.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static Stream OpenStandardInput (int bufferSize)
 		{
 			throw new NotImplementedException ();
@@ -613,6 +705,9 @@ namespace Terminal.Gui {
 		//
 		// Returns:
 		//     The standard input stream.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static Stream OpenStandardInput ()
 		{
 			throw new NotImplementedException ();
@@ -632,6 +727,9 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.ArgumentOutOfRangeException:
 		//     bufferSize is less than or equal to zero.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static Stream OpenStandardOutput (int bufferSize)
 		{
 			throw new NotImplementedException ();
@@ -643,6 +741,9 @@ namespace Terminal.Gui {
 		//
 		// Returns:
 		//     The standard output stream.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static Stream OpenStandardOutput ()
 		{
 			throw new NotImplementedException ();
@@ -659,6 +760,9 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int Read ()
 		{
 			throw new NotImplementedException ();
@@ -686,6 +790,9 @@ namespace Terminal.Gui {
 		//     The System.Console.In property is redirected from some stream other than the
 		//     console.
 		//[SecuritySafeCritical]
+		/// <summary>
+		/// 
+		/// </summary>
 		public static ConsoleKeyInfo ReadKey (bool intercept)
 		{
 			if (MockKeyPresses.Count > 0) {
@@ -695,6 +802,9 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public static Stack<ConsoleKeyInfo> MockKeyPresses = new Stack<ConsoleKeyInfo> ();
 
 		//
@@ -713,6 +823,9 @@ namespace Terminal.Gui {
 		//   T:System.InvalidOperationException:
 		//     The System.Console.In property is redirected from some stream other than the
 		//     console.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static ConsoleKeyInfo ReadKey ()
 		{
 			throw new NotImplementedException ();
@@ -735,6 +848,9 @@ namespace Terminal.Gui {
 		//
 		//   T:System.ArgumentOutOfRangeException:
 		//     The number of characters in the next line of characters is greater than System.Int32.MaxValue.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static string ReadLine ()
 		{
 			throw new NotImplementedException ();
@@ -751,6 +867,9 @@ namespace Terminal.Gui {
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
 		//[SecuritySafeCritical]
+		/// <summary>
+		/// 
+		/// </summary>
 		public static void ResetColor ()
 		{
 			BackgroundColor = _defaultBackgroundColor;
@@ -781,6 +900,9 @@ namespace Terminal.Gui {
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
 		//[SecuritySafeCritical]
+		/// <summary>
+		/// 
+		/// </summary>
 		public static void SetBufferSize (int width, int height)
 		{
 			throw new NotImplementedException ();
@@ -810,6 +932,9 @@ namespace Terminal.Gui {
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
 		//[SecuritySafeCritical]
+		/// <summary>
+		/// 
+		/// </summary>
 		public static void SetCursorPosition (int left, int top)
 		{
 			CursorLeft = left;
@@ -832,6 +957,9 @@ namespace Terminal.Gui {
 		//   T:System.Security.SecurityException:
 		//     The caller does not have the required permission.
 		//[SecuritySafeCritical]
+		/// <summary>
+		/// 
+		/// </summary>
 		public static void SetError (TextWriter newError)
 		{
 			throw new NotImplementedException ();
@@ -852,6 +980,9 @@ namespace Terminal.Gui {
 		//   T:System.Security.SecurityException:
 		//     The caller does not have the required permission.
 		//[SecuritySafeCritical]
+		/// <summary>
+		/// 
+		/// </summary>
 		public static void SetIn (TextReader newIn)
 		{
 			throw new NotImplementedException ();
@@ -872,6 +1003,10 @@ namespace Terminal.Gui {
 		//   T:System.Security.SecurityException:
 		//     The caller does not have the required permission.
 		//[SecuritySafeCritical]
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="newOut"></param>
 		public static void SetOut (TextWriter newOut)
 		{
 			throw new NotImplementedException ();
@@ -900,6 +1035,11 @@ namespace Terminal.Gui {
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
 		//[SecuritySafeCritical]
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="top"></param>
 		public static void SetWindowPosition (int left, int top)
 		{
 			throw new NotImplementedException ();
@@ -929,6 +1069,11 @@ namespace Terminal.Gui {
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
 		//[SecuritySafeCritical]
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
 		public static void SetWindowSize (int width, int height)
 		{
 			throw new NotImplementedException ();
@@ -945,6 +1090,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void Write (string value)
 		{
 			throw new NotImplementedException ();
@@ -962,6 +1111,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void Write (object value)
 		{
 			throw new NotImplementedException ();
@@ -980,6 +1133,10 @@ namespace Terminal.Gui {
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
 		//[CLSCompliant (false)]
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void Write (ulong value)
 		{
 			throw new NotImplementedException ();
@@ -997,6 +1154,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void Write (long value)
 		{
 			throw new NotImplementedException ();
@@ -1026,6 +1187,12 @@ namespace Terminal.Gui {
 		//
 		//   T:System.FormatException:
 		//     The format specification in format is invalid.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="format"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
 		public static void Write (string format, object arg0, object arg1)
 		{
 			throw new NotImplementedException ();
@@ -1043,6 +1210,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void Write (int value)
 		{
 			throw new NotImplementedException ();
@@ -1069,6 +1240,11 @@ namespace Terminal.Gui {
 		//
 		//   T:System.FormatException:
 		//     The format specification in format is invalid.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="format"></param>
+		/// <param name="arg0"></param>
 		public static void Write (string format, object arg0)
 		{
 			throw new NotImplementedException ();
@@ -1087,12 +1263,24 @@ namespace Terminal.Gui {
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
 		//[CLSCompliant (false)]
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void Write (uint value)
 		{
 			throw new NotImplementedException ();
 		}
 
 		//[CLSCompliant (false)]
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="format"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
+		/// <param name="arg2"></param>
+		/// <param name="arg3"></param>
 		public static void Write (string format, object arg0, object arg1, object arg2, object arg3)
 		{
 			throw new NotImplementedException ();
@@ -1119,6 +1307,11 @@ namespace Terminal.Gui {
 		//
 		//   T:System.FormatException:
 		//     The format specification in format is invalid.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="format"></param>
+		/// <param name="arg"></param>
 		public static void Write (string format, params object [] arg)
 		{
 			throw new NotImplementedException ();
@@ -1136,6 +1329,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void Write (bool value)
 		{
 			throw new NotImplementedException ();
@@ -1152,6 +1349,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void Write (char value)
 		{
 			_buffer [CursorLeft, CursorTop] = value;
@@ -1168,6 +1369,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="buffer"></param>
 		public static void Write (char [] buffer)
 		{
 			throw new NotImplementedException ();
@@ -1199,6 +1404,12 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="buffer"></param>
+		/// <param name="index"></param>
+		/// <param name="count"></param>
 		public static void Write (char [] buffer, int index, int count)
 		{
 			throw new NotImplementedException ();
@@ -1231,6 +1442,13 @@ namespace Terminal.Gui {
 		//
 		//   T:System.FormatException:
 		//     The format specification in format is invalid.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="format"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
+		/// <param name="arg2"></param>
 		public static void Write (string format, object arg0, object arg1, object arg2)
 		{
 			throw new NotImplementedException ();
@@ -1248,6 +1466,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void Write (decimal value)
 		{
 			throw new NotImplementedException ();
@@ -1265,6 +1487,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void Write (float value)
 		{
 			throw new NotImplementedException ();
@@ -1282,6 +1508,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void Write (double value)
 		{
 			throw new NotImplementedException ();
@@ -1294,6 +1524,9 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
 		public static void WriteLine ()
 		{
 			throw new NotImplementedException ();
@@ -1311,6 +1544,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void WriteLine (float value)
 		{
 			throw new NotImplementedException ();
@@ -1328,6 +1565,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void WriteLine (int value)
 		{
 			throw new NotImplementedException ();
@@ -1346,6 +1587,10 @@ namespace Terminal.Gui {
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
 		//[CLSCompliant (false)]
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void WriteLine (uint value)
 		{
 			throw new NotImplementedException ();
@@ -1363,6 +1608,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void WriteLine (long value)
 		{
 			throw new NotImplementedException ();
@@ -1381,6 +1630,10 @@ namespace Terminal.Gui {
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
 		//[CLSCompliant (false)]
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void WriteLine (ulong value)
 		{
 			throw new NotImplementedException ();
@@ -1398,6 +1651,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void WriteLine (object value)
 		{
 			throw new NotImplementedException ();
@@ -1415,6 +1672,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void WriteLine (string value)
 		{
 			throw new NotImplementedException ();
@@ -1441,6 +1702,11 @@ namespace Terminal.Gui {
 		//
 		//   T:System.FormatException:
 		//     The format specification in format is invalid.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="format"></param>
+		/// <param name="arg0"></param>
 		public static void WriteLine (string format, object arg0)
 		{
 			throw new NotImplementedException ();
@@ -1473,12 +1739,27 @@ namespace Terminal.Gui {
 		//
 		//   T:System.FormatException:
 		//     The format specification in format is invalid.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="format"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
+		/// <param name="arg2"></param>
 		public static void WriteLine (string format, object arg0, object arg1, object arg2)
 		{
 			throw new NotImplementedException ();
 		}
 
 		//[CLSCompliant (false)]
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="format"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
+		/// <param name="arg2"></param>
+		/// <param name="arg3"></param>
 		public static void WriteLine (string format, object arg0, object arg1, object arg2, object arg3)
 		{
 			throw new NotImplementedException ();
@@ -1506,6 +1787,11 @@ namespace Terminal.Gui {
 		//
 		//   T:System.FormatException:
 		//     The format specification in format is invalid.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="format"></param>
+		/// <param name="arg"></param>
 		public static void WriteLine (string format, params object [] arg)
 		{
 			throw new NotImplementedException ();
@@ -1538,6 +1824,12 @@ namespace Terminal.Gui {
 		//
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="buffer"></param>
+		/// <param name="index"></param>
+		/// <param name="count"></param>
 		public static void WriteLine (char [] buffer, int index, int count)
 		{
 			throw new NotImplementedException ();
@@ -1555,6 +1847,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void WriteLine (decimal value)
 		{
 			throw new NotImplementedException ();
@@ -1572,6 +1868,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="buffer"></param>
 		public static void WriteLine (char [] buffer)
 		{
 			throw new NotImplementedException ();
@@ -1589,6 +1889,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void WriteLine (char value)
 		{
 			throw new NotImplementedException ();
@@ -1606,6 +1910,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void WriteLine (bool value)
 		{
 			throw new NotImplementedException ();
@@ -1635,6 +1943,12 @@ namespace Terminal.Gui {
 		//
 		//   T:System.FormatException:
 		//     The format specification in format is invalid.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="format"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
 		public static void WriteLine (string format, object arg0, object arg1)
 		{
 			throw new NotImplementedException ();
@@ -1652,6 +1966,10 @@ namespace Terminal.Gui {
 		// Exceptions:
 		//   T:System.IO.IOException:
 		//     An I/O error occurred.
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void WriteLine (double value)
 		{
 			throw new NotImplementedException ();
