@@ -7,12 +7,12 @@ using Terminal.Gui;
 using Xunit;
 
 // Alais Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.MockConsole;
+using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui {
 	public class ViewTests {
 		[Fact]
-		public void TestNew ()
+		public void New_Initializes ()
 		{
 			// Parameterless
 			var r = new View ();
@@ -90,7 +90,7 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void TestMethods ()
+		public void New_Methods_Return_False ()
 		{
 			var r = new View ();
 

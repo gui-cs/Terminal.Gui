@@ -222,7 +222,7 @@ namespace Terminal.Gui {
 
 			public override string ToString ()
 			{
-				return $"Pos.Combine ({left.ToString ()}{(add ? '+' : '-')}{right.ToString ()})";
+				return $"Pos.Combine({left.ToString ()}{(add ? '+' : '-')}{right.ToString ()})";
 			}
 
 		}
@@ -274,7 +274,7 @@ namespace Terminal.Gui {
 			}
 			internal override int Anchor (int width)
 			{
-				switch (side) {
+				switch(side) {
 				case 0: return Target.Frame.X;
 				case 1: return Target.Frame.Y;
 				case 2: return Target.Frame.Right;
@@ -287,14 +287,14 @@ namespace Terminal.Gui {
 			public override string ToString ()
 			{
 				string tside;
-				switch (side) {
+				switch(side) {
 				case 0: tside = "x"; break;
 				case 1: tside = "y"; break;
 				case 2: tside = "right"; break;
 				case 3: tside = "bottom"; break;
 				default: tside = "unknown"; break;
 				}
-				return $"Pos.View(side={tside}, target={Target.ToString ()}";
+				return $"Pos.View(side={tside}, target={Target.ToString ()})";
 			}
 		}
 
@@ -538,9 +538,20 @@ namespace Terminal.Gui {
 				this.side = side;
 			}
 
+			public override string ToString ()
+			{
+				string tside;
+				switch(side) {
+				case 0: tside = "Height"; break;
+				case 1: tside = "Width"; break;
+				default: tside = "unknown"; break;
+				}
+				return $"DimView(side={tside}, target={Target.ToString ()})";
+			}
+
 			internal override int Anchor (int width)
 			{
-				switch (side) {
+				switch(side) {
 				case 0: return Target.Frame.Height;
 				case 1: return Target.Frame.Width;
 				default:

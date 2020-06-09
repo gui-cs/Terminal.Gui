@@ -1,5 +1,5 @@
 ﻿//
-// MockConsole.cs: A mock .NET Windows Console API implementaiton for unit tests.
+// FakeConsole.cs: A fake .NET Windows Console API implementaiton for unit tests.
 //
 // Authors:
 //   Charlie Kindel (github.com/tig)
@@ -15,7 +15,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// 
 	/// </summary>
-	public static class MockConsole {
+	public static class FakeConsole {
 
 		//
 		// Summary:
