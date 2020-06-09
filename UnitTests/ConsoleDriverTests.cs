@@ -3,14 +3,14 @@ using Terminal.Gui;
 using Xunit;
 
 // Alais Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.MockConsole;
+using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui {
 	public class ConsoleDriverTests {
 		[Fact]
-		public void TestInit ()
+		public void Init_Inits ()
 		{
-			var driver = new MockDriver ();
+			var driver = new FakeDriver ();
 			driver.Init (() => { });
 
 			Assert.Equal (80, Console.BufferWidth);
@@ -23,15 +23,15 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void TestEnd ()
+		public void End_Cleans_Up ()
 		{
-			var driver = new MockDriver ();
+			var driver = new FakeDriver ();
 			driver.Init (() => { });
 
-			MockConsole.ForegroundColor = ConsoleColor.Red;
+			FakeConsole.ForegroundColor = ConsoleColor.Red;
 			Assert.Equal (ConsoleColor.Red, Console.ForegroundColor);
 
-			MockConsole.BackgroundColor = ConsoleColor.Green;
+			FakeConsole.BackgroundColor = ConsoleColor.Green;
 			Assert.Equal (ConsoleColor.Green, Console.BackgroundColor);
 			driver.Move (2, 3);
 			Assert.Equal (2, Console.CursorLeft);
@@ -45,9 +45,9 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void TestSetColors ()
+		public void SetColors_Changes_Colors ()
 		{
-			var driver = new MockDriver ();
+			var driver = new FakeDriver ();
 			driver.Init (() => { });
 			Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
 			Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);

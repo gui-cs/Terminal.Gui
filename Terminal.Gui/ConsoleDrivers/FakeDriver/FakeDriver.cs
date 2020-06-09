@@ -1,5 +1,5 @@
 ﻿//
-// MockDriver.cs: A mock ConsoleDriver for unit tests.
+// FakeDriver.cs: A fake ConsoleDriver for unit tests. 
 //
 // Authors:
 //   Charlie Kindel (github.com/tig)
@@ -14,7 +14,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Implements a mock ConsoleDriver for unit testing
 	/// </summary>
-	public class MockDriver : ConsoleDriver, IMainLoopDriver {
+	public class FakeDriver : ConsoleDriver, IMainLoopDriver {
 		int cols, rows;
 		/// <summary>
 		/// 
@@ -52,10 +52,10 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// 
 		/// </summary>
-		public MockDriver ()
+		public FakeDriver ()
 		{
-			cols = MockConsole.WindowWidth;
-			rows = MockConsole.WindowHeight; // - 1;
+			cols = FakeConsole.WindowWidth;
+			rows = FakeConsole.WindowHeight; // - 1;
 			UpdateOffscreen ();
 		}
 
@@ -73,12 +73,12 @@ namespace Terminal.Gui {
 			crow = row;
 
 			if (Clip.Contains (col, row)) {
-				MockConsole.CursorTop = row;
-				MockConsole.CursorLeft = col;
+				FakeConsole.CursorTop = row;
+				FakeConsole.CursorLeft = col;
 				needMove = false;
 			} else {
-				MockConsole.CursorTop = Clip.Y;
-				MockConsole.CursorLeft = Clip.X;
+				FakeConsole.CursorTop = Clip.Y;
+				FakeConsole.CursorLeft = Clip.X;
 				needMove = true;
 			}
 
@@ -127,8 +127,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void End ()
 		{
-			MockConsole.ResetColor ();
-			MockConsole.Clear ();
+			FakeConsole.ResetColor ();
+			FakeConsole.Clear ();
 		}
 
 		static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
@@ -230,10 +230,10 @@ namespace Terminal.Gui {
 			      .OfType<ConsoleColor> ()
 			      .Select (s => (int)s);
 			if (values.Contains (color & 0xffff)) {
-				MockConsole.BackgroundColor = (ConsoleColor)(color & 0xffff);
+				FakeConsole.BackgroundColor = (ConsoleColor)(color & 0xffff);
 			}
 			if (values.Contains ((color >> 16) & 0xffff)) {
-				MockConsole.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
+				FakeConsole.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
 			}
 		}
 
@@ -245,8 +245,8 @@ namespace Terminal.Gui {
 			int rows = Rows;
 			int cols = Cols;
 
-			MockConsole.CursorTop = 0;
-			MockConsole.CursorLeft = 0;
+			FakeConsole.CursorTop = 0;
+			FakeConsole.CursorLeft = 0;
 			for (int row = 0; row < rows; row++) {
 				dirtyLine [row] = false;
 				for (int col = 0; col < cols; col++) {
@@ -254,7 +254,7 @@ namespace Terminal.Gui {
 					var color = contents [row, col, 1];
 					if (color != redrawColor)
 						SetColor (color);
-					MockConsole.Write ((char)contents [row, col, 0]);
+					FakeConsole.Write ((char)contents [row, col, 0]);
 				}
 			}
 		}
@@ -267,8 +267,8 @@ namespace Terminal.Gui {
 			int rows = Rows;
 			int cols = Cols;
 
-			var savedRow = MockConsole.CursorTop;
-			var savedCol = MockConsole.CursorLeft;
+			var savedRow = FakeConsole.CursorTop;
+			var savedCol = FakeConsole.CursorLeft;
 			for (int row = 0; row < rows; row++) {
 				if (!dirtyLine [row])
 					continue;
@@ -277,20 +277,20 @@ namespace Terminal.Gui {
 					if (contents [row, col, 2] != 1)
 						continue;
 
-					MockConsole.CursorTop = row;
-					MockConsole.CursorLeft = col;
+					FakeConsole.CursorTop = row;
+					FakeConsole.CursorLeft = col;
 					for (; col < cols && contents [row, col, 2] == 1; col++) {
 						var color = contents [row, col, 1];
 						if (color != redrawColor)
 							SetColor (color);
 
-						MockConsole.Write ((char)contents [row, col, 0]);
+						FakeConsole.Write ((char)contents [row, col, 0]);
 						contents [row, col, 2] = 0;
 					}
 				}
 			}
-			MockConsole.CursorTop = savedRow;
-			MockConsole.CursorLeft = savedCol;
+			FakeConsole.CursorTop = savedRow;
+			FakeConsole.CursorLeft = savedCol;
 		}
 
 		/// <summary>
@@ -421,7 +421,7 @@ namespace Terminal.Gui {
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-			(mainLoop.Driver as MockDriver).WindowsKeyPressed = delegate (ConsoleKeyInfo consoleKey) {
+			(mainLoop.Driver as FakeDriver).WindowsKeyPressed = delegate (ConsoleKeyInfo consoleKey) {
 				var map = MapKey (consoleKey);
 				if (map == (Key)0xffffffff)
 					return;
@@ -478,7 +478,7 @@ namespace Terminal.Gui {
 		{
 			while (true) {
 				waitForProbe.WaitOne ();
-				windowsKeyResult = MockConsole.ReadKey (true);
+				windowsKeyResult = FakeConsole.ReadKey (true);
 				keyReady.Set ();
 			}
 		}
