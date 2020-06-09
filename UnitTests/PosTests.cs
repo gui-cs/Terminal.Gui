@@ -155,12 +155,15 @@ namespace Terminal.Gui {
 		[Fact]
 		public void Percent_SetsValue ()
 		{
-			var pos = Pos.Percent (0);
-			Assert.Equal ("Pos.Factor(0)", pos.ToString ());
-			pos = Pos.Percent (0.5F);
-			Assert.Equal ("Pos.Factor(0.005)", pos.ToString ());
-			pos = Pos.Percent (100);
-			Assert.Equal ("Pos.Factor(1)", pos.ToString ());
+			float f = 0;
+			var pos = Pos.Percent (f);
+			Assert.Equal ($"Pos.Factor({f / 100:0.###})", pos.ToString ());
+			f = 0.5F;
+			pos = Pos.Percent (f);
+			Assert.Equal ($"Pos.Factor({f / 100:0.###})", pos.ToString ());
+			f = 100;
+			pos = Pos.Percent (f);
+			Assert.Equal ($"Pos.Factor({f / 100:0.###})", pos.ToString ());
 		}
 
 		[Fact]

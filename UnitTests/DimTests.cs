@@ -97,12 +97,15 @@ namespace Terminal.Gui {
 		[Fact]
 		public void Percent_SetsValue ()
 		{
-			var dim = Dim.Percent (0);
-			Assert.Equal ("Dim.Factor(0)", dim.ToString ());
-			dim = Dim.Percent (0.5F);
-			Assert.Equal ("Dim.Factor(0.005)", dim.ToString ());
-			dim = Dim.Percent (100);
-			Assert.Equal ("Dim.Factor(1)", dim.ToString ());
+			float f = 0;
+			var dim = Dim.Percent (f);
+			Assert.Equal ($"Dim.Factor({f/100:0.###})", dim.ToString ());
+			f = 0.5F;
+			dim = Dim.Percent (f);
+			Assert.Equal ($"Dim.Factor({f/100:0.###})", dim.ToString ());
+			f = 100;
+			dim = Dim.Percent (f);
+			Assert.Equal ($"Dim.Factor({f/100:0.###})", dim.ToString ());
 		}
 
 		// TODO: Other Dim.Percent tests (e.g. Equal?)
