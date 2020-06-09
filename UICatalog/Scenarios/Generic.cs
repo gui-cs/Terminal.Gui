@@ -12,22 +12,6 @@ namespace UICatalog {
 				Y = Pos.Center (),
 				Clicked = () => MessageBox.Query (20, 7, "Hi", "Neat?", "Yes", "No")
 			});
-
-			var label = new Label ("Label: ") { 
-				X = 0,
-				Y = 0
-			};
-			Win.Add (label);
-
-			var button = new Button ("test") {
-				X = Pos.Y (label),
-				Y = Pos.Bottom (label),
-			};
-			button.Width = Dim.Width (label);
-			label.X = button.X;
-
-
-			Win.Add (button);
 		}
 	}
 }
