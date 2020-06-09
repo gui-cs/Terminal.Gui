@@ -62,7 +62,7 @@ namespace Terminal.Gui {
 		///   The width of the <see cref="Button"/> is computed based on the
 		///   text length. The height will always be 1.
 		/// </remarks>
-		public Button () : this (string.Empty) { }
+		public Button () : this (text: string.Empty, is_default: false) { }
 
 		/// <summary>
 		///   Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.
@@ -78,11 +78,7 @@ namespace Terminal.Gui {
 		/// </param>
 		public Button (ustring text, bool is_default = false) : base ()
 		{
-			CanFocus = true;
-			Text = text ?? string.Empty;
-			this.IsDefault = is_default;
-			int w = SetWidthHeight (text, is_default);
-			Frame = new Rect (Frame.Location, new Size (w, 1));
+			Init (text, is_default);
 		}
 
 		/// <summary>
@@ -114,9 +110,26 @@ namespace Terminal.Gui {
 		public Button (int x, int y, ustring text, bool is_default)
 		    : base (new Rect (x, y, text.Length + 4 + (is_default ? 2 : 0), 1))
 		{
+			Init (text, is_default);
+		}
+
+		Rune _leftBracket;
+		Rune _rightBracket;
+		Rune _leftDefault;
+		Rune _rightDefault;
+
+		void Init (ustring text, bool is_default)
+		{
+			_leftBracket = new Rune (Driver != null ? Driver.LeftBracket : '[');
+			_rightBracket = new Rune (Driver != null ? Driver.RightBracket : ']');
+			_leftDefault = new Rune (Driver != null ? Driver.LeftDefaultIndicator : '<');
+			_rightDefault = new Rune (Driver != null ? Driver.RightDefaultIndicator : '>');
+
 			CanFocus = true;
 			Text = text ?? string.Empty;
 			this.IsDefault = is_default;
+			int w = SetWidthHeight (text, is_default);
+			Frame = new Rect (Frame.Location, new Size (w, 1));
 		}
 
 		int SetWidthHeight (ustring text, bool is_default)
@@ -153,11 +166,6 @@ namespace Terminal.Gui {
 				Update ();
 			}
 		}
-
-		Rune _leftBracket = new Rune (Driver.LeftBracket);
-		Rune _rightBracket = new Rune (Driver.RightBracket);
-		Rune _leftDefault = new Rune (Driver.LeftDefaultIndicator);
-		Rune _rightDefault = new Rune (Driver.RightDefaultIndicator);
 
 		internal void Update ()
 		{
