@@ -46,10 +46,10 @@ namespace UICatalog {
 		private static Toplevel _top;
 		private static MenuBar _menu;
 		private static int _nameColumnWidth;
-		private static Window _leftPane;
+		private static FrameView _leftPane;
 		private static List<string> _categories;
 		private static ListView _categoryListView;
-		private static Window _rightPane;
+		private static FrameView _rightPane;
 		private static List<Type> _scenarios;
 		private static ListView _scenarioListView;
 		private static StatusBar _statusBar;
@@ -212,11 +212,11 @@ namespace UICatalog {
 				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "Ok")),
 			});
 
-			_leftPane = new Window ("Categories") {
+			_leftPane = new FrameView ("Categories") {
 				X = 0,
 				Y = 1, // for menu
 				Width = 25,
-				Height = Dim.Fill (),
+				Height = Dim.Fill (1),
 				CanFocus = false,
 			};
 
@@ -236,12 +236,12 @@ namespace UICatalog {
 			_categoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
 			_leftPane.Add (_categoryListView);
 
-			_rightPane = new Window ("Scenarios") {
+			_rightPane = new FrameView ("Scenarios") {
 				X = 25,
 				Y = 1, // for menu
 				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-				CanFocus = false,
+				Height = Dim.Fill (1),
+				CanFocus = true,
 
 			};
 
@@ -348,13 +348,13 @@ namespace UICatalog {
 		/// <param name="ke"></param>
 		private static void KeyDownHandler (View.KeyEventEventArgs a)
 		{
-			if (a.KeyEvent.Key == Key.Tab || a.KeyEvent.Key == Key.BackTab) {
-				// BUGBUG: Work around Issue #434 by implementing our own TAB navigation
-				if (_top.MostFocused == _categoryListView)
-					_top.SetFocus (_rightPane);
-				else
-					_top.SetFocus (_leftPane);
-			}
+			//if (a.KeyEvent.Key == Key.Tab || a.KeyEvent.Key == Key.BackTab) {
+			//	// BUGBUG: Work around Issue #434 by implementing our own TAB navigation
+			//	if (_top.MostFocused == _categoryListView)
+			//		_top.SetFocus (_rightPane);
+			//	else
+			//		_top.SetFocus (_leftPane);
+			//}
 
 			if (a.KeyEvent.IsCapslock) {
 				_capslock.Title = "Capslock: On";
