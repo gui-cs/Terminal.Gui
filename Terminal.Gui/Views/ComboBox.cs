@@ -64,8 +64,8 @@ namespace Terminal.Gui {
 		ustring text = "";
 		TextField search;
 		ListView listview;
-		int x;
-		int y;
+		int x = 0;
+		int y = 0;
 		int height;
 		int width;
 		bool autoHide = true;
@@ -114,7 +114,7 @@ namespace Terminal.Gui {
 			LayoutComplete += (LayoutEventArgs a) => {
 
 				search.Width = Bounds.Width;
-				listview.Width = Bounds.Width - 1;
+				listview.Width = autoHide ? Bounds.Width - 1 : Bounds.Width;
 			};
 
 			listview.SelectedItemChanged += (ListViewItemEventArgs e) => {
