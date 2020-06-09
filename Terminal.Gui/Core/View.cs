@@ -1385,10 +1385,12 @@ namespace Terminal.Gui {
 				}
 			}
 
-			// if graph has edges then
 			if (edges.Any ()) {
-				// return error (graph has at least one cycle)
-				return null;
+				if (!object.ReferenceEquals(edges.First ().From, edges.First ().To)) {
+					throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {edges.First ().From}. Did you forget to add it to {this}?");
+				} else {
+					throw new InvalidOperationException ("TopologicalSort encountered a recursive cycle in the relative Pos/Dim in the views of " + this);
+				}
 			} else {
 				// return L (a topologically sorted order)
 				return result;
@@ -1454,8 +1456,6 @@ namespace Terminal.Gui {
 			}
 
 			var ordered = TopologicalSort (nodes, edges);
-			if (ordered == null)
-				throw new Exception ("There is a recursive cycle in the relative Pos/Dim in the views of " + this);
 
 			foreach (var v in ordered) {
 				if (v.LayoutStyle == LayoutStyle.Computed)
@@ -1483,7 +1483,7 @@ namespace Terminal.Gui {
 		/// <param name="hotPos">The returning hot-key position.</param>
 		/// <param name="showHotKey">The character immediately to the right relative to the hot-key position</param>
 		/// <returns>It aims to facilitate the preparation for <see cref="TextAlignment"/> procedures.</returns>
-		public virtual ustring GetTextFromHotKey(ustring text, Rune hotKey, out int hotPos, out Rune showHotKey)
+		public virtual ustring GetTextFromHotKey (ustring text, Rune hotKey, out int hotPos, out Rune showHotKey)
 		{
 			Rune hot_key = (Rune)0;
 			int hot_pos = -1;

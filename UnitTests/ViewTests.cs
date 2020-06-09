@@ -107,5 +107,33 @@ namespace Terminal.Gui {
 
 			// TODO: Add more
 		}
+
+		[Fact]
+		public void TopologicalSort_Missing_Add ()
+		{
+			var root = new View ();
+			var sub1 = new View ();
+			root.Add (sub1);
+			var sub2 = new View ();
+			sub1.Width = Dim.Width(sub2);
+
+			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
+
+			sub2.Width = Dim.Width (sub1);
+
+			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
+		}
+
+		[Fact]
+		public void TopologicalSort_Recursive_Ref ()
+		{
+			var root = new View ();
+			var sub1 = new View ();
+			root.Add (sub1);
+			var sub2 = new View ();
+			root.Add (sub2);
+			sub2.Width = Dim.Width (sub2);
+			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
+		}
 	}
 }
