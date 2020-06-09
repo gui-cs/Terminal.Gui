@@ -984,15 +984,10 @@ namespace Terminal.Gui {
 								view.LayoutSubviews ();
 							Application.CurrentView = view;
 
-							// Clip the sub-view
-							var savedClip = view.ClipToBounds ();
-
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0) because
 							view.Redraw (view.Bounds);
 
-							// Undo the clip
-							Driver.Clip = savedClip;
 						}
 						view.NeedDisplay = Rect.Empty;
 						view.childNeedsDisplay = false;
