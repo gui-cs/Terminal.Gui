@@ -105,6 +105,8 @@ namespace Terminal.Gui {
 		[Fact]
 		public void TestPercent ()
 		{
+			System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo ("en-US");
+
 			var pos = Pos.Percent (0);
 			Assert.Equal ("Pos.Factor(0)", pos.ToString ());
 
