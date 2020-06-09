@@ -5,12 +5,12 @@ using Terminal.Gui;
 using Xunit;
 
 // Alais Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.MockConsole;
+using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui {
 	public class ResponderTests {
 		[Fact]
-		public void TestNew ()
+		public void New_Initializes ()
 		{
 			var r = new Responder ();
 			Assert.NotNull (r);
@@ -20,7 +20,7 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void TestMethods ()
+		public void New_Methods_Return_False ()
 		{
 			var r = new Responder ();
 

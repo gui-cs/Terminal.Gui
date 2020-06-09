@@ -5,7 +5,7 @@ using Terminal.Gui;
 using Xunit;
 
 // Alais Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.MockConsole;
+using Console = Terminal.Gui.FakeConsole;
 
 // Since Application is a singleton we can't run tests in parallel
 [assembly: CollectionBehavior (DisableTestParallelization = true)]
@@ -13,7 +13,7 @@ using Console = Terminal.Gui.MockConsole;
 namespace Terminal.Gui {
 	public class ApplicationTests {
 		[Fact]
-		public void TestInitShutdown ()
+		public void Init_Shutdown_Cleans_Up ()
 		{
 			Assert.Null (Application.Current);
 			Assert.Null (Application.CurrentView);
@@ -21,7 +21,7 @@ namespace Terminal.Gui {
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Driver);
 
-			Application.Init (new MockDriver ());
+			Application.Init (new FakeDriver ());
 			Assert.NotNull (Application.Current);
 			Assert.NotNull (Application.CurrentView);
 			Assert.NotNull (Application.Top);
@@ -41,7 +41,7 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void TestNewRunState ()
+		public void RunState_Dispose_Cleans_Up ()
 		{
 			var rs = new Application.RunState (null);
 			Assert.NotNull (rs);
@@ -58,10 +58,10 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void TestBeginEnd ()
+		public void Begin_End_Cleana_Up ()
 		{
 			// Setup Mock driver
-			Application.Init (new MockDriver ());
+			Application.Init (new FakeDriver ());
 			Assert.NotNull (Application.Driver);
 
 			// Test null Toplevel
@@ -83,10 +83,10 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void TestRequestStop ()
+		public void RequestStop_Stops ()
 		{
 			// Setup Mock driver
-			Application.Init (new MockDriver ());
+			Application.Init (new FakeDriver ());
 			Assert.NotNull (Application.Driver);
 
 			var top = new Toplevel ();
@@ -109,10 +109,10 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void TestRunningFalse ()
+		public void RunningFalse_Stops ()
 		{
 			// Setup Mock driver
-			Application.Init (new MockDriver ());
+			Application.Init (new FakeDriver ());
 			Assert.NotNull (Application.Driver);
 
 			var top = new Toplevel ();
@@ -136,10 +136,10 @@ namespace Terminal.Gui {
 
 
 		[Fact]
-		public void TestKeyUp ()
+		public void KeyUp_Event ()
 		{
 			// Setup Mock driver
-			Application.Init (new MockDriver ());
+			Application.Init (new FakeDriver ());
 			Assert.NotNull (Application.Driver);
 
 			// Setup some fake kepresses (This)
