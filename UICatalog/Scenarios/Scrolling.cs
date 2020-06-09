@@ -214,7 +214,7 @@ namespace UICatalog {
 
 			int count = 0;
 			var mousePos = new Label ("Mouse: ");
-			mousePos.X = Pos.Center ();
+			mousePos.X = Pos.Right(scrollView) + 1;
 			mousePos.Y = Pos.AnchorEnd (1);
 			mousePos.Width = 50;
 			Application.RootMouseEvent += delegate (MouseEvent me) {
