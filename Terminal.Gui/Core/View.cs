@@ -1591,11 +1591,7 @@ namespace Terminal.Gui {
 						}
 					}
 					if (c_hot_pos > -1) {
-						if (wLen - runeCount == 0) {
-							c_hot_pos += (wLen - runeCount == 0 ? w_hot_pos * (space) - space - w_hot_pos + 1 : space + wLen - runeCount);
-						} else {
-							c_hot_pos += space + wLen - runeCount;
-						}
+						c_hot_pos += w_hot_pos * space - space - w_hot_pos + 1;
 					}
 					break;
 				}

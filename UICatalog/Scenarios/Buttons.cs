@@ -54,18 +54,25 @@ namespace UICatalog {
 			};
 			Win.Add (colorButtonsLabel);
 
-			View prev = colorButtonsLabel;
+			//View prev = colorButtonsLabel;
+
+			//With this method there is no need to call Top.Ready += () => Top.Redraw (Top.Bounds);
+			var x = Pos.Right (colorButtonsLabel) + 2;
 			foreach (var colorScheme in Colors.ColorSchemes) {
 				var colorButton = new Button ($"{colorScheme.Key}") {
 					ColorScheme = colorScheme.Value,
-					X = Pos.Right (prev) + 2,
+					//X = Pos.Right (prev) + 2,
+					X = x,
 					Y = Pos.Y (colorButtonsLabel),
 				};
 				DoMessage (colorButton, colorButton.Text);
 				Win.Add (colorButton);
-				prev = colorButton;
+				//prev = colorButton;
+				x += colorButton.Frame.Width + 2;
 			}
 			// BUGBUG: For some reason these buttons don't move to correct locations initially. 
+			// This was the only way I find to resolves this with the View prev variable.
+			//Top.Ready += () => Top.Redraw (Top.Bounds);
 
 			Button button;
 			Win.Add (button = new Button ("A super long _Button that will probably expose a bug in clipping or wrapping of text. Will it?") {
@@ -119,7 +126,8 @@ namespace UICatalog {
 			};
 			moveBtn.Clicked = () => {
 				moveBtn.X = moveBtn.Frame.X + 5;
-				computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
+				// This is already fixed with the call to SetNeedDisplay() in the Pos Dim.
+				//computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
 			};
 			computedFrame.Add (moveBtn);
 
@@ -212,7 +220,7 @@ namespace UICatalog {
 
 			var muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
 			var moveUnicodeHotKeyBtn = new Button (muhkb) {
-				X = Pos.Right (moveHotKeyBtn) + 6,
+				X = Pos.Left (absoluteFrame) + 1,
 				Y = Pos.Bottom (radioGroup) + 1,
 				Width = muhkb.Length + 30,
 				ColorScheme = Colors.TopLevel,
