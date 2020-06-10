@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
-using Rune = System.Rune;
 
 namespace UICatalog {
 	/// <summary>
@@ -58,7 +57,7 @@ namespace UICatalog {
 			jumpList.Y = Pos.Bottom (label);
 			jumpList.Width = Dim.Fill ();
 			jumpList.SelectedItemChanged = (args) => {
-				charMap.Start = radioItems [args.SelectedItem].start;
+				charMap.Start = radioItems[args.SelectedItem].start;
 			};
 
 			Win.Add (jumpList);
@@ -106,15 +105,6 @@ namespace UICatalog {
 #if true
 		private void CharMap_DrawContent (Rect viewport)
 		{
-			Rune ReplaceNonPrintables (Rune c)
-			{
-				if (c < 0x20) {
-					return new Rune (c + 0x2400);         // U+25A1 □ WHITE SQUARE
-				} else {
-					return c;
-				}
-			}
-
 			for (int header = 0; header < 16; header++) {
 				Move (viewport.X + RowHeaderWidth + (header * 2), 0);
 				Driver.AddStr ($" {header:x} ");
@@ -127,8 +117,7 @@ namespace UICatalog {
 					Driver.AddStr (rowLabel);
 					for (int col = 0; col < 16; col++) {
 						Move (viewport.X + RowHeaderWidth + (col * 2), 0 + y + 1);
-						Driver.AddRune (' ');
-						Driver.AddRune (ReplaceNonPrintables (new Rune (((uint)((uint)(-viewport.Y + row) * 16 + col)))));
+						Driver.AddStr ($" {(char)((-viewport.Y + row) * 16 + col)}");
 					}
 				}
 			}
