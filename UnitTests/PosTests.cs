@@ -66,8 +66,7 @@ namespace Terminal.Gui {
 
 			var pos1 = Pos.At (n1);
 			var pos2 = Pos.At (n2);
-			// BUGBUG: Pos should implement equality and this should change to Equal
-			Assert.NotEqual (pos1, pos2);
+			Assert.Equal (pos1, pos2);
 		}
 
 		[Fact]
