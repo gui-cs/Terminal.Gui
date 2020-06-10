@@ -75,6 +75,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		public ComboBox () : base()
 		{
+			ColorScheme = Colors.Base;
+
 			search = new TextField ("");
 			listview = new ListView () { LayoutStyle = LayoutStyle.Computed, CanFocus = true };
 

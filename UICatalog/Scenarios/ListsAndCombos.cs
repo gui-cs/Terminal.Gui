@@ -42,14 +42,14 @@ namespace UICatalog.Scenarios {
 			var lbComboBox = new Label ("ComboBox") {
 				ColorScheme = Colors.TopLevel,
 				X = Pos.Right (lbListView) + 1,
-				Width = Dim.Percent(30)
+				Width = Dim.Percent(60)
 			};
 
 			var comboBox = new ComboBox () {
 				X = Pos.Right (listview) + 1,
 				Y = Pos.Bottom (lbListView) + 1,
 				Height = Dim.Fill (2),
-				Width = Dim.Percent(30)
+				Width = Dim.Percent(60)
 			};
 			comboBox.SetSource (items);
 
