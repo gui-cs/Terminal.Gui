@@ -171,13 +171,19 @@ namespace Terminal.Gui {
 			int start = 0, end;
 			var lines = new List<ustring> ();
 
-			text = text
-				.Replace ("\f", "\u21a1")               // U+21A1 ↡ DOWNWARDS TWO HEADED ARROW
-				.Replace ("\n", "\u240a")               // U+240A (SYMBOL FOR LINE FEED, ␊)
-				.Replace ("\r", "\u240d")               // U+240D (SYMBOL FOR CARRIAGE RETURN, ␍)
-				.Replace ("\t", "\u2409")               // U+2409 ␉ SYMBOL FOR HORIZONTAL TABULATION
-				.Replace ("\v", "\u240b")               // U+240B ␋ SYMBOL FOR VERTICAL TABULATION
-				.TrimSpace ();
+			ustring ReplaceNonPrintables (ustring str)
+			{
+				var runes = new List<Rune>();
+				foreach (var r in str.ToRunes()) {
+					if (r < 0x20) {
+						runes.Add(new Rune (r + 0x2400));         // U+25A1 □ WHITE SQUARE
+					} else {
+						runes.Add(r);
+					}
+				}
+				return ustring.Make (runes); ;
+			}
+			text = ReplaceNonPrintables (text);
 
 			while ((end = start + margin) < text.Length) {
 				while (text [end] != ' ' && end > start)
