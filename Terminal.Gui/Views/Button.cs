@@ -6,7 +6,6 @@
 //
 
 using System;
-using System.Collections.Generic;
 using NStack;
 
 namespace Terminal.Gui {
@@ -166,20 +165,6 @@ namespace Terminal.Gui {
 				shown_text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
 			else
 				shown_text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
-
-			ustring ReplaceNonPrintables (ustring str)
-			{
-				var runes = new List<Rune> ();
-				foreach (var r in str.ToRunes ()) {
-					if (r < 0x20) {
-						runes.Add (new Rune (r + 0x2400));         // U+25A1 □ WHITE SQUARE
-					} else {
-						runes.Add (r);
-					}
-				}
-				return ustring.Make (runes); ;
-			}
-			shown_text = ReplaceNonPrintables (text);
 
 			shown_text = GetTextFromHotKey (shown_text, '_', out hot_pos, out hot_key);
 

@@ -166,23 +166,24 @@ namespace Terminal.Gui {
 			Recalc (text, lines, Frame.Width, textAlignment, Bounds.Height > 1);
 		}
 
+		static ustring ReplaceNonPrintables (ustring str)
+		{
+			var runes = new List<Rune> ();
+			foreach (var r in str.ToRunes ()) {
+				if (r < 0x20) {
+					runes.Add (new Rune (r + 0x2400));         // U+25A1 □ WHITE SQUARE
+				} else {
+					runes.Add (r);
+				}
+			}
+			return ustring.Make (runes); ;
+		}
+
 		static List<ustring> WordWrap (ustring text, int margin)
 		{
 			int start = 0, end;
 			var lines = new List<ustring> ();
 
-			ustring ReplaceNonPrintables (ustring str)
-			{
-				var runes = new List<Rune>();
-				foreach (var r in str.ToRunes()) {
-					if (r < 0x20) {
-						runes.Add(new Rune (r + 0x2400));         // U+25A1 □ WHITE SQUARE
-					} else {
-						runes.Add(r);
-					}
-				}
-				return ustring.Make (runes); ;
-			}
 			text = ReplaceNonPrintables (text);
 
 			while ((end = start + margin) < text.Length) {
@@ -207,12 +208,7 @@ namespace Terminal.Gui {
 			lineResult.Clear ();
 
 			if (wordWrap == false) {
-				textStr = textStr.Replace ("\f", " ")
-				.Replace ("\n", " ")
-				.Replace ("\r", " ")
-				.Replace ("\t", " ")
-				.Replace ("\v", " ")
-				.TrimSpace ();
+				textStr = ReplaceNonPrintables (textStr);
 				lineResult.Add (ClipAndJustify (textStr, width, talign));
 				return;
 			}
