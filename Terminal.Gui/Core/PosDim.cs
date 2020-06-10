@@ -178,6 +178,11 @@ namespace Terminal.Gui {
 			{
 				return n;
 			}
+
+			public override int GetHashCode () => n.GetHashCode ();
+
+			public override bool Equals (object other) => other is PosAbsolute abs && abs.n == n;
+
 		}
 
 		/// <summary>
