@@ -381,6 +381,11 @@ namespace Terminal.Gui {
 		{
 		}
 
+		public override ConsoleFont GetFont ()
+		{
+			return null;
+		}
+
 		//
 		// These are for the .NET driver, but running natively on Windows, wont run
 		// on the Mono emulation

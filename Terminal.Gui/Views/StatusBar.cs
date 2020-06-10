@@ -181,7 +181,11 @@ namespace Terminal.Gui {
 					}
 					Driver.AddRune (title [n]);
 				}
-				Driver.AddRune (' ');
+				if (i + 1 < Items.Length) {
+					Driver.AddRune (' ');
+					Driver.AddRune (Driver.VLine);
+					Driver.AddRune (' ');
+				}
 			}
 		}
 

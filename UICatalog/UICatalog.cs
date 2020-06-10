@@ -266,6 +266,11 @@ namespace UICatalog {
 			_numlock = new StatusItem (Key.CharMask, "Numlock", null);
 			_scrolllock = new StatusItem (Key.CharMask, "Scrolllock", null);
 
+			ConsoleDriver.ConsoleFont consoleFont = Application.Driver.GetFont ();
+			StatusItem font = new StatusItem (Key.Unknown, $"Console driver does not support querying font.", null); ;
+			if (consoleFont != null) {
+				font = new StatusItem (Key.Unknown, $"Console Font: {consoleFont.FaceName}, {consoleFont.Weight}, {consoleFont.Size.Width}x{consoleFont.Size.Height}", null);
+			}
 			_statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.ControlQ, "~CTRL-Q~ Quit", () => {
 					if (_runningScenario is null){
@@ -278,7 +283,8 @@ namespace UICatalog {
 				}),
 				_capslock,
 				_numlock,
-				_scrolllock
+				_scrolllock,
+				font
 			});
 
 			SetColorScheme ();

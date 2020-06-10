@@ -464,6 +464,15 @@ namespace Terminal.Gui {
 		{
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public override ConsoleFont GetFont ()
+		{
+			return null;
+		}
+
 		AutoResetEvent keyReady = new AutoResetEvent (false);
 		AutoResetEvent waitForProbe = new AutoResetEvent (false);
 		ConsoleKeyInfo? windowsKeyResult = null;

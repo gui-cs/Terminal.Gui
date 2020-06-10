@@ -120,6 +120,27 @@ namespace Terminal.Gui {
 			}
 		}
 
+		public ConsoleDriver.ConsoleFont GetFont ()
+		{
+			ConsoleDriver.ConsoleFont cf = null;
+			CONSOLE_FONT_INFO_EX fontInfoEx = new CONSOLE_FONT_INFO_EX ();
+			fontInfoEx.cbSize = Marshal.SizeOf (typeof (CONSOLE_FONT_INFO_EX));
+
+			if (GetCurrentConsoleFontEx(OutputHandle, false, ref fontInfoEx)) {
+				cf = new ConsoleDriver.ConsoleFont ();
+				cf.FaceName = fontInfoEx.FaceName;
+				cf.Size = new Size (fontInfoEx.FontWidth, fontInfoEx.FontHeight);
+				cf.Weight = fontInfoEx.FontWeight;
+			}
+
+			var err = Marshal.GetLastWin32Error ();
+			if (err != 0)
+				throw new System.ComponentModel.Win32Exception (err);
+
+			return cf;
+
+		}
+
 		[Flags]
 		public enum ConsoleModes : uint {
 			EnableProcessedInput = 1,
@@ -420,6 +441,24 @@ namespace Terminal.Gui {
 				return v;
 			}
 		}
+
+		[StructLayout (LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+		public struct CONSOLE_FONT_INFO_EX {
+			public int cbSize;
+			public int FontIndex;
+			public short FontWidth;
+			public short FontHeight;
+			public int FontFamily;
+			public int FontWeight;
+			[MarshalAs (UnmanagedType.ByValTStr, SizeConst = 32)]
+			public string FaceName;
+		}
+
+		[DllImport ("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+		extern static bool GetCurrentConsoleFontEx (
+			IntPtr hConsoleOutput, 
+			bool bMaximumWindow, 
+			[In,Out] ref CONSOLE_FONT_INFO_EX lpConsoleCurrentFont);
 	}
 
 	internal class WindowsDriver : ConsoleDriver, IMainLoopDriver {
@@ -1265,8 +1304,12 @@ namespace Terminal.Gui {
 		public override void CookMouse ()
 		{
 		}
-		#endregion
+		public override ConsoleFont GetFont ()
+		{
+			return winConsole.GetFont ();
 
+		}
+		#endregion
 	}
 
 }
