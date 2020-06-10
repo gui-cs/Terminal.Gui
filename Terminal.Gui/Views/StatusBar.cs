@@ -212,7 +212,7 @@ namespace Terminal.Gui {
 				if (me.X >= pos && me.X < pos + GetItemTitleLength (Items [i].Title)) {
 					Run (Items [i].Action);
 				}
-				pos += GetItemTitleLength (Items [i].Title) + 1;
+				pos += GetItemTitleLength (Items [i].Title) + 3;
 			}
 			return true;
 		}
