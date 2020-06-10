@@ -159,23 +159,35 @@ namespace Terminal.Gui {
 					Driver.AddRune (Driver.UpArrow);
 					Move (col, Bounds.Height - 1);
 					Driver.AddRune (Driver.DownArrow);
+
+					bool hasTopTee = false;
+					bool hasDiamond = false;
+					bool hasBottomTee = false;
 					for (int y = 0; y < bh; y++) {
 						Move (col, y + 1);
-						if (y < by1 - 1 || y > by2)
+						if ((y < by1 || y > by2) && ((position > 0 && !hasTopTee) || (hasTopTee && hasBottomTee))) {
 							special = Driver.Stipple;
-						else {
-							if (by2 - by1 == 0 && by1 < bh - 1)
+						} else {
+							if (y != by2 && y > 1 && by2 - by1 == 0 && by1 < bh - 1 && hasTopTee && !hasDiamond) {
+								hasDiamond = true;
 								special = Driver.Diamond;
-							else {
-								if (y == by1 - 1)
+							} else {
+								if (y == by1 && !hasTopTee) {
+									hasTopTee = true;
 									special = Driver.TopTee;
-								else if (y == by2)
+								} else if ((y >= by2 || by2 == 0) && !hasBottomTee) {
+									hasBottomTee = true;
 									special = Driver.BottomTee;
-								else
+								} else {
 									special = Driver.VLine;
+								}
 							}
 						}
 						Driver.AddRune (special);
+					}
+					if (!hasTopTee) {
+						Move (col, Bounds.Height - 2);
+						Driver.AddRune (Driver.TopTee);
 					}
 				}
 			} else {
@@ -206,24 +218,35 @@ namespace Terminal.Gui {
 					Move (0, row);
 					Driver.AddRune (Driver.LeftArrow);
 
+					bool hasLeftTee = false;
+					bool hasDiamond = false;
+					bool hasRightTee = false;
 					for (int x = 0; x < bw; x++) {
-
-						if (x < bx1 || x > bx2) {
+						if ((x < bx1 || x >= bx2 + 1) && ((position > 0 && !hasLeftTee) || (hasLeftTee && hasRightTee))) {
 							special = Driver.Stipple;
 						} else {
-							if (bx2 - bx1 == 0)
+							if (x != bx2 && x > 1 && bx2 - bx1 == 0 && bx1 < bw - 1 && hasLeftTee && !hasDiamond) {
+								hasDiamond = true;
 								special = Driver.Diamond;
-							else {
-								if (x == bx1)
+							} else {
+								if (x == bx1 && !hasLeftTee) {
+									hasLeftTee = true;
 									special = Driver.LeftTee;
-								else if (x == bx2)
+								} else if ((x >= bx2 || bx2 == 0) && !hasRightTee) {
+									hasRightTee = true;
 									special = Driver.RightTee;
-								else
+								} else {
 									special = Driver.HLine;
+								}
 							}
 						}
 						Driver.AddRune (special);
 					}
+					if (!hasLeftTee) {
+						Move (Bounds.Width -2, row);
+						Driver.AddRune (Driver.LeftTee);
+					}
+
 					Driver.AddRune (Driver.RightArrow);
 				}
 			}
@@ -250,7 +273,7 @@ namespace Terminal.Gui {
 					if (pos > 0)
 						SetPosition (pos - 1);
 				} else if (location == barsize + 1) {
-					if (pos + 1 + barsize < Size)
+					if (pos + 1 <= Size + 2)
 						SetPosition (pos + 1);
 				} else {
 					var b1 = pos * barsize / Size;
