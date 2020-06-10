@@ -108,13 +108,10 @@ namespace UICatalog {
 		{
 			Rune ReplaceNonPrintables (Rune c)
 			{
-				switch (c) {
-				case '\f': return new Rune ('\u21a1');               // U+21A1 ↡ DOWNWARDS TWO HEADED ARROW
-				case '\n': return new Rune ('\u240a');               // U+240A (SYMBOL FOR LINE FEED, ␊)
-				case '\r': return new Rune ('\u240d');               // U+240D (SYMBOL FOR CARRIAGE RETURN, ␍)
-				case '\t': return new Rune ('\u2409');               // U+2409 ␉ SYMBOL FOR HORIZONTAL TABULATION
-				case '\v': return new Rune ('\u240b');               // U+240B ␋ SYMBOL FOR VERTICAL TABULATION
-				default: return c;
+				if (c < 0x20) {
+					return new Rune (c + 0x2400);         // U+25A1 □ WHITE SQUARE
+				} else {
+					return c;
 				}
 			}
 
@@ -131,7 +128,7 @@ namespace UICatalog {
 					for (int col = 0; col < 16; col++) {
 						Move (viewport.X + RowHeaderWidth + (col * 2), 0 + y + 1);
 						Driver.AddRune (' ');
-						Driver.AddRune (ReplaceNonPrintables (new Rune(((uint)((uint)(-viewport.Y + row) * 16 + col)))));
+						Driver.AddRune (ReplaceNonPrintables (new Rune (((uint)((uint)(-viewport.Y + row) * 16 + col)))));
 					}
 				}
 			}
