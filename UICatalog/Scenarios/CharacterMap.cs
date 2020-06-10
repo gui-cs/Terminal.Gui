@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
+using Rune = System.Rune;
 
 namespace UICatalog {
 	/// <summary>
@@ -57,7 +58,7 @@ namespace UICatalog {
 			jumpList.Y = Pos.Bottom (label);
 			jumpList.Width = Dim.Fill ();
 			jumpList.SelectedItemChanged = (args) => {
-				charMap.Start = radioItems[args.SelectedItem].start;
+				charMap.Start = radioItems [args.SelectedItem].start;
 			};
 
 			Win.Add (jumpList);
@@ -105,6 +106,18 @@ namespace UICatalog {
 #if true
 		private void CharMap_DrawContent (Rect viewport)
 		{
+			Rune ReplaceNonPrintables (Rune c)
+			{
+				switch (c) {
+				case '\f': return new Rune ('\u21a1');               // U+21A1 ↡ DOWNWARDS TWO HEADED ARROW
+				case '\n': return new Rune ('\u240a');               // U+240A (SYMBOL FOR LINE FEED, ␊)
+				case '\r': return new Rune ('\u240d');               // U+240D (SYMBOL FOR CARRIAGE RETURN, ␍)
+				case '\t': return new Rune ('\u2409');               // U+2409 ␉ SYMBOL FOR HORIZONTAL TABULATION
+				case '\v': return new Rune ('\u240b');               // U+240B ␋ SYMBOL FOR VERTICAL TABULATION
+				default: return c;
+				}
+			}
+
 			for (int header = 0; header < 16; header++) {
 				Move (viewport.X + RowHeaderWidth + (header * 2), 0);
 				Driver.AddStr ($" {header:x} ");
@@ -117,7 +130,8 @@ namespace UICatalog {
 					Driver.AddStr (rowLabel);
 					for (int col = 0; col < 16; col++) {
 						Move (viewport.X + RowHeaderWidth + (col * 2), 0 + y + 1);
-						Driver.AddStr ($" {(char)((-viewport.Y + row) * 16 + col)}");
+						Driver.AddRune (' ');
+						Driver.AddRune (ReplaceNonPrintables (new Rune(((uint)((uint)(-viewport.Y + row) * 16 + col)))));
 					}
 				}
 			}
