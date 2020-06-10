@@ -163,7 +163,7 @@ namespace Terminal.Gui {
 		void Recalc ()
 		{
 			recalcPending = false;
-			Recalc (text, lines, Frame.Width, textAlignment);
+			Recalc (text, lines, Frame.Width, textAlignment, Bounds.Height > 1);
 		}
 
 		static List<ustring> WordWrap (ustring text, int margin)
@@ -195,9 +195,21 @@ namespace Terminal.Gui {
 			return lines;
 		}
 
-		static void Recalc (ustring textStr, List<ustring> lineResult, int width, TextAlignment talign)
+		static void Recalc (ustring textStr, List<ustring> lineResult, int width, TextAlignment talign, bool wordWrap)
 		{
 			lineResult.Clear ();
+
+			if (wordWrap == false) {
+				textStr = textStr.Replace ("\f", " ")
+				.Replace ("\n", " ")
+				.Replace ("\r", " ")
+				.Replace ("\t", " ")
+				.Replace ("\v", " ")
+				.TrimSpace ();
+				lineResult.Add (ClipAndJustify (textStr, width, talign));
+				return;
+			}
+
 			int textLen = textStr.Length;
 			int lp = 0;
 			for (int i = 0; i < textLen; i++) {
@@ -271,7 +283,7 @@ namespace Terminal.Gui {
 		public static int MeasureLines (ustring text, int width)
 		{
 			var result = new List<ustring> ();
-			Recalc (text, result, width, TextAlignment.Left);
+			Recalc (text, result, width, TextAlignment.Left, true);
 			return result.Count;
 		}
 
@@ -284,7 +296,7 @@ namespace Terminal.Gui {
 		public static int MaxWidth (ustring text, int width)
 		{
 			var result = new List<ustring> ();
-			Recalc (text, result, width, TextAlignment.Left);
+			Recalc (text, result, width, TextAlignment.Left, true);
 			return result.Max (s => s.RuneCount);
 		}
 
@@ -297,7 +309,7 @@ namespace Terminal.Gui {
 		public static int MaxHeight (ustring text, int width)
 		{
 			var result = new List<ustring> ();
-			Recalc (text, result, width, TextAlignment.Left);
+			Recalc (text, result, width, TextAlignment.Left, true);
 			return result.Count;
 		}
 
