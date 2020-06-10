@@ -32,7 +32,7 @@ namespace Terminal.Gui {
 		/// <param name="width">Width for the window.</param>
 		/// <param name="height">Height for the window.</param>
 		/// <param name="title">Title for the query.</param>
-		/// <param name="message">Message to display, might contain multiple lines..</param>
+		/// <param name="message">Message to display, might contain multiple lines.</param>
 		/// <param name="buttons">Array of buttons to add.</param>
 		/// <remarks>
 		/// Use <see cref="Query(ustring, ustring, ustring[])"/> instead; it automatically sizes the MessageBox based on the contents.
