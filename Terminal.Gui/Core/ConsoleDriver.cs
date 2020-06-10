@@ -890,6 +890,26 @@ namespace Terminal.Gui {
 		public abstract void CookMouse ();
 
 		/// <summary>
+		/// Contains information for a console font.
+		/// </summary>
+		public class ConsoleFont {
+			/// <summary>
+			/// The name of the typeface (such as Courier or Arial).
+			/// </summary>
+			public string FaceName;
+
+			/// <summary>
+			/// The font weight. The weight can range from 100 to 1000, in multiples of 100. For example, the normal weight is 400, while 700 is bold.
+			/// </summary>
+			public int Weight;
+
+			/// <summary>
+			/// Contains the width and height of each character in the font, in logical units. The X member contains the width, while the Y member contains the height.
+			/// </summary>
+			public Size Size;
+		}
+
+		/// <summary>
 		/// Gets the current font set for the console.
 		/// </summary>
 		/// <returns>The Font for the current console. <c>null</c> if the console driver does not support querying the font.</returns>
@@ -1032,25 +1052,5 @@ namespace Terminal.Gui {
 		/// <param name="back">Background.</param>
 		/// <returns></returns>
 		public abstract Attribute MakeAttribute (Color fore, Color back);
-
-		/// <summary>
-		/// Contains information for a console font.
-		/// </summary>
-		public class ConsoleFont {
-			/// <summary>
-			/// The name of the typeface (such as Courier or Arial).
-			/// </summary>
-			public string FaceName;
-
-			/// <summary>
-			/// The font weight. The weight can range from 100 to 1000, in multiples of 100. For example, the normal weight is 400, while 700 is bold.
-			/// </summary>
-			public int Weight;
-
-			/// <summary>
-			/// Contains the width and height of each character in the font, in logical units. The X member contains the width, while the Y member contains the height.
-			/// </summary>
-			public Size Size;
-		}
 	}
 }
