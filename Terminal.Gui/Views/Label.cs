@@ -13,7 +13,7 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// The Label <see cref="View"/> displays a string at a given position and supports multiple lines separted by newline characters.
+	/// The Label <see cref="View"/> displays a string at a given position and supports multiple lines separted by newline characters. Multi-line Labels support word wrap.
 	/// </summary>
 	public class Label : View {
 		List<ustring> lines = new List<ustring> ();
@@ -52,7 +52,7 @@ namespace Terminal.Gui {
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
-		///   No line wraping is provided.
+		///   No line wrapping is provided.
 		/// </para>
 		/// </remarks>
 		/// <param name="x">column to locate the Label.</param>
@@ -72,7 +72,7 @@ namespace Terminal.Gui {
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
-		///   No line wraping is provided.
+		///   If <c>rect.Height</c> is greater than one, word wrapping is provided.
 		/// </para>
 		/// </remarks>
 		/// <param name="rect">Location.</param>
@@ -92,7 +92,7 @@ namespace Terminal.Gui {
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
-		///   No line wraping is provided.
+		///   If <c>Height</c> is greater than one, word wrapping is provided.
 		/// </para>
 		/// </remarks>
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
@@ -114,7 +114,7 @@ namespace Terminal.Gui {
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
-		///   No line wraping is provided.
+		///   If <c>Height</c> is greater than one, word wrapping is provided.
 		/// </para>
 		/// </remarks>
 		public Label () : this (text: string.Empty) { }
