@@ -984,15 +984,10 @@ namespace Terminal.Gui {
 								view.LayoutSubviews ();
 							Application.CurrentView = view;
 
-							// Clip the sub-view
-							var savedClip = view.ClipToBounds ();
-
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0) because
 							view.Redraw (view.Bounds);
 
-							// Undo the clip
-							Driver.Clip = savedClip;
 						}
 						view.NeedDisplay = Rect.Empty;
 						view.childNeedsDisplay = false;
@@ -1591,11 +1586,7 @@ namespace Terminal.Gui {
 						}
 					}
 					if (c_hot_pos > -1) {
-						if (wLen - runeCount == 0) {
-							c_hot_pos += (wLen - runeCount == 0 ? w_hot_pos * (space) - space - w_hot_pos + 1 : space + wLen - runeCount);
-						} else {
-							c_hot_pos += space + wLen - runeCount;
-						}
+						c_hot_pos += w_hot_pos * space - space - w_hot_pos + 1;
 					}
 					break;
 				}
