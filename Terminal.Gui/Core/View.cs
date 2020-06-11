@@ -681,8 +681,8 @@ namespace Terminal.Gui {
 
 			// The following ensures that the cursor is always in the screen boundaries.
 			if (clipped) {
-				rrow = Math.Max (0, Math.Min (rrow, Driver.Rows - 1));
-				rcol = Math.Max (0, Math.Min (rcol, Driver.Cols - 1));
+				rrow = Math.Min (rrow, Driver.Rows - 1);
+				rcol = Math.Min (rcol, Driver.Cols - 1);
 			}
 		}
 
@@ -799,8 +799,8 @@ namespace Terminal.Gui {
 		/// This moves the cursor to the specified column and row in the view.
 		/// </summary>
 		/// <returns>The move.</returns>
-		/// <param name="col">Col (view-relative).</param>
-		/// <param name="row">Row (view-relative).</param>
+		/// <param name="col">Col.</param>
+		/// <param name="row">Row.</param>
 		public void Move (int col, int row)
 		{
 			ViewToScreen (col, row, out var rcol, out var rrow);
@@ -977,7 +977,7 @@ namespace Terminal.Gui {
 			if (subviews != null) {
 				foreach (var view in subviews) {
 					if (view.NeedDisplay != null && (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay)) {
-						if (view.Frame.IntersectsWith (clipRect) && view.Frame.IntersectsWith (bounds)) {
+						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
 
 							// FIXED: optimize this by computing the intersection of region and view.Bounds
 							if (view.layoutNeeded)
