@@ -157,30 +157,32 @@ namespace Terminal.Gui {
 		/// Creates a <see cref="Toplevel"/> and assigns it to <see cref="Top"/> and <see cref="CurrentView"/>
 		/// </para>
 		/// </remarks>
-		public static void Init (ConsoleDriver driver = null) => Init (() => Toplevel.Create (), driver);
+		public static void Init (ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null) => Init (() => Toplevel.Create (), driver, mainLoopDriver);
 
 		internal static bool _initialized = false;
 
 		/// <summary>
 		/// Initializes the Terminal.Gui application
 		/// </summary>
-		static void Init (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null)
+		static void Init (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null)
 		{
 			if (_initialized) return;
 
 			// This supports Unit Tests and the passing of a mock driver/loopdriver
 			if (driver != null) {
+				if (mainLoopDriver == null) {
+					throw new ArgumentNullException ("mainLoopDriver cannot be null if driver is provided.");
+				}
 				Driver = driver;
 				Driver.Init (TerminalResized);
-				MainLoop = new MainLoop ((IMainLoopDriver)driver);
+				MainLoop = new MainLoop (mainLoopDriver);
 				SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
 			}
 
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
-				IMainLoopDriver mainLoopDriver;
 				if (UseSystemConsole) {
-					mainLoopDriver = new NetMainLoop ();
+					mainLoopDriver = new NetMainLoop (() => Console.ReadKey (true));
 					Driver = new NetDriver ();
 				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 					var windowsDriver = new WindowsDriver ();
@@ -487,7 +489,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Shutdown an application initialized with <see cref="Init(ConsoleDriver)"/>
+		/// Shutdown an application initialized with <see cref="Init(ConsoleDriver, IMainLoopDriver)"/>
 		/// </summary>
 		/// /// <param name="closeDriver"><c>true</c>Closes the application.<c>false</c>Closes toplevels only.</param>
 		public static void Shutdown (bool closeDriver = true)
