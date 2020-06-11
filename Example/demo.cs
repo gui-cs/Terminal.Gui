@@ -421,26 +421,26 @@ static class Demo {
 		MessageBox.Query (60, 10, "Selected Animals", result == "" ? "No animals selected" : result, "Ok");
 	}
 
-	//static void ComboBoxDemo ()
-	//{
-	//	IList<string> items = new List<string> ();
-	//	foreach (var dir in new [] { "/etc", @"\windows\System32" }) {
-	//		if (Directory.Exists (dir)) {
-	//			items = Directory.GetFiles (dir)
-	//			.Select (Path.GetFileName)
-	//			.Where (x => char.IsLetterOrDigit (x [0]))
-	//			.Distinct ()
-	//			.OrderBy (x => x).ToList ();
-	//		}
-	//	}
-	//	var list = new ComboBox (0, 0, 36, 7, items);
-	//	list.Changed += (object sender, ustring text) => { Application.RequestStop (); };
+	static void ComboBoxDemo ()
+	{
+		IList<string> items = new List<string> ();
+		foreach (var dir in new [] { "/etc", @"\windows\System32" }) {
+			if (Directory.Exists (dir)) {
+				items = Directory.GetFiles (dir).Union (Directory.GetDirectories (dir))
+					.Select (Path.GetFileName)
+					.Where (x => char.IsLetterOrDigit (x [0]))
+					.OrderBy (x => x).ToList ();
+			}
+		}
+		var list = new ComboBox () { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() };
+		list.SetSource(items.ToList());
+		list.SelectedItemChanged += (object sender, ustring text) => { Application.RequestStop (); };
 
-	//	var d = new Dialog ("Select source file", 40, 12) { list };
-	//	Application.Run (d);
+		var d = new Dialog ("Select source file", 40, 12) { list };
+		Application.Run (d);
 
-	//	MessageBox.Query (60, 10, "Selected file", list.Text.ToString() == "" ? "Nothing selected" : list.Text.ToString(), "Ok");
-	//}
+		MessageBox.Query (60, 10, "Selected file", list.Text.ToString() == "" ? "Nothing selected" : list.Text.ToString(), "Ok");
+	}
 	#endregion
 
 
@@ -571,7 +571,7 @@ static class Demo {
 			new MenuBarItem ("_List Demos", new MenuItem [] {
 				new MenuItem ("Select _Multiple Items", "", () => ListSelectionDemo (true)),
 				new MenuItem ("Select _Single Item", "", () => ListSelectionDemo (false)),
-//				new MenuItem ("Search Single Item", "", ComboBoxDemo)
+				new MenuItem ("Search Single Item", "", ComboBoxDemo)
 			}),
 			new MenuBarItem ("A_ssorted", new MenuItem [] {
 				new MenuItem ("_Show text alignments", "", () => ShowTextAlignments ()),

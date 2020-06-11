@@ -4,10 +4,15 @@
 // Authors:
 //   Ross Ferguson (ross.c.ferguson@btinternet.com)
 //
+// TODO:
+//  LayoutComplete() resize Height implement
+//	Cursor rolls of end of list when Height = Dim.Fill() and list fills frame
+//
 
 using System;
-using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using NStack;
 
 namespace Terminal.Gui {
@@ -15,6 +20,39 @@ namespace Terminal.Gui {
 	/// ComboBox control
 	/// </summary>
 	public class ComboBox : View {
+
+		IListDataSource source;
+		/// <summary>
+		/// Gets or sets the <see cref="IListDataSource"/> backing this <see cref="ComboBox"/>, enabling custom rendering.
+		/// </summary>
+		/// <value>The source.</value>
+		/// <remarks>
+		///  Use <see cref="SetSource"/> to set a new <see cref="IList"/> source.
+		/// </remarks>
+		public IListDataSource Source {
+			get => source;
+			set {
+				source = value;
+				SetNeedsDisplay ();
+			}
+		}
+
+		/// <summary>
+		/// Sets the source of the <see cref="ComboBox"/> to an <see cref="IList"/>.
+		/// </summary>
+		/// <value>An object implementing the IList interface.</value>
+		/// <remarks>
+		///  Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custome rendering.
+		/// </remarks>
+		public void SetSource (IList source)
+		{
+			if (source == null)
+				Source = null;
+			else {
+				Source = MakeWrapper (source);
+			}
+		}
+
 		/// <summary>
 		///   Changed event, raised when the selection has been confirmed.
 		/// </summary>
@@ -22,15 +60,12 @@ namespace Terminal.Gui {
 		///   Client code can hook up to this event, it is
 		///   raised when the selection has been confirmed.
 		/// </remarks>
-		public Action<ustring> SelectedItemChanged;
+		public event EventHandler<ustring> SelectedItemChanged;
 
-		IList<string> listsource;
-		IList<string> searchset;
+		IList searchset;
 		ustring text = "";
-		TextField search;
-		ListView listview;
-		int x;
-		int y;
+		readonly TextField search;
+		readonly ListView listview;
 		int height;
 		int width;
 		bool autoHide = true;
@@ -40,8 +75,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		public ComboBox () : base()
 		{
-			search = new TextField ("") { LayoutStyle = LayoutStyle.Computed };
-			listview = new ListView () { LayoutStyle = LayoutStyle.Computed, CanFocus = true /* why? */ };
+			search = new TextField ("");
+			listview = new ListView () { LayoutStyle = LayoutStyle.Computed, CanFocus = true };
 
 			Initialize ();
 		}
@@ -49,39 +84,45 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Public constructor
 		/// </summary>
-		/// <param name="x">The x coordinate</param>
-		/// <param name="y">The y coordinate</param>
-		/// <param name="w">The width</param>
-		/// <param name="h">The height</param>
-		/// <param name="source">Auto completion source</param>
-		public ComboBox (int x, int y, int w, int h, IList<string> source)
+		/// <param name="rect"></param>
+		/// <param name="source"></param>
+		public ComboBox (Rect rect, IList source) : base (rect)
 		{
 			SetSource (source);
-			this.x = x;
-			this.y = y;
-			height = h;
-			width = w;
+			this.height = rect.Height;
+			this.width = rect.Width;
 
-			search = new TextField (x, y, w, "");
-
-			listview = new ListView (new Rect (x, y + 1, w, 0), listsource.ToList ()) {
-				LayoutStyle = LayoutStyle.Computed,
-			};
+			search = new TextField ("") { Width = width };
+			listview = new ListView (rect, source) { LayoutStyle = LayoutStyle.Computed };
 
 			Initialize ();
 		}
 
+		static IListDataSource MakeWrapper (IList source)
+		{
+			return new ListWrapper (source);
+		}
+
 		private void Initialize()
 		{
-			search.Changed += Search_Changed;
+			ColorScheme = Colors.Base;
 
-			listview.SelectedChanged += (object sender, ListViewItemEventArgs e) => {
-				if(searchset.Count > 0)
-					SetValue (searchset [listview.SelectedItem]);
+			search.TextChanged += Search_Changed;
+
+			// On resize
+			LayoutComplete += (LayoutEventArgs a) => {
+
+				search.Width = Bounds.Width;
+				listview.Width = autoHide ? Bounds.Width - 1 : Bounds.Width;
 			};
 
-			// TODO: LayoutComplete event breaks cursor up/down. Revert to Application.Loaded 
-			Application.Loaded += (sender, a) => {
+			listview.SelectedItemChanged += (ListViewItemEventArgs e) => {
+
+				if(searchset.Count > 0)
+					SetValue ((string)searchset [listview.SelectedItem]);
+			};
+
+			Application.Loaded += (Application.ResizedEventArgs a) => {
 				// Determine if this view is hosted inside a dialog
 				for (View view = this.SuperView; view != null; view = view.SuperView) {
 					if (view is Dialog) {
@@ -90,34 +131,37 @@ namespace Terminal.Gui {
 					}
 				}
 
-				searchset = autoHide ? new List<string> () : listsource;
+				ResetSearchSet ();
+
+				ColorScheme = autoHide ? Colors.Base : ColorScheme = null;
 
 				// Needs to be re-applied for LayoutStyle.Computed
 				// If Dim or Pos are null, these are the from the parametrized constructor
-				if (X == null) 
-					listview.X = x;
+				listview.Y = 1;
 
-				if (Y == null)
-					listview.Y = y + 1;
-				else
-					listview.Y = Pos.Bottom (search);
-
-				if (Width == null)
+				if (Width == null) {
 					listview.Width = CalculateWidth ();
-				else {
-					width = GetDimAsInt (Width);
+					search.Width = width;
+				} else {
+					width = GetDimAsInt (Width, vertical: false);
+					search.Width = width;
 					listview.Width = CalculateWidth ();
 				}
 
-				if (Height == null)
+				if (Height == null) {
+					var h = CalculatetHeight ();
+					listview.Height = h;
+					this.Height = h + 1; // adjust view to account for search box
+				} else {
+					if (height == 0)
+						height = GetDimAsInt (Height, vertical: true);
+
 					listview.Height = CalculatetHeight ();
-				else {
-					height = GetDimAsInt (Height);
-					listview.Height = CalculatetHeight ();
+					this.Height = height + 1; // adjust view to account for search box
 				}
 
 				if (this.Text != null)
-					Search_Changed (search, Text);
+					Search_Changed (Text);
 
 				if (autoHide)
 					listview.ColorScheme = Colors.Menu;
@@ -131,20 +175,12 @@ namespace Terminal.Gui {
 			this.SetFocus(search);
 		}
 
-		/// <summary>
-		/// Set search list source
-		/// </summary>
-		public void SetSource(IList<string> source)
-		{
-			listsource = new List<string> (source);
-		}
-
-		private void Search_MouseClick (object sender, MouseEventArgs e)
+		private void Search_MouseClick (MouseEventArgs e)
 		{
 			if (e.MouseEvent.Flags != MouseFlags.Button1Clicked)
 				return;
 
-			SuperView.SetFocus ((View)sender);
+			SuperView.SetFocus (search);
 		}
 
 		///<inheritdoc/>
@@ -158,11 +194,23 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <summary>
+		/// Invokes the SelectedChanged event if it is defined.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool OnSelectedChanged ()
+		{
+			// Note: Cannot rely on "listview.SelectedItem != lastSelectedItem" because the list is dynamic. 
+			// So we cannot optimize. Ie: Don't call if not changed
+			SelectedItemChanged?.Invoke (this, search.Text);
+
+			return true;
+		}
+
 		///<inheritdoc/>
 		public override bool ProcessKey(KeyEvent e)
 		{
-			if (e.Key == Key.Tab)
-			{
+			if (e.Key == Key.Tab) {
 				base.ProcessKey(e);
 				return false; // allow tab-out to next control
 			}
@@ -173,10 +221,10 @@ namespace Terminal.Gui {
 					return true;
 				}
 
-				SetValue( searchset [listview.SelectedItem]);
+				SetValue((string)searchset [listview.SelectedItem]);
 				search.CursorPosition = search.Text.Length;
-				Search_Changed (search, search.Text);
-				Changed?.Invoke (this, text);
+				Search_Changed (search.Text);
+				OnSelectedChanged ();
 
 				searchset.Clear();
 				listview.Clear ();
@@ -188,7 +236,7 @@ namespace Terminal.Gui {
 
 			if (e.Key == Key.CursorDown && search.HasFocus && listview.SelectedItem == 0 && searchset.Count > 0) { // jump to list
 				this.SetFocus (listview);
-				SetValue (searchset [listview.SelectedItem]);
+				SetValue ((string)searchset [listview.SelectedItem]);
 				return true;
 			}
 
@@ -205,7 +253,7 @@ namespace Terminal.Gui {
 			if (e.Key == Key.Esc) {
 				this.SetFocus (search);
 				search.Text = text = "";
-				Changed?.Invoke (this, search.Text);
+				OnSelectedChanged ();
 				return true;
 			}
 
@@ -235,10 +283,10 @@ namespace Terminal.Gui {
 
 		private void SetValue(ustring text)
 		{
-			search.Changed -= Search_Changed;
+			search.TextChanged -= Search_Changed;
 			this.text = search.Text = text;
 			search.CursorPosition = 0;
-			search.Changed += Search_Changed;
+			search.TextChanged += Search_Changed;
 		}
 
 		/// <summary>
@@ -247,26 +295,38 @@ namespace Terminal.Gui {
 		private void Reset()
 		{
 			search.Text = text = "";
-			Changed?.Invoke (this, search.Text);
-			searchset = autoHide ? new List<string> () : listsource;
+			OnSelectedChanged();
 
-			listview.SetSource(searchset.ToList());
+			ResetSearchSet ();
+
+			listview.SetSource(searchset);
 			listview.Height = CalculatetHeight ();
 
 			this.SetFocus(search);
 		}
 
-		private void Search_Changed (object sender, ustring text)
+		private void ResetSearchSet()
 		{
-			if (listsource == null) // Object initialization
+			if (autoHide) {
+				if (searchset == null)
+					searchset = new List<string> ();
+				else
+					searchset.Clear ();
+			} else
+				searchset = source.ToList ();
+		}
+
+		private void Search_Changed (ustring text)
+		{
+			if (source == null) // Object initialization
 				return;
 
-			if (string.IsNullOrEmpty (search.Text.ToString()))
-				searchset = autoHide ? new List<string> () : listsource;
+			if (string.IsNullOrEmpty (search.Text.ToString ()))
+				ResetSearchSet ();
 			else
-				searchset = listsource.Where (x => x.StartsWith (search.Text.ToString (), StringComparison.CurrentCultureIgnoreCase)).ToList ();
+				searchset = source.ToList().Cast<string>().Where (x => x.StartsWith (search.Text.ToString (), StringComparison.CurrentCultureIgnoreCase)).ToList();
 
-			listview.SetSource (searchset.ToList ());
+			listview.SetSource (searchset);
 			listview.Height = CalculatetHeight ();
 
 			listview.Redraw (new Rect (0, 0, width, height)); // for any view behind this
@@ -292,21 +352,21 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Get DimAbsolute as integer value
+		/// Get Dim as integer value
 		/// </summary>
 		/// <param name="dim"></param>
-		/// <returns></returns>
-		private int GetDimAsInt(Dim dim)
+		/// <param name="vertical"></param>
+		/// <returns></returns>n
+		private int GetDimAsInt (Dim dim, bool vertical)
 		{
-			if (!(dim is Dim.DimAbsolute))
-				throw new ArgumentException ("Dim must be an absolute value");
-
-			// Anchor in the case of DimAbsolute returns absolute value. No documentation on what Anchor() does so not sure if this will change in the future.
-			//
-			// TODO: Does Dim need:- 
-			//		public static implicit operator int (Dim d)
-			//
-			return dim.Anchor (0);
+			if (dim is Dim.DimAbsolute)
+				return dim.Anchor (0);
+			else { // Dim.Fill Dim.Factor
+				if(autoHide)
+					return vertical ? dim.Anchor (SuperView.Bounds.Height) : dim.Anchor (SuperView.Bounds.Width);
+				else 
+					return vertical ? dim.Anchor (Bounds.Height) : dim.Anchor (Bounds.Width);
+			}
 		}
 	}
 }

@@ -262,11 +262,14 @@ namespace UICatalog {
 			_categoryListView.SelectedItem = 0;
 			_categoryListView.OnSelectedChanged ();
 
-			_capslock = new StatusItem (Key.CharMask, "Capslock", null);
-			_numlock = new StatusItem (Key.CharMask, "Numlock", null);
-			_scrolllock = new StatusItem (Key.CharMask, "Scrolllock", null);
+			_capslock = new StatusItem (Key.CharMask, "Caps", null);
+			_numlock = new StatusItem (Key.CharMask, "Num", null);
+			_scrolllock = new StatusItem (Key.CharMask, "Scroll", null);
 
 			_statusBar = new StatusBar (new StatusItem [] {
+				_capslock,
+				_numlock,
+				_scrolllock,
 				new StatusItem(Key.ControlQ, "~CTRL-Q~ Quit", () => {
 					if (_runningScenario is null){
 						// This causes GetScenarioToRun to return null
@@ -276,9 +279,6 @@ namespace UICatalog {
 						_runningScenario.RequestStop();
 					}
 				}),
-				_capslock,
-				_numlock,
-				_scrolllock
 			});
 
 			SetColorScheme ();
@@ -357,26 +357,26 @@ namespace UICatalog {
 			//}
 
 			if (a.KeyEvent.IsCapslock) {
-				_capslock.Title = "Capslock: On";
+				_capslock.Title = "Caps: On";
 				_statusBar.SetNeedsDisplay ();
 			} else {
-				_capslock.Title = "Capslock: Off";
+				_capslock.Title = "Caps: Off";
 				_statusBar.SetNeedsDisplay ();
 			}
 
 			if (a.KeyEvent.IsNumlock) {
-				_numlock.Title = "Numlock: On";
+				_numlock.Title = "Num: On";
 				_statusBar.SetNeedsDisplay ();
 			} else {
-				_numlock.Title = "Numlock: Off";
+				_numlock.Title = "Num: Off";
 				_statusBar.SetNeedsDisplay ();
 			}
 
 			if (a.KeyEvent.IsScrolllock) {
-				_scrolllock.Title = "Scrolllock: On";
+				_scrolllock.Title = "Scroll: On";
 				_statusBar.SetNeedsDisplay ();
 			} else {
-				_scrolllock.Title = "Scrolllock: Off";
+				_scrolllock.Title = "Scroll: Off";
 				_statusBar.SetNeedsDisplay ();
 			}
 		}

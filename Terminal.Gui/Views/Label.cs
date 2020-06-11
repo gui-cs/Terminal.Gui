@@ -8,11 +8,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// The Label <see cref="View"/> displays a string at a given position and supports multiple lines separted by newline characters.
+	/// The Label <see cref="View"/> displays a string at a given position and supports multiple lines separted by newline characters. Multi-line Labels support word wrap.
 	/// </summary>
 	public class Label : View {
 		List<ustring> lines = new List<ustring> ();
@@ -51,7 +52,7 @@ namespace Terminal.Gui {
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
-		///   No line wraping is provided.
+		///   No line wrapping is provided.
 		/// </para>
 		/// </remarks>
 		/// <param name="x">column to locate the Label.</param>
@@ -71,7 +72,7 @@ namespace Terminal.Gui {
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
-		///   No line wraping is provided.
+		///   If <c>rect.Height</c> is greater than one, word wrapping is provided.
 		/// </para>
 		/// </remarks>
 		/// <param name="rect">Location.</param>
@@ -91,7 +92,7 @@ namespace Terminal.Gui {
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
-		///   No line wraping is provided.
+		///   If <c>Height</c> is greater than one, word wrapping is provided.
 		/// </para>
 		/// </remarks>
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
@@ -113,7 +114,7 @@ namespace Terminal.Gui {
 		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
 		/// </para>
 		/// <para>
-		///   No line wraping is provided.
+		///   If <c>Height</c> is greater than one, word wrapping is provided.
 		/// </para>
 		/// </remarks>
 		public Label () : this (text: string.Empty) { }
@@ -125,7 +126,7 @@ namespace Terminal.Gui {
 			// Get rid of any '\r' added by Windows
 			str = str.Replace ("\r", ustring.Empty);
 			int slen = str.RuneCount;
-			if (slen > width){
+			if (slen > width) {
 				var uints = str.ToRunes (width);
 				var runes = new Rune [uints.Length];
 				for (int i = 0; i < uints.Length; i++)
@@ -134,11 +135,11 @@ namespace Terminal.Gui {
 			} else {
 				if (talign == TextAlignment.Justified) {
 					// TODO: ustring needs this
-			               	var words = str.ToString ().Split (whitespace, StringSplitOptions.RemoveEmptyEntries);
+					var words = str.ToString ().Split (whitespace, StringSplitOptions.RemoveEmptyEntries);
 					int textCount = words.Sum (arg => arg.Length);
 
-					var spaces = (width- textCount) / (words.Length - 1);
-					var extras = (width - textCount) % words.Length;
+					var spaces = words.Length > 1 ? (width - textCount) / (words.Length - 1) : 0;
+					var extras = words.Length > 1 ? (width - textCount) % words.Length : 0;
 
 					var s = new System.Text.StringBuilder ();
 					//s.Append ($"tc={textCount} sp={spaces},x={extras} - ");
@@ -162,27 +163,80 @@ namespace Terminal.Gui {
 		void Recalc ()
 		{
 			recalcPending = false;
-			Recalc (text, lines, Frame.Width, textAlignment);
+			Recalc (text, lines, Frame.Width, textAlignment, Bounds.Height > 1);
 		}
 
-		static void Recalc (ustring textStr, List<ustring> lineResult, int width, TextAlignment talign)
+		static ustring ReplaceNonPrintables (ustring str)
+		{
+			var runes = new List<Rune> ();
+			foreach (var r in str.ToRunes ()) {
+				if (r < 0x20) {
+					runes.Add (new Rune (r + 0x2400));         // U+25A1 □ WHITE SQUARE
+				} else {
+					runes.Add (r);
+				}
+			}
+			return ustring.Make (runes); ;
+		}
+
+		static List<ustring> WordWrap (ustring text, int margin)
+		{
+			int start = 0, end;
+			var lines = new List<ustring> ();
+
+			text = ReplaceNonPrintables (text);
+
+			while ((end = start + margin) < text.Length) {
+				while (text [end] != ' ' && end > start)
+					end -= 1;
+
+				if (end == start)
+					end = start + margin;
+
+				lines.Add (text [start, end]);
+				start = end + 1;
+			}
+
+			if (start < text.Length)
+				lines.Add (text.Substring (start));
+
+			return lines;
+		}
+
+		static void Recalc (ustring textStr, List<ustring> lineResult, int width, TextAlignment talign, bool wordWrap)
 		{
 			lineResult.Clear ();
-			if (textStr.IndexOf ('\n') == -1) {
+
+			if (wordWrap == false) {
+				textStr = ReplaceNonPrintables (textStr);
 				lineResult.Add (ClipAndJustify (textStr, width, talign));
 				return;
 			}
+
 			int textLen = textStr.Length;
 			int lp = 0;
 			for (int i = 0; i < textLen; i++) {
 				Rune c = textStr [i];
-
 				if (c == '\n') {
-					lineResult.Add (ClipAndJustify (textStr [lp, i], width, talign));
+					var wrappedLines = WordWrap (textStr [lp, i], width);
+					foreach (var line in wrappedLines) {
+						lineResult.Add (ClipAndJustify (line, width, talign));
+					}
+					if (wrappedLines.Count == 0) {
+						lineResult.Add (ustring.Empty);
+					}
 					lp = i + 1;
 				}
 			}
-			lineResult.Add(ClipAndJustify(textStr[lp, textLen], width, talign));
+			foreach (var line in WordWrap (textStr [lp, textLen], width)) {
+				lineResult.Add (ClipAndJustify (line, width, talign));
+			}
+		}
+
+		///<inheritdoc/>
+		public override void LayoutSubviews ()
+		{
+			recalcPending = true;
 		}
 
 		///<inheritdoc/>
@@ -198,7 +252,7 @@ namespace Terminal.Gui {
 
 			Clear ();
 			for (int line = 0; line < lines.Count; line++) {
-				if (line < bounds.Top || line > bounds.Bottom)
+				if (line < bounds.Top || line >= bounds.Bottom)
 					continue;
 				var str = lines [line];
 				int x;
@@ -207,7 +261,6 @@ namespace Terminal.Gui {
 					x = 0;
 					break;
 				case TextAlignment.Justified:
-					Recalc ();
 					x = Bounds.Left;
 					break;
 				case TextAlignment.Right:
@@ -233,7 +286,7 @@ namespace Terminal.Gui {
 		public static int MeasureLines (ustring text, int width)
 		{
 			var result = new List<ustring> ();
-			Recalc (text, result, width, TextAlignment.Left);
+			Recalc (text, result, width, TextAlignment.Left, true);
 			return result.Count;
 		}
 
@@ -243,11 +296,24 @@ namespace Terminal.Gui {
 		/// <returns>Max width of lines.</returns>
 		/// <param name="text">Text, may contain newlines.</param>
 		/// <param name="width">The width for the text.</param>
-		public static int MaxWidth(ustring text, int width)
+		public static int MaxWidth (ustring text, int width)
 		{
-			var result = new List<ustring>();
-			Recalc(text, result, width, TextAlignment.Left);
-			return result.Max(s => s.RuneCount);
+			var result = new List<ustring> ();
+			Recalc (text, result, width, TextAlignment.Left, true);
+			return result.Max (s => s.RuneCount);
+		}
+
+		/// <summary>
+		/// Computes the max height of a line or multilines needed to render by the Label control
+		/// </summary>
+		/// <returns>Max height of lines.</returns>
+		/// <param name="text">Text, may contain newlines.</param>
+		/// <param name="width">The width for the text.</param>
+		public static int MaxHeight (ustring text, int width)
+		{
+			var result = new List<ustring> ();
+			Recalc (text, result, width, TextAlignment.Left, true);
+			return result.Count;
 		}
 
 		/// <summary>

@@ -32,7 +32,7 @@ namespace Terminal.Gui {
 		/// <param name="width">Width for the window.</param>
 		/// <param name="height">Height for the window.</param>
 		/// <param name="title">Title for the query.</param>
-		/// <param name="message">Message to display, might contain multiple lines..</param>
+		/// <param name="message">Message to display, might contain multiple lines.</param>
 		/// <param name="buttons">Array of buttons to add.</param>
 		/// <remarks>
 		/// Use <see cref="Query(ustring, ustring, ustring[])"/> instead; it automatically sizes the MessageBox based on the contents.
@@ -93,10 +93,10 @@ namespace Terminal.Gui {
 
 		static int QueryFull (bool useErrorColors, int width, int height, ustring title, ustring message, params ustring [] buttons)
 		{
-			const int defaultWidth = 30;
+			const int defaultWidth = 50;
 			int textWidth = Label.MaxWidth (message, width);
-			int textHeight = message.Count (ustring.Make ('\n')) + 1;
-			int msgboxHeight = Math.Max (1, textHeight) + 4; // textHeight + (top + top padding + buttons + bottom)
+			int textHeight = Label.MaxHeight (message, width == 0 ? defaultWidth : width); // message.Count (ustring.Make ('\n')) + 1;
+			int msgboxHeight = Math.Max (1, textHeight) + 3; // textHeight + (top + top padding + buttons + bottom)
 
 			// Create button array for Dialog
 			int count = 0;
@@ -130,7 +130,7 @@ namespace Terminal.Gui {
 				l.X = Pos.Center ();
 				l.Y = Pos.Center ();
 				l.Width = Dim.Fill (2);
-				l.Height = Dim.Fill (2);
+				l.Height = Dim.Fill (1);
 				d.Add (l);
 			}
 
