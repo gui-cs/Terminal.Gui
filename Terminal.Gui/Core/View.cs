@@ -667,8 +667,7 @@ namespace Terminal.Gui {
 		/// <param name="rcol">Absolute column; screen-relative.</param>
 		/// <param name="rrow">Absolute row; screen-relative.</param>
 		/// <param name="clipped">Whether to clip the result of the ViewToScreen method, if set to <c>true</c>, the rcol, rrow values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
-		/// <param name="force">If <true/>force negative coordinates <false/>otherwise.</param>
-		internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true, bool force = true)
+		internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Computes the real row, col relative to the screen.
 			rrow = row + frame.Y;
@@ -681,11 +680,7 @@ namespace Terminal.Gui {
 			}
 
 			// The following ensures that the cursor is always in the screen boundaries.
-			if (clipped && !force) {
-				rrow = Math.Max (0, Math.Min (rrow, Driver.Rows - 1));
-				rcol = Math.Max (0, Math.Min (rcol, Driver.Cols - 1));
-			}
-			if (clipped && force) {
+			if (clipped) {
 				rrow = Math.Min (rrow, Driver.Rows - 1);
 				rcol = Math.Min (rcol, Driver.Cols - 1);
 			}
@@ -806,22 +801,9 @@ namespace Terminal.Gui {
 		/// <returns>The move.</returns>
 		/// <param name="col">Col.</param>
 		/// <param name="row">Row.</param>
-		/// <param name="force">If <true/>force move <false/>otherwise.</param>
-		public void Move (int col, int row, bool force = true)
+		public void Move (int col, int row)
 		{
-			int c = 0, r = 0;
-
-			if (!force && SuperView != null) {
-				if (col == 0)
-					c = SuperView.Frame.X;
-				if (row == 0)
-					r = SuperView.Frame.Y;
-			} else if (SuperView != null) {
-				c = col;
-				r = row;
-			}
-
-			ViewToScreen (c, r, out var rcol, out var rrow, force);
+			ViewToScreen (col, row, out var rcol, out var rrow);
 			Driver.Move (rcol, rrow);
 		}
 
@@ -839,23 +821,6 @@ namespace Terminal.Gui {
 				focused.PositionCursor ();
 			else
 				Move (frame.X, frame.Y);
-		}
-
-		/// <summary>
-		///   Positions the cursor in the right position based on the currently focused view in the chain.
-		/// </summary>
-		/// <param name="force">If <true/>force move <false/>otherwise.</param>
-		///    Views that are focusable should override <see cref="PositionCursor (bool)"/> to ensure
-		///    the cursor is placed in a location that makes sense. Unix terminals do not have
-		///    a way of hiding the cursor, so it can be distracting to have the cursor left at
-		///    the last focused view. Views should make sure that they place the cursor
-		///    in a visually sensible place.
-		public virtual void PositionCursor (bool force = true)
-		{
-			if (focused != null)
-				focused.PositionCursor (force);
-			else
-				Move (frame.X, frame.Y, force);
 		}
 
 		/// <inheritdoc/>

@@ -517,7 +517,7 @@ namespace Terminal.Gui {
 			if (InternalSubviews.Count == 0)
 				Move (0, 0);
 			else
-				base.PositionCursor (true);
+				base.PositionCursor ();
 		}
 
 		/// <summary>

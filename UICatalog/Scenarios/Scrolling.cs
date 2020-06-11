@@ -69,7 +69,7 @@ namespace UICatalog {
 				h = 0;
 
 				for (int y = 0; y < f.Width; y++) {
-					Move (0, y, true);
+					Move (0, y);
 					var nw = 0;
 					for (int x = 0; x < f.Height; x++) {
 						Rune r;
