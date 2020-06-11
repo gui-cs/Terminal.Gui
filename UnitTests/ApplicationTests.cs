@@ -21,7 +21,7 @@ namespace Terminal.Gui {
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Driver);
 
-			Application.Init (new FakeDriver ());
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
 			Assert.NotNull (Application.Current);
 			Assert.NotNull (Application.CurrentView);
 			Assert.NotNull (Application.Top);
@@ -57,12 +57,23 @@ namespace Terminal.Gui {
 			Assert.Throws<InvalidOperationException> (() => rs.Dispose ());
 		}
 
+		void Init ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey(true)));
+			Assert.NotNull (Application.Driver);
+			Assert.NotNull (Application.MainLoop);
+		}
+
+		void Shutdown ()
+		{
+			Application.Shutdown (true);
+		}
+
 		[Fact]
 		public void Begin_End_Cleana_Up ()
 		{
 			// Setup Mock driver
-			Application.Init (new FakeDriver ());
-			Assert.NotNull (Application.Driver);
+			Init ();
 
 			// Test null Toplevel
 			Assert.Throws<ArgumentNullException> (() => Application.Begin (null));
@@ -79,15 +90,14 @@ namespace Terminal.Gui {
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Driver);
 
-			Application.Shutdown (true);
+			Shutdown ();
 		}
 
 		[Fact]
 		public void RequestStop_Stops ()
 		{
 			// Setup Mock driver
-			Application.Init (new FakeDriver ());
-			Assert.NotNull (Application.Driver);
+			Init ();
 
 			var top = new Toplevel ();
 			var rs = Application.Begin (top);
@@ -112,8 +122,7 @@ namespace Terminal.Gui {
 		public void RunningFalse_Stops ()
 		{
 			// Setup Mock driver
-			Application.Init (new FakeDriver ());
-			Assert.NotNull (Application.Driver);
+			Init ();
 
 			var top = new Toplevel ();
 			var rs = Application.Begin (top);
@@ -139,20 +148,17 @@ namespace Terminal.Gui {
 		public void KeyUp_Event ()
 		{
 			// Setup Mock driver
-			Application.Init (new FakeDriver ());
-			Assert.NotNull (Application.Driver);
+			Init ();
 
 			// Setup some fake kepresses (This)
 			var input = "Tests";
 
 			// Put a control-q in at the end
 			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('q', ConsoleKey.Q, shift: false, alt: false, control: true));
-			foreach (var c in input.Reverse()) {
+			foreach (var c in input.Reverse ()) {
 				if (char.IsLetter (c)) {
 					Console.MockKeyPresses.Push (new ConsoleKeyInfo (char.ToLower (c), (ConsoleKey)char.ToUpper (c), shift: char.IsUpper (c), alt: false, control: false));
-				}
-				else
-				{
+				} else {
 					Console.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)c, shift: false, alt: false, control: false));
 				}
 			}
@@ -162,6 +168,10 @@ namespace Terminal.Gui {
 			int iterations = 0;
 			Application.Iteration = () => {
 				iterations++;
+				// Stop if we run out of control...
+				if (iterations > 10) {
+					Application.RequestStop ();
+				}
 			};
 
 			int keyUps = 0;
