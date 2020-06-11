@@ -4,11 +4,14 @@
 // Authors:
 //   Ross Ferguson (ross.c.ferguson@btinternet.com)
 //
+// TODO:
+//  LayoutComplete() resize Height implement
+//	Cursor rolls of end of list when Height = Dim.Fill() and list fills frame
+//
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using NStack;
 
@@ -17,7 +20,6 @@ namespace Terminal.Gui {
 	/// ComboBox control
 	/// </summary>
 	public class ComboBox : View {
-
 
 		IListDataSource source;
 		/// <summary>
@@ -62,10 +64,8 @@ namespace Terminal.Gui {
 
 		IList searchset;
 		ustring text = "";
-		TextField search;
-		ListView listview;
-		int x = 0;
-		int y = 0;
+		readonly TextField search;
+		readonly ListView listview;
 		int height;
 		int width;
 		bool autoHide = true;
@@ -75,33 +75,28 @@ namespace Terminal.Gui {
 		/// </summary>
 		public ComboBox () : base()
 		{
-			ColorScheme = Colors.Base;
-
 			search = new TextField ("");
 			listview = new ListView () { LayoutStyle = LayoutStyle.Computed, CanFocus = true };
 
 			Initialize ();
 		}
 
-		///// <summary>
-		///// Public constructor
-		///// </summary>
-		///// <param name="rect"></param>
-		///// <param name="source"></param>
-		//public ComboBox (Rect rect, IList source) : base (rect)
-		//{
-		//	SetSource (source);
-		//	this.x = rect.X;
-		//	this.y = rect.Y;
-		//	this.height = rect.Height;
-		//	this.width = rect.Width;
+		/// <summary>
+		/// Public constructor
+		/// </summary>
+		/// <param name="rect"></param>
+		/// <param name="source"></param>
+		public ComboBox (Rect rect, IList source) : base (rect)
+		{
+			SetSource (source);
+			this.height = rect.Height;
+			this.width = rect.Width;
 
-		//	search = new TextField ("") { X = rect.X, Y = rect.Y, Width = width };
+			search = new TextField ("") { Width = width };
+			listview = new ListView (rect, source) { LayoutStyle = LayoutStyle.Computed };
 
-		//	listview = new ListView (new Rect (rect.X, rect.Y + 1, width, 0), source) { LayoutStyle = LayoutStyle.Computed};
-
-		//	Initialize ();
-		//}
+			Initialize ();
+		}
 
 		static IListDataSource MakeWrapper (IList source)
 		{
@@ -110,6 +105,8 @@ namespace Terminal.Gui {
 
 		private void Initialize()
 		{
+			ColorScheme = Colors.Base;
+
 			search.TextChanged += Search_Changed;
 
 			// On resize
@@ -136,21 +133,17 @@ namespace Terminal.Gui {
 
 				ResetSearchSet ();
 
+				ColorScheme = autoHide ? Colors.Base : ColorScheme = null;
+
 				// Needs to be re-applied for LayoutStyle.Computed
 				// If Dim or Pos are null, these are the from the parametrized constructor
-				if (X == null) 
-					listview.X = x;
-
-				if (Y == null)
-					listview.Y = y + 1;
-				else
-					listview.Y = Pos.Bottom (search);
+				listview.Y = 1;
 
 				if (Width == null) {
 					listview.Width = CalculateWidth ();
 					search.Width = width;
 				} else {
-					width = GetDimAsInt (Width, a, vertical: false);
+					width = GetDimAsInt (Width, vertical: false);
 					search.Width = width;
 					listview.Width = CalculateWidth ();
 				}
@@ -161,7 +154,7 @@ namespace Terminal.Gui {
 					this.Height = h + 1; // adjust view to account for search box
 				} else {
 					if (height == 0)
-						height = GetDimAsInt (Height, a, vertical: true);
+						height = GetDimAsInt (Height, vertical: true);
 
 					listview.Height = CalculatetHeight ();
 					this.Height = height + 1; // adjust view to account for search box
@@ -359,18 +352,21 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Get DimAbsolute as integer value
+		/// Get Dim as integer value
 		/// </summary>
 		/// <param name="dim"></param>
-		/// <param name="a"></param>
 		/// <param name="vertical"></param>
-		/// <returns></returns>
-		private int GetDimAsInt (Dim dim, Application.ResizedEventArgs a, bool vertical)
+		/// <returns></returns>n
+		private int GetDimAsInt (Dim dim, bool vertical)
 		{
 			if (dim is Dim.DimAbsolute)
 				return dim.Anchor (0);
-			else
-				return vertical ? dim.Anchor (a.Rows) : dim.Anchor (a.Cols);
+			else { // Dim.Fill Dim.Factor
+				if(autoHide)
+					return vertical ? dim.Anchor (SuperView.Bounds.Height) : dim.Anchor (SuperView.Bounds.Width);
+				else 
+					return vertical ? dim.Anchor (Bounds.Height) : dim.Anchor (Bounds.Width);
+			}
 		}
 	}
 }

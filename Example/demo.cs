@@ -426,14 +426,13 @@ static class Demo {
 		IList<string> items = new List<string> ();
 		foreach (var dir in new [] { "/etc", @"\windows\System32" }) {
 			if (Directory.Exists (dir)) {
-				items = Directory.GetFiles (dir)
-				.Select (Path.GetFileName)
-				.Where (x => char.IsLetterOrDigit (x [0]))
-				.Distinct ()
-				.OrderBy (x => x).ToList ();
+				items = Directory.GetFiles (dir).Union (Directory.GetDirectories (dir))
+					.Select (Path.GetFileName)
+					.Where (x => char.IsLetterOrDigit (x [0]))
+					.OrderBy (x => x).ToList ();
 			}
 		}
-		var list = new ComboBox () { X = 0, Y = 0, Width = 36, Height = 7 };
+		var list = new ComboBox () { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() };
 		list.SetSource(items.ToList());
 		list.SelectedItemChanged += (object sender, ustring text) => { Application.RequestStop (); };
 
