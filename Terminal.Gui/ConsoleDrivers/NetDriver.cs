@@ -354,7 +354,7 @@ namespace Terminal.Gui {
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-			(mainLoop.Driver as NetMainLoop).WindowsKeyPressed = delegate (ConsoleKeyInfo consoleKey) {
+			(mainLoop.Driver as NetMainLoop).KeyPressed = delegate (ConsoleKeyInfo consoleKey) {
 				var map = MapKey (consoleKey);
 				if (map == (Key)0xffffffff)
 					return;
@@ -393,22 +393,41 @@ namespace Terminal.Gui {
 	/// be used on Windows and Unix, it is cross platform but lacks things like
 	/// file descriptor monitoring.
 	/// </summary>
-	class NetMainLoop : IMainLoopDriver {
+	/// <remarks>
+	/// This implementation is used for both NetDriver and FakeDriver. 
+	/// </remarks>
+	public class NetMainLoop : IMainLoopDriver {
 		AutoResetEvent keyReady = new AutoResetEvent (false);
 		AutoResetEvent waitForProbe = new AutoResetEvent (false);
-		ConsoleKeyInfo? windowsKeyResult = null;
-		public Action<ConsoleKeyInfo> WindowsKeyPressed;
+		ConsoleKeyInfo? keyResult = null;
 		MainLoop mainLoop;
+		Func<ConsoleKeyInfo> consoleKeyReaderFn = null;
 
-		public NetMainLoop ()
+		/// <summary>
+		/// Invoked when a Key is pressed.
+		/// </summary>
+		public Action<ConsoleKeyInfo> KeyPressed;
+
+		/// <summary>
+		/// Initializes the class.
+		/// </summary>
+		/// <remarks>
+		///   Passing a consoleKeyReaderfn is provided to support unit test sceanrios.
+		/// </remarks>
+		/// <param name="consoleKeyReaderFn">The method to be called to get a key from the console.</param>
+		public NetMainLoop (Func<ConsoleKeyInfo> consoleKeyReaderFn = null)
 		{
+			if (consoleKeyReaderFn == null) {
+				throw new ArgumentNullException ("key reader function must be provided.");
+			}
+			this.consoleKeyReaderFn = consoleKeyReaderFn;
 		}
 
 		void WindowsKeyReader ()
 		{
 			while (true) {
 				waitForProbe.WaitOne ();
-				windowsKeyResult = Console.ReadKey (true);
+				keyResult = consoleKeyReaderFn();
 				keyReady.Set ();
 			}
 		}
@@ -439,18 +458,17 @@ namespace Terminal.Gui {
 			if (!wait)
 				waitTimeout = 0;
 
-			windowsKeyResult = null;
+			keyResult = null;
 			waitForProbe.Set ();
 			keyReady.WaitOne (waitTimeout);
-			return windowsKeyResult.HasValue;
+			return keyResult.HasValue;
 		}
 
 		void IMainLoopDriver.MainIteration ()
 		{
-			if (windowsKeyResult.HasValue) {
-				if (WindowsKeyPressed != null)
-					WindowsKeyPressed (windowsKeyResult.Value);
-				windowsKeyResult = null;
+			if (keyResult.HasValue) {
+				KeyPressed?.Invoke (keyResult.Value);
+				keyResult = null;
 			}
 		}
 	}
