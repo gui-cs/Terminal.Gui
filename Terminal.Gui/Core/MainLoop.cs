@@ -53,26 +53,27 @@ namespace Terminal.Gui {
 		internal SortedList<long, Timeout> timeouts = new SortedList<long, Timeout> ();
 		internal List<Func<bool>> idleHandlers = new List<Func<bool>> ();
 
+		IMainLoopDriver driver;
+
 		/// <summary>
 		/// The current IMainLoopDriver in use.
 		/// </summary>
 		/// <value>The driver.</value>
-		public IMainLoopDriver Driver { get; }
+		public IMainLoopDriver Driver => driver;
 
 		/// <summary>
-		///  Creates a new Mainloop. 
+		///  Creates a new Mainloop, to run it you must provide a driver, and choose
+		///  one of the implementations UnixMainLoop, NetMainLoop or WindowsMainLoop.
 		/// </summary>
-		/// <param name="driver">Should match the <see cref="ConsoleDriver"/> (one of the implementations UnixMainLoop, NetMainLoop or WindowsMainLoop).</param>
 		public MainLoop (IMainLoopDriver driver)
 		{
-			Driver = driver;
+			this.driver = driver;
 			driver.Setup (this);
 		}
 
 		/// <summary>
-		///   Runs <c>action</c> on the thread that is processing events
+		///   Runs @action on the thread that is processing events
 		/// </summary>
-		/// <param name="action">the action to be invoked on the main processing thread.</param>
 		public void Invoke (Action action)
 		{
 			AddIdle (() => {
@@ -82,17 +83,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Adds specified idle handler function to mainloop processing. The handler function will be called once per iteration of the main loop after other events have been handled.
+		///   Executes the specified @idleHandler on the idle loop.  The return value is a token to remove it.
 		/// </summary>
-		/// <remarks>
-		/// <para>
-		///   Remove an idle hander by calling <see cref="RemoveIdle(Func{bool})"/> with the token this method returns.
-		/// </para>
-		/// <para>
-		///   If the <c>idleHandler</c> returns <c>false</c> it will be removed and not called subsequently.
-		/// </para>
-		/// </remarks>
-		/// <param name="idleHandler">Token that can be used to remove the idle handler with <see cref="RemoveIdle(Func{bool})"/> .</param>
 		public Func<bool> AddIdle (Func<bool> idleHandler)
 		{
 			lock (idleHandlers)
@@ -102,13 +94,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Removes an idle handler added with <see cref="AddIdle(Func{bool})"/> from processing.
+		///   Removes the specified idleHandler from processing.
 		/// </summary>
-		/// <param name="token">A token returned by <see cref="AddIdle(Func{bool})"/></param>
-		public void RemoveIdle (Func<bool> token)
+		public void RemoveIdle (Func<bool> idleHandler)
 		{
-			lock (token)
-				idleHandlers.Remove (token);
+			lock (idleHandler)
+				idleHandlers.Remove (idleHandler);
 		}
 
 		void AddTimeout (TimeSpan time, Timeout timeout)
@@ -122,10 +113,10 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   When time time specified passes, the callback will be invoked.
 		///   If the callback returns true, the timeout will be reset, repeating
-		///   the invocation. If it returns false, the timeout will stop and be removed.
+		///   the invocation. If it returns false, the timeout will stop.
 		///
 		///   The returned value is a token that can be used to stop the timeout
-		///   by calling <see cref="RemoveTimeout(object)"/>.
+		///   by calling RemoveTimeout.
 		/// </remarks>
 		public object AddTimeout (TimeSpan time, Func<MainLoop, bool> callback)
 		{
@@ -191,7 +182,7 @@ namespace Terminal.Gui {
 		public void Stop ()
 		{
 			running = false;
-			Driver.Wakeup ();
+			driver.Wakeup ();
 		}
 
 		/// <summary>
@@ -204,7 +195,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public bool EventsPending (bool wait = false)
 		{
-			return Driver.EventsPending (wait);
+			return driver.EventsPending (wait);
 		}
 
 		/// <summary>
@@ -221,7 +212,7 @@ namespace Terminal.Gui {
 			if (timeouts.Count > 0)
 				RunTimers ();
 
-			Driver.MainIteration ();
+			driver.MainIteration ();
 
 			lock (idleHandlers) {
 				if (idleHandlers.Count > 0)

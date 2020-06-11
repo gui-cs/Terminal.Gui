@@ -14,7 +14,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Implements a mock ConsoleDriver for unit testing
 	/// </summary>
-	public class FakeDriver : ConsoleDriver {
+	public class FakeDriver : ConsoleDriver, IMainLoopDriver {
 		int cols, rows;
 		/// <summary>
 		/// 
@@ -421,7 +421,7 @@ namespace Terminal.Gui {
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-			(mainLoop.Driver as NetMainLoop).KeyPressed = delegate (ConsoleKeyInfo consoleKey) {
+			(mainLoop.Driver as FakeDriver).WindowsKeyPressed = delegate (ConsoleKeyInfo consoleKey) {
 				var map = MapKey (consoleKey);
 				if (map == (Key)0xffffffff)
 					return;
@@ -462,6 +462,66 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void UncookMouse ()
 		{
+		}
+
+		AutoResetEvent keyReady = new AutoResetEvent (false);
+		AutoResetEvent waitForProbe = new AutoResetEvent (false);
+		ConsoleKeyInfo? windowsKeyResult = null;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Action<ConsoleKeyInfo> WindowsKeyPressed;
+		MainLoop mainLoop;
+
+		void WindowsKeyReader ()
+		{
+			while (true) {
+				waitForProbe.WaitOne ();
+				windowsKeyResult = FakeConsole.ReadKey (true);
+				keyReady.Set ();
+			}
+		}
+
+		void IMainLoopDriver.Setup (MainLoop mainLoop)
+		{
+			this.mainLoop = mainLoop;
+			Thread readThread = new Thread (WindowsKeyReader);
+			readThread.Start ();
+		}
+
+		void IMainLoopDriver.Wakeup ()
+		{
+		}
+
+		bool IMainLoopDriver.EventsPending (bool wait)
+		{
+			long now = DateTime.UtcNow.Ticks;
+
+			int waitTimeout;
+			if (mainLoop.timeouts.Count > 0) {
+				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+				if (waitTimeout < 0)
+					return true;
+			} else
+				waitTimeout = -1;
+
+			if (!wait)
+				waitTimeout = 0;
+
+			windowsKeyResult = null;
+			waitForProbe.Set ();
+			keyReady.WaitOne (waitTimeout);
+			return windowsKeyResult.HasValue;
+		}
+
+		void IMainLoopDriver.MainIteration ()
+		{
+			if (windowsKeyResult.HasValue) {
+				if (WindowsKeyPressed != null)
+					WindowsKeyPressed (windowsKeyResult.Value);
+				windowsKeyResult = null;
+			}
 		}
 	}
 }
