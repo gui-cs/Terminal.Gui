@@ -142,14 +142,10 @@ namespace Terminal.Gui {
 					var by1 = position * bh / Size;
 					var by2 = (position + bh) * bh / Size;
 
-					for (int y = 0; y < bh; y++) {
-						Move (col, y);
-						if (y < by1 || y > by2)
-							special = Driver.Stipple;
-						else
-							special = Driver.Diamond;
-						Driver.AddRune (special);
-					}
+					Move (col, 0);
+					Driver.AddRune (Driver.UpArrow);
+					Move (col, Bounds.Height - 1);
+					Driver.AddRune (Driver.DownArrow);
 				} else {
 					bh -= 2;
 					var by1 = position * bh / Size;
@@ -202,14 +198,9 @@ namespace Terminal.Gui {
 					var bx1 = position * bw / Size;
 					var bx2 = (position + bw) * bw / Size;
 
-					for (int x = 0; x < bw; x++) {
-						Move (0, x);
-						if (x < bx1 || x > bx2)
-							special = Driver.Stipple;
-						else
-							special = Driver.Diamond;
-						Driver.AddRune (special);
-					}
+					Move (0, row);
+					Driver.AddRune (Driver.LeftArrow);
+					Driver.AddRune (Driver.RightArrow);
 				} else {
 					bw -= 2;
 					var bx1 = position * bw / Size;
@@ -262,33 +253,27 @@ namespace Terminal.Gui {
 			int location = vertical ? me.Y : me.X;
 			int barsize = vertical ? Bounds.Height : Bounds.Width;
 
-			if (barsize < 4) {
-				// Handle scrollbars with no buttons
-				Console.WriteLine ("TODO at ScrollBarView2");
+			barsize -= 2;
+			var pos = Position;
+			if (location == 0) {
+				if (pos > 0)
+					SetPosition (pos - 1);
+			} else if (location == barsize + 1) {
+				if (pos + 1 < Size)
+					SetPosition (pos + 1);
 			} else {
-				barsize -= 2;
-				// Handle scrollbars with arrow buttons
-				var pos = Position;
-				if (location == 0) {
-					if (pos > 0)
-						SetPosition (pos - 1);
-				} else if (location == barsize + 1) {
-					if (pos + 1 <= Size + 2)
-						SetPosition (pos + 1);
-				} else {
-					var b1 = pos * barsize / Size;
-					var b2 = (pos + barsize) * barsize / Size;
+				var b1 = pos * barsize / Size;
+				var b2 = (pos + barsize) * barsize / Size;
 
-					if (b2 == 0 && location == 1 && pos == 0 ||
-						(b2 == barsize && location == barsize) ||
-						(location > b1 && location < b2)) {
-						return true;
-					} else if (location <= barsize) {
-						if (location > 1 && location >= b2)
-							SetPosition (Math.Min (pos + barsize, Size));
-						else if (location <= b2 && pos > 0 || pos > 0)
-							SetPosition (Math.Max (pos - barsize, 0));
-					}
+				if (b2 == 0 && location == 1 && pos == 0 ||
+					(b2 == barsize && location == barsize) ||
+					(location > b1 && location < b2)) {
+					return true;
+				} else if (location <= barsize) {
+					if (location > 1 && location >= b2)
+						SetPosition (Math.Min (pos + barsize, Size));
+					else if (location <= b2 && pos > 0 || pos > 0)
+						SetPosition (Math.Max (pos - barsize, 0));
 				}
 			}
 
@@ -501,7 +486,7 @@ namespace Terminal.Gui {
 			OnDrawContent (new Rect (ContentOffset,
 				new Size (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0),
 					Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0))));
-			contentView.Redraw (contentView.Bounds);
+			contentView.Redraw (contentView.Frame);
 			Driver.Clip = savedClip;
 
 			if (ShowVerticalScrollIndicator) {
@@ -530,9 +515,9 @@ namespace Terminal.Gui {
 		public override void PositionCursor ()
 		{
 			if (InternalSubviews.Count == 0)
-				Driver.Move (0, 0);
+				Move (0, 0);
 			else
-				base.PositionCursor ();
+				base.PositionCursor (true);
 		}
 
 		/// <summary>
@@ -571,7 +556,7 @@ namespace Terminal.Gui {
 		public bool ScrollDown (int lines)
 		{
 			var ny = Math.Max (-contentSize.Height, contentOffset.Y - lines);
-			if (ny == contentOffset.Y)
+			if (Math.Abs (ny) == contentSize.Height)
 				return false;
 			ContentOffset = new Point (contentOffset.X, ny);
 			return true;
