@@ -118,7 +118,7 @@ namespace Terminal.Gui {
 	///    in color as well as black and white displays.
 	/// </para>
 	/// <para>
-	///    Views that are focusable should implement the <see cref="PositionCursor ()"/> to make sure that
+	///    Views that are focusable should implement the <see cref="PositionCursor"/> to make sure that
 	///    the cursor is placed in a location that makes sense.  Unix terminals do not have
 	///    a way of hiding the cursor, so it can be distracting to have the cursor left at
 	///    the last focused view.   So views should make sure that they place the cursor
@@ -810,7 +810,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		///   Positions the cursor in the right position based on the currently focused view in the chain.
 		/// </summary>
-		///    Views that are focusable should override <see cref="PositionCursor ()"/> to ensure
+		///    Views that are focusable should override <see cref="PositionCursor"/> to ensure
 		///    the cursor is placed in a location that makes sense. Unix terminals do not have
 		///    a way of hiding the cursor, so it can be distracting to have the cursor left at
 		///    the last focused view. Views should make sure that they place the cursor
