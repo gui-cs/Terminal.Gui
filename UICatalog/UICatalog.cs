@@ -118,7 +118,7 @@ namespace UICatalog {
 				}
 			};
 
-			Application.Run (_top, false);
+			Application.Run (_top, true);
 			Application.Shutdown ();
 			return _runningScenario;
 		}

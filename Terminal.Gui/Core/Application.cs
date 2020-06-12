@@ -478,7 +478,7 @@ namespace Terminal.Gui {
 		/// Building block API: completes the execution of a <see cref="Toplevel"/>  that was started with <see cref="Begin(Toplevel)"/> .
 		/// </summary>
 		/// <param name="runState">The runstate returned by the <see cref="Begin(Toplevel)"/> method.</param>
-		/// <param name="closeDriver"><c>true</c>Closes the application.<c>false</c>Closes the toplevels only.</param>
+		/// <param name="closeDriver">If <c>true</c>, closes the application. If <c>false</c> closes the toplevels only.</param>
 		public static void End (RunState runState, bool closeDriver = true)
 		{
 			if (runState == null)
@@ -491,7 +491,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Shutdown an application initialized with <see cref="Init(ConsoleDriver, IMainLoopDriver)"/>
 		/// </summary>
-		/// /// <param name="closeDriver"><c>true</c>Closes the application.<c>false</c>Closes toplevels only.</param>
+		/// <param name="closeDriver"><c>true</c>Closes the application.<c>false</c>Closes toplevels only.</param>
 		public static void Shutdown (bool closeDriver = true)
 		{
 			// Shutdown is the bookend for Init. As such it needs to clean up all resources
@@ -651,6 +651,8 @@ namespace Terminal.Gui {
 		///     then return control immediately.
 		///   </para>
 		/// </remarks>
+		/// <param name="view">The <see cref="Toplevel"/> tu run modally.</param>
+		/// <param name="closeDriver">Set to <true/> to cause the MainLoop to end when <see cref="End(RunState, bool)"/> is called, clsing the toplevels only.</param>
 		public static void Run (Toplevel view, bool closeDriver = true)
 		{
 			var runToken = Begin (view);
