@@ -1614,6 +1614,29 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// A generic virtual method at the level of View to surrogate non printable characters.
+		/// </summary>
+		/// <param name="text">The text to process.</param>
+		/// <returns>The text without non printable characters.</returns>
+		public virtual ustring GetPrintableText (ustring text)
+		{
+			ustring txt = "";
+			int i = 0;
+			foreach (Rune c in text) {
+				if ((char)c != 0xFFFD) {
+					if ((char)c == 0x240D)
+						txt += ustring.Make ('\r');
+					else if ((char)c == 0x240A)
+						txt += ustring.Make ("");
+					else
+						txt += ustring.Make (c);
+				}
+				i++;
+			}
+			return txt;
+		}
+
+		/// <summary>
 		/// Pretty prints the View
 		/// </summary>
 		/// <returns></returns>

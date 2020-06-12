@@ -254,7 +254,7 @@ namespace Terminal.Gui {
 			for (int line = 0; line < lines.Count; line++) {
 				if (line < bounds.Top || line >= bounds.Bottom)
 					continue;
-				var str = lines [line];
+				var str = GetPrintableText (lines [line]);
 				int x;
 				switch (textAlignment) {
 				case TextAlignment.Left:
