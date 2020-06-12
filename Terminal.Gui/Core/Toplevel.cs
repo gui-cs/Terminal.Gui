@@ -20,7 +20,7 @@ namespace Terminal.Gui {
 	///     been called (which sets the <see cref="Toplevel.Running"/> property to false). 
 	///   </para>
 	///   <para>
-	///     A Toplevel is created when an application initialzies Terminal.Gui by callling <see cref="Application.Init(ConsoleDriver)"/>.
+	///     A Toplevel is created when an application initialzies Terminal.Gui by callling <see cref="Application.Init(ConsoleDriver, IMainLoopDriver)"/>.
 	///     The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created 
 	///     and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and 
 	///     call <see cref="Application.Run(Toplevel, bool)"/>.
