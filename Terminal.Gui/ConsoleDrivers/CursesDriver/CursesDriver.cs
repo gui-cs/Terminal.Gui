@@ -223,7 +223,7 @@ namespace Terminal.Gui {
 				if (cev.ButtonState == Curses.Event.ReportMousePosition) {
 					mouseFlag = (MouseFlags)LastMouseButtonPressed | MouseFlags.ReportMousePosition;
 					point = new Point ();
-					cancelButtonClicked = true;
+					//cancelButtonClicked = true;
 				} else {
 					point = new Point () {
 						X = cev.X,
