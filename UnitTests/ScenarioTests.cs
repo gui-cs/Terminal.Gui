@@ -38,6 +38,7 @@ namespace Terminal.Gui {
 			foreach (var scenarioClass in scenarioClasses) {
 				// Setup some fake kepresses 
 				// Passing empty string will cause just a ctrl-q to be fired
+				Console.MockKeyPresses.Clear ();
 				int stackSize = CreateInput ("");
 				int iterations = 0;
 				Application.Iteration = () => {
@@ -49,6 +50,15 @@ namespace Terminal.Gui {
 				};
 				Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
 
+				var ms = 1000;
+				var abortCount = 0;
+				Func<MainLoop, bool> abortCallback = (MainLoop loop) => {
+					abortCount++;
+					Application.RequestStop ();
+					return false;
+				};
+				var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
+
 				var scenario = (Scenario)Activator.CreateInstance (scenarioClass);
 				scenario.Init (Application.Top, Colors.Base);
 				scenario.Setup ();
@@ -56,10 +66,59 @@ namespace Terminal.Gui {
 
 				Application.Shutdown ();
 
+				Assert.Equal (0, abortCount);
 				// # of key up events should match # of iterations
 				Assert.Equal (1, iterations);
 				Assert.Equal (stackSize, iterations);
 			}
+		}
+
+		[Fact]
+		public void Run_Generic ()
+		{
+			List<Type> scenarioClasses = Scenario.GetDerivedClasses<Scenario> ();
+			Assert.NotEmpty (scenarioClasses);
+
+			var item = scenarioClasses.FindIndex (t => Scenario.ScenarioMetadata.GetName (t).Equals ("Generic", StringComparison.OrdinalIgnoreCase));
+			var scenarioClass = scenarioClasses[item];
+			// Setup some fake kepresses 
+			// Passing empty string will cause just a ctrl-q to be fired
+			int stackSize = CreateInput ("");
+
+			int iterations = 0;
+			Application.Iteration = () => {
+				iterations++;
+				// Stop if we run out of control...
+				if (iterations == 10) {
+					Application.RequestStop ();
+				}
+			};
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var ms = 1000;
+			var abortCount = 0;
+			Func<MainLoop, bool> abortCallback = (MainLoop loop) => {
+				abortCount++;
+				Application.RequestStop ();
+				return false;
+			};
+			var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
+
+			Application.Top.KeyPress += (View.KeyEventEventArgs args) => {
+				Assert.Equal (Key.ControlQ, args.KeyEvent.Key);
+			};
+
+			var scenario = (Scenario)Activator.CreateInstance (scenarioClass);
+			scenario.Init (Application.Top, Colors.Base);
+			scenario.Setup ();
+			scenario.Run ();
+
+			Application.Shutdown ();
+
+			Assert.Equal (0, abortCount);
+			// # of key up events should match # of iterations
+			//Assert.Equal (1, iterations);
+			Assert.Equal (stackSize, iterations);
 		}
 	}
 }

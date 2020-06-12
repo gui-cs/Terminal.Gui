@@ -148,7 +148,8 @@ namespace Terminal.Gui {
 				};
 			}
 
-			Application.Run (d);
+			// Rin the modal; do not shutdown the mainloop driver when done
+			Application.Run (d, false);
 			return clicked;
 		}
 	}
