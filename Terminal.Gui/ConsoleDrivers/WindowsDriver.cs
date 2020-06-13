@@ -420,6 +420,47 @@ namespace Terminal.Gui {
 				return v;
 			}
 		}
+
+#if false // See: https://github.com/migueldeicaza/gui.cs/issues/357
+		[StructLayout (LayoutKind.Sequential)]
+		public struct SMALL_RECT {
+			public short Left;
+			public short Top;
+			public short Right;
+			public short Bottom;
+
+			public SMALL_RECT (short Left, short Top, short Right, short Bottom)
+			{
+				this.Left = Left;
+				this.Top = Top;
+				this.Right = Right;
+				this.Bottom = Bottom;
+			}
+		}
+
+		[StructLayout (LayoutKind.Sequential)]
+		public struct CONSOLE_SCREEN_BUFFER_INFO {
+			public int dwSize;
+			public int dwCursorPosition;
+			public short wAttributes;
+			public SMALL_RECT srWindow;
+			public int dwMaximumWindowSize;
+		}
+
+		[DllImport ("kernel32.dll", SetLastError = true)]
+		static extern bool GetConsoleScreenBufferInfo (IntPtr hConsoleOutput, out CONSOLE_SCREEN_BUFFER_INFO ConsoleScreenBufferInfo);
+
+		// Theoretically GetConsoleScreenBuffer height should give the console Windoww size
+		// It does not work, however, and always returns the size the window was initially created at
+		internal Size GetWindowSize ()
+		{
+			var consoleScreenBufferInfo = new CONSOLE_SCREEN_BUFFER_INFO ();
+			//consoleScreenBufferInfo.dwSize = Marshal.SizeOf (typeof (CONSOLE_SCREEN_BUFFER_INFO));
+			GetConsoleScreenBufferInfo (OutputHandle, out consoleScreenBufferInfo);
+			return new Size (consoleScreenBufferInfo.srWindow.Right - consoleScreenBufferInfo.srWindow.Left,
+				consoleScreenBufferInfo.srWindow.Bottom - consoleScreenBufferInfo.srWindow.Top);
+		}
+#endif
 	}
 
 	internal class WindowsDriver : ConsoleDriver, IMainLoopDriver {
@@ -726,6 +767,12 @@ namespace Terminal.Gui {
 				ResizeScreen ();
 				UpdateOffScreen ();
 				TerminalResized?.Invoke ();
+				break;
+
+			case WindowsConsole.EventType.Focus:
+				break;
+
+			default:
 				break;
 			}
 			result = null;
