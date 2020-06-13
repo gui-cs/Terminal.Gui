@@ -866,7 +866,7 @@ namespace Terminal.Gui {
 					X = mouseEvent.MousePosition.X,
 					Y = mouseEvent.MousePosition.Y
 				};
-				if (p == point) {
+				//if (p == point) {
 					switch (LastMouseButtonPressed) {
 					case WindowsConsole.ButtonState.Button1Pressed:
 						mouseFlag = MouseFlags.Button1Clicked;
@@ -880,9 +880,13 @@ namespace Terminal.Gui {
 						mouseFlag = MouseFlags.Button3Clicked;
 						break;
 					}
-				} else {
-					mouseFlag = 0;
-				}
+					point = new Point () {
+						X = mouseEvent.MousePosition.X,
+						Y = mouseEvent.MousePosition.Y
+					};
+				//} else {
+				//	mouseFlag = 0;
+				//}
 				LastMouseButtonPressed = null;
 				IsButtonReleased = false;
 			} else if (mouseEvent.EventFlags.HasFlag (WindowsConsole.EventFlags.DoubleClick)) {
@@ -927,7 +931,12 @@ namespace Terminal.Gui {
 				}
 
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
-				mouseFlag = MouseFlags.ReportMousePosition;
+				if (mouseEvent.MousePosition.X != point.X || mouseEvent.MousePosition.Y != point.Y) {
+					mouseFlag = MouseFlags.ReportMousePosition;
+					point = new Point ();
+				} else {
+					mouseFlag = 0;
+				}
 			} else if (mouseEvent.ButtonState == 0 && mouseEvent.EventFlags == 0) {
 				mouseFlag = 0;
 			}
