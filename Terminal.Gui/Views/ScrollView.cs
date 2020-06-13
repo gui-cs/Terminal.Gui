@@ -122,6 +122,11 @@ namespace Terminal.Gui {
 			WantContinuousButtonPressed = true;
 		}
 
+		int posTopTee;
+		int posLeftTee;
+		int posBottomTee;
+		int posRightTee;
+
 		///<inheritdoc/>
 		public override void Redraw (Rect region)
 		{
@@ -170,9 +175,11 @@ namespace Terminal.Gui {
 							} else {
 								if (y == by1 && !hasTopTee) {
 									hasTopTee = true;
+									posTopTee = y;
 									special = Driver.TopTee;
 								} else if ((y >= by2 || by2 == 0) && !hasBottomTee) {
 									hasBottomTee = true;
+									posBottomTee = y;
 									special = Driver.BottomTee;
 								} else {
 									special = Driver.VLine;
@@ -222,9 +229,11 @@ namespace Terminal.Gui {
 							} else {
 								if (x == bx1 && !hasLeftTee) {
 									hasLeftTee = true;
+									posLeftTee = x;
 									special = Driver.LeftTee;
 								} else if ((x >= bx2 || bx2 == 0) && !hasRightTee) {
 									hasRightTee = true;
+									posRightTee = x;
 									special = Driver.RightTee;
 								} else {
 									special = Driver.HLine;
@@ -252,6 +261,8 @@ namespace Terminal.Gui {
 
 			int location = vertical ? me.Y : me.X;
 			int barsize = vertical ? Bounds.Height : Bounds.Width;
+			int posTopLeftTee = vertical ? posTopTee : posLeftTee;
+			int posBottomRightTee = vertical ? posBottomTee : posRightTee;
 
 			barsize -= 2;
 			var pos = Position;
@@ -265,12 +276,11 @@ namespace Terminal.Gui {
 				var b1 = pos * barsize / Size;
 				var b2 = (pos + barsize) * barsize / Size;
 
-				if (b2 == 0 && location == 1 && pos == 0 ||
-					(b2 == barsize && location == barsize) ||
-					(location > b1 && location < b2)) {
+				if (b1 == 0 && location == 1 && pos == 0 || (location >= posTopLeftTee + 1 && location <= posBottomRightTee + 1 && (pos != 0 || pos != Size - 1) && location != 1 && location != barsize) ||
+					(b2 == barsize + (b2 - b1 - 1) && location == barsize && pos == Size - 1)) {
 					return true;
 				} else if (location <= barsize) {
-					if (location > 1 && location >= b2)
+					if (location > 1 && location > posTopLeftTee && location > posBottomRightTee)
 						SetPosition (Math.Min (pos + (Size / location), Size - 1));
 					else if (location <= b2 && pos > 0 || pos > 0)
 						SetPosition (Math.Max (pos - (Size / barsize), 0));
