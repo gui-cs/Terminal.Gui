@@ -556,7 +556,7 @@ namespace Terminal.Gui {
 		public bool ScrollDown (int lines)
 		{
 			var ny = Math.Max (-contentSize.Height, contentOffset.Y - lines);
-			if (Math.Abs (ny) == contentSize.Height)
+			if (Math.Abs (ny) == contentSize.Height - 1)
 				return false;
 			ContentOffset = new Point (contentOffset.X, ny);
 			return true;
