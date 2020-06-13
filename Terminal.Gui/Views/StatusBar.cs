@@ -96,7 +96,7 @@ namespace Terminal.Gui {
 				if (SuperView == null || SuperView == Application.Top) {
 					Y = Driver.Rows - 1;
 				} else {
-					Y = Pos.Bottom (SuperView);
+					//Y = Pos.Bottom (SuperView);
 				}
 			};
 		}
