@@ -271,9 +271,9 @@ namespace Terminal.Gui {
 					return true;
 				} else if (location <= barsize) {
 					if (location > 1 && location >= b2)
-						SetPosition (Math.Min (pos + barsize, Size));
+						SetPosition (Math.Min (pos + (Size / location), Size - 1));
 					else if (location <= b2 && pos > 0 || pos > 0)
-						SetPosition (Math.Max (pos - barsize, 0));
+						SetPosition (Math.Max (pos - (Size / barsize), 0));
 				}
 			}
 
