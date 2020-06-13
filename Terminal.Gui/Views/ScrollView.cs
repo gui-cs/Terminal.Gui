@@ -635,5 +635,12 @@ namespace Terminal.Gui {
 			}
 			return true;
 		}
+
+		protected override void Dispose (bool disposing)
+		{
+			vertical?.Dispose ();
+			horizontal?.Dispose ();
+			base.Dispose (disposing);
+		}
 	}
 }

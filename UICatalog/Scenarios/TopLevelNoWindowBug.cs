@@ -8,6 +8,8 @@ namespace UICatalog {
 
 		public override void Run ()
 		{
+			Top?.Dispose ();
+
 			Top = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
 
 			var menu = new MenuBar (new MenuBarItem [] {

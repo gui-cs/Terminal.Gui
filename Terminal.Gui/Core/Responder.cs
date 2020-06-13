@@ -14,6 +14,7 @@
 //   - Add rendering limitation to the exposed area
 
 using System;
+using System.Collections.Generic;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -21,6 +22,18 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class Responder : IDisposable {
 		bool disposedValue;
+
+#if DEBUG
+		/// <summary>
+		/// For debug purposes to verify objects are being disposed properly
+		/// </summary>
+		public bool WasDisposed = false;
+		public static List<Responder> Instances = new List<Responder> ();
+		public Responder ()
+		{
+			Instances.Add (this);
+		}
+#endif 
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="Responder"/> can focus.
@@ -219,6 +232,7 @@ namespace Terminal.Gui {
 			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
 			Dispose (disposing: true);
 			GC.SuppressFinalize (this);
+			WasDisposed = true;
 		}
 	}
 }

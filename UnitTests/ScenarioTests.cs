@@ -71,6 +71,10 @@ namespace Terminal.Gui {
 				Assert.Equal (1, iterations);
 				Assert.Equal (stackSize, iterations);
 			}
+
+			foreach (var inst in Responder.Instances) {
+				Assert.True (inst.WasDisposed);
+			}
 		}
 
 		[Fact]
@@ -79,7 +83,7 @@ namespace Terminal.Gui {
 			List<Type> scenarioClasses = Scenario.GetDerivedClasses<Scenario> ();
 			Assert.NotEmpty (scenarioClasses);
 
-			var item = scenarioClasses.FindIndex (t => Scenario.ScenarioMetadata.GetName (t).Equals ("Generic", StringComparison.OrdinalIgnoreCase));
+			var item = scenarioClasses.FindIndex (t => Scenario.ScenarioMetadata.GetName (t).Equals ("Clipping", StringComparison.OrdinalIgnoreCase));
 			var scenarioClass = scenarioClasses[item];
 			// Setup some fake kepresses 
 			// Passing empty string will cause just a ctrl-q to be fired
@@ -119,6 +123,11 @@ namespace Terminal.Gui {
 			// # of key up events should match # of iterations
 			//Assert.Equal (1, iterations);
 			Assert.Equal (stackSize, iterations);
+
+
+			foreach (var inst in Responder.Instances) {
+				Assert.True (inst.WasDisposed);
+			}
 		}
 	}
 }
