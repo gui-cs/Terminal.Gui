@@ -1684,5 +1684,14 @@ namespace Terminal.Gui {
 
 			return false;
 		}
+
+		protected override void Dispose (bool disposing)
+		{
+			foreach (var subview in InternalSubviews) {
+				subview.Dispose ();
+			}
+
+			base.Dispose (disposing);
+		}
 	}
 }
