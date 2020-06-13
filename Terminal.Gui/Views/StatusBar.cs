@@ -63,41 +63,6 @@ namespace Terminal.Gui {
 	/// So for each context must be a new instance of a statusbar.
 	/// </summary>
 	public class StatusBar : View {
-		// After attempting to implement this, I noticed that there are hard dependencies
-		// on StatusBar and MenuBars within core. They will need to be refactored for having the
-		// StatusBar work at the top
-#if SNAP_TO_TOP
-		/// <summary>
-		/// The style supported by StatusBar
-		/// </summary>
-		public enum StatusBarStyle {
-			Default = 0,
-			/// <summary>
-			/// The StatusBar will snap at the the bottom line of the Parent view.
-			/// If the console window is made larger while the app is runing, the StatusBar
-			/// will continue to snap to the bottom line of the Parent, staying visible.
-			/// On consoles that support resizing of console apps (e.g. Windows Terminal and ConEmu),
-			/// if the console window is subsequently made shorter, the status bar will remain visible
-			/// as the Parent view resizes. If Parent is null, the StatusBar will snap to the bottom line
-			/// of the console window.
-			/// This is the default.
-			/// </summary>
-			SnapToBottom = Default,
-
-			/// <summary>
-			/// The StatusBar will act identically to MenuBar, snapping to the first line of the
-			/// console window.
-			/// </summary>
-			SnapToTop = 1,
-		}
-
-		public StatusBarStyle Style { get; set; } = StatusBarStyle.Default;
-#endif
-		/// <summary>
-		/// The parent view of the <see cref="StatusBar"/>.
-		/// </summary>
-		public View Parent { get; set; }
-
 		/// <summary>
 		/// The items that compose the <see cref="StatusBar"/>
 		/// </summary>
@@ -110,7 +75,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="StatusBar"/> class with the specified set of <see cref="StatusItem"/>s.
-		/// The <see cref="StatusBar"/> will be drawn on the lowest line of the terminal or <see cref="StatusBar.Parent"/> (if not null).
+		/// The <see cref="StatusBar"/> will be drawn on the lowest line of the terminal or <see cref="View.SuperView"/> (if not null).
 		/// </summary>
 		/// <param name="items">A list of statusbar items.</param>
 		public StatusBar (StatusItem [] items) : base ()
@@ -125,26 +90,14 @@ namespace Terminal.Gui {
 			Width = Dim.Fill ();
 			Height = 1;
 
-			LayoutComplete += (e) => {
+			Application.Resized += (e) => {
 				X = 0;
 				Height = 1;
-#if SNAP_TO_TOP
-				switch (Style) {
-				case StatusBarStyle.SnapToTop:
-					X = 0;
-					Y = 0;
-					break;
-				case StatusBarStyle.SnapToBottom:
-#endif
-				if (Parent == null) {
+				if (SuperView == null || SuperView == Application.Top) {
 					Y = Driver.Rows - 1;
 				} else {
-					Y = Pos.Bottom (Parent);
+					Y = Pos.Bottom (SuperView);
 				}
-#if SNAP_TO_TOP
-					break;
-				}
-#endif
 			};
 		}
 

@@ -649,12 +649,9 @@ static class Demo {
 			new StatusItem(Key.F3, "~F3~ Save", Save),
 			new StatusItem(Key.ControlQ, "~^Q~ Quit", () => { if (Quit ()) top.Running = false; }),
 		}) {
-			Parent = null,
 		};
 
 		win.Add (drag, dragText);
-#if true
-		// FIXED: This currently causes a stack overflow, because it is referencing a window that has not had its size allocated yet
 
 		var bottom = new Label ("This should go on the bottom of the same top-level!");
 		win.Add (bottom);
@@ -667,7 +664,6 @@ static class Demo {
 			bottom2.X = Pos.Left (win);
 			bottom2.Y = Pos.Bottom (win);
 		};
-#endif
 
 		win.KeyPress += Win_KeyPress;
 
