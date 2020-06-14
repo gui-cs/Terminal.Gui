@@ -85,8 +85,22 @@ namespace UICatalog {
 				scenario.Init (Application.Top, _baseColorScheme);
 				scenario.Setup ();
 				scenario.Run ();
+
+#if DEBUG
+				foreach (var inst in Responder.Instances) {
+					Debug.Assert (inst.WasDisposed);
+				}
+				Responder.Instances.Clear();
+#endif
+
 				scenario = GetScenarioToRun ();
 			}
+
+#if DEBUG
+			foreach (var inst in Responder.Instances) {
+				Debug.Assert (inst.WasDisposed);
+			}
+#endif
 		}
 
 		/// <summary>
