@@ -524,7 +524,7 @@ namespace Terminal.Gui {
 					Run (barItems.Children [meY].Action);
 				return true;
 			} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked ||
-				me.Flags == MouseFlags.ReportMousePosition ||
+				me.Flags == MouseFlags.Button1TripleClicked || me.Flags == MouseFlags.ReportMousePosition ||
 				me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
 				disabled = false;
 				if (me.Y < 1)
@@ -1161,7 +1161,7 @@ namespace Terminal.Gui {
 			}
 			handled = false;
 
-			if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1Clicked ||
+			if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1TripleClicked || me.Flags == MouseFlags.Button1Clicked ||
 				(me.Flags == MouseFlags.ReportMousePosition && selected > -1) ||
 				(me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && selected > -1)) {
 				int pos = 1;
@@ -1173,7 +1173,7 @@ namespace Terminal.Gui {
 								var menu = new Menu (this, i, 0, Menus [i]);
 								menu.Run (Menus [i].Action);
 							}
-						} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked) {
+						} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1TripleClicked) {
 							if (IsMenuOpen) {
 								CloseAllMenus ();
 							} else {
@@ -1209,7 +1209,7 @@ namespace Terminal.Gui {
 						me.View.MouseEvent (me);
 					}
 				} else if (!(me.View is MenuBar || me.View is Menu) && (me.Flags.HasFlag (MouseFlags.Button1Clicked) ||
-					me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked)) {
+					me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1TripleClicked)) {
 					Application.UngrabMouse ();
 					CloseAllMenus ();
 					handled = false;
@@ -1218,7 +1218,7 @@ namespace Terminal.Gui {
 					handled = false;
 					return false;
 				}
-			} else if (!IsMenuOpen && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
+			} else if (!IsMenuOpen && (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1TripleClicked || me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
 				Application.GrabMouse (current);
 			} else if (IsMenuOpen && (me.View is MenuBar || me.View is Menu)) {
 				Application.GrabMouse (me.View);
