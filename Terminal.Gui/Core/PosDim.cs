@@ -279,7 +279,7 @@ namespace Terminal.Gui {
 			}
 			internal override int Anchor (int width)
 			{
-				switch(side) {
+				switch (side) {
 				case 0: return Target.Frame.X;
 				case 1: return Target.Frame.Y;
 				case 2: return Target.Frame.Right;
@@ -292,7 +292,7 @@ namespace Terminal.Gui {
 			public override string ToString ()
 			{
 				string tside;
-				switch(side) {
+				switch (side) {
 				case 0: tside = "x"; break;
 				case 1: tside = "y"; break;
 				case 2: tside = "right"; break;
@@ -308,42 +308,42 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos Left (View view) => new PosView (view, 0);
+		public static Pos Left (View view) => new PosCombine (true, new PosView (view, 0), new Pos.PosAbsolute (0));
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object tracks the Left (X) position of the specified <see cref="View"/>.
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos X (View view) => new PosView (view, 0);
+		public static Pos X (View view) => new PosCombine (true, new PosView (view, 0), new Pos.PosAbsolute (0));
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object tracks the Top (Y) position of the specified <see cref="View"/>.
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos Top (View view) => new PosView (view, 1);
+		public static Pos Top (View view) => new PosCombine (true, new PosView (view, 1), new Pos.PosAbsolute (0));
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object tracks the Top (Y) position of the specified <see cref="View"/>.
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos Y (View view) => new PosView (view, 1);
+		public static Pos Y (View view) => new PosCombine (true, new PosView (view, 1), new Pos.PosAbsolute (0));
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object tracks the Right (X+Width) coordinate of the specified <see cref="View"/>.
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos Right (View view) => new PosView (view, 2);
+		public static Pos Right (View view) => new PosCombine (true, new PosView (view, 2), new Pos.PosAbsolute (0));
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object tracks the Bottom (Y+Height) coordinate of the specified <see cref="View"/> 
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos Bottom (View view) => new PosView (view, 3);
+		public static Pos Bottom (View view) => new PosCombine (true, new PosView (view, 3), new Pos.PosAbsolute (0));
 	}
 
 	/// <summary>
@@ -546,7 +546,7 @@ namespace Terminal.Gui {
 			public override string ToString ()
 			{
 				string tside;
-				switch(side) {
+				switch (side) {
 				case 0: tside = "Height"; break;
 				case 1: tside = "Width"; break;
 				default: tside = "unknown"; break;
@@ -556,7 +556,7 @@ namespace Terminal.Gui {
 
 			internal override int Anchor (int width)
 			{
-				switch(side) {
+				switch (side) {
 				case 0: return Target.Frame.Height;
 				case 1: return Target.Frame.Width;
 				default:
