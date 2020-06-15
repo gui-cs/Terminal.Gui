@@ -71,11 +71,6 @@ namespace Terminal.Gui {
 				Assert.Equal (1, iterations);
 				Assert.Equal (stackSize, iterations);
 			}
-#if DEBUG
-			foreach (var inst in Responder.Instances) {
-				Assert.True (inst.WasDisposed);
-			}
-#endif
 		}
 
 		[Fact]

@@ -240,11 +240,6 @@ namespace Terminal.Gui {
 			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
 			Dispose (disposing: true);
 			GC.SuppressFinalize (this);
-#if DEBUG
-			WasDisposed = true;
-			Debug.Assert (DisposedCount == 0);
-			DisposedCount++;
-#endif
 		}
 	}
 }
