@@ -29,6 +29,9 @@ namespace Terminal.Gui {
 		/// For debug purposes to verify objects are being disposed properly
 		/// </summary>
 		public bool WasDisposed = false;
+		/// <summary>
+		/// For debug purposes to verify objects are being disposed properly
+		/// </summary>
 		public int DisposedCount = 0;
 		/// <summary>
 		/// For debug purposes
@@ -242,8 +245,8 @@ namespace Terminal.Gui {
 			GC.SuppressFinalize (this);
 #if DEBUG_IDISPOSABLE
 			WasDisposed = true;
-			Debug.Assert (DisposedCount == 0);
-			DisposedCount++;
+			//Debug.Assert (DisposedCount == 0);
+			//DisposedCount++;
 #endif
 		}
 	}

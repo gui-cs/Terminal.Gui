@@ -10,6 +10,13 @@ using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui {
 	public class ScenarioTests {
+		public ScenarioTests ()
+		{
+#if DEBUG_IDISPOSABLE
+			Responder.Instances.Clear ();
+#endif
+		}
+
 		int CreateInput (string input)
 		{
 			// Put a control-q in at the end
@@ -75,6 +82,7 @@ namespace Terminal.Gui {
 			foreach (var inst in Responder.Instances) {
 				Assert.True (inst.WasDisposed);
 			}
+			Responder.Instances.Clear ();
 #endif
 		}
 
@@ -129,6 +137,7 @@ namespace Terminal.Gui {
 			foreach (var inst in Responder.Instances) {
 				Assert.True (inst.WasDisposed);
 			}
+			Responder.Instances.Clear ();
 #endif
 		}
 	}

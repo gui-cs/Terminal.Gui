@@ -86,7 +86,7 @@ namespace UICatalog {
 				scenario.Setup ();
 				scenario.Run ();
 
-#if DEBUG
+#if DEBUG_IDISPOSABLE
 				foreach (var inst in Responder.Instances) {
 					Debug.Assert (inst.WasDisposed);
 				}
@@ -96,10 +96,11 @@ namespace UICatalog {
 				scenario = GetScenarioToRun ();
 			}
 
-#if DEBUG
+#if DEBUG_IDISPOSABLE
 			foreach (var inst in Responder.Instances) {
 				Debug.Assert (inst.WasDisposed);
 			}
+			Responder.Instances.Clear ();
 #endif
 		}
 
