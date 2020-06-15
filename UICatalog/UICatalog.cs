@@ -112,101 +112,6 @@ namespace UICatalog {
 			Application.UseSystemConsole = false;
 			Application.Init ();
 
-			if (_menu == null) {
-				Setup ();
-			}
-
-			_top = Application.Top;
-
-			_top.KeyDown += KeyDownHandler;
-
-			_top.Add (_menu);
-			_top.Add (_leftPane);
-			_top.Add (_rightPane);
-			_top.Add (_statusBar);
-
-			_top.Ready += () => {
-				if (_runningScenario != null) {
-					_top.SetFocus (_rightPane);
-					_runningScenario = null;
-				}
-			};
-
-			Application.Run (_top, true);
-			Application.Shutdown ();
-			return _runningScenario;
-		}
-
-		static MenuItem [] CreateDiagnosticMenuItems ()
-		{
-			MenuItem CheckedMenuMenuItem (ustring menuItem, Action action, Func<bool> checkFunction)
-			{
-				var mi = new MenuItem ();
-				mi.Title = menuItem;
-				mi.CheckType |= MenuItemCheckStyle.Checked;
-				mi.Checked = checkFunction ();
-				mi.Action = () => {
-					action?.Invoke ();
-					mi.Title = menuItem;
-					mi.Checked = checkFunction ();
-				};
-				return mi;
-			}
-
-			return new MenuItem [] {
-				CheckedMenuMenuItem ("Use _System Console",
-					() => {
-						_useSystemConsole = !_useSystemConsole;
-					},
-					() => _useSystemConsole),
-				CheckedMenuMenuItem ("Diagnostics: _Frame Padding",
-					() => {
-						ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FramePadding;
-						_top.SetNeedsDisplay ();
-					},
-					() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FramePadding) == ConsoleDriver.DiagnosticFlags.FramePadding),
-				CheckedMenuMenuItem ("Diagnostics: Frame _Ruler",
-					() => {
-						ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
-						_top.SetNeedsDisplay ();
-					},
-					() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler),
-			};
-		}
-
-		static void SetColorScheme ()
-		{
-			_leftPane.ColorScheme = _baseColorScheme;
-			_rightPane.ColorScheme = _baseColorScheme;
-			_top?.SetNeedsDisplay ();
-		}
-
-		static ColorScheme _baseColorScheme;
-		static MenuItem [] CreateColorSchemeMenuItems ()
-		{
-			List<MenuItem> menuItems = new List<MenuItem> ();
-			foreach (var sc in Colors.ColorSchemes) {
-				var item = new MenuItem ();
-				item.Title = sc.Key;
-				item.CheckType |= MenuItemCheckStyle.Radio;
-				item.Checked = sc.Value == _baseColorScheme;
-				item.Action += () => {
-					_baseColorScheme = sc.Value;
-					SetColorScheme ();
-					foreach (var menuItem in menuItems) {
-						menuItem.Checked = menuItem.Title.Equals (sc.Key) && sc.Value == _baseColorScheme;
-					}
-				};
-				menuItems.Add (item);
-			}
-			return menuItems.ToArray ();
-		}
-
-		/// <summary>
-		/// Create all controls. This gets called once and the controls remain with their state between Sceanrio runs.
-		/// </summary>
-		private static void Setup ()
-		{
 			// Set this here because not initilzied until driver is loaded
 			_baseColorScheme = Colors.Base;
 
@@ -296,6 +201,87 @@ namespace UICatalog {
 			});
 
 			SetColorScheme ();
+			_top = Application.Top;
+			_top.KeyDown += KeyDownHandler;
+			_top.Add (_menu);
+			_top.Add (_leftPane);
+			_top.Add (_rightPane);
+			_top.Add (_statusBar);
+			_top.Ready += () => {
+				if (_runningScenario != null) {
+					_top.SetFocus (_rightPane);
+					_runningScenario = null;
+				}
+			};
+
+			Application.Run (_top, true);
+			Application.Shutdown ();
+			return _runningScenario;
+		}
+
+		static MenuItem [] CreateDiagnosticMenuItems ()
+		{
+			MenuItem CheckedMenuMenuItem (ustring menuItem, Action action, Func<bool> checkFunction)
+			{
+				var mi = new MenuItem ();
+				mi.Title = menuItem;
+				mi.CheckType |= MenuItemCheckStyle.Checked;
+				mi.Checked = checkFunction ();
+				mi.Action = () => {
+					action?.Invoke ();
+					mi.Title = menuItem;
+					mi.Checked = checkFunction ();
+				};
+				return mi;
+			}
+
+			return new MenuItem [] {
+				CheckedMenuMenuItem ("Use _System Console",
+					() => {
+						_useSystemConsole = !_useSystemConsole;
+					},
+					() => _useSystemConsole),
+				CheckedMenuMenuItem ("Diagnostics: _Frame Padding",
+					() => {
+						ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FramePadding;
+						_top.SetNeedsDisplay ();
+					},
+					() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FramePadding) == ConsoleDriver.DiagnosticFlags.FramePadding),
+				CheckedMenuMenuItem ("Diagnostics: Frame _Ruler",
+					() => {
+						ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
+						_top.SetNeedsDisplay ();
+					},
+					() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler),
+			};
+		}
+
+		static void SetColorScheme ()
+		{
+			_leftPane.ColorScheme = _baseColorScheme;
+			_rightPane.ColorScheme = _baseColorScheme;
+			_top?.SetNeedsDisplay ();
+		}
+
+		static ColorScheme _baseColorScheme;
+		static MenuItem [] CreateColorSchemeMenuItems ()
+		{
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			foreach (var sc in Colors.ColorSchemes) {
+				var item = new MenuItem ();
+				item.Title = sc.Key;
+				item.CheckType |= MenuItemCheckStyle.Radio;
+				item.Checked = sc.Value == _baseColorScheme;
+				item.Action += () => {
+					_baseColorScheme = sc.Value;
+					SetColorScheme ();
+					foreach (var menuItem in menuItems) {
+						menuItem.Checked = menuItem.Title.Equals (sc.Key) && sc.Value == _baseColorScheme;
+					}
+				};
+				menuItems.Add (item);
+			}
+			return menuItems.ToArray ();
 		}
 
 		private static void _scenarioListView_OpenSelectedItem (EventArgs e)

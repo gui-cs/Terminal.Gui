@@ -75,8 +75,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public StatusBar () : this (items: new StatusItem [] { }) { }
 
-		Action<Application.ResizedEventArgs> cachedResizedHandler;
-
 		/// <summary>
 		/// Initializes a new instance of the <see cref="StatusBar"/> class with the specified set of <see cref="StatusItem"/>s.
 		/// The <see cref="StatusBar"/> will be drawn on the lowest line of the terminal or <see cref="View.SuperView"/> (if not null).
@@ -94,7 +92,12 @@ namespace Terminal.Gui {
 			Width = Dim.Fill ();
 			Height = 1;
 
-			cachedResizedHandler = (action) => {
+			Application.Resized += Application_Resized ();
+		}
+
+		private Action<Application.ResizedEventArgs> Application_Resized ()
+		{
+			return delegate {
 				X = 0;
 				Height = 1;
 				if (SuperView == null || SuperView == Application.Top) {
@@ -103,8 +106,6 @@ namespace Terminal.Gui {
 					//Y = Pos.Bottom (SuperView);
 				}
 			};
-
-			Application.Resized += cachedResizedHandler;
 		}
 
 		Attribute ToggleScheme (Attribute scheme)
@@ -204,7 +205,7 @@ namespace Terminal.Gui {
 		{
 			if (!disposedValue) {
 				if (disposing) {
-					Application.Resized -= cachedResizedHandler;
+					Application.Resized -= Application_Resized ();
 				}
 				disposedValue = true;
 			}

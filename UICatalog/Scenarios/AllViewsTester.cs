@@ -1,6 +1,7 @@
 ﻿using NStack;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -334,6 +335,7 @@ namespace UICatalog {
 			// Remove existing class, if any
 			if (view != null) {
 				_hostPane.Remove (view);
+				view.Dispose ();
 				_hostPane.Clear ();
 			}
 		}

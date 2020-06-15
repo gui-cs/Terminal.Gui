@@ -67,7 +67,6 @@ namespace UICatalog {
 		public override void Run ()
 		{
 			base.Run ();
-			_charMap.Dispose ();
 		}
 	}
 
@@ -127,11 +126,6 @@ namespace UICatalog {
 					}
 				}
 			}
-		}
-
-		protected override void Dispose (bool disposing)
-		{
-			base.Dispose (disposing);
 		}
 #else
 		public override void OnDrawContent (Rect viewport)

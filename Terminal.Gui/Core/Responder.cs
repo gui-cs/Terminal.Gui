@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -28,7 +29,14 @@ namespace Terminal.Gui {
 		/// For debug purposes to verify objects are being disposed properly
 		/// </summary>
 		public bool WasDisposed = false;
+		public int DisposedCount = 0;
+		/// <summary>
+		/// For debug purposes
+		/// </summary>
 		public static List<Responder> Instances = new List<Responder> ();
+		/// <summary>
+		/// For debug purposes
+		/// </summary>
 		public Responder ()
 		{
 			Instances.Add (this);
@@ -232,7 +240,11 @@ namespace Terminal.Gui {
 			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
 			Dispose (disposing: true);
 			GC.SuppressFinalize (this);
+#if DEBUG
 			WasDisposed = true;
+			Debug.Assert (DisposedCount == 0);
+			DisposedCount++;
+#endif
 		}
 	}
 }
