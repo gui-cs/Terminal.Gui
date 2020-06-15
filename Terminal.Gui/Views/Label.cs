@@ -123,8 +123,6 @@ namespace Terminal.Gui {
 
 		static ustring ClipAndJustify (ustring str, int width, TextAlignment talign)
 		{
-			// Get rid of any '\r' added by Windows
-			str = str.Replace ("\r", ustring.Empty);
 			int slen = str.RuneCount;
 			if (slen > width) {
 				var uints = str.ToRunes (width);
@@ -166,12 +164,22 @@ namespace Terminal.Gui {
 			Recalc (text, lines, Frame.Width, textAlignment, Bounds.Height > 1);
 		}
 
-		static ustring ReplaceNonPrintables (ustring str)
+		static ustring StripCRLF (ustring str)
 		{
 			var runes = new List<Rune> ();
 			foreach (var r in str.ToRunes ()) {
-				if (r < 0x20) {
-					runes.Add (new Rune (r + 0x2400));         // U+25A1 □ WHITE SQUARE
+				if (r != '\r' && r != '\n') {
+					runes.Add (r);
+				}
+			}
+			return ustring.Make (runes); ;
+		}
+		static ustring ReplaceCRLFWithSpace (ustring str)
+		{
+			var runes = new List<Rune> ();
+			foreach (var r in str.ToRunes ()) {
+				if (r == '\r' || r == '\n') {
+					runes.Add (new Rune (' ')); // r + 0x2400));         // U+25A1 □ WHITE SQUARE
 				} else {
 					runes.Add (r);
 				}
@@ -184,7 +192,7 @@ namespace Terminal.Gui {
 			int start = 0, end;
 			var lines = new List<ustring> ();
 
-			text = ReplaceNonPrintables (text);
+			text = StripCRLF (text);
 
 			while ((end = start + margin) < text.Length) {
 				while (text [end] != ' ' && end > start)
@@ -208,7 +216,7 @@ namespace Terminal.Gui {
 			lineResult.Clear ();
 
 			if (wordWrap == false) {
-				textStr = ReplaceNonPrintables (textStr);
+				textStr = ReplaceCRLFWithSpace (textStr);
 				lineResult.Add (ClipAndJustify (textStr, width, talign));
 				return;
 			}
