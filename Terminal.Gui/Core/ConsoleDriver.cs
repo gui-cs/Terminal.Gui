@@ -8,7 +8,6 @@
 using NStack;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -459,225 +458,76 @@ namespace Terminal.Gui {
 		public static Dictionary<string, ColorScheme> ColorSchemes { get; }
 	}
 
-	/// <summary>
-	/// Provides glyphs used for drawning standard UI elements such as frames and buttons. 
-	/// </summary>
-	public static class Glyphs {
-		/// <summary>
-		/// Horizontal line character.
-		/// </summary>
-		public static Rune HLine;
+	///// <summary>
+	///// Special characters that can be drawn with 
+	///// </summary>
+	//public enum SpecialChar {
+	//	/// <summary>
+	//	/// Horizontal line character.
+	//	/// </summary>
+	//	HLine,
 
-		/// <summary>
-		/// Vertical line character.
-		/// </summary>
-		public static Rune VLine;
+	//	/// <summary>
+	//	/// Vertical line character.
+	//	/// </summary>
+	//	VLine,
 
-		/// <summary>
-		/// Stipple pattern
-		/// </summary>
-		public static Rune Stipple;
+	//	/// <summary>
+	//	/// Stipple pattern
+	//	/// </summary>
+	//	Stipple,
 
-		/// <summary>
-		/// Diamond character
-		/// </summary>
-		public static Rune Diamond;
+	//	/// <summary>
+	//	/// Diamond character
+	//	/// </summary>
+	//	Diamond,
 
-		/// <summary>
-		/// Upper left corner
-		/// </summary>
-		public static Rune ULCorner;
+	//	/// <summary>
+	//	/// Upper left corner
+	//	/// </summary>
+	//	ULCorner,
 
-		/// <summary>
-		/// Lower left corner
-		/// </summary>
-		public static Rune LLCorner;
+	//	/// <summary>
+	//	/// Lower left corner
+	//	/// </summary>
+	//	LLCorner,
 
-		/// <summary>
-		/// Upper right corner
-		/// </summary>
-		public static Rune URCorner;
+	//	/// <summary>
+	//	/// Upper right corner
+	//	/// </summary>
+	//	URCorner,
 
-		/// <summary>
-		/// Lower right corner
-		/// </summary>
-		public static Rune LRCorner;
+	//	/// <summary>
+	//	/// Lower right corner
+	//	/// </summary>
+	//	LRCorner,
 
-		/// <summary>
-		/// Left tee
-		/// </summary>
-		public static Rune LeftTee;
+	//	/// <summary>
+	//	/// Left tee
+	//	/// </summary>
+	//	LeftTee,
 
-		/// <summary>
-		/// Right tee
-		/// </summary>
-		public static Rune RightTee;
+	//	/// <summary>
+	//	/// Right tee
+	//	/// </summary>
+	//	RightTee,
 
-		/// <summary>
-		/// Top tee
-		/// </summary>
-		public static Rune TopTee;
+	//	/// <summary>
+	//	/// Top tee
+	//	/// </summary>
+	//	TopTee,
 
-		/// <summary>
-		/// The bottom tee.
-		/// </summary>
-		public static Rune BottomTee;
-
-		/// <summary>
-		/// Checkmark.
-		/// </summary>
-		public static Rune Checked;
-
-		/// <summary>
-		/// Un-checked checkmark.
-		/// </summary>
-		public static Rune UnChecked;
-
-		/// <summary>
-		/// Selected mark.
-		/// </summary>
-		public static Rune Selected;
-
-		/// <summary>
-		/// Un-selected selected mark.
-		/// </summary>
-		public static Rune UnSelected;
-
-		/// <summary>
-		/// Right Arrow.
-		/// </summary>
-		public static Rune RightArrow;
-
-		/// <summary>
-		/// Left Arrow.
-		/// </summary>
-		public static Rune LeftArrow;
-
-		/// <summary>
-		/// Down Arrow.
-		/// </summary>
-		public static Rune DownArrow;
-
-		/// <summary>
-		/// Up Arrow.
-		/// </summary>
-		public static Rune UpArrow;
-
-		/// <summary>
-		/// Left indicator for default action (e.g. for <see cref="Button"/>).
-		/// </summary>
-		public static Rune LeftDefaultIndicator;
-
-		/// <summary>
-		/// Right indicator for default action (e.g. for <see cref="Button"/>).
-		/// </summary>
-		public static Rune RightDefaultIndicator;
-
-		/// <summary>
-		/// Left frame/bracket (e.g. '[' for <see cref="Button"/>).
-		/// </summary>
-		public static Rune LeftBracket;
-
-		/// <summary>
-		/// Right frame/bracket (e.g. ']' for <see cref="Button"/>).
-		/// </summary>
-		public static Rune RightBracket;
-
-		/// <summary>
-		/// On Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
-		/// </summary>
-		public static Rune OnMeterSegment;
-
-		/// <summary>
-		/// Off Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
-		/// </summary>
-		public static Rune OffMeterSegement;
-	}
+	//	/// <summary>
+	//	/// The bottom tee.
+	//	/// </summary>
+	//	BottomTee,
+	//}
 
 	/// <summary>
 	/// ConsoleDriver is an abstract class that defines the requirements for a console driver.  
 	/// There are currently three implementations: <see cref="CursesDriver"/> (for Unix and Mac), <see cref="WindowsDriver"/>, and <see cref="NetDriver"/> that uses the .NET Console API.
 	/// </summary>
 	public abstract class ConsoleDriver {
-
-		/// <summary>
-		/// Initalizes a new <see cref="ConsoleDriver"/> object. Sets default colors and common glyphs.
-		/// </summary>
-		public ConsoleDriver ()
-		{
-			Colors.TopLevel = new ColorScheme ();
-			Colors.Base = new ColorScheme ();
-			Colors.Dialog = new ColorScheme ();
-			Colors.Menu = new ColorScheme ();
-			Colors.Error = new ColorScheme ();
-
-			Colors.TopLevel.Normal = MakeColor (ConsoleColor.Green, ConsoleColor.Black);
-			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
-			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
-			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkCyan);
-
-			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkBlue);
-			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Base.HotNormal = MakeColor (ConsoleColor.DarkCyan, ConsoleColor.DarkBlue);
-			Colors.Base.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
-
-			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
-			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
-			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.DarkGray);
-			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
-			Colors.Menu.Disabled = MakeColor (ConsoleColor.Gray, ConsoleColor.DarkGray);
-
-			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkGray);
-			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.Gray);
-			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkGray);
-
-			Colors.Error.Normal = MakeColor (ConsoleColor.DarkRed, ConsoleColor.White);
-			Colors.Error.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkRed);
-			Colors.Error.HotNormal = MakeColor (ConsoleColor.Black, ConsoleColor.White);
-			Colors.Error.HotFocus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkRed);
-
-			Glyphs.HLine = '\u2500';
-			Glyphs.VLine = '\u2502';
-			Glyphs.Stipple = '\u2592';
-			Glyphs.Diamond = '\u25c6';
-			Glyphs.ULCorner = '\u250C';
-			Glyphs.LLCorner = '\u2514';
-			Glyphs.URCorner = '\u2510';
-			Glyphs.LRCorner = '\u2518';
-			Glyphs.LeftTee = '\u251c';
-			Glyphs.RightTee = '\u2524';
-			Glyphs.TopTee = '\u22a4';
-			Glyphs.BottomTee = '\u22a5';
-			Glyphs.Checked = '\u221a';
-			Glyphs.UnChecked = ' ';
-			Glyphs.Selected = '\u25cf';
-			Glyphs.UnSelected = '\u25cc';
-			Glyphs.RightArrow = '\u25ba';
-			Glyphs.LeftArrow = '\u25c4';
-			Glyphs.UpArrow = '\u25b2';
-			Glyphs.DownArrow = '\u25bc';
-			Glyphs.LeftDefaultIndicator = '\u25e6';
-			Glyphs.RightDefaultIndicator = '\u25e6';
-			Glyphs.LeftBracket = '[';
-			Glyphs.RightBracket = ']';
-			Glyphs.OnMeterSegment = '\u258c';
-			Glyphs.OffMeterSegement = ' ';
-		}
-
-		/// <summary>
-		/// Creates an Attribute based on a forground and background color
-		/// </summary>
-		public virtual Attribute MakeColor (ConsoleColor foregroundColor, ConsoleColor backgroundColor)
-		{
-			// Encode the colors into the int value.
-			return new Attribute () {
-				value = ((int)foregroundColor | (int)backgroundColor << 4),
-				foreground = (Color)foregroundColor,
-				background = (Color)backgroundColor
-			};
-		}
-
 		/// <summary>
 		/// The handler fired when the terminal is resized.
 		/// </summary>
@@ -755,6 +605,8 @@ namespace Terminal.Gui {
 		/// <param name="background">Background.</param>
 		public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
 
+		// Advanced uses - set colors to any pre-set pairs, you would need to init_color
+		// that independently with the R, G, B values.
 		/// <summary>
 		/// Advanced uses - set colors to any pre-set pairs, you would need to init_color
 		/// that independently with the R, G, B values.
@@ -871,12 +723,12 @@ namespace Terminal.Gui {
 			// fbottom is locaiton of bottom frame line
 			int fbottom = ftop + fheight + 1;
 
-			Rune hLine = border ? Glyphs.HLine : clearChar;
-			Rune vLine = border ? Glyphs.VLine : clearChar;
-			Rune uRCorner = border ? Glyphs.URCorner : clearChar;
-			Rune uLCorner = border ? Glyphs.ULCorner : clearChar;
-			Rune lLCorner = border ? Glyphs.LLCorner : clearChar;
-			Rune lRCorner = border ? Glyphs.LRCorner : clearChar;
+			Rune hLine = border ? HLine : clearChar;
+			Rune vLine = border ? VLine : clearChar;
+			Rune uRCorner = border ? URCorner : clearChar;
+			Rune uLCorner = border ? ULCorner : clearChar;
+			Rune lLCorner = border ? LLCorner : clearChar;
+			Rune lRCorner = border ? LRCorner : clearChar;
 
 			// Outside top
 			if (paddingTop > 1) {
@@ -1037,48 +889,135 @@ namespace Terminal.Gui {
 		public abstract void CookMouse ();
 
 		/// <summary>
-		///  Defines the capabilities of the Console. 
+		/// Horizontal line character.
 		/// </summary>
-		public class Capabilites {
-			/// <summary>
-			///  If <c>true</c> the Console supports Unicode. If <c>false</c> the Console cannot render
-			///  Unicode characters properly.
-			/// </summary>
-			public bool Unicode { get; set; }
-		}
+		public Rune HLine;
 
 		/// <summary>
-		///  Returns the capabilities of the console.
+		/// Vertical line character.
 		/// </summary>
-		/// <returns>The console's capabilities</returns>
-		public abstract Capabilites GetCapabilites ();
+		public Rune VLine;
 
 		/// <summary>
-		/// Contains information for a console font.
+		/// Stipple pattern
 		/// </summary>
-		public class ConsoleFont {
-			/// <summary>
-			/// The name of the typeface (such as Courier or Arial).
-			/// </summary>
-			public string FaceName;
-
-			/// <summary>
-			/// The font weight. The weight can range from 100 to 1000, in multiples of 100. For example, the normal weight is 400, while 700 is bold.
-			/// </summary>
-			public int Weight;
-
-			/// <summary>
-			/// Contains the width and height of each character in the font, in logical units. The X member contains the width, while the Y member contains the height.
-			/// </summary>
-			public Size Size;
-		}
+		public Rune Stipple;
 
 		/// <summary>
-		/// Gets the current font set for the console.
+		/// Diamond character
 		/// </summary>
-		/// <returns>The Font for the current console. <c>null</c> if the console driver does not support querying the font.</returns>
-		public abstract ConsoleFont GetFont ();
-		
+		public Rune Diamond;
+
+		/// <summary>
+		/// Upper left corner
+		/// </summary>
+		public Rune ULCorner;
+
+		/// <summary>
+		/// Lower left corner
+		/// </summary>
+		public Rune LLCorner;
+
+		/// <summary>
+		/// Upper right corner
+		/// </summary>
+		public Rune URCorner;
+
+		/// <summary>
+		/// Lower right corner
+		/// </summary>
+		public Rune LRCorner;
+
+		/// <summary>
+		/// Left tee
+		/// </summary>
+		public Rune LeftTee;
+
+		/// <summary>
+		/// Right tee
+		/// </summary>
+		public Rune RightTee;
+
+		/// <summary>
+		/// Top tee
+		/// </summary>
+		public Rune TopTee;
+
+		/// <summary>
+		/// The bottom tee.
+		/// </summary>
+		public Rune BottomTee;
+
+		/// <summary>
+		/// Checkmark.
+		/// </summary>
+		public Rune Checked;
+
+		/// <summary>
+		/// Un-checked checkmark.
+		/// </summary>
+		public Rune UnChecked;
+
+		/// <summary>
+		/// Selected mark.
+		/// </summary>
+		public Rune Selected;
+
+		/// <summary>
+		/// Un-selected selected mark.
+		/// </summary>
+		public Rune UnSelected;
+
+		/// <summary>
+		/// Right Arrow.
+		/// </summary>
+		public Rune RightArrow;
+
+		/// <summary>
+		/// Left Arrow.
+		/// </summary>
+		public Rune LeftArrow;
+
+		/// <summary>
+		/// Down Arrow.
+		/// </summary>
+		public Rune DownArrow;
+
+		/// <summary>
+		/// Up Arrow.
+		/// </summary>
+		public Rune UpArrow;
+
+		/// <summary>
+		/// Left indicator for default action (e.g. for <see cref="Button"/>).
+		/// </summary>
+		public Rune LeftDefaultIndicator;
+
+		/// <summary>
+		/// Right indicator for default action (e.g. for <see cref="Button"/>).
+		/// </summary>
+		public Rune RightDefaultIndicator;
+
+		/// <summary>
+		/// Left frame/bracket (e.g. '[' for <see cref="Button"/>).
+		/// </summary>
+		public Rune LeftBracket;
+
+		/// <summary>
+		/// Right frame/bracket (e.g. ']' for <see cref="Button"/>).
+		/// </summary>
+		public Rune RightBracket;
+
+		/// <summary>
+		/// On Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
+		/// </summary>
+		public Rune OnMeterSegment;
+
+		/// <summary>
+		/// Off Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
+		/// </summary>
+		public Rune OffMeterSegement;
+
 		/// <summary>
 		/// Make the attribute for the foreground and background colors.
 		/// </summary>

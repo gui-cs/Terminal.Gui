@@ -320,32 +320,32 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (item == null ? ColorScheme.Normal : i == current ? ColorScheme.Focus : ColorScheme.Normal);
 				if (item == null) {
 					Move (0, i + 1);
-					Driver.AddRune (Glyphs.LeftTee);
+					Driver.AddRune (Driver.LeftTee);
 				} else
 					Move (1, i + 1);
 
 				Driver.SetAttribute (DetermineColorSchemeFor (item, i));
 				for (int p = 0; p < Frame.Width - 2; p++)
 					if (item == null)
-						Driver.AddRune (Glyphs.HLine);
+						Driver.AddRune (Driver.HLine);
 					else if (p == Frame.Width - 3 && barItems.Children [i].SubMenu != null)
-						Driver.AddRune (Glyphs.RightArrow);
+						Driver.AddRune (Driver.RightArrow);
 					else
 						Driver.AddRune (' ');
 
 				if (item == null) {
 					Move (Frame.Right - 1, i + 1);
-					Driver.AddRune (Glyphs.RightTee);
+					Driver.AddRune (Driver.RightTee);
 					continue;
 				}
 
 				ustring textToDraw;
-				var checkChar = Glyphs.Selected;
-				var uncheckedChar = Glyphs.UnSelected;
+				var checkChar = Driver.Selected;
+				var uncheckedChar = Driver.UnSelected;
 
 				if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked)) {
-					checkChar = Glyphs.Checked; 
-					uncheckedChar = Glyphs.UnChecked;
+					checkChar = Driver.Checked; 
+					uncheckedChar = Driver.UnChecked;
 				}
 
 				// Support Checked even though CHeckType wasn't set

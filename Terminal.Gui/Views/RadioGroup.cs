@@ -141,7 +141,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < radioLabels.Count; i++) {
 				Move (0, i);
 				Driver.SetAttribute (ColorScheme.Normal);
-				Driver.AddStr (ustring.Make(new Rune[] { (i == selected ? Glyphs.Selected : Glyphs.UnSelected), ' '}));
+				Driver.AddStr (ustring.Make(new Rune[] { (i == selected ? Driver.Selected : Driver.UnSelected), ' '}));
 				DrawHotString (radioLabels [i], HasFocus && i == cursor, ColorScheme);
 			}
 			base.Redraw (bounds);

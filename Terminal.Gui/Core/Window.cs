@@ -29,6 +29,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+
 		/// <summary>
 		/// ContentView is an internal implementation detail of Window. It is used to host Views added with <see cref="Add(View)"/>. 
 		/// Its ONLY reason for being is to provide a simple way for Window to expose to those SubViews that the Window's Bounds 
