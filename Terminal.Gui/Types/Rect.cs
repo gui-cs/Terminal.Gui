@@ -17,6 +17,9 @@ namespace Terminal.Gui
 	/// </summary>
 	public struct Rect
 	{
+		int width;
+		int height;
+
 		/// <summary>
 		/// Gets or sets the x-coordinate of the upper-left corner of this Rectangle structure.
 		/// </summary>
@@ -29,12 +32,26 @@ namespace Terminal.Gui
 		/// <summary>
 		/// Gets or sets the width of this Rect structure.
 		/// </summary>
-		public int Width;
+		public int Width {
+			get { return width; }
+			set {
+				if (value < 0)
+					throw new ArgumentException ("Width must be greater or equal to 0.");
+				width = value;
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets the height of this Rectangle structure.
 		/// </summary>
-		public int Height;
+		public int Height {
+			get { return height; }
+			set {
+				if (value < 0)
+					throw new ArgumentException ("Height must be greater or equal to 0.");
+				height = value;
+			}
+		}
 
 		/// <summary>
 		///	Empty Shared Field
@@ -209,8 +226,10 @@ namespace Terminal.Gui
 		{
 			X = location.X;
 			Y = location.Y;
-			Width = size.Width;
-			Height = size.Height;
+			width = size.Width;
+			height = size.Height;
+			Width = width;
+			Height = height;
 		}
 
 		/// <summary>
@@ -224,10 +243,12 @@ namespace Terminal.Gui
 
 		public Rect (int x, int y, int width, int height)
 		{
-			this.X = x;
-			this.Y = y;
-			this.Width = width;
-			this.Height = height;
+			X = x;
+			Y = y;
+			this.width = width;
+			this.height = height;
+			Width = this.width;
+			Height = this.height;
 		}
 
 
