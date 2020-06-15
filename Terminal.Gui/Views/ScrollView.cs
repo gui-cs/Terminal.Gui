@@ -148,18 +148,18 @@ namespace Terminal.Gui {
 					var by2 = (position + bh) * bh / Size;
 
 					Move (col, 0);
-					Driver.AddRune (Driver.UpArrow);
+					Driver.AddRune (Glyphs.UpArrow);
 					Move (col, Bounds.Height - 1);
-					Driver.AddRune (Driver.DownArrow);
+					Driver.AddRune (Glyphs.DownArrow);
 				} else {
 					bh -= 2;
 					var by1 = position * bh / Size;
 					var by2 = (position + bh) * bh / Size;
 
 					Move (col, 0);
-					Driver.AddRune (Driver.UpArrow);
+					Driver.AddRune (Glyphs.UpArrow);
 					Move (col, Bounds.Height - 1);
-					Driver.AddRune (Driver.DownArrow);
+					Driver.AddRune (Glyphs.DownArrow);
 
 					bool hasTopTee = false;
 					bool hasDiamond = false;
@@ -167,22 +167,22 @@ namespace Terminal.Gui {
 					for (int y = 0; y < bh; y++) {
 						Move (col, y + 1);
 						if ((y < by1 || y > by2) && ((position > 0 && !hasTopTee) || (hasTopTee && hasBottomTee))) {
-							special = Driver.Stipple;
+							special = Glyphs.Stipple;
 						} else {
 							if (y != by2 && y > 1 && by2 - by1 == 0 && by1 < bh - 1 && hasTopTee && !hasDiamond) {
 								hasDiamond = true;
-								special = Driver.Diamond;
+								special = Glyphs.Diamond;
 							} else {
 								if (y == by1 && !hasTopTee) {
 									hasTopTee = true;
 									posTopTee = y;
-									special = Driver.TopTee;
+									special = Glyphs.TopTee;
 								} else if ((y >= by2 || by2 == 0) && !hasBottomTee) {
 									hasBottomTee = true;
 									posBottomTee = y;
-									special = Driver.BottomTee;
+									special = Glyphs.BottomTee;
 								} else {
-									special = Driver.VLine;
+									special = Glyphs.VLine;
 								}
 							}
 						}
@@ -190,7 +190,7 @@ namespace Terminal.Gui {
 					}
 					if (!hasTopTee) {
 						Move (col, Bounds.Height - 2);
-						Driver.AddRune (Driver.TopTee);
+						Driver.AddRune (Glyphs.TopTee);
 					}
 				}
 			} else {
@@ -206,37 +206,37 @@ namespace Terminal.Gui {
 					var bx2 = (position + bw) * bw / Size;
 
 					Move (0, row);
-					Driver.AddRune (Driver.LeftArrow);
-					Driver.AddRune (Driver.RightArrow);
+					Driver.AddRune (Glyphs.LeftArrow);
+					Driver.AddRune (Glyphs.RightArrow);
 				} else {
 					bw -= 2;
 					var bx1 = position * bw / Size;
 					var bx2 = (position + bw) * bw / Size;
 
 					Move (0, row);
-					Driver.AddRune (Driver.LeftArrow);
+					Driver.AddRune (Glyphs.LeftArrow);
 
 					bool hasLeftTee = false;
 					bool hasDiamond = false;
 					bool hasRightTee = false;
 					for (int x = 0; x < bw; x++) {
 						if ((x < bx1 || x >= bx2 + 1) && ((position > 0 && !hasLeftTee) || (hasLeftTee && hasRightTee))) {
-							special = Driver.Stipple;
+							special = Glyphs.Stipple;
 						} else {
 							if (x != bx2 && x > 1 && bx2 - bx1 == 0 && bx1 < bw - 1 && hasLeftTee && !hasDiamond) {
 								hasDiamond = true;
-								special = Driver.Diamond;
+								special = Glyphs.Diamond;
 							} else {
 								if (x == bx1 && !hasLeftTee) {
 									hasLeftTee = true;
 									posLeftTee = x;
-									special = Driver.LeftTee;
+									special = Glyphs.LeftTee;
 								} else if ((x >= bx2 || bx2 == 0) && !hasRightTee) {
 									hasRightTee = true;
 									posRightTee = x;
-									special = Driver.RightTee;
+									special = Glyphs.RightTee;
 								} else {
-									special = Driver.HLine;
+									special = Glyphs.HLine;
 								}
 							}
 						}
@@ -244,10 +244,10 @@ namespace Terminal.Gui {
 					}
 					if (!hasLeftTee) {
 						Move (Bounds.Width -2, row);
-						Driver.AddRune (Driver.LeftTee);
+						Driver.AddRune (Glyphs.LeftTee);
 					}
 
-					Driver.AddRune (Driver.RightArrow);
+					Driver.AddRune (Glyphs.RightArrow);
 				}
 			}
 		}

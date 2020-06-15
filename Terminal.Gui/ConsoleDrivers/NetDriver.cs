@@ -43,9 +43,18 @@ namespace Terminal.Gui {
 
 		public NetDriver ()
 		{
+			Glyphs.LeftDefaultIndicator = '<';
+			Glyphs.RightDefaultIndicator = '>';
+
 			cols = Console.WindowWidth;
 			rows = Console.WindowHeight - 1;
 			UpdateOffscreen ();
+		}
+
+		public override Attribute MakeColor (ConsoleColor f, ConsoleColor b)
+		{
+			// Encode the colors into the int value.
+			return new Attribute () { value = ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff) };
 		}
 
 		bool needMove;
@@ -104,80 +113,18 @@ namespace Terminal.Gui {
 			Console.Clear ();
 		}
 
-		static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
-		{
-			// Encode the colors into the int value.
-			return new Attribute () { value = ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff) };
-		}
+		//public override Attribute MakeColor (ConsoleColor f, ConsoleColor b)
+		//{
+		//	// Encode the colors into the int value.
+		//	return new Attribute () { value = ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff) };
+		//}
 
 
 		public override void Init (Action terminalResized)
 		{
-			Colors.TopLevel = new ColorScheme ();
-			Colors.Base = new ColorScheme ();
-			Colors.Dialog = new ColorScheme ();
-			Colors.Menu = new ColorScheme ();
-			Colors.Error = new ColorScheme ();
 			Clip = new Rect (0, 0, Cols, Rows);
 
-			Colors.TopLevel.Normal = MakeColor (ConsoleColor.Green, ConsoleColor.Black);
-			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
-			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
-			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkCyan);
-
-			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Blue);
-			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
-			Colors.Base.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Blue);
-			Colors.Base.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
-
-			// Focused,
-			//    Selected, Hot: Yellow on Black
-			//    Selected, text: white on black
-			//    Unselected, hot: yellow on cyan
-			//    unselected, text: same as unfocused
-			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
-			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
-			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Cyan);
-			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Cyan);
-			Colors.Menu.Disabled = MakeColor (ConsoleColor.DarkGray, ConsoleColor.Cyan);
-
-			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Cyan);
-			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
-			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Cyan);
-
-			Colors.Error.Normal = MakeColor (ConsoleColor.White, ConsoleColor.Red);
-			Colors.Error.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Error.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Red);
-			Colors.Error.HotFocus = Colors.Error.HotNormal;
 			Console.Clear ();
-
-			HLine = '\u2500';
-			VLine = '\u2502';
-			Stipple = '\u2592';
-			Diamond = '\u25c6';
-			ULCorner = '\u250C';
-			LLCorner = '\u2514';
-			URCorner = '\u2510';
-			LRCorner = '\u2518';
-			LeftTee = '\u251c';
-			RightTee = '\u2524';
-			TopTee = '\u22a4';
-			BottomTee = '\u22a5';
-			Checked = '\u221a';
-			UnChecked = ' ';
-			Selected = '\u25cf';
-			UnSelected = '\u25cc';
-			RightArrow = '\u25ba';
-			LeftArrow = '\u25c4';
-			UpArrow = '\u25b2';
-			DownArrow = '\u25bc';
-			LeftDefaultIndicator = '\u25e6';
-			RightDefaultIndicator = '\u25e6';
-			LeftBracket = '[';
-			RightBracket = ']';
-			OnMeterSegment = '\u258c';
-			OffMeterSegement = ' ';
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)
@@ -252,7 +199,6 @@ namespace Terminal.Gui {
 
 		public override void UpdateCursor ()
 		{
-			//
 		}
 
 		public override void StartReportingMouseMoves ()
@@ -381,6 +327,16 @@ namespace Terminal.Gui {
 		{
 		}
 
+		public override ConsoleFont GetFont ()
+		{
+			return null;
+		}
+
+		public override Capabilites GetCapabilites ()
+		{
+			throw new NotImplementedException ();
+		}
+
 		//
 		// These are for the .NET driver, but running natively on Windows, wont run
 		// on the Mono emulation
@@ -427,7 +383,7 @@ namespace Terminal.Gui {
 		{
 			while (true) {
 				waitForProbe.WaitOne ();
-				keyResult = consoleKeyReaderFn();
+				keyResult = consoleKeyReaderFn ();
 				keyReady.Set ();
 			}
 		}

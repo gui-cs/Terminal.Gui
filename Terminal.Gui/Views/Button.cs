@@ -154,10 +154,10 @@ namespace Terminal.Gui {
 			}
 		}
 
-		Rune _leftBracket = new Rune (Driver != null ? Driver.LeftBracket : '[');
-		Rune _rightBracket = new Rune (Driver != null ? Driver.RightBracket : ']');
-		Rune _leftDefault = new Rune (Driver != null ? Driver.LeftDefaultIndicator : '<');
-		Rune _rightDefault = new Rune (Driver != null ? Driver.RightDefaultIndicator : '>');
+		Rune _leftBracket = new Rune (Driver != null ? Glyphs.LeftBracket : '[');
+		Rune _rightBracket = new Rune (Driver != null ? Glyphs.RightBracket : ']');
+		Rune _leftDefault = new Rune (Driver != null ? Glyphs.LeftDefaultIndicator : '<');
+		Rune _rightDefault = new Rune (Driver != null ? Glyphs.RightDefaultIndicator : '>');
 
 		internal void Update ()
 		{

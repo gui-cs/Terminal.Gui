@@ -17,7 +17,6 @@ namespace Terminal.Gui {
 	/// This is the Curses driver for the gui.cs/Terminal framework.
 	/// </summary>
 	internal class CursesDriver : ConsoleDriver {
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 		public override int Cols => Curses.Cols;
 		public override int Rows => Curses.Lines;
 
@@ -67,7 +66,8 @@ namespace Terminal.Gui {
 				AddRune (rune);
 		}
 
-		public override void Refresh () {
+		public override void Refresh ()
+		{
 			Curses.refresh ();
 			if (Curses.CheckWinChange ()) {
 				TerminalResized?.Invoke ();
@@ -270,8 +270,7 @@ namespace Terminal.Gui {
 				mouseFlag = MouseFlags.WheeledDown;
 				canWheeledDown = true;
 
-			}
-			else if (cev.ButtonState == Curses.Event.ReportMousePosition && !canWheeledDown) {
+			} else if (cev.ButtonState == Curses.Event.ReportMousePosition && !canWheeledDown) {
 
 				mouseFlag = MouseFlags.ReportMousePosition;
 				canWheeledDown = true;
@@ -519,32 +518,32 @@ namespace Terminal.Gui {
 			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition))
 				StartReportingMouseMoves ();
 
-			HLine = Curses.ACS_HLINE;
-			VLine = Curses.ACS_VLINE;
-			Stipple = Curses.ACS_CKBOARD;
-			Diamond = Curses.ACS_DIAMOND;
-			ULCorner = Curses.ACS_ULCORNER;
-			LLCorner = Curses.ACS_LLCORNER;
-			URCorner = Curses.ACS_URCORNER;
-			LRCorner = Curses.ACS_LRCORNER;
-			LeftTee = Curses.ACS_LTEE;
-			RightTee = Curses.ACS_RTEE;
-			TopTee = Curses.ACS_TTEE;
-			BottomTee = Curses.ACS_BTEE;
-			Checked = '\u221a';
-			UnChecked = ' ';
-			Selected = '\u25cf';
-			UnSelected = '\u25cc';
-			RightArrow = Curses.ACS_RARROW;
-			LeftArrow = Curses.ACS_LARROW;
-			UpArrow = Curses.ACS_UARROW;
-			DownArrow = Curses.ACS_DARROW;
-			LeftDefaultIndicator = '\u25e6';
-			RightDefaultIndicator = '\u25e6';
-			LeftBracket = '[';
-			RightBracket = ']';
-			OnMeterSegment = '\u258c';
-			OffMeterSegement = ' ';
+			Glyphs.HLine = Curses.ACS_HLINE;
+			Glyphs.VLine = Curses.ACS_VLINE;
+			Glyphs.Stipple = Curses.ACS_CKBOARD;
+			Glyphs.Diamond = Curses.ACS_DIAMOND;
+			Glyphs.ULCorner = Curses.ACS_ULCORNER;
+			Glyphs.LLCorner = Curses.ACS_LLCORNER;
+			Glyphs.URCorner = Curses.ACS_URCORNER;
+			Glyphs.LRCorner = Curses.ACS_LRCORNER;
+			Glyphs.LeftTee = Curses.ACS_LTEE;
+			Glyphs.RightTee = Curses.ACS_RTEE;
+			Glyphs.TopTee = Curses.ACS_TTEE;
+			Glyphs.BottomTee = Curses.ACS_BTEE;
+			Glyphs.Checked = '\u221a';
+			Glyphs.UnChecked = ' ';
+			Glyphs.Selected = '\u25cf';
+			Glyphs.UnSelected = '\u25cc';
+			Glyphs.RightArrow = Curses.ACS_RARROW;
+			Glyphs.LeftArrow = Curses.ACS_LARROW;
+			Glyphs.UpArrow = Curses.ACS_UARROW;
+			Glyphs.DownArrow = Curses.ACS_DARROW;
+			Glyphs.LeftDefaultIndicator = '\u25e6';
+			Glyphs.RightDefaultIndicator = '\u25e6';
+			Glyphs.LeftBracket = '[';
+			Glyphs.RightBracket = ']';
+			Glyphs.OnMeterSegment = '\u258c';
+			Glyphs.OffMeterSegement = ' ';
 
 			Colors.TopLevel = new ColorScheme ();
 			Colors.Base = new ColorScheme ();
@@ -694,6 +693,16 @@ namespace Terminal.Gui {
 			//mouseGrabbed = false;
 			//Curses.mouseinterval (lastMouseInterval);
 		}
+
+		public override ConsoleFont GetFont ()
+		{
+			return null;
+		}
+
+		public override Capabilites GetCapabilites ()
+		{
+			throw new NotImplementedException ();
+		}
 	}
 
 	internal static class Platform {
@@ -755,7 +764,6 @@ namespace Terminal.Gui {
 			killpg (0, signal);
 			return true;
 		}
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 	}
 
 }

@@ -266,6 +266,11 @@ namespace UICatalog {
 			_numlock = new StatusItem (Key.CharMask, "Num", null);
 			_scrolllock = new StatusItem (Key.CharMask, "Scroll", null);
 
+			var consoleFont = Application.Driver.GetFont ();
+			StatusItem font = new StatusItem (Key.Unknown, $"Console driver does not support querying font.", null); ;
+			if (consoleFont != null) {
+				font = new StatusItem (Key.Unknown, $"Console Font: {consoleFont.FaceName}, {consoleFont.Weight}, {consoleFont.Size.Width}x{consoleFont.Size.Height}", null);
+			}
 			_statusBar = new StatusBar (new StatusItem [] {
 				_capslock,
 				_numlock,

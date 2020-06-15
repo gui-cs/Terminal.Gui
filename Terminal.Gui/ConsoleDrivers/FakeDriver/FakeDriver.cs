@@ -84,10 +84,7 @@ namespace Terminal.Gui {
 
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="rune"></param>
+		/// <inheritdoc/>
 		public override void AddRune (Rune rune)
 		{
 			if (Clip.Contains (ccol, crow)) {
@@ -112,35 +109,28 @@ namespace Terminal.Gui {
 				UpdateScreen ();
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="str"></param>
+		/// <inheritdoc/>
 		public override void AddStr (ustring str)
 		{
 			foreach (var rune in str)
 				AddRune (rune);
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
+		/// <inheritdoc/>
 		public override void End ()
 		{
 			FakeConsole.ResetColor ();
 			FakeConsole.Clear ();
 		}
 
-		static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
+		/// <inheritdoc/>
+		public override Attribute MakeColor (ConsoleColor f, ConsoleColor b)
 		{
 			// Encode the colors into the int value.
 			return new Attribute () { value = ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff) };
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="terminalResized"></param>
+		/// <inheritdoc/>
 		public override void Init (Action terminalResized)
 		{
 			Colors.TopLevel = new ColorScheme ();
@@ -180,35 +170,6 @@ namespace Terminal.Gui {
 			Colors.Error.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
 			Colors.Error.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Red);
 			Colors.Error.HotFocus = Colors.Error.HotNormal;
-
-			HLine = '\u2500';
-			VLine = '\u2502';
-			Stipple = '\u2592';
-			Diamond = '\u25c6';
-			ULCorner = '\u250C';
-			LLCorner = '\u2514';
-			URCorner = '\u2510';
-			LRCorner = '\u2518';
-			LeftTee = '\u251c';
-			RightTee = '\u2524';
-			TopTee = '\u22a4';
-			BottomTee = '\u22a5';
-			Checked = '\u221a';
-			UnChecked = ' ';
-			Selected = '\u25cf';
-			UnSelected = '\u25cc';
-			RightArrow = '\u25ba';
-			LeftArrow = '\u25c4';
-			UpArrow = '\u25b2';
-			DownArrow = '\u25bc';
-			LeftDefaultIndicator = '\u25e6';
-			RightDefaultIndicator = '\u25e6';
-			LeftBracket = '[';
-			RightBracket = ']';
-			OnMeterSegment = '\u258c';
-			OffMeterSegement = ' ';
-
-			//MockConsole.Clear ();
 		}
 
 		/// <summary>
@@ -462,6 +423,18 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void UncookMouse ()
 		{
+		}
+
+		/// <inheritdoc/>
+		public override ConsoleFont GetFont ()
+		{
+			return null;
+		}
+
+		/// <inheritdoc/>
+		public override Capabilites GetCapabilites ()
+		{
+			throw new NotImplementedException ();
 		}
 	}
 }

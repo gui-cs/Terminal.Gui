@@ -120,6 +120,27 @@ namespace Terminal.Gui {
 			}
 		}
 
+		public ConsoleDriver.ConsoleFont GetFont ()
+		{
+			ConsoleDriver.ConsoleFont cf = null;
+			CONSOLE_FONT_INFO_EX fontInfoEx = new CONSOLE_FONT_INFO_EX ();
+			fontInfoEx.cbSize = Marshal.SizeOf (typeof (CONSOLE_FONT_INFO_EX));
+
+			if (GetCurrentConsoleFontEx(OutputHandle, false, ref fontInfoEx)) {
+				cf = new ConsoleDriver.ConsoleFont ();
+				cf.FaceName = fontInfoEx.FaceName;
+				cf.Size = new Size (fontInfoEx.FontWidth, fontInfoEx.FontHeight);
+				cf.Weight = fontInfoEx.FontWeight;
+			}
+
+			var err = Marshal.GetLastWin32Error ();
+			if (err != 0)
+				throw new System.ComponentModel.Win32Exception (err);
+
+			return cf;
+
+		}
+
 		[Flags]
 		public enum ConsoleModes : uint {
 			EnableProcessedInput = 1,
@@ -461,6 +482,24 @@ namespace Terminal.Gui {
 				consoleScreenBufferInfo.srWindow.Bottom - consoleScreenBufferInfo.srWindow.Top);
 		}
 #endif
+
+		[StructLayout (LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+		public struct CONSOLE_FONT_INFO_EX {
+			public int cbSize;
+			public int FontIndex;
+			public short FontWidth;
+			public short FontHeight;
+			public int FontFamily;
+			public int FontWeight;
+			[MarshalAs (UnmanagedType.ByValTStr, SizeConst = 32)]
+			public string FaceName;
+		}
+
+		[DllImport ("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+		extern static bool GetCurrentConsoleFontEx (
+			IntPtr hConsoleOutput, 
+			bool bMaximumWindow, 
+			[In,Out] ref CONSOLE_FONT_INFO_EX lpConsoleCurrentFont);
 	}
 
 	internal class WindowsDriver : ConsoleDriver, IMainLoopDriver {
@@ -480,8 +519,6 @@ namespace Terminal.Gui {
 		{
 			winConsole = new WindowsConsole ();
 
-			SetupColorsAndBorders ();
-
 			cols = Console.WindowWidth;
 			rows = Console.WindowHeight;
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
@@ -490,68 +527,6 @@ namespace Terminal.Gui {
 			UpdateOffScreen ();
 
 			Task.Run ((Action)WindowsInputHandler);
-		}
-
-		private void SetupColorsAndBorders ()
-		{
-			Colors.TopLevel = new ColorScheme ();
-			Colors.Base = new ColorScheme ();
-			Colors.Dialog = new ColorScheme ();
-			Colors.Menu = new ColorScheme ();
-			Colors.Error = new ColorScheme ();
-
-			Colors.TopLevel.Normal = MakeColor (ConsoleColor.Green, ConsoleColor.Black);
-			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
-			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
-			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkCyan);
-
-			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkBlue);
-			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Base.HotNormal = MakeColor (ConsoleColor.DarkCyan, ConsoleColor.DarkBlue);
-			Colors.Base.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
-
-			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
-			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
-			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.DarkGray);
-			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
-			Colors.Menu.Disabled = MakeColor (ConsoleColor.Gray, ConsoleColor.DarkGray);
-
-			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkGray);
-			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.Gray);
-			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkGray);
-
-			Colors.Error.Normal = MakeColor (ConsoleColor.DarkRed, ConsoleColor.White);
-			Colors.Error.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkRed);
-			Colors.Error.HotNormal = MakeColor (ConsoleColor.Black, ConsoleColor.White);
-			Colors.Error.HotFocus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkRed);
-
-			HLine = '\u2500';
-			VLine = '\u2502';
-			Stipple = '\u2591';
-			Diamond = '\u25ca';
-			ULCorner = '\u250C';
-			LLCorner = '\u2514';
-			URCorner = '\u2510';
-			LRCorner = '\u2518';
-			LeftTee = '\u251c';
-			RightTee = '\u2524';
-			TopTee = '\u252c';
-			BottomTee = '\u2534';
-			Checked = '\u221a';
-			UnChecked = ' ';
-			Selected = '\u25cf';
-			UnSelected = '\u25cc';
-			RightArrow = '\u25ba';
-			LeftArrow = '\u25c4';
-			UpArrow = '\u25b2';
-			DownArrow = '\u25bc';
-			LeftDefaultIndicator = '\u25e6';
-			RightDefaultIndicator = '\u25e6';
-			LeftBracket = '[';
-			RightBracket = ']';
-			OnMeterSegment = '\u258c';
-			OffMeterSegement = ' ';
 		}
 
 		[StructLayout (LayoutKind.Sequential)]
@@ -1148,7 +1123,6 @@ namespace Terminal.Gui {
 		public override void Init (Action terminalResized)
 		{
 			TerminalResized = terminalResized;
-			SetupColorsAndBorders ();
 		}
 
 		void ResizeScreen ()
@@ -1218,16 +1192,6 @@ namespace Terminal.Gui {
 		public override void SetAttribute (Attribute c)
 		{
 			currentAttribute = c.value;
-		}
-
-		Attribute MakeColor (ConsoleColor f, ConsoleColor b)
-		{
-			// Encode the colors into the int value.
-			return new Attribute () {
-				value = ((int)f | (int)b << 4),
-				foreground = (Color)f,
-				background = (Color)b
-			};
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)
@@ -1321,8 +1285,17 @@ namespace Terminal.Gui {
 		public override void CookMouse ()
 		{
 		}
-		#endregion
+		public override ConsoleFont GetFont ()
+		{
+			return winConsole.GetFont ();
 
+		}
+
+		public override Capabilites GetCapabilites ()
+		{
+			throw new NotImplementedException ();
+		}
+		#endregion
 	}
 
 }
