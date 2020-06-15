@@ -90,6 +90,7 @@ namespace Terminal.Gui {
 		/// <param name="rune"></param>
 		public override void AddRune (Rune rune)
 		{
+			rune = MakePrintable (rune);
 			if (Clip.Contains (ccol, crow)) {
 				if (needMove) {
 					//MockConsole.CursorLeft = ccol;

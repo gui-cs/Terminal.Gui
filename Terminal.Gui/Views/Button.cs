@@ -174,14 +174,6 @@ namespace Terminal.Gui {
 			else
 				shown_text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
 
-			shown_text = shown_text
-				.Replace ("\f", "\u21a1")		// U+21A1 ↡ DOWNWARDS TWO HEADED ARROW
-				.Replace ("\n", "\u240a")		// U+240A (SYMBOL FOR LINE FEED, ␊)
-				.Replace ("\r", "\u240d")		// U+240D (SYMBOL FOR CARRIAGE RETURN, ␍)
-				.Replace ("\t", "\u2409")		// U+2409 ␉ SYMBOL FOR HORIZONTAL TABULATION
-				.Replace ("\v", "\u240b")		// U+240B ␋ SYMBOL FOR VERTICAL TABULATION
-				.TrimSpace ();
-
 			shown_text = GetTextFromHotKey (shown_text, '_', out hot_pos, out hot_key);
 
 			SetNeedsDisplay ();

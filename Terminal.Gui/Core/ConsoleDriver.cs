@@ -1,4 +1,4 @@
-//
+﻿//
 // ConsoleDriver.cs: Definition for the Console Driver API
 //
 // Authors:
@@ -557,6 +557,28 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="rune">Rune to add.</param>
 		public abstract void AddRune (Rune rune);
+		/// <summary>
+		/// Ensures a Rune is not a control character and can be displayed by translating characters below 0x20
+		/// to equivalent, printable, Unicode chars.
+		/// </summary>
+		/// <param name="c">Rune to translate</param>
+		/// <returns></returns>
+		public static Rune MakePrintable (Rune c)
+		{
+			if (c <= 0x1F) {
+				// ASCII (C0) control characters. 
+				return new Rune (c + 0x2400);
+			} else if (c >= 0x80 && c <= 0x9F) {
+				// C1 control characters (https://www.aivosto.com/articles/control-characters.html#c1)
+				return new Rune (0x25a1); // U+25A1, WHITE SQUARE, □: 
+			} else if (Rune.ColumnWidth (c) > 1) {
+				// BUGBUG: Until we figure out how to fix #41. Note this still doesn't help when 
+				// an Emoji or other char doesn't represent it's width correctly
+				return new Rune (0x25a1); // U+25A1, WHITE SQUARE, □: 
+			} else {
+				return c;
+			}
+		}
 		/// <summary>
 		/// Adds the specified
 		/// </summary>
