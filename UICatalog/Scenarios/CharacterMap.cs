@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
+using Rune = System.Rune;
 
 namespace UICatalog {
 	/// <summary>
@@ -36,6 +37,9 @@ namespace UICatalog {
 			}
 
 			var radioItems = new (ustring radioLabel, int start, int end) [] {
+				CreateRadio("ASCII Control Characterss", 0x00, 0x1F),
+				CreateRadio("C0 Control Characters", 0x80, 0x9f),
+				CreateRadio("Hangul Jamo", 0x1100, 0x11ff),	// This is where wide chars tend to start
 				CreateRadio("Currency Symbols", 0x20A0, 0x20CF),
 				CreateRadio("Letterlike Symbols", 0x2100, 0x214F),
 				CreateRadio("Arrows", 0x2190, 0x21ff),
@@ -57,7 +61,7 @@ namespace UICatalog {
 			jumpList.Y = Pos.Bottom (label);
 			jumpList.Width = Dim.Fill ();
 			jumpList.SelectedItemChanged = (args) => {
-				charMap.Start = radioItems[args.SelectedItem].start;
+				charMap.Start = radioItems [args.SelectedItem].start;
 			};
 
 			Win.Add (jumpList);
@@ -105,6 +109,15 @@ namespace UICatalog {
 #if true
 		private void CharMap_DrawContent (Rect viewport)
 		{
+			//Rune ReplaceNonPrintables (Rune c)
+			//{
+			//	if (c < 0x20) {
+			//		return new Rune (c + 0x2400);         // U+25A1 □ WHITE SQUARE
+			//	} else {
+			//		return c;
+			//	}
+			//}
+
 			for (int header = 0; header < 16; header++) {
 				Move (viewport.X + RowHeaderWidth + (header * 2), 0);
 				Driver.AddStr ($" {header:x} ");
@@ -115,9 +128,12 @@ namespace UICatalog {
 					var rowLabel = $"U+{val / 16:x4}x";
 					Move (0, y + 1);
 					Driver.AddStr (rowLabel);
+					var prevColWasWide = false;
 					for (int col = 0; col < 16; col++) {
-						Move (viewport.X + RowHeaderWidth + (col * 2), 0 + y + 1);
-						Driver.AddStr ($" {(char)((-viewport.Y + row) * 16 + col)}");
+						var rune = new Rune ((uint)((uint)(-viewport.Y + row) * 16 + col));
+						Move (viewport.X + RowHeaderWidth + (col * 2) + (prevColWasWide ? 0 : 1), 0 + y + 1);
+						Driver.AddRune (rune);
+						//prevColWasWide = Rune.ColumnWidth(rune) > 1;
 					}
 				}
 			}

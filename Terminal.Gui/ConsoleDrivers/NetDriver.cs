@@ -70,6 +70,7 @@ namespace Terminal.Gui {
 
 		public override void AddRune (Rune rune)
 		{
+			rune = MakePrintable (rune);
 			if (Clip.Contains (ccol, crow)) {
 				if (needMove) {
 					//Console.CursorLeft = ccol;

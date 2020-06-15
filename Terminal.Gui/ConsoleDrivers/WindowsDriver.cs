@@ -1182,6 +1182,7 @@ namespace Terminal.Gui {
 
 		public override void AddRune (Rune rune)
 		{
+			rune = MakePrintable (rune);
 			var position = crow * Cols + ccol;
 
 			if (Clip.Contains (ccol, crow)) {

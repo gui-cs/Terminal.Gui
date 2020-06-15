@@ -39,14 +39,14 @@ namespace Terminal.Gui {
 		}
 
 		static bool sync = false;
-		public override void AddRune (Rune rune)
+		public override void AddRune (Rune rune) 
 		{
 			if (Clip.Contains (ccol, crow)) {
 				if (needMove) {
 					Curses.move (crow, ccol);
 					needMove = false;
 				}
-				Curses.addch ((int)(uint)rune);
+				Curses.addch ((int)(uint)MakePrintable(rune));
 			} else
 				needMove = true;
 			if (sync)

@@ -62,7 +62,7 @@ namespace Terminal.Gui {
 		///   The width of the <see cref="Button"/> is computed based on the
 		///   text length. The height will always be 1.
 		/// </remarks>
-		public Button () : this (string.Empty) { }
+		public Button () : this (text: string.Empty, is_default: false) { }
 
 		/// <summary>
 		///   Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.
@@ -78,11 +78,7 @@ namespace Terminal.Gui {
 		/// </param>
 		public Button (ustring text, bool is_default = false) : base ()
 		{
-			CanFocus = true;
-			Text = text ?? string.Empty;
-			this.IsDefault = is_default;
-			int w = SetWidthHeight (text, is_default);
-			Frame = new Rect (Frame.Location, new Size (w, 1));
+			Init (text, is_default);
 		}
 
 		/// <summary>
@@ -114,9 +110,26 @@ namespace Terminal.Gui {
 		public Button (int x, int y, ustring text, bool is_default)
 		    : base (new Rect (x, y, text.Length + 4 + (is_default ? 2 : 0), 1))
 		{
+			Init (text, is_default);
+		}
+
+		Rune _leftBracket;
+		Rune _rightBracket;
+		Rune _leftDefault;
+		Rune _rightDefault;
+
+		void Init (ustring text, bool is_default)
+		{
+			_leftBracket = new Rune (Driver != null ? Driver.LeftBracket : '[');
+			_rightBracket = new Rune (Driver != null ? Driver.RightBracket : ']');
+			_leftDefault = new Rune (Driver != null ? Driver.LeftDefaultIndicator : '<');
+			_rightDefault = new Rune (Driver != null ? Driver.RightDefaultIndicator : '>');
+
 			CanFocus = true;
 			Text = text ?? string.Empty;
 			this.IsDefault = is_default;
+			int w = SetWidthHeight (text, is_default);
+			Frame = new Rect (Frame.Location, new Size (w, 1));
 		}
 
 		int SetWidthHeight (ustring text, bool is_default)
@@ -154,25 +167,12 @@ namespace Terminal.Gui {
 			}
 		}
 
-		Rune _leftBracket = new Rune (Driver != null ? Driver.LeftBracket : '[');
-		Rune _rightBracket = new Rune (Driver != null ? Driver.RightBracket : ']');
-		Rune _leftDefault = new Rune (Driver != null ? Driver.LeftDefaultIndicator : '<');
-		Rune _rightDefault = new Rune (Driver != null ? Driver.RightDefaultIndicator : '>');
-
 		internal void Update ()
 		{
 			if (IsDefault)
 				shown_text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
 			else
 				shown_text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
-
-			shown_text = shown_text
-				.Replace ("\f", "\u21a1")		// U+21A1 ↡ DOWNWARDS TWO HEADED ARROW
-				.Replace ("\n", "\u240a")		// U+240A (SYMBOL FOR LINE FEED, ␊)
-				.Replace ("\r", "\u240d")		// U+240D (SYMBOL FOR CARRIAGE RETURN, ␍)
-				.Replace ("\t", "\u2409")		// U+2409 ␉ SYMBOL FOR HORIZONTAL TABULATION
-				.Replace ("\v", "\u240b")		// U+240B ␋ SYMBOL FOR VERTICAL TABULATION
-				.TrimSpace ();
 
 			shown_text = GetTextFromHotKey (shown_text, '_', out hot_pos, out hot_key);
 
