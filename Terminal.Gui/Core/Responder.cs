@@ -24,7 +24,7 @@ namespace Terminal.Gui {
 	public class Responder : IDisposable {
 		bool disposedValue;
 
-#if DEBUG
+#if DEBUG_IDISPOSABLE
 		/// <summary>
 		/// For debug purposes to verify objects are being disposed properly
 		/// </summary>
@@ -41,7 +41,7 @@ namespace Terminal.Gui {
 		{
 			Instances.Add (this);
 		}
-#endif 
+#endif
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="Responder"/> can focus.
@@ -240,6 +240,11 @@ namespace Terminal.Gui {
 			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
 			Dispose (disposing: true);
 			GC.SuppressFinalize (this);
+#if DEBUG_IDISPOSABLE
+			WasDisposed = true;
+			Debug.Assert (DisposedCount == 0);
+			DisposedCount++;
+#endif
 		}
 	}
 }
