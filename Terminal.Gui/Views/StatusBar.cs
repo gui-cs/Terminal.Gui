@@ -90,7 +90,7 @@ namespace Terminal.Gui {
 			Width = Dim.Fill ();
 			Height = 1;
 
-			Application.Resized += (e) => {
+			LayoutComplete += (e) => {
 				X = 0;
 				Height = 1;
 				if (SuperView == null || SuperView == Application.Top) {
