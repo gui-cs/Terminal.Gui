@@ -144,7 +144,6 @@ namespace Terminal.Gui {
 				Driver.AddStr (ustring.Make(new Rune[] { (i == selected ? Driver.Selected : Driver.UnSelected), ' '}));
 				DrawHotString (radioLabels [i], HasFocus && i == cursor, ColorScheme);
 			}
-			base.Redraw (bounds);
 		}
 
 		///<inheritdoc/>

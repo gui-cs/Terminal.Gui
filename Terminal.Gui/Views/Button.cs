@@ -26,11 +26,7 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class Button : View {
 		ustring text;
-		ustring shown_text;
-		Rune hot_key;
-		int hot_pos = -1;
 		bool is_default;
-		TextAlignment textAlignment = TextAlignment.Centered;
 
 		/// <summary>
 		/// Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.
@@ -44,16 +40,6 @@ namespace Terminal.Gui {
 				Update ();
 			}
 		}
-
-		/// <summary>
-		///   Clicked <see cref="Action"/>, raised when the button is clicked.
-		/// </summary>
-		/// <remarks>
-		///   Client code can hook up to this event, it is
-		///   raised when the button is activated either with
-		///   the mouse or the keyboard.
-		/// </remarks>
-		public Action Clicked;
 
 		/// <summary>
 		///   Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.
@@ -120,6 +106,8 @@ namespace Terminal.Gui {
 
 		void Init (ustring text, bool is_default)
 		{
+			HotKeySpecifier = new Rune ('_');
+
 			_leftBracket = new Rune (Driver != null ? Driver.LeftBracket : '[');
 			_rightBracket = new Rune (Driver != null ? Driver.RightBracket : ']');
 			_leftDefault = new Rune (Driver != null ? Driver.LeftDefaultIndicator : '<');
@@ -144,7 +132,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		///   The text displayed by this <see cref="Button"/>.
 		/// </summary>
-		public ustring Text {
+		public new ustring Text {
 			get {
 				return text;
 			}
@@ -156,58 +144,19 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// Sets or gets the text alignment for the <see cref="Button"/>.
-		/// </summary>
-		public TextAlignment TextAlignment {
-			get => textAlignment;
-			set {
-				textAlignment = value;
-				Update ();
-			}
-		}
-
 		internal void Update ()
 		{
 			if (IsDefault)
-				shown_text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
+				base.Text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
 			else
-				shown_text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
-
-			shown_text = GetTextFromHotKey (shown_text, '_', out hot_pos, out hot_key);
+				base.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
 
 			SetNeedsDisplay ();
 		}
 
-		int c_hot_pos;
-
-		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
-		{
-			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
-			Move (0, 0);
-
-			var caption = GetTextAlignment (shown_text, hot_pos, out int s_hot_pos, TextAlignment);
-			c_hot_pos = s_hot_pos;
-
-			Driver.AddStr (caption);
-
-			if (c_hot_pos != -1) {
-				Move (c_hot_pos, 0);
-				Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
-				Driver.AddRune (hot_key);
-			}
-		}
-
-		///<inheritdoc/>
-		public override void PositionCursor ()
-		{
-			Move (c_hot_pos == -1 ? 1 : c_hot_pos, 0);
-		}
-
 		bool CheckKey (KeyEvent key)
 		{
-			if ((char)key.KeyValue == hot_key) {
+			if ((char)key.KeyValue == HotKey) {
 				this.SuperView.SetFocus (this);
 				Clicked?.Invoke ();
 				return true;
@@ -238,26 +187,12 @@ namespace Terminal.Gui {
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			var c = kb.KeyValue;
-			if (c == '\n' || c == ' ' || Rune.ToUpper ((uint)c) == hot_key) {
+			if (c == '\n' || c == ' ' || Rune.ToUpper ((uint)c) == HotKey) {
 				Clicked?.Invoke ();
 				return true;
 			}
 			return base.ProcessKey (kb);
 		}
 
-		///<inheritdoc/>
-		public override bool MouseEvent (MouseEvent me)
-		{
-			if (me.Flags == MouseFlags.Button1Clicked) {
-				if (!HasFocus) {
-					SuperView.SetFocus (this);
-					SetNeedsDisplay ();
-				}
-
-				Clicked?.Invoke ();
-				return true;
-			}
-			return false;
-		}
 	}
 }

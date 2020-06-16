@@ -1,4 +1,4 @@
-//
+﻿//
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
 //
@@ -13,6 +13,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NStack;
 
@@ -132,6 +133,482 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public class View : Responder, IEnumerable {
+		/// <summary>
+		/// Suppports text formatting, including horizontal alignment and word wrap for <see cref="View"/>.
+		/// </summary>
+		public class ViewText {
+			List<ustring> lines = new List<ustring> ();
+			ustring text;
+			TextAlignment textAlignment;
+			Attribute textColor = -1;
+			View view;
+
+			/// <summary>
+			///  Inititalizes a new <see cref="ViewText"/> object.
+			/// </summary>
+			/// <param name="view"></param>
+			public ViewText (View view)
+			{
+				this.view = view;
+				recalcPending = true;
+			}
+
+			/// <summary>
+			///   The text to be displayed.
+			/// </summary>
+			public virtual ustring Text {
+				get => text;
+				set {
+					text = value;
+					recalcPending = true;
+					view.SetNeedsDisplay ();
+				}
+			}
+
+			// TODO: Add Vertical Text Alignment
+			/// <summary>
+			/// Controls the horizontal text-alignment property. 
+			/// </summary>
+			/// <value>The text alignment.</value>
+			public TextAlignment TextAlignment {
+				get => textAlignment;
+				set {
+					textAlignment = value;
+					recalcPending = true;
+					view.SetNeedsDisplay ();
+				}
+			}
+
+			/// <summary>
+			///   The color used for the drawing of the <see cref="Text"/>.
+			/// </summary>
+			public Attribute TextColor {
+				get => textColor;
+				set {
+					textColor = value;
+					recalcPending = true;
+					view.SetNeedsDisplay ();
+				}
+			}
+
+			/// <summary>
+			///  Gets the size of the area the text will be drawn in. 
+			/// </summary>
+			public Size TextSize { get; internal set; }
+
+			bool recalcPending = false;
+
+			public int HotKeyPos { get => hotKeyPos; set => hotKeyPos = value; }
+			public Rune HotKey { get => hotKey; set => hotKey = value; }
+			Rune hotKey;
+
+			/// <summary>
+			/// The specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'. 
+			/// </summary>
+			public Rune HotKeySpecifier { get; set; } = (Rune)0xFFFF;
+
+			/// <summary>
+			/// Causes the Text to be formatted, based on <see cref="TextAlignment"/> and <see cref="TextSize"/>.
+			/// </summary>
+			public void ReFormat ()
+			{
+				// With this check, we protect against subclasses with overrides of Text
+				if (ustring.IsNullOrEmpty (Text)) {
+					return;
+				}
+				recalcPending = false;
+				var shown_text = ProcessHotKeyText (text, HotKeySpecifier, false, out hotKeyPos, out hotKey);
+				Reformat (shown_text, lines, TextSize.Width, textAlignment, TextSize.Height > 1);
+			}
+
+			static ustring StripCRLF (ustring str)
+			{
+				var runes = new List<Rune> ();
+				foreach (var r in str.ToRunes ()) {
+					if (r != '\r' && r != '\n') {
+						runes.Add (r);
+					}
+				}
+				return ustring.Make (runes); ;
+			}
+			static ustring ReplaceCRLFWithSpace (ustring str)
+			{
+				var runes = new List<Rune> ();
+				foreach (var r in str.ToRunes ()) {
+					if (r == '\r' || r == '\n') {
+						runes.Add (new Rune (' ')); // r + 0x2400));         // U+25A1 □ WHITE SQUARE
+					} else {
+						runes.Add (r);
+					}
+				}
+				return ustring.Make (runes); ;
+			}
+
+			static List<ustring> WordWrap (ustring text, int margin)
+			{
+				int start = 0, end;
+				var lines = new List<ustring> ();
+
+				text = StripCRLF (text);
+
+				while ((end = start + margin) < text.Length) {
+					while (text [end] != ' ' && end > start)
+						end -= 1;
+					if (end == start)
+						end = start + margin;
+
+					lines.Add (text [start, end]);
+					start = end + 1;
+				}
+
+				if (start < text.Length)
+					lines.Add (text.Substring (start));
+
+				return lines;
+			}
+
+			static ustring ClipAndJustify (ustring str, int width, TextAlignment talign)
+			{
+				int slen = str.RuneCount;
+				if (slen > width) {
+					var uints = str.ToRunes (width);
+					var runes = new Rune [uints.Length];
+					for (int i = 0; i < uints.Length; i++)
+						runes [i] = uints [i];
+					return ustring.Make (runes);
+				} else {
+					if (talign == TextAlignment.Justified) {
+						// TODO: ustring needs this
+						var words = str.ToString ().Split (whitespace, StringSplitOptions.RemoveEmptyEntries);
+						int textCount = words.Sum (arg => arg.Length);
+
+						var spaces = words.Length > 1 ? (width - textCount) / (words.Length - 1) : 0;
+						var extras = words.Length > 1 ? (width - textCount) % words.Length : 0;
+
+						var s = new System.Text.StringBuilder ();
+						//s.Append ($"tc={textCount} sp={spaces},x={extras} - ");
+						for (int w = 0; w < words.Length; w++) {
+							var x = words [w];
+							s.Append (x);
+							if (w + 1 < words.Length)
+								for (int i = 0; i < spaces; i++)
+									s.Append (' ');
+							if (extras > 0) {
+								//s.Append ('_');
+								extras--;
+							}
+						}
+						return ustring.Make (s.ToString ());
+					}
+					return str;
+				}
+			}
+
+			static char [] whitespace = new char [] { ' ', '\t' };
+			private int hotKeyPos;
+
+			/// <summary>
+			/// Reformats text into lines, applying text alignment and word wraping.
+			/// </summary>
+			/// <param name="textStr"></param>
+			/// <param name="lineResult"></param>
+			/// <param name="width"></param>
+			/// <param name="talign"></param>
+			/// <param name="wordWrap">if <c>false</c>, forces text to fit a single line. Line breaks are converted to spaces.</param>
+			static void Reformat (ustring textStr, List<ustring> lineResult, int width, TextAlignment talign, bool wordWrap)
+			{
+				lineResult.Clear ();
+
+				if (wordWrap == false) {
+					textStr = ReplaceCRLFWithSpace (textStr);
+					lineResult.Add (ClipAndJustify (textStr, width, talign));
+					return;
+				}
+
+				int textLen = textStr.Length;
+				int lp = 0;
+				for (int i = 0; i < textLen; i++) {
+					Rune c = textStr [i];
+					if (c == '\n') {
+						var wrappedLines = WordWrap (textStr [lp, i], width);
+						foreach (var line in wrappedLines) {
+							lineResult.Add (ClipAndJustify (line, width, talign));
+						}
+						if (wrappedLines.Count == 0) {
+							lineResult.Add (ustring.Empty);
+						}
+						lp = i + 1;
+					}
+				}
+				foreach (var line in WordWrap (textStr [lp, textLen], width)) {
+					lineResult.Add (ClipAndJustify (line, width, talign));
+				}
+			}
+
+			/// <summary>
+			/// Computes the number of lines needed to render the specified text given the width.
+			/// </summary>
+			/// <returns>Number of lines.</returns>
+			/// <param name="text">Text, may contain newlines.</param>
+			/// <param name="width">The minimum width for the text.</param>
+			public static int MaxLines (ustring text, int width)
+			{
+				var result = new List<ustring> ();
+				ViewText.Reformat (text, result, width, TextAlignment.Left, true);
+				return result.Count;
+			}
+
+			/// <summary>
+			/// Computes the maximum width needed to render the text (single line or multple lines).
+			/// </summary>
+			/// <returns>Max width of lines.</returns>
+			/// <param name="text">Text, may contain newlines.</param>
+			/// <param name="width">The minimum width for the text.</param>
+			public static int MaxWidth (ustring text, int width)
+			{
+				var result = new List<ustring> ();
+				ViewText.Reformat (text, result, width, TextAlignment.Left, true);
+				return result.Max (s => s.RuneCount);
+			}
+
+			internal void Draw (Rect bounds)
+			{
+				// With this check, we protect against subclasses with overrides of Text
+				if (ustring.IsNullOrEmpty (text)) {
+					return;
+				}
+
+				if (recalcPending) {
+					ReFormat ();
+				}
+
+				if (TextColor != -1)
+					Driver.SetAttribute (TextColor);
+				else
+					Driver.SetAttribute (view.ColorScheme.Normal);
+
+				view.Clear ();
+				for (int line = 0; line < lines.Count; line++) {
+					if (line < bounds.Top || line >= bounds.Bottom)
+						continue;
+					var str = lines [line];
+					int x;
+					switch (textAlignment) {
+					case TextAlignment.Left:
+						x = 0;
+						break;
+					case TextAlignment.Justified:
+						x = bounds.Left;
+						break;
+					case TextAlignment.Right:
+						x = bounds.Right - str.Length;
+						break;
+					case TextAlignment.Centered:
+						x = bounds.Left + (bounds.Width - str.Length) / 2;
+						break;
+					default:
+						throw new ArgumentOutOfRangeException ();
+					}
+					view.Move (x, line);
+					Driver.AddStr (str);
+				}
+
+				if (HotKeyPos != -1) {
+					_ = GetAlignedText (lines [0], TextSize.Width, hotKeyPos, out hotKeyPos, textAlignment);
+
+					view.Move (HotKeyPos, 0);
+					Driver.SetAttribute (view.HasFocus ? view.ColorScheme.HotFocus : view.ColorScheme.HotNormal);
+					Driver.AddRune (hotKey);
+				}
+			}
+
+			/// <summary>
+			///  Calculates the rectangle requried to hold text, assuming no word wrapping.
+			/// </summary>
+			/// <param name="x">The x location of the rectangle</param>
+			/// <param name="y">The y location of the rectangle</param>
+			/// <param name="text">The text to measure</param>
+			/// <returns></returns>
+			public static Rect CalcRect (int x, int y, ustring text)
+			{
+				if (ustring.IsNullOrEmpty (text))
+					return Rect.Empty;
+
+				int mw = 0;
+				int ml = 1;
+
+				int cols = 0;
+				foreach (var rune in text) {
+					if (rune == '\n') {
+						ml++;
+						if (cols > mw)
+							mw = cols;
+						cols = 0;
+					} else
+						cols++;
+				}
+				if (cols > mw)
+					mw = cols;
+
+				return new Rect (x, y, mw, ml);
+			}
+
+
+			/// <summary>
+			/// Gets the position and Rune for the hotkey in text and removes the hotkey specifier.
+			/// </summary>
+			/// <param name="text">The text to manipulate.</param>
+			/// <param name="hotKeySpecifier">The hot-key specifier (e.g. '_') to look for.</param>
+			/// <param name="firstUpperCase">If <c>true</c> and no hotkey is found via the hotkey specifier, the first upper case char found will be the hotkey.</param>
+			/// <param name="hotPos">Returns the postion of the hot-key in the text. -1 if not found.</param>
+			/// <param name="showHotKey">Returns the Rune immediately to the right of the hot-key position</param>
+			/// <returns>The input text with the hotkey specifier ('_') removed.</returns>
+			public static ustring ProcessHotKeyText (ustring text, Rune hotKeySpecifier, bool firstUpperCase, out int hotPos, out Rune showHotKey)
+			{
+				if (hotKeySpecifier == (Rune)0xFFFF) {
+					hotPos = -1;
+					showHotKey = (Rune)0xFFFF;
+					return text;
+				}
+				Rune hot_key = (Rune)0;
+				int hot_pos = -1;
+				ustring shown_text = text;
+
+				// Use first hot_key char passed into 'hotKey'.
+				// TODO: Ignore hot_key of two are provided
+				int i = 0;
+				foreach (Rune c in shown_text) {
+					if ((char)c != 0xFFFD) {
+						if (c == hotKeySpecifier) {
+							hot_pos = i;
+						} else if (hot_pos > -1) {
+							hot_key = c;
+							break;
+						}
+					}
+					i++;
+				}
+
+				// Legacy support - use first upper case char if the specifier was not found
+				if (hot_pos == -1 && firstUpperCase) {
+					i = 0;
+					foreach (Rune c in shown_text) {
+						if ((char)c != 0xFFFD) {
+							if (Rune.IsUpper (c)) {
+								hot_key = c;
+								hot_pos = i;
+								break;
+							}
+						}
+						i++;
+					}
+				}
+				else {
+					if (hot_pos != -1) {
+						// Use char after 'hotKey'
+						ustring start = "";
+						i = 0;
+						foreach (Rune c in shown_text) {
+							start += ustring.Make (c);
+							i++;
+							if (i == hot_pos)
+								break;
+						}
+						var st = shown_text;
+						shown_text = start;
+						i = 0;
+						foreach (Rune c in st) {
+							i++;
+							if (i > hot_pos + 1) {
+								shown_text += ustring.Make (c);
+							}
+						}
+					}
+				}
+				hotPos = hot_pos;
+				showHotKey = hot_key;
+				return shown_text;
+			}
+
+			/// <summary>
+			/// Formats a single line of text with a hot-key and <see cref="TextAlignment"/>.
+			/// </summary>
+			/// <param name="shown_text">The text to align.</param>
+			/// <param name="width">The maximum width for the text.</param>
+			/// <param name="hot_pos">The hot-key position before reformatting.</param>
+			/// <param name="c_hot_pos">The hot-key position after reformatting.</param>
+			/// <param name="textAlignment">The <see cref="TextAlignment"/> to align to.</param>
+			/// <returns>The aligned text.</returns>
+			public static ustring GetAlignedText (ustring shown_text, int width, int hot_pos, out int c_hot_pos, TextAlignment textAlignment)
+			{
+				int start;
+				var caption = shown_text;
+				c_hot_pos = hot_pos;
+
+				if (width > shown_text.Length + 1) {
+					switch (textAlignment) {
+					case TextAlignment.Left:
+						caption += new string (' ', width - caption.RuneCount);
+						break;
+					case TextAlignment.Right:
+						start = width - caption.RuneCount;
+						caption = $"{new string (' ', width - caption.RuneCount)}{caption}";
+						if (c_hot_pos > -1) {
+							c_hot_pos += start;
+						}
+						break;
+					case TextAlignment.Centered:
+						start = width / 2 - caption.RuneCount / 2;
+						caption = $"{new string (' ', start)}{caption}{new string (' ', width - caption.RuneCount - start)}";
+						if (c_hot_pos > -1) {
+							c_hot_pos += start;
+						}
+						break;
+					case TextAlignment.Justified:
+						var words = caption.Split (" ");
+						var wLen = GetWordsLength (words, c_hot_pos, out int runeCount, out int w_hot_pos);
+						var space = (width - runeCount) / (caption.Length - wLen);
+						caption = "";
+						for (int i = 0; i < words.Length; i++) {
+							if (i == words.Length - 1) {
+								caption += new string (' ', width - caption.RuneCount - 1);
+								caption += words [i];
+							} else {
+								caption += words [i];
+							}
+							if (i < words.Length - 1) {
+								caption += new string (' ', space);
+							}
+						}
+						if (c_hot_pos > -1) {
+							c_hot_pos += w_hot_pos * space - space - w_hot_pos + 1;
+						}
+						break;
+					}
+				}
+
+				return caption;
+			}
+
+			static int GetWordsLength (ustring [] words, int hotPos, out int runeCount, out int wordHotPos)
+			{
+				int length = 0;
+				int rCount = 0;
+				int wHotPos = -1;
+				for (int i = 0; i < words.Length; i++) {
+					if (wHotPos == -1 && rCount + words [i].RuneCount >= hotPos)
+						wHotPos = i;
+					length += words [i].Length;
+					rCount += words [i].RuneCount;
+				}
+				if (wHotPos == -1 && hotPos > -1)
+					wHotPos = words.Length;
+				runeCount = rCount;
+				wordHotPos = wHotPos;
+				return length;
+			}
+		}
+
 		internal enum Direction {
 			Forward,
 			Backward
@@ -141,6 +618,8 @@ namespace Terminal.Gui {
 		View container = null;
 		View focused = null;
 		Direction focusDirection;
+
+		ViewText viewText;
 
 		/// <summary>
 		/// Event fired when the view gets focus.
@@ -166,6 +645,27 @@ namespace Terminal.Gui {
 		/// Event fired when a mouse event is generated.
 		/// </summary>
 		public Action<MouseEventArgs> MouseClick;
+
+		/// <summary>
+		/// The HotKey defined for this view. A user pressing HotKey on the keyboard while this view has focus will cause the Clicked event to fire.
+		/// </summary>
+		public Rune HotKey { get => viewText.HotKey; set => viewText.HotKey = value; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Rune HotKeySpecifier { get => viewText.HotKeySpecifier; set => viewText.HotKeySpecifier = value; }
+
+		/// <summary>
+		///   Clicked <see cref="Action"/>, raised when the user clicks the primary mouse button within the Bounds of this <see cref="View"/>
+		///   or if the user presses the action key while this view is focused. (TODO: IsDefault)
+		/// </summary>
+		/// <remarks>
+		///   Client code can hook up to this event, it is
+		///   raised when the button is activated either with
+		///   the mouse or the keyboard.
+		/// </remarks>
+		public Action Clicked;
 
 		internal Direction FocusDirection {
 			get => SuperView?.FocusDirection ?? focusDirection;
@@ -389,29 +889,99 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public View (Rect frame)
 		{
+			viewText = new ViewText (this);
+			this.Text = ustring.Empty;
+
 			this.Frame = frame;
-			CanFocus = false;
 			LayoutStyle = LayoutStyle.Absolute;
 		}
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="LayoutStyle.Computed"/> <see cref="View"/> class.
+		///   Initializes a new instance of <see cref="View"/> using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <remarks>
+		/// <para>
 		///   Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically control the size and location of the view.
-		/// </remarks>
-		/// <remarks>
+		///   The <see cref="Label"/> will be created using <see cref="LayoutStyle.Computed"/>
+		///   coordinates. The initial size (<see cref="View.Frame"/> will be 
+		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
+		/// </para>
+		/// <para>
+		///   If <c>Height</c> is greater than one, word wrapping is provided.
+		/// </para>
+		/// <para>
 		///   This constructor intitalize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
 		///   Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically control the size and location of the view.
+		/// </para>
 		/// </remarks>
-		public View ()
+		public View () : this (text: string.Empty) { }
+
+
+		/// <summary>
+		///   Initializes a new instance of <see cref="View"/> using <see cref="LayoutStyle.Absolute"/> layout.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		///   The <see cref="View"/> will be created at the given
+		///   coordinates with the given string. The size (<see cref="View.Frame"/> will be 
+		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
+		/// </para>
+		/// <para>
+		///   No line wrapping is provided.
+		/// </para>
+		/// </remarks>
+		/// <param name="x">column to locate the Label.</param>
+		/// <param name="y">row to locate the Label.</param>
+		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
+		public View (int x, int y, ustring text) : this (ViewText.CalcRect (x, y, text), text) { }
+
+		/// <summary>
+		///   Initializes a new instance of <see cref="View"/> using <see cref="LayoutStyle.Absolute"/> layout.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		///   The <see cref="View"/> will be created at the given
+		///   coordinates with the given string. The initial size (<see cref="View.Frame"/> will be 
+		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
+		/// </para>
+		/// <para>
+		///   If <c>rect.Height</c> is greater than one, word wrapping is provided.
+		/// </para>
+		/// </remarks>
+		/// <param name="rect">Location.</param>
+		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
+		public View (Rect rect, ustring text) : this (rect)
 		{
+			viewText = new ViewText (this);
+			this.Text = text;
+		}
+
+		/// <summary>
+		///   Initializes a new instance of <see cref="View"/> using <see cref="LayoutStyle.Computed"/> layout.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		///   The <see cref="View"/> will be created using <see cref="LayoutStyle.Computed"/>
+		///   coordinates with the given string. The initial size (<see cref="View.Frame"/> will be 
+		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
+		/// </para>
+		/// <para>
+		///   If <c>Height</c> is greater than one, word wrapping is provided.
+		/// </para>
+		/// </remarks>
+		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
+		public View (ustring text) : base ()
+		{
+			viewText = new ViewText (this);
+			this.Text = text;
+
 			CanFocus = false;
 			LayoutStyle = LayoutStyle.Computed;
+			var r = ViewText.CalcRect (0, 0, text);
 			x = Pos.At (0);
 			y = Pos.At (0);
-			Height = 0;
-			Width = 0;
+			Width = r.Width;
+			Height = r.Height;
 		}
 
 		/// <summary>
@@ -432,6 +1002,7 @@ namespace Terminal.Gui {
 			if (SuperView == null)
 				return;
 			SuperView.SetNeedsLayout ();
+			viewText.ReFormat ();
 		}
 
 		/// <summary>
@@ -819,8 +1390,13 @@ namespace Terminal.Gui {
 		{
 			if (focused != null)
 				focused.PositionCursor ();
-			else
-				Move (frame.X, frame.Y);
+			else {
+				if (CanFocus && HasFocus) {
+					Move (viewText.HotKeyPos == -1 ? 1 : viewText.HotKeyPos, 0);
+				} else {
+					Move (frame.X, frame.Y);
+				}
+			}
 		}
 
 		/// <inheritdoc/>
@@ -971,6 +1547,13 @@ namespace Terminal.Gui {
 		{
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
+			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
+
+			// Draw any Text
+			// TODO: Figure out if this should go here or after OnDrawContent
+			viewText?.ReFormat ();
+			viewText?.Draw (bounds);
+
 			// Invoke DrawContentEvent
 			OnDrawContent (bounds);
 
@@ -1083,13 +1666,18 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
 			KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
 			if (Focused?.ProcessKey (keyEvent) == true)
 				return true;
+
+			var c = keyEvent.KeyValue;
+			if (c == '\n' || c == ' ' || Rune.ToUpper ((uint)c) == HotKey) {
+				Clicked?.Invoke ();
+				return true;
+			}
 
 			return false;
 		}
@@ -1381,7 +1969,7 @@ namespace Terminal.Gui {
 			}
 
 			if (edges.Any ()) {
-				if (!object.ReferenceEquals(edges.First ().From, edges.First ().To)) {
+				if (!object.ReferenceEquals (edges.First ().From, edges.First ().To)) {
 					throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {edges.First ().From}. Did you forget to add it to {this}?");
 				} else {
 					throw new InvalidOperationException ("TopologicalSort encountered a recursive cycle in the relative Pos/Dim in the views of " + this);
@@ -1430,6 +2018,9 @@ namespace Terminal.Gui {
 			if (!layoutNeeded)
 				return;
 
+			viewText.TextSize = Bounds.Size;
+			viewText.ReFormat ();
+
 			Rect oldBounds = Bounds;
 
 			// Sort out the dependencies of the X, Y, Width, Height properties
@@ -1471,146 +2062,40 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// A generic virtual method at the level of View to manipulate any hot-keys.
+		///   The text displayed by the <see cref="View"/>.
 		/// </summary>
-		/// <param name="text">The text to manipulate.</param>
-		/// <param name="hotKey">The hot-key to look for.</param>
-		/// <param name="hotPos">The returning hot-key position.</param>
-		/// <param name="showHotKey">The character immediately to the right relative to the hot-key position</param>
-		/// <returns>It aims to facilitate the preparation for <see cref="TextAlignment"/> procedures.</returns>
-		public virtual ustring GetTextFromHotKey (ustring text, Rune hotKey, out int hotPos, out Rune showHotKey)
-		{
-			Rune hot_key = (Rune)0;
-			int hot_pos = -1;
-			ustring shown_text = text;
-
-			// Use first hot_key char passed into 'hotKey'.
-			int i = 0;
-			foreach (Rune c in shown_text) {
-				if ((char)c != 0xFFFD) {
-					if (c == hotKey) {
-						hot_pos = i;
-					} else if (hot_pos > -1) {
-						hot_key = c;
-						break;
-					}
-				}
-				i++;
+		/// <remarks>
+		///  The text will only be displayed if the View has no subviews.
+		/// </remarks>
+		public virtual ustring Text {
+			get => viewText.Text;
+			set {
+				viewText.Text = value;
+				SetNeedsDisplay ();
 			}
-
-			if (hot_pos == -1) {
-				// Use first upper-case char if there are no hot-key in the text.
-				i = 0;
-				foreach (Rune c in shown_text) {
-					if ((char)c != 0xFFFD) {
-						if (Rune.IsUpper (c)) {
-							hot_key = c;
-							hot_pos = i;
-							break;
-						}
-					}
-					i++;
-				}
-			} else {
-				// Use char after 'hotKey'
-				ustring start = "";
-				i = 0;
-				foreach (Rune c in shown_text) {
-					start += ustring.Make (c);
-					i++;
-					if (i == hot_pos)
-						break;
-				}
-				var st = shown_text;
-				shown_text = start;
-				i = 0;
-				foreach (Rune c in st) {
-					i++;
-					if (i > hot_pos + 1) {
-						shown_text += ustring.Make (c);
-					}
-				}
-			}
-			hotPos = hot_pos;
-			showHotKey = hot_key;
-			return shown_text;
 		}
 
 		/// <summary>
-		/// A generic virtual method at the level of View to manipulate any hot-keys with <see cref="TextAlignment"/> process.
+		/// Controls the text-alignment property of the View. Changing this property will redisplay the <see cref="View"/>.
 		/// </summary>
-		/// <param name="shown_text">The text to manipulate to align.</param>
-		/// <param name="hot_pos">The passed in hot-key position.</param>
-		/// <param name="c_hot_pos">The returning hot-key position.</param>
-		/// <param name="textAlignment">The <see cref="TextAlignment"/> to align to.</param>
-		/// <returns>It performs the <see cref="TextAlignment"/> process to the caller.</returns>
-		public virtual ustring GetTextAlignment (ustring shown_text, int hot_pos, out int c_hot_pos, TextAlignment textAlignment)
-		{
-			int start;
-			var caption = shown_text;
-			c_hot_pos = hot_pos;
-
-			if (Frame.Width > shown_text.Length + 1) {
-				switch (textAlignment) {
-				case TextAlignment.Left:
-					caption += new string (' ', Frame.Width - caption.RuneCount);
-					break;
-				case TextAlignment.Right:
-					start = Frame.Width - caption.RuneCount;
-					caption = $"{new string (' ', Frame.Width - caption.RuneCount)}{caption}";
-					if (c_hot_pos > -1) {
-						c_hot_pos += start;
-					}
-					break;
-				case TextAlignment.Centered:
-					start = Frame.Width / 2 - caption.RuneCount / 2;
-					caption = $"{new string (' ', start)}{caption}{new string (' ', Frame.Width - caption.RuneCount - start)}";
-					if (c_hot_pos > -1) {
-						c_hot_pos += start;
-					}
-					break;
-				case TextAlignment.Justified:
-					var words = caption.Split (" ");
-					var wLen = GetWordsLength (words, c_hot_pos, out int runeCount, out int w_hot_pos);
-					var space = (Frame.Width - runeCount) / (caption.Length - wLen);
-					caption = "";
-					for (int i = 0; i < words.Length; i++) {
-						if (i == words.Length - 1) {
-							caption += new string (' ', Frame.Width - caption.RuneCount - 1);
-							caption += words [i];
-						} else {
-							caption += words [i];
-						}
-						if (i < words.Length - 1) {
-							caption += new string (' ', space);
-						}
-					}
-					if (c_hot_pos > -1) {
-						c_hot_pos += w_hot_pos * space - space - w_hot_pos + 1;
-					}
-					break;
-				}
+		/// <value>The text alignment.</value>
+		public virtual TextAlignment TextAlignment {
+			get => viewText.TextAlignment;
+			set {
+				viewText.TextAlignment = value;
+				SetNeedsDisplay ();
 			}
-
-			return caption;
 		}
 
-		int GetWordsLength (ustring [] words, int hotPos, out int runeCount, out int wordHotPos)
-		{
-			int length = 0;
-			int rCount = 0;
-			int wHotPos = -1;
-			for (int i = 0; i < words.Length; i++) {
-				if (wHotPos == -1 && rCount + words [i].RuneCount >= hotPos)
-					wHotPos = i;
-				length += words [i].Length;
-				rCount += words [i].RuneCount;
+		/// <summary>
+		///   The color used for the <see cref="Label"/>.
+		/// </summary>
+		public virtual Attribute TextColor {
+			get => viewText.TextColor;
+			set {
+				viewText.TextColor = value;
+				SetNeedsDisplay ();
 			}
-			if (wHotPos == -1 && hotPos > -1)
-				wHotPos = words.Length;
-			runeCount = rCount;
-			wordHotPos = wHotPos;
-			return length;
 		}
 
 		/// <summary>
@@ -1682,6 +2167,16 @@ namespace Terminal.Gui {
 			if (MouseEvent (mouseEvent))
 				return true;
 
+
+			if (mouseEvent.Flags == MouseFlags.Button1Clicked) {
+				if (!HasFocus) {
+					SuperView.SetFocus (this);
+					SetNeedsDisplay ();
+				}
+
+				Clicked?.Invoke ();
+				return true;
+			}
 			return false;
 		}
 	}

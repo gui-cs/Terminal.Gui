@@ -63,7 +63,8 @@ namespace Terminal.Gui {
 		/// <param name="text">Initial text contents.</param>
 		public TextField (ustring text)
 		{
-			Initialize (text, Frame.Width);
+			Initialize (text, 0);
+			Width = text.Length + 1;
 		}
 
 		/// <summary>
@@ -122,7 +123,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
-		public ustring Text {
+		public new ustring Text {
 			get {
 				return ustring.Make (text);
 			}

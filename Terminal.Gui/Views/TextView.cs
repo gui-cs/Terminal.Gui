@@ -326,7 +326,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
-		public ustring Text {
+		public override ustring Text {
 			get {
 				return model.ToString ();
 			}

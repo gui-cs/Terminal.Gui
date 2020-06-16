@@ -440,7 +440,7 @@ namespace Terminal.Gui {
 		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message) : base (title, Driver.Cols - 20, Driver.Rows - 5, null)
 		{
 			this.message = new Label (Rect.Empty, "MESSAGE" + message);
-			var msgLines = Label.MeasureLines (message, Driver.Cols - 20);
+			var msgLines = ViewText.MaxLines (message, Driver.Cols - 20);
 
 			dirLabel = new Label ("Directory: ") {
 				X = 1,

@@ -88,7 +88,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		///   The text displayed by this <see cref="CheckBox"/>
 		/// </summary>
-		public ustring Text {
+		public new ustring Text {
 			get {
 				return text;
 			}

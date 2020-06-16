@@ -270,7 +270,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The currently selected list item
 		/// </summary>
-		public ustring Text
+		public new ustring Text
 		{
 			get
 			{
