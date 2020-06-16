@@ -269,31 +269,29 @@ namespace Terminal.Gui {
 
 		internal void PositionToplevels ()
 		{
-			if (this != Application.Top) {
-				EnsureVisibleBounds (this, Frame.X, Frame.Y, out int nx, out int ny);
-				if ((nx != Frame.X || ny != Frame.Y) && LayoutStyle != LayoutStyle.Computed) {
-					X = nx;
-					Y = ny;
+			PositionToplevel (this);
+			foreach (var top in Subviews) {
+				if (top is Toplevel) {
+					PositionToplevel ((Toplevel)top);
 				}
-			} else {
-				foreach (var top in Subviews) {
-					if (top is Toplevel) {
-						EnsureVisibleBounds ((Toplevel)top, top.Frame.X, top.Frame.Y, out int nx, out int ny);
-						if ((nx != top.Frame.X || ny != top.Frame.Y) && top.LayoutStyle != LayoutStyle.Computed) {
-							top.X = nx;
-							top.Y = ny;
-						}
-						if (StatusBar != null) {
-							if (ny + top.Frame.Height > Driver.Rows - 1) {
-								if (top.Height is Dim.DimFill)
-									top.Height = Dim.Fill () - 1;
-							}
-							if (StatusBar.Frame.Y != Driver.Rows - 1) {
-								StatusBar.Y = Driver.Rows - 1;
-								SetNeedsDisplay ();
-							}
-						}
-					}
+			}
+		}
+
+		private void PositionToplevel (Toplevel top)
+		{
+			EnsureVisibleBounds (top, top.Frame.X, top.Frame.Y, out int nx, out int ny);
+			if ((nx != top.Frame.X || ny != top.Frame.Y) && top.LayoutStyle != LayoutStyle.Computed) {
+				top.X = nx;
+				top.Y = ny;
+			}
+			if (StatusBar != null) {
+				if (ny + top.Frame.Height > Driver.Rows - 1) {
+					if (top.Height is Dim.DimFill)
+						top.Height = Dim.Fill () - 1;
+				}
+				if (StatusBar.Frame.Y != Driver.Rows - 1) {
+					StatusBar.Y = Driver.Rows - 1;
+					SetNeedsDisplay ();
 				}
 			}
 		}
@@ -311,6 +309,7 @@ namespace Terminal.Gui {
 					// (the bounds passed to us).
 					Clear (bounds);
 					Driver.SetAttribute (Colors.Base.Normal);
+					PositionToplevels ();
 				}
 				foreach (var view in Subviews) {
 					if (view.Frame.IntersectsWith (bounds)) {
