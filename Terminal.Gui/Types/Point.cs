@@ -111,6 +111,9 @@ namespace Terminal.Gui
 
 		public static explicit operator Size (Point p)
 		{
+			if (p.X < 0 || p.Y < 0)
+				throw new ArgumentException ("Either Width and Height must be greater or equal to 0.");
+
 			return new Size (p.X, p.Y);
 		}
 

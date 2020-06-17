@@ -87,6 +87,8 @@ namespace UICatalog {
 				scenario.Run ();
 				scenario = GetScenarioToRun ();
 			}
+			if (!_top.Running)
+				Application.Shutdown (true);
 		}
 
 		/// <summary>
@@ -118,8 +120,8 @@ namespace UICatalog {
 				}
 			};
 
-			Application.Run (_top, true);
-			Application.Shutdown ();
+			Application.Run (_top, false);
+			Application.Shutdown (false);
 			return _runningScenario;
 		}
 

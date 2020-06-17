@@ -85,8 +85,8 @@ namespace Terminal.Gui {
 
 			var dim1 = Dim.Width (view1);
 			var dim2 = Dim.Width (view1);
-			// BUGBUG: Dim.Width should support Equals() and this should change to Euqal.
-			Assert.NotEqual (dim1, dim2);
+			// FIXED: Dim.Width should support Equals() and this should change to Equal.
+			Assert.Equal (dim1, dim2);
 
 			dim2 = Dim.Width (view2);
 			Assert.NotEqual (dim1, dim2);
@@ -96,18 +96,19 @@ namespace Terminal.Gui {
 			testRect2 = new Rect (0, 1, 2, 3);
 			dim1 = Dim.Width (view1);
 			dim2 = Dim.Width (view1);
-			// BUGBUG: Dim.Width should support Equals() and this should change to Euqal.
-			Assert.NotEqual (dim1, dim2);
+			// FIXED: Dim.Width should support Equals() and this should change to Equal.
+			Assert.Equal (dim1, dim2);
 
-			testRect1 = new Rect (0, -1, -2, -3);
+			Assert.Throws<ArgumentException> (() => new Rect (0, -1, -2, -3));
+			testRect1 = new Rect (0, -1, 2, 3);
 			view1 = new View (testRect1);
-			testRect2 = new Rect (0, -1, -2, -3);
+			testRect2 = new Rect (0, -1, 2, 3);
 			dim1 = Dim.Width (view1);
 			dim2 = Dim.Width (view1);
-			// BUGBUG: Dim.Width should support Equals() and this should change to Euqal.
-			Assert.NotEqual (dim1, dim2);
+			// FIXED: Dim.Width should support Equals() and this should change to Equal.
+			Assert.Equal (dim1, dim2);
 
-			testRect1 = new Rect (0, -1, -2, -3);
+			testRect1 = new Rect (0, -1, 2, 3);
 			view1 = new View (testRect1);
 			testRect2 = Rect.Empty;
 			view2 = new View (testRect2);
@@ -166,13 +167,13 @@ namespace Terminal.Gui {
 		{
 			float f = 0;
 			var dim = Dim.Percent (f);
-			Assert.Equal ($"Dim.Factor({f / 100:0.###})", dim.ToString ());
+			Assert.Equal ($"Dim.Factor(factor={f / 100:0.###}, remaining={false})", dim.ToString ());
 			f = 0.5F;
 			dim = Dim.Percent (f);
-			Assert.Equal ($"Dim.Factor({f / 100:0.###})", dim.ToString ());
+			Assert.Equal ($"Dim.Factor(factor={f / 100:0.###}, remaining={false})", dim.ToString ());
 			f = 100;
 			dim = Dim.Percent (f);
-			Assert.Equal ($"Dim.Factor({f / 100:0.###})", dim.ToString ());
+			Assert.Equal ($"Dim.Factor(factor={f / 100:0.###}, remaining={false})", dim.ToString ());
 		}
 
 		[Fact]
@@ -198,6 +199,16 @@ namespace Terminal.Gui {
 			dim1 = Dim.Percent (n1);
 			dim2 = Dim.Percent (n2);
 			Assert.Equal (dim1, dim2);
+
+			n1 = n2 = 0.3f;
+			dim1 = Dim.Percent (n1, true);
+			dim2 = Dim.Percent (n2, true);
+			Assert.Equal (dim1, dim2);
+
+			n1 = n2 = 0.3f;
+			dim1 = Dim.Percent (n1);
+			dim2 = Dim.Percent (n2, true);
+			Assert.NotEqual (dim1, dim2);
 
 			n1 = 0;
 			n2 = 1;

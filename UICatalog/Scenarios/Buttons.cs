@@ -210,7 +210,7 @@ namespace UICatalog {
 			var moveHotKeyBtn = new Button (mhkb) {
 				X = 2,
 				Y = Pos.Bottom (radioGroup) + 1,
-				Width = mhkb.Length + 10,
+				Width = Dim.Width (computedFrame) - 2,
 				ColorScheme = Colors.TopLevel,
 			};
 			moveHotKeyBtn.Clicked = () => {
@@ -222,7 +222,7 @@ namespace UICatalog {
 			var moveUnicodeHotKeyBtn = new Button (muhkb) {
 				X = Pos.Left (absoluteFrame) + 1,
 				Y = Pos.Bottom (radioGroup) + 1,
-				Width = muhkb.RuneCount + 30,
+				Width = Dim.Width (absoluteFrame) - 2, // BUGBUG: Not always the width isn't calculated correctly.
 				ColorScheme = Colors.TopLevel,
 			};
 			moveUnicodeHotKeyBtn.Clicked = () => {
