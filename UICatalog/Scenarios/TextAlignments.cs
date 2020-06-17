@@ -9,8 +9,11 @@ namespace UICatalog {
 	class TextAlignments : Scenario {
 		public override void Setup ()
 		{
+			Win.X = 10;
+			Win.Width = Dim.Fill (20);
+
 			string txt = "Hello world, how are you today? Pretty neat!";
-			string unicodeSampleText = "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.";
+			string unicodeSampleText = "A Unicode sentence (Ð¿ÑÐ Ð²ÐµÑ) has words.";
 
 			var alignments = Enum.GetValues (typeof (Terminal.Gui.TextAlignment)).Cast<Terminal.Gui.TextAlignment> ().ToList ();
 			var singleLines = new Label [alignments.Count];

@@ -414,7 +414,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public View (Rect frame)
 		{
-			viewText = new TextFormatter (this);
+			viewText = new TextFormatter ();
 			this.Text = ustring.Empty;
 
 			this.Frame = frame;
@@ -477,7 +477,7 @@ namespace Terminal.Gui {
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
 		public View (Rect rect, ustring text) : this (rect)
 		{
-			viewText = new TextFormatter (this);
+			viewText = new TextFormatter ();
 			this.Text = text;
 		}
 
@@ -497,7 +497,7 @@ namespace Terminal.Gui {
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
 		public View (ustring text) : base ()
 		{
-			viewText = new TextFormatter (this);
+			viewText = new TextFormatter ();
 			this.Text = text;
 
 			CanFocus = false;
@@ -528,7 +528,7 @@ namespace Terminal.Gui {
 			if (SuperView == null)
 				return;
 			SuperView.SetNeedsLayout ();
-			viewText.ReFormat ();
+			viewText.SetNeedsFormat ();
 		}
 
 		/// <summary>
@@ -1079,7 +1079,7 @@ namespace Terminal.Gui {
 				Clear ();
 				// Draw any Text
 				// TODO: Figure out if this should go here or after OnDrawContent
-				viewText?.ReFormat ();
+				viewText?.SetNeedsFormat ();
 				viewText?.Draw (ViewToScreen (Bounds), ColorScheme.Normal, ColorScheme.HotNormal);
 			}
 
@@ -1549,7 +1549,6 @@ namespace Terminal.Gui {
 				return;
 
 			viewText.Size = Bounds.Size;
-			viewText.ReFormat ();
 
 			Rect oldBounds = Bounds;
 

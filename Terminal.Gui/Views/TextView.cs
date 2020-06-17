@@ -128,10 +128,11 @@ namespace Terminal.Gui {
 		public override string ToString ()
 		{
 			var sb = new StringBuilder ();
-			foreach (var line in lines) 
-			{
-				sb.Append (ustring.Make(line));
-				sb.AppendLine ();
+			for (int i = 0; i < lines.Count; i++) {
+				sb.Append (ustring.Make (lines[i]));
+				if ((i + 1) < lines.Count) {
+					sb.AppendLine ();
+				}
 			}
 			return sb.ToString ();
 		}
@@ -148,7 +149,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>The line.</returns>
 		/// <param name="line">Line number to retrieve.</param>
-		public List<Rune> GetLine (int line) => line < Count ? lines [line]: lines[Count-1];
+		public List<Rune> GetLine (int line) => line < Count ? lines [line] : lines [Count - 1];
 
 		/// <summary>
 		/// Adds a line to the model at the specified position.
@@ -366,7 +367,7 @@ namespace Terminal.Gui {
 			if (stream == null)
 				throw new ArgumentNullException (nameof (stream));
 			ResetPosition ();
-			model.LoadStream(stream);
+			model.LoadStream (stream);
 			SetNeedsDisplay ();
 		}
 
@@ -374,7 +375,7 @@ namespace Terminal.Gui {
 		/// Closes the contents of the stream into the  <see cref="TextView"/>.
 		/// </summary>
 		/// <returns><c>true</c>, if stream was closed, <c>false</c> otherwise.</returns>
-		public bool CloseFile()
+		public bool CloseFile ()
 		{
 			ResetPosition ();
 			var res = model.CloseFile ();
@@ -399,7 +400,7 @@ namespace Terminal.Gui {
 		public override void PositionCursor ()
 		{
 			if (selecting) {
-				var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow)-topRow, 0), Frame.Height);
+				var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
 				var maxRow = Math.Min (Math.Max (Math.Max (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
 
 				SetNeedsDisplay (new Rect (0, minRow, Frame.Width, maxRow));
@@ -478,12 +479,12 @@ namespace Terminal.Gui {
 			var endCol = (int)(end & 0xffffffff);
 			var line = model.GetLine (startRow);
 
-			if (startRow == maxrow) 
+			if (startRow == maxrow)
 				return StringFromRunes (line.GetRange (startCol, endCol));
 
 			ustring res = StringFromRunes (line.GetRange (startCol, line.Count - startCol));
 
-			for (int row = startRow+1; row < maxrow; row++) {
+			for (int row = startRow + 1; row < maxrow; row++) {
 				res = res + ustring.Make ((Rune)10) + StringFromRunes (model.GetLine (row));
 			}
 			line = model.GetLine (maxrow);
@@ -516,7 +517,7 @@ namespace Terminal.Gui {
 			var line2 = model.GetLine (maxrow);
 			line.AddRange (line2.Skip (endCol));
 			for (int row = startRow + 1; row <= maxrow; row++) {
-				model.RemoveLine (startRow+1);
+				model.RemoveLine (startRow + 1);
 			}
 			if (currentEncoded == end) {
 				currentRow -= maxrow - (startRow);
@@ -533,33 +534,29 @@ namespace Terminal.Gui {
 
 			int bottom = bounds.Bottom;
 			int right = bounds.Right;
-			for (int row = bounds.Top; row < bottom; row++) 
-			{
+			for (int row = bounds.Top; row < bottom; row++) {
 				int textLine = topRow + row;
-				if (textLine >= model.Count) 
-				{
+				if (textLine >= model.Count) {
 					ColorNormal ();
 					ClearRegion (bounds.Left, row, bounds.Right, row + 1);
 					continue;
 				}
 				var line = model.GetLine (textLine);
 				int lineRuneCount = line.Count;
-				if (line.Count < bounds.Left)
-				{
+				if (line.Count < bounds.Left) {
 					ClearRegion (bounds.Left, row, bounds.Right, row + 1);
 					continue;
 				}
 
 				Move (bounds.Left, row);
-				for (int col = bounds.Left; col < right; col++) 
-				{
+				for (int col = bounds.Left; col < right; col++) {
 					var lineCol = leftColumn + col;
 					var rune = lineCol >= lineRuneCount ? ' ' : line [lineCol];
 					if (selecting && PointInSelection (col, row))
 						ColorSelection ();
 					else
 						ColorNormal ();
-					
+
 					AddRune (col, row, rune);
 				}
 			}
@@ -639,12 +636,12 @@ namespace Terminal.Gui {
 			for (int i = 1; i < lines.Count; i++)
 				model.AddLine (currentRow + i, lines [i]);
 
-			var last = model.GetLine (currentRow + lines.Count-1);
+			var last = model.GetLine (currentRow + lines.Count - 1);
 			var lastp = last.Count;
 			last.InsertRange (last.Count, rest);
 
 			// Now adjjust column and row positions
-			currentRow += lines.Count-1;
+			currentRow += lines.Count - 1;
 			currentColumn = lastp;
 			if (currentRow - topRow > Frame.Height) {
 				topRow = currentRow - Frame.Height + 1;
@@ -653,7 +650,7 @@ namespace Terminal.Gui {
 			}
 			if (currentColumn < leftColumn)
 				leftColumn = currentColumn;
-			if (currentColumn-leftColumn >= Frame.Width)
+			if (currentColumn - leftColumn >= Frame.Width)
 				leftColumn = currentColumn - Frame.Width + 1;
 			SetNeedsDisplay ();
 		}
@@ -970,7 +967,7 @@ namespace Terminal.Gui {
 
 				break;
 
-			case (Key)((int)'f' + Key.AltMask): 
+			case (Key)((int)'f' + Key.AltMask):
 				newPos = WordForward (currentColumn, currentRow);
 				if (newPos.HasValue) {
 					currentColumn = newPos.Value.col;
@@ -1096,8 +1093,8 @@ namespace Terminal.Gui {
 				col++;
 				rune = line [col];
 				return true;
-			} 
-			while (row + 1 < model.Count){
+			}
+			while (row + 1 < model.Count) {
 				col = 0;
 				row++;
 				line = model.GetLine (row);
@@ -1145,7 +1142,7 @@ namespace Terminal.Gui {
 
 			var srow = row;
 			if (Rune.IsPunctuation (rune) || Rune.IsWhiteSpace (rune)) {
-				while (MoveNext (ref col, ref row, out rune)){
+				while (MoveNext (ref col, ref row, out rune)) {
 					if (Rune.IsLetterOrDigit (rune))
 						break;
 				}
@@ -1168,18 +1165,18 @@ namespace Terminal.Gui {
 		{
 			if (fromRow == 0 && fromCol == 0)
 				return null;
-			
+
 			var col = fromCol;
 			var row = fromRow;
 			var line = GetCurrentLine ();
 			var rune = RuneAt (col, row);
 
 			if (Rune.IsPunctuation (rune) || Rune.IsSymbol (rune) || Rune.IsWhiteSpace (rune)) {
-				while (MovePrev (ref col, ref row, out rune)){
+				while (MovePrev (ref col, ref row, out rune)) {
 					if (Rune.IsLetterOrDigit (rune))
 						break;
 				}
-				while (MovePrev (ref col, ref row, out rune)){
+				while (MovePrev (ref col, ref row, out rune)) {
 					if (!Rune.IsLetterOrDigit (rune))
 						break;
 				}

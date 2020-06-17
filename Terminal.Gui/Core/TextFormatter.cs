@@ -6,33 +6,25 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Suppports text formatting, including horizontal alignment and word wrap for <see cref="View"/>.
+	/// Provides text formatting capabilites for console apps. Supports, hotkeys, horizontal alignment, multille lines, and word-based line wrap.
 	/// </summary>
 	public class TextFormatter {
 		List<ustring> lines = new List<ustring> ();
 		ustring text;
 		TextAlignment textAlignment;
 		Attribute textColor = -1;
-		bool recalcPending = false;
+		bool needsFormat = true;
 		Key hotKey;
+		Size size;
 
 		/// <summary>
-		///  Inititalizes a new <see cref="TextFormatter"/> object.
-		/// </summary>
-		/// <param name="view"></param>
-		public TextFormatter (View view)
-		{
-			recalcPending = true;
-		}
-
-		/// <summary>
-		///   The text to be displayed.
+		///   The text to be displayed. This text is never modified.
 		/// </summary>
 		public virtual ustring Text {
 			get => text;
 			set {
 				text = value;
-				recalcPending = true;
+				needsFormat = true;
 			}
 		}
 
@@ -45,15 +37,20 @@ namespace Terminal.Gui {
 			get => textAlignment;
 			set {
 				textAlignment = value;
-				recalcPending = true;
+				needsFormat = true;
 			}
 		}
 
 		/// <summary>
 		///  Gets the size of the area the text will be drawn in. 
 		/// </summary>
-		public Size Size { get; internal set; }
-
+		public Size Size {
+			get => size;
+			internal set {
+				size = value;
+				needsFormat = true;
+			}
+		}
 
 		/// <summary>
 		/// The specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'. 
@@ -71,41 +68,83 @@ namespace Terminal.Gui {
 		public Key HotKey { get => hotKey; internal set => hotKey = value; }
 
 		/// <summary>
-		/// Causes the Text to be formatted, based on <see cref="Alignment"/> and <see cref="Size"/>.
+		/// Specifies the mask to apply to the hotkey to tag it as the hotkey. The default value of <c>0x100000</c> causes
+		/// the underlying Rune to be identified as a "private use" Unicode character.
+		/// </summary>HotKeyTagMask
+		public uint HotKeyTagMask { get; set; } = 0x100000;
+
+		/// <summary>
+		/// Gets the formatted lines.
 		/// </summary>
-		public void ReFormat ()
-		{
-			// With this check, we protect against subclasses with overrides of Text
-			if (ustring.IsNullOrEmpty (Text)) {
-				return;
+		public List<ustring> Lines {
+			get {
+				// With this check, we protect against subclasses with overrides of Text
+				if (ustring.IsNullOrEmpty (Text)) {
+					lines = new List<ustring> ();
+					lines.Add (ustring.Empty);
+					needsFormat = false;
+					return lines;
+				}
+
+				if (needsFormat) {
+					var shown_text = text;
+					if (FindHotKey (text, HotKeySpecifier, true, out hotKeyPos, out hotKey)) {
+						shown_text = RemoveHotKeySpecifier (Text, hotKeyPos, HotKeySpecifier);
+						shown_text = ReplaceHotKeyWithTag (shown_text, hotKeyPos);
+					}
+					lines = Format (shown_text, Size.Width, textAlignment, Size.Height > 1);
+				}
+				needsFormat = false;
+				return lines;
 			}
-			recalcPending = false;
-			var shown_text = text;
-			if (FindHotKey (text, HotKeySpecifier, true, out hotKeyPos, out hotKey)) {
-				shown_text = RemoveHotKeySpecifier (Text, hotKeyPos, HotKeySpecifier);
-				shown_text = ReplaceHotKeyWithTag (shown_text, hotKeyPos);
-			}
-			Reformat (shown_text, lines, Size.Width, textAlignment, Size.Height > 1);
 		}
 
-		static ustring StripWhiteCRLF (ustring str)
+		/// <summary>
+		/// Sets a flag indicating the text needs to be formatted. 
+		/// Subsequent calls to <see cref="Draw"/>, <see cref="Lines"/>, etc... will cause the formatting to happen.>
+		/// </summary>
+		public void SetNeedsFormat ()
 		{
-			var runes = new List<Rune> ();
-			foreach (var r in str.ToRunes ()) {
-				if (r != '\r' && r != '\n') {
-					runes.Add (r);
+			needsFormat = true;
+		}
+
+
+		static ustring StripCRLF (ustring str)
+		{
+			var runes = str.ToRuneList ();
+			for (int i = 0; i < runes.Count; i++) {
+				switch (runes [i]) {
+				case '\n':
+					runes.RemoveAt (i);
+					break;
+
+				case '\r':
+					if ((i + 1) < runes.Count && runes [i + 1] == '\n') {
+						runes.RemoveAt (i);
+						runes.RemoveAt (i + 1);
+						i++;
+					}
+					break;
 				}
 			}
-			return ustring.Make (runes); ;
+			return ustring.Make (runes);
 		}
 		static ustring ReplaceCRLFWithSpace (ustring str)
 		{
-			var runes = new List<Rune> ();
-			foreach (var r in str.ToRunes ()) {
-				if (r == '\r' || r == '\n') {
-					runes.Add (new Rune (' '));
-				} else {
-					runes.Add (r);
+			var runes = str.ToRuneList ();
+			for (int i = 0; i < runes.Count; i++) {
+				switch (runes [i]) {
+				case '\n':
+					runes [i] = (Rune)' ';
+					break;
+
+				case '\r':
+					if ((i + 1) < runes.Count && runes [i + 1] == '\n') {
+						runes [i] = (Rune)' ';
+						runes.RemoveAt (i + 1);
+						i++;
+					}
+					break;
 				}
 			}
 			return ustring.Make (runes); ;
@@ -116,9 +155,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="text">The text to word warp</param>
 		/// <param name="width">The width to contrain the text to</param>
-		/// <returns>Returns a list of lines.</returns>
+		/// <returns>Returns a list of word wrapped lines.</returns>
 		/// <remarks>
-		/// Newlines ('\n' and '\r\n') sequences are honored.
+		/// <para>
+		/// This method does not do any justification.
+		/// </para>
+		/// <para>
+		/// Newlines ('\n' and '\r\n') sequences are honored, adding the appropriate lines to the output.
+		/// </para>
 		/// </remarks>
 		public static List<ustring> WordWrap (ustring text, int width)
 		{
@@ -133,24 +177,32 @@ namespace Terminal.Gui {
 				return lines;
 			}
 
-			text = StripWhiteCRLF (text);
+			var runes = StripCRLF (text).ToRunes ();
 
-			while ((end = start + width) < text.RuneCount) {
-				while (text [end] != ' ' && end > start)
+			while ((end = start + width) < runes.Length) {
+				while (runes [end] != ' ' && end > start)
 					end -= 1;
 				if (end == start)
 					end = start + width;
 
-				lines.Add (text [start, end].TrimSpace ());
+
+				lines.Add (ustring.Make (runes [start..end]).TrimSpace ());
 				start = end;
 			}
 
 			if (start < text.RuneCount)
-				lines.Add (text.Substring (start).TrimSpace ());
+				lines.Add (ustring.Make (runes [start..]).TrimSpace ());
 
 			return lines;
 		}
 
+		/// <summary>
+		/// Justifies text within a specified width. 
+		/// </summary>
+		/// <param name="text">The text to justify.</param>
+		/// <param name="width">If the text length is greater that <c>width</c> it will be clipped.</param>
+		/// <param name="talign">Alignment.</param>
+		/// <returns>Justified and clipped text.</returns>
 		public static ustring ClipAndJustify (ustring text, int width, TextAlignment talign)
 		{
 			if (width < 0) {
@@ -160,9 +212,10 @@ namespace Terminal.Gui {
 				return text;
 			}
 
-			int slen = text.RuneCount;
+			var runes = text.ToRunes ();
+			int slen = runes.Length;
 			if (slen > width) {
-				return text [0, width];
+				return ustring.Make (runes [0..width]); // text [0, width];
 			} else {
 				if (talign == TextAlignment.Justified) {
 					return Justify (text, width);
@@ -189,8 +242,8 @@ namespace Terminal.Gui {
 			}
 
 			// TODO: Use ustring
-			var words = text.ToString ().Split (whitespace, StringSplitOptions.RemoveEmptyEntries);
-			int textCount = words.Sum (arg => arg.Length);
+			var words = text.Split (ustring.Make (' '));// whitespace, StringSplitOptions.RemoveEmptyEntries);
+			int textCount = words.Sum (arg => arg.RuneCount);
 
 			var spaces = words.Length > 1 ? (width - textCount) / (words.Length - 1) : 0;
 			var extras = words.Length > 1 ? (width - textCount) % words.Length : 0;
@@ -215,29 +268,47 @@ namespace Terminal.Gui {
 		private int hotKeyPos;
 
 		/// <summary>
-		/// Reformats text into lines, applying text alignment and word wraping.
+		/// Reformats text into lines, applying text alignment and optionally wrapping text to new lines on word boundaries.
 		/// </summary>
-		/// <param name="textStr"></param>
-		/// <param name="lineResult"></param>
-		/// <param name="width"></param>
-		/// <param name="talign"></param>
-		/// <param name="wordWrap">if <c>false</c>, forces text to fit a single line. Line breaks are converted to spaces.</param>
-		static void Reformat (ustring textStr, List<ustring> lineResult, int width, TextAlignment talign, bool wordWrap)
+		/// <param name="text"></param>
+		/// <param name="width">The width to bound the text to for word wrapping and clipping.</param>
+		/// <param name="talign">Specifies how the text will be aligned horizontally.</param>
+		/// <param name="wordWrap">If <c>true</c>, the text will be wrapped to new lines as need. If <c>false</c>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to <c>width</c></param>
+		/// <returns>A list of word wrapped lines.</returns>
+		/// <remarks>
+		/// <para>
+		/// An empty <c>text</c> string will result in one empty line.
+		/// </para>
+		/// <para>
+		/// If <c>width</c> is 0, a single, empty line will be returned.
+		/// </para>
+		/// </remarks>
+		public static List<ustring> Format (ustring text, int width, TextAlignment talign, bool wordWrap)
 		{
-			lineResult.Clear ();
-
-			if (wordWrap == false) {
-				textStr = ReplaceCRLFWithSpace (textStr);
-				lineResult.Add (ClipAndJustify (textStr, width, talign));
-				return;
+			if (width < 0) {
+				throw new ArgumentOutOfRangeException ("width cannot be negative");
 			}
 
-			int runeCount = textStr.RuneCount;
+			List<ustring> lineResult = new List<ustring> ();
+
+			if (ustring.IsNullOrEmpty (text) || width == 0) {
+				lineResult.Add (ustring.Empty);
+				return lineResult;
+			}
+
+			if (wordWrap == false) {
+				text = ReplaceCRLFWithSpace (text);
+				lineResult.Add (ClipAndJustify (text, width, talign));
+				return lineResult;
+			}
+
+			var runes = text.ToRunes ();
+			int runeCount = runes.Length;
 			int lp = 0;
 			for (int i = 0; i < runeCount; i++) {
-				Rune c = textStr [i];
+				Rune c = text [i];
 				if (c == '\n') {
-					var wrappedLines = WordWrap (textStr [lp, i], width);
+					var wrappedLines = WordWrap (ustring.Make (runes [lp..i]), width);
 					foreach (var line in wrappedLines) {
 						lineResult.Add (ClipAndJustify (line, width, talign));
 					}
@@ -247,9 +318,11 @@ namespace Terminal.Gui {
 					lp = i + 1;
 				}
 			}
-			foreach (var line in WordWrap (textStr [lp, runeCount], width)) {
+			foreach (var line in WordWrap (ustring.Make (runes [lp..runeCount]), width)) {
 				lineResult.Add (ClipAndJustify (line, width, talign));
 			}
+
+			return lineResult;
 		}
 
 		/// <summary>
@@ -260,8 +333,7 @@ namespace Terminal.Gui {
 		/// <param name="width">The minimum width for the text.</param>
 		public static int MaxLines (ustring text, int width)
 		{
-			var result = new List<ustring> ();
-			TextFormatter.Reformat (text, result, width, TextAlignment.Left, true);
+			var result = TextFormatter.Format (text, width, TextAlignment.Left, true);
 			return result.Count;
 		}
 
@@ -273,59 +345,10 @@ namespace Terminal.Gui {
 		/// <param name="width">The minimum width for the text.</param>
 		public static int MaxWidth (ustring text, int width)
 		{
-			var result = new List<ustring> ();
-			TextFormatter.Reformat (text, result, width, TextAlignment.Left, true);
+			var result = TextFormatter.Format (text, width, TextAlignment.Left, true);
 			return result.Max (s => s.RuneCount);
 		}
 
-		internal void Draw (Rect bounds, Attribute normalColor, Attribute hotColor)
-		{
-			// With this check, we protect against subclasses with overrides of Text
-			if (ustring.IsNullOrEmpty (text)) {
-				return;
-			}
-
-			if (recalcPending) {
-				ReFormat ();
-			}
-
-			Application.Driver.SetAttribute (normalColor);
-
-			for (int line = 0; line < lines.Count; line++) {
-				if (line < (bounds.Height - bounds.Top) || line >= bounds.Height)
-					continue;
-				var str = lines [line];
-				int x;
-				switch (textAlignment) {
-				case TextAlignment.Left:
-					x = bounds.Left;
-					break;
-				case TextAlignment.Justified:
-					x = bounds.Left;
-					break;
-				case TextAlignment.Right:
-					x = bounds.Right - str.RuneCount;
-					break;
-				case TextAlignment.Centered:
-					x = bounds.Left + (bounds.Width - str.RuneCount) / 2;
-					break;
-				default:
-					throw new ArgumentOutOfRangeException ();
-				}
-				int col = 0;
-				foreach (var rune in str) {
-					Application.Driver.Move (x + col, bounds.Y + line);
-					if ((rune & 0x100000) == 0x100000) {
-						Application.Driver.SetAttribute (hotColor);
-						Application.Driver.AddRune ((Rune)((uint)rune & ~0x100000));
-						Application.Driver.SetAttribute (normalColor);
-					} else {
-						Application.Driver.AddRune (rune);
-					}
-					col++;
-				}
-			}
-		}
 
 		/// <summary>
 		///  Calculates the rectangle requried to hold text, assuming no word wrapping.
@@ -361,6 +384,16 @@ namespace Terminal.Gui {
 			return new Rect (x, y, mw, ml);
 		}
 
+		/// <summary>
+		/// Finds the hotkey and its location in text. 
+		/// </summary>
+		/// <param name="text">The text to look in.</param>
+		/// <param name="hotKeySpecifier">The hotkey specifier (e.g. '_') to look for.</param>
+		/// <param name="firstUpperCase">If <c>true</c> the legacy behavior of identifying the first upper case character as the hotkey will be eanbled. 
+		/// Regardless of the value of this parameter, <c>hotKeySpecifier</c> takes precidence.</param>
+		/// <param name="hotPos">Outputs the Rune index into <c>text</c>.</param>
+		/// <param name="hotKey">Outputs the hotKey.</param>
+		/// <returns><c>true</c> if a hotkey was found; <c>false</c> otherwise.</returns>
 		public static bool FindHotKey (ustring text, Rune hotKeySpecifier, bool firstUpperCase, out int hotPos, out Key hotKey)
 		{
 			if (ustring.IsNullOrEmpty (text) || hotKeySpecifier == (Rune)0xFFFF) {
@@ -418,12 +451,23 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		public static ustring ReplaceHotKeyWithTag (ustring text, int hotPos)
+		/// <summary>
+		/// Replaces the Rune at the index specfiied by the <c>hotPos</c> parameter with a tag identifying 
+		/// it as the hotkey. 
+		/// </summary>
+		/// <param name="text">The text to tag the hotkey in.</param>
+		/// <param name="hotPos">The Rune index of the hotkey in <c>text</c>.</param>
+		/// <returns>The text with the hotkey tagged.</returns>
+		/// <remarks>
+		/// The returned string will not render correctly without first un-doing the tag. To undo the tag, search for 
+		/// Runes with a bitmask of <c>otKeyTagMask</c> and remove that bitmask.
+		/// </remarks>
+		public ustring ReplaceHotKeyWithTag (ustring text, int hotPos)
 		{
 			// Set the high bit
 			var runes = text.ToRuneList ();
 			if (Rune.IsLetterOrNumber (runes [hotPos])) {
-				runes [hotPos] = new Rune ((uint)runes [hotPos] | 0x100000);
+				runes [hotPos] = new Rune ((uint)runes [hotPos] | HotKeyTagMask);
 			}
 			return ustring.Make (runes);
 		}
@@ -456,81 +500,57 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Formats a single line of text with a hot-key and <see cref="Alignment"/>.
+		/// Draws the text held by <see cref="TextFormatter"/> to <see cref="Application.Driver"/> using the colors specified.
 		/// </summary>
-		/// <param name="shown_text">The text to align.</param>
-		/// <param name="width">The maximum width for the text.</param>
-		/// <param name="hot_pos">The hot-key position before reformatting.</param>
-		/// <param name="c_hot_pos">The hot-key position after reformatting.</param>
-		/// <param name="textAlignment">The <see cref="Alignment"/> to align to.</param>
-		/// <returns>The aligned text.</returns>
-		public static ustring GetAlignedText (ustring shown_text, int width, int hot_pos, out int c_hot_pos, TextAlignment textAlignment)
+		/// <param name="bounds">Specifies the screen-relative location and maximum size for drawing the text.</param>
+		/// <param name="normalColor">The color to use for all text except the hotkey</param>
+		/// <param name="hotColor">The color to use to draw the hotkey</param>
+		public void Draw (Rect bounds, Attribute normalColor, Attribute hotColor)
 		{
-			int start;
-			var caption = shown_text;
-			c_hot_pos = hot_pos;
+			// With this check, we protect against subclasses with overrides of Text
+			if (ustring.IsNullOrEmpty (text)) {
+				return;
+			}
 
-			if (width > shown_text.RuneCount + 1) {
+			Application.Driver.SetAttribute (normalColor);
+
+			// Use "Lines" to ensure a Format (don't use "lines"))
+			for (int line = 0; line < Lines.Count; line++) {
+				if (line < (bounds.Height - bounds.Top) || line >= bounds.Height)
+					continue;
+				var runes = lines [line].ToRunes ();
+				int x;
 				switch (textAlignment) {
 				case TextAlignment.Left:
-					caption += new string (' ', width - caption.RuneCount);
-					break;
-				case TextAlignment.Right:
-					start = width - caption.RuneCount;
-					caption = $"{new string (' ', width - caption.RuneCount)}{caption}";
-					if (c_hot_pos > -1) {
-						c_hot_pos += start;
-					}
-					break;
-				case TextAlignment.Centered:
-					start = width / 2 - caption.RuneCount / 2;
-					caption = $"{new string (' ', start)}{caption}{new string (' ', width - caption.RuneCount - start)}";
-					if (c_hot_pos > -1) {
-						c_hot_pos += start;
-					}
+					x = bounds.Left;
 					break;
 				case TextAlignment.Justified:
-					var words = caption.Split (" ");
-					var wLen = GetWordsLength (words, c_hot_pos, out int runeCount, out int w_hot_pos);
-					var space = (width - runeCount) / (caption.RuneCount - wLen);
-					caption = "";
-					for (int i = 0; i < words.Length; i++) {
-						if (i == words.Length - 1) {
-							caption += new string (' ', width - caption.RuneCount - 1);
-							caption += words [i];
-						} else {
-							caption += words [i];
-						}
-						if (i < words.Length - 1) {
-							caption += new string (' ', space);
-						}
-					}
-					if (c_hot_pos > -1) {
-						c_hot_pos += w_hot_pos * space - space - w_hot_pos + 1;
-					}
+					x = bounds.Left;
 					break;
+				case TextAlignment.Right:
+					x = bounds.Right - runes.Length;
+					break;
+				case TextAlignment.Centered:
+					x = bounds.Left + (bounds.Width - runes.Length) / 2;
+					break;
+				default:
+					throw new ArgumentOutOfRangeException ();
+				}
+				for (var col = bounds.Left; col < bounds.Left + bounds.Width; col++) {
+					Application.Driver.Move (col, bounds.Y + line);
+					var rune = (Rune)' ';
+					if (col >= x && col < (x + runes.Length)) {
+						rune = runes [col - x];
+					}
+					if ((rune & HotKeyTagMask) == HotKeyTagMask) {
+						Application.Driver.SetAttribute (hotColor);
+						Application.Driver.AddRune ((Rune)((uint)rune & ~HotKeyTagMask));
+						Application.Driver.SetAttribute (normalColor);
+					} else {
+						Application.Driver.AddRune (rune);
+					}
 				}
 			}
-
-			return caption;
-		}
-
-		static int GetWordsLength (ustring [] words, int hotPos, out int runeCount, out int wordHotPos)
-		{
-			int length = 0;
-			int rCount = 0;
-			int wHotPos = -1;
-			for (int i = 0; i < words.Length; i++) {
-				if (wHotPos == -1 && rCount + words [i].RuneCount >= hotPos)
-					wHotPos = i;
-				length += words [i].Length;
-				rCount += words [i].RuneCount;
-			}
-			if (wHotPos == -1 && hotPos > -1)
-				wHotPos = words.Length;
-			runeCount = rCount;
-			wordHotPos = wHotPos;
-			return length;
 		}
 	}
 }
