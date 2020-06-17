@@ -628,7 +628,6 @@ static class Demo {
 		int count = 0;
 		ml = new Label (new Rect (3, 17, 47, 1), "Mouse: ");
 		Application.RootMouseEvent += delegate (MouseEvent me) {
-			ml.TextColor = Colors.TopLevel.Normal;
 			ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
 		};
 

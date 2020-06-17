@@ -190,16 +190,5 @@ namespace Terminal.Gui {
 				base.TextAlignment = contentView.TextAlignment = value;
 			}
 		}
-
-		/// <summary>
-		///   The color used for the <see cref="Label"/>.
-		/// </summary>
-		public override Attribute TextColor {
-			get => contentView.TextColor;
-			set {
-				base.TextColor = contentView.TextColor = value;
-			}
-		}
-
 	}
 }

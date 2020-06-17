@@ -77,6 +77,8 @@ namespace Terminal.Gui {
 		{
 			var lines = new List<List<Rune>> ();
 			int start = 0, i = 0;
+			// BUGBUG: I think this is buggy w.r.t Unicode. content.Length is bytes, and content[i] is bytes
+			// and content[i] == 10 may be the middle of a Rune.
 			for (; i < content.Length; i++) {
 				if (content [i] == 10) {
 					if (i - start > 0)

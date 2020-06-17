@@ -94,8 +94,8 @@ namespace Terminal.Gui {
 		static int QueryFull (bool useErrorColors, int width, int height, ustring title, ustring message, params ustring [] buttons)
 		{
 			const int defaultWidth = 50;
-			int textWidth = View.ViewText.MaxWidth (message, width == 0 ? defaultWidth : width);
-			int textHeight = View.ViewText.MaxLines (message, textWidth); // message.Count (ustring.Make ('\n')) + 1;
+			int textWidth = TextFormatter.MaxWidth (message, width == 0 ? defaultWidth : width);
+			int textHeight = TextFormatter.MaxLines (message, textWidth); // message.Count (ustring.Make ('\n')) + 1;
 			int msgboxHeight = Math.Max (1, textHeight) + 3; // textHeight + (top + top padding + buttons + bottom)
 
 			// Create button array for Dialog
@@ -135,7 +135,7 @@ namespace Terminal.Gui {
 			}
 
 			// Dynamically size Width
-			int msgboxWidth = Math.Max (defaultWidth, Math.Max (title.Length + 8, Math.Max (textWidth + 4, d.GetButtonsWidth ()) + 8)); // textWidth + (left + padding + padding + right)
+			int msgboxWidth = Math.Max (defaultWidth, Math.Max (title.RuneCount + 8, Math.Max (textWidth + 4, d.GetButtonsWidth ()) + 8)); // textWidth + (left + padding + padding + right)
 			d.Width = msgboxWidth;
 
 			// Setup actions

@@ -13,7 +13,6 @@ namespace UICatalog {
 			Win.Text = "This is the Te_xt for the host Win object. TextAlignment.Centered was specified. It is intentionally very long to illustrate word wrap.\n" +
 				"<-- There is a new line here to show a hard line break. You should see this text bleed underneath the subviews, which start at Y = 3.";
 			Win.TextAlignment = TextAlignment.Centered;
-			Win.TextColor = Application.Driver.MakeAttribute (Color.BrightGreen, Color.Black);
 #if true
 			string txt = "Hello world, how are you today? Pretty neat!";
 #else
@@ -31,7 +30,6 @@ namespace UICatalog {
 					Width = Dim.Fill (),
 					Height = 1,
 					ColorScheme = Colors.Dialog,
-					TextColor = Application.Driver.MakeAttribute (Color.BrightRed, Color.White),
 				};
 				Win.Add (label);
 			}

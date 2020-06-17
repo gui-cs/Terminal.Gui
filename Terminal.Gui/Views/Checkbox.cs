@@ -51,7 +51,7 @@ namespace Terminal.Gui {
 			Text = s;
 			CanFocus = true;
 			Height = 1;
-			Width = s.Length + 4;
+			Width = s.RuneCount + 4;
 		}
 
 		/// <summary>

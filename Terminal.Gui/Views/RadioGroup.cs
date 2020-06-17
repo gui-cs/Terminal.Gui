@@ -95,7 +95,7 @@ namespace Terminal.Gui {
 			}
 
 			foreach (var s in radioLabels)
-				width = Math.Max (s.Length + 3, width);
+				width = Math.Max (s.RuneCount + 3, width);
 			return new Rect (x, y, width, radioLabels.Count);
 		}
 
@@ -126,7 +126,7 @@ namespace Terminal.Gui {
 		//	for (int i = 0; i < radioLabels.Count; i++) {
 		//		Move(0, i);
 		//		Driver.SetAttribute(ColorScheme.Normal);
-		//		Driver.AddStr(ustring.Make(new string (' ', radioLabels[i].Length + 4)));
+		//		Driver.AddStr(ustring.Make(new string (' ', radioLabels[i].RuneCount + 4)));
 		//	}
 		//	if (newRadioLabels.Count != radioLabels.Count) {
 		//		SetWidthHeight(newRadioLabels);

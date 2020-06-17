@@ -663,7 +663,7 @@ namespace Terminal.Gui {
 			if (!ustring.IsNullOrEmpty (title) && width > 4 && region.Y + paddingTop <= region.Y + paddingBottom) {
 				Move (region.X + 1 + paddingLeft, region.Y + paddingTop);
 				AddRune (' ');
-				var str = title.Length >= width ? title [0, width - 2] : title;
+				var str = title.RuneCount >= width ? title [0, width - 2] : title;
 				AddStr (str);
 				AddRune (' ');
 			}

@@ -191,17 +191,17 @@ namespace UICatalog {
 				ustring start = "";
 				if (i > -1)
 					start = txt [0, i];
-				txt = start + txt [i + 1, txt.Length];
+				txt = start + txt [i + 1, txt.RuneCount];
 
 				// Move over one or go to start
 				i++;
-				if (i >= txt.Length) {
+				if (i >= txt.RuneCount) {
 					i = 0;
 				}
 
 				// Slip in the '_'
 				start = txt [0, i];
-				txt = start + ustring.Make ('_') + txt [i, txt.Length];
+				txt = start + ustring.Make ('_') + txt [i, txt.RuneCount];
 
 				return txt;
 			}
@@ -218,11 +218,11 @@ namespace UICatalog {
 			};
 			Win.Add (moveHotKeyBtn);
 
-			var muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
+			var muhkb = ustring.Make(" ~  s  gui.cs   master ↑10 = Сохранить");
 			var moveUnicodeHotKeyBtn = new Button (muhkb) {
 				X = Pos.Left (absoluteFrame) + 1,
 				Y = Pos.Bottom (radioGroup) + 1,
-				Width = muhkb.Length + 30,
+				Width = muhkb.RuneCount + 30,
 				ColorScheme = Colors.TopLevel,
 			};
 			moveUnicodeHotKeyBtn.Clicked = () => {

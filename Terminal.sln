@@ -10,7 +10,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Designer", "Designer\Design
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UICatalog", "UICatalog\UICatalog.csproj", "{88979F89-9A42-448F-AE3E-3060145F6375}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{8B901EDE-8974-4820-B100-5226917E2990}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{8B901EDE-8974-4820-B100-5226917E2990}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

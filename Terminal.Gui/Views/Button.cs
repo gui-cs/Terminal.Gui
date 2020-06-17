@@ -29,19 +29,6 @@ namespace Terminal.Gui {
 		bool is_default;
 
 		/// <summary>
-		/// Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.
-		/// </summary>
-		/// <value><c>true</c> if is default; otherwise, <c>false</c>.</value>
-		public bool IsDefault {
-			get => is_default;
-			set {
-				is_default = value;
-				SetWidthHeight (Text, is_default);
-				Update ();
-			}
-		}
-
-		/// <summary>
 		///   Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <remarks>
@@ -94,7 +81,7 @@ namespace Terminal.Gui {
 		///   in a <see cref="Dialog"/> will implicitly activate this button.
 		/// </param>
 		public Button (int x, int y, ustring text, bool is_default)
-		    : base (new Rect (x, y, text.Length + 4 + (is_default ? 2 : 0), 1))
+		    : base (new Rect (x, y, text.RuneCount + 4 + (is_default ? 2 : 0), 1))
 		{
 			Init (text, is_default);
 		}
@@ -114,20 +101,20 @@ namespace Terminal.Gui {
 			_rightDefault = new Rune (Driver != null ? Driver.RightDefaultIndicator : '>');
 
 			CanFocus = true;
-			Text = text ?? string.Empty;
 			this.IsDefault = is_default;
-			int w = SetWidthHeight (text, is_default);
-			Frame = new Rect (Frame.Location, new Size (w, 1));
+			Text = text ?? string.Empty;
+			//int w = SetWidthHeight (text, is_default);
+			//Frame = new Rect (Frame.Location, new Size (w, 1));
 		}
 
-		int SetWidthHeight (ustring text, bool is_default)
-		{
-			int w = text.Length + 4 + (is_default ? 2 : 0);
-			Width = w;
-			Height = 1;
-			Frame = new Rect (Frame.Location, new Size (w, 1));
-			return w;
-		}
+		//int SetWidthHeight (ustring text, bool is_default)
+		//{
+		//	int w = text.RuneCount;// + 4 + (is_default ? 2 : 0);
+		//	Width = w;
+		//	Height = 1;
+		//	Frame = new Rect (Frame.Location, new Size (w, 1));
+		//	return w;
+		//}
 
 		/// <summary>
 		///   The text displayed by this <see cref="Button"/>.
@@ -138,8 +125,19 @@ namespace Terminal.Gui {
 			}
 
 			set {
-				SetWidthHeight (value, is_default);
 				text = value;
+				Update ();
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.
+		/// </summary>
+		/// <value><c>true</c> if is default; otherwise, <c>false</c>.</value>
+		public bool IsDefault {
+			get => is_default;
+			set {
+				is_default = value;
 				Update ();
 			}
 		}
@@ -151,12 +149,17 @@ namespace Terminal.Gui {
 			else
 				base.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
 
+			int w = base.Text.RuneCount - (base.Text.Contains (HotKeySpecifier) ? 1 : 0);
+			Width = w;
+			Height = 1;
+			Frame = new Rect (Frame.Location, new Size (w, 1));
+
 			SetNeedsDisplay ();
 		}
 
 		bool CheckKey (KeyEvent key)
 		{
-			if ((char)key.KeyValue == HotKey) {
+			if (key.Key == HotKey) {
 				this.SuperView.SetFocus (this);
 				Clicked?.Invoke ();
 				return true;
@@ -187,7 +190,7 @@ namespace Terminal.Gui {
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			var c = kb.KeyValue;
-			if (c == '\n' || c == ' ' || Rune.ToUpper ((uint)c) == HotKey) {
+			if (c == '\n' || c == ' ' || kb.Key == HotKey) {
 				Clicked?.Invoke ();
 				return true;
 			}

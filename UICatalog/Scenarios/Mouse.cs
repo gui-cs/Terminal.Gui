@@ -28,7 +28,6 @@ namespace UICatalog {
 			Win.Add (rmeList);
 
 			Application.RootMouseEvent += delegate (MouseEvent me) {
-				ml.TextColor = Colors.TopLevel.Normal;
 				ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count}";
 				rme.Add ($"({me.X},{me.Y}) - {me.Flags} {count++}");
 				rmeList.MoveDown ();

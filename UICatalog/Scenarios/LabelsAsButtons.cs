@@ -133,6 +133,7 @@ namespace UICatalog {
 
 			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
 			var sizeBtn = new Label ("Size This \u263a Button _via Pos") {
+			//var sizeBtn = new Label ("Size This x Button _via Pos") {
 				X = 0,
 				Y = Pos.Center () + 1,
 				Width = 30,
@@ -191,17 +192,17 @@ namespace UICatalog {
 				ustring start = "";
 				if (i > -1)
 					start = txt [0, i];
-				txt = start + txt [i + 1, txt.Length];
+				txt = start + txt [i + 1, txt.RuneCount];
 
 				// Move over one or go to start
 				i++;
-				if (i >= txt.Length) {
+				if (i >= txt.RuneCount) {
 					i = 0;
 				}
 
 				// Slip in the '_'
 				start = txt [0, i];
-				txt = start + ustring.Make ('_') + txt [i, txt.Length];
+				txt = start + ustring.Make ('_') + txt [i, txt.RuneCount];
 
 				return txt;
 			}
@@ -218,7 +219,7 @@ namespace UICatalog {
 			};
 			Win.Add (moveHotKeyBtn);
 
-			var muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
+			ustring muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
 			var moveUnicodeHotKeyBtn = new Label (muhkb) {
 				X = Pos.Left (absoluteFrame) + 1,
 				Y = Pos.Bottom (radioGroup) + 1,
