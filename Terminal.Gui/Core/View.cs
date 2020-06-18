@@ -1541,13 +1541,14 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void LayoutSubviews ()
 		{
-			if (!layoutNeeded)
+			if (!layoutNeeded) {
 				return;
+			}
+
+			viewText.Size = Bounds.Size;
 
 			Rect oldBounds = Bounds;
 			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
-
-			viewText.Size = Bounds.Size;
 
 			// Sort out the dependencies of the X, Y, Width, Height properties
 			var nodes = new HashSet<View> ();
@@ -1570,8 +1571,9 @@ namespace Terminal.Gui {
 			var ordered = TopologicalSort (nodes, edges);
 
 			foreach (var v in ordered) {
-				if (v.LayoutStyle == LayoutStyle.Computed)
+				if (v.LayoutStyle == LayoutStyle.Computed) {
 					v.SetRelativeLayout (Frame);
+				}
 
 				v.LayoutSubviews ();
 				v.layoutNeeded = false;
