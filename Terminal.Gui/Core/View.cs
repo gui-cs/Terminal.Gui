@@ -1506,10 +1506,26 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.
 		/// </remarks>
+		public Action<LayoutEventArgs> LayoutStarted;
+
+		/// <summary>
+		/// Raises the <see cref="LayoutStarted"/> event. Called from  <see cref="LayoutSubviews"/> before any subviews have been laid out.
+		/// </summary>
+		internal virtual void OnLayoutStarted (LayoutEventArgs args)
+		{
+			LayoutStarted?.Invoke (args);
+		}
+
+		/// <summary>
+		/// Fired after the Views's <see cref="LayoutSubviews"/> method has completed. 
+		/// </summary>
+		/// <remarks>
+		/// Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.
+		/// </remarks>
 		public Action<LayoutEventArgs> LayoutComplete;
 
 		/// <summary>
-		/// Raises the <see cref="LayoutComplete"/> event. Called from  <see cref="LayoutSubviews"/> after all sub-views have been laid out.
+		/// Raises the <see cref="LayoutComplete"/> event. Called from  <see cref="LayoutSubviews"/> before all sub-views have been laid out.
 		/// </summary>
 		internal virtual void OnLayoutComplete (LayoutEventArgs args)
 		{
@@ -1528,9 +1544,10 @@ namespace Terminal.Gui {
 			if (!layoutNeeded)
 				return;
 
-			viewText.Size = Bounds.Size;
-
 			Rect oldBounds = Bounds;
+			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
+
+			viewText.Size = Bounds.Size;
 
 			// Sort out the dependencies of the X, Y, Width, Height properties
 			var nodes = new HashSet<View> ();
