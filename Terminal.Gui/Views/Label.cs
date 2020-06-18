@@ -245,6 +245,7 @@ namespace Terminal.Gui {
 		public override void LayoutSubviews ()
 		{
 			recalcPending = true;
+			base.LayoutSubviews ();
 		}
 
 		///<inheritdoc/>
