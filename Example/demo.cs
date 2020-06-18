@@ -235,14 +235,14 @@ static class Demo {
 	}
 
 	//
-	// Creates a nested editor
-	static void Editor (Toplevel top)
+	static void Editor ()
 	{
-		var tframe = top.Frame;
-		var ntop = new Toplevel (tframe);
+		var tframe = Application.Top.Frame;
+		Application.Top.RemoveAll ();
+		var ntop = Application.Top;
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_Close", "", () => {Application.RequestStop ();}),
+				new MenuItem ("_Close", "", () => { if (Quit ()) {Application.RequestStop (); } }),
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
 				new MenuItem ("_Copy", "", null),
@@ -273,7 +273,9 @@ static class Demo {
 			text.Text = System.IO.File.ReadAllText (fname);
 		win.Add (text);
 
-		Application.Run (ntop);
+		Application.Run (ntop, false);
+		Application.Top.RemoveAll ();
+		Main ();
 	}
 
 	static bool Quit ()
@@ -576,7 +578,7 @@ static class Demo {
 
 		menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("Text _Editor Demo", "", () => { Editor (top); }),
+				new MenuItem ("Text _Editor Demo", "", () => { Editor (); }),
 				new MenuItem ("_New", "Creates new file", NewFile),
 				new MenuItem ("_Open", "", Open),
 				new MenuItem ("_Hex", "", () => ShowHex (top)),
