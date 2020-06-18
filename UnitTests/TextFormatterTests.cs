@@ -1613,6 +1613,10 @@ namespace Terminal.Gui {
 			Assert.Equal ("se", wrappedLines [1].ToString ());
 			Assert.Equal ("nte", wrappedLines [2].ToString ());
 			Assert.Equal ("nce", wrappedLines [3].ToString ());
+			Assert.Equal ("ha", wrappedLines [4].ToString ());
+			Assert.Equal ("s", wrappedLines [5].ToString ());
+			Assert.Equal ("wo", wrappedLines [6].ToString ());
+			Assert.Equal ("rds", wrappedLines [7].ToString ());
 			Assert.Equal (".", wrappedLines [^1].ToString ());
 
 			maxWidth = 2;

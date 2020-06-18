@@ -1,12 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
     <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
     <AssemblyVersion>0.90.0.0</AssemblyVersion>
-    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
@@ -75,7 +74,7 @@
       * Added a OpenSelectedItem event to the ListView #429. (Thanks @bdisp!)
       * Fixes the return value of the position cursor in the TextField. (Thanks @bdisp!)
       * Updates screen on Unix window resizing. (Thanks @bdisp!)
-      * Fixes the functions of the Edit-&gt;Copy-Cut-Paste menu for the TextField that was not working well. (Thanks @bdisp!)
+      * Fixes the functions of the Edit-Copy-Cut-Paste menu for the TextField that was not working well. (Thanks @bdisp!)
       * More robust error handing in Pos/Dim. Fixes #355 stack overflow with Pos based on the size of windows at startup. Added a OnResized action to set the Pos after the terminal are resized. (Thanks @bdisp!)
       * Fixes #389 Window layouting breaks when resizing. (Thanks @bdisp!)
       * Fixes #557 MessageBox needs to take ustrings (BREAKING CHANGE). (Thanks @tig!)
@@ -101,6 +100,15 @@
       * ConsoleDriver and Drivers have new standard glyph definitions for things like right arrow. (Thanks @tig!)
       * ScrollView updated to use pretty glyphs. (Thanks @tig!)
       * Menubar now uses pretty arrow glyph for sub-menus. (Thanks @tig!)
+      * The project now has a growing set of unit tests (over 100 tests). (Thanks @tig!)
+      * View now has a Text property, implemented via the new TextFormatting class. (Thanks @tig!)
+        * TextAlignment is implemented once across all Views that support it.
+        * Unicode support is now much more robust and complete; dozens of bugs fixed.
+        * Any view dervied from View now has a Text property with multi-line text formatting, including word-wrap and hotkey support.
+        * Any view derived from View now gets mouse click (Clicked event) support for free.
+        * Label is now just an alias for View.
+        * Button is now a very thin class derived from View (no API changes).
+        * Dozens of unit tests for TextAlignment are provided reducing the chance of regressions.
 
       0.81:
       * Fix ncurses engine for macOS/Linux, it works again

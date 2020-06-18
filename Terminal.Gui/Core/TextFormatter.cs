@@ -6,6 +6,28 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
+	/// Text alignment enumeration, controls how text is displayed.
+	/// </summary>
+	public enum TextAlignment {
+		/// <summary>
+		/// Aligns the text to the left of the frame.
+		/// </summary>
+		Left,
+		/// <summary>
+		/// Aligns the text to the right side of the frame.
+		/// </summary>
+		Right,
+		/// <summary>
+		/// Centers the text in the frame.
+		/// </summary>
+		Centered,
+		/// <summary>
+		/// Shows the text as justified text in the frame.
+		/// </summary>
+		Justified
+	}
+
+	/// <summary>
 	/// Provides text formatting capabilites for console apps. Supports, hotkeys, horizontal alignment, multille lines, and word-based line wrap.
 	/// </summary>
 	public class TextFormatter {
@@ -177,21 +199,20 @@ namespace Terminal.Gui {
 				return lines;
 			}
 
-			var runes = StripCRLF (text).ToRunes ();
+			var runes = StripCRLF (text).ToRuneList();
 
-			while ((end = start + width) < runes.Length) {
+			while ((end = start + width) < runes.Count) {
 				while (runes [end] != ' ' && end > start)
 					end -= 1;
 				if (end == start)
 					end = start + width;
-
-
-				lines.Add (ustring.Make (runes [start..end]).TrimSpace ());
+				lines.Add (ustring.Make (runes.GetRange (start, end - start)).TrimSpace());
 				start = end;
 			}
 
-			if (start < text.RuneCount)
-				lines.Add (ustring.Make (runes [start..]).TrimSpace ());
+			if (start < text.RuneCount) {
+				lines.Add (ustring.Make (runes.GetRange (start, runes.Count - start)).TrimSpace ());
+			}
 
 			return lines;
 		}
@@ -212,10 +233,10 @@ namespace Terminal.Gui {
 				return text;
 			}
 
-			var runes = text.ToRunes ();
-			int slen = runes.Length;
+			var runes = text.ToRuneList ();
+			int slen = runes.Count;
 			if (slen > width) {
-				return ustring.Make (runes [0..width]); // text [0, width];
+				return ustring.Make (runes.GetRange(0, width));
 			} else {
 				if (talign == TextAlignment.Justified) {
 					return Justify (text, width);
@@ -302,13 +323,13 @@ namespace Terminal.Gui {
 				return lineResult;
 			}
 
-			var runes = text.ToRunes ();
-			int runeCount = runes.Length;
+			var runes = text.ToRuneList ();
+			int runeCount = runes.Count;
 			int lp = 0;
 			for (int i = 0; i < runeCount; i++) {
 				Rune c = text [i];
 				if (c == '\n') {
-					var wrappedLines = WordWrap (ustring.Make (runes [lp..i]), width);
+					var wrappedLines = WordWrap (ustring.Make (runes.GetRange(lp, i - lp)), width);
 					foreach (var line in wrappedLines) {
 						lineResult.Add (ClipAndJustify (line, width, talign));
 					}
@@ -318,7 +339,7 @@ namespace Terminal.Gui {
 					lp = i + 1;
 				}
 			}
-			foreach (var line in WordWrap (ustring.Make (runes [lp..runeCount]), width)) {
+			foreach (var line in WordWrap (ustring.Make (runes.GetRange(lp, runeCount - lp)), width)) {
 				lineResult.Add (ClipAndJustify (line, width, talign));
 			}
 
@@ -516,7 +537,7 @@ namespace Terminal.Gui {
 
 			// Use "Lines" to ensure a Format (don't use "lines"))
 			for (int line = 0; line < Lines.Count; line++) {
-				if (line < (bounds.Height - bounds.Top) || line >= bounds.Height)
+				if (line > bounds.Height)
 					continue;
 				var runes = lines [line].ToRunes ();
 				int x;
@@ -537,7 +558,7 @@ namespace Terminal.Gui {
 					throw new ArgumentOutOfRangeException ();
 				}
 				for (var col = bounds.Left; col < bounds.Left + bounds.Width; col++) {
-					Application.Driver.Move (col, bounds.Y + line);
+					Application.Driver.Move (col, bounds.Top + line);
 					var rune = (Rune)' ';
 					if (col >= x && col < (x + runes.Length)) {
 						rune = runes [col - x];
@@ -552,5 +573,6 @@ namespace Terminal.Gui {
 				}
 			}
 		}
+
 	}
 }

@@ -76,9 +76,9 @@ namespace UICatalog {
 
 			_leftPane = new Window ("Classes") {
 				X = 0,
-				Y = 0, // for menu
+				Y = 0, 
 				Width = 15,
-				Height = Dim.Fill (),
+				Height = Dim.Fill (1), // for status bar
 				CanFocus = false,
 				ColorScheme = Colors.TopLevel,
 			};
@@ -87,7 +87,7 @@ namespace UICatalog {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (0),
-				Height = Dim.Fill (), // for status bar
+				Height = Dim.Fill (0), 
 				AllowsMarking = false,
 				ColorScheme = Colors.TopLevel,
 			};

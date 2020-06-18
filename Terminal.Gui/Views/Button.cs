@@ -15,8 +15,14 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// <para>
 	///   Provides a button showing text invokes an <see cref="Action"/> when clicked on with a mouse
-	///   or when the user presses SPACE, ENTER, or hotkey. The hotkey is specified by the first uppercase
-	///   letter in the button.
+	///   or when the user presses SPACE, ENTER, or hotkey. The hotkey is the first letter or digit following the first underscore ('_') 
+	///   in the button text. 
+	/// </para>
+	/// <para>
+	///   Use <see cref="View.HotKeySpecifier"/> to change the hotkey specifier from the default of ('_'). 
+	/// </para>
+	/// <para>
+	///   If no hotkey specifier is found, the first uppercase letter encountered will be used as the hotkey.
 	/// </para>
 	/// <para>
 	///   When the button is configured as the default (<see cref="IsDefault"/>) and the user presses
@@ -103,18 +109,7 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			this.IsDefault = is_default;
 			Text = text ?? string.Empty;
-			//int w = SetWidthHeight (text, is_default);
-			//Frame = new Rect (Frame.Location, new Size (w, 1));
 		}
-
-		//int SetWidthHeight (ustring text, bool is_default)
-		//{
-		//	int w = text.RuneCount;// + 4 + (is_default ? 2 : 0);
-		//	Width = w;
-		//	Height = 1;
-		//	Frame = new Rect (Frame.Location, new Size (w, 1));
-		//	return w;
-		//}
 
 		/// <summary>
 		///   The text displayed by this <see cref="Button"/>.
@@ -153,7 +148,6 @@ namespace Terminal.Gui {
 			Width = w;
 			Height = 1;
 			Frame = new Rect (Frame.Location, new Size (w, 1));
-
 			SetNeedsDisplay ();
 		}
 
@@ -196,6 +190,5 @@ namespace Terminal.Gui {
 			}
 			return base.ProcessKey (kb);
 		}
-
 	}
 }

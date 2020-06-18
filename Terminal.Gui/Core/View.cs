@@ -19,28 +19,6 @@ using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Text alignment enumeration, controls how text is displayed.
-	/// </summary>
-	public enum TextAlignment {
-		/// <summary>
-		/// Aligns the text to the left of the frame.
-		/// </summary>
-		Left,
-		/// <summary>
-		/// Aligns the text to the right side of the frame.
-		/// </summary>
-		Right,
-		/// <summary>
-		/// Centers the text in the frame.
-		/// </summary>
-		Centered,
-		/// <summary>
-		/// Shows the text as justified text in the frame.
-		/// </summary>
-		Justified
-	}
-
-	/// <summary>
 	/// Determines the LayoutStyle for a view, if Absolute, during LayoutSubviews, the
 	/// value from the Frame will be used, if the value is Computed, then the Frame
 	/// will be updated from the X, Y Pos objects and the Width and Height Dim objects.
@@ -172,12 +150,12 @@ namespace Terminal.Gui {
 		public Action<MouseEventArgs> MouseClick;
 
 		/// <summary>
-		/// The HotKey defined for this view. A user pressing HotKey on the keyboard while this view has focus will cause the Clicked event to fire.
+		/// Gets or sets the HotKey defined for this view. A user pressing HotKey on the keyboard while this view has focus will cause the Clicked event to fire.
 		/// </summary>
 		public Key HotKey { get => viewText.HotKey; set => viewText.HotKey = value; }
 
 		/// <summary>
-		/// 
+		/// Gets or sets the specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'. 
 		/// </summary>
 		public Rune HotKeySpecifier { get => viewText.HotKeySpecifier; set => viewText.HotKeySpecifier = value; }
 
@@ -860,21 +838,24 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Utility function to draw strings that contain a hotkey.
 		/// </summary>
-		/// <param name="text">String to display, the underscoore before a letter flags the next letter as the hotkey.</param>
+		/// <param name="text">String to display, the hotkey specifier before a letter flags the next letter as the hotkey.</param>
 		/// <param name="hotColor">Hot color.</param>
 		/// <param name="normalColor">Normal color.</param>
 		/// <remarks>
-		/// The hotkey is any character following an underscore ('_') character.</remarks>
+		/// <para>The hotkey is any character following the hotkey specifier, which is the underscore ('_') character by default.</para>
+		/// <para>The hotkey specifier can be changed via <see cref="HotKeySpecifier"/></para>
+		/// </remarks>
 		public void DrawHotString (ustring text, Attribute hotColor, Attribute normalColor)
 		{
-			Driver.SetAttribute (normalColor);
+			var hotkeySpec = HotKeySpecifier == (Rune)0xffff ? (Rune)'_' : HotKeySpecifier;
+			Application.Driver.SetAttribute (normalColor);
 			foreach (var rune in text) {
-				if (rune == '_') {
-					Driver.SetAttribute (hotColor);
+				if (rune == hotkeySpec) {
+					Application.Driver.SetAttribute (hotColor);
 					continue;
 				}
-				Driver.AddRune (rune);
-				Driver.SetAttribute (normalColor);
+				Application.Driver.AddRune (rune);
+				Application.Driver.SetAttribute (normalColor);
 			}
 		}
 
@@ -1078,9 +1059,8 @@ namespace Terminal.Gui {
 			if (!ustring.IsNullOrEmpty (Text)) {
 				Clear ();
 				// Draw any Text
-				// TODO: Figure out if this should go here or after OnDrawContent
 				viewText?.SetNeedsFormat ();
-				viewText?.Draw (ViewToScreen (Bounds), ColorScheme.Normal, ColorScheme.HotNormal);
+				viewText?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : ColorScheme.Normal, HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
 			}
 
 			// Invoke DrawContentEvent
@@ -1594,7 +1574,19 @@ namespace Terminal.Gui {
 		///   The text displayed by the <see cref="View"/>.
 		/// </summary>
 		/// <remarks>
-		///  The text will only be displayed if the View has no subviews.
+		/// <para>
+		///  If provided, the text will be drawn before any subviews are drawn.
+		/// </para>
+		/// <para>
+		///  The text will be drawn starting at the view origin (0, 0) and will be formatted according
+		///  to the <see cref="TextAlignment"/> property. If the view's height is greater than 1, the
+		///  text will word-wrap to additional lines if it does not fit horizontally. If the view's height
+		///  is 1, the text will be clipped.
+		/// </para>
+		/// <para>
+		///  Set the <see cref="HotKeySpecifier"/> to enable hotkey support. To disable hotkey support set <see cref="HotKeySpecifier"/> to
+		///  <c>(Rune)0xffff</c>.
+		/// </para>
 		/// </remarks>
 		public virtual ustring Text {
 			get => viewText.Text;
@@ -1605,7 +1597,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Controls the text-alignment property of the View. Changing this property will redisplay the <see cref="View"/>.
+		/// Gets or sets how the View's <see cref="Text"/> is aligned horizontally when drawn. Changing this property will redisplay the <see cref="View"/>.
 		/// </summary>
 		/// <value>The text alignment.</value>
 		public virtual TextAlignment TextAlignment {

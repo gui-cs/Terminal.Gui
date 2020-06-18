@@ -10,7 +10,7 @@ namespace UICatalog {
 		public override void Setup ()
 		{
 			Win.X = 10;
-			Win.Width = Dim.Fill (20);
+			Win.Width = Dim.Fill (10);
 
 			string txt = "Hello world, how are you today? Pretty neat!";
 			string unicodeSampleText = "A Unicode sentence (Ð¿ÑÐ Ð²ÐµÑ) has words.";
@@ -22,8 +22,8 @@ namespace UICatalog {
 			var multiLineHeight = 5;
 
 			foreach (var alignment in alignments) {
-				singleLines[(int)alignment] = new Label (txt) { TextAlignment = alignment, Width = Dim.Fill (), Height = 1, ColorScheme = Colors.Dialog };
-				multipleLines [(int)alignment] = new Label (txt) { TextAlignment = alignment, Width = Dim.Fill (), Height = multiLineHeight, ColorScheme = Colors.Dialog };
+				singleLines [(int)alignment] = new Label (txt) { TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = 1, ColorScheme = Colors.Dialog };
+				multipleLines [(int)alignment] = new Label (txt) { TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = multiLineHeight, ColorScheme = Colors.Dialog };
 			}
 
 			// Add a label & text field so we can demo IsDefault
@@ -35,7 +35,7 @@ namespace UICatalog {
 			var edit = new TextView () {
 				X = Pos.Right (editLabel) + 1,
 				Y = Pos.Y (editLabel),
-				Width = Dim.Fill("Text:".Length + "  Unicode Sample".Length + 2),
+				Width = Dim.Fill ("Text:".Length + "  Unicode Sample".Length + 2),
 				Height = 4,
 				ColorScheme = Colors.TopLevel,
 				Text = txt,
@@ -57,7 +57,7 @@ namespace UICatalog {
 			};
 			Win.Add (unicodeSample);
 
-			var update = new Button ("_Update", is_default: true) {
+			var update = new Button ("_Update") {
 				X = Pos.Right (edit) + 1,
 				Y = Pos.Bottom (edit) - 1,
 				Clicked = () => {
@@ -69,7 +69,14 @@ namespace UICatalog {
 			};
 			Win.Add (update);
 
-			var label = new Label ($"Demonstrating single-line (should clip):") { Y = Pos.Bottom (edit) + 1 };
+			var enableHotKeyCheckBox = new CheckBox ("Enable Hotkey (_)", false) {
+				X = 0,
+				Y = Pos.Bottom (edit),
+			};
+
+			Win.Add (enableHotKeyCheckBox);
+
+			var label = new Label ($"Demonstrating single-line (should clip):") { Y = Pos.Bottom (enableHotKeyCheckBox) + 1 };
 			Win.Add (label);
 			foreach (var alignment in alignments) {
 				label = new Label ($"{alignment}:") { Y = Pos.Bottom (label) };
@@ -80,7 +87,7 @@ namespace UICatalog {
 			}
 
 			txt += "\nSecond line\n\nFourth Line.";
-			label = new Label ($"Demonstrating multi-line and word wrap:") { Y = Pos.Bottom (label) + 1 };
+			label = new Label ($"Demonstrating multi-line and word wrap:") { Y = Pos.Bottom (label) };
 			Win.Add (label);
 			foreach (var alignment in alignments) {
 				label = new Label ($"{alignment}:") { Y = Pos.Bottom (label) };
@@ -89,6 +96,15 @@ namespace UICatalog {
 				Win.Add (multipleLines [(int)alignment]);
 				label = multipleLines [(int)alignment];
 			}
+
+			enableHotKeyCheckBox.Toggled += (previous) => {
+				foreach (var alignment in alignments) {
+					singleLines [(int)alignment].HotKeySpecifier = previous ? (Rune)0xffff : (Rune)'_';
+					multipleLines [(int)alignment].HotKeySpecifier = previous ? (Rune)0xffff : (Rune)'_';
+				}
+				Win.SetNeedsDisplay ();
+				Win.LayoutSubviews ();
+			};
 		}
 	}
 }

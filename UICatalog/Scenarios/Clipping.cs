@@ -34,7 +34,7 @@ namespace UICatalog {
 			//Win.Height = Dim.Fill () - 2;
 			var label = new Label ("ScrollView (new Rect (5, 5, 100, 60)) with a 200, 100 ContentSize...") {
 				X = 0, Y = 0,
-				ColorScheme = Colors.Dialog
+				//ColorScheme = Colors.Dialog
 			};
 			Top.Add (label);
 

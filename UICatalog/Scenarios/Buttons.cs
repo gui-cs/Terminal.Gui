@@ -70,9 +70,6 @@ namespace UICatalog {
 				//prev = colorButton;
 				x += colorButton.Frame.Width + 2;
 			}
-			// BUGBUG: For some reason these buttons don't move to correct locations initially. 
-			// This was the only way I find to resolves this with the View prev variable.
-			//Top.Ready += () => Top.Redraw (Top.Bounds);
 
 			Button button;
 			Win.Add (button = new Button ("A super long _Button that will probably expose a bug in clipping or wrapping of text. Will it?") {
@@ -187,23 +184,26 @@ namespace UICatalog {
 			ustring MoveHotkey (ustring txt)
 			{
 				// Remove the '_'
-				var i = txt.IndexOf ('_');
+				var runes = txt.ToRuneList ();
+
+				var i = runes.IndexOf ('_');
 				ustring start = "";
-				if (i > -1)
-					start = txt [0, i];
-				txt = start + txt [i + 1, txt.RuneCount];
+				if (i > -1) {
+					start = ustring.Make (runes.GetRange (0, i));
+				}
+				txt = start + ustring.Make (runes.GetRange (i + 1, runes.Count - (i + 1)));
+
+				runes = txt.ToRuneList ();
 
 				// Move over one or go to start
 				i++;
-				if (i >= txt.RuneCount) {
+				if (i >= runes.Count) {
 					i = 0;
 				}
 
 				// Slip in the '_'
-				start = txt [0, i];
-				txt = start + ustring.Make ('_') + txt [i, txt.RuneCount];
-
-				return txt;
+				start = ustring.Make (runes.GetRange (0, i));
+				return start + ustring.Make ('_') + ustring.Make (runes.GetRange (i, runes.Count - i));
 			}
 
 			var mhkb = "Click to Change th_is Button's Hotkey";
@@ -218,7 +218,7 @@ namespace UICatalog {
 			};
 			Win.Add (moveHotKeyBtn);
 
-			var muhkb = ustring.Make(" ~  s  gui.cs   master ↑10 = Сохранить");
+			var muhkb = ustring.Make (" ~  s  gui.cs   master ↑10 = Сохранить");
 			var moveUnicodeHotKeyBtn = new Button (muhkb) {
 				X = Pos.Left (absoluteFrame) + 1,
 				Y = Pos.Bottom (radioGroup) + 1,
