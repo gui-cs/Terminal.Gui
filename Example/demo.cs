@@ -458,11 +458,12 @@ static class Demo {
 					.OrderBy (x => x).ToList ();
 			}
 		}
-		var list = new ComboBox () { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() };
+		var list = new ComboBox () { Width = Dim.Fill(), Height = Dim.Fill() };
 		list.SetSource(items.ToList());
 		list.SelectedItemChanged += (object sender, ustring text) => { Application.RequestStop (); };
 
-		var d = new Dialog ("Select source file", 40, 12) { list };
+		var d = new Dialog () { Title = "Select source file", Width = Dim.Percent (50), Height = Dim.Percent (50) };
+		d.Add (list);
 		Application.Run (d);
 
 		MessageBox.Query (60, 10, "Selected file", list.Text.ToString() == "" ? "Nothing selected" : list.Text.ToString(), "Ok");
