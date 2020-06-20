@@ -26,14 +26,14 @@ namespace UICatalog.Scenarios {
 			var lbListView = new Label ("Listview") {
 				ColorScheme = Colors.TopLevel,
 				X = 0,
-				Width = 30
+				Width = Dim.Percent (40)
 			};
 
 			var listview = new ListView (items) {
 				X = 0,
 				Y = Pos.Bottom (lbListView) + 1,
 				Height = Dim.Fill(2),
-				Width = 30
+				Width = Dim.Percent (40)
 			};
 			listview.OpenSelectedItem += (ListViewItemEventArgs e) => lbListView.Text = items [listview.SelectedItem];
 			Win.Add (lbListView, listview);
