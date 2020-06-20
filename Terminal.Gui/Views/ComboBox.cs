@@ -338,7 +338,7 @@ namespace Terminal.Gui {
 		private int CalculatetHeight ()
 		{
 			var h = (Height is Dim.DimAbsolute) ? height : Bounds.Height;
-			return Math.Min (Math.Max (0, h - 1), searchset.Count);
+			return Math.Min (Math.Max (0, h - 1), searchset?.Count ?? 0);
 		}
 	}
 }
