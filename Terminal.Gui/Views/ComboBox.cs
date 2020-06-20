@@ -81,6 +81,19 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Public constructor
 		/// </summary>
+		/// <param name="text"></param>
+		public ComboBox (ustring text) : base ()
+		{
+			search = new TextField ("");
+			listview = new ListView () { LayoutStyle = LayoutStyle.Computed, CanFocus = true };
+
+			Initialize ();
+			Text = text;
+		}
+
+		/// <summary>
+		/// Public constructor
+		/// </summary>
 		/// <param name="rect"></param>
 		/// <param name="source"></param>
 		public ComboBox (Rect rect, IList source) : base (rect)
