@@ -339,7 +339,7 @@ namespace Terminal.Gui {
 			if (string.IsNullOrEmpty (search.Text.ToString ()))
 				ResetSearchSet ();
 			else
-				searchset = source.ToList().Cast<ustring>().Where (x => x.ToString().StartsWith (search.Text.ToString (), StringComparison.CurrentCultureIgnoreCase)).ToList();
+				searchset = source.ToList().Cast<object>().Where (x => x.ToString().StartsWith (search.Text.ToString (), StringComparison.CurrentCultureIgnoreCase)).ToList();
 
 			listview.SetSource (searchset);
 			listview.Height = CalculatetHeight ();
