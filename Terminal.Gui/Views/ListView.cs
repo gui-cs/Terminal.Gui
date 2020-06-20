@@ -242,12 +242,25 @@ namespace Terminal.Gui {
 		{
 			Source = source;
 			CanFocus = true;
+			if (source.Count > 0)
+				Text = source.ToList () [selected].ToString ();
+		}
+		ustring text;
+
+		///<inheritdoc/>
+		public ustring Text { get { return text; }
+			set {
+				text = value;
+				if (source.Count == 1 && selected == 0 && source.ToList () [selected].ToString () == string.Empty)
+					source.ToList () [selected] = text.ToString ();
+
+			}
 		}
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="ListView"/>. Set the <see cref="Source"/> property to display something.
 		/// </summary>
-		public ListView () : base ()
+		public ListView () : this (new List<string> () { string.Empty })
 		{
 		}
 
@@ -469,6 +482,7 @@ namespace Terminal.Gui {
 		{
 			if (selected != lastSelectedItem) {
 				var value = source.ToList () [selected];
+				Text = value.ToString ();
 				SelectedItemChanged?.Invoke (new ListViewItemEventArgs (selected, value));
 				lastSelectedItem = selected;
 				return true;
