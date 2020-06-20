@@ -4,10 +4,6 @@
 // Authors:
 //   Ross Ferguson (ross.c.ferguson@btinternet.com)
 //
-// TODO:
-//  LayoutComplete() resize Height implement
-//	Cursor rolls of end of list when Height = Dim.Fill() and list fills frame
-//
 
 using System;
 using System.Collections;
@@ -33,6 +29,7 @@ namespace Terminal.Gui {
 			get => source;
 			set {
 				source = value;
+				Search_Changed ("");
 				SetNeedsDisplay ();
 			}
 		}
@@ -88,7 +85,6 @@ namespace Terminal.Gui {
 		/// <param name="source"></param>
 		public ComboBox (Rect rect, IList source) : base (rect)
 		{
-			SetSource (source);
 			this.height = rect.Height;
 			this.width = rect.Width;
 
@@ -96,6 +92,7 @@ namespace Terminal.Gui {
 			listview = new ListView (rect, source) { LayoutStyle = LayoutStyle.Computed };
 
 			Initialize ();
+			SetSource (source);
 		}
 
 		static IListDataSource MakeWrapper (IList source)
@@ -108,12 +105,14 @@ namespace Terminal.Gui {
 			ColorScheme = Colors.Base;
 
 			search.TextChanged += Search_Changed;
+			listview.OpenSelectedItem += (ListViewItemEventArgs a) => Selected();
 
 			// On resize
 			LayoutComplete += (LayoutEventArgs a) => {
 
 				search.Width = Bounds.Width;
 				listview.Width = autoHide ? Bounds.Width - 1 : Bounds.Width;
+				listview.Height = CalculatetHeight ();
 			};
 
 			listview.SelectedItemChanged += (ListViewItemEventArgs e) => {
@@ -135,30 +134,20 @@ namespace Terminal.Gui {
 
 				ColorScheme = autoHide ? Colors.Base : ColorScheme = null;
 
-				// Needs to be re-applied for LayoutStyle.Computed
-				// If Dim or Pos are null, these are the from the parametrized constructor
-				listview.Y = 1;
+				listview.Y = Pos.Bottom (search);
 
-				if (Width == null) {
-					listview.Width = CalculateWidth ();
-					search.Width = width;
-				} else {
-					width = GetDimAsInt (Width, vertical: false);
-					search.Width = width;
-					listview.Width = CalculateWidth ();
-				}
+				if (Width != null && width == 0) // new ComboBox() { Width = 
+					width = Bounds.Width;
 
-				if (Height == null) {
-					var h = CalculatetHeight ();
-					listview.Height = h;
-					this.Height = h + 1; // adjust view to account for search box
-				} else {
-					if (height == 0)
-						height = GetDimAsInt (Height, vertical: true);
+				search.Width = width;
+				listview.Width = CalculateWidth ();
 
-					listview.Height = CalculatetHeight ();
-					this.Height = height + 1; // adjust view to account for search box
-				}
+				if (Height != null && height == 0) // new ComboBox() { Height = 
+					height = Bounds.Height;
+
+				listview.Height = CalculatetHeight ();
+
+				SetNeedsLayout ();
 
 				if (this.Text != null)
 					Search_Changed (Text);
@@ -216,21 +205,7 @@ namespace Terminal.Gui {
 			}
 
 			if (e.Key == Key.Enter && listview.HasFocus) {
-				if (listview.Source.Count == 0 || searchset.Count == 0) {
-					text = "";
-					return true;
-				}
-
-				SetValue((string)searchset [listview.SelectedItem]);
-				search.CursorPosition = search.Text.Length;
-				Search_Changed (search.Text);
-				OnSelectedChanged ();
-
-				searchset.Clear();
-				listview.Clear ();
-				listview.Height = 0;
-				this.SetFocus(search);
-
+				Selected ();
 				return true;
 			}
 
@@ -289,14 +264,28 @@ namespace Terminal.Gui {
 			search.TextChanged += Search_Changed;
 		}
 
+		private void Selected()
+		{
+			if (listview.Source.Count == 0 || searchset.Count == 0) {
+				text = "";
+				return;
+			}
+
+			SetValue ((string)searchset [listview.SelectedItem]);
+			search.CursorPosition = search.Text.Length;
+			Search_Changed (search.Text);
+			Reset (keepSearchText: true);
+		}
+
 		/// <summary>
 		/// Reset to full original list
 		/// </summary>
-		private void Reset()
+		private void Reset(bool keepSearchText = false)
 		{
-			search.Text = text = "";
-			OnSelectedChanged();
+			if(!keepSearchText) 
+				search.Text = text = "";
 
+			OnSelectedChanged ();
 			ResetSearchSet ();
 
 			listview.SetSource(searchset);
@@ -334,15 +323,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Internal height of dynamic search list
-		/// </summary>
-		/// <returns></returns>
-		private int CalculatetHeight ()
-		{
-			return Math.Min (height, searchset.Count);
-		}
-
-		/// <summary>
 		/// Internal width of search list
 		/// </summary>
 		/// <returns></returns>
@@ -352,21 +332,13 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Get Dim as integer value
+		/// Internal height of dynamic search list
 		/// </summary>
-		/// <param name="dim"></param>
-		/// <param name="vertical"></param>
-		/// <returns></returns>n
-		private int GetDimAsInt (Dim dim, bool vertical)
+		/// <returns></returns>
+		private int CalculatetHeight ()
 		{
-			if (dim is Dim.DimAbsolute)
-				return dim.Anchor (0);
-			else { // Dim.Fill Dim.Factor
-				if(autoHide)
-					return vertical ? dim.Anchor (SuperView.Bounds.Height) : dim.Anchor (SuperView.Bounds.Width);
-				else 
-					return vertical ? dim.Anchor (Bounds.Height) : dim.Anchor (Bounds.Width);
-			}
+			var h = (Height is Dim.DimAbsolute) ? height : Bounds.Height;
+			return Math.Min (Math.Max (0, h - 1), searchset.Count);
 		}
 	}
 }
