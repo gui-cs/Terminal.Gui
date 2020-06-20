@@ -449,13 +449,13 @@ static class Demo {
 
 	static void ComboBoxDemo ()
 	{
-		IList<string> items = new List<string> ();
+		List<ustring> items = new List<ustring> ();
 		foreach (var dir in new [] { "/etc", @"\windows\System32" }) {
 			if (Directory.Exists (dir)) {
 				items = Directory.GetFiles (dir).Union (Directory.GetDirectories (dir))
 					.Select (Path.GetFileName)
 					.Where (x => char.IsLetterOrDigit (x [0]))
-					.OrderBy (x => x).ToList ();
+					.OrderBy (x => x).Select (x => ustring.Make (x)).ToList ();
 			}
 		}
 		var list = new ComboBox () { Width = Dim.Fill(), Height = Dim.Fill() };
