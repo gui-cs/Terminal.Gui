@@ -568,7 +568,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < byteLen;) {
 				(var rune, var size) = Utf8.DecodeRune (ustr, i, i - byteLen);
 				var count = Rune.ColumnWidth (rune);
-				if (used + count >= width)
+				if (used + count > width)
 					break;
 				driver.AddRune (rune);
 				used += count;
