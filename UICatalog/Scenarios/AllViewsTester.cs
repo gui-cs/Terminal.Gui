@@ -316,7 +316,7 @@ namespace UICatalog {
 
 		void UpdateTitle (View view)
 		{
-			_hostPane.Title = $"{view.GetType().Name} - {view.X.ToString ()}, {view.Y.ToString ()}, {view.Width.ToString ()}, {view.Height.ToString ()}";
+			_hostPane.Title = $"{view.GetType ().Name} - {view.X.ToString ()}, {view.Y.ToString ()}, {view.Width.ToString ()}, {view.Height.ToString ()}";
 		}
 
 		List<Type> GetAllViewClassesCollection ()
@@ -361,11 +361,15 @@ namespace UICatalog {
 				}
 			}
 
-			if (view == null) return null;
-
 			// If the view supports a Title property, set it so we have something to look at
-			if (view.GetType ().GetProperty ("Title") != null) {
+			if (view != null && view.GetType ().GetProperty ("Title") != null) {
 				view?.GetType ().GetProperty ("Title")?.GetSetMethod ()?.Invoke (view, new [] { ustring.Make ("Test Title") });
+			}
+
+			// If the view supports a Source property, set it so we have something to look at
+			if (view != null && view.GetType ().GetProperty ("Source") != null) {
+				var source = new ListWrapper (new List<ustring> () { ustring.Make ("List Item #1"), ustring.Make ("List Item #2"), ustring.Make ("List Item #3")});
+				view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
 			}
 
 			// Set Settings
