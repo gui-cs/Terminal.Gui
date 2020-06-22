@@ -140,7 +140,7 @@ type Demo() = class end
         container.Add (login, loginText, password, passText,
             new FrameView (new Rect (3, 10, 25, 6), ustr "Options",
                 [|new CheckBox (1, 0, ustr "Remember me");
-                new RadioGroup (1, 2, [|"_Personal"; "_Company"|])|]
+                new RadioGroup (1, 2, [|ustr "_Personal"; ustr "_Company"|])|]
                 ),
             new ListView (new Rect(59, 6, 16, 4),
                     [|"First row";
@@ -434,8 +434,7 @@ type Demo() = class end
             new StatusItem(Key.F2, ustr "~F2~ Load", Action(Load));
             new StatusItem(Key.F3, ustr "~F3~ Save", Action(Save));
             new StatusItem(Key.ControlX, ustr "~^X~ Quit", fun () -> if (Quit ()) then top.Running <- false)
-            |],
-            Parent = null
+            |]
             )
         win.Add (drag, dragText)
         let mutable bottom = new Label(ustr "This should go on the bottom of the same top-level!")

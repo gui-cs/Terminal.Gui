@@ -279,7 +279,7 @@ namespace Terminal.Gui {
 			}
 			internal override int Anchor (int width)
 			{
-				switch(side) {
+				switch (side) {
 				case 0: return Target.Frame.X;
 				case 1: return Target.Frame.Y;
 				case 2: return Target.Frame.Right;
@@ -292,7 +292,7 @@ namespace Terminal.Gui {
 			public override string ToString ()
 			{
 				string tside;
-				switch(side) {
+				switch (side) {
 				case 0: tside = "x"; break;
 				case 1: tside = "y"; break;
 				case 2: tside = "right"; break;
@@ -308,42 +308,42 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos Left (View view) => new PosView (view, 0);
+		public static Pos Left (View view) => new PosCombine (true, new PosView (view, 0), new Pos.PosAbsolute (0));
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object tracks the Left (X) position of the specified <see cref="View"/>.
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos X (View view) => new PosView (view, 0);
+		public static Pos X (View view) => new PosCombine (true, new PosView (view, 0), new Pos.PosAbsolute (0));
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object tracks the Top (Y) position of the specified <see cref="View"/>.
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos Top (View view) => new PosView (view, 1);
+		public static Pos Top (View view) => new PosCombine (true, new PosView (view, 1), new Pos.PosAbsolute (0));
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object tracks the Top (Y) position of the specified <see cref="View"/>.
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos Y (View view) => new PosView (view, 1);
+		public static Pos Y (View view) => new PosCombine (true, new PosView (view, 1), new Pos.PosAbsolute (0));
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object tracks the Right (X+Width) coordinate of the specified <see cref="View"/>.
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos Right (View view) => new PosView (view, 2);
+		public static Pos Right (View view) => new PosCombine (true, new PosView (view, 2), new Pos.PosAbsolute (0));
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object tracks the Bottom (Y+Height) coordinate of the specified <see cref="View"/> 
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos Bottom (View view) => new PosView (view, 3);
+		public static Pos Bottom (View view) => new PosCombine (true, new PosView (view, 3), new Pos.PosAbsolute (0));
 	}
 
 	/// <summary>
@@ -366,12 +366,14 @@ namespace Terminal.Gui {
 			return 0;
 		}
 
-		class DimFactor : Dim {
+		internal class DimFactor : Dim {
 			float factor;
+			bool remaining;
 
-			public DimFactor (float n)
+			public DimFactor (float n, bool r = false)
 			{
-				this.factor = n;
+				factor = n;
+				remaining = r;
 			}
 
 			internal override int Anchor (int width)
@@ -379,14 +381,19 @@ namespace Terminal.Gui {
 				return (int)(width * factor);
 			}
 
+			public bool IsFromRemaining ()
+			{
+				return remaining;
+			}
+
 			public override string ToString ()
 			{
-				return $"Dim.Factor({factor})";
+				return $"Dim.Factor(factor={factor}, remaining={remaining})";
 			}
 
 			public override int GetHashCode () => factor.GetHashCode ();
 
-			public override bool Equals (object other) => other is DimFactor f && f.factor == factor;
+			public override bool Equals (object other) => other is DimFactor f && f.factor == factor && f.remaining == remaining;
 
 		}
 
@@ -395,6 +402,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>The percent <see cref="Dim"/> object.</returns>
 		/// <param name="n">A value between 0 and 100 representing the percentage.</param>
+		/// <param name="r">If <c>true</c> the Percent is computed based on the remaining space after the X/Y anchor positions. If <c>false</c> is computed based on the whole original space.</param>
 		/// <example>
 		/// This initializes a <see cref="TextField"/>that is centered horizontally, is 50% of the way down, 
 		/// is 30% the height, and is 80% the width of the <see cref="View"/> it added to.
@@ -407,12 +415,12 @@ namespace Terminal.Gui {
 		/// };
 		/// </code>
 		/// </example>
-		public static Dim Percent (float n)
+		public static Dim Percent (float n, bool r = false)
 		{
 			if (n < 0 || n > 100)
 				throw new ArgumentException ("Percent value must be between 0 and 100");
 
-			return new DimFactor (n / 100);
+			return new DimFactor (n / 100, r);
 		}
 
 		internal class DimAbsolute : Dim {
@@ -546,7 +554,7 @@ namespace Terminal.Gui {
 			public override string ToString ()
 			{
 				string tside;
-				switch(side) {
+				switch (side) {
 				case 0: tside = "Height"; break;
 				case 1: tside = "Width"; break;
 				default: tside = "unknown"; break;
@@ -556,13 +564,18 @@ namespace Terminal.Gui {
 
 			internal override int Anchor (int width)
 			{
-				switch(side) {
+				switch (side) {
 				case 0: return Target.Frame.Height;
 				case 1: return Target.Frame.Width;
 				default:
 					return 0;
 				}
 			}
+
+			public override int GetHashCode () => Target.GetHashCode ();
+
+			public override bool Equals (object other) => other is DimView abs && abs.Target == Target;
+
 		}
 		/// <summary>
 		/// Returns a <see cref="Dim"/> object tracks the Width of the specified <see cref="View"/>.
@@ -577,5 +590,15 @@ namespace Terminal.Gui {
 		/// <returns>The <see cref="Dim"/> of the other <see cref="View"/>.</returns>
 		/// <param name="view">The view that will be tracked.</param>
 		public static Dim Height (View view) => new DimView (view, 0);
+
+		/// <summary>Serves as the default hash function. </summary>
+		/// <returns>A hash code for the current object.</returns>
+		public override int GetHashCode () => GetHashCode ();
+
+		/// <summary>Determines whether the specified object is equal to the current object.</summary>
+		/// <param name="other">The object to compare with the current object. </param>
+		/// <returns>
+		///     <see langword="true" /> if the specified object  is equal to the current object; otherwise, <see langword="false" />.</returns>
+		public override bool Equals (object other) => other is Dim abs && abs == this;
 	}
 }

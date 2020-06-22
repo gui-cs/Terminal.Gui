@@ -364,7 +364,7 @@ namespace Terminal.Gui {
 		[DllImport ("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode)]
 		public static extern bool ReadConsoleInput (
 			IntPtr hConsoleInput,
-			[Out] InputRecord [] lpBuffer,
+			IntPtr lpBuffer,
 			uint nLength,
 			out uint lpNumberOfEventsRead);
 
@@ -418,6 +418,24 @@ namespace Terminal.Gui {
 				uint v;
 				GetNumberOfConsoleInputEvents (InputHandle, out v);
 				return v;
+			}
+		}
+		
+		public InputRecord [] ReadConsoleInput ()
+		{
+			const int bufferSize = 1;
+			var pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * bufferSize);
+			try {
+				ReadConsoleInput (InputHandle, pRecord, bufferSize,
+					out var numberEventsRead);
+
+				return numberEventsRead == 0
+					? null
+					: new [] {Marshal.PtrToStructure<InputRecord> (pRecord)};
+			} catch (Exception) {
+				return null;
+			} finally {
+				Marshal.FreeHGlobal (pRecord);
 			}
 		}
 
@@ -577,13 +595,7 @@ namespace Terminal.Gui {
 				waitForProbe.Wait ();
 				waitForProbe.Reset ();
 
-				uint numberEventsRead = 0;
-
-				WindowsConsole.ReadConsoleInput (winConsole.InputHandle, records, 1, out numberEventsRead);
-				if (numberEventsRead == 0)
-					result = null;
-				else
-					result = records;
+				result = winConsole.ReadConsoleInput ();
 
 				eventReady.Set ();
 			}
@@ -1182,6 +1194,7 @@ namespace Terminal.Gui {
 
 		public override void AddRune (Rune rune)
 		{
+			rune = MakePrintable (rune);
 			var position = crow * Cols + ccol;
 
 			if (Clip.Contains (ccol, crow)) {

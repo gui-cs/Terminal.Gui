@@ -121,6 +121,9 @@ namespace Terminal.Gui {
 
 		public Size (int width, int height)
 		{
+			if (width < 0 || height < 0)
+				throw new ArgumentException ("Either Width and Height must be greater or equal to 0.");
+
 			this.width = width;
 			this.height = height;
 		}
@@ -152,6 +155,8 @@ namespace Terminal.Gui {
 				return width;
 			}
 			set {
+				if (value < 0)
+					throw new ArgumentException ("Width must be greater or equal to 0.");
 				width = value;
 			}
 		}
@@ -169,6 +174,8 @@ namespace Terminal.Gui {
 				return height;
 			}
 			set {
+				if (value < 0)
+					throw new ArgumentException ("Height must be greater or equal to 0.");
 				height = value;
 			}
 		}

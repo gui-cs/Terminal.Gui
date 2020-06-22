@@ -7,11 +7,11 @@ namespace UICatalog {
 	[ScenarioCategory ("Input")]
 	class Keys : Scenario {
 
-		static List<string> _processKeyList = new List<string> ();
-		static List<string> _processHotKeyList = new List<string> ();
-		static List<string> _processColdKeyList = new List<string> ();
-
 		class TestWindow : Window {
+			public List<string> _processKeyList = new List<string> ();
+			public List<string> _processHotKeyList = new List<string> ();
+			public List<string> _processColdKeyList = new List<string> ();
+
 			public TestWindow (ustring title = null) : base (title)
 			{
 			}
@@ -112,7 +112,7 @@ namespace UICatalog {
 			var keyStrokeListView = new ListView (keyStrokelist) {
 				X = 0,
 				Y = Pos.Top (keyLogLabel) + yOffset,
-				Width = maxLogEntry,
+				Width = Dim.Percent (30),
 				Height = Dim.Fill (),
 			};
 			keyStrokeListView.ColorScheme = Colors.TopLevel;
@@ -127,10 +127,10 @@ namespace UICatalog {
 
 			maxLogEntry = $"{fakeKeyPress}".Length;
 			yOffset = (Top == Application.Top ? 1 : 6);
-			var processKeyListView = new ListView (_processKeyList) {
+			var processKeyListView = new ListView (((TestWindow)Win)._processKeyList) {
 				X = Pos.Left (processKeyLogLabel),
 				Y = Pos.Top (processKeyLogLabel) + yOffset,
-				Width = maxLogEntry,
+				Width = Dim.Percent(30),
 				Height = Dim.Fill (),
 			};
 			processKeyListView.ColorScheme = Colors.TopLevel;
@@ -145,10 +145,10 @@ namespace UICatalog {
 			Win.Add (processHotKeyLogLabel);
 
 			yOffset = (Top == Application.Top ? 1 : 6);
-			var processHotKeyListView = new ListView (_processHotKeyList) {
+			var processHotKeyListView = new ListView (((TestWindow)Win)._processHotKeyList) {
 				X = Pos.Left (processHotKeyLogLabel),
 				Y = Pos.Top (processHotKeyLogLabel) + yOffset,
-				Width = maxLogEntry,
+				Width = Dim.Percent (20),
 				Height = Dim.Fill (),
 			};
 			processHotKeyListView.ColorScheme = Colors.TopLevel;
@@ -163,10 +163,10 @@ namespace UICatalog {
 			Win.Add (processColdKeyLogLabel);
 
 			yOffset = (Top == Application.Top ? 1 : 6);
-			var processColdKeyListView = new ListView (_processColdKeyList) {
+			var processColdKeyListView = new ListView (((TestWindow)Win)._processColdKeyList) {
 				X = Pos.Left (processColdKeyLogLabel),
 				Y = Pos.Top (processColdKeyLogLabel) + yOffset,
-				Width = maxLogEntry,
+				Width = Dim.Percent (20),
 				Height = Dim.Fill (),
 			};
 

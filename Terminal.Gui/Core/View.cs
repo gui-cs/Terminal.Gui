@@ -1325,8 +1325,10 @@ namespace Terminal.Gui {
 					_x = x.Anchor (hostFrame.Width);
 				if (width == null)
 					w = hostFrame.Width;
+				else if (width is Dim.DimFactor && !((Dim.DimFactor)width).IsFromRemaining ())
+					w = width.Anchor (hostFrame.Width);
 				else
-					w = width.Anchor (hostFrame.Width - _x);
+					w = Math.Max (width.Anchor (hostFrame.Width - _x), 0);
 			}
 
 			if (y is Pos.PosCenter) {
@@ -1342,8 +1344,10 @@ namespace Terminal.Gui {
 					_y = y.Anchor (hostFrame.Height);
 				if (height == null)
 					h = hostFrame.Height;
+				else if (height is Dim.DimFactor && !((Dim.DimFactor)height).IsFromRemaining ())
+					h = height.Anchor (hostFrame.Height);
 				else
-					h = height.Anchor (hostFrame.Height - _y);
+					h = Math.Max (height.Anchor (hostFrame.Height - _y), 0);
 			}
 			Frame = new Rect (_x, _y, w, h);
 		}
