@@ -47,8 +47,8 @@ namespace UICatalog {
 				var lbl = new Label (1, 1, "Tick every (ms):");
 				LeftFrame.Add (lbl);
 				Speed = new TextField ("") {
-					X = Pos.Right (lbl) + 1,
-					Y = Pos.Y (lbl),
+					X = Pos.X (lbl),
+					Y = Pos.Bottom (lbl),
 					Width = 7,
 				};
 				LeftFrame.Add (Speed);
@@ -134,9 +134,9 @@ namespace UICatalog {
 		}
 
 		private Timer _systemTimer = null;
-		private uint _systemTimerTick = 1000; // ms
+		private uint _systemTimerTick = 100; // ms
 		private object _mainLoopTimeout = null;
-		private uint _mainLooopTimeoutTick = 1000; // ms
+		private uint _mainLooopTimeoutTick = 100; // ms
 		public override void Setup ()
 		{
 			// Demo #1 - Use System.Timer (and threading)
