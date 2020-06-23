@@ -190,5 +190,44 @@ namespace Terminal.Gui {
 			}
 			return base.ProcessKey (kb);
 		}
+
+
+		/// <summary>
+		///   Clicked <see cref="Action"/>, raised when the user clicks the primary mouse button within the Bounds of this <see cref="View"/>
+		///   or if the user presses the action key while this view is focused. (TODO: IsDefault)
+		/// </summary>
+		/// <remarks>
+		///   Client code can hook up to this event, it is
+		///   raised when the button is activated either with
+		///   the mouse or the keyboard.
+		/// </remarks>
+		public Action Clicked;
+
+		/// <summary>
+		/// Method invoked when a mouse event is generated
+		/// </summary>
+		/// <param name="mouseEvent"></param>
+		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
+		public override bool OnMouseEvent (MouseEvent mouseEvent)
+		{
+			MouseEventArgs args = new MouseEventArgs (mouseEvent);
+			MouseClick?.Invoke (args);
+			if (args.Handled)
+				return true;
+			if (MouseEvent (mouseEvent))
+				return true;
+
+
+			if (mouseEvent.Flags == MouseFlags.Button1Clicked) {
+				if (!HasFocus && SuperView != null) {
+					SuperView.SetFocus (this);
+					SetNeedsDisplay ();
+				}
+
+				Clicked?.Invoke ();
+				return true;
+			}
+			return false;
+		}
 	}
 }

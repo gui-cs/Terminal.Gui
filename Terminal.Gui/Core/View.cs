@@ -159,17 +159,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Rune HotKeySpecifier { get => viewText.HotKeySpecifier; set => viewText.HotKeySpecifier = value; }
 
-		/// <summary>
-		///   Clicked <see cref="Action"/>, raised when the user clicks the primary mouse button within the Bounds of this <see cref="View"/>
-		///   or if the user presses the action key while this view is focused. (TODO: IsDefault)
-		/// </summary>
-		/// <remarks>
-		///   Client code can hook up to this event, it is
-		///   raised when the button is activated either with
-		///   the mouse or the keyboard.
-		/// </remarks>
-		public Action Clicked;
-
 		internal Direction FocusDirection {
 			get => SuperView?.FocusDirection ?? focusDirection;
 			set {
@@ -1179,12 +1168,6 @@ namespace Terminal.Gui {
 			if (Focused?.ProcessKey (keyEvent) == true)
 				return true;
 
-			var c = keyEvent.KeyValue;
-			if (c == '\n' || c == ' ' || keyEvent.Key == HotKey) {
-				Clicked?.Invoke ();
-				return true;
-			}
-
 			return false;
 		}
 
@@ -1545,10 +1528,11 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			viewText.Size = Bounds.Size;
-
 			Rect oldBounds = Bounds;
 			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
+
+			viewText.Size = Bounds.Size;
+
 
 			// Sort out the dependencies of the X, Y, Width, Height properties
 			var nodes = new HashSet<View> ();
@@ -1703,7 +1687,6 @@ namespace Terminal.Gui {
 					SetNeedsDisplay ();
 				}
 
-				Clicked?.Invoke ();
 				return true;
 			}
 			return false;
