@@ -105,8 +105,7 @@
         * TextAlignment is implemented once across all Views that support it.
         * Unicode support is now much more robust and complete; dozens of bugs fixed.
         * Any view dervied from View now has a Text property with multi-line text formatting, including word-wrap and hotkey support.
-        * Any view derived from View now gets mouse click (Clicked event) support for free.
-        * Label is now just an alias for View.
+        * Label is now mostly just an alias for View; supports Clicked
         * Button is now a very thin class derived from View (no API changes).
         * Dozens of unit tests for TextAlignment are provided reducing the chance of regressions.
 
