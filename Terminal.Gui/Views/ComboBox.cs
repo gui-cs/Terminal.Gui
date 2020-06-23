@@ -122,7 +122,7 @@ namespace Terminal.Gui {
 					SetValue ((string)searchset [listview.SelectedItem]);
 			};
 
-			Application.Loaded += (Application.ResizedEventArgs a) => {
+			Loaded += (Application.ResizedEventArgs a) => {
 				// Determine if this view is hosted inside a dialog
 				for (View view = this.SuperView; view != null; view = view.SuperView) {
 					if (view is Dialog) {

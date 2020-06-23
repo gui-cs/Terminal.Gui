@@ -426,12 +426,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// This event is fired once when the application is first loaded. The dimensions of the
-		/// terminal are provided.
-		/// </summary>
-		public static Action<ResizedEventArgs> Loaded;
-
-		/// <summary>
 		/// Building block API: Prepares the provided <see cref="Toplevel"/>  for execution.
 		/// </summary>
 		/// <returns>The runstate handle that needs to be passed to the <see cref="End(RunState, bool)"/> method upon completion.</returns>
@@ -465,13 +459,26 @@ namespace Terminal.Gui {
 			if (toplevel.LayoutStyle == LayoutStyle.Computed)
 				toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
 			toplevel.LayoutSubviews ();
-			Loaded?.Invoke (new ResizedEventArgs () { Rows = Driver.Rows, Cols = Driver.Cols });
+			OnLoaded (toplevel, new ResizedEventArgs () { Rows = Driver.Rows, Cols = Driver.Cols });
 			toplevel.WillPresent ();
 			Redraw (toplevel);
 			toplevel.PositionCursor ();
 			Driver.Refresh ();
 
 			return rs;
+		}
+
+		//There is no need to overrides this because it's called once and is only managed by the Application class.
+		static void OnLoaded (View view, ResizedEventArgs eventArgs)
+		{
+			view.Loaded?.Invoke (eventArgs);
+			for (int i = 0; i < view.Subviews.Count; i++) {
+				View v = view.Subviews [i];
+				v.Loaded?.Invoke (eventArgs);
+				if (v.Subviews.Count > 0) {
+					OnLoaded (v.Subviews [0], eventArgs);
+				}
+			}
 		}
 
 		/// <summary>

@@ -143,6 +143,12 @@ namespace Terminal.Gui {
 		Direction focusDirection;
 
 		/// <summary>
+		/// This event is fired once when the application is first loaded. The dimensions of the
+		/// terminal are provided.
+		/// </summary>
+		public Action<Application.ResizedEventArgs> Loaded;
+
+		/// <summary>
 		/// Event fired when the view gets focus.
 		/// </summary>
 		public Action<FocusEventArgs> Enter;
