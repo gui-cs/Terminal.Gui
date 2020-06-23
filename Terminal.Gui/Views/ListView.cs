@@ -285,7 +285,7 @@ namespace Terminal.Gui {
 			for (int row = 0; row < f.Height; row++, item++) {
 				bool isSelected = item == selected;
 
-				var newcolor = focused ? (isSelected ? ColorScheme.Focus : ColorScheme.Normal) : ColorScheme.Normal;
+				var newcolor = focused ? (isSelected ? ColorScheme.Focus : ColorScheme.Normal) : (isSelected ? ColorScheme.HotNormal : ColorScheme.Normal);
 				if (newcolor != current) {
 					Driver.SetAttribute (newcolor);
 					current = newcolor;
@@ -568,7 +568,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < byteLen;) {
 				(var rune, var size) = Utf8.DecodeRune (ustr, i, i - byteLen);
 				var count = Rune.ColumnWidth (rune);
-				if (used + count >= width)
+				if (used + count > width)
 					break;
 				driver.AddRune (rune);
 				used += count;
