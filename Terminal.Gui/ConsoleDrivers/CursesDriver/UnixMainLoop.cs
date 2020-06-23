@@ -168,45 +168,38 @@ namespace Terminal.Gui {
 
 		bool IMainLoopDriver.EventsPending (bool wait)
 		{
-			int pollTimeout = 0;
-			int n;
-
-			if (CkeckTimeout (wait, ref pollTimeout))
+			if (CheckTimers (wait, out var pollTimeout)) {
 				return true;
+			}
 
 			UpdatePollMap ();
 
-			while (true) {
-				n = poll (pollmap, (uint)pollmap.Length, 0);
-				if (pollmap != null) {
-					break;
-				}
-				if (mainLoop.idleHandlers.Count > 0 || CkeckTimeout (wait, ref pollTimeout)) {
-					return true;
-				}
-			}
-			int ic;
-			lock (mainLoop.idleHandlers)
-				ic = mainLoop.idleHandlers.Count;
-			return n > 0 || mainLoop.timeouts.Count > 0 && ((mainLoop.timeouts.Keys [0] - DateTime.UtcNow.Ticks) < 0) || ic > 0;
+			var n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
+			
+			return n > 0 || CheckTimers (wait, out pollTimeout);
 		}
 
-		bool CkeckTimeout (bool wait, ref int pollTimeout)
+		bool CheckTimers (bool wait, out int pollTimeout)
 		{
 			long now = DateTime.UtcNow.Ticks;
 
 			if (mainLoop.timeouts.Count > 0) {
 				pollTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-				if (pollTimeout < 0)
+				if (pollTimeout < 0) {
 					return true;
-
+				}
 			} else
 				pollTimeout = -1;
 
 			if (!wait)
 				pollTimeout = 0;
 
-			return false;
+			int ic;
+			lock (mainLoop.idleHandlers) {
+				ic = mainLoop.idleHandlers.Count;
+			}
+
+			return ic > 0;
 		}
 
 		void IMainLoopDriver.MainIteration ()
