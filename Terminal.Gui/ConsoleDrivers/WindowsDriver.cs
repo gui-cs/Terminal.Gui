@@ -615,24 +615,16 @@ namespace Terminal.Gui {
 
 		bool IMainLoopDriver.EventsPending (bool wait)
 		{
-			int waitTimeout = 0;
-
-			if (CkeckTimeout (wait, ref waitTimeout))
+			if (CheckTimers (wait, out var waitTimeout)) {
 				return true;
+			}
 
 			result = null;
 			waitForProbe.Set ();
 
 			try {
-				while (result == null) {
-					if (!tokenSource.IsCancellationRequested)
-						eventReady.Wait (0, tokenSource.Token);
-					if (result != null) {
-						break;
-					}
-					if (mainLoop.idleHandlers.Count > 0 || CkeckTimeout (wait, ref waitTimeout)) {
-						return true;
-					}
+				if (!tokenSource.IsCancellationRequested) {
+					eventReady.Wait (waitTimeout, tokenSource.Token);
 				}
 			} catch (OperationCanceledException) {
 				return true;
@@ -640,15 +632,16 @@ namespace Terminal.Gui {
 				eventReady.Reset ();
 			}
 
-			if (!tokenSource.IsCancellationRequested)
-				return result != null;
+			if (!tokenSource.IsCancellationRequested) {
+				return result != null || CheckTimers (wait, out waitTimeout);
+			}
 
 			tokenSource.Dispose ();
 			tokenSource = new CancellationTokenSource ();
 			return true;
 		}
 
-		bool CkeckTimeout (bool wait, ref int waitTimeout)
+		bool CheckTimers (bool wait, out int waitTimeout)
 		{
 			long now = DateTime.UtcNow.Ticks;
 
@@ -663,7 +656,12 @@ namespace Terminal.Gui {
 			if (!wait)
 				waitTimeout = 0;
 
-			return false;
+			int ic;
+			lock (mainLoop.idleHandlers) {
+				ic = mainLoop.idleHandlers.Count;
+			}
+
+			return ic > 0;
 		}
 
 		Action<KeyEvent> keyHandler;

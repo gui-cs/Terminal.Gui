@@ -95,9 +95,11 @@ namespace Terminal.Gui {
 		/// <param name="idleHandler">Token that can be used to remove the idle handler with <see cref="RemoveIdle(Func{bool})"/> .</param>
 		public Func<bool> AddIdle (Func<bool> idleHandler)
 		{
-			lock (idleHandlers)
+			lock (idleHandlers) {
 				idleHandlers.Add (idleHandler);
+			}
 
+			Driver.Wakeup ();
 			return idleHandler;
 		}
 
