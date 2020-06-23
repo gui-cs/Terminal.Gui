@@ -143,6 +143,16 @@ namespace Terminal.Gui {
 		Direction focusDirection;
 
 		/// <summary>
+		/// Event fired when the view is added.
+		/// </summary>
+		public Action<View> AddedView;
+
+		/// <summary>
+		/// Event fired when the view is being removing.
+		/// </summary>
+		public Action<View> RemovingView;
+
+		/// <summary>
 		/// Event fired when the view gets focus.
 		/// </summary>
 		public Action<FocusEventArgs> Enter;
@@ -488,6 +498,7 @@ namespace Terminal.Gui {
 				subviews = new List<View> ();
 			subviews.Add (view);
 			view.container = this;
+			OnAddedView (view);
 			if (view.CanFocus)
 				CanFocus = true;
 			SetNeedsLayout ();
@@ -532,6 +543,7 @@ namespace Terminal.Gui {
 			if (view == null || subviews == null)
 				return;
 
+			OnRemovingView (view);
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
 			var touched = view.Frame;
@@ -859,6 +871,20 @@ namespace Terminal.Gui {
 			/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
 			/// </summary>
 			public bool Handled { get; set; }
+		}
+
+		/// <inheritdoc/>
+		public override void OnAddedView (View view)
+		{
+			AddedView?.Invoke (view);
+			base.OnAddedView (view);
+		}
+
+		/// <inheritdoc/>
+		public override void OnRemovingView (View view)
+		{
+			RemovingView?.Invoke (view);
+			base.OnRemovingView (view);
 		}
 
 		/// <inheritdoc/>
