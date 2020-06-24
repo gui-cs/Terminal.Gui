@@ -119,7 +119,7 @@ namespace Terminal.Gui {
 			listview.SelectedItemChanged += (ListViewItemEventArgs e) => {
 
 				if(searchset.Count > 0)
-					SetValue ((string)searchset [listview.SelectedItem]);
+					SetValue ((ustring)searchset [listview.SelectedItem]);
 			};
 
 			Application.Loaded += (Application.ResizedEventArgs a) => {
@@ -221,7 +221,7 @@ namespace Terminal.Gui {
 					return true;
 				}
 
-				SetValue((string)searchset [listview.SelectedItem]);
+				SetValue((ustring)searchset [listview.SelectedItem]);
 				search.CursorPosition = search.Text.RuneCount;
 				Search_Changed (search.Text);
 				OnSelectedChanged ();
@@ -236,7 +236,7 @@ namespace Terminal.Gui {
 
 			if (e.Key == Key.CursorDown && search.HasFocus && listview.SelectedItem == 0 && searchset.Count > 0) { // jump to list
 				this.SetFocus (listview);
-				SetValue ((string)searchset [listview.SelectedItem]);
+				SetValue ((ustring)searchset [listview.SelectedItem]);
 				return true;
 			}
 
@@ -321,7 +321,7 @@ namespace Terminal.Gui {
 			if (source == null) // Object initialization
 				return;
 
-			if (string.IsNullOrEmpty (search.Text.ToString ()))
+			if (ustring.IsNullOrEmpty (search.Text))
 				ResetSearchSet ();
 			else
 				searchset = source.ToList().Cast<ustring>().Where (x => x.StartsWith (search.Text)).ToList();
