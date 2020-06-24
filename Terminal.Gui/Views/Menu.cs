@@ -132,7 +132,7 @@ namespace Terminal.Gui {
 			return CanExecute == null ? true : CanExecute ();
 		}
 
-		internal int Width => Title.Length + Help.Length + 1 + 2 +
+		internal int Width => Title.RuneCount + Help.Length + 1 + 2 +
 			(Checked || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0);
 
 		/// <summary>
@@ -367,7 +367,7 @@ namespace Terminal.Gui {
 					       i == current ? ColorScheme.Focus : ColorScheme.Normal);
 
 				// The help string
-				var l = item.Help.Length;
+				var l = item.Help.RuneCount;
 				Move (Frame.Width - l - 2, 1 + i);
 				Driver.AddStr (item.Help);
 			}

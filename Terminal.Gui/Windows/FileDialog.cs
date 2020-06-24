@@ -437,14 +437,14 @@ namespace Terminal.Gui {
 		/// <param name="prompt">The prompt.</param>
 		/// <param name="nameFieldLabel">The name field label.</param>
 		/// <param name="message">The message.</param>
-		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message) : base (title, Driver.Cols - 20, Driver.Rows - 5, null)
+		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message) : base (title)//, Driver.Cols - 20, Driver.Rows - 5, null)
 		{
 			this.message = new Label (message) { 
 				X = 1,
 				Y = 0,
 			};
 			Add (this.message);
-			var msgLines = Label.MeasureLines (message, Driver.Cols - 20);
+			var msgLines = TextFormatter.MaxLines (message, Driver.Cols - 20);
 
 			dirLabel = new Label ("Directory: ") {
 				X = 1,

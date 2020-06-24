@@ -6,10 +6,10 @@ using System.Reflection;
 using Terminal.Gui;
 
 namespace UICatalog {
-	[ScenarioMetadata (Name: "Buttons", Description: "Demonstrates all sorts of Buttons")]
+	[ScenarioMetadata (Name: "Labels As Buttons", Description: "Illustrates that Button is really just a Label++")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("Layout")]
-	class Buttons : Scenario {
+	[ScenarioCategory ("POC")]
+	class LabelsAsLabels : Scenario {
 		public override void Setup ()
 		{
 			// Add a label & text field so we can demo IsDefault
@@ -22,104 +22,120 @@ namespace UICatalog {
 			var edit = new TextField (31, 0, 15, "");
 			Win.Add (edit);
 
-			// This is the default button (IsDefault = true); if user presses ENTER in the TextField
+			// This is the default Label (IsDefault = true); if user presses ENTER in the TextField
 			// the scenario will quit
-			var defaultButton = new Button ("_Quit") {
+			var defaultLabel = new Label ("_Quit") {
 				X = Pos.Center (),
 				//TODO: Change to use Pos.AnchorEnd()
 				Y = Pos.Bottom (Win) - 3,
-				IsDefault = true,
+				//IsDefault = true,
 				Clicked = () => Application.RequestStop (),
+				HotKeySpecifier = (System.Rune)'_',
+				CanFocus = true,
 			};
-			Win.Add (defaultButton);
+			Win.Add (defaultLabel);
 
-			var swapButton = new Button (50, 0, "Swap Default (Absolute Layout)");
-			swapButton.Clicked = () => {
-				defaultButton.IsDefault = !defaultButton.IsDefault;
-				swapButton.IsDefault = !swapButton.IsDefault;
+			var swapLabel = new Label (50, 0, "S_wap Default (Absolute Layout)") {
+				HotKeySpecifier = (System.Rune)'_',
+				CanFocus = true,
 			};
-			Win.Add (swapButton);
+			swapLabel.Clicked = () => {
+				//defaultLabel.IsDefault = !defaultLabel.IsDefault;
+				//swapLabel.IsDefault = !swapLabel.IsDefault;
+			};
+			Win.Add (swapLabel);
 
-			static void DoMessage (Button button, ustring txt)
+			static void DoMessage (Label Label, ustring txt)
 			{
-				button.Clicked = () => {
-					var btnText = button.Text.ToString ();
+				Label.Clicked = () => {
+					var btnText = Label.Text.ToString ();
 					MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
 				};
 			}
 
-			var colorButtonsLabel = new Label ("Color Buttons:") {
+			var colorLabelsLabel = new Label ("Color Labels:") {
 				X = 0,
 				Y = Pos.Bottom (editLabel) + 1,
 			};
-			Win.Add (colorButtonsLabel);
-
-			//View prev = colorButtonsLabel;
+			Win.Add (colorLabelsLabel);
 
 			//With this method there is no need to call Top.Ready += () => Top.Redraw (Top.Bounds);
-			var x = Pos.Right (colorButtonsLabel) + 2;
+			var x = Pos.Right (colorLabelsLabel) + 2;
 			foreach (var colorScheme in Colors.ColorSchemes) {
-				var colorButton = new Button ($"{colorScheme.Key}") {
+				var colorLabel = new Label ($"{colorScheme.Key}") {
 					ColorScheme = colorScheme.Value,
-					//X = Pos.Right (prev) + 2,
 					X = x,
-					Y = Pos.Y (colorButtonsLabel),
+					Y = Pos.Y (colorLabelsLabel),
+					HotKeySpecifier = (System.Rune)'_',
+					CanFocus = true,
 				};
-				DoMessage (colorButton, colorButton.Text);
-				Win.Add (colorButton);
-				//prev = colorButton;
-				x += colorButton.Frame.Width + 2;
+				DoMessage (colorLabel, colorLabel.Text);
+				Win.Add (colorLabel);
+				x += colorLabel.Text.Length + 2;
 			}
+			Top.Ready += () => Top.Redraw (Top.Bounds);
 
-			Button button;
-			Win.Add (button = new Button ("A super long _Button that will probably expose a bug in clipping or wrapping of text. Will it?") {
+			Label Label;
+			Win.Add (Label = new Label ("A super long _Label that will probably expose a bug in clipping or wrapping of text. Will it?") {
 				X = 2,
-				Y = Pos.Bottom (colorButtonsLabel) + 1,
+				Y = Pos.Bottom (colorLabelsLabel) + 1,
+				HotKeySpecifier = (System.Rune)'_',
+				CanFocus = true,
 			});
-			DoMessage (button, button.Text);
+			DoMessage (Label, Label.Text);
 
 			// Note the 'N' in 'Newline' will be the hotkey
-			Win.Add (button = new Button ("a Newline\nin the button") {
+			Win.Add (Label = new Label ("a Newline\nin the Label") {
 				X = 2,
-				Y = Pos.Bottom (button) + 1,
-				Clicked = () => MessageBox.Query ("Message", "Question?", "Yes", "No")
+				Y = Pos.Bottom (Label) + 1,
+				Clicked = () => MessageBox.Query ("Message", "Question?", "Yes", "No"),
+				HotKeySpecifier = (System.Rune)'_',
+				CanFocus = true,
 			});
 
-			var textChanger = new Button ("Te_xt Changer") {
+			var textChanger = new Label ("Te_xt Changer") {
 				X = 2,
-				Y = Pos.Bottom (button) + 1,
+				Y = Pos.Bottom (Label) + 1,
+				HotKeySpecifier = (System.Rune)'_',
+				CanFocus = true,
 			};
 			Win.Add (textChanger);
 			textChanger.Clicked = () => textChanger.Text += "!";
 
-			Win.Add (button = new Button ("Lets see if this will move as \"Text Changer\" grows") {
+			Win.Add (Label = new Label ("Lets see if this will move as \"Text Changer\" grows") {
 				X = Pos.Right (textChanger) + 2,
 				Y = Pos.Y (textChanger),
+				HotKeySpecifier = (System.Rune)'_',
+				CanFocus = true,
 			});
 
-			var removeButton = new Button ("Remove this button") {
+			var removeLabel = new Label ("Remove this Label") {
 				X = 2,
-				Y = Pos.Bottom (button) + 1,
-				ColorScheme = Colors.Error
+				Y = Pos.Bottom (Label) + 1,
+				ColorScheme = Colors.Error,
+				HotKeySpecifier = (System.Rune)'_',
+				CanFocus = true,
 			};
-			Win.Add (removeButton);
+			Win.Add (removeLabel);
 			// This in intresting test case because `moveBtn` and below are laid out relative to this one!
-			removeButton.Clicked = () => Win.Remove (removeButton);
+			removeLabel.Clicked = () => Win.Remove (removeLabel);
 
 			var computedFrame = new FrameView ("Computed Layout") {
 				X = 0,
-				Y = Pos.Bottom (removeButton) + 1,
+				Y = Pos.Bottom (removeLabel) + 1,
 				Width = Dim.Percent (50),
 				Height = 5
 			};
 			Win.Add (computedFrame);
 
 			// Demonstrates how changing the View.Frame property can move Views
-			var moveBtn = new Button ("Move This \u263b Button _via Pos") {
+			var moveBtn = new Label ("Move This \u263b Label _via Pos") {
 				X = 0,
 				Y = Pos.Center () - 1,
 				Width = 30,
 				ColorScheme = Colors.Error,
+				HotKeySpecifier = (System.Rune)'_',
+				CanFocus = true,
 			};
 			moveBtn.Clicked = () => {
 				moveBtn.X = moveBtn.Frame.X + 5;
@@ -129,11 +145,14 @@ namespace UICatalog {
 			computedFrame.Add (moveBtn);
 
 			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
-			var sizeBtn = new Button ("Size This \u263a Button _via Pos") {
+			var sizeBtn = new Label ("Size This \u263a Label _via Pos") {
+				//var sizeBtn = new Label ("Size This x Label _via Pos") {
 				X = 0,
 				Y = Pos.Center () + 1,
 				Width = 30,
 				ColorScheme = Colors.Error,
+				HotKeySpecifier = (System.Rune)'_',
+				CanFocus = true,
 			};
 			sizeBtn.Clicked = () => {
 				sizeBtn.Width = sizeBtn.Frame.Width + 5;
@@ -143,15 +162,17 @@ namespace UICatalog {
 
 			var absoluteFrame = new FrameView ("Absolute Layout") {
 				X = Pos.Right (computedFrame),
-				Y = Pos.Bottom (removeButton) + 1,
+				Y = Pos.Bottom (removeLabel) + 1,
 				Width = Dim.Fill (),
 				Height = 5
 			};
 			Win.Add (absoluteFrame);
 
 			// Demonstrates how changing the View.Frame property can move Views
-			var moveBtnA = new Button (0, 0, "Move This Button via Frame") {
+			var moveBtnA = new Label (0, 0, "Move This Label via Frame") {
 				ColorScheme = Colors.Error,
+				HotKeySpecifier = (System.Rune)'_',
+				CanFocus = true,
 			};
 			moveBtnA.Clicked = () => {
 				moveBtnA.Frame = new Rect (moveBtnA.Frame.X + 5, moveBtnA.Frame.Y, moveBtnA.Frame.Width, moveBtnA.Frame.Height);
@@ -159,17 +180,21 @@ namespace UICatalog {
 			absoluteFrame.Add (moveBtnA);
 
 			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
-			var sizeBtnA = new Button (0, 2, " ~  s  gui.cs   master ↑10 = Со_хранить") {
+			var sizeBtnA = new Label (0, 2, " ~  s  gui.cs   master ↑10 = Со_хранить") {
 				ColorScheme = Colors.Error,
+				HotKeySpecifier = (System.Rune)'_',
+				CanFocus = true,
 			};
 			sizeBtnA.Clicked = () => {
 				sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5, sizeBtnA.Frame.Height);
 			};
 			absoluteFrame.Add (sizeBtnA);
 
-			var label = new Label ("Text Alignment (changes the four buttons above): ") {
+			var label = new Label ("Text Alignment (changes the four Labels above): ") {
 				X = 2,
 				Y = Pos.Bottom (computedFrame) + 1,
+				HotKeySpecifier = (System.Rune)'_',
+				CanFocus = true,
 			};
 			Win.Add (label);
 
@@ -206,24 +231,28 @@ namespace UICatalog {
 				return start + ustring.Make ('_') + ustring.Make (runes.GetRange (i, runes.Count - i));
 			}
 
-			var mhkb = "Click to Change th_is Button's Hotkey";
-			var moveHotKeyBtn = new Button (mhkb) {
+			var mhkb = "Click to Change th_is Label's Hotkey";
+			var moveHotKeyBtn = new Label (mhkb) {
 				X = 2,
 				Y = Pos.Bottom (radioGroup) + 1,
-				Width = Dim.Width (computedFrame) - 2,
+				Width = mhkb.Length + 10,
 				ColorScheme = Colors.TopLevel,
+				HotKeySpecifier = (System.Rune)'_',
+				CanFocus = true,
 			};
 			moveHotKeyBtn.Clicked = () => {
 				moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
 			};
 			Win.Add (moveHotKeyBtn);
 
-			var muhkb = ustring.Make (" ~  s  gui.cs   master ↑10 = Сохранить");
-			var moveUnicodeHotKeyBtn = new Button (muhkb) {
+			ustring muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
+			var moveUnicodeHotKeyBtn = new Label (muhkb) {
 				X = Pos.Left (absoluteFrame) + 1,
 				Y = Pos.Bottom (radioGroup) + 1,
-				Width = Dim.Width (absoluteFrame) - 2, // BUGBUG: Not always the width isn't calculated correctly.
+				Width = muhkb.Length + 30,
 				ColorScheme = Colors.TopLevel,
+				HotKeySpecifier = (System.Rune)'_',
+				CanFocus = true,
 			};
 			moveUnicodeHotKeyBtn.Clicked = () => {
 				moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);

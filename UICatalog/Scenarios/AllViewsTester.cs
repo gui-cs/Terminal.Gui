@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -77,9 +78,9 @@ namespace UICatalog {
 
 			_leftPane = new Window ("Classes") {
 				X = 0,
-				Y = 0, // for menu
+				Y = 0, 
 				Width = 15,
-				Height = Dim.Fill (),
+				Height = Dim.Fill (1), // for status bar
 				CanFocus = false,
 				ColorScheme = Colors.TopLevel,
 			};
@@ -88,7 +89,7 @@ namespace UICatalog {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (0),
-				Height = Dim.Fill (), // for status bar
+				Height = Dim.Fill (0), 
 				AllowsMarking = false,
 				ColorScheme = Colors.TopLevel,
 			};
@@ -369,7 +370,7 @@ namespace UICatalog {
 			}
 
 			// If the view supports a Source property, set it so we have something to look at
-			if (view != null && view.GetType ().GetProperty ("Source") != null) {
+			if (view != null && view.GetType ().GetProperty ("Source") != null && view.GetType().GetProperty("Source").PropertyType == typeof(Terminal.Gui.IListDataSource)) {
 				var source = new ListWrapper (new List<ustring> () { ustring.Make ("List Item #1"), ustring.Make ("List Item #2"), ustring.Make ("List Item #3")});
 				view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
 			}

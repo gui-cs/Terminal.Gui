@@ -189,7 +189,7 @@ namespace Terminal.Gui {
 			if (!search.HasFocus)
 				this.SetFocus (search);
 
-			search.CursorPosition = search.Text.Length;
+			search.CursorPosition = search.Text.RuneCount;
 
 			return true;
 		}
@@ -222,7 +222,7 @@ namespace Terminal.Gui {
 				}
 
 				SetValue((string)searchset [listview.SelectedItem]);
-				search.CursorPosition = search.Text.Length;
+				search.CursorPosition = search.Text.RuneCount;
 				Search_Changed (search.Text);
 				OnSelectedChanged ();
 
@@ -245,7 +245,7 @@ namespace Terminal.Gui {
 
 			if (e.Key == Key.CursorUp && listview.HasFocus && listview.SelectedItem == 0 && searchset.Count > 0) // jump back to search
 			{
-				search.CursorPosition = search.Text.Length;
+				search.CursorPosition = search.Text.RuneCount;
 				this.SetFocus (search);
 				return true;
 			}
@@ -270,7 +270,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The currently selected list item
 		/// </summary>
-		public ustring Text
+		public new ustring Text
 		{
 			get
 			{
@@ -324,7 +324,7 @@ namespace Terminal.Gui {
 			if (string.IsNullOrEmpty (search.Text.ToString ()))
 				ResetSearchSet ();
 			else
-				searchset = source.ToList().Cast<string>().Where (x => x.StartsWith (search.Text.ToString (), StringComparison.CurrentCultureIgnoreCase)).ToList();
+				searchset = source.ToList().Cast<ustring>().Where (x => x.StartsWith (search.Text)).ToList();
 
 			listview.SetSource (searchset);
 			listview.Height = CalculatetHeight ();

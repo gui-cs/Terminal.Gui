@@ -142,7 +142,7 @@ namespace UICatalog {
 				ColorScheme = Colors.Error,
 			};
 
-			var btnText = new [] { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine" };
+			var btnText = new [] { "_Zero", "_One", "T_wo", "_Three", "_Four", "Fi_ve", "Si_x", "_Seven", "_Eight", "_Nine" };
 
 			var showMessageBoxButton = new Button ("Show MessageBox") {
 				X = Pos.Center(),
