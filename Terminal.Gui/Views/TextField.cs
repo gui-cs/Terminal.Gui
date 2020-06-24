@@ -63,7 +63,8 @@ namespace Terminal.Gui {
 		/// <param name="text">Initial text contents.</param>
 		public TextField (ustring text)
 		{
-			Initialize (text, Frame.Width);
+			Initialize (text, 0);
+			Width = text.RuneCount + 1;
 		}
 
 		/// <summary>
@@ -84,7 +85,7 @@ namespace Terminal.Gui {
 				text = "";
 
 			this.text = TextModel.ToRunes (text);
-			point = text.Length;
+			point = text.RuneCount;
 			first = point > w ? point - w : 0;
 			CanFocus = true;
 			Used = true;
@@ -122,7 +123,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
-		public ustring Text {
+		public new ustring Text {
 			get {
 				return ustring.Make (text);
 			}
@@ -770,13 +771,13 @@ namespace Terminal.Gui {
 
 		void DeleteSelectedText ()
 		{
-			string actualText = Text.ToString ();
+			ustring actualText = Text;
 			int selStart = SelectedLength < 0 ? SelectedLength + SelectedStart : SelectedStart;
 			int selLength = Math.Abs (SelectedLength);
-			Text = actualText.Substring (0, selStart) +
-				actualText.Substring (selStart + selLength, actualText.Length - selStart - selLength);
+			Text = actualText[0, selStart] +
+				actualText[selStart + selLength, actualText.RuneCount - selLength];
 			ClearAllSelection ();
-			CursorPosition = selStart >= Text.Length ? Text.Length : selStart;
+			CursorPosition = selStart >= Text.RuneCount ? Text.RuneCount : selStart;
 			SetNeedsDisplay ();
 		}
 
@@ -788,13 +789,13 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return;
 
-			string actualText = Text.ToString ();
+			ustring actualText = Text;
 			int start = SelectedStart == -1 ? CursorPosition : SelectedStart;
-			ustring cbTxt = Clipboard.Contents?.ToString () ?? "";
-			Text = actualText.Substring (0, start) +
+			ustring cbTxt = Clipboard.Contents ?? "";
+			Text = actualText[0, start] +
 				cbTxt +
-				actualText.Substring (start + SelectedLength, actualText.Length - start - SelectedLength);
-			point = start + cbTxt.Length;
+				actualText[start + SelectedLength, actualText.RuneCount - SelectedLength];
+			point = start + cbTxt.RuneCount;
 			SelectedLength = 0;
 			ClearAllSelection ();
 			SetNeedsDisplay ();

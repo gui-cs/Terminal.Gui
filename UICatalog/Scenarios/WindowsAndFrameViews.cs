@@ -64,11 +64,11 @@ namespace UICatalog {
 				X = Pos.Center (),
 				Y = 0,
 				ColorScheme = Colors.Error,
-				Clicked = () => About()
+				Clicked = () => About ()
 			});
 			Win.Add (new Button ("Press ME! (Y = Pos.AnchorEnd(1))") {
 				X = Pos.Center (),
-				Y = Pos.AnchorEnd(1),
+				Y = Pos.AnchorEnd (1),
 				ColorScheme = Colors.Error
 			});
 			Top.Add (Win);
@@ -80,7 +80,7 @@ namespace UICatalog {
 					X = margin,
 					Y = Pos.Bottom (listWin.Last ()) + (margin),
 					Width = Dim.Fill (margin),
-					Height = contentHeight + (i*2) + 2,
+					Height = contentHeight + (i * 2) + 2,
 				};
 				win.ColorScheme = Colors.Dialog;
 				win.Add (new Button ("Press me! (Y = 0)") {
@@ -95,8 +95,10 @@ namespace UICatalog {
 					Width = Dim.Percent (50),
 					Height = 5,
 					ColorScheme = Colors.Base,
+					Text = "The Text in the Window",
 				};
-				subWin.Add (new TextField (win.Title.ToString ()) {
+				subWin.Add (new TextField ("Edit me! " + win.Title.ToString ()) {
+					Y = 1,
 					ColorScheme = Colors.Error
 				});
 				win.Add (subWin);
@@ -106,8 +108,12 @@ namespace UICatalog {
 					Width = Dim.Percent (100),
 					Height = 5,
 					ColorScheme = Colors.Base,
+					Text = "The Text in the FrameView",
+
 				};
-				frameView.Add (new TextField ("Edit Me"));
+				frameView.Add (new TextField ("Edit Me!") {
+					Y = 1,
+				});
 				win.Add (frameView);
 
 				Top.Add (win);
@@ -135,6 +141,7 @@ namespace UICatalog {
 				Width = Dim.Percent (50),
 				Height = Dim.Fill () - 1,
 				ColorScheme = Colors.Base,
+				Text = "The Text in the Window",
 			};
 			subWinofFV.Add (new TextField ("Edit Me") {
 				ColorScheme = Colors.Error
@@ -150,8 +157,9 @@ namespace UICatalog {
 				Width = Dim.Percent (100),
 				Height = Dim.Fill () - 1,
 				ColorScheme = Colors.Base,
+				Text = "The Text in the FrameView",
 			};
-			subFrameViewofFV.Add (new TextField ("Edit Me"));
+			subFrameViewofFV.Add (new TextField (0, 0, 15, "Edit Me"));
 
 			subFrameViewofFV.Add (new CheckBox (0, 1, "Check me"));
 			// BUGBUG: This checkbox is not shown even though frameViewFV has 3 rows in 
@@ -160,12 +168,12 @@ namespace UICatalog {
 
 			frame.Add (new CheckBox ("Btn1 (Y = Pos.AnchorEnd (1))") {
 				X = 0,
-				Y = Pos.AnchorEnd (1), 
+				Y = Pos.AnchorEnd (1),
 			});
 			CheckBox c = new CheckBox ("Btn2 (Y = Pos.AnchorEnd (1))") {
-				Y = Pos.AnchorEnd (1), 
+				Y = Pos.AnchorEnd (1),
 			};
-			c.X = Pos.AnchorEnd () - (Pos.Right (c) - Pos.Left (c)); 
+			c.X = Pos.AnchorEnd () - (Pos.Right (c) - Pos.Left (c));
 			frame.Add (c);
 
 			frame.Add (subFrameViewofFV);

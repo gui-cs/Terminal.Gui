@@ -51,7 +51,7 @@ namespace Terminal.Gui {
 			Text = s;
 			CanFocus = true;
 			Height = 1;
-			Width = s.Length + 4;
+			Width = s.RuneCount + 4;
 		}
 
 		/// <summary>
@@ -88,7 +88,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		///   The text displayed by this <see cref="CheckBox"/>
 		/// </summary>
-		public ustring Text {
+		public new ustring Text {
 			get {
 				return text;
 			}

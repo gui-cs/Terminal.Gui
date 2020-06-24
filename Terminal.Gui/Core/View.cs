@@ -1,4 +1,4 @@
-//
+﻿//
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
 //
@@ -13,32 +13,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NStack;
 
 namespace Terminal.Gui {
-	/// <summary>
-	/// Text alignment enumeration, controls how text is displayed.
-	/// </summary>
-	public enum TextAlignment {
-		/// <summary>
-		/// Aligns the text to the left of the frame.
-		/// </summary>
-		Left,
-		/// <summary>
-		/// Aligns the text to the right side of the frame.
-		/// </summary>
-		Right,
-		/// <summary>
-		/// Centers the text in the frame.
-		/// </summary>
-		Centered,
-		/// <summary>
-		/// Shows the text as justified text in the frame.
-		/// </summary>
-		Justified
-	}
-
 	/// <summary>
 	/// Determines the LayoutStyle for a view, if Absolute, during LayoutSubviews, the
 	/// value from the Frame will be used, if the value is Computed, then the Frame
@@ -131,7 +110,8 @@ namespace Terminal.Gui {
 	///    frames for the vies that use <see cref="LayoutStyle.Computed"/>.
 	/// </para>
 	/// </remarks>
-	public class View : Responder, IEnumerable {
+	public partial class View : Responder, IEnumerable {
+
 		internal enum Direction {
 			Forward,
 			Backward
@@ -141,6 +121,8 @@ namespace Terminal.Gui {
 		View container = null;
 		View focused = null;
 		Direction focusDirection;
+
+		TextFormatter viewText;
 
 		/// <summary>
 		/// Event fired when the view gets focus.
@@ -166,6 +148,16 @@ namespace Terminal.Gui {
 		/// Event fired when a mouse event is generated.
 		/// </summary>
 		public Action<MouseEventArgs> MouseClick;
+
+		/// <summary>
+		/// Gets or sets the HotKey defined for this view. A user pressing HotKey on the keyboard while this view has focus will cause the Clicked event to fire.
+		/// </summary>
+		public Key HotKey { get => viewText.HotKey; set => viewText.HotKey = value; }
+
+		/// <summary>
+		/// Gets or sets the specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'. 
+		/// </summary>
+		public Rune HotKeySpecifier { get => viewText.HotKeySpecifier; set => viewText.HotKeySpecifier = value; }
 
 		internal Direction FocusDirection {
 			get => SuperView?.FocusDirection ?? focusDirection;
@@ -389,29 +381,100 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public View (Rect frame)
 		{
+			viewText = new TextFormatter ();
+			this.Text = ustring.Empty;
+
 			this.Frame = frame;
-			CanFocus = false;
 			LayoutStyle = LayoutStyle.Absolute;
 		}
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="LayoutStyle.Computed"/> <see cref="View"/> class.
+		///   Initializes a new instance of <see cref="View"/> using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <remarks>
+		/// <para>
 		///   Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically control the size and location of the view.
-		/// </remarks>
-		/// <remarks>
+		///   The <see cref="Label"/> will be created using <see cref="LayoutStyle.Computed"/>
+		///   coordinates. The initial size (<see cref="View.Frame"/> will be 
+		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
+		/// </para>
+		/// <para>
+		///   If <c>Height</c> is greater than one, word wrapping is provided.
+		/// </para>
+		/// <para>
 		///   This constructor intitalize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
 		///   Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically control the size and location of the view.
+		/// </para>
 		/// </remarks>
-		public View ()
+		public View () : this (text: string.Empty) { }
+
+
+		/// <summary>
+		///   Initializes a new instance of <see cref="View"/> using <see cref="LayoutStyle.Absolute"/> layout.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		///   The <see cref="View"/> will be created at the given
+		///   coordinates with the given string. The size (<see cref="View.Frame"/> will be 
+		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
+		/// </para>
+		/// <para>
+		///   No line wrapping is provided.
+		/// </para>
+		/// </remarks>
+		/// <param name="x">column to locate the Label.</param>
+		/// <param name="y">row to locate the Label.</param>
+		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
+		public View (int x, int y, ustring text) : this (TextFormatter.CalcRect (x, y, text), text) { }
+
+		/// <summary>
+		///   Initializes a new instance of <see cref="View"/> using <see cref="LayoutStyle.Absolute"/> layout.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		///   The <see cref="View"/> will be created at the given
+		///   coordinates with the given string. The initial size (<see cref="View.Frame"/> will be 
+		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
+		/// </para>
+		/// <para>
+		///   If <c>rect.Height</c> is greater than one, word wrapping is provided.
+		/// </para>
+		/// </remarks>
+		/// <param name="rect">Location.</param>
+		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
+		public View (Rect rect, ustring text) : this (rect)
 		{
+			viewText = new TextFormatter ();
+			this.Text = text;
+		}
+
+		/// <summary>
+		///   Initializes a new instance of <see cref="View"/> using <see cref="LayoutStyle.Computed"/> layout.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		///   The <see cref="View"/> will be created using <see cref="LayoutStyle.Computed"/>
+		///   coordinates with the given string. The initial size (<see cref="View.Frame"/> will be 
+		///   adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines. 
+		/// </para>
+		/// <para>
+		///   If <c>Height</c> is greater than one, word wrapping is provided.
+		/// </para>
+		/// </remarks>
+		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
+		public View (ustring text) : base ()
+		{
+			viewText = new TextFormatter ();
+			this.Text = text;
+
 			CanFocus = false;
 			LayoutStyle = LayoutStyle.Computed;
+			// BUGBUG: CalcRect doesn't account for line wrapping
+			var r = TextFormatter.CalcRect (0, 0, text);
 			x = Pos.At (0);
 			y = Pos.At (0);
-			Height = 0;
-			Width = 0;
+			Width = r.Width;
+			Height = r.Height;
 		}
 
 		/// <summary>
@@ -432,6 +495,7 @@ namespace Terminal.Gui {
 			if (SuperView == null)
 				return;
 			SuperView.SetNeedsLayout ();
+			viewText.SetNeedsFormat ();
 		}
 
 		/// <summary>
@@ -763,21 +827,24 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Utility function to draw strings that contain a hotkey.
 		/// </summary>
-		/// <param name="text">String to display, the underscoore before a letter flags the next letter as the hotkey.</param>
+		/// <param name="text">String to display, the hotkey specifier before a letter flags the next letter as the hotkey.</param>
 		/// <param name="hotColor">Hot color.</param>
 		/// <param name="normalColor">Normal color.</param>
 		/// <remarks>
-		/// The hotkey is any character following an underscore ('_') character.</remarks>
+		/// <para>The hotkey is any character following the hotkey specifier, which is the underscore ('_') character by default.</para>
+		/// <para>The hotkey specifier can be changed via <see cref="HotKeySpecifier"/></para>
+		/// </remarks>
 		public void DrawHotString (ustring text, Attribute hotColor, Attribute normalColor)
 		{
-			Driver.SetAttribute (normalColor);
+			var hotkeySpec = HotKeySpecifier == (Rune)0xffff ? (Rune)'_' : HotKeySpecifier;
+			Application.Driver.SetAttribute (normalColor);
 			foreach (var rune in text) {
-				if (rune == '_') {
-					Driver.SetAttribute (hotColor);
+				if (rune == hotkeySpec) {
+					Application.Driver.SetAttribute (hotColor);
 					continue;
 				}
-				Driver.AddRune (rune);
-				Driver.SetAttribute (normalColor);
+				Application.Driver.AddRune (rune);
+				Application.Driver.SetAttribute (normalColor);
 			}
 		}
 
@@ -819,8 +886,13 @@ namespace Terminal.Gui {
 		{
 			if (focused != null)
 				focused.PositionCursor ();
-			else
-				Move (frame.X, frame.Y);
+			else {
+				if (CanFocus && HasFocus) {
+					Move (viewText.HotKeyPos == -1 ? 1 : viewText.HotKeyPos, 0);
+				} else {
+					Move (frame.X, frame.Y);
+				}
+			}
 		}
 
 		/// <inheritdoc/>
@@ -971,6 +1043,15 @@ namespace Terminal.Gui {
 		{
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
+			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
+
+			if (!ustring.IsNullOrEmpty (Text)) {
+				Clear ();
+				// Draw any Text
+				viewText?.SetNeedsFormat ();
+				viewText?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : ColorScheme.Normal, HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
+			}
+
 			// Invoke DrawContentEvent
 			OnDrawContent (bounds);
 
@@ -978,8 +1059,6 @@ namespace Terminal.Gui {
 				foreach (var view in subviews) {
 					if (view.NeedDisplay != null && (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay)) {
 						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
-
-							// FIXED: optimize this by computing the intersection of region and view.Bounds
 							if (view.layoutNeeded)
 								view.LayoutSubviews ();
 							Application.CurrentView = view;
@@ -987,7 +1066,6 @@ namespace Terminal.Gui {
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0) because
 							view.Redraw (view.Bounds);
-
 						}
 						view.NeedDisplay = Rect.Empty;
 						view.childNeedsDisplay = false;
@@ -1083,7 +1161,6 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
 			KeyPress?.Invoke (args);
 			if (args.Handled)
@@ -1385,7 +1462,7 @@ namespace Terminal.Gui {
 			}
 
 			if (edges.Any ()) {
-				if (!object.ReferenceEquals(edges.First ().From, edges.First ().To)) {
+				if (!object.ReferenceEquals (edges.First ().From, edges.First ().To)) {
 					throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {edges.First ().From}. Did you forget to add it to {this}?");
 				} else {
 					throw new InvalidOperationException ("TopologicalSort encountered a recursive cycle in the relative Pos/Dim in the views of " + this);
@@ -1412,10 +1489,26 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.
 		/// </remarks>
+		public Action<LayoutEventArgs> LayoutStarted;
+
+		/// <summary>
+		/// Raises the <see cref="LayoutStarted"/> event. Called from  <see cref="LayoutSubviews"/> before any subviews have been laid out.
+		/// </summary>
+		internal virtual void OnLayoutStarted (LayoutEventArgs args)
+		{
+			LayoutStarted?.Invoke (args);
+		}
+
+		/// <summary>
+		/// Fired after the Views's <see cref="LayoutSubviews"/> method has completed. 
+		/// </summary>
+		/// <remarks>
+		/// Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.
+		/// </remarks>
 		public Action<LayoutEventArgs> LayoutComplete;
 
 		/// <summary>
-		/// Raises the <see cref="LayoutComplete"/> event. Called from  <see cref="LayoutSubviews"/> after all sub-views have been laid out.
+		/// Raises the <see cref="LayoutComplete"/> event. Called from  <see cref="LayoutSubviews"/> before all sub-views have been laid out.
 		/// </summary>
 		internal virtual void OnLayoutComplete (LayoutEventArgs args)
 		{
@@ -1431,10 +1524,15 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void LayoutSubviews ()
 		{
-			if (!layoutNeeded)
+			if (!layoutNeeded) {
 				return;
+			}
 
 			Rect oldBounds = Bounds;
+			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
+
+			viewText.Size = Bounds.Size;
+
 
 			// Sort out the dependencies of the X, Y, Width, Height properties
 			var nodes = new HashSet<View> ();
@@ -1457,8 +1555,9 @@ namespace Terminal.Gui {
 			var ordered = TopologicalSort (nodes, edges);
 
 			foreach (var v in ordered) {
-				if (v.LayoutStyle == LayoutStyle.Computed)
+				if (v.LayoutStyle == LayoutStyle.Computed) {
 					v.SetRelativeLayout (Frame);
+				}
 
 				v.LayoutSubviews ();
 				v.layoutNeeded = false;
@@ -1475,146 +1574,41 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// A generic virtual method at the level of View to manipulate any hot-keys.
+		///   The text displayed by the <see cref="View"/>.
 		/// </summary>
-		/// <param name="text">The text to manipulate.</param>
-		/// <param name="hotKey">The hot-key to look for.</param>
-		/// <param name="hotPos">The returning hot-key position.</param>
-		/// <param name="showHotKey">The character immediately to the right relative to the hot-key position</param>
-		/// <returns>It aims to facilitate the preparation for <see cref="TextAlignment"/> procedures.</returns>
-		public virtual ustring GetTextFromHotKey (ustring text, Rune hotKey, out int hotPos, out Rune showHotKey)
-		{
-			Rune hot_key = (Rune)0;
-			int hot_pos = -1;
-			ustring shown_text = text;
-
-			// Use first hot_key char passed into 'hotKey'.
-			int i = 0;
-			foreach (Rune c in shown_text) {
-				if ((char)c != 0xFFFD) {
-					if (c == hotKey) {
-						hot_pos = i;
-					} else if (hot_pos > -1) {
-						hot_key = c;
-						break;
-					}
-				}
-				i++;
+		/// <remarks>
+		/// <para>
+		///  If provided, the text will be drawn before any subviews are drawn.
+		/// </para>
+		/// <para>
+		///  The text will be drawn starting at the view origin (0, 0) and will be formatted according
+		///  to the <see cref="TextAlignment"/> property. If the view's height is greater than 1, the
+		///  text will word-wrap to additional lines if it does not fit horizontally. If the view's height
+		///  is 1, the text will be clipped.
+		/// </para>
+		/// <para>
+		///  Set the <see cref="HotKeySpecifier"/> to enable hotkey support. To disable hotkey support set <see cref="HotKeySpecifier"/> to
+		///  <c>(Rune)0xffff</c>.
+		/// </para>
+		/// </remarks>
+		public virtual ustring Text {
+			get => viewText.Text;
+			set {
+				viewText.Text = value;
+				SetNeedsDisplay ();
 			}
-
-			if (hot_pos == -1) {
-				// Use first upper-case char if there are no hot-key in the text.
-				i = 0;
-				foreach (Rune c in shown_text) {
-					if ((char)c != 0xFFFD) {
-						if (Rune.IsUpper (c)) {
-							hot_key = c;
-							hot_pos = i;
-							break;
-						}
-					}
-					i++;
-				}
-			} else {
-				// Use char after 'hotKey'
-				ustring start = "";
-				i = 0;
-				foreach (Rune c in shown_text) {
-					start += ustring.Make (c);
-					i++;
-					if (i == hot_pos)
-						break;
-				}
-				var st = shown_text;
-				shown_text = start;
-				i = 0;
-				foreach (Rune c in st) {
-					i++;
-					if (i > hot_pos + 1) {
-						shown_text += ustring.Make (c);
-					}
-				}
-			}
-			hotPos = hot_pos;
-			showHotKey = hot_key;
-			return shown_text;
 		}
 
 		/// <summary>
-		/// A generic virtual method at the level of View to manipulate any hot-keys with <see cref="TextAlignment"/> process.
+		/// Gets or sets how the View's <see cref="Text"/> is aligned horizontally when drawn. Changing this property will redisplay the <see cref="View"/>.
 		/// </summary>
-		/// <param name="shown_text">The text to manipulate to align.</param>
-		/// <param name="hot_pos">The passed in hot-key position.</param>
-		/// <param name="c_hot_pos">The returning hot-key position.</param>
-		/// <param name="textAlignment">The <see cref="TextAlignment"/> to align to.</param>
-		/// <returns>It performs the <see cref="TextAlignment"/> process to the caller.</returns>
-		public virtual ustring GetTextAlignment (ustring shown_text, int hot_pos, out int c_hot_pos, TextAlignment textAlignment)
-		{
-			int start;
-			var caption = shown_text;
-			c_hot_pos = hot_pos;
-
-			if (Frame.Width > shown_text.Length + 1) {
-				switch (textAlignment) {
-				case TextAlignment.Left:
-					caption += new string (' ', Frame.Width - caption.RuneCount);
-					break;
-				case TextAlignment.Right:
-					start = Frame.Width - caption.RuneCount;
-					caption = $"{new string (' ', Frame.Width - caption.RuneCount)}{caption}";
-					if (c_hot_pos > -1) {
-						c_hot_pos += start;
-					}
-					break;
-				case TextAlignment.Centered:
-					start = Frame.Width / 2 - caption.RuneCount / 2;
-					caption = $"{new string (' ', start)}{caption}{new string (' ', Frame.Width - caption.RuneCount - start)}";
-					if (c_hot_pos > -1) {
-						c_hot_pos += start;
-					}
-					break;
-				case TextAlignment.Justified:
-					var words = caption.Split (" ");
-					var wLen = GetWordsLength (words, c_hot_pos, out int runeCount, out int w_hot_pos);
-					var space = (Frame.Width - runeCount) / (caption.Length - wLen);
-					caption = "";
-					for (int i = 0; i < words.Length; i++) {
-						if (i == words.Length - 1) {
-							caption += new string (' ', Frame.Width - caption.RuneCount - 1);
-							caption += words [i];
-						} else {
-							caption += words [i];
-						}
-						if (i < words.Length - 1) {
-							caption += new string (' ', space);
-						}
-					}
-					if (c_hot_pos > -1) {
-						c_hot_pos += w_hot_pos * space - space - w_hot_pos + 1;
-					}
-					break;
-				}
+		/// <value>The text alignment.</value>
+		public virtual TextAlignment TextAlignment {
+			get => viewText.Alignment;
+			set {
+				viewText.Alignment = value;
+				SetNeedsDisplay ();
 			}
-
-			return caption;
-		}
-
-		int GetWordsLength (ustring [] words, int hotPos, out int runeCount, out int wordHotPos)
-		{
-			int length = 0;
-			int rCount = 0;
-			int wHotPos = -1;
-			for (int i = 0; i < words.Length; i++) {
-				if (wHotPos == -1 && rCount + words [i].RuneCount >= hotPos)
-					wHotPos = i;
-				length += words [i].Length;
-				rCount += words [i].RuneCount;
-			}
-			if (wHotPos == -1 && hotPos > -1)
-				wHotPos = words.Length;
-			runeCount = rCount;
-			wordHotPos = wHotPos;
-			return length;
 		}
 
 		/// <summary>
@@ -1686,6 +1680,15 @@ namespace Terminal.Gui {
 			if (MouseEvent (mouseEvent))
 				return true;
 
+
+			if (mouseEvent.Flags == MouseFlags.Button1Clicked) {
+				if (!HasFocus && SuperView != null) {
+					SuperView.SetFocus (this);
+					SetNeedsDisplay ();
+				}
+
+				return true;
+			}
 			return false;
 		}
 	}

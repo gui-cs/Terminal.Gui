@@ -25,7 +25,7 @@ namespace Terminal.Gui {
 			Assert.Equal (new Rect (0, 0, 0, 0), r.Frame);
 			Assert.Null (r.Focused);
 			Assert.Null (r.ColorScheme);
-			Assert.Equal (Dim.Sized (0), r.Height);
+			Assert.Equal (Dim.Sized (0), r.Width);
 			Assert.Equal (Dim.Sized (0), r.Height);
 			// BUGBUG: Pos needs eqality implemented
 			//Assert.Equal (Pos.At (0), r.X);
