@@ -125,14 +125,14 @@ namespace Terminal.Gui {
 		TextFormatter viewText;
 
 		/// <summary>
-		/// Event fired when the view is added.
+		/// Event fired when a subview is being added to this view.
 		/// </summary>
-		public Action<View> AddedView;
+		public Action<View> Adding;
 
 		/// <summary>
-		/// Event fired when the view is being removing.
+		/// Event fired when a subview is being removed from this view.
 		/// </summary>
-		public Action<View> RemovingView;
+		public Action<View> Removing;
 
 		/// <summary>
 		/// Event fired when the view gets focus.
@@ -562,7 +562,7 @@ namespace Terminal.Gui {
 				subviews = new List<View> ();
 			subviews.Add (view);
 			view.container = this;
-			OnAddedView (view);
+			OnAdding (view);
 			if (view.CanFocus)
 				CanFocus = true;
 			SetNeedsLayout ();
@@ -607,7 +607,7 @@ namespace Terminal.Gui {
 			if (view == null || subviews == null)
 				return;
 
-			OnRemovingView (view);
+			OnRemoving (view);
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
 			var touched = view.Frame;
@@ -945,16 +945,22 @@ namespace Terminal.Gui {
 			public bool Handled { get; set; }
 		}
 
-		/// <inheritdoc/>
-		public override void OnAddedView (View view)
+		/// <summary>
+		/// Method invoked  when a subview is being added to this view.
+		/// </summary>
+		/// <param name="view">The subview being added.</param>
+		public virtual void OnAdding (View view)
 		{
-			AddedView?.Invoke (view);
+			Adding?.Invoke (view);
 		}
 
-		/// <inheritdoc/>
-		public override void OnRemovingView (View view)
+		/// <summary>
+		/// Method invoked when a subview is being removed from this view.
+		/// </summary>
+		/// <param name="view">The subview being removed.</param>
+		public virtual void OnRemoving (View view)
 		{
-			RemovingView?.Invoke (view);
+			Removing?.Invoke (view);
 		}
 
 		/// <inheritdoc/>
