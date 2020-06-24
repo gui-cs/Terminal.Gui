@@ -122,6 +122,7 @@ namespace Terminal.Gui {
 					SetValue ((ustring)searchset [listview.SelectedItem]);
 			};
 
+#if false
 			Application.Loaded += (Application.ResizedEventArgs a) => {
 				// Determine if this view is hosted inside a dialog
 				for (View view = this.SuperView; view != null; view = view.SuperView) {
@@ -168,7 +169,7 @@ namespace Terminal.Gui {
 				else
 					search.ColorScheme = Colors.Menu;
 			};
-
+#endif
 			search.MouseClick += Search_MouseClick;
 
 			this.Add(listview, search);
