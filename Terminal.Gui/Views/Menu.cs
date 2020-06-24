@@ -877,7 +877,7 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 				if (previousFocused != null && openMenu != null && previousFocused.ToString () != openCurrentMenu.ToString ())
 					previousFocused?.SuperView?.SetFocus (previousFocused);
-				openMenu.Dispose ();
+				openMenu?.Dispose ();
 				openMenu = null;
 				if (lastFocused is Menu) {
 					lastFocused = null;

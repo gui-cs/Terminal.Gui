@@ -229,10 +229,14 @@ namespace Terminal.Gui {
 		public override void Remove (View view)
 		{
 			if (this == Application.Top) {
-				if (view is MenuBar)
+				if (view is MenuBar) {
+					MenuBar?.Dispose ();
 					MenuBar = null;
-				if (view is StatusBar)
+				}
+				if (view is StatusBar) {
 					StatusBar = null;
+					StatusBar = null;
+				}
 			}
 			base.Remove (view);
 		}
@@ -241,7 +245,9 @@ namespace Terminal.Gui {
 		public override void RemoveAll ()
 		{
 			if (this == Application.Top) {
+				MenuBar?.Dispose ();
 				MenuBar = null;
+				StatusBar?.Dispose ();
 				StatusBar = null;
 			}
 			base.RemoveAll ();

@@ -78,8 +78,18 @@ namespace UICatalog {
 				return;
 			}
 
-			Scenario scenario = GetScenarioToRun ();
-			while (scenario != null) {
+			Scenario scenario;
+			while ((scenario = GetScenarioToRun ()) != null) {
+#if DEBUG_IDISPOSABLE
+				// Validate there are no outstanding Responder-based instances 
+				// after a sceanario was selected to run. This proves the main UI Catalog
+				// 'app' closed cleanly.
+				foreach (var inst in Responder.Instances) {
+					Debug.Assert (inst.WasDisposed);
+				}
+				Responder.Instances.Clear ();
+#endif
+
 				Application.UseSystemConsole = _useSystemConsole;
 				Application.Init ();
 				scenario.Init (Application.Top, _baseColorScheme);
@@ -87,16 +97,18 @@ namespace UICatalog {
 				scenario.Run ();
 
 #if DEBUG_IDISPOSABLE
+				// After the scenario runs, validate all Responder-based instances
+				// were disposed. This proves the scenario 'app' closed cleanly.
 				foreach (var inst in Responder.Instances) {
 					Debug.Assert (inst.WasDisposed);
 				}
 				Responder.Instances.Clear();
 #endif
-
-				scenario = GetScenarioToRun ();
 			}
 
 #if DEBUG_IDISPOSABLE
+			// This proves that when the user exited the UI Catalog app
+			// it cleaned up properly.
 			foreach (var inst in Responder.Instances) {
 				Debug.Assert (inst.WasDisposed);
 			}
