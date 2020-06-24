@@ -1104,7 +1104,7 @@ namespace Terminal.Gui {
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.SuperView.IsCurrentTop && view.ProcessHotKey (keyEvent))
+				if (view.ProcessHotKey (keyEvent))
 					return true;
 			return false;
 		}
@@ -1119,7 +1119,7 @@ namespace Terminal.Gui {
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.SuperView.IsCurrentTop && view.ProcessColdKey (keyEvent))
+				if (view.ProcessColdKey (keyEvent))
 					return true;
 			return false;
 		}
@@ -1139,7 +1139,7 @@ namespace Terminal.Gui {
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.SuperView.IsCurrentTop && view.OnKeyDown (keyEvent))
+				if (view.OnKeyDown (keyEvent))
 					return true;
 
 			return false;
@@ -1160,7 +1160,7 @@ namespace Terminal.Gui {
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
-				if (view.SuperView.IsCurrentTop && view.OnKeyUp (keyEvent))
+				if (view.OnKeyUp (keyEvent))
 					return true;
 
 			return false;
