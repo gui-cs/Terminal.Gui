@@ -164,18 +164,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Method invoked when a view is added.
-		/// </summary>
-		/// <param name="view">The view added.</param>
-		public virtual void OnAddedView (View view) { }
-
-		/// <summary>
-		/// Method invoked when a view being removing.
-		/// </summary>
-		/// <param name="view">The view being removing.</param>
-		public virtual void OnRemovingView (View view) { }
-
-		/// <summary>
 		/// Method invoked when a view gets focus.
 		/// </summary>
 		/// <param name="view">The view that is losing focus.</param>
