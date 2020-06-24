@@ -949,14 +949,12 @@ namespace Terminal.Gui {
 		public override void OnAddedView (View view)
 		{
 			AddedView?.Invoke (view);
-			base.OnAddedView (view);
 		}
 
 		/// <inheritdoc/>
 		public override void OnRemovingView (View view)
 		{
 			RemovingView?.Invoke (view);
-			base.OnRemovingView (view);
 		}
 
 		/// <inheritdoc/>
