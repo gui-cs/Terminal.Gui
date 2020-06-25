@@ -879,7 +879,7 @@ namespace Terminal.Gui {
 		/// <param name="view">The subview being added.</param>
 		public virtual void OnAdding (View view)
 		{
-			Adding?.Invoke (view);
+			view.Adding?.Invoke (this);
 		}
 
 		/// <summary>
@@ -888,7 +888,7 @@ namespace Terminal.Gui {
 		/// <param name="view">The subview being removed.</param>
 		public virtual void OnRemoving (View view)
 		{
-			Removing?.Invoke (view);
+			view.Removing?.Invoke (this);
 		}
 
 		/// <inheritdoc/>
