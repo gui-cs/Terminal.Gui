@@ -48,6 +48,8 @@ namespace UICatalog {
 			var checkBox = new CheckBox (" ~  s  gui.cs   master ↑10") { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50) };
 			Win.Add (checkBox);
 
+			// BUGBUG: Combobox does not deal with unicode properly. 
+#if false
 			label = new Label ("ComboBox:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
 			Win.Add (label);
 			var comboBox = new ComboBox () {
@@ -59,7 +61,7 @@ namespace UICatalog {
 
 			Win.Add (comboBox);
 			comboBox.Text = " ~  s  gui.cs   master ↑10";
-
+#endif
 			label = new Label ("HexView:") { X = Pos.X (label), Y = Pos.Bottom (label) + 2 };
 			Win.Add (label);
 			var hexView = new HexView (new System.IO.MemoryStream (Encoding.ASCII.GetBytes (" ~  s  gui.cs   master ↑10 Со_хранить"))) {
