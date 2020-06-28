@@ -243,7 +243,6 @@ namespace UICatalog {
 			mousePos.Y = Pos.AnchorEnd (1);
 			mousePos.Width = 50;
 			Application.RootMouseEvent += delegate (MouseEvent me) {
-				mousePos.TextColor = Colors.TopLevel.Normal;
 				mousePos.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
 			};
 

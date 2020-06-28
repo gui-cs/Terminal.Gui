@@ -61,6 +61,10 @@ namespace Terminal.Gui {
 					Add (b);
 				}
 			}
+
+			LayoutStarted += (args) => {
+				LayoutStartedHandler ();
+			};
 		}
 
 		/// <summary>
@@ -110,8 +114,8 @@ namespace Terminal.Gui {
 			}
 			return buttons.Select (b => b.Bounds.Width).Sum () + buttons.Count() - 1;
 		}
-		///<inheritdoc/>
-		public override void LayoutSubviews ()
+
+		void LayoutStartedHandler ()
 		{
 			int buttonsWidth = GetButtonsWidth ();
 
@@ -122,8 +126,6 @@ namespace Terminal.Gui {
 				button.X = Pos.AnchorEnd (shiftLeft);
 				button.Y = Pos.AnchorEnd (1);
 			}
-
-			base.LayoutSubviews ();
 		}
 
 		///<inheritdoc/>

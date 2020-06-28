@@ -211,7 +211,7 @@ namespace UICatalog {
 				}),
 				new MenuBarItem ("_Color Scheme", CreateColorSchemeMenuItems()),
 				new MenuBarItem ("_Diagostics", CreateDiagnosticMenuItems()),
-				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "Ok")),
+				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "_Ok")),
 			});
 
 			_leftPane = new FrameView ("Categories") {

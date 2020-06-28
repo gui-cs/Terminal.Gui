@@ -217,7 +217,7 @@ namespace Terminal.Gui {
 				this.SetFocus (search);
 			}
 
-			search.CursorPosition = search.Text.Length;
+			search.CursorPosition = search.Text.RuneCount;
 
 			return true;
 		}
@@ -272,8 +272,9 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (e.Key == Key.CursorUp && listview.HasFocus && listview.SelectedItem == 0 && searchset.Count > 0) { // jump back to search
-				search.CursorPosition = search.Text.Length;
+			if (e.Key == Key.CursorUp && listview.HasFocus && listview.SelectedItem == 0 && searchset.Count > 0) // jump back to search
+			{
+				search.CursorPosition = search.Text.RuneCount;
 				this.SetFocus (search);
 				return true;
 			}
@@ -297,7 +298,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The currently selected list item
 		/// </summary>
-		public ustring Text 
+		public new ustring Text
 		{
 			get {
 				return text;

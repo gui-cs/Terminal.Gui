@@ -24,7 +24,8 @@ namespace UICatalog {
 				Width = CharMap.RowWidth + 2,
 				Height = Dim.Fill (),
 				Start = 0x2500,
-				ColorScheme = Colors.Dialog
+				ColorScheme = Colors.Dialog,
+				CanFocus = true,
 			};
 
 			Win.Add (charMap);
