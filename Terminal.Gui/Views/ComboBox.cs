@@ -8,8 +8,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-
 using NStack;
 
 namespace Terminal.Gui {
@@ -30,8 +28,11 @@ namespace Terminal.Gui {
 			get => source;
 			set {
 				source = value;
-				Search_Changed ("");
-				SetNeedsDisplay ();
+
+				if(isAdded) { 
+					Search_Changed ("");
+					SetNeedsDisplay ();
+				}
 			}
 		}
 
@@ -64,9 +65,8 @@ namespace Terminal.Gui {
 		ustring text = "";
 		readonly TextField search;
 		readonly ListView listview;
-		int height;
-		int width;
 		bool autoHide = true;
+		bool isAdded;
 
 		/// <summary>
 		/// Public constructor
@@ -95,27 +95,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Public constructor
 		/// </summary>
-		/// <param name="text"></param>
-		public ComboBox (ustring text) : base ()
-		{
-			search = new TextField ("");
-			listview = new ListView () { LayoutStyle = LayoutStyle.Computed, CanFocus = true };
-
-			Initialize ();
-			Text = text;
-		}
-
-		/// <summary>
-		/// Public constructor
-		/// </summary>
 		/// <param name="rect"></param>
 		/// <param name="source"></param>
 		public ComboBox (Rect rect, IList source) : base (rect)
 		{
-			this.height = rect.Height;
-			this.width = rect.Width;
-
-			search = new TextField ("") { Width = width };
+			search = new TextField ("") { Width = rect.Width };
 			listview = new ListView (rect, source) { LayoutStyle = LayoutStyle.Computed };
 
 			Initialize ();
@@ -132,7 +116,13 @@ namespace Terminal.Gui {
 			ColorScheme = Colors.Base;
 
 			search.TextChanged += Search_Changed;
+			search.MouseClick += Search_MouseClick;
+
+			listview.Y = Pos.Bottom (search);
 			listview.OpenSelectedItem += (ListViewItemEventArgs a) => Selected ();
+
+			this.Add (listview, search);
+			this.SetFocus (search);
 
 			// On resize
 			LayoutComplete += (LayoutEventArgs a) => {
@@ -144,11 +134,18 @@ namespace Terminal.Gui {
 			listview.SelectedItemChanged += (ListViewItemEventArgs e) => {
 
 				if (searchset.Count > 0) {
-					SetValue ((ustring)searchset [listview.SelectedItem]);
+					SetValue (searchset [listview.SelectedItem]);
 				}
 			};
 
+			// This is needed in addition to 'Adding' to trigger the capture the Bounds.Width & Height
 			Application.Loaded += (Application.ResizedEventArgs a) => {
+				SetNeedsLayout ();
+				Search_Changed (Text);
+			};
+
+			Adding += (View v) => {
+
 				// Determine if this view is hosted inside a dialog
 				for (View view = this.SuperView; view != null; view = view.SuperView) {
 					if (view is Dialog) {
@@ -157,70 +154,43 @@ namespace Terminal.Gui {
 					}
 				}
 
-				ResetSearchSet ();
-
 				ColorScheme = autoHide ? Colors.Base : ColorScheme = null;
 
-				listview.Y = Pos.Bottom (search);
-
-				if (Width != null && width == 0) { // new ComboBox() { Width = 
-					width = Bounds.Width;
-				}
-
-				search.Width = width;
-				listview.Width = CalculateWidth ();
-
-				if (Height != null && height == 0) { // new ComboBox() { Height = 
-					height = Bounds.Height;
-				}
-
-				listview.Height = CalculatetHeight ();
-
 				SetNeedsLayout ();
-
-				if (this.Text != null) {
-					Search_Changed (Text);
-				}
+				Search_Changed (Text);
 
 				if (autoHide) {
 					listview.ColorScheme = Colors.Menu;
 				} else {
 					search.ColorScheme = Colors.Menu;
 				}
+
+				isAdded = true;
 			};
-
-			search.MouseClick += Search_MouseClick;
-
-			this.Add (listview, search);
-			this.SetFocus (search);
 		}
 
-#if COMBO_FEATURE
 		bool isShow = false;
-#endif
 
 		private void Search_MouseClick (MouseEventArgs me)
 		{
-#if !COMBO_FEATURE
-
-			if (me.MouseEvent.Flags != MouseFlags.Button1Clicked)
-				return;
-#else
 			if (me.MouseEvent.X == Bounds.Right - 1 && me.MouseEvent.Y == Bounds.Top && me.MouseEvent.Flags == MouseFlags.Button1Pressed
-			&&  search.Text == "" && autoHide) {
+			&& search.Text == "" && autoHide) {
 
 				if (isShow) {
 					HideList ();
 					isShow = false;
 				} else {
-					searchset = Source.ToList().Cast<object>().ToList(); // force deep copy
+					// force deep copy
+					foreach (var item in Source.ToList()) { 
+						searchset.Add (item);
+					}
+
 					ShowList ();
 					isShow = true;
 				}
+			} else { 
+				SuperView.SetFocus (search);
 			}
-			else
-#endif
-			SuperView.SetFocus (search);
 		}
 
 		///<inheritdoc/>
@@ -230,7 +200,7 @@ namespace Terminal.Gui {
 				this.SetFocus (search);
 			}
 
-			search.CursorPosition = search.Text.Length;
+			search.CursorPosition = search.Text.RuneCount;
 
 			return true;
 		}
@@ -248,7 +218,6 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-#if COMBO_FEATURE
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
@@ -261,7 +230,7 @@ namespace Terminal.Gui {
 			Move (Bounds.Right - 1, 0);
 			Driver.AddRune (Driver.DownArrow);
 		}
-#endif
+
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent e)
 		{
@@ -275,9 +244,9 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (e.Key == Key.CursorDown && search.HasFocus && listview.SelectedItem == 0 && searchset.Count > 0) { // jump to list
+			if (e.Key == Key.CursorDown && search.HasFocus && searchset.Count > 0) { // jump to list
 				this.SetFocus (listview);
-				SetValue ((ustring)searchset [listview.SelectedItem]);
+				SetValue (searchset [listview.SelectedItem]);
 				return true;
 			}
 
@@ -285,9 +254,20 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (e.Key == Key.CursorUp && listview.HasFocus && listview.SelectedItem == 0 && searchset.Count > 0) { // jump back to search
-				search.CursorPosition = search.Text.Length;
+			if (e.Key == Key.CursorUp && listview.HasFocus && listview.SelectedItem == 0 && searchset.Count > 0) // jump back to search
+			{
+				search.CursorPosition = search.Text.RuneCount;
 				this.SetFocus (search);
+				return true;
+			}
+
+			if(e.Key == Key.PageDown) { 
+				listview.MovePageDown ();
+				return true;
+			}
+
+			if (e.Key == Key.PageUp) { 
+				listview.MovePageUp ();
 				return true;
 			}
 
@@ -310,8 +290,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The currently selected list item
 		/// </summary>
-		public ustring Text 
-		{
+		public new ustring Text {
 			get {
 				return text;
 			}
@@ -320,10 +299,10 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void SetValue (ustring text)
+		private void SetValue (object text)
 		{
 			search.TextChanged -= Search_Changed;
-			this.text = search.Text = text;
+			this.text = search.Text = text.ToString();
 			search.CursorPosition = 0;
 			search.TextChanged += Search_Changed;
 		}
@@ -335,9 +314,10 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			SetValue ((ustring)searchset [listview.SelectedItem]);
-			search.CursorPosition = search.Text.Length;
+			SetValue (searchset [listview.SelectedItem]);
+			search.CursorPosition = search.Text.RuneCount;
 			Search_Changed (search.Text);
+			OnSelectedChanged ();
 			Reset (keepSearchText: true);
 		}
 
@@ -350,7 +330,6 @@ namespace Terminal.Gui {
 				search.Text = text = "";
 			}
 
-			OnSelectedChanged ();
 			ResetSearchSet ();
 
 			listview.SetSource (searchset);
@@ -359,16 +338,20 @@ namespace Terminal.Gui {
 			this.SetFocus (search);
 		}
 
-		private void ResetSearchSet ()
+		private void ResetSearchSet (bool noCopy = false)
 		{
-			if (autoHide) {
-				if (searchset == null) {
-					searchset = new List<string> ();
-				} else {
-					searchset.Clear ();
-				}
-			} else {
-				searchset = source.ToList ();
+			if (searchset == null) {
+				searchset = new List<object> ();
+			} else { 
+				searchset.Clear ();
+			}
+
+			if (autoHide || noCopy)
+				return;
+
+			// force deep copy
+			foreach (var item in Source.ToList ()) {
+				searchset.Add (item);
 			}
 		}
 
@@ -378,10 +361,16 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (string.IsNullOrEmpty (search.Text.ToString ())) {
+			if (ustring.IsNullOrEmpty (search.Text)) {
 				ResetSearchSet ();
 			} else {
-				searchset = source.ToList ().Cast<object> ().Where (x => x.ToString ().StartsWith (search.Text.ToString (), StringComparison.CurrentCultureIgnoreCase)).ToList ();
+				ResetSearchSet (noCopy: true);
+
+				foreach (var item in source.ToList ()) { // Iterate to preserver object type and force deep copy
+					if (item.ToString().StartsWith (search.Text.ToString(), StringComparison.CurrentCultureIgnoreCase)) { 
+						searchset.Add (item);
+					}
+				}
 			}
 
 			ShowList ();
@@ -392,14 +381,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// 
 		/// Consider making public
-		private void ShowList()
+		private void ShowList ()
 		{
 			listview.SetSource (searchset);
 			listview.Height = CalculatetHeight ();
-
-			listview.Redraw (new Rect (0, 0, width, height)); // for any view behind this
+			listview.Redraw (new Rect (0, 0, Bounds.Width, Bounds.Height)); // Ensure list shrinks in Dialog
 			this.SuperView?.BringSubviewToFront (this);
-
 		}
 
 		/// <summary>
@@ -407,18 +394,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// 
 		/// Consider making public
-		private void HideList()
+		private void HideList ()
 		{
 			Reset ();
-		}
-
-		/// <summary>
-		/// Internal width of search list
-		/// </summary>
-		/// <returns></returns>
-		private int CalculateWidth ()
-		{
-			return autoHide ? Math.Max (1, width - 1) : width;
 		}
 
 		/// <summary>
@@ -427,8 +405,10 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private int CalculatetHeight ()
 		{
-			var h = (Height is Dim.DimAbsolute) ? height : Bounds.Height;
-			return Math.Min (Math.Max (0, h - 1), searchset?.Count ?? 0);
+			if (Bounds.Height == 0)
+				return 0;
+
+			return Math.Min (Bounds.Height - 1, searchset?.Count ?? 0);
 		}
 	}
 }
