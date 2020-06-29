@@ -126,9 +126,13 @@ namespace Terminal.Gui {
 
 			// On resize
 			LayoutComplete += (LayoutEventArgs a) => {
-				search.Width = Bounds.Width;
-				listview.Width = autoHide ? Bounds.Width - 1 : Bounds.Width;
-				listview.Height = CalculatetHeight ();
+				if (!autoHide && search.Frame.Width != Bounds.Width ||
+					autoHide && search.Frame.Width != Bounds.Width - 1) {
+					search.Width = listview.Width = autoHide ? Bounds.Width - 1 : Bounds.Width;
+					listview.Height = CalculatetHeight ();
+					search.SetRelativeLayout (Bounds);
+					listview.SetRelativeLayout (Bounds);
+				}
 			};
 
 			listview.SelectedItemChanged += (ListViewItemEventArgs e) => {
@@ -136,12 +140,6 @@ namespace Terminal.Gui {
 				if (searchset.Count > 0) {
 					SetValue (searchset [listview.SelectedItem]);
 				}
-			};
-
-			// This is needed in addition to 'Adding' to trigger the capture the Bounds.Width & Height
-			Application.Loaded += (Application.ResizedEventArgs a) => {
-				SetNeedsLayout ();
-				Search_Changed (Text);
 			};
 
 			Adding += (View v) => {
