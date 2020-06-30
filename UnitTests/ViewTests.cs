@@ -135,5 +135,26 @@ namespace Terminal.Gui {
 			sub2.Width = Dim.Width (sub2);
 			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
 		}
+
+		[Fact]
+		public void Added_Removing ()
+		{
+			var v = new View (new Rect (0, 0, 10, 24));
+			var t = new View ();
+
+			v.Added += (View e) => {
+				Assert.True (v.SuperView == e);
+			};
+
+			v.Removing += (View e) => {
+				Assert.True (v.SuperView == e);
+			};
+
+			t.Add (v);
+			Assert.True (t.Subviews.Count == 1);
+
+			t.Remove (v);
+			Assert.True (t.Subviews.Count == 0);
+		}
 	}
 }
