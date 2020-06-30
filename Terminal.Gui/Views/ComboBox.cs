@@ -143,7 +143,7 @@ namespace Terminal.Gui {
 				}
 			};
 
-			Adding += (View v) => {
+			Added += (View v) => {
 
 				// Determine if this view is hosted inside a dialog
 				for (View view = this.SuperView; view != null; view = view.SuperView) {
