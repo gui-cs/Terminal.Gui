@@ -128,7 +128,8 @@ namespace Terminal.Gui {
 			LayoutComplete += (LayoutEventArgs a) => {
 				if (!autoHide && search.Frame.Width != Bounds.Width ||
 					autoHide && search.Frame.Width != Bounds.Width - 1) {
-					search.Width = listview.Width = autoHide ? Bounds.Width - 1 : Bounds.Width;
+					search.Width = Bounds.Width;
+					listview.Width = listview.Width = autoHide ? Bounds.Width - 1 : Bounds.Width;
 					listview.Height = CalculatetHeight ();
 					search.SetRelativeLayout (Bounds);
 					listview.SetRelativeLayout (Bounds);
