@@ -29,7 +29,8 @@ namespace Terminal.Gui {
 			set {
 				source = value;
 
-				if(isAdded) { 
+				// Only need to refresh list if its been added to a container view
+				if(SuperView != null && SuperView.Subviews.Contains(this)) { 
 					Search_Changed ("");
 					SetNeedsDisplay ();
 				}
@@ -66,7 +67,6 @@ namespace Terminal.Gui {
 		readonly TextField search;
 		readonly ListView listview;
 		bool autoHide = true;
-		bool isAdded;
 
 		/// <summary>
 		/// Public constructor
@@ -163,8 +163,6 @@ namespace Terminal.Gui {
 				} else {
 					search.ColorScheme = Colors.Menu;
 				}
-
-				isAdded = true;
 			};
 		}
 
