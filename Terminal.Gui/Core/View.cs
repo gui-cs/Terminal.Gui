@@ -127,7 +127,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event fired when a subview is being added to this view.
 		/// </summary>
-		public Action<View> Adding;
+		public Action<View> Added;
 
 		/// <summary>
 		/// Event fired when a subview is being removed from this view.
@@ -562,7 +562,7 @@ namespace Terminal.Gui {
 				subviews = new List<View> ();
 			subviews.Add (view);
 			view.container = this;
-			OnAdding (view);
+			OnAdded (view);
 			if (view.CanFocus)
 				CanFocus = true;
 			SetNeedsLayout ();
@@ -949,9 +949,9 @@ namespace Terminal.Gui {
 		/// Method invoked  when a subview is being added to this view.
 		/// </summary>
 		/// <param name="view">The subview being added.</param>
-		public virtual void OnAdding (View view)
+		public virtual void OnAdded (View view)
 		{
-			view.Adding?.Invoke (this);
+			view.Added?.Invoke (this);
 		}
 
 		/// <summary>
