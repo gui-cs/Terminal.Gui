@@ -335,6 +335,7 @@ namespace UICatalog {
 		{
 			// Remove existing class, if any
 			if (view != null) {
+				view.LayoutComplete -= LayoutCompleteHandler;
 				_hostPane.Remove (view);
 				view.Dispose ();
 				_hostPane.Clear ();
@@ -348,8 +349,8 @@ namespace UICatalog {
 
 			//_curView.X = Pos.Center ();
 			//_curView.Y = Pos.Center ();
-			//_curView.Width = Dim.Fill (5);
-			//_curView.Height = Dim.Fill (5);
+			view.Width = Dim.Percent(75);
+			view.Height = Dim.Percent (75);
 
 			// Set the colorscheme to make it stand out
 			view.ColorScheme = Colors.Base;
@@ -386,7 +387,15 @@ namespace UICatalog {
 			_hostPane.SetNeedsDisplay ();
 			UpdateSettings (view);
 			UpdateTitle (view);
+
+			view.LayoutComplete += LayoutCompleteHandler;
+
 			return view;
+		}
+
+		void LayoutCompleteHandler(View.LayoutEventArgs args)
+		{
+			UpdateTitle (_curView);
 		}
 
 		public override void Run ()

@@ -16,10 +16,76 @@ namespace Terminal.Gui {
 		[Fact]
 		public void Basic_Usage ()
 		{
+			var testText = ustring.Make("test");
+			var expectedSize = new Size ();
+			var testBounds = new Rect (0, 0, 100, 1);
 			var tf = new TextFormatter ();
 
+			tf.Text = testText;
+			expectedSize = new Size (testText.Length, 1);
+			Assert.Equal (testText, tf.Text);
+			Assert.Equal (TextAlignment.Left, tf.Alignment);
+			Assert.Equal (expectedSize, tf.Size);
+			tf.Draw (testBounds, new Attribute(), new Attribute());
+			Assert.Equal (expectedSize, tf.Size);
+			Assert.NotEmpty (tf.Lines);
 
+			tf.Alignment = TextAlignment.Right;
+			expectedSize = new Size (testText.Length, 1);
+			Assert.Equal (testText, tf.Text);
+			Assert.Equal (TextAlignment.Right, tf.Alignment);
+			Assert.Equal (expectedSize, tf.Size);
+			tf.Draw (testBounds, new Attribute (), new Attribute ());
+			Assert.Equal (expectedSize, tf.Size);
+			Assert.NotEmpty (tf.Lines);
+
+			tf.Alignment = TextAlignment.Right;
+			expectedSize = new Size (testText.Length * 2, 1);
+			tf.Size = expectedSize;
+			Assert.Equal (testText, tf.Text);
+			Assert.Equal (TextAlignment.Right, tf.Alignment);
+			Assert.Equal (expectedSize, tf.Size);
+			tf.Draw (testBounds, new Attribute (), new Attribute ());
+			Assert.Equal (expectedSize, tf.Size);
+			Assert.NotEmpty (tf.Lines);
+
+			tf.Alignment = TextAlignment.Centered;
+			expectedSize = new Size (testText.Length * 2, 1);
+			tf.Size = expectedSize;
+			Assert.Equal (testText, tf.Text);
+			Assert.Equal (TextAlignment.Centered, tf.Alignment);
+			Assert.Equal (expectedSize, tf.Size);
+			tf.Draw (testBounds, new Attribute (), new Attribute ());
+			Assert.Equal (expectedSize, tf.Size);
+			Assert.NotEmpty (tf.Lines);
 		}
+
+		[Fact]
+		public void NeedsFormat_Sets ()
+		{
+			var testText = ustring.Make ("test");
+			var testBounds = new Rect (0, 0, 100, 1);
+			var tf = new TextFormatter ();
+
+			tf.Text = "test";
+			Assert.True (tf.NeedsFormat); // get_Lines causes a Format
+			Assert.NotEmpty (tf.Lines);
+			Assert.False (tf.NeedsFormat); // get_Lines causes a Format
+			Assert.Equal (testText, tf.Text);
+			tf.Draw (testBounds, new Attribute (), new Attribute ());
+			Assert.False (tf.NeedsFormat);
+
+			tf.Size = new Size (1, 1);
+			Assert.True (tf.NeedsFormat); 
+			Assert.NotEmpty (tf.Lines);
+			Assert.False (tf.NeedsFormat); // get_Lines causes a Format
+
+			tf.Alignment = TextAlignment.Centered;
+			Assert.True (tf.NeedsFormat);
+			Assert.NotEmpty (tf.Lines);
+			Assert.False (tf.NeedsFormat); // get_Lines causes a Format
+		}
+
 		[Fact]
 		public void FindHotKey_Invalid_ReturnsFalse ()
 		{

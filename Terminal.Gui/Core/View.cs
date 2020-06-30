@@ -122,7 +122,7 @@ namespace Terminal.Gui {
 		View focused = null;
 		Direction focusDirection;
 
-		TextFormatter viewText;
+		TextFormatter textFormatter;
 
 		/// <summary>
 		/// Event fired when the view gets focus.
@@ -152,12 +152,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the HotKey defined for this view. A user pressing HotKey on the keyboard while this view has focus will cause the Clicked event to fire.
 		/// </summary>
-		public Key HotKey { get => viewText.HotKey; set => viewText.HotKey = value; }
+		public Key HotKey { get => textFormatter.HotKey; set => textFormatter.HotKey = value; }
 
 		/// <summary>
 		/// Gets or sets the specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'. 
 		/// </summary>
-		public Rune HotKeySpecifier { get => viewText.HotKeySpecifier; set => viewText.HotKeySpecifier = value; }
+		public Rune HotKeySpecifier { get => textFormatter.HotKeySpecifier; set => textFormatter.HotKeySpecifier = value; }
 
 		internal Direction FocusDirection {
 			get => SuperView?.FocusDirection ?? focusDirection;
@@ -381,7 +381,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public View (Rect frame)
 		{
-			viewText = new TextFormatter ();
+			textFormatter = new TextFormatter ();
 			this.Text = ustring.Empty;
 
 			this.Frame = frame;
@@ -444,7 +444,7 @@ namespace Terminal.Gui {
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
 		public View (Rect rect, ustring text) : this (rect)
 		{
-			viewText = new TextFormatter ();
+			textFormatter = new TextFormatter ();
 			this.Text = text;
 		}
 
@@ -464,7 +464,7 @@ namespace Terminal.Gui {
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
 		public View (ustring text) : base ()
 		{
-			viewText = new TextFormatter ();
+			textFormatter = new TextFormatter ();
 			this.Text = text;
 
 			CanFocus = false;
@@ -495,7 +495,7 @@ namespace Terminal.Gui {
 			if (SuperView == null)
 				return;
 			SuperView.SetNeedsLayout ();
-			viewText.SetNeedsFormat ();
+			textFormatter.NeedsFormat = true;
 		}
 
 		/// <summary>
@@ -888,7 +888,7 @@ namespace Terminal.Gui {
 				focused.PositionCursor ();
 			else {
 				if (CanFocus && HasFocus) {
-					Move (viewText.HotKeyPos == -1 ? 1 : viewText.HotKeyPos, 0);
+					Move (textFormatter.HotKeyPos == -1 ? 1 : textFormatter.HotKeyPos, 0);
 				} else {
 					Move (frame.X, frame.Y);
 				}
@@ -1048,8 +1048,10 @@ namespace Terminal.Gui {
 			if (!ustring.IsNullOrEmpty (Text)) {
 				Clear ();
 				// Draw any Text
-				viewText?.SetNeedsFormat ();
-				viewText?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : ColorScheme.Normal, HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
+				if (textFormatter != null) {
+					textFormatter.NeedsFormat = true;
+				}
+				textFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : ColorScheme.Normal, HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
 			}
 
 			// Invoke DrawContentEvent
@@ -1531,7 +1533,7 @@ namespace Terminal.Gui {
 			Rect oldBounds = Bounds;
 			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
 
-			viewText.Size = Bounds.Size;
+			textFormatter.Size = Bounds.Size;
 
 
 			// Sort out the dependencies of the X, Y, Width, Height properties
@@ -1592,9 +1594,9 @@ namespace Terminal.Gui {
 		/// </para>
 		/// </remarks>
 		public virtual ustring Text {
-			get => viewText.Text;
+			get => textFormatter.Text;
 			set {
-				viewText.Text = value;
+				textFormatter.Text = value;
 				SetNeedsDisplay ();
 			}
 		}
@@ -1604,9 +1606,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The text alignment.</value>
 		public virtual TextAlignment TextAlignment {
-			get => viewText.Alignment;
+			get => textFormatter.Alignment;
 			set {
-				viewText.Alignment = value;
+				textFormatter.Alignment = value;
 				SetNeedsDisplay ();
 			}
 		}
