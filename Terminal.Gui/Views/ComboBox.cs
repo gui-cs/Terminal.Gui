@@ -49,7 +49,8 @@ namespace Terminal.Gui {
 			if (source == null) {
 				Source = null;
 			} else {
-				Source = MakeWrapper (source);
+				listview.SetSource (source);
+				Source = listview.Source;
 			}
 		}
 
@@ -104,11 +105,6 @@ namespace Terminal.Gui {
 
 			Initialize ();
 			SetSource (source);
-		}
-
-		static IListDataSource MakeWrapper (IList source)
-		{
-			return new ListWrapper (source);
 		}
 
 		private void Initialize ()
