@@ -561,7 +561,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the number of items in the <see cref="IList"/>.
 		/// </summary>
-		public int Count => Convert.ToInt32 (src?.Count);
+		public int Count {
+			get {
+				return src?.Count != null ? src.Count : 0;
+			}
+		}
 
 		void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width)
 		{
