@@ -346,6 +346,12 @@ namespace Terminal.Gui {
 				OnOpenSelectedItem ();
 				break;
 
+			case Key.End:
+				return MoveEnd ();
+
+			case Key.Home:
+				return MoveHome ();
+
 			}
 			return base.ProcessKey (kb);
 		}
@@ -452,6 +458,38 @@ namespace Terminal.Gui {
 				selected--;
 				if (selected < top)
 					top = selected;
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Moves the selected item index to the last row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MoveEnd ()
+		{
+			if (selected != source.Count - 1) {
+				selected = source.Count - 1;
+				top = selected;
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Moves the selected item index to the first row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MoveHome ()
+		{
+			if (selected != 0) {
+				selected = 0;
+				top = selected;
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			}
