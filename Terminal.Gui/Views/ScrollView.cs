@@ -152,13 +152,19 @@ namespace Terminal.Gui {
 					var by2 = (position + bh) * bh / Size;
 
 					Move (col, 0);
-					Driver.AddRune (Driver.UpArrow);
+					if (Bounds.Height == 1) {
+						Driver.AddRune (Driver.Diamond);
+					} else {
+						Driver.AddRune (Driver.UpArrow);
+					}
 					if (Bounds.Height == 3) {
 						Move (col, 1);
 						Driver.AddRune (Driver.Diamond);
 					}
-					Move (col, Bounds.Height - 1);
-					Driver.AddRune (Driver.DownArrow);
+					if (Bounds.Height > 1) {
+						Move (col, Bounds.Height - 1);
+						Driver.AddRune (Driver.DownArrow);
+					}
 				} else {
 					bh -= 2;
 					var by1 = position * bh / Size;
@@ -533,13 +539,15 @@ namespace Terminal.Gui {
 
 		void ShowHideScrollBars ()
 		{
-			bool v = false, h = false;
+			bool v = false, h = false; bool p = false;
 
 			if (Bounds.Height == 0 || Bounds.Height > contentSize.Height) {
 				if (ShowVerticalScrollIndicator) {
 					ShowVerticalScrollIndicator = false;
 				}
 				v = false;
+			} else if (Bounds.Height > 0 && Bounds.Height == contentSize.Height) {
+				p = true;
 			} else {
 				if (!ShowVerticalScrollIndicator) {
 					ShowVerticalScrollIndicator = true;
@@ -551,7 +559,22 @@ namespace Terminal.Gui {
 					ShowHorizontalScrollIndicator = false;
 				}
 				h = false;
+			} else if (Bounds.Width > 0 && Bounds.Width == contentSize.Width && p) {
+				if (ShowHorizontalScrollIndicator) {
+					ShowHorizontalScrollIndicator = false;
+				}
+				h = false;
+				if (ShowVerticalScrollIndicator) {
+					ShowVerticalScrollIndicator = false;
+				}
+				v = false;
 			} else {
+				if (p) {
+					if (!ShowVerticalScrollIndicator) {
+						ShowVerticalScrollIndicator = true;
+					}
+					v = true;
+				}
 				if (!ShowHorizontalScrollIndicator) {
 					ShowHorizontalScrollIndicator = true;
 				}
