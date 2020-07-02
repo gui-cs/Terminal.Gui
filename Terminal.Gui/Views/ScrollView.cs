@@ -564,10 +564,10 @@ namespace Terminal.Gui {
 					ShowHorizontalScrollIndicator = false;
 				}
 				h = false;
-				if (!ShowVerticalScrollIndicator) {
-					ShowVerticalScrollIndicator = true;
+				if (ShowVerticalScrollIndicator) {
+					ShowVerticalScrollIndicator = false;
 				}
-				v = true;
+				v = false;
 			} else {
 				if (p) {
 					if (!ShowVerticalScrollIndicator) {
