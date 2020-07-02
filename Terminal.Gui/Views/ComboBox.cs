@@ -88,7 +88,7 @@ namespace Terminal.Gui {
 		{
 			search = new TextField ("");
 			listview = new ListView () { LayoutStyle = LayoutStyle.Computed, CanFocus = true };
-
+						
 			Initialize ();
 			Text = text;
 		}
@@ -101,7 +101,7 @@ namespace Terminal.Gui {
 		public ComboBox (Rect rect, IList source) : base (rect)
 		{
 			search = new TextField ("") { Width = rect.Width };
-			listview = new ListView (rect, source) { LayoutStyle = LayoutStyle.Computed };
+			listview = new ListView (rect, source) { LayoutStyle = LayoutStyle.Computed, ColorScheme = Colors.Base };
 
 			Initialize ();
 			SetSource (source);
@@ -109,8 +109,6 @@ namespace Terminal.Gui {
 
 		private void Initialize ()
 		{
-			ColorScheme = Colors.Base;
-
 			search.TextChanged += Search_Changed;
 			search.MouseClick += Search_MouseClick;
 
@@ -149,20 +147,25 @@ namespace Terminal.Gui {
 					}
 				}
 
-				ColorScheme = autoHide ? Colors.Base : ColorScheme = null;
-
 				SetNeedsLayout ();
+				SetNeedsDisplay ();
 				Search_Changed (Text);
-
-				if (autoHide) {
-					listview.ColorScheme = Colors.Menu;
-				} else {
-					search.ColorScheme = Colors.Menu;
-				}
 			};
 		}
 
 		bool isShow = false;
+
+		///<inheritdoc/>
+		public new ColorScheme ColorScheme {
+			get {
+				return base.ColorScheme;
+			}
+			set {
+				listview.ColorScheme = value;			
+				base.ColorScheme = value;
+				SetNeedsDisplay ();
+			}
+		}
 
 		private void Search_MouseClick (MouseEventArgs me)
 		{
