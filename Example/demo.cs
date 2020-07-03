@@ -237,12 +237,13 @@ static class Demo {
 	//
 	static void Editor ()
 	{
-		var tframe = Application.Top.Frame;
-		Application.Top.RemoveAll ();
+		Application.Init ();
+
 		var ntop = Application.Top;
+
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_Close", "", () => { if (Quit ()) {Application.RequestStop (); } }),
+				new MenuItem ("_Close", "", () => { if (Quit ()) { running = MainApp; Application.RequestStop (); } }),
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
 				new MenuItem ("_Copy", "", null),
@@ -267,15 +268,13 @@ static class Demo {
 		};
 		ntop.Add (win);
 
-		var text = new TextView (new Rect (0, 0, tframe.Width - 2, tframe.Height - 3));
+		var text = new TextView () { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
 		if (fname != null)
 			text.Text = System.IO.File.ReadAllText (fname);
 		win.Add (text);
 
 		Application.Run (ntop, false);
-		Application.Top.RemoveAll ();
-		Main ();
 	}
 
 	static bool Quit ()
@@ -534,11 +533,20 @@ static class Demo {
 	}
 	#endregion
 
+	public static Action running = MainApp;
+	static void Main ()
+	{
+		while (running != null) {
+			running.Invoke ();
+		}
+		Application.Shutdown ();
+	}
+
 	public static Label ml;
 	public static MenuBar menu;
 	public static CheckBox menuKeysStyle;
 	public static CheckBox menuAutoMouseNav;
-	static void Main ()
+	static void MainApp ()
 	{
 		if (Debugger.IsAttached)
 			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
@@ -578,14 +586,14 @@ static class Demo {
 
 		menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("Text _Editor Demo", "", () => { Editor (); }),
+				new MenuItem ("Text _Editor Demo", "", () => { running = Editor; Application.RequestStop (); }),
 				new MenuItem ("_New", "Creates new file", NewFile),
 				new MenuItem ("_Open", "", Open),
 				new MenuItem ("_Hex", "", () => ShowHex (top)),
 				new MenuItem ("_Close", "", () => Close ()),
 				new MenuItem ("_Disabled", "", () => { }, () => false),
 				null,
-				new MenuItem ("_Quit", "", () => { if (Quit ()) top.Running = false; })
+				new MenuItem ("_Quit", "", () => { if (Quit ()) { running = null; top.Running = false; } })
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
 				new MenuItem ("_Copy", "", Copy),
@@ -648,9 +656,8 @@ static class Demo {
 			new StatusItem(Key.F1, "~F1~ Help", () => Help()),
 			new StatusItem(Key.F2, "~F2~ Load", Load),
 			new StatusItem(Key.F3, "~F3~ Save", Save),
-			new StatusItem(Key.ControlQ, "~^Q~ Quit", () => { if (Quit ()) top.Running = false; }),
-		}) {
-		};
+			new StatusItem(Key.ControlQ, "~^Q~ Quit", () => { if (Quit ()) { running = null; top.Running = false; } })
+		});
 
 		win.Add (drag, dragText);
 
@@ -671,7 +678,7 @@ static class Demo {
 		top.Add (win);
 		//top.Add (menu);
 		top.Add (menu, statusBar);
-		Application.Run ();
+		Application.Run (top, false);
 	}
 
 	private static void Win_KeyPress (View.KeyEventEventArgs e)
