@@ -450,7 +450,7 @@ static class Demo {
 	static void ComboBoxDemo ()
 	{
 		List<ustring> items = new List<ustring> ();
-		foreach (var dir in new [] { "/etc", @"\windows\System32" }) {
+		foreach (var dir in new [] { "/etc", @$"{Environment.GetEnvironmentVariable ("SystemRoot")}\System32" }) {
 			if (Directory.Exists (dir)) {
 				items = Directory.GetFiles (dir).Union (Directory.GetDirectories (dir))
 					.Select (Path.GetFileName)
@@ -460,7 +460,7 @@ static class Demo {
 		}
 		var list = new ComboBox () { Width = Dim.Fill(), Height = Dim.Fill() };
 		list.SetSource(items.ToList());
-		list.SelectedItemChanged += (object sender, ustring text) => { Application.RequestStop (); };
+		list.SelectedItemChanged += (object sender, ListViewItemEventArgs text) => { Application.RequestStop (); };
 
 		var d = new Dialog () { Title = "Select source file", Width = Dim.Percent (50), Height = Dim.Percent (50) };
 		d.Add (list);

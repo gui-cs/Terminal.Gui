@@ -61,7 +61,7 @@ namespace Terminal.Gui {
 		///   Client code can hook up to this event, it is
 		///   raised when the selection has been confirmed.
 		/// </remarks>
-		public event EventHandler<ustring> SelectedItemChanged;
+		public event EventHandler<ListViewItemEventArgs> SelectedItemChanged;
 
 		IList searchset;
 		ustring text = "";
@@ -209,7 +209,7 @@ namespace Terminal.Gui {
 		{
 			// Note: Cannot rely on "listview.SelectedItem != lastSelectedItem" because the list is dynamic. 
 			// So we cannot optimize. Ie: Don't call if not changed
-			SelectedItemChanged?.Invoke (this, search.Text);
+			SelectedItemChanged?.Invoke (this, new ListViewItemEventArgs(listview.SelectedItem, search.Text));
 
 			return true;
 		}
