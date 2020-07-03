@@ -346,6 +346,12 @@ namespace Terminal.Gui {
 				OnOpenSelectedItem ();
 				break;
 
+			case Key.End:
+				return MoveEnd ();
+
+			case Key.Home:
+				return MoveHome ();
+
 			}
 			return base.ProcessKey (kb);
 		}
@@ -459,6 +465,38 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <summary>
+		/// Moves the selected item index to the last row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MoveEnd ()
+		{
+			if (selected != source.Count - 1) {
+				selected = source.Count - 1;
+				top = selected;
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Moves the selected item index to the first row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MoveHome ()
+		{
+			if (selected != 0) {
+				selected = 0;
+				top = selected;
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
+			}
+
+			return true;
+		}
+
 		int lastSelectedItem = -1;
 
 		/// <summary>
@@ -551,15 +589,17 @@ namespace Terminal.Gui {
 		/// <param name="source"></param>
 		public ListWrapper (IList source)
 		{
-			count = source.Count;
-			marks = new BitArray (count);
-			this.src = source;
+			if (source != null) {
+				count = source.Count;
+				marks = new BitArray (count);
+				this.src = source;
+			}
 		}
 
 		/// <summary>
 		/// Gets the number of items in the <see cref="IList"/>.
 		/// </summary>
-		public int Count => src.Count;
+		public int Count => src != null ? src.Count : 0;
 
 		void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width)
 		{
@@ -594,7 +634,7 @@ namespace Terminal.Gui {
 			container.Move (col, line);
 			var t = src [item];
 			if (t == null) {
-				RenderUstr (driver, ustring.Make(""), col, line, width);
+				RenderUstr (driver, ustring.Make (""), col, line, width);
 			} else {
 				if (t is ustring) {
 					RenderUstr (driver, (ustring)t, col, line, width);
