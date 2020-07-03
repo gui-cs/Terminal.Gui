@@ -13,7 +13,7 @@ namespace UICatalog.Scenarios {
 		public override void Setup ()
 		{
 			List<ustring> items = new List<ustring> ();
-			foreach (var dir in new [] { "/etc", @"\windows\System32" }) {
+			foreach (var dir in new [] { "/etc", @$"{Environment.GetEnvironmentVariable ("SystemRoot")}\System32" }) {
 				if (Directory.Exists (dir)) {
 					items = Directory.GetFiles (dir).Union(Directory.GetDirectories(dir))
 						.Select (Path.GetFileName)
@@ -53,7 +53,7 @@ namespace UICatalog.Scenarios {
 			};
 			comboBox.SetSource (items);
 
-			comboBox.SelectedItemChanged += (object sender, ustring text) => lbComboBox.Text = text;
+			comboBox.SelectedItemChanged += (object sender, ListViewItemEventArgs text) => lbComboBox.Text = (ustring)text.Value;
 			Win.Add (lbComboBox, comboBox);
 		}
 	}
