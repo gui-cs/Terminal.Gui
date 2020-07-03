@@ -539,6 +539,7 @@ static class Demo {
 		while (running != null) {
 			running.Invoke ();
 		}
+		Application.Shutdown ();
 	}
 
 	public static Label ml;
