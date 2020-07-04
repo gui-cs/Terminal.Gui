@@ -380,8 +380,8 @@ namespace Terminal.Gui {
 		private void ShowList ()
 		{
 			listview.SetSource (searchset);
+			listview.Clear (); // Ensure list shrinks in Dialog as you type
 			listview.Height = CalculatetHeight ();
-			listview.Redraw (new Rect (0, 0, Bounds.Width, Bounds.Height)); // Ensure list shrinks in Dialog
 			this.SuperView?.BringSubviewToFront (this);
 		}
 
