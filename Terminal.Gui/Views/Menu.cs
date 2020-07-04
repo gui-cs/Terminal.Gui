@@ -535,8 +535,6 @@ namespace Terminal.Gui {
 				if (item == null || !item.IsEnabled ()) disabled = true;
 				if (item != null && !disabled)
 					current = me.Y - 1;
-				hasFocus = true;
-				SetNeedsDisplay ();
 				CheckSubMenu ();
 				return true;
 			}

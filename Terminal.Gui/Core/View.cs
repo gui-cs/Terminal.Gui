@@ -895,6 +895,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		bool hasFocus;
 		/// <inheritdoc/>
 		public override bool HasFocus {
 			get {

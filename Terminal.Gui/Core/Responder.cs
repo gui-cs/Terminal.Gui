@@ -24,12 +24,11 @@ namespace Terminal.Gui {
 		/// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
 		public virtual bool CanFocus { get; set; }
 
-		internal bool hasFocus;
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="Responder"/> has focus.
 		/// </summary>
 		/// <value><c>true</c> if has focus; otherwise, <c>false</c>.</value>
-		public virtual bool HasFocus { get { return hasFocus; } }
+		public virtual bool HasFocus { get; }
 
 		// Key handling
 		/// <summary>
