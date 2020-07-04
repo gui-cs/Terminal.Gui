@@ -190,6 +190,15 @@ namespace Terminal.Gui {
 		// to make the same mistakes our users make when they poke at the Subviews.
 		internal IList<View> InternalSubviews => subviews ?? empty;
 
+		// This is null, and allocated on demand.
+		List<View> tabIndex;
+
+		/// <summary>
+		/// This returns a tab index list of the subviews contained by this view.
+		/// </summary>
+		/// <value>The tabIndex.</value>
+		public IList<View> TabIndex => tabIndex == null ? empty : tabIndex.AsReadOnly ();
+
 		internal Rect NeedDisplay { get; private set; } = Rect.Empty;
 
 		// The frame for the object. Superview relative.
@@ -548,9 +557,14 @@ namespace Terminal.Gui {
 		{
 			if (view == null)
 				return;
-			if (subviews == null)
+			if (subviews == null) {
 				subviews = new List<View> ();
+			}
+			if (tabIndex == null) {
+				tabIndex = new List<View> ();
+			}
 			subviews.Add (view);
+			tabIndex.Add (view);
 			view.container = this;
 			if (view.CanFocus)
 				CanFocus = true;
@@ -583,6 +597,7 @@ namespace Terminal.Gui {
 
 			while (subviews.Count > 0) {
 				Remove (subviews [0]);
+				Remove (tabIndex [0]);
 			}
 		}
 
@@ -600,6 +615,7 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 			var touched = view.Frame;
 			subviews.Remove (view);
+			tabIndex.Remove (view);
 			view.container = null;
 
 			if (subviews.Count < 1)
@@ -1260,12 +1276,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void FocusFirst ()
 		{
-			if (subviews == null) {
+			if (tabIndex == null) {
 				SuperView?.SetFocus (this);
 				return;
 			}
 
-			foreach (var view in subviews) {
+			foreach (var view in tabIndex) {
 				if (view.CanFocus) {
 					SetFocus (view);
 					return;
@@ -1278,15 +1294,15 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void FocusLast ()
 		{
-			if (subviews == null) {
+			if (tabIndex == null) {
 				SuperView?.SetFocus (this);
 				return;
 			}
 
-			for (int i = subviews.Count; i > 0;) {
+			for (int i = tabIndex.Count; i > 0;) {
 				i--;
 
-				View v = subviews [i];
+				View v = tabIndex [i];
 				if (v.CanFocus) {
 					SetFocus (v);
 					return;
@@ -1301,7 +1317,7 @@ namespace Terminal.Gui {
 		public bool FocusPrev ()
 		{
 			FocusDirection = Direction.Backward;
-			if (subviews == null || subviews.Count == 0)
+			if (tabIndex == null || tabIndex.Count == 0)
 				return false;
 
 			if (focused == null) {
@@ -1309,9 +1325,9 @@ namespace Terminal.Gui {
 				return focused != null;
 			}
 			int focused_idx = -1;
-			for (int i = subviews.Count; i > 0;) {
+			for (int i = tabIndex.Count; i > 0;) {
 				i--;
-				View w = subviews [i];
+				View w = tabIndex [i];
 
 				if (w.HasFocus) {
 					if (w.FocusPrev ())
@@ -1343,17 +1359,17 @@ namespace Terminal.Gui {
 		public bool FocusNext ()
 		{
 			FocusDirection = Direction.Forward;
-			if (subviews == null || subviews.Count == 0)
+			if (tabIndex == null || tabIndex.Count == 0)
 				return false;
 
 			if (focused == null) {
 				FocusFirst ();
 				return focused != null;
 			}
-			int n = subviews.Count;
+			int n = tabIndex.Count;
 			int focused_idx = -1;
 			for (int i = 0; i < n; i++) {
-				View w = subviews [i];
+				View w = tabIndex [i];
 
 				if (w.HasFocus) {
 					if (w.FocusNext ())
