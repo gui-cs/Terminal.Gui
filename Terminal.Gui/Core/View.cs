@@ -132,7 +132,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event fired when a subview is being removed from this view.
 		/// </summary>
-		public Action<View> Removing;
+		public Action<View> Removed;
 
 		/// <summary>
 		/// Event fired when the view gets focus.
@@ -607,12 +607,12 @@ namespace Terminal.Gui {
 			if (view == null || subviews == null)
 				return;
 
-			OnRemoving (view);
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
 			var touched = view.Frame;
 			subviews.Remove (view);
 			view.container = null;
+			OnRemoved (view);
 
 			if (subviews.Count < 1)
 				this.CanFocus = false;
@@ -958,9 +958,9 @@ namespace Terminal.Gui {
 		/// Method invoked when a subview is being removed from this view.
 		/// </summary>
 		/// <param name="view">The subview being removed.</param>
-		public virtual void OnRemoving (View view)
+		public virtual void OnRemoved (View view)
 		{
-			view.Removing?.Invoke (this);
+			view.Removed?.Invoke (this);
 		}
 
 		/// <inheritdoc/>
