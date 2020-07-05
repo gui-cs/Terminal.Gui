@@ -532,7 +532,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnEnter (View view)
 		{
-			if (lastSelectedItem == -1) {
+			if (source.Count > 0 && lastSelectedItem == -1) {
 				OnSelectedChanged ();
 				return true;
 			}
