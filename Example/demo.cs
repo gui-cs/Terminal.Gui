@@ -449,7 +449,8 @@ static class Demo {
 
 	static void ComboBoxDemo ()
 	{
-		List<ustring> items = new List<ustring> ();
+		//TODO: Duplicated code in ListsAndCombos.cs Consider moving to shared assembly
+		var items = new List<ustring> ();
 		foreach (var dir in new [] { "/etc", @$"{Environment.GetEnvironmentVariable ("SystemRoot")}\System32" }) {
 			if (Directory.Exists (dir)) {
 				items = Directory.GetFiles (dir).Union (Directory.GetDirectories (dir))
@@ -459,8 +460,8 @@ static class Demo {
 			}
 		}
 		var list = new ComboBox () { Width = Dim.Fill(), Height = Dim.Fill() };
-		list.SetSource(items.ToList());
-		list.SelectedItemChanged += (object sender, ListViewItemEventArgs text) => { Application.RequestStop (); };
+		list.SetSource(items);
+		list.OpenSelectedItem += (ListViewItemEventArgs text) => { Application.RequestStop (); };
 
 		var d = new Dialog () { Title = "Select source file", Width = Dim.Percent (50), Height = Dim.Percent (50) };
 		d.Add (list);

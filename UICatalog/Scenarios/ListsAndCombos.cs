@@ -12,7 +12,8 @@ namespace UICatalog.Scenarios {
 
 		public override void Setup ()
 		{
-			List<ustring> items = new List<ustring> ();
+			//TODO: Duplicated code in Demo.cs Consider moving to shared assembly
+			var items = new List<ustring> ();
 			foreach (var dir in new [] { "/etc", @$"{Environment.GetEnvironmentVariable ("SystemRoot")}\System32" }) {
 				if (Directory.Exists (dir)) {
 					items = Directory.GetFiles (dir).Union(Directory.GetDirectories(dir))
@@ -35,7 +36,7 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill(2),
 				Width = Dim.Percent (40)
 			};
-			listview.OpenSelectedItem += (ListViewItemEventArgs e) => lbListView.Text = items [listview.SelectedItem];
+			listview.SelectedItemChanged += (ListViewItemEventArgs e) => lbListView.Text = items [listview.SelectedItem];
 			Win.Add (lbListView, listview);
 
 			// ComboBox
@@ -53,7 +54,7 @@ namespace UICatalog.Scenarios {
 			};
 			comboBox.SetSource (items);
 
-			comboBox.SelectedItemChanged += (object sender, ListViewItemEventArgs text) => lbComboBox.Text = (ustring)text.Value;
+			comboBox.SelectedItemChanged += (ListViewItemEventArgs text) => lbComboBox.Text = items[comboBox.SelectedItem];
 			Win.Add (lbComboBox, comboBox);
 		}
 	}

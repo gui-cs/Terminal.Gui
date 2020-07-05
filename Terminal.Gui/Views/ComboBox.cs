@@ -55,13 +55,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Changed event, raised when the selection has been confirmed.
+		/// This event is raised when the selected item in the <see cref="ComboBox"/> has changed.
 		/// </summary>
-		/// <remarks>
-		///   Client code can hook up to this event, it is
-		///   raised when the selection has been confirmed.
-		/// </remarks>
-		public event EventHandler<ListViewItemEventArgs> SelectedItemChanged;
+		public Action<ListViewItemEventArgs> SelectedItemChanged;
+
+		/// <summary>
+		/// This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
+		/// </summary>
+		public Action<ListViewItemEventArgs> OpenSelectedItem;
 
 		IList searchset;
 		ustring text = "";
@@ -153,6 +154,12 @@ namespace Terminal.Gui {
 			};
 		}
 
+		/// <summary>
+		/// Gets the index of the currently selected item in the <see cref="Source"/>
+		/// </summary>
+		/// <value>The selected item or -1 none selected.</value>
+		public int SelectedItem { private set; get; }
+
 		bool isShow = false;
 
 		///<inheritdoc/>
@@ -209,7 +216,19 @@ namespace Terminal.Gui {
 		{
 			// Note: Cannot rely on "listview.SelectedItem != lastSelectedItem" because the list is dynamic. 
 			// So we cannot optimize. Ie: Don't call if not changed
-			SelectedItemChanged?.Invoke (this, new ListViewItemEventArgs(listview.SelectedItem, search.Text));
+			SelectedItemChanged?.Invoke (new ListViewItemEventArgs(SelectedItem, search.Text));
+
+			return true;
+		}
+
+		/// <summary>
+		/// Invokes the OnOpenSelectedItem event if it is defined.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool OnOpenSelectedItem ()
+		{
+			var value = search.Text;
+			OpenSelectedItem?.Invoke (new ListViewItemEventArgs (SelectedItem, value));
 
 			return true;
 		}
@@ -301,6 +320,8 @@ namespace Terminal.Gui {
 			this.text = search.Text = text.ToString();
 			search.CursorPosition = 0;
 			search.TextChanged += Search_Changed;
+			SelectedItem = GetSelectedItemFromSource (this.text);
+			OnSelectedChanged ();
 		}
 
 		private void Selected ()
@@ -313,8 +334,21 @@ namespace Terminal.Gui {
 			SetValue (searchset [listview.SelectedItem]);
 			search.CursorPosition = search.Text.RuneCount;
 			Search_Changed (search.Text);
-			OnSelectedChanged ();
+			OnOpenSelectedItem ();
 			Reset (keepSearchText: true);
+		}
+
+		private int GetSelectedItemFromSource (ustring value)
+		{
+			if (source == null) {
+				return -1;
+			}
+			for (int i = 0; i < source.Count; i++) {
+				if (source.ToList () [i].ToString () == value) {
+					return i;
+				}
+			}
+			return -1;
 		}
 
 		/// <summary>
