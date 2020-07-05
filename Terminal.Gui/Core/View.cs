@@ -917,8 +917,8 @@ namespace Terminal.Gui {
 
 			// Remove focus down the chain of subviews if focus is removed
 			if (!value && focused != null) {
-				focused.OnLeave (focused);
-				focused.hasFocus = false;
+				focused.OnLeave (view);
+				focused.SetHasFocus (false, view);
 				focused = null;
 			}
 		}
@@ -1135,8 +1135,9 @@ namespace Terminal.Gui {
 			if (focused != null)
 				focused.SetHasFocus (false, view);
 
+			var f = focused;
 			focused = view;
-			focused.SetHasFocus (true, view);
+			focused.SetHasFocus (true, f);
 			focused.EnsureFocus ();
 
 			// Send focus upwards
@@ -1340,7 +1341,7 @@ namespace Terminal.Gui {
 				}
 			}
 			if (focused != null) {
-				focused.SetHasFocus (false, focused);
+				focused.SetHasFocus (false, this);
 				focused = null;
 			}
 			return false;
