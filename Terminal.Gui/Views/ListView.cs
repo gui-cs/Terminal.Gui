@@ -214,7 +214,7 @@ namespace Terminal.Gui {
 				OnSelectedChanged ();
 				if (selected < top)
 					top = selected;
-				else if (selected >= top + Frame.Height)
+				else if (selected >= top + (LayoutStyle == LayoutStyle.Absolute ? Frame.Height : Height.Anchor (0)))
 					top = selected;
 			}
 		}
@@ -532,7 +532,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnEnter (View view)
 		{
-			if (source.Count > 0 && lastSelectedItem == -1) {
+			if (source?.Count > 0 && lastSelectedItem == -1) {
 				OnSelectedChanged ();
 				return true;
 			}
@@ -543,7 +543,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnMouseEnter (MouseEvent mouseEvent)
 		{
-			if (source.Count > 0 && selected >= 0 && lastSelectedItem == -1) {
+			if (source?.Count > 0 && selected >= 0 && lastSelectedItem == -1) {
 				lastSelectedItem = selected;
 				return true;
 			}
