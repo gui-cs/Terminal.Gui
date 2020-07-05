@@ -530,6 +530,17 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			if (lastSelectedItem == -1) {
+				OnSelectedChanged ();
+				return true;
+			}
+
+			return false;
+		}
+
+		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
 			if (allowsMarking)
