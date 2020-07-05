@@ -146,8 +146,8 @@ namespace Terminal.Gui {
 				Assert.True (v.SuperView == e);
 			};
 
-			v.Removing += (View e) => {
-				Assert.True (v.SuperView == e);
+			v.Removed += (View e) => {
+				Assert.True (v.SuperView == null);
 			};
 
 			t.Add (v);
