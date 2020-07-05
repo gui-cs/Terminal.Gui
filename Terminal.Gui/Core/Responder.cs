@@ -28,7 +28,7 @@ namespace Terminal.Gui {
 		/// Gets or sets a value indicating whether this <see cref="Responder"/> has focus.
 		/// </summary>
 		/// <value><c>true</c> if has focus; otherwise, <c>false</c>.</value>
-		public virtual bool HasFocus { get; internal set; }
+		public virtual bool HasFocus { get; }
 
 		// Key handling
 		/// <summary>
@@ -133,7 +133,6 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-
 		/// <summary>
 		/// Method invoked when a mouse event is generated
 		/// </summary>
@@ -167,8 +166,9 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Method invoked when a view gets focus.
 		/// </summary>
+		/// <param name="view">The view that is losing focus.</param>
 		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
-		public virtual bool OnEnter ()
+		public virtual bool OnEnter (View view)
 		{
 			return false;
 		}
@@ -176,8 +176,9 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Method invoked when a view loses focus.
 		/// </summary>
+		/// <param name="view">The view that is getting focus.</param>
 		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
-		public virtual bool OnLeave ()
+		public virtual bool OnLeave (View view)
 		{
 			return false;
 		}
