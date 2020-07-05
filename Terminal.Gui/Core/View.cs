@@ -1382,7 +1382,7 @@ namespace Terminal.Gui {
 				}
 			}
 			if (focused != null) {
-				focused.SetHasFocus (false, focused);
+				focused.SetHasFocus (false, this);
 				focused = null;
 			}
 			return false;
