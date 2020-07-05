@@ -120,6 +120,7 @@ namespace Terminal.Gui {
 				source = value;
 				top = 0;
 				selected = 0;
+				lastSelectedItem = -1;
 				SetNeedsDisplay ();
 			}
 		}
@@ -210,6 +211,7 @@ namespace Terminal.Gui {
 				if (selected < 0 || selected >= source.Count)
 					throw new ArgumentException ("value");
 				selected = value;
+				OnSelectedChanged ();
 				if (selected < top)
 					top = selected;
 				else if (selected >= top + Frame.Height)
