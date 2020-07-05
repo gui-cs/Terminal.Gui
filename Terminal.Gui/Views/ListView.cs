@@ -541,6 +541,17 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
+		public override bool OnMouseEnter (MouseEvent mouseEvent)
+		{
+			if (source.Count > 0 && selected >= 0 && lastSelectedItem == -1) {
+				lastSelectedItem = selected;
+				return true;
+			}
+
+			return false;
+		}
+
+		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
 			if (allowsMarking)
