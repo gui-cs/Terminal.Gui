@@ -93,14 +93,14 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnLeave ()
+		public override bool OnLeave (View view)
 		{
 			if (Application.mouseGrabView != null && Application.mouseGrabView == this)
 				Application.UngrabMouse ();
 			if (SelectedLength != 0 && !(Application.mouseGrabView is MenuBar))
 				ClearAllSelection ();
 
-			return base.OnLeave ();
+			return base.OnLeave (view);
 		}
 
 		///<inheritdoc/>

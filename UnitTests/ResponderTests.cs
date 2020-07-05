@@ -32,8 +32,8 @@ namespace Terminal.Gui {
 			Assert.False (r.MouseEvent (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseEnter (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseLeave (new MouseEvent () { Flags = MouseFlags.AllEvents }));
-			Assert.False (r.OnEnter ());
-			Assert.False (r.OnLeave ());
+			Assert.False (r.OnEnter (new View ()));
+			Assert.False (r.OnLeave (new View ()));
 		}
 	}
 }

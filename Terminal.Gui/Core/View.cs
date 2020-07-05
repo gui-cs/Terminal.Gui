@@ -911,26 +911,31 @@ namespace Terminal.Gui {
 			}
 		}
 
+		bool hasFocus;
 		/// <inheritdoc/>
 		public override bool HasFocus {
 			get {
-				return base.HasFocus;
+				return hasFocus;
 			}
-			internal set {
-				if (base.HasFocus != value)
-					if (value)
-						OnEnter ();
-					else
-						OnLeave ();
-				SetNeedsDisplay ();
-				base.HasFocus = value;
+		}
 
-				// Remove focus down the chain of subviews if focus is removed
-				if (!value && focused != null) {
-					focused.OnLeave ();
-					focused.HasFocus = false;
-					focused = null;
-				}
+		void SetHasFocus (bool value, View view)
+		{
+			if (hasFocus != value) {
+				hasFocus = value;
+			}
+			if (value) {
+				OnEnter (view);
+			} else {
+				OnLeave (view);
+			}
+			SetNeedsDisplay ();
+
+			// Remove focus down the chain of subviews if focus is removed
+			if (!value && focused != null) {
+				focused.OnLeave (view);
+				focused.SetHasFocus (false, view);
+				focused = null;
 			}
 		}
 
@@ -941,35 +946,40 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// Constructs.
 			/// </summary>
-			public FocusEventArgs () { }
+			/// <param name="view">The view that gets or loses focus.</param>
+			public FocusEventArgs (View view) { View = view; }
 			/// <summary>
 			/// Indicates if the current focus event has already been processed and the driver should stop notifying any other event subscriber.
 			/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
 			/// </summary>
 			public bool Handled { get; set; }
+			/// <summary>
+			/// Indicates the current view that gets or loses focus.
+			/// </summary>
+			public View View { get; set; }
 		}
 
 		/// <inheritdoc/>
-		public override bool OnEnter ()
+		public override bool OnEnter (View view)
 		{
-			FocusEventArgs args = new FocusEventArgs ();
+			FocusEventArgs args = new FocusEventArgs (view);
 			Enter?.Invoke (args);
 			if (args.Handled)
 				return true;
-			if (base.OnEnter ())
+			if (base.OnEnter (view))
 				return true;
 
 			return false;
 		}
 
 		/// <inheritdoc/>
-		public override bool OnLeave ()
+		public override bool OnLeave (View view)
 		{
-			FocusEventArgs args = new FocusEventArgs ();
+			FocusEventArgs args = new FocusEventArgs (view);
 			Leave?.Invoke (args);
 			if (args.Handled)
 				return true;
-			if (base.OnLeave ())
+			if (base.OnLeave (view))
 				return true;
 
 			return false;
@@ -1139,10 +1149,11 @@ namespace Terminal.Gui {
 				throw new ArgumentException ("the specified view is not part of the hierarchy of this view");
 
 			if (focused != null)
-				focused.HasFocus = false;
+				focused.SetHasFocus (false, view);
 
+			var f = focused;
 			focused = view;
-			focused.HasFocus = true;
+			focused.SetHasFocus (true, f);
 			focused.EnsureFocus ();
 
 			// Send focus upwards
@@ -1336,7 +1347,7 @@ namespace Terminal.Gui {
 					continue;
 				}
 				if (w.CanFocus && focused_idx != -1) {
-					focused.HasFocus = false;
+					focused.SetHasFocus (false, w);
 
 					if (w != null && w.CanFocus)
 						w.FocusLast ();
@@ -1346,7 +1357,7 @@ namespace Terminal.Gui {
 				}
 			}
 			if (focused != null) {
-				focused.HasFocus = false;
+				focused.SetHasFocus (false, this);
 				focused = null;
 			}
 			return false;
@@ -1378,7 +1389,7 @@ namespace Terminal.Gui {
 					continue;
 				}
 				if (w.CanFocus && focused_idx != -1) {
-					focused.HasFocus = false;
+					focused.SetHasFocus (false, w);
 
 					if (w != null && w.CanFocus)
 						w.FocusFirst ();
@@ -1388,7 +1399,7 @@ namespace Terminal.Gui {
 				}
 			}
 			if (focused != null) {
-				focused.HasFocus = false;
+				focused.SetHasFocus (false, this);
 				focused = null;
 			}
 			return false;
