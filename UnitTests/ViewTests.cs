@@ -135,5 +135,350 @@ namespace Terminal.Gui {
 			sub2.Width = Dim.Width (sub2);
 			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
 		}
+
+		[Fact]
+		public void Subviews_TabIndexes_AreEqual ()
+		{
+			var r = new View ();
+			var v1 = new View () { CanFocus = true };
+			var v2 = new View () { CanFocus = true };
+			var v3 = new View () { CanFocus = true };
+
+			r.Add (v1, v2, v3);
+
+			Assert.True (r.Subviews.IndexOf (v1) == 0);
+			Assert.True (r.Subviews.IndexOf (v2) == 1);
+			Assert.True (r.Subviews.IndexOf (v3) == 2);
+
+			Assert.True (r.TabIndexes.IndexOf (v1) == 0);
+			Assert.True (r.TabIndexes.IndexOf (v2) == 1);
+			Assert.True (r.TabIndexes.IndexOf (v3) == 2);
+
+			Assert.Equal (r.Subviews.IndexOf (v1), r.TabIndexes.IndexOf (v1));
+			Assert.Equal (r.Subviews.IndexOf (v2), r.TabIndexes.IndexOf (v2));
+			Assert.Equal (r.Subviews.IndexOf (v3), r.TabIndexes.IndexOf (v3));
+		}
+
+		[Fact]
+		public void BringSubviewToFront_Subviews_vs_TabIndexes ()
+		{
+			var r = new View ();
+			var v1 = new View () { CanFocus = true };
+			var v2 = new View () { CanFocus = true };
+			var v3 = new View () { CanFocus = true };
+
+			r.Add (v1, v2, v3);
+
+			r.BringSubviewToFront (v1);
+			Assert.True (r.Subviews.IndexOf (v1) == 2);
+			Assert.True (r.Subviews.IndexOf (v2) == 0);
+			Assert.True (r.Subviews.IndexOf (v3) == 1);
+
+			Assert.True (r.TabIndexes.IndexOf (v1) == 0);
+			Assert.True (r.TabIndexes.IndexOf (v2) == 1);
+			Assert.True (r.TabIndexes.IndexOf (v3) == 2);
+		}
+
+		[Fact]
+		public void BringSubviewForward_Subviews_vs_TabIndexes ()
+		{
+			var r = new View ();
+			var v1 = new View () { CanFocus = true };
+			var v2 = new View () { CanFocus = true };
+			var v3 = new View () { CanFocus = true };
+
+			r.Add (v1, v2, v3);
+
+			r.BringSubviewForward (v1);
+			Assert.True (r.Subviews.IndexOf (v1) == 1);
+			Assert.True (r.Subviews.IndexOf (v2) == 0);
+			Assert.True (r.Subviews.IndexOf (v3) == 2);
+
+			Assert.True (r.TabIndexes.IndexOf (v1) == 0);
+			Assert.True (r.TabIndexes.IndexOf (v2) == 1);
+			Assert.True (r.TabIndexes.IndexOf (v3) == 2);
+		}
+
+		[Fact]
+		public void SendSubviewToBack_Subviews_vs_TabIndexes ()
+		{
+			var r = new View ();
+			var v1 = new View () { CanFocus = true };
+			var v2 = new View () { CanFocus = true };
+			var v3 = new View () { CanFocus = true };
+
+			r.Add (v1, v2, v3);
+
+			r.SendSubviewToBack (v3);
+			Assert.True (r.Subviews.IndexOf (v1) == 1);
+			Assert.True (r.Subviews.IndexOf (v2) == 2);
+			Assert.True (r.Subviews.IndexOf (v3) == 0);
+
+			Assert.True (r.TabIndexes.IndexOf (v1) == 0);
+			Assert.True (r.TabIndexes.IndexOf (v2) == 1);
+			Assert.True (r.TabIndexes.IndexOf (v3) == 2);
+		}
+
+		[Fact]
+		public void SendSubviewBackwards_Subviews_vs_TabIndexes ()
+		{
+			var r = new View ();
+			var v1 = new View () { CanFocus = true };
+			var v2 = new View () { CanFocus = true };
+			var v3 = new View () { CanFocus = true };
+
+			r.Add (v1, v2, v3);
+
+			r.SendSubviewBackwards (v3);
+			Assert.True (r.Subviews.IndexOf (v1) == 0);
+			Assert.True (r.Subviews.IndexOf (v2) == 2);
+			Assert.True (r.Subviews.IndexOf (v3) == 1);
+
+			Assert.True (r.TabIndexes.IndexOf (v1) == 0);
+			Assert.True (r.TabIndexes.IndexOf (v2) == 1);
+			Assert.True (r.TabIndexes.IndexOf (v3) == 2);
+		}
+
+		[Fact]
+		public void TabIndex_Set_CanFocus_ValidValues ()
+		{
+			var r = new View ();
+			var v1 = new View () { CanFocus = true };
+			var v2 = new View () { CanFocus = true };
+			var v3 = new View () { CanFocus = true };
+
+			r.Add (v1, v2, v3);
+
+			v1.TabIndex = 1;
+			Assert.True (r.Subviews.IndexOf (v1) == 0);
+			Assert.True (r.TabIndexes.IndexOf (v1) == 1);
+
+			v1.TabIndex = 2;
+			Assert.True (r.Subviews.IndexOf (v1) == 0);
+			Assert.True (r.TabIndexes.IndexOf (v1) == 2);
+		}
+
+		[Fact]
+		public void TabIndex_Set_CanFocus_HigherValues ()
+		{
+			var r = new View ();
+			var v1 = new View () { CanFocus = true };
+			var v2 = new View () { CanFocus = true };
+			var v3 = new View () { CanFocus = true };
+
+			r.Add (v1, v2, v3);
+
+			v1.TabIndex = 3;
+			Assert.True (r.Subviews.IndexOf (v1) == 0);
+			Assert.True (r.TabIndexes.IndexOf (v1) == 2);
+		}
+
+		[Fact]
+		public void TabIndex_Set_CanFocus_LowerValues ()
+		{
+			var r = new View ();
+			var v1 = new View () { CanFocus = true };
+			var v2 = new View () { CanFocus = true };
+			var v3 = new View () { CanFocus = true };
+
+			r.Add (v1, v2, v3);
+
+			v1.TabIndex = -1;
+			Assert.True (r.Subviews.IndexOf (v1) == 0);
+			Assert.True (r.TabIndexes.IndexOf (v1) == 0);
+		}
+
+		[Fact]
+		public void TabIndex_Set_CanFocus_False ()
+		{
+			var r = new View ();
+			var v1 = new View () { CanFocus = true };
+			var v2 = new View () { CanFocus = true };
+			var v3 = new View () { CanFocus = true };
+
+			r.Add (v1, v2, v3);
+
+			v1.CanFocus = false;
+			v1.TabIndex = 0;
+			Assert.True (r.Subviews.IndexOf (v1) == 0);
+			Assert.True (r.TabIndexes.IndexOf (v1) == 0);
+			Assert.Equal (-1, v1.TabIndex);
+		}
+
+		[Fact]
+		public void TabIndex_Set_CanFocus_False_To_True ()
+		{
+			var r = new View ();
+			var v1 = new View ();
+			var v2 = new View () { CanFocus = true };
+			var v3 = new View () { CanFocus = true };
+
+			r.Add (v1, v2, v3);
+
+			v1.CanFocus = true;
+			v1.TabIndex = 1;
+			Assert.True (r.Subviews.IndexOf (v1) == 0);
+			Assert.True (r.TabIndexes.IndexOf (v1) == 1);
+		}
+
+		[Fact]
+		public void TabStop_And_CanFocus_Are_All_True ()
+		{
+			var r = new View ();
+			var v1 = new View () { CanFocus = true };
+			var v2 = new View () { CanFocus = true };
+			var v3 = new View () { CanFocus = true };
+
+			r.Add (v1, v2, v3);
+
+			r.FocusNext ();
+			Assert.True (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.True (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.True (v3.HasFocus);
+		}
+
+		[Fact]
+		public void TabStop_Are_All_True_And_CanFocus_Are_All_False ()
+		{
+			var r = new View ();
+			var v1 = new View ();
+			var v2 = new View ();
+			var v3 = new View ();
+
+			r.Add (v1, v2, v3);
+
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+		}
+
+		[Fact]
+		public void TabStop_Are_All_False_And_CanFocus_Are_All_True ()
+		{
+			var r = new View ();
+			var v1 = new View () { CanFocus = true, TabStop = false };
+			var v2 = new View () { CanFocus = true, TabStop = false };
+			var v3 = new View () { CanFocus = true, TabStop = false };
+
+			r.Add (v1, v2, v3);
+
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+		}
+
+		[Fact]
+		public void TabStop_And_CanFocus_Mixed_And_BothFalse ()
+		{
+			var r = new View ();
+			var v1 = new View () { CanFocus = true, TabStop = false };
+			var v2 = new View () { CanFocus = false, TabStop = true };
+			var v3 = new View () { CanFocus = false, TabStop = false };
+
+			r.Add (v1, v2, v3);
+
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+		}
+
+		[Fact]
+		public void TabStop_All_True_And_Changing_CanFocus_Later ()
+		{
+			var r = new View ();
+			var v1 = new View ();
+			var v2 = new View ();
+			var v3 = new View ();
+
+			r.Add (v1, v2, v3);
+
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+
+			v1.CanFocus = true;
+			r.FocusNext ();
+			Assert.True (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+			v2.CanFocus = true;
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.True (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+			v3.CanFocus = true;
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.True (v3.HasFocus);
+		}
+
+		[Fact]
+		public void TabStop_All_False_And_All_True_And_Changing_TabStop_Later ()
+		{
+			var r = new View ();
+			var v1 = new View () { CanFocus = true, TabStop = false };
+			var v2 = new View () { CanFocus = true, TabStop = false };
+			var v3 = new View () { CanFocus = true, TabStop = false };
+
+			r.Add (v1, v2, v3);
+
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+
+			v1.TabStop = true;
+			r.FocusNext ();
+			Assert.True (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+			v2.TabStop = true;
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.True (v2.HasFocus);
+			Assert.False (v3.HasFocus);
+			v3.TabStop = true;
+			r.FocusNext ();
+			Assert.False (v1.HasFocus);
+			Assert.False (v2.HasFocus);
+			Assert.True (v3.HasFocus);
+		}
 	}
 }
