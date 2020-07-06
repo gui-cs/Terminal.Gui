@@ -246,8 +246,6 @@ namespace Terminal.Gui {
 			GC.SuppressFinalize (this);
 #if DEBUG_IDISPOSABLE
 			WasDisposed = true;
-			//Debug.Assert (DisposedCount == 0);
-			//DisposedCount++;
 #endif
 		}
 	}

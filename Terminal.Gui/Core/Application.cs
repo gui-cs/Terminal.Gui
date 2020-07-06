@@ -508,7 +508,6 @@ namespace Terminal.Gui {
 			CurrentView = null;
 			Top = null;
 
-
 			// Closes the application if it's true.
 			if (closeDriver) {
 				MainLoop = null;

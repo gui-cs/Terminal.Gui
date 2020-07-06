@@ -92,7 +92,7 @@ namespace Terminal.Gui {
 			List<Type> scenarioClasses = Scenario.GetDerivedClasses<Scenario> ();
 			Assert.NotEmpty (scenarioClasses);
 
-			var item = scenarioClasses.FindIndex (t => Scenario.ScenarioMetadata.GetName (t).Equals ("Clipping", StringComparison.OrdinalIgnoreCase));
+			var item = scenarioClasses.FindIndex (t => Scenario.ScenarioMetadata.GetName (t).Equals ("Generic", StringComparison.OrdinalIgnoreCase));
 			var scenarioClass = scenarioClasses[item];
 			// Setup some fake kepresses 
 			// Passing empty string will cause just a ctrl-q to be fired

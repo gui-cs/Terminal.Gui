@@ -1738,7 +1738,9 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		protected override void Dispose (bool disposing)
 		{
-			foreach (var subview in InternalSubviews) {
+			for (int i = InternalSubviews.Count - 1; i >= 0; i--) {
+				View subview = InternalSubviews [i];
+				Remove (subview);
 				subview.Dispose ();
 			}
 			base.Dispose (disposing);

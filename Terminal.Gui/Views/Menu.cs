@@ -1069,6 +1069,7 @@ namespace Terminal.Gui {
 			if (mi.IsTopLevel) {
 				var menu = new Menu (this, i, 0, mi);
 				menu.Run (mi.Action);
+				menu.Dispose ();
 			} else {
 				openedByHotKey = true;
 				Application.GrabMouse (this);
@@ -1176,6 +1177,7 @@ namespace Terminal.Gui {
 							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
 								menu.Run (Menus [i].Action);
+								menu.Dispose ();
 							}
 						} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1TripleClicked) {
 							if (IsMenuOpen) {
