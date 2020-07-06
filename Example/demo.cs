@@ -449,20 +449,22 @@ static class Demo {
 
 	static void ComboBoxDemo ()
 	{
-		IList<string> items = new List<string> ();
-		foreach (var dir in new [] { "/etc", @"\windows\System32" }) {
+		//TODO: Duplicated code in ListsAndCombos.cs Consider moving to shared assembly
+		var items = new List<ustring> ();
+		foreach (var dir in new [] { "/etc", @$"{Environment.GetEnvironmentVariable ("SystemRoot")}\System32" }) {
 			if (Directory.Exists (dir)) {
 				items = Directory.GetFiles (dir).Union (Directory.GetDirectories (dir))
 					.Select (Path.GetFileName)
 					.Where (x => char.IsLetterOrDigit (x [0]))
-					.OrderBy (x => x).ToList ();
+					.OrderBy (x => x).Select (x => ustring.Make (x)).ToList ();
 			}
 		}
-		var list = new ComboBox () { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() };
-		list.SetSource(items.ToList());
-		list.SelectedItemChanged += (object sender, ustring text) => { Application.RequestStop (); };
+		var list = new ComboBox () { Width = Dim.Fill(), Height = Dim.Fill() };
+		list.SetSource(items);
+		list.OpenSelectedItem += (ListViewItemEventArgs text) => { Application.RequestStop (); };
 
-		var d = new Dialog ("Select source file", 40, 12) { list };
+		var d = new Dialog () { Title = "Select source file", Width = Dim.Percent (50), Height = Dim.Percent (50) };
+		d.Add (list);
 		Application.Run (d);
 
 		MessageBox.Query (60, 10, "Selected file", list.Text.ToString() == "" ? "Nothing selected" : list.Text.ToString(), "Ok");
