@@ -589,16 +589,23 @@ namespace Terminal.Gui {
 
 					MainLoop.MainIteration ();
 					Iteration?.Invoke ();
-				} else if (wait == false)
+				} else if (wait == false) {
 					return;
-				if (state.Toplevel.NeedDisplay != null && (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.childNeedsDisplay)) {
+				}
+				if (state.Toplevel != Top && (!Top.NeedDisplay.IsEmpty || Top.childNeedsDisplay)) {
+					Top.Redraw (Top.Bounds);
+					state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
+				}
+				if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.childNeedsDisplay) {
 					state.Toplevel.Redraw (state.Toplevel.Bounds);
-					if (DebugDrawBounds)
+					if (DebugDrawBounds) {
 						DrawBounds (state.Toplevel);
+					}
 					state.Toplevel.PositionCursor ();
 					Driver.Refresh ();
-				} else
+				} else {
 					Driver.UpdateCursor ();
+				}
 			}
 		}
 

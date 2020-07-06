@@ -102,8 +102,8 @@ namespace Terminal.Gui {
 			Assert.False (r.MouseEvent (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseEnter (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseLeave (new MouseEvent () { Flags = MouseFlags.AllEvents }));
-			Assert.False (r.OnEnter ());
-			Assert.False (r.OnLeave ());
+			Assert.False (r.OnEnter (new View ()));
+			Assert.False (r.OnLeave (new View ()));
 
 			// TODO: Add more
 		}
@@ -134,6 +134,27 @@ namespace Terminal.Gui {
 			root.Add (sub2);
 			sub2.Width = Dim.Width (sub2);
 			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
+		}
+
+		[Fact]
+		public void Added_Removing ()
+		{
+			var v = new View (new Rect (0, 0, 10, 24));
+			var t = new View ();
+
+			v.Added += (View e) => {
+				Assert.True (v.SuperView == e);
+			};
+
+			v.Removed += (View e) => {
+				Assert.True (v.SuperView == null);
+			};
+
+			t.Add (v);
+			Assert.True (t.Subviews.Count == 1);
+
+			t.Remove (v);
+			Assert.True (t.Subviews.Count == 0);
 		}
 	}
 }
