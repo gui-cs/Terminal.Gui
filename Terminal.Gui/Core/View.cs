@@ -125,6 +125,16 @@ namespace Terminal.Gui {
 		TextFormatter viewText;
 
 		/// <summary>
+		/// Event fired when a subview is being added to this view.
+		/// </summary>
+		public Action<View> Added;
+
+		/// <summary>
+		/// Event fired when a subview is being removed from this view.
+		/// </summary>
+		public Action<View> Removed;
+
+		/// <summary>
 		/// Event fired when the view gets focus.
 		/// </summary>
 		public Action<FocusEventArgs> Enter;
@@ -552,6 +562,7 @@ namespace Terminal.Gui {
 				subviews = new List<View> ();
 			subviews.Add (view);
 			view.container = this;
+			OnAdded (view);
 			if (view.CanFocus)
 				CanFocus = true;
 			SetNeedsLayout ();
@@ -601,6 +612,7 @@ namespace Terminal.Gui {
 			var touched = view.Frame;
 			subviews.Remove (view);
 			view.container = null;
+			OnRemoved (view);
 
 			if (subviews.Count < 1)
 				this.CanFocus = false;
@@ -941,6 +953,24 @@ namespace Terminal.Gui {
 			/// Indicates the current view that gets or loses focus.
 			/// </summary>
 			public View View { get; set; }
+		}
+
+		/// <summary>
+		/// Method invoked  when a subview is being added to this view.
+		/// </summary>
+		/// <param name="view">The subview being added.</param>
+		public virtual void OnAdded (View view)
+		{
+			view.Added?.Invoke (this);
+		}
+
+		/// <summary>
+		/// Method invoked when a subview is being removed from this view.
+		/// </summary>
+		/// <param name="view">The subview being removed.</param>
+		public virtual void OnRemoved (View view)
+		{
+			view.Removed?.Invoke (this);
 		}
 
 		/// <inheritdoc/>
