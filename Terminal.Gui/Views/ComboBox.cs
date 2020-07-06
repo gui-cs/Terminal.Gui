@@ -254,6 +254,12 @@ namespace Terminal.Gui {
 				return false; // allow tab-out to next control
 			}
 
+			if(e.Key == Key.BackTab) {
+				base.ProcessKey (e);
+				this.FocusPrev ();
+				return false; // allow tab-out to prev control
+			}
+
 			if (e.Key == Key.Enter && listview.HasFocus) {
 				Selected ();
 				return true;
