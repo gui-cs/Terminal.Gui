@@ -276,13 +276,31 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if(e.Key == Key.PageDown) { 
-				listview.MovePageDown ();
+			if(e.Key == Key.PageDown) {
+				if (listview.SelectedItem != -1) {
+					listview.MovePageDown ();
+				}
 				return true;
 			}
 
-			if (e.Key == Key.PageUp) { 
-				listview.MovePageUp ();
+			if (e.Key == Key.PageUp) {
+				if (listview.SelectedItem != -1) {
+					listview.MovePageUp ();
+				}
+				return true;
+			}
+
+			if (e.Key == Key.Home) {
+				if (listview.SelectedItem != -1) {
+					listview.MoveHome ();				
+				}
+				return true;
+			}
+
+			if(e.Key == Key.End) {
+				if(listview.SelectedItem != -1) { 
+					listview.MoveEnd ();
+				}
 				return true;
 			}
 
