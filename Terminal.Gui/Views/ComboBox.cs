@@ -197,7 +197,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnEnter ()
+		public override bool OnEnter (View view)
 		{
 			if (!search.HasFocus) {
 				this.SetFocus (search);

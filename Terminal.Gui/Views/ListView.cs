@@ -206,7 +206,7 @@ namespace Terminal.Gui {
 		public int SelectedItem {
 			get => selected;
 			set {
-				if (source == null)
+				if (source == null || source.Count == 0)
 					return;
 				if (selected < 0 || selected >= source.Count)
 					throw new ArgumentException ("value");
