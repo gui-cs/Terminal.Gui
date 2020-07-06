@@ -137,6 +137,27 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
+		public void Added_Removed ()
+		{
+			var v = new View (new Rect (0, 0, 10, 24));
+			var t = new View ();
+
+			v.Added += (View e) => {
+				Assert.True (v.SuperView == e);
+			};
+
+			v.Removed += (View e) => {
+				Assert.True (v.SuperView == null);
+			};
+
+			t.Add (v);
+			Assert.True (t.Subviews.Count == 1);
+
+			t.Remove (v);
+			Assert.True (t.Subviews.Count == 0);
+		}
+
+		[Fact]
 		public void Subviews_TabIndexes_AreEqual ()
 		{
 			var r = new View ();
