@@ -120,6 +120,7 @@ namespace Terminal.Gui {
 				source = value;
 				top = 0;
 				selected = 0;
+				lastSelectedItem = -1;
 				SetNeedsDisplay ();
 			}
 		}
@@ -205,14 +206,15 @@ namespace Terminal.Gui {
 		public int SelectedItem {
 			get => selected;
 			set {
-				if (source == null)
+				if (source == null || source.Count == 0)
 					return;
 				if (selected < 0 || selected >= source.Count)
 					throw new ArgumentException ("value");
 				selected = value;
+				OnSelectedChanged ();
 				if (selected < top)
 					top = selected;
-				else if (selected >= top + Frame.Height)
+				else if (selected >= top + (LayoutStyle == LayoutStyle.Absolute ? Frame.Height : Height.Anchor (0)))
 					top = selected;
 			}
 		}
@@ -525,6 +527,28 @@ namespace Terminal.Gui {
 			OpenSelectedItem?.Invoke (new ListViewItemEventArgs (selected, value));
 
 			return true;
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			if (source?.Count > 0 && lastSelectedItem == -1) {
+				OnSelectedChanged ();
+				return true;
+			}
+
+			return false;
+		}
+
+		///<inheritdoc/>
+		public override bool OnMouseEnter (MouseEvent mouseEvent)
+		{
+			if (source?.Count > 0 && selected >= 0 && lastSelectedItem == -1) {
+				lastSelectedItem = selected;
+				return true;
+			}
+
+			return false;
 		}
 
 		///<inheritdoc/>
