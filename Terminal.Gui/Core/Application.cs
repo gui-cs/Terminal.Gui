@@ -241,6 +241,7 @@ namespace Terminal.Gui {
 			{
 				if (Toplevel != null) {
 					End (Toplevel, disposing);
+					Toplevel.Dispose ();
 					Toplevel = null;
 				}
 			}
@@ -500,6 +501,7 @@ namespace Terminal.Gui {
 			// TODO: Some of this state is actually related to Begin/End (not Init/Shutdown) and should be moved to `RunState` (#520)
 			foreach (var t in toplevels) {
 				t.Running = false;
+				t.Dispose ();
 			}
 			toplevels.Clear ();
 			Current = null;

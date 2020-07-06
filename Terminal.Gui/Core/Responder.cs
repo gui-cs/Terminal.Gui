@@ -13,11 +13,39 @@
 // Optimziations
 //   - Add rendering limitation to the exposed area
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
 namespace Terminal.Gui {
 	/// <summary>
 	/// Responder base class implemented by objects that want to participate on keyboard and mouse input.
 	/// </summary>
-	public class Responder {
+	public class Responder : IDisposable {
+		bool disposedValue;
+
+#if DEBUG_IDISPOSABLE
+		/// <summary>
+		/// For debug purposes to verify objects are being disposed properly
+		/// </summary>
+		public bool WasDisposed = false;
+		/// <summary>
+		/// For debug purposes to verify objects are being disposed properly
+		/// </summary>
+		public int DisposedCount = 0;
+		/// <summary>
+		/// For debug purposes
+		/// </summary>
+		public static List<Responder> Instances = new List<Responder> ();
+		/// <summary>
+		/// For debug purposes
+		/// </summary>
+		public Responder ()
+		{
+			Instances.Add (this);
+		}
+#endif
+
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="Responder"/> can focus.
 		/// </summary>
@@ -181,6 +209,44 @@ namespace Terminal.Gui {
 		public virtual bool OnLeave (View view)
 		{
 			return false;
+		}
+
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
+		/// <remarks>
+		/// If disposing equals true, the method has been called directly
+		/// or indirectly by a user's code. Managed and unmanaged resources
+		/// can be disposed.
+		/// If disposing equals false, the method has been called by the
+		/// runtime from inside the finalizer and you should not reference
+		/// other objects. Only unmanaged resources can be disposed.		
+		/// </remarks>
+		/// <param name="disposing"></param>
+		protected virtual void Dispose (bool disposing)
+		{
+			if (!disposedValue) {
+				if (disposing) {
+					// TODO: dispose managed state (managed objects)
+				}
+
+				// TODO: free unmanaged resources (unmanaged objects) and override finalizer
+				// TODO: set large fields to null
+				disposedValue = true;
+			}
+		}
+
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resource.
+		/// </summary>
+		public void Dispose ()
+		{
+			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+			Dispose (disposing: true);
+			GC.SuppressFinalize (this);
+#if DEBUG_IDISPOSABLE
+			WasDisposed = true;
+#endif
 		}
 	}
 }

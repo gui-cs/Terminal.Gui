@@ -725,5 +725,19 @@ namespace Terminal.Gui {
 			}
 			return true;
 		}
+
+		///<inheritdoc/>
+		protected override void Dispose (bool disposing)
+		{
+			if (!showVerticalScrollIndicator) {
+				// It was not added to SuperView, so it won't get disposed automatically
+				vertical?.Dispose ();
+			}
+			if (!showHorizontalScrollIndicator) {
+				// It was not added to SuperView, so it won't get disposed automatically
+				horizontal?.Dispose ();
+			}
+			base.Dispose (disposing);
+		}
 	}
 }

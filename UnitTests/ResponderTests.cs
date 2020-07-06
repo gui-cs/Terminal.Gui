@@ -35,5 +35,12 @@ namespace Terminal.Gui {
 			Assert.False (r.OnEnter (new View ()));
 			Assert.False (r.OnLeave (new View ()));
 		}
+
+		// Generic lifetime (IDisposable) tests
+		[Fact]
+		public void Dispose_Works ()
+		{
+
+		}
 	}
 }

@@ -53,37 +53,49 @@ namespace UICatalog {
 
 			lblOldTime = new Label ("Old Time: ") {
 				X = Pos.Center (),
-				Y = Pos.Bottom (longDate) + 1
+				Y = Pos.Bottom (longDate) + 1,
+				TextAlignment = TextAlignment.Centered,
+				Width = Dim.Fill(),
 			};
 			Win.Add (lblOldTime);
 
 			lblNewTime = new Label ("New Time: ") {
 				X = Pos.Center (),
-				Y = Pos.Bottom (lblOldTime) + 1
+				Y = Pos.Bottom (lblOldTime) + 1,
+				TextAlignment = TextAlignment.Centered,
+				Width = Dim.Fill (),
 			};
 			Win.Add (lblNewTime);
 
 			lblTimeFmt = new Label ("Time Format: ") {
 				X = Pos.Center (),
-				Y = Pos.Bottom (lblNewTime) + 1
+				Y = Pos.Bottom (lblNewTime) + 1,
+				TextAlignment = TextAlignment.Centered,
+				Width = Dim.Fill (),
 			};
 			Win.Add (lblTimeFmt);
 
 			lblOldDate = new Label ("Old Date: ") {
 				X = Pos.Center (),
-				Y = Pos.Bottom (lblTimeFmt) + 2
+				Y = Pos.Bottom (lblTimeFmt) + 2,
+				TextAlignment = TextAlignment.Centered,
+				Width = Dim.Fill (),
 			};
 			Win.Add (lblOldDate);
 
 			lblNewDate = new Label ("New Date: ") {
 				X = Pos.Center (),
-				Y = Pos.Bottom (lblOldDate) + 1
+				Y = Pos.Bottom (lblOldDate) + 1,
+				TextAlignment = TextAlignment.Centered,
+				Width = Dim.Fill (),
 			};
 			Win.Add (lblNewDate);
 
 			lblDateFmt = new Label ("Date Format: ") {
 				X = Pos.Center (),
-				Y = Pos.Bottom (lblNewDate) + 1
+				Y = Pos.Bottom (lblNewDate) + 1,
+				TextAlignment = TextAlignment.Centered,
+				Width = Dim.Fill (),
 			};
 			Win.Add (lblDateFmt);
 

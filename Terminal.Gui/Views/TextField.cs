@@ -33,7 +33,7 @@ namespace Terminal.Gui {
 		public bool ReadOnly { get; set; } = false;
 
 		/// <summary>
-		///   Changed event, raised when the text has clicked.
+		///   Changed event, raised when the text has changed.
 		/// </summary>
 		/// <remarks>
 		///   This event is raised when the <see cref="Text"/> changes. 

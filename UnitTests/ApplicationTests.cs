@@ -12,6 +12,13 @@ using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui {
 	public class ApplicationTests {
+		public ApplicationTests ()
+		{
+#if DEBUG_IDISPOSABLE
+			Responder.Instances.Clear ();
+#endif
+		}
+
 		[Fact]
 		public void Init_Shutdown_Cleans_Up ()
 		{
