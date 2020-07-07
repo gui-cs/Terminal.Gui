@@ -916,9 +916,10 @@ namespace Terminal.Gui {
 				else
 					SuperView.SetFocus (openMenu);
 				if (openSubMenu != null) {
-					SuperView.Remove (openSubMenu [i]);
-					openSubMenu.Remove (openSubMenu [i]);
-					openSubMenu [i].Dispose ();
+					var menu = openSubMenu [i];
+					SuperView.Remove (menu);
+					openSubMenu.Remove (menu);
+					menu.Dispose ();
 				}
 				RemoveSubMenu (i);
 			}
