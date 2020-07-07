@@ -217,8 +217,8 @@ namespace Terminal.Gui {
 					} else {
 						SuperView.SetNeedsDisplay (Frame);
 					}
-					EnsureVisibleBounds (this, mouseEvent.X + mouseEvent.OfX - start.X,
-						mouseEvent.Y + mouseEvent.OfY, out nx, out ny);
+					EnsureVisibleBounds (this, mouseEvent.X + (SuperView == null ? mouseEvent.OfX - start.X : Frame.X - start.X),
+						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY : Frame.Y), out nx, out ny);
 
 					dragPosition = new Point (nx, ny);
 					Frame = new Rect (nx, ny, Frame.Width, Frame.Height);
