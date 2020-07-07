@@ -205,8 +205,21 @@ namespace Terminal.Gui {
 			// a pending mouse event activated.
 
 			int nx, ny;
-			if ((mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) ||
-				mouseEvent.Flags == MouseFlags.Button3Pressed)) {
+			if (!dragPosition.HasValue && mouseEvent.Flags == (MouseFlags.Button1Pressed)) {
+				// Only start grabbing if the user clicks on the title bar.
+				if (mouseEvent.Y == 0) {
+					start = new Point (mouseEvent.X, mouseEvent.Y);
+					dragPosition = new Point ();
+					nx = mouseEvent.X - mouseEvent.OfX;
+					ny = mouseEvent.Y - mouseEvent.OfY;
+					dragPosition = new Point (nx, ny);
+					Application.GrabMouse (this);
+				}
+
+				//Demo.ml2.Text = $"Starting at {dragPosition}";
+				return true;
+			} else if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) ||
+				mouseEvent.Flags == MouseFlags.Button3Pressed) {
 				if (dragPosition.HasValue) {
 					if (SuperView == null) {
 						Application.Top.SetNeedsDisplay (Frame);
@@ -228,19 +241,6 @@ namespace Terminal.Gui {
 
 					// FIXED: optimize, only SetNeedsDisplay on the before/after regions.
 					SetNeedsDisplay ();
-					return true;
-				} else {
-					// Only start grabbing if the user clicks on the title bar.
-					if (mouseEvent.Y == 0) {
-						start = new Point (mouseEvent.X, mouseEvent.Y);
-						dragPosition = new Point ();
-						nx = mouseEvent.X - mouseEvent.OfX;
-						ny = mouseEvent.Y - mouseEvent.OfY;
-						dragPosition = new Point (nx, ny);
-						Application.GrabMouse (this);
-					}
-
-					//Demo.ml2.Text = $"Starting at {dragPosition}";
 					return true;
 				}
 			}
