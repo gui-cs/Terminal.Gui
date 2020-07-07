@@ -217,12 +217,46 @@ namespace Terminal.Gui {
 		public int TabIndex {
 			get { return tabIndex; }
 			set {
-				if (!CanFocus || SuperView?.tabIndexes == null || SuperView?.tabIndexes.Count == 1 || tabIndex == value) {
+				if (!CanFocus) {
+					tabIndex = -1;
+					return;
+				} else if (SuperView?.tabIndexes == null || SuperView?.tabIndexes.Count == 1) {
+					tabIndex = 0;
+					return;
+				} else if (tabIndex == value) {
 					return;
 				}
 				tabIndex = value > SuperView.tabIndexes.Count - 1 ? SuperView.tabIndexes.Count - 1 : value < 0 ? 0 : value;
-				SuperView.tabIndexes.Remove (this);
-				SuperView.tabIndexes.Insert (tabIndex, this);
+				tabIndex = GetTabIndex (tabIndex);
+				if (SuperView.tabIndexes.IndexOf (this) != tabIndex) {
+					SuperView.tabIndexes.Remove (this);
+					SuperView.tabIndexes.Insert (tabIndex, this);
+					SetTabIndex ();
+				}
+			}
+		}
+
+		private int GetTabIndex (int idx)
+		{
+			int i = 0;
+			foreach (var v in SuperView.tabIndexes) {
+				if (v.tabIndex == -1 || v == this) {
+					continue;
+				}
+				i++;
+			}
+			return Math.Min (i, idx);
+		}
+
+		private void SetTabIndex ()
+		{
+			int i = 0;
+			foreach (var v in SuperView.tabIndexes) {
+				if (v.tabIndex == -1) {
+					continue;
+				}
+				v.tabIndex = i;
+				i++;
 			}
 		}
 
@@ -248,11 +282,11 @@ namespace Terminal.Gui {
 				if (base.CanFocus != value) {
 					base.CanFocus = value;
 					if (!value && tabIndex > -1) {
-						tabIndex = -1;
+						TabIndex = -1;
+					} else if (value && tabIndex == -1) {
+						TabIndex = SuperView != null ? SuperView.tabIndexes.IndexOf (this) : -1;
 					}
-					if (!value && tabStop) {
-						tabStop = false;
-					}
+					TabStop = value;
 				}
 			}
 		}
@@ -535,6 +569,8 @@ namespace Terminal.Gui {
 			this.Text = text;
 
 			CanFocus = false;
+			TabIndex = -1;
+			TabStop = false;
 			LayoutStyle = LayoutStyle.Computed;
 			// BUGBUG: CalcRect doesn't account for line wrapping
 			var r = TextFormatter.CalcRect (0, 0, text);
