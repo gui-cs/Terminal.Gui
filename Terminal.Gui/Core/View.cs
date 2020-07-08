@@ -1209,7 +1209,7 @@ namespace Terminal.Gui {
 							Application.CurrentView = view;
 
 							if (!view.initialized) {
-								view.OnInitialize ();
+								view.OnInitialized ();
 							}
 
 							// Draw the subview
@@ -1229,15 +1229,15 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event called only once when the content area of the Visualization will actually be drawn for the first time.
 		/// </summary>
-		public Action Initialize;
+		public Action Initialized;
 
 		/// <summary>
 		/// Allows configurations and assignments to be performed only once before the view is drawn for the first time.
 		/// </summary>
-		public virtual void OnInitialize ()
+		public virtual void OnInitialized ()
 		{
 			initialized = true;
-			Initialize?.Invoke ();
+			Initialized?.Invoke ();
 		}
 
 		/// <summary>

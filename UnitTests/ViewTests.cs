@@ -582,22 +582,22 @@ namespace Terminal.Gui {
 				Assert.Equal (1, v2c);
 				Assert.Equal (1, sv1c);
 			};
-			r.Initialize += () => {
+			r.Initialized += () => {
 				rc++;
 				Assert.Equal (t.Frame.Width, r.Frame.Width);
 				Assert.Equal (t.Frame.Height, r.Frame.Height);
 			};
-			v1.Initialize += () => {
+			v1.Initialized += () => {
 				v1c++;
 				Assert.Equal (t.Frame.Width, v1.Frame.Width);
 				Assert.Equal (t.Frame.Height, v1.Frame.Height);
 			};
-			v2.Initialize += () => {
+			v2.Initialized += () => {
 				v2c++;
 				Assert.Equal (t.Frame.Width, v2.Frame.Width);
 				Assert.Equal (t.Frame.Height, v2.Frame.Height);
 			};
-			sv1.Initialize += () => {
+			sv1.Initialized += () => {
 				sv1c++;
 				Assert.Equal (t.Frame.Width, sv1.Frame.Width);
 				Assert.Equal (t.Frame.Height, sv1.Frame.Height);
