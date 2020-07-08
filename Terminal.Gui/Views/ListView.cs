@@ -199,6 +199,8 @@ namespace Terminal.Gui {
 			}
 		}
 
+		bool topPending;
+
 		/// <summary>
 		/// Gets or sets the index of the currently selected item.
 		/// </summary>
@@ -214,8 +216,8 @@ namespace Terminal.Gui {
 				OnSelectedChanged ();
 				if (selected < top)
 					top = selected;
-				else if (selected >= top + (LayoutStyle == LayoutStyle.Absolute ? Frame.Height : Height.Anchor (0)))
-					top = selected;
+				else
+					topPending = true;
 			}
 		}
 
@@ -280,6 +282,12 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (current);
 			Move (0, 0);
 			var f = Frame;
+			if (topPending) {
+				topPending = false;
+				if (selected >= top + f.Height) {
+					top = selected;
+				}
+			}
 			var item = top;
 			bool focused = HasFocus;
 			int col = allowsMarking ? 4 : 0;
