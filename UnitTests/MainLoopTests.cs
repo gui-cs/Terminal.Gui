@@ -289,9 +289,9 @@ namespace Terminal.Gui {
 			var token = ml.AddTimeout (ms, callback);
 			watch.Start ();
 			ml.Run ();
-			// +/- 10ms should be good enuf
+			// +/- 100ms should be good enuf
 			// https://github.com/xunit/assert.xunit/pull/25
-			Assert.Equal<TimeSpan> (ms * callbackCount, watch.Elapsed, new MillisecondTolerance (10));
+			Assert.Equal<TimeSpan> (ms * callbackCount, watch.Elapsed, new MillisecondTolerance (100));
 
 			ml.RemoveTimeout (token);
 			Assert.Equal (1, callbackCount);
@@ -317,9 +317,9 @@ namespace Terminal.Gui {
 			var token = ml.AddTimeout (ms, callback);
 			watch.Start ();
 			ml.Run ();
-			// +/- 10ms should be good enuf
+			// +/- 100ms should be good enuf
 			// https://github.com/xunit/assert.xunit/pull/25
-			Assert.Equal<TimeSpan> (ms * callbackCount, watch.Elapsed, new MillisecondTolerance (10));
+			Assert.Equal<TimeSpan> (ms * callbackCount, watch.Elapsed, new MillisecondTolerance (100));
 
 			ml.RemoveTimeout (token);
 			Assert.Equal (2, callbackCount);

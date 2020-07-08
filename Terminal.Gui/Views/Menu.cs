@@ -344,13 +344,13 @@ namespace Terminal.Gui {
 				var uncheckedChar = Driver.UnSelected;
 
 				if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked)) {
-					checkChar = Driver.Checked; 
+					checkChar = Driver.Checked;
 					uncheckedChar = Driver.UnChecked;
 				}
 
 				// Support Checked even though CHeckType wasn't set
 				if (item.Checked) {
-					textToDraw = ustring.Make(new Rune [] { checkChar, ' ' }) + item.Title;
+					textToDraw = ustring.Make (new Rune [] { checkChar, ' ' }) + item.Title;
 				} else if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked) ||
 					item.CheckType.HasFlag (MenuItemCheckStyle.Radio)) {
 					textToDraw = ustring.Make (new Rune [] { uncheckedChar, ' ' }) + item.Title;
@@ -535,8 +535,6 @@ namespace Terminal.Gui {
 				if (item == null || !item.IsEnabled ()) disabled = true;
 				if (item != null && !disabled)
 					current = me.Y - 1;
-				HasFocus = true;
-				SetNeedsDisplay ();
 				CheckSubMenu ();
 				return true;
 			}
@@ -795,8 +793,10 @@ namespace Terminal.Gui {
 				lastFocused = lastFocused ?? SuperView.MostFocused;
 				if (openSubMenu != null)
 					CloseMenu (false, true);
-				if (openMenu != null)
+				if (openMenu != null) {
 					SuperView.Remove (openMenu);
+					openMenu.Dispose ();
+				}
 
 				for (int i = 0; i < index; i++)
 					pos += Menus [i].Title.Length + 2;
@@ -869,11 +869,13 @@ namespace Terminal.Gui {
 			OnMenuClosing ();
 			switch (isSubMenu) {
 			case false:
-				if (openMenu != null)
+				if (openMenu != null) {
 					SuperView.Remove (openMenu);
+				}
 				SetNeedsDisplay ();
 				if (previousFocused != null && openMenu != null && previousFocused.ToString () != openCurrentMenu.ToString ())
 					previousFocused?.SuperView?.SetFocus (previousFocused);
+				openMenu?.Dispose ();
 				openMenu = null;
 				if (lastFocused is Menu) {
 					lastFocused = null;
@@ -914,8 +916,10 @@ namespace Terminal.Gui {
 				else
 					SuperView.SetFocus (openMenu);
 				if (openSubMenu != null) {
-					SuperView.Remove (openSubMenu [i]);
-					openSubMenu.Remove (openSubMenu [i]);
+					var menu = openSubMenu [i];
+					SuperView.Remove (menu);
+					openSubMenu.Remove (menu);
+					menu.Dispose ();
 				}
 				RemoveSubMenu (i);
 			}
@@ -950,6 +954,7 @@ namespace Terminal.Gui {
 			if (openSubMenu != null) {
 				foreach (var item in openSubMenu) {
 					SuperView.Remove (item);
+					item.Dispose ();
 				}
 			}
 		}
@@ -1065,6 +1070,7 @@ namespace Terminal.Gui {
 			if (mi.IsTopLevel) {
 				var menu = new Menu (this, i, 0, mi);
 				menu.Run (mi.Action);
+				menu.Dispose ();
 			} else {
 				openedByHotKey = true;
 				Application.GrabMouse (this);
@@ -1172,6 +1178,7 @@ namespace Terminal.Gui {
 							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
 								menu.Run (Menus [i].Action);
+								menu.Dispose ();
 							}
 						} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1TripleClicked) {
 							if (IsMenuOpen) {

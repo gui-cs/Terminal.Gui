@@ -55,6 +55,21 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public Action Clicked;
 
+		///// <inheritdoc/>
+		//public new ustring Text {
+		//	get => base.Text;
+		//	set {
+		//		base.Text = value;
+		//		// This supports Label auto-sizing when Text changes (preserving backwards compat behavior)
+		//		if (Frame.Height == 1 && !ustring.IsNullOrEmpty (value)) {
+		//			int w = Text.RuneCount;
+		//			Width = w;
+		//			Frame = new Rect (Frame.Location, new Size (w, Frame.Height));
+		//		}
+		//		SetNeedsDisplay ();
+		//	}
+		//}
+
 		/// <summary>
 		/// Method invoked when a mouse event is generated
 		/// </summary>

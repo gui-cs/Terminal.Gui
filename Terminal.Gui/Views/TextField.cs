@@ -33,7 +33,7 @@ namespace Terminal.Gui {
 		public bool ReadOnly { get; set; } = false;
 
 		/// <summary>
-		///   Changed event, raised when the text has clicked.
+		///   Changed event, raised when the text has changed.
 		/// </summary>
 		/// <remarks>
 		///   This event is raised when the <see cref="Text"/> changes. 
@@ -93,14 +93,14 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnLeave ()
+		public override bool OnLeave (View view)
 		{
 			if (Application.mouseGrabView != null && Application.mouseGrabView == this)
 				Application.UngrabMouse ();
 			if (SelectedLength != 0 && !(Application.mouseGrabView is MenuBar))
 				ClearAllSelection ();
 
-			return base.OnLeave ();
+			return base.OnLeave (view);
 		}
 
 		///<inheritdoc/>

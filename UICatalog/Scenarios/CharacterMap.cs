@@ -16,9 +16,10 @@ namespace UICatalog {
 	[ScenarioCategory ("Text")]
 	[ScenarioCategory ("Controls")]
 	class CharacterMap : Scenario {
+		CharMap _charMap;
 		public override void Setup ()
 		{
-			var charMap = new CharMap () {
+			_charMap = new CharMap () {
 				X = 0,
 				Y = 0,
 				Width = CharMap.RowWidth + 2,
@@ -28,8 +29,8 @@ namespace UICatalog {
 				CanFocus = true,
 			};
 
-			Win.Add (charMap);
-			var label = new Label ("Jump To Unicode Block:") { X = Pos.Right (charMap) + 1, Y = Pos.Y (charMap) };
+			Win.Add (_charMap);
+			var label = new Label ("Jump To Unicode Block:") { X = Pos.Right (_charMap) + 1, Y = Pos.Y (_charMap) };
 			Win.Add (label);
 
 			(ustring radioLabel, int start, int end) CreateRadio (ustring title, int start, int end)
@@ -62,10 +63,15 @@ namespace UICatalog {
 			jumpList.Y = Pos.Bottom (label);
 			jumpList.Width = Dim.Fill ();
 			jumpList.SelectedItemChanged = (args) => {
-				charMap.Start = radioItems [args.SelectedItem].start;
+				_charMap.Start = radioItems[args.SelectedItem].start;
 			};
 
 			Win.Add (jumpList);
+		}
+
+		public override void Run ()
+		{
+			base.Run ();
 		}
 	}
 
@@ -106,7 +112,6 @@ namespace UICatalog {
 
 			DrawContent += CharMap_DrawContent;
 		}
-
 #if true
 		private void CharMap_DrawContent (Rect viewport)
 		{

@@ -35,7 +35,7 @@ namespace Terminal.Gui {
 		ustring text;
 		TextAlignment textAlignment;
 		Attribute textColor = -1;
-		bool needsFormat = true;
+		bool needsFormat;
 		Key hotKey;
 		Size size;
 
@@ -46,7 +46,14 @@ namespace Terminal.Gui {
 			get => text;
 			set {
 				text = value;
-				needsFormat = true;
+
+				if (Size.IsEmpty) {
+					// Proivde a default size (width = length of longest line, height = 1)
+					// TODO: It might makem more sense for the default to be width = length of first line?
+					Size = new Size (TextFormatter.MaxWidth (Text, int.MaxValue), 1);
+				}
+
+				NeedsFormat = true;
 			}
 		}
 
@@ -59,18 +66,18 @@ namespace Terminal.Gui {
 			get => textAlignment;
 			set {
 				textAlignment = value;
-				needsFormat = true;
+				NeedsFormat = true;
 			}
 		}
 
 		/// <summary>
-		///  Gets the size of the area the text will be drawn in. 
+		///  Gets or sets the size of the area the text will be constrainted to when formatted. 
 		/// </summary>
 		public Size Size {
 			get => size;
-			internal set {
+			set {
 				size = value;
-				needsFormat = true;
+				NeedsFormat = true;
 			}
 		}
 
@@ -96,40 +103,50 @@ namespace Terminal.Gui {
 		public uint HotKeyTagMask { get; set; } = 0x100000;
 
 		/// <summary>
-		/// Gets the formatted lines.
+		/// Gets the formatted lines. 
 		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// Upon a 'get' of this property, if the text needs to be formatted (if <see cref="NeedsFormat"/> is <c>true</c>)
+		/// <see cref="Format(ustring, int, TextAlignment, bool)"/> will be called internally. 
+		/// </para>
+		/// </remarks>
 		public List<ustring> Lines {
 			get {
 				// With this check, we protect against subclasses with overrides of Text
 				if (ustring.IsNullOrEmpty (Text)) {
 					lines = new List<ustring> ();
 					lines.Add (ustring.Empty);
-					needsFormat = false;
+					NeedsFormat = false;
 					return lines;
 				}
 
-				if (needsFormat) {
+				if (NeedsFormat) {
 					var shown_text = text;
 					if (FindHotKey (text, HotKeySpecifier, true, out hotKeyPos, out hotKey)) {
 						shown_text = RemoveHotKeySpecifier (Text, hotKeyPos, HotKeySpecifier);
 						shown_text = ReplaceHotKeyWithTag (shown_text, hotKeyPos);
 					}
+					if (Size.IsEmpty) {
+						throw new InvalidOperationException ("Size must be set before accessing Lines");
+					}
 					lines = Format (shown_text, Size.Width, textAlignment, Size.Height > 1);
+					NeedsFormat = false;
 				}
-				needsFormat = false;
 				return lines;
 			}
 		}
 
 		/// <summary>
-		/// Sets a flag indicating the text needs to be formatted. 
-		/// Subsequent calls to <see cref="Draw"/>, <see cref="Lines"/>, etc... will cause the formatting to happen.>
+		/// Gets or sets whether the <see cref="TextFormatter"/> needs to format the text when <see cref="Draw(Rect, Attribute, Attribute)"/> is called. 
+		/// If it is <c>false</c> when Draw is called, the Draw call will be faster.
 		/// </summary>
-		public void SetNeedsFormat ()
-		{
-			needsFormat = true;
-		}
-
+		/// <remarks>
+		/// <para>
+		/// This is set to true when the properties of <see cref="TextFormatter"/> are set. 
+		/// </para>
+		/// </remarks>
+		public bool NeedsFormat { get => needsFormat; set => needsFormat = value; }
 
 		static ustring StripCRLF (ustring str)
 		{
@@ -199,14 +216,14 @@ namespace Terminal.Gui {
 				return lines;
 			}
 
-			var runes = StripCRLF (text).ToRuneList();
+			var runes = StripCRLF (text).ToRuneList ();
 
 			while ((end = start + width) < runes.Count) {
 				while (runes [end] != ' ' && end > start)
 					end -= 1;
 				if (end == start)
 					end = start + width;
-				lines.Add (ustring.Make (runes.GetRange (start, end - start)).TrimSpace());
+				lines.Add (ustring.Make (runes.GetRange (start, end - start)).TrimSpace ());
 				start = end;
 			}
 
@@ -236,7 +253,7 @@ namespace Terminal.Gui {
 			var runes = text.ToRuneList ();
 			int slen = runes.Count;
 			if (slen > width) {
-				return ustring.Make (runes.GetRange(0, width));
+				return ustring.Make (runes.GetRange (0, width));
 			} else {
 				if (talign == TextAlignment.Justified) {
 					return Justify (text, width);
@@ -303,6 +320,9 @@ namespace Terminal.Gui {
 		/// <para>
 		/// If <c>width</c> is 0, a single, empty line will be returned.
 		/// </para>
+		/// <para>
+		/// If <c>width</c> is int.MaxValue, the text will be formatted to the maximum width possible. 
+		/// </para>
 		/// </remarks>
 		public static List<ustring> Format (ustring text, int width, TextAlignment talign, bool wordWrap)
 		{
@@ -329,7 +349,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < runeCount; i++) {
 				Rune c = text [i];
 				if (c == '\n') {
-					var wrappedLines = WordWrap (ustring.Make (runes.GetRange(lp, i - lp)), width);
+					var wrappedLines = WordWrap (ustring.Make (runes.GetRange (lp, i - lp)), width);
 					foreach (var line in wrappedLines) {
 						lineResult.Add (ClipAndJustify (line, width, talign));
 					}
@@ -339,7 +359,7 @@ namespace Terminal.Gui {
 					lp = i + 1;
 				}
 			}
-			foreach (var line in WordWrap (ustring.Make (runes.GetRange(lp, runeCount - lp)), width)) {
+			foreach (var line in WordWrap (ustring.Make (runes.GetRange (lp, runeCount - lp)), width)) {
 				lineResult.Add (ClipAndJustify (line, width, talign));
 			}
 
@@ -359,7 +379,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Computes the maximum width needed to render the text (single line or multple lines).
+		/// Computes the maximum width needed to render the text (single line or multple lines) given a minimium width.
 		/// </summary>
 		/// <returns>Max width of lines.</returns>
 		/// <param name="text">Text, may contain newlines.</param>
@@ -528,12 +548,12 @@ namespace Terminal.Gui {
 		/// <param name="hotColor">The color to use to draw the hotkey</param>
 		public void Draw (Rect bounds, Attribute normalColor, Attribute hotColor)
 		{
-			// With this check, we protect against subclasses with overrides of Text
+			// With this check, we protect against subclasses with overrides of Text (like Button)
 			if (ustring.IsNullOrEmpty (text)) {
 				return;
 			}
 
-			Application.Driver.SetAttribute (normalColor);
+			Application.Driver?.SetAttribute (normalColor);
 
 			// Use "Lines" to ensure a Format (don't use "lines"))
 			for (int line = 0; line < Lines.Count; line++) {
@@ -558,17 +578,17 @@ namespace Terminal.Gui {
 					throw new ArgumentOutOfRangeException ();
 				}
 				for (var col = bounds.Left; col < bounds.Left + bounds.Width; col++) {
-					Application.Driver.Move (col, bounds.Top + line);
+					Application.Driver?.Move (col, bounds.Top + line);
 					var rune = (Rune)' ';
 					if (col >= x && col < (x + runes.Length)) {
 						rune = runes [col - x];
 					}
 					if ((rune & HotKeyTagMask) == HotKeyTagMask) {
-						Application.Driver.SetAttribute (hotColor);
-						Application.Driver.AddRune ((Rune)((uint)rune & ~HotKeyTagMask));
-						Application.Driver.SetAttribute (normalColor);
+						Application.Driver?.SetAttribute (hotColor);
+						Application.Driver?.AddRune ((Rune)((uint)rune & ~HotKeyTagMask));
+						Application.Driver?.SetAttribute (normalColor);
 					} else {
-						Application.Driver.AddRune (rune);
+						Application.Driver?.AddRune (rune);
 					}
 				}
 			}

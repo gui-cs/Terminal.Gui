@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -334,7 +335,9 @@ namespace UICatalog {
 		{
 			// Remove existing class, if any
 			if (view != null) {
+				view.LayoutComplete -= LayoutCompleteHandler;
 				_hostPane.Remove (view);
+				view.Dispose ();
 				_hostPane.Clear ();
 			}
 		}
@@ -346,8 +349,8 @@ namespace UICatalog {
 
 			//_curView.X = Pos.Center ();
 			//_curView.Y = Pos.Center ();
-			//_curView.Width = Dim.Fill (5);
-			//_curView.Height = Dim.Fill (5);
+			view.Width = Dim.Percent(75);
+			view.Height = Dim.Percent (75);
 
 			// Set the colorscheme to make it stand out
 			view.ColorScheme = Colors.Base;
@@ -369,7 +372,7 @@ namespace UICatalog {
 
 			// If the view supports a Source property, set it so we have something to look at
 			if (view != null && view.GetType ().GetProperty ("Source") != null && view.GetType().GetProperty("Source").PropertyType == typeof(Terminal.Gui.IListDataSource)) {
-				var source = new ListWrapper (new List<ustring> () { ustring.Make ("List Item #1"), ustring.Make ("List Item #2"), ustring.Make ("List Item #3")});
+				var source = new ListWrapper (new List<ustring> () { ustring.Make ("Test Text #1"), ustring.Make ("Test Text #2"), ustring.Make ("Test Text #3") });
 				view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
 			}
 
@@ -384,7 +387,15 @@ namespace UICatalog {
 			_hostPane.SetNeedsDisplay ();
 			UpdateSettings (view);
 			UpdateTitle (view);
+
+			view.LayoutComplete += LayoutCompleteHandler;
+
 			return view;
+		}
+
+		void LayoutCompleteHandler(View.LayoutEventArgs args)
+		{
+			UpdateTitle (_curView);
 		}
 
 		public override void Run ()

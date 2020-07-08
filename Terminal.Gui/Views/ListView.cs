@@ -120,6 +120,7 @@ namespace Terminal.Gui {
 				source = value;
 				top = 0;
 				selected = 0;
+				lastSelectedItem = -1;
 				SetNeedsDisplay ();
 			}
 		}
@@ -205,14 +206,15 @@ namespace Terminal.Gui {
 		public int SelectedItem {
 			get => selected;
 			set {
-				if (source == null)
+				if (source == null || source.Count == 0)
 					return;
 				if (selected < 0 || selected >= source.Count)
 					throw new ArgumentException ("value");
 				selected = value;
+				OnSelectedChanged ();
 				if (selected < top)
 					top = selected;
-				else if (selected >= top + Frame.Height)
+				else if (selected >= top + (LayoutStyle == LayoutStyle.Absolute ? Frame.Height : Height.Anchor (0)))
 					top = selected;
 			}
 		}
@@ -346,6 +348,12 @@ namespace Terminal.Gui {
 				OnOpenSelectedItem ();
 				break;
 
+			case Key.End:
+				return MoveEnd ();
+
+			case Key.Home:
+				return MoveHome ();
+
 			}
 			return base.ProcessKey (kb);
 		}
@@ -459,6 +467,38 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <summary>
+		/// Moves the selected item index to the last row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MoveEnd ()
+		{
+			if (selected != source.Count - 1) {
+				selected = source.Count - 1;
+				top = selected;
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Moves the selected item index to the first row.
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool MoveHome ()
+		{
+			if (selected != 0) {
+				selected = 0;
+				top = selected;
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
+			}
+
+			return true;
+		}
+
 		int lastSelectedItem = -1;
 
 		/// <summary>
@@ -487,6 +527,28 @@ namespace Terminal.Gui {
 			OpenSelectedItem?.Invoke (new ListViewItemEventArgs (selected, value));
 
 			return true;
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			if (source?.Count > 0 && lastSelectedItem == -1) {
+				OnSelectedChanged ();
+				return true;
+			}
+
+			return false;
+		}
+
+		///<inheritdoc/>
+		public override bool OnMouseEnter (MouseEvent mouseEvent)
+		{
+			if (source?.Count > 0 && selected >= 0 && lastSelectedItem == -1) {
+				lastSelectedItem = selected;
+				return true;
+			}
+
+			return false;
 		}
 
 		///<inheritdoc/>

@@ -229,10 +229,14 @@ namespace Terminal.Gui {
 		public override void Remove (View view)
 		{
 			if (this == Application.Top) {
-				if (view is MenuBar)
+				if (view is MenuBar) {
+					MenuBar?.Dispose ();
 					MenuBar = null;
-				if (view is StatusBar)
+				}
+				if (view is StatusBar) {
 					StatusBar = null;
+					StatusBar = null;
+				}
 			}
 			base.Remove (view);
 		}
@@ -241,7 +245,9 @@ namespace Terminal.Gui {
 		public override void RemoveAll ()
 		{
 			if (this == Application.Top) {
+				MenuBar?.Dispose ();
 				MenuBar = null;
+				StatusBar?.Dispose ();
 				StatusBar = null;
 			}
 			base.RemoveAll ();
@@ -252,17 +258,28 @@ namespace Terminal.Gui {
 			nx = Math.Max (x, 0);
 			nx = nx + top.Frame.Width > Driver.Cols ? Math.Max (Driver.Cols - top.Frame.Width, 0) : nx;
 			bool m, s;
-			if (SuperView == null || SuperView.GetType () != typeof (Toplevel))
+			if (SuperView == null || SuperView.GetType () != typeof (Toplevel)) {
 				m = Application.Top.MenuBar != null;
-			else
+			} else {
 				m = ((Toplevel)SuperView).MenuBar != null;
-			int l = m ? 1 : 0;
+			}
+			int l;
+			if (SuperView == null || SuperView is Toplevel) {
+				l = m ? 1 : 0;
+			} else {
+				l = 0;
+			}
 			ny = Math.Max (y, l);
-			if (SuperView == null || SuperView.GetType () != typeof (Toplevel))
+			if (SuperView == null || SuperView.GetType () != typeof (Toplevel)) {
 				s = Application.Top.StatusBar != null;
-			else
+			} else {
 				s = ((Toplevel)SuperView).StatusBar != null;
-			l = s ? Driver.Rows - 1 : Driver.Rows;
+			}
+			if (SuperView == null || SuperView is Toplevel) {
+				l = s ? Driver.Rows - 1 : Driver.Rows;
+			} else {
+				l = s ? SuperView.Frame.Height - 1 : SuperView.Frame.Height;
+			}
 			ny = Math.Min (ny, l);
 			ny = ny + top.Frame.Height > l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
 		}

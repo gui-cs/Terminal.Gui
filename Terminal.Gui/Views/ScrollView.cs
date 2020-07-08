@@ -135,6 +135,10 @@ namespace Terminal.Gui {
 
 			Driver.SetAttribute (ColorScheme.Normal);
 
+			if (Bounds.Height == 0) {
+				return;
+			}
+
 			if (vertical) {
 				if (region.Right < Bounds.Width - 1)
 					return;
@@ -148,9 +152,19 @@ namespace Terminal.Gui {
 					var by2 = (position + bh) * bh / Size;
 
 					Move (col, 0);
-					Driver.AddRune (Driver.UpArrow);
-					Move (col, Bounds.Height - 1);
-					Driver.AddRune (Driver.DownArrow);
+					if (Bounds.Height == 1) {
+						Driver.AddRune (Driver.Diamond);
+					} else {
+						Driver.AddRune (Driver.UpArrow);
+					}
+					if (Bounds.Height == 3) {
+						Move (col, 1);
+						Driver.AddRune (Driver.Diamond);
+					}
+					if (Bounds.Height > 1) {
+						Move (col, Bounds.Height - 1);
+						Driver.AddRune (Driver.DownArrow);
+					}
 				} else {
 					bh -= 2;
 					var by1 = position * bh / Size;
@@ -394,6 +408,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// If true the vertical/horizontal scroll bars won't be showed if it's not needed.
+		/// </summary>
+		public bool AutoHideScrollBars { get; set; } = true;
+
+		/// <summary>
 		/// Adds the view to the scrollview.
 		/// </summary>
 		/// <param name="view">The view to add to the scrollview.</param>
@@ -494,17 +513,21 @@ namespace Terminal.Gui {
 
 			var savedClip = ClipToBounds ();
 			OnDrawContent (new Rect (ContentOffset,
-				new Size (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0),
-					Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0))));
+				new Size (Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
+					Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0))));
 			contentView.Redraw (contentView.Frame);
 			Driver.Clip = savedClip;
 
-			if (ShowVerticalScrollIndicator) {
-				vertical.Redraw (vertical.Bounds);
-			}
+			if (AutoHideScrollBars) {
+				ShowHideScrollBars ();
+			} else {
+				if (ShowVerticalScrollIndicator) {
+					vertical.Redraw (vertical.Bounds);
+				}
 
-			if (ShowHorizontalScrollIndicator) {
-				horizontal.Redraw (horizontal.Bounds);
+				if (ShowHorizontalScrollIndicator) {
+					horizontal.Redraw (horizontal.Bounds);
+				}
 			}
 
 			// Fill in the bottom left corner
@@ -512,6 +535,63 @@ namespace Terminal.Gui {
 				AddRune (Bounds.Width - 1, Bounds.Height - 1, ' ');
 			}
 			Driver.SetAttribute (ColorScheme.Normal);
+		}
+
+		void ShowHideScrollBars ()
+		{
+			bool v = false, h = false; bool p = false;
+
+			if (Bounds.Height == 0 || Bounds.Height > contentSize.Height) {
+				if (ShowVerticalScrollIndicator) {
+					ShowVerticalScrollIndicator = false;
+				}
+				v = false;
+			} else if (Bounds.Height > 0 && Bounds.Height == contentSize.Height) {
+				p = true;
+			} else {
+				if (!ShowVerticalScrollIndicator) {
+					ShowVerticalScrollIndicator = true;
+				}
+				v = true;
+			}
+			if (Bounds.Width == 0 || Bounds.Width > contentSize.Width) {
+				if (ShowHorizontalScrollIndicator) {
+					ShowHorizontalScrollIndicator = false;
+				}
+				h = false;
+			} else if (Bounds.Width > 0 && Bounds.Width == contentSize.Width && p) {
+				if (ShowHorizontalScrollIndicator) {
+					ShowHorizontalScrollIndicator = false;
+				}
+				h = false;
+				if (ShowVerticalScrollIndicator) {
+					ShowVerticalScrollIndicator = false;
+				}
+				v = false;
+			} else {
+				if (p) {
+					if (!ShowVerticalScrollIndicator) {
+						ShowVerticalScrollIndicator = true;
+					}
+					v = true;
+				}
+				if (!ShowHorizontalScrollIndicator) {
+					ShowHorizontalScrollIndicator = true;
+				}
+				h = true;
+			}
+
+			vertical.Height = Dim.Fill (h ? 1 : 0);
+			horizontal.Width = Dim.Fill (v ? 1 : 0);
+
+			if (v) {
+				vertical.SetRelativeLayout (Bounds);
+				vertical.Redraw (vertical.Bounds);
+			}
+			if (h) {
+				horizontal.SetRelativeLayout (Bounds);
+				horizontal.Redraw (horizontal.Bounds);
+			}
 		}
 
 		void SetViewsNeedsDisplay ()
@@ -631,19 +711,33 @@ namespace Terminal.Gui {
 				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
 				return false;
 
-			if (me.Flags == MouseFlags.WheeledDown)
+			if (me.Flags == MouseFlags.WheeledDown && ShowVerticalScrollIndicator)
 				ScrollDown (1);
-			else if (me.Flags == MouseFlags.WheeledUp)
+			else if (me.Flags == MouseFlags.WheeledUp && ShowVerticalScrollIndicator)
 				ScrollUp (1);
-			else if (me.X == vertical.Frame.X)
+			else if (me.X == vertical.Frame.X && ShowVerticalScrollIndicator)
 				vertical.MouseEvent (me);
-			else if (me.Y == horizontal.Frame.Y)
+			else if (me.Y == horizontal.Frame.Y && ShowHorizontalScrollIndicator)
 				horizontal.MouseEvent (me);
 			else if (IsOverridden (me.View)) {
 				Application.UngrabMouse ();
 				return false;
 			}
 			return true;
+		}
+
+		///<inheritdoc/>
+		protected override void Dispose (bool disposing)
+		{
+			if (!showVerticalScrollIndicator) {
+				// It was not added to SuperView, so it won't get disposed automatically
+				vertical?.Dispose ();
+			}
+			if (!showHorizontalScrollIndicator) {
+				// It was not added to SuperView, so it won't get disposed automatically
+				horizontal?.Dispose ();
+			}
+			base.Dispose (disposing);
 		}
 	}
 }

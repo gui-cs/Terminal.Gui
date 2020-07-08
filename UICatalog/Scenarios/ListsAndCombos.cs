@@ -12,13 +12,14 @@ namespace UICatalog.Scenarios {
 
 		public override void Setup ()
 		{
-			List<string> items = new List<string> ();
-			foreach (var dir in new [] { "/etc", @"\windows\System32" }) {
+			//TODO: Duplicated code in Demo.cs Consider moving to shared assembly
+			var items = new List<ustring> ();
+			foreach (var dir in new [] { "/etc", @$"{Environment.GetEnvironmentVariable ("SystemRoot")}\System32" }) {
 				if (Directory.Exists (dir)) {
 					items = Directory.GetFiles (dir).Union(Directory.GetDirectories(dir))
-					.Select (Path.GetFileName)
-					.Where (x => char.IsLetterOrDigit (x [0]))
-					.OrderBy (x => x).ToList ();
+						.Select (Path.GetFileName)
+						.Where (x => char.IsLetterOrDigit (x [0]))
+						.OrderBy (x => x).Select(x => ustring.Make(x)).ToList() ;
 				}
 			}
 
@@ -26,16 +27,16 @@ namespace UICatalog.Scenarios {
 			var lbListView = new Label ("Listview") {
 				ColorScheme = Colors.TopLevel,
 				X = 0,
-				Width = 30
+				Width = Dim.Percent (40)
 			};
 
 			var listview = new ListView (items) {
 				X = 0,
 				Y = Pos.Bottom (lbListView) + 1,
 				Height = Dim.Fill(2),
-				Width = 30
+				Width = Dim.Percent (40)
 			};
-			listview.OpenSelectedItem += (ListViewItemEventArgs e) => lbListView.Text = items [listview.SelectedItem];
+			listview.SelectedItemChanged += (ListViewItemEventArgs e) => lbListView.Text = items [listview.SelectedItem];
 			Win.Add (lbListView, listview);
 
 			// ComboBox
@@ -53,7 +54,7 @@ namespace UICatalog.Scenarios {
 			};
 			comboBox.SetSource (items);
 
-			comboBox.SelectedItemChanged += (object sender, ustring text) => lbComboBox.Text = text;
+			comboBox.SelectedItemChanged += (ListViewItemEventArgs text) => lbComboBox.Text = items[comboBox.SelectedItem];
 			Win.Add (lbComboBox, comboBox);
 		}
 	}

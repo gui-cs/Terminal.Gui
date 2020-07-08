@@ -63,6 +63,8 @@ namespace Terminal.Gui {
 	/// So for each context must be a new instance of a statusbar.
 	/// </summary>
 	public class StatusBar : View {
+		bool disposedValue;
+
 		/// <summary>
 		/// The items that compose the <see cref="StatusBar"/>
 		/// </summary>
@@ -90,7 +92,12 @@ namespace Terminal.Gui {
 			Width = Dim.Fill ();
 			Height = 1;
 
-			LayoutComplete += (e) => {
+			Application.Resized += Application_Resized ();
+		}
+
+		private Action<Application.ResizedEventArgs> Application_Resized ()
+		{
+			return delegate {
 				X = 0;
 				Height = 1;
 				if (SuperView == null || SuperView == Application.Top) {
@@ -191,6 +198,17 @@ namespace Terminal.Gui {
 				action ();
 				return false;
 			});
+		}
+
+		/// <inheritdoc/>
+		protected override void Dispose (bool disposing)
+		{
+			if (!disposedValue) {
+				if (disposing) {
+					Application.Resized -= Application_Resized ();
+				}
+				disposedValue = true;
+			}
 		}
 	}
 }
