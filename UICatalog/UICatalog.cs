@@ -114,6 +114,7 @@ namespace UICatalog {
 			}
 			Responder.Instances.Clear ();
 #endif
+			Application.Shutdown ();
 		}
 
 		/// <summary>
@@ -227,8 +228,8 @@ namespace UICatalog {
 				}
 			};
 
-			Application.Run (_top, true);
-			Application.Shutdown ();
+			Application.Run (_top, false);
+			Application.Shutdown (false);
 			return _runningScenario;
 		}
 
