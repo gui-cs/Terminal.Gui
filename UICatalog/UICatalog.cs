@@ -56,6 +56,8 @@ namespace UICatalog {
 		private static StatusItem _capslock;
 		private static StatusItem _numlock;
 		private static StatusItem _scrolllock;
+		private static int _categoryListViewItem;
+		private static int _scenarioListViewItem;
 
 		private static Scenario _runningScenario = null;
 		private static bool _useSystemConsole = false;
@@ -191,7 +193,7 @@ namespace UICatalog {
 			_scenarioListView.OpenSelectedItem += _scenarioListView_OpenSelectedItem;
 			_rightPane.Add (_scenarioListView);
 
-			_categoryListView.SelectedItem = 0;
+			_categoryListView.SelectedItem = _categoryListViewItem;
 			_categoryListView.OnSelectedChanged ();
 
 			_capslock = new StatusItem (Key.CharMask, "Caps", null);
@@ -300,6 +302,7 @@ namespace UICatalog {
 		private static void _scenarioListView_OpenSelectedItem (EventArgs e)
 		{
 			if (_runningScenario is null) {
+				_scenarioListViewItem = _scenarioListView.SelectedItem;
 				var source = _scenarioListView.Source as ScenarioListDataSource;
 				_runningScenario = (Scenario)Activator.CreateInstance (source.Scenarios [_scenarioListView.SelectedItem]);
 				Application.RequestStop ();
@@ -396,6 +399,10 @@ namespace UICatalog {
 
 		private static void CategoryListView_SelectedChanged (ListViewItemEventArgs e)
 		{
+			if (_categoryListViewItem != _categoryListView.SelectedItem) {
+				_scenarioListViewItem = 0;
+			}
+			_categoryListViewItem = _categoryListView.SelectedItem;
 			var item = _categories [_categoryListView.SelectedItem];
 			List<Type> newlist;
 			if (item.Equals ("All")) {
@@ -405,7 +412,8 @@ namespace UICatalog {
 				newlist = _scenarios.Where (t => Scenario.ScenarioCategory.GetCategories (t).Contains (item)).ToList ();
 			}
 			_scenarioListView.Source = new ScenarioListDataSource (newlist);
-			_scenarioListView.SelectedItem = 0;
+			_scenarioListView.SelectedItem = _scenarioListViewItem;
+
 		}
 	}
 }
