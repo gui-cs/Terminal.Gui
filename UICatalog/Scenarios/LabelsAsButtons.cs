@@ -73,7 +73,7 @@ namespace UICatalog {
 				Win.Add (colorLabel);
 				x += colorLabel.Text.Length + 2;
 			}
-			Top.Ready += () => Top.Redraw (Top.Bounds);
+			Top.Load += () => Top.Redraw (Top.Bounds);
 
 			Label Label;
 			Win.Add (Label = new Label ("A super long _Label that will probably expose a bug in clipping or wrapping of text. Will it?") {

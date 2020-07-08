@@ -469,6 +469,8 @@ namespace Terminal.Gui {
 			Loaded?.Invoke (new ResizedEventArgs () { Rows = Driver.Rows, Cols = Driver.Cols });
 			toplevel.WillPresent ();
 			Redraw (toplevel);
+			// Notify Toplevel it's ready to load.
+			toplevel.OnLoad ();
 			toplevel.PositionCursor ();
 			Driver.Refresh ();
 
@@ -577,15 +579,8 @@ namespace Terminal.Gui {
 			if (state.Toplevel == null)
 				throw new ObjectDisposedException ("state");
 
-			bool firstIteration = true;
 			for (state.Toplevel.Running = true; state.Toplevel.Running;) {
 				if (MainLoop.EventsPending (wait)) {
-					// Notify Toplevel it's ready
-					if (firstIteration) {
-						state.Toplevel.OnReady ();
-					}
-					firstIteration = false;
-
 					MainLoop.MainIteration ();
 					Iteration?.Invoke ();
 				} else if (wait == false) {

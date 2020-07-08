@@ -545,7 +545,7 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void Load_Event ()
+		public void Load_And_Initialize_Event_Comparing_With_Added ()
 		{
 			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
 
@@ -575,27 +575,33 @@ namespace Terminal.Gui {
 				Assert.Equal (0, sv1.Frame.Height);
 			};
 
-			r.Load += () => {
+			t.Load += () => {
+				Application.Refresh ();
+				Assert.Equal (1, rc);
+				Assert.Equal (1, v1c);
+				Assert.Equal (1, v2c);
+				Assert.Equal (1, sv1c);
+			};
+			r.Initialize += () => {
 				rc++;
 				Assert.Equal (t.Frame.Width, r.Frame.Width);
 				Assert.Equal (t.Frame.Height, r.Frame.Height);
 			};
-			v1.Load += () => {
+			v1.Initialize += () => {
 				v1c++;
 				Assert.Equal (t.Frame.Width, v1.Frame.Width);
 				Assert.Equal (t.Frame.Height, v1.Frame.Height);
 			};
-			v2.Load += () => {
+			v2.Initialize += () => {
 				v2c++;
 				Assert.Equal (t.Frame.Width, v2.Frame.Width);
 				Assert.Equal (t.Frame.Height, v2.Frame.Height);
 			};
-			sv1.Load += () => {
+			sv1.Initialize += () => {
 				sv1c++;
 				Assert.Equal (t.Frame.Width, sv1.Frame.Width);
 				Assert.Equal (t.Frame.Height, sv1.Frame.Height);
 			};
-
 
 			v2.Add (sv1);
 			r.Add (v1, v2);

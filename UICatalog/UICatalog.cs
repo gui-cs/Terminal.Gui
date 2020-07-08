@@ -222,7 +222,7 @@ namespace UICatalog {
 			_top.Add (_leftPane);
 			_top.Add (_rightPane);
 			_top.Add (_statusBar);
-			_top.Ready += () => {
+			_top.Load += () => {
 				if (_runningScenario != null) {
 					_top.SetFocus (_rightPane);
 					_runningScenario = null;

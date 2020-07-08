@@ -1208,8 +1208,8 @@ namespace Terminal.Gui {
 								view.LayoutSubviews ();
 							Application.CurrentView = view;
 
-							if (!view.loaded) {
-								view.OnLoad ();
+							if (!view.initialized) {
+								view.OnInitialize ();
 							}
 
 							// Draw the subview
@@ -1224,20 +1224,20 @@ namespace Terminal.Gui {
 			ClearNeedsDisplay ();
 		}
 
-		bool loaded;
+		bool initialized;
 
 		/// <summary>
 		/// Event called only once when the content area of the Visualization will actually be drawn for the first time.
 		/// </summary>
-		public Action Load;
+		public Action Initialize;
 
 		/// <summary>
 		/// Allows configurations and assignments to be performed only once before the view is drawn for the first time.
 		/// </summary>
-		public virtual void OnLoad ()
+		public virtual void OnInitialize ()
 		{
-			loaded = true;
-			Load?.Invoke ();
+			initialized = true;
+			Initialize?.Invoke ();
 		}
 
 		/// <summary>
