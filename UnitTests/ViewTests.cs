@@ -6,7 +6,7 @@ using System.Linq;
 using Terminal.Gui;
 using Xunit;
 
-// Alais Console to MockConsole so we don't accidentally use Console
+// Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui {
@@ -542,6 +542,77 @@ namespace Terminal.Gui {
 			Assert.Equal (r.TabIndexes.IndexOf (v3), v3.TabIndex);
 			Assert.Equal (2, v3.TabIndex);
 			Assert.True (v3.TabStop);
+		}
+
+		[Fact]
+		public void Load_Event ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = new Toplevel ();
+
+			var r = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
+			var v1 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
+			var v2 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
+			var sv1 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+			int rc = 0, v1c = 0, v2c = 0, sv1c = 0;
+
+			r.Added += (e) => {
+				Assert.Equal (0, r.Frame.Width);
+				Assert.Equal (0, r.Frame.Height);
+			};
+			v1.Added += (e) => {
+				Assert.Equal (0, v1.Frame.Width);
+				Assert.Equal (0, v1.Frame.Height);
+			};
+			v2.Added += (e) => {
+				Assert.Equal (0, v2.Frame.Width);
+				Assert.Equal (0, v2.Frame.Height);
+			};
+			sv1.Added += (e) => {
+				Assert.Equal (0, sv1.Frame.Width);
+				Assert.Equal (0, sv1.Frame.Height);
+			};
+
+			r.Load += () => {
+				rc++;
+				Assert.Equal (t.Frame.Width, r.Frame.Width);
+				Assert.Equal (t.Frame.Height, r.Frame.Height);
+			};
+			v1.Load += () => {
+				v1c++;
+				Assert.Equal (t.Frame.Width, v1.Frame.Width);
+				Assert.Equal (t.Frame.Height, v1.Frame.Height);
+			};
+			v2.Load += () => {
+				v2c++;
+				Assert.Equal (t.Frame.Width, v2.Frame.Width);
+				Assert.Equal (t.Frame.Height, v2.Frame.Height);
+			};
+			sv1.Load += () => {
+				sv1c++;
+				Assert.Equal (t.Frame.Width, sv1.Frame.Width);
+				Assert.Equal (t.Frame.Height, sv1.Frame.Height);
+			};
+
+
+			v2.Add (sv1);
+			r.Add (v1, v2);
+			t.Add (r);
+
+			Application.Iteration = () => {
+				Application.Refresh ();
+				t.Running = false;
+			};
+
+			Application.Run (t, true);
+			Application.Shutdown (true);
+
+			Assert.Equal (1, rc);
+			Assert.Equal (1, v1c);
+			Assert.Equal (1, v2c);
+			Assert.Equal (1, sv1c);
 		}
 	}
 }
