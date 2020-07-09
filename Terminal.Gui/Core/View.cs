@@ -695,7 +695,6 @@ namespace Terminal.Gui {
 
 			while (subviews.Count > 0) {
 				Remove (subviews [0]);
-				Remove (tabIndexes [0]);
 			}
 		}
 
@@ -1186,7 +1185,8 @@ namespace Terminal.Gui {
 		{
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
-			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
+			if (ColorScheme != null)
+				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 
 			if (!ustring.IsNullOrEmpty (Text)) {
 				Clear ();
