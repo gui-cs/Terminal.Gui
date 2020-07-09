@@ -1003,7 +1003,7 @@ namespace Terminal.Gui {
 				focused.PositionCursor ();
 			else {
 				if (CanFocus && HasFocus) {
-					Move (textFormatter.HotKeyPos == -1 ? 1 : textFormatter.HotKeyPos, 0);
+					Move (textFormatter.HotKeyPos == -1 ? 0 : textFormatter.HotKeyPos, 0);
 				} else {
 					Move (frame.X, frame.Y);
 				}
