@@ -545,7 +545,7 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void Load_And_Initialize_Event_Comparing_With_Added ()
+		public void Load_And_Initialized_Event_Comparing_With_Added ()
 		{
 			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
 
@@ -638,6 +638,85 @@ namespace Terminal.Gui {
 			Assert.False (v1.CanFocus);
 			Assert.False (v2.CanFocus);
 			Assert.True (sv1.CanFocus);
+		}
+
+		[Fact]
+		public void Initialized_Event_Will_Be_Invoked_Even_View_Is_Added_Dynamically ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = new Toplevel ();
+
+			var r = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
+			var v1 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
+			var v2 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+			int tc = 0, rc = 0, v1c = 0, v2c = 0, sv1c = 0;
+
+			t.Load += () => {
+				tc++;
+				Assert.Equal (1, tc);
+				Assert.Equal (1, rc);
+				Assert.Equal (1, v1c);
+				Assert.Equal (1, v2c);
+				Assert.Equal (0, sv1c);
+
+				Assert.True (t.CanFocus);
+				Assert.False (r.CanFocus);
+				Assert.False (v1.CanFocus);
+				Assert.False (v2.CanFocus);
+
+				Application.Refresh ();
+			};
+			r.Initialized += () => {
+				rc++;
+				Assert.Equal (t.Frame.Width, r.Frame.Width);
+				Assert.Equal (t.Frame.Height, r.Frame.Height);
+			};
+			v1.Initialized += () => {
+				v1c++;
+				Assert.Equal (t.Frame.Width, v1.Frame.Width);
+				Assert.Equal (t.Frame.Height, v1.Frame.Height);
+			};
+			v2.Initialized += () => {
+				v2c++;
+				Assert.Equal (t.Frame.Width, v2.Frame.Width);
+				Assert.Equal (t.Frame.Height, v2.Frame.Height);
+			};
+
+			r.Add (v1, v2);
+			t.Add (r);
+
+			Application.Iteration = () => {
+				var sv1 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
+				v1.Add (sv1);
+
+				sv1.Initialized += () => {
+					sv1c++;
+					Assert.Equal (t.Frame.Width, sv1.Frame.Width);
+					Assert.Equal (t.Frame.Height, sv1.Frame.Height);
+					Assert.False (sv1.CanFocus);
+					sv1.CanFocus = true;
+					Assert.True (sv1.CanFocus);
+				};
+
+				Application.Refresh ();
+				t.Running = false;
+			};
+
+			Application.Run (t, true);
+			Application.Shutdown (true);
+
+			Assert.Equal (1, tc);
+			Assert.Equal (1, rc);
+			Assert.Equal (1, v1c);
+			Assert.Equal (1, v2c);
+			Assert.Equal (1, sv1c);
+
+			Assert.True (t.CanFocus);
+			Assert.False (r.CanFocus);
+			Assert.False (v1.CanFocus);
+			Assert.False (v2.CanFocus);
 		}
 	}
 }
