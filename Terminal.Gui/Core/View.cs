@@ -695,9 +695,6 @@ namespace Terminal.Gui {
 
 			while (subviews.Count > 0) {
 				Remove (subviews [0]);
-				if (tabIndexes.Count > 0) {
-					Remove (tabIndexes [0]);
-				}
 			}
 		}
 
