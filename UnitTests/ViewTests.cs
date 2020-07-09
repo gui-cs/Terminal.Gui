@@ -641,12 +641,23 @@ namespace Terminal.Gui {
 
 			var t = new Toplevel ();
 
-			var r = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
-			var v1 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
-			var v2 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
+			var r = new View ("r") { Width = Dim.Fill (), Height = Dim.Fill () };
+			var v1 = new View ("v1") { Width = Dim.Fill (), Height = Dim.Fill () };
+			var v2 = new View ("v2") { Width = Dim.Fill (), Height = Dim.Fill () };
 
 			int tc = 0, rc = 0, v1c = 0, v2c = 0, sv1c = 0;
 
+			t.Initialized += () => {
+				rc++;
+				Assert.Equal (t.Frame.Width, r.Frame.Width);
+				Assert.Equal (t.Frame.Height, r.Frame.Height);
+				v1c++;
+				Assert.Equal (t.Frame.Width, v1.Frame.Width);
+				Assert.Equal (t.Frame.Height, v1.Frame.Height);
+				v2c++;
+				Assert.Equal (t.Frame.Width, v2.Frame.Width);
+				Assert.Equal (t.Frame.Height, v2.Frame.Height);
+			};
 			t.Load += () => {
 				tc++;
 				Assert.Equal (1, tc);
@@ -662,33 +673,25 @@ namespace Terminal.Gui {
 
 				Application.Refresh ();
 			};
-			t.Initialized += () => {
-				rc++;
-				Assert.Equal (t.Frame.Width, r.Frame.Width);
-				Assert.Equal (t.Frame.Height, r.Frame.Height);
-				v1c++;
-				Assert.Equal (t.Frame.Width, v1.Frame.Width);
-				Assert.Equal (t.Frame.Height, v1.Frame.Height);
-				v2c++;
-				Assert.Equal (t.Frame.Width, v2.Frame.Width);
-				Assert.Equal (t.Frame.Height, v2.Frame.Height);
-			};
 
 			r.Add (v1, v2);
 			t.Add (r);
 
 			Application.Iteration = () => {
-				var sv1 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
-				v1.Add (sv1);
+				var sv1 = new View ("sv1") { Width = Dim.Fill (), Height = Dim.Fill () };
 
 				sv1.Added += (e) => {
 					sv1c++;
-					Assert.Equal (t.Frame.Width, sv1.Frame.Width);
-					Assert.Equal (t.Frame.Height, sv1.Frame.Height);
+					Assert.NotEqual (t.Frame.Width, sv1.Frame.Width);
+					Assert.NotEqual (t.Frame.Height, sv1.Frame.Height);
+					Assert.Equal (t.Frame.Width, sv1.SuperView.Frame.Width);
+					Assert.Equal (t.Frame.Height, sv1.SuperView.Frame.Height);
 					Assert.False (sv1.CanFocus);
 					sv1.CanFocus = true;
 					Assert.True (sv1.CanFocus);
 				};
+
+				v1.Add (sv1);
 
 				Application.Refresh ();
 				t.Running = false;
@@ -701,7 +704,7 @@ namespace Terminal.Gui {
 			Assert.Equal (1, rc);
 			Assert.Equal (1, v1c);
 			Assert.Equal (1, v2c);
-			Assert.Equal (0, sv1c);
+			Assert.Equal (1, sv1c);
 
 			Assert.True (t.CanFocus);
 			Assert.False (r.CanFocus);
