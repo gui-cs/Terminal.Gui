@@ -556,7 +556,7 @@ namespace Terminal.Gui {
 			var v2 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
 			var sv1 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
 
-			int rc = 0, v1c = 0, v2c = 0, sv1c = 0;
+			int tc = 0, rc = 0, v1c = 0, v2c = 0, sv1c = 0;
 
 			r.Added += (e) => {
 				Assert.Equal (0, r.Frame.Width);
@@ -576,11 +576,20 @@ namespace Terminal.Gui {
 			};
 
 			t.Load += () => {
-				Application.Refresh ();
+				tc++;
+				Assert.Equal (1, tc);
 				Assert.Equal (1, rc);
 				Assert.Equal (1, v1c);
 				Assert.Equal (1, v2c);
 				Assert.Equal (1, sv1c);
+
+				Assert.True (t.CanFocus);
+				Assert.False (r.CanFocus);
+				Assert.False (v1.CanFocus);
+				Assert.False (v2.CanFocus);
+				Assert.True (sv1.CanFocus);
+
+				Application.Refresh ();
 			};
 			r.Initialized += () => {
 				rc++;
@@ -601,9 +610,12 @@ namespace Terminal.Gui {
 				sv1c++;
 				Assert.Equal (t.Frame.Width, sv1.Frame.Width);
 				Assert.Equal (t.Frame.Height, sv1.Frame.Height);
+				Assert.False (sv1.CanFocus);
+				sv1.CanFocus = true;
+				Assert.True (sv1.CanFocus);
 			};
 
-			v2.Add (sv1);
+			v1.Add (sv1);
 			r.Add (v1, v2);
 			t.Add (r);
 
@@ -615,10 +627,17 @@ namespace Terminal.Gui {
 			Application.Run (t, true);
 			Application.Shutdown (true);
 
+			Assert.Equal (1, tc);
 			Assert.Equal (1, rc);
 			Assert.Equal (1, v1c);
 			Assert.Equal (1, v2c);
 			Assert.Equal (1, sv1c);
+
+			Assert.True (t.CanFocus);
+			Assert.False (r.CanFocus);
+			Assert.False (v1.CanFocus);
+			Assert.False (v2.CanFocus);
+			Assert.True (sv1.CanFocus);
 		}
 	}
 }
