@@ -591,22 +591,16 @@ namespace Terminal.Gui {
 
 				Application.Refresh ();
 			};
-			r.Initialized += () => {
+			t.Initialized += () => {
 				rc++;
 				Assert.Equal (t.Frame.Width, r.Frame.Width);
 				Assert.Equal (t.Frame.Height, r.Frame.Height);
-			};
-			v1.Initialized += () => {
 				v1c++;
 				Assert.Equal (t.Frame.Width, v1.Frame.Width);
 				Assert.Equal (t.Frame.Height, v1.Frame.Height);
-			};
-			v2.Initialized += () => {
 				v2c++;
 				Assert.Equal (t.Frame.Width, v2.Frame.Width);
 				Assert.Equal (t.Frame.Height, v2.Frame.Height);
-			};
-			sv1.Initialized += () => {
 				sv1c++;
 				Assert.Equal (t.Frame.Width, sv1.Frame.Width);
 				Assert.Equal (t.Frame.Height, sv1.Frame.Height);
@@ -641,7 +635,7 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void Initialized_Event_Will_Be_Invoked_Even_View_Is_Added_Dynamically ()
+		public void Initialized_Event_Will_Be_Invoked_Before_Redraw_Then_Added_Dynamically ()
 		{
 			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
 
@@ -668,17 +662,13 @@ namespace Terminal.Gui {
 
 				Application.Refresh ();
 			};
-			r.Initialized += () => {
+			t.Initialized += () => {
 				rc++;
 				Assert.Equal (t.Frame.Width, r.Frame.Width);
 				Assert.Equal (t.Frame.Height, r.Frame.Height);
-			};
-			v1.Initialized += () => {
 				v1c++;
 				Assert.Equal (t.Frame.Width, v1.Frame.Width);
 				Assert.Equal (t.Frame.Height, v1.Frame.Height);
-			};
-			v2.Initialized += () => {
 				v2c++;
 				Assert.Equal (t.Frame.Width, v2.Frame.Width);
 				Assert.Equal (t.Frame.Height, v2.Frame.Height);
@@ -691,7 +681,7 @@ namespace Terminal.Gui {
 				var sv1 = new View () { Width = Dim.Fill (), Height = Dim.Fill () };
 				v1.Add (sv1);
 
-				sv1.Initialized += () => {
+				sv1.Added += (e) => {
 					sv1c++;
 					Assert.Equal (t.Frame.Width, sv1.Frame.Width);
 					Assert.Equal (t.Frame.Height, sv1.Frame.Height);
@@ -711,7 +701,7 @@ namespace Terminal.Gui {
 			Assert.Equal (1, rc);
 			Assert.Equal (1, v1c);
 			Assert.Equal (1, v2c);
-			Assert.Equal (1, sv1c);
+			Assert.Equal (0, sv1c);
 
 			Assert.True (t.CanFocus);
 			Assert.False (r.CanFocus);

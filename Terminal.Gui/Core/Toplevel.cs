@@ -49,6 +49,19 @@ namespace Terminal.Gui {
 		public bool Running { get; set; }
 
 		/// <summary>
+		/// Event called only once when the content area of the Visualization will actually be drawn for the first time.
+		/// </summary>
+		public Action Initialized;
+
+		/// <summary>
+		/// Allows configurations and assignments to be performed only once before the views is drawn for the first time.
+		/// </summary>
+		public virtual void OnInitialized ()
+		{
+			Initialized?.Invoke ();
+		}
+
+		/// <summary>
 		/// Fired once the Toplevel's <see cref="MainLoop"/> has started it's first iteration. 
 		/// Subscribe to this event to perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set.
 		/// changes. A Ready event handler is a good place to finalize initialization after calling `<see cref="Application.Run()"/>(topLevel)`. 

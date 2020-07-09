@@ -468,6 +468,7 @@ namespace Terminal.Gui {
 			toplevel.LayoutSubviews ();
 			Loaded?.Invoke (new ResizedEventArgs () { Rows = Driver.Rows, Cols = Driver.Cols });
 			toplevel.WillPresent ();
+			toplevel.OnInitialized ();
 			Redraw (toplevel);
 			// Notify Toplevel it's ready to load.
 			toplevel.OnLoad ();

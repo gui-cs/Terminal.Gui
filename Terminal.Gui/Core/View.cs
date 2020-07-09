@@ -1208,10 +1208,6 @@ namespace Terminal.Gui {
 								view.LayoutSubviews ();
 							Application.CurrentView = view;
 
-							if (!view.initialized) {
-								view.OnInitialized ();
-							}
-
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0) because
 							view.Redraw (view.Bounds);
@@ -1222,22 +1218,6 @@ namespace Terminal.Gui {
 				}
 			}
 			ClearNeedsDisplay ();
-		}
-
-		bool initialized;
-
-		/// <summary>
-		/// Event called only once when the content area of the Visualization will actually be drawn for the first time.
-		/// </summary>
-		public Action Initialized;
-
-		/// <summary>
-		/// Allows configurations and assignments to be performed only once before the view is drawn for the first time.
-		/// </summary>
-		public virtual void OnInitialized ()
-		{
-			initialized = true;
-			Initialized?.Invoke ();
 		}
 
 		/// <summary>
