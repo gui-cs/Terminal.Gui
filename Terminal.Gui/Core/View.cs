@@ -621,18 +621,13 @@ namespace Terminal.Gui {
 				container.ChildNeedsDisplay ();
 			if (subviews == null)
 				return;
-			foreach (var view in subviews) {
-				if (IsInitialized && !view.IsInitialized) {
-					view.BeginInit ();
-					view.EndInit ();
-				}
+			foreach (var view in subviews)
 				if (view.Frame.IntersectsWith (region)) {
 					var childRegion = Rect.Intersect (view.Frame, region);
 					childRegion.X -= view.Frame.X;
 					childRegion.Y -= view.Frame.Y;
 					view.SetNeedsDisplay (childRegion);
 				}
-			}
 		}
 
 		internal bool childNeedsDisplay;
@@ -670,6 +665,9 @@ namespace Terminal.Gui {
 			if (view.CanFocus) {
 				CanFocus = true;
 				view.tabIndex = tabIndexes.IndexOf (view);
+			}
+			if (IsInitialized) {
+				view.BeginInit ();
 			}
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
