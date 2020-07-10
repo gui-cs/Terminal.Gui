@@ -666,11 +666,11 @@ namespace Terminal.Gui {
 				CanFocus = true;
 				view.tabIndex = tabIndexes.IndexOf (view);
 			}
+			SetNeedsLayout ();
+			SetNeedsDisplay ();
 			if (IsInitialized) {
 				view.BeginInit ();
 			}
-			SetNeedsLayout ();
-			SetNeedsDisplay ();
 		}
 
 		/// <summary>
