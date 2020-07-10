@@ -543,5 +543,180 @@ namespace Terminal.Gui {
 			Assert.Equal (2, v3.TabIndex);
 			Assert.True (v3.TabStop);
 		}
+
+		[Fact]
+		public void Initialized_Event_Comparing_With_Added_Event ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = new Toplevel () { Id = "0", };
+
+			var w = new Window () {Id = "t", Width = Dim.Fill (), Height = Dim.Fill () };
+			var v1 = new View () { Id = "v1", Width = Dim.Fill (), Height = Dim.Fill () };
+			var v2 = new View () { Id = "v2", Width = Dim.Fill (), Height = Dim.Fill () };
+			var sv1 = new View () { Id = "sv1", Width = Dim.Fill (), Height = Dim.Fill () };
+
+			int tc = 0, wc = 0, v1c = 0, v2c = 0, sv1c = 0;
+
+			w.Added += (e) => {
+				Assert.Equal (e.Frame.Width, w.Frame.Width);
+				Assert.Equal (e.Frame.Height, w.Frame.Height);
+			};
+			v1.Added += (e) => {
+				Assert.Equal (e.Frame.Width, v1.Frame.Width);
+				Assert.Equal (e.Frame.Height, v1.Frame.Height);
+			};
+			v2.Added += (e) => {
+				Assert.Equal (e.Frame.Width, v2.Frame.Width);
+				Assert.Equal (e.Frame.Height, v2.Frame.Height);
+			};
+			sv1.Added += (e) => {
+				Assert.Equal (e.Frame.Width, sv1.Frame.Width);
+				Assert.Equal (e.Frame.Height, sv1.Frame.Height);
+			};
+
+			t.Initialized += (s, e) => {
+				tc++;
+				Assert.Equal (1, tc);
+				Assert.Equal (0, wc);
+				Assert.Equal (0, v1c);
+				Assert.Equal (0, v2c);
+				Assert.Equal (0, sv1c);
+
+				Assert.True (t.CanFocus);
+				Assert.True (w.CanFocus);
+				Assert.False (v1.CanFocus);
+				Assert.False (v2.CanFocus);
+				Assert.False (sv1.CanFocus);
+
+				Application.Refresh ();
+			};
+			w.Initialized += (s, e) => {
+				wc++;
+				Assert.Equal (t.Frame.Width, w.Frame.Width);
+				Assert.Equal (t.Frame.Height, w.Frame.Height);
+			};
+			v1.Initialized += (s, e) => {
+				v1c++;
+				Assert.Equal (t.Frame.Width, v1.Frame.Width);
+				Assert.Equal (t.Frame.Height, v1.Frame.Height);
+			};
+			v2.Initialized += (s, e) => {
+				v2c++;
+				Assert.Equal (t.Frame.Width, v2.Frame.Width);
+				Assert.Equal (t.Frame.Height, v2.Frame.Height);
+			};
+			sv1.Initialized += (s, e) => {
+				sv1c++;
+				Assert.Equal (t.Frame.Width, sv1.Frame.Width);
+				Assert.Equal (t.Frame.Height, sv1.Frame.Height);
+				Assert.False (sv1.CanFocus);
+				sv1.CanFocus = true;
+				Assert.True (sv1.CanFocus);
+			};
+
+			v1.Add (sv1);
+			w.Add (v1, v2);
+			t.Add (w);
+
+			Application.Iteration = () => {
+				Application.Refresh ();
+				t.Running = false;
+			};
+
+			Application.Run (t, true);
+			Application.Shutdown (true);
+
+			Assert.Equal (1, tc);
+			Assert.Equal (1, wc);
+			Assert.Equal (1, v1c);
+			Assert.Equal (1, v2c);
+			Assert.Equal (1, sv1c);
+
+			Assert.True (t.CanFocus);
+			Assert.True (w.CanFocus);
+			Assert.False (v1.CanFocus);
+			Assert.False (v2.CanFocus);
+			Assert.True (sv1.CanFocus);
+		}
+
+		[Fact]
+		public void Initialized_Event_Will_Be_Invoked_When_Added_Dynamically ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = new Toplevel () { Id = "0", };
+
+			var w = new Window () { Id = "t", Width = Dim.Fill (), Height = Dim.Fill () };
+			var v1 = new View () { Id = "v1", Width = Dim.Fill (), Height = Dim.Fill () };
+			var v2 = new View () { Id = "v2", Width = Dim.Fill (), Height = Dim.Fill () };
+
+			int tc = 0, wc = 0, v1c = 0, v2c = 0, sv1c = 0;
+
+			t.Initialized += (s, e) => {
+				tc++;
+				Assert.Equal (1, tc);
+				Assert.Equal (0, wc);
+				Assert.Equal (0, v1c);
+				Assert.Equal (0, v2c);
+				Assert.Equal (0, sv1c);
+
+				Assert.True (t.CanFocus);
+				Assert.True (w.CanFocus);
+				Assert.False (v1.CanFocus);
+				Assert.False (v2.CanFocus);
+
+				Application.Refresh ();
+			};
+			w.Initialized += (s, e) => {
+				wc++;
+				Assert.Equal (t.Frame.Width, w.Frame.Width);
+				Assert.Equal (t.Frame.Height, w.Frame.Height);
+			};
+			v1.Initialized += (s, e) => {
+				v1c++;
+				Assert.Equal (t.Frame.Width, v1.Frame.Width);
+				Assert.Equal (t.Frame.Height, v1.Frame.Height);
+			};
+			v2.Initialized += (s, e) => {
+				v2c++;
+				Assert.Equal (t.Frame.Width, v2.Frame.Width);
+				Assert.Equal (t.Frame.Height, v2.Frame.Height);
+			};
+			w.Add (v1, v2);
+			t.Add (w);
+
+			Application.Iteration = () => {
+				var sv1 = new View () { Id = "sv1", Width = Dim.Fill (), Height = Dim.Fill () };
+
+				sv1.Initialized += (s, e) => {
+					sv1c++;
+					Assert.NotEqual (t.Frame.Width, sv1.Frame.Width);
+					Assert.NotEqual (t.Frame.Height, sv1.Frame.Height);
+					Assert.False (sv1.CanFocus);
+					sv1.CanFocus = true;
+					Assert.True (sv1.CanFocus);
+				};
+
+				v1.Add (sv1);
+
+				Application.Refresh ();
+				t.Running = false;
+			};
+
+			Application.Run (t, true);
+			Application.Shutdown (true);
+
+			Assert.Equal (1, tc);
+			Assert.Equal (1, wc);
+			Assert.Equal (1, v1c);
+			Assert.Equal (1, v2c);
+			Assert.Equal (1, sv1c);
+
+			Assert.True (t.CanFocus);
+			Assert.True (w.CanFocus);
+			Assert.False (v1.CanFocus);
+			Assert.False (v2.CanFocus);
+		}
 	}
 }
