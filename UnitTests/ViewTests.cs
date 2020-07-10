@@ -700,6 +700,9 @@ namespace Terminal.Gui {
 
 				v1.Add (sv1);
 
+				while (!sv1.CanFocus) {
+				}
+
 				Application.Refresh ();
 				t.Running = false;
 			};
