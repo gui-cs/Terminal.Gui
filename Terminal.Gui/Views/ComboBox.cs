@@ -69,6 +69,7 @@ namespace Terminal.Gui {
 		readonly TextField search;
 		readonly ListView listview;
 		bool autoHide = true;
+		int dropDownHeight = 4;
 
 		/// <summary>
 		/// Public constructor
@@ -110,6 +111,10 @@ namespace Terminal.Gui {
 
 		private void Initialize ()
 		{
+			if (Bounds.Height < dropDownHeight && Height is Dim.DimAbsolute) {
+				Height = dropDownHeight;
+			}
+
 			search.TextChanged += Search_Changed;
 
 			listview.Y = Pos.Bottom (search);
@@ -156,6 +161,20 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The selected item or -1 none selected.</value>
 		public int SelectedItem { private set; get; }
+
+		/// <summary>
+		/// Gets or Sets the list height when is drop down. Ensures at least the SelectedItem is shown.
+		/// </summary>
+		public int DropDownHeight {
+			get { return dropDownHeight; }
+			set {
+				if (value < 1) {
+					dropDownHeight = 1;
+				} else {
+					dropDownHeight = value;
+				}
+			}
+		}
 
 		bool isShow = false;
 
@@ -504,7 +523,7 @@ namespace Terminal.Gui {
 			if (Bounds.Height == 0)
 				return 0;
 
-			return Math.Min (Bounds.Height - 1, searchset?.Count > 0 ? searchset.Count : isShow ? Bounds.Height - 1 : 0);
+			return Math.Min (Math.Max(Bounds.Height - 1, dropDownHeight), searchset?.Count > 0 ? searchset.Count : isShow ? Math.Max (Bounds.Height - 1, dropDownHeight) : 0);
 		}
 	}
 }
