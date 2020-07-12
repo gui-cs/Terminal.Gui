@@ -114,10 +114,6 @@ namespace UICatalog {
 				Text = unicode,
 			};
 			Win.Add (textView);
-
-			// Move Win down to row 1, below menu
-			Win.Y = 1;
-			Top.LayoutSubviews ();
 		}
 	}
 }

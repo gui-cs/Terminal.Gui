@@ -132,7 +132,7 @@ namespace Terminal.Gui {
 			return CanExecute == null ? true : CanExecute ();
 		}
 
-		internal int Width => Title.RuneCount + Help.Length + 1 + 2 +
+		internal int Width => Title.RuneCount + Help.RuneCount + 1 + 2 +
 			(Checked || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0);
 
 		/// <summary>
@@ -527,10 +527,9 @@ namespace Terminal.Gui {
 				me.Flags == MouseFlags.Button1TripleClicked || me.Flags == MouseFlags.ReportMousePosition ||
 				me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
 				disabled = false;
-				if (me.Y < 1)
+				if (me.Y < 1 || me.Y - 1 >= barItems.Children.Length) {
 					return true;
-				if (me.Y - 1 >= barItems.Children.Length)
-					return true;
+				}
 				var item = barItems.Children [me.Y - 1];
 				if (item == null || !item.IsEnabled ()) disabled = true;
 				if (item != null && !disabled)
@@ -553,6 +552,9 @@ namespace Terminal.Gui {
 				host.Activate (host.selected, pos, subMenu);
 			} else if (host.openSubMenu != null && !barItems.Children [current].IsFromSubMenu)
 				host.CloseMenu (false, true);
+			else {
+				SetNeedsDisplay ();
+			}
 		}
 
 		int GetSubMenuIndex (MenuBarItem subMenu)
@@ -799,7 +801,7 @@ namespace Terminal.Gui {
 				}
 
 				for (int i = 0; i < index; i++)
-					pos += Menus [i].Title.Length + 2;
+					pos += Menus [i].Title.RuneCount + 2;
 				openMenu = new Menu (this, pos, 1, Menus [index]);
 				openCurrentMenu = openMenu;
 				openCurrentMenu.previousSubFocused = openMenu;
@@ -1055,7 +1057,7 @@ namespace Terminal.Gui {
 				// TODO: this code is duplicated, hotkey should be part of the MenuBarItem
 				var mi = Menus [i];
 				int p = mi.Title.IndexOf ('_');
-				if (p != -1 && p + 1 < mi.Title.Length) {
+				if (p != -1 && p + 1 < mi.Title.RuneCount) {
 					if (Char.ToUpperInvariant ((char)mi.Title [p + 1]) == c) {
 						ProcessMenu (i, mi);
 						return true;
@@ -1144,7 +1146,7 @@ namespace Terminal.Gui {
 						if (mi == null)
 							continue;
 						int p = mi.Title.IndexOf ('_');
-						if (p != -1 && p + 1 < mi.Title.Length) {
+						if (p != -1 && p + 1 < mi.Title.RuneCount) {
 							if (mi.Title [p + 1] == c) {
 								Selected (mi);
 								return true;
@@ -1212,8 +1214,19 @@ namespace Terminal.Gui {
 				if (me.View is MenuBar || me.View is Menu) {
 					if (me.View != current) {
 						Application.UngrabMouse ();
-						Application.GrabMouse (me.View);
-						me.View.MouseEvent (me);
+						var v = me.View;
+						Application.GrabMouse (v);
+						var newxy = v.ScreenToView (me.X, me.Y);
+						var nme = new MouseEvent () {
+							X = newxy.X,
+							Y = newxy.Y,
+							Flags = me.Flags,
+							OfX = me.X - newxy.X,
+							OfY = me.Y - newxy.Y,
+							View = v
+						};
+
+						v.MouseEvent (nme);
 					}
 				} else if (!(me.View is MenuBar || me.View is Menu) && (me.Flags.HasFlag (MouseFlags.Button1Clicked) ||
 					me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1TripleClicked)) {
