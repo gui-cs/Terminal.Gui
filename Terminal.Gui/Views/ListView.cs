@@ -212,10 +212,6 @@ namespace Terminal.Gui {
 					throw new ArgumentException ("value");
 				selected = value;
 				OnSelectedChanged ();
-				if (selected < top)
-					top = selected;
-				else if (selected >= top + (LayoutStyle == LayoutStyle.Absolute ? Frame.Height : Height.Anchor (0)))
-					top = selected;
 			}
 		}
 
@@ -280,6 +276,11 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (current);
 			Move (0, 0);
 			var f = Frame;
+			if (selected < top) {
+				top = selected;
+			} else if (selected >= top + f.Height) {
+				top = selected;
+			}
 			var item = top;
 			bool focused = HasFocus;
 			int col = allowsMarking ? 4 : 0;
