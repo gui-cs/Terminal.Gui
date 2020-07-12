@@ -88,7 +88,7 @@ namespace Terminal.Gui {
 			CanFocus = false;
 			ColorScheme = Colors.Menu;
 			X = 0;
-			Y = Driver.Rows - 1;
+			Y = SuperView != null ? SuperView.Frame.Height - 1 : Pos.AnchorEnd (1);
 			Width = Dim.Fill ();
 			Height = 1;
 
@@ -100,8 +100,8 @@ namespace Terminal.Gui {
 			return delegate {
 				X = 0;
 				Height = 1;
-				if (SuperView == null || SuperView == Application.Top) {
-					Y = Driver.Rows - 1;
+				if (SuperView == null || SuperView is Toplevel) {
+					Y = SuperView.Frame.Height - 1;
 				} else {
 					//Y = Pos.Bottom (SuperView);
 				}
@@ -125,7 +125,7 @@ namespace Terminal.Gui {
 			//}
 
 			Move (0, 0);
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (Colors.Menu.Normal);
 			for (int i = 0; i < Frame.Width; i++)
 				Driver.AddRune (' ');
 
@@ -133,8 +133,8 @@ namespace Terminal.Gui {
 			var scheme = ColorScheme.Normal;
 			Driver.SetAttribute (scheme);
 			for (int i = 0; i < Items.Length; i++) {
-				var title = Items [i].Title;
-				for (int n = 0; n < title.Length; n++) {
+				var title = Items [i].Title.ToString ();
+				for (int n = 0; n < Items [i].Title.RuneCount; n++) {
 					if (title [n] == '~') {
 						scheme = ToggleScheme (scheme);
 						continue;
