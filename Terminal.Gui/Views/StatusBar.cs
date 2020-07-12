@@ -133,8 +133,8 @@ namespace Terminal.Gui {
 			var scheme = ColorScheme.Normal;
 			Driver.SetAttribute (scheme);
 			for (int i = 0; i < Items.Length; i++) {
-				var title = Items [i].Title;
-				for (int n = 0; n < title.RuneCount; n++) {
+				var title = Items [i].Title.ToString ();
+				for (int n = 0; n < Items [i].Title.RuneCount; n++) {
 					if (title [n] == '~') {
 						scheme = ToggleScheme (scheme);
 						continue;
