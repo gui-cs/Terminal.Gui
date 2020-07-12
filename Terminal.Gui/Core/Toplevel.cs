@@ -276,7 +276,7 @@ namespace Terminal.Gui {
 				s = ((Toplevel)SuperView).StatusBar != null;
 			}
 			if (SuperView == null || SuperView is Toplevel) {
-				l = s ? Frame.Height - 1 : Frame.Height;
+				l = s ? Driver.Rows - 1 : Driver.Rows;
 			} else {
 				l = s ? SuperView.Frame.Height - 1 : SuperView.Frame.Height;
 			}
