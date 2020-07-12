@@ -286,6 +286,7 @@ namespace Terminal.Gui {
 
 		internal void PositionToplevels ()
 		{
+			PositionToplevel (this);
 			foreach (var top in Subviews) {
 				if (top is Toplevel) {
 					PositionToplevel ((Toplevel)top);
