@@ -38,6 +38,7 @@ namespace Terminal.Gui {
 		bool needsFormat;
 		Key hotKey;
 		Size size;
+		bool wordWrapText;
 
 		/// <summary>
 		///   The text to be displayed. This text is never modified.
@@ -50,7 +51,7 @@ namespace Terminal.Gui {
 				if (Size.IsEmpty) {
 					// Proivde a default size (width = length of longest line, height = 1)
 					// TODO: It might makem more sense for the default to be width = length of first line?
-					Size = new Size (TextFormatter.MaxWidth (Text, int.MaxValue), 1);
+					Size = new Size (TextFormatter.MaxWidth (Text, int.MaxValue, wordWrapText), 1);
 				}
 
 				NeedsFormat = true;
@@ -101,6 +102,11 @@ namespace Terminal.Gui {
 		/// the underlying Rune to be identified as a "private use" Unicode character.
 		/// </summary>HotKeyTagMask
 		public uint HotKeyTagMask { get; set; } = 0x100000;
+
+		/// <summary>
+		/// Word wrap enabled
+		/// </summary>
+		public bool WordWrapText { get => wordWrapText; set => wordWrapText = value; }
 
 		/// <summary>
 		/// Gets the formatted lines. 
@@ -234,6 +240,30 @@ namespace Terminal.Gui {
 			return lines;
 		}
 
+		public static List<ustring> ClipLines (ustring text, int width)
+		{
+			if (width < 0) {
+				throw new ArgumentOutOfRangeException ("Width cannot be negative.");
+			}
+
+			int start = 0, end;
+			var lines = new List<ustring> ();
+
+			if (ustring.IsNullOrEmpty (text)) {
+				return lines;
+			}
+
+			var runes = text.ToRuneList ();
+
+			if (runes.Count > width) {
+				lines.Add (ustring.Make (runes.GetRange (start, width)));
+			} else {
+				lines.Add (ustring.Make (runes));
+			}
+
+			return lines;
+		}
+
 		/// <summary>
 		/// Justifies text within a specified width. 
 		/// </summary>
@@ -337,29 +367,36 @@ namespace Terminal.Gui {
 				return lineResult;
 			}
 
-			if (wordWrap == false) {
-				text = ReplaceCRLFWithSpace (text);
-				lineResult.Add (ClipAndJustify (text, width, talign));
-				return lineResult;
-			}
-
 			var runes = text.ToRuneList ();
 			int runeCount = runes.Count;
 			int lp = 0;
 			for (int i = 0; i < runeCount; i++) {
 				Rune c = text [i];
 				if (c == '\n') {
-					var wrappedLines = WordWrap (ustring.Make (runes.GetRange (lp, i - lp)), width);
-					foreach (var line in wrappedLines) {
-						lineResult.Add (ClipAndJustify (line, width, talign));
-					}
-					if (wrappedLines.Count == 0) {
-						lineResult.Add (ustring.Empty);
+
+					if (!wordWrap) {
+						var line = ClipAndJustify (ustring.Make (runes.GetRange (lp, i - lp)), width, talign);
+						lineResult.Add (line);
+					} else {
+						var wrappedLines = WordWrap (ustring.Make (runes.GetRange (lp, i - lp)), width);
+						foreach (var line in wrappedLines) {
+							lineResult.Add (ClipAndJustify (line, width, talign));
+						}
+						if (wrappedLines.Count == 0) {
+							lineResult.Add (ustring.Empty);
+						}
 					}
 					lp = i + 1;
 				}
 			}
-			foreach (var line in WordWrap (ustring.Make (runes.GetRange (lp, runeCount - lp)), width)) {
+			List<ustring> formatted;
+			if (wordWrap) {
+				formatted = WordWrap (ustring.Make (runes.GetRange (lp, runeCount - lp)), width);
+			} else {
+				formatted = ClipLines (ustring.Make (runes.GetRange (lp, runeCount - lp)), width);
+			}
+
+			foreach (var line in formatted) {
 				lineResult.Add (ClipAndJustify (line, width, talign));
 			}
 
@@ -371,10 +408,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>Number of lines.</returns>
 		/// <param name="text">Text, may contain newlines.</param>
-		/// <param name="width">The minimum width for the text.</param>
-		public static int MaxLines (ustring text, int width)
+		/// <param name="wordWrap">Word wrap</param>/// 
+		public static int MaxLines (ustring text, int width, bool wordWrap)
 		{
-			var result = TextFormatter.Format (text, width, TextAlignment.Left, true);
+			var result = TextFormatter.Format (text, width, TextAlignment.Left, wordWrap);
 			return result.Count;
 		}
 
@@ -384,9 +421,10 @@ namespace Terminal.Gui {
 		/// <returns>Max width of lines.</returns>
 		/// <param name="text">Text, may contain newlines.</param>
 		/// <param name="width">The minimum width for the text.</param>
-		public static int MaxWidth (ustring text, int width)
+		/// <param name="wordWrap">Word wrap</param>/// 
+		public static int MaxWidth (ustring text, int width, bool wordWrap)
 		{
-			var result = TextFormatter.Format (text, width, TextAlignment.Left, true);
+			var result = TextFormatter.Format (text, width, TextAlignment.Left, wordWrap);
 			return result.Max (s => s.RuneCount);
 		}
 

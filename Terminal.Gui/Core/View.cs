@@ -169,6 +169,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Rune HotKeySpecifier { get => textFormatter.HotKeySpecifier; set => textFormatter.HotKeySpecifier = value; }
 
+		/// <summary>
+		/// Word wrap text boolean
+		/// </summary>
+		public bool WordWrapText { get => textFormatter.WordWrapText; set => textFormatter.WordWrapText = value; }
+
+
 		internal Direction FocusDirection {
 			get => SuperView?.FocusDirection ?? focusDirection;
 			set {
