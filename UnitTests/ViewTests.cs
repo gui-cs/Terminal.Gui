@@ -645,9 +645,9 @@ namespace Terminal.Gui {
 		{
 			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
 
-			var t = new Toplevel () { Id = "0", };
+			var t = new Toplevel () { Id = "t", };
 
-			var w = new Window () { Id = "t", Width = Dim.Fill (), Height = Dim.Fill () };
+			var w = new Window () { Id = "w", Width = Dim.Fill (), Height = Dim.Fill () };
 			var v1 = new View () { Id = "v1", Width = Dim.Fill (), Height = Dim.Fill () };
 			var v2 = new View () { Id = "v2", Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -717,6 +717,55 @@ namespace Terminal.Gui {
 			Assert.True (w.CanFocus);
 			Assert.False (v1.CanFocus);
 			Assert.False (v2.CanFocus);
+		}
+
+		[Fact]
+		public void PosAbsolute_And_DimAbsolute_Type_Is_Needed_At_Least_With_String ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = new Toplevel () { Id = "t" };
+			var w = new Window () {Id = "w", X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+			var v1 = new View () { Id = "v1", X = 0, Y = 0, Width = 20, Height = 10 };
+			var v2 = new View () { Id = "v2", X = Pos.X (v1), Y = Pos.Y (v1), Width = Dim.Width (v1), Height = Dim.Height (v1) };
+
+			w.Add (v1);
+			t.Add (w);
+
+			Application.Iteration = () => {
+				Assert.Contains ("Pos.Combine", v2.X.ToString ());
+				Assert.Contains ("Pos.Combine", v2.Y.ToString ());
+				Assert.Contains ("DimView", v2.Width.ToString ());
+				Assert.Contains ("DimView", v2.Height.ToString ());
+
+				// Now need to performs an operation that need to assign absolute values if they don't respect some values and
+				// if they are only of type PosAbsolute and DimAbsolute.
+				// Ups! No way to check with types nor strings. I'll assign it any way and hope they are of these types.
+				if (v2.Bounds.X < 4) {
+					v2.X = 4;
+				}
+				if (v2.Bounds.Y < 5) {
+					v2.Y = 5;
+				}
+				if (v2.Bounds.Width < 30) {
+					v2.Width = 30;
+				}
+				if (v2.Bounds.Height < 20) {
+					v2.Height = 20;
+				}
+
+				// Ups! I messed this. Now they are absolute and not relative to other views. Damn!
+				Assert.DoesNotContain ("Pos.Combine", v2.X.ToString ());
+				Assert.DoesNotContain ("Pos.Combine", v2.Y.ToString ());
+				Assert.DoesNotContain ("DimView", v2.Width.ToString ());
+				Assert.DoesNotContain ("DimView", v2.Height.ToString ());
+
+				// I go out!
+				t.Running = false;
+			};
+
+			Application.Run (t, true);
+			Application.Shutdown (true);
 		}
 	}
 }
