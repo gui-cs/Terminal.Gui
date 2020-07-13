@@ -69,6 +69,7 @@ namespace Terminal.Gui {
 		readonly TextField search;
 		readonly ListView listview;
 		bool autoHide = true;
+		int minimumHeight = 2;
 
 		/// <summary>
 		/// Public constructor
@@ -110,6 +111,10 @@ namespace Terminal.Gui {
 
 		private void Initialize ()
 		{
+			if (Bounds.Height < minimumHeight && Height is Dim.DimAbsolute) {
+				Height = minimumHeight;
+			}
+
 			search.TextChanged += Search_Changed;
 
 			listview.Y = Pos.Bottom (search);
@@ -504,7 +509,7 @@ namespace Terminal.Gui {
 			if (Bounds.Height == 0)
 				return 0;
 
-			return Math.Min (Bounds.Height - 1, searchset?.Count > 0 ? searchset.Count : isShow ? Bounds.Height - 1 : 0);
+			return Math.Min (Math.Max(Bounds.Height - 1, minimumHeight - 1), searchset?.Count > 0 ? searchset.Count : isShow ? Math.Max (Bounds.Height - 1, minimumHeight - 1) : 0);
 		}
 	}
 }
