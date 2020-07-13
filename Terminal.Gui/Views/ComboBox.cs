@@ -111,7 +111,7 @@ namespace Terminal.Gui {
 
 		private void Initialize ()
 		{
-			if (Bounds.Height < minimumHeight && Height.GetType ().Name == "DimAbsolute") {
+			if (Bounds.Height < minimumHeight && Height is Dim.DimAbsolute) {
 				Height = minimumHeight;
 			}
 
