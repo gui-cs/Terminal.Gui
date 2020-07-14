@@ -132,6 +132,12 @@ namespace UICatalog {
 
 			StringBuilder aboutMessage = new StringBuilder ();
 			aboutMessage.AppendLine ("UI Catalog is a comprehensive sample library for Terminal.Gui");
+			aboutMessage.AppendLine (@"             _           ");
+			aboutMessage.AppendLine (@"  __ _ _   _(_)  ___ ___ ");
+			aboutMessage.AppendLine (@" / _` | | | | | / __/ __|");
+			aboutMessage.AppendLine (@"| (_| | |_| | || (__\__ \");
+			aboutMessage.AppendLine (@" \__, |\__,_|_(_)___|___/");
+			aboutMessage.AppendLine (@" |___/                   ");
 			aboutMessage.AppendLine ("");
 			aboutMessage.AppendLine ($"Version: {typeof (UICatalogApp).Assembly.GetName ().Version}");
 			aboutMessage.AppendLine ($"Using Terminal.Gui Version: {typeof (Terminal.Gui.Application).Assembly.GetName ().Version}");
