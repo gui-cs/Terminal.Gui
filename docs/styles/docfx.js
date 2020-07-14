@@ -422,6 +422,8 @@ $(function () {
       $('#toc a.active').parents('li').each(function (i, e) {
         $(e).addClass(active).addClass(expanded);
         $(e).children('a').addClass(active);
+      })
+      $('#toc a.active').parents('li').each(function (i, e) {
         top += $(e).position().top;
       })
       $('.sidetoc').scrollTop(top - 50);

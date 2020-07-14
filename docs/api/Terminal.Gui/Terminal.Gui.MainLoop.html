@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class MainLoop
    ">
-    <meta name="generator" content="docfx 2.54.0.0">
+    <meta name="generator" content="docfx 2.56.1.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -135,8 +135,7 @@ does not seem to be a way of supporting this on Windows.
   <a id="Terminal_Gui_MainLoop__ctor_" data-uid="Terminal.Gui.MainLoop.#ctor*"></a>
   <h4 id="Terminal_Gui_MainLoop__ctor_Terminal_Gui_IMainLoopDriver_" data-uid="Terminal.Gui.MainLoop.#ctor(Terminal.Gui.IMainLoopDriver)">MainLoop(IMainLoopDriver)</h4>
   <div class="markdown level1 summary">
-Creates a new Mainloop, to run it you must provide a driver, and choose
-one of the implementations UnixMainLoop, NetMainLoop or WindowsMainLoop.
+Creates a new Mainloop. 
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -156,7 +155,7 @@ one of the implementations UnixMainLoop, NetMainLoop or WindowsMainLoop.
       <tr>
         <td><a class="xref" href="Terminal.Gui.IMainLoopDriver.html">IMainLoopDriver</a></td>
         <td><span class="parametername">driver</span></td>
-        <td></td>
+        <td>Should match the <a class="xref" href="Terminal.Gui.ConsoleDriver.html">ConsoleDriver</a> (one of the implementations UnixMainLoop, NetMainLoop or WindowsMainLoop).</td>
       </tr>
     </tbody>
   </table>
@@ -196,7 +195,7 @@ The current IMainLoopDriver in use.
   <a id="Terminal_Gui_MainLoop_AddIdle_" data-uid="Terminal.Gui.MainLoop.AddIdle*"></a>
   <h4 id="Terminal_Gui_MainLoop_AddIdle_System_Func_System_Boolean__" data-uid="Terminal.Gui.MainLoop.AddIdle(System.Func{System.Boolean})">AddIdle(Func&lt;Boolean&gt;)</h4>
   <div class="markdown level1 summary">
-Executes the specified @idleHandler on the idle loop.  The return value is a token to remove it.
+Adds specified idle handler function to mainloop processing. The handler function will be called once per iteration of the main loop after other events have been handled.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -216,7 +215,7 @@ Executes the specified @idleHandler on the idle loop.  The return value is a tok
       <tr>
         <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Boolean</span>&gt;</td>
         <td><span class="parametername">idleHandler</span></td>
-        <td></td>
+        <td>Token that can be used to remove the idle handler with <a class="xref" href="Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_RemoveIdle_System_Func_System_Boolean__">RemoveIdle(Func&lt;Boolean&gt;)</a> .</td>
       </tr>
     </tbody>
   </table>
@@ -235,6 +234,15 @@ Executes the specified @idleHandler on the idle loop.  The return value is a tok
       </tr>
     </tbody>
   </table>
+  <h5 id="Terminal_Gui_MainLoop_AddIdle_System_Func_System_Boolean___remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  Remove an idle hander by calling <a class="xref" href="Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_RemoveIdle_System_Func_System_Boolean__">RemoveIdle(Func&lt;Boolean&gt;)</a> with the token this method returns.
+</p>
+<p>
+  If the <code>idleHandler</code> returns <code>false</code> it will be removed and not called subsequently.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_MainLoop_AddTimeout_" data-uid="Terminal.Gui.MainLoop.AddTimeout*"></a>
@@ -288,10 +296,10 @@ Adds a timeout to the mainloop.
   <div class="markdown level1 remarks">
 When time time specified passes, the callback will be invoked.
 If the callback returns true, the timeout will be reset, repeating
-the invocation. If it returns false, the timeout will stop.
+the invocation. If it returns false, the timeout will stop and be removed.
 
 The returned value is a token that can be used to stop the timeout
-by calling RemoveTimeout.
+by calling <a class="xref" href="Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_RemoveTimeout_System_Object_">RemoveTimeout(Object)</a>.
 </div>
   
   
@@ -348,7 +356,7 @@ running some of your own code in your main thread.
   <a id="Terminal_Gui_MainLoop_Invoke_" data-uid="Terminal.Gui.MainLoop.Invoke*"></a>
   <h4 id="Terminal_Gui_MainLoop_Invoke_System_Action_" data-uid="Terminal.Gui.MainLoop.Invoke(System.Action)">Invoke(Action)</h4>
   <div class="markdown level1 summary">
-Runs @action on the thread that is processing events
+Runs <code>action</code> on the thread that is processing events
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -368,7 +376,7 @@ Runs @action on the thread that is processing events
       <tr>
         <td><span class="xref">System.Action</span></td>
         <td><span class="parametername">action</span></td>
-        <td></td>
+        <td>the action to be invoked on the main processing thread.</td>
       </tr>
     </tbody>
   </table>
@@ -396,12 +404,12 @@ while (main.EvensPending ()) MainIteration ();
   <a id="Terminal_Gui_MainLoop_RemoveIdle_" data-uid="Terminal.Gui.MainLoop.RemoveIdle*"></a>
   <h4 id="Terminal_Gui_MainLoop_RemoveIdle_System_Func_System_Boolean__" data-uid="Terminal.Gui.MainLoop.RemoveIdle(System.Func{System.Boolean})">RemoveIdle(Func&lt;Boolean&gt;)</h4>
   <div class="markdown level1 summary">
-Removes the specified idleHandler from processing.
+Removes an idle handler added with <a class="xref" href="Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_AddIdle_System_Func_System_Boolean__">AddIdle(Func&lt;Boolean&gt;)</a> from processing.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void RemoveIdle(Func&lt;bool&gt; idleHandler)</code></pre>
+    <pre><code class="lang-csharp hljs">public void RemoveIdle(Func&lt;bool&gt; token)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -415,8 +423,8 @@ Removes the specified idleHandler from processing.
     <tbody>
       <tr>
         <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Boolean</span>&gt;</td>
-        <td><span class="parametername">idleHandler</span></td>
-        <td></td>
+        <td><span class="parametername">token</span></td>
+        <td>A token returned by <a class="xref" href="Terminal.Gui.MainLoop.html#Terminal_Gui_MainLoop_AddIdle_System_Func_System_Boolean__">AddIdle(Func&lt;Boolean&gt;)</a></td>
       </tr>
     </tbody>
   </table>
