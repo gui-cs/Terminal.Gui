@@ -1360,13 +1360,12 @@ namespace Terminal.Gui {
 		{
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
 			KeyDown?.Invoke (args);
-			if (args.Handled)
+			if (args.Handled) {
 				return true;
-			if (subviews == null || subviews.Count == 0)
-				return false;
-			foreach (var view in subviews)
-				if (view.HasFocus && view.OnKeyDown (keyEvent))
-					return true;
+			}
+			if (Focused?.OnKeyDown (keyEvent) == true) {
+				return true;
+			}
 
 			return false;
 		}
@@ -1381,13 +1380,12 @@ namespace Terminal.Gui {
 		{
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
 			KeyUp?.Invoke (args);
-			if (args.Handled)
+			if (args.Handled) {
 				return true;
-			if (subviews == null || subviews.Count == 0)
-				return false;
-			foreach (var view in subviews)
-				if (view.HasFocus && view.OnKeyUp (keyEvent))
-					return true;
+			}
+			if (Focused?.OnKeyUp (keyEvent) == true) {
+				return true;
+			}
 
 			return false;
 		}
