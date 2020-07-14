@@ -133,6 +133,17 @@ namespace UICatalog {
 			StringBuilder aboutMessage = new StringBuilder ();
 			aboutMessage.AppendLine ("UI Catalog is a comprehensive sample library for Terminal.Gui");
 			aboutMessage.AppendLine ("");
+			aboutMessage.AppendLine ("  ▄████  █    ██  ██▓      ▄████▄    ██████ ");
+			aboutMessage.AppendLine (" ██▒ ▀█▒ ██  ▓██▒▓██▒     ▒██▀ ▀█  ▒██    ▒ ");
+			aboutMessage.AppendLine ("▒██░▄▄▄░▓██  ▒██░▒██▒     ▒▓█    ▄ ░ ▓██▄   ");
+			aboutMessage.AppendLine ("░▓█  ██▓▓▓█  ░██░░██░     ▒▓▓▄ ▄██▒  ▒   ██▒");
+			aboutMessage.AppendLine ("░▒▓███▀▒▒▒█████▓ ░██░ ██▓ ▒ ▓███▀ ░▒██████▒▒");
+			aboutMessage.AppendLine (" ░▒   ▒ ░▒▓▒ ▒ ▒ ░▓   ▒▓▒ ░ ░▒ ▒  ░▒ ▒▓▒ ▒ ░");
+			aboutMessage.AppendLine ("  ░   ░ ░░▒░ ░ ░  ▒ ░ ░▒    ░  ▒   ░ ░▒  ░ ░");
+			aboutMessage.AppendLine ("░ ░   ░  ░░░ ░ ░  ▒ ░ ░   ░        ░  ░  ░  ");
+			aboutMessage.AppendLine ("      ░    ░      ░    ░  ░ ░            ░  ");
+			aboutMessage.AppendLine ("                       ░  ░                 ");
+			aboutMessage.AppendLine ("");
 			aboutMessage.AppendLine ($"Version: {typeof (UICatalogApp).Assembly.GetName ().Version}");
 			aboutMessage.AppendLine ($"Using Terminal.Gui Version: {typeof (Terminal.Gui.Application).Assembly.GetName ().Version}");
 			aboutMessage.AppendLine ("");

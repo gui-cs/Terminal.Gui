@@ -39,7 +39,8 @@ namespace UICatalog {
 			block.AppendLine ("  ░   ░ ░░▒░ ░ ░  ▒ ░ ░▒    ░  ▒   ░ ░▒  ░ ░");
 			block.AppendLine ("░ ░   ░  ░░░ ░ ░  ▒ ░ ░   ░        ░  ░  ░  ");
 			block.AppendLine ("      ░    ░      ░    ░  ░ ░            ░  ");
-			block.AppendLine ("                       ░  ░                 "); blockText.Text = ustring.Make (block.ToString ()); // .Replace(" ", "\u00A0"); // \u00A0 is 'non-breaking space
+			block.AppendLine ("                       ░  ░                 "); 
+			blockText.Text = ustring.Make (block.ToString ()); // .Replace(" ", "\u00A0"); // \u00A0 is 'non-breaking space
 			Win.Add (blockText);
 
 			var unicodeCheckBox = new CheckBox ("Unicode", Top.HotKeySpecifier == (Rune)' ') {
