@@ -1560,6 +1560,84 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
+		public void WordWrap_Unicode_LineWithNonBreakingSpace ()
+		{
+			var text = ustring.Empty;
+			int width = 0;
+			List<ustring> wrappedLines;
+
+			text = "This\u00A0is\u00A0a\u00A0sentence.";
+			width = text.RuneCount;
+			wrappedLines = TextFormatter.WordWrap (text, width);
+			Assert.True (wrappedLines.Count == 1);
+
+			width = text.RuneCount - 1;
+			wrappedLines = TextFormatter.WordWrap (text, width);
+			Assert.Equal (2, wrappedLines.Count);
+			Assert.Equal (ustring.Make (text.ToRunes () [0..(text.RuneCount - 1)]).ToString (), wrappedLines [0].ToString ());
+			Assert.Equal (".", wrappedLines [1].ToString ());
+
+			width = text.RuneCount - 2;
+			wrappedLines = TextFormatter.WordWrap (text, width);
+			Assert.Equal (2, wrappedLines.Count);
+			Assert.Equal (ustring.Make (text.ToRunes () [0..(text.RuneCount - 2)]).ToString (), wrappedLines [0].ToString ());
+
+			width = text.RuneCount - 5;
+			wrappedLines = TextFormatter.WordWrap (text, width);
+			Assert.Equal (2, wrappedLines.Count);
+
+			width = (int)Math.Ceiling ((double)(text.RuneCount / 2F));
+			wrappedLines = TextFormatter.WordWrap (text, width);
+			Assert.Equal (2, wrappedLines.Count);
+			Assert.Equal ("This\u00A0is\u00A0a\u00A0", wrappedLines [0].ToString ());
+			Assert.Equal ("sentence.", wrappedLines [1].ToString ());
+
+			width = (int)Math.Ceiling ((double)(text.RuneCount / 3F));
+			wrappedLines = TextFormatter.WordWrap (text, width);
+			Assert.Equal (3, wrappedLines.Count);
+			Assert.Equal ("This\u00A0is", wrappedLines [0].ToString ());
+			Assert.Equal ("\u00a0a\u00a0sent", wrappedLines [1].ToString ());
+			Assert.Equal ("ence.", wrappedLines [2].ToString ());
+
+			width = (int)Math.Ceiling ((double)(text.RuneCount / 4F));
+			wrappedLines = TextFormatter.WordWrap (text, width);
+			Assert.Equal (4, wrappedLines.Count);
+
+			width = (int)Math.Ceiling ((double)text.RuneCount / text.RuneCount);
+			wrappedLines = TextFormatter.WordWrap (text, width);
+			Assert.Equal (text.RuneCount, wrappedLines.Count);
+			Assert.Equal ("T", wrappedLines [0].ToString ());
+			Assert.Equal ("h", wrappedLines [1].ToString ());
+			Assert.Equal ("i", wrappedLines [2].ToString ());
+			Assert.Equal (".", wrappedLines [^1].ToString ());
+		}
+
+		[Fact]
+		public void WordWrap_Unicode_2LinesWithNonBreakingSpace ()
+		{
+			var text = ustring.Empty;
+			int width = 0;
+			List<ustring> wrappedLines;
+
+			text = "This\u00A0is\n\u00A0a\u00A0sentence.";
+			width = text.RuneCount;
+			wrappedLines = TextFormatter.WordWrap (text, width);
+			Assert.True (wrappedLines.Count == 1);
+
+			width = text.RuneCount - 1;
+			wrappedLines = TextFormatter.WordWrap (text, width);
+#pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
+			Assert.Equal (1, wrappedLines.Count);
+#pragma warning restore xUnit2013 // Do not use equality check to check for collection size.
+			Assert.Equal ("This\u00A0is\u00A0a\u00A0sentence.", wrappedLines [0].ToString ());
+
+			text = "\u00A0\u00A0\u00A0\u00A0\u00A0test\u00A0sentence.";
+			width = text.RuneCount;
+			wrappedLines = TextFormatter.WordWrap (text, width);
+			Assert.True (wrappedLines.Count == 1);
+		}
+
+		[Fact]
 		public void WordWrap_NoNewLines ()
 		{
 			var text = ustring.Empty;
@@ -1656,6 +1734,87 @@ namespace Terminal.Gui {
 			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
 			Assert.Equal ("A Unicode sentence", wrappedLines [0].ToString ());
 			Assert.Equal ("(Ð¿ÑÐ¸Ð²ÐµÑ) has words.", wrappedLines [1].ToString ());
+		}
+
+		/// <summary>
+		/// WordWrap strips CRLF
+		/// </summary>
+		[Fact]
+		public void WordWrap_WithNewLines ()
+		{
+			var text = ustring.Empty;
+			int maxWidth = 0;
+			int expectedClippedWidth = 0;
+
+			List<ustring> wrappedLines;
+
+			text = "A sentence has words.\nA paragraph has lines.";
+			maxWidth = text.RuneCount;
+			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth);
+#pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
+			Assert.Equal (1, wrappedLines.Count);
+#pragma warning restore xUnit2013 // Do not use equality check to check for collection size.
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A sentence has words.A paragraph has lines.", wrappedLines [0].ToString ());
+
+			maxWidth = text.RuneCount - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth);
+#pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
+			Assert.Equal (1, wrappedLines.Count);
+#pragma warning restore xUnit2013 // Do not use equality check to check for collection size.
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A sentence has words.A paragraph has lines.", wrappedLines [0].ToString ());
+
+			maxWidth = text.RuneCount - "words.".Length;
+			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth);
+			Assert.Equal (2, wrappedLines.Count);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A sentence has words.A paragraph has", wrappedLines [0].ToString ());
+			Assert.Equal ("lines.", wrappedLines [1].ToString ());
+
+			// Unicode 
+			text = "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has Линии.";
+			maxWidth = text.RuneCount;
+			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth);
+			Assert.True (wrappedLines.Count == 1);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has Линии.", wrappedLines [0].ToString ());
+
+			maxWidth = text.RuneCount - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth);
+			Assert.Equal (2, wrappedLines.Count);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has", wrappedLines [0].ToString ());
+			Assert.Equal ("Линии.", wrappedLines [1].ToString ());
+
+			maxWidth = text.RuneCount - "words.".Length;
+			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth);
+			Assert.Equal (2, wrappedLines.Count);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has", wrappedLines [0].ToString ());
+			Assert.Equal ("Линии.", wrappedLines [1].ToString ());
+
+			maxWidth = text.RuneCount - "s words.".Length;
+			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth);
+			Assert.Equal (2, wrappedLines.Count);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт", wrappedLines [0].ToString ());
+			Assert.Equal ("has Линии.", wrappedLines [1].ToString ());
+
+			maxWidth = text.RuneCount - "Ð²ÐµÑ) has words.".Length;
+			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			wrappedLines = TextFormatter.WordWrap (text, maxWidth);
+			Assert.Equal (2, wrappedLines.Count);
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
+			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode", wrappedLines [0].ToString ());
+			Assert.Equal ("Пункт has Линии.", wrappedLines [1].ToString ());
 		}
 
 		[Fact]
@@ -2001,13 +2160,13 @@ namespace Terminal.Gui {
 			// Unicode
 			// Even # of chars
 			//      0123456789
-			text = "Ð¿ÑÐ Ð²Ð Ñ";
+			text = "\u2660Ð¿ÑÐ Ð²Ð Ñ";
 
 			maxWidth = text.RuneCount - 1;
 			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 2);
-			Assert.Equal ("Ð¿ÑÐ Ð²Ð", list [0]);
+			Assert.Equal ("\u2660Ð¿ÑÐ Ð²Ð", list [0]);
 			Assert.Equal ("Ñ", list [1]);
 
 			// no clip
@@ -2015,24 +2174,24 @@ namespace Terminal.Gui {
 			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal ("Ð¿ÑÐ Ð²Ð Ñ", list [0]);
+			Assert.Equal ("\u2660Ð¿ÑÐ Ð²Ð Ñ", list [0]);
 
 			maxWidth = text.RuneCount + 1;
 			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal ("Ð¿ÑÐ Ð²Ð Ñ", list [0]);
+			Assert.Equal ("\u2660Ð¿ÑÐ Ð²Ð Ñ", list [0]);
 
 			// Unicode
 			// Odd # of chars
 			//      0123456789
-			text = "Ð ÑÐ Ð²Ð Ñ";
+			text = "\u2660 ÑÐ Ð²Ð Ñ";
 
 			maxWidth = text.RuneCount - 1;
 			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 2);
-			Assert.Equal ("Ð ÑÐ Ð²Ð", list [0]);
+			Assert.Equal ("\u2660 ÑÐ Ð²Ð", list [0]);
 			Assert.Equal ("Ñ", list [1]);
 
 			// no clip
@@ -2040,14 +2199,48 @@ namespace Terminal.Gui {
 			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal ("Ð ÑÐ Ð²Ð Ñ", list [0]);
+			Assert.Equal ("\u2660 ÑÐ Ð²Ð Ñ", list [0]);
 
 			maxWidth = text.RuneCount + 1;
 			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal ("Ð ÑÐ Ð²Ð Ñ", list [0]);
+			Assert.Equal ("\u2660 ÑÐ Ð²Ð Ñ", list [0]);
+		}
 
+		[Fact]
+		public void Reformat_Unicode_Wrap_Spaces_NewLines ()
+		{
+			var text = ustring.Empty;
+			var list = new List<ustring> ();
+			var maxWidth = 0;
+			var expectedClippedWidth = 0;
+			var wrap = true;
+
+			// Unicode
+			text = "\u2460\u2461\u2462\n\u2460\u2461\u2462\u2463\u2464";
+
+			maxWidth = text.RuneCount - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
+			Assert.Equal (2, list.Count);
+			Assert.Equal ("\u2460\u2461\u2462", list [0]);
+			Assert.Equal ("\u2460\u2461\u2462\u2463\u2464", list [1]);
+
+			// no clip
+			maxWidth = text.RuneCount + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
+			Assert.Equal (2, list.Count);
+			Assert.Equal ("\u2460\u2461\u2462", list [0]);
+			Assert.Equal ("\u2460\u2461\u2462\u2463\u2464", list [1]);
+
+			maxWidth = text.RuneCount + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
+			Assert.Equal (2, list.Count);
+			Assert.Equal ("\u2460\u2461\u2462", list [0]);
+			Assert.Equal ("\u2460\u2461\u2462\u2463\u2464", list [1]);
 		}
 	}
 }

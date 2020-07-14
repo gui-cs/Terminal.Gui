@@ -196,7 +196,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Formats the provided text to fit within the width provided using word wrapping.
 		/// </summary>
-		/// <param name="text">The text to word warp</param>
+		/// <param name="text">The text to word wrap</param>
 		/// <param name="width">The width to contrain the text to</param>
 		/// <returns>Returns a list of word wrapped lines.</returns>
 		/// <remarks>
@@ -204,7 +204,7 @@ namespace Terminal.Gui {
 		/// This method does not do any justification.
 		/// </para>
 		/// <para>
-		/// Newlines ('\n' and '\r\n') sequences are honored, adding the appropriate lines to the output.
+		/// This method strips Newline ('\n' and '\r\n') sequences before processing.
 		/// </para>
 		/// </remarks>
 		public static List<ustring> WordWrap (ustring text, int width)
@@ -351,7 +351,7 @@ namespace Terminal.Gui {
 			int runeCount = runes.Count;
 			int lp = 0;
 			for (int i = 0; i < runeCount; i++) {
-				Rune c = text [i];
+				Rune c = runes [i];
 				if (c == '\n') {
 					var wrappedLines = WordWrap (ustring.Make (runes.GetRange (lp, i - lp)), width);
 					foreach (var line in wrappedLines) {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NStack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,17 +27,19 @@ namespace UICatalog {
 			string text = "Hello world, how are you today? Pretty neat!\nSecond line\n\nFourth Line.";
 			string unicode = "Τὴ γλῶσσα μοῦ ἔδωσαν ἑλληνικὴ\nτὸ σπίτι φτωχικὸ στὶς ἀμμουδιὲς τοῦ Ὁμήρου.\nΜονάχη ἔγνοια ἡ γλῶσσα μου στὶς ἀμμουδιὲς τοῦ Ὁμήρου.";
 
-			Label blockText = new Label () { ColorScheme = Colors.TopLevel, X = 0, Y = 3, Height = 7, Width = Dim.Fill (0) };
+			Label blockText = new Label () { ColorScheme = Colors.TopLevel, X = 0, Y = 0, Height = 10, Width = Dim.Fill (0) };
 
 			var block = new StringBuilder ();
-			block.AppendLine ("                        _/                       ");
-			block.AppendLine ("     _/_/_/  _/    _/            _/_/_/    _/_/_/");
-			block.AppendLine ("  _/    _/  _/    _/  _/      _/        _/_/     ");
-			block.AppendLine (" _/    _/  _/    _/  _/      _/            _/_/  ");
-			block.AppendLine ("  _/_/_/    _/_/_/  _/  _/    _/_/_/  _/_/_/     ");
-			block.AppendLine ("     _/                                          ");
-			block.AppendLine ("_ /_/                                            ");
-			blockText.Text = block.ToString ();
+			block.AppendLine ("  ▄████  █    ██  ██▓      ▄████▄    ██████ ");
+			block.AppendLine (" ██▒ ▀█▒ ██  ▓██▒▓██▒     ▒██▀ ▀█  ▒██    ▒ ");
+			block.AppendLine ("▒██░▄▄▄░▓██  ▒██░▒██▒     ▒▓█    ▄ ░ ▓██▄   ");
+			block.AppendLine ("░▓█  ██▓▓▓█  ░██░░██░     ▒▓▓▄ ▄██▒  ▒   ██▒");
+			block.AppendLine ("░▒▓███▀▒▒▒█████▓ ░██░ ██▓ ▒ ▓███▀ ░▒██████▒▒");
+			block.AppendLine (" ░▒   ▒ ░▒▓▒ ▒ ▒ ░▓   ▒▓▒ ░ ░▒ ▒  ░▒ ▒▓▒ ▒ ░");
+			block.AppendLine ("  ░   ░ ░░▒░ ░ ░  ▒ ░ ░▒    ░  ▒   ░ ░▒  ░ ░");
+			block.AppendLine ("░ ░   ░  ░░░ ░ ░  ▒ ░ ░   ░        ░  ░  ░  ");
+			block.AppendLine ("      ░    ░      ░    ░  ░ ░            ░  ");
+			block.AppendLine ("                       ░  ░                 "); blockText.Text = ustring.Make (block.ToString ()); // .Replace(" ", "\u00A0"); // \u00A0 is 'non-breaking space
 			Win.Add (blockText);
 
 			var unicodeCheckBox = new CheckBox ("Unicode", Top.HotKeySpecifier == (Rune)' ') {
