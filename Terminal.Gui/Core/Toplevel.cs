@@ -122,6 +122,42 @@ namespace Terminal.Gui {
 		public StatusBar StatusBar { get; set; }
 
 		///<inheritdoc/>
+		public override bool OnKeyDown (KeyEvent keyEvent)
+		{
+			if (base.OnKeyDown (keyEvent)) {
+				return true;
+			}
+
+			switch (keyEvent.Key) {
+			case Key.AltMask:
+				if (MenuBar != null && MenuBar.OnKeyDown (keyEvent)) {
+					return true;
+				}
+				break;
+			}
+
+			return false;
+		}
+
+		///<inheritdoc/>
+		public override bool OnKeyUp (KeyEvent keyEvent)
+		{
+			if (base.OnKeyUp (keyEvent)) {
+				return true;
+			}
+
+			switch (keyEvent.Key) {
+			case Key.AltMask:
+				if (MenuBar != null && MenuBar.OnKeyUp (keyEvent)) {
+					return true;
+				}
+				break;
+			}
+
+			return false;
+		}
+
+		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			if (base.ProcessKey (keyEvent))

@@ -218,7 +218,8 @@ namespace Terminal.Gui {
 				return true;
 
 
-			if (mouseEvent.Flags == MouseFlags.Button1Clicked) {
+			if (mouseEvent.Flags == MouseFlags.Button1Clicked || mouseEvent.Flags == MouseFlags.Button1DoubleClicked ||
+				mouseEvent.Flags == MouseFlags.Button1TripleClicked) {
 				if (!HasFocus && SuperView != null) {
 					SuperView.SetFocus (this);
 					SetNeedsDisplay ();
