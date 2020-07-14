@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Responder
    ">
-    <meta name="generator" content="docfx 2.54.0.0">
+    <meta name="generator" content="docfx 2.56.1.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -93,6 +93,10 @@ Responder base class implemented by objects that want to participate on keyboard
     <div class="level1"><span class="xref">Responder</span></div>
       <div class="level2"><a class="xref" href="Terminal.Gui.View.html">View</a></div>
   </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><span class="xref">System.IDisposable</span></div>
+  </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -121,7 +125,7 @@ Responder base class implemented by objects that want to participate on keyboard
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Responder_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class Responder</code></pre>
+    <pre><code class="lang-csharp hljs">public class Responder : IDisposable</code></pre>
   </div>
   <h3 id="properties">Properties
   </h3>
@@ -183,6 +187,56 @@ Gets or sets a value indicating whether this <a class="xref" href="Terminal.Gui.
   </h3>
   
   
+  <a id="Terminal_Gui_Responder_Dispose_" data-uid="Terminal.Gui.Responder.Dispose*"></a>
+  <h4 id="Terminal_Gui_Responder_Dispose" data-uid="Terminal.Gui.Responder.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary">
+Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resource.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_Responder_Dispose_" data-uid="Terminal.Gui.Responder.Dispose*"></a>
+  <h4 id="Terminal_Gui_Responder_Dispose_System_Boolean_" data-uid="Terminal.Gui.Responder.Dispose(System.Boolean)">Dispose(Boolean)</h4>
+  <div class="markdown level1 summary">
+Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void Dispose(bool disposing)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">disposing</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_Responder_Dispose_System_Boolean__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+If disposing equals true, the method has been called directly
+or indirectly by a user&apos;s code. Managed and unmanaged resources
+can be disposed.
+If disposing equals false, the method has been called by the
+runtime from inside the finalizer and you should not reference
+other objects. Only unmanaged resources can be disposed.		
+</div>
+  
+  
   <a id="Terminal_Gui_Responder_MouseEvent_" data-uid="Terminal.Gui.Responder.MouseEvent*"></a>
   <h4 id="Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.Responder.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
   <div class="markdown level1 summary">
@@ -228,15 +282,32 @@ Method invoked when a mouse event is generated
   
   
   <a id="Terminal_Gui_Responder_OnEnter_" data-uid="Terminal.Gui.Responder.OnEnter*"></a>
-  <h4 id="Terminal_Gui_Responder_OnEnter" data-uid="Terminal.Gui.Responder.OnEnter">OnEnter()</h4>
+  <h4 id="Terminal_Gui_Responder_OnEnter_Terminal_Gui_View_" data-uid="Terminal.Gui.Responder.OnEnter(Terminal.Gui.View)">OnEnter(View)</h4>
   <div class="markdown level1 summary">
 Method invoked when a view gets focus.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual bool OnEnter()</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual bool OnEnter(View view)</code></pre>
   </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td>The view that is losing focus.</td>
+      </tr>
+    </tbody>
+  </table>
   <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
@@ -343,15 +414,32 @@ Method invoked when a key is released.
   
   
   <a id="Terminal_Gui_Responder_OnLeave_" data-uid="Terminal.Gui.Responder.OnLeave*"></a>
-  <h4 id="Terminal_Gui_Responder_OnLeave" data-uid="Terminal.Gui.Responder.OnLeave">OnLeave()</h4>
+  <h4 id="Terminal_Gui_Responder_OnLeave_Terminal_Gui_View_" data-uid="Terminal.Gui.Responder.OnLeave(Terminal.Gui.View)">OnLeave(View)</h4>
   <div class="markdown level1 summary">
 Method invoked when a view loses focus.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual bool OnLeave()</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual bool OnLeave(View view)</code></pre>
   </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td>The view that is getting focus.</td>
+      </tr>
+    </tbody>
+  </table>
   <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
@@ -645,6 +733,10 @@ chance to process the keystroke.
   other View subclasses.
 </p>
 </div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <span class="xref">System.IDisposable</span>
+  </div>
 </article>
           </div>
           

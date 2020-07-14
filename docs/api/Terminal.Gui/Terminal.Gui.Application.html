@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Application
    ">
-    <meta name="generator" content="docfx 2.54.0.0">
+    <meta name="generator" content="docfx 2.56.1.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -509,7 +509,7 @@ Building block API: completes the execution of a <a class="xref" href="Terminal.
       <tr>
         <td><span class="xref">System.Boolean</span></td>
         <td><span class="parametername">closeDriver</span></td>
-        <td><code>true</code>Closes the application.<code>false</code>Closes the toplevels only.</td>
+        <td>If <code>true</code>, closes the application. If <code>false</code> closes the toplevels only.</td>
       </tr>
     </tbody>
   </table>
@@ -545,16 +545,38 @@ Grabs the mouse, forcing all mouse events to be routed to the specified view unt
   
   
   <a id="Terminal_Gui_Application_Init_" data-uid="Terminal.Gui.Application.Init*"></a>
-  <h4 id="Terminal_Gui_Application_Init" data-uid="Terminal.Gui.Application.Init">Init()</h4>
+  <h4 id="Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_" data-uid="Terminal.Gui.Application.Init(Terminal.Gui.ConsoleDriver,Terminal.Gui.IMainLoopDriver)">Init(ConsoleDriver, IMainLoopDriver)</h4>
   <div class="markdown level1 summary">
 Initializes a new instance of <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a> Application. 
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static void Init()</code></pre>
+    <pre><code class="lang-csharp hljs">public static void Init(ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null)</code></pre>
   </div>
-  <h5 id="Terminal_Gui_Application_Init_remarks">Remarks</h5>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ConsoleDriver.html">ConsoleDriver</a></td>
+        <td><span class="parametername">driver</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.IMainLoopDriver.html">IMainLoopDriver</a></td>
+        <td><span class="parametername">mainLoopDriver</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver__remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 <p>
 Call this method once per instance (or after <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Shutdown_System_Boolean_">Shutdown(Boolean)</a> has been called).
@@ -680,12 +702,12 @@ Runs the main loop on the given <a class="xref" href="Terminal.Gui.Toplevel.html
       <tr>
         <td><a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a></td>
         <td><span class="parametername">view</span></td>
-        <td></td>
+        <td>The <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> tu run modally.</td>
       </tr>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
         <td><span class="parametername">closeDriver</span></td>
-        <td></td>
+        <td>Set to <true></true> to cause the MainLoop to end when <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_System_Boolean_">End(Application.RunState, Boolean)</a> is called, clsing the toplevels only.</td>
       </tr>
     </tbody>
   </table>
@@ -722,6 +744,7 @@ Runs the application by calling <a class="xref" href="Terminal.Gui.Application.h
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static void Run&lt;T&gt;()
+
     where T : Toplevel, new()</code></pre>
   </div>
   <h5 class="typeParameters">Type Parameters</h5>
@@ -783,7 +806,7 @@ blocking or non-blocking call.
   <a id="Terminal_Gui_Application_Shutdown_" data-uid="Terminal.Gui.Application.Shutdown*"></a>
   <h4 id="Terminal_Gui_Application_Shutdown_System_Boolean_" data-uid="Terminal.Gui.Application.Shutdown(System.Boolean)">Shutdown(Boolean)</h4>
   <div class="markdown level1 summary">
-Shutdown an application initialized with <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Init">Init()</a>
+Shutdown an application initialized with <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_">Init(ConsoleDriver, IMainLoopDriver)</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>

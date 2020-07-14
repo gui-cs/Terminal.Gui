@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Dim
    ">
-    <meta name="generator" content="docfx 2.54.0.0">
+    <meta name="generator" content="docfx 2.56.1.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -95,13 +95,7 @@ Dim properties of a <a class="xref" href="Terminal.Gui.View.html">View</a> to co
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
       <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
     </div>
     <div>
       <span class="xref">System.Object.GetType()</span>
@@ -136,6 +130,51 @@ Dim properties of a <a class="xref" href="Terminal.Gui.View.html">View</a> to co
 </div>
   <h3 id="methods">Methods
   </h3>
+  
+  
+  <a id="Terminal_Gui_Dim_Equals_" data-uid="Terminal.Gui.Dim.Equals*"></a>
+  <h4 id="Terminal_Gui_Dim_Equals_System_Object_" data-uid="Terminal.Gui.Dim.Equals(System.Object)">Equals(Object)</h4>
+  <div class="markdown level1 summary">Determines whether the specified object is equal to the current object.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool Equals(object other)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">other</span></td>
+        <td>The object to compare with the current object. </td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>
+<span class="xref">true</span> if the specified object  is equal to the current object; otherwise, <span class="xref">false</span>.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.Object.Equals(System.Object)</span></div>
   
   
   <a id="Terminal_Gui_Dim_Fill_" data-uid="Terminal.Gui.Dim.Fill*"></a>
@@ -180,6 +219,33 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Dim.html">D
       </tr>
     </tbody>
   </table>
+  
+  
+  <a id="Terminal_Gui_Dim_GetHashCode_" data-uid="Terminal.Gui.Dim.GetHashCode*"></a>
+  <h4 id="Terminal_Gui_Dim_GetHashCode" data-uid="Terminal.Gui.Dim.GetHashCode">GetHashCode()</h4>
+  <div class="markdown level1 summary">Serves as the default hash function. </div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override int GetHashCode()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td>A hash code for the current object.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.Object.GetHashCode()</span></div>
   
   
   <a id="Terminal_Gui_Dim_Height_" data-uid="Terminal.Gui.Dim.Height*"></a>
@@ -227,14 +293,14 @@ Returns a <a class="xref" href="Terminal.Gui.Dim.html">Dim</a> object tracks the
   
   
   <a id="Terminal_Gui_Dim_Percent_" data-uid="Terminal.Gui.Dim.Percent*"></a>
-  <h4 id="Terminal_Gui_Dim_Percent_System_Single_" data-uid="Terminal.Gui.Dim.Percent(System.Single)">Percent(Single)</h4>
+  <h4 id="Terminal_Gui_Dim_Percent_System_Single_System_Boolean_" data-uid="Terminal.Gui.Dim.Percent(System.Single,System.Boolean)">Percent(Single, Boolean)</h4>
   <div class="markdown level1 summary">
 Creates a percentage <a class="xref" href="Terminal.Gui.Dim.html">Dim</a> object
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Dim Percent(float n)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Dim Percent(float n, bool r = false)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -250,6 +316,11 @@ Creates a percentage <a class="xref" href="Terminal.Gui.Dim.html">Dim</a> object
         <td><span class="xref">System.Single</span></td>
         <td><span class="parametername">n</span></td>
         <td>A value between 0 and 100 representing the percentage.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">r</span></td>
+        <td>If <code>true</code> the Percent is computed based on the remaining space after the X/Y anchor positions. If <code>false</code> is computed based on the whole original space.</td>
       </tr>
     </tbody>
   </table>
@@ -268,7 +339,7 @@ Creates a percentage <a class="xref" href="Terminal.Gui.Dim.html">Dim</a> object
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Dim_Percent_System_Single__examples">Examples</h5>
+  <h5 id="Terminal_Gui_Dim_Percent_System_Single_System_Boolean__examples">Examples</h5>
   
 This initializes a <a class="xref" href="Terminal.Gui.TextField.html">TextField</a>that is centered horizontally, is 50% of the way down, 
 is 30% the height, and is 80% the width of the <a class="xref" href="Terminal.Gui.View.html">View</a> it added to.
