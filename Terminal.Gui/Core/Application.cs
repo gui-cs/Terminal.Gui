@@ -161,6 +161,9 @@ namespace Terminal.Gui {
 
 		internal static bool _initialized = false;
 
+		static IMainLoopDriver oldMainLoopDriver;
+		static ConsoleDriver oldDriver;		
+
 		/// <summary>
 		/// Initializes the Terminal.Gui application
 		/// </summary>
@@ -189,8 +192,15 @@ namespace Terminal.Gui {
 					mainLoopDriver = windowsDriver;
 					Driver = windowsDriver;
 				} else {
-					mainLoopDriver = new UnixMainLoop ();
-					Driver = new CursesDriver ();
+					if (oldMainLoopDriver == null && oldDriver == null) {
+						mainLoopDriver = new UnixMainLoop ();
+						Driver = new CursesDriver ();
+						oldMainLoopDriver = mainLoopDriver;
+						oldDriver = Driver;
+					} else {
+						mainLoopDriver = oldMainLoopDriver;
+						Driver = oldDriver;
+					}
 				}
 				Driver.Init (TerminalResized);
 				MainLoop = new MainLoop (mainLoopDriver);
