@@ -10,19 +10,9 @@ namespace UICatalog {
 	[ScenarioCategory ("Text")]
 	[ScenarioCategory ("POC")]
 	class TextFormatterDemo : Scenario {
-		//public override void Init (Toplevel top, ColorScheme colorScheme)
-		//{
-		//	Application.Init ();
-
-		//	Top = top;
-		//	if (Top == null) {
-		//		Top = Application.Top;
-		//	}
-		//	Win = null;
-		//}
-
 		public override void Setup ()
 		{
+			// TODO: Move this to another Scenario that specifically tests `Views` that have no subviews.
 			//Top.Text = "Press CTRL-Q to Quit. This is the Text for the TopLevel View. TextAlignment.Centered was specified. It is intentionally very long to illustrate word wrap.\n" +
 			//	"<-- There is a new line here to show a hard line break. You should see this text bleed underneath the subviews, which start at Y = 3.";
 			//Top.TextAlignment = TextAlignment.Centered;

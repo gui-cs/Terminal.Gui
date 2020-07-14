@@ -227,7 +227,7 @@ namespace Terminal.Gui {
 					end -= 1;
 				if (end == start)
 					end = start + width;
-				lines.Add (ustring.Make (runes.GetRange (start, end - start))); //.TrimStart ((rune) => rune == ' '));
+				lines.Add (ustring.Make (runes.GetRange (start, end - start))); 
 				start = end;
 				if (runes[end] == ' ') {
 					start++;
@@ -235,7 +235,7 @@ namespace Terminal.Gui {
 			}
 
 			if (start < text.RuneCount) {
-				lines.Add (ustring.Make (runes.GetRange (start, runes.Count - start))); //.TrimStart ((rune) => rune == ' '));
+				lines.Add (ustring.Make (runes.GetRange (start, runes.Count - start)));
 			}
 
 			return lines;
@@ -286,15 +286,13 @@ namespace Terminal.Gui {
 				return text;
 			}
 
-			// TODO: Use ustring
-			var words = text.Split (ustring.Make (' '));// whitespace, StringSplitOptions.RemoveEmptyEntries);
+			var words = text.Split (ustring.Make (' '));
 			int textCount = words.Sum (arg => arg.RuneCount);
 
 			var spaces = words.Length > 1 ? (width - textCount) / (words.Length - 1) : 0;
 			var extras = words.Length > 1 ? (width - textCount) % words.Length : 0;
 
 			var s = new System.Text.StringBuilder ();
-			//s.Append ($"tc={textCount} sp={spaces},x={extras} - ");
 			for (int w = 0; w < words.Length; w++) {
 				var x = words [w];
 				s.Append (x);
@@ -302,7 +300,6 @@ namespace Terminal.Gui {
 					for (int i = 0; i < spaces; i++)
 						s.Append (spaceChar);
 				if (extras > 0) {
-					//s.Append ('_');
 					extras--;
 				}
 			}
