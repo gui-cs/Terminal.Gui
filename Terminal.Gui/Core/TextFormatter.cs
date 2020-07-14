@@ -162,6 +162,8 @@ namespace Terminal.Gui {
 						runes.RemoveAt (i);
 						runes.RemoveAt (i + 1);
 						i++;
+					} else {
+						runes.RemoveAt (i);
 					}
 					break;
 				}
@@ -182,6 +184,8 @@ namespace Terminal.Gui {
 						runes [i] = (Rune)' ';
 						runes.RemoveAt (i + 1);
 						i++;
+					} else {
+						runes [i] = (Rune)' ';
 					}
 					break;
 				}
@@ -223,12 +227,15 @@ namespace Terminal.Gui {
 					end -= 1;
 				if (end == start)
 					end = start + width;
-				lines.Add (ustring.Make (runes.GetRange (start, end - start)).TrimSpace ());
+				lines.Add (ustring.Make (runes.GetRange (start, end - start))); //.TrimStart ((rune) => rune == ' '));
 				start = end;
+				if (runes[end] == ' ') {
+					start++;
+				}
 			}
 
 			if (start < text.RuneCount) {
-				lines.Add (ustring.Make (runes.GetRange (start, runes.Count - start)).TrimSpace ());
+				lines.Add (ustring.Make (runes.GetRange (start, runes.Count - start))); //.TrimStart ((rune) => rune == ' '));
 			}
 
 			return lines;

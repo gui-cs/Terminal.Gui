@@ -1674,16 +1674,12 @@ namespace Terminal.Gui {
 			//Assert.True (wrappedLines.Count == );
 			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
 			Assert.Equal ("A", wrappedLines [0].ToString ());
-			// BUGBUG: WordWrap breaks down with small widths. It should not
-			// the following line should be "sen"...
-			Assert.Equal ("se", wrappedLines [1].ToString ());
-			Assert.Equal ("nte", wrappedLines [2].ToString ());
-			Assert.Equal ("nce", wrappedLines [3].ToString ());
-			Assert.Equal ("ha", wrappedLines [4].ToString ());
-			Assert.Equal ("s", wrappedLines [5].ToString ());
-			Assert.Equal ("wo", wrappedLines [6].ToString ());
-			Assert.Equal ("rds", wrappedLines [7].ToString ());
-			Assert.Equal (".", wrappedLines [^1].ToString ());
+			Assert.Equal ("sen", wrappedLines [1].ToString ());
+			Assert.Equal ("ten", wrappedLines [2].ToString ());
+			Assert.Equal ("ce", wrappedLines [3].ToString ());
+			Assert.Equal ("has", wrappedLines [4].ToString ());
+			Assert.Equal ("wor", wrappedLines [5].ToString ());
+			Assert.Equal ("ds.", wrappedLines [6].ToString ());
 
 			maxWidth = 2;
 			expectedClippedWidth = 2;
@@ -1691,10 +1687,10 @@ namespace Terminal.Gui {
 			//Assert.True (wrappedLines.Count == );
 			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
 			Assert.Equal ("A", wrappedLines [0].ToString ());
-			Assert.Equal ("s", wrappedLines [1].ToString ());
-			Assert.Equal ("en", wrappedLines [2].ToString ());
-			Assert.Equal ("te", wrappedLines [3].ToString ());
-			Assert.Equal (".", wrappedLines [^1].ToString ());
+			Assert.Equal ("se", wrappedLines [1].ToString ());
+			Assert.Equal ("nt", wrappedLines [2].ToString ());
+			Assert.Equal ("en", wrappedLines [3].ToString ());
+			Assert.Equal ("s.", wrappedLines [^1].ToString ());
 
 			maxWidth = 1;
 			expectedClippedWidth = 1;
@@ -1702,12 +1698,9 @@ namespace Terminal.Gui {
 			//Assert.True (wrappedLines.Count == );
 			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
 			Assert.Equal ("A", wrappedLines [0].ToString ());
-			// BUGBUG: WordWrap breaks down with a width of one. It should not
-			// provide blank lines like it does.
-			Assert.Equal ("", wrappedLines [1].ToString ());
-			Assert.Equal ("s", wrappedLines [2].ToString ());
-			Assert.Equal ("e", wrappedLines [3].ToString ());
-			Assert.Equal ("n", wrappedLines [4].ToString ());
+			Assert.Equal ("s", wrappedLines [1].ToString ());
+			Assert.Equal ("e", wrappedLines [2].ToString ());
+			Assert.Equal ("n", wrappedLines [3].ToString ());
 			Assert.Equal (".", wrappedLines [^1].ToString ());
 
 		}
