@@ -5,12 +5,12 @@
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
     <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
-    <AssemblyVersion>0.90.0.0</AssemblyVersion>
+    <AssemblyVersion>0.89.0.0</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <PackageId>Terminal.Gui</PackageId>
-    <PackageVersion>0.90</PackageVersion>
+    <PackageVersion>0.89</PackageVersion>
     <Authors>Miguel de Icaza, Charlie Kindel (@tig), @BDisp</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/migueldeicaza/gui.cs/</PackageProjectUrl>
@@ -20,7 +20,7 @@
     <Summary>Application framework for creating modern console applications using .NET</Summary>
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
     <PackageReleaseNotes>
-      0.90: (Still Under Construction - Will be Feature Complete release for 1.0)
+      0.90: Feature Complete pre-release of 1.00
       * API documentation completely revamped and updated. Readme upated. Contributors guide added (Thanks @tig!)
       * New sample/demo app - UI Catalog - Replaces demo.cs with an easy to use and extend set of demo scenarios. (Thanks @tig!)
       * MenuBar can now have MenuItems directly (enables top-level menu items with no submenu). (Thanks @tig!)
