@@ -127,7 +127,7 @@ namespace UICatalog {
 			Application.UseSystemConsole = false;
 			Application.Init ();
 
-			// Set this here because not initilzied until driver is loaded
+			// Set this here because not initialized until driver is loaded
 			_baseColorScheme = Colors.Base;
 
 			StringBuilder aboutMessage = new StringBuilder ();
@@ -235,7 +235,7 @@ namespace UICatalog {
 				}
 			};
 
-			Application.Run (_top, true);
+			Application.Run (_top);
 			Application.Shutdown ();
 			return _runningScenario;
 		}
