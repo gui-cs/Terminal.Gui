@@ -238,8 +238,8 @@ namespace Terminal.Gui {
 		/// the "Source" property to reset the internal settings of the ListView.</param>
 		public ListView (IListDataSource source) : base ()
 		{
-			Source = source;
-			CanFocus = true;
+			this.source = source;
+			Initialize ();
 		}
 
 		/// <summary>
@@ -247,6 +247,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public ListView () : base ()
 		{
+			Initialize ();
 		}
 
 		/// <summary>
@@ -256,6 +257,7 @@ namespace Terminal.Gui {
 		/// <param name="source">An IList data source, if the elements of the IList are strings or ustrings, the string is rendered, otherwise the ToString() method is invoked on the result.</param>
 		public ListView (Rect rect, IList source) : this (rect, MakeWrapper (source))
 		{
+			Initialize ();
 		}
 
 		/// <summary>
@@ -264,6 +266,12 @@ namespace Terminal.Gui {
 		/// <param name="rect">Frame for the listview.</param>
 		/// <param name="source">IListDataSource object that provides a mechanism to render the data. The number of elements on the collection should not change, if you must change, set the "Source" property to reset the internal settings of the ListView.</param>
 		public ListView (Rect rect, IListDataSource source) : base (rect)
+		{
+			this.source = source;
+			Initialize ();
+		}
+
+		void Initialize ()
 		{
 			Source = source;
 			CanFocus = true;
