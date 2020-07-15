@@ -496,12 +496,29 @@ namespace Terminal.Gui {
 
 		public WindowsDriver ()
 		{
+			Initialize ();
+		}
+
+		public WindowsDriver (int cols, int rows)
+		{
+			this.cols = cols;
+			this.rows = rows;
+
+			Initialize ();
+		}
+
+		void Initialize ()
+		{
 			winConsole = new WindowsConsole ();
 
 			SetupColorsAndBorders ();
 
-			cols = Console.WindowWidth;
-			rows = Console.WindowHeight;
+			if (cols == 0 && rows == 0) {
+				cols = Console.WindowWidth;
+				rows = Console.WindowHeight;
+			} else {
+				Console.SetWindowSize (cols, rows);
+			}
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 
 			ResizeScreen ();
