@@ -153,7 +153,7 @@ namespace Terminal.Gui {
 
 		bool CheckKey (KeyEvent key)
 		{
-			if (key.Key == HotKey) {
+			if (key.Key == (Key.AltMask | HotKey)) {
 				this.SuperView.SetFocus (this);
 				Clicked?.Invoke ();
 				return true;
