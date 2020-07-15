@@ -718,5 +718,34 @@ namespace Terminal.Gui {
 			Assert.False (v1.CanFocus);
 			Assert.False (v2.CanFocus);
 		}
+
+		[Fact]
+		public void CanFocus_Faced_With_Container ()
+		{
+			var t = new Toplevel ();
+			var w = new Window ();
+			var f = new FrameView ();
+			var v = new View () { CanFocus = true };
+			f.Add (v);
+			w.Add (f);
+			t.Add (w);
+
+			Assert.True (t.CanFocus);
+			Assert.True (w.CanFocus);
+			Assert.True (f.CanFocus);
+			Assert.True (v.CanFocus);
+
+			f.CanFocus = false;
+			Assert.False (f.CanFocus);
+			Assert.True (v.CanFocus);
+
+			v.CanFocus = false;
+			Assert.False (f.CanFocus);
+			Assert.False (v.CanFocus);
+
+			v.CanFocus = true;
+			Assert.False (f.CanFocus);
+			Assert.True (v.CanFocus);
+		}
 	}
 }
