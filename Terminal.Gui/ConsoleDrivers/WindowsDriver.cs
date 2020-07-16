@@ -439,6 +439,23 @@ namespace Terminal.Gui {
 			}
 		}
 
+		[DllImport ("kernel32.dll", ExactSpelling = true)]
+		private static extern IntPtr GetConsoleWindow ();
+
+		[DllImport ("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		private static extern bool ShowWindow (IntPtr hWnd, int nCmdShow);
+
+		public const int HIDE = 0;
+		public const int MAXIMIZE = 3;
+		public const int MINIMIZE = 6;
+		public const int RESTORE = 9;
+
+		internal void ShowWindow (int state)
+		{
+			IntPtr thisConsole = GetConsoleWindow ();
+			ShowWindow (thisConsole, state);
+		}
+
 #if false // See: https://github.com/migueldeicaza/gui.cs/issues/357
 		[StructLayout (LayoutKind.Sequential)]
 		public struct SMALL_RECT {
@@ -496,29 +513,14 @@ namespace Terminal.Gui {
 
 		public WindowsDriver ()
 		{
-			Initialize ();
-		}
-
-		public WindowsDriver (int cols, int rows)
-		{
-			this.cols = cols;
-			this.rows = rows;
-
-			Initialize ();
-		}
-
-		void Initialize ()
-		{
 			winConsole = new WindowsConsole ();
 
 			SetupColorsAndBorders ();
 
-			if (cols == 0 && rows == 0) {
-				cols = Console.WindowWidth;
-				rows = Console.WindowHeight;
-			} else {
-				Console.SetWindowSize (cols, rows);
-			}
+			cols = Console.WindowWidth;
+			rows = Console.WindowHeight;
+			winConsole.ShowWindow (WindowsConsole.RESTORE);
+
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 
 			ResizeScreen ();
