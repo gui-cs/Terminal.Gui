@@ -161,7 +161,6 @@ namespace Terminal.Gui {
 
 		internal static bool _initialized = false;
 
-		static int cols, rows;
 		static IMainLoopDriver oldMainLoopDriver;
 		static ConsoleDriver oldDriver;
 
@@ -189,7 +188,7 @@ namespace Terminal.Gui {
 					mainLoopDriver = new NetMainLoop (() => Console.ReadKey (true));
 					Driver = new NetDriver ();
 				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
-					var windowsDriver = cols == 0 && rows == 0 ? new WindowsDriver () : new WindowsDriver (cols, rows);
+					var windowsDriver = new WindowsDriver ();
 					mainLoopDriver = windowsDriver;
 					Driver = windowsDriver;
 				} else {
@@ -557,8 +556,6 @@ namespace Terminal.Gui {
 			}
 			last?.PositionCursor ();
 			Driver.Refresh ();
-			cols = Driver.Cols;
-			rows = Driver.Rows;
 		}
 
 		internal static void End (View view, bool closeDriver = true)
