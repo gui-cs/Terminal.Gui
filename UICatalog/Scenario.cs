@@ -198,7 +198,7 @@ namespace UICatalog {
 		public virtual void Run ()
 		{
 			// This method already performs a later automatic shutdown.
-			Application.Run (Top);
+			Application.Run (Top, false);
 		}
 
 		/// <summary>

@@ -1225,9 +1225,9 @@ namespace Terminal.Gui {
 								menu.Dispose ();
 							}
 						} else if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1TripleClicked) {
-							if (IsMenuOpen) {
+							if (me.Flags != MouseFlags.Button1Pressed && IsMenuOpen) {
 								CloseAllMenus ();
-							} else {
+							} else if (!Menus [i].IsTopLevel) {
 								Activate (i);
 							}
 						} else if (selected != i && selected > -1 && (me.Flags == MouseFlags.ReportMousePosition ||
