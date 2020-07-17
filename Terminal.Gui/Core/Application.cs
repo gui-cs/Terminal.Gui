@@ -546,8 +546,12 @@ namespace Terminal.Gui {
 				throw new ArgumentException ("The view that you end with must be balanced");
 			toplevels.Pop ();
 
-			if (toplevels.Count > 0) {
+			if (toplevels.Count == 0) {
+				Current = null;
+				CurrentView = null;
+			} else {
 				Current = toplevels.Peek ();
+				CurrentView = Current;
 				Refresh ();
 			}
 		}
