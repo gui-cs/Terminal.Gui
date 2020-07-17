@@ -166,7 +166,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		static void Init (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null)
 		{
-			if (_initialized) return;
+			if (_initialized && driver == null) return;
 
 			// This supports Unit Tests and the passing of a mock driver/loopdriver
 			if (driver != null) {
