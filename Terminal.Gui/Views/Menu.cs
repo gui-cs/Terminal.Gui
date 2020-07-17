@@ -1217,7 +1217,7 @@ namespace Terminal.Gui {
 				int pos = 1;
 				int cx = me.X;
 				for (int i = 0; i < Menus.Length; i++) {
-					if (cx > pos && me.X < pos + 1 + Menus [i].TitleLength) {
+					if (cx >= pos && cx < pos + 1 + Menus [i].TitleLength + 2) {
 						if (me.Flags == MouseFlags.Button1Clicked) {
 							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
@@ -1242,7 +1242,7 @@ namespace Terminal.Gui {
 						}
 						return true;
 					}
-					pos += 2 + Menus [i].TitleLength + 1;
+					pos += 1 + Menus [i].TitleLength + 2;
 				}
 			}
 			return false;
