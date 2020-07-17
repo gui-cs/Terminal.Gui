@@ -420,7 +420,7 @@ namespace Terminal.Gui {
 				return v;
 			}
 		}
-		
+
 		public InputRecord [] ReadConsoleInput ()
 		{
 			const int bufferSize = 1;
@@ -438,7 +438,7 @@ namespace Terminal.Gui {
 				Marshal.FreeHGlobal (pRecord);
 			}
 		}
-
+#if false	// Not needed on the constructor. Perhaps could be used on resizing. To study.
 		[DllImport ("kernel32.dll", ExactSpelling = true)]
 		private static extern IntPtr GetConsoleWindow ();
 
@@ -455,7 +455,7 @@ namespace Terminal.Gui {
 			IntPtr thisConsole = GetConsoleWindow ();
 			ShowWindow (thisConsole, state);
 		}
-
+#endif
 #if false // See: https://github.com/migueldeicaza/gui.cs/issues/357
 		[StructLayout (LayoutKind.Sequential)]
 		public struct SMALL_RECT {
@@ -519,8 +519,9 @@ namespace Terminal.Gui {
 
 			cols = Console.WindowWidth;
 			rows = Console.WindowHeight;
+#if false
 			winConsole.ShowWindow (WindowsConsole.RESTORE);
-
+#endif
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 
 			ResizeScreen ();
@@ -1323,7 +1324,7 @@ namespace Terminal.Gui {
 			winConsole.Cleanup ();
 		}
 
-		#region Unused
+#region Unused
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
 		}
@@ -1351,7 +1352,7 @@ namespace Terminal.Gui {
 		public override void CookMouse ()
 		{
 		}
-		#endregion
+#endregion
 
 	}
 
