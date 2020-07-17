@@ -15,7 +15,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	/// <remarks>
 	///   <para>
-	///     Toplevels can be modally executing views, started by calling <see cref="Application.Run(Toplevel, bool)"/>. 
+	///     Toplevels can be modally executing views, started by calling <see cref="Application.Run(Toplevel)"/>. 
 	///     They return control to the caller when <see cref="Application.RequestStop()"/> has 
 	///     been called (which sets the <see cref="Toplevel.Running"/> property to false). 
 	///   </para>
@@ -23,7 +23,7 @@ namespace Terminal.Gui {
 	///     A Toplevel is created when an application initialzies Terminal.Gui by callling <see cref="Application.Init(ConsoleDriver, IMainLoopDriver)"/>.
 	///     The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created 
 	///     and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and 
-	///     call <see cref="Application.Run(Toplevel, bool)"/>.
+	///     call <see cref="Application.Run(Toplevel)"/>.
 	///   </para>
 	///   <para>
 	///     Toplevels can also opt-in to more sophisticated initialization
@@ -382,7 +382,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoked by <see cref="Application.Begin"/> as part of the <see cref="Application.Run(Toplevel, bool)"/> after
+		/// Invoked by <see cref="Application.Begin"/> as part of the <see cref="Application.Run(Toplevel)"/> after
 		/// the views have been laid out, and before the views are drawn for the first time.
 		/// </summary>
 		public virtual void WillPresent ()
