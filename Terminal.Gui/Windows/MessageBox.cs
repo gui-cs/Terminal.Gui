@@ -149,7 +149,7 @@ namespace Terminal.Gui {
 			}
 
 			// Rin the modal; do not shutdown the mainloop driver when done
-			Application.Run (d, false);
+			Application.Run (d);
 			return clicked;
 		}
 	}

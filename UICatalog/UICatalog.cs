@@ -93,10 +93,13 @@ namespace UICatalog {
 #endif
 
 				Application.UseSystemConsole = _useSystemConsole;
-				Application.Init ();
 				scenario.Init (Application.Top, _baseColorScheme);
 				scenario.Setup ();
 				scenario.Run ();
+				_top.Ready += () => {
+					_top.SetFocus (_rightPane);
+					_top.Ready = null;
+				};
 
 #if DEBUG_IDISPOSABLE
 				// After the scenario runs, validate all Responder-based instances
@@ -107,6 +110,8 @@ namespace UICatalog {
 				Responder.Instances.Clear();
 #endif
 			}
+
+			Application.Shutdown ();
 
 #if DEBUG_IDISPOSABLE
 			// This proves that when the user exited the UI Catalog app
@@ -230,13 +235,11 @@ namespace UICatalog {
 			_top.Add (_statusBar);
 			_top.Ready += () => {
 				if (_runningScenario != null) {
-					_top.SetFocus (_rightPane);
 					_runningScenario = null;
 				}
 			};
 
 			Application.Run (_top);
-			Application.Shutdown ();
 			return _runningScenario;
 		}
 

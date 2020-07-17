@@ -624,8 +624,8 @@ namespace Terminal.Gui {
 				t.Running = false;
 			};
 
-			Application.Run (t, true);
-			Application.Shutdown (true);
+			Application.Run (t);
+			Application.Shutdown ();
 
 			Assert.Equal (1, tc);
 			Assert.Equal (1, wc);
@@ -704,8 +704,8 @@ namespace Terminal.Gui {
 				t.Running = false;
 			};
 
-			Application.Run (t, true);
-			Application.Shutdown (true);
+			Application.Run (t);
+			Application.Shutdown ();
 
 			Assert.Equal (1, tc);
 			Assert.Equal (1, wc);
