@@ -747,5 +747,157 @@ namespace Terminal.Gui {
 			Assert.False (f.CanFocus);
 			Assert.True (v.CanFocus);
 		}
+
+		[Fact]
+		public void CanFocus_Faced_With_Container_Before_Run ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = Application.Top;
+
+			var w = new Window ("w");
+			var f = new FrameView ("f");
+			var v = new View ("v") { CanFocus = true };
+			f.Add (v);
+			w.Add (f);
+			t.Add (w);
+
+			Assert.True (t.CanFocus);
+			Assert.True (w.CanFocus);
+			Assert.True (f.CanFocus);
+			Assert.True (v.CanFocus);
+
+			f.CanFocus = false;
+			Assert.False (f.CanFocus);
+			Assert.True (v.CanFocus);
+
+			v.CanFocus = false;
+			Assert.False (f.CanFocus);
+			Assert.False (v.CanFocus);
+
+			v.CanFocus = true;
+			Assert.False (f.CanFocus);
+			Assert.True (v.CanFocus);
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void CanFocus_Faced_With_Container_After_Run ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = Application.Top;
+
+			var w = new Window ("w");
+			var f = new FrameView ("f");
+			var v = new View ("v") { CanFocus = true };
+			f.Add (v);
+			w.Add (f);
+			t.Add (w);
+
+			t.Ready += () => {
+				Assert.True (t.CanFocus);
+				Assert.True (w.CanFocus);
+				Assert.True (f.CanFocus);
+				Assert.True (v.CanFocus);
+
+				f.CanFocus = false;
+				Assert.False (f.CanFocus);
+				Assert.False (v.CanFocus);
+
+				v.CanFocus = false;
+				Assert.False (f.CanFocus);
+				Assert.False (v.CanFocus);
+
+				v.CanFocus = true;
+				Assert.True (f.CanFocus);
+				Assert.True (v.CanFocus);
+			};
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void CanFocus_Container_ToFalse_Turns_All_Subviews_ToFalse_Too ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = Application.Top;
+
+			var w = new Window ("w");
+			var f = new FrameView ("f");
+			var v1 = new View ("v1") { CanFocus = true };
+			var v2 = new View ("v2") { CanFocus = true };
+			f.Add (v1, v2);
+			w.Add (f);
+			t.Add (w);
+
+			t.Ready += () => {
+				Assert.True (t.CanFocus);
+				Assert.True (w.CanFocus);
+				Assert.True (f.CanFocus);
+				Assert.True (v1.CanFocus);
+				Assert.True (v2.CanFocus);
+
+				w.CanFocus = false;
+				Assert.True (w.CanFocus);
+				Assert.False (f.CanFocus);
+				Assert.False (v1.CanFocus);
+				Assert.False (v2.CanFocus);
+			};
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void CanFocus_Container_Toggling_All_Subviews_To_Old_Value_When_Is_True ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = Application.Top;
+
+			var w = new Window ("w");
+			var f = new FrameView ("f");
+			var v1 = new View ("v1");
+			var v2 = new View ("v2") { CanFocus = true };
+			f.Add (v1, v2);
+			w.Add (f);
+			t.Add (w);
+
+			t.Ready += () => {
+				Assert.True (t.CanFocus);
+				Assert.True (w.CanFocus);
+				Assert.True (f.CanFocus);
+				Assert.False (v1.CanFocus);
+				Assert.True (v2.CanFocus);
+
+				w.CanFocus = false;
+				Assert.True (w.CanFocus);
+				Assert.False (f.CanFocus);
+				Assert.False (v1.CanFocus);
+				Assert.False (v2.CanFocus);
+
+				w.CanFocus = true;
+				Assert.True (w.CanFocus);
+				Assert.True (f.CanFocus);
+				Assert.False (v1.CanFocus);
+				Assert.True (v2.CanFocus);
+			};
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+			Application.Shutdown ();
+		}
 	}
 }

@@ -276,6 +276,9 @@ namespace Terminal.Gui {
 			}
 		}
 
+		bool oldCanFocus;
+		int oldTabIndex;
+
 		/// <inheritdoc/>
 		public override bool CanFocus {
 			get => base.CanFocus;
@@ -284,10 +287,29 @@ namespace Terminal.Gui {
 					base.CanFocus = value;
 					if (!value && tabIndex > -1) {
 						TabIndex = -1;
-					} else if (value && tabIndex == -1) {
+					}
+					if (value && SuperView != null && !SuperView.CanFocus) {
+						SuperView.CanFocus = value;
+					}
+					if (value && tabIndex == -1) {
 						TabIndex = SuperView != null ? SuperView.tabIndexes.IndexOf (this) : -1;
 					}
 					TabStop = value;
+				}
+				if (subviews != null && IsInitialized) {
+					foreach (var view in subviews) {
+						if (view.CanFocus != value) {
+							if (!value) {
+								view.oldCanFocus = view.CanFocus;
+								view.oldTabIndex = view.tabIndex;
+								view.CanFocus = value;
+								view.tabIndex = -1;
+							} else {
+								view.CanFocus = view.oldCanFocus;
+								view.tabIndex = view.oldTabIndex;
+							}
+						}
+					}
 				}
 			}
 		}
@@ -690,13 +712,13 @@ namespace Terminal.Gui {
 			subviews.Add (view);
 			tabIndexes.Add (view);
 			view.container = this;
-			OnAdded (view);
 			if (view.CanFocus) {
 				CanFocus = true;
 				view.tabIndex = tabIndexes.IndexOf (view);
 			}
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
+			OnAdded (view);
 			if (IsInitialized) {
 				view.BeginInit ();
 			}
@@ -746,15 +768,15 @@ namespace Terminal.Gui {
 			subviews.Remove (view);
 			tabIndexes.Remove (view);
 			view.container = null;
-			OnRemoved (view);
 			view.tabIndex = -1;
-			if (subviews.Count < 1)
-				this.CanFocus = false;
-
+			if (subviews.Count < 1) {
+				CanFocus = false;
+			}
 			foreach (var v in subviews) {
 				if (v.Frame.IntersectsWith (touched))
 					view.SetNeedsDisplay ();
 			}
+			OnRemoved (view);
 		}
 
 		void PerformActionForSubview (View subview, Action<View> action)
@@ -1898,7 +1920,9 @@ namespace Terminal.Gui {
 		public void BeginInit ()
 		{
 			if (!IsInitialized) {
-				Initialized?.Invoke (this, new EventArgs ());
+				oldCanFocus = CanFocus;
+				oldTabIndex = tabIndex;
+				Initialized?.Invoke (this, EventArgs.Empty);
 			}
 			if (subviews?.Count > 0) {
 				foreach (var view in subviews) {
