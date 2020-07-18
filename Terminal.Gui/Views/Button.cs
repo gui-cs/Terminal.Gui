@@ -203,29 +203,19 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public Action Clicked;
 
-		/// <summary>
-		/// Method invoked when a mouse event is generated
-		/// </summary>
-		/// <param name="mouseEvent"></param>
-		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
-		public override bool OnMouseEvent (MouseEvent mouseEvent)
+		///<inheritdoc/>
+		public override bool MouseEvent (MouseEvent me)
 		{
-			MouseEventArgs args = new MouseEventArgs (mouseEvent);
-			MouseClick?.Invoke (args);
-			if (args.Handled)
-				return true;
-			if (MouseEvent (mouseEvent))
-				return true;
-
-
-			if (mouseEvent.Flags == MouseFlags.Button1Clicked || mouseEvent.Flags == MouseFlags.Button1DoubleClicked ||
-				mouseEvent.Flags == MouseFlags.Button1TripleClicked) {
-				if (!HasFocus && SuperView != null) {
-					SuperView.SetFocus (this);
-					SetNeedsDisplay ();
+			if (me.Flags == MouseFlags.Button1Clicked || me.Flags == MouseFlags.Button1DoubleClicked ||
+				me.Flags == MouseFlags.Button1TripleClicked) {
+				if (CanFocus) {
+					if (!HasFocus) {
+						SuperView?.SetFocus (this);
+						SetNeedsDisplay ();
+					}
+					Clicked?.Invoke ();
 				}
 
-				Clicked?.Invoke ();
 				return true;
 			}
 			return false;
