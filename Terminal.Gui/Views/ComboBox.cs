@@ -429,8 +429,10 @@ namespace Terminal.Gui {
 
 			listview.SetSource (searchset);
 			listview.Height = CalculatetHeight ();
-			
-			this.SetFocus (search);
+
+			if (Subviews.Count > 0) {
+				SetFocus (search);
+			}
 		}
 
 		private void ResetSearchSet (bool noCopy = false)
