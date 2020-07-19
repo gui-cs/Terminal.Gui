@@ -372,6 +372,40 @@ namespace Terminal.Gui {
 			Assert.Throws<ArgumentException> (() => pos = Pos.Percent (1000001));
 		}
 
+		[Fact]
+		public void Pos_Validation_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = Application.Top;
+
+			var w = new Window ("w") {
+				X = Pos.Left (t) + 2,
+				Y = Pos.At (2)
+			};
+			var v = new View ("v") {
+				X = Pos.Center (),
+				Y = Pos.Percent (10)
+			};
+			w.Add (v);
+			t.Add (w);
+
+			t.Ready += () => {
+				w.X = 2;
+				Assert.Equal (2, w.X = 2);
+				w.Y = 2;
+				Assert.Equal (2, w.Y);
+				Assert.Throws<ArgumentException> (() => v.X = 2);
+				Assert.Throws<ArgumentException> (() => v.Y = 2);
+			};
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+			Application.Shutdown ();
+
+		}
+
 		// TODO: Test PosCombine
 
 
