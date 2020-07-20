@@ -46,15 +46,21 @@ namespace Terminal.Gui {
 
 		internal void Reload ()
 		{
-			dirInfo = new DirectoryInfo (directory.ToString ());
-			infos = (from x in dirInfo.GetFileSystemInfos ()
-				 where IsAllowed (x)
-				 orderby (!x.Attributes.HasFlag (FileAttributes.Directory)) + x.Name
-				 select (x.Name, x.Attributes.HasFlag (FileAttributes.Directory), false)).ToList ();
-			infos.Insert (0, ("..", true, false));
-			top = 0;
-			selected = 0;
-			SetNeedsDisplay ();
+			try {
+				dirInfo = new DirectoryInfo (directory.ToString ());
+				infos = (from x in dirInfo.GetFileSystemInfos ()
+					 where IsAllowed (x)
+					 orderby (!x.Attributes.HasFlag (FileAttributes.Directory)) + x.Name
+					 select (x.Name, x.Attributes.HasFlag (FileAttributes.Directory), false)).ToList ();
+				infos.Insert (0, ("..", true, false));
+				top = 0;
+				selected = 0;
+			} catch (Exception) {
+				dirInfo = null;
+				infos.Clear ();
+			} finally {
+				SetNeedsDisplay ();
+			}
 		}
 
 		ustring directory;
@@ -454,7 +460,10 @@ namespace Terminal.Gui {
 			dirEntry = new TextField ("") {
 				X = Pos.Right (dirLabel),
 				Y = 1 + msgLines,
-				Width = Dim.Fill () - 1
+				Width = Dim.Fill () - 1,
+				TextChanged = (e) => {
+					DirectoryPath = dirEntry.Text;
+				}
 			};
 			Add (dirLabel, dirEntry);
 
