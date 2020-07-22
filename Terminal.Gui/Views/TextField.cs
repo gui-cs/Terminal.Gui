@@ -129,9 +129,6 @@ namespace Terminal.Gui {
 			}
 
 			set {
-				if (ReadOnly)
-					return;
-
 				var oldText = ustring.Make (text);
 
 				if (oldText == value)
