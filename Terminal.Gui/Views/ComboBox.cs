@@ -144,7 +144,7 @@ namespace Terminal.Gui {
 
 				// Determine if this view is hosted inside a dialog and is the only control
 				for (View view = this.SuperView; view != null; view = view.SuperView) {
-					if (view is Dialog && view.Subviews.Count == 1 && view.Subviews [0].Subviews.Count == 1) {
+					if (view is Dialog && SuperView != null && SuperView.Subviews.Count == 1 && SuperView.Subviews[0] == this) {
 						autoHide = false;
 						break;
 					}
