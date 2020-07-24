@@ -1049,13 +1049,13 @@ namespace Terminal.Gui {
 		{
 			if (hasFocus != value) {
 				hasFocus = value;
+				if (value) {
+					OnEnter (view);
+				} else {
+					OnLeave (view);
+				}
+				SetNeedsDisplay ();
 			}
-			if (value) {
-				OnEnter (view);
-			} else {
-				OnLeave (view);
-			}
-			SetNeedsDisplay ();
 
 			// Remove focus down the chain of subviews if focus is removed
 			if (!value && focused != null) {
@@ -1274,7 +1274,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Causes the specified subview to have focus.
+		/// Causes the specified subview to have focus. 
+		/// This does not ensures that the entire parent hierarchy can really get focus and thus not updating the focus order.
 		/// </summary>
 		/// <param name="view">View.</param>
 		public void SetFocus (View view)
@@ -1284,7 +1285,7 @@ namespace Terminal.Gui {
 			//Console.WriteLine ($"Request to focus {view}");
 			if (!view.CanFocus)
 				return;
-			if (focused == view)
+			if (focused?.hasFocus == true && focused == view)
 				return;
 
 			// Make sure that this view is a subview
@@ -1304,6 +1305,14 @@ namespace Terminal.Gui {
 			focused.EnsureFocus ();
 
 			// Send focus upwards
+			SuperView?.SetFocus (this);
+		}
+
+		/// <summary>
+		/// Causes the specified view and the entire parent hierarchy to have focus.
+		/// </summary>
+		public void SetFocus ()
+		{
 			SuperView?.SetFocus (this);
 		}
 
@@ -1420,11 +1429,13 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void EnsureFocus ()
 		{
-			if (focused == null)
-				if (FocusDirection == Direction.Forward)
+			if (focused == null && subviews?.Count > 0) {
+				if (FocusDirection == Direction.Forward) {
 					FocusFirst ();
-				else
+				} else {
 					FocusLast ();
+				}
+			}
 		}
 
 		/// <summary>
