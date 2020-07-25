@@ -166,7 +166,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		static void Init (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null)
 		{
-			if (_initialized) return;
+			if (_initialized && driver == null) return;
 
 			// This supports Unit Tests and the passing of a mock driver/loopdriver
 			if (driver != null) {
@@ -206,8 +206,6 @@ namespace Terminal.Gui {
 		/// Captures the execution state for the provided <see cref="Toplevel"/>  view.
 		/// </summary>
 		public class RunState : IDisposable {
-			internal bool closeDriver = true;
-
 			/// <summary>
 			/// Initializes a new <see cref="RunState"/> class.
 			/// </summary>
@@ -228,7 +226,7 @@ namespace Terminal.Gui {
 			/// <see cref="Application.RunState"/> was occupying.</remarks>
 			public void Dispose ()
 			{
-				Dispose (closeDriver);
+				Dispose (true);
 				GC.SuppressFinalize (this);
 			}
 
@@ -239,8 +237,8 @@ namespace Terminal.Gui {
 			/// <param name="disposing">If set to <c>true</c> disposing.</param>
 			protected virtual void Dispose (bool disposing)
 			{
-				if (Toplevel != null) {
-					End (Toplevel, disposing);
+				if (Toplevel != null && disposing) {
+					End (Toplevel);
 					Toplevel.Dispose ();
 					Toplevel = null;
 				}
@@ -435,14 +433,14 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Building block API: Prepares the provided <see cref="Toplevel"/>  for execution.
 		/// </summary>
-		/// <returns>The runstate handle that needs to be passed to the <see cref="End(RunState, bool)"/> method upon completion.</returns>
+		/// <returns>The runstate handle that needs to be passed to the <see cref="End(RunState)"/> method upon completion.</returns>
 		/// <param name="toplevel">Toplevel to prepare execution for.</param>
 		/// <remarks>
 		///  This method prepares the provided toplevel for running with the focus,
 		///  it adds this to the list of toplevels, sets up the mainloop to process the
 		///  event, lays out the subviews, focuses the first element, and draws the
 		///  toplevel in the screen. This is usually followed by executing
-		///  the <see cref="RunLoop"/> method, and then the <see cref="End(RunState, bool)"/> method upon termination which will
+		///  the <see cref="RunLoop"/> method, and then the <see cref="End(RunState)"/> method upon termination which will
 		///   undo these changes.
 		/// </remarks>
 		public static RunState Begin (Toplevel toplevel)
@@ -479,21 +477,18 @@ namespace Terminal.Gui {
 		/// Building block API: completes the execution of a <see cref="Toplevel"/>  that was started with <see cref="Begin(Toplevel)"/> .
 		/// </summary>
 		/// <param name="runState">The runstate returned by the <see cref="Begin(Toplevel)"/> method.</param>
-		/// <param name="closeDriver">If <c>true</c>, closes the application. If <c>false</c> closes the toplevels only.</param>
-		public static void End (RunState runState, bool closeDriver = true)
+		public static void End (RunState runState)
 		{
 			if (runState == null)
 				throw new ArgumentNullException (nameof (runState));
 
-			runState.closeDriver = closeDriver;
 			runState.Dispose ();
 		}
 
 		/// <summary>
 		/// Shutdown an application initialized with <see cref="Init(ConsoleDriver, IMainLoopDriver)"/>
 		/// </summary>
-		/// <param name="closeDriver"><c>true</c>Closes the application.<c>false</c>Closes toplevels only.</param>
-		public static void Shutdown (bool closeDriver = true)
+		public static void Shutdown ()
 		{
 			// Shutdown is the bookend for Init. As such it needs to clean up all resources
 			// Init created. Apps that do any threading will need to code defensively for this.
@@ -508,14 +503,9 @@ namespace Terminal.Gui {
 			CurrentView = null;
 			Top = null;
 
-			// Closes the application if it's true.
-			if (closeDriver) {
-				MainLoop = null;
-				Driver?.End ();
-				Driver = null;
-			}
-
-			_initialized = false;
+			MainLoop = null;
+			Driver?.End ();
+			Driver = null;
 		}
 
 		static void Redraw (View view)
@@ -548,15 +538,18 @@ namespace Terminal.Gui {
 			Driver.Refresh ();
 		}
 
-		internal static void End (View view, bool closeDriver = true)
+		internal static void End (View view)
 		{
 			if (toplevels.Peek () != view)
 				throw new ArgumentException ("The view that you end with must be balanced");
 			toplevels.Pop ();
-			if (toplevels.Count == 0)
-				Shutdown (closeDriver);
-			else {
+
+			if (toplevels.Count == 0) {
+				Current = null;
+				CurrentView = null;
+			} else {
 				Current = toplevels.Peek ();
+				CurrentView = Current;
 				Refresh ();
 			}
 		}
@@ -588,7 +581,7 @@ namespace Terminal.Gui {
 
 					MainLoop.MainIteration ();
 					Iteration?.Invoke ();
-				} else if (wait == false) {
+				} else if (!wait) {
 					return;
 				}
 				if (state.Toplevel != Top && (!Top.NeedDisplay.IsEmpty || Top.childNeedsDisplay)) {
@@ -620,7 +613,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Runs the application by calling <see cref="Run(Toplevel, bool)"/> with the value of <see cref="Top"/>
+		/// Runs the application by calling <see cref="Run(Toplevel)"/> with the value of <see cref="Top"/>
 		/// </summary>
 		public static void Run ()
 		{
@@ -628,7 +621,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Runs the application by calling <see cref="Run(Toplevel, bool)"/> with a new instance of the specified <see cref="Toplevel"/>-derived class
+		/// Runs the application by calling <see cref="Run(Toplevel)"/> with a new instance of the specified <see cref="Toplevel"/>-derived class
 		/// </summary>
 		public static void Run<T> () where T : Toplevel, new()
 		{
@@ -646,11 +639,11 @@ namespace Terminal.Gui {
 		///     run other modal <see cref="View"/>s such as <see cref="Dialog"/> boxes.
 		///   </para>
 		///   <para>
-		///     To make a <see cref="Run(Toplevel, bool)"/> stop execution, call <see cref="Application.RequestStop"/>.
+		///     To make a <see cref="Run(Toplevel)"/> stop execution, call <see cref="Application.RequestStop"/>.
 		///   </para>
 		///   <para>
-		///     Calling <see cref="Run(Toplevel, bool)"/> is equivalent to calling <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState, bool)"/>,
-		///     and then calling <see cref="End(RunState, bool)"/>.
+		///     Calling <see cref="Run(Toplevel)"/> is equivalent to calling <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState, bool)"/>,
+		///     and then calling <see cref="End(RunState)"/>.
 		///   </para>
 		///   <para>
 		///     Alternatively, to have a program control the main loop and 
@@ -661,12 +654,11 @@ namespace Terminal.Gui {
 		///   </para>
 		/// </remarks>
 		/// <param name="view">The <see cref="Toplevel"/> tu run modally.</param>
-		/// <param name="closeDriver">Set to <true/> to cause the MainLoop to end when <see cref="End(RunState, bool)"/> is called, clsing the toplevels only.</param>
-		public static void Run (Toplevel view, bool closeDriver = true)
+		public static void Run (Toplevel view)
 		{
 			var runToken = Begin (view);
 			RunLoop (runToken);
-			End (runToken, closeDriver);
+			End (runToken);
 		}
 
 		/// <summary>

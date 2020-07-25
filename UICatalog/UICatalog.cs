@@ -93,10 +93,13 @@ namespace UICatalog {
 #endif
 
 				Application.UseSystemConsole = _useSystemConsole;
-				Application.Init ();
 				scenario.Init (Application.Top, _baseColorScheme);
 				scenario.Setup ();
 				scenario.Run ();
+				_top.Ready += () => {
+					_top.SetFocus (_rightPane);
+					_top.Ready = null;
+				};
 
 #if DEBUG_IDISPOSABLE
 				// After the scenario runs, validate all Responder-based instances
@@ -107,6 +110,8 @@ namespace UICatalog {
 				Responder.Instances.Clear();
 #endif
 			}
+
+			Application.Shutdown ();
 
 #if DEBUG_IDISPOSABLE
 			// This proves that when the user exited the UI Catalog app
@@ -127,11 +132,17 @@ namespace UICatalog {
 			Application.UseSystemConsole = false;
 			Application.Init ();
 
-			// Set this here because not initilzied until driver is loaded
+			// Set this here because not initialized until driver is loaded
 			_baseColorScheme = Colors.Base;
 
 			StringBuilder aboutMessage = new StringBuilder ();
 			aboutMessage.AppendLine ("UI Catalog is a comprehensive sample library for Terminal.Gui");
+			aboutMessage.AppendLine (@"             _           ");
+			aboutMessage.AppendLine (@"  __ _ _   _(_)  ___ ___ ");
+			aboutMessage.AppendLine (@" / _` | | | | | / __/ __|");
+			aboutMessage.AppendLine (@"| (_| | |_| | || (__\__ \");
+			aboutMessage.AppendLine (@" \__, |\__,_|_(_)___|___/");
+			aboutMessage.AppendLine (@" |___/                   ");
 			aboutMessage.AppendLine ("");
 			aboutMessage.AppendLine ($"Version: {typeof (UICatalogApp).Assembly.GetName ().Version}");
 			aboutMessage.AppendLine ($"Using Terminal.Gui Version: {typeof (Terminal.Gui.Application).Assembly.GetName ().Version}");
@@ -224,13 +235,11 @@ namespace UICatalog {
 			_top.Add (_statusBar);
 			_top.Ready += () => {
 				if (_runningScenario != null) {
-					_top.SetFocus (_rightPane);
 					_runningScenario = null;
 				}
 			};
 
-			Application.Run (_top, true);
-			Application.Shutdown ();
+			Application.Run (_top);
 			return _runningScenario;
 		}
 

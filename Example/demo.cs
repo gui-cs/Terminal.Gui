@@ -274,7 +274,7 @@ static class Demo {
 			text.Text = System.IO.File.ReadAllText (fname);
 		win.Add (text);
 
-		Application.Run (ntop, false);
+		Application.Run (ntop);
 	}
 
 	static bool Quit ()
@@ -680,7 +680,7 @@ static class Demo {
 		top.Add (win);
 		//top.Add (menu);
 		top.Add (menu, statusBar);
-		Application.Run (top, false);
+		Application.Run (top);
 	}
 
 	private static void Win_KeyPress (View.KeyEventEventArgs e)

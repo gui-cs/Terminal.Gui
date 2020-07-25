@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Scenario
    ">
-    <meta name="generator" content="docfx 2.54.0.0">
+    <meta name="generator" content="docfx 2.56.1.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -98,31 +98,6 @@ ListViews. Press ENTER to run the selected scenario. Press CTRL-Q to exit it.   
     <h5>Inheritance</h5>
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">Scenario</span></div>
-  </div>
-  <div classs="implements">
-    <h5>Implements</h5>
-    <div><span class="xref">System.IDisposable</span></div>
-  </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="UICatalog.html">UICatalog</a></h6>
   <h6><strong>Assembly</strong>: UICatalog.dll</h6>
@@ -264,9 +239,51 @@ namespace UICatalog {
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.List</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td><span class="xref">List</span>&lt;<span class="xref">System.String</span>&gt;</td>
         <td><p>list of catagory names</p>
 </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="UICatalog_Scenario_GetDerivedClasses_" data-uid="UICatalog.Scenario.GetDerivedClasses*"></a>
+  <h4 id="UICatalog_Scenario_GetDerivedClasses__1" data-uid="UICatalog.Scenario.GetDerivedClasses``1">GetDerivedClasses&lt;T&gt;()</h4>
+  <div class="markdown level1 summary"><p>Returns an instance of each <a class="xref" href="UICatalog.Scenario.html">Scenario</a> defined in the project. 
+<a href="https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class">https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;Type&gt; GetDerivedClasses&lt;T&gt;()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">List</span>&lt;<span class="xref">Type</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -362,10 +379,10 @@ Override <see cref="!:Init(Toplevel)"></see> to provide any <a class="xref" href
   </table>
   <h5 id="UICatalog_Scenario_Init_Terminal_Gui_Toplevel_Terminal_Gui_ColorScheme__remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>
-Thg base implementation calls <a class="xref" href="../Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init">Init()</a>, sets <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Top">Top</a> to the passed in <a class="xref" href="../Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a>, creates a <a class="xref" href="../Terminal.Gui/Terminal.Gui.Window.html">Window</a> for <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Win">Win</a> and adds it to <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Top">Top</a>.
+Thg base implementation calls <a class="xref" href="../Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_">Init(ConsoleDriver, IMainLoopDriver)</a>, sets <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Top">Top</a> to the passed in <a class="xref" href="../Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a>, creates a <a class="xref" href="../Terminal.Gui/Terminal.Gui.Window.html">Window</a> for <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Win">Win</a> and adds it to <a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Top">Top</a>.
 </p>
 <p>
-Overrides that do not call the base.<a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Run">Run()</a>, must call <a class="xref" href="../Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init">Init()</a> before creating any views or calling other Terminal.Gui APIs.
+Overrides that do not call the base.<a class="xref" href="UICatalog.Scenario.html#UICatalog_Scenario_Run">Run()</a>, must call <a class="xref" href="../Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_">Init(ConsoleDriver, IMainLoopDriver)</a> before creating any views or calling other Terminal.Gui APIs.
 </p>
 </div>
   
@@ -432,12 +449,6 @@ Overrides that do not call the base.<a class="xref" href="UICatalog.Scenario.htm
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.Object.ToString()</span></div>
-  <h3 id="implements">Implements</h3>
-  <div>
-      <span class="xref">System.IDisposable</span>
-  </div>
 </article>
           </div>
           

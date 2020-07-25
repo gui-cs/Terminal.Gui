@@ -69,9 +69,10 @@ namespace Terminal.Gui {
 				var scenario = (Scenario)Activator.CreateInstance (scenarioClass);
 				scenario.Init (Application.Top, Colors.Base);
 				scenario.Setup ();
+				var rs = Application.Begin (Application.Top);
 				scenario.Run ();
 
-				Application.Shutdown ();
+				Application.End (rs);
 
 				Assert.Equal (0, abortCount);
 				// # of key up events should match # of iterations
@@ -124,9 +125,10 @@ namespace Terminal.Gui {
 			var scenario = (Scenario)Activator.CreateInstance (scenarioClass);
 			scenario.Init (Application.Top, Colors.Base);
 			scenario.Setup ();
+			var rs = Application.Begin (Application.Top);
 			scenario.Run ();
 
-			Application.Shutdown ();
+			Application.End (rs);
 
 			Assert.Equal (0, abortCount);
 			// # of key up events should match # of iterations

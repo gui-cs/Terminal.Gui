@@ -162,6 +162,8 @@ namespace Terminal.Gui {
 						runes.RemoveAt (i);
 						runes.RemoveAt (i + 1);
 						i++;
+					} else {
+						runes.RemoveAt (i);
 					}
 					break;
 				}
@@ -182,6 +184,8 @@ namespace Terminal.Gui {
 						runes [i] = (Rune)' ';
 						runes.RemoveAt (i + 1);
 						i++;
+					} else {
+						runes [i] = (Rune)' ';
 					}
 					break;
 				}
@@ -192,7 +196,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Formats the provided text to fit within the width provided using word wrapping.
 		/// </summary>
-		/// <param name="text">The text to word warp</param>
+		/// <param name="text">The text to word wrap</param>
 		/// <param name="width">The width to contrain the text to</param>
 		/// <returns>Returns a list of word wrapped lines.</returns>
 		/// <remarks>
@@ -200,7 +204,7 @@ namespace Terminal.Gui {
 		/// This method does not do any justification.
 		/// </para>
 		/// <para>
-		/// Newlines ('\n' and '\r\n') sequences are honored, adding the appropriate lines to the output.
+		/// This method strips Newline ('\n' and '\r\n') sequences before processing.
 		/// </para>
 		/// </remarks>
 		public static List<ustring> WordWrap (ustring text, int width)
@@ -223,12 +227,15 @@ namespace Terminal.Gui {
 					end -= 1;
 				if (end == start)
 					end = start + width;
-				lines.Add (ustring.Make (runes.GetRange (start, end - start)).TrimSpace ());
+				lines.Add (ustring.Make (runes.GetRange (start, end - start))); 
 				start = end;
+				if (runes[end] == ' ') {
+					start++;
+				}
 			}
 
 			if (start < text.RuneCount) {
-				lines.Add (ustring.Make (runes.GetRange (start, runes.Count - start)).TrimSpace ());
+				lines.Add (ustring.Make (runes.GetRange (start, runes.Count - start)));
 			}
 
 			return lines;
@@ -279,15 +286,13 @@ namespace Terminal.Gui {
 				return text;
 			}
 
-			// TODO: Use ustring
-			var words = text.Split (ustring.Make (' '));// whitespace, StringSplitOptions.RemoveEmptyEntries);
+			var words = text.Split (ustring.Make (' '));
 			int textCount = words.Sum (arg => arg.RuneCount);
 
 			var spaces = words.Length > 1 ? (width - textCount) / (words.Length - 1) : 0;
 			var extras = words.Length > 1 ? (width - textCount) % words.Length : 0;
 
 			var s = new System.Text.StringBuilder ();
-			//s.Append ($"tc={textCount} sp={spaces},x={extras} - ");
 			for (int w = 0; w < words.Length; w++) {
 				var x = words [w];
 				s.Append (x);
@@ -295,7 +300,6 @@ namespace Terminal.Gui {
 					for (int i = 0; i < spaces; i++)
 						s.Append (spaceChar);
 				if (extras > 0) {
-					//s.Append ('_');
 					extras--;
 				}
 			}
@@ -347,7 +351,7 @@ namespace Terminal.Gui {
 			int runeCount = runes.Count;
 			int lp = 0;
 			for (int i = 0; i < runeCount; i++) {
-				Rune c = text [i];
+				Rune c = runes [i];
 				if (c == '\n') {
 					var wrappedLines = WordWrap (ustring.Make (runes.GetRange (lp, i - lp)), width);
 					foreach (var line in wrappedLines) {

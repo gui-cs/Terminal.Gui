@@ -13,6 +13,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using NStack;
@@ -110,7 +111,7 @@ namespace Terminal.Gui {
 	///    frames for the vies that use <see cref="LayoutStyle.Computed"/>.
 	/// </para>
 	/// </remarks>
-	public partial class View : Responder, IEnumerable {
+	public partial class View : Responder, IEnumerable, ISupportInitializeNotification {
 
 		internal enum Direction {
 			Forward,
@@ -275,6 +276,9 @@ namespace Terminal.Gui {
 			}
 		}
 
+		bool oldCanFocus;
+		int oldTabIndex;
+
 		/// <inheritdoc/>
 		public override bool CanFocus {
 			get => base.CanFocus;
@@ -283,10 +287,29 @@ namespace Terminal.Gui {
 					base.CanFocus = value;
 					if (!value && tabIndex > -1) {
 						TabIndex = -1;
-					} else if (value && tabIndex == -1) {
+					}
+					if (value && SuperView != null && !SuperView.CanFocus) {
+						SuperView.CanFocus = value;
+					}
+					if (value && tabIndex == -1) {
 						TabIndex = SuperView != null ? SuperView.tabIndexes.IndexOf (this) : -1;
 					}
 					TabStop = value;
+				}
+				if (subviews != null && IsInitialized) {
+					foreach (var view in subviews) {
+						if (view.CanFocus != value) {
+							if (!value) {
+								view.oldCanFocus = view.CanFocus;
+								view.oldTabIndex = view.tabIndex;
+								view.CanFocus = value;
+								view.tabIndex = -1;
+							} else {
+								view.CanFocus = view.oldCanFocus;
+								view.tabIndex = view.oldTabIndex;
+							}
+						}
+					}
 				}
 			}
 		}
@@ -660,14 +683,16 @@ namespace Terminal.Gui {
 			subviews.Add (view);
 			tabIndexes.Add (view);
 			view.container = this;
-			OnAdded (view);
 			if (view.CanFocus) {
 				CanFocus = true;
 				view.tabIndex = tabIndexes.IndexOf (view);
 			}
-
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
+			OnAdded (view);
+			if (IsInitialized) {
+				view.BeginInit ();
+			}
 		}
 
 		/// <summary>
@@ -695,7 +720,6 @@ namespace Terminal.Gui {
 
 			while (subviews.Count > 0) {
 				Remove (subviews [0]);
-				Remove (tabIndexes [0]);
 			}
 		}
 
@@ -715,15 +739,15 @@ namespace Terminal.Gui {
 			subviews.Remove (view);
 			tabIndexes.Remove (view);
 			view.container = null;
-			OnRemoved (view);
 			view.tabIndex = -1;
-			if (subviews.Count < 1)
-				this.CanFocus = false;
-
+			if (subviews.Count < 1) {
+				CanFocus = false;
+			}
 			foreach (var v in subviews) {
 				if (v.Frame.IntersectsWith (touched))
 					view.SetNeedsDisplay ();
 			}
+			OnRemoved (view);
 		}
 
 		void PerformActionForSubview (View subview, Action<View> action)
@@ -1186,7 +1210,8 @@ namespace Terminal.Gui {
 		{
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
-			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
+			if (ColorScheme != null)
+				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 
 			if (!ustring.IsNullOrEmpty (Text)) {
 				Clear ();
@@ -1357,13 +1382,12 @@ namespace Terminal.Gui {
 		{
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
 			KeyDown?.Invoke (args);
-			if (args.Handled)
+			if (args.Handled) {
 				return true;
-			if (subviews == null || subviews.Count == 0)
-				return false;
-			foreach (var view in subviews)
-				if (view.HasFocus && view.OnKeyDown (keyEvent))
-					return true;
+			}
+			if (Focused?.OnKeyDown (keyEvent) == true) {
+				return true;
+			}
 
 			return false;
 		}
@@ -1378,13 +1402,12 @@ namespace Terminal.Gui {
 		{
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
 			KeyUp?.Invoke (args);
-			if (args.Handled)
+			if (args.Handled) {
 				return true;
-			if (subviews == null || subviews.Count == 0)
-				return false;
-			foreach (var view in subviews)
-				if (view.HasFocus && view.OnKeyUp (keyEvent))
-					return true;
+			}
+			if (Focused?.OnKeyUp (keyEvent) == true) {
+				return true;
+			}
 
 			return false;
 		}
@@ -1654,6 +1677,13 @@ namespace Terminal.Gui {
 		public Action<LayoutEventArgs> LayoutComplete;
 
 		/// <summary>
+		/// Event called only once when the <see cref="View"/> is being initialized for the first time.
+		/// Allows configurations and assignments to be performed before the <see cref="View"/> being shown.
+		/// This derived from <see cref="ISupportInitializeNotification"/> to allow notify all the views that are being initialized.
+		/// </summary>
+		public event EventHandler Initialized;
+
+		/// <summary>
 		/// Raises the <see cref="LayoutComplete"/> event. Called from  <see cref="LayoutSubviews"/> before all sub-views have been laid out.
 		/// </summary>
 		internal virtual void OnLayoutComplete (LayoutEventArgs args)
@@ -1758,6 +1788,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Get or sets if  the <see cref="View"/> was already initialized.
+		/// This derived from <see cref="ISupportInitializeNotification"/> to allow notify all the views that are being initialized.
+		/// </summary>
+		public bool IsInitialized { get; set; }
+
+		/// <summary>
 		/// Pretty prints the View
 		/// </summary>
 		/// <returns></returns>
@@ -1847,6 +1883,40 @@ namespace Terminal.Gui {
 				subview.Dispose ();
 			}
 			base.Dispose (disposing);
+		}
+
+		/// <summary>
+		/// This derived from <see cref="ISupportInitializeNotification"/> to allow notify all the views that are beginning initialized.
+		/// </summary>
+		public void BeginInit ()
+		{
+			if (!IsInitialized) {
+				oldCanFocus = CanFocus;
+				oldTabIndex = tabIndex;
+				Initialized?.Invoke (this, EventArgs.Empty);
+			}
+			if (subviews?.Count > 0) {
+				foreach (var view in subviews) {
+					if (!view.IsInitialized) {
+						view.BeginInit ();
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// This derived from <see cref="ISupportInitializeNotification"/> to allow notify all the views that are ending initialized.
+		/// </summary>
+		public void EndInit ()
+		{
+			IsInitialized = true;
+			if (subviews?.Count > 0) {
+				foreach (var view in subviews) {
+					if (!view.IsInitialized) {
+						view.EndInit ();
+					}
+				}
+			}
 		}
 	}
 }

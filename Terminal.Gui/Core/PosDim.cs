@@ -165,7 +165,7 @@ namespace Terminal.Gui {
 			return pCenter;
 		}
 
-		class PosAbsolute : Pos {
+		internal class PosAbsolute : Pos {
 			int n;
 			public PosAbsolute (int n) { this.n = n; }
 

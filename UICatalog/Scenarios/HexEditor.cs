@@ -102,7 +102,7 @@ namespace UICatalog {
 		private void Open ()
 		{
 			var d = new OpenDialog ("Open", "Open a file") { AllowsMultipleSelection = false };
-			Application.Run (d, false);
+			Application.Run (d);
 
 			if (!d.Canceled) {
 				_fileName = d.FilePaths [0];

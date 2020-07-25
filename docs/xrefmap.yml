@@ -84,12 +84,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Application.GrabMouse
   nameWithType: Application.GrabMouse
-- uid: Terminal.Gui.Application.Init
-  name: Init()
-  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init
-  commentId: M:Terminal.Gui.Application.Init
-  fullName: Terminal.Gui.Application.Init()
-  nameWithType: Application.Init()
+- uid: Terminal.Gui.Application.Init(Terminal.Gui.ConsoleDriver,Terminal.Gui.IMainLoopDriver)
+  name: Init(ConsoleDriver, IMainLoopDriver)
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_
+  commentId: M:Terminal.Gui.Application.Init(Terminal.Gui.ConsoleDriver,Terminal.Gui.IMainLoopDriver)
+  fullName: Terminal.Gui.Application.Init(Terminal.Gui.ConsoleDriver, Terminal.Gui.IMainLoopDriver)
+  nameWithType: Application.Init(ConsoleDriver, IMainLoopDriver)
 - uid: Terminal.Gui.Application.Init*
   name: Init
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init_
@@ -252,6 +252,19 @@ references:
   commentId: T:Terminal.Gui.Application.RunState
   fullName: Terminal.Gui.Application.RunState
   nameWithType: Application.RunState
+- uid: Terminal.Gui.Application.RunState.#ctor(Terminal.Gui.Toplevel)
+  name: RunState(Toplevel)
+  href: api/Terminal.Gui/Terminal.Gui.Application.RunState.html#Terminal_Gui_Application_RunState__ctor_Terminal_Gui_Toplevel_
+  commentId: M:Terminal.Gui.Application.RunState.#ctor(Terminal.Gui.Toplevel)
+  fullName: Terminal.Gui.Application.RunState.RunState(Terminal.Gui.Toplevel)
+  nameWithType: Application.RunState.RunState(Toplevel)
+- uid: Terminal.Gui.Application.RunState.#ctor*
+  name: RunState
+  href: api/Terminal.Gui/Terminal.Gui.Application.RunState.html#Terminal_Gui_Application_RunState__ctor_
+  commentId: Overload:Terminal.Gui.Application.RunState.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Application.RunState.RunState
+  nameWithType: Application.RunState.RunState
 - uid: Terminal.Gui.Application.RunState.Dispose
   name: Dispose()
   href: api/Terminal.Gui/Terminal.Gui.Application.RunState.html#Terminal_Gui_Application_RunState_Dispose
@@ -438,32 +451,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Button.IsDefault
   nameWithType: Button.IsDefault
-- uid: Terminal.Gui.Button.MouseEvent(Terminal.Gui.MouseEvent)
-  name: MouseEvent(MouseEvent)
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_MouseEvent_Terminal_Gui_MouseEvent_
-  commentId: M:Terminal.Gui.Button.MouseEvent(Terminal.Gui.MouseEvent)
-  fullName: Terminal.Gui.Button.MouseEvent(Terminal.Gui.MouseEvent)
-  nameWithType: Button.MouseEvent(MouseEvent)
-- uid: Terminal.Gui.Button.MouseEvent*
-  name: MouseEvent
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_MouseEvent_
-  commentId: Overload:Terminal.Gui.Button.MouseEvent
+- uid: Terminal.Gui.Button.OnMouseEvent(Terminal.Gui.MouseEvent)
+  name: OnMouseEvent(MouseEvent)
+  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_OnMouseEvent_Terminal_Gui_MouseEvent_
+  commentId: M:Terminal.Gui.Button.OnMouseEvent(Terminal.Gui.MouseEvent)
+  fullName: Terminal.Gui.Button.OnMouseEvent(Terminal.Gui.MouseEvent)
+  nameWithType: Button.OnMouseEvent(MouseEvent)
+- uid: Terminal.Gui.Button.OnMouseEvent*
+  name: OnMouseEvent
+  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_OnMouseEvent_
+  commentId: Overload:Terminal.Gui.Button.OnMouseEvent
   isSpec: "True"
-  fullName: Terminal.Gui.Button.MouseEvent
-  nameWithType: Button.MouseEvent
-- uid: Terminal.Gui.Button.PositionCursor
-  name: PositionCursor()
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_PositionCursor
-  commentId: M:Terminal.Gui.Button.PositionCursor
-  fullName: Terminal.Gui.Button.PositionCursor()
-  nameWithType: Button.PositionCursor()
-- uid: Terminal.Gui.Button.PositionCursor*
-  name: PositionCursor
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_PositionCursor_
-  commentId: Overload:Terminal.Gui.Button.PositionCursor
-  isSpec: "True"
-  fullName: Terminal.Gui.Button.PositionCursor
-  nameWithType: Button.PositionCursor
+  fullName: Terminal.Gui.Button.OnMouseEvent
+  nameWithType: Button.OnMouseEvent
 - uid: Terminal.Gui.Button.ProcessColdKey(Terminal.Gui.KeyEvent)
   name: ProcessColdKey(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_ProcessColdKey_Terminal_Gui_KeyEvent_
@@ -503,19 +503,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Button.ProcessKey
   nameWithType: Button.ProcessKey
-- uid: Terminal.Gui.Button.Redraw(Terminal.Gui.Rect)
-  name: Redraw(Rect)
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_Redraw_Terminal_Gui_Rect_
-  commentId: M:Terminal.Gui.Button.Redraw(Terminal.Gui.Rect)
-  fullName: Terminal.Gui.Button.Redraw(Terminal.Gui.Rect)
-  nameWithType: Button.Redraw(Rect)
-- uid: Terminal.Gui.Button.Redraw*
-  name: Redraw
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_Redraw_
-  commentId: Overload:Terminal.Gui.Button.Redraw
-  isSpec: "True"
-  fullName: Terminal.Gui.Button.Redraw
-  nameWithType: Button.Redraw
 - uid: Terminal.Gui.Button.Text
   name: Text
   href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_Text
@@ -529,19 +516,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Button.Text
   nameWithType: Button.Text
-- uid: Terminal.Gui.Button.TextAlignment
-  name: TextAlignment
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_TextAlignment
-  commentId: P:Terminal.Gui.Button.TextAlignment
-  fullName: Terminal.Gui.Button.TextAlignment
-  nameWithType: Button.TextAlignment
-- uid: Terminal.Gui.Button.TextAlignment*
-  name: TextAlignment
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_TextAlignment_
-  commentId: Overload:Terminal.Gui.Button.TextAlignment
-  isSpec: "True"
-  fullName: Terminal.Gui.Button.TextAlignment
-  nameWithType: Button.TextAlignment
 - uid: Terminal.Gui.CheckBox
   name: CheckBox
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html
@@ -1010,6 +984,205 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ColorScheme.Inequality
   nameWithType: ColorScheme.Inequality
+- uid: Terminal.Gui.ComboBox
+  name: ComboBox
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html
+  commentId: T:Terminal.Gui.ComboBox
+  fullName: Terminal.Gui.ComboBox
+  nameWithType: ComboBox
+- uid: Terminal.Gui.ComboBox.#ctor
+  name: ComboBox()
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox__ctor
+  commentId: M:Terminal.Gui.ComboBox.#ctor
+  fullName: Terminal.Gui.ComboBox.ComboBox()
+  nameWithType: ComboBox.ComboBox()
+- uid: Terminal.Gui.ComboBox.#ctor(NStack.ustring)
+  name: ComboBox(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox__ctor_NStack_ustring_
+  commentId: M:Terminal.Gui.ComboBox.#ctor(NStack.ustring)
+  fullName: Terminal.Gui.ComboBox.ComboBox(NStack.ustring)
+  nameWithType: ComboBox.ComboBox(ustring)
+- uid: Terminal.Gui.ComboBox.#ctor(Terminal.Gui.Rect,System.Collections.IList)
+  name: ComboBox(Rect, IList)
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox__ctor_Terminal_Gui_Rect_System_Collections_IList_
+  commentId: M:Terminal.Gui.ComboBox.#ctor(Terminal.Gui.Rect,System.Collections.IList)
+  fullName: Terminal.Gui.ComboBox.ComboBox(Terminal.Gui.Rect, System.Collections.IList)
+  nameWithType: ComboBox.ComboBox(Rect, IList)
+- uid: Terminal.Gui.ComboBox.#ctor*
+  name: ComboBox
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox__ctor_
+  commentId: Overload:Terminal.Gui.ComboBox.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.ComboBox
+  nameWithType: ComboBox.ComboBox
+- uid: Terminal.Gui.ComboBox.ColorScheme
+  name: ColorScheme
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_ColorScheme
+  commentId: P:Terminal.Gui.ComboBox.ColorScheme
+  fullName: Terminal.Gui.ComboBox.ColorScheme
+  nameWithType: ComboBox.ColorScheme
+- uid: Terminal.Gui.ComboBox.ColorScheme*
+  name: ColorScheme
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_ColorScheme_
+  commentId: Overload:Terminal.Gui.ComboBox.ColorScheme
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.ColorScheme
+  nameWithType: ComboBox.ColorScheme
+- uid: Terminal.Gui.ComboBox.MouseEvent(Terminal.Gui.MouseEvent)
+  name: MouseEvent(MouseEvent)
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_MouseEvent_Terminal_Gui_MouseEvent_
+  commentId: M:Terminal.Gui.ComboBox.MouseEvent(Terminal.Gui.MouseEvent)
+  fullName: Terminal.Gui.ComboBox.MouseEvent(Terminal.Gui.MouseEvent)
+  nameWithType: ComboBox.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.ComboBox.MouseEvent*
+  name: MouseEvent
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_MouseEvent_
+  commentId: Overload:Terminal.Gui.ComboBox.MouseEvent
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.MouseEvent
+  nameWithType: ComboBox.MouseEvent
+- uid: Terminal.Gui.ComboBox.OnEnter(Terminal.Gui.View)
+  name: OnEnter(View)
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnEnter_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.ComboBox.OnEnter(Terminal.Gui.View)
+  fullName: Terminal.Gui.ComboBox.OnEnter(Terminal.Gui.View)
+  nameWithType: ComboBox.OnEnter(View)
+- uid: Terminal.Gui.ComboBox.OnEnter*
+  name: OnEnter
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnEnter_
+  commentId: Overload:Terminal.Gui.ComboBox.OnEnter
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.OnEnter
+  nameWithType: ComboBox.OnEnter
+- uid: Terminal.Gui.ComboBox.OnLeave(Terminal.Gui.View)
+  name: OnLeave(View)
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnLeave_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.ComboBox.OnLeave(Terminal.Gui.View)
+  fullName: Terminal.Gui.ComboBox.OnLeave(Terminal.Gui.View)
+  nameWithType: ComboBox.OnLeave(View)
+- uid: Terminal.Gui.ComboBox.OnLeave*
+  name: OnLeave
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnLeave_
+  commentId: Overload:Terminal.Gui.ComboBox.OnLeave
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.OnLeave
+  nameWithType: ComboBox.OnLeave
+- uid: Terminal.Gui.ComboBox.OnOpenSelectedItem
+  name: OnOpenSelectedItem()
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnOpenSelectedItem
+  commentId: M:Terminal.Gui.ComboBox.OnOpenSelectedItem
+  fullName: Terminal.Gui.ComboBox.OnOpenSelectedItem()
+  nameWithType: ComboBox.OnOpenSelectedItem()
+- uid: Terminal.Gui.ComboBox.OnOpenSelectedItem*
+  name: OnOpenSelectedItem
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnOpenSelectedItem_
+  commentId: Overload:Terminal.Gui.ComboBox.OnOpenSelectedItem
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.OnOpenSelectedItem
+  nameWithType: ComboBox.OnOpenSelectedItem
+- uid: Terminal.Gui.ComboBox.OnSelectedChanged
+  name: OnSelectedChanged()
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnSelectedChanged
+  commentId: M:Terminal.Gui.ComboBox.OnSelectedChanged
+  fullName: Terminal.Gui.ComboBox.OnSelectedChanged()
+  nameWithType: ComboBox.OnSelectedChanged()
+- uid: Terminal.Gui.ComboBox.OnSelectedChanged*
+  name: OnSelectedChanged
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OnSelectedChanged_
+  commentId: Overload:Terminal.Gui.ComboBox.OnSelectedChanged
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.OnSelectedChanged
+  nameWithType: ComboBox.OnSelectedChanged
+- uid: Terminal.Gui.ComboBox.OpenSelectedItem
+  name: OpenSelectedItem
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OpenSelectedItem
+  commentId: F:Terminal.Gui.ComboBox.OpenSelectedItem
+  fullName: Terminal.Gui.ComboBox.OpenSelectedItem
+  nameWithType: ComboBox.OpenSelectedItem
+- uid: Terminal.Gui.ComboBox.ProcessKey(Terminal.Gui.KeyEvent)
+  name: ProcessKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_ProcessKey_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.ComboBox.ProcessKey(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.ComboBox.ProcessKey(Terminal.Gui.KeyEvent)
+  nameWithType: ComboBox.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.ComboBox.ProcessKey*
+  name: ProcessKey
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_ProcessKey_
+  commentId: Overload:Terminal.Gui.ComboBox.ProcessKey
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.ProcessKey
+  nameWithType: ComboBox.ProcessKey
+- uid: Terminal.Gui.ComboBox.Redraw(Terminal.Gui.Rect)
+  name: Redraw(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Redraw_Terminal_Gui_Rect_
+  commentId: M:Terminal.Gui.ComboBox.Redraw(Terminal.Gui.Rect)
+  fullName: Terminal.Gui.ComboBox.Redraw(Terminal.Gui.Rect)
+  nameWithType: ComboBox.Redraw(Rect)
+- uid: Terminal.Gui.ComboBox.Redraw*
+  name: Redraw
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Redraw_
+  commentId: Overload:Terminal.Gui.ComboBox.Redraw
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.Redraw
+  nameWithType: ComboBox.Redraw
+- uid: Terminal.Gui.ComboBox.SelectedItem
+  name: SelectedItem
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_SelectedItem
+  commentId: P:Terminal.Gui.ComboBox.SelectedItem
+  fullName: Terminal.Gui.ComboBox.SelectedItem
+  nameWithType: ComboBox.SelectedItem
+- uid: Terminal.Gui.ComboBox.SelectedItem*
+  name: SelectedItem
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_SelectedItem_
+  commentId: Overload:Terminal.Gui.ComboBox.SelectedItem
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.SelectedItem
+  nameWithType: ComboBox.SelectedItem
+- uid: Terminal.Gui.ComboBox.SelectedItemChanged
+  name: SelectedItemChanged
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_SelectedItemChanged
+  commentId: F:Terminal.Gui.ComboBox.SelectedItemChanged
+  fullName: Terminal.Gui.ComboBox.SelectedItemChanged
+  nameWithType: ComboBox.SelectedItemChanged
+- uid: Terminal.Gui.ComboBox.SetSource(System.Collections.IList)
+  name: SetSource(IList)
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_SetSource_System_Collections_IList_
+  commentId: M:Terminal.Gui.ComboBox.SetSource(System.Collections.IList)
+  fullName: Terminal.Gui.ComboBox.SetSource(System.Collections.IList)
+  nameWithType: ComboBox.SetSource(IList)
+- uid: Terminal.Gui.ComboBox.SetSource*
+  name: SetSource
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_SetSource_
+  commentId: Overload:Terminal.Gui.ComboBox.SetSource
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.SetSource
+  nameWithType: ComboBox.SetSource
+- uid: Terminal.Gui.ComboBox.Source
+  name: Source
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Source
+  commentId: P:Terminal.Gui.ComboBox.Source
+  fullName: Terminal.Gui.ComboBox.Source
+  nameWithType: ComboBox.Source
+- uid: Terminal.Gui.ComboBox.Source*
+  name: Source
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Source_
+  commentId: Overload:Terminal.Gui.ComboBox.Source
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.Source
+  nameWithType: ComboBox.Source
+- uid: Terminal.Gui.ComboBox.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Text
+  commentId: P:Terminal.Gui.ComboBox.Text
+  fullName: Terminal.Gui.ComboBox.Text
+  nameWithType: ComboBox.Text
+- uid: Terminal.Gui.ComboBox.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Text_
+  commentId: Overload:Terminal.Gui.ComboBox.Text
+  isSpec: "True"
+  fullName: Terminal.Gui.ComboBox.Text
+  nameWithType: ComboBox.Text
 - uid: Terminal.Gui.ConsoleDriver
   name: ConsoleDriver
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html
@@ -1048,6 +1221,12 @@ references:
   commentId: F:Terminal.Gui.ConsoleDriver.BottomTee
   fullName: Terminal.Gui.ConsoleDriver.BottomTee
   nameWithType: ConsoleDriver.BottomTee
+- uid: Terminal.Gui.ConsoleDriver.Checked
+  name: Checked
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Checked
+  commentId: F:Terminal.Gui.ConsoleDriver.Checked
+  fullName: Terminal.Gui.ConsoleDriver.Checked
+  nameWithType: ConsoleDriver.Checked
 - uid: Terminal.Gui.ConsoleDriver.Clip
   name: Clip
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Clip
@@ -1130,6 +1309,12 @@ references:
   commentId: F:Terminal.Gui.ConsoleDriver.Diamond
   fullName: Terminal.Gui.ConsoleDriver.Diamond
   nameWithType: ConsoleDriver.Diamond
+- uid: Terminal.Gui.ConsoleDriver.DownArrow
+  name: DownArrow
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DownArrow
+  commentId: F:Terminal.Gui.ConsoleDriver.DownArrow
+  fullName: Terminal.Gui.ConsoleDriver.DownArrow
+  nameWithType: ConsoleDriver.DownArrow
 - uid: Terminal.Gui.ConsoleDriver.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
   name: DrawFrame(Rect, Int32, Boolean)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean_
@@ -1201,6 +1386,24 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ConsoleDriver.Init
   nameWithType: ConsoleDriver.Init
+- uid: Terminal.Gui.ConsoleDriver.LeftArrow
+  name: LeftArrow
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_LeftArrow
+  commentId: F:Terminal.Gui.ConsoleDriver.LeftArrow
+  fullName: Terminal.Gui.ConsoleDriver.LeftArrow
+  nameWithType: ConsoleDriver.LeftArrow
+- uid: Terminal.Gui.ConsoleDriver.LeftBracket
+  name: LeftBracket
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_LeftBracket
+  commentId: F:Terminal.Gui.ConsoleDriver.LeftBracket
+  fullName: Terminal.Gui.ConsoleDriver.LeftBracket
+  nameWithType: ConsoleDriver.LeftBracket
+- uid: Terminal.Gui.ConsoleDriver.LeftDefaultIndicator
+  name: LeftDefaultIndicator
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_LeftDefaultIndicator
+  commentId: F:Terminal.Gui.ConsoleDriver.LeftDefaultIndicator
+  fullName: Terminal.Gui.ConsoleDriver.LeftDefaultIndicator
+  nameWithType: ConsoleDriver.LeftDefaultIndicator
 - uid: Terminal.Gui.ConsoleDriver.LeftTee
   name: LeftTee
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_LeftTee
@@ -1232,6 +1435,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ConsoleDriver.MakeAttribute
   nameWithType: ConsoleDriver.MakeAttribute
+- uid: Terminal.Gui.ConsoleDriver.MakePrintable(System.Rune)
+  name: MakePrintable(Rune)
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_MakePrintable_System_Rune_
+  commentId: M:Terminal.Gui.ConsoleDriver.MakePrintable(System.Rune)
+  fullName: Terminal.Gui.ConsoleDriver.MakePrintable(System.Rune)
+  nameWithType: ConsoleDriver.MakePrintable(Rune)
+- uid: Terminal.Gui.ConsoleDriver.MakePrintable*
+  name: MakePrintable
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_MakePrintable_
+  commentId: Overload:Terminal.Gui.ConsoleDriver.MakePrintable
+  isSpec: "True"
+  fullName: Terminal.Gui.ConsoleDriver.MakePrintable
+  nameWithType: ConsoleDriver.MakePrintable
 - uid: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
   name: Move(Int32, Int32)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Move_System_Int32_System_Int32_
@@ -1245,6 +1461,18 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ConsoleDriver.Move
   nameWithType: ConsoleDriver.Move
+- uid: Terminal.Gui.ConsoleDriver.OffMeterSegement
+  name: OffMeterSegement
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_OffMeterSegement
+  commentId: F:Terminal.Gui.ConsoleDriver.OffMeterSegement
+  fullName: Terminal.Gui.ConsoleDriver.OffMeterSegement
+  nameWithType: ConsoleDriver.OffMeterSegement
+- uid: Terminal.Gui.ConsoleDriver.OnMeterSegment
+  name: OnMeterSegment
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_OnMeterSegment
+  commentId: F:Terminal.Gui.ConsoleDriver.OnMeterSegment
+  fullName: Terminal.Gui.ConsoleDriver.OnMeterSegment
+  nameWithType: ConsoleDriver.OnMeterSegment
 - uid: Terminal.Gui.ConsoleDriver.PrepareToRun(Terminal.Gui.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
   name: PrepareToRun(MainLoop, Action<KeyEvent>, Action<KeyEvent>, Action<KeyEvent>, Action<MouseEvent>)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_PrepareToRun_Terminal_Gui_MainLoop_System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_MouseEvent__
@@ -1274,6 +1502,24 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ConsoleDriver.Refresh
   nameWithType: ConsoleDriver.Refresh
+- uid: Terminal.Gui.ConsoleDriver.RightArrow
+  name: RightArrow
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_RightArrow
+  commentId: F:Terminal.Gui.ConsoleDriver.RightArrow
+  fullName: Terminal.Gui.ConsoleDriver.RightArrow
+  nameWithType: ConsoleDriver.RightArrow
+- uid: Terminal.Gui.ConsoleDriver.RightBracket
+  name: RightBracket
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_RightBracket
+  commentId: F:Terminal.Gui.ConsoleDriver.RightBracket
+  fullName: Terminal.Gui.ConsoleDriver.RightBracket
+  nameWithType: ConsoleDriver.RightBracket
+- uid: Terminal.Gui.ConsoleDriver.RightDefaultIndicator
+  name: RightDefaultIndicator
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_RightDefaultIndicator
+  commentId: F:Terminal.Gui.ConsoleDriver.RightDefaultIndicator
+  fullName: Terminal.Gui.ConsoleDriver.RightDefaultIndicator
+  nameWithType: ConsoleDriver.RightDefaultIndicator
 - uid: Terminal.Gui.ConsoleDriver.RightTee
   name: RightTee
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_RightTee
@@ -1293,6 +1539,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ConsoleDriver.Rows
   nameWithType: ConsoleDriver.Rows
+- uid: Terminal.Gui.ConsoleDriver.Selected
+  name: Selected
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Selected
+  commentId: F:Terminal.Gui.ConsoleDriver.Selected
+  fullName: Terminal.Gui.ConsoleDriver.Selected
+  nameWithType: ConsoleDriver.Selected
 - uid: Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
   name: SetAttribute(Attribute)
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetAttribute_Terminal_Gui_Attribute_
@@ -1401,6 +1653,12 @@ references:
   commentId: F:Terminal.Gui.ConsoleDriver.ULCorner
   fullName: Terminal.Gui.ConsoleDriver.ULCorner
   nameWithType: ConsoleDriver.ULCorner
+- uid: Terminal.Gui.ConsoleDriver.UnChecked
+  name: UnChecked
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UnChecked
+  commentId: F:Terminal.Gui.ConsoleDriver.UnChecked
+  fullName: Terminal.Gui.ConsoleDriver.UnChecked
+  nameWithType: ConsoleDriver.UnChecked
 - uid: Terminal.Gui.ConsoleDriver.UncookMouse
   name: UncookMouse()
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UncookMouse
@@ -1414,6 +1672,18 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ConsoleDriver.UncookMouse
   nameWithType: ConsoleDriver.UncookMouse
+- uid: Terminal.Gui.ConsoleDriver.UnSelected
+  name: UnSelected
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UnSelected
+  commentId: F:Terminal.Gui.ConsoleDriver.UnSelected
+  fullName: Terminal.Gui.ConsoleDriver.UnSelected
+  nameWithType: ConsoleDriver.UnSelected
+- uid: Terminal.Gui.ConsoleDriver.UpArrow
+  name: UpArrow
+  href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UpArrow
+  commentId: F:Terminal.Gui.ConsoleDriver.UpArrow
+  fullName: Terminal.Gui.ConsoleDriver.UpArrow
+  nameWithType: ConsoleDriver.UpArrow
 - uid: Terminal.Gui.ConsoleDriver.UpdateCursor
   name: UpdateCursor()
   href: api/Terminal.Gui/Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UpdateCursor
@@ -1684,19 +1954,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Dialog.AddButton
   nameWithType: Dialog.AddButton
-- uid: Terminal.Gui.Dialog.LayoutSubviews
-  name: LayoutSubviews()
-  href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_LayoutSubviews
-  commentId: M:Terminal.Gui.Dialog.LayoutSubviews
-  fullName: Terminal.Gui.Dialog.LayoutSubviews()
-  nameWithType: Dialog.LayoutSubviews()
-- uid: Terminal.Gui.Dialog.LayoutSubviews*
-  name: LayoutSubviews
-  href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_LayoutSubviews_
-  commentId: Overload:Terminal.Gui.Dialog.LayoutSubviews
-  isSpec: "True"
-  fullName: Terminal.Gui.Dialog.LayoutSubviews
-  nameWithType: Dialog.LayoutSubviews
 - uid: Terminal.Gui.Dialog.ProcessKey(Terminal.Gui.KeyEvent)
   name: ProcessKey(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_ProcessKey_Terminal_Gui_KeyEvent_
@@ -1716,6 +1973,19 @@ references:
   commentId: T:Terminal.Gui.Dim
   fullName: Terminal.Gui.Dim
   nameWithType: Dim
+- uid: Terminal.Gui.Dim.Equals(System.Object)
+  name: Equals(Object)
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Equals_System_Object_
+  commentId: M:Terminal.Gui.Dim.Equals(System.Object)
+  fullName: Terminal.Gui.Dim.Equals(System.Object)
+  nameWithType: Dim.Equals(Object)
+- uid: Terminal.Gui.Dim.Equals*
+  name: Equals
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Equals_
+  commentId: Overload:Terminal.Gui.Dim.Equals
+  isSpec: "True"
+  fullName: Terminal.Gui.Dim.Equals
+  nameWithType: Dim.Equals
 - uid: Terminal.Gui.Dim.Fill(System.Int32)
   name: Fill(Int32)
   href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Fill_System_Int32_
@@ -1729,6 +1999,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Dim.Fill
   nameWithType: Dim.Fill
+- uid: Terminal.Gui.Dim.GetHashCode
+  name: GetHashCode()
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_GetHashCode
+  commentId: M:Terminal.Gui.Dim.GetHashCode
+  fullName: Terminal.Gui.Dim.GetHashCode()
+  nameWithType: Dim.GetHashCode()
+- uid: Terminal.Gui.Dim.GetHashCode*
+  name: GetHashCode
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_GetHashCode_
+  commentId: Overload:Terminal.Gui.Dim.GetHashCode
+  isSpec: "True"
+  fullName: Terminal.Gui.Dim.GetHashCode
+  nameWithType: Dim.GetHashCode
 - uid: Terminal.Gui.Dim.Height(Terminal.Gui.View)
   name: Height(View)
   href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Height_Terminal_Gui_View_
@@ -1787,12 +2070,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Dim.Subtraction
   nameWithType: Dim.Subtraction
-- uid: Terminal.Gui.Dim.Percent(System.Single)
-  name: Percent(Single)
-  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Percent_System_Single_
-  commentId: M:Terminal.Gui.Dim.Percent(System.Single)
-  fullName: Terminal.Gui.Dim.Percent(System.Single)
-  nameWithType: Dim.Percent(Single)
+- uid: Terminal.Gui.Dim.Percent(System.Single,System.Boolean)
+  name: Percent(Single, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Percent_System_Single_System_Boolean_
+  commentId: M:Terminal.Gui.Dim.Percent(System.Single,System.Boolean)
+  fullName: Terminal.Gui.Dim.Percent(System.Single, System.Boolean)
+  nameWithType: Dim.Percent(Single, Boolean)
 - uid: Terminal.Gui.Dim.Percent*
   name: Percent
   href: api/Terminal.Gui/Terminal.Gui.Dim.html#Terminal_Gui_Dim_Percent_
@@ -1826,6 +2109,1155 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Dim.Width
   nameWithType: Dim.Width
+- uid: Terminal.Gui.FakeConsole
+  name: FakeConsole
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html
+  commentId: T:Terminal.Gui.FakeConsole
+  fullName: Terminal.Gui.FakeConsole
+  nameWithType: FakeConsole
+- uid: Terminal.Gui.FakeConsole.BackgroundColor
+  name: BackgroundColor
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_BackgroundColor
+  commentId: P:Terminal.Gui.FakeConsole.BackgroundColor
+  fullName: Terminal.Gui.FakeConsole.BackgroundColor
+  nameWithType: FakeConsole.BackgroundColor
+- uid: Terminal.Gui.FakeConsole.BackgroundColor*
+  name: BackgroundColor
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_BackgroundColor_
+  commentId: Overload:Terminal.Gui.FakeConsole.BackgroundColor
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.BackgroundColor
+  nameWithType: FakeConsole.BackgroundColor
+- uid: Terminal.Gui.FakeConsole.Beep
+  name: Beep()
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Beep
+  commentId: M:Terminal.Gui.FakeConsole.Beep
+  fullName: Terminal.Gui.FakeConsole.Beep()
+  nameWithType: FakeConsole.Beep()
+- uid: Terminal.Gui.FakeConsole.Beep(System.Int32,System.Int32)
+  name: Beep(Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Beep_System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.FakeConsole.Beep(System.Int32,System.Int32)
+  fullName: Terminal.Gui.FakeConsole.Beep(System.Int32, System.Int32)
+  nameWithType: FakeConsole.Beep(Int32, Int32)
+- uid: Terminal.Gui.FakeConsole.Beep*
+  name: Beep
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Beep_
+  commentId: Overload:Terminal.Gui.FakeConsole.Beep
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.Beep
+  nameWithType: FakeConsole.Beep
+- uid: Terminal.Gui.FakeConsole.BufferHeight
+  name: BufferHeight
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_BufferHeight
+  commentId: P:Terminal.Gui.FakeConsole.BufferHeight
+  fullName: Terminal.Gui.FakeConsole.BufferHeight
+  nameWithType: FakeConsole.BufferHeight
+- uid: Terminal.Gui.FakeConsole.BufferHeight*
+  name: BufferHeight
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_BufferHeight_
+  commentId: Overload:Terminal.Gui.FakeConsole.BufferHeight
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.BufferHeight
+  nameWithType: FakeConsole.BufferHeight
+- uid: Terminal.Gui.FakeConsole.BufferWidth
+  name: BufferWidth
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_BufferWidth
+  commentId: P:Terminal.Gui.FakeConsole.BufferWidth
+  fullName: Terminal.Gui.FakeConsole.BufferWidth
+  nameWithType: FakeConsole.BufferWidth
+- uid: Terminal.Gui.FakeConsole.BufferWidth*
+  name: BufferWidth
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_BufferWidth_
+  commentId: Overload:Terminal.Gui.FakeConsole.BufferWidth
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.BufferWidth
+  nameWithType: FakeConsole.BufferWidth
+- uid: Terminal.Gui.FakeConsole.CapsLock
+  name: CapsLock
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_CapsLock
+  commentId: P:Terminal.Gui.FakeConsole.CapsLock
+  fullName: Terminal.Gui.FakeConsole.CapsLock
+  nameWithType: FakeConsole.CapsLock
+- uid: Terminal.Gui.FakeConsole.CapsLock*
+  name: CapsLock
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_CapsLock_
+  commentId: Overload:Terminal.Gui.FakeConsole.CapsLock
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.CapsLock
+  nameWithType: FakeConsole.CapsLock
+- uid: Terminal.Gui.FakeConsole.Clear
+  name: Clear()
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Clear
+  commentId: M:Terminal.Gui.FakeConsole.Clear
+  fullName: Terminal.Gui.FakeConsole.Clear()
+  nameWithType: FakeConsole.Clear()
+- uid: Terminal.Gui.FakeConsole.Clear*
+  name: Clear
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Clear_
+  commentId: Overload:Terminal.Gui.FakeConsole.Clear
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.Clear
+  nameWithType: FakeConsole.Clear
+- uid: Terminal.Gui.FakeConsole.CursorLeft
+  name: CursorLeft
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_CursorLeft
+  commentId: P:Terminal.Gui.FakeConsole.CursorLeft
+  fullName: Terminal.Gui.FakeConsole.CursorLeft
+  nameWithType: FakeConsole.CursorLeft
+- uid: Terminal.Gui.FakeConsole.CursorLeft*
+  name: CursorLeft
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_CursorLeft_
+  commentId: Overload:Terminal.Gui.FakeConsole.CursorLeft
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.CursorLeft
+  nameWithType: FakeConsole.CursorLeft
+- uid: Terminal.Gui.FakeConsole.CursorSize
+  name: CursorSize
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_CursorSize
+  commentId: P:Terminal.Gui.FakeConsole.CursorSize
+  fullName: Terminal.Gui.FakeConsole.CursorSize
+  nameWithType: FakeConsole.CursorSize
+- uid: Terminal.Gui.FakeConsole.CursorSize*
+  name: CursorSize
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_CursorSize_
+  commentId: Overload:Terminal.Gui.FakeConsole.CursorSize
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.CursorSize
+  nameWithType: FakeConsole.CursorSize
+- uid: Terminal.Gui.FakeConsole.CursorTop
+  name: CursorTop
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_CursorTop
+  commentId: P:Terminal.Gui.FakeConsole.CursorTop
+  fullName: Terminal.Gui.FakeConsole.CursorTop
+  nameWithType: FakeConsole.CursorTop
+- uid: Terminal.Gui.FakeConsole.CursorTop*
+  name: CursorTop
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_CursorTop_
+  commentId: Overload:Terminal.Gui.FakeConsole.CursorTop
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.CursorTop
+  nameWithType: FakeConsole.CursorTop
+- uid: Terminal.Gui.FakeConsole.CursorVisible
+  name: CursorVisible
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_CursorVisible
+  commentId: P:Terminal.Gui.FakeConsole.CursorVisible
+  fullName: Terminal.Gui.FakeConsole.CursorVisible
+  nameWithType: FakeConsole.CursorVisible
+- uid: Terminal.Gui.FakeConsole.CursorVisible*
+  name: CursorVisible
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_CursorVisible_
+  commentId: Overload:Terminal.Gui.FakeConsole.CursorVisible
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.CursorVisible
+  nameWithType: FakeConsole.CursorVisible
+- uid: Terminal.Gui.FakeConsole.Error
+  name: Error
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Error
+  commentId: P:Terminal.Gui.FakeConsole.Error
+  fullName: Terminal.Gui.FakeConsole.Error
+  nameWithType: FakeConsole.Error
+- uid: Terminal.Gui.FakeConsole.Error*
+  name: Error
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Error_
+  commentId: Overload:Terminal.Gui.FakeConsole.Error
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.Error
+  nameWithType: FakeConsole.Error
+- uid: Terminal.Gui.FakeConsole.ForegroundColor
+  name: ForegroundColor
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_ForegroundColor
+  commentId: P:Terminal.Gui.FakeConsole.ForegroundColor
+  fullName: Terminal.Gui.FakeConsole.ForegroundColor
+  nameWithType: FakeConsole.ForegroundColor
+- uid: Terminal.Gui.FakeConsole.ForegroundColor*
+  name: ForegroundColor
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_ForegroundColor_
+  commentId: Overload:Terminal.Gui.FakeConsole.ForegroundColor
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.ForegroundColor
+  nameWithType: FakeConsole.ForegroundColor
+- uid: Terminal.Gui.FakeConsole.In
+  name: In
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_In
+  commentId: P:Terminal.Gui.FakeConsole.In
+  fullName: Terminal.Gui.FakeConsole.In
+  nameWithType: FakeConsole.In
+- uid: Terminal.Gui.FakeConsole.In*
+  name: In
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_In_
+  commentId: Overload:Terminal.Gui.FakeConsole.In
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.In
+  nameWithType: FakeConsole.In
+- uid: Terminal.Gui.FakeConsole.InputEncoding
+  name: InputEncoding
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_InputEncoding
+  commentId: P:Terminal.Gui.FakeConsole.InputEncoding
+  fullName: Terminal.Gui.FakeConsole.InputEncoding
+  nameWithType: FakeConsole.InputEncoding
+- uid: Terminal.Gui.FakeConsole.InputEncoding*
+  name: InputEncoding
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_InputEncoding_
+  commentId: Overload:Terminal.Gui.FakeConsole.InputEncoding
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.InputEncoding
+  nameWithType: FakeConsole.InputEncoding
+- uid: Terminal.Gui.FakeConsole.IsErrorRedirected
+  name: IsErrorRedirected
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_IsErrorRedirected
+  commentId: P:Terminal.Gui.FakeConsole.IsErrorRedirected
+  fullName: Terminal.Gui.FakeConsole.IsErrorRedirected
+  nameWithType: FakeConsole.IsErrorRedirected
+- uid: Terminal.Gui.FakeConsole.IsErrorRedirected*
+  name: IsErrorRedirected
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_IsErrorRedirected_
+  commentId: Overload:Terminal.Gui.FakeConsole.IsErrorRedirected
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.IsErrorRedirected
+  nameWithType: FakeConsole.IsErrorRedirected
+- uid: Terminal.Gui.FakeConsole.IsInputRedirected
+  name: IsInputRedirected
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_IsInputRedirected
+  commentId: P:Terminal.Gui.FakeConsole.IsInputRedirected
+  fullName: Terminal.Gui.FakeConsole.IsInputRedirected
+  nameWithType: FakeConsole.IsInputRedirected
+- uid: Terminal.Gui.FakeConsole.IsInputRedirected*
+  name: IsInputRedirected
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_IsInputRedirected_
+  commentId: Overload:Terminal.Gui.FakeConsole.IsInputRedirected
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.IsInputRedirected
+  nameWithType: FakeConsole.IsInputRedirected
+- uid: Terminal.Gui.FakeConsole.IsOutputRedirected
+  name: IsOutputRedirected
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_IsOutputRedirected
+  commentId: P:Terminal.Gui.FakeConsole.IsOutputRedirected
+  fullName: Terminal.Gui.FakeConsole.IsOutputRedirected
+  nameWithType: FakeConsole.IsOutputRedirected
+- uid: Terminal.Gui.FakeConsole.IsOutputRedirected*
+  name: IsOutputRedirected
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_IsOutputRedirected_
+  commentId: Overload:Terminal.Gui.FakeConsole.IsOutputRedirected
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.IsOutputRedirected
+  nameWithType: FakeConsole.IsOutputRedirected
+- uid: Terminal.Gui.FakeConsole.KeyAvailable
+  name: KeyAvailable
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_KeyAvailable
+  commentId: P:Terminal.Gui.FakeConsole.KeyAvailable
+  fullName: Terminal.Gui.FakeConsole.KeyAvailable
+  nameWithType: FakeConsole.KeyAvailable
+- uid: Terminal.Gui.FakeConsole.KeyAvailable*
+  name: KeyAvailable
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_KeyAvailable_
+  commentId: Overload:Terminal.Gui.FakeConsole.KeyAvailable
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.KeyAvailable
+  nameWithType: FakeConsole.KeyAvailable
+- uid: Terminal.Gui.FakeConsole.LargestWindowHeight
+  name: LargestWindowHeight
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_LargestWindowHeight
+  commentId: P:Terminal.Gui.FakeConsole.LargestWindowHeight
+  fullName: Terminal.Gui.FakeConsole.LargestWindowHeight
+  nameWithType: FakeConsole.LargestWindowHeight
+- uid: Terminal.Gui.FakeConsole.LargestWindowHeight*
+  name: LargestWindowHeight
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_LargestWindowHeight_
+  commentId: Overload:Terminal.Gui.FakeConsole.LargestWindowHeight
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.LargestWindowHeight
+  nameWithType: FakeConsole.LargestWindowHeight
+- uid: Terminal.Gui.FakeConsole.LargestWindowWidth
+  name: LargestWindowWidth
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_LargestWindowWidth
+  commentId: P:Terminal.Gui.FakeConsole.LargestWindowWidth
+  fullName: Terminal.Gui.FakeConsole.LargestWindowWidth
+  nameWithType: FakeConsole.LargestWindowWidth
+- uid: Terminal.Gui.FakeConsole.LargestWindowWidth*
+  name: LargestWindowWidth
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_LargestWindowWidth_
+  commentId: Overload:Terminal.Gui.FakeConsole.LargestWindowWidth
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.LargestWindowWidth
+  nameWithType: FakeConsole.LargestWindowWidth
+- uid: Terminal.Gui.FakeConsole.MockKeyPresses
+  name: MockKeyPresses
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_MockKeyPresses
+  commentId: F:Terminal.Gui.FakeConsole.MockKeyPresses
+  fullName: Terminal.Gui.FakeConsole.MockKeyPresses
+  nameWithType: FakeConsole.MockKeyPresses
+- uid: Terminal.Gui.FakeConsole.MoveBufferArea(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)
+  name: MoveBufferArea(Int32, Int32, Int32, Int32, Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_MoveBufferArea_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.FakeConsole.MoveBufferArea(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)
+  fullName: Terminal.Gui.FakeConsole.MoveBufferArea(System.Int32, System.Int32, System.Int32, System.Int32, System.Int32, System.Int32)
+  nameWithType: FakeConsole.MoveBufferArea(Int32, Int32, Int32, Int32, Int32, Int32)
+- uid: Terminal.Gui.FakeConsole.MoveBufferArea(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Char,System.ConsoleColor,System.ConsoleColor)
+  name: MoveBufferArea(Int32, Int32, Int32, Int32, Int32, Int32, Char, ConsoleColor, ConsoleColor)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_MoveBufferArea_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Char_System_ConsoleColor_System_ConsoleColor_
+  commentId: M:Terminal.Gui.FakeConsole.MoveBufferArea(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Char,System.ConsoleColor,System.ConsoleColor)
+  fullName: Terminal.Gui.FakeConsole.MoveBufferArea(System.Int32, System.Int32, System.Int32, System.Int32, System.Int32, System.Int32, System.Char, System.ConsoleColor, System.ConsoleColor)
+  nameWithType: FakeConsole.MoveBufferArea(Int32, Int32, Int32, Int32, Int32, Int32, Char, ConsoleColor, ConsoleColor)
+- uid: Terminal.Gui.FakeConsole.MoveBufferArea*
+  name: MoveBufferArea
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_MoveBufferArea_
+  commentId: Overload:Terminal.Gui.FakeConsole.MoveBufferArea
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.MoveBufferArea
+  nameWithType: FakeConsole.MoveBufferArea
+- uid: Terminal.Gui.FakeConsole.NumberLock
+  name: NumberLock
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_NumberLock
+  commentId: P:Terminal.Gui.FakeConsole.NumberLock
+  fullName: Terminal.Gui.FakeConsole.NumberLock
+  nameWithType: FakeConsole.NumberLock
+- uid: Terminal.Gui.FakeConsole.NumberLock*
+  name: NumberLock
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_NumberLock_
+  commentId: Overload:Terminal.Gui.FakeConsole.NumberLock
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.NumberLock
+  nameWithType: FakeConsole.NumberLock
+- uid: Terminal.Gui.FakeConsole.OpenStandardError
+  name: OpenStandardError()
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_OpenStandardError
+  commentId: M:Terminal.Gui.FakeConsole.OpenStandardError
+  fullName: Terminal.Gui.FakeConsole.OpenStandardError()
+  nameWithType: FakeConsole.OpenStandardError()
+- uid: Terminal.Gui.FakeConsole.OpenStandardError(System.Int32)
+  name: OpenStandardError(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_OpenStandardError_System_Int32_
+  commentId: M:Terminal.Gui.FakeConsole.OpenStandardError(System.Int32)
+  fullName: Terminal.Gui.FakeConsole.OpenStandardError(System.Int32)
+  nameWithType: FakeConsole.OpenStandardError(Int32)
+- uid: Terminal.Gui.FakeConsole.OpenStandardError*
+  name: OpenStandardError
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_OpenStandardError_
+  commentId: Overload:Terminal.Gui.FakeConsole.OpenStandardError
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.OpenStandardError
+  nameWithType: FakeConsole.OpenStandardError
+- uid: Terminal.Gui.FakeConsole.OpenStandardInput
+  name: OpenStandardInput()
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_OpenStandardInput
+  commentId: M:Terminal.Gui.FakeConsole.OpenStandardInput
+  fullName: Terminal.Gui.FakeConsole.OpenStandardInput()
+  nameWithType: FakeConsole.OpenStandardInput()
+- uid: Terminal.Gui.FakeConsole.OpenStandardInput(System.Int32)
+  name: OpenStandardInput(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_OpenStandardInput_System_Int32_
+  commentId: M:Terminal.Gui.FakeConsole.OpenStandardInput(System.Int32)
+  fullName: Terminal.Gui.FakeConsole.OpenStandardInput(System.Int32)
+  nameWithType: FakeConsole.OpenStandardInput(Int32)
+- uid: Terminal.Gui.FakeConsole.OpenStandardInput*
+  name: OpenStandardInput
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_OpenStandardInput_
+  commentId: Overload:Terminal.Gui.FakeConsole.OpenStandardInput
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.OpenStandardInput
+  nameWithType: FakeConsole.OpenStandardInput
+- uid: Terminal.Gui.FakeConsole.OpenStandardOutput
+  name: OpenStandardOutput()
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_OpenStandardOutput
+  commentId: M:Terminal.Gui.FakeConsole.OpenStandardOutput
+  fullName: Terminal.Gui.FakeConsole.OpenStandardOutput()
+  nameWithType: FakeConsole.OpenStandardOutput()
+- uid: Terminal.Gui.FakeConsole.OpenStandardOutput(System.Int32)
+  name: OpenStandardOutput(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_OpenStandardOutput_System_Int32_
+  commentId: M:Terminal.Gui.FakeConsole.OpenStandardOutput(System.Int32)
+  fullName: Terminal.Gui.FakeConsole.OpenStandardOutput(System.Int32)
+  nameWithType: FakeConsole.OpenStandardOutput(Int32)
+- uid: Terminal.Gui.FakeConsole.OpenStandardOutput*
+  name: OpenStandardOutput
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_OpenStandardOutput_
+  commentId: Overload:Terminal.Gui.FakeConsole.OpenStandardOutput
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.OpenStandardOutput
+  nameWithType: FakeConsole.OpenStandardOutput
+- uid: Terminal.Gui.FakeConsole.Out
+  name: Out
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Out
+  commentId: P:Terminal.Gui.FakeConsole.Out
+  fullName: Terminal.Gui.FakeConsole.Out
+  nameWithType: FakeConsole.Out
+- uid: Terminal.Gui.FakeConsole.Out*
+  name: Out
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Out_
+  commentId: Overload:Terminal.Gui.FakeConsole.Out
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.Out
+  nameWithType: FakeConsole.Out
+- uid: Terminal.Gui.FakeConsole.OutputEncoding
+  name: OutputEncoding
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_OutputEncoding
+  commentId: P:Terminal.Gui.FakeConsole.OutputEncoding
+  fullName: Terminal.Gui.FakeConsole.OutputEncoding
+  nameWithType: FakeConsole.OutputEncoding
+- uid: Terminal.Gui.FakeConsole.OutputEncoding*
+  name: OutputEncoding
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_OutputEncoding_
+  commentId: Overload:Terminal.Gui.FakeConsole.OutputEncoding
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.OutputEncoding
+  nameWithType: FakeConsole.OutputEncoding
+- uid: Terminal.Gui.FakeConsole.Read
+  name: Read()
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Read
+  commentId: M:Terminal.Gui.FakeConsole.Read
+  fullName: Terminal.Gui.FakeConsole.Read()
+  nameWithType: FakeConsole.Read()
+- uid: Terminal.Gui.FakeConsole.Read*
+  name: Read
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Read_
+  commentId: Overload:Terminal.Gui.FakeConsole.Read
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.Read
+  nameWithType: FakeConsole.Read
+- uid: Terminal.Gui.FakeConsole.ReadKey
+  name: ReadKey()
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_ReadKey
+  commentId: M:Terminal.Gui.FakeConsole.ReadKey
+  fullName: Terminal.Gui.FakeConsole.ReadKey()
+  nameWithType: FakeConsole.ReadKey()
+- uid: Terminal.Gui.FakeConsole.ReadKey(System.Boolean)
+  name: ReadKey(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_ReadKey_System_Boolean_
+  commentId: M:Terminal.Gui.FakeConsole.ReadKey(System.Boolean)
+  fullName: Terminal.Gui.FakeConsole.ReadKey(System.Boolean)
+  nameWithType: FakeConsole.ReadKey(Boolean)
+- uid: Terminal.Gui.FakeConsole.ReadKey*
+  name: ReadKey
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_ReadKey_
+  commentId: Overload:Terminal.Gui.FakeConsole.ReadKey
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.ReadKey
+  nameWithType: FakeConsole.ReadKey
+- uid: Terminal.Gui.FakeConsole.ReadLine
+  name: ReadLine()
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_ReadLine
+  commentId: M:Terminal.Gui.FakeConsole.ReadLine
+  fullName: Terminal.Gui.FakeConsole.ReadLine()
+  nameWithType: FakeConsole.ReadLine()
+- uid: Terminal.Gui.FakeConsole.ReadLine*
+  name: ReadLine
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_ReadLine_
+  commentId: Overload:Terminal.Gui.FakeConsole.ReadLine
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.ReadLine
+  nameWithType: FakeConsole.ReadLine
+- uid: Terminal.Gui.FakeConsole.ResetColor
+  name: ResetColor()
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_ResetColor
+  commentId: M:Terminal.Gui.FakeConsole.ResetColor
+  fullName: Terminal.Gui.FakeConsole.ResetColor()
+  nameWithType: FakeConsole.ResetColor()
+- uid: Terminal.Gui.FakeConsole.ResetColor*
+  name: ResetColor
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_ResetColor_
+  commentId: Overload:Terminal.Gui.FakeConsole.ResetColor
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.ResetColor
+  nameWithType: FakeConsole.ResetColor
+- uid: Terminal.Gui.FakeConsole.SetBufferSize(System.Int32,System.Int32)
+  name: SetBufferSize(Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_SetBufferSize_System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.FakeConsole.SetBufferSize(System.Int32,System.Int32)
+  fullName: Terminal.Gui.FakeConsole.SetBufferSize(System.Int32, System.Int32)
+  nameWithType: FakeConsole.SetBufferSize(Int32, Int32)
+- uid: Terminal.Gui.FakeConsole.SetBufferSize*
+  name: SetBufferSize
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_SetBufferSize_
+  commentId: Overload:Terminal.Gui.FakeConsole.SetBufferSize
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.SetBufferSize
+  nameWithType: FakeConsole.SetBufferSize
+- uid: Terminal.Gui.FakeConsole.SetCursorPosition(System.Int32,System.Int32)
+  name: SetCursorPosition(Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_SetCursorPosition_System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.FakeConsole.SetCursorPosition(System.Int32,System.Int32)
+  fullName: Terminal.Gui.FakeConsole.SetCursorPosition(System.Int32, System.Int32)
+  nameWithType: FakeConsole.SetCursorPosition(Int32, Int32)
+- uid: Terminal.Gui.FakeConsole.SetCursorPosition*
+  name: SetCursorPosition
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_SetCursorPosition_
+  commentId: Overload:Terminal.Gui.FakeConsole.SetCursorPosition
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.SetCursorPosition
+  nameWithType: FakeConsole.SetCursorPosition
+- uid: Terminal.Gui.FakeConsole.SetError(System.IO.TextWriter)
+  name: SetError(TextWriter)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_SetError_System_IO_TextWriter_
+  commentId: M:Terminal.Gui.FakeConsole.SetError(System.IO.TextWriter)
+  fullName: Terminal.Gui.FakeConsole.SetError(System.IO.TextWriter)
+  nameWithType: FakeConsole.SetError(TextWriter)
+- uid: Terminal.Gui.FakeConsole.SetError*
+  name: SetError
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_SetError_
+  commentId: Overload:Terminal.Gui.FakeConsole.SetError
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.SetError
+  nameWithType: FakeConsole.SetError
+- uid: Terminal.Gui.FakeConsole.SetIn(System.IO.TextReader)
+  name: SetIn(TextReader)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_SetIn_System_IO_TextReader_
+  commentId: M:Terminal.Gui.FakeConsole.SetIn(System.IO.TextReader)
+  fullName: Terminal.Gui.FakeConsole.SetIn(System.IO.TextReader)
+  nameWithType: FakeConsole.SetIn(TextReader)
+- uid: Terminal.Gui.FakeConsole.SetIn*
+  name: SetIn
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_SetIn_
+  commentId: Overload:Terminal.Gui.FakeConsole.SetIn
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.SetIn
+  nameWithType: FakeConsole.SetIn
+- uid: Terminal.Gui.FakeConsole.SetOut(System.IO.TextWriter)
+  name: SetOut(TextWriter)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_SetOut_System_IO_TextWriter_
+  commentId: M:Terminal.Gui.FakeConsole.SetOut(System.IO.TextWriter)
+  fullName: Terminal.Gui.FakeConsole.SetOut(System.IO.TextWriter)
+  nameWithType: FakeConsole.SetOut(TextWriter)
+- uid: Terminal.Gui.FakeConsole.SetOut*
+  name: SetOut
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_SetOut_
+  commentId: Overload:Terminal.Gui.FakeConsole.SetOut
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.SetOut
+  nameWithType: FakeConsole.SetOut
+- uid: Terminal.Gui.FakeConsole.SetWindowPosition(System.Int32,System.Int32)
+  name: SetWindowPosition(Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_SetWindowPosition_System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.FakeConsole.SetWindowPosition(System.Int32,System.Int32)
+  fullName: Terminal.Gui.FakeConsole.SetWindowPosition(System.Int32, System.Int32)
+  nameWithType: FakeConsole.SetWindowPosition(Int32, Int32)
+- uid: Terminal.Gui.FakeConsole.SetWindowPosition*
+  name: SetWindowPosition
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_SetWindowPosition_
+  commentId: Overload:Terminal.Gui.FakeConsole.SetWindowPosition
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.SetWindowPosition
+  nameWithType: FakeConsole.SetWindowPosition
+- uid: Terminal.Gui.FakeConsole.SetWindowSize(System.Int32,System.Int32)
+  name: SetWindowSize(Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_SetWindowSize_System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.FakeConsole.SetWindowSize(System.Int32,System.Int32)
+  fullName: Terminal.Gui.FakeConsole.SetWindowSize(System.Int32, System.Int32)
+  nameWithType: FakeConsole.SetWindowSize(Int32, Int32)
+- uid: Terminal.Gui.FakeConsole.SetWindowSize*
+  name: SetWindowSize
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_SetWindowSize_
+  commentId: Overload:Terminal.Gui.FakeConsole.SetWindowSize
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.SetWindowSize
+  nameWithType: FakeConsole.SetWindowSize
+- uid: Terminal.Gui.FakeConsole.Title
+  name: Title
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Title
+  commentId: P:Terminal.Gui.FakeConsole.Title
+  fullName: Terminal.Gui.FakeConsole.Title
+  nameWithType: FakeConsole.Title
+- uid: Terminal.Gui.FakeConsole.Title*
+  name: Title
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Title_
+  commentId: Overload:Terminal.Gui.FakeConsole.Title
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.Title
+  nameWithType: FakeConsole.Title
+- uid: Terminal.Gui.FakeConsole.TreatControlCAsInput
+  name: TreatControlCAsInput
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_TreatControlCAsInput
+  commentId: P:Terminal.Gui.FakeConsole.TreatControlCAsInput
+  fullName: Terminal.Gui.FakeConsole.TreatControlCAsInput
+  nameWithType: FakeConsole.TreatControlCAsInput
+- uid: Terminal.Gui.FakeConsole.TreatControlCAsInput*
+  name: TreatControlCAsInput
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_TreatControlCAsInput_
+  commentId: Overload:Terminal.Gui.FakeConsole.TreatControlCAsInput
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.TreatControlCAsInput
+  nameWithType: FakeConsole.TreatControlCAsInput
+- uid: Terminal.Gui.FakeConsole.WindowHeight
+  name: WindowHeight
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WindowHeight
+  commentId: P:Terminal.Gui.FakeConsole.WindowHeight
+  fullName: Terminal.Gui.FakeConsole.WindowHeight
+  nameWithType: FakeConsole.WindowHeight
+- uid: Terminal.Gui.FakeConsole.WindowHeight*
+  name: WindowHeight
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WindowHeight_
+  commentId: Overload:Terminal.Gui.FakeConsole.WindowHeight
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.WindowHeight
+  nameWithType: FakeConsole.WindowHeight
+- uid: Terminal.Gui.FakeConsole.WindowLeft
+  name: WindowLeft
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WindowLeft
+  commentId: P:Terminal.Gui.FakeConsole.WindowLeft
+  fullName: Terminal.Gui.FakeConsole.WindowLeft
+  nameWithType: FakeConsole.WindowLeft
+- uid: Terminal.Gui.FakeConsole.WindowLeft*
+  name: WindowLeft
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WindowLeft_
+  commentId: Overload:Terminal.Gui.FakeConsole.WindowLeft
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.WindowLeft
+  nameWithType: FakeConsole.WindowLeft
+- uid: Terminal.Gui.FakeConsole.WindowTop
+  name: WindowTop
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WindowTop
+  commentId: P:Terminal.Gui.FakeConsole.WindowTop
+  fullName: Terminal.Gui.FakeConsole.WindowTop
+  nameWithType: FakeConsole.WindowTop
+- uid: Terminal.Gui.FakeConsole.WindowTop*
+  name: WindowTop
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WindowTop_
+  commentId: Overload:Terminal.Gui.FakeConsole.WindowTop
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.WindowTop
+  nameWithType: FakeConsole.WindowTop
+- uid: Terminal.Gui.FakeConsole.WindowWidth
+  name: WindowWidth
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WindowWidth
+  commentId: P:Terminal.Gui.FakeConsole.WindowWidth
+  fullName: Terminal.Gui.FakeConsole.WindowWidth
+  nameWithType: FakeConsole.WindowWidth
+- uid: Terminal.Gui.FakeConsole.WindowWidth*
+  name: WindowWidth
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WindowWidth_
+  commentId: Overload:Terminal.Gui.FakeConsole.WindowWidth
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.WindowWidth
+  nameWithType: FakeConsole.WindowWidth
+- uid: Terminal.Gui.FakeConsole.Write(System.Boolean)
+  name: Write(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_Boolean_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.Boolean)
+  fullName: Terminal.Gui.FakeConsole.Write(System.Boolean)
+  nameWithType: FakeConsole.Write(Boolean)
+- uid: Terminal.Gui.FakeConsole.Write(System.Char)
+  name: Write(Char)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_Char_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.Char)
+  fullName: Terminal.Gui.FakeConsole.Write(System.Char)
+  nameWithType: FakeConsole.Write(Char)
+- uid: Terminal.Gui.FakeConsole.Write(System.Char[])
+  name: Write(Char[])
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_Char___
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.Char[])
+  name.vb: Write(Char())
+  fullName: Terminal.Gui.FakeConsole.Write(System.Char[])
+  fullName.vb: Terminal.Gui.FakeConsole.Write(System.Char())
+  nameWithType: FakeConsole.Write(Char[])
+  nameWithType.vb: FakeConsole.Write(Char())
+- uid: Terminal.Gui.FakeConsole.Write(System.Char[],System.Int32,System.Int32)
+  name: Write(Char[], Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_Char___System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.Char[],System.Int32,System.Int32)
+  name.vb: Write(Char(), Int32, Int32)
+  fullName: Terminal.Gui.FakeConsole.Write(System.Char[], System.Int32, System.Int32)
+  fullName.vb: Terminal.Gui.FakeConsole.Write(System.Char(), System.Int32, System.Int32)
+  nameWithType: FakeConsole.Write(Char[], Int32, Int32)
+  nameWithType.vb: FakeConsole.Write(Char(), Int32, Int32)
+- uid: Terminal.Gui.FakeConsole.Write(System.Decimal)
+  name: Write(Decimal)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_Decimal_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.Decimal)
+  fullName: Terminal.Gui.FakeConsole.Write(System.Decimal)
+  nameWithType: FakeConsole.Write(Decimal)
+- uid: Terminal.Gui.FakeConsole.Write(System.Double)
+  name: Write(Double)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_Double_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.Double)
+  fullName: Terminal.Gui.FakeConsole.Write(System.Double)
+  nameWithType: FakeConsole.Write(Double)
+- uid: Terminal.Gui.FakeConsole.Write(System.Int32)
+  name: Write(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_Int32_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.Int32)
+  fullName: Terminal.Gui.FakeConsole.Write(System.Int32)
+  nameWithType: FakeConsole.Write(Int32)
+- uid: Terminal.Gui.FakeConsole.Write(System.Int64)
+  name: Write(Int64)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_Int64_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.Int64)
+  fullName: Terminal.Gui.FakeConsole.Write(System.Int64)
+  nameWithType: FakeConsole.Write(Int64)
+- uid: Terminal.Gui.FakeConsole.Write(System.Object)
+  name: Write(Object)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_Object_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.Object)
+  fullName: Terminal.Gui.FakeConsole.Write(System.Object)
+  nameWithType: FakeConsole.Write(Object)
+- uid: Terminal.Gui.FakeConsole.Write(System.Single)
+  name: Write(Single)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_Single_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.Single)
+  fullName: Terminal.Gui.FakeConsole.Write(System.Single)
+  nameWithType: FakeConsole.Write(Single)
+- uid: Terminal.Gui.FakeConsole.Write(System.String)
+  name: Write(String)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_String_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.String)
+  fullName: Terminal.Gui.FakeConsole.Write(System.String)
+  nameWithType: FakeConsole.Write(String)
+- uid: Terminal.Gui.FakeConsole.Write(System.String,System.Object)
+  name: Write(String, Object)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_String_System_Object_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.String,System.Object)
+  fullName: Terminal.Gui.FakeConsole.Write(System.String, System.Object)
+  nameWithType: FakeConsole.Write(String, Object)
+- uid: Terminal.Gui.FakeConsole.Write(System.String,System.Object,System.Object)
+  name: Write(String, Object, Object)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_String_System_Object_System_Object_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.String,System.Object,System.Object)
+  fullName: Terminal.Gui.FakeConsole.Write(System.String, System.Object, System.Object)
+  nameWithType: FakeConsole.Write(String, Object, Object)
+- uid: Terminal.Gui.FakeConsole.Write(System.String,System.Object,System.Object,System.Object)
+  name: Write(String, Object, Object, Object)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_String_System_Object_System_Object_System_Object_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.String,System.Object,System.Object,System.Object)
+  fullName: Terminal.Gui.FakeConsole.Write(System.String, System.Object, System.Object, System.Object)
+  nameWithType: FakeConsole.Write(String, Object, Object, Object)
+- uid: Terminal.Gui.FakeConsole.Write(System.String,System.Object,System.Object,System.Object,System.Object)
+  name: Write(String, Object, Object, Object, Object)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_String_System_Object_System_Object_System_Object_System_Object_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.String,System.Object,System.Object,System.Object,System.Object)
+  fullName: Terminal.Gui.FakeConsole.Write(System.String, System.Object, System.Object, System.Object, System.Object)
+  nameWithType: FakeConsole.Write(String, Object, Object, Object, Object)
+- uid: Terminal.Gui.FakeConsole.Write(System.String,System.Object[])
+  name: Write(String, Object[])
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_String_System_Object___
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.String,System.Object[])
+  name.vb: Write(String, Object())
+  fullName: Terminal.Gui.FakeConsole.Write(System.String, System.Object[])
+  fullName.vb: Terminal.Gui.FakeConsole.Write(System.String, System.Object())
+  nameWithType: FakeConsole.Write(String, Object[])
+  nameWithType.vb: FakeConsole.Write(String, Object())
+- uid: Terminal.Gui.FakeConsole.Write(System.UInt32)
+  name: Write(UInt32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_UInt32_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.UInt32)
+  fullName: Terminal.Gui.FakeConsole.Write(System.UInt32)
+  nameWithType: FakeConsole.Write(UInt32)
+- uid: Terminal.Gui.FakeConsole.Write(System.UInt64)
+  name: Write(UInt64)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_System_UInt64_
+  commentId: M:Terminal.Gui.FakeConsole.Write(System.UInt64)
+  fullName: Terminal.Gui.FakeConsole.Write(System.UInt64)
+  nameWithType: FakeConsole.Write(UInt64)
+- uid: Terminal.Gui.FakeConsole.Write*
+  name: Write
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_Write_
+  commentId: Overload:Terminal.Gui.FakeConsole.Write
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.Write
+  nameWithType: FakeConsole.Write
+- uid: Terminal.Gui.FakeConsole.WriteLine
+  name: WriteLine()
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine
+  fullName: Terminal.Gui.FakeConsole.WriteLine()
+  nameWithType: FakeConsole.WriteLine()
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.Boolean)
+  name: WriteLine(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_Boolean_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.Boolean)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.Boolean)
+  nameWithType: FakeConsole.WriteLine(Boolean)
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.Char)
+  name: WriteLine(Char)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_Char_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.Char)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.Char)
+  nameWithType: FakeConsole.WriteLine(Char)
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.Char[])
+  name: WriteLine(Char[])
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_Char___
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.Char[])
+  name.vb: WriteLine(Char())
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.Char[])
+  fullName.vb: Terminal.Gui.FakeConsole.WriteLine(System.Char())
+  nameWithType: FakeConsole.WriteLine(Char[])
+  nameWithType.vb: FakeConsole.WriteLine(Char())
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.Char[],System.Int32,System.Int32)
+  name: WriteLine(Char[], Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_Char___System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.Char[],System.Int32,System.Int32)
+  name.vb: WriteLine(Char(), Int32, Int32)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.Char[], System.Int32, System.Int32)
+  fullName.vb: Terminal.Gui.FakeConsole.WriteLine(System.Char(), System.Int32, System.Int32)
+  nameWithType: FakeConsole.WriteLine(Char[], Int32, Int32)
+  nameWithType.vb: FakeConsole.WriteLine(Char(), Int32, Int32)
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.Decimal)
+  name: WriteLine(Decimal)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_Decimal_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.Decimal)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.Decimal)
+  nameWithType: FakeConsole.WriteLine(Decimal)
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.Double)
+  name: WriteLine(Double)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_Double_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.Double)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.Double)
+  nameWithType: FakeConsole.WriteLine(Double)
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.Int32)
+  name: WriteLine(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_Int32_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.Int32)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.Int32)
+  nameWithType: FakeConsole.WriteLine(Int32)
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.Int64)
+  name: WriteLine(Int64)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_Int64_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.Int64)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.Int64)
+  nameWithType: FakeConsole.WriteLine(Int64)
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.Object)
+  name: WriteLine(Object)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_Object_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.Object)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.Object)
+  nameWithType: FakeConsole.WriteLine(Object)
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.Single)
+  name: WriteLine(Single)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_Single_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.Single)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.Single)
+  nameWithType: FakeConsole.WriteLine(Single)
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.String)
+  name: WriteLine(String)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_String_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.String)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.String)
+  nameWithType: FakeConsole.WriteLine(String)
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.String,System.Object)
+  name: WriteLine(String, Object)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_String_System_Object_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.String,System.Object)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.String, System.Object)
+  nameWithType: FakeConsole.WriteLine(String, Object)
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.String,System.Object,System.Object)
+  name: WriteLine(String, Object, Object)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_String_System_Object_System_Object_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.String,System.Object,System.Object)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.String, System.Object, System.Object)
+  nameWithType: FakeConsole.WriteLine(String, Object, Object)
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.String,System.Object,System.Object,System.Object)
+  name: WriteLine(String, Object, Object, Object)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_String_System_Object_System_Object_System_Object_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.String,System.Object,System.Object,System.Object)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.String, System.Object, System.Object, System.Object)
+  nameWithType: FakeConsole.WriteLine(String, Object, Object, Object)
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.String,System.Object,System.Object,System.Object,System.Object)
+  name: WriteLine(String, Object, Object, Object, Object)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_String_System_Object_System_Object_System_Object_System_Object_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.String,System.Object,System.Object,System.Object,System.Object)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.String, System.Object, System.Object, System.Object, System.Object)
+  nameWithType: FakeConsole.WriteLine(String, Object, Object, Object, Object)
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.String,System.Object[])
+  name: WriteLine(String, Object[])
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_String_System_Object___
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.String,System.Object[])
+  name.vb: WriteLine(String, Object())
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.String, System.Object[])
+  fullName.vb: Terminal.Gui.FakeConsole.WriteLine(System.String, System.Object())
+  nameWithType: FakeConsole.WriteLine(String, Object[])
+  nameWithType.vb: FakeConsole.WriteLine(String, Object())
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.UInt32)
+  name: WriteLine(UInt32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_UInt32_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.UInt32)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.UInt32)
+  nameWithType: FakeConsole.WriteLine(UInt32)
+- uid: Terminal.Gui.FakeConsole.WriteLine(System.UInt64)
+  name: WriteLine(UInt64)
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_System_UInt64_
+  commentId: M:Terminal.Gui.FakeConsole.WriteLine(System.UInt64)
+  fullName: Terminal.Gui.FakeConsole.WriteLine(System.UInt64)
+  nameWithType: FakeConsole.WriteLine(UInt64)
+- uid: Terminal.Gui.FakeConsole.WriteLine*
+  name: WriteLine
+  href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html#Terminal_Gui_FakeConsole_WriteLine_
+  commentId: Overload:Terminal.Gui.FakeConsole.WriteLine
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeConsole.WriteLine
+  nameWithType: FakeConsole.WriteLine
+- uid: Terminal.Gui.FakeDriver
+  name: FakeDriver
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html
+  commentId: T:Terminal.Gui.FakeDriver
+  fullName: Terminal.Gui.FakeDriver
+  nameWithType: FakeDriver
+- uid: Terminal.Gui.FakeDriver.#ctor
+  name: FakeDriver()
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver__ctor
+  commentId: M:Terminal.Gui.FakeDriver.#ctor
+  fullName: Terminal.Gui.FakeDriver.FakeDriver()
+  nameWithType: FakeDriver.FakeDriver()
+- uid: Terminal.Gui.FakeDriver.#ctor*
+  name: FakeDriver
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver__ctor_
+  commentId: Overload:Terminal.Gui.FakeDriver.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.FakeDriver
+  nameWithType: FakeDriver.FakeDriver
+- uid: Terminal.Gui.FakeDriver.AddRune(System.Rune)
+  name: AddRune(Rune)
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_AddRune_System_Rune_
+  commentId: M:Terminal.Gui.FakeDriver.AddRune(System.Rune)
+  fullName: Terminal.Gui.FakeDriver.AddRune(System.Rune)
+  nameWithType: FakeDriver.AddRune(Rune)
+- uid: Terminal.Gui.FakeDriver.AddRune*
+  name: AddRune
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_AddRune_
+  commentId: Overload:Terminal.Gui.FakeDriver.AddRune
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.AddRune
+  nameWithType: FakeDriver.AddRune
+- uid: Terminal.Gui.FakeDriver.AddStr(NStack.ustring)
+  name: AddStr(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_AddStr_NStack_ustring_
+  commentId: M:Terminal.Gui.FakeDriver.AddStr(NStack.ustring)
+  fullName: Terminal.Gui.FakeDriver.AddStr(NStack.ustring)
+  nameWithType: FakeDriver.AddStr(ustring)
+- uid: Terminal.Gui.FakeDriver.AddStr*
+  name: AddStr
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_AddStr_
+  commentId: Overload:Terminal.Gui.FakeDriver.AddStr
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.AddStr
+  nameWithType: FakeDriver.AddStr
+- uid: Terminal.Gui.FakeDriver.Cols
+  name: Cols
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Cols
+  commentId: P:Terminal.Gui.FakeDriver.Cols
+  fullName: Terminal.Gui.FakeDriver.Cols
+  nameWithType: FakeDriver.Cols
+- uid: Terminal.Gui.FakeDriver.Cols*
+  name: Cols
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Cols_
+  commentId: Overload:Terminal.Gui.FakeDriver.Cols
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.Cols
+  nameWithType: FakeDriver.Cols
+- uid: Terminal.Gui.FakeDriver.CookMouse
+  name: CookMouse()
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_CookMouse
+  commentId: M:Terminal.Gui.FakeDriver.CookMouse
+  fullName: Terminal.Gui.FakeDriver.CookMouse()
+  nameWithType: FakeDriver.CookMouse()
+- uid: Terminal.Gui.FakeDriver.CookMouse*
+  name: CookMouse
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_CookMouse_
+  commentId: Overload:Terminal.Gui.FakeDriver.CookMouse
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.CookMouse
+  nameWithType: FakeDriver.CookMouse
+- uid: Terminal.Gui.FakeDriver.End
+  name: End()
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_End
+  commentId: M:Terminal.Gui.FakeDriver.End
+  fullName: Terminal.Gui.FakeDriver.End()
+  nameWithType: FakeDriver.End()
+- uid: Terminal.Gui.FakeDriver.End*
+  name: End
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_End_
+  commentId: Overload:Terminal.Gui.FakeDriver.End
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.End
+  nameWithType: FakeDriver.End
+- uid: Terminal.Gui.FakeDriver.Init(System.Action)
+  name: Init(Action)
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Init_System_Action_
+  commentId: M:Terminal.Gui.FakeDriver.Init(System.Action)
+  fullName: Terminal.Gui.FakeDriver.Init(System.Action)
+  nameWithType: FakeDriver.Init(Action)
+- uid: Terminal.Gui.FakeDriver.Init*
+  name: Init
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Init_
+  commentId: Overload:Terminal.Gui.FakeDriver.Init
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.Init
+  nameWithType: FakeDriver.Init
+- uid: Terminal.Gui.FakeDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
+  name: MakeAttribute(Color, Color)
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_MakeAttribute_Terminal_Gui_Color_Terminal_Gui_Color_
+  commentId: M:Terminal.Gui.FakeDriver.MakeAttribute(Terminal.Gui.Color,Terminal.Gui.Color)
+  fullName: Terminal.Gui.FakeDriver.MakeAttribute(Terminal.Gui.Color, Terminal.Gui.Color)
+  nameWithType: FakeDriver.MakeAttribute(Color, Color)
+- uid: Terminal.Gui.FakeDriver.MakeAttribute*
+  name: MakeAttribute
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_MakeAttribute_
+  commentId: Overload:Terminal.Gui.FakeDriver.MakeAttribute
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.MakeAttribute
+  nameWithType: FakeDriver.MakeAttribute
+- uid: Terminal.Gui.FakeDriver.Move(System.Int32,System.Int32)
+  name: Move(Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Move_System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.FakeDriver.Move(System.Int32,System.Int32)
+  fullName: Terminal.Gui.FakeDriver.Move(System.Int32, System.Int32)
+  nameWithType: FakeDriver.Move(Int32, Int32)
+- uid: Terminal.Gui.FakeDriver.Move*
+  name: Move
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Move_
+  commentId: Overload:Terminal.Gui.FakeDriver.Move
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.Move
+  nameWithType: FakeDriver.Move
+- uid: Terminal.Gui.FakeDriver.PrepareToRun(Terminal.Gui.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  name: PrepareToRun(MainLoop, Action<KeyEvent>, Action<KeyEvent>, Action<KeyEvent>, Action<MouseEvent>)
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_PrepareToRun_Terminal_Gui_MainLoop_System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_KeyEvent__System_Action_Terminal_Gui_MouseEvent__
+  commentId: M:Terminal.Gui.FakeDriver.PrepareToRun(Terminal.Gui.MainLoop,System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.KeyEvent},System.Action{Terminal.Gui.MouseEvent})
+  name.vb: PrepareToRun(MainLoop, Action(Of KeyEvent), Action(Of KeyEvent), Action(Of KeyEvent), Action(Of MouseEvent))
+  fullName: Terminal.Gui.FakeDriver.PrepareToRun(Terminal.Gui.MainLoop, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.KeyEvent>, System.Action<Terminal.Gui.MouseEvent>)
+  fullName.vb: Terminal.Gui.FakeDriver.PrepareToRun(Terminal.Gui.MainLoop, System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.KeyEvent), System.Action(Of Terminal.Gui.MouseEvent))
+  nameWithType: FakeDriver.PrepareToRun(MainLoop, Action<KeyEvent>, Action<KeyEvent>, Action<KeyEvent>, Action<MouseEvent>)
+  nameWithType.vb: FakeDriver.PrepareToRun(MainLoop, Action(Of KeyEvent), Action(Of KeyEvent), Action(Of KeyEvent), Action(Of MouseEvent))
+- uid: Terminal.Gui.FakeDriver.PrepareToRun*
+  name: PrepareToRun
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_PrepareToRun_
+  commentId: Overload:Terminal.Gui.FakeDriver.PrepareToRun
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.PrepareToRun
+  nameWithType: FakeDriver.PrepareToRun
+- uid: Terminal.Gui.FakeDriver.Refresh
+  name: Refresh()
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Refresh
+  commentId: M:Terminal.Gui.FakeDriver.Refresh
+  fullName: Terminal.Gui.FakeDriver.Refresh()
+  nameWithType: FakeDriver.Refresh()
+- uid: Terminal.Gui.FakeDriver.Refresh*
+  name: Refresh
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Refresh_
+  commentId: Overload:Terminal.Gui.FakeDriver.Refresh
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.Refresh
+  nameWithType: FakeDriver.Refresh
+- uid: Terminal.Gui.FakeDriver.Rows
+  name: Rows
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Rows
+  commentId: P:Terminal.Gui.FakeDriver.Rows
+  fullName: Terminal.Gui.FakeDriver.Rows
+  nameWithType: FakeDriver.Rows
+- uid: Terminal.Gui.FakeDriver.Rows*
+  name: Rows
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Rows_
+  commentId: Overload:Terminal.Gui.FakeDriver.Rows
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.Rows
+  nameWithType: FakeDriver.Rows
+- uid: Terminal.Gui.FakeDriver.SetAttribute(Terminal.Gui.Attribute)
+  name: SetAttribute(Attribute)
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_SetAttribute_Terminal_Gui_Attribute_
+  commentId: M:Terminal.Gui.FakeDriver.SetAttribute(Terminal.Gui.Attribute)
+  fullName: Terminal.Gui.FakeDriver.SetAttribute(Terminal.Gui.Attribute)
+  nameWithType: FakeDriver.SetAttribute(Attribute)
+- uid: Terminal.Gui.FakeDriver.SetAttribute*
+  name: SetAttribute
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_SetAttribute_
+  commentId: Overload:Terminal.Gui.FakeDriver.SetAttribute
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.SetAttribute
+  nameWithType: FakeDriver.SetAttribute
+- uid: Terminal.Gui.FakeDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+  name: SetColors(ConsoleColor, ConsoleColor)
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_SetColors_System_ConsoleColor_System_ConsoleColor_
+  commentId: M:Terminal.Gui.FakeDriver.SetColors(System.ConsoleColor,System.ConsoleColor)
+  fullName: Terminal.Gui.FakeDriver.SetColors(System.ConsoleColor, System.ConsoleColor)
+  nameWithType: FakeDriver.SetColors(ConsoleColor, ConsoleColor)
+- uid: Terminal.Gui.FakeDriver.SetColors(System.Int16,System.Int16)
+  name: SetColors(Int16, Int16)
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_SetColors_System_Int16_System_Int16_
+  commentId: M:Terminal.Gui.FakeDriver.SetColors(System.Int16,System.Int16)
+  fullName: Terminal.Gui.FakeDriver.SetColors(System.Int16, System.Int16)
+  nameWithType: FakeDriver.SetColors(Int16, Int16)
+- uid: Terminal.Gui.FakeDriver.SetColors*
+  name: SetColors
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_SetColors_
+  commentId: Overload:Terminal.Gui.FakeDriver.SetColors
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.SetColors
+  nameWithType: FakeDriver.SetColors
+- uid: Terminal.Gui.FakeDriver.StartReportingMouseMoves
+  name: StartReportingMouseMoves()
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_StartReportingMouseMoves
+  commentId: M:Terminal.Gui.FakeDriver.StartReportingMouseMoves
+  fullName: Terminal.Gui.FakeDriver.StartReportingMouseMoves()
+  nameWithType: FakeDriver.StartReportingMouseMoves()
+- uid: Terminal.Gui.FakeDriver.StartReportingMouseMoves*
+  name: StartReportingMouseMoves
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_StartReportingMouseMoves_
+  commentId: Overload:Terminal.Gui.FakeDriver.StartReportingMouseMoves
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.StartReportingMouseMoves
+  nameWithType: FakeDriver.StartReportingMouseMoves
+- uid: Terminal.Gui.FakeDriver.StopReportingMouseMoves
+  name: StopReportingMouseMoves()
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_StopReportingMouseMoves
+  commentId: M:Terminal.Gui.FakeDriver.StopReportingMouseMoves
+  fullName: Terminal.Gui.FakeDriver.StopReportingMouseMoves()
+  nameWithType: FakeDriver.StopReportingMouseMoves()
+- uid: Terminal.Gui.FakeDriver.StopReportingMouseMoves*
+  name: StopReportingMouseMoves
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_StopReportingMouseMoves_
+  commentId: Overload:Terminal.Gui.FakeDriver.StopReportingMouseMoves
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.StopReportingMouseMoves
+  nameWithType: FakeDriver.StopReportingMouseMoves
+- uid: Terminal.Gui.FakeDriver.Suspend
+  name: Suspend()
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Suspend
+  commentId: M:Terminal.Gui.FakeDriver.Suspend
+  fullName: Terminal.Gui.FakeDriver.Suspend()
+  nameWithType: FakeDriver.Suspend()
+- uid: Terminal.Gui.FakeDriver.Suspend*
+  name: Suspend
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_Suspend_
+  commentId: Overload:Terminal.Gui.FakeDriver.Suspend
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.Suspend
+  nameWithType: FakeDriver.Suspend
+- uid: Terminal.Gui.FakeDriver.UncookMouse
+  name: UncookMouse()
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_UncookMouse
+  commentId: M:Terminal.Gui.FakeDriver.UncookMouse
+  fullName: Terminal.Gui.FakeDriver.UncookMouse()
+  nameWithType: FakeDriver.UncookMouse()
+- uid: Terminal.Gui.FakeDriver.UncookMouse*
+  name: UncookMouse
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_UncookMouse_
+  commentId: Overload:Terminal.Gui.FakeDriver.UncookMouse
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.UncookMouse
+  nameWithType: FakeDriver.UncookMouse
+- uid: Terminal.Gui.FakeDriver.UpdateCursor
+  name: UpdateCursor()
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_UpdateCursor
+  commentId: M:Terminal.Gui.FakeDriver.UpdateCursor
+  fullName: Terminal.Gui.FakeDriver.UpdateCursor()
+  nameWithType: FakeDriver.UpdateCursor()
+- uid: Terminal.Gui.FakeDriver.UpdateCursor*
+  name: UpdateCursor
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_UpdateCursor_
+  commentId: Overload:Terminal.Gui.FakeDriver.UpdateCursor
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.UpdateCursor
+  nameWithType: FakeDriver.UpdateCursor
+- uid: Terminal.Gui.FakeDriver.UpdateScreen
+  name: UpdateScreen()
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_UpdateScreen
+  commentId: M:Terminal.Gui.FakeDriver.UpdateScreen
+  fullName: Terminal.Gui.FakeDriver.UpdateScreen()
+  nameWithType: FakeDriver.UpdateScreen()
+- uid: Terminal.Gui.FakeDriver.UpdateScreen*
+  name: UpdateScreen
+  href: api/Terminal.Gui/Terminal.Gui.FakeDriver.html#Terminal_Gui_FakeDriver_UpdateScreen_
+  commentId: Overload:Terminal.Gui.FakeDriver.UpdateScreen
+  isSpec: "True"
+  fullName: Terminal.Gui.FakeDriver.UpdateScreen
+  nameWithType: FakeDriver.UpdateScreen
 - uid: Terminal.Gui.FileDialog
   name: FileDialog
   href: api/Terminal.Gui/Terminal.Gui.FileDialog.html
@@ -2086,6 +3518,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.FrameView.RemoveAll
   nameWithType: FrameView.RemoveAll
+- uid: Terminal.Gui.FrameView.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Text
+  commentId: P:Terminal.Gui.FrameView.Text
+  fullName: Terminal.Gui.FrameView.Text
+  nameWithType: FrameView.Text
+- uid: Terminal.Gui.FrameView.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Text_
+  commentId: Overload:Terminal.Gui.FrameView.Text
+  isSpec: "True"
+  fullName: Terminal.Gui.FrameView.Text
+  nameWithType: FrameView.Text
+- uid: Terminal.Gui.FrameView.TextAlignment
+  name: TextAlignment
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_TextAlignment
+  commentId: P:Terminal.Gui.FrameView.TextAlignment
+  fullName: Terminal.Gui.FrameView.TextAlignment
+  nameWithType: FrameView.TextAlignment
+- uid: Terminal.Gui.FrameView.TextAlignment*
+  name: TextAlignment
+  href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_TextAlignment_
+  commentId: Overload:Terminal.Gui.FrameView.TextAlignment
+  isSpec: "True"
+  fullName: Terminal.Gui.FrameView.TextAlignment
+  nameWithType: FrameView.TextAlignment
 - uid: Terminal.Gui.FrameView.Title
   name: Title
   href: api/Terminal.Gui/Terminal.Gui.FrameView.html#Terminal_Gui_FrameView_Title
@@ -2949,6 +4407,12 @@ references:
   commentId: M:Terminal.Gui.Label.#ctor(System.Int32,System.Int32,NStack.ustring)
   fullName: Terminal.Gui.Label.Label(System.Int32, System.Int32, NStack.ustring)
   nameWithType: Label.Label(Int32, Int32, ustring)
+- uid: Terminal.Gui.Label.#ctor(Terminal.Gui.Rect)
+  name: Label(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label__ctor_Terminal_Gui_Rect_
+  commentId: M:Terminal.Gui.Label.#ctor(Terminal.Gui.Rect)
+  fullName: Terminal.Gui.Label.Label(Terminal.Gui.Rect)
+  nameWithType: Label.Label(Rect)
 - uid: Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,NStack.ustring)
   name: Label(Rect, ustring)
   href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label__ctor_Terminal_Gui_Rect_NStack_ustring_
@@ -2962,84 +4426,25 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Label.Label
   nameWithType: Label.Label
-- uid: Terminal.Gui.Label.MaxWidth(NStack.ustring,System.Int32)
-  name: MaxWidth(ustring, Int32)
-  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_MaxWidth_NStack_ustring_System_Int32_
-  commentId: M:Terminal.Gui.Label.MaxWidth(NStack.ustring,System.Int32)
-  fullName: Terminal.Gui.Label.MaxWidth(NStack.ustring, System.Int32)
-  nameWithType: Label.MaxWidth(ustring, Int32)
-- uid: Terminal.Gui.Label.MaxWidth*
-  name: MaxWidth
-  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_MaxWidth_
-  commentId: Overload:Terminal.Gui.Label.MaxWidth
+- uid: Terminal.Gui.Label.Clicked
+  name: Clicked
+  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_Clicked
+  commentId: F:Terminal.Gui.Label.Clicked
+  fullName: Terminal.Gui.Label.Clicked
+  nameWithType: Label.Clicked
+- uid: Terminal.Gui.Label.OnMouseEvent(Terminal.Gui.MouseEvent)
+  name: OnMouseEvent(MouseEvent)
+  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_OnMouseEvent_Terminal_Gui_MouseEvent_
+  commentId: M:Terminal.Gui.Label.OnMouseEvent(Terminal.Gui.MouseEvent)
+  fullName: Terminal.Gui.Label.OnMouseEvent(Terminal.Gui.MouseEvent)
+  nameWithType: Label.OnMouseEvent(MouseEvent)
+- uid: Terminal.Gui.Label.OnMouseEvent*
+  name: OnMouseEvent
+  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_OnMouseEvent_
+  commentId: Overload:Terminal.Gui.Label.OnMouseEvent
   isSpec: "True"
-  fullName: Terminal.Gui.Label.MaxWidth
-  nameWithType: Label.MaxWidth
-- uid: Terminal.Gui.Label.MeasureLines(NStack.ustring,System.Int32)
-  name: MeasureLines(ustring, Int32)
-  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_MeasureLines_NStack_ustring_System_Int32_
-  commentId: M:Terminal.Gui.Label.MeasureLines(NStack.ustring,System.Int32)
-  fullName: Terminal.Gui.Label.MeasureLines(NStack.ustring, System.Int32)
-  nameWithType: Label.MeasureLines(ustring, Int32)
-- uid: Terminal.Gui.Label.MeasureLines*
-  name: MeasureLines
-  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_MeasureLines_
-  commentId: Overload:Terminal.Gui.Label.MeasureLines
-  isSpec: "True"
-  fullName: Terminal.Gui.Label.MeasureLines
-  nameWithType: Label.MeasureLines
-- uid: Terminal.Gui.Label.Redraw(Terminal.Gui.Rect)
-  name: Redraw(Rect)
-  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_Redraw_Terminal_Gui_Rect_
-  commentId: M:Terminal.Gui.Label.Redraw(Terminal.Gui.Rect)
-  fullName: Terminal.Gui.Label.Redraw(Terminal.Gui.Rect)
-  nameWithType: Label.Redraw(Rect)
-- uid: Terminal.Gui.Label.Redraw*
-  name: Redraw
-  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_Redraw_
-  commentId: Overload:Terminal.Gui.Label.Redraw
-  isSpec: "True"
-  fullName: Terminal.Gui.Label.Redraw
-  nameWithType: Label.Redraw
-- uid: Terminal.Gui.Label.Text
-  name: Text
-  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_Text
-  commentId: P:Terminal.Gui.Label.Text
-  fullName: Terminal.Gui.Label.Text
-  nameWithType: Label.Text
-- uid: Terminal.Gui.Label.Text*
-  name: Text
-  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_Text_
-  commentId: Overload:Terminal.Gui.Label.Text
-  isSpec: "True"
-  fullName: Terminal.Gui.Label.Text
-  nameWithType: Label.Text
-- uid: Terminal.Gui.Label.TextAlignment
-  name: TextAlignment
-  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_TextAlignment
-  commentId: P:Terminal.Gui.Label.TextAlignment
-  fullName: Terminal.Gui.Label.TextAlignment
-  nameWithType: Label.TextAlignment
-- uid: Terminal.Gui.Label.TextAlignment*
-  name: TextAlignment
-  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_TextAlignment_
-  commentId: Overload:Terminal.Gui.Label.TextAlignment
-  isSpec: "True"
-  fullName: Terminal.Gui.Label.TextAlignment
-  nameWithType: Label.TextAlignment
-- uid: Terminal.Gui.Label.TextColor
-  name: TextColor
-  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_TextColor
-  commentId: P:Terminal.Gui.Label.TextColor
-  fullName: Terminal.Gui.Label.TextColor
-  nameWithType: Label.TextColor
-- uid: Terminal.Gui.Label.TextColor*
-  name: TextColor
-  href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_TextColor_
-  commentId: Overload:Terminal.Gui.Label.TextColor
-  isSpec: "True"
-  fullName: Terminal.Gui.Label.TextColor
-  nameWithType: Label.TextColor
+  fullName: Terminal.Gui.Label.OnMouseEvent
+  nameWithType: Label.OnMouseEvent
 - uid: Terminal.Gui.LayoutStyle
   name: LayoutStyle
   href: api/Terminal.Gui/Terminal.Gui.LayoutStyle.html
@@ -3179,6 +4584,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ListView.MoveDown
   nameWithType: ListView.MoveDown
+- uid: Terminal.Gui.ListView.MoveEnd
+  name: MoveEnd()
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_MoveEnd
+  commentId: M:Terminal.Gui.ListView.MoveEnd
+  fullName: Terminal.Gui.ListView.MoveEnd()
+  nameWithType: ListView.MoveEnd()
+- uid: Terminal.Gui.ListView.MoveEnd*
+  name: MoveEnd
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_MoveEnd_
+  commentId: Overload:Terminal.Gui.ListView.MoveEnd
+  isSpec: "True"
+  fullName: Terminal.Gui.ListView.MoveEnd
+  nameWithType: ListView.MoveEnd
+- uid: Terminal.Gui.ListView.MoveHome
+  name: MoveHome()
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_MoveHome
+  commentId: M:Terminal.Gui.ListView.MoveHome
+  fullName: Terminal.Gui.ListView.MoveHome()
+  nameWithType: ListView.MoveHome()
+- uid: Terminal.Gui.ListView.MoveHome*
+  name: MoveHome
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_MoveHome_
+  commentId: Overload:Terminal.Gui.ListView.MoveHome
+  isSpec: "True"
+  fullName: Terminal.Gui.ListView.MoveHome
+  nameWithType: ListView.MoveHome
 - uid: Terminal.Gui.ListView.MovePageDown
   name: MovePageDown()
   href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_MovePageDown
@@ -3218,6 +4649,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ListView.MoveUp
   nameWithType: ListView.MoveUp
+- uid: Terminal.Gui.ListView.OnEnter(Terminal.Gui.View)
+  name: OnEnter(View)
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_OnEnter_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.ListView.OnEnter(Terminal.Gui.View)
+  fullName: Terminal.Gui.ListView.OnEnter(Terminal.Gui.View)
+  nameWithType: ListView.OnEnter(View)
+- uid: Terminal.Gui.ListView.OnEnter*
+  name: OnEnter
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_OnEnter_
+  commentId: Overload:Terminal.Gui.ListView.OnEnter
+  isSpec: "True"
+  fullName: Terminal.Gui.ListView.OnEnter
+  nameWithType: ListView.OnEnter
+- uid: Terminal.Gui.ListView.OnMouseEnter(Terminal.Gui.MouseEvent)
+  name: OnMouseEnter(MouseEvent)
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_OnMouseEnter_Terminal_Gui_MouseEvent_
+  commentId: M:Terminal.Gui.ListView.OnMouseEnter(Terminal.Gui.MouseEvent)
+  fullName: Terminal.Gui.ListView.OnMouseEnter(Terminal.Gui.MouseEvent)
+  nameWithType: ListView.OnMouseEnter(MouseEvent)
+- uid: Terminal.Gui.ListView.OnMouseEnter*
+  name: OnMouseEnter
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_OnMouseEnter_
+  commentId: Overload:Terminal.Gui.ListView.OnMouseEnter
+  isSpec: "True"
+  fullName: Terminal.Gui.ListView.OnMouseEnter
+  nameWithType: ListView.OnMouseEnter
 - uid: Terminal.Gui.ListView.OnOpenSelectedItem
   name: OnOpenSelectedItem()
   href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_OnOpenSelectedItem
@@ -3778,6 +5235,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.MenuBar.OnKeyUp
   nameWithType: MenuBar.OnKeyUp
+- uid: Terminal.Gui.MenuBar.OnLeave(Terminal.Gui.View)
+  name: OnLeave(View)
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_OnLeave_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.MenuBar.OnLeave(Terminal.Gui.View)
+  fullName: Terminal.Gui.MenuBar.OnLeave(Terminal.Gui.View)
+  nameWithType: MenuBar.OnLeave(View)
+- uid: Terminal.Gui.MenuBar.OnLeave*
+  name: OnLeave
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_OnLeave_
+  commentId: Overload:Terminal.Gui.MenuBar.OnLeave
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuBar.OnLeave
+  nameWithType: MenuBar.OnLeave
 - uid: Terminal.Gui.MenuBar.OnMenuClosing
   name: OnMenuClosing()
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_OnMenuClosing
@@ -4407,6 +5877,102 @@ references:
   commentId: F:Terminal.Gui.MouseFlags.WheeledUp
   fullName: Terminal.Gui.MouseFlags.WheeledUp
   nameWithType: MouseFlags.WheeledUp
+- uid: Terminal.Gui.NetMainLoop
+  name: NetMainLoop
+  href: api/Terminal.Gui/Terminal.Gui.NetMainLoop.html
+  commentId: T:Terminal.Gui.NetMainLoop
+  fullName: Terminal.Gui.NetMainLoop
+  nameWithType: NetMainLoop
+- uid: Terminal.Gui.NetMainLoop.#ctor(System.Func{System.ConsoleKeyInfo})
+  name: NetMainLoop(Func<ConsoleKeyInfo>)
+  href: api/Terminal.Gui/Terminal.Gui.NetMainLoop.html#Terminal_Gui_NetMainLoop__ctor_System_Func_System_ConsoleKeyInfo__
+  commentId: M:Terminal.Gui.NetMainLoop.#ctor(System.Func{System.ConsoleKeyInfo})
+  name.vb: NetMainLoop(Func(Of ConsoleKeyInfo))
+  fullName: Terminal.Gui.NetMainLoop.NetMainLoop(System.Func<System.ConsoleKeyInfo>)
+  fullName.vb: Terminal.Gui.NetMainLoop.NetMainLoop(System.Func(Of System.ConsoleKeyInfo))
+  nameWithType: NetMainLoop.NetMainLoop(Func<ConsoleKeyInfo>)
+  nameWithType.vb: NetMainLoop.NetMainLoop(Func(Of ConsoleKeyInfo))
+- uid: Terminal.Gui.NetMainLoop.#ctor*
+  name: NetMainLoop
+  href: api/Terminal.Gui/Terminal.Gui.NetMainLoop.html#Terminal_Gui_NetMainLoop__ctor_
+  commentId: Overload:Terminal.Gui.NetMainLoop.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.NetMainLoop.NetMainLoop
+  nameWithType: NetMainLoop.NetMainLoop
+- uid: Terminal.Gui.NetMainLoop.KeyPressed
+  name: KeyPressed
+  href: api/Terminal.Gui/Terminal.Gui.NetMainLoop.html#Terminal_Gui_NetMainLoop_KeyPressed
+  commentId: F:Terminal.Gui.NetMainLoop.KeyPressed
+  fullName: Terminal.Gui.NetMainLoop.KeyPressed
+  nameWithType: NetMainLoop.KeyPressed
+- uid: Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending(System.Boolean)
+  name: IMainLoopDriver.EventsPending(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.NetMainLoop.html#Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_EventsPending_System_Boolean_
+  commentId: M:Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending(System.Boolean)
+  name.vb: Terminal.Gui.IMainLoopDriver.EventsPending(Boolean)
+  fullName: Terminal.Gui.NetMainLoop.Terminal.Gui.IMainLoopDriver.EventsPending(System.Boolean)
+  nameWithType: NetMainLoop.IMainLoopDriver.EventsPending(Boolean)
+  nameWithType.vb: NetMainLoop.Terminal.Gui.IMainLoopDriver.EventsPending(Boolean)
+- uid: Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending*
+  name: IMainLoopDriver.EventsPending
+  href: api/Terminal.Gui/Terminal.Gui.NetMainLoop.html#Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_EventsPending_
+  commentId: Overload:Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending
+  isSpec: "True"
+  name.vb: Terminal.Gui.IMainLoopDriver.EventsPending
+  fullName: Terminal.Gui.NetMainLoop.Terminal.Gui.IMainLoopDriver.EventsPending
+  nameWithType: NetMainLoop.IMainLoopDriver.EventsPending
+  nameWithType.vb: NetMainLoop.Terminal.Gui.IMainLoopDriver.EventsPending
+- uid: Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration
+  name: IMainLoopDriver.MainIteration()
+  href: api/Terminal.Gui/Terminal.Gui.NetMainLoop.html#Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_MainIteration
+  commentId: M:Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration
+  name.vb: Terminal.Gui.IMainLoopDriver.MainIteration()
+  fullName: Terminal.Gui.NetMainLoop.Terminal.Gui.IMainLoopDriver.MainIteration()
+  nameWithType: NetMainLoop.IMainLoopDriver.MainIteration()
+  nameWithType.vb: NetMainLoop.Terminal.Gui.IMainLoopDriver.MainIteration()
+- uid: Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration*
+  name: IMainLoopDriver.MainIteration
+  href: api/Terminal.Gui/Terminal.Gui.NetMainLoop.html#Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_MainIteration_
+  commentId: Overload:Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration
+  isSpec: "True"
+  name.vb: Terminal.Gui.IMainLoopDriver.MainIteration
+  fullName: Terminal.Gui.NetMainLoop.Terminal.Gui.IMainLoopDriver.MainIteration
+  nameWithType: NetMainLoop.IMainLoopDriver.MainIteration
+  nameWithType.vb: NetMainLoop.Terminal.Gui.IMainLoopDriver.MainIteration
+- uid: Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#Setup(Terminal.Gui.MainLoop)
+  name: IMainLoopDriver.Setup(MainLoop)
+  href: api/Terminal.Gui/Terminal.Gui.NetMainLoop.html#Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_Setup_Terminal_Gui_MainLoop_
+  commentId: M:Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#Setup(Terminal.Gui.MainLoop)
+  name.vb: Terminal.Gui.IMainLoopDriver.Setup(MainLoop)
+  fullName: Terminal.Gui.NetMainLoop.Terminal.Gui.IMainLoopDriver.Setup(Terminal.Gui.MainLoop)
+  nameWithType: NetMainLoop.IMainLoopDriver.Setup(MainLoop)
+  nameWithType.vb: NetMainLoop.Terminal.Gui.IMainLoopDriver.Setup(MainLoop)
+- uid: Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#Setup*
+  name: IMainLoopDriver.Setup
+  href: api/Terminal.Gui/Terminal.Gui.NetMainLoop.html#Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_Setup_
+  commentId: Overload:Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#Setup
+  isSpec: "True"
+  name.vb: Terminal.Gui.IMainLoopDriver.Setup
+  fullName: Terminal.Gui.NetMainLoop.Terminal.Gui.IMainLoopDriver.Setup
+  nameWithType: NetMainLoop.IMainLoopDriver.Setup
+  nameWithType.vb: NetMainLoop.Terminal.Gui.IMainLoopDriver.Setup
+- uid: Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup
+  name: IMainLoopDriver.Wakeup()
+  href: api/Terminal.Gui/Terminal.Gui.NetMainLoop.html#Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_Wakeup
+  commentId: M:Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup
+  name.vb: Terminal.Gui.IMainLoopDriver.Wakeup()
+  fullName: Terminal.Gui.NetMainLoop.Terminal.Gui.IMainLoopDriver.Wakeup()
+  nameWithType: NetMainLoop.IMainLoopDriver.Wakeup()
+  nameWithType.vb: NetMainLoop.Terminal.Gui.IMainLoopDriver.Wakeup()
+- uid: Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup*
+  name: IMainLoopDriver.Wakeup
+  href: api/Terminal.Gui/Terminal.Gui.NetMainLoop.html#Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_Wakeup_
+  commentId: Overload:Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup
+  isSpec: "True"
+  name.vb: Terminal.Gui.IMainLoopDriver.Wakeup
+  fullName: Terminal.Gui.NetMainLoop.Terminal.Gui.IMainLoopDriver.Wakeup
+  nameWithType: NetMainLoop.IMainLoopDriver.Wakeup
+  nameWithType.vb: NetMainLoop.Terminal.Gui.IMainLoopDriver.Wakeup
 - uid: Terminal.Gui.OpenDialog
   name: OpenDialog
   href: api/Terminal.Gui/Terminal.Gui.OpenDialog.html
@@ -4952,33 +6518,33 @@ references:
   commentId: M:Terminal.Gui.RadioGroup.#ctor
   fullName: Terminal.Gui.RadioGroup.RadioGroup()
   nameWithType: RadioGroup.RadioGroup()
-- uid: Terminal.Gui.RadioGroup.#ctor(System.Int32,System.Int32,System.String[],System.Int32)
-  name: RadioGroup(Int32, Int32, String[], Int32)
-  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup__ctor_System_Int32_System_Int32_System_String___System_Int32_
-  commentId: M:Terminal.Gui.RadioGroup.#ctor(System.Int32,System.Int32,System.String[],System.Int32)
-  name.vb: RadioGroup(Int32, Int32, String(), Int32)
-  fullName: Terminal.Gui.RadioGroup.RadioGroup(System.Int32, System.Int32, System.String[], System.Int32)
-  fullName.vb: Terminal.Gui.RadioGroup.RadioGroup(System.Int32, System.Int32, System.String(), System.Int32)
-  nameWithType: RadioGroup.RadioGroup(Int32, Int32, String[], Int32)
-  nameWithType.vb: RadioGroup.RadioGroup(Int32, Int32, String(), Int32)
-- uid: Terminal.Gui.RadioGroup.#ctor(System.String[],System.Int32)
-  name: RadioGroup(String[], Int32)
-  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup__ctor_System_String___System_Int32_
-  commentId: M:Terminal.Gui.RadioGroup.#ctor(System.String[],System.Int32)
-  name.vb: RadioGroup(String(), Int32)
-  fullName: Terminal.Gui.RadioGroup.RadioGroup(System.String[], System.Int32)
-  fullName.vb: Terminal.Gui.RadioGroup.RadioGroup(System.String(), System.Int32)
-  nameWithType: RadioGroup.RadioGroup(String[], Int32)
-  nameWithType.vb: RadioGroup.RadioGroup(String(), Int32)
-- uid: Terminal.Gui.RadioGroup.#ctor(Terminal.Gui.Rect,System.String[],System.Int32)
-  name: RadioGroup(Rect, String[], Int32)
-  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup__ctor_Terminal_Gui_Rect_System_String___System_Int32_
-  commentId: M:Terminal.Gui.RadioGroup.#ctor(Terminal.Gui.Rect,System.String[],System.Int32)
-  name.vb: RadioGroup(Rect, String(), Int32)
-  fullName: Terminal.Gui.RadioGroup.RadioGroup(Terminal.Gui.Rect, System.String[], System.Int32)
-  fullName.vb: Terminal.Gui.RadioGroup.RadioGroup(Terminal.Gui.Rect, System.String(), System.Int32)
-  nameWithType: RadioGroup.RadioGroup(Rect, String[], Int32)
-  nameWithType.vb: RadioGroup.RadioGroup(Rect, String(), Int32)
+- uid: Terminal.Gui.RadioGroup.#ctor(NStack.ustring[],System.Int32)
+  name: RadioGroup(ustring[], Int32)
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup__ctor_NStack_ustring___System_Int32_
+  commentId: M:Terminal.Gui.RadioGroup.#ctor(NStack.ustring[],System.Int32)
+  name.vb: RadioGroup(ustring(), Int32)
+  fullName: Terminal.Gui.RadioGroup.RadioGroup(NStack.ustring[], System.Int32)
+  fullName.vb: Terminal.Gui.RadioGroup.RadioGroup(NStack.ustring(), System.Int32)
+  nameWithType: RadioGroup.RadioGroup(ustring[], Int32)
+  nameWithType.vb: RadioGroup.RadioGroup(ustring(), Int32)
+- uid: Terminal.Gui.RadioGroup.#ctor(System.Int32,System.Int32,NStack.ustring[],System.Int32)
+  name: RadioGroup(Int32, Int32, ustring[], Int32)
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup__ctor_System_Int32_System_Int32_NStack_ustring___System_Int32_
+  commentId: M:Terminal.Gui.RadioGroup.#ctor(System.Int32,System.Int32,NStack.ustring[],System.Int32)
+  name.vb: RadioGroup(Int32, Int32, ustring(), Int32)
+  fullName: Terminal.Gui.RadioGroup.RadioGroup(System.Int32, System.Int32, NStack.ustring[], System.Int32)
+  fullName.vb: Terminal.Gui.RadioGroup.RadioGroup(System.Int32, System.Int32, NStack.ustring(), System.Int32)
+  nameWithType: RadioGroup.RadioGroup(Int32, Int32, ustring[], Int32)
+  nameWithType.vb: RadioGroup.RadioGroup(Int32, Int32, ustring(), Int32)
+- uid: Terminal.Gui.RadioGroup.#ctor(Terminal.Gui.Rect,NStack.ustring[],System.Int32)
+  name: RadioGroup(Rect, ustring[], Int32)
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup__ctor_Terminal_Gui_Rect_NStack_ustring___System_Int32_
+  commentId: M:Terminal.Gui.RadioGroup.#ctor(Terminal.Gui.Rect,NStack.ustring[],System.Int32)
+  name.vb: RadioGroup(Rect, ustring(), Int32)
+  fullName: Terminal.Gui.RadioGroup.RadioGroup(Terminal.Gui.Rect, NStack.ustring[], System.Int32)
+  fullName.vb: Terminal.Gui.RadioGroup.RadioGroup(Terminal.Gui.Rect, NStack.ustring(), System.Int32)
+  nameWithType: RadioGroup.RadioGroup(Rect, ustring[], Int32)
+  nameWithType.vb: RadioGroup.RadioGroup(Rect, ustring(), Int32)
 - uid: Terminal.Gui.RadioGroup.#ctor*
   name: RadioGroup
   href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup__ctor_
@@ -5012,6 +6578,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.RadioGroup.MouseEvent
   nameWithType: RadioGroup.MouseEvent
+- uid: Terminal.Gui.RadioGroup.OnSelectedItemChanged(System.Int32,System.Int32)
+  name: OnSelectedItemChanged(Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_OnSelectedItemChanged_System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.RadioGroup.OnSelectedItemChanged(System.Int32,System.Int32)
+  fullName: Terminal.Gui.RadioGroup.OnSelectedItemChanged(System.Int32, System.Int32)
+  nameWithType: RadioGroup.OnSelectedItemChanged(Int32, Int32)
+- uid: Terminal.Gui.RadioGroup.OnSelectedItemChanged*
+  name: OnSelectedItemChanged
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_OnSelectedItemChanged_
+  commentId: Overload:Terminal.Gui.RadioGroup.OnSelectedItemChanged
+  isSpec: "True"
+  fullName: Terminal.Gui.RadioGroup.OnSelectedItemChanged
+  nameWithType: RadioGroup.OnSelectedItemChanged
 - uid: Terminal.Gui.RadioGroup.PositionCursor
   name: PositionCursor()
   href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_PositionCursor
@@ -5077,25 +6656,70 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.RadioGroup.Redraw
   nameWithType: RadioGroup.Redraw
-- uid: Terminal.Gui.RadioGroup.Selected
-  name: Selected
-  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_Selected
-  commentId: P:Terminal.Gui.RadioGroup.Selected
-  fullName: Terminal.Gui.RadioGroup.Selected
-  nameWithType: RadioGroup.Selected
-- uid: Terminal.Gui.RadioGroup.Selected*
-  name: Selected
-  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_Selected_
-  commentId: Overload:Terminal.Gui.RadioGroup.Selected
+- uid: Terminal.Gui.RadioGroup.SelectedItem
+  name: SelectedItem
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_SelectedItem
+  commentId: P:Terminal.Gui.RadioGroup.SelectedItem
+  fullName: Terminal.Gui.RadioGroup.SelectedItem
+  nameWithType: RadioGroup.SelectedItem
+- uid: Terminal.Gui.RadioGroup.SelectedItem*
+  name: SelectedItem
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_SelectedItem_
+  commentId: Overload:Terminal.Gui.RadioGroup.SelectedItem
   isSpec: "True"
-  fullName: Terminal.Gui.RadioGroup.Selected
-  nameWithType: RadioGroup.Selected
+  fullName: Terminal.Gui.RadioGroup.SelectedItem
+  nameWithType: RadioGroup.SelectedItem
 - uid: Terminal.Gui.RadioGroup.SelectedItemChanged
   name: SelectedItemChanged
   href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_SelectedItemChanged
   commentId: F:Terminal.Gui.RadioGroup.SelectedItemChanged
   fullName: Terminal.Gui.RadioGroup.SelectedItemChanged
   nameWithType: RadioGroup.SelectedItemChanged
+- uid: Terminal.Gui.RadioGroup.SelectedItemChangedArgs
+  name: RadioGroup.SelectedItemChangedArgs
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.SelectedItemChangedArgs.html
+  commentId: T:Terminal.Gui.RadioGroup.SelectedItemChangedArgs
+  fullName: Terminal.Gui.RadioGroup.SelectedItemChangedArgs
+  nameWithType: RadioGroup.SelectedItemChangedArgs
+- uid: Terminal.Gui.RadioGroup.SelectedItemChangedArgs.#ctor(System.Int32,System.Int32)
+  name: SelectedItemChangedArgs(Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.SelectedItemChangedArgs.html#Terminal_Gui_RadioGroup_SelectedItemChangedArgs__ctor_System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.RadioGroup.SelectedItemChangedArgs.#ctor(System.Int32,System.Int32)
+  fullName: Terminal.Gui.RadioGroup.SelectedItemChangedArgs.SelectedItemChangedArgs(System.Int32, System.Int32)
+  nameWithType: RadioGroup.SelectedItemChangedArgs.SelectedItemChangedArgs(Int32, Int32)
+- uid: Terminal.Gui.RadioGroup.SelectedItemChangedArgs.#ctor*
+  name: SelectedItemChangedArgs
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.SelectedItemChangedArgs.html#Terminal_Gui_RadioGroup_SelectedItemChangedArgs__ctor_
+  commentId: Overload:Terminal.Gui.RadioGroup.SelectedItemChangedArgs.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.RadioGroup.SelectedItemChangedArgs.SelectedItemChangedArgs
+  nameWithType: RadioGroup.SelectedItemChangedArgs.SelectedItemChangedArgs
+- uid: Terminal.Gui.RadioGroup.SelectedItemChangedArgs.PreviousSelectedItem
+  name: PreviousSelectedItem
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.SelectedItemChangedArgs.html#Terminal_Gui_RadioGroup_SelectedItemChangedArgs_PreviousSelectedItem
+  commentId: P:Terminal.Gui.RadioGroup.SelectedItemChangedArgs.PreviousSelectedItem
+  fullName: Terminal.Gui.RadioGroup.SelectedItemChangedArgs.PreviousSelectedItem
+  nameWithType: RadioGroup.SelectedItemChangedArgs.PreviousSelectedItem
+- uid: Terminal.Gui.RadioGroup.SelectedItemChangedArgs.PreviousSelectedItem*
+  name: PreviousSelectedItem
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.SelectedItemChangedArgs.html#Terminal_Gui_RadioGroup_SelectedItemChangedArgs_PreviousSelectedItem_
+  commentId: Overload:Terminal.Gui.RadioGroup.SelectedItemChangedArgs.PreviousSelectedItem
+  isSpec: "True"
+  fullName: Terminal.Gui.RadioGroup.SelectedItemChangedArgs.PreviousSelectedItem
+  nameWithType: RadioGroup.SelectedItemChangedArgs.PreviousSelectedItem
+- uid: Terminal.Gui.RadioGroup.SelectedItemChangedArgs.SelectedItem
+  name: SelectedItem
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.SelectedItemChangedArgs.html#Terminal_Gui_RadioGroup_SelectedItemChangedArgs_SelectedItem
+  commentId: P:Terminal.Gui.RadioGroup.SelectedItemChangedArgs.SelectedItem
+  fullName: Terminal.Gui.RadioGroup.SelectedItemChangedArgs.SelectedItem
+  nameWithType: RadioGroup.SelectedItemChangedArgs.SelectedItem
+- uid: Terminal.Gui.RadioGroup.SelectedItemChangedArgs.SelectedItem*
+  name: SelectedItem
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.SelectedItemChangedArgs.html#Terminal_Gui_RadioGroup_SelectedItemChangedArgs_SelectedItem_
+  commentId: Overload:Terminal.Gui.RadioGroup.SelectedItemChangedArgs.SelectedItem
+  isSpec: "True"
+  fullName: Terminal.Gui.RadioGroup.SelectedItemChangedArgs.SelectedItem
+  nameWithType: RadioGroup.SelectedItemChangedArgs.SelectedItem
 - uid: Terminal.Gui.Rect
   name: Rect
   href: api/Terminal.Gui/Terminal.Gui.Rect.html
@@ -5207,7 +6831,14 @@ references:
 - uid: Terminal.Gui.Rect.Height
   name: Height
   href: api/Terminal.Gui/Terminal.Gui.Rect.html#Terminal_Gui_Rect_Height
-  commentId: F:Terminal.Gui.Rect.Height
+  commentId: P:Terminal.Gui.Rect.Height
+  fullName: Terminal.Gui.Rect.Height
+  nameWithType: Rect.Height
+- uid: Terminal.Gui.Rect.Height*
+  name: Height
+  href: api/Terminal.Gui/Terminal.Gui.Rect.html#Terminal_Gui_Rect_Height_
+  commentId: Overload:Terminal.Gui.Rect.Height
+  isSpec: "True"
   fullName: Terminal.Gui.Rect.Height
   nameWithType: Rect.Height
 - uid: Terminal.Gui.Rect.Inflate(System.Int32,System.Int32)
@@ -5419,7 +7050,14 @@ references:
 - uid: Terminal.Gui.Rect.Width
   name: Width
   href: api/Terminal.Gui/Terminal.Gui.Rect.html#Terminal_Gui_Rect_Width
-  commentId: F:Terminal.Gui.Rect.Width
+  commentId: P:Terminal.Gui.Rect.Width
+  fullName: Terminal.Gui.Rect.Width
+  nameWithType: Rect.Width
+- uid: Terminal.Gui.Rect.Width*
+  name: Width
+  href: api/Terminal.Gui/Terminal.Gui.Rect.html#Terminal_Gui_Rect_Width_
+  commentId: Overload:Terminal.Gui.Rect.Width
+  isSpec: "True"
   fullName: Terminal.Gui.Rect.Width
   nameWithType: Rect.Width
 - uid: Terminal.Gui.Rect.X
@@ -5453,6 +7091,25 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Responder.CanFocus
   nameWithType: Responder.CanFocus
+- uid: Terminal.Gui.Responder.Dispose
+  name: Dispose()
+  href: api/Terminal.Gui/Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose
+  commentId: M:Terminal.Gui.Responder.Dispose
+  fullName: Terminal.Gui.Responder.Dispose()
+  nameWithType: Responder.Dispose()
+- uid: Terminal.Gui.Responder.Dispose(System.Boolean)
+  name: Dispose(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose_System_Boolean_
+  commentId: M:Terminal.Gui.Responder.Dispose(System.Boolean)
+  fullName: Terminal.Gui.Responder.Dispose(System.Boolean)
+  nameWithType: Responder.Dispose(Boolean)
+- uid: Terminal.Gui.Responder.Dispose*
+  name: Dispose
+  href: api/Terminal.Gui/Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose_
+  commentId: Overload:Terminal.Gui.Responder.Dispose
+  isSpec: "True"
+  fullName: Terminal.Gui.Responder.Dispose
+  nameWithType: Responder.Dispose
 - uid: Terminal.Gui.Responder.HasFocus
   name: HasFocus
   href: api/Terminal.Gui/Terminal.Gui.Responder.html#Terminal_Gui_Responder_HasFocus
@@ -5479,12 +7136,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Responder.MouseEvent
   nameWithType: Responder.MouseEvent
-- uid: Terminal.Gui.Responder.OnEnter
-  name: OnEnter()
-  href: api/Terminal.Gui/Terminal.Gui.Responder.html#Terminal_Gui_Responder_OnEnter
-  commentId: M:Terminal.Gui.Responder.OnEnter
-  fullName: Terminal.Gui.Responder.OnEnter()
-  nameWithType: Responder.OnEnter()
+- uid: Terminal.Gui.Responder.OnEnter(Terminal.Gui.View)
+  name: OnEnter(View)
+  href: api/Terminal.Gui/Terminal.Gui.Responder.html#Terminal_Gui_Responder_OnEnter_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.Responder.OnEnter(Terminal.Gui.View)
+  fullName: Terminal.Gui.Responder.OnEnter(Terminal.Gui.View)
+  nameWithType: Responder.OnEnter(View)
 - uid: Terminal.Gui.Responder.OnEnter*
   name: OnEnter
   href: api/Terminal.Gui/Terminal.Gui.Responder.html#Terminal_Gui_Responder_OnEnter_
@@ -5518,12 +7175,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Responder.OnKeyUp
   nameWithType: Responder.OnKeyUp
-- uid: Terminal.Gui.Responder.OnLeave
-  name: OnLeave()
-  href: api/Terminal.Gui/Terminal.Gui.Responder.html#Terminal_Gui_Responder_OnLeave
-  commentId: M:Terminal.Gui.Responder.OnLeave
-  fullName: Terminal.Gui.Responder.OnLeave()
-  nameWithType: Responder.OnLeave()
+- uid: Terminal.Gui.Responder.OnLeave(Terminal.Gui.View)
+  name: OnLeave(View)
+  href: api/Terminal.Gui/Terminal.Gui.Responder.html#Terminal_Gui_Responder_OnLeave_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.Responder.OnLeave(Terminal.Gui.View)
+  fullName: Terminal.Gui.Responder.OnLeave(Terminal.Gui.View)
+  nameWithType: Responder.OnLeave(View)
 - uid: Terminal.Gui.Responder.OnLeave*
   name: OnLeave
   href: api/Terminal.Gui/Terminal.Gui.Responder.html#Terminal_Gui_Responder_OnLeave_
@@ -5780,6 +7437,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ScrollView.Add
   nameWithType: ScrollView.Add
+- uid: Terminal.Gui.ScrollView.AutoHideScrollBars
+  name: AutoHideScrollBars
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_AutoHideScrollBars
+  commentId: P:Terminal.Gui.ScrollView.AutoHideScrollBars
+  fullName: Terminal.Gui.ScrollView.AutoHideScrollBars
+  nameWithType: ScrollView.AutoHideScrollBars
+- uid: Terminal.Gui.ScrollView.AutoHideScrollBars*
+  name: AutoHideScrollBars
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_AutoHideScrollBars_
+  commentId: Overload:Terminal.Gui.ScrollView.AutoHideScrollBars
+  isSpec: "True"
+  fullName: Terminal.Gui.ScrollView.AutoHideScrollBars
+  nameWithType: ScrollView.AutoHideScrollBars
 - uid: Terminal.Gui.ScrollView.ContentOffset
   name: ContentOffset
   href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ContentOffset
@@ -5806,6 +7476,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ScrollView.ContentSize
   nameWithType: ScrollView.ContentSize
+- uid: Terminal.Gui.ScrollView.Dispose(System.Boolean)
+  name: Dispose(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_Dispose_System_Boolean_
+  commentId: M:Terminal.Gui.ScrollView.Dispose(System.Boolean)
+  fullName: Terminal.Gui.ScrollView.Dispose(System.Boolean)
+  nameWithType: ScrollView.Dispose(Boolean)
+- uid: Terminal.Gui.ScrollView.Dispose*
+  name: Dispose
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_Dispose_
+  commentId: Overload:Terminal.Gui.ScrollView.Dispose
+  isSpec: "True"
+  fullName: Terminal.Gui.ScrollView.Dispose
+  nameWithType: ScrollView.Dispose
 - uid: Terminal.Gui.ScrollView.MouseEvent(Terminal.Gui.MouseEvent)
   name: MouseEvent(MouseEvent)
   href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_MouseEvent_Terminal_Gui_MouseEvent_
@@ -6183,6 +7866,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.StatusBar.StatusBar
   nameWithType: StatusBar.StatusBar
+- uid: Terminal.Gui.StatusBar.Dispose(System.Boolean)
+  name: Dispose(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.StatusBar.html#Terminal_Gui_StatusBar_Dispose_System_Boolean_
+  commentId: M:Terminal.Gui.StatusBar.Dispose(System.Boolean)
+  fullName: Terminal.Gui.StatusBar.Dispose(System.Boolean)
+  nameWithType: StatusBar.Dispose(Boolean)
+- uid: Terminal.Gui.StatusBar.Dispose*
+  name: Dispose
+  href: api/Terminal.Gui/Terminal.Gui.StatusBar.html#Terminal_Gui_StatusBar_Dispose_
+  commentId: Overload:Terminal.Gui.StatusBar.Dispose
+  isSpec: "True"
+  fullName: Terminal.Gui.StatusBar.Dispose
+  nameWithType: StatusBar.Dispose
 - uid: Terminal.Gui.StatusBar.Items
   name: Items
   href: api/Terminal.Gui/Terminal.Gui.StatusBar.html#Terminal_Gui_StatusBar_Items
@@ -6209,19 +7905,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.StatusBar.MouseEvent
   nameWithType: StatusBar.MouseEvent
-- uid: Terminal.Gui.StatusBar.Parent
-  name: Parent
-  href: api/Terminal.Gui/Terminal.Gui.StatusBar.html#Terminal_Gui_StatusBar_Parent
-  commentId: P:Terminal.Gui.StatusBar.Parent
-  fullName: Terminal.Gui.StatusBar.Parent
-  nameWithType: StatusBar.Parent
-- uid: Terminal.Gui.StatusBar.Parent*
-  name: Parent
-  href: api/Terminal.Gui/Terminal.Gui.StatusBar.html#Terminal_Gui_StatusBar_Parent_
-  commentId: Overload:Terminal.Gui.StatusBar.Parent
-  isSpec: "True"
-  fullName: Terminal.Gui.StatusBar.Parent
-  nameWithType: StatusBar.Parent
 - uid: Terminal.Gui.StatusBar.ProcessHotKey(Terminal.Gui.KeyEvent)
   name: ProcessHotKey(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.StatusBar.html#Terminal_Gui_StatusBar_ProcessHotKey_Terminal_Gui_KeyEvent_
@@ -6464,12 +8147,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextField.MouseEvent
   nameWithType: TextField.MouseEvent
-- uid: Terminal.Gui.TextField.OnLeave
-  name: OnLeave()
-  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_OnLeave
-  commentId: M:Terminal.Gui.TextField.OnLeave
-  fullName: Terminal.Gui.TextField.OnLeave()
-  nameWithType: TextField.OnLeave()
+- uid: Terminal.Gui.TextField.OnLeave(Terminal.Gui.View)
+  name: OnLeave(View)
+  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_OnLeave_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.TextField.OnLeave(Terminal.Gui.View)
+  fullName: Terminal.Gui.TextField.OnLeave(Terminal.Gui.View)
+  nameWithType: TextField.OnLeave(View)
 - uid: Terminal.Gui.TextField.OnLeave*
   name: OnLeave
   href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_OnLeave_
@@ -6626,6 +8309,275 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextField.Used
   nameWithType: TextField.Used
+- uid: Terminal.Gui.TextFormatter
+  name: TextFormatter
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html
+  commentId: T:Terminal.Gui.TextFormatter
+  fullName: Terminal.Gui.TextFormatter
+  nameWithType: TextFormatter
+- uid: Terminal.Gui.TextFormatter.Alignment
+  name: Alignment
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Alignment
+  commentId: P:Terminal.Gui.TextFormatter.Alignment
+  fullName: Terminal.Gui.TextFormatter.Alignment
+  nameWithType: TextFormatter.Alignment
+- uid: Terminal.Gui.TextFormatter.Alignment*
+  name: Alignment
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Alignment_
+  commentId: Overload:Terminal.Gui.TextFormatter.Alignment
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.Alignment
+  nameWithType: TextFormatter.Alignment
+- uid: Terminal.Gui.TextFormatter.CalcRect(System.Int32,System.Int32,NStack.ustring)
+  name: CalcRect(Int32, Int32, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_CalcRect_System_Int32_System_Int32_NStack_ustring_
+  commentId: M:Terminal.Gui.TextFormatter.CalcRect(System.Int32,System.Int32,NStack.ustring)
+  fullName: Terminal.Gui.TextFormatter.CalcRect(System.Int32, System.Int32, NStack.ustring)
+  nameWithType: TextFormatter.CalcRect(Int32, Int32, ustring)
+- uid: Terminal.Gui.TextFormatter.CalcRect*
+  name: CalcRect
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_CalcRect_
+  commentId: Overload:Terminal.Gui.TextFormatter.CalcRect
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.CalcRect
+  nameWithType: TextFormatter.CalcRect
+- uid: Terminal.Gui.TextFormatter.ClipAndJustify(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment)
+  name: ClipAndJustify(ustring, Int32, TextAlignment)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_ClipAndJustify_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_
+  commentId: M:Terminal.Gui.TextFormatter.ClipAndJustify(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment)
+  fullName: Terminal.Gui.TextFormatter.ClipAndJustify(NStack.ustring, System.Int32, Terminal.Gui.TextAlignment)
+  nameWithType: TextFormatter.ClipAndJustify(ustring, Int32, TextAlignment)
+- uid: Terminal.Gui.TextFormatter.ClipAndJustify*
+  name: ClipAndJustify
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_ClipAndJustify_
+  commentId: Overload:Terminal.Gui.TextFormatter.ClipAndJustify
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.ClipAndJustify
+  nameWithType: TextFormatter.ClipAndJustify
+- uid: Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  name: Draw(Rect, Attribute, Attribute)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Draw_Terminal_Gui_Rect_Terminal_Gui_Attribute_Terminal_Gui_Attribute_
+  commentId: M:Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  fullName: Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect, Terminal.Gui.Attribute, Terminal.Gui.Attribute)
+  nameWithType: TextFormatter.Draw(Rect, Attribute, Attribute)
+- uid: Terminal.Gui.TextFormatter.Draw*
+  name: Draw
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Draw_
+  commentId: Overload:Terminal.Gui.TextFormatter.Draw
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.Draw
+  nameWithType: TextFormatter.Draw
+- uid: Terminal.Gui.TextFormatter.FindHotKey(NStack.ustring,System.Rune,System.Boolean,System.Int32@,Terminal.Gui.Key@)
+  name: FindHotKey(ustring, Rune, Boolean, out Int32, out Key)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_FindHotKey_NStack_ustring_System_Rune_System_Boolean_System_Int32__Terminal_Gui_Key__
+  commentId: M:Terminal.Gui.TextFormatter.FindHotKey(NStack.ustring,System.Rune,System.Boolean,System.Int32@,Terminal.Gui.Key@)
+  name.vb: FindHotKey(ustring, Rune, Boolean, ByRef Int32, ByRef Key)
+  fullName: Terminal.Gui.TextFormatter.FindHotKey(NStack.ustring, System.Rune, System.Boolean, out System.Int32, out Terminal.Gui.Key)
+  fullName.vb: Terminal.Gui.TextFormatter.FindHotKey(NStack.ustring, System.Rune, System.Boolean, ByRef System.Int32, ByRef Terminal.Gui.Key)
+  nameWithType: TextFormatter.FindHotKey(ustring, Rune, Boolean, out Int32, out Key)
+  nameWithType.vb: TextFormatter.FindHotKey(ustring, Rune, Boolean, ByRef Int32, ByRef Key)
+- uid: Terminal.Gui.TextFormatter.FindHotKey*
+  name: FindHotKey
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_FindHotKey_
+  commentId: Overload:Terminal.Gui.TextFormatter.FindHotKey
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.FindHotKey
+  nameWithType: TextFormatter.FindHotKey
+- uid: Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment,System.Boolean)
+  name: Format(ustring, Int32, TextAlignment, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean_
+  commentId: M:Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment,System.Boolean)
+  fullName: Terminal.Gui.TextFormatter.Format(NStack.ustring, System.Int32, Terminal.Gui.TextAlignment, System.Boolean)
+  nameWithType: TextFormatter.Format(ustring, Int32, TextAlignment, Boolean)
+- uid: Terminal.Gui.TextFormatter.Format*
+  name: Format
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_
+  commentId: Overload:Terminal.Gui.TextFormatter.Format
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.Format
+  nameWithType: TextFormatter.Format
+- uid: Terminal.Gui.TextFormatter.HotKey
+  name: HotKey
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_HotKey
+  commentId: P:Terminal.Gui.TextFormatter.HotKey
+  fullName: Terminal.Gui.TextFormatter.HotKey
+  nameWithType: TextFormatter.HotKey
+- uid: Terminal.Gui.TextFormatter.HotKey*
+  name: HotKey
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_HotKey_
+  commentId: Overload:Terminal.Gui.TextFormatter.HotKey
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.HotKey
+  nameWithType: TextFormatter.HotKey
+- uid: Terminal.Gui.TextFormatter.HotKeyPos
+  name: HotKeyPos
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_HotKeyPos
+  commentId: P:Terminal.Gui.TextFormatter.HotKeyPos
+  fullName: Terminal.Gui.TextFormatter.HotKeyPos
+  nameWithType: TextFormatter.HotKeyPos
+- uid: Terminal.Gui.TextFormatter.HotKeyPos*
+  name: HotKeyPos
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_HotKeyPos_
+  commentId: Overload:Terminal.Gui.TextFormatter.HotKeyPos
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.HotKeyPos
+  nameWithType: TextFormatter.HotKeyPos
+- uid: Terminal.Gui.TextFormatter.HotKeySpecifier
+  name: HotKeySpecifier
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_HotKeySpecifier
+  commentId: P:Terminal.Gui.TextFormatter.HotKeySpecifier
+  fullName: Terminal.Gui.TextFormatter.HotKeySpecifier
+  nameWithType: TextFormatter.HotKeySpecifier
+- uid: Terminal.Gui.TextFormatter.HotKeySpecifier*
+  name: HotKeySpecifier
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_HotKeySpecifier_
+  commentId: Overload:Terminal.Gui.TextFormatter.HotKeySpecifier
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.HotKeySpecifier
+  nameWithType: TextFormatter.HotKeySpecifier
+- uid: Terminal.Gui.TextFormatter.HotKeyTagMask
+  name: HotKeyTagMask
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_HotKeyTagMask
+  commentId: P:Terminal.Gui.TextFormatter.HotKeyTagMask
+  fullName: Terminal.Gui.TextFormatter.HotKeyTagMask
+  nameWithType: TextFormatter.HotKeyTagMask
+- uid: Terminal.Gui.TextFormatter.HotKeyTagMask*
+  name: HotKeyTagMask
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_HotKeyTagMask_
+  commentId: Overload:Terminal.Gui.TextFormatter.HotKeyTagMask
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.HotKeyTagMask
+  nameWithType: TextFormatter.HotKeyTagMask
+- uid: Terminal.Gui.TextFormatter.Justify(NStack.ustring,System.Int32,System.Char)
+  name: Justify(ustring, Int32, Char)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Justify_NStack_ustring_System_Int32_System_Char_
+  commentId: M:Terminal.Gui.TextFormatter.Justify(NStack.ustring,System.Int32,System.Char)
+  fullName: Terminal.Gui.TextFormatter.Justify(NStack.ustring, System.Int32, System.Char)
+  nameWithType: TextFormatter.Justify(ustring, Int32, Char)
+- uid: Terminal.Gui.TextFormatter.Justify*
+  name: Justify
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Justify_
+  commentId: Overload:Terminal.Gui.TextFormatter.Justify
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.Justify
+  nameWithType: TextFormatter.Justify
+- uid: Terminal.Gui.TextFormatter.Lines
+  name: Lines
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Lines
+  commentId: P:Terminal.Gui.TextFormatter.Lines
+  fullName: Terminal.Gui.TextFormatter.Lines
+  nameWithType: TextFormatter.Lines
+- uid: Terminal.Gui.TextFormatter.Lines*
+  name: Lines
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Lines_
+  commentId: Overload:Terminal.Gui.TextFormatter.Lines
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.Lines
+  nameWithType: TextFormatter.Lines
+- uid: Terminal.Gui.TextFormatter.MaxLines(NStack.ustring,System.Int32)
+  name: MaxLines(ustring, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_MaxLines_NStack_ustring_System_Int32_
+  commentId: M:Terminal.Gui.TextFormatter.MaxLines(NStack.ustring,System.Int32)
+  fullName: Terminal.Gui.TextFormatter.MaxLines(NStack.ustring, System.Int32)
+  nameWithType: TextFormatter.MaxLines(ustring, Int32)
+- uid: Terminal.Gui.TextFormatter.MaxLines*
+  name: MaxLines
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_MaxLines_
+  commentId: Overload:Terminal.Gui.TextFormatter.MaxLines
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.MaxLines
+  nameWithType: TextFormatter.MaxLines
+- uid: Terminal.Gui.TextFormatter.MaxWidth(NStack.ustring,System.Int32)
+  name: MaxWidth(ustring, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_MaxWidth_NStack_ustring_System_Int32_
+  commentId: M:Terminal.Gui.TextFormatter.MaxWidth(NStack.ustring,System.Int32)
+  fullName: Terminal.Gui.TextFormatter.MaxWidth(NStack.ustring, System.Int32)
+  nameWithType: TextFormatter.MaxWidth(ustring, Int32)
+- uid: Terminal.Gui.TextFormatter.MaxWidth*
+  name: MaxWidth
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_MaxWidth_
+  commentId: Overload:Terminal.Gui.TextFormatter.MaxWidth
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.MaxWidth
+  nameWithType: TextFormatter.MaxWidth
+- uid: Terminal.Gui.TextFormatter.NeedsFormat
+  name: NeedsFormat
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_NeedsFormat
+  commentId: P:Terminal.Gui.TextFormatter.NeedsFormat
+  fullName: Terminal.Gui.TextFormatter.NeedsFormat
+  nameWithType: TextFormatter.NeedsFormat
+- uid: Terminal.Gui.TextFormatter.NeedsFormat*
+  name: NeedsFormat
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_NeedsFormat_
+  commentId: Overload:Terminal.Gui.TextFormatter.NeedsFormat
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.NeedsFormat
+  nameWithType: TextFormatter.NeedsFormat
+- uid: Terminal.Gui.TextFormatter.RemoveHotKeySpecifier(NStack.ustring,System.Int32,System.Rune)
+  name: RemoveHotKeySpecifier(ustring, Int32, Rune)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_RemoveHotKeySpecifier_NStack_ustring_System_Int32_System_Rune_
+  commentId: M:Terminal.Gui.TextFormatter.RemoveHotKeySpecifier(NStack.ustring,System.Int32,System.Rune)
+  fullName: Terminal.Gui.TextFormatter.RemoveHotKeySpecifier(NStack.ustring, System.Int32, System.Rune)
+  nameWithType: TextFormatter.RemoveHotKeySpecifier(ustring, Int32, Rune)
+- uid: Terminal.Gui.TextFormatter.RemoveHotKeySpecifier*
+  name: RemoveHotKeySpecifier
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_RemoveHotKeySpecifier_
+  commentId: Overload:Terminal.Gui.TextFormatter.RemoveHotKeySpecifier
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.RemoveHotKeySpecifier
+  nameWithType: TextFormatter.RemoveHotKeySpecifier
+- uid: Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag(NStack.ustring,System.Int32)
+  name: ReplaceHotKeyWithTag(ustring, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_ReplaceHotKeyWithTag_NStack_ustring_System_Int32_
+  commentId: M:Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag(NStack.ustring,System.Int32)
+  fullName: Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag(NStack.ustring, System.Int32)
+  nameWithType: TextFormatter.ReplaceHotKeyWithTag(ustring, Int32)
+- uid: Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag*
+  name: ReplaceHotKeyWithTag
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_ReplaceHotKeyWithTag_
+  commentId: Overload:Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag
+  nameWithType: TextFormatter.ReplaceHotKeyWithTag
+- uid: Terminal.Gui.TextFormatter.Size
+  name: Size
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Size
+  commentId: P:Terminal.Gui.TextFormatter.Size
+  fullName: Terminal.Gui.TextFormatter.Size
+  nameWithType: TextFormatter.Size
+- uid: Terminal.Gui.TextFormatter.Size*
+  name: Size
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Size_
+  commentId: Overload:Terminal.Gui.TextFormatter.Size
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.Size
+  nameWithType: TextFormatter.Size
+- uid: Terminal.Gui.TextFormatter.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Text
+  commentId: P:Terminal.Gui.TextFormatter.Text
+  fullName: Terminal.Gui.TextFormatter.Text
+  nameWithType: TextFormatter.Text
+- uid: Terminal.Gui.TextFormatter.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Text_
+  commentId: Overload:Terminal.Gui.TextFormatter.Text
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.Text
+  nameWithType: TextFormatter.Text
+- uid: Terminal.Gui.TextFormatter.WordWrap(NStack.ustring,System.Int32)
+  name: WordWrap(ustring, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_
+  commentId: M:Terminal.Gui.TextFormatter.WordWrap(NStack.ustring,System.Int32)
+  fullName: Terminal.Gui.TextFormatter.WordWrap(NStack.ustring, System.Int32)
+  nameWithType: TextFormatter.WordWrap(ustring, Int32)
+- uid: Terminal.Gui.TextFormatter.WordWrap*
+  name: WordWrap
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_WordWrap_
+  commentId: Overload:Terminal.Gui.TextFormatter.WordWrap
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.WordWrap
+  nameWithType: TextFormatter.WordWrap
 - uid: Terminal.Gui.TextView
   name: TextView
   href: api/Terminal.Gui/Terminal.Gui.TextView.html
@@ -7021,6 +8973,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Toplevel.Modal
   nameWithType: Toplevel.Modal
+- uid: Terminal.Gui.Toplevel.OnKeyDown(Terminal.Gui.KeyEvent)
+  name: OnKeyDown(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnKeyDown_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.Toplevel.OnKeyDown(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.Toplevel.OnKeyDown(Terminal.Gui.KeyEvent)
+  nameWithType: Toplevel.OnKeyDown(KeyEvent)
+- uid: Terminal.Gui.Toplevel.OnKeyDown*
+  name: OnKeyDown
+  href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnKeyDown_
+  commentId: Overload:Terminal.Gui.Toplevel.OnKeyDown
+  isSpec: "True"
+  fullName: Terminal.Gui.Toplevel.OnKeyDown
+  nameWithType: Toplevel.OnKeyDown
+- uid: Terminal.Gui.Toplevel.OnKeyUp(Terminal.Gui.KeyEvent)
+  name: OnKeyUp(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnKeyUp_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.Toplevel.OnKeyUp(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.Toplevel.OnKeyUp(Terminal.Gui.KeyEvent)
+  nameWithType: Toplevel.OnKeyUp(KeyEvent)
+- uid: Terminal.Gui.Toplevel.OnKeyUp*
+  name: OnKeyUp
+  href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_OnKeyUp_
+  commentId: Overload:Terminal.Gui.Toplevel.OnKeyUp
+  isSpec: "True"
+  fullName: Terminal.Gui.Toplevel.OnKeyUp
+  nameWithType: Toplevel.OnKeyUp
 - uid: Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)
   name: ProcessKey(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_
@@ -7130,12 +9108,30 @@ references:
   commentId: M:Terminal.Gui.View.#ctor
   fullName: Terminal.Gui.View.View()
   nameWithType: View.View()
+- uid: Terminal.Gui.View.#ctor(NStack.ustring)
+  name: View(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View__ctor_NStack_ustring_
+  commentId: M:Terminal.Gui.View.#ctor(NStack.ustring)
+  fullName: Terminal.Gui.View.View(NStack.ustring)
+  nameWithType: View.View(ustring)
+- uid: Terminal.Gui.View.#ctor(System.Int32,System.Int32,NStack.ustring)
+  name: View(Int32, Int32, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View__ctor_System_Int32_System_Int32_NStack_ustring_
+  commentId: M:Terminal.Gui.View.#ctor(System.Int32,System.Int32,NStack.ustring)
+  fullName: Terminal.Gui.View.View(System.Int32, System.Int32, NStack.ustring)
+  nameWithType: View.View(Int32, Int32, ustring)
 - uid: Terminal.Gui.View.#ctor(Terminal.Gui.Rect)
   name: View(Rect)
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View__ctor_Terminal_Gui_Rect_
   commentId: M:Terminal.Gui.View.#ctor(Terminal.Gui.Rect)
   fullName: Terminal.Gui.View.View(Terminal.Gui.Rect)
   nameWithType: View.View(Rect)
+- uid: Terminal.Gui.View.#ctor(Terminal.Gui.Rect,NStack.ustring)
+  name: View(Rect, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View__ctor_Terminal_Gui_Rect_NStack_ustring_
+  commentId: M:Terminal.Gui.View.#ctor(Terminal.Gui.Rect,NStack.ustring)
+  fullName: Terminal.Gui.View.View(Terminal.Gui.Rect, NStack.ustring)
+  nameWithType: View.View(Rect, ustring)
 - uid: Terminal.Gui.View.#ctor*
   name: View
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View__ctor_
@@ -7165,6 +9161,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.Add
   nameWithType: View.Add
+- uid: Terminal.Gui.View.Added
+  name: Added
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Added
+  commentId: F:Terminal.Gui.View.Added
+  fullName: Terminal.Gui.View.Added
+  nameWithType: View.Added
 - uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
   name: AddRune(Int32, Int32, Rune)
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_AddRune_System_Int32_System_Int32_System_Rune_
@@ -7178,6 +9180,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.AddRune
   nameWithType: View.AddRune
+- uid: Terminal.Gui.View.BeginInit
+  name: BeginInit()
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_BeginInit
+  commentId: M:Terminal.Gui.View.BeginInit
+  fullName: Terminal.Gui.View.BeginInit()
+  nameWithType: View.BeginInit()
+- uid: Terminal.Gui.View.BeginInit*
+  name: BeginInit
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_BeginInit_
+  commentId: Overload:Terminal.Gui.View.BeginInit
+  isSpec: "True"
+  fullName: Terminal.Gui.View.BeginInit
+  nameWithType: View.BeginInit
 - uid: Terminal.Gui.View.Bounds
   name: Bounds
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Bounds
@@ -7217,6 +9232,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.BringSubviewToFront
   nameWithType: View.BringSubviewToFront
+- uid: Terminal.Gui.View.CanFocus
+  name: CanFocus
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_CanFocus
+  commentId: P:Terminal.Gui.View.CanFocus
+  fullName: Terminal.Gui.View.CanFocus
+  nameWithType: View.CanFocus
+- uid: Terminal.Gui.View.CanFocus*
+  name: CanFocus
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_CanFocus_
+  commentId: Overload:Terminal.Gui.View.CanFocus
+  isSpec: "True"
+  fullName: Terminal.Gui.View.CanFocus
+  nameWithType: View.CanFocus
 - uid: Terminal.Gui.View.ChildNeedsDisplay
   name: ChildNeedsDisplay()
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ChildNeedsDisplay
@@ -7288,6 +9316,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.ColorScheme
   nameWithType: View.ColorScheme
+- uid: Terminal.Gui.View.Dispose(System.Boolean)
+  name: Dispose(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_
+  commentId: M:Terminal.Gui.View.Dispose(System.Boolean)
+  fullName: Terminal.Gui.View.Dispose(System.Boolean)
+  nameWithType: View.Dispose(Boolean)
+- uid: Terminal.Gui.View.Dispose*
+  name: Dispose
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Dispose_
+  commentId: Overload:Terminal.Gui.View.Dispose
+  isSpec: "True"
+  fullName: Terminal.Gui.View.Dispose
+  nameWithType: View.Dispose
 - uid: Terminal.Gui.View.DrawContent
   name: DrawContent
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_DrawContent
@@ -7339,6 +9380,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.Driver
   nameWithType: View.Driver
+- uid: Terminal.Gui.View.EndInit
+  name: EndInit()
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_EndInit
+  commentId: M:Terminal.Gui.View.EndInit
+  fullName: Terminal.Gui.View.EndInit()
+  nameWithType: View.EndInit()
+- uid: Terminal.Gui.View.EndInit*
+  name: EndInit
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_EndInit_
+  commentId: Overload:Terminal.Gui.View.EndInit
+  isSpec: "True"
+  fullName: Terminal.Gui.View.EndInit
+  nameWithType: View.EndInit
 - uid: Terminal.Gui.View.EnsureFocus
   name: EnsureFocus()
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_EnsureFocus
@@ -7377,12 +9431,12 @@ references:
   commentId: T:Terminal.Gui.View.FocusEventArgs
   fullName: Terminal.Gui.View.FocusEventArgs
   nameWithType: View.FocusEventArgs
-- uid: Terminal.Gui.View.FocusEventArgs.#ctor
-  name: FocusEventArgs()
-  href: api/Terminal.Gui/Terminal.Gui.View.FocusEventArgs.html#Terminal_Gui_View_FocusEventArgs__ctor
-  commentId: M:Terminal.Gui.View.FocusEventArgs.#ctor
-  fullName: Terminal.Gui.View.FocusEventArgs.FocusEventArgs()
-  nameWithType: View.FocusEventArgs.FocusEventArgs()
+- uid: Terminal.Gui.View.FocusEventArgs.#ctor(Terminal.Gui.View)
+  name: FocusEventArgs(View)
+  href: api/Terminal.Gui/Terminal.Gui.View.FocusEventArgs.html#Terminal_Gui_View_FocusEventArgs__ctor_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.View.FocusEventArgs.#ctor(Terminal.Gui.View)
+  fullName: Terminal.Gui.View.FocusEventArgs.FocusEventArgs(Terminal.Gui.View)
+  nameWithType: View.FocusEventArgs.FocusEventArgs(View)
 - uid: Terminal.Gui.View.FocusEventArgs.#ctor*
   name: FocusEventArgs
   href: api/Terminal.Gui/Terminal.Gui.View.FocusEventArgs.html#Terminal_Gui_View_FocusEventArgs__ctor_
@@ -7403,6 +9457,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.FocusEventArgs.Handled
   nameWithType: View.FocusEventArgs.Handled
+- uid: Terminal.Gui.View.FocusEventArgs.View
+  name: View
+  href: api/Terminal.Gui/Terminal.Gui.View.FocusEventArgs.html#Terminal_Gui_View_FocusEventArgs_View
+  commentId: P:Terminal.Gui.View.FocusEventArgs.View
+  fullName: Terminal.Gui.View.FocusEventArgs.View
+  nameWithType: View.FocusEventArgs.View
+- uid: Terminal.Gui.View.FocusEventArgs.View*
+  name: View
+  href: api/Terminal.Gui/Terminal.Gui.View.FocusEventArgs.html#Terminal_Gui_View_FocusEventArgs_View_
+  commentId: Overload:Terminal.Gui.View.FocusEventArgs.View
+  isSpec: "True"
+  fullName: Terminal.Gui.View.FocusEventArgs.View
+  nameWithType: View.FocusEventArgs.View
 - uid: Terminal.Gui.View.FocusFirst
   name: FocusFirst()
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_FocusFirst
@@ -7507,6 +9574,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.Height
   nameWithType: View.Height
+- uid: Terminal.Gui.View.HotKey
+  name: HotKey
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_HotKey
+  commentId: P:Terminal.Gui.View.HotKey
+  fullName: Terminal.Gui.View.HotKey
+  nameWithType: View.HotKey
+- uid: Terminal.Gui.View.HotKey*
+  name: HotKey
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_HotKey_
+  commentId: Overload:Terminal.Gui.View.HotKey
+  isSpec: "True"
+  fullName: Terminal.Gui.View.HotKey
+  nameWithType: View.HotKey
+- uid: Terminal.Gui.View.HotKeySpecifier
+  name: HotKeySpecifier
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier
+  commentId: P:Terminal.Gui.View.HotKeySpecifier
+  fullName: Terminal.Gui.View.HotKeySpecifier
+  nameWithType: View.HotKeySpecifier
+- uid: Terminal.Gui.View.HotKeySpecifier*
+  name: HotKeySpecifier
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier_
+  commentId: Overload:Terminal.Gui.View.HotKeySpecifier
+  isSpec: "True"
+  fullName: Terminal.Gui.View.HotKeySpecifier
+  nameWithType: View.HotKeySpecifier
 - uid: Terminal.Gui.View.Id
   name: Id
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Id
@@ -7520,6 +9613,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.Id
   nameWithType: View.Id
+- uid: Terminal.Gui.View.Initialized
+  name: Initialized
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Initialized
+  commentId: E:Terminal.Gui.View.Initialized
+  fullName: Terminal.Gui.View.Initialized
+  nameWithType: View.Initialized
 - uid: Terminal.Gui.View.IsCurrentTop
   name: IsCurrentTop
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_IsCurrentTop
@@ -7533,6 +9632,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.IsCurrentTop
   nameWithType: View.IsCurrentTop
+- uid: Terminal.Gui.View.IsInitialized
+  name: IsInitialized
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized
+  commentId: P:Terminal.Gui.View.IsInitialized
+  fullName: Terminal.Gui.View.IsInitialized
+  nameWithType: View.IsInitialized
+- uid: Terminal.Gui.View.IsInitialized*
+  name: IsInitialized
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized_
+  commentId: Overload:Terminal.Gui.View.IsInitialized
+  isSpec: "True"
+  fullName: Terminal.Gui.View.IsInitialized
+  nameWithType: View.IsInitialized
 - uid: Terminal.Gui.View.KeyDown
   name: KeyDown
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_KeyDown
@@ -7621,6 +9733,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.LayoutEventArgs.OldBounds
   nameWithType: View.LayoutEventArgs.OldBounds
+- uid: Terminal.Gui.View.LayoutStarted
+  name: LayoutStarted
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_LayoutStarted
+  commentId: F:Terminal.Gui.View.LayoutStarted
+  fullName: Terminal.Gui.View.LayoutStarted
+  nameWithType: View.LayoutStarted
 - uid: Terminal.Gui.View.LayoutStyle
   name: LayoutStyle
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle
@@ -7742,6 +9860,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.Move
   nameWithType: View.Move
+- uid: Terminal.Gui.View.OnAdded(Terminal.Gui.View)
+  name: OnAdded(View)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_OnAdded_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.View.OnAdded(Terminal.Gui.View)
+  fullName: Terminal.Gui.View.OnAdded(Terminal.Gui.View)
+  nameWithType: View.OnAdded(View)
+- uid: Terminal.Gui.View.OnAdded*
+  name: OnAdded
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_OnAdded_
+  commentId: Overload:Terminal.Gui.View.OnAdded
+  isSpec: "True"
+  fullName: Terminal.Gui.View.OnAdded
+  nameWithType: View.OnAdded
 - uid: Terminal.Gui.View.OnDrawContent(Terminal.Gui.Rect)
   name: OnDrawContent(Rect)
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_
@@ -7755,12 +9886,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.OnDrawContent
   nameWithType: View.OnDrawContent
-- uid: Terminal.Gui.View.OnEnter
-  name: OnEnter()
-  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_OnEnter
-  commentId: M:Terminal.Gui.View.OnEnter
-  fullName: Terminal.Gui.View.OnEnter()
-  nameWithType: View.OnEnter()
+- uid: Terminal.Gui.View.OnEnter(Terminal.Gui.View)
+  name: OnEnter(View)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.View.OnEnter(Terminal.Gui.View)
+  fullName: Terminal.Gui.View.OnEnter(Terminal.Gui.View)
+  nameWithType: View.OnEnter(View)
 - uid: Terminal.Gui.View.OnEnter*
   name: OnEnter
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_
@@ -7794,12 +9925,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.OnKeyUp
   nameWithType: View.OnKeyUp
-- uid: Terminal.Gui.View.OnLeave
-  name: OnLeave()
-  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_OnLeave
-  commentId: M:Terminal.Gui.View.OnLeave
-  fullName: Terminal.Gui.View.OnLeave()
-  nameWithType: View.OnLeave()
+- uid: Terminal.Gui.View.OnLeave(Terminal.Gui.View)
+  name: OnLeave(View)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_OnLeave_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.View.OnLeave(Terminal.Gui.View)
+  fullName: Terminal.Gui.View.OnLeave(Terminal.Gui.View)
+  nameWithType: View.OnLeave(View)
 - uid: Terminal.Gui.View.OnLeave*
   name: OnLeave
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_OnLeave_
@@ -7846,6 +9977,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.OnMouseLeave
   nameWithType: View.OnMouseLeave
+- uid: Terminal.Gui.View.OnRemoved(Terminal.Gui.View)
+  name: OnRemoved(View)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_OnRemoved_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.View.OnRemoved(Terminal.Gui.View)
+  fullName: Terminal.Gui.View.OnRemoved(Terminal.Gui.View)
+  nameWithType: View.OnRemoved(View)
+- uid: Terminal.Gui.View.OnRemoved*
+  name: OnRemoved
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_OnRemoved_
+  commentId: Overload:Terminal.Gui.View.OnRemoved
+  isSpec: "True"
+  fullName: Terminal.Gui.View.OnRemoved
+  nameWithType: View.OnRemoved
 - uid: Terminal.Gui.View.PositionCursor
   name: PositionCursor()
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_PositionCursor
@@ -7937,6 +10081,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.RemoveAll
   nameWithType: View.RemoveAll
+- uid: Terminal.Gui.View.Removed
+  name: Removed
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Removed
+  commentId: F:Terminal.Gui.View.Removed
+  fullName: Terminal.Gui.View.Removed
+  nameWithType: View.Removed
 - uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
   name: ScreenToView(Int32, Int32)
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ScreenToView_System_Int32_System_Int32_
@@ -8047,6 +10197,71 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.SuperView
   nameWithType: View.SuperView
+- uid: Terminal.Gui.View.TabIndex
+  name: TabIndex
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_TabIndex
+  commentId: P:Terminal.Gui.View.TabIndex
+  fullName: Terminal.Gui.View.TabIndex
+  nameWithType: View.TabIndex
+- uid: Terminal.Gui.View.TabIndex*
+  name: TabIndex
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_TabIndex_
+  commentId: Overload:Terminal.Gui.View.TabIndex
+  isSpec: "True"
+  fullName: Terminal.Gui.View.TabIndex
+  nameWithType: View.TabIndex
+- uid: Terminal.Gui.View.TabIndexes
+  name: TabIndexes
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_TabIndexes
+  commentId: P:Terminal.Gui.View.TabIndexes
+  fullName: Terminal.Gui.View.TabIndexes
+  nameWithType: View.TabIndexes
+- uid: Terminal.Gui.View.TabIndexes*
+  name: TabIndexes
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_TabIndexes_
+  commentId: Overload:Terminal.Gui.View.TabIndexes
+  isSpec: "True"
+  fullName: Terminal.Gui.View.TabIndexes
+  nameWithType: View.TabIndexes
+- uid: Terminal.Gui.View.TabStop
+  name: TabStop
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_TabStop
+  commentId: P:Terminal.Gui.View.TabStop
+  fullName: Terminal.Gui.View.TabStop
+  nameWithType: View.TabStop
+- uid: Terminal.Gui.View.TabStop*
+  name: TabStop
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_TabStop_
+  commentId: Overload:Terminal.Gui.View.TabStop
+  isSpec: "True"
+  fullName: Terminal.Gui.View.TabStop
+  nameWithType: View.TabStop
+- uid: Terminal.Gui.View.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Text
+  commentId: P:Terminal.Gui.View.Text
+  fullName: Terminal.Gui.View.Text
+  nameWithType: View.Text
+- uid: Terminal.Gui.View.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Text_
+  commentId: Overload:Terminal.Gui.View.Text
+  isSpec: "True"
+  fullName: Terminal.Gui.View.Text
+  nameWithType: View.Text
+- uid: Terminal.Gui.View.TextAlignment
+  name: TextAlignment
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_TextAlignment
+  commentId: P:Terminal.Gui.View.TextAlignment
+  fullName: Terminal.Gui.View.TextAlignment
+  nameWithType: View.TextAlignment
+- uid: Terminal.Gui.View.TextAlignment*
+  name: TextAlignment
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_TextAlignment_
+  commentId: Overload:Terminal.Gui.View.TextAlignment
+  isSpec: "True"
+  fullName: Terminal.Gui.View.TextAlignment
+  nameWithType: View.TextAlignment
 - uid: Terminal.Gui.View.ToString
   name: ToString()
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ToString
@@ -8246,6 +10461,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Window.RemoveAll
   nameWithType: Window.RemoveAll
+- uid: Terminal.Gui.Window.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_Text
+  commentId: P:Terminal.Gui.Window.Text
+  fullName: Terminal.Gui.Window.Text
+  nameWithType: Window.Text
+- uid: Terminal.Gui.Window.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_Text_
+  commentId: Overload:Terminal.Gui.Window.Text
+  isSpec: "True"
+  fullName: Terminal.Gui.Window.Text
+  nameWithType: Window.Text
+- uid: Terminal.Gui.Window.TextAlignment
+  name: TextAlignment
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_TextAlignment
+  commentId: P:Terminal.Gui.Window.TextAlignment
+  fullName: Terminal.Gui.Window.TextAlignment
+  nameWithType: Window.TextAlignment
+- uid: Terminal.Gui.Window.TextAlignment*
+  name: TextAlignment
+  href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_TextAlignment_
+  commentId: Overload:Terminal.Gui.Window.TextAlignment
+  isSpec: "True"
+  fullName: Terminal.Gui.Window.TextAlignment
+  nameWithType: Window.TextAlignment
 - uid: Terminal.Gui.Window.Title
   name: Title
   href: api/Terminal.Gui/Terminal.Gui.Window.html#Terminal_Gui_Window_Title
@@ -8303,6 +10544,22 @@ references:
   isSpec: "True"
   fullName: UICatalog.Scenario.GetCategories
   nameWithType: Scenario.GetCategories
+- uid: UICatalog.Scenario.GetDerivedClasses*
+  name: GetDerivedClasses
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_GetDerivedClasses_
+  commentId: Overload:UICatalog.Scenario.GetDerivedClasses
+  isSpec: "True"
+  fullName: UICatalog.Scenario.GetDerivedClasses
+  nameWithType: Scenario.GetDerivedClasses
+- uid: UICatalog.Scenario.GetDerivedClasses``1
+  name: GetDerivedClasses<T>()
+  href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_GetDerivedClasses__1
+  commentId: M:UICatalog.Scenario.GetDerivedClasses``1
+  name.vb: GetDerivedClasses(Of T)()
+  fullName: UICatalog.Scenario.GetDerivedClasses<T>()
+  fullName.vb: UICatalog.Scenario.GetDerivedClasses(Of T)()
+  nameWithType: Scenario.GetDerivedClasses<T>()
+  nameWithType.vb: Scenario.GetDerivedClasses(Of T)()
 - uid: UICatalog.Scenario.GetDescription
   name: GetDescription()
   href: api/UICatalog/UICatalog.Scenario.html#UICatalog_Scenario_GetDescription
@@ -8387,11 +10644,11 @@ references:
   isSpec: "True"
   fullName: UICatalog.Scenario.ScenarioCategory.ScenarioCategory
   nameWithType: Scenario.ScenarioCategory.ScenarioCategory
-- uid: UICatalog.Scenario.ScenarioCategory.GetCategories(System.Type)
+- uid: UICatalog.Scenario.ScenarioCategory.GetCategories(Type)
   name: GetCategories(Type)
-  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory_GetCategories_System_Type_
-  commentId: M:UICatalog.Scenario.ScenarioCategory.GetCategories(System.Type)
-  fullName: UICatalog.Scenario.ScenarioCategory.GetCategories(System.Type)
+  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory_GetCategories_Type_
+  commentId: M:UICatalog.Scenario.ScenarioCategory.GetCategories(Type)
+  fullName: UICatalog.Scenario.ScenarioCategory.GetCategories(Type)
   nameWithType: Scenario.ScenarioCategory.GetCategories(Type)
 - uid: UICatalog.Scenario.ScenarioCategory.GetCategories*
   name: GetCategories
@@ -8400,11 +10657,11 @@ references:
   isSpec: "True"
   fullName: UICatalog.Scenario.ScenarioCategory.GetCategories
   nameWithType: Scenario.ScenarioCategory.GetCategories
-- uid: UICatalog.Scenario.ScenarioCategory.GetName(System.Type)
+- uid: UICatalog.Scenario.ScenarioCategory.GetName(Type)
   name: GetName(Type)
-  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory_GetName_System_Type_
-  commentId: M:UICatalog.Scenario.ScenarioCategory.GetName(System.Type)
-  fullName: UICatalog.Scenario.ScenarioCategory.GetName(System.Type)
+  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory_GetName_Type_
+  commentId: M:UICatalog.Scenario.ScenarioCategory.GetName(Type)
+  fullName: UICatalog.Scenario.ScenarioCategory.GetName(Type)
   nameWithType: Scenario.ScenarioCategory.GetName(Type)
 - uid: UICatalog.Scenario.ScenarioCategory.GetName*
   name: GetName
@@ -8458,11 +10715,11 @@ references:
   isSpec: "True"
   fullName: UICatalog.Scenario.ScenarioMetadata.Description
   nameWithType: Scenario.ScenarioMetadata.Description
-- uid: UICatalog.Scenario.ScenarioMetadata.GetDescription(System.Type)
+- uid: UICatalog.Scenario.ScenarioMetadata.GetDescription(Type)
   name: GetDescription(Type)
-  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_GetDescription_System_Type_
-  commentId: M:UICatalog.Scenario.ScenarioMetadata.GetDescription(System.Type)
-  fullName: UICatalog.Scenario.ScenarioMetadata.GetDescription(System.Type)
+  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_GetDescription_Type_
+  commentId: M:UICatalog.Scenario.ScenarioMetadata.GetDescription(Type)
+  fullName: UICatalog.Scenario.ScenarioMetadata.GetDescription(Type)
   nameWithType: Scenario.ScenarioMetadata.GetDescription(Type)
 - uid: UICatalog.Scenario.ScenarioMetadata.GetDescription*
   name: GetDescription
@@ -8471,11 +10728,11 @@ references:
   isSpec: "True"
   fullName: UICatalog.Scenario.ScenarioMetadata.GetDescription
   nameWithType: Scenario.ScenarioMetadata.GetDescription
-- uid: UICatalog.Scenario.ScenarioMetadata.GetName(System.Type)
+- uid: UICatalog.Scenario.ScenarioMetadata.GetName(Type)
   name: GetName(Type)
-  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_GetName_System_Type_
-  commentId: M:UICatalog.Scenario.ScenarioMetadata.GetName(System.Type)
-  fullName: UICatalog.Scenario.ScenarioMetadata.GetName(System.Type)
+  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_GetName_Type_
+  commentId: M:UICatalog.Scenario.ScenarioMetadata.GetName(Type)
+  fullName: UICatalog.Scenario.ScenarioMetadata.GetName(Type)
   nameWithType: Scenario.ScenarioMetadata.GetName(Type)
 - uid: UICatalog.Scenario.ScenarioMetadata.GetName*
   name: GetName

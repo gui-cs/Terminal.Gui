@@ -69,6 +69,7 @@ namespace Terminal.Gui {
 		readonly TextField search;
 		readonly ListView listview;
 		bool autoHide = true;
+		int minimumHeight = 2;
 
 		/// <summary>
 		/// Public constructor
@@ -110,6 +111,10 @@ namespace Terminal.Gui {
 
 		private void Initialize ()
 		{
+			if (Bounds.Height < minimumHeight && Height is Dim.DimAbsolute) {
+				Height = minimumHeight;
+			}
+
 			search.TextChanged += Search_Changed;
 
 			listview.Y = Pos.Bottom (search);
@@ -137,9 +142,9 @@ namespace Terminal.Gui {
 
 			Added += (View v) => {
 
-				// Determine if this view is hosted inside a dialog
+				// Determine if this view is hosted inside a dialog and is the only control
 				for (View view = this.SuperView; view != null; view = view.SuperView) {
-					if (view is Dialog) {
+					if (view is Dialog && SuperView != null && SuperView.Subviews.Count == 1 && SuperView.Subviews[0] == this) {
 						autoHide = false;
 						break;
 					}
@@ -424,8 +429,10 @@ namespace Terminal.Gui {
 
 			listview.SetSource (searchset);
 			listview.Height = CalculatetHeight ();
-			
-			this.SetFocus (search);
+
+			if (Subviews.Count > 0) {
+				SetFocus (search);
+			}
 		}
 
 		private void ResetSearchSet (bool noCopy = false)
@@ -504,7 +511,7 @@ namespace Terminal.Gui {
 			if (Bounds.Height == 0)
 				return 0;
 
-			return Math.Min (Bounds.Height - 1, searchset?.Count > 0 ? searchset.Count : isShow ? Bounds.Height - 1 : 0);
+			return Math.Min (Math.Max(Bounds.Height - 1, minimumHeight - 1), searchset?.Count > 0 ? searchset.Count : isShow ? Math.Max (Bounds.Height - 1, minimumHeight - 1) : 0);
 		}
 	}
 }

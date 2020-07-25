@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Namespace Terminal.Gui
    ">
-    <meta name="generator" content="docfx 2.54.0.0">
+    <meta name="generator" content="docfx 2.56.1.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -122,6 +122,10 @@ Color scheme definitions, they cover some common scenarios and are used
 typically in containers such as <a class="xref" href="Terminal.Gui.Window.html">Window</a> and <a class="xref" href="Terminal.Gui.FrameView.html">FrameView</a> to set the scheme that is used by all the
 views contained inside.
 </section>
+      <h4><a class="xref" href="Terminal.Gui.ComboBox.html">ComboBox</a></h4>
+      <section>
+ComboBox control
+</section>
       <h4><a class="xref" href="Terminal.Gui.ConsoleDriver.html">ConsoleDriver</a></h4>
       <section>
 ConsoleDriver is an abstract class that defines the requirements for a console driver.  
@@ -143,6 +147,14 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
       <h4><a class="xref" href="Terminal.Gui.Dim.html">Dim</a></h4>
       <section>
 Dim properties of a <a class="xref" href="Terminal.Gui.View.html">View</a> to control the position.
+</section>
+      <h4><a class="xref" href="Terminal.Gui.FakeConsole.html">FakeConsole</a></h4>
+      <section>
+
+</section>
+      <h4><a class="xref" href="Terminal.Gui.FakeDriver.html">FakeDriver</a></h4>
+      <section>
+Implements a mock ConsoleDriver for unit testing
 </section>
       <h4><a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a></h4>
       <section>
@@ -167,7 +179,7 @@ Identifies the state of the &quot;shift&quot;-keys within a event.
 </section>
       <h4><a class="xref" href="Terminal.Gui.Label.html">Label</a></h4>
       <section>
-The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a string at a given position and supports multiple lines separted by newline characters.
+The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a string at a given position and supports multiple lines separted by newline characters. Multi-line Labels support word wrap.
 </section>
       <h4><a class="xref" href="Terminal.Gui.ListView.html">ListView</a></h4>
       <section>
@@ -202,6 +214,12 @@ A <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a> has a title, an
       <section>
 MessageBox displays a modal message to the user, with a title, a message and a series of options that the user can choose from.
 </section>
+      <h4><a class="xref" href="Terminal.Gui.NetMainLoop.html">NetMainLoop</a></h4>
+      <section>
+Mainloop intended to be used with the .NET System.Console API, and can
+be used on Windows and Unix, it is cross platform but lacks things like
+file descriptor monitoring.
+</section>
       <h4><a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialog</a></h4>
       <section>
 The <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialog</a>provides an interactive dialog box for users to select files or directories.
@@ -221,6 +239,10 @@ A Progress Bar view that can indicate progress of an activity visually.
       <h4><a class="xref" href="Terminal.Gui.RadioGroup.html">RadioGroup</a></h4>
       <section>
 <a class="xref" href="Terminal.Gui.RadioGroup.html">RadioGroup</a> shows a group of radio labels, only one of those can be selected at a given time
+</section>
+      <h4><a class="xref" href="Terminal.Gui.RadioGroup.SelectedItemChangedArgs.html">RadioGroup.SelectedItemChangedArgs</a></h4>
+      <section>
+Event arguments for the SelectedItemChagned event.
 </section>
       <h4><a class="xref" href="Terminal.Gui.Responder.html">Responder</a></h4>
       <section>
@@ -259,6 +281,10 @@ A <a class="xref" href="Terminal.Gui.StatusItem.html#Terminal_Gui_StatusItem_Tit
       <h4><a class="xref" href="Terminal.Gui.TextField.html">TextField</a></h4>
       <section>
 Single-line text entry <a class="xref" href="Terminal.Gui.View.html">View</a>
+</section>
+      <h4><a class="xref" href="Terminal.Gui.TextFormatter.html">TextFormatter</a></h4>
+      <section>
+Provides text formatting capabilites for console apps. Supports, hotkeys, horizontal alignment, multille lines, and word-based line wrap.
 </section>
       <h4><a class="xref" href="Terminal.Gui.TextView.html">TextView</a></h4>
       <section>

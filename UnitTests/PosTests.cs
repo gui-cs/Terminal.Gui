@@ -283,42 +283,50 @@ namespace Terminal.Gui {
 				return (win, button);
 			}
 
-			void cleanup ()
+			Application.RunState rs;
+
+			void cleanup (Application.RunState rs)
 			{
 				// Cleanup
-				Application.Shutdown ();
+				Application.End (rs);
 			}
 
 			// Test cases:
 			var app = setup ();
 			app.button.Y = Pos.Left (app.win);
+			rs = Application.Begin (Application.Top);
 			Application.Run ();
-			cleanup ();
+			cleanup (rs);
 
 			app = setup ();
 			app.button.Y = Pos.X (app.win);
+			rs = Application.Begin (Application.Top);
 			Application.Run ();
-			cleanup ();
+			cleanup (rs);
 
 			app = setup ();
 			app.button.Y = Pos.Top (app.win);
+			rs = Application.Begin (Application.Top);
 			Application.Run ();
-			cleanup ();
+			cleanup (rs);
 
 			app = setup ();
 			app.button.Y = Pos.Y (app.win);
+			rs = Application.Begin (Application.Top);
 			Application.Run ();
-			cleanup ();
+			cleanup (rs);
 
 			app = setup ();
 			app.button.Y = Pos.Bottom (app.win);
+			rs = Application.Begin (Application.Top);
 			Application.Run ();
-			cleanup ();
+			cleanup (rs);
 
 			app = setup ();
 			app.button.Y = Pos.Right (app.win);
+			rs = Application.Begin (Application.Top);
 			Application.Run ();
-			cleanup ();
+			cleanup (rs);
 
 		}
 

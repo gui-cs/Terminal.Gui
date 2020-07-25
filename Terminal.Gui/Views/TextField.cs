@@ -129,9 +129,6 @@ namespace Terminal.Gui {
 			}
 
 			set {
-				if (ReadOnly)
-					return;
-
 				var oldText = ustring.Make (text);
 
 				if (oldText == value)
@@ -267,7 +264,7 @@ namespace Terminal.Gui {
 
 		///<inheritdoc/>
 		public override bool CanFocus {
-			get => true;
+			get => base.CanFocus;
 			set { base.CanFocus = value; }
 		}
 
@@ -637,6 +634,7 @@ namespace Terminal.Gui {
 		public ustring SelectedText { get; set; }
 
 		int start, length;
+		bool isButtonPressed;
 		bool isButtonReleased = true;
 
 		///<inheritdoc/>
@@ -644,17 +642,24 @@ namespace Terminal.Gui {
 		{
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed) && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition) &&
 				!ev.Flags.HasFlag (MouseFlags.Button1Released) && !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
-				!ev.Flags.HasFlag (MouseFlags.Button1TripleClicked))
+				!ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)) {
 				return false;
+			}
 
 			if (ev.Flags == MouseFlags.Button1Pressed) {
-				if (!HasFocus)
+				if (!CanFocus) {
+					return true;
+				}
+				if (!HasFocus) {
 					SuperView.SetFocus (this);
+				}
 				PositionCursor (ev);
-				if (isButtonReleased)
+				if (isButtonReleased) {
 					ClearAllSelection ();
+				}
 				isButtonReleased = true;
-			} else if (ev.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
+				isButtonPressed = true;
+			} else if (ev.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && isButtonPressed) {
 				int x = PositionCursor (ev);
 				isButtonReleased = false;
 				PrepareSelection (x);
@@ -663,12 +668,14 @@ namespace Terminal.Gui {
 				}
 			} else if (ev.Flags == MouseFlags.Button1Released) {
 				isButtonReleased = true;
+				isButtonPressed = false;
 				Application.UngrabMouse ();
 			} else if (ev.Flags == MouseFlags.Button1DoubleClicked) {
 				int x = PositionCursor (ev);
 				int sbw = x;
-				if (x > 0 && (char)Text [x - 1] != ' ')
+				if (x > 0 && (char)Text [x - 1] != ' ') {
 					sbw = WordBackward (x);
+				}
 				if (sbw != -1) {
 					x = sbw;
 					PositionCursor (x);

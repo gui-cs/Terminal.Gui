@@ -565,7 +565,7 @@ namespace Terminal.Gui {
 
 		///<inheritdoc/>
 		public override bool CanFocus {
-			get => true;
+			get => base.CanFocus;
 			set { base.CanFocus = value; }
 		}
 
@@ -1199,8 +1199,13 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (!HasFocus)
+			if (!CanFocus) {
+				return true;
+			}
+
+			if (!HasFocus) {
 				SuperView.SetFocus (this);
+			}
 
 			if (ev.Flags == MouseFlags.Button1Clicked) {
 				if (model.Count > 0) {
