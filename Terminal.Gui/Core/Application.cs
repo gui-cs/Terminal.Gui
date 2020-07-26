@@ -506,6 +506,7 @@ namespace Terminal.Gui {
 			MainLoop = null;
 			Driver?.End ();
 			Driver = null;
+			_initialized = false;
 		}
 
 		static void Redraw (View view)
