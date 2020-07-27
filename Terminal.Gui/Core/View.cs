@@ -1882,6 +1882,9 @@ namespace Terminal.Gui {
 				Remove (subview);
 				subview.Dispose ();
 			}
+			if (Application.Top.focused == this) {
+				Application.Top.focused = null;
+			}
 			base.Dispose (disposing);
 		}
 
