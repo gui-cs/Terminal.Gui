@@ -1019,11 +1019,13 @@ namespace Terminal.Gui {
 				LastFocused = lastFocused;
 				lastFocused = null;
 				if (LastFocused != null) {
+					CanFocus = false;
 					if (!reopen) {
 						selected = -1;
 					}
 					LastFocused.SuperView?.SetFocus (LastFocused);
 				} else {
+					CanFocus = true;
 					SuperView.SetFocus (this);
 					PositionCursor ();
 				}
