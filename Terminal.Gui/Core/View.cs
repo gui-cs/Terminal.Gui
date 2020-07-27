@@ -748,6 +748,9 @@ namespace Terminal.Gui {
 					view.SetNeedsDisplay ();
 			}
 			OnRemoved (view);
+			if (focused == view) {
+				focused = null;
+			}
 		}
 
 		void PerformActionForSubview (View subview, Action<View> action)
@@ -1881,9 +1884,6 @@ namespace Terminal.Gui {
 				View subview = InternalSubviews [i];
 				Remove (subview);
 				subview.Dispose ();
-			}
-			if (Application.Top.focused == this) {
-				Application.Top.focused = null;
 			}
 			base.Dispose (disposing);
 		}
