@@ -1896,7 +1896,7 @@ namespace Terminal.Gui {
 
 
 			if (mouseEvent.Flags == MouseFlags.Button1Clicked) {
-				if (!HasFocus && SuperView != null) {
+				if (CanFocus && !HasFocus && SuperView != null) {
 					SuperView.SetFocus (this);
 					SetNeedsDisplay ();
 				}
