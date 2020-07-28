@@ -97,7 +97,7 @@ namespace UICatalog {
 				scenario.Setup ();
 				scenario.Run ();
 				_top.Ready += () => {
-					_top.SetFocus (_rightPane);
+					_rightPane.SetFocus ();
 					_top.Ready = null;
 				};
 
@@ -176,7 +176,7 @@ namespace UICatalog {
 				CanFocus = true,
 			};
 			_categoryListView.OpenSelectedItem += (a) => {
-				_top.SetFocus (_rightPane);
+				_rightPane.SetFocus ();
 			};
 			_categoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
 			_leftPane.Add (_categoryListView);
