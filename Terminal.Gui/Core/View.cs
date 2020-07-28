@@ -748,6 +748,9 @@ namespace Terminal.Gui {
 					view.SetNeedsDisplay ();
 			}
 			OnRemoved (view);
+			if (focused == view) {
+				focused = null;
+			}
 		}
 
 		void PerformActionForSubview (View subview, Action<View> action)
@@ -1864,7 +1867,7 @@ namespace Terminal.Gui {
 
 
 			if (mouseEvent.Flags == MouseFlags.Button1Clicked) {
-				if (!HasFocus && SuperView != null) {
+				if (CanFocus && !HasFocus && SuperView != null) {
 					SuperView.SetFocus (this);
 					SetNeedsDisplay ();
 				}
