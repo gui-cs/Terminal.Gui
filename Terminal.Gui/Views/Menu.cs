@@ -720,7 +720,7 @@ namespace Terminal.Gui {
 					selected = 0;
 					CanFocus = true;
 					lastFocused = SuperView.MostFocused;
-					SuperView.SetFocus (this);
+					SetFocus ();
 					SetNeedsDisplay ();
 					Application.GrabMouse (this);
 				} else if (!openedByHotKey) {
@@ -747,7 +747,7 @@ namespace Terminal.Gui {
 			selected = -1;
 			CanFocus = false;
 			if (lastFocused != null) {
-				lastFocused.SuperView?.SetFocus (lastFocused);
+				lastFocused.SetFocus ();
 			}
 			SetNeedsDisplay ();
 			Application.UngrabMouse ();
@@ -880,7 +880,7 @@ namespace Terminal.Gui {
 				openCurrentMenu.previousSubFocused = openMenu;
 
 				SuperView.Add (openMenu);
-				SuperView.SetFocus (openMenu);
+				openMenu.SetFocus ();
 				break;
 			default:
 				if (openSubMenu == null)
@@ -896,7 +896,7 @@ namespace Terminal.Gui {
 				}
 				selectedSub = openSubMenu.Count - 1;
 				if (selectedSub > -1 && SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)) {
-					SuperView?.SetFocus (openCurrentMenu);
+					openCurrentMenu.SetFocus ();
 				}
 				break;
 			}
@@ -1007,7 +1007,7 @@ namespace Terminal.Gui {
 				}
 				SetNeedsDisplay ();
 				if (previousFocused != null && previousFocused is Menu && openMenu != null && previousFocused.ToString () != openCurrentMenu.ToString ())
-					previousFocused?.SuperView?.SetFocus (previousFocused);
+					previousFocused.SetFocus ();
 				openMenu?.Dispose ();
 				openMenu = null;
 				if (lastFocused is Menu || lastFocused is MenuBar) {
@@ -1020,10 +1020,10 @@ namespace Terminal.Gui {
 					if (!reopen) {
 						selected = -1;
 					}
-					LastFocused.SuperView?.SetFocus (LastFocused);
+					LastFocused.SetFocus ();
 				} else {
 					CanFocus = true;
-					SuperView.SetFocus (this);
+					SetFocus ();
 					PositionCursor ();
 				}
 				IsMenuOpen = false;
@@ -1033,7 +1033,7 @@ namespace Terminal.Gui {
 				selectedSub = -1;
 				SetNeedsDisplay ();
 				RemoveAllOpensSubMenus ();
-				openCurrentMenu.previousSubFocused?.SuperView?.SetFocus (openCurrentMenu.previousSubFocused);
+				openCurrentMenu.previousSubFocused.SetFocus ();
 				openSubMenu = null;
 				IsMenuOpen = true;
 				break;
@@ -1049,9 +1049,9 @@ namespace Terminal.Gui {
 			for (int i = openSubMenu.Count - 1; i > index; i--) {
 				isMenuClosing = true;
 				if (openSubMenu.Count - 1 > 0)
-					SuperView.SetFocus (openSubMenu [i - 1]);
+					openSubMenu [i - 1].SetFocus ();
 				else
-					SuperView.SetFocus (openMenu);
+					openMenu.SetFocus ();
 				if (openSubMenu != null) {
 					var menu = openSubMenu [i];
 					SuperView.Remove (menu);
@@ -1272,7 +1272,7 @@ namespace Terminal.Gui {
 				CloseMenu ();
 				if (openedByAltKey) {
 					openedByAltKey = false;
-					LastFocused.SuperView?.SetFocus (LastFocused);
+					LastFocused.SetFocus ();
 				}
 				break;
 
