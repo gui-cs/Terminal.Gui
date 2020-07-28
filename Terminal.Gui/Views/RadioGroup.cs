@@ -224,7 +224,7 @@ namespace Terminal.Gui {
 								SelectedItem = i;
 								cursor = i;
 								if (!HasFocus)
-									SuperView.SetFocus (this);
+									SetFocus ();
 								return true;
 							}
 							nextIsHot = false;
@@ -267,7 +267,7 @@ namespace Terminal.Gui {
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked))
 				return false;
 
-			SuperView.SetFocus (this);
+			SetFocus ();
 
 			if (me.Y < radioLabels.Count) {
 				cursor = SelectedItem = me.Y;

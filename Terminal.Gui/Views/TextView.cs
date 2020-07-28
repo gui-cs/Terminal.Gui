@@ -1204,7 +1204,7 @@ namespace Terminal.Gui {
 			}
 
 			if (!HasFocus) {
-				SuperView.SetFocus (this);
+				SetFocus ();
 			}
 
 			if (ev.Flags == MouseFlags.Button1Clicked) {

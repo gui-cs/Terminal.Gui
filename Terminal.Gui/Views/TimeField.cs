@@ -275,7 +275,7 @@ namespace Terminal.Gui {
 			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked))
 				return false;
 			if (!HasFocus)
-				SuperView.SetFocus (this);
+				SetFocus ();
 
 			var point = ev.X;
 			if (point > FieldLen)

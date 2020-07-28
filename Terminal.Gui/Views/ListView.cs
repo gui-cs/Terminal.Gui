@@ -577,7 +577,7 @@ namespace Terminal.Gui {
 				return false;
 
 			if (!HasFocus)
-				SuperView.SetFocus (this);
+				SetFocus ();
 
 			if (source == null)
 				return false;
