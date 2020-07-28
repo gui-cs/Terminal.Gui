@@ -483,20 +483,10 @@ namespace Terminal.Gui {
 				if (current >= barItems.Children.Length) {
 					current = 0;
 				}
-				if (!host.SelectEnabledItem (barItems.Children, current, out current)) {
-					if (current == -1 && barItems.Children [current + 1].IsFromSubMenu && host.selectedSub > -1) {
-						current++;
-						host.PreviousMenu (true);
-						if (host.openMenu.current > 0) {
-							host.openMenu.current++;
-							if (host.openMenu.current >= barItems.Children.Length) {
-								host.openMenu.current = 0;
-								host.SelectEnabledItem (host.openMenu.barItems.Children, host.openMenu.current, out host.openMenu.current);
-							}
-							host.openCurrentMenu = host.openMenu;
-						}
-					}
-					break;
+				if (this != host.openCurrentMenu && barItems.Children [current].IsFromSubMenu && host.selectedSub > -1) {
+					host.PreviousMenu (true);
+					host.SelectEnabledItem (barItems.Children, current, out current);
+					host.openCurrentMenu = this;
 				}
 				var item = barItems.Children [current];
 				if (item?.IsEnabled () != true) {
@@ -526,12 +516,12 @@ namespace Terminal.Gui {
 			do {
 				current--;
 				if (host.UseKeysUpDownAsKeysLeftRight) {
-					if (current == -1 && barItems.Children [current + 1].IsFromSubMenu && host.selectedSub > -1) {
+					if ((current == -1 || this != host.openCurrentMenu) && barItems.Children [current + 1].IsFromSubMenu && host.selectedSub > -1) {
 						current++;
 						host.PreviousMenu (true);
-						if (host.openMenu.current > 0) {
-							host.openMenu.current--;
-							host.openCurrentMenu = host.openMenu;
+						if (current > 0) {
+							current--;
+							host.openCurrentMenu = this;
 						}
 						break;
 					}
@@ -599,17 +589,22 @@ namespace Terminal.Gui {
 
 		internal void CheckSubMenu ()
 		{
-			if (current == -1 || barItems.Children [current] == null)
+			if (current == -1 || barItems.Children [current] == null) {
 				return;
+			}
 			var subMenu = barItems.Children [current].SubMenu;
 			if (subMenu != null) {
 				int pos = -1;
-				if (host.openSubMenu != null)
+				if (host.openSubMenu != null) {
 					pos = host.openSubMenu.FindIndex (o => o?.barItems == subMenu);
+				}
+				if (pos == -1 && this != host.openCurrentMenu && subMenu.Children != host.openCurrentMenu.barItems.Children) {
+					host.CloseMenu (false, true);
+				}
 				host.Activate (host.selected, pos, subMenu);
-			} else if (host.openSubMenu != null && !barItems.Children [current].IsFromSubMenu)
+			} else if (host.openSubMenu != null && !barItems.Children [current].IsFromSubMenu) {
 				host.CloseMenu (false, true);
-			else {
+			} else {
 				SetNeedsDisplay ();
 			}
 		}
@@ -900,7 +895,9 @@ namespace Terminal.Gui {
 					SuperView.Add (openCurrentMenu);
 				}
 				selectedSub = openSubMenu.Count - 1;
-				SuperView?.SetFocus (openCurrentMenu);
+				if (selectedSub > -1 && SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)) {
+					SuperView?.SetFocus (openCurrentMenu);
+				}
 				break;
 			}
 			isMenuOpening = false;
