@@ -94,7 +94,7 @@ namespace UICatalog {
 				ColorScheme = Colors.TopLevel,
 			};
 			_classListView.OpenSelectedItem += (a) => {
-				Top.SetFocus (_settingsPane);
+				_settingsPane.SetFocus ();
 			};
 			_classListView.SelectedItemChanged += (args) => {
 				ClearClass (_curView);

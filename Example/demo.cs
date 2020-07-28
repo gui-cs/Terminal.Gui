@@ -253,12 +253,7 @@ static class Demo {
 		});
 		ntop.Add (menu);
 
-		string fname = null;
-		foreach (var s in new [] { "/etc/passwd", "c:\\windows\\win.ini" })
-			if (System.IO.File.Exists (s)) {
-				fname = s;
-				break;
-			}
+		string fname = GetFileName ();
 
 		var win = new Window (fname ?? "Untitled") {
 			X = 0,
@@ -275,6 +270,18 @@ static class Demo {
 		win.Add (text);
 
 		Application.Run (ntop);
+	}
+
+	private static string GetFileName ()
+	{
+		string fname = null;
+		foreach (var s in new [] { "/etc/passwd", "c:\\windows\\win.ini" })
+			if (System.IO.File.Exists (s)) {
+				fname = s;
+				break;
+			}
+
+		return fname;
 	}
 
 	static bool Quit ()
@@ -312,7 +319,8 @@ static class Demo {
 		});
 		ntop.Add (menu);
 
-		var win = new Window ("/etc/passwd") {
+		string fname = GetFileName ();
+		var win = new Window (fname) {
 			X = 0,
 			Y = 1,
 			Width = Dim.Fill (),
@@ -320,7 +328,7 @@ static class Demo {
 		};
 		ntop.Add (win);
 
-		var source = System.IO.File.OpenRead ("/etc/passwd");
+		var source = System.IO.File.OpenRead (fname);
 		var hex = new HexView (source) {
 			X = 0,
 			Y = 0,
@@ -647,7 +655,7 @@ static class Demo {
 		win.Add (test);
 		win.Add (ml);
 
-		var drag = new Label ("Drag: ") { X = 70, Y = 24 };
+		var drag = new Label ("Drag: ") { X = 70, Y = 22 };
 		var dragText = new TextField ("") {
 			X = Pos.Right (drag),
 			Y = Pos.Top (drag),

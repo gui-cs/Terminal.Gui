@@ -154,7 +154,7 @@ namespace Terminal.Gui {
 		bool CheckKey (KeyEvent key)
 		{
 			if (key.Key == (Key.AltMask | HotKey)) {
-				this.SuperView.SetFocus (this);
+				SetFocus ();
 				Clicked?.Invoke ();
 				return true;
 			}
@@ -210,7 +210,7 @@ namespace Terminal.Gui {
 				me.Flags == MouseFlags.Button1TripleClicked) {
 				if (CanFocus) {
 					if (!HasFocus) {
-						SuperView?.SetFocus (this);
+						SetFocus ();
 						SetNeedsDisplay ();
 					}
 					Clicked?.Invoke ();

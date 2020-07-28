@@ -651,7 +651,7 @@ namespace Terminal.Gui {
 					return true;
 				}
 				if (!HasFocus) {
-					SuperView.SetFocus (this);
+					SetFocus ();
 				}
 				PositionCursor (ev);
 				if (isButtonReleased) {

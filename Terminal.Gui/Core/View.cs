@@ -1303,11 +1303,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Causes the specified subview to have focus. 
-		/// This does not ensures that the entire parent hierarchy can really get focus and thus not updating the focus order.
+		/// Causes the specified subview to have focus.
 		/// </summary>
 		/// <param name="view">View.</param>
-		public void SetFocus (View view)
+		void SetFocus (View view)
 		{
 			if (view == null)
 				return;
@@ -1338,7 +1337,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Causes the specified view and the entire parent hierarchy to have focus.
+		/// Causes the specified view and the entire parent hierarchy to have the focused order updated.
 		/// </summary>
 		public void SetFocus ()
 		{
