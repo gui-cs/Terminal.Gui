@@ -516,7 +516,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool OnSelectedChanged ()
 		{
-			if (selected != lastSelectedItem) {
+			if (selected != lastSelectedItem && source?.Count > 0) {
 				var value = source.ToList () [selected];
 				SelectedItemChanged?.Invoke (new ListViewItemEventArgs (selected, value));
 				lastSelectedItem = selected;
@@ -550,10 +550,10 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnMouseEnter (MouseEvent mouseEvent)
+		public override bool OnLeave (View view)
 		{
-			if (source?.Count > 0 && selected >= 0 && lastSelectedItem == -1) {
-				lastSelectedItem = selected;
+			if (lastSelectedItem > -1) {
+				lastSelectedItem = -1;
 				return true;
 			}
 
@@ -573,7 +573,7 @@ namespace Terminal.Gui {
 		public override bool MouseEvent(MouseEvent me)
 		{
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
-				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp)
+				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp && !CanFocus)
 				return false;
 
 			if (!HasFocus)
