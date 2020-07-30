@@ -499,6 +499,7 @@ namespace Terminal.Gui {
 		private void HideList ()
 		{
 			Reset (SelectedItem > -1);
+			listview.Clear ();
 			listview.TabStop = false;
 		}
 
