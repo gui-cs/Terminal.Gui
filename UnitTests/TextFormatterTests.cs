@@ -533,8 +533,8 @@ namespace Terminal.Gui {
 		{
 			Assert.Equal (Rect.Empty, TextFormatter.CalcRect (0, 0, null));
 			Assert.Equal (Rect.Empty, TextFormatter.CalcRect (0, 0, ""));
-			Assert.Equal (Rect.Empty, TextFormatter.CalcRect (1, 2, ""));
-			Assert.Equal (Rect.Empty, TextFormatter.CalcRect (-1, -2, ""));
+			Assert.Equal (new Rect (new Point (1, 2), Size.Empty), TextFormatter.CalcRect (1, 2, ""));
+			Assert.Equal (new Rect (new Point (-1, -2), Size.Empty), TextFormatter.CalcRect (-1, -2, ""));
 		}
 
 		[Fact]
