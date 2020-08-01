@@ -1026,10 +1026,14 @@ namespace Terminal.Gui {
 		///    in a visually sensible place.
 		public virtual void PositionCursor ()
 		{
-			if (focused != null)
+			if (!CanBeVisible (this)) {
+				return;
+			}
+
+			if (focused != null) {
 				focused.PositionCursor ();
-			else {
-				if (CanFocus && HasFocus) {
+			} else {
+				if (CanFocus && HasFocus && Visible) {
 					Move (textFormatter.HotKeyPos == -1 ? 0 : textFormatter.HotKeyPos, 0);
 				} else {
 					Move (frame.X, frame.Y);
@@ -1211,6 +1215,10 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void Redraw (Rect bounds)
 		{
+			if (!CanBeVisible (this)) {
+				return;
+			}
+
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
 			if (ColorScheme != null)
@@ -1238,7 +1246,9 @@ namespace Terminal.Gui {
 
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0) because
-							view.Redraw (view.Bounds);
+							if (view.Visible) {
+								view.Redraw (view.Bounds);
+							}
 						}
 						view.NeedDisplay = Rect.Empty;
 						view.childNeedsDisplay = false;
@@ -1282,7 +1292,7 @@ namespace Terminal.Gui {
 			if (view == null)
 				return;
 			//Console.WriteLine ($"Request to focus {view}");
-			if (!view.CanFocus)
+			if (!view.CanFocus || !view.Visible)
 				return;
 			if (focused?.hasFocus == true && focused == view)
 				return;
@@ -1312,6 +1322,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void SetFocus ()
 		{
+			if (!CanBeVisible (this)) {
+				return;
+			}
+
 			SuperView?.SetFocus (this);
 		}
 
@@ -1442,13 +1456,17 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void FocusFirst ()
 		{
+			if (!CanBeVisible (this)) {
+				return;
+			}
+
 			if (tabIndexes == null) {
 				SuperView?.SetFocus (this);
 				return;
 			}
 
 			foreach (var view in tabIndexes) {
-				if (view.CanFocus && view.tabStop) {
+				if (view.CanFocus && view.tabStop && view.Visible) {
 					SetFocus (view);
 					return;
 				}
@@ -1460,6 +1478,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void FocusLast ()
 		{
+			if (!CanBeVisible (this)) {
+				return;
+			}
+
 			if (tabIndexes == null) {
 				SuperView?.SetFocus (this);
 				return;
@@ -1469,7 +1491,7 @@ namespace Terminal.Gui {
 				i--;
 
 				View v = tabIndexes [i];
-				if (v.CanFocus && v.tabStop) {
+				if (v.CanFocus && v.tabStop && v.Visible) {
 					SetFocus (v);
 					return;
 				}
@@ -1482,6 +1504,10 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c>, if previous was focused, <c>false</c> otherwise.</returns>
 		public bool FocusPrev ()
 		{
+			if (!CanBeVisible (this)) {
+				return false;
+			}
+
 			FocusDirection = Direction.Backward;
 			if (tabIndexes == null || tabIndexes.Count == 0)
 				return false;
@@ -1501,10 +1527,10 @@ namespace Terminal.Gui {
 					focused_idx = i;
 					continue;
 				}
-				if (w.CanFocus && focused_idx != -1 && w.tabStop) {
+				if (w.CanFocus && focused_idx != -1 && w.tabStop && w.Visible) {
 					focused.SetHasFocus (false, w);
 
-					if (w != null && w.CanFocus && w.tabStop)
+					if (w != null && w.CanFocus && w.tabStop && w.Visible)
 						w.FocusLast ();
 
 					SetFocus (w);
@@ -1524,6 +1550,10 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c>, if next was focused, <c>false</c> otherwise.</returns>
 		public bool FocusNext ()
 		{
+			if (!CanBeVisible (this)) {
+				return false;
+			}
+
 			FocusDirection = Direction.Forward;
 			if (tabIndexes == null || tabIndexes.Count == 0)
 				return false;
@@ -1543,10 +1573,10 @@ namespace Terminal.Gui {
 					focused_idx = i;
 					continue;
 				}
-				if (w.CanFocus && focused_idx != -1 && w.tabStop) {
+				if (w.CanFocus && focused_idx != -1 && w.tabStop && w.Visible) {
 					focused.SetHasFocus (false, w);
 
-					if (w != null && w.CanFocus && w.tabStop)
+					if (w != null && w.CanFocus && w.tabStop && w.Visible)
 						w.FocusFirst ();
 
 					SetFocus (w);
@@ -1838,6 +1868,10 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool OnMouseEnter (MouseEvent mouseEvent)
 		{
+			if (!CanBeVisible (this)) {
+				return false;
+			}
+
 			MouseEventArgs args = new MouseEventArgs (mouseEvent);
 			MouseEnter?.Invoke (args);
 			if (args.Handled)
@@ -1851,6 +1885,10 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool OnMouseLeave (MouseEvent mouseEvent)
 		{
+			if (!CanBeVisible (this)) {
+				return false;
+			}
+
 			MouseEventArgs args = new MouseEventArgs (mouseEvent);
 			MouseLeave?.Invoke (args);
 			if (args.Handled)
@@ -1868,6 +1906,10 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
 		public virtual bool OnMouseEvent (MouseEvent mouseEvent)
 		{
+			if (!CanBeVisible (this)) {
+				return false;
+			}
+
 			MouseEventArgs args = new MouseEventArgs (mouseEvent);
 			MouseClick?.Invoke (args);
 			if (args.Handled)
@@ -1930,6 +1972,25 @@ namespace Terminal.Gui {
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// Gets or sets the view visibility.
+		/// </summary>
+		public bool Visible { get; set; } = true;
+
+		bool CanBeVisible (View view)
+		{
+			if (!view.Visible) {
+				return false;
+			}
+			for (var c = view.SuperView; c != null; c = c.SuperView) {
+				if (!c.Visible) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 	}
 }
