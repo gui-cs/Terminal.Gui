@@ -573,14 +573,16 @@ namespace Terminal.Gui {
 		public override bool MouseEvent(MouseEvent me)
 		{
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
-				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp && !CanFocus)
+				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp)
 				return false;
 
-			if (!HasFocus)
+			if (!HasFocus && CanFocus) {
 				SetFocus ();
+			}
 
-			if (source == null)
+			if (source == null) {
 				return false;
+			}
 
 			if (me.Flags == MouseFlags.WheeledDown) {
 				MoveDown ();
@@ -590,8 +592,9 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (me.Y + top >= source.Count)
+			if (me.Y + top >= source.Count) {
 				return true;
+			}
 
 			selected = top + me.Y;
 			if (AllowsAll ()) {
@@ -601,8 +604,10 @@ namespace Terminal.Gui {
 			}
 			OnSelectedChanged ();
 			SetNeedsDisplay ();
-			if (me.Flags == MouseFlags.Button1DoubleClicked)
+			if (me.Flags == MouseFlags.Button1DoubleClicked) {
 				OnOpenSelectedItem ();
+			}
+
 			return true;
 		}
 	}
