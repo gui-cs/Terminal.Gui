@@ -454,6 +454,9 @@ namespace Terminal.Gui {
 					top++;
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
+			} else if (lastSelectedItem == -1) {
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
 			}
 
 			return true;
