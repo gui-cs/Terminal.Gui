@@ -519,8 +519,8 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool OnSelectedChanged ()
 		{
-			if (selected != lastSelectedItem && source?.Count > 0) {
-				var value = source.ToList () [selected];
+			if (selected != lastSelectedItem) {
+				var value = source.Count > 0 ? source.ToList () [selected] : null;
 				SelectedItemChanged?.Invoke (new ListViewItemEventArgs (selected, value));
 				lastSelectedItem = selected;
 				return true;
@@ -544,7 +544,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnEnter (View view)
 		{
-			if (source?.Count > 0 && lastSelectedItem == -1) {
+			if (lastSelectedItem == -1) {
 				OnSelectedChanged ();
 				return true;
 			}
