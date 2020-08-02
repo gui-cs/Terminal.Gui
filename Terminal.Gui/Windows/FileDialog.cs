@@ -347,13 +347,15 @@ namespace Terminal.Gui {
 			}
 		}
 
-		internal bool ExecuteSelection ()
+		internal bool ExecuteSelection (bool isPrompt = false)
 		{
 			var isDir = infos [selected].Item2;
 
 			if (isDir) {
-				Directory = Path.GetFullPath (Path.Combine (Path.GetFullPath (Directory.ToString ()), infos [selected].Item1));
-				DirectoryChanged?.Invoke (Directory);
+				if (!isPrompt) {
+					Directory = Path.GetFullPath (Path.Combine (Path.GetFullPath (Directory.ToString ()), infos [selected].Item1));
+					DirectoryChanged?.Invoke (Directory);
+				}
 			} else {
 				FileChanged?.Invoke (infos [selected].Item1);
 				if (canChooseFiles) {
@@ -467,8 +469,8 @@ namespace Terminal.Gui {
 			};
 			Add (dirLabel, dirEntry);
 
-			this.nameFieldLabel = new Label ("Open: ") {
-				X = 6,
+			this.nameFieldLabel = new Label ("File(s): ") {
+				X = 3,
 				Y = 3 + msgLines,
 			};
 			nameEntry = new TextField ("") {
@@ -500,7 +502,7 @@ namespace Terminal.Gui {
 				IsDefault = true,
 			};
 			this.prompt.Clicked += () => {
-				dirListView.ExecuteSelection ();
+				dirListView.ExecuteSelection (true);
 				canceled = false;
 				Application.RequestStop ();
 			};

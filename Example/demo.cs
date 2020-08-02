@@ -305,7 +305,7 @@ static class Demo {
 		Application.Run (d);
 
 		if (!d.Canceled)
-			MessageBox.Query (50, 7, "Selected File", string.Join (", ", d.FilePaths), "Ok");
+			MessageBox.Query (50, 7, "Selected File", d.FilePaths.Count > 0 ? string.Join (", ", d.FilePaths) : d.FilePath, "Ok");
 	}
 
 	public static void ShowHex (Toplevel top)
