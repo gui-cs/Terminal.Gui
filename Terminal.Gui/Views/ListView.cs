@@ -520,7 +520,7 @@ namespace Terminal.Gui {
 		public virtual bool OnSelectedChanged ()
 		{
 			if (selected != lastSelectedItem) {
-				var value = source.Count > 0 ? source.ToList () [selected] : null;
+				var value = source?.Count > 0 ? source.ToList () [selected] : null;
 				SelectedItemChanged?.Invoke (new ListViewItemEventArgs (selected, value));
 				lastSelectedItem = selected;
 				return true;
