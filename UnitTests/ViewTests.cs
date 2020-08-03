@@ -899,5 +899,89 @@ namespace Terminal.Gui {
 			Application.Run ();
 			Application.Shutdown ();
 		}
+
+		[Fact]
+		public void Multi_Thread_Toplevels ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = Application.Top;
+			var w = new Window ();
+			t.Add (w);
+
+			int count = 0, count1 = 0, count2 = 0;
+			bool log = false, log1 = false, log2 = false;
+
+			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+				count++;
+				if (count1 == 5) {
+					log1 = true;
+				}
+				if (count == 30) {
+					Assert.Equal (30, count);
+					Assert.Equal (20, count1);
+					Assert.Equal (10, count2);
+
+					Assert.True (log);
+					Assert.True (log1);
+					Assert.True (log2);
+
+					Application.RequestStop ();
+					return false;
+				}
+				return true;
+			});
+
+			t.Ready = () => {
+				FirstDialogToplevel ();
+			};
+
+			void FirstDialogToplevel ()
+			{
+				var od = new OpenDialog {
+					Ready = () => {
+						SecoundDialogToplevel ();
+					}
+				};
+
+				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+					count1++;
+					if (count2 == 5) {
+						log2 = true;
+					}
+					if (count1 == 20) {
+						Assert.Equal (20, count1);
+						Application.RequestStop ();
+						return false;
+					}
+					return true;
+				});
+
+				Application.Run (od);
+			}
+
+			void SecoundDialogToplevel ()
+			{
+				var d = new Dialog ();
+
+				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+					count2++;
+					if (count < 30) {
+						log = true;
+					}
+					if (count2 == 10) {
+						Assert.Equal (10, count2);
+						Application.RequestStop ();
+						return false;
+					}
+					return true;
+				});
+
+				Application.Run (d);
+			}
+
+			Application.Run ();
+			Application.Shutdown ();
+		}
 	}
 }
