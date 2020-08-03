@@ -353,15 +353,16 @@ namespace Terminal.Gui {
 					top.Y = ny;
 				}
 			}
-			if (StatusBar != null) {
+			if (top.StatusBar != null) {
 				if (ny + top.Frame.Height > top.Frame.Height - 1) {
 					if (top.Height is Dim.DimFill)
 						top.Height = Dim.Fill () - 1;
 				}
-				if (StatusBar.Frame.Y != Frame.Height - 1) {
-					StatusBar.Y = Frame.Height - 1;
-					SetNeedsDisplay ();
+				if (top.StatusBar.Frame.Y != top.Frame.Height - 1) {
+					top.StatusBar.Y = top.Frame.Height - 1;
+					top.LayoutSubviews ();
 				}
+				top.BringSubviewToFront (top.StatusBar);
 			}
 		}
 
