@@ -56,8 +56,9 @@ namespace Terminal.Gui {
 		/// <param name="title">Title for the menu item.</param>
 		/// <param name="help">Help text to display.</param>
 		/// <param name="action">Action to invoke when the menu item is activated.</param>
-		/// <param name="canExecute">Function to determine if the action can currently be executred.</param>
-		public MenuItem (ustring title, string help, Action action, Func<bool> canExecute = null)
+		/// <param name="canExecute">Function to determine if the action can currently be executed.</param>
+		/// <param name="parent">The parent of this menu item.</param>
+		public MenuItem (ustring title, ustring help, Action action, Func<bool> canExecute = null, MenuItem parent = null)
 		{
 			Title = title ?? "";
 			Help = help ?? "";
@@ -75,17 +76,7 @@ namespace Terminal.Gui {
 					nextIsHot = false;
 				}
 			}
-		}
-
-		/// <summary>
-		/// Initializes a new instance of <see cref="MenuItem"/>
-		/// </summary>
-		/// <param name="title">Title for the menu item.</param>
-		/// <param name="subMenu">The menu sub-menu.</param>
-		public MenuItem (ustring title, MenuBarItem subMenu) : this (title, "", null)
-		{
-			SubMenu = subMenu;
-			IsFromSubMenu = true;
+			Parent = parent;
 		}
 
 		/// <summary>
@@ -146,11 +137,15 @@ namespace Terminal.Gui {
 		public MenuItemCheckStyle CheckType { get; set; }
 
 		/// <summary>
-		/// Gets or sets the parent for this <see cref="MenuItem"/>
+		/// Gets or sets the parent for this <see cref="MenuItem"/>.
 		/// </summary>
 		/// <value>The parent.</value>
-		internal MenuBarItem SubMenu { get; set; }
-		internal bool IsFromSubMenu { get; set; }
+		public MenuItem Parent { get; internal set; }
+
+		/// <summary>
+		/// Gets if this <see cref="MenuItem"/> is from a sub-menu.
+		/// </summary>
+		internal bool IsFromSubMenu { get {return Parent != null; } }
 
 		/// <summary>
 		/// Merely a debugging aid to see the interaction with main
@@ -179,8 +174,9 @@ namespace Terminal.Gui {
 		/// <param name="title">Title for the menu item.</param>
 		/// <param name="help">Help text to display.</param>
 		/// <param name="action">Action to invoke when the menu item is activated.</param>
-		/// <param name="canExecute">Function to determine if the action can currently be executred.</param>
-		public MenuBarItem (ustring title, string help, Action action, Func<bool> canExecute = null) : base (title, help, action, canExecute)
+		/// <param name="canExecute">Function to determine if the action can currently be executed.</param>
+		/// <param name="parent">The parent <see cref="MenuItem"/> of this if exist, otherwise is null.</param>
+		public MenuBarItem (ustring title, ustring help, Action action, Func<bool> canExecute = null, MenuItem parent = null) : base (title, help, action, canExecute, parent)
 		{
 			SetTitle (title ?? "");
 			Children = null;
@@ -191,12 +187,17 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="title">Title for the menu item.</param>
 		/// <param name="children">The items in the current menu.</param>
-		public MenuBarItem (ustring title, MenuItem [] children)
+		/// <param name="parent">The parent <see cref="MenuItem"/> of this if exist, otherwise is null.</param>
+		public MenuBarItem (ustring title, MenuItem [] children, MenuItem parent = null)
 		{
-			if (children == null)
+			if (children == null) {
 				throw new ArgumentNullException (nameof (children), "The parameter cannot be null. Use an empty array instead.");
-
+			}
 			SetTitle (title ?? "");
+			if (parent != null) {
+				Parent = parent;
+			}
+			SetChildrensParent (children);
 			Children = children;
 		}
 
@@ -204,24 +205,78 @@ namespace Terminal.Gui {
 		/// Initializes a new <see cref="MenuBarItem"/>.
 		/// </summary>
 		/// <param name="children">The items in the current menu.</param>
-		public MenuBarItem (MenuItem [] children) : this (new string (' ', GetMaxTitleLength (children)), children) { }
+		public MenuBarItem (MenuItem [] children) : this ("", children) { }
 
 		/// <summary>
 		/// Initializes a new <see cref="MenuBarItem"/>.
 		/// </summary>
-		public MenuBarItem () : this (children: new MenuItem [] { }) { }
+		public MenuBarItem () : this (children: new MenuItem [] { }) {  }
 
-		static int GetMaxTitleLength (MenuItem [] children)
+		//static int GetMaxTitleLength (MenuItem [] children)
+		//{
+		//	int maxLength = 0;
+		//	foreach (var item in children) {
+		//		int len = GetMenuBarItemLength (item.Title);
+		//		if (len > maxLength)
+		//			maxLength = len;
+		//		item.IsFromSubMenu = true;
+		//	}
+
+		//	return maxLength;
+		//}
+
+		void SetChildrensParent (MenuItem [] childrens)
 		{
-			int maxLength = 0;
-			foreach (var item in children) {
-				int len = GetMenuBarItemLength (item.Title);
-				if (len > maxLength)
-					maxLength = len;
-				item.IsFromSubMenu = true;
+			foreach (var child in childrens) {
+				if (child != null && child.Parent == null) {
+					child.Parent = this;
+				}
 			}
+		}
 
-			return maxLength;
+		/// <summary>
+		/// Check if the children parameter is a <see cref="MenuBarItem"/>.
+		/// </summary>
+		/// <param name="children"></param>
+		/// <returns>Returns a <see cref="MenuBarItem"/> or null otherwise.</returns>
+		public MenuBarItem SubMenu (MenuItem children)
+		{
+			return children as MenuBarItem;
+		}
+
+		/// <summary>
+		/// Check if the <see cref="MenuItem"/> parameter is a child of this.
+		/// </summary>
+		/// <param name="menuItem"></param>
+		/// <returns>Returns <c>true</c> if it is a child of this. <c>false</c> otherwise.</returns>
+		public bool IsSubMenuOf (MenuItem menuItem)
+		{
+			foreach (var child in Children) {
+				if (child == menuItem && child.Parent == menuItem.Parent) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// Get the index of the <see cref="MenuItem"/> parameter.
+		/// </summary>
+		/// <param name="children"></param>
+		/// <returns>Returns a value bigger than -1 if the <see cref="MenuItem"/> is a child of this.</returns>
+		public int GetChildrenIndex (MenuItem children)
+		{
+			if (Children?.Length == 0) {
+				return -1;
+			}
+			int i = 0;
+			foreach (var child in Children) {
+				if (child == children) {
+					return i;
+				}
+				i++;
+			}
+			return -1;
 		}
 
 		void SetTitle (ustring title)
@@ -229,10 +284,9 @@ namespace Terminal.Gui {
 			if (title == null)
 				title = "";
 			Title = title;
-			TitleLength = GetMenuBarItemLength (Title);
 		}
 
-		static int GetMenuBarItemLength (ustring title)
+		int GetMenuBarItemLength (ustring title)
 		{
 			int len = 0;
 			foreach (var ch in title) {
@@ -255,9 +309,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The children.</value>
 		public MenuItem [] Children { get; set; }
-		internal int TitleLength { get; private set; }
 
-		internal bool IsTopLevel { get => (Children == null || Children.Length == 0); }
+		internal int TitleLength => GetMenuBarItemLength (Title);
+
+		internal bool IsTopLevel { get => Parent == null && (Children == null || Children.Length == 0); }
 
 	}
 
@@ -328,7 +383,7 @@ namespace Terminal.Gui {
 				for (int p = 0; p < Frame.Width - 2; p++)
 					if (item == null)
 						Driver.AddRune (Driver.HLine);
-					else if (p == Frame.Width - 3 && barItems.Children [i].SubMenu != null)
+					else if (p == Frame.Width - 3 && barItems.SubMenu(barItems.Children [i]) != null)
 						Driver.AddRune (Driver.RightArrow);
 					else
 						Driver.AddRune (' ');
@@ -494,7 +549,7 @@ namespace Terminal.Gui {
 				} else {
 					disabled = false;
 				}
-				if (host.UseKeysUpDownAsKeysLeftRight && barItems.Children [current]?.SubMenu != null &&
+				if (host.UseKeysUpDownAsKeysLeftRight && barItems.SubMenu (barItems.Children [current]) != null &&
 					!disabled && host.IsMenuOpen) {
 					CheckSubMenu ();
 					break;
@@ -541,7 +596,7 @@ namespace Terminal.Gui {
 				} else {
 					disabled = false;
 				}
-				if (host.UseKeysUpDownAsKeysLeftRight && barItems.Children [current]?.SubMenu != null &&
+				if (host.UseKeysUpDownAsKeysLeftRight && barItems.SubMenu (barItems.Children [current]) != null &&
 					!disabled && host.IsMenuOpen) {
 					CheckSubMenu ();
 					break;
@@ -592,7 +647,7 @@ namespace Terminal.Gui {
 			if (current == -1 || barItems.Children [current] == null) {
 				return;
 			}
-			var subMenu = barItems.Children [current].SubMenu;
+			var subMenu = barItems.SubMenu (barItems.Children [current]);
 			if (subMenu != null) {
 				int pos = -1;
 				if (host.openSubMenu != null) {
@@ -602,7 +657,7 @@ namespace Terminal.Gui {
 					host.CloseMenu (false, true);
 				}
 				host.Activate (host.selected, pos, subMenu);
-			} else if (host.openSubMenu != null && !barItems.Children [current].IsFromSubMenu) {
+			} else if (host.openSubMenu?.Last ().barItems.IsSubMenuOf (barItems.Children [current]) == false) {
 				host.CloseMenu (false, true);
 			} else {
 				SetNeedsDisplay ();
@@ -1003,7 +1058,7 @@ namespace Terminal.Gui {
 			switch (isSubMenu) {
 			case false:
 				if (openMenu != null) {
-					SuperView.Remove (openMenu);
+					SuperView?.Remove (openMenu);
 				}
 				SetNeedsDisplay ();
 				if (previousFocused != null && previousFocused is Menu && openMenu != null && previousFocused.ToString () != openCurrentMenu.ToString ())
@@ -1016,13 +1071,11 @@ namespace Terminal.Gui {
 				LastFocused = lastFocused;
 				lastFocused = null;
 				if (LastFocused != null) {
-					CanFocus = false;
 					if (!reopen) {
 						selected = -1;
 					}
 					LastFocused.SetFocus ();
 				} else {
-					CanFocus = true;
 					SetFocus ();
 					PositionCursor ();
 				}
@@ -1175,11 +1228,12 @@ namespace Terminal.Gui {
 					CloseMenu (false, true);
 					NextMenu ();
 				} else {
-					if ((selectedSub == -1 || openSubMenu == null || openSubMenu?.Count == selectedSub) && openCurrentMenu.barItems.Children [openCurrentMenu.current].SubMenu == null) {
+					var subMenu = openCurrentMenu.barItems.SubMenu (openCurrentMenu.barItems.Children [openCurrentMenu.current]);
+					if ((selectedSub == -1 || openSubMenu == null || openSubMenu?.Count == selectedSub) && subMenu == null) {
 						if (openSubMenu != null)
 							CloseMenu (false, true);
 						NextMenu ();
-					} else if (openCurrentMenu.barItems.Children [openCurrentMenu.current].SubMenu != null ||
+					} else if (subMenu != null ||
 						!openCurrentMenu.barItems.Children [openCurrentMenu.current].IsFromSubMenu)
 						selectedSub++;
 					else

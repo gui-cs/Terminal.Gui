@@ -253,26 +253,26 @@ namespace Terminal.Gui {
 		public override void Add (View view)
 		{
 			if (this == Application.Top) {
-				if (view is MenuBar)
-					MenuBar = view as MenuBar;
-				if (view is StatusBar)
-					StatusBar = view as StatusBar;
+				AddMenuStatusBar (view);
 			}
 			base.Add (view);
+		}
+
+		internal void AddMenuStatusBar (View view)
+		{
+			if (view is MenuBar) {
+				MenuBar = view as MenuBar;
+			}
+			if (view is StatusBar) {
+				StatusBar = view as StatusBar;
+			}
 		}
 
 		///<inheritdoc/>
 		public override void Remove (View view)
 		{
-			if (this is Toplevel && ((Toplevel)this).MenuBar != null) {
-				if (view is MenuBar) {
-					MenuBar?.Dispose ();
-					MenuBar = null;
-				}
-				if (view is StatusBar) {
-					StatusBar?.Dispose ();
-					StatusBar = null;
-				}
+			if (this is Toplevel toplevel && toplevel.MenuBar != null) {
+				RemoveMenuStatusBar (view);
 			}
 			base.Remove (view);
 		}
@@ -287,6 +287,18 @@ namespace Terminal.Gui {
 				StatusBar = null;
 			}
 			base.RemoveAll ();
+		}
+
+		internal void RemoveMenuStatusBar (View view)
+		{
+			if (view is MenuBar) {
+				MenuBar?.Dispose ();
+				MenuBar = null;
+			}
+			if (view is StatusBar) {
+				StatusBar?.Dispose ();
+				StatusBar = null;
+			}
 		}
 
 		internal void EnsureVisibleBounds (Toplevel top, int x, int y, out int nx, out int ny)

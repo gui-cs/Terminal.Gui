@@ -135,23 +135,28 @@ namespace Terminal.Gui {
 		public override void Add (View view)
 		{
 			contentView.Add (view);
-			if (view.CanFocus)
+			if (view.CanFocus) {
 				CanFocus = true;
+			}
+			AddMenuStatusBar (view);
 		}
 
 
 		/// <inheritdoc/>
 		public override void Remove (View view)
 		{
-			if (view == null)
+			if (view == null) {
 				return;
+			}
 
 			SetNeedsDisplay ();
 			var touched = view.Frame;
 			contentView.Remove (view);
 
-			if (contentView.InternalSubviews.Count < 1)
-				this.CanFocus = false;
+			if (contentView.InternalSubviews.Count < 1) {
+				CanFocus = false;
+			}
+			RemoveMenuStatusBar (view);
 		}
 
 		/// <inheritdoc/>
