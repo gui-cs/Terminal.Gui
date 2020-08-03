@@ -11,6 +11,7 @@ namespace Terminal.Gui {
 		int selected = -1;
 		int cursor;
 		DisplayModeLayout displayMode;
+		int horizontalSpace = 2;
 		List<(int pos, int length)> horizontal;
 
 		void Init (Rect rect, ustring [] radioLabels, int selected)
@@ -72,6 +73,20 @@ namespace Terminal.Gui {
 			set {
 				if (displayMode != value) {
 					displayMode = value;
+					SetWidthHeight (radioLabels);
+					SetNeedsDisplay ();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the horizontal space for this <see cref="RadioGroup"/> if the <see cref="DisplayMode"/> is <see cref="DisplayModeLayout.Horizontal"/>
+		/// </summary>
+		public int HorizontalSpace {
+			get { return horizontalSpace; }
+			set {
+				if (horizontalSpace != value && displayMode == DisplayModeLayout.Horizontal) {
+					horizontalSpace = value;
 					SetWidthHeight (radioLabels);
 					SetNeedsDisplay ();
 				}
@@ -147,7 +162,7 @@ namespace Terminal.Gui {
 				int length = 0;
 				for (int i = 0; i < radioLabels.Count; i++) {
 					start += length;
-					length = radioLabels [i].RuneCount + 2;
+					length = radioLabels [i].RuneCount + horizontalSpace;
 					horizontal.Add ((start, length));
 				}
 			}
