@@ -911,11 +911,20 @@ namespace Terminal.Gui {
 
 			int count = 0, count1 = 0, count2 = 0;
 			bool log = false, log1 = false, log2 = false;
+			bool fromTopStillKnowFirstIsRunning = false;
+			bool fromTopStillKnowSecondIsRunning = false;
+			bool fromFirstStillKnowSecondIsRunning = false;
 
 			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
 				count++;
 				if (count1 == 5) {
 					log1 = true;
+				}
+				if (count1 > 13 && count < 15) {
+					fromTopStillKnowFirstIsRunning = true;
+				}
+				if (count2 > 6 && count2 < 8) {
+					fromTopStillKnowSecondIsRunning = true;
 				}
 				if (count == 30) {
 					Assert.Equal (30, count);
@@ -925,6 +934,10 @@ namespace Terminal.Gui {
 					Assert.True (log);
 					Assert.True (log1);
 					Assert.True (log2);
+
+					Assert.True (fromTopStillKnowFirstIsRunning);
+					Assert.True (fromTopStillKnowSecondIsRunning);
+					Assert.True (fromFirstStillKnowSecondIsRunning);
 
 					Application.RequestStop ();
 					return false;
@@ -948,6 +961,9 @@ namespace Terminal.Gui {
 					count1++;
 					if (count2 == 5) {
 						log2 = true;
+					}
+					if (count2 > 3 && count2 < 5) {
+						fromFirstStillKnowSecondIsRunning = true;
 					}
 					if (count1 == 20) {
 						Assert.Equal (20, count1);
