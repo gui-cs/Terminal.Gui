@@ -628,9 +628,9 @@ namespace Terminal.Gui {
 
 		void IMainLoopDriver.Wakeup ()
 		{
-			tokenSource.Cancel ();
-			//eventReady.Reset ();
-			//eventReady.Set ();
+			//tokenSource.Cancel ();
+			eventReady.Reset ();
+			eventReady.Set ();
 		}
 
 		bool IMainLoopDriver.EventsPending (bool wait)
