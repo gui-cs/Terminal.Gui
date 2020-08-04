@@ -387,7 +387,9 @@ namespace Terminal.Gui {
 				X = Pos.Center (),
 				Y = Pos.Percent (10)
 			};
-			w.Add (v);
+			var vn = new View (new Rect (1, 3, 3, 4));
+
+			w.Add (v, vn);
 			t.Add (w);
 
 			t.Ready += () => {
@@ -397,6 +399,7 @@ namespace Terminal.Gui {
 				Assert.Equal (2, w.Y);
 				Assert.Throws<ArgumentException> (() => v.X = 2);
 				Assert.Throws<ArgumentException> (() => v.Y = 2);
+				Assert.Equal (2, vn.Y = 2);
 			};
 
 			Application.Iteration += () => Application.RequestStop ();

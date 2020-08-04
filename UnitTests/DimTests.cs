@@ -248,7 +248,9 @@ namespace Terminal.Gui {
 				Width = Dim.Width (w) - 2,
 				Height = Dim.Percent (10)
 			};
-			w.Add (v);
+			var vn = new View (new Rect (1, 2, 3, 3));
+
+			w.Add (v, vn);
 			t.Add (w);
 
 			t.Ready += () => {
@@ -258,6 +260,7 @@ namespace Terminal.Gui {
 				Assert.Equal (2, w.Height);
 				Assert.Throws<ArgumentException> (() => v.Width = 2);
 				Assert.Throws<ArgumentException> (() => v.Height = 2);
+				Assert.Equal (4, vn.Height = 4);
 			};
 
 			Application.Iteration += () => Application.RequestStop ();
