@@ -47,7 +47,7 @@ namespace Terminal.Gui {
 			set {
 				text = value;
 
-				if (Size.IsEmpty) {
+				if (text.RuneCount > 0 && (Size.Width == 0 || Size.Height == 0 || Size.Width != text.RuneCount)) {
 					// Proivde a default size (width = length of longest line, height = 1)
 					// TODO: It might makem more sense for the default to be width = length of first line?
 					Size = new Size (TextFormatter.MaxWidth (Text, int.MaxValue), 1);
@@ -405,7 +405,7 @@ namespace Terminal.Gui {
 		public static Rect CalcRect (int x, int y, ustring text)
 		{
 			if (ustring.IsNullOrEmpty (text))
-				return Rect.Empty;
+				return new Rect (new Point (x, y), Size.Empty);
 
 			int mw = 0;
 			int ml = 1;
