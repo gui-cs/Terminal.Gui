@@ -387,19 +387,36 @@ namespace Terminal.Gui {
 				X = Pos.Center (),
 				Y = Pos.Percent (10)
 			};
-			var vn = new View (new Rect (1, 3, 3, 4));
 
-			w.Add (v, vn);
+			w.Add (v);
 			t.Add (w);
 
 			t.Ready += () => {
-				w.X = 2;
 				Assert.Equal (2, w.X = 2);
-				w.Y = 2;
-				Assert.Equal (2, w.Y);
+				Assert.Equal (2, w.Y = 2);
 				Assert.Throws<ArgumentException> (() => v.X = 2);
 				Assert.Throws<ArgumentException> (() => v.Y = 2);
-				Assert.Equal (2, vn.Y = 2);
+			};
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Null ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = Application.Top;
+
+			var w = new Window (new Rect (1, 2, 4, 5), "w");
+			t.Add (w);
+
+			t.Ready += () => {
+				Assert.Equal (2, w.X = 2);
+				Assert.Equal (2, w.Y = 2);
 			};
 
 			Application.Iteration += () => Application.RequestStop ();
@@ -407,6 +424,37 @@ namespace Terminal.Gui {
 			Application.Run ();
 			Application.Shutdown ();
 
+		}
+
+		[Fact]
+		public void Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = Application.Top;
+
+			var w = new Window ("w") {
+				X = Pos.Left (t) + 2,
+				Y = Pos.At (2)
+			};
+			var v = new View ("v") {
+				X = Pos.Center (),
+				Y = Pos.Percent (10)
+			};
+
+			w.Add (v);
+			t.Add (w);
+
+			t.Ready += () => {
+				v.LayoutStyle = LayoutStyle.Absolute;
+				Assert.Equal (2, v.X = 2);
+				Assert.Equal (2, v.Y = 2);
+			};
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+			Application.Shutdown ();
 		}
 
 		// TODO: Test PosCombine
