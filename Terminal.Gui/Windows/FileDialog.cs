@@ -44,33 +44,39 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		internal void Reload ()
+		internal bool Reload (ustring value = null)
 		{
+			bool valid = false;
 			try {
-				dirInfo = new DirectoryInfo (directory.ToString ());
+				dirInfo = new DirectoryInfo (value == null ? directory.ToString () : value.ToString ());
 				infos = (from x in dirInfo.GetFileSystemInfos ()
-					 where IsAllowed (x)
+					 where IsAllowed (x) && (!canChooseFiles ? x.Attributes.HasFlag (FileAttributes.Directory) : true)
 					 orderby (!x.Attributes.HasFlag (FileAttributes.Directory)) + x.Name
 					 select (x.Name, x.Attributes.HasFlag (FileAttributes.Directory), false)).ToList ();
 				infos.Insert (0, ("..", true, false));
 				top = 0;
 				selected = 0;
+				valid = true;
 			} catch (Exception) {
-				dirInfo = null;
-				infos.Clear ();
+				valid = false;
 			} finally {
-				SetNeedsDisplay ();
+				if (valid) {
+					SetNeedsDisplay ();
+				}
 			}
+			return valid;
 		}
 
 		ustring directory;
 		public ustring Directory {
 			get => directory;
 			set {
-				if (directory == value)
+				if (directory == value) {
 					return;
-				directory = value;
-				Reload ();
+				}
+				if (Reload (value)) {
+					directory = value;
+				}
 			}
 		}
 
@@ -413,6 +419,9 @@ namespace Terminal.Gui {
 							res.Add (MakePath (item.Item1));
 					return res;
 				} else {
+					if (infos.Count == 0) {
+						return null;
+					}
 					if (infos [selected].Item2) {
 						if (canChooseDirectories)
 							return new List<string> () { MakePath (infos [selected].Item1) };
@@ -472,8 +481,8 @@ namespace Terminal.Gui {
 			};
 			Add (dirLabel, dirEntry);
 
-			this.nameFieldLabel = new Label ("File(s): ") {
-				X = 3,
+			this.nameFieldLabel = new Label ("Open: ") {
+				X = 6,
 				Y = 3 + msgLines,
 			};
 			nameEntry = new TextField ("") {
