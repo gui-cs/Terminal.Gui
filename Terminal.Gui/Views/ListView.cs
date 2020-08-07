@@ -454,6 +454,9 @@ namespace Terminal.Gui {
 					top++;
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
+			} else if (lastSelectedItem == -1) {
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
 			}
 
 			return true;
@@ -516,8 +519,8 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool OnSelectedChanged ()
 		{
-			if (selected != lastSelectedItem && source?.Count > 0) {
-				var value = source.ToList () [selected];
+			if (selected != lastSelectedItem) {
+				var value = source?.Count > 0 ? source.ToList () [selected] : null;
 				SelectedItemChanged?.Invoke (new ListViewItemEventArgs (selected, value));
 				lastSelectedItem = selected;
 				return true;
@@ -541,7 +544,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnEnter (View view)
 		{
-			if (source?.Count > 0 && lastSelectedItem == -1) {
+			if (lastSelectedItem == -1) {
 				OnSelectedChanged ();
 				return true;
 			}
@@ -573,14 +576,16 @@ namespace Terminal.Gui {
 		public override bool MouseEvent(MouseEvent me)
 		{
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
-				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp && !CanFocus)
+				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp)
 				return false;
 
-			if (!HasFocus)
+			if (!HasFocus && CanFocus) {
 				SetFocus ();
+			}
 
-			if (source == null)
+			if (source == null) {
 				return false;
+			}
 
 			if (me.Flags == MouseFlags.WheeledDown) {
 				MoveDown ();
@@ -590,8 +595,9 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (me.Y + top >= source.Count)
+			if (me.Y + top >= source.Count) {
 				return true;
+			}
 
 			selected = top + me.Y;
 			if (AllowsAll ()) {
@@ -601,8 +607,10 @@ namespace Terminal.Gui {
 			}
 			OnSelectedChanged ();
 			SetNeedsDisplay ();
-			if (me.Flags == MouseFlags.Button1DoubleClicked)
+			if (me.Flags == MouseFlags.Button1DoubleClicked) {
 				OnOpenSelectedItem ();
+			}
+
 			return true;
 		}
 	}
