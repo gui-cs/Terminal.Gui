@@ -243,7 +243,7 @@ namespace Terminal.Gui {
 			if (FilePaths.Count > 0)
 				FileChanged?.Invoke (string.Join (", ", GetFilesName (FilePaths)));
 			else
-				FileChanged?.Invoke (infos [selected].Item2 ? "" : Path.GetFileName (infos [selected].Item1));
+				FileChanged?.Invoke (infos [selected].Item2 && !canChooseDirectories ? "" : Path.GetFileName (infos [selected].Item1));
 			if (SelectedChanged != null) {
 				var sel = infos [selected];
 				SelectedChanged ((sel.Item1, sel.Item2));
