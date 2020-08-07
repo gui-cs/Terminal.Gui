@@ -57,8 +57,18 @@ namespace Terminal.Gui {
 				top = 0;
 				selected = 0;
 				valid = true;
-			} catch (Exception) {
-				valid = false;
+			} catch (Exception ex) {
+				switch (ex) {
+				case DirectoryNotFoundException _:
+				case ArgumentException _:
+					dirInfo = null;
+					infos.Clear ();
+					valid = true;
+					break;
+				default:
+					valid = false;
+					break;
+				}
 			} finally {
 				if (valid) {
 					SetNeedsDisplay ();
