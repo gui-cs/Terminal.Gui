@@ -349,6 +349,9 @@ namespace Terminal.Gui {
 
 		internal bool ExecuteSelection (bool isPrompt = false)
 		{
+			if (infos.Count == 0) {
+				return false;
+			}
 			var isDir = infos [selected].Item2;
 
 			if (isDir) {
