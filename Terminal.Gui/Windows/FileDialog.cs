@@ -378,7 +378,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		internal bool ExecuteSelection (bool isPrompt = false)
+		internal bool ExecuteSelection ()
 		{
 			if (infos.Count == 0) {
 				return false;
@@ -386,11 +386,9 @@ namespace Terminal.Gui {
 			var isDir = infos [selected].Item2;
 
 			if (isDir) {
-				if (!isPrompt) {
-					Directory = Path.GetFullPath (Path.Combine (Path.GetFullPath (Directory.ToString ()), infos [selected].Item1));
-					DirectoryChanged?.Invoke (Directory);
-				}
-			} else if (!isPrompt) {
+				Directory = Path.GetFullPath (Path.Combine (Path.GetFullPath (Directory.ToString ()), infos [selected].Item1));
+				DirectoryChanged?.Invoke (Directory);
+			} else {
 				FileChanged?.Invoke (infos [selected].Item1);
 				if (canChooseFiles) {
 					// Ensures that at least one file is selected.
@@ -439,9 +437,13 @@ namespace Terminal.Gui {
 			get {
 				if (allowsMultipleSelection) {
 					var res = new List<string> ();
-					foreach (var item in infos)
+					foreach (var item in infos) {
 						if (item.Item3)
 							res.Add (MakePath (item.Item1));
+					}
+					if (res.Count == 0 && infos.Count > 0 && infos [selected].Item1 != "..") {
+						res.Add (MakePath (infos [selected].Item1));
+					}
 					return res;
 				} else {
 					if (infos.Count == 0) {
@@ -542,7 +544,6 @@ namespace Terminal.Gui {
 				IsDefault = true,
 			};
 			this.prompt.Clicked += () => {
-				dirListView.ExecuteSelection (true);
 				canceled = false;
 				Application.RequestStop ();
 			};
