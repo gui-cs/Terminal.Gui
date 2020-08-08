@@ -430,7 +430,8 @@ namespace Terminal.Gui {
 
 		public string MakePath (string relativePath)
 		{
-			return Path.GetFullPath (Path.Combine (Directory.ToString (), relativePath));
+			var dir = Directory.ToString ();
+			return string.IsNullOrEmpty (dir) ? "" : Path.GetFullPath (Path.Combine (dir, relativePath));
 		}
 
 		public IReadOnlyList<string> FilePaths {
@@ -507,6 +508,7 @@ namespace Terminal.Gui {
 				Width = Dim.Fill () - 1,
 				TextChanged = (e) => {
 					DirectoryPath = dirEntry.Text;
+					nameEntry.Text = ustring.Empty;
 				}
 			};
 			Add (dirLabel, dirEntry);
