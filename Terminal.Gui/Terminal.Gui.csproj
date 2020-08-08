@@ -66,7 +66,7 @@
       * Added support for F11 and F12 keys. (Thanks @bdisp!)
       * Multiple improvements to Date/TimeField. (Thanks @bdisp!)
       * Fixes #409 - Invoke does not cause Wakeup #501. (Thanks @bdisp!)
-      * Fixed Label text alignemnt. (Thanks @bdisp!)
+      * Fixed Label text alignment. (Thanks @bdisp!)
       * Added mouse features in the Unix version. Supports xterm-1006. (Thanks @bdisp!)
       * Several StatusBar fixes. (Thanks @bdisp!)
       * Tons of mouse improvements including mouse wheel support (e.g. #404, #409). (Thanks @bdisp!)
@@ -80,7 +80,7 @@
       * Fixes #557 MessageBox needs to take ustrings (BREAKING CHANGE). (Thanks @tig!)
       * Fixes ScrollView in several key ways. (Thanks @tig!)
       *   Now supports Computed layout and has constructors that don't require parameters.
-      *   ScrollBarViews are now positioned using Computed layout versus error prone absoulte
+      *   ScrollBarViews are now positioned using Computed layout versus error prone absolute
       *   ScrollBarViews now correctly position themselves when one, either, or both are on/off.
       *   IsVertical is now a public property that does the expected thing when changed
       *   Mouse handling is better; there's still a bug where the mouse doesn't get grabbed by the ScrollView initially but I think this is a broader problem. I need @BDisp's help on this.

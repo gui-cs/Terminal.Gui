@@ -68,7 +68,7 @@ namespace Terminal.Gui {
 	///    if the terminal size changes.
 	/// </para>
 	/// <para>
-	///    Absolute layout requires specifying coordiantes and sizes of Views explicitly, and the
+	///    Absolute layout requires specifying coordinates and sizes of Views explicitly, and the
 	///    View will typcialy stay in a fixed position and size. To change the position and size use the
 	///    <see cref="Frame"/> property.
 	/// </para>
@@ -1235,7 +1235,7 @@ namespace Terminal.Gui {
 		/// </para>
 		/// <para>
 		///    Views should set the color that they want to use on entry, as otherwise this will inherit
-		///    the last color that was set globaly on the driver.
+		///    the last color that was set globally on the driver.
 		/// </para>
 		/// <para>
 		///    Overrides of <see cref="Redraw"/> must ensure they do not set <c>Driver.Clip</c> to a clip region

@@ -1,5 +1,5 @@
 ﻿//
-// FakeConsole.cs: A fake .NET Windows Console API implementaiton for unit tests.
+// FakeConsole.cs: A fake .NET Windows Console API implementation for unit tests.
 //
 // Authors:
 //   Charlie Kindel (github.com/tig)
