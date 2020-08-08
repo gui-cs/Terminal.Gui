@@ -21,7 +21,7 @@ namespace Terminal.Gui {
 	///   <para>
 	///     These can be used to set the absolute position, when merely assigning an
 	///     integer value (via the implicit integer to <see cref="Pos"/> conversion), and they can be combined
-	///     to produce more useful layouts, like: Pos.Center - 3, which would shift the postion
+	///     to produce more useful layouts, like: Pos.Center - 3, which would shift the position
 	///     of the <see cref="View"/> 3 characters to the left after centering for example.
 	///   </para>
 	///   <para>
@@ -356,7 +356,7 @@ namespace Terminal.Gui {
 	///   <para>
 	///     These can be used to set the absolute position, when merely assigning an
 	///     integer value (via the implicit integer to Pos conversion), and they can be combined
-	///     to produce more useful layouts, like: Pos.Center - 3, which would shift the postion
+	///     to produce more useful layouts, like: Pos.Center - 3, which would shift the position
 	///     of the <see cref="View"/> 3 characters to the left after centering for example.
 	///   </para>
 	/// </remarks>

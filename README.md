@@ -90,7 +90,7 @@ Debates on architecture and design can be found in Issues tagged with [design](h
 ## Documentation
 
 * [Overview](https://migueldeicaza.github.io/gui.cs/articles/overview.html)
-* [Conceptual Documenation](https://migueldeicaza.github.io/gui.cs/articles/index.html)
+* [Conceptual Documentation](https://migueldeicaza.github.io/gui.cs/articles/index.html)
 * [API Documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html)
 
 ### Sample Usage

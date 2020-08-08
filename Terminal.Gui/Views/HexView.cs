@@ -16,7 +16,7 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// <para>
 	/// <see cref="HexView"/> provides a hex editor on top of a seekable <see cref="Stream"/> with the left side showing an hex
-	/// dump of the values in the <see cref="Stream"/> and the right side showing the contents (filterd to 
+	/// dump of the values in the <see cref="Stream"/> and the right side showing the contents (filtered to 
 	/// non-control sequence ASCII characters).    
 	/// </para>
 	/// <para>

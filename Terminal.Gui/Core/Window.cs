@@ -49,7 +49,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Gui.Window"/> class with an optional title using <see cref="LayoutStyle.Absolute"/> positioning.
 		/// </summary>
-		/// <param name="frame">Superview-relatie rectangle specifying the location and size</param>
+		/// <param name="frame">Superview-relative rectangle specifying the location and size</param>
 		/// <param name="title">Title</param>
 		/// <remarks>
 		/// This constructor intitalizes a Window with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use constructors
@@ -81,7 +81,7 @@ namespace Terminal.Gui {
 		/// Initializes a new instance of the <see cref="Window"/> using <see cref="LayoutStyle.Absolute"/> positioning with the specified frame for its location, with the specified frame padding,
 		/// and an optional title.
 		/// </summary>
-		/// <param name="frame">Superview-relatie rectangle specifying the location and size</param>
+		/// <param name="frame">Superview-relative rectangle specifying the location and size</param>
 		/// <param name="padding">Number of characters to use for padding of the drawn frame.</param>
 		/// <param name="title">Title</param>
 		/// <remarks>

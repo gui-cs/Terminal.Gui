@@ -301,7 +301,7 @@ namespace Terminal.Gui {
 		public Action Changed;
 #endif
 		/// <summary>
-		///   Initalizes a <see cref="TextView"/> on the specified area, with absolute position and size.
+		///   Initializes a <see cref="TextView"/> on the specified area, with absolute position and size.
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
@@ -311,7 +311,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Initalizes a <see cref="TextView"/> on the specified area, 
+		///   Initializes a <see cref="TextView"/> on the specified area, 
 		///   with dimensions controlled with the X, Y, Width and Height properties.
 		/// </summary>
 		public TextView () : base ()

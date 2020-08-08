@@ -34,13 +34,13 @@ We welcome contributions from the community. See [Issues](https://github.com/mig
 
 ### Include API Documentation
 
-Great care has been provided thus far in ensuring **Terminal.Gui** has great [API Documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html). Contributors have a responsiblity for continously improving the API Documentation.
+Great care has been provided thus far in ensuring **Terminal.Gui** has great [API Documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html). Contributors have a responsibility for continuously improving the API Documentation.
 
 - All public APIs must have clear, concise, and complete documentation in the form of [XML Documentation](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/).
 - Keep the `<summary></summary>` terse.
 - Use `<see cref=""/>` liberally to cross-link topics.
-- Use `<remarks></remarks>` to add more context and explaination.
-- For complex topics, provide conceptual documentation in the `docfx/articles` folder as a `.md` file. It will automatically get picked up and be added to [Conceptual Documenation](https://migueldeicaza.github.io/gui.cs/articles/index.html).
+- Use `<remarks></remarks>` to add more context and explanation.
+- For complex topics, provide conceptual documentation in the `docfx/articles` folder as a `.md` file. It will automatically get picked up and be added to [Conceptual Documentation](https://migueldeicaza.github.io/gui.cs/articles/index.html).
 - Use proper English and good grammar.
 
 ### Defining Events
