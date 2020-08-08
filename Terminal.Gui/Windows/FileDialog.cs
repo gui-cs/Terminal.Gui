@@ -117,10 +117,11 @@ namespace Terminal.Gui {
 			switch (me.Flags) {
 			case MouseFlags.Button1Clicked:
 				SetSelected (me);
-				SelectionChanged ();
+				OnSelectionChanged ();
 				SetNeedsDisplay ();
 				break;
 			case MouseFlags.Button1DoubleClicked:
+				UnMarkAll ();
 				SetSelected (me);
 				if (ExecuteSelection ()) {
 					host.canceled = false;
@@ -165,6 +166,17 @@ namespace Terminal.Gui {
 			}
 
 			return true;
+		}
+
+		private void UnMarkAll ()
+		{
+			if (allowsMultipleSelection && infos.Count > 0) {
+				for (int i = 0; i < infos.Count; i++) {
+					if (infos [i].Item3) {
+						infos [i] = (infos [i].Item1, infos [i].Item2, false);
+					}
+				}
+			}
 		}
 
 		void SetSelected (MouseEvent me)
@@ -238,15 +250,17 @@ namespace Terminal.Gui {
 		public Action<ustring> DirectoryChanged { get; set; }
 		public Action<ustring> FileChanged { get; set; }
 
-		void SelectionChanged ()
+		void OnSelectionChanged ()
 		{
-			if (FilePaths.Count > 0)
-				FileChanged?.Invoke (string.Join (", ", GetFilesName (FilePaths)));
-			else
-				FileChanged?.Invoke (infos [selected].Item2 && !canChooseDirectories ? "" : Path.GetFileName (infos [selected].Item1));
-			if (SelectedChanged != null) {
+			if (allowsMultipleSelection) {
+				if (FilePaths.Count > 0) {
+					FileChanged?.Invoke (string.Join (", ", GetFilesName (FilePaths)));
+				} else {
+					FileChanged?.Invoke (infos [selected].Item2 && !canChooseDirectories ? "" : Path.GetFileName (infos [selected].Item1));
+				}
+			} else {
 				var sel = infos [selected];
-				SelectedChanged ((sel.Item1, sel.Item2));
+				SelectedChanged?.Invoke ((sel.Item1, sel.Item2));
 			}
 		}
 
@@ -285,13 +299,14 @@ namespace Terminal.Gui {
 						top = selected;
 					else
 						top = 0;
-					SelectionChanged ();
+					OnSelectionChanged ();
 
 					SetNeedsDisplay ();
 				}
 				return true;
 
 			case Key.Enter:
+				UnMarkAll ();
 				if (ExecuteSelection ())
 					return false;
 				else
@@ -304,7 +319,7 @@ namespace Terminal.Gui {
 				if (n != selected) {
 					selected = n;
 					top = selected;
-					SelectionChanged ();
+					OnSelectionChanged ();
 					SetNeedsDisplay ();
 				}
 				return true;
@@ -329,7 +344,7 @@ namespace Terminal.Gui {
 		{
 			selected = infos.Count - 1;
 			top = infos.Count () - 1;
-			SelectionChanged ();
+			OnSelectionChanged ();
 			SetNeedsDisplay ();
 		}
 
@@ -337,7 +352,7 @@ namespace Terminal.Gui {
 		{
 			selected = 0;
 			top = 0;
-			SelectionChanged ();
+			OnSelectionChanged ();
 			SetNeedsDisplay ();
 		}
 
@@ -347,7 +362,7 @@ namespace Terminal.Gui {
 				selected++;
 				if (selected >= top + Frame.Height)
 					top++;
-				SelectionChanged ();
+				OnSelectionChanged ();
 				SetNeedsDisplay ();
 			}
 		}
@@ -358,7 +373,7 @@ namespace Terminal.Gui {
 				selected--;
 				if (selected < top)
 					top = selected;
-				SelectionChanged ();
+				OnSelectionChanged ();
 				SetNeedsDisplay ();
 			}
 		}
@@ -375,7 +390,7 @@ namespace Terminal.Gui {
 					Directory = Path.GetFullPath (Path.Combine (Path.GetFullPath (Directory.ToString ()), infos [selected].Item1));
 					DirectoryChanged?.Invoke (Directory);
 				}
-			} else {
+			} else if (!isPrompt) {
 				FileChanged?.Invoke (infos [selected].Item1);
 				if (canChooseFiles) {
 					// Ensures that at least one file is selected.
@@ -401,7 +416,7 @@ namespace Terminal.Gui {
 						infos [i] = (infos [i].Item1, infos [i].Item2, !infos [i].Item3);
 					}
 				}
-				SelectionChanged ();
+				OnSelectionChanged ();
 				SetNeedsDisplay ();
 			}
 		}
@@ -433,12 +448,15 @@ namespace Terminal.Gui {
 						return null;
 					}
 					if (infos [selected].Item2) {
-						if (canChooseDirectories)
-							return new List<string> () { MakePath (infos [selected].Item1) };
+						if (canChooseDirectories) {
+							var sel = infos [selected].Item1;
+							return sel == ".." ? new List<string> () : new List<string> () { MakePath (infos [selected].Item1) };
+						}
 						return Array.Empty<string> ();
 					} else {
-						if (canChooseFiles)
+						if (canChooseFiles) {
 							return new List<string> () { MakePath (infos [selected].Item1) };
+						}
 						return Array.Empty<string> ();
 					}
 				}
@@ -510,9 +528,9 @@ namespace Terminal.Gui {
 			};
 			DirectoryPath = Path.GetFullPath (Environment.CurrentDirectory);
 			Add (dirListView);
-			dirListView.DirectoryChanged = (dir) => dirEntry.Text = dir;
-			dirListView.FileChanged = (file) => nameEntry.Text = file;
-
+			dirListView.DirectoryChanged = (dir) => { nameEntry.Text = ustring.Empty; dirEntry.Text = dir; };
+			dirListView.FileChanged = (file) => nameEntry.Text = file == ".." ? "" : file;
+			dirListView.SelectedChanged = (file) => nameEntry.Text = file.Item1 == ".." ? "" : file.Item1;
 			this.cancel = new Button ("Cancel");
 			this.cancel.Clicked += () => {
 				canceled = true;
