@@ -1053,7 +1053,7 @@ $(function () {
     function getAbsolutePath(href) {
       // Use anchor to normalize href
       var anchor = $('<a href="' + href + '"></a>')[0];
-      // Ignore protocal, remove search and query
+      // Ignore protocol, remove search and query
       return anchor.host + anchor.pathname;
     }
 

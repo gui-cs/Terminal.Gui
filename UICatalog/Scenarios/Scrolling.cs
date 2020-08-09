@@ -169,7 +169,7 @@ namespace UICatalog {
 				ColorScheme = Colors.Dialog
 			});
 
-			scrollView.Add (new TextField ("... the emergency broadcast sytem.") {
+			scrollView.Add (new TextField ("... the emergency broadcast system.") {
 				X = 3,
 				Y = 10,
 				Width = 50,

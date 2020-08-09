@@ -11,7 +11,7 @@ Contains all files required to build the **Terminal.Gui** library (and nuget pac
     - `ConsoleDriver` - Definition for the Console Driver API.
     - `Events.cs` - Defines keyboard and mouse related structs & classes. 
     - `PosDim.cs` - Implements **Terminal-Gui's** *Computed Layout* system. These classes have deep dependencies on `View`.
-    - `Responder` - Base class for the windowing class heirachy. Implements support for keyboard & mouse input.
+    - `Responder` - Base class for the windowing class hierarchy. Implements support for keyboard & mouse input.
     - `View` - Derived from `Responder`, the base class for non-modal visual elements such as controls.
     - `Toplevel` - Drived from `View`, the base class for modal visual elements such as top-level windows and dialogs. Supports the concept of `MenuBar` and `StatusBar`.
     - `Window` - Drived from `TopLevel`, implements Toplevel views with a visible frame and Title.
