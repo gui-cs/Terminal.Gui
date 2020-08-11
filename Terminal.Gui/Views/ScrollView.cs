@@ -447,7 +447,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the visibility for the horizontal scroll indicator.
 		/// </summary>
-		/// <value><c>true</c> if show vertical scroll indicator; otherwise, <c>false</c>.</value>
+		/// <value><c>true</c> if show horizontal scroll indicator; otherwise, <c>false</c>.</value>
 		public bool ShowHorizontalScrollIndicator {
 			get => showHorizontalScrollIndicator;
 			set {
