@@ -1843,7 +1843,7 @@ namespace Terminal.Gui {
 			get => textFormatter.Text;
 			set {
 				textFormatter.Text = value;
-				if (textFormatter.Size != Bounds.Size && (width == null || Bounds.Width == 0 || height == null || Bounds.Height == 0)) {
+				if (textFormatter.Size != Bounds.Size && (width == null && Bounds.Width == 0) || (height == null && Bounds.Height == 0)) {
 					Bounds = new Rect (Bounds.X, Bounds.Y, textFormatter.Size.Width, textFormatter.Size.Height);
 				}
 				SetNeedsDisplay ();
