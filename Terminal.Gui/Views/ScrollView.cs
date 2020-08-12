@@ -646,10 +646,11 @@ namespace Terminal.Gui {
 		public bool ScrollDown (int lines)
 		{
 			var ny = Math.Max (-contentSize.Height, contentOffset.Y - lines);
-			if (ny == contentOffset.Y)
-				return false;
-			ContentOffset = new Point (contentOffset.X, ny);
-			return true;
+			if (-contentSize.Height < ny) {
+				ContentOffset = new Point (contentOffset.X, ny);
+				return true;
+			}
+			return false;
 		}
 
 		/// <summary>
@@ -660,11 +661,11 @@ namespace Terminal.Gui {
 		public bool ScrollRight (int cols)
 		{
 			var nx = Math.Max (-contentSize.Width, contentOffset.X - cols);
-			if (nx == contentOffset.X)
-				return false;
-
-			ContentOffset = new Point (nx, contentOffset.Y);
-			return true;
+			if (-contentSize.Width < nx) {
+				ContentOffset = new Point (nx, contentOffset.Y);
+				return true;
+			}
+			return false;
 		}
 
 		///<inheritdoc/>
