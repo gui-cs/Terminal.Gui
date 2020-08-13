@@ -182,7 +182,7 @@ namespace Terminal.Gui {
 			case Key.CursorRight:
 			case Key.CursorDown:
 			case Key.ControlI: // Unix
-				var old = Focused;
+				var old = GetDeepestFocusedSubview (Focused);
 				if (!FocusNext ())
 					FocusNext ();
 				if (old != Focused) {
@@ -195,7 +195,7 @@ namespace Terminal.Gui {
 			case Key.CursorLeft:
 			case Key.CursorUp:
 			case Key.BackTab:
-				old = Focused;
+				old = GetDeepestFocusedSubview (Focused);
 				if (!FocusPrev ())
 					FocusPrev ();
 				if (old != Focused) {
@@ -211,6 +211,16 @@ namespace Terminal.Gui {
 				return true;
 			}
 			return false;
+		}
+
+		View GetDeepestFocusedSubview (View view)
+		{
+			foreach (var v in view.Subviews) {
+				if (v.HasFocus) {
+					return GetDeepestFocusedSubview (v);
+				}
+			}
+			return view;
 		}
 
 		IEnumerable<View> GetToplevelSubviews (bool isForward)

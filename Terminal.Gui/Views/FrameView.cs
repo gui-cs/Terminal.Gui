@@ -92,8 +92,10 @@ namespace Terminal.Gui {
 
 		void Initialize ()
 		{
-			base.Add (contentView);
-			contentView.Text = base.Text;
+			if (Subviews?.Count == 0) {
+				base.Add (contentView);
+				contentView.Text = base.Text;
+			}
 		}
 
 		void DrawFrame ()
