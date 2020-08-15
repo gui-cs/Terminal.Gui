@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ListView
    ">
-    <meta name="generator" content="docfx 2.56.1.0">
+    <meta name="generator" content="docfx 2.56.2.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -257,9 +257,6 @@ ListView <a class="xref" href="Terminal.Gui.View.html">View</a> renders a scroll
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnRemoved_Terminal_Gui_View_">View.OnRemoved(View)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnLeave_Terminal_Gui_View_">View.OnLeave(View)</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Focused">View.Focused</a>
     </div>
     <div>
@@ -281,7 +278,7 @@ ListView <a class="xref" href="Terminal.Gui.View.html">View</a> renders a scroll
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus_Terminal_Gui_View_">View.SetFocus(View)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
@@ -344,6 +341,9 @@ ListView <a class="xref" href="Terminal.Gui.View.html">View</a> renders a scroll
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ToString">View.ToString()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEnter_Terminal_Gui_MouseEvent_">View.OnMouseEnter(MouseEvent)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseLeave_Terminal_Gui_MouseEvent_">View.OnMouseLeave(MouseEvent)</a>
     </div>
     <div>
@@ -357,6 +357,9 @@ ListView <a class="xref" href="Terminal.Gui.View.html">View</a> renders a scroll
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -819,7 +822,9 @@ Marks an unmarked row.
   
   <a id="Terminal_Gui_ListView_MouseEvent_" data-uid="Terminal.Gui.ListView.MouseEvent*"></a>
   <h4 id="Terminal_Gui_ListView_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.ListView.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a mouse event is generated
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -853,7 +858,7 @@ Marks an unmarked row.
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -1025,7 +1030,9 @@ Moves the selected item index to the previous row.
   
   <a id="Terminal_Gui_ListView_OnEnter_" data-uid="Terminal.Gui.ListView.OnEnter*"></a>
   <h4 id="Terminal_Gui_ListView_OnEnter_Terminal_Gui_View_" data-uid="Terminal.Gui.ListView.OnEnter(Terminal.Gui.View)">OnEnter(View)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a view gets focus.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1044,7 +1051,7 @@ Moves the selected item index to the previous row.
       <tr>
         <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
         <td><span class="parametername">view</span></td>
-        <td></td>
+        <td>The view that is losing focus.</td>
       </tr>
     </tbody>
   </table>
@@ -1059,7 +1066,7 @@ Moves the selected item index to the previous row.
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -1067,13 +1074,15 @@ Moves the selected item index to the previous row.
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a></div>
   
   
-  <a id="Terminal_Gui_ListView_OnMouseEnter_" data-uid="Terminal.Gui.ListView.OnMouseEnter*"></a>
-  <h4 id="Terminal_Gui_ListView_OnMouseEnter_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.ListView.OnMouseEnter(Terminal.Gui.MouseEvent)">OnMouseEnter(MouseEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <a id="Terminal_Gui_ListView_OnLeave_" data-uid="Terminal.Gui.ListView.OnLeave*"></a>
+  <h4 id="Terminal_Gui_ListView_OnLeave_Terminal_Gui_View_" data-uid="Terminal.Gui.ListView.OnLeave(Terminal.Gui.View)">OnLeave(View)</h4>
+  <div class="markdown level1 summary">
+Method invoked when a view loses focus.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override bool OnMouseEnter(MouseEvent mouseEvent)</code></pre>
+    <pre><code class="lang-csharp hljs">public override bool OnLeave(View view)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1086,9 +1095,9 @@ Moves the selected item index to the previous row.
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></td>
-        <td><span class="parametername">mouseEvent</span></td>
-        <td></td>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td>The view that is getting focus.</td>
       </tr>
     </tbody>
   </table>
@@ -1103,12 +1112,12 @@ Moves the selected item index to the previous row.
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEnter_Terminal_Gui_MouseEvent_">View.OnMouseEnter(MouseEvent)</a></div>
+  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnLeave_Terminal_Gui_View_">View.OnLeave(View)</a></div>
   
   
   <a id="Terminal_Gui_ListView_OnOpenSelectedItem_" data-uid="Terminal.Gui.ListView.OnOpenSelectedItem*"></a>
@@ -1167,7 +1176,9 @@ Invokes the SelectedChanged event if it is defined.
   
   <a id="Terminal_Gui_ListView_PositionCursor_" data-uid="Terminal.Gui.ListView.PositionCursor*"></a>
   <h4 id="Terminal_Gui_ListView_PositionCursor" data-uid="Terminal.Gui.ListView.PositionCursor">PositionCursor()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Positions the cursor in the right position based on the currently focused view in the chain.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1179,7 +1190,10 @@ Invokes the SelectedChanged event if it is defined.
   
   <a id="Terminal_Gui_ListView_ProcessKey_" data-uid="Terminal.Gui.ListView.ProcessKey*"></a>
   <h4 id="Terminal_Gui_ListView_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.ListView.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+If the view is focused, gives the view a
+chance to process the keystroke.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1219,11 +1233,32 @@ Invokes the SelectedChanged event if it is defined.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
+  <h5 id="Terminal_Gui_ListView_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  Views can override this method if they are
+  interested in processing the given keystroke.
+  If they consume the keystroke, they must
+  return true to stop the keystroke from being
+  processed by other widgets or consumed by the
+  widget engine.    If they return false, the
+  keystroke will be passed using the ProcessColdKey
+  method to other views to process.
+</p>
+<p>
+  The View implementation does nothing but return false,
+  so it is not necessary to call base.ProcessKey if you
+  derive directly from View, but you should if you derive
+  other View subclasses.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_ListView_Redraw_" data-uid="Terminal.Gui.ListView.Redraw*"></a>
   <h4 id="Terminal_Gui_ListView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.ListView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1242,12 +1277,26 @@ Invokes the SelectedChanged event if it is defined.
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">bounds</span></td>
-        <td></td>
+        <td>The bounds (view-relative region) to redraw.</td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
+  <h5 id="Terminal_Gui_ListView_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
+</p>
+<p>
+   Views should set the color that they want to use on entry, as otherwise this will inherit
+   the last color that was set globally on the driver.
+</p>
+<p>
+   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
+   larger than the <code>region</code> parameter.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_ListView_SetSource_" data-uid="Terminal.Gui.ListView.SetSource*"></a>

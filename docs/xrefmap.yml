@@ -58,12 +58,12 @@ references:
   commentId: F:Terminal.Gui.Application.Driver
   fullName: Terminal.Gui.Application.Driver
   nameWithType: Application.Driver
-- uid: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState,System.Boolean)
-  name: End(Application.RunState, Boolean)
-  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_System_Boolean_
-  commentId: M:Terminal.Gui.Application.End(Terminal.Gui.Application.RunState,System.Boolean)
-  fullName: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState, System.Boolean)
-  nameWithType: Application.End(Application.RunState, Boolean)
+- uid: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
+  name: End(Application.RunState)
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_
+  commentId: M:Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
+  fullName: Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)
+  nameWithType: Application.End(Application.RunState)
 - uid: Terminal.Gui.Application.End*
   name: End
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_End_
@@ -211,12 +211,12 @@ references:
   commentId: M:Terminal.Gui.Application.Run
   fullName: Terminal.Gui.Application.Run()
   nameWithType: Application.Run()
-- uid: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel,System.Boolean)
-  name: Run(Toplevel, Boolean)
-  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Boolean_
-  commentId: M:Terminal.Gui.Application.Run(Terminal.Gui.Toplevel,System.Boolean)
-  fullName: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel, System.Boolean)
-  nameWithType: Application.Run(Toplevel, Boolean)
+- uid: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
+  name: Run(Toplevel)
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_
+  commentId: M:Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
+  fullName: Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)
+  nameWithType: Application.Run(Toplevel)
 - uid: Terminal.Gui.Application.Run*
   name: Run
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Run_
@@ -284,12 +284,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Application.RunState.Dispose
   nameWithType: Application.RunState.Dispose
-- uid: Terminal.Gui.Application.Shutdown(System.Boolean)
-  name: Shutdown(Boolean)
-  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Shutdown_System_Boolean_
-  commentId: M:Terminal.Gui.Application.Shutdown(System.Boolean)
-  fullName: Terminal.Gui.Application.Shutdown(System.Boolean)
-  nameWithType: Application.Shutdown(Boolean)
+- uid: Terminal.Gui.Application.Shutdown
+  name: Shutdown()
+  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Shutdown
+  commentId: M:Terminal.Gui.Application.Shutdown
+  fullName: Terminal.Gui.Application.Shutdown()
+  nameWithType: Application.Shutdown()
 - uid: Terminal.Gui.Application.Shutdown*
   name: Shutdown
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Shutdown_
@@ -451,19 +451,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Button.IsDefault
   nameWithType: Button.IsDefault
-- uid: Terminal.Gui.Button.OnMouseEvent(Terminal.Gui.MouseEvent)
-  name: OnMouseEvent(MouseEvent)
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_OnMouseEvent_Terminal_Gui_MouseEvent_
-  commentId: M:Terminal.Gui.Button.OnMouseEvent(Terminal.Gui.MouseEvent)
-  fullName: Terminal.Gui.Button.OnMouseEvent(Terminal.Gui.MouseEvent)
-  nameWithType: Button.OnMouseEvent(MouseEvent)
-- uid: Terminal.Gui.Button.OnMouseEvent*
-  name: OnMouseEvent
-  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_OnMouseEvent_
-  commentId: Overload:Terminal.Gui.Button.OnMouseEvent
+- uid: Terminal.Gui.Button.MouseEvent(Terminal.Gui.MouseEvent)
+  name: MouseEvent(MouseEvent)
+  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_MouseEvent_Terminal_Gui_MouseEvent_
+  commentId: M:Terminal.Gui.Button.MouseEvent(Terminal.Gui.MouseEvent)
+  fullName: Terminal.Gui.Button.MouseEvent(Terminal.Gui.MouseEvent)
+  nameWithType: Button.MouseEvent(MouseEvent)
+- uid: Terminal.Gui.Button.MouseEvent*
+  name: MouseEvent
+  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_MouseEvent_
+  commentId: Overload:Terminal.Gui.Button.MouseEvent
   isSpec: "True"
-  fullName: Terminal.Gui.Button.OnMouseEvent
-  nameWithType: Button.OnMouseEvent
+  fullName: Terminal.Gui.Button.MouseEvent
+  nameWithType: Button.MouseEvent
+- uid: Terminal.Gui.Button.PositionCursor
+  name: PositionCursor()
+  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_PositionCursor
+  commentId: M:Terminal.Gui.Button.PositionCursor
+  fullName: Terminal.Gui.Button.PositionCursor()
+  nameWithType: Button.PositionCursor()
+- uid: Terminal.Gui.Button.PositionCursor*
+  name: PositionCursor
+  href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_PositionCursor_
+  commentId: Overload:Terminal.Gui.Button.PositionCursor
+  isSpec: "True"
+  fullName: Terminal.Gui.Button.PositionCursor
+  nameWithType: Button.PositionCursor
 - uid: Terminal.Gui.Button.ProcessColdKey(Terminal.Gui.KeyEvent)
   name: ProcessColdKey(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_ProcessColdKey_Terminal_Gui_KeyEvent_
@@ -2109,6 +2122,24 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Dim.Width
   nameWithType: Dim.Width
+- uid: Terminal.Gui.DisplayModeLayout
+  name: DisplayModeLayout
+  href: api/Terminal.Gui/Terminal.Gui.DisplayModeLayout.html
+  commentId: T:Terminal.Gui.DisplayModeLayout
+  fullName: Terminal.Gui.DisplayModeLayout
+  nameWithType: DisplayModeLayout
+- uid: Terminal.Gui.DisplayModeLayout.Horizontal
+  name: Horizontal
+  href: api/Terminal.Gui/Terminal.Gui.DisplayModeLayout.html#Terminal_Gui_DisplayModeLayout_Horizontal
+  commentId: F:Terminal.Gui.DisplayModeLayout.Horizontal
+  fullName: Terminal.Gui.DisplayModeLayout.Horizontal
+  nameWithType: DisplayModeLayout.Horizontal
+- uid: Terminal.Gui.DisplayModeLayout.Vertical
+  name: Vertical
+  href: api/Terminal.Gui/Terminal.Gui.DisplayModeLayout.html#Terminal_Gui_DisplayModeLayout_Vertical
+  commentId: F:Terminal.Gui.DisplayModeLayout.Vertical
+  fullName: Terminal.Gui.DisplayModeLayout.Vertical
+  nameWithType: DisplayModeLayout.Vertical
 - uid: Terminal.Gui.FakeConsole
   name: FakeConsole
   href: api/Terminal.Gui/Terminal.Gui.FakeConsole.html
@@ -4662,19 +4693,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ListView.OnEnter
   nameWithType: ListView.OnEnter
-- uid: Terminal.Gui.ListView.OnMouseEnter(Terminal.Gui.MouseEvent)
-  name: OnMouseEnter(MouseEvent)
-  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_OnMouseEnter_Terminal_Gui_MouseEvent_
-  commentId: M:Terminal.Gui.ListView.OnMouseEnter(Terminal.Gui.MouseEvent)
-  fullName: Terminal.Gui.ListView.OnMouseEnter(Terminal.Gui.MouseEvent)
-  nameWithType: ListView.OnMouseEnter(MouseEvent)
-- uid: Terminal.Gui.ListView.OnMouseEnter*
-  name: OnMouseEnter
-  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_OnMouseEnter_
-  commentId: Overload:Terminal.Gui.ListView.OnMouseEnter
+- uid: Terminal.Gui.ListView.OnLeave(Terminal.Gui.View)
+  name: OnLeave(View)
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_OnLeave_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.ListView.OnLeave(Terminal.Gui.View)
+  fullName: Terminal.Gui.ListView.OnLeave(Terminal.Gui.View)
+  nameWithType: ListView.OnLeave(View)
+- uid: Terminal.Gui.ListView.OnLeave*
+  name: OnLeave
+  href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_OnLeave_
+  commentId: Overload:Terminal.Gui.ListView.OnLeave
   isSpec: "True"
-  fullName: Terminal.Gui.ListView.OnMouseEnter
-  nameWithType: ListView.OnMouseEnter
+  fullName: Terminal.Gui.ListView.OnLeave
+  nameWithType: ListView.OnLeave
 - uid: Terminal.Gui.ListView.OnOpenSelectedItem
   name: OnOpenSelectedItem()
   href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_OnOpenSelectedItem
@@ -5364,24 +5395,24 @@ references:
   commentId: M:Terminal.Gui.MenuBarItem.#ctor
   fullName: Terminal.Gui.MenuBarItem.MenuBarItem()
   nameWithType: MenuBarItem.MenuBarItem()
-- uid: Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,System.String,System.Action,System.Func{System.Boolean})
-  name: MenuBarItem(ustring, String, Action, Func<Boolean>)
-  href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem__ctor_NStack_ustring_System_String_System_Action_System_Func_System_Boolean__
-  commentId: M:Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,System.String,System.Action,System.Func{System.Boolean})
-  name.vb: MenuBarItem(ustring, String, Action, Func(Of Boolean))
-  fullName: Terminal.Gui.MenuBarItem.MenuBarItem(NStack.ustring, System.String, System.Action, System.Func<System.Boolean>)
-  fullName.vb: Terminal.Gui.MenuBarItem.MenuBarItem(NStack.ustring, System.String, System.Action, System.Func(Of System.Boolean))
-  nameWithType: MenuBarItem.MenuBarItem(ustring, String, Action, Func<Boolean>)
-  nameWithType.vb: MenuBarItem.MenuBarItem(ustring, String, Action, Func(Of Boolean))
-- uid: Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,Terminal.Gui.MenuItem[])
-  name: MenuBarItem(ustring, MenuItem[])
-  href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem__ctor_NStack_ustring_Terminal_Gui_MenuItem___
-  commentId: M:Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,Terminal.Gui.MenuItem[])
-  name.vb: MenuBarItem(ustring, MenuItem())
-  fullName: Terminal.Gui.MenuBarItem.MenuBarItem(NStack.ustring, Terminal.Gui.MenuItem[])
-  fullName.vb: Terminal.Gui.MenuBarItem.MenuBarItem(NStack.ustring, Terminal.Gui.MenuItem())
-  nameWithType: MenuBarItem.MenuBarItem(ustring, MenuItem[])
-  nameWithType.vb: MenuBarItem.MenuBarItem(ustring, MenuItem())
+- uid: Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,NStack.ustring,System.Action,System.Func{System.Boolean},Terminal.Gui.MenuItem)
+  name: MenuBarItem(ustring, ustring, Action, Func<Boolean>, MenuItem)
+  href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem__ctor_NStack_ustring_NStack_ustring_System_Action_System_Func_System_Boolean__Terminal_Gui_MenuItem_
+  commentId: M:Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,NStack.ustring,System.Action,System.Func{System.Boolean},Terminal.Gui.MenuItem)
+  name.vb: MenuBarItem(ustring, ustring, Action, Func(Of Boolean), MenuItem)
+  fullName: Terminal.Gui.MenuBarItem.MenuBarItem(NStack.ustring, NStack.ustring, System.Action, System.Func<System.Boolean>, Terminal.Gui.MenuItem)
+  fullName.vb: Terminal.Gui.MenuBarItem.MenuBarItem(NStack.ustring, NStack.ustring, System.Action, System.Func(Of System.Boolean), Terminal.Gui.MenuItem)
+  nameWithType: MenuBarItem.MenuBarItem(ustring, ustring, Action, Func<Boolean>, MenuItem)
+  nameWithType.vb: MenuBarItem.MenuBarItem(ustring, ustring, Action, Func(Of Boolean), MenuItem)
+- uid: Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,Terminal.Gui.MenuItem[],Terminal.Gui.MenuItem)
+  name: MenuBarItem(ustring, MenuItem[], MenuItem)
+  href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem__ctor_NStack_ustring_Terminal_Gui_MenuItem___Terminal_Gui_MenuItem_
+  commentId: M:Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,Terminal.Gui.MenuItem[],Terminal.Gui.MenuItem)
+  name.vb: MenuBarItem(ustring, MenuItem(), MenuItem)
+  fullName: Terminal.Gui.MenuBarItem.MenuBarItem(NStack.ustring, Terminal.Gui.MenuItem[], Terminal.Gui.MenuItem)
+  fullName.vb: Terminal.Gui.MenuBarItem.MenuBarItem(NStack.ustring, Terminal.Gui.MenuItem(), Terminal.Gui.MenuItem)
+  nameWithType: MenuBarItem.MenuBarItem(ustring, MenuItem[], MenuItem)
+  nameWithType.vb: MenuBarItem.MenuBarItem(ustring, MenuItem(), MenuItem)
 - uid: Terminal.Gui.MenuBarItem.#ctor(Terminal.Gui.MenuItem[])
   name: MenuBarItem(MenuItem[])
   href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem__ctor_Terminal_Gui_MenuItem___
@@ -5411,6 +5442,45 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.MenuBarItem.Children
   nameWithType: MenuBarItem.Children
+- uid: Terminal.Gui.MenuBarItem.GetChildrenIndex(Terminal.Gui.MenuItem)
+  name: GetChildrenIndex(MenuItem)
+  href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem_GetChildrenIndex_Terminal_Gui_MenuItem_
+  commentId: M:Terminal.Gui.MenuBarItem.GetChildrenIndex(Terminal.Gui.MenuItem)
+  fullName: Terminal.Gui.MenuBarItem.GetChildrenIndex(Terminal.Gui.MenuItem)
+  nameWithType: MenuBarItem.GetChildrenIndex(MenuItem)
+- uid: Terminal.Gui.MenuBarItem.GetChildrenIndex*
+  name: GetChildrenIndex
+  href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem_GetChildrenIndex_
+  commentId: Overload:Terminal.Gui.MenuBarItem.GetChildrenIndex
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuBarItem.GetChildrenIndex
+  nameWithType: MenuBarItem.GetChildrenIndex
+- uid: Terminal.Gui.MenuBarItem.IsSubMenuOf(Terminal.Gui.MenuItem)
+  name: IsSubMenuOf(MenuItem)
+  href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem_IsSubMenuOf_Terminal_Gui_MenuItem_
+  commentId: M:Terminal.Gui.MenuBarItem.IsSubMenuOf(Terminal.Gui.MenuItem)
+  fullName: Terminal.Gui.MenuBarItem.IsSubMenuOf(Terminal.Gui.MenuItem)
+  nameWithType: MenuBarItem.IsSubMenuOf(MenuItem)
+- uid: Terminal.Gui.MenuBarItem.IsSubMenuOf*
+  name: IsSubMenuOf
+  href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem_IsSubMenuOf_
+  commentId: Overload:Terminal.Gui.MenuBarItem.IsSubMenuOf
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuBarItem.IsSubMenuOf
+  nameWithType: MenuBarItem.IsSubMenuOf
+- uid: Terminal.Gui.MenuBarItem.SubMenu(Terminal.Gui.MenuItem)
+  name: SubMenu(MenuItem)
+  href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem_SubMenu_Terminal_Gui_MenuItem_
+  commentId: M:Terminal.Gui.MenuBarItem.SubMenu(Terminal.Gui.MenuItem)
+  fullName: Terminal.Gui.MenuBarItem.SubMenu(Terminal.Gui.MenuItem)
+  nameWithType: MenuBarItem.SubMenu(MenuItem)
+- uid: Terminal.Gui.MenuBarItem.SubMenu*
+  name: SubMenu
+  href: api/Terminal.Gui/Terminal.Gui.MenuBarItem.html#Terminal_Gui_MenuBarItem_SubMenu_
+  commentId: Overload:Terminal.Gui.MenuBarItem.SubMenu
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuBarItem.SubMenu
+  nameWithType: MenuBarItem.SubMenu
 - uid: Terminal.Gui.MenuItem
   name: MenuItem
   href: api/Terminal.Gui/Terminal.Gui.MenuItem.html
@@ -5423,21 +5493,15 @@ references:
   commentId: M:Terminal.Gui.MenuItem.#ctor
   fullName: Terminal.Gui.MenuItem.MenuItem()
   nameWithType: MenuItem.MenuItem()
-- uid: Terminal.Gui.MenuItem.#ctor(NStack.ustring,System.String,System.Action,System.Func{System.Boolean})
-  name: MenuItem(ustring, String, Action, Func<Boolean>)
-  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem__ctor_NStack_ustring_System_String_System_Action_System_Func_System_Boolean__
-  commentId: M:Terminal.Gui.MenuItem.#ctor(NStack.ustring,System.String,System.Action,System.Func{System.Boolean})
-  name.vb: MenuItem(ustring, String, Action, Func(Of Boolean))
-  fullName: Terminal.Gui.MenuItem.MenuItem(NStack.ustring, System.String, System.Action, System.Func<System.Boolean>)
-  fullName.vb: Terminal.Gui.MenuItem.MenuItem(NStack.ustring, System.String, System.Action, System.Func(Of System.Boolean))
-  nameWithType: MenuItem.MenuItem(ustring, String, Action, Func<Boolean>)
-  nameWithType.vb: MenuItem.MenuItem(ustring, String, Action, Func(Of Boolean))
-- uid: Terminal.Gui.MenuItem.#ctor(NStack.ustring,Terminal.Gui.MenuBarItem)
-  name: MenuItem(ustring, MenuBarItem)
-  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem__ctor_NStack_ustring_Terminal_Gui_MenuBarItem_
-  commentId: M:Terminal.Gui.MenuItem.#ctor(NStack.ustring,Terminal.Gui.MenuBarItem)
-  fullName: Terminal.Gui.MenuItem.MenuItem(NStack.ustring, Terminal.Gui.MenuBarItem)
-  nameWithType: MenuItem.MenuItem(ustring, MenuBarItem)
+- uid: Terminal.Gui.MenuItem.#ctor(NStack.ustring,NStack.ustring,System.Action,System.Func{System.Boolean},Terminal.Gui.MenuItem)
+  name: MenuItem(ustring, ustring, Action, Func<Boolean>, MenuItem)
+  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem__ctor_NStack_ustring_NStack_ustring_System_Action_System_Func_System_Boolean__Terminal_Gui_MenuItem_
+  commentId: M:Terminal.Gui.MenuItem.#ctor(NStack.ustring,NStack.ustring,System.Action,System.Func{System.Boolean},Terminal.Gui.MenuItem)
+  name.vb: MenuItem(ustring, ustring, Action, Func(Of Boolean), MenuItem)
+  fullName: Terminal.Gui.MenuItem.MenuItem(NStack.ustring, NStack.ustring, System.Action, System.Func<System.Boolean>, Terminal.Gui.MenuItem)
+  fullName.vb: Terminal.Gui.MenuItem.MenuItem(NStack.ustring, NStack.ustring, System.Action, System.Func(Of System.Boolean), Terminal.Gui.MenuItem)
+  nameWithType: MenuItem.MenuItem(ustring, ustring, Action, Func<Boolean>, MenuItem)
+  nameWithType.vb: MenuItem.MenuItem(ustring, ustring, Action, Func(Of Boolean), MenuItem)
 - uid: Terminal.Gui.MenuItem.#ctor*
   name: MenuItem
   href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem__ctor_
@@ -5555,6 +5619,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.MenuItem.IsEnabled
   nameWithType: MenuItem.IsEnabled
+- uid: Terminal.Gui.MenuItem.Parent
+  name: Parent
+  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_Parent
+  commentId: P:Terminal.Gui.MenuItem.Parent
+  fullName: Terminal.Gui.MenuItem.Parent
+  nameWithType: MenuItem.Parent
+- uid: Terminal.Gui.MenuItem.Parent*
+  name: Parent
+  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_Parent_
+  commentId: Overload:Terminal.Gui.MenuItem.Parent
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuItem.Parent
+  nameWithType: MenuItem.Parent
 - uid: Terminal.Gui.MenuItem.ShortCut
   name: ShortCut
   href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_ShortCut
@@ -6552,19 +6629,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.RadioGroup.RadioGroup
   nameWithType: RadioGroup.RadioGroup
-- uid: Terminal.Gui.RadioGroup.Cursor
-  name: Cursor
-  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_Cursor
-  commentId: P:Terminal.Gui.RadioGroup.Cursor
-  fullName: Terminal.Gui.RadioGroup.Cursor
-  nameWithType: RadioGroup.Cursor
-- uid: Terminal.Gui.RadioGroup.Cursor*
-  name: Cursor
-  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_Cursor_
-  commentId: Overload:Terminal.Gui.RadioGroup.Cursor
+- uid: Terminal.Gui.RadioGroup.DisplayMode
+  name: DisplayMode
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_DisplayMode
+  commentId: P:Terminal.Gui.RadioGroup.DisplayMode
+  fullName: Terminal.Gui.RadioGroup.DisplayMode
+  nameWithType: RadioGroup.DisplayMode
+- uid: Terminal.Gui.RadioGroup.DisplayMode*
+  name: DisplayMode
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_DisplayMode_
+  commentId: Overload:Terminal.Gui.RadioGroup.DisplayMode
   isSpec: "True"
-  fullName: Terminal.Gui.RadioGroup.Cursor
-  nameWithType: RadioGroup.Cursor
+  fullName: Terminal.Gui.RadioGroup.DisplayMode
+  nameWithType: RadioGroup.DisplayMode
+- uid: Terminal.Gui.RadioGroup.HorizontalSpace
+  name: HorizontalSpace
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_HorizontalSpace
+  commentId: P:Terminal.Gui.RadioGroup.HorizontalSpace
+  fullName: Terminal.Gui.RadioGroup.HorizontalSpace
+  nameWithType: RadioGroup.HorizontalSpace
+- uid: Terminal.Gui.RadioGroup.HorizontalSpace*
+  name: HorizontalSpace
+  href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_HorizontalSpace_
+  commentId: Overload:Terminal.Gui.RadioGroup.HorizontalSpace
+  isSpec: "True"
+  fullName: Terminal.Gui.RadioGroup.HorizontalSpace
+  nameWithType: RadioGroup.HorizontalSpace
 - uid: Terminal.Gui.RadioGroup.MouseEvent(Terminal.Gui.MouseEvent)
   name: MouseEvent(MouseEvent)
   href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_MouseEvent_Terminal_Gui_MouseEvent_
@@ -10139,12 +10229,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.SetClip
   nameWithType: View.SetClip
-- uid: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
-  name: SetFocus(View)
-  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_SetFocus_Terminal_Gui_View_
-  commentId: M:Terminal.Gui.View.SetFocus(Terminal.Gui.View)
-  fullName: Terminal.Gui.View.SetFocus(Terminal.Gui.View)
-  nameWithType: View.SetFocus(View)
+- uid: Terminal.Gui.View.SetFocus
+  name: SetFocus()
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_SetFocus
+  commentId: M:Terminal.Gui.View.SetFocus
+  fullName: Terminal.Gui.View.SetFocus()
+  nameWithType: View.SetFocus()
 - uid: Terminal.Gui.View.SetFocus*
   name: SetFocus
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_SetFocus_
@@ -10275,6 +10365,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.ToString
   nameWithType: View.ToString
+- uid: Terminal.Gui.View.Visible
+  name: Visible
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Visible
+  commentId: P:Terminal.Gui.View.Visible
+  fullName: Terminal.Gui.View.Visible
+  nameWithType: View.Visible
+- uid: Terminal.Gui.View.Visible*
+  name: Visible
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Visible_
+  commentId: Overload:Terminal.Gui.View.Visible
+  isSpec: "True"
+  fullName: Terminal.Gui.View.Visible
+  nameWithType: View.Visible
 - uid: Terminal.Gui.View.WantContinuousButtonPressed
   name: WantContinuousButtonPressed
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_WantContinuousButtonPressed
@@ -10506,6 +10609,115 @@ references:
   commentId: N:UICatalog
   fullName: UICatalog
   nameWithType: UICatalog
+- uid: UICatalog.Binding
+  name: Binding
+  href: api/UICatalog/UICatalog.Binding.html
+  commentId: T:UICatalog.Binding
+  fullName: UICatalog.Binding
+  nameWithType: Binding
+- uid: UICatalog.Binding.#ctor(Terminal.Gui.View,System.String,Terminal.Gui.View,System.String,UICatalog.IValueConverter)
+  name: Binding(View, String, View, String, IValueConverter)
+  href: api/UICatalog/UICatalog.Binding.html#UICatalog_Binding__ctor_Terminal_Gui_View_System_String_Terminal_Gui_View_System_String_UICatalog_IValueConverter_
+  commentId: M:UICatalog.Binding.#ctor(Terminal.Gui.View,System.String,Terminal.Gui.View,System.String,UICatalog.IValueConverter)
+  fullName: UICatalog.Binding.Binding(Terminal.Gui.View, System.String, Terminal.Gui.View, System.String, UICatalog.IValueConverter)
+  nameWithType: Binding.Binding(View, String, View, String, IValueConverter)
+- uid: UICatalog.Binding.#ctor*
+  name: Binding
+  href: api/UICatalog/UICatalog.Binding.html#UICatalog_Binding__ctor_
+  commentId: Overload:UICatalog.Binding.#ctor
+  isSpec: "True"
+  fullName: UICatalog.Binding.Binding
+  nameWithType: Binding.Binding
+- uid: UICatalog.Binding.Source
+  name: Source
+  href: api/UICatalog/UICatalog.Binding.html#UICatalog_Binding_Source
+  commentId: P:UICatalog.Binding.Source
+  fullName: UICatalog.Binding.Source
+  nameWithType: Binding.Source
+- uid: UICatalog.Binding.Source*
+  name: Source
+  href: api/UICatalog/UICatalog.Binding.html#UICatalog_Binding_Source_
+  commentId: Overload:UICatalog.Binding.Source
+  isSpec: "True"
+  fullName: UICatalog.Binding.Source
+  nameWithType: Binding.Source
+- uid: UICatalog.Binding.SourcePropertyName
+  name: SourcePropertyName
+  href: api/UICatalog/UICatalog.Binding.html#UICatalog_Binding_SourcePropertyName
+  commentId: P:UICatalog.Binding.SourcePropertyName
+  fullName: UICatalog.Binding.SourcePropertyName
+  nameWithType: Binding.SourcePropertyName
+- uid: UICatalog.Binding.SourcePropertyName*
+  name: SourcePropertyName
+  href: api/UICatalog/UICatalog.Binding.html#UICatalog_Binding_SourcePropertyName_
+  commentId: Overload:UICatalog.Binding.SourcePropertyName
+  isSpec: "True"
+  fullName: UICatalog.Binding.SourcePropertyName
+  nameWithType: Binding.SourcePropertyName
+- uid: UICatalog.Binding.Target
+  name: Target
+  href: api/UICatalog/UICatalog.Binding.html#UICatalog_Binding_Target
+  commentId: P:UICatalog.Binding.Target
+  fullName: UICatalog.Binding.Target
+  nameWithType: Binding.Target
+- uid: UICatalog.Binding.Target*
+  name: Target
+  href: api/UICatalog/UICatalog.Binding.html#UICatalog_Binding_Target_
+  commentId: Overload:UICatalog.Binding.Target
+  isSpec: "True"
+  fullName: UICatalog.Binding.Target
+  nameWithType: Binding.Target
+- uid: UICatalog.Binding.TargetPropertyName
+  name: TargetPropertyName
+  href: api/UICatalog/UICatalog.Binding.html#UICatalog_Binding_TargetPropertyName
+  commentId: P:UICatalog.Binding.TargetPropertyName
+  fullName: UICatalog.Binding.TargetPropertyName
+  nameWithType: Binding.TargetPropertyName
+- uid: UICatalog.Binding.TargetPropertyName*
+  name: TargetPropertyName
+  href: api/UICatalog/UICatalog.Binding.html#UICatalog_Binding_TargetPropertyName_
+  commentId: Overload:UICatalog.Binding.TargetPropertyName
+  isSpec: "True"
+  fullName: UICatalog.Binding.TargetPropertyName
+  nameWithType: Binding.TargetPropertyName
+- uid: UICatalog.IValueConverter
+  name: IValueConverter
+  href: api/UICatalog/UICatalog.IValueConverter.html
+  commentId: T:UICatalog.IValueConverter
+  fullName: UICatalog.IValueConverter
+  nameWithType: IValueConverter
+- uid: UICatalog.IValueConverter.Convert(System.Object,System.Object)
+  name: Convert(Object, Object)
+  href: api/UICatalog/UICatalog.IValueConverter.html#UICatalog_IValueConverter_Convert_System_Object_System_Object_
+  commentId: M:UICatalog.IValueConverter.Convert(System.Object,System.Object)
+  fullName: UICatalog.IValueConverter.Convert(System.Object, System.Object)
+  nameWithType: IValueConverter.Convert(Object, Object)
+- uid: UICatalog.IValueConverter.Convert*
+  name: Convert
+  href: api/UICatalog/UICatalog.IValueConverter.html#UICatalog_IValueConverter_Convert_
+  commentId: Overload:UICatalog.IValueConverter.Convert
+  isSpec: "True"
+  fullName: UICatalog.IValueConverter.Convert
+  nameWithType: IValueConverter.Convert
+- uid: UICatalog.ListWrapperConverter
+  name: ListWrapperConverter
+  href: api/UICatalog/UICatalog.ListWrapperConverter.html
+  commentId: T:UICatalog.ListWrapperConverter
+  fullName: UICatalog.ListWrapperConverter
+  nameWithType: ListWrapperConverter
+- uid: UICatalog.ListWrapperConverter.Convert(System.Object,System.Object)
+  name: Convert(Object, Object)
+  href: api/UICatalog/UICatalog.ListWrapperConverter.html#UICatalog_ListWrapperConverter_Convert_System_Object_System_Object_
+  commentId: M:UICatalog.ListWrapperConverter.Convert(System.Object,System.Object)
+  fullName: UICatalog.ListWrapperConverter.Convert(System.Object, System.Object)
+  nameWithType: ListWrapperConverter.Convert(Object, Object)
+- uid: UICatalog.ListWrapperConverter.Convert*
+  name: Convert
+  href: api/UICatalog/UICatalog.ListWrapperConverter.html#UICatalog_ListWrapperConverter_Convert_
+  commentId: Overload:UICatalog.ListWrapperConverter.Convert
+  isSpec: "True"
+  fullName: UICatalog.ListWrapperConverter.Convert
+  nameWithType: ListWrapperConverter.Convert
 - uid: UICatalog.Scenario
   name: Scenario
   href: api/UICatalog/UICatalog.Scenario.html
@@ -10812,6 +11024,25 @@ references:
   commentId: T:UICatalog.UICatalogApp
   fullName: UICatalog.UICatalogApp
   nameWithType: UICatalogApp
+- uid: UICatalog.UStringValueConverter
+  name: UStringValueConverter
+  href: api/UICatalog/UICatalog.UStringValueConverter.html
+  commentId: T:UICatalog.UStringValueConverter
+  fullName: UICatalog.UStringValueConverter
+  nameWithType: UStringValueConverter
+- uid: UICatalog.UStringValueConverter.Convert(System.Object,System.Object)
+  name: Convert(Object, Object)
+  href: api/UICatalog/UICatalog.UStringValueConverter.html#UICatalog_UStringValueConverter_Convert_System_Object_System_Object_
+  commentId: M:UICatalog.UStringValueConverter.Convert(System.Object,System.Object)
+  fullName: UICatalog.UStringValueConverter.Convert(System.Object, System.Object)
+  nameWithType: UStringValueConverter.Convert(Object, Object)
+- uid: UICatalog.UStringValueConverter.Convert*
+  name: Convert
+  href: api/UICatalog/UICatalog.UStringValueConverter.html#UICatalog_UStringValueConverter_Convert_
+  commentId: Overload:UICatalog.UStringValueConverter.Convert
+  isSpec: "True"
+  fullName: UICatalog.UStringValueConverter.Convert
+  nameWithType: UStringValueConverter.Convert
 - uid: Unix.Terminal
   name: Unix.Terminal
   href: api/Terminal.Gui/Unix.Terminal.html
