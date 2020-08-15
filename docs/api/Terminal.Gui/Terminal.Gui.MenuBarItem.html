@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class MenuBarItem
    ">
-    <meta name="generator" content="docfx 2.56.1.0">
+    <meta name="generator" content="docfx 2.56.2.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -123,6 +123,9 @@ A <a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a> contains 
       <a class="xref" href="Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_CheckType">MenuItem.CheckType</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_Parent">MenuItem.Parent</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_GetMenuItem">MenuItem.GetMenuItem()</a>
     </div>
     <div>
@@ -173,14 +176,14 @@ Initializes a new <a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarIt
   
   
   <a id="Terminal_Gui_MenuBarItem__ctor_" data-uid="Terminal.Gui.MenuBarItem.#ctor*"></a>
-  <h4 id="Terminal_Gui_MenuBarItem__ctor_NStack_ustring_System_String_System_Action_System_Func_System_Boolean__" data-uid="Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,System.String,System.Action,System.Func{System.Boolean})">MenuBarItem(ustring, String, Action, Func&lt;Boolean&gt;)</h4>
+  <h4 id="Terminal_Gui_MenuBarItem__ctor_NStack_ustring_NStack_ustring_System_Action_System_Func_System_Boolean__Terminal_Gui_MenuItem_" data-uid="Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,NStack.ustring,System.Action,System.Func{System.Boolean},Terminal.Gui.MenuItem)">MenuBarItem(ustring, ustring, Action, Func&lt;Boolean&gt;, MenuItem)</h4>
   <div class="markdown level1 summary">
 Initializes a new <a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a> as a <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MenuBarItem(ustring title, string help, Action action, Func&lt;bool&gt; canExecute = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public MenuBarItem(ustring title, ustring help, Action action, Func&lt;bool&gt; canExecute = null, MenuItem parent = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -198,7 +201,7 @@ Initializes a new <a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarIt
         <td>Title for the menu item.</td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><span class="xref">NStack.ustring</span></td>
         <td><span class="parametername">help</span></td>
         <td>Help text to display.</td>
       </tr>
@@ -210,21 +213,26 @@ Initializes a new <a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarIt
       <tr>
         <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Boolean</span>&gt;</td>
         <td><span class="parametername">canExecute</span></td>
-        <td>Function to determine if the action can currently be executred.</td>
+        <td>Function to determine if the action can currently be executed.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a></td>
+        <td><span class="parametername">parent</span></td>
+        <td>The parent <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a> of this if exist, otherwise is null.</td>
       </tr>
     </tbody>
   </table>
   
   
   <a id="Terminal_Gui_MenuBarItem__ctor_" data-uid="Terminal.Gui.MenuBarItem.#ctor*"></a>
-  <h4 id="Terminal_Gui_MenuBarItem__ctor_NStack_ustring_Terminal_Gui_MenuItem___" data-uid="Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,Terminal.Gui.MenuItem[])">MenuBarItem(ustring, MenuItem[])</h4>
+  <h4 id="Terminal_Gui_MenuBarItem__ctor_NStack_ustring_Terminal_Gui_MenuItem___Terminal_Gui_MenuItem_" data-uid="Terminal.Gui.MenuBarItem.#ctor(NStack.ustring,Terminal.Gui.MenuItem[],Terminal.Gui.MenuItem)">MenuBarItem(ustring, MenuItem[], MenuItem)</h4>
   <div class="markdown level1 summary">
 Initializes a new <a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MenuBarItem(ustring title, MenuItem[] children)</code></pre>
+    <pre><code class="lang-csharp hljs">public MenuBarItem(ustring title, MenuItem[] children, MenuItem parent = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -245,6 +253,11 @@ Initializes a new <a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarIt
         <td><a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a>[]</td>
         <td><span class="parametername">children</span></td>
         <td>The items in the current menu.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a></td>
+        <td><span class="parametername">parent</span></td>
+        <td>The parent <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a> of this if exist, otherwise is null.</td>
       </tr>
     </tbody>
   </table>
@@ -303,6 +316,140 @@ Gets or sets an array of <a class="xref" href="Terminal.Gui.MenuItem.html">MenuI
       <tr>
         <td><a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a>[]</td>
         <td>The children.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Terminal_Gui_MenuBarItem_GetChildrenIndex_" data-uid="Terminal.Gui.MenuBarItem.GetChildrenIndex*"></a>
+  <h4 id="Terminal_Gui_MenuBarItem_GetChildrenIndex_Terminal_Gui_MenuItem_" data-uid="Terminal.Gui.MenuBarItem.GetChildrenIndex(Terminal.Gui.MenuItem)">GetChildrenIndex(MenuItem)</h4>
+  <div class="markdown level1 summary">
+Get the index of the <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a> parameter.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int GetChildrenIndex(MenuItem children)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a></td>
+        <td><span class="parametername">children</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td>Returns a value bigger than -1 if the <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a> is a child of this.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_MenuBarItem_IsSubMenuOf_" data-uid="Terminal.Gui.MenuBarItem.IsSubMenuOf*"></a>
+  <h4 id="Terminal_Gui_MenuBarItem_IsSubMenuOf_Terminal_Gui_MenuItem_" data-uid="Terminal.Gui.MenuBarItem.IsSubMenuOf(Terminal.Gui.MenuItem)">IsSubMenuOf(MenuItem)</h4>
+  <div class="markdown level1 summary">
+Check if the <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a> parameter is a child of this.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsSubMenuOf(MenuItem menuItem)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a></td>
+        <td><span class="parametername">menuItem</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>Returns <code>true</code> if it is a child of this. <code>false</code> otherwise.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_MenuBarItem_SubMenu_" data-uid="Terminal.Gui.MenuBarItem.SubMenu*"></a>
+  <h4 id="Terminal_Gui_MenuBarItem_SubMenu_Terminal_Gui_MenuItem_" data-uid="Terminal.Gui.MenuBarItem.SubMenu(Terminal.Gui.MenuItem)">SubMenu(MenuItem)</h4>
+  <div class="markdown level1 summary">
+Check if the children parameter is a <a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MenuBarItem SubMenu(MenuItem children)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a></td>
+        <td><span class="parametername">children</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a></td>
+        <td>Returns a <a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a> or null otherwise.</td>
       </tr>
     </tbody>
   </table>
