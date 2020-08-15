@@ -5,13 +5,15 @@
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
     <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
-    <AssemblyVersion>0.89.0.0</AssemblyVersion>
+    <!-- moved to ../Directory.Build.props -->
+    <!-- <AssemblyVersion>0.89.0.0</AssemblyVersion> -->
   </PropertyGroup>
   <PropertyGroup>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <PackageId>Terminal.Gui</PackageId>
-    <PackageVersion>0.89</PackageVersion>
-    <Authors>Miguel de Icaza, Charlie Kindel (@tig), @BDisp</Authors>
+    <!-- moved to ../Directory.Build.props -->
+    <!-- <PackageVersion>0.89</PackageVersion> -->
+    <!-- <Authors>Miguel de Icaza, Charlie Kindel (@tig), @BDisp</Authors> -->
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/migueldeicaza/gui.cs/</PackageProjectUrl>
     <PackageTags>csharp, terminal, c#, f#, gui, toolkit, console</PackageTags>
