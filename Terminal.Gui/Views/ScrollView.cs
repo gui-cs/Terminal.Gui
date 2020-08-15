@@ -173,7 +173,10 @@ namespace Terminal.Gui {
 				} else {
 					bh -= 2;
 					var by1 = position * bh / Size;
-					var by2 = (position + bh) * bh / Size;
+					var by2 = Host.KeepContentAlwaysInViewport ? Math.Min (((position + bh) * bh / Size) + 1, bh - 1) : (position + bh) * bh / Size;
+					if (Host.KeepContentAlwaysInViewport && by1 == by2) {
+						by1 = Math.Max (by1 - 1, 0);
+					}
 
 					Move (col, 0);
 					Driver.AddRune (Driver.UpArrow);
@@ -196,7 +199,7 @@ namespace Terminal.Gui {
 									hasTopTee = true;
 									posTopTee = y;
 									special = Driver.TopTee;
-								} else if ((position == 0 &&  y == bh -1 || y >= by2 || by2 == 0) && !hasBottomTee) {
+								} else if ((position == 0 && y == bh - 1 || y >= by2 || by2 == 0) && !hasBottomTee) {
 									hasBottomTee = true;
 									posBottomTee = y;
 									special = Driver.BottomTee;
@@ -230,7 +233,10 @@ namespace Terminal.Gui {
 				} else {
 					bw -= 2;
 					var bx1 = position * bw / Size;
-					var bx2 = (position + bw) * bw / Size;
+					var bx2 = Host.KeepContentAlwaysInViewport ? Math.Min (((position + bw) * bw / Size) + 1, bw - 1) : (position + bw) * bw / Size;
+					if (Host.KeepContentAlwaysInViewport && bx1 == bx2) {
+						bx1 = Math.Max (bx1 - 1, 0);
+					}
 
 					Move (0, row);
 					Driver.AddRune (Driver.LeftArrow);
@@ -294,30 +300,20 @@ namespace Terminal.Gui {
 				if (Host.CanScroll (1, out _, vertical)) {
 					SetPosition (pos + 1);
 				}
-			} else {
+			} else if (location > 0 && location < barsize + 1) {
 				var b1 = pos * barsize / Size;
-				var b2 = (pos + barsize) * barsize / Size;
+				var b2 = Host.KeepContentAlwaysInViewport ? Math.Min (((pos + barsize) * barsize / Size) + 1, barsize - 1) : (pos + barsize) * barsize / Size;
+				if (Host.KeepContentAlwaysInViewport && b1 == b2) {
+					b1 = Math.Max (b1 - 1, 0);
+				}
 
-				if (b1 == 0 && location == 1 && pos == 0 || (location >= posTopLeftTee + 1 && location <= posBottomRightTee + 1 && location < Size && (pos != 0 || pos != Size - 1) && location != 1 && location != barsize) ||
-					(b2 == barsize + (b2 - b1 - 1) && location == barsize && pos == Size - 1)) {
-					return true;
-				} else if (location <= barsize) {
-					if (location > 1 && location > posTopLeftTee && location > b1 && location > posBottomRightTee && posBottomRightTee > 0) {
-						var n = Size / location;
-						if (pos < Size && n == 0) {
-							n = Size;
-						}
-						Host.CanScroll (n, out int nv, vertical);
-						if (nv > 0) {
-							SetPosition (Math.Min (pos + nv, Size));
-						}
-					} else if (location <= b2 && pos > 0 || pos > 0) {
-						var n = Size / barsize;
-						if (pos > 0 && n == 0) {
-							n = pos;
-						}
-						SetPosition (Math.Max (pos - n, 0));
+				if (location > b2 + 1 && location > posTopLeftTee && location > b1 && location > posBottomRightTee && posBottomRightTee > 0) {
+					Host.CanScroll (location, out int nv, vertical);
+					if (nv > 0) {
+						SetPosition (Math.Min (pos + nv, Size));
 					}
+				} else if (location <= b1) {
+					SetPosition (Math.Max (pos - barsize - location, 0));
 				}
 			}
 
@@ -408,16 +404,11 @@ namespace Terminal.Gui {
 				if (contentSize != value) {
 					contentSize = value;
 					contentView.Frame = new Rect (contentOffset, value);
-					UpdateSize ();
+					vertical.Size = contentSize.Height;
+					horizontal.Size = contentSize.Width;
 					SetNeedsDisplay ();
 				}
 			}
-		}
-
-		void UpdateSize ()
-		{
-			vertical.Size = keepContentAlwaysInViewport ? contentSize.Height - Bounds.Height + 1: contentSize.Height;
-			horizontal.Size = keepContentAlwaysInViewport ? contentSize.Width - Bounds.Width + 1 : contentSize.Width;
 		}
 
 		/// <summary>
@@ -450,8 +441,20 @@ namespace Terminal.Gui {
 			set {
 				if (keepContentAlwaysInViewport != value) {
 					keepContentAlwaysInViewport = value;
-					UpdateSize ();
-					SetNeedsDisplay ();
+					Point p = default;
+					if (value && -contentOffset.X + Bounds.Width > contentSize.Width) {
+						p = new Point (contentSize.Width - Bounds.Width + (showVerticalScrollIndicator ? 1 : 0), -contentOffset.Y);
+					}
+					if (value && -contentOffset.Y + Bounds.Height > contentSize.Height) {
+						if (p == default) {
+							p = new Point (-contentOffset.X, contentSize.Height - Bounds.Height + (showHorizontalScrollIndicator ? 1 : 0));
+						} else {
+							p.Y = contentSize.Height - Bounds.Height + (showHorizontalScrollIndicator ? 1 : 0);
+						}
+					}
+					if (p != default) {
+						ContentOffset = p;
+					}
 				}
 			}
 		}
@@ -718,7 +721,7 @@ namespace Terminal.Gui {
 			var cSize = isVertical ? -contentSize.Height : -contentSize.Width;
 			var cOffSet = isVertical ? contentOffset.Y : contentOffset.X;
 			var newSize = Math.Max (cSize, cOffSet - n);
-			max = cSize < newSize - size ? n : cSize + -(newSize - size);
+			max = cSize < newSize - size ? n : -cSize + (cOffSet - size) - 1;
 			if (cSize < newSize - size) {
 				return true;
 			}
