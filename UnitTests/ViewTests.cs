@@ -35,7 +35,7 @@ namespace Terminal.Gui {
 			Assert.Empty (r.Subviews);
 			Assert.False (r.WantContinuousButtonPressed);
 			Assert.False (r.WantMousePositionReports);
-			Assert.Null (r.GetEnumerator().Current);
+			Assert.Null (r.GetEnumerator ().Current);
 			Assert.Null (r.SuperView);
 			Assert.Null (r.MostFocused);
 
@@ -64,7 +64,7 @@ namespace Terminal.Gui {
 			Assert.Null (r.MostFocused);
 
 			// Rect with values
-			r = new View (new Rect(1, 2, 3, 4));
+			r = new View (new Rect (1, 2, 3, 4));
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 			Assert.Equal ("View()({X=1,Y=2,Width=3,Height=4})", r.ToString ());
@@ -115,7 +115,7 @@ namespace Terminal.Gui {
 			var sub1 = new View ();
 			root.Add (sub1);
 			var sub2 = new View ();
-			sub1.Width = Dim.Width(sub2);
+			sub1.Width = Dim.Width (sub2);
 
 			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
 
@@ -551,7 +551,7 @@ namespace Terminal.Gui {
 
 			var t = new Toplevel () { Id = "0", };
 
-			var w = new Window () {Id = "t", Width = Dim.Fill (), Height = Dim.Fill () };
+			var w = new Window () { Id = "t", Width = Dim.Fill (), Height = Dim.Fill () };
 			var v1 = new View () { Id = "v1", Width = Dim.Fill (), Height = Dim.Fill () };
 			var v2 = new View () { Id = "v2", Width = Dim.Fill (), Height = Dim.Fill () };
 			var sv1 = new View () { Id = "sv1", Width = Dim.Fill (), Height = Dim.Fill () };
@@ -893,6 +893,27 @@ namespace Terminal.Gui {
 				Assert.False (v1.CanFocus);
 				Assert.True (v2.CanFocus);
 			};
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+			Application.Shutdown ();
+		}
+
+
+		[Fact]
+		public void Navigation_With_Null_Focused_View ()
+		{
+			// Non-regression test for #882 (NullReferenceException during keyboard navigation when Focused is null)
+
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			Application.Top.Ready += () => {
+				Assert.Null (Application.Top.Focused);
+			};
+
+			// Keyboard navigation with tab
+			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('\t', ConsoleKey.Tab, false, false, false));
 
 			Application.Iteration += () => Application.RequestStop ();
 
