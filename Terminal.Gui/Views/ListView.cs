@@ -1,4 +1,4 @@
-﻿//
+//
 // ListView.cs: ListView control
 //
 // Authors:
@@ -448,8 +448,20 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool MoveDown ()
 		{
-			if (selected + 1 < source.Count) {
+			if (source.Count == 0){
+				// Do we set lastSelectedItem to zero here?
+                return false; //Nothing for us to move to
+            }
+			if (selected >= source.Count) { 
+				// If for some reason we are currently outside of the
+				// valid values range, we should select the bottommost valid value.
+				// This can occur if the backing data source changes.
+                selected = source.Count - 1;
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
+            } else if (selected + 1 < source.Count) { //can move by down by one.
 				selected++;
+
 				if (selected >= top + Frame.Height)
 					top++;
 				OnSelectedChanged ();
@@ -468,8 +480,22 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool MoveUp ()
 		{
-			if (selected > 0) {
+			if (source.Count == 0){
+				// Do we set lastSelectedItem to zero here?
+                return false; //Nothing for us to move to
+            }
+			if (selected >= source.Count) { 
+				// If for some reason we are currently outside of the
+				// valid values range, we should select the bottommost valid value.
+				// This can occur if the backing data source changes.
+                selected = source.Count - 1;
+				OnSelectedChanged ();
+				SetNeedsDisplay ();
+            } else if (selected > 0) {
 				selected--;
+				if (selected > Source.Count) {
+                    selected = Source.Count - 1;
+                }
 				if (selected < top)
 					top = selected;
 				OnSelectedChanged ();
