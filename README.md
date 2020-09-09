@@ -11,9 +11,9 @@ A simple toolkit for buiding console GUI apps for .NET, .NET Core, and Mono that
 
 ![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.gif)
 
-## IMPORTANT RELEASE INFO
+## RELEASE INFO
 
-We are actively converging on a major update to Terminal.Gui. The most recent released Nuget package is version `0.81` which is way behind `master`. This README and the API Documentation refers to the latest build from `master`. If you want the latest and greatest functionality, clone and build locally. Otherwise `0.81` is quite stable, but the documentation may not match.
+The most recent released Nuget package is version `0.90` which is the "Stable Feature Complete" pre-release of 1.0. If you want the latest and greatest functionality, clone and build locally.
 
 ## Controls & Features
 
