@@ -2,7 +2,7 @@
 
 A simple UI toolkit for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
 
-*We are actively converging on a major update to Terminal.Gui. The most recent released Nuget package is version `0.81` which is way behind `master`. This README and the API Documentation refers to the latest build from `master`. If you want the latest and greatest functionality, clone and build locally. Otherwise `0.81` is quite stable, but the documentation may not match.*
+*The most recent released Nuget package is version `0.90` which is the "Stable Feature Complete" pre-release of 1.0.*
 
 * [Terminal.Gui Project on GitHub](https://github.com/migueldeicaza/gui.cs)
 
