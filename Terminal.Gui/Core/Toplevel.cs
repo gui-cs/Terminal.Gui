@@ -215,6 +215,10 @@ namespace Terminal.Gui {
 
 		View GetDeepestFocusedSubview (View view)
 		{
+			if (view == null) {
+				return null;
+			}
+
 			foreach (var v in view.Subviews) {
 				if (v.HasFocus) {
 					return GetDeepestFocusedSubview (v);
