@@ -79,7 +79,7 @@ namespace Terminal.Gui {
 		public static View CurrentView { get; set; }
 
 		/// <summary>
-		/// The <see cref="MainLoop"/>  driver for the applicaiton
+		/// The <see cref="MainLoop"/>  driver for the application
 		/// </summary>
 		/// <value>The main loop.</value>
 		public static MainLoop MainLoop { get; private set; }
@@ -506,6 +506,7 @@ namespace Terminal.Gui {
 			MainLoop = null;
 			Driver?.End ();
 			Driver = null;
+			_initialized = false;
 		}
 
 		static void Redraw (View view)

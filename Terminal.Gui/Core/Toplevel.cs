@@ -182,7 +182,7 @@ namespace Terminal.Gui {
 			case Key.CursorRight:
 			case Key.CursorDown:
 			case Key.ControlI: // Unix
-				var old = Focused;
+				var old = GetDeepestFocusedSubview (Focused);
 				if (!FocusNext ())
 					FocusNext ();
 				if (old != Focused) {
@@ -195,7 +195,7 @@ namespace Terminal.Gui {
 			case Key.CursorLeft:
 			case Key.CursorUp:
 			case Key.BackTab:
-				old = Focused;
+				old = GetDeepestFocusedSubview (Focused);
 				if (!FocusPrev ())
 					FocusPrev ();
 				if (old != Focused) {
@@ -211,6 +211,20 @@ namespace Terminal.Gui {
 				return true;
 			}
 			return false;
+		}
+
+		View GetDeepestFocusedSubview (View view)
+		{
+			if (view == null) {
+				return null;
+			}
+
+			foreach (var v in view.Subviews) {
+				if (v.HasFocus) {
+					return GetDeepestFocusedSubview (v);
+				}
+			}
+			return view;
 		}
 
 		IEnumerable<View> GetToplevelSubviews (bool isForward)
@@ -253,26 +267,26 @@ namespace Terminal.Gui {
 		public override void Add (View view)
 		{
 			if (this == Application.Top) {
-				if (view is MenuBar)
-					MenuBar = view as MenuBar;
-				if (view is StatusBar)
-					StatusBar = view as StatusBar;
+				AddMenuStatusBar (view);
 			}
 			base.Add (view);
+		}
+
+		internal void AddMenuStatusBar (View view)
+		{
+			if (view is MenuBar) {
+				MenuBar = view as MenuBar;
+			}
+			if (view is StatusBar) {
+				StatusBar = view as StatusBar;
+			}
 		}
 
 		///<inheritdoc/>
 		public override void Remove (View view)
 		{
-			if (this is Toplevel && ((Toplevel)this).MenuBar != null) {
-				if (view is MenuBar) {
-					MenuBar?.Dispose ();
-					MenuBar = null;
-				}
-				if (view is StatusBar) {
-					StatusBar?.Dispose ();
-					StatusBar = null;
-				}
+			if (this is Toplevel toplevel && toplevel.MenuBar != null) {
+				RemoveMenuStatusBar (view);
 			}
 			base.Remove (view);
 		}
@@ -287,6 +301,18 @@ namespace Terminal.Gui {
 				StatusBar = null;
 			}
 			base.RemoveAll ();
+		}
+
+		internal void RemoveMenuStatusBar (View view)
+		{
+			if (view is MenuBar) {
+				MenuBar?.Dispose ();
+				MenuBar = null;
+			}
+			if (view is StatusBar) {
+				StatusBar?.Dispose ();
+				StatusBar = null;
+			}
 		}
 
 		internal void EnsureVisibleBounds (Toplevel top, int x, int y, out int nx, out int ny)
@@ -341,15 +367,16 @@ namespace Terminal.Gui {
 					top.Y = ny;
 				}
 			}
-			if (StatusBar != null) {
+			if (top.StatusBar != null) {
 				if (ny + top.Frame.Height > top.Frame.Height - 1) {
 					if (top.Height is Dim.DimFill)
 						top.Height = Dim.Fill () - 1;
 				}
-				if (StatusBar.Frame.Y != Frame.Height - 1) {
-					StatusBar.Y = Frame.Height - 1;
-					SetNeedsDisplay ();
+				if (top.StatusBar.Frame.Y != top.Frame.Height - 1) {
+					top.StatusBar.Y = top.Frame.Height - 1;
+					top.LayoutSubviews ();
 				}
+				top.BringSubviewToFront (top.StatusBar);
 			}
 		}
 

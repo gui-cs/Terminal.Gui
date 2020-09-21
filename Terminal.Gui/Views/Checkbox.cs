@@ -150,7 +150,7 @@ namespace Terminal.Gui {
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) || !CanFocus)
 				return false;
 
-			SuperView.SetFocus (this);
+			SetFocus ();
 			var previousChecked = Checked;
 			Checked = !Checked;
 			OnToggled (previousChecked);

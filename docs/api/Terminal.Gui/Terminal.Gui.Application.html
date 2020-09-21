@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Application
    ">
-    <meta name="generator" content="docfx 2.56.1.0">
+    <meta name="generator" content="docfx 2.56.2.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -375,7 +375,7 @@ TThe current <a class="xref" href="Terminal.Gui.View.html">View</a> object being
   <a id="Terminal_Gui_Application_MainLoop_" data-uid="Terminal.Gui.Application.MainLoop*"></a>
   <h4 id="Terminal_Gui_Application_MainLoop" data-uid="Terminal.Gui.Application.MainLoop">MainLoop</h4>
   <div class="markdown level1 summary">
-The <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_MainLoop">MainLoop</a>  driver for the applicaiton
+The <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_MainLoop">MainLoop</a>  driver for the application
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -466,7 +466,7 @@ Building block API: Prepares the provided <a class="xref" href="Terminal.Gui.Top
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a></td>
-        <td>The runstate handle that needs to be passed to the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_System_Boolean_">End(Application.RunState, Boolean)</a> method upon completion.</td>
+        <td>The runstate handle that needs to be passed to the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_">End(Application.RunState)</a> method upon completion.</td>
       </tr>
     </tbody>
   </table>
@@ -476,20 +476,20 @@ This method prepares the provided toplevel for running with the focus,
 it adds this to the list of toplevels, sets up the mainloop to process the
 event, lays out the subviews, focuses the first element, and draws the
 toplevel in the screen. This is usually followed by executing
-the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_">RunLoop(Application.RunState, Boolean)</a> method, and then the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_System_Boolean_">End(Application.RunState, Boolean)</a> method upon termination which will
+the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_">RunLoop(Application.RunState, Boolean)</a> method, and then the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_">End(Application.RunState)</a> method upon termination which will
 undo these changes.
 </div>
   
   
   <a id="Terminal_Gui_Application_End_" data-uid="Terminal.Gui.Application.End*"></a>
-  <h4 id="Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_System_Boolean_" data-uid="Terminal.Gui.Application.End(Terminal.Gui.Application.RunState,System.Boolean)">End(Application.RunState, Boolean)</h4>
+  <h4 id="Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_" data-uid="Terminal.Gui.Application.End(Terminal.Gui.Application.RunState)">End(Application.RunState)</h4>
   <div class="markdown level1 summary">
 Building block API: completes the execution of a <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a>  that was started with <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_">Begin(Toplevel)</a> .
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static void End(Application.RunState runState, bool closeDriver = true)</code></pre>
+    <pre><code class="lang-csharp hljs">public static void End(Application.RunState runState)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -505,11 +505,6 @@ Building block API: completes the execution of a <a class="xref" href="Terminal.
         <td><a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a></td>
         <td><span class="parametername">runState</span></td>
         <td>The runstate returned by the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_">Begin(Toplevel)</a> method.</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">closeDriver</span></td>
-        <td>If <code>true</code>, closes the application. If <code>false</code> closes the toplevels only.</td>
       </tr>
     </tbody>
   </table>
@@ -579,7 +574,7 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.html">Terminal.
   <h5 id="Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver__remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 <p>
-Call this method once per instance (or after <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Shutdown_System_Boolean_">Shutdown(Boolean)</a> has been called).
+Call this method once per instance (or after <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Shutdown">Shutdown()</a> has been called).
 </p>
 <p>
 Loads the right <a class="xref" href="Terminal.Gui.ConsoleDriver.html">ConsoleDriver</a> for the platform.
@@ -670,7 +665,7 @@ This will cause <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui
   <a id="Terminal_Gui_Application_Run_" data-uid="Terminal.Gui.Application.Run*"></a>
   <h4 id="Terminal_Gui_Application_Run" data-uid="Terminal.Gui.Application.Run">Run()</h4>
   <div class="markdown level1 summary">
-Runs the application by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Boolean_">Run(Toplevel, Boolean)</a> with the value of <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Top">Top</a>
+Runs the application by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_">Run(Toplevel)</a> with the value of <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Top">Top</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -680,14 +675,14 @@ Runs the application by calling <a class="xref" href="Terminal.Gui.Application.h
   
   
   <a id="Terminal_Gui_Application_Run_" data-uid="Terminal.Gui.Application.Run*"></a>
-  <h4 id="Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Boolean_" data-uid="Terminal.Gui.Application.Run(Terminal.Gui.Toplevel,System.Boolean)">Run(Toplevel, Boolean)</h4>
+  <h4 id="Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_" data-uid="Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)">Run(Toplevel)</h4>
   <div class="markdown level1 summary">
 Runs the main loop on the given <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> container.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static void Run(Toplevel view, bool closeDriver = true)</code></pre>
+    <pre><code class="lang-csharp hljs">public static void Run(Toplevel view)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -704,14 +699,9 @@ Runs the main loop on the given <a class="xref" href="Terminal.Gui.Toplevel.html
         <td><span class="parametername">view</span></td>
         <td>The <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> tu run modally.</td>
       </tr>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">closeDriver</span></td>
-        <td>Set to <true></true> to cause the MainLoop to end when <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_System_Boolean_">End(Application.RunState, Boolean)</a> is called, clsing the toplevels only.</td>
-      </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Boolean__remarks">Remarks</h5>
+  <h5 id="Terminal_Gui_Application_Run_Terminal_Gui_Toplevel__remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 <p>
   This method is used to start processing events
@@ -719,11 +709,11 @@ Runs the main loop on the given <a class="xref" href="Terminal.Gui.Toplevel.html
   run other modal <a class="xref" href="Terminal.Gui.View.html">View</a>s such as <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> boxes.
 </p>
 <p>
-  To make a <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Boolean_">Run(Toplevel, Boolean)</a> stop execution, call <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop">RequestStop()</a>.
+  To make a <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_">Run(Toplevel)</a> stop execution, call <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop">RequestStop()</a>.
 </p>
 <p>
-  Calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Boolean_">Run(Toplevel, Boolean)</a> is equivalent to calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_">Begin(Toplevel)</a>, followed by <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_">RunLoop(Application.RunState, Boolean)</a>,
-  and then calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_System_Boolean_">End(Application.RunState, Boolean)</a>.
+  Calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_">Run(Toplevel)</a> is equivalent to calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_">Begin(Toplevel)</a>, followed by <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_">RunLoop(Application.RunState, Boolean)</a>,
+  and then calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_">End(Application.RunState)</a>.
 </p>
 <p>
   Alternatively, to have a program control the main loop and 
@@ -738,13 +728,12 @@ Runs the main loop on the given <a class="xref" href="Terminal.Gui.Toplevel.html
   <a id="Terminal_Gui_Application_Run_" data-uid="Terminal.Gui.Application.Run*"></a>
   <h4 id="Terminal_Gui_Application_Run__1" data-uid="Terminal.Gui.Application.Run``1">Run&lt;T&gt;()</h4>
   <div class="markdown level1 summary">
-Runs the application by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Boolean_">Run(Toplevel, Boolean)</a> with a new instance of the specified <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a>-derived class
+Runs the application by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_">Run(Toplevel)</a> with a new instance of the specified <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a>-derived class
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static void Run&lt;T&gt;()
-
     where T : Toplevel, new()</code></pre>
   </div>
   <h5 class="typeParameters">Type Parameters</h5>
@@ -804,32 +793,15 @@ blocking or non-blocking call.
   
   
   <a id="Terminal_Gui_Application_Shutdown_" data-uid="Terminal.Gui.Application.Shutdown*"></a>
-  <h4 id="Terminal_Gui_Application_Shutdown_System_Boolean_" data-uid="Terminal.Gui.Application.Shutdown(System.Boolean)">Shutdown(Boolean)</h4>
+  <h4 id="Terminal_Gui_Application_Shutdown" data-uid="Terminal.Gui.Application.Shutdown">Shutdown()</h4>
   <div class="markdown level1 summary">
 Shutdown an application initialized with <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_">Init(ConsoleDriver, IMainLoopDriver)</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static void Shutdown(bool closeDriver = true)</code></pre>
+    <pre><code class="lang-csharp hljs">public static void Shutdown()</code></pre>
   </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">closeDriver</span></td>
-        <td><code>true</code>Closes the application.<code>false</code>Closes toplevels only.</td>
-      </tr>
-    </tbody>
-  </table>
   
   
   <a id="Terminal_Gui_Application_UngrabMouse_" data-uid="Terminal.Gui.Application.UngrabMouse*"></a>

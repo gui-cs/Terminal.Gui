@@ -253,12 +253,7 @@ static class Demo {
 		});
 		ntop.Add (menu);
 
-		string fname = null;
-		foreach (var s in new [] { "/etc/passwd", "c:\\windows\\win.ini" })
-			if (System.IO.File.Exists (s)) {
-				fname = s;
-				break;
-			}
+		string fname = GetFileName ();
 
 		var win = new Window (fname ?? "Untitled") {
 			X = 0,
@@ -275,6 +270,18 @@ static class Demo {
 		win.Add (text);
 
 		Application.Run (ntop);
+	}
+
+	private static string GetFileName ()
+	{
+		string fname = null;
+		foreach (var s in new [] { "/etc/passwd", "c:\\windows\\win.ini" })
+			if (System.IO.File.Exists (s)) {
+				fname = s;
+				break;
+			}
+
+		return fname;
 	}
 
 	static bool Quit ()
@@ -298,7 +305,7 @@ static class Demo {
 		Application.Run (d);
 
 		if (!d.Canceled)
-			MessageBox.Query (50, 7, "Selected File", string.Join (", ", d.FilePaths), "Ok");
+			MessageBox.Query (50, 7, "Selected File", d.FilePaths.Count > 0 ? string.Join (", ", d.FilePaths) : d.FilePath, "Ok");
 	}
 
 	public static void ShowHex (Toplevel top)
@@ -312,7 +319,8 @@ static class Demo {
 		});
 		ntop.Add (menu);
 
-		var win = new Window ("/etc/passwd") {
+		string fname = GetFileName ();
+		var win = new Window (fname) {
 			X = 0,
 			Y = 1,
 			Width = Dim.Fill (),
@@ -320,7 +328,7 @@ static class Demo {
 		};
 		ntop.Add (win);
 
-		var source = System.IO.File.OpenRead ("/etc/passwd");
+		var source = System.IO.File.OpenRead (fname);
 		var hex = new HexView (source) {
 			X = 0,
 			Y = 0,
@@ -578,7 +586,7 @@ static class Demo {
 			new MenuItemDetails ("F_ind", "", null),
 			new MenuItemDetails ("_Replace", "", null),
 			new MenuItemDetails ("_Item1", "", null),
-			new MenuItemDetails ("_Not From Sub Menu", "", null)
+			new MenuItemDetails ("_Also From Sub Menu", "", null)
 		};
 
 		menuItems [0].Action = () => ShowMenuItem (menuItems [0]);
@@ -601,8 +609,8 @@ static class Demo {
 				new MenuItem ("_Copy", "", Copy),
 				new MenuItem ("C_ut", "", Cut),
 				new MenuItem ("_Paste", "", Paste),
-				new MenuItem ("_Find and Replace",
-					new MenuBarItem (new MenuItem[] {menuItems [0], menuItems [1] })),
+				new MenuBarItem ("_Find and Replace",
+					new MenuItem [] { menuItems [0], menuItems [1] }),
 				menuItems[3]
 			}),
 			new MenuBarItem ("_List Demos", new MenuItem [] {
@@ -614,18 +622,13 @@ static class Demo {
 				new MenuItem ("_Show text alignments", "", () => ShowTextAlignments ()),
 				new MenuItem ("_OnKeyDown/Press/Up", "", () => OnKeyDownPressUpDemo ())
 			}),
-			new MenuBarItem ("_Test Menu and SubMenus", new MenuItem [] {
-				new MenuItem ("SubMenu1Item_1",
-					new MenuBarItem (new MenuItem[] {
-						new MenuItem ("SubMenu2Item_1",
-							new MenuBarItem (new MenuItem [] {
-								new MenuItem ("SubMenu3Item_1",
-									new MenuBarItem (new MenuItem [] { menuItems [2] })
-								)
-							})
-						)
+			new MenuBarItem ("_Test Menu and SubMenus", new MenuBarItem [] {
+				new MenuBarItem ("SubMenu1Item_1",  new MenuBarItem [] {
+					new MenuBarItem ("SubMenu2Item_1", new MenuBarItem [] {
+						new MenuBarItem ("SubMenu3Item_1",
+							new MenuItem [] { menuItems [2] })
 					})
-				)
+				})
 			}),
 			new MenuBarItem ("_About...", "Demonstrates top-level menu item", () =>  MessageBox.ErrorQuery (50, 7, "About Demo", "This is a demo app for gui.cs", "Ok")),
 		});
@@ -647,7 +650,7 @@ static class Demo {
 		win.Add (test);
 		win.Add (ml);
 
-		var drag = new Label ("Drag: ") { X = 70, Y = 24 };
+		var drag = new Label ("Drag: ") { X = 70, Y = 22 };
 		var dragText = new TextField ("") {
 			X = Pos.Right (drag),
 			Y = Pos.Top (drag),

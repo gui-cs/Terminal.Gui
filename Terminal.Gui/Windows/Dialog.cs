@@ -94,7 +94,7 @@ namespace Terminal.Gui {
 		public Dialog (ustring title, params Button [] buttons) : this (title: title, width: 0, height: 0, buttons: buttons) { }
 
 		/// <summary>
-		/// Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controled by the <see cref="Dialog"/>
+		/// Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the <see cref="Dialog"/>
 		/// </summary>
 		/// <param name="button">Button to add.</param>
 		public void AddButton (Button button)

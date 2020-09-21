@@ -154,7 +154,7 @@ namespace Terminal.Gui {
 		bool CheckKey (KeyEvent key)
 		{
 			if (key.Key == (Key.AltMask | HotKey)) {
-				this.SuperView.SetFocus (this);
+				SetFocus ();
 				Clicked?.Invoke ();
 				return true;
 			}
@@ -210,7 +210,7 @@ namespace Terminal.Gui {
 				me.Flags == MouseFlags.Button1TripleClicked) {
 				if (CanFocus) {
 					if (!HasFocus) {
-						SuperView?.SetFocus (this);
+						SetFocus ();
 						SetNeedsDisplay ();
 					}
 					Clicked?.Invoke ();
@@ -219,6 +219,20 @@ namespace Terminal.Gui {
 				return true;
 			}
 			return false;
+		}
+
+		///<inheritdoc/>
+		public override void PositionCursor ()
+		{
+			if (HotKey == Key.Unknown) {
+				for (int i = 0; i < base.Text.RuneCount; i++) {
+					if (base.Text [i] == text [0]) {
+						Move (i, 0);
+						return;
+					}
+				}
+			}
+			base.PositionCursor ();
 		}
 	}
 }

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class DateField
    ">
-    <meta name="generator" content="docfx 2.56.1.0">
+    <meta name="generator" content="docfx 2.56.2.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -330,7 +330,7 @@ Simple Date editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus_Terminal_Gui_View_">View.SetFocus(View)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
@@ -406,6 +406,9 @@ Simple Date editing <a class="xref" href="Terminal.Gui.View.html">View</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -623,7 +626,9 @@ Get or set the date format for the widget.
   
   <a id="Terminal_Gui_DateField_MouseEvent_" data-uid="Terminal.Gui.DateField.MouseEvent*"></a>
   <h4 id="Terminal_Gui_DateField_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.DateField.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a mouse event is generated
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -657,7 +662,7 @@ Get or set the date format for the widget.
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -696,7 +701,9 @@ Event firing method for the <a class="xref" href="Terminal.Gui.DateField.html#Te
   
   <a id="Terminal_Gui_DateField_ProcessKey_" data-uid="Terminal.Gui.DateField.ProcessKey*"></a>
   <h4 id="Terminal_Gui_DateField_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.DateField.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Processes key presses for the <a class="xref" href="Terminal.Gui.TextField.html">TextField</a>.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -736,6 +743,11 @@ Event firing method for the <a class="xref" href="Terminal.Gui.DateField.html#Te
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_ProcessKey_Terminal_Gui_KeyEvent_">TextField.ProcessKey(KeyEvent)</a></div>
+  <h5 id="Terminal_Gui_DateField_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+The <a class="xref" href="Terminal.Gui.TextField.html">TextField</a> control responds to the following keys:
+<table><thead><tr><th>Keys</th><th>Function</th></tr></thead><tbody><tr><td><a class="xref" href="Terminal.Gui.Key.html#Terminal_Gui_Key_Delete">Delete</a>, <a class="xref" href="Terminal.Gui.Key.html#Terminal_Gui_Key_Backspace">Backspace</a></td><td>Deletes the character before cursor.</td></tr></tbody></table>
+</div>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>

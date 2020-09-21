@@ -156,14 +156,14 @@ namespace UICatalog {
 			/// Static helper function to get the <see cref="Scenario"/> Name given a Type
 			/// </summary>
 			/// <param name="t"></param>
-			/// <returns>Name of the catagory</returns>
+			/// <returns>Name of the category</returns>
 			public static string GetName (Type t) => ((ScenarioCategory)System.Attribute.GetCustomAttributes (t) [0]).Name;
 
 			/// <summary>
 			/// Static helper function to get the <see cref="Scenario"/> Categories given a Type
 			/// </summary>
 			/// <param name="t"></param>
-			/// <returns>list of catagory names</returns>
+			/// <returns>list of category names</returns>
 			public static List<string> GetCategories (Type t) => System.Attribute.GetCustomAttributes (t)
 				.ToList ()
 				.Where (a => a is ScenarioCategory)
@@ -174,7 +174,7 @@ namespace UICatalog {
 		/// <summary>
 		/// Helper function to get the list of categories a <see cref="Scenario"/> belongs to (defined in <see cref="ScenarioCategory"/>)
 		/// </summary>
-		/// <returns>list of catagory names</returns>
+		/// <returns>list of category names</returns>
 		public List<string> GetCategories () => ScenarioCategory.GetCategories (this.GetType ());
 
 		/// <inheritdoc/>

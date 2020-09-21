@@ -196,7 +196,7 @@ namespace Terminal.Gui {
 				return true;
 			} else if (me.Flags == MouseFlags.Button1Pressed) {
 				if (!search.HasFocus) {
-					SetFocus (search);
+					search.SetFocus ();
 				}
 
 				return true;
@@ -210,7 +210,7 @@ namespace Terminal.Gui {
 			listview.SelectedItem = SelectedItem > -1 ? SelectedItem : 0;
 			if (SelectedItem > -1) {
 				listview.TabStop = true;
-				this.SetFocus (listview);
+				listview.SetFocus ();
 			}
 		}
 
@@ -218,7 +218,7 @@ namespace Terminal.Gui {
 		public override bool OnEnter (View view)
 		{
 			if (!search.HasFocus && !listview.HasFocus) {
-				SetFocus (search);
+				search.SetFocus ();
 			}
 
 			search.CursorPosition = search.Text.RuneCount;
@@ -301,7 +301,7 @@ namespace Terminal.Gui {
 			if (e.Key == Key.CursorDown && search.HasFocus) { // jump to list
 				if (searchset.Count > 0) {
 					listview.TabStop = true;
-					this.SetFocus (listview);
+					listview.SetFocus ();
 					SetValue (searchset [listview.SelectedItem]);
 					return true;
 				} else {
@@ -317,7 +317,7 @@ namespace Terminal.Gui {
 			if (e.Key == Key.CursorUp && listview.HasFocus && listview.SelectedItem == 0 && searchset.Count > 0) // jump back to search
 			{
 				search.CursorPosition = search.Text.RuneCount;
-				this.SetFocus (search);
+				search.SetFocus ();
 				return true;
 			}
 
@@ -350,7 +350,7 @@ namespace Terminal.Gui {
 			}
 
 			if (e.Key == Key.Esc) {
-				this.SetFocus (search);
+				search.SetFocus ();
 				search.Text = text = "";
 				OnSelectedChanged ();
 				return true;
@@ -431,7 +431,7 @@ namespace Terminal.Gui {
 			listview.Height = CalculatetHeight ();
 
 			if (Subviews.Count > 0) {
-				SetFocus (search);
+				search.SetFocus ();
 			}
 		}
 
@@ -499,6 +499,7 @@ namespace Terminal.Gui {
 		private void HideList ()
 		{
 			Reset (SelectedItem > -1);
+			listview.Clear ();
 			listview.TabStop = false;
 		}
 

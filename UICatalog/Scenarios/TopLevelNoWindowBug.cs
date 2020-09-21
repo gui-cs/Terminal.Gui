@@ -10,14 +10,14 @@ namespace UICatalog {
 		{
 			Top?.Dispose ();
 
-			Top = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
+			//Top = new Toplevel (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_Файл", new MenuItem [] {
 					new MenuItem ("_Создать", "Creates new file", null),
 					new MenuItem ("_Открыть", "", null),
 					new MenuItem ("Со_хранить", "", null),
-					new MenuItem ("_Выход", "", () => Application.RequestStop())
+					new MenuItem ("_Выход", "", () => { if (Quit ()) { Application.RequestStop(); } })
 				}),
 				new MenuBarItem ("_Edit", new MenuItem [] {
 					new MenuItem ("_Copy", "", null),
@@ -28,15 +28,21 @@ namespace UICatalog {
 			Top.Add (menu);
 
 			// BUGBUG: #437 This being commented out causes menu to mis-behave
-			//var win = new Window ($"Scenario: {GetName ()}") {
-			//	X = 0,
-			//	Y = 1,
-			//	Width = Dim.Fill (),
-			//	Height = Dim.Fill ()
-			//};
-			//ntop.Add (win);
+			var win = new Window ($"Scenario: {GetName ()}") {
+				X = 0,
+				Y = 1,
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			Top.Add (win);
 
 			base.Run ();
+		}
+
+		private bool Quit ()
+		{
+			var n = MessageBox.Query (50, 7, $"Quit {GetName ()}", $"Are you sure you want to quit this {GetName ()}?", "Yes", "No");
+			return n == 0;
 		}
 	}
 }

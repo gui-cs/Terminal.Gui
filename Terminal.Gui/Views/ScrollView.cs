@@ -74,6 +74,11 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Get or sets the view that host this <see cref="ScrollView"/>
+		/// </summary>
+		public ScrollView Host { get; internal set; }
+
 		void SetPosition (int newPos)
 		{
 			Position = newPos;
@@ -168,7 +173,10 @@ namespace Terminal.Gui {
 				} else {
 					bh -= 2;
 					var by1 = position * bh / Size;
-					var by2 = (position + bh) * bh / Size;
+					var by2 = Host.KeepContentAlwaysInViewport ? Math.Min (((position + bh) * bh / Size) + 1, bh - 1) : (position + bh) * bh / Size;
+					if (Host.KeepContentAlwaysInViewport && by1 == by2) {
+						by1 = Math.Max (by1 - 1, 0);
+					}
 
 					Move (col, 0);
 					Driver.AddRune (Driver.UpArrow);
@@ -191,7 +199,7 @@ namespace Terminal.Gui {
 									hasTopTee = true;
 									posTopTee = y;
 									special = Driver.TopTee;
-								} else if ((y >= by2 || by2 == 0) && !hasBottomTee) {
+								} else if ((position == 0 && y == bh - 1 || y >= by2 || by2 == 0) && !hasBottomTee) {
 									hasBottomTee = true;
 									posBottomTee = y;
 									special = Driver.BottomTee;
@@ -225,7 +233,10 @@ namespace Terminal.Gui {
 				} else {
 					bw -= 2;
 					var bx1 = position * bw / Size;
-					var bx2 = (position + bw) * bw / Size;
+					var bx2 = Host.KeepContentAlwaysInViewport ? Math.Min (((position + bw) * bw / Size) + 1, bw - 1) : (position + bw) * bw / Size;
+					if (Host.KeepContentAlwaysInViewport && bx1 == bx2) {
+						bx1 = Math.Max (bx1 - 1, 0);
+					}
 
 					Move (0, row);
 					Driver.AddRune (Driver.LeftArrow);
@@ -245,7 +256,7 @@ namespace Terminal.Gui {
 									hasLeftTee = true;
 									posLeftTee = x;
 									special = Driver.LeftTee;
-								} else if ((x >= bx2 || bx2 == 0) && !hasRightTee) {
+								} else if ((position == 0 && x == bw - 1 || x >= bx2 || bx2 == 0) && !hasRightTee) {
 									hasRightTee = true;
 									posRightTee = x;
 									special = Driver.RightTee;
@@ -270,8 +281,9 @@ namespace Terminal.Gui {
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
-				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
+				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
 				return false;
+			}
 
 			int location = vertical ? me.Y : me.X;
 			int barsize = vertical ? Bounds.Height : Bounds.Width;
@@ -281,23 +293,27 @@ namespace Terminal.Gui {
 			barsize -= 2;
 			var pos = Position;
 			if (location == 0) {
-				if (pos > 0)
+				if (pos > 0) {
 					SetPosition (pos - 1);
+				}
 			} else if (location == barsize + 1) {
-				if (pos + 1 < Size)
+				if (Host.CanScroll (1, out _, vertical)) {
 					SetPosition (pos + 1);
-			} else {
+				}
+			} else if (location > 0 && location < barsize + 1) {
 				var b1 = pos * barsize / Size;
-				var b2 = (pos + barsize) * barsize / Size;
+				var b2 = Host.KeepContentAlwaysInViewport ? Math.Min (((pos + barsize) * barsize / Size) + 1, barsize - 1) : (pos + barsize) * barsize / Size;
+				if (Host.KeepContentAlwaysInViewport && b1 == b2) {
+					b1 = Math.Max (b1 - 1, 0);
+				}
 
-				if (b1 == 0 && location == 1 && pos == 0 || (location >= posTopLeftTee + 1 && location <= posBottomRightTee + 1 && (pos != 0 || pos != Size - 1) && location != 1 && location != barsize) ||
-					(b2 == barsize + (b2 - b1 - 1) && location == barsize && pos == Size - 1)) {
-					return true;
-				} else if (location <= barsize) {
-					if (location > 1 && location > posTopLeftTee && location > posBottomRightTee)
-						SetPosition (Math.Min (pos + (Size / location), Size - 1));
-					else if (location <= b2 && pos > 0 || pos > 0)
-						SetPosition (Math.Max (pos - (Size / barsize), 0));
+				if (location > b2 + 1 && location > posTopLeftTee && location > b1 && location > posBottomRightTee && posBottomRightTee > 0) {
+					Host.CanScroll (location, out int nv, vertical);
+					if (nv > 0) {
+						SetPosition (Math.Min (pos + nv, Size));
+					}
+				} else if (location <= b1) {
+					SetPosition (Math.Max (pos - barsize - location, 0));
 				}
 			}
 
@@ -352,6 +368,7 @@ namespace Terminal.Gui {
 			vertical.ChangedPosition += delegate {
 				ContentOffset = new Point (ContentOffset.X, vertical.Position);
 			};
+			vertical.Host = this;
 			horizontal = new ScrollBarView (1, 0, isVertical: false) {
 				X = 0,
 				Y = Pos.AnchorEnd (1),
@@ -361,6 +378,7 @@ namespace Terminal.Gui {
 			horizontal.ChangedPosition += delegate {
 				ContentOffset = new Point (horizontal.Position, ContentOffset.Y);
 			};
+			horizontal.Host = this;
 			base.Add (contentView);
 			CanFocus = true;
 
@@ -372,6 +390,7 @@ namespace Terminal.Gui {
 		Point contentOffset;
 		bool showHorizontalScrollIndicator;
 		bool showVerticalScrollIndicator;
+		bool keepContentAlwaysInViewport = true;
 
 		/// <summary>
 		/// Represents the contents of the data shown inside the scrolview
@@ -382,11 +401,13 @@ namespace Terminal.Gui {
 				return contentSize;
 			}
 			set {
-				contentSize = value;
-				contentView.Frame = new Rect (contentOffset, value);
-				vertical.Size = contentSize.Height;
-				horizontal.Size = contentSize.Width;
-				SetNeedsDisplay ();
+				if (contentSize != value) {
+					contentSize = value;
+					contentView.Frame = new Rect (contentOffset, value);
+					vertical.Size = contentSize.Height;
+					horizontal.Size = contentSize.Width;
+					SetNeedsDisplay ();
+				}
 			}
 		}
 
@@ -411,6 +432,32 @@ namespace Terminal.Gui {
 		/// If true the vertical/horizontal scroll bars won't be showed if it's not needed.
 		/// </summary>
 		public bool AutoHideScrollBars { get; set; } = true;
+
+		/// <summary>
+		/// Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollView"/>
+		/// </summary>
+		public bool KeepContentAlwaysInViewport {
+			get { return keepContentAlwaysInViewport; }
+			set {
+				if (keepContentAlwaysInViewport != value) {
+					keepContentAlwaysInViewport = value;
+					Point p = default;
+					if (value && -contentOffset.X + Bounds.Width > contentSize.Width) {
+						p = new Point (contentSize.Width - Bounds.Width + (showVerticalScrollIndicator ? 1 : 0), -contentOffset.Y);
+					}
+					if (value && -contentOffset.Y + Bounds.Height > contentSize.Height) {
+						if (p == default) {
+							p = new Point (-contentOffset.X, contentSize.Height - Bounds.Height + (showHorizontalScrollIndicator ? 1 : 0));
+						} else {
+							p.Y = contentSize.Height - Bounds.Height + (showHorizontalScrollIndicator ? 1 : 0);
+						}
+					}
+					if (p != default) {
+						ContentOffset = p;
+					}
+				}
+			}
+		}
 
 		/// <summary>
 		/// Adds the view to the scrollview.
@@ -447,7 +494,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the visibility for the horizontal scroll indicator.
 		/// </summary>
-		/// <value><c>true</c> if show vertical scroll indicator; otherwise, <c>false</c>.</value>
+		/// <value><c>true</c> if show horizontal scroll indicator; otherwise, <c>false</c>.</value>
 		public bool ShowHorizontalScrollIndicator {
 			get => showHorizontalScrollIndicator;
 			set {
@@ -645,11 +692,11 @@ namespace Terminal.Gui {
 		/// <param name="lines">Number of lines to scroll.</param>
 		public bool ScrollDown (int lines)
 		{
-			var ny = Math.Max (-contentSize.Height, contentOffset.Y - lines);
-			if (ny == contentOffset.Y)
-				return false;
-			ContentOffset = new Point (contentOffset.X, ny);
-			return true;
+			if (CanScroll (lines, out _, true)) {
+				ContentOffset = new Point (contentOffset.X, contentOffset.Y - lines);
+				return true;
+			}
+			return false;
 		}
 
 		/// <summary>
@@ -659,12 +706,26 @@ namespace Terminal.Gui {
 		/// <param name="cols">Number of columns to scroll by.</param>
 		public bool ScrollRight (int cols)
 		{
-			var nx = Math.Max (-contentSize.Width, contentOffset.X - cols);
-			if (nx == contentOffset.X)
-				return false;
+			if (CanScroll (cols, out _)) {
+				ContentOffset = new Point (contentOffset.X - cols, contentOffset.Y);
+				return true;
+			}
+			return false;
+		}
 
-			ContentOffset = new Point (nx, contentOffset.Y);
-			return true;
+		internal bool CanScroll (int n, out int max, bool isVertical = false)
+		{
+			var size = isVertical ?
+				(KeepContentAlwaysInViewport ? Bounds.Height + (showHorizontalScrollIndicator ? -2 : -1) : 0) :
+				(KeepContentAlwaysInViewport ? Bounds.Width + (showVerticalScrollIndicator ? -2 : -1) : 0);
+			var cSize = isVertical ? -contentSize.Height : -contentSize.Width;
+			var cOffSet = isVertical ? contentOffset.Y : contentOffset.X;
+			var newSize = Math.Max (cSize, cOffSet - n);
+			max = cSize < newSize - size ? n : -cSize + (cOffSet - size) - 1;
+			if (cSize < newSize - size) {
+				return true;
+			}
+			return false;
 		}
 
 		///<inheritdoc/>

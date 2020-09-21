@@ -16,7 +16,7 @@ namespace Terminal.Gui {
 	/// The Label <see cref="View"/> displays a string at a given position and supports multiple lines separted by newline characters. Multi-line Labels support word wrap.
 	/// </summary>
 	/// <remarks>
-	/// The <see cref="Label"/> view is functionality identical to <see cref="View"/> and is included for API backwards compatibilty.
+	/// The <see cref="Label"/> view is functionality identical to <see cref="View"/> and is included for API backwards compatibility.
 	/// </remarks>
 	public class Label : View {
 		/// <inheritdoc/>
@@ -87,7 +87,7 @@ namespace Terminal.Gui {
 
 			if (mouseEvent.Flags == MouseFlags.Button1Clicked) {
 				if (!HasFocus && SuperView != null) {
-					SuperView.SetFocus (this);
+					SetFocus ();
 					SetNeedsDisplay ();
 				}
 

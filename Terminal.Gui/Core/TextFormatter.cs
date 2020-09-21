@@ -28,7 +28,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Provides text formatting capabilites for console apps. Supports, hotkeys, horizontal alignment, multille lines, and word-based line wrap.
+	/// Provides text formatting capabilities for console apps. Supports, hotkeys, horizontal alignment, multille lines, and word-based line wrap.
 	/// </summary>
 	public class TextFormatter {
 		List<ustring> lines = new List<ustring> ();
@@ -47,7 +47,7 @@ namespace Terminal.Gui {
 			set {
 				text = value;
 
-				if (Size.IsEmpty) {
+				if (text.RuneCount > 0 && (Size.Width == 0 || Size.Height == 0 || Size.Width != text.RuneCount)) {
 					// Proivde a default size (width = length of longest line, height = 1)
 					// TODO: It might makem more sense for the default to be width = length of first line?
 					Size = new Size (TextFormatter.MaxWidth (Text, int.MaxValue), 1);
@@ -383,7 +383,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Computes the maximum width needed to render the text (single line or multple lines) given a minimium width.
+		/// Computes the maximum width needed to render the text (single line or multple lines) given a minimum width.
 		/// </summary>
 		/// <returns>Max width of lines.</returns>
 		/// <param name="text">Text, may contain newlines.</param>
@@ -396,7 +396,7 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		///  Calculates the rectangle requried to hold text, assuming no word wrapping.
+		///  Calculates the rectangle required to hold text, assuming no word wrapping.
 		/// </summary>
 		/// <param name="x">The x location of the rectangle</param>
 		/// <param name="y">The y location of the rectangle</param>
@@ -405,7 +405,7 @@ namespace Terminal.Gui {
 		public static Rect CalcRect (int x, int y, ustring text)
 		{
 			if (ustring.IsNullOrEmpty (text))
-				return Rect.Empty;
+				return new Rect (new Point (x, y), Size.Empty);
 
 			int mw = 0;
 			int ml = 1;
@@ -522,7 +522,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="text">The text to manipulate.</param>
 		/// <param name="hotKeySpecifier">The hot-key specifier (e.g. '_') to look for.</param>
-		/// <param name="hotPos">Returns the postion of the hot-key in the text. -1 if not found.</param>
+		/// <param name="hotPos">Returns the position of the hot-key in the text. -1 if not found.</param>
 		/// <returns>The input text with the hotkey specifier ('_') removed.</returns>
 		public static ustring RemoveHotKeySpecifier (ustring text, int hotPos, Rune hotKeySpecifier)
 		{

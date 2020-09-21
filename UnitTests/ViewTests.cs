@@ -35,7 +35,7 @@ namespace Terminal.Gui {
 			Assert.Empty (r.Subviews);
 			Assert.False (r.WantContinuousButtonPressed);
 			Assert.False (r.WantMousePositionReports);
-			Assert.Null (r.GetEnumerator().Current);
+			Assert.Null (r.GetEnumerator ().Current);
 			Assert.Null (r.SuperView);
 			Assert.Null (r.MostFocused);
 
@@ -64,7 +64,7 @@ namespace Terminal.Gui {
 			Assert.Null (r.MostFocused);
 
 			// Rect with values
-			r = new View (new Rect(1, 2, 3, 4));
+			r = new View (new Rect (1, 2, 3, 4));
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 			Assert.Equal ("View()({X=1,Y=2,Width=3,Height=4})", r.ToString ());
@@ -115,7 +115,7 @@ namespace Terminal.Gui {
 			var sub1 = new View ();
 			root.Add (sub1);
 			var sub2 = new View ();
-			sub1.Width = Dim.Width(sub2);
+			sub1.Width = Dim.Width (sub2);
 
 			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
 
@@ -551,7 +551,7 @@ namespace Terminal.Gui {
 
 			var t = new Toplevel () { Id = "0", };
 
-			var w = new Window () {Id = "t", Width = Dim.Fill (), Height = Dim.Fill () };
+			var w = new Window () { Id = "t", Width = Dim.Fill (), Height = Dim.Fill () };
 			var v1 = new View () { Id = "v1", Width = Dim.Fill (), Height = Dim.Fill () };
 			var v2 = new View () { Id = "v2", Width = Dim.Fill (), Height = Dim.Fill () };
 			var sv1 = new View () { Id = "sv1", Width = Dim.Fill (), Height = Dim.Fill () };
@@ -895,6 +895,127 @@ namespace Terminal.Gui {
 			};
 
 			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+			Application.Shutdown ();
+		}
+
+
+		[Fact]
+		public void Navigation_With_Null_Focused_View ()
+		{
+			// Non-regression test for #882 (NullReferenceException during keyboard navigation when Focused is null)
+
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			Application.Top.Ready += () => {
+				Assert.Null (Application.Top.Focused);
+			};
+
+			// Keyboard navigation with tab
+			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('\t', ConsoleKey.Tab, false, false, false));
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void Multi_Thread_Toplevels ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = Application.Top;
+			var w = new Window ();
+			t.Add (w);
+
+			int count = 0, count1 = 0, count2 = 0;
+			bool log = false, log1 = false, log2 = false;
+			bool fromTopStillKnowFirstIsRunning = false;
+			bool fromTopStillKnowSecondIsRunning = false;
+			bool fromFirstStillKnowSecondIsRunning = false;
+
+			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+				count++;
+				if (count1 == 5) {
+					log1 = true;
+				}
+				if (count1 > 13 && count < 15) {
+					fromTopStillKnowFirstIsRunning = true;
+				}
+				if (count2 > 6 && count2 < 8) {
+					fromTopStillKnowSecondIsRunning = true;
+				}
+				if (count == 30) {
+					Assert.Equal (30, count);
+					Assert.Equal (20, count1);
+					Assert.Equal (10, count2);
+
+					Assert.True (log);
+					Assert.True (log1);
+					Assert.True (log2);
+
+					Assert.True (fromTopStillKnowFirstIsRunning);
+					Assert.True (fromTopStillKnowSecondIsRunning);
+					Assert.True (fromFirstStillKnowSecondIsRunning);
+
+					Application.RequestStop ();
+					return false;
+				}
+				return true;
+			});
+
+			t.Ready = () => {
+				FirstDialogToplevel ();
+			};
+
+			void FirstDialogToplevel ()
+			{
+				var od = new OpenDialog {
+					Ready = () => {
+						SecoundDialogToplevel ();
+					}
+				};
+
+				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+					count1++;
+					if (count2 == 5) {
+						log2 = true;
+					}
+					if (count2 > 3 && count2 < 5) {
+						fromFirstStillKnowSecondIsRunning = true;
+					}
+					if (count1 == 20) {
+						Assert.Equal (20, count1);
+						Application.RequestStop ();
+						return false;
+					}
+					return true;
+				});
+
+				Application.Run (od);
+			}
+
+			void SecoundDialogToplevel ()
+			{
+				var d = new Dialog ();
+
+				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+					count2++;
+					if (count < 30) {
+						log = true;
+					}
+					if (count2 == 10) {
+						Assert.Equal (10, count2);
+						Application.RequestStop ();
+						return false;
+					}
+					return true;
+				});
+
+				Application.Run (d);
+			}
 
 			Application.Run ();
 			Application.Shutdown ();

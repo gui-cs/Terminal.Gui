@@ -234,6 +234,18 @@ namespace Terminal.Gui {
 	///        </description>
 	///     </item>
 	///     <item>
+	///        <term>Control-Home</term>
+	///        <description>
+	///          Scrolls to the first line and moves the cursor there.
+	///        </description>
+	///     </item>
+	///     <item>
+	///        <term>Control-End</term>
+	///        <description>
+	///          Scrolls to the last line and moves the cursor there.
+	///        </description>
+	///     </item>
+	///     <item>
 	///        <term>Delete, Control-d</term>
 	///        <description>
 	///          Deletes the character in front of the cursor.
@@ -301,7 +313,7 @@ namespace Terminal.Gui {
 		public Action Changed;
 #endif
 		/// <summary>
-		///   Initalizes a <see cref="TextView"/> on the specified area, with absolute position and size.
+		///   Initializes a <see cref="TextView"/> on the specified area, with absolute position and size.
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
@@ -311,7 +323,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Initalizes a <see cref="TextView"/> on the specified area, 
+		///   Initializes a <see cref="TextView"/> on the specified area, 
 		///   with dimensions controlled with the X, Y, Width and Height properties.
 		/// </summary>
 		public TextView () : base ()
@@ -1004,15 +1016,11 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.CtrlMask | Key.End:
-				currentRow = model.Count;
-				TrackColumn ();
-				PositionCursor ();
+				MoveEnd ();
 				break;
 
 			case Key.CtrlMask | Key.Home:
-				currentRow = 0;
-				TrackColumn ();
-				PositionCursor ();
+				MoveHome ();
 				break;
 
 			default:
@@ -1085,6 +1093,26 @@ namespace Terminal.Gui {
 		}
 
 		Rune RuneAt (int col, int row) => model.GetLine (row) [col];
+
+		/// <summary>
+		/// Will scroll the <see cref="TextView"/> to the last line and position the cursor there.
+		/// </summary>
+		public void MoveEnd ()
+		{
+			currentRow = model.Count - 1;
+			TrackColumn ();
+			PositionCursor ();
+		}
+
+		/// <summary>
+		/// Will scroll the <see cref="TextView"/> to the first line and position the cursor there.
+		/// </summary>
+		public void MoveHome ()
+		{
+			currentRow = 0;
+			TrackColumn ();
+			PositionCursor ();
+		}
 
 		bool MoveNext (ref int col, ref int row, out Rune rune)
 		{
@@ -1204,7 +1232,7 @@ namespace Terminal.Gui {
 			}
 
 			if (!HasFocus) {
-				SuperView.SetFocus (this);
+				SetFocus ();
 			}
 
 			if (ev.Flags == MouseFlags.Button1Clicked) {

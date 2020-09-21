@@ -5,13 +5,15 @@
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
     <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
-    <AssemblyVersion>0.89.0.0</AssemblyVersion>
+    <!-- moved to ../Directory.Build.props -->
+    <!-- <AssemblyVersion>0.89.0.0</AssemblyVersion> -->
   </PropertyGroup>
   <PropertyGroup>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <PackageId>Terminal.Gui</PackageId>
-    <PackageVersion>0.89</PackageVersion>
-    <Authors>Miguel de Icaza, Charlie Kindel (@tig), @BDisp</Authors>
+    <!-- moved to ../Directory.Build.props -->
+    <!-- <PackageVersion>0.89</PackageVersion> -->
+    <!-- <Authors>Miguel de Icaza, Charlie Kindel (@tig), @BDisp</Authors> -->
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/migueldeicaza/gui.cs/</PackageProjectUrl>
     <PackageTags>csharp, terminal, c#, f#, gui, toolkit, console</PackageTags>
@@ -66,7 +68,7 @@
       * Added support for F11 and F12 keys. (Thanks @bdisp!)
       * Multiple improvements to Date/TimeField. (Thanks @bdisp!)
       * Fixes #409 - Invoke does not cause Wakeup #501. (Thanks @bdisp!)
-      * Fixed Label text alignemnt. (Thanks @bdisp!)
+      * Fixed Label text alignment. (Thanks @bdisp!)
       * Added mouse features in the Unix version. Supports xterm-1006. (Thanks @bdisp!)
       * Several StatusBar fixes. (Thanks @bdisp!)
       * Tons of mouse improvements including mouse wheel support (e.g. #404, #409). (Thanks @bdisp!)
@@ -80,7 +82,7 @@
       * Fixes #557 MessageBox needs to take ustrings (BREAKING CHANGE). (Thanks @tig!)
       * Fixes ScrollView in several key ways. (Thanks @tig!)
       *   Now supports Computed layout and has constructors that don't require parameters.
-      *   ScrollBarViews are now positioned using Computed layout versus error prone absoulte
+      *   ScrollBarViews are now positioned using Computed layout versus error prone absolute
       *   ScrollBarViews now correctly position themselves when one, either, or both are on/off.
       *   IsVertical is now a public property that does the expected thing when changed
       *   Mouse handling is better; there's still a bug where the mouse doesn't get grabbed by the ScrollView initially but I think this is a broader problem. I need @BDisp's help on this.
@@ -182,6 +184,11 @@
       0.3: Fix Windows key input to not echo characters on console, proper Fkey mapping
       0.2: Auto-detect the best console
     </PackageReleaseNotes>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">

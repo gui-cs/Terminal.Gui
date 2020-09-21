@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Dialog
    ">
-    <meta name="generator" content="docfx 2.56.1.0">
+    <meta name="generator" content="docfx 2.56.2.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -333,7 +333,7 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnDrawContent_Terminal_Gui_Rect_">View.OnDrawContent(Rect)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus_Terminal_Gui_View_">View.SetFocus(View)</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">View.SetFocus()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
@@ -400,6 +400,9 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_EndInit">View.EndInit()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -557,7 +560,7 @@ After initialzation use <code>X</code>, <code>Y</code>, <code>Width</code>, and 
   <a id="Terminal_Gui_Dialog_AddButton_" data-uid="Terminal.Gui.Dialog.AddButton*"></a>
   <h4 id="Terminal_Gui_Dialog_AddButton_Terminal_Gui_Button_" data-uid="Terminal.Gui.Dialog.AddButton(Terminal.Gui.Button)">AddButton(Button)</h4>
   <div class="markdown level1 summary">
-Adds a <a class="xref" href="Terminal.Gui.Button.html">Button</a> to the <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>, its layout will be controled by the <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>
+Adds a <a class="xref" href="Terminal.Gui.Button.html">Button</a> to the <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>, its layout will be controlled by the <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -585,7 +588,10 @@ Adds a <a class="xref" href="Terminal.Gui.Button.html">Button</a> to the <a clas
   
   <a id="Terminal_Gui_Dialog_ProcessKey_" data-uid="Terminal.Gui.Dialog.ProcessKey*"></a>
   <h4 id="Terminal_Gui_Dialog_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Dialog.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+If the view is focused, gives the view a
+chance to process the keystroke.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -625,6 +631,25 @@ Adds a <a class="xref" href="Terminal.Gui.Button.html">Button</a> to the <a clas
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_">Toplevel.ProcessKey(KeyEvent)</a></div>
+  <h5 id="Terminal_Gui_Dialog_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  Views can override this method if they are
+  interested in processing the given keystroke.
+  If they consume the keystroke, they must
+  return true to stop the keystroke from being
+  processed by other widgets or consumed by the
+  widget engine.    If they return false, the
+  keystroke will be passed using the ProcessColdKey
+  method to other views to process.
+</p>
+<p>
+  The View implementation does nothing but return false,
+  so it is not necessary to call base.ProcessKey if you
+  derive directly from View, but you should if you derive
+  other View subclasses.
+</p>
+</div>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class MenuItem
    ">
-    <meta name="generator" content="docfx 2.56.1.0">
+    <meta name="generator" content="docfx 2.56.2.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -140,14 +140,14 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.MenuItem.html">
   
   
   <a id="Terminal_Gui_MenuItem__ctor_" data-uid="Terminal.Gui.MenuItem.#ctor*"></a>
-  <h4 id="Terminal_Gui_MenuItem__ctor_NStack_ustring_System_String_System_Action_System_Func_System_Boolean__" data-uid="Terminal.Gui.MenuItem.#ctor(NStack.ustring,System.String,System.Action,System.Func{System.Boolean})">MenuItem(ustring, String, Action, Func&lt;Boolean&gt;)</h4>
+  <h4 id="Terminal_Gui_MenuItem__ctor_NStack_ustring_NStack_ustring_System_Action_System_Func_System_Boolean__Terminal_Gui_MenuItem_" data-uid="Terminal.Gui.MenuItem.#ctor(NStack.ustring,NStack.ustring,System.Action,System.Func{System.Boolean},Terminal.Gui.MenuItem)">MenuItem(ustring, ustring, Action, Func&lt;Boolean&gt;, MenuItem)</h4>
   <div class="markdown level1 summary">
 Initializes a new instance of <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MenuItem(ustring title, string help, Action action, Func&lt;bool&gt; canExecute = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public MenuItem(ustring title, ustring help, Action action, Func&lt;bool&gt; canExecute = null, MenuItem parent = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -165,7 +165,7 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.MenuItem.html">
         <td>Title for the menu item.</td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><span class="xref">NStack.ustring</span></td>
         <td><span class="parametername">help</span></td>
         <td>Help text to display.</td>
       </tr>
@@ -177,41 +177,12 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.MenuItem.html">
       <tr>
         <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Boolean</span>&gt;</td>
         <td><span class="parametername">canExecute</span></td>
-        <td>Function to determine if the action can currently be executred.</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_MenuItem__ctor_" data-uid="Terminal.Gui.MenuItem.#ctor*"></a>
-  <h4 id="Terminal_Gui_MenuItem__ctor_NStack_ustring_Terminal_Gui_MenuBarItem_" data-uid="Terminal.Gui.MenuItem.#ctor(NStack.ustring,Terminal.Gui.MenuBarItem)">MenuItem(ustring, MenuBarItem)</h4>
-  <div class="markdown level1 summary">
-Initializes a new instance of <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MenuItem(ustring title, MenuBarItem subMenu)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">NStack.ustring</span></td>
-        <td><span class="parametername">title</span></td>
-        <td>Title for the menu item.</td>
+        <td>Function to determine if the action can currently be executed.</td>
       </tr>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a></td>
-        <td><span class="parametername">subMenu</span></td>
-        <td>The menu sub-menu.</td>
+        <td><a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a></td>
+        <td><span class="parametername">parent</span></td>
+        <td>The parent of this menu item.</td>
       </tr>
     </tbody>
   </table>
@@ -405,6 +376,33 @@ Gets or sets the help text for the menu item.
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
         <td>The help text.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_MenuItem_Parent_" data-uid="Terminal.Gui.MenuItem.Parent*"></a>
+  <h4 id="Terminal_Gui_MenuItem_Parent" data-uid="Terminal.Gui.MenuItem.Parent">Parent</h4>
+  <div class="markdown level1 summary">
+Gets or sets the parent for this <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MenuItem Parent { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a></td>
+        <td>The parent.</td>
       </tr>
     </tbody>
   </table>
