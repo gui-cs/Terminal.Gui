@@ -236,7 +236,7 @@ namespace UICatalog {
 				Y = Pos.Bottom (_ckbIsTopLevel)
 			};
 			_frmMenuDetails.Add (_ckbSubMenu);
-			_ckbIsTopLevel.Toggled = (e) => {
+			_ckbIsTopLevel.Toggled += (e) => {
 				if (_ckbIsTopLevel.Checked && _currentEditMenuBarItem.Parent != null) {
 					MessageBox.ErrorQuery ("Invalid IsTopLevel", "Only menu bar can have top level menu item!", "Ok");
 					_ckbIsTopLevel.Checked = false;
@@ -250,7 +250,7 @@ namespace UICatalog {
 					_txtAction.ReadOnly = true;
 				}
 			};
-			_ckbSubMenu.Toggled = (e) => {
+			_ckbSubMenu.Toggled += (e) => {
 				if (_ckbSubMenu.Checked) {
 					_ckbIsTopLevel.Checked = false;
 					_ckbIsTopLevel.SetNeedsDisplay ();
@@ -746,7 +746,7 @@ namespace UICatalog {
 					Y = Pos.Bottom (_ckbIsTopLevel),
 					Checked = menuItem == null
 				};
-				_ckbIsTopLevel.Toggled = (e) => {
+				_ckbIsTopLevel.Toggled += (e) => {
 					if (_ckbIsTopLevel.Checked && menuItem != null) {
 						MessageBox.ErrorQuery ("Invalid IsTopLevel", "Only menu bar can have top level menu item!", "Ok");
 						_ckbIsTopLevel.Checked = false;
@@ -760,7 +760,7 @@ namespace UICatalog {
 						_txtAction.ReadOnly = true;
 					}
 				};
-				_ckbSubMenu.Toggled = (e) => {
+				_ckbSubMenu.Toggled += (e) => {
 					if (_ckbSubMenu.Checked) {
 						_ckbIsTopLevel.Checked = false;
 						_ckbIsTopLevel.SetNeedsDisplay ();
