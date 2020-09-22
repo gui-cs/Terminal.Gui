@@ -257,7 +257,7 @@ namespace UICatalog {
 			};
 			var filler = new Filler (new Rect (0, 0, 60, 40));
 			scrollView2.Add (filler);
-			scrollView2.DrawContent = (r) => {
+			scrollView2.DrawContent += (r) => {
 				scrollView2.ContentSize = filler.GetContentSize ();
 			};
 

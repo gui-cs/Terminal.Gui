@@ -141,7 +141,7 @@ static class Demo {
 #else
 		var filler = new Filler (new Rect (0, 0, 40, 40));
 		scrollView.Add (filler);
-		scrollView.DrawContent = (r) => {
+		scrollView.DrawContent += (r) => {
 			scrollView.ContentSize = filler.GetContentSize ();
 		};
 #endif
