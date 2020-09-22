@@ -149,18 +149,20 @@ namespace UICatalog {
 				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height * 2)];
 			};
 
-			scrollView.Add (new Button ("Press me!") {
+			var pressMeButton = new Button ("Press me!") {
 				X = 3,
 				Y = 3,
-				Clicked = () => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No")
-			});
+			};
+			pressMeButton.Clicked += () => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
+			scrollView.Add (pressMeButton);
 
-			scrollView.Add (new Button ("A very long button. Should be wide enough to demo clipping!") {
+			var aLongButton = new Button ("A very long button. Should be wide enough to demo clipping!") {
 				X = 3,
 				Y = 4,
 				Width = Dim.Fill (6),
-				Clicked = () => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No")
-			});
+			};
+			aLongButton.Clicked += () => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
+			scrollView.Add (aLongButton);
 
 			scrollView.Add (new TextField ("This is a test of...") {
 				X = 3,
@@ -189,7 +191,7 @@ namespace UICatalog {
 			};
 			// TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
 			anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
-			anchorButton.Clicked = () => {
+			anchorButton.Clicked += () => {
 				// Ths demonstrates how to have a dynamically sized button
 				// Each time the button is clicked the button's text gets longer
 				// The call to Win.LayoutSubviews causes the Computed layout to
