@@ -30,6 +30,8 @@ using System.Linq;
 using System.Text;
 using NStack;
 
+using Rune = System.Rune;
+
 namespace Terminal.Gui {
 	class TextModel {
 		List<List<Rune>> lines = new List<List<Rune>> ();
