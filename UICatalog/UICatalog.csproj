@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <StartupObject>UICatalog.UICatalogApp</StartupObject>
     <AssemblyVersion>1.0.0.1</AssemblyVersion>
     <LangVersion>8.0</LangVersion>
