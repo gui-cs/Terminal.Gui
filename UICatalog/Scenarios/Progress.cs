@@ -58,18 +58,18 @@ namespace UICatalog {
 				var startButton = new Button ("Start Timer") {
 					X = Pos.Right (LeftFrame) + 1,
 					Y = 0,
-					Clicked = () => Start()
 				};
+				startButton.Clicked += () => Start ();
 				var pulseButton = new Button ("Pulse") {
 					X = Pos.Right (startButton) + 2,
 					Y = Pos.Y (startButton),
-					Clicked = () => Pulse()
 				};
+				pulseButton.Clicked += () => Pulse ();
 				var stopbutton = new Button ("Stop Timer") {
 					X = Pos.Right (pulseButton) + 2,
 					Y = Pos.Top (pulseButton),
-					Clicked = () => Stop()
 				};
+				stopbutton.Clicked += () => Stop ();
 
 				Add (startButton);
 				Add (pulseButton);
@@ -225,7 +225,7 @@ namespace UICatalog {
 				X = Pos.Center (),
 				Y = Pos.Bottom(mainLoopTimeoutDemo) + 1,
 			};
-			startBoth.Clicked = () => {
+			startBoth.Clicked += () => {
 				systemTimerDemo.Start ();
 				mainLoopTimeoutDemo.Start ();
 			};

@@ -99,23 +99,24 @@ namespace UICatalog {
 			};
 			Win.Add (lblDateFmt);
 
-			Win.Add (new Button ("Swap Long/Short & Read/Read Only") {
+			var swapButton = new Button ("Swap Long/Short & Read/Read Only") {
 				X = Pos.Center (),
 				Y = Pos.Bottom (Win) - 5,
-				Clicked = () => {
-					longTime.ReadOnly = !longTime.ReadOnly;
-					shortTime.ReadOnly = !shortTime.ReadOnly;
+			};
+			swapButton.Clicked += () => {
+				longTime.ReadOnly = !longTime.ReadOnly;
+				shortTime.ReadOnly = !shortTime.ReadOnly;
 
-					longTime.IsShortFormat = !longTime.IsShortFormat;
-					shortTime.IsShortFormat = !shortTime.IsShortFormat;
+				longTime.IsShortFormat = !longTime.IsShortFormat;
+				shortTime.IsShortFormat = !shortTime.IsShortFormat;
 
-					longDate.ReadOnly = !longDate.ReadOnly;
-					shortDate.ReadOnly = !shortDate.ReadOnly;
+				longDate.ReadOnly = !longDate.ReadOnly;
+				shortDate.ReadOnly = !shortDate.ReadOnly;
 
-					longDate.IsShortFormat = !longDate.IsShortFormat;
-					shortDate.IsShortFormat = !shortDate.IsShortFormat;
-				}
-			});
+				longDate.IsShortFormat = !longDate.IsShortFormat;
+				shortDate.IsShortFormat = !shortDate.IsShortFormat;
+			};
+			Win.Add (swapButton);
 		}
 
 		private void TimeChanged (DateTimeEventArgs<TimeSpan> e)

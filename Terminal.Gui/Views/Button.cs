@@ -201,7 +201,7 @@ namespace Terminal.Gui {
 		///   raised when the button is activated either with
 		///   the mouse or the keyboard.
 		/// </remarks>
-		public Action Clicked;
+		public event Action Clicked;
 
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)

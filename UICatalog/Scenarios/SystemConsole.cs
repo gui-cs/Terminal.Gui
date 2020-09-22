@@ -24,11 +24,12 @@ namespace UICatalog {
 
 		public override void Setup ()
 		{
-		       Win.Add (new Button ("Press me!") {
-			       X = Pos.Center (),
-			       Y = Pos.Center (),
-			       Clicked = () => MessageBox.Query (20, 7, "Hi", "Neat?", "Yes", "No")
-		       });
+			var pressMe = new Button ("Press me!") {
+				X = Pos.Center (),
+				Y = Pos.Center (),
+			};
+			pressMe.Clicked += () => MessageBox.Query (20, 7, "Hi", "Neat?", "Yes", "No");
+			Win.Add (pressMe);
 		}
 	}
 }
