@@ -96,10 +96,14 @@ namespace UICatalog {
 				scenario.Init (Application.Top, _baseColorScheme);
 				scenario.Setup ();
 				scenario.Run ();
-				_top.Ready += () => {
+
+				static void ReadyHandler ()
+				{
 					_rightPane.SetFocus ();
-					_top.Ready = null;
-				};
+					_top.Ready -= ReadyHandler;
+				}
+				
+				_top.Ready += ReadyHandler;
 
 #if DEBUG_IDISPOSABLE
 				// After the scenario runs, validate all Responder-based instances
