@@ -40,7 +40,7 @@ namespace UICatalog {
 				ColorScheme = Colors.TopLevel,
 				Text = txt,
 			};
-			edit.TextChanged = () => {
+			edit.TextChanged += () => {
 				foreach (var alignment in alignments) {
 					singleLines [(int)alignment].Text = edit.Text;
 					multipleLines [(int)alignment].Text = edit.Text;
