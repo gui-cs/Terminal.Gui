@@ -498,12 +498,12 @@ namespace UICatalog {
 				SelectCurrentMenuBarItem ();
 			};
 
-			_lstMenus.SelectedItemChanged = (e) => {
+			_lstMenus.SelectedItemChanged += (e) => {
 				var menuBarItem = DataContext.Menus.Count > 0 ? DataContext.Menus [e.Item].MenuItem : null;
 				EditMenuBarItem (menuBarItem);
 			};
 
-			_lstMenus.OpenSelectedItem = (e) => {
+			_lstMenus.OpenSelectedItem += (e) => {
 				_currentMenuBarItem = DataContext.Menus [e.Item].MenuItem;
 				DataContext.Parent = _currentMenuBarItem.Title;
 				DataContext.Menus = new List<DynamicMenuItemList> ();

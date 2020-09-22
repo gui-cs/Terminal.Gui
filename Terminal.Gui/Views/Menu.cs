@@ -871,12 +871,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Raised as a menu is opening.
 		/// </summary>
-		public Action MenuOpening;
+		public event Action MenuOpening;
 
 		/// <summary>
 		/// Raised when a menu is closing.
 		/// </summary>
-		public Action MenuClosing;
+		public event Action MenuClosing;
 
 		internal Menu openMenu;
 		internal Menu openCurrentMenu;
