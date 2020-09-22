@@ -477,7 +477,7 @@ namespace UICatalog {
 				EditMenuBarItem (null);
 			};
 
-			_lblMenuBar.Enter = (e) => {
+			_lblMenuBar.Enter += (e) => {
 				if (_menuBar?.Menus != null) {
 					_currentMenuBarItem = _menuBar.Menus [_currentSelectedMenuBar];
 					EditMenuBarItem (_menuBar.Menus [_currentSelectedMenuBar]);
