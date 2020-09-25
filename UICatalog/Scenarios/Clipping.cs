@@ -69,11 +69,12 @@ namespace UICatalog {
 				Height = Dim.Fill (3),
 				ColorScheme = Colors.TopLevel
 			};
-			embedded3.Add (new Button (2, 2, "click me") {
-				Clicked = () => {
-					MessageBox.Query (10, 5, "Test", "test message", "Ok");
-				}
-			});
+
+			var testButton = new Button (2, 2, "click me");
+			testButton.Clicked += () => {
+				MessageBox.Query (10, 5, "Test", "test message", "Ok");
+			};
+			embedded3.Add (testButton);
 			embedded2.Add (embedded3);
 
 			scrollView.Add (embedded1);

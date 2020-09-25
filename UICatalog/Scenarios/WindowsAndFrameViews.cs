@@ -60,12 +60,13 @@ namespace UICatalog {
 				Height = Dim.Percent (15)
 			};
 			Win.ColorScheme = Colors.Dialog;
-			Win.Add (new Button ($"Padding of container is {padding}") {
+			var paddingButton = new Button ($"Padding of container is {padding}") {
 				X = Pos.Center (),
 				Y = 0,
 				ColorScheme = Colors.Error,
-				Clicked = () => About ()
-			});
+			};
+			paddingButton.Clicked += () => About ();
+			Win.Add (paddingButton);
 			Win.Add (new Button ("Press ME! (Y = Pos.AnchorEnd(1))") {
 				X = Pos.Center (),
 				Y = Pos.AnchorEnd (1),
@@ -83,12 +84,14 @@ namespace UICatalog {
 					Height = contentHeight + (i * 2) + 2,
 				};
 				win.ColorScheme = Colors.Dialog;
-				win.Add (new Button ("Press me! (Y = 0)") {
+				var pressMeButton = new Button ("Press me! (Y = 0)") {
 					X = Pos.Center (),
 					Y = 0,
 					ColorScheme = Colors.Error,
-					Clicked = () => MessageBox.ErrorQuery (win.Title.ToString (), "Neat?", "Yes", "No")
-				});
+				};
+				pressMeButton.Clicked += () =>
+					MessageBox.ErrorQuery (win.Title.ToString (), "Neat?", "Yes", "No");
+				win.Add (pressMeButton);
 				var subWin = new Window ("Sub Window") {
 					X = Pos.Percent (0),
 					Y = 1,

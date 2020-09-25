@@ -236,7 +236,7 @@ namespace UICatalog {
 				Y = Pos.Bottom (_ckbIsTopLevel)
 			};
 			_frmMenuDetails.Add (_ckbSubMenu);
-			_ckbIsTopLevel.Toggled = (e) => {
+			_ckbIsTopLevel.Toggled += (e) => {
 				if (_ckbIsTopLevel.Checked && _currentEditMenuBarItem.Parent != null) {
 					MessageBox.ErrorQuery ("Invalid IsTopLevel", "Only menu bar can have top level menu item!", "Ok");
 					_ckbIsTopLevel.Checked = false;
@@ -250,7 +250,7 @@ namespace UICatalog {
 					_txtAction.ReadOnly = true;
 				}
 			};
-			_ckbSubMenu.Toggled = (e) => {
+			_ckbSubMenu.Toggled += (e) => {
 				if (_ckbSubMenu.Checked) {
 					_ckbIsTopLevel.Checked = false;
 					_ckbIsTopLevel.SetNeedsDisplay ();
@@ -270,13 +270,19 @@ namespace UICatalog {
 			var _btnOk = new Button ("Ok") {
 				X = Pos.Left (_lblTitle) + 20,
 				Y = Pos.Bottom (_rbChkStyle) + 1,
-				Clicked = () => {
-					if (ustring.IsNullOrEmpty (_txtTitle.Text) && _currentEditMenuBarItem != null) {
-						MessageBox.ErrorQuery ("Invalid title", "Must enter a valid title!.", "Ok");
-					} else if (_currentEditMenuBarItem != null) {
-						var menuItem = new DynamicMenuItem (_txtTitle.Text, _txtHelp.Text, _txtAction.Text, _ckbIsTopLevel != null ? _ckbIsTopLevel.Checked : false, _ckbSubMenu != null ? _ckbSubMenu.Checked : false, _rbChkStyle.SelectedItem == 0 ? MenuItemCheckStyle.NoCheck : _rbChkStyle.SelectedItem == 1 ? MenuItemCheckStyle.Checked : MenuItemCheckStyle.Radio);
-						UpdateMenuItem (_currentEditMenuBarItem, menuItem, _lstMenus.SelectedItem);
-					}
+			};
+			_btnOk.Clicked += () => {
+				if (ustring.IsNullOrEmpty (_txtTitle.Text) && _currentEditMenuBarItem != null) {
+					MessageBox.ErrorQuery ("Invalid title", "Must enter a valid title!.", "Ok");
+				} else if (_currentEditMenuBarItem != null) {
+					var menuItem = new DynamicMenuItem (_txtTitle.Text, _txtHelp.Text,
+						_txtAction.Text,
+						_ckbIsTopLevel != null ? _ckbIsTopLevel.Checked : false,
+						_ckbSubMenu != null ? _ckbSubMenu.Checked : false,
+						_rbChkStyle.SelectedItem == 0 ? MenuItemCheckStyle.NoCheck :
+						_rbChkStyle.SelectedItem == 1 ? MenuItemCheckStyle.Checked :
+						MenuItemCheckStyle.Radio);
+					UpdateMenuItem (_currentEditMenuBarItem, menuItem, _lstMenus.SelectedItem);
 				}
 			};
 			_frmMenuDetails.Add (_btnOk);
@@ -284,15 +290,15 @@ namespace UICatalog {
 			var _btnCancel = new Button ("Cancel") {
 				X = Pos.Right (_btnOk) + 3,
 				Y = Pos.Top (_btnOk),
-				Clicked = () => {
-					_txtTitle.Text = ustring.Empty;
-				}
+			};
+			_btnCancel.Clicked += () => {
+				_txtTitle.Text = ustring.Empty;
 			};
 			_frmMenuDetails.Add (_btnCancel);
 
 			Add (_frmMenuDetails);
 
-			_btnAdd.Clicked = () => {
+			_btnAdd.Clicked += () => {
 				if (MenuBar == null) {
 					MessageBox.ErrorQuery ("Menu Bar Error", "Must add a MenuBar first!", "Ok");
 					_btnAddMenuBar.SetFocus ();
@@ -328,7 +334,7 @@ namespace UICatalog {
 				}
 			};
 
-			_btnRemove.Clicked = () => {
+			_btnRemove.Clicked += () => {
 				var menuItem = DataContext.Menus.Count > 0 ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem : null;
 				if (menuItem != null) {
 					var childrens = ((MenuBarItem)_currentMenuBarItem).Children;
@@ -355,7 +361,7 @@ namespace UICatalog {
 				}
 			};
 
-			_btnMenuBarUp.Clicked = () => {
+			_btnMenuBarUp.Clicked += () => {
 				var i = _currentSelectedMenuBar;
 				var menuItem = _menuBar != null && _menuBar.Menus.Length > 0 ? _menuBar.Menus [i] : null;
 				if (menuItem != null) {
@@ -369,7 +375,7 @@ namespace UICatalog {
 				}
 			};
 
-			_btnMenuBarDown.Clicked = () => {
+			_btnMenuBarDown.Clicked += () => {
 				var i = _currentSelectedMenuBar;
 				var menuItem = _menuBar != null && _menuBar.Menus.Length > 0 ? _menuBar.Menus [i] : null;
 				if (menuItem != null) {
@@ -383,7 +389,7 @@ namespace UICatalog {
 				}
 			};
 
-			_btnUp.Clicked = () => {
+			_btnUp.Clicked += () => {
 				var i = _lstMenus.SelectedItem;
 				var menuItem = DataContext.Menus.Count > 0 ? DataContext.Menus [i].MenuItem : null;
 				if (menuItem != null) {
@@ -398,7 +404,7 @@ namespace UICatalog {
 				}
 			};
 
-			_btnDown.Clicked = () => {
+			_btnDown.Clicked += () => {
 				var i = _lstMenus.SelectedItem;
 				var menuItem = DataContext.Menus.Count > 0 ? DataContext.Menus [i].MenuItem : null;
 				if (menuItem != null) {
@@ -413,7 +419,7 @@ namespace UICatalog {
 				}
 			};
 
-			_btnAddMenuBar.Clicked = () => {
+			_btnAddMenuBar.Clicked += () => {
 				var item = EnterMenuItem (null);
 				if (ustring.IsNullOrEmpty (item.title)) {
 					return;
@@ -439,7 +445,7 @@ namespace UICatalog {
 				_menuBar.SetNeedsDisplay ();
 			};
 
-			_btnRemoveMenuBar.Clicked = () => {
+			_btnRemoveMenuBar.Clicked += () => {
 				if (_menuBar != null && _menuBar.Menus.Length > 0) {
 					_menuBar.Menus [_currentSelectedMenuBar] = null;
 					int i = 0;
@@ -471,33 +477,33 @@ namespace UICatalog {
 				EditMenuBarItem (null);
 			};
 
-			_lblMenuBar.Enter = (e) => {
+			_lblMenuBar.Enter += (e) => {
 				if (_menuBar?.Menus != null) {
 					_currentMenuBarItem = _menuBar.Menus [_currentSelectedMenuBar];
 					EditMenuBarItem (_menuBar.Menus [_currentSelectedMenuBar]);
 				}
 			};
 
-			_btnPrevious.Clicked = () => {
+			_btnPrevious.Clicked += () => {
 				if (_currentSelectedMenuBar - 1 > -1) {
 					_currentSelectedMenuBar--;
 				}
 				SelectCurrentMenuBarItem ();
 			};
 
-			_btnNext.Clicked = () => {
+			_btnNext.Clicked += () => {
 				if (_menuBar != null && _currentSelectedMenuBar + 1 < _menuBar.Menus.Length) {
 					_currentSelectedMenuBar++;
 				}
 				SelectCurrentMenuBarItem ();
 			};
 
-			_lstMenus.SelectedItemChanged = (e) => {
+			_lstMenus.SelectedItemChanged += (e) => {
 				var menuBarItem = DataContext.Menus.Count > 0 ? DataContext.Menus [e.Item].MenuItem : null;
 				EditMenuBarItem (menuBarItem);
 			};
 
-			_lstMenus.OpenSelectedItem = (e) => {
+			_lstMenus.OpenSelectedItem += (e) => {
 				_currentMenuBarItem = DataContext.Menus [e.Item].MenuItem;
 				DataContext.Parent = _currentMenuBarItem.Title;
 				DataContext.Menus = new List<DynamicMenuItemList> ();
@@ -506,7 +512,7 @@ namespace UICatalog {
 				EditMenuBarItem (menuBarItem);
 			};
 
-			_btnPreviowsParent.Clicked = () => {
+			_btnPreviowsParent.Clicked += () => {
 				if (_currentMenuBarItem != null && _currentMenuBarItem.Parent != null) {
 					var mi = _currentMenuBarItem;
 					_currentMenuBarItem = _currentMenuBarItem.Parent as MenuBarItem;
@@ -740,7 +746,7 @@ namespace UICatalog {
 					Y = Pos.Bottom (_ckbIsTopLevel),
 					Checked = menuItem == null
 				};
-				_ckbIsTopLevel.Toggled = (e) => {
+				_ckbIsTopLevel.Toggled += (e) => {
 					if (_ckbIsTopLevel.Checked && menuItem != null) {
 						MessageBox.ErrorQuery ("Invalid IsTopLevel", "Only menu bar can have top level menu item!", "Ok");
 						_ckbIsTopLevel.Checked = false;
@@ -754,7 +760,7 @@ namespace UICatalog {
 						_txtAction.ReadOnly = true;
 					}
 				};
-				_ckbSubMenu.Toggled = (e) => {
+				_ckbSubMenu.Toggled += (e) => {
 					if (_ckbSubMenu.Checked) {
 						_ckbIsTopLevel.Checked = false;
 						_ckbIsTopLevel.SetNeedsDisplay ();
@@ -770,19 +776,18 @@ namespace UICatalog {
 				};
 				var _btnOk = new Button ("Ok") {
 					IsDefault = true,
-					Clicked = () => {
-						if (ustring.IsNullOrEmpty (_txtTitle.Text)) {
-							MessageBox.ErrorQuery ("Invalid title", "Must enter a valid title!.", "Ok");
-						} else {
-							Application.RequestStop ();
-						}
-					}
 				};
-				var _btnCancel = new Button ("Cancel") {
-					Clicked = () => {
-						_txtTitle.Text = ustring.Empty;
+				_btnOk.Clicked += () => {
+					if (ustring.IsNullOrEmpty (_txtTitle.Text)) {
+						MessageBox.ErrorQuery ("Invalid title", "Must enter a valid title!.", "Ok");
+					} else {
 						Application.RequestStop ();
 					}
+				};
+				var _btnCancel = new Button ("Cancel");
+				_btnCancel.Clicked += () => {
+					_txtTitle.Text = ustring.Empty;
+					Application.RequestStop ();
 				};
 				var _dialog = new Dialog ("Please enter the menu details.", _btnOk, _btnCancel);
 				_dialog.Add (_lblTitle, _txtTitle, _lblHelp, _txtHelp, _lblAction, _txtAction, _ckbIsTopLevel, _ckbSubMenu, _rbChkStyle);

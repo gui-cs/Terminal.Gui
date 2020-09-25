@@ -125,7 +125,7 @@ namespace UICatalog {
 			};
 			// TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
 			anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
-			anchorButton.Clicked = () => {
+			anchorButton.Clicked += () => {
 				// Ths demonstrates how to have a dynamically sized button
 				// Each time the button is clicked the button's text gets longer
 				// The call to Win.LayoutSubviews causes the Computed layout to
@@ -152,7 +152,7 @@ namespace UICatalog {
 			var leftButton = new Button ("Left") {
 				Y = Pos.Bottom (Win) - 3
 			};
-			leftButton.Clicked = () => {
+			leftButton.Clicked += () => {
 				// Ths demonstrates how to have a dynamically sized button
 				// Each time the button is clicked the button's text gets longer
 				// The call to Win.LayoutSubviews causes the Computed layout to
@@ -167,7 +167,7 @@ namespace UICatalog {
 				X = Pos.Center (),
 				Y = Pos.AnchorEnd () - 1
 			};
-			centerButton.Clicked = () => {
+			centerButton.Clicked += () => {
 				// Ths demonstrates how to have a dynamically sized button
 				// Each time the button is clicked the button's text gets longer
 				// The call to Win.LayoutSubviews causes the Computed layout to
@@ -180,7 +180,7 @@ namespace UICatalog {
 			var rightButton = new Button ("Right") {
 				Y = Pos.Y (centerButton)
 			};
-			rightButton.Clicked = () => {
+			rightButton.Clicked += () => {
 				// Ths demonstrates how to have a dynamically sized button
 				// Each time the button is clicked the button's text gets longer
 				// The call to Win.LayoutSubviews causes the Computed layout to

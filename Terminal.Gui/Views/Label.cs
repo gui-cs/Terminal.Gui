@@ -53,7 +53,7 @@ namespace Terminal.Gui {
 		///   raised when the button is activated either with
 		///   the mouse or the keyboard.
 		/// </remarks>
-		public Action Clicked;
+		public event Action Clicked;
 
 		///// <inheritdoc/>
 		//public new ustring Text {
@@ -78,7 +78,7 @@ namespace Terminal.Gui {
 		public override bool OnMouseEvent (MouseEvent mouseEvent)
 		{
 			MouseEventArgs args = new MouseEventArgs (mouseEvent);
-			MouseClick?.Invoke (args);
+			OnMouseClick (args);
 			if (args.Handled)
 				return true;
 			if (MouseEvent (mouseEvent))

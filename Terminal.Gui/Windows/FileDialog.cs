@@ -506,10 +506,10 @@ namespace Terminal.Gui {
 				X = Pos.Right (dirLabel),
 				Y = 1 + msgLines,
 				Width = Dim.Fill () - 1,
-				TextChanged = (e) => {
-					DirectoryPath = dirEntry.Text;
-					nameEntry.Text = ustring.Empty;
-				}
+			};
+			dirEntry.TextChanged += (e) => {
+				DirectoryPath = dirEntry.Text;
+				nameEntry.Text = ustring.Empty;
 			};
 			Add (dirLabel, dirEntry);
 

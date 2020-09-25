@@ -244,7 +244,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when the selected radio label has changed.
 		/// </summary>
-		public Action<SelectedItemChangedArgs> SelectedItemChanged;
+		public event Action<SelectedItemChangedArgs> SelectedItemChanged;
 
 		/// <summary>
 		/// The currently selected item from the list of radio labels

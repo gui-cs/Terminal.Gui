@@ -300,7 +300,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Raised when the <see cref="Text"/> of the <see cref="TextView"/> changes.
 		/// </summary>
-		public Action TextChanged;
+		public event Action TextChanged;
 
 #if false
 		/// <summary>
