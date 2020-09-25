@@ -29,12 +29,12 @@ namespace UICatalog {
 				//TODO: Change to use Pos.AnchorEnd()
 				Y = Pos.Bottom (Win) - 3,
 				IsDefault = true,
-				Clicked = () => Application.RequestStop (),
 			};
+			defaultButton.Clicked += () => Application.RequestStop ();
 			Win.Add (defaultButton);
 
 			var swapButton = new Button (50, 0, "Swap Default (Absolute Layout)");
-			swapButton.Clicked = () => {
+			swapButton.Clicked += () => {
 				defaultButton.IsDefault = !defaultButton.IsDefault;
 				swapButton.IsDefault = !swapButton.IsDefault;
 			};
@@ -42,7 +42,7 @@ namespace UICatalog {
 
 			static void DoMessage (Button button, ustring txt)
 			{
-				button.Clicked = () => {
+				button.Clicked += () => {
 					var btnText = button.Text.ToString ();
 					MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
 				};
@@ -82,15 +82,15 @@ namespace UICatalog {
 			Win.Add (button = new Button ("a Newline\nin the button") {
 				X = 2,
 				Y = Pos.Bottom (button) + 1,
-				Clicked = () => MessageBox.Query ("Message", "Question?", "Yes", "No")
 			});
+			button.Clicked += () => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
 			var textChanger = new Button ("Te_xt Changer") {
 				X = 2,
 				Y = Pos.Bottom (button) + 1,
 			};
 			Win.Add (textChanger);
-			textChanger.Clicked = () => textChanger.Text += "!";
+			textChanger.Clicked += () => textChanger.Text += "!";
 
 			Win.Add (button = new Button ("Lets see if this will move as \"Text Changer\" grows") {
 				X = Pos.Right (textChanger) + 2,
@@ -104,7 +104,7 @@ namespace UICatalog {
 			};
 			Win.Add (removeButton);
 			// This in intresting test case because `moveBtn` and below are laid out relative to this one!
-			removeButton.Clicked = () => Win.Remove (removeButton);
+			removeButton.Clicked += () => Win.Remove (removeButton);
 
 			var computedFrame = new FrameView ("Computed Layout") {
 				X = 0,
@@ -121,7 +121,7 @@ namespace UICatalog {
 				Width = 30,
 				ColorScheme = Colors.Error,
 			};
-			moveBtn.Clicked = () => {
+			moveBtn.Clicked += () => {
 				moveBtn.X = moveBtn.Frame.X + 5;
 				// This is already fixed with the call to SetNeedDisplay() in the Pos Dim.
 				//computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
@@ -135,7 +135,7 @@ namespace UICatalog {
 				Width = 30,
 				ColorScheme = Colors.Error,
 			};
-			sizeBtn.Clicked = () => {
+			sizeBtn.Clicked += () => {
 				sizeBtn.Width = sizeBtn.Frame.Width + 5;
 				//computedFrame.LayoutSubviews (); // FIXED: This call should not be needed. View.X is not causing relayout correctly
 			};
@@ -153,7 +153,7 @@ namespace UICatalog {
 			var moveBtnA = new Button (0, 0, "Move This Button via Frame") {
 				ColorScheme = Colors.Error,
 			};
-			moveBtnA.Clicked = () => {
+			moveBtnA.Clicked += () => {
 				moveBtnA.Frame = new Rect (moveBtnA.Frame.X + 5, moveBtnA.Frame.Y, moveBtnA.Frame.Width, moveBtnA.Frame.Height);
 			};
 			absoluteFrame.Add (moveBtnA);
@@ -162,7 +162,7 @@ namespace UICatalog {
 			var sizeBtnA = new Button (0, 2, " ~  s  gui.cs   master ↑10 = Со_хранить") {
 				ColorScheme = Colors.Error,
 			};
-			sizeBtnA.Clicked = () => {
+			sizeBtnA.Clicked += () => {
 				sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5, sizeBtnA.Frame.Height);
 			};
 			absoluteFrame.Add (sizeBtnA);
@@ -213,7 +213,7 @@ namespace UICatalog {
 				Width = Dim.Width (computedFrame) - 2,
 				ColorScheme = Colors.TopLevel,
 			};
-			moveHotKeyBtn.Clicked = () => {
+			moveHotKeyBtn.Clicked += () => {
 				moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
 			};
 			Win.Add (moveHotKeyBtn);
@@ -225,7 +225,7 @@ namespace UICatalog {
 				Width = Dim.Width (absoluteFrame) - 2, // BUGBUG: Not always the width isn't calculated correctly.
 				ColorScheme = Colors.TopLevel,
 			};
-			moveUnicodeHotKeyBtn.Clicked = () => {
+			moveUnicodeHotKeyBtn.Clicked += () => {
 				moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
 			};
 			Win.Add (moveUnicodeHotKeyBtn);

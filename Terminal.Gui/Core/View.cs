@@ -128,37 +128,37 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event fired when a subview is being added to this view.
 		/// </summary>
-		public Action<View> Added;
+		public event Action<View> Added;
 
 		/// <summary>
 		/// Event fired when a subview is being removed from this view.
 		/// </summary>
-		public Action<View> Removed;
+		public event Action<View> Removed;
 
 		/// <summary>
 		/// Event fired when the view gets focus.
 		/// </summary>
-		public Action<FocusEventArgs> Enter;
+		public event Action<FocusEventArgs> Enter;
 
 		/// <summary>
 		/// Event fired when the view looses focus.
 		/// </summary>
-		public Action<FocusEventArgs> Leave;
+		public event Action<FocusEventArgs> Leave;
 
 		/// <summary>
 		/// Event fired when the view receives the mouse event for the first time.
 		/// </summary>
-		public Action<MouseEventArgs> MouseEnter;
+		public event Action<MouseEventArgs> MouseEnter;
 
 		/// <summary>
 		/// Event fired when the view receives a mouse event for the last time.
 		/// </summary>
-		public Action<MouseEventArgs> MouseLeave;
+		public event Action<MouseEventArgs> MouseLeave;
 
 		/// <summary>
 		/// Event fired when a mouse event is generated.
 		/// </summary>
-		public Action<MouseEventArgs> MouseClick;
+		public event Action<MouseEventArgs> MouseClick;
 
 		/// <summary>
 		/// Gets or sets the HotKey defined for this view. A user pressing HotKey on the keyboard while this view has focus will cause the Clicked event to fire.
@@ -1269,7 +1269,7 @@ namespace Terminal.Gui {
 		/// Rect provides the view-relative rectangle describing the currently visible viewport into the <see cref="View"/>.
 		/// </para>
 		/// </remarks>
-		public Action<Rect> DrawContent;
+		public event Action<Rect> DrawContent;
 
 		/// <summary>
 		/// Enables overrides to draw infinitely scrolled content and/or a background behind added controls. 
@@ -1352,7 +1352,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a character key is pressed and occurs after the key up event.
 		/// </summary>
-		public Action<KeyEventEventArgs> KeyPress;
+		public event Action<KeyEventEventArgs> KeyPress;
 
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
@@ -1400,7 +1400,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is pressed
 		/// </summary>
-		public Action<KeyEventEventArgs> KeyDown;
+		public event Action<KeyEventEventArgs> KeyDown;
 
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool OnKeyDown (KeyEvent keyEvent)
@@ -1420,7 +1420,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is released
 		/// </summary>
-		public Action<KeyEventEventArgs> KeyUp;
+		public event Action<KeyEventEventArgs> KeyUp;
 
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		public override bool OnKeyUp (KeyEvent keyEvent)
@@ -1701,7 +1701,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.
 		/// </remarks>
-		public Action<LayoutEventArgs> LayoutStarted;
+		public event Action<LayoutEventArgs> LayoutStarted;
 
 		/// <summary>
 		/// Raises the <see cref="LayoutStarted"/> event. Called from  <see cref="LayoutSubviews"/> before any subviews have been laid out.
@@ -1717,7 +1717,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.
 		/// </remarks>
-		public Action<LayoutEventArgs> LayoutComplete;
+		public event Action<LayoutEventArgs> LayoutComplete;
 
 		/// <summary>
 		/// Event called only once when the <see cref="View"/> is being initialized for the first time.
@@ -1914,7 +1914,7 @@ namespace Terminal.Gui {
 			}
 
 			MouseEventArgs args = new MouseEventArgs (mouseEvent);
-			MouseClick?.Invoke (args);
+			OnMouseClick (args);
 			if (args.Handled)
 				return true;
 			if (MouseEvent (mouseEvent))
@@ -1931,6 +1931,11 @@ namespace Terminal.Gui {
 			}
 			return false;
 		}
+
+		/// <summary>
+		/// Invokes the MouseClick event.
+		/// </summary>
+		protected void OnMouseClick (MouseEventArgs args) => MouseClick?.Invoke (args);
 
 		/// <inheritdoc/>
 		protected override void Dispose (bool disposing)

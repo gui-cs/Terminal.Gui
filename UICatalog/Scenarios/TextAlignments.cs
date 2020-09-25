@@ -40,7 +40,7 @@ namespace UICatalog {
 				ColorScheme = Colors.TopLevel,
 				Text = txt,
 			};
-			edit.TextChanged = () => {
+			edit.TextChanged += () => {
 				foreach (var alignment in alignments) {
 					singleLines [(int)alignment].Text = edit.Text;
 					multipleLines [(int)alignment].Text = edit.Text;
@@ -51,20 +51,21 @@ namespace UICatalog {
 			var unicodeSample = new Button ("Unicode Sample") {
 				X = Pos.Right (edit) + 1,
 				Y = 0,
-				Clicked = () => {
-					edit.Text = unicodeSampleText;
-				}
+			};
+			unicodeSample.Clicked += () => {
+				edit.Text = unicodeSampleText;
 			};
 			Win.Add (unicodeSample);
 
 			var update = new Button ("_Update") {
 				X = Pos.Right (edit) + 1,
 				Y = Pos.Bottom (edit) - 1,
-				Clicked = () => {
-					foreach (var alignment in alignments) {
-						singleLines [(int)alignment].Text = edit.Text;
-						multipleLines [(int)alignment].Text = edit.Text;
-					}
+				
+			};
+			update.Clicked += () => {
+				foreach (var alignment in alignments) {
+					singleLines [(int) alignment].Text = edit.Text;
+					multipleLines [(int) alignment].Text = edit.Text;
 				}
 			};
 			Win.Add (update);

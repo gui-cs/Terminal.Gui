@@ -966,17 +966,12 @@ namespace Terminal.Gui {
 				return true;
 			});
 
-			t.Ready = () => {
-				FirstDialogToplevel ();
-			};
+			t.Ready += FirstDialogToplevel;
 
 			void FirstDialogToplevel ()
 			{
-				var od = new OpenDialog {
-					Ready = () => {
-						SecoundDialogToplevel ();
-					}
-				};
+				var od = new OpenDialog();
+				od.Ready += SecoundDialogToplevel;
 
 				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
 					count1++;
