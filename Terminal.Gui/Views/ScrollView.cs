@@ -60,7 +60,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// This event is raised when the position on the scrollbar has changed.
 		/// </summary>
-		public Action ChangedPosition;
+		public event Action ChangedPosition;
 
 		/// <summary>
 		/// The position, relative to <see cref="Size"/>, to set the scrollbar at.

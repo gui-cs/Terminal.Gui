@@ -29,17 +29,17 @@ namespace UICatalog {
 				//TODO: Change to use Pos.AnchorEnd()
 				Y = Pos.Bottom (Win) - 3,
 				//IsDefault = true,
-				Clicked = () => Application.RequestStop (),
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
 			};
+			defaultLabel.Clicked += () => Application.RequestStop ();
 			Win.Add (defaultLabel);
 
 			var swapLabel = new Label (50, 0, "S_wap Default (Absolute Layout)") {
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
 			};
-			swapLabel.Clicked = () => {
+			swapLabel.Clicked += () => {
 				//defaultLabel.IsDefault = !defaultLabel.IsDefault;
 				//swapLabel.IsDefault = !swapLabel.IsDefault;
 			};
@@ -47,7 +47,7 @@ namespace UICatalog {
 
 			static void DoMessage (Label Label, ustring txt)
 			{
-				Label.Clicked = () => {
+				Label.Clicked += () => {
 					var btnText = Label.Text.ToString ();
 					MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
 				};
@@ -88,10 +88,10 @@ namespace UICatalog {
 			Win.Add (Label = new Label ("a Newline\nin the Label") {
 				X = 2,
 				Y = Pos.Bottom (Label) + 1,
-				Clicked = () => MessageBox.Query ("Message", "Question?", "Yes", "No"),
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
 			});
+			Label.Clicked += () => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
 			var textChanger = new Label ("Te_xt Changer") {
 				X = 2,
@@ -100,7 +100,7 @@ namespace UICatalog {
 				CanFocus = true,
 			};
 			Win.Add (textChanger);
-			textChanger.Clicked = () => textChanger.Text += "!";
+			textChanger.Clicked += () => textChanger.Text += "!";
 
 			Win.Add (Label = new Label ("Lets see if this will move as \"Text Changer\" grows") {
 				X = Pos.Right (textChanger) + 2,
@@ -118,7 +118,7 @@ namespace UICatalog {
 			};
 			Win.Add (removeLabel);
 			// This in intresting test case because `moveBtn` and below are laid out relative to this one!
-			removeLabel.Clicked = () => Win.Remove (removeLabel);
+			removeLabel.Clicked += () => Win.Remove (removeLabel);
 
 			var computedFrame = new FrameView ("Computed Layout") {
 				X = 0,
@@ -137,7 +137,7 @@ namespace UICatalog {
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
 			};
-			moveBtn.Clicked = () => {
+			moveBtn.Clicked += () => {
 				moveBtn.X = moveBtn.Frame.X + 5;
 				// This is already fixed with the call to SetNeedDisplay() in the Pos Dim.
 				//computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
@@ -154,7 +154,7 @@ namespace UICatalog {
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
 			};
-			sizeBtn.Clicked = () => {
+			sizeBtn.Clicked += () => {
 				sizeBtn.Width = sizeBtn.Frame.Width + 5;
 				//computedFrame.LayoutSubviews (); // FIXED: This call should not be needed. View.X is not causing relayout correctly
 			};
@@ -174,7 +174,7 @@ namespace UICatalog {
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
 			};
-			moveBtnA.Clicked = () => {
+			moveBtnA.Clicked += () => {
 				moveBtnA.Frame = new Rect (moveBtnA.Frame.X + 5, moveBtnA.Frame.Y, moveBtnA.Frame.Width, moveBtnA.Frame.Height);
 			};
 			absoluteFrame.Add (moveBtnA);
@@ -185,7 +185,7 @@ namespace UICatalog {
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
 			};
-			sizeBtnA.Clicked = () => {
+			sizeBtnA.Clicked += () => {
 				sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5, sizeBtnA.Frame.Height);
 			};
 			absoluteFrame.Add (sizeBtnA);
@@ -240,7 +240,7 @@ namespace UICatalog {
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
 			};
-			moveHotKeyBtn.Clicked = () => {
+			moveHotKeyBtn.Clicked += () => {
 				moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
 			};
 			Win.Add (moveHotKeyBtn);
@@ -254,7 +254,7 @@ namespace UICatalog {
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
 			};
-			moveUnicodeHotKeyBtn.Clicked = () => {
+			moveUnicodeHotKeyBtn.Clicked += () => {
 				moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
 			};
 			Win.Add (moveUnicodeHotKeyBtn);

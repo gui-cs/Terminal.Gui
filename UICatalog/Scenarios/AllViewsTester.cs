@@ -133,8 +133,8 @@ namespace UICatalog {
 			_xRadioGroup = new RadioGroup (radioItems) {
 				X = 0,
 				Y = Pos.Bottom (label),
-				SelectedItemChanged = (selected) => DimPosChanged (_curView),
 			};
+			_xRadioGroup.SelectedItemChanged += (selected) => DimPosChanged (_curView);
 			_xText = new TextField ($"{_xVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
 			_xText.TextChanged += (args) => {
 				try {
@@ -164,8 +164,8 @@ namespace UICatalog {
 			_yRadioGroup = new RadioGroup (radioItems) {
 				X = Pos.X (label),
 				Y = Pos.Bottom (label),
-				SelectedItemChanged = (selected) => DimPosChanged (_curView),
 			};
+			_yRadioGroup.SelectedItemChanged += (selected) => DimPosChanged (_curView);
 			_locationFrame.Add (_yRadioGroup);
 
 			_sizeFrame = new FrameView ("Size (Dim)") {
@@ -181,8 +181,8 @@ namespace UICatalog {
 			_wRadioGroup = new RadioGroup (radioItems) {
 				X = 0,
 				Y = Pos.Bottom (label),
-				SelectedItemChanged = (selected) => DimPosChanged (_curView)
 			};
+			_wRadioGroup.SelectedItemChanged += (selected) => DimPosChanged (_curView);
 			_wText = new TextField ($"{_wVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
 			_wText.TextChanged += (args) => {
 				try {
@@ -212,8 +212,8 @@ namespace UICatalog {
 			_hRadioGroup = new RadioGroup (radioItems) {
 				X = Pos.X (label),
 				Y = Pos.Bottom (label),
-				SelectedItemChanged = (selected) => DimPosChanged (_curView),
 			};
+			_hRadioGroup.SelectedItemChanged += (selected) => DimPosChanged (_curView);
 			_sizeFrame.Add (_hRadioGroup);
 
 			_settingsPane.Add (_sizeFrame);

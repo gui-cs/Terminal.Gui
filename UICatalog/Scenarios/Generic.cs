@@ -7,11 +7,12 @@ namespace UICatalog {
 		public override void Setup ()
 		{
 			// Put your scenario code here, e.g.
-			Win.Add (new Button ("Press me!") {
+			var button = new Button ("Press me!") {
 				X = Pos.Center (),
 				Y = Pos.Center (),
-				Clicked = () => MessageBox.Query (20, 7, "Hi", "Neat?", "Yes", "No")
-			});
+			};
+			button.Clicked += () => MessageBox.Query (20, 7, "Hi", "Neat?", "Yes", "No");
+			Win.Add (button);
 		}
 	}
 }

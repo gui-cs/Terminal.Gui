@@ -116,52 +116,54 @@ namespace UICatalog {
 				X = Pos.Center(),
 				Y = Pos.Bottom (frame) + 2			,
 				IsDefault = true,
-				Clicked = () => {
-					try {
-						int width = int.Parse (widthEdit.Text.ToString ());
-						int height = int.Parse (heightEdit.Text.ToString ());
-						int numButtons = int.Parse (numButtonsEdit.Text.ToString ());
+			};
+			showDialogButton.Clicked += () => {
+				try {
+					int width = int.Parse (widthEdit.Text.ToString ());
+					int height = int.Parse (heightEdit.Text.ToString ());
+					int numButtons = int.Parse (numButtonsEdit.Text.ToString ());
 
-						var buttons = new List<Button> ();
-						var clicked = -1;
-						for (int i = 0; i < numButtons; i++) {
-							var buttonId = i;
-							var button = new Button (btnText [buttonId % 10], is_default: buttonId == 0) {
-								Clicked = () => {
-									clicked = buttonId;
-									Application.RequestStop ();
-								},
-							};
-							buttons.Add(button);
-						}
-
-						// This tests dynamically adding buttons; ensuring the dialog resizes if needed and 
-						// the buttons are laid out correctly
-						var dialog = new Dialog (titleEdit.Text, width, height, buttons.ToArray ());
-						var add = new Button ("Add a button") {
-							X = Pos.Center (),
-							Y = Pos.Center (),
-							Clicked = () => {
-								var buttonId = buttons.Count;
-								var button = new Button (btnText [buttonId % 10], is_default: buttonId == 0) {
-									Clicked = () => {
-										clicked = buttonId;
-										Application.RequestStop ();
-									},
-								};
-								buttons.Add (button);
-								dialog.AddButton (button);
-							},
+					var buttons = new List<Button> ();
+					var clicked = -1;
+					for (int i = 0; i < numButtons; i++) {
+						var buttonId = i;
+						var button = new Button (btnText [buttonId % 10],
+							is_default: buttonId == 0);
+						button.Clicked += () => {
+							clicked = buttonId;
+							Application.RequestStop ();
 						};
-						dialog.Add (add);
-
-						Application.Run (dialog);
-						buttonPressedLabel.Text = $"{clicked}";
-
-					} catch (FormatException) {
-						buttonPressedLabel.Text = "Invalid Options";
+						buttons.Add (button);
 					}
-				},
+
+					// This tests dynamically adding buttons; ensuring the dialog resizes if needed and 
+					// the buttons are laid out correctly
+					var dialog = new Dialog (titleEdit.Text, width, height,
+						buttons.ToArray ());
+					var add = new Button ("Add a button") {
+						X = Pos.Center (),
+						Y = Pos.Center (),
+
+					};
+					add.Clicked += () => {
+						var buttonId = buttons.Count;
+						var button = new Button (btnText [buttonId % 10],
+							is_default: buttonId == 0);
+						button.Clicked += () => {
+							clicked = buttonId;
+							Application.RequestStop ();
+						};
+						buttons.Add (button);
+						dialog.AddButton (button);
+					};
+					dialog.Add (add);
+
+					Application.Run (dialog);
+					buttonPressedLabel.Text = $"{clicked}";
+
+				} catch (FormatException) {
+					buttonPressedLabel.Text = "Invalid Options";
+				}
 			};
 			Win.Add (showDialogButton);
 
