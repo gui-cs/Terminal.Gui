@@ -148,25 +148,25 @@ namespace UICatalog {
 				X = Pos.Center(),
 				Y = Pos.Bottom (frame) + 2			,
 				IsDefault = true,
-				Clicked = () => {
-					try {
-						int width = int.Parse (widthEdit.Text.ToString ());
-						int height = int.Parse (heightEdit.Text.ToString ());
-						int numButtons = int.Parse (numButtonsEdit.Text.ToString ());
+			};
+			showMessageBoxButton.Clicked += () => {
+				try {
+					int width = int.Parse (widthEdit.Text.ToString ());
+					int height = int.Parse (heightEdit.Text.ToString ());
+					int numButtons = int.Parse (numButtonsEdit.Text.ToString ());
 
-						var btns = new List<ustring> ();
-						for (int i = 0; i < numButtons; i++) {
-							btns.Add(btnText[i % 10]);
-						}
-						if (styleRadioGroup.SelectedItem == 0) {
-							buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), btns.ToArray ())}";
-						} else {
-							buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), btns.ToArray ())}";
-						}
-					} catch (FormatException) {
-						buttonPressedLabel.Text = "Invalid Options";
+					var btns = new List<ustring> ();
+					for (int i = 0; i < numButtons; i++) {
+						btns.Add(btnText[i % 10]);
 					}
-				},
+					if (styleRadioGroup.SelectedItem == 0) {
+						buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), btns.ToArray ())}";
+					} else {
+						buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), btns.ToArray ())}";
+					}
+				} catch (FormatException) {
+					buttonPressedLabel.Text = "Invalid Options";
+				}
 			};
 			Win.Add (showMessageBoxButton);
 

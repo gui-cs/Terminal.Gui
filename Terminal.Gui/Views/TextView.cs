@@ -30,6 +30,8 @@ using System.Linq;
 using System.Text;
 using NStack;
 
+using Rune = System.Rune;
+
 namespace Terminal.Gui {
 	class TextModel {
 		List<List<Rune>> lines = new List<List<Rune>> ();
@@ -300,7 +302,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Raised when the <see cref="Text"/> of the <see cref="TextView"/> changes.
 		/// </summary>
-		public Action TextChanged;
+		public event Action TextChanged;
 
 #if false
 		/// <summary>
