@@ -56,6 +56,24 @@ namespace UICatalog.Scenarios {
 
 			comboBox.SelectedItemChanged += (ListViewItemEventArgs text) => lbComboBox.Text = items[comboBox.SelectedItem];
 			Win.Add (lbComboBox, comboBox);
+
+			var btnMoveUp = new Button ("Move _Up") {
+				X = 1,
+				Y = Pos.Bottom(lbListView),
+			};
+			btnMoveUp.Clicked += () => {
+				listview.MoveUp ();
+			};
+
+			var btnMoveDown = new Button ("Move _Down") {
+				X = Pos.Right (btnMoveUp) + 1,
+				Y = Pos.Bottom (lbListView),
+			};
+			btnMoveDown.Clicked += () => {
+				listview.MoveDown ();
+			};
+
+			Win.Add (btnMoveUp, btnMoveDown);
 		}
 	}
 }
