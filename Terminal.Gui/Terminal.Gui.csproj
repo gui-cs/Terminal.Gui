@@ -28,8 +28,8 @@
       * New sample/demo app - UI Catalog - Replaces demo.cs with an easy to use and extend set of demo scenarios. (Thanks @tig!)
       * The API documentation is completely revamped and updated. Readme upated. Contributors guide added (Thanks @tig!)
       * MenuBar can now have MenuItems directly (enables top-level menu items with no submenu). (Thanks @tig!)
-      * API semantics are much more consistent across classes. For example, all events are now defined in terms of Action instead of EventHanlder. BREAKING CHANGE. (Thanks @bdisp and @tig!)
-      * The project has been refactored an reorganized to reduce risk of bugs and make it easier to c
+      * API semantics are much more consistent across classes. For example, all events are now defined in terms of event Action instead of EventHanlder. BREAKING CHANGE. (Thanks @bdisp, @worldbeater, and @tig!)
+      * The project has been refactored an reorganized to reduce risk of bugs and make it easier to contribute.
       * Symbols are now included with the nuget package.
 
       Fixes/Improvements (partial list; see Github issues for complete list):
