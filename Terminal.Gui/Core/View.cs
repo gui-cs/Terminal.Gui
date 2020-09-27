@@ -434,6 +434,10 @@ namespace Terminal.Gui {
 		public Pos X {
 			get => x;
 			set {
+				if (!ValidatePosDim (x, value)) {
+					throw new ArgumentException ();
+				}
+
 				x = value;
 				SetNeedsLayout ();
 				SetNeedsDisplay (frame);
@@ -450,6 +454,10 @@ namespace Terminal.Gui {
 		public Pos Y {
 			get => y;
 			set {
+				if (!ValidatePosDim (y, value)) {
+					throw new ArgumentException ();
+				}
+
 				y = value;
 				SetNeedsLayout ();
 				SetNeedsDisplay (frame);
@@ -468,6 +476,10 @@ namespace Terminal.Gui {
 		public Dim Width {
 			get => width;
 			set {
+				if (!ValidatePosDim (width, value)) {
+					throw new ArgumentException ();
+				}
+
 				width = value;
 				SetNeedsLayout ();
 				SetNeedsDisplay (frame);
@@ -482,10 +494,27 @@ namespace Terminal.Gui {
 		public Dim Height {
 			get => height;
 			set {
+				if (!ValidatePosDim (height, value)) {
+					throw new ArgumentException ();
+				}
+
 				height = value;
 				SetNeedsLayout ();
 				SetNeedsDisplay (frame);
 			}
+		}
+
+		bool ValidatePosDim (object oldvalue, object newValue)
+		{
+			if (!IsInitialized || layoutStyle == LayoutStyle.Absolute || oldvalue == null || oldvalue.GetType () == newValue.GetType () || this is Toplevel) {
+				return true;
+			}
+			if (layoutStyle == LayoutStyle.Computed) {
+				if (oldvalue.GetType () != newValue.GetType () && !(newValue is Pos.PosAbsolute || newValue is Dim.DimAbsolute)) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		/// <summary>
