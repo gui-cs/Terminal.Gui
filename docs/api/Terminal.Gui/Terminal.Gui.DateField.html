@@ -399,6 +399,9 @@ Simple Date editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -529,38 +532,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.DateField.html"
       </tr>
     </tbody>
   </table>
-  <h3 id="fields">Fields
-  </h3>
-  
-  
-  <h4 id="Terminal_Gui_DateField_DateChanged" data-uid="Terminal.Gui.DateField.DateChanged">DateChanged</h4>
-  <div class="markdown level1 summary">
-DateChanged event, raised when the <a class="xref" href="Terminal.Gui.DateField.html#Terminal_Gui_DateField_Date">Date</a> property has changed.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Action&lt;DateTimeEventArgs&lt;DateTime&gt;&gt; DateChanged</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.DateTimeEventArgs-1.html">DateTimeEventArgs</a>&lt;<span class="xref">System.DateTime</span>&gt;&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 id="Terminal_Gui_DateField_DateChanged_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-This event is raised when the <a class="xref" href="Terminal.Gui.DateField.html#Terminal_Gui_DateField_Date">Date</a> property changes.
-</div>
   <h3 id="properties">Properties
   </h3>
   
@@ -747,6 +718,38 @@ Processes key presses for the <a class="xref" href="Terminal.Gui.TextField.html"
   <div class="markdown level1 remarks">
 The <a class="xref" href="Terminal.Gui.TextField.html">TextField</a> control responds to the following keys:
 <table><thead><tr><th>Keys</th><th>Function</th></tr></thead><tbody><tr><td><a class="xref" href="Terminal.Gui.Key.html#Terminal_Gui_Key_Delete">Delete</a>, <a class="xref" href="Terminal.Gui.Key.html#Terminal_Gui_Key_Backspace">Backspace</a></td><td>Deletes the character before cursor.</td></tr></tbody></table>
+</div>
+  <h3 id="events">Events
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_DateField_DateChanged" data-uid="Terminal.Gui.DateField.DateChanged">DateChanged</h4>
+  <div class="markdown level1 summary">
+DateChanged event, raised when the <a class="xref" href="Terminal.Gui.DateField.html#Terminal_Gui_DateField_Date">Date</a> property has changed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;DateTimeEventArgs&lt;DateTime&gt;&gt; DateChanged</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.DateTimeEventArgs-1.html">DateTimeEventArgs</a>&lt;<span class="xref">System.DateTime</span>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_DateField_DateChanged_remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+This event is raised when the <a class="xref" href="Terminal.Gui.DateField.html#Terminal_Gui_DateField_Date">Date</a> property changes.
 </div>
   <h3 id="implements">Implements</h3>
   <div>

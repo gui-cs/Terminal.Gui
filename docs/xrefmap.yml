@@ -435,7 +435,7 @@ references:
 - uid: Terminal.Gui.Button.Clicked
   name: Clicked
   href: api/Terminal.Gui/Terminal.Gui.Button.html#Terminal_Gui_Button_Clicked
-  commentId: F:Terminal.Gui.Button.Clicked
+  commentId: E:Terminal.Gui.Button.Clicked
   fullName: Terminal.Gui.Button.Clicked
   nameWithType: Button.Clicked
 - uid: Terminal.Gui.Button.IsDefault
@@ -660,7 +660,7 @@ references:
 - uid: Terminal.Gui.CheckBox.Toggled
   name: Toggled
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox_Toggled
-  commentId: F:Terminal.Gui.CheckBox.Toggled
+  commentId: E:Terminal.Gui.CheckBox.Toggled
   fullName: Terminal.Gui.CheckBox.Toggled
   nameWithType: CheckBox.Toggled
 - uid: Terminal.Gui.Clipboard
@@ -1109,7 +1109,7 @@ references:
 - uid: Terminal.Gui.ComboBox.OpenSelectedItem
   name: OpenSelectedItem
   href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_OpenSelectedItem
-  commentId: F:Terminal.Gui.ComboBox.OpenSelectedItem
+  commentId: E:Terminal.Gui.ComboBox.OpenSelectedItem
   fullName: Terminal.Gui.ComboBox.OpenSelectedItem
   nameWithType: ComboBox.OpenSelectedItem
 - uid: Terminal.Gui.ComboBox.ProcessKey(Terminal.Gui.KeyEvent)
@@ -1154,7 +1154,7 @@ references:
 - uid: Terminal.Gui.ComboBox.SelectedItemChanged
   name: SelectedItemChanged
   href: api/Terminal.Gui/Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_SelectedItemChanged
-  commentId: F:Terminal.Gui.ComboBox.SelectedItemChanged
+  commentId: E:Terminal.Gui.ComboBox.SelectedItemChanged
   fullName: Terminal.Gui.ComboBox.SelectedItemChanged
   nameWithType: ComboBox.SelectedItemChanged
 - uid: Terminal.Gui.ComboBox.SetSource(System.Collections.IList)
@@ -1782,7 +1782,7 @@ references:
 - uid: Terminal.Gui.DateField.DateChanged
   name: DateChanged
   href: api/Terminal.Gui/Terminal.Gui.DateField.html#Terminal_Gui_DateField_DateChanged
-  commentId: F:Terminal.Gui.DateField.DateChanged
+  commentId: E:Terminal.Gui.DateField.DateChanged
   fullName: Terminal.Gui.DateField.DateChanged
   nameWithType: DateField.DateChanged
 - uid: Terminal.Gui.DateField.IsShortFormat
@@ -4460,7 +4460,7 @@ references:
 - uid: Terminal.Gui.Label.Clicked
   name: Clicked
   href: api/Terminal.Gui/Terminal.Gui.Label.html#Terminal_Gui_Label_Clicked
-  commentId: F:Terminal.Gui.Label.Clicked
+  commentId: E:Terminal.Gui.Label.Clicked
   fullName: Terminal.Gui.Label.Clicked
   nameWithType: Label.Clicked
 - uid: Terminal.Gui.Label.OnMouseEvent(Terminal.Gui.MouseEvent)
@@ -4735,7 +4735,7 @@ references:
 - uid: Terminal.Gui.ListView.OpenSelectedItem
   name: OpenSelectedItem
   href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_OpenSelectedItem
-  commentId: F:Terminal.Gui.ListView.OpenSelectedItem
+  commentId: E:Terminal.Gui.ListView.OpenSelectedItem
   fullName: Terminal.Gui.ListView.OpenSelectedItem
   nameWithType: ListView.OpenSelectedItem
 - uid: Terminal.Gui.ListView.PositionCursor
@@ -4793,7 +4793,7 @@ references:
 - uid: Terminal.Gui.ListView.SelectedItemChanged
   name: SelectedItemChanged
   href: api/Terminal.Gui/Terminal.Gui.ListView.html#Terminal_Gui_ListView_SelectedItemChanged
-  commentId: F:Terminal.Gui.ListView.SelectedItemChanged
+  commentId: E:Terminal.Gui.ListView.SelectedItemChanged
   fullName: Terminal.Gui.ListView.SelectedItemChanged
   nameWithType: ListView.SelectedItemChanged
 - uid: Terminal.Gui.ListView.SetSource(System.Collections.IList)
@@ -5205,13 +5205,13 @@ references:
 - uid: Terminal.Gui.MenuBar.MenuClosing
   name: MenuClosing
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_MenuClosing
-  commentId: F:Terminal.Gui.MenuBar.MenuClosing
+  commentId: E:Terminal.Gui.MenuBar.MenuClosing
   fullName: Terminal.Gui.MenuBar.MenuClosing
   nameWithType: MenuBar.MenuClosing
 - uid: Terminal.Gui.MenuBar.MenuOpening
   name: MenuOpening
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_MenuOpening
-  commentId: F:Terminal.Gui.MenuBar.MenuOpening
+  commentId: E:Terminal.Gui.MenuBar.MenuOpening
   fullName: Terminal.Gui.MenuBar.MenuOpening
   nameWithType: MenuBar.MenuOpening
 - uid: Terminal.Gui.MenuBar.Menus
@@ -6762,7 +6762,7 @@ references:
 - uid: Terminal.Gui.RadioGroup.SelectedItemChanged
   name: SelectedItemChanged
   href: api/Terminal.Gui/Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_SelectedItemChanged
-  commentId: F:Terminal.Gui.RadioGroup.SelectedItemChanged
+  commentId: E:Terminal.Gui.RadioGroup.SelectedItemChanged
   fullName: Terminal.Gui.RadioGroup.SelectedItemChanged
   nameWithType: RadioGroup.SelectedItemChanged
 - uid: Terminal.Gui.RadioGroup.SelectedItemChangedArgs
@@ -7421,9 +7421,22 @@ references:
 - uid: Terminal.Gui.ScrollBarView.ChangedPosition
   name: ChangedPosition
   href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_ChangedPosition
-  commentId: F:Terminal.Gui.ScrollBarView.ChangedPosition
+  commentId: E:Terminal.Gui.ScrollBarView.ChangedPosition
   fullName: Terminal.Gui.ScrollBarView.ChangedPosition
   nameWithType: ScrollBarView.ChangedPosition
+- uid: Terminal.Gui.ScrollBarView.Host
+  name: Host
+  href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_Host
+  commentId: P:Terminal.Gui.ScrollBarView.Host
+  fullName: Terminal.Gui.ScrollBarView.Host
+  nameWithType: ScrollBarView.Host
+- uid: Terminal.Gui.ScrollBarView.Host*
+  name: Host
+  href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_Host_
+  commentId: Overload:Terminal.Gui.ScrollBarView.Host
+  isSpec: "True"
+  fullName: Terminal.Gui.ScrollBarView.Host
+  nameWithType: ScrollBarView.Host
 - uid: Terminal.Gui.ScrollBarView.IsVertical
   name: IsVertical
   href: api/Terminal.Gui/Terminal.Gui.ScrollBarView.html#Terminal_Gui_ScrollBarView_IsVertical
@@ -7579,6 +7592,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ScrollView.Dispose
   nameWithType: ScrollView.Dispose
+- uid: Terminal.Gui.ScrollView.KeepContentAlwaysInViewport
+  name: KeepContentAlwaysInViewport
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_KeepContentAlwaysInViewport
+  commentId: P:Terminal.Gui.ScrollView.KeepContentAlwaysInViewport
+  fullName: Terminal.Gui.ScrollView.KeepContentAlwaysInViewport
+  nameWithType: ScrollView.KeepContentAlwaysInViewport
+- uid: Terminal.Gui.ScrollView.KeepContentAlwaysInViewport*
+  name: KeepContentAlwaysInViewport
+  href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_KeepContentAlwaysInViewport_
+  commentId: Overload:Terminal.Gui.ScrollView.KeepContentAlwaysInViewport
+  isSpec: "True"
+  fullName: Terminal.Gui.ScrollView.KeepContentAlwaysInViewport
+  nameWithType: ScrollView.KeepContentAlwaysInViewport
 - uid: Terminal.Gui.ScrollView.MouseEvent(Terminal.Gui.MouseEvent)
   name: MouseEvent(MouseEvent)
   href: api/Terminal.Gui/Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_MouseEvent_Terminal_Gui_MouseEvent_
@@ -8383,7 +8409,7 @@ references:
 - uid: Terminal.Gui.TextField.TextChanged
   name: TextChanged
   href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_TextChanged
-  commentId: F:Terminal.Gui.TextField.TextChanged
+  commentId: E:Terminal.Gui.TextField.TextChanged
   fullName: Terminal.Gui.TextField.TextChanged
   nameWithType: TextField.TextChanged
 - uid: Terminal.Gui.TextField.Used
@@ -8784,6 +8810,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.MouseEvent
   nameWithType: TextView.MouseEvent
+- uid: Terminal.Gui.TextView.MoveEnd
+  name: MoveEnd()
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_MoveEnd
+  commentId: M:Terminal.Gui.TextView.MoveEnd
+  fullName: Terminal.Gui.TextView.MoveEnd()
+  nameWithType: TextView.MoveEnd()
+- uid: Terminal.Gui.TextView.MoveEnd*
+  name: MoveEnd
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_MoveEnd_
+  commentId: Overload:Terminal.Gui.TextView.MoveEnd
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.MoveEnd
+  nameWithType: TextView.MoveEnd
+- uid: Terminal.Gui.TextView.MoveHome
+  name: MoveHome()
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_MoveHome
+  commentId: M:Terminal.Gui.TextView.MoveHome
+  fullName: Terminal.Gui.TextView.MoveHome()
+  nameWithType: TextView.MoveHome()
+- uid: Terminal.Gui.TextView.MoveHome*
+  name: MoveHome
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_MoveHome_
+  commentId: Overload:Terminal.Gui.TextView.MoveHome
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.MoveHome
+  nameWithType: TextView.MoveHome
 - uid: Terminal.Gui.TextView.PositionCursor
   name: PositionCursor()
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_PositionCursor
@@ -8865,7 +8917,7 @@ references:
 - uid: Terminal.Gui.TextView.TextChanged
   name: TextChanged
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_TextChanged
-  commentId: F:Terminal.Gui.TextView.TextChanged
+  commentId: E:Terminal.Gui.TextView.TextChanged
   fullName: Terminal.Gui.TextView.TextChanged
   nameWithType: TextView.TextChanged
 - uid: Terminal.Gui.TimeField
@@ -8970,7 +9022,7 @@ references:
 - uid: Terminal.Gui.TimeField.TimeChanged
   name: TimeChanged
   href: api/Terminal.Gui/Terminal.Gui.TimeField.html#Terminal_Gui_TimeField_TimeChanged
-  commentId: F:Terminal.Gui.TimeField.TimeChanged
+  commentId: E:Terminal.Gui.TimeField.TimeChanged
   fullName: Terminal.Gui.TimeField.TimeChanged
   nameWithType: TimeField.TimeChanged
 - uid: Terminal.Gui.Toplevel
@@ -9105,7 +9157,7 @@ references:
 - uid: Terminal.Gui.Toplevel.Ready
   name: Ready
   href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Ready
-  commentId: F:Terminal.Gui.Toplevel.Ready
+  commentId: E:Terminal.Gui.Toplevel.Ready
   fullName: Terminal.Gui.Toplevel.Ready
   nameWithType: Toplevel.Ready
 - uid: Terminal.Gui.Toplevel.Redraw(Terminal.Gui.Rect)
@@ -9254,7 +9306,7 @@ references:
 - uid: Terminal.Gui.View.Added
   name: Added
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Added
-  commentId: F:Terminal.Gui.View.Added
+  commentId: E:Terminal.Gui.View.Added
   fullName: Terminal.Gui.View.Added
   nameWithType: View.Added
 - uid: Terminal.Gui.View.AddRune(System.Int32,System.Int32,System.Rune)
@@ -9422,7 +9474,7 @@ references:
 - uid: Terminal.Gui.View.DrawContent
   name: DrawContent
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_DrawContent
-  commentId: F:Terminal.Gui.View.DrawContent
+  commentId: E:Terminal.Gui.View.DrawContent
   fullName: Terminal.Gui.View.DrawContent
   nameWithType: View.DrawContent
 - uid: Terminal.Gui.View.DrawFrame(Terminal.Gui.Rect,System.Int32,System.Boolean)
@@ -9499,7 +9551,7 @@ references:
 - uid: Terminal.Gui.View.Enter
   name: Enter
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Enter
-  commentId: F:Terminal.Gui.View.Enter
+  commentId: E:Terminal.Gui.View.Enter
   fullName: Terminal.Gui.View.Enter
   nameWithType: View.Enter
 - uid: Terminal.Gui.View.Focused
@@ -9738,7 +9790,7 @@ references:
 - uid: Terminal.Gui.View.KeyDown
   name: KeyDown
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_KeyDown
-  commentId: F:Terminal.Gui.View.KeyDown
+  commentId: E:Terminal.Gui.View.KeyDown
   fullName: Terminal.Gui.View.KeyDown
   nameWithType: View.KeyDown
 - uid: Terminal.Gui.View.KeyEventEventArgs
@@ -9789,19 +9841,19 @@ references:
 - uid: Terminal.Gui.View.KeyPress
   name: KeyPress
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_KeyPress
-  commentId: F:Terminal.Gui.View.KeyPress
+  commentId: E:Terminal.Gui.View.KeyPress
   fullName: Terminal.Gui.View.KeyPress
   nameWithType: View.KeyPress
 - uid: Terminal.Gui.View.KeyUp
   name: KeyUp
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_KeyUp
-  commentId: F:Terminal.Gui.View.KeyUp
+  commentId: E:Terminal.Gui.View.KeyUp
   fullName: Terminal.Gui.View.KeyUp
   nameWithType: View.KeyUp
 - uid: Terminal.Gui.View.LayoutComplete
   name: LayoutComplete
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_LayoutComplete
-  commentId: F:Terminal.Gui.View.LayoutComplete
+  commentId: E:Terminal.Gui.View.LayoutComplete
   fullName: Terminal.Gui.View.LayoutComplete
   nameWithType: View.LayoutComplete
 - uid: Terminal.Gui.View.LayoutEventArgs
@@ -9826,7 +9878,7 @@ references:
 - uid: Terminal.Gui.View.LayoutStarted
   name: LayoutStarted
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_LayoutStarted
-  commentId: F:Terminal.Gui.View.LayoutStarted
+  commentId: E:Terminal.Gui.View.LayoutStarted
   fullName: Terminal.Gui.View.LayoutStarted
   nameWithType: View.LayoutStarted
 - uid: Terminal.Gui.View.LayoutStyle
@@ -9858,7 +9910,7 @@ references:
 - uid: Terminal.Gui.View.Leave
   name: Leave
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Leave
-  commentId: F:Terminal.Gui.View.Leave
+  commentId: E:Terminal.Gui.View.Leave
   fullName: Terminal.Gui.View.Leave
   nameWithType: View.Leave
 - uid: Terminal.Gui.View.MostFocused
@@ -9877,13 +9929,13 @@ references:
 - uid: Terminal.Gui.View.MouseClick
   name: MouseClick
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_MouseClick
-  commentId: F:Terminal.Gui.View.MouseClick
+  commentId: E:Terminal.Gui.View.MouseClick
   fullName: Terminal.Gui.View.MouseClick
   nameWithType: View.MouseClick
 - uid: Terminal.Gui.View.MouseEnter
   name: MouseEnter
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_MouseEnter
-  commentId: F:Terminal.Gui.View.MouseEnter
+  commentId: E:Terminal.Gui.View.MouseEnter
   fullName: Terminal.Gui.View.MouseEnter
   nameWithType: View.MouseEnter
 - uid: Terminal.Gui.View.MouseEventArgs
@@ -9934,7 +9986,7 @@ references:
 - uid: Terminal.Gui.View.MouseLeave
   name: MouseLeave
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_MouseLeave
-  commentId: F:Terminal.Gui.View.MouseLeave
+  commentId: E:Terminal.Gui.View.MouseLeave
   fullName: Terminal.Gui.View.MouseLeave
   nameWithType: View.MouseLeave
 - uid: Terminal.Gui.View.Move(System.Int32,System.Int32)
@@ -10028,6 +10080,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.OnLeave
   nameWithType: View.OnLeave
+- uid: Terminal.Gui.View.OnMouseClick(Terminal.Gui.View.MouseEventArgs)
+  name: OnMouseClick(View.MouseEventArgs)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_
+  commentId: M:Terminal.Gui.View.OnMouseClick(Terminal.Gui.View.MouseEventArgs)
+  fullName: Terminal.Gui.View.OnMouseClick(Terminal.Gui.View.MouseEventArgs)
+  nameWithType: View.OnMouseClick(View.MouseEventArgs)
+- uid: Terminal.Gui.View.OnMouseClick*
+  name: OnMouseClick
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_
+  commentId: Overload:Terminal.Gui.View.OnMouseClick
+  isSpec: "True"
+  fullName: Terminal.Gui.View.OnMouseClick
+  nameWithType: View.OnMouseClick
 - uid: Terminal.Gui.View.OnMouseEnter(Terminal.Gui.MouseEvent)
   name: OnMouseEnter(MouseEvent)
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEnter_Terminal_Gui_MouseEvent_
@@ -10174,7 +10239,7 @@ references:
 - uid: Terminal.Gui.View.Removed
   name: Removed
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Removed
-  commentId: F:Terminal.Gui.View.Removed
+  commentId: E:Terminal.Gui.View.Removed
   fullName: Terminal.Gui.View.Removed
   nameWithType: View.Removed
 - uid: Terminal.Gui.View.ScreenToView(System.Int32,System.Int32)
@@ -10856,11 +10921,11 @@ references:
   isSpec: "True"
   fullName: UICatalog.Scenario.ScenarioCategory.ScenarioCategory
   nameWithType: Scenario.ScenarioCategory.ScenarioCategory
-- uid: UICatalog.Scenario.ScenarioCategory.GetCategories(Type)
+- uid: UICatalog.Scenario.ScenarioCategory.GetCategories(System.Type)
   name: GetCategories(Type)
-  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory_GetCategories_Type_
-  commentId: M:UICatalog.Scenario.ScenarioCategory.GetCategories(Type)
-  fullName: UICatalog.Scenario.ScenarioCategory.GetCategories(Type)
+  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory_GetCategories_System_Type_
+  commentId: M:UICatalog.Scenario.ScenarioCategory.GetCategories(System.Type)
+  fullName: UICatalog.Scenario.ScenarioCategory.GetCategories(System.Type)
   nameWithType: Scenario.ScenarioCategory.GetCategories(Type)
 - uid: UICatalog.Scenario.ScenarioCategory.GetCategories*
   name: GetCategories
@@ -10869,11 +10934,11 @@ references:
   isSpec: "True"
   fullName: UICatalog.Scenario.ScenarioCategory.GetCategories
   nameWithType: Scenario.ScenarioCategory.GetCategories
-- uid: UICatalog.Scenario.ScenarioCategory.GetName(Type)
+- uid: UICatalog.Scenario.ScenarioCategory.GetName(System.Type)
   name: GetName(Type)
-  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory_GetName_Type_
-  commentId: M:UICatalog.Scenario.ScenarioCategory.GetName(Type)
-  fullName: UICatalog.Scenario.ScenarioCategory.GetName(Type)
+  href: api/UICatalog/UICatalog.Scenario.ScenarioCategory.html#UICatalog_Scenario_ScenarioCategory_GetName_System_Type_
+  commentId: M:UICatalog.Scenario.ScenarioCategory.GetName(System.Type)
+  fullName: UICatalog.Scenario.ScenarioCategory.GetName(System.Type)
   nameWithType: Scenario.ScenarioCategory.GetName(Type)
 - uid: UICatalog.Scenario.ScenarioCategory.GetName*
   name: GetName
@@ -10927,11 +10992,11 @@ references:
   isSpec: "True"
   fullName: UICatalog.Scenario.ScenarioMetadata.Description
   nameWithType: Scenario.ScenarioMetadata.Description
-- uid: UICatalog.Scenario.ScenarioMetadata.GetDescription(Type)
+- uid: UICatalog.Scenario.ScenarioMetadata.GetDescription(System.Type)
   name: GetDescription(Type)
-  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_GetDescription_Type_
-  commentId: M:UICatalog.Scenario.ScenarioMetadata.GetDescription(Type)
-  fullName: UICatalog.Scenario.ScenarioMetadata.GetDescription(Type)
+  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_GetDescription_System_Type_
+  commentId: M:UICatalog.Scenario.ScenarioMetadata.GetDescription(System.Type)
+  fullName: UICatalog.Scenario.ScenarioMetadata.GetDescription(System.Type)
   nameWithType: Scenario.ScenarioMetadata.GetDescription(Type)
 - uid: UICatalog.Scenario.ScenarioMetadata.GetDescription*
   name: GetDescription
@@ -10940,11 +11005,11 @@ references:
   isSpec: "True"
   fullName: UICatalog.Scenario.ScenarioMetadata.GetDescription
   nameWithType: Scenario.ScenarioMetadata.GetDescription
-- uid: UICatalog.Scenario.ScenarioMetadata.GetName(Type)
+- uid: UICatalog.Scenario.ScenarioMetadata.GetName(System.Type)
   name: GetName(Type)
-  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_GetName_Type_
-  commentId: M:UICatalog.Scenario.ScenarioMetadata.GetName(Type)
-  fullName: UICatalog.Scenario.ScenarioMetadata.GetName(Type)
+  href: api/UICatalog/UICatalog.Scenario.ScenarioMetadata.html#UICatalog_Scenario_ScenarioMetadata_GetName_System_Type_
+  commentId: M:UICatalog.Scenario.ScenarioMetadata.GetName(System.Type)
+  fullName: UICatalog.Scenario.ScenarioMetadata.GetName(System.Type)
   nameWithType: Scenario.ScenarioMetadata.GetName(Type)
 - uid: UICatalog.Scenario.ScenarioMetadata.GetName*
   name: GetName

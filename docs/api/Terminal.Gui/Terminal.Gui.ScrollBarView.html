@@ -362,6 +362,9 @@ ScrollBarViews are views that display a 1-character scrollbar, either horizontal
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -538,20 +541,21 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.ScrollBarVi
       </tr>
     </tbody>
   </table>
-  <h3 id="fields">Fields
+  <h3 id="properties">Properties
   </h3>
   
   
-  <h4 id="Terminal_Gui_ScrollBarView_ChangedPosition" data-uid="Terminal.Gui.ScrollBarView.ChangedPosition">ChangedPosition</h4>
+  <a id="Terminal_Gui_ScrollBarView_Host_" data-uid="Terminal.Gui.ScrollBarView.Host*"></a>
+  <h4 id="Terminal_Gui_ScrollBarView_Host" data-uid="Terminal.Gui.ScrollBarView.Host">Host</h4>
   <div class="markdown level1 summary">
-This event is raised when the position on the scrollbar has changed.
+Get or sets the view that host this <a class="xref" href="Terminal.Gui.ScrollView.html">ScrollView</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Action ChangedPosition</code></pre>
+    <pre><code class="lang-csharp hljs">public ScrollView Host { get; }</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
+  <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -561,13 +565,11 @@ This event is raised when the position on the scrollbar has changed.
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Action</span></td>
+        <td><a class="xref" href="Terminal.Gui.ScrollView.html">ScrollView</a></td>
         <td></td>
       </tr>
     </tbody>
   </table>
-  <h3 id="properties">Properties
-  </h3>
   
   
   <a id="Terminal_Gui_ScrollBarView_IsVertical_" data-uid="Terminal.Gui.ScrollBarView.IsVertical*"></a>
@@ -745,6 +747,34 @@ Redraws this view and its subviews; only redraws the views that have been flagge
    larger than the <code>region</code> parameter.
 </p>
 </div>
+  <h3 id="events">Events
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_ScrollBarView_ChangedPosition" data-uid="Terminal.Gui.ScrollBarView.ChangedPosition">ChangedPosition</h4>
+  <div class="markdown level1 summary">
+This event is raised when the position on the scrollbar has changed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action ChangedPosition</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>

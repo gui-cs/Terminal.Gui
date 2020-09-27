@@ -350,6 +350,9 @@ ListView <a class="xref" href="Terminal.Gui.View.html">View</a> renders a scroll
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -558,60 +561,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.ListView.html">
         <td><a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a></td>
         <td><span class="parametername">source</span></td>
         <td>IListDataSource object that provides a mechanism to render the data. The number of elements on the collection should not change, if you must change, set the &quot;Source&quot; property to reset the internal settings of the ListView.</td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="fields">Fields
-  </h3>
-  
-  
-  <h4 id="Terminal_Gui_ListView_OpenSelectedItem" data-uid="Terminal.Gui.ListView.OpenSelectedItem">OpenSelectedItem</h4>
-  <div class="markdown level1 summary">
-This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Action&lt;ListViewItemEventArgs&gt; OpenSelectedItem</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.ListViewItemEventArgs.html">ListViewItemEventArgs</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <h4 id="Terminal_Gui_ListView_SelectedItemChanged" data-uid="Terminal.Gui.ListView.SelectedItemChanged">SelectedItemChanged</h4>
-  <div class="markdown level1 summary">
-This event is raised when the selected item in the <a class="xref" href="Terminal.Gui.ListView.html">ListView</a> has changed.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Action&lt;ListViewItemEventArgs&gt; SelectedItemChanged</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.ListViewItemEventArgs.html">ListViewItemEventArgs</a>&gt;</td>
-        <td></td>
       </tr>
     </tbody>
   </table>
@@ -1378,6 +1327,60 @@ Sets the source to an <span class="xref">System.Collections.IList</span> value a
   <div class="markdown level1 remarks">
 Use the <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_Source">Source</a> property to set a new <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a> source and use custome rendering.
 </div>
+  <h3 id="events">Events
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_ListView_OpenSelectedItem" data-uid="Terminal.Gui.ListView.OpenSelectedItem">OpenSelectedItem</h4>
+  <div class="markdown level1 summary">
+This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;ListViewItemEventArgs&gt; OpenSelectedItem</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.ListViewItemEventArgs.html">ListViewItemEventArgs</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_ListView_SelectedItemChanged" data-uid="Terminal.Gui.ListView.SelectedItemChanged">SelectedItemChanged</h4>
+  <div class="markdown level1 summary">
+This event is raised when the selected item in the <a class="xref" href="Terminal.Gui.ListView.html">ListView</a> has changed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;ListViewItemEventArgs&gt; SelectedItemChanged</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.ListViewItemEventArgs.html">ListViewItemEventArgs</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>

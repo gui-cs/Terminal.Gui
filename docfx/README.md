@@ -7,4 +7,6 @@ This folder generates the API docs for Terminal.Gui
 3. Type `docfx --metadata` to generate metadata
 4. Type `docfx --serve` to generate the docs and start a local webserver for testing.
 
+Run `build_docs.ps1` to accomplish the above.
+
 If `docfx` fails with a `Stackoverflow` error. Just run it again. And again. Sometimes it takes a few times. If that doesn't work, create a fresh clone or delete the `docfx/api`, `docfx/obj`, and `docs/` folders and run the steps above again.
