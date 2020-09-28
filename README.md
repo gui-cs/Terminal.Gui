@@ -11,9 +11,15 @@ A simple toolkit for buiding console GUI apps for .NET, .NET Core, and Mono that
 
 ![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.gif)
 
-## RELEASE INFO
-
 The most recent released Nuget package is version `0.90` which is the "Stable Feature Complete" pre-release of 1.0. If you want the latest and greatest functionality, clone and build locally.
+
+* [Nuget Package](https://www.nuget.org/packages/Terminal.Gui)
+
+## Documentation
+
+* [Overview](https://migueldeicaza.github.io/gui.cs/articles/overview.html)
+* [Conceptual Documentation](https://migueldeicaza.github.io/gui.cs/articles/index.html)
+* [API Documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html)
 
 ## Controls & Features
 
@@ -86,12 +92,6 @@ Debates on architecture and design can be found in Issues tagged with [design](h
 * **UI Catalog** - The [UI Catalog project](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog) provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run` in the `UICatalog` directory to run the UI Catalog.
 * **Example (aka `demo.cs`)** - Run `dotnet run` in the `Example` directory to run the simple demo.
 * **Standalone Example** - A trivial .NET core sample application can be found in the `StandaloneExample` directory. Run `dotnet run` in directory to test.
-
-## Documentation
-
-* [Overview](https://migueldeicaza.github.io/gui.cs/articles/overview.html)
-* [Conceptual Documentation](https://migueldeicaza.github.io/gui.cs/articles/index.html)
-* [API Documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html)
 
 ### Sample Usage
 
@@ -187,7 +187,7 @@ Use NuGet to install the `Terminal.Gui` NuGet package: https://www.nuget.org/pac
 
 ## Running and Building
 
-* Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory) 
+* Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory)
 * Windows - Open `Terminal.Gui.sln` with Visual Studio 2019.
 
 ## Contributing
@@ -204,4 +204,4 @@ A presentation of this was part of the [Retro.NET](https://channel9.msdn.com/Eve
 
 Release history can be found in the [Terminal.Gui.csproj](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Terminal.Gui.csproj) file.
 
-In 2019 and 2020, Charlie Kindel (https://github.com/tig) and @BDisp (https://github.com/BDisp) vastly extended, improved, polished and fixed gui.cs to what it is today.
+In 2019 and 2020, [Charlie Kindel](https://github.com/tig) and [@BDisp](https://github.com/BDisp) vastly extended, improved, polished and fixed gui.cs to what it is today.
