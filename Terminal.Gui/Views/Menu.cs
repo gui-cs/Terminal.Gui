@@ -87,11 +87,6 @@ namespace Terminal.Gui {
 		public Rune HotKey;
 
 		/// <summary>
-		/// This is the global setting that can be used as a global shortcut to invoke the action on the menu.
-		/// </summary>
-		public Key ShortCut;
-
-		/// <summary>
 		/// Gets or sets the title. 
 		/// </summary>
 		/// <value>The title.</value>
