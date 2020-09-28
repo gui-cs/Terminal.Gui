@@ -1,9 +1,9 @@
 <Project>
 
   <PropertyGroup>
-    <Version>0.89.5</Version>
-    <AssemblyVersion>0.89.5</AssemblyVersion>
-    <FileVersion>0.89.5</FileVersion>    
+    <Version>0.89.6</Version>
+    <AssemblyVersion>0.89.6</AssemblyVersion>
+    <FileVersion>0.89.6</FileVersion>    
     <Authors>Miguel de Icaza, Charlie Kindel (@tig), @BDisp</Authors>
   </PropertyGroup>
 
