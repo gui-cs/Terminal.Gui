@@ -50,6 +50,6 @@ jobs:
           # Flag to toggle pushing symbols along with nuget package to the server, disabled by default
           INCLUDE_SYMBOLS: false
 
-        - name: publish symbols to nuget
-          id: publish_nuget_symbols
-          run: nuget push Terminal.Gui.snupkg
+        # - name: publish symbols to nuget
+        #   id: publish_nuget_symbols
+        #   run: nuget push Terminal.Gui.snupkg
