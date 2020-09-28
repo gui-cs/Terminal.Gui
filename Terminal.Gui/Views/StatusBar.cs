@@ -88,11 +88,16 @@ namespace Terminal.Gui {
 			CanFocus = false;
 			ColorScheme = Colors.Menu;
 			X = 0;
-			Y = SuperView != null ? SuperView.Frame.Height - 1 : Pos.AnchorEnd (1);
 			Width = Dim.Fill ();
 			Height = 1;
 
+			Initialized += StatusBar_Initialized;
 			Application.Resized += Application_Resized ();
+		}
+
+		private void StatusBar_Initialized (object sender, EventArgs e)
+		{
+			Y = SuperView.Frame.Height - 1;
 		}
 
 		private Action<Application.ResizedEventArgs> Application_Resized ()

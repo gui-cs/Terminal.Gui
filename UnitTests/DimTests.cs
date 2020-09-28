@@ -233,6 +233,91 @@ namespace Terminal.Gui {
 			Assert.Throws<ArgumentException> (() => dim = Dim.Percent (1000001));
 		}
 
+		[Fact]
+		public void Dim_Validation_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Another_Type ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = Application.Top;
+
+			var w = new Window ("w") {
+				Width = Dim.Fill (0),
+				Height = Dim.Sized (10)
+			};
+			var v = new View ("v") {
+				Width = Dim.Width (w) - 2,
+				Height = Dim.Percent (10)
+			};
+
+			w.Add (v);
+			t.Add (w);
+
+			t.Ready += () => {
+				Assert.Equal (2, w.Width = 2);
+				Assert.Equal (2, w.Height = 2);
+				Assert.Throws<ArgumentException> (() => v.Width = 2);
+				Assert.Throws<ArgumentException> (() => v.Height = 2);
+			};
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Null ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = Application.Top;
+
+			var w = new Window (new Rect (1, 2, 4, 5), "w");
+			t.Add (w);
+
+			t.Ready += () => {
+				Assert.Equal (3, w.Width = 3);
+				Assert.Equal (4, w.Height = 4);
+			};
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
+		{
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = Application.Top;
+
+			var w = new Window ("w") {
+				Width = Dim.Fill (0),
+				Height = Dim.Sized (10)
+			};
+			var v = new View ("v") {
+				Width = Dim.Width (w) - 2,
+				Height = Dim.Percent (10)
+			};
+
+			w.Add (v);
+			t.Add (w);
+
+			t.Ready += () => {
+				v.LayoutStyle = LayoutStyle.Absolute;
+				Assert.Equal (2, v.Width = 2);
+				Assert.Equal (2, v.Height = 2);
+			};
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+			Application.Shutdown ();
+		}
+
+
 		// TODO: Test operators
 	}
 }
