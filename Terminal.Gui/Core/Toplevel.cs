@@ -333,9 +333,9 @@ namespace Terminal.Gui {
 			}
 			ny = Math.Max (y, l);
 			if (SuperView == null || SuperView.GetType () != typeof (Toplevel)) {
-				s = Application.Top.StatusBar != null;
+				s = Application.Top.StatusBar != null && Application.Top.StatusBar.Visible;
 			} else {
-				s = ((Toplevel)SuperView).StatusBar != null;
+				s = ((Toplevel)SuperView).StatusBar != null && ((Toplevel)SuperView).StatusBar.Visible;
 			}
 			if (SuperView == null || SuperView is Toplevel) {
 				l = s ? Driver.Rows - 1 : Driver.Rows;
@@ -368,12 +368,12 @@ namespace Terminal.Gui {
 				}
 			}
 			if (top.StatusBar != null) {
-				if (ny + top.Frame.Height > top.Frame.Height - 1) {
+				if (ny + top.Frame.Height > top.Frame.Height - (top.StatusBar.Visible ? 1 : 0)) {
 					if (top.Height is Dim.DimFill)
-						top.Height = Dim.Fill () - 1;
+						top.Height = Dim.Fill () - (top.StatusBar.Visible ? 1 : 0);
 				}
-				if (top.StatusBar.Frame.Y != top.Frame.Height - 1) {
-					top.StatusBar.Y = top.Frame.Height - 1;
+				if (top.StatusBar.Frame.Y != top.Frame.Height - (top.StatusBar.Visible ? 1 : 0)) {
+					top.StatusBar.Y = top.Frame.Height - (top.StatusBar.Visible ? 1 : 0);
 					top.LayoutSubviews ();
 				}
 				top.BringSubviewToFront (top.StatusBar);

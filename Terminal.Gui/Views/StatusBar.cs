@@ -105,8 +105,8 @@ namespace Terminal.Gui {
 			return delegate {
 				X = 0;
 				Height = 1;
-				if (SuperView == null || SuperView is Toplevel) {
-					Y = SuperView.Frame.Height - 1;
+				if (SuperView != null || SuperView is Toplevel) {
+					Y = SuperView.Frame.Height - (Visible ? 1 : 0);
 				} else {
 					//Y = Pos.Bottom (SuperView);
 				}

@@ -215,7 +215,10 @@ namespace UICatalog {
 			_numlock = new StatusItem (Key.CharMask, "Num", null);
 			_scrolllock = new StatusItem (Key.CharMask, "Scroll", null);
 
-			_statusBar = new StatusBar (new StatusItem [] {
+			_statusBar = new StatusBar () { 
+				Visible = true,
+			};
+			_statusBar.Items = new StatusItem [] {
 				_capslock,
 				_numlock,
 				_scrolllock,
@@ -228,7 +231,14 @@ namespace UICatalog {
 						_runningScenario.RequestStop();
 					}
 				}),
-			});
+				new StatusItem(Key.F10, "~F10~ Hide/Show Status Bar", () => {
+					_statusBar.Visible = !_statusBar.Visible;
+					_leftPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
+					_rightPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
+					_top.LayoutSubviews();
+					_top.ChildNeedsDisplay();
+				}),
+			};
 
 			SetColorScheme ();
 			_top = Application.Top;
