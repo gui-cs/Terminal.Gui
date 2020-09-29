@@ -283,12 +283,15 @@ namespace Terminal.Gui {
 		public override bool CanFocus {
 			get => base.CanFocus;
 			set {
+				if (!addingView && IsInitialized && SuperView?.CanFocus == false && value) {
+					throw new InvalidOperationException ("Cannot set CanFocus to true if the SuperView CanFocus is false!");
+				}
 				if (base.CanFocus != value) {
 					base.CanFocus = value;
 					if (!value && tabIndex > -1) {
 						TabIndex = -1;
 					}
-					if (value && SuperView != null && !SuperView.CanFocus) {
+					if (value && SuperView?.CanFocus == false && addingView) {
 						SuperView.CanFocus = value;
 					}
 					if (value && tabIndex == -1) {
@@ -305,8 +308,12 @@ namespace Terminal.Gui {
 								view.CanFocus = value;
 								view.tabIndex = -1;
 							} else {
+								if (addingView) {
+									view.addingView = true;
+								}
 								view.CanFocus = view.oldCanFocus;
 								view.tabIndex = view.oldTabIndex;
+								view.addingView = false;
 							}
 						}
 					}
@@ -693,6 +700,8 @@ namespace Terminal.Gui {
 				container.ChildNeedsDisplay ();
 		}
 
+		internal bool addingView = false;
+
 		/// <summary>
 		///   Adds a subview (child) to this view.
 		/// </summary>
@@ -713,14 +722,22 @@ namespace Terminal.Gui {
 			tabIndexes.Add (view);
 			view.container = this;
 			if (view.CanFocus) {
+				addingView = true;
+				if (SuperView?.CanFocus == false) {
+					SuperView.addingView = true;
+					SuperView.CanFocus = true;
+					SuperView.addingView = false;
+				}
 				CanFocus = true;
 				view.tabIndex = tabIndexes.IndexOf (view);
+				addingView = false;
 			}
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
 			OnAdded (view);
 			if (IsInitialized) {
 				view.BeginInit ();
+				view.EndInit ();
 			}
 		}
 
@@ -1985,7 +2002,6 @@ namespace Terminal.Gui {
 			if (!IsInitialized) {
 				oldCanFocus = CanFocus;
 				oldTabIndex = tabIndex;
-				Initialized?.Invoke (this, EventArgs.Empty);
 			}
 			if (subviews?.Count > 0) {
 				foreach (var view in subviews) {
@@ -2009,6 +2025,7 @@ namespace Terminal.Gui {
 					}
 				}
 			}
+			Initialized?.Invoke (this, EventArgs.Empty);
 		}
 
 		/// <summary>
