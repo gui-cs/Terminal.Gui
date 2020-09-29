@@ -27,7 +27,7 @@ jobs:
           PACKAGE_NAME: Terminal.Gui
           
           # Filepath with version info, relative to root of repository & defaults to PROJECT_FILE_PATH
-          VERSION_FILE_PATH: Directory.Build.props
+          VERSION_FILE_PATH: Terminal.Gui/Directory.Build.props
 
           # Regex pattern to extract version info in a capturing group
           VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
