@@ -1,9 +1,17 @@
 <Project>
 
   <PropertyGroup>
+    <!--
+       Uses this guidance: https://docs.microsoft.com/en-us/dotnet/standard/library-guidance/versioning
+       Use major.minor.build.revision
+       Version 
+          - Used for Nuget it shoudl be major.minor.build[-pre].revision where [-pre] indicates it's a pre-release.
+          - Changing Version will cause a new nuget package to get generated and published when 'master' is updated
+       AssemblyVersion & File Version are for the assembly. 
+    -->
     <Version>1.0.0-pre.1</Version>
-    <AssemblyVersion>1.0.1</AssemblyVersion>
-    <FileVersion>1.0.1</FileVersion>    
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <FileVersion>1.0.0.1</FileVersion>    
     <Authors>Miguel de Icaza, Charlie Kindel (@tig), @BDisp</Authors>
   </PropertyGroup>
 
