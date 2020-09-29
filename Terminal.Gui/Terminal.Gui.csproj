@@ -22,7 +22,10 @@
     <Summary>Application framework for creating modern console applications using .NET</Summary>
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
     <PackageReleaseNotes>
-      This (0.90) is the "Feature Complete" pre-release of Terminal.Gui (aka gui.cs) 1.0. This release is a signficant upgrade from the previous published release (0.81). Most of the major changes and bug fixes are listed below. NOTE: This release includes breaking changes to the API; we will strive to avoid any more breaking changes before 1.0.
+      v1.00 -
+      * If StatusBar.Visible is set to false, TopLevel resizes correctly enabling hiding/showing of a StatusBar. UICatalog demonstrates.
+      
+      v0.90 - "Feature Complete" pre-release of Terminal.Gui (aka gui.cs) 1.0. This release is a signficant upgrade from the previous published release (0.81). Most of the major changes and bug fixes are listed below. NOTE: This release includes breaking changes to the API; we will strive to avoid any more breaking changes before 1.0.
 
       What's new:
       * New sample/demo app - UI Catalog - Replaces demo.cs with an easy to use and extend set of demo scenarios. (Thanks @tig!)
