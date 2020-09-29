@@ -182,33 +182,6 @@ namespace Terminal.Gui {
 			Colors.Error.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Red);
 			Colors.Error.HotFocus = Colors.Error.HotNormal;
 
-			HLine = '\u2500';
-			VLine = '\u2502';
-			Stipple = '\u2592';
-			Diamond = '\u25c6';
-			ULCorner = '\u250C';
-			LLCorner = '\u2514';
-			URCorner = '\u2510';
-			LRCorner = '\u2518';
-			LeftTee = '\u251c';
-			RightTee = '\u2524';
-			TopTee = '\u22a4';
-			BottomTee = '\u22a5';
-			Checked = '\u221a';
-			UnChecked = ' ';
-			Selected = '\u25cf';
-			UnSelected = '\u25cc';
-			RightArrow = '\u25ba';
-			LeftArrow = '\u25c4';
-			UpArrow = '\u25b2';
-			DownArrow = '\u25bc';
-			LeftDefaultIndicator = '\u25e6';
-			RightDefaultIndicator = '\u25e6';
-			LeftBracket = '[';
-			RightBracket = ']';
-			OnMeterSegment = '\u258c';
-			OffMeterSegement = ' ';
-
 			//MockConsole.Clear ();
 		}
 

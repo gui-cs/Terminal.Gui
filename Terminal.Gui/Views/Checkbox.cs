@@ -115,11 +115,12 @@ namespace Terminal.Gui {
 		{
 			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
 			Move (0, 0);
-			Driver.AddStr (Checked ? "[x] " : "[ ] ");
-			Move (4, 0);
+			Driver.AddRune (Checked ? Driver.Checked : Driver.UnChecked);
+			Driver.AddRune (' ');
+			Move (2, 0);
 			Driver.AddStr (Text);
 			if (hot_pos != -1) {
-				Move (4 + hot_pos, 0);
+				Move (2 + hot_pos, 0);
 				Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
 				Driver.AddRune (hot_key);
 			}
@@ -128,7 +129,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
-			Move (1, 0);
+			Move (0, 0);
 		}
 
 		///<inheritdoc/>

@@ -563,33 +563,6 @@ namespace Terminal.Gui {
 			Colors.Error.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkRed);
 			Colors.Error.HotNormal = MakeColor (ConsoleColor.Black, ConsoleColor.White);
 			Colors.Error.HotFocus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkRed);
-
-			HLine = '\u2500';
-			VLine = '\u2502';
-			Stipple = '\u2591';
-			Diamond = '\u25ca';
-			ULCorner = '\u250C';
-			LLCorner = '\u2514';
-			URCorner = '\u2510';
-			LRCorner = '\u2518';
-			LeftTee = '\u251c';
-			RightTee = '\u2524';
-			TopTee = '\u252c';
-			BottomTee = '\u2534';
-			Checked = '\u221a';
-			UnChecked = ' ';
-			Selected = '\u25cf';
-			UnSelected = '\u25cc';
-			RightArrow = '\u25ba';
-			LeftArrow = '\u25c4';
-			UpArrow = '\u25b2';
-			DownArrow = '\u25bc';
-			LeftDefaultIndicator = '\u25e6';
-			RightDefaultIndicator = '\u25e6';
-			LeftBracket = '[';
-			RightBracket = ']';
-			OnMeterSegment = '\u258c';
-			OffMeterSegement = ' ';
 		}
 
 		[StructLayout (LayoutKind.Sequential)]
