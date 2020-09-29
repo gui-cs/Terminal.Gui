@@ -913,132 +913,132 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Horizontal line character.
 		/// </summary>
-		public Rune HLine;
+		public Rune HLine = '\u2500';
 
 		/// <summary>
 		/// Vertical line character.
 		/// </summary>
-		public Rune VLine;
+		public Rune VLine = '\u2502';
 
 		/// <summary>
 		/// Stipple pattern
 		/// </summary>
-		public Rune Stipple;
+		public Rune Stipple = '\u2591';
 
 		/// <summary>
 		/// Diamond character
 		/// </summary>
-		public Rune Diamond;
+		public Rune Diamond = '\u25ca';
 
 		/// <summary>
 		/// Upper left corner
 		/// </summary>
-		public Rune ULCorner;
+		public Rune ULCorner = '\u250C';
 
 		/// <summary>
 		/// Lower left corner
 		/// </summary>
-		public Rune LLCorner;
+		public Rune LLCorner = '\u2514';
 
 		/// <summary>
 		/// Upper right corner
 		/// </summary>
-		public Rune URCorner;
+		public Rune URCorner = '\u2510';
 
 		/// <summary>
 		/// Lower right corner
 		/// </summary>
-		public Rune LRCorner;
+		public Rune LRCorner = '\u2518';
 
 		/// <summary>
 		/// Left tee
 		/// </summary>
-		public Rune LeftTee;
+		public Rune LeftTee = '\u251c';
 
 		/// <summary>
 		/// Right tee
 		/// </summary>
-		public Rune RightTee;
+		public Rune RightTee = '\u2524';
 
 		/// <summary>
 		/// Top tee
 		/// </summary>
-		public Rune TopTee;
+		public Rune TopTee = '\u252c';
 
 		/// <summary>
 		/// The bottom tee.
 		/// </summary>
-		public Rune BottomTee;
+		public Rune BottomTee = '\u2534';
 
 		/// <summary>
 		/// Checkmark.
 		/// </summary>
-		public Rune Checked;
+		public Rune Checked = '\u221a';
 
 		/// <summary>
 		/// Un-checked checkmark.
 		/// </summary>
-		public Rune UnChecked;
+		public Rune UnChecked = '\u2574';
 
 		/// <summary>
 		/// Selected mark.
 		/// </summary>
-		public Rune Selected;
+		public Rune Selected = '\u25cf';
 
 		/// <summary>
 		/// Un-selected selected mark.
 		/// </summary>
-		public Rune UnSelected;
+		public Rune UnSelected = '\u25cc';
 
 		/// <summary>
 		/// Right Arrow.
 		/// </summary>
-		public Rune RightArrow;
+		public Rune RightArrow = '\u25ba';
 
 		/// <summary>
 		/// Left Arrow.
 		/// </summary>
-		public Rune LeftArrow;
+		public Rune LeftArrow = '\u25c4';
 
 		/// <summary>
 		/// Down Arrow.
 		/// </summary>
-		public Rune DownArrow;
+		public Rune DownArrow = '\u25bc';
 
 		/// <summary>
 		/// Up Arrow.
 		/// </summary>
-		public Rune UpArrow;
+		public Rune UpArrow = '\u25b2';
 
 		/// <summary>
 		/// Left indicator for default action (e.g. for <see cref="Button"/>).
 		/// </summary>
-		public Rune LeftDefaultIndicator;
+		public Rune LeftDefaultIndicator = '\u25e6';
 
 		/// <summary>
 		/// Right indicator for default action (e.g. for <see cref="Button"/>).
 		/// </summary>
-		public Rune RightDefaultIndicator;
+		public Rune RightDefaultIndicator = '\u25e6';
 
 		/// <summary>
 		/// Left frame/bracket (e.g. '[' for <see cref="Button"/>).
 		/// </summary>
-		public Rune LeftBracket;
+		public Rune LeftBracket = '[';
 
 		/// <summary>
 		/// Right frame/bracket (e.g. ']' for <see cref="Button"/>).
 		/// </summary>
-		public Rune RightBracket;
+		public Rune RightBracket = ']';
 
 		/// <summary>
 		/// On Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
 		/// </summary>
-		public Rune OnMeterSegment;
+		public Rune OnMeterSegment = '\u258c';
 
 		/// <summary>
 		/// Off Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
 		/// </summary>
-		public Rune OffMeterSegement;
+		public Rune OffMeterSegement = ' ';
 
 		/// <summary>
 		/// Make the attribute for the foreground and background colors.
