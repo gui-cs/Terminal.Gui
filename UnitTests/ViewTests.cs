@@ -578,10 +578,10 @@ namespace Terminal.Gui {
 			t.Initialized += (s, e) => {
 				tc++;
 				Assert.Equal (1, tc);
-				Assert.Equal (0, wc);
-				Assert.Equal (0, v1c);
-				Assert.Equal (0, v2c);
-				Assert.Equal (0, sv1c);
+				Assert.Equal (1, wc);
+				Assert.Equal (1, v1c);
+				Assert.Equal (1, v2c);
+				Assert.Equal (1, sv1c);
 
 				Assert.True (t.CanFocus);
 				Assert.True (w.CanFocus);
@@ -611,8 +611,8 @@ namespace Terminal.Gui {
 				Assert.Equal (t.Frame.Width, sv1.Frame.Width);
 				Assert.Equal (t.Frame.Height, sv1.Frame.Height);
 				Assert.False (sv1.CanFocus);
-				sv1.CanFocus = true;
-				Assert.True (sv1.CanFocus);
+				Assert.Throws<InvalidOperationException> (() => sv1.CanFocus = true);
+				Assert.False (sv1.CanFocus);
 			};
 
 			v1.Add (sv1);
@@ -637,7 +637,10 @@ namespace Terminal.Gui {
 			Assert.True (w.CanFocus);
 			Assert.False (v1.CanFocus);
 			Assert.False (v2.CanFocus);
-			Assert.True (sv1.CanFocus);
+			Assert.False (sv1.CanFocus);
+
+			v1.CanFocus = true;
+			Assert.False (sv1.CanFocus); // False because sv1 was disposed and it isn't a subview of v1.
 		}
 
 		[Fact]
@@ -656,10 +659,10 @@ namespace Terminal.Gui {
 			t.Initialized += (s, e) => {
 				tc++;
 				Assert.Equal (1, tc);
-				Assert.Equal (0, wc);
-				Assert.Equal (0, v1c);
-				Assert.Equal (0, v2c);
-				Assert.Equal (0, sv1c);
+				Assert.Equal (1, wc);
+				Assert.Equal (1, v1c);
+				Assert.Equal (1, v2c);
+				Assert.Equal (0, sv1c); // Added after t in the Application.Iteration.
 
 				Assert.True (t.CanFocus);
 				Assert.True (w.CanFocus);
@@ -694,8 +697,8 @@ namespace Terminal.Gui {
 					Assert.NotEqual (t.Frame.Width, sv1.Frame.Width);
 					Assert.NotEqual (t.Frame.Height, sv1.Frame.Height);
 					Assert.False (sv1.CanFocus);
-					sv1.CanFocus = true;
-					Assert.True (sv1.CanFocus);
+					Assert.Throws<InvalidOperationException> (() => sv1.CanFocus = true);
+					Assert.False (sv1.CanFocus);
 				};
 
 				v1.Add (sv1);
@@ -813,7 +816,11 @@ namespace Terminal.Gui {
 				Assert.False (f.CanFocus);
 				Assert.False (v.CanFocus);
 
-				v.CanFocus = true;
+				Assert.Throws<InvalidOperationException> (() => v.CanFocus = true);
+				Assert.False (f.CanFocus);
+				Assert.False (v.CanFocus);
+
+				f.CanFocus = true;
 				Assert.True (f.CanFocus);
 				Assert.True (v.CanFocus);
 			};
@@ -1015,5 +1022,6 @@ namespace Terminal.Gui {
 			Application.Run ();
 			Application.Shutdown ();
 		}
+
 	}
 }
