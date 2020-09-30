@@ -12,3 +12,5 @@ docfx/api
 
 #git merge files
 *.orig
+
+.vscode/
