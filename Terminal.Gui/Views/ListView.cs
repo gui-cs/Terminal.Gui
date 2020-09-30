@@ -206,10 +206,12 @@ namespace Terminal.Gui {
 		public int SelectedItem {
 			get => selected;
 			set {
-				if (source == null || source.Count == 0)
+				if (source == null || source.Count == 0) {
 					return;
-				if (selected < 0 || selected >= source.Count)
+				}
+				if (value < 0 || value >= source.Count) {
 					throw new ArgumentException ("value");
+				}
 				selected = value;
 				OnSelectedChanged ();
 			}
@@ -466,7 +468,7 @@ namespace Terminal.Gui {
 					top++;
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
-			} else if (lastSelectedItem == -1) {
+			} else if (selected == 0) {
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			}
@@ -575,7 +577,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			return false;
+			return base.OnEnter (view);
 		}
 
 		///<inheritdoc/>
