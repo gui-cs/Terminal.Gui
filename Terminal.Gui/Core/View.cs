@@ -170,6 +170,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Rune HotKeySpecifier { get => textFormatter.HotKeySpecifier; set => textFormatter.HotKeySpecifier = value; }
 
+		/// <summary>
+		/// Gets or sets arbitrary data for the view.
+		/// </summary>
+		/// <remarks>This property is not used internally.</remarks>
+		public object Data { get; set; }
+
 		internal Direction FocusDirection {
 			get => SuperView?.FocusDirection ?? focusDirection;
 			set {
