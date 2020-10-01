@@ -10,15 +10,15 @@ namespace ReactiveExample {
 		
 		public LoginView (LoginViewModel viewModel) : base("Reactive Extensions Example") {
 			ViewModel = viewModel;
-			this.StackPanel (new Label ("Login Form"))
-				.Append (UsernameLengthLabel ())
-				.Append (UsernameInput ())
-				.Append (PasswordLengthLabel ())
-				.Append (PasswordInput ())
-				.Append (ValidationLabel ())
-				.Append (LoginButton ())
-				.Append (ClearButton ())
-				.Append (LoginProgressLabel ());
+			var title = TitleLabel ();
+			var usernameLengthLabel = UsernameLengthLabel (title);
+			var usernameInput = UsernameInput (usernameLengthLabel);
+			var passwordLengthLabel = PasswordLengthLabel (usernameInput);
+			var passwordInput = PasswordInput (passwordLengthLabel);
+			var validationLabel = ValidationLabel (passwordInput);
+			var loginButton = LoginButton (validationLabel);
+			var clearButton = ClearButton (loginButton);
+			LoginProgressLabel (clearButton);
 		}
 		
 		public LoginViewModel ViewModel { get; set; }
@@ -28,8 +28,18 @@ namespace ReactiveExample {
 			base.Dispose (disposing);
 		}
 
-		TextField UsernameInput () {
-			var usernameInput = new TextField (ViewModel.Username) { Width = 40 };
+		Label TitleLabel () {
+			var label = new Label("Login Form");
+			Add (label);
+			return label;
+		}
+
+		TextField UsernameInput (View previous) {
+			var usernameInput = new TextField (ViewModel.Username) {
+				X = Pos.Left(previous),
+				Y = Pos.Top(previous) + 1,
+				Width = 40
+			};
 			ViewModel
 				.WhenAnyValue (x => x.Username)
 				.BindTo (usernameInput, x => x.Text)
@@ -41,21 +51,31 @@ namespace ReactiveExample {
 				.DistinctUntilChanged ()
 				.BindTo (ViewModel, x => x.Username)
 				.DisposeWith (_disposable);
+			Add (usernameInput);
 			return usernameInput;
 		}
 
-		Label UsernameLengthLabel () {
-			var usernameLengthLabel = new Label { Width = 40 };
+		Label UsernameLengthLabel (View previous) {
+			var usernameLengthLabel = new Label {
+				X = Pos.Left(previous),
+				Y = Pos.Top(previous) + 1,
+				Width = 40
+			};
 			ViewModel
 				.WhenAnyValue (x => x.UsernameLength)
 				.Select (length => ustring.Make ($"Username ({length} characters)"))
 				.BindTo (usernameLengthLabel, x => x.Text)
 				.DisposeWith (_disposable);
+			Add (usernameLengthLabel);
 			return usernameLengthLabel;
 		}
 
-		TextField PasswordInput () {
-			var passwordInput = new TextField (ViewModel.Password) { Width = 40 };
+		TextField PasswordInput (View previous) {
+			var passwordInput = new TextField (ViewModel.Password) {
+				X = Pos.Left(previous),
+				Y = Pos.Top(previous) + 1,
+				Width = 40
+			};
 			ViewModel
 				.WhenAnyValue (x => x.Password)
 				.BindTo (passwordInput, x => x.Text)
@@ -67,23 +87,33 @@ namespace ReactiveExample {
 				.DistinctUntilChanged ()
 				.BindTo (ViewModel, x => x.Password)
 				.DisposeWith (_disposable);
+			Add (passwordInput);
 			return passwordInput;
 		}
 
-		Label PasswordLengthLabel () {
-			var passwordLengthLabel = new Label { Width = 40 };
+		Label PasswordLengthLabel (View previous) {
+			var passwordLengthLabel = new Label {
+				X = Pos.Left(previous),
+				Y = Pos.Top(previous) + 1,
+				Width = 40
+			};
 			ViewModel
 				.WhenAnyValue (x => x.PasswordLength)
 				.Select (length => ustring.Make ($"Password ({length} characters)"))
 				.BindTo (passwordLengthLabel, x => x.Text)
 				.DisposeWith (_disposable);
+			Add (passwordLengthLabel);
 			return passwordLengthLabel;
 		}
 
-		Label ValidationLabel () {
+		Label ValidationLabel (View previous) {
 			var error = ustring.Make("Please, enter user name and password.");
 			var success = ustring.Make("The input is valid!");
-			var validationLabel = new Label(error) { Width = 40 };
+			var validationLabel = new Label(error) {
+				X = Pos.Left(previous),
+				Y = Pos.Top(previous) + 1,
+				Width = 40
+			};
 			ViewModel
 				.WhenAnyValue (x => x.IsValid)	
 				.Select (valid => valid ? success : error)
@@ -94,38 +124,55 @@ namespace ReactiveExample {
 				.Select (valid => valid ? Colors.Base : Colors.Error)
 				.BindTo (validationLabel, x => x.ColorScheme)
 				.DisposeWith (_disposable);
+			Add (validationLabel);
 			return validationLabel;
 		}
 
-		Label LoginProgressLabel () {
+		Label LoginProgressLabel (View previous) {
 			var progress = ustring.Make ("Logging in...");
 			var idle = ustring.Make ("Press 'Login' to log in.");
-			var loginProgressLabel = new Label(idle) { Width = 40 };
+			var loginProgressLabel = new Label(idle) {
+				X = Pos.Left(previous),
+				Y = Pos.Top(previous) + 1,
+				Width = 40
+			};
 			ViewModel
 				.WhenAnyObservable (x => x.Login.IsExecuting)
 				.Select (executing => executing ? progress : idle)
+				.ObserveOn (RxApp.MainThreadScheduler)
 				.BindTo (loginProgressLabel, x => x.Text)
 				.DisposeWith (_disposable);
+			Add (loginProgressLabel);
 			return loginProgressLabel;
 		}
 
-		Button LoginButton () {
-			var loginButton = new Button ("Login") { Width = 40 };
+		Button LoginButton (View previous) {
+			var loginButton = new Button ("Login") {
+				X = Pos.Left(previous),
+				Y = Pos.Top(previous) + 1,
+				Width = 40
+			};
 			loginButton
 				.Events ()
 				.Clicked
 				.InvokeCommand (ViewModel, x => x.Login)
 				.DisposeWith (_disposable);
+			Add (loginButton);
 			return loginButton;
 		}
 
-		Button ClearButton () {
-			var clearButton = new Button("Clear") { Width = 40 };
+		Button ClearButton (View previous) {
+			var clearButton = new Button("Clear") {
+				X = Pos.Left(previous),
+				Y = Pos.Top(previous) + 1,
+				Width = 40
+			};
 			clearButton
 				.Events ()
 				.Clicked
 				.InvokeCommand (ViewModel, x => x.Clear)
 				.DisposeWith (_disposable);
+			Add (clearButton);
 			return clearButton;
 		}
 		
