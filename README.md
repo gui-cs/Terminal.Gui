@@ -52,6 +52,7 @@ In addition, a complete Xterm/Vt100 terminal emulator that you can embed is now 
 * **[Arbitrary Views](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.View.html)** - All visible UI elements are subclasses of the `View` class, and these in turn can contain an arbitrary number of sub-views.
 * **Advanced App Features** - The [Mainloop](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Mono.Terminal.MainLoop.html) supports processing events, idle handlers, timers, and monitoring file
 descriptors.
+* **Reactive Extensions Support** - Use [reactive extensions](https://github.com/dotnet/reactive) and benefit from increased code readability, and the ability to apply the MVVM pattern and [ReactiveUI](https://www.reactiveui.net/) data bindings. See the [source code](https://github.com/migueldeicaza/gui.cs/tree/master/ReactiveExample) of a sample app in order to learn how to achieve this.
 
 ### Keyboard Input Handling
 
