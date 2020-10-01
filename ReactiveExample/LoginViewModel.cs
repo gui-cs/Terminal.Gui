@@ -8,6 +8,17 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace ReactiveExample {
+	//
+	// This view model can be easily shared across different UI frameworks.
+	// For example, if you have a WPF or XF app with view models written
+	// this way, you can easily port your app to Terminal.Gui by implementing
+	// the views with Terminal.Gui classes and ReactiveUI bindings.
+	//
+	// We mark the view model with the [DataContract] attributes and this
+	// allows you to save the view model class to the disk, and then to read
+	// the view model from the disk, making your app state persistent.
+	// See also: https://www.reactiveui.net/docs/handbook/data-persistence/
+	//
 	[DataContract]
 	public class LoginViewModel : ReactiveObject {
 		readonly ObservableAsPropertyHelper<int> _usernameLength;
