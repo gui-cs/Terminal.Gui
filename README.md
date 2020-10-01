@@ -3,7 +3,6 @@
 [![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui)
 [![Downloads](https://img.shields.io/nuget/dt/Terminal.Gui)](https://www.nuget.org/packages/Terminal.Gui)
 [![License](https://img.shields.io/github/license/migueldeicaza/gui.cs.svg)](LICENSE)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mono/mono?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) - The Mono Channel room
 
 # Terminal.Gui - Terminal GUI toolkit for .NET
 
@@ -11,13 +10,13 @@ A simple toolkit for buiding console GUI apps for .NET, .NET Core, and Mono that
 
 ![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.gif)
 
-## RELEASE INFO
+The most recent released [Nuget package is version `0.90.x`](https://www.nuget.org/packages/Terminal.Gui) which is the "Stable, Feature Complete" pre-release of 1.0. 
 
-The most recent released Nuget package is version `0.90` which is the "Stable Feature Complete" pre-release of 1.0. If you want the latest and greatest functionality, clone and build locally.
+Nuget also contains pre-release versions of 1.0; they are identified with `-pre` in the version number (e.g. `1.0.0-pre.1`)
 
 ## Controls & Features
 
-The *Terminal.Gui* toolkit contains various controls for building text user interfaces:
+*Terminal.Gui* contains various controls for building text user interfaces:
 
 * [Button](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Button.html) 
 * [CheckBox](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.CheckBox.html)
@@ -45,7 +44,7 @@ In addition, a complete Xterm/Vt100 terminal emulator that you can embed is now 
 
 ### Features
 
-* **Cross Platform** - Terminal drivers for Curses, [Windows Console](https://github.com/migueldeicaza/gui.cs/issues/27), and the .NET Console mean **Terminal.Gui** works well on both color and monochrome terminals and has mouse support on terminal emulators that support it.
+* **Cross Platform** - Works on Windows, Mac, and Linux. Terminal drivers for Curses, [Windows Console](https://github.com/migueldeicaza/gui.cs/issues/27), and the .NET Console mean **Terminal.Gui** works well on both color and monochrome terminals and has mouse support on terminal emulators that support it.
 * **Keyboard and Mouse Input** - Both keyboard and mouse input are supported, including limited support for drag & drop.
 * **[Flexible Layout](https://migueldeicaza.github.io/gui.cs/articles/overview.html#layout)** - **Terminal.Gui** supports both *Absolute layout* and an innovative UI layout system referred to as *Computed Layout*. *Computed Layout* makes it easy to layout controls relative to each other and enables dynamic console GUIs.
 * **Clipboard support** - Cut, Copy, and Paste of text provided through the [`Clipboard`](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Clipboard.html) class.
@@ -70,29 +69,28 @@ To enter the key `ESC`, you can either press `ESC` and wait 100 milliseconds, or
 
 ### Driver model
 
-Currently **Terminal.Gui** has support for [ncurses](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Drivers/CursesDriver.cs), [`System.Console`](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Drivers/NetDriver.cs), and a full [Win32 Console](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Drivers/WindowsDriver.cs) front-end.
+**Terminal.Gui** has support for [ncurses](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Drivers/CursesDriver.cs), [`System.Console`](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Drivers/NetDriver.cs), and a full [Win32 Console](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Drivers/WindowsDriver.cs) front-end.
 
 `ncurses` is used on Mac/Linux/Unix with color support based on what your library is compiled with; the Windows driver supports full color and mouse, and an easy-to-debug `System.Console` can be used on Windows and Unix, but lacks mouse support.
 
 You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 
-### Design
-
-See the [`Terminal.Gui/` README](https://github.com/migueldeicaza/gui.cs/tree/master/Terminal.Gui) for an overview of how the library is structured. The [Conceptual Documentation](https://migueldeicaza.github.io/gui.cs/articles/index.html) provides insight into core concepts.
-
-Debates on architecture and design can be found in Issues tagged with [design](https://github.com/migueldeicaza/gui.cs/issues?q=is%3Aopen+is%3Aissue+label%3Adesign).
-
 ## Showcase & Examples
 
 * **UI Catalog** - The [UI Catalog project](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog) provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run` in the `UICatalog` directory to run the UI Catalog.
+* **Reactive Example** - A [sample app](https://github.com/migueldeicaza/gui.cs/tree/master/ReactiveExample) that shows how to use `System.Reactive` and `ReactiveUI` with `Terminal.Gui`. The app uses the MVVM architecture that may seem familiar to folks coming from WPF, Xamarin Forms, UWP, Avalonia, or Windows Forms. In this app, we implement the data bindings using ReactiveUI `WhenAnyValue` syntax and [Pharmacist](https://github.com/reactiveui/pharmacist) — a tool that converts all events in a NuGet package into observable wrappers.
 * **Example (aka `demo.cs`)** - Run `dotnet run` in the `Example` directory to run the simple demo.
 * **Standalone Example** - A trivial .NET core sample application can be found in the `StandaloneExample` directory. Run `dotnet run` in directory to test.
+* **FSharp Example** - An example showing how to build a Terminal.Gui app using F#.
+* **PowerShell's Out-ConsoleGridView** - The [`Out-ConsoleGridView` PowerShell Cmdlet](https://github.com/PowerShell/GraphicalTools/blob/master/docs/Microsoft.PowerShell.ConsoleGuiTools/Out-ConsoleGridView.md) sends the output from a command to a grid view window where the output is displayed in an interactive table. sends the output from a command to a grid view window where the output is displayed in an interactive table, using Terminal.Gui. 
 
 ## Documentation
 
 * [Overview](https://migueldeicaza.github.io/gui.cs/articles/overview.html)
 * [Conceptual Documentation](https://migueldeicaza.github.io/gui.cs/articles/index.html)
 * [API Documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html)
+
+See the [`Terminal.Gui/` README](https://github.com/migueldeicaza/gui.cs/tree/master/Terminal.Gui) for an overview of how the library is structured. The [Conceptual Documentation](https://migueldeicaza.github.io/gui.cs/articles/index.html) provides insight into core concepts.
 
 ### Sample Usage
 
@@ -105,18 +103,19 @@ class Demo {
 		Application.Init ();
 		var top = Application.Top;
 
-	// Creates the top-level window to show
+		// Creates the top-level window to show
 		var win = new Window ("MyApp") {
-		X = 0,
-		Y = 1, // Leave one row for the toplevel menu
+			X = 0,
+			Y = 1, // Leave one row for the toplevel menu
 
-		// By using Dim.Fill(), it will automatically resize without manual intervention
-		Width = Dim.Fill (),
-		Height = Dim.Fill ()
-	};
+			// By using Dim.Fill(), it will automatically resize without manual intervention
+			Width = Dim.Fill (),
+			Height = Dim.Fill ()
+		};
+	
 		top.Add (win);
 
-	// Creates a menubar, the item "New" has a help menu.
+		// Creates a menubar, the item "New" has a help menu.
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
 				new MenuItem ("_New", "Creates new file", NewFile),
@@ -131,34 +130,35 @@ class Demo {
 		});
 		top.Add (menu);
 
-	var login = new Label ("Login: ") { X = 3, Y = 2 };
-	var password = new Label ("Password: ") {
+		var login = new Label ("Login: ") { X = 3, Y = 2 };
+		var password = new Label ("Password: ") {
 			X = Pos.Left (login),
-		Y = Pos.Top (login) + 1
+			Y = Pos.Top (login) + 1
 		};
-	var loginText = new TextField ("") {
-				X = Pos.Right (password),
-				Y = Pos.Top (login),
-				Width = 40
+		var loginText = new TextField ("") {
+			X = Pos.Right (password),
+			Y = Pos.Top (login),
+			Width = 40
 		};
 		var passText = new TextField ("") {
-				Secret = true,
-				X = Pos.Left (loginText),
-				Y = Pos.Top (password),
-				Width = Dim.Width (loginText)
+			Secret = true,
+			X = Pos.Left (loginText),
+			Y = Pos.Top (password),
+			Width = Dim.Width (loginText)
 		};
 	
-	// Add some controls, 
-	win.Add (
-		// The ones with my favorite layout system
-  		login, password, loginText, passText,
+		// Add some controls, 
+		win.Add (
+			// The ones with my favorite layout system, Computed
+  			login, password, loginText, passText,
 
-		// The ones laid out like an australopithecus, with absolute positions:
+			// The ones laid out like an australopithecus, with Absolute positions:
 			new CheckBox (3, 6, "Remember me"),
 			new RadioGroup (3, 8, new [] { "_Personal", "_Company" }),
 			new Button (3, 14, "Ok"),
 			new Button (10, 14, "Cancel"),
-			new Label (3, 18, "Press F9 or ESC plus 9 to activate the menubar"));
+			new Label (3, 18, "Press F9 or ESC plus 9 to activate the menubar")
+		);
 
 		Application.Run ();
 	}
@@ -182,18 +182,18 @@ The example above shows how to add views using both styles of layout supported b
 
 ## Installing
 
-*We are actively converging on a major update to Terminal.Gui. The most recent released Nuget package is version `0.81` which is way behind `master`. This README and the API Documentation refers to the latest build from `master`. If you want the latest and greatest functionality, clone and build locally. Otherwise `0.81` is quite stable, but the documentation may not match.*
-
 Use NuGet to install the `Terminal.Gui` NuGet package: https://www.nuget.org/packages/Terminal.Gui
 
 ## Running and Building
 
-* Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory) 
+* Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet ./UICatalog/bin/Debug/net5.0/UICatalog.dll` or by directly executing `./UICatalog/bin/Debug/net5.0/UICatalog.exe`.
 * Windows - Open `Terminal.Gui.sln` with Visual Studio 2019.
 
 ## Contributing
 
 See [CONTRIBUTING.md](https://github.com/migueldeicaza/gui.cs/blob/master/CONTRIBUTING.md).
+
+Debates on architecture and design can be found in Issues tagged with [design](https://github.com/migueldeicaza/gui.cs/issues?q=is%3Aopen+is%3Aissue+label%3Adesign).
 
 ## History
 

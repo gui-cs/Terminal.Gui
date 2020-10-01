@@ -12,7 +12,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UICatalog", "UICatalog\UICa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{8B901EDE-8974-4820-B100-5226917E2990}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveExample", "ReactiveExample\ReactiveExample.csproj", "{44E15B48-0DB2-4560-82BD-D3B7989811C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactiveExample", "ReactiveExample\ReactiveExample.csproj", "{44E15B48-0DB2-4560-82BD-D3B7989811C3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E143FB1F-0B88-48CB-9086-72CDCECFCD22}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
