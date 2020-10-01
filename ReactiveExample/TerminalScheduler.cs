@@ -23,19 +23,22 @@ namespace ReactiveExample {
 				return composite;
 			}
 
-			IDisposable PostAsTimeout () {
-				var composite = new CompositeDisposable(2);
-				var token = Application.MainLoop.AddTimeout (dueTime, args => {
+			IDisposable PostOnMainLoopAsTimeout () {
+				object timeout = null;
+				var composite = new CompositeDisposable (2) {
+					Disposable.Create (() => Application.MainLoop.RemoveTimeout (timeout))
+				};
+				timeout = Application.MainLoop.AddTimeout (dueTime, args => {
 					composite.Add(action (this, state));
+					Application.MainLoop.RemoveTimeout (timeout);
 					return true;
 				});
-				composite.Add (Disposable.Create (() => Application.MainLoop.RemoveTimeout (token)));
 				return composite;
 			}
 
 			return dueTime == TimeSpan.Zero 
 				? PostOnMainLoop ()
-				: PostAsTimeout ();
+				: PostOnMainLoopAsTimeout ();
 		}
 	}
 }
