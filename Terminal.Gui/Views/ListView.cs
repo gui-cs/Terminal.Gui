@@ -180,7 +180,19 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// If set to true allows more than one item to be selected. If false only allow one item selected.
 		/// </summary>
-		public bool AllowsMultipleSelection { get; set; } = true;
+		public bool AllowsMultipleSelection { get => allowsMultipleSelection;
+			set {
+				allowsMultipleSelection = value;
+				if (Source != null && !allowsMultipleSelection) {
+					// Clear all selections except selected 
+					for (int i = 0; i < Source.Count; i++) {
+						if (Source.IsMarked (i) && i != selected) {
+							Source.SetMark (i, false);
+						}
+					}
+				}
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets the item that is displayed at the top of the <see cref="ListView"/>.
@@ -293,7 +305,7 @@ namespace Terminal.Gui {
 			}
 			var item = top;
 			bool focused = HasFocus;
-			int col = allowsMarking ? 4 : 0;
+			int col = allowsMarking ? 2 : 0;
 
 			for (int row = 0; row < f.Height; row++, item++) {
 				bool isSelected = item == selected;
@@ -310,7 +322,8 @@ namespace Terminal.Gui {
 						Driver.AddRune (' ');
 				} else {
 					if (allowsMarking) {
-						Driver.AddStr (source.IsMarked (item) ? (AllowsMultipleSelection ? "[x] " : "(o)") : (AllowsMultipleSelection ? "[ ] " : "( )"));
+						Driver.AddRune (source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Selected : Driver.Checked) : (AllowsMultipleSelection ? Driver.UnSelected : Driver.UnChecked));
+						Driver.AddRune (' ');
 					}
 					Source.Render (this, Driver, isSelected, item, col, row, f.Width - col);
 				}
@@ -539,6 +552,7 @@ namespace Terminal.Gui {
 		}
 
 		int lastSelectedItem = -1;
+		private bool allowsMultipleSelection = true;
 
 		/// <summary>
 		/// Invokes the SelectedChanged event if it is defined.
@@ -595,9 +609,9 @@ namespace Terminal.Gui {
 		public override void PositionCursor ()
 		{
 			if (allowsMarking)
-				Move (1, selected - top);
-			else
 				Move (0, selected - top);
+			else
+				Move (Bounds.Width - 1, selected - top);
 		}
 
 		///<inheritdoc/>
