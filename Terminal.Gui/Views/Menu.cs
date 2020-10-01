@@ -398,11 +398,10 @@ namespace Terminal.Gui {
 					uncheckedChar = Driver.UnChecked;
 				}
 
-				// Support Checked even though CHeckType wasn't set
+				// Support Checked even though CheckType wasn't set
 				if (item.Checked) {
 					textToDraw = ustring.Make (new Rune [] { checkChar, ' ' }) + item.Title;
-				} else if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked) ||
-					item.CheckType.HasFlag (MenuItemCheckStyle.Radio)) {
+				} else if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked) || item.CheckType.HasFlag (MenuItemCheckStyle.Radio)) {
 					textToDraw = ustring.Make (new Rune [] { uncheckedChar, ' ' }) + item.Title;
 				} else {
 					textToDraw = item.Title;
