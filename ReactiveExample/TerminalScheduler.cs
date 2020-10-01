@@ -24,15 +24,12 @@ namespace ReactiveExample {
 			}
 
 			IDisposable PostOnMainLoopAsTimeout () {
-				object timeout = null;
-				var composite = new CompositeDisposable (2) {
-					Disposable.Create (() => Application.MainLoop.RemoveTimeout (timeout))
-				};
-				timeout = Application.MainLoop.AddTimeout (dueTime, args => {
+				var composite = new CompositeDisposable (2);
+				var timeout = Application.MainLoop.AddTimeout (dueTime, args => {
 					composite.Add(action (this, state));
-					Application.MainLoop.RemoveTimeout (timeout);
-					return true;
+					return false;
 				});
+				composite.Add (Disposable.Create (() => Application.MainLoop.RemoveTimeout (timeout)));
 				return composite;
 			}
 
