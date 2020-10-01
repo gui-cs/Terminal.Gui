@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using NStack;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -18,8 +20,8 @@ namespace ReactiveExample {
 				x => x.Username, 
 				x => x.Password,
 				(username, password) =>
-					!string.IsNullOrWhiteSpace (username) &&
-					!string.IsNullOrWhiteSpace (password));
+					!ustring.IsNullOrEmpty (username) &&
+					!ustring.IsNullOrEmpty (password));
 			
 			_isValid = canLogin.ToProperty (this, x => x.IsValid);
 			Login = ReactiveCommand.CreateFromTask (
@@ -34,13 +36,19 @@ namespace ReactiveExample {
 				.WhenAnyValue (x => x.Password)
 				.Select (password => password.Length)
 				.ToProperty (this, x => x.PasswordLength);
+			
+			Clear = ReactiveCommand.Create (() => { });
+			Clear.Subscribe (unit => {
+				Username = ustring.Empty;
+				Password = ustring.Empty;
+			});
 		}
 		
 		[Reactive, DataMember]
-		public string Username { get; set; } = string.Empty;
+		public ustring Username { get; set; } = ustring.Empty;
 		
 		[Reactive, DataMember]
-		public string Password { get; set; } = string.Empty;
+		public ustring Password { get; set; } = ustring.Empty;
 		
 		[IgnoreDataMember]
 		public int UsernameLength => _usernameLength.Value;
@@ -50,6 +58,9 @@ namespace ReactiveExample {
 
 		[IgnoreDataMember]
 		public ReactiveCommand<Unit, Unit> Login { get; }
+		
+		[IgnoreDataMember]
+		public ReactiveCommand<Unit, Unit> Clear { get; }
 		
 		[IgnoreDataMember]
 		public bool IsValid => _isValid.Value;

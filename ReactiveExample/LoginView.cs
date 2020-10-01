@@ -17,6 +17,7 @@ namespace ReactiveExample {
 				.Append (PasswordInput ())
 				.Append (ValidationLabel ())
 				.Append (LoginButton ())
+				.Append (ClearButton ())
 				.Append (LoginProgressLabel ());
 		}
 		
@@ -36,7 +37,7 @@ namespace ReactiveExample {
 			usernameInput
 				.Events ()
 				.TextChanged
-				.Select (old => usernameInput.Text.ToString ())
+				.Select (old => usernameInput.Text)
 				.DistinctUntilChanged ()
 				.BindTo (ViewModel, x => x.Username)
 				.DisposeWith (_disposable);
@@ -62,7 +63,7 @@ namespace ReactiveExample {
 			passwordInput
 				.Events ()
 				.TextChanged
-				.Select (old => passwordInput.Text.ToString ())
+				.Select (old => passwordInput.Text)
 				.DistinctUntilChanged ()
 				.BindTo (ViewModel, x => x.Password)
 				.DisposeWith (_disposable);
@@ -116,6 +117,16 @@ namespace ReactiveExample {
 				.InvokeCommand (ViewModel, x => x.Login)
 				.DisposeWith (_disposable);
 			return loginButton;
+		}
+
+		Button ClearButton () {
+			var clearButton = new Button("Clear") { Width = 40 };
+			clearButton
+				.Events ()
+				.Clicked
+				.InvokeCommand (ViewModel, x => x.Clear)
+				.DisposeWith (_disposable);
+			return clearButton;
 		}
 		
 		object IViewFor.ViewModel {
