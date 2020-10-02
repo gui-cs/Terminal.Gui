@@ -1013,22 +1013,22 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Left indicator for default action (e.g. for <see cref="Button"/>).
 		/// </summary>
-		public Rune LeftDefaultIndicator = '\u25e6';
+		public Rune LeftDefaultIndicator = '\u257e';
 
 		/// <summary>
 		/// Right indicator for default action (e.g. for <see cref="Button"/>).
 		/// </summary>
-		public Rune RightDefaultIndicator = '\u25e6';
+		public Rune RightDefaultIndicator = '\u257c';
 
 		/// <summary>
 		/// Left frame/bracket (e.g. '[' for <see cref="Button"/>).
 		/// </summary>
-		public Rune LeftBracket = '[';
+		public Rune LeftBracket = '\u2503';
 
 		/// <summary>
 		/// Right frame/bracket (e.g. ']' for <see cref="Button"/>).
 		/// </summary>
-		public Rune RightBracket = ']';
+		public Rune RightBracket = '\u2503';
 
 		/// <summary>
 		/// On Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.

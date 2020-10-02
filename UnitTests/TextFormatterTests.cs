@@ -1866,6 +1866,9 @@ namespace Terminal.Gui {
 		[Fact]
 		public void ReplaceHotKeyWithTag ()
 		{
+			// Setup Mock driver so Application.Driver is available
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
 			var tf = new TextFormatter ();
 			ustring text = "test";
 			int hotPos = 0;
@@ -1886,14 +1889,14 @@ namespace Terminal.Gui {
 			Assert.Equal (ustring.Make (new Rune [] { tag, 'k' }), result = tf.ReplaceHotKeyWithTag (text, hotPos));
 			Assert.Equal ('O', (uint)(result.ToRunes () [0] & ~tf.HotKeyTagMask));
 
-			text = "[◦ Ok ◦]";
-			text = ustring.Make (new Rune [] { '[', '◦', ' ', 'O', 'k', ' ', '◦', ']' });
+			text = Application.Driver.LeftBracket + Application.Driver.LeftDefaultIndicator + " Ok " + Application.Driver.RightDefaultIndicator + Application.Driver.RightBracket;
+			text = ustring.Make (new Rune [] { Application.Driver.LeftBracket, Application.Driver.LeftDefaultIndicator, ' ', 'O', 'k', ' ', Application.Driver.RightDefaultIndicator, Application.Driver.RightBracket });
 			var runes = text.ToRuneList ();
 			Assert.Equal (text.RuneCount, runes.Count);
 			Assert.Equal (text, ustring.Make (runes));
 			tag = tf.HotKeyTagMask | 'O';
 			hotPos = 3;
-			Assert.Equal (ustring.Make (new Rune [] { '[', '◦', ' ', tag, 'k', ' ', '◦', ']' }), result = tf.ReplaceHotKeyWithTag (text, hotPos));
+			Assert.Equal (ustring.Make (new Rune [] { Application.Driver.LeftBracket, Application.Driver.LeftDefaultIndicator, ' ', tag, 'k', ' ', Application.Driver.RightDefaultIndicator, Application.Driver.RightBracket }), result = tf.ReplaceHotKeyWithTag (text, hotPos));
 			Assert.Equal ('O', (uint)(result.ToRunes () [3] & ~tf.HotKeyTagMask));
 
 			text = "^k";
