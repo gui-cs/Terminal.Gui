@@ -322,7 +322,7 @@ namespace Terminal.Gui {
 						Driver.AddRune (' ');
 				} else {
 					if (allowsMarking) {
-						Driver.AddRune (source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Selected : Driver.Checked) : (AllowsMultipleSelection ? Driver.UnSelected : Driver.UnChecked));
+						Driver.AddRune (source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Checked : Driver.Selected) : (AllowsMultipleSelection ? Driver.UnChecked : Driver.UnSelected));
 						Driver.AddRune (' ');
 					}
 					Source.Render (this, Driver, isSelected, item, col, row, f.Width - col);
