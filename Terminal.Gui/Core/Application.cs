@@ -616,18 +616,20 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Runs the application by calling <see cref="Run(Toplevel)"/> with the value of <see cref="Top"/>
 		/// </summary>
-		public static void Run ()
+		/// <param name="shutdownWhenDone">If true, <see cref="Shutdown"/> will be called automatically. If false callers will need to call <see cref="Shutdown"/> after this function returns before exiting the app.</param>
+		public static void Run (bool shutdownWhenDone = true)
 		{
-			Run (Top);
+			Run (Top, shutdownWhenDone);
 		}
 
 		/// <summary>
 		/// Runs the application by calling <see cref="Run(Toplevel)"/> with a new instance of the specified <see cref="Toplevel"/>-derived class
 		/// </summary>
-		public static void Run<T> () where T : Toplevel, new()
+		/// <param name="shutdownWhenDone">If true, <see cref="Shutdown"/> will be called automatically. If false callers will need to call <see cref="Shutdown"/> after this function returns before exiting the app.</param>
+		public static void Run<T> (bool shutdownWhenDone = true) where T : Toplevel, new()
 		{
 			Init (() => new T ());
-			Run (Top);
+			Run (Top, shutdownWhenDone);
 		}
 
 		/// <summary>
@@ -635,31 +637,36 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		///   <para>
-		///     This method is used to start processing events
-		///     for the main application, but it is also used to
-		///     run other modal <see cref="View"/>s such as <see cref="Dialog"/> boxes.
+		///     This method is used to start processing events for the main application and modal <see cref="View"/>s such as <see cref="Dialog"/> boxes.
 		///   </para>
 		///   <para>
-		///     To make a <see cref="Run(Toplevel)"/> stop execution, call <see cref="Application.RequestStop"/>.
+		///     To stop execution call <see cref="Application.RequestStop"/>.
 		///   </para>
 		///   <para>
-		///     Calling <see cref="Run(Toplevel)"/> is equivalent to calling <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState, bool)"/>,
-		///     and then calling <see cref="End(RunState)"/>.
+		///     When running a modal (e.g.  <see cref="Dialog"/>), set the shutdownWhenDone parameter to false.
+		///   </para>
+		///   <para>
+		///     Calling <see cref="Run(Toplevel, bool)"/> is equivalent to calling <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState, bool)"/>,
+		///     followed by <see cref="End(RunState)"/>.
 		///   </para>
 		///   <para>
 		///     Alternatively, to have a program control the main loop and 
 		///     process events manually, call <see cref="Begin(Toplevel)"/> to set things up manually and then
-		///     repeatedly call <see cref="RunLoop(RunState, bool)"/> with the wait parameter set to false.   By doing this
+		///     repeatedly call <see cref="RunLoop(RunState, bool)"/> with the wait parameter set to false. By doing this
 		///     the <see cref="RunLoop(RunState, bool)"/> method will only process any pending events, timers, idle handlers and
 		///     then return control immediately.
 		///   </para>
 		/// </remarks>
 		/// <param name="view">The <see cref="Toplevel"/> tu run modally.</param>
-		public static void Run (Toplevel view)
+		/// <param name="shutdownWhenDone">If true, <see cref="Shutdown()"/> will be called automatically. If false callers will need to call <see cref="Shutdown()"/> after this function returns before exiting the app.</param>
+		public static void Run (Toplevel view, bool shutdownWhenDone = false)
 		{
 			var runToken = Begin (view);
 			RunLoop (runToken);
 			End (runToken);
+			if (shutdownWhenDone) {
+				Shutdown ();
+			}
 		}
 
 		/// <summary>

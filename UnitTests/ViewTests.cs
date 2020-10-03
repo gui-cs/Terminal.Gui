@@ -1019,8 +1019,8 @@ namespace Terminal.Gui {
 				Application.Run (d);
 			}
 
-			Application.Run ();
-			Application.Shutdown ();
+			Application.Run (true);
+			//Application.Shutdown ();
 		}
 
 	}

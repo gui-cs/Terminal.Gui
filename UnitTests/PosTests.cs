@@ -294,37 +294,37 @@ namespace Terminal.Gui {
 			var app = setup ();
 			app.button.Y = Pos.Left (app.win);
 			rs = Application.Begin (Application.Top);
-			Application.Run ();
+			Application.Run (false);
 			cleanup (rs);
 
 			app = setup ();
 			app.button.Y = Pos.X (app.win);
 			rs = Application.Begin (Application.Top);
-			Application.Run ();
+			Application.Run (false);
 			cleanup (rs);
 
 			app = setup ();
 			app.button.Y = Pos.Top (app.win);
 			rs = Application.Begin (Application.Top);
-			Application.Run ();
+			Application.Run (false);
 			cleanup (rs);
 
 			app = setup ();
 			app.button.Y = Pos.Y (app.win);
 			rs = Application.Begin (Application.Top);
-			Application.Run ();
+			Application.Run (false);
 			cleanup (rs);
 
 			app = setup ();
 			app.button.Y = Pos.Bottom (app.win);
 			rs = Application.Begin (Application.Top);
-			Application.Run ();
+			Application.Run (false);
 			cleanup (rs);
 
 			app = setup ();
 			app.button.Y = Pos.Right (app.win);
 			rs = Application.Begin (Application.Top);
-			Application.Run ();
+			Application.Run (false);
 			cleanup (rs);
 
 		}

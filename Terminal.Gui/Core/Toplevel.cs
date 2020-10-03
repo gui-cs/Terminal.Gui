@@ -15,7 +15,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	/// <remarks>
 	///   <para>
-	///     Toplevels can be modally executing views, started by calling <see cref="Application.Run(Toplevel)"/>. 
+	///     Toplevels can be modally executing views, started by calling <see cref="Application.Run(Toplevel, bool)"/>. 
 	///     They return control to the caller when <see cref="Application.RequestStop()"/> has 
 	///     been called (which sets the <see cref="Toplevel.Running"/> property to false). 
 	///   </para>

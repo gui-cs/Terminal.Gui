@@ -197,8 +197,8 @@ namespace UICatalog {
 		/// </remarks>
 		public virtual void Run ()
 		{
-			// Must explicit call Application.Shutdown method to shutdown.
-			Application.Run (Top);
+			// Must explicitly call Application.Shutdown method to shutdown.
+			Application.Run (Top, false);
 		}
 
 		/// <summary>
