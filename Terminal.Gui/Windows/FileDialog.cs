@@ -670,7 +670,7 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// <para>
 	///   To use, create an instance of <see cref="SaveDialog"/>, and pass it to
-	///   <see cref="Application.Run()"/>. This will run the dialog modally,
+	///   <see cref="Application.Run(bool)"/>. This will run the dialog modally,
 	///   and when this returns, the <see cref="FileName"/>property will contain the selected file name or 
 	///   null if the user canceled. 
 	/// </para>
@@ -713,7 +713,7 @@ namespace Terminal.Gui {
 	/// </para>
 	/// <para>
 	///   To use, create an instance of <see cref="OpenDialog"/>, and pass it to
-	///   <see cref="Application.Run()"/>. This will run the dialog modally,
+	///   <see cref="Application.Run(bool)"/>. This will run the dialog modally,
 	///   and when this returns, the list of filds will be available on the <see cref="FilePaths"/> property.
 	/// </para>
 	/// <para>

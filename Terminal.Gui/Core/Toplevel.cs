@@ -23,7 +23,7 @@ namespace Terminal.Gui {
 	///     A Toplevel is created when an application initialzies Terminal.Gui by callling <see cref="Application.Init(ConsoleDriver, IMainLoopDriver)"/>.
 	///     The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created 
 	///     and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and 
-	///     call <see cref="Application.Run(Toplevel)"/>.
+	///     call <see cref="Application.Run(Toplevel, bool)"/>.
 	///   </para>
 	///   <para>
 	///     Toplevels can also opt-in to more sophisticated initialization
@@ -51,7 +51,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Fired once the Toplevel's <see cref="MainLoop"/> has started it's first iteration. 
 		/// Subscribe to this event to perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set.
-		/// changes. A Ready event handler is a good place to finalize initialization after calling `<see cref="Application.Run()"/>(topLevel)`. 
+		/// changes. A Ready event handler is a good place to finalize initialization after calling `<see cref="Application.Run(bool)"/>(topLevel)`. 
 		/// </summary>
 		public event Action Ready;
 
@@ -409,7 +409,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoked by <see cref="Application.Begin"/> as part of the <see cref="Application.Run(Toplevel)"/> after
+		/// Invoked by <see cref="Application.Begin"/> as part of the <see cref="Application.Run(Toplevel, bool)"/> after
 		/// the views have been laid out, and before the views are drawn for the first time.
 		/// </summary>
 		public virtual void WillPresent ()

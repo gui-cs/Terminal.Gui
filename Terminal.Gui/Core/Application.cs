@@ -67,7 +67,7 @@ namespace Terminal.Gui {
 		public static Toplevel Top { get; private set; }
 
 		/// <summary>
-		/// The current <see cref="Toplevel"/> object. This is updated when <see cref="Application.Run()"/> enters and leaves to point to the current <see cref="Toplevel"/> .
+		/// The current <see cref="Toplevel"/> object. This is updated when <see cref="Application.Run(bool)"/> enters and leaves to point to the current <see cref="Toplevel"/> .
 		/// </summary>
 		/// <value>The current.</value>
 		public static Toplevel Current { get; private set; }
@@ -614,7 +614,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Runs the application by calling <see cref="Run(Toplevel)"/> with the value of <see cref="Top"/>
+		/// Runs the application by calling <see cref="Run(Toplevel, bool)"/> with the value of <see cref="Top"/>
 		/// </summary>
 		/// <param name="shutdownWhenDone">If true, <see cref="Shutdown"/> will be called automatically. If false callers will need to call <see cref="Shutdown"/> after this function returns before exiting the app.</param>
 		public static void Run (bool shutdownWhenDone = true)
@@ -623,7 +623,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Runs the application by calling <see cref="Run(Toplevel)"/> with a new instance of the specified <see cref="Toplevel"/>-derived class
+		/// Runs the application by calling <see cref="Run(Toplevel, bool)"/> with a new instance of the specified <see cref="Toplevel"/>-derived class
 		/// </summary>
 		/// <param name="shutdownWhenDone">If true, <see cref="Shutdown"/> will be called automatically. If false callers will need to call <see cref="Shutdown"/> after this function returns before exiting the app.</param>
 		public static void Run<T> (bool shutdownWhenDone = true) where T : Toplevel, new()
@@ -674,7 +674,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		///   <para>
-		///   This will cause <see cref="Application.Run()"/> to return.
+		///   This will cause <see cref="Application.Run(bool)"/> to return.
 		///   </para>
 		///   <para>
 		///     Calling <see cref="Application.RequestStop"/> is equivalent to setting the <see cref="Toplevel.Running"/> property on the curently running <see cref="Toplevel"/> to false.
