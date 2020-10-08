@@ -643,7 +643,7 @@ namespace Terminal.Gui {
 
 		void SetViewsNeedsDisplay ()
 		{
-			foreach (View view in contentView) {
+			foreach (View view in contentView.Subviews) {
 				view.SetNeedsDisplay ();
 			}
 		}

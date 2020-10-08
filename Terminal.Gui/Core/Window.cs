@@ -20,7 +20,7 @@ namespace Terminal.Gui {
 	/// The 'client area' of a <see cref="Window"/> is a rectangle deflated by one or more rows/columns from <see cref="View.Bounds"/>. A this time there is no
 	/// API to determine this rectangle.
 	/// </remarks>
-	public class Window : Toplevel, IEnumerable {
+	public class Window : Toplevel {
 		View contentView;
 		ustring title;
 
@@ -122,14 +122,14 @@ namespace Terminal.Gui {
 			base.Add (contentView);
 		}
 
-		/// <summary>
-		/// Enumerates the various <see cref="View"/>s in the embedded <see cref="ContentView"/>.
-		/// </summary>
-		/// <returns>The enumerator.</returns>
-		public new IEnumerator GetEnumerator ()
-		{
-			return contentView.GetEnumerator ();
-		}
+		///// <summary>
+		///// Enumerates the various <see cref="View"/>s in the embedded <see cref="ContentView"/>.
+		///// </summary>
+		///// <returns>The enumerator.</returns>
+		//public new IEnumerator GetEnumerator ()
+		//{
+		//	return contentView.GetEnumerator ();
+		//}
 
 		/// <inheritdoc/>
 		public override void Add (View view)

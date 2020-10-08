@@ -111,7 +111,7 @@ namespace Terminal.Gui {
 	///    frames for the vies that use <see cref="LayoutStyle.Computed"/>.
 	/// </para>
 	/// </remarks>
-	public partial class View : Responder, IEnumerable, ISupportInitializeNotification {
+	public partial class View : Responder, ISupportInitializeNotification {
 
 		internal enum Direction {
 			Forward,
@@ -386,15 +386,15 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// Gets an enumerator that enumerates the subviews in this view.
-		/// </summary>
-		/// <returns>The enumerator.</returns>
-		public IEnumerator GetEnumerator ()
-		{
-			foreach (var v in InternalSubviews)
-				yield return v;
-		}
+		///// <summary>
+		///// Gets an enumerator that enumerates the subviews in this view.
+		///// </summary>
+		///// <returns>The enumerator.</returns>
+		//public IEnumerator GetEnumerator ()
+		//{
+		//	foreach (var v in InternalSubviews)
+		//		yield return v;
+		//}
 
 		LayoutStyle layoutStyle;
 
