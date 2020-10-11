@@ -760,7 +760,7 @@ namespace UICatalog {
 			};
 			Add (_txtShortCut);
 
-			var _btnShortCut = new Button ("Clear ShirtCut") {
+			var _btnShortCut = new Button ("Clear ShortCut") {
 				X = Pos.X (_lblShortCut),
 				Y = Pos.Bottom (_txtShortCut) + 1
 			};
