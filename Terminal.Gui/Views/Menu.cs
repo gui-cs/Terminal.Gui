@@ -40,14 +40,19 @@ namespace Terminal.Gui {
 	/// A <see cref="MenuItem"/> has a title, an associated help text, and an action to execute on activation.
 	/// </summary>
 	public class MenuItem {
+		ustring title;
+		Key shortCut;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="MenuItem"/>
 		/// </summary>
-		public MenuItem ()
+		public MenuItem (Key shortCut = Key.ControlSpace)
 		{
 			Title = "";
 			Help = "";
+			if (shortCut != Key.ControlSpace) {
+				ShortCut = shortCut;
+			}
 		}
 
 		/// <summary>
@@ -57,26 +62,18 @@ namespace Terminal.Gui {
 		/// <param name="help">Help text to display.</param>
 		/// <param name="action">Action to invoke when the menu item is activated.</param>
 		/// <param name="canExecute">Function to determine if the action can currently be executed.</param>
-		/// <param name="parent">The parent of this menu item.</param>
-		public MenuItem (ustring title, ustring help, Action action, Func<bool> canExecute = null, MenuItem parent = null)
+		/// <param name="parent">The <see cref="Parent"/> of this menu item.</param>
+		/// <param name="shortCut">The <see cref="ShortCut"/> keystroke combination.</param>
+		public MenuItem (ustring title, ustring help, Action action, Func<bool> canExecute = null, MenuItem parent = null, Key shortCut = Key.ControlSpace)
 		{
 			Title = title ?? "";
 			Help = help ?? "";
 			Action = action;
 			CanExecute = canExecute;
-			bool nextIsHot = false;
-			foreach (var x in Title) {
-				if (x == '_')
-					nextIsHot = true;
-				else {
-					if (nextIsHot) {
-						HotKey = Char.ToUpper ((char)x);
-						break;
-					}
-					nextIsHot = false;
-				}
-			}
 			Parent = parent;
+			if (shortCut != Key.ControlSpace) {
+				ShortCut = shortCut;
+			}
 		}
 
 		/// <summary>
@@ -87,10 +84,40 @@ namespace Terminal.Gui {
 		public Rune HotKey;
 
 		/// <summary>
+		/// This is the global setting that can be used as a global shortcut to invoke the action on the menu.
+		/// </summary>
+		public Key ShortCut {
+			get => shortCut;
+			set {
+				if (shortCut != value) {
+					if (GetKeyToString (value).Contains ("Control")) {
+						shortCut = Key.CtrlMask | value;
+					} else {
+						shortCut = value;
+					}
+					ShortCutTag = GetShortCutTag (shortCut);
+				}
+			}
+		}
+
+		/// <summary>
+		/// The keystroke combination used in the <see cref="ShortCut"/> as string.
+		/// </summary>
+		public ustring ShortCutTag { get; private set; } = ustring.Empty;
+
+		/// <summary>
 		/// Gets or sets the title. 
 		/// </summary>
 		/// <value>The title.</value>
-		public ustring Title { get; set; }
+		public ustring Title {
+			get { return title; }
+			set {
+				if (title != value) {
+					title = value;
+					GetHotKey ();
+				}
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets the help text for the menu item.
@@ -119,7 +146,8 @@ namespace Terminal.Gui {
 		}
 
 		internal int Width => Title.RuneCount + Help.RuneCount + 1 + 2 +
-			(Checked || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0);
+			(Checked || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0) +
+			(ShortCutTag.RuneCount > 0 ? ShortCutTag.RuneCount + 2 : 0);
 
 		/// <summary>
 		/// Sets or gets whether the <see cref="MenuItem"/> shows a check indicator or not. See <see cref="MenuItemCheckStyle"/>.
@@ -156,6 +184,154 @@ namespace Terminal.Gui {
 		public bool GetMenuBarItem ()
 		{
 			return IsFromSubMenu;
+		}
+
+		void GetHotKey ()
+		{
+			bool nextIsHot = false;
+			foreach (var x in title) {
+				if (x == '_') {
+					nextIsHot = true;
+				} else {
+					if (nextIsHot) {
+						HotKey = Char.ToUpper ((char)x);
+						break;
+					}
+					nextIsHot = false;
+					HotKey = default;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Get the <see cref="ShortCut"/> key as string.
+		/// </summary>
+		/// <param name="shortCut">The shortcut key.</param>
+		/// <returns></returns>
+		public ustring GetShortCutTag (Key shortCut)
+		{
+			if (shortCut == Key.ControlSpace) {
+				return "";
+			}
+
+			var k = (uint)shortCut;
+			var delimiter = MenuBar.ShortCutDelimiter;
+			ustring tag = ustring.Empty;
+			var sCut = GetKeyToString (shortCut).ToString ();
+			if (sCut.Contains ("Control") || (shortCut & Key.CtrlMask) != 0) {
+				tag = "Ctrl";
+			}
+			if ((shortCut & Key.ShiftMask) != 0) {
+				if (!tag.IsEmpty) {
+					tag += delimiter;
+				}
+				tag += "Shift";
+			}
+			if ((shortCut & Key.AltMask) != 0) {
+				if (!tag.IsEmpty) {
+					tag += delimiter;
+				}
+				tag += "Alt";
+			}
+
+			ustring [] keys = ustring.Make (sCut).Split (",");
+			for (int i = 0; i < keys.Length; i++) {
+				var key = keys [i].TrimSpace ();
+				if (key == Key.AltMask.ToString () || key == Key.ShiftMask.ToString () || key == Key.CtrlMask.ToString ()) {
+					continue;
+				}
+				if (!tag.IsEmpty) {
+					tag += delimiter;
+				}
+				if (key.Contains ("Control")) {
+					tag += ((char)key.ElementAt (7)).ToString ();
+				} else if (!key.Contains ("F") && key.Length > 2 && keys.Length == 1) {
+					k = (uint)Key.AltMask + k;
+					tag += ((char)k).ToString ();
+				} else if (key.Length == 2 && key.StartsWith ("D")) {
+					tag += ((char)key.ElementAt (1)).ToString ();
+				} else {
+					tag += key;
+				}
+			}
+
+			return tag;
+		}
+
+		ustring GetKeyToString (Key key)
+		{
+			if (key == Key.ControlSpace) {
+				return "";
+			}
+
+			var mK = key & (Key.AltMask | Key.CtrlMask | Key.ShiftMask);
+			for (uint i = (uint)Key.F1; i < (uint)Key.F12; i++) {
+				if ((key | (Key)i) == key) {
+					mK |= (Key)i;
+				}
+			}
+			var k = key;
+			k &= ~mK;
+			int.TryParse (k.ToString (), out int c);
+			var s = mK == Key.ControlSpace ? "" : mK.ToString ();
+			if (s != "" && (k != Key.ControlSpace || c > 0)) {
+				s += ",";
+			}
+			s += c == 0 ? k == Key.ControlSpace ? "" : k.ToString () : ((char)c).ToString ();
+			return s;
+		}
+
+		/// <summary>
+		/// Allows to generate a <see cref="Key"/> from a <see cref="ShortCutTag"/>
+		/// </summary>
+		/// <param name="tag">The key as string.</param>
+		/// <returns></returns>
+		public Key CreateShortCutFromTag (ustring tag)
+		{
+			var sCut = tag;
+			if (sCut.IsEmpty) {
+				return default;
+			}
+
+			Key key = Key.ControlSpace;
+			var hasCtrl = false;
+			var delimiter = MenuBar.ShortCutDelimiter;
+
+			ustring [] keys = sCut.Split (MenuBar.ShortCutDelimiter);
+			for (int i = 0; i < keys.Length; i++) {
+				var k = keys [i];
+				if (k == "Ctrl") {
+					hasCtrl = true;
+					key |= Key.CtrlMask;
+				} else if (k == "Shift") {
+					key |= Key.ShiftMask;
+				} else if (k == "Alt") {
+					key |= Key.AltMask;
+				} else if (k.StartsWith ("F") && k.Length > 1) {
+					int.TryParse (k.Substring (1).ToString (), out int n);
+					for (uint j = (uint)Key.F1; j < (uint)Key.F12; j++) {
+						int.TryParse (((Key)j).ToString ().Substring (1), out int f);
+						if (f == n) {
+							key |= (Key)j;
+						}
+					}
+				} else if (k [0] >= 'A' && k [0] <= 'Z') {
+					if (hasCtrl) {
+						var n = k [0] - 'A' + 1;
+						var d = n - (uint)Key.ControlA;
+						key |= (Key)((uint)Key.ControlA + d);
+					} else {
+						key |= (Key)k [0];
+					}
+				} else if (k [0] >= '0' && k [0] <= '9') {
+					//var n = k [0] - (uint)Key.D0 + 1;
+					//var d = n - (uint)Key.D0;
+					//key |= (Key)((uint)Key.D0 + d);
+					key |= (Key)k [0];
+				}
+			}
+
+			return key;
 		}
 	}
 
@@ -307,7 +483,7 @@ namespace Terminal.Gui {
 
 		internal int TitleLength => GetMenuBarItemLength (Title);
 
-		internal bool IsTopLevel { get => Parent == null && (Children == null || Children.Length == 0); }
+		internal bool IsTopLevel { get => Parent == null && (Children == null || Children.Length == 0) && Action != null; }
 
 	}
 
@@ -416,9 +592,16 @@ namespace Terminal.Gui {
 					       i == current ? ColorScheme.Focus : ColorScheme.Normal);
 
 				// The help string
-				var l = item.Help.RuneCount;
+				var l = item.ShortCutTag.RuneCount == 0 ? item.Help.RuneCount : item.Help.RuneCount + item.ShortCutTag.RuneCount + 2;
 				Move (Frame.Width - l - 2, 1 + i);
 				Driver.AddStr (item.Help);
+
+				// The shortcut tag string
+				if (!item.ShortCutTag.IsEmpty) {
+					l = item.ShortCutTag.RuneCount;
+					Move (Frame.Width - l - 2, 1 + i);
+					Driver.AddStr (item.ShortCutTag);
+				}
 			}
 			PositionCursor ();
 		}
@@ -705,6 +888,11 @@ namespace Terminal.Gui {
 		public bool UseKeysUpDownAsKeysLeftRight { get; set; } = true;
 
 		/// <summary>
+		/// Used for change the shortcut delimiter separator.
+		/// </summary>
+		public static ustring ShortCutDelimiter { get; set; } = "+";
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="MenuBar"/>.
 		/// </summary>
 		public MenuBar () : this (new MenuBarItem [] { }) { }
@@ -828,8 +1016,8 @@ namespace Terminal.Gui {
 					hotColor = ColorScheme.Normal;
 					normalColor = ColorScheme.Normal;
 				}
-				DrawHotString ($" {menu.Title}  ", hotColor, normalColor);
-				pos += 1 + menu.TitleLength + 2;
+				DrawHotString (menu.Help.IsEmpty ? $" {menu.Title}  " : $" {menu.Title}  {menu.Help}  ", hotColor, normalColor);
+				pos += 1 + menu.TitleLength + (menu.Help.Length > 0 ? menu.Help.Length + 2 : 0) + 2;
 			}
 			PositionCursor ();
 		}
@@ -843,14 +1031,14 @@ namespace Terminal.Gui {
 					pos++;
 					if (IsMenuOpen)
 						Move (pos + 1, 0);
-					else
+					else {
 						Move (pos + 1, 0);
+					}
 					return;
+				} else if (IsMenuOpen) {
+					pos += 1 + Menus [i].TitleLength + (Menus [i].Help.Length > 0 ? Menus [i].Help.Length + 2 : 0) + 2;
 				} else {
-					if (IsMenuOpen)
-						pos += 1 + Menus [i].TitleLength + 2;
-					else
-						pos += 2 + Menus [i].TitleLength + 1;
+					pos += 2 + Menus [i].TitleLength + (Menus [i].Help.Length > 0 ? Menus [i].Help.Length + 2 : 0) + 1;
 				}
 			}
 			//Move (0, 0);
@@ -923,7 +1111,7 @@ namespace Terminal.Gui {
 				}
 
 				for (int i = 0; i < index; i++)
-					pos += Menus [i].Title.RuneCount + 2;
+					pos += Menus [i].Title.RuneCount + (Menus [i].Help.RuneCount > 0 ? Menus [i].Help.RuneCount + 2 : 0) + 2;
 				openMenu = new Menu (this, pos, 1, Menus [index]);
 				openCurrentMenu = openMenu;
 				openCurrentMenu.previousSubFocused = openMenu;
@@ -1258,6 +1446,44 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		internal bool FindAndOpenMenuByShortCut (KeyEvent kb, MenuItem [] children = null)
+		{
+			if (children == null) {
+				children = Menus;
+			}
+
+			var key = kb.KeyValue;
+			var keys = GetModifiersKey (kb);
+			key |= (int)keys;
+			//if (kb.IsShift) {
+			//	key |= (int)Key.ShiftMask;
+			//}
+			//if (kb.IsAlt) {
+			//	key |= unchecked((int)Key.AltMask);
+			//}
+			for (int i = 0; i < children.Length; i++) {
+				var mi = children [i];
+				if (mi == null) {
+					continue;
+				}
+				if ((!(mi is MenuBarItem mbiTopLevel) || mbiTopLevel.IsTopLevel) && mi.ShortCut != Key.ControlSpace && mi.ShortCut == (Key)key) {
+					var action = mi.Action;
+					if (action != null) {
+						Application.MainLoop.AddIdle (() => {
+							action ();
+							return false;
+						});
+					}
+					return true;
+				}
+				if (mi is MenuBarItem menuBarItem && !menuBarItem.IsTopLevel && FindAndOpenMenuByShortCut (kb, menuBarItem.Children)) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		private void ProcessMenu (int i, MenuBarItem mi)
 		{
 			if (mi.IsTopLevel) {
@@ -1293,7 +1519,7 @@ namespace Terminal.Gui {
 				OnKeyDown (kb);
 				OnKeyUp (kb);
 				return true;
-			} else if (kb.IsAlt) {
+			} else if (kb.IsAlt && !kb.IsCtrl && !kb.IsShift) {
 				if (FindAndOpenMenuByHotkey (kb)) return true;
 			}
 			//var kc = kb.KeyValue;
@@ -1359,6 +1585,12 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
+		public override bool ProcessColdKey (KeyEvent kb)
+		{
+			return FindAndOpenMenuByShortCut (kb);
+		}
+
+		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!handled && !HandleGrabView (me, this)) {
@@ -1372,7 +1604,7 @@ namespace Terminal.Gui {
 				int pos = 1;
 				int cx = me.X;
 				for (int i = 0; i < Menus.Length; i++) {
-					if (cx >= pos && cx < pos + 1 + Menus [i].TitleLength + 2) {
+					if (cx >= pos && cx < pos + 1 + Menus [i].TitleLength + Menus [i].Help.RuneCount + 2) {
 						if (me.Flags == MouseFlags.Button1Clicked) {
 							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
@@ -1424,6 +1656,7 @@ namespace Terminal.Gui {
 						};
 
 						v.MouseEvent (nme);
+						return false;
 					}
 				} else if (!(me.View is MenuBar || me.View is Menu) && (me.Flags.HasFlag (MouseFlags.Button1Clicked) ||
 					me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1TripleClicked)) {

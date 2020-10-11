@@ -105,7 +105,7 @@ static class Demo {
 
 	static void ShowTextAlignments ()
 	{
-		var container = new Window ($"Show Text Alignments") {
+		var container = new Window ("Show Text Alignments - Press Esc to return") {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),
@@ -244,12 +244,12 @@ static class Demo {
 
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_Close", "", () => { if (Quit ()) { running = MainApp; Application.RequestStop (); } }),
+				new MenuItem ("_Close", "", () => { if (Quit ()) { running = MainApp; Application.RequestStop (); } }, null, null, Key.AltMask | Key.F4),
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
-				new MenuItem ("_Copy", "", null),
-				new MenuItem ("C_ut", "", null),
-				new MenuItem ("_Paste", "", null)
+				new MenuItem ("_Copy", "", null, null, null, Key.ControlC),
+				new MenuItem ("C_ut", "", null, null, null, Key.ControlX),
+				new MenuItem ("_Paste", "", null, null, null, Key.ControlV)
 			}),
 		});
 		ntop.Add (menu);
@@ -309,13 +309,12 @@ static class Demo {
 			MessageBox.Query (50, 7, "Selected File", d.FilePaths.Count > 0 ? string.Join (", ", d.FilePaths) : d.FilePath, "Ok");
 	}
 
-	public static void ShowHex (Toplevel top)
+	public static void ShowHex ()
 	{
-		var tframe = top.Frame;
-		var ntop = new Toplevel (tframe);
+		var ntop = Application.Top;
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_Close", "", () => {Application.RequestStop ();}),
+				new MenuItem ("_Close", "", () => { running = MainApp; Application.RequestStop (); }, null, null, Key.AltMask | Key.F4),
 			}),
 		});
 		ntop.Add (menu);
@@ -338,7 +337,6 @@ static class Demo {
 		};
 		win.Add (hex);
 		Application.Run (ntop);
-
 	}
 
 	public class MenuItemDetails : MenuItem {
@@ -382,7 +380,7 @@ static class Demo {
 
 	static void Copy ()
 	{
-		TextField textField = menu.LastFocused as TextField;
+		TextField textField = menu.LastFocused as TextField ?? Application.Top.MostFocused as TextField;
 		if (textField != null && textField.SelectedLength != 0) {
 			textField.Copy ();
 		}
@@ -390,7 +388,7 @@ static class Demo {
 
 	static void Cut ()
 	{
-		TextField textField = menu.LastFocused as TextField;
+		TextField textField = menu.LastFocused as TextField ?? Application.Top.MostFocused as TextField;
 		if (textField != null && textField.SelectedLength != 0) {
 			textField.Cut ();
 		}
@@ -398,10 +396,8 @@ static class Demo {
 
 	static void Paste ()
 	{
-		TextField textField = menu.LastFocused as TextField;
-		if (textField != null) {
-			textField.Paste ();
-		}
+		TextField textField = menu.LastFocused as TextField ?? Application.Top.MostFocused as TextField;
+		textField?.Paste ();
 	}
 
 	static void Help ()
@@ -601,31 +597,31 @@ static class Demo {
 
 		menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("Text _Editor Demo", "", () => { running = Editor; Application.RequestStop (); }),
-				new MenuItem ("_New", "Creates new file", NewFile),
-				new MenuItem ("_Open", "", Open),
-				new MenuItem ("_Hex", "", () => ShowHex (top)),
-				new MenuItem ("_Close", "", () => Close ()),
+				new MenuItem ("Text _Editor Demo", "", () => { running = Editor; Application.RequestStop (); }, null, null, Key.AltMask | Key.ControlD),
+				new MenuItem ("_New", "Creates new file", NewFile, null, null, Key.AltMask | Key.ControlN),
+				new MenuItem ("_Open", "", Open, null, null, Key.AltMask | Key.ControlO),
+				new MenuItem ("_Hex", "", () => { running = ShowHex; Application.RequestStop (); }, null, null, Key.AltMask | Key.ControlH),
+				new MenuItem ("_Close", "", Close, null, null, Key.AltMask | Key.F4),
 				new MenuItem ("_Disabled", "", () => { }, () => false),
 				null,
-				new MenuItem ("_Quit", "", () => { if (Quit ()) { running = null; top.Running = false; } })
+				new MenuItem ("_Quit", "", () => { if (Quit ()) { running = null; top.Running = false; } }, null, null, Key.ControlQ)
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
-				new MenuItem ("_Copy", "", Copy),
-				new MenuItem ("C_ut", "", Cut),
-				new MenuItem ("_Paste", "", Paste),
+				new MenuItem ("_Copy", "", Copy, null, null, Key.AltMask | Key.ControlC),
+				new MenuItem ("C_ut", "", Cut, null, null, Key.AltMask | Key.ControlX),
+				new MenuItem ("_Paste", "", Paste, null, null, Key.AltMask | Key.ControlV),
 				new MenuBarItem ("_Find and Replace",
 					new MenuItem [] { menuItems [0], menuItems [1] }),
 				menuItems[3]
 			}),
 			new MenuBarItem ("_List Demos", new MenuItem [] {
-				new MenuItem ("Select _Multiple Items", "", () => ListSelectionDemo (true)),
-				new MenuItem ("Select _Single Item", "", () => ListSelectionDemo (false)),
-				new MenuItem ("Search Single Item", "", ComboBoxDemo)
+				new MenuItem ("Select _Multiple Items", "", () => ListSelectionDemo (true), null, null, Key.AltMask + 0.ToString () [0]),
+				new MenuItem ("Select _Single Item", "", () => ListSelectionDemo (false), null, null, Key.AltMask + 1.ToString () [0]),
+				new MenuItem ("Search Single Item", "", ComboBoxDemo, null, null, Key.AltMask + 2.ToString () [0])
 			}),
 			new MenuBarItem ("A_ssorted", new MenuItem [] {
-				new MenuItem ("_Show text alignments", "", () => ShowTextAlignments ()),
-				new MenuItem ("_OnKeyDown/Press/Up", "", () => OnKeyDownPressUpDemo ())
+				new MenuItem ("_Show text alignments", "", () => ShowTextAlignments (), null, null, Key.AltMask | Key.ControlG),
+				new MenuItem ("_OnKeyDown/Press/Up", "", () => OnKeyDownPressUpDemo (), null, null, Key.AltMask | Key.ControlK)
 			}),
 			new MenuBarItem ("_Test Menu and SubMenus", new MenuBarItem [] {
 				new MenuBarItem ("SubMenu1Item_1",  new MenuBarItem [] {

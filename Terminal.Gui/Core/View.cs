@@ -2055,5 +2055,26 @@ namespace Terminal.Gui {
 
 			return true;
 		}
+
+		/// <summary>
+		/// Gets the key with all the keys modifiers, especially the shift key that sometimes have to be injected later.
+		/// </summary>
+		/// <param name="kb">The <see cref="KeyEvent"/> to check.</param>
+		/// <returns>The <see cref="KeyEvent.Key"/> with all the keys modifiers.</returns>
+		public Key GetModifiersKey (KeyEvent kb)
+		{
+			var key = kb.Key;
+			if (kb.IsAlt && (key & Key.AltMask) == 0) {
+				key |= Key.AltMask;
+			}
+			if (kb.IsCtrl && (key & Key.CtrlMask) == 0) {
+				key |= Key.CtrlMask;
+			}
+			if (kb.IsShift && (key & Key.ShiftMask) == 0) {
+				key |= Key.ShiftMask;
+			}
+
+			return key;
+		}
 	}
 }

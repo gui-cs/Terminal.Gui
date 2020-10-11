@@ -318,6 +318,46 @@ namespace Terminal.Gui {
 		/// </summary>
 		BackTab,
 		/// <summary>
+		/// Digit 0.
+		/// </summary>
+		D0 = 48,
+		/// <summary>
+		/// Digit 1.
+		/// </summary>
+		D1,
+		/// <summary>
+		/// Digit 2.
+		/// </summary>
+		D2,
+		/// <summary>
+		/// Digit 3.
+		/// </summary>
+		D3,
+		/// <summary>
+		/// Digit 4.
+		/// </summary>
+		D4,
+		/// <summary>
+		/// Digit 5.
+		/// </summary>
+		D5,
+		/// <summary>
+		/// Digit 6.
+		/// </summary>
+		D6,
+		/// <summary>
+		/// Digit 7.
+		/// </summary>
+		D7,
+		/// <summary>
+		/// Digit 8.
+		/// </summary>
+		D8,
+		/// <summary>
+		/// Digit 9.
+		/// </summary>
+		D9,
+		/// <summary>
 		/// A key with an unknown mapping was raised.
 		/// </summary>
 		Unknown

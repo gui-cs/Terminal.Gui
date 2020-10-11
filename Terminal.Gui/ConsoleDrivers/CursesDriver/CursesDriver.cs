@@ -439,11 +439,11 @@ namespace Terminal.Gui {
 			if (keyModifiers == null)
 				keyModifiers = new KeyModifiers ();
 
-			if (!keyModifiers.Shift && key.HasFlag (Key.ShiftMask))
+			if (!keyModifiers.Shift && (key & Key.ShiftMask) != 0)
 				keyModifiers.Shift = true;
-			if (!keyModifiers.Alt && key.HasFlag (Key.AltMask))
+			if (!keyModifiers.Alt && (key & Key.AltMask) != 0)
 				keyModifiers.Alt = true;
-			if (!keyModifiers.Ctrl && key.HasFlag (Key.CtrlMask))
+			if (!keyModifiers.Ctrl && (key & Key.CtrlMask) != 0)
 				keyModifiers.Ctrl = true;
 
 			return keyModifiers;
@@ -472,8 +472,23 @@ namespace Terminal.Gui {
 					mouseHandler (ToDriverMouse (ev));
 					return;
 				}
-				keyHandler (new KeyEvent (MapCursesKey (wch), keyModifiers));
-				keyUpHandler (new KeyEvent (MapCursesKey (wch), keyModifiers));
+				k = MapCursesKey (wch);
+				if (wch >= 277 && wch <= 288) { // Shift+(F1 - F12)
+					wch -= 12;
+					k = Key.ShiftMask | MapCursesKey (wch);
+				} else if (wch >= 289 && wch <= 300) { // Ctrl+(F1 - F12)
+					wch -= 24;
+					k = Key.CtrlMask | MapCursesKey (wch);
+				} else if (wch >= 301 && wch <= 312) { // Ctrl+Shift+(F1 - F12)
+					wch -= 36;
+					k = Key.CtrlMask | Key.ShiftMask | MapCursesKey (wch);
+				} else if (wch >= 313 && wch <= 324) { // Alt+(F1 - F12)
+					wch -= 48;
+					k = Key.AltMask | MapCursesKey (wch);
+				}
+				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				keyUpHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				return;
 			}
 
@@ -498,19 +513,65 @@ namespace Terminal.Gui {
 					} else if (wch2 - (int)Key.Space >= 'A' && wch2 - (int)Key.Space <= 'Z') {
 						k = (Key)((uint)Key.AltMask + (wch2 - (int)Key.Space));
 						key = new KeyEvent (k, MapKeyModifiers (k));
-					} else if (wch2 >= '1' && wch <= '9') {
-						k = (Key)((int)Key.F1 + (wch2 - '0' - 1));
+					} else if (wch2 >= (uint)Key.ControlA && wch2 <= (uint)Key.ControlZ) {
+						k = (Key)((uint)(Key.AltMask | Key.CtrlMask) + wch2);
 						key = new KeyEvent (k, MapKeyModifiers (k));
-					} else if (wch2 == '0') {
-						k = Key.F10;
+					} else if (wch2 >= '0' && wch2 <= '9') {
+						k = (Key)((uint)Key.AltMask + (uint)Key.D0 + (wch2 - '0'));
 						key = new KeyEvent (k, MapKeyModifiers (k));
 					} else if (wch2 == 27) {
 						k = (Key)wch2;
 						key = new KeyEvent (k, MapKeyModifiers (k));
+					} else if (wch2 == 91) {
+						int [] c = null;
+						while (code == 0) {
+							code = Curses.get_wch (out wch2);
+							if (wch2 > 0) {
+								Array.Resize (ref c, c == null ? 1 : c.Length + 1);
+								c [c.Length - 1] = wch2;
+							}
+						}
+						if (c [0] == 49 && c [1] == 59 && c [2] == 55) { // Ctrl+Alt+(F1 - F4)
+							wch2 = c [3] + 185;
+							k = Key.CtrlMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 49 && c [2] == 59 && c [3] == 55 && c [4] == 126) { // Ctrl+Alt+(F5 - F8)
+							wch2 = c [1] == 53 ? c [1] + 216 : c [1] + 215;
+							k = Key.CtrlMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 50 && c [2] == 59 && c [3] == 55 && c [4] == 126) { // Ctrl+Alt+(F9 - F12)
+							wch2 = c [1] < 51 ? c [1] + 225 : c [1] + 224;
+							k = Key.CtrlMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 49 && c [1] == 59 && c [2] == 56) { // Ctrl+Shift+Alt+(F1 - F4)
+							wch2 = c [3] + 185;
+							k = Key.CtrlMask | Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 49 && c [2] == 59 && c [3] == 56 && c [4] == 126) { // Ctrl+Shift+Alt+(F5 - F8)
+							wch2 = c [1] == 53 ? c [1] + 216 : c [1] + 215;
+							k = Key.CtrlMask | Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 50 && c [2] == 59 && c [3] == 56 && c [4] == 126) {  // Ctrl+Shift+Alt+(F9 - F12)
+							wch2 = c [1] < 51 ? c [1] + 225 : c [1] + 224;
+							k = Key.CtrlMask | Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
+						} else {
+							k = MapCursesKey (wch2);
+						}
+						key = new KeyEvent (k, MapKeyModifiers (k));
 					} else {
-						k = Key.AltMask | (Key)wch2;
+						// Unfortunately there are no way to differentiate Ctrl+Alt+alfa and Ctrl+Shift+Alt+alfa.
+						if (wch2 == 0) {
+							k = Key.CtrlMask | Key.AltMask | Key.Space;
+						} else {
+							if (((Key)wch2).ToString ().Contains ("Control")) {
+								keyModifiers.Ctrl = true;
+							}
+							if (wch2 < 256) {
+								k = Key.AltMask | (Key)wch2;
+							} else {
+								//k = (Key)wch2;
+								//keyModifiers.Alt = true;
+								k = (Key)((uint)(Key.AltMask | Key.CtrlMask) + wch2);
+							}
+						}
 						key = new KeyEvent (k, MapKeyModifiers (k));
 					}
+					keyDownHandler (key);
 					keyHandler (key);
 				} else {
 					k = Key.Esc;
@@ -521,7 +582,16 @@ namespace Terminal.Gui {
 				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 			} else {
+				// Unfortunately there are no way to differentiate Ctrl+alfa and Ctrl+Shift+alfa.
 				k = (Key)wch;
+				if (wch == 0) {
+					k = Key.CtrlMask | Key.Space;
+				} else if (wch >= (uint)Key.ControlA && wch <= (uint)Key.ControlZ) {
+					k = (Key)wch;
+					keyModifiers.Ctrl = true;
+				} else if (wch >= 'A' && wch <= 'Z') {
+					keyModifiers.Shift = true;
+				}
 				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 			}

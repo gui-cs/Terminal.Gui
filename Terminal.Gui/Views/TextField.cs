@@ -345,9 +345,9 @@ namespace Terminal.Gui {
 			// Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
 			var oldCursorPos = point;
 
-			switch (kb.Key) {
+			switch (GetModifiersKey (kb)) {
 			case Key.DeleteChar:
-			case Key.ControlD:
+			case Key.ControlD | Key.CtrlMask:
 				if (ReadOnly)
 					return true;
 
@@ -398,7 +398,7 @@ namespace Terminal.Gui {
 
 			// Home, C-A
 			case Key.Home:
-			case Key.ControlA:
+			case Key.ControlA | Key.CtrlMask:
 				ClearAllSelection ();
 				point = 0;
 				Adjust ();
@@ -441,7 +441,7 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.CursorLeft:
-			case Key.ControlB:
+			case Key.ControlB | Key.CtrlMask:
 				ClearAllSelection ();
 				if (point > 0) {
 					point--;
@@ -450,14 +450,14 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.End:
-			case Key.ControlE: // End
+			case Key.ControlE | Key.CtrlMask: // End
 				ClearAllSelection ();
 				point = text.Count;
 				Adjust ();
 				break;
 
 			case Key.CursorRight:
-			case Key.ControlF:
+			case Key.ControlF | Key.CtrlMask:
 				ClearAllSelection ();
 				if (point == text.Count)
 					break;
@@ -465,7 +465,7 @@ namespace Terminal.Gui {
 				Adjust ();
 				break;
 
-			case Key.ControlK: // kill-to-end
+			case Key.ControlK | Key.CtrlMask: // kill-to-end
 				if (ReadOnly)
 					return true;
 
@@ -478,7 +478,7 @@ namespace Terminal.Gui {
 				break;
 
 			// Undo
-			case Key.ControlZ:
+			case Key.ControlZ | Key.CtrlMask:
 				if (ReadOnly)
 					return true;
 
@@ -494,7 +494,7 @@ namespace Terminal.Gui {
 				break;
 
 			//Redo
-			case Key.ControlY: // Control-y, yank
+			case Key.ControlY | Key.CtrlMask: // Control-y, yank
 				if (ReadOnly)
 					return true;
 
@@ -552,18 +552,18 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 				break;
 
-			case Key.ControlC:
+			case Key.ControlC | Key.CtrlMask:
 				Copy ();
 				break;
 
-			case Key.ControlX:
+			case Key.ControlX | Key.CtrlMask:
 				if (ReadOnly)
 					return true;
 
 				Cut ();
 				break;
 
-			case Key.ControlV:
+			case Key.ControlV | Key.CtrlMask:
 				Paste ();
 				break;
 

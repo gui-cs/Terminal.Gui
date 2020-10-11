@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using Terminal.Gui;
 using Rune = System.Rune;
@@ -156,11 +157,15 @@ namespace UICatalog {
 
 			_menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_Quit", "", () => Application.RequestStop() )
+					new MenuItem ("_Quit", "", () => Application.RequestStop(), null, null, Key.ControlQ)
 				}),
 				new MenuBarItem ("_Color Scheme", CreateColorSchemeMenuItems()),
-				new MenuBarItem ("_Diagostics", CreateDiagnosticMenuItems()),
-				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "_Ok")),
+				new MenuBarItem ("Diag_ostics", CreateDiagnosticMenuItems()),
+				new MenuBarItem ("_Help", new MenuItem [] {
+					new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://migueldeicaza.github.io/gui.cs/articles/overview.html"), null, null, Key.F1),
+					new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/migueldeicaza/gui.cs"), null, null, Key.F2),
+					new MenuItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "_Ok"), null, null, Key.ControlA),
+				})
 			});
 
 			_leftPane = new FrameView ("Categories") {
@@ -261,10 +266,14 @@ namespace UICatalog {
 
 		static MenuItem [] CreateDiagnosticMenuItems ()
 		{
+			var index = 0;
+
 			MenuItem CheckedMenuMenuItem (ustring menuItem, Action action, Func<bool> checkFunction)
 			{
 				var mi = new MenuItem ();
 				mi.Title = menuItem;
+				mi.ShortCut = Key.AltMask + index.ToString () [0];
+				index++;
 				mi.CheckType |= MenuItemCheckStyle.Checked;
 				mi.Checked = checkFunction ();
 				mi.Action = () => {
@@ -309,14 +318,15 @@ namespace UICatalog {
 			List<MenuItem> menuItems = new List<MenuItem> ();
 			foreach (var sc in Colors.ColorSchemes) {
 				var item = new MenuItem ();
-				item.Title = sc.Key;
+				item.Title = $"_{sc.Key}";
+				item.ShortCut = Key.AltMask | (Key)sc.Key.Substring (0, 1) [0];
 				item.CheckType |= MenuItemCheckStyle.Radio;
 				item.Checked = sc.Value == _baseColorScheme;
 				item.Action += () => {
 					_baseColorScheme = sc.Value;
 					SetColorScheme ();
 					foreach (var menuItem in menuItems) {
-						menuItem.Checked = menuItem.Title.Equals (sc.Key) && sc.Value == _baseColorScheme;
+						menuItem.Checked = menuItem.Title.Equals ($"_{sc.Key}") && sc.Value == _baseColorScheme;
 					}
 				};
 				menuItems.Add (item);
@@ -439,6 +449,25 @@ namespace UICatalog {
 			_scenarioListView.Source = new ScenarioListDataSource (newlist);
 			_scenarioListView.SelectedItem = _scenarioListViewItem;
 
+		}
+
+		private static void OpenUrl (string url)
+		{
+			try {
+				Process.Start (url);
+			} catch {
+				// hack because of this: https://github.com/dotnet/corefx/issues/10361
+				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
+					url = url.Replace ("&", "^&");
+					Process.Start (new ProcessStartInfo ("cmd", $"/c start {url}") { CreateNoWindow = true });
+				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
+					Process.Start ("xdg-open", url);
+				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+					Process.Start ("open", url);
+				} else {
+					throw;
+				}
+			}
 		}
 	}
 }

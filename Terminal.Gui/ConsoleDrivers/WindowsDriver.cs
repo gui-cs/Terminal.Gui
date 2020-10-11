@@ -1118,30 +1118,42 @@ namespace Terminal.Gui {
 
 			if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
 				var delta = key - ConsoleKey.A;
-				if (keyInfo.Modifiers == ConsoleModifiers.Control)
+				if (keyInfo.Modifiers == ConsoleModifiers.Control) {
 					return (Key)((uint)Key.ControlA + delta);
-				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
+				}
+				if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
 					return (Key)(((uint)Key.AltMask) | ((uint)'A' + delta));
+				}
 				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-					if (keyInfo.KeyChar == 0)
-						return (Key)(((uint)Key.AltMask) + ((uint)Key.ControlA + delta));
-					else
+					if (keyInfo.KeyChar == 0) {
+						return (Key)(((uint)Key.AltMask | (uint)Key.CtrlMask) | ((uint)Key.ControlA + delta));
+					} else {
 						return (Key)((uint)keyInfo.KeyChar);
+					}
 				}
 				//return (Key)((uint)alphaBase + delta);
 				return (Key)((uint)keyInfo.KeyChar);
 			}
 			if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
 				var delta = key - ConsoleKey.D0;
-				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
+				if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
 					return (Key)(((uint)Key.AltMask) | ((uint)'0' + delta));
-
+				}
+				if (keyInfo.Modifiers == ConsoleModifiers.Control) {
+					return (Key)(((uint)Key.CtrlMask) | ((uint)'0' + delta));
+				}
+				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30) {
+					return MapKeyModifiers (keyInfo, (Key)((uint)'0' + delta));
+				}
 				return (Key)((uint)keyInfo.KeyChar);
 			}
 			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F12) {
 				var delta = key - ConsoleKey.F1;
+				if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+					return MapKeyModifiers (keyInfo, (Key)((uint)Key.F1 + delta));
+				}
 
-				return (Key)((int)Key.F1 + delta);
+				return (Key)((uint)Key.F1 + delta);
 			}
 			if (keyInfo.KeyChar != 0) {
 				return (Key)((uint)keyInfo.KeyChar);
@@ -1153,11 +1165,11 @@ namespace Terminal.Gui {
 		private Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 		{
 			Key keyMod = new Key ();
-			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift))
+			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
 				keyMod = Key.ShiftMask;
-			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
+			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
 				keyMod |= Key.CtrlMask;
-			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt))
+			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0)
 				keyMod |= Key.AltMask;
 
 			return keyMod != Key.ControlSpace ? keyMod | key : key;
