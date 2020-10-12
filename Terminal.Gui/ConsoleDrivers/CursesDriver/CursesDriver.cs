@@ -67,14 +67,22 @@ namespace Terminal.Gui {
 				AddRune (rune);
 		}
 
-		public override void Refresh () {
+		public override void Refresh ()
+		{
 			Curses.refresh ();
 			if (Curses.CheckWinChange ()) {
 				TerminalResized?.Invoke ();
 			}
 		}
+
 		public override void UpdateCursor () => Refresh ();
-		public override void End () => Curses.endwin ();
+		public override void End ()
+		{
+			Console.Out.Write ("\x1b[?1049l");
+			Console.Out.Flush ();
+
+			Curses.endwin ();
+		}
 		public override void UpdateScreen () => window.redrawwin ();
 		public override void SetAttribute (Attribute c) => Curses.attrset (c.value);
 		public Curses.Window window;
@@ -506,6 +514,9 @@ namespace Terminal.Gui {
 				return;
 
 			try {
+				Console.Out.Write ("\x1b[?1049h");
+				Console.Out.Flush ();
+
 				window = Curses.initscr ();
 			} catch (Exception e) {
 				Console.WriteLine ("Curses failed to initialize, the exception is: " + e);
