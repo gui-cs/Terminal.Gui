@@ -95,7 +95,6 @@ namespace Terminal.Gui {
 					} else {
 						shortCut = value;
 					}
-					ShortCutTag = GetShortCutTag (shortCut);
 				}
 			}
 		}
@@ -103,10 +102,10 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The keystroke combination used in the <see cref="ShortCut"/> as string.
 		/// </summary>
-		public ustring ShortCutTag { get; private set; } = ustring.Empty;
+		public ustring ShortCutTag => GetShortCutTag (shortCut);
 
 		/// <summary>
-		/// Gets or sets the title. 
+		/// Gets or sets the title.
 		/// </summary>
 		/// <value>The title.</value>
 		public ustring Title {
@@ -297,7 +296,7 @@ namespace Terminal.Gui {
 			var hasCtrl = false;
 			var delimiter = MenuBar.ShortCutDelimiter;
 
-			ustring [] keys = sCut.Split (MenuBar.ShortCutDelimiter);
+			ustring [] keys = sCut.Split (delimiter);
 			for (int i = 0; i < keys.Length; i++) {
 				var k = keys [i];
 				if (k == "Ctrl") {
@@ -887,10 +886,18 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool UseKeysUpDownAsKeysLeftRight { get; set; } = true;
 
+		static ustring shortCutDelimiter = "+";
 		/// <summary>
 		/// Used for change the shortcut delimiter separator.
 		/// </summary>
-		public static ustring ShortCutDelimiter { get; set; } = "+";
+		public static ustring ShortCutDelimiter {
+			get => shortCutDelimiter;
+			set {
+				if (shortCutDelimiter != value) {
+					shortCutDelimiter = value == ustring.Empty ? " " : value;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MenuBar"/>.

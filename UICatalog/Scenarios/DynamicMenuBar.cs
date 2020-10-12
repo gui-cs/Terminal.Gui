@@ -76,10 +76,10 @@ namespace UICatalog {
 		{
 			DataContext = new DynamicMenuItemModel ();
 
-			var _frmDelimiter = new FrameView ("Delimiter") {
+			var _frmDelimiter = new FrameView ("ShortCut Delimiter:") {
 				X = Pos.Center (),
 				Y = 3,
-				Width = 20,
+				Width = 25,
 				Height = 4
 			};
 
@@ -555,12 +555,14 @@ namespace UICatalog {
 					newMenu = new MenuItem (item.title, item.help, null, null, parent);
 					newMenu.CheckType = item.checkStyle;
 					newMenu.Action = _frmMenuDetails.CreateAction (newMenu, item);
+					newMenu.ShortCut = newMenu.CreateShortCutFromTag (item.shortCut);
 				} else if (item.isTopLevel) {
 					newMenu = new MenuBarItem (item.title, item.help, null);
 					newMenu.Action = _frmMenuDetails.CreateAction (newMenu, item);
 				} else {
 					newMenu = new MenuBarItem (item.title, item.help, null);
 					((MenuBarItem)newMenu).Children [0].Action = _frmMenuDetails.CreateAction (newMenu, item);
+					((MenuBarItem)newMenu).Children [0].ShortCut = newMenu.CreateShortCutFromTag (item.shortCut);
 				}
 
 				return newMenu;
@@ -712,17 +714,12 @@ namespace UICatalog {
 			};
 			_txtShortCut.KeyDown += (e) => {
 				var k = GetModifiersKey (e.KeyEvent);
-				if (_menuItem == null || ((k & (Key.CtrlMask | Key.ShiftMask | Key.AltMask)) == 0 && !CheckFlagRange (k, Key.F1, Key.F12))) {
+				if (((k & (Key.CtrlMask | Key.ShiftMask | Key.AltMask)) == 0 && !CheckFlagRange (k, Key.F1, Key.F12))) {
 					_txtShortCut.Text = "";
 					return;
 				}
 
-				var s = _menuItem.GetShortCutTag (k);
-				if (s.Contains ("Unknow")) {
-					_txtShortCut.Text = "";
-				} else {
-					_txtShortCut.Text = s;
-				}
+				GetShortCut (k);
 				e.Handled = true;
 			};
 
@@ -736,9 +733,20 @@ namespace UICatalog {
 				return false;
 			}
 
+			void GetShortCut (Key k)
+			{
+				var m = _menuItem != null ? _menuItem : new MenuItem ();
+				var s = m.GetShortCutTag (k);
+				if (s.Contains ("Unknow")) {
+					_txtShortCut.Text = "";
+				} else {
+					_txtShortCut.Text = s;
+				}
+			}
+
 			_txtShortCut.KeyUp += (e) => {
 				var k = GetModifiersKey (e.KeyEvent);
-				if (_menuItem == null || (k & (Key.CtrlMask | Key.ShiftMask | Key.AltMask)) == 0 || ((k | Key.D0) == 0 && !CheckFlagRange (k, Key.F1, Key.F12))) {
+				if ((k & (Key.CtrlMask | Key.ShiftMask | Key.AltMask)) == 0 || ((k | Key.D0) == 0 && !CheckFlagRange (k, Key.F1, Key.F12))) {
 					return;
 				}
 
@@ -751,12 +759,8 @@ namespace UICatalog {
 				       (kVal & (Key.CtrlMask | Key.ShiftMask | Key.AltMask)) != 0) && !kVal.ToString ().Contains ("Control")) {
 					return;
 				}
-				var s = _menuItem.GetShortCutTag (k);
-				if (s.Contains ("Unknow")) {
-					_txtShortCut.Text = "";
-				} else {
-					_txtShortCut.Text = s;
-				}
+				GetShortCut (k);
+				e.Handled = true;
 			};
 			Add (_txtShortCut);
 
@@ -802,6 +806,7 @@ namespace UICatalog {
 					_txtHelp.CanFocus = false;
 					_txtAction.Text = "";
 					_txtAction.CanFocus = false;
+					_txtShortCut.Text = "";
 					_txtShortCut.CanFocus = false;
 				} else {
 					if (!hasParent) {
