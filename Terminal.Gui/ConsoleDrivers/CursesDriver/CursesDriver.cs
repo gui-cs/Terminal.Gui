@@ -78,7 +78,7 @@ namespace Terminal.Gui {
 		public override void UpdateCursor () => Refresh ();
 		public override void End ()
 		{
-			Console.Out.Write ("\x1b[?1049l");
+			Console.Out.Write ("\x1b[?1h\x1b=");
 			Console.Out.Flush ();
 
 			Curses.endwin ();
@@ -514,7 +514,7 @@ namespace Terminal.Gui {
 				return;
 
 			try {
-				Console.Out.Write ("\x1b[?1049h");
+				Console.Out.Write ("\x1b[?1l\x1b>");
 				Console.Out.Flush ();
 
 				window = Curses.initscr ();
