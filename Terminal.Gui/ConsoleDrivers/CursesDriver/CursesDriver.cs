@@ -78,7 +78,8 @@ namespace Terminal.Gui {
 		public override void UpdateCursor () => Refresh ();
 		public override void End ()
 		{
-			Console.Out.Write ("\x1b[?1h\x1b=");
+			//Set cursor key to cursor.
+			Console.Out.Write ("\x1b[?1l");
 			Console.Out.Flush ();
 
 			Curses.endwin ();
@@ -514,7 +515,8 @@ namespace Terminal.Gui {
 				return;
 
 			try {
-				Console.Out.Write ("\x1b[?1l\x1b>");
+				//Set cursor key to application.
+				Console.Out.Write ("\x1b[?1h");
 				Console.Out.Flush ();
 
 				window = Curses.initscr ();
