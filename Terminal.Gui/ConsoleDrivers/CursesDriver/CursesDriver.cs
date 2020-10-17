@@ -189,7 +189,6 @@ namespace Terminal.Gui {
 		Curses.Event? LastMouseButtonPressed;
 		bool IsButtonPressed;
 		bool cancelButtonClicked;
-		bool canWheeledDown;
 		bool isReportMousePosition;
 		Point point;
 
@@ -258,30 +257,22 @@ namespace Terminal.Gui {
 
 				mouseFlag = ProcessButtonReleasedEvent (cev);
 				IsButtonPressed = false;
-				canWheeledDown = false;
 
-			} else if (cev.ButtonState == Curses.Event.Button4Pressed) {
+			} else if (cev.ButtonState == Curses.Event.ButtonWheeledUp) {
 
 				mouseFlag = MouseFlags.WheeledUp;
 
-			} else if (cev.ButtonState == Curses.Event.ReportMousePosition && cev.X == point.X && cev.Y == point.Y &&
-				canWheeledDown) {
+			} else if (cev.ButtonState == Curses.Event.ButtonWheeledDown) {
 
 				mouseFlag = MouseFlags.WheeledDown;
-				canWheeledDown = true;
 
-			}
-			else if (cev.ButtonState == Curses.Event.ReportMousePosition && !canWheeledDown) {
+			} else if (cev.ButtonState == Curses.Event.ReportMousePosition) {
 
 				mouseFlag = MouseFlags.ReportMousePosition;
-				canWheeledDown = true;
 				isReportMousePosition = true;
 
 			} else {
 				mouseFlag = (MouseFlags)cev.ButtonState;
-				canWheeledDown = false;
-				if (cev.ButtonState == Curses.Event.ReportMousePosition)
-					isReportMousePosition = true;
 			}
 
 			point = new Point () {
@@ -310,7 +301,6 @@ namespace Terminal.Gui {
 				}
 			}
 			LastMouseButtonPressed = null;
-			canWheeledDown = false;
 			return mf;
 		}
 
@@ -324,7 +314,6 @@ namespace Terminal.Gui {
 				mf = MouseFlags.ReportMousePosition;
 			}
 			cancelButtonClicked = false;
-			canWheeledDown = false;
 			return mf;
 		}
 
@@ -414,8 +403,8 @@ namespace Terminal.Gui {
 					}
 				}
 				if (wch == Curses.KeyMouse) {
-					Curses.MouseEvent ev;
-					Curses.getmouse (out ev);
+					Curses.getmouse (out Curses.MouseEvent ev);
+					//System.Diagnostics.Debug.WriteLine ($"ButtonState: {ev.ButtonState}; ID: {ev.ID}; X: {ev.X}; Y: {ev.Y}; Z: {ev.Z}");
 					mouseHandler (ToDriverMouse (ev));
 					return;
 				}
