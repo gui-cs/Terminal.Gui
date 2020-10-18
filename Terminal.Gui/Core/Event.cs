@@ -542,6 +542,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		WheeledDown = unchecked((int)0x20000000),
 		/// <summary>
+		/// Vertical button wheeled up while pressing ButtonShift.
+		/// </summary>
+		WheeledLeft = ButtonShift | WheeledUp,
+		/// <summary>
+		/// Vertical button wheeled down while pressing ButtonShift.
+		/// </summary>
+		WheeledRight = ButtonShift | WheeledDown,
+		/// <summary>
 		/// Mask that captures all the events.
 		/// </summary>
 		AllEvents = unchecked((int)0x7ffffff),

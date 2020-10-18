@@ -213,14 +213,14 @@ namespace Terminal.Gui {
 				cev.ButtonState == Curses.Event.Button3Pressed) && LastMouseButtonPressed == null) ||
 				IsButtonPressed && cev.ButtonState == Curses.Event.ReportMousePosition) {
 
-				mouseFlag = (MouseFlags)cev.ButtonState;
+				mouseFlag = MapCursesButton (cev.ButtonState);
 				if (cev.ButtonState != Curses.Event.ReportMousePosition)
 					LastMouseButtonPressed = cev.ButtonState;
 				IsButtonPressed = true;
 				isReportMousePosition = false;
 
 				if (cev.ButtonState == Curses.Event.ReportMousePosition) {
-					mouseFlag = (MouseFlags)LastMouseButtonPressed | MouseFlags.ReportMousePosition;
+					mouseFlag = MapCursesButton ((Curses.Event)LastMouseButtonPressed) | MouseFlags.ReportMousePosition;
 					point = new Point ();
 					//cancelButtonClicked = true;
 				} else {
@@ -266,14 +266,30 @@ namespace Terminal.Gui {
 
 				mouseFlag = MouseFlags.WheeledDown;
 
+			} else if ((cev.ButtonState & (Curses.Event.ButtonWheeledUp & Curses.Event.ButtonShift)) != 0) {
+
+				mouseFlag = MouseFlags.WheeledLeft;
+
+			} else if ((cev.ButtonState & (Curses.Event.ButtonWheeledDown & Curses.Event.ButtonShift)) != 0) {
+
+				mouseFlag = MouseFlags.WheeledRight;
+
 			} else if (cev.ButtonState == Curses.Event.ReportMousePosition) {
 
 				mouseFlag = MouseFlags.ReportMousePosition;
 				isReportMousePosition = true;
 
 			} else {
-				mouseFlag = (MouseFlags)cev.ButtonState;
+				mouseFlag = 0;
+				var eFlags = cev.ButtonState;
+				foreach (Enum value in Enum.GetValues (eFlags.GetType ())) {
+					if (eFlags.HasFlag (value)) {
+						mouseFlag |= MapCursesButton ((Curses.Event)value);
+					}
+				}
 			}
+
+			mouseFlag = SetControlKeyStates (cev, mouseFlag);
 
 			point = new Point () {
 				X = cev.X,
@@ -283,7 +299,7 @@ namespace Terminal.Gui {
 			return new MouseEvent () {
 				X = cev.X,
 				Y = cev.Y,
-				//Flags = (MouseFlags)cev.ButtonState
+				//Flags = MapCursesButton (cev.ButtonState)
 				Flags = mouseFlag
 			};
 		}
@@ -297,7 +313,7 @@ namespace Terminal.Gui {
 				mf = GetButtonState (cev, false);
 				mouseHandler (ProcessButtonState (cev, mf));
 				if (LastMouseButtonPressed != null && LastMouseButtonPressed == cev.ButtonState) {
-					mf = (MouseFlags)cev.ButtonState;
+					mf = MapCursesButton (cev.ButtonState);
 				}
 			}
 			LastMouseButtonPressed = null;
@@ -306,7 +322,7 @@ namespace Terminal.Gui {
 
 		private MouseFlags ProcessButtonReleasedEvent (Curses.MouseEvent cev)
 		{
-			var mf = (MouseFlags)cev.ButtonState;
+			var mf = MapCursesButton (cev.ButtonState);
 			if (!cancelButtonClicked && LastMouseButtonPressed == null && !isReportMousePosition) {
 				mouseHandler (ProcessButtonState (cev, mf));
 				mf = GetButtonState (cev);
@@ -367,6 +383,54 @@ namespace Terminal.Gui {
 				Flags = mf
 			};
 		}
+
+		MouseFlags MapCursesButton (Curses.Event cursesButton)
+		{
+			switch (cursesButton) {
+			case Curses.Event.Button1Pressed: return MouseFlags.Button1Pressed;
+			case Curses.Event.Button1Released: return MouseFlags.Button1Released;
+			case Curses.Event.Button1Clicked: return MouseFlags.Button1Clicked;
+			case Curses.Event.Button1DoubleClicked: return MouseFlags.Button1DoubleClicked;
+			case Curses.Event.Button1TripleClicked: return MouseFlags.Button1TripleClicked;
+			case Curses.Event.Button2Pressed: return MouseFlags.Button2Pressed;
+			case Curses.Event.Button2Released: return MouseFlags.Button2Released;
+			case Curses.Event.Button2Clicked: return MouseFlags.Button2Clicked;
+			case Curses.Event.Button2DoubleClicked: return MouseFlags.Button2DoubleClicked;
+			case Curses.Event.Button2TrippleClicked: return MouseFlags.Button2TripleClicked;
+			case Curses.Event.Button3Pressed: return MouseFlags.Button3Pressed;
+			case Curses.Event.Button3Released: return MouseFlags.Button3Released;
+			case Curses.Event.Button3Clicked: return MouseFlags.Button3Clicked;
+			case Curses.Event.Button3DoubleClicked: return MouseFlags.Button3DoubleClicked;
+			case Curses.Event.Button3TripleClicked: return MouseFlags.Button3TripleClicked;
+			case Curses.Event.ButtonWheeledUp: return MouseFlags.WheeledUp;
+			case Curses.Event.ButtonWheeledDown: return MouseFlags.WheeledDown;
+			case Curses.Event.Button4Pressed: return MouseFlags.Button4Pressed;
+			case Curses.Event.Button4Released: return MouseFlags.Button4Released;
+			case Curses.Event.Button4Clicked: return MouseFlags.Button4Clicked;
+			case Curses.Event.Button4DoubleClicked: return MouseFlags.Button4DoubleClicked;
+			case Curses.Event.Button4TripleClicked: return MouseFlags.Button4TripleClicked;
+			case Curses.Event.ButtonShift: return MouseFlags.ButtonShift;
+			case Curses.Event.ButtonCtrl: return MouseFlags.ButtonCtrl;
+			case Curses.Event.ButtonAlt: return MouseFlags.ButtonAlt;
+			case Curses.Event.ReportMousePosition: return MouseFlags.ReportMousePosition;
+			case Curses.Event.AllEvents: return MouseFlags.AllEvents;
+			default: return 0;
+			}
+		}
+
+		static MouseFlags SetControlKeyStates (Curses.MouseEvent cev, MouseFlags mouseFlag)
+		{
+			if ((cev.ButtonState & Curses.Event.ButtonCtrl) != 0 && (mouseFlag & MouseFlags.ButtonCtrl) == 0)
+				mouseFlag |= MouseFlags.ButtonCtrl;
+
+			if ((cev.ButtonState & Curses.Event.ButtonShift) != 0 && (mouseFlag & MouseFlags.ButtonShift) == 0)
+				mouseFlag |= MouseFlags.ButtonShift;
+
+			if ((cev.ButtonState & Curses.Event.ButtonAlt) != 0 && (mouseFlag & MouseFlags.ButtonAlt) == 0)
+				mouseFlag |= MouseFlags.ButtonAlt;
+			return mouseFlag;
+		}
+
 
 		KeyModifiers keyModifiers;
 

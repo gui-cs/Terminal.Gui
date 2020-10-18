@@ -75,7 +75,7 @@ namespace Unix.Terminal {
 			Button4Pressed = unchecked((int)0x80000),
 			Button4Released = unchecked((int)0x40000),
 			Button4Clicked = unchecked((int)0x100000),
-			Button4DoubleClicked = unchecked((int)0x200000),
+			Button4DoubleClicked = unchecked((int)0x20000),
 			Button4TripleClicked = unchecked((int)0x400000),
 			ButtonShift = unchecked((int)0x4000000),
 			ButtonCtrl = unchecked((int)0x2000000),
