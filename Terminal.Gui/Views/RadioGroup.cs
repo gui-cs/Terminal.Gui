@@ -259,6 +259,9 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Allow to invoke the <see cref="SelectedItemChanged"/> after their creation.
+		/// </summary>
 		public void Refresh ()
 		{
 			OnSelectedItemChanged (selected, -1);
