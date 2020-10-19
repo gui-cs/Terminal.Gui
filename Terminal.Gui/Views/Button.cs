@@ -145,7 +145,13 @@ namespace Terminal.Gui {
 				base.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
 
 			int w = base.Text.RuneCount - (base.Text.Contains (HotKeySpecifier) ? 1 : 0);
-			Width = w;
+			try {
+				Width = w;
+#pragma warning disable RCS1075 // Avoid empty catch clause that catches System.Exception.
+			} catch (Exception) {
+#pragma warning restore RCS1075 // Avoid empty catch clause that catches System.Exception.
+			       // It's a Dim.DimCombine and so can't be assigned. Let it have it's own anchor.
+			}
 			Height = 1;
 			Frame = new Rect (Frame.Location, new Size (w, 1));
 			SetNeedsDisplay ();

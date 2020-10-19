@@ -259,6 +259,11 @@ namespace Terminal.Gui {
 			}
 		}
 
+		public void Refresh ()
+		{
+			OnSelectedItemChanged (selected, -1);
+		}
+
 		/// <summary>
 		/// Called whenever the current selected item changes. Invokes the <see cref="SelectedItemChanged"/> event.
 		/// </summary>

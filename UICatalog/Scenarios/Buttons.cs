@@ -266,6 +266,8 @@ namespace UICatalog {
 					break;
 				}
 			};
+
+			Top.Ready += () => radioGroup.Refresh ();
 		}
 	}
 }
