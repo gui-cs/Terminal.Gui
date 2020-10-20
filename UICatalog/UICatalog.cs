@@ -64,6 +64,8 @@ namespace UICatalog {
 
 		static void Main (string [] args)
 		{
+			Console.OutputEncoding = Encoding.Default;
+
 			if (Debugger.IsAttached)
 				CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 

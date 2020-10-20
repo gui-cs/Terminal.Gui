@@ -571,14 +571,11 @@ namespace Terminal.Gui {
 			} else if (c >= 0x80 && c <= 0x9F) {
 				// C1 control characters (https://www.aivosto.com/articles/control-characters.html#c1)
 				return new Rune (0x25a1); // U+25A1, WHITE SQUARE, □: 
-			} else if (Rune.ColumnWidth (c) > 1) {
-				// BUGBUG: Until we figure out how to fix #41. Note this still doesn't help when 
-				// an Emoji or other char doesn't represent it's width correctly
-				return new Rune (0x25a1); // U+25A1, WHITE SQUARE, □: 
 			} else {
 				return c;
 			}
 		}
+
 		/// <summary>
 		/// Adds the specified
 		/// </summary>
