@@ -1690,7 +1690,10 @@ namespace Terminal.Gui {
 				else
 					h = Math.Max (height.Anchor (hostFrame.Height - _y), 0);
 			}
-			Frame = new Rect (_x, _y, w, h);
+			var r = new Rect (_x, _y, w, h);
+			if (Frame != r) {
+				Frame = new Rect (_x, _y, w, h);
+			}
 		}
 
 		// https://en.wikipedia.org/wiki/Topological_sorting
