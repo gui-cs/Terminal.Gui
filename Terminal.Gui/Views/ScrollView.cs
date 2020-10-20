@@ -768,19 +768,25 @@ namespace Terminal.Gui {
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp &&
+				me.Flags != MouseFlags.WheeledRight && me.Flags != MouseFlags.WheeledLeft &&
 				me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
-				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
+				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
 				return false;
+			}
 
-			if (me.Flags == MouseFlags.WheeledDown && ShowVerticalScrollIndicator)
+			if (me.Flags == MouseFlags.WheeledDown && ShowVerticalScrollIndicator) {
 				ScrollDown (1);
-			else if (me.Flags == MouseFlags.WheeledUp && ShowVerticalScrollIndicator)
+			} else if (me.Flags == MouseFlags.WheeledUp && ShowVerticalScrollIndicator) {
 				ScrollUp (1);
-			else if (me.X == vertical.Frame.X && ShowVerticalScrollIndicator)
+			} else if (me.Flags == MouseFlags.WheeledRight && showHorizontalScrollIndicator) {
+				ScrollRight (1);
+			} else if (me.Flags == MouseFlags.WheeledLeft && ShowVerticalScrollIndicator) {
+				ScrollLeft (1);
+			} else if (me.X == vertical.Frame.X && ShowVerticalScrollIndicator) {
 				vertical.MouseEvent (me);
-			else if (me.Y == horizontal.Frame.Y && ShowHorizontalScrollIndicator)
+			} else if (me.Y == horizontal.Frame.Y && ShowHorizontalScrollIndicator) {
 				horizontal.MouseEvent (me);
-			else if (IsOverridden (me.View)) {
+			} else if (IsOverridden (me.View)) {
 				Application.UngrabMouse ();
 				return false;
 			}

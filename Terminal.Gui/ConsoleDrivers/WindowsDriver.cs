@@ -933,6 +933,18 @@ namespace Terminal.Gui {
 					break;
 				}
 
+			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseWheeled &&
+				mouseEvent.ControlKeyState == WindowsConsole.ControlKeyState.ShiftPressed) {
+				switch (mouseEvent.ButtonState) {
+				case WindowsConsole.ButtonState.WheeledUp:
+					mouseFlag = MouseFlags.WheeledLeft;
+					break;
+
+				case WindowsConsole.ButtonState.WheeledDown:
+					mouseFlag = MouseFlags.WheeledRight;
+					break;
+				}
+
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 				if (mouseEvent.MousePosition.X != point.X || mouseEvent.MousePosition.Y != point.Y) {
 					mouseFlag = MouseFlags.ReportMousePosition;
