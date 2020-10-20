@@ -149,12 +149,7 @@ namespace Terminal.Gui {
 				Width = w;
 			} catch (Exception) {
 				// It's a Dim.DimCombine and so can't be assigned. Let it have it's own anchor.
-				var width = Width;
-				LayoutStyle = LayoutStyle.Absolute;
-				Width = w;
-				LayoutStyle = LayoutStyle.Computed;
-				Width = width;
-				w = width.Anchor (w);
+				w = Width.Anchor (w);
 			}
 			Height = 1;
 			Frame = new Rect (Frame.Location, new Size (w, 1));
