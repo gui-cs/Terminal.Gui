@@ -20,12 +20,11 @@ namespace Terminal.Gui {
 	public class TextField : View {
 		List<Rune> text;
 		int first, point;
-		bool used;
 
 		/// <summary>
 		/// Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so new input should be appended at the cursor position, rather than clearing the entry
 		/// </summary>
-		public bool Used { get => used; set { used = value; } }
+		public bool Used { get; set; }
 
 		/// <summary>
 		/// If set to true its not allow any changes in the text.
@@ -185,7 +184,7 @@ namespace Terminal.Gui {
 				if (idx == point)
 					break;
 				var cols = Rune.ColumnWidth (text [idx]);
-				col += cols;
+				col = SetCol (col, Frame.Width - 1, cols);
 			}
 			Move (col, 0);
 		}
@@ -206,33 +205,50 @@ namespace Terminal.Gui {
 			var roc = new Attribute (Color.DarkGray, Color.Gray);
 			for (int idx = 0; idx < tcount; idx++) {
 				var rune = text [idx];
-				if (idx < p)
+				if (idx < p) {
 					continue;
+				}
 				var cols = Rune.ColumnWidth (rune);
-				if (col == point && HasFocus && !Used && SelectedLength == 0 && !ReadOnly)
+				if (idx == point && HasFocus && !Used && SelectedLength == 0 && !ReadOnly) {
 					Driver.SetAttribute (Colors.Menu.HotFocus);
-				else if (ReadOnly)
+				} else if (ReadOnly) {
 					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : roc);
-				else
+				} else {
 					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : ColorScheme.Focus);
-				if (col + cols <= width)
+				}
+				if (col + cols <= width) {
 					Driver.AddRune ((Rune)(Secret ? '*' : rune));
-				col += cols;
+				}
+				col = SetCol (col, width, cols);
 			}
 
 			Driver.SetAttribute (ColorScheme.Focus);
-			for (int i = col; i < Frame.Width; i++)
+			for (int i = col; i < Frame.Width; i++) {
 				Driver.AddRune (' ');
+			}
 
 			PositionCursor ();
 		}
 
-		// Returns the size of the string starting at position start
-		int DisplaySize (List<Rune> t, int start)
+		static int SetCol (int col, int width, int cols)
 		{
+			if (col + cols <= width) {
+				col += cols;
+			}
+
+			return col;
+		}
+
+		// Returns the size in a range of the string.
+		int DisplaySize (List<Rune> t, int start = -1, int end = -1)
+		{
+			if (t == null || t.Count == 0) {
+				return 0;
+			}
 			int size = 0;
-			int tcount = t.Count;
-			for (int i = start; i < tcount; i++) {
+			int tcount = end == -1 ? t.Count : end > t.Count ? t.Count : end;
+			int i = start == -1 ? 0 : start;
+			for (; i < tcount; i++) {
 				var rune = t [i];
 				size += Rune.ColumnWidth (rune);
 			}
@@ -241,15 +257,45 @@ namespace Terminal.Gui {
 
 		void Adjust ()
 		{
-			int offB = 0;
-			if (SuperView != null && SuperView.Frame.Right - Frame.Right < 0)
-				offB = SuperView.Frame.Right - Frame.Right - 1;
-			if (point < first)
+			int offB = OffSetBackground ();
+			if (point < first) {
 				first = point;
-			else if (first + point >= Frame.Width + offB) {
-				first = point - (Frame.Width - 1 + offB);
+			} else if (first + point - (Frame.Width + offB) == 0 ||
+				  DisplaySize (text, first, point) >= Frame.Width + offB) {
+				first = Math.Max (CalculateFirst (text, first, point, Frame.Width - 1 + offB), 0);
 			}
+
 			SetNeedsDisplay ();
+		}
+
+		int OffSetBackground ()
+		{
+			int offB = 0;
+			if (SuperView?.Frame.Right - Frame.Right < 0) {
+				offB = SuperView.Frame.Right - Frame.Right - 1;
+			}
+
+			return offB;
+		}
+
+		int CalculateFirst (List<Rune> t, int start, int end, int width)
+		{
+			if (start + end - width >= width) {
+				return end - width;
+			}
+			int size = 0;
+			int tcount = end > width || end > t.Count - 1 ? t.Count - 1 : end;
+			int col = 0;
+			for (int i = tcount; i > -1; i--) {
+				var rune = t [i];
+				var s = Rune.ColumnWidth (rune);
+				size += s;
+				if (size > width) {
+					col += size - width;
+					break;
+				}
+			}
+			return col + start;
 		}
 
 		void SetText (List<Rune> newText)
@@ -327,7 +373,7 @@ namespace Terminal.Gui {
 						return true;
 
 					point--;
-					SetText (text.GetRange (0, oldCursorPos - 1).Concat (text.GetRange (oldCursorPos, text.Count - (oldCursorPos))));
+					SetText (text.GetRange (0, oldCursorPos - 1).Concat (text.GetRange (oldCursorPos, text.Count - oldCursorPos)));
 					Adjust ();
 				} else {
 					DeleteSelectedText ();
@@ -539,11 +585,14 @@ namespace Terminal.Gui {
 					oldCursorPos = point;
 				}
 				var kbstr = TextModel.ToRunes (ustring.Make ((uint)kb.Key));
-				if (used) {
+				if (Used) {
 					point++;
 					if (point == text.Count + 1) {
 						SetText (text.Concat (kbstr).ToList ());
 					} else {
+						if (oldCursorPos > text.Count) {
+							oldCursorPos = text.Count;
+						}
 						SetText (text.GetRange (0, oldCursorPos).Concat (kbstr).Concat (text.GetRange (oldCursorPos, Math.Min (text.Count - oldCursorPos, text.Count))));
 					}
 				} else {
@@ -697,22 +746,47 @@ namespace Terminal.Gui {
 		{
 			// We could also set the cursor position.
 			int x;
-			if (text.Count == 0)
-				x = ev.X - ev.OfX;
-			else
-				x = ev.X;
-
-			return PositionCursor (x);
+			var pX = GetPointFromX (text, first, ev.X);
+			if (text.Count == 0) {
+				x = pX - ev.OfX;
+			} else {
+				x = pX;
+			}
+			return PositionCursor (x, false);
 		}
 
-		private int PositionCursor (int x)
+		int PositionCursor (int x, bool getX = true)
 		{
-			point = first + x;
-			if (point > text.Count)
+			int pX = x;
+			if (getX) {
+				pX = GetPointFromX (text, first, x);
+			}
+			if (first + pX > text.Count) {
 				point = text.Count;
-			if (point < first)
+			} else if (first + pX < first) {
 				point = 0;
+			} else {
+				point = first + pX;
+			}
+
 			return point;
+		}
+
+		int GetPointFromX (List<Rune> t, int start, int x)
+		{
+			if (x < 0) {
+				return x;
+			}
+			int size = start;
+			var pX = x + start;
+			for (int i = start; i < t.Count; i++) {
+				var r = t [i];
+				size += Rune.ColumnWidth (r);
+				if (i == pX || (size > pX)) {
+					return i - start;
+				}
+			}
+			return t.Count - start;
 		}
 
 		void PrepareSelection (int x, int direction = 0)
@@ -724,6 +798,10 @@ namespace Terminal.Gui {
 				SetSelectedStartSelectedLength ();
 				SelectedText = length > 0 ? ustring.Make (text).ToString ().Substring (
 					start < 0 ? 0 : start, length > text.Count ? text.Count : length) : "";
+				if (first > start) {
+					first = start;
+				}
+				point = start + length;
 			}
 			Adjust ();
 		}

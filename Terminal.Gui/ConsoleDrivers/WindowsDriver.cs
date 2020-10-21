@@ -1143,6 +1143,9 @@ namespace Terminal.Gui {
 
 				return (Key)((int)Key.F1 + delta);
 			}
+			if (keyInfo.KeyChar != 0) {
+				return (Key)((uint)keyInfo.KeyChar);
+			}
 
 			return (Key)(0xffffffff);
 		}
