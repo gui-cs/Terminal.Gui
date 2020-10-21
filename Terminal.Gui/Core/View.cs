@@ -672,7 +672,7 @@ namespace Terminal.Gui {
 		/// <param name="region">The view-relative region that must be flagged for repaint.</param>
 		public void SetNeedsDisplay (Rect region)
 		{
-			if (NeedDisplay == null || NeedDisplay.IsEmpty)
+			if (NeedDisplay.IsEmpty)
 				NeedDisplay = region;
 			else {
 				var x = Math.Min (NeedDisplay.X, region.X);
@@ -1290,7 +1290,7 @@ namespace Terminal.Gui {
 
 			if (subviews != null) {
 				foreach (var view in subviews) {
-					if (view.NeedDisplay != null && (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay)) {
+					if (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay) {
 						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
 							if (view.layoutNeeded)
 								view.LayoutSubviews ();

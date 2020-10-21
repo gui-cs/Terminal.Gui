@@ -173,7 +173,7 @@ namespace Terminal.Gui {
 			var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
 
 			// BUGBUG: Why do we draw the frame twice? This call is here to clear the content area, I think. Why not just clear that area?
-			if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
+			if (!NeedDisplay.IsEmpty) {
 				Driver.SetAttribute (ColorScheme.Normal);
 				Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: true);
 			}
