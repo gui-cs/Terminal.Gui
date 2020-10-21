@@ -145,7 +145,9 @@ namespace Terminal.Gui {
 				base.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
 
 			int w = base.Text.RuneCount - (base.Text.Contains (HotKeySpecifier) ? 1 : 0);
-			if (Width is Dim.DimCombine) {
+			if (!(Width is Dim.DimCombine)) {
+				Width = w;
+			} else {
 				// It's a Dim.DimCombine and so can't be assigned. Let it have it's own anchor.
 				w = Width.Anchor (w);
 			}
