@@ -150,7 +150,7 @@ namespace Terminal.Gui {
 			Application.CurrentView = this;
 			var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
 
-			if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
+			if (!NeedDisplay.IsEmpty) {
 				Driver.SetAttribute (ColorScheme.Normal);
 				Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: true);
 			}

@@ -103,6 +103,11 @@ namespace Terminal.Gui {
 		public uint HotKeyTagMask { get; set; } = 0x100000;
 
 		/// <summary>
+		/// Gets the cursor position from <see cref="HotKey"/>. If the <see cref="HotKey"/> is defined, the cursor will be positioned over it.
+		/// </summary>
+		public int CursorPosition { get; set; }
+
+		/// <summary>
 		/// Gets the formatted lines. 
 		/// </summary>
 		/// <remarks>
@@ -567,16 +572,17 @@ namespace Terminal.Gui {
 				int x;
 				switch (textAlignment) {
 				case TextAlignment.Left:
-					x = bounds.Left;
-					break;
 				case TextAlignment.Justified:
 					x = bounds.Left;
+					CursorPosition = hotKeyPos;
 					break;
 				case TextAlignment.Right:
 					x = bounds.Right - runes.Length;
+					CursorPosition = bounds.Width - runes.Length + hotKeyPos;
 					break;
 				case TextAlignment.Centered:
 					x = bounds.Left + (bounds.Width - runes.Length) / 2;
+					CursorPosition = (bounds.Width - runes.Length) / 2 + hotKeyPos;
 					break;
 				default:
 					throw new ArgumentOutOfRangeException ();
@@ -588,6 +594,9 @@ namespace Terminal.Gui {
 						rune = runes [col - x];
 					}
 					if ((rune & HotKeyTagMask) == HotKeyTagMask) {
+						if (textAlignment == TextAlignment.Justified) {
+							CursorPosition = col - bounds.Left;
+						}
 						Application.Driver?.SetAttribute (hotColor);
 						Application.Driver?.AddRune ((Rune)((uint)rune & ~HotKeyTagMask));
 						Application.Driver?.SetAttribute (normalColor);

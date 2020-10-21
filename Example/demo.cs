@@ -549,6 +549,8 @@ static class Demo {
 	public static Action running = MainApp;
 	static void Main ()
 	{
+		Console.OutputEncoding = System.Text.Encoding.Default;
+
 		while (running != null) {
 			running.Invoke ();
 		}

@@ -933,6 +933,18 @@ namespace Terminal.Gui {
 					break;
 				}
 
+			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseWheeled &&
+				mouseEvent.ControlKeyState == WindowsConsole.ControlKeyState.ShiftPressed) {
+				switch (mouseEvent.ButtonState) {
+				case WindowsConsole.ButtonState.WheeledUp:
+					mouseFlag = MouseFlags.WheeledLeft;
+					break;
+
+				case WindowsConsole.ButtonState.WheeledDown:
+					mouseFlag = MouseFlags.WheeledRight;
+					break;
+				}
+
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 				if (mouseEvent.MousePosition.X != point.X || mouseEvent.MousePosition.Y != point.Y) {
 					mouseFlag = MouseFlags.ReportMousePosition;
@@ -1130,6 +1142,9 @@ namespace Terminal.Gui {
 				var delta = key - ConsoleKey.F1;
 
 				return (Key)((int)Key.F1 + delta);
+			}
+			if (keyInfo.KeyChar != 0) {
+				return (Key)((uint)keyInfo.KeyChar);
 			}
 
 			return (Key)(0xffffffff);

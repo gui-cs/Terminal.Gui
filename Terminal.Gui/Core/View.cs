@@ -672,7 +672,7 @@ namespace Terminal.Gui {
 		/// <param name="region">The view-relative region that must be flagged for repaint.</param>
 		public void SetNeedsDisplay (Rect region)
 		{
-			if (NeedDisplay == null || NeedDisplay.IsEmpty)
+			if (NeedDisplay.IsEmpty)
 				NeedDisplay = region;
 			else {
 				var x = Math.Min (NeedDisplay.X, region.X);
@@ -1086,7 +1086,7 @@ namespace Terminal.Gui {
 				focused.PositionCursor ();
 			} else {
 				if (CanFocus && HasFocus && Visible) {
-					Move (textFormatter.HotKeyPos == -1 ? 0 : textFormatter.HotKeyPos, 0);
+					Move (textFormatter.HotKeyPos == -1 ? 0 : textFormatter.CursorPosition, 0);
 				} else {
 					Move (frame.X, frame.Y);
 				}
@@ -1290,7 +1290,7 @@ namespace Terminal.Gui {
 
 			if (subviews != null) {
 				foreach (var view in subviews) {
-					if (view.NeedDisplay != null && (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay)) {
+					if (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay) {
 						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
 							if (view.layoutNeeded)
 								view.LayoutSubviews ();
@@ -1690,7 +1690,10 @@ namespace Terminal.Gui {
 				else
 					h = Math.Max (height.Anchor (hostFrame.Height - _y), 0);
 			}
-			Frame = new Rect (_x, _y, w, h);
+			var r = new Rect (_x, _y, w, h);
+			if (Frame != r) {
+				Frame = new Rect (_x, _y, w, h);
+			}
 		}
 
 		// https://en.wikipedia.org/wiki/Topological_sorting
