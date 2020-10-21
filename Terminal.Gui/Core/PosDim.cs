@@ -499,7 +499,7 @@ namespace Terminal.Gui {
 			return new DimAbsolute (n);
 		}
 
-		public class DimCombine : Dim {
+		internal class DimCombine : Dim {
 			Dim left, right;
 			bool add;
 			public DimCombine (bool add, Dim left, Dim right)
