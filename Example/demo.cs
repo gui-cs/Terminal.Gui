@@ -185,16 +185,16 @@ static class Demo {
 		};
 
 		var tf = new Button (3, 19, "Ok");
+		var frameView = new FrameView (new Rect (3, 10, 25, 6), "Options");
+		frameView.Add (new CheckBox (1, 0, "Remember me"));
+		frameView.Add (new RadioGroup (1, 2, new ustring [] { "_Personal", "_Company" }));
 		// Add some content
 		container.Add (
 			login,
 			loginText,
 			password,
 			passText,
-			new FrameView (new Rect (3, 10, 25, 6), "Options"){
-				new CheckBox (1, 0, "Remember me"),
-				new RadioGroup (1, 2, new ustring [] { "_Personal", "_Company" }),
-			},
+			frameView,
 			new ListView (new Rect (59, 6, 16, 4), new string [] {
 				"First row",
 				"<>",

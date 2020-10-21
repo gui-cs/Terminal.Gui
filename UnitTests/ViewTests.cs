@@ -35,7 +35,6 @@ namespace Terminal.Gui {
 			Assert.Empty (r.Subviews);
 			Assert.False (r.WantContinuousButtonPressed);
 			Assert.False (r.WantMousePositionReports);
-			Assert.Null (r.GetEnumerator ().Current);
 			Assert.Null (r.SuperView);
 			Assert.Null (r.MostFocused);
 
@@ -59,7 +58,6 @@ namespace Terminal.Gui {
 			Assert.Empty (r.Subviews);
 			Assert.False (r.WantContinuousButtonPressed);
 			Assert.False (r.WantMousePositionReports);
-			Assert.Null (r.GetEnumerator ().Current);
 			Assert.Null (r.SuperView);
 			Assert.Null (r.MostFocused);
 
@@ -83,7 +81,6 @@ namespace Terminal.Gui {
 			Assert.Empty (r.Subviews);
 			Assert.False (r.WantContinuousButtonPressed);
 			Assert.False (r.WantMousePositionReports);
-			Assert.Null (r.GetEnumerator ().Current);
 			Assert.Null (r.SuperView);
 			Assert.Null (r.MostFocused);
 
