@@ -386,7 +386,7 @@ namespace Terminal.Gui {
 			Application.CurrentView = this;
 
 			if (IsCurrentTop || this == Application.Top) {
-				if (NeedDisplay != null && !NeedDisplay.IsEmpty) {
+				if (!NeedDisplay.IsEmpty) {
 					Driver.SetAttribute (Colors.TopLevel.Normal);
 
 					// This is the Application.Top. Clear just the region we're being asked to redraw 
