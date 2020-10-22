@@ -82,11 +82,12 @@ type Demo() = class end
             ()
 
     let ShowTextAlignments() =
-        let mutable container = new Dialog(
-            ustr "Text Alignments", 50, 20,
-            new Button (ustr "Ok", true, Clicked = Action(Application.RequestStop)),
-            new Button (ustr "Cancel", true, Clicked = Action(Application.RequestStop))
-            )
+        let okButton = new Button(ustr "Ok", true)
+        okButton.add_Clicked(Action(Application.RequestStop))
+        let cancelButton = new Button(ustr "Cancel", true)
+        cancelButton.add_Clicked(Action(Application.RequestStop))
+
+        let mutable container = new Dialog(ustr "Text Alignments", 50, 20, okButton, cancelButton)
         let mutable (i : int) = 0
         let mutable (txt : string) = "Hello world, how are you doing today"
         container.Add (
@@ -166,10 +167,12 @@ type Demo() = class end
         ()
 
     let NewFile() =
-        let mutable d = new Dialog (ustr "New File", 50, 20,
-                            new Button (ustr "Ok", true, Clicked = Action(Application.RequestStop)),
-                            new Button (ustr "Cancel", true, Clicked = Action(Application.RequestStop))
-        )
+        let okButton = new Button(ustr "Ok", true)
+        okButton.add_Clicked(Action(Application.RequestStop))
+        let cancelButton = new Button(ustr "Cancel", true)
+        cancelButton.add_Clicked(Action(Application.RequestStop))
+
+        let mutable d = new Dialog (ustr "New File", 50, 20, okButton, cancelButton)
         ml2 <- new Label(1, 1, ustr "Mouse Debug Line")
         d.Add (ml2)
         Application.Run (d)
@@ -297,10 +300,12 @@ type Demo() = class end
         |> ignore
 
     let ListSelectionDemo(multiple : System.Boolean) =
-        let mutable d = new Dialog (ustr "Selection Demo", 60, 20,
-            new Button (ustr "Ok", true, Clicked = fun () -> Application.RequestStop ()),
-            new Button (ustr "Cancel", Clicked = fun () -> Application.RequestStop ())
-            )
+        let okButton = new Button(ustr "Ok", true)
+        okButton.add_Clicked(Action(Application.RequestStop))
+        let cancelButton = new Button(ustr "Cancel")
+        cancelButton.add_Clicked(Action(Application.RequestStop))
+
+        let mutable d = new Dialog (ustr "Selection Demo", 60, 20, okButton, cancelButton)
         let mutable animals = new List<string> ()
         animals.AddRange([|"Alpaca"; "Llama"; "Lion"; "Shark"; "Goat"|])
         let mutable msg = new Label (ustr "Use space bar or control-t to toggle selection",
@@ -331,11 +336,10 @@ type Demo() = class end
         MessageBox.Query (60, 10, ustr "Selected Animals", ustr (if result = "" then "No animals selected" else result), ustr "Ok") |> ignore
 
     let OnKeyDownPressUpDemo() =
-        let mutable container = new Dialog (ustr "KeyDown & KeyPress & KeyUp demo", 80, 20,            
-            new Button (ustr "Close", Clicked = fun () -> Application.RequestStop ()),
-                Width = Dim.Fill (),
-                Height = Dim.Fill ()
-            )
+        let closeButton = new Button(ustr "Close")
+        closeButton.add_Clicked(Action(Application.RequestStop))
+
+        let mutable container = new Dialog (ustr "KeyDown & KeyPress & KeyUp demo", 80, 20, closeButton, Width = Dim.Fill (), Height = Dim.Fill ())
         
         let mutable list = new List<string> ()
         let mutable listView = new ListView (list,
