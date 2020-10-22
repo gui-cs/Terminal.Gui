@@ -1,4 +1,6 @@
-This folder generates the API docs for Terminal.Gui
+This folder generates the API docs for Terminal.Gui. 
+
+The API documentation is generated using the [DocFX tool](https://github.com/dotnet/docfx). The output of docfx gets put into the `./docs` folder which is then checked in. The `./docs` folder is then picked up by Github Pages and published to Miguel's Github Pages (https://migueldeicaza.github.io/gui.cs/).
 
 ## To Generate the Docs
 
