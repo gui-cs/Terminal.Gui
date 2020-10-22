@@ -360,9 +360,10 @@ type Demo() = class end
                 list.Add (keyEvent.ToString ())    
             listView.MoveDown ();
     
-        container.KeyDown <- Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Down") |> ignore)
-        container.KeyPress <- Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Press") |> ignore)
-        container.KeyUp <- Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Up") |> ignore)
+    container.add_KeyDown(Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Down") |> ignore))
+    container.add_KeyPress(Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Press") |> ignore))
+    container.add_KeyUp(Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Up") |> ignore))
+
         Application.Run (container)
 
     let Main() =
@@ -387,28 +388,67 @@ type Demo() = class end
         menuItems.[2].Action <- fun () -> ShowMenuItem (menuItems.[2])
         menuItems.[3].Action <- fun () -> ShowMenuItem (menuItems.[3])
         menu <-
-            new MenuBar ([|new MenuBarItem(ustr "_File",
-                [|new MenuItem (ustr "Text _Editor Demo", ustring.Empty, (fun () -> Editor (top)));
-                    new MenuItem (ustr "_New", ustr "Creates new file", fun () -> NewFile());
-                    new MenuItem (ustr "_Open", ustring.Empty, fun () -> Open());
-                    new MenuItem (ustr "_Hex", ustring.Empty, (fun () -> ShowHex (top)));
-                    new MenuItem (ustr "_Close", ustring.Empty, (fun () -> Close()));
-                    new MenuItem (ustr "_Disabled", ustring.Empty, (fun () -> ()), (fun () -> false));
-                    Unchecked.defaultof<_>;
-                    new MenuItem (ustr "_Quit", ustring.Empty, (fun () -> if Quit() then top.Running <- false))|]);
-                new MenuBarItem (ustr "_Edit", [|new MenuItem(ustr "_Copy", ustring.Empty, fun () -> Copy());
-                    new MenuItem(ustr "C_ut", ustring.Empty, fun () -> Cut()); new MenuItem(ustr "_Paste", ustring.Empty, fun () -> Paste());
-                    new MenuItem(ustr "_Find and Replace", new MenuBarItem([|(menuItems.[0]);
-                    (menuItems.[1])|])); (menuItems.[3])|]);
-                new MenuBarItem(ustr "_List Demos", [|new MenuItem(ustr "Select _Multiple Items", ustring.Empty, (fun () -> ListSelectionDemo (true)));
-                    new MenuItem(ustr "Select _Single Item", ustring.Empty, (fun () -> ListSelectionDemo (false)))|]);
-                    new MenuBarItem(ustr "A_ssorted", [|new MenuItem(ustr "_Show text alignments", ustring.Empty, (fun () -> ShowTextAlignments ()));
-                new MenuItem(ustr "_OnKeyDown/Press/Up", ustring.Empty, (fun () -> OnKeyDownPressUpDemo ()))|]);
-                new MenuBarItem(ustr "_Test Menu and SubMenus",
-                    [|new MenuItem(ustr "SubMenu1Item_1", new MenuBarItem([|new MenuItem(ustr "SubMenu2Item_1",
-                    new MenuBarItem([|new MenuItem(ustr "SubMenu3Item_1", new MenuBarItem([|(menuItems.[2])|]))|]))|]))|]);
-                new MenuBarItem(ustr "_About...", "Demonstrates top-level menu item",
-                    (fun () -> MessageBox.ErrorQuery (50, 7, ustr "About Demo", ustr "This is a demo app for gui.cs", ustr "Ok") |> ignore))|])
+            new MenuBar (
+                [|
+                    new MenuBarItem(ustr "_File",
+                        [|
+                            new MenuItem (ustr "Text _Editor Demo", ustring.Empty, (fun () -> Editor (top)))
+                            new MenuItem (ustr "_New", ustr "Creates new file", fun () -> NewFile())
+                            new MenuItem (ustr "_Open", ustring.Empty, fun () -> Open())
+                            new MenuItem (ustr "_Hex", ustring.Empty, (fun () -> ShowHex (top)))
+                            new MenuItem (ustr "_Close", ustring.Empty, (fun () -> Close()))
+                            new MenuItem (ustr "_Disabled", ustring.Empty, (fun () -> ()), (fun () -> false))
+                            Unchecked.defaultof<_>
+                            new MenuItem (ustr "_Quit", ustring.Empty, (fun () -> if Quit() then top.Running <- false))
+                        |]
+                    )
+                    new MenuBarItem (ustr "_Edit", 
+                        [|
+                            new MenuItem(ustr "_Copy", ustring.Empty, fun () -> Copy())
+                            new MenuItem(ustr "C_ut", ustring.Empty, fun () -> Cut())
+                            new MenuItem(ustr "_Paste", ustring.Empty, fun () -> Paste())
+                            new MenuBarItem(ustr "_Find and Replace",
+                                [|
+                                    menuItems.[0]
+                                    menuItems.[1]
+                                |]
+                            )
+                            menuItems.[3]
+                        |]
+                    )
+                    new MenuBarItem(ustr "_List Demos", 
+                        [|
+                            new MenuItem(ustr "Select _Multiple Items", ustring.Empty, (fun () -> ListSelectionDemo (true)))
+                            new MenuItem(ustr "Select _Single Item", ustring.Empty, (fun () -> ListSelectionDemo (false)))
+                        |]
+                    )   
+                    new MenuBarItem(ustr "A_ssorted",
+                        [|
+                            new MenuItem(ustr "_Show text alignments", ustring.Empty, (fun () -> ShowTextAlignments ())) 
+                            new MenuItem(ustr "_OnKeyDown/Press/Up", ustring.Empty, (fun () -> OnKeyDownPressUpDemo ()))
+                        |]
+                    )
+                    new MenuBarItem(ustr "_Test Menu and SubMenus",
+                        [|
+                            new MenuBarItem(ustr "SubMenu1Item_1",
+                                [|
+                                    new MenuBarItem(ustr "SubMenu2Item_1",
+                                        [|
+                                            new MenuBarItem(ustr "SubMenu3Item_1",
+                                                [|
+                                                    menuItems.[2]
+                                                |]
+                                            )
+                                        |]
+                                    )
+                                |]
+                            )
+                        |]
+                    )
+                    new MenuBarItem(ustr "_About...", ustr "Demonstrates top-level menu item", (fun() -> MessageBox.ErrorQuery (50, 7, ustr "Error", ustr "This is a demo app for gui.cs", ustr "Ok") |> ignore)
+                    )
+                |]
+            )
         menuKeysStyle <- new CheckBox(3, 25, ustr "UseKeysUpDownAsKeysLeftRight", true)
         menuKeysStyle.Toggled <- Action<bool> (MenuKeysStyle_Toggled)
         menuAutoMouseNav <- new CheckBox(40, 25, ustr "UseMenuAutoNavigation", true)
