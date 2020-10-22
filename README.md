@@ -77,11 +77,12 @@ You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 
 ## Showcase & Examples
 
-* **UI Catalog** - The [UI Catalog project](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog) provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run` in the `UICatalog` directory to run the UI Catalog.
-* **Reactive Example** - A [sample app](https://github.com/migueldeicaza/gui.cs/tree/master/ReactiveExample) that shows how to use `System.Reactive` and `ReactiveUI` with `Terminal.Gui`. The app uses the MVVM architecture that may seem familiar to folks coming from WPF, Xamarin Forms, UWP, Avalonia, or Windows Forms. In this app, we implement the data bindings using ReactiveUI `WhenAnyValue` syntax and [Pharmacist](https://github.com/reactiveui/pharmacist) — a tool that converts all events in a NuGet package into observable wrappers.
-* **Example (aka `demo.cs`)** - Run `dotnet run` in the `Example` directory to run the simple demo.
-* **Standalone Example** - A trivial .NET core sample application can be found in the `StandaloneExample` directory. Run `dotnet run` in directory to test.
-* **FSharp Example** - An example showing how to build a Terminal.Gui app using F#.
+* **[UI Catalog](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog)** - The UI Catalog project provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run` in the `UICatalog` directory to run the UI Catalog.
+* **[Reactive Example](https://github.com/migueldeicaza/gui.cs/tree/master/ReactiveExample)** - A sample app that shows how to use `System.Reactive` and `ReactiveUI` with `Terminal.Gui`. The app uses the MVVM architecture that may seem familiar to folks coming from WPF, Xamarin Forms, UWP, Avalonia, or Windows Forms. In this app, we implement the data bindings using ReactiveUI `WhenAnyValue` syntax and [Pharmacist](https://github.com/reactiveui/pharmacist) — a tool that converts all events in a NuGet package into observable wrappers.
+* **[Example (aka `demo.cs`)](https://github.com/migueldeicaza/gui.cs/tree/master/Example)** - Run `dotnet run` in the `Example` directory to run the simple demo.
+* **[Standalone Example](https://github.com/migueldeicaza/gui.cs/tree/master/StandaloneExample)** - A trivial .NET core sample application can be found in the `StandaloneExample` directory. Run `dotnet run` in directory to test.
+* **[F# Example](https://github.com/migueldeicaza/gui.cs/tree/master/FSharpExample)** - An example showing how to build a Terminal.Gui app using F#.
+* **[Powershell Sample]()** - Shows how to build Terminal.Gui apps using Powershell.
 * **PowerShell's Out-ConsoleGridView** - The [`Out-ConsoleGridView` PowerShell Cmdlet](https://github.com/PowerShell/GraphicalTools/blob/master/docs/Microsoft.PowerShell.ConsoleGuiTools/Out-ConsoleGridView.md) sends the output from a command to a grid view window where the output is displayed in an interactive table. sends the output from a command to a grid view window where the output is displayed in an interactive table, using Terminal.Gui. 
 
 ## Documentation
