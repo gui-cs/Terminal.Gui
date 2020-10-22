@@ -449,9 +449,9 @@ type Demo() = class end
                 |]
             )
         menuKeysStyle <- new CheckBox(3, 25, ustr "UseKeysUpDownAsKeysLeftRight", true)
-        menuKeysStyle.Toggled <- Action<bool> (MenuKeysStyle_Toggled)
+        menuKeysStyle.add_Toggled(Action<bool>(MenuKeysStyle_Toggled))
         menuAutoMouseNav <- new CheckBox(40, 25, ustr "UseMenuAutoNavigation", true)
-        menuAutoMouseNav.Toggled <- Action<bool> (MenuAutoMouseNav_Toggled)
+        menuAutoMouseNav.add_Toggled(Action<bool>(MenuAutoMouseNav_Toggled))
         ShowEntries (win)
         let mutable (count : int) = 0
         ml <- new Label(new Rect(3, 17, 47, 1), ustr "Mouse: ")
