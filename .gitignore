@@ -16,3 +16,5 @@ docfx/api
 .vscode/
 
 demo.txt
+
+*.deb
