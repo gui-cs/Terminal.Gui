@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Terminal.Gui;
 using Xunit;
 
@@ -11,6 +13,15 @@ using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui {
 	public class DimTests {
+		public DimTests ()
+		{
+			Console.OutputEncoding = System.Text.Encoding.Default;
+			// Change current culture
+			CultureInfo culture = CultureInfo.CreateSpecificCulture ("en-US");
+			Thread.CurrentThread.CurrentCulture = culture;
+			Thread.CurrentThread.CurrentUICulture = culture;
+		}
+
 		[Fact]
 		public void New_Works ()
 		{
@@ -390,7 +401,7 @@ namespace Terminal.Gui {
 				Assert.Equal (100, w.Frame.Width);
 				Assert.Equal (100, w.Frame.Height);
 
-				Assert.Equal ("Dim.Factor(factor=0,5, remaining=False)", f1.Width.ToString ());
+				Assert.Equal ("Dim.Factor(factor=0.5, remaining=False)", f1.Width.ToString ());
 				Assert.Equal ("Dim.Absolute(5)", f1.Height.ToString ());
 				Assert.Equal (49, f1.Frame.Width); // 50-1=49
 				Assert.Equal (5, f1.Frame.Height);
@@ -411,8 +422,8 @@ namespace Terminal.Gui {
 				Assert.Equal (47, v2.Frame.Width); // 49-2=47
 				Assert.Equal (89, v2.Frame.Height); // 98-5-2-2=89
 
-				Assert.Equal ("Dim.Factor(factor=0,1, remaining=False)", v3.Width.ToString ());
-				Assert.Equal ("Dim.Factor(factor=0,1, remaining=False)", v3.Height.ToString ());
+				Assert.Equal ("Dim.Factor(factor=0.1, remaining=False)", v3.Width.ToString ());
+				Assert.Equal ("Dim.Factor(factor=0.1, remaining=False)", v3.Height.ToString ());
 				Assert.Equal (9, v3.Frame.Width); // 98*10%=9
 				Assert.Equal (9, v3.Frame.Height); // 98*10%=9
 
@@ -426,8 +437,8 @@ namespace Terminal.Gui {
 				Assert.Equal (38, v5.Frame.Width); // 47-9=38
 				Assert.Equal (80, v5.Frame.Height); // 89-9=80
 
-				Assert.Equal ("Dim.Factor(factor=0,2, remaining=True)", v6.Width.ToString ());
-				Assert.Equal ("Dim.Factor(factor=0,2, remaining=True)", v6.Height.ToString ());
+				Assert.Equal ("Dim.Factor(factor=0.2, remaining=True)", v6.Width.ToString ());
+				Assert.Equal ("Dim.Factor(factor=0.2, remaining=True)", v6.Height.ToString ());
 				Assert.Equal (9, v6.Frame.Width); // 47*20%=9
 				Assert.Equal (18, v6.Frame.Height); // 89*20%=18
 
@@ -442,7 +453,7 @@ namespace Terminal.Gui {
 				Assert.Equal (200, w.Frame.Height);
 
 				f1.Text = "Frame1";
-				Assert.Equal ("Dim.Factor(factor=0,5, remaining=False)", f1.Width.ToString ());
+				Assert.Equal ("Dim.Factor(factor=0.5, remaining=False)", f1.Width.ToString ());
 				Assert.Equal ("Dim.Absolute(5)", f1.Height.ToString ());
 				Assert.Equal (99, f1.Frame.Width); // 100-1=99
 				Assert.Equal (5, f1.Frame.Height);
@@ -466,7 +477,7 @@ namespace Terminal.Gui {
 				Assert.Equal (1, v2.Frame.Height); // 1 because is Dim.DimAbsolute
 
 				v3.Text = "Button3";
-				Assert.Equal ("Dim.Factor(factor=0,1, remaining=False)", v3.Width.ToString ());
+				Assert.Equal ("Dim.Factor(factor=0.1, remaining=False)", v3.Width.ToString ());
 				Assert.Equal ("Dim.Absolute(1)", v3.Height.ToString ());
 				Assert.Equal (19, v3.Frame.Width); // 198*10%=19 * Percent is related to the super-view if it isn't null otherwise the view width
 				Assert.Equal (1, v3.Frame.Height); // 1 because is Dim.DimAbsolute
@@ -484,7 +495,7 @@ namespace Terminal.Gui {
 				Assert.Equal (1, v5.Frame.Height); // 1 because is Dim.DimAbsolute
 
 				v6.Text = "Button6";
-				Assert.Equal ("Dim.Factor(factor=0,2, remaining=True)", v6.Width.ToString ());
+				Assert.Equal ("Dim.Factor(factor=0.2, remaining=True)", v6.Width.ToString ());
 				Assert.Equal ("Dim.Absolute(1)", v6.Height.ToString ());
 				Assert.Equal (19, v6.Frame.Width); // 99*20%=19
 				Assert.Equal (1, v6.Frame.Height); // 1 because is Dim.DimAbsolute
