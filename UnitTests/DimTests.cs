@@ -317,6 +317,184 @@ namespace Terminal.Gui {
 			Application.Shutdown ();
 		}
 
+		[Fact]
+		public void Only_DimAbsolute_And_DimFactor_As_A_Different_Procedure_For_Assigning_Value_To_Width_Or_Height ()
+		{
+			// Testing with the Button because it properly handles the Dim class.
+
+			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = Application.Top;
+
+			var w = new Window ("w") {
+				Width = 100,
+				Height = 100
+			};
+
+			var f1 = new FrameView ("f1") {
+				X = 0,
+				Y = 0,
+				Width = Dim.Percent (50),
+				Height = 5
+			};
+
+			var f2 = new FrameView ("f2") {
+				X = Pos.Right (f1),
+				Y = 0,
+				Width = Dim.Fill (),
+				Height = 5
+			};
+
+			var v1 = new Button ("v1") {
+				X = Pos.X (f1) + 2,
+				Y = Pos.Bottom (f1) + 2,
+				Width = Dim.Width (f1) - 2,
+				Height = Dim.Fill () - 2
+			};
+
+			var v2 = new Button ("v2") {
+				X = Pos.X (f2) + 2,
+				Y = Pos.Bottom (f2) + 2,
+				Width = Dim.Width (f2) - 2,
+				Height = Dim.Fill () - 2
+			};
+
+			var v3 = new Button ("v3") {
+				Width = Dim.Percent (10),
+				Height = Dim.Percent (10)
+			};
+
+			var v4 = new Button ("v4") {
+				Width = Dim.Sized (50),
+				Height = Dim.Sized (50)
+			};
+
+			var v5 = new Button ("v5") {
+				Width = Dim.Width (v1) - Dim.Width (v3),
+				Height = Dim.Height (v1) - Dim.Height (v3)
+			};
+
+			var v6 = new Button ("v6") {
+				X = Pos.X (f2),
+				Y = Pos.Bottom (f2) + 2,
+				Width = Dim.Percent (20, true),
+				Height = Dim.Percent (20, true)
+			};
+
+			w.Add (f1, f2, v1, v2, v3, v4, v5, v6);
+			t.Add (w);
+
+			t.Ready += () => {
+				Assert.Equal ("Dim.Absolute(100)", w.Width.ToString ());
+				Assert.Equal ("Dim.Absolute(100)", w.Height.ToString ());
+				Assert.Equal (100, w.Frame.Width);
+				Assert.Equal (100, w.Frame.Height);
+
+				Assert.Equal ("Dim.Factor(factor=0,5, remaining=False)", f1.Width.ToString ());
+				Assert.Equal ("Dim.Absolute(5)", f1.Height.ToString ());
+				Assert.Equal (49, f1.Frame.Width); // 50-1=49
+				Assert.Equal (5, f1.Frame.Height);
+
+				Assert.Equal ("Dim.Fill(margin=0)", f2.Width.ToString ());
+				Assert.Equal ("Dim.Absolute(5)", f2.Height.ToString ());
+				Assert.Equal (49, f2.Frame.Width); // 50-1=49
+				Assert.Equal (5, f2.Frame.Height);
+
+				Assert.Equal ("Dim.Combine(DimView(side=Width, target=FrameView()({X=0,Y=0,Width=49,Height=5}))-Dim.Absolute(2))", v1.Width.ToString ());
+				Assert.Equal ("Dim.Combine(Dim.Fill(margin=0)-Dim.Absolute(2))", v1.Height.ToString ());
+				Assert.Equal (47, v1.Frame.Width); // 49-2=47
+				Assert.Equal (89, v1.Frame.Height); // 98-5-2-2=89
+
+
+				Assert.Equal ("Dim.Combine(DimView(side=Width, target=FrameView()({X=49,Y=0,Width=49,Height=5}))-Dim.Absolute(2))", v2.Width.ToString ());
+				Assert.Equal ("Dim.Combine(Dim.Fill(margin=0)-Dim.Absolute(2))", v2.Height.ToString ());
+				Assert.Equal (47, v2.Frame.Width); // 49-2=47
+				Assert.Equal (89, v2.Frame.Height); // 98-5-2-2=89
+
+				Assert.Equal ("Dim.Factor(factor=0,1, remaining=False)", v3.Width.ToString ());
+				Assert.Equal ("Dim.Factor(factor=0,1, remaining=False)", v3.Height.ToString ());
+				Assert.Equal (9, v3.Frame.Width); // 98*10%=9
+				Assert.Equal (9, v3.Frame.Height); // 98*10%=9
+
+				Assert.Equal ("Dim.Absolute(50)", v4.Width.ToString ());
+				Assert.Equal ("Dim.Absolute(50)", v4.Height.ToString ());
+				Assert.Equal (50, v4.Frame.Width);
+				Assert.Equal (50, v4.Frame.Height);
+
+				Assert.Equal ("Dim.Combine(DimView(side=Width, target=Button()({X=2,Y=7,Width=47,Height=89}))-DimView(side=Width, target=Button()({X=0,Y=0,Width=9,Height=9})))", v5.Width.ToString ());
+				Assert.Equal ("Dim.Combine(DimView(side=Height, target=Button()({X=2,Y=7,Width=47,Height=89}))-DimView(side=Height, target=Button()({X=0,Y=0,Width=9,Height=9})))", v5.Height.ToString ());
+				Assert.Equal (38, v5.Frame.Width); // 47-9=38
+				Assert.Equal (80, v5.Frame.Height); // 89-9=80
+
+				Assert.Equal ("Dim.Factor(factor=0,2, remaining=True)", v6.Width.ToString ());
+				Assert.Equal ("Dim.Factor(factor=0,2, remaining=True)", v6.Height.ToString ());
+				Assert.Equal (9, v6.Frame.Width); // 47*20%=9
+				Assert.Equal (18, v6.Frame.Height); // 89*20%=18
+
+
+				w.Width = 200;
+				w.Height = 200;
+				t.LayoutSubviews ();
+
+				Assert.Equal ("Dim.Absolute(200)", w.Width.ToString ());
+				Assert.Equal ("Dim.Absolute(200)", w.Height.ToString ());
+				Assert.Equal (200, w.Frame.Width);
+				Assert.Equal (200, w.Frame.Height);
+
+				f1.Text = "Frame1";
+				Assert.Equal ("Dim.Factor(factor=0,5, remaining=False)", f1.Width.ToString ());
+				Assert.Equal ("Dim.Absolute(5)", f1.Height.ToString ());
+				Assert.Equal (99, f1.Frame.Width); // 100-1=99
+				Assert.Equal (5, f1.Frame.Height);
+
+				f2.Text = "Frame2";
+				Assert.Equal ("Dim.Fill(margin=0)", f2.Width.ToString ());
+				Assert.Equal ("Dim.Absolute(5)", f2.Height.ToString ());
+				Assert.Equal (99, f2.Frame.Width); // 100-1=99
+				Assert.Equal (5, f2.Frame.Height);
+
+				v1.Text = "Button1";
+				Assert.Equal ("Dim.Combine(DimView(side=Width, target=FrameView()({X=0,Y=0,Width=99,Height=5}))-Dim.Absolute(2))", v1.Width.ToString ());
+				Assert.Equal ("Dim.Absolute(1)", v1.Height.ToString ());
+				Assert.Equal (97, v1.Frame.Width); // 99-2=97
+				Assert.Equal (1, v1.Frame.Height); // 1 because is Dim.DimAbsolute
+
+				v2.Text = "Button2";
+				Assert.Equal ("Dim.Combine(DimView(side=Width, target=FrameView()({X=99,Y=0,Width=99,Height=5}))-Dim.Absolute(2))", v2.Width.ToString ());
+				Assert.Equal ("Dim.Absolute(1)", v2.Height.ToString ());
+				Assert.Equal (97, v2.Frame.Width); // 99-2=97
+				Assert.Equal (1, v2.Frame.Height); // 1 because is Dim.DimAbsolute
+
+				v3.Text = "Button3";
+				Assert.Equal ("Dim.Factor(factor=0,1, remaining=False)", v3.Width.ToString ());
+				Assert.Equal ("Dim.Absolute(1)", v3.Height.ToString ());
+				Assert.Equal (19, v3.Frame.Width); // 198*10%=19 * Percent is related to the super-view if it isn't null otherwise the view width
+				Assert.Equal (1, v3.Frame.Height); // 1 because is Dim.DimAbsolute
+
+				v4.Text = "Button4";
+				Assert.Equal ("Dim.Absolute(11)", v4.Width.ToString ());
+				Assert.Equal ("Dim.Absolute(1)", v4.Height.ToString ());
+				Assert.Equal (11, v4.Frame.Width); // 11 is the text length and because is Dim.DimAbsolute
+				Assert.Equal (1, v4.Frame.Height); // 1 because is Dim.DimAbsolute
+
+				v5.Text = "Button5";
+				Assert.Equal ("Dim.Combine(DimView(side=Width, target=Button()({X=2,Y=7,Width=97,Height=1}))-DimView(side=Width, target=Button()({X=0,Y=0,Width=19,Height=1})))", v5.Width.ToString ());
+				Assert.Equal ("Dim.Absolute(1)", v5.Height.ToString ());
+				Assert.Equal (78, v5.Frame.Width); // 97-19=78
+				Assert.Equal (1, v5.Frame.Height); // 1 because is Dim.DimAbsolute
+
+				v6.Text = "Button6";
+				Assert.Equal ("Dim.Factor(factor=0,2, remaining=True)", v6.Width.ToString ());
+				Assert.Equal ("Dim.Absolute(1)", v6.Height.ToString ());
+				Assert.Equal (19, v6.Frame.Width); // 99*20%=19
+				Assert.Equal (1, v6.Frame.Height); // 1 because is Dim.DimAbsolute
+			};
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+			Application.Shutdown ();
+		}
 
 		// TODO: Test operators
 	}
