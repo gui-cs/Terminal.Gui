@@ -145,13 +145,30 @@ namespace Terminal.Gui {
 				base.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
 
 			int w = base.Text.RuneCount - (base.Text.Contains (HotKeySpecifier) ? 1 : 0);
-			if (Width is Dim.DimCombine) {
-				// It's a Dim.DimCombine and so can't be assigned. Let it have it's own anchor.
+			if (Width is Dim.DimCombine || Width is Dim.DimView || Width is Dim.DimFill) {
+				// It's a Dim.DimCombine and so can't be assigned. Let it have it's width anchored.
 				w = Width.Anchor (w);
+			} else if (Width is Dim.DimFactor) {
+				// Tries to get the SuperView width otherwise the button width.
+				var sw = SuperView != null ? SuperView.Frame.Width : w;
+				if (((Dim.DimFactor)Width).IsFromRemaining ()) {
+					sw -= Frame.X;
+				}
+				w = Width.Anchor (sw);
 			} else {
 				Width = w;
 			}
+			var layout = LayoutStyle;
+			bool layoutChanged = false;
+			if (!(Height is Dim.DimAbsolute)) {
+				// The height is always equal to 1 and must be Dim.DimAbsolute.
+				layoutChanged = true;
+				LayoutStyle = LayoutStyle.Absolute;
+			}
 			Height = 1;
+			if (layoutChanged) {
+				LayoutStyle = layout;
+			}
 			Frame = new Rect (Frame.Location, new Size (w, 1));
 			SetNeedsDisplay ();
 		}

@@ -518,6 +518,12 @@ namespace Terminal.Gui {
 				else
 					return la - ra;
 			}
+
+			public override string ToString ()
+			{
+				return $"Dim.Combine({left.ToString ()}{(add ? '+' : '-')}{right.ToString ()})";
+			}
+
 		}
 
 		/// <summary>
