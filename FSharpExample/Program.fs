@@ -360,10 +360,9 @@ type Demo() = class end
                 list.Add (keyEvent.ToString ())    
             listView.MoveDown ();
     
-    container.add_KeyDown(Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Down") |> ignore))
-    container.add_KeyPress(Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Press") |> ignore))
-    container.add_KeyUp(Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Up") |> ignore))
-
+        container.add_KeyDown(Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Down") |> ignore))
+        container.add_KeyPress(Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Press") |> ignore))
+        container.add_KeyUp(Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Up") |> ignore))
         Application.Run (container)
 
     let Main() =
