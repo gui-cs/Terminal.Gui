@@ -82,11 +82,12 @@ type Demo() = class end
             ()
 
     let ShowTextAlignments() =
-        let mutable container = new Dialog(
-            ustr "Text Alignments", 50, 20,
-            new Button (ustr "Ok", true, Clicked = Action(Application.RequestStop)),
-            new Button (ustr "Cancel", true, Clicked = Action(Application.RequestStop))
-            )
+        let okButton = new Button(ustr "Ok", true)
+        okButton.add_Clicked(Action(Application.RequestStop))
+        let cancelButton = new Button(ustr "Cancel", true)
+        cancelButton.add_Clicked(Action(Application.RequestStop))
+
+        let mutable container = new Dialog(ustr "Text Alignments", 50, 20, okButton, cancelButton)
         let mutable (i : int) = 0
         let mutable (txt : string) = "Hello world, how are you doing today"
         container.Add (
@@ -166,10 +167,12 @@ type Demo() = class end
         ()
 
     let NewFile() =
-        let mutable d = new Dialog (ustr "New File", 50, 20,
-                            new Button (ustr "Ok", true, Clicked = Action(Application.RequestStop)),
-                            new Button (ustr "Cancel", true, Clicked = Action(Application.RequestStop))
-        )
+        let okButton = new Button(ustr "Ok", true)
+        okButton.add_Clicked(Action(Application.RequestStop))
+        let cancelButton = new Button(ustr "Cancel", true)
+        cancelButton.add_Clicked(Action(Application.RequestStop))
+
+        let mutable d = new Dialog (ustr "New File", 50, 20, okButton, cancelButton)
         ml2 <- new Label(1, 1, ustr "Mouse Debug Line")
         d.Add (ml2)
         Application.Run (d)
@@ -178,10 +181,10 @@ type Demo() = class end
         let mutable tframe = top.Frame
         let mutable ntop = new Toplevel(tframe)
         let mutable menu = new MenuBar([|new MenuBarItem(ustr "_File",
-            [|new MenuItem(ustr "_Close", "", (fun () -> Application.RequestStop ()))|]);
-            new MenuBarItem(ustr "_Edit", [|new MenuItem(ustr "_Copy", "", Unchecked.defaultof<_>);
-            new MenuItem(ustr "C_ut", "", Unchecked.defaultof<_>);
-            new MenuItem(ustr "_Paste", "", Unchecked.defaultof<_>)|])|]
+            [|new MenuItem(ustr "_Close", ustring.Empty, (fun () -> Application.RequestStop ()))|]);
+            new MenuBarItem(ustr "_Edit", [|new MenuItem(ustr "_Copy", ustring.Empty, Unchecked.defaultof<_>);
+            new MenuItem(ustr "C_ut", ustring.Empty, Unchecked.defaultof<_>);
+            new MenuItem(ustr "_Paste", ustring.Empty, Unchecked.defaultof<_>)|])|]
             )
         ntop.Add (menu)
         let mutable (fname : string) = Unchecked.defaultof<_>
@@ -220,7 +223,7 @@ type Demo() = class end
         let mutable tframe = top.Frame
         let mutable ntop = new Toplevel(tframe)
         let mutable menu = new MenuBar([|new MenuBarItem(ustr "_File",
-            [|new MenuItem(ustr "_Close", "", (fun () -> Application.RequestStop ()))|])|])
+            [|new MenuItem(ustr "_Close", ustring.Empty, (fun () -> Application.RequestStop ()))|])|])
         ntop.Add (menu)
         let mutable win = new Window (ustr "/etc/passwd",
             X = Pos.At(0),
@@ -297,10 +300,12 @@ type Demo() = class end
         |> ignore
 
     let ListSelectionDemo(multiple : System.Boolean) =
-        let mutable d = new Dialog (ustr "Selection Demo", 60, 20,
-            new Button (ustr "Ok", true, Clicked = fun () -> Application.RequestStop ()),
-            new Button (ustr "Cancel", Clicked = fun () -> Application.RequestStop ())
-            )
+        let okButton = new Button(ustr "Ok", true)
+        okButton.add_Clicked(Action(Application.RequestStop))
+        let cancelButton = new Button(ustr "Cancel")
+        cancelButton.add_Clicked(Action(Application.RequestStop))
+
+        let mutable d = new Dialog (ustr "Selection Demo", 60, 20, okButton, cancelButton)
         let mutable animals = new List<string> ()
         animals.AddRange([|"Alpaca"; "Llama"; "Lion"; "Shark"; "Goat"|])
         let mutable msg = new Label (ustr "Use space bar or control-t to toggle selection",
@@ -331,11 +336,10 @@ type Demo() = class end
         MessageBox.Query (60, 10, ustr "Selected Animals", ustr (if result = "" then "No animals selected" else result), ustr "Ok") |> ignore
 
     let OnKeyDownPressUpDemo() =
-        let mutable container = new Dialog (ustr "KeyDown & KeyPress & KeyUp demo", 80, 20,            
-            new Button (ustr "Close", Clicked = fun () -> Application.RequestStop ()),
-                Width = Dim.Fill (),
-                Height = Dim.Fill ()
-            )
+        let closeButton = new Button(ustr "Close")
+        closeButton.add_Clicked(Action(Application.RequestStop))
+
+        let mutable container = new Dialog (ustr "KeyDown & KeyPress & KeyUp demo", 80, 20, closeButton, Width = Dim.Fill (), Height = Dim.Fill ())
         
         let mutable list = new List<string> ()
         let mutable listView = new ListView (list,
@@ -356,9 +360,9 @@ type Demo() = class end
                 list.Add (keyEvent.ToString ())    
             listView.MoveDown ();
     
-        container.KeyDown <- Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Down") |> ignore)
-        container.KeyPress <- Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Press") |> ignore)
-        container.KeyUp <- Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Up") |> ignore)
+        container.add_KeyDown(Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Down") |> ignore))
+        container.add_KeyPress(Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Press") |> ignore))
+        container.add_KeyUp(Action<View.KeyEventEventArgs> (fun (e : View.KeyEventEventArgs) -> KeyDownPressUp (e.KeyEvent, "Up") |> ignore))
         Application.Run (container)
 
     let Main() =
@@ -383,38 +387,76 @@ type Demo() = class end
         menuItems.[2].Action <- fun () -> ShowMenuItem (menuItems.[2])
         menuItems.[3].Action <- fun () -> ShowMenuItem (menuItems.[3])
         menu <-
-            new MenuBar ([|new MenuBarItem(ustr "_File",
-                [|new MenuItem (ustr "Text _Editor Demo", "", (fun () -> Editor (top)));
-                    new MenuItem (ustr "_New", "Creates new file", fun () -> NewFile());
-                    new MenuItem (ustr "_Open", "", fun () -> Open());
-                    new MenuItem (ustr "_Hex", "", (fun () -> ShowHex (top)));
-                    new MenuItem (ustr "_Close", "", (fun () -> Close()));
-                    new MenuItem (ustr "_Disabled", "", (fun () -> ()), (fun () -> false));
-                    Unchecked.defaultof<_>;
-                    new MenuItem (ustr "_Quit", "", (fun () -> if Quit() then top.Running <- false))|]);
-                new MenuBarItem (ustr "_Edit", [|new MenuItem(ustr "_Copy", "", fun () -> Copy());
-                    new MenuItem(ustr "C_ut", "", fun () -> Cut()); new MenuItem(ustr "_Paste", "", fun () -> Paste());
-                    new MenuItem(ustr "_Find and Replace", new MenuBarItem([|(menuItems.[0]);
-                    (menuItems.[1])|])); (menuItems.[3])|]);
-                new MenuBarItem(ustr "_List Demos", [|new MenuItem(ustr "Select _Multiple Items", "", (fun () -> ListSelectionDemo (true)));
-                    new MenuItem(ustr "Select _Single Item", "", (fun () -> ListSelectionDemo (false)))|]);
-                    new MenuBarItem(ustr "A_ssorted", [|new MenuItem(ustr "_Show text alignments", "", (fun () -> ShowTextAlignments ()));
-                new MenuItem(ustr "_OnKeyDown/Press/Up", "", (fun () -> OnKeyDownPressUpDemo ()))|]);
-                new MenuBarItem(ustr "_Test Menu and SubMenus",
-                    [|new MenuItem(ustr "SubMenu1Item_1", new MenuBarItem([|new MenuItem(ustr "SubMenu2Item_1",
-                    new MenuBarItem([|new MenuItem(ustr "SubMenu3Item_1", new MenuBarItem([|(menuItems.[2])|]))|]))|]))|]);
-                new MenuBarItem(ustr "_About...", "Demonstrates top-level menu item",
-                    (fun () -> MessageBox.ErrorQuery (50, 7, ustr "About Demo", ustr "This is a demo app for gui.cs", ustr "Ok") |> ignore))|])
+            new MenuBar (
+                [|
+                    new MenuBarItem(ustr "_File",
+                        [|
+                            new MenuItem (ustr "Text _Editor Demo", ustring.Empty, (fun () -> Editor (top)))
+                            new MenuItem (ustr "_New", ustr "Creates new file", fun () -> NewFile())
+                            new MenuItem (ustr "_Open", ustring.Empty, fun () -> Open())
+                            new MenuItem (ustr "_Hex", ustring.Empty, (fun () -> ShowHex (top)))
+                            new MenuItem (ustr "_Close", ustring.Empty, (fun () -> Close()))
+                            new MenuItem (ustr "_Disabled", ustring.Empty, (fun () -> ()), (fun () -> false))
+                            Unchecked.defaultof<_>
+                            new MenuItem (ustr "_Quit", ustring.Empty, (fun () -> if Quit() then top.Running <- false))
+                        |]
+                    )
+                    new MenuBarItem (ustr "_Edit", 
+                        [|
+                            new MenuItem(ustr "_Copy", ustring.Empty, fun () -> Copy())
+                            new MenuItem(ustr "C_ut", ustring.Empty, fun () -> Cut())
+                            new MenuItem(ustr "_Paste", ustring.Empty, fun () -> Paste())
+                            new MenuBarItem(ustr "_Find and Replace",
+                                [|
+                                    menuItems.[0]
+                                    menuItems.[1]
+                                |]
+                            )
+                            menuItems.[3]
+                        |]
+                    )
+                    new MenuBarItem(ustr "_List Demos", 
+                        [|
+                            new MenuItem(ustr "Select _Multiple Items", ustring.Empty, (fun () -> ListSelectionDemo (true)))
+                            new MenuItem(ustr "Select _Single Item", ustring.Empty, (fun () -> ListSelectionDemo (false)))
+                        |]
+                    )   
+                    new MenuBarItem(ustr "A_ssorted",
+                        [|
+                            new MenuItem(ustr "_Show text alignments", ustring.Empty, (fun () -> ShowTextAlignments ())) 
+                            new MenuItem(ustr "_OnKeyDown/Press/Up", ustring.Empty, (fun () -> OnKeyDownPressUpDemo ()))
+                        |]
+                    )
+                    new MenuBarItem(ustr "_Test Menu and SubMenus",
+                        [|
+                            new MenuBarItem(ustr "SubMenu1Item_1",
+                                [|
+                                    new MenuBarItem(ustr "SubMenu2Item_1",
+                                        [|
+                                            new MenuBarItem(ustr "SubMenu3Item_1",
+                                                [|
+                                                    menuItems.[2]
+                                                |]
+                                            )
+                                        |]
+                                    )
+                                |]
+                            )
+                        |]
+                    )
+                    new MenuBarItem(ustr "_About...", ustr "Demonstrates top-level menu item", (fun() -> MessageBox.ErrorQuery (50, 7, ustr "Error", ustr "This is a demo app for gui.cs", ustr "Ok") |> ignore)
+                    )
+                |]
+            )
         menuKeysStyle <- new CheckBox(3, 25, ustr "UseKeysUpDownAsKeysLeftRight", true)
-        menuKeysStyle.Toggled <- Action<bool> (MenuKeysStyle_Toggled)
+        menuKeysStyle.add_Toggled(Action<bool>(MenuKeysStyle_Toggled))
         menuAutoMouseNav <- new CheckBox(40, 25, ustr "UseMenuAutoNavigation", true)
-        menuAutoMouseNav.Toggled <- Action<bool> (MenuAutoMouseNav_Toggled)
+        menuAutoMouseNav.add_Toggled(Action<bool>(MenuAutoMouseNav_Toggled))
         ShowEntries (win)
         let mutable (count : int) = 0
         ml <- new Label(new Rect(3, 17, 47, 1), ustr "Mouse: ")
         Application.RootMouseEvent <- Action<MouseEvent> (
                 fun (me : MouseEvent) ->
-                    ml.TextColor <- Colors.TopLevel.Normal
                     ml.Text <- ustr (
                          (((sprintf "Mouse: (%O,%O) - %O %O" me.X) me.Y) me.Flags) (
                             count <- count + 1
