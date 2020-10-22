@@ -178,10 +178,10 @@ type Demo() = class end
         let mutable tframe = top.Frame
         let mutable ntop = new Toplevel(tframe)
         let mutable menu = new MenuBar([|new MenuBarItem(ustr "_File",
-            [|new MenuItem(ustr "_Close", "", (fun () -> Application.RequestStop ()))|]);
-            new MenuBarItem(ustr "_Edit", [|new MenuItem(ustr "_Copy", "", Unchecked.defaultof<_>);
-            new MenuItem(ustr "C_ut", "", Unchecked.defaultof<_>);
-            new MenuItem(ustr "_Paste", "", Unchecked.defaultof<_>)|])|]
+            [|new MenuItem(ustr "_Close", ustring.Empty, (fun () -> Application.RequestStop ()))|]);
+            new MenuBarItem(ustr "_Edit", [|new MenuItem(ustr "_Copy", ustring.Empty, Unchecked.defaultof<_>);
+            new MenuItem(ustr "C_ut", ustring.Empty, Unchecked.defaultof<_>);
+            new MenuItem(ustr "_Paste", ustring.Empty, Unchecked.defaultof<_>)|])|]
             )
         ntop.Add (menu)
         let mutable (fname : string) = Unchecked.defaultof<_>
@@ -220,7 +220,7 @@ type Demo() = class end
         let mutable tframe = top.Frame
         let mutable ntop = new Toplevel(tframe)
         let mutable menu = new MenuBar([|new MenuBarItem(ustr "_File",
-            [|new MenuItem(ustr "_Close", "", (fun () -> Application.RequestStop ()))|])|])
+            [|new MenuItem(ustr "_Close", ustring.Empty, (fun () -> Application.RequestStop ()))|])|])
         ntop.Add (menu)
         let mutable win = new Window (ustr "/etc/passwd",
             X = Pos.At(0),
@@ -384,22 +384,22 @@ type Demo() = class end
         menuItems.[3].Action <- fun () -> ShowMenuItem (menuItems.[3])
         menu <-
             new MenuBar ([|new MenuBarItem(ustr "_File",
-                [|new MenuItem (ustr "Text _Editor Demo", "", (fun () -> Editor (top)));
-                    new MenuItem (ustr "_New", "Creates new file", fun () -> NewFile());
-                    new MenuItem (ustr "_Open", "", fun () -> Open());
-                    new MenuItem (ustr "_Hex", "", (fun () -> ShowHex (top)));
-                    new MenuItem (ustr "_Close", "", (fun () -> Close()));
-                    new MenuItem (ustr "_Disabled", "", (fun () -> ()), (fun () -> false));
+                [|new MenuItem (ustr "Text _Editor Demo", ustring.Empty, (fun () -> Editor (top)));
+                    new MenuItem (ustr "_New", ustr "Creates new file", fun () -> NewFile());
+                    new MenuItem (ustr "_Open", ustring.Empty, fun () -> Open());
+                    new MenuItem (ustr "_Hex", ustring.Empty, (fun () -> ShowHex (top)));
+                    new MenuItem (ustr "_Close", ustring.Empty, (fun () -> Close()));
+                    new MenuItem (ustr "_Disabled", ustring.Empty, (fun () -> ()), (fun () -> false));
                     Unchecked.defaultof<_>;
-                    new MenuItem (ustr "_Quit", "", (fun () -> if Quit() then top.Running <- false))|]);
-                new MenuBarItem (ustr "_Edit", [|new MenuItem(ustr "_Copy", "", fun () -> Copy());
-                    new MenuItem(ustr "C_ut", "", fun () -> Cut()); new MenuItem(ustr "_Paste", "", fun () -> Paste());
+                    new MenuItem (ustr "_Quit", ustring.Empty, (fun () -> if Quit() then top.Running <- false))|]);
+                new MenuBarItem (ustr "_Edit", [|new MenuItem(ustr "_Copy", ustring.Empty, fun () -> Copy());
+                    new MenuItem(ustr "C_ut", ustring.Empty, fun () -> Cut()); new MenuItem(ustr "_Paste", ustring.Empty, fun () -> Paste());
                     new MenuItem(ustr "_Find and Replace", new MenuBarItem([|(menuItems.[0]);
                     (menuItems.[1])|])); (menuItems.[3])|]);
-                new MenuBarItem(ustr "_List Demos", [|new MenuItem(ustr "Select _Multiple Items", "", (fun () -> ListSelectionDemo (true)));
-                    new MenuItem(ustr "Select _Single Item", "", (fun () -> ListSelectionDemo (false)))|]);
-                    new MenuBarItem(ustr "A_ssorted", [|new MenuItem(ustr "_Show text alignments", "", (fun () -> ShowTextAlignments ()));
-                new MenuItem(ustr "_OnKeyDown/Press/Up", "", (fun () -> OnKeyDownPressUpDemo ()))|]);
+                new MenuBarItem(ustr "_List Demos", [|new MenuItem(ustr "Select _Multiple Items", ustring.Empty, (fun () -> ListSelectionDemo (true)));
+                    new MenuItem(ustr "Select _Single Item", ustring.Empty, (fun () -> ListSelectionDemo (false)))|]);
+                    new MenuBarItem(ustr "A_ssorted", [|new MenuItem(ustr "_Show text alignments", ustring.Empty, (fun () -> ShowTextAlignments ()));
+                new MenuItem(ustr "_OnKeyDown/Press/Up", ustring.Empty, (fun () -> OnKeyDownPressUpDemo ()))|]);
                 new MenuBarItem(ustr "_Test Menu and SubMenus",
                     [|new MenuItem(ustr "SubMenu1Item_1", new MenuBarItem([|new MenuItem(ustr "SubMenu2Item_1",
                     new MenuBarItem([|new MenuItem(ustr "SubMenu3Item_1", new MenuBarItem([|(menuItems.[2])|]))|]))|]))|]);
