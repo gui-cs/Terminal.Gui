@@ -97,7 +97,6 @@ The MenuBar provides a menu for Terminal.Gui applications.
   <div classs="implements">
     <h5>Implements</h5>
     <div><span class="xref">System.IDisposable</span></div>
-    <div><span class="xref">System.Collections.IEnumerable</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
@@ -131,6 +130,9 @@ The MenuBar provides a menu for Terminal.Gui applications.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">View.HotKeySpecifier</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Data">View.Data</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
     </div>
     <div>
@@ -162,9 +164,6 @@ The MenuBar provides a menu for Terminal.Gui applications.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">View.Frame</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetEnumerator">View.GetEnumerator()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle">View.LayoutStyle</a>
@@ -344,6 +343,9 @@ The MenuBar provides a menu for Terminal.Gui applications.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -381,7 +383,7 @@ The MenuBar provides a menu for Terminal.Gui applications.
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_MenuBar_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class MenuBar : View, IDisposable, IEnumerable, ISupportInitializeNotification, ISupportInitialize</code></pre>
+    <pre><code class="lang-csharp hljs">public class MenuBar : View, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
   </div>
   <h5 id="Terminal_Gui_MenuBar_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks">
@@ -432,60 +434,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.MenuBar.htm
         <td><a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a>[]</td>
         <td><span class="parametername">menus</span></td>
         <td>Individual menu items; a null item will result in a separator being drawn.</td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="fields">Fields
-  </h3>
-  
-  
-  <h4 id="Terminal_Gui_MenuBar_MenuClosing" data-uid="Terminal.Gui.MenuBar.MenuClosing">MenuClosing</h4>
-  <div class="markdown level1 summary">
-Raised when a menu is closing.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Action MenuClosing</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Action</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <h4 id="Terminal_Gui_MenuBar_MenuOpening" data-uid="Terminal.Gui.MenuBar.MenuOpening">MenuOpening</h4>
-  <div class="markdown level1 summary">
-Raised as a menu is opening.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Action MenuOpening</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Action</span></td>
-        <td></td>
       </tr>
     </tbody>
   </table>
@@ -1019,12 +967,63 @@ Redraws this view and its subviews; only redraws the views that have been flagge
    larger than the <code>region</code> parameter.
 </p>
 </div>
+  <h3 id="events">Events
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_MenuBar_MenuClosing" data-uid="Terminal.Gui.MenuBar.MenuClosing">MenuClosing</h4>
+  <div class="markdown level1 summary">
+Raised when a menu is closing.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action MenuClosing</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_MenuBar_MenuOpening" data-uid="Terminal.Gui.MenuBar.MenuOpening">MenuOpening</h4>
+  <div class="markdown level1 summary">
+Raised as a menu is opening.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action MenuOpening</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>
-  </div>
-  <div>
-      <span class="xref">System.Collections.IEnumerable</span>
   </div>
   <div>
       <span class="xref">System.ComponentModel.ISupportInitializeNotification</span>

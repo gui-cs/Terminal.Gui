@@ -97,7 +97,6 @@ The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a stri
   <div classs="implements">
     <h5>Implements</h5>
     <div><span class="xref">System.IDisposable</span></div>
-    <div><span class="xref">System.Collections.IEnumerable</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
@@ -131,6 +130,9 @@ The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a stri
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">View.HotKeySpecifier</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Data">View.Data</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
     </div>
     <div>
@@ -162,9 +164,6 @@ The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a stri
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">View.Frame</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetEnumerator">View.GetEnumerator()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle">View.LayoutStyle</a>
@@ -362,6 +361,9 @@ The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a stri
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseLeave_Terminal_Gui_MouseEvent_">View.OnMouseLeave(MouseEvent)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -402,7 +404,7 @@ The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a stri
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Label_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class Label : View, IDisposable, IEnumerable, ISupportInitializeNotification, ISupportInitialize</code></pre>
+    <pre><code class="lang-csharp hljs">public class Label : View, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
   </div>
   <h5 id="Terminal_Gui_Label_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks">
@@ -590,41 +592,6 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.View.html">View
   If <code>rect.Height</code> is greater than one, word wrapping is provided.
 </p>
 </div>
-  <h3 id="fields">Fields
-  </h3>
-  
-  
-  <h4 id="Terminal_Gui_Label_Clicked" data-uid="Terminal.Gui.Label.Clicked">Clicked</h4>
-  <div class="markdown level1 summary">
-Clicked <span class="xref">System.Action</span>, raised when the user clicks the primary mouse button within the Bounds of this <a class="xref" href="Terminal.Gui.View.html">View</a>
-or if the user presses the action key while this view is focused. (TODO: IsDefault)
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Action Clicked</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Action</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 id="Terminal_Gui_Label_Clicked_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-Client code can hook up to this event, it is
-raised when the button is activated either with
-the mouse or the keyboard.
-</div>
   <h3 id="methods">Methods
   </h3>
   
@@ -673,12 +640,44 @@ Method invoked when a mouse event is generated
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a></div>
+  <h3 id="events">Events
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_Label_Clicked" data-uid="Terminal.Gui.Label.Clicked">Clicked</h4>
+  <div class="markdown level1 summary">
+Clicked <span class="xref">System.Action</span>, raised when the user clicks the primary mouse button within the Bounds of this <a class="xref" href="Terminal.Gui.View.html">View</a>
+or if the user presses the action key while this view is focused. (TODO: IsDefault)
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action Clicked</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Terminal_Gui_Label_Clicked_remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+Client code can hook up to this event, it is
+raised when the button is activated either with
+the mouse or the keyboard.
+</div>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>
-  </div>
-  <div>
-      <span class="xref">System.Collections.IEnumerable</span>
   </div>
   <div>
       <span class="xref">System.ComponentModel.ISupportInitializeNotification</span>

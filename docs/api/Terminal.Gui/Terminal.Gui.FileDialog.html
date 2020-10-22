@@ -104,7 +104,6 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
     <div><span class="xref">System.IDisposable</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
-    <div><span class="xref">System.Collections.IEnumerable</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -116,9 +115,6 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Title">Window.Title</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_GetEnumerator">Window.GetEnumerator()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Add_Terminal_Gui_View_">Window.Add(View)</a>
@@ -194,6 +190,9 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">View.HotKeySpecifier</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Data">View.Data</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
@@ -397,6 +396,9 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -434,7 +436,7 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_FileDialog_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class FileDialog : Dialog, IDisposable, ISupportInitializeNotification, ISupportInitialize, IEnumerable</code></pre>
+    <pre><code class="lang-csharp hljs">public class FileDialog : Dialog, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -792,9 +794,6 @@ the views have been laid out, and before the views are drawn for the first time.
   </div>
   <div>
       <span class="xref">System.ComponentModel.ISupportInitialize</span>
-  </div>
-  <div>
-      <span class="xref">System.Collections.IEnumerable</span>
   </div>
 </article>
           </div>

@@ -103,15 +103,11 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
     <div><span class="xref">System.IDisposable</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
-    <div><span class="xref">System.Collections.IEnumerable</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
       <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Title">Window.Title</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_GetEnumerator">Window.GetEnumerator()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Window.html#Terminal_Gui_Window_Add_Terminal_Gui_View_">Window.Add(View)</a>
@@ -190,6 +186,9 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">View.HotKeySpecifier</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Data">View.Data</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
@@ -393,6 +392,9 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -430,7 +432,7 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Dialog_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class Dialog : Window, IDisposable, ISupportInitializeNotification, ISupportInitialize, IEnumerable</code></pre>
+    <pre><code class="lang-csharp hljs">public class Dialog : Window, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
   </div>
   <h5 id="Terminal_Gui_Dialog_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks">
@@ -659,9 +661,6 @@ chance to process the keystroke.
   </div>
   <div>
       <span class="xref">System.ComponentModel.ISupportInitialize</span>
-  </div>
-  <div>
-      <span class="xref">System.Collections.IEnumerable</span>
   </div>
 </article>
           </div>

@@ -97,7 +97,6 @@ ComboBox control
   <div classs="implements">
     <h5>Implements</h5>
     <div><span class="xref">System.IDisposable</span></div>
-    <div><span class="xref">System.Collections.IEnumerable</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
@@ -131,6 +130,9 @@ ComboBox control
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">View.HotKeySpecifier</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Data">View.Data</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
     </div>
     <div>
@@ -162,9 +164,6 @@ ComboBox control
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">View.Frame</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetEnumerator">View.GetEnumerator()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle">View.LayoutStyle</a>
@@ -347,6 +346,9 @@ ComboBox control
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -384,7 +386,7 @@ ComboBox control
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_ComboBox_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ComboBox : View, IDisposable, IEnumerable, ISupportInitializeNotification, ISupportInitialize</code></pre>
+    <pre><code class="lang-csharp hljs">public class ComboBox : View, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -459,60 +461,6 @@ Public constructor
       <tr>
         <td><span class="xref">System.Collections.IList</span></td>
         <td><span class="parametername">source</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="fields">Fields
-  </h3>
-  
-  
-  <h4 id="Terminal_Gui_ComboBox_OpenSelectedItem" data-uid="Terminal.Gui.ComboBox.OpenSelectedItem">OpenSelectedItem</h4>
-  <div class="markdown level1 summary">
-This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Action&lt;ListViewItemEventArgs&gt; OpenSelectedItem</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.ListViewItemEventArgs.html">ListViewItemEventArgs</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <h4 id="Terminal_Gui_ComboBox_SelectedItemChanged" data-uid="Terminal.Gui.ComboBox.SelectedItemChanged">SelectedItemChanged</h4>
-  <div class="markdown level1 summary">
-This event is raised when the selected item in the <a class="xref" href="Terminal.Gui.ComboBox.html">ComboBox</a> has changed.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Action&lt;ListViewItemEventArgs&gt; SelectedItemChanged</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.ListViewItemEventArgs.html">ListViewItemEventArgs</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -967,12 +915,63 @@ Sets the source of the <a class="xref" href="Terminal.Gui.ComboBox.html">ComboBo
   <div class="markdown level1 remarks">
 Use the <a class="xref" href="Terminal.Gui.ComboBox.html#Terminal_Gui_ComboBox_Source">Source</a> property to set a new <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a> source and use custome rendering.
 </div>
+  <h3 id="events">Events
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_ComboBox_OpenSelectedItem" data-uid="Terminal.Gui.ComboBox.OpenSelectedItem">OpenSelectedItem</h4>
+  <div class="markdown level1 summary">
+This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;ListViewItemEventArgs&gt; OpenSelectedItem</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.ListViewItemEventArgs.html">ListViewItemEventArgs</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_ComboBox_SelectedItemChanged" data-uid="Terminal.Gui.ComboBox.SelectedItemChanged">SelectedItemChanged</h4>
+  <div class="markdown level1 summary">
+This event is raised when the selected item in the <a class="xref" href="Terminal.Gui.ComboBox.html">ComboBox</a> has changed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;ListViewItemEventArgs&gt; SelectedItemChanged</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.ListViewItemEventArgs.html">ListViewItemEventArgs</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>
-  </div>
-  <div>
-      <span class="xref">System.Collections.IEnumerable</span>
   </div>
   <div>
       <span class="xref">System.ComponentModel.ISupportInitializeNotification</span>

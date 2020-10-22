@@ -98,7 +98,6 @@ Toplevel views can be modally executed.
   <div classs="implements">
     <h5>Implements</h5>
     <div><span class="xref">System.IDisposable</span></div>
-    <div><span class="xref">System.Collections.IEnumerable</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
@@ -132,6 +131,9 @@ Toplevel views can be modally executed.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">View.HotKeySpecifier</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Data">View.Data</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
     </div>
     <div>
@@ -160,9 +162,6 @@ Toplevel views can be modally executed.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">View.Frame</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetEnumerator">View.GetEnumerator()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle">View.LayoutStyle</a>
@@ -342,6 +341,9 @@ Toplevel views can be modally executed.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -382,7 +384,7 @@ Toplevel views can be modally executed.
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_Toplevel_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class Toplevel : View, IDisposable, IEnumerable, ISupportInitializeNotification, ISupportInitialize</code></pre>
+    <pre><code class="lang-csharp hljs">public class Toplevel : View, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
   </div>
   <h5 id="Terminal_Gui_Toplevel_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks">
@@ -451,36 +453,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Toplevel.ht
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">frame</span></td>
         <td>A superview-relative rectangle specifying the location and size for the new Toplevel</td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="fields">Fields
-  </h3>
-  
-  
-  <h4 id="Terminal_Gui_Toplevel_Ready" data-uid="Terminal.Gui.Toplevel.Ready">Ready</h4>
-  <div class="markdown level1 summary">
-Fired once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a> has started it&apos;s first iteration. 
-Subscribe to this event to perform tasks when the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> has been laid out and focus has been set.
-changes. A Ready event handler is a good place to finalize initialization after calling `<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run">Run()</a>(topLevel)`. 
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Action Ready</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Action</span></td>
-        <td></td>
       </tr>
     </tbody>
   </table>
@@ -953,12 +925,39 @@ the views have been laid out, and before the views are drawn for the first time.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public virtual void WillPresent()</code></pre>
   </div>
+  <h3 id="events">Events
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_Toplevel_Ready" data-uid="Terminal.Gui.Toplevel.Ready">Ready</h4>
+  <div class="markdown level1 summary">
+Fired once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a> has started it&apos;s first iteration. 
+Subscribe to this event to perform tasks when the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> has been laid out and focus has been set.
+changes. A Ready event handler is a good place to finalize initialization after calling `<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run">Run()</a>(topLevel)`. 
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action Ready</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>
-  </div>
-  <div>
-      <span class="xref">System.Collections.IEnumerable</span>
   </div>
   <div>
       <span class="xref">System.ComponentModel.ISupportInitializeNotification</span>
