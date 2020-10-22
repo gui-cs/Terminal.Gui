@@ -457,7 +457,6 @@ type Demo() = class end
         ml <- new Label(new Rect(3, 17, 47, 1), ustr "Mouse: ")
         Application.RootMouseEvent <- Action<MouseEvent> (
                 fun (me : MouseEvent) ->
-                    ml.TextColor <- Colors.TopLevel.Normal
                     ml.Text <- ustr (
                          (((sprintf "Mouse: (%O,%O) - %O %O" me.X) me.Y) me.Flags) (
                             count <- count + 1
