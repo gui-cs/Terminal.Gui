@@ -97,7 +97,6 @@ A Progress Bar view that can indicate progress of an activity visually.
   <div classs="implements">
     <h5>Implements</h5>
     <div><span class="xref">System.IDisposable</span></div>
-    <div><span class="xref">System.Collections.IEnumerable</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
@@ -131,6 +130,9 @@ A Progress Bar view that can indicate progress of an activity visually.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">View.HotKeySpecifier</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Data">View.Data</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
     </div>
     <div>
@@ -162,9 +164,6 @@ A Progress Bar view that can indicate progress of an activity visually.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">View.Frame</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetEnumerator">View.GetEnumerator()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle">View.LayoutStyle</a>
@@ -362,6 +361,9 @@ A Progress Bar view that can indicate progress of an activity visually.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -402,7 +404,7 @@ A Progress Bar view that can indicate progress of an activity visually.
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_ProgressBar_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ProgressBar : View, IDisposable, IEnumerable, ISupportInitializeNotification, ISupportInitialize</code></pre>
+    <pre><code class="lang-csharp hljs">public class ProgressBar : View, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
   </div>
   <h5 id="Terminal_Gui_ProgressBar_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks">
@@ -554,9 +556,6 @@ Redraws this view and its subviews; only redraws the views that have been flagge
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>
-  </div>
-  <div>
-      <span class="xref">System.Collections.IEnumerable</span>
   </div>
   <div>
       <span class="xref">System.ComponentModel.ISupportInitializeNotification</span>

@@ -98,7 +98,6 @@ a GroupBox in Windows.
   <div classs="implements">
     <h5>Implements</h5>
     <div><span class="xref">System.IDisposable</span></div>
-    <div><span class="xref">System.Collections.IEnumerable</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
@@ -132,6 +131,9 @@ a GroupBox in Windows.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">View.HotKeySpecifier</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Data">View.Data</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
     </div>
     <div>
@@ -163,9 +165,6 @@ a GroupBox in Windows.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">View.Frame</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetEnumerator">View.GetEnumerator()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle">View.LayoutStyle</a>
@@ -348,6 +347,9 @@ a GroupBox in Windows.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -388,7 +390,7 @@ a GroupBox in Windows.
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_FrameView_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class FrameView : View, IDisposable, IEnumerable, ISupportInitializeNotification, ISupportInitialize</code></pre>
+    <pre><code class="lang-csharp hljs">public class FrameView : View, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -725,9 +727,6 @@ Removes all <a class="xref" href="Terminal.Gui.View.html">View</a>s from this co
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>
-  </div>
-  <div>
-      <span class="xref">System.Collections.IEnumerable</span>
   </div>
   <div>
       <span class="xref">System.ComponentModel.ISupportInitializeNotification</span>

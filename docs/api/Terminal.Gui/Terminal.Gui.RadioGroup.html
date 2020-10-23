@@ -97,7 +97,6 @@
   <div classs="implements">
     <h5>Implements</h5>
     <div><span class="xref">System.IDisposable</span></div>
-    <div><span class="xref">System.Collections.IEnumerable</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitializeNotification</span></div>
     <div><span class="xref">System.ComponentModel.ISupportInitialize</span></div>
   </div>
@@ -131,6 +130,9 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">View.HotKeySpecifier</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Data">View.Data</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Driver">View.Driver</a>
     </div>
     <div>
@@ -162,9 +164,6 @@
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">View.Frame</a>
-    </div>
-    <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetEnumerator">View.GetEnumerator()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle">View.LayoutStyle</a>
@@ -353,6 +352,9 @@
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseEvent_Terminal_Gui_MouseEvent_">View.OnMouseEvent(MouseEvent)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnMouseClick_Terminal_Gui_View_MouseEventArgs_">View.OnMouseClick(View.MouseEventArgs)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a>
     </div>
     <div>
@@ -390,7 +392,7 @@
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
   <h5 id="Terminal_Gui_RadioGroup_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class RadioGroup : View, IDisposable, IEnumerable, ISupportInitializeNotification, ISupportInitialize</code></pre>
+    <pre><code class="lang-csharp hljs">public class RadioGroup : View, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -521,34 +523,6 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.RadioGroup.
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">selected</span></td>
         <td>The index of item to be selected, the value is clamped to the number of items.</td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="fields">Fields
-  </h3>
-  
-  
-  <h4 id="Terminal_Gui_RadioGroup_SelectedItemChanged" data-uid="Terminal.Gui.RadioGroup.SelectedItemChanged">SelectedItemChanged</h4>
-  <div class="markdown level1 summary">
-Invoked when the selected radio label has changed.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Action&lt;RadioGroup.SelectedItemChangedArgs&gt; SelectedItemChanged</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.RadioGroup.SelectedItemChangedArgs.html">RadioGroup.SelectedItemChangedArgs</a>&gt;</td>
-        <td></td>
       </tr>
     </tbody>
   </table>
@@ -934,12 +908,49 @@ Redraws this view and its subviews; only redraws the views that have been flagge
    larger than the <code>region</code> parameter.
 </p>
 </div>
+  
+  
+  <a id="Terminal_Gui_RadioGroup_Refresh_" data-uid="Terminal.Gui.RadioGroup.Refresh*"></a>
+  <h4 id="Terminal_Gui_RadioGroup_Refresh" data-uid="Terminal.Gui.RadioGroup.Refresh">Refresh()</h4>
+  <div class="markdown level1 summary">
+Allow to invoke the <a class="xref" href="Terminal.Gui.RadioGroup.html#Terminal_Gui_RadioGroup_SelectedItemChanged">SelectedItemChanged</a> after their creation.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Refresh()</code></pre>
+  </div>
+  <h3 id="events">Events
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_RadioGroup_SelectedItemChanged" data-uid="Terminal.Gui.RadioGroup.SelectedItemChanged">SelectedItemChanged</h4>
+  <div class="markdown level1 summary">
+Invoked when the selected radio label has changed.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;RadioGroup.SelectedItemChangedArgs&gt; SelectedItemChanged</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.RadioGroup.SelectedItemChangedArgs.html">RadioGroup.SelectedItemChangedArgs</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>
-  </div>
-  <div>
-      <span class="xref">System.Collections.IEnumerable</span>
   </div>
   <div>
       <span class="xref">System.ComponentModel.ISupportInitializeNotification</span>
