@@ -177,6 +177,14 @@ type Demo() = class end
         d.Add (ml2)
         Application.Run (d)
 
+    let GetFileName()=
+        let mutable (fname : string) = Unchecked.defaultof<_>
+        for s in [|"/etc/passwd"; "c:\\windows\\win.ini"|] do
+            if System.IO.File.Exists (s)
+            then
+                fname <- s
+        fname
+
     let Editor(top : Toplevel) =
         let mutable tframe = top.Frame
         let mutable ntop = new Toplevel(tframe)
@@ -187,11 +195,7 @@ type Demo() = class end
             new MenuItem(ustr "_Paste", ustring.Empty, Unchecked.defaultof<_>)|])|]
             )
         ntop.Add (menu)
-        let mutable (fname : string) = Unchecked.defaultof<_>
-        for s in [|"/etc/passwd"; "c:\\windows\\win.ini"|] do
-            if System.IO.File.Exists (s)
-            then
-                fname <- s
+        let mutable (fname : string) = GetFileName()
         let mutable win = new Window (ustr(if fname <> null then fname else "Untitled"),
             X = Pos.At(0),
             Y = Pos.At(1),
@@ -232,7 +236,8 @@ type Demo() = class end
             Height = Dim.Fill ()
             )
         ntop.Add (win)
-        let mutable source = System.IO.File.OpenRead ("/etc/passwd")
+        let mutable (fname : string) = GetFileName()
+        let mutable source = System.IO.File.OpenRead (fname)
         let mutable hex = new HexView (source,
             X = Pos.At(0),
             Y = Pos.At(0),
@@ -241,7 +246,7 @@ type Demo() = class end
             )
         win.Add (hex)
         Application.Run (ntop)
-
+    
     type MenuItemDetails() =
         inherit MenuItem()
         new(title : ustring, help : string, action : Action) as this =
@@ -381,7 +386,7 @@ type Demo() = class end
         let mutable (menuItems : MenuItemDetails[]) = [|new MenuItemDetails(ustr "F_ind", "", Unchecked.defaultof<_>);
             new MenuItemDetails(ustr "_Replace", "", Unchecked.defaultof<_>);
             new MenuItemDetails(ustr "_Item1", "", Unchecked.defaultof<_>);
-            new MenuItemDetails(ustr "_Not From Sub Menu", "", Unchecked.defaultof<_>)|]
+            new MenuItemDetails(ustr "_Also From Sub Menu", "", Unchecked.defaultof<_>)|]
         menuItems.[0].Action <- fun () -> ShowMenuItem (menuItems.[0])
         menuItems.[1].Action <- fun () -> ShowMenuItem (menuItems.[1])
         menuItems.[2].Action <- fun () -> ShowMenuItem (menuItems.[2])
