@@ -125,6 +125,8 @@ namespace Terminal.Gui {
 
 		TextFormatter textFormatter;
 
+		ShortCutHelper shortCutHelper;
+
 		/// <summary>
 		/// Event fired when a subview is being added to this view.
 		/// </summary>
@@ -169,6 +171,28 @@ namespace Terminal.Gui {
 		/// Gets or sets the specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'. 
 		/// </summary>
 		public Rune HotKeySpecifier { get => textFormatter.HotKeySpecifier; set => textFormatter.HotKeySpecifier = value; }
+
+		/// <summary>
+		/// This is the global setting that can be used as a global shortcut to invoke an action if provided.
+		/// </summary>
+		public Key ShortCut {
+			get => shortCutHelper.ShortCut;
+			set {
+				if (shortCutHelper.ShortCut != value && (ShortCutHelper.PostShortCutValidation (value) || value == Key.Null)) {
+					shortCutHelper.ShortCut = value;
+				}
+			}
+		}
+
+		/// <summary>
+		/// The keystroke combination used in the <see cref="ShortCut"/> as string.
+		/// </summary>
+		public ustring ShortCutTag => ShortCutHelper.GetShortCutTag (shortCutHelper.ShortCut);
+
+		/// <summary>
+		/// The action to run if the <see cref="ShortCut"/> is defined.
+		/// </summary>
+		public virtual Action ShortCutAction { get; set; }
 
 		/// <summary>
 		/// Gets or sets arbitrary data for the view.
@@ -550,6 +574,8 @@ namespace Terminal.Gui {
 			textFormatter = new TextFormatter ();
 			this.Text = ustring.Empty;
 
+			shortCutHelper = new ShortCutHelper ();
+
 			this.Frame = frame;
 			LayoutStyle = LayoutStyle.Absolute;
 		}
@@ -612,6 +638,8 @@ namespace Terminal.Gui {
 		{
 			textFormatter = new TextFormatter ();
 			this.Text = text;
+
+			shortCutHelper = new ShortCutHelper ();
 		}
 
 		/// <summary>
@@ -632,6 +660,8 @@ namespace Terminal.Gui {
 		{
 			textFormatter = new TextFormatter ();
 			this.Text = text;
+
+			shortCutHelper = new ShortCutHelper ();
 
 			CanFocus = false;
 			TabIndex = -1;
@@ -2054,27 +2084,6 @@ namespace Terminal.Gui {
 			}
 
 			return true;
-		}
-
-		/// <summary>
-		/// Gets the key with all the keys modifiers, especially the shift key that sometimes have to be injected later.
-		/// </summary>
-		/// <param name="kb">The <see cref="KeyEvent"/> to check.</param>
-		/// <returns>The <see cref="KeyEvent.Key"/> with all the keys modifiers.</returns>
-		public Key GetModifiersKey (KeyEvent kb)
-		{
-			var key = kb.Key;
-			if (kb.IsAlt && (key & Key.AltMask) == 0) {
-				key |= Key.AltMask;
-			}
-			if (kb.IsCtrl && (key & Key.CtrlMask) == 0) {
-				key |= Key.CtrlMask;
-			}
-			if (kb.IsShift && (key & Key.ShiftMask) == 0) {
-				key |= Key.ShiftMask;
-			}
-
-			return key;
 		}
 	}
 }

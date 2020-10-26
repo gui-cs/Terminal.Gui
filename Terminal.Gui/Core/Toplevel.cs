@@ -213,6 +213,19 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		///<inheritdoc/>
+		public override bool ProcessColdKey (KeyEvent keyEvent)
+		{
+			if (base.ProcessColdKey (keyEvent)) {
+				return true;
+			}
+
+			if (ShortCutHelper.FindAndOpenByShortCut(keyEvent, this)) {
+				return true;
+			}
+			return false;
+		}
+
 		View GetDeepestFocusedSubview (View view)
 		{
 			if (view == null) {

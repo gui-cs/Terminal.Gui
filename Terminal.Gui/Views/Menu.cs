@@ -1328,14 +1328,8 @@ namespace Terminal.Gui {
 			}
 
 			var key = kb.KeyValue;
-			var keys = GetModifiersKey (kb);
+			var keys = ShortCutHelper.GetModifiersKey (kb);
 			key |= (int)keys;
-			//if (kb.IsShift) {
-			//	key |= (int)Key.ShiftMask;
-			//}
-			//if (kb.IsAlt) {
-			//	key |= unchecked((int)Key.AltMask);
-			//}
 			for (int i = 0; i < children.Length; i++) {
 				var mi = children [i];
 				if (mi == null) {

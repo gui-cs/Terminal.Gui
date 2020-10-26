@@ -30,6 +30,32 @@ namespace Terminal.Gui {
 		public virtual ustring ShortCutTag => GetShortCutTag (shortCut);
 
 		/// <summary>
+		/// The action to run if the <see cref="ShortCut"/> is defined.
+		/// </summary>
+		public virtual Action ShortCutAction { get; set; }
+
+		/// <summary>
+		/// Gets the key with all the keys modifiers, especially the shift key that sometimes have to be injected later.
+		/// </summary>
+		/// <param name="kb">The <see cref="KeyEvent"/> to check.</param>
+		/// <returns>The <see cref="KeyEvent.Key"/> with all the keys modifiers.</returns>
+		public static Key GetModifiersKey (KeyEvent kb)
+		{
+			var key = kb.Key;
+			if (kb.IsAlt && (key & Key.AltMask) == 0) {
+				key |= Key.AltMask;
+			}
+			if (kb.IsCtrl && (key & Key.CtrlMask) == 0) {
+				key |= Key.CtrlMask;
+			}
+			if (kb.IsShift && (key & Key.ShiftMask) == 0) {
+				key |= Key.ShiftMask;
+			}
+
+			return key;
+		}
+
+		/// <summary>
 		/// Get the <see cref="ShortCut"/> key as string.
 		/// </summary>
 		/// <param name="shortCut">The shortcut key.</param>
@@ -200,6 +226,39 @@ namespace Terminal.Gui {
 				((key & (Key.CtrlMask | Key.ShiftMask | Key.AltMask)) != 0 && knm != Key.Null && knm != Key.Unknown)) {
 				return true;
 			}
+			return false;
+		}
+
+		/// <summary>
+		/// Allows a view to run a <see cref="View.ShortCutAction"/> if defined.
+		/// </summary>
+		/// <param name="kb">The <see cref="KeyEvent"/></param>
+		/// <param name="view">The <see cref="View"/></param>
+		/// <returns><c>true</c> if defined <c>false</c>otherwise.</returns>
+		public static bool FindAndOpenByShortCut (KeyEvent kb, View view = null)
+		{
+			if (view == null) {
+				return false;			}
+
+			var key = kb.KeyValue;
+			var keys = GetModifiersKey (kb);
+			key |= (int)keys;
+			foreach (var v in view.Subviews) {
+				if (v.ShortCut != Key.Null && v.ShortCut == (Key)key) {
+					var action = v.ShortCutAction;
+					if (action != null) {
+						Application.MainLoop.AddIdle (() => {
+							action ();
+							return false;
+						});
+					}
+					return true;
+				}
+				if (FindAndOpenByShortCut (kb, v)) {
+					return true;
+				}
+			}
+
 			return false;
 		}
 	}

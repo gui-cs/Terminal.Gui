@@ -345,7 +345,7 @@ namespace Terminal.Gui {
 			// Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
 			var oldCursorPos = point;
 
-			switch (GetModifiersKey (kb)) {
+			switch (ShortCutHelper.GetModifiersKey (kb)) {
 			case Key.DeleteChar:
 			case Key.D | Key.CtrlMask:
 				if (ReadOnly)

@@ -725,7 +725,7 @@ namespace UICatalog {
 					return;
 				}
 
-				var k = GetModifiersKey (e.KeyEvent);
+				var k = ShortCutHelper.GetModifiersKey (e.KeyEvent);
 				if (CheckShortCut (k, true)) {
 					e.Handled = true;
 				}
@@ -764,7 +764,7 @@ namespace UICatalog {
 			}
 
 			_txtShortCut.KeyUp += (e) => {
-				var k = GetModifiersKey (e.KeyEvent);
+				var k = ShortCutHelper.GetModifiersKey (e.KeyEvent);
 				if (CheckShortCut (k, false)) {
 					e.Handled = true;
 				}

@@ -105,7 +105,7 @@ namespace UICatalog {
 					_rightPane.SetFocus ();
 					_top.Ready -= ReadyHandler;
 				}
-				
+
 				_top.Ready += ReadyHandler;
 
 #if DEBUG_IDISPOSABLE
@@ -114,7 +114,7 @@ namespace UICatalog {
 				foreach (var inst in Responder.Instances) {
 					Debug.Assert (inst.WasDisposed);
 				}
-				Responder.Instances.Clear();
+				Responder.Instances.Clear ();
 #endif
 			}
 
@@ -174,8 +174,10 @@ namespace UICatalog {
 				Width = 25,
 				Height = Dim.Fill (1),
 				CanFocus = false,
+				ShortCut = Key.CtrlMask | Key.C
 			};
-
+			_leftPane.Title = $"{_leftPane.Title} ({_leftPane.ShortCutTag})";
+			_leftPane.ShortCutAction = () => _leftPane.SetFocus ();
 
 			_categories = Scenario.GetAllCategories ().OrderBy (c => c).ToList ();
 			_categoryListView = new ListView (_categories) {
@@ -198,8 +200,10 @@ namespace UICatalog {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (1),
 				CanFocus = true,
-
+				ShortCut = Key.CtrlMask | Key.S
 			};
+			_rightPane.Title = $"{_rightPane.Title} ({_rightPane.ShortCutTag})";
+			_rightPane.ShortCutAction = () => _rightPane.SetFocus ();
 
 			_nameColumnWidth = Scenario.ScenarioMetadata.GetName (_scenarios.OrderByDescending (t => Scenario.ScenarioMetadata.GetName (t).Length).FirstOrDefault ()).Length;
 
@@ -222,7 +226,7 @@ namespace UICatalog {
 			_numlock = new StatusItem (Key.CharMask, "Num", null);
 			_scrolllock = new StatusItem (Key.CharMask, "Scroll", null);
 
-			_statusBar = new StatusBar () { 
+			_statusBar = new StatusBar () {
 				Visible = true,
 			};
 			_statusBar.Items = new StatusItem [] {
