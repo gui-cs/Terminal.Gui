@@ -174,10 +174,10 @@ namespace UICatalog {
 				Width = 25,
 				Height = Dim.Fill (1),
 				CanFocus = false,
-				ShortCut = Key.CtrlMask | Key.C
+				Shortcut = Key.CtrlMask | Key.C
 			};
-			_leftPane.Title = $"{_leftPane.Title} ({_leftPane.ShortCutTag})";
-			_leftPane.ShortCutAction = () => _leftPane.SetFocus ();
+			_leftPane.Title = $"{_leftPane.Title} ({_leftPane.ShortcutTag})";
+			_leftPane.ShortcutAction = () => _leftPane.SetFocus ();
 
 			_categories = Scenario.GetAllCategories ().OrderBy (c => c).ToList ();
 			_categoryListView = new ListView (_categories) {
@@ -200,10 +200,10 @@ namespace UICatalog {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (1),
 				CanFocus = true,
-				ShortCut = Key.CtrlMask | Key.S
+				Shortcut = Key.CtrlMask | Key.S
 			};
-			_rightPane.Title = $"{_rightPane.Title} ({_rightPane.ShortCutTag})";
-			_rightPane.ShortCutAction = () => _rightPane.SetFocus ();
+			_rightPane.Title = $"{_rightPane.Title} ({_rightPane.ShortcutTag})";
+			_rightPane.ShortcutAction = () => _rightPane.SetFocus ();
 
 			_nameColumnWidth = Scenario.ScenarioMetadata.GetName (_scenarios.OrderByDescending (t => Scenario.ScenarioMetadata.GetName (t).Length).FirstOrDefault ()).Length;
 
@@ -276,7 +276,7 @@ namespace UICatalog {
 			{
 				var mi = new MenuItem ();
 				mi.Title = menuItem;
-				mi.ShortCut = Key.AltMask + index.ToString () [0];
+				mi.Shortcut = Key.AltMask + index.ToString () [0];
 				index++;
 				mi.CheckType |= MenuItemCheckStyle.Checked;
 				mi.Checked = checkFunction ();
@@ -323,7 +323,7 @@ namespace UICatalog {
 			foreach (var sc in Colors.ColorSchemes) {
 				var item = new MenuItem ();
 				item.Title = $"_{sc.Key}";
-				item.ShortCut = Key.AltMask | (Key)sc.Key.Substring (0, 1) [0];
+				item.Shortcut = Key.AltMask | (Key)sc.Key.Substring (0, 1) [0];
 				item.CheckType |= MenuItemCheckStyle.Radio;
 				item.Checked = sc.Value == _baseColorScheme;
 				item.Action += () => {

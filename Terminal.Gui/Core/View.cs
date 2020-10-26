@@ -125,7 +125,7 @@ namespace Terminal.Gui {
 
 		TextFormatter textFormatter;
 
-		ShortCutHelper shortCutHelper;
+		ShortcutHelper shortcutHelper;
 
 		/// <summary>
 		/// Event fired when a subview is being added to this view.
@@ -175,24 +175,24 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// This is the global setting that can be used as a global shortcut to invoke an action if provided.
 		/// </summary>
-		public Key ShortCut {
-			get => shortCutHelper.ShortCut;
+		public Key Shortcut {
+			get => shortcutHelper.Shortcut;
 			set {
-				if (shortCutHelper.ShortCut != value && (ShortCutHelper.PostShortCutValidation (value) || value == Key.Null)) {
-					shortCutHelper.ShortCut = value;
+				if (shortcutHelper.Shortcut != value && (ShortcutHelper.PostShortcutValidation (value) || value == Key.Null)) {
+					shortcutHelper.Shortcut = value;
 				}
 			}
 		}
 
 		/// <summary>
-		/// The keystroke combination used in the <see cref="ShortCut"/> as string.
+		/// The keystroke combination used in the <see cref="Shortcut"/> as string.
 		/// </summary>
-		public ustring ShortCutTag => ShortCutHelper.GetShortCutTag (shortCutHelper.ShortCut);
+		public ustring ShortcutTag => ShortcutHelper.GetShortcutTag (shortcutHelper.Shortcut);
 
 		/// <summary>
-		/// The action to run if the <see cref="ShortCut"/> is defined.
+		/// The action to run if the <see cref="Shortcut"/> is defined.
 		/// </summary>
-		public virtual Action ShortCutAction { get; set; }
+		public virtual Action ShortcutAction { get; set; }
 
 		/// <summary>
 		/// Gets or sets arbitrary data for the view.
@@ -574,7 +574,7 @@ namespace Terminal.Gui {
 			textFormatter = new TextFormatter ();
 			this.Text = ustring.Empty;
 
-			shortCutHelper = new ShortCutHelper ();
+			shortcutHelper = new ShortcutHelper ();
 
 			this.Frame = frame;
 			LayoutStyle = LayoutStyle.Absolute;
@@ -639,7 +639,7 @@ namespace Terminal.Gui {
 			textFormatter = new TextFormatter ();
 			this.Text = text;
 
-			shortCutHelper = new ShortCutHelper ();
+			shortcutHelper = new ShortcutHelper ();
 		}
 
 		/// <summary>
@@ -661,7 +661,7 @@ namespace Terminal.Gui {
 			textFormatter = new TextFormatter ();
 			this.Text = text;
 
-			shortCutHelper = new ShortCutHelper ();
+			shortcutHelper = new ShortcutHelper ();
 
 			CanFocus = false;
 			TabIndex = -1;

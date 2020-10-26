@@ -5,7 +5,7 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 // TODO:
-//   Add accelerator support, but should also support chords (ShortCut in MenuItem)
+//   Add accelerator support, but should also support chords (Shortcut in MenuItem)
 //   Allow menus inside menus
 
 using System;
@@ -42,18 +42,18 @@ namespace Terminal.Gui {
 	public class MenuItem {
 		ustring title;
 
-		ShortCutHelper shortCutHelper;
+		ShortcutHelper shortcutHelper;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="MenuItem"/>
 		/// </summary>
-		public MenuItem (Key shortCut = Key.Null)
+		public MenuItem (Key shortcut = Key.Null)
 		{
 			Title = "";
 			Help = "";
-			shortCutHelper = new ShortCutHelper ();
-			if (shortCut != Key.Null) {
-				shortCutHelper.ShortCut = shortCut;
+			shortcutHelper = new ShortcutHelper ();
+			if (shortcut != Key.Null) {
+				shortcutHelper.Shortcut = shortcut;
 			}
 		}
 
@@ -65,43 +65,43 @@ namespace Terminal.Gui {
 		/// <param name="action">Action to invoke when the menu item is activated.</param>
 		/// <param name="canExecute">Function to determine if the action can currently be executed.</param>
 		/// <param name="parent">The <see cref="Parent"/> of this menu item.</param>
-		/// <param name="shortCut">The <see cref="ShortCut"/> keystroke combination.</param>
-		public MenuItem (ustring title, ustring help, Action action, Func<bool> canExecute = null, MenuItem parent = null, Key shortCut = Key.Null)
+		/// <param name="shortcut">The <see cref="Shortcut"/> keystroke combination.</param>
+		public MenuItem (ustring title, ustring help, Action action, Func<bool> canExecute = null, MenuItem parent = null, Key shortcut = Key.Null)
 		{
 			Title = title ?? "";
 			Help = help ?? "";
 			Action = action;
 			CanExecute = canExecute;
 			Parent = parent;
-			shortCutHelper = new ShortCutHelper ();
-			if (shortCut != Key.Null) {
-				shortCutHelper.ShortCut = shortCut;
+			shortcutHelper = new ShortcutHelper ();
+			if (shortcut != Key.Null) {
+				shortcutHelper.Shortcut = shortcut;
 			}
 		}
 
 		/// <summary>
 		/// The HotKey is used when the menu is active, the shortcut can be triggered when the menu is not active.
 		/// For example HotKey would be "N" when the File Menu is open (assuming there is a "_New" entry
-		/// if the ShortCut is set to "Control-N", this would be a global hotkey that would trigger as well
+		/// if the Shortcut is set to "Control-N", this would be a global hotkey that would trigger as well
 		/// </summary>
 		public Rune HotKey;
 
 		/// <summary>
-		/// This is the global setting that can be used as a global <see cref="ShortCutHelper.ShortCut"/> to invoke the action on the menu.
+		/// This is the global setting that can be used as a global <see cref="ShortcutHelper.Shortcut"/> to invoke the action on the menu.
 		/// </summary>
-		public Key ShortCut {
-			get => shortCutHelper.ShortCut;
+		public Key Shortcut {
+			get => shortcutHelper.Shortcut;
 			set {
-				if (shortCutHelper.ShortCut != value && (ShortCutHelper.PostShortCutValidation (value) || value == Key.Null)) {
-					shortCutHelper.ShortCut = value;
+				if (shortcutHelper.Shortcut != value && (ShortcutHelper.PostShortcutValidation (value) || value == Key.Null)) {
+					shortcutHelper.Shortcut = value;
 				}
 			}
 		}
 
 		/// <summary>
-		/// The keystroke combination used in the <see cref="ShortCutHelper.ShortCutTag"/> as string.
+		/// The keystroke combination used in the <see cref="ShortcutHelper.ShortcutTag"/> as string.
 		/// </summary>
-		public ustring ShortCutTag => ShortCutHelper.GetShortCutTag (shortCutHelper.ShortCut);
+		public ustring ShortcutTag => ShortcutHelper.GetShortcutTag (shortcutHelper.Shortcut);
 
 		/// <summary>
 		/// Gets or sets the title.
@@ -145,7 +145,7 @@ namespace Terminal.Gui {
 
 		internal int Width => Title.RuneCount + Help.RuneCount + 1 + 2 +
 			(Checked || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0) +
-			(ShortCutTag.RuneCount > 0 ? ShortCutTag.RuneCount + 2 : 0);
+			(ShortcutTag.RuneCount > 0 ? ShortcutTag.RuneCount + 2 : 0);
 
 		/// <summary>
 		/// Sets or gets whether the <see cref="MenuItem"/> shows a check indicator or not. See <see cref="MenuItemCheckStyle"/>.
@@ -459,15 +459,15 @@ namespace Terminal.Gui {
 					       i == current ? ColorScheme.Focus : ColorScheme.Normal);
 
 				// The help string
-				var l = item.ShortCutTag.RuneCount == 0 ? item.Help.RuneCount : item.Help.RuneCount + item.ShortCutTag.RuneCount + 2;
+				var l = item.ShortcutTag.RuneCount == 0 ? item.Help.RuneCount : item.Help.RuneCount + item.ShortcutTag.RuneCount + 2;
 				Move (Frame.Width - l - 2, 1 + i);
 				Driver.AddStr (item.Help);
 
 				// The shortcut tag string
-				if (!item.ShortCutTag.IsEmpty) {
-					l = item.ShortCutTag.RuneCount;
+				if (!item.ShortcutTag.IsEmpty) {
+					l = item.ShortcutTag.RuneCount;
 					Move (Frame.Width - l - 2, 1 + i);
-					Driver.AddStr (item.ShortCutTag);
+					Driver.AddStr (item.ShortcutTag);
 				}
 			}
 			PositionCursor ();
@@ -754,15 +754,15 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool UseKeysUpDownAsKeysLeftRight { get; set; } = true;
 
-		static ustring shortCutDelimiter = "+";
+		static ustring shortcutDelimiter = "+";
 		/// <summary>
 		/// Used for change the shortcut delimiter separator.
 		/// </summary>
-		public static ustring ShortCutDelimiter {
-			get => shortCutDelimiter;
+		public static ustring ShortcutDelimiter {
+			get => shortcutDelimiter;
 			set {
-				if (shortCutDelimiter != value) {
-					shortCutDelimiter = value == ustring.Empty ? " " : value;
+				if (shortcutDelimiter != value) {
+					shortcutDelimiter = value == ustring.Empty ? " " : value;
 				}
 			}
 		}
@@ -1321,21 +1321,21 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		internal bool FindAndOpenMenuByShortCut (KeyEvent kb, MenuItem [] children = null)
+		internal bool FindAndOpenMenuByShortcut (KeyEvent kb, MenuItem [] children = null)
 		{
 			if (children == null) {
 				children = Menus;
 			}
 
 			var key = kb.KeyValue;
-			var keys = ShortCutHelper.GetModifiersKey (kb);
+			var keys = ShortcutHelper.GetModifiersKey (kb);
 			key |= (int)keys;
 			for (int i = 0; i < children.Length; i++) {
 				var mi = children [i];
 				if (mi == null) {
 					continue;
 				}
-				if ((!(mi is MenuBarItem mbiTopLevel) || mbiTopLevel.IsTopLevel) && mi.ShortCut != Key.Null && mi.ShortCut == (Key)key) {
+				if ((!(mi is MenuBarItem mbiTopLevel) || mbiTopLevel.IsTopLevel) && mi.Shortcut != Key.Null && mi.Shortcut == (Key)key) {
 					var action = mi.Action;
 					if (action != null) {
 						Application.MainLoop.AddIdle (() => {
@@ -1345,7 +1345,7 @@ namespace Terminal.Gui {
 					}
 					return true;
 				}
-				if (mi is MenuBarItem menuBarItem && !menuBarItem.IsTopLevel && FindAndOpenMenuByShortCut (kb, menuBarItem.Children)) {
+				if (mi is MenuBarItem menuBarItem && !menuBarItem.IsTopLevel && FindAndOpenMenuByShortcut (kb, menuBarItem.Children)) {
 					return true;
 				}
 			}
@@ -1456,7 +1456,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool ProcessColdKey (KeyEvent kb)
 		{
-			return FindAndOpenMenuByShortCut (kb);
+			return FindAndOpenMenuByShortcut (kb);
 		}
 
 		///<inheritdoc/>

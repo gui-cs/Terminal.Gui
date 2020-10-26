@@ -220,7 +220,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (ShortCutHelper.FindAndOpenByShortCut(keyEvent, this)) {
+			if (ShortcutHelper.FindAndOpenByShortcut(keyEvent, this)) {
 				return true;
 			}
 			return false;

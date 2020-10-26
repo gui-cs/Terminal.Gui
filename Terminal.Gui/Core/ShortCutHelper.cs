@@ -9,30 +9,30 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Represents a helper to manipulate shortcut keys used on views.
 	/// </summary>
-	public class ShortCutHelper {
-		private Key shortCut;
+	public class ShortcutHelper {
+		private Key shortcut;
 
 		/// <summary>
 		/// This is the global setting that can be used as a global shortcut to invoke the action on the view.
 		/// </summary>
-		public virtual Key ShortCut {
-			get => shortCut;
+		public virtual Key Shortcut {
+			get => shortcut;
 			set {
-				if (shortCut != value && (PostShortCutValidation (value) || value == Key.Null)) {
-					shortCut = value;
+				if (shortcut != value && (PostShortcutValidation (value) || value == Key.Null)) {
+					shortcut = value;
 				}
 			}
 		}
 
 		/// <summary>
-		/// The keystroke combination used in the <see cref="ShortCut"/> as string.
+		/// The keystroke combination used in the <see cref="Shortcut"/> as string.
 		/// </summary>
-		public virtual ustring ShortCutTag => GetShortCutTag (shortCut);
+		public virtual ustring ShortcutTag => GetShortcutTag (shortcut);
 
 		/// <summary>
-		/// The action to run if the <see cref="ShortCut"/> is defined.
+		/// The action to run if the <see cref="Shortcut"/> is defined.
 		/// </summary>
-		public virtual Action ShortCutAction { get; set; }
+		public virtual Action ShortcutAction { get; set; }
 
 		/// <summary>
 		/// Gets the key with all the keys modifiers, especially the shift key that sometimes have to be injected later.
@@ -56,18 +56,18 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Get the <see cref="ShortCut"/> key as string.
+		/// Get the <see cref="Shortcut"/> key as string.
 		/// </summary>
-		/// <param name="shortCut">The shortcut key.</param>
+		/// <param name="shortcut">The shortcut key.</param>
 		/// <returns></returns>
-		public static ustring GetShortCutTag (Key shortCut)
+		public static ustring GetShortcutTag (Key shortcut)
 		{
-			if (shortCut == Key.Null) {
+			if (shortcut == Key.Null) {
 				return "";
 			}
 
-			var k = shortCut;
-			var delimiter = MenuBar.ShortCutDelimiter;
+			var k = shortcut;
+			var delimiter = MenuBar.ShortcutDelimiter;
 			ustring tag = ustring.Empty;
 			var sCut = GetKeyToString (k, out Key knm).ToString ();
 			if (knm == Key.Unknown) {
@@ -143,10 +143,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Allows to retrieve a <see cref="Key"/> from a <see cref="ShortCutTag"/>
+		/// Allows to retrieve a <see cref="Key"/> from a <see cref="ShortcutTag"/>
 		/// </summary>
 		/// <param name="tag">The key as string.</param>
-		public static Key GetShortCutFromTag (ustring tag)
+		public static Key GetShortcutFromTag (ustring tag)
 		{
 			var sCut = tag;
 			if (sCut.IsEmpty) {
@@ -155,7 +155,7 @@ namespace Terminal.Gui {
 
 			Key key = Key.Null;
 			//var hasCtrl = false;
-			var delimiter = MenuBar.ShortCutDelimiter;
+			var delimiter = MenuBar.ShortcutDelimiter;
 
 			ustring [] keys = sCut.Split (delimiter);
 			for (int i = 0; i < keys.Length; i++) {
@@ -204,7 +204,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="key">The key to validate.</param>
 		/// <returns><c>true</c> if is valid.<c>false</c>otherwise.</returns>
-		public static bool PreShortCutValidation (Key key)
+		public static bool PreShortcutValidation (Key key)
 		{
 			if ((key & (Key.CtrlMask | Key.ShiftMask | Key.AltMask)) == 0 && !CheckKeysFlagRange (key, Key.F1, Key.F12)) {
 				return false;
@@ -218,7 +218,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="key">The key to validate.</param>
 		/// <returns><c>true</c> if is valid.<c>false</c>otherwise.</returns>
-		public static bool PostShortCutValidation (Key key)
+		public static bool PostShortcutValidation (Key key)
 		{
 			GetKeyToString (key, out Key knm);
 
@@ -230,12 +230,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Allows a view to run a <see cref="View.ShortCutAction"/> if defined.
+		/// Allows a view to run a <see cref="View.ShortcutAction"/> if defined.
 		/// </summary>
 		/// <param name="kb">The <see cref="KeyEvent"/></param>
 		/// <param name="view">The <see cref="View"/></param>
 		/// <returns><c>true</c> if defined <c>false</c>otherwise.</returns>
-		public static bool FindAndOpenByShortCut (KeyEvent kb, View view = null)
+		public static bool FindAndOpenByShortcut (KeyEvent kb, View view = null)
 		{
 			if (view == null) {
 				return false;			}
@@ -244,8 +244,8 @@ namespace Terminal.Gui {
 			var keys = GetModifiersKey (kb);
 			key |= (int)keys;
 			foreach (var v in view.Subviews) {
-				if (v.ShortCut != Key.Null && v.ShortCut == (Key)key) {
-					var action = v.ShortCutAction;
+				if (v.Shortcut != Key.Null && v.Shortcut == (Key)key) {
+					var action = v.ShortcutAction;
 					if (action != null) {
 						Application.MainLoop.AddIdle (() => {
 							action ();
@@ -254,7 +254,7 @@ namespace Terminal.Gui {
 					}
 					return true;
 				}
-				if (FindAndOpenByShortCut (kb, v)) {
+				if (FindAndOpenByShortcut (kb, v)) {
 					return true;
 				}
 			}

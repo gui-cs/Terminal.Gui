@@ -41,7 +41,7 @@ namespace UICatalog {
 		public bool isTopLevel;
 		public bool hasSubMenu;
 		public MenuItemCheckStyle checkStyle;
-		public ustring shortCut;
+		public ustring shortcut;
 
 		public DynamicMenuItem () { }
 
@@ -51,7 +51,7 @@ namespace UICatalog {
 			this.hasSubMenu = hasSubMenu;
 		}
 
-		public DynamicMenuItem (ustring title, ustring help, ustring action, bool isTopLevel, bool hasSubMenu, MenuItemCheckStyle checkStyle = MenuItemCheckStyle.NoCheck, ustring shortCut = null)
+		public DynamicMenuItem (ustring title, ustring help, ustring action, bool isTopLevel, bool hasSubMenu, MenuItemCheckStyle checkStyle = MenuItemCheckStyle.NoCheck, ustring shortcut = null)
 		{
 			this.title = title;
 			this.help = help;
@@ -59,7 +59,7 @@ namespace UICatalog {
 			this.isTopLevel = isTopLevel;
 			this.hasSubMenu = hasSubMenu;
 			this.checkStyle = checkStyle;
-			this.shortCut = shortCut;
+			this.shortcut = shortcut;
 		}
 	}
 
@@ -76,18 +76,18 @@ namespace UICatalog {
 		{
 			DataContext = new DynamicMenuItemModel ();
 
-			var _frmDelimiter = new FrameView ("ShortCut Delimiter:") {
+			var _frmDelimiter = new FrameView ("Shortcut Delimiter:") {
 				X = Pos.Center (),
 				Y = 3,
 				Width = 25,
 				Height = 4
 			};
 
-			var _txtDelimiter = new TextField (MenuBar.ShortCutDelimiter.ToString ()) {
+			var _txtDelimiter = new TextField (MenuBar.ShortcutDelimiter.ToString ()) {
 				X = Pos.Center(),
 				Width = 2,
 			};
-			_txtDelimiter.TextChanged += (_) => MenuBar.ShortCutDelimiter = _txtDelimiter.Text;
+			_txtDelimiter.TextChanged += (_) => MenuBar.ShortcutDelimiter = _txtDelimiter.Text;
 			_frmDelimiter.Add (_txtDelimiter);
 
 			Add (_frmDelimiter);
@@ -315,7 +315,7 @@ namespace UICatalog {
 						_frmMenuDetails._rbChkStyle.SelectedItem == 0 ? MenuItemCheckStyle.NoCheck :
 						_frmMenuDetails._rbChkStyle.SelectedItem == 1 ? MenuItemCheckStyle.Checked :
 						MenuItemCheckStyle.Radio,
-						_frmMenuDetails._txtShortCut.Text);
+						_frmMenuDetails._txtShortcut.Text);
 					UpdateMenuItem (_currentEditMenuBarItem, menuItem, _lstMenus.SelectedItem);
 				}
 			};
@@ -563,14 +563,14 @@ namespace UICatalog {
 					newMenu = new MenuItem (item.title, item.help, null, null, parent);
 					newMenu.CheckType = item.checkStyle;
 					newMenu.Action = _frmMenuDetails.CreateAction (newMenu, item);
-					newMenu.ShortCut = ShortCutHelper.GetShortCutFromTag (item.shortCut);
+					newMenu.Shortcut = ShortcutHelper.GetShortcutFromTag (item.shortcut);
 				} else if (item.isTopLevel) {
 					newMenu = new MenuBarItem (item.title, item.help, null);
 					newMenu.Action = _frmMenuDetails.CreateAction (newMenu, item);
 				} else {
 					newMenu = new MenuBarItem (item.title, item.help, null);
 					((MenuBarItem)newMenu).Children [0].Action = _frmMenuDetails.CreateAction (newMenu, item);
-					((MenuBarItem)newMenu).Children [0].ShortCut = ShortCutHelper.GetShortCutFromTag (item.shortCut);
+					((MenuBarItem)newMenu).Children [0].Shortcut = ShortcutHelper.GetShortcutFromTag (item.shortcut);
 				}
 
 				return newMenu;
@@ -608,7 +608,7 @@ namespace UICatalog {
 						DataContext.Menus = new List<DynamicMenuItemList> ();
 					}
 					_currentEditMenuBarItem.Action = _frmMenuDetails.CreateAction (_currentEditMenuBarItem, menuItem);
-					_currentEditMenuBarItem.ShortCut = ShortCutHelper.GetShortCutFromTag (menuItem.shortCut);
+					_currentEditMenuBarItem.Shortcut = ShortcutHelper.GetShortcutFromTag (menuItem.shortcut);
 				}
 
 				if (_currentEditMenuBarItem.Parent == null) {
@@ -636,7 +636,7 @@ namespace UICatalog {
 		public CheckBox _ckbIsTopLevel;
 		public CheckBox _ckbSubMenu;
 		public RadioGroup _rbChkStyle;
-		public TextField _txtShortCut;
+		public TextField _txtShortcut;
 
 		bool hasParent;
 
@@ -708,25 +708,25 @@ namespace UICatalog {
 			};
 			Add (_rbChkStyle);
 
-			var _lblShortCut = new Label ("ShortCut:") {
+			var _lblShortcut = new Label ("Shortcut:") {
 				X = Pos.Right (_ckbSubMenu) + 10,
 				Y = Pos.Top (_ckbSubMenu)
 			};
-			Add (_lblShortCut);
+			Add (_lblShortcut);
 
-			_txtShortCut = new TextField () {
-				X = Pos.X (_lblShortCut),
-				Y = Pos.Bottom (_lblShortCut),
+			_txtShortcut = new TextField () {
+				X = Pos.X (_lblShortcut),
+				Y = Pos.Bottom (_lblShortcut),
 				Width = Dim.Fill (),
 				ReadOnly = true
 			};
-			_txtShortCut.KeyDown += (e) => {
+			_txtShortcut.KeyDown += (e) => {
 				if (!ProcessKey (e.KeyEvent)) {
 					return;
 				}
 
-				var k = ShortCutHelper.GetModifiersKey (e.KeyEvent);
-				if (CheckShortCut (k, true)) {
+				var k = ShortcutHelper.GetModifiersKey (e.KeyEvent);
+				if (CheckShortcut (k, true)) {
 					e.Handled = true;
 				}
 			};
@@ -744,41 +744,41 @@ namespace UICatalog {
 				return true;
 			}
 
-			bool CheckShortCut (Key k, bool pre)
+			bool CheckShortcut (Key k, bool pre)
 			{
 				var m = _menuItem != null ? _menuItem : new MenuItem ();
-				if (pre && !ShortCutHelper.PreShortCutValidation (k)) {
-					_txtShortCut.Text = "";
+				if (pre && !ShortcutHelper.PreShortcutValidation (k)) {
+					_txtShortcut.Text = "";
 					return false;
 				}
 				if (!pre) {
-					if (!ShortCutHelper.PostShortCutValidation (ShortCutHelper.GetShortCutFromTag (_txtShortCut.Text))) {
-						_txtShortCut.Text = "";
+					if (!ShortcutHelper.PostShortcutValidation (ShortcutHelper.GetShortcutFromTag (_txtShortcut.Text))) {
+						_txtShortcut.Text = "";
 						return false;
 					}
 					return true;
 				}
-				_txtShortCut.Text = ShortCutHelper.GetShortCutTag (k);
+				_txtShortcut.Text = ShortcutHelper.GetShortcutTag (k);
 
 				return true;
 			}
 
-			_txtShortCut.KeyUp += (e) => {
-				var k = ShortCutHelper.GetModifiersKey (e.KeyEvent);
-				if (CheckShortCut (k, false)) {
+			_txtShortcut.KeyUp += (e) => {
+				var k = ShortcutHelper.GetModifiersKey (e.KeyEvent);
+				if (CheckShortcut (k, false)) {
 					e.Handled = true;
 				}
 			};
-			Add (_txtShortCut);
+			Add (_txtShortcut);
 
-			var _btnShortCut = new Button ("Clear ShortCut") {
-				X = Pos.X (_lblShortCut),
-				Y = Pos.Bottom (_txtShortCut) + 1
+			var _btnShortcut = new Button ("Clear Shortcut") {
+				X = Pos.X (_lblShortcut),
+				Y = Pos.Bottom (_txtShortcut) + 1
 			};
-			_btnShortCut.Clicked += () => {
-				_txtShortCut.Text = "";
+			_btnShortcut.Clicked += () => {
+				_txtShortcut.Text = "";
 			};
-			Add (_btnShortCut);
+			Add (_btnShortcut);
 
 			_ckbIsTopLevel.Toggled += (e) => {
 				if ((_menuItem != null && _menuItem.Parent != null && _ckbIsTopLevel.Checked) ||
@@ -792,12 +792,12 @@ namespace UICatalog {
 					_ckbSubMenu.SetNeedsDisplay ();
 					_txtHelp.CanFocus = true;
 					_txtAction.CanFocus = true;
-					_txtShortCut.CanFocus = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
+					_txtShortcut.CanFocus = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
 				} else {
 					if (_menuItem == null && !hasParent || _menuItem.Parent == null) {
 						_ckbSubMenu.Checked = true;
 						_ckbSubMenu.SetNeedsDisplay ();
-						_txtShortCut.CanFocus = false;
+						_txtShortcut.CanFocus = false;
 					}
 					_txtHelp.Text = "";
 					_txtHelp.CanFocus = false;
@@ -813,17 +813,17 @@ namespace UICatalog {
 					_txtHelp.CanFocus = false;
 					_txtAction.Text = "";
 					_txtAction.CanFocus = false;
-					_txtShortCut.Text = "";
-					_txtShortCut.CanFocus = false;
+					_txtShortcut.Text = "";
+					_txtShortcut.CanFocus = false;
 				} else {
 					if (!hasParent) {
 						_ckbIsTopLevel.Checked = true;
 						_ckbIsTopLevel.SetNeedsDisplay ();
-						_txtShortCut.CanFocus = false;
+						_txtShortcut.CanFocus = false;
 					}
 					_txtHelp.CanFocus = true;
 					_txtAction.CanFocus = true;
-					_txtShortCut.CanFocus = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
+					_txtShortcut.CanFocus = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
 				}
 			};
 
@@ -845,7 +845,7 @@ namespace UICatalog {
 				_ckbSubMenu.Checked = !hasParent;
 				_txtHelp.CanFocus = hasParent;
 				_txtAction.CanFocus = hasParent;
-				_txtShortCut.CanFocus = hasParent;
+				_txtShortcut.CanFocus = hasParent;
 			} else {
 				EditMenuBarItem (_menuItem);
 			}
@@ -881,7 +881,7 @@ namespace UICatalog {
 					_ckbSubMenu != null ? _ckbSubMenu.Checked : false,
 					_rbChkStyle.SelectedItem == 0 ? MenuItemCheckStyle.NoCheck :
 					_rbChkStyle.SelectedItem == 1 ? MenuItemCheckStyle.Checked : MenuItemCheckStyle.Radio,
-					_txtShortCut.Text);
+					_txtShortcut.Text);
 			} else {
 				return null;
 			}
@@ -907,8 +907,8 @@ namespace UICatalog {
 			_txtHelp.CanFocus = !_ckbSubMenu.Checked;
 			_txtAction.CanFocus = !_ckbSubMenu.Checked;
 			_rbChkStyle.SelectedItem = (int)(menuItem?.CheckType ?? MenuItemCheckStyle.NoCheck);
-			_txtShortCut.Text = menuItem?.ShortCutTag ?? "";
-			_txtShortCut.CanFocus = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
+			_txtShortcut.Text = menuItem?.ShortcutTag ?? "";
+			_txtShortcut.CanFocus = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
 		}
 
 		void CleanEditMenuBarItem ()
@@ -919,7 +919,7 @@ namespace UICatalog {
 			_ckbIsTopLevel.Checked = false;
 			_ckbSubMenu.Checked = false;
 			_rbChkStyle.SelectedItem = (int)MenuItemCheckStyle.NoCheck;
-			_txtShortCut.Text = "";
+			_txtShortcut.Text = "";
 		}
 
 		ustring GetTargetAction (Action action)
