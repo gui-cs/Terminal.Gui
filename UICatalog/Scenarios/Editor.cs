@@ -41,7 +41,7 @@ namespace UICatalog {
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.F2, "~F2~ Open", () => Open()),
 				new StatusItem(Key.F3, "~F3~ Save", () => Save()),
-				new StatusItem(Key.ControlQ, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 			});
 			Top.Add (statusBar);
 

@@ -279,16 +279,16 @@ namespace Terminal.Gui {
 		{
 			switch (keyEvent.Key) {
 			case Key.CursorUp:
-			case Key.ControlP:
+			case Key.P | Key.CtrlMask:
 				MoveUp ();
 				return true;
 
 			case Key.CursorDown:
-			case Key.ControlN:
+			case Key.N | Key.CtrlMask:
 				MoveDown ();
 				return true;
 
-			case Key.ControlV:
+			case Key.V | Key.CtrlMask:
 			case Key.PageDown:
 				var n = (selected + Frame.Height);
 				if (n > infos.Count)
@@ -325,7 +325,7 @@ namespace Terminal.Gui {
 				return true;
 
 			case Key.Space:
-			case Key.ControlT:
+			case Key.T | Key.CtrlMask:
 				PerformMultipleSelection ();
 				return true;
 

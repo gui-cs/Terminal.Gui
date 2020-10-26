@@ -247,9 +247,9 @@ static class Demo {
 				new MenuItem ("_Close", "", () => { if (Quit ()) { running = MainApp; Application.RequestStop (); } }, null, null, Key.AltMask | Key.F4),
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
-				new MenuItem ("_Copy", "", null, null, null, Key.ControlC),
-				new MenuItem ("C_ut", "", null, null, null, Key.ControlX),
-				new MenuItem ("_Paste", "", null, null, null, Key.ControlV)
+				new MenuItem ("_Copy", "", null, null, null, Key.C | Key.CtrlMask),
+				new MenuItem ("C_ut", "", null, null, null, Key.X | Key.CtrlMask),
+				new MenuItem ("_Paste", "", null, null, null, Key.V | Key.CtrlMask)
 			}),
 		});
 		ntop.Add (menu);
@@ -597,19 +597,19 @@ static class Demo {
 
 		menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("Text _Editor Demo", "", () => { running = Editor; Application.RequestStop (); }, null, null, Key.AltMask | Key.ControlD),
-				new MenuItem ("_New", "Creates new file", NewFile, null, null, Key.AltMask | Key.ControlN),
-				new MenuItem ("_Open", "", Open, null, null, Key.AltMask | Key.ControlO),
-				new MenuItem ("_Hex", "", () => { running = ShowHex; Application.RequestStop (); }, null, null, Key.AltMask | Key.ControlH),
+				new MenuItem ("Text _Editor Demo", "", () => { running = Editor; Application.RequestStop (); }, null, null, Key.AltMask | Key.CtrlMask | Key.D),
+				new MenuItem ("_New", "Creates new file", NewFile, null, null, Key.AltMask | Key.CtrlMask| Key.N),
+				new MenuItem ("_Open", "", Open, null, null, Key.AltMask | Key.CtrlMask| Key.O),
+				new MenuItem ("_Hex", "", () => { running = ShowHex; Application.RequestStop (); }, null, null, Key.AltMask | Key.CtrlMask | Key.H),
 				new MenuItem ("_Close", "", Close, null, null, Key.AltMask | Key.F4),
 				new MenuItem ("_Disabled", "", () => { }, () => false),
 				null,
-				new MenuItem ("_Quit", "", () => { if (Quit ()) { running = null; top.Running = false; } }, null, null, Key.ControlQ)
+				new MenuItem ("_Quit", "", () => { if (Quit ()) { running = null; top.Running = false; } }, null, null, Key.CtrlMask | Key.Q)
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
-				new MenuItem ("_Copy", "", Copy, null, null, Key.AltMask | Key.ControlC),
-				new MenuItem ("C_ut", "", Cut, null, null, Key.AltMask | Key.ControlX),
-				new MenuItem ("_Paste", "", Paste, null, null, Key.AltMask | Key.ControlV),
+				new MenuItem ("_Copy", "", Copy, null, null, Key.AltMask | Key.CtrlMask | Key.C),
+				new MenuItem ("C_ut", "", Cut, null, null, Key.AltMask | Key.CtrlMask| Key.X),
+				new MenuItem ("_Paste", "", Paste, null, null, Key.AltMask | Key.CtrlMask| Key.V),
 				new MenuBarItem ("_Find and Replace",
 					new MenuItem [] { menuItems [0], menuItems [1] }),
 				menuItems[3]
@@ -620,8 +620,8 @@ static class Demo {
 				new MenuItem ("Search Single Item", "", ComboBoxDemo, null, null, Key.AltMask + 2.ToString () [0])
 			}),
 			new MenuBarItem ("A_ssorted", new MenuItem [] {
-				new MenuItem ("_Show text alignments", "", () => ShowTextAlignments (), null, null, Key.AltMask | Key.ControlG),
-				new MenuItem ("_OnKeyDown/Press/Up", "", () => OnKeyDownPressUpDemo (), null, null, Key.AltMask | Key.ControlK)
+				new MenuItem ("_Show text alignments", "", () => ShowTextAlignments (), null, null, Key.AltMask | Key.CtrlMask | Key.G),
+				new MenuItem ("_OnKeyDown/Press/Up", "", () => OnKeyDownPressUpDemo (), null, null, Key.AltMask | Key.CtrlMask | Key.K)
 			}),
 			new MenuBarItem ("_Test Menu and SubMenus", new MenuBarItem [] {
 				new MenuBarItem ("SubMenu1Item_1",  new MenuBarItem [] {
@@ -662,7 +662,7 @@ static class Demo {
 			new StatusItem(Key.F1, "~F1~ Help", () => Help()),
 			new StatusItem(Key.F2, "~F2~ Load", Load),
 			new StatusItem(Key.F3, "~F3~ Save", Save),
-			new StatusItem(Key.ControlQ, "~^Q~ Quit", () => { if (Quit ()) { running = null; top.Running = false; } })
+			new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => { if (Quit ()) { running = null; top.Running = false; } })
 		});
 
 		win.Add (drag, dragText);
@@ -689,7 +689,7 @@ static class Demo {
 
 	private static void Win_KeyPress (View.KeyEventEventArgs e)
 	{
-		if (e.KeyEvent.Key == Key.ControlT) {
+		if ((e.KeyEvent.Key & (Key.CtrlMask | Key.T)) != 0) {
 			if (menu.IsMenuOpen)
 				menu.CloseMenu ();
 			else

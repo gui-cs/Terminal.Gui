@@ -734,13 +734,13 @@ namespace Terminal.Gui {
 			// Handle some state here - whether the last command was a kill
 			// operation and the column tracking (up/down)
 			switch (kb.Key) {
-			case Key.ControlN:
+			case Key.N | Key.CtrlMask:
 			case Key.CursorDown:
-			case Key.ControlP:
+			case Key.P | Key.CtrlMask:
 			case Key.CursorUp:
 				lastWasKill = false;
 				break;
-			case Key.ControlK:
+			case Key.K | Key.CtrlMask:
 				break;
 			default:
 				lastWasKill = false;
@@ -751,7 +751,7 @@ namespace Terminal.Gui {
 			// Dispatch the command.
 			switch (kb.Key) {
 			case Key.PageDown:
-			case Key.ControlV:
+			case Key.V | Key.CtrlMask:
 				int nPageDnShift = Frame.Height - 1;
 				if (currentRow < model.Count) {
 					if (columnTrack == -1)
@@ -782,17 +782,17 @@ namespace Terminal.Gui {
 				}
 				break;
 
-			case Key.ControlN:
+			case Key.N | Key.CtrlMask:
 			case Key.CursorDown:
 				MoveDown ();
 				break;
 
-			case Key.ControlP:
+			case Key.P | Key.CtrlMask:
 			case Key.CursorUp:
 				MoveUp ();
 				break;
 
-			case Key.ControlF:
+			case Key.F | Key.CtrlMask:
 			case Key.CursorRight:
 				var currentLine = GetCurrentLine ();
 				if (currentColumn < currentLine.Count) {
@@ -817,7 +817,7 @@ namespace Terminal.Gui {
 				}
 				break;
 
-			case Key.ControlB:
+			case Key.B | Key.CtrlMask:
 			case Key.CursorLeft:
 				if (currentColumn > 0) {
 					currentColumn--;
@@ -880,7 +880,7 @@ namespace Terminal.Gui {
 
 			// Home, C-A
 			case Key.Home:
-			case Key.ControlA:
+			case Key.A | Key.CtrlMask:
 				currentColumn = 0;
 				if (currentColumn < leftColumn) {
 					leftColumn = 0;
@@ -889,7 +889,7 @@ namespace Terminal.Gui {
 					PositionCursor ();
 				break;
 			case Key.DeleteChar:
-			case Key.ControlD: // Delete
+			case Key.D | Key.CtrlMask: // Delete
 				if (isReadOnly)
 					break;
 				currentLine = GetCurrentLine ();
@@ -909,7 +909,7 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.End:
-			case Key.ControlE: // End
+			case Key.E | Key.CtrlMask: // End
 				currentLine = GetCurrentLine ();
 				currentColumn = currentLine.Count;
 				int pcol = leftColumn;
@@ -921,7 +921,7 @@ namespace Terminal.Gui {
 				PositionCursor ();
 				break;
 
-			case Key.ControlK: // kill-to-end
+			case Key.K | Key.CtrlMask: // kill-to-end
 				if (isReadOnly)
 					break;
 				currentLine = GetCurrentLine ();
@@ -946,14 +946,14 @@ namespace Terminal.Gui {
 				lastWasKill = true;
 				break;
 
-			case Key.ControlY: // Control-y, yank
+			case Key.Y | Key.CtrlMask: // Control-y, yank
 				if (isReadOnly)
 					break;
 				InsertText (Clipboard.Contents);
 				selecting = false;
 				break;
 
-			case Key.ControlSpace:
+			case Key.Space | Key.CtrlMask:
 				selecting = true;
 				selectionStartColumn = currentColumn;
 				selectionStartRow = currentRow;
@@ -964,7 +964,7 @@ namespace Terminal.Gui {
 				selecting = false;
 				break;
 
-			case Key.ControlW:
+			case Key.W | Key.CtrlMask:
 				SetClipboard (GetRegion ());
 				if (!isReadOnly)
 					ClearRegion ();

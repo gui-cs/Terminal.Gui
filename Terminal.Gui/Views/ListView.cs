@@ -348,14 +348,14 @@ namespace Terminal.Gui {
 
 			switch (kb.Key) {
 			case Key.CursorUp:
-			case Key.ControlP:
+			case Key.P | Key.CtrlMask:
 				return MoveUp ();
 
 			case Key.CursorDown:
-			case Key.ControlN:
+			case Key.N | Key.CtrlMask:
 				return MoveDown ();
 
-			case Key.ControlV:
+			case Key.V | Key.CtrlMask:
 			case Key.PageDown:
 				return MovePageDown ();
 
@@ -464,7 +464,7 @@ namespace Terminal.Gui {
 		public virtual bool MoveDown ()
 		{
 			if (source.Count == 0) {
-				// Do we set lastSelectedItem to zero here?
+				// Do we set lastSelectedItem to -1 here?
 				return false; //Nothing for us to move to
 			}
 			if (selected >= source.Count) {
@@ -496,7 +496,7 @@ namespace Terminal.Gui {
 		public virtual bool MoveUp ()
 		{
 			if (source.Count == 0) {
-				// Do we set lastSelectedItem to zero here?
+				// Do we set lastSelectedItem to -1 here?
 				return false; //Nothing for us to move to
 			}
 			if (selected >= source.Count) {

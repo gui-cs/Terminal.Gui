@@ -325,7 +325,7 @@ namespace Terminal.Gui {
 			case Key.PageUp:
 				MoveUp (bytesPerLine * Frame.Height);
 				break;
-			case Key.ControlV:
+			case Key.V | Key.CtrlMask:
 			case Key.PageDown:
 				MoveDown (bytesPerLine * Frame.Height);
 				break;

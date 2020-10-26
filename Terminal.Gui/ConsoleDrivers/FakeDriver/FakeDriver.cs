@@ -310,33 +310,35 @@ namespace Terminal.Gui {
 		{
 			switch (keyInfo.Key) {
 			case ConsoleKey.Escape:
-				return Key.Esc;
+				return MapKeyModifiers (keyInfo, Key.Esc);
 			case ConsoleKey.Tab:
 				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.BackTab : Key.Tab;
 			case ConsoleKey.Home:
-				return Key.Home;
+				return MapKeyModifiers (keyInfo, Key.Home);
 			case ConsoleKey.End:
-				return Key.End;
+				return MapKeyModifiers (keyInfo, Key.End);
 			case ConsoleKey.LeftArrow:
-				return Key.CursorLeft;
+				return MapKeyModifiers (keyInfo, Key.CursorLeft);
 			case ConsoleKey.RightArrow:
-				return Key.CursorRight;
+				return MapKeyModifiers (keyInfo, Key.CursorRight);
 			case ConsoleKey.UpArrow:
-				return Key.CursorUp;
+				return MapKeyModifiers (keyInfo, Key.CursorUp);
 			case ConsoleKey.DownArrow:
-				return Key.CursorDown;
+				return MapKeyModifiers (keyInfo, Key.CursorDown);
 			case ConsoleKey.PageUp:
-				return Key.PageUp;
+				return MapKeyModifiers (keyInfo, Key.PageUp);
 			case ConsoleKey.PageDown:
-				return Key.PageDown;
+				return MapKeyModifiers (keyInfo, Key.PageDown);
 			case ConsoleKey.Enter:
-				return Key.Enter;
+				return MapKeyModifiers (keyInfo, Key.Enter);
 			case ConsoleKey.Spacebar:
-				return Key.Space;
+				return MapKeyModifiers (keyInfo, Key.Space);
 			case ConsoleKey.Backspace:
-				return Key.Backspace;
+				return MapKeyModifiers (keyInfo, Key.Backspace);
 			case ConsoleKey.Delete:
-				return Key.Delete;
+				return MapKeyModifiers (keyInfo, Key.DeleteChar);
+			case ConsoleKey.Insert:
+				return MapKeyModifiers (keyInfo, Key.InsertChar);
 
 			case ConsoleKey.Oem1:
 			case ConsoleKey.Oem2:
@@ -351,38 +353,69 @@ namespace Terminal.Gui {
 			case ConsoleKey.OemComma:
 			case ConsoleKey.OemPlus:
 			case ConsoleKey.OemMinus:
+				if (keyInfo.KeyChar == 0)
+					return Key.Unknown;
+
 				return (Key)((uint)keyInfo.KeyChar);
 			}
 
 			var key = keyInfo.Key;
 			if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
 				var delta = key - ConsoleKey.A;
-				if (keyInfo.Modifiers == ConsoleModifiers.Control)
-					return (Key)((uint)Key.ControlA + delta);
-				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
-					return (Key)(((uint)Key.AltMask) | ((uint)'A' + delta));
-				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
-					return (Key)((uint)'A' + delta);
-				else
-					return (Key)((uint)'a' + delta);
+				if (keyInfo.Modifiers == ConsoleModifiers.Control) {
+					return (Key)(((uint)Key.CtrlMask) | ((uint)Key.A + delta));
+				}
+				if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
+					return (Key)(((uint)Key.AltMask) | ((uint)Key.A + delta));
+				}
+				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+					if (keyInfo.KeyChar == 0) {
+						return (Key)(((uint)Key.AltMask | (uint)Key.CtrlMask) | ((uint)Key.A + delta));
+					} else {
+						return (Key)((uint)keyInfo.KeyChar);
+					}
+				}
+				return (Key)((uint)keyInfo.KeyChar);
 			}
 			if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
 				var delta = key - ConsoleKey.D0;
-				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
-					return (Key)(((uint)Key.AltMask) | ((uint)'0' + delta));
-				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
-					return (Key)((uint)keyInfo.KeyChar);
-				return (Key)((uint)'0' + delta);
+				if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
+					return (Key)(((uint)Key.AltMask) | ((uint)Key.D0 + delta));
+				}
+				if (keyInfo.Modifiers == ConsoleModifiers.Control) {
+					return (Key)(((uint)Key.CtrlMask) | ((uint)Key.D0 + delta));
+				}
+				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30) {
+					return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
+				}
+				return (Key)((uint)keyInfo.KeyChar);
 			}
-			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
+			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F12) {
 				var delta = key - ConsoleKey.F1;
+				if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+					return MapKeyModifiers (keyInfo, (Key)((uint)Key.F1 + delta));
+				}
 
-				return (Key)((int)Key.F1 + delta);
+				return (Key)((uint)Key.F1 + delta);
 			}
+
 			return (Key)(0xffffffff);
 		}
 
-		KeyModifiers keyModifiers = new KeyModifiers ();
+		KeyModifiers keyModifiers;
+
+		private Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
+		{
+			Key keyMod = new Key ();
+			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
+				keyMod = Key.ShiftMask;
+			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
+				keyMod |= Key.CtrlMask;
+			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0)
+				keyMod |= Key.AltMask;
+
+			return keyMod != Key.Null ? keyMod | key : key;
+		}
 
 		/// <summary>
 		/// 
@@ -399,6 +432,21 @@ namespace Terminal.Gui {
 				var map = MapKey (consoleKey);
 				if (map == (Key)0xffffffff)
 					return;
+
+				if (keyModifiers == null)
+					keyModifiers = new KeyModifiers ();
+				switch (consoleKey.Modifiers) {
+				case ConsoleModifiers.Alt:
+					keyModifiers.Alt = true;
+					break;
+				case ConsoleModifiers.Shift:
+					keyModifiers.Shift = true;
+					break;
+				case ConsoleModifiers.Control:
+					keyModifiers.Ctrl = true;
+					break;
+				}
+
 				keyHandler (new KeyEvent (map, keyModifiers));
 				keyUpHandler (new KeyEvent (map, keyModifiers));
 			};

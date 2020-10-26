@@ -119,7 +119,7 @@ namespace Terminal.Gui {
 			var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
 
 			Application.Top.KeyPress += (View.KeyEventEventArgs args) => {
-				Assert.Equal (Key.ControlQ, args.KeyEvent.Key);
+				Assert.Equal (Key.CtrlMask | Key.Q, args.KeyEvent.Key);
 			};
 
 			var scenario = (Scenario)Activator.CreateInstance (scenarioClass);

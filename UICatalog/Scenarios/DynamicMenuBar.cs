@@ -207,74 +207,6 @@ namespace UICatalog {
 			};
 			Add (_frmMenuDetails);
 
-			_btnAdd.Clicked += () => {
-				if (MenuBar == null) {
-					MessageBox.ErrorQuery ("Menu Bar Error", "Must add a MenuBar first!", "Ok");
-					_btnAddMenuBar.SetFocus ();
-					return;
-				}
-
-				var frameDetails = new DynamicMenuBarDetails (null, _currentMenuBarItem != null);
-				var item = frameDetails.EnterMenuItem ();
-				if (item == null) {
-					return;
-				}
-
-				if (!(_currentMenuBarItem is MenuBarItem)) {
-					var parent = _currentMenuBarItem.Parent as MenuBarItem;
-					var idx = parent.GetChildrenIndex (_currentMenuBarItem);
-					_currentMenuBarItem = new MenuBarItem (_currentMenuBarItem.Title, new MenuItem [] { }, _currentMenuBarItem.Parent);
-					_currentMenuBarItem.CheckType = item.checkStyle;
-					parent.Children [idx] = _currentMenuBarItem;
-				} else {
-					MenuItem newMenu = CreateNewMenu (item, _currentMenuBarItem);
-					var menuBarItem = _currentMenuBarItem as MenuBarItem;
-					if (menuBarItem == null) {
-						menuBarItem = new MenuBarItem (_currentMenuBarItem.Title, new MenuItem [] { newMenu }, _currentMenuBarItem.Parent);
-					} else if (menuBarItem.Children == null) {
-						menuBarItem.Children = new MenuItem [] { newMenu };
-					} else {
-						var childrens = menuBarItem.Children;
-						Array.Resize (ref childrens, childrens.Length + 1);
-						childrens [childrens.Length - 1] = newMenu;
-						menuBarItem.Children = childrens;
-					}
-					DataContext.Menus.Add (new DynamicMenuItemList (newMenu.Title, newMenu));
-					_lstMenus.MoveDown ();
-				}
-			};
-
-			_btnRemove.Clicked += () => {
-				var menuItem = DataContext.Menus.Count > 0 ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem : null;
-				if (menuItem != null) {
-					var childrens = ((MenuBarItem)_currentMenuBarItem).Children;
-					childrens [_lstMenus.SelectedItem] = null;
-					int i = 0;
-					foreach (var c in childrens) {
-						if (c != null) {
-							childrens [i] = c;
-							i++;
-						}
-					}
-					Array.Resize (ref childrens, childrens.Length - 1);
-					if (childrens.Length == 0) {
-						if (_currentMenuBarItem.Parent == null) {
-							((MenuBarItem)_currentMenuBarItem).Children = null;
-							_currentMenuBarItem.Action = _frmMenuDetails.CreateAction (_currentEditMenuBarItem, new DynamicMenuItem (_currentMenuBarItem.Title));
-						} else {
-							_currentMenuBarItem = new MenuItem (_currentMenuBarItem.Title, _currentMenuBarItem.Help, _frmMenuDetails.CreateAction (_currentEditMenuBarItem, new DynamicMenuItem (_currentEditMenuBarItem.Title)), null, _currentMenuBarItem.Parent);
-						}
-					} else {
-						((MenuBarItem)_currentMenuBarItem).Children = childrens;
-					}
-					DataContext.Menus.RemoveAt (_lstMenus.SelectedItem);
-					if (_lstMenus.Source.Count > 0 && _lstMenus.SelectedItem > _lstMenus.Source.Count - 1) {
-						_lstMenus.SelectedItem = _lstMenus.Source.Count - 1;
-					}
-					_lstMenus.SetNeedsDisplay ();
-				}
-			};
-
 			_btnMenuBarUp.Clicked += () => {
 				var i = _currentSelectedMenuBar;
 				var menuItem = _menuBar != null && _menuBar.Menus.Length > 0 ? _menuBar.Menus [i] : null;
@@ -369,8 +301,7 @@ namespace UICatalog {
 			Add (_btnCancel);
 
 			_lstMenus.SelectedItemChanged += (e) => {
-				var menuBarItem = DataContext.Menus.Count > 0 ? DataContext.Menus [e.Item].MenuItem : null;
-				SetFrameDetails (menuBarItem);
+				SetFrameDetails ();
 			};
 
 			_btnOk.Clicked += () => {
@@ -386,6 +317,75 @@ namespace UICatalog {
 						MenuItemCheckStyle.Radio,
 						_frmMenuDetails._txtShortCut.Text);
 					UpdateMenuItem (_currentEditMenuBarItem, menuItem, _lstMenus.SelectedItem);
+				}
+			};
+
+			_btnAdd.Clicked += () => {
+				if (MenuBar == null) {
+					MessageBox.ErrorQuery ("Menu Bar Error", "Must add a MenuBar first!", "Ok");
+					_btnAddMenuBar.SetFocus ();
+					return;
+				}
+
+				var frameDetails = new DynamicMenuBarDetails (null, _currentMenuBarItem != null);
+				var item = frameDetails.EnterMenuItem ();
+				if (item == null) {
+					return;
+				}
+
+				if (!(_currentMenuBarItem is MenuBarItem)) {
+					var parent = _currentMenuBarItem.Parent as MenuBarItem;
+					var idx = parent.GetChildrenIndex (_currentMenuBarItem);
+					_currentMenuBarItem = new MenuBarItem (_currentMenuBarItem.Title, new MenuItem [] { }, _currentMenuBarItem.Parent);
+					_currentMenuBarItem.CheckType = item.checkStyle;
+					parent.Children [idx] = _currentMenuBarItem;
+				} else {
+					MenuItem newMenu = CreateNewMenu (item, _currentMenuBarItem);
+					var menuBarItem = _currentMenuBarItem as MenuBarItem;
+					if (menuBarItem == null) {
+						menuBarItem = new MenuBarItem (_currentMenuBarItem.Title, new MenuItem [] { newMenu }, _currentMenuBarItem.Parent);
+					} else if (menuBarItem.Children == null) {
+						menuBarItem.Children = new MenuItem [] { newMenu };
+					} else {
+						var childrens = menuBarItem.Children;
+						Array.Resize (ref childrens, childrens.Length + 1);
+						childrens [childrens.Length - 1] = newMenu;
+						menuBarItem.Children = childrens;
+					}
+					DataContext.Menus.Add (new DynamicMenuItemList (newMenu.Title, newMenu));
+					_lstMenus.MoveDown ();
+				}
+			};
+
+			_btnRemove.Clicked += () => {
+				var menuItem = DataContext.Menus.Count > 0 ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem : null;
+				if (menuItem != null) {
+					var childrens = ((MenuBarItem)_currentMenuBarItem).Children;
+					childrens [_lstMenus.SelectedItem] = null;
+					int i = 0;
+					foreach (var c in childrens) {
+						if (c != null) {
+							childrens [i] = c;
+							i++;
+						}
+					}
+					Array.Resize (ref childrens, childrens.Length - 1);
+					if (childrens.Length == 0) {
+						if (_currentMenuBarItem.Parent == null) {
+							((MenuBarItem)_currentMenuBarItem).Children = null;
+							//_currentMenuBarItem.Action = _frmMenuDetails.CreateAction (_currentEditMenuBarItem, new DynamicMenuItem (_currentMenuBarItem.Title));
+						} else {
+							_currentMenuBarItem = new MenuItem (_currentMenuBarItem.Title, _currentMenuBarItem.Help, _frmMenuDetails.CreateAction (_currentEditMenuBarItem, new DynamicMenuItem (_currentEditMenuBarItem.Title)), null, _currentMenuBarItem.Parent);
+						}
+					} else {
+						((MenuBarItem)_currentMenuBarItem).Children = childrens;
+					}
+					DataContext.Menus.RemoveAt (_lstMenus.SelectedItem);
+					if (_lstMenus.Source.Count > 0 && _lstMenus.SelectedItem > _lstMenus.Source.Count - 1) {
+						_lstMenus.SelectedItem = _lstMenus.Source.Count - 1;
+					}
+					_lstMenus.SetNeedsDisplay ();
+					SetFrameDetails ();
 				}
 			};
 
@@ -503,8 +503,16 @@ namespace UICatalog {
 			var lstMenus = new Binding (this, "Menus", _lstMenus, "Source", listWrapperConverter);
 
 
-			void SetFrameDetails (MenuItem menuItem = null)
+			void SetFrameDetails (MenuItem menuBarItem = null)
 			{
+				MenuItem menuItem;
+
+				if (menuBarItem == null) {
+					menuItem = DataContext.Menus.Count > 0 ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem : null;
+				} else {
+					menuItem = menuBarItem;
+				}
+
 				_currentEditMenuBarItem = menuItem;
 				_frmMenuDetails.EditMenuBarItem (menuItem);
 				var f = _btnOk.CanFocus == _frmMenuDetails.CanFocus;
@@ -555,14 +563,14 @@ namespace UICatalog {
 					newMenu = new MenuItem (item.title, item.help, null, null, parent);
 					newMenu.CheckType = item.checkStyle;
 					newMenu.Action = _frmMenuDetails.CreateAction (newMenu, item);
-					newMenu.ShortCut = newMenu.CreateShortCutFromTag (item.shortCut);
+					newMenu.ShortCut = ShortCutHelper.GetShortCutFromTag (item.shortCut);
 				} else if (item.isTopLevel) {
 					newMenu = new MenuBarItem (item.title, item.help, null);
 					newMenu.Action = _frmMenuDetails.CreateAction (newMenu, item);
 				} else {
 					newMenu = new MenuBarItem (item.title, item.help, null);
 					((MenuBarItem)newMenu).Children [0].Action = _frmMenuDetails.CreateAction (newMenu, item);
-					((MenuBarItem)newMenu).Children [0].ShortCut = newMenu.CreateShortCutFromTag (item.shortCut);
+					((MenuBarItem)newMenu).Children [0].ShortCut = ShortCutHelper.GetShortCutFromTag (item.shortCut);
 				}
 
 				return newMenu;
@@ -600,7 +608,7 @@ namespace UICatalog {
 						DataContext.Menus = new List<DynamicMenuItemList> ();
 					}
 					_currentEditMenuBarItem.Action = _frmMenuDetails.CreateAction (_currentEditMenuBarItem, menuItem);
-					_currentEditMenuBarItem.ShortCut = _currentEditMenuBarItem.CreateShortCutFromTag (menuItem.shortCut);
+					_currentEditMenuBarItem.ShortCut = ShortCutHelper.GetShortCutFromTag (menuItem.shortCut);
 				}
 
 				if (_currentEditMenuBarItem.Parent == null) {
@@ -713,54 +721,53 @@ namespace UICatalog {
 				ReadOnly = true
 			};
 			_txtShortCut.KeyDown += (e) => {
-				var k = GetModifiersKey (e.KeyEvent);
-				if (((k & (Key.CtrlMask | Key.ShiftMask | Key.AltMask)) == 0 && !CheckFlagRange (k, Key.F1, Key.F12))) {
-					_txtShortCut.Text = "";
+				if (!ProcessKey (e.KeyEvent)) {
 					return;
 				}
 
-				GetShortCut (k);
-				e.Handled = true;
+				var k = GetModifiersKey (e.KeyEvent);
+				if (CheckShortCut (k, true)) {
+					e.Handled = true;
+				}
 			};
 
-			bool CheckFlagRange (Key key, Key first, Key last)
+			bool ProcessKey (KeyEvent ev)
 			{
-				for (uint i = (uint)first; i < (uint)last; i++) {
-					if ((key | (Key)i) == key) {
-						return true;
-					}
+				switch (ev.Key) {
+				case Key.CursorUp:
+				case Key.CursorDown:
+				case Key.Tab:
+				case Key.BackTab:
+					return false;
 				}
-				return false;
+
+				return true;
 			}
 
-			void GetShortCut (Key k)
+			bool CheckShortCut (Key k, bool pre)
 			{
 				var m = _menuItem != null ? _menuItem : new MenuItem ();
-				var s = m.GetShortCutTag (k);
-				if (s.Contains ("Unknow")) {
+				if (pre && !ShortCutHelper.PreShortCutValidation (k)) {
 					_txtShortCut.Text = "";
-				} else {
-					_txtShortCut.Text = s;
+					return false;
 				}
+				if (!pre) {
+					if (!ShortCutHelper.PostShortCutValidation (ShortCutHelper.GetShortCutFromTag (_txtShortCut.Text))) {
+						_txtShortCut.Text = "";
+						return false;
+					}
+					return true;
+				}
+				_txtShortCut.Text = ShortCutHelper.GetShortCutTag (k);
+
+				return true;
 			}
 
 			_txtShortCut.KeyUp += (e) => {
 				var k = GetModifiersKey (e.KeyEvent);
-				if ((k & (Key.CtrlMask | Key.ShiftMask | Key.AltMask)) == 0 || ((k | Key.D0) == 0 && !CheckFlagRange (k, Key.F1, Key.F12))) {
-					return;
+				if (CheckShortCut (k, false)) {
+					e.Handled = true;
 				}
-
-				e.Handled = true;
-				var kVal = (Key)e.KeyEvent.KeyValue;
-				if ((kVal & Key.D0) != 0) {
-
-				} else if ((kVal == Key.CtrlMask || kVal == Key.ShiftMask || kVal == Key.AltMask ||
-				       (kVal & (Key.CtrlMask | Key.ShiftMask)) != 0 || (kVal & (Key.CtrlMask | Key.AltMask)) != 0 || (kVal & (Key.ShiftMask | Key.AltMask)) != 0 ||
-				       (kVal & (Key.CtrlMask | Key.ShiftMask | Key.AltMask)) != 0) && !kVal.ToString ().Contains ("Control")) {
-					return;
-				}
-				GetShortCut (k);
-				e.Handled = true;
 			};
 			Add (_txtShortCut);
 
@@ -865,6 +872,7 @@ namespace UICatalog {
 			Height = Dim.Fill () - 1;
 			_dialog.Add (this);
 			_txtTitle.SetFocus ();
+			_txtTitle.CursorPosition = _txtTitle.Text.Length;
 			Application.Run (_dialog);
 
 			if (valid) {
@@ -884,6 +892,7 @@ namespace UICatalog {
 			if (menuItem == null) {
 				hasParent = false;
 				CanFocus = false;
+				CleanEditMenuBarItem ();
 				return;
 			} else {
 				hasParent = menuItem.Parent != null;
@@ -900,6 +909,17 @@ namespace UICatalog {
 			_rbChkStyle.SelectedItem = (int)(menuItem?.CheckType ?? MenuItemCheckStyle.NoCheck);
 			_txtShortCut.Text = menuItem?.ShortCutTag ?? "";
 			_txtShortCut.CanFocus = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
+		}
+
+		void CleanEditMenuBarItem ()
+		{
+			_txtTitle.Text = "";
+			_txtHelp.Text = "";
+			_txtAction.Text = "";
+			_ckbIsTopLevel.Checked = false;
+			_ckbSubMenu.Checked = false;
+			_rbChkStyle.SelectedItem = (int)MenuItemCheckStyle.NoCheck;
+			_txtShortCut.Text = "";
 		}
 
 		ustring GetTargetAction (Action action)

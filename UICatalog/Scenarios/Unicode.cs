@@ -37,7 +37,7 @@ namespace UICatalog {
 			Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.ControlQ, "~^Q~ Выход", () => Application.RequestStop()),
+				new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Выход", () => Application.RequestStop()),
 				new StatusItem (Key.Unknown, "~F2~ Создать", null),
 				new StatusItem(Key.Unknown, "~F3~ Со_хранить", null),
 			});

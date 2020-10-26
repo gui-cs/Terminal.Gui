@@ -59,7 +59,7 @@ namespace UICatalog {
 		public override void Setup ()
 		{
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.ControlQ, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 				new StatusItem(Key.F2, "~F2~ Toggle Frame Ruler", () => {
 					ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
 					Top.SetNeedsDisplay ();

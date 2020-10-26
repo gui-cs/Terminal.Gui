@@ -182,6 +182,18 @@ namespace Terminal.Gui {
 			case Curses.ShiftCtrlKeyEnd: return Key.End | Key.ShiftMask | Key.CtrlMask;
 			case Curses.ShiftCtrlKeyNPage: return Key.PageDown | Key.ShiftMask | Key.CtrlMask;
 			case Curses.ShiftCtrlKeyPPage: return Key.PageUp | Key.ShiftMask | Key.CtrlMask;
+			case Curses.ShiftAltKeyUp: return Key.CursorUp | Key.ShiftMask | Key.AltMask;
+			case Curses.ShiftAltKeyDown: return Key.CursorDown | Key.ShiftMask | Key.AltMask;
+			case Curses.ShiftAltKeyLeft: return Key.CursorLeft | Key.ShiftMask | Key.AltMask;
+			case Curses.ShiftAltKeyRight: return Key.CursorRight | Key.ShiftMask | Key.AltMask;
+			case Curses.ShiftAltKeyNPage: return Key.PageDown | Key.ShiftMask | Key.AltMask;
+			case Curses.ShiftAltKeyPPage: return Key.PageUp | Key.ShiftMask | Key.AltMask;
+			case Curses.ShiftAltKeyHome: return Key.Home | Key.ShiftMask | Key.AltMask;
+			case Curses.ShiftAltKeyEnd: return Key.End | Key.ShiftMask | Key.AltMask;
+			case Curses.AltCtrlKeyNPage: return Key.PageDown | Key.AltMask | Key.CtrlMask;
+			case Curses.AltCtrlKeyPPage: return Key.PageUp | Key.AltMask | Key.CtrlMask;
+			case Curses.AltCtrlKeyHome: return Key.Home | Key.AltMask | Key.CtrlMask;
+			case Curses.AltCtrlKeyEnd: return Key.End | Key.AltMask | Key.CtrlMask;
 			default: return Key.Unknown;
 			}
 		}
@@ -457,7 +469,7 @@ namespace Terminal.Gui {
 				return;
 
 			keyModifiers = new KeyModifiers ();
-			Key k;
+			Key k = Key.Null;
 
 			if (code == Curses.KEY_CODE_YES) {
 				if (wch == Curses.KeyResize) {
@@ -485,6 +497,9 @@ namespace Terminal.Gui {
 				} else if (wch >= 313 && wch <= 324) { // Alt+(F1 - F12)
 					wch -= 48;
 					k = Key.AltMask | MapCursesKey (wch);
+				} else if (wch >= 325 && wch <= 327) { // Shift+Alt+(F1 - F3)
+					wch -= 60;
+					k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch);
 				}
 				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
@@ -500,7 +515,6 @@ namespace Terminal.Gui {
 
 				if (code == Curses.KEY_CODE_YES) {
 					k = Key.AltMask | MapCursesKey (wch);
-					keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				}
 				if (code == 0) {
 					KeyEvent key;
@@ -509,20 +523,15 @@ namespace Terminal.Gui {
 					// Simulates the AltMask itself by pressing Alt + Space.
 					if (wch2 == (int)Key.Space) {
 						k = Key.AltMask;
-						key = new KeyEvent (k, MapKeyModifiers (k));
-					} else if (wch2 - (int)Key.Space >= 'A' && wch2 - (int)Key.Space <= 'Z') {
+					} else if (wch2 - (int)Key.Space >= (uint)Key.A && wch2 - (int)Key.Space <= (uint)Key.Z) {
 						k = (Key)((uint)Key.AltMask + (wch2 - (int)Key.Space));
-						key = new KeyEvent (k, MapKeyModifiers (k));
-					} else if (wch2 >= (uint)Key.ControlA && wch2 <= (uint)Key.ControlZ) {
-						k = (Key)((uint)(Key.AltMask | Key.CtrlMask) + wch2);
-						key = new KeyEvent (k, MapKeyModifiers (k));
-					} else if (wch2 >= '0' && wch2 <= '9') {
-						k = (Key)((uint)Key.AltMask + (uint)Key.D0 + (wch2 - '0'));
-						key = new KeyEvent (k, MapKeyModifiers (k));
+					} else if (wch2 >= (uint)Key.A - 64 && wch2 <= (uint)Key.Z - 64) {
+						k = (Key)((uint)(Key.AltMask | Key.CtrlMask) + (wch2 + 64));
+					} else if (wch2 >= (uint)Key.D0 && wch2 <= (uint)Key.D9) {
+						k = (Key)((uint)Key.AltMask + (uint)Key.D0 + (wch2 - (uint)Key.D0));
 					} else if (wch2 == 27) {
 						k = (Key)wch2;
-						key = new KeyEvent (k, MapKeyModifiers (k));
-					} else if (wch2 == 91) {
+					} else if (wch2 == Curses.KEY_CODE_SEQ) {
 						int [] c = null;
 						while (code == 0) {
 							code = Curses.get_wch (out wch2);
@@ -531,46 +540,62 @@ namespace Terminal.Gui {
 								c [c.Length - 1] = wch2;
 							}
 						}
-						if (c [0] == 49 && c [1] == 59 && c [2] == 55) { // Ctrl+Alt+(F1 - F4)
+						if (c [0] == 49 && c [1] == 59 && c [2] == 55 && c [3] >= 80 && c [3] <= 83) { // Ctrl+Alt+(F1 - F4)
 							wch2 = c [3] + 185;
 							k = Key.CtrlMask | Key.AltMask | MapCursesKey (wch2);
-						} else if (c [0] == 49 && c [2] == 59 && c [3] == 55 && c [4] == 126) { // Ctrl+Alt+(F5 - F8)
+						} else if (c [0] == 49 && c [2] == 59 && c [3] == 55 && c [4] == 126 && c [1] >= 53 && c [1] <= 57) { // Ctrl+Alt+(F5 - F8)
 							wch2 = c [1] == 53 ? c [1] + 216 : c [1] + 215;
 							k = Key.CtrlMask | Key.AltMask | MapCursesKey (wch2);
-						} else if (c [0] == 50 && c [2] == 59 && c [3] == 55 && c [4] == 126) { // Ctrl+Alt+(F9 - F12)
+						} else if (c [0] == 50 && c [2] == 59 && c [3] == 55 && c [4] == 126 && c [1] >= 48 && c [1] <= 52) { // Ctrl+Alt+(F9 - F12)
 							wch2 = c [1] < 51 ? c [1] + 225 : c [1] + 224;
 							k = Key.CtrlMask | Key.AltMask | MapCursesKey (wch2);
-						} else if (c [0] == 49 && c [1] == 59 && c [2] == 56) { // Ctrl+Shift+Alt+(F1 - F4)
+						} else if (c [0] == 49 && c [1] == 59 && c [2] == 56 && c [3] >= 80 && c [3] <= 83) { // Ctrl+Shift+Alt+(F1 - F4)
 							wch2 = c [3] + 185;
 							k = Key.CtrlMask | Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
-						} else if (c [0] == 49 && c [2] == 59 && c [3] == 56 && c [4] == 126) { // Ctrl+Shift+Alt+(F5 - F8)
+						} else if (c [0] == 49 && c [2] == 59 && c [3] == 56 && c [4] == 126 && c [1] >= 53 && c [1] <= 57) { // Ctrl+Shift+Alt+(F5 - F8)
 							wch2 = c [1] == 53 ? c [1] + 216 : c [1] + 215;
 							k = Key.CtrlMask | Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
-						} else if (c [0] == 50 && c [2] == 59 && c [3] == 56 && c [4] == 126) {  // Ctrl+Shift+Alt+(F9 - F12)
+						} else if (c [0] == 50 && c [2] == 59 && c [3] == 56 && c [4] == 126 && c [1] >= 48 && c [1] <= 52) {  // Ctrl+Shift+Alt+(F9 - F12)
 							wch2 = c [1] < 51 ? c [1] + 225 : c [1] + 224;
 							k = Key.CtrlMask | Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 49 && c [1] == 59 && c [2] == 52 && c [3] == 83) {  // Shift+Alt+(F4)
+							wch2 = 268;
+							k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 49 && c [2] == 59 && c [3] == 52 && c [4] == 126 && c [1] >= 53 && c [1] <= 57) {  // Shift+Alt+(F5 - F8)
+							wch2 = c [1] < 55 ? c [1] + 216 : c [1] + 215;
+							k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 50 && c [2] == 59 && c [3] == 52 && c [4] == 126 && c [1] >= 48 && c [1] <= 52) {  // Shift+Alt+(F9 - F12)
+							wch2 = c [1] < 51 ? c [1] + 225 : c [1] + 224;
+							k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch2);
+						} else if (c [0] == 54 && c [1] == 59 && c [2] == 56 && c [3] == 126) {  // Shift+Ctrl+Alt+KeyNPage
+							k = Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.PageDown;
+						} else if (c [0] == 53 && c [1] == 59 && c [2] == 56 && c [3] == 126) {  // Shift+Ctrl+Alt+KeyPPage
+							k = Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.PageUp;
+						} else if (c [0] == 49 && c [1] == 59 && c [2] == 56 && c [3] == 72) {  // Shift+Ctrl+Alt+KeyHome
+							k = Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.Home;
+						} else if (c [0] == 49 && c [1] == 59 && c [2] == 56 && c [3] == 70) {  // Shift+Ctrl+Alt+KeyEnd
+							k = Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.End;
 						} else {
 							k = MapCursesKey (wch2);
 						}
-						key = new KeyEvent (k, MapKeyModifiers (k));
 					} else {
 						// Unfortunately there are no way to differentiate Ctrl+Alt+alfa and Ctrl+Shift+Alt+alfa.
+						if (((Key)wch2 & Key.CtrlMask) != 0) {
+							keyModifiers.Ctrl = true;
+						}
 						if (wch2 == 0) {
 							k = Key.CtrlMask | Key.AltMask | Key.Space;
+						} else if (wch >= (uint)Key.A && wch <= (uint)Key.Z) {
+							keyModifiers.Shift = true;
+							keyModifiers.Alt = true;
+						} else if (wch2 < 256) {
+							k = (Key)wch2;
+							keyModifiers.Alt = true;
 						} else {
-							if (((Key)wch2).ToString ().Contains ("Control")) {
-								keyModifiers.Ctrl = true;
-							}
-							if (wch2 < 256) {
-								k = Key.AltMask | (Key)wch2;
-							} else {
-								//k = (Key)wch2;
-								//keyModifiers.Alt = true;
-								k = (Key)((uint)(Key.AltMask | Key.CtrlMask) + wch2);
-							}
+							k = (Key)((uint)(Key.AltMask | Key.CtrlMask) + wch2);
 						}
-						key = new KeyEvent (k, MapKeyModifiers (k));
 					}
+					key = new KeyEvent (k, MapKeyModifiers (k));
 					keyDownHandler (key);
 					keyHandler (key);
 				} else {
@@ -586,10 +611,11 @@ namespace Terminal.Gui {
 				k = (Key)wch;
 				if (wch == 0) {
 					k = Key.CtrlMask | Key.Space;
-				} else if (wch >= (uint)Key.ControlA && wch <= (uint)Key.ControlZ) {
-					k = (Key)wch;
-					keyModifiers.Ctrl = true;
-				} else if (wch >= 'A' && wch <= 'Z') {
+				} else if (wch >= (uint)Key.A - 64 && wch <= (uint)Key.Z - 64) {
+					if ((Key)(wch + 64) != Key.J) {
+						k = Key.CtrlMask | (Key)(wch + 64);
+					}
+				} else if (wch >= (uint)Key.A && wch <= (uint)Key.Z) {
 					keyModifiers.Shift = true;
 				}
 				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));

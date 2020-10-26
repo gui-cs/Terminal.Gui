@@ -168,6 +168,14 @@ namespace Terminal.Gui {
 		{
 			if (_initialized && driver == null) return;
 
+			// Used only for start debugging on Unix.
+//#if DEBUG
+//			while (!System.Diagnostics.Debugger.IsAttached) {
+//				System.Threading.Thread.Sleep (100);
+//			}
+//			System.Diagnostics.Debugger.Break ();
+//#endif
+
 			// This supports Unit Tests and the passing of a mock driver/loopdriver
 			if (driver != null) {
 				if (mainLoopDriver == null) {

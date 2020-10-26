@@ -41,17 +41,19 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class MenuItem {
 		ustring title;
-		Key shortCut;
+
+		ShortCutHelper shortCutHelper;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="MenuItem"/>
 		/// </summary>
-		public MenuItem (Key shortCut = Key.ControlSpace)
+		public MenuItem (Key shortCut = Key.Null)
 		{
 			Title = "";
 			Help = "";
-			if (shortCut != Key.ControlSpace) {
-				ShortCut = shortCut;
+			shortCutHelper = new ShortCutHelper ();
+			if (shortCut != Key.Null) {
+				shortCutHelper.ShortCut = shortCut;
 			}
 		}
 
@@ -64,15 +66,16 @@ namespace Terminal.Gui {
 		/// <param name="canExecute">Function to determine if the action can currently be executed.</param>
 		/// <param name="parent">The <see cref="Parent"/> of this menu item.</param>
 		/// <param name="shortCut">The <see cref="ShortCut"/> keystroke combination.</param>
-		public MenuItem (ustring title, ustring help, Action action, Func<bool> canExecute = null, MenuItem parent = null, Key shortCut = Key.ControlSpace)
+		public MenuItem (ustring title, ustring help, Action action, Func<bool> canExecute = null, MenuItem parent = null, Key shortCut = Key.Null)
 		{
 			Title = title ?? "";
 			Help = help ?? "";
 			Action = action;
 			CanExecute = canExecute;
 			Parent = parent;
-			if (shortCut != Key.ControlSpace) {
-				ShortCut = shortCut;
+			shortCutHelper = new ShortCutHelper ();
+			if (shortCut != Key.Null) {
+				shortCutHelper.ShortCut = shortCut;
 			}
 		}
 
@@ -84,25 +87,21 @@ namespace Terminal.Gui {
 		public Rune HotKey;
 
 		/// <summary>
-		/// This is the global setting that can be used as a global shortcut to invoke the action on the menu.
+		/// This is the global setting that can be used as a global <see cref="ShortCutHelper.ShortCut"/> to invoke the action on the menu.
 		/// </summary>
 		public Key ShortCut {
-			get => shortCut;
+			get => shortCutHelper.ShortCut;
 			set {
-				if (shortCut != value) {
-					if (GetKeyToString (value).Contains ("Control")) {
-						shortCut = Key.CtrlMask | value;
-					} else {
-						shortCut = value;
-					}
+				if (shortCutHelper.ShortCut != value && (ShortCutHelper.PostShortCutValidation (value) || value == Key.Null)) {
+					shortCutHelper.ShortCut = value;
 				}
 			}
 		}
 
 		/// <summary>
-		/// The keystroke combination used in the <see cref="ShortCut"/> as string.
+		/// The keystroke combination used in the <see cref="ShortCutHelper.ShortCutTag"/> as string.
 		/// </summary>
-		public ustring ShortCutTag => GetShortCutTag (shortCut);
+		public ustring ShortCutTag => ShortCutHelper.GetShortCutTag (shortCutHelper.ShortCut);
 
 		/// <summary>
 		/// Gets or sets the title.
@@ -200,137 +199,6 @@ namespace Terminal.Gui {
 					HotKey = default;
 				}
 			}
-		}
-
-		/// <summary>
-		/// Get the <see cref="ShortCut"/> key as string.
-		/// </summary>
-		/// <param name="shortCut">The shortcut key.</param>
-		/// <returns></returns>
-		public ustring GetShortCutTag (Key shortCut)
-		{
-			if (shortCut == Key.ControlSpace) {
-				return "";
-			}
-
-			var k = (uint)shortCut;
-			var delimiter = MenuBar.ShortCutDelimiter;
-			ustring tag = ustring.Empty;
-			var sCut = GetKeyToString (shortCut).ToString ();
-			if (sCut.Contains ("Control") || (shortCut & Key.CtrlMask) != 0) {
-				tag = "Ctrl";
-			}
-			if ((shortCut & Key.ShiftMask) != 0) {
-				if (!tag.IsEmpty) {
-					tag += delimiter;
-				}
-				tag += "Shift";
-			}
-			if ((shortCut & Key.AltMask) != 0) {
-				if (!tag.IsEmpty) {
-					tag += delimiter;
-				}
-				tag += "Alt";
-			}
-
-			ustring [] keys = ustring.Make (sCut).Split (",");
-			for (int i = 0; i < keys.Length; i++) {
-				var key = keys [i].TrimSpace ();
-				if (key == Key.AltMask.ToString () || key == Key.ShiftMask.ToString () || key == Key.CtrlMask.ToString ()) {
-					continue;
-				}
-				if (!tag.IsEmpty) {
-					tag += delimiter;
-				}
-				if (key.Contains ("Control")) {
-					tag += ((char)key.ElementAt (7)).ToString ();
-				} else if (!key.Contains ("F") && key.Length > 2 && keys.Length == 1) {
-					k = (uint)Key.AltMask + k;
-					tag += ((char)k).ToString ();
-				} else if (key.Length == 2 && key.StartsWith ("D")) {
-					tag += ((char)key.ElementAt (1)).ToString ();
-				} else {
-					tag += key;
-				}
-			}
-
-			return tag;
-		}
-
-		ustring GetKeyToString (Key key)
-		{
-			if (key == Key.ControlSpace) {
-				return "";
-			}
-
-			var mK = key & (Key.AltMask | Key.CtrlMask | Key.ShiftMask);
-			for (uint i = (uint)Key.F1; i < (uint)Key.F12; i++) {
-				if ((key | (Key)i) == key) {
-					mK |= (Key)i;
-				}
-			}
-			var k = key;
-			k &= ~mK;
-			int.TryParse (k.ToString (), out int c);
-			var s = mK == Key.ControlSpace ? "" : mK.ToString ();
-			if (s != "" && (k != Key.ControlSpace || c > 0)) {
-				s += ",";
-			}
-			s += c == 0 ? k == Key.ControlSpace ? "" : k.ToString () : ((char)c).ToString ();
-			return s;
-		}
-
-		/// <summary>
-		/// Allows to generate a <see cref="Key"/> from a <see cref="ShortCutTag"/>
-		/// </summary>
-		/// <param name="tag">The key as string.</param>
-		/// <returns></returns>
-		public Key CreateShortCutFromTag (ustring tag)
-		{
-			var sCut = tag;
-			if (sCut.IsEmpty) {
-				return default;
-			}
-
-			Key key = Key.ControlSpace;
-			var hasCtrl = false;
-			var delimiter = MenuBar.ShortCutDelimiter;
-
-			ustring [] keys = sCut.Split (delimiter);
-			for (int i = 0; i < keys.Length; i++) {
-				var k = keys [i];
-				if (k == "Ctrl") {
-					hasCtrl = true;
-					key |= Key.CtrlMask;
-				} else if (k == "Shift") {
-					key |= Key.ShiftMask;
-				} else if (k == "Alt") {
-					key |= Key.AltMask;
-				} else if (k.StartsWith ("F") && k.Length > 1) {
-					int.TryParse (k.Substring (1).ToString (), out int n);
-					for (uint j = (uint)Key.F1; j < (uint)Key.F12; j++) {
-						int.TryParse (((Key)j).ToString ().Substring (1), out int f);
-						if (f == n) {
-							key |= (Key)j;
-						}
-					}
-				} else if (k [0] >= 'A' && k [0] <= 'Z') {
-					if (hasCtrl) {
-						var n = k [0] - 'A' + 1;
-						var d = n - (uint)Key.ControlA;
-						key |= (Key)((uint)Key.ControlA + d);
-					} else {
-						key |= (Key)k [0];
-					}
-				} else if (k [0] >= '0' && k [0] <= '9') {
-					//var n = k [0] - (uint)Key.D0 + 1;
-					//var d = n - (uint)Key.D0;
-					//key |= (Key)((uint)Key.D0 + d);
-					key |= (Key)k [0];
-				}
-			}
-
-			return key;
 		}
 	}
 
@@ -513,7 +381,7 @@ namespace Terminal.Gui {
 			} else {
 
 				current = -1;
-				for (int i = 0; i < barItems.Children.Length; i++) {
+				for (int i = 0; i < barItems.Children?.Length; i++) {
 					if (barItems.Children [i] != null) {
 						current = i;
 						break;
@@ -1473,7 +1341,7 @@ namespace Terminal.Gui {
 				if (mi == null) {
 					continue;
 				}
-				if ((!(mi is MenuBarItem mbiTopLevel) || mbiTopLevel.IsTopLevel) && mi.ShortCut != Key.ControlSpace && mi.ShortCut == (Key)key) {
+				if ((!(mi is MenuBarItem mbiTopLevel) || mbiTopLevel.IsTopLevel) && mi.ShortCut != Key.Null && mi.ShortCut == (Key)key) {
 					var action = mi.Action;
 					if (action != null) {
 						Application.MainLoop.AddIdle (() => {
@@ -1548,7 +1416,7 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.Esc:
-			case Key.ControlC:
+			case Key.C | Key.CtrlMask:
 				//TODO: Running = false;
 				CloseMenu ();
 				if (openedByAltKey) {

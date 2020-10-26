@@ -101,7 +101,7 @@ namespace UICatalog {
 				Y = Pos.Top (editLabel) + 4,
 			};
 			Win.Add (keyLogLabel);
-			var fakeKeyPress = new KeyEvent (Key.ControlA, new KeyModifiers () {
+			var fakeKeyPress = new KeyEvent (Key.CtrlMask | Key.A, new KeyModifiers () {
 				Alt = true,
 				Ctrl = true,
 				Shift = true

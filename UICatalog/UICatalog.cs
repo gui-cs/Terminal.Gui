@@ -157,14 +157,14 @@ namespace UICatalog {
 
 			_menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_Quit", "", () => Application.RequestStop(), null, null, Key.ControlQ)
+					new MenuItem ("_Quit", "", () => Application.RequestStop(), null, null, Key.Q | Key.CtrlMask)
 				}),
 				new MenuBarItem ("_Color Scheme", CreateColorSchemeMenuItems()),
 				new MenuBarItem ("Diag_ostics", CreateDiagnosticMenuItems()),
 				new MenuBarItem ("_Help", new MenuItem [] {
 					new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://migueldeicaza.github.io/gui.cs/articles/overview.html"), null, null, Key.F1),
 					new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/migueldeicaza/gui.cs"), null, null, Key.F2),
-					new MenuItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "_Ok"), null, null, Key.ControlA),
+					new MenuItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
 				})
 			});
 
@@ -229,7 +229,7 @@ namespace UICatalog {
 				_capslock,
 				_numlock,
 				_scrolllock,
-				new StatusItem(Key.ControlQ, "~CTRL-Q~ Quit", () => {
+				new StatusItem(Key.Q | Key.CtrlMask, "~CTRL-Q~ Quit", () => {
 					if (_runningScenario is null){
 						// This causes GetScenarioToRun to return null
 						_runningScenario = null;
