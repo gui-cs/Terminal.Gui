@@ -2242,5 +2242,69 @@ namespace Terminal.Gui {
 			Assert.Equal ("\u2460\u2461\u2462", list [0]);
 			Assert.Equal ("\u2460\u2461\u2462\u2463\u2464", list [1]);
 		}
+
+		[Fact]
+		public void System_Rune_ColumnWidth ()
+		{
+			var c = new System.Rune ('a');
+			Assert.Equal (1, Rune.ColumnWidth (c));
+			Assert.Equal (1, ustring.Make (c).ConsoleWidth);
+			Assert.Equal (1, ustring.Make (c).Length);
+
+			c = new System.Rune ('b');
+			Assert.Equal (1, Rune.ColumnWidth (c));
+			Assert.Equal (1, ustring.Make (c).ConsoleWidth);
+			Assert.Equal (1, ustring.Make (c).Length);
+
+			c = new System.Rune (123);
+			Assert.Equal (1, Rune.ColumnWidth (c));
+			Assert.Equal (1, ustring.Make (c).ConsoleWidth);
+			Assert.Equal (1, ustring.Make (c).Length);
+
+			c = new System.Rune (4432);
+			Assert.Equal (2, Rune.ColumnWidth (c));      // 0x1150	ᅐ	Unicode Technical Report #11
+			Assert.Equal (2, ustring.Make (c).ConsoleWidth);
+			Assert.Equal (3, ustring.Make (c).Length);
+
+			c = new System.Rune (4449);
+			Assert.Equal (0, Rune.ColumnWidth (c));      // 0x1161	ᅡ	column width of 0
+			Assert.Equal (0, ustring.Make (c).ConsoleWidth);
+			Assert.Equal (3, ustring.Make (c).Length);
+
+			c = new System.Rune (31);
+			Assert.Equal (0, Rune.ColumnWidth (c));        // non printable character
+			Assert.Equal (0, ustring.Make (c).ConsoleWidth);
+			Assert.Equal (1, ustring.Make (c).Length);
+
+			c = new System.Rune (127);
+			Assert.Equal (0, Rune.ColumnWidth (c));       // non printable character
+			Assert.Equal (0, ustring.Make (c).ConsoleWidth);
+			Assert.Equal (1, ustring.Make (c).Length);
+		}
+
+		[Fact]
+		public void System_Text_Rune ()
+		{
+			var c = new System.Text.Rune ('a');
+			Assert.Equal (1, c.Utf8SequenceLength);
+
+			c = new System.Text.Rune ('b');
+			Assert.Equal (1, c.Utf8SequenceLength);
+
+			c = new System.Text.Rune (123);
+			Assert.Equal (1, c.Utf8SequenceLength);
+
+			c = new System.Text.Rune (4432);
+			Assert.Equal (3, c.Utf8SequenceLength);		// 0x1150	ᅐ	Unicode Technical Report #11
+
+			c = new System.Text.Rune (4449);
+			Assert.Equal (3, c.Utf8SequenceLength);		// 0x1161	ᅡ	column width of 0
+
+			c = new System.Text.Rune (31);
+			Assert.Equal (1, c.Utf8SequenceLength);		// non printable character
+
+			c = new System.Text.Rune (127);
+			Assert.Equal (1, c.Utf8SequenceLength);		// non printable character
+		}
 	}
 }
