@@ -2261,12 +2261,12 @@ namespace Terminal.Gui {
 			Assert.Equal (1, ustring.Make (c).ConsoleWidth);
 			Assert.Equal (1, ustring.Make (c).Length);
 
-			c = new System.Rune (4432);
+			c = new System.Rune ('\u1150');
 			Assert.Equal (2, Rune.ColumnWidth (c));      // 0x1150	ᅐ	Unicode Technical Report #11
 			Assert.Equal (2, ustring.Make (c).ConsoleWidth);
 			Assert.Equal (3, ustring.Make (c).Length);
 
-			c = new System.Rune (4449);
+			c = new System.Rune ('\u1161');
 			Assert.Equal (0, Rune.ColumnWidth (c));      // 0x1161	ᅡ	column width of 0
 			Assert.Equal (0, ustring.Make (c).ConsoleWidth);
 			Assert.Equal (3, ustring.Make (c).Length);
@@ -2294,10 +2294,10 @@ namespace Terminal.Gui {
 			c = new System.Text.Rune (123);
 			Assert.Equal (1, c.Utf8SequenceLength);
 
-			c = new System.Text.Rune (4432);
+			c = new System.Text.Rune ('\u1150');
 			Assert.Equal (3, c.Utf8SequenceLength);		// 0x1150	ᅐ	Unicode Technical Report #11
 
-			c = new System.Text.Rune (4449);
+			c = new System.Text.Rune ('\u1161');
 			Assert.Equal (3, c.Utf8SequenceLength);		// 0x1161	ᅡ	column width of 0
 
 			c = new System.Text.Rune (31);
