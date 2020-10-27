@@ -48,13 +48,13 @@ namespace Terminal.Gui {
 		/// <param name="text">Initial text contents.</param>
 		public TextField (string text) : this (ustring.Make (text))
 		{
-			Height = 1;
+			Initialize ();
 		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
-		public TextField () : this (string.Empty) { }
+		public TextField () : this (string.Empty) { Initialize (); }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
@@ -80,6 +80,8 @@ namespace Terminal.Gui {
 
 		void Initialize (ustring text, int w)
 		{
+			Initialize ();
+
 			if (text == null)
 				text = "";
 
@@ -89,6 +91,11 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			Used = true;
 			WantMousePositionReports = true;
+		}
+
+		void Initialize ()
+		{
+			Height = 1;
 		}
 
 		///<inheritdoc/>

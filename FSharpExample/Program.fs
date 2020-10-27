@@ -27,7 +27,7 @@ type Box10x (x: int, y: int) =
         raise (NotImplementedException())
 
     override this.Redraw (_: Rect) =
-        Application.Driver.SetAttribute Application.Current.ColorScheme.Focus
+        Application.Driver.SetAttribute this.ColorScheme.Focus
         do
         let mutable y = 0
         while y < h do
@@ -47,7 +47,7 @@ type Filler (rect: Rect) =
         new Filler ()
 
     override this.Redraw (_: Rect) =
-        Application.Driver.SetAttribute Application.Current.ColorScheme.Focus
+        Application.Driver.SetAttribute this.ColorScheme.Focus
         let mutable f = this.Frame
         do
         let mutable y = 0
