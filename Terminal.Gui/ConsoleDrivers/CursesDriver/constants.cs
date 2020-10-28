@@ -52,6 +52,7 @@ namespace Unix.Terminal {
 		public const int COLOR_CYAN = unchecked((int)0x6);
 		public const int COLOR_WHITE = unchecked((int)0x7);
 		public const int KEY_CODE_YES = unchecked((int)0x100);
+		public const int KEY_CODE_SEQ = unchecked((int)0x5b);
 
 		[Flags]
 		public enum Event : long {
@@ -152,7 +153,18 @@ namespace Unix.Terminal {
 		public const int ShiftCtrlKeyPPage = unchecked((int)0x22c + LeftRightUpNPagePPage);
 		public const int ShiftCtrlKeyHome = unchecked((int)0x218 + Home);
 		public const int ShiftCtrlKeyEnd = unchecked((int)0x213 + DownEnd);
-
+		public const int ShiftAltKeyUp = unchecked((int)0x235 + LeftRightUpNPagePPage);
+		public const int ShiftAltKeyDown = unchecked((int)0x20c + DownEnd);
+		public const int ShiftAltKeyLeft = unchecked((int)0x220 + LeftRightUpNPagePPage);
+		public const int ShiftAltKeyRight = unchecked((int)0x22f + LeftRightUpNPagePPage);
+		public const int ShiftAltKeyNPage = unchecked((int)0x225 + LeftRightUpNPagePPage);
+		public const int ShiftAltKeyPPage = unchecked((int)0x22a + LeftRightUpNPagePPage);
+		public const int ShiftAltKeyHome = unchecked((int)0x216 + Home);
+		public const int ShiftAltKeyEnd = unchecked((int)0x211 + DownEnd);
+		public const int AltCtrlKeyNPage = unchecked((int)0x228 + LeftRightUpNPagePPage);
+		public const int AltCtrlKeyPPage = unchecked((int)0x22d + LeftRightUpNPagePPage);
+		public const int AltCtrlKeyHome = unchecked((int)0x219 + Home);
+		public const int AltCtrlKeyEnd = unchecked((int)0x214 + DownEnd);
 		public const int LC_ALL = 6;
 		static public int ColorPair(int n){
 			return 0 + n * 256;

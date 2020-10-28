@@ -168,7 +168,7 @@ namespace Terminal.Gui {
 			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('q', ConsoleKey.Q, shift: false, alt: false, control: true));
 			foreach (var c in input.Reverse ()) {
 				if (char.IsLetter (c)) {
-					Console.MockKeyPresses.Push (new ConsoleKeyInfo (char.ToLower (c), (ConsoleKey)char.ToUpper (c), shift: char.IsUpper (c), alt: false, control: false));
+					Console.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)char.ToUpper (c), shift: char.IsUpper (c), alt: false, control: false));
 				} else {
 					Console.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)c, shift: false, alt: false, control: false));
 				}
@@ -188,7 +188,7 @@ namespace Terminal.Gui {
 			int keyUps = 0;
 			var output = string.Empty;
 			Application.Top.KeyUp += (View.KeyEventEventArgs args) => {
-				if (args.KeyEvent.Key != Key.ControlQ) {
+				if (args.KeyEvent.Key != (Key.CtrlMask | Key.Q)) {
 					output += (char)args.KeyEvent.KeyValue;
 				}
 				keyUps++;

@@ -5,7 +5,7 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 // TODO:
-//   Add accelerator support, but should also support chords (ShortCut in MenuItem)
+//   Add accelerator support, but should also support chords (Shortcut in MenuItem)
 //   Allow menus inside menus
 
 using System;
@@ -40,14 +40,21 @@ namespace Terminal.Gui {
 	/// A <see cref="MenuItem"/> has a title, an associated help text, and an action to execute on activation.
 	/// </summary>
 	public class MenuItem {
+		ustring title;
+
+		ShortcutHelper shortcutHelper;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="MenuItem"/>
 		/// </summary>
-		public MenuItem ()
+		public MenuItem (Key shortcut = Key.Null)
 		{
 			Title = "";
 			Help = "";
+			shortcutHelper = new ShortcutHelper ();
+			if (shortcut != Key.Null) {
+				shortcutHelper.Shortcut = shortcut;
+			}
 		}
 
 		/// <summary>
@@ -57,40 +64,58 @@ namespace Terminal.Gui {
 		/// <param name="help">Help text to display.</param>
 		/// <param name="action">Action to invoke when the menu item is activated.</param>
 		/// <param name="canExecute">Function to determine if the action can currently be executed.</param>
-		/// <param name="parent">The parent of this menu item.</param>
-		public MenuItem (ustring title, ustring help, Action action, Func<bool> canExecute = null, MenuItem parent = null)
+		/// <param name="parent">The <see cref="Parent"/> of this menu item.</param>
+		/// <param name="shortcut">The <see cref="Shortcut"/> keystroke combination.</param>
+		public MenuItem (ustring title, ustring help, Action action, Func<bool> canExecute = null, MenuItem parent = null, Key shortcut = Key.Null)
 		{
 			Title = title ?? "";
 			Help = help ?? "";
 			Action = action;
 			CanExecute = canExecute;
-			bool nextIsHot = false;
-			foreach (var x in Title) {
-				if (x == '_')
-					nextIsHot = true;
-				else {
-					if (nextIsHot) {
-						HotKey = Char.ToUpper ((char)x);
-						break;
-					}
-					nextIsHot = false;
-				}
-			}
 			Parent = parent;
+			shortcutHelper = new ShortcutHelper ();
+			if (shortcut != Key.Null) {
+				shortcutHelper.Shortcut = shortcut;
+			}
 		}
 
 		/// <summary>
 		/// The HotKey is used when the menu is active, the shortcut can be triggered when the menu is not active.
 		/// For example HotKey would be "N" when the File Menu is open (assuming there is a "_New" entry
-		/// if the ShortCut is set to "Control-N", this would be a global hotkey that would trigger as well
+		/// if the Shortcut is set to "Control-N", this would be a global hotkey that would trigger as well
 		/// </summary>
 		public Rune HotKey;
 
 		/// <summary>
-		/// Gets or sets the title. 
+		/// This is the global setting that can be used as a global <see cref="ShortcutHelper.Shortcut"/> to invoke the action on the menu.
+		/// </summary>
+		public Key Shortcut {
+			get => shortcutHelper.Shortcut;
+			set {
+				if (shortcutHelper.Shortcut != value && (ShortcutHelper.PostShortcutValidation (value) || value == Key.Null)) {
+					shortcutHelper.Shortcut = value;
+				}
+			}
+		}
+
+		/// <summary>
+		/// The keystroke combination used in the <see cref="ShortcutHelper.ShortcutTag"/> as string.
+		/// </summary>
+		public ustring ShortcutTag => ShortcutHelper.GetShortcutTag (shortcutHelper.Shortcut);
+
+		/// <summary>
+		/// Gets or sets the title.
 		/// </summary>
 		/// <value>The title.</value>
-		public ustring Title { get; set; }
+		public ustring Title {
+			get { return title; }
+			set {
+				if (title != value) {
+					title = value;
+					GetHotKey ();
+				}
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets the help text for the menu item.
@@ -119,7 +144,8 @@ namespace Terminal.Gui {
 		}
 
 		internal int Width => Title.RuneCount + Help.RuneCount + 1 + 2 +
-			(Checked || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0);
+			(Checked || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0) +
+			(ShortcutTag.RuneCount > 0 ? ShortcutTag.RuneCount + 2 : 0);
 
 		/// <summary>
 		/// Sets or gets whether the <see cref="MenuItem"/> shows a check indicator or not. See <see cref="MenuItemCheckStyle"/>.
@@ -156,6 +182,23 @@ namespace Terminal.Gui {
 		public bool GetMenuBarItem ()
 		{
 			return IsFromSubMenu;
+		}
+
+		void GetHotKey ()
+		{
+			bool nextIsHot = false;
+			foreach (var x in title) {
+				if (x == '_') {
+					nextIsHot = true;
+				} else {
+					if (nextIsHot) {
+						HotKey = Char.ToUpper ((char)x);
+						break;
+					}
+					nextIsHot = false;
+					HotKey = default;
+				}
+			}
 		}
 	}
 
@@ -307,7 +350,7 @@ namespace Terminal.Gui {
 
 		internal int TitleLength => GetMenuBarItemLength (Title);
 
-		internal bool IsTopLevel { get => Parent == null && (Children == null || Children.Length == 0); }
+		internal bool IsTopLevel { get => Parent == null && (Children == null || Children.Length == 0) && Action != null; }
 
 	}
 
@@ -338,7 +381,7 @@ namespace Terminal.Gui {
 			} else {
 
 				current = -1;
-				for (int i = 0; i < barItems.Children.Length; i++) {
+				for (int i = 0; i < barItems.Children?.Length; i++) {
 					if (barItems.Children [i] != null) {
 						current = i;
 						break;
@@ -416,9 +459,16 @@ namespace Terminal.Gui {
 					       i == current ? ColorScheme.Focus : ColorScheme.Normal);
 
 				// The help string
-				var l = item.Help.RuneCount;
+				var l = item.ShortcutTag.RuneCount == 0 ? item.Help.RuneCount : item.Help.RuneCount + item.ShortcutTag.RuneCount + 2;
 				Move (Frame.Width - l - 2, 1 + i);
 				Driver.AddStr (item.Help);
+
+				// The shortcut tag string
+				if (!item.ShortcutTag.IsEmpty) {
+					l = item.ShortcutTag.RuneCount;
+					Move (Frame.Width - l - 2, 1 + i);
+					Driver.AddStr (item.ShortcutTag);
+				}
 			}
 			PositionCursor ();
 		}
@@ -704,6 +754,19 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool UseKeysUpDownAsKeysLeftRight { get; set; } = true;
 
+		static ustring shortcutDelimiter = "+";
+		/// <summary>
+		/// Used for change the shortcut delimiter separator.
+		/// </summary>
+		public static ustring ShortcutDelimiter {
+			get => shortcutDelimiter;
+			set {
+				if (shortcutDelimiter != value) {
+					shortcutDelimiter = value == ustring.Empty ? " " : value;
+				}
+			}
+		}
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MenuBar"/>.
 		/// </summary>
@@ -828,8 +891,8 @@ namespace Terminal.Gui {
 					hotColor = ColorScheme.Normal;
 					normalColor = ColorScheme.Normal;
 				}
-				DrawHotString ($" {menu.Title}  ", hotColor, normalColor);
-				pos += 1 + menu.TitleLength + 2;
+				DrawHotString (menu.Help.IsEmpty ? $" {menu.Title}  " : $" {menu.Title}  {menu.Help}  ", hotColor, normalColor);
+				pos += 1 + menu.TitleLength + (menu.Help.Length > 0 ? menu.Help.Length + 2 : 0) + 2;
 			}
 			PositionCursor ();
 		}
@@ -843,14 +906,14 @@ namespace Terminal.Gui {
 					pos++;
 					if (IsMenuOpen)
 						Move (pos + 1, 0);
-					else
+					else {
 						Move (pos + 1, 0);
+					}
 					return;
+				} else if (IsMenuOpen) {
+					pos += 1 + Menus [i].TitleLength + (Menus [i].Help.Length > 0 ? Menus [i].Help.Length + 2 : 0) + 2;
 				} else {
-					if (IsMenuOpen)
-						pos += 1 + Menus [i].TitleLength + 2;
-					else
-						pos += 2 + Menus [i].TitleLength + 1;
+					pos += 2 + Menus [i].TitleLength + (Menus [i].Help.Length > 0 ? Menus [i].Help.Length + 2 : 0) + 1;
 				}
 			}
 			//Move (0, 0);
@@ -923,7 +986,7 @@ namespace Terminal.Gui {
 				}
 
 				for (int i = 0; i < index; i++)
-					pos += Menus [i].Title.RuneCount + 2;
+					pos += Menus [i].Title.RuneCount + (Menus [i].Help.RuneCount > 0 ? Menus [i].Help.RuneCount + 2 : 0) + 2;
 				openMenu = new Menu (this, pos, 1, Menus [index]);
 				openCurrentMenu = openMenu;
 				openCurrentMenu.previousSubFocused = openMenu;
@@ -1258,6 +1321,38 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		internal bool FindAndOpenMenuByShortcut (KeyEvent kb, MenuItem [] children = null)
+		{
+			if (children == null) {
+				children = Menus;
+			}
+
+			var key = kb.KeyValue;
+			var keys = ShortcutHelper.GetModifiersKey (kb);
+			key |= (int)keys;
+			for (int i = 0; i < children.Length; i++) {
+				var mi = children [i];
+				if (mi == null) {
+					continue;
+				}
+				if ((!(mi is MenuBarItem mbiTopLevel) || mbiTopLevel.IsTopLevel) && mi.Shortcut != Key.Null && mi.Shortcut == (Key)key) {
+					var action = mi.Action;
+					if (action != null) {
+						Application.MainLoop.AddIdle (() => {
+							action ();
+							return false;
+						});
+					}
+					return true;
+				}
+				if (mi is MenuBarItem menuBarItem && !menuBarItem.IsTopLevel && FindAndOpenMenuByShortcut (kb, menuBarItem.Children)) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		private void ProcessMenu (int i, MenuBarItem mi)
 		{
 			if (mi.IsTopLevel) {
@@ -1293,7 +1388,7 @@ namespace Terminal.Gui {
 				OnKeyDown (kb);
 				OnKeyUp (kb);
 				return true;
-			} else if (kb.IsAlt) {
+			} else if (kb.IsAlt && !kb.IsCtrl && !kb.IsShift) {
 				if (FindAndOpenMenuByHotkey (kb)) return true;
 			}
 			//var kc = kb.KeyValue;
@@ -1315,7 +1410,7 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.Esc:
-			case Key.ControlC:
+			case Key.C | Key.CtrlMask:
 				//TODO: Running = false;
 				CloseMenu ();
 				if (openedByAltKey) {
@@ -1359,6 +1454,12 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
+		public override bool ProcessColdKey (KeyEvent kb)
+		{
+			return FindAndOpenMenuByShortcut (kb);
+		}
+
+		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!handled && !HandleGrabView (me, this)) {
@@ -1372,7 +1473,7 @@ namespace Terminal.Gui {
 				int pos = 1;
 				int cx = me.X;
 				for (int i = 0; i < Menus.Length; i++) {
-					if (cx >= pos && cx < pos + 1 + Menus [i].TitleLength + 2) {
+					if (cx >= pos && cx < pos + 1 + Menus [i].TitleLength + Menus [i].Help.RuneCount + 2) {
 						if (me.Flags == MouseFlags.Button1Clicked) {
 							if (Menus [i].IsTopLevel) {
 								var menu = new Menu (this, i, 0, Menus [i]);
@@ -1424,6 +1525,7 @@ namespace Terminal.Gui {
 						};
 
 						v.MouseEvent (nme);
+						return false;
 					}
 				} else if (!(me.View is MenuBar || me.View is Menu) && (me.Flags.HasFlag (MouseFlags.Button1Clicked) ||
 					me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1DoubleClicked || me.Flags == MouseFlags.Button1TripleClicked)) {

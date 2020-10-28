@@ -741,7 +741,7 @@ namespace Terminal.Gui {
 			case Key.PageUp:
 				return ScrollUp (Bounds.Height);
 
-			case Key.ControlV:
+			case Key.V | Key.CtrlMask:
 			case Key.PageDown:
 				return ScrollDown (Bounds.Height);
 

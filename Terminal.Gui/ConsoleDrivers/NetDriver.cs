@@ -299,21 +299,21 @@ namespace Terminal.Gui {
 			if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
 				var delta = key - ConsoleKey.A;
 				if (keyInfo.Modifiers == ConsoleModifiers.Control)
-					return (Key)((uint)Key.ControlA + delta);
+					return (Key)((uint)Key.A + delta);
 				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
-					return (Key)(((uint)Key.AltMask) | ((uint)'A' + delta));
+					return (Key)(((uint)Key.AltMask) | ((uint)Key.A + delta));
 				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
-					return (Key)((uint)'A' + delta);
+					return (Key)((uint)Key.A + delta);
 				else
 					return (Key)((uint)'a' + delta);
 			}
 			if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
 				var delta = key - ConsoleKey.D0;
 				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
-					return (Key)(((uint)Key.AltMask) | ((uint)'0' + delta));
+					return (Key)(((uint)Key.AltMask) | ((uint)Key.D0 + delta));
 				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
 					return (Key)((uint)keyInfo.KeyChar);
-				return (Key)((uint)'0' + delta);
+				return (Key)((uint)Key.D0 + delta);
 			}
 			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
 				var delta = key - ConsoleKey.F1;

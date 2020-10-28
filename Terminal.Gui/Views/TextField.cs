@@ -352,9 +352,9 @@ namespace Terminal.Gui {
 			// Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
 			var oldCursorPos = point;
 
-			switch (kb.Key) {
+			switch (ShortcutHelper.GetModifiersKey (kb)) {
 			case Key.DeleteChar:
-			case Key.ControlD:
+			case Key.D | Key.CtrlMask:
 				if (ReadOnly)
 					return true;
 
@@ -388,6 +388,8 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.Home | Key.ShiftMask:
+			case Key.Home | Key.ShiftMask | Key.CtrlMask:
+			case Key.A | Key.ShiftMask | Key.CtrlMask:
 				if (point > 0) {
 					int x = point;
 					point = 0;
@@ -396,6 +398,8 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.End | Key.ShiftMask:
+			case Key.End | Key.ShiftMask | Key.CtrlMask:
+			case Key.E | Key.ShiftMask | Key.CtrlMask:
 				if (point < text.Count) {
 					int x = point;
 					point = text.Count;
@@ -405,7 +409,8 @@ namespace Terminal.Gui {
 
 			// Home, C-A
 			case Key.Home:
-			case Key.ControlA:
+			case Key.Home | Key.CtrlMask:
+			case Key.A | Key.CtrlMask:
 				ClearAllSelection ();
 				point = 0;
 				Adjust ();
@@ -448,7 +453,7 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.CursorLeft:
-			case Key.ControlB:
+			case Key.B | Key.CtrlMask:
 				ClearAllSelection ();
 				if (point > 0) {
 					point--;
@@ -457,14 +462,15 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.End:
-			case Key.ControlE: // End
+			case Key.End | Key.CtrlMask:
+			case Key.E | Key.CtrlMask: // End
 				ClearAllSelection ();
 				point = text.Count;
 				Adjust ();
 				break;
 
 			case Key.CursorRight:
-			case Key.ControlF:
+			case Key.F | Key.CtrlMask:
 				ClearAllSelection ();
 				if (point == text.Count)
 					break;
@@ -472,7 +478,7 @@ namespace Terminal.Gui {
 				Adjust ();
 				break;
 
-			case Key.ControlK: // kill-to-end
+			case Key.K | Key.CtrlMask: // kill-to-end
 				if (ReadOnly)
 					return true;
 
@@ -485,7 +491,7 @@ namespace Terminal.Gui {
 				break;
 
 			// Undo
-			case Key.ControlZ:
+			case Key.Z | Key.CtrlMask:
 				if (ReadOnly)
 					return true;
 
@@ -501,7 +507,7 @@ namespace Terminal.Gui {
 				break;
 
 			//Redo
-			case Key.ControlY: // Control-y, yank
+			case Key.Y | Key.CtrlMask: // Control-y, yank
 				if (ReadOnly)
 					return true;
 
@@ -537,6 +543,7 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.CursorLeft | Key.CtrlMask:
+			case Key.CursorUp | Key.CtrlMask:
 			case (Key)((int)'b' + Key.AltMask):
 				ClearAllSelection ();
 				int bw = WordBackward (point);
@@ -546,6 +553,7 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.CursorRight | Key.CtrlMask:
+			case Key.CursorDown | Key.CtrlMask:
 			case (Key)((int)'f' + Key.AltMask):
 				ClearAllSelection ();
 				int fw = WordForward (point);
@@ -559,18 +567,18 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 				break;
 
-			case Key.ControlC:
+			case Key.C | Key.CtrlMask:
 				Copy ();
 				break;
 
-			case Key.ControlX:
+			case Key.X | Key.CtrlMask:
 				if (ReadOnly)
 					return true;
 
 				Cut ();
 				break;
 
-			case Key.ControlV:
+			case Key.V | Key.CtrlMask:
 				Paste ();
 				break;
 
@@ -824,6 +832,7 @@ namespace Terminal.Gui {
 			SelectedLength = 0;
 			SelectedText = "";
 			start = 0;
+			SetNeedsDisplay ();
 		}
 
 		void SetSelectedStartSelectedLength ()

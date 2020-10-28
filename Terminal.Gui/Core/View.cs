@@ -125,6 +125,8 @@ namespace Terminal.Gui {
 
 		TextFormatter textFormatter;
 
+		ShortcutHelper shortcutHelper;
+
 		/// <summary>
 		/// Event fired when a subview is being added to this view.
 		/// </summary>
@@ -169,6 +171,28 @@ namespace Terminal.Gui {
 		/// Gets or sets the specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'. 
 		/// </summary>
 		public Rune HotKeySpecifier { get => textFormatter.HotKeySpecifier; set => textFormatter.HotKeySpecifier = value; }
+
+		/// <summary>
+		/// This is the global setting that can be used as a global shortcut to invoke an action if provided.
+		/// </summary>
+		public Key Shortcut {
+			get => shortcutHelper.Shortcut;
+			set {
+				if (shortcutHelper.Shortcut != value && (ShortcutHelper.PostShortcutValidation (value) || value == Key.Null)) {
+					shortcutHelper.Shortcut = value;
+				}
+			}
+		}
+
+		/// <summary>
+		/// The keystroke combination used in the <see cref="Shortcut"/> as string.
+		/// </summary>
+		public ustring ShortcutTag => ShortcutHelper.GetShortcutTag (shortcutHelper.Shortcut);
+
+		/// <summary>
+		/// The action to run if the <see cref="Shortcut"/> is defined.
+		/// </summary>
+		public virtual Action ShortcutAction { get; set; }
 
 		/// <summary>
 		/// Gets or sets arbitrary data for the view.
@@ -550,6 +574,8 @@ namespace Terminal.Gui {
 			textFormatter = new TextFormatter ();
 			this.Text = ustring.Empty;
 
+			shortcutHelper = new ShortcutHelper ();
+
 			this.Frame = frame;
 			LayoutStyle = LayoutStyle.Absolute;
 		}
@@ -612,6 +638,8 @@ namespace Terminal.Gui {
 		{
 			textFormatter = new TextFormatter ();
 			this.Text = text;
+
+			shortcutHelper = new ShortcutHelper ();
 		}
 
 		/// <summary>
@@ -632,6 +660,8 @@ namespace Terminal.Gui {
 		{
 			textFormatter = new TextFormatter ();
 			this.Text = text;
+
+			shortcutHelper = new ShortcutHelper ();
 
 			CanFocus = false;
 			TabIndex = -1;

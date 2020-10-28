@@ -271,7 +271,9 @@ namespace Unix.Terminal {
 		static public int mouseinterval (int interval) => methods.mouseinterval (interval);
 	}
 
+#pragma warning disable RCS1102 // Make class static.
 	internal class Delegates {
+#pragma warning restore RCS1102 // Make class static.
 		public delegate IntPtr initscr ();
 		public delegate int endwin ();
 		public delegate bool isendwin ();

@@ -164,11 +164,11 @@ namespace Terminal.Gui {
 				return true;
 
 			switch (keyEvent.Key) {
-			case Key.ControlQ:
+			case Key.Q | Key.CtrlMask:
 				// FIXED: stop current execution of this container
 				Application.RequestStop ();
 				break;
-			case Key.ControlZ:
+			case Key.Z | Key.CtrlMask:
 				Driver.Suspend ();
 				return true;
 
@@ -181,7 +181,7 @@ namespace Terminal.Gui {
 			case Key.Tab:
 			case Key.CursorRight:
 			case Key.CursorDown:
-			case Key.ControlI: // Unix
+			case Key.I | Key.CtrlMask: // Unix
 				var old = GetDeepestFocusedSubview (Focused);
 				if (!FocusNext ())
 					FocusNext ();
@@ -206,8 +206,21 @@ namespace Terminal.Gui {
 				}
 				return true;
 
-			case Key.ControlL:
+			case Key.L | Key.CtrlMask:
 				Application.Refresh ();
+				return true;
+			}
+			return false;
+		}
+
+		///<inheritdoc/>
+		public override bool ProcessColdKey (KeyEvent keyEvent)
+		{
+			if (base.ProcessColdKey (keyEvent)) {
+				return true;
+			}
+
+			if (ShortcutHelper.FindAndOpenByShortcut(keyEvent, this)) {
 				return true;
 			}
 			return false;

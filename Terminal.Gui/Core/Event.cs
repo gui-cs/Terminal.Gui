@@ -46,9 +46,12 @@ namespace Terminal.Gui {
 	/// <para>
 	///   If the <see cref="SpecialMask"/> is set, then the value is that of the special mask,
 	///   otherwise, the value is the one of the lower bits (as extracted by <see cref="CharMask"/>)
+	/// <para>
+	///   Numerics keys are the values between 48 and 57 corresponding to 0 to 9
+	/// </para>
 	/// </para>
 	/// <para>
-	///   Control keys are the values between 1 and 26 corresponding to Control-A to Control-Z
+	///   Upper alpha keys are the values between 65 and 90 corresponding to A to Z
 	/// </para>
 	/// <para>
 	///   Unicode runes are also stored here, the letter 'A" for example is encoded as a value 65 (not surfaced in the enum).
@@ -70,119 +73,9 @@ namespace Terminal.Gui {
 		SpecialMask = 0xfff00000,
 
 		/// <summary>
-		/// The key code for the user pressing Control-spacebar
+		/// The key code representing null or empty
 		/// </summary>
-		ControlSpace = 0,
-
-		/// <summary>
-		/// The key code for the user pressing Control-A
-		/// </summary>
-		ControlA = 1,
-		/// <summary>
-		/// The key code for the user pressing Control-B
-		/// </summary>
-		ControlB,
-		/// <summary>
-		/// The key code for the user pressing Control-C
-		/// </summary>
-		ControlC,
-		/// <summary>
-		/// The key code for the user pressing Control-D
-		/// </summary>
-		ControlD,
-		/// <summary>
-		/// The key code for the user pressing Control-E
-		/// </summary>
-		ControlE,
-		/// <summary>
-		/// The key code for the user pressing Control-F
-		/// </summary>
-		ControlF,
-		/// <summary>
-		/// The key code for the user pressing Control-G
-		/// </summary>
-		ControlG,
-		/// <summary>
-		/// The key code for the user pressing Control-H
-		/// </summary>
-		ControlH,
-		/// <summary>
-		/// The key code for the user pressing Control-I (same as the tab key).
-		/// </summary>
-		ControlI,
-		/// <summary>
-		/// The key code for the user pressing Control-J
-		/// </summary>
-		ControlJ,
-		/// <summary>
-		/// The key code for the user pressing Control-K
-		/// </summary>
-		ControlK,
-		/// <summary>
-		/// The key code for the user pressing Control-L
-		/// </summary>
-		ControlL,
-		/// <summary>
-		/// The key code for the user pressing Control-M
-		/// </summary>
-		ControlM,
-		/// <summary>
-		/// The key code for the user pressing Control-N (same as the return key).
-		/// </summary>
-		ControlN,
-		/// <summary>
-		/// The key code for the user pressing Control-O
-		/// </summary>
-		ControlO,
-		/// <summary>
-		/// The key code for the user pressing Control-P
-		/// </summary>
-		ControlP,
-		/// <summary>
-		/// The key code for the user pressing Control-Q
-		/// </summary>
-		ControlQ,
-		/// <summary>
-		/// The key code for the user pressing Control-R
-		/// </summary>
-		ControlR,
-		/// <summary>
-		/// The key code for the user pressing Control-S
-		/// </summary>
-		ControlS,
-		/// <summary>
-		/// The key code for the user pressing Control-T
-		/// </summary>
-		ControlT,
-		/// <summary>
-		/// The key code for the user pressing Control-U
-		/// </summary>
-		ControlU,
-		/// <summary>
-		/// The key code for the user pressing Control-V
-		/// </summary>
-		ControlV,
-		/// <summary>
-		/// The key code for the user pressing Control-W
-		/// </summary>
-		ControlW,
-		/// <summary>
-		/// The key code for the user pressing Control-X
-		/// </summary>
-		ControlX,
-		/// <summary>
-		/// The key code for the user pressing Control-Y
-		/// </summary>
-		ControlY,
-		/// <summary>
-		/// The key code for the user pressing Control-Z
-		/// </summary>
-		ControlZ,
-
-		/// <summary>
-		/// The key code for the user pressing the escape key
-		/// </summary>
-		Esc = 27,
+		Null = 0,
 
 		/// <summary>
 		/// The key code for the user pressing the return key.
@@ -190,9 +83,160 @@ namespace Terminal.Gui {
 		Enter = '\n',
 
 		/// <summary>
+		/// The key code for the user pressing the escape key
+		/// </summary>
+		Esc = 27,
+
+		/// <summary>
 		/// The key code for the user pressing the space bar
 		/// </summary>
 		Space = 32,
+
+		/// <summary>
+		/// Digit 0.
+		/// </summary>
+		D0 = 48,
+		/// <summary>
+		/// Digit 1.
+		/// </summary>
+		D1,
+		/// <summary>
+		/// Digit 2.
+		/// </summary>
+		D2,
+		/// <summary>
+		/// Digit 3.
+		/// </summary>
+		D3,
+		/// <summary>
+		/// Digit 4.
+		/// </summary>
+		D4,
+		/// <summary>
+		/// Digit 5.
+		/// </summary>
+		D5,
+		/// <summary>
+		/// Digit 6.
+		/// </summary>
+		D6,
+		/// <summary>
+		/// Digit 7.
+		/// </summary>
+		D7,
+		/// <summary>
+		/// Digit 8.
+		/// </summary>
+		D8,
+		/// <summary>
+		/// Digit 9.
+		/// </summary>
+		D9,
+
+		/// <summary>
+		/// The key code for the user pressing Shift-A
+		/// </summary>
+		A = 65,
+		/// <summary>
+		/// The key code for the user pressing Shift-B
+		/// </summary>
+		B,
+		/// <summary>
+		/// The key code for the user pressing Shift-C
+		/// </summary>
+		C,
+		/// <summary>
+		/// The key code for the user pressing Shift-D
+		/// </summary>
+		D,
+		/// <summary>
+		/// The key code for the user pressing Shift-E
+		/// </summary>
+		E,
+		/// <summary>
+		/// The key code for the user pressing Shift-F
+		/// </summary>
+		F,
+		/// <summary>
+		/// The key code for the user pressing Shift-G
+		/// </summary>
+		G,
+		/// <summary>
+		/// The key code for the user pressing Shift-H
+		/// </summary>
+		H,
+		/// <summary>
+		/// The key code for the user pressing Shift-I
+		/// </summary>
+		I,
+		/// <summary>
+		/// The key code for the user pressing Shift-J
+		/// </summary>
+		J,
+		/// <summary>
+		/// The key code for the user pressing Shift-K
+		/// </summary>
+		K,
+		/// <summary>
+		/// The key code for the user pressing Shift-L
+		/// </summary>
+		L,
+		/// <summary>
+		/// The key code for the user pressing Shift-M
+		/// </summary>
+		M,
+		/// <summary>
+		/// The key code for the user pressing Shift-N
+		/// </summary>
+		N,
+		/// <summary>
+		/// The key code for the user pressing Shift-O
+		/// </summary>
+		O,
+		/// <summary>
+		/// The key code for the user pressing Shift-P
+		/// </summary>
+		P,
+		/// <summary>
+		/// The key code for the user pressing Shift-Q
+		/// </summary>
+		Q,
+		/// <summary>
+		/// The key code for the user pressing Shift-R
+		/// </summary>
+		R,
+		/// <summary>
+		/// The key code for the user pressing Shift-S
+		/// </summary>
+		S,
+		/// <summary>
+		/// The key code for the user pressing Shift-T
+		/// </summary>
+		T,
+		/// <summary>
+		/// The key code for the user pressing Shift-U
+		/// </summary>
+		U,
+		/// <summary>
+		/// The key code for the user pressing Shift-V
+		/// </summary>
+		V,
+		/// <summary>
+		/// The key code for the user pressing Shift-W
+		/// </summary>
+		W,
+		/// <summary>
+		/// The key code for the user pressing Shift-X
+		/// </summary>
+		X,
+		/// <summary>
+		/// The key code for the user pressing Shift-Y
+		/// </summary>
+		Y,
+		/// <summary>
+		/// The key code for the user pressing Shift-Z
+		/// </summary>
+		Z,
 
 		/// <summary>
 		/// The key code for the user pressing the delete key.
@@ -261,6 +305,7 @@ namespace Terminal.Gui {
 		/// Insert character key
 		/// </summary>
 		InsertChar,
+
 		/// <summary>
 		/// F1 key.
 		/// </summary>
@@ -309,6 +354,7 @@ namespace Terminal.Gui {
 		/// F12 key.
 		/// </summary>
 		F12,
+
 		/// <summary>
 		/// The key code for the user pressing the tab key (forwards tab key).
 		/// </summary>
@@ -317,6 +363,7 @@ namespace Terminal.Gui {
 		/// Shift-tab key (backwards tab key).
 		/// </summary>
 		BackTab,
+
 		/// <summary>
 		/// A key with an unknown mapping was raised.
 		/// </summary>

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using Terminal.Gui;
 using Rune = System.Rune;
@@ -104,7 +105,7 @@ namespace UICatalog {
 					_rightPane.SetFocus ();
 					_top.Ready -= ReadyHandler;
 				}
-				
+
 				_top.Ready += ReadyHandler;
 
 #if DEBUG_IDISPOSABLE
@@ -113,7 +114,7 @@ namespace UICatalog {
 				foreach (var inst in Responder.Instances) {
 					Debug.Assert (inst.WasDisposed);
 				}
-				Responder.Instances.Clear();
+				Responder.Instances.Clear ();
 #endif
 			}
 
@@ -156,11 +157,15 @@ namespace UICatalog {
 
 			_menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_Quit", "", () => Application.RequestStop() )
+					new MenuItem ("_Quit", "", () => Application.RequestStop(), null, null, Key.Q | Key.CtrlMask)
 				}),
 				new MenuBarItem ("_Color Scheme", CreateColorSchemeMenuItems()),
-				new MenuBarItem ("_Diagostics", CreateDiagnosticMenuItems()),
-				new MenuBarItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "_Ok")),
+				new MenuBarItem ("Diag_ostics", CreateDiagnosticMenuItems()),
+				new MenuBarItem ("_Help", new MenuItem [] {
+					new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://migueldeicaza.github.io/gui.cs/articles/overview.html"), null, null, Key.F1),
+					new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/migueldeicaza/gui.cs"), null, null, Key.F2),
+					new MenuItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
+				})
 			});
 
 			_leftPane = new FrameView ("Categories") {
@@ -169,8 +174,10 @@ namespace UICatalog {
 				Width = 25,
 				Height = Dim.Fill (1),
 				CanFocus = false,
+				Shortcut = Key.CtrlMask | Key.C
 			};
-
+			_leftPane.Title = $"{_leftPane.Title} ({_leftPane.ShortcutTag})";
+			_leftPane.ShortcutAction = () => _leftPane.SetFocus ();
 
 			_categories = Scenario.GetAllCategories ().OrderBy (c => c).ToList ();
 			_categoryListView = new ListView (_categories) {
@@ -193,8 +200,10 @@ namespace UICatalog {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (1),
 				CanFocus = true,
-
+				Shortcut = Key.CtrlMask | Key.S
 			};
+			_rightPane.Title = $"{_rightPane.Title} ({_rightPane.ShortcutTag})";
+			_rightPane.ShortcutAction = () => _rightPane.SetFocus ();
 
 			_nameColumnWidth = Scenario.ScenarioMetadata.GetName (_scenarios.OrderByDescending (t => Scenario.ScenarioMetadata.GetName (t).Length).FirstOrDefault ()).Length;
 
@@ -217,14 +226,14 @@ namespace UICatalog {
 			_numlock = new StatusItem (Key.CharMask, "Num", null);
 			_scrolllock = new StatusItem (Key.CharMask, "Scroll", null);
 
-			_statusBar = new StatusBar () { 
+			_statusBar = new StatusBar () {
 				Visible = true,
 			};
 			_statusBar.Items = new StatusItem [] {
 				_capslock,
 				_numlock,
 				_scrolllock,
-				new StatusItem(Key.ControlQ, "~CTRL-Q~ Quit", () => {
+				new StatusItem(Key.Q | Key.CtrlMask, "~CTRL-Q~ Quit", () => {
 					if (_runningScenario is null){
 						// This causes GetScenarioToRun to return null
 						_runningScenario = null;
@@ -261,10 +270,14 @@ namespace UICatalog {
 
 		static MenuItem [] CreateDiagnosticMenuItems ()
 		{
+			var index = 0;
+
 			MenuItem CheckedMenuMenuItem (ustring menuItem, Action action, Func<bool> checkFunction)
 			{
 				var mi = new MenuItem ();
 				mi.Title = menuItem;
+				mi.Shortcut = Key.AltMask + index.ToString () [0];
+				index++;
 				mi.CheckType |= MenuItemCheckStyle.Checked;
 				mi.Checked = checkFunction ();
 				mi.Action = () => {
@@ -309,14 +322,15 @@ namespace UICatalog {
 			List<MenuItem> menuItems = new List<MenuItem> ();
 			foreach (var sc in Colors.ColorSchemes) {
 				var item = new MenuItem ();
-				item.Title = sc.Key;
+				item.Title = $"_{sc.Key}";
+				item.Shortcut = Key.AltMask | (Key)sc.Key.Substring (0, 1) [0];
 				item.CheckType |= MenuItemCheckStyle.Radio;
 				item.Checked = sc.Value == _baseColorScheme;
 				item.Action += () => {
 					_baseColorScheme = sc.Value;
 					SetColorScheme ();
 					foreach (var menuItem in menuItems) {
-						menuItem.Checked = menuItem.Title.Equals (sc.Key) && sc.Value == _baseColorScheme;
+						menuItem.Checked = menuItem.Title.Equals ($"_{sc.Key}") && sc.Value == _baseColorScheme;
 					}
 				};
 				menuItems.Add (item);
@@ -439,6 +453,25 @@ namespace UICatalog {
 			_scenarioListView.Source = new ScenarioListDataSource (newlist);
 			_scenarioListView.SelectedItem = _scenarioListViewItem;
 
+		}
+
+		private static void OpenUrl (string url)
+		{
+			try {
+				Process.Start (url);
+			} catch {
+				// hack because of this: https://github.com/dotnet/corefx/issues/10361
+				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
+					url = url.Replace ("&", "^&");
+					Process.Start (new ProcessStartInfo ("cmd", $"/c start {url}") { CreateNoWindow = true });
+				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
+					Process.Start ("xdg-open", url);
+				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+					Process.Start ("open", url);
+				} else {
+					throw;
+				}
+			}
 		}
 	}
 }

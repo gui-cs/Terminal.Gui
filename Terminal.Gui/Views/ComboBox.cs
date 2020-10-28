@@ -357,7 +357,7 @@ namespace Terminal.Gui {
 			}
 
 			// Unix emulation
-			if (e.Key == Key.ControlU) {
+			if (e.Key == (Key.U | Key.CtrlMask)) {
 				Reset ();
 				return true;
 			}
