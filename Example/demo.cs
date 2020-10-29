@@ -689,12 +689,14 @@ static class Demo {
 
 	private static void Win_KeyPress (View.KeyEventEventArgs e)
 	{
-		if ((e.KeyEvent.Key & (Key.CtrlMask | Key.T)) != 0) {
+		switch (ShortcutHelper.GetModifiersKey (e.KeyEvent)) {
+		case Key.CtrlMask | Key.T:
 			if (menu.IsMenuOpen)
 				menu.CloseMenu ();
 			else
 				menu.OpenMenu ();
 			e.Handled = true;
+			break;
 		}
 	}
 }
