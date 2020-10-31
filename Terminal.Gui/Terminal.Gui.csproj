@@ -146,7 +146,7 @@
   </PropertyGroup>-->
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="true" />
-    <PackageReference Include="NStack.Core" Version="0.14.0" />
+    <PackageReference Include="NStack.Core" Version="0.15.0" />
   </ItemGroup>
   <!--<ItemGroup>
     <Reference Include="NStack">
