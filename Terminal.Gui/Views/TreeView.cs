@@ -43,6 +43,10 @@ namespace Terminal.Gui.Views {
 		}
 
 		private int SelectedItemIndex {
+			get => Root.ToList ().IndexOf (selected);
+		}
+
+		private int SelectedItemVisibleListIndex {
 			get => GetVisibleItems ().IndexOf (selected);
 		}
 
@@ -491,7 +495,7 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		public virtual bool OnOpenSelectedItem ()
 		{
-			if (root.Count <= SelectedItemIndex || SelectedItemIndex < 0) return false;
+			if (selected == null) return false;
 			var value = selected;
 			OpenSelectedItem?.Invoke (new TreeViewItemEventArgs (SelectedItemIndex, value));
 
@@ -500,7 +504,7 @@ namespace Terminal.Gui.Views {
 
 		public virtual bool OnExpandSelectedItem ()
 		{
-			if (root.Count <= SelectedItemIndex || SelectedItemIndex < 0) return false;
+			if (selected == null) return false;
 			var value = selected;
 			if (!value.IsExpanded)
 				value.SetExpanded (true);
@@ -512,7 +516,7 @@ namespace Terminal.Gui.Views {
 
 		public virtual bool OnCollapseSelectedItem()
 		{
-			if (root.Count <= SelectedItemIndex || SelectedItemIndex < 0) return false;
+			if (selected == null) return false;
 			var value = selected;
 			if (value.IsExpanded)
 				value.SetExpanded (false);
