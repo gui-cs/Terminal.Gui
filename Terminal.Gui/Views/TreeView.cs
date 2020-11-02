@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 
 namespace Terminal.Gui.Views {
 
 	public interface ITreeViewItem {
+		object Data { get; }
 
 		ITreeViewItem Parent { get; set; }
 
@@ -23,6 +25,8 @@ namespace Terminal.Gui.Views {
 		bool IsMarked { get; }
 
 		void SetMark (bool value);
+
+		void SetExpanded (bool value);
 
 		IList ToList ();
 
@@ -124,12 +128,10 @@ namespace Terminal.Gui.Views {
 			bool focused = HasFocus;
 			int col = allowsMarking ? 4 : 0;
 
-			var items = Root.ToList ().Cast<ITreeViewItem>();
+			var items = GetDisplayItems (true);
 
 			for (int row = 0; row < f.Height; row++, item++) {
-				var treeViewItem = items.ElementAt (item);
-				var itemLevel = treeViewItem.Level;
-				bool isSelected = item == selected;
+				bool isSelected = item < items.Count && items.ElementAt (item) == Root.ToList () [selected];
 
 				var newcolor = focused ? (isSelected ? ColorScheme.Focus : ColorScheme.Normal) : (isSelected ? ColorScheme.HotNormal : ColorScheme.Normal);
 				if (newcolor != current) {
@@ -138,16 +140,56 @@ namespace Terminal.Gui.Views {
 				}
 
 				Move (0, row);
-				if (root == null || item >= root.Count) {
+				if (root == null || item >= items.Count) {
 					for (int c = 0; c < f.Width; c++)
 						Driver.AddRune (' ');
 				} else {
+					var treeViewItem = items.ElementAt (item);
 					if (allowsMarking) {
 						Driver.AddStr (treeViewItem.IsMarked ? (AllowsMultipleSelection ? "[x] " : "(o)") : (AllowsMultipleSelection ? "[ ] " : "( )"));
 					}
-					treeViewItem.Render (this, Driver, isSelected, itemLevel, col, row, f.Width - col);
+					treeViewItem.Render (this, Driver, isSelected, treeViewItem.Level, col, row, f.Width - col);
 				}
 			}
+		}
+
+		// TODO: Expand: implement DisplayRoot flag.
+		/// <summary>
+		/// In essence, this method returns a flattened collection of tree items, in which items which are hidden
+		/// due to their parent not being expanded aren't included.
+		/// </summary>
+		/// <param name="includeRoot"></param>
+		/// <returns></returns>
+		private IList<ITreeViewItem> GetDisplayItems(bool includeRoot)
+		{
+			var list = new List<ITreeViewItem> ();
+			if (Root == null)
+				return list;
+			if (includeRoot)
+				list.Add (Root);
+			if (Root.Children == null)
+				return list;
+			foreach (var childItem in Root.Children) {
+				list.Add (childItem);
+				if (childItem.IsExpanded) {
+					list.AddRange (GetDisplayItemsRecursively (childItem));
+				}
+			}
+			return list;
+		}
+
+		private IList<ITreeViewItem> GetDisplayItemsRecursively(ITreeViewItem item)
+		{
+			var list = new List<ITreeViewItem> ();
+			if (item.Children == null)
+				return list;
+			foreach (var childItem in item.Children) {
+				list.Add (childItem);
+				if (childItem.IsExpanded) {
+					list.AddRange (GetDisplayItemsRecursively (childItem));
+				}
+			}
+			return list;
 		}
 
 		/// <summary>
@@ -202,9 +244,11 @@ namespace Terminal.Gui.Views {
 			case Key.Home:
 				return MoveHome ();
 
+			case Key.CursorRight:
 			case Key.ControlD:
 				return OnExpandSelectedItem ();
 
+			case Key.CursorLeft:
 			case Key.ControlA:
 				return OnCollapseSelectedItem ();
 
@@ -297,18 +341,19 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		public virtual bool MoveDown ()
 		{
-			if (root.Count == 0) {
+			var count = GetDisplayItems (true).Count;
+			if (count == 0) {
 				// Do we set lastSelectedItem to zero here?
 				return false; //Nothing for us to move to
 			}
-			if (selected >= root.Count) {
+			if (selected >= count) {
 				// If for some reason we are currently outside of the
 				// valid values range, we should select the bottommost valid value.
 				// This can occur if the backing data source changes.
-				selected = root.Count - 1;
+				selected = count - 1;
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
-			} else if (selected + 1 < root.Count) { //can move by down by one.
+			} else if (selected + 1 < count) { //can move by down by one.
 				selected++;
 
 				if (selected >= top + Frame.Height)
@@ -415,8 +460,11 @@ namespace Terminal.Gui.Views {
 		public virtual bool OnExpandSelectedItem ()
 		{
 			if (root.Count <= selected || selected < 0) return false;
-			var value = root.ToList () [selected];
+			ITreeViewItem value = (ITreeViewItem)root.ToList () [selected];
+			if (!value.IsExpanded)
+				value.SetExpanded (true);
 			ExpandSelectedItem?.Invoke (new TreeViewItemEventArgs (selected, value));
+			SetNeedsDisplay ();
 
 			return true;
 		}
@@ -424,8 +472,11 @@ namespace Terminal.Gui.Views {
 		public virtual bool OnCollapseSelectedItem()
 		{
 			if (root.Count <= selected || selected < 0) return false;
-			var value = root.ToList () [selected];
+			ITreeViewItem value = (ITreeViewItem)root.ToList () [selected];
+			if (value.IsExpanded)
+				value.SetExpanded (false);
 			CollapseSelectedItem?.Invoke (new TreeViewItemEventArgs (selected, value));
+			SetNeedsDisplay ();
 
 			return true;
 		}
@@ -526,6 +577,8 @@ namespace Terminal.Gui.Views {
 		{
 			this.parent = parent;
 			this.children = children;
+
+			SetChildrensParent ();
 		}
 
 		public TreeViewItem(string nodeName)
@@ -533,11 +586,22 @@ namespace Terminal.Gui.Views {
 			this.nodeName = nodeName;
 		}
 
+		private void SetChildrensParent()
+		{
+			if (children != null) {
+				foreach (var child in children) {
+					child.Parent = this;
+				}
+			}
+		}
+
 		public int Count {
 			get {
 				int count = 1; // 1, because the root item counts towards Count.
+				if (Children == null)
+					return count;
+
 				foreach (ITreeViewItem item in Children) {
-					count++;
 					count += item.Count;
 				}
 				return count;
@@ -567,6 +631,7 @@ namespace Terminal.Gui.Views {
 			}
 		}
 
+		public object Data { get; set; }
 
 		public void Render (TreeView container, ConsoleDriver driver, bool selected, int level, int col, int line, int width)
 		{
@@ -575,14 +640,16 @@ namespace Terminal.Gui.Views {
 			for (int i = 0; i < level - 1; i++) {
 				sb.Append ("  ");
 			}
-			sb.Append ('|');
-			if (Children.Count > 0)
-				if (IsExpanded)
-					sb.Append ("^");
+			if (level > 0) {
+				sb.Append ('|');
+				if (Children != null && Children.Count > 0)
+					if (IsExpanded)
+						sb.Append ("^");
+					else
+						sb.Append ('v');
 				else
-					sb.Append ('v');
-			else
-				sb.Append ('-');
+					sb.Append ('-');
+			}
 
 			sb.Append (nodeName);
 
@@ -595,7 +662,7 @@ namespace Terminal.Gui.Views {
 			int used = 0;
 			for (int i = 0; i < byteLen;) {
 				(var rune, var size) = Utf8.DecodeRune (ustr, i, i - byteLen);
-				var count = Rune.ColumnWidth (rune);
+				var count = System.Rune.ColumnWidth (rune);
 				if (used + count > width)
 					break;
 				driver.AddRune (rune);
@@ -612,11 +679,19 @@ namespace Terminal.Gui.Views {
 			isMarked = value;
 		}
 
+		public void SetExpanded(bool value)
+		{
+			isExpanded = value;
+		}
+
 		public IList ToList ()
 		{
 			var list = new List<ITreeViewItem> ();
+			list.Add (this);
+			if (children == null)
+				return list;
+
 			foreach (ITreeViewItem item in children) {
-				list.Add (item);
 				foreach (ITreeViewItem childItem in item.ToList()) {
 					list.Add (childItem);
 				}

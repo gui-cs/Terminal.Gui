@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Terminal.Gui;
+using Terminal.Gui.Views;
 
 static class Demo {
 	class Box10x : View {
@@ -480,6 +481,56 @@ static class Demo {
 
 		MessageBox.Query (60, 10, "Selected file", list.Text.ToString() == "" ? "Nothing selected" : list.Text.ToString(), "Ok");
 	}
+
+	static void TreeViewDemo() {
+		var ok = new Button ("Ok", is_default: true);
+		ok.Clicked += () => { Application.RequestStop(); };
+		var cancel = new Button ("Cancel");
+		cancel.Clicked += () => { Application.RequestStop (); };
+		var d = new Dialog ("Selection Demo", 60, 20, ok, cancel);
+
+		var root = new TreeViewItem ("/root", new ITreeViewItem [] {
+			new TreeViewItem("/.."),
+			new TreeViewItem("/folder1", new ITreeViewItem[] {
+				new TreeViewItem("fileA.txt"),
+				new TreeViewItem("fileB.exe"),
+			}),
+			new TreeViewItem("/folder2", new ITreeViewItem[] {
+				new TreeViewItem("/EmptyFolder"),
+				new TreeViewItem("/folder21", new ITreeViewItem[] {
+					new TreeViewItem("fileC.csv"),
+					new TreeViewItem("fileD"),
+					new TreeViewItem("This"),
+					new TreeViewItem("is"),
+					new TreeViewItem("a"),
+					new TreeViewItem("really"),
+					new TreeViewItem("long"),
+					new TreeViewItem("file"),
+					new TreeViewItem("list"),
+					new TreeViewItem("to"),
+					new TreeViewItem("test"),
+					new TreeViewItem("scrolling."),
+					new TreeViewItem("Lorem"),
+					new TreeViewItem("ipsum"),
+					new TreeViewItem("dolor"),
+					new TreeViewItem("sit"),
+					new TreeViewItem("amet"),
+				}),
+			})
+		});
+
+		var tree = new TreeView (root) {
+			X = 1,
+			Y = 3,
+			Width = Dim.Fill () - 4,
+			Height = Dim.Fill () - 4,
+			AllowsMarking = true,
+			AllowsMultipleSelection = false
+		};
+
+		d.Add (tree);
+		Application.Run (d);
+	}
 	#endregion
 
 
@@ -620,6 +671,9 @@ static class Demo {
 				new MenuItem ("Select _Multiple Items", "", () => ListSelectionDemo (true)),
 				new MenuItem ("Select _Single Item", "", () => ListSelectionDemo (false)),
 				new MenuItem ("Search Single Item", "", ComboBoxDemo)
+			}),
+			new MenuBarItem ("T_reeView Demos", new MenuItem[] {
+				new MenuItem ("_TreeView", "", TreeViewDemo)	
 			}),
 			new MenuBarItem ("A_ssorted", new MenuItem [] {
 				new MenuItem ("_Show text alignments", "", () => ShowTextAlignments ()),
