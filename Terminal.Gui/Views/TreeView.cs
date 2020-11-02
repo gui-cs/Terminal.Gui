@@ -18,13 +18,9 @@ namespace Terminal.Gui.Views {
 
 		void Render (TreeView container, ConsoleDriver driver, bool selected, int level, int col, int line, int width);
 
-		bool IsExpanded { get; }
+		bool IsExpanded { get; set; }
 
-		bool IsMarked { get; }
-
-		void SetMark (bool value);
-
-		void SetExpanded (bool value);
+		bool IsMarked { get; set; }
 
 		IList ToList ();
 
@@ -283,7 +279,7 @@ namespace Terminal.Gui.Views {
 				for (int i = 0; i < Root.Count; i++) {
 					var treeViewItem = items.ElementAt (i);
 					if (treeViewItem.IsMarked && treeViewItem != selected) {
-						treeViewItem.SetMark (false);
+						treeViewItem.IsMarked = false;
 						return true;
 					}
 				}
@@ -300,7 +296,7 @@ namespace Terminal.Gui.Views {
 			if (AllowsAll ()) {
 				var items = Root.ToList ().Cast<ITreeViewItem> ();
 				var treeViewItem = SelectedItem;
-				treeViewItem.SetMark (!treeViewItem.IsMarked);
+				treeViewItem.IsMarked = !treeViewItem.IsMarked;
 				SetNeedsDisplay ();
 				return true;
 			}
@@ -516,7 +512,7 @@ namespace Terminal.Gui.Views {
 			if (selected == null) return false;
 			var value = selected;
 			if (!value.IsExpanded)
-				value.SetExpanded (true);
+				value.IsExpanded = true;
 			ExpandSelectedItem?.Invoke (new TreeViewItemEventArgs (SelectedItemIndex, value));
 			SetNeedsDisplay ();
 
@@ -528,7 +524,7 @@ namespace Terminal.Gui.Views {
 			if (selected == null) return false;
 			var value = selected;
 			if (value.IsExpanded)
-				value.SetExpanded (false);
+				value.IsExpanded = false;
 			CollapseSelectedItem?.Invoke (new TreeViewItemEventArgs (SelectedItemIndex, value));
 			SetNeedsDisplay ();
 
@@ -600,7 +596,7 @@ namespace Terminal.Gui.Views {
 			if (AllowsAll ()) {
 				var items = root.ToList().Cast<ITreeViewItem>();
 				var treeViewItem = selected;
-				treeViewItem.SetMark (!treeViewItem.IsMarked);
+				treeViewItem.IsMarked = !treeViewItem.IsMarked;
 				SetNeedsDisplay ();
 				return true;
 			}
@@ -665,9 +661,15 @@ namespace Terminal.Gui.Views {
 			}
 		}
 
-		public bool IsExpanded => isExpanded;
+		public bool IsExpanded { 
+			get => isExpanded;
+			set => isExpanded = value;
+		}
 
-		public bool IsMarked => isMarked;
+		public bool IsMarked { 
+			get => isMarked;
+			set => isMarked = value;
+		}
 
 		public IList<ITreeViewItem> Children => children;
 
