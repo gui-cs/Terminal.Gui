@@ -34,17 +34,25 @@ namespace Terminal.Gui.Views {
 	}
 
 	public class TreeView : View {
-		int top;
-		int selected;
+		ITreeViewItem top;
+		ITreeViewItem selected;
 		ITreeViewItem root;
+
+		private int TopItemIndex {
+			get => Root.ToList ().IndexOf (top);
+		}
+
+		private int SelectedItemIndex {
+			get => Root.ToList ().IndexOf (selected);
+		}
 
 		public ITreeViewItem Root {
 			get => root; 
 			set {
 				root = value;
-				top = 0;
-				selected = 0;
-				lastSelectedItem = -1;
+				top = root;
+				selected = root;
+				lastSelectedItem = null;
 				SetNeedsDisplay ();
 			}
 		}
@@ -63,29 +71,40 @@ namespace Terminal.Gui.Views {
 		/// </summary>
 		public bool AllowsMultipleSelection { get; set; } = true;
 
-		public int TopItem {
+		public ITreeViewItem TopItem {
 			get => top;
 			set {
 				if (root == null)
 					return;
 
-				if (top < 0 || top >= root.Count)
+				if (!IsVisible (value)) // An invisible element can not be the top item
 					throw new ArgumentException ("value");
 				top = value;
 				SetNeedsDisplay ();
 			}
 		}
 
-		public int SelectedItem {
+		private bool IsVisible (ITreeViewItem value)
+		{
+			ITreeViewItem parent = value.Parent;
+			while (parent != null) {
+				if (!parent.IsExpanded)
+					return false;
+				parent = parent.Parent;
+			}
+
+			return true;
+		}
+
+		public ITreeViewItem SelectedItem {
 			get => selected;
 			set {
-				if (root == null || root.Count == 0) {
+				if (root == null) {
 					return;
 				}
-				if (value < 0 || value >= root.Count) {
+
+				if (!IsVisible (value)) // An invisible element can not be selected
 					throw new ArgumentException ("value");
-				}
-				selected = value;
 				OnSelectedChanged ();
 			}
 		}
@@ -119,19 +138,23 @@ namespace Terminal.Gui.Views {
 			Driver.SetAttribute (current);
 			Move (0, 0);
 			var f = Frame;
-			if (selected < top) {
+
+			var items = GetDisplayItems (true);
+			var indexOfSelected = items.IndexOf(selected);
+			var indexOfTop = items.IndexOf(top);
+			if (indexOfSelected < indexOfTop) {
 				top = selected;
-			} else if (selected >= top + f.Height) {
+			} else if (indexOfSelected >= indexOfTop + f.Height) {
 				top = selected;
 			}
+
 			var item = top;
 			bool focused = HasFocus;
 			int col = allowsMarking ? 4 : 0;
 
-			var items = GetDisplayItems (true);
 
-			for (int row = 0; row < f.Height; row++, item++) {
-				bool isSelected = item < items.Count && items.ElementAt (item) == Root.ToList () [selected];
+			for (int row = 0; row < f.Height; row++, item = GetNext(item)) {
+				bool isSelected = items.Contains(item) && item == selected;
 
 				var newcolor = focused ? (isSelected ? ColorScheme.Focus : ColorScheme.Normal) : (isSelected ? ColorScheme.HotNormal : ColorScheme.Normal);
 				if (newcolor != current) {
@@ -140,11 +163,11 @@ namespace Terminal.Gui.Views {
 				}
 
 				Move (0, row);
-				if (root == null || item >= items.Count) {
+				if (root == null || item == null) {
 					for (int c = 0; c < f.Width; c++)
 						Driver.AddRune (' ');
 				} else {
-					var treeViewItem = items.ElementAt (item);
+					var treeViewItem = item;
 					if (allowsMarking) {
 						Driver.AddStr (treeViewItem.IsMarked ? (AllowsMultipleSelection ? "[x] " : "(o)") : (AllowsMultipleSelection ? "[ ] " : "( )"));
 					}
@@ -268,7 +291,7 @@ namespace Terminal.Gui.Views {
 			if (!AllowsMultipleSelection) {
 				for (int i = 0; i < Root.Count; i++) {
 					var treeViewItem = items.ElementAt (i);
-					if (treeViewItem.IsMarked && i != selected) {
+					if (treeViewItem.IsMarked && treeViewItem != selected) {
 						treeViewItem.SetMark (false);
 						return true;
 					}
@@ -285,7 +308,7 @@ namespace Terminal.Gui.Views {
 		{
 			if (AllowsAll ()) {
 				var items = Root.ToList ().Cast<ITreeViewItem> ();
-				var treeViewItem = items.ElementAt (SelectedItem);
+				var treeViewItem = SelectedItem;
 				treeViewItem.SetMark (!treeViewItem.IsMarked);
 				SetNeedsDisplay ();
 				return true;
@@ -300,11 +323,13 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		public virtual bool MovePageUp ()
 		{
-			int n = (selected - Frame.Height);
+			var items = GetDisplayItems (true);
+			var visibleSelectedItemIndex = items.IndexOf(selected);
+			int n = (visibleSelectedItemIndex - Frame.Height);
 			if (n < 0)
 				n = 0;
-			if (n != selected) {
-				selected = n;
+			if (n != visibleSelectedItemIndex) {
+				selected = items [n];
 				top = selected;
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
@@ -319,15 +344,17 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		public virtual bool MovePageDown ()
 		{
-			var n = (selected + Frame.Height);
-			if (n > root.Count)
-				n = root.Count - 1;
-			if (n != selected) {
-				selected = n;
-				if (root.Count >= Frame.Height)
+			var items = GetDisplayItems (true);
+			var visibleSelectedItemIndex = items.IndexOf(selected);
+			var n = (visibleSelectedItemIndex + Frame.Height);
+			if (n > items.Count)
+				n = items.Count - 1;
+			if (n != visibleSelectedItemIndex) {
+				selected = items [n];
+				if (items.Count >= Frame.Height)
 					top = selected;
 				else
-					top = 0;
+					top = Root;
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			}
@@ -341,31 +368,21 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		public virtual bool MoveDown ()
 		{
-			var count = GetDisplayItems (true).Count;
-			if (count == 0) {
-				// Do we set lastSelectedItem to zero here?
-				return false; //Nothing for us to move to
-			}
-			if (selected >= count) {
-				// If for some reason we are currently outside of the
-				// valid values range, we should select the bottommost valid value.
-				// This can occur if the backing data source changes.
-				selected = count - 1;
-				OnSelectedChanged ();
-				SetNeedsDisplay ();
-			} else if (selected + 1 < count) { //can move by down by one.
-				selected++;
-
-				if (selected >= top + Frame.Height)
-					top++;
-				OnSelectedChanged ();
-				SetNeedsDisplay ();
-			} else if (selected == 0) {
-				OnSelectedChanged ();
-				SetNeedsDisplay ();
-			}
+			// TODO: Optimize
+			selected = GetNext (selected);
+			if (selected == null)
+				selected = GetDisplayItems (true).Last ();
 
 			return true;
+		}
+
+		private ITreeViewItem GetNext (ITreeViewItem item)
+		{
+			if (item == null) return null;
+			var items = GetDisplayItems (true);
+			var index = items.IndexOf (item);
+			if (index + 1 >= items.Count) return null;
+			return items [index + 1];
 		}
 
 		/// <summary>
@@ -374,28 +391,20 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		public virtual bool MoveUp ()
 		{
-			if (root.Count == 0) {
-				// Do we set lastSelectedItem to zero here?
-				return false; //Nothing for us to move to
-			}
-			if (selected >= root.Count) {
-				// If for some reason we are currently outside of the
-				// valid values range, we should select the bottommost valid value.
-				// This can occur if the backing data source changes.
-				selected = root.Count - 1;
-				OnSelectedChanged ();
-				SetNeedsDisplay ();
-			} else if (selected > 0) {
-				selected--;
-				if (selected > root.Count) {
-					selected = root.Count - 1;
-				}
-				if (selected < top)
-					top = selected;
-				OnSelectedChanged ();
-				SetNeedsDisplay ();
-			}
+			// TODO: Optimize
+			selected = GetPrevious (selected);
+			if (selected == null)
+				selected = GetDisplayItems (true).First ();
 			return true;
+		}
+
+		private ITreeViewItem GetPrevious (ITreeViewItem item)
+		{
+			if (item == null) return null;
+			var items = GetDisplayItems (true);
+			var index = items.IndexOf (item);
+			if (index - 1 < 0) return null;
+			return items [index - 1];
 		}
 
 		/// <summary>
@@ -404,8 +413,10 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		public virtual bool MoveEnd ()
 		{
-			if (selected != root.Count - 1) {
-				selected = root.Count - 1;
+			var items = GetDisplayItems (true);
+			var last = items.Last ();
+			if (selected != last) {
+				selected = last;
 				top = selected;
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
@@ -420,8 +431,8 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		public virtual bool MoveHome ()
 		{
-			if (selected != 0) {
-				selected = 0;
+			if (selected != Root) {
+				selected = Root;
 				top = selected;
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
@@ -430,13 +441,13 @@ namespace Terminal.Gui.Views {
 			return true;
 		}
 
-		int lastSelectedItem;
+		ITreeViewItem lastSelectedItem;
 
 		public virtual bool OnSelectedChanged ()
 		{
 			if (selected != lastSelectedItem) {
-				var value = root?.Count > 0 ? root.ToList () [selected] : null;
-				SelectedItemChanged?.Invoke (new TreeViewItemEventArgs (selected, value));
+				var value = root?.Count > 0 ? selected : null;
+				SelectedItemChanged?.Invoke (new TreeViewItemEventArgs (SelectedItemIndex, value));
 				lastSelectedItem = selected;
 				return true;
 			}
@@ -450,20 +461,20 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		public virtual bool OnOpenSelectedItem ()
 		{
-			if (root.Count <= selected || selected < 0) return false;
-			var value = root.ToList () [selected];
-			OpenSelectedItem?.Invoke (new TreeViewItemEventArgs (selected, value));
+			if (root.Count <= SelectedItemIndex || SelectedItemIndex < 0) return false;
+			var value = selected;
+			OpenSelectedItem?.Invoke (new TreeViewItemEventArgs (SelectedItemIndex, value));
 
 			return true;
 		}
 
 		public virtual bool OnExpandSelectedItem ()
 		{
-			if (root.Count <= selected || selected < 0) return false;
-			ITreeViewItem value = (ITreeViewItem)root.ToList () [selected];
+			if (root.Count <= SelectedItemIndex || SelectedItemIndex < 0) return false;
+			var value = selected;
 			if (!value.IsExpanded)
 				value.SetExpanded (true);
-			ExpandSelectedItem?.Invoke (new TreeViewItemEventArgs (selected, value));
+			ExpandSelectedItem?.Invoke (new TreeViewItemEventArgs (SelectedItemIndex, value));
 			SetNeedsDisplay ();
 
 			return true;
@@ -471,11 +482,11 @@ namespace Terminal.Gui.Views {
 
 		public virtual bool OnCollapseSelectedItem()
 		{
-			if (root.Count <= selected || selected < 0) return false;
-			ITreeViewItem value = (ITreeViewItem)root.ToList () [selected];
+			if (root.Count <= SelectedItemIndex || SelectedItemIndex < 0) return false;
+			var value = selected;
 			if (value.IsExpanded)
 				value.SetExpanded (false);
-			CollapseSelectedItem?.Invoke (new TreeViewItemEventArgs (selected, value));
+			CollapseSelectedItem?.Invoke (new TreeViewItemEventArgs (SelectedItemIndex, value));
 			SetNeedsDisplay ();
 
 			return true;
@@ -484,7 +495,7 @@ namespace Terminal.Gui.Views {
 		///<inheritdoc/>
 		public override bool OnEnter (View view)
 		{
-			if (lastSelectedItem == -1) {
+			if (lastSelectedItem == null) {
 				OnSelectedChanged ();
 				return true;
 			}
@@ -495,8 +506,8 @@ namespace Terminal.Gui.Views {
 		///<inheritdoc/>
 		public override bool OnLeave (View view)
 		{
-			if (lastSelectedItem > -1) {
-				lastSelectedItem = -1;
+			if (lastSelectedItem != null) {
+				lastSelectedItem = null;
 				return true;
 			}
 
@@ -506,10 +517,13 @@ namespace Terminal.Gui.Views {
 		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
+			var items = GetDisplayItems (true);
+			var index = items.IndexOf (selected);
+			var topIndex = items.IndexOf (top);
 			if (allowsMarking)
-				Move (1, selected - top);
+				Move (1, index - topIndex);
 			else
-				Move (0, selected - top);
+				Move (0, index - topIndex);
 		}
 
 		///<inheritdoc/>
@@ -535,14 +549,14 @@ namespace Terminal.Gui.Views {
 				return true;
 			}
 
-			if (me.Y + top >= root.Count) {
+			if (me.Y + TopItemIndex >= root.Count) {
 				return true;
 			}
 
-			selected = top + me.Y;
+			selected = GetDisplayItems(true)[TopItemIndex + me.Y];
 			if (AllowsAll ()) {
 				var items = root.ToList().Cast<ITreeViewItem>();
-				var treeViewItem = items.ElementAt (SelectedItem);
+				var treeViewItem = selected;
 				treeViewItem.SetMark (!treeViewItem.IsMarked);
 				SetNeedsDisplay ();
 				return true;
