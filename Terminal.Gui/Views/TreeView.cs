@@ -721,16 +721,6 @@ namespace Terminal.Gui.Views {
 			}
 		}
 
-		public void SetMark (bool value)
-		{
-			isMarked = value;
-		}
-
-		public void SetExpanded(bool value)
-		{
-			isExpanded = value;
-		}
-
 		public IList ToList ()
 		{
 			var list = new List<ITreeViewItem> ();
