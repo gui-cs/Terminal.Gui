@@ -14,8 +14,6 @@ namespace Terminal.Gui.Views {
 
 		ITreeViewItem Parent { get; set; }
 
-		int Level { get; }
-
 		int Count { get; }
 
 		void Render (TreeView container, ConsoleDriver driver, bool selected, int level, int col, int line, int width);
@@ -163,7 +161,7 @@ namespace Terminal.Gui.Views {
 					if (allowsMarking) {
 						Driver.AddStr (treeViewItem.IsMarked ? (AllowsMultipleSelection ? "[x] " : "(o)") : (AllowsMultipleSelection ? "[ ] " : "( )"));
 					}
-					treeViewItem.Render (this, Driver, isSelected, treeViewItem.Level, col, row, f.Width - col);
+					treeViewItem.Render (this, Driver, isSelected, GetLevel(treeViewItem), col, row, f.Width - col);
 				}
 			}
 		}
@@ -441,6 +439,17 @@ namespace Terminal.Gui.Views {
 			return lastExpandedChild;
 		}
 
+		private int GetLevel(ITreeViewItem item)
+		{
+			int level = 0;
+			ITreeViewItem tmpParent = item.Parent;
+			while (tmpParent != null) {
+				level++;
+				tmpParent = tmpParent.Parent;
+			}
+			return level;
+		}
+
 		/// <summary>
 		/// Moves the selected item index to the last row.
 		/// </summary>
@@ -665,18 +674,6 @@ namespace Terminal.Gui.Views {
 		public ITreeViewItem Parent { 
 			get => parent; 
 			set => parent = value; 
-		}
-
-		public int Level {
-			get {
-				int level = 0;
-				ITreeViewItem tmpParent = parent;
-				while (tmpParent != null) {
-					level++;
-					tmpParent = tmpParent.Parent;
-				}
-				return level;
-			}
 		}
 
 		public object Data { get; set; }
