@@ -1020,5 +1020,62 @@ namespace Terminal.Gui {
 			Application.Shutdown ();
 		}
 
+		[Fact]
+		public void View_Difference_Between_An_Object_Initializer_And_A_Constructor ()
+		{
+			// Object Initializer
+			var view = new View () {
+				X = 1,
+				Y = 2,
+				Width = 3,
+				Height = 4
+			};
+			Assert.Equal (1, view.X);
+			Assert.Equal (2, view.Y);
+			Assert.Equal (3, view.Width);
+			Assert.Equal (4, view.Height);
+			Assert.True (view.Frame.IsEmpty);
+			Assert.True (view.Bounds.IsEmpty);
+
+			view.LayoutSubviews ();
+
+			Assert.Equal (1, view.X);
+			Assert.Equal (2, view.Y);
+			Assert.Equal (3, view.Width);
+			Assert.Equal (4, view.Height);
+			Assert.False (view.Frame.IsEmpty);
+			Assert.False (view.Bounds.IsEmpty);
+
+			// Default Constructor
+			view = new View ();
+			Assert.Equal (0, view.X);
+			Assert.Equal (0, view.Y);
+			Assert.Equal (0, view.Width);
+			Assert.Equal (0, view.Height);
+			Assert.True (view.Frame.IsEmpty);
+			Assert.True (view.Bounds.IsEmpty);
+
+			// Constructor
+			view = new View (1, 2, "");
+			Assert.Null (view.X);
+			Assert.Null (view.Y);
+			Assert.Null (view.Width);
+			Assert.Null (view.Height);
+			Assert.False (view.Frame.IsEmpty);
+			Assert.True (view.Bounds.IsEmpty);
+
+			// Default Constructor and post assignment equivalent to Object Initializer
+			view = new View ();
+			view.X = 1;
+			view.Y = 2;
+			view.Width = 3;
+			view.Height = 4;
+			Assert.Equal (1, view.X);
+			Assert.Equal (2, view.Y);
+			Assert.Equal (3, view.Width);
+			Assert.Equal (4, view.Height);
+			Assert.True (view.Frame.IsEmpty);
+			Assert.True (view.Bounds.IsEmpty);
+		}
 	}
 }

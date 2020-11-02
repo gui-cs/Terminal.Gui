@@ -124,19 +124,21 @@ namespace UICatalog {
 			};
 			frame.Add (styleRadioGroup);
 
-			frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (messageEdit) 
-				+ Dim.Height(numButtonsEdit) + Dim.Height (styleRadioGroup) + 2;
+			frame.LayoutSubviews ();
+
+			frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (messageEdit)
+				+ Dim.Height (numButtonsEdit) + Dim.Height (styleRadioGroup) + 2;
 
 			label = new Label ("Button Pressed:") {
 				X = Pos.Center (),
-				Y = Pos.Bottom (frame) + 2,
+				Y = Pos.Bottom (frame) + 4,
 				Height = 1,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			Win.Add (label);
-			var buttonPressedLabel = new Label ("") {
+			var buttonPressedLabel = new Label (" ") {
 				X = Pos.Center (),
-				Y = Pos.Bottom (frame) + 4,
+				Y = Pos.Bottom (frame) + 5,
 				Width = 25,
 				Height = 1,
 				ColorScheme = Colors.Error,
@@ -146,7 +148,7 @@ namespace UICatalog {
 
 			var showMessageBoxButton = new Button ("Show MessageBox") {
 				X = Pos.Center(),
-				Y = Pos.Bottom (frame) + 2			,
+				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,
 			};
 			showMessageBoxButton.Clicked += () => {

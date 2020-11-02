@@ -46,21 +46,18 @@ namespace Terminal.Gui {
 		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
 		/// <param name="text">Initial text contents.</param>
-		public TextField (string text) : this (ustring.Make (text))
-		{
-			Initialize ();
-		}
+		public TextField (string text) : this (ustring.Make (text)) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
-		public TextField () : this (string.Empty) { Initialize (); }
+		public TextField () : this (string.Empty) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
 		/// <param name="text">Initial text contents.</param>
-		public TextField (ustring text)
+		public TextField (ustring text) : base (text)
 		{
 			Initialize (text, 0);
 			Width = text.RuneCount + 1;
