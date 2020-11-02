@@ -32,7 +32,7 @@ namespace Terminal.Gui.Views {
 		ITreeViewItem selected;
 		ITreeViewItem root;
 
-		private int TopItemIndex {
+		private int TopItemVisibleListIndex {
 			get => GetVisibleItems().IndexOf(top);
 		}
 
@@ -126,12 +126,14 @@ namespace Terminal.Gui.Views {
 			var f = Frame;
 
 			var items = GetVisibleItems ();
-			var indexOfSelected = items.IndexOf(selected);
-			var indexOfTop = items.IndexOf(top);
+			var indexOfSelected = SelectedItemVisibleListIndex;
+			var indexOfTop = TopItemVisibleListIndex;
 			if (indexOfSelected < indexOfTop) {
 				top = selected;
 			} else if (indexOfSelected >= indexOfTop + f.Height) {
-				top = selected;
+				var difference = indexOfSelected - (indexOfTop + f.Height);
+				var newTop = items [indexOfTop + difference + 1];
+				top = newTop;
 			}
 
 			var item = top;
@@ -182,13 +184,13 @@ namespace Terminal.Gui.Views {
 			foreach (var childItem in Root.Children) {
 				list.Add (childItem);
 				if (childItem.IsExpanded) {
-					list.AddRange (GetDisplayItemsRecursively (childItem));
+					list.AddRange (GetVisibleItemsRecursively (childItem));
 				}
 			}
 			return list;
 		}
 
-		private IList<ITreeViewItem> GetDisplayItemsRecursively(ITreeViewItem item)
+		private IList<ITreeViewItem> GetVisibleItemsRecursively(ITreeViewItem item)
 		{
 			var list = new List<ITreeViewItem> ();
 			if (item.Children == null)
@@ -196,7 +198,7 @@ namespace Terminal.Gui.Views {
 			foreach (var childItem in item.Children) {
 				list.Add (childItem);
 				if (childItem.IsExpanded) {
-					list.AddRange (GetDisplayItemsRecursively (childItem));
+					list.AddRange (GetVisibleItemsRecursively (childItem));
 				}
 			}
 			return list;
@@ -588,11 +590,11 @@ namespace Terminal.Gui.Views {
 				return true;
 			}
 
-			if (me.Y + TopItemIndex >= root.Count) {
+			if (me.Y + TopItemVisibleListIndex >= root.Count) {
 				return true;
 			}
 
-			selected = GetVisibleItems()[TopItemIndex + me.Y];
+			selected = GetVisibleItems()[TopItemVisibleListIndex + me.Y];
 			if (AllowsAll ()) {
 				var items = root.ToList().Cast<ITreeViewItem>();
 				var treeViewItem = selected;
