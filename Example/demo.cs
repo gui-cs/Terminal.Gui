@@ -244,7 +244,7 @@ static class Demo {
 
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_Close", "", () => { if (Quit ()) { running = MainApp; Application.RequestStop (); } }, null, null, Key.AltMask | Key.F4),
+				new MenuItem ("_Close", "", () => { if (Quit ()) { running = MainApp; Application.RequestStop (); } }, null, null, Key.AltMask | Key.Q),
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
 				new MenuItem ("_Copy", "", null, null, null, Key.C | Key.CtrlMask),
@@ -314,7 +314,7 @@ static class Demo {
 		var ntop = Application.Top;
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_Close", "", () => { running = MainApp; Application.RequestStop (); }, null, null, Key.AltMask | Key.F4),
+				new MenuItem ("_Close", "", () => { running = MainApp; Application.RequestStop (); }, null, null, Key.AltMask | Key.Q),
 			}),
 		});
 		ntop.Add (menu);
@@ -601,7 +601,7 @@ static class Demo {
 				new MenuItem ("_New", "Creates new file", NewFile, null, null, Key.AltMask | Key.CtrlMask| Key.N),
 				new MenuItem ("_Open", "", Open, null, null, Key.AltMask | Key.CtrlMask| Key.O),
 				new MenuItem ("_Hex", "", () => { running = ShowHex; Application.RequestStop (); }, null, null, Key.AltMask | Key.CtrlMask | Key.H),
-				new MenuItem ("_Close", "", Close, null, null, Key.AltMask | Key.F4),
+				new MenuItem ("_Close", "", Close, null, null, Key.AltMask | Key.Q),
 				new MenuItem ("_Disabled", "", () => { }, () => false),
 				null,
 				new MenuItem ("_Quit", "", () => { if (Quit ()) { running = null; top.Running = false; } }, null, null, Key.CtrlMask | Key.Q)
@@ -689,12 +689,14 @@ static class Demo {
 
 	private static void Win_KeyPress (View.KeyEventEventArgs e)
 	{
-		if ((e.KeyEvent.Key & (Key.CtrlMask | Key.T)) != 0) {
+		switch (ShortcutHelper.GetModifiersKey (e.KeyEvent)) {
+		case Key.CtrlMask | Key.T:
 			if (menu.IsMenuOpen)
 				menu.CloseMenu ();
 			else
 				menu.OpenMenu ();
 			e.Handled = true;
+			break;
 		}
 	}
 }

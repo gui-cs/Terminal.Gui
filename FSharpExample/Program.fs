@@ -425,7 +425,7 @@ let Main () =
         StatusItem(Key.F1, ustr "~F1~ Help", Action Help)
         StatusItem(Key.F2, ustr "~F2~ Load", Action Load)
         StatusItem(Key.F3, ustr "~F3~ Save", Action Save)
-        StatusItem(Key.ControlQ, ustr "~^Q~ Quit", fun () -> if (Quit()) then top.Running <- false) |])
+        StatusItem(Key.Q, ustr "~^Q~ Quit", fun () -> if (Quit()) then top.Running <- false) |])
     win.Add (drag, dragText)
     let bottom = new Label (ustr "This should go on the bottom of the same top-level!")
     win.Add bottom
