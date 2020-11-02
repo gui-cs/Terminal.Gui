@@ -2272,13 +2272,13 @@ namespace Terminal.Gui {
 			Assert.Equal (3, ustring.Make (c).Length);
 
 			c = new System.Rune (31);
-			Assert.Equal (0, Rune.ColumnWidth (c));        // non printable character
-			Assert.Equal (0, ustring.Make (c).ConsoleWidth);
+			Assert.Equal (-1, Rune.ColumnWidth (c));        // non printable character
+			Assert.Equal (-1, ustring.Make (c).ConsoleWidth);
 			Assert.Equal (1, ustring.Make (c).Length);
 
 			c = new System.Rune (127);
-			Assert.Equal (0, Rune.ColumnWidth (c));       // non printable character
-			Assert.Equal (0, ustring.Make (c).ConsoleWidth);
+			Assert.Equal (-1, Rune.ColumnWidth (c));       // non printable character
+			Assert.Equal (-1, ustring.Make (c).ConsoleWidth);
 			Assert.Equal (1, ustring.Make (c).Length);
 		}
 
