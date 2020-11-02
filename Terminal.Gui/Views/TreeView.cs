@@ -39,11 +39,11 @@ namespace Terminal.Gui.Views {
 		ITreeViewItem root;
 
 		private int TopItemIndex {
-			get => Root.ToList ().IndexOf (top);
+			get => GetVisibleItems().IndexOf(top);
 		}
 
 		private int SelectedItemIndex {
-			get => Root.ToList ().IndexOf (selected);
+			get => GetVisibleItems ().IndexOf (selected);
 		}
 
 		public ITreeViewItem Root {
@@ -82,18 +82,6 @@ namespace Terminal.Gui.Views {
 				top = value;
 				SetNeedsDisplay ();
 			}
-		}
-
-		private bool IsVisible (ITreeViewItem value)
-		{
-			ITreeViewItem parent = value.Parent;
-			while (parent != null) {
-				if (!parent.IsExpanded)
-					return false;
-				parent = parent.Parent;
-			}
-
-			return true;
 		}
 
 		public ITreeViewItem SelectedItem {
@@ -139,7 +127,7 @@ namespace Terminal.Gui.Views {
 			Move (0, 0);
 			var f = Frame;
 
-			var items = GetDisplayItems (true);
+			var items = GetVisibleItems ();
 			var indexOfSelected = items.IndexOf(selected);
 			var indexOfTop = items.IndexOf(top);
 			if (indexOfSelected < indexOfTop) {
@@ -183,8 +171,9 @@ namespace Terminal.Gui.Views {
 		/// </summary>
 		/// <param name="includeRoot"></param>
 		/// <returns></returns>
-		private IList<ITreeViewItem> GetDisplayItems(bool includeRoot)
+		private IList<ITreeViewItem> GetVisibleItems()
 		{
+			bool includeRoot = true;
 			var list = new List<ITreeViewItem> ();
 			if (Root == null)
 				return list;
@@ -323,7 +312,7 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		public virtual bool MovePageUp ()
 		{
-			var items = GetDisplayItems (true);
+			var items = GetVisibleItems ();
 			var visibleSelectedItemIndex = items.IndexOf(selected);
 			int n = (visibleSelectedItemIndex - Frame.Height);
 			if (n < 0)
@@ -344,7 +333,7 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		public virtual bool MovePageDown ()
 		{
-			var items = GetDisplayItems (true);
+			var items = GetVisibleItems ();
 			var visibleSelectedItemIndex = items.IndexOf(selected);
 			var n = (visibleSelectedItemIndex + Frame.Height);
 			if (n > items.Count)
@@ -368,21 +357,11 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		public virtual bool MoveDown ()
 		{
-			// TODO: Optimize
 			selected = GetNext (selected);
 			if (selected == null)
-				selected = GetDisplayItems (true).Last ();
+				selected = GetVisibleItems ().Last ();
 
 			return true;
-		}
-
-		private ITreeViewItem GetNext (ITreeViewItem item)
-		{
-			if (item == null) return null;
-			var items = GetDisplayItems (true);
-			var index = items.IndexOf (item);
-			if (index + 1 >= items.Count) return null;
-			return items [index + 1];
 		}
 
 		/// <summary>
@@ -391,20 +370,71 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		public virtual bool MoveUp ()
 		{
-			// TODO: Optimize
 			selected = GetPrevious (selected);
 			if (selected == null)
-				selected = GetDisplayItems (true).First ();
+				selected = Root;
 			return true;
 		}
 
-		private ITreeViewItem GetPrevious (ITreeViewItem item)
+		private bool IsVisible (ITreeViewItem value)
+		{
+			ITreeViewItem parent = value.Parent;
+			while (parent != Root) {
+				if (!parent.IsExpanded)
+					return false;
+				parent = parent.Parent;
+			}
+
+			return true;
+		}
+
+		private ITreeViewItem GetNext (ITreeViewItem item)
 		{
 			if (item == null) return null;
-			var items = GetDisplayItems (true);
-			var index = items.IndexOf (item);
-			if (index - 1 < 0) return null;
-			return items [index - 1];
+			if (item.IsExpanded && item.Children.Count > 0)
+				return item.Children.First ();
+
+			var itemTemp = item;
+			var parentTemp = itemTemp.Parent;
+
+			if (itemTemp == Root) {
+				return itemTemp.Children.FirstOrDefault ();
+			}
+
+			while (parentTemp != Root) {
+				var indexInParent = parentTemp.Children.IndexOf (itemTemp);
+				if (indexInParent + 1 < parentTemp.Children.Count)
+					return parentTemp.Children [indexInParent + 1];
+
+				itemTemp = parentTemp;
+				parentTemp = itemTemp.Parent;
+			}
+
+			{
+				var indexInParent = parentTemp.Children.IndexOf (itemTemp);
+				if (indexInParent + 1 < parentTemp.Children.Count)
+					return parentTemp.Children [indexInParent + 1];
+			}
+
+			return null;
+		}
+
+		private ITreeViewItem GetPrevious(ITreeViewItem item)
+		{
+			if (item == null || item == Root) return null;
+			var indexInParent = item.Parent.Children.IndexOf (item);
+			if (indexInParent == 0)
+				return item.Parent;
+
+			var previousSibling = item.Parent.Children [indexInParent - 1];
+			if (!previousSibling.IsExpanded)
+				return previousSibling;
+
+			var lastExpandedChild = previousSibling;
+			while (lastExpandedChild.IsExpanded && lastExpandedChild.Children.Count > 0) {
+				lastExpandedChild = lastExpandedChild.Children.Last ();
+			}
+			return lastExpandedChild;
 		}
 
 		/// <summary>
@@ -413,7 +443,7 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		public virtual bool MoveEnd ()
 		{
-			var items = GetDisplayItems (true);
+			var items = GetVisibleItems ();
 			var last = items.Last ();
 			if (selected != last) {
 				selected = last;
@@ -517,7 +547,7 @@ namespace Terminal.Gui.Views {
 		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
-			var items = GetDisplayItems (true);
+			var items = GetVisibleItems ();
 			var index = items.IndexOf (selected);
 			var topIndex = items.IndexOf (top);
 			if (allowsMarking)
@@ -553,7 +583,7 @@ namespace Terminal.Gui.Views {
 				return true;
 			}
 
-			selected = GetDisplayItems(true)[TopItemIndex + me.Y];
+			selected = GetVisibleItems()[TopItemIndex + me.Y];
 			if (AllowsAll ()) {
 				var items = root.ToList().Cast<ITreeViewItem>();
 				var treeViewItem = selected;
