@@ -24,9 +24,8 @@ namespace UICatalog {
 					return Convert (amount_int) + " Point " + Convert (amount_dec) + " Only.";
 				}
 			} catch (Exception e) {
-				// TODO: handle exception  
+				throw new ArgumentOutOfRangeException (e.Message);
 			}
-			return "";
 		}
 
 		public static String Convert (Int64 i)
