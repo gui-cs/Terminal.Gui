@@ -59,8 +59,7 @@ namespace Terminal.Gui {
 		/// <param name="text">Initial text contents.</param>
 		public TextField (ustring text) : base (text)
 		{
-			Initialize (text, 0);
-			Width = text.RuneCount + 1;
+			Initialize (text, text.RuneCount + 1);
 		}
 
 		/// <summary>

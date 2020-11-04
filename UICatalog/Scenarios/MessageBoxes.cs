@@ -38,7 +38,7 @@ namespace UICatalog {
 			label = new Label ("height:") {
 				X = 0,
 				Y = Pos.Bottom (label),
-				Width = Dim.Width(label),
+				Width = Dim.Width (label),
 				Height = 1,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
@@ -124,9 +124,7 @@ namespace UICatalog {
 			};
 			frame.Add (styleRadioGroup);
 
-			frame.LayoutSubviews ();
-
-			frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (messageEdit)
+			Top.Ready += () => frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (messageEdit)
 				+ Dim.Height (numButtonsEdit) + Dim.Height (styleRadioGroup) + 2;
 
 			label = new Label ("Button Pressed:") {
@@ -144,7 +142,7 @@ namespace UICatalog {
 				ColorScheme = Colors.Error,
 			};
 
-			var btnText = new [] { "_Zero", "_One", "T_wo", "_Three", "_Four", "Fi_ve", "Si_x", "_Seven", "_Eight", "_Nine" };
+			//var btnText = new [] { "_Zero", "_One", "T_wo", "_Three", "_Four", "Fi_ve", "Si_x", "_Seven", "_Eight", "_Nine" };
 
 			var showMessageBoxButton = new Button ("Show MessageBox") {
 				X = Pos.Center(),
@@ -159,7 +157,8 @@ namespace UICatalog {
 
 					var btns = new List<ustring> ();
 					for (int i = 0; i < numButtons; i++) {
-						btns.Add(btnText[i % 10]);
+						//btns.Add(btnText[i % 10]);
+						btns.Add (NumberToWords.Convert (i));
 					}
 					if (styleRadioGroup.SelectedItem == 0) {
 						buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), btns.ToArray ())}";

@@ -656,10 +656,10 @@ namespace Terminal.Gui {
 		/// </para>
 		/// </remarks>
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
-		public View (ustring text) : base ()
+		public View (ustring text)
 		{
 			textFormatter = new TextFormatter ();
-			this.Text = text;
+			Text = text;
 
 			shortcutHelper = new ShortcutHelper ();
 

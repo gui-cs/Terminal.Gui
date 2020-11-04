@@ -55,7 +55,7 @@ namespace Terminal.Gui {
 		///   If <c>true</c>, a special decoration is used, and the user pressing the enter key 
 		///   in a <see cref="Dialog"/> will implicitly activate this button.
 		/// </param>
-		public Button (ustring text, bool is_default = false) : base ()
+		public Button (ustring text, bool is_default = false) : base (text)
 		{
 			Init (text, is_default);
 		}
@@ -87,7 +87,7 @@ namespace Terminal.Gui {
 		///   in a <see cref="Dialog"/> will implicitly activate this button.
 		/// </param>
 		public Button (int x, int y, ustring text, bool is_default)
-		    : base (new Rect (x, y, text.RuneCount + 4 + (is_default ? 2 : 0), 1))
+		    : base (new Rect (x, y, text.RuneCount + 4 + (is_default ? 2 : 0), 1), text)
 		{
 			Init (text, is_default);
 		}
@@ -107,8 +107,9 @@ namespace Terminal.Gui {
 			_rightDefault = new Rune (Driver != null ? Driver.RightDefaultIndicator : '>');
 
 			CanFocus = true;
-			this.IsDefault = is_default;
-			Text = text ?? string.Empty;
+			this.is_default = is_default;
+			this.text = text ?? string.Empty;
+			Update ();
 		}
 
 		/// <summary>

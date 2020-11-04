@@ -104,6 +104,7 @@ namespace Terminal.Gui {
 
 			buttons.Add (button);
 			Add (button);
+			SetNeedsDisplay ();
 			LayoutSubviews ();
 		}
 
@@ -112,7 +113,7 @@ namespace Terminal.Gui {
 			if (buttons.Count == 0) {
 				return 0;
 			}
-			return buttons.Select (b => b.Bounds.Width).Sum () + buttons.Count() - 1;
+			return buttons.Select (b => b.Bounds.Width).Sum () + buttons.Count - 1;
 		}
 
 		void LayoutStartedHandler ()
