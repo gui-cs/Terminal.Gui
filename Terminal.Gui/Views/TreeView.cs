@@ -89,6 +89,7 @@ namespace Terminal.Gui.Views {
 					return;
 				}
 
+				selected = value;
 				if (!IsVisible (value)) // An invisible element can not be selected
 					throw new ArgumentException ("value");
 				OnSelectedChanged ();
@@ -361,6 +362,9 @@ namespace Terminal.Gui.Views {
 			if (selected == null)
 				selected = GetVisibleItems ().Last ();
 
+			OnSelectedChanged ();
+			SetNeedsDisplay ();
+
 			return true;
 		}
 
@@ -373,12 +377,19 @@ namespace Terminal.Gui.Views {
 			selected = GetPrevious (selected);
 			if (selected == null)
 				selected = Root;
+
+			OnSelectedChanged ();
+			SetNeedsDisplay ();
+
 			return true;
 		}
 
 		private bool IsVisible (ITreeViewItem value)
 		{
 			ITreeViewItem parent = value.Parent;
+			if (value == Root)
+				return true;
+
 			while (parent != Root) {
 				if (!parent.IsExpanded)
 					return false;
@@ -650,18 +661,7 @@ namespace Terminal.Gui.Views {
 			}
 		}
 
-		public int Count {
-			get {
-				int count = 1; // 1, because the root item counts towards Count.
-				if (Children == null)
-					return count;
-
-				foreach (ITreeViewItem item in Children) {
-					count += item.Count;
-				}
-				return count;
-			}
-		}
+		public int Count => children == null ? 1 : children.Count + 1; // root itself counts as a 1
 
 		public bool IsExpanded { 
 			get => isExpanded;
