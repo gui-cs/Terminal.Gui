@@ -256,14 +256,8 @@ namespace Terminal.Gui.Views {
 			case Key.Home:
 				return MoveHome ();
 
-			case Key.CursorRight:
-			case Key.ControlD:
-				return OnExpandSelectedItem ();
-
-			case Key.CursorLeft:
-			case Key.ControlA:
-				return OnCollapseSelectedItem ();
-
+			case Key.Tab:
+				return OnExpandOrCollapseSelectedItem ();
 			}
 			return base.ProcessKey (kb);
 		}
@@ -519,25 +513,16 @@ namespace Terminal.Gui.Views {
 			return true;
 		}
 
-		public virtual bool OnExpandSelectedItem ()
+		public virtual bool OnExpandOrCollapseSelectedItem ()
 		{
 			if (selected == null) return false;
-			var value = selected;
-			if (!value.IsExpanded)
-				value.IsExpanded = true;
-			ExpandSelectedItem?.Invoke (new TreeViewItemEventArgs (SelectedItemIndex, value));
-			SetNeedsDisplay ();
-
-			return true;
-		}
-
-		public virtual bool OnCollapseSelectedItem()
-		{
-			if (selected == null) return false;
-			var value = selected;
-			if (value.IsExpanded)
-				value.IsExpanded = false;
-			CollapseSelectedItem?.Invoke (new TreeViewItemEventArgs (SelectedItemIndex, value));
+			if (selected.IsExpanded) {
+				selected.IsExpanded = false;
+				CollapseSelectedItem?.Invoke (new TreeViewItemEventArgs (SelectedItemIndex, selected));
+			} else {
+				selected.IsExpanded = true;
+				ExpandSelectedItem?.Invoke (new TreeViewItemEventArgs (SelectedItemIndex, selected));
+			}
 			SetNeedsDisplay ();
 
 			return true;
