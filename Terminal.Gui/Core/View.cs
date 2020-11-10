@@ -1899,9 +1899,21 @@ namespace Terminal.Gui {
 			get => textFormatter.Text;
 			set {
 				textFormatter.Text = value;
-				if (textFormatter.Size != Bounds.Size && (width == null && Bounds.Width == 0) || (height == null && Bounds.Height == 0)) {
+				if (textFormatter.Size != Bounds.Size && (((width == null || width is Dim.DimAbsolute) && Bounds.Width == 0)
+					|| ((height == null || height is Dim.DimAbsolute) && Bounds.Height == 0))) {
 					Bounds = new Rect (Bounds.X, Bounds.Y, textFormatter.Size.Width, textFormatter.Size.Height);
+					if (width == null) {
+						width = Bounds.Width;
+					} else if (width is Dim.DimAbsolute) {
+						width = Math.Max (Bounds.Width, height.Anchor (Bounds.Width));
+					}
+					if (height == null) {
+						height = Bounds.Height;
+					} else if (height is Dim.DimAbsolute) {
+						height = Math.Max (Bounds.Height, height.Anchor (Bounds.Height));
+					}
 				}
+				SetNeedsLayout ();
 				SetNeedsDisplay ();
 			}
 		}

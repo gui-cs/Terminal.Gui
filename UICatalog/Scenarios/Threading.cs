@@ -92,7 +92,7 @@ namespace UICatalog {
 			_btnQuit.Clicked += Application.RequestStop;
 
 			Win.Add (_itemsList, _btnActionCancel, _logJob, text, _btnAction, _btnLambda, _btnHandler, _btnSync, _btnMethod, _btnClearData, _btnQuit);
-
+			_btnActionCancel.SetFocus ();
 		}
 
 		private async void LoadData ()
