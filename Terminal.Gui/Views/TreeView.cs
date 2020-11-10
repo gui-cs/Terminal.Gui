@@ -75,7 +75,7 @@ namespace Terminal.Gui.Views {
 				if (root == null)
 					return;
 
-				if (!IsVisible (value)) // An invisible element can not be the top item
+				if (!IsVisible (value)) // An element which is not currently visible can not be the top item
 					throw new ArgumentException ("value");
 				top = value;
 				SetNeedsDisplay ();
@@ -90,7 +90,7 @@ namespace Terminal.Gui.Views {
 				}
 
 				selected = value;
-				if (!IsVisible (value)) // An invisible element can not be selected
+				if (!IsVisible (value)) // An element which is not currently visible can not be selected
 					throw new ArgumentException ("value");
 				OnSelectedChanged ();
 			}
@@ -165,7 +165,6 @@ namespace Terminal.Gui.Views {
 			}
 		}
 
-		// TODO: Expand: implement DisplayRoot flag.
 		/// <summary>
 		/// In essence, this method returns a flattened collection of tree items, in which items which are hidden
 		/// due to their parent not being expanded aren't included.
