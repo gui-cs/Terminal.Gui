@@ -600,15 +600,16 @@ namespace Terminal.Gui.Views {
 				return true;
 			}
 
-			if (me.Y + TopItemVisibleListIndex >= root.Count) {
+			var visibleItems = GetVisibleItems ();
+			var indexOfClickedItem = visibleItems.IndexOf (top) + me.Y;
+
+			if (indexOfClickedItem >= visibleItems.Count) {
 				return true;
 			}
 
-			selected = GetVisibleItems()[TopItemVisibleListIndex + me.Y];
+			selected = visibleItems[indexOfClickedItem];
 			if (AllowsAll ()) {
-				var items = root.ToList().Cast<ITreeViewItem>();
-				var treeViewItem = selected;
-				treeViewItem.IsMarked = !treeViewItem.IsMarked;
+				selected.IsMarked = !selected.IsMarked;
 				SetNeedsDisplay ();
 				return true;
 			}
