@@ -401,7 +401,7 @@ namespace Terminal.Gui.Views {
 		private ITreeViewItem GetNext (ITreeViewItem item)
 		{
 			if (item == null) return null;
-			if (item.IsExpanded && item.Children.Count > 0)
+			if (item.IsExpanded && item.Children?.Count > 0)
 				return item.Children.First ();
 
 			var itemTemp = item;
@@ -441,7 +441,7 @@ namespace Terminal.Gui.Views {
 				return previousSibling;
 
 			var lastExpandedChild = previousSibling;
-			while (lastExpandedChild.IsExpanded && lastExpandedChild.Children.Count > 0) {
+			while (lastExpandedChild.IsExpanded && lastExpandedChild.Children?.Count > 0) {
 				lastExpandedChild = lastExpandedChild.Children.Last ();
 			}
 			return lastExpandedChild;
