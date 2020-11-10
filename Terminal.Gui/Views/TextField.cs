@@ -148,7 +148,7 @@ namespace Terminal.Gui {
 				TextChanged?.Invoke (oldText);
 
 				if (point > text.Count) {
-					point = Math.Max (DisplaySize (text, 0).Size - 1, 0);
+					point = Math.Max (DisplaySize (text, 0).size - 1, 0);
 				}
 
 				Adjust ();
@@ -242,7 +242,7 @@ namespace Terminal.Gui {
 		}
 
 		// Returns the size and length in a range of the string.
-		(int Size, int Length) DisplaySize (List<Rune> t, int start = -1, int end = -1, bool checkNextRune = true)
+		(int size, int length) DisplaySize (List<Rune> t, int start = -1, int end = -1, bool checkNextRune = true)
 		{
 			if (t == null || t.Count == 0) {
 				return (0, 0);
@@ -269,7 +269,7 @@ namespace Terminal.Gui {
 			if (point < first) {
 				first = point;
 			} else if (first + point - (Frame.Width + offB) == 0 ||
-				  DisplaySize (text, first, point).Size >= Frame.Width + offB) {
+				  DisplaySize (text, first, point).size >= Frame.Width + offB) {
 				first = Math.Max (CalculateFirst (text, first, point, Frame.Width - 1 + offB), 0);
 			}
 			SetNeedsDisplay ();
