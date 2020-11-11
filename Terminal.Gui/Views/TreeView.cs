@@ -272,7 +272,7 @@ namespace Terminal.Gui.Views {
 				return false;
 			var items = Root.ToList ().Cast<ITreeViewItem>();
 			if (!AllowsMultipleSelection) {
-				for (int i = 0; i < Root.Count; i++) {
+				for (int i = 0; i < items.Count(); i++) {
 					var treeViewItem = items.ElementAt (i);
 					if (treeViewItem.IsMarked && treeViewItem != selected) {
 						treeViewItem.IsMarked = false;
@@ -291,8 +291,7 @@ namespace Terminal.Gui.Views {
 		{
 			if (AllowsAll ()) {
 				var items = Root.ToList ().Cast<ITreeViewItem> ();
-				var treeViewItem = SelectedItem;
-				treeViewItem.IsMarked = !treeViewItem.IsMarked;
+				selected.IsMarked = !selected.IsMarked;
 				SetNeedsDisplay ();
 				return true;
 			}
