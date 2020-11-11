@@ -22,7 +22,7 @@ namespace Terminal.Gui.Views {
 
 		bool IsMarked { get; set; }
 
-		IList ToList ();
+		IList<ITreeViewItem> ToList ();
 
 		IList<ITreeViewItem> Children { get; }
 	}
@@ -31,18 +31,6 @@ namespace Terminal.Gui.Views {
 		ITreeViewItem top;
 		ITreeViewItem selected;
 		ITreeViewItem root;
-
-		private int TopItemVisibleListIndex {
-			get => GetVisibleItems().IndexOf(top);
-		}
-
-		private int SelectedItemIndex {
-			get => Root.ToList ().IndexOf (selected);
-		}
-
-		private int SelectedItemVisibleListIndex {
-			get => GetVisibleItems ().IndexOf (selected);
-		}
 
 		public ITreeViewItem Root {
 			get => root; 
@@ -127,8 +115,8 @@ namespace Terminal.Gui.Views {
 			var f = Frame;
 
 			var items = GetVisibleItems ();
-			var indexOfSelected = SelectedItemVisibleListIndex;
-			var indexOfTop = TopItemVisibleListIndex;
+			var indexOfSelected = items.IndexOf (selected);
+			var indexOfTop = items.IndexOf (top); ;
 			if (indexOfSelected < indexOfTop) {
 				top = selected;
 			} else if (indexOfSelected >= indexOfTop + f.Height) {
@@ -270,7 +258,7 @@ namespace Terminal.Gui.Views {
 		{
 			if (!allowsMarking)
 				return false;
-			var items = Root.ToList ().Cast<ITreeViewItem>();
+			var items = Root.ToList ();
 			if (!AllowsMultipleSelection) {
 				for (int i = 0; i < items.Count(); i++) {
 					var treeViewItem = items.ElementAt (i);
@@ -290,7 +278,6 @@ namespace Terminal.Gui.Views {
 		public virtual bool MarkUnmarkRow ()
 		{
 			if (AllowsAll ()) {
-				var items = Root.ToList ().Cast<ITreeViewItem> ();
 				selected.IsMarked = !selected.IsMarked;
 				SetNeedsDisplay ();
 				return true;
@@ -491,7 +478,7 @@ namespace Terminal.Gui.Views {
 		{
 			if (selected != lastSelectedItem) {
 				var value = root?.Count > 0 ? selected : null;
-				SelectedItemChanged?.Invoke (new TreeViewItemEventArgs (SelectedItemIndex, value));
+				SelectedItemChanged?.Invoke (new TreeViewItemEventArgs (value));
 				lastSelectedItem = selected;
 				return true;
 			}
@@ -507,7 +494,7 @@ namespace Terminal.Gui.Views {
 		{
 			if (selected == null) return false;
 			var value = selected;
-			OpenSelectedItem?.Invoke (new TreeViewItemEventArgs (SelectedItemIndex, value));
+			OpenSelectedItem?.Invoke (new TreeViewItemEventArgs (value));
 
 			return true;
 		}
@@ -517,10 +504,10 @@ namespace Terminal.Gui.Views {
 			if (selected == null) return false;
 			if (selected.IsExpanded) {
 				selected.IsExpanded = false;
-				CollapseSelectedItem?.Invoke (new TreeViewItemEventArgs (SelectedItemIndex, selected));
+				CollapseSelectedItem?.Invoke (new TreeViewItemEventArgs (selected));
 			} else {
 				selected.IsExpanded = true;
-				ExpandSelectedItem?.Invoke (new TreeViewItemEventArgs (SelectedItemIndex, selected));
+				ExpandSelectedItem?.Invoke (new TreeViewItemEventArgs (selected));
 			}
 			SetNeedsDisplay ();
 
@@ -707,7 +694,7 @@ namespace Terminal.Gui.Views {
 			}
 		}
 
-		public IList ToList ()
+		public IList<ITreeViewItem> ToList ()
 		{
 			var list = new List<ITreeViewItem> ();
 			list.Add (this);
@@ -724,12 +711,10 @@ namespace Terminal.Gui.Views {
 	}
 
 	public class TreeViewItemEventArgs : EventArgs {
-		public int Item { get; }
-		public object Value { get; }
+		public ITreeViewItem Value { get; }
 
-		public TreeViewItemEventArgs (int item, object value)
+		public TreeViewItemEventArgs (ITreeViewItem value)
 		{
-			Item = item;
 			Value = value;
 		}
 	}
