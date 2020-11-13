@@ -235,7 +235,7 @@ namespace UICatalog {
 			var moveHotKeyBtn = new Label (mhkb) {
 				X = 2,
 				Y = Pos.Bottom (radioGroup) + 1,
-				Width = mhkb.Length + 10,
+				Width = Dim.Width (computedFrame) - 2,
 				ColorScheme = Colors.TopLevel,
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
@@ -249,7 +249,7 @@ namespace UICatalog {
 			var moveUnicodeHotKeyBtn = new Label (muhkb) {
 				X = Pos.Left (absoluteFrame) + 1,
 				Y = Pos.Bottom (radioGroup) + 1,
-				Width = muhkb.Length + 30,
+				Width = Dim.Width (absoluteFrame) - 2,
 				ColorScheme = Colors.TopLevel,
 				HotKeySpecifier = (System.Rune)'_',
 				CanFocus = true,
@@ -295,6 +295,8 @@ namespace UICatalog {
 					break;
 				}
 			};
+
+			Top.Ready += () => radioGroup.Refresh ();
 		}
 	}
 }
