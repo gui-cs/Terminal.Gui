@@ -399,7 +399,7 @@ namespace Terminal.Gui {
 			Application.CurrentView = this;
 
 			if (IsCurrentTop || this == Application.Top) {
-				if (!NeedDisplay.IsEmpty) {
+				if (!NeedDisplay.IsEmpty || layoutNeeded) {
 					Driver.SetAttribute (Colors.TopLevel.Normal);
 
 					// This is the Application.Top. Clear just the region we're being asked to redraw 
@@ -407,15 +407,17 @@ namespace Terminal.Gui {
 					Clear (bounds);
 					Driver.SetAttribute (Colors.Base.Normal);
 					PositionToplevels ();
-				}
-				foreach (var view in Subviews) {
-					if (view.Frame.IntersectsWith (bounds)) {
-						view.SetNeedsLayout ();
-						view.SetNeedsDisplay (view.Bounds);
-					}
-				}
 
-				ClearNeedsDisplay ();
+					foreach (var view in Subviews) {
+						if (view.Frame.IntersectsWith (bounds)) {
+							view.SetNeedsLayout ();
+							view.SetNeedsDisplay (view.Bounds);
+						}
+					}
+
+					layoutNeeded = false;
+					ClearNeedsDisplay ();
+				}
 			}
 
 			base.Redraw (base.Bounds);
