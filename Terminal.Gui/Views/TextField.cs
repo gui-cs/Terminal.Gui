@@ -360,6 +360,7 @@ namespace Terminal.Gui {
 			var oldCursorPos = point;
 
 			switch (ShortcutHelper.GetModifiersKey (kb)) {
+			case Key.Delete:
 			case Key.DeleteChar:
 			case Key.D | Key.CtrlMask:
 				if (ReadOnly)
@@ -377,7 +378,6 @@ namespace Terminal.Gui {
 				}
 				break;
 
-			case Key.Delete:
 			case Key.Backspace:
 				if (ReadOnly)
 					return true;
