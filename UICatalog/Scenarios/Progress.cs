@@ -100,6 +100,7 @@ namespace UICatalog {
 				};
 				Add (_startedLabel);
 
+				LayoutSubviews ();
 
 				// Set height to height of controls + spacing + frame
 				Height = 2 + _verticalSpace + Dim.Height (startButton) + _verticalSpace + Dim.Height (ActivityProgressBar) + _verticalSpace + Dim.Height (PulseProgressBar) + _verticalSpace;
