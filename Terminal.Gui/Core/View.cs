@@ -122,6 +122,7 @@ namespace Terminal.Gui {
 		View container = null;
 		View focused = null;
 		Direction focusDirection;
+		bool autoSize;
 
 		TextFormatter textFormatter;
 
@@ -1899,22 +1900,24 @@ namespace Terminal.Gui {
 			get => textFormatter.Text;
 			set {
 				textFormatter.Text = value;
-				if (textFormatter.Size != Bounds.Size && (((width == null || width is Dim.DimAbsolute) && Bounds.Width == 0)
-					|| ((height == null || height is Dim.DimAbsolute) && Bounds.Height == 0))) {
-					Bounds = new Rect (Bounds.X, Bounds.Y, textFormatter.Size.Width, textFormatter.Size.Height);
-					if (width == null) {
-						width = Bounds.Width;
-					} else if (width is Dim.DimAbsolute) {
-						width = Math.Max (Bounds.Width, height.Anchor (Bounds.Width));
-					}
-					if (height == null) {
-						height = Bounds.Height;
-					} else if (height is Dim.DimAbsolute) {
-						height = Math.Max (Bounds.Height, height.Anchor (Bounds.Height));
-					}
-				}
+				ResizeView (autoSize);
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
+			}
+		}
+
+		/// <summary>
+		/// Used by <see cref="Text"/> to resize the view's <see cref="Bounds"/> with the <see cref="TextFormatter.Size"/>.
+		/// </summary>
+		public virtual bool AutoSize {
+			get => autoSize;
+			set {
+				var v = ResizeView (value);
+				if (autoSize != v) {
+					autoSize = v;
+					SetNeedsLayout ();
+					SetNeedsDisplay ();
+				}
 			}
 		}
 
@@ -1943,6 +1946,31 @@ namespace Terminal.Gui {
 		public override string ToString ()
 		{
 			return $"{GetType ().Name}({Id})({Frame})";
+		}
+
+		bool ResizeView (bool autoSize)
+		{
+			if (textFormatter.Size != Bounds.Size && (((width == null || width is Dim.DimAbsolute) && (Bounds.Width == 0
+				|| autoSize && Bounds.Width != textFormatter.Size.Width))
+				|| ((height == null || height is Dim.DimAbsolute) && (Bounds.Height == 0
+				|| autoSize && Bounds.Height != textFormatter.Size.Height)))) {
+				Bounds = new Rect (Bounds.X, Bounds.Y, textFormatter.Size.Width, textFormatter.Size.Height);
+				if (width == null) {
+					width = Bounds.Width;
+				} else if (width is Dim.DimAbsolute) {
+					width = Math.Max (Bounds.Width, height.Anchor (Bounds.Width));
+				} else {
+					return false;
+				}
+				if (height == null) {
+					height = Bounds.Height;
+				} else if (height is Dim.DimAbsolute) {
+					height = Math.Max (Bounds.Height, height.Anchor (Bounds.Height));
+				} else {
+					return false;
+				}
+			}
+			return autoSize;
 		}
 
 		/// <summary>
