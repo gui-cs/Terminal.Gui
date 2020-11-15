@@ -479,16 +479,15 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new <see cref="FileDialog"/>.
 		/// </summary>
-		public FileDialog () : this (title: string.Empty, prompt: string.Empty, nameFieldLabel: string.Empty, message: string.Empty) { }
+		public FileDialog () : this (title: string.Empty, prompt: string.Empty, message: string.Empty) { }
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="FileDialog"/>
 		/// </summary>
 		/// <param name="title">The title.</param>
 		/// <param name="prompt">The prompt.</param>
-		/// <param name="nameFieldLabel">The name field label.</param>
 		/// <param name="message">The message.</param>
-		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message) : base (title)//, Driver.Cols - 20, Driver.Rows - 5, null)
+		public FileDialog (ustring title, ustring prompt, ustring message) : base (title)//, Driver.Cols - 20, Driver.Rows - 5, null)
 		{
 			this.message = new Label (message) { 
 				X = 1,
@@ -513,7 +512,7 @@ namespace Terminal.Gui {
 			};
 			Add (dirLabel, dirEntry);
 
-			this.nameFieldLabel = new Label ("Open: ") {
+			this.nameFieldLabel = new Label ("File:") {
 				X = 6,
 				Y = 3 + msgLines,
 			};
@@ -686,7 +685,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="title">The title.</param>
 		/// <param name="message">The message.</param>
-		public SaveDialog (ustring title, ustring message) : base (title, prompt: "Save", nameFieldLabel: "Save as:", message: message) { }
+		public SaveDialog (ustring title, ustring message) : base (title, prompt: "Save", message: message) { }
 
 		/// <summary>
 		/// Gets the name of the file the user selected for saving, or null
@@ -731,7 +730,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="title"></param>
 		/// <param name="message"></param>
-		public OpenDialog (ustring title, ustring message) : base (title, prompt: "Open", nameFieldLabel: "Open", message: message)
+		public OpenDialog (ustring title, ustring message) : base (title, prompt: "Open", message: message)
 		{
 		}
 
