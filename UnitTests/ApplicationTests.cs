@@ -212,5 +212,20 @@ namespace Terminal.Gui {
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Driver);
 		}
+
+		[Fact]
+		public void Loaded_Ready_Unlodaded_Events ()
+		{
+			Init ();
+			var top = Application.Top;
+			var count = 0;
+			top.Loaded += () => count++;
+			top.Ready += () => count++;
+			top.Unloaded += () => count++;
+			Application.Iteration = () => Application.RequestStop ();
+			Application.Run ();
+			Application.Shutdown ();
+			Assert.Equal (3, count);
+		}
 	}
 }

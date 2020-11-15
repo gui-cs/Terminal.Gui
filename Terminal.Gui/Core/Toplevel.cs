@@ -62,6 +62,12 @@ namespace Terminal.Gui {
 		public event Action Ready;
 
 		/// <summary>
+		/// Fired once the Toplevel's <see cref="Application.RunState"/> has begin unloaded.
+		/// A Unloaded event handler is a good place to disposing after calling `<see cref="Application.End(Application.RunState)"/>.
+		/// </summary>
+		public event Action Unloaded;
+
+		/// <summary>
 		/// Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> is redraws for the first time.
 		/// </summary>
 		internal virtual void OnLoaded ()
@@ -70,11 +76,19 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered it's first iteration of the loop. 
+		/// Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered it's first iteration of the loop.
 		/// </summary>
 		internal virtual void OnReady ()
 		{
 			Ready?.Invoke ();
+		}
+
+		/// <summary>
+		/// Called from <see cref="Application.End(Application.RunState)"/> before the <see cref="Toplevel"/> is disposed.
+		/// </summary>
+		internal virtual void OnUnloaded ()
+		{
+			Unloaded?.Invoke ();
 		}
 
 		/// <summary>

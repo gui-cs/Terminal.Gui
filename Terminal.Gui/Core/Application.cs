@@ -484,6 +484,7 @@ namespace Terminal.Gui {
 			if (runState == null)
 				throw new ArgumentNullException (nameof (runState));
 
+			runState.Toplevel.OnUnloaded ();
 			runState.Dispose ();
 		}
 
