@@ -93,7 +93,7 @@ namespace UICatalog {
 			};
 			frame.Add (numButtonsEdit);
 
-			Top.Ready += () => frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit)
+			Top.Loaded += () => frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit)
 				+ Dim.Height (numButtonsEdit) + 2;
 
 			label = new Label ("Button Pressed:") {

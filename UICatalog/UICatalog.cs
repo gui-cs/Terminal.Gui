@@ -100,13 +100,13 @@ namespace UICatalog {
 				scenario.Setup ();
 				scenario.Run ();
 
-				static void ReadyHandler ()
+				static void LoadedHandler ()
 				{
 					_rightPane.SetFocus ();
-					_top.Ready -= ReadyHandler;
+					_top.Loaded -= LoadedHandler;
 				}
 
-				_top.Ready += ReadyHandler;
+				_top.Loaded += LoadedHandler;
 
 #if DEBUG_IDISPOSABLE
 				// After the scenario runs, validate all Responder-based instances
@@ -258,7 +258,7 @@ namespace UICatalog {
 			_top.Add (_leftPane);
 			_top.Add (_rightPane);
 			_top.Add (_statusBar);
-			_top.Ready += () => {
+			_top.Loaded += () => {
 				if (_runningScenario != null) {
 					_runningScenario = null;
 				}
