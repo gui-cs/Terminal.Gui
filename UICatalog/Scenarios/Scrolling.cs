@@ -284,12 +284,20 @@ namespace UICatalog {
 			progress.X = Pos.Right (scrollView) + 1;
 			progress.Y = Pos.AnchorEnd (2);
 			progress.Width = 50;
+			bool pulsing = true;
 			bool timer (MainLoop caller)
 			{
 				progress.Pulse ();
-				return true;
+				return pulsing;
 			}
 			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
+
+			void Top_Unloaded ()
+			{
+				pulsing = false;
+				Top.Unloaded -= Top_Unloaded;
+			}
+			Top.Unloaded += Top_Unloaded;
 
 			Win.Add (scrollView, scrollView2, scrollView3, mousePos, progress);
 		}
