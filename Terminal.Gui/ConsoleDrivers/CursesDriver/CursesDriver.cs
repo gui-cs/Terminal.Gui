@@ -17,9 +17,9 @@ namespace Terminal.Gui {
 	/// This is the Curses driver for the gui.cs/Terminal framework.
 	/// </summary>
 	internal class CursesDriver : ConsoleDriver {
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 		public override int Cols => Curses.Cols;
 		public override int Rows => Curses.Lines;
+		public override int Top => 0;
 
 		// Current row, and current col, tracked by Move/AddRune only
 		int ccol, crow;
@@ -907,7 +907,5 @@ namespace Terminal.Gui {
 			killpg (0, signal);
 			return true;
 		}
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 	}
-
 }

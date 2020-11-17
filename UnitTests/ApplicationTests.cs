@@ -28,7 +28,7 @@ namespace Terminal.Gui {
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Driver);
 
-			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 			Assert.NotNull (Application.Current);
 			Assert.NotNull (Application.CurrentView);
 			Assert.NotNull (Application.Top);
@@ -66,7 +66,7 @@ namespace Terminal.Gui {
 
 		void Init ()
 		{
-			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey(true)));
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 			Assert.NotNull (Application.Driver);
 			Assert.NotNull (Application.MainLoop);
 		}

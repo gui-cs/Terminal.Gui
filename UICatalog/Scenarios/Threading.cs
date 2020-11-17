@@ -127,6 +127,7 @@ namespace UICatalog {
 			await Task.Delay (3000);
 			LogJob ("Returning from task method");
 			await _itemsList.SetSourceAsync (items);
+			_itemsList.SetNeedsDisplay ();
 		}
 
 		private CancellationTokenSource cancellationTokenSource;

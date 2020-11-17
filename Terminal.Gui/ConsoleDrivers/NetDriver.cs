@@ -8,18 +8,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using NStack;
 
 namespace Terminal.Gui {
 
 	internal class NetDriver : ConsoleDriver {
-		int cols, rows;
+		int cols, rows, top;
 		public override int Cols => cols;
 		public override int Rows => rows;
+		public override int Top => top;
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		int [,,] contents;
 		bool [] dirtyLine;
+
+		public NetDriver ()
+		{
+			ResizeScreen ();
+			UpdateOffscreen ();
+		}
 
 		void UpdateOffscreen ()
 		{
@@ -27,26 +35,18 @@ namespace Terminal.Gui {
 			int rows = Rows;
 
 			contents = new int [rows, cols, 3];
-			for (int r = 0; r < rows; r++) {
+			dirtyLine = new bool [rows];
+			for (int row = 0; row < rows; row++) {
 				for (int c = 0; c < cols; c++) {
-					contents [r, c, 0] = ' ';
-					contents [r, c, 1] = MakeColor (ConsoleColor.Gray, ConsoleColor.Black);
-					contents [r, c, 2] = 0;
+					contents [row, c, 0] = ' ';
+					contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
+					contents [row, c, 2] = 0;
+					dirtyLine [row] = true;
 				}
 			}
-			dirtyLine = new bool [rows];
-			for (int row = 0; row < rows; row++)
-				dirtyLine [row] = true;
 		}
 
 		static bool sync = false;
-
-		public NetDriver ()
-		{
-			cols = Console.WindowWidth;
-			rows = Console.WindowHeight - 1;
-			UpdateOffscreen ();
-		}
 
 		bool needMove;
 		// Current row, and current col, tracked by Move/AddCh only
@@ -57,15 +57,18 @@ namespace Terminal.Gui {
 			crow = row;
 
 			if (Clip.Contains (col, row)) {
-				Console.CursorTop = row;
-				Console.CursorLeft = col;
-				needMove = false;
+				if (cols == Console.WindowWidth && rows == Console.WindowHeight) {
+					Console.SetCursorPosition (col, row);
+					needMove = false;
+				}
 			} else {
-				Console.CursorTop = Clip.Y;
-				Console.CursorLeft = Clip.X;
-				needMove = true;
+				if (cols == Console.WindowWidth && rows == Console.WindowHeight) {
+					if (Console.WindowHeight > 0) {
+						Console.SetCursorPosition (Clip.X, Clip.Y);
+					}
+					needMove = true;
+				}
 			}
-
 		}
 
 		public override void AddRune (Rune rune)
@@ -73,8 +76,9 @@ namespace Terminal.Gui {
 			rune = MakePrintable (rune);
 			if (Clip.Contains (ccol, crow)) {
 				if (needMove) {
-					//Console.CursorLeft = ccol;
-					//Console.CursorTop = crow;
+					if (cols == Console.WindowWidth && rows == Console.WindowHeight) {
+						Console.SetCursorPosition (ccol, crow);
+					}
 					needMove = false;
 				}
 				contents [crow, ccol, 0] = (int)(uint)rune;
@@ -102,7 +106,14 @@ namespace Terminal.Gui {
 		public override void End ()
 		{
 			Console.ResetColor ();
-			Console.Clear ();
+			Clear ();
+		}
+
+		void Clear ()
+		{
+			if (Rows > 0) {
+				Console.Clear ();
+			}
 		}
 
 		static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
@@ -111,15 +122,16 @@ namespace Terminal.Gui {
 			return new Attribute () { value = ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff) };
 		}
 
-
 		public override void Init (Action terminalResized)
 		{
+			TerminalResized = terminalResized;
+			Console.TreatControlCAsInput = true;
+
 			Colors.TopLevel = new ColorScheme ();
 			Colors.Base = new ColorScheme ();
 			Colors.Dialog = new ColorScheme ();
 			Colors.Menu = new ColorScheme ();
 			Colors.Error = new ColorScheme ();
-			Clip = new Rect (0, 0, Cols, Rows);
 
 			Colors.TopLevel.Normal = MakeColor (ConsoleColor.Green, ConsoleColor.Black);
 			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
@@ -151,7 +163,15 @@ namespace Terminal.Gui {
 			Colors.Error.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
 			Colors.Error.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Red);
 			Colors.Error.HotFocus = Colors.Error.HotNormal;
-			Console.Clear ();
+			Clear ();
+		}
+
+		void ResizeScreen ()
+		{
+			cols = Console.WindowWidth;
+			rows = Console.WindowHeight;
+			Clip = new Rect (0, 0, Cols, Rows);
+			top = Console.WindowTop;
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)
@@ -176,31 +196,14 @@ namespace Terminal.Gui {
 
 		public override void UpdateScreen ()
 		{
-			int rows = Rows;
-			int cols = Cols;
-
-			Console.CursorTop = 0;
-			Console.CursorLeft = 0;
-			for (int row = 0; row < rows; row++) {
-				dirtyLine [row] = false;
-				for (int col = 0; col < cols; col++) {
-					contents [row, col, 2] = 0;
-					var color = contents [row, col, 1];
-					if (color != redrawColor)
-						SetColor (color);
-					Console.Write ((char)contents [row, col, 0]);
-				}
+			if (Rows == 0) {
+				return;
 			}
-		}
 
-		public override void Refresh ()
-		{
 			int rows = Rows;
 			int cols = Cols;
 
-			var savedRow = Console.CursorTop;
-			var savedCol = Console.CursorLeft;
-			for (int row = 0; row < rows; row++) {
+			for (int row = top; row < rows; row++) {
 				if (!dirtyLine [row])
 					continue;
 				dirtyLine [row] = false;
@@ -208,8 +211,9 @@ namespace Terminal.Gui {
 					if (contents [row, col, 2] != 1)
 						continue;
 
-					Console.CursorTop = row;
-					Console.CursorLeft = col;
+					if (Console.WindowHeight > 0) {
+						Console.SetCursorPosition (col, row);
+					}
 					for (; col < cols && contents [row, col, 2] == 1; col++) {
 						var color = contents [row, col, 1];
 						if (color != redrawColor)
@@ -220,13 +224,29 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			Console.CursorTop = savedRow;
-			Console.CursorLeft = savedCol;
+
+			UpdateCursor ();
+		}
+
+		public override void Refresh ()
+		{
+			if (Console.WindowWidth != Cols || Console.WindowHeight != Rows || Console.WindowTop != Top) {
+				ResizeScreen ();
+				UpdateOffscreen ();
+				TerminalResized.Invoke ();
+			}
+
+			UpdateScreen ();
 		}
 
 		public override void UpdateCursor ()
 		{
-			//
+			// Prevents the exception of size changing during resizing.
+			try {
+				if (ccol > 0 && ccol < Console.WindowWidth && crow > 0 && crow < Console.WindowHeight) {
+					Console.SetCursorPosition (ccol, crow);
+				}
+			} catch (ArgumentOutOfRangeException) { }
 		}
 
 		public override void StartReportingMouseMoves ()
@@ -249,6 +269,7 @@ namespace Terminal.Gui {
 
 		Key MapKey (ConsoleKeyInfo keyInfo)
 		{
+			MapKeyModifiers (keyInfo);
 			switch (keyInfo.Key) {
 			case ConsoleKey.Escape:
 				return Key.Esc;
@@ -298,42 +319,75 @@ namespace Terminal.Gui {
 			var key = keyInfo.Key;
 			if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
 				var delta = key - ConsoleKey.A;
-				if (keyInfo.Modifiers == ConsoleModifiers.Control)
-					return (Key)((uint)Key.A + delta);
-				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
+				if (keyInfo.Modifiers == ConsoleModifiers.Control) {
+					return (Key)(((uint)Key.CtrlMask) | ((uint)Key.A + delta));
+				}
+				if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
 					return (Key)(((uint)Key.AltMask) | ((uint)Key.A + delta));
-				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
-					return (Key)((uint)Key.A + delta);
-				else
-					return (Key)((uint)'a' + delta);
+				}
+				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+					if (keyInfo.KeyChar == 0 || (keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26)) {
+						return (Key)((uint)Key.A + delta);
+					}
+				}
+				return (Key)((uint)keyInfo.KeyChar);
 			}
 			if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
 				var delta = key - ConsoleKey.D0;
-				if (keyInfo.Modifiers == ConsoleModifiers.Alt)
+				if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
 					return (Key)(((uint)Key.AltMask) | ((uint)Key.D0 + delta));
-				if (keyInfo.Modifiers == ConsoleModifiers.Shift)
-					return (Key)((uint)keyInfo.KeyChar);
-				return (Key)((uint)Key.D0 + delta);
+				}
+				if (keyInfo.Modifiers == ConsoleModifiers.Control) {
+					return (Key)(((uint)Key.CtrlMask) | ((uint)Key.D0 + delta));
+				}
+				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+					if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30) {
+						return (Key)((uint)Key.D0 + delta);
+					}
+				}
+				return (Key)((uint)keyInfo.KeyChar);
 			}
-			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F10) {
+			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F12) {
 				var delta = key - ConsoleKey.F1;
+				if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+					return (Key)((uint)Key.F1 + delta);
+				}
 
-				return (Key)((int)Key.F1 + delta);
+				return (Key)((uint)Key.F1 + delta);
 			}
+			if (keyInfo.KeyChar != 0) {
+				return (Key)((uint)keyInfo.KeyChar);
+			}
+
 			return (Key)(0xffffffff);
 		}
 
-		KeyModifiers keyModifiers = new KeyModifiers ();
+		KeyModifiers keyModifiers;
+
+		void MapKeyModifiers (ConsoleKeyInfo keyInfo)
+		{
+			if (keyModifiers == null)
+				keyModifiers = new KeyModifiers ();
+
+			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
+				keyModifiers.Shift = true;
+			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
+				keyModifiers.Ctrl = true;
+			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0)
+				keyModifiers.Alt = true;
+		}
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			(mainLoop.Driver as NetMainLoop).KeyPressed = delegate (ConsoleKeyInfo consoleKey) {
 				var map = MapKey (consoleKey);
-				if (map == (Key)0xffffffff)
+				if (map == (Key)0xffffffff) {
 					return;
+				}
 				keyHandler (new KeyEvent (map, keyModifiers));
 				keyUpHandler (new KeyEvent (map, keyModifiers));
+				keyModifiers = null;
 			};
 		}
 
@@ -368,14 +422,17 @@ namespace Terminal.Gui {
 	/// file descriptor monitoring.
 	/// </summary>
 	/// <remarks>
-	/// This implementation is used for both NetDriver and FakeDriver. 
+	/// This implementation is used for NetDriver.
 	/// </remarks>
 	public class NetMainLoop : IMainLoopDriver {
-		AutoResetEvent keyReady = new AutoResetEvent (false);
-		AutoResetEvent waitForProbe = new AutoResetEvent (false);
+		ManualResetEventSlim keyReady = new ManualResetEventSlim (false);
+		ManualResetEventSlim waitForProbe = new ManualResetEventSlim (false);
+		ManualResetEventSlim winChange = new ManualResetEventSlim (false);
 		ConsoleKeyInfo? keyResult = null;
 		MainLoop mainLoop;
-		Func<ConsoleKeyInfo> consoleKeyReaderFn = null;
+		ConsoleDriver consoleDriver;
+		bool winChanged;
+		CancellationTokenSource tokenSource = new CancellationTokenSource ();
 
 		/// <summary>
 		/// Invoked when a Key is pressed.
@@ -383,66 +440,126 @@ namespace Terminal.Gui {
 		public Action<ConsoleKeyInfo> KeyPressed;
 
 		/// <summary>
-		/// Initializes the class.
+		/// Initializes the class with the console driver.
 		/// </summary>
 		/// <remarks>
-		///   Passing a consoleKeyReaderfn is provided to support unit test sceanrios.
+		///   Passing a consoleDriver is provided to capture windows resizing.
 		/// </remarks>
-		/// <param name="consoleKeyReaderFn">The method to be called to get a key from the console.</param>
-		public NetMainLoop (Func<ConsoleKeyInfo> consoleKeyReaderFn = null)
+		/// <param name="consoleDriver">The console driver used by this Net main loop.</param>
+		public NetMainLoop (ConsoleDriver consoleDriver = null)
 		{
-			if (consoleKeyReaderFn == null) {
-				throw new ArgumentNullException ("key reader function must be provided.");
+			if (consoleDriver == null) {
+				throw new ArgumentNullException ("console driver instance must be provided.");
 			}
-			this.consoleKeyReaderFn = consoleKeyReaderFn;
+			this.consoleDriver = consoleDriver;
 		}
 
-		void WindowsKeyReader ()
+		void KeyReader ()
 		{
 			while (true) {
-				waitForProbe.WaitOne ();
-				keyResult = consoleKeyReaderFn();
+				waitForProbe.Wait ();
+				waitForProbe.Reset ();
+				keyResult = Console.ReadKey (true);
 				keyReady.Set ();
+			}
+		}
+
+		void CheckWinChange ()
+		{
+			while (true) {
+				winChange.Wait ();
+				winChange.Reset ();
+				WaitWinChange ();
+				winChanged = true;
+				keyReady.Set ();
+			}
+		}
+
+		void WaitWinChange ()
+		{
+			while (true) {
+				if (Console.WindowWidth != consoleDriver.Cols || Console.WindowHeight != consoleDriver.Rows
+					|| Console.WindowTop != consoleDriver.Top) { // Top only working on Windows.
+					return;
+				}
 			}
 		}
 
 		void IMainLoopDriver.Setup (MainLoop mainLoop)
 		{
 			this.mainLoop = mainLoop;
-			Thread readThread = new Thread (WindowsKeyReader);
-			readThread.Start ();
+			Task.Run (KeyReader);
+			Task.Run (CheckWinChange);
 		}
 
 		void IMainLoopDriver.Wakeup ()
 		{
+			keyReady.Set ();
 		}
 
 		bool IMainLoopDriver.EventsPending (bool wait)
 		{
 			long now = DateTime.UtcNow.Ticks;
 
-			int waitTimeout;
+			waitForProbe.Set ();
+			winChange.Set ();
+
+			if (CheckTimers (wait, out var waitTimeout)) {
+				return true;
+			}
+
+			try {
+				if (!tokenSource.IsCancellationRequested) {
+					keyReady.Wait (waitTimeout, tokenSource.Token);
+				}
+			} catch (OperationCanceledException) {
+				return true;
+			} finally {
+				keyReady.Reset ();
+			}
+
+			if (!tokenSource.IsCancellationRequested) {
+				return keyResult.HasValue || CheckTimers (wait, out _) || winChanged;
+			}
+
+			tokenSource.Dispose ();
+			tokenSource = new CancellationTokenSource ();
+			return true;
+		}
+
+		bool CheckTimers (bool wait, out int waitTimeout)
+		{
+			long now = DateTime.UtcNow.Ticks;
+
 			if (mainLoop.timeouts.Count > 0) {
 				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
 				if (waitTimeout < 0)
 					return true;
-			} else
+			} else {
 				waitTimeout = -1;
+			}
 
 			if (!wait)
 				waitTimeout = 0;
 
-			keyResult = null;
-			waitForProbe.Set ();
-			keyReady.WaitOne (waitTimeout);
-			return keyResult.HasValue;
+			int ic;
+			lock (mainLoop.idleHandlers) {
+				ic = mainLoop.idleHandlers.Count;
+			}
+
+			return ic > 0;
 		}
 
 		void IMainLoopDriver.MainIteration ()
 		{
 			if (keyResult.HasValue) {
-				KeyPressed?.Invoke (keyResult.Value);
+				var kr = keyResult;
 				keyResult = null;
+				KeyPressed?.Invoke (kr.Value);
+			}
+			if (winChanged) {
+				winChanged = false;
+				consoleDriver.Refresh ();
 			}
 		}
 	}
