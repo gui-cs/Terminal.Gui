@@ -1912,7 +1912,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Used by <see cref="Text"/> to resize the view's <see cref="Bounds"/> with the <see cref="TextFormatter.Size"/>.
-		/// Setting <see cref="Auto"/> to true only work if the <see cref="Width"/> and <see cref="Height"/> are null or
+		/// Setting <see cref="AutoSize"/> to true only work if the <see cref="Width"/> and <see cref="Height"/> are null or
 		///   <see cref="LayoutStyle.Absolute"/> values and doesn't work with <see cref="LayoutStyle.Computed"/> layout,
 		///   to avoid breaking the <see cref="Pos"/> and <see cref="Dim"/> settings.
 		/// </summary>
