@@ -84,7 +84,7 @@
   <h1 id="Terminal_Gui_TextFormatter" data-uid="Terminal.Gui.TextFormatter" class="text-break">Class TextFormatter
   </h1>
   <div class="markdown level0 summary">
-Provides text formatting capabilities for console apps. Supports, hotkeys, horizontal alignment, multille lines, and word-based line wrap.
+Provides text formatting capabilities for console apps. Supports, hotkeys, horizontal alignment, multiple lines, and word-based line wrap.
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -237,7 +237,7 @@ The position in the text of the hotkey. The hotkey will be rendered using the ho
   <a id="Terminal_Gui_TextFormatter_HotKeySpecifier_" data-uid="Terminal.Gui.TextFormatter.HotKeySpecifier*"></a>
   <h4 id="Terminal_Gui_TextFormatter_HotKeySpecifier" data-uid="Terminal.Gui.TextFormatter.HotKeySpecifier">HotKeySpecifier</h4>
   <div class="markdown level1 summary">
-The specifier character for the hotkey (e.g. &apos;_&apos;). Set to &apos;\xffff&apos; to disable hotkey support for this View instance. The default is &apos;\xffff&apos;. 
+The specifier character for the hotkey (e.g. &apos;_&apos;). Set to &apos;\xffff&apos; to disable hotkey support for this View instance. The default is &apos;\xffff&apos;.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -292,7 +292,7 @@ the underlying Rune to be identified as a &quot;private use&quot; Unicode charac
   <a id="Terminal_Gui_TextFormatter_Lines_" data-uid="Terminal.Gui.TextFormatter.Lines*"></a>
   <h4 id="Terminal_Gui_TextFormatter_Lines" data-uid="Terminal.Gui.TextFormatter.Lines">Lines</h4>
   <div class="markdown level1 summary">
-Gets the formatted lines. 
+Gets the formatted lines.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -326,7 +326,7 @@ Upon a &apos;get&apos; of this property, if the text needs to be formatted (if <
   <a id="Terminal_Gui_TextFormatter_NeedsFormat_" data-uid="Terminal.Gui.TextFormatter.NeedsFormat*"></a>
   <h4 id="Terminal_Gui_TextFormatter_NeedsFormat" data-uid="Terminal.Gui.TextFormatter.NeedsFormat">NeedsFormat</h4>
   <div class="markdown level1 summary">
-Gets or sets whether the <a class="xref" href="Terminal.Gui.TextFormatter.html">TextFormatter</a> needs to format the text when <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Draw_Terminal_Gui_Rect_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">Draw(Rect, Attribute, Attribute)</a> is called. 
+Gets or sets whether the <a class="xref" href="Terminal.Gui.TextFormatter.html">TextFormatter</a> needs to format the text when <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Draw_Terminal_Gui_Rect_Terminal_Gui_Attribute_Terminal_Gui_Attribute_">Draw(Rect, Attribute, Attribute)</a> is called.
 If it is <code>false</code> when Draw is called, the Draw call will be faster.
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -352,7 +352,7 @@ If it is <code>false</code> when Draw is called, the Draw call will be faster.
   <h5 id="Terminal_Gui_TextFormatter_NeedsFormat_remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 <p>
-This is set to true when the properties of <a class="xref" href="Terminal.Gui.TextFormatter.html">TextFormatter</a> are set. 
+This is set to true when the properties of <a class="xref" href="Terminal.Gui.TextFormatter.html">TextFormatter</a> are set.
 </p>
 </div>
   
@@ -360,7 +360,7 @@ This is set to true when the properties of <a class="xref" href="Terminal.Gui.Te
   <a id="Terminal_Gui_TextFormatter_Size_" data-uid="Terminal.Gui.TextFormatter.Size*"></a>
   <h4 id="Terminal_Gui_TextFormatter_Size" data-uid="Terminal.Gui.TextFormatter.Size">Size</h4>
   <div class="markdown level1 summary">
-Gets or sets the size of the area the text will be constrainted to when formatted. 
+Gets or sets the size of the area the text will be constrained to when formatted.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -593,8 +593,8 @@ Finds the hotkey and its location in text.
       <tr>
         <td><span class="xref">System.Boolean</span></td>
         <td><span class="parametername">firstUpperCase</span></td>
-        <td>If <code>true</code> the legacy behavior of identifying the first upper case character as the hotkey will be eanbled. 
-Regardless of the value of this parameter, <code>hotKeySpecifier</code> takes precidence.</td>
+        <td>If <code>true</code> the legacy behavior of identifying the first upper case character as the hotkey will be enabled.
+Regardless of the value of this parameter, <code>hotKeySpecifier</code> takes precedence.</td>
       </tr>
       <tr>
         <td><span class="xref">System.Int32</span></td>
@@ -745,7 +745,7 @@ make the text just fit <code>width</code>. Spaces will not be added to the ends.
     <tbody>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
-        <td>The justifed text.</td>
+        <td>The justified text.</td>
       </tr>
     </tbody>
   </table>
@@ -803,7 +803,7 @@ Computes the number of lines needed to render the specified text given the width
   <a id="Terminal_Gui_TextFormatter_MaxWidth_" data-uid="Terminal.Gui.TextFormatter.MaxWidth*"></a>
   <h4 id="Terminal_Gui_TextFormatter_MaxWidth_NStack_ustring_System_Int32_" data-uid="Terminal.Gui.TextFormatter.MaxWidth(NStack.ustring,System.Int32)">MaxWidth(ustring, Int32)</h4>
   <div class="markdown level1 summary">
-Computes the maximum width needed to render the text (single line or multple lines) given a minimum width.
+Computes the maximum width needed to render the text (single line or multiple lines) given a minimum width.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -906,8 +906,8 @@ Removes the hotkey specifier from text.
   <a id="Terminal_Gui_TextFormatter_ReplaceHotKeyWithTag_" data-uid="Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag*"></a>
   <h4 id="Terminal_Gui_TextFormatter_ReplaceHotKeyWithTag_NStack_ustring_System_Int32_" data-uid="Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag(NStack.ustring,System.Int32)">ReplaceHotKeyWithTag(ustring, Int32)</h4>
   <div class="markdown level1 summary">
-Replaces the Rune at the index specfiied by the <code>hotPos</code> parameter with a tag identifying 
-it as the hotkey. 
+Replaces the Rune at the index specified by the <code>hotPos</code> parameter with a tag identifying 
+it as the hotkey.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -986,7 +986,7 @@ Formats the provided text to fit within the width provided using word wrapping.
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">width</span></td>
-        <td>The width to contrain the text to</td>
+        <td>The width to contain the text to</td>
       </tr>
     </tbody>
   </table>

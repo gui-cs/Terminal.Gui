@@ -132,6 +132,15 @@ Single-line text entry <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">View.HotKeySpecifier</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Shortcut">View.Shortcut</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ShortcutTag">View.ShortcutTag</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ShortcutAction">View.ShortcutAction</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Data">View.Data</a>
     </div>
     <div>
@@ -325,6 +334,9 @@ Single-line text entry <a class="xref" href="Terminal.Gui.View.html">View</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">View.LayoutSubviews()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AutoSize">View.AutoSize</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextAlignment">View.TextAlignment</a>
@@ -932,6 +944,50 @@ Method invoked when a view loses focus.
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnLeave_Terminal_Gui_View_">View.OnLeave(View)</a></div>
   
   
+  <a id="Terminal_Gui_TextField_OnTextChanging_" data-uid="Terminal.Gui.TextField.OnTextChanging*"></a>
+  <h4 id="Terminal_Gui_TextField_OnTextChanging_NStack_ustring_" data-uid="Terminal.Gui.TextField.OnTextChanging(NStack.ustring)">OnTextChanging(ustring)</h4>
+  <div class="markdown level1 summary">
+Virtual method that invoke the <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_TextChanging">TextChanging</a> event if it&apos;s defined.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual TextChangingEventArgs OnTextChanging(ustring newText)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">newText</span></td>
+        <td>The new text to be replaced.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.TextChangingEventArgs.html">TextChangingEventArgs</a></td>
+        <td>Returns the <a class="xref" href="Terminal.Gui.TextChangingEventArgs.html">TextChangingEventArgs</a></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_TextField_Paste_" data-uid="Terminal.Gui.TextField.Paste*"></a>
   <h4 id="Terminal_Gui_TextField_Paste" data-uid="Terminal.Gui.TextField.Paste">Paste()</h4>
   <div class="markdown level1 summary">
@@ -1084,6 +1140,32 @@ Changed event, raised when the text has changed.
   <div class="markdown level1 remarks">
 This event is raised when the <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_Text">Text</a> changes. 
 </div>
+  
+  
+  <h4 id="Terminal_Gui_TextField_TextChanging" data-uid="Terminal.Gui.TextField.TextChanging">TextChanging</h4>
+  <div class="markdown level1 summary">
+Changing event, raised before the <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_Text">Text</a> changes and can be canceled or changing the new text.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;TextChangingEventArgs&gt; TextChanging</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.TextChangingEventArgs.html">TextChangingEventArgs</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>

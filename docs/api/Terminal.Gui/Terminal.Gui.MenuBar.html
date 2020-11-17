@@ -130,6 +130,15 @@ The MenuBar provides a menu for Terminal.Gui applications.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">View.HotKeySpecifier</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Shortcut">View.Shortcut</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ShortcutTag">View.ShortcutTag</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ShortcutAction">View.ShortcutAction</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Data">View.Data</a>
     </div>
     <div>
@@ -286,9 +295,6 @@ The MenuBar provides a menu for Terminal.Gui applications.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyPress">View.KeyPress</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_">View.ProcessColdKey(KeyEvent)</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyDown">View.KeyDown</a>
     </div>
     <div>
@@ -323,6 +329,9 @@ The MenuBar provides a menu for Terminal.Gui applications.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">View.Text</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AutoSize">View.AutoSize</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextAlignment">View.TextAlignment</a>
@@ -517,6 +526,33 @@ Gets or sets the array of <a class="xref" href="Terminal.Gui.MenuBarItem.html">M
       <tr>
         <td><a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a>[]</td>
         <td>The menu array.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_MenuBar_ShortcutDelimiter_" data-uid="Terminal.Gui.MenuBar.ShortcutDelimiter*"></a>
+  <h4 id="Terminal_Gui_MenuBar_ShortcutDelimiter" data-uid="Terminal.Gui.MenuBar.ShortcutDelimiter">ShortcutDelimiter</h4>
+  <div class="markdown level1 summary">
+Used for change the shortcut delimiter separator.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ustring ShortcutDelimiter { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -791,6 +827,71 @@ Positions the cursor in the right position based on the currently focused view i
   </div>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_PositionCursor">View.PositionCursor()</a></div>
+  
+  
+  <a id="Terminal_Gui_MenuBar_ProcessColdKey_" data-uid="Terminal.Gui.MenuBar.ProcessColdKey*"></a>
+  <h4 id="Terminal_Gui_MenuBar_ProcessColdKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.MenuBar.ProcessColdKey(Terminal.Gui.KeyEvent)">ProcessColdKey(KeyEvent)</h4>
+  <div class="markdown level1 summary">
+This method can be overwritten by views that
+want to provide accelerator functionality
+(Alt-key for example), but without
+interefering with normal ProcessKey behavior.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool ProcessColdKey(KeyEvent kb)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
+        <td><span class="parametername">kb</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_">View.ProcessColdKey(KeyEvent)</a></div>
+  <h5 id="Terminal_Gui_MenuBar_ProcessColdKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  After keys are sent to the subviews on the
+  current view, all the view are
+  processed and the key is passed to the views
+  to allow some of them to process the keystroke
+  as a cold-key. </p>
+<p>
+  This functionality is used, for example, by
+  default buttons to act on the enter key.
+  Processing this as a hot-key would prevent
+  non-default buttons from consuming the enter
+  keypress when they have the focus.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_MenuBar_ProcessHotKey_" data-uid="Terminal.Gui.MenuBar.ProcessHotKey*"></a>
