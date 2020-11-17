@@ -391,6 +391,7 @@ namespace Terminal.Gui {
 		bool showHorizontalScrollIndicator;
 		bool showVerticalScrollIndicator;
 		bool keepContentAlwaysInViewport = true;
+		bool autoHideScrollBars = true;
 
 		/// <summary>
 		/// Represents the contents of the data shown inside the scrolview
@@ -431,7 +432,15 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// If true the vertical/horizontal scroll bars won't be showed if it's not needed.
 		/// </summary>
-		public bool AutoHideScrollBars { get; set; } = true;
+		public bool AutoHideScrollBars {
+			get => autoHideScrollBars;
+			set {
+				if (autoHideScrollBars != value) {
+					autoHideScrollBars = value;
+					SetNeedsDisplay ();
+				}
+			}
+		}
 
 		/// <summary>
 		/// Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollView"/>
@@ -565,7 +574,7 @@ namespace Terminal.Gui {
 			contentView.Redraw (contentView.Frame);
 			Driver.Clip = savedClip;
 
-			if (AutoHideScrollBars) {
+			if (autoHideScrollBars) {
 				ShowHideScrollBars ();
 			} else {
 				if (ShowVerticalScrollIndicator) {
@@ -627,9 +636,14 @@ namespace Terminal.Gui {
 				}
 				h = true;
 			}
-
-			vertical.Height = Dim.Fill (h ? 1 : 0);
-			horizontal.Width = Dim.Fill (v ? 1 : 0);
+			var dim = Dim.Fill (h ? 1 : 0);
+			if (!vertical.Height.Equals (dim)) {
+				vertical.Height = dim;
+			}
+			dim = Dim.Fill (v ? 1 : 0);
+			if (!horizontal.Width.Equals (dim)) {
+				horizontal.Width = dim;
+			}
 
 			if (v) {
 				vertical.SetRelativeLayout (Bounds);
