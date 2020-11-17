@@ -32,6 +32,11 @@ namespace Terminal.Gui {
 		public bool ReadOnly { get; set; } = false;
 
 		/// <summary>
+		/// Changing event, raised before the <see cref="Text"/> changes and can be canceled or changing the new text.
+		/// </summary>
+		public event Action<TextChangingEventArgs> TextChanging;
+
+		/// <summary>
 		///   Changed event, raised when the text has changed.
 		/// </summary>
 		/// <remarks>
@@ -136,7 +141,11 @@ namespace Terminal.Gui {
 				if (oldText == value)
 					return;
 
-				text = TextModel.ToRunes (value);
+				var newText = OnTextChanging (value);
+				if (newText.Cancel) {
+					return;
+				}
+				text = TextModel.ToRunes (newText.NewText);
 				if (!Secret && !isFromHistory) {
 					if (historyText == null)
 						historyText = new List<ustring> () { oldText };
@@ -920,6 +929,41 @@ namespace Terminal.Gui {
 			point = selStart + cbTxt.RuneCount;
 			ClearAllSelection ();
 			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Virtual method that invoke the <see cref="TextChanging"/> event if it's defined.
+		/// </summary>
+		/// <param name="newText">The new text to be replaced.</param>
+		/// <returns>Returns the <see cref="TextChangingEventArgs"/></returns>
+		public virtual TextChangingEventArgs OnTextChanging (ustring newText)
+		{
+			var ev = new TextChangingEventArgs (newText);
+			TextChanging?.Invoke (ev);
+			return ev;
+		}
+	}
+
+	/// <summary>
+	/// An <see cref="EventArgs"/> which allows passing a cancelable new text value event.
+	/// </summary>
+	public class TextChangingEventArgs : EventArgs {
+		/// <summary>
+		/// The new text to be replaced.
+		/// </summary>
+		public ustring NewText { get; set; }
+		/// <summary>
+		/// Flag which allows to cancel the new text value.
+		/// </summary>
+		public bool Cancel { get; set; }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="TextChangingEventArgs"/>
+		/// </summary>
+		/// <param name="newText">The new <see cref="TextField.Text"/> to be replaced.</param>
+		public TextChangingEventArgs (ustring newText)
+		{
+			NewText = newText;
 		}
 	}
 }
