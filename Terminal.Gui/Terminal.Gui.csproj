@@ -22,11 +22,32 @@
     <Summary>Application framework for creating modern console applications using .NET</Summary>
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
     <PackageReleaseNotes>
-      v1.00 -
+      v1.0.0-pre.6
       * If StatusBar.Visible is set to false, TopLevel resizes correctly enabling hiding/showing of a StatusBar. UICatalog demonstrates.
       * New sample/demo app - ReactiveExample - Shows how to use reactive extensions and ReactiveUI with gui.cs. (Thanks @worldbeater)
       * BREAKING API CHANGE - Removed IEnumerable from View and Window. Use Subviews property instead. See #950.
-      
+      * Fixes #998. Added a cancelable TextChanging event to prevent the TextChanged event being called if the changing is canceled.
+      * Fixes #1002. Added a AutoSize property to the View class.
+      * Fixes #1009. AutoHideScrollBars is causing ScrollView always redrawing.
+      * Update to .NET 5 RTM
+      * Fixes #995. Improving TextField to work properly with Unicode characters
+      * Fixes #999. Toplevel should only redraw the subviews if !NeedDisplay.IsEmpty or layoutNeeded.
+      * Fixes #992. TextFormatter class now respect the view dimensions. Some typo fixing too.
+      * Fixes #990. Pos and Dim only can be properly used when all the views are totally initialized.
+      * Fixes #979. Force call LayoutSubviews to perform layout.
+      * Fixes #988. Update NStack.Core to version 0.15.0
+      * Fixes #41 and #949. Unit test to compare the difference between System.Rune and System.Text.Rune.
+      * Fixes #881, #928. Allowing more key combinations.
+      * Fixes #976. Mouse prints sequence characters on the terminal and the screen is not fully cleared. Only for netcoreapp3.1.
+      * BREAKING API CHANGE - #950 - Remove IEnumerable from View and Window
+      * Fixes #959. CursorPosition with hotkeys.
+      * Fixes #963. Added support for Unicode in TextField.
+      * Fixes #961. Recreates the Frame when necessary.
+      * Fixes #957. Terminal.Gui nuget package in Reactive example version.
+      * Fixes #933. Updated to work with libncurses 6.2
+      * Fixes #225 and maybe #41. Allowing Rune.ColumnWidth greater than one.
+      * Use glyphs for checkmarks and selection.
+
       v0.90 - "Feature Complete" pre-release of Terminal.Gui (aka gui.cs) 1.0. This release is a signficant upgrade from the previous published release (0.81). Most of the major changes and bug fixes are listed below. NOTE: This release includes breaking changes to the API; we will strive to avoid any more breaking changes before 1.0.
 
       What's new:
@@ -112,12 +133,12 @@
       * ScrollView updated to use pretty glyphs. (Thanks @tig!)
       * Menubar now uses pretty arrow glyph for sub-menus. (Thanks @tig!)
       * View now has a Text property, implemented via the new TextFormatting class. (Thanks @tig!)
-        * TextAlignment is implemented once across all Views that support it.
-        * Unicode support is now much more robust and complete; dozens of bugs fixed.
-        * Any view dervied from View now has a Text property with multi-line text formatting, including word-wrap and hotkey support.
-        * Label is now mostly just an alias for View; supports Clicked
-        * Button is now a very thin class derived from View (no API changes).
-        * Dozens of unit tests for TextAlignment are provided reducing the chance of regressions.
+      * TextAlignment is implemented once across all Views that support it.
+      * Unicode support is now much more robust and complete; dozens of bugs fixed.
+      * Any view dervied from View now has a Text property with multi-line text formatting, including word-wrap and hotkey support.
+      * Label is now mostly just an alias for View; supports Clicked
+      * Button is now a very thin class derived from View (no API changes).
+      * Dozens of unit tests for TextAlignment are provided reducing the chance of regressions.
       * Fixes #351. Added a horizontal display for RadioGroup. (Thanks @bidsp!)
       * Fixes #644. Added a UICatalog Scenario for a dynamic menu bar. (Thanks @bidsp!)
       * Fixes #838. Added a Visible property to the View. (Thanks @bidsp!)

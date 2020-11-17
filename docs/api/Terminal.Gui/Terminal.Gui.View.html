@@ -424,6 +424,36 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.View.html">View
   </h3>
   
   
+  <a id="Terminal_Gui_View_AutoSize_" data-uid="Terminal.Gui.View.AutoSize*"></a>
+  <h4 id="Terminal_Gui_View_AutoSize" data-uid="Terminal.Gui.View.AutoSize">AutoSize</h4>
+  <div class="markdown level1 summary">
+Used by <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">Text</a> to resize the view&apos;s <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> with the <a class="xref" href="Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Size">Size</a>.
+Setting <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AutoSize">AutoSize</a> to true only work if the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">Width</a> and <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">Height</a> are null or
+<a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> values and doesn&apos;t work with <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout,
+to avoid breaking the <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> and <a class="xref" href="Terminal.Gui.Dim.html">Dim</a> settings.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool AutoSize { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_View_Bounds_" data-uid="Terminal.Gui.View.Bounds*"></a>
   <h4 id="Terminal_Gui_View_Bounds" data-uid="Terminal.Gui.View.Bounds">Bounds</h4>
   <div class="markdown level1 summary">
@@ -887,6 +917,87 @@ Returns the most focused view in the chain of subviews (the leaf view that has t
       <tr>
         <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
         <td>The most focused.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_View_Shortcut_" data-uid="Terminal.Gui.View.Shortcut*"></a>
+  <h4 id="Terminal_Gui_View_Shortcut" data-uid="Terminal.Gui.View.Shortcut">Shortcut</h4>
+  <div class="markdown level1 summary">
+This is the global setting that can be used as a global shortcut to invoke an action if provided.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Key Shortcut { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Key.html">Key</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_View_ShortcutAction_" data-uid="Terminal.Gui.View.ShortcutAction*"></a>
+  <h4 id="Terminal_Gui_View_ShortcutAction" data-uid="Terminal.Gui.View.ShortcutAction">ShortcutAction</h4>
+  <div class="markdown level1 summary">
+The action to run if the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Shortcut">Shortcut</a> is defined.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual Action ShortcutAction { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_View_ShortcutTag_" data-uid="Terminal.Gui.View.ShortcutTag*"></a>
+  <h4 id="Terminal_Gui_View_ShortcutTag" data-uid="Terminal.Gui.View.ShortcutTag">ShortcutTag</h4>
+  <div class="markdown level1 summary">
+The keystroke combination used in the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Shortcut">Shortcut</a> as string.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ustring ShortcutTag { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>

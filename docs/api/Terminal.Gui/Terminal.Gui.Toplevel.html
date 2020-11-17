@@ -131,6 +131,15 @@ Toplevel views can be modally executed.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeySpecifier">View.HotKeySpecifier</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Shortcut">View.Shortcut</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ShortcutTag">View.ShortcutTag</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ShortcutAction">View.ShortcutAction</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Data">View.Data</a>
     </div>
     <div>
@@ -284,9 +293,6 @@ Toplevel views can be modally executed.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessHotKey_Terminal_Gui_KeyEvent_">View.ProcessHotKey(KeyEvent)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_">View.ProcessColdKey(KeyEvent)</a>
-    </div>
-    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_KeyDown">View.KeyDown</a>
     </div>
     <div>
@@ -321,6 +327,9 @@ Toplevel views can be modally executed.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">View.Text</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AutoSize">View.AutoSize</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextAlignment">View.TextAlignment</a>
@@ -755,6 +764,71 @@ Convenience factory method that creates a new Toplevel with the current terminal
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnKeyUp_Terminal_Gui_KeyEvent_">View.OnKeyUp(KeyEvent)</a></div>
   
   
+  <a id="Terminal_Gui_Toplevel_ProcessColdKey_" data-uid="Terminal.Gui.Toplevel.ProcessColdKey*"></a>
+  <h4 id="Terminal_Gui_Toplevel_ProcessColdKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Toplevel.ProcessColdKey(Terminal.Gui.KeyEvent)">ProcessColdKey(KeyEvent)</h4>
+  <div class="markdown level1 summary">
+This method can be overwritten by views that
+want to provide accelerator functionality
+(Alt-key for example), but without
+interefering with normal ProcessKey behavior.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool ProcessColdKey(KeyEvent keyEvent)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
+        <td><span class="parametername">keyEvent</span></td>
+        <td>Contains the details about the key that produced the event.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessColdKey_Terminal_Gui_KeyEvent_">View.ProcessColdKey(KeyEvent)</a></div>
+  <h5 id="Terminal_Gui_Toplevel_ProcessColdKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  After keys are sent to the subviews on the
+  current view, all the view are
+  processed and the key is passed to the views
+  to allow some of them to process the keystroke
+  as a cold-key. </p>
+<p>
+  This functionality is used, for example, by
+  default buttons to act on the enter key.
+  Processing this as a hot-key would prevent
+  non-default buttons from consuming the enter
+  keypress when they have the focus.
+</p>
+</div>
+  
+  
   <a id="Terminal_Gui_Toplevel_ProcessKey_" data-uid="Terminal.Gui.Toplevel.ProcessKey*"></a>
   <h4 id="Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
   <div class="markdown level1 summary">
@@ -929,16 +1003,70 @@ the views have been laid out, and before the views are drawn for the first time.
   </h3>
   
   
+  <h4 id="Terminal_Gui_Toplevel_Loaded" data-uid="Terminal.Gui.Toplevel.Loaded">Loaded</h4>
+  <div class="markdown level1 summary">
+Fired once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> has begin loaded.
+A Loaded event handler is a good place to finalize initialization before calling `<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_">RunLoop(Application.RunState, Boolean)</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action Loaded</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <h4 id="Terminal_Gui_Toplevel_Ready" data-uid="Terminal.Gui.Toplevel.Ready">Ready</h4>
   <div class="markdown level1 summary">
-Fired once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a> has started it&apos;s first iteration. 
+Fired once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a> has started it&apos;s first iteration.
 Subscribe to this event to perform tasks when the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> has been laid out and focus has been set.
-changes. A Ready event handler is a good place to finalize initialization after calling `<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run">Run()</a>(topLevel)`. 
+changes. A Ready event handler is a good place to finalize initialization after calling `<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run">Run()</a>(topLevel)`.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public event Action Ready</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_Toplevel_Unloaded" data-uid="Terminal.Gui.Toplevel.Unloaded">Unloaded</h4>
+  <div class="markdown level1 summary">
+Fired once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.Application.RunState.html">Application.RunState</a> has begin unloaded.
+A Unloaded event handler is a good place to disposing after calling `<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_">End(Application.RunState)</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action Unloaded</code></pre>
   </div>
   <h5 class="eventType">Event Type</h5>
   <table class="table table-bordered table-striped table-condensed">

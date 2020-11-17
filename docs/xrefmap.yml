@@ -103,12 +103,6 @@ references:
   commentId: F:Terminal.Gui.Application.Iteration
   fullName: Terminal.Gui.Application.Iteration
   nameWithType: Application.Iteration
-- uid: Terminal.Gui.Application.Loaded
-  name: Loaded
-  href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Loaded
-  commentId: F:Terminal.Gui.Application.Loaded
-  fullName: Terminal.Gui.Application.Loaded
-  nameWithType: Application.Loaded
 - uid: Terminal.Gui.Application.MainLoop
   name: MainLoop
   href: api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_MainLoop
@@ -3865,12 +3859,24 @@ references:
   commentId: T:Terminal.Gui.Key
   fullName: Terminal.Gui.Key
   nameWithType: Key
+- uid: Terminal.Gui.Key.A
+  name: A
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_A
+  commentId: F:Terminal.Gui.Key.A
+  fullName: Terminal.Gui.Key.A
+  nameWithType: Key.A
 - uid: Terminal.Gui.Key.AltMask
   name: AltMask
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_AltMask
   commentId: F:Terminal.Gui.Key.AltMask
   fullName: Terminal.Gui.Key.AltMask
   nameWithType: Key.AltMask
+- uid: Terminal.Gui.Key.B
+  name: B
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_B
+  commentId: F:Terminal.Gui.Key.B
+  fullName: Terminal.Gui.Key.B
+  nameWithType: Key.B
 - uid: Terminal.Gui.Key.Backspace
   name: Backspace
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_Backspace
@@ -3883,174 +3889,18 @@ references:
   commentId: F:Terminal.Gui.Key.BackTab
   fullName: Terminal.Gui.Key.BackTab
   nameWithType: Key.BackTab
+- uid: Terminal.Gui.Key.C
+  name: C
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_C
+  commentId: F:Terminal.Gui.Key.C
+  fullName: Terminal.Gui.Key.C
+  nameWithType: Key.C
 - uid: Terminal.Gui.Key.CharMask
   name: CharMask
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_CharMask
   commentId: F:Terminal.Gui.Key.CharMask
   fullName: Terminal.Gui.Key.CharMask
   nameWithType: Key.CharMask
-- uid: Terminal.Gui.Key.ControlA
-  name: ControlA
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlA
-  commentId: F:Terminal.Gui.Key.ControlA
-  fullName: Terminal.Gui.Key.ControlA
-  nameWithType: Key.ControlA
-- uid: Terminal.Gui.Key.ControlB
-  name: ControlB
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlB
-  commentId: F:Terminal.Gui.Key.ControlB
-  fullName: Terminal.Gui.Key.ControlB
-  nameWithType: Key.ControlB
-- uid: Terminal.Gui.Key.ControlC
-  name: ControlC
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlC
-  commentId: F:Terminal.Gui.Key.ControlC
-  fullName: Terminal.Gui.Key.ControlC
-  nameWithType: Key.ControlC
-- uid: Terminal.Gui.Key.ControlD
-  name: ControlD
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlD
-  commentId: F:Terminal.Gui.Key.ControlD
-  fullName: Terminal.Gui.Key.ControlD
-  nameWithType: Key.ControlD
-- uid: Terminal.Gui.Key.ControlE
-  name: ControlE
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlE
-  commentId: F:Terminal.Gui.Key.ControlE
-  fullName: Terminal.Gui.Key.ControlE
-  nameWithType: Key.ControlE
-- uid: Terminal.Gui.Key.ControlF
-  name: ControlF
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlF
-  commentId: F:Terminal.Gui.Key.ControlF
-  fullName: Terminal.Gui.Key.ControlF
-  nameWithType: Key.ControlF
-- uid: Terminal.Gui.Key.ControlG
-  name: ControlG
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlG
-  commentId: F:Terminal.Gui.Key.ControlG
-  fullName: Terminal.Gui.Key.ControlG
-  nameWithType: Key.ControlG
-- uid: Terminal.Gui.Key.ControlH
-  name: ControlH
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlH
-  commentId: F:Terminal.Gui.Key.ControlH
-  fullName: Terminal.Gui.Key.ControlH
-  nameWithType: Key.ControlH
-- uid: Terminal.Gui.Key.ControlI
-  name: ControlI
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlI
-  commentId: F:Terminal.Gui.Key.ControlI
-  fullName: Terminal.Gui.Key.ControlI
-  nameWithType: Key.ControlI
-- uid: Terminal.Gui.Key.ControlJ
-  name: ControlJ
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlJ
-  commentId: F:Terminal.Gui.Key.ControlJ
-  fullName: Terminal.Gui.Key.ControlJ
-  nameWithType: Key.ControlJ
-- uid: Terminal.Gui.Key.ControlK
-  name: ControlK
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlK
-  commentId: F:Terminal.Gui.Key.ControlK
-  fullName: Terminal.Gui.Key.ControlK
-  nameWithType: Key.ControlK
-- uid: Terminal.Gui.Key.ControlL
-  name: ControlL
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlL
-  commentId: F:Terminal.Gui.Key.ControlL
-  fullName: Terminal.Gui.Key.ControlL
-  nameWithType: Key.ControlL
-- uid: Terminal.Gui.Key.ControlM
-  name: ControlM
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlM
-  commentId: F:Terminal.Gui.Key.ControlM
-  fullName: Terminal.Gui.Key.ControlM
-  nameWithType: Key.ControlM
-- uid: Terminal.Gui.Key.ControlN
-  name: ControlN
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlN
-  commentId: F:Terminal.Gui.Key.ControlN
-  fullName: Terminal.Gui.Key.ControlN
-  nameWithType: Key.ControlN
-- uid: Terminal.Gui.Key.ControlO
-  name: ControlO
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlO
-  commentId: F:Terminal.Gui.Key.ControlO
-  fullName: Terminal.Gui.Key.ControlO
-  nameWithType: Key.ControlO
-- uid: Terminal.Gui.Key.ControlP
-  name: ControlP
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlP
-  commentId: F:Terminal.Gui.Key.ControlP
-  fullName: Terminal.Gui.Key.ControlP
-  nameWithType: Key.ControlP
-- uid: Terminal.Gui.Key.ControlQ
-  name: ControlQ
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlQ
-  commentId: F:Terminal.Gui.Key.ControlQ
-  fullName: Terminal.Gui.Key.ControlQ
-  nameWithType: Key.ControlQ
-- uid: Terminal.Gui.Key.ControlR
-  name: ControlR
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlR
-  commentId: F:Terminal.Gui.Key.ControlR
-  fullName: Terminal.Gui.Key.ControlR
-  nameWithType: Key.ControlR
-- uid: Terminal.Gui.Key.ControlS
-  name: ControlS
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlS
-  commentId: F:Terminal.Gui.Key.ControlS
-  fullName: Terminal.Gui.Key.ControlS
-  nameWithType: Key.ControlS
-- uid: Terminal.Gui.Key.ControlSpace
-  name: ControlSpace
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlSpace
-  commentId: F:Terminal.Gui.Key.ControlSpace
-  fullName: Terminal.Gui.Key.ControlSpace
-  nameWithType: Key.ControlSpace
-- uid: Terminal.Gui.Key.ControlT
-  name: ControlT
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlT
-  commentId: F:Terminal.Gui.Key.ControlT
-  fullName: Terminal.Gui.Key.ControlT
-  nameWithType: Key.ControlT
-- uid: Terminal.Gui.Key.ControlU
-  name: ControlU
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlU
-  commentId: F:Terminal.Gui.Key.ControlU
-  fullName: Terminal.Gui.Key.ControlU
-  nameWithType: Key.ControlU
-- uid: Terminal.Gui.Key.ControlV
-  name: ControlV
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlV
-  commentId: F:Terminal.Gui.Key.ControlV
-  fullName: Terminal.Gui.Key.ControlV
-  nameWithType: Key.ControlV
-- uid: Terminal.Gui.Key.ControlW
-  name: ControlW
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlW
-  commentId: F:Terminal.Gui.Key.ControlW
-  fullName: Terminal.Gui.Key.ControlW
-  nameWithType: Key.ControlW
-- uid: Terminal.Gui.Key.ControlX
-  name: ControlX
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlX
-  commentId: F:Terminal.Gui.Key.ControlX
-  fullName: Terminal.Gui.Key.ControlX
-  nameWithType: Key.ControlX
-- uid: Terminal.Gui.Key.ControlY
-  name: ControlY
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlY
-  commentId: F:Terminal.Gui.Key.ControlY
-  fullName: Terminal.Gui.Key.ControlY
-  nameWithType: Key.ControlY
-- uid: Terminal.Gui.Key.ControlZ
-  name: ControlZ
-  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ControlZ
-  commentId: F:Terminal.Gui.Key.ControlZ
-  fullName: Terminal.Gui.Key.ControlZ
-  nameWithType: Key.ControlZ
 - uid: Terminal.Gui.Key.CtrlMask
   name: CtrlMask
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_CtrlMask
@@ -4081,6 +3931,72 @@ references:
   commentId: F:Terminal.Gui.Key.CursorUp
   fullName: Terminal.Gui.Key.CursorUp
   nameWithType: Key.CursorUp
+- uid: Terminal.Gui.Key.D
+  name: D
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_D
+  commentId: F:Terminal.Gui.Key.D
+  fullName: Terminal.Gui.Key.D
+  nameWithType: Key.D
+- uid: Terminal.Gui.Key.D0
+  name: D0
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_D0
+  commentId: F:Terminal.Gui.Key.D0
+  fullName: Terminal.Gui.Key.D0
+  nameWithType: Key.D0
+- uid: Terminal.Gui.Key.D1
+  name: D1
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_D1
+  commentId: F:Terminal.Gui.Key.D1
+  fullName: Terminal.Gui.Key.D1
+  nameWithType: Key.D1
+- uid: Terminal.Gui.Key.D2
+  name: D2
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_D2
+  commentId: F:Terminal.Gui.Key.D2
+  fullName: Terminal.Gui.Key.D2
+  nameWithType: Key.D2
+- uid: Terminal.Gui.Key.D3
+  name: D3
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_D3
+  commentId: F:Terminal.Gui.Key.D3
+  fullName: Terminal.Gui.Key.D3
+  nameWithType: Key.D3
+- uid: Terminal.Gui.Key.D4
+  name: D4
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_D4
+  commentId: F:Terminal.Gui.Key.D4
+  fullName: Terminal.Gui.Key.D4
+  nameWithType: Key.D4
+- uid: Terminal.Gui.Key.D5
+  name: D5
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_D5
+  commentId: F:Terminal.Gui.Key.D5
+  fullName: Terminal.Gui.Key.D5
+  nameWithType: Key.D5
+- uid: Terminal.Gui.Key.D6
+  name: D6
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_D6
+  commentId: F:Terminal.Gui.Key.D6
+  fullName: Terminal.Gui.Key.D6
+  nameWithType: Key.D6
+- uid: Terminal.Gui.Key.D7
+  name: D7
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_D7
+  commentId: F:Terminal.Gui.Key.D7
+  fullName: Terminal.Gui.Key.D7
+  nameWithType: Key.D7
+- uid: Terminal.Gui.Key.D8
+  name: D8
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_D8
+  commentId: F:Terminal.Gui.Key.D8
+  fullName: Terminal.Gui.Key.D8
+  nameWithType: Key.D8
+- uid: Terminal.Gui.Key.D9
+  name: D9
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_D9
+  commentId: F:Terminal.Gui.Key.D9
+  fullName: Terminal.Gui.Key.D9
+  nameWithType: Key.D9
 - uid: Terminal.Gui.Key.Delete
   name: Delete
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_Delete
@@ -4093,6 +4009,12 @@ references:
   commentId: F:Terminal.Gui.Key.DeleteChar
   fullName: Terminal.Gui.Key.DeleteChar
   nameWithType: Key.DeleteChar
+- uid: Terminal.Gui.Key.E
+  name: E
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_E
+  commentId: F:Terminal.Gui.Key.E
+  fullName: Terminal.Gui.Key.E
+  nameWithType: Key.E
 - uid: Terminal.Gui.Key.End
   name: End
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_End
@@ -4111,6 +4033,12 @@ references:
   commentId: F:Terminal.Gui.Key.Esc
   fullName: Terminal.Gui.Key.Esc
   nameWithType: Key.Esc
+- uid: Terminal.Gui.Key.F
+  name: F
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_F
+  commentId: F:Terminal.Gui.Key.F
+  fullName: Terminal.Gui.Key.F
+  nameWithType: Key.F
 - uid: Terminal.Gui.Key.F1
   name: F1
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_F1
@@ -4183,18 +4111,84 @@ references:
   commentId: F:Terminal.Gui.Key.F9
   fullName: Terminal.Gui.Key.F9
   nameWithType: Key.F9
+- uid: Terminal.Gui.Key.G
+  name: G
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_G
+  commentId: F:Terminal.Gui.Key.G
+  fullName: Terminal.Gui.Key.G
+  nameWithType: Key.G
+- uid: Terminal.Gui.Key.H
+  name: H
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_H
+  commentId: F:Terminal.Gui.Key.H
+  fullName: Terminal.Gui.Key.H
+  nameWithType: Key.H
 - uid: Terminal.Gui.Key.Home
   name: Home
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_Home
   commentId: F:Terminal.Gui.Key.Home
   fullName: Terminal.Gui.Key.Home
   nameWithType: Key.Home
+- uid: Terminal.Gui.Key.I
+  name: I
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_I
+  commentId: F:Terminal.Gui.Key.I
+  fullName: Terminal.Gui.Key.I
+  nameWithType: Key.I
 - uid: Terminal.Gui.Key.InsertChar
   name: InsertChar
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_InsertChar
   commentId: F:Terminal.Gui.Key.InsertChar
   fullName: Terminal.Gui.Key.InsertChar
   nameWithType: Key.InsertChar
+- uid: Terminal.Gui.Key.J
+  name: J
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_J
+  commentId: F:Terminal.Gui.Key.J
+  fullName: Terminal.Gui.Key.J
+  nameWithType: Key.J
+- uid: Terminal.Gui.Key.K
+  name: K
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_K
+  commentId: F:Terminal.Gui.Key.K
+  fullName: Terminal.Gui.Key.K
+  nameWithType: Key.K
+- uid: Terminal.Gui.Key.L
+  name: L
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_L
+  commentId: F:Terminal.Gui.Key.L
+  fullName: Terminal.Gui.Key.L
+  nameWithType: Key.L
+- uid: Terminal.Gui.Key.M
+  name: M
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_M
+  commentId: F:Terminal.Gui.Key.M
+  fullName: Terminal.Gui.Key.M
+  nameWithType: Key.M
+- uid: Terminal.Gui.Key.N
+  name: N
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_N
+  commentId: F:Terminal.Gui.Key.N
+  fullName: Terminal.Gui.Key.N
+  nameWithType: Key.N
+- uid: Terminal.Gui.Key.Null
+  name: "Null"
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_Null
+  commentId: F:Terminal.Gui.Key.Null
+  fullName: Terminal.Gui.Key.Null
+  nameWithType: Key.Null
+- uid: Terminal.Gui.Key.O
+  name: O
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_O
+  commentId: F:Terminal.Gui.Key.O
+  fullName: Terminal.Gui.Key.O
+  nameWithType: Key.O
+- uid: Terminal.Gui.Key.P
+  name: P
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_P
+  commentId: F:Terminal.Gui.Key.P
+  fullName: Terminal.Gui.Key.P
+  nameWithType: Key.P
 - uid: Terminal.Gui.Key.PageDown
   name: PageDown
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_PageDown
@@ -4207,6 +4201,24 @@ references:
   commentId: F:Terminal.Gui.Key.PageUp
   fullName: Terminal.Gui.Key.PageUp
   nameWithType: Key.PageUp
+- uid: Terminal.Gui.Key.Q
+  name: Q
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_Q
+  commentId: F:Terminal.Gui.Key.Q
+  fullName: Terminal.Gui.Key.Q
+  nameWithType: Key.Q
+- uid: Terminal.Gui.Key.R
+  name: R
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_R
+  commentId: F:Terminal.Gui.Key.R
+  fullName: Terminal.Gui.Key.R
+  nameWithType: Key.R
+- uid: Terminal.Gui.Key.S
+  name: S
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_S
+  commentId: F:Terminal.Gui.Key.S
+  fullName: Terminal.Gui.Key.S
+  nameWithType: Key.S
 - uid: Terminal.Gui.Key.ShiftMask
   name: ShiftMask
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_ShiftMask
@@ -4225,18 +4237,60 @@ references:
   commentId: F:Terminal.Gui.Key.SpecialMask
   fullName: Terminal.Gui.Key.SpecialMask
   nameWithType: Key.SpecialMask
+- uid: Terminal.Gui.Key.T
+  name: T
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_T
+  commentId: F:Terminal.Gui.Key.T
+  fullName: Terminal.Gui.Key.T
+  nameWithType: Key.T
 - uid: Terminal.Gui.Key.Tab
   name: Tab
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_Tab
   commentId: F:Terminal.Gui.Key.Tab
   fullName: Terminal.Gui.Key.Tab
   nameWithType: Key.Tab
+- uid: Terminal.Gui.Key.U
+  name: U
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_U
+  commentId: F:Terminal.Gui.Key.U
+  fullName: Terminal.Gui.Key.U
+  nameWithType: Key.U
 - uid: Terminal.Gui.Key.Unknown
   name: Unknown
   href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_Unknown
   commentId: F:Terminal.Gui.Key.Unknown
   fullName: Terminal.Gui.Key.Unknown
   nameWithType: Key.Unknown
+- uid: Terminal.Gui.Key.V
+  name: V
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_V
+  commentId: F:Terminal.Gui.Key.V
+  fullName: Terminal.Gui.Key.V
+  nameWithType: Key.V
+- uid: Terminal.Gui.Key.W
+  name: W
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_W
+  commentId: F:Terminal.Gui.Key.W
+  fullName: Terminal.Gui.Key.W
+  nameWithType: Key.W
+- uid: Terminal.Gui.Key.X
+  name: X
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_X
+  commentId: F:Terminal.Gui.Key.X
+  fullName: Terminal.Gui.Key.X
+  nameWithType: Key.X
+- uid: Terminal.Gui.Key.Y
+  name: Y
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_Y
+  commentId: F:Terminal.Gui.Key.Y
+  fullName: Terminal.Gui.Key.Y
+  nameWithType: Key.Y
+- uid: Terminal.Gui.Key.Z
+  name: Z
+  href: api/Terminal.Gui/Terminal.Gui.Key.html#Terminal_Gui_Key_Z
+  commentId: F:Terminal.Gui.Key.Z
+  fullName: Terminal.Gui.Key.Z
+  nameWithType: Key.Z
 - uid: Terminal.Gui.KeyEvent
   name: KeyEvent
   href: api/Terminal.Gui/Terminal.Gui.KeyEvent.html
@@ -5331,6 +5385,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.MenuBar.PositionCursor
   nameWithType: MenuBar.PositionCursor
+- uid: Terminal.Gui.MenuBar.ProcessColdKey(Terminal.Gui.KeyEvent)
+  name: ProcessColdKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_ProcessColdKey_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.MenuBar.ProcessColdKey(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.MenuBar.ProcessColdKey(Terminal.Gui.KeyEvent)
+  nameWithType: MenuBar.ProcessColdKey(KeyEvent)
+- uid: Terminal.Gui.MenuBar.ProcessColdKey*
+  name: ProcessColdKey
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_ProcessColdKey_
+  commentId: Overload:Terminal.Gui.MenuBar.ProcessColdKey
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuBar.ProcessColdKey
+  nameWithType: MenuBar.ProcessColdKey
 - uid: Terminal.Gui.MenuBar.ProcessHotKey(Terminal.Gui.KeyEvent)
   name: ProcessHotKey(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_ProcessHotKey_Terminal_Gui_KeyEvent_
@@ -5370,6 +5437,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.MenuBar.Redraw
   nameWithType: MenuBar.Redraw
+- uid: Terminal.Gui.MenuBar.ShortcutDelimiter
+  name: ShortcutDelimiter
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_ShortcutDelimiter
+  commentId: P:Terminal.Gui.MenuBar.ShortcutDelimiter
+  fullName: Terminal.Gui.MenuBar.ShortcutDelimiter
+  nameWithType: MenuBar.ShortcutDelimiter
+- uid: Terminal.Gui.MenuBar.ShortcutDelimiter*
+  name: ShortcutDelimiter
+  href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_ShortcutDelimiter_
+  commentId: Overload:Terminal.Gui.MenuBar.ShortcutDelimiter
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuBar.ShortcutDelimiter
+  nameWithType: MenuBar.ShortcutDelimiter
 - uid: Terminal.Gui.MenuBar.UseKeysUpDownAsKeysLeftRight
   name: UseKeysUpDownAsKeysLeftRight
   href: api/Terminal.Gui/Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_UseKeysUpDownAsKeysLeftRight
@@ -5487,21 +5567,21 @@ references:
   commentId: T:Terminal.Gui.MenuItem
   fullName: Terminal.Gui.MenuItem
   nameWithType: MenuItem
-- uid: Terminal.Gui.MenuItem.#ctor
-  name: MenuItem()
-  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem__ctor
-  commentId: M:Terminal.Gui.MenuItem.#ctor
-  fullName: Terminal.Gui.MenuItem.MenuItem()
-  nameWithType: MenuItem.MenuItem()
-- uid: Terminal.Gui.MenuItem.#ctor(NStack.ustring,NStack.ustring,System.Action,System.Func{System.Boolean},Terminal.Gui.MenuItem)
-  name: MenuItem(ustring, ustring, Action, Func<Boolean>, MenuItem)
-  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem__ctor_NStack_ustring_NStack_ustring_System_Action_System_Func_System_Boolean__Terminal_Gui_MenuItem_
-  commentId: M:Terminal.Gui.MenuItem.#ctor(NStack.ustring,NStack.ustring,System.Action,System.Func{System.Boolean},Terminal.Gui.MenuItem)
-  name.vb: MenuItem(ustring, ustring, Action, Func(Of Boolean), MenuItem)
-  fullName: Terminal.Gui.MenuItem.MenuItem(NStack.ustring, NStack.ustring, System.Action, System.Func<System.Boolean>, Terminal.Gui.MenuItem)
-  fullName.vb: Terminal.Gui.MenuItem.MenuItem(NStack.ustring, NStack.ustring, System.Action, System.Func(Of System.Boolean), Terminal.Gui.MenuItem)
-  nameWithType: MenuItem.MenuItem(ustring, ustring, Action, Func<Boolean>, MenuItem)
-  nameWithType.vb: MenuItem.MenuItem(ustring, ustring, Action, Func(Of Boolean), MenuItem)
+- uid: Terminal.Gui.MenuItem.#ctor(NStack.ustring,NStack.ustring,System.Action,System.Func{System.Boolean},Terminal.Gui.MenuItem,Terminal.Gui.Key)
+  name: MenuItem(ustring, ustring, Action, Func<Boolean>, MenuItem, Key)
+  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem__ctor_NStack_ustring_NStack_ustring_System_Action_System_Func_System_Boolean__Terminal_Gui_MenuItem_Terminal_Gui_Key_
+  commentId: M:Terminal.Gui.MenuItem.#ctor(NStack.ustring,NStack.ustring,System.Action,System.Func{System.Boolean},Terminal.Gui.MenuItem,Terminal.Gui.Key)
+  name.vb: MenuItem(ustring, ustring, Action, Func(Of Boolean), MenuItem, Key)
+  fullName: Terminal.Gui.MenuItem.MenuItem(NStack.ustring, NStack.ustring, System.Action, System.Func<System.Boolean>, Terminal.Gui.MenuItem, Terminal.Gui.Key)
+  fullName.vb: Terminal.Gui.MenuItem.MenuItem(NStack.ustring, NStack.ustring, System.Action, System.Func(Of System.Boolean), Terminal.Gui.MenuItem, Terminal.Gui.Key)
+  nameWithType: MenuItem.MenuItem(ustring, ustring, Action, Func<Boolean>, MenuItem, Key)
+  nameWithType.vb: MenuItem.MenuItem(ustring, ustring, Action, Func(Of Boolean), MenuItem, Key)
+- uid: Terminal.Gui.MenuItem.#ctor(Terminal.Gui.Key)
+  name: MenuItem(Key)
+  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem__ctor_Terminal_Gui_Key_
+  commentId: M:Terminal.Gui.MenuItem.#ctor(Terminal.Gui.Key)
+  fullName: Terminal.Gui.MenuItem.MenuItem(Terminal.Gui.Key)
+  nameWithType: MenuItem.MenuItem(Key)
 - uid: Terminal.Gui.MenuItem.#ctor*
   name: MenuItem
   href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem__ctor_
@@ -5632,6 +5712,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.MenuItem.Parent
   nameWithType: MenuItem.Parent
+- uid: Terminal.Gui.MenuItem.Shortcut
+  name: Shortcut
+  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_Shortcut
+  commentId: P:Terminal.Gui.MenuItem.Shortcut
+  fullName: Terminal.Gui.MenuItem.Shortcut
+  nameWithType: MenuItem.Shortcut
+- uid: Terminal.Gui.MenuItem.Shortcut*
+  name: Shortcut
+  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_Shortcut_
+  commentId: Overload:Terminal.Gui.MenuItem.Shortcut
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuItem.Shortcut
+  nameWithType: MenuItem.Shortcut
+- uid: Terminal.Gui.MenuItem.ShortcutTag
+  name: ShortcutTag
+  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_ShortcutTag
+  commentId: P:Terminal.Gui.MenuItem.ShortcutTag
+  fullName: Terminal.Gui.MenuItem.ShortcutTag
+  nameWithType: MenuItem.ShortcutTag
+- uid: Terminal.Gui.MenuItem.ShortcutTag*
+  name: ShortcutTag
+  href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_ShortcutTag_
+  commentId: Overload:Terminal.Gui.MenuItem.ShortcutTag
+  isSpec: "True"
+  fullName: Terminal.Gui.MenuItem.ShortcutTag
+  nameWithType: MenuItem.ShortcutTag
 - uid: Terminal.Gui.MenuItem.Title
   name: Title
   href: api/Terminal.Gui/Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_Title
@@ -7767,6 +7873,158 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.ScrollView.ShowVerticalScrollIndicator
   nameWithType: ScrollView.ShowVerticalScrollIndicator
+- uid: Terminal.Gui.ShortcutHelper
+  name: ShortcutHelper
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html
+  commentId: T:Terminal.Gui.ShortcutHelper
+  fullName: Terminal.Gui.ShortcutHelper
+  nameWithType: ShortcutHelper
+- uid: Terminal.Gui.ShortcutHelper.CheckKeysFlagRange(Terminal.Gui.Key,Terminal.Gui.Key,Terminal.Gui.Key)
+  name: CheckKeysFlagRange(Key, Key, Key)
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_CheckKeysFlagRange_Terminal_Gui_Key_Terminal_Gui_Key_Terminal_Gui_Key_
+  commentId: M:Terminal.Gui.ShortcutHelper.CheckKeysFlagRange(Terminal.Gui.Key,Terminal.Gui.Key,Terminal.Gui.Key)
+  fullName: Terminal.Gui.ShortcutHelper.CheckKeysFlagRange(Terminal.Gui.Key, Terminal.Gui.Key, Terminal.Gui.Key)
+  nameWithType: ShortcutHelper.CheckKeysFlagRange(Key, Key, Key)
+- uid: Terminal.Gui.ShortcutHelper.CheckKeysFlagRange*
+  name: CheckKeysFlagRange
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_CheckKeysFlagRange_
+  commentId: Overload:Terminal.Gui.ShortcutHelper.CheckKeysFlagRange
+  isSpec: "True"
+  fullName: Terminal.Gui.ShortcutHelper.CheckKeysFlagRange
+  nameWithType: ShortcutHelper.CheckKeysFlagRange
+- uid: Terminal.Gui.ShortcutHelper.FindAndOpenByShortcut(Terminal.Gui.KeyEvent,Terminal.Gui.View)
+  name: FindAndOpenByShortcut(KeyEvent, View)
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_FindAndOpenByShortcut_Terminal_Gui_KeyEvent_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.ShortcutHelper.FindAndOpenByShortcut(Terminal.Gui.KeyEvent,Terminal.Gui.View)
+  fullName: Terminal.Gui.ShortcutHelper.FindAndOpenByShortcut(Terminal.Gui.KeyEvent, Terminal.Gui.View)
+  nameWithType: ShortcutHelper.FindAndOpenByShortcut(KeyEvent, View)
+- uid: Terminal.Gui.ShortcutHelper.FindAndOpenByShortcut*
+  name: FindAndOpenByShortcut
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_FindAndOpenByShortcut_
+  commentId: Overload:Terminal.Gui.ShortcutHelper.FindAndOpenByShortcut
+  isSpec: "True"
+  fullName: Terminal.Gui.ShortcutHelper.FindAndOpenByShortcut
+  nameWithType: ShortcutHelper.FindAndOpenByShortcut
+- uid: Terminal.Gui.ShortcutHelper.GetKeyToString(Terminal.Gui.Key,Terminal.Gui.Key@)
+  name: GetKeyToString(Key, out Key)
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_GetKeyToString_Terminal_Gui_Key_Terminal_Gui_Key__
+  commentId: M:Terminal.Gui.ShortcutHelper.GetKeyToString(Terminal.Gui.Key,Terminal.Gui.Key@)
+  name.vb: GetKeyToString(Key, ByRef Key)
+  fullName: Terminal.Gui.ShortcutHelper.GetKeyToString(Terminal.Gui.Key, out Terminal.Gui.Key)
+  fullName.vb: Terminal.Gui.ShortcutHelper.GetKeyToString(Terminal.Gui.Key, ByRef Terminal.Gui.Key)
+  nameWithType: ShortcutHelper.GetKeyToString(Key, out Key)
+  nameWithType.vb: ShortcutHelper.GetKeyToString(Key, ByRef Key)
+- uid: Terminal.Gui.ShortcutHelper.GetKeyToString*
+  name: GetKeyToString
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_GetKeyToString_
+  commentId: Overload:Terminal.Gui.ShortcutHelper.GetKeyToString
+  isSpec: "True"
+  fullName: Terminal.Gui.ShortcutHelper.GetKeyToString
+  nameWithType: ShortcutHelper.GetKeyToString
+- uid: Terminal.Gui.ShortcutHelper.GetModifiersKey(Terminal.Gui.KeyEvent)
+  name: GetModifiersKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_GetModifiersKey_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.ShortcutHelper.GetModifiersKey(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.ShortcutHelper.GetModifiersKey(Terminal.Gui.KeyEvent)
+  nameWithType: ShortcutHelper.GetModifiersKey(KeyEvent)
+- uid: Terminal.Gui.ShortcutHelper.GetModifiersKey*
+  name: GetModifiersKey
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_GetModifiersKey_
+  commentId: Overload:Terminal.Gui.ShortcutHelper.GetModifiersKey
+  isSpec: "True"
+  fullName: Terminal.Gui.ShortcutHelper.GetModifiersKey
+  nameWithType: ShortcutHelper.GetModifiersKey
+- uid: Terminal.Gui.ShortcutHelper.GetShortcutFromTag(NStack.ustring)
+  name: GetShortcutFromTag(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_GetShortcutFromTag_NStack_ustring_
+  commentId: M:Terminal.Gui.ShortcutHelper.GetShortcutFromTag(NStack.ustring)
+  fullName: Terminal.Gui.ShortcutHelper.GetShortcutFromTag(NStack.ustring)
+  nameWithType: ShortcutHelper.GetShortcutFromTag(ustring)
+- uid: Terminal.Gui.ShortcutHelper.GetShortcutFromTag*
+  name: GetShortcutFromTag
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_GetShortcutFromTag_
+  commentId: Overload:Terminal.Gui.ShortcutHelper.GetShortcutFromTag
+  isSpec: "True"
+  fullName: Terminal.Gui.ShortcutHelper.GetShortcutFromTag
+  nameWithType: ShortcutHelper.GetShortcutFromTag
+- uid: Terminal.Gui.ShortcutHelper.GetShortcutTag(Terminal.Gui.Key)
+  name: GetShortcutTag(Key)
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_GetShortcutTag_Terminal_Gui_Key_
+  commentId: M:Terminal.Gui.ShortcutHelper.GetShortcutTag(Terminal.Gui.Key)
+  fullName: Terminal.Gui.ShortcutHelper.GetShortcutTag(Terminal.Gui.Key)
+  nameWithType: ShortcutHelper.GetShortcutTag(Key)
+- uid: Terminal.Gui.ShortcutHelper.GetShortcutTag*
+  name: GetShortcutTag
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_GetShortcutTag_
+  commentId: Overload:Terminal.Gui.ShortcutHelper.GetShortcutTag
+  isSpec: "True"
+  fullName: Terminal.Gui.ShortcutHelper.GetShortcutTag
+  nameWithType: ShortcutHelper.GetShortcutTag
+- uid: Terminal.Gui.ShortcutHelper.PostShortcutValidation(Terminal.Gui.Key)
+  name: PostShortcutValidation(Key)
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_PostShortcutValidation_Terminal_Gui_Key_
+  commentId: M:Terminal.Gui.ShortcutHelper.PostShortcutValidation(Terminal.Gui.Key)
+  fullName: Terminal.Gui.ShortcutHelper.PostShortcutValidation(Terminal.Gui.Key)
+  nameWithType: ShortcutHelper.PostShortcutValidation(Key)
+- uid: Terminal.Gui.ShortcutHelper.PostShortcutValidation*
+  name: PostShortcutValidation
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_PostShortcutValidation_
+  commentId: Overload:Terminal.Gui.ShortcutHelper.PostShortcutValidation
+  isSpec: "True"
+  fullName: Terminal.Gui.ShortcutHelper.PostShortcutValidation
+  nameWithType: ShortcutHelper.PostShortcutValidation
+- uid: Terminal.Gui.ShortcutHelper.PreShortcutValidation(Terminal.Gui.Key)
+  name: PreShortcutValidation(Key)
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_PreShortcutValidation_Terminal_Gui_Key_
+  commentId: M:Terminal.Gui.ShortcutHelper.PreShortcutValidation(Terminal.Gui.Key)
+  fullName: Terminal.Gui.ShortcutHelper.PreShortcutValidation(Terminal.Gui.Key)
+  nameWithType: ShortcutHelper.PreShortcutValidation(Key)
+- uid: Terminal.Gui.ShortcutHelper.PreShortcutValidation*
+  name: PreShortcutValidation
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_PreShortcutValidation_
+  commentId: Overload:Terminal.Gui.ShortcutHelper.PreShortcutValidation
+  isSpec: "True"
+  fullName: Terminal.Gui.ShortcutHelper.PreShortcutValidation
+  nameWithType: ShortcutHelper.PreShortcutValidation
+- uid: Terminal.Gui.ShortcutHelper.Shortcut
+  name: Shortcut
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_Shortcut
+  commentId: P:Terminal.Gui.ShortcutHelper.Shortcut
+  fullName: Terminal.Gui.ShortcutHelper.Shortcut
+  nameWithType: ShortcutHelper.Shortcut
+- uid: Terminal.Gui.ShortcutHelper.Shortcut*
+  name: Shortcut
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_Shortcut_
+  commentId: Overload:Terminal.Gui.ShortcutHelper.Shortcut
+  isSpec: "True"
+  fullName: Terminal.Gui.ShortcutHelper.Shortcut
+  nameWithType: ShortcutHelper.Shortcut
+- uid: Terminal.Gui.ShortcutHelper.ShortcutAction
+  name: ShortcutAction
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_ShortcutAction
+  commentId: P:Terminal.Gui.ShortcutHelper.ShortcutAction
+  fullName: Terminal.Gui.ShortcutHelper.ShortcutAction
+  nameWithType: ShortcutHelper.ShortcutAction
+- uid: Terminal.Gui.ShortcutHelper.ShortcutAction*
+  name: ShortcutAction
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_ShortcutAction_
+  commentId: Overload:Terminal.Gui.ShortcutHelper.ShortcutAction
+  isSpec: "True"
+  fullName: Terminal.Gui.ShortcutHelper.ShortcutAction
+  nameWithType: ShortcutHelper.ShortcutAction
+- uid: Terminal.Gui.ShortcutHelper.ShortcutTag
+  name: ShortcutTag
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_ShortcutTag
+  commentId: P:Terminal.Gui.ShortcutHelper.ShortcutTag
+  fullName: Terminal.Gui.ShortcutHelper.ShortcutTag
+  nameWithType: ShortcutHelper.ShortcutTag
+- uid: Terminal.Gui.ShortcutHelper.ShortcutTag*
+  name: ShortcutTag
+  href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html#Terminal_Gui_ShortcutHelper_ShortcutTag_
+  commentId: Overload:Terminal.Gui.ShortcutHelper.ShortcutTag
+  isSpec: "True"
+  fullName: Terminal.Gui.ShortcutHelper.ShortcutTag
+  nameWithType: ShortcutHelper.ShortcutTag
 - uid: Terminal.Gui.Size
   name: Size
   href: api/Terminal.Gui/Terminal.Gui.Size.html
@@ -8154,6 +8412,51 @@ references:
   commentId: F:Terminal.Gui.TextAlignment.Right
   fullName: Terminal.Gui.TextAlignment.Right
   nameWithType: TextAlignment.Right
+- uid: Terminal.Gui.TextChangingEventArgs
+  name: TextChangingEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.TextChangingEventArgs.html
+  commentId: T:Terminal.Gui.TextChangingEventArgs
+  fullName: Terminal.Gui.TextChangingEventArgs
+  nameWithType: TextChangingEventArgs
+- uid: Terminal.Gui.TextChangingEventArgs.#ctor(NStack.ustring)
+  name: TextChangingEventArgs(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.TextChangingEventArgs.html#Terminal_Gui_TextChangingEventArgs__ctor_NStack_ustring_
+  commentId: M:Terminal.Gui.TextChangingEventArgs.#ctor(NStack.ustring)
+  fullName: Terminal.Gui.TextChangingEventArgs.TextChangingEventArgs(NStack.ustring)
+  nameWithType: TextChangingEventArgs.TextChangingEventArgs(ustring)
+- uid: Terminal.Gui.TextChangingEventArgs.#ctor*
+  name: TextChangingEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.TextChangingEventArgs.html#Terminal_Gui_TextChangingEventArgs__ctor_
+  commentId: Overload:Terminal.Gui.TextChangingEventArgs.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.TextChangingEventArgs.TextChangingEventArgs
+  nameWithType: TextChangingEventArgs.TextChangingEventArgs
+- uid: Terminal.Gui.TextChangingEventArgs.Cancel
+  name: Cancel
+  href: api/Terminal.Gui/Terminal.Gui.TextChangingEventArgs.html#Terminal_Gui_TextChangingEventArgs_Cancel
+  commentId: P:Terminal.Gui.TextChangingEventArgs.Cancel
+  fullName: Terminal.Gui.TextChangingEventArgs.Cancel
+  nameWithType: TextChangingEventArgs.Cancel
+- uid: Terminal.Gui.TextChangingEventArgs.Cancel*
+  name: Cancel
+  href: api/Terminal.Gui/Terminal.Gui.TextChangingEventArgs.html#Terminal_Gui_TextChangingEventArgs_Cancel_
+  commentId: Overload:Terminal.Gui.TextChangingEventArgs.Cancel
+  isSpec: "True"
+  fullName: Terminal.Gui.TextChangingEventArgs.Cancel
+  nameWithType: TextChangingEventArgs.Cancel
+- uid: Terminal.Gui.TextChangingEventArgs.NewText
+  name: NewText
+  href: api/Terminal.Gui/Terminal.Gui.TextChangingEventArgs.html#Terminal_Gui_TextChangingEventArgs_NewText
+  commentId: P:Terminal.Gui.TextChangingEventArgs.NewText
+  fullName: Terminal.Gui.TextChangingEventArgs.NewText
+  nameWithType: TextChangingEventArgs.NewText
+- uid: Terminal.Gui.TextChangingEventArgs.NewText*
+  name: NewText
+  href: api/Terminal.Gui/Terminal.Gui.TextChangingEventArgs.html#Terminal_Gui_TextChangingEventArgs_NewText_
+  commentId: Overload:Terminal.Gui.TextChangingEventArgs.NewText
+  isSpec: "True"
+  fullName: Terminal.Gui.TextChangingEventArgs.NewText
+  nameWithType: TextChangingEventArgs.NewText
 - uid: Terminal.Gui.TextField
   name: TextField
   href: api/Terminal.Gui/Terminal.Gui.TextField.html
@@ -8295,6 +8598,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextField.OnLeave
   nameWithType: TextField.OnLeave
+- uid: Terminal.Gui.TextField.OnTextChanging(NStack.ustring)
+  name: OnTextChanging(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_OnTextChanging_NStack_ustring_
+  commentId: M:Terminal.Gui.TextField.OnTextChanging(NStack.ustring)
+  fullName: Terminal.Gui.TextField.OnTextChanging(NStack.ustring)
+  nameWithType: TextField.OnTextChanging(ustring)
+- uid: Terminal.Gui.TextField.OnTextChanging*
+  name: OnTextChanging
+  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_OnTextChanging_
+  commentId: Overload:Terminal.Gui.TextField.OnTextChanging
+  isSpec: "True"
+  fullName: Terminal.Gui.TextField.OnTextChanging
+  nameWithType: TextField.OnTextChanging
 - uid: Terminal.Gui.TextField.Paste
   name: Paste()
   href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_Paste
@@ -8431,6 +8747,12 @@ references:
   commentId: E:Terminal.Gui.TextField.TextChanged
   fullName: Terminal.Gui.TextField.TextChanged
   nameWithType: TextField.TextChanged
+- uid: Terminal.Gui.TextField.TextChanging
+  name: TextChanging
+  href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_TextChanging
+  commentId: E:Terminal.Gui.TextField.TextChanging
+  fullName: Terminal.Gui.TextField.TextChanging
+  nameWithType: TextField.TextChanging
 - uid: Terminal.Gui.TextField.Used
   name: Used
   href: api/Terminal.Gui/Terminal.Gui.TextField.html#Terminal_Gui_TextField_Used
@@ -9121,6 +9443,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Toplevel.Create
   nameWithType: Toplevel.Create
+- uid: Terminal.Gui.Toplevel.Loaded
+  name: Loaded
+  href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Loaded
+  commentId: E:Terminal.Gui.Toplevel.Loaded
+  fullName: Terminal.Gui.Toplevel.Loaded
+  nameWithType: Toplevel.Loaded
 - uid: Terminal.Gui.Toplevel.MenuBar
   name: MenuBar
   href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_MenuBar
@@ -9173,6 +9501,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Toplevel.OnKeyUp
   nameWithType: Toplevel.OnKeyUp
+- uid: Terminal.Gui.Toplevel.ProcessColdKey(Terminal.Gui.KeyEvent)
+  name: ProcessColdKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ProcessColdKey_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.Toplevel.ProcessColdKey(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.Toplevel.ProcessColdKey(Terminal.Gui.KeyEvent)
+  nameWithType: Toplevel.ProcessColdKey(KeyEvent)
+- uid: Terminal.Gui.Toplevel.ProcessColdKey*
+  name: ProcessColdKey
+  href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ProcessColdKey_
+  commentId: Overload:Terminal.Gui.Toplevel.ProcessColdKey
+  isSpec: "True"
+  fullName: Terminal.Gui.Toplevel.ProcessColdKey
+  nameWithType: Toplevel.ProcessColdKey
 - uid: Terminal.Gui.Toplevel.ProcessKey(Terminal.Gui.KeyEvent)
   name: ProcessKey(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_
@@ -9257,6 +9598,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Toplevel.StatusBar
   nameWithType: Toplevel.StatusBar
+- uid: Terminal.Gui.Toplevel.Unloaded
+  name: Unloaded
+  href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Unloaded
+  commentId: E:Terminal.Gui.Toplevel.Unloaded
+  fullName: Terminal.Gui.Toplevel.Unloaded
+  nameWithType: Toplevel.Unloaded
 - uid: Terminal.Gui.Toplevel.WillPresent
   name: WillPresent()
   href: api/Terminal.Gui/Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_WillPresent
@@ -9354,6 +9701,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.AddRune
   nameWithType: View.AddRune
+- uid: Terminal.Gui.View.AutoSize
+  name: AutoSize
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_AutoSize
+  commentId: P:Terminal.Gui.View.AutoSize
+  fullName: Terminal.Gui.View.AutoSize
+  nameWithType: View.AutoSize
+- uid: Terminal.Gui.View.AutoSize*
+  name: AutoSize
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_AutoSize_
+  commentId: Overload:Terminal.Gui.View.AutoSize
+  isSpec: "True"
+  fullName: Terminal.Gui.View.AutoSize
+  nameWithType: View.AutoSize
 - uid: Terminal.Gui.View.BeginInit
   name: BeginInit()
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_BeginInit
@@ -10358,6 +10718,45 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.SetNeedsDisplay
   nameWithType: View.SetNeedsDisplay
+- uid: Terminal.Gui.View.Shortcut
+  name: Shortcut
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Shortcut
+  commentId: P:Terminal.Gui.View.Shortcut
+  fullName: Terminal.Gui.View.Shortcut
+  nameWithType: View.Shortcut
+- uid: Terminal.Gui.View.Shortcut*
+  name: Shortcut
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Shortcut_
+  commentId: Overload:Terminal.Gui.View.Shortcut
+  isSpec: "True"
+  fullName: Terminal.Gui.View.Shortcut
+  nameWithType: View.Shortcut
+- uid: Terminal.Gui.View.ShortcutAction
+  name: ShortcutAction
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ShortcutAction
+  commentId: P:Terminal.Gui.View.ShortcutAction
+  fullName: Terminal.Gui.View.ShortcutAction
+  nameWithType: View.ShortcutAction
+- uid: Terminal.Gui.View.ShortcutAction*
+  name: ShortcutAction
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ShortcutAction_
+  commentId: Overload:Terminal.Gui.View.ShortcutAction
+  isSpec: "True"
+  fullName: Terminal.Gui.View.ShortcutAction
+  nameWithType: View.ShortcutAction
+- uid: Terminal.Gui.View.ShortcutTag
+  name: ShortcutTag
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ShortcutTag
+  commentId: P:Terminal.Gui.View.ShortcutTag
+  fullName: Terminal.Gui.View.ShortcutTag
+  nameWithType: View.ShortcutTag
+- uid: Terminal.Gui.View.ShortcutTag*
+  name: ShortcutTag
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ShortcutTag_
+  commentId: Overload:Terminal.Gui.View.ShortcutTag
+  isSpec: "True"
+  fullName: Terminal.Gui.View.ShortcutTag
+  nameWithType: View.ShortcutTag
 - uid: Terminal.Gui.View.Subviews
   name: Subviews
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Subviews
@@ -10764,6 +11163,380 @@ references:
   isSpec: "True"
   fullName: UICatalog.Binding.TargetPropertyName
   nameWithType: Binding.TargetPropertyName
+- uid: UICatalog.DynamicMenuBarDetails
+  name: DynamicMenuBarDetails
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html
+  commentId: T:UICatalog.DynamicMenuBarDetails
+  fullName: UICatalog.DynamicMenuBarDetails
+  nameWithType: DynamicMenuBarDetails
+- uid: UICatalog.DynamicMenuBarDetails.#ctor(Terminal.Gui.MenuItem,System.Boolean)
+  name: DynamicMenuBarDetails(MenuItem, Boolean)
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails__ctor_Terminal_Gui_MenuItem_System_Boolean_
+  commentId: M:UICatalog.DynamicMenuBarDetails.#ctor(Terminal.Gui.MenuItem,System.Boolean)
+  fullName: UICatalog.DynamicMenuBarDetails.DynamicMenuBarDetails(Terminal.Gui.MenuItem, System.Boolean)
+  nameWithType: DynamicMenuBarDetails.DynamicMenuBarDetails(MenuItem, Boolean)
+- uid: UICatalog.DynamicMenuBarDetails.#ctor(ustring)
+  name: DynamicMenuBarDetails(ustring)
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails__ctor_ustring_
+  commentId: M:UICatalog.DynamicMenuBarDetails.#ctor(ustring)
+  fullName: UICatalog.DynamicMenuBarDetails.DynamicMenuBarDetails(ustring)
+  nameWithType: DynamicMenuBarDetails.DynamicMenuBarDetails(ustring)
+- uid: UICatalog.DynamicMenuBarDetails.#ctor*
+  name: DynamicMenuBarDetails
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails__ctor_
+  commentId: Overload:UICatalog.DynamicMenuBarDetails.#ctor
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuBarDetails.DynamicMenuBarDetails
+  nameWithType: DynamicMenuBarDetails.DynamicMenuBarDetails
+- uid: UICatalog.DynamicMenuBarDetails._ckbIsTopLevel
+  name: _ckbIsTopLevel
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails__ckbIsTopLevel
+  commentId: F:UICatalog.DynamicMenuBarDetails._ckbIsTopLevel
+  fullName: UICatalog.DynamicMenuBarDetails._ckbIsTopLevel
+  nameWithType: DynamicMenuBarDetails._ckbIsTopLevel
+- uid: UICatalog.DynamicMenuBarDetails._ckbSubMenu
+  name: _ckbSubMenu
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails__ckbSubMenu
+  commentId: F:UICatalog.DynamicMenuBarDetails._ckbSubMenu
+  fullName: UICatalog.DynamicMenuBarDetails._ckbSubMenu
+  nameWithType: DynamicMenuBarDetails._ckbSubMenu
+- uid: UICatalog.DynamicMenuBarDetails._menuItem
+  name: _menuItem
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails__menuItem
+  commentId: F:UICatalog.DynamicMenuBarDetails._menuItem
+  fullName: UICatalog.DynamicMenuBarDetails._menuItem
+  nameWithType: DynamicMenuBarDetails._menuItem
+- uid: UICatalog.DynamicMenuBarDetails._rbChkStyle
+  name: _rbChkStyle
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails__rbChkStyle
+  commentId: F:UICatalog.DynamicMenuBarDetails._rbChkStyle
+  fullName: UICatalog.DynamicMenuBarDetails._rbChkStyle
+  nameWithType: DynamicMenuBarDetails._rbChkStyle
+- uid: UICatalog.DynamicMenuBarDetails._txtAction
+  name: _txtAction
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails__txtAction
+  commentId: F:UICatalog.DynamicMenuBarDetails._txtAction
+  fullName: UICatalog.DynamicMenuBarDetails._txtAction
+  nameWithType: DynamicMenuBarDetails._txtAction
+- uid: UICatalog.DynamicMenuBarDetails._txtHelp
+  name: _txtHelp
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails__txtHelp
+  commentId: F:UICatalog.DynamicMenuBarDetails._txtHelp
+  fullName: UICatalog.DynamicMenuBarDetails._txtHelp
+  nameWithType: DynamicMenuBarDetails._txtHelp
+- uid: UICatalog.DynamicMenuBarDetails._txtShortcut
+  name: _txtShortcut
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails__txtShortcut
+  commentId: F:UICatalog.DynamicMenuBarDetails._txtShortcut
+  fullName: UICatalog.DynamicMenuBarDetails._txtShortcut
+  nameWithType: DynamicMenuBarDetails._txtShortcut
+- uid: UICatalog.DynamicMenuBarDetails._txtTitle
+  name: _txtTitle
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails__txtTitle
+  commentId: F:UICatalog.DynamicMenuBarDetails._txtTitle
+  fullName: UICatalog.DynamicMenuBarDetails._txtTitle
+  nameWithType: DynamicMenuBarDetails._txtTitle
+- uid: UICatalog.DynamicMenuBarDetails.CreateAction(Terminal.Gui.MenuItem,UICatalog.DynamicMenuItem)
+  name: CreateAction(MenuItem, DynamicMenuItem)
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails_CreateAction_Terminal_Gui_MenuItem_UICatalog_DynamicMenuItem_
+  commentId: M:UICatalog.DynamicMenuBarDetails.CreateAction(Terminal.Gui.MenuItem,UICatalog.DynamicMenuItem)
+  fullName: UICatalog.DynamicMenuBarDetails.CreateAction(Terminal.Gui.MenuItem, UICatalog.DynamicMenuItem)
+  nameWithType: DynamicMenuBarDetails.CreateAction(MenuItem, DynamicMenuItem)
+- uid: UICatalog.DynamicMenuBarDetails.CreateAction*
+  name: CreateAction
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails_CreateAction_
+  commentId: Overload:UICatalog.DynamicMenuBarDetails.CreateAction
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuBarDetails.CreateAction
+  nameWithType: DynamicMenuBarDetails.CreateAction
+- uid: UICatalog.DynamicMenuBarDetails.EditMenuBarItem(Terminal.Gui.MenuItem)
+  name: EditMenuBarItem(MenuItem)
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails_EditMenuBarItem_Terminal_Gui_MenuItem_
+  commentId: M:UICatalog.DynamicMenuBarDetails.EditMenuBarItem(Terminal.Gui.MenuItem)
+  fullName: UICatalog.DynamicMenuBarDetails.EditMenuBarItem(Terminal.Gui.MenuItem)
+  nameWithType: DynamicMenuBarDetails.EditMenuBarItem(MenuItem)
+- uid: UICatalog.DynamicMenuBarDetails.EditMenuBarItem*
+  name: EditMenuBarItem
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails_EditMenuBarItem_
+  commentId: Overload:UICatalog.DynamicMenuBarDetails.EditMenuBarItem
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuBarDetails.EditMenuBarItem
+  nameWithType: DynamicMenuBarDetails.EditMenuBarItem
+- uid: UICatalog.DynamicMenuBarDetails.EnterMenuItem
+  name: EnterMenuItem()
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails_EnterMenuItem
+  commentId: M:UICatalog.DynamicMenuBarDetails.EnterMenuItem
+  fullName: UICatalog.DynamicMenuBarDetails.EnterMenuItem()
+  nameWithType: DynamicMenuBarDetails.EnterMenuItem()
+- uid: UICatalog.DynamicMenuBarDetails.EnterMenuItem*
+  name: EnterMenuItem
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails_EnterMenuItem_
+  commentId: Overload:UICatalog.DynamicMenuBarDetails.EnterMenuItem
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuBarDetails.EnterMenuItem
+  nameWithType: DynamicMenuBarDetails.EnterMenuItem
+- uid: UICatalog.DynamicMenuBarDetails.UpdateParent(Terminal.Gui.MenuItem@)
+  name: UpdateParent(ref MenuItem)
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails_UpdateParent_Terminal_Gui_MenuItem__
+  commentId: M:UICatalog.DynamicMenuBarDetails.UpdateParent(Terminal.Gui.MenuItem@)
+  name.vb: UpdateParent(ByRef MenuItem)
+  fullName: UICatalog.DynamicMenuBarDetails.UpdateParent(ref Terminal.Gui.MenuItem)
+  fullName.vb: UICatalog.DynamicMenuBarDetails.UpdateParent(ByRef Terminal.Gui.MenuItem)
+  nameWithType: DynamicMenuBarDetails.UpdateParent(ref MenuItem)
+  nameWithType.vb: DynamicMenuBarDetails.UpdateParent(ByRef MenuItem)
+- uid: UICatalog.DynamicMenuBarDetails.UpdateParent*
+  name: UpdateParent
+  href: api/UICatalog/UICatalog.DynamicMenuBarDetails.html#UICatalog_DynamicMenuBarDetails_UpdateParent_
+  commentId: Overload:UICatalog.DynamicMenuBarDetails.UpdateParent
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuBarDetails.UpdateParent
+  nameWithType: DynamicMenuBarDetails.UpdateParent
+- uid: UICatalog.DynamicMenuBarSample
+  name: DynamicMenuBarSample
+  href: api/UICatalog/UICatalog.DynamicMenuBarSample.html
+  commentId: T:UICatalog.DynamicMenuBarSample
+  fullName: UICatalog.DynamicMenuBarSample
+  nameWithType: DynamicMenuBarSample
+- uid: UICatalog.DynamicMenuBarSample.#ctor(ustring)
+  name: DynamicMenuBarSample(ustring)
+  href: api/UICatalog/UICatalog.DynamicMenuBarSample.html#UICatalog_DynamicMenuBarSample__ctor_ustring_
+  commentId: M:UICatalog.DynamicMenuBarSample.#ctor(ustring)
+  fullName: UICatalog.DynamicMenuBarSample.DynamicMenuBarSample(ustring)
+  nameWithType: DynamicMenuBarSample.DynamicMenuBarSample(ustring)
+- uid: UICatalog.DynamicMenuBarSample.#ctor*
+  name: DynamicMenuBarSample
+  href: api/UICatalog/UICatalog.DynamicMenuBarSample.html#UICatalog_DynamicMenuBarSample__ctor_
+  commentId: Overload:UICatalog.DynamicMenuBarSample.#ctor
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuBarSample.DynamicMenuBarSample
+  nameWithType: DynamicMenuBarSample.DynamicMenuBarSample
+- uid: UICatalog.DynamicMenuBarSample.DataContext
+  name: DataContext
+  href: api/UICatalog/UICatalog.DynamicMenuBarSample.html#UICatalog_DynamicMenuBarSample_DataContext
+  commentId: P:UICatalog.DynamicMenuBarSample.DataContext
+  fullName: UICatalog.DynamicMenuBarSample.DataContext
+  nameWithType: DynamicMenuBarSample.DataContext
+- uid: UICatalog.DynamicMenuBarSample.DataContext*
+  name: DataContext
+  href: api/UICatalog/UICatalog.DynamicMenuBarSample.html#UICatalog_DynamicMenuBarSample_DataContext_
+  commentId: Overload:UICatalog.DynamicMenuBarSample.DataContext
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuBarSample.DataContext
+  nameWithType: DynamicMenuBarSample.DataContext
+- uid: UICatalog.DynamicMenuItem
+  name: DynamicMenuItem
+  href: api/UICatalog/UICatalog.DynamicMenuItem.html
+  commentId: T:UICatalog.DynamicMenuItem
+  fullName: UICatalog.DynamicMenuItem
+  nameWithType: DynamicMenuItem
+- uid: UICatalog.DynamicMenuItem.#ctor
+  name: DynamicMenuItem()
+  href: api/UICatalog/UICatalog.DynamicMenuItem.html#UICatalog_DynamicMenuItem__ctor
+  commentId: M:UICatalog.DynamicMenuItem.#ctor
+  fullName: UICatalog.DynamicMenuItem.DynamicMenuItem()
+  nameWithType: DynamicMenuItem.DynamicMenuItem()
+- uid: UICatalog.DynamicMenuItem.#ctor(ustring,System.Boolean)
+  name: DynamicMenuItem(ustring, Boolean)
+  href: api/UICatalog/UICatalog.DynamicMenuItem.html#UICatalog_DynamicMenuItem__ctor_ustring_System_Boolean_
+  commentId: M:UICatalog.DynamicMenuItem.#ctor(ustring,System.Boolean)
+  fullName: UICatalog.DynamicMenuItem.DynamicMenuItem(ustring, System.Boolean)
+  nameWithType: DynamicMenuItem.DynamicMenuItem(ustring, Boolean)
+- uid: UICatalog.DynamicMenuItem.#ctor(ustring,ustring,ustring,System.Boolean,System.Boolean,Terminal.Gui.MenuItemCheckStyle,ustring)
+  name: DynamicMenuItem(ustring, ustring, ustring, Boolean, Boolean, MenuItemCheckStyle, ustring)
+  href: api/UICatalog/UICatalog.DynamicMenuItem.html#UICatalog_DynamicMenuItem__ctor_ustring_ustring_ustring_System_Boolean_System_Boolean_Terminal_Gui_MenuItemCheckStyle_ustring_
+  commentId: M:UICatalog.DynamicMenuItem.#ctor(ustring,ustring,ustring,System.Boolean,System.Boolean,Terminal.Gui.MenuItemCheckStyle,ustring)
+  fullName: UICatalog.DynamicMenuItem.DynamicMenuItem(ustring, ustring, ustring, System.Boolean, System.Boolean, Terminal.Gui.MenuItemCheckStyle, ustring)
+  nameWithType: DynamicMenuItem.DynamicMenuItem(ustring, ustring, ustring, Boolean, Boolean, MenuItemCheckStyle, ustring)
+- uid: UICatalog.DynamicMenuItem.#ctor*
+  name: DynamicMenuItem
+  href: api/UICatalog/UICatalog.DynamicMenuItem.html#UICatalog_DynamicMenuItem__ctor_
+  commentId: Overload:UICatalog.DynamicMenuItem.#ctor
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuItem.DynamicMenuItem
+  nameWithType: DynamicMenuItem.DynamicMenuItem
+- uid: UICatalog.DynamicMenuItem.action
+  name: action
+  href: api/UICatalog/UICatalog.DynamicMenuItem.html#UICatalog_DynamicMenuItem_action
+  commentId: F:UICatalog.DynamicMenuItem.action
+  fullName: UICatalog.DynamicMenuItem.action
+  nameWithType: DynamicMenuItem.action
+- uid: UICatalog.DynamicMenuItem.checkStyle
+  name: checkStyle
+  href: api/UICatalog/UICatalog.DynamicMenuItem.html#UICatalog_DynamicMenuItem_checkStyle
+  commentId: F:UICatalog.DynamicMenuItem.checkStyle
+  fullName: UICatalog.DynamicMenuItem.checkStyle
+  nameWithType: DynamicMenuItem.checkStyle
+- uid: UICatalog.DynamicMenuItem.hasSubMenu
+  name: hasSubMenu
+  href: api/UICatalog/UICatalog.DynamicMenuItem.html#UICatalog_DynamicMenuItem_hasSubMenu
+  commentId: F:UICatalog.DynamicMenuItem.hasSubMenu
+  fullName: UICatalog.DynamicMenuItem.hasSubMenu
+  nameWithType: DynamicMenuItem.hasSubMenu
+- uid: UICatalog.DynamicMenuItem.help
+  name: help
+  href: api/UICatalog/UICatalog.DynamicMenuItem.html#UICatalog_DynamicMenuItem_help
+  commentId: F:UICatalog.DynamicMenuItem.help
+  fullName: UICatalog.DynamicMenuItem.help
+  nameWithType: DynamicMenuItem.help
+- uid: UICatalog.DynamicMenuItem.isTopLevel
+  name: isTopLevel
+  href: api/UICatalog/UICatalog.DynamicMenuItem.html#UICatalog_DynamicMenuItem_isTopLevel
+  commentId: F:UICatalog.DynamicMenuItem.isTopLevel
+  fullName: UICatalog.DynamicMenuItem.isTopLevel
+  nameWithType: DynamicMenuItem.isTopLevel
+- uid: UICatalog.DynamicMenuItem.shortcut
+  name: shortcut
+  href: api/UICatalog/UICatalog.DynamicMenuItem.html#UICatalog_DynamicMenuItem_shortcut
+  commentId: F:UICatalog.DynamicMenuItem.shortcut
+  fullName: UICatalog.DynamicMenuItem.shortcut
+  nameWithType: DynamicMenuItem.shortcut
+- uid: UICatalog.DynamicMenuItem.title
+  name: title
+  href: api/UICatalog/UICatalog.DynamicMenuItem.html#UICatalog_DynamicMenuItem_title
+  commentId: F:UICatalog.DynamicMenuItem.title
+  fullName: UICatalog.DynamicMenuItem.title
+  nameWithType: DynamicMenuItem.title
+- uid: UICatalog.DynamicMenuItemList
+  name: DynamicMenuItemList
+  href: api/UICatalog/UICatalog.DynamicMenuItemList.html
+  commentId: T:UICatalog.DynamicMenuItemList
+  fullName: UICatalog.DynamicMenuItemList
+  nameWithType: DynamicMenuItemList
+- uid: UICatalog.DynamicMenuItemList.#ctor
+  name: DynamicMenuItemList()
+  href: api/UICatalog/UICatalog.DynamicMenuItemList.html#UICatalog_DynamicMenuItemList__ctor
+  commentId: M:UICatalog.DynamicMenuItemList.#ctor
+  fullName: UICatalog.DynamicMenuItemList.DynamicMenuItemList()
+  nameWithType: DynamicMenuItemList.DynamicMenuItemList()
+- uid: UICatalog.DynamicMenuItemList.#ctor(ustring,Terminal.Gui.MenuItem)
+  name: DynamicMenuItemList(ustring, MenuItem)
+  href: api/UICatalog/UICatalog.DynamicMenuItemList.html#UICatalog_DynamicMenuItemList__ctor_ustring_Terminal_Gui_MenuItem_
+  commentId: M:UICatalog.DynamicMenuItemList.#ctor(ustring,Terminal.Gui.MenuItem)
+  fullName: UICatalog.DynamicMenuItemList.DynamicMenuItemList(ustring, Terminal.Gui.MenuItem)
+  nameWithType: DynamicMenuItemList.DynamicMenuItemList(ustring, MenuItem)
+- uid: UICatalog.DynamicMenuItemList.#ctor*
+  name: DynamicMenuItemList
+  href: api/UICatalog/UICatalog.DynamicMenuItemList.html#UICatalog_DynamicMenuItemList__ctor_
+  commentId: Overload:UICatalog.DynamicMenuItemList.#ctor
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuItemList.DynamicMenuItemList
+  nameWithType: DynamicMenuItemList.DynamicMenuItemList
+- uid: UICatalog.DynamicMenuItemList.MenuItem
+  name: MenuItem
+  href: api/UICatalog/UICatalog.DynamicMenuItemList.html#UICatalog_DynamicMenuItemList_MenuItem
+  commentId: P:UICatalog.DynamicMenuItemList.MenuItem
+  fullName: UICatalog.DynamicMenuItemList.MenuItem
+  nameWithType: DynamicMenuItemList.MenuItem
+- uid: UICatalog.DynamicMenuItemList.MenuItem*
+  name: MenuItem
+  href: api/UICatalog/UICatalog.DynamicMenuItemList.html#UICatalog_DynamicMenuItemList_MenuItem_
+  commentId: Overload:UICatalog.DynamicMenuItemList.MenuItem
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuItemList.MenuItem
+  nameWithType: DynamicMenuItemList.MenuItem
+- uid: UICatalog.DynamicMenuItemList.Title
+  name: Title
+  href: api/UICatalog/UICatalog.DynamicMenuItemList.html#UICatalog_DynamicMenuItemList_Title
+  commentId: P:UICatalog.DynamicMenuItemList.Title
+  fullName: UICatalog.DynamicMenuItemList.Title
+  nameWithType: DynamicMenuItemList.Title
+- uid: UICatalog.DynamicMenuItemList.Title*
+  name: Title
+  href: api/UICatalog/UICatalog.DynamicMenuItemList.html#UICatalog_DynamicMenuItemList_Title_
+  commentId: Overload:UICatalog.DynamicMenuItemList.Title
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuItemList.Title
+  nameWithType: DynamicMenuItemList.Title
+- uid: UICatalog.DynamicMenuItemList.ToString
+  name: ToString()
+  href: api/UICatalog/UICatalog.DynamicMenuItemList.html#UICatalog_DynamicMenuItemList_ToString
+  commentId: M:UICatalog.DynamicMenuItemList.ToString
+  fullName: UICatalog.DynamicMenuItemList.ToString()
+  nameWithType: DynamicMenuItemList.ToString()
+- uid: UICatalog.DynamicMenuItemList.ToString*
+  name: ToString
+  href: api/UICatalog/UICatalog.DynamicMenuItemList.html#UICatalog_DynamicMenuItemList_ToString_
+  commentId: Overload:UICatalog.DynamicMenuItemList.ToString
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuItemList.ToString
+  nameWithType: DynamicMenuItemList.ToString
+- uid: UICatalog.DynamicMenuItemModel
+  name: DynamicMenuItemModel
+  href: api/UICatalog/UICatalog.DynamicMenuItemModel.html
+  commentId: T:UICatalog.DynamicMenuItemModel
+  fullName: UICatalog.DynamicMenuItemModel
+  nameWithType: DynamicMenuItemModel
+- uid: UICatalog.DynamicMenuItemModel.#ctor
+  name: DynamicMenuItemModel()
+  href: api/UICatalog/UICatalog.DynamicMenuItemModel.html#UICatalog_DynamicMenuItemModel__ctor
+  commentId: M:UICatalog.DynamicMenuItemModel.#ctor
+  fullName: UICatalog.DynamicMenuItemModel.DynamicMenuItemModel()
+  nameWithType: DynamicMenuItemModel.DynamicMenuItemModel()
+- uid: UICatalog.DynamicMenuItemModel.#ctor*
+  name: DynamicMenuItemModel
+  href: api/UICatalog/UICatalog.DynamicMenuItemModel.html#UICatalog_DynamicMenuItemModel__ctor_
+  commentId: Overload:UICatalog.DynamicMenuItemModel.#ctor
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuItemModel.DynamicMenuItemModel
+  nameWithType: DynamicMenuItemModel.DynamicMenuItemModel
+- uid: UICatalog.DynamicMenuItemModel.GetPropertyName(System.String)
+  name: GetPropertyName(String)
+  href: api/UICatalog/UICatalog.DynamicMenuItemModel.html#UICatalog_DynamicMenuItemModel_GetPropertyName_System_String_
+  commentId: M:UICatalog.DynamicMenuItemModel.GetPropertyName(System.String)
+  fullName: UICatalog.DynamicMenuItemModel.GetPropertyName(System.String)
+  nameWithType: DynamicMenuItemModel.GetPropertyName(String)
+- uid: UICatalog.DynamicMenuItemModel.GetPropertyName*
+  name: GetPropertyName
+  href: api/UICatalog/UICatalog.DynamicMenuItemModel.html#UICatalog_DynamicMenuItemModel_GetPropertyName_
+  commentId: Overload:UICatalog.DynamicMenuItemModel.GetPropertyName
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuItemModel.GetPropertyName
+  nameWithType: DynamicMenuItemModel.GetPropertyName
+- uid: UICatalog.DynamicMenuItemModel.MenuBar
+  name: MenuBar
+  href: api/UICatalog/UICatalog.DynamicMenuItemModel.html#UICatalog_DynamicMenuItemModel_MenuBar
+  commentId: P:UICatalog.DynamicMenuItemModel.MenuBar
+  fullName: UICatalog.DynamicMenuItemModel.MenuBar
+  nameWithType: DynamicMenuItemModel.MenuBar
+- uid: UICatalog.DynamicMenuItemModel.MenuBar*
+  name: MenuBar
+  href: api/UICatalog/UICatalog.DynamicMenuItemModel.html#UICatalog_DynamicMenuItemModel_MenuBar_
+  commentId: Overload:UICatalog.DynamicMenuItemModel.MenuBar
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuItemModel.MenuBar
+  nameWithType: DynamicMenuItemModel.MenuBar
+- uid: UICatalog.DynamicMenuItemModel.Menus
+  name: Menus
+  href: api/UICatalog/UICatalog.DynamicMenuItemModel.html#UICatalog_DynamicMenuItemModel_Menus
+  commentId: P:UICatalog.DynamicMenuItemModel.Menus
+  fullName: UICatalog.DynamicMenuItemModel.Menus
+  nameWithType: DynamicMenuItemModel.Menus
+- uid: UICatalog.DynamicMenuItemModel.Menus*
+  name: Menus
+  href: api/UICatalog/UICatalog.DynamicMenuItemModel.html#UICatalog_DynamicMenuItemModel_Menus_
+  commentId: Overload:UICatalog.DynamicMenuItemModel.Menus
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuItemModel.Menus
+  nameWithType: DynamicMenuItemModel.Menus
+- uid: UICatalog.DynamicMenuItemModel.Parent
+  name: Parent
+  href: api/UICatalog/UICatalog.DynamicMenuItemModel.html#UICatalog_DynamicMenuItemModel_Parent
+  commentId: P:UICatalog.DynamicMenuItemModel.Parent
+  fullName: UICatalog.DynamicMenuItemModel.Parent
+  nameWithType: DynamicMenuItemModel.Parent
+- uid: UICatalog.DynamicMenuItemModel.Parent*
+  name: Parent
+  href: api/UICatalog/UICatalog.DynamicMenuItemModel.html#UICatalog_DynamicMenuItemModel_Parent_
+  commentId: Overload:UICatalog.DynamicMenuItemModel.Parent
+  isSpec: "True"
+  fullName: UICatalog.DynamicMenuItemModel.Parent
+  nameWithType: DynamicMenuItemModel.Parent
+- uid: UICatalog.DynamicMenuItemModel.PropertyChanged
+  name: PropertyChanged
+  href: api/UICatalog/UICatalog.DynamicMenuItemModel.html#UICatalog_DynamicMenuItemModel_PropertyChanged
+  commentId: E:UICatalog.DynamicMenuItemModel.PropertyChanged
+  fullName: UICatalog.DynamicMenuItemModel.PropertyChanged
+  nameWithType: DynamicMenuItemModel.PropertyChanged
 - uid: UICatalog.IValueConverter
   name: IValueConverter
   href: api/UICatalog/UICatalog.IValueConverter.html
@@ -10802,6 +11575,38 @@ references:
   isSpec: "True"
   fullName: UICatalog.ListWrapperConverter.Convert
   nameWithType: ListWrapperConverter.Convert
+- uid: UICatalog.NumberToWords
+  name: NumberToWords
+  href: api/UICatalog/UICatalog.NumberToWords.html
+  commentId: T:UICatalog.NumberToWords
+  fullName: UICatalog.NumberToWords
+  nameWithType: NumberToWords
+- uid: UICatalog.NumberToWords.Convert(System.Int64)
+  name: Convert(Int64)
+  href: api/UICatalog/UICatalog.NumberToWords.html#UICatalog_NumberToWords_Convert_System_Int64_
+  commentId: M:UICatalog.NumberToWords.Convert(System.Int64)
+  fullName: UICatalog.NumberToWords.Convert(System.Int64)
+  nameWithType: NumberToWords.Convert(Int64)
+- uid: UICatalog.NumberToWords.Convert*
+  name: Convert
+  href: api/UICatalog/UICatalog.NumberToWords.html#UICatalog_NumberToWords_Convert_
+  commentId: Overload:UICatalog.NumberToWords.Convert
+  isSpec: "True"
+  fullName: UICatalog.NumberToWords.Convert
+  nameWithType: NumberToWords.Convert
+- uid: UICatalog.NumberToWords.ConvertAmount(System.Double)
+  name: ConvertAmount(Double)
+  href: api/UICatalog/UICatalog.NumberToWords.html#UICatalog_NumberToWords_ConvertAmount_System_Double_
+  commentId: M:UICatalog.NumberToWords.ConvertAmount(System.Double)
+  fullName: UICatalog.NumberToWords.ConvertAmount(System.Double)
+  nameWithType: NumberToWords.ConvertAmount(Double)
+- uid: UICatalog.NumberToWords.ConvertAmount*
+  name: ConvertAmount
+  href: api/UICatalog/UICatalog.NumberToWords.html#UICatalog_NumberToWords_ConvertAmount_
+  commentId: Overload:UICatalog.NumberToWords.ConvertAmount
+  isSpec: "True"
+  fullName: UICatalog.NumberToWords.ConvertAmount
+  nameWithType: NumberToWords.ConvertAmount
 - uid: UICatalog.Scenario
   name: Scenario
   href: api/UICatalog/UICatalog.Scenario.html
@@ -11385,6 +12190,30 @@ references:
   isSpec: "True"
   fullName: Unix.Terminal.Curses.addwstr
   nameWithType: Curses.addwstr
+- uid: Unix.Terminal.Curses.AltCtrlKeyEnd
+  name: AltCtrlKeyEnd
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_AltCtrlKeyEnd
+  commentId: F:Unix.Terminal.Curses.AltCtrlKeyEnd
+  fullName: Unix.Terminal.Curses.AltCtrlKeyEnd
+  nameWithType: Curses.AltCtrlKeyEnd
+- uid: Unix.Terminal.Curses.AltCtrlKeyHome
+  name: AltCtrlKeyHome
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_AltCtrlKeyHome
+  commentId: F:Unix.Terminal.Curses.AltCtrlKeyHome
+  fullName: Unix.Terminal.Curses.AltCtrlKeyHome
+  nameWithType: Curses.AltCtrlKeyHome
+- uid: Unix.Terminal.Curses.AltCtrlKeyNPage
+  name: AltCtrlKeyNPage
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_AltCtrlKeyNPage
+  commentId: F:Unix.Terminal.Curses.AltCtrlKeyNPage
+  fullName: Unix.Terminal.Curses.AltCtrlKeyNPage
+  nameWithType: Curses.AltCtrlKeyNPage
+- uid: Unix.Terminal.Curses.AltCtrlKeyPPage
+  name: AltCtrlKeyPPage
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_AltCtrlKeyPPage
+  commentId: F:Unix.Terminal.Curses.AltCtrlKeyPPage
+  fullName: Unix.Terminal.Curses.AltCtrlKeyPPage
+  nameWithType: Curses.AltCtrlKeyPPage
 - uid: Unix.Terminal.Curses.AltKeyDown
   name: AltKeyDown
   href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_AltKeyDown
@@ -12085,6 +12914,12 @@ references:
   isSpec: "True"
   fullName: Unix.Terminal.Curses.isendwin
   nameWithType: Curses.isendwin
+- uid: Unix.Terminal.Curses.KEY_CODE_SEQ
+  name: KEY_CODE_SEQ
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_KEY_CODE_SEQ
+  commentId: F:Unix.Terminal.Curses.KEY_CODE_SEQ
+  fullName: Unix.Terminal.Curses.KEY_CODE_SEQ
+  nameWithType: Curses.KEY_CODE_SEQ
 - uid: Unix.Terminal.Curses.KEY_CODE_YES
   name: KEY_CODE_YES
   href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_KEY_CODE_YES
@@ -12595,6 +13430,54 @@ references:
   isSpec: "True"
   fullName: Unix.Terminal.Curses.setscrreg
   nameWithType: Curses.setscrreg
+- uid: Unix.Terminal.Curses.ShiftAltKeyDown
+  name: ShiftAltKeyDown
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_ShiftAltKeyDown
+  commentId: F:Unix.Terminal.Curses.ShiftAltKeyDown
+  fullName: Unix.Terminal.Curses.ShiftAltKeyDown
+  nameWithType: Curses.ShiftAltKeyDown
+- uid: Unix.Terminal.Curses.ShiftAltKeyEnd
+  name: ShiftAltKeyEnd
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_ShiftAltKeyEnd
+  commentId: F:Unix.Terminal.Curses.ShiftAltKeyEnd
+  fullName: Unix.Terminal.Curses.ShiftAltKeyEnd
+  nameWithType: Curses.ShiftAltKeyEnd
+- uid: Unix.Terminal.Curses.ShiftAltKeyHome
+  name: ShiftAltKeyHome
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_ShiftAltKeyHome
+  commentId: F:Unix.Terminal.Curses.ShiftAltKeyHome
+  fullName: Unix.Terminal.Curses.ShiftAltKeyHome
+  nameWithType: Curses.ShiftAltKeyHome
+- uid: Unix.Terminal.Curses.ShiftAltKeyLeft
+  name: ShiftAltKeyLeft
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_ShiftAltKeyLeft
+  commentId: F:Unix.Terminal.Curses.ShiftAltKeyLeft
+  fullName: Unix.Terminal.Curses.ShiftAltKeyLeft
+  nameWithType: Curses.ShiftAltKeyLeft
+- uid: Unix.Terminal.Curses.ShiftAltKeyNPage
+  name: ShiftAltKeyNPage
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_ShiftAltKeyNPage
+  commentId: F:Unix.Terminal.Curses.ShiftAltKeyNPage
+  fullName: Unix.Terminal.Curses.ShiftAltKeyNPage
+  nameWithType: Curses.ShiftAltKeyNPage
+- uid: Unix.Terminal.Curses.ShiftAltKeyPPage
+  name: ShiftAltKeyPPage
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_ShiftAltKeyPPage
+  commentId: F:Unix.Terminal.Curses.ShiftAltKeyPPage
+  fullName: Unix.Terminal.Curses.ShiftAltKeyPPage
+  nameWithType: Curses.ShiftAltKeyPPage
+- uid: Unix.Terminal.Curses.ShiftAltKeyRight
+  name: ShiftAltKeyRight
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_ShiftAltKeyRight
+  commentId: F:Unix.Terminal.Curses.ShiftAltKeyRight
+  fullName: Unix.Terminal.Curses.ShiftAltKeyRight
+  nameWithType: Curses.ShiftAltKeyRight
+- uid: Unix.Terminal.Curses.ShiftAltKeyUp
+  name: ShiftAltKeyUp
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_ShiftAltKeyUp
+  commentId: F:Unix.Terminal.Curses.ShiftAltKeyUp
+  fullName: Unix.Terminal.Curses.ShiftAltKeyUp
+  nameWithType: Curses.ShiftAltKeyUp
 - uid: Unix.Terminal.Curses.ShiftCtrlKeyDown
   name: ShiftCtrlKeyDown
   href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_ShiftCtrlKeyDown
