@@ -143,11 +143,13 @@ namespace UICatalog {
 			};
 			scrollView.Add (verticalRuler);
 
-			Win.LayoutComplete += (a) => {
+			void Top_Loaded()  {
 				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)] +
 				"\n" + "|         ".Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
 				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height * 2)];
+				Top.Loaded -= Top_Loaded;
 			};
+			Top.Loaded += Top_Loaded;
 
 			var pressMeButton = new Button ("Press me!") {
 				X = 3,
@@ -282,12 +284,20 @@ namespace UICatalog {
 			progress.X = Pos.Right (scrollView) + 1;
 			progress.Y = Pos.AnchorEnd (2);
 			progress.Width = 50;
+			bool pulsing = true;
 			bool timer (MainLoop caller)
 			{
 				progress.Pulse ();
-				return true;
+				return pulsing;
 			}
 			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
+
+			void Top_Unloaded ()
+			{
+				pulsing = false;
+				Top.Unloaded -= Top_Unloaded;
+			}
+			Top.Unloaded += Top_Unloaded;
 
 			Win.Add (scrollView, scrollView2, scrollView3, mousePos, progress);
 		}

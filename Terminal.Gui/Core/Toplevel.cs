@@ -49,18 +49,46 @@ namespace Terminal.Gui {
 		public bool Running { get; set; }
 
 		/// <summary>
-		/// Fired once the Toplevel's <see cref="MainLoop"/> has started it's first iteration. 
+		/// Fired once the Toplevel's <see cref="Application.RunState"/> has begin loaded.
+		/// A Loaded event handler is a good place to finalize initialization before calling `<see cref="Application.RunLoop(Application.RunState, bool)"/>.
+		/// </summary>
+		public event Action Loaded;
+
+		/// <summary>
+		/// Fired once the Toplevel's <see cref="MainLoop"/> has started it's first iteration.
 		/// Subscribe to this event to perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set.
-		/// changes. A Ready event handler is a good place to finalize initialization after calling `<see cref="Application.Run()"/>(topLevel)`. 
+		/// changes. A Ready event handler is a good place to finalize initialization after calling `<see cref="Application.Run()"/>(topLevel)`.
 		/// </summary>
 		public event Action Ready;
 
 		/// <summary>
-		/// Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered it's first iteration of the loop. 
+		/// Fired once the Toplevel's <see cref="Application.RunState"/> has begin unloaded.
+		/// A Unloaded event handler is a good place to disposing after calling `<see cref="Application.End(Application.RunState)"/>.
+		/// </summary>
+		public event Action Unloaded;
+
+		/// <summary>
+		/// Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> is redraws for the first time.
+		/// </summary>
+		internal virtual void OnLoaded ()
+		{
+			Loaded?.Invoke ();
+		}
+
+		/// <summary>
+		/// Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered it's first iteration of the loop.
 		/// </summary>
 		internal virtual void OnReady ()
 		{
 			Ready?.Invoke ();
+		}
+
+		/// <summary>
+		/// Called from <see cref="Application.End(Application.RunState)"/> before the <see cref="Toplevel"/> is disposed.
+		/// </summary>
+		internal virtual void OnUnloaded ()
+		{
+			Unloaded?.Invoke ();
 		}
 
 		/// <summary>
