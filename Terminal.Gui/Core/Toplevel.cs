@@ -427,7 +427,7 @@ namespace Terminal.Gui {
 			Application.CurrentView = this;
 
 			if (IsCurrentTop || this == Application.Top) {
-				if (!NeedDisplay.IsEmpty || layoutNeeded) {
+				if (!NeedDisplay.IsEmpty || LayoutNeeded) {
 					Driver.SetAttribute (Colors.TopLevel.Normal);
 
 					// This is the Application.Top. Clear just the region we're being asked to redraw 
@@ -443,7 +443,7 @@ namespace Terminal.Gui {
 						}
 					}
 
-					layoutNeeded = false;
+					ClearLayoutNeeded ();
 					ClearNeedsDisplay ();
 				}
 			}

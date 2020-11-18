@@ -684,17 +684,25 @@ namespace Terminal.Gui {
 			SetNeedsDisplay (Bounds);
 		}
 
-		internal bool layoutNeeded = true;
+		internal bool LayoutNeeded { get; private set; } = true;
 
 		internal void SetNeedsLayout ()
 		{
-			if (layoutNeeded)
+			if (LayoutNeeded)
 				return;
-			layoutNeeded = true;
+			LayoutNeeded = true;
 			if (SuperView == null)
 				return;
 			SuperView.SetNeedsLayout ();
 			textFormatter.NeedsFormat = true;
+		}
+
+		/// <summary>
+		/// Removes the <see cref="SetNeedsLayout"/> setting on this view.
+		/// </summary>
+		protected void ClearLayoutNeeded ()
+		{
+			LayoutNeeded = false;
 		}
 
 		/// <summary>
@@ -1327,7 +1335,7 @@ namespace Terminal.Gui {
 				foreach (var view in subviews) {
 					if (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay) {
 						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
-							if (view.layoutNeeded)
+							if (view.LayoutNeeded)
 								view.LayoutSubviews ();
 							Application.CurrentView = view;
 
@@ -1833,7 +1841,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void LayoutSubviews ()
 		{
-			if (!layoutNeeded) {
+			if (!LayoutNeeded) {
 				return;
 			}
 
@@ -1869,15 +1877,15 @@ namespace Terminal.Gui {
 				}
 
 				v.LayoutSubviews ();
-				v.layoutNeeded = false;
+				v.LayoutNeeded = false;
 
 			}
 
-			if (SuperView == Application.Top && layoutNeeded && ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
+			if (SuperView == Application.Top && LayoutNeeded && ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
 				SetRelativeLayout (Frame);
 			}
 
-			layoutNeeded = false;
+			LayoutNeeded = false;
 
 			OnLayoutComplete (new LayoutEventArgs () { OldBounds = oldBounds });
 		}
