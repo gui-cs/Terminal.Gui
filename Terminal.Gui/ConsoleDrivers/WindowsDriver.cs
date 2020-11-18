@@ -510,6 +510,7 @@ namespace Terminal.Gui {
 
 		public override int Cols => cols;
 		public override int Rows => rows;
+		public override int Top => 0;
 
 		public WindowsDriver ()
 		{

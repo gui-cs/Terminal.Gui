@@ -190,8 +190,8 @@ namespace Terminal.Gui {
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
 				if (UseSystemConsole) {
-					mainLoopDriver = new NetMainLoop (() => Console.ReadKey (true));
 					Driver = new NetDriver ();
+					mainLoopDriver = new NetMainLoop (Driver);
 				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 					var windowsDriver = new WindowsDriver ();
 					mainLoopDriver = windowsDriver;

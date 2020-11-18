@@ -62,6 +62,7 @@ namespace UICatalog {
 
 		private static Scenario _runningScenario = null;
 		private static bool _useSystemConsole = false;
+		private static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
 
 		static void Main (string [] args)
 		{
@@ -72,14 +73,20 @@ namespace UICatalog {
 
 			_scenarios = Scenario.GetDerivedClasses<Scenario> ().OrderBy (t => Scenario.ScenarioMetadata.GetName (t)).ToList ();
 
+			if (args.Length > 0 && args.Contains("-usc")) {
+				_useSystemConsole = true;
+				args = args.Where (val => val != "-usc").ToArray ();
+			}
 			if (args.Length > 0) {
 				var item = _scenarios.FindIndex (t => Scenario.ScenarioMetadata.GetName (t).Equals (args [0], StringComparison.OrdinalIgnoreCase));
 				_runningScenario = (Scenario)Activator.CreateInstance (_scenarios [item]);
+				Application.UseSystemConsole = _useSystemConsole;
 				Application.Init ();
 				_runningScenario.Init (Application.Top, _baseColorScheme);
 				_runningScenario.Setup ();
 				_runningScenario.Run ();
 				_runningScenario = null;
+				Application.Shutdown ();
 				return;
 			}
 
@@ -87,7 +94,7 @@ namespace UICatalog {
 			while ((scenario = GetScenarioToRun ()) != null) {
 #if DEBUG_IDISPOSABLE
 				// Validate there are no outstanding Responder-based instances 
-				// after a sceanario was selected to run. This proves the main UI Catalog
+				// after a scenario was selected to run. This proves the main UI Catalog
 				// 'app' closed cleanly.
 				foreach (var inst in Responder.Instances) {
 					Debug.Assert (inst.WasDisposed);
@@ -95,7 +102,6 @@ namespace UICatalog {
 				Responder.Instances.Clear ();
 #endif
 
-				Application.UseSystemConsole = _useSystemConsole;
 				scenario.Init (Application.Top, _baseColorScheme);
 				scenario.Setup ();
 				scenario.Run ();
@@ -136,7 +142,7 @@ namespace UICatalog {
 		/// <returns></returns>
 		private static Scenario GetScenarioToRun ()
 		{
-			Application.UseSystemConsole = false;
+			Application.UseSystemConsole = _useSystemConsole;
 			Application.Init ();
 
 			// Set this here because not initialized until driver is loaded
@@ -160,7 +166,7 @@ namespace UICatalog {
 					new MenuItem ("_Quit", "", () => Application.RequestStop(), null, null, Key.Q | Key.CtrlMask)
 				}),
 				new MenuBarItem ("_Color Scheme", CreateColorSchemeMenuItems()),
-				new MenuBarItem ("Diag_ostics", CreateDiagnosticMenuItems()),
+				new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems()),
 				new MenuBarItem ("_Help", new MenuItem [] {
 					new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://migueldeicaza.github.io/gui.cs/articles/overview.html"), null, null, Key.F1),
 					new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/migueldeicaza/gui.cs"), null, null, Key.F2),
@@ -270,43 +276,132 @@ namespace UICatalog {
 
 		static MenuItem [] CreateDiagnosticMenuItems ()
 		{
+			const string OFF = "Diagnostics: _Off";
+			const string FRAME_RULER = "Diagnostics: Frame _Ruler";
+			const string FRAME_PADDING = "Diagnostics: _Frame Padding";
 			var index = 0;
 
-			MenuItem CheckedMenuMenuItem (ustring menuItem, Action action, Func<bool> checkFunction)
-			{
-				var mi = new MenuItem ();
-				mi.Title = menuItem;
-				mi.Shortcut = Key.AltMask + index.ToString () [0];
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			foreach (Enum diag in Enum.GetValues(_diagnosticFlags.GetType())) {
+				var item = new MenuItem ();
+				item.Title = GetDiagnosticsTitle (diag);
+				item.Shortcut = Key.AltMask + index.ToString () [0];
 				index++;
-				mi.CheckType |= MenuItemCheckStyle.Checked;
-				mi.Checked = checkFunction ();
-				mi.Action = () => {
-					action?.Invoke ();
-					mi.Title = menuItem;
-					mi.Checked = checkFunction ();
+				item.CheckType |= MenuItemCheckStyle.Checked;
+				item.Checked = _diagnosticFlags.HasFlag (diag);
+				item.Action += () => {
+					var t = GetDiagnosticsTitle (ConsoleDriver.DiagnosticFlags.Off);
+					if (item.Title == t && !item.Checked) {
+						_diagnosticFlags &= ~(ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler);
+						item.Checked = true;
+					} else if (item.Title == t && item.Checked) {
+						_diagnosticFlags |= (ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler);
+						item.Checked = false;
+					} else {
+						var f = GetDiagnosticsEnumValue (item.Title);
+						if (_diagnosticFlags.HasFlag (f)) {
+							SetDiagnosticsFlag (f, false);
+						} else {
+							SetDiagnosticsFlag (f, true);
+						}
+					}
+					foreach (var menuItem in menuItems) {
+						if (menuItem.Title == t) {
+							menuItem.Checked = !_diagnosticFlags.HasFlag (ConsoleDriver.DiagnosticFlags.FrameRuler)
+								&& !_diagnosticFlags.HasFlag (ConsoleDriver.DiagnosticFlags.FramePadding);
+						} else if (menuItem.Title != t) {
+							menuItem.Checked = _diagnosticFlags.HasFlag (GetDiagnosticsEnumValue (menuItem.Title));
+						}
+					}
+					ConsoleDriver.Diagnostics = _diagnosticFlags;
+					_top.SetNeedsDisplay ();
 				};
-				return mi;
+				menuItems.Add (item);
+			}
+			return menuItems.ToArray ();
+
+			string GetDiagnosticsTitle (Enum diag)
+			{
+				switch (Enum.GetName (_diagnosticFlags.GetType (), diag)) {
+				case "Off":
+					return OFF;
+				case "FrameRuler":
+					return FRAME_RULER;
+				case "FramePadding":
+					return FRAME_PADDING;
+				}
+				return "";
 			}
 
-			return new MenuItem [] {
-				CheckedMenuMenuItem ("Use _System Console",
-					() => {
-						_useSystemConsole = !_useSystemConsole;
-					},
-					() => _useSystemConsole),
-				CheckedMenuMenuItem ("Diagnostics: _Frame Padding",
-					() => {
-						ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FramePadding;
-						_top.SetNeedsDisplay ();
-					},
-					() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FramePadding) == ConsoleDriver.DiagnosticFlags.FramePadding),
-				CheckedMenuMenuItem ("Diagnostics: Frame _Ruler",
-					() => {
-						ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
-						_top.SetNeedsDisplay ();
-					},
-					() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler),
-			};
+			Enum GetDiagnosticsEnumValue (ustring title)
+			{
+				switch (title.ToString ()) {
+				case FRAME_RULER:
+					return ConsoleDriver.DiagnosticFlags.FrameRuler;
+				case FRAME_PADDING:
+					return ConsoleDriver.DiagnosticFlags.FramePadding;
+				}
+				return null;
+			}
+
+			void SetDiagnosticsFlag (Enum diag, bool add)
+			{
+				switch (diag) {
+				case ConsoleDriver.DiagnosticFlags.FrameRuler:
+					if (add) {
+						_diagnosticFlags |= ConsoleDriver.DiagnosticFlags.FrameRuler;
+					} else {
+						_diagnosticFlags &= ~ConsoleDriver.DiagnosticFlags.FrameRuler;
+					}
+					break;
+				case ConsoleDriver.DiagnosticFlags.FramePadding:
+					if (add) {
+						_diagnosticFlags |= ConsoleDriver.DiagnosticFlags.FramePadding;
+					} else {
+						_diagnosticFlags &= ~ConsoleDriver.DiagnosticFlags.FramePadding;
+					}
+					break;
+				default:
+					_diagnosticFlags = default;
+					break;
+				}
+			}
+
+			//MenuItem CheckedMenuMenuItem (ustring menuItem, Action action, Func<bool> checkFunction)
+			//{
+			//	var mi = new MenuItem ();
+			//	mi.Title = menuItem;
+			//	mi.Shortcut = Key.AltMask + index.ToString () [0];
+			//	index++;
+			//	mi.CheckType |= MenuItemCheckStyle.Checked;
+			//	mi.Checked = checkFunction ();
+			//	mi.Action = () => {
+			//		action?.Invoke ();
+			//		mi.Title = menuItem;
+			//		mi.Checked = checkFunction ();
+			//	};
+			//	return mi;
+			//}
+
+			//return new MenuItem [] {
+			//	CheckedMenuMenuItem ("Use _System Console",
+			//		() => {
+			//			_useSystemConsole = !_useSystemConsole;
+			//		},
+			//		() => _useSystemConsole),
+			//	CheckedMenuMenuItem ("Diagnostics: _Frame Padding",
+			//		() => {
+			//			ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FramePadding;
+			//			_top.SetNeedsDisplay ();
+			//		},
+			//		() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FramePadding) == ConsoleDriver.DiagnosticFlags.FramePadding),
+			//	CheckedMenuMenuItem ("Diagnostics: Frame _Ruler",
+			//		() => {
+			//			ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
+			//			_top.SetNeedsDisplay ();
+			//		},
+			//		() => (ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler),
+			//};
 		}
 
 		static void SetColorScheme ()

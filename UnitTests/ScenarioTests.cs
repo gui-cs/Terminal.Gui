@@ -55,7 +55,7 @@ namespace Terminal.Gui {
 						Application.RequestStop ();
 					}
 				};
-				Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+				Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 				var ms = 1000;
 				var abortCount = 0;
@@ -107,7 +107,7 @@ namespace Terminal.Gui {
 					Application.RequestStop ();
 				}
 			};
-			Application.Init (new FakeDriver (), new NetMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 			var ms = 1000;
 			var abortCount = 0;

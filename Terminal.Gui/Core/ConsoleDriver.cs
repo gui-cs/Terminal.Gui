@@ -542,6 +542,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public abstract int Rows { get; }
 		/// <summary>
+		/// The current top in the terminal.
+		/// </summary>
+		public abstract int Top { get; }
+
+		/// <summary>
 		/// Initializes the driver
 		/// </summary>
 		/// <param name="terminalResized">Method to invoke when the terminal is resized.</param>

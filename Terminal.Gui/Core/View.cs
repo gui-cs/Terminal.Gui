@@ -1095,6 +1095,10 @@ namespace Terminal.Gui {
 		/// <param name="row">Row.</param>
 		public void Move (int col, int row)
 		{
+			if (Driver.Rows == 0) {
+				return;
+			}
+
 			ViewToScreen (col, row, out var rcol, out var rrow);
 			Driver.Move (rcol, rrow);
 		}

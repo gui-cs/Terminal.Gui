@@ -11,7 +11,7 @@ namespace Terminal.Gui {
 		public void Init_Inits ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new NetMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 			driver.Init (() => { });
 
 			Assert.Equal (80, Console.BufferWidth);
@@ -27,7 +27,7 @@ namespace Terminal.Gui {
 		public void End_Cleans_Up ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new NetMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 			driver.Init (() => { });
 
 			FakeConsole.ForegroundColor = ConsoleColor.Red;
@@ -50,7 +50,7 @@ namespace Terminal.Gui {
 		public void SetColors_Changes_Colors ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new NetMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 			driver.Init (() => { });
 			Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
 			Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
