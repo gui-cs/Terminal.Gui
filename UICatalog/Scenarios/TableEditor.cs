@@ -32,7 +32,61 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (),
 			};
 			tableView.CanFocus = true;
+
+			tableView.KeyPress += KeyPressed; 
+
 			Win.Add (tableView);
+		}
+
+		private void KeyPressed (View.KeyEventEventArgs obj)
+		{
+			if(obj.KeyEvent.Key == Key.Enter) {
+				EditCurrentCell();
+			}
+			
+		}
+
+		private void EditCurrentCell ()
+		{
+			var oldValue = tableView.Table.Rows[tableView.SelectedRow][tableView.SelectedColumn].ToString();
+			bool okPressed = false;
+
+			var ok = new Button ("Ok", is_default: true);
+			ok.Clicked += () => { okPressed = true; Application.RequestStop (); };
+			var cancel = new Button ("Cancel");
+			cancel.Clicked += () => { Application.RequestStop (); };
+			var d = new Dialog ("Enter new value", 60, 20, ok, cancel);
+
+			var lbl = new Label() {
+				X = 0,
+				Y = 1,
+				Text = tableView.Table.Columns[tableView.SelectedColumn].ColumnName
+			};
+
+			var tf = new TextField()
+				{
+					Text = oldValue,
+					X = 0,
+					Y = 2,
+					Width = Dim.Fill()
+				};
+			
+			d.Add (lbl,tf);
+			tf.SetFocus();
+
+			Application.Run (d);
+
+			if(okPressed) {
+
+				try {
+					tableView.Table.Rows[tableView.SelectedRow][tableView.SelectedColumn] = tf.Text;
+				}
+				catch(Exception ex) {
+					MessageBox.ErrorQuery(60,20,"Failed to set text", ex.Message,"Ok");
+				}
+				
+				tableView.RefreshViewport();
+			}
 		}
 
 		/// <summary>
@@ -60,7 +114,7 @@ namespace UICatalog.Scenarios {
 			for(int i=0;i< rows;i++) {
 				
 				List<object> row = new List<object>(){ 
-					"Some long text with unicode '😀'",
+					"Some long text that is super cool",
 					new DateTime(2000+i,12,25),
 					r.Next(i),
 					r.NextDouble()*i,
