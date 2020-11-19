@@ -17,6 +17,9 @@ namespace Terminal.Gui.Views {
 		private int selectedColumn;
 		private DataTable table;
 
+		/// <summary>
+		/// The data table to render in the view.  Setting this property automatically updates and redraws the control.
+		/// </summary>
 		public DataTable Table { get => table; set {table = value; Update(); } }
 
 		/// <summary>
@@ -91,11 +94,7 @@ namespace Terminal.Gui.Views {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			Attribute currentAttribute;
-			var current = ColorScheme.Focus;
-			Driver.SetAttribute (current);
 			Move (0, 0);
-
 			var frame = Frame;
 
 			// What columns to render at what X offset in viewport
@@ -141,16 +140,14 @@ namespace Terminal.Gui.Views {
 				}
 			}
 
-			void SetAttribute (Attribute attribute)
-			{
-				if (currentAttribute != attribute) {
-					currentAttribute = attribute;
-					Driver.SetAttribute (attribute);
-				}
-			}
-
 		}
 
+		/// <summary>
+		/// Truncates <paramref name="valueToRender"/> so that it occupies a maximum of <paramref name="availableHorizontalSpace"/>
+		/// </summary>
+		/// <param name="valueToRender"></param>
+		/// <param name="availableHorizontalSpace"></param>
+		/// <returns></returns>
 		private ustring Truncate (string valueToRender, int availableHorizontalSpace)
 		{
 			if (string.IsNullOrEmpty (valueToRender) || valueToRender.Length < availableHorizontalSpace)
