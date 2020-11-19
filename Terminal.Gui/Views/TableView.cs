@@ -15,8 +15,9 @@ namespace Terminal.Gui.Views {
 		private int rowOffset;
 		private int selectedRow;
 		private int selectedColumn;
+		private DataTable table;
 
-		public DataTable Table { get; private set; }
+		public DataTable Table { get => table; set {table = value; Update(); } }
 
 		/// <summary>
 		/// Zero indexed offset for the upper left <see cref="DataColumn"/> to display in <see cref="Table"/>.
@@ -26,16 +27,16 @@ namespace Terminal.Gui.Views {
 			get => columnOffset;
 
 			//try to prevent this being set to an out of bounds column
-			set  => columnOffset = Math.Min (Table.Columns.Count - 1, Math.Max (0, value));
+			set => columnOffset = Table == null ? 0 : Math.Min (Table.Columns.Count - 1, Math.Max (0, value));
 		}
 
 		/// <summary>
 		/// Zero indexed offset for the <see cref="DataRow"/> to display in <see cref="Table"/> on line 2 of the control (first line being headers)
 		/// </summary>
 		/// <remarks>This property allows very wide tables to be rendered with horizontal scrolling</remarks>
-		public int RowOffset { 
-			get => rowOffset; 
-			set => rowOffset = Math.Min (Table.Rows.Count - 1, Math.Max (0, value));
+		public int RowOffset {
+			get => rowOffset;
+			set => rowOffset = Table == null ? 0 : Math.Min (Table.Rows.Count - 1, Math.Max (0, value));
 		}
 
 		/// <summary>
@@ -45,31 +46,31 @@ namespace Terminal.Gui.Views {
 			get => selectedColumn;
 
 			//try to prevent this being set to an out of bounds column
-			set  => selectedColumn = Math.Min (Table.Columns.Count - 1, Math.Max (0, value));
+			set => selectedColumn = Table == null ? 0 :  Math.Min (Table.Columns.Count - 1, Math.Max (0, value));
 		}
 
 		/// <summary>
 		/// The index of <see cref="DataTable.Rows"/> in <see cref="Table"/> that the user has currently selected
 		/// </summary>
-		public int SelectedRow { 
-			get => selectedRow; 
-			set => selectedRow = Math.Min (Table.Rows.Count - 1, Math.Max (0, value));
+		public int SelectedRow {
+			get => selectedRow;
+			set => selectedRow =  Table == null ? 0 : Math.Min (Table.Rows.Count - 1, Math.Max (0, value));
 		}
 
 		/// <summary>
 		/// The maximum number of characters to render in any given column.  This prevents one long column from pushing out all the others
 		/// </summary>
-		public int MaximumCellWidth {get;set;} = 100;
+		public int MaximumCellWidth { get; set; } = 100;
 
 		/// <summary>
 		/// The text representation that should be rendered for cells with the value <see cref="DBNull.Value"/>
 		/// </summary>
-		public string NullSymbol {get;set;} = "-";
+		public string NullSymbol { get; set; } = "-";
 
 		/// <summary>
 		/// The symbol to add after each cell value and header value to visually seperate values
 		/// </summary>
-		public char SeparatorSymbol {get;set; } = ' ';
+		public char SeparatorSymbol { get; set; } = ' ';
 
 		/// <summary>
 		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
@@ -77,8 +78,16 @@ namespace Terminal.Gui.Views {
 		/// <param name="table">The table to display in the control</param>
 		public TableView (DataTable table) : base ()
 		{
-			this.Table = table ?? throw new ArgumentNullException (nameof (table));
+			this.Table = table;
 		}
+
+		/// <summary>
+		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. Set the <see cref="Table"/> property to begin editing
+		/// </summary>
+		public TableView () : base ()
+		{
+		}
+
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
@@ -90,45 +99,45 @@ namespace Terminal.Gui.Views {
 			var frame = Frame;
 
 			// What columns to render at what X offset in viewport
-			Dictionary<DataColumn, int> columnsToRender = CalculateViewport(bounds);
+			Dictionary<DataColumn, int> columnsToRender = CalculateViewport (bounds);
 
 			Driver.SetAttribute (ColorScheme.Normal);
 
 			//invalidate current row (prevents scrolling around leaving old characters in the frame
-			Driver.AddStr(new string (' ',bounds.Width));
-			
+			Driver.AddStr (new string (' ', bounds.Width));
+
 			// Render the headers
-			foreach(var kvp in columnsToRender) {
-				
-				Move (kvp.Value,0);
-				Driver.AddStr(Truncate(kvp.Key.ColumnName+ SeparatorSymbol,bounds.Width - kvp.Value));
+			foreach (var kvp in columnsToRender) {
+
+				Move (kvp.Value, 0);
+				Driver.AddStr (Truncate (kvp.Key.ColumnName + SeparatorSymbol, bounds.Width - kvp.Value));
 			}
 
 			//render the cells
 			for (int line = 1; line < frame.Height; line++) {
-				
+
 				//invalidate current row (prevents scrolling around leaving old characters in the frame
-				Move (0,line);
-				Driver.SetAttribute(ColorScheme.Normal);
-				Driver.AddStr(new string (' ',bounds.Width));
+				Move (0, line);
+				Driver.SetAttribute (ColorScheme.Normal);
+				Driver.AddStr (new string (' ', bounds.Width));
 
 				//work out what Row to render
-				var rowToRender = RowOffset + (line-1);
+				var rowToRender = RowOffset + (line - 1);
 
 				//if we have run off the end of the table
-				if(rowToRender >= Table.Rows.Count)
+				if ( Table == null || rowToRender >= Table.Rows.Count)
 					continue;
 
-				foreach(var kvp in columnsToRender) {
-					Move (kvp.Value,line);
+				foreach (var kvp in columnsToRender) {
+					Move (kvp.Value, line);
 
 					bool isSelectedCell = rowToRender == SelectedRow && kvp.Key.Ordinal == SelectedColumn;
 
-					Driver.SetAttribute(isSelectedCell? ColorScheme.HotFocus: ColorScheme.Normal);
+					Driver.SetAttribute (isSelectedCell ? ColorScheme.HotFocus : ColorScheme.Normal);
 
-					
-					var valueToRender = GetRenderedVal(Table.Rows[rowToRender][kvp.Key]) + SeparatorSymbol;
-					Driver.AddStr(Truncate(valueToRender,bounds.Width - kvp.Value ));
+
+					var valueToRender = GetRenderedVal (Table.Rows [rowToRender] [kvp.Key]) + SeparatorSymbol;
+					Driver.AddStr (Truncate (valueToRender, bounds.Width - kvp.Value));
 				}
 			}
 
@@ -144,10 +153,10 @@ namespace Terminal.Gui.Views {
 
 		private ustring Truncate (string valueToRender, int availableHorizontalSpace)
 		{
-			if(string.IsNullOrEmpty(valueToRender) || valueToRender.Length < availableHorizontalSpace)
+			if (string.IsNullOrEmpty (valueToRender) || valueToRender.Length < availableHorizontalSpace)
 				return valueToRender;
 
-			return valueToRender.Substring(0,availableHorizontalSpace);
+			return valueToRender.Substring (0, availableHorizontalSpace);
 		}
 
 		/// <inheritdoc/>
@@ -156,47 +165,47 @@ namespace Terminal.Gui.Views {
 			switch (keyEvent.Key) {
 			case Key.CursorLeft:
 				SelectedColumn--;
-				RefreshViewport();
+				Update ();
 				break;
 			case Key.CursorRight:
 				SelectedColumn++;
-				RefreshViewport();
+				Update ();
 				break;
 			case Key.CursorDown:
 				SelectedRow++;
-				RefreshViewport();
+				Update ();
 				break;
 			case Key.CursorUp:
 				SelectedRow--;
-				RefreshViewport();
+				Update ();
 				break;
 			case Key.PageUp:
 				SelectedRow -= Frame.Height;
-				RefreshViewport();
+				Update ();
 				break;
 			case Key.PageDown:
 				SelectedRow += Frame.Height;
-				RefreshViewport();
+				Update ();
 				break;
 			case Key.Home | Key.CtrlMask:
 				SelectedRow = 0;
 				SelectedColumn = 0;
-				RefreshViewport();
+				Update ();
 				break;
 			case Key.Home:
 				SelectedColumn = 0;
-				RefreshViewport();
+				Update ();
 				break;
 			case Key.End | Key.CtrlMask:
 				//jump to end of table
-				SelectedRow = Table.Rows.Count-1;
-				SelectedColumn = Table.Columns.Count-1;
-				RefreshViewport();
+				SelectedRow =  Table == null ? 0 : Table.Rows.Count - 1;
+				SelectedColumn =  Table == null ? 0 : Table.Columns.Count - 1;
+				Update ();
 				break;
 			case Key.End:
 				//jump to end of row
-				SelectedColumn = Table.Columns.Count-1;
-				RefreshViewport();		
+				SelectedColumn =  Table == null ? 0 : Table.Columns.Count - 1;
+				Update ();
 				break;
 			}
 			PositionCursor ();
@@ -204,36 +213,38 @@ namespace Terminal.Gui.Views {
 		}
 
 		/// <summary>
-		/// Updates the viewport (<see cref="ColumnOffset"/> / <see cref="RowOffset"/>) to ensure that the users selected cell is visible and redraws control
+		/// Updates the view to reflect changes to <see cref="Table"/> and to (<see cref="ColumnOffset"/> / <see cref="RowOffset"/>) etc
 		/// </summary>
 		/// <remarks>This always calls <see cref="View.SetNeedsDisplay()"/></remarks>
-		public void RefreshViewport ()
+		public void Update()
 		{
-			//TODO: implement
+			if(Table == null) {
+				SetNeedsDisplay ();
+				return;
+			}
 
-			Dictionary<DataColumn, int> columnsToRender = CalculateViewport(Bounds);
-
+			Dictionary<DataColumn, int> columnsToRender = CalculateViewport (Bounds);
 
 			//if we have scrolled too far to the left 
-			if(SelectedColumn < columnsToRender.Keys.Min(col=>col.Ordinal)) {
+			if (SelectedColumn < columnsToRender.Keys.Min (col => col.Ordinal)) {
 				ColumnOffset = SelectedColumn;
 			}
 
 			//if we have scrolled too far to the right
-			if(SelectedColumn > columnsToRender.Keys.Max(col=>col.Ordinal)) {
+			if (SelectedColumn > columnsToRender.Keys.Max (col => col.Ordinal)) {
 				ColumnOffset = SelectedColumn;
 			}
 
 			//if we have scrolled too far down
-			if(SelectedRow > RowOffset + Bounds.Height-1) {
+			if (SelectedRow > RowOffset + Bounds.Height - 1) {
 				RowOffset = SelectedRow;
 			}
 			//if we have scrolled too far up
-			if(SelectedRow < RowOffset) {
+			if (SelectedRow < RowOffset) {
 				RowOffset = SelectedRow;
 			}
 
-			SetNeedsDisplay();
+			SetNeedsDisplay ();
 		}
 
 		/// <summary>
@@ -242,24 +253,27 @@ namespace Terminal.Gui.Views {
 		/// <param name="bounds"></param>
 		/// <param name="padding"></param>
 		/// <returns></returns>
-		private Dictionary<DataColumn,int> CalculateViewport(Rect bounds, int padding = 1)
+		private Dictionary<DataColumn, int> CalculateViewport (Rect bounds, int padding = 1)
 		{
-			Dictionary<DataColumn,int> toReturn = new Dictionary<DataColumn, int>();
+			Dictionary<DataColumn, int> toReturn = new Dictionary<DataColumn, int> ();
+
+			if(Table == null)
+				return toReturn;
 
 			int usedSpace = 0;
 			int availableHorizontalSpace = bounds.Width;
-			int rowsToRender = bounds.Height-1; //1 reserved for the headers row
-			
-			foreach(var col in Table.Columns.Cast<DataColumn>().Skip(ColumnOffset)) {
-				
-				toReturn.Add(col,usedSpace);
-				usedSpace += CalculateMaxRowSize(col,rowsToRender) + padding;
+			int rowsToRender = bounds.Height - 1; //1 reserved for the headers row
 
-				if(usedSpace > availableHorizontalSpace)
+			foreach (var col in Table.Columns.Cast<DataColumn> ().Skip (ColumnOffset)) {
+
+				toReturn.Add (col, usedSpace);
+				usedSpace += CalculateMaxRowSize (col, rowsToRender) + padding;
+
+				if (usedSpace > availableHorizontalSpace)
 					return toReturn;
-				
+
 			}
-			
+
 			return toReturn;
 		}
 
@@ -273,10 +287,10 @@ namespace Terminal.Gui.Views {
 		{
 			int spaceRequired = col.ColumnName.Length;
 
-			for(int i = RowOffset; i<RowOffset + rowsToRender && i<Table.Rows.Count;i++) {
+			for (int i = RowOffset; i < RowOffset + rowsToRender && i < Table.Rows.Count; i++) {
 
 				//expand required space if cell is bigger than the last biggest cell or header
-				spaceRequired = Math.Max(spaceRequired,GetRenderedVal(Table.Rows[i][col]).Length);
+				spaceRequired = Math.Max (spaceRequired, GetRenderedVal (Table.Rows [i] [col]).Length);
 			}
 
 			return spaceRequired;
@@ -289,16 +303,15 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		private string GetRenderedVal (object value)
 		{
-			if(value == null || value == DBNull.Value) 
-			{
+			if (value == null || value == DBNull.Value) {
 				return NullSymbol;
 			}
-			
-			var representation = value.ToString();
+
+			var representation = value.ToString ();
 
 			//if it is too long to fit
-			if(representation.Length > MaximumCellWidth)
-				return representation.Substring(0,MaximumCellWidth);
+			if (representation.Length > MaximumCellWidth)
+				return representation.Substring (0, MaximumCellWidth);
 
 			return representation;
 		}

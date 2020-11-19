@@ -18,14 +18,30 @@ namespace UICatalog.Scenarios {
 
 		public override void Setup ()
 		{
-			var dt = BuildDemoDataTable(30,1000);
-
-			Win.Title = this.GetName() + "-" + dt.TableName ?? "Untitled";
+			Win.Title = this.GetName();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
 			Top.LayoutSubviews ();
 
-			this.tableView = new TableView (dt) {
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("_File", new MenuItem [] {
+					new MenuItem ("_OpenExample", "", () => OpenExample()),
+					new MenuItem ("_CloseExample", "", () => CloseExample()),
+					new MenuItem ("_Quit", "", () => Quit()),
+				}),
+			});
+			Top.Add (menu);
+
+			var statusBar = new StatusBar (new StatusItem [] {
+				//new StatusItem(Key.Enter, "~ENTER~ ApplyEdits", () => { _hexView.ApplyEdits(); }),
+				new StatusItem(Key.F2, "~F2~ OpenExample", () => OpenExample()),
+				new StatusItem(Key.F3, "~F3~ EditCell", () => EditCurrentCell()),
+				new StatusItem(Key.F4, "~F4~ CloseExample", () => CloseExample()),
+				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+			});
+			Top.Add (statusBar);
+
+			this.tableView = new TableView () {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
@@ -33,21 +49,30 @@ namespace UICatalog.Scenarios {
 			};
 			tableView.CanFocus = true;
 
-			tableView.KeyPress += KeyPressed; 
 
 			Win.Add (tableView);
 		}
 
-		private void KeyPressed (View.KeyEventEventArgs obj)
+		private void CloseExample ()
 		{
-			if(obj.KeyEvent.Key == Key.Enter) {
-				EditCurrentCell();
-			}
-			
+			tableView.Table = null;
+		}
+
+		private void Quit ()
+		{
+			Application.RequestStop ();
+		}
+
+		private void OpenExample ()
+		{
+			tableView.Table = BuildDemoDataTable(30,1000);
 		}
 
 		private void EditCurrentCell ()
 		{
+			if(tableView.Table == null)
+				return;
+
 			var oldValue = tableView.Table.Rows[tableView.SelectedRow][tableView.SelectedColumn].ToString();
 			bool okPressed = false;
 
@@ -85,7 +110,7 @@ namespace UICatalog.Scenarios {
 					MessageBox.ErrorQuery(60,20,"Failed to set text", ex.Message,"Ok");
 				}
 				
-				tableView.RefreshViewport();
+				tableView.Update();
 			}
 		}
 
