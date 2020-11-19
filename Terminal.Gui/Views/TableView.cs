@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Terminal.Gui.Views {
 
@@ -22,10 +20,21 @@ namespace Terminal.Gui.Views {
 		/// </summary>
 		/// <remarks>This property allows very wide tables to be rendered with horizontal scrolling</remarks>
 		public int ColumnOffset {
-			get => columnOffset; 
+			get {
+				return columnOffset; 
+			}
 
 			//try to prevent this being set to an out of bounds column
-			set => columnOffset = Math.Min (Table.Columns.Count - 1, Math.Max (0, value));
+			set {
+				//the value before we changed it
+				var origValue = columnOffset;
+
+				columnOffset = Math.Min (Table.Columns.Count - 1, Math.Max (0, value));
+				
+				//if value actually changed we must update UI
+				if(columnOffset != origValue)
+					SetNeedsDisplay();
+			}
 		}
 
 
@@ -34,9 +43,20 @@ namespace Terminal.Gui.Views {
 		/// </summary>
 		/// <remarks>This property allows very wide tables to be rendered with horizontal scrolling</remarks>
 		public int RowOffset { 
-			get => rowOffset; 
-			set => rowOffset = Math.Min (Table.Rows.Count - 1, Math.Max (0, value));
+			get {
+				return rowOffset; 
 			}
+			set {
+				//the value before we changed it
+				var origValue = rowOffset;
+
+				rowOffset = Math.Min (Table.Rows.Count - 1, Math.Max (0, value));
+
+				//if value actually changed we must update UI
+				if(rowOffset != origValue)
+					SetNeedsDisplay();
+			}
+		}
 
 		/// <summary>
 		/// The maximum number of characters to render in any given column.  This prevents one long column from pushing out all the others
@@ -47,6 +67,11 @@ namespace Terminal.Gui.Views {
 		/// The text representation that should be rendered for cells with the value <see cref="DBNull.Value"/>
 		/// </summary>
 		public string NullSymbol {get;set;} = "-";
+
+		/// <summary>
+		/// The symbol to add after each cell value and header value to visually seperate values
+		/// </summary>
+		public char SeparatorSymbol {get;set; } = ' ';
 
 		/// <summary>
 		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
@@ -74,41 +99,35 @@ namespace Terminal.Gui.Views {
 
 			Driver.SetAttribute (ColorScheme.HotNormal);
 
+			//invalidate current row (prevents scrolling around leaving old characters in the frame
+			Driver.AddStr(new string (' ',bounds.Width));
+
 			// Render the headers
 			foreach(var kvp in columnsToRender) {
 				
 				Move (kvp.Value,0);
-				Driver.AddStr(kvp.Key.ColumnName);
+				Driver.AddStr(kvp.Key.ColumnName+ SeparatorSymbol);
 			}
 
 			//render the cells
 			for (int line = 1; line < frame.Height; line++) {
 				
+				//invalidate current row (prevents scrolling around leaving old characters in the frame
+				Move (0,line);
+				Driver.AddStr(new string (' ',bounds.Width));
+
 				//work out what Row to render
 				var rowToRender = RowOffset + (line-1);
+
+				//if we have run off the end of the table
 				if(rowToRender >= Table.Rows.Count)
-					break;
+					continue;
 
 				foreach(var kvp in columnsToRender) {
 					Move (kvp.Value,line);
-					Driver.AddStr(GetRenderedVal(Table.Rows[rowToRender][kvp.Key]));
+					Driver.AddStr(GetRenderedVal(Table.Rows[rowToRender][kvp.Key]) + SeparatorSymbol);
 				}
 			}
-
-			/*
-
-			for (int line = 1; line < frame.Height; line++) {
-				var lineRect = new Rect (0, line, frame.Width, 1);
-				if (!bounds.Contains (lineRect))
-					continue;
-
-				Move (0, line);
-				Driver.SetAttribute (ColorScheme.HotNormal);
-				Driver.AddStr ("test");
-
-				currentAttribute = ColorScheme.HotNormal;
-				SetAttribute (ColorScheme.Normal);
-			}*/
 
 			void SetAttribute (Attribute attribute)
 			{
@@ -119,7 +138,50 @@ namespace Terminal.Gui.Views {
 			}
 
 		}
-
+		
+		/// <inheritdoc/>
+		public override bool ProcessKey (KeyEvent keyEvent)
+		{
+			switch (keyEvent.Key) {
+			case Key.CursorLeft:
+				ColumnOffset--;
+				break;
+			case Key.CursorRight:
+				ColumnOffset++;
+				break;
+			case Key.CursorDown:
+				RowOffset++;
+				break;
+			case Key.CursorUp:
+				RowOffset--;
+				break;
+			case Key.PageUp:
+				 RowOffset -= Frame.Height;
+				break;
+			case Key.V | Key.CtrlMask:
+			case Key.PageDown:
+				 RowOffset += Frame.Height;
+				break;
+			case Key.Home | Key.CtrlMask:
+				RowOffset = 0;
+				ColumnOffset = 0;
+				break;
+			case Key.Home:
+				ColumnOffset = 0;
+				break;
+			case Key.End | Key.CtrlMask:
+				//jump to end of table
+				RowOffset = Table.Rows.Count-1;
+				ColumnOffset = Table.Columns.Count-1;
+				break;
+			case Key.End:
+				//jump to end of row
+				ColumnOffset = Table.Columns.Count-1;				
+				break;
+			}
+			PositionCursor ();
+			return true;
+		}
 		/// <summary>
 		/// Calculates which columns should be rendered given the <paramref name="bounds"/> in which to display and the <see cref="ColumnOffset"/>
 		/// </summary>
@@ -157,7 +219,7 @@ namespace Terminal.Gui.Views {
 		{
 			int spaceRequired = col.ColumnName.Length;
 
-			for(int i = RowOffset; i<rowsToRender && i<Table.Rows.Count;i++) {
+			for(int i = RowOffset; i<RowOffset + rowsToRender && i<Table.Rows.Count;i++) {
 
 				//expand required space if cell is bigger than the last biggest cell or header
 				spaceRequired = Math.Max(spaceRequired,GetRenderedVal(Table.Rows[i][col]).Length);

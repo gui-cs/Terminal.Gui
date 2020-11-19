@@ -36,7 +36,7 @@ namespace UICatalog.Scenarios {
 		}
 
 		/// <summary>
-		/// Generates a new demo <see cref="DataTable"/> with the given number of <paramref name="cols"/> (min 4) and <paramref name="rows"/>
+		/// Generates a new demo <see cref="DataTable"/> with the given number of <paramref name="cols"/> (min 5) and <paramref name="rows"/>
 		/// </summary>
 		/// <param name="cols"></param>
 		/// <param name="rows"></param>
@@ -49,8 +49,9 @@ namespace UICatalog.Scenarios {
 			dt.Columns.Add(new DataColumn("DateCol",typeof(DateTime)));
 			dt.Columns.Add(new DataColumn("IntCol",typeof(int)));
 			dt.Columns.Add(new DataColumn("DoubleCol",typeof(double)));
+			dt.Columns.Add(new DataColumn("NullsCol",typeof(string)));
 
-			for(int i=0;i< cols -4; i++) {
+			for(int i=0;i< cols -5; i++) {
 				dt.Columns.Add("Column" + (i+4));
 			}
 			
@@ -62,10 +63,11 @@ namespace UICatalog.Scenarios {
 					"Some long text with unicode '😀'",
 					new DateTime(2000+i,12,25),
 					r.Next(i),
-					r.NextDouble()*i
+					r.NextDouble()*i,
+					DBNull.Value
 				};
 				
-				for(int j=0;j< cols -4; j++) {
+				for(int j=0;j< cols -5; j++) {
 					row.Add("SomeValue" + r.Next(100));
 				}
 
