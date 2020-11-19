@@ -9,29 +9,102 @@ using System.Xml.Schema;
 
 namespace Terminal.Gui.Views {
 
+	/// <summary>
+	/// Implement <see cref="ITreeViewItem"/> to provide rendering for a single item in the <see cref="TreeView"/>
+	/// </summary>
 	public interface ITreeViewItem {
+		/// <summary>
+		/// Gets arbitrary data associated with the particular <see cref="ITreeViewItem"/>
+		/// </summary>
+		/// <remarks>This property is not used internally.</remarks>
 		object Data { get; }
 
+		/// <summary>
+		/// The parent of this <see cref="ITreeViewItem"/>
+		/// </summary>
+		/// <remarks>This property is used internally by <see cref="TreeView"/> and can be null. </remarks>
 		ITreeViewItem Parent { get; set; }
 
+		/// <summary>
+		/// Count of items if the tree were to be flattened into a collection such as a list.
+		/// </summary>
+		/// <remarks>This item must be counted, as well as all the children items below this item.</remarks>
 		int Count { get; }
 
+		/// <summary>
+		/// This method is invoked to render a specified item, the method should cover the entire provided width.
+		/// </summary>
+		/// <returns>The render.</returns>
+		/// <param name="container">The parent tree view.</param>
+		/// <param name="driver">The console driver to render.</param>
+		/// <param name="selected">Describes whether the item being rendered is currently selected by the user.</param>
+		/// <param name="level">Describes the indentation level of the item.</param>
+		/// <param name="col">The column where the rendering will start</param>
+		/// <param name="line">The line where the rendering will be done.</param>
+		/// <param name="width">The width that must be filled out.</param>
+		/// <remarks>
+		///   The default color will be set before this method is invoked, and will be based on whether the item is selected or not.
+		/// </remarks>
 		void Render (TreeView container, ConsoleDriver driver, bool selected, int level, int col, int line, int width);
 
+		/// <summary>
+		/// Gets or sets whether this item is expanded in the <see cref="TreeView"/>.
+		/// The children of expanded items must be displayed in the <see cref="TreeView"/>.
+		/// </summary>
 		bool IsExpanded { get; set; }
 
+		/// <summary>
+		/// Gets or sets whether this item is marked by the user.
+		/// </summary>
 		bool IsMarked { get; set; }
 
+		/// <summary>
+		/// Collects all items in this <see cref="ITreeViewItem"/> node into a flat collection.
+		/// </summary>
+		/// <remarks>This item is included in the collection.</remarks>
+		/// <returns>A collection of items, including this item and all children below this item.</returns>
 		IList<ITreeViewItem> ToList ();
 
+		/// <summary>
+		/// Gets the direct children of this item.
+		/// </summary>
 		IList<ITreeViewItem> Children { get; }
 	}
 
+	/// <summary>
+	/// TreeView <see cref="View"/> renders a tree-like scrollable collection of items. Items can be activated
+	/// </summary>
+	/// /// <remarks>
+	/// <para>
+	///   The <see cref="TreeView"/> displays data in forms of trees and allows the user to scroll through the data.
+	///   Items can aggregate other items in their Children collection and display them.
+	///   Items in the can be activated firing an event (with the ENTER key or a mouse double-click). 
+	///   If the <see cref="AllowsMarking"/> property is true, elements can be marked by the user.
+	/// </para>
+	/// <para>
+	///   A default implementation if <see cref="ITreeViewItem"/> is provided: <see cref="TreeViewItem"/>.
+	///   Alternatively, the way items are rendered can be customised by implementing ITreeViewItem.
+	/// </para>
+	/// <para>
+	///   To change the contents of the <see cref="TreeView"/> set the <see cref="Root"/> property,
+	///   or manipulate any of the children items by removing or adding items.
+	///   Adding or removing a child item requires a call to the <see cref="View.SetNeedsDisplay()"/>.
+	/// </para>
+	/// <para>
+	///   When <see cref="AllowsMarking"/> is set to true the rendering will prefix the rendered items with
+	///   [x] or [ ] and bind the SPACE key to toggle the selection. To implement a different
+	///   marking style set <see cref="AllowsMarking"/> to false and implement custom rendering.
+	/// </para>
+	/// </remarks>
 	public class TreeView : View {
 		ITreeViewItem top;
 		ITreeViewItem selected;
 		ITreeViewItem root;
 
+		/// <summary>
+		/// Gets or sets the top-level item of the <see cref="TreeView"/>.
+		/// </summary>
+		/// <value>The root.</value>
 		public ITreeViewItem Root {
 			get => root; 
 			set {
@@ -44,6 +117,15 @@ namespace Terminal.Gui.Views {
 		}
 
 		bool allowsMarking;
+		/// <summary>
+		/// Gets or sets whether this <see cref="TreeView"/> allows items to be marked.
+		/// </summary>
+		/// <value><c>true</c> if allows marking elements of the list; otherwise, <c>false</c>.
+		/// </value>
+		/// <remarks>
+		/// If set to true, <see cref="TreeView"/> will render items marked items with "[x]", and unmarked items with "[ ]".
+		/// SPACE key will toggle marking.
+		/// </remarks>
 		public bool AllowsMarking {
 			get => allowsMarking;
 			set {
@@ -57,6 +139,10 @@ namespace Terminal.Gui.Views {
 		/// </summary>
 		public bool AllowsMultipleSelection { get; set; } = true;
 
+		/// <summary>
+		/// Gets or sets the item that is displayed at the top of the <see cref="TreeView"/>.
+		/// </summary>
+		/// <value>The top item.</value>
 		public ITreeViewItem TopItem {
 			get => top;
 			set {
@@ -70,6 +156,10 @@ namespace Terminal.Gui.Views {
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the currently selected item.
+		/// </summary>
+		/// <value>The selected item.</value>
 		public ITreeViewItem SelectedItem {
 			get => selected;
 			set {
@@ -84,17 +174,31 @@ namespace Terminal.Gui.Views {
 			}
 		}
 
+		/// <summary>
+		/// Initializes a new instance of <see cref="TreeView"/> with a starting root item 
+		/// and relative positioning
+		/// </summary>
+		/// <param name="root">The root item.</param>
 		public TreeView (ITreeViewItem root) : base ()
 		{
 			this.root = root;
 			Initialize ();
 		}
 
+		/// <summary>
+		/// Initializes a new instance of <see cref="TreeView"/> with relative positioning. 
+		/// A root must be supplied later, in order to display any items.
+		/// </summary>
 		public TreeView () : base ()
 		{
 			Initialize ();
 		}
 
+		/// <summary>
+		/// Initializes a new instance of <see cref="TreeView"/> with absolute positioning.
+		/// </summary>
+		/// <param name="rect">Frame for the treeview.</param>
+		/// <param name="root">The root item.</param>
 		public TreeView (Rect rect, ITreeViewItem root) : base (rect)
 		{
 			this.root = root;
@@ -107,6 +211,7 @@ namespace Terminal.Gui.Views {
 			CanFocus = true;
 		}
 
+		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
 			var current = ColorScheme.Focus;
@@ -157,8 +262,6 @@ namespace Terminal.Gui.Views {
 		/// In essence, this method returns a flattened collection of tree items, in which items which are hidden
 		/// due to their parent not being expanded aren't included.
 		/// </summary>
-		/// <param name="includeRoot"></param>
-		/// <returns></returns>
 		private IList<ITreeViewItem> GetVisibleItems()
 		{
 			bool includeRoot = true;
@@ -193,7 +296,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		/// <summary>
-		/// This event is raised when the selected item in the <see cref="ListView"/> has changed.
+		/// This event is raised when the selected item in the <see cref="TreeView"/> has changed.
 		/// </summary>
 		public event Action<TreeViewItemEventArgs> SelectedItemChanged;
 
@@ -202,8 +305,14 @@ namespace Terminal.Gui.Views {
 		/// </summary>
 		public event Action<TreeViewItemEventArgs> OpenSelectedItem;
 
+		/// <summary>
+		/// This event is raised when the user presses TAB to expand the selected item.
+		/// </summary>
 		public event Action<TreeViewItemEventArgs> ExpandSelectedItem;
 
+		/// <summary>
+		/// This event is raised when the user presses TAB to collapse the selected item.
+		/// </summary>
 		public event Action<TreeViewItemEventArgs> CollapseSelectedItem;
 
 		///<inheritdoc/>
@@ -251,9 +360,8 @@ namespace Terminal.Gui.Views {
 		}
 
 		/// <summary>
-		/// Prevents marking if it's not allowed mark and if it's not allows multiple selection.
+		/// Prevents marking if it's not allowed and if it is, does not allow multiple selection.
 		/// </summary>
-		/// <returns></returns>
 		public virtual bool AllowsAll ()
 		{
 			if (!allowsMarking)
@@ -287,9 +395,8 @@ namespace Terminal.Gui.Views {
 		}
 
 		/// <summary>
-		/// Moves the selected item index to the next page.
+		/// Moves the selected item to the next page.
 		/// </summary>
-		/// <returns></returns>
 		public virtual bool MovePageUp ()
 		{
 			var items = GetVisibleItems ();
@@ -308,7 +415,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		/// <summary>
-		/// Moves the selected item index to the previous page.
+		/// Moves the selected item to the previous page.
 		/// </summary>
 		/// <returns></returns>
 		public virtual bool MovePageDown ()
@@ -332,9 +439,8 @@ namespace Terminal.Gui.Views {
 		}
 
 		/// <summary>
-		/// Moves the selected item index to the next row.
+		/// Moves the selected item to the next visible item.
 		/// </summary>
-		/// <returns></returns>
 		public virtual bool MoveDown ()
 		{
 			selected = GetNext (selected);
@@ -348,7 +454,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		/// <summary>
-		/// Moves the selected item index to the previous row.
+		/// Moves the selected item to the previous visible item.
 		/// </summary>
 		/// <returns></returns>
 		public virtual bool MoveUp ()
@@ -439,9 +545,8 @@ namespace Terminal.Gui.Views {
 		}
 
 		/// <summary>
-		/// Moves the selected item index to the last row.
+		/// Moves the selected item to the last visible item.
 		/// </summary>
-		/// <returns></returns>
 		public virtual bool MoveEnd ()
 		{
 			var items = GetVisibleItems ();
@@ -457,9 +562,8 @@ namespace Terminal.Gui.Views {
 		}
 
 		/// <summary>
-		/// Moves the selected item index to the first row.
+		/// Moves the selected item index to the first visible item.
 		/// </summary>
-		/// <returns></returns>
 		public virtual bool MoveHome ()
 		{
 			if (selected != Root) {
@@ -474,6 +578,9 @@ namespace Terminal.Gui.Views {
 
 		ITreeViewItem lastSelectedItem;
 
+		/// <summary>
+		/// Invokes <see cref="SelectedItemChanged"/> event if it is defined.
+		/// </summary>
 		public virtual bool OnSelectedChanged ()
 		{
 			if (selected != lastSelectedItem) {
@@ -489,7 +596,6 @@ namespace Terminal.Gui.Views {
 		/// <summary>
 		/// Invokes the OnOpenSelectedItem event if it is defined.
 		/// </summary>
-		/// <returns></returns>
 		public virtual bool OnOpenSelectedItem ()
 		{
 			if (selected == null) return false;
@@ -499,6 +605,11 @@ namespace Terminal.Gui.Views {
 			return true;
 		}
 
+		/// <summary>
+		/// Switches the <see cref="ITreeViewItem.IsMarked"/> property of the <see cref="SelectedItem"/> in the <see cref="TreeView"/>.
+		/// Invokes <see cref="CollapseSelectedItem"/> if the item becomes collapsed or the <see cref="ExpandSelectedItem"/>
+		/// if it becomes expanded.
+		/// </summary>
 		public virtual bool OnExpandOrCollapseSelectedItem ()
 		{
 			if (selected == null) return false;
@@ -594,6 +705,24 @@ namespace Terminal.Gui.Views {
 		}
 	}
 
+	/// <summary>
+	/// The default implementation of <see cref="ITreeViewItem"/>.
+	/// A single level of indentation consists of two characters to accomodate the formats of items.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// An item without children will be displayed as follows: <c>|-item</c>
+	/// </para>
+	/// <para>
+	/// An collapsed item with children will be displayed as follows: <c>|vitem</c>
+	/// </para>
+	/// <para>
+	/// An expanded item with children will be displayed as follows: <c>|^item</c>
+	/// </para>
+	/// <para>
+	/// In all cases the vertical bar will be placed under the first character of the parent item.
+	/// </para>
+	/// </remarks>
 	public class TreeViewItem : ITreeViewItem {
 
 		ITreeViewItem parent;
@@ -602,15 +731,31 @@ namespace Terminal.Gui.Views {
 		bool isExpanded;
 		bool isMarked;
 
+		/// <summary>
+		/// Initializes a new instance of <see cref="TreeViewItem"/> with a name and children
+		/// </summary>
+		/// <param name="nodeName">The name of this item to display in the TreeView.</param>
+		/// <param name="children">The children of this item.</param>
 		public TreeViewItem (string nodeName, IList<ITreeViewItem> children) : this (nodeName, null, children)
 		{
 		}
 
-		public TreeViewItem(string nodeName, ITreeViewItem parent) : this(nodeName, parent, null)
+		/// <summary>
+		/// Initializes a new instance of <see cref="TreeViewItem"/> with a name and a parent.
+		/// </summary>
+		/// <param name="nodeName">The name of this item to display in the TreeView.</param>
+		/// <param name="parent">The parent of this item.</param>
+		public TreeViewItem (string nodeName, ITreeViewItem parent) : this(nodeName, parent, null)
 		{
 		}
 
-		public TreeViewItem(string nodeName, ITreeViewItem parent, IList<ITreeViewItem> children) : this(nodeName)
+		/// <summary>
+		/// Initializes a new instance of <see cref="TreeViewItem"/> with a name, parent and children.
+		/// </summary>
+		/// <param name="nodeName">The name of this item to display in the TreeView.</param>
+		/// <param name="parent">The parent of this item.</param>
+		/// <param name="children">The children of this item.</param>
+		public TreeViewItem (string nodeName, ITreeViewItem parent, IList<ITreeViewItem> children) : this(nodeName)
 		{
 			this.parent = parent;
 			this.children = children;
@@ -618,6 +763,10 @@ namespace Terminal.Gui.Views {
 			SetChildrensParent ();
 		}
 
+		/// <summary>
+		/// Initializes a new instance of <see cref="TreeViewItem"/> with a name.
+		/// </summary>
+		/// <param name="nodeName">The name of this item to display in the TreeView.</param>
 		public TreeViewItem(string nodeName)
 		{
 			this.nodeName = nodeName;
@@ -632,27 +781,34 @@ namespace Terminal.Gui.Views {
 			}
 		}
 
+		/// <inheritdoc/>
 		public int Count => children == null ? 1 : children.Count + 1; // root itself counts as a 1
 
-		public bool IsExpanded { 
+		/// <inheritdoc/>
+		public bool IsExpanded {
 			get => isExpanded;
 			set => isExpanded = value;
 		}
 
-		public bool IsMarked { 
+		/// <inheritdoc/>
+		public bool IsMarked {
 			get => isMarked;
 			set => isMarked = value;
 		}
 
+		/// <inheritdoc/>
 		public IList<ITreeViewItem> Children => children;
 
-		public ITreeViewItem Parent { 
+		/// <inheritdoc/>
+		public ITreeViewItem Parent {
 			get => parent; 
 			set => parent = value; 
 		}
 
+		/// <inheritdoc/>
 		public object Data { get; set; }
 
+		/// <inheritdoc/>
 		public void Render (TreeView container, ConsoleDriver driver, bool selected, int level, int col, int line, int width)
 		{
 			container.Move (col, line);
@@ -694,6 +850,7 @@ namespace Terminal.Gui.Views {
 			}
 		}
 
+		/// <inheritdoc/>
 		public IList<ITreeViewItem> ToList ()
 		{
 			var list = new List<ITreeViewItem> ();
@@ -710,9 +867,19 @@ namespace Terminal.Gui.Views {
 		}
 	}
 
+	/// <summary>
+	/// <see cref="EventArgs"/> for <see cref="TreeView"/> events.
+	/// </summary>
 	public class TreeViewItemEventArgs : EventArgs {
+		/// <summary>
+		/// The affected item.
+		/// </summary>
 		public ITreeViewItem Value { get; }
 
+		/// <summary>
+		/// Initializes a new instance of <see cref="TreeViewItemEventArgs"/>
+		/// </summary>
+		/// <param name="value">The affected <see cref="TreeView"/> item.</param>
 		public TreeViewItemEventArgs (ITreeViewItem value)
 		{
 			Value = value;
