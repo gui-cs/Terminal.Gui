@@ -25,7 +25,8 @@ namespace UICatalog.Scenarios {
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_OpenExample", "", () => OpenExample()),
+					new MenuItem ("_OpenBigExample", "", () => OpenExample(true)),
+					new MenuItem ("_OpenSmallExample", "", () => OpenExample(false)),
 					new MenuItem ("_CloseExample", "", () => CloseExample()),
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
@@ -34,7 +35,7 @@ namespace UICatalog.Scenarios {
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				//new StatusItem(Key.Enter, "~ENTER~ ApplyEdits", () => { _hexView.ApplyEdits(); }),
-				new StatusItem(Key.F2, "~F2~ OpenExample", () => OpenExample()),
+				new StatusItem(Key.F2, "~F2~ OpenExample", () => OpenExample(true)),
 				new StatusItem(Key.F3, "~F3~ EditCell", () => EditCurrentCell()),
 				new StatusItem(Key.F4, "~F4~ CloseExample", () => CloseExample()),
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
@@ -63,9 +64,9 @@ namespace UICatalog.Scenarios {
 			Application.RequestStop ();
 		}
 
-		private void OpenExample ()
+		private void OpenExample (bool big)
 		{
-			tableView.Table = BuildDemoDataTable(30,1000);
+			tableView.Table = BuildDemoDataTable(big ? 30 : 5, big ? 1000 : 5);
 		}
 
 		private void EditCurrentCell ()

@@ -223,6 +223,12 @@ namespace Terminal.Gui.Views {
 				return;
 			}
 
+			//if user opened a large table scrolled down a lot then opened a smaller table (or API deleted a bunch of columns without telling anyone)
+			ColumnOffset = Math.Max(Math.Min(ColumnOffset,Table.Columns.Count -1),0);
+			RowOffset = Math.Max(Math.Min(RowOffset,Table.Rows.Count -1),0);
+			SelectedColumn = Math.Max(Math.Min(SelectedColumn,Table.Columns.Count -1),0);
+			SelectedRow = Math.Max(Math.Min(SelectedRow,Table.Rows.Count -1),0);
+
 			Dictionary<DataColumn, int> columnsToRender = CalculateViewport (Bounds);
 
 			//if we have scrolled too far to the left 
