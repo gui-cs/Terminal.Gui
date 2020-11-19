@@ -721,7 +721,7 @@ namespace Terminal.Gui {
 				NeedDisplay = new Rect (x, y, w, h);
 			}
 			if (container != null)
-				container.ChildNeedsDisplay ();
+				container.SetChildNeedsDisplay ();
 			if (subviews == null)
 				return;
 			foreach (var view in subviews)
@@ -733,16 +733,16 @@ namespace Terminal.Gui {
 				}
 		}
 
-		internal bool childNeedsDisplay;
+		internal bool ChildNeedsDisplay { get; private set; }
 
 		/// <summary>
 		/// Indicates that any child views (in the <see cref="Subviews"/> list) need to be repainted.
 		/// </summary>
-		public void ChildNeedsDisplay ()
+		public void SetChildNeedsDisplay ()
 		{
-			childNeedsDisplay = true;
+			ChildNeedsDisplay = true;
 			if (container != null)
-				container.ChildNeedsDisplay ();
+				container.SetChildNeedsDisplay ();
 		}
 
 		internal bool addingView = false;
@@ -1288,7 +1288,7 @@ namespace Terminal.Gui {
 		protected void ClearNeedsDisplay ()
 		{
 			NeedDisplay = Rect.Empty;
-			childNeedsDisplay = false;
+			ChildNeedsDisplay = false;
 		}
 
 		/// <summary>
@@ -1333,7 +1333,7 @@ namespace Terminal.Gui {
 
 			if (subviews != null) {
 				foreach (var view in subviews) {
-					if (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay) {
+					if (!view.NeedDisplay.IsEmpty || view.ChildNeedsDisplay) {
 						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
 							if (view.LayoutNeeded)
 								view.LayoutSubviews ();
@@ -1346,7 +1346,7 @@ namespace Terminal.Gui {
 							}
 						}
 						view.NeedDisplay = Rect.Empty;
-						view.childNeedsDisplay = false;
+						view.ChildNeedsDisplay = false;
 					}
 				}
 			}

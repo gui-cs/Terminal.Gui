@@ -588,11 +588,11 @@ namespace Terminal.Gui {
 				} else if (!wait) {
 					return;
 				}
-				if (state.Toplevel != Top && (!Top.NeedDisplay.IsEmpty || Top.childNeedsDisplay)) {
+				if (state.Toplevel != Top && (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay)) {
 					Top.Redraw (Top.Bounds);
 					state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
 				}
-				if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.childNeedsDisplay) {
+				if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay) {
 					state.Toplevel.Redraw (state.Toplevel.Bounds);
 					if (DebugDrawBounds) {
 						DrawBounds (state.Toplevel);
