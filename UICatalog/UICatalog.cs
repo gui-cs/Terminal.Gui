@@ -253,7 +253,7 @@ namespace UICatalog {
 					_leftPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
 					_rightPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
 					_top.LayoutSubviews();
-					_top.ChildNeedsDisplay();
+					_top.SetChildNeedsDisplay();
 				}),
 			};
 
