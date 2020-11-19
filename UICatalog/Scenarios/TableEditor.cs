@@ -79,7 +79,7 @@ namespace UICatalog.Scenarios {
 			if(okPressed) {
 
 				try {
-					tableView.Table.Rows[tableView.SelectedRow][tableView.SelectedColumn] = tf.Text;
+					tableView.Table.Rows[tableView.SelectedRow][tableView.SelectedColumn] = string.IsNullOrWhiteSpace(tf.Text.ToString()) ? DBNull.Value : (object)tf.Text;
 				}
 				catch(Exception ex) {
 					MessageBox.ErrorQuery(60,20,"Failed to set text", ex.Message,"Ok");
