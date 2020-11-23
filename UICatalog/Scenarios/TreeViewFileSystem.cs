@@ -54,6 +54,9 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
+			// As a shortcut to enumerating half the file system, tell tree that all directories are expandable (even if they turn out to be empty later on)
+			_treeView.CanExpandGetter = (o)=>o is DirectoryInfo;
+
 			// Determines how to compute children of any given branch
 			_treeView.ChildrenGetter = GetChildren;
 

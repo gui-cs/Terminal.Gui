@@ -25,6 +25,16 @@ namespace Terminal.Gui {
 		}
 	
 		private ChildrenGetterDelegate childrenGetter;
+		private CanExpandGetterDelegate canExpandGetter;
+
+		/// <summary>
+		/// Optional delegate where <see cref="ChildrenGetter"/> is expensive.  This should quickly return true/false for whether an object is expandable.  (e.g. indicating to a user that all folders can be expanded because they are folders without having to calculate contents)
+		/// </summary>
+		/// <remarks>When this is null <see cref="ChildrenGetter"/> is used directly to determine if a node should be expandable</remarks>
+		public CanExpandGetterDelegate CanExpandGetter {
+			get { return canExpandGetter; }
+			set { canExpandGetter = value; }
+		}
 
 		/// <summary>
 		/// The currently selected object in the tree
@@ -409,9 +419,18 @@ namespace Terminal.Gui {
 			if(IsExpanded)
 				return tree.ExpandedSymbol;
 
-			if(ChildBranches == null)
+			if(ChildBranches == null) {
+			
+				//if there is a rapid method for determining whether there are children
+				if(tree.CanExpandGetter != null) {
+					return tree.CanExpandGetter(Model) ? tree.ExpandableSymbol : tree.LeafSymbol;
+				}
+				
+				//there is no way of knowing whether we can expand without fetching the children
 				FetchChildren();
+			}
 
+			//we fetched or already know the children, so return whether we are a leaf or a expandable branch
 			return ChildBranches.Any() ? tree.ExpandableSymbol : tree.LeafSymbol;
 		}
 
@@ -448,4 +467,11 @@ namespace Terminal.Gui {
 	/// <param name="model"></param>
 	/// <returns></returns>
 	public delegate string AspectGetterDelegate(object model);
+
+	/// <summary>
+	/// Delegates of this type are used to quickly display to the user whether a given user object can be expanded when fetching it's children is expensive (e.g. indicating to a user that all 1000 folders can be expanded because they are folders without having to calculate contents)
+	/// </summary>
+	/// <param name="model"></param>
+	/// <returns></returns>
+	public delegate bool CanExpandGetterDelegate(object model);
 }
