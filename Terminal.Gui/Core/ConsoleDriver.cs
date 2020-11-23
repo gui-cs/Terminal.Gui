@@ -458,6 +458,20 @@ namespace Terminal.Gui {
 		public static Dictionary<string, ColorScheme> ColorSchemes { get; }
 	}
 
+	/// <summary>
+	/// The visible height should be used on the window.
+	/// </summary>
+	public enum HeightSize {
+		/// <summary>
+		/// Only window height will be visible not allowing scroll.
+		/// </summary>
+		WindowHeight,
+		/// <summary>
+		/// All buffer height will be visible allowing scroll.
+		/// </summary>
+		BufferHeight
+	}
+
 	///// <summary>
 	///// Special characters that can be drawn with 
 	///// </summary>
@@ -545,6 +559,11 @@ namespace Terminal.Gui {
 		/// The current top in the terminal.
 		/// </summary>
 		public abstract int Top { get; }
+
+		/// <summary>
+		/// The current <see cref="HeightSize"/> used in the terminal.
+		/// </summary>
+		public abstract HeightSize HeightSize { get; set; }
 
 		/// <summary>
 		/// Initializes the driver

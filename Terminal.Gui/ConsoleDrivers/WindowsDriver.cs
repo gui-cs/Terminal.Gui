@@ -207,7 +207,7 @@ namespace Terminal.Gui {
 			public override string ToString () => $"({X},{Y})";
 		};
 
-		internal struct WindowBufferSizeRecord {
+		public struct WindowBufferSizeRecord {
 			public Coordinate size;
 
 			public WindowBufferSizeRecord (short x, short y)
@@ -355,6 +355,20 @@ namespace Terminal.Gui {
 			}
 		}
 
+		[StructLayout (LayoutKind.Sequential)]
+		public struct ConsoleKeyInfoEx {
+			public ConsoleKeyInfo consoleKeyInfo;
+			public bool CapsLock;
+			public bool NumLock;
+
+			public ConsoleKeyInfoEx (ConsoleKeyInfo consoleKeyInfo, bool capslock, bool numlock)
+			{
+				this.consoleKeyInfo = consoleKeyInfo;
+				CapsLock = capslock;
+				NumLock = numlock;
+			}
+		}
+
 		[DllImport ("kernel32.dll", SetLastError = true)]
 		static extern IntPtr GetStdHandle (int nStdHandle);
 
@@ -431,14 +445,15 @@ namespace Terminal.Gui {
 
 				return numberEventsRead == 0
 					? null
-					: new [] {Marshal.PtrToStructure<InputRecord> (pRecord)};
+					: new [] { Marshal.PtrToStructure<InputRecord> (pRecord) };
 			} catch (Exception) {
 				return null;
 			} finally {
 				Marshal.FreeHGlobal (pRecord);
 			}
 		}
-#if false	// Not needed on the constructor. Perhaps could be used on resizing. To study.
+
+#if false      // Not needed on the constructor. Perhaps could be used on resizing. To study.
 		[DllImport ("kernel32.dll", ExactSpelling = true)]
 		private static extern IntPtr GetConsoleWindow ();
 
@@ -498,19 +513,17 @@ namespace Terminal.Gui {
 #endif
 	}
 
-	internal class WindowsDriver : ConsoleDriver, IMainLoopDriver {
+	internal class WindowsDriver : ConsoleDriver {
 		static bool sync = false;
-		ManualResetEventSlim eventReady = new ManualResetEventSlim (false);
-		ManualResetEventSlim waitForProbe = new ManualResetEventSlim (false);
-		MainLoop mainLoop;
 		WindowsConsole.CharInfo [] OutputBuffer;
-		int cols, rows;
+		int cols, rows, top;
 		WindowsConsole winConsole;
 		WindowsConsole.SmallRect damageRegion;
 
 		public override int Cols => cols;
 		public override int Rows => rows;
-		public override int Top => 0;
+		public override int Top => top;
+		public override HeightSize HeightSize { get; set; }
 
 		public WindowsDriver ()
 		{
@@ -527,8 +540,11 @@ namespace Terminal.Gui {
 
 			ResizeScreen ();
 			UpdateOffScreen ();
+		}
 
-			Task.Run ((Action)WindowsInputHandler);
+		public WindowsConsole WinConsole {
+			get => winConsole;
+			private set => winConsole = value;
 		}
 
 		private void SetupColorsAndBorders ()
@@ -566,98 +582,6 @@ namespace Terminal.Gui {
 			Colors.Error.HotFocus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkRed);
 		}
 
-		[StructLayout (LayoutKind.Sequential)]
-		public struct ConsoleKeyInfoEx {
-			public ConsoleKeyInfo consoleKeyInfo;
-			public bool CapsLock;
-			public bool NumLock;
-
-			public ConsoleKeyInfoEx (ConsoleKeyInfo consoleKeyInfo, bool capslock, bool numlock)
-			{
-				this.consoleKeyInfo = consoleKeyInfo;
-				CapsLock = capslock;
-				NumLock = numlock;
-			}
-		}
-
-		// The records that we keep fetching
-		WindowsConsole.InputRecord [] result, records = new WindowsConsole.InputRecord [1];
-
-		void WindowsInputHandler ()
-		{
-			while (true) {
-				waitForProbe.Wait ();
-				waitForProbe.Reset ();
-
-				result = winConsole.ReadConsoleInput ();
-
-				eventReady.Set ();
-			}
-		}
-
-		void IMainLoopDriver.Setup (MainLoop mainLoop)
-		{
-			this.mainLoop = mainLoop;
-		}
-
-		void IMainLoopDriver.Wakeup ()
-		{
-			//tokenSource.Cancel ();
-			eventReady.Reset ();
-			eventReady.Set ();
-		}
-
-		bool IMainLoopDriver.EventsPending (bool wait)
-		{
-			if (CheckTimers (wait, out var waitTimeout)) {
-				return true;
-			}
-
-			result = null;
-			waitForProbe.Set ();
-
-			try {
-				if (!tokenSource.IsCancellationRequested) {
-					eventReady.Wait (waitTimeout, tokenSource.Token);
-				}
-			} catch (OperationCanceledException) {
-				return true;
-			} finally {
-				eventReady.Reset ();
-			}
-
-			if (!tokenSource.IsCancellationRequested) {
-				return result != null || CheckTimers (wait, out waitTimeout);
-			}
-
-			tokenSource.Dispose ();
-			tokenSource = new CancellationTokenSource ();
-			return true;
-		}
-
-		bool CheckTimers (bool wait, out int waitTimeout)
-		{
-			long now = DateTime.UtcNow.Ticks;
-
-			if (mainLoop.timeouts.Count > 0) {
-				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-				if (waitTimeout < 0)
-					return true;
-			} else {
-				waitTimeout = -1;
-			}
-
-			if (!wait)
-				waitTimeout = 0;
-
-			int ic;
-			lock (mainLoop.idleHandlers) {
-				ic = mainLoop.idleHandlers.Count;
-			}
-
-			return ic > 0;
-		}
-
 		Action<KeyEvent> keyHandler;
 		Action<KeyEvent> keyDownHandler;
 		Action<KeyEvent> keyUpHandler;
@@ -669,14 +593,12 @@ namespace Terminal.Gui {
 			this.keyDownHandler = keyDownHandler;
 			this.keyUpHandler = keyUpHandler;
 			this.mouseHandler = mouseHandler;
+
+			(mainLoop.Driver as WindowsMainLoop).ProcessInput = (e) => ProcessInput (e);
 		}
 
-		void IMainLoopDriver.MainIteration ()
+		void ProcessInput (WindowsConsole.InputRecord inputEvent)
 		{
-			if (result == null)
-				return;
-
-			var inputEvent = result [0];
 			switch (inputEvent.EventType) {
 			case WindowsConsole.EventType.Key:
 				var map = MapKey (ToConsoleKeyInfoEx (inputEvent.KeyEvent));
@@ -775,11 +697,7 @@ namespace Terminal.Gui {
 
 			case WindowsConsole.EventType.Focus:
 				break;
-
-			default:
-				break;
 			}
-			result = null;
 		}
 
 		WindowsConsole.ButtonState? LastMouseButtonPressed = null;
@@ -871,23 +789,23 @@ namespace Terminal.Gui {
 					Y = mouseEvent.MousePosition.Y
 				};
 				//if (p == point) {
-					switch (LastMouseButtonPressed) {
-					case WindowsConsole.ButtonState.Button1Pressed:
-						mouseFlag = MouseFlags.Button1Clicked;
-						break;
+				switch (LastMouseButtonPressed) {
+				case WindowsConsole.ButtonState.Button1Pressed:
+					mouseFlag = MouseFlags.Button1Clicked;
+					break;
 
-					case WindowsConsole.ButtonState.Button2Pressed:
-						mouseFlag = MouseFlags.Button2Clicked;
-						break;
+				case WindowsConsole.ButtonState.Button2Pressed:
+					mouseFlag = MouseFlags.Button2Clicked;
+					break;
 
-					case WindowsConsole.ButtonState.RightmostButtonPressed:
-						mouseFlag = MouseFlags.Button3Clicked;
-						break;
-					}
-					point = new Point () {
-						X = mouseEvent.MousePosition.X,
-						Y = mouseEvent.MousePosition.Y
-					};
+				case WindowsConsole.ButtonState.RightmostButtonPressed:
+					mouseFlag = MouseFlags.Button3Clicked;
+					break;
+				}
+				point = new Point () {
+					X = mouseEvent.MousePosition.X,
+					Y = mouseEvent.MousePosition.Y
+				};
 				//} else {
 				//	mouseFlag = 0;
 				//}
@@ -1009,7 +927,7 @@ namespace Terminal.Gui {
 
 		KeyModifiers keyModifiers;
 
-		public ConsoleKeyInfoEx ToConsoleKeyInfoEx (WindowsConsole.KeyEventRecord keyEvent)
+		public WindowsConsole.ConsoleKeyInfoEx ToConsoleKeyInfoEx (WindowsConsole.KeyEventRecord keyEvent)
 		{
 			var state = keyEvent.dwControlKeyState;
 
@@ -1036,10 +954,10 @@ namespace Terminal.Gui {
 				keyModifiers.Scrolllock = scrolllock;
 
 			var ConsoleKeyInfo = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
-			return new ConsoleKeyInfoEx (ConsoleKeyInfo, capslock, numlock);
+			return new WindowsConsole.ConsoleKeyInfoEx (ConsoleKeyInfo, capslock, numlock);
 		}
 
-		public Key MapKey (ConsoleKeyInfoEx keyInfoEx)
+		public Key MapKey (WindowsConsole.ConsoleKeyInfoEx keyInfoEx)
 		{
 			var keyInfo = keyInfoEx.consoleKeyInfo;
 			switch (keyInfo.Key) {
@@ -1245,7 +1163,6 @@ namespace Terminal.Gui {
 		}
 
 		int currentAttribute;
-		CancellationTokenSource tokenSource = new CancellationTokenSource ();
 
 		public override void SetAttribute (Attribute c)
 		{
@@ -1325,7 +1242,7 @@ namespace Terminal.Gui {
 			winConsole.Cleanup ();
 		}
 
-#region Unused
+		#region Unused
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
 		}
@@ -1353,8 +1270,156 @@ namespace Terminal.Gui {
 		public override void CookMouse ()
 		{
 		}
-#endregion
-
+		#endregion
 	}
 
+	/// <summary>
+	/// Mainloop intended to be used with the <see cref="WindowsDriver"/>, and can
+	/// only be used on Windows.
+	/// </summary>
+	/// <remarks>
+	/// This implementation is used for WindowsDriver.
+	/// </remarks>
+	internal class WindowsMainLoop : IMainLoopDriver {
+		ManualResetEventSlim eventReady = new ManualResetEventSlim (false);
+		ManualResetEventSlim waitForProbe = new ManualResetEventSlim (false);
+		ManualResetEventSlim winChange = new ManualResetEventSlim (false);
+		MainLoop mainLoop;
+		ConsoleDriver consoleDriver;
+		WindowsConsole winConsole;
+		bool winChanged;
+		CancellationTokenSource tokenSource = new CancellationTokenSource ();
+
+		// The records that we keep fetching
+		WindowsConsole.InputRecord [] result = new WindowsConsole.InputRecord [1];
+
+		/// <summary>
+		/// Invoked when a Key is pressed or released.
+		/// </summary>
+		public Action<WindowsConsole.InputRecord> ProcessInput;
+
+		public WindowsMainLoop (ConsoleDriver consoleDriver = null)
+		{
+			this.consoleDriver = consoleDriver;
+			winConsole = ((WindowsDriver)consoleDriver).WinConsole;
+		}
+
+		void IMainLoopDriver.Setup (MainLoop mainLoop)
+		{
+			this.mainLoop = mainLoop;
+			Task.Run ((Action)WindowsInputHandler);
+			Task.Run (CheckWinChange);
+		}
+
+		void WindowsInputHandler ()
+		{
+			while (true) {
+				waitForProbe.Wait ();
+				waitForProbe.Reset ();
+
+				result = winConsole.ReadConsoleInput ();
+
+				eventReady.Set ();
+			}
+		}
+
+		void CheckWinChange ()
+		{
+			while (true) {
+				winChange.Wait ();
+				winChange.Reset ();
+				WaitWinChange ();
+				winChanged = true;
+				eventReady.Set ();
+			}
+		}
+
+		void WaitWinChange ()
+		{
+			while (true) {
+				switch (consoleDriver.HeightSize) {
+				case HeightSize.WindowHeight:
+					if (Console.WindowWidth != consoleDriver.Cols || Console.WindowHeight != consoleDriver.Rows
+						|| Console.WindowTop != consoleDriver.Top) {    // Top only working on Windows.
+						return;
+					}
+					break;
+				case HeightSize.BufferHeight:
+					if (Console.BufferWidth != consoleDriver.Cols || Console.BufferHeight != consoleDriver.Rows) {
+						return;
+					}
+					break;
+				}
+			}
+		}
+
+		void IMainLoopDriver.Wakeup ()
+		{
+			//tokenSource.Cancel ();
+			eventReady.Reset ();
+			eventReady.Set ();
+		}
+
+		bool IMainLoopDriver.EventsPending (bool wait)
+		{
+			if (CheckTimers (wait, out var waitTimeout)) {
+				return true;
+			}
+
+			//result = null;
+			waitForProbe.Set ();
+			winChange.Set ();
+
+			try {
+				if (!tokenSource.IsCancellationRequested) {
+					eventReady.Wait (waitTimeout, tokenSource.Token);
+				}
+			} catch (OperationCanceledException) {
+				return true;
+			} finally {
+				eventReady.Reset ();
+			}
+
+			if (!tokenSource.IsCancellationRequested) {
+				return result != null || CheckTimers (wait, out waitTimeout);
+			}
+
+			tokenSource.Dispose ();
+			tokenSource = new CancellationTokenSource ();
+			return true;
+		}
+
+		bool CheckTimers (bool wait, out int waitTimeout)
+		{
+			long now = DateTime.UtcNow.Ticks;
+
+			if (mainLoop.timeouts.Count > 0) {
+				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+				if (waitTimeout < 0)
+					return true;
+			} else {
+				waitTimeout = -1;
+			}
+
+			if (!wait)
+				waitTimeout = 0;
+
+			int ic;
+			lock (mainLoop.idleHandlers) {
+				ic = mainLoop.idleHandlers.Count;
+			}
+
+			return ic > 0;
+		}
+
+		void IMainLoopDriver.MainIteration ()
+		{
+			if (result == null)
+				return;
+
+			var inputEvent = result [0];
+			result = null;
+			ProcessInput.Invoke (inputEvent);
+		}
+	}
 }

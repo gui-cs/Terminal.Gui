@@ -59,7 +59,7 @@ namespace Terminal.Gui {
 		/// The current <see cref="ConsoleDriver"/> in use.
 		/// </summary>
 		public static ConsoleDriver Driver;
-
+		
 		/// <summary>
 		/// The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Application.Top"/>)
 		/// </summary>
@@ -73,10 +73,31 @@ namespace Terminal.Gui {
 		public static Toplevel Current { get; private set; }
 
 		/// <summary>
-		/// TThe current <see cref="View"/> object being redrawn.
+		/// The current <see cref="View"/> object being redrawn.
 		/// </summary>
 		/// /// <value>The current.</value>
 		public static View CurrentView { get; set; }
+
+		/// <summary>
+		/// The current <see cref="Terminal.Gui.HeightSize"/> used in the terminal.
+		/// </summary>
+		public static HeightSize HeightSize {
+			get {
+				if (Driver == null) {
+					throw new ArgumentNullException ("The driver must be initialized first.");
+				}
+				return Driver.HeightSize;
+			}
+			set {
+				if (Driver == null) {
+					throw new ArgumentNullException ("The driver must be initialized first.");
+				}
+				if (Driver.HeightSize != value) {
+					Driver.HeightSize = value;
+					Driver.Refresh ();
+				}
+			}
+		}
 
 		/// <summary>
 		/// The <see cref="MainLoop"/>  driver for the application
@@ -167,7 +188,7 @@ namespace Terminal.Gui {
 		static void Init (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null)
 		{
 			if (_initialized && driver == null) return;
-
+			
 			// Used only for start debugging on Unix.
 //#if DEBUG
 //			while (!System.Diagnostics.Debugger.IsAttached) {
@@ -193,9 +214,8 @@ namespace Terminal.Gui {
 					Driver = new NetDriver ();
 					mainLoopDriver = new NetMainLoop (Driver);
 				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
-					var windowsDriver = new WindowsDriver ();
-					mainLoopDriver = windowsDriver;
-					Driver = windowsDriver;
+					Driver = new WindowsDriver ();
+					mainLoopDriver = new WindowsMainLoop (Driver);
 				} else {
 					mainLoopDriver = new UnixMainLoop ();
 					Driver = new CursesDriver ();

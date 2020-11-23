@@ -562,9 +562,11 @@ static class Demo {
 		if (Debugger.IsAttached)
 			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 
-		//Application.UseSystemConsole = true;
+		Application.UseSystemConsole = true;
 
 		Application.Init();
+		Application.HeightSize = HeightSize.BufferHeight;
+		//ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler;
 
 		var top = Application.Top;
 

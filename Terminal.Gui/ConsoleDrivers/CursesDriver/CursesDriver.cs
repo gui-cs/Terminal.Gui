@@ -20,6 +20,7 @@ namespace Terminal.Gui {
 		public override int Cols => Curses.Cols;
 		public override int Rows => Curses.Lines;
 		public override int Top => 0;
+		public override HeightSize HeightSize { get; set; }
 
 		// Current row, and current col, tracked by Move/AddRune only
 		int ccol, crow;
@@ -70,6 +71,7 @@ namespace Terminal.Gui {
 		public override void Refresh () {
 			Curses.refresh ();
 			if (Curses.CheckWinChange ()) {
+				Clip = new Rect (0, 0, Cols, Rows);
 				TerminalResized?.Invoke ();
 			}
 		}
