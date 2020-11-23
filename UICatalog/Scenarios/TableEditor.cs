@@ -48,8 +48,6 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
-			tableView.CanFocus = true;
-
 
 			Win.Add (tableView);
 		}

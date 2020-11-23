@@ -79,7 +79,7 @@ namespace Terminal.Gui.Views {
 		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
 		/// </summary>
 		/// <param name="table">The table to display in the control</param>
-		public TableView (DataTable table) : base ()
+		public TableView (DataTable table) : this ()
 		{
 			this.Table = table;
 		}
@@ -89,6 +89,7 @@ namespace Terminal.Gui.Views {
 		/// </summary>
 		public TableView () : base ()
 		{
+			CanFocus = true;
 		}
 
 		///<inheritdoc/>
