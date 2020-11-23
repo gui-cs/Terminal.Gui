@@ -6,7 +6,7 @@ using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "TreeViewFileSystem", Description: "A Terminal.Gui tree view file system explorer")]
+	[ScenarioMetadata (Name: "TreeViewFileSystem", Description: "Hierarchical file system explorer based on TreeView")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("Dialogs")]
 	[ScenarioCategory ("Text")]
@@ -31,6 +31,9 @@ namespace UICatalog.Scenarios {
 			Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
+				new StatusItem(Key.F2, "~F2~ Add Root Drives", () => AddRootDrives()),
+				new StatusItem(Key.F3, "~F3~ Remove Root Object", () => RemoveRoot()),
+				new StatusItem(Key.F4, "~F4~ Clear Objects", () => ClearObjects()),
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 			});
 			Top.Add (statusBar);
@@ -51,31 +54,59 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
+			// Determines how to compute children of any given branch
 			_treeView.ChildrenGetter = GetChildren;
-			_treeView.AddObject(new DirectoryInfo(root));
-			
+
+			// Determines how to represent objects as strings on the screen
+			_treeView.AspectGetter = AspectGetter;
+
 			Win.Add (_treeView);
 		}
 
-        private IEnumerable<object> GetChildren(object model)
-        {
-		// If it is a directory it's children are all contained files and dirs
-		if(model is DirectoryInfo d) {
-			try {
-				return d.GetDirectories().Cast<object>().Union(d.GetFileSystemInfos());
-			}
-			catch(SystemException ex) {
-				return new []{ex};
+		private void ClearObjects()
+		{
+			_treeView.ClearObjects();
+		}
+		private void AddRootDrives()
+		{
+			_treeView.AddObjects(DriveInfo.GetDrives().Select(d=>d.RootDirectory));
+		}
+		private void RemoveRoot()
+		{
+			if(_treeView.SelectedObject == null)
+				MessageBox.ErrorQuery(10,5,"Error","No object selected","ok");
+			else {
+				_treeView.Remove(_treeView.SelectedObject);
 			}
 		}
 
-	    return new object[0];
-        }
+		private IEnumerable<object> GetChildren(object model)
+		{
+			// If it is a directory it's children are all contained files and dirs
+			if(model is DirectoryInfo d) {
+				try {
+					return d.GetDirectories().Cast<object>().Union(d.GetFileSystemInfos());
+				}
+				catch(SystemException ex) {
+					return new []{ex};
+				}
+			}
 
-        private void Quit ()
+		    return new object[0];
+		}
+		private string AspectGetter(object model)
+		{
+			if(model is DirectoryInfo d)
+				return d.Name;
+			if(model is FileInfo f)
+				return f.Name;
+
+			return model.ToString();
+		}
+
+		private void Quit ()
 		{
 			Application.RequestStop ();
 		}
-
 	}
 }
