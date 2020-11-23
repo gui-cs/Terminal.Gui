@@ -85,7 +85,7 @@ namespace UICatalog.Scenarios {
 			// If it is a directory it's children are all contained files and dirs
 			if(model is DirectoryInfo d) {
 				try {
-					return d.GetDirectories().Cast<object>().Union(d.GetFileSystemInfos());
+					return d.GetFileSystemInfos();
 				}
 				catch(SystemException ex) {
 					return new []{ex};

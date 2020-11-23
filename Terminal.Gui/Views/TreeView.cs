@@ -375,7 +375,7 @@ namespace Terminal.Gui {
 		public virtual void FetchChildren()
 		{
 			if (tree.ChildrenGetter == null)
-			return;
+				return;
 
 			this.ChildBranches = tree.ChildrenGetter(this.Model).ToDictionary(k=>k,val=>new Branch(tree,this,val));
 		}
