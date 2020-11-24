@@ -166,12 +166,14 @@ namespace Terminal.Gui {
 					try {
 						// Not supported on Unix.
 						if (isWinPlatform) {
+#pragma warning disable CA1416
 							Console.CursorTop = 0;
 							Console.CursorLeft = 0;
 							Console.WindowTop = 0;
 							Console.WindowLeft = 0;
 							Console.SetBufferSize (Math.Max (Min_WindowWidth, Console.WindowWidth),
 								Console.WindowHeight);
+#pragma warning restore CA1416
 						} else {
 							//Console.Out.Write ($"\x1b[8;{Console.WindowHeight};{Console.WindowWidth}t");
 							//Console.Out.Flush ();
@@ -193,7 +195,9 @@ namespace Terminal.Gui {
 				if (isWinPlatform && Console.WindowHeight > 0) {
 					// Can raise an exception while is still resizing.
 					try {
+#pragma warning disable CA1416
 						Console.WindowTop = Math.Max (Math.Min (top, Console.BufferHeight - Console.WindowHeight), 0);
+#pragma warning restore CA1416
 					} catch (Exception) {
 						return;
 					}
