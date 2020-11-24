@@ -589,12 +589,10 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public static Rune MakePrintable (Rune c)
 		{
-			if (c <= 0x1F) {
-				// ASCII (C0) control characters. 
-				return new Rune (c + 0x2400);
-			} else if (c >= 0x80 && c <= 0x9F) {
+			if (c <= 0x1F || (c >= 0x80 && c <= 0x9F)) {
+				// ASCII (C0) control characters.
 				// C1 control characters (https://www.aivosto.com/articles/control-characters.html#c1)
-				return new Rune (0x25a1); // U+25A1, WHITE SQUARE, □: 
+				return new Rune (c + 0x2400);
 			} else {
 				return c;
 			}
