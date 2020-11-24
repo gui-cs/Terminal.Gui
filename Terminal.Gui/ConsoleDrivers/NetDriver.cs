@@ -534,6 +534,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		int lastWindowHeight;
 		void WaitWinChange ()
 		{
 			while (true) {
@@ -545,8 +546,10 @@ namespace Terminal.Gui {
 					break;
 				case HeightSize.BufferHeight:
 					if (Console.BufferWidth != consoleDriver.Cols || Console.BufferHeight != consoleDriver.Rows
-						|| Console.WindowTop != consoleDriver.Top) {
+						|| Console.WindowTop != consoleDriver.Top
+						|| Console.WindowHeight != lastWindowHeight) {
 						newTop = Console.WindowTop;
+						lastWindowHeight = Console.WindowHeight;
 						return;
 					}
 					break;

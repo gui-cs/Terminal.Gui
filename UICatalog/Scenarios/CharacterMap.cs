@@ -74,6 +74,7 @@ namespace UICatalog {
 			Win.Add (jumpList);
 
 			jumpList.Refresh ();
+			jumpList.SetFocus ();
 		}
 
 		public override void Run ()
