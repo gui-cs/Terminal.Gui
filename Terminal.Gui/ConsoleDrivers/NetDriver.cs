@@ -191,13 +191,11 @@ namespace Terminal.Gui {
 				break;
 			case HeightSize.BufferHeight:
 				if (isWinPlatform && Console.WindowHeight > 0) {
-					if (isWinPlatform) {
-						// Can raise an exception while is still resizing.
-						try {
-							Console.WindowTop = Math.Max (Math.Min (top, Console.BufferHeight - Console.WindowHeight), 0);
-						} catch (Exception) {
-							return;
-						}
+					// Can raise an exception while is still resizing.
+					try {
+						Console.WindowTop = Math.Max (Math.Min (top, Console.BufferHeight - Console.WindowHeight), 0);
+					} catch (Exception) {
+						return;
 					}
 				} else {
 					Console.Out.Write ($"\x1b[{top};{Console.WindowLeft}" +
