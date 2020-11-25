@@ -565,7 +565,7 @@ static class Demo {
 		Application.UseSystemConsole = true;
 
 		Application.Init();
-		Application.HeightSize = HeightSize.BufferHeight;
+		Application.HeightAsBuffer = true;
 		//ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler;
 
 		var top = Application.Top;
