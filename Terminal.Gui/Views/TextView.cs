@@ -419,7 +419,13 @@ namespace Terminal.Gui {
 
 				SetNeedsDisplay (new Rect (0, minRow, Frame.Width, maxRow));
 			}
-			Move (CurrentColumn - leftColumn, CurrentRow - topRow);
+			var line = model.GetLine (currentRow);
+			var retreat = 0;
+			if (line.Count > 0) {
+				retreat = Math.Max ((SpecialRune (line [Math.Max (CurrentColumn - leftColumn - 1, 0)])
+				? 1 : 0), 0);
+			}
+			Move (CurrentColumn - leftColumn - retreat, CurrentRow - topRow);
 		}
 
 		void ClearRegion (int left, int top, int right, int bottom)
@@ -566,15 +572,28 @@ namespace Terminal.Gui {
 				for (int col = bounds.Left; col < right; col++) {
 					var lineCol = leftColumn + col;
 					var rune = lineCol >= lineRuneCount ? ' ' : line [lineCol];
-					if (selecting && PointInSelection (col, row))
+					if (selecting && PointInSelection (col, row)) {
 						ColorSelection ();
-					else
+					} else {
 						ColorNormal ();
+					}
 
-					AddRune (col, row, rune);
+					if (!SpecialRune (rune)) {
+						AddRune (col, row, rune);
+					}
 				}
 			}
 			PositionCursor ();
+		}
+
+		bool SpecialRune (Rune rune)
+		{
+			switch (rune) {
+			case (uint)Key.Enter:
+			case 0xd:
+				return true;
+			default:
+				return false;			}
 		}
 
 		///<inheritdoc/>
