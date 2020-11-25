@@ -455,10 +455,10 @@ namespace Terminal.Gui {
 
 #if false      // Not needed on the constructor. Perhaps could be used on resizing. To study.
 		[DllImport ("kernel32.dll", ExactSpelling = true)]
-		private static extern IntPtr GetConsoleWindow ();
+		static extern IntPtr GetConsoleWindow ();
 
 		[DllImport ("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-		private static extern bool ShowWindow (IntPtr hWnd, int nCmdShow);
+		static extern bool ShowWindow (IntPtr hWnd, int nCmdShow);
 
 		public const int HIDE = 0;
 		public const int MAXIMIZE = 3;
@@ -525,67 +525,20 @@ namespace Terminal.Gui {
 		public override int Top => top;
 		public override HeightSize HeightSize { get; set; }
 
-		public WindowsDriver ()
-		{
-			winConsole = new WindowsConsole ();
-
-			SetupColorsAndBorders ();
-
-			cols = Console.WindowWidth;
-			rows = Console.WindowHeight;
-#if false
-			winConsole.ShowWindow (WindowsConsole.RESTORE);
-#endif
-			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
-
-			ResizeScreen ();
-			UpdateOffScreen ();
-		}
-
 		public WindowsConsole WinConsole {
 			get => winConsole;
 			private set => winConsole = value;
-		}
-
-		private void SetupColorsAndBorders ()
-		{
-			Colors.TopLevel = new ColorScheme ();
-			Colors.Base = new ColorScheme ();
-			Colors.Dialog = new ColorScheme ();
-			Colors.Menu = new ColorScheme ();
-			Colors.Error = new ColorScheme ();
-
-			Colors.TopLevel.Normal = MakeColor (ConsoleColor.Green, ConsoleColor.Black);
-			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
-			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
-			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkCyan);
-
-			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkBlue);
-			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Base.HotNormal = MakeColor (ConsoleColor.DarkCyan, ConsoleColor.DarkBlue);
-			Colors.Base.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
-
-			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
-			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
-			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.DarkGray);
-			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
-			Colors.Menu.Disabled = MakeColor (ConsoleColor.Gray, ConsoleColor.DarkGray);
-
-			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
-			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkGray);
-			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.Gray);
-			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkGray);
-
-			Colors.Error.Normal = MakeColor (ConsoleColor.DarkRed, ConsoleColor.White);
-			Colors.Error.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkRed);
-			Colors.Error.HotNormal = MakeColor (ConsoleColor.Black, ConsoleColor.White);
-			Colors.Error.HotFocus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkRed);
 		}
 
 		Action<KeyEvent> keyHandler;
 		Action<KeyEvent> keyDownHandler;
 		Action<KeyEvent> keyUpHandler;
 		Action<MouseEvent> mouseHandler;
+
+		public WindowsDriver ()
+		{
+			winConsole = new WindowsConsole ();
+		}
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
@@ -1081,7 +1034,7 @@ namespace Terminal.Gui {
 			return (Key)(0xffffffff);
 		}
 
-		private Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
+		Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 		{
 			Key keyMod = new Key ();
 			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
@@ -1097,7 +1050,48 @@ namespace Terminal.Gui {
 		public override void Init (Action terminalResized)
 		{
 			TerminalResized = terminalResized;
-			SetupColorsAndBorders ();
+
+			cols = Console.WindowWidth;
+			rows = Console.WindowHeight;
+#if false
+			winConsole.ShowWindow (WindowsConsole.RESTORE);
+#endif
+			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
+
+			ResizeScreen ();
+			UpdateOffScreen ();
+
+			Colors.TopLevel = new ColorScheme ();
+			Colors.Base = new ColorScheme ();
+			Colors.Dialog = new ColorScheme ();
+			Colors.Menu = new ColorScheme ();
+			Colors.Error = new ColorScheme ();
+
+			Colors.TopLevel.Normal = MakeColor (ConsoleColor.Green, ConsoleColor.Black);
+			Colors.TopLevel.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkCyan);
+			Colors.TopLevel.HotNormal = MakeColor (ConsoleColor.DarkYellow, ConsoleColor.Black);
+			Colors.TopLevel.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkCyan);
+
+			Colors.Base.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkBlue);
+			Colors.Base.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
+			Colors.Base.HotNormal = MakeColor (ConsoleColor.DarkCyan, ConsoleColor.DarkBlue);
+			Colors.Base.HotFocus = MakeColor (ConsoleColor.Blue, ConsoleColor.Gray);
+
+			Colors.Menu.Normal = MakeColor (ConsoleColor.White, ConsoleColor.DarkGray);
+			Colors.Menu.Focus = MakeColor (ConsoleColor.White, ConsoleColor.Black);
+			Colors.Menu.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.DarkGray);
+			Colors.Menu.HotFocus = MakeColor (ConsoleColor.Yellow, ConsoleColor.Black);
+			Colors.Menu.Disabled = MakeColor (ConsoleColor.Gray, ConsoleColor.DarkGray);
+
+			Colors.Dialog.Normal = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
+			Colors.Dialog.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkGray);
+			Colors.Dialog.HotNormal = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.Gray);
+			Colors.Dialog.HotFocus = MakeColor (ConsoleColor.DarkBlue, ConsoleColor.DarkGray);
+
+			Colors.Error.Normal = MakeColor (ConsoleColor.DarkRed, ConsoleColor.White);
+			Colors.Error.Focus = MakeColor (ConsoleColor.White, ConsoleColor.DarkRed);
+			Colors.Error.HotNormal = MakeColor (ConsoleColor.Black, ConsoleColor.White);
+			Colors.Error.HotFocus = MakeColor (ConsoleColor.Black, ConsoleColor.DarkRed);
 		}
 
 		void ResizeScreen ()
@@ -1300,6 +1294,9 @@ namespace Terminal.Gui {
 
 		public WindowsMainLoop (ConsoleDriver consoleDriver = null)
 		{
+			if (consoleDriver == null) {
+				throw new ArgumentNullException ("Console driver instance must be provided.");
+			}
 			this.consoleDriver = consoleDriver;
 			winConsole = ((WindowsDriver)consoleDriver).WinConsole;
 		}

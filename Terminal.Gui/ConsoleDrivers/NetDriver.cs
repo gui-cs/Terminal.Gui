@@ -24,23 +24,6 @@ namespace Terminal.Gui {
 		int [,,] contents;
 		bool [] dirtyLine;
 
-		void UpdateOffscreen ()
-		{
-			int cols = Cols;
-			int rows = Rows;
-
-			contents = new int [rows, cols, 3];
-			dirtyLine = new bool [rows];
-			for (int row = 0; row < rows; row++) {
-				for (int c = 0; c < cols; c++) {
-					contents [row, c, 0] = ' ';
-					contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
-					contents [row, c, 2] = 0;
-					dirtyLine [row] = true;
-				}
-			}
-		}
-
 		static bool sync = false;
 
 		// Current row, and current col, tracked by Move/AddCh only
@@ -65,7 +48,11 @@ namespace Terminal.Gui {
 			if (runeWidth > 1) {
 				for (int i = 1; i < runeWidth; i++) {
 					contents [crow, ccol, 2] = 0;
-					ccol++;
+					if (ccol + 1 < cols) {
+						ccol++;
+					} else {
+						break;
+					}
 				}
 			}
 			//if (ccol == Cols) {
@@ -108,11 +95,19 @@ namespace Terminal.Gui {
 		public override void Init (Action terminalResized)
 		{
 			TerminalResized = terminalResized;
+
 			Console.TreatControlCAsInput = true;
 			var p = Environment.OSVersion.Platform;
 			if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 				isWinPlatform = true;
 			}
+
+			cols = Console.WindowWidth;
+			rows = Console.WindowHeight;
+
+			Clear ();
+			ResizeScreen ();
+			UpdateOffscreen ();
 
 			Colors.TopLevel = new ColorScheme ();
 			Colors.Base = new ColorScheme ();
@@ -150,15 +145,10 @@ namespace Terminal.Gui {
 			Colors.Error.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
 			Colors.Error.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Red);
 			Colors.Error.HotFocus = Colors.Error.HotNormal;
-			Clear ();
-			ResizeScreen ();
-			UpdateOffscreen ();
 		}
 
 		void ResizeScreen ()
 		{
-			const int Min_WindowWidth = 14;
-
 			switch (HeightSize) {
 			case HeightSize.WindowHeight:
 				if (Console.WindowHeight > 0) {
@@ -171,15 +161,12 @@ namespace Terminal.Gui {
 							Console.CursorLeft = 0;
 							Console.WindowTop = 0;
 							Console.WindowLeft = 0;
-							Console.SetBufferSize (Math.Max (Min_WindowWidth, Console.WindowWidth),
-								Console.WindowHeight);
+							Console.SetBufferSize (Cols, Rows);
 #pragma warning restore CA1416
 						} else {
 							//Console.Out.Write ($"\x1b[8;{Console.WindowHeight};{Console.WindowWidth}t");
-							//Console.Out.Flush ();
 							Console.Out.Write ($"\x1b[0;0" +
-								$";{Console.WindowHeight};" +
-								$"{Math.Max (Min_WindowWidth, Console.WindowWidth)}w");
+								$";{Rows};{Cols}w");
 						}
 					} catch (System.IO.IOException) {
 						return;
@@ -187,30 +174,47 @@ namespace Terminal.Gui {
 						return;
 					}
 				}
-				cols = Console.WindowWidth;
-				rows = Console.WindowHeight;
-				top = 0;
 				break;
 			case HeightSize.BufferHeight:
 				if (isWinPlatform && Console.WindowHeight > 0) {
 					// Can raise an exception while is still resizing.
 					try {
 #pragma warning disable CA1416
-						Console.WindowTop = Math.Max (Math.Min (top, Console.BufferHeight - Console.WindowHeight), 0);
+						Console.WindowTop = Math.Max (Math.Min (top, Rows - Console.WindowHeight), 0);
 #pragma warning restore CA1416
 					} catch (Exception) {
 						return;
 					}
 				} else {
 					Console.Out.Write ($"\x1b[{top};{Console.WindowLeft}" +
-						$";{Console.BufferHeight}" +
-						$";{Math.Max (Min_WindowWidth, Console.BufferWidth)}w");
+						$";{Rows};{Cols}w");
 				}
-				cols = Console.BufferWidth;
-				rows = Console.BufferHeight;
 				break;
 			}
 			Clip = new Rect (0, 0, Cols, Rows);
+
+			contents = new int [Rows, Cols, 3];
+			dirtyLine = new bool [Rows];
+
+			winChanging = false;
+		}
+
+		void UpdateOffscreen ()
+		{
+			if (!winChanging) {
+				return;
+			}
+			// Can raise an exception while is still resizing.
+			try {
+				for (int row = 0; row < rows; row++) {
+					for (int c = 0; c < cols; c++) {
+						contents [row, c, 0] = ' ';
+						contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
+						contents [row, c, 2] = 0;
+						dirtyLine [row] = true;
+					}
+				}
+			} catch (IndexOutOfRangeException) { }
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)
@@ -315,36 +319,39 @@ namespace Terminal.Gui {
 
 		Key MapKey (ConsoleKeyInfo keyInfo)
 		{
-			MapKeyModifiers (keyInfo);
+			MapKeyModifiers (keyInfo, (Key)keyInfo.Key);
 			switch (keyInfo.Key) {
 			case ConsoleKey.Escape:
-				return Key.Esc;
+				return MapKeyModifiers (keyInfo, Key.Esc);
 			case ConsoleKey.Tab:
 				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.BackTab : Key.Tab;
 			case ConsoleKey.Home:
-				return Key.Home;
+				return MapKeyModifiers (keyInfo, Key.Home);
 			case ConsoleKey.End:
-				return Key.End;
+				return MapKeyModifiers (keyInfo, Key.End);
 			case ConsoleKey.LeftArrow:
-				return Key.CursorLeft;
+				return MapKeyModifiers (keyInfo, Key.CursorLeft);
 			case ConsoleKey.RightArrow:
-				return Key.CursorRight;
+				return MapKeyModifiers (keyInfo, Key.CursorRight);
 			case ConsoleKey.UpArrow:
-				return Key.CursorUp;
+				return MapKeyModifiers (keyInfo, Key.CursorUp);
 			case ConsoleKey.DownArrow:
-				return Key.CursorDown;
+				return MapKeyModifiers (keyInfo, Key.CursorDown);
 			case ConsoleKey.PageUp:
-				return Key.PageUp;
+				return MapKeyModifiers (keyInfo, Key.PageUp);
 			case ConsoleKey.PageDown:
-				return Key.PageDown;
+				return MapKeyModifiers (keyInfo, Key.PageDown);
 			case ConsoleKey.Enter:
-				return Key.Enter;
+				return MapKeyModifiers (keyInfo, Key.Enter);
 			case ConsoleKey.Spacebar:
-				return Key.Space;
+				return MapKeyModifiers (keyInfo, Key.Space);
 			case ConsoleKey.Backspace:
-				return Key.Backspace;
+				return MapKeyModifiers (keyInfo, Key.Backspace);
 			case ConsoleKey.Delete:
-				return Key.Delete;
+				return MapKeyModifiers (keyInfo, Key.DeleteChar);
+			case ConsoleKey.Insert:
+				return MapKeyModifiers (keyInfo, Key.InsertChar);
+
 
 			case ConsoleKey.Oem1:
 			case ConsoleKey.Oem2:
@@ -373,7 +380,7 @@ namespace Terminal.Gui {
 				}
 				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
 					if (keyInfo.KeyChar == 0 || (keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26)) {
-						return (Key)((uint)Key.A + delta);
+						return MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
 					}
 				}
 				return (Key)((uint)keyInfo.KeyChar);
@@ -388,7 +395,7 @@ namespace Terminal.Gui {
 				}
 				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
 					if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30) {
-						return (Key)((uint)Key.D0 + delta);
+						return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
 					}
 				}
 				return (Key)((uint)keyInfo.KeyChar);
@@ -396,7 +403,7 @@ namespace Terminal.Gui {
 			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F12) {
 				var delta = key - ConsoleKey.F1;
 				if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-					return (Key)((uint)Key.F1 + delta);
+					return MapKeyModifiers (keyInfo, (Key)((uint)Key.F1 + delta));
 				}
 
 				return (Key)((uint)Key.F1 + delta);
@@ -410,17 +417,26 @@ namespace Terminal.Gui {
 
 		KeyModifiers keyModifiers;
 
-		void MapKeyModifiers (ConsoleKeyInfo keyInfo)
+		Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 		{
-			if (keyModifiers == null)
+			if (keyModifiers == null) {
 				keyModifiers = new KeyModifiers ();
-
-			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
+			}
+			Key keyMod = new Key ();
+			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0) {
+				keyMod = Key.ShiftMask;
 				keyModifiers.Shift = true;
-			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
+			}
+			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0) {
+				keyMod |= Key.CtrlMask;
 				keyModifiers.Ctrl = true;
-			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0)
+			}
+			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0) {
+				keyMod |= Key.AltMask;
 				keyModifiers.Alt = true;
+			}
+
+			return keyMod != Key.Null ? keyMod | key : key;
 		}
 
 		bool winChanging;
@@ -432,18 +448,43 @@ namespace Terminal.Gui {
 				if (map == (Key)0xffffffff) {
 					return;
 				}
-				keyHandler (new KeyEvent (map, keyModifiers));
-				keyUpHandler (new KeyEvent (map, keyModifiers));
-				keyModifiers = null;
+
+				if (map == (Key.Space | Key.CtrlMask) || map == (Key.Space | Key.AltMask)) {
+					map = Key.AltMask;
+					keyModifiers.Alt = true;
+					keyModifiers.Ctrl = false;
+					keyDownHandler (new KeyEvent (map, keyModifiers));
+					keyUpHandler (new KeyEvent (map, keyModifiers));
+				} else {
+					keyDownHandler (new KeyEvent (map, keyModifiers));
+					keyHandler (new KeyEvent (map, keyModifiers));
+					keyUpHandler (new KeyEvent (map, keyModifiers));
+				}
+				keyModifiers = new KeyModifiers ();
 			};
 
 			(mainLoop.Driver as NetMainLoop).WinChanged = (e) => {
 				winChanging = true;
-				top = e;
+				const int Min_WindowWidth = 14;
+				Size size = new Size ();
+				switch (HeightSize) {
+				case HeightSize.WindowHeight:
+					size = new Size (Math.Max (Min_WindowWidth, Console.WindowWidth),
+						Console.WindowHeight);
+					top = 0;
+					break;
+				case HeightSize.BufferHeight:
+					size = new Size (Console.BufferWidth, Console.BufferHeight);
+					top = e;
+					break;
+				}
+				cols = size.Width;
+				rows = size.Height;
 				ResizeScreen ();
 				UpdateOffscreen ();
-				winChanging = false;
-				TerminalResized.Invoke ();
+				if (!winChanging) {
+					TerminalResized.Invoke ();
+				}
 			};
 		}
 

@@ -421,35 +421,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
-		{
-			Application.CurrentView = this;
-
-			if (IsCurrentTop || this == Application.Top) {
-				if (!NeedDisplay.IsEmpty || LayoutNeeded) {
-					Driver.SetAttribute (Colors.TopLevel.Normal);
-
-					// This is the Application.Top. Clear just the region we're being asked to redraw 
-					// (the bounds passed to us).
-					Clear (bounds);
-					Driver.SetAttribute (Colors.Base.Normal);
-					PositionToplevels ();
-
-					foreach (var view in Subviews) {
-						if (view.Frame.IntersectsWith (bounds)) {
-							view.SetNeedsLayout ();
-							view.SetNeedsDisplay (view.Bounds);
-						}
-					}
-
-					ClearLayoutNeeded ();
-					ClearNeedsDisplay ();
-				}
-			}
-
-			base.Redraw (base.Bounds);
-		}
 
 		/// <summary>
 		/// Invoked by <see cref="Application.Begin"/> as part of the <see cref="Application.Run(Toplevel)"/> after
