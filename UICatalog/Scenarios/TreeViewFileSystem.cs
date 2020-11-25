@@ -88,7 +88,10 @@ namespace UICatalog.Scenarios {
 			// If it is a directory it's children are all contained files and dirs
 			if(model is DirectoryInfo d) {
 				try {
-					return d.GetFileSystemInfos();
+					return d.GetFileSystemInfos()
+						//show directories first
+						.OrderBy(a=>a is DirectoryInfo ? 0:1)
+						.ThenBy(b=>b.Name);
 				}
 				catch(SystemException ex) {
 					return new []{ex};
