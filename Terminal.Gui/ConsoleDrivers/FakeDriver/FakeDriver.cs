@@ -20,7 +20,7 @@ namespace Terminal.Gui {
 		public override int Cols => cols;
 		public override int Rows => rows;
 		public override int Top => 0;
-		public override HeightSize HeightSize { get; set; }
+		public override bool HeightAsBuffer { get; set; }
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		int [,,] contents;

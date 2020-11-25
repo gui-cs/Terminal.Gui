@@ -458,20 +458,6 @@ namespace Terminal.Gui {
 		public static Dictionary<string, ColorScheme> ColorSchemes { get; }
 	}
 
-	/// <summary>
-	/// The visible height should be used on the window.
-	/// </summary>
-	public enum HeightSize {
-		/// <summary>
-		/// Only window height will be visible not allowing scroll.
-		/// </summary>
-		WindowHeight,
-		/// <summary>
-		/// All buffer height will be visible allowing scroll.
-		/// </summary>
-		BufferHeight
-	}
-
 	///// <summary>
 	///// Special characters that can be drawn with 
 	///// </summary>
@@ -561,9 +547,10 @@ namespace Terminal.Gui {
 		public abstract int Top { get; }
 
 		/// <summary>
-		/// The current <see cref="HeightSize"/> used in the terminal.
+		/// If false height is measured by the window height and thus no scrolling.
+		/// If true then height is measured by the buffer height, enabling scrolling.
 		/// </summary>
-		public abstract HeightSize HeightSize { get; set; }
+		public abstract bool HeightAsBuffer { get; set; }
 
 		/// <summary>
 		/// Initializes the driver

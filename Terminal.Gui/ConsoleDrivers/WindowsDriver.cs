@@ -523,7 +523,7 @@ namespace Terminal.Gui {
 		public override int Cols => cols;
 		public override int Rows => rows;
 		public override int Top => top;
-		public override HeightSize HeightSize { get; set; }
+		public override bool HeightAsBuffer { get; set; }
 
 		public WindowsConsole WinConsole {
 			get => winConsole;
@@ -1334,14 +1334,12 @@ namespace Terminal.Gui {
 		void WaitWinChange ()
 		{
 			while (true) {
-				switch (consoleDriver.HeightSize) {
-				case HeightSize.WindowHeight:
+				if (!consoleDriver.HeightAsBuffer) {
 					if (Console.WindowWidth != consoleDriver.Cols || Console.WindowHeight != consoleDriver.Rows
 						|| Console.WindowTop != consoleDriver.Top) {    // Top only working on Windows.
 						return;
 					}
-					break;
-				case HeightSize.BufferHeight:
+				} else {
 					if (Console.BufferWidth != consoleDriver.Cols || Console.BufferHeight != consoleDriver.Rows) {
 						return;
 					}

@@ -18,7 +18,7 @@ namespace Terminal.Gui {
 		public override int Cols => cols;
 		public override int Rows => rows;
 		public override int Top => top;
-		public override HeightSize HeightSize { get; set; }
+		public override bool HeightAsBuffer { get; set; }
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		int [,,] contents;
@@ -149,8 +149,7 @@ namespace Terminal.Gui {
 
 		void ResizeScreen ()
 		{
-			switch (HeightSize) {
-			case HeightSize.WindowHeight:
+			if (!HeightAsBuffer) {
 				if (Console.WindowHeight > 0) {
 					// Can raise an exception while is still resizing.
 					try {
@@ -174,8 +173,7 @@ namespace Terminal.Gui {
 						return;
 					}
 				}
-				break;
-			case HeightSize.BufferHeight:
+			} else {
 				if (isWinPlatform && Console.WindowHeight > 0) {
 					// Can raise an exception while is still resizing.
 					try {
@@ -189,8 +187,8 @@ namespace Terminal.Gui {
 					Console.Out.Write ($"\x1b[{top};{Console.WindowLeft}" +
 						$";{Rows};{Cols}w");
 				}
-				break;
 			}
+
 			Clip = new Rect (0, 0, Cols, Rows);
 
 			contents = new int [Rows, Cols, 3];
@@ -240,8 +238,8 @@ namespace Terminal.Gui {
 		public override void UpdateScreen ()
 		{
 			if (winChanging || Console.WindowHeight == 0
-				|| (HeightSize == HeightSize.WindowHeight && Rows != Console.WindowHeight)
-				|| (HeightSize == HeightSize.BufferHeight && Rows != Console.BufferHeight)) {
+				|| (!HeightAsBuffer && Rows != Console.WindowHeight)
+				|| (HeightAsBuffer && Rows != Console.BufferHeight)) {
 				return;
 			}
 
@@ -467,16 +465,13 @@ namespace Terminal.Gui {
 				winChanging = true;
 				const int Min_WindowWidth = 14;
 				Size size = new Size ();
-				switch (HeightSize) {
-				case HeightSize.WindowHeight:
+				if (!HeightAsBuffer) {
 					size = new Size (Math.Max (Min_WindowWidth, Console.WindowWidth),
 						Console.WindowHeight);
 					top = 0;
-					break;
-				case HeightSize.BufferHeight:
+				} else {
 					size = new Size (Console.BufferWidth, Console.BufferHeight);
 					top = e;
-					break;
 				}
 				cols = size.Width;
 				rows = size.Height;
@@ -579,13 +574,11 @@ namespace Terminal.Gui {
 		void WaitWinChange ()
 		{
 			while (true) {
-				switch (consoleDriver.HeightSize) {
-				case HeightSize.WindowHeight:
+				if (!consoleDriver.HeightAsBuffer) {
 					if (Console.WindowWidth != consoleDriver.Cols || Console.WindowHeight != consoleDriver.Rows) {
 						return;
 					}
-					break;
-				case HeightSize.BufferHeight:
+				} else {
 					if (Console.BufferWidth != consoleDriver.Cols || Console.BufferHeight != consoleDriver.Rows
 						|| Console.WindowTop != consoleDriver.Top
 						|| Console.WindowHeight != lastWindowHeight) {

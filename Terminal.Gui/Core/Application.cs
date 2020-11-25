@@ -79,21 +79,21 @@ namespace Terminal.Gui {
 		public static View CurrentView { get; set; }
 
 		/// <summary>
-		/// The current <see cref="Terminal.Gui.HeightSize"/> used in the terminal.
+		/// The current <see cref="ConsoleDriver.HeightAsBuffer"/> used in the terminal.
 		/// </summary>
-		public static HeightSize HeightSize {
+		public static bool HeightAsBuffer {
 			get {
 				if (Driver == null) {
 					throw new ArgumentNullException ("The driver must be initialized first.");
 				}
-				return Driver.HeightSize;
+				return Driver.HeightAsBuffer;
 			}
 			set {
 				if (Driver == null) {
 					throw new ArgumentNullException ("The driver must be initialized first.");
 				}
-				if (Driver.HeightSize != value) {
-					Driver.HeightSize = value;
+				if (Driver.HeightAsBuffer != value) {
+					Driver.HeightAsBuffer = value;
 					Driver.Refresh ();
 				}
 			}
