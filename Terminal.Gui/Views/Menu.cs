@@ -1415,7 +1415,7 @@ namespace Terminal.Gui {
 				CloseMenu ();
 				if (openedByAltKey) {
 					openedByAltKey = false;
-					LastFocused.SetFocus ();
+					LastFocused?.SetFocus ();
 				}
 				break;
 
