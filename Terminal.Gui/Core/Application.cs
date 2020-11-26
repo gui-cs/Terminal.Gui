@@ -608,11 +608,11 @@ namespace Terminal.Gui {
 				} else if (!wait) {
 					return;
 				}
-				if (state.Toplevel != Top && (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay)) {
+				if (state.Toplevel != Top && (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
 					Top.Redraw (Top.Bounds);
 					state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
 				}
-				if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay) {
+				if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded) {
 					state.Toplevel.Redraw (state.Toplevel.Bounds);
 					if (DebugDrawBounds) {
 						DrawBounds (state.Toplevel);
