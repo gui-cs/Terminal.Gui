@@ -252,7 +252,6 @@ namespace Terminal.Gui {
 					continue;
 				}
 				dirtyLine [row] = false;
-				int [,,] damage = new int [0, 0, 0];
 				for (int col = 0; col < cols; col++) {
 					if (contents [row, col, 2] != 1) {
 						continue;
