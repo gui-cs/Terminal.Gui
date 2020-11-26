@@ -586,7 +586,6 @@ namespace Terminal.Gui {
 						lastWindowHeight = Console.WindowHeight;
 						return;
 					}
-					break;
 				}
 			}
 		}
