@@ -1310,11 +1310,11 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void Redraw (Rect bounds)
 		{
-			Application.CurrentView = this;
-
 			if (!CanBeVisible (this)) {
 				return;
 			}
+
+			Application.CurrentView = this;
 
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
@@ -1331,25 +1331,6 @@ namespace Terminal.Gui {
 				textFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : ColorScheme.Normal, HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
 			}
 
-			if (IsCurrentTop || this == Application.Top) {
-				if (!NeedDisplay.IsEmpty || LayoutNeeded) {
-					Driver.SetAttribute (Colors.TopLevel.Normal);
-
-					// This is the Application.Top. Clear just the region we're being asked to redraw 
-					// (the bounds passed to us).
-					Clear (bounds);
-					Driver.SetAttribute (Colors.Base.Normal);
-					((Toplevel)this).PositionToplevels ();
-
-					foreach (var view in Subviews) {
-						if (view.Frame.IntersectsWith (bounds)) {
-							view.SetNeedsLayout ();
-							view.SetNeedsDisplay (view.Bounds);
-						}
-					}
-				}
-			}
-
 			// Invoke DrawContentEvent
 			OnDrawContent (bounds);
 
@@ -1362,7 +1343,7 @@ namespace Terminal.Gui {
 							Application.CurrentView = view;
 
 							// Draw the subview
-							// Use the view's bounds (view-relative; Location will always be (0,0) because
+							// Use the view's bounds (view-relative; Location will always be (0,0)
 							if (view.Visible) {
 								view.Redraw (view.Bounds);
 							}
