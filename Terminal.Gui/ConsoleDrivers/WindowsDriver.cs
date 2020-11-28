@@ -86,6 +86,13 @@ namespace Terminal.Gui {
 			return WriteConsoleOutput (ScreenBuffer, charInfoBuffer, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
 		}
 
+		public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
+		{
+			OriginalStdOutChars = new CharInfo [size.Height * size.Width];
+
+			ReadConsoleOutput (OutputHandle, OriginalStdOutChars, coords, new Coord () { X = 0, Y = 0 }, ref window);
+		}
+
 		public bool SetCursorPosition (Coord position)
 		{
 			return SetConsoleCursorPosition (ScreenBuffer, position);
@@ -540,6 +547,8 @@ namespace Terminal.Gui {
 			winConsole = new WindowsConsole ();
 		}
 
+		bool winChanging;
+
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			this.keyHandler = keyHandler;
@@ -547,7 +556,33 @@ namespace Terminal.Gui {
 			this.keyUpHandler = keyUpHandler;
 			this.mouseHandler = mouseHandler;
 
-			(mainLoop.Driver as WindowsMainLoop).ProcessInput = (e) => ProcessInput (e);
+			var mLoop = mainLoop.Driver as WindowsMainLoop;
+
+			mLoop.ProcessInput = (e) => ProcessInput (e);
+
+			mLoop.WinChanged = (e) => {
+				ChangeWin (e);
+			};
+		}
+
+		private void ChangeWin (Size e)
+		{
+			winChanging = true;
+			if (!HeightAsBuffer) {
+				top = 0;
+				cols = e.Width;
+				rows = e.Height;
+				ResizeScreen ();
+				UpdateOffScreen ();
+				var bufferCoords = new WindowsConsole.Coord () {
+					X = (short)Clip.Width,
+					Y = (short)Clip.Height
+				};
+				winConsole.ReadFromConsoleOutput (e, bufferCoords, ref damageRegion);
+				if (!winChanging) {
+					TerminalResized.Invoke ();
+				}
+			}
 		}
 
 		void ProcessInput (WindowsConsole.InputRecord inputEvent)
@@ -1108,12 +1143,15 @@ namespace Terminal.Gui {
 
 		void UpdateOffScreen ()
 		{
-			for (int row = 0; row < rows; row++)
+			for (int row = 0; row < rows; row++) {
 				for (int col = 0; col < cols; col++) {
 					int position = row * cols + col;
 					OutputBuffer [position].Attributes = (ushort)Colors.TopLevel.Normal;
 					OutputBuffer [position].Char.UnicodeChar = ' ';
 				}
+			}
+
+			winChanging = false;
 		}
 
 		int ccol, crow;
@@ -1209,12 +1247,12 @@ namespace Terminal.Gui {
 				Y = (short)Clip.Height
 			};
 
-			var window = new WindowsConsole.SmallRect () {
-				Top = 0,
-				Left = 0,
-				Right = (short)Clip.Right,
-				Bottom = (short)Clip.Bottom
-			};
+			//var window = new WindowsConsole.SmallRect () {
+			//	Top = 0,
+			//	Left = 0,
+			//	Right = (short)Clip.Right,
+			//	Bottom = (short)Clip.Bottom
+			//};
 
 			UpdateCursor ();
 			winConsole.WriteToConsole (OutputBuffer, bufferCoords, damageRegion);
@@ -1282,6 +1320,7 @@ namespace Terminal.Gui {
 		ConsoleDriver consoleDriver;
 		WindowsConsole winConsole;
 		bool winChanged;
+		Size windowSize;
 		CancellationTokenSource tokenSource = new CancellationTokenSource ();
 
 		// The records that we keep fetching
@@ -1291,6 +1330,11 @@ namespace Terminal.Gui {
 		/// Invoked when a Key is pressed or released.
 		/// </summary>
 		public Action<WindowsConsole.InputRecord> ProcessInput;
+
+		/// <summary>
+		/// Invoked when the window is changed.
+		/// </summary>
+		public Action<Size> WinChanged;
 
 		public WindowsMainLoop (ConsoleDriver consoleDriver = null)
 		{
@@ -1304,7 +1348,7 @@ namespace Terminal.Gui {
 		void IMainLoopDriver.Setup (MainLoop mainLoop)
 		{
 			this.mainLoop = mainLoop;
-			Task.Run ((Action)WindowsInputHandler);
+			Task.Run (WindowsInputHandler);
 			Task.Run (CheckWinChange);
 		}
 
@@ -1335,15 +1379,11 @@ namespace Terminal.Gui {
 		{
 			while (true) {
 				if (!consoleDriver.HeightAsBuffer) {
-					if (Console.WindowWidth != consoleDriver.Cols || Console.WindowHeight != consoleDriver.Rows
-						|| Console.WindowTop != consoleDriver.Top) {    // Top only working on Windows.
-						return;
+					windowSize = new Size (Console.WindowWidth, Console.WindowHeight);
+					if (windowSize.Height < consoleDriver.Rows) {
+						// I still haven't been able to find a way to capture the shrinking in height.
+						//return;
 					}
-				} else {
-					if (Console.BufferWidth != consoleDriver.Cols || Console.BufferHeight != consoleDriver.Rows) {
-						return;
-					}
-					break;
 				}
 			}
 		}
@@ -1351,7 +1391,6 @@ namespace Terminal.Gui {
 		void IMainLoopDriver.Wakeup ()
 		{
 			//tokenSource.Cancel ();
-			eventReady.Reset ();
 			eventReady.Set ();
 		}
 
@@ -1376,7 +1415,7 @@ namespace Terminal.Gui {
 			}
 
 			if (!tokenSource.IsCancellationRequested) {
-				return result != null || CheckTimers (wait, out waitTimeout);
+				return result != null || CheckTimers (wait, out waitTimeout) || winChanged;
 			}
 
 			tokenSource.Dispose ();
@@ -1409,12 +1448,15 @@ namespace Terminal.Gui {
 
 		void IMainLoopDriver.MainIteration ()
 		{
-			if (result == null)
-				return;
-
-			var inputEvent = result [0];
-			result = null;
-			ProcessInput.Invoke (inputEvent);
+			if (result != null) {
+				var inputEvent = result [0];
+				result = null;
+				ProcessInput?.Invoke (inputEvent);
+			}
+			if (winChanged) {
+				winChanged = false;
+				WinChanged?.Invoke (windowSize);
+			}
 		}
 	}
 }

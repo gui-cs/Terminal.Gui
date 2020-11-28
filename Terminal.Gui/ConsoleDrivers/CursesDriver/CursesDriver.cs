@@ -647,16 +647,16 @@ namespace Terminal.Gui {
 		}
 
 		Action<MouseEvent> mouseHandler;
-		MainLoop mainLoop;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			Curses.timeout (0);
 			this.mouseHandler = mouseHandler;
-			this.mainLoop = mainLoop;
 
-			(mainLoop.Driver as UnixMainLoop).AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
+			var mLoop = mainLoop.Driver as UnixMainLoop;
+
+			mLoop.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
 				ProcessInput (keyHandler, keyDownHandler, keyUpHandler, mouseHandler);
 				return true;
 			});

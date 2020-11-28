@@ -36,25 +36,33 @@ namespace Terminal.Gui {
 
 		public override void AddRune (Rune rune)
 		{
+			if (contents.Length != Rows * Cols * 3) {
+				return;
+			}
 			rune = MakePrintable (rune);
-			if (Clip.Contains (ccol, crow)) {
+			var runeWidth = Rune.ColumnWidth (rune);
+			if (Clip.Contains (ccol, crow) && ccol + Math.Max (runeWidth, 1) <= Cols) {
 				contents [crow, ccol, 0] = (int)(uint)rune;
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
 				dirtyLine [crow] = true;
-			}
-			ccol++;
-			var runeWidth = Rune.ColumnWidth (rune);
-			if (runeWidth > 1) {
-				for (int i = 1; i < runeWidth; i++) {
-					contents [crow, ccol, 2] = 0;
-					if (ccol + 1 < cols) {
+
+				ccol++;
+				if (runeWidth > 1) {
+					for (int i = 1; i < runeWidth; i++) {
+						if (ccol < cols) {
+							contents [crow, ccol, 2] = 0;
+						} else {
+							break;
+						}
 						ccol++;
-					} else {
-						break;
 					}
 				}
+			} else if (ccol < cols && crow < rows) {
+				contents [crow, ccol, 2] = 1;
+				dirtyLine [crow] = true;
 			}
+
 			//if (ccol == Cols) {
 			//	ccol = 0;
 			//	if (crow + 1 < Rows)
@@ -107,7 +115,7 @@ namespace Terminal.Gui {
 
 			Clear ();
 			ResizeScreen ();
-			UpdateOffscreen ();
+			UpdateOffScreen ();
 
 			Colors.TopLevel = new ColorScheme ();
 			Colors.Base = new ColorScheme ();
@@ -193,15 +201,10 @@ namespace Terminal.Gui {
 
 			contents = new int [Rows, Cols, 3];
 			dirtyLine = new bool [Rows];
-
-			winChanging = false;
 		}
 
-		void UpdateOffscreen ()
+		void UpdateOffScreen ()
 		{
-			if (!winChanging) {
-				return;
-			}
 			// Can raise an exception while is still resizing.
 			try {
 				for (int row = 0; row < rows; row++) {
@@ -213,6 +216,8 @@ namespace Terminal.Gui {
 					}
 				}
 			} catch (IndexOutOfRangeException) { }
+
+			winChanging = false;
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)
@@ -237,7 +242,7 @@ namespace Terminal.Gui {
 
 		public override void UpdateScreen ()
 		{
-			if (winChanging || Console.WindowHeight == 0
+			if (winChanging || Console.WindowHeight == 0 || contents.Length != Rows * Cols * 3
 				|| (!HeightAsBuffer && Rows != Console.WindowHeight)
 				|| (HeightAsBuffer && Rows != Console.BufferHeight)) {
 				return;
@@ -256,7 +261,6 @@ namespace Terminal.Gui {
 					if (contents [row, col, 2] != 1) {
 						continue;
 					}
-
 					if (Console.WindowHeight > 0) {
 						// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
 						try {
@@ -266,6 +270,10 @@ namespace Terminal.Gui {
 						}
 					}
 					for (; col < cols && contents [row, col, 2] == 1; col++) {
+						// Needed for the .Net Framework.
+						if (row == rows - 1 && col == cols - 1) {
+							break;
+						}
 						var color = contents [row, col, 1];
 						if (color != redrawColor) {
 							SetColor (color);
@@ -439,8 +447,10 @@ namespace Terminal.Gui {
 		bool winChanging;
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
+			var mLoop = mainLoop.Driver as NetMainLoop;
+
 			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-			(mainLoop.Driver as NetMainLoop).KeyPressed = (consoleKey) => {
+			mLoop.KeyPressed = (consoleKey) => {
 				var map = MapKey (consoleKey);
 				if (map == (Key)0xffffffff) {
 					return;
@@ -460,7 +470,7 @@ namespace Terminal.Gui {
 				keyModifiers = new KeyModifiers ();
 			};
 
-			(mainLoop.Driver as NetMainLoop).WinChanged = (e) => {
+			mLoop.WinChanged = (e) => {
 				winChanging = true;
 				const int Min_WindowWidth = 14;
 				Size size = new Size ();
@@ -475,7 +485,7 @@ namespace Terminal.Gui {
 				cols = size.Width;
 				rows = size.Height;
 				ResizeScreen ();
-				UpdateOffscreen ();
+				UpdateOffScreen ();
 				if (!winChanging) {
 					TerminalResized.Invoke ();
 				}
@@ -529,6 +539,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Action<ConsoleKeyInfo> KeyPressed;
 
+		/// <summary>
+		/// Invoked when the window is changed.
+		/// </summary>
 		public Action<int> WinChanged;
 
 		/// <summary>
@@ -581,6 +594,7 @@ namespace Terminal.Gui {
 					if (Console.BufferWidth != consoleDriver.Cols || Console.BufferHeight != consoleDriver.Rows
 						|| Console.WindowTop != consoleDriver.Top
 						|| Console.WindowHeight != lastWindowHeight) {
+						// Top only working on Windows.
 						newTop = Console.WindowTop;
 						lastWindowHeight = Console.WindowHeight;
 						return;
@@ -659,7 +673,7 @@ namespace Terminal.Gui {
 			}
 			if (winChanged) {
 				winChanged = false;
-				WinChanged.Invoke (newTop);
+				WinChanged?.Invoke (newTop);
 			}
 		}
 	}
