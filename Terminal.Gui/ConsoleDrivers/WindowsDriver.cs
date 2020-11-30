@@ -86,10 +86,29 @@ namespace Terminal.Gui {
 			return WriteConsoleOutput (ScreenBuffer, charInfoBuffer, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
 		}
 
-		public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
+		public void ReadFromConsoleOutput (Size size, Coord coords)
 		{
-			OriginalStdOutChars = new CharInfo [size.Height * size.Width];
+			ScreenBuffer = CreateConsoleScreenBuffer (
+				DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
+				ShareMode.FileShareRead | ShareMode.FileShareWrite,
+				IntPtr.Zero,
+				1,
+				IntPtr.Zero
+			);
+			if (ScreenBuffer == INVALID_HANDLE_VALUE) {
+				var err = Marshal.GetLastWin32Error ();
 
+				if (err != 0)
+					throw new System.ComponentModel.Win32Exception (err);
+			}
+
+			if (!SetConsoleActiveScreenBuffer (ScreenBuffer)) {
+				var err = Marshal.GetLastWin32Error ();
+				throw new System.ComponentModel.Win32Exception (err);
+			}
+
+			OriginalStdOutChars = new CharInfo [size.Height * size.Width];
+			SmallRect window = new SmallRect ();
 			ReadConsoleOutput (OutputHandle, OriginalStdOutChars, coords, new Coord () { X = 0, Y = 0 }, ref window);
 		}
 
@@ -460,62 +479,79 @@ namespace Terminal.Gui {
 			}
 		}
 
-#if false      // Not needed on the constructor. Perhaps could be used on resizing. To study.
+		// Not needed on the constructor. Perhaps could be used on resizing. To study.
 		[DllImport ("kernel32.dll", ExactSpelling = true)]
 		static extern IntPtr GetConsoleWindow ();
 
-		[DllImport ("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-		static extern bool ShowWindow (IntPtr hWnd, int nCmdShow);
+		[DllImport ("user32.dll")]
+		[return: MarshalAs (UnmanagedType.Bool)]
+		static extern bool GetWindowPlacement (IntPtr hWnd, ref WindowPlacement lpwndpl);
 
+		[DllImport ("user32.dll", SetLastError = true)]
+		[return: MarshalAs (UnmanagedType.Bool)]
+		static extern bool SetWindowPlacement (IntPtr hWnd, [In] ref WindowPlacement lpwndpl);
+
+		internal struct WindowPlacement {
+			public int length;
+			public int flags;
+			public int showCmd;
+			public System.Drawing.Point ptMinPosition;
+			public System.Drawing.Point ptMaxPosition;
+			public System.Drawing.Rectangle rcNormalPosition;
+			public System.Drawing.Rectangle rcDevice;
+		}
+
+		// flags
+		public const int WPF_SET_MIN_POSITION = 1;
+		public const int WPF_RESTORE_TO_MAXIMIZED = 2;
+		public const int WPF_ASYNC_WINDOWPLACEMENT = 4;
+
+		// showCmd
 		public const int HIDE = 0;
-		public const int MAXIMIZE = 3;
+		public const int NORMAL = 1;
+		public const int SHOW_MINIMIZED = 2;
+		public const int SHOW_MAXIMIZED = 3;
+		public const int SHOW_NOACTIVATE = 4;
+		public const int SHOW = 5;
 		public const int MINIMIZE = 6;
+		public const int SHOW_MIN_NOACTIVE = 7;
+		public const int SHOW_NA = 8;
 		public const int RESTORE = 9;
+		public const int SHOW_DEFAULT = 10;
+		public const int FORCE_MINIMIZE = 11;
 
-		internal void ShowWindow (int state)
+		internal WindowPlacement GetWindow ()
 		{
 			IntPtr thisConsole = GetConsoleWindow ();
-			ShowWindow (thisConsole, state);
-		}
-#endif
-#if false // See: https://github.com/migueldeicaza/gui.cs/issues/357
-		[StructLayout (LayoutKind.Sequential)]
-		public struct SMALL_RECT {
-			public short Left;
-			public short Top;
-			public short Right;
-			public short Bottom;
+			WindowPlacement placement = new WindowPlacement {
+				length = Marshal.SizeOf (typeof (WindowPlacement))
+			};
+			GetWindowPlacement (thisConsole, ref placement);
 
-			public SMALL_RECT (short Left, short Top, short Right, short Bottom)
-			{
-				this.Left = Left;
-				this.Top = Top;
-				this.Right = Right;
-				this.Bottom = Bottom;
-			}
+			return placement;
 		}
 
-		[StructLayout (LayoutKind.Sequential)]
-		public struct CONSOLE_SCREEN_BUFFER_INFO {
-			public int dwSize;
-			public int dwCursorPosition;
-			public short wAttributes;
-			public SMALL_RECT srWindow;
-			public int dwMaximumWindowSize;
-		}
-
-		[DllImport ("kernel32.dll", SetLastError = true)]
-		static extern bool GetConsoleScreenBufferInfo (IntPtr hConsoleOutput, out CONSOLE_SCREEN_BUFFER_INFO ConsoleScreenBufferInfo);
-
-		// Theoretically GetConsoleScreenBuffer height should give the console Windoww size
-		// It does not work, however, and always returns the size the window was initially created at
-		internal Size GetWindowSize ()
+		internal void SetWindow (int showCmd)
 		{
-			var consoleScreenBufferInfo = new CONSOLE_SCREEN_BUFFER_INFO ();
-			//consoleScreenBufferInfo.dwSize = Marshal.SizeOf (typeof (CONSOLE_SCREEN_BUFFER_INFO));
-			GetConsoleScreenBufferInfo (OutputHandle, out consoleScreenBufferInfo);
-			return new Size (consoleScreenBufferInfo.srWindow.Right - consoleScreenBufferInfo.srWindow.Left,
-				consoleScreenBufferInfo.srWindow.Bottom - consoleScreenBufferInfo.srWindow.Top);
+			IntPtr thisConsole = GetConsoleWindow ();
+			WindowPlacement placement = new WindowPlacement {
+				length = Marshal.SizeOf (typeof (WindowPlacement)),
+				showCmd = showCmd
+			};
+			SetWindowPlacement (thisConsole, ref placement);
+		}
+
+#if false
+		[DllImport ("kernel32.dll", SetLastError = true)]
+		static extern bool GetConsoleScreenBufferInfo (IntPtr hConsoleOutput, out ConsoleScreenBufferInfo ConsoleScreenBufferInfo);
+
+		// Theoretically GetConsoleScreenBuffer height should give the console Window size, but the Top is always 0.
+		// It does not work, however, and always returns the size the window was initially created at
+		internal Size GetWindowSize (IntPtr handle)
+		{
+			GetConsoleScreenBufferInfo (handle, out ConsoleScreenBufferInfo consoleScreenBufferInfo);
+			return new Size (consoleScreenBufferInfo.srWindow.Right - consoleScreenBufferInfo.srWindow.Left + 1,
+				consoleScreenBufferInfo.srWindow.Bottom - consoleScreenBufferInfo.srWindow.Top + 1);
 		}
 #endif
 	}
@@ -560,27 +596,27 @@ namespace Terminal.Gui {
 
 			mLoop.ProcessInput = (e) => ProcessInput (e);
 
-			mLoop.WinChanged = (e) => {
-				ChangeWin (e);
-			};
+			mLoop.WinChanged = (e) => ChangeWin (e);
 		}
 
-		private void ChangeWin (Size e)
+		void ChangeWin (Size size)
 		{
-			winChanging = true;
 			if (!HeightAsBuffer) {
+				winChanging = true;
 				top = 0;
-				cols = e.Width;
-				rows = e.Height;
+				cols = size.Width;
+				rows = size.Height;
+				var bufferCoords = new WindowsConsole.Coord () {
+					X = (short)cols,
+					Y = (short)rows
+				};
+				winConsole.ReadFromConsoleOutput (size, bufferCoords);
 				ResizeScreen ();
 				UpdateOffScreen ();
-				var bufferCoords = new WindowsConsole.Coord () {
-					X = (short)Clip.Width,
-					Y = (short)Clip.Height
-				};
-				winConsole.ReadFromConsoleOutput (e, bufferCoords, ref damageRegion);
 				if (!winChanging) {
 					TerminalResized.Invoke ();
+				} else {
+					System.Diagnostics.Debugger.Break ();
 				}
 			}
 		}
@@ -676,11 +712,13 @@ namespace Terminal.Gui {
 				break;
 
 			case WindowsConsole.EventType.WindowBufferSize:
-				cols = inputEvent.WindowBufferSizeEvent.size.X;
-				rows = inputEvent.WindowBufferSizeEvent.size.Y;
-				ResizeScreen ();
-				UpdateOffScreen ();
-				TerminalResized?.Invoke ();
+				if (HeightAsBuffer) {
+					cols = inputEvent.WindowBufferSizeEvent.size.X;
+					rows = inputEvent.WindowBufferSizeEvent.size.Y;
+					ResizeScreen ();
+					UpdateOffScreen ();
+					TerminalResized?.Invoke ();
+				}
 				break;
 
 			case WindowsConsole.EventType.Focus:
@@ -1256,7 +1294,7 @@ namespace Terminal.Gui {
 
 			UpdateCursor ();
 			winConsole.WriteToConsole (OutputBuffer, bufferCoords, damageRegion);
-			//			System.Diagnostics.Debugger.Log(0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
+			//System.Diagnostics.Debugger.Log(0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 		}
 
@@ -1320,6 +1358,7 @@ namespace Terminal.Gui {
 		ConsoleDriver consoleDriver;
 		WindowsConsole winConsole;
 		bool winChanged;
+		WindowsConsole.WindowPlacement windowPlacement;
 		Size windowSize;
 		CancellationTokenSource tokenSource = new CancellationTokenSource ();
 
@@ -1379,10 +1418,20 @@ namespace Terminal.Gui {
 		{
 			while (true) {
 				if (!consoleDriver.HeightAsBuffer) {
-					windowSize = new Size (Console.WindowWidth, Console.WindowHeight);
-					if (windowSize.Height < consoleDriver.Rows) {
-						// I still haven't been able to find a way to capture the shrinking in height.
-						//return;
+					windowPlacement = winConsole.GetWindow ();
+					if (windowPlacement.rcNormalPosition.Size.Height > -1) {
+						windowSize = new Size (Math.Max (((windowPlacement.rcNormalPosition.Size.Width -
+							windowPlacement.rcNormalPosition.X) / 8) - 2, 0),
+							Math.Max (((windowPlacement.rcNormalPosition.Size.Height -
+							windowPlacement.rcNormalPosition.Y) / 16) - 7, 0));
+						if (windowPlacement.showCmd != WindowsConsole.SHOW_MAXIMIZED
+							&& (windowSize.Width != consoleDriver.Cols || windowSize.Height != consoleDriver.Rows)) {
+							return;
+						} else if (windowPlacement.showCmd == WindowsConsole.SHOW_MAXIMIZED
+							&& (Console.LargestWindowWidth != consoleDriver.Cols || Console.LargestWindowHeight != consoleDriver.Rows)) {
+							windowSize = new Size (Console.LargestWindowWidth, Console.LargestWindowHeight);
+							return;
+						}
 					}
 				}
 			}
