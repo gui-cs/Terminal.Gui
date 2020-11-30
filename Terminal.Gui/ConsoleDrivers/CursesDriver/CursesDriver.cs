@@ -20,6 +20,7 @@ namespace Terminal.Gui {
 		public override int Cols => Curses.Cols;
 		public override int Rows => Curses.Lines;
 		public override int Top => 0;
+		public override bool HeightAsBuffer { get; set; }
 
 		// Current row, and current col, tracked by Move/AddRune only
 		int ccol, crow;
@@ -70,6 +71,7 @@ namespace Terminal.Gui {
 		public override void Refresh () {
 			Curses.refresh ();
 			if (Curses.CheckWinChange ()) {
+				Clip = new Rect (0, 0, Cols, Rows);
 				TerminalResized?.Invoke ();
 			}
 		}
@@ -645,16 +647,16 @@ namespace Terminal.Gui {
 		}
 
 		Action<MouseEvent> mouseHandler;
-		MainLoop mainLoop;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			Curses.timeout (0);
 			this.mouseHandler = mouseHandler;
-			this.mainLoop = mainLoop;
 
-			(mainLoop.Driver as UnixMainLoop).AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
+			var mLoop = mainLoop.Driver as UnixMainLoop;
+
+			mLoop.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
 				ProcessInput (keyHandler, keyDownHandler, keyUpHandler, mouseHandler);
 				return true;
 			});

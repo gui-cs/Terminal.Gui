@@ -1314,10 +1314,13 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			Application.CurrentView = this;
+
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
-			if (ColorScheme != null)
+			if (ColorScheme != null) {
 				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
+			}
 
 			if (!ustring.IsNullOrEmpty (Text)) {
 				Clear ();
@@ -1333,14 +1336,14 @@ namespace Terminal.Gui {
 
 			if (subviews != null) {
 				foreach (var view in subviews) {
-					if (!view.NeedDisplay.IsEmpty || view.ChildNeedsDisplay) {
+					if (!view.NeedDisplay.IsEmpty || view.ChildNeedsDisplay || view.LayoutNeeded) {
 						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
 							if (view.LayoutNeeded)
 								view.LayoutSubviews ();
 							Application.CurrentView = view;
 
 							// Draw the subview
-							// Use the view's bounds (view-relative; Location will always be (0,0) because
+							// Use the view's bounds (view-relative; Location will always be (0,0)
 							if (view.Visible) {
 								view.Redraw (view.Bounds);
 							}
@@ -1350,6 +1353,7 @@ namespace Terminal.Gui {
 					}
 				}
 			}
+			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
 		}
 
