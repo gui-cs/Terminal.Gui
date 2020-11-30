@@ -211,7 +211,7 @@ namespace Terminal.Gui {
 
 			int p = first;
 			int col = 0;
-			int width = Frame.Width;
+			int width = Frame.Width + OffSetBackground ();
 			var tcount = text.Count;
 			var roc = new Attribute (Color.DarkGray, Color.Gray);
 			for (int idx = p; idx < tcount; idx++) {
