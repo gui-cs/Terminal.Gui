@@ -37,9 +37,29 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// private variable for <see cref="SelectedObject"/>
+		/// </summary>
+		object selectedObject;
+
+		/// <summary>
 		/// The currently selected object in the tree
 		/// </summary>
-		public object SelectedObject {get;set;}
+		public object SelectedObject { 
+			get => selectedObject; 
+			set {                
+				var oldValue = selectedObject;
+				selectedObject = value; 
+
+				if(!ReferenceEquals(oldValue,value))
+				SelectionChanged?.Invoke(this,new SelectionChangedEventArgs(this,oldValue,value));
+			}
+		}
+		
+		/// <summary>
+		/// Called when the <see cref="SelectedObject"/> changes
+		/// </summary>
+		public event EventHandler<SelectionChangedEventArgs> SelectionChanged;
+
 
 		/// <summary>
 		/// The root objects in the tree, note that this collection is of root objects only
@@ -478,4 +498,33 @@ namespace Terminal.Gui {
 	/// <param name="model"></param>
 	/// <returns></returns>
 	public delegate bool CanExpandGetterDelegate(object model);
+
+	
+	/// <summary>
+	/// Event arguments describing a change in selected object in a tree view
+	/// </summary>
+	public class SelectionChangedEventArgs : EventArgs
+	{
+		/// <summary>
+		/// The view in which the change occurred
+		/// </summary>
+		public TreeView Tree { get; }
+
+		/// <summary>
+		/// The previously selected value (can be null)
+		/// </summary>
+		public object OldValue { get; }
+
+		/// <summary>
+		/// The newly selected value in the <see cref="Tree"/> (can be null)
+		/// </summary>
+		public object NewValue { get; }
+
+		public SelectionChangedEventArgs(TreeView tree, object oldValue, object newValue)
+		{
+			Tree = tree;
+			OldValue = oldValue;
+			NewValue = newValue;
+		}
+	}
 }
