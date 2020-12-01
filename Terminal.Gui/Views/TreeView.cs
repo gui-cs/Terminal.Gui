@@ -229,6 +229,10 @@ namespace Terminal.Gui {
 				case Key.End:
 					GoToEnd();
 				break;
+
+				default:
+					// we don't care about this keystroke
+					return false;
 			}
 
 			PositionCursor ();
