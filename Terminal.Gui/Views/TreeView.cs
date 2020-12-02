@@ -61,6 +61,22 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event EventHandler<SelectionChangedEventArgs> SelectionChanged;
 
+		/// <summary>
+		/// Refreshes the state of the object <paramref name="o"/> in the tree.  This will recompute children, string representation etc
+		/// </summary>
+		/// <remarks>This has no effect if the object is not exposed in the tree.</remarks>
+		/// <param name="o"></param>
+		/// <param name="startAtTop">True to also refresh all ancestors of the objects branch (starting with the root).  False to refresh only the passed node</param>
+		public void RefreshObject (object o, bool startAtTop = false)
+		{
+			var branch = ObjectToBranch(o);
+			if(branch != null) {
+				branch.Refresh(startAtTop);
+				SetNeedsDisplay();
+			}
+
+		}
+
 
 		/// <summary>
 		/// The root objects in the tree, note that this collection is of root objects only
@@ -365,6 +381,16 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Returns true if the given object <paramref name="o"/> is exposed in the tree and expanded otherwise false
+		/// </summary>
+		/// <param name="o"></param>
+		/// <returns></returns>
+		public bool IsExpanded(object o)
+		{
+			return ObjectToBranch(o)?.IsExpanded ?? false;
+		}
+
+		/// <summary>
 		/// Collapses the supplied object if it is currently expanded 
 		/// </summary>
 		/// <param name="toCollapse">The object to collapse</param>
@@ -398,18 +424,22 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The users object that is being displayed by this branch of the tree
 		/// </summary>
-		public object Model {get;set;}
+		public object Model {get;private set;}
 		
 		/// <summary>
 		/// The depth of the current branch.  Depth of 0 indicates root level branches
 		/// </summary>
-		public int Depth {get;set;} = 0;
+		public int Depth {get;private set;} = 0;
 
 		/// <summary>
 		/// The children of the current branch.  This is null until the first call to <see cref="FetchChildren"/> to avoid enumerating the entire underlying hierarchy
 		/// </summary>
 		public Dictionary<object,Branch> ChildBranches {get;set;}
 
+		/// <summary>
+		/// The parent <see cref="Branch"/> or null if it is a root.
+		/// </summary>
+		public Branch Parent {get; private set;}
 
 		private TreeView tree;
 
@@ -426,6 +456,7 @@ namespace Terminal.Gui {
 			
 			if(parentBranchIfAny != null) {
 				Depth = parentBranchIfAny.Depth +1;
+				Parent = parentBranchIfAny;
 			}
 		}
 
@@ -438,7 +469,9 @@ namespace Terminal.Gui {
 			if (tree.ChildrenGetter == null)
 				return;
 
-			this.ChildBranches = tree.ChildrenGetter(this.Model).ToDictionary(k=>k,val=>new Branch(tree,this,val));
+			var children = tree.ChildrenGetter(this.Model) ?? new object[0];
+
+			this.ChildBranches = children.ToDictionary(k=>k,val=>new Branch(tree,this,val));
 		}
 
 		/// <summary>
@@ -499,9 +532,49 @@ namespace Terminal.Gui {
 			}
 		}
 
-		internal void Collapse ()
+		/// <summary>
+		/// Marks the branch as collapsed (<see cref="IsExpanded"/> false)
+		/// </summary>
+		public void Collapse ()
 		{
 			IsExpanded = false;
+		}
+
+		/// <summary>
+		/// Refreshes cached knowledge in this branch e.g. what children an object has
+		/// </summary>
+		/// <param name="startAtTop">True to also refresh all <see cref="Parent"/> branches (starting with the root)</param>
+		public void Refresh (bool startAtTop)
+		{
+			// if we must go up and refresh from the top down
+			if(startAtTop)
+				Parent?.Refresh(true);
+
+			// we don't want to loose the state of our children so lets be selective about how we refresh
+			//if we don't know about any children yet just use the normal method
+			if(ChildBranches == null)
+				FetchChildren();
+			else {
+				// we already knew about some children so preserve the state of the old children
+
+				// first gather the new Children
+				var newChildren = tree.ChildrenGetter(this.Model) ?? new object[0];
+
+				// Children who no longer appear need to go
+				foreach(var toRemove in ChildBranches.Keys.Except(newChildren).ToArray())
+				{
+					ChildBranches.Remove(toRemove);
+					
+					//also if the user has this node selected (its disapearing) so lets change selection to us (the parent object) to be helpful
+					if(Equals(tree.SelectedObject ,toRemove))
+						tree.SelectedObject = Model;
+				}
+				
+				// New children need to be added
+				foreach(var toAdd in newChildren.Except(ChildBranches.Keys).ToArray())
+					ChildBranches.Add(toAdd,new Branch(tree,this,toAdd));
+			}
+			
 		}
 	}
    
