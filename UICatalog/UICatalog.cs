@@ -167,6 +167,7 @@ namespace UICatalog {
 				}),
 				new MenuBarItem ("_Color Scheme", CreateColorSchemeMenuItems()),
 				new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems()),
+				new MenuBarItem ("_Size Style", CreateSizeStyle()),
 				new MenuBarItem ("_Help", new MenuItem [] {
 					new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://migueldeicaza.github.io/gui.cs/articles/overview.html"), null, null, Key.F1),
 					new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/migueldeicaza/gui.cs"), null, null, Key.F2),
@@ -272,6 +273,27 @@ namespace UICatalog {
 
 			Application.Run (_top);
 			return _runningScenario;
+		}
+
+		static MenuItem [] CreateSizeStyle ()
+		{
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			for (int i = 0; i < 2; i++) {
+				var item = new MenuItem ();
+				item.Title = i == 0 ? "_Normal" : "_As Buffer";
+				item.Shortcut = Key.CtrlMask | Key.AltMask | (Key)item.Title.ToString ().Substring (1, 1) [0];
+				item.CheckType |= MenuItemCheckStyle.Radio;
+				item.Checked = i == 0 && !Application.HeightAsBuffer ? true : false;
+				item.Action += () => {
+					item.Checked = !item.Checked;
+					Application.HeightAsBuffer = item.Title == "_Normal" ? false : true;
+					foreach (var menuItem in menuItems) {
+						menuItem.Checked = menuItem.Title.Equals (item.Title);
+					}
+				};
+				menuItems.Add (item);
+			}
+			return menuItems.ToArray ();
 		}
 
 		static MenuItem [] CreateDiagnosticMenuItems ()
