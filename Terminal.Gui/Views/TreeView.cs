@@ -547,6 +547,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public object NewValue { get; }
 
+		/// <summary>
+		/// Creates a new instance of event args describing a change of selection in <paramref name="tree"/>
+		/// </summary>
+		/// <param name="tree"></param>
+		/// <param name="oldValue"></param>
+		/// <param name="newValue"></param>
 		public SelectionChangedEventArgs(TreeView tree, object oldValue, object newValue)
 		{
 			Tree = tree;
