@@ -26,6 +26,7 @@ namespace Terminal.Gui {
 	
 		private ChildrenGetterDelegate childrenGetter;
 		private CanExpandGetterDelegate canExpandGetter;
+		private int scrollOffset;
 
 		/// <summary>
 		/// Optional delegate where <see cref="ChildrenGetter"/> is expensive.  This should quickly return true/false for whether an object is expandable.  (e.g. indicating to a user that all folders can be expanded because they are folders without having to calculate contents)
@@ -51,7 +52,7 @@ namespace Terminal.Gui {
 				selectedObject = value; 
 
 				if(!ReferenceEquals(oldValue,value))
-				SelectionChanged?.Invoke(this,new SelectionChangedEventArgs(this,oldValue,value));
+					SelectionChanged?.Invoke(this,new SelectionChangedEventArgs(this,oldValue,value));
 			}
 		}
 		
@@ -74,7 +75,14 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The amount of tree view that has been scrolled off the top of the screen (by the user scrolling down)
 		/// </summary>
-		public int ScrollOffset {get; private set;}
+		/// <remarks>Setting a value of less than 0 will result in a ScrollOffset of 0.  To see changes in the UI call <see cref="View.SetNeedsDisplay()"/></remarks>
+		public int ScrollOffset { 
+			get => scrollOffset;
+			set {
+				scrollOffset = Math.Max(0,value); 
+			}
+		}
+
 
 		/// <summary>
 		/// Creates a new tree view with absolute positioning.  Use <see cref="AddObjects(IEnumerable{object})"/> to set set root objects for the tree
@@ -172,6 +180,25 @@ namespace Terminal.Gui {
 				}
 					
 			}
+		}
+		
+		/// <summary>
+		/// Returns the index of the object <paramref name="o"/> if it is currently exposed (it's parent(s) have been expanded).  This can be used with <see cref="ScrollOffset"/> and <see cref="View.SetNeedsDisplay()"/> to scroll to a specific object
+		/// </summary>
+		/// <remarks>Uses the Equals method and returns the first index at which the object is found or -1 if it is not found</remarks>
+		/// <param name="o">An object that appears in your tree and is currently exposed</param>
+		/// <returns>The index the object was found at or -1 if it is not currently revealed or not in the tree at all</returns>
+		public int GetScrollOffsetOf(object o)
+		{
+			var map = BuildLineMap();
+			for (int i = 0; i < map.Length; i++)
+			{
+				if (map[i].Model.Equals(o))
+					return i;
+			}
+
+			//object not found
+			return -1;
 		}
 
 		/// <summary>
