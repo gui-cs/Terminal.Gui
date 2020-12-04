@@ -885,7 +885,7 @@ namespace Terminal.Gui {
 		/// <param name="region">Screen relative region where the frame will be drawn.</param>
 		/// <param name="padding">Padding to add on the sides.</param>
 		/// <param name="fill">If set to <c>true</c> it will clear the contents with the current color, otherwise the contents will be left untouched.</param>
-		/// <remarks>This API has been supersede by <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/>.</remarks>
+		/// <remarks>This API has been superseded by <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/>.</remarks>
 		/// <remarks>This API is equivalent to calling <c>DrawWindowFrame(Rect, p - 1, p - 1, p - 1, p - 1)</c>. In other words,
 		/// A padding value of 0 means there is actually a one cell border.
 		/// </remarks>
