@@ -205,6 +205,9 @@ namespace Terminal.Gui.Views {
 				SelectedColumn =  Table == null ? 0 : Table.Columns.Count - 1;
 				Update ();
 				break;
+			default:
+				// Not a keystroke we care about
+				return false;
 			}
 			PositionCursor ();
 			return true;
