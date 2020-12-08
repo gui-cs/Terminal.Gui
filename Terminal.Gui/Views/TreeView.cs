@@ -166,6 +166,30 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Returns the currently expanded children of the passed object.  Returns an empty collection if the branch is not exposed or not expanded
+		/// </summary>
+		/// <param name="o">An object in the tree</param>
+		/// <returns></returns>
+		public IEnumerable<object> GetChildren (object o)
+		{
+			var branch = ObjectToBranch(o);
+
+			if(branch == null || !branch.IsExpanded)
+				return new object[0];
+
+			return branch.ChildBranches?.Values?.Select(b=>b.Model)?.ToArray() ?? new object[0];
+		}
+		/// <summary>
+		/// Returns the parent object of <paramref name="o"/> in the tree.  Returns null if the object is not exposed in the tree
+		/// </summary>
+		/// <param name="o">An object in the tree</param>
+		/// <returns></returns>
+		public object GetParent (object o)
+		{
+			return ObjectToBranch(o)?.Parent?.Model;
+		}
+
+		/// <summary>
 		/// Returns the string representation of model objects hosted in the tree.  Default implementation is to call <see cref="object.ToString"/>
 		/// </summary>
 		/// <value></value>

@@ -167,5 +167,51 @@ namespace UnitTests {
 			// The old selection was c1 which is now gone so selection should default to the parent of that branch (the factory)
 			Assert.Equal(f,tree.SelectedObject);
 		}
+		[Fact]
+		public void GetParent_ReturnsParentOnlyWhenExpanded()
+		{
+			var tree = CreateTree(out Factory f, out Car c1, out Car c2);
+			
+			Assert.Null(tree.GetParent(f));
+			Assert.Null(tree.GetParent(c1));
+			Assert.Null(tree.GetParent(c2));
+
+			// now when we expand the factory we discover the cars
+			tree.Expand(f);
+			
+			Assert.Null(tree.GetParent(f));
+			Assert.Equal(f,tree.GetParent(c1));
+			Assert.Equal(f,tree.GetParent(c2));
+
+			tree.Collapse(f);
+
+			Assert.Null(tree.GetParent(f));
+			Assert.Null(tree.GetParent(c1));
+			Assert.Null(tree.GetParent(c2));
+		}
+
+		[Fact]
+		public void GetChildren_ReturnsChildrenOnlyWhenExpanded()
+		{
+			var tree = CreateTree(out Factory f, out Car c1, out Car c2);
+			
+			Assert.Empty(tree.GetChildren(f));
+			Assert.Empty(tree.GetChildren(c1));
+			Assert.Empty(tree.GetChildren(c2));
+
+			// now when we expand the factory we discover the cars
+			tree.Expand(f);
+			
+			Assert.Contains(c1,tree.GetChildren(f));
+			Assert.Contains(c2,tree.GetChildren(f));
+			Assert.Empty(tree.GetChildren(c1));
+			Assert.Empty(tree.GetChildren(c2));
+
+			tree.Collapse(f);
+
+			Assert.Empty(tree.GetChildren(f));
+			Assert.Empty(tree.GetChildren(c1));
+			Assert.Empty(tree.GetChildren(c2));
+		}
 	}
 }
