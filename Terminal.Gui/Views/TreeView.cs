@@ -595,8 +595,17 @@ namespace Terminal.Gui {
 				}
 				
 				// New children need to be added
-				foreach(var toAdd in newChildren.Except(ChildBranches.Keys).ToArray())
-					ChildBranches.Add(toAdd,new Branch(tree,this,toAdd));
+				foreach(var newChild in newChildren)
+				{
+					// If we don't know about the child yet we need a new branch
+					if (!ChildBranches.ContainsKey (newChild)) {
+						ChildBranches.Add(newChild,new Branch(tree,this,newChild));
+					}
+					else{
+						//we already have this object but update the reference anyway incase Equality match but the references are new
+						ChildBranches[newChild].Model = newChild;
+					}					
+				}
 			}
 			
 		}

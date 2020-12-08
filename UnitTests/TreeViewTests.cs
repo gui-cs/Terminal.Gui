@@ -213,5 +213,60 @@ namespace UnitTests {
 			Assert.Empty(tree.GetChildren(c1));
 			Assert.Empty(tree.GetChildren(c2));
 		}
+
+
+		/// <summary>
+		/// Simulates behind the scenes changes to an object (which children it has) and how to sync that into the tree using <see cref="TreeView.RefreshObject(object, bool)"/>
+		/// </summary>
+		[Fact]
+		public void RefreshObject_EqualityTest()
+		{
+			var obj1 = new EqualityTestObject(){Name="Bob",Age=1 };
+			var obj2 = new EqualityTestObject(){Name="Bob",Age=2 };;
+
+			string root = "root";
+			
+			var tree = new TreeView();
+			tree.ChildrenGetter = (s)=>  ReferenceEquals(s , root) ? new object[]{obj1 } : null;
+			tree.AddObject(root);
+
+			// Tree is not expanded so the root has no children yet
+			Assert.Empty(tree.GetChildren(root));
+
+
+			tree.Expand(root);
+
+			// now that the tree is expanded we should get our child returned
+			Assert.Equal(1,tree.GetChildren(root).Count(child=>ReferenceEquals(obj1,child)));
+
+			// change the getter to return an Equal object (but not the same reference - obj2)
+			tree.ChildrenGetter = (s)=>  ReferenceEquals(s , root) ? new object[]{obj2 } : null;
+
+			// tree has cached the knowledge of what children the root has so won't know about the change (we still get obj1)
+			Assert.Equal(1,tree.GetChildren(root).Count(child=>ReferenceEquals(obj1,child)));
+
+			// now that we refresh the root we should get the new child reference (obj2)
+			tree.RefreshObject(root);
+			Assert.Equal(1,tree.GetChildren(root).Count(child=>ReferenceEquals(obj2,child)));
+
+		}
+
+		/// <summary>
+		/// Test object which considers for equality only <see cref="Name"/>
+		/// </summary>
+		private class EqualityTestObject
+		{
+			public string Name { get;set;}
+			public int Age { get;set;}
+
+			public override int GetHashCode ()
+			{
+				return Name?.GetHashCode()??base.GetHashCode ();
+			}
+			public override bool Equals (object obj)
+			{
+				return obj is EqualityTestObject eto && Equals(Name, eto.Name);
+			}
+		}
 	}
 }
