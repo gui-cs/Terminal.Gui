@@ -167,6 +167,12 @@ namespace UnitTests {
 			// The old selection was c1 which is now gone so selection should default to the parent of that branch (the factory)
 			Assert.Equal(f,tree.SelectedObject);
 		}
+
+		/// <summary>
+		/// Tests that <see cref="TreeView.GetParent(object)"/> returns the parent object for
+		/// Cars (Factories).  Note that the method only works once the parent branch (Factory)
+		/// is expanded to expose the child (Car)
+		/// </summary>
 		[Fact]
 		public void GetParent_ReturnsParentOnlyWhenExpanded()
 		{
@@ -190,6 +196,91 @@ namespace UnitTests {
 			Assert.Null(tree.GetParent(c2));
 		}
 
+		/// <summary>
+		/// Tests how the tree adapts to changes in the ChildrenGetter delegate during runtime
+		/// when some branches are expanded and the new delegate returns children for a node that
+		/// previously didn't have any children
+		/// </summary>
+		[Fact]
+		public void RefreshObject_AfterChangingChildrenGetterDuringRuntime()
+		{
+			var tree = CreateTree(out Factory f, out Car c1, out Car c2);
+			
+			string wheel = "Shiny Wheel";
+
+			// Expand the Factory
+			tree.Expand(f);
+			
+			// c1 cannot have children
+			Assert.Equal(f,tree.GetParent(c1));
+
+			// expanding it does nothing
+			tree.Expand(c1);
+			Assert.False(tree.IsExpanded(c1));
+
+			// change the children getter so that now cars can have wheels
+			tree.ChildrenGetter = (o)=>
+				// factories have cars
+				o is Factory ? new object[]{c1,c2} 
+				// cars have wheels
+				: new object[]{wheel };
+			
+			// still cannot expand
+			tree.Expand(c1);
+			Assert.False(tree.IsExpanded(c1));
+
+			tree.RefreshObject(c1);
+			tree.Expand(c1);
+			Assert.True(tree.IsExpanded(c1));
+			Assert.Equal(wheel,tree.GetChildren(c1).FirstOrDefault());
+		}
+		/// <summary>
+		/// Same as <see cref="RefreshObject_AfterChangingChildrenGetterDuringRuntime"/> but
+		/// uses <see cref="TreeView.RebuildTree()"/> instead of <see cref="TreeView.RefreshObject(object, bool)"/>
+		/// </summary>
+		[Fact]
+		public void RebuildTree_AfterChangingChildrenGetterDuringRuntime()
+		{
+			var tree = CreateTree(out Factory f, out Car c1, out Car c2);
+			
+			string wheel = "Shiny Wheel";
+
+			// Expand the Factory
+			tree.Expand(f);
+			
+			// c1 cannot have children
+			Assert.Equal(f,tree.GetParent(c1));
+
+			// expanding it does nothing
+			tree.Expand(c1);
+			Assert.False(tree.IsExpanded(c1));
+
+			// change the children getter so that now cars can have wheels
+			tree.ChildrenGetter = (o)=>
+				// factories have cars
+				o is Factory ? new object[]{c1,c2} 
+				// cars have wheels
+				: new object[]{wheel };
+			
+			// still cannot expand
+			tree.Expand(c1);
+			Assert.False(tree.IsExpanded(c1));
+
+			// Rebuild the tree
+			tree.RebuildTree();
+			
+			// Rebuild should not have collapsed any branches or done anything wierd
+			Assert.True(tree.IsExpanded(f));
+
+			tree.Expand(c1);
+			Assert.True(tree.IsExpanded(c1));
+			Assert.Equal(wheel,tree.GetChildren(c1).FirstOrDefault());
+		}
+		/// <summary>
+		/// Tests that <see cref="TreeView.GetChildren(object)"/> returns the child objects for
+		/// the factory.  Note that the method only works once the parent branch (Factory)
+		/// is expanded to expose the child (Car)
+		/// </summary>
 		[Fact]
 		public void GetChildren_ReturnsChildrenOnlyWhenExpanded()
 		{

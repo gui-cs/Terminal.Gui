@@ -76,7 +76,17 @@ namespace Terminal.Gui {
 			}
 
 		}
-
+		
+		/// <summary>
+		/// Rebuilds the tree structure for all exposed objects starting with the root objects.  Call this method when you know there are changes to the tree but don't know which objects have changed (otherwise use <see cref="RefreshObject(object, bool)"/>)
+		/// </summary>
+		public void RebuildTree()
+		{
+			foreach(var branch in roots.Values)
+				branch.Rebuild();
+			
+			SetNeedsDisplay();
+		}
 
 		/// <summary>
 		/// The root objects in the tree, note that this collection is of root objects only
@@ -608,6 +618,30 @@ namespace Terminal.Gui {
 				}
 			}
 			
+		}
+
+		/// <summary>
+		/// Calls <see cref="Refresh(bool)"/> on the current branch and all expanded children
+		/// </summary>
+		internal void Rebuild()
+		{
+			Refresh(false);
+
+			// if we know about our children
+			if(ChildBranches != null) {
+				if(IsExpanded) {
+					//if we are expanded we need to updatethe visible children
+					foreach(var child in ChildBranches) {
+						child.Value.Refresh(false);
+					}
+					
+				}
+				else {
+					// we are not expanded so should forget about children because they may not exist anymore
+					ChildBranches = null;
+				}
+			}
+				
 		}
 	}
    
