@@ -240,6 +240,32 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Initializes a new <see cref="MenuBarItem"/> with separate list of items.
+		/// </summary>
+		/// <param name="title">Title for the menu item.</param>
+		/// <param name="children">The list of items in the current menu.</param>
+		/// <param name="parent">The parent <see cref="MenuItem"/> of this if exist, otherwise is null.</param>
+		public MenuBarItem (ustring title, List<MenuItem []> children, MenuItem parent = null)
+		{
+			if (children == null) {
+				throw new ArgumentNullException (nameof (children), "The parameter cannot be null. Use an empty array instead.");
+			}
+			SetTitle (title ?? "");
+			if (parent != null) {
+				Parent = parent;
+			}
+			MenuItem [] childrens = new MenuItem [] { };
+			foreach (var item in children) {
+				for (int i = 0; i < item.Length; i++) {
+					SetChildrensParent (item);
+					Array.Resize (ref childrens, childrens.Length + 1);
+					childrens [childrens.Length - 1] = item [i];
+				}
+			}
+			Children = childrens;
+		}
+
+		/// <summary>
 		/// Initializes a new <see cref="MenuBarItem"/>.
 		/// </summary>
 		/// <param name="children">The items in the current menu.</param>
