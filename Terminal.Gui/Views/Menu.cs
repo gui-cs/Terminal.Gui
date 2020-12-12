@@ -834,7 +834,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
-			if (keyEvent.IsAlt) {
+			if (keyEvent.IsAlt || (keyEvent.IsCtrl && keyEvent.Key == (Key.CtrlMask | Key.Space))) {
 				openedByAltKey = true;
 				SetNeedsDisplay ();
 				openedByHotKey = false;
@@ -845,9 +845,10 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
-			if (keyEvent.IsAlt) {
+			if (keyEvent.IsAlt || (keyEvent.IsCtrl && keyEvent.Key == (Key.CtrlMask | Key.Space))) {
 				// User pressed Alt - this may be a precursor to a menu accelerator (e.g. Alt-F)
-				if (!keyEvent.IsCtrl && openedByAltKey && !IsMenuOpen && openMenu == null && ((uint)keyEvent.Key & (uint)Key.CharMask) == 0) {
+				if (openedByAltKey && !IsMenuOpen && openMenu == null && (((uint)keyEvent.Key & (uint)Key.CharMask) == 0
+					|| ((uint)keyEvent.Key & (uint)Key.CharMask) == (uint)Key.Space)) {
 					// There's no open menu, the first menu item should be highlight.
 					// The right way to do this is to SetFocus(MenuBar), but for some reason
 					// that faults.
