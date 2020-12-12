@@ -356,7 +356,7 @@ namespace Terminal.Gui {
 				} else if (foundPoint > 0 && c != 'm' && c != 'M') {
 					value += c.ToString ();
 				} else if (c == 'm' || c == 'M') {
-					point.Y = int.Parse (value) - 1;
+					point.Y = int.Parse (value) + Console.WindowTop - 1;
 
 					if (c == 'M') {
 						isButtonPressed = true;
