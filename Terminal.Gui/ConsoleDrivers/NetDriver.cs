@@ -305,11 +305,11 @@ namespace Terminal.Gui {
 					(mod & ConsoleModifiers.Alt) != 0,
 					(mod & ConsoleModifiers.Control) != 0);
 				break;
-			case int n when n >= 9:
+			case 7:
+				throw new NotImplementedException ("Condition not yet detected!");
+			case int n when n >= 8:
 				GetMouseEvent (cki);
 				return;
-			default:
-				break;
 			}
 			if (inputResult.EventType == EventType.key) {
 				inputResult.ConsoleKeyInfo = newConsoleKeyInfo;
