@@ -95,7 +95,11 @@ namespace Terminal.Gui {
 		static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
 		{
 			// Encode the colors into the int value.
-			return new Attribute () { value = ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff) };
+			return new Attribute (
+				value: ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff),
+				foreground: (Color)f,
+				background: (Color)b
+				);
 		}
 
 		bool isWinPlatform;
@@ -319,7 +323,7 @@ namespace Terminal.Gui {
 		int currentAttribute;
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c.value;
+			currentAttribute = c.Value;
 		}
 
 		Key MapKey (ConsoleKeyInfo keyInfo)
@@ -492,6 +496,12 @@ namespace Terminal.Gui {
 			};
 		}
 
+		public override Attribute GetAttribute ()
+		{
+			return currentAttribute;
+		}
+
+		#region Unused
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
 		}
@@ -507,6 +517,7 @@ namespace Terminal.Gui {
 		public override void UncookMouse ()
 		{
 		}
+		#endregion
 
 		//
 		// These are for the .NET driver, but running natively on Windows, wont run

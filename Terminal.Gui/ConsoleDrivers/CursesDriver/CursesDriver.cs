@@ -40,7 +40,7 @@ namespace Terminal.Gui {
 		}
 
 		static bool sync = false;
-		public override void AddRune (Rune rune) 
+		public override void AddRune (Rune rune)
 		{
 			if (Clip.Contains (ccol, crow)) {
 				if (needMove) {
@@ -91,7 +91,14 @@ namespace Terminal.Gui {
 		}
 
 		public override void UpdateScreen () => window.redrawwin ();
-		public override void SetAttribute (Attribute c) => Curses.attrset (c.value);
+
+		int currentAttribute;
+
+		public override void SetAttribute (Attribute c) {
+			currentAttribute = c.Value;
+			Curses.attrset (currentAttribute);
+		}
+
 		public Curses.Window window;
 
 		static short last_color_pair = 16;
@@ -105,7 +112,11 @@ namespace Terminal.Gui {
 		public static Attribute MakeColor (short foreground, short background)
 		{
 			Curses.InitColorPair (++last_color_pair, foreground, background);
-			return new Attribute () { value = Curses.ColorPair (last_color_pair) };
+			return new Attribute (
+				value: Curses.ColorPair (last_color_pair),
+				foreground: (Color)foreground,
+				background: (Color)background
+				);
 		}
 
 		int [,] colorPairs = new int [16, 16];
@@ -847,6 +858,11 @@ namespace Terminal.Gui {
 		{
 			//mouseGrabbed = false;
 			//Curses.mouseinterval (lastMouseInterval);
+		}
+
+		public override Attribute GetAttribute ()
+		{
+			return currentAttribute;
 		}
 	}
 

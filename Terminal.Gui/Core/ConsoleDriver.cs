@@ -61,7 +61,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		BrightGreen,
 		/// <summary>
-		/// The brigh cyan color.
+		/// The bright cyan color.
 		/// </summary>
 		BrighCyan,
 		/// <summary>
@@ -91,9 +91,18 @@ namespace Terminal.Gui {
 	///   class to define color schemes that can be used in your application.
 	/// </remarks>
 	public struct Attribute {
-		internal int value;
-		internal Color foreground;
-		internal Color background;
+		/// <summary>
+		/// The color attribute value.
+		/// </summary>
+		public int Value { get; }
+		/// <summary>
+		/// The foreground color.
+		/// </summary>
+		public Color Foreground { get; }
+		/// <summary>
+		/// The background color.
+		/// </summary>
+		public Color Background { get; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> struct.
@@ -103,9 +112,9 @@ namespace Terminal.Gui {
 		/// <param name="background">Background</param>
 		public Attribute (int value, Color foreground = new Color (), Color background = new Color ())
 		{
-			this.value = value;
-			this.foreground = foreground;
-			this.background = background;
+			Value = value;
+			Foreground = foreground;
+			Background = background;
 		}
 
 		/// <summary>
@@ -115,9 +124,9 @@ namespace Terminal.Gui {
 		/// <param name="background">Background</param>
 		public Attribute (Color foreground = new Color (), Color background = new Color ())
 		{
-			this.value = value = ((int)foreground | (int)background << 4);
-			this.foreground = foreground;
-			this.background = background;
+			Value = (int)foreground | ((int)background << 4);
+			Foreground = foreground;
+			Background = background;
 		}
 
 		/// <summary>
@@ -125,7 +134,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>The integer value stored in the attribute.</returns>
 		/// <param name="c">The attribute to convert</param>
-		public static implicit operator int (Attribute c) => c.value;
+		public static implicit operator int (Attribute c) => c.Value;
 
 		/// <summary>
 		/// Implicitly convert an integer value into an <see cref="Attribute"/>
@@ -145,6 +154,17 @@ namespace Terminal.Gui {
 			if (Application.Driver == null)
 				throw new InvalidOperationException ("The Application has not been initialized");
 			return Application.Driver.MakeAttribute (foreground, background);
+		}
+
+		/// <summary>
+		/// Gets the current <see cref="Attribute"/> from the driver.
+		/// </summary>
+		/// <returns>The current attribute.</returns>
+		public static Attribute Get ()
+		{
+			if (Application.Driver == null)
+				throw new InvalidOperationException ("The Application has not been initialized");
+			return Application.Driver.GetAttribute ();
 		}
 	}
 
@@ -201,18 +221,18 @@ namespace Terminal.Gui {
 			case "TopLevel":
 				switch (callerMemberName) {
 				case "Normal":
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.foreground, attribute.background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
 					break;
 				case "Focus":
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.foreground, attribute.background);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
 					break;
 				case "HotNormal":
-					HotFocus = Application.Driver.MakeAttribute (attribute.foreground, HotFocus.background);
+					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
 					break;
 				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.foreground, HotNormal.background);
-					if (Focus.foreground != attribute.background)
-						Focus = Application.Driver.MakeAttribute (Focus.foreground, attribute.background);
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
+					if (Focus.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
 					break;
 				}
 				break;
@@ -220,19 +240,19 @@ namespace Terminal.Gui {
 			case "Base":
 				switch (callerMemberName) {
 				case "Normal":
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.foreground, attribute.background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
 					break;
 				case "Focus":
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.foreground, attribute.background);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
 					break;
 				case "HotNormal":
-					HotFocus = Application.Driver.MakeAttribute (attribute.foreground, HotFocus.background);
-					Normal = Application.Driver.MakeAttribute (Normal.foreground, attribute.background);
+					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
+					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
 					break;
 				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.foreground, HotNormal.background);
-					if (Focus.foreground != attribute.background)
-						Focus = Application.Driver.MakeAttribute (Focus.foreground, attribute.background);
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
+					if (Focus.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
 					break;
 				}
 				break;
@@ -240,57 +260,56 @@ namespace Terminal.Gui {
 			case "Menu":
 				switch (callerMemberName) {
 				case "Normal":
-					if (Focus.background != attribute.background)
-						Focus = Application.Driver.MakeAttribute (attribute.foreground, Focus.background);
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.foreground, attribute.background);
-					Disabled = Application.Driver.MakeAttribute (Disabled.foreground, attribute.background);
+					if (Focus.Background != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus.Background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
+					Disabled = Application.Driver.MakeAttribute (Disabled.Foreground, attribute.Background);
 					break;
 				case "Focus":
-					Normal = Application.Driver.MakeAttribute (attribute.foreground, Normal.background);
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.foreground, attribute.background);
+					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal.Background);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
 					break;
 				case "HotNormal":
-					if (Focus.background != attribute.background)
-						HotFocus = Application.Driver.MakeAttribute (attribute.foreground, HotFocus.background);
-					Normal = Application.Driver.MakeAttribute (Normal.foreground, attribute.background);
-					Disabled = Application.Driver.MakeAttribute (Disabled.foreground, attribute.background);
+					if (Focus.Background != attribute.Background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
+					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
+					Disabled = Application.Driver.MakeAttribute (Disabled.Foreground, attribute.Background);
 					break;
 				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.foreground, HotNormal.background);
-					if (Focus.foreground != attribute.background)
-						Focus = Application.Driver.MakeAttribute (Focus.foreground, attribute.background);
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
+					if (Focus.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
 					break;
 				case "Disabled":
-					if (Focus.background != attribute.background)
-						HotFocus = Application.Driver.MakeAttribute (attribute.foreground, HotFocus.background);
-					Normal = Application.Driver.MakeAttribute (Normal.foreground, attribute.background);
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.foreground, attribute.background);
+					if (Focus.Background != attribute.Background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
+					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
 					break;
-
 				}
 				break;
 
 			case "Dialog":
 				switch (callerMemberName) {
 				case "Normal":
-					if (Focus.background != attribute.background)
-						Focus = Application.Driver.MakeAttribute (attribute.foreground, Focus.background);
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.foreground, attribute.background);
+					if (Focus.Background != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (attribute.Foreground, Focus.Background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
 					break;
 				case "Focus":
-					Normal = Application.Driver.MakeAttribute (attribute.foreground, Normal.background);
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.foreground, attribute.background);
+					Normal = Application.Driver.MakeAttribute (attribute.Foreground, Normal.Background);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
 					break;
 				case "HotNormal":
-					if (Focus.background != attribute.background)
-						HotFocus = Application.Driver.MakeAttribute (attribute.foreground, HotFocus.background);
-					if (Normal.foreground != attribute.background)
-						Normal = Application.Driver.MakeAttribute (Normal.foreground, attribute.background);
+					if (Focus.Background != attribute.Background)
+						HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, HotFocus.Background);
+					if (Normal.Foreground != attribute.Background)
+						Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
 					break;
 				case "HotFocus":
-					HotNormal = Application.Driver.MakeAttribute (attribute.foreground, HotNormal.background);
-					if (Focus.foreground != attribute.background)
-						Focus = Application.Driver.MakeAttribute (Focus.foreground, attribute.background);
+					HotNormal = Application.Driver.MakeAttribute (attribute.Foreground, HotNormal.Background);
+					if (Focus.Foreground != attribute.Background)
+						Focus = Application.Driver.MakeAttribute (Focus.Foreground, attribute.Background);
 					break;
 				}
 				break;
@@ -298,17 +317,16 @@ namespace Terminal.Gui {
 			case "Error":
 				switch (callerMemberName) {
 				case "Normal":
-					HotNormal = Application.Driver.MakeAttribute (HotNormal.foreground, attribute.background);
-					HotFocus = Application.Driver.MakeAttribute (HotFocus.foreground, attribute.background);
+					HotNormal = Application.Driver.MakeAttribute (HotNormal.Foreground, attribute.Background);
+					HotFocus = Application.Driver.MakeAttribute (HotFocus.Foreground, attribute.Background);
 					break;
 				case "HotNormal":
 				case "HotFocus":
-					HotFocus = Application.Driver.MakeAttribute (attribute.foreground, attribute.background);
-					Normal = Application.Driver.MakeAttribute (Normal.foreground, attribute.background);
+					HotFocus = Application.Driver.MakeAttribute (attribute.Foreground, attribute.Background);
+					Normal = Application.Driver.MakeAttribute (Normal.Foreground, attribute.Background);
 					break;
 				}
 				break;
-
 			}
 			preparingScheme = false;
 			return attribute;
@@ -383,7 +401,7 @@ namespace Terminal.Gui {
 	public static class Colors {
 		static Colors ()
 		{
-			// Use reflection to dynamically create the default set of ColorSchemes from the list defiined 
+			// Use reflection to dynamically create the default set of ColorSchemes from the list defined 
 			// by the class. 
 			ColorSchemes = typeof (Colors).GetProperties ()
 				.Where (p => p.PropertyType == typeof (ColorScheme))
@@ -661,7 +679,7 @@ namespace Terminal.Gui {
 		/// <param name="paddingTop">Number of rows to pad on the top (if 0 the border and title will not appear on the top).</param>
 		/// <param name="paddingRight">Number of columns to pad on the right (if 0 the border will not appear on the right).</param>
 		/// <param name="paddingBottom">Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).</param>
-		/// <param name="textAlignment">Not yet immplemented.</param>
+		/// <param name="textAlignment">Not yet implemented.</param>
 		/// <remarks></remarks>
 		public virtual void DrawWindowTitle (Rect region, ustring title, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom, TextAlignment textAlignment = TextAlignment.Left)
 		{
@@ -676,7 +694,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Enables diagnostic funcions
+		/// Enables diagnostic functions
 		/// </summary>
 		[Flags]
 		public enum DiagnosticFlags : uint {
@@ -867,7 +885,7 @@ namespace Terminal.Gui {
 		/// <param name="region">Screen relative region where the frame will be drawn.</param>
 		/// <param name="padding">Padding to add on the sides.</param>
 		/// <param name="fill">If set to <c>true</c> it will clear the contents with the current color, otherwise the contents will be left untouched.</param>
-		/// <remarks>This API has been superceded by <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/>.</remarks>
+		/// <remarks>This API has been superseded by <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool)"/>.</remarks>
 		/// <remarks>This API is equivalent to calling <c>DrawWindowFrame(Rect, p - 1, p - 1, p - 1, p - 1)</c>. In other words,
 		/// A padding value of 0 means there is actually a one cell border.
 		/// </remarks>
@@ -1053,5 +1071,11 @@ namespace Terminal.Gui {
 		/// <param name="back">Background.</param>
 		/// <returns></returns>
 		public abstract Attribute MakeAttribute (Color fore, Color back);
+
+		/// <summary>
+		/// Gets the current <see cref="Attribute"/>.
+		/// </summary>
+		/// <returns>The current attribute.</returns>
+		public abstract Attribute GetAttribute ();
 	}
 }

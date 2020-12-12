@@ -1236,17 +1236,17 @@ namespace Terminal.Gui {
 
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c.value;
+			currentAttribute = c.Value;
 		}
 
 		Attribute MakeColor (ConsoleColor f, ConsoleColor b)
 		{
 			// Encode the colors into the int value.
-			return new Attribute () {
-				value = ((int)f | (int)b << 4),
-				foreground = (Color)f,
-				background = (Color)b
-			};
+			return new Attribute (
+				value: ((int)f | (int)b << 4),
+				foreground: (Color)f,
+				background: (Color)b
+			);
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)
@@ -1310,6 +1310,11 @@ namespace Terminal.Gui {
 		public override void End ()
 		{
 			winConsole.Cleanup ();
+		}
+
+		public override Attribute GetAttribute ()
+		{
+			return currentAttribute;
 		}
 
 		#region Unused
