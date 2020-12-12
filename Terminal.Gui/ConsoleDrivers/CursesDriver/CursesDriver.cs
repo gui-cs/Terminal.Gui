@@ -635,6 +635,7 @@ namespace Terminal.Gui {
 				}
 				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				keyUpHandler (new KeyEvent (k, MapKeyModifiers (k)));
 			}
 			// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
 			// will not impact KeyUp.
