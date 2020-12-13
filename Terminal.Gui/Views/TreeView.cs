@@ -7,14 +7,76 @@ using System.Linq;
 namespace Terminal.Gui {
 
 	/// <summary>
+	/// Interface to implement when you want <see cref="TreeView"/> to automatically determine children for your class
+	/// </summary>
+	public interface ITreeNode
+	{
+		/// <summary>
+		/// The children of your class which should be rendered underneath it when expanded
+		/// </summary>
+		/// <value></value>
+		IList<ITreeNode> Children {get;}
+
+		/// <summary>
+		/// The textual representation to be rendered when your class is visible in the tree
+		/// </summary>
+		/// <value></value>
+		string Text {get;}
+	}
+
+	/// <summary>
+	/// Simple class for representing nodes of a <see cref="TreeView"/>
+	/// </summary>
+	public class TreeNode : ITreeNode
+	{
+		/// <summary>
+		/// Children of the current node
+		/// </summary>
+		/// <returns></returns>
+		public IList<ITreeNode> Children {get;set;} = new List<ITreeNode>();
+		
+		/// <summary>
+		/// Text to display in tree node for current entry
+		/// </summary>
+		/// <value></value>
+		public string Text {get;set;}
+
+		/// <summary>
+		/// returns <see cref="Text"/>
+		/// </summary>
+		/// <returns></returns>
+		public override string ToString()
+		{
+			return Text;
+		}
+
+		/// <summary>
+		/// Initialises a new instance with no <see cref="Text"/>
+		/// </summary>
+		public TreeNode()
+		{
+			
+		}
+		/// <summary>
+		/// Initialises a new instance and sets starting <see cref="Text"/>
+		/// </summary>
+		public TreeNode(string text)
+		{
+			Text = text;
+		}
+
+
+	}
+
+	/// <summary>
 	/// Hierarchical tree view with expandable branches.  Branch objects are dynamically determined when expanded using a user defined <see cref="ChildrenGetterDelegate"/>
 	/// </summary>
 	public class TreeView : View
 	{   
 		/// <summary>
-		/// Default implementation of a <see cref="ChildrenGetterDelegate"/>, returns an empty collection (i.e. no children)
+		/// Default implementation of a <see cref="ChildrenGetterDelegate"/>.  Supports returning children of <see cref="ITreeNode"/> or otherwise returns an empty collection (i.e. no children)
 		/// </summary>
-		static ChildrenGetterDelegate DefaultChildrenGetter = (s)=>{return new object[0];};
+		static ChildrenGetterDelegate DefaultChildrenGetter = (s)=>{return s is ITreeNode n ? n.Children : Enumerable.Empty<object>();};
 
 		/// <summary>
 		/// This is the delegate that will be used to fetch the children of a model object
@@ -27,6 +89,12 @@ namespace Terminal.Gui {
 		private ChildrenGetterDelegate childrenGetter;
 		private CanExpandGetterDelegate canExpandGetter;
 		private int scrollOffset;
+
+		/// <summary>
+		/// True to render vertical lines under expanded nodes to show which node belongs to which parent.  False to use only whitespace
+		/// </summary>
+		/// <value></value>
+		public bool ShowBranchLines {get;set;} = true;
 
 		/// <summary>
 		/// Optional delegate where <see cref="ChildrenGetter"/> is expensive.  This should quickly return true/false for whether an object is expandable.  (e.g. indicating to a user that all folders can be expanded because they are folders without having to calculate contents)
@@ -96,7 +164,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Map of root objects to the branches under them.  All objects have a <see cref="Branch"/> even if that branch has no children
 		/// </summary>
-		Dictionary<object,Branch> roots {get; set;} = new Dictionary<object, Branch>();
+		internal Dictionary<object,Branch> roots {get; set;} = new Dictionary<object, Branch>();
 
 		/// <summary>
 		/// The amount of tree view that has been scrolled off the top of the screen (by the user scrolling down)
@@ -284,17 +352,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Symbol to use for expanded branch nodes to indicate to the user that they can be collapsed.  Defaults to '-'
 		/// </summary>
-		public char ExpandedSymbol {get;set;} = '-';
+		public Rune ExpandedSymbol {get;set;} = '-';
 
 		/// <summary>
 		/// Symbol to use for branch nodes that can be expanded to indicate this to the user.  Defaults to '+'
 		/// </summary>
-		public char ExpandableSymbol {get;set;} = '+';
-
-		/// <summary>
-		/// Symbol to use for branch nodes that cannot be expanded (as they have no children).  Defaults to space ' '
-		/// </summary>
-		public char LeafSymbol {get;set;} = ' ';
+		public Rune ExpandableSymbol {get;set;} = '+';
 
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
@@ -304,7 +367,7 @@ namespace Terminal.Gui {
 					Expand(SelectedObject);
 				break;
 				case Key.CursorLeft:
-					Collapse(SelectedObject);
+					CursorLeft();
 				break;
 			
 				case Key.CursorUp:
@@ -334,6 +397,23 @@ namespace Terminal.Gui {
 
 			PositionCursor ();
 			return true;
+		}
+
+		/// <summary>
+		/// Determines systems behaviour when the left arrow key is pressed.  Default behaviour is to collapse the current tree node if possible otherwise changes selection to current branches parent
+		/// </summary>
+		protected virtual void CursorLeft()
+		{
+			if(IsExpanded(SelectedObject))
+				Collapse(SelectedObject);
+			else
+			{
+				var parent = GetParent(SelectedObject);
+				if(parent != null){
+					SelectedObject = parent;
+					SetNeedsDisplay();
+				}
+			}
 		}
 
 		/// <summary>
@@ -476,7 +556,7 @@ namespace Terminal.Gui {
 		public Branch Parent {get; private set;}
 
 		private TreeView tree;
-
+		
 		/// <summary>
 		/// Declares a new branch of <paramref name="tree"/> in which the users object <paramref name="model"/> is presented
 		/// </summary>
@@ -517,31 +597,91 @@ namespace Terminal.Gui {
 		/// <param name="availableWidth"></param>
 		public virtual void Draw(ConsoleDriver driver,ColorScheme colorScheme, int y, int availableWidth)
 		{
-			string representation = new string(' ',Depth) + GetExpandableIcon() + tree.AspectGetter(Model);
-            
+
+			// Everything on line before the expansion run and branch text
+			string prefix = GetLinePrefix(driver);
+			var expansion = GetExpandableIcon(driver);
+			string lineBody = tree.AspectGetter(Model);
+
+			var remainingWidth = availableWidth - (prefix.Length + 1 + lineBody.Length);
+			            
 			tree.Move(0,y);
+
+			driver.SetAttribute(colorScheme.Normal);
+
+			driver.AddStr(prefix + expansion);
 
 			driver.SetAttribute(tree.SelectedObject == Model ?
 				colorScheme.HotFocus :
 				colorScheme.Normal);
 
-			driver.AddStr(representation.PadRight(availableWidth));
+			driver.AddStr(lineBody);
+
+			driver.SetAttribute(colorScheme.Normal);
+
+			if(remainingWidth > 0)
+				driver.AddStr(new string(' ',remainingWidth));
+		}
+
+		/// <summary>
+		/// Gets all characters to render prior to the current branches line.  This includes indentation whitespace and any tree branches (if enabled)
+		/// </summary>
+		/// <param name="driver"></param>
+		/// <returns></returns>
+		private string GetLinePrefix (ConsoleDriver driver)
+		{
+			// If not showing line branches or this is a root object
+			if(!tree.ShowBranchLines || Parent == null)
+				return new string(' ',Depth);
+
+			string prefix = "";
+
+			foreach(var cur in GetParentBranches().Reverse())
+			{
+				if(cur.IsLast())
+					prefix += " ";
+				else
+					prefix += driver.VLine;
+			}
+
+			if(IsLast())
+				return prefix + driver.LLCorner;
+			else
+				return prefix + driver.LeftTee;
+		}
+
+		/// <summary>
+		/// Returns all parents starting with the immediate parent and ending at the root
+		/// </summary>
+		/// <returns></returns>
+		private IEnumerable<Branch> GetParentBranches()
+		{
+			var cur = Parent;
+
+			while(cur != null)
+			{
+				yield return cur;
+				cur = cur.Parent;
+			}
 		}
 
 		/// <summary>
 		/// Returns an appropriate symbol for displaying next to the string representation of the <see cref="Model"/> object to indicate whether it <see cref="IsExpanded"/> or not (or it is a leaf)
 		/// </summary>
+		/// <param name="driver"></param>
 		/// <returns></returns>
-		public char GetExpandableIcon()
+		public Rune GetExpandableIcon(ConsoleDriver driver)
 		{
 			if(IsExpanded)
 				return tree.ExpandedSymbol;
+
+			var leafSymbol = tree.ShowBranchLines ? driver.HLine : ' ';
 
 			if(ChildBranches == null) {
 			
 				//if there is a rapid method for determining whether there are children
 				if(tree.CanExpandGetter != null) {
-					return tree.CanExpandGetter(Model) ? tree.ExpandableSymbol : tree.LeafSymbol;
+					return tree.CanExpandGetter(Model) ? tree.ExpandableSymbol : leafSymbol;
 				}
 				
 				//there is no way of knowing whether we can expand without fetching the children
@@ -549,7 +689,7 @@ namespace Terminal.Gui {
 			}
 
 			//we fetched or already know the children, so return whether we are a leaf or a expandable branch
-			return ChildBranches.Any() ? tree.ExpandableSymbol : tree.LeafSymbol;
+			return ChildBranches.Any() ? tree.ExpandableSymbol : leafSymbol;
 		}
 
 		/// <summary>
@@ -642,6 +782,18 @@ namespace Terminal.Gui {
 				}
 			}
 				
+		}
+
+		/// <summary>
+		/// Returns true if this branch has parents and it is the last node of it's parents branches (or last root of the tree)
+		/// </summary>
+		/// <returns></returns>
+		private bool IsLast()
+		{
+			if(Parent == null)
+				return this == tree.roots.Values.LastOrDefault();
+
+			return Parent.ChildBranches.Values.LastOrDefault() == this;
 		}
 	}
    
