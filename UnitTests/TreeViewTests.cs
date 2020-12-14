@@ -305,6 +305,21 @@ namespace UnitTests {
 			Assert.Empty(tree.GetChildren(c2));
 		}
 
+		[Fact]
+		public void TreeNode_WorksWithoutDelegate()
+		{
+			var tree = new TreeView();
+
+			var root = new TreeNode("Root");
+			root.Children.Add(new TreeNode("Leaf1"));
+			root.Children.Add(new TreeNode("Leaf2"));
+
+			tree.AddObject(root);
+
+			tree.Expand(root);
+			Assert.Equal(2,tree.GetChildren(root).Count());
+		}
+
 
 		/// <summary>
 		/// Simulates behind the scenes changes to an object (which children it has) and how to sync that into the tree using <see cref="TreeView.RefreshObject(object, bool)"/>
