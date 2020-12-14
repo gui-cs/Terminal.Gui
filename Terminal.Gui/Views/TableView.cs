@@ -230,7 +230,7 @@ namespace Terminal.Gui.Views {
 					line++;
 				}
 
-				RenderHeaderMidline(line,bounds.Width,columnsToRender);
+				RenderHeaderMidline(line,columnsToRender);
 				line++;
 
 				if(Style.ShowHorizontalHeaderUnderline){
@@ -251,7 +251,7 @@ namespace Terminal.Gui.Views {
 				if ( Table == null || rowToRender >= Table.Rows.Count || rowToRender < 0)
 					continue;
 
-				RenderRow(line,bounds.Width,rowToRender,columnsToRender);
+				RenderRow(line,rowToRender,columnsToRender);
 			}
 		}
 
@@ -311,12 +311,12 @@ namespace Terminal.Gui.Views {
 			}
 		}
 
-		private void RenderHeaderMidline(int row,int availableWidth, ColumnToRender[] columnsToRender)
+		private void RenderHeaderMidline(int row, ColumnToRender[] columnsToRender)
 		{
 			// Renders something like:
 			// │ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
 						
-			ClearLine(row,availableWidth);
+			ClearLine(row,Bounds.Width);
 
 			//render start of line
 			if(style.ShowVerticalHeaderLines)
@@ -325,7 +325,7 @@ namespace Terminal.Gui.Views {
 			for(int i =0 ; i<columnsToRender.Length;i++) {
 				
 				var current =  columnsToRender[i];
-				var availableWidthForCell = GetCellWidth(columnsToRender,i,availableWidth);
+				var availableWidthForCell = GetCellWidth(columnsToRender,i);
 
 				var colStyle = Style.GetColumnStyleIfAny(current.Column);
 				var colName = current.Column.ColumnName;
@@ -340,7 +340,7 @@ namespace Terminal.Gui.Views {
 
 			//render end of line
 			if(style.ShowVerticalHeaderLines)
-				AddRune(availableWidth-1,row,Driver.VLine);
+				AddRune(Bounds.Width-1,row,Driver.VLine);
 		}
 
 		/// <summary>
@@ -348,15 +348,14 @@ namespace Terminal.Gui.Views {
 		/// </summary>
 		/// <param name="columnsToRender"></param>
 		/// <param name="i"></param>
-		/// <param name="availableWidth"></param>
-		private int GetCellWidth (ColumnToRender [] columnsToRender, int i,int availableWidth)
+		private int GetCellWidth (ColumnToRender [] columnsToRender, int i)
 		{
 			var current =  columnsToRender[i];
 			var next = i+1 < columnsToRender.Length ? columnsToRender[i+1] : null;
 
 			if(next == null) {
 				// cell can fill to end of the line
-				return availableWidth - current.X;
+				return Bounds.Width - current.X;
 			}
 			else {
 				// cell can fill up to next cell start				
@@ -393,7 +392,7 @@ namespace Terminal.Gui.Views {
 			}
 			
 		}
-		private void RenderRow(int row, int availableWidth, int rowToRender, ColumnToRender[] columnsToRender)
+		private void RenderRow(int row, int rowToRender, ColumnToRender[] columnsToRender)
 		{
 			//render start of line
 			if(style.ShowVerticalCellLines)
@@ -403,7 +402,7 @@ namespace Terminal.Gui.Views {
 			for(int i=0;i< columnsToRender.Length ;i++) {
 
 				var current = columnsToRender[i];
-				var availableWidthForCell = GetCellWidth(columnsToRender,i,availableWidth);
+				var availableWidthForCell = GetCellWidth(columnsToRender,i);
 
 				var colStyle = Style.GetColumnStyleIfAny(current.Column);
 
@@ -428,7 +427,7 @@ namespace Terminal.Gui.Views {
 
 			//render end of line
 			if(style.ShowVerticalCellLines)
-				AddRune(availableWidth-1,row,Driver.VLine);
+				AddRune(Bounds.Width-1,row,Driver.VLine);
 		}
 		
 		private void RenderSeparator(int col, int row,bool isHeader)
@@ -456,7 +455,7 @@ namespace Terminal.Gui.Views {
 		/// <param name="availableHorizontalSpace"></param>
 		/// <param name="colStyle">Optional style indicating custom alignment for the cell</param>
 		/// <returns></returns>
-		private ustring TruncateOrPad (object originalCellValue,string representation, int availableHorizontalSpace, ColumnStyle colStyle)
+		private string TruncateOrPad (object originalCellValue,string representation, int availableHorizontalSpace, ColumnStyle colStyle)
 		{
 			if (string.IsNullOrEmpty (representation))
 				return representation;
@@ -465,29 +464,23 @@ namespace Terminal.Gui.Views {
 			if(representation.Length < availableHorizontalSpace) {
 				
 				// pad it out with spaces to the given alignment
-				int toPad = availableHorizontalSpace - representation.Length;
+				int toPad = availableHorizontalSpace - (representation.Length+1 /*leave 1 space for cell boundary*/);
 
 				switch(colStyle?.GetAlignment(originalCellValue) ?? TextAlignment.Left) {
 
 					case TextAlignment.Left : 
-						representation = representation.PadRight(toPad);
-						break;
+						return representation + new string(' ',toPad);
 					case TextAlignment.Right : 
-						representation = representation.PadLeft(toPad);
-						break;
+						return new string(' ',toPad) + representation;
 					
 					// TODO: With single line cells, centered and justified are the same right?
 					case TextAlignment.Centered : 
 					case TextAlignment.Justified : 
-						//round down
-						representation = representation.PadRight((int)Math.Floor(toPad/2.0));
-						//round up
-						representation = representation.PadLeft((int)Math.Ceiling(toPad/2.0));
-						break;
-
+						return 
+							new string(' ',(int)Math.Floor(toPad/2.0)) + // round down
+							representation +
+							 new string(' ',(int)Math.Ceiling(toPad/2.0)) ; // round up
 				}
-				
-				return representation;
 			}
 
 			// value is too wide
