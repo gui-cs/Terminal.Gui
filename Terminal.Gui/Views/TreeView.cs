@@ -631,7 +631,7 @@ namespace Terminal.Gui {
 		private string GetLinePrefix (ConsoleDriver driver)
 		{
 			// If not showing line branches or this is a root object
-			if(!tree.ShowBranchLines || Parent == null)
+			if(!tree.ShowBranchLines)
 				return new string(' ',Depth);
 
 			string prefix = "";
