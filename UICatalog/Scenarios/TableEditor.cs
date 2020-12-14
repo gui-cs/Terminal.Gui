@@ -38,6 +38,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_CellLines", "", () => ToggleCellLines()),
 					new MenuItem ("_AllLines", "", () => ToggleAllCellLines()),
 					new MenuItem ("_NoLines", "", () => ToggleNoCellLines()),
+					new MenuItem ("_ClearColumnStyles", "", () => ClearColumnStyles()),
 				}),
 			});
 			Top.Add (menu);
@@ -62,7 +63,11 @@ namespace UICatalog.Scenarios {
 			Win.Add (tableView);
 		}
 
-
+		private void ClearColumnStyles ()
+		{
+			tableView.Style.ColumnStyles.Clear();
+			tableView.Update();
+		}
 
 		private void ToggleAlwaysShowHeader ()
 		{
@@ -121,10 +126,48 @@ namespace UICatalog.Scenarios {
 		private void OpenExample (bool big)
 		{
 			tableView.Table = BuildDemoDataTable(big ? 30 : 5, big ? 1000 : 5);
+			SetDemoTableStyles();
 		}
+
+		private void SetDemoTableStyles ()
+		{
+			var alignMid = new ColumnStyle() {
+				Alignment = TextAlignment.Centered
+			};
+			var alignRight = new ColumnStyle() {
+				Alignment = TextAlignment.Right
+			};
+
+			var dateFormatStyle = new ColumnStyle() {
+				Alignment = TextAlignment.Right,
+				RepresentationGetter = (v)=> v is DateTime d ? d.ToString("yyyy-MM-dd"):v.ToString()
+			};
+
+			var negativeRight = new ColumnStyle() {
+				
+				RepresentationGetter = (v)=> v is double d ? 
+								d.ToString("0.##"):
+								v.ToString(),
+				MinWidth = 10,
+				AlignmentGetter = (v)=>v is double d ? 
+								// align negative values right
+								d < 0 ? TextAlignment.Right : 
+								// align positive values left
+								TextAlignment.Left:
+								// not a double
+								TextAlignment.Left
+			};
+			
+			tableView.Style.ColumnStyles.Add(tableView.Table.Columns["DateCol"],dateFormatStyle);
+			tableView.Style.ColumnStyles.Add(tableView.Table.Columns["DoubleCol"],negativeRight);
+			tableView.Style.ColumnStyles.Add(tableView.Table.Columns["NullsCol"],alignMid);
+			tableView.Style.ColumnStyles.Add(tableView.Table.Columns["IntCol"],alignRight);
+			
+			tableView.Update();
+		}
+
 		private void OpenSimple (bool big)
 		{
-			
 			tableView.Table = BuildSimpleDataTable(big ? 30 : 5, big ? 1000 : 5);
 		}
 
@@ -202,7 +245,7 @@ namespace UICatalog.Scenarios {
 					"Some long text that is super cool",
 					new DateTime(2000+i,12,25),
 					r.Next(i),
-					r.NextDouble()*i,
+					(r.NextDouble()*i)-0.5 /*add some negatives to demo styles*/,
 					DBNull.Value
 				};
 				
