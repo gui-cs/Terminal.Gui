@@ -6,6 +6,9 @@ using System.Linq;
 
 namespace Terminal.Gui.Views {
 
+	/// <summary>
+	/// Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> and textual representation of cells (e.g. date formats)
+	/// </summary>
 	public class ColumnStyle {
 		
 		/// <summary>
@@ -448,7 +451,7 @@ namespace Terminal.Gui.Views {
 		}
 
 		/// <summary>
-		/// Truncates or pads <paramref name="representation"/> so that it occupies a exactly <paramref name="availableHorizontalSpace"/> using the alignment specified in <paramref name="style"/> (or left if no style is defined)
+		/// Truncates or pads <paramref name="representation"/> so that it occupies a exactly <paramref name="availableHorizontalSpace"/> using the alignment specified in <paramref name="colStyle"/> (or left if no style is defined)
 		/// </summary>
 		/// <param name="originalCellValue">The object in this cell of the <see cref="Table"/></param>
 		/// <param name="representation">The string representation of <paramref name="originalCellValue"/></param>
