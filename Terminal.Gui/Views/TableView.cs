@@ -254,7 +254,7 @@ namespace Terminal.Gui.Views {
 				//where the header should start
 				var col = kvp.Value;
 
-				RenderSeparator(col-1,row);
+				RenderSeparator(col-1,row,true);
 									
 				Move (col, row);
 				Driver.AddStr(Truncate (kvp.Key.ColumnName, availableWidth - kvp.Value));
@@ -297,7 +297,7 @@ namespace Terminal.Gui.Views {
 		private void RenderRow(int row, int availableWidth, int rowToRender, Dictionary<DataColumn, int> columnsToRender)
 		{
 			//render start of line
-			if(style.ShowVerticalHeaderLines)
+			if(style.ShowVerticalCellLines)
 				AddRune(0,row,Driver.VLine);
 
 			// Render cells for each visible header for the current row
@@ -316,20 +316,22 @@ namespace Terminal.Gui.Views {
 				
 				// Reset color scheme to normal and render the vertical line (or space) at the end of the cell
 				Driver.SetAttribute (ColorScheme.Normal);
-				RenderSeparator(kvp.Value-1,row);
+				RenderSeparator(kvp.Value-1,row,false);
 			}
 
 			//render end of line
-			if(style.ShowVerticalHeaderLines)
+			if(style.ShowVerticalCellLines)
 				AddRune(availableWidth-1,row,Driver.VLine);
 		}
 		
-		private void RenderSeparator(int col, int row)
+		private void RenderSeparator(int col, int row,bool isHeader)
 		{
 			if(col<0)
 				return;
+				
+			var renderLines = isHeader ? style.ShowVerticalHeaderLines : style.ShowVerticalCellLines;
 
-			Rune symbol = style.ShowVerticalHeaderLines ? Driver.VLine : SeparatorSymbol;
+			Rune symbol =  renderLines ? Driver.VLine : SeparatorSymbol;
 			AddRune(col,row,symbol);
 		}
 
@@ -468,7 +470,7 @@ namespace Terminal.Gui.Views {
 
 			//if horizontal space is required at the start of the line (before the first header)
 			if(Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines)
-				usedSpace+=2;
+				usedSpace+=1;
 			
 			int availableHorizontalSpace = bounds.Width;
 			int rowsToRender = bounds.Height;
@@ -500,6 +502,9 @@ namespace Terminal.Gui.Views {
 
 		private bool ShouldRenderHeaders()
 		{
+			if(Table == null || Table.Columns.Count == 0)
+				return false;
+
 		    return Style.AlwaysShowHeaders || rowOffset == 0;
 		}
 
