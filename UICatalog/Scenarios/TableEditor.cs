@@ -30,6 +30,15 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_CloseExample", "", () => CloseExample()),
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
+				new MenuBarItem ("_View", new MenuItem [] {
+					new MenuItem ("_AlwaysShowHeaders", "", () => ToggleAlwaysShowHeader()),
+					new MenuItem ("_HeaderOverLine", "", () => ToggleOverline()),
+					new MenuItem ("_HeaderMidLine", "", () => ToggleHeaderMidline()),
+					new MenuItem ("_HeaderUnderLine", "", () => ToggleUnderline()),
+					new MenuItem ("_CellLines", "", () => ToggleCellLines()),
+					new MenuItem ("_AllLines", "", () => ToggleAllCellLines()),
+					new MenuItem ("_NoLines", "", () => ToggleNoCellLines()),
+				}),
 			});
 			Top.Add (menu);
 
@@ -38,6 +47,7 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Key.F2, "~F2~ OpenExample", () => OpenExample(true)),
 				new StatusItem(Key.F3, "~F3~ EditCell", () => EditCurrentCell()),
 				new StatusItem(Key.F4, "~F4~ CloseExample", () => CloseExample()),
+				new StatusItem(Key.F5, "~F5~ OpenSimple", () => OpenSimple(true)),
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 			});
 			Top.Add (statusBar);
@@ -52,6 +62,52 @@ namespace UICatalog.Scenarios {
 			Win.Add (tableView);
 		}
 
+
+
+		private void ToggleAlwaysShowHeader ()
+		{
+			tableView.Style.AlwaysShowHeaders = !tableView.Style.AlwaysShowHeaders;
+			tableView.Update();
+		}
+
+		private void ToggleOverline ()
+		{
+			tableView.Style.ShowHorizontalHeaderOverline = !tableView.Style.ShowHorizontalHeaderOverline;
+			tableView.Update();
+		}
+		private void ToggleHeaderMidline ()
+		{
+			tableView.Style.ShowVerticalHeaderLines = !tableView.Style.ShowVerticalHeaderLines;
+			tableView.Update();
+		}
+		private void ToggleUnderline ()
+		{
+			tableView.Style.ShowHorizontalHeaderUnderline = !tableView.Style.ShowHorizontalHeaderUnderline;
+			tableView.Update();
+		}
+		private void ToggleCellLines()
+		{
+			tableView.Style.ShowVerticalCellLines = !tableView.Style.ShowVerticalCellLines;
+			tableView.Update();
+		}
+		private void ToggleAllCellLines()
+		{
+			tableView.Style.ShowHorizontalHeaderOverline = true;
+			tableView.Style.ShowVerticalHeaderLines = true;
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.ShowVerticalCellLines = true;
+			tableView.Update();
+		}
+		private void ToggleNoCellLines()
+		{
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.ShowVerticalHeaderLines = false;
+			tableView.Style.ShowHorizontalHeaderUnderline = false;
+			tableView.Style.ShowVerticalCellLines = false;
+			tableView.Update();
+		}
+		
+
 		private void CloseExample ()
 		{
 			tableView.Table = null;
@@ -65,6 +121,11 @@ namespace UICatalog.Scenarios {
 		private void OpenExample (bool big)
 		{
 			tableView.Table = BuildDemoDataTable(big ? 30 : 5, big ? 1000 : 5);
+		}
+		private void OpenSimple (bool big)
+		{
+			
+			tableView.Table = BuildSimpleDataTable(big ? 30 : 5, big ? 1000 : 5);
 		}
 
 		private void EditCurrentCell ()
@@ -152,6 +213,33 @@ namespace UICatalog.Scenarios {
 				dt.Rows.Add(row.ToArray());
 			}
 
+			return dt;
+		}
+
+		/// <summary>
+		/// Builds a simple table in which cell values contents are the index of the cell.  This helps testing that scrolling etc is working correctly and not skipping out any rows/columns when paging
+		/// </summary>
+		/// <param name="cols"></param>
+		/// <param name="rows"></param>
+		/// <returns></returns>
+		public static DataTable BuildSimpleDataTable(int cols, int rows)
+		{
+			var dt = new DataTable();
+
+			for(int c = 0; c < cols; c++) {
+				dt.Columns.Add("Col"+c);
+			}
+				
+			for(int r = 0; r < rows; r++) {
+				var newRow = dt.NewRow();
+
+				for(int c = 0; c < cols; c++) {
+					newRow[c] = $"R{r}C{c}";
+				}
+
+				dt.Rows.Add(newRow);
+			}
+			
 			return dt;
 		}
 	}
