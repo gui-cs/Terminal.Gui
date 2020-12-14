@@ -597,10 +597,9 @@ namespace Terminal.Gui {
 		/// <param name="availableWidth"></param>
 		public virtual void Draw(ConsoleDriver driver,ColorScheme colorScheme, int y, int availableWidth)
 		{
-
 			// Everything on line before the expansion run and branch text
-			string prefix = GetLinePrefix(driver);
-			var expansion = GetExpandableIcon(driver);
+			Rune[] prefix = GetLinePrefix(driver).ToArray();
+			Rune expansion = GetExpandableIcon(driver);
 			string lineBody = tree.AspectGetter(Model);
 
 			var remainingWidth = availableWidth - (prefix.Length + 1 + lineBody.Length);
@@ -609,7 +608,10 @@ namespace Terminal.Gui {
 
 			driver.SetAttribute(colorScheme.Normal);
 
-			driver.AddStr(prefix + expansion);
+			foreach(Rune r in prefix)
+				driver.AddRune(r);
+
+			driver.AddRune(expansion);
 
 			driver.SetAttribute(tree.SelectedObject == Model ?
 				colorScheme.HotFocus :
@@ -628,26 +630,28 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="driver"></param>
 		/// <returns></returns>
-		private string GetLinePrefix (ConsoleDriver driver)
+		private IEnumerable<Rune> GetLinePrefix (ConsoleDriver driver)
 		{
 			// If not showing line branches or this is a root object
-			if(!tree.ShowBranchLines)
-				return new string(' ',Depth);
+			if (!tree.ShowBranchLines) {
+				for(int i = 0; i < Depth; i++) {
+					yield return new Rune(' ');
+				}
+			}
 
-			string prefix = "";
-
+			// yield indentations with runes appropriate to the state of the parents
 			foreach(var cur in GetParentBranches().Reverse())
 			{
 				if(cur.IsLast())
-					prefix += " ";
+					yield return new Rune(' ');
 				else
-					prefix += driver.VLine;
+					yield return driver.VLine;
 			}
 
 			if(IsLast())
-				return prefix + driver.LLCorner;
+				yield return driver.LLCorner;
 			else
-				return prefix + driver.LeftTee;
+				yield return driver.LeftTee;
 		}
 
 		/// <summary>
