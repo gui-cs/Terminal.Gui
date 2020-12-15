@@ -213,6 +213,11 @@ namespace Terminal.Gui {
 		public bool ShowBranchLines {get;set;} = true;
 
 		/// <summary>
+		/// True to render <see cref="ExpandableSymbol"/> next to branches that can be expanded.  Defaults to true
+		/// </summary>
+		public bool ShowExpandableSymbol {get;set;} = true;
+
+		/// <summary>
 		/// Determines how sub branches of the tree are dynamically built at runtime as the user expands root nodes
 		/// </summary>
 		/// <value></value>
@@ -800,7 +805,7 @@ namespace Terminal.Gui {
 			
 				//if there is a rapid method for determining whether there are children
 				if(tree.TreeBuilder.SupportsCanExpand) {
-					return tree.TreeBuilder.CanExpand(Model) ? tree.ExpandableSymbol : leafSymbol;
+					return tree.TreeBuilder.CanExpand(Model) && tree.ShowExpandableSymbol? tree.ExpandableSymbol : leafSymbol;
 				}
 				
 				//there is no way of knowing whether we can expand without fetching the children
@@ -808,7 +813,7 @@ namespace Terminal.Gui {
 			}
 
 			//we fetched or already know the children, so return whether we are a leaf or a expandable branch
-			return ChildBranches.Any() ? tree.ExpandableSymbol : leafSymbol;
+			return ChildBranches.Any() && tree.ShowExpandableSymbol? tree.ExpandableSymbol : leafSymbol;
 		}
 
 		/// <summary>

@@ -29,6 +29,7 @@ namespace UICatalog.Scenarios {
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
 					new MenuItem ("_ShowLines", "", () => ShowLines()),
+					new MenuItem ("_ShowExpandableSymbol", "", () => ShowExpandableSymbol()),
 				}),
 			});
 			Top.Add (menu);
@@ -62,12 +63,18 @@ namespace UICatalog.Scenarios {
 			Win.Add (_treeView);
 		}
 
+
 		private void ShowLines ()
 		{
 			_treeView.ShowBranchLines = !_treeView.ShowBranchLines;
 			_treeView.SetNeedsDisplay();
 		}
-
+		
+		private void ShowExpandableSymbol ()
+		{
+			_treeView.ShowExpandableSymbol = !_treeView.ShowExpandableSymbol;
+			_treeView.SetNeedsDisplay();
+		}
 		/// <summary>
 		/// Sets up children getter delegates that return subfolders/files from directories
 		/// </summary>
