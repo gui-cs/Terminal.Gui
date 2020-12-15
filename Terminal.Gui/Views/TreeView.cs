@@ -719,6 +719,10 @@ namespace Terminal.Gui {
 		/// <param name="availableWidth"></param>
 		public virtual void Draw(ConsoleDriver driver,ColorScheme colorScheme, int y, int availableWidth)
 		{
+			driver.SetAttribute(tree.SelectedObject == Model ?
+				colorScheme.HotFocus :
+				colorScheme.Normal);
+
 			// Everything on line before the expansion run and branch text
 			Rune[] prefix = GetLinePrefix(driver).ToArray();
 			Rune expansion = GetExpandableIcon(driver);
@@ -728,23 +732,17 @@ namespace Terminal.Gui {
 			            
 			tree.Move(0,y);
 
-			driver.SetAttribute(colorScheme.Normal);
-
 			foreach(Rune r in prefix)
 				driver.AddRune(r);
 
 			driver.AddRune(expansion);
 
-			driver.SetAttribute(tree.SelectedObject == Model ?
-				colorScheme.HotFocus :
-				colorScheme.Normal);
-
 			driver.AddStr(lineBody);
-
-			driver.SetAttribute(colorScheme.Normal);
 
 			if(remainingWidth > 0)
 				driver.AddStr(new string(' ',remainingWidth));
+
+			driver.SetAttribute(colorScheme.Normal);
 		}
 
 		/// <summary>
