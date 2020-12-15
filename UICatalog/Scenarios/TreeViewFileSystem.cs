@@ -73,12 +73,14 @@ namespace UICatalog.Scenarios {
 		/// </summary>
 		private void SetupFileSystemDelegates ()
 		{
-			
-			// As a shortcut to enumerating half the file system, tell tree that all directories are expandable (even if they turn out to be empty later on)
-			_treeView.CanExpandGetter = (o)=>o is DirectoryInfo;
+			_treeView.TreeBuilder = new DelegateTreeBuilder(
 
-			// Determines how to compute children of any given branch
-			_treeView.ChildrenGetter = GetChildren;
+				// Determines how to compute children of any given branch
+				GetChildren,
+				// As a shortcut to enumerating half the file system, tell tree that all directories are expandable (even if they turn out to be empty later on)				
+				(o)=>o is DirectoryInfo
+
+			);
 
 			// Determines how to represent objects as strings on the screen
 			_treeView.AspectGetter = AspectGetter;
@@ -88,9 +90,8 @@ namespace UICatalog.Scenarios {
 		{
 			ClearObjects();
 		
-			// Clear any previous delegates
-			_treeView.CanExpandGetter = null;
-			_treeView.ChildrenGetter = null;
+			// Set builder to serve children of ITreeNode objects
+			_treeView.TreeBuilder = new TreeNodeBuilder();
 
 			// Add 2 root nodes with simple set of subfolders
 			_treeView.AddObject(CreateSimpleRoot());

@@ -33,8 +33,7 @@ namespace UnitTests {
 				Cars = new []{car1 ,car2}
 			};
 			
-			var tree = new TreeView();
-			tree.ChildrenGetter = (s)=> s is Factory f ? f.Cars: null;
+			var tree = new TreeView(new DelegateTreeBuilder((s)=> s is Factory f ? f.Cars: null));
 			tree.AddObject(factory1);
 
 			return tree;
@@ -219,11 +218,11 @@ namespace UnitTests {
 			Assert.False(tree.IsExpanded(c1));
 
 			// change the children getter so that now cars can have wheels
-			tree.ChildrenGetter = (o)=>
+			tree.TreeBuilder = new DelegateTreeBuilder((o)=>
 				// factories have cars
 				o is Factory ? new object[]{c1,c2} 
 				// cars have wheels
-				: new object[]{wheel };
+				: new object[]{wheel });
 			
 			// still cannot expand
 			tree.Expand(c1);
@@ -256,11 +255,11 @@ namespace UnitTests {
 			Assert.False(tree.IsExpanded(c1));
 
 			// change the children getter so that now cars can have wheels
-			tree.ChildrenGetter = (o)=>
+			tree.TreeBuilder = new DelegateTreeBuilder((o)=>
 				// factories have cars
 				o is Factory ? new object[]{c1,c2} 
 				// cars have wheels
-				: new object[]{wheel };
+				: new object[]{wheel });
 			
 			// still cannot expand
 			tree.Expand(c1);
@@ -333,7 +332,7 @@ namespace UnitTests {
 			string root = "root";
 			
 			var tree = new TreeView();
-			tree.ChildrenGetter = (s)=>  ReferenceEquals(s , root) ? new object[]{obj1 } : null;
+			tree.TreeBuilder = new DelegateTreeBuilder((s)=>  ReferenceEquals(s , root) ? new object[]{obj1 } : null);
 			tree.AddObject(root);
 
 			// Tree is not expanded so the root has no children yet
@@ -346,7 +345,7 @@ namespace UnitTests {
 			Assert.Equal(1,tree.GetChildren(root).Count(child=>ReferenceEquals(obj1,child)));
 
 			// change the getter to return an Equal object (but not the same reference - obj2)
-			tree.ChildrenGetter = (s)=>  ReferenceEquals(s , root) ? new object[]{obj2 } : null;
+			tree.TreeBuilder = new DelegateTreeBuilder((s)=>  ReferenceEquals(s , root) ? new object[]{obj2 } : null);
 
 			// tree has cached the knowledge of what children the root has so won't know about the change (we still get obj1)
 			Assert.Equal(1,tree.GetChildren(root).Count(child=>ReferenceEquals(obj1,child)));
