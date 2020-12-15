@@ -757,6 +757,8 @@ namespace Terminal.Gui {
 				for(int i = 0; i < Depth; i++) {
 					yield return new Rune(' ');
 				}
+
+				yield break;
 			}
 
 			// yield indentations with runes appropriate to the state of the parents
@@ -766,6 +768,8 @@ namespace Terminal.Gui {
 					yield return new Rune(' ');
 				else
 					yield return driver.VLine;
+
+				yield return new Rune(' ');
 			}
 
 			if(IsLast())
