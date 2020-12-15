@@ -472,11 +472,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Symbol to use for expanded branch nodes to indicate to the user that they can be collapsed.  Defaults to '-'
-		/// </summary>
-		public Rune ExpandedSymbol {get;set;} = '-';
-
-		/// <summary>
 		/// Symbol to use for branch nodes that can be expanded to indicate this to the user.  Defaults to '+'
 		/// </summary>
 		public Rune ExpandableSymbol {get;set;} = '+';
@@ -797,7 +792,7 @@ namespace Terminal.Gui {
 		public Rune GetExpandableIcon(ConsoleDriver driver)
 		{
 			if(IsExpanded)
-				return tree.ExpandedSymbol;
+				return driver.HLine;
 
 			var leafSymbol = tree.ShowBranchLines ? driver.HLine : ' ';
 
