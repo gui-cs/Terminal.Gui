@@ -254,7 +254,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Optional color scheme to use when rendering <see cref="ExpandableSymbol"/> (defaults to null)
 		/// </summary>
-		public Attribute? ExpandableSymbolColor;
+		public Attribute? ExpandableSymbolColor {get;set;}
 
 				
 		/// <summary>
@@ -265,7 +265,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Optional color scheme to use when rendering <see cref="CollapseableSymbol"/> (defaults to null)
 		/// </summary>
-		public Attribute? CollapseableSymbolColor;
+		public Attribute? CollapseableSymbolColor {get;set;}
 
 	}
 
