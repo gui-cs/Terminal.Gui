@@ -22,24 +22,32 @@ namespace UICatalog.Scenarios {
 		/// A tree view where nodes are <see cref="ITreeNode"/>
 		/// </summary>
 		TreeView treeViewNodes;
-		
+
+		MenuItem miShowLines;
+		private MenuItem miPlusMinus;
+		private MenuItem miArrowSymbols;
+		private MenuItem miNoSymbols;
+		private MenuItem miColoredSymbols;
+
 		public override void Setup ()
 		{
 			Win.Title = this.GetName();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
 			Top.LayoutSubviews ();
-
+			
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
-					new MenuItem ("_ShowLines", "", () => ShowLines()),
-					new MenuItem ("_PlusMinusSymbols", "", () => SetExpandableSymbols('+','-')),
-					new MenuItem ("_ArrowSymbols", "", () => SetExpandableSymbols('>','v')),
-					new MenuItem ("_NoSymbols", "", () => SetExpandableSymbols(null,null)),
-					new MenuItem ("_ColoredSymbols", "", () => ShowColoredExpandableSymbols()),
+					miShowLines = new MenuItem ("_ShowLines", "", () => ShowLines()){
+					Checked = true, CheckType = MenuItemCheckStyle.Checked
+						},
+					miPlusMinus = new MenuItem ("_PlusMinusSymbols", "", () => SetExpandableSymbols('+','-')){Checked = true, CheckType = MenuItemCheckStyle.Radio},
+					miArrowSymbols = new MenuItem ("_ArrowSymbols", "", () => SetExpandableSymbols('>','v')){Checked = false, CheckType = MenuItemCheckStyle.Radio},
+					miNoSymbols = new MenuItem ("_NoSymbols", "", () => SetExpandableSymbols(null,null)){Checked = false, CheckType = MenuItemCheckStyle.Radio},
+					miColoredSymbols = new MenuItem ("_ColoredSymbols", "", () => ShowColoredExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 				}),
 			});
 			Top.Add (menu);
@@ -112,15 +120,21 @@ namespace UICatalog.Scenarios {
 
 		private void ShowLines ()
 		{
-			treeViewNodes.Style.ShowBranchLines = !treeViewNodes.Style.ShowBranchLines;
+			miShowLines.Checked = !miShowLines.Checked;
+
+			treeViewNodes.Style.ShowBranchLines = miShowLines.Checked;
 			treeViewNodes.SetNeedsDisplay();
 
-			treeViewFiles.Style.ShowBranchLines = !treeViewFiles.Style.ShowBranchLines;
+			treeViewFiles.Style.ShowBranchLines = miShowLines.Checked;
 			treeViewFiles.SetNeedsDisplay();
 		}
 		
 		private void SetExpandableSymbols(Rune? expand, Rune? collapse)
 		{
+			miPlusMinus.Checked = expand == '+';
+			miArrowSymbols.Checked = expand == '>';
+			miNoSymbols.Checked = expand == null;
+
 			treeViewNodes.Style.ExpandableSymbol = expand;
 			treeViewNodes.Style.CollapseableSymbol = collapse;
 			treeViewNodes.SetNeedsDisplay();
@@ -137,20 +151,18 @@ namespace UICatalog.Scenarios {
 
 		private void ShowColoredExpandableSymbols (ITreeView treeView)
 		{
-			// TODO: how to know what the normal window background is this member is private
-			//Win.ColorScheme.Normal.Background
-
+			miColoredSymbols.Checked = !miColoredSymbols.Checked;
 			// Toggle Green expand symbols
-			if(treeView.Style.ExpandableSymbolColor.HasValue)
-				treeView.Style.ExpandableSymbolColor =  null; //clear it
+			if(miColoredSymbols.Checked)
+				treeView.Style.ExpandableSymbolColor =  new Terminal.Gui.Attribute(Color.Green,Win.ColorScheme.Normal.Background);
 			else
-				treeView.Style.ExpandableSymbolColor =  new Terminal.Gui.Attribute(Color.Green,Color.Blue);
+				treeView.Style.ExpandableSymbolColor =  null; //clear it
 
 			// Toggle Red collapse symbols
-			if(treeView.Style.CollapseableSymbolColor.HasValue)
-				treeView.Style.CollapseableSymbolColor =  null; //clear it
+			if(miColoredSymbols.Checked)
+				treeView.Style.CollapseableSymbolColor =  new Terminal.Gui.Attribute(Color.Red,Win.ColorScheme.Normal.Background);
 			else
-				treeView.Style.CollapseableSymbolColor =  new Terminal.Gui.Attribute(Color.Red,Color.Blue);
+				treeView.Style.CollapseableSymbolColor =  null; //clear it
 
 			treeView.SetNeedsDisplay();
 		}
