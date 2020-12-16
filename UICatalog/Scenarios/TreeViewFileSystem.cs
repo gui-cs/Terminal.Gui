@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
@@ -37,7 +36,10 @@ namespace UICatalog.Scenarios {
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
 					new MenuItem ("_ShowLines", "", () => ShowLines()),
-					new MenuItem ("_ShowExpandableSymbol", "", () => ShowExpandableSymbol()),
+					new MenuItem ("_PlusMinusSymbols", "", () => SetExpandableSymbols('+','-')),
+					new MenuItem ("_ArrowSymbols", "", () => SetExpandableSymbols('>','v')),
+					new MenuItem ("_NoSymbols", "", () => SetExpandableSymbols(null,null)),
+					new MenuItem ("_ColoredSymbols", "", () => ShowColoredExpandableSymbols()),
 				}),
 			});
 			Top.Add (menu);
@@ -110,22 +112,49 @@ namespace UICatalog.Scenarios {
 
 		private void ShowLines ()
 		{
-			treeViewNodes.ShowBranchLines = !treeViewNodes.ShowBranchLines;
+			treeViewNodes.Style.ShowBranchLines = !treeViewNodes.Style.ShowBranchLines;
 			treeViewNodes.SetNeedsDisplay();
 
-			treeViewFiles.ShowBranchLines = !treeViewFiles.ShowBranchLines;
+			treeViewFiles.Style.ShowBranchLines = !treeViewFiles.Style.ShowBranchLines;
 			treeViewFiles.SetNeedsDisplay();
 		}
 		
-		private void ShowExpandableSymbol ()
+		private void SetExpandableSymbols(Rune? expand, Rune? collapse)
 		{
-			treeViewNodes.ShowExpandableSymbol = !treeViewNodes.ShowExpandableSymbol;
+			treeViewNodes.Style.ExpandableSymbol = expand;
+			treeViewNodes.Style.CollapseableSymbol = collapse;
 			treeViewNodes.SetNeedsDisplay();
-
-			treeViewFiles.ShowExpandableSymbol = !treeViewFiles.ShowExpandableSymbol;
+			
+			treeViewFiles.Style.ExpandableSymbol = expand;
+			treeViewFiles.Style.CollapseableSymbol = collapse;
 			treeViewFiles.SetNeedsDisplay();
 		}
-	
+		private void ShowColoredExpandableSymbols()
+		{
+			ShowColoredExpandableSymbols(treeViewNodes);
+			ShowColoredExpandableSymbols(treeViewFiles);
+		}
+
+		private void ShowColoredExpandableSymbols (ITreeView treeView)
+		{
+			// TODO: how to know what the normal window background is this member is private
+			//Win.ColorScheme.Normal.Background
+
+			// Toggle Green expand symbols
+			if(treeView.Style.ExpandableSymbolColor.HasValue)
+				treeView.Style.ExpandableSymbolColor =  null; //clear it
+			else
+				treeView.Style.ExpandableSymbolColor =  new Terminal.Gui.Attribute(Color.Green,Color.Blue);
+
+			// Toggle Red collapse symbols
+			if(treeView.Style.CollapseableSymbolColor.HasValue)
+				treeView.Style.CollapseableSymbolColor =  null; //clear it
+			else
+				treeView.Style.CollapseableSymbolColor =  new Terminal.Gui.Attribute(Color.Red,Color.Blue);
+
+			treeView.SetNeedsDisplay();
+		}
+
 		private ITreeNode CreateSimpleRoot ()
 		{
 			return new TreeNode("Root"){

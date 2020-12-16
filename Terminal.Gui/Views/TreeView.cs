@@ -203,22 +203,13 @@ namespace Terminal.Gui {
 	/// Interface for all non generic members of <see cref="TreeView{T}"/>
 	/// </summary>
 	public interface ITreeView {
+		
+		
 		/// <summary>
-		/// True to render vertical lines under expanded nodes to show which node belongs to which parent.  False to use only whitespace
+		/// Contains options for changing how the tree is rendered
 		/// </summary>
-		/// <value></value>
-		bool ShowBranchLines {get;set;}
+		TreeStyle Style{get;set;}
 
-		/// <summary>
-		/// True to render <see cref="ExpandableSymbol"/> next to branches that can be expanded.  Defaults to true
-		/// </summary>
-		bool ShowExpandableSymbol {get;set;}
-		
-		/// <summary>
-		/// Symbol to use for branch nodes that can be expanded to indicate this to the user.  Defaults to '+'
-		/// </summary>
-		Rune ExpandableSymbol {get;set;}
-		
 		/// <summary>
 		/// Removes all objects from the tree and clears selection
 		/// </summary>
@@ -243,24 +234,47 @@ namespace Terminal.Gui {
 			TreeBuilder = new TreeNodeBuilder();
 		}
 	}
-
+	
 	/// <summary>
-	/// Hierarchical tree view with expandable branches.  Branch objects are dynamically determined when expanded using a user defined <see cref="ITreeBuilder{T}"/>
+	/// Defines rendering options that affect how the tree is displayed
 	/// </summary>
-	public class TreeView<T> : View,ITreeView where T:class
-	{   
-		private int scrollOffset;
+	public class TreeStyle {
 
 		/// <summary>
 		/// True to render vertical lines under expanded nodes to show which node belongs to which parent.  False to use only whitespace
 		/// </summary>
 		/// <value></value>
 		public bool ShowBranchLines {get;set;} = true;
+				
+		/// <summary>
+		/// Symbol to use for branch nodes that can be expanded to indicate this to the user.  Defaults to '+'. Set to null to hide
+		/// </summary>
+		public Rune? ExpandableSymbol {get;set;} = '+';
 
 		/// <summary>
-		/// True to render <see cref="ExpandableSymbol"/> next to branches that can be expanded.  Defaults to true
+		/// Optional color scheme to use when rendering <see cref="ExpandableSymbol"/> (defaults to null)
 		/// </summary>
-		public bool ShowExpandableSymbol {get;set;} = true;
+		public Attribute? ExpandableSymbolColor;
+
+				
+		/// <summary>
+		/// Symbol to use for branch nodes that can be collapsed (are currently expanded).  Defaults to '-'.  Set to null to hide
+		/// </summary>
+		public Rune? CollapseableSymbol {get;set;} = '-';
+
+		/// <summary>
+		/// Optional color scheme to use when rendering <see cref="CollapseableSymbol"/> (defaults to null)
+		/// </summary>
+		public Attribute? CollapseableSymbolColor;
+
+	}
+
+	/// <summary>
+	/// Hierarchical tree view with expandable branches.  Branch objects are dynamically determined when expanded using a user defined <see cref="ITreeBuilder{T}"/>
+	/// </summary>
+	public class TreeView<T> : View, ITreeView where T:class
+	{   
+		private int scrollOffset;
 
 		/// <summary>
 		/// Determines how sub branches of the tree are dynamically built at runtime as the user expands root nodes
@@ -272,6 +286,12 @@ namespace Terminal.Gui {
 		/// private variable for <see cref="SelectedObject"/>
 		/// </summary>
 		T selectedObject;
+
+		
+		/// <summary>
+		/// Contains options for changing how the tree is rendered
+		/// </summary>
+		public TreeStyle Style {get;set;} = new TreeStyle();
 
 		/// <summary>
 		/// The currently selected object in the tree
@@ -291,33 +311,6 @@ namespace Terminal.Gui {
 		/// Called when the <see cref="SelectedObject"/> changes
 		/// </summary>
 		public event EventHandler<SelectionChangedEventArgs<T>> SelectionChanged;
-
-		/// <summary>
-		/// Refreshes the state of the object <paramref name="o"/> in the tree.  This will recompute children, string representation etc
-		/// </summary>
-		/// <remarks>This has no effect if the object is not exposed in the tree.</remarks>
-		/// <param name="o"></param>
-		/// <param name="startAtTop">True to also refresh all ancestors of the objects branch (starting with the root).  False to refresh only the passed node</param>
-		public void RefreshObject (T o, bool startAtTop = false)
-		{
-			var branch = ObjectToBranch(o);
-			if(branch != null) {
-				branch.Refresh(startAtTop);
-				SetNeedsDisplay();
-			}
-
-		}
-		
-		/// <summary>
-		/// Rebuilds the tree structure for all exposed objects starting with the root objects.  Call this method when you know there are changes to the tree but don't know which objects have changed (otherwise use <see cref="RefreshObject(T, bool)"/>)
-		/// </summary>
-		public void RebuildTree()
-		{
-			foreach(var branch in roots.Values)
-				branch.Rebuild();
-			
-			SetNeedsDisplay();
-		}
 
 		/// <summary>
 		/// The root objects in the tree, note that this collection is of root objects only
@@ -340,6 +333,11 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Returns the string representation of model objects hosted in the tree.  Default implementation is to call <see cref="object.ToString"/>
+		/// </summary>
+		/// <value></value>
+		public AspectGetterDelegate<T> AspectGetter {get;set;} = (o)=>o.ToString();
 
 		/// <summary>
 		/// Creates a new tree view with absolute positioning.  Use <see cref="AddObjects(IEnumerable{T})"/> to set set root objects for the tree.  Children will not be rendered until you set <see cref="TreeBuilder"/>
@@ -415,6 +413,33 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Refreshes the state of the object <paramref name="o"/> in the tree.  This will recompute children, string representation etc
+		/// </summary>
+		/// <remarks>This has no effect if the object is not exposed in the tree.</remarks>
+		/// <param name="o"></param>
+		/// <param name="startAtTop">True to also refresh all ancestors of the objects branch (starting with the root).  False to refresh only the passed node</param>
+		public void RefreshObject (T o, bool startAtTop = false)
+		{
+			var branch = ObjectToBranch(o);
+			if(branch != null) {
+				branch.Refresh(startAtTop);
+				SetNeedsDisplay();
+			}
+
+		}
+		
+		/// <summary>
+		/// Rebuilds the tree structure for all exposed objects starting with the root objects.  Call this method when you know there are changes to the tree but don't know which objects have changed (otherwise use <see cref="RefreshObject(T, bool)"/>)
+		/// </summary>
+		public void RebuildTree()
+		{
+			foreach(var branch in roots.Values)
+				branch.Rebuild();
+			
+			SetNeedsDisplay();
+		}
+
+		/// <summary>
 		/// Returns the currently expanded children of the passed object.  Returns an empty collection if the branch is not exposed or not expanded
 		/// </summary>
 		/// <param name="o">An object in the tree</param>
@@ -437,12 +462,6 @@ namespace Terminal.Gui {
 		{
 			return ObjectToBranch(o)?.Parent?.Model;
 		}
-
-		/// <summary>
-		/// Returns the string representation of model objects hosted in the tree.  Default implementation is to call <see cref="object.ToString"/>
-		/// </summary>
-		/// <value></value>
-		public AspectGetterDelegate<T> AspectGetter {get;set;} = (o)=>o.ToString();
 
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
@@ -519,11 +538,6 @@ namespace Terminal.Gui {
 				}
 			}
 		}
-
-		/// <summary>
-		/// Symbol to use for branch nodes that can be expanded to indicate this to the user.  Defaults to '+'
-		/// </summary>
-		public Rune ExpandableSymbol {get;set;} = '+';
 
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
@@ -659,6 +673,16 @@ namespace Terminal.Gui {
 			ObjectToBranch(toExpand)?.Expand();
 			SetNeedsDisplay();
 		}
+		
+		/// <summary>
+		/// Returns true if the given object <paramref name="o"/> is exposed in the tree and can be expanded otherwise false
+		/// </summary>
+		/// <param name="o"></param>
+		/// <returns></returns>
+		public bool CanExpand(T o)
+		{
+			return ObjectToBranch(o)?.CanExpand() ?? false;
+		}
 
 		/// <summary>
 		/// Returns true if the given object <paramref name="o"/> is exposed in the tree and expanded otherwise false
@@ -763,13 +787,16 @@ namespace Terminal.Gui {
 		/// <param name="availableWidth"></param>
 		public virtual void Draw(ConsoleDriver driver,ColorScheme colorScheme, int y, int availableWidth)
 		{
-			driver.SetAttribute(tree.SelectedObject == Model && tree.HasFocus?
-				colorScheme.HotFocus :
-				colorScheme.Normal);
+			// true if the current line of the tree is the selected one and control has focus
+			bool isSelected = tree.SelectedObject == Model && tree.HasFocus;
+			Attribute lineColor = isSelected? colorScheme.HotFocus : colorScheme.Normal;
+
+			driver.SetAttribute(lineColor);
 
 			// Everything on line before the expansion run and branch text
 			Rune[] prefix = GetLinePrefix(driver).ToArray();
-			Rune expansion = GetExpandableIcon(driver);
+			Rune expansion = GetExpandableSymbol(driver);
+			Attribute? expansionColor = GetExpandableSymbolColor();
 			string lineBody = tree.AspectGetter(Model);
 
 			var remainingWidth = availableWidth - (prefix.Length + 1 + lineBody.Length);
@@ -779,7 +806,14 @@ namespace Terminal.Gui {
 			foreach(Rune r in prefix)
 				driver.AddRune(r);
 
+			// if it is not the curerntly selected line render the expansion symbol in the appropriate color scheme
+			if(!isSelected && expansionColor.HasValue)
+				driver.SetAttribute(expansionColor.Value);
+
 			driver.AddRune(expansion);
+			
+			//reset the line color if it was changed for rendering expansion symbol
+			driver.SetAttribute(lineColor);
 
 			driver.AddStr(lineBody);
 
@@ -797,7 +831,7 @@ namespace Terminal.Gui {
 		private IEnumerable<Rune> GetLinePrefix (ConsoleDriver driver)
 		{
 			// If not showing line branches or this is a root object
-			if (!tree.ShowBranchLines) {
+			if (!tree.Style.ShowBranchLines) {
 				for(int i = 0; i < Depth; i++) {
 					yield return new Rune(' ');
 				}
@@ -842,26 +876,54 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="driver"></param>
 		/// <returns></returns>
-		public Rune GetExpandableIcon(ConsoleDriver driver)
+		public Rune GetExpandableSymbol(ConsoleDriver driver)
+		{
+			var leafSymbol = tree.Style.ShowBranchLines ? driver.HLine : ' ';
+
+			if(IsExpanded)
+				return tree.Style.CollapseableSymbol ?? leafSymbol;
+
+			if(CanExpand())
+				return tree.Style.ExpandableSymbol ?? leafSymbol;
+
+			return leafSymbol;
+		}
+
+		/// <summary>
+		/// Returns an appropriate color according to the <see cref="TreeStyle"/> for displaying the <see cref="GetExpandableSymbol(ConsoleDriver)"/>
+		/// </summary>
+		/// <returns></returns>
+		public Attribute? GetExpandableSymbolColor()
 		{
 			if(IsExpanded)
-				return driver.HLine;
+				return tree.Style.CollapseableSymbolColor;
 
-			var leafSymbol = tree.ShowBranchLines ? driver.HLine : ' ';
+			if(CanExpand())
+				return tree.Style.ExpandableSymbolColor;
 
+			return null;
+		}
+
+		/// <summary>
+		/// Returns true if the current branch can be expanded according to the <see cref="TreeBuilder{T}"/> or cached children already fetched
+		/// </summary>
+		/// <returns></returns>
+		public bool CanExpand ()
+		{
+			// if we do not know the children yet
 			if(ChildBranches == null) {
 			
 				//if there is a rapid method for determining whether there are children
 				if(tree.TreeBuilder.SupportsCanExpand) {
-					return tree.TreeBuilder.CanExpand(Model) && tree.ShowExpandableSymbol? tree.ExpandableSymbol : leafSymbol;
+					return tree.TreeBuilder.CanExpand(Model);
 				}
 				
 				//there is no way of knowing whether we can expand without fetching the children
 				FetchChildren();
 			}
 
-			//we fetched or already know the children, so return whether we are a leaf or a expandable branch
-			return ChildBranches.Any() && tree.ShowExpandableSymbol? tree.ExpandableSymbol : leafSymbol;
+			//we fetched or already know the children, so return whether we have any
+			return ChildBranches.Any();
 		}
 
 		/// <summary>
