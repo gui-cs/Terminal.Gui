@@ -1,4 +1,5 @@
-﻿//
+﻿//#define PROCESS_REQUEST
+//
 // NetDriver.cs: The System.Console-based .NET driver, works on Windows and Unix, but is not particularly efficient.
 //
 // Authors:
@@ -107,24 +108,40 @@ namespace Terminal.Gui {
 	internal class NetEvents {
 		ManualResetEventSlim inputReady = new ManualResetEventSlim (false);
 		ManualResetEventSlim waitForStart = new ManualResetEventSlim (false);
+		ManualResetEventSlim winChange = new ManualResetEventSlim (false);
 		Queue<InputResult?> inputResultQueue = new Queue<InputResult?> ();
-
+		ConsoleDriver consoleDriver;
+		int lastWindowHeight;
+		int largestWindowHeight;
+#if PROCESS_REQUEST
+		bool neededProcessRequest;
+#endif
 		public int NumberOfCSI { get; }
 
-		public NetEvents (int numberOfCSI = 1)
+		public NetEvents (ConsoleDriver consoleDriver, int numberOfCSI = 1)
 		{
+			if (consoleDriver == null) {
+				throw new ArgumentNullException ("Console driver instance must be provided.");
+			}
+			this.consoleDriver = consoleDriver;
 			NumberOfCSI = numberOfCSI;
 			Task.Run (ProcessInputResultQueue);
+			Task.Run (CheckWinChange);
 		}
 
 		public InputResult? ReadConsoleInput ()
 		{
 			while (true) {
 				waitForStart.Set ();
+				winChange.Set ();
+
 				if (inputResultQueue.Count == 0) {
 					inputReady.Wait ();
 					inputReady.Reset ();
 				}
+#if PROCESS_REQUEST
+				neededProcessRequest = false;
+#endif
 				if (inputResultQueue.Count > 0) {
 					return inputResultQueue.Dequeue ();
 				}
@@ -143,6 +160,65 @@ namespace Terminal.Gui {
 
 				inputReady.Set ();
 			}
+		}
+
+		void CheckWinChange ()
+		{
+			while (true) {
+				winChange.Wait ();
+				winChange.Reset ();
+				WaitWinChange ();
+				inputReady.Set ();
+			}
+		}
+
+		void WaitWinChange ()
+		{
+			while (true) {
+				if (!consoleDriver.HeightAsBuffer) {
+					if (Console.WindowWidth != consoleDriver.Cols || Console.WindowHeight != consoleDriver.Rows) {
+						GetWindowSizeEvent (new Size (Console.WindowWidth, Console.WindowHeight));
+						return;
+					}
+				} else {
+					largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+					if (Console.BufferWidth != consoleDriver.Cols || largestWindowHeight != consoleDriver.Rows
+						|| Console.WindowHeight != lastWindowHeight) {
+						lastWindowHeight = Console.WindowHeight;
+						GetWindowSizeEvent (new Size (Console.BufferWidth, lastWindowHeight));
+						return;
+					}
+					if (Console.WindowTop != consoleDriver.Top) {
+						// Top only working on Windows.
+						var winPositionEv = new WindowPositionEvent () {
+							Top = Console.WindowTop
+						};
+						inputResultQueue.Enqueue (new InputResult () {
+							EventType = EventType.WindowPosition,
+							WindowPositionEvent = winPositionEv
+						});
+						return;
+					}
+#if PROCESS_REQUEST
+					if (!neededProcessRequest) {
+						Console.Out.Write ("\x1b[6n");
+						neededProcessRequest = true;
+					}
+#endif
+				}
+			}
+		}
+
+		void GetWindowSizeEvent (Size size)
+		{
+			WindowSizeEvent windowSizeEvent = new WindowSizeEvent () {
+				Size = size
+			};
+
+			inputResultQueue.Enqueue (new InputResult () {
+				EventType = EventType.WindowSize,
+				WindowSizeEvent = windowSizeEvent
+			});
 		}
 
 		void GetConsoleInputType (ConsoleKeyInfo consoleKeyInfo)
@@ -174,6 +250,7 @@ namespace Terminal.Gui {
 				}
 				break;
 			case 27:
+			case 91:
 				ConsoleKeyInfo [] cki = new ConsoleKeyInfo [] { consoleKeyInfo };
 				ConsoleModifiers mod = consoleKeyInfo.Modifiers;
 				while (Console.KeyAvailable) {
@@ -207,30 +284,67 @@ namespace Terminal.Gui {
 			ConsoleKeyInfo [] splitedCki = new ConsoleKeyInfo [] { };
 			int length = 0;
 			var kChar = GetKeyCharArray (cki);
-			var nCSI = kChar.Where (val => val == '\x1b').ToArray ().Length;
+			var nCSI = GetNumberOfCSI (kChar);
 			int curCSI = 0;
+			char previousKChar = '\0';
 			if (nCSI > 1) {
 				foreach (var ck in cki) {
 					if (NumberOfCSI > 0 && nCSI - curCSI > NumberOfCSI) {
-						if (ck.KeyChar == '\x1b') {
+						if (ck.KeyChar == '\x1b'
+							|| (ck.KeyChar == '[' && previousKChar != '\x1b')) {
 							curCSI++;
 						}
+						previousKChar = ck.KeyChar;
 						continue;
 					}
-					if (ck.KeyChar == '\x1b') {
-						if (splitedCki.Length > 0) {
+					if (ck.KeyChar == '\x1b' || (ck.KeyChar == '[' && previousKChar != '\x1b')) {
+						if (ck.KeyChar == 'R') {
+							ResizeArray (ck);
+						}
+						if (splitedCki.Length > 1) {
 							DecodeCSI (ref inputResult, ref newConsoleKeyInfo, ref key, ref mouseEvent, splitedCki, ref mod);
 						}
 						splitedCki = new ConsoleKeyInfo [] { };
 						length = 0;
 					}
-					length++;
-					Array.Resize (ref splitedCki, length);
-					splitedCki [length - 1] = ck;
+					ResizeArray (ck);
+					previousKChar = ck.KeyChar;
 				}
 			} else {
 				DecodeCSI (ref inputResult, ref newConsoleKeyInfo, ref key, ref mouseEvent, cki, ref mod);
 			}
+
+			void ResizeArray (ConsoleKeyInfo ck)
+			{
+				length++;
+				Array.Resize (ref splitedCki, length);
+				splitedCki [length - 1] = ck;
+			}
+		}
+
+		char [] GetKeyCharArray (ConsoleKeyInfo [] cki)
+		{
+			char [] kChar = new char [] { };
+			var length = 0;
+			foreach (var kc in cki) {
+				length++;
+				Array.Resize (ref kChar, length);
+				kChar [length - 1] = kc.KeyChar;
+			}
+
+			return kChar;
+		}
+
+		int GetNumberOfCSI (char [] csi)
+		{
+			int nCSI = 0;
+			for (int i = 0; i < csi.Length; i++) {
+				if (csi [i] == '\x1b' || (csi [i] == '[' && (i == 0 || (i > 0 && csi [i - 1] != '\x1b')))) {
+					nCSI++;
+				}
+			}
+
+			return nCSI;
 		}
 
 		void DecodeCSI (ref InputResult inputResult, ref ConsoleKeyInfo newConsoleKeyInfo, ref ConsoleKey key, ref MouseEvent mouseEvent, ConsoleKeyInfo [] cki, ref ConsoleModifiers mod)
@@ -306,7 +420,8 @@ namespace Terminal.Gui {
 					(mod & ConsoleModifiers.Control) != 0);
 				break;
 			case 7:
-				throw new NotImplementedException ("Condition not yet detected!");
+				GetRequestEvent (GetKeyCharArray (cki));
+				return;
 			case int n when n >= 8:
 				GetMouseEvent (cki);
 				return;
@@ -318,6 +433,56 @@ namespace Terminal.Gui {
 			}
 
 			inputResultQueue.Enqueue (inputResult);
+		}
+
+		Point lastCursorPosition;
+
+		void GetRequestEvent (char [] kChar)
+		{
+			EventType eventType = new EventType ();
+			Point point = new Point ();
+			int foundPoint = 0;
+			string value = "";
+			for (int i = 0; i < kChar.Length; i++) {
+				var c = kChar [i];
+				if (c == '[') {
+					foundPoint++;
+				} else if (foundPoint == 1 && c != ';') {
+					value += c.ToString ();
+				} else if (c == ';') {
+					if (foundPoint == 1) {
+						point.Y = int.Parse (value) - 1;
+					}
+					value = "";
+					foundPoint++;
+				} else if (foundPoint > 0 && i < kChar.Length - 1) {
+					value += c.ToString ();
+				} else if (i == kChar.Length - 1) {
+					point.X = int.Parse (value) + Console.WindowTop - 1;
+
+					switch (c) {
+					case 'R':
+						if (lastCursorPosition.Y != point.Y) {
+							lastCursorPosition = point;
+							eventType = EventType.WindowPosition;
+							var winPositionEv = new WindowPositionEvent () {
+								CursorPosition = point
+							};
+							inputResultQueue.Enqueue (new InputResult () {
+								EventType = eventType,
+								WindowPositionEvent = winPositionEv
+							});
+						} else {
+							return;
+						}
+						break;
+					default:
+						throw new NotImplementedException ();
+					}
+				}
+			}
+
+			inputReady.Set ();
 		}
 
 		MouseEvent lastMouseEvent;
@@ -369,6 +534,7 @@ namespace Terminal.Gui {
 					case 8:
 					case 16:
 					case 32:
+					case 40:
 						buttonState = c == 'M' ? MouseButtonState.Button1Pressed
 							: MouseButtonState.Button1Released;
 						break;
@@ -376,6 +542,7 @@ namespace Terminal.Gui {
 					case 9:
 					case 17:
 					case 33:
+					case 41:
 						buttonState = c == 'M' ? MouseButtonState.Button2Pressed
 							: MouseButtonState.Button2Released;
 						break;
@@ -383,6 +550,7 @@ namespace Terminal.Gui {
 					case 10:
 					case 18:
 					case 34:
+					case 42:
 						buttonState = c == 'M' ? MouseButtonState.Button3Pressed
 							: MouseButtonState.Button3Released;
 						break;
@@ -585,7 +753,7 @@ namespace Terminal.Gui {
 				await Task.Delay (200);
 				var view = Application.wantContinuousButtonPressedView;
 				if (isButtonPressed && !Console.KeyAvailable
-					&&  !isButtonClicked && !isButtonDoubleClicked && !isButtonTripleClicked
+					&& !isButtonClicked && !isButtonDoubleClicked && !isButtonTripleClicked
 					&& (view != null || view == null && lastMouseEvent.Position != point)) {
 					point = lastMouseEvent.Position;
 					inputResultQueue.Enqueue (new InputResult () {
@@ -599,19 +767,6 @@ namespace Terminal.Gui {
 			}
 			isProcContBtnPressedRuning = false;
 			isButtonPressed = false;
-		}
-
-		char [] GetKeyCharArray (ConsoleKeyInfo [] cki)
-		{
-			char [] kChar = new char [] { };
-			var length = 0;
-			foreach (var kc in cki) {
-				length++;
-				Array.Resize (ref kChar, length);
-				kChar [length - 1] = kc.KeyChar;
-			}
-
-			return kChar;
 		}
 
 		ConsoleModifiers GetConsoleModifiers (uint keyChar)
@@ -719,7 +874,9 @@ namespace Terminal.Gui {
 
 		public enum EventType {
 			key = 1,
-			Mouse = 2
+			Mouse = 2,
+			WindowSize = 3,
+			WindowPosition = 4
 		}
 
 		[Flags]
@@ -760,10 +917,21 @@ namespace Terminal.Gui {
 			public MouseButtonState ButtonState;
 		}
 
+		public struct WindowSizeEvent {
+			public Size Size;
+		}
+
+		public struct WindowPositionEvent {
+			public int Top;
+			public Point CursorPosition;
+		}
+
 		public struct InputResult {
 			public EventType EventType;
 			public ConsoleKeyInfo ConsoleKeyInfo;
 			public MouseEvent MouseEvent;
+			public WindowSizeEvent WindowSizeEvent;
+			public WindowPositionEvent WindowPositionEvent;
 		}
 	}
 
@@ -775,16 +943,19 @@ namespace Terminal.Gui {
 		public override bool HeightAsBuffer { get; set; }
 
 		public NetWinVTConsole NetWinConsole { get; }
+		public bool IsWinPlatform { get; }
+		public bool AlwaysSetPosition { get; set; }
 
-		bool isWinPlatform;
+		int largestWindowHeight;
 
 		public NetDriver ()
 		{
 			var p = Environment.OSVersion.Platform;
 			if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
-				isWinPlatform = true;
+				IsWinPlatform = true;
 				NetWinConsole = new NetWinVTConsole ();
 			}
+			largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
 		}
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
@@ -848,7 +1019,7 @@ namespace Terminal.Gui {
 
 		public override void End ()
 		{
-			if (isWinPlatform) {
+			if (IsWinPlatform) {
 				NetWinConsole.Cleanup ();
 			}
 
@@ -934,7 +1105,7 @@ namespace Terminal.Gui {
 					// Can raise an exception while is still resizing.
 					try {
 						// Not supported on Unix.
-						if (isWinPlatform) {
+						if (IsWinPlatform) {
 #pragma warning disable CA1416
 							Console.CursorTop = 0;
 							Console.CursorLeft = 0;
@@ -954,7 +1125,7 @@ namespace Terminal.Gui {
 					}
 				}
 			} else {
-				if (isWinPlatform && Console.WindowHeight > 0) {
+				if (IsWinPlatform && Console.WindowHeight > 0) {
 					// Can raise an exception while is still resizing.
 					try {
 #pragma warning disable CA1416
@@ -1012,11 +1183,16 @@ namespace Terminal.Gui {
 			}
 		}
 
+		public override void Refresh ()
+		{
+			UpdateScreen ();
+		}
+
 		public override void UpdateScreen ()
 		{
 			if (winChanging || Console.WindowHeight == 0 || contents.Length != Rows * Cols * 3
 				|| (!HeightAsBuffer && Rows != Console.WindowHeight)
-				|| (HeightAsBuffer && Rows != Console.BufferHeight)) {
+				|| (HeightAsBuffer && Rows != largestWindowHeight)) {
 				return;
 			}
 
@@ -1024,6 +1200,7 @@ namespace Terminal.Gui {
 			int rows = Math.Min (Console.WindowHeight + top, Rows);
 			int cols = Cols;
 
+			Console.CursorVisible = false;
 			for (int row = top; row < rows; row++) {
 				if (!dirtyLine [row]) {
 					continue;
@@ -1033,31 +1210,35 @@ namespace Terminal.Gui {
 					if (contents [row, col, 2] != 1) {
 						continue;
 					}
-					if (Console.WindowHeight > 0) {
-						// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
-						try {
-							Console.SetCursorPosition (col, row);
-						} catch (Exception) {
-							return;
-						}
+					if (Console.WindowHeight > 0 && !SetCursorPosition (col, row)) {
+						return;
 					}
 					for (; col < cols && contents [row, col, 2] == 1; col++) {
 						var color = contents [row, col, 1];
 						if (color != redrawColor) {
 							SetColor (color);
 						}
+						if (AlwaysSetPosition && !SetCursorPosition (col, row)) {
+							return;
+						}
 						Console.Write ((char)contents [row, col, 0]);
 						contents [row, col, 2] = 0;
 					}
 				}
 			}
-
+			Console.CursorVisible = true;
 			UpdateCursor ();
 		}
 
-		public override void Refresh ()
+		bool SetCursorPosition (int col, int row)
 		{
-			UpdateScreen ();
+			// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
+			try {
+				Console.SetCursorPosition (col, row);
+				return true;
+			} catch (Exception) {
+				return false;
+			}
 		}
 
 		public override void UpdateCursor ()
@@ -1230,34 +1411,8 @@ namespace Terminal.Gui {
 
 			var mLoop = mainLoop.Driver as NetMainLoop;
 
-			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-			mLoop.KeyPressed = (e) => ProcessInput (e);
-
-			mLoop.WinChanged = (e) => ChangeWin (e);
-		}
-
-		bool winChanging;
-
-		void ChangeWin (int newTop)
-		{
-			winChanging = true;
-			const int Min_WindowWidth = 14;
-			Size size = new Size ();
-			if (!HeightAsBuffer) {
-				size = new Size (Math.Max (Min_WindowWidth, Console.WindowWidth),
-					Console.WindowHeight);
-				top = 0;
-			} else {
-				size = new Size (Console.BufferWidth, Console.BufferHeight);
-				top = newTop;
-			}
-			cols = size.Width;
-			rows = size.Height;
-			ResizeScreen ();
-			UpdateOffScreen ();
-			if (!winChanging) {
-				TerminalResized.Invoke ();
-			}
+			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will be simulated to be called.
+			mLoop.ProcessInput = (e) => ProcessInput (e);
 		}
 
 		void ProcessInput (NetEvents.InputResult inputEvent)
@@ -1276,6 +1431,40 @@ namespace Terminal.Gui {
 			case NetEvents.EventType.Mouse:
 				mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
 				break;
+			case NetEvents.EventType.WindowSize:
+				ChangeWin ();
+				break;
+			case NetEvents.EventType.WindowPosition:
+				var newTop = inputEvent.WindowPositionEvent.Top;
+				if (HeightAsBuffer && top != newTop) {
+					top = newTop;
+					Refresh ();
+				}
+				break;
+			}
+		}
+
+		bool winChanging;
+
+		void ChangeWin ()
+		{
+			winChanging = true;
+			const int Min_WindowWidth = 14;
+			Size size = new Size ();
+			if (!HeightAsBuffer) {
+				size = new Size (Math.Max (Min_WindowWidth, Console.WindowWidth),
+					Console.WindowHeight);
+				top = 0;
+			} else {
+				largestWindowHeight = Math.Max (Console.BufferHeight, largestWindowHeight);
+				size = new Size (Console.BufferWidth, largestWindowHeight);
+			}
+			cols = size.Width;
+			rows = size.Height;
+			ResizeScreen ();
+			UpdateOffScreen ();
+			if (!winChanging) {
+				TerminalResized.Invoke ();
 			}
 		}
 
@@ -1416,24 +1605,15 @@ namespace Terminal.Gui {
 	internal class NetMainLoop : IMainLoopDriver {
 		ManualResetEventSlim keyReady = new ManualResetEventSlim (false);
 		ManualResetEventSlim waitForProbe = new ManualResetEventSlim (false);
-		ManualResetEventSlim winChange = new ManualResetEventSlim (false);
 		Queue<NetEvents.InputResult?> inputResult = new Queue<NetEvents.InputResult?> ();
 		MainLoop mainLoop;
-		ConsoleDriver consoleDriver;
-		bool winChanged;
-		int newTop;
 		CancellationTokenSource tokenSource = new CancellationTokenSource ();
 		NetEvents netEvents;
 
 		/// <summary>
 		/// Invoked when a Key is pressed.
 		/// </summary>
-		public Action<NetEvents.InputResult> KeyPressed;
-
-		/// <summary>
-		/// Invoked when the window is changed.
-		/// </summary>
-		public Action<int> WinChanged;
+		public Action<NetEvents.InputResult> ProcessInput;
 
 		/// <summary>
 		/// Initializes the class with the console driver.
@@ -1447,11 +1627,10 @@ namespace Terminal.Gui {
 			if (consoleDriver == null) {
 				throw new ArgumentNullException ("Console driver instance must be provided.");
 			}
-			this.consoleDriver = consoleDriver;
-			netEvents = new NetEvents ();
+			netEvents = new NetEvents (consoleDriver);
 		}
 
-		void KeyReader ()
+		void NetInputHandler ()
 		{
 			while (true) {
 				waitForProbe.Wait ();
@@ -1470,43 +1649,10 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void CheckWinChange ()
-		{
-			while (true) {
-				winChange.Wait ();
-				winChange.Reset ();
-				WaitWinChange ();
-				winChanged = true;
-				keyReady.Set ();
-			}
-		}
-
-		int lastWindowHeight;
-		void WaitWinChange ()
-		{
-			while (true) {
-				if (!consoleDriver.HeightAsBuffer) {
-					if (Console.WindowWidth != consoleDriver.Cols || Console.WindowHeight != consoleDriver.Rows) {
-						return;
-					}
-				} else {
-					if (Console.BufferWidth != consoleDriver.Cols || Console.BufferHeight != consoleDriver.Rows
-						|| Console.WindowTop != consoleDriver.Top
-						|| Console.WindowHeight != lastWindowHeight) {
-						// Top only working on Windows.
-						newTop = Console.WindowTop;
-						lastWindowHeight = Console.WindowHeight;
-						return;
-					}
-				}
-			}
-		}
-
 		void IMainLoopDriver.Setup (MainLoop mainLoop)
 		{
 			this.mainLoop = mainLoop;
-			Task.Run (KeyReader);
-			Task.Run (CheckWinChange);
+			Task.Run (NetInputHandler);
 		}
 
 		void IMainLoopDriver.Wakeup ()
@@ -1517,7 +1663,6 @@ namespace Terminal.Gui {
 		bool IMainLoopDriver.EventsPending (bool wait)
 		{
 			waitForProbe.Set ();
-			winChange.Set ();
 
 			if (CheckTimers (wait, out var waitTimeout)) {
 				return true;
@@ -1534,7 +1679,7 @@ namespace Terminal.Gui {
 			}
 
 			if (!tokenSource.IsCancellationRequested) {
-				return inputResult.Count > 0 || CheckTimers (wait, out _) || winChanged;
+				return inputResult.Count > 0 || CheckTimers (wait, out _);
 			}
 
 			tokenSource.Dispose ();
@@ -1568,11 +1713,7 @@ namespace Terminal.Gui {
 		void IMainLoopDriver.MainIteration ()
 		{
 			if (inputResult.Count > 0) {
-				KeyPressed?.Invoke (inputResult.Dequeue ().Value);
-			}
-			if (winChanged) {
-				winChanged = false;
-				WinChanged?.Invoke (newTop);
+				ProcessInput?.Invoke (inputResult.Dequeue ().Value);
 			}
 		}
 	}
