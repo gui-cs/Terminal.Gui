@@ -145,9 +145,7 @@ namespace UICatalog.Scenarios {
 
 			var negativeRight = new ColumnStyle() {
 				
-				RepresentationGetter = (v)=> v is double d ? 
-								d.ToString("0.##"):
-								v.ToString(),
+				Format = "0.##",
 				MinWidth = 10,
 				AlignmentGetter = (v)=>v is double d ? 
 								// align negative values right

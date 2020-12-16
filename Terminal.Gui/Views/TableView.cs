@@ -27,6 +27,11 @@ namespace Terminal.Gui.Views {
 		public Func<object,string> RepresentationGetter;
 
 		/// <summary>
+		/// Defines the format for values e.g. "yyyy-MM-dd" for dates
+		/// </summary>
+		public string Format{get;set;}
+
+		/// <summary>
 		/// Set the maximum width of the column in characters.  This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/>.  Defaults to <see cref="TableView.DefaultMaxCellWidth"/>
 		/// </summary>
 		public int MaxWidth {get;set;} = TableView.DefaultMaxCellWidth;
@@ -56,6 +61,13 @@ namespace Terminal.Gui.Views {
 		/// <returns></returns>
 		public string GetRepresentation (object value)
 		{
+			if(!string.IsNullOrWhiteSpace(Format)) {
+
+				if(value is IFormattable f)
+					return f.ToString(Format,null);
+			}
+				
+
 			if(RepresentationGetter != null)
 				return RepresentationGetter(value);
 
