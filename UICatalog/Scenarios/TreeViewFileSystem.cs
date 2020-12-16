@@ -28,6 +28,8 @@ namespace UICatalog.Scenarios {
 		private MenuItem miArrowSymbols;
 		private MenuItem miNoSymbols;
 		private MenuItem miColoredSymbols;
+		private Terminal.Gui.Attribute green;
+		private Terminal.Gui.Attribute red;
 
 		public override void Setup ()
 		{
@@ -91,6 +93,9 @@ namespace UICatalog.Scenarios {
 			SetupNodeTree();
 
 			Win.Add(treeViewNodes);
+
+			green = Application.Driver.MakeAttribute (Color.Green, Color.Blue);			
+			red = Application.Driver.MakeAttribute (Color.Red, Color.Blue);
 		}
 
 		private void SetupNodeTree ()
@@ -145,22 +150,23 @@ namespace UICatalog.Scenarios {
 		}
 		private void ShowColoredExpandableSymbols()
 		{
-			ShowColoredExpandableSymbols(treeViewNodes);
+			miColoredSymbols.Checked = !miColoredSymbols.Checked;
+
 			ShowColoredExpandableSymbols(treeViewFiles);
+			ShowColoredExpandableSymbols(treeViewNodes);
 		}
 
 		private void ShowColoredExpandableSymbols (ITreeView treeView)
 		{
-			miColoredSymbols.Checked = !miColoredSymbols.Checked;
 			// Toggle Green expand symbols
 			if(miColoredSymbols.Checked)
-				treeView.Style.ExpandableSymbolColor =  new Terminal.Gui.Attribute(Color.Green,Win.ColorScheme.Normal.Background);
+				treeView.Style.ExpandableSymbolColor =  green;
 			else
 				treeView.Style.ExpandableSymbolColor =  null; //clear it
 
 			// Toggle Red collapse symbols
 			if(miColoredSymbols.Checked)
-				treeView.Style.CollapseableSymbolColor =  new Terminal.Gui.Attribute(Color.Red,Win.ColorScheme.Normal.Background);
+				treeView.Style.CollapseableSymbolColor =  red;
 			else
 				treeView.Style.CollapseableSymbolColor =  null; //clear it
 

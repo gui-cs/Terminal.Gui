@@ -591,6 +591,7 @@ namespace Terminal.Gui {
 				var parent = GetParent(SelectedObject);
 				if(parent != null){
 					SelectedObject = parent;
+					AdjustSelection(0);
 					SetNeedsDisplay();
 				}
 			}
@@ -624,7 +625,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>If nothing is currently selected the first root is selected.  If the selected object is no longer in the tree the first object is selected</remarks>
 		/// <param name="offset"></param>
-		private void AdjustSelection (int offset)
+		public void AdjustSelection (int offset)
 		{
 			if(SelectedObject == null){
 				SelectedObject = roots.Keys.FirstOrDefault();
