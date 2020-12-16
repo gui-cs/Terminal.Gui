@@ -7,94 +7,837 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using NStack;
 
 namespace Terminal.Gui {
+	internal class NetWinVTConsole {
+		IntPtr InputHandle, OutputHandle, ErrorHandle;
+		uint originalInputConsoleMode, originalOutputConsoleMode, originalErrorConsoleMode;
+
+		public NetWinVTConsole ()
+		{
+			InputHandle = GetStdHandle (STD_INPUT_HANDLE);
+			if (!GetConsoleMode (InputHandle, out uint mode)) {
+				throw new ApplicationException ($"Failed to get input console mode, error code: {GetLastError ()}.");
+			}
+			originalInputConsoleMode = mode;
+			if ((mode & ENABLE_VIRTUAL_TERMINAL_INPUT) < ENABLE_VIRTUAL_TERMINAL_INPUT) {
+				mode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+				if (!SetConsoleMode (InputHandle, mode)) {
+					throw new ApplicationException ($"Failed to set input console mode, error code: {GetLastError ()}.");
+				}
+			}
+
+			OutputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
+			if (!GetConsoleMode (OutputHandle, out mode)) {
+				throw new ApplicationException ($"Failed to get output console mode, error code: {GetLastError ()}.");
+			}
+			originalOutputConsoleMode = mode;
+			if ((mode & (ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN)) < DISABLE_NEWLINE_AUTO_RETURN) {
+				mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN;
+				if (!SetConsoleMode (OutputHandle, mode)) {
+					throw new ApplicationException ($"Failed to set output console mode, error code: {GetLastError ()}.");
+				}
+			}
+
+			ErrorHandle = GetStdHandle (STD_ERROR_HANDLE);
+			if (!GetConsoleMode (ErrorHandle, out mode)) {
+				throw new ApplicationException ($"Failed to get error console mode, error code: {GetLastError ()}.");
+			}
+			originalErrorConsoleMode = mode;
+			if ((mode & (DISABLE_NEWLINE_AUTO_RETURN)) < DISABLE_NEWLINE_AUTO_RETURN) {
+				mode |= DISABLE_NEWLINE_AUTO_RETURN;
+				if (!SetConsoleMode (ErrorHandle, mode)) {
+					throw new ApplicationException ($"Failed to set error console mode, error code: {GetLastError ()}.");
+				}
+			}
+		}
+
+		public void Cleanup ()
+		{
+			if (!SetConsoleMode (InputHandle, originalInputConsoleMode)) {
+				throw new ApplicationException ($"Failed to restore input console mode, error code: {GetLastError ()}.");
+			}
+			if (!SetConsoleMode (OutputHandle, originalOutputConsoleMode)) {
+				throw new ApplicationException ($"Failed to restore output console mode, error code: {GetLastError ()}.");
+			}
+			if (!SetConsoleMode (ErrorHandle, originalErrorConsoleMode)) {
+				throw new ApplicationException ($"Failed to restore error console mode, error code: {GetLastError ()}.");
+			}
+		}
+
+		const int STD_INPUT_HANDLE = -10;
+		const int STD_OUTPUT_HANDLE = -11;
+		const int STD_ERROR_HANDLE = -12;
+
+		// Input modes.
+		const uint ENABLE_PROCESSED_INPUT = 1;
+		const uint ENABLE_LINE_INPUT = 2;
+		const uint ENABLE_ECHO_INPUT = 4;
+		const uint ENABLE_WINDOW_INPUT = 8;
+		const uint ENABLE_MOUSE_INPUT = 16;
+		const uint ENABLE_INSERT_MODE = 32;
+		const uint ENABLE_QUICK_EDIT_MODE = 64;
+		const uint ENABLE_EXTENDED_FLAGS = 128;
+		const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 512;
+
+		// Output modes.
+		const uint ENABLE_PROCESSED_OUTPUT = 1;
+		const uint ENABLE_WRAP_AT_EOL_OUTPUT = 2;
+		const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
+		const uint DISABLE_NEWLINE_AUTO_RETURN = 8;
+		const uint ENABLE_LVB_GRID_WORLDWIDE = 10;
+
+		[DllImport ("kernel32.dll", SetLastError = true)]
+		static extern IntPtr GetStdHandle (int nStdHandle);
+
+		[DllImport ("kernel32.dll")]
+		static extern bool GetConsoleMode (IntPtr hConsoleHandle, out uint lpMode);
+
+		[DllImport ("kernel32.dll")]
+		static extern bool SetConsoleMode (IntPtr hConsoleHandle, uint dwMode);
+
+		[DllImport ("kernel32.dll")]
+		static extern uint GetLastError ();
+	}
+
+	internal class NetEvents {
+		ManualResetEventSlim inputReady = new ManualResetEventSlim (false);
+		ManualResetEventSlim waitForStart = new ManualResetEventSlim (false);
+		Queue<InputResult?> inputResultQueue = new Queue<InputResult?> ();
+
+		public int NumberOfCSI { get; }
+
+		public NetEvents (int numberOfCSI = 1)
+		{
+			NumberOfCSI = numberOfCSI;
+			Task.Run (ProcessInputResultQueue);
+		}
+
+		public InputResult? ReadConsoleInput ()
+		{
+			while (true) {
+				waitForStart.Set ();
+				if (inputResultQueue.Count == 0) {
+					inputReady.Wait ();
+					inputReady.Reset ();
+				}
+				if (inputResultQueue.Count > 0) {
+					return inputResultQueue.Dequeue ();
+				}
+			}
+		}
+
+		void ProcessInputResultQueue ()
+		{
+			while (true) {
+				waitForStart.Wait ();
+				waitForStart.Reset ();
+
+				if (inputResultQueue.Count == 0) {
+					GetConsoleInputType (Console.ReadKey (true));
+				}
+
+				inputReady.Set ();
+			}
+		}
+
+		void GetConsoleInputType (ConsoleKeyInfo consoleKeyInfo)
+		{
+			InputResult inputResult = new InputResult {
+				EventType = EventType.key
+			};
+			ConsoleKeyInfo newConsoleKeyInfo = consoleKeyInfo;
+			ConsoleKey key = 0;
+			MouseEvent mouseEvent = new MouseEvent ();
+			var keyChar = consoleKeyInfo.KeyChar;
+			switch ((uint)keyChar) {
+			case 0:
+				if (consoleKeyInfo.Key == (ConsoleKey)64) {    // Ctrl+Space in Windows.
+					newConsoleKeyInfo = new ConsoleKeyInfo (' ', ConsoleKey.Spacebar,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
+				}
+				break;
+			case uint n when (n >= '\u0001' && n <= '\u001a'):
+				if (consoleKeyInfo.Key == 0) {
+					key = (ConsoleKey)(char)(consoleKeyInfo.KeyChar + (uint)ConsoleKey.A - 1);
+					newConsoleKeyInfo = new ConsoleKeyInfo ((char)key,
+						key,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+						(consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+						true);
+				}
+				break;
+			case 27:
+				ConsoleKeyInfo [] cki = new ConsoleKeyInfo [] { consoleKeyInfo };
+				ConsoleModifiers mod = consoleKeyInfo.Modifiers;
+				while (Console.KeyAvailable) {
+					var result = Console.ReadKey (true);
+					Array.Resize (ref cki, cki == null ? 1 : cki.Length + 1);
+					cki [cki.Length - 1] = result;
+				}
+				SplitCSI (cki, ref inputResult, ref newConsoleKeyInfo, ref key, ref mouseEvent, ref mod);
+				return;
+			case 127:
+				newConsoleKeyInfo = new ConsoleKeyInfo (consoleKeyInfo.KeyChar, ConsoleKey.Backspace,
+					(consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+					(consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+					(consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
+				break;
+			default:
+				newConsoleKeyInfo = consoleKeyInfo;
+				break;
+			}
+			if (inputResult.EventType == EventType.key) {
+				inputResult.ConsoleKeyInfo = newConsoleKeyInfo;
+			} else {
+				inputResult.MouseEvent = mouseEvent;
+			}
+
+			inputResultQueue.Enqueue (inputResult);
+		}
+
+		void SplitCSI (ConsoleKeyInfo [] cki, ref InputResult inputResult, ref ConsoleKeyInfo newConsoleKeyInfo, ref ConsoleKey key, ref MouseEvent mouseEvent, ref ConsoleModifiers mod)
+		{
+			ConsoleKeyInfo [] splitedCki = new ConsoleKeyInfo [] { };
+			int length = 0;
+			var kChar = GetKeyCharArray (cki);
+			var nCSI = kChar.Where (val => val == '\x1b').ToArray ().Length;
+			int curCSI = 0;
+			if (nCSI > 1) {
+				foreach (var ck in cki) {
+					if (NumberOfCSI > 0 && nCSI - curCSI > NumberOfCSI) {
+						if (ck.KeyChar == '\x1b') {
+							curCSI++;
+						}
+						continue;
+					}
+					if (ck.KeyChar == '\x1b') {
+						if (splitedCki.Length > 0) {
+							DecodeCSI (ref inputResult, ref newConsoleKeyInfo, ref key, ref mouseEvent, splitedCki, ref mod);
+						}
+						splitedCki = new ConsoleKeyInfo [] { };
+						length = 0;
+					}
+					length++;
+					Array.Resize (ref splitedCki, length);
+					splitedCki [length - 1] = ck;
+				}
+			} else {
+				DecodeCSI (ref inputResult, ref newConsoleKeyInfo, ref key, ref mouseEvent, cki, ref mod);
+			}
+		}
+
+		void DecodeCSI (ref InputResult inputResult, ref ConsoleKeyInfo newConsoleKeyInfo, ref ConsoleKey key, ref MouseEvent mouseEvent, ConsoleKeyInfo [] cki, ref ConsoleModifiers mod)
+		{
+			switch (cki.Length) {
+			case 2:
+				if ((uint)cki [1].KeyChar >= 1 && (uint)cki [1].KeyChar <= 26) {
+					key = (ConsoleKey)(char)(cki [1].KeyChar + (uint)ConsoleKey.A - 1);
+					newConsoleKeyInfo = new ConsoleKeyInfo (cki [1].KeyChar,
+						key,
+						false,
+						true,
+						true);
+				} else {
+					if (cki [1].KeyChar >= 97 && cki [1].KeyChar <= 122) {
+						key = (ConsoleKey)cki [1].KeyChar.ToString ().ToUpper () [0];
+					} else {
+						key = (ConsoleKey)cki [1].KeyChar;
+					}
+					newConsoleKeyInfo = new ConsoleKeyInfo ((char)key,
+						(ConsoleKey)Math.Min ((uint)key, 255),
+						false,
+						true,
+						false);
+				}
+				break;
+			case 3:
+				if (cki [1].KeyChar == '[' || cki [1].KeyChar == 79) {
+					key = GetConsoleKey (cki [2].KeyChar, ref mod, cki.Length);
+				}
+				newConsoleKeyInfo = new ConsoleKeyInfo ('\0',
+					key,
+					(mod & ConsoleModifiers.Shift) != 0,
+					(mod & ConsoleModifiers.Alt) != 0,
+					(mod & ConsoleModifiers.Control) != 0);
+				break;
+			case 4:
+				if (cki [1].KeyChar == '[' && cki [3].KeyChar == 126) {
+					key = GetConsoleKey (cki [2].KeyChar, ref mod, cki.Length);
+					newConsoleKeyInfo = new ConsoleKeyInfo ('\0',
+						key,
+						(mod & ConsoleModifiers.Shift) != 0,
+						(mod & ConsoleModifiers.Alt) != 0,
+						(mod & ConsoleModifiers.Control) != 0);
+				}
+				break;
+			case 5:
+				if (cki [1].KeyChar == '[' && (cki [2].KeyChar == 49 || cki [2].KeyChar == 50)
+					&& cki [4].KeyChar == 126) {
+					key = GetConsoleKey (cki [3].KeyChar, ref mod, cki.Length);
+				} else if (cki [1].KeyChar == 49 && cki [2].KeyChar == ';') { // For WSL
+					mod |= GetConsoleModifiers (cki [3].KeyChar);
+					key = ConsoleKey.End;
+				}
+				newConsoleKeyInfo = new ConsoleKeyInfo ('\0',
+					key,
+					(mod & ConsoleModifiers.Shift) != 0,
+					(mod & ConsoleModifiers.Alt) != 0,
+					(mod & ConsoleModifiers.Control) != 0);
+				break;
+			case 6:
+				if (cki [1].KeyChar == '[' && cki [2].KeyChar == 49 && cki [3].KeyChar == ';') {
+					mod |= GetConsoleModifiers (cki [4].KeyChar);
+					key = GetConsoleKey (cki [5].KeyChar, ref mod, cki.Length);
+				} else if (cki [1].KeyChar == '[' && cki [3].KeyChar == ';') {
+					mod |= GetConsoleModifiers (cki [4].KeyChar);
+					key = GetConsoleKey (cki [2].KeyChar, ref mod, cki.Length);
+				}
+				newConsoleKeyInfo = new ConsoleKeyInfo ('\0',
+					key,
+					(mod & ConsoleModifiers.Shift) != 0,
+					(mod & ConsoleModifiers.Alt) != 0,
+					(mod & ConsoleModifiers.Control) != 0);
+				break;
+			case 7:
+				throw new NotImplementedException ("Condition not yet detected!");
+			case int n when n >= 8:
+				GetMouseEvent (cki);
+				return;
+			}
+			if (inputResult.EventType == EventType.key) {
+				inputResult.ConsoleKeyInfo = newConsoleKeyInfo;
+			} else {
+				inputResult.MouseEvent = mouseEvent;
+			}
+
+			inputResultQueue.Enqueue (inputResult);
+		}
+
+		MouseEvent lastMouseEvent;
+		bool isButtonPressed;
+		bool isButtonClicked;
+		bool isButtonDoubleClicked;
+		bool isButtonTripleClicked;
+		bool isProcContBtnPressedRuning;
+
+		void GetMouseEvent (ConsoleKeyInfo [] cki)
+		{
+			MouseEvent mouseEvent = new MouseEvent ();
+			MouseButtonState buttonState = 0;
+			Point point = new Point ();
+			int buttonCode = 0;
+			bool foundButtonCode = false;
+			int foundPoint = 0;
+			string value = "";
+			var kChar = GetKeyCharArray (cki);
+			for (int i = 0; i < kChar.Length; i++) {
+				var c = kChar [i];
+				if (c == '<') {
+					foundButtonCode = true;
+				} else if (foundButtonCode && c != ';') {
+					value += c.ToString ();
+				} else if (c == ';') {
+					if (foundButtonCode) {
+						foundButtonCode = false;
+						buttonCode = int.Parse (value);
+					}
+					if (foundPoint == 1) {
+						point.X = int.Parse (value) - 1;
+					}
+					value = "";
+					foundPoint++;
+				} else if (foundPoint > 0 && c != 'm' && c != 'M') {
+					value += c.ToString ();
+				} else if (c == 'm' || c == 'M') {
+					point.Y = int.Parse (value) + Console.WindowTop - 1;
+
+					if (c == 'M') {
+						isButtonPressed = true;
+					} else if (c == 'm') {
+						isButtonPressed = false;
+					}
+
+					switch (buttonCode) {
+					case 0:
+					case 8:
+					case 16:
+					case 32:
+						buttonState = c == 'M' ? MouseButtonState.Button1Pressed
+							: MouseButtonState.Button1Released;
+						break;
+					case 1:
+					case 9:
+					case 17:
+					case 33:
+						buttonState = c == 'M' ? MouseButtonState.Button2Pressed
+							: MouseButtonState.Button2Released;
+						break;
+					case 2:
+					case 10:
+					case 18:
+					case 34:
+						buttonState = c == 'M' ? MouseButtonState.Button3Pressed
+							: MouseButtonState.Button3Released;
+						break;
+					case 35:
+					case 43:
+						buttonState = MouseButtonState.ReportMousePosition;
+						break;
+					case 64:
+						buttonState = MouseButtonState.ButtonWheeledUp;
+						break;
+					case 65:
+						buttonState = MouseButtonState.ButtonWheeledDown;
+						break;
+					case 72:
+						buttonState = MouseButtonState.ButtonWheeledLeft;       // Ctrl+ButtonWheeledUp
+						break;
+					case 73:
+						buttonState = MouseButtonState.ButtonWheeledRight;      // Ctrl+ButtonWheeledDown
+						break;
+					}
+					// Modifiers.
+					switch (buttonCode) {
+					case 8:
+					case 9:
+					case 10:
+					case 16:
+					case 17:
+					case 18:
+					case 43:
+						buttonState |= MouseButtonState.ButtonCtrl;
+						break;
+					case 32:
+					case 33:
+					case 34:
+						buttonState |= MouseButtonState.ReportMousePosition;
+						break;
+					}
+				}
+			}
+			mouseEvent.Position.X = point.X;
+			mouseEvent.Position.Y = point.Y;
+			mouseEvent.ButtonState = buttonState;
+
+			if ((isButtonClicked || isButtonDoubleClicked || isButtonTripleClicked)
+				&& ((buttonState & MouseButtonState.Button1Released) != 0
+				|| (buttonState & MouseButtonState.Button2Released) != 0
+				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
+				isButtonTripleClicked = false;
+				return;
+			}
+
+			if (isButtonClicked && !isButtonDoubleClicked && lastMouseEvent.Position != default && lastMouseEvent.Position == point
+				&& ((buttonState & MouseButtonState.Button1Pressed) != 0
+				|| (buttonState & MouseButtonState.Button2Pressed) != 0
+				|| (buttonState & MouseButtonState.Button3Pressed) != 0)) {
+				isButtonDoubleClicked = true;
+				ProcessButtonDoubleClicked (mouseEvent);
+				Application.MainLoop.AddIdle (() => {
+					Task.Run (async () => {
+						await Task.Delay (300);
+						isButtonDoubleClicked = false;
+					});
+					return false;
+				});
+				inputReady.Set ();
+				return;
+			}
+			if (isButtonDoubleClicked && lastMouseEvent.Position != default && lastMouseEvent.Position == point
+				&& ((buttonState & MouseButtonState.Button1Pressed) != 0
+				|| (buttonState & MouseButtonState.Button2Pressed) != 0
+				|| (buttonState & MouseButtonState.Button3Pressed) != 0)) {
+				isButtonTripleClicked = true;
+				ProcessButtonTripleClicked (mouseEvent);
+				inputReady.Set ();
+				return;
+			}
+
+			inputResultQueue.Enqueue (new InputResult () {
+				EventType = EventType.Mouse,
+				MouseEvent = mouseEvent
+			});
+
+			if (!isButtonClicked && lastMouseEvent.Position != default && lastMouseEvent.Position == point
+				&& ((buttonState & MouseButtonState.Button1Released) != 0
+				|| (buttonState & MouseButtonState.Button2Released) != 0
+				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
+				isButtonClicked = true;
+				ProcessButtonClicked (mouseEvent);
+				Application.MainLoop.AddIdle (() => {
+					Task.Run (async () => {
+						await Task.Delay (300);
+						isButtonClicked = false;
+					});
+					return false;
+				});
+				inputReady.Set ();
+				return;
+			}
+
+			lastMouseEvent = mouseEvent;
+			if (isButtonPressed && !isButtonClicked && !isButtonDoubleClicked && !isButtonTripleClicked && !isProcContBtnPressedRuning) {
+				Application.MainLoop.AddIdle (() => {
+					ProcessContinuousButtonPressedAsync ().ConfigureAwait (false);
+					return false;
+				});
+			}
+
+			inputReady.Set ();
+		}
+
+		void ProcessButtonClicked (MouseEvent mouseEvent)
+		{
+			var me = new MouseEvent () {
+				Position = mouseEvent.Position,
+				ButtonState = mouseEvent.ButtonState
+			};
+			switch (mouseEvent.ButtonState) {
+			case MouseButtonState.Button1Released:
+				me.ButtonState &= ~MouseButtonState.Button1Released;
+				me.ButtonState |= MouseButtonState.Button1Clicked;
+				break;
+			case MouseButtonState.Button2Released:
+				me.ButtonState &= ~MouseButtonState.Button2Released;
+				me.ButtonState |= MouseButtonState.Button2Clicked;
+				break;
+			case MouseButtonState.Button3Released:
+				me.ButtonState &= ~MouseButtonState.Button3Released;
+				me.ButtonState |= MouseButtonState.Button3Clicked;
+				break;
+			default:
+				return;
+			}
+			inputResultQueue.Enqueue (new InputResult () {
+				EventType = EventType.Mouse,
+				MouseEvent = me
+			});
+		}
+
+		void ProcessButtonDoubleClicked (MouseEvent mouseEvent)
+		{
+			var me = new MouseEvent () {
+				Position = mouseEvent.Position,
+				ButtonState = mouseEvent.ButtonState
+			};
+			switch (mouseEvent.ButtonState) {
+			case MouseButtonState.Button1Pressed:
+				me.ButtonState &= ~MouseButtonState.Button1Pressed;
+				me.ButtonState |= MouseButtonState.Button1DoubleClicked;
+				break;
+			case MouseButtonState.Button2Pressed:
+				me.ButtonState &= ~MouseButtonState.Button2Pressed;
+				me.ButtonState |= MouseButtonState.Button2DoubleClicked;
+				break;
+			case MouseButtonState.Button3Pressed:
+				me.ButtonState &= ~MouseButtonState.Button3Pressed;
+				me.ButtonState |= MouseButtonState.Button3DoubleClicked;
+				break;
+			default:
+				return;
+			}
+			inputResultQueue.Enqueue (new InputResult () {
+				EventType = EventType.Mouse,
+				MouseEvent = me
+			});
+		}
+
+		void ProcessButtonTripleClicked (MouseEvent mouseEvent)
+		{
+			var me = new MouseEvent () {
+				Position = mouseEvent.Position,
+				ButtonState = mouseEvent.ButtonState
+			};
+			switch (mouseEvent.ButtonState) {
+			case MouseButtonState.Button1Pressed:
+				me.ButtonState &= ~MouseButtonState.Button1Pressed;
+				me.ButtonState |= MouseButtonState.Button1TripleClicked;
+				break;
+			case MouseButtonState.Button2Pressed:
+				me.ButtonState &= ~MouseButtonState.Button2Pressed;
+				me.ButtonState |= MouseButtonState.Button2TrippleClicked;
+				break;
+			case MouseButtonState.Button3Pressed:
+				me.ButtonState &= ~MouseButtonState.Button3Pressed;
+				me.ButtonState |= MouseButtonState.Button3TripleClicked;
+				break;
+			default:
+				return;
+			}
+			inputResultQueue.Enqueue (new InputResult () {
+				EventType = EventType.Mouse,
+				MouseEvent = me
+			});
+		}
+
+		async Task ProcessContinuousButtonPressedAsync ()
+		{
+			isProcContBtnPressedRuning = true;
+			Point point = new Point ();
+			while (isButtonPressed) {
+				await Task.Delay (200);
+				var view = Application.wantContinuousButtonPressedView;
+				if (isButtonPressed && !Console.KeyAvailable
+					&&  !isButtonClicked && !isButtonDoubleClicked && !isButtonTripleClicked
+					&& (view != null || view == null && lastMouseEvent.Position != point)) {
+					point = lastMouseEvent.Position;
+					inputResultQueue.Enqueue (new InputResult () {
+						EventType = EventType.Mouse,
+						MouseEvent = lastMouseEvent
+					});
+					inputReady.Set ();
+				} else {
+					break;
+				}
+			}
+			isProcContBtnPressedRuning = false;
+			isButtonPressed = false;
+		}
+
+		char [] GetKeyCharArray (ConsoleKeyInfo [] cki)
+		{
+			char [] kChar = new char [] { };
+			var length = 0;
+			foreach (var kc in cki) {
+				length++;
+				Array.Resize (ref kChar, length);
+				kChar [length - 1] = kc.KeyChar;
+			}
+
+			return kChar;
+		}
+
+		ConsoleModifiers GetConsoleModifiers (uint keyChar)
+		{
+			switch (keyChar) {
+			case 50:
+				return ConsoleModifiers.Shift;
+			case 51:
+				return ConsoleModifiers.Alt;
+			case 52:
+				return ConsoleModifiers.Shift | ConsoleModifiers.Alt;
+			case 53:
+				return ConsoleModifiers.Control;
+			case 54:
+				return ConsoleModifiers.Shift | ConsoleModifiers.Control;
+			case 55:
+				return ConsoleModifiers.Alt | ConsoleModifiers.Control;
+			case 56:
+				return ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control;
+			default:
+				return 0;
+			}
+		}
+
+		ConsoleKey GetConsoleKey (char keyChar, ref ConsoleModifiers mod, int length)
+		{
+			ConsoleKey key;
+			switch (keyChar) {
+			case 'A':
+				key = ConsoleKey.UpArrow;
+				break;
+			case 'B':
+				key = ConsoleKey.DownArrow;
+				break;
+			case 'C':
+				key = ConsoleKey.RightArrow;
+				break;
+			case 'D':
+				key = ConsoleKey.LeftArrow;
+				break;
+			case 'F':
+				key = ConsoleKey.End;
+				break;
+			case 'H':
+				key = ConsoleKey.Home;
+				break;
+			case 'P':
+				key = ConsoleKey.F1;
+				break;
+			case 'Q':
+				key = ConsoleKey.F2;
+				break;
+			case 'R':
+				key = ConsoleKey.F3;
+				break;
+			case 'S':
+				key = ConsoleKey.F4;
+				break;
+			case 'Z':
+				key = ConsoleKey.Tab;
+				mod |= ConsoleModifiers.Shift;
+				break;
+			case '0':
+				key = ConsoleKey.F9;
+				break;
+			case '1':
+				key = ConsoleKey.F10;
+				break;
+			case '3':
+				if (length == 5) {
+					key = ConsoleKey.F11;
+				} else {
+					key = ConsoleKey.Delete;
+				}
+				break;
+			case '4':
+				key = ConsoleKey.F12;
+				break;
+			case '5':
+				if (length == 5) {
+					key = ConsoleKey.F5;
+				} else {
+					key = ConsoleKey.PageUp;
+				}
+				break;
+			case '6':
+				key = ConsoleKey.PageDown;
+				break;
+			case '7':
+				key = ConsoleKey.F6;
+				break;
+			case '8':
+				key = ConsoleKey.F7;
+				break;
+			case '9':
+				key = ConsoleKey.F8;
+				break;
+			default:
+				key = 0;
+				break;
+			}
+
+			return key;
+		}
+
+		public enum EventType {
+			key = 1,
+			Mouse = 2
+		}
+
+		[Flags]
+		public enum MouseButtonState {
+			Button1Pressed = 0x1,
+			Button1Released = 0x2,
+			Button1Clicked = 0x4,
+			Button1DoubleClicked = 0x8,
+			Button1TripleClicked = 0x10,
+			Button2Pressed = 0x20,
+			Button2Released = 0x40,
+			Button2Clicked = 0x80,
+			Button2DoubleClicked = 0x100,
+			Button2TrippleClicked = 0x200,
+			Button3Pressed = 0x400,
+			Button3Released = 0x800,
+			Button3Clicked = 0x1000,
+			Button3DoubleClicked = 0x2000,
+			Button3TripleClicked = 0x4000,
+			ButtonWheeledUp = 0x8000,
+			ButtonWheeledDown = 0x10000,
+			ButtonWheeledLeft = 0x20000,
+			ButtonWheeledRight = 0x40000,
+			Button4Pressed = 0x80000,
+			Button4Released = 0x100000,
+			Button4Clicked = 0x200000,
+			Button4DoubleClicked = 0x400000,
+			Button4TripleClicked = 0x800000,
+			ButtonShift = 0x1000000,
+			ButtonCtrl = 0x2000000,
+			ButtonAlt = 0x4000000,
+			ReportMousePosition = 0x8000000,
+			AllEvents = Button1Pressed | Button1Released | Button1Clicked | Button1DoubleClicked | Button1TripleClicked | Button2Pressed | Button2Released | Button2Clicked | Button2DoubleClicked | Button2TrippleClicked | Button3Pressed | Button3Released | Button3Clicked | Button3DoubleClicked | Button3TripleClicked | ButtonWheeledUp | ButtonWheeledDown | ButtonWheeledLeft | ButtonWheeledRight | Button4Pressed | Button4Released | Button4Clicked | Button4DoubleClicked | Button4TripleClicked | ReportMousePosition
+		}
+
+		public struct MouseEvent {
+			public Point Position;
+			public MouseButtonState ButtonState;
+		}
+
+		public struct InputResult {
+			public EventType EventType;
+			public ConsoleKeyInfo ConsoleKeyInfo;
+			public MouseEvent MouseEvent;
+		}
+	}
 
 	internal class NetDriver : ConsoleDriver {
 		int cols, rows, top;
 		public override int Cols => cols;
 		public override int Rows => rows;
 		public override int Top => top;
+		public override bool HeightAsBuffer { get; set; }
+
+		public NetWinVTConsole NetWinConsole { get; }
+
+		bool isWinPlatform;
+
+		public NetDriver ()
+		{
+			var p = Environment.OSVersion.Platform;
+			if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
+				isWinPlatform = true;
+				NetWinConsole = new NetWinVTConsole ();
+			}
+		}
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		int [,,] contents;
 		bool [] dirtyLine;
 
-		public NetDriver ()
-		{
-			ResizeScreen ();
-			UpdateOffscreen ();
-		}
-
-		void UpdateOffscreen ()
-		{
-			int cols = Cols;
-			int rows = Rows;
-
-			contents = new int [rows, cols, 3];
-			dirtyLine = new bool [rows];
-			for (int row = 0; row < rows; row++) {
-				for (int c = 0; c < cols; c++) {
-					contents [row, c, 0] = ' ';
-					contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
-					contents [row, c, 2] = 0;
-					dirtyLine [row] = true;
-				}
-			}
-		}
-
 		static bool sync = false;
 
-		bool needMove;
 		// Current row, and current col, tracked by Move/AddCh only
 		int ccol, crow;
 		public override void Move (int col, int row)
 		{
 			ccol = col;
 			crow = row;
-
-			if (Clip.Contains (col, row)) {
-				if (cols == Console.WindowWidth && rows == Console.WindowHeight) {
-					Console.SetCursorPosition (col, row);
-					needMove = false;
-				}
-			} else {
-				if (cols == Console.WindowWidth && rows == Console.WindowHeight) {
-					if (Console.WindowHeight > 0) {
-						Console.SetCursorPosition (Clip.X, Clip.Y);
-					}
-					needMove = true;
-				}
-			}
 		}
 
 		public override void AddRune (Rune rune)
 		{
+			if (contents.Length != Rows * Cols * 3) {
+				return;
+			}
 			rune = MakePrintable (rune);
-			if (Clip.Contains (ccol, crow)) {
-				if (needMove) {
-					if (cols == Console.WindowWidth && rows == Console.WindowHeight) {
-						Console.SetCursorPosition (ccol, crow);
-					}
-					needMove = false;
-				}
+			var runeWidth = Rune.ColumnWidth (rune);
+			if (Clip.Contains (ccol, crow) && ccol + Math.Max (runeWidth, 1) <= Cols) {
 				contents [crow, ccol, 0] = (int)(uint)rune;
 				contents [crow, ccol, 1] = currentAttribute;
 				contents [crow, ccol, 2] = 1;
 				dirtyLine [crow] = true;
-			} else
-				needMove = true;
-			ccol++;
+
+				ccol++;
+				if (runeWidth > 1) {
+					for (int i = 1; i < runeWidth; i++) {
+						if (ccol < cols) {
+							contents [crow, ccol, 2] = 0;
+						} else {
+							break;
+						}
+						ccol++;
+					}
+				}
+			} else if (ccol > -1 && crow > -1 && ccol < cols && crow < rows) {
+				contents [crow, ccol, 2] = 1;
+				dirtyLine [crow] = true;
+			}
+
 			//if (ccol == Cols) {
 			//	ccol = 0;
 			//	if (crow + 1 < Rows)
 			//		crow++;
 			//}
-			if (sync)
+			if (sync) {
 				UpdateScreen ();
+			}
 		}
 
 		public override void AddStr (ustring str)
@@ -105,6 +848,11 @@ namespace Terminal.Gui {
 
 		public override void End ()
 		{
+			if (isWinPlatform) {
+				NetWinConsole.Cleanup ();
+			}
+
+			StopReportingMouseMoves ();
 			Console.ResetColor ();
 			Clear ();
 		}
@@ -119,13 +867,27 @@ namespace Terminal.Gui {
 		static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
 		{
 			// Encode the colors into the int value.
-			return new Attribute () { value = ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff) };
+			return new Attribute (
+				value: ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff),
+				foreground: (Color)f,
+				background: (Color)b
+				);
 		}
 
 		public override void Init (Action terminalResized)
 		{
 			TerminalResized = terminalResized;
+
 			Console.TreatControlCAsInput = true;
+
+			cols = Console.WindowWidth;
+			rows = Console.WindowHeight;
+
+			Clear ();
+			ResizeScreen ();
+			UpdateOffScreen ();
+
+			StartReportingMouseMoves ();
 
 			Colors.TopLevel = new ColorScheme ();
 			Colors.Base = new ColorScheme ();
@@ -163,15 +925,71 @@ namespace Terminal.Gui {
 			Colors.Error.Focus = MakeColor (ConsoleColor.Black, ConsoleColor.Gray);
 			Colors.Error.HotNormal = MakeColor (ConsoleColor.Yellow, ConsoleColor.Red);
 			Colors.Error.HotFocus = Colors.Error.HotNormal;
-			Clear ();
 		}
 
 		void ResizeScreen ()
 		{
-			cols = Console.WindowWidth;
-			rows = Console.WindowHeight;
+			if (!HeightAsBuffer) {
+				if (Console.WindowHeight > 0) {
+					// Can raise an exception while is still resizing.
+					try {
+						// Not supported on Unix.
+						if (isWinPlatform) {
+#pragma warning disable CA1416
+							Console.CursorTop = 0;
+							Console.CursorLeft = 0;
+							Console.WindowTop = 0;
+							Console.WindowLeft = 0;
+							Console.SetBufferSize (Cols, Rows);
+#pragma warning restore CA1416
+						} else {
+							//Console.Out.Write ($"\x1b[8;{Console.WindowHeight};{Console.WindowWidth}t");
+							Console.Out.Write ($"\x1b[0;0" +
+								$";{Rows};{Cols}w");
+						}
+					} catch (System.IO.IOException) {
+						return;
+					} catch (ArgumentOutOfRangeException) {
+						return;
+					}
+				}
+			} else {
+				if (isWinPlatform && Console.WindowHeight > 0) {
+					// Can raise an exception while is still resizing.
+					try {
+#pragma warning disable CA1416
+						Console.WindowTop = Math.Max (Math.Min (top, Rows - Console.WindowHeight), 0);
+#pragma warning restore CA1416
+					} catch (Exception) {
+						return;
+					}
+				} else {
+					Console.Out.Write ($"\x1b[{top};{Console.WindowLeft}" +
+						$";{Rows};{Cols}w");
+				}
+			}
+
 			Clip = new Rect (0, 0, Cols, Rows);
-			top = Console.WindowTop;
+
+			contents = new int [Rows, Cols, 3];
+			dirtyLine = new bool [Rows];
+		}
+
+		void UpdateOffScreen ()
+		{
+			// Can raise an exception while is still resizing.
+			try {
+				for (int row = 0; row < rows; row++) {
+					for (int c = 0; c < cols; c++) {
+						contents [row, c, 0] = ' ';
+						contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
+						contents [row, c, 2] = 0;
+						dirtyLine [row] = true;
+					}
+				}
+			} catch (IndexOutOfRangeException) { }
+
+			winChanging = false;
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)
@@ -196,29 +1014,38 @@ namespace Terminal.Gui {
 
 		public override void UpdateScreen ()
 		{
-			if (Rows == 0) {
+			if (winChanging || Console.WindowHeight == 0 || contents.Length != Rows * Cols * 3
+				|| (!HeightAsBuffer && Rows != Console.WindowHeight)
+				|| (HeightAsBuffer && Rows != Console.BufferHeight)) {
 				return;
 			}
 
-			int rows = Rows;
+			int top = Top;
+			int rows = Math.Min (Console.WindowHeight + top, Rows);
 			int cols = Cols;
 
 			for (int row = top; row < rows; row++) {
-				if (!dirtyLine [row])
+				if (!dirtyLine [row]) {
 					continue;
+				}
 				dirtyLine [row] = false;
 				for (int col = 0; col < cols; col++) {
-					if (contents [row, col, 2] != 1)
+					if (contents [row, col, 2] != 1) {
 						continue;
-
+					}
 					if (Console.WindowHeight > 0) {
-						Console.SetCursorPosition (col, row);
+						// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
+						try {
+							Console.SetCursorPosition (col, row);
+						} catch (Exception) {
+							return;
+						}
 					}
 					for (; col < cols && contents [row, col, 2] == 1; col++) {
 						var color = contents [row, col, 1];
-						if (color != redrawColor)
+						if (color != redrawColor) {
 							SetColor (color);
-
+						}
 						Console.Write ((char)contents [row, col, 0]);
 						contents [row, col, 2] = 0;
 					}
@@ -230,12 +1057,6 @@ namespace Terminal.Gui {
 
 		public override void Refresh ()
 		{
-			if (Console.WindowWidth != Cols || Console.WindowHeight != Rows || Console.WindowTop != Top) {
-				ResizeScreen ();
-				UpdateOffscreen ();
-				TerminalResized.Invoke ();
-			}
-
 			UpdateScreen ();
 		}
 
@@ -243,18 +1064,24 @@ namespace Terminal.Gui {
 		{
 			// Prevents the exception of size changing during resizing.
 			try {
-				if (ccol > 0 && ccol < Console.WindowWidth && crow > 0 && crow < Console.WindowHeight) {
+				if (ccol >= 0 && ccol <= cols && crow >= 0 && crow <= rows) {
 					Console.SetCursorPosition (ccol, crow);
 				}
-			} catch (ArgumentOutOfRangeException) { }
+			} catch (System.IO.IOException) {
+			} catch (ArgumentOutOfRangeException) {
+			}
 		}
 
 		public override void StartReportingMouseMoves ()
 		{
+			Console.Out.Write ("\x1b[?1003h\x1b[?1015h\x1b[?1006h");
+			Console.Out.Flush ();
 		}
 
 		public override void StopReportingMouseMoves ()
 		{
+			Console.Out.Write ("\x1b[?1003l\x1b[?1015l\x1b[?1006l");
+			Console.Out.Flush ();
 		}
 
 		public override void Suspend ()
@@ -264,41 +1091,44 @@ namespace Terminal.Gui {
 		int currentAttribute;
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c.value;
+			currentAttribute = c.Value;
 		}
 
 		Key MapKey (ConsoleKeyInfo keyInfo)
 		{
-			MapKeyModifiers (keyInfo);
+			MapKeyModifiers (keyInfo, (Key)keyInfo.Key);
 			switch (keyInfo.Key) {
 			case ConsoleKey.Escape:
-				return Key.Esc;
+				return MapKeyModifiers (keyInfo, Key.Esc);
 			case ConsoleKey.Tab:
 				return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.BackTab : Key.Tab;
 			case ConsoleKey.Home:
-				return Key.Home;
+				return MapKeyModifiers (keyInfo, Key.Home);
 			case ConsoleKey.End:
-				return Key.End;
+				return MapKeyModifiers (keyInfo, Key.End);
 			case ConsoleKey.LeftArrow:
-				return Key.CursorLeft;
+				return MapKeyModifiers (keyInfo, Key.CursorLeft);
 			case ConsoleKey.RightArrow:
-				return Key.CursorRight;
+				return MapKeyModifiers (keyInfo, Key.CursorRight);
 			case ConsoleKey.UpArrow:
-				return Key.CursorUp;
+				return MapKeyModifiers (keyInfo, Key.CursorUp);
 			case ConsoleKey.DownArrow:
-				return Key.CursorDown;
+				return MapKeyModifiers (keyInfo, Key.CursorDown);
 			case ConsoleKey.PageUp:
-				return Key.PageUp;
+				return MapKeyModifiers (keyInfo, Key.PageUp);
 			case ConsoleKey.PageDown:
-				return Key.PageDown;
+				return MapKeyModifiers (keyInfo, Key.PageDown);
 			case ConsoleKey.Enter:
-				return Key.Enter;
+				return MapKeyModifiers (keyInfo, Key.Enter);
 			case ConsoleKey.Spacebar:
-				return Key.Space;
+				return MapKeyModifiers (keyInfo, Key.Space);
 			case ConsoleKey.Backspace:
-				return Key.Backspace;
+				return MapKeyModifiers (keyInfo, Key.Backspace);
 			case ConsoleKey.Delete:
-				return Key.Delete;
+				return MapKeyModifiers (keyInfo, Key.DeleteChar);
+			case ConsoleKey.Insert:
+				return MapKeyModifiers (keyInfo, Key.InsertChar);
+
 
 			case ConsoleKey.Oem1:
 			case ConsoleKey.Oem2:
@@ -327,7 +1157,7 @@ namespace Terminal.Gui {
 				}
 				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
 					if (keyInfo.KeyChar == 0 || (keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26)) {
-						return (Key)((uint)Key.A + delta);
+						return MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
 					}
 				}
 				return (Key)((uint)keyInfo.KeyChar);
@@ -342,7 +1172,7 @@ namespace Terminal.Gui {
 				}
 				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
 					if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30) {
-						return (Key)((uint)Key.D0 + delta);
+						return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
 					}
 				}
 				return (Key)((uint)keyInfo.KeyChar);
@@ -350,7 +1180,7 @@ namespace Terminal.Gui {
 			if (key >= ConsoleKey.F1 && key <= ConsoleKey.F12) {
 				var delta = key - ConsoleKey.F1;
 				if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-					return (Key)((uint)Key.F1 + delta);
+					return MapKeyModifiers (keyInfo, (Key)((uint)Key.F1 + delta));
 				}
 
 				return (Key)((uint)Key.F1 + delta);
@@ -364,41 +1194,199 @@ namespace Terminal.Gui {
 
 		KeyModifiers keyModifiers;
 
-		void MapKeyModifiers (ConsoleKeyInfo keyInfo)
+		Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 		{
-			if (keyModifiers == null)
+			if (keyModifiers == null) {
 				keyModifiers = new KeyModifiers ();
-
-			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
+			}
+			Key keyMod = new Key ();
+			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0) {
+				keyMod = Key.ShiftMask;
 				keyModifiers.Shift = true;
-			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
+			}
+			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0) {
+				keyMod |= Key.CtrlMask;
 				keyModifiers.Ctrl = true;
-			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0)
+			}
+			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0) {
+				keyMod |= Key.AltMask;
 				keyModifiers.Alt = true;
+			}
+
+			return keyMod != Key.Null ? keyMod | key : key;
 		}
+
+		Action<KeyEvent> keyHandler;
+		Action<KeyEvent> keyDownHandler;
+		Action<KeyEvent> keyUpHandler;
+		Action<MouseEvent> mouseHandler;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
+			this.keyHandler = keyHandler;
+			this.keyDownHandler = keyDownHandler;
+			this.keyUpHandler = keyUpHandler;
+			this.mouseHandler = mouseHandler;
+
+			var mLoop = mainLoop.Driver as NetMainLoop;
+
 			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-			(mainLoop.Driver as NetMainLoop).KeyPressed = delegate (ConsoleKeyInfo consoleKey) {
-				var map = MapKey (consoleKey);
+			mLoop.KeyPressed = (e) => ProcessInput (e);
+
+			mLoop.WinChanged = (e) => ChangeWin (e);
+		}
+
+		bool winChanging;
+
+		void ChangeWin (int newTop)
+		{
+			winChanging = true;
+			const int Min_WindowWidth = 14;
+			Size size = new Size ();
+			if (!HeightAsBuffer) {
+				size = new Size (Math.Max (Min_WindowWidth, Console.WindowWidth),
+					Console.WindowHeight);
+				top = 0;
+			} else {
+				size = new Size (Console.BufferWidth, Console.BufferHeight);
+				top = newTop;
+			}
+			cols = size.Width;
+			rows = size.Height;
+			ResizeScreen ();
+			UpdateOffScreen ();
+			if (!winChanging) {
+				TerminalResized.Invoke ();
+			}
+		}
+
+		void ProcessInput (NetEvents.InputResult inputEvent)
+		{
+			switch (inputEvent.EventType) {
+			case NetEvents.EventType.key:
+				var map = MapKey (inputEvent.ConsoleKeyInfo);
 				if (map == (Key)0xffffffff) {
 					return;
 				}
+				keyDownHandler (new KeyEvent (map, keyModifiers));
 				keyHandler (new KeyEvent (map, keyModifiers));
 				keyUpHandler (new KeyEvent (map, keyModifiers));
-				keyModifiers = null;
+				keyModifiers = new KeyModifiers ();
+				break;
+			case NetEvents.EventType.Mouse:
+				mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
+				break;
+			}
+		}
+
+		MouseEvent ToDriverMouse (NetEvents.MouseEvent me)
+		{
+			MouseFlags mouseFlag = 0;
+
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button1Pressed) != 0) {
+				mouseFlag |= MouseFlags.Button1Pressed;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button1Released) != 0) {
+				mouseFlag |= MouseFlags.Button1Released;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button1Clicked) != 0) {
+				mouseFlag |= MouseFlags.Button1Clicked;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button1DoubleClicked) != 0) {
+				mouseFlag |= MouseFlags.Button1DoubleClicked;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button1TripleClicked) != 0) {
+				mouseFlag |= MouseFlags.Button1TripleClicked;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button2Pressed) != 0) {
+				mouseFlag |= MouseFlags.Button2Pressed;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button2Released) != 0) {
+				mouseFlag |= MouseFlags.Button2Released;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button2Clicked) != 0) {
+				mouseFlag |= MouseFlags.Button2Clicked;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button2DoubleClicked) != 0) {
+				mouseFlag |= MouseFlags.Button2DoubleClicked;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button2TrippleClicked) != 0) {
+				mouseFlag |= MouseFlags.Button2TripleClicked;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button3Pressed) != 0) {
+				mouseFlag |= MouseFlags.Button3Pressed;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button3Released) != 0) {
+				mouseFlag |= MouseFlags.Button3Released;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button3Clicked) != 0) {
+				mouseFlag |= MouseFlags.Button3Clicked;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button3DoubleClicked) != 0) {
+				mouseFlag |= MouseFlags.Button3DoubleClicked;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button3TripleClicked) != 0) {
+				mouseFlag |= MouseFlags.Button3TripleClicked;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.ButtonWheeledUp) != 0) {
+				mouseFlag |= MouseFlags.WheeledUp;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.ButtonWheeledDown) != 0) {
+				mouseFlag |= MouseFlags.WheeledDown;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.ButtonWheeledLeft) != 0) {
+				mouseFlag |= MouseFlags.WheeledLeft;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.ButtonWheeledRight) != 0) {
+				mouseFlag |= MouseFlags.WheeledRight;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button4Pressed) != 0) {
+				mouseFlag |= MouseFlags.Button4Pressed;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button4Released) != 0) {
+				mouseFlag |= MouseFlags.Button4Released;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button4Clicked) != 0) {
+				mouseFlag |= MouseFlags.Button4Clicked;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button4DoubleClicked) != 0) {
+				mouseFlag |= MouseFlags.Button4DoubleClicked;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.Button4TripleClicked) != 0) {
+				mouseFlag |= MouseFlags.Button4TripleClicked;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.ReportMousePosition) != 0) {
+				mouseFlag |= MouseFlags.ReportMousePosition;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.ButtonShift) != 0) {
+				mouseFlag |= MouseFlags.ButtonShift;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.ButtonCtrl) != 0) {
+				mouseFlag |= MouseFlags.ButtonCtrl;
+			}
+			if ((me.ButtonState & NetEvents.MouseButtonState.ButtonAlt) != 0) {
+				mouseFlag |= MouseFlags.ButtonAlt;
+			}
+
+			return new MouseEvent () {
+				X = me.Position.X,
+				Y = me.Position.Y,
+				Flags = mouseFlag
 			};
 		}
 
+		public override Attribute GetAttribute ()
+		{
+			return currentAttribute;
+		}
+
+		#region Unused
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
-			throw new NotImplementedException ();
 		}
 
 		public override void SetColors (short foregroundColorId, short backgroundColorId)
 		{
-			throw new NotImplementedException ();
 		}
 
 		public override void CookMouse ()
@@ -408,6 +1396,7 @@ namespace Terminal.Gui {
 		public override void UncookMouse ()
 		{
 		}
+		#endregion
 
 		//
 		// These are for the .NET driver, but running natively on Windows, wont run
@@ -424,20 +1413,27 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// This implementation is used for NetDriver.
 	/// </remarks>
-	public class NetMainLoop : IMainLoopDriver {
+	internal class NetMainLoop : IMainLoopDriver {
 		ManualResetEventSlim keyReady = new ManualResetEventSlim (false);
 		ManualResetEventSlim waitForProbe = new ManualResetEventSlim (false);
 		ManualResetEventSlim winChange = new ManualResetEventSlim (false);
-		ConsoleKeyInfo? keyResult = null;
+		Queue<NetEvents.InputResult?> inputResult = new Queue<NetEvents.InputResult?> ();
 		MainLoop mainLoop;
 		ConsoleDriver consoleDriver;
 		bool winChanged;
+		int newTop;
 		CancellationTokenSource tokenSource = new CancellationTokenSource ();
+		NetEvents netEvents;
 
 		/// <summary>
 		/// Invoked when a Key is pressed.
 		/// </summary>
-		public Action<ConsoleKeyInfo> KeyPressed;
+		public Action<NetEvents.InputResult> KeyPressed;
+
+		/// <summary>
+		/// Invoked when the window is changed.
+		/// </summary>
+		public Action<int> WinChanged;
 
 		/// <summary>
 		/// Initializes the class with the console driver.
@@ -449,9 +1445,10 @@ namespace Terminal.Gui {
 		public NetMainLoop (ConsoleDriver consoleDriver = null)
 		{
 			if (consoleDriver == null) {
-				throw new ArgumentNullException ("console driver instance must be provided.");
+				throw new ArgumentNullException ("Console driver instance must be provided.");
 			}
 			this.consoleDriver = consoleDriver;
+			netEvents = new NetEvents ();
 		}
 
 		void KeyReader ()
@@ -459,8 +1456,17 @@ namespace Terminal.Gui {
 			while (true) {
 				waitForProbe.Wait ();
 				waitForProbe.Reset ();
-				keyResult = Console.ReadKey (true);
-				keyReady.Set ();
+				if (inputResult.Count == 0) {
+					inputResult.Enqueue (netEvents.ReadConsoleInput ());
+				}
+				try {
+					while (inputResult.Peek () == null) {
+						inputResult.Dequeue ();
+					}
+					if (inputResult.Count > 0) {
+						keyReady.Set ();
+					}
+				} catch (InvalidOperationException) { }
 			}
 		}
 
@@ -475,12 +1481,23 @@ namespace Terminal.Gui {
 			}
 		}
 
+		int lastWindowHeight;
 		void WaitWinChange ()
 		{
 			while (true) {
-				if (Console.WindowWidth != consoleDriver.Cols || Console.WindowHeight != consoleDriver.Rows
-					|| Console.WindowTop != consoleDriver.Top) { // Top only working on Windows.
-					return;
+				if (!consoleDriver.HeightAsBuffer) {
+					if (Console.WindowWidth != consoleDriver.Cols || Console.WindowHeight != consoleDriver.Rows) {
+						return;
+					}
+				} else {
+					if (Console.BufferWidth != consoleDriver.Cols || Console.BufferHeight != consoleDriver.Rows
+						|| Console.WindowTop != consoleDriver.Top
+						|| Console.WindowHeight != lastWindowHeight) {
+						// Top only working on Windows.
+						newTop = Console.WindowTop;
+						lastWindowHeight = Console.WindowHeight;
+						return;
+					}
 				}
 			}
 		}
@@ -499,8 +1516,6 @@ namespace Terminal.Gui {
 
 		bool IMainLoopDriver.EventsPending (bool wait)
 		{
-			long now = DateTime.UtcNow.Ticks;
-
 			waitForProbe.Set ();
 			winChange.Set ();
 
@@ -519,7 +1534,7 @@ namespace Terminal.Gui {
 			}
 
 			if (!tokenSource.IsCancellationRequested) {
-				return keyResult.HasValue || CheckTimers (wait, out _) || winChanged;
+				return inputResult.Count > 0 || CheckTimers (wait, out _) || winChanged;
 			}
 
 			tokenSource.Dispose ();
@@ -552,14 +1567,12 @@ namespace Terminal.Gui {
 
 		void IMainLoopDriver.MainIteration ()
 		{
-			if (keyResult.HasValue) {
-				var kr = keyResult;
-				keyResult = null;
-				KeyPressed?.Invoke (kr.Value);
+			if (inputResult.Count > 0) {
+				KeyPressed?.Invoke (inputResult.Dequeue ().Value);
 			}
 			if (winChanged) {
 				winChanged = false;
-				consoleDriver.Refresh ();
+				WinChanged?.Invoke (newTop);
 			}
 		}
 	}

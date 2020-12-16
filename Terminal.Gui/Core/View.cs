@@ -721,7 +721,7 @@ namespace Terminal.Gui {
 				NeedDisplay = new Rect (x, y, w, h);
 			}
 			if (container != null)
-				container.ChildNeedsDisplay ();
+				container.SetChildNeedsDisplay ();
 			if (subviews == null)
 				return;
 			foreach (var view in subviews)
@@ -733,16 +733,16 @@ namespace Terminal.Gui {
 				}
 		}
 
-		internal bool childNeedsDisplay;
+		internal bool ChildNeedsDisplay { get; private set; }
 
 		/// <summary>
 		/// Indicates that any child views (in the <see cref="Subviews"/> list) need to be repainted.
 		/// </summary>
-		public void ChildNeedsDisplay ()
+		public void SetChildNeedsDisplay ()
 		{
-			childNeedsDisplay = true;
+			ChildNeedsDisplay = true;
 			if (container != null)
-				container.ChildNeedsDisplay ();
+				container.SetChildNeedsDisplay ();
 		}
 
 		internal bool addingView = false;
@@ -1288,7 +1288,7 @@ namespace Terminal.Gui {
 		protected void ClearNeedsDisplay ()
 		{
 			NeedDisplay = Rect.Empty;
-			childNeedsDisplay = false;
+			ChildNeedsDisplay = false;
 		}
 
 		/// <summary>
@@ -1314,10 +1314,13 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			Application.CurrentView = this;
+
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
-			if (ColorScheme != null)
+			if (ColorScheme != null) {
 				Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
+			}
 
 			if (!ustring.IsNullOrEmpty (Text)) {
 				Clear ();
@@ -1333,23 +1336,24 @@ namespace Terminal.Gui {
 
 			if (subviews != null) {
 				foreach (var view in subviews) {
-					if (!view.NeedDisplay.IsEmpty || view.childNeedsDisplay) {
+					if (!view.NeedDisplay.IsEmpty || view.ChildNeedsDisplay || view.LayoutNeeded) {
 						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
 							if (view.LayoutNeeded)
 								view.LayoutSubviews ();
 							Application.CurrentView = view;
 
 							// Draw the subview
-							// Use the view's bounds (view-relative; Location will always be (0,0) because
+							// Use the view's bounds (view-relative; Location will always be (0,0)
 							if (view.Visible) {
 								view.Redraw (view.Bounds);
 							}
 						}
 						view.NeedDisplay = Rect.Empty;
-						view.childNeedsDisplay = false;
+						view.ChildNeedsDisplay = false;
 					}
 				}
 			}
+			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
 		}
 

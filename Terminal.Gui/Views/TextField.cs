@@ -211,9 +211,9 @@ namespace Terminal.Gui {
 
 			int p = first;
 			int col = 0;
-			int width = Frame.Width;
+			int width = Frame.Width + OffSetBackground ();
 			var tcount = text.Count;
-			var roc = new Attribute (Color.DarkGray, Color.Gray);
+			var roc = Colors.Menu.Disabled;
 			for (int idx = p; idx < tcount; idx++) {
 				var rune = text [idx];
 				var cols = Rune.ColumnWidth (rune);

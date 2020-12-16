@@ -20,6 +20,7 @@ namespace Terminal.Gui {
 		public override int Cols => Curses.Cols;
 		public override int Rows => Curses.Lines;
 		public override int Top => 0;
+		public override bool HeightAsBuffer { get; set; }
 
 		// Current row, and current col, tracked by Move/AddRune only
 		int ccol, crow;
@@ -39,7 +40,7 @@ namespace Terminal.Gui {
 		}
 
 		static bool sync = false;
-		public override void AddRune (Rune rune) 
+		public override void AddRune (Rune rune)
 		{
 			if (Clip.Contains (ccol, crow)) {
 				if (needMove) {
@@ -70,6 +71,7 @@ namespace Terminal.Gui {
 		public override void Refresh () {
 			Curses.refresh ();
 			if (Curses.CheckWinChange ()) {
+				Clip = new Rect (0, 0, Cols, Rows);
 				TerminalResized?.Invoke ();
 			}
 		}
@@ -89,7 +91,14 @@ namespace Terminal.Gui {
 		}
 
 		public override void UpdateScreen () => window.redrawwin ();
-		public override void SetAttribute (Attribute c) => Curses.attrset (c.value);
+
+		int currentAttribute;
+
+		public override void SetAttribute (Attribute c) {
+			currentAttribute = c.Value;
+			Curses.attrset (currentAttribute);
+		}
+
 		public Curses.Window window;
 
 		static short last_color_pair = 16;
@@ -103,7 +112,11 @@ namespace Terminal.Gui {
 		public static Attribute MakeColor (short foreground, short background)
 		{
 			Curses.InitColorPair (++last_color_pair, foreground, background);
-			return new Attribute () { value = Curses.ColorPair (last_color_pair) };
+			return new Attribute (
+				value: Curses.ColorPair (last_color_pair),
+				foreground: (Color)foreground,
+				background: (Color)background
+				);
 		}
 
 		int [,] colorPairs = new int [16, 16];
@@ -633,6 +646,7 @@ namespace Terminal.Gui {
 				}
 				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				keyUpHandler (new KeyEvent (k, MapKeyModifiers (k)));
 			}
 			// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
 			// will not impact KeyUp.
@@ -645,16 +659,16 @@ namespace Terminal.Gui {
 		}
 
 		Action<MouseEvent> mouseHandler;
-		MainLoop mainLoop;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			Curses.timeout (0);
 			this.mouseHandler = mouseHandler;
-			this.mainLoop = mainLoop;
 
-			(mainLoop.Driver as UnixMainLoop).AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
+			var mLoop = mainLoop.Driver as UnixMainLoop;
+
+			mLoop.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
 				ProcessInput (keyHandler, keyDownHandler, keyUpHandler, mouseHandler);
 				return true;
 			});
@@ -845,6 +859,11 @@ namespace Terminal.Gui {
 		{
 			//mouseGrabbed = false;
 			//Curses.mouseinterval (lastMouseInterval);
+		}
+
+		public override Attribute GetAttribute ()
+		{
+			return currentAttribute;
 		}
 	}
 

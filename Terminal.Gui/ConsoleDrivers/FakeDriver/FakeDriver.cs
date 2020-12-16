@@ -20,6 +20,7 @@ namespace Terminal.Gui {
 		public override int Cols => cols;
 		public override int Rows => rows;
 		public override int Top => 0;
+		public override bool HeightAsBuffer { get; set; }
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		int [,,] contents;
@@ -112,7 +113,11 @@ namespace Terminal.Gui {
 		static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
 		{
 			// Encode the colors into the int value.
-			return new Attribute () { value = ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff) };
+			return new Attribute (
+				value: ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff),
+				foreground: (Color)f,
+				background: (Color)b
+				);
 		}
 
 		public override void Init (Action terminalResized)
@@ -248,7 +253,7 @@ namespace Terminal.Gui {
 		int currentAttribute;
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c.value;
+			currentAttribute = c.Value;
 		}
 
 		Key MapKey (ConsoleKeyInfo keyInfo)
@@ -389,9 +394,14 @@ namespace Terminal.Gui {
 			};
 		}
 
+		public override Attribute GetAttribute ()
+		{
+			return currentAttribute;
+		}
+
+		#region Unused
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
-			throw new NotImplementedException ();
 		}
 
 		public override void SetColors (short foregroundColorId, short backgroundColorId)
@@ -406,6 +416,7 @@ namespace Terminal.Gui {
 		public override void UncookMouse ()
 		{
 		}
+		#endregion
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 	}
 }

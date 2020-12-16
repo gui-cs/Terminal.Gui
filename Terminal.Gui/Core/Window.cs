@@ -193,6 +193,16 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (ColorScheme.HotNormal);
 			Driver.DrawWindowTitle (scrRect, Title, padding, padding, padding, padding);
 			Driver.SetAttribute (ColorScheme.Normal);
+
+			// Checks if there are any SuperView view which intersect with this window.
+			if (SuperView != null) {
+				foreach (var view in SuperView.Subviews) {
+					if (view != this && view.Frame.IntersectsWith (Bounds)) {
+						view.SetNeedsLayout ();
+						view.SetNeedsDisplay (view.Bounds);
+					}
+				}
+			}
 		}
 
 		//

@@ -158,6 +158,8 @@ namespace Terminal.Gui {
 
 			switch (keyEvent.Key) {
 			case Key.AltMask:
+			case Key.AltMask | Key.Space:
+			case Key.CtrlMask | Key.Space:
 				if (MenuBar != null && MenuBar.OnKeyDown (keyEvent)) {
 					return true;
 				}
@@ -176,6 +178,8 @@ namespace Terminal.Gui {
 
 			switch (keyEvent.Key) {
 			case Key.AltMask:
+			case Key.AltMask | Key.Space:
+			case Key.CtrlMask | Key.Space:
 				if (MenuBar != null && MenuBar.OnKeyUp (keyEvent)) {
 					return true;
 				}
@@ -401,10 +405,10 @@ namespace Terminal.Gui {
 		{
 			EnsureVisibleBounds (top, top.Frame.X, top.Frame.Y, out int nx, out int ny);
 			if ((nx != top.Frame.X || ny != top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
-				if (top.X is Pos.PosAbsolute && top.Bounds.X != nx) {
+				if ((top.X == null || top.X is Pos.PosAbsolute) && top.Bounds.X != nx) {
 					top.X = nx;
 				}
-				if (top.Y is Pos.PosAbsolute && top.Bounds.Y != ny) {
+				if ((top.Y == null || top.Y is Pos.PosAbsolute) && top.Bounds.Y != ny) {
 					top.Y = ny;
 				}
 			}

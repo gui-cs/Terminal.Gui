@@ -253,7 +253,7 @@ namespace UICatalog {
 					_leftPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
 					_rightPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
 					_top.LayoutSubviews();
-					_top.ChildNeedsDisplay();
+					_top.SetChildNeedsDisplay();
 				}),
 			};
 
@@ -274,7 +274,33 @@ namespace UICatalog {
 			return _runningScenario;
 		}
 
-		static MenuItem [] CreateDiagnosticMenuItems ()
+		static List<MenuItem []> CreateDiagnosticMenuItems ()
+		{
+			List<MenuItem []> menuItems = new List<MenuItem []> ();
+			menuItems.Add (CreateDiagnosticFlagsMenuItems ());
+			menuItems.Add (new MenuItem [] { null });
+			menuItems.Add (CreateSizeStyle ());
+			return menuItems;
+		}
+
+		static MenuItem [] CreateSizeStyle ()
+		{
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			var item = new MenuItem ();
+			item.Title = "_Height As Buffer";
+			item.Shortcut = Key.CtrlMask | Key.AltMask | (Key)item.Title.ToString ().Substring (1, 1) [0];
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = Application.HeightAsBuffer;
+			item.Action += () => {
+				item.Checked = !item.Checked;
+				Application.HeightAsBuffer = item.Checked;
+			};
+			menuItems.Add (item);
+
+			return menuItems.ToArray ();
+		}
+
+		static MenuItem [] CreateDiagnosticFlagsMenuItems ()
 		{
 			const string OFF = "Diagnostics: _Off";
 			const string FRAME_RULER = "Diagnostics: Frame _Ruler";
@@ -288,7 +314,12 @@ namespace UICatalog {
 				item.Shortcut = Key.AltMask + index.ToString () [0];
 				index++;
 				item.CheckType |= MenuItemCheckStyle.Checked;
-				item.Checked = _diagnosticFlags.HasFlag (diag);
+				if (GetDiagnosticsTitle (ConsoleDriver.DiagnosticFlags.Off) == item.Title) {
+					item.Checked = (_diagnosticFlags & (ConsoleDriver.DiagnosticFlags.FramePadding
+					| ConsoleDriver.DiagnosticFlags.FrameRuler)) == 0;
+				} else {
+					item.Checked = _diagnosticFlags.HasFlag (diag);
+				}
 				item.Action += () => {
 					var t = GetDiagnosticsTitle (ConsoleDriver.DiagnosticFlags.Off);
 					if (item.Title == t && !item.Checked) {
