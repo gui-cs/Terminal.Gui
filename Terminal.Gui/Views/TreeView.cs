@@ -763,7 +763,7 @@ namespace Terminal.Gui {
 		/// <param name="availableWidth"></param>
 		public virtual void Draw(ConsoleDriver driver,ColorScheme colorScheme, int y, int availableWidth)
 		{
-			driver.SetAttribute(tree.SelectedObject == Model ?
+			driver.SetAttribute(tree.SelectedObject == Model && tree.HasFocus?
 				colorScheme.HotFocus :
 				colorScheme.Normal);
 

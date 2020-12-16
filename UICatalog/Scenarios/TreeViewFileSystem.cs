@@ -17,18 +17,13 @@ namespace UICatalog.Scenarios {
 		/// <summary>
 		/// A tree view where nodes are files and folders
 		/// </summary>
-		TreeView<FileSystemInfo> _treeViewFiles;
+		TreeView<FileSystemInfo> treeViewFiles;
 
 		/// <summary>
 		/// A tree view where nodes are <see cref="ITreeNode"/>
 		/// </summary>
-		TreeView _treeViewNodes;
+		TreeView treeViewNodes;
 		
-		/// <summary>
-		/// Currently showing tree view (either <see cref="_treeViewFiles"/> or <see cref="_treeViewNodes"/>)
-		/// </summary>
-		ITreeView _treeView;
-
 		public override void Setup ()
 		{
 			Win.Title = this.GetName();
@@ -48,23 +43,58 @@ namespace UICatalog.Scenarios {
 			Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.F2, "~F2~ File Tree", () => SwitchToFileTree()),
-				new StatusItem(Key.F3, "~F3~ Clear Objects", () => ClearObjects()),
-				new StatusItem(Key.F4, "~F4~ Simple Tree", () => SwitchToSimpleTree()),
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 			});
 			Top.Add (statusBar);
 
+			var lblFiles = new Label("File Tree:"){
+				X=0,
+				Y=1
+			};
+			Win.Add(lblFiles);
 
-			_treeViewFiles = new TreeView<FileSystemInfo> () {
+			treeViewFiles = new TreeView<FileSystemInfo> () {
 				X = 0,
-				Y = 0,
+				Y = Pos.Bottom(lblFiles),
+				Width = 40,
+				Height = 9,
+			};
+			
+			SetupFileTree();
+
+			Win.Add(treeViewFiles);
+			
+			var lblNodeTree = new Label("Node Tree:"){
+				X=0,
+				Y=Pos.Bottom(treeViewFiles)+1
+			};
+
+			Win.Add(lblNodeTree);
+			
+			treeViewNodes = new TreeView() {
+				X = 0,
+				Y = Pos.Bottom(lblNodeTree),
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
+
+			SetupNodeTree();
+
+			Win.Add(treeViewNodes);
+		}
+
+		private void SetupNodeTree ()
+		{		
+			// Add 2 root nodes with simple set of subfolders
+			treeViewNodes.AddObject(CreateSimpleRoot());
+			treeViewNodes.AddObject(CreateSimpleRoot());
+		}
+
+		private void SetupFileTree ()
+		{
 			
 			// setup delegates
-			_treeViewFiles.TreeBuilder = new DelegateTreeBuilder<FileSystemInfo>(
+			treeViewFiles.TreeBuilder = new DelegateTreeBuilder<FileSystemInfo>(
 
 				// Determines how to compute children of any given branch
 				GetChildren,
@@ -73,53 +103,31 @@ namespace UICatalog.Scenarios {
 			);
 
 			// Determines how to represent objects as strings on the screen
-			_treeViewFiles.AspectGetter = FileSystemAspectGetter;
+			treeViewFiles.AspectGetter = FileSystemAspectGetter;
 
-			_treeViewNodes = new TreeView() {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-			};
-			string root = System.IO.Path.GetPathRoot(Environment.CurrentDirectory);
-
-			if(root == null)
-			{
-				MessageBox.ErrorQuery(10,5,"Error","Unable to determine file system root","ok");
-				return;
-			}
+			treeViewFiles.AddObjects(DriveInfo.GetDrives().Select(d=>d.RootDirectory));
 		}
-
 
 		private void ShowLines ()
 		{
-			_treeView.ShowBranchLines = !_treeView.ShowBranchLines;
-			_treeView.SetNeedsDisplay();
+			treeViewNodes.ShowBranchLines = !treeViewNodes.ShowBranchLines;
+			treeViewNodes.SetNeedsDisplay();
+
+			treeViewFiles.ShowBranchLines = !treeViewFiles.ShowBranchLines;
+			treeViewFiles.SetNeedsDisplay();
 		}
 		
 		private void ShowExpandableSymbol ()
 		{
-			_treeView.ShowExpandableSymbol = !_treeView.ShowExpandableSymbol;
-			_treeView.SetNeedsDisplay();
+			treeViewNodes.ShowExpandableSymbol = !treeViewNodes.ShowExpandableSymbol;
+			treeViewNodes.SetNeedsDisplay();
+
+			treeViewFiles.ShowExpandableSymbol = !treeViewFiles.ShowExpandableSymbol;
+			treeViewFiles.SetNeedsDisplay();
 		}
 	
-		private void SwitchToSimpleTree ()
-		{
-			Win.Remove (_treeViewFiles);
-			Win.Add(_treeViewNodes);
-			_treeView = _treeViewNodes;
-
-			ClearObjects();
-		
-			// Add 2 root nodes with simple set of subfolders
-			_treeViewNodes.AddObject(CreateSimpleRoot());
-			_treeViewNodes.AddObject(CreateSimpleRoot());
-			
-		}
-
 		private ITreeNode CreateSimpleRoot ()
 		{
-			
 			return new TreeNode("Root"){
 				Children = new List<ITreeNode>()
 				{
@@ -176,22 +184,6 @@ namespace UICatalog.Scenarios {
 					}}
 				}
 			};
-		}
-
-		private void ClearObjects()
-		{
-			_treeView?.ClearObjects();
-		}
-		private void SwitchToFileTree()
-		{
-			// switch trees
-			Win.Remove(_treeViewNodes);
-			Win.Add (_treeViewFiles);
-			_treeView = _treeViewFiles;
-
-			ClearObjects();
-
-			_treeViewFiles.AddObjects(DriveInfo.GetDrives().Select(d=>d.RootDirectory));
 		}
 
 		private IEnumerable<FileSystemInfo> GetChildren(FileSystemInfo model)
