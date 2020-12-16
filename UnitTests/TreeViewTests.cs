@@ -18,12 +18,12 @@ namespace UnitTests {
 
 		};
 		
-		private TreeView CreateTree()
+		private TreeView<object> CreateTree()
 		{
 			return CreateTree(out _, out _, out _);
 		}
 
-		private TreeView CreateTree(out Factory factory1, out Car car1, out Car car2)
+		private TreeView<object> CreateTree(out Factory factory1, out Car car1, out Car car2)
 		{
 			car1 = new Car();
 			car2 = new Car();
@@ -33,7 +33,7 @@ namespace UnitTests {
 				Cars = new []{car1 ,car2}
 			};
 			
-			var tree = new TreeView(new DelegateTreeBuilder((s)=> s is Factory f ? f.Cars: null));
+			var tree = new TreeView<object>(new DelegateTreeBuilder<object>((s)=> s is Factory f ? f.Cars: null));
 			tree.AddObject(factory1);
 
 			return tree;
@@ -218,7 +218,7 @@ namespace UnitTests {
 			Assert.False(tree.IsExpanded(c1));
 
 			// change the children getter so that now cars can have wheels
-			tree.TreeBuilder = new DelegateTreeBuilder((o)=>
+			tree.TreeBuilder = new DelegateTreeBuilder<object>((o)=>
 				// factories have cars
 				o is Factory ? new object[]{c1,c2} 
 				// cars have wheels
@@ -255,7 +255,7 @@ namespace UnitTests {
 			Assert.False(tree.IsExpanded(c1));
 
 			// change the children getter so that now cars can have wheels
-			tree.TreeBuilder = new DelegateTreeBuilder((o)=>
+			tree.TreeBuilder = new DelegateTreeBuilder<object>((o)=>
 				// factories have cars
 				o is Factory ? new object[]{c1,c2} 
 				// cars have wheels
@@ -331,8 +331,8 @@ namespace UnitTests {
 
 			string root = "root";
 			
-			var tree = new TreeView();
-			tree.TreeBuilder = new DelegateTreeBuilder((s)=>  ReferenceEquals(s , root) ? new object[]{obj1 } : null);
+			var tree = new TreeView<object>();
+			tree.TreeBuilder = new DelegateTreeBuilder<object>((s)=>  ReferenceEquals(s , root) ? new object[]{obj1 } : null);
 			tree.AddObject(root);
 
 			// Tree is not expanded so the root has no children yet
@@ -345,7 +345,7 @@ namespace UnitTests {
 			Assert.Equal(1,tree.GetChildren(root).Count(child=>ReferenceEquals(obj1,child)));
 
 			// change the getter to return an Equal object (but not the same reference - obj2)
-			tree.TreeBuilder = new DelegateTreeBuilder((s)=>  ReferenceEquals(s , root) ? new object[]{obj2 } : null);
+			tree.TreeBuilder = new DelegateTreeBuilder<object>((s)=>  ReferenceEquals(s , root) ? new object[]{obj2 } : null);
 
 			// tree has cached the knowledge of what children the root has so won't know about the change (we still get obj1)
 			Assert.Equal(1,tree.GetChildren(root).Count(child=>ReferenceEquals(obj1,child)));

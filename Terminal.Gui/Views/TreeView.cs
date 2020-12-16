@@ -7,7 +7,7 @@ using System.Linq;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// Interface to implement when you want <see cref="TreeView"/> to automatically determine children for your class
+	/// Interface to implement when you want <see cref="TreeView{T}"/> to automatically determine children for your class
 	/// </summary>
 	public interface ITreeNode
 	{
@@ -25,7 +25,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Simple class for representing nodes of a <see cref="TreeView"/>
+	/// Simple class for representing nodes of a <see cref="TreeView{T}"/>.
 	/// </summary>
 	public class TreeNode : ITreeNode
 	{
@@ -67,9 +67,9 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Interface for supplying data to a <see cref="TreeView"/> on demand as root level nodes are expanded by the user
+	/// Interface for supplying data to a <see cref="TreeView{T}"/> on demand as root level nodes are expanded by the user
 	/// </summary>
-	public interface ITreeBuilder
+	public interface ITreeBuilder<T>
 	{
 		/// <summary>
 		/// Returns true if <see cref="CanExpand"/> is implemented by this class
@@ -82,41 +82,41 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="model"></param>
 		/// <returns></returns>
-		bool CanExpand(object model);
+		bool CanExpand(T model);
 
 		/// <summary>
 		/// Returns all children of a given <paramref name="model"/> which should be added to the tree as new branches underneath it
 		/// </summary>
 		/// <param name="model"></param>
 		/// <returns></returns>
-		IEnumerable<object> GetChildren(object model);
+		IEnumerable<T> GetChildren(T model);
 	}
 
 	/// <summary>
-	/// Abstract implementation of <see cref="ITreeBuilder"/>
+	/// Abstract implementation of <see cref="ITreeBuilder{T}"/>
 	/// </summary>
-	public abstract class TreeBuilder : ITreeBuilder {
+	public abstract class TreeBuilder<T> : ITreeBuilder<T> {
 
 		/// <inheritdoc/>
 		public bool SupportsCanExpand { get; protected set;} = false;
 
 		/// <summary>
-		/// Override this method to return a rapid answer as to whether <see cref="GetChildren(object)"/> returns results.
+		/// Override this method to return a rapid answer as to whether <see cref="GetChildren(T)"/> returns results.
 		/// </summary>
 		/// <param name="model"></param>
 		/// <returns></returns>
-		public virtual bool CanExpand (object model){
+		public virtual bool CanExpand (T model){
 			
 			return GetChildren(model).Any();
 		}
 
 		/// <inheritdoc/>
-		public abstract IEnumerable<object> GetChildren (object model);
+		public abstract IEnumerable<T> GetChildren (T model);
 
 		/// <summary>
 		/// Constructs base and initializes <see cref="SupportsCanExpand"/>
 		/// </summary>
-		/// <param name="supportsCanExpand">Pass true if you intend to implement <see cref="CanExpand(object)"/> otherwise false</param>
+		/// <param name="supportsCanExpand">Pass true if you intend to implement <see cref="CanExpand(T)"/> otherwise false</param>
 		public TreeBuilder(bool supportsCanExpand)
 		{
 			SupportsCanExpand = supportsCanExpand;
@@ -124,9 +124,10 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// <see cref="ITreeBuilder"/> implementation for <see cref="TreeNode"/> objects
+	/// <see cref="ITreeBuilder{T}"/> implementation for <see cref="ITreeNode"/> objects
 	/// </summary>
-	public class TreeNodeBuilder : TreeBuilder {
+	public class TreeNodeBuilder : TreeBuilder<ITreeNode>
+	{
 		
 		/// <summary>
 		/// Initialises a new instance of builder for any model objects of Type <see cref="ITreeNode"/>
@@ -141,37 +142,37 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="model"></param>
 		/// <returns></returns>
-		public override IEnumerable<object> GetChildren (object model)
+		public override IEnumerable<ITreeNode> GetChildren (ITreeNode model)
 		{
-			return model is ITreeNode n ? n.Children : Enumerable.Empty<object>();
+			return model.Children;
 		}
 	}
 
 	/// <summary>
-	/// Implementation of <see cref="ITreeBuilder"/> that uses user defined functions
+	/// Implementation of <see cref="ITreeBuilder{T}"/> that uses user defined functions
 	/// </summary>
-	public class DelegateTreeBuilder : TreeBuilder
+	public class DelegateTreeBuilder<T> : TreeBuilder<T>
 	{
-		private Func<object,IEnumerable<object>> childGetter;
-		private Func<object,bool> canExpand;
+		private Func<T,IEnumerable<T>> childGetter;
+		private Func<T,bool> canExpand;
 
 		/// <summary>
-		/// Constructs an implementation of <see cref="ITreeBuilder"/> that calls the user defined method <paramref name="childGetter"/> to determine children
+		/// Constructs an implementation of <see cref="ITreeBuilder{T}"/> that calls the user defined method <paramref name="childGetter"/> to determine children
 		/// </summary>
 		/// <param name="childGetter"></param>
 		/// <returns></returns>
-   		public DelegateTreeBuilder(Func<object,IEnumerable<object>> childGetter) : base(false)
+		public DelegateTreeBuilder(Func<T,IEnumerable<T>> childGetter) : base(false)
 		{
 			this.childGetter = childGetter;
 		}
 
 		/// <summary>
-		/// Constructs an implementation of <see cref="ITreeBuilder"/> that calls the user defined method <paramref name="childGetter"/> to determine children and <paramref name="canExpand"/> to determine expandability
+		/// Constructs an implementation of <see cref="ITreeBuilder{T}"/> that calls the user defined method <paramref name="childGetter"/> to determine children and <paramref name="canExpand"/> to determine expandability
 		/// </summary>
 		/// <param name="childGetter"></param>
 		/// <param name="canExpand"></param>
 		/// <returns></returns>
-		public DelegateTreeBuilder(Func<object,IEnumerable<object>> childGetter, Func<object,bool> canExpand) : base(true)
+		public DelegateTreeBuilder(Func<T,IEnumerable<T>> childGetter, Func<T,bool> canExpand) : base(true)
 		{
 			this.childGetter = childGetter;
 			this.canExpand = canExpand;
@@ -182,7 +183,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="model"></param>
 		/// <returns></returns>
-		public override bool CanExpand (object model)
+		public override bool CanExpand (T model)
 		{
 			return canExpand?.Invoke(model) ?? base.CanExpand (model);
 		}
@@ -192,17 +193,61 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="model"></param>
 		/// <returns></returns>
-		public override IEnumerable<object> GetChildren (object model)
+		public override IEnumerable<T> GetChildren (T model)
 		{
 			return childGetter.Invoke(model);
 		}
 	}
 
+	/// <summary>
+	/// Interface for all non generic members of <see cref="TreeView{T}"/>
+	/// </summary>
+	public interface ITreeView {
+		/// <summary>
+		/// True to render vertical lines under expanded nodes to show which node belongs to which parent.  False to use only whitespace
+		/// </summary>
+		/// <value></value>
+		bool ShowBranchLines {get;set;}
+
+		/// <summary>
+		/// True to render <see cref="ExpandableSymbol"/> next to branches that can be expanded.  Defaults to true
+		/// </summary>
+		bool ShowExpandableSymbol {get;set;}
+		
+		/// <summary>
+		/// Symbol to use for branch nodes that can be expanded to indicate this to the user.  Defaults to '+'
+		/// </summary>
+		Rune ExpandableSymbol {get;set;}
+		
+		/// <summary>
+		/// Removes all objects from the tree and clears selection
+		/// </summary>
+		void ClearObjects ();
+		
+		/// <summary>
+		/// Sets a flag indicating this view needs to be redisplayed because its state has changed.
+		/// </summary>
+		void SetNeedsDisplay ();
+	}
 
 	/// <summary>
-	/// Hierarchical tree view with expandable branches.  Branch objects are dynamically determined when expanded using a user defined <see cref="ITreeBuilder"/>
+	/// Convenience implementation of generic <see cref="TreeView{T}"/> for any tree were all nodes implement <see cref="ITreeNode"/>
 	/// </summary>
-	public class TreeView : View
+	public class TreeView : TreeView<ITreeNode> {
+
+		/// <summary>
+		/// Creates a new instance of the tree control with absolute positioning and initialises <see cref="TreeBuilder{T}"/> with default <see cref="ITreeNode"/> based builder
+		/// </summary>
+		public TreeView ()
+		{
+			TreeBuilder = new TreeNodeBuilder();
+		}
+	}
+
+	/// <summary>
+	/// Hierarchical tree view with expandable branches.  Branch objects are dynamically determined when expanded using a user defined <see cref="ITreeBuilder{T}"/>
+	/// </summary>
+	public class TreeView<T> : View,ITreeView where T:class
 	{   
 		private int scrollOffset;
 
@@ -221,31 +266,31 @@ namespace Terminal.Gui {
 		/// Determines how sub branches of the tree are dynamically built at runtime as the user expands root nodes
 		/// </summary>
 		/// <value></value>
-		public ITreeBuilder TreeBuilder { get;set;}
+		public ITreeBuilder<T> TreeBuilder { get;set;}
 
 		/// <summary>
 		/// private variable for <see cref="SelectedObject"/>
 		/// </summary>
-		object selectedObject;
+		T selectedObject;
 
 		/// <summary>
 		/// The currently selected object in the tree
 		/// </summary>
-		public object SelectedObject { 
+		public T SelectedObject { 
 			get => selectedObject; 
 			set {                
 				var oldValue = selectedObject;
 				selectedObject = value; 
 
 				if(!ReferenceEquals(oldValue,value))
-					SelectionChanged?.Invoke(this,new SelectionChangedEventArgs(this,oldValue,value));
+					SelectionChanged?.Invoke(this,new SelectionChangedEventArgs<T>(this,oldValue,value));
 			}
 		}
 		
 		/// <summary>
 		/// Called when the <see cref="SelectedObject"/> changes
 		/// </summary>
-		public event EventHandler<SelectionChangedEventArgs> SelectionChanged;
+		public event EventHandler<SelectionChangedEventArgs<T>> SelectionChanged;
 
 		/// <summary>
 		/// Refreshes the state of the object <paramref name="o"/> in the tree.  This will recompute children, string representation etc
@@ -253,7 +298,7 @@ namespace Terminal.Gui {
 		/// <remarks>This has no effect if the object is not exposed in the tree.</remarks>
 		/// <param name="o"></param>
 		/// <param name="startAtTop">True to also refresh all ancestors of the objects branch (starting with the root).  False to refresh only the passed node</param>
-		public void RefreshObject (object o, bool startAtTop = false)
+		public void RefreshObject (T o, bool startAtTop = false)
 		{
 			var branch = ObjectToBranch(o);
 			if(branch != null) {
@@ -264,7 +309,7 @@ namespace Terminal.Gui {
 		}
 		
 		/// <summary>
-		/// Rebuilds the tree structure for all exposed objects starting with the root objects.  Call this method when you know there are changes to the tree but don't know which objects have changed (otherwise use <see cref="RefreshObject(object, bool)"/>)
+		/// Rebuilds the tree structure for all exposed objects starting with the root objects.  Call this method when you know there are changes to the tree but don't know which objects have changed (otherwise use <see cref="RefreshObject(T, bool)"/>)
 		/// </summary>
 		public void RebuildTree()
 		{
@@ -277,12 +322,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The root objects in the tree, note that this collection is of root objects only
 		/// </summary>
-		public IEnumerable<object> Objects {get=>roots.Keys;}
+		public IEnumerable<T> Objects {get=>roots.Keys;}
 
 		/// <summary>
-		/// Map of root objects to the branches under them.  All objects have a <see cref="Branch"/> even if that branch has no children
+		/// Map of root objects to the branches under them.  All objects have a <see cref="Branch{T}"/> even if that branch has no children
 		/// </summary>
-		internal Dictionary<object,Branch> roots {get; set;} = new Dictionary<object, Branch>();
+		internal Dictionary<T,Branch<T>> roots {get; set;} = new Dictionary<T, Branch<T>>();
 
 		/// <summary>
 		/// The amount of tree view that has been scrolled off the top of the screen (by the user scrolling down)
@@ -297,18 +342,17 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Creates a new tree view with absolute positioning.  Use <see cref="AddObjects(IEnumerable{object})"/> to set set root objects for the tree.  
+		/// Creates a new tree view with absolute positioning.  Use <see cref="AddObjects(IEnumerable{T})"/> to set set root objects for the tree.  Children will not be rendered until you set <see cref="TreeBuilder"/>
 		/// </summary>
 		public TreeView():base()
 		{
 			CanFocus = true;
-			TreeBuilder = new TreeNodeBuilder();
 		}
 
 		/// <summary>
-		/// Initialises <see cref="TreeBuilder"/>.Creates a new tree view with absolute positioning.  Use <see cref="AddObjects(IEnumerable{object})"/> to set set root objects for the tree.
+		/// Initialises <see cref="TreeBuilder"/>.Creates a new tree view with absolute positioning.  Use <see cref="AddObjects(IEnumerable{T})"/> to set set root objects for the tree.
 		/// </summary>
-		public TreeView(ITreeBuilder builder) : this()
+		public TreeView(ITreeBuilder<T> builder) : this()
 		{
 			TreeBuilder = builder;
 		}
@@ -317,10 +361,10 @@ namespace Terminal.Gui {
 		/// Adds a new root level object unless it is already a root of the tree
 		/// </summary>
 		/// <param name="o"></param>
-		public void AddObject(object o)
+		public void AddObject(T o)
 		{
 			if(!roots.ContainsKey(o)) {
-				roots.Add(o,new Branch(this,null,o));
+				roots.Add(o,new Branch<T>(this,null,o));
 				SetNeedsDisplay();
 			}
 		}
@@ -330,8 +374,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ClearObjects()
 		{
-			SelectedObject = null;
-			roots = new Dictionary<object, Branch>();
+			SelectedObject = default(T);
+			roots = new Dictionary<T, Branch<T>>();
 			SetNeedsDisplay();
 		}
 
@@ -340,14 +384,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>If <paramref name="o"/> is the currently <see cref="SelectedObject"/> then the selection is cleared</remarks>
 		/// <param name="o"></param>
-		public void Remove(object o)
+		public void Remove(T o)
 		{
 			if(roots.ContainsKey(o)) {
 				roots.Remove(o);
 				SetNeedsDisplay();
 
 				if(Equals(SelectedObject,o))
-					SelectedObject = null;
+					SelectedObject = default(T);
 			}
 		}
 		
@@ -355,13 +399,13 @@ namespace Terminal.Gui {
 		/// Adds many new root level objects.  Objects that are already root objects are ignored
 		/// </summary>
 		/// <param name="collection">Objects to add as new root level objects</param>
-		public void AddObjects(IEnumerable<object> collection)
+		public void AddObjects(IEnumerable<T> collection)
 		{
 			bool objectsAdded = false;
 
 			foreach(var o in collection) {
 				if (!roots.ContainsKey (o)) {
-					roots.Add(o,new Branch(this,null,o));
+					roots.Add(o,new Branch<T>(this,null,o));
 					objectsAdded = true;
 				}	
 			}
@@ -375,21 +419,21 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="o">An object in the tree</param>
 		/// <returns></returns>
-		public IEnumerable<object> GetChildren (object o)
+		public IEnumerable<T> GetChildren (T o)
 		{
 			var branch = ObjectToBranch(o);
 
 			if(branch == null || !branch.IsExpanded)
-				return new object[0];
+				return new T[0];
 
-			return branch.ChildBranches?.Values?.Select(b=>b.Model)?.ToArray() ?? new object[0];
+			return branch.ChildBranches?.Values?.Select(b=>b.Model)?.ToArray() ?? new T[0];
 		}
 		/// <summary>
 		/// Returns the parent object of <paramref name="o"/> in the tree.  Returns null if the object is not exposed in the tree
 		/// </summary>
 		/// <param name="o">An object in the tree</param>
 		/// <returns></returns>
-		public object GetParent (object o)
+		public T GetParent (T o)
 		{
 			return ObjectToBranch(o)?.Parent?.Model;
 		}
@@ -398,7 +442,7 @@ namespace Terminal.Gui {
 		/// Returns the string representation of model objects hosted in the tree.  Default implementation is to call <see cref="object.ToString"/>
 		/// </summary>
 		/// <value></value>
-		public AspectGetterDelegate AspectGetter {get;set;} = (o)=>o.ToString();
+		public AspectGetterDelegate<T> AspectGetter {get;set;} = (o)=>o.ToString();
 
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
@@ -433,7 +477,7 @@ namespace Terminal.Gui {
 		/// <remarks>Uses the Equals method and returns the first index at which the object is found or -1 if it is not found</remarks>
 		/// <param name="o">An object that appears in your tree and is currently exposed</param>
 		/// <returns>The index the object was found at or -1 if it is not currently revealed or not in the tree at all</returns>
-		public int GetScrollOffsetOf(object o)
+		public int GetScrollOffsetOf(T o)
 		{
 			var map = BuildLineMap();
 			for (int i = 0; i < map.Length; i++)
@@ -451,9 +495,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>Index 0 of the returned array is the first item that should be visible in the top of the control, index 1 is the next etc.</remarks>
 		/// <returns></returns>
-		private Branch[] BuildLineMap()
+		private Branch<T>[] BuildLineMap()
 		{
-			List<Branch> toReturn = new List<Branch>();
+			List<Branch<T>> toReturn = new List<Branch<T>>();
 
 			foreach(var root in roots.Values) {
 				toReturn.AddRange(AddToLineMap(root));
@@ -462,7 +506,7 @@ namespace Terminal.Gui {
 			return toReturn.ToArray();
 		}
 
-		private IEnumerable<Branch> AddToLineMap (Branch currentBranch)
+		private IEnumerable<Branch<T>> AddToLineMap (Branch<T> currentBranch)
 		{
 			yield return currentBranch;
 
@@ -607,7 +651,7 @@ namespace Terminal.Gui {
 		/// Expands the supplied object if it is contained in the tree (either as a root object or as an exposed branch object)
 		/// </summary>
 		/// <param name="toExpand">The object to expand</param>
-		public void Expand(object toExpand)
+		public void Expand(T toExpand)
 		{
 			if(toExpand == null)
 				return;
@@ -621,7 +665,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="o"></param>
 		/// <returns></returns>
-		public bool IsExpanded(object o)
+		public bool IsExpanded(T o)
 		{
 			return ObjectToBranch(o)?.IsExpanded ?? false;
 		}
@@ -630,7 +674,7 @@ namespace Terminal.Gui {
 		/// Collapses the supplied object if it is currently expanded 
 		/// </summary>
 		/// <param name="toCollapse">The object to collapse</param>
-		public void Collapse(object toCollapse)
+		public void Collapse(T toCollapse)
 		{
 			if(toCollapse == null)
 				return;
@@ -640,17 +684,17 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns the corresponding <see cref="Branch"/> in the tree for <paramref name="toFind"/>.  This will not work for objects hidden by their parent being collapsed
+		/// Returns the corresponding <see cref="Branch{T}"/> in the tree for <paramref name="toFind"/>.  This will not work for objects hidden by their parent being collapsed
 		/// </summary>
 		/// <param name="toFind"></param>
 		/// <returns>The branch for <paramref name="toFind"/> or null if it is not currently exposed in the tree</returns>
-		private Branch ObjectToBranch(object toFind)
+		private Branch<T> ObjectToBranch(T toFind)
 		{
 			return BuildLineMap().FirstOrDefault(o=>o.Model.Equals(toFind));
 		}
 	}
 
-	class Branch
+	class Branch<T> where T:class
 	{
 		/// <summary>
 		/// True if the branch is expanded to reveal child branches
@@ -660,7 +704,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The users object that is being displayed by this branch of the tree
 		/// </summary>
-		public object Model {get;private set;}
+		public T Model {get;private set;}
 		
 		/// <summary>
 		/// The depth of the current branch.  Depth of 0 indicates root level branches
@@ -670,14 +714,14 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The children of the current branch.  This is null until the first call to <see cref="FetchChildren"/> to avoid enumerating the entire underlying hierarchy
 		/// </summary>
-		public Dictionary<object,Branch> ChildBranches {get;set;}
+		public Dictionary<T,Branch<T>> ChildBranches {get;set;}
 
 		/// <summary>
-		/// The parent <see cref="Branch"/> or null if it is a root.
+		/// The parent <see cref="Branch{T}"/> or null if it is a root.
 		/// </summary>
-		public Branch Parent {get; private set;}
+		public Branch<T> Parent {get; private set;}
 
-		private TreeView tree;
+		private TreeView<T> tree;
 		
 		/// <summary>
 		/// Declares a new branch of <paramref name="tree"/> in which the users object <paramref name="model"/> is presented
@@ -685,7 +729,7 @@ namespace Terminal.Gui {
 		/// <param name="tree">The UI control in which the branch resides</param>
 		/// <param name="parentBranchIfAny">Pass null for root level branches, otherwise pass the parent</param>
 		/// <param name="model">The user's object that should be displayed</param>
-		public Branch(TreeView tree,Branch parentBranchIfAny,object model)
+		public Branch(TreeView<T> tree,Branch<T> parentBranchIfAny,T model)
 		{
 			this.tree  = tree;
 			this.Model = model;
@@ -705,9 +749,9 @@ namespace Terminal.Gui {
 			if (tree.TreeBuilder == null)
 				return;
 
-			var children = tree.TreeBuilder.GetChildren(this.Model) ?? Enumerable.Empty<object>();
+			var children = tree.TreeBuilder.GetChildren(this.Model) ?? Enumerable.Empty<T>();
 
-			this.ChildBranches = children.ToDictionary(k=>k,val=>new Branch(tree,this,val));
+			this.ChildBranches = children.ToDictionary(k=>k,val=>new Branch<T>(tree,this,val));
 		}
 
 		/// <summary>
@@ -782,7 +826,7 @@ namespace Terminal.Gui {
 		/// Returns all parents starting with the immediate parent and ending at the root
 		/// </summary>
 		/// <returns></returns>
-		private IEnumerable<Branch> GetParentBranches()
+		private IEnumerable<Branch<T>> GetParentBranches()
 		{
 			var cur = Parent;
 
@@ -860,7 +904,7 @@ namespace Terminal.Gui {
 				// we already knew about some children so preserve the state of the old children
 
 				// first gather the new Children
-				var newChildren = tree.TreeBuilder?.GetChildren(this.Model) ?? Enumerable.Empty<object>();
+				var newChildren = tree.TreeBuilder?.GetChildren(this.Model) ?? Enumerable.Empty<T>();
 
 				// Children who no longer appear need to go
 				foreach(var toRemove in ChildBranches.Keys.Except(newChildren).ToArray())
@@ -877,7 +921,7 @@ namespace Terminal.Gui {
 				{
 					// If we don't know about the child yet we need a new branch
 					if (!ChildBranches.ContainsKey (newChild)) {
-						ChildBranches.Add(newChild,new Branch(tree,this,newChild));
+						ChildBranches.Add(newChild,new Branch<T>(tree,this,newChild));
 					}
 					else{
 						//we already have this object but update the reference anyway incase Equality match but the references are new
@@ -930,27 +974,27 @@ namespace Terminal.Gui {
 	/// </summary>
 	/// <param name="model"></param>
 	/// <returns></returns>
-	public delegate string AspectGetterDelegate(object model);
+	public delegate string AspectGetterDelegate<T>(T model) where T:class;
 	
 	/// <summary>
 	/// Event arguments describing a change in selected object in a tree view
 	/// </summary>
-	public class SelectionChangedEventArgs : EventArgs
+	public class SelectionChangedEventArgs<T> : EventArgs where T:class
 	{
 		/// <summary>
 		/// The view in which the change occurred
 		/// </summary>
-		public TreeView Tree { get; }
+		public TreeView<T> Tree { get; }
 
 		/// <summary>
 		/// The previously selected value (can be null)
 		/// </summary>
-		public object OldValue { get; }
+		public T OldValue { get; }
 
 		/// <summary>
 		/// The newly selected value in the <see cref="Tree"/> (can be null)
 		/// </summary>
-		public object NewValue { get; }
+		public T NewValue { get; }
 
 		/// <summary>
 		/// Creates a new instance of event args describing a change of selection in <paramref name="tree"/>
@@ -958,7 +1002,7 @@ namespace Terminal.Gui {
 		/// <param name="tree"></param>
 		/// <param name="oldValue"></param>
 		/// <param name="newValue"></param>
-		public SelectionChangedEventArgs(TreeView tree, object oldValue, object newValue)
+		public SelectionChangedEventArgs(TreeView<T> tree, T oldValue, T newValue)
 		{
 			Tree = tree;
 			OldValue = oldValue;
