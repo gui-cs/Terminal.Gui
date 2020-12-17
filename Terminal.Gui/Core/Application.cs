@@ -100,7 +100,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Used only by <see cref="NetDriver"/> to forcing always setting the cursor position when writing to the screen.
+		/// Used only by <see cref="NetDriver"/> to forcing always moving the cursor position when writing to the screen.
 		/// </summary>
 		public static bool AlwaysSetPosition {
 			get {

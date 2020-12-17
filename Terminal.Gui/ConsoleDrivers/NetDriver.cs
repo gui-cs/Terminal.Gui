@@ -1032,6 +1032,8 @@ namespace Terminal.Gui {
 		{
 			if (Rows > 0) {
 				Console.Clear ();
+				Console.Out.Write ("\x1b[3J");
+				//Console.Out.Write ("\x1b[?25l");
 			}
 		}
 
