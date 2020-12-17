@@ -177,7 +177,9 @@ namespace Terminal.Gui {
 			while (true) {
 				if (!consoleDriver.HeightAsBuffer) {
 					if (Console.WindowWidth != consoleDriver.Cols || Console.WindowHeight != consoleDriver.Rows) {
-						GetWindowSizeEvent (new Size (Console.WindowWidth, Console.WindowHeight));
+						var w = Math.Max (Console.WindowWidth, 0);
+						var h = Math.Max (Console.WindowHeight, 0);
+						GetWindowSizeEvent (new Size (w, h));
 						return;
 					}
 				} else {
