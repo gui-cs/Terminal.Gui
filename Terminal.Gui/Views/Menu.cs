@@ -453,7 +453,7 @@ namespace Terminal.Gui {
 						Driver.AddRune (' ');
 
 				if (item == null) {
-					Move (Frame.Right - 1, i + 1);
+					Move (Frame.Width - 1, i + 1);
 					Driver.AddRune (Driver.RightTee);
 					continue;
 				}
