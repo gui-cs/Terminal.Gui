@@ -28,6 +28,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miArrowSymbols;
 		private MenuItem miNoSymbols;
 		private MenuItem miColoredSymbols;
+		private MenuItem miInvertSymbols;
 		private Terminal.Gui.Attribute green;
 		private Terminal.Gui.Attribute red;
 
@@ -50,6 +51,7 @@ namespace UICatalog.Scenarios {
 					miArrowSymbols = new MenuItem ("_ArrowSymbols", "", () => SetExpandableSymbols('>','v')){Checked = false, CheckType = MenuItemCheckStyle.Radio},
 					miNoSymbols = new MenuItem ("_NoSymbols", "", () => SetExpandableSymbols(null,null)){Checked = false, CheckType = MenuItemCheckStyle.Radio},
 					miColoredSymbols = new MenuItem ("_ColoredSymbols", "", () => ShowColoredExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
+					miInvertSymbols = new MenuItem ("_InvertSymbols", "", () => InvertExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 				}),
 			});
 			Top.Add (menu);
@@ -152,26 +154,22 @@ namespace UICatalog.Scenarios {
 		{
 			miColoredSymbols.Checked = !miColoredSymbols.Checked;
 
-			ShowColoredExpandableSymbols(treeViewFiles);
-			ShowColoredExpandableSymbols(treeViewNodes);
+			treeViewFiles.Style.ColorExpandSymbol =  miColoredSymbols.Checked;
+			treeViewFiles.SetNeedsDisplay();
+
+			treeViewNodes.Style.ColorExpandSymbol =  miColoredSymbols.Checked;
+			treeViewNodes.SetNeedsDisplay();
+		}
+		private void InvertExpandableSymbols(){
+			miInvertSymbols.Checked = !miInvertSymbols.Checked;
+
+			treeViewFiles.Style.InvertExpandSymbolColors =  miInvertSymbols.Checked;
+			treeViewFiles.SetNeedsDisplay();
+
+			treeViewNodes.Style.InvertExpandSymbolColors =  miInvertSymbols.Checked;
+			treeViewNodes.SetNeedsDisplay();
 		}
 
-		private void ShowColoredExpandableSymbols (ITreeView treeView)
-		{
-			// Toggle Green expand symbols
-			if(miColoredSymbols.Checked)
-				treeView.Style.ExpandableSymbolColor =  green;
-			else
-				treeView.Style.ExpandableSymbolColor =  null; //clear it
-
-			// Toggle Red collapse symbols
-			if(miColoredSymbols.Checked)
-				treeView.Style.CollapseableSymbolColor =  red;
-			else
-				treeView.Style.CollapseableSymbolColor =  null; //clear it
-
-			treeView.SetNeedsDisplay();
-		}
 
 		private ITreeNode CreateSimpleRoot ()
 		{

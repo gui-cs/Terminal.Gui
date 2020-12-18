@@ -7,7 +7,7 @@ using System.Linq;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// Interface to implement when you want <see cref="TreeView{T}"/> to automatically determine children for your class
+	/// Interface to implement when you want the regular (non generic) <see cref="TreeView"/> to automatically determine children for your class (without having to specify a <see cref="ITreeBuilder{T}"/>)
 	/// </summary>
 	public interface ITreeNode
 	{
@@ -25,7 +25,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Simple class for representing nodes of a <see cref="TreeView{T}"/>.
+	/// Simple class for representing nodes, use with regular (non generic) <see cref="TreeView"/>.
 	/// </summary>
 	public class TreeNode : ITreeNode
 	{
@@ -80,6 +80,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Returns true/false for whether a model has children.  This method should be implemented when <see cref="GetChildren"/> is an expensive operation otherwise <see cref="SupportsCanExpand"/> should return false (in which case this method will not be called)
 		/// </summary>
+		/// <remarks>Only implement this method if you have a very fast way of determining whether an object can have children e.g. checking a Type (directories can always be expanded)</remarks>
 		/// <param name="model"></param>
 		/// <returns></returns>
 		bool CanExpand(T model);
@@ -93,7 +94,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Abstract implementation of <see cref="ITreeBuilder{T}"/>
+	/// Abstract implementation of <see cref="ITreeBuilder{T}"/>.
 	/// </summary>
 	public abstract class TreeBuilder<T> : ITreeBuilder<T> {
 
@@ -101,7 +102,7 @@ namespace Terminal.Gui {
 		public bool SupportsCanExpand { get; protected set;} = false;
 
 		/// <summary>
-		/// Override this method to return a rapid answer as to whether <see cref="GetChildren(T)"/> returns results.
+		/// Override this method to return a rapid answer as to whether <see cref="GetChildren(T)"/> returns results.  If you are implementing this method ensure you passed true in base constructor or set <see cref="SupportsCanExpand"/>
 		/// </summary>
 		/// <param name="model"></param>
 		/// <returns></returns>
@@ -250,12 +251,6 @@ namespace Terminal.Gui {
 		/// Symbol to use for branch nodes that can be expanded to indicate this to the user.  Defaults to '+'. Set to null to hide
 		/// </summary>
 		public Rune? ExpandableSymbol {get;set;} = '+';
-
-		/// <summary>
-		/// Optional color scheme to use when rendering <see cref="ExpandableSymbol"/> (defaults to null)
-		/// </summary>
-		public Attribute? ExpandableSymbolColor {get;set;}
-
 				
 		/// <summary>
 		/// Symbol to use for branch nodes that can be collapsed (are currently expanded).  Defaults to '-'.  Set to null to hide
@@ -263,9 +258,14 @@ namespace Terminal.Gui {
 		public Rune? CollapseableSymbol {get;set;} = '-';
 
 		/// <summary>
-		/// Optional color scheme to use when rendering <see cref="CollapseableSymbol"/> (defaults to null)
+		/// Set to true to highlight expand/collapse symbols in hot key color
 		/// </summary>
-		public Attribute? CollapseableSymbolColor {get;set;}
+		public bool ColorExpandSymbol {get;set;}
+
+		/// <summary>
+		/// Invert console colours used to render the expand symbol
+		/// </summary>
+		public bool InvertExpandSymbolColors {get;set;}
 
 	}
 
@@ -790,14 +790,13 @@ namespace Terminal.Gui {
 		{
 			// true if the current line of the tree is the selected one and control has focus
 			bool isSelected = tree.SelectedObject == Model && tree.HasFocus;
-			Attribute lineColor = isSelected? colorScheme.HotFocus : colorScheme.Normal;
+			Attribute lineColor = isSelected? colorScheme.Focus : colorScheme.Normal;
 
 			driver.SetAttribute(lineColor);
 
 			// Everything on line before the expansion run and branch text
 			Rune[] prefix = GetLinePrefix(driver).ToArray();
 			Rune expansion = GetExpandableSymbol(driver);
-			Attribute? expansionColor = GetExpandableSymbolColor();
 			string lineBody = tree.AspectGetter(Model);
 
 			var remainingWidth = availableWidth - (prefix.Length + 1 + lineBody.Length);
@@ -807,9 +806,21 @@ namespace Terminal.Gui {
 			foreach(Rune r in prefix)
 				driver.AddRune(r);
 
-			// if it is not the curerntly selected line render the expansion symbol in the appropriate color scheme
-			if(!isSelected && expansionColor.HasValue)
-				driver.SetAttribute(expansionColor.Value);
+			// pick color for expanded symbol
+			if(tree.Style.ColorExpandSymbol || tree.Style.InvertExpandSymbolColors)
+			{
+				Attribute color;
+
+				if(tree.Style.ColorExpandSymbol)
+					color = isSelected ? tree.ColorScheme.HotFocus : tree.ColorScheme.HotNormal;
+				else
+					color = lineColor;
+
+				if(tree.Style.InvertExpandSymbolColors)
+					color = new Attribute(color.Background,color.Foreground);
+
+				driver.SetAttribute(color);
+			}
 
 			driver.AddRune(expansion);
 			
@@ -888,21 +899,6 @@ namespace Terminal.Gui {
 				return tree.Style.ExpandableSymbol ?? leafSymbol;
 
 			return leafSymbol;
-		}
-
-		/// <summary>
-		/// Returns an appropriate color according to the <see cref="TreeStyle"/> for displaying the <see cref="GetExpandableSymbol(ConsoleDriver)"/>
-		/// </summary>
-		/// <returns></returns>
-		public Attribute? GetExpandableSymbolColor()
-		{
-			if(IsExpanded)
-				return tree.Style.CollapseableSymbolColor;
-
-			if(CanExpand())
-				return tree.Style.ExpandableSymbolColor;
-
-			return null;
 		}
 
 		/// <summary>
