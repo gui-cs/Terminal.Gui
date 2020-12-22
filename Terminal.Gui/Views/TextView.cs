@@ -421,11 +421,18 @@ namespace Terminal.Gui {
 			}
 			var line = model.GetLine (currentRow);
 			var retreat = 0;
+			var col = 0;
 			if (line.Count > 0) {
 				retreat = Math.Max ((SpecialRune (line [Math.Max (CurrentColumn - leftColumn - 1, 0)])
 				? 1 : 0), 0);
+				for (int idx = leftColumn < 0 ? 0 : leftColumn; idx < line.Count; idx++) {
+					if (idx == CurrentColumn)
+						break;
+					var cols = Rune.ColumnWidth (line [idx]);
+					col += cols - 1;
+				}
 			}
-			Move (CurrentColumn - leftColumn - retreat, CurrentRow - topRow);
+			Move (CurrentColumn - leftColumn - retreat + col, CurrentRow - topRow);
 		}
 
 		void ClearRegion (int left, int top, int right, int bottom)
@@ -569,10 +576,12 @@ namespace Terminal.Gui {
 				}
 
 				Move (bounds.Left, row);
-				for (int col = bounds.Left; col < right; col++) {
-					var lineCol = leftColumn + col;
+				var col = 0;
+				for (int idx = bounds.Left; idx < right; idx++) {
+					var lineCol = leftColumn + idx;
 					var rune = lineCol >= lineRuneCount ? ' ' : line [lineCol];
-					if (selecting && PointInSelection (col, row)) {
+					var cols = Rune.ColumnWidth (rune);
+					if (selecting && PointInSelection (idx, row)) {
 						ColorSelection ();
 					} else {
 						ColorNormal ();
@@ -581,6 +590,7 @@ namespace Terminal.Gui {
 					if (!SpecialRune (rune)) {
 						AddRune (col, row, rune);
 					}
+					col = TextField.SetCol (col, bounds.Right, cols);
 				}
 			}
 			PositionCursor ();
@@ -1265,10 +1275,12 @@ namespace Terminal.Gui {
 						currentRow = ev.Y + topRow;
 					}
 					var r = GetCurrentLine ();
-					if (ev.X - leftColumn >= r.Count)
+					var idx = TextField.GetPointFromX (r, leftColumn, ev.X);
+					if (idx - leftColumn >= r.Count) {
 						currentColumn = r.Count - leftColumn;
-					else
-						currentColumn = ev.X - leftColumn;
+					} else {
+						currentColumn = idx - leftColumn;
+					}
 				}
 				PositionCursor ();
 			} else if (ev.Flags == MouseFlags.WheeledDown) {

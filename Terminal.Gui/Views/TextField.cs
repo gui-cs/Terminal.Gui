@@ -241,7 +241,7 @@ namespace Terminal.Gui {
 			PositionCursor ();
 		}
 
-		static int SetCol (int col, int width, int cols)
+		internal static int SetCol (int col, int width, int cols)
 		{
 			if (col + cols <= width) {
 				col += cols;
@@ -805,7 +805,7 @@ namespace Terminal.Gui {
 			return point;
 		}
 
-		int GetPointFromX (List<Rune> t, int start, int x)
+		internal static int GetPointFromX (List<Rune> t, int start, int x)
 		{
 			if (x < 0) {
 				return x;
