@@ -195,7 +195,7 @@ namespace Terminal.Gui {
 				if (idx == point)
 					break;
 				var cols = Rune.ColumnWidth (text [idx]);
-				col = SetCol (col, Frame.Width - 1, cols);
+				col = TextModel.SetCol (col, Frame.Width - 1, cols);
 			}
 			Move (col, 0);
 		}
@@ -227,7 +227,7 @@ namespace Terminal.Gui {
 				if (col + cols <= width) {
 					Driver.AddRune ((Rune)(Secret ? '*' : rune));
 				}
-				col = SetCol (col, width, cols);
+				col = TextModel.SetCol (col, width, cols);
 				if (idx + 1 < tcount && col + Rune.ColumnWidth (text [idx + 1]) > width) {
 					break;
 				}
@@ -239,15 +239,6 @@ namespace Terminal.Gui {
 			}
 
 			PositionCursor ();
-		}
-
-		internal static int SetCol (int col, int width, int cols)
-		{
-			if (col + cols <= width) {
-				col += cols;
-			}
-
-			return col;
 		}
 
 		// Returns the size and length in a range of the string.
@@ -779,7 +770,7 @@ namespace Terminal.Gui {
 		{
 			// We could also set the cursor position.
 			int x;
-			var pX = GetPointFromX (text, first, ev.X);
+			var pX = TextModel.GetColFromX (text, first, ev.X);
 			if (text.Count == 0) {
 				x = pX - ev.OfX;
 			} else {
@@ -792,7 +783,7 @@ namespace Terminal.Gui {
 		{
 			int pX = x;
 			if (getX) {
-				pX = GetPointFromX (text, first, x);
+				pX = TextModel.GetColFromX (text, first, x);
 			}
 			if (first + pX > text.Count) {
 				point = text.Count;
@@ -803,23 +794,6 @@ namespace Terminal.Gui {
 			}
 
 			return point;
-		}
-
-		internal static int GetPointFromX (List<Rune> t, int start, int x)
-		{
-			if (x < 0) {
-				return x;
-			}
-			int size = start;
-			var pX = x + start;
-			for (int i = start; i < t.Count; i++) {
-				var r = t [i];
-				size += Rune.ColumnWidth (r);
-				if (i == pX || (size > pX)) {
-					return i - start;
-				}
-			}
-			return t.Count - start;
 		}
 
 		void PrepareSelection (int x, int direction = 0)

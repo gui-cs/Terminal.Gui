@@ -171,6 +171,34 @@ namespace Terminal.Gui {
 		{
 			lines.RemoveAt (pos);
 		}
+
+		internal static int SetCol (int col, int width, int cols)
+		{
+			if (col + cols <= width) {
+				col += cols;
+			}
+
+			return col;
+		}
+
+		internal static int GetColFromX (List<Rune> t, int start, int x)
+		{
+			if (x < 0) {
+				return x;
+			}
+			int size = start;
+			var pX = x + start;
+			for (int i = start; i < t.Count; i++) {
+				var r = t [i];
+				size += Rune.ColumnWidth (r);
+				if (i == pX || (size > pX)) {
+					return i - start;
+				}
+			}
+			return t.Count - start;
+		}
+
+
 	}
 
 	/// <summary>
@@ -590,7 +618,7 @@ namespace Terminal.Gui {
 					if (!SpecialRune (rune)) {
 						AddRune (col, row, rune);
 					}
-					col = TextField.SetCol (col, bounds.Right, cols);
+					col = TextModel.SetCol (col, bounds.Right, cols);
 				}
 			}
 			PositionCursor ();
@@ -658,7 +686,7 @@ namespace Terminal.Gui {
 
 			var line = GetCurrentLine ();
 
-			// Optmize single line
+			// Optimize single line
 			if (lines.Count == 1) {
 				line.InsertRange (currentColumn, lines [0]);
 				currentColumn += lines [0].Count;
@@ -683,7 +711,7 @@ namespace Terminal.Gui {
 			var lastp = last.Count;
 			last.InsertRange (last.Count, rest);
 
-			// Now adjjust column and row positions
+			// Now adjust column and row positions
 			currentRow += lines.Count - 1;
 			currentColumn = lastp;
 			if (currentRow - topRow > Frame.Height) {
@@ -1275,7 +1303,7 @@ namespace Terminal.Gui {
 						currentRow = ev.Y + topRow;
 					}
 					var r = GetCurrentLine ();
-					var idx = TextField.GetPointFromX (r, leftColumn, ev.X);
+					var idx = TextModel.GetColFromX (r, leftColumn, ev.X);
 					if (idx - leftColumn >= r.Count) {
 						currentColumn = r.Count - leftColumn;
 					} else {
