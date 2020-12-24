@@ -198,7 +198,55 @@ namespace Terminal.Gui {
 			return t.Count - start;
 		}
 
+		// Returns the size and length in a range of the string.
+		internal static (int size, int length) DisplaySize (List<Rune> t, int start = -1, int end = -1, bool checkNextRune = true)
+		{
+			if (t == null || t.Count == 0) {
+				return (0, 0);
+			}
+			int size = 0;
+			int len = 0;
+			int tcount = end == -1 ? t.Count : end > t.Count ? t.Count : end;
+			int i = start == -1 ? 0 : start;
+			for (; i < tcount; i++) {
+				var rune = t [i];
+				size += Rune.ColumnWidth (rune);
+				len += Rune.RuneLen (rune);
+				if (checkNextRune && i == tcount - 1 && t.Count > tcount && Rune.ColumnWidth (t [i + 1]) > 1) {
+					size += Rune.ColumnWidth (t [i + 1]);
+					len += Rune.RuneLen (t [i + 1]);
+				}
+			}
+			return (size, len);
+		}
 
+		// Returns the left column in a range of the string.
+		internal static int CalculateLeftColumn (List<Rune> t, int start, int end, int width, int currentColumn)
+		{
+			if (t == null) {
+				return 0;
+			}
+			(var dSize, _) = TextModel.DisplaySize (t, start, end);
+			if (dSize < width) {
+				return start;
+			}
+			int size = 0;
+			int tcount = end > t.Count - 1 ? t.Count - 1 : end;
+			int col = 0;
+			for (int i = tcount; i > start; i--) {
+				var rune = t [i];
+				var s = Rune.ColumnWidth (rune);
+				size += s;
+				if (size >= dSize - width) {
+					col = tcount - i + start;
+					if (start == 0 || col == start || (currentColumn == t.Count && (currentColumn - col > width))) {
+						col++;
+					}
+					break;
+				}
+			}
+			return col;
+		}
 	}
 
 	/// <summary>
@@ -679,10 +727,15 @@ namespace Terminal.Gui {
 
 		void InsertText (ustring text)
 		{
+			if (ustring.IsNullOrEmpty (text)) {
+				return;
+			}
+
 			var lines = TextModel.StringToRunes (text);
 
-			if (lines.Count == 0)
+			if (lines.Count == 0) {
 				return;
+			}
 
 			var line = GetCurrentLine ();
 
@@ -690,8 +743,9 @@ namespace Terminal.Gui {
 			if (lines.Count == 1) {
 				line.InsertRange (currentColumn, lines [0]);
 				currentColumn += lines [0].Count;
-				if (currentColumn - leftColumn > Frame.Width)
+				if (currentColumn - leftColumn > Frame.Width) {
 					leftColumn = currentColumn - Frame.Width + 1;
+				}
 				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, currentRow - topRow + 1));
 				return;
 			}
@@ -704,8 +758,9 @@ namespace Terminal.Gui {
 			// First line is inserted at the current location, the rest is appended
 			line.InsertRange (currentColumn, lines [0]);
 
-			for (int i = 1; i < lines.Count; i++)
+			for (int i = 1; i < lines.Count; i++) {
 				model.AddLine (currentRow + i, lines [i]);
+			}
 
 			var last = model.GetLine (currentRow + lines.Count - 1);
 			var lastp = last.Count;
@@ -714,16 +769,7 @@ namespace Terminal.Gui {
 			// Now adjust column and row positions
 			currentRow += lines.Count - 1;
 			currentColumn = lastp;
-			if (currentRow - topRow > Frame.Height) {
-				topRow = currentRow - Frame.Height + 1;
-				if (topRow < 0)
-					topRow = 0;
-			}
-			if (currentColumn < leftColumn)
-				leftColumn = currentColumn;
-			if (currentColumn - leftColumn >= Frame.Width)
-				leftColumn = currentColumn - Frame.Width + 1;
-			SetNeedsDisplay ();
+			Adjust ();
 		}
 
 		// The column we are tracking, or -1 if we are not tracking any column
@@ -745,27 +791,40 @@ namespace Terminal.Gui {
 
 		void Adjust ()
 		{
+			int offB = OffSetBackground ();
+			var line = GetCurrentLine ();
 			bool need = false;
 			if (currentColumn < leftColumn) {
-				currentColumn = leftColumn;
+				leftColumn = currentColumn;
 				need = true;
-			}
-			if (currentColumn - leftColumn > Frame.Width) {
-				leftColumn = currentColumn - Frame.Width + 1;
+			} else if (currentColumn - leftColumn > Frame.Width + offB ||
+				TextModel.DisplaySize (line, leftColumn, currentColumn).size >= Frame.Width + offB) {
+				leftColumn = Math.Max (TextModel.CalculateLeftColumn (line, leftColumn,
+					currentColumn, Frame.Width - 1 + offB, currentColumn), 0);
 				need = true;
 			}
 			if (currentRow < topRow) {
 				topRow = currentRow;
 				need = true;
-			}
-			if (currentRow - topRow > Frame.Height) {
+			} else if (currentRow - topRow > Frame.Height) {
 				topRow = currentRow - Frame.Height + 1;
 				need = true;
 			}
-			if (need)
+			if (need) {
 				SetNeedsDisplay ();
-			else
+			} else {
 				PositionCursor ();
+			}
+		}
+
+		int OffSetBackground ()
+		{
+			int offB = 0;
+			if (SuperView?.Frame.Right - Frame.Right < 0) {
+				offB = SuperView.Frame.Right - Frame.Right - 1;
+			}
+
+			return offB;
 		}
 
 		/// <summary>
@@ -854,53 +913,33 @@ namespace Terminal.Gui {
 				var currentLine = GetCurrentLine ();
 				if (currentColumn < currentLine.Count) {
 					currentColumn++;
-					if (currentColumn >= leftColumn + Frame.Width) {
-						leftColumn++;
-						SetNeedsDisplay ();
-					}
-					PositionCursor ();
 				} else {
 					if (currentRow + 1 < model.Count) {
 						currentRow++;
 						currentColumn = 0;
-						leftColumn = 0;
 						if (currentRow >= topRow + Frame.Height) {
 							topRow++;
 						}
-						SetNeedsDisplay ();
-						PositionCursor ();
 					}
-					break;
 				}
+				Adjust ();
 				break;
 
 			case Key.B | Key.CtrlMask:
 			case Key.CursorLeft:
 				if (currentColumn > 0) {
 					currentColumn--;
-					if (currentColumn < leftColumn) {
-						leftColumn--;
-						SetNeedsDisplay ();
-					}
-					PositionCursor ();
 				} else {
 					if (currentRow > 0) {
 						currentRow--;
 						if (currentRow < topRow) {
 							topRow--;
-							SetNeedsDisplay ();
 						}
 						currentLine = GetCurrentLine ();
 						currentColumn = currentLine.Count;
-						int prev = leftColumn;
-						leftColumn = currentColumn - Frame.Width + 1;
-						if (leftColumn < 0)
-							leftColumn = 0;
-						if (prev != leftColumn)
-							SetNeedsDisplay ();
-						PositionCursor ();
 					}
 				}
+				Adjust ();
 				break;
 
 			case Key.Delete:
@@ -928,10 +967,7 @@ namespace Terminal.Gui {
 					model.RemoveLine (currentRow);
 					currentRow--;
 					currentColumn = prevCount;
-					leftColumn = currentColumn - Frame.Width + 1;
-					if (leftColumn < 0)
-						leftColumn = 0;
-					SetNeedsDisplay ();
+					Adjust ();
 				}
 				break;
 
@@ -939,11 +975,7 @@ namespace Terminal.Gui {
 			case Key.Home:
 			case Key.A | Key.CtrlMask:
 				currentColumn = 0;
-				if (currentColumn < leftColumn) {
-					leftColumn = 0;
-					SetNeedsDisplay ();
-				} else
-					PositionCursor ();
+				Adjust ();
 				break;
 			case Key.DeleteChar:
 			case Key.D | Key.CtrlMask: // Delete
@@ -970,12 +1002,7 @@ namespace Terminal.Gui {
 				currentLine = GetCurrentLine ();
 				currentColumn = currentLine.Count;
 				int pcol = leftColumn;
-				leftColumn = currentColumn - Frame.Width + 1;
-				if (leftColumn < 0)
-					leftColumn = 0;
-				if (pcol != leftColumn)
-					SetNeedsDisplay ();
-				PositionCursor ();
+				Adjust ();
 				break;
 
 			case Key.K | Key.CtrlMask: // kill-to-end
@@ -1016,11 +1043,7 @@ namespace Terminal.Gui {
 				selectionStartRow = currentRow;
 				break;
 
-			case ((int)'w' + Key.AltMask):
-				SetClipboard (GetRegion ());
-				selecting = false;
-				break;
-
+			case ((int)'W' + Key.AltMask):
 			case Key.W | Key.CtrlMask:
 				SetClipboard (GetRegion ());
 				if (!isReadOnly)
@@ -1050,7 +1073,6 @@ namespace Terminal.Gui {
 			case Key.Enter:
 				if (isReadOnly)
 					break;
-				var orow = currentRow;
 				currentLine = GetCurrentLine ();
 				restCount = currentLine.Count - currentColumn;
 				rest = currentLine.GetRange (currentColumn, restCount);
@@ -1307,7 +1329,7 @@ namespace Terminal.Gui {
 					if (idx - leftColumn >= r.Count) {
 						currentColumn = r.Count - leftColumn;
 					} else {
-						currentColumn = idx - leftColumn;
+						currentColumn = idx + leftColumn;
 					}
 				}
 				PositionCursor ();

@@ -157,7 +157,7 @@ namespace Terminal.Gui {
 				TextChanged?.Invoke (oldText);
 
 				if (point > text.Count) {
-					point = Math.Max (DisplaySize (text, 0).size - 1, 0);
+					point = Math.Max (TextModel.DisplaySize (text, 0).size - 1, 0);
 				}
 
 				Adjust ();
@@ -241,36 +241,15 @@ namespace Terminal.Gui {
 			PositionCursor ();
 		}
 
-		// Returns the size and length in a range of the string.
-		(int size, int length) DisplaySize (List<Rune> t, int start = -1, int end = -1, bool checkNextRune = true)
-		{
-			if (t == null || t.Count == 0) {
-				return (0, 0);
-			}
-			int size = 0;
-			int len = 0;
-			int tcount = end == -1 ? t.Count : end > t.Count ? t.Count : end;
-			int i = start == -1 ? 0 : start;
-			for (; i < tcount; i++) {
-				var rune = t [i];
-				size += Rune.ColumnWidth (rune);
-				len += Rune.RuneLen (rune);
-				if (checkNextRune && i == tcount - 1 && t.Count > tcount && Rune.ColumnWidth (t [i + 1]) > 1) {
-					size += Rune.ColumnWidth (t [i + 1]);
-					len += Rune.RuneLen (t [i + 1]);
-				}
-			}
-			return (size, len);
-		}
-
 		void Adjust ()
 		{
 			int offB = OffSetBackground ();
 			if (point < first) {
 				first = point;
 			} else if (first + point - (Frame.Width + offB) == 0 ||
-				  DisplaySize (text, first, point).size >= Frame.Width + offB) {
-				first = Math.Max (CalculateFirst (text, first, point, Frame.Width - 1 + offB), 0);
+				  TextModel.DisplaySize (text, first, point).size >= Frame.Width + offB) {
+				first = Math.Max (TextModel.CalculateLeftColumn (text, first,
+					point, Frame.Width - 1 + offB, point), 0);
 			}
 			SetNeedsDisplay ();
 		}
@@ -283,33 +262,6 @@ namespace Terminal.Gui {
 			}
 
 			return offB;
-		}
-
-		int CalculateFirst (List<Rune> t, int start, int end, int width)
-		{
-			if (t == null) {
-				return 0;
-			}
-			(var dSize, _) = DisplaySize (t, start, end);
-			if (dSize < width) {
-				return start;
-			}
-			int size = 0;
-			int tcount = end > t.Count - 1 ? t.Count - 1 : end;
-			int col = 0;
-			for (int i = tcount; i > start; i--) {
-				var rune = t [i];
-				var s = Rune.ColumnWidth (rune);
-				size += s;
-				if (size >= dSize - width) {
-					col = tcount - i + start;
-					if (start == 0 || col == start || (point == t.Count && (point - col > width))) {
-						col++;
-					}
-					break;
-				}
-			}
-			return col;
 		}
 
 		void SetText (List<Rune> newText)
@@ -871,9 +823,9 @@ namespace Terminal.Gui {
 			ustring actualText = Text;
 			int selStart = SelectedLength < 0 ? SelectedLength + SelectedStart : SelectedStart;
 			int selLength = Math.Abs (SelectedLength);
-			(var _, var len) = DisplaySize (text, 0, selStart, false);
-			(var _, var len2) = DisplaySize (text, selStart, selStart + selLength, false);
-			(var _, var len3) = DisplaySize (text, selStart + selLength, actualText.RuneCount, false);
+			(var _, var len) = TextModel.DisplaySize (text, 0, selStart, false);
+			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + selLength, false);
+			(var _, var len3) = TextModel.DisplaySize (text, selStart + selLength, actualText.RuneCount, false);
 			Text = actualText[0, len] +
 				actualText[len + len2, len + len2 + len3];
 			ClearAllSelection ();
@@ -893,9 +845,9 @@ namespace Terminal.Gui {
 			SetSelectedStartSelectedLength ();
 			int selStart = start == -1 ? CursorPosition : start;
 			ustring actualText = Text;
-			(int _, int len) = DisplaySize (text, 0, selStart, false);
-			(var _, var len2) = DisplaySize (text, selStart, selStart + length, false);
-			(var _, var len3) = DisplaySize (text, selStart + length, actualText.RuneCount, false);
+			(int _, int len) = TextModel.DisplaySize (text, 0, selStart, false);
+			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + length, false);
+			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.RuneCount, false);
 			ustring cbTxt = Clipboard.Contents ?? "";
 			Text = actualText [0, len] +
 				cbTxt +
