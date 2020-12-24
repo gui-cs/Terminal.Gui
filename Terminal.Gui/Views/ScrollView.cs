@@ -277,12 +277,18 @@ namespace Terminal.Gui {
 			}
 		}
 
+		int lastLocation = -1;
+
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
 				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
 				return false;
+			}
+
+			if (!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
+				lastLocation = -1;
 			}
 
 			int location = vertical ? me.Y : me.X;
@@ -307,13 +313,40 @@ namespace Terminal.Gui {
 					b1 = Math.Max (b1 - 1, 0);
 				}
 
-				if (location > b2 + 1 && location > posTopLeftTee && location > b1 && location > posBottomRightTee && posBottomRightTee > 0) {
-					Host.CanScroll (location, out int nv, vertical);
-					if (nv > 0) {
-						SetPosition (Math.Min (pos + nv, Size));
+				if (location > b1 && location <= b2 + 1) {
+					if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1Clicked) {
+						if (location == 1) {
+							SetPosition (0);
+						} else if (location == barsize) {
+							Host.CanScroll (Size - pos, out int nv, vertical);
+							if (nv > 0) {
+								SetPosition (Math.Min (pos + nv, Size));
+							}
+						}
+					} else if (me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
+						var mb = (b2 - b1) / 2;
+						var ml = mb + b1 + (mb == 0 ? 1 : 0);
+						if ((location >= b1 && location <= ml) || (location < lastLocation && lastLocation > -1)) {
+							lastLocation = location;
+							var np = b1 * Size / barsize;
+							SetPosition (np);
+						} else if (location > lastLocation) {
+							var np = location * Size / barsize;
+							Host.CanScroll (np - pos, out int nv, vertical);
+							if (nv > 0) {
+								SetPosition (pos + nv);
+							}
+						}
 					}
-				} else if (location <= b1) {
-					SetPosition (Math.Max (pos - barsize - location, 0));
+				} else {
+					if (location >= b2 + 1 && location > posTopLeftTee && location > b1 && location > posBottomRightTee && posBottomRightTee > 0) {
+						Host.CanScroll (location, out int nv, vertical);
+						if (nv > 0) {
+							SetPosition (Math.Min (pos + nv, Size));
+						}
+					} else if (location <= b1) {
+						SetPosition (Math.Max (pos - barsize - location, 0));
+					}
 				}
 			}
 

@@ -137,6 +137,8 @@ namespace UICatalog {
 			//	}
 			//}
 
+			ContentSize = new Size (CharMap.RowWidth, MaxCodePointVal / 16 + Frame.Height - 1);
+
 			for (int header = 0; header < 16; header++) {
 				Move (viewport.X + RowHeaderWidth + (header * H_SPACE), 0);
 				Driver.AddStr ($" {header:x} ");

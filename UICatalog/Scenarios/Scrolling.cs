@@ -129,6 +129,7 @@ namespace UICatalog {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (1),  // BUGBUG: I don't think this should be needed; DimFill() should respect container's frame. X does.
+				Height = 1,
 				ColorScheme = Colors.Error
 			};
 			scrollView.Add (horizontalRuler);
