@@ -115,8 +115,6 @@ namespace Terminal.Gui {
 			get => base.Frame;
 			set {
 				base.Frame = value;
-				var w = base.Frame.Width;
-				first = point > w ? point - w : 0;
 				Adjust ();
 			}
 		}

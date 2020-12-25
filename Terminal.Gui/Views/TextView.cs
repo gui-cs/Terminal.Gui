@@ -172,6 +172,25 @@ namespace Terminal.Gui {
 			lines.RemoveAt (pos);
 		}
 
+		/// <summary>
+		/// Returns the maximum line length of the visible lines.
+		/// </summary>
+		/// <param name="first">The first line.</param>
+		/// <param name="last">The last line.</param>
+		public int GetMaxVisibleLine (int first, int last)
+		{
+			int maxLength = 0;
+			last = last < lines.Count ? last : lines.Count;
+			for (int i = first; i < last; i++) {
+				var l = GetLine (i).Count;
+				if (l > maxLength) {
+					maxLength = l;
+				}
+			}
+
+			return maxLength;
+		}
+
 		internal static int SetCol (int col, int width, int cols)
 		{
 			if (col + cols <= width) {
@@ -432,6 +451,15 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc/>
+		public override Rect Frame {
+			get => base.Frame;
+			set {
+				base.Frame = value;
+				Adjust ();
+			}
+		}
+
 		/// <summary>
 		/// Loads the contents of the file into the  <see cref="TextView"/>.
 		/// </summary>
@@ -508,7 +536,11 @@ namespace Terminal.Gui {
 					col += cols - 1;
 				}
 			}
-			Move (CurrentColumn - leftColumn - retreat + col, CurrentRow - topRow);
+			var ccol = CurrentColumn - leftColumn - retreat + col;
+			if (leftColumn <= CurrentColumn && ccol < Frame.Width
+				&& topRow <= CurrentRow && CurrentRow - topRow < Frame.Height) {
+				Move (ccol, CurrentRow - topRow);
+			}
 		}
 
 		void ClearRegion (int left, int top, int right, int bottom)
@@ -791,23 +823,23 @@ namespace Terminal.Gui {
 
 		void Adjust ()
 		{
-			int offB = OffSetBackground ();
+			var offB = OffSetBackground ();
 			var line = GetCurrentLine ();
 			bool need = false;
 			if (currentColumn < leftColumn) {
 				leftColumn = currentColumn;
 				need = true;
-			} else if (currentColumn - leftColumn > Frame.Width + offB ||
-				TextModel.DisplaySize (line, leftColumn, currentColumn).size >= Frame.Width + offB) {
+			} else if (currentColumn - leftColumn > Frame.Width + offB.width ||
+				TextModel.DisplaySize (line, leftColumn, currentColumn).size >= Frame.Width + offB.width) {
 				leftColumn = Math.Max (TextModel.CalculateLeftColumn (line, leftColumn,
-					currentColumn, Frame.Width - 1 + offB, currentColumn), 0);
+					currentColumn, Frame.Width - 1 + offB.width, currentColumn), 0);
 				need = true;
 			}
 			if (currentRow < topRow) {
 				topRow = currentRow;
 				need = true;
-			} else if (currentRow - topRow > Frame.Height) {
-				topRow = currentRow - Frame.Height + 1;
+			} else if (currentRow - topRow >= Frame.Height + offB.height) {
+				topRow = Math.Min (Math.Max (currentRow - Frame.Height + 1, 0), currentRow);
 				need = true;
 			}
 			if (need) {
@@ -817,25 +849,43 @@ namespace Terminal.Gui {
 			}
 		}
 
-		int OffSetBackground ()
+		(int width, int height) OffSetBackground ()
 		{
-			int offB = 0;
+			int w = 0;
+			int h = 0;
 			if (SuperView?.Frame.Right - Frame.Right < 0) {
-				offB = SuperView.Frame.Right - Frame.Right - 1;
+				w = SuperView.Frame.Right - Frame.Right - 1;
 			}
-
-			return offB;
+			if (SuperView?.Frame.Bottom - Frame.Bottom < 0) {
+				h = SuperView.Frame.Bottom - Frame.Bottom - 1;
+			}
+			return (w, h);
 		}
 
 		/// <summary>
 		/// Will scroll the <see cref="TextView"/> to display the specified row at the top
 		/// </summary>
 		/// <param name="row">Row that should be displayed at the top, if the value is negative it will be reset to zero</param>
-		public void ScrollTo (int row)
+		public void ScrollToRow (int row)
 		{
-			if (row < 0)
+			if (row < 0) {
 				row = 0;
-			topRow = row > model.Count ? model.Count - 1 : row;
+			}
+			topRow = row > model.Count - 1 ? model.Count - 1 : row;
+			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Will scroll the <see cref="TextView"/> to display the specified column at the left
+		/// </summary>
+		/// <param name="col">Column that should be displayed at the left, if the value is negative it will be reset to zero</param>
+		public void ScrollToCol (int col)
+		{
+			if (col < 0) {
+				col = 0;
+			}
+			var maxlength = model.GetMaxVisibleLine (topRow, topRow + Frame.Height);
+			leftColumn = col > maxlength - 1 ? maxlength - 1 : col;
 			SetNeedsDisplay ();
 		}
 
@@ -883,7 +933,7 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.PageUp:
-			case ((int)'v' + Key.AltMask):
+			case ((int)'V' + Key.AltMask):
 				int nPageUpShift = Frame.Height - 1;
 				if (currentRow > 0) {
 					if (columnTrack == -1)
@@ -1051,7 +1101,8 @@ namespace Terminal.Gui {
 				selecting = false;
 				break;
 
-			case (Key)((int)'b' + Key.AltMask):
+			case Key.CtrlMask | Key.CursorLeft:
+			case (Key)((int)'B' + Key.AltMask):
 				var newPos = WordBackward (currentColumn, currentRow);
 				if (newPos.HasValue) {
 					currentColumn = newPos.Value.col;
@@ -1061,7 +1112,8 @@ namespace Terminal.Gui {
 
 				break;
 
-			case (Key)((int)'f' + Key.AltMask):
+			case Key.CtrlMask | Key.CursorRight:
+			case (Key)((int)'F' + Key.AltMask):
 				newPos = WordForward (currentColumn, currentRow);
 				if (newPos.HasValue) {
 					currentColumn = newPos.Value.col;
@@ -1123,11 +1175,12 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		private void MoveUp ()
+		void MoveUp ()
 		{
 			if (currentRow > 0) {
-				if (columnTrack == -1)
+				if (columnTrack == -1) {
 					columnTrack = currentColumn;
+				}
 				currentRow--;
 				if (currentRow < topRow) {
 					topRow--;
@@ -1138,11 +1191,12 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void MoveDown ()
+		void MoveDown ()
 		{
 			if (currentRow + 1 < model.Count) {
-				if (columnTrack == -1)
+				if (columnTrack == -1) {
 					columnTrack = currentColumn;
+				}
 				currentRow++;
 				if (currentRow >= topRow + Frame.Height) {
 					topRow++;
@@ -1150,6 +1204,8 @@ namespace Terminal.Gui {
 				}
 				TrackColumn ();
 				PositionCursor ();
+			} else if (currentRow > Frame.Height) {
+				Adjust ();
 			}
 		}
 
@@ -1246,28 +1302,31 @@ namespace Terminal.Gui {
 		{
 			var col = fromCol;
 			var row = fromRow;
-			var line = GetCurrentLine ();
-			var rune = RuneAt (col, row);
+			try {
+				var rune = RuneAt (col, row);
 
-			var srow = row;
-			if (Rune.IsPunctuation (rune) || Rune.IsWhiteSpace (rune)) {
-				while (MoveNext (ref col, ref row, out rune)) {
-					if (Rune.IsLetterOrDigit (rune))
-						break;
+				var srow = row;
+				if (Rune.IsPunctuation (rune) || Rune.IsWhiteSpace (rune)) {
+					while (MoveNext (ref col, ref row, out rune)) {
+						if (Rune.IsLetterOrDigit (rune))
+							break;
+					}
+					while (MoveNext (ref col, ref row, out rune)) {
+						if (!Rune.IsLetterOrDigit (rune))
+							break;
+					}
+				} else {
+					while (MoveNext (ref col, ref row, out rune)) {
+						if (!Rune.IsLetterOrDigit (rune))
+							break;
+					}
 				}
-				while (MoveNext (ref col, ref row, out rune)) {
-					if (!Rune.IsLetterOrDigit (rune))
-						break;
-				}
-			} else {
-				while (MoveNext (ref col, ref row, out rune)) {
-					if (!Rune.IsLetterOrDigit (rune))
-						break;
-				}
+				if (fromCol != col || fromRow != row)
+					return (col, row);
+				return null;
+			} catch (Exception) {
+				return null;
 			}
-			if (fromCol != col || fromRow != row)
-				return (col, row);
-			return null;
 		}
 
 		(int col, int row)? WordBackward (int fromCol, int fromRow)
@@ -1277,27 +1336,30 @@ namespace Terminal.Gui {
 
 			var col = fromCol;
 			var row = fromRow;
-			var line = GetCurrentLine ();
-			var rune = RuneAt (col, row);
+			try {
+				var rune = RuneAt (col, row);
 
-			if (Rune.IsPunctuation (rune) || Rune.IsSymbol (rune) || Rune.IsWhiteSpace (rune)) {
-				while (MovePrev (ref col, ref row, out rune)) {
-					if (Rune.IsLetterOrDigit (rune))
-						break;
+				if (Rune.IsPunctuation (rune) || Rune.IsSymbol (rune) || Rune.IsWhiteSpace (rune)) {
+					while (MovePrev (ref col, ref row, out rune)) {
+						if (Rune.IsLetterOrDigit (rune))
+							break;
+					}
+					while (MovePrev (ref col, ref row, out rune)) {
+						if (!Rune.IsLetterOrDigit (rune))
+							break;
+					}
+				} else {
+					while (MovePrev (ref col, ref row, out rune)) {
+						if (!Rune.IsLetterOrDigit (rune))
+							break;
+					}
 				}
-				while (MovePrev (ref col, ref row, out rune)) {
-					if (!Rune.IsLetterOrDigit (rune))
-						break;
-				}
-			} else {
-				while (MovePrev (ref col, ref row, out rune)) {
-					if (!Rune.IsLetterOrDigit (rune))
-						break;
-				}
+				if (fromCol != col || fromRow != row)
+					return (col, row);
+				return null;
+			} catch (Exception) {
+				return null;
 			}
-			if (fromCol != col || fromRow != row)
-				return (col, row);
-			return null;
 		}
 
 		///<inheritdoc/>
@@ -1335,10 +1397,20 @@ namespace Terminal.Gui {
 				PositionCursor ();
 			} else if (ev.Flags == MouseFlags.WheeledDown) {
 				lastWasKill = false;
-				MoveDown ();
+				columnTrack = currentColumn;
+				ScrollToRow (topRow + 1);
 			} else if (ev.Flags == MouseFlags.WheeledUp) {
 				lastWasKill = false;
-				MoveUp ();
+				columnTrack = currentColumn;
+				ScrollToRow (topRow - 1);
+			} else if (ev.Flags == MouseFlags.WheeledRight) {
+				lastWasKill = false;
+				columnTrack = currentColumn;
+				ScrollToCol (leftColumn + 1);
+			} else if (ev.Flags == MouseFlags.WheeledLeft) {
+				lastWasKill = false;
+				columnTrack = currentColumn;
+				ScrollToCol (leftColumn - 1);
 			}
 
 			return true;
