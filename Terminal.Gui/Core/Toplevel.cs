@@ -363,14 +363,24 @@ namespace Terminal.Gui {
 		internal void EnsureVisibleBounds (Toplevel top, int x, int y, out int nx, out int ny)
 		{
 			nx = Math.Max (x, 0);
-			nx = nx + top.Frame.Width > Driver.Cols ? Math.Max (Driver.Cols - top.Frame.Width, 0) : nx;
+			int l;
+			if (SuperView == null || SuperView is Toplevel) {
+				l = Driver.Cols;
+			} else {
+				l = SuperView.Frame.Width;
+			}
+			nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;
+			SetWidth (top.Frame.Width, out int rWidth);
+			if (rWidth < 0 && nx >= top.Frame.X) {
+				nx = Math.Max (top.Frame.Right - 2, 0);
+			}
+			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
 			bool m, s;
 			if (SuperView == null || SuperView.GetType () != typeof (Toplevel)) {
 				m = Application.Top.MenuBar != null;
 			} else {
 				m = ((Toplevel)SuperView).MenuBar != null;
 			}
-			int l;
 			if (SuperView == null || SuperView is Toplevel) {
 				l = m ? 1 : 0;
 			} else {
@@ -389,6 +399,11 @@ namespace Terminal.Gui {
 			}
 			ny = Math.Min (ny, l);
 			ny = ny + top.Frame.Height > l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
+			SetHeight (top.Frame.Height, out int rHeight);
+			if (rHeight < 0 && ny >= top.Frame.Y) {
+				ny = Math.Max (top.Frame.Bottom - 2, 0);
+			}
+			//System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
 		}
 
 		internal void PositionToplevels ()

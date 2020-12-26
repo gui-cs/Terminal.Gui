@@ -2144,5 +2144,65 @@ namespace Terminal.Gui {
 
 			return true;
 		}
+
+		/// <summary>
+		/// Calculate the width based on the <see cref="Width"/> settings.
+		/// </summary>
+		/// <param name="desiredWidth">The desired width.</param>
+		/// <param name="resultWidth">The real result width.</param>
+		/// <returns>True if the width can be directed assigned, false otherwise.</returns>
+		public bool SetWidth (int desiredWidth, out int resultWidth)
+		{
+			int w = desiredWidth;
+			bool canSetWidth;
+			if (Width is Dim.DimCombine || Width is Dim.DimView || Width is Dim.DimFill) {
+				// It's a Dim.DimCombine and so can't be assigned. Let it have it's width anchored.
+				w = Width.Anchor (w);
+				canSetWidth = false;
+			} else if (Width is Dim.DimFactor factor) {
+				// Tries to get the SuperView width otherwise the view width.
+				var sw = SuperView != null ? SuperView.Frame.Width : w;
+				if (factor.IsFromRemaining ()) {
+					sw -= Frame.X;
+				}
+				w = Width.Anchor (sw);
+				canSetWidth = false;
+			} else {
+				canSetWidth = true;
+			}
+			resultWidth = w;
+
+			return canSetWidth;
+		}
+
+		/// <summary>
+		/// Calculate the height based on the <see cref="Height"/> settings.
+		/// </summary>
+		/// <param name="desiredHeight">The desired height.</param>
+		/// <param name="resultHeight">The real result height.</param>
+		/// <returns>True if the height can be directed assigned, false otherwise.</returns>
+		public bool SetHeight (int desiredHeight, out int resultHeight)
+		{
+			int h = desiredHeight;
+			bool canSetHeight;
+			if (Height is Dim.DimCombine || Height is Dim.DimView || Height is Dim.DimFill) {
+				// It's a Dim.DimCombine and so can't be assigned. Let it have it's height anchored.
+				h = Height.Anchor (h);
+				canSetHeight = false;
+			} else if (Height is Dim.DimFactor factor) {
+				// Tries to get the SuperView height otherwise the view height.
+				var sh = SuperView != null ? SuperView.Frame.Height : h;
+				if (factor.IsFromRemaining ()) {
+					sh -= Frame.Y;
+				}
+				h = Height.Anchor (sh);
+				canSetHeight = false;
+			} else {
+				canSetHeight = true;
+			}
+			resultHeight = h;
+
+			return canSetHeight;
+		}
 	}
 }
