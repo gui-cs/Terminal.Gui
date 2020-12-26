@@ -1314,8 +1314,6 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			Application.CurrentView = this;
-
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
 			if (ColorScheme != null) {
@@ -1340,7 +1338,6 @@ namespace Terminal.Gui {
 						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
 							if (view.LayoutNeeded)
 								view.LayoutSubviews ();
-							Application.CurrentView = view;
 
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0)

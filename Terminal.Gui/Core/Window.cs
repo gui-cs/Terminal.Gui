@@ -169,7 +169,6 @@ namespace Terminal.Gui {
 		public override void Redraw (Rect bounds)
 		{
 			//var padding = 0;
-			Application.CurrentView = this;
 			var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
 
 			// BUGBUG: Why do we draw the frame twice? This call is here to clear the content area, I think. Why not just clear that area?
