@@ -438,8 +438,8 @@ namespace Terminal.Gui {
 					X = rx,
 					Y = ry,
 					Flags = me.Flags,
-					OfX = rx,
-					OfY = ry,
+					OfX = 0,
+					OfY = 0,
 					View = view
 				};
 
