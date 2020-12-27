@@ -443,8 +443,6 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			Application.CurrentView = this;
-
 			if (IsCurrentTop || this == Application.Top) {
 				if (!NeedDisplay.IsEmpty || LayoutNeeded) {
 					Driver.SetAttribute (Colors.TopLevel.Normal);

@@ -73,12 +73,6 @@ namespace Terminal.Gui {
 		public static Toplevel Current { get; private set; }
 
 		/// <summary>
-		/// The current <see cref="View"/> object being redrawn.
-		/// </summary>
-		/// /// <value>The current.</value>
-		public static View CurrentView { get; set; }
-
-		/// <summary>
 		/// The current <see cref="ConsoleDriver.HeightAsBuffer"/> used in the terminal.
 		/// </summary>
 		public static bool HeightAsBuffer {
@@ -193,7 +187,7 @@ namespace Terminal.Gui {
 		/// Loads the right <see cref="ConsoleDriver"/> for the platform.
 		/// </para>
 		/// <para>
-		/// Creates a <see cref="Toplevel"/> and assigns it to <see cref="Top"/> and <see cref="CurrentView"/>
+		/// Creates a <see cref="Toplevel"/> and assigns it to <see cref="Top"/>
 		/// </para>
 		/// </remarks>
 		public static void Init (ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null) => Init (() => Toplevel.Create (), driver, mainLoopDriver);
@@ -244,7 +238,6 @@ namespace Terminal.Gui {
 			}
 			Top = topLevelFactory ();
 			Current = Top;
-			CurrentView = Top;
 			_initialized = true;
 		}
 
@@ -541,7 +534,6 @@ namespace Terminal.Gui {
 			}
 			toplevels.Clear ();
 			Current = null;
-			CurrentView = null;
 			Top = null;
 
 			MainLoop = null;
@@ -552,8 +544,6 @@ namespace Terminal.Gui {
 
 		static void Redraw (View view)
 		{
-			Application.CurrentView = view;
-
 			view.Redraw (view.Bounds);
 			Driver.Refresh ();
 		}
@@ -588,10 +578,8 @@ namespace Terminal.Gui {
 
 			if (toplevels.Count == 0) {
 				Current = null;
-				CurrentView = null;
 			} else {
 				Current = toplevels.Peek ();
-				CurrentView = Current;
 				Refresh ();
 			}
 		}

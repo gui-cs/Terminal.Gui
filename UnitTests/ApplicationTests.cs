@@ -23,14 +23,12 @@ namespace Terminal.Gui {
 		public void Init_Shutdown_Cleans_Up ()
 		{
 			Assert.Null (Application.Current);
-			Assert.Null (Application.CurrentView);
 			Assert.Null (Application.Top);
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Driver);
 
 			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 			Assert.NotNull (Application.Current);
-			Assert.NotNull (Application.CurrentView);
 			Assert.NotNull (Application.Top);
 			Assert.NotNull (Application.MainLoop);
 			Assert.NotNull (Application.Driver);
@@ -41,7 +39,6 @@ namespace Terminal.Gui {
 
 			Application.Shutdown ();
 			Assert.Null (Application.Current);
-			Assert.Null (Application.CurrentView);
 			Assert.Null (Application.Top);
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Driver);
@@ -92,7 +89,6 @@ namespace Terminal.Gui {
 			Application.End (rs);
 
 			Assert.Null (Application.Current);
-			Assert.Null (Application.CurrentView);
 			Assert.NotNull (Application.Top);
 			Assert.NotNull (Application.MainLoop);
 			Assert.NotNull (Application.Driver);
@@ -123,7 +119,6 @@ namespace Terminal.Gui {
 
 			Application.Shutdown ();
 			Assert.Null (Application.Current);
-			Assert.Null (Application.CurrentView);
 			Assert.Null (Application.Top);
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Driver);
@@ -148,7 +143,6 @@ namespace Terminal.Gui {
 
 			Application.Shutdown ();
 			Assert.Null (Application.Current);
-			Assert.Null (Application.CurrentView);
 			Assert.Null (Application.Top);
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Driver);
@@ -207,7 +201,6 @@ namespace Terminal.Gui {
 
 			Application.Shutdown ();
 			Assert.Null (Application.Current);
-			Assert.Null (Application.CurrentView);
 			Assert.Null (Application.Top);
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Driver);
