@@ -863,29 +863,23 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Will scroll the <see cref="TextView"/> to display the specified row at the top
+		/// Will scroll the <see cref="TextView"/> to display the specified row at the top if <paramref name="isRow"/> is true or
+		/// will scroll the <see cref="TextView"/> to display the specified column at the left if <paramref name="isRow"/> is false.
 		/// </summary>
-		/// <param name="row">Row that should be displayed at the top, if the value is negative it will be reset to zero</param>
-		public void ScrollToRow (int row)
+		/// <param name="idx">Row that should be displayed at the top or Column that should be displayed at the left,
+		///  if the value is negative it will be reset to zero</param>
+		/// <param name="isRow">If true (default) the <paramref name="idx"/> is a row, column otherwise.</param>
+		public void ScrollTo (int idx, bool isRow = true)
 		{
-			if (row < 0) {
-				row = 0;
+			if (idx < 0) {
+				idx = 0;
 			}
-			topRow = row > model.Count - 1 ? model.Count - 1 : row;
-			SetNeedsDisplay ();
-		}
-
-		/// <summary>
-		/// Will scroll the <see cref="TextView"/> to display the specified column at the left
-		/// </summary>
-		/// <param name="col">Column that should be displayed at the left, if the value is negative it will be reset to zero</param>
-		public void ScrollToCol (int col)
-		{
-			if (col < 0) {
-				col = 0;
+			if (isRow) {
+				topRow = idx > model.Count - 1 ? model.Count - 1 : idx;
+			} else {
+				var maxlength = model.GetMaxVisibleLine (topRow, topRow + Frame.Height);
+				leftColumn = idx > maxlength - 1 ? maxlength - 1 : idx;
 			}
-			var maxlength = model.GetMaxVisibleLine (topRow, topRow + Frame.Height);
-			leftColumn = col > maxlength - 1 ? maxlength - 1 : col;
 			SetNeedsDisplay ();
 		}
 
@@ -1398,19 +1392,19 @@ namespace Terminal.Gui {
 			} else if (ev.Flags == MouseFlags.WheeledDown) {
 				lastWasKill = false;
 				columnTrack = currentColumn;
-				ScrollToRow (topRow + 1);
+				ScrollTo (topRow + 1);
 			} else if (ev.Flags == MouseFlags.WheeledUp) {
 				lastWasKill = false;
 				columnTrack = currentColumn;
-				ScrollToRow (topRow - 1);
+				ScrollTo (topRow - 1);
 			} else if (ev.Flags == MouseFlags.WheeledRight) {
 				lastWasKill = false;
 				columnTrack = currentColumn;
-				ScrollToCol (leftColumn + 1);
+				ScrollTo (leftColumn + 1, false);
 			} else if (ev.Flags == MouseFlags.WheeledLeft) {
 				lastWasKill = false;
 				columnTrack = currentColumn;
-				ScrollToCol (leftColumn - 1);
+				ScrollTo (leftColumn - 1, false);
 			}
 
 			return true;
