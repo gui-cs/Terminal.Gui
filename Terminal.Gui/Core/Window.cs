@@ -196,12 +196,8 @@ namespace Terminal.Gui {
 
 			// Checks if there are any SuperView view which intersect with this window.
 			if (SuperView != null) {
-				foreach (var view in SuperView.Subviews) {
-					if (view != this && view.Frame.IntersectsWith (Bounds)) {
-						view.SetNeedsLayout ();
-						view.SetNeedsDisplay (view.Bounds);
-					}
-				}
+				SuperView.SetNeedsLayout ();
+				SuperView.SetNeedsDisplay ();
 			}
 		}
 
@@ -231,7 +227,7 @@ namespace Terminal.Gui {
 					Application.GrabMouse (this);
 				}
 
-				//Demo.ml2.Text = $"Starting at {dragPosition}";
+				//System.Diagnostics.Debug.WriteLine ($"Starting at {dragPosition}");
 				return true;
 			} else if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) ||
 				mouseEvent.Flags == MouseFlags.Button3Pressed) {
@@ -249,10 +245,11 @@ namespace Terminal.Gui {
 						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY : Frame.Y), out nx, out ny);
 
 					dragPosition = new Point (nx, ny);
+					LayoutSubviews ();
 					Frame = new Rect (nx, ny, Frame.Width, Frame.Height);
 					X = nx;
 					Y = ny;
-					//Demo.ml2.Text = $"{dx},{dy}";
+					//System.Diagnostics.Debug.WriteLine ($"nx:{nx},ny:{ny}");
 
 					// FIXED: optimize, only SetNeedsDisplay on the before/after regions.
 					SetNeedsDisplay ();
@@ -266,7 +263,7 @@ namespace Terminal.Gui {
 				dragPosition = null;
 			}
 
-			//Demo.ml.Text = me.ToString ();
+			//System.Diagnostics.Debug.WriteLine (mouseEvent.ToString ());
 			return false;
 		}
 
