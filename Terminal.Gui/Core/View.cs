@@ -2133,11 +2133,11 @@ namespace Terminal.Gui {
 
 		bool CanBeVisible (View view)
 		{
-			if (!view.Visible || view.Frame.Width == 0 || view.Frame.Height == 0) {
+			if (!view.Visible) {
 				return false;
 			}
 			for (var c = view.SuperView; c != null; c = c.SuperView) {
-				if (!c.Visible || c.Frame.Width == 0 || c.Frame.Height == 0) {
+				if (!c.Visible) {
 					return false;
 				}
 			}
