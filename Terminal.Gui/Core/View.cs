@@ -2150,7 +2150,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="desiredWidth">The desired width.</param>
 		/// <param name="resultWidth">The real result width.</param>
-		/// <returns>True if the width can be directed assigned, false otherwise.</returns>
+		/// <returns>True if the width can be directly assigned, false otherwise.</returns>
 		public bool SetWidth (int desiredWidth, out int resultWidth)
 		{
 			int w = desiredWidth;
@@ -2180,7 +2180,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="desiredHeight">The desired height.</param>
 		/// <param name="resultHeight">The real result height.</param>
-		/// <returns>True if the height can be directed assigned, false otherwise.</returns>
+		/// <returns>True if the height can be directly assigned, false otherwise.</returns>
 		public bool SetHeight (int desiredHeight, out int resultHeight)
 		{
 			int h = desiredHeight;
