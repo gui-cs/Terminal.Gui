@@ -1125,10 +1125,10 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (focused != null) {
+			if (focused?.Frame.Width > 0 && focused.Frame.Height > 0) {
 				focused.PositionCursor ();
 			} else {
-				if (CanFocus && HasFocus && Visible) {
+				if (CanFocus && HasFocus && Visible && Frame.Width > 0 && Frame.Height > 0) {
 					Move (textFormatter.HotKeyPos == -1 ? 0 : textFormatter.CursorPosition, 0);
 				} else {
 					Move (frame.X, frame.Y);
@@ -1344,7 +1344,7 @@ namespace Terminal.Gui {
 
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0)
-							if (view.Visible) {
+							if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
 								view.Redraw (view.Bounds);
 							}
 						}
@@ -2133,11 +2133,11 @@ namespace Terminal.Gui {
 
 		bool CanBeVisible (View view)
 		{
-			if (!view.Visible) {
+			if (!view.Visible || view.Frame.Width == 0 || view.Frame.Height == 0) {
 				return false;
 			}
 			for (var c = view.SuperView; c != null; c = c.SuperView) {
-				if (!c.Visible) {
+				if (!c.Visible || c.Frame.Width == 0 || c.Frame.Height == 0) {
 					return false;
 				}
 			}
