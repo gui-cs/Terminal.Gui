@@ -67,7 +67,7 @@ namespace Terminal.Gui {
 		public static Toplevel Top { get; private set; }
 
 		/// <summary>
-		/// The current <see cref="Toplevel"/> object. This is updated when <see cref="Application.Run()"/> enters and leaves to point to the current <see cref="Toplevel"/> .
+		/// The current <see cref="Toplevel"/> object. This is updated when <see cref="Application.Run(Func{Exception, bool})"/> enters and leaves to point to the current <see cref="Toplevel"/> .
 		/// </summary>
 		/// <value>The current.</value>
 		public static Toplevel Current { get; private set; }
@@ -643,7 +643,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Runs the application by calling <see cref="Run(Toplevel)"/> with the value of <see cref="Top"/>
+		/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> with the value of <see cref="Top"/>
 		/// </summary>
 		public static void Run (Func<Exception, bool> errorHandler = null)
 		{
