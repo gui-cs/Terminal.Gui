@@ -184,6 +184,7 @@ namespace Terminal.Gui {
 			contentView.Redraw (contentView.Bounds);
 			Driver.Clip = savedClip;
 
+			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
 			Driver.SetAttribute (ColorScheme.Normal);
 			Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
@@ -246,8 +247,12 @@ namespace Terminal.Gui {
 					dragPosition = new Point (nx, ny);
 					LayoutSubviews ();
 					Frame = new Rect (nx, ny, Frame.Width, Frame.Height);
-					X = nx;
-					Y = ny;
+					if (X == null || X is Pos.PosAbsolute) {
+						X = nx;
+					}
+					if (Y == null || Y is Pos.PosAbsolute) {
+						Y = ny;
+					}
 					//System.Diagnostics.Debug.WriteLine ($"nx:{nx},ny:{ny}");
 
 					// FIXED: optimize, only SetNeedsDisplay on the before/after regions.
