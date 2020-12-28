@@ -580,6 +580,7 @@ namespace Terminal.Gui.Views {
 				return true;
 			} else if (me.Flags == MouseFlags.WheeledUp) {
 				RowOffset--;
+				Update ();
 				return true;
 			}
 
