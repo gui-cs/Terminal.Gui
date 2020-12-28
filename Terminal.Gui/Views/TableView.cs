@@ -558,6 +558,53 @@ namespace Terminal.Gui.Views {
 			return true;
 		}
 
+		///<inheritdoc/>
+		public override bool MouseEvent (MouseEvent me)
+		{
+			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
+				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp)
+				return false;
+
+			if (!HasFocus && CanFocus) {
+				SetFocus ();
+			}
+
+			if (Table == null) {
+				return false;
+			}
+
+			if (me.Flags == MouseFlags.WheeledDown) {
+				
+				RowOffset++;
+				Update ();
+				return true;
+			} else if (me.Flags == MouseFlags.WheeledUp) {
+				RowOffset--;
+				return true;
+			}
+
+			if(me.Flags == MouseFlags.Button1Clicked) {
+				
+				var viewPort = CalculateViewport(Bounds);
+				
+				var headerHeight = GetHeaderHeight();
+
+				var col = viewPort.LastOrDefault(c=>c.X < me.OfX);
+				
+				var rowIdx = RowOffset - headerHeight + me.OfY;
+
+				if(col != null && rowIdx >= 0) {
+					
+					SelectedRow = rowIdx;
+					SelectedColumn = col.Column.Ordinal;
+				
+					Update();
+				}
+			}
+
+			return false;
+		}
+
 		/// <summary>
 		/// Updates the view to reflect changes to <see cref="Table"/> and to (<see cref="ColumnOffset"/> / <see cref="RowOffset"/>) etc
 		/// </summary>
