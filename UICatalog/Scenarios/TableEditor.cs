@@ -72,7 +72,7 @@ namespace UICatalog.Scenarios {
 
 			Win.Add(selectedCellLabel);
 
-			tableView.SelectedCellChanged += (s,e)=>{selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";};
+			tableView.SelectedCellChanged += (e)=>{selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";};
 		}
 
 		private void ClearColumnStyles ()
