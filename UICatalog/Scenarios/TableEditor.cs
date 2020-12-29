@@ -56,10 +56,23 @@ namespace UICatalog.Scenarios {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
-				Height = Dim.Fill (),
+				Height = Dim.Fill (1),
 			};
 
 			Win.Add (tableView);
+
+			var selectedCellLabel = new Label(){
+				X = 0,
+				Y = Pos.Bottom(tableView),
+				Text = "0,0",
+				Width = Dim.Fill(),
+				TextAlignment = TextAlignment.Right
+				
+			};
+
+			Win.Add(selectedCellLabel);
+
+			tableView.SelectedCellChanged += (s,e)=>{selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";};
 		}
 
 		private void ClearColumnStyles ()
@@ -231,7 +244,7 @@ namespace UICatalog.Scenarios {
 			dt.Columns.Add(new DataColumn("NullsCol",typeof(string)));
 
 			for(int i=0;i< cols -5; i++) {
-				dt.Columns.Add("Column" + (i+4));
+				dt.Columns.Add("Column" + (i+5));
 			}
 			
 			var r = new Random(100);

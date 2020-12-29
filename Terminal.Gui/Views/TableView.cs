@@ -172,8 +172,15 @@ namespace Terminal.Gui {
 		public int SelectedColumn {
 			get => selectedColumn;
 
-			//try to prevent this being set to an out of bounds column
-			set => selectedColumn = Table == null ? 0 :  Math.Min (Table.Columns.Count - 1, Math.Max (0, value));
+			set {
+				var oldValue = selectedColumn;
+
+				//try to prevent this being set to an out of bounds column
+				selectedColumn = Table == null ? 0 :  Math.Min (Table.Columns.Count - 1, Math.Max (0, value));
+
+				if(oldValue != selectedColumn)
+					OnSelectedCellChanged();
+			} 
 		}
 
 		/// <summary>
@@ -181,7 +188,15 @@ namespace Terminal.Gui {
 		/// </summary>
 		public int SelectedRow {
 			get => selectedRow;
-			set => selectedRow =  Table == null ? 0 : Math.Min (Table.Rows.Count - 1, Math.Max (0, value));
+			set {
+
+				var oldValue = selectedColumn;
+
+				selectedRow =  Table == null ? 0 : Math.Min (Table.Rows.Count - 1, Math.Max (0, value));
+
+				if(oldValue != selectedRow)
+					OnSelectedCellChanged();
+			}
 		}
 
 		/// <summary>
@@ -198,6 +213,11 @@ namespace Terminal.Gui {
 		/// The symbol to add after each cell value and header value to visually seperate values (if not using vertical gridlines)
 		/// </summary>
 		public char SeparatorSymbol { get; set; } = ' ';
+
+		/// <summary>
+		/// This event is raised when the selected cell in the table changes.
+		/// </summary>
+		public event Action<EventArgs> SelectedCellChanged;
 
 		/// <summary>
 		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
@@ -690,6 +710,14 @@ namespace Terminal.Gui {
 			if (SelectedRow < RowOffset) {
 				RowOffset = SelectedRow;
 			}
+		}
+
+		/// <summary>
+		/// Invokes the <see cref="SelectedCellChanged"/> event
+		/// </summary>
+		protected virtual void OnSelectedCellChanged()
+		{
+			SelectedCellChanged?.Invoke(new EventArgs());
 		}
 
 		/// <summary>
