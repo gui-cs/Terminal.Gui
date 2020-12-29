@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
-namespace Terminal.Gui.Views {
+namespace Terminal.Gui {
 
 	/// <summary>
 	/// Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> and textual representation of cells (e.g. date formats)
@@ -148,23 +148,22 @@ namespace Terminal.Gui.Views {
 		public TableStyle Style { get => style; set {style = value; Update(); } }
 						
 		/// <summary>
-		/// Zero indexed offset for the upper left <see cref="DataColumn"/> to display in <see cref="Table"/>.
+		/// Horizontal scroll offset.  The index of the first column in <see cref="Table"/> to display when when rendering the view.
 		/// </summary>
 		/// <remarks>This property allows very wide tables to be rendered with horizontal scrolling</remarks>
 		public int ColumnOffset {
 			get => columnOffset;
 
 			//try to prevent this being set to an out of bounds column
-			set => columnOffset = Table == null ? 0 : Math.Min (Table.Columns.Count - 1, Math.Max (0, value));
+			set => columnOffset = Table == null ? 0 :Math.Max (0,Math.Min (Table.Columns.Count - 1,  value));
 		}
 
 		/// <summary>
-		/// Zero indexed offset for the <see cref="DataRow"/> to display in <see cref="Table"/> on line 2 of the control (first line being headers)
+		/// Vertical scroll offset.  The index of the first row in <see cref="Table"/> to display in the first non header line of the control when rendering the view.
 		/// </summary>
-		/// <remarks>This property allows very wide tables to be rendered with horizontal scrolling</remarks>
 		public int RowOffset {
 			get => rowOffset;
-			set => rowOffset = Table == null ? 0 : Math.Min (Table.Rows.Count - 1, Math.Max (0, value));
+			set => rowOffset = Table == null ? 0 : Math.Max (0,Math.Min (Table.Rows.Count - 1, value));
 		}
 
 		/// <summary>
@@ -666,7 +665,7 @@ namespace Terminal.Gui.Views {
 		/// <remarks>Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/></remarks>
 		public void EnsureSelectedCellIsVisible ()
 		{
-			if(Table == null){
+			if(Table == null || Table.Columns.Count <= 0){
 				return;
 			}
 
