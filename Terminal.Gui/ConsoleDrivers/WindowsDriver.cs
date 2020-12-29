@@ -592,7 +592,24 @@ namespace Terminal.Gui {
 		public override int Cols => cols;
 		public override int Rows => rows;
 		public override int Top => top;
-		public override bool HeightAsBuffer { get; set; }
+
+		bool heightAsBuffer;
+		public override bool HeightAsBuffer {
+			get => heightAsBuffer;
+			set {
+				heightAsBuffer = value;
+				if (heightAsBuffer) {
+					ResizeScreen ();
+					UpdateOffScreen ();
+					var bufferCoords = new WindowsConsole.Coord () {
+						X = (short)cols,
+						Y = (short)rows
+					};
+					winConsole.ReadFromConsoleOutput (new Size (cols, rows), bufferCoords, damageRegion);
+				}
+				Refresh ();
+			}
+		}
 
 		public WindowsConsole WinConsole {
 			get => winConsole;
