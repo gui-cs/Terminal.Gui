@@ -576,11 +576,17 @@ namespace Terminal.Gui.Views {
 			if (me.Flags == MouseFlags.WheeledDown) {
 				
 				RowOffset++;
-				Update ();
+				
+				EnsureValidScrollOffsets();
+				SetNeedsDisplay();
+
 				return true;
 			} else if (me.Flags == MouseFlags.WheeledUp) {
 				RowOffset--;
-				Update ();
+				
+				EnsureValidScrollOffsets();
+				SetNeedsDisplay();
+
 				return true;
 			}
 
@@ -617,11 +623,8 @@ namespace Terminal.Gui.Views {
 				return;
 			}
 
-			//if user opened a large table scrolled down a lot then opened a smaller table (or API deleted a bunch of columns without telling anyone)
-			ColumnOffset = Math.Max(Math.Min(ColumnOffset,Table.Columns.Count -1),0);
-			RowOffset = Math.Max(Math.Min(RowOffset,Table.Rows.Count -1),0);
-			SelectedColumn = Math.Max(Math.Min(SelectedColumn,Table.Columns.Count -1),0);
-			SelectedRow = Math.Max(Math.Min(SelectedRow,Table.Rows.Count -1),0);
+			EnsureValidScrollOffsets();
+			EnsureValidSelection();
 
 			var columnsToRender = CalculateViewport (Bounds).ToArray();
 			var headerHeight = GetHeaderHeight();
@@ -646,6 +649,35 @@ namespace Terminal.Gui.Views {
 			}
 
 			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Updates <see cref="ColumnOffset"/> and <see cref="RowOffset"/> where they are outside the bounds of the table (by adjusting them to the nearest existing cell).  Has no effect if <see cref="Table"/> has not been set.
+		/// </summary>
+		/// <remarks>Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/></remarks>
+		public void EnsureValidScrollOffsets ()
+		{
+			if(Table == null){
+				return;
+			}
+
+			ColumnOffset = Math.Max(Math.Min(ColumnOffset,Table.Columns.Count -1),0);
+			RowOffset = Math.Max(Math.Min(RowOffset,Table.Rows.Count -1),0);
+		}
+
+
+		/// <summary>
+		/// Updates <see cref="SelectedColumn"/> and <see cref="SelectedRow"/> where they are outside the bounds of the table (by adjusting them to the nearest existing cell).  Has no effect if <see cref="Table"/> has not been set.
+		/// </summary>
+		/// <remarks>Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/></remarks>
+		public void EnsureValidSelection ()
+		{
+			if(Table == null){
+				return;
+			}
+
+			SelectedColumn = Math.Max(Math.Min(SelectedColumn,Table.Columns.Count -1),0);
+			SelectedRow = Math.Max(Math.Min(SelectedRow,Table.Rows.Count -1),0);
 		}
 
 		/// <summary>
