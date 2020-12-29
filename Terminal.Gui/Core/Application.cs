@@ -690,24 +690,24 @@ namespace Terminal.Gui {
 		/// <param name="errorHandler">Handler for any unhandled exceptions (resumes when returns true, rethrows when null).</param>
 		public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
 		{
-			while (true)
+			var resume = true;
+			while (resume)
 			{
-				var resume = false;
 				try
 				{
+					resume = false;
 					var runToken = Begin (view);
 					RunLoop (runToken);
 					End (runToken);
-				} 
-				catch (Exception error) 
+				}
+				catch (Exception error)
 				{
 					if (errorHandler == null)
+					{
 						throw;
-					resume = errorHandler (error);
+					}
+					resume = errorHandler(error);
 				}
-				if (resume)
-					continue;
-				break;
 			}
 		}
 
