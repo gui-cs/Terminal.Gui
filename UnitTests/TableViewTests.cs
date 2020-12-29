@@ -67,6 +67,66 @@ namespace UnitTests {
             Assert.Equal(1,tableView.RowOffset);
             Assert.Equal(1,tableView.ColumnOffset);
         }
+
+        [Fact]
+        public void SelectedCellChanged_NotFiredForSameValue()
+        {
+            var tableView = new TableView(){
+                Table = BuildTable(25,50)
+            };
+
+            bool called = false;
+            tableView.SelectedCellChanged += (e)=>{called=true;};
+
+            Assert.Equal(0,tableView.SelectedColumn);
+            Assert.False(called);
+            
+            // Changing value to same as it already was should not raise an event
+            tableView.SelectedColumn = 0;
+
+            Assert.False(called);
+
+            tableView.SelectedColumn = 10;
+            Assert.True(called);
+        }
+
+
+
+        [Fact]
+        public void SelectedCellChanged_SelectedColumnIndexesCorrect()
+        {
+            var tableView = new TableView(){
+                Table = BuildTable(25,50)
+            };
+
+            bool called = false;
+            tableView.SelectedCellChanged += (e)=>{
+                called=true;
+                Assert.Equal(0,e.OldCol);
+                Assert.Equal(10,e.NewCol);
+            };
+            
+            tableView.SelectedColumn = 10;
+            Assert.True(called);
+        }
+
+        [Fact]
+        public void SelectedCellChanged_SelectedRowIndexesCorrect()
+        {
+            var tableView = new TableView(){
+                Table = BuildTable(25,50)
+            };
+
+            bool called = false;
+            tableView.SelectedCellChanged += (e)=>{
+                called=true;
+                Assert.Equal(0,e.OldRow);
+                Assert.Equal(10,e.NewRow);
+            };
+            
+            tableView.SelectedRow = 10;
+            Assert.True(called);
+        }
         
         /// <summary>
 		/// Builds a simple table of string columns with the requested number of columns and rows
