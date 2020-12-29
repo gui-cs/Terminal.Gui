@@ -626,27 +626,7 @@ namespace Terminal.Gui.Views {
 			EnsureValidScrollOffsets();
 			EnsureValidSelection();
 
-			var columnsToRender = CalculateViewport (Bounds).ToArray();
-			var headerHeight = GetHeaderHeight();
-
-			//if we have scrolled too far to the left 
-			if (SelectedColumn < columnsToRender.Min (r => r.Column.Ordinal)) {
-				ColumnOffset = SelectedColumn;
-			}
-
-			//if we have scrolled too far to the right
-			if (SelectedColumn > columnsToRender.Max (r=> r.Column.Ordinal)) {
-				ColumnOffset = SelectedColumn;
-			}
-
-			//if we have scrolled too far down
-			if (SelectedRow >= RowOffset + (Bounds.Height - headerHeight)) {
-				RowOffset = SelectedRow;
-			}
-			//if we have scrolled too far up
-			if (SelectedRow < RowOffset) {
-				RowOffset = SelectedRow;
-			}
+			EnsureSelectedCellIsVisible();
 
 			SetNeedsDisplay ();
 		}
@@ -678,6 +658,39 @@ namespace Terminal.Gui.Views {
 
 			SelectedColumn = Math.Max(Math.Min(SelectedColumn,Table.Columns.Count -1),0);
 			SelectedRow = Math.Max(Math.Min(SelectedRow,Table.Rows.Count -1),0);
+		}
+
+		/// <summary>
+		/// Updates scroll offsets to ensure that the selected cell is visible.  Has no effect if <see cref="Table"/> has not been set.
+		/// </summary>
+		/// <remarks>Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/></remarks>
+		public void EnsureSelectedCellIsVisible ()
+		{
+			if(Table == null){
+				return;
+			}
+
+			var columnsToRender = CalculateViewport (Bounds).ToArray();
+			var headerHeight = GetHeaderHeight();
+
+			//if we have scrolled too far to the left 
+			if (SelectedColumn < columnsToRender.Min (r => r.Column.Ordinal)) {
+				ColumnOffset = SelectedColumn;
+			}
+
+			//if we have scrolled too far to the right
+			if (SelectedColumn > columnsToRender.Max (r=> r.Column.Ordinal)) {
+				ColumnOffset = SelectedColumn;
+			}
+
+			//if we have scrolled too far down
+			if (SelectedRow >= RowOffset + (Bounds.Height - headerHeight)) {
+				RowOffset = SelectedRow;
+			}
+			//if we have scrolled too far up
+			if (SelectedRow < RowOffset) {
+				RowOffset = SelectedRow;
+			}
 		}
 
 		/// <summary>
