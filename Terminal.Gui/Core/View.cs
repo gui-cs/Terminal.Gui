@@ -1966,6 +1966,7 @@ namespace Terminal.Gui {
 
 		bool ResizeView (bool autoSize)
 		{
+			var aSize = autoSize;
 			if (textFormatter.Size != Bounds.Size && (((width == null || width is Dim.DimAbsolute) && (Bounds.Width == 0
 				|| autoSize && Bounds.Width != textFormatter.Size.Width))
 				|| ((height == null || height is Dim.DimAbsolute) && (Bounds.Height == 0
@@ -1976,17 +1977,17 @@ namespace Terminal.Gui {
 				} else if (width is Dim.DimAbsolute) {
 					width = Math.Max (Bounds.Width, height.Anchor (Bounds.Width));
 				} else {
-					return false;
+					aSize = false;
 				}
 				if (height == null) {
 					height = Bounds.Height;
 				} else if (height is Dim.DimAbsolute) {
 					height = Math.Max (Bounds.Height, height.Anchor (Bounds.Height));
 				} else {
-					return false;
+					aSize = false;
 				}
 			}
-			return autoSize;
+			return aSize;
 		}
 
 		/// <summary>
