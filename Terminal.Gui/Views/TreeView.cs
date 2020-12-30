@@ -650,6 +650,28 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Positions the cursor at the start of the selected objects line (if visible)
+		/// </summary>
+		public override void PositionCursor()
+		{
+			if (CanFocus && HasFocus && Visible && SelectedObject != null) 
+			{
+				var map = BuildLineMap();
+				var idx = Array.FindIndex(map,b=>b.Model.Equals(SelectedObject));
+
+				// if currently selected line is visible
+				if(idx - ScrollOffset >= 0 && idx - ScrollOffset  < Bounds.Height)
+					Move(0,idx - ScrollOffset);
+				else
+					base.PositionCursor();
+
+			} else {
+				base.PositionCursor();
+			}			
+		}
+
+
+		/// <summary>
 		/// Determines systems behaviour when the left arrow key is pressed.  Default behaviour is to collapse the current tree node if possible otherwise changes selection to current branches parent
 		/// </summary>
 		protected virtual void CursorLeft()
