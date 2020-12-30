@@ -869,8 +869,22 @@ namespace Terminal.Gui {
 			Rune expansion = GetExpandableSymbol(driver);
 			string lineBody = tree.AspectGetter(Model);
 
-			var remainingWidth = availableWidth - (prefix.Length + 1 + lineBody.Length);
-			            
+			// How much space is left after prefix and expansion symbol?
+			var remainingWidth = availableWidth - (prefix.Length + 1 );
+
+			// If body of line is too long
+			if(lineBody.Length > remainingWidth)
+			{
+				// remaining space is zero and truncate the line
+				lineBody = lineBody.Substring(0,remainingWidth);
+				remainingWidth = 0;
+			}
+			else{
+
+				// line is short so remaining width will be whatever comes after the line body
+				remainingWidth -= lineBody.Length;
+			}
+
 			tree.Move(0,y);
 
 			foreach(Rune r in prefix)
@@ -896,7 +910,6 @@ namespace Terminal.Gui {
 			
 			//reset the line color if it was changed for rendering expansion symbol
 			driver.SetAttribute(lineColor);
-
 			driver.AddStr(lineBody);
 
 			if(remainingWidth > 0)
