@@ -533,6 +533,42 @@ namespace Terminal.Gui {
 			return GetWindowRect (handle, out lpRect);
 		}
 
+		[StructLayout (LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+		public class ConsoleFontInfoEx {
+			private int cbSize;
+			public ConsoleFontInfoEx ()
+			{
+				cbSize = Marshal.SizeOf (typeof (ConsoleFontInfoEx));
+			}
+			public int FontIndex;
+			public short FontWidth;
+			public short FontHeight;
+			public int FontFamily;
+			public int FontWeight;
+			[MarshalAs (UnmanagedType.ByValTStr, SizeConst = 32)]
+			public string FaceName;
+		}
+
+		[DllImport ("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+		extern static bool GetCurrentConsoleFontEx (
+			IntPtr hConsoleOutput,
+			bool bMaximumWindow,
+			[In, Out] ConsoleFontInfoEx lpConsoleCurrentFont);
+
+		internal ConsoleFontInfoEx GetCurrentFontSize ()
+		{
+			//IntPtr _consoleOutputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
+			IntPtr _consoleOutputHandle = OutputHandle;
+
+			ConsoleFontInfoEx currentFont = new ConsoleFontInfoEx ();
+			GetCurrentConsoleFontEx (
+				_consoleOutputHandle,
+				false,
+				currentFont);
+
+			return currentFont;
+		}
+
 #if false
 		// size of a device name string
 		private const int CCHDEVICENAME = 32;
@@ -1480,13 +1516,12 @@ namespace Terminal.Gui {
 			}
 		}
 
-		const int Width_Divider = 8;
-		const int Height_Divider = 18;
 		bool docked;
 
 		void WaitWinChange ()
 		{
 			var handle = winConsole.GetConsole ();
+			var fontSize = winConsole.GetCurrentFontSize ();
 
 			while (!consoleDriver.HeightAsBuffer) {
 				WindowsConsole.WindowPlacement windowPlacement = new WindowsConsole.WindowPlacement ();
@@ -1522,8 +1557,10 @@ namespace Terminal.Gui {
 
 			Size SetWindowSize (System.Drawing.Rectangle rect)
 			{
-				return new Size (Math.Max (((rect.Width - rect.X) / Width_Divider) - 2, 0),
-					Math.Max (((rect.Height - rect.Y) / Height_Divider) - 2, 0));
+				var fontHDividerW = fontSize.FontHeight / fontSize.FontWidth;
+
+				return new Size (Math.Max (((rect.Width - rect.X) / fontSize.FontWidth) - (fontHDividerW * 3), 0),
+					Math.Max (((rect.Height - rect.Y) / fontSize.FontHeight) - fontHDividerW - 1, 0));
 			}
 
 			bool IsDockedToMonitor (IntPtr hWnd, WindowsConsole.WindowPlacement placement)
@@ -1545,9 +1582,9 @@ namespace Terminal.Gui {
 					windowSize = SetWindowSize (rc);
 
 					if ((rc.X < 0) || (rc.Y == 0) || (rc.Y == 0 && rc.X < 0)
-						|| (rc.Y == 0 && rc.Right / Width_Divider >= Console.LargestWindowWidth)
-						|| (rc.X < 0 && rc.Bottom / Height_Divider >= Console.LargestWindowHeight)
-						|| (rc.X / Width_Divider >= Console.LargestWindowWidth / 2 - 1 && rc.Bottom / Height_Divider >= Console.LargestWindowHeight)) {
+						|| (rc.Y == 0 && rc.Right / fontSize.FontWidth >= Console.LargestWindowWidth)
+						|| (rc.X < 0 && rc.Bottom / fontSize.FontHeight >= Console.LargestWindowHeight)
+						|| (rc.X / fontSize.FontWidth >= Console.LargestWindowWidth / 2 - 1 && rc.Bottom / fontSize.FontHeight >= Console.LargestWindowHeight)) {
 						if (!docked || consoleDriver.Cols != windowSize.Width
 							|| consoleDriver.Rows != windowSize.Height) {
 							docked = true;
@@ -1555,8 +1592,8 @@ namespace Terminal.Gui {
 							changed = false;
 						}
 					} else {
-						if (!docked && (pSize == rSize || rSize.Width / Width_Divider >= Console.LargestWindowWidth
-							|| rSize.Height / Height_Divider >= Console.LargestWindowHeight)) {
+						if (!docked && (pSize == rSize || rSize.Width / fontSize.FontWidth >= Console.LargestWindowWidth
+							|| rSize.Height / fontSize.FontHeight >= Console.LargestWindowHeight)) {
 							changed = false;
 						}
 						docked = false;
