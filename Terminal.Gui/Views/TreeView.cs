@@ -579,6 +579,76 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		///<inheritdoc/>
+		public override bool MouseEvent (MouseEvent me)
+		{
+			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
+				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp)
+				return false;
+
+			if (!HasFocus && CanFocus) {
+				SetFocus ();
+			}
+
+
+			if (me.Flags == MouseFlags.WheeledDown) {
+
+				ScrollOffset++;
+				SetNeedsDisplay();
+
+				return true;
+			} else if (me.Flags == MouseFlags.WheeledUp) {
+				ScrollOffset--;
+				SetNeedsDisplay();
+
+				return true;
+			}
+
+			if(me.Flags == MouseFlags.Button1Clicked) {
+
+				var map = BuildLineMap();
+				
+				var idx = me.OfY + ScrollOffset;
+
+				// click is outside any visible nodes
+				if(idx < 0 || idx >= map.Length) {
+					return false;
+				}
+				
+				// The line they clicked on
+				var clickedBranch = map[idx];
+
+				bool isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol(Driver,me.OfX);
+				
+				// If we are already selected (double click)
+				if(Equals(SelectedObject,clickedBranch.Model)) 
+					isExpandToggleAttempt = true;
+
+				// if they clicked on the +/- expansion symbol
+				if( isExpandToggleAttempt) {
+
+					if (clickedBranch.IsExpanded) {
+						clickedBranch.Collapse();
+					}
+					else
+					if(clickedBranch.CanExpand())
+						clickedBranch.Expand();
+					else {
+						SelectedObject = clickedBranch.Model; // It is a leaf node
+					}
+				}
+				else {
+					// It is a first click somewhere in the current line that doesn't look like an expansion/collapse attempt
+					SelectedObject = clickedBranch.Model;
+				}
+
+				SetNeedsDisplay();
+				return true;
+			}
+
+			return false;
+		}
+
 		/// <summary>
 		/// Determines systems behaviour when the left arrow key is pressed.  Default behaviour is to collapse the current tree node if possible otherwise changes selection to current branches parent
 		/// </summary>
@@ -1025,6 +1095,32 @@ namespace Terminal.Gui {
 				return this == tree.roots.Values.LastOrDefault();
 
 			return Parent.ChildBranches.Values.LastOrDefault() == this;
+		}
+
+		/// <summary>
+		/// Returns true if the given x offset on the branch line is the +/- symbol.  Returns false if not showing expansion symbols or leaf node etc
+		/// </summary>
+		/// <param name="driver"></param>
+		/// <param name="x"></param>
+		/// <returns></returns>
+		internal bool IsHitOnExpandableSymbol (ConsoleDriver driver, int x)
+		{
+			// if leaf node then we cannot expand
+			if(!CanExpand())
+				return false;
+
+
+			// if we could theoretically expand
+			if(!IsExpanded && tree.Style.ExpandableSymbol != null) {
+				return x == GetLinePrefix(driver).Count();
+			}
+
+			// if we could theoretically collapse
+			if(IsExpanded && tree.Style.CollapseableSymbol != null) {
+				return x == GetLinePrefix(driver).Count();
+			}
+
+			return false;
 		}
 	}
 
