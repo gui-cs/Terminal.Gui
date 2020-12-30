@@ -617,8 +617,12 @@ namespace Terminal.Gui {
 				
 				var headerHeight = ShouldRenderHeaders()? GetHeaderHeight():0;
 
-				var col = viewPort.LastOrDefault(c=>c.X < me.OfX);
+				var col = viewPort.LastOrDefault(c=>c.X <= me.OfX);
 				
+				// Click is on the header section of rendered UI
+				if(me.OfY < headerHeight)
+					return false;
+
 				var rowIdx = RowOffset - headerHeight + me.OfY;
 
 				if(col != null && rowIdx >= 0) {
