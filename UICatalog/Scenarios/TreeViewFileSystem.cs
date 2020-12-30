@@ -29,6 +29,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miNoSymbols;
 		private MenuItem miColoredSymbols;
 		private MenuItem miInvertSymbols;
+		private MenuItem miUnicodeSymbols;
 		private Terminal.Gui.Attribute green;
 		private Terminal.Gui.Attribute red;
 
@@ -51,6 +52,7 @@ namespace UICatalog.Scenarios {
 					miPlusMinus = new MenuItem ("_PlusMinusSymbols", "", () => SetExpandableSymbols('+','-')){Checked = true, CheckType = MenuItemCheckStyle.Radio},
 					miArrowSymbols = new MenuItem ("_ArrowSymbols", "", () => SetExpandableSymbols('>','v')){Checked = false, CheckType = MenuItemCheckStyle.Radio},
 					miNoSymbols = new MenuItem ("_NoSymbols", "", () => SetExpandableSymbols(null,null)){Checked = false, CheckType = MenuItemCheckStyle.Radio},
+					miUnicodeSymbols = new MenuItem ("_Unicode", "", () => SetExpandableSymbols('ஹ','﷽')){Checked = false, CheckType = MenuItemCheckStyle.Radio},
 					null /*separator*/,
 					miColoredSymbols = new MenuItem ("_ColoredSymbols", "", () => ShowColoredExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 					miInvertSymbols = new MenuItem ("_InvertSymbols", "", () => InvertExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
@@ -143,6 +145,7 @@ namespace UICatalog.Scenarios {
 			miPlusMinus.Checked = expand == '+';
 			miArrowSymbols.Checked = expand == '>';
 			miNoSymbols.Checked = expand == null;
+			miUnicodeSymbols.Checked = expand == 'ஹ';
 
 			treeViewNodes.Style.ExpandableSymbol = expand;
 			treeViewNodes.Style.CollapseableSymbol = collapse;

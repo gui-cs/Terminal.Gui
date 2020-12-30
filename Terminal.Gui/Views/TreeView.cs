@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NStack;
 
 namespace Terminal.Gui {
 
@@ -892,13 +893,13 @@ namespace Terminal.Gui {
 			string lineBody = tree.AspectGetter(Model);
 
 			// How much space is left after prefix and expansion symbol?
-			var remainingWidth = availableWidth - (prefix.Length + 1 );
+			var remainingWidth = availableWidth - (prefix.Sum(Rune.ColumnWidth) + Rune.ColumnWidth(expansion) );
 
 			// If body of line is too long
-			if(lineBody.Length > remainingWidth)
+			if(lineBody.Sum(l=>Rune.ColumnWidth(l)) > remainingWidth)
 			{
 				// remaining space is zero and truncate the line
-				lineBody = lineBody.Substring(0,remainingWidth);
+				lineBody = new string(lineBody.TakeWhile(c=>(remainingWidth -= Rune.ColumnWidth(c)) > 0).ToArray());
 				remainingWidth = 0;
 			}
 			else{
@@ -909,8 +910,9 @@ namespace Terminal.Gui {
 
 			tree.Move(0,y);
 
-			foreach(Rune r in prefix)
+			foreach(Rune r in prefix){
 				driver.AddRune(r);
+			}
 
 			// pick color for expanded symbol
 			if(tree.Style.ColorExpandSymbol || tree.Style.InvertExpandSymbolColors)
