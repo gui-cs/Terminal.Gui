@@ -47,9 +47,11 @@ namespace UICatalog.Scenarios {
 					miShowLines = new MenuItem ("_ShowLines", "", () => ShowLines()){
 					Checked = true, CheckType = MenuItemCheckStyle.Checked
 						},
+					null /*separator*/,
 					miPlusMinus = new MenuItem ("_PlusMinusSymbols", "", () => SetExpandableSymbols('+','-')){Checked = true, CheckType = MenuItemCheckStyle.Radio},
 					miArrowSymbols = new MenuItem ("_ArrowSymbols", "", () => SetExpandableSymbols('>','v')){Checked = false, CheckType = MenuItemCheckStyle.Radio},
 					miNoSymbols = new MenuItem ("_NoSymbols", "", () => SetExpandableSymbols(null,null)){Checked = false, CheckType = MenuItemCheckStyle.Radio},
+					null /*separator*/,
 					miColoredSymbols = new MenuItem ("_ColoredSymbols", "", () => ShowColoredExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 					miInvertSymbols = new MenuItem ("_InvertSymbols", "", () => InvertExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 				}),
