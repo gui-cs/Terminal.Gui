@@ -72,8 +72,8 @@ namespace UICatalog.Scenarios {
 			treeViewFiles = new TreeView<FileSystemInfo> () {
 				X = 0,
 				Y = Pos.Bottom(lblFiles),
-				Width = 40,
-				Height = 9,
+				Width = Dim.Fill(),
+				Height = Dim.Fill(11 /*9 for other tree view, 1 for label, 1 for status bar*/),
 			};
 			
 			SetupFileTree();
@@ -90,8 +90,8 @@ namespace UICatalog.Scenarios {
 			treeViewNodes = new TreeView() {
 				X = 0,
 				Y = Pos.Bottom(lblNodeTree),
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
+				Width = 40,
+				Height = 9,
 			};
 
 			SetupNodeTree();
