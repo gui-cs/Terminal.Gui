@@ -273,13 +273,15 @@ namespace Terminal.Gui {
 				}
 			}
 					
+			int headerLinesConsumed = line;
+
 			//render the cells
 			for (; line < frame.Height; line++) {
 
 				ClearLine(line,bounds.Width);
 
 				//work out what Row to render
-				var rowToRender = RowOffset + (line - GetHeaderHeight());
+				var rowToRender = RowOffset + (line - headerLinesConsumed);
 
 				//if we have run off the end of the table
 				if ( Table == null || rowToRender >= Table.Rows.Count || rowToRender < 0)
@@ -613,7 +615,7 @@ namespace Terminal.Gui {
 				
 				var viewPort = CalculateViewport(Bounds);
 				
-				var headerHeight = GetHeaderHeight();
+				var headerHeight = ShouldRenderHeaders()? GetHeaderHeight():0;
 
 				var col = viewPort.LastOrDefault(c=>c.X < me.OfX);
 				
@@ -690,7 +692,7 @@ namespace Terminal.Gui {
 			}
 
 			var columnsToRender = CalculateViewport (Bounds).ToArray();
-			var headerHeight = GetHeaderHeight();
+			var headerHeight = ShouldRenderHeaders()? GetHeaderHeight() : 0;
 
 			//if we have scrolled too far to the left 
 			if (SelectedColumn < columnsToRender.Min (r => r.Column.Ordinal)) {
