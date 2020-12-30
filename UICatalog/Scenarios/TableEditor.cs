@@ -14,6 +14,11 @@ namespace UICatalog.Scenarios {
 	public class TableEditor : Scenario 
 	{
 		TableView tableView;
+		private MenuItem miAlwaysShowHeaders;
+		private MenuItem miHeaderOverline;
+		private MenuItem miHeaderMidline;
+		private MenuItem miHeaderUnderline;
+		private MenuItem miCellLines;
 
 		public override void Setup ()
 		{
@@ -21,6 +26,13 @@ namespace UICatalog.Scenarios {
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
 			Top.LayoutSubviews ();
+
+			this.tableView = new TableView () {
+				X = 0,
+				Y = 0,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (1),
+			};
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
@@ -30,17 +42,19 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
-					new MenuItem ("_AlwaysShowHeaders", "", () => ToggleAlwaysShowHeader()),
-					new MenuItem ("_HeaderOverLine", "", () => ToggleOverline()),
-					new MenuItem ("_HeaderMidLine", "", () => ToggleHeaderMidline()),
-					new MenuItem ("_HeaderUnderLine", "", () => ToggleUnderline()),
-					new MenuItem ("_CellLines", "", () => ToggleCellLines()),
+					miAlwaysShowHeaders = new MenuItem ("_AlwaysShowHeaders", "", () => ToggleAlwaysShowHeader()){Checked = tableView.Style.AlwaysShowHeaders, CheckType = MenuItemCheckStyle.Checked },
+					miHeaderOverline = new MenuItem ("_HeaderOverLine", "", () => ToggleOverline()){Checked = tableView.Style.ShowHorizontalHeaderOverline, CheckType = MenuItemCheckStyle.Checked },
+					miHeaderMidline = new MenuItem ("_HeaderMidLine", "", () => ToggleHeaderMidline()){Checked = tableView.Style.ShowVerticalHeaderLines, CheckType = MenuItemCheckStyle.Checked },
+					miHeaderUnderline =new MenuItem ("_HeaderUnderLine", "", () => ToggleUnderline()){Checked = tableView.Style.ShowHorizontalHeaderUnderline, CheckType = MenuItemCheckStyle.Checked },
+					miCellLines =new MenuItem ("_CellLines", "", () => ToggleCellLines()){Checked = tableView.Style.ShowVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
 					new MenuItem ("_AllLines", "", () => ToggleAllCellLines()),
 					new MenuItem ("_NoLines", "", () => ToggleNoCellLines()),
 					new MenuItem ("_ClearColumnStyles", "", () => ClearColumnStyles()),
 				}),
 			});
 			Top.Add (menu);
+
+
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				//new StatusItem(Key.Enter, "~ENTER~ ApplyEdits", () => { _hexView.ApplyEdits(); }),
@@ -51,13 +65,6 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 			});
 			Top.Add (statusBar);
-
-			this.tableView = new TableView () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (1),
-			};
 
 			Win.Add (tableView);
 
@@ -83,28 +90,33 @@ namespace UICatalog.Scenarios {
 
 		private void ToggleAlwaysShowHeader ()
 		{
-			tableView.Style.AlwaysShowHeaders = !tableView.Style.AlwaysShowHeaders;
+			miAlwaysShowHeaders.Checked = !miAlwaysShowHeaders.Checked;
+			tableView.Style.AlwaysShowHeaders = miAlwaysShowHeaders.Checked;
 			tableView.Update();
 		}
 
 		private void ToggleOverline ()
 		{
-			tableView.Style.ShowHorizontalHeaderOverline = !tableView.Style.ShowHorizontalHeaderOverline;
+			miHeaderOverline.Checked = !miHeaderOverline.Checked;
+			tableView.Style.ShowHorizontalHeaderOverline = miHeaderOverline.Checked;
 			tableView.Update();
 		}
 		private void ToggleHeaderMidline ()
 		{
-			tableView.Style.ShowVerticalHeaderLines = !tableView.Style.ShowVerticalHeaderLines;
+			miHeaderMidline.Checked = !miHeaderMidline.Checked;
+			tableView.Style.ShowVerticalHeaderLines = miHeaderMidline.Checked;
 			tableView.Update();
 		}
 		private void ToggleUnderline ()
 		{
-			tableView.Style.ShowHorizontalHeaderUnderline = !tableView.Style.ShowHorizontalHeaderUnderline;
+			miHeaderUnderline.Checked = !miHeaderUnderline.Checked;
+			tableView.Style.ShowHorizontalHeaderUnderline = miHeaderUnderline.Checked;
 			tableView.Update();
 		}
 		private void ToggleCellLines()
 		{
-			tableView.Style.ShowVerticalCellLines = !tableView.Style.ShowVerticalCellLines;
+			miCellLines.Checked = !miCellLines.Checked;
+			tableView.Style.ShowVerticalCellLines = miCellLines.Checked;
 			tableView.Update();
 		}
 		private void ToggleAllCellLines()
@@ -113,6 +125,12 @@ namespace UICatalog.Scenarios {
 			tableView.Style.ShowVerticalHeaderLines = true;
 			tableView.Style.ShowHorizontalHeaderUnderline = true;
 			tableView.Style.ShowVerticalCellLines = true;
+						
+			miHeaderOverline.Checked = true;
+			miHeaderMidline.Checked = true;
+			miHeaderUnderline.Checked = true;
+			miCellLines.Checked = true;
+
 			tableView.Update();
 		}
 		private void ToggleNoCellLines()
@@ -121,6 +139,12 @@ namespace UICatalog.Scenarios {
 			tableView.Style.ShowVerticalHeaderLines = false;
 			tableView.Style.ShowHorizontalHeaderUnderline = false;
 			tableView.Style.ShowVerticalCellLines = false;
+
+			miHeaderOverline.Checked = false;
+			miHeaderMidline.Checked = false;
+			miHeaderUnderline.Checked = false;
+			miCellLines.Checked = false;
+
 			tableView.Update();
 		}
 		
