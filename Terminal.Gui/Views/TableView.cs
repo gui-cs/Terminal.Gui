@@ -583,7 +583,8 @@ namespace Terminal.Gui {
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
-				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp)
+				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp &&
+				me.Flags != MouseFlags.WheeledLeft && me.Flags != MouseFlags.WheeledRight)
 				return false;
 
 			if (!HasFocus && CanFocus) {
@@ -594,21 +595,32 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (me.Flags == MouseFlags.WheeledDown) {
-				
-				RowOffset++;
-				
-				EnsureValidScrollOffsets();
-				SetNeedsDisplay();
+			// Scroll wheel flags
+			switch(me.Flags)
+			{
+				case MouseFlags.WheeledDown: 
+					RowOffset++;
+					EnsureValidScrollOffsets();
+					SetNeedsDisplay();
+					return true;
 
-				return true;
-			} else if (me.Flags == MouseFlags.WheeledUp) {
-				RowOffset--;
-				
-				EnsureValidScrollOffsets();
-				SetNeedsDisplay();
+				case MouseFlags.WheeledUp:
+					RowOffset--;
+					EnsureValidScrollOffsets();
+					SetNeedsDisplay();
+					return true;
 
-				return true;
+				case MouseFlags.WheeledRight:
+					ColumnOffset++;
+					EnsureValidScrollOffsets();
+					SetNeedsDisplay();
+					return true;
+
+				case  MouseFlags.WheeledLeft:
+					ColumnOffset--;
+					EnsureValidScrollOffsets();
+					SetNeedsDisplay();
+					return true;
 			}
 
 			if(me.Flags == MouseFlags.Button1Clicked) {
