@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using Terminal.Gui;
+using System.Globalization;
 
 namespace UICatalog.Scenarios {
 
@@ -261,14 +262,16 @@ namespace UICatalog.Scenarios {
 		{
 			var dt = new DataTable();
 
+			int explicitCols = 6;
 			dt.Columns.Add(new DataColumn("StrCol",typeof(string)));
 			dt.Columns.Add(new DataColumn("DateCol",typeof(DateTime)));
 			dt.Columns.Add(new DataColumn("IntCol",typeof(int)));
 			dt.Columns.Add(new DataColumn("DoubleCol",typeof(double)));
 			dt.Columns.Add(new DataColumn("NullsCol",typeof(string)));
+			dt.Columns.Add(new DataColumn("Unicode",typeof(string)));
 
-			for(int i=0;i< cols -5; i++) {
-				dt.Columns.Add("Column" + (i+5));
+			for(int i=0;i< cols -explicitCols; i++) {
+				dt.Columns.Add("Column" + (i+explicitCols));
 			}
 			
 			var r = new Random(100);
@@ -280,10 +283,11 @@ namespace UICatalog.Scenarios {
 					new DateTime(2000+i,12,25),
 					r.Next(i),
 					(r.NextDouble()*i)-0.5 /*add some negatives to demo styles*/,
-					DBNull.Value
+					DBNull.Value,
+					"Les Mise" + Char.ConvertFromUtf32(Int32.Parse("0301", NumberStyles.HexNumber)) + "rables"
 				};
 				
-				for(int j=0;j< cols -5; j++) {
+				for(int j=0;j< cols -explicitCols; j++) {
 					row.Add("SomeValue" + r.Next(100));
 				}
 

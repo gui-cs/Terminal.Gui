@@ -497,10 +497,10 @@ namespace Terminal.Gui {
 				return representation;
 
 			// if value is not wide enough
-			if(representation.Length < availableHorizontalSpace) {
+			if(representation.Sum(c=>Rune.ColumnWidth(c)) < availableHorizontalSpace) {
 				
 				// pad it out with spaces to the given alignment
-				int toPad = availableHorizontalSpace - (representation.Length+1 /*leave 1 space for cell boundary*/);
+				int toPad = availableHorizontalSpace - (representation.Sum(c=>Rune.ColumnWidth(c)) +1 /*leave 1 space for cell boundary*/);
 
 				switch(colStyle?.GetAlignment(originalCellValue) ?? TextAlignment.Left) {
 
@@ -520,7 +520,7 @@ namespace Terminal.Gui {
 			}
 
 			// value is too wide
-			return representation.Substring (0, availableHorizontalSpace);
+			return new string(representation.TakeWhile(c=>(availableHorizontalSpace-= Rune.ColumnWidth(c))>0).ToArray());
 		}
 
 		/// <inheritdoc/>
@@ -787,7 +787,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private int CalculateMaxCellWidth(DataColumn col, int rowsToRender,ColumnStyle colStyle)
 		{
-			int spaceRequired = col.ColumnName.Length;
+			int spaceRequired = col.ColumnName.Sum(c=>Rune.ColumnWidth(c));
 
 			// if table has no rows
 			if(RowOffset < 0)
@@ -797,7 +797,7 @@ namespace Terminal.Gui {
 			for (int i = RowOffset; i < RowOffset + rowsToRender && i < Table.Rows.Count; i++) {
 
 				//expand required space if cell is bigger than the last biggest cell or header
-				spaceRequired = Math.Max (spaceRequired, GetRepresentation(Table.Rows [i][col],colStyle).Length);
+				spaceRequired = Math.Max (spaceRequired, GetRepresentation(Table.Rows [i][col],colStyle).Sum(c=>Rune.ColumnWidth(c)));
 			}
 
 			// Don't require more space than the style allows

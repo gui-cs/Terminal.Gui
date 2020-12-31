@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Terminal.Gui;
 using Xunit;
+using System.Globalization;
 
 namespace UnitTests {
 	public class TableViewTests 
@@ -126,6 +126,19 @@ namespace UnitTests {
             
             tableView.SelectedRow = 10;
             Assert.True(called);
+        }
+
+        [Fact]
+        public void Test_SumColumnWidth_UnicodeLength()
+        {
+            Assert.Equal(11,"hello there".Sum(c=>Rune.ColumnWidth(c)));
+
+            // Creates a string with the peculiar (french?) r symbol
+            String surrogate = "Les Mise" + Char.ConvertFromUtf32(Int32.Parse("0301", NumberStyles.HexNumber)) + "rables";
+
+            // The unicode width of this string is shorter than the string length! 
+            Assert.Equal(14,surrogate.Sum(c=>Rune.ColumnWidth(c)));
+            Assert.Equal(15,surrogate.Length);
         }
         
         /// <summary>
