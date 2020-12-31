@@ -148,6 +148,11 @@ namespace Terminal.Gui {
 		public TableStyle Style { get => style; set {style = value; Update(); } }
 						
 		/// <summary>
+		/// True to select the entire row at once.  False to select individual cells.  Defaults to false
+		/// </summary>
+		public bool FullRowSelect {get;set;}
+
+		/// <summary>
 		/// Horizontal scroll offset.  The index of the first column in <see cref="Table"/> to display when when rendering the view.
 		/// </summary>
 		/// <remarks>This property allows very wide tables to be rendered with horizontal scrolling</remarks>
@@ -446,7 +451,9 @@ namespace Terminal.Gui {
 				Move (current.X, row);
 
 				// Set color scheme based on whether the current cell is the selected one
-				bool isSelectedCell = rowToRender == SelectedRow && current.Column.Ordinal == SelectedColumn;
+				bool isSelectedCell = rowToRender == SelectedRow && 
+					(current.Column.Ordinal == SelectedColumn || FullRowSelect);
+
 				Driver.SetAttribute (isSelectedCell ? ColorScheme.HotFocus : ColorScheme.Normal);
 
 				var val = Table.Rows [rowToRender][current.Column];
@@ -456,8 +463,10 @@ namespace Terminal.Gui {
 				
 				Driver.AddStr (TruncateOrPad(val,representation,availableWidthForCell,colStyle));
 				
-				// Reset color scheme to normal and render the vertical line (or space) at the end of the cell
-				Driver.SetAttribute (ColorScheme.Normal);
+				// If not in full row select mode always, reset color scheme to normal and render the vertical line (or space) at the end of the cell
+				if(!FullRowSelect)
+					Driver.SetAttribute (ColorScheme.Normal);
+
 				RenderSeparator(current.X-1,row,false);
 			}
 

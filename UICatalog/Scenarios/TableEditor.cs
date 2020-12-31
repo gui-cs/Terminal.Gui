@@ -20,6 +20,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miHeaderMidline;
 		private MenuItem miHeaderUnderline;
 		private MenuItem miCellLines;
+		private MenuItem miFullRowSelect;
 
 		public override void Setup ()
 		{
@@ -47,6 +48,7 @@ namespace UICatalog.Scenarios {
 					miHeaderOverline = new MenuItem ("_HeaderOverLine", "", () => ToggleOverline()){Checked = tableView.Style.ShowHorizontalHeaderOverline, CheckType = MenuItemCheckStyle.Checked },
 					miHeaderMidline = new MenuItem ("_HeaderMidLine", "", () => ToggleHeaderMidline()){Checked = tableView.Style.ShowVerticalHeaderLines, CheckType = MenuItemCheckStyle.Checked },
 					miHeaderUnderline =new MenuItem ("_HeaderUnderLine", "", () => ToggleUnderline()){Checked = tableView.Style.ShowHorizontalHeaderUnderline, CheckType = MenuItemCheckStyle.Checked },
+					miFullRowSelect =new MenuItem ("_FullRowSelect", "", () => ToggleFullRowSelect()){Checked = tableView.FullRowSelect, CheckType = MenuItemCheckStyle.Checked },
 					miCellLines =new MenuItem ("_CellLines", "", () => ToggleCellLines()){Checked = tableView.Style.ShowVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
 					new MenuItem ("_AllLines", "", () => ToggleAllCellLines()),
 					new MenuItem ("_NoLines", "", () => ToggleNoCellLines()),
@@ -112,6 +114,12 @@ namespace UICatalog.Scenarios {
 		{
 			miHeaderUnderline.Checked = !miHeaderUnderline.Checked;
 			tableView.Style.ShowHorizontalHeaderUnderline = miHeaderUnderline.Checked;
+			tableView.Update();
+		}
+		private void ToggleFullRowSelect ()
+		{
+			miFullRowSelect.Checked = !miFullRowSelect.Checked;
+			tableView.FullRowSelect= miFullRowSelect.Checked;
 			tableView.Update();
 		}
 		private void ToggleCellLines()
