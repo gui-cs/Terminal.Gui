@@ -579,6 +579,22 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <summary>
+		/// Positions the cursor in the area of the screen in which the start of the active cell is rendered.  Calls base implementation if active cell is not visible due to scrolling or table is loaded etc
+		/// </summary>
+		public override void PositionCursor()
+		{
+			if(Table == null) {
+				base.PositionCursor();
+				return;
+			}
+				
+			var screenPoint = CellToScreen(SelectedColumn,SelectedRow);
+			
+			if(screenPoint  != null)
+				Move(screenPoint.Value.X,screenPoint.Value.Y);
+		}
+
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
@@ -625,23 +641,12 @@ namespace Terminal.Gui {
 
 			if(me.Flags == MouseFlags.Button1Clicked) {
 				
-				var viewPort = CalculateViewport(Bounds);
-				
-				var headerHeight = ShouldRenderHeaders()? GetHeaderHeight():0;
+				var hit = ScreenToCell(me.OfX,me.OfY);
 
-				var col = viewPort.LastOrDefault(c=>c.X <= me.OfX);
-				
-				// Click is on the header section of rendered UI
-				if(me.OfY < headerHeight)
-					return false;
-
-				var rowIdx = RowOffset - headerHeight + me.OfY;
-
-				if(col != null && rowIdx >= 0) {
+				if(hit != null) {
 					
-					SelectedRow = rowIdx;
-					SelectedColumn = col.Column.Ordinal;
-				
+					SelectedRow = hit.Value.Y;
+					SelectedColumn = hit.Value.X;
 					Update();
 				}
 			}
@@ -649,6 +654,68 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		/// <summary>
+		/// Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control bounds
+		/// </summary>
+		/// <param name="clientX">X offset from the top left of the control</param>
+		/// <param name="clientY">Y offset from the top left of the control</param>
+		/// <returns></returns>
+		public Point? ScreenToCell (int clientX, int clientY)
+		{
+			if(Table == null)
+				return null;
+
+			var viewPort = CalculateViewport(Bounds);
+				
+			var headerHeight = ShouldRenderHeaders()? GetHeaderHeight():0;
+
+			var col = viewPort.LastOrDefault(c=>c.X <= clientX);
+				
+			// Click is on the header section of rendered UI
+			if(clientY < headerHeight)
+				return null;
+
+			var rowIdx = RowOffset - headerHeight + clientY;
+
+			if(col != null && rowIdx >= 0) {
+				
+				return new Point(col.Column.Ordinal,rowIdx);
+			}
+
+			return null;
+		}
+		
+		/// <summary>
+		/// Returns the screen position (relative to the control client area) that the given cell is rendered or null if it is outside the current scroll area or no table is loaded
+		/// </summary>
+		/// <param name="tableColumn">The index of the <see cref="Table"/> column you are looking for, use <see cref="DataColumn.Ordinal"/></param>
+		/// <param name="tableRow">The index of the row in <see cref="Table"/> that you are looking for</param>
+		/// <returns></returns>
+		public Point? CellToScreen (int tableColumn, int tableRow)
+		{
+			if(Table == null)
+				return null;
+
+			var viewPort = CalculateViewport(Bounds);
+				
+			var headerHeight = ShouldRenderHeaders()? GetHeaderHeight():0;
+
+			var colHit = viewPort.FirstOrDefault(c=>c.Column.Ordinal == tableColumn);
+
+			// current column is outside the scroll area
+			if(colHit == null)
+				return null;
+				
+			// the cell is too far up above the current scroll area
+			if(RowOffset > tableRow)
+				return null;
+
+			// the cell is way down below the scroll area and off the screen
+			if(tableRow > RowOffset + (Bounds.Height - headerHeight))
+				return null;
+ 
+			return new Point(colHit.X,tableRow + headerHeight - RowOffset);
+		}
 		/// <summary>
 		/// Updates the view to reflect changes to <see cref="Table"/> and to (<see cref="ColumnOffset"/> / <see cref="RowOffset"/>) etc
 		/// </summary>
