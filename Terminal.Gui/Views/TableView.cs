@@ -225,6 +225,16 @@ namespace Terminal.Gui {
 		public event Action<SelectedCellChangedEventArgs> SelectedCellChanged;
 
 		/// <summary>
+		/// This event is raised when a cell is activated e.g. by double clicking or pressing <see cref="CellActivationKey"/>
+		/// </summary>
+		public event Action<CellActivatedEventArgs> CellActivated;
+
+		/// <summary>
+		/// The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.
+		/// </summary>
+		public Key CellActivationKey {get;set;} = Key.Enter;
+
+		/// <summary>
 		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
 		/// </summary>
 		/// <param name="table">The table to display in the control</param>
@@ -535,6 +545,12 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
+			if(keyEvent.Key == CellActivationKey && Table != null) {
+				OnCellActivated(new CellActivatedEventArgs(Table,SelectedColumn,SelectedRow));
+				return true;
+			}
+				
+
 			switch (keyEvent.Key) {
 			case Key.CursorLeft:
 				SelectedColumn--;
@@ -657,6 +673,14 @@ namespace Terminal.Gui {
 					SelectedRow = hit.Value.Y;
 					SelectedColumn = hit.Value.X;
 					Update();
+				}
+			}
+
+			// Double clicking a cell activates
+			if(me.Flags == MouseFlags.Button1DoubleClicked) {
+				var hit = ScreenToCell(me.OfX,me.OfY);
+				if(hit!= null) {
+					OnCellActivated(new CellActivatedEventArgs(Table,hit.Value.X,hit.Value.Y));
 				}
 			}
 
@@ -812,6 +836,15 @@ namespace Terminal.Gui {
 		protected virtual void OnSelectedCellChanged(SelectedCellChangedEventArgs args)
 		{
 			SelectedCellChanged?.Invoke(args);
+		}
+		
+		/// <summary>
+		/// Invokes the <see cref="CellActivated"/> event
+		/// </summary>
+		/// <param name="args"></param>
+		protected virtual void OnCellActivated (CellActivatedEventArgs args)
+		{
+			CellActivated?.Invoke(args);
 		}
 
 		/// <summary>
@@ -1002,6 +1035,42 @@ namespace Terminal.Gui {
 			NewCol = newCol;
 			OldRow = oldRow;
 			NewRow = newRow;
+		}
+	}
+
+	/// <summary>
+	/// Defines the event arguments for <see cref="TableView.CellActivated"/> event
+	/// </summary>
+	public class CellActivatedEventArgs : EventArgs
+	{
+		/// <summary>
+		/// The current table to which the new indexes refer.  May be null e.g. if selection change is the result of clearing the table from the view
+		/// </summary>
+		/// <value></value>
+		public DataTable Table {get;}
+
+
+		/// <summary>
+		/// The column index of the <see cref="Table"/> cell that is being activated
+		/// </summary>
+		/// <value></value>
+		public int Col {get;}
+		
+		/// <summary>
+		/// The row index of the <see cref="Table"/> cell that is being activated
+		/// </summary>
+		/// <value></value>
+		public int Row {get;}
+
+		/// <summary>
+		/// Creates a new instance of arguments describing a cell being activated in <see cref="TableView"/>
+		/// </summary>
+		/// <param name="t"></param>
+		public CellActivatedEventArgs(DataTable t, int col, int row)
+		{
+			Table = t;
+			Col = col;
+			Row = row;
 		}
 	}
 }
