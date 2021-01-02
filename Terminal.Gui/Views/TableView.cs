@@ -153,6 +153,18 @@ namespace Terminal.Gui {
 		public bool FullRowSelect {get;set;}
 
 		/// <summary>
+		/// True to allow regions to be selected 
+		/// </summary>
+		/// <value></value>
+		public bool MultiSelect {get;set;} = true;
+
+		/// <summary>
+		/// When <see cref="MultiSelect"/> is enabled this property contain all rectangles of selected cells.  Rectangles describe column/rows selected in <see cref="Table"/> (not screen coordinates)
+		/// </summary>
+		/// <returns></returns>
+		public Stack<TableSelection> MultiSelectedRegions {get;} = new Stack<TableSelection>();
+
+		/// <summary>
 		/// Horizontal scroll offset.  The index of the first column in <see cref="Table"/> to display when when rendering the view.
 		/// </summary>
 		/// <remarks>This property allows very wide tables to be rendered with horizontal scrolling</remarks>
@@ -451,8 +463,7 @@ namespace Terminal.Gui {
 				Move (current.X, row);
 
 				// Set color scheme based on whether the current cell is the selected one
-				bool isSelectedCell = rowToRender == SelectedRow && 
-					(current.Column.Ordinal == SelectedColumn || FullRowSelect);
+				bool isSelectedCell = IsSelected(current.Column.Ordinal,rowToRender);
 
 				Driver.SetAttribute (isSelectedCell ? ColorScheme.HotFocus : ColorScheme.Normal);
 
@@ -537,19 +548,23 @@ namespace Terminal.Gui {
 		{
 			switch (keyEvent.Key) {
 			case Key.CursorLeft:
-				SelectedColumn--;
+			case Key.ShiftMask | Key.CursorLeft:
+				ChangeSelectionByOffset(-1,0,keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			case Key.CursorRight:
-				SelectedColumn++;
+			case Key.ShiftMask | Key.CursorRight:
+				ChangeSelectionByOffset(1,0,keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			case Key.CursorDown:
-				SelectedRow++;
+			case Key.ShiftMask | Key.CursorDown:
+				ChangeSelectionByOffset(0,1,keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			case Key.CursorUp:
-				SelectedRow--;
+			case Key.ShiftMask | Key.CursorUp:
+				ChangeSelectionByOffset(0,-1,keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			case Key.PageUp:
@@ -587,6 +602,74 @@ namespace Terminal.Gui {
 			PositionCursor ();
 			return true;
 		}
+
+		private void ChangeSelectionByOffset (int offsetX, int offsetY, bool extendExistingSelection)
+		{
+			if(!MultiSelect || !extendExistingSelection)
+				MultiSelectedRegions.Clear();
+
+			if(extendExistingSelection)
+			{
+				// If we are extending current selection but there isn't one
+				if(MultiSelectedRegions.Count == 0)
+				{
+					// Create a new region between the old active cell and the new offset
+					var rect = CreateTableSelection(SelectedColumn,SelectedRow,SelectedColumn+offsetX,SelectedRow+offsetY);
+					MultiSelectedRegions.Push(rect);
+				}
+				else
+				{
+					// Extend the current head selection to include the new offset
+					var head = MultiSelectedRegions.Pop();
+					var newRect = CreateTableSelection(head.Origin.X,head.Origin.Y,SelectedColumn + offsetX,SelectedRow + offsetY);
+					MultiSelectedRegions.Push(newRect);
+				}
+			}
+
+			SelectedColumn += offsetX;
+			SelectedRow += offsetY;
+			
+		}
+
+
+		/// <summary>
+		/// Returns a new rectangle between the two points with positive width/height regardless of relative positioning of the points.  pt1 is always considered the <see cref="TableSelection.Origin"/> point
+		/// </summary>
+		/// <param name="pt1X">Origin point for the selection in X</param>
+		/// <param name="pt1Y">Origin point for the selection in Y</param>
+		/// <param name="pt2X">End point for the selection in X</param>
+		/// <param name="pt2Y">End point for the selection in Y</param>
+		/// <returns></returns>
+		private TableSelection CreateTableSelection (int pt1X, int pt1Y, int pt2X, int pt2Y)
+		{
+			var top = Math.Min(pt1Y,pt2Y);
+			var bot = Math.Max(pt1Y,pt2Y);
+
+			var left = Math.Min(pt1X,pt2X);
+			var right = Math.Max(pt1X,pt2X);
+
+			// Rect class is inclusive of Top Left but exclusive of Bottom Right so extend by 1
+			return new TableSelection(new Point(pt1X,pt1Y),new Rect(left,top,right-left + 1,bot-top + 1));
+		}
+
+		/// <summary>
+		/// Returns true if the given cell is selected either because it is the active cell or part of a multi cell selection (e.g. <see cref="FullRowSelect"/>)
+		/// </summary>
+		/// <param name="col"></param>
+		/// <param name="row"></param>
+		/// <returns></returns>
+		public bool IsSelected(int col, int row)
+		{
+			// Cell is also selected if 
+			if(MultiSelect && MultiSelectedRegions.Any(r=>r.Rect.Contains(col,row)))
+				return true;
+
+			return row == SelectedRow && 
+					(col == SelectedColumn || FullRowSelect);
+		}
+
+
+		
 
 		/// <summary>
 		/// Positions the cursor in the area of the screen in which the start of the active cell is rendered.  Calls base implementation if active cell is not visible due to scrolling or table is loaded etc
@@ -1003,5 +1086,35 @@ namespace Terminal.Gui {
 			OldRow = oldRow;
 			NewRow = newRow;
 		}
+	}
+
+	/// <summary>
+	/// Describes a selected region of the table
+	/// </summary>
+	public class TableSelection{
+
+		/// <summary>
+		/// Corner of the <see cref="Rect"/> where selection began
+		/// </summary>
+		/// <value></value>
+		public Point Origin{get;}
+
+		/// <summary>
+		/// Area selected
+		/// </summary>
+		/// <value></value>
+		public Rect Rect { get; }
+
+		/// <summary>
+		/// Creates a new selected area starting at the origin corner and covering the provided rectangular area
+		/// </summary>
+		/// <param name="origin"></param>
+		/// <param name="rect"></param>
+		public TableSelection(Point origin, Rect rect)
+		{
+			Origin = origin;
+			Rect = rect;
+		}
+
 	}
 }
