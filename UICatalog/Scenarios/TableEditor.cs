@@ -62,9 +62,8 @@ namespace UICatalog.Scenarios {
 			var statusBar = new StatusBar (new StatusItem [] {
 				//new StatusItem(Key.Enter, "~ENTER~ ApplyEdits", () => { _hexView.ApplyEdits(); }),
 				new StatusItem(Key.F2, "~F2~ OpenExample", () => OpenExample(true)),
-				new StatusItem(Key.F3, "~F3~ EditCell", () => EditCurrentCell()),
-				new StatusItem(Key.F4, "~F4~ CloseExample", () => CloseExample()),
-				new StatusItem(Key.F5, "~F5~ OpenSimple", () => OpenSimple(true)),
+				new StatusItem(Key.F3, "~F3~ CloseExample", () => CloseExample()),
+				new StatusItem(Key.F4, "~F4~ OpenSimple", () => OpenSimple(true)),
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 			});
 			Top.Add (statusBar);
@@ -83,6 +82,7 @@ namespace UICatalog.Scenarios {
 			Win.Add(selectedCellLabel);
 
 			tableView.SelectedCellChanged += (e)=>{selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";};
+			tableView.CellActivated += EditCurrentCell;
 		}
 
 		private void ClearColumnStyles ()
@@ -214,12 +214,12 @@ namespace UICatalog.Scenarios {
 			tableView.Table = BuildSimpleDataTable(big ? 30 : 5, big ? 1000 : 5);
 		}
 
-		private void EditCurrentCell ()
+		private void EditCurrentCell (CellActivatedEventArgs e)
 		{
-			if(tableView.Table == null)
+			if(e.Table == null)
 				return;
 
-			var oldValue = tableView.Table.Rows[tableView.SelectedRow][tableView.SelectedColumn].ToString();
+			var oldValue = e.Table.Rows[e.Row][e.Col].ToString();
 			bool okPressed = false;
 
 			var ok = new Button ("Ok", is_default: true);
@@ -231,7 +231,7 @@ namespace UICatalog.Scenarios {
 			var lbl = new Label() {
 				X = 0,
 				Y = 1,
-				Text = tableView.Table.Columns[tableView.SelectedColumn].ColumnName
+				Text = e.Table.Columns[e.Col].ColumnName
 			};
 
 			var tf = new TextField()
@@ -250,7 +250,7 @@ namespace UICatalog.Scenarios {
 			if(okPressed) {
 
 				try {
-					tableView.Table.Rows[tableView.SelectedRow][tableView.SelectedColumn] = string.IsNullOrWhiteSpace(tf.Text.ToString()) ? DBNull.Value : (object)tf.Text;
+					e.Table.Rows[e.Row][e.Col] = string.IsNullOrWhiteSpace(tf.Text.ToString()) ? DBNull.Value : (object)tf.Text;
 				}
 				catch(Exception ex) {
 					MessageBox.ErrorQuery(60,20,"Failed to set text", ex.Message,"Ok");
