@@ -546,53 +546,64 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
+			if(Table == null){
+				PositionCursor ();
+				return true;
+			}
+
 			switch (keyEvent.Key) {
 			case Key.CursorLeft:
-			case Key.ShiftMask | Key.CursorLeft:
+			case Key.CursorLeft | Key.ShiftMask:
 				ChangeSelectionByOffset(-1,0,keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			case Key.CursorRight:
-			case Key.ShiftMask | Key.CursorRight:
+			case Key.CursorRight | Key.ShiftMask:
 				ChangeSelectionByOffset(1,0,keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			case Key.CursorDown:
-			case Key.ShiftMask | Key.CursorDown:
+			case Key.CursorDown | Key.ShiftMask:
 				ChangeSelectionByOffset(0,1,keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			case Key.CursorUp:
-			case Key.ShiftMask | Key.CursorUp:
+			case Key.CursorUp | Key.ShiftMask:
 				ChangeSelectionByOffset(0,-1,keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			case Key.PageUp:
-				SelectedRow -= Frame.Height;
+			case Key.PageUp | Key.ShiftMask:
+				ChangeSelectionByOffset(0,-Frame.Height,keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			case Key.PageDown:
-				SelectedRow += Frame.Height;
+			case Key.PageDown | Key.ShiftMask:
+				ChangeSelectionByOffset(0,Frame.Height,keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			case Key.Home | Key.CtrlMask:
-				SelectedRow = 0;
-				SelectedColumn = 0;
+			case Key.Home | Key.CtrlMask | Key.ShiftMask:
+				// jump to table origin
+				SetSelection(0,0,keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			case Key.Home:
-				SelectedColumn = 0;
+			case Key.Home | Key.ShiftMask:
+				// jump to start of line
+				SetSelection(0,SelectedRow,keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			case Key.End | Key.CtrlMask:
-				//jump to end of table
-				SelectedRow =  Table == null ? 0 : Table.Rows.Count - 1;
-				SelectedColumn =  Table == null ? 0 : Table.Columns.Count - 1;
+			case Key.End | Key.CtrlMask | Key.ShiftMask:
+				// jump to end of table
+				SetSelection(Table.Columns.Count - 1, Table.Rows.Count - 1, keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			case Key.End:
+			case Key.End | Key.ShiftMask:
 				//jump to end of row
-				SelectedColumn =  Table == null ? 0 : Table.Columns.Count - 1;
+				SetSelection(Table.Columns.Count - 1,SelectedRow, keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			default:
@@ -603,7 +614,13 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		private void ChangeSelectionByOffset (int offsetX, int offsetY, bool extendExistingSelection)
+		/// <summary>
+		/// Moves the <see cref="SelectedRow"/> and <see cref="SelectedColumn"/> to the given col/row in <see cref="Table"/>. Optionally starting a box selection (see <see cref="MultiSelect"/>)
+		/// </summary>
+		/// <param name="col"></param>
+		/// <param name="row"></param>
+		/// <param name="extendExistingSelection">True to create a multi cell selection or adjust an existing one</param>
+		public void SetSelection (int col, int row, bool extendExistingSelection)
 		{
 			if(!MultiSelect || !extendExistingSelection)
 				MultiSelectedRegions.Clear();
@@ -613,22 +630,32 @@ namespace Terminal.Gui {
 				// If we are extending current selection but there isn't one
 				if(MultiSelectedRegions.Count == 0)
 				{
-					// Create a new region between the old active cell and the new offset
-					var rect = CreateTableSelection(SelectedColumn,SelectedRow,SelectedColumn+offsetX,SelectedRow+offsetY);
+					// Create a new region between the old active cell and the new cell
+					var rect = CreateTableSelection(SelectedColumn,SelectedRow,col,row);
 					MultiSelectedRegions.Push(rect);
 				}
 				else
 				{
-					// Extend the current head selection to include the new offset
+					// Extend the current head selection to include the new cell
 					var head = MultiSelectedRegions.Pop();
-					var newRect = CreateTableSelection(head.Origin.X,head.Origin.Y,SelectedColumn + offsetX,SelectedRow + offsetY);
+					var newRect = CreateTableSelection(head.Origin.X,head.Origin.Y,col,row);
 					MultiSelectedRegions.Push(newRect);
 				}
 			}
 
-			SelectedColumn += offsetX;
-			SelectedRow += offsetY;
-			
+			SelectedColumn = col;
+			SelectedRow = row;
+		}
+
+		/// <summary>
+		/// Moves the <see cref="SelectedRow"/> and <see cref="SelectedColumn"/> by the provided offsets. Optionally starting a box selection (see <see cref="MultiSelect"/>)
+		/// </summary>
+		/// <param name="offsetX">Offset in number of columns</param>
+		/// <param name="offsetY">Offset in number of rows</param>
+		/// <param name="extendExistingSelection">True to create a multi cell selection or adjust an existing one</param>
+		public void ChangeSelectionByOffset (int offsetX, int offsetY, bool extendExistingSelection)
+		{
+			SetSelection(SelectedColumn + offsetX, SelectedRow + offsetY,extendExistingSelection);
 		}
 
 
@@ -660,16 +687,17 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public bool IsSelected(int col, int row)
 		{
-			// Cell is also selected if 
+			// Cell is also selected if in any multi selection region
 			if(MultiSelect && MultiSelectedRegions.Any(r=>r.Rect.Contains(col,row)))
+				return true;
+
+			// Cell is also selected if Y axis appears in any region (when FullRowSelect is enabled)
+			if(FullRowSelect && MultiSelect && MultiSelectedRegions.Any(r=>r.Rect.Bottom> row  && r.Rect.Top <= row))
 				return true;
 
 			return row == SelectedRow && 
 					(col == SelectedColumn || FullRowSelect);
 		}
-
-
-		
 
 		/// <summary>
 		/// Positions the cursor in the area of the screen in which the start of the active cell is rendered.  Calls base implementation if active cell is not visible due to scrolling or table is loaded etc
@@ -731,14 +759,12 @@ namespace Terminal.Gui {
 					return true;
 			}
 
-			if(me.Flags == MouseFlags.Button1Clicked) {
+			if(me.Flags.HasFlag(MouseFlags.Button1Clicked)) {
 				
 				var hit = ScreenToCell(me.OfX,me.OfY);
-
 				if(hit != null) {
-					
-					SelectedRow = hit.Value.Y;
-					SelectedColumn = hit.Value.X;
+					// TODO : if shift is held down extend selection
+					SetSelection(hit.Value.X,hit.Value.Y,false );
 					Update();
 				}
 			}
