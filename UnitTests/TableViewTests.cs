@@ -140,6 +140,90 @@ namespace UnitTests {
             Assert.Equal(14,surrogate.Sum(c=>Rune.ColumnWidth(c)));
             Assert.Equal(15,surrogate.Length);
         }
+
+        [Fact]
+        public void IsSelected_MultiSelectionOn_Vertical()
+        {
+            var tableView = new TableView(){
+                Table = BuildTable(25,50),
+                MultiSelect = true
+            };
+
+            // 3 cell vertical selection
+            tableView.SetSelection(1,1,false);
+            tableView.SetSelection(1,3,true);
+
+            Assert.False(tableView.IsSelected(0,0));
+            Assert.False(tableView.IsSelected(1,0));
+            Assert.False(tableView.IsSelected(2,0));
+
+            Assert.False(tableView.IsSelected(0,1));
+            Assert.True(tableView.IsSelected(1,1));
+            Assert.False(tableView.IsSelected(2,1));
+
+            Assert.False(tableView.IsSelected(0,2));
+            Assert.True(tableView.IsSelected(1,2));
+            Assert.False(tableView.IsSelected(2,2));
+
+            Assert.False(tableView.IsSelected(0,3));
+            Assert.True(tableView.IsSelected(1,3));
+            Assert.False(tableView.IsSelected(2,3));
+
+            Assert.False(tableView.IsSelected(0,4));
+            Assert.False(tableView.IsSelected(1,4));
+            Assert.False(tableView.IsSelected(2,4));
+        }
+
+
+        [Fact]
+        public void IsSelected_MultiSelectionOn_Horizontal()
+        {
+            var tableView = new TableView(){
+                Table = BuildTable(25,50),
+                MultiSelect = true
+            };
+
+            // 2 cell horizontal selection
+            tableView.SetSelection(1,0,false);
+            tableView.SetSelection(2,0,true);
+
+            Assert.False(tableView.IsSelected(0,0));
+            Assert.True(tableView.IsSelected(1,0));
+            Assert.True(tableView.IsSelected(2,0));
+            Assert.False(tableView.IsSelected(3,0));
+
+            Assert.False(tableView.IsSelected(0,1));
+            Assert.False(tableView.IsSelected(1,1));
+            Assert.False(tableView.IsSelected(2,1));
+            Assert.False(tableView.IsSelected(3,1));
+        }
+
+
+
+        [Fact]
+        public void IsSelected_MultiSelectionOn_BoxSelection()
+        {
+            var tableView = new TableView(){
+                Table = BuildTable(25,50),
+                MultiSelect = true
+            };
+
+            // 4 cell horizontal in box 2x2
+            tableView.SetSelection(0,0,false);
+            tableView.SetSelection(1,1,true);
+
+            Assert.True(tableView.IsSelected(0,0));
+            Assert.True(tableView.IsSelected(1,0));
+            Assert.False(tableView.IsSelected(2,0));
+
+            Assert.True(tableView.IsSelected(0,1));
+            Assert.True(tableView.IsSelected(1,1));
+            Assert.False(tableView.IsSelected(2,1));
+
+            Assert.False(tableView.IsSelected(0,2));
+            Assert.False(tableView.IsSelected(1,2));
+            Assert.False(tableView.IsSelected(2,2));
+        }
         
         /// <summary>
 		/// Builds a simple table of string columns with the requested number of columns and rows
