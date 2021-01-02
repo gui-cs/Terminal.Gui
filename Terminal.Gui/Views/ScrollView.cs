@@ -427,7 +427,7 @@ namespace Terminal.Gui {
 		bool autoHideScrollBars = true;
 
 		/// <summary>
-		/// Represents the contents of the data shown inside the scrolview
+		/// Represents the contents of the data shown inside the scrollview
 		/// </summary>
 		/// <value>The size of the content.</value>
 		public Size ContentSize {
