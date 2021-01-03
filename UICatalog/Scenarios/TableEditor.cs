@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using Terminal.Gui;
+using System.Linq;
 using System.Globalization;
 
 namespace UICatalog.Scenarios {
@@ -60,7 +61,6 @@ namespace UICatalog.Scenarios {
 
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				//new StatusItem(Key.Enter, "~ENTER~ ApplyEdits", () => { _hexView.ApplyEdits(); }),
 				new StatusItem(Key.F2, "~F2~ OpenExample", () => OpenExample(true)),
 				new StatusItem(Key.F3, "~F3~ CloseExample", () => CloseExample()),
 				new StatusItem(Key.F4, "~F4~ OpenSimple", () => OpenSimple(true)),
@@ -83,6 +83,33 @@ namespace UICatalog.Scenarios {
 
 			tableView.SelectedCellChanged += (e)=>{selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";};
 			tableView.CellActivated += EditCurrentCell;
+			tableView.KeyPress += TableViewKeyPress;
+		}
+
+		private void TableViewKeyPress (View.KeyEventEventArgs e)
+		{
+			if(e.KeyEvent.Key == Key.DeleteChar){
+
+				if(tableView.FullRowSelect)
+				{
+					// Delete button deletes all rows when in full row mode
+					foreach(int toRemove in tableView.GetAllSelectedCells().Select(p=>p.Y).Distinct().OrderByDescending(i=>i))
+						tableView.Table.Rows.RemoveAt(toRemove);
+				}
+				else{
+
+					// otherwise set all selected cells to null
+					foreach(var pt in tableView.GetAllSelectedCells())
+					{
+						tableView.Table.Rows[pt.Y][pt.X] = DBNull.Value;
+					}
+				}
+
+				tableView.Update();
+				e.Handled = true;
+			}
+
+
 		}
 
 		private void ClearColumnStyles ()

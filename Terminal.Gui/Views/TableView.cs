@@ -624,6 +624,10 @@ namespace Terminal.Gui {
 				SetSelection(Table.Columns.Count - 1, Table.Rows.Count - 1, keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
+			case Key.A | Key.CtrlMask:
+				SelectAll();
+				Update ();
+				break;
 			case Key.End:
 			case Key.End | Key.ShiftMask:
 				//jump to end of row
@@ -682,6 +686,71 @@ namespace Terminal.Gui {
 			SetSelection(SelectedColumn + offsetX, SelectedRow + offsetY,extendExistingSelection);
 		}
 
+		/// <summary>
+		/// When <see cref="MultiSelect"/> is on, creates selection over all cells in the table (replacing any old selection regions)
+		/// </summary>
+		public void SelectAll()
+		{
+			if(Table == null || !MultiSelect || Table.Rows.Count == 0)
+				return;
+
+			MultiSelectedRegions.Clear();
+
+			// Create a single region over entire table, set the origin of the selection to the active cell so that a followup spread selection e.g. shift-right behaves properly
+			MultiSelectedRegions.Push(new TableSelection(new Point(SelectedColumn,SelectedRow), new Rect(0,0,Table.Columns.Count,table.Rows.Count)));
+			Update();
+		}
+
+		/// <summary>
+		/// Returns all cells in any <see cref="MultiSelectedRegions"/> (if <see cref="MultiSelect"/> is enabled) and the selected cell
+		/// </summary>
+		/// <returns></returns>
+		public IEnumerable<Point> GetAllSelectedCells()
+		{
+			if(Table == null || Table.Rows.Count == 0)
+				yield break;
+
+			EnsureValidSelection();
+
+			// If there are one or more rectangular selections
+			if(MultiSelect && MultiSelectedRegions.Any()){
+				
+				// Quiz any cells for whether they are selected.  For performance we only need to check those between the top left and lower right vertex of selection regions
+				var yMin = MultiSelectedRegions.Min(r=>r.Rect.Top);
+				var yMax = MultiSelectedRegions.Max(r=>r.Rect.Bottom);
+
+				var xMin = FullRowSelect ? 0 : MultiSelectedRegions.Min(r=>r.Rect.Left);
+				var xMax = FullRowSelect ? Table.Columns.Count : MultiSelectedRegions.Max(r=>r.Rect.Right);
+
+				for(int y = yMin ; y < yMax ; y++)
+				{
+					for(int x = xMin ; x < xMax ; x++)
+					{
+						if(IsSelected(x,y)){
+							yield return new Point(x,y);
+						}
+					}
+				}
+			}
+			else{
+
+				// if there are no region selections then it is just the active cell
+
+				// if we are selecting the full row
+				if(FullRowSelect)
+				{
+					// all cells in active row are selected
+					for(int x =0;x<Table.Columns.Count;x++){
+						yield return new Point(x,SelectedRow);
+					}
+				}
+				else
+					{
+						// Not full row select and no multi selections
+						yield return new Point(SelectedColumn,SelectedRow);
+					}
+			}
+		}
 
 		/// <summary>
 		/// Returns a new rectangle between the two points with positive width/height regardless of relative positioning of the points.  pt1 is always considered the <see cref="TableSelection.Origin"/> point
@@ -901,17 +970,51 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Updates <see cref="SelectedColumn"/> and <see cref="SelectedRow"/> where they are outside the bounds of the table (by adjusting them to the nearest existing cell).  Has no effect if <see cref="Table"/> has not been set.
+		/// Updates <see cref="SelectedColumn"/>, <see cref="SelectedRow"/> and <see cref="MultiSelectedRegions"/> where they are outside the bounds of the table (by adjusting them to the nearest existing cell).  Has no effect if <see cref="Table"/> has not been set.
 		/// </summary>
 		/// <remarks>Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/></remarks>
-		public void EnsureValidSelection ()
+		public void EnsureValidSelection()
 		{
 			if(Table == null){
+
+				// Table doesn't exist, we should probably clear those selections
+				MultiSelectedRegions.Clear();
 				return;
 			}
 
 			SelectedColumn = Math.Max(Math.Min(SelectedColumn,Table.Columns.Count -1),0);
 			SelectedRow = Math.Max(Math.Min(SelectedRow,Table.Rows.Count -1),0);
+
+			var oldRegions = MultiSelectedRegions.ToArray().Reverse();
+
+			MultiSelectedRegions.Clear();
+
+			// evaluate 
+			foreach(var region in oldRegions)
+			{
+				// ignore regions entirely below current table state
+				if(region.Rect.Top >= Table.Rows.Count)
+					continue;
+
+				// ignore regions entirely too far right of table columns
+				if(region.Rect.Left >= Table.Columns.Count)
+					continue;
+
+				// ensure region's origin exists
+				region.Origin = new Point(
+					Math.Max(Math.Min(region.Origin.X,Table.Columns.Count -1),0),
+					Math.Max(Math.Min(region.Origin.Y,Table.Rows.Count -1),0));
+
+				// ensure regions do not go over edge of table bounds
+				region.Rect = Rect.FromLTRB(region.Rect.Left,
+					region.Rect.Top,
+					Math.Max(Math.Min(region.Rect.Right, Table.Columns.Count ),0),
+					Math.Max(Math.Min(region.Rect.Bottom,Table.Rows.Count),0)
+					);
+
+				MultiSelectedRegions.Push(region);
+			}
+
 		}
 
 		/// <summary>
@@ -1165,13 +1268,13 @@ namespace Terminal.Gui {
 		/// Corner of the <see cref="Rect"/> where selection began
 		/// </summary>
 		/// <value></value>
-		public Point Origin{get;}
+		public Point Origin{get;set;}
 
 		/// <summary>
 		/// Area selected
 		/// </summary>
 		/// <value></value>
-		public Rect Rect { get; }
+		public Rect Rect { get; set;}
 
 		/// <summary>
 		/// Creates a new selected area starting at the origin corner and covering the provided rectangular area

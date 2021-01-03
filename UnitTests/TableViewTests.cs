@@ -257,7 +257,166 @@ namespace UnitTests {
             
             Assert.Equal(8,tableView.RowOffset);
         }
+
+        [Fact]
+        public void DeleteRow_SelectAll_AdjustsSelectionToPreventOverrun()
+        {
+            // create a 4 by 4 table
+            var tableView = new TableView(){
+                Table = BuildTable(4,4),
+                MultiSelect = true,
+                Bounds = new Rect(0,0,10,5)
+            };
+
+            tableView.SelectAll();
+            Assert.Equal(16,tableView.GetAllSelectedCells().Count());
+
+            // delete one of the columns
+            tableView.Table.Columns.RemoveAt(2);
+
+            // table should now be 3x4
+            Assert.Equal(12,tableView.GetAllSelectedCells().Count());
+
+            // remove a row
+            tableView.Table.Rows.RemoveAt(1);
+
+            // table should now be 3x3
+            Assert.Equal(9,tableView.GetAllSelectedCells().Count());
+        }
+
+
+        [Fact]
+        public void DeleteRow_SelectLastRow_AdjustsSelectionToPreventOverrun()
+        {
+            // create a 4 by 4 table
+            var tableView = new TableView(){
+                Table = BuildTable(4,4),
+                MultiSelect = true,
+                Bounds = new Rect(0,0,10,5)
+            };
+
+            // select the last row
+            tableView.MultiSelectedRegions.Clear();
+            tableView.MultiSelectedRegions.Push(new TableSelection(new Point(0,3), new Rect(0,3,4,1)));
+
+            Assert.Equal(4,tableView.GetAllSelectedCells().Count());
+
+            // remove a row
+            tableView.Table.Rows.RemoveAt(0);
+
+            tableView.EnsureValidSelection();
+
+            // since the selection no longer exists it should be removed
+            Assert.Empty(tableView.MultiSelectedRegions);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void GetAllSelectedCells_SingleCellSelected_ReturnsOne(bool multiSelect)
+        {
+            var tableView = new TableView(){
+                Table = BuildTable(3,3),
+                MultiSelect = multiSelect,
+                Bounds = new Rect(0,0,10,5)
+            };
+
+            tableView.SetSelection(1,1,false);
+
+            Assert.Single(tableView.GetAllSelectedCells());
+            Assert.Equal(new Point(1,1),tableView.GetAllSelectedCells().Single());
+        }
+
+
+        [Fact]
+        public void GetAllSelectedCells_SquareSelection_ReturnsFour()
+        {
+            var tableView = new TableView(){
+                Table = BuildTable(3,3),
+                MultiSelect = true,
+                Bounds = new Rect(0,0,10,5)
+            };
+
+            // move cursor to 1,1
+            tableView.SetSelection(1,1,false);
+            // spread selection across to 2,2 (e.g. shift+right then shift+down)
+            tableView.SetSelection(2,2,true);
+
+            var selected = tableView.GetAllSelectedCells().ToArray();
+
+            Assert.Equal(4,selected.Length);
+            Assert.Equal(new Point(1,1),selected[0]);
+            Assert.Equal(new Point(2,1),selected[1]);
+            Assert.Equal(new Point(1,2),selected[2]);
+            Assert.Equal(new Point(2,2),selected[3]);
+        }
         
+
+        [Fact]
+        public void GetAllSelectedCells_SquareSelection_FullRowSelect()
+        {
+            var tableView = new TableView(){
+                Table = BuildTable(3,3),
+                MultiSelect = true,
+                FullRowSelect = true,
+                Bounds = new Rect(0,0,10,5)
+            };
+
+            // move cursor to 1,1
+            tableView.SetSelection(1,1,false);
+            // spread selection across to 2,2 (e.g. shift+right then shift+down)
+            tableView.SetSelection(2,2,true);
+
+            var selected = tableView.GetAllSelectedCells().ToArray();
+
+            Assert.Equal(6,selected.Length);
+            Assert.Equal(new Point(0,1),selected[0]);
+            Assert.Equal(new Point(1,1),selected[1]);
+            Assert.Equal(new Point(2,1),selected[2]);
+            Assert.Equal(new Point(0,2),selected[3]);
+            Assert.Equal(new Point(1,2),selected[4]);
+            Assert.Equal(new Point(2,2),selected[5]);
+        }
+        
+
+        [Fact]
+        public void GetAllSelectedCells_TwoIsolatedSelections_ReturnsSix()
+        {
+            var tableView = new TableView(){
+                Table = BuildTable(20,20),
+                MultiSelect = true,
+                Bounds = new Rect(0,0,10,5)
+            };
+
+            /*  
+                    Sets up disconnected selections like:
+
+                    00000000000
+                    01100000000
+                    01100000000
+                    00000001100
+                    00000000000
+            */
+
+            tableView.MultiSelectedRegions.Clear();
+            tableView.MultiSelectedRegions.Push(new TableSelection(new Point(1,1),new Rect(1,1,2,2)));
+            tableView.MultiSelectedRegions.Push(new TableSelection(new Point(7,3),new Rect(7,3,2,1)));
+            
+            tableView.SelectedColumn = 8;
+            tableView.SelectedRow = 3;
+
+            var selected = tableView.GetAllSelectedCells().ToArray();
+
+            Assert.Equal(6,selected.Length);
+
+            Assert.Equal(new Point(1,1),selected[0]);
+            Assert.Equal(new Point(2,1),selected[1]);
+            Assert.Equal(new Point(1,2),selected[2]);
+            Assert.Equal(new Point(2,2),selected[3]);
+            Assert.Equal(new Point(7,3),selected[4]);
+            Assert.Equal(new Point(8,3),selected[5]);
+        }
+
         /// <summary>
 		/// Builds a simple table of string columns with the requested number of columns and rows
 		/// </summary>
