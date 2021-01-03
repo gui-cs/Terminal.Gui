@@ -331,6 +331,15 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Returns the amount of vertical space currently occupied by the header or 0 if it is not visible.
+		/// </summary>
+		/// <returns></returns>
+		private int GetHeaderHeightIfAny()
+		{
+			return ShouldRenderHeaders()? GetHeaderHeight():0;
+		}
+
+		/// <summary>
 		/// Returns the amount of vertical space required to display the header
 		/// </summary>
 		/// <returns></returns>
@@ -589,12 +598,12 @@ namespace Terminal.Gui {
 				break;
 			case Key.PageUp:
 			case Key.PageUp | Key.ShiftMask:
-				ChangeSelectionByOffset(0,-Frame.Height,keyEvent.Key.HasFlag(Key.ShiftMask));
+				ChangeSelectionByOffset(0,-(Bounds.Height - GetHeaderHeightIfAny()),keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			case Key.PageDown:
 			case Key.PageDown | Key.ShiftMask:
-				ChangeSelectionByOffset(0,Frame.Height,keyEvent.Key.HasFlag(Key.ShiftMask));
+				ChangeSelectionByOffset(0,Bounds.Height - GetHeaderHeightIfAny(),keyEvent.Key.HasFlag(Key.ShiftMask));
 				Update ();
 				break;
 			case Key.Home | Key.CtrlMask:
@@ -778,8 +787,8 @@ namespace Terminal.Gui {
 				
 				var hit = ScreenToCell(me.OfX,me.OfY);
 				if(hit != null) {
-					// TODO : if shift is held down extend selection
-					SetSelection(hit.Value.X,hit.Value.Y,false );
+					
+					SetSelection(hit.Value.X,hit.Value.Y,me.Flags.HasFlag(MouseFlags.ButtonShift));
 					Update();
 				}
 			}
@@ -808,7 +817,7 @@ namespace Terminal.Gui {
 
 			var viewPort = CalculateViewport(Bounds);
 				
-			var headerHeight = ShouldRenderHeaders()? GetHeaderHeight():0;
+			var headerHeight = GetHeaderHeightIfAny();
 
 			var col = viewPort.LastOrDefault(c=>c.X <= clientX);
 				
@@ -839,7 +848,7 @@ namespace Terminal.Gui {
 
 			var viewPort = CalculateViewport(Bounds);
 				
-			var headerHeight = ShouldRenderHeaders()? GetHeaderHeight():0;
+			var headerHeight = GetHeaderHeightIfAny();
 
 			var colHit = viewPort.FirstOrDefault(c=>c.Column.Ordinal == tableColumn);
 
@@ -916,7 +925,7 @@ namespace Terminal.Gui {
 			}
 
 			var columnsToRender = CalculateViewport (Bounds).ToArray();
-			var headerHeight = ShouldRenderHeaders()? GetHeaderHeight() : 0;
+			var headerHeight = GetHeaderHeightIfAny();
 
 			//if we have scrolled too far to the left 
 			if (SelectedColumn < columnsToRender.Min (r => r.Column.Ordinal)) {

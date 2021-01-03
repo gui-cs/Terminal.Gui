@@ -224,6 +224,39 @@ namespace UnitTests {
             Assert.False(tableView.IsSelected(1,2));
             Assert.False(tableView.IsSelected(2,2));
         }
+
+        [Fact]
+        public void PageDown_ExcludesHeaders()
+        {
+
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			driver.Init (() => { });
+
+
+            var tableView = new TableView(){
+                Table = BuildTable(25,50),
+                MultiSelect = true,
+                Bounds = new Rect(0,0,10,5)
+            };
+
+            // Header should take up 2 lines
+            tableView.Style.ShowHorizontalHeaderOverline = false;
+            tableView.Style.ShowHorizontalHeaderUnderline = true;
+            tableView.Style.AlwaysShowHeaders = false;
+
+            Assert.Equal(0,tableView.RowOffset);
+
+            tableView.ProcessKey(new KeyEvent(Key.PageDown,new KeyModifiers()));
+
+            // window height is 5 rows 2 are header so page down should give 3 new rows
+            Assert.Equal(3,tableView.RowOffset);
+
+            // header is no longer visible so page down should give 5 new rows
+            tableView.ProcessKey(new KeyEvent(Key.PageDown,new KeyModifiers()));
+            
+            Assert.Equal(8,tableView.RowOffset);
+        }
         
         /// <summary>
 		/// Builds a simple table of string columns with the requested number of columns and rows
