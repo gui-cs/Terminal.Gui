@@ -67,7 +67,7 @@ namespace Terminal.Gui {
 		public static Toplevel Top { get; private set; }
 
 		/// <summary>
-		/// The current <see cref="Toplevel"/> object. This is updated when <see cref="Application.Run()"/> enters and leaves to point to the current <see cref="Toplevel"/> .
+		/// The current <see cref="Toplevel"/> object. This is updated when <see cref="Application.Run(Func{Exception, bool})"/> enters and leaves to point to the current <see cref="Toplevel"/> .
 		/// </summary>
 		/// <value>The current.</value>
 		public static Toplevel Current { get; private set; }
@@ -643,20 +643,20 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Runs the application by calling <see cref="Run(Toplevel)"/> with the value of <see cref="Top"/>
+		/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> with the value of <see cref="Top"/>
 		/// </summary>
-		public static void Run ()
+		public static void Run (Func<Exception, bool> errorHandler = null)
 		{
-			Run (Top);
+			Run (Top, errorHandler);
 		}
 
 		/// <summary>
-		/// Runs the application by calling <see cref="Run(Toplevel)"/> with a new instance of the specified <see cref="Toplevel"/>-derived class
+		/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> with a new instance of the specified <see cref="Toplevel"/>-derived class
 		/// </summary>
-		public static void Run<T> () where T : Toplevel, new()
+		public static void Run<T> (Func<Exception, bool> errorHandler = null) where T : Toplevel, new()
 		{
 			Init (() => new T ());
-			Run (Top);
+			Run (Top, errorHandler);
 		}
 
 		/// <summary>
@@ -669,10 +669,10 @@ namespace Terminal.Gui {
 		///     run other modal <see cref="View"/>s such as <see cref="Dialog"/> boxes.
 		///   </para>
 		///   <para>
-		///     To make a <see cref="Run(Toplevel)"/> stop execution, call <see cref="Application.RequestStop"/>.
+		///     To make a <see cref="Run(Toplevel, Func{Exception, bool})"/> stop execution, call <see cref="Application.RequestStop"/>.
 		///   </para>
 		///   <para>
-		///     Calling <see cref="Run(Toplevel)"/> is equivalent to calling <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState, bool)"/>,
+		///     Calling <see cref="Run(Toplevel, Func{Exception, bool})"/> is equivalent to calling <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState, bool)"/>,
 		///     and then calling <see cref="End(RunState)"/>.
 		///   </para>
 		///   <para>
@@ -682,13 +682,33 @@ namespace Terminal.Gui {
 		///     the <see cref="RunLoop(RunState, bool)"/> method will only process any pending events, timers, idle handlers and
 		///     then return control immediately.
 		///   </para>
+		///   <para>
+		///     When <paramref name="errorHandler"/> is null the exception is rethrown, when it returns true the application is resumed and when false method exits gracefully.
+		///   </para>
 		/// </remarks>
 		/// <param name="view">The <see cref="Toplevel"/> tu run modally.</param>
-		public static void Run (Toplevel view)
+		/// <param name="errorHandler">Handler for any unhandled exceptions (resumes when returns true, rethrows when null).</param>
+		public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
 		{
-			var runToken = Begin (view);
-			RunLoop (runToken);
-			End (runToken);
+			var resume = true;
+			while (resume)
+			{
+				try
+				{
+					resume = false;
+					var runToken = Begin (view);
+					RunLoop (runToken);
+					End (runToken);
+				}
+				catch (Exception error)
+				{
+					if (errorHandler == null)
+					{
+						throw;
+					}
+					resume = errorHandler(error);
+				}
+			}
 		}
 
 		/// <summary>
@@ -696,7 +716,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		///   <para>
-		///   This will cause <see cref="Application.Run()"/> to return.
+		///   This will cause <see cref="Application.Run(Func{Exception, bool})"/> to return.
 		///   </para>
 		///   <para>
 		///     Calling <see cref="Application.RequestStop"/> is equivalent to setting the <see cref="Toplevel.Running"/> property on the curently running <see cref="Toplevel"/> to false.
