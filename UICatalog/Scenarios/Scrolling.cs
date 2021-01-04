@@ -128,8 +128,7 @@ namespace UICatalog {
 			var horizontalRuler = new Label () {
 				X = 0,
 				Y = 0,
-				Width = Dim.Fill (1),  // BUGBUG: I don't think this should be needed; DimFill() should respect container's frame. X does.
-				Height = 1,
+				Width = Dim.Fill (),  // FIXED: I don't think this should be needed; DimFill() should respect container's frame. X does.
 				ColorScheme = Colors.Error
 			};
 			scrollView.Add (horizontalRuler);
