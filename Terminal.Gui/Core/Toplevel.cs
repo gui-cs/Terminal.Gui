@@ -278,7 +278,7 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			HashSet<View> views = new HashSet<View> ();
+			IList<View> views = new List<View> ();
 
 			foreach (var v in SuperView.Subviews) {
 				views.Add (v);
