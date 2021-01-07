@@ -6,7 +6,7 @@ using System.Linq;
 using Terminal.Gui;
 using Xunit;
 
-// Alais Console to MockConsole so we don't accidentally use Console
+// Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui {
@@ -27,9 +27,9 @@ namespace Terminal.Gui {
 			Assert.Null (r.ColorScheme);
 			Assert.Equal (Dim.Sized (0), r.Width);
 			Assert.Equal (Dim.Sized (0), r.Height);
-			// BUGBUG: Pos needs eqality implemented
-			//Assert.Equal (Pos.At (0), r.X);
-			//Assert.Equal (Pos.At (0), r.Y);
+			// FIXED: Pos needs equality implemented
+			Assert.Equal (Pos.At (0), r.X);
+			Assert.Equal (Pos.At (0), r.Y);
 			Assert.False (r.IsCurrentTop);
 			Assert.Empty (r.Id);
 			Assert.Empty (r.Subviews);
@@ -1076,6 +1076,33 @@ namespace Terminal.Gui {
 			Assert.Equal (4, view.Height);
 			Assert.True (view.Frame.IsEmpty);
 			Assert.True (view.Bounds.IsEmpty);
+		}
+
+		[Fact]
+		public void GetToplevelSubviews_Ensure_Order_List ()
+		{
+			var top = new Toplevel ();
+
+			for (int i = 0; i < 6; i++) {
+				var view = new View ($"View{i}");
+				top.Add (view);
+			}
+
+			IList<View> views = new List<View> ();
+
+			var idx = 0;
+			foreach (var v in top.Subviews) {
+				views.Add (v);
+				Assert.Equal ($"View{idx}", v.Text);
+				idx++;
+			}
+
+			idx = top.Subviews.Count - 1;
+			foreach (var v in top.Subviews.Reverse ()) {
+				views.Add (v);
+				Assert.Equal ($"View{idx}", v.Text);
+				idx--;
+			}
 		}
 	}
 }
