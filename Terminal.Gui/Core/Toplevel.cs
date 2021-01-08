@@ -195,7 +195,7 @@ namespace Terminal.Gui {
 			if (base.ProcessKey (keyEvent))
 				return true;
 
-			switch (keyEvent.Key) {
+			switch (ShortcutHelper.GetModifiersKey (keyEvent)) {
 			case Key.Q | Key.CtrlMask:
 				// FIXED: stop current execution of this container
 				Application.RequestStop ();
@@ -224,9 +224,9 @@ namespace Terminal.Gui {
 					FocusNearestView (SuperView?.Subviews, Direction.Forward);
 				}
 				return true;
+			case Key.BackTab | Key.ShiftMask:
 			case Key.CursorLeft:
 			case Key.CursorUp:
-			case Key.BackTab:
 				old = GetDeepestFocusedSubview (Focused);
 				if (!FocusPrev ())
 					FocusPrev ();
@@ -237,7 +237,12 @@ namespace Terminal.Gui {
 					FocusNearestView (SuperView?.Subviews?.Reverse(), Direction.Backward);
 				}
 				return true;
-
+			case Key.Tab | Key.CtrlMask:
+				Application.Top.FocusNext ();
+				return true;
+			case Key.Tab | Key.ShiftMask | Key.CtrlMask:
+				Application.Top.FocusPrev ();
+				return true;
 			case Key.L | Key.CtrlMask:
 				Application.Refresh ();
 				return true;
