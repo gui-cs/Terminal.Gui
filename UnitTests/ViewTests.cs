@@ -1079,30 +1079,35 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void GetToplevelSubviews_Ensure_Order_List ()
+		public void FocusNearestView_Ensure_Focus_Ordered ()
 		{
 			var top = new Toplevel ();
 
-			for (int i = 0; i < 6; i++) {
-				var view = new View ($"View{i}");
-				top.Add (view);
-			}
+			var win = new Window ();
+			var winSubview = new View ("WindowSubview") {
+				CanFocus = true
+			};
+			win.Add (winSubview);
+			top.Add (win);
 
-			IList<View> views = new List<View> ();
+			var frm = new FrameView ();
+			var frmSubview = new View ("FrameSubview") {
+				CanFocus = true
+			};
+			frm.Add (frmSubview);
+			top.Add (frm);
 
-			var idx = 0;
-			foreach (var v in top.Subviews) {
-				views.Add (v);
-				Assert.Equal ($"View{idx}", v.Text);
-				idx++;
-			}
+			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
+			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
+			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
+			Assert.Equal ("FrameSubview", top.MostFocused.Text);
+			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
+			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 
-			idx = top.Subviews.Count - 1;
-			foreach (var v in top.Subviews.Reverse ()) {
-				views.Add (v);
-				Assert.Equal ($"View{idx}", v.Text);
-				idx--;
-			}
+			top.ProcessKey (new KeyEvent (Key.BackTab, new KeyModifiers ()));
+			Assert.Equal ("FrameSubview", top.MostFocused.Text);
+			top.ProcessKey (new KeyEvent (Key.BackTab, new KeyModifiers ()));
+			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 		}
 	}
 }

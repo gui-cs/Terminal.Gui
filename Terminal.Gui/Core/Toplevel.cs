@@ -217,11 +217,11 @@ namespace Terminal.Gui {
 				var old = GetDeepestFocusedSubview (Focused);
 				if (!FocusNext ())
 					FocusNext ();
-				if (old != Focused) {
+				if (old != Focused && old != Focused?.Focused) {
 					old?.SetNeedsDisplay ();
 					Focused?.SetNeedsDisplay ();
 				} else {
-					FocusNearestView (GetToplevelSubviews (true));
+					FocusNearestView (SuperView?.Subviews, Direction.Forward);
 				}
 				return true;
 			case Key.CursorLeft:
@@ -230,11 +230,11 @@ namespace Terminal.Gui {
 				old = GetDeepestFocusedSubview (Focused);
 				if (!FocusPrev ())
 					FocusPrev ();
-				if (old != Focused) {
+				if (old != Focused && old != Focused?.Focused) {
 					old?.SetNeedsDisplay ();
 					Focused?.SetNeedsDisplay ();
 				} else {
-					FocusNearestView (GetToplevelSubviews (false));
+					FocusNearestView (SuperView?.Subviews?.Reverse(), Direction.Backward);
 				}
 				return true;
 
@@ -272,39 +272,34 @@ namespace Terminal.Gui {
 			return view;
 		}
 
-		IEnumerable<View> GetToplevelSubviews (bool isForward)
-		{
-			if (SuperView == null) {
-				return null;
-			}
-
-			IList<View> views = new List<View> ();
-
-			foreach (var v in SuperView.Subviews) {
-				views.Add (v);
-			}
-
-			return isForward ? views : views.Reverse ();
-		}
-
-		void FocusNearestView (IEnumerable<View> views)
+		void FocusNearestView (IEnumerable<View> views, Direction direction)
 		{
 			if (views == null) {
 				return;
 			}
 
 			bool found = false;
+			bool focusProcessed = false;
+			int idx = 0;
 
 			foreach (var v in views) {
 				if (v == this) {
 					found = true;
 				}
 				if (found && v != this) {
-					v.EnsureFocus ();
+					if (direction == Direction.Forward) {
+						SuperView?.FocusNext ();
+					} else {
+						SuperView?.FocusPrev ();
+					}
+					focusProcessed = true;
 					if (SuperView.Focused != null && SuperView.Focused != this) {
 						return;
 					}
+				} else if (found && !focusProcessed && idx == views.Count () - 1) {
+					views.ToList () [0].SetFocus ();
 				}
+				idx++;
 			}
 		}
 
