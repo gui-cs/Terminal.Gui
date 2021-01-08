@@ -1104,9 +1104,9 @@ namespace Terminal.Gui {
 			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 
-			top.ProcessKey (new KeyEvent (Key.BackTab, new KeyModifiers ()));
+			top.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
 			Assert.Equal ("FrameSubview", top.MostFocused.Text);
-			top.ProcessKey (new KeyEvent (Key.BackTab, new KeyModifiers ()));
+			top.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 		}
 	}
