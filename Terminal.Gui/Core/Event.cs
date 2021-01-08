@@ -392,7 +392,7 @@ namespace Terminal.Gui {
 		/// Gets a value indicating whether the Shift key was pressed.
 		/// </summary>
 		/// <value><c>true</c> if is shift; otherwise, <c>false</c>.</value>
-		public bool IsShift => keyModifiers.Shift;
+		public bool IsShift => keyModifiers.Shift || Key == Key.BackTab;
 
 		/// <summary>
 		/// Gets a value indicating whether the Alt key was pressed (real or synthesized)
