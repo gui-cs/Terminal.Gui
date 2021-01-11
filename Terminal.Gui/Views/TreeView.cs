@@ -48,7 +48,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public override string ToString()
 		{
-			return Text;
+			return Text ?? "Unamed Node";
 		}
 
 		/// <summary>
@@ -338,7 +338,7 @@ namespace Terminal.Gui {
 		/// Returns the string representation of model objects hosted in the tree.  Default implementation is to call <see cref="object.ToString"/>
 		/// </summary>
 		/// <value></value>
-		public AspectGetterDelegate<T> AspectGetter {get;set;} = (o)=>o.ToString();
+		public AspectGetterDelegate<T> AspectGetter {get;set;} = (o)=>o.ToString() ?? "";
 
 		/// <summary>
 		/// Creates a new tree view with absolute positioning.  Use <see cref="AddObjects(IEnumerable{T})"/> to set set root objects for the tree.  Children will not be rendered until you set <see cref="TreeBuilder"/>
