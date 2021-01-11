@@ -13,6 +13,7 @@ namespace UICatalog {
 		private string _fileName = "demo.txt";
 		private TextView _textView;
 		private bool _saved = true;
+		private ScrollBarView _vertical;
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
@@ -35,6 +36,7 @@ namespace UICatalog {
 					new MenuItem ("C_ut", "", () => Cut()),
 					new MenuItem ("_Paste", "", () => Paste())
 				}),
+				new MenuBarItem ("_ScrollBarView", CreateKeepChecked ())
 			});
 			Top.Add (menu);
 
@@ -67,6 +69,41 @@ namespace UICatalog {
 			LoadFile ();
 
 			Win.Add (_textView);
+
+			_vertical = new ScrollBarView (_textView, true);
+			var horizontal = new ScrollBarView (_textView, false);
+			_vertical.OtherScrollBarView = horizontal;
+			horizontal.OtherScrollBarView = _vertical;
+
+			_vertical.ChangedPosition += () => {
+				_textView.TopRow = _vertical.Position;
+				if (_textView.TopRow != _vertical.Position) {
+					_vertical.Position = _textView.TopRow;
+				}
+				_textView.SetNeedsDisplay ();
+			};
+
+			horizontal.ChangedPosition += () => {
+				_textView.LeftColumn = horizontal.Position;
+				if (_textView.LeftColumn != horizontal.Position) {
+					horizontal.Position = _textView.LeftColumn;
+				}
+				_textView.SetNeedsDisplay ();
+			};
+
+			_textView.DrawContent += (e) => {
+				_vertical.Size = _textView.Lines - 1;
+				_vertical.ContentOffset = _textView.TopRow;
+				horizontal.Size = _textView.Maxlength - 1;
+				horizontal.ContentOffset = _textView.LeftColumn;
+				_vertical.ColorScheme = horizontal.ColorScheme = _textView.ColorScheme;
+				if (_vertical.ShowScrollIndicator) {
+					_vertical.Redraw (e);
+				}
+				if (horizontal.ShowScrollIndicator) {
+					horizontal.Redraw (e);
+				}
+			};
 		}
 
 		public override void Setup ()
@@ -145,9 +182,23 @@ namespace UICatalog {
 			sb.Append ("Hello world.\n");
 			sb.Append ("This is a test of the Emergency Broadcast System.\n");
 
+			for (int i = 0; i < 40; i++) {
+				sb.Append ("This is a test with a very long line and many lines to test the ScrollViewBar against the TextView.\n");
+			}
 			var sw = System.IO.File.CreateText (fileName);
 			sw.Write (sb.ToString ());
 			sw.Close ();
+		}
+
+		private MenuItem [] CreateKeepChecked ()
+		{
+			var item = new MenuItem ();
+			item.Title = "Keep Content Always In Viewport";
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = true;
+			item.Action += () => _vertical.KeepContentAlwaysInViewport = item.Checked = !item.Checked;
+
+			return new MenuItem [] { item };
 		}
 
 		public override void Run ()

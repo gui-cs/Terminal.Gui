@@ -6,7 +6,7 @@ using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog {
-	[ScenarioMetadata (Name: "List View With Selection", Description: "ListView with colunns and selection")]
+	[ScenarioMetadata (Name: "List View With Selection", Description: "ListView with columns and selection")]
 	[ScenarioCategory ("Controls")]
 	class ListViewWithSelection : Scenario {
 
@@ -55,9 +55,34 @@ namespace UICatalog {
 			};
 			Win.Add (_listView);
 
-			
+			var vertical = new ScrollBarView (_listView, true);
+
+			vertical.ChangedPosition += () => {
+				_listView.TopItem = vertical.Position;
+				if (_listView.TopItem != vertical.Position) {
+					vertical.Position = _listView.TopItem;
+				}
+				_listView.SetNeedsDisplay ();
+			};
+
+			_listView.DrawContent += (e) => {
+				vertical.Size = _listView.Source.Count;
+				vertical.ContentOffset = _listView.TopItem;
+				vertical.ColorScheme = _listView.ColorScheme;
+				if (vertical.ShowScrollIndicator) {
+					vertical.Redraw (e);
+				}
+			};
+
 			_listView.SetSource (_scenarios);
 
+			var k = "Keep Content Always In Viewport";
+			var keepCheckBox = new CheckBox (k, vertical.AutoHideScrollBars) {
+				X = Pos.AnchorEnd (k.Length + 3),
+				Y = 0,
+			};
+			keepCheckBox.Toggled += (_) => vertical.KeepContentAlwaysInViewport = keepCheckBox.Checked;
+			Win.Add (keepCheckBox);
 		}
 
 		private void _customRenderCB_Toggled (bool prev)
@@ -84,7 +109,7 @@ namespace UICatalog {
 			Win.SetNeedsDisplay ();
 		}
 
-		// This is basicaly the same implementation used by the UICatalog main window
+		// This is basically the same implementation used by the UICatalog main window
 		internal class ScenarioListDataSource : IListDataSource {
 			int _nameColumnWidth = 30;
 			private List<Type> scenarios;

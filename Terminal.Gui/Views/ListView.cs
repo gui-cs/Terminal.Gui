@@ -298,11 +298,6 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (current);
 			Move (0, 0);
 			var f = Frame;
-			if (selected < top) {
-				top = selected;
-			} else if (selected >= top + f.Height) {
-				top = selected;
-			}
 			var item = top;
 			bool focused = HasFocus;
 			int col = allowsMarking ? 2 : 0;
@@ -477,8 +472,11 @@ namespace Terminal.Gui {
 			} else if (selected + 1 < source.Count) { //can move by down by one.
 				selected++;
 
-				if (selected >= top + Frame.Height)
+				if (selected >= top + Frame.Height) {
 					top++;
+				} else if (selected < top) {
+					top = selected;
+				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			} else if (selected == 0) {
@@ -511,8 +509,11 @@ namespace Terminal.Gui {
 				if (selected > Source.Count) {
 					selected = Source.Count - 1;
 				}
-				if (selected < top)
+				if (selected < top) {
 					top = selected;
+				} else if (selected > top + Frame.Height) {
+					top = Math.Max (selected - Frame.Height + 1, 0);
+				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			}
@@ -549,6 +550,26 @@ namespace Terminal.Gui {
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Scrolls the view down.
+		/// </summary>
+		/// <param name="lines">Number of lines to scroll down.</param>
+		public virtual void ScrollDown (int lines)
+		{
+			top = Math.Min (top + lines, source.Count - 1);
+			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Scrolls the view up.
+		/// </summary>
+		/// <param name="lines">Number of lines to scroll up.</param>
+		public virtual void ScrollUp (int lines)
+		{
+			top = Math.Max (top - lines, 0);
+			SetNeedsDisplay ();
 		}
 
 		int lastSelectedItem = -1;
@@ -630,10 +651,10 @@ namespace Terminal.Gui {
 			}
 
 			if (me.Flags == MouseFlags.WheeledDown) {
-				MoveDown ();
+				ScrollDown (1);
 				return true;
 			} else if (me.Flags == MouseFlags.WheeledUp) {
-				MoveUp ();
+				ScrollUp (1);
 				return true;
 			}
 
@@ -655,6 +676,8 @@ namespace Terminal.Gui {
 
 			return true;
 		}
+
+
 	}
 
 	/// <summary>

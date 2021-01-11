@@ -741,7 +741,7 @@ namespace Terminal.Gui {
 		public void SetChildNeedsDisplay ()
 		{
 			ChildNeedsDisplay = true;
-			if (container != null)
+			if (container != null && !container.ChildNeedsDisplay)
 				container.SetChildNeedsDisplay ();
 		}
 
@@ -1342,6 +1342,7 @@ namespace Terminal.Gui {
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0)
 							if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
+								view.OnDrawContent (view.Bounds);
 								view.Redraw (view.Bounds);
 							}
 						}
