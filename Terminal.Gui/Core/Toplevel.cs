@@ -221,7 +221,7 @@ namespace Terminal.Gui {
 					old?.SetNeedsDisplay ();
 					Focused?.SetNeedsDisplay ();
 				} else {
-					FocusNearestView (SuperView?.Subviews, Direction.Forward);
+					FocusNearestView (SuperView?.TabIndexes, Direction.Forward);
 				}
 				return true;
 			case Key.BackTab | Key.ShiftMask:
@@ -234,7 +234,7 @@ namespace Terminal.Gui {
 					old?.SetNeedsDisplay ();
 					Focused?.SetNeedsDisplay ();
 				} else {
-					FocusNearestView (SuperView?.Subviews?.Reverse(), Direction.Backward);
+					FocusNearestView (SuperView?.TabIndexes?.Reverse(), Direction.Backward);
 				}
 				return true;
 			case Key.Tab | Key.CtrlMask:
