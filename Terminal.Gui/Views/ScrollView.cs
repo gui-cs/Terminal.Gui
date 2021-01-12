@@ -117,7 +117,9 @@ namespace Terminal.Gui {
 			set {
 				contentOffset = new Point (-Math.Abs (value.X), -Math.Abs (value.Y));
 				contentView.Frame = new Rect (contentOffset, contentSize);
+				vertical.ContentOffset = -contentOffset.Y;
 				vertical.Position = Math.Max (0, -contentOffset.Y);
+				horizontal.ContentOffset = -contentOffset.X;
 				horizontal.Position = Math.Max (0, -contentOffset.X);
 				SetNeedsDisplay ();
 			}
