@@ -126,11 +126,11 @@ namespace Terminal.Gui {
 			set {
 				var co = -Math.Abs (value);
 				if (contentOffset != co) {
-					if (CanScroll (contentOffset - co, out int max, vertical)) {
+					if (CanScroll (value + contentOffset, out int max, vertical) || max > 0) {
 						if (max == contentOffset - co) {
 							contentOffset = co;
 						} else {
-							contentOffset = co + max;
+							contentOffset = -max;
 						}
 					}
 					Position = Math.Max (0, -contentOffset);

@@ -94,7 +94,7 @@ namespace UICatalog {
 			_textView.DrawContent += (e) => {
 				_vertical.Size = _textView.Lines - 1;
 				_vertical.ContentOffset = _textView.TopRow;
-				horizontal.Size = _textView.Maxlength;
+				horizontal.Size = _textView.Maxlength + 1;
 				horizontal.ContentOffset = _textView.LeftColumn;
 				_vertical.ColorScheme = horizontal.ColorScheme = _textView.ColorScheme;
 				if (_vertical.ShowScrollIndicator) {
