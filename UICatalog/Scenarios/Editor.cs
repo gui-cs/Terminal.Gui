@@ -94,7 +94,7 @@ namespace UICatalog {
 			_textView.DrawContent += (e) => {
 				_vertical.Size = _textView.Lines - 1;
 				_vertical.ContentOffset = _textView.TopRow;
-				horizontal.Size = _textView.Maxlength - 1;
+				horizontal.Size = _textView.Maxlength;
 				horizontal.ContentOffset = _textView.LeftColumn;
 				_vertical.ColorScheme = horizontal.ColorScheme = _textView.ColorScheme;
 				if (_vertical.ShowScrollIndicator) {
@@ -182,8 +182,8 @@ namespace UICatalog {
 			sb.Append ("Hello world.\n");
 			sb.Append ("This is a test of the Emergency Broadcast System.\n");
 
-			for (int i = 0; i < 40; i++) {
-				sb.Append ("This is a test with a very long line and many lines to test the ScrollViewBar against the TextView.\n");
+			for (int i = 0; i < 30; i++) {
+				sb.Append ($"{i} - This is a test with a very long line and many lines to test the ScrollViewBar against the TextView. - {i}\n");
 			}
 			var sw = System.IO.File.CreateText (fileName);
 			sw.Write (sb.ToString ());

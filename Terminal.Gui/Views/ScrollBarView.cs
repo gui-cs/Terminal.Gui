@@ -29,7 +29,7 @@ namespace Terminal.Gui {
 		bool autoHideScrollBars = true;
 		Dim originalHostWidth, originalHostHeight;
 		bool hosted;
-		bool showBothScrollIndicator => OtherScrollBarView != null && OtherScrollBarView.showScrollIndicator;
+		bool showBothScrollIndicator => OtherScrollBarView != null && OtherScrollBarView.showScrollIndicator && showScrollIndicator;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Absolute"/> layout.
@@ -256,38 +256,35 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (vertical) {
-				if (Host.Bounds.Height == 0 || Host.Bounds.Height > size) {
-					if (showScrollIndicator) {
-						ShowScrollIndicator = false;
+			int barsize = vertical ? Bounds.Height : Bounds.Width;
+
+			if (barsize == 0 || barsize > size) {
+				if (showScrollIndicator) {
+					ShowScrollIndicator = false;
+				}
+			} else if (barsize > 0 && barsize == size && OtherScrollBarView != null && OtherScrollBarView.pending) {
+				if (showScrollIndicator) {
+					ShowScrollIndicator = false;
+				}
+				if (OtherScrollBarView != null && showBothScrollIndicator) {
+					OtherScrollBarView.ShowScrollIndicator = false;
+				}
+			} else if (barsize > 0 && barsize == size && OtherScrollBarView != null && !OtherScrollBarView.pending) {
+				pending = true;
+				OtherScrollBarView.Redraw (OtherScrollBarView.Bounds);
+			} else {
+				if (OtherScrollBarView != null && OtherScrollBarView.pending) {
+					if (!showBothScrollIndicator) {
+						OtherScrollBarView.ShowScrollIndicator = true;
+						OtherScrollBarView.Redraw (OtherScrollBarView.Bounds);
 					}
-				} else if (Host.Bounds.Height > 0 && Host.Bounds.Height == size) {
-					pending = true;
-				} else if (!showScrollIndicator) {
+				}
+				if (!showScrollIndicator) {
 					ShowScrollIndicator = true;
 				}
-			} else {
-				if (Host.Bounds.Width == 0 || Host.Bounds.Width > size) {
-					if (showScrollIndicator) {
-						ShowScrollIndicator = false;
-					}
-				} else if (Host.Bounds.Width > 0 && Host.Bounds.Width == size && OtherScrollBarView.pending) {
-					if (showScrollIndicator) {
-						ShowScrollIndicator = false;
-					}
-					if (showBothScrollIndicator) {
-						OtherScrollBarView.showScrollIndicator = false;
-					}
-				} else {
-					if (OtherScrollBarView.pending) {
-						if (!showBothScrollIndicator) {
-							OtherScrollBarView.showScrollIndicator = true;
-						}
-					}
-					if (!showScrollIndicator) {
-						ShowScrollIndicator = true;
-					}
-				}
+			}
+			if (OtherScrollBarView != null) {
+				OtherScrollBarView.pending = false;
 			}
 		}
 
