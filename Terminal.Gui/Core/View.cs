@@ -1342,8 +1342,8 @@ namespace Terminal.Gui {
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0)
 							if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
-								view.OnDrawContent (view.Bounds);
 								view.Redraw (view.Bounds);
+								view.OnDrawContent (view.Bounds);
 							}
 						}
 						view.NeedDisplay = Rect.Empty;

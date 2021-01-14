@@ -147,6 +147,32 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
+		public void ChangedPosition_Scrolling ()
+		{
+			Hosting_A_View_To_A_ScrollBarView ();
+
+			AddHandlers ();
+
+			for (int i = 0; i < _vertical.Size; i++) {
+				_vertical.Position += 1;
+				Assert.Equal (_vertical.Position, _hostView.Top);
+			}
+			for (int i = _vertical.Size - 1; i >= 0; i--) {
+				_vertical.Position -= 1;
+				Assert.Equal (_vertical.Position, _hostView.Top);
+			}
+
+			for (int i = 0; i < _horizontal.Size; i++) {
+				_horizontal.Position += i;
+				Assert.Equal (_horizontal.Position, _hostView.Left);
+			}
+			for (int i = _horizontal.Size - 1; i >= 0; i--) {
+				_horizontal.Position -= 1;
+				Assert.Equal (_horizontal.Position, _hostView.Left);
+			}
+		}
+
+		[Fact]
 		public void ChangedPosition_Negative_Value ()
 		{
 			Hosting_A_View_To_A_ScrollBarView ();

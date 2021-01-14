@@ -137,7 +137,7 @@ namespace Terminal.Gui {
 						if (max > 0 && max == value - position) {
 							position = value;
 						} else {
-							position = Math.Max (max, 0);
+							position = Math.Max (position + max, 0);
 						}
 					}
 					OnChangedPosition ();
