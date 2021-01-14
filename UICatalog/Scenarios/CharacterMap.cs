@@ -143,7 +143,7 @@ namespace UICatalog {
 				Move (viewport.X + RowHeaderWidth + (header * H_SPACE), 0);
 				Driver.AddStr ($" {header:x} ");
 			}
-			for (int row = 0, y = 0; row < viewport.Height / 2 - 1; row++, y+= V_SPACE) {
+			for (int row = -ContentOffset.Y, y = 0; row < -ContentOffset.Y + viewport.Height / 2 - 1; row++, y+= V_SPACE) {
 				int val = (-viewport.Y + row) * 16;
 				if (val < MaxCodePointVal) {
 					var rowLabel = $"U+{val / 16:x4}x";

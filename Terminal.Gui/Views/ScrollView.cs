@@ -78,6 +78,8 @@ namespace Terminal.Gui {
 
 			MouseEnter += View_MouseEnter;
 			MouseLeave += View_MouseLeave;
+			contentView.MouseEnter += View_MouseEnter;
+			contentView.MouseLeave += View_MouseLeave;
 		}
 
 		Size contentSize;
@@ -115,11 +117,20 @@ namespace Terminal.Gui {
 				return contentOffset;
 			}
 			set {
-				contentOffset = new Point (-Math.Abs (value.X), -Math.Abs (value.Y));
-				contentView.Frame = new Rect (contentOffset, contentSize);
-				vertical.Position = Math.Max (0, -contentOffset.Y);
-				horizontal.Position = Math.Max (0, -contentOffset.X);
-				SetNeedsDisplay ();
+				var co = new Point (-Math.Abs (value.X), -Math.Abs (value.Y));
+				if (contentOffset != co) {
+					contentOffset = co;
+					contentView.Frame = new Rect (contentOffset, contentSize);
+					var p = Math.Max (0, -contentOffset.Y);
+					if (vertical.Position != p) {
+						vertical.Position = Math.Max (0, -contentOffset.Y);
+					}
+					p = Math.Max (0, -contentOffset.X);
+					if (horizontal.Position != p) {
+						horizontal.Position = Math.Max (0, -contentOffset.X);
+					}
+					SetNeedsDisplay ();
+				}
 			}
 		}
 
@@ -180,7 +191,9 @@ namespace Terminal.Gui {
 
 		void View_MouseLeave (MouseEventArgs e)
 		{
-			Application.UngrabMouse ();
+			if (Application.mouseGrabView != null && Application.mouseGrabView != vertical && Application.mouseGrabView != horizontal) {
+				Application.UngrabMouse ();
+			}
 		}
 
 		void View_MouseEnter (MouseEventArgs e)

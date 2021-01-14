@@ -222,12 +222,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void SetPosition (int newPos)
-		{
-			Position = newPos;
-			OnChangedPosition ();
-		}
-
 		/// <summary>
 		/// Virtual method to invoke the <see cref="ChangedPosition"/> action event.
 		/// </summary>
@@ -435,28 +429,42 @@ namespace Terminal.Gui {
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
-				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
+				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) &&
+				me.Flags != MouseFlags.Button1Released && me.Flags != MouseFlags.WheeledDown &&
+				me.Flags != MouseFlags.WheeledUp && me.Flags != MouseFlags.WheeledRight &&
+				me.Flags != MouseFlags.WheeledLeft) {
 				return false;
-			}
-
-			if (!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
-				lastLocation = -1;
 			}
 
 			int location = vertical ? me.Y : me.X;
 			int barsize = vertical ? Bounds.Height : Bounds.Width;
 			int posTopLeftTee = vertical ? posTopTee : posLeftTee;
 			int posBottomRightTee = vertical ? posBottomTee : posRightTee;
-
 			barsize -= 2;
 			var pos = Position;
+
+			if ((me.Flags.HasFlag (MouseFlags.Button1Pressed) ||
+				me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
+				&& (Application.mouseGrabView == null || Application.mouseGrabView != this)) {
+				Application.GrabMouse (this);
+			} else if (me.Flags == MouseFlags.Button1Released && Application.mouseGrabView != null && Application.mouseGrabView == this) {
+				Application.UngrabMouse ();
+				return true;
+			} else if (showScrollIndicator && (me.Flags == MouseFlags.WheeledDown || me.Flags == MouseFlags.WheeledUp ||
+				me.Flags == MouseFlags.WheeledRight || me.Flags == MouseFlags.WheeledLeft)) {
+				return Host.MouseEvent (me);
+			}
+
+			if (!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
+				lastLocation = -1;
+			}
 			if (location == 0) {
 				if (pos > 0) {
-					SetPosition (pos - 1);
+					Position = pos - 1;
 				}
 			} else if (location == barsize + 1) {
 				if (CanScroll (1, out _, vertical)) {
-					SetPosition (pos + 1);
+					Position = pos + 1;
 				}
 			} else if (location > 0 && location < barsize + 1) {
 				var b1 = pos * barsize / Size;
@@ -468,11 +476,11 @@ namespace Terminal.Gui {
 				if (location > b1 && location <= b2 + 1) {
 					if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1Clicked) {
 						if (location == 1) {
-							SetPosition (0);
+							Position = 0;
 						} else if (location == barsize) {
 							CanScroll (Size - pos, out int nv, vertical);
 							if (nv > 0) {
-								SetPosition (Math.Min (pos + nv, Size));
+								Position = Math.Min (pos + nv, Size);
 							}
 						}
 					} else if (me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
@@ -481,12 +489,12 @@ namespace Terminal.Gui {
 						if ((location >= b1 && location <= ml) || (location < lastLocation && lastLocation > -1)) {
 							lastLocation = location;
 							var np = b1 * Size / barsize;
-							SetPosition (np);
+							Position = np;
 						} else if (location > lastLocation) {
 							var np = location * Size / barsize;
 							CanScroll (np - pos, out int nv, vertical);
 							if (nv > 0) {
-								SetPosition (pos + nv);
+								Position = pos + nv;
 							}
 						}
 					}
@@ -494,10 +502,10 @@ namespace Terminal.Gui {
 					if (location >= b2 + 1 && location > posTopLeftTee && location > b1 && location > posBottomRightTee && posBottomRightTee > 0) {
 						CanScroll (location, out int nv, vertical);
 						if (nv > 0) {
-							SetPosition (Math.Min (pos + nv, Size));
+							Position = Math.Min (pos + nv, Size);
 						}
 					} else if (location <= b1) {
-						SetPosition (Math.Max (pos - barsize - location, 0));
+						Position = Math.Max (pos - barsize - location, 0);
 					}
 				}
 			}
