@@ -67,7 +67,7 @@ namespace UICatalog {
 
 			_listView.DrawContent += (e) => {
 				vertical.Size = _listView.Source.Count;
-				vertical.ContentOffset = _listView.TopItem;
+				vertical.Position = _listView.TopItem;
 				vertical.ColorScheme = _listView.ColorScheme;
 				if (vertical.ShowScrollIndicator) {
 					vertical.Redraw (e);

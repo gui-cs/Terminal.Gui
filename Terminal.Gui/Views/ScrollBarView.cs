@@ -23,7 +23,7 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class ScrollBarView : View {
 		bool vertical;
-		int size, position, contentOffset;
+		int size, position;
 		bool showScrollIndicator;
 		bool keepContentAlwaysInViewport = true;
 		bool autoHideScrollBars = true;
@@ -70,6 +70,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public ScrollBarView (View host, bool isVertical) : this (0, 0, isVertical)
 		{
+			if (host == null) {
+				throw new ArgumentNullException ("The host parameter can't be null.");
+			} else if (host.SuperView == null) {
+				throw new ArgumentNullException ("The host SuperView parameter can't be null.");
+			}
 			hosted = true;
 			originalHostWidth = host.Width;
 			originalHostHeight = host.Height;
@@ -116,31 +121,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Represents the top left/top corner coordinate that is displayed by the scrollbar.
-		/// </summary>
-		/// <value>The content offset.</value>
-		public int ContentOffset {
-			get {
-				return contentOffset;
-			}
-			set {
-				var co = -Math.Abs (value);
-				if (contentOffset != co) {
-					if (CanScroll (value + contentOffset, out int max, vertical) || max > 0) {
-						if (max == contentOffset - co) {
-							contentOffset = co;
-						} else {
-							contentOffset = -max;
-						}
-					}
-					Position = Math.Max (0, -contentOffset);
-					OnChangedPosition ();
-					SetNeedsDisplay ();
-				}
-			}
-		}
-
-		/// <summary>
 		/// This event is raised when the position on the scrollbar has changed.
 		/// </summary>
 		public event Action ChangedPosition;
@@ -152,8 +132,17 @@ namespace Terminal.Gui {
 		public int Position {
 			get => position;
 			set {
-				position = value;
-				SetNeedsDisplay ();
+				if (position != value) {
+					if (CanScroll (value - position, out int max, vertical) || max > 0) {
+						if (max > 0 && max == value - position) {
+							position = value;
+						} else {
+							position = Math.Max (max, 0);
+						}
+					}
+					OnChangedPosition ();
+					SetNeedsDisplay ();
+				}
 			}
 		}
 
@@ -203,15 +192,15 @@ namespace Terminal.Gui {
 			set {
 				if (keepContentAlwaysInViewport != value) {
 					keepContentAlwaysInViewport = value;
-					int co = 0;
-					if (value && !vertical && -contentOffset + Host.Bounds.Width > size) {
-						co = size - Host.Bounds.Width + (showBothScrollIndicator ? 1 : 0);
+					int pos = 0;
+					if (value && !vertical && position + Host.Bounds.Width > size) {
+						pos = size - Host.Bounds.Width + (showBothScrollIndicator ? 1 : 0);
 					}
-					if (value && vertical && -contentOffset + Host.Bounds.Height > size) {
-						co = size - Host.Bounds.Height + (showBothScrollIndicator ? 1 : 0);
+					if (value && vertical && position + Host.Bounds.Height > size) {
+						pos = size - Host.Bounds.Height + (showBothScrollIndicator ? 1 : 0);
 					}
-					if (co != 0) {
-						ContentOffset = co;
+					if (pos != 0) {
+						Position = pos;
 					}
 					if (OtherScrollBarView != null && OtherScrollBarView.keepContentAlwaysInViewport != value) {
 						OtherScrollBarView.KeepContentAlwaysInViewport = value;
@@ -236,7 +225,6 @@ namespace Terminal.Gui {
 		void SetPosition (int newPos)
 		{
 			Position = newPos;
-			ContentOffset = Position;
 			OnChangedPosition ();
 		}
 
@@ -432,7 +420,7 @@ namespace Terminal.Gui {
 						Driver.AddRune (special);
 					}
 					if (!hasLeftTee) {
-						Move (Bounds.Width -2, row);
+						Move (Bounds.Width - 2, row);
 						Driver.AddRune (Driver.LeftTee);
 					}
 
@@ -519,14 +507,12 @@ namespace Terminal.Gui {
 
 		internal bool CanScroll (int n, out int max, bool isVertical = false)
 		{
-			var size = isVertical ?
+			var s = isVertical ?
 				(KeepContentAlwaysInViewport ? Host.Bounds.Height + (showBothScrollIndicator ? -2 : -1) : 0) :
 				(KeepContentAlwaysInViewport ? Host.Bounds.Width + (showBothScrollIndicator ? -2 : -1) : 0);
-			var cSize = -Size;
-			var cOffSet = contentOffset;
-			var newSize = Math.Max (cSize, cOffSet - n);
-			max = cSize < newSize - size ? n : -cSize + (cOffSet - size) - 1;
-			if (cSize < newSize - size) {
+			var newSize = Math.Min (size, position + n);
+			max = size > s + newSize ? n : size - (s + position) - 1;
+			if (size > s + newSize) {
 				return true;
 			}
 			return false;
