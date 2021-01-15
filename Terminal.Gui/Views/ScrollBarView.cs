@@ -479,8 +479,10 @@ namespace Terminal.Gui {
 					Position = pos + 1;
 				}
 			} else if (location > 0 && location < barsize + 1) {
-				var b1 = pos * barsize / Size;
-				var b2 = KeepContentAlwaysInViewport ? Math.Min (((pos + barsize) * barsize / Size) + 1, barsize - 1) : (pos + barsize) * barsize / Size;
+				var b1 = pos * (Size > 0 ? barsize / Size : 0);
+				var b2 = Size > 0
+					? (KeepContentAlwaysInViewport ? Math.Min (((pos + barsize) * barsize / Size) + 1, barsize - 1) : (pos + barsize) * barsize / Size)
+					: 0;
 				if (KeepContentAlwaysInViewport && b1 == b2) {
 					b1 = Math.Max (b1 - 1, 0);
 				}
@@ -527,6 +529,9 @@ namespace Terminal.Gui {
 
 		internal bool CanScroll (int n, out int max, bool isVertical = false)
 		{
+			if (Host == null) {
+				throw new ArgumentNullException ("The host can't be null.");
+			}
 			var s = isVertical ?
 				(KeepContentAlwaysInViewport ? Host.Bounds.Height + (showBothScrollIndicator ? -2 : -1) : 0) :
 				(KeepContentAlwaysInViewport ? Host.Bounds.Width + (showBothScrollIndicator ? -2 : -1) : 0);
