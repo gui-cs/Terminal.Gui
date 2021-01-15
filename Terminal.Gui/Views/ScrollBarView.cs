@@ -29,6 +29,7 @@ namespace Terminal.Gui {
 		bool autoHideScrollBars = true;
 		Dim originalHostWidth, originalHostHeight;
 		bool hosted;
+		ScrollBarView otherScrollBarView;
 		bool showBothScrollIndicator => OtherScrollBarView != null && OtherScrollBarView.showScrollIndicator && showScrollIndicator;
 
 		/// <summary>
@@ -156,7 +157,15 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Represent a vertical or horizontal ScrollBarView other than this.
 		/// </summary>
-		public ScrollBarView OtherScrollBarView { get; set; }
+		public ScrollBarView OtherScrollBarView {
+			get => otherScrollBarView;
+			set {
+				if (value.IsVertical && vertical || !value.IsVertical && !vertical) {
+					throw new ArgumentException ($"There is already a {(vertical ? "vertical" : "horizontal")} ScrollBarView.");
+				}
+				otherScrollBarView = value;
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets the visibility for the vertical or horizontal scroll indicator.

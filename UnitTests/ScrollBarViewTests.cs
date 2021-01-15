@@ -105,6 +105,32 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
+		public void Hosting_Two_Vertical_ScrollBarView_Throws_ArgumentException ()
+		{
+			var top = new Toplevel ();
+			var host = new View ();
+			top.Add (host);
+			var v = new ScrollBarView (host, true);
+			var h = new ScrollBarView (host, true);
+
+			Assert.Throws<ArgumentException> (null, () => v.OtherScrollBarView = h);
+			Assert.Throws<ArgumentException> (null, () => h.OtherScrollBarView = v);
+		}
+
+		[Fact]
+		public void Hosting_Two_Horizontal_ScrollBarView_Throws_ArgumentException ()
+		{
+			var top = new Toplevel ();
+			var host = new View ();
+			top.Add (host);
+			var v = new ScrollBarView (host, false);
+			var h = new ScrollBarView (host, false);
+
+			Assert.Throws<ArgumentException> (null, () => v.OtherScrollBarView = h);
+			Assert.Throws<ArgumentException> (null, () => h.OtherScrollBarView = v);
+		}
+
+		[Fact]
 		public void Hosting_A_View_To_A_ScrollBarView ()
 		{
 			RemoveHandlers ();
