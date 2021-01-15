@@ -586,7 +586,7 @@ namespace Terminal.Gui {
 		/// <param name="lines">Number of lines to scroll down.</param>
 		public virtual void ScrollDown (int lines)
 		{
-			top = Math.Min (top + lines, source.Count - 1);
+			top = Math.Max (Math.Min (top + lines, source.Count - 1), 0);
 			SetNeedsDisplay ();
 		}
 
@@ -632,7 +632,9 @@ namespace Terminal.Gui {
 			if (selected != lastSelectedItem) {
 				var value = source?.Count > 0 ? source.ToList () [selected] : null;
 				SelectedItemChanged?.Invoke (new ListViewItemEventArgs (selected, value));
-				lastSelectedItem = selected;
+				if (HasFocus) {
+					lastSelectedItem = selected;
+				}
 				return true;
 			}
 
@@ -656,6 +658,7 @@ namespace Terminal.Gui {
 		public override bool OnEnter (View view)
 		{
 			if (lastSelectedItem == -1) {
+				EnsuresVisibilitySelectedItem ();
 				OnSelectedChanged ();
 				return true;
 			}
@@ -672,6 +675,15 @@ namespace Terminal.Gui {
 			}
 
 			return false;
+		}
+
+		void EnsuresVisibilitySelectedItem ()
+		{
+			if (selected < top) {
+				top = selected;
+			} else if (selected >= top + Frame.Height) {
+				top = Math.Max (selected - Frame.Height + 1, 0);
+			}
 		}
 
 		///<inheritdoc/>
