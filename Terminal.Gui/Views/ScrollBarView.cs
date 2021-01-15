@@ -139,6 +139,8 @@ namespace Terminal.Gui {
 						} else {
 							position = Math.Max (position + max, 0);
 						}
+					} else if (max < 0) {
+						position = Math.Max (position + max, 0);
 					}
 					OnChangedPosition ();
 					SetNeedsDisplay ();
@@ -173,6 +175,7 @@ namespace Terminal.Gui {
 					Visible = true;
 				} else {
 					Visible = false;
+					Position = 0;
 				}
 				Width = vertical ? 1 : Dim.Width (Host);
 				Height = vertical ? Dim.Height (Host) : 1;

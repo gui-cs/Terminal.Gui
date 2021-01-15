@@ -25,7 +25,7 @@ namespace UICatalog {
 				Height = 1,
 			};
 			Win.Add (_customRenderCB);
-			_customRenderCB.Toggled += _customRenderCB_Toggled; ;
+			_customRenderCB.Toggled += _customRenderCB_Toggled;
 
 			_allowMarkingCB = new CheckBox ("Allow Marking") {
 				X = Pos.Right (_customRenderCB) + 1,
@@ -56,6 +56,9 @@ namespace UICatalog {
 			Win.Add (_listView);
 
 			var vertical = new ScrollBarView (_listView, true);
+			var horizontal = new ScrollBarView (_listView, false);
+			vertical.OtherScrollBarView = horizontal;
+			horizontal.OtherScrollBarView = vertical;
 
 			vertical.ChangedPosition += () => {
 				_listView.TopItem = vertical.Position;
@@ -65,12 +68,25 @@ namespace UICatalog {
 				_listView.SetNeedsDisplay ();
 			};
 
+			horizontal.ChangedPosition += () => {
+				_listView.LeftItem = horizontal.Position;
+				if (_listView.LeftItem != horizontal.Position) {
+					horizontal.Position = _listView.LeftItem;
+				}
+				_listView.SetNeedsDisplay ();
+			};
+
 			_listView.DrawContent += (e) => {
-				vertical.Size = _listView.Source.Count;
+				vertical.Size = _listView.Source.Count - 1;
 				vertical.Position = _listView.TopItem;
-				vertical.ColorScheme = _listView.ColorScheme;
+				horizontal.Size = _listView.Maxlength;
+				horizontal.Position = _listView.LeftItem;
+				vertical.ColorScheme = horizontal.ColorScheme = _listView.ColorScheme;
 				if (vertical.ShowScrollIndicator) {
 					vertical.Redraw (e);
+				}
+				if (horizontal.ShowScrollIndicator) {
+					horizontal.Redraw (e);
 				}
 			};
 
@@ -114,15 +130,16 @@ namespace UICatalog {
 			int _nameColumnWidth = 30;
 			private List<Type> scenarios;
 			BitArray marks;
-			int count;
+			int count, len;
 
 			public List<Type> Scenarios {
-				get => scenarios; 
+				get => scenarios;
 				set {
 					if (value != null) {
 						count = value.Count;
 						marks = new BitArray (count);
 						scenarios = value;
+						len = GetMaxLengthItem ();
 					}
 				}
 			}
@@ -135,14 +152,16 @@ namespace UICatalog {
 
 			public int Count => Scenarios != null ? Scenarios.Count : 0;
 
+			public int Length => len;
+
 			public ScenarioListDataSource (List<Type> itemList) => Scenarios = itemList;
 
-			public void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width)
+			public void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width, int start = 0)
 			{
 				container.Move (col, line);
 				// Equivalent to an interpolated string like $"{Scenarios[item].Name, -widtestname}"; if such a thing were possible
 				var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenario.ScenarioMetadata.GetName (Scenarios [item]));
-				RenderUstr (driver, $"{s}  {Scenario.ScenarioMetadata.GetDescription (Scenarios [item])}", col, line, width);
+				RenderUstr (driver, $"{s}  {Scenario.ScenarioMetadata.GetDescription (Scenarios [item])}", col, line, width, start);
 			}
 
 			public void SetMark (int item, bool value)
@@ -151,11 +170,30 @@ namespace UICatalog {
 					marks [item] = value;
 			}
 
+			int GetMaxLengthItem ()
+			{
+				if (scenarios?.Count == 0) {
+					return 0;
+				}
+
+				int maxLength = 0;
+				for (int i = 0; i < scenarios.Count; i++) {
+					var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenario.ScenarioMetadata.GetName (Scenarios [i]));
+					var sc = $"{s}  {Scenario.ScenarioMetadata.GetDescription (Scenarios [i])}";
+					var l = sc.Length;
+					if (l > maxLength) {
+						maxLength = l;
+					}
+				}
+
+				return maxLength;
+			}
+
 			// A slightly adapted method from: https://github.com/migueldeicaza/gui.cs/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
-			private void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width)
+			private void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width, int start = 0)
 			{
 				int used = 0;
-				int index = 0;
+				int index = start;
 				while (index < ustr.Length) {
 					(var rune, var size) = Utf8.DecodeRune (ustr, index, index - ustr.Length);
 					var count = Rune.ColumnWidth (rune);
