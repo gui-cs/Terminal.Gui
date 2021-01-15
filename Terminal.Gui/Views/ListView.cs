@@ -210,7 +210,7 @@ namespace Terminal.Gui {
 				if (source == null)
 					return;
 
-				if (top < 0 || top >= source.Count)
+				if (top < 0 || (source.Count > 0 && top >= source.Count))
 					throw new ArgumentException ("value");
 				top = value;
 				SetNeedsDisplay ();
@@ -227,7 +227,7 @@ namespace Terminal.Gui {
 				if (source == null)
 					return;
 
-				if (left < 0 || top >= source.Count)
+				if (left < 0 || (Maxlength > 0 && left >= Maxlength))
 					throw new ArgumentException ("value");
 				left = value;
 				SetNeedsDisplay ();
