@@ -448,10 +448,14 @@ namespace Terminal.Gui {
 				return false;
 			}
 
+			if (!Host.HasFocus) {
+				Host.SetFocus ();
+			}
+
 			int location = vertical ? me.Y : me.X;
 			int barsize = vertical ? Bounds.Height : Bounds.Width;
-			int posTopLeftTee = vertical ? posTopTee : posLeftTee;
-			int posBottomRightTee = vertical ? posBottomTee : posRightTee;
+			int posTopLeftTee = vertical ? posTopTee + 1: posLeftTee + 1;
+			int posBottomRightTee = vertical ? posBottomTee + 1: posRightTee + 1;
 			barsize -= 2;
 			var pos = Position;
 
@@ -489,12 +493,16 @@ namespace Terminal.Gui {
 
 				if (location > b1 && location <= b2 + 1) {
 					if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1Clicked) {
-						if (location == 1) {
+						if (location == 1 && posTopLeftTee <= 2) {
 							Position = 0;
 						} else if (location == barsize) {
 							CanScroll (Size - pos, out int nv, vertical);
 							if (nv > 0) {
 								Position = Math.Min (pos + nv, Size);
+							}
+						} else if (location < posTopLeftTee) {
+							if (CanScroll (-barsize, out int nv, vertical)) {
+								Position = pos + nv;
 							}
 						}
 					} else if (me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
@@ -502,8 +510,7 @@ namespace Terminal.Gui {
 						var ml = mb + b1 + (mb == 0 ? 1 : 0);
 						if ((location >= b1 && location <= ml) || (location < lastLocation && lastLocation > -1)) {
 							lastLocation = location;
-							var np = b1 * Size / barsize;
-							Position = np;
+							Position = b1 * Size / barsize;
 						} else if (location > lastLocation) {
 							var np = location * Size / barsize;
 							CanScroll (np - pos, out int nv, vertical);
