@@ -448,7 +448,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (!Host.HasFocus) {
+			if (Host != null && !Host.HasFocus) {
 				Host.SetFocus ();
 			}
 
@@ -537,7 +537,8 @@ namespace Terminal.Gui {
 		internal bool CanScroll (int n, out int max, bool isVertical = false)
 		{
 			if (Host == null) {
-				throw new ArgumentNullException ("The host can't be null.");
+				max = 0;
+				return false;
 			}
 			var s = isVertical ?
 				(KeepContentAlwaysInViewport ? Host.Bounds.Height + (showBothScrollIndicator ? -2 : -1) : 0) :

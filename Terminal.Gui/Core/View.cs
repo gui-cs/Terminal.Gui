@@ -741,7 +741,7 @@ namespace Terminal.Gui {
 		public void SetChildNeedsDisplay ()
 		{
 			ChildNeedsDisplay = true;
-			if (container != null && !container.ChildNeedsDisplay)
+			if (container != null)
 				container.SetChildNeedsDisplay ();
 		}
 

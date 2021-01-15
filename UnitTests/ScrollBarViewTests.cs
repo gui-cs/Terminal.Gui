@@ -118,11 +118,13 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void Scrolling_With_Default_Constructor_Throws_ArgumentNullException ()
+		public void Scrolling_With_Default_Constructor_Do_Not_Scroll ()
 		{
-			var sbv = new ScrollBarView ();
-
-			Assert.Throws<ArgumentNullException> ("The host can't be null.", () => sbv.Position = 1);
+			var sbv = new ScrollBarView {
+				Position = 1
+			};
+			Assert.NotEqual (1, sbv.Position);
+			Assert.Equal (0, sbv.Position);
 		}
 
 		[Fact]
