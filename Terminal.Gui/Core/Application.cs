@@ -351,7 +351,7 @@ namespace Terminal.Gui {
 					var ry = y - startFrame.Y;
 					for (int i = count - 1; i >= 0; i--) {
 						View v = start.InternalSubviews [i];
-						if (v.Frame.Contains (rx, ry)) {
+						if (v.Visible && v.Frame.Contains (rx, ry)) {
 							var deep = FindDeepestView (v, rx, ry, out resx, out resy);
 							if (deep == null)
 								return v;
