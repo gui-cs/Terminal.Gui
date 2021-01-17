@@ -679,9 +679,10 @@ namespace Terminal.Gui {
 
 		void EnsuresVisibilitySelectedItem ()
 		{
+			SuperView?.LayoutSubviews ();
 			if (selected < top) {
 				top = selected;
-			} else if (selected >= top + Frame.Height) {
+			} else if (Frame.Height > 0 && selected >= top + Frame.Height) {
 				top = Math.Max (selected - Frame.Height + 2, 0);
 			}
 		}
