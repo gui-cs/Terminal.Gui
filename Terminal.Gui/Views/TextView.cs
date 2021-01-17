@@ -1409,6 +1409,8 @@ namespace Terminal.Gui {
 					}
 				}
 				PositionCursor ();
+				lastWasKill = false;
+				columnTrack = currentColumn;
 			} else if (ev.Flags == MouseFlags.WheeledDown) {
 				lastWasKill = false;
 				columnTrack = currentColumn;
