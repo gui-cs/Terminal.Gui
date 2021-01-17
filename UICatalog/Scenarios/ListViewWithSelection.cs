@@ -55,49 +55,40 @@ namespace UICatalog {
 			};
 			Win.Add (_listView);
 
-			var vertical = new ScrollBarView (_listView, true);
-			var horizontal = new ScrollBarView (_listView, false);
-			vertical.OtherScrollBarView = horizontal;
-			horizontal.OtherScrollBarView = vertical;
+			var _scrollBar = new ScrollBarView (_listView, true);
 
-			vertical.ChangedPosition += () => {
-				_listView.TopItem = vertical.Position;
-				if (_listView.TopItem != vertical.Position) {
-					vertical.Position = _listView.TopItem;
+			_scrollBar.ChangedPosition += () => {
+				_listView.TopItem = _scrollBar.Position;
+				if (_listView.TopItem != _scrollBar.Position) {
+					_scrollBar.Position = _listView.TopItem;
 				}
 				_listView.SetNeedsDisplay ();
 			};
 
-			horizontal.ChangedPosition += () => {
-				_listView.LeftItem = horizontal.Position;
-				if (_listView.LeftItem != horizontal.Position) {
-					horizontal.Position = _listView.LeftItem;
+			_scrollBar.OtherScrollBarView.ChangedPosition += () => {
+				_listView.LeftItem = _scrollBar.OtherScrollBarView.Position;
+				if (_listView.LeftItem != _scrollBar.OtherScrollBarView.Position) {
+					_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
 				}
 				_listView.SetNeedsDisplay ();
 			};
 
 			_listView.DrawContent += (e) => {
-				vertical.Size = _listView.Source.Count - 1;
-				vertical.Position = _listView.TopItem;
-				horizontal.Size = _listView.Maxlength;
-				horizontal.Position = _listView.LeftItem;
-				vertical.ColorScheme = horizontal.ColorScheme = _listView.ColorScheme;
-				if (vertical.ShowScrollIndicator) {
-					vertical.Redraw (e);
-				}
-				if (horizontal.ShowScrollIndicator) {
-					horizontal.Redraw (e);
-				}
+				_scrollBar.Size = _listView.Source.Count;
+				_scrollBar.Position = _listView.TopItem;
+				_scrollBar.OtherScrollBarView.Size = _listView.Maxlength;
+				_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
+				_scrollBar.Refresh ();
 			};
 
 			_listView.SetSource (_scenarios);
 
 			var k = "Keep Content Always In Viewport";
-			var keepCheckBox = new CheckBox (k, vertical.AutoHideScrollBars) {
+			var keepCheckBox = new CheckBox (k, _scrollBar.AutoHideScrollBars) {
 				X = Pos.AnchorEnd (k.Length + 3),
 				Y = 0,
 			};
-			keepCheckBox.Toggled += (_) => vertical.KeepContentAlwaysInViewport = keepCheckBox.Checked;
+			keepCheckBox.Toggled += (_) => _scrollBar.KeepContentAlwaysInViewport = keepCheckBox.Checked;
 			Win.Add (keepCheckBox);
 		}
 

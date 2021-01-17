@@ -39,39 +39,30 @@ namespace UICatalog.Scenarios {
 			listview.SelectedItemChanged += (ListViewItemEventArgs e) => lbListView.Text = items [listview.SelectedItem];
 			Win.Add (lbListView, listview);
 
-			var vertical = new ScrollBarView (listview, true);
-			var horizontal = new ScrollBarView (listview, false);
-			vertical.OtherScrollBarView = horizontal;
-			horizontal.OtherScrollBarView = vertical;
+			var _scrollBar = new ScrollBarView (listview, true);
 
-			vertical.ChangedPosition += () => {
-				listview.TopItem = vertical.Position;
-				if (listview.TopItem != vertical.Position) {
-					vertical.Position = listview.TopItem;
+			_scrollBar.ChangedPosition += () => {
+				listview.TopItem = _scrollBar.Position;
+				if (listview.TopItem != _scrollBar.Position) {
+					_scrollBar.Position = listview.TopItem;
 				}
 				listview.SetNeedsDisplay ();
 			};
 
-			horizontal.ChangedPosition += () => {
-				listview.LeftItem = horizontal.Position;
-				if (listview.LeftItem != horizontal.Position) {
-					horizontal.Position = listview.LeftItem;
+			_scrollBar.OtherScrollBarView.ChangedPosition += () => {
+				listview.LeftItem = _scrollBar.OtherScrollBarView.Position;
+				if (listview.LeftItem != _scrollBar.OtherScrollBarView.Position) {
+					_scrollBar.OtherScrollBarView.Position = listview.LeftItem;
 				}
 				listview.SetNeedsDisplay ();
 			};
 
 			listview.DrawContent += (e) => {
-				vertical.Size = listview.Source.Count - 1;
-				vertical.Position = listview.TopItem;
-				horizontal.Size = listview.Maxlength;
-				horizontal.Position = listview.LeftItem;
-				vertical.ColorScheme = horizontal.ColorScheme = listview.ColorScheme;
-				if (vertical.ShowScrollIndicator) {
-					vertical.Redraw (e);
-				}
-				if (horizontal.ShowScrollIndicator) {
-					horizontal.Redraw (e);
-				}
+				_scrollBar.Size = listview.Source.Count;
+				_scrollBar.Position = listview.TopItem;
+				_scrollBar.OtherScrollBarView.Size = listview.Maxlength;
+				_scrollBar.OtherScrollBarView.Position = listview.LeftItem;
+				_scrollBar.Refresh ();
 			};
 
 			// ComboBox

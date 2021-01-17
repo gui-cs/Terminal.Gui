@@ -11,8 +11,7 @@ namespace Terminal.Gui {
 		}
 
 		private HostView _hostView;
-		private ScrollBarView _vertical;
-		private ScrollBarView _horizontal;
+		private ScrollBarView _scrollBar;
 		private bool _added;
 
 		public ScrollBarViewTests ()
@@ -37,8 +36,8 @@ namespace Terminal.Gui {
 		{
 			if (!_added) {
 				_hostView.DrawContent += _hostView_DrawContent;
-				_vertical.ChangedPosition += _vertical_ChangedPosition;
-				_horizontal.ChangedPosition += _horizontal_ChangedPosition;
+				_scrollBar.ChangedPosition += _scrollBar_ChangedPosition;
+				_scrollBar.OtherScrollBarView.ChangedPosition += _scrollBar_OtherScrollBarView_ChangedPosition;
 			}
 			_added = true;
 		}
@@ -47,41 +46,36 @@ namespace Terminal.Gui {
 		{
 			if (_added) {
 				_hostView.DrawContent -= _hostView_DrawContent;
-				_vertical.ChangedPosition -= _vertical_ChangedPosition;
-				_horizontal.ChangedPosition -= _horizontal_ChangedPosition;
+				_scrollBar.ChangedPosition -= _scrollBar_ChangedPosition;
+				_scrollBar.OtherScrollBarView.ChangedPosition -= _scrollBar_OtherScrollBarView_ChangedPosition;
 			}
 			_added = false;
 		}
 
 		private void _hostView_DrawContent (Rect obj)
 		{
-			_vertical.Size = _hostView.Lines;
-			_vertical.Position = _hostView.Top;
-			_horizontal.Size = _hostView.Cols;
-			_horizontal.Position = _hostView.Left;
-			_vertical.ColorScheme = _horizontal.ColorScheme = _hostView.ColorScheme;
-			if (_vertical.ShowScrollIndicator) {
-				_vertical.Redraw (obj);
-			}
-			if (_horizontal.ShowScrollIndicator) {
-				_horizontal.Redraw (obj);
-			}
+			_scrollBar.Size = _hostView.Lines;
+			_scrollBar.Position = _hostView.Top;
+			_scrollBar.OtherScrollBarView.Size = _hostView.Cols;
+			_scrollBar.OtherScrollBarView.Position = _hostView.Left;
+			_scrollBar.ColorScheme = _scrollBar.OtherScrollBarView.ColorScheme = _hostView.ColorScheme;
+			_scrollBar.Refresh ();
 		}
 
-		private void _vertical_ChangedPosition ()
+		private void _scrollBar_ChangedPosition ()
 		{
-			_hostView.Top = _vertical.Position;
-			if (_hostView.Top != _vertical.Position) {
-				_vertical.Position = _hostView.Top;
+			_hostView.Top = _scrollBar.Position;
+			if (_hostView.Top != _scrollBar.Position) {
+				_scrollBar.Position = _hostView.Top;
 			}
 			_hostView.SetNeedsDisplay ();
 		}
 
-		private void _horizontal_ChangedPosition ()
+		private void _scrollBar_OtherScrollBarView_ChangedPosition ()
 		{
-			_hostView.Left = _horizontal.Position;
-			if (_hostView.Left != _horizontal.Position) {
-				_horizontal.Position = _hostView.Left;
+			_hostView.Left = _scrollBar.OtherScrollBarView.Position;
+			if (_hostView.Left != _scrollBar.OtherScrollBarView.Position) {
+				_scrollBar.OtherScrollBarView.Position = _hostView.Left;
 			}
 			_hostView.SetNeedsDisplay ();
 		}
@@ -145,27 +139,27 @@ namespace Terminal.Gui {
 		{
 			RemoveHandlers ();
 
-			_vertical = new ScrollBarView (_hostView, true);
-			_horizontal = new ScrollBarView (_hostView, false);
-			_vertical.OtherScrollBarView = _horizontal;
-			_horizontal.OtherScrollBarView = _vertical;
+			_scrollBar = new ScrollBarView (_hostView, true);
+			_scrollBar.OtherScrollBarView = new ScrollBarView (_hostView, false);
+			_scrollBar.OtherScrollBarView = _scrollBar.OtherScrollBarView;
+			_scrollBar.OtherScrollBarView.OtherScrollBarView = _scrollBar;
 
-			Assert.True (_vertical.IsVertical);
-			Assert.False (_horizontal.IsVertical);
+			Assert.True (_scrollBar.IsVertical);
+			Assert.False (_scrollBar.OtherScrollBarView.IsVertical);
 
-			Assert.Equal (_vertical.Position, _hostView.Top);
-			Assert.NotEqual (_vertical.Size, _hostView.Lines);
-			Assert.Equal (_horizontal.Position, _hostView.Left);
-			Assert.NotEqual (_horizontal.Size, _hostView.Cols);
+			Assert.Equal (_scrollBar.Position, _hostView.Top);
+			Assert.NotEqual (_scrollBar.Size, _hostView.Lines);
+			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
+			Assert.NotEqual (_scrollBar.OtherScrollBarView.Size, _hostView.Cols);
 
 			AddHandlers ();
 			_hostView.SuperView.LayoutSubviews ();
 			_hostView.Redraw (_hostView.Bounds);
 
-			Assert.Equal (_vertical.Position, _hostView.Top);
-			Assert.Equal (_vertical.Size, _hostView.Lines);
-			Assert.Equal (_horizontal.Position, _hostView.Left);
-			Assert.Equal (_horizontal.Size, _hostView.Cols);
+			Assert.Equal (_scrollBar.Position, _hostView.Top);
+			Assert.Equal (_scrollBar.Size, _hostView.Lines);
+			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
+			Assert.Equal (_scrollBar.OtherScrollBarView.Size, _hostView.Cols);
 		}
 
 		[Fact]
@@ -175,11 +169,11 @@ namespace Terminal.Gui {
 
 			AddHandlers ();
 
-			_vertical.Position = 2;
-			Assert.Equal (_vertical.Position, _hostView.Top);
+			_scrollBar.Position = 2;
+			Assert.Equal (_scrollBar.Position, _hostView.Top);
 
-			_horizontal.Position = 5;
-			Assert.Equal (_horizontal.Position, _hostView.Left);
+			_scrollBar.OtherScrollBarView.Position = 5;
+			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
 		}
 
 		[Fact]
@@ -189,22 +183,22 @@ namespace Terminal.Gui {
 
 			AddHandlers ();
 
-			for (int i = 0; i < _vertical.Size; i++) {
-				_vertical.Position += 1;
-				Assert.Equal (_vertical.Position, _hostView.Top);
+			for (int i = 0; i < _scrollBar.Size; i++) {
+				_scrollBar.Position += 1;
+				Assert.Equal (_scrollBar.Position, _hostView.Top);
 			}
-			for (int i = _vertical.Size - 1; i >= 0; i--) {
-				_vertical.Position -= 1;
-				Assert.Equal (_vertical.Position, _hostView.Top);
+			for (int i = _scrollBar.Size - 1; i >= 0; i--) {
+				_scrollBar.Position -= 1;
+				Assert.Equal (_scrollBar.Position, _hostView.Top);
 			}
 
-			for (int i = 0; i < _horizontal.Size; i++) {
-				_horizontal.Position += i;
-				Assert.Equal (_horizontal.Position, _hostView.Left);
+			for (int i = 0; i < _scrollBar.OtherScrollBarView.Size; i++) {
+				_scrollBar.OtherScrollBarView.Position += i;
+				Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
 			}
-			for (int i = _horizontal.Size - 1; i >= 0; i--) {
-				_horizontal.Position -= 1;
-				Assert.Equal (_horizontal.Position, _hostView.Left);
+			for (int i = _scrollBar.OtherScrollBarView.Size - 1; i >= 0; i--) {
+				_scrollBar.OtherScrollBarView.Position -= 1;
+				Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
 			}
 		}
 
@@ -215,13 +209,13 @@ namespace Terminal.Gui {
 
 			AddHandlers ();
 
-			_vertical.Position = -20;
-			Assert.Equal (0, _vertical.Position);
-			Assert.Equal (_vertical.Position, _hostView.Top);
+			_scrollBar.Position = -20;
+			Assert.Equal (0, _scrollBar.Position);
+			Assert.Equal (_scrollBar.Position, _hostView.Top);
 
-			_horizontal.Position = -50;
-			Assert.Equal (0, _horizontal.Position);
-			Assert.Equal (_horizontal.Position, _hostView.Left);
+			_scrollBar.OtherScrollBarView.Position = -50;
+			Assert.Equal (0, _scrollBar.OtherScrollBarView.Position);
+			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
 		}
 
 		[Fact]
@@ -233,11 +227,11 @@ namespace Terminal.Gui {
 
 			_hostView.Top = 3;
 			_hostView.Redraw (_hostView.Bounds);
-			Assert.Equal (_vertical.Position, _hostView.Top);
+			Assert.Equal (_scrollBar.Position, _hostView.Top);
 
 			_hostView.Left = 6;
 			_hostView.Redraw (_hostView.Bounds);
-			Assert.Equal (_horizontal.Position, _hostView.Left);
+			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
 		}
 
 		[Fact]
@@ -247,8 +241,8 @@ namespace Terminal.Gui {
 
 			AddHandlers ();
 
-			Assert.Equal (_vertical.OtherScrollBarView, _horizontal);
-			Assert.Equal (_horizontal.OtherScrollBarView, _vertical);
+			Assert.Equal (_scrollBar.OtherScrollBarView, _scrollBar.OtherScrollBarView);
+			Assert.Equal (_scrollBar.OtherScrollBarView.OtherScrollBarView, _scrollBar);
 		}
 
 		[Fact]
@@ -258,8 +252,8 @@ namespace Terminal.Gui {
 
 			AddHandlers ();
 
-			Assert.True (_vertical.ShowScrollIndicator);
-			Assert.True (_horizontal.ShowScrollIndicator);
+			Assert.True (_scrollBar.ShowScrollIndicator);
+			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 		}
 
 		[Fact]
@@ -269,13 +263,28 @@ namespace Terminal.Gui {
 
 			AddHandlers ();
 
-			_vertical.Position = 50;
-			Assert.Equal (_vertical.Position, _vertical.Size - _vertical.Bounds.Height + 1);
-			Assert.Equal (_vertical.Position, _hostView.Top);
+			Assert.Equal (80, _hostView.Bounds.Width);
+			Assert.Equal (25, _hostView.Bounds.Height);
+			Assert.Equal (79, _scrollBar.OtherScrollBarView.Bounds.Width);
+			Assert.Equal (24, _scrollBar.Bounds.Height);
+			Assert.Equal (30, _scrollBar.Size);
+			Assert.Equal (100, _scrollBar.OtherScrollBarView.Size);
+			Assert.True (_scrollBar.ShowScrollIndicator);
+			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+			Assert.True (_scrollBar.Visible);
+			Assert.True (_scrollBar.OtherScrollBarView.Visible);
 
-			_horizontal.Position = 150;
-			Assert.Equal (_horizontal.Position, _horizontal.Size - _horizontal.Bounds.Width + 1);
-			Assert.Equal (_horizontal.Position, _hostView.Left);
+			_scrollBar.Position = 50;
+			Assert.Equal (_scrollBar.Position, _scrollBar.Size - _scrollBar.Bounds.Height);
+			Assert.Equal (_scrollBar.Position, _hostView.Top);
+			Assert.Equal (6, _scrollBar.Position);
+			Assert.Equal (6, _hostView.Top);
+
+			_scrollBar.OtherScrollBarView.Position = 150;
+			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _scrollBar.OtherScrollBarView.Size - _scrollBar.OtherScrollBarView.Bounds.Width);
+			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
+			Assert.Equal (21, _scrollBar.OtherScrollBarView.Position);
+			Assert.Equal (21, _hostView.Left);
 		}
 
 		[Fact]
@@ -285,14 +294,14 @@ namespace Terminal.Gui {
 
 			AddHandlers ();
 
-			_vertical.KeepContentAlwaysInViewport = false;
-			_vertical.Position = 50;
-			Assert.Equal (_vertical.Position, _vertical.Size - 1);
-			Assert.Equal (_vertical.Position, _hostView.Top);
+			_scrollBar.KeepContentAlwaysInViewport = false;
+			_scrollBar.Position = 50;
+			Assert.Equal (_scrollBar.Position, _scrollBar.Size - 1);
+			Assert.Equal (_scrollBar.Position, _hostView.Top);
 
-			_horizontal.Position = 150;
-			Assert.Equal (_horizontal.Position, _horizontal.Size - 1);
-			Assert.Equal (_horizontal.Position, _hostView.Left);
+			_scrollBar.OtherScrollBarView.Position = 150;
+			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _scrollBar.OtherScrollBarView.Size - 1);
+			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
 		}
 
 		[Fact]
@@ -302,19 +311,54 @@ namespace Terminal.Gui {
 
 			AddHandlers ();
 
+			_hostView.Redraw (_hostView.Bounds);
+			Assert.True (_scrollBar.ShowScrollIndicator);
+			Assert.True (_scrollBar.Visible);
+			Assert.Equal ("Dim.Combine(DimView(side=Height, target=HostView()({X=0,Y=0,Width=80,Height=25}))-Dim.Absolute(1))",
+				_scrollBar.Height.ToString ());
+			Assert.Equal (24, _scrollBar.Bounds.Height);
+			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+			Assert.True (_scrollBar.OtherScrollBarView.Visible);
+			Assert.Equal ("Dim.Combine(DimView(side=Width, target=HostView()({X=0,Y=0,Width=80,Height=25}))-Dim.Absolute(1))",
+				_scrollBar.OtherScrollBarView.Width.ToString ());
+			Assert.Equal (79, _scrollBar.OtherScrollBarView.Bounds.Width);
+
 			_hostView.Lines = 10;
 			_hostView.Redraw (_hostView.Bounds);
-			Assert.False (_vertical.ShowScrollIndicator);
+			Assert.False (_scrollBar.ShowScrollIndicator);
+			Assert.False (_scrollBar.Visible);
+			Assert.Equal ("Dim.Combine(DimView(side=Height, target=HostView()({X=0,Y=0,Width=80,Height=25}))-Dim.Absolute(1))",
+				_scrollBar.Height.ToString ());
+			Assert.Equal (24, _scrollBar.Bounds.Height);
+
 			_hostView.Cols = 60;
 			_hostView.Redraw (_hostView.Bounds);
-			Assert.False (_horizontal.ShowScrollIndicator);
+			Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+			Assert.False (_scrollBar.OtherScrollBarView.Visible);
+			Assert.Equal ("Dim.Combine(DimView(side=Width, target=HostView()({X=0,Y=0,Width=80,Height=25}))-Dim.Absolute(0))",
+				_scrollBar.OtherScrollBarView.Width.ToString ());
+			Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
 
 			_hostView.Lines = 40;
 			_hostView.Redraw (_hostView.Bounds);
-			Assert.True (_vertical.ShowScrollIndicator);
+			Assert.True (_scrollBar.ShowScrollIndicator);
+			Assert.True (_scrollBar.Visible);
+			Assert.Equal ("Dim.Combine(DimView(side=Height, target=HostView()({X=0,Y=0,Width=80,Height=25}))-Dim.Absolute(0))",
+				_scrollBar.Height.ToString ());
+			Assert.Equal (25, _scrollBar.Bounds.Height);
+
 			_hostView.Cols = 120;
 			_hostView.Redraw (_hostView.Bounds);
-			Assert.True (_horizontal.ShowScrollIndicator);
+			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+			Assert.True (_scrollBar.OtherScrollBarView.Visible);
+			Assert.Equal ("Dim.Combine(DimView(side=Width, target=HostView()({X=0,Y=0,Width=80,Height=25}))-Dim.Absolute(1))",
+				_scrollBar.OtherScrollBarView.Width.ToString ());
+			Assert.Equal (79, _scrollBar.OtherScrollBarView.Bounds.Width);
+			Assert.True (_scrollBar.ShowScrollIndicator);
+			Assert.True (_scrollBar.Visible);
+			Assert.Equal ("Dim.Combine(DimView(side=Height, target=HostView()({X=0,Y=0,Width=80,Height=25}))-Dim.Absolute(1))",
+				_scrollBar.Height.ToString ());
+			Assert.Equal (24, _scrollBar.Bounds.Height);
 		}
 	}
 }

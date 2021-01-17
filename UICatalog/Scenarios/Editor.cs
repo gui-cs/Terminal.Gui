@@ -13,7 +13,7 @@ namespace UICatalog {
 		private string _fileName = "demo.txt";
 		private TextView _textView;
 		private bool _saved = true;
-		private ScrollBarView _vertical;
+		private ScrollBarView _scrollBar;
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
@@ -70,39 +70,31 @@ namespace UICatalog {
 
 			Win.Add (_textView);
 
-			_vertical = new ScrollBarView (_textView, true);
-			var horizontal = new ScrollBarView (_textView, false);
-			_vertical.OtherScrollBarView = horizontal;
-			horizontal.OtherScrollBarView = _vertical;
+			_scrollBar = new ScrollBarView (_textView, true);
 
-			_vertical.ChangedPosition += () => {
-				_textView.TopRow = _vertical.Position;
-				if (_textView.TopRow != _vertical.Position) {
-					_vertical.Position = _textView.TopRow;
+			_scrollBar.ChangedPosition += () => {
+				_textView.TopRow = _scrollBar.Position;
+				if (_textView.TopRow != _scrollBar.Position) {
+					_scrollBar.Position = _textView.TopRow;
 				}
 				_textView.SetNeedsDisplay ();
 			};
 
-			horizontal.ChangedPosition += () => {
-				_textView.LeftColumn = horizontal.Position;
-				if (_textView.LeftColumn != horizontal.Position) {
-					horizontal.Position = _textView.LeftColumn;
+			_scrollBar.OtherScrollBarView.ChangedPosition += () => {
+				_textView.LeftColumn = _scrollBar.OtherScrollBarView.Position;
+				if (_textView.LeftColumn != _scrollBar.OtherScrollBarView.Position) {
+					_scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
 				}
 				_textView.SetNeedsDisplay ();
 			};
 
 			_textView.DrawContent += (e) => {
-				_vertical.Size = _textView.Lines - 1;
-				_vertical.Position = _textView.TopRow;
-				horizontal.Size = _textView.Maxlength + 1;
-				horizontal.Position = _textView.LeftColumn;
-				_vertical.ColorScheme = horizontal.ColorScheme = _textView.ColorScheme;
-				if (_vertical.ShowScrollIndicator) {
-					_vertical.Redraw (e);
-				}
-				if (horizontal.ShowScrollIndicator) {
-					horizontal.Redraw (e);
-				}
+				_scrollBar.Size = _textView.Lines;
+				_scrollBar.Position = _textView.TopRow;
+				_scrollBar.OtherScrollBarView.Size = _textView.Maxlength + 1;
+				_scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
+				_scrollBar.LayoutSubviews ();
+				_scrollBar.Refresh ();
 			};
 		}
 
@@ -196,7 +188,7 @@ namespace UICatalog {
 			item.Title = "Keep Content Always In Viewport";
 			item.CheckType |= MenuItemCheckStyle.Checked;
 			item.Checked = true;
-			item.Action += () => _vertical.KeepContentAlwaysInViewport = item.Checked = !item.Checked;
+			item.Action += () => _scrollBar.KeepContentAlwaysInViewport = item.Checked = !item.Checked;
 
 			return new MenuItem [] { item };
 		}
