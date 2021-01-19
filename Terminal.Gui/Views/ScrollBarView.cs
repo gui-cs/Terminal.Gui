@@ -586,8 +586,6 @@ namespace Terminal.Gui {
 						}
 					}
 				} else if (me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
-					var posBarLength = posBottomRightTee - posTopLeftTee;
-
 					if (lastLocation > -1 ||
 						location > 1 && location < barsize && location >= posTopLeftTee && location <= posBottomRightTee) {
 						if (lastLocation == -1) {
