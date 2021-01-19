@@ -166,8 +166,8 @@ namespace Terminal.Gui {
 			get => position;
 			set {
 				if (position != value) {
-					if (CanScroll (value - position, out int max, vertical) || max > 0) {
-						if (max > 0 && max == value - position) {
+					if (CanScroll (value - position, out int max, vertical)) {
+						if (max == value - position) {
 							position = value;
 						} else {
 							position = Math.Max (position + max, 0);
@@ -219,22 +219,6 @@ namespace Terminal.Gui {
 					Position = 0;
 				}
 				SetWidthHeight ();
-			}
-		}
-
-		void SetWidthHeight ()
-		{
-			if (showBothScrollIndicator) {
-				Width = vertical ? 1 : Dim.Width (Host) - 1;
-				Height = vertical ? Dim.Height (Host) - 1 : 1;
-				otherScrollBarView.Width = otherScrollBarView.vertical ? 1 : Dim.Width (Host) - 1;
-				otherScrollBarView.Height = otherScrollBarView.vertical ? Dim.Height (Host) - 1 : 1;
-			} else if (showScrollIndicator) {
-				Width = vertical ? 1 : Dim.Width (Host) - 0;
-				Height = vertical ? Dim.Height (Host) - 0 : 1;
-			} else if (otherScrollBarView != null && otherScrollBarView.showScrollIndicator) {
-				otherScrollBarView.Width = otherScrollBarView.vertical ? 1 : Dim.Width (Host) - 0;
-				otherScrollBarView.Height = otherScrollBarView.vertical ? Dim.Height (Host) - 0 : 1;
 			}
 		}
 
@@ -310,7 +294,7 @@ namespace Terminal.Gui {
 			} else {
 				contentBottomRightCorner.Visible = false;
 			}
-			if (showBothScrollIndicator) {
+			if (showScrollIndicator) {
 				Redraw (Bounds);
 			}
 			if (otherScrollBarView.showScrollIndicator) {
@@ -347,6 +331,23 @@ namespace Terminal.Gui {
 			}
 
 			return pending;
+		}
+
+		void SetWidthHeight ()
+		{
+			if (showBothScrollIndicator) {
+				Width = vertical ? 1 : Dim.Width (Host) - 1;
+				Height = vertical ? Dim.Height (Host) - 1 : 1;
+
+				otherScrollBarView.Width = otherScrollBarView.vertical ? 1 : Dim.Width (Host) - 1;
+				otherScrollBarView.Height = otherScrollBarView.vertical ? Dim.Height (Host) - 1 : 1;
+			} else if (showScrollIndicator) {
+				Width = vertical ? 1 : Dim.Width (Host) - 0;
+				Height = vertical ? Dim.Height (Host) - 0 : 1;
+			} else if (otherScrollBarView != null && otherScrollBarView.showScrollIndicator) {
+				otherScrollBarView.Width = otherScrollBarView.vertical ? 1 : Dim.Width (Host) - 0;
+				otherScrollBarView.Height = otherScrollBarView.vertical ? Dim.Height (Host) - 0 : 1;
+			}
 		}
 
 		int posTopTee;
@@ -535,6 +536,7 @@ namespace Terminal.Gui {
 				&& (Application.mouseGrabView == null || Application.mouseGrabView != this)) {
 				Application.GrabMouse (this);
 			} else if (me.Flags == MouseFlags.Button1Released && Application.mouseGrabView != null && Application.mouseGrabView == this) {
+				lastLocation = -1;
 				Application.UngrabMouse ();
 				return true;
 			} else if (showScrollIndicator && (me.Flags == MouseFlags.WheeledDown || me.Flags == MouseFlags.WheeledUp ||
@@ -542,9 +544,6 @@ namespace Terminal.Gui {
 				return Host.MouseEvent (me);
 			}
 
-			if (!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
-				lastLocation = -1;
-			}
 			if (location == 0) {
 				if (pos > 0) {
 					Position = pos - 1;
@@ -562,51 +561,66 @@ namespace Terminal.Gui {
 					b1 = Math.Max (b1 - 1, 0);
 				}
 
-				if (location > b1 && location <= b2 + 1) {
-					if (me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1Clicked) {
-						if (location == 1 && posTopLeftTee <= 2) {
-							Position = 0;
-						} else if (location == barsize) {
-							CanScroll (Size - pos, out int nv, vertical);
-							if (nv > 0) {
-								Position = Math.Min (pos + nv, Size);
-							}
-						} else if (location < posTopLeftTee) {
-							if (CanScroll (-barsize, out int nv, vertical)) {
-								Position = pos + nv;
-							}
+				if (lastLocation == -1 && me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1Clicked) {
+					if (location == 1) {
+						if (location < posTopLeftTee && CanScroll (-barsize, out int nv, vertical)) {
+							Position = pos + nv;
 						}
-					} else if (me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
-						var mb = (b2 - b1) / 2;
-						var ml = mb + b1 + (mb == 0 ? 1 : 0);
-						if ((location > 1 || (location == 1 && posTopLeftTee > 1)) && ((location >= b1 && location <= ml) || (location < lastLocation && lastLocation > -1))) {
-							lastLocation = location;
-							var np = location * Size / barsize;
-							if (CanScroll (np - pos, out int nv, vertical)) {
-								Position = pos + nv;
-							}
-						} else if (location != barsize && location > lastLocation) {
-							var np = location * Size / barsize;
-							if (CanScroll (np - pos, out int nv, vertical)) {
-								Position = pos + nv;
-							}
-						} else if (location == 1 && posTopLeftTee <= 2) {
+						if (location == posTopLeftTee) {
 							Position = 0;
-						} else if (location == barsize) {
-							CanScroll (Size - pos, out int nv, vertical);
-							if (nv > 0) {
-								Position = Math.Min (pos + nv, Size);
-							}
 						}
-					}
-				} else {
-					if (location >= b2 + 1 && location > posTopLeftTee && location > b1 && location > posBottomRightTee && posBottomRightTee > 0) {
-						CanScroll (location, out int nv, vertical);
-						if (nv > 0) {
+					} else if (location == barsize) {
+						if (location > posBottomRightTee && CanScroll (barsize, out int nv, vertical)) {
+							Position = pos + nv;
+						}
+						if (location == posBottomRightTee && CanScroll (Size - pos, out nv, vertical)) {
 							Position = Math.Min (pos + nv, Size);
 						}
-					} else if (location <= b1) {
-						Position = Math.Max (pos - barsize - location, 0);
+					} else if (location < posTopLeftTee) {
+						if (CanScroll (-barsize, out int nv, vertical)) {
+							Position = pos + nv;
+						}
+					} else if (location > posBottomRightTee) {
+						if (CanScroll (barsize, out int nv, vertical)) {
+							Position = pos + nv;
+						}
+					}
+				} else if (me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
+					var posBarLength = posBottomRightTee - posTopLeftTee;
+
+					if (lastLocation > -1 ||
+						location > 1 && location < barsize && location >= posTopLeftTee && location <= posBottomRightTee) {
+						if (lastLocation == -1) {
+							lastLocation = location;
+							return true;
+						}
+
+						var np = location * Size / barsize - lastLocation;
+						if (CanScroll (np - pos, out int nv, vertical)) {
+							Position = pos + nv;
+						}
+
+						if (location > lastLocation && location == barsize) {
+							if (CanScroll (Size - pos, out nv, vertical)) {
+								Position = Math.Min (pos + nv, Size);
+							}
+						} else if (location < lastLocation && location == 1 && b2 <= 2) {
+							Position = 0;
+						}
+					} else if (location > posBottomRightTee) {
+						if (CanScroll (barsize, out int nv, vertical)) {
+							Position = pos + nv;
+						}
+					} else if (location < posTopLeftTee) {
+						if (CanScroll (-barsize, out int nv, vertical)) {
+							Position = pos + nv;
+						}
+					} else if (location == 1 && b2 <= 2) {
+						Position = 0;
+					} else if (location == barsize) {
+						if (CanScroll (Size - pos, out int nv, vertical)) {
+							Position = Math.Min (pos + nv, Size);
+						}
 					}
 				}
 			}
@@ -623,9 +637,9 @@ namespace Terminal.Gui {
 			var s = isVertical ?
 				(KeepContentAlwaysInViewport ? Host.Bounds.Height + (showBothScrollIndicator ? -2 : -1) : 0) :
 				(KeepContentAlwaysInViewport ? Host.Bounds.Width + (showBothScrollIndicator ? -2 : -1) : 0);
-			var newSize = Math.Min (size, position + n);
-			max = size > s + newSize ? n : size - (s + position) - 1;
-			if (size > s + newSize) {
+			var newSize = Math.Max (Math.Min (size - s, position + n), 0);
+			max = size > s + newSize ? (newSize == 0 ? -position : n) : size - (s + position) - 1;
+			if (size >= s + newSize && max != 0) {
 				return true;
 			}
 			return false;
