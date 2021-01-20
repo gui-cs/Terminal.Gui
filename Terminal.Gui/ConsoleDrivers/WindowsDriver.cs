@@ -961,7 +961,7 @@ namespace Terminal.Gui {
 		async Task ProcessContinuousButtonPressedAsync (WindowsConsole.MouseEventRecord mouseEvent, MouseFlags mouseFlag)
 		{
 			while (IsButtonPressed) {
-				await Task.Delay (200);
+				await Task.Delay (100);
 				var me = new MouseEvent () {
 					X = mouseEvent.MousePosition.X,
 					Y = mouseEvent.MousePosition.Y,
