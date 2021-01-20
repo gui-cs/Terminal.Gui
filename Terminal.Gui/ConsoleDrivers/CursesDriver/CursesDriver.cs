@@ -269,10 +269,7 @@ namespace Terminal.Gui {
 				}
 
 				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-					Application.MainLoop.AddIdle (() => {
-						ProcessContinuousButtonPressedAsync (cev, mouseFlag).ConfigureAwait (false);
-						return false;
-					});
+					ProcessContinuousButtonPressedAsync (cev, mouseFlag).ConfigureAwait (false);
 				}
 
 
