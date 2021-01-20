@@ -243,6 +243,9 @@ namespace Terminal.Gui {
 					if (OtherScrollBarView != null && OtherScrollBarView.keepContentAlwaysInViewport != value) {
 						OtherScrollBarView.KeepContentAlwaysInViewport = value;
 					}
+					if (pos == 0) {
+						Refresh ();
+					}
 				}
 			}
 		}
@@ -397,8 +400,8 @@ namespace Terminal.Gui {
 					}
 				} else {
 					bh -= 2;
-					var by1 = position * bh / Size;
-					var by2 = KeepContentAlwaysInViewport ? Math.Min (((position + bh) * bh / Size) + 1, bh - 1) : (position + bh) * bh / Size;
+					var by1 = KeepContentAlwaysInViewport ? position * bh / Size : position * bh / (Size + bh);
+					var by2 = KeepContentAlwaysInViewport ? Math.Min (((position + bh) * bh / Size) + 1, bh - 1) : (position + bh) * bh / (Size + bh);
 					if (KeepContentAlwaysInViewport && by1 == by2) {
 						by1 = Math.Max (by1 - 1, 0);
 					}
@@ -458,8 +461,8 @@ namespace Terminal.Gui {
 					Driver.AddRune (Driver.RightArrow);
 				} else {
 					bw -= 2;
-					var bx1 = position * bw / Size;
-					var bx2 = KeepContentAlwaysInViewport ? Math.Min (((position + bw) * bw / Size) + 1, bw - 1) : (position + bw) * bw / Size;
+					var bx1 = KeepContentAlwaysInViewport ? position * bw / Size : position * bw / (Size + bw);
+					var bx2 = KeepContentAlwaysInViewport ? Math.Min (((position + bw) * bw / Size) + 1, bw - 1) : (position + bw) * bw / (Size + bw);
 					if (KeepContentAlwaysInViewport && bx1 == bx2) {
 						bx1 = Math.Max (bx1 - 1, 0);
 					}
@@ -508,6 +511,7 @@ namespace Terminal.Gui {
 		}
 
 		int lastLocation = -1;
+		int posBarOffset;
 
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
@@ -553,56 +557,46 @@ namespace Terminal.Gui {
 					Position = pos + 1;
 				}
 			} else if (location > 0 && location < barsize + 1) {
-				var b1 = pos * (Size > 0 ? barsize / Size : 0);
-				var b2 = Size > 0
-					? (KeepContentAlwaysInViewport ? Math.Min (((pos + barsize) * barsize / Size) + 1, barsize - 1) : (pos + barsize) * barsize / Size)
-					: 0;
-				if (KeepContentAlwaysInViewport && b1 == b2) {
-					b1 = Math.Max (b1 - 1, 0);
-				}
+				//var b1 = pos * (Size > 0 ? barsize / Size : 0);
+				//var b2 = Size > 0
+				//	? (KeepContentAlwaysInViewport ? Math.Min (((pos + barsize) * barsize / Size) + 1, barsize - 1) : (pos + barsize) * barsize / Size)
+				//	: 0;
+				//if (KeepContentAlwaysInViewport && b1 == b2) {
+				//	b1 = Math.Max (b1 - 1, 0);
+				//}
 
-				if (lastLocation == -1 && me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1Clicked) {
-					if (location == 1) {
-						if (location < posTopLeftTee && CanScroll (-barsize, out int nv, vertical)) {
-							Position = pos + nv;
-						}
-						if (location == posTopLeftTee) {
-							Position = 0;
-						}
-					} else if (location == barsize) {
-						if (location > posBottomRightTee && CanScroll (barsize, out int nv, vertical)) {
-							Position = pos + nv;
-						}
-						if (location == posBottomRightTee && CanScroll (Size - pos, out nv, vertical)) {
-							Position = Math.Min (pos + nv, Size);
-						}
-					} else if (location < posTopLeftTee) {
-						if (CanScroll (-barsize, out int nv, vertical)) {
-							Position = pos + nv;
-						}
-					} else if (location > posBottomRightTee) {
-						if (CanScroll (barsize, out int nv, vertical)) {
-							Position = pos + nv;
-						}
-					}
-				} else if (me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
-					if (lastLocation > -1 ||
-						location > 1 && location < barsize && location >= posTopLeftTee && location <= posBottomRightTee) {
+				if (me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)
+					|| me.Flags == MouseFlags.Button1Pressed) {
+					if (lastLocation > -1 || (location >= posTopLeftTee && location <= posBottomRightTee)) {
 						if (lastLocation == -1) {
 							lastLocation = location;
+							posBarOffset = keepContentAlwaysInViewport ? Math.Max (location - posTopLeftTee, 1) : 0;
 							return true;
 						}
 
-						var np = location * Size / barsize - lastLocation;
-						if (CanScroll (np - pos, out int nv, vertical)) {
-							Position = pos + nv;
-						}
-
-						if (location > lastLocation && location == barsize) {
-							if (CanScroll (Size - pos, out nv, vertical)) {
+						if (location > lastLocation) {
+							if (location - posBarOffset < barsize) {
+								var np = ((location - posBarOffset) * Size / barsize) + (Size / barsize);
+								if (CanScroll (np - pos, out int nv, vertical)) {
+									Position = pos + nv;
+								}
+							} else if (CanScroll (Size - pos, out int nv, vertical)) {
 								Position = Math.Min (pos + nv, Size);
 							}
-						} else if (location < lastLocation && location == 1 && b2 <= 2) {
+						} else if (location < lastLocation) {
+							if (location - posBarOffset > 0) {
+								var np = ((location - posBarOffset) * Size / barsize) - (Size / barsize);
+								if (CanScroll (np - pos, out int nv, vertical)) {
+									Position = pos + nv;
+								}
+							} else {
+								Position = 0;
+							}
+						} else if (location - posBarOffset >= barsize && posBottomRightTee - posTopLeftTee >= 3 && CanScroll (Size - pos, out int nv, vertical)) {
+							Position = Math.Min (pos + nv, Size);
+						} else if (location - posBarOffset >= barsize - 1 && posBottomRightTee - posTopLeftTee <= 3 && CanScroll (Size - pos, out nv, vertical)) {
+							Position = Math.Min (pos + nv, Size);
+						} else if (location - posBarOffset <= 0 && posBottomRightTee - posTopLeftTee <= 3) {
 							Position = 0;
 						}
 					} else if (location > posBottomRightTee) {
@@ -613,7 +607,7 @@ namespace Terminal.Gui {
 						if (CanScroll (-barsize, out int nv, vertical)) {
 							Position = pos + nv;
 						}
-					} else if (location == 1 && b2 <= 2) {
+					} else if (location == 1 && posTopLeftTee <= 3) {
 						Position = 0;
 					} else if (location == barsize) {
 						if (CanScroll (Size - pos, out int nv, vertical)) {
