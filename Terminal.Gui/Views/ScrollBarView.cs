@@ -296,6 +296,9 @@ namespace Terminal.Gui {
 				contentBottomRightCorner.Visible = true;
 			} else {
 				contentBottomRightCorner.Visible = false;
+				if (Application.mouseGrabView != null && Application.mouseGrabView == this) {
+					Application.UngrabMouse ();
+				}
 			}
 			if (showScrollIndicator) {
 				Redraw (Bounds);
@@ -516,11 +519,11 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
-			if (me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
+			if (me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1DoubleClicked &&
 				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) &&
 				me.Flags != MouseFlags.Button1Released && me.Flags != MouseFlags.WheeledDown &&
 				me.Flags != MouseFlags.WheeledUp && me.Flags != MouseFlags.WheeledRight &&
-				me.Flags != MouseFlags.WheeledLeft) {
+				me.Flags != MouseFlags.WheeledLeft && me.Flags != MouseFlags.Button1TripleClicked) {
 				return false;
 			}
 
@@ -535,8 +538,7 @@ namespace Terminal.Gui {
 			barsize -= 2;
 			var pos = Position;
 
-			if ((me.Flags.HasFlag (MouseFlags.Button1Pressed) ||
-				me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
+			if (me.Flags != MouseFlags.Button1Released
 				&& (Application.mouseGrabView == null || Application.mouseGrabView != this)) {
 				Application.GrabMouse (this);
 			} else if (me.Flags == MouseFlags.Button1Released && Application.mouseGrabView != null && Application.mouseGrabView == this) {
@@ -565,54 +567,52 @@ namespace Terminal.Gui {
 				//	b1 = Math.Max (b1 - 1, 0);
 				//}
 
-				if (me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)
-					|| me.Flags == MouseFlags.Button1Pressed) {
-					if (lastLocation > -1 || (location >= posTopLeftTee && location <= posBottomRightTee)) {
-						if (lastLocation == -1) {
-							lastLocation = location;
-							posBarOffset = keepContentAlwaysInViewport ? Math.Max (location - posTopLeftTee, 1) : 0;
-							return true;
-						}
+				if (lastLocation > -1 || (location >= posTopLeftTee && location <= posBottomRightTee
+				&& me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))) {
+					if (lastLocation == -1) {
+						lastLocation = location;
+						posBarOffset = keepContentAlwaysInViewport ? Math.Max (location - posTopLeftTee, 1) : 0;
+						return true;
+					}
 
-						if (location > lastLocation) {
-							if (location - posBarOffset < barsize) {
-								var np = ((location - posBarOffset) * Size / barsize) + (Size / barsize);
-								if (CanScroll (np - pos, out int nv, vertical)) {
-									Position = pos + nv;
-								}
-							} else if (CanScroll (Size - pos, out int nv, vertical)) {
-								Position = Math.Min (pos + nv, Size);
+					if (location > lastLocation) {
+						if (location - posBarOffset < barsize) {
+							var np = ((location - posBarOffset) * Size / barsize) + (Size / barsize);
+							if (CanScroll (np - pos, out int nv, vertical)) {
+								Position = pos + nv;
 							}
-						} else if (location < lastLocation) {
-							if (location - posBarOffset > 0) {
-								var np = ((location - posBarOffset) * Size / barsize) - (Size / barsize);
-								if (CanScroll (np - pos, out int nv, vertical)) {
-									Position = pos + nv;
-								}
-							} else {
-								Position = 0;
+						} else if (CanScroll (Size - pos, out int nv, vertical)) {
+							Position = Math.Min (pos + nv, Size);
+						}
+					} else if (location < lastLocation) {
+						if (location - posBarOffset > 0) {
+							var np = ((location - posBarOffset) * Size / barsize) - (Size / barsize);
+							if (CanScroll (np - pos, out int nv, vertical)) {
+								Position = pos + nv;
 							}
-						} else if (location - posBarOffset >= barsize && posBottomRightTee - posTopLeftTee >= 3 && CanScroll (Size - pos, out int nv, vertical)) {
-							Position = Math.Min (pos + nv, Size);
-						} else if (location - posBarOffset >= barsize - 1 && posBottomRightTee - posTopLeftTee <= 3 && CanScroll (Size - pos, out nv, vertical)) {
-							Position = Math.Min (pos + nv, Size);
-						} else if (location - posBarOffset <= 0 && posBottomRightTee - posTopLeftTee <= 3) {
+						} else {
 							Position = 0;
 						}
-					} else if (location > posBottomRightTee) {
-						if (CanScroll (barsize, out int nv, vertical)) {
-							Position = pos + nv;
-						}
-					} else if (location < posTopLeftTee) {
-						if (CanScroll (-barsize, out int nv, vertical)) {
-							Position = pos + nv;
-						}
-					} else if (location == 1 && posTopLeftTee <= 3) {
+					} else if (location - posBarOffset >= barsize && posBottomRightTee - posTopLeftTee >= 3 && CanScroll (Size - pos, out int nv, vertical)) {
+						Position = Math.Min (pos + nv, Size);
+					} else if (location - posBarOffset >= barsize - 1 && posBottomRightTee - posTopLeftTee <= 3 && CanScroll (Size - pos, out nv, vertical)) {
+						Position = Math.Min (pos + nv, Size);
+					} else if (location - posBarOffset <= 0 && posBottomRightTee - posTopLeftTee <= 3) {
 						Position = 0;
-					} else if (location == barsize) {
-						if (CanScroll (Size - pos, out int nv, vertical)) {
-							Position = Math.Min (pos + nv, Size);
-						}
+					}
+				} else if (location > posBottomRightTee) {
+					if (CanScroll (barsize, out int nv, vertical)) {
+						Position = pos + nv;
+					}
+				} else if (location < posTopLeftTee) {
+					if (CanScroll (-barsize, out int nv, vertical)) {
+						Position = pos + nv;
+					}
+				} else if (location == 1 && posTopLeftTee <= 3) {
+					Position = 0;
+				} else if (location == barsize) {
+					if (CanScroll (Size - pos, out int nv, vertical)) {
+						Position = Math.Min (pos + nv, Size);
 					}
 				}
 			}
