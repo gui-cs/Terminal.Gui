@@ -342,7 +342,7 @@ namespace Terminal.Gui {
 			};
 		}
 
-		private MouseFlags ProcessButtonClickedEvent (Curses.MouseEvent cev)
+		MouseFlags ProcessButtonClickedEvent (Curses.MouseEvent cev)
 		{
 			LastMouseButtonPressed = cev.ButtonState;
 			var mf = GetButtonState (cev, true);
@@ -358,7 +358,7 @@ namespace Terminal.Gui {
 			return mf;
 		}
 
-		private MouseFlags ProcessButtonReleasedEvent (Curses.MouseEvent cev)
+		MouseFlags ProcessButtonReleasedEvent (Curses.MouseEvent cev)
 		{
 			var mf = MapCursesButton (cev.ButtonState);
 			if (!cancelButtonClicked && LastMouseButtonPressed == null && !isReportMousePosition) {
