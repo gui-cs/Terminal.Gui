@@ -539,6 +539,7 @@ namespace Terminal.Gui {
 					case 0:
 					case 8:
 					case 16:
+					case 24:
 					case 32:
 					case 40:
 						buttonState = c == 'M' ? MouseButtonState.Button1Pressed
@@ -547,6 +548,7 @@ namespace Terminal.Gui {
 					case 1:
 					case 9:
 					case 17:
+					case 25:
 					case 33:
 					case 41:
 						buttonState = c == 'M' ? MouseButtonState.Button2Pressed
@@ -555,6 +557,7 @@ namespace Terminal.Gui {
 					case 2:
 					case 10:
 					case 18:
+					case 26:
 					case 34:
 					case 42:
 						buttonState = c == 'M' ? MouseButtonState.Button3Pressed
@@ -570,10 +573,14 @@ namespace Terminal.Gui {
 					case 65:
 						buttonState = MouseButtonState.ButtonWheeledDown;
 						break;
+					case 68:
 					case 72:
+					case 80:
 						buttonState = MouseButtonState.ButtonWheeledLeft;       // Ctrl+ButtonWheeledUp
 						break;
+					case 69:
 					case 73:
+					case 81:
 						buttonState = MouseButtonState.ButtonWheeledRight;      // Ctrl+ButtonWheeledDown
 						break;
 					}
@@ -582,16 +589,27 @@ namespace Terminal.Gui {
 					case 8:
 					case 9:
 					case 10:
+						buttonState |= MouseButtonState.ButtonAlt;
+						break;
 					case 16:
 					case 17:
 					case 18:
 					case 43:
 						buttonState |= MouseButtonState.ButtonCtrl;
 						break;
+					case 24:
+					case 25:
+					case 26:
+						buttonState |= MouseButtonState.ButtonAlt | MouseButtonState.ButtonCtrl;
+						break;
 					case 32:
 					case 33:
 					case 34:
 						buttonState |= MouseButtonState.ReportMousePosition;
+						break;
+					case 68:
+					case 69:
+						buttonState |= MouseButtonState.ButtonShift;
 						break;
 					}
 				}
