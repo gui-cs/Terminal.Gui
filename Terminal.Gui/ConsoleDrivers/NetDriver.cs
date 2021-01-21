@@ -290,16 +290,18 @@ namespace Terminal.Gui {
 			int curCSI = 0;
 			char previousKChar = '\0';
 			if (nCSI > 1) {
-				foreach (var ck in cki) {
+				for (int i = 0; i < cki.Length; i++) {
+					var ck = cki [i];
 					if (NumberOfCSI > 0 && nCSI - curCSI > NumberOfCSI) {
-						if (ck.KeyChar == '\x1b'
-							|| (ck.KeyChar == '[' && previousKChar != '\x1b')) {
+						if (cki [i + 1].KeyChar == '\x1b' && previousKChar != '\0') {
 							curCSI++;
+							previousKChar = '\0';
+						} else {
+							previousKChar = ck.KeyChar;
 						}
-						previousKChar = ck.KeyChar;
 						continue;
 					}
-					if (ck.KeyChar == '\x1b' || (ck.KeyChar == '[' && previousKChar != '\x1b')) {
+					if (ck.KeyChar == '\x1b') {
 						if (ck.KeyChar == 'R') {
 							ResizeArray (ck);
 						}
@@ -310,7 +312,9 @@ namespace Terminal.Gui {
 						length = 0;
 					}
 					ResizeArray (ck);
-					previousKChar = ck.KeyChar;
+					if (i == cki.Length - 1 && splitedCki.Length > 0) {
+						DecodeCSI (ref inputResult, ref newConsoleKeyInfo, ref key, ref mouseEvent, splitedCki, ref mod);
+					}
 				}
 			} else {
 				DecodeCSI (ref inputResult, ref newConsoleKeyInfo, ref key, ref mouseEvent, cki, ref mod);
