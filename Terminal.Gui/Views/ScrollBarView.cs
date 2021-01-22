@@ -93,6 +93,7 @@ namespace Terminal.Gui {
 					Host = host,
 					OtherScrollBarView = this,
 				};
+				OtherScrollBarView.hosted = true;
 				OtherScrollBarView.X = OtherScrollBarView.IsVertical ? Pos.Right (host) - 1 : Pos.Left (host);
 				OtherScrollBarView.Y = OtherScrollBarView.IsVertical ? Pos.Top (host) : Pos.Bottom (host) - 1;
 				OtherScrollBarView.Host.SuperView.Add (OtherScrollBarView);
@@ -108,7 +109,7 @@ namespace Terminal.Gui {
 			contentBottomRightCorner.MouseClick += ContentBottomRightCorner_MouseClick;
 		}
 
-		private void ContentBottomRightCorner_MouseClick (MouseEventArgs me)
+		void ContentBottomRightCorner_MouseClick (MouseEventArgs me)
 		{
 			if (me.MouseEvent.Flags == MouseFlags.WheeledDown || me.MouseEvent.Flags == MouseFlags.WheeledUp
 				|| me.MouseEvent.Flags == MouseFlags.WheeledRight || me.MouseEvent.Flags == MouseFlags.WheeledLeft) {
@@ -148,7 +149,11 @@ namespace Terminal.Gui {
 		public int Size {
 			get => size;
 			set {
-				size = value;
+				if (hosted || (otherScrollBarView != null && otherScrollBarView.hosted)) {
+					size = value + 1;
+				} else {
+					size = value;
+				}
 				SetNeedsDisplay ();
 			}
 		}
@@ -174,6 +179,10 @@ namespace Terminal.Gui {
 						}
 					} else if (max < 0) {
 						position = Math.Max (position + max, 0);
+					}
+					var s = GetBarsize (vertical);
+					if (position + s == size && (hosted || (otherScrollBarView != null && otherScrollBarView.hosted))) {
+						position++;
 					}
 					OnChangedPosition ();
 					SetNeedsDisplay ();
@@ -293,9 +302,13 @@ namespace Terminal.Gui {
 			OtherScrollBarView.SetRelativeLayout (OtherScrollBarView.Bounds);
 
 			if (showBothScrollIndicator) {
-				contentBottomRightCorner.Visible = true;
-			} else {
-				contentBottomRightCorner.Visible = false;
+				if (contentBottomRightCorner != null) {
+					contentBottomRightCorner.Visible = true;
+				}
+			} else if (!showScrollIndicator) {
+				if (contentBottomRightCorner != null) {
+					contentBottomRightCorner.Visible = false;
+				}
 				if (Application.mouseGrabView != null && Application.mouseGrabView == this) {
 					Application.UngrabMouse ();
 				}
@@ -508,7 +521,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			if (hosted && showBothScrollIndicator) {
+			if (contentBottomRightCorner != null && hosted && showBothScrollIndicator) {
 				contentBottomRightCorner.Redraw (contentBottomRightCorner.Bounds);
 			}
 		}
@@ -627,15 +640,23 @@ namespace Terminal.Gui {
 				max = 0;
 				return false;
 			}
-			var s = isVertical ?
-				(KeepContentAlwaysInViewport ? Host.Bounds.Height + (showBothScrollIndicator ? -2 : -1) : 0) :
-				(KeepContentAlwaysInViewport ? Host.Bounds.Width + (showBothScrollIndicator ? -2 : -1) : 0);
+			int s = GetBarsize (isVertical);
 			var newSize = Math.Max (Math.Min (size - s, position + n), 0);
 			max = size > s + newSize ? (newSize == 0 ? -position : n) : size - (s + position) - 1;
 			if (size >= s + newSize && max != 0) {
 				return true;
 			}
 			return false;
+		}
+
+		int GetBarsize (bool isVertical)
+		{
+			if (Host == null) {
+				return 0;
+			}
+			return isVertical ?
+				(KeepContentAlwaysInViewport ? Host.Bounds.Height + (showBothScrollIndicator ? -2 : -1) : 0) :
+				(KeepContentAlwaysInViewport ? Host.Bounds.Width + (showBothScrollIndicator ? -2 : -1) : 0);
 		}
 	}
 }

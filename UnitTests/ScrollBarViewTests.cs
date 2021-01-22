@@ -153,9 +153,9 @@ namespace Terminal.Gui {
 			_hostView.Redraw (_hostView.Bounds);
 
 			Assert.Equal (_scrollBar.Position, _hostView.Top);
-			Assert.Equal (_scrollBar.Size, _hostView.Lines);
+			Assert.Equal (_scrollBar.Size, _hostView.Lines + 1);
 			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
-			Assert.Equal (_scrollBar.OtherScrollBarView.Size, _hostView.Cols);
+			Assert.Equal (_scrollBar.OtherScrollBarView.Size, _hostView.Cols + 1);
 		}
 
 		[Fact]
@@ -264,8 +264,8 @@ namespace Terminal.Gui {
 			Assert.Equal (25, _hostView.Bounds.Height);
 			Assert.Equal (79, _scrollBar.OtherScrollBarView.Bounds.Width);
 			Assert.Equal (24, _scrollBar.Bounds.Height);
-			Assert.Equal (30, _scrollBar.Size);
-			Assert.Equal (100, _scrollBar.OtherScrollBarView.Size);
+			Assert.Equal (31, _scrollBar.Size);
+			Assert.Equal (101, _scrollBar.OtherScrollBarView.Size);
 			Assert.True (_scrollBar.ShowScrollIndicator);
 			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 			Assert.True (_scrollBar.Visible);
@@ -274,14 +274,22 @@ namespace Terminal.Gui {
 			_scrollBar.Position = 50;
 			Assert.Equal (_scrollBar.Position, _scrollBar.Size - _scrollBar.Bounds.Height);
 			Assert.Equal (_scrollBar.Position, _hostView.Top);
-			Assert.Equal (6, _scrollBar.Position);
-			Assert.Equal (6, _hostView.Top);
+			Assert.Equal (7, _scrollBar.Position);
+			Assert.Equal (7, _hostView.Top);
+			Assert.True (_scrollBar.ShowScrollIndicator);
+			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+			Assert.True (_scrollBar.Visible);
+			Assert.True (_scrollBar.OtherScrollBarView.Visible);
 
 			_scrollBar.OtherScrollBarView.Position = 150;
 			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _scrollBar.OtherScrollBarView.Size - _scrollBar.OtherScrollBarView.Bounds.Width);
 			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
-			Assert.Equal (21, _scrollBar.OtherScrollBarView.Position);
-			Assert.Equal (21, _hostView.Left);
+			Assert.Equal (22, _scrollBar.OtherScrollBarView.Position);
+			Assert.Equal (22, _hostView.Left);
+			Assert.True (_scrollBar.ShowScrollIndicator);
+			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+			Assert.True (_scrollBar.Visible);
+			Assert.True (_scrollBar.OtherScrollBarView.Visible);
 		}
 
 		[Fact]
@@ -295,14 +303,14 @@ namespace Terminal.Gui {
 			_scrollBar.Position = 50;
 			Assert.Equal (_scrollBar.Position, _scrollBar.Size - 1);
 			Assert.Equal (_scrollBar.Position, _hostView.Top);
-			Assert.Equal (29, _scrollBar.Position);
-			Assert.Equal (29, _hostView.Top);
+			Assert.Equal (30, _scrollBar.Position);
+			Assert.Equal (30, _hostView.Top);
 
 			_scrollBar.OtherScrollBarView.Position = 150;
 			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _scrollBar.OtherScrollBarView.Size - 1);
 			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
-			Assert.Equal (99, _scrollBar.OtherScrollBarView.Position);
-			Assert.Equal (99, _hostView.Left);
+			Assert.Equal (100, _scrollBar.OtherScrollBarView.Position);
+			Assert.Equal (100, _hostView.Left);
 		}
 
 		[Fact]

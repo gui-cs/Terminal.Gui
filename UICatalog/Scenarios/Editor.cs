@@ -89,9 +89,9 @@ namespace UICatalog {
 			};
 
 			_textView.DrawContent += (e) => {
-				_scrollBar.Size = _textView.Lines;
+				_scrollBar.Size = _textView.Lines - 1;
 				_scrollBar.Position = _textView.TopRow;
-				_scrollBar.OtherScrollBarView.Size = _textView.Maxlength + 1;
+				_scrollBar.OtherScrollBarView.Size = _textView.Maxlength;
 				_scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
 				_scrollBar.LayoutSubviews ();
 				_scrollBar.Refresh ();
