@@ -545,7 +545,8 @@ namespace Terminal.Gui {
 				lastLocation = -1;
 				Application.UngrabMouse ();
 				return true;
-			} else if (showScrollIndicator && (me.Flags == MouseFlags.WheeledDown || me.Flags == MouseFlags.WheeledUp ||
+			}
+			if (showScrollIndicator && (me.Flags == MouseFlags.WheeledDown || me.Flags == MouseFlags.WheeledUp ||
 				me.Flags == MouseFlags.WheeledRight || me.Flags == MouseFlags.WheeledLeft)) {
 				return Host.MouseEvent (me);
 			}
