@@ -799,6 +799,11 @@ namespace Terminal.Gui {
 				IsButtonReleased = false;
 			}
 
+			var p = new Point () {
+				X = mouseEvent.MousePosition.X,
+				Y = mouseEvent.MousePosition.Y
+			};
+
 			if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && LastMouseButtonPressed == null && !IsButtonDoubleClicked) ||
 				(mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved &&
 				mouseEvent.ButtonState != 0 && !IsButtonReleased && !IsButtonDoubleClicked)) {
@@ -854,12 +859,7 @@ namespace Terminal.Gui {
 				IsButtonPressed = false;
 				IsButtonReleased = true;
 			} else if ((mouseEvent.EventFlags == 0 || mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) &&
-				  IsButtonReleased) {
-				var p = new Point () {
-					X = mouseEvent.MousePosition.X,
-					Y = mouseEvent.MousePosition.Y
-				};
-				//if (p == point) {
+				  IsButtonReleased && p == point) {
 				switch (LastMouseButtonPressed) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Clicked;
@@ -877,9 +877,6 @@ namespace Terminal.Gui {
 					X = mouseEvent.MousePosition.X,
 					Y = mouseEvent.MousePosition.Y
 				};
-				//} else {
-				//	mouseFlag = 0;
-				//}
 				LastMouseButtonPressed = null;
 				IsButtonReleased = false;
 			} else if (mouseEvent.EventFlags.HasFlag (WindowsConsole.EventFlags.DoubleClick)) {
@@ -964,7 +961,7 @@ namespace Terminal.Gui {
 		async Task ProcessContinuousButtonPressedAsync (WindowsConsole.MouseEventRecord mouseEvent, MouseFlags mouseFlag)
 		{
 			while (IsButtonPressed) {
-				await Task.Delay (200);
+				await Task.Delay (100);
 				var me = new MouseEvent () {
 					X = mouseEvent.MousePosition.X,
 					Y = mouseEvent.MousePosition.Y,
