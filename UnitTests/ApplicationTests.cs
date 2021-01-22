@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Terminal.Gui;
 using Xunit;
 
@@ -219,6 +221,31 @@ namespace Terminal.Gui {
 			Application.Run ();
 			Application.Shutdown ();
 			Assert.Equal (3, count);
+		}
+
+		[Fact]
+		public void Shutdown_Allows_Async ()
+		{
+			static async Task TaskWithAsyncContinuation ()
+			{
+				await Task.Yield ();
+				await Task.Yield ();
+			}
+
+			Init ();
+			Application.Shutdown ();
+
+			var task = TaskWithAsyncContinuation ();
+			Thread.Sleep (20);
+			Assert.True (task.IsCompletedSuccessfully);
+		}
+
+		[Fact]
+		public void Shutdown_Resets_SyncContext ()
+		{
+			Init ();
+			Application.Shutdown ();
+			Assert.Null (SynchronizationContext.Current);
 		}
 	}
 }
