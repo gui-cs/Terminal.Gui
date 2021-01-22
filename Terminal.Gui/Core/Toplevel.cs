@@ -195,7 +195,7 @@ namespace Terminal.Gui {
 			if (base.ProcessKey (keyEvent))
 				return true;
 
-			switch (keyEvent.Key) {
+			switch (ShortcutHelper.GetModifiersKey (keyEvent)) {
 			case Key.Q | Key.CtrlMask:
 				// FIXED: stop current execution of this container
 				Application.RequestStop ();
@@ -217,27 +217,32 @@ namespace Terminal.Gui {
 				var old = GetDeepestFocusedSubview (Focused);
 				if (!FocusNext ())
 					FocusNext ();
-				if (old != Focused) {
+				if (old != Focused && old != Focused?.Focused) {
 					old?.SetNeedsDisplay ();
 					Focused?.SetNeedsDisplay ();
 				} else {
-					FocusNearestView (GetToplevelSubviews (true));
+					FocusNearestView (SuperView?.TabIndexes, Direction.Forward);
 				}
 				return true;
+			case Key.BackTab | Key.ShiftMask:
 			case Key.CursorLeft:
 			case Key.CursorUp:
-			case Key.BackTab:
 				old = GetDeepestFocusedSubview (Focused);
 				if (!FocusPrev ())
 					FocusPrev ();
-				if (old != Focused) {
+				if (old != Focused && old != Focused?.Focused) {
 					old?.SetNeedsDisplay ();
 					Focused?.SetNeedsDisplay ();
 				} else {
-					FocusNearestView (GetToplevelSubviews (false));
+					FocusNearestView (SuperView?.TabIndexes?.Reverse(), Direction.Backward);
 				}
 				return true;
-
+			case Key.Tab | Key.CtrlMask:
+				Application.Top.FocusNext ();
+				return true;
+			case Key.Tab | Key.ShiftMask | Key.CtrlMask:
+				Application.Top.FocusPrev ();
+				return true;
 			case Key.L | Key.CtrlMask:
 				Application.Refresh ();
 				return true;
@@ -272,39 +277,34 @@ namespace Terminal.Gui {
 			return view;
 		}
 
-		IEnumerable<View> GetToplevelSubviews (bool isForward)
-		{
-			if (SuperView == null) {
-				return null;
-			}
-
-			HashSet<View> views = new HashSet<View> ();
-
-			foreach (var v in SuperView.Subviews) {
-				views.Add (v);
-			}
-
-			return isForward ? views : views.Reverse ();
-		}
-
-		void FocusNearestView (IEnumerable<View> views)
+		void FocusNearestView (IEnumerable<View> views, Direction direction)
 		{
 			if (views == null) {
 				return;
 			}
 
 			bool found = false;
+			bool focusProcessed = false;
+			int idx = 0;
 
 			foreach (var v in views) {
 				if (v == this) {
 					found = true;
 				}
 				if (found && v != this) {
-					v.EnsureFocus ();
+					if (direction == Direction.Forward) {
+						SuperView?.FocusNext ();
+					} else {
+						SuperView?.FocusPrev ();
+					}
+					focusProcessed = true;
 					if (SuperView.Focused != null && SuperView.Focused != this) {
 						return;
 					}
+				} else if (found && !focusProcessed && idx == views.Count () - 1) {
+					views.ToList () [0].SetFocus ();
 				}
+				idx++;
 			}
 		}
 
