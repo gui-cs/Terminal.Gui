@@ -16,8 +16,6 @@ var tree = new TreeView()
     Height = 20
 };
 
-Win.Add(tree);
-
 var root1 = new TreeNode("Root1");
 root1.Children.Add(new TreeNode("Child1.1"));
 root1.Children.Add(new TreeNode("Child1.2"));
@@ -34,7 +32,7 @@ tree.AddObject(root2);
 Having to create a bunch of TreeNode objects can be a pain especially if you already have your own objects e.g. `House`, `Room` etc.  There are two ways to use your own classes without having to create nodes manually.  Firstly you can implement the `ITreeNode` interface:
 
 
-```
+```csharp
 // Your data class
 private class House : ITreeNode {
 
@@ -67,11 +65,11 @@ private class Room : ITreeNode{
         return Name;
     }
 }
+```
 
+After implementing the interface you can add your objects directly to the tree
 
-...
-
-// After implementing the interface you can add your objects directly to the tree
+```csharp
 
 var myHouse = new House()
 {
@@ -92,7 +90,6 @@ var tree = new TreeView()
 };
 
 tree.AddObject(myHouse);
-
 
 ```
 
@@ -161,7 +158,7 @@ private class GameObjectTreeBuilder : ITreeBuilder<GameObject> {
 
 To use the builder in a tree you would use:
 
-```
+```csharp
 var army1 = new Army()
 {
     Designation = "3rd Infantry",
@@ -187,7 +184,7 @@ tree.AddObject(army1);
 
 Alternatively you can use `DelegateTreeBuilder<T>` instead of implementing your own `ITreeBuilder<T>`.  For example:
 
-```
+```csharp
 tree.TreeBuilder = new DelegateTreeBuilder<GameObject>(
     (o)=>o is Army a ? a.Units 
         : Enumerable.Empty<GameObject>());
@@ -197,7 +194,7 @@ tree.TreeBuilder = new DelegateTreeBuilder<GameObject>(
 
 The default behaviour of TreeView is to use the `ToString` method on the objects for rendering.  You can customise this by changing the `AspectGetter`.  For example:
 
-```
+```csharp
 treeViewFiles.AspectGetter = (f)=>f.FullName;
 ```
 
