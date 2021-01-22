@@ -96,10 +96,111 @@ tree.AddObject(myHouse);
 
 ```
 
-Alternatively you can simply tell the tree how the objects relate to one another by implementing `ITreeBuilder`.  This is a good option if you don't have control of the data objects you are working with:
-
-```
-TODO
-```
+Alternatively you can simply tell the tree how the objects relate to one another by implementing `ITreeBuilder<T>`.  This is a good option if you don't have control of the data objects you are working with.
 
 ## TreeView<T>
+
+The generic `Treeview<T>` allows you to store any object hierarchy where nodes implement Type T.  For example if you are working with `DirectoryInfo` and `FileInfo` objects then you could create a `TreeView<FileSystemInfo>`.  If you don't have a shared interface/base class for all nodes you can still declare a `TreeView<object>`.
+
+In order to use `TreeView<T>` you need to tell the tree how objects relate to one another (who are children of who).  To do this you must provide an `ITreeBuilder<T>`.
+
+
+### Implementing ITreeBuilder<T>
+
+Consider a simple data model that already exists in your program:
+
+```csharp
+private abstract class GameObject
+{
+
+}
+private class Army : GameObject
+{
+    public string Designation {get;set;}
+    public List<Unit> Units {get;set;}
+
+
+    public override string ToString ()
+    {
+        return Designation;
+    }
+}
+
+private class Unit : GameObject
+{
+    public string Name {get;set;}
+    public override string ToString ()
+    {
+        return Name;
+    }
+}
+
+```
+
+An `ITreeBuilder<T>` for these classes might look like:
+
+```csharp
+
+private class GameObjectTreeBuilder : ITreeBuilder<GameObject> {
+    public bool SupportsCanExpand => true;
+
+    public bool CanExpand (GameObject model)
+    {
+        return model is Army;
+    }
+
+    public IEnumerable<GameObject> GetChildren (GameObject model)
+    {
+        if(model is Army a)
+            return a.Units;
+
+        return Enumerable.Empty<GameObject>();
+    }
+}
+```
+
+To use the builder in a tree you would use:
+
+```
+var army1 = new Army()
+{
+    Designation = "3rd Infantry",
+    Units = new List<Unit>{
+        new Unit(){Name = "Orc"},
+        new Unit(){Name = "Troll"},
+        new Unit(){Name = "Goblin"},
+    }
+};
+
+var tree = new TreeView<GameObject>()
+{
+    X = 0,
+    Y = 0,
+    Width = 40,
+    Height = 20,
+    TreeBuilder = new GameObjectTreeBuilder()
+};
+
+
+tree.AddObject(army1);
+```
+
+Alternatively you can use `DelegateTreeBuilder<T>` instead of implementing your own `ITreeBuilder<T>`.  For example:
+
+```
+tree.TreeBuilder = new DelegateTreeBuilder<GameObject>(
+    (o)=>o is Army a ? a.Units 
+        : Enumerable.Empty<GameObject>());
+```
+
+## Node Text and ToString
+
+The default behaviour of TreeView is to use the `ToString` method on the objects for rendering.  You can customise this by changing the `AspectGetter`.  For example:
+
+```
+treeViewFiles.AspectGetter = (f)=>f.FullName;
+```
+
+
+
+

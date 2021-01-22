@@ -26,6 +26,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miColoredSymbols;
 		private MenuItem miInvertSymbols;
 		private MenuItem miUnicodeSymbols;
+		private MenuItem miFullPaths;
 		private Terminal.Gui.Attribute green;
 		private Terminal.Gui.Attribute red;
 
@@ -52,6 +53,7 @@ namespace UICatalog.Scenarios {
 					null /*separator*/,
 					miColoredSymbols = new MenuItem ("_ColoredSymbols", "", () => ShowColoredExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 					miInvertSymbols = new MenuItem ("_InvertSymbols", "", () => InvertExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
+					miFullPaths = new MenuItem ("_FullPaths", "", () => SetFullName()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 				}),
 			});
 			Top.Add (menu);
@@ -169,6 +171,16 @@ namespace UICatalog.Scenarios {
 
 			treeViewNodes.Style.InvertExpandSymbolColors =  miInvertSymbols.Checked;
 			treeViewNodes.SetNeedsDisplay();
+		}
+
+		private void SetFullName()
+		{
+			miFullPaths.Checked = !miFullPaths.Checked;
+
+			if(miFullPaths.Checked)
+				treeViewFiles.AspectGetter = (f)=>f.FullName;
+			else
+				treeViewFiles.AspectGetter = (f)=>f.Name;
 		}
 
 

@@ -25,6 +25,8 @@ namespace UICatalog.Scenarios {
 				new MenuBarItem ("_Scenarios", new MenuItem [] {
 					new MenuItem ("_Simple Nodes", "", () => LoadSimpleNodes()),
 					new MenuItem ("_Rooms", "", () => LoadRooms()),
+					new MenuItem ("_Armies With Builder", "", () => LoadArmies(false)),
+					new MenuItem ("_Armies With Delegate", "", () => LoadArmies(true)),
 				}),
 			});
 			
@@ -97,6 +99,88 @@ namespace UICatalog.Scenarios {
             Win.Add(tree);
 
             tree.AddObject(myHouse);
+
+            currentTree = tree;
+		}
+
+
+
+        private abstract class GameObject
+        {
+
+        }
+        private class Army : GameObject
+        {
+            public string Designation {get;set;}
+            public List<Unit> Units {get;set;}
+
+
+			public override string ToString ()
+			{
+				return Designation;
+			}
+        }
+
+        private class Unit : GameObject
+        {
+            public string Name {get;set;}
+			public override string ToString ()
+			{
+				return Name;
+			}
+        }
+
+		private class GameObjectTreeBuilder : ITreeBuilder<GameObject> {
+			public bool SupportsCanExpand => true;
+
+			public bool CanExpand (GameObject model)
+			{
+				return model is Army;
+			}
+
+			public IEnumerable<GameObject> GetChildren (GameObject model)
+			{
+                if(model is Army a)
+                    return a.Units;
+
+				return Enumerable.Empty<GameObject>();
+			}
+		}
+
+
+		private void LoadArmies(bool useDelegate)
+		{
+            var army1 = new Army()
+            {
+                Designation = "3rd Infantry",
+                Units = new List<Unit>{
+                    new Unit(){Name = "Orc"},
+                    new Unit(){Name = "Troll"},
+                    new Unit(){Name = "Goblin"},
+                }
+            };
+
+            if(currentTree != null)
+                Win.Remove(currentTree);
+
+			var tree = new TreeView<GameObject>()
+			{
+                X = 0,
+                Y = 0,
+				Width = 40,
+				Height = 20
+			};
+
+            if(useDelegate){
+                tree.TreeBuilder = new DelegateTreeBuilder<GameObject>((o)=>o is Army a ? a.Units : Enumerable.Empty<GameObject>());
+            }
+            else{
+                tree.TreeBuilder = new GameObjectTreeBuilder();
+            }
+
+            Win.Add(tree);
+
+            tree.AddObject(army1);
 
             currentTree = tree;
 		}
