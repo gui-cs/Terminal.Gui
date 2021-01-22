@@ -269,24 +269,7 @@ namespace Terminal.Gui {
 				}
 
 				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-					Task.Run (async () => {
-						while (IsButtonPressed && LastMouseButtonPressed != null) {
-							await Task.Delay (100);
-							var me = new MouseEvent () {
-								X = cev.X,
-								Y = cev.Y,
-								Flags = mouseFlag
-							};
-
-							var view = Application.wantContinuousButtonPressedView;
-							if (view == null)
-								break;
-							if (IsButtonPressed && LastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-								mouseHandler (me);
-								//mainLoop.Driver.Wakeup ();
-							}
-						}
-					});
+					ProcessContinuousButtonPressedAsync (cev, mouseFlag).ConfigureAwait (false);
 				}
 
 
@@ -369,6 +352,26 @@ namespace Terminal.Gui {
 			}
 			cancelButtonClicked = false;
 			return mf;
+		}
+
+		async Task ProcessContinuousButtonPressedAsync (Curses.MouseEvent cev, MouseFlags mouseFlag)
+		{
+			while (IsButtonPressed && LastMouseButtonPressed != null) {
+				await Task.Delay (100);
+				var me = new MouseEvent () {
+					X = cev.X,
+					Y = cev.Y,
+					Flags = mouseFlag
+				};
+
+				var view = Application.wantContinuousButtonPressedView;
+				if (view == null)
+					break;
+				if (IsButtonPressed && LastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
+					mouseHandler (me);
+					//mainLoop.Driver.Wakeup ();
+				}
+			}
 		}
 
 		MouseFlags GetButtonState (Curses.MouseEvent cev, bool pressed = false)
