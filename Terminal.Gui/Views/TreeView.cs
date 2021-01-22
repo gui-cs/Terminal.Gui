@@ -17,12 +17,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value></value>
 		IList<ITreeNode> Children {get;}
-
-		/// <summary>
-		/// The textual representation to be rendered when your class is visible in the tree
-		/// </summary>
-		/// <value></value>
-		string Text {get;}
 	}
 
 	/// <summary>
