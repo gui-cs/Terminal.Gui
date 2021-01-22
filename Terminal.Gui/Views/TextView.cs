@@ -461,6 +461,26 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Gets or sets the top row.
+		/// </summary>
+		public int TopRow { get => topRow; set => topRow = Math.Max (Math.Min (value, Lines - 1), 0); }
+
+		/// <summary>
+		/// Gets or sets the left column.
+		/// </summary>
+		public int LeftColumn { get => leftColumn; set => leftColumn = Math.Max (Math.Min (value, Maxlength - 1), 0); }
+
+		/// <summary>
+		/// Gets the maximum visible length line.
+		/// </summary>
+		public int Maxlength => model.GetMaxVisibleLine (topRow, topRow + Frame.Height);
+
+		/// <summary>
+		/// Gets the  number of lines.
+		/// </summary>
+		public int Lines => model.Count;
+
+		/// <summary>
 		/// Loads the contents of the file into the  <see cref="TextView"/>.
 		/// </summary>
 		/// <returns><c>true</c>, if file was loaded, <c>false</c> otherwise.</returns>
@@ -875,10 +895,10 @@ namespace Terminal.Gui {
 				idx = 0;
 			}
 			if (isRow) {
-				topRow = idx > model.Count - 1 ? model.Count - 1 : idx;
+				topRow = Math.Max (idx > model.Count - 1 ? model.Count - 1 : idx, 0);
 			} else {
 				var maxlength = model.GetMaxVisibleLine (topRow, topRow + Frame.Height);
-				leftColumn = idx > maxlength - 1 ? maxlength - 1 : idx;
+				leftColumn = Math.Max (idx > maxlength - 1 ? maxlength - 1 : idx, 0);
 			}
 			SetNeedsDisplay ();
 		}
@@ -1374,7 +1394,7 @@ namespace Terminal.Gui {
 
 			if (ev.Flags == MouseFlags.Button1Clicked) {
 				if (model.Count > 0) {
-					var maxCursorPositionableLine = (model.Count - 1) - topRow;
+					var maxCursorPositionableLine = Math.Max ((model.Count - 1) - topRow, 0);
 					if (ev.Y > maxCursorPositionableLine) {
 						currentRow = maxCursorPositionableLine;
 					} else {
@@ -1389,6 +1409,8 @@ namespace Terminal.Gui {
 					}
 				}
 				PositionCursor ();
+				lastWasKill = false;
+				columnTrack = currentColumn;
 			} else if (ev.Flags == MouseFlags.WheeledDown) {
 				lastWasKill = false;
 				columnTrack = currentColumn;
