@@ -2,7 +2,7 @@
 
 TreeView is a control for navigating hierarchical objects.  It comes in two forms `TreeView` and `TreeView<T>`.  
 
-## TreeView
+## Using TreeView
 
 The basic non generic TreeView class is populated by `ITreeNode` objects.  The simplest tree you can make would look something like:
 
@@ -95,14 +95,14 @@ tree.AddObject(myHouse);
 
 Alternatively you can simply tell the tree how the objects relate to one another by implementing `ITreeBuilder<T>`.  This is a good option if you don't have control of the data objects you are working with.
 
-## TreeView<T>
+## `TreeView<T>`
 
 The generic `Treeview<T>` allows you to store any object hierarchy where nodes implement Type T.  For example if you are working with `DirectoryInfo` and `FileInfo` objects then you could create a `TreeView<FileSystemInfo>`.  If you don't have a shared interface/base class for all nodes you can still declare a `TreeView<object>`.
 
 In order to use `TreeView<T>` you need to tell the tree how objects relate to one another (who are children of who).  To do this you must provide an `ITreeBuilder<T>`.
 
 
-### Implementing ITreeBuilder<T>
+### `Implementing ITreeBuilder<T>`
 
 Consider a simple data model that already exists in your program:
 
