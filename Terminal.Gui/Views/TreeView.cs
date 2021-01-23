@@ -331,7 +331,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The current number of rows in the tree (ignoring the controls bounds)
 		/// </summary>
-		public int ContentHeight { get; private set; }
+		public int ContentHeight => BuildLineMap().Count();
 
 		/// <summary>
 		/// Returns the string representation of model objects hosted in the tree.  Default implementation is to call <see cref="object.ToString"/>
@@ -522,8 +522,6 @@ namespace Terminal.Gui {
 				toReturn.AddRange(AddToLineMap(root));
 			}
 
-			ContentHeight = toReturn.Count;
-
 			return toReturn.ToArray();
 		}
 
@@ -610,7 +608,7 @@ namespace Terminal.Gui {
 
 				var map = BuildLineMap();
 				
-				var idx = me.OfY + ScrollOffset;
+				var idx = me.Y + ScrollOffset;
 
 				// click is outside any visible nodes
 				if(idx < 0 || idx >= map.Length) {
@@ -620,7 +618,7 @@ namespace Terminal.Gui {
 				// The line they clicked on
 				var clickedBranch = map[idx];
 
-				bool isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol(Driver,me.OfX);
+				bool isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol(Driver,me.X);
 				
 				// If we are already selected (double click)
 				if(Equals(SelectedObject,clickedBranch.Model)) 
