@@ -147,7 +147,6 @@ namespace Terminal.Gui {
 		public override void Redraw (Rect bounds)
 		{
 			var padding = 0;
-			Application.CurrentView = this;
 			var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
 
 			if (!NeedDisplay.IsEmpty) {

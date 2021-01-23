@@ -453,7 +453,7 @@ namespace Terminal.Gui {
 						Driver.AddRune (' ');
 
 				if (item == null) {
-					Move (Frame.Right - 1, i + 1);
+					Move (Frame.Width - 1, i + 1);
 					Driver.AddRune (Driver.RightTee);
 					continue;
 				}
@@ -927,6 +927,9 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
+			if (selected == -1 && HasFocus && Menus.Length > 0) {
+				selected = 0;
+			}
 			int pos = 0;
 			for (int i = 0; i < Menus.Length; i++) {
 				if (i == selected) {

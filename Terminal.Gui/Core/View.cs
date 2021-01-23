@@ -1125,10 +1125,10 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (focused != null) {
+			if (focused?.Frame.Width > 0 && focused.Frame.Height > 0) {
 				focused.PositionCursor ();
 			} else {
-				if (CanFocus && HasFocus && Visible) {
+				if (CanFocus && HasFocus && Visible && Frame.Width > 0 && Frame.Height > 0) {
 					Move (textFormatter.HotKeyPos == -1 ? 0 : textFormatter.CursorPosition, 0);
 				} else {
 					Move (frame.X, frame.Y);
@@ -1314,8 +1314,6 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			Application.CurrentView = this;
-
 			var clipRect = new Rect (Point.Empty, frame.Size);
 
 			if (ColorScheme != null) {
@@ -1340,11 +1338,11 @@ namespace Terminal.Gui {
 						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
 							if (view.LayoutNeeded)
 								view.LayoutSubviews ();
-							Application.CurrentView = view;
 
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0)
-							if (view.Visible) {
+							if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
+								view.OnDrawContent (view.Bounds);
 								view.Redraw (view.Bounds);
 							}
 						}
@@ -1969,6 +1967,7 @@ namespace Terminal.Gui {
 
 		bool ResizeView (bool autoSize)
 		{
+			var aSize = autoSize;
 			if (textFormatter.Size != Bounds.Size && (((width == null || width is Dim.DimAbsolute) && (Bounds.Width == 0
 				|| autoSize && Bounds.Width != textFormatter.Size.Width))
 				|| ((height == null || height is Dim.DimAbsolute) && (Bounds.Height == 0
@@ -1979,17 +1978,17 @@ namespace Terminal.Gui {
 				} else if (width is Dim.DimAbsolute) {
 					width = Math.Max (Bounds.Width, height.Anchor (Bounds.Width));
 				} else {
-					return false;
+					aSize = false;
 				}
 				if (height == null) {
 					height = Bounds.Height;
 				} else if (height is Dim.DimAbsolute) {
 					height = Math.Max (Bounds.Height, height.Anchor (Bounds.Height));
 				} else {
-					return false;
+					aSize = false;
 				}
 			}
-			return autoSize;
+			return aSize;
 		}
 
 		/// <summary>
@@ -2143,6 +2142,66 @@ namespace Terminal.Gui {
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Calculate the width based on the <see cref="Width"/> settings.
+		/// </summary>
+		/// <param name="desiredWidth">The desired width.</param>
+		/// <param name="resultWidth">The real result width.</param>
+		/// <returns>True if the width can be directly assigned, false otherwise.</returns>
+		public bool SetWidth (int desiredWidth, out int resultWidth)
+		{
+			int w = desiredWidth;
+			bool canSetWidth;
+			if (Width is Dim.DimCombine || Width is Dim.DimView || Width is Dim.DimFill) {
+				// It's a Dim.DimCombine and so can't be assigned. Let it have it's width anchored.
+				w = Width.Anchor (w);
+				canSetWidth = false;
+			} else if (Width is Dim.DimFactor factor) {
+				// Tries to get the SuperView width otherwise the view width.
+				var sw = SuperView != null ? SuperView.Frame.Width : w;
+				if (factor.IsFromRemaining ()) {
+					sw -= Frame.X;
+				}
+				w = Width.Anchor (sw);
+				canSetWidth = false;
+			} else {
+				canSetWidth = true;
+			}
+			resultWidth = w;
+
+			return canSetWidth;
+		}
+
+		/// <summary>
+		/// Calculate the height based on the <see cref="Height"/> settings.
+		/// </summary>
+		/// <param name="desiredHeight">The desired height.</param>
+		/// <param name="resultHeight">The real result height.</param>
+		/// <returns>True if the height can be directly assigned, false otherwise.</returns>
+		public bool SetHeight (int desiredHeight, out int resultHeight)
+		{
+			int h = desiredHeight;
+			bool canSetHeight;
+			if (Height is Dim.DimCombine || Height is Dim.DimView || Height is Dim.DimFill) {
+				// It's a Dim.DimCombine and so can't be assigned. Let it have it's height anchored.
+				h = Height.Anchor (h);
+				canSetHeight = false;
+			} else if (Height is Dim.DimFactor factor) {
+				// Tries to get the SuperView height otherwise the view height.
+				var sh = SuperView != null ? SuperView.Frame.Height : h;
+				if (factor.IsFromRemaining ()) {
+					sh -= Frame.Y;
+				}
+				h = Height.Anchor (sh);
+				canSetHeight = false;
+			} else {
+				canSetHeight = true;
+			}
+			resultHeight = h;
+
+			return canSetHeight;
 		}
 	}
 }

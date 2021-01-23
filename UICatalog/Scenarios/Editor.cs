@@ -13,6 +13,7 @@ namespace UICatalog {
 		private string _fileName = "demo.txt";
 		private TextView _textView;
 		private bool _saved = true;
+		private ScrollBarView _scrollBar;
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
@@ -35,6 +36,7 @@ namespace UICatalog {
 					new MenuItem ("C_ut", "", () => Cut()),
 					new MenuItem ("_Paste", "", () => Paste())
 				}),
+				new MenuBarItem ("_ScrollBarView", CreateKeepChecked ())
 			});
 			Top.Add (menu);
 
@@ -67,6 +69,33 @@ namespace UICatalog {
 			LoadFile ();
 
 			Win.Add (_textView);
+
+			_scrollBar = new ScrollBarView (_textView, true);
+
+			_scrollBar.ChangedPosition += () => {
+				_textView.TopRow = _scrollBar.Position;
+				if (_textView.TopRow != _scrollBar.Position) {
+					_scrollBar.Position = _textView.TopRow;
+				}
+				_textView.SetNeedsDisplay ();
+			};
+
+			_scrollBar.OtherScrollBarView.ChangedPosition += () => {
+				_textView.LeftColumn = _scrollBar.OtherScrollBarView.Position;
+				if (_textView.LeftColumn != _scrollBar.OtherScrollBarView.Position) {
+					_scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
+				}
+				_textView.SetNeedsDisplay ();
+			};
+
+			_textView.DrawContent += (e) => {
+				_scrollBar.Size = _textView.Lines - 1;
+				_scrollBar.Position = _textView.TopRow;
+				_scrollBar.OtherScrollBarView.Size = _textView.Maxlength;
+				_scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
+				_scrollBar.LayoutSubviews ();
+				_scrollBar.Refresh ();
+			};
 		}
 
 		public override void Setup ()
@@ -145,9 +174,23 @@ namespace UICatalog {
 			sb.Append ("Hello world.\n");
 			sb.Append ("This is a test of the Emergency Broadcast System.\n");
 
+			for (int i = 0; i < 30; i++) {
+				sb.Append ($"{i} - This is a test with a very long line and many lines to test the ScrollViewBar against the TextView. - {i}\n");
+			}
 			var sw = System.IO.File.CreateText (fileName);
 			sw.Write (sb.ToString ());
 			sw.Close ();
+		}
+
+		private MenuItem [] CreateKeepChecked ()
+		{
+			var item = new MenuItem ();
+			item.Title = "Keep Content Always In Viewport";
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = true;
+			item.Action += () => _scrollBar.KeepContentAlwaysInViewport = item.Checked = !item.Checked;
+
+			return new MenuItem [] { item };
 		}
 
 		public override void Run ()
