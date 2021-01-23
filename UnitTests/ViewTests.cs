@@ -6,7 +6,7 @@ using System.Linq;
 using Terminal.Gui;
 using Xunit;
 
-// Alais Console to MockConsole so we don't accidentally use Console
+// Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui {
@@ -27,9 +27,9 @@ namespace Terminal.Gui {
 			Assert.Null (r.ColorScheme);
 			Assert.Equal (Dim.Sized (0), r.Width);
 			Assert.Equal (Dim.Sized (0), r.Height);
-			// BUGBUG: Pos needs eqality implemented
-			//Assert.Equal (Pos.At (0), r.X);
-			//Assert.Equal (Pos.At (0), r.Y);
+			// FIXED: Pos needs equality implemented
+			Assert.Equal (Pos.At (0), r.X);
+			Assert.Equal (Pos.At (0), r.Y);
 			Assert.False (r.IsCurrentTop);
 			Assert.Empty (r.Id);
 			Assert.Empty (r.Subviews);
@@ -1076,6 +1076,38 @@ namespace Terminal.Gui {
 			Assert.Equal (4, view.Height);
 			Assert.True (view.Frame.IsEmpty);
 			Assert.True (view.Bounds.IsEmpty);
+		}
+
+		[Fact]
+		public void FocusNearestView_Ensure_Focus_Ordered ()
+		{
+			var top = new Toplevel ();
+
+			var win = new Window ();
+			var winSubview = new View ("WindowSubview") {
+				CanFocus = true
+			};
+			win.Add (winSubview);
+			top.Add (win);
+
+			var frm = new FrameView ();
+			var frmSubview = new View ("FrameSubview") {
+				CanFocus = true
+			};
+			frm.Add (frmSubview);
+			top.Add (frm);
+
+			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
+			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
+			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
+			Assert.Equal ("FrameSubview", top.MostFocused.Text);
+			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
+			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
+
+			top.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+			Assert.Equal ("FrameSubview", top.MostFocused.Text);
+			top.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 		}
 	}
 }

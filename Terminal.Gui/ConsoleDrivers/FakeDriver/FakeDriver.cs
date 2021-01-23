@@ -391,6 +391,7 @@ namespace Terminal.Gui {
 
 				keyHandler (new KeyEvent (map, keyModifiers));
 				keyUpHandler (new KeyEvent (map, keyModifiers));
+				keyModifiers = new KeyModifiers ();
 			};
 		}
 

@@ -35,6 +35,11 @@ namespace Terminal.Gui {
 		int Count { get; }
 
 		/// <summary>
+		/// Returns the maximum length of elements to display
+		/// </summary>
+		int Length { get; }
+
+		/// <summary>
 		/// This method is invoked to render a specified item, the method should cover the entire provided width.
 		/// </summary>
 		/// <returns>The render.</returns>
@@ -45,10 +50,11 @@ namespace Terminal.Gui {
 		/// <param name="col">The column where the rendering will start</param>
 		/// <param name="line">The line where the rendering will be done.</param>
 		/// <param name="width">The width that must be filled out.</param>
+		/// <param name="start">The index of the string to be displayed.</param>
 		/// <remarks>
 		///   The default color will be set before this method is invoked, and will be based on whether the item is selected or not.
 		/// </remarks>
-		void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width);
+		void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width, int start = 0);
 
 		/// <summary>
 		/// Should return whether the specified item is currently marked.
@@ -103,7 +109,7 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public class ListView : View {
-		int top;
+		int top, left;
 		int selected;
 
 		IListDataSource source;
@@ -146,7 +152,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>An item implementing the IList interface.</value>
 		/// <remarks>
-		///  Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custome rendering.
+		///  Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custom rendering.
 		/// </remarks>
 		public Task SetSourceAsync (IList source)
 		{
@@ -204,12 +210,34 @@ namespace Terminal.Gui {
 				if (source == null)
 					return;
 
-				if (top < 0 || top >= source.Count)
+				if (value < 0 || (source.Count > 0 && value >= source.Count))
 					throw new ArgumentException ("value");
 				top = value;
 				SetNeedsDisplay ();
 			}
 		}
+
+		/// <summary>
+		/// Gets or sets the left column where the item start to be displayed at on the <see cref="ListView"/>.
+		/// </summary>
+		/// <value>The left position.</value>
+		public int LeftItem {
+			get => left;
+			set {
+				if (source == null)
+					return;
+
+				if (value < 0 || (Maxlength > 0 && value >= Maxlength))
+					throw new ArgumentException ("value");
+				left = value;
+				SetNeedsDisplay ();
+			}
+		}
+
+		/// <summary>
+		/// Gets the widest item.
+		/// </summary>
+		public int Maxlength => (source?.Length) ?? 0;
 
 		/// <summary>
 		/// Gets or sets the index of the currently selected item.
@@ -228,7 +256,6 @@ namespace Terminal.Gui {
 				OnSelectedChanged ();
 			}
 		}
-
 
 		static IListDataSource MakeWrapper (IList source)
 		{
@@ -298,14 +325,10 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (current);
 			Move (0, 0);
 			var f = Frame;
-			if (selected < top) {
-				top = selected;
-			} else if (selected >= top + f.Height) {
-				top = selected;
-			}
 			var item = top;
 			bool focused = HasFocus;
 			int col = allowsMarking ? 2 : 0;
+			int start = left;
 
 			for (int row = 0; row < f.Height; row++, item++) {
 				bool isSelected = item == selected;
@@ -325,7 +348,7 @@ namespace Terminal.Gui {
 						Driver.AddRune (source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Checked : Driver.Selected) : (AllowsMultipleSelection ? Driver.UnChecked : Driver.UnSelected));
 						Driver.AddRune (' ');
 					}
-					Source.Render (this, Driver, isSelected, item, col, row, f.Width - col);
+					Source.Render (this, Driver, isSelected, item, col, row, f.Width - col, start);
 				}
 			}
 		}
@@ -477,8 +500,11 @@ namespace Terminal.Gui {
 			} else if (selected + 1 < source.Count) { //can move by down by one.
 				selected++;
 
-				if (selected >= top + Frame.Height)
+				if (selected >= top + Frame.Height) {
 					top++;
+				} else if (selected < top) {
+					top = selected;
+				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			} else if (selected == 0) {
@@ -511,8 +537,11 @@ namespace Terminal.Gui {
 				if (selected > Source.Count) {
 					selected = Source.Count - 1;
 				}
-				if (selected < top)
+				if (selected < top) {
 					top = selected;
+				} else if (selected > top + Frame.Height) {
+					top = Math.Max (selected - Frame.Height + 1, 0);
+				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			}
@@ -551,6 +580,46 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <summary>
+		/// Scrolls the view down.
+		/// </summary>
+		/// <param name="lines">Number of lines to scroll down.</param>
+		public virtual void ScrollDown (int lines)
+		{
+			top = Math.Max (Math.Min (top + lines, source.Count - 1), 0);
+			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Scrolls the view up.
+		/// </summary>
+		/// <param name="lines">Number of lines to scroll up.</param>
+		public virtual void ScrollUp (int lines)
+		{
+			top = Math.Max (top - lines, 0);
+			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Scrolls the view right.
+		/// </summary>
+		/// <param name="cols">Number of columns to scroll right.</param>
+		public virtual void ScrollRight (int cols)
+		{
+			left = Math.Max (Math.Min (left + cols, Maxlength - 1), 0);
+			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Scrolls the view left.
+		/// </summary>
+		/// <param name="cols">Number of columns to scroll left.</param>
+		public virtual void ScrollLeft (int cols)
+		{
+			left = Math.Max (left - cols, 0);
+			SetNeedsDisplay ();
+		}
+
 		int lastSelectedItem = -1;
 		private bool allowsMultipleSelection = true;
 
@@ -563,7 +632,9 @@ namespace Terminal.Gui {
 			if (selected != lastSelectedItem) {
 				var value = source?.Count > 0 ? source.ToList () [selected] : null;
 				SelectedItemChanged?.Invoke (new ListViewItemEventArgs (selected, value));
-				lastSelectedItem = selected;
+				if (HasFocus) {
+					lastSelectedItem = selected;
+				}
 				return true;
 			}
 
@@ -587,6 +658,7 @@ namespace Terminal.Gui {
 		public override bool OnEnter (View view)
 		{
 			if (lastSelectedItem == -1) {
+				EnsuresVisibilitySelectedItem ();
 				OnSelectedChanged ();
 				return true;
 			}
@@ -605,6 +677,16 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		void EnsuresVisibilitySelectedItem ()
+		{
+			SuperView?.LayoutSubviews ();
+			if (selected < top) {
+				top = selected;
+			} else if (Frame.Height > 0 && selected >= top + Frame.Height) {
+				top = Math.Max (selected - Frame.Height + 2, 0);
+			}
+		}
+
 		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
@@ -618,7 +700,8 @@ namespace Terminal.Gui {
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
-				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp)
+				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp &&
+				me.Flags != MouseFlags.WheeledRight && me.Flags != MouseFlags.WheeledLeft)
 				return false;
 
 			if (!HasFocus && CanFocus) {
@@ -630,10 +713,16 @@ namespace Terminal.Gui {
 			}
 
 			if (me.Flags == MouseFlags.WheeledDown) {
-				MoveDown ();
+				ScrollDown (1);
 				return true;
 			} else if (me.Flags == MouseFlags.WheeledUp) {
-				MoveUp ();
+				ScrollUp (1);
+				return true;
+			} else if (me.Flags == MouseFlags.WheeledRight) {
+				ScrollRight (1);
+				return true;
+			} else if (me.Flags == MouseFlags.WheeledLeft) {
+				ScrollLeft (1);
 				return true;
 			}
 
@@ -655,6 +744,8 @@ namespace Terminal.Gui {
 
 			return true;
 		}
+
+
 	}
 
 	/// <summary>
@@ -664,7 +755,7 @@ namespace Terminal.Gui {
 	public class ListWrapper : IListDataSource {
 		IList src;
 		BitArray marks;
-		int count;
+		int count, len;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="ListWrapper"/> given an <see cref="IList"/>
@@ -675,7 +766,8 @@ namespace Terminal.Gui {
 			if (source != null) {
 				count = source.Count;
 				marks = new BitArray (count);
-				this.src = source;
+				src = source;
+				len = GetMaxLengthItem ();
 			}
 		}
 
@@ -684,11 +776,42 @@ namespace Terminal.Gui {
 		/// </summary>
 		public int Count => src != null ? src.Count : 0;
 
-		void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width)
+		/// <summary>
+		/// Gets the maximum item length in the <see cref="IList"/>.
+		/// </summary>
+		public int Length => len;
+
+		int GetMaxLengthItem ()
+		{
+			if (src?.Count == 0) {
+				return 0;
+			}
+
+			int maxLength = 0;
+			for (int i = 0; i < src.Count; i++) {
+				var t = src [i];
+				int l;
+				if (t is ustring u) {
+					l = u.RuneCount;
+				} else if (t is string s) {
+					l = s.Length;
+				} else {
+					l = t.ToString ().Length;
+				}
+
+				if (l > maxLength) {
+					maxLength = l;
+				}
+			}
+
+			return maxLength;
+		}
+
+		void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width, int start = 0)
 		{
 			int byteLen = ustr.Length;
 			int used = 0;
-			for (int i = 0; i < byteLen;) {
+			for (int i = start; i < byteLen;) {
 				(var rune, var size) = Utf8.DecodeRune (ustr, i, i - byteLen);
 				var count = Rune.ColumnWidth (rune);
 				if (used + count > width)
@@ -712,19 +835,21 @@ namespace Terminal.Gui {
 		/// <param name="col">The col where to move.</param>
 		/// <param name="line">The line where to move.</param>
 		/// <param name="width">The item width.</param>
-		public void Render (ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width)
+		/// <param name="start">The index of the string to be displayed.</param>
+		public void Render (ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width, int start = 0)
 		{
 			container.Move (col, line);
 			var t = src [item];
 			if (t == null) {
 				RenderUstr (driver, ustring.Make (""), col, line, width);
 			} else {
-				if (t is ustring) {
-					RenderUstr (driver, (ustring)t, col, line, width);
-				} else if (t is string) {
-					RenderUstr (driver, (string)t, col, line, width);
-				} else
-					RenderUstr (driver, t.ToString (), col, line, width);
+				if (t is ustring u) {
+					RenderUstr (driver, u, col, line, width, start);
+				} else if (t is string s) {
+					RenderUstr (driver, s, col, line, width, start);
+				} else {
+					RenderUstr (driver, t.ToString (), col, line, width, start);
+				}
 			}
 		}
 
@@ -770,14 +895,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		public int Item { get; }
 		/// <summary>
-		/// The the <see cref="ListView"/> item.
+		/// The <see cref="ListView"/> item.
 		/// </summary>
 		public object Value { get; }
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="ListViewItemEventArgs"/>
 		/// </summary>
-		/// <param name="item">The index of the the <see cref="ListView"/> item.</param>
+		/// <param name="item">The index of the <see cref="ListView"/> item.</param>
 		/// <param name="value">The <see cref="ListView"/> item</param>
 		public ListViewItemEventArgs (int item, object value)
 		{
