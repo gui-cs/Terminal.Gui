@@ -329,6 +329,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// The current number of rows in the tree (ignoring the controls bounds)
+		/// </summary>
+		public int ContentHeight { get; private set; }
+
+		/// <summary>
 		/// Returns the string representation of model objects hosted in the tree.  Default implementation is to call <see cref="object.ToString"/>
 		/// </summary>
 		/// <value></value>
@@ -516,6 +521,8 @@ namespace Terminal.Gui {
 			foreach(var root in roots.Values) {
 				toReturn.AddRange(AddToLineMap(root));
 			}
+
+			ContentHeight = toReturn.Count;
 
 			return toReturn.ToArray();
 		}

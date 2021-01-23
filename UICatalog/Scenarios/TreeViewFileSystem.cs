@@ -14,11 +14,6 @@ namespace UICatalog.Scenarios {
 		/// </summary>
 		TreeView<FileSystemInfo> treeViewFiles;
 
-		/// <summary>
-		/// A tree view where nodes are <see cref="ITreeNode"/>
-		/// </summary>
-		TreeView treeViewNodes;
-
 		MenuItem miShowLines;
 		private MenuItem miPlusMinus;
 		private MenuItem miArrowSymbols;
@@ -73,40 +68,46 @@ namespace UICatalog.Scenarios {
 				X = 0,
 				Y = Pos.Bottom(lblFiles),
 				Width = Dim.Fill(),
-				Height = Dim.Fill(11 /*9 for other tree view, 1 for label, 1 for status bar*/),
+				Height = Dim.Fill(),
 			};
 			
 			SetupFileTree();
 
 			Win.Add(treeViewFiles);
 			
-			var lblNodeTree = new Label("Node Tree:"){
-				X=0,
-				Y=Pos.Bottom(treeViewFiles)+1
-			};
-
-			Win.Add(lblNodeTree);
-			
-			treeViewNodes = new TreeView() {
-				X = 0,
-				Y = Pos.Bottom(lblNodeTree),
-				Width = 40,
-				Height = 9,
-			};
-
-			SetupNodeTree();
-
-			Win.Add(treeViewNodes);
-
+			SetupScrollBar();
+						
 			green = Application.Driver.MakeAttribute (Color.Green, Color.Blue);			
 			red = Application.Driver.MakeAttribute (Color.Red, Color.Blue);
 		}
 
-		private void SetupNodeTree ()
-		{		
-			// Add 2 root nodes with simple set of subfolders
-			treeViewNodes.AddObject(CreateSimpleRoot());
-			treeViewNodes.AddObject(CreateSimpleRoot());
+		private void SetupScrollBar ()
+		{
+			var _scrollBar = new ScrollBarView (treeViewFiles, true);
+
+			_scrollBar.ChangedPosition += () => {
+				treeViewFiles.ScrollOffset = _scrollBar.Position;
+				if (treeViewFiles.ScrollOffset != _scrollBar.Position) {
+					_scrollBar.Position = treeViewFiles.ScrollOffset;
+				}
+				treeViewFiles.SetNeedsDisplay ();
+			};
+			/*
+			_scrollBar.OtherScrollBarView.ChangedPosition += () => {
+				_listView.LeftItem = _scrollBar.OtherScrollBarView.Position;
+				if (_listView.LeftItem != _scrollBar.OtherScrollBarView.Position) {
+					_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
+				}
+				_listView.SetNeedsDisplay ();
+			};*/
+			
+			treeViewFiles.DrawContent += (e) => {
+				_scrollBar.Size = treeViewFiles.ContentHeight;
+				_scrollBar.Position = treeViewFiles.ScrollOffset;
+			//	_scrollBar.OtherScrollBarView.Size = _listView.Maxlength - 1;
+			//	_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
+				_scrollBar.Refresh ();
+			};
 		}
 
 		private void SetupFileTree ()
@@ -131,9 +132,6 @@ namespace UICatalog.Scenarios {
 		{
 			miShowLines.Checked = !miShowLines.Checked;
 
-			treeViewNodes.Style.ShowBranchLines = miShowLines.Checked;
-			treeViewNodes.SetNeedsDisplay();
-
 			treeViewFiles.Style.ShowBranchLines = miShowLines.Checked;
 			treeViewFiles.SetNeedsDisplay();
 		}
@@ -144,11 +142,7 @@ namespace UICatalog.Scenarios {
 			miArrowSymbols.Checked = expand == '>';
 			miNoSymbols.Checked = expand == null;
 			miUnicodeSymbols.Checked = expand == 'ஹ';
-
-			treeViewNodes.Style.ExpandableSymbol = expand;
-			treeViewNodes.Style.CollapseableSymbol = collapse;
-			treeViewNodes.SetNeedsDisplay();
-			
+						
 			treeViewFiles.Style.ExpandableSymbol = expand;
 			treeViewFiles.Style.CollapseableSymbol = collapse;
 			treeViewFiles.SetNeedsDisplay();
@@ -159,18 +153,12 @@ namespace UICatalog.Scenarios {
 
 			treeViewFiles.Style.ColorExpandSymbol =  miColoredSymbols.Checked;
 			treeViewFiles.SetNeedsDisplay();
-
-			treeViewNodes.Style.ColorExpandSymbol =  miColoredSymbols.Checked;
-			treeViewNodes.SetNeedsDisplay();
 		}
 		private void InvertExpandableSymbols(){
 			miInvertSymbols.Checked = !miInvertSymbols.Checked;
 
 			treeViewFiles.Style.InvertExpandSymbolColors =  miInvertSymbols.Checked;
 			treeViewFiles.SetNeedsDisplay();
-
-			treeViewNodes.Style.InvertExpandSymbolColors =  miInvertSymbols.Checked;
-			treeViewNodes.SetNeedsDisplay();
 		}
 
 		private void SetFullName()
@@ -183,66 +171,6 @@ namespace UICatalog.Scenarios {
 				treeViewFiles.AspectGetter = (f)=>f.Name;
 		}
 
-
-		private ITreeNode CreateSimpleRoot ()
-		{
-			return new TreeNode("Root"){
-				Children = new List<ITreeNode>()
-				{
-					new TreeNode("Folder_1"){
-					Children = new List<ITreeNode>()
-					{
-						new TreeNode("Folder_1.1"){
-							Children = new List<ITreeNode>()
-							{
-								new TreeNode("File_1.1.1"),
-								new TreeNode("File_1.1.2")
-							}},
-						new TreeNode("Folder_1.2"){
-							Children = new List<ITreeNode>()
-							{
-								new TreeNode("File_1.2.1"),
-								new TreeNode("File_1.2.2")
-							}},
-						new TreeNode("File_1.1")
-					}},
-					new TreeNode("Folder_2"){
-					Children = new List<ITreeNode>()
-					{
-						new TreeNode("Folder_2.1"){
-							Children = new List<ITreeNode>()
-							{
-								new TreeNode("File_2.1.1"),
-								new TreeNode("File_2.1.2")
-							}},
-						new TreeNode("Folder_2.2"){
-							Children = new List<ITreeNode>()
-							{
-								new TreeNode("File_2.2.1"),
-								new TreeNode("File_2.2.2")
-							}},
-						new TreeNode("File_2.1")
-					}},
-					new TreeNode("Folder_3"){
-					Children = new List<ITreeNode>()
-					{
-						new TreeNode("Folder_3.1"){
-							Children = new List<ITreeNode>()
-							{
-								new TreeNode("File_3.1.1"),
-								new TreeNode("File_3.1.2")
-							}},
-						new TreeNode("Folder_3.2"){
-							Children = new List<ITreeNode>()
-							{
-								new TreeNode("File_3.2.1"),
-								new TreeNode("File_3.2.2")
-							}},
-						new TreeNode("File_3.1")
-					}}
-				}
-			};
-		}
 
 		private IEnumerable<FileSystemInfo> GetChildren(FileSystemInfo model)
 		{
