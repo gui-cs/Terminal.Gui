@@ -797,10 +797,10 @@ namespace Terminal.Gui {
 						//if user has scrolled up too far to see their selection
 						ScrollOffsetVertical = newIdx;
 					}
-					else if(newIdx >= ScrollOffsetVertical + Bounds.Height){
+					else if(newIdx >= ScrollOffsetVertical + Bounds.Height -1 /*this -1 allows for possible horizontal scroll bar*/){
 						
 						//if user has scrolled off bottom of visible tree
-						ScrollOffsetVertical = Math.Max(0,(newIdx+1) - Bounds.Height);
+						ScrollOffsetVertical = Math.Max(0,(newIdx+1) - (Bounds.Height-1));
 
 					}
 				}
