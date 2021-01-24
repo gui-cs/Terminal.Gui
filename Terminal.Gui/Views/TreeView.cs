@@ -262,6 +262,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool InvertExpandSymbolColors {get;set;}
 
+		/// <summary>
+		/// True to leave the last row of the control free for overwritting (e.g. by a scrollbar). When True scrolling will be triggered on the second last row of the control rather than the last.
+		/// </summary>
+		/// <value></value>
+		public bool LeaveLastRow {get;set;}
+
 	}
 
 	/// <summary>
@@ -792,16 +798,17 @@ namespace Terminal.Gui {
 					var newIdx = Math.Min(Math.Max(0,idx+offset),map.Length-1);
 					SelectedObject = map[newIdx].Model;
 
+ 					/*this -1 allows for possible horizontal scroll bar in the last row of the control*/
+					int leaveSpace = Style.LeaveLastRow ? 1 :0;
 					
 					if(newIdx < ScrollOffsetVertical) {
 						//if user has scrolled up too far to see their selection
 						ScrollOffsetVertical = newIdx;
 					}
-					else if(newIdx >= ScrollOffsetVertical + Bounds.Height -1 /*this -1 allows for possible horizontal scroll bar*/){
+					else if(newIdx >= ScrollOffsetVertical + Bounds.Height - leaveSpace){
 						
 						//if user has scrolled off bottom of visible tree
-						ScrollOffsetVertical = Math.Max(0,(newIdx+1) - (Bounds.Height-1));
-
+						ScrollOffsetVertical = Math.Max(0,(newIdx+1) - (Bounds.Height-leaveSpace));
 					}
 				}
 

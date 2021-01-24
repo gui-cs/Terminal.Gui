@@ -83,6 +83,9 @@ namespace UICatalog.Scenarios {
 
 		private void SetupScrollBar ()
 		{
+			// When using scroll bar leave the last row of the control free (for over-rendering with scroll bar)
+			treeViewFiles.Style.LeaveLastRow = true;
+
 			var _scrollBar = new ScrollBarView (treeViewFiles, true);
 
 			_scrollBar.ChangedPosition += () => {
