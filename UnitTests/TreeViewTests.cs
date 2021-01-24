@@ -13,9 +13,17 @@ namespace UnitTests {
 		class Factory
 		{
 			public Car[] Cars {get;set;}
+			public override string ToString ()
+			{
+				return "Factory";
+			}
 		};
 		class Car {
-
+			public string Name{get;set;}
+			public override string ToString ()
+			{
+				return Name;
+			}
 		};
 		
 		private TreeView<object> CreateTree()
@@ -56,6 +64,103 @@ namespace UnitTests {
 			Assert.False(tree.IsExpanded(f));
 		}
 
+		[Fact]
+		public void EmptyTreeView_ContentSizes()
+		{
+			var emptyTree = new TreeView();
+			Assert.Equal(0,emptyTree.ContentHeight);
+			Assert.Equal(0,emptyTree.GetContentWidth(true));
+			Assert.Equal(0,emptyTree.GetContentWidth(false));
+		}
+		[Fact]
+		public void EmptyTreeViewGeneric_ContentSizes()
+		{
+			var emptyTree = new TreeView<string>();
+			Assert.Equal(0,emptyTree.ContentHeight);
+			Assert.Equal(0,emptyTree.GetContentWidth(true));
+			Assert.Equal(0,emptyTree.GetContentWidth(false));
+		}
+		
+		/// <summary>
+		/// Tests that <see cref="TreeView.Expand(object)"/> results in a correct content height
+		/// </summary>
+		[Fact]
+		public void ContentHeight_BiggerAfterExpand()
+		{
+			var tree = CreateTree(out Factory f, out _, out _);
+			Assert.Equal(1,tree.ContentHeight);
+
+			tree.Expand(f);
+			Assert.Equal(3,tree.ContentHeight);
+
+			tree.Collapse(f);
+			Assert.Equal(1,tree.ContentHeight);
+		}
+
+		[Fact]
+		public void ContentWidth_BiggerAfterExpand()
+		{
+			var tree = CreateTree(out Factory f, out Car car1, out _);
+			tree.Bounds = new Rect(0,0,10,10);
+			
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			driver.Init (() => { });
+
+			//-+Factory
+			Assert.Equal(9,tree.GetContentWidth(true));
+
+			car1.Name = "123456789";
+
+			tree.Expand(f);
+
+			//..├-123456789
+			Assert.Equal(13,tree.GetContentWidth(true));
+
+			tree.Collapse(f);
+			//-+Factory
+			Assert.Equal(9,tree.GetContentWidth(true));
+		}
+		
+		[Fact]
+		public void ContentWidth_VisibleVsAll()
+		{
+			var tree = CreateTree(out Factory f, out Car car1, out Car car2);
+			// control only allows 1 row to be viewed at once
+			tree.Bounds = new Rect(0,0,20,1);
+			
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			driver.Init (() => { });
+
+			//-+Factory
+			Assert.Equal(9,tree.GetContentWidth(true));
+			Assert.Equal(9,tree.GetContentWidth(false));
+
+			car1.Name = "123456789";
+			car2.Name = "12345678";
+
+			tree.Expand(f);
+			
+			// Although expanded the bigger (longer) child node is not in the rendered area of the control
+			Assert.Equal(9,tree.GetContentWidth(true));
+			Assert.Equal(13,tree.GetContentWidth(false)); // If you ask for the global max width it includes the longer child
+
+			// Now that we have scrolled down 1 row we should see the big child
+			tree.ScrollOffsetVertical = 1;
+			Assert.Equal(13,tree.GetContentWidth(true));
+			Assert.Equal(13,tree.GetContentWidth(false));
+			
+			// Scroll down so only car2 is visible
+			tree.ScrollOffsetVertical = 2;
+			Assert.Equal(12,tree.GetContentWidth(true));
+			Assert.Equal(13,tree.GetContentWidth(false));
+			
+			// Scroll way down (off bottom of control even)
+			tree.ScrollOffsetVertical = 5;
+			Assert.Equal(0,tree.GetContentWidth(true));
+			Assert.Equal(13,tree.GetContentWidth(false));
+		}
 		/// <summary>
 		/// Tests that <see cref="TreeView.IsExpanded(object)"/> and <see cref="TreeView.Expand(object)"/> behaves correctly when an object cannot be expanded (because it has no children)
 		/// </summary>

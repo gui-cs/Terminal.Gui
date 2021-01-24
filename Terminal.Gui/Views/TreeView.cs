@@ -537,7 +537,11 @@ namespace Terminal.Gui {
 			if(visible){
 
 				//Somehow we managed to scroll off the end of the control
-				if(ScrollOffsetVertical > map.Length)
+				if(ScrollOffsetVertical >= map.Length)
+					return 0;
+
+				// If control has no height to it then there is no visible area for content
+				if(Bounds.Height == 0)
 					return 0;
 
 				return map.Skip(ScrollOffsetVertical).Take(Bounds.Height).Max(b=>b.GetWidth(Driver));
