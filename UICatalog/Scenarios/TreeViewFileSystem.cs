@@ -92,20 +92,20 @@ namespace UICatalog.Scenarios {
 				}
 				treeViewFiles.SetNeedsDisplay ();
 			};
-			/*
+			
 			_scrollBar.OtherScrollBarView.ChangedPosition += () => {
-				_listView.LeftItem = _scrollBar.OtherScrollBarView.Position;
-				if (_listView.LeftItem != _scrollBar.OtherScrollBarView.Position) {
-					_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
+				treeViewFiles.ScrollOffsetHorizontal = _scrollBar.OtherScrollBarView.Position;
+				if (treeViewFiles.ScrollOffsetHorizontal != _scrollBar.OtherScrollBarView.Position) {
+					_scrollBar.OtherScrollBarView.Position = treeViewFiles.ScrollOffsetHorizontal;
 				}
-				_listView.SetNeedsDisplay ();
-			};*/
+				treeViewFiles.SetNeedsDisplay ();
+			};
 			
 			treeViewFiles.DrawContent += (e) => {
 				_scrollBar.Size = treeViewFiles.ContentHeight;
 				_scrollBar.Position = treeViewFiles.ScrollOffsetVertical;
-			//	_scrollBar.OtherScrollBarView.Size = _listView.Maxlength - 1;
-			//	_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
+				_scrollBar.OtherScrollBarView.Size = treeViewFiles.GetContentWidth(true);
+				_scrollBar.OtherScrollBarView.Position = treeViewFiles.ScrollOffsetHorizontal;
 				_scrollBar.Refresh ();
 			};
 		}

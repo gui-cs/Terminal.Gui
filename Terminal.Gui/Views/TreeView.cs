@@ -346,7 +346,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public int ContentHeight => BuildLineMap().Count();
 
-
 		/// <summary>
 		/// Returns the string representation of model objects hosted in the tree.  Default implementation is to call <see cref="object.ToString"/>
 		/// </summary>
@@ -521,6 +520,32 @@ namespace Terminal.Gui {
 
 			//object not found
 			return -1;
+		}
+
+		/// <summary>
+		/// Returns the maximum width line in the tree including prefix and expansion symbols
+		/// </summary>
+		/// <param name="visible">True to consider only rows currently visible (based on window bounds and <see cref="ScrollOffsetVertical"/>.  False to calculate the width of every exposed branch in the tree</param>
+		/// <returns></returns>
+		public int GetContentWidth(bool visible){
+			
+			var map = BuildLineMap();
+
+			if(map.Length == 0)
+				return 0;
+
+			if(visible){
+
+				//Somehow we managed to scroll off the end of the control
+				if(ScrollOffsetVertical > map.Length)
+					return 0;
+
+				return map.Skip(ScrollOffsetVertical).Take(Bounds.Height).Max(b=>b.GetWidth(Driver));
+			}
+			else{
+
+				return map.Max(b=>b.GetWidth(Driver));
+			}
 		}
 
 		/// <summary>
@@ -899,6 +924,18 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Returns the width of the line including prefix and the results of <see cref="TreeView{T}.AspectGetter"/> (the line body).
+		/// </summary>
+		/// <returns></returns>
+		public virtual int GetWidth (ConsoleDriver driver)
+		{
+			return 
+				GetLinePrefix(driver).Sum(Rune.ColumnWidth) + 
+				Rune.ColumnWidth(GetExpandableSymbol(driver)) + 
+				(tree.AspectGetter(Model) ?? "").Length;
+		}
+
+		/// <summary>
 		/// Renders the current <see cref="Model"/> on the specified line <paramref name="y"/>
 		/// </summary>
 		/// <param name="driver"></param>
@@ -1210,6 +1247,7 @@ namespace Terminal.Gui {
 
 			return false;
 		}
+
 	}
 
 	/// <summary>

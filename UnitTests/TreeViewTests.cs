@@ -89,13 +89,13 @@ namespace UnitTests {
 		{
 			var tree = CreateTree();
 
-			Assert.Equal(0,tree.ScrollOffset);
+			Assert.Equal(0,tree.ScrollOffsetVertical);
 
-			tree.ScrollOffset = -100;
-			Assert.Equal(0,tree.ScrollOffset);
+			tree.ScrollOffsetVertical = -100;
+			Assert.Equal(0,tree.ScrollOffsetVertical);
 			
-			tree.ScrollOffset = 10;
-			Assert.Equal(10,tree.ScrollOffset);
+			tree.ScrollOffsetVertical = 10;
+			Assert.Equal(10,tree.ScrollOffsetVertical);
 		}
 
 
