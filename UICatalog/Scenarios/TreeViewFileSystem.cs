@@ -86,9 +86,9 @@ namespace UICatalog.Scenarios {
 			var _scrollBar = new ScrollBarView (treeViewFiles, true);
 
 			_scrollBar.ChangedPosition += () => {
-				treeViewFiles.ScrollOffset = _scrollBar.Position;
-				if (treeViewFiles.ScrollOffset != _scrollBar.Position) {
-					_scrollBar.Position = treeViewFiles.ScrollOffset;
+				treeViewFiles.ScrollOffsetVertical = _scrollBar.Position;
+				if (treeViewFiles.ScrollOffsetVertical != _scrollBar.Position) {
+					_scrollBar.Position = treeViewFiles.ScrollOffsetVertical;
 				}
 				treeViewFiles.SetNeedsDisplay ();
 			};
@@ -103,7 +103,7 @@ namespace UICatalog.Scenarios {
 			
 			treeViewFiles.DrawContent += (e) => {
 				_scrollBar.Size = treeViewFiles.ContentHeight;
-				_scrollBar.Position = treeViewFiles.ScrollOffset;
+				_scrollBar.Position = treeViewFiles.ScrollOffsetVertical;
 			//	_scrollBar.OtherScrollBarView.Size = _listView.Maxlength - 1;
 			//	_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
 				_scrollBar.Refresh ();

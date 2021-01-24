@@ -269,7 +269,8 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class TreeView<T> : View, ITreeView where T:class
 	{   
-		private int scrollOffset;
+		private int scrollOffsetVertical;
+		private int scrollOffsetHorizontal;
 
 		/// <summary>
 		/// Determines how sub branches of the tree are dynamically built at runtime as the user expands root nodes
@@ -320,11 +321,23 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The amount of tree view that has been scrolled off the top of the screen (by the user scrolling down)
 		/// </summary>
-		/// <remarks>Setting a value of less than 0 will result in a ScrollOffset of 0.  To see changes in the UI call <see cref="View.SetNeedsDisplay()"/></remarks>
-		public int ScrollOffset { 
-			get => scrollOffset;
+		/// <remarks>Setting a value of less than 0 will result in a offset of 0.  To see changes in the UI call <see cref="View.SetNeedsDisplay()"/></remarks>
+		public int ScrollOffsetVertical { 
+			get => scrollOffsetVertical;
 			set {
-				scrollOffset = Math.Max(0,value); 
+				scrollOffsetVertical = Math.Max(0,value); 
+			}
+		}
+
+
+		/// <summary>
+		/// The amount of tree view that has been scrolled to the right (horizontally)
+		/// </summary>
+		/// <remarks>Setting a value of less than 0 will result in a offset of 0.  To see changes in the UI call <see cref="View.SetNeedsDisplay()"/></remarks>
+		public int ScrollOffsetHorizontal { 
+			get => scrollOffsetHorizontal;
+			set {
+				scrollOffsetHorizontal = Math.Max(0,value); 
 			}
 		}
 
@@ -332,6 +345,7 @@ namespace Terminal.Gui {
 		/// The current number of rows in the tree (ignoring the controls bounds)
 		/// </summary>
 		public int ContentHeight => BuildLineMap().Count();
+
 
 		/// <summary>
 		/// Returns the string representation of model objects hosted in the tree.  Default implementation is to call <see cref="object.ToString"/>
@@ -473,7 +487,7 @@ namespace Terminal.Gui {
 
 			for(int line = 0 ; line < bounds.Height; line++){
 
-				var idxToRender = ScrollOffset + line;
+				var idxToRender = ScrollOffsetVertical + line;
 
 				// Is there part of the tree view to render?
 				if(idxToRender < map.Length) {
@@ -491,7 +505,7 @@ namespace Terminal.Gui {
 		}
 		
 		/// <summary>
-		/// Returns the index of the object <paramref name="o"/> if it is currently exposed (it's parent(s) have been expanded).  This can be used with <see cref="ScrollOffset"/> and <see cref="View.SetNeedsDisplay()"/> to scroll to a specific object
+		/// Returns the index of the object <paramref name="o"/> if it is currently exposed (it's parent(s) have been expanded).  This can be used with <see cref="ScrollOffsetVertical"/> and <see cref="View.SetNeedsDisplay()"/> to scroll to a specific object
 		/// </summary>
 		/// <remarks>Uses the Equals method and returns the first index at which the object is found or -1 if it is not found</remarks>
 		/// <param name="o">An object that appears in your tree and is currently exposed</param>
@@ -583,7 +597,7 @@ namespace Terminal.Gui {
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
-				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp)
+				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp && me.Flags != MouseFlags.WheeledRight&& me.Flags != MouseFlags.WheeledLeft)
 				return false;
 
 			if (!HasFocus && CanFocus) {
@@ -593,12 +607,25 @@ namespace Terminal.Gui {
 
 			if (me.Flags == MouseFlags.WheeledDown) {
 
-				ScrollOffset++;
+				ScrollOffsetVertical++;
 				SetNeedsDisplay();
 
 				return true;
 			} else if (me.Flags == MouseFlags.WheeledUp) {
-				ScrollOffset--;
+				ScrollOffsetVertical--;
+				SetNeedsDisplay();
+
+				return true;
+			}
+
+			if (me.Flags == MouseFlags.WheeledRight) {
+
+				ScrollOffsetHorizontal++;
+				SetNeedsDisplay();
+
+				return true;
+			} else if (me.Flags == MouseFlags.WheeledLeft) {
+				ScrollOffsetHorizontal--;
 				SetNeedsDisplay();
 
 				return true;
@@ -608,7 +635,7 @@ namespace Terminal.Gui {
 
 				var map = BuildLineMap();
 				
-				var idx = me.Y + ScrollOffset;
+				var idx = me.Y + ScrollOffsetVertical;
 
 				// click is outside any visible nodes
 				if(idx < 0 || idx >= map.Length) {
@@ -660,8 +687,8 @@ namespace Terminal.Gui {
 				var idx = Array.FindIndex(map,b=>b.Model.Equals(SelectedObject));
 
 				// if currently selected line is visible
-				if(idx - ScrollOffset >= 0 && idx - ScrollOffset  < Bounds.Height)
-					Move(0,idx - ScrollOffset);
+				if(idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical  < Bounds.Height)
+					Move(0,idx - ScrollOffsetVertical);
 				else
 					base.PositionCursor();
 
@@ -690,11 +717,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Changes the <see cref="SelectedObject"/> to the first root object and resets the <see cref="ScrollOffset"/> to 0
+		/// Changes the <see cref="SelectedObject"/> to the first root object and resets the <see cref="ScrollOffsetVertical"/> to 0
 		/// </summary>
 		public void GoToFirst()
 		{
-			ScrollOffset = 0;
+			ScrollOffsetVertical = 0;
 			SelectedObject = roots.Keys.FirstOrDefault();
 
 			SetNeedsDisplay();
@@ -706,7 +733,7 @@ namespace Terminal.Gui {
 		public void GoToEnd ()
 		{
 			var map = BuildLineMap();
-			ScrollOffset = Math.Max(0,map.Length - Bounds.Height +1);
+			ScrollOffsetVertical = Math.Max(0,map.Length - Bounds.Height +1);
 			SelectedObject = map.Last().Model;
 						
 			SetNeedsDisplay();
@@ -737,14 +764,14 @@ namespace Terminal.Gui {
 					SelectedObject = map[newIdx].Model;
 
 					
-					if(newIdx < ScrollOffset) {
+					if(newIdx < ScrollOffsetVertical) {
 						//if user has scrolled up too far to see their selection
-						ScrollOffset = newIdx;
+						ScrollOffsetVertical = newIdx;
 					}
-					else if(newIdx >= ScrollOffset + Bounds.Height){
+					else if(newIdx >= ScrollOffsetVertical + Bounds.Height){
 						
 						//if user has scrolled off bottom of visible tree
-						ScrollOffset = Math.Max(0,(newIdx+1) - Bounds.Height);
+						ScrollOffsetVertical = Math.Max(0,(newIdx+1) - Bounds.Height);
 
 					}
 				}
@@ -889,28 +916,23 @@ namespace Terminal.Gui {
 			// Everything on line before the expansion run and branch text
 			Rune[] prefix = GetLinePrefix(driver).ToArray();
 			Rune expansion = GetExpandableSymbol(driver);
-			string lineBody = tree.AspectGetter(Model);
-
-			// How much space is left after prefix and expansion symbol?
-			var remainingWidth = availableWidth - (prefix.Sum(Rune.ColumnWidth) + Rune.ColumnWidth(expansion) );
-
-			// If body of line is too long
-			if(lineBody.Sum(l=>Rune.ColumnWidth(l)) > remainingWidth)
-			{
-				// remaining space is zero and truncate the line
-				lineBody = new string(lineBody.TakeWhile(c=>(remainingWidth -= Rune.ColumnWidth(c)) > 0).ToArray());
-				remainingWidth = 0;
-			}
-			else{
-
-				// line is short so remaining width will be whatever comes after the line body
-				remainingWidth -= lineBody.Length;
-			}
+			string lineBody = tree.AspectGetter(Model) ?? "";
 
 			tree.Move(0,y);
 
+			// if we have scrolled to the right then bits of the prefix will have dispeared off the screen
+			int toSkip = tree.ScrollOffsetHorizontal;
+
+			// Draw the line prefix (all paralell lanes or whitespace and an expand/collapse/leaf symbol)
 			foreach(Rune r in prefix){
-				driver.AddRune(r);
+
+				if(toSkip > 0){
+					toSkip--;
+				}
+				else{
+					driver.AddRune(r);
+					availableWidth -= Rune.ColumnWidth(r);
+				}
 			}
 
 			// pick color for expanded symbol
@@ -929,14 +951,44 @@ namespace Terminal.Gui {
 				driver.SetAttribute(color);
 			}
 
-			driver.AddRune(expansion);
+			if(toSkip > 0){
+				toSkip--;
+			}
+			else{
+				driver.AddRune(expansion);
+				availableWidth -= Rune.ColumnWidth(expansion);
+			}
+
+			// horizontal scrolling has already skipped the prefix but now must also skip some of the line body
+			if(toSkip > 0)
+			{
+				if(toSkip > lineBody.Length){
+					lineBody = "";
+				}
+				else{
+					lineBody = lineBody.Substring(toSkip);
+				}
+			}
 			
+			// If body of line is too long
+			if(lineBody.Sum(l=>Rune.ColumnWidth(l)) > availableWidth)
+			{
+				// remaining space is zero and truncate the line
+				lineBody = new string(lineBody.TakeWhile(c=>(availableWidth -= Rune.ColumnWidth(c)) > 0).ToArray());
+				availableWidth = 0;
+			}
+			else{
+
+				// line is short so remaining width will be whatever comes after the line body
+				availableWidth -= lineBody.Length;
+			}
+
 			//reset the line color if it was changed for rendering expansion symbol
 			driver.SetAttribute(lineColor);
 			driver.AddStr(lineBody);
 
-			if(remainingWidth > 0)
-				driver.AddStr(new string(' ',remainingWidth));
+			if(availableWidth > 0)
+				driver.AddStr(new string(' ',availableWidth));
 
 			driver.SetAttribute(colorScheme.Normal);
 		}
