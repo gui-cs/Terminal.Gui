@@ -22,6 +22,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miInvertSymbols;
 		private MenuItem miUnicodeSymbols;
 		private MenuItem miFullPaths;
+		private MenuItem miLeaveLastRow;
 		private Terminal.Gui.Attribute green;
 		private Terminal.Gui.Attribute red;
 
@@ -49,6 +50,7 @@ namespace UICatalog.Scenarios {
 					miColoredSymbols = new MenuItem ("_ColoredSymbols", "", () => ShowColoredExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 					miInvertSymbols = new MenuItem ("_InvertSymbols", "", () => InvertExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 					miFullPaths = new MenuItem ("_FullPaths", "", () => SetFullName()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
+					miLeaveLastRow = new MenuItem ("_LeaveLastRow", "", () => SetLeaveLastRow()){Checked = true, CheckType = MenuItemCheckStyle.Checked},
 				}),
 			});
 			Top.Add (menu);
@@ -172,6 +174,12 @@ namespace UICatalog.Scenarios {
 				treeViewFiles.AspectGetter = (f)=>f.FullName;
 			else
 				treeViewFiles.AspectGetter = (f)=>f.Name;
+		}
+
+		private void SetLeaveLastRow()
+		{
+			miLeaveLastRow.Checked = !miLeaveLastRow.Checked;
+			treeViewFiles.Style.LeaveLastRow = miLeaveLastRow.Checked;
 		}
 
 
