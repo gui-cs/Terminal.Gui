@@ -63,7 +63,7 @@ namespace UICatalog {
 		private static Scenario _runningScenario = null;
 		private static bool _useSystemConsole = false;
 		private static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
-		private static bool _heightAsBuffer = true;
+		private static bool _heightAsBuffer = false;
 		private static bool _alwaysSetPosition;
 
 		static void Main (string [] args)

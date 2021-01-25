@@ -1558,9 +1558,11 @@ namespace Terminal.Gui {
 			Size SetWindowSize (System.Drawing.Rectangle rect)
 			{
 				var fontHDividerW = fontSize.FontHeight / fontSize.FontWidth;
+				var w = (rect.Width - rect.X) / fontSize.FontWidth;
+				var h = (rect.Height - rect.Y) / fontSize.FontHeight;
 
-				return new Size (Math.Max (((rect.Width - rect.X) / fontSize.FontWidth) - (fontHDividerW * 3), 0),
-					Math.Max (((rect.Height - rect.Y) / fontSize.FontHeight) - fontHDividerW - 1, 0));
+				return new Size (Math.Max ((w) - (fontHDividerW * 3) - (w < (Console.LargestWindowWidth / 2) ? -1 : 2), 0),
+					Math.Max ((h) - fontHDividerW - (w < (Console.LargestWindowHeight / 2) ? -1 : 1), 0));
 			}
 
 			bool IsDockedToMonitor (IntPtr hWnd, WindowsConsole.WindowPlacement placement)
