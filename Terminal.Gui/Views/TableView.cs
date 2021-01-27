@@ -118,6 +118,19 @@ namespace Terminal.Gui {
 		{
 			return ColumnStyles.TryGetValue(col,out ColumnStyle result) ? result : null;
 		}
+
+		/// <summary>
+		/// Returns an existing <see cref="ColumnStyle"/> for the given <paramref name="col"/> or creates a new one with default options
+		/// </summary>
+		/// <param name="col"></param>
+		/// <returns></returns>
+		public ColumnStyle GetOrCreateColumnStyle (DataColumn col)
+		{
+			if(!ColumnStyles.ContainsKey(col))
+				ColumnStyles.Add(col,new ColumnStyle());
+
+			return ColumnStyles[col];
+		}
 	}
 	
 	/// <summary>

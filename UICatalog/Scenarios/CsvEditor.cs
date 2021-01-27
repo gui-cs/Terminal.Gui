@@ -6,6 +6,7 @@ using System.Linq;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using NStack;
 
 namespace UICatalog.Scenarios {
 
@@ -19,6 +20,10 @@ namespace UICatalog.Scenarios {
 	{
 		TableView tableView;
 		private string currentFile;
+		private MenuItem miLeft;
+		private MenuItem miRight;
+		private MenuItem miCentered;
+		private Label selectedCellLabel;
 
 		public override void Setup ()
 		{
@@ -41,11 +46,18 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_Edit", new MenuItem [] {
-					new MenuItem ("_Rename Column", "", () => RenameColumn()),
-				}),
-				new MenuBarItem ("_Insert", new MenuItem [] {
 					new MenuItem ("_New Column", "", () => AddColumn()),
 					new MenuItem ("_New Row", "", () => AddRow()),
+					new MenuItem ("_Rename Column", "", () => RenameColumn()),
+					new MenuItem ("_Delete Column", "", () => DeleteColum()),
+				}),
+				new MenuBarItem ("_View", new MenuItem [] {
+					miLeft = new MenuItem ("_Align Left", "", () => Align(TextAlignment.Left)),
+					miRight = new MenuItem ("_Align Right", "", () => Align(TextAlignment.Right)),
+					miCentered = new MenuItem ("_Align Centered", "", () => Align(TextAlignment.Centered)),
+					
+					// Format requires hard typed data table, when we read a CSV everything is untyped (string) so this only works for new columns in this demo
+					miCentered = new MenuItem ("_Set Format Pattern", "", () => SetFormat()),
 				})
 			});
 			Top.Add (menu);
@@ -59,7 +71,7 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (tableView);
 
-			var selectedCellLabel = new Label(){
+			selectedCellLabel = new Label(){
 				X = 0,
 				Y = Pos.Bottom(tableView),
 				Text = "0,0",
@@ -70,11 +82,27 @@ namespace UICatalog.Scenarios {
 
 			Win.Add(selectedCellLabel);
 
-			tableView.SelectedCellChanged += (e)=>{selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";};
+			tableView.SelectedCellChanged += OnSelectedCellChanged;
 			tableView.CellActivated += EditCurrentCell;
 			tableView.KeyPress += TableViewKeyPress;
 
 			SetupScrollBar();
+		}
+
+		private void OnSelectedCellChanged (SelectedCellChangedEventArgs e)
+		{
+			selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";
+			
+			if(tableView.Table == null)
+				return;
+
+			var col = tableView.Table.Columns[tableView.SelectedColumn];
+
+			var style = tableView.Style.GetColumnStyleIfAny(col);
+			
+			miLeft.Checked = style?.Alignment == TextAlignment.Left;
+			miRight.Checked = style?.Alignment == TextAlignment.Right;
+			miCentered.Checked = style?.Alignment == TextAlignment.Centered;			
 		}
 
 		private void RenameColumn ()
@@ -89,8 +117,55 @@ namespace UICatalog.Scenarios {
 				currentCol.ColumnName = newName;
 				tableView.Update();
 			}
+		}
 
+		private void DeleteColum()
+		{
+			if(NoTableLoaded()) {
+				return;
+			}
 
+			tableView.Table.Columns.RemoveAt(tableView.SelectedColumn);
+			tableView.Update();
+		}
+
+		private void Align (TextAlignment newAlignment)
+		{
+			if (NoTableLoaded ()) {
+				return;
+			}
+
+			var col = tableView.Table.Columns[tableView.SelectedColumn];
+
+			var style = tableView.Style.GetOrCreateColumnStyle(col);
+			style.Alignment = newAlignment;
+
+			miLeft.Checked = style.Alignment == TextAlignment.Left;
+			miRight.Checked = style.Alignment == TextAlignment.Right;
+			miCentered.Checked = style.Alignment == TextAlignment.Centered;	
+			
+			tableView.Update();
+		}
+		
+		private void SetFormat()
+		{
+			if (NoTableLoaded ()) {
+				return;
+			}
+
+			var col = tableView.Table.Columns[tableView.SelectedColumn];
+
+			if(col.DataType == typeof(string)) {
+				MessageBox.ErrorQuery("Cannot Format Column","String columns cannot be Formatted, try adding a new column to the table with a date/numerical Type","Ok");
+				return;
+			}
+
+			var style = tableView.Style.GetOrCreateColumnStyle(col);
+
+			if(GetText("Format","Pattern:",style.Format ?? "",out string newPattern)) {
+				style.Format = newPattern;
+				tableView.Update();
+			}
 		}
 
 		private bool NoTableLoaded ()
@@ -120,9 +195,29 @@ namespace UICatalog.Scenarios {
 			}
 
 			if(GetText("Enter column name","Name:","",out string colName)) {
-				tableView.Table.Columns.Add(new DataColumn(colName));
+
+				var col = new DataColumn(colName);
+
+				int result = MessageBox.Query(40,15,"Column Type","Pick a data type for the column",new ustring[]{"Date","Integer","Double","Text","Cancel"});
+
+				if(result <= -1 || result >= 4)
+					return;
+				switch(result) {
+					case 0: col.DataType = typeof(DateTime);
+						break;
+					case 1: col.DataType = typeof(int);
+						break;
+					case 2: col.DataType = typeof(double);
+						break;
+					case 3: col.DataType = typeof(string);
+						break;
+				}
+
+				tableView.Table.Columns.Add(col);
 				tableView.Update();
 			}
+
+			
 				
 		}
 
@@ -256,52 +351,6 @@ namespace UICatalog.Scenarios {
 		{
 			Application.RequestStop ();
 		}
-
-		private void OpenExample (bool big)
-		{
-			tableView.Table = BuildDemoDataTable(big ? 30 : 5, big ? 1000 : 5);
-			SetDemoTableStyles();
-		}
-
-		private void SetDemoTableStyles ()
-		{
-			var alignMid = new ColumnStyle() {
-				Alignment = TextAlignment.Centered
-			};
-			var alignRight = new ColumnStyle() {
-				Alignment = TextAlignment.Right
-			};
-
-			var dateFormatStyle = new ColumnStyle() {
-				Alignment = TextAlignment.Right,
-				RepresentationGetter = (v)=> v is DateTime d ? d.ToString("yyyy-MM-dd"):v.ToString()
-			};
-
-			var negativeRight = new ColumnStyle() {
-				
-				Format = "0.##",
-				MinWidth = 10,
-				AlignmentGetter = (v)=>v is double d ? 
-								// align negative values right
-								d < 0 ? TextAlignment.Right : 
-								// align positive values left
-								TextAlignment.Left:
-								// not a double
-								TextAlignment.Left
-			};
-			
-			tableView.Style.ColumnStyles.Add(tableView.Table.Columns["DateCol"],dateFormatStyle);
-			tableView.Style.ColumnStyles.Add(tableView.Table.Columns["DoubleCol"],negativeRight);
-			tableView.Style.ColumnStyles.Add(tableView.Table.Columns["NullsCol"],alignMid);
-			tableView.Style.ColumnStyles.Add(tableView.Table.Columns["IntCol"],alignRight);
-			
-			tableView.Update();
-		}
-
-		private void OpenSimple (bool big)
-		{
-			tableView.Table = BuildSimpleDataTable(big ? 30 : 5, big ? 1000 : 5);
-		}
 		private bool GetText(string title, string label, string initialText, out string enteredText)
 		{
 			bool okPressed = false;
@@ -351,78 +400,6 @@ namespace UICatalog.Scenarios {
 				
 				tableView.Update();
 			}
-		}
-
-		/// <summary>
-		/// Generates a new demo <see cref="DataTable"/> with the given number of <paramref name="cols"/> (min 5) and <paramref name="rows"/>
-		/// </summary>
-		/// <param name="cols"></param>
-		/// <param name="rows"></param>
-		/// <returns></returns>
-		public static DataTable BuildDemoDataTable(int cols, int rows)
-		{
-			var dt = new DataTable();
-
-			int explicitCols = 6;
-			dt.Columns.Add(new DataColumn("StrCol",typeof(string)));
-			dt.Columns.Add(new DataColumn("DateCol",typeof(DateTime)));
-			dt.Columns.Add(new DataColumn("IntCol",typeof(int)));
-			dt.Columns.Add(new DataColumn("DoubleCol",typeof(double)));
-			dt.Columns.Add(new DataColumn("NullsCol",typeof(string)));
-			dt.Columns.Add(new DataColumn("Unicode",typeof(string)));
-
-			for(int i=0;i< cols -explicitCols; i++) {
-				dt.Columns.Add("Column" + (i+explicitCols));
-			}
-			
-			var r = new Random(100);
-
-			for(int i=0;i< rows;i++) {
-				
-				List<object> row = new List<object>(){ 
-					"Some long text that is super cool",
-					new DateTime(2000+i,12,25),
-					r.Next(i),
-					(r.NextDouble()*i)-0.5 /*add some negatives to demo styles*/,
-					DBNull.Value,
-					"Les Mise" + Char.ConvertFromUtf32(Int32.Parse("0301", NumberStyles.HexNumber)) + "rables"
-				};
-				
-				for(int j=0;j< cols -explicitCols; j++) {
-					row.Add("SomeValue" + r.Next(100));
-				}
-
-				dt.Rows.Add(row.ToArray());
-			}
-
-			return dt;
-		}
-
-		/// <summary>
-		/// Builds a simple table in which cell values contents are the index of the cell.  This helps testing that scrolling etc is working correctly and not skipping out any rows/columns when paging
-		/// </summary>
-		/// <param name="cols"></param>
-		/// <param name="rows"></param>
-		/// <returns></returns>
-		public static DataTable BuildSimpleDataTable(int cols, int rows)
-		{
-			var dt = new DataTable();
-
-			for(int c = 0; c < cols; c++) {
-				dt.Columns.Add("Col"+c);
-			}
-				
-			for(int r = 0; r < rows; r++) {
-				var newRow = dt.NewRow();
-
-				for(int c = 0; c < cols; c++) {
-					newRow[c] = $"R{r}C{c}";
-				}
-
-				dt.Rows.Add(newRow);
-			}
-			
-			return dt;
 		}
 	}
 }
