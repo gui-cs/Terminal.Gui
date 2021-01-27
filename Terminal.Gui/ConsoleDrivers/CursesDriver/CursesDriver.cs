@@ -22,6 +22,9 @@ namespace Terminal.Gui {
 		public override int Top => 0;
 		public override bool HeightAsBuffer { get; set; }
 
+		CursorVisibility? initialCursorVisibility = null;
+		CursorVisibility? currentCursorVisibility = null;
+
 		// Current row, and current col, tracked by Move/AddRune only
 		int ccol, crow;
 		bool needMove;
@@ -689,6 +692,18 @@ namespace Terminal.Gui {
 			} catch (Exception e) {
 				Console.WriteLine ("Curses failed to initialize, the exception is: " + e);
 			}
+
+			switch (Curses.curs_set (1)) {
+				case 0:		initialCursorVisibility = CursorVisibility.Invisible;	break;
+				case 1:		initialCursorVisibility = CursorVisibility.Normal;	break;
+				case 2:		initialCursorVisibility = CursorVisibility.Block;	break;
+				default:	initialCursorVisibility = null;				break;
+			}
+
+			if (initialCursorVisibility != null) {
+				currentCursorVisibility = CursorVisibility.Normal;
+			}
+
 			Curses.raw ();
 			Curses.noecho ();
 
@@ -867,6 +882,39 @@ namespace Terminal.Gui {
 		public override Attribute GetAttribute ()
 		{
 			return currentAttribute;
+		}
+
+		public override bool GetCursorVisibility (out CursorVisibility visibility)
+		{
+			visibility = CursorVisibility.Normal;
+
+			if (!currentCursorVisibility.HasValue) {
+				return false;
+			}
+
+			visibility = currentCursorVisibility.Value;
+
+			return true;
+		}
+
+		public override bool SetCursorVisibility (CursorVisibility visibility)
+		{
+			if (initialCursorVisibility.HasValue == false) {
+				return false;
+			}
+
+			switch (currentCursorVisibility = visibility) {
+				case CursorVisibility.Invisible:	Curses.curs_set (0); break;
+				case CursorVisibility.Normal:		Curses.curs_set (1); break;
+				case CursorVisibility.Block:		Curses.curs_set (2); break;
+			}
+
+			return true;
+		}
+
+		public override bool EnsureCursorVisibility ()
+		{
+			return false;
 		}
 	}
 

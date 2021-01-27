@@ -866,6 +866,14 @@ namespace Terminal.Gui {
 			TextChanging?.Invoke (ev);
 			return ev;
 		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Normal);
+
+			return base.OnEnter (view);
+		}
 	}
 
 	/// <summary>

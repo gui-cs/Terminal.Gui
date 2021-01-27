@@ -598,6 +598,15 @@ namespace Terminal.Gui {
 			}
 		}
 
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			//TODO: Improve it by handling read only mode of the text field
+			Application.Driver.SetCursorVisibility (CursorVisibility.Normal);
+
+			return base.OnEnter (view);
+		}
+
 		// Returns an encoded region start..end (top 32 bits are the row, low32 the column)
 		void GetEncodedRegionBounds (out long start, out long end)
 		{

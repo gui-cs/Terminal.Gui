@@ -41,6 +41,9 @@ namespace Terminal.Gui {
 		internal IntPtr InputHandle, OutputHandle;
 		IntPtr ScreenBuffer;
 		uint originalConsoleMode;
+		CursorVisibility? initialCursorVisibility = null;
+		CursorVisibility? currentCursorVisibility = null;
+		CursorVisibility? pendingCursorVisibility = null;
 
 		public WindowsConsole ()
 		{
@@ -82,6 +85,10 @@ namespace Terminal.Gui {
 				}
 			}
 
+			if (GetCursorVisibility (out CursorVisibility visibility)) {
+				initialCursorVisibility = visibility;
+			}
+
 			if (!SetConsoleActiveScreenBuffer (ScreenBuffer)) {
 				var err = Marshal.GetLastWin32Error ();
 				if (HeightAsBuffer) {
@@ -100,8 +107,76 @@ namespace Terminal.Gui {
 			return SetConsoleCursorPosition (ScreenBuffer, position);
 		}
 
+		public void SetInitialCursorVisibility ()
+		{
+			if (initialCursorVisibility.HasValue == false && GetCursorVisibility (out CursorVisibility visibility)) {
+				initialCursorVisibility = visibility;
+			}
+		}
+
+		public bool GetCursorVisibility (out CursorVisibility visibility)
+		{
+			if (!GetConsoleCursorInfo (ScreenBuffer, out ConsoleCursorInfo info)) {
+
+				var err = Marshal.GetLastWin32Error ();
+
+				if (err != 0) {
+					throw new System.ComponentModel.Win32Exception (err);
+				}
+
+				visibility = Gui.CursorVisibility.Normal;
+
+				return false;
+			}
+
+			if (!info.bVisible)		visibility = CursorVisibility.Invisible;
+			else if (info.dwSize > 50)	visibility = CursorVisibility.Block;
+			else				visibility = CursorVisibility.Normal;
+
+			return true;
+		}
+
+		public bool EnsureCursorVisibility () 
+		{
+			if (initialCursorVisibility.HasValue && pendingCursorVisibility.HasValue && SetCursorVisibility (pendingCursorVisibility.Value)) {
+				pendingCursorVisibility = null;
+
+				return true;
+			}
+
+			return false;
+		}
+
+		public bool SetCursorVisibility (CursorVisibility visibility)
+		{
+			if (initialCursorVisibility.HasValue == false) {
+				pendingCursorVisibility = visibility;
+
+				return false;
+			}
+
+			if (currentCursorVisibility.HasValue == false || currentCursorVisibility.Value != visibility) {
+				ConsoleCursorInfo info = new ConsoleCursorInfo {
+					dwSize   = visibility == CursorVisibility.Block ? 100u : 25u,
+					bVisible = visibility != CursorVisibility.Invisible
+				};
+
+				if (!SetConsoleCursorInfo (ScreenBuffer, ref info)) {
+					return false;
+				}
+
+				currentCursorVisibility = visibility;
+			}
+
+			return true;
+		}
+
 		public void Cleanup ()
 		{
+			if (initialCursorVisibility.HasValue) {
+				SetCursorVisibility (initialCursorVisibility.Value);
+			}
+
 			ConsoleMode = originalConsoleMode;
 			//ContinueListeningForConsoleEvents = false;
 			if (!SetConsoleActiveScreenBuffer (OutputHandle)) {
@@ -414,9 +489,20 @@ namespace Terminal.Gui {
 		[DllImport ("kernel32.dll")]
 		static extern bool SetConsoleCursorPosition (IntPtr hConsoleOutput, Coord dwCursorPosition);
 
+		[StructLayout (LayoutKind.Sequential)]
+		public struct ConsoleCursorInfo {
+			public uint dwSize;
+			public bool bVisible;
+		}
+
+		[DllImport ("kernel32.dll", SetLastError = true)]
+		static extern bool SetConsoleCursorInfo (IntPtr hConsoleOutput, [In] ref ConsoleCursorInfo lpConsoleCursorInfo);
+
+		[DllImport ("kernel32.dll", SetLastError = true)]
+		static extern bool GetConsoleCursorInfo (IntPtr hConsoleOutput, out ConsoleCursorInfo lpConsoleCursorInfo);
+
 		[DllImport ("kernel32.dll")]
 		static extern bool GetConsoleMode (IntPtr hConsoleHandle, out uint lpMode);
-
 
 		[DllImport ("kernel32.dll")]
 		static extern bool SetConsoleMode (IntPtr hConsoleHandle, uint dwMode);
@@ -1299,6 +1385,8 @@ namespace Terminal.Gui {
 		public override void Refresh ()
 		{
 			UpdateScreen ();
+
+			winConsole.SetInitialCursorVisibility ();
 #if false
 			var bufferCoords = new WindowsConsole.Coord (){
 				X = (short)Clip.Width,
@@ -1359,6 +1447,21 @@ namespace Terminal.Gui {
 			return currentAttribute;
 		}
 
+		public override bool GetCursorVisibility (out CursorVisibility visibility)
+		{
+			return winConsole.GetCursorVisibility (out visibility);
+		}
+
+		public override bool SetCursorVisibility (CursorVisibility visibility)
+		{
+			return winConsole.SetCursorVisibility (visibility);
+		}
+
+		public override bool EnsureCursorVisibility ()
+		{
+			return winConsole.EnsureCursorVisibility ();
+		}
+
 		#region Unused
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
@@ -1387,6 +1490,7 @@ namespace Terminal.Gui {
 		public override void CookMouse ()
 		{
 		}
+
 		#endregion
 	}
 

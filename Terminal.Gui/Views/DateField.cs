@@ -377,6 +377,14 @@ namespace Terminal.Gui {
 		{
 			DateChanged?.Invoke (args);
 		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnEnter (view);
+		}
 	}
 
 	/// <summary>

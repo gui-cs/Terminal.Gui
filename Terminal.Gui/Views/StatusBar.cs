@@ -215,5 +215,13 @@ namespace Terminal.Gui {
 				disposedValue = true;
 			}
 		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnEnter (view);
+		}
 	}
 }

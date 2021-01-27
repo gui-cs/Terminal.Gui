@@ -503,6 +503,7 @@ namespace Terminal.Gui {
 			toplevel.PositionCursor ();
 			Driver.Refresh ();
 
+
 			return rs;
 		}
 
@@ -617,6 +618,10 @@ namespace Terminal.Gui {
 
 					MainLoop.MainIteration ();
 					Iteration?.Invoke ();
+					
+					if (Driver.EnsureCursorVisibility ()) {
+						state.Toplevel.SetNeedsDisplay ();
+					}
 				} else if (!wait) {
 					return;
 				}
@@ -704,9 +709,9 @@ namespace Terminal.Gui {
 					resume = false;
 					var runToken = Begin (view);
 					RunLoop (runToken);
+
 					End (runToken);
-				}
-				catch (Exception error)
+				} catch (Exception error)
 				{
 					if (errorHandler == null)
 					{

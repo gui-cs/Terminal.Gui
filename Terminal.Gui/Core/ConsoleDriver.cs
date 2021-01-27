@@ -476,6 +476,26 @@ namespace Terminal.Gui {
 		public static Dictionary<string, ColorScheme> ColorSchemes { get; }
 	}
 
+	/// <summary>
+	/// Cursors Visibility that are displayed
+	/// </summary>
+	public enum CursorVisibility : Int32 {
+		/// <summary>
+		///	Cursor caret is hidden
+		/// </summary>
+		Invisible = 0,
+
+		/// <summary>
+		///	Cursor caret is normally shown
+		/// </summary>
+		Normal = 1,
+
+		/// <summary>
+		///	Cursor caret is displayed a block
+		/// </summary>
+		Block = 2
+	}
+
 	///// <summary>
 	///// Special characters that can be drawn with 
 	///// </summary>
@@ -627,6 +647,26 @@ namespace Terminal.Gui {
 		/// Updates the location of the cursor position
 		/// </summary>
 		public abstract void UpdateCursor ();
+
+		/// <summary>
+		/// Retreive the cursor caret visibility
+		/// </summary>
+		/// <param name="visibility">The current <see cref="CursorVisibility"/></param>
+		/// <returns>true upon success</returns>
+		public abstract bool GetCursorVisibility (out CursorVisibility visibility);
+
+		/// <summary>
+		/// Change the cursor caret visibility
+		/// </summary>
+		/// <param name="visibility">The wished <see cref="CursorVisibility"/></param>
+		/// <returns>true upon success</returns>
+		public abstract bool SetCursorVisibility (CursorVisibility visibility);
+
+		/// <summary>
+		/// Ensure the cursor visibility
+		/// </summary>
+		/// <returns>true upon success</returns>
+		public abstract bool EnsureCursorVisibility ();
 
 		/// <summary>
 		/// Ends the execution of the console driver.

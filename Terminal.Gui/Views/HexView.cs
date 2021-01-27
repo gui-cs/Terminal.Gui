@@ -395,5 +395,13 @@ namespace Terminal.Gui {
 			}
 			edits = new SortedDictionary<long, byte> ();
 		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Normal);
+
+			return base.OnEnter (view);
+		}
 	}
 }
