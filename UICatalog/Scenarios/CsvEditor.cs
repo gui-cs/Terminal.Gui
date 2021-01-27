@@ -225,7 +225,8 @@ namespace UICatalog.Scenarios {
 
 					var arrayItems = currentRow.ItemArray;
 					tableView.Table.Rows.Remove(currentRow);
-					
+
+					// Removing and Inserting the same DataRow seems to result in it loosing its values so we have to create a new instance
 					var newRow = tableView.Table.NewRow();
 					newRow.ItemArray = arrayItems;
 					
@@ -297,7 +298,11 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
-			tableView.Table.Rows.Add();
+			var newRow = tableView.Table.NewRow();
+
+			var newRowIdx = Math.Min(Math.Max(0,tableView.SelectedRow+1),tableView.Table.Rows.Count);
+
+			tableView.Table.Rows.InsertAt(newRow,newRowIdx);
 			tableView.Update();
 		}
 
@@ -311,6 +316,8 @@ namespace UICatalog.Scenarios {
 
 				var col = new DataColumn(colName);
 
+				var newColIdx = Math.Min(Math.Max(0,tableView.SelectedColumn + 1),tableView.Table.Columns.Count);
+				
 				int result = MessageBox.Query(40,15,"Column Type","Pick a data type for the column",new ustring[]{"Date","Integer","Double","Text","Cancel"});
 
 				if(result <= -1 || result >= 4)
@@ -327,6 +334,7 @@ namespace UICatalog.Scenarios {
 				}
 
 				tableView.Table.Columns.Add(col);
+				col.SetOrdinal(newColIdx);
 				tableView.Update();
 			}
 
