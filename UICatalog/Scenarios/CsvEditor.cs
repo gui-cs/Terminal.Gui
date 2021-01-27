@@ -50,6 +50,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_New Row", "", () => AddRow()),
 					new MenuItem ("_Rename Column", "", () => RenameColumn()),
 					new MenuItem ("_Delete Column", "", () => DeleteColum()),
+					new MenuItem ("_Move Column", "", () => MoveColumn()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
 					miLeft = new MenuItem ("_Align Left", "", () => Align(TextAlignment.Left)),
@@ -88,6 +89,7 @@ namespace UICatalog.Scenarios {
 
 			SetupScrollBar();
 		}
+
 
 		private void OnSelectedCellChanged (SelectedCellChangedEventArgs e)
 		{
@@ -138,6 +140,39 @@ namespace UICatalog.Scenarios {
 
 			} catch (Exception ex) {
 				MessageBox.ErrorQuery("Could not remove column",ex.Message, "Ok");
+			}
+		}
+
+		private void MoveColumn ()
+		{
+			if(NoTableLoaded()) {
+				return;
+			}
+
+			if(tableView.SelectedColumn == -1) {
+				
+				MessageBox.ErrorQuery("No Column","No column selected", "Ok");
+				return;
+			}
+			
+			try{
+
+				var currentCol = tableView.Table.Columns[tableView.SelectedColumn];
+
+				if(GetText("Move Column","New Index:",currentCol.Ordinal.ToString(),out string newOrdinal)) {
+
+					var newIdx = Math.Min(Math.Max(0,int.Parse(newOrdinal)),tableView.Table.Columns.Count-1);
+
+					currentCol.SetOrdinal(newIdx);
+
+					tableView.SetSelection(newIdx,tableView.SelectedRow,false);
+					tableView.EnsureSelectedCellIsVisible();
+					tableView.SetNeedsDisplay();
+				}
+
+			}catch(Exception ex)
+			{
+				MessageBox.ErrorQuery("Error moving column",ex.Message, "Ok");
 			}
 		}
 
