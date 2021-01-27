@@ -84,6 +84,38 @@ namespace UICatalog.Scenarios {
 			tableView.SelectedCellChanged += (e)=>{selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";};
 			tableView.CellActivated += EditCurrentCell;
 			tableView.KeyPress += TableViewKeyPress;
+
+			SetupScrollBar();
+		}
+
+		private void SetupScrollBar ()
+		{
+			var _scrollBar = new ScrollBarView (tableView, true);
+
+			_scrollBar.ChangedPosition += () => {
+				tableView.RowOffset = _scrollBar.Position;
+				if (tableView.RowOffset != _scrollBar.Position) {
+					_scrollBar.Position = tableView.RowOffset;
+				}
+				tableView.SetNeedsDisplay ();
+			};
+			/*
+			_scrollBar.OtherScrollBarView.ChangedPosition += () => {
+				_listView.LeftItem = _scrollBar.OtherScrollBarView.Position;
+				if (_listView.LeftItem != _scrollBar.OtherScrollBarView.Position) {
+					_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
+				}
+				_listView.SetNeedsDisplay ();
+			};*/
+
+			tableView.DrawContent += (e) => {
+				_scrollBar.Size = tableView.Table?.Rows?.Count ??0;
+				_scrollBar.Position = tableView.RowOffset;
+			//	_scrollBar.OtherScrollBarView.Size = _listView.Maxlength - 1;
+			//	_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
+				_scrollBar.Refresh ();
+			};
+		
 		}
 
 		private void TableViewKeyPress (View.KeyEventEventArgs e)
