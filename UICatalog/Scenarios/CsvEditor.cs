@@ -93,7 +93,7 @@ namespace UICatalog.Scenarios {
 		{
 			selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";
 			
-			if(tableView.Table == null)
+			if(tableView.Table == null || tableView.SelectedColumn == -1)
 				return;
 
 			var col = tableView.Table.Columns[tableView.SelectedColumn];
@@ -125,8 +125,20 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
-			tableView.Table.Columns.RemoveAt(tableView.SelectedColumn);
-			tableView.Update();
+			if(tableView.SelectedColumn == -1) {
+				
+				MessageBox.ErrorQuery("No Column","No column selected", "Ok");
+				return;
+			}
+
+
+			try {
+				tableView.Table.Columns.RemoveAt(tableView.SelectedColumn);
+				tableView.Update();
+
+			} catch (Exception ex) {
+				MessageBox.ErrorQuery("Could not remove column",ex.Message, "Ok");
+			}
 		}
 
 		private void Align (TextAlignment newAlignment)
