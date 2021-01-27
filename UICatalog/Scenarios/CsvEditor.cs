@@ -51,6 +51,9 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Rename Column", "", () => RenameColumn()),
 					new MenuItem ("_Delete Column", "", () => DeleteColum()),
 					new MenuItem ("_Move Column", "", () => MoveColumn()),
+					new MenuItem ("_Move Row", "", () => MoveRow()),
+					new MenuItem ("_Sort Asc", "", () => Sort(true)),
+					new MenuItem ("_Sort Desc", "", () => Sort(false)),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
 					miLeft = new MenuItem ("_Align Left", "", () => Align(TextAlignment.Left)),
@@ -166,6 +169,69 @@ namespace UICatalog.Scenarios {
 					currentCol.SetOrdinal(newIdx);
 
 					tableView.SetSelection(newIdx,tableView.SelectedRow,false);
+					tableView.EnsureSelectedCellIsVisible();
+					tableView.SetNeedsDisplay();
+				}
+
+			}catch(Exception ex)
+			{
+				MessageBox.ErrorQuery("Error moving column",ex.Message, "Ok");
+			}
+		}
+		private void Sort (bool asc)
+		{
+
+			if(NoTableLoaded()) {
+				return;
+			}
+
+			if(tableView.SelectedColumn == -1) {
+				
+				MessageBox.ErrorQuery("No Column","No column selected", "Ok");
+				return;
+			}
+
+			var colName = tableView.Table.Columns[tableView.SelectedColumn].ColumnName;
+
+			tableView.Table.DefaultView.Sort = colName + (asc ? " asc" : " desc");
+			tableView.Table = tableView.Table.DefaultView.ToTable();
+		}
+
+		private void MoveRow ()
+		{
+			if(NoTableLoaded()) {
+				return;
+			}
+
+			if(tableView.SelectedRow == -1) {
+				
+				MessageBox.ErrorQuery("No Rows","No row selected", "Ok");
+				return;
+			}
+			
+			try{
+
+				int oldIdx = tableView.SelectedRow;
+
+				var currentRow = tableView.Table.Rows[oldIdx];
+
+				if(GetText("Move Row","New Row:",oldIdx.ToString(),out string newOrdinal)) {
+
+					var newIdx = Math.Min(Math.Max(0,int.Parse(newOrdinal)),tableView.Table.Rows.Count-1);
+
+
+					if(newIdx == oldIdx)
+						return;
+
+					var arrayItems = currentRow.ItemArray;
+					tableView.Table.Rows.Remove(currentRow);
+					
+					var newRow = tableView.Table.NewRow();
+					newRow.ItemArray = arrayItems;
+					
+					tableView.Table.Rows.InsertAt(newRow,newIdx);
+					
+					tableView.SetSelection(tableView.SelectedColumn,newIdx,false);
 					tableView.EnsureSelectedCellIsVisible();
 					tableView.SetNeedsDisplay();
 				}
