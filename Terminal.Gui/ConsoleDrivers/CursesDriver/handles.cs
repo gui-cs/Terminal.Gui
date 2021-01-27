@@ -28,9 +28,8 @@
 using System;
 
 namespace Unix.Terminal {
-
-	public partial class Curses {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+	public partial class Curses {
 		public class Window {
 			public readonly IntPtr Handle;
 			static Window curscr;

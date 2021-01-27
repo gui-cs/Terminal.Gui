@@ -108,7 +108,7 @@ namespace UICatalog {
 				var frameView = new FrameView ("This is a Sub-FrameView") {
 					X = Pos.Percent (50),
 					Y = 1,
-					Width = Dim.Percent (100),
+					Width = Dim.Percent (100, true), // Or Dim.Percent (50)
 					Height = 5,
 					ColorScheme = Colors.Base,
 					Text = "The Text in the FrameView",

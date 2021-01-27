@@ -63,6 +63,8 @@ namespace UICatalog {
 		private static Scenario _runningScenario = null;
 		private static bool _useSystemConsole = false;
 		private static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
+		private static bool _heightAsBuffer;
+		private static bool _alwaysSetPosition;
 
 		static void Main (string [] args)
 		{
@@ -144,6 +146,8 @@ namespace UICatalog {
 		{
 			Application.UseSystemConsole = _useSystemConsole;
 			Application.Init ();
+			Application.HeightAsBuffer = _heightAsBuffer;
+			Application.AlwaysSetPosition = _alwaysSetPosition;
 
 			// Set this here because not initialized until driver is loaded
 			_baseColorScheme = Colors.Base;
@@ -253,7 +257,7 @@ namespace UICatalog {
 					_leftPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
 					_rightPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
 					_top.LayoutSubviews();
-					_top.ChildNeedsDisplay();
+					_top.SetChildNeedsDisplay();
 				}),
 			};
 
@@ -274,7 +278,52 @@ namespace UICatalog {
 			return _runningScenario;
 		}
 
-		static MenuItem [] CreateDiagnosticMenuItems ()
+		static List<MenuItem []> CreateDiagnosticMenuItems ()
+		{
+			List<MenuItem []> menuItems = new List<MenuItem []> ();
+			menuItems.Add (CreateDiagnosticFlagsMenuItems ());
+			menuItems.Add (new MenuItem [] { null });
+			menuItems.Add (CreateSizeStyle ());
+			menuItems.Add (CreateAlwaysSetPosition ());
+			return menuItems;
+		}
+
+		static MenuItem [] CreateAlwaysSetPosition ()
+		{
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			var item = new MenuItem ();
+			item.Title = "_Always set position (NetDriver only)";
+			item.Shortcut = Key.CtrlMask | Key.AltMask | (Key)item.Title.ToString ().Substring (1, 1) [0];
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = Application.AlwaysSetPosition;
+			item.Action += () => {
+				Application.AlwaysSetPosition = !item.Checked;
+				item.Checked = _alwaysSetPosition = Application.AlwaysSetPosition;
+			};
+			menuItems.Add (item);
+
+			return menuItems.ToArray ();
+		}
+
+		static MenuItem [] CreateSizeStyle ()
+		{
+			List<MenuItem> menuItems = new List<MenuItem> ();
+			var item = new MenuItem ();
+			item.Title = "_Height As Buffer";
+			item.Shortcut = Key.CtrlMask | Key.AltMask | (Key)item.Title.ToString ().Substring (1, 1) [0];
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = Application.HeightAsBuffer;
+			item.Action += () => {
+				item.Checked = !item.Checked;
+				_heightAsBuffer = item.Checked;
+				Application.HeightAsBuffer = _heightAsBuffer;
+			};
+			menuItems.Add (item);
+
+			return menuItems.ToArray ();
+		}
+
+		static MenuItem [] CreateDiagnosticFlagsMenuItems ()
 		{
 			const string OFF = "Diagnostics: _Off";
 			const string FRAME_RULER = "Diagnostics: Frame _Ruler";
@@ -288,7 +337,12 @@ namespace UICatalog {
 				item.Shortcut = Key.AltMask + index.ToString () [0];
 				index++;
 				item.CheckType |= MenuItemCheckStyle.Checked;
-				item.Checked = _diagnosticFlags.HasFlag (diag);
+				if (GetDiagnosticsTitle (ConsoleDriver.DiagnosticFlags.Off) == item.Title) {
+					item.Checked = (_diagnosticFlags & (ConsoleDriver.DiagnosticFlags.FramePadding
+					| ConsoleDriver.DiagnosticFlags.FrameRuler)) == 0;
+				} else {
+					item.Checked = _diagnosticFlags.HasFlag (diag);
+				}
 				item.Action += () => {
 					var t = GetDiagnosticsTitle (ConsoleDriver.DiagnosticFlags.Off);
 					if (item.Title == t && !item.Checked) {
@@ -444,31 +498,58 @@ namespace UICatalog {
 		}
 
 		internal class ScenarioListDataSource : IListDataSource {
+			private readonly int len;
+
 			public List<Type> Scenarios { get; set; }
 
 			public bool IsMarked (int item) => false;
 
 			public int Count => Scenarios.Count;
 
-			public ScenarioListDataSource (List<Type> itemList) => Scenarios = itemList;
+			public int Length => len;
 
-			public void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width)
+			public ScenarioListDataSource (List<Type> itemList)
+			{
+				Scenarios = itemList;
+				len = GetMaxLengthItem ();
+			}
+
+			public void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width, int start = 0)
 			{
 				container.Move (col, line);
 				// Equivalent to an interpolated string like $"{Scenarios[item].Name, -widtestname}"; if such a thing were possible
 				var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenario.ScenarioMetadata.GetName (Scenarios [item]));
-				RenderUstr (driver, $"{s}  {Scenario.ScenarioMetadata.GetDescription (Scenarios [item])}", col, line, width);
+				RenderUstr (driver, $"{s}  {Scenario.ScenarioMetadata.GetDescription (Scenarios [item])}", col, line, width, start);
 			}
 
 			public void SetMark (int item, bool value)
 			{
 			}
 
+			int GetMaxLengthItem ()
+			{
+				if (Scenarios?.Count == 0) {
+					return 0;
+				}
+
+				int maxLength = 0;
+				for (int i = 0; i < Scenarios.Count; i++) {
+					var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenario.ScenarioMetadata.GetName (Scenarios [i]));
+					var sc = $"{s}  {Scenario.ScenarioMetadata.GetDescription (Scenarios [i])}";
+					var l = sc.Length;
+					if (l > maxLength) {
+						maxLength = l;
+					}
+				}
+
+				return maxLength;
+			}
+
 			// A slightly adapted method from: https://github.com/migueldeicaza/gui.cs/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
-			private void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width)
+			private void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width, int start = 0)
 			{
 				int used = 0;
-				int index = 0;
+				int index = start;
 				while (index < ustr.Length) {
 					(var rune, var size) = Utf8.DecodeRune (ustr, index, index - ustr.Length);
 					var count = Rune.ColumnWidth (rune);

@@ -59,7 +59,7 @@ namespace Terminal.Gui {
 		/// The current <see cref="ConsoleDriver"/> in use.
 		/// </summary>
 		public static ConsoleDriver Driver;
-
+		
 		/// <summary>
 		/// The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Application.Top"/>)
 		/// </summary>
@@ -67,16 +67,49 @@ namespace Terminal.Gui {
 		public static Toplevel Top { get; private set; }
 
 		/// <summary>
-		/// The current <see cref="Toplevel"/> object. This is updated when <see cref="Application.Run()"/> enters and leaves to point to the current <see cref="Toplevel"/> .
+		/// The current <see cref="Toplevel"/> object. This is updated when <see cref="Application.Run(Func{Exception, bool})"/> enters and leaves to point to the current <see cref="Toplevel"/> .
 		/// </summary>
 		/// <value>The current.</value>
 		public static Toplevel Current { get; private set; }
 
 		/// <summary>
-		/// TThe current <see cref="View"/> object being redrawn.
+		/// The current <see cref="ConsoleDriver.HeightAsBuffer"/> used in the terminal.
 		/// </summary>
-		/// /// <value>The current.</value>
-		public static View CurrentView { get; set; }
+		public static bool HeightAsBuffer {
+			get {
+				if (Driver == null) {
+					throw new ArgumentNullException ("The driver must be initialized first.");
+				}
+				return Driver.HeightAsBuffer;
+			}
+			set {
+				if (Driver == null) {
+					throw new ArgumentNullException ("The driver must be initialized first.");
+				}
+				if (Driver.HeightAsBuffer != value) {
+					Driver.HeightAsBuffer = value;
+					Driver.Refresh ();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Used only by <see cref="NetDriver"/> to forcing always moving the cursor position when writing to the screen.
+		/// </summary>
+		public static bool AlwaysSetPosition {
+			get {
+				if (Driver is NetDriver) {
+					return (Driver as NetDriver).AlwaysSetPosition;
+				}
+				return false;
+			}
+			set {
+				if (Driver is NetDriver) {
+					(Driver as NetDriver).AlwaysSetPosition = value;
+					Driver.Refresh ();
+				}
+			}
+		}
 
 		/// <summary>
 		/// The <see cref="MainLoop"/>  driver for the application
@@ -154,7 +187,7 @@ namespace Terminal.Gui {
 		/// Loads the right <see cref="ConsoleDriver"/> for the platform.
 		/// </para>
 		/// <para>
-		/// Creates a <see cref="Toplevel"/> and assigns it to <see cref="Top"/> and <see cref="CurrentView"/>
+		/// Creates a <see cref="Toplevel"/> and assigns it to <see cref="Top"/>
 		/// </para>
 		/// </remarks>
 		public static void Init (ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null) => Init (() => Toplevel.Create (), driver, mainLoopDriver);
@@ -167,7 +200,7 @@ namespace Terminal.Gui {
 		static void Init (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null)
 		{
 			if (_initialized && driver == null) return;
-
+			
 			// Used only for start debugging on Unix.
 //#if DEBUG
 //			while (!System.Diagnostics.Debugger.IsAttached) {
@@ -193,9 +226,8 @@ namespace Terminal.Gui {
 					Driver = new NetDriver ();
 					mainLoopDriver = new NetMainLoop (Driver);
 				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
-					var windowsDriver = new WindowsDriver ();
-					mainLoopDriver = windowsDriver;
-					Driver = windowsDriver;
+					Driver = new WindowsDriver ();
+					mainLoopDriver = new WindowsMainLoop (Driver);
 				} else {
 					mainLoopDriver = new UnixMainLoop ();
 					Driver = new CursesDriver ();
@@ -206,7 +238,6 @@ namespace Terminal.Gui {
 			}
 			Top = topLevelFactory ();
 			Current = Top;
-			CurrentView = Top;
 			_initialized = true;
 		}
 
@@ -320,7 +351,7 @@ namespace Terminal.Gui {
 					var ry = y - startFrame.Y;
 					for (int i = count - 1; i >= 0; i--) {
 						View v = start.InternalSubviews [i];
-						if (v.Frame.Contains (rx, ry)) {
+						if (v.Visible && v.Frame.Contains (rx, ry)) {
 							var deep = FindDeepestView (v, rx, ry, out resx, out resy);
 							if (deep == null)
 								return v;
@@ -400,8 +431,8 @@ namespace Terminal.Gui {
 					X = rx,
 					Y = ry,
 					Flags = me.Flags,
-					OfX = rx,
-					OfY = ry,
+					OfX = 0,
+					OfY = 0,
 					View = view
 				};
 
@@ -503,19 +534,22 @@ namespace Terminal.Gui {
 			}
 			toplevels.Clear ();
 			Current = null;
-			CurrentView = null;
 			Top = null;
 
 			MainLoop = null;
 			Driver?.End ();
 			Driver = null;
 			_initialized = false;
+
+			// Reset synchronization context to allow the user to run async/await,
+			// as the main loop has been ended, the synchronization context from 
+			// gui.cs does no longer process any callbacks. See #1084 for more details:
+			// (https://github.com/migueldeicaza/gui.cs/issues/1084).
+			SynchronizationContext.SetSynchronizationContext (syncContext: null);
 		}
 
 		static void Redraw (View view)
 		{
-			Application.CurrentView = view;
-
 			view.Redraw (view.Bounds);
 			Driver.Refresh ();
 		}
@@ -550,10 +584,8 @@ namespace Terminal.Gui {
 
 			if (toplevels.Count == 0) {
 				Current = null;
-				CurrentView = null;
 			} else {
 				Current = toplevels.Peek ();
-				CurrentView = Current;
 				Refresh ();
 			}
 		}
@@ -588,11 +620,11 @@ namespace Terminal.Gui {
 				} else if (!wait) {
 					return;
 				}
-				if (state.Toplevel != Top && (!Top.NeedDisplay.IsEmpty || Top.childNeedsDisplay)) {
+				if (state.Toplevel != Top && (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
 					Top.Redraw (Top.Bounds);
 					state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
 				}
-				if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.childNeedsDisplay) {
+				if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded) {
 					state.Toplevel.Redraw (state.Toplevel.Bounds);
 					if (DebugDrawBounds) {
 						DrawBounds (state.Toplevel);
@@ -617,20 +649,20 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Runs the application by calling <see cref="Run(Toplevel)"/> with the value of <see cref="Top"/>
+		/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> with the value of <see cref="Top"/>
 		/// </summary>
-		public static void Run ()
+		public static void Run (Func<Exception, bool> errorHandler = null)
 		{
-			Run (Top);
+			Run (Top, errorHandler);
 		}
 
 		/// <summary>
-		/// Runs the application by calling <see cref="Run(Toplevel)"/> with a new instance of the specified <see cref="Toplevel"/>-derived class
+		/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> with a new instance of the specified <see cref="Toplevel"/>-derived class
 		/// </summary>
-		public static void Run<T> () where T : Toplevel, new()
+		public static void Run<T> (Func<Exception, bool> errorHandler = null) where T : Toplevel, new()
 		{
 			Init (() => new T ());
-			Run (Top);
+			Run (Top, errorHandler);
 		}
 
 		/// <summary>
@@ -643,10 +675,10 @@ namespace Terminal.Gui {
 		///     run other modal <see cref="View"/>s such as <see cref="Dialog"/> boxes.
 		///   </para>
 		///   <para>
-		///     To make a <see cref="Run(Toplevel)"/> stop execution, call <see cref="Application.RequestStop"/>.
+		///     To make a <see cref="Run(Toplevel, Func{Exception, bool})"/> stop execution, call <see cref="Application.RequestStop"/>.
 		///   </para>
 		///   <para>
-		///     Calling <see cref="Run(Toplevel)"/> is equivalent to calling <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState, bool)"/>,
+		///     Calling <see cref="Run(Toplevel, Func{Exception, bool})"/> is equivalent to calling <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState, bool)"/>,
 		///     and then calling <see cref="End(RunState)"/>.
 		///   </para>
 		///   <para>
@@ -656,13 +688,33 @@ namespace Terminal.Gui {
 		///     the <see cref="RunLoop(RunState, bool)"/> method will only process any pending events, timers, idle handlers and
 		///     then return control immediately.
 		///   </para>
+		///   <para>
+		///     When <paramref name="errorHandler"/> is null the exception is rethrown, when it returns true the application is resumed and when false method exits gracefully.
+		///   </para>
 		/// </remarks>
 		/// <param name="view">The <see cref="Toplevel"/> tu run modally.</param>
-		public static void Run (Toplevel view)
+		/// <param name="errorHandler">Handler for any unhandled exceptions (resumes when returns true, rethrows when null).</param>
+		public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
 		{
-			var runToken = Begin (view);
-			RunLoop (runToken);
-			End (runToken);
+			var resume = true;
+			while (resume)
+			{
+				try
+				{
+					resume = false;
+					var runToken = Begin (view);
+					RunLoop (runToken);
+					End (runToken);
+				}
+				catch (Exception error)
+				{
+					if (errorHandler == null)
+					{
+						throw;
+					}
+					resume = errorHandler(error);
+				}
+			}
 		}
 
 		/// <summary>
@@ -670,7 +722,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		///   <para>
-		///   This will cause <see cref="Application.Run()"/> to return.
+		///   This will cause <see cref="Application.Run(Func{Exception, bool})"/> to return.
 		///   </para>
 		///   <para>
 		///     Calling <see cref="Application.RequestStop"/> is equivalent to setting the <see cref="Toplevel.Running"/> property on the curently running <see cref="Toplevel"/> to false.
