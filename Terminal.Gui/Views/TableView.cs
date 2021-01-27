@@ -854,7 +854,7 @@ namespace Terminal.Gui {
 
 			if(me.Flags.HasFlag(MouseFlags.Button1Clicked)) {
 				
-				var hit = ScreenToCell(me.OfX,me.OfY);
+				var hit = ScreenToCell(me.X,me.Y);
 				if(hit != null) {
 					
 					SetSelection(hit.Value.X,hit.Value.Y,me.Flags.HasFlag(MouseFlags.ButtonShift));
@@ -864,7 +864,7 @@ namespace Terminal.Gui {
 
 			// Double clicking a cell activates
 			if(me.Flags == MouseFlags.Button1DoubleClicked) {
-				var hit = ScreenToCell(me.OfX,me.OfY);
+				var hit = ScreenToCell(me.X,me.Y);
 				if(hit!= null) {
 					OnCellActivated(new CellActivatedEventArgs(Table,hit.Value.X,hit.Value.Y));
 				}
