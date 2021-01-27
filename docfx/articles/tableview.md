@@ -18,7 +18,6 @@ foreach(var h in lines[0].Split(',')){
 				
 
 foreach(var line in lines.Skip(1)) {
-	lineNumber++;
 	dt.Rows.Add(line.Split(','));
 }
 ```
