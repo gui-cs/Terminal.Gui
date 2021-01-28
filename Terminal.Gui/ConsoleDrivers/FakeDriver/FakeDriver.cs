@@ -420,7 +420,7 @@ namespace Terminal.Gui {
 
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
-			visibility = CursorVisibility.Normal;
+			visibility = CursorVisibility.Default;
 
 			return true;
 		}

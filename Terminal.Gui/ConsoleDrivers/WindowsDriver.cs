@@ -124,14 +124,14 @@ namespace Terminal.Gui {
 					throw new System.ComponentModel.Win32Exception (err);
 				}
 
-				visibility = Gui.CursorVisibility.Normal;
+				visibility = Gui.CursorVisibility.Default;
 
 				return false;
 			}
 
-			if (!info.bVisible)		visibility = CursorVisibility.Invisible;
-			else if (info.dwSize > 50)	visibility = CursorVisibility.Block;
-			else				visibility = CursorVisibility.Normal;
+			if (!info.bVisible)			visibility = CursorVisibility.Invisible;
+			else if (info.dwSize > 50)	visibility = CursorVisibility.Box;
+			else						visibility = CursorVisibility.Underline;
 
 			return true;
 		}
@@ -157,8 +157,8 @@ namespace Terminal.Gui {
 
 			if (currentCursorVisibility.HasValue == false || currentCursorVisibility.Value != visibility) {
 				ConsoleCursorInfo info = new ConsoleCursorInfo {
-					dwSize   = visibility == CursorVisibility.Block ? 100u : 25u,
-					bVisible = visibility != CursorVisibility.Invisible
+					dwSize   =  (uint) visibility & 0x00FF,
+					bVisible = ((uint) visibility & 0xFF00) != 0
 				};
 
 				if (!SetConsoleCursorInfo (ScreenBuffer, ref info)) {

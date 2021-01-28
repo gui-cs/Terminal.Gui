@@ -85,6 +85,9 @@ namespace Terminal.Gui {
 			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition)) {
 				StopReportingMouseMoves ();
 			}
+
+			SetCursorVisibility (CursorVisibility.Default);
+			
 			Curses.endwin ();
 			// Clear and reset entire screen.
 			Console.Out.Write ("\x1b[2J");
@@ -693,15 +696,14 @@ namespace Terminal.Gui {
 				Console.WriteLine ("Curses failed to initialize, the exception is: " + e);
 			}
 
-			switch (Curses.curs_set (1)) {
-				case 0:		initialCursorVisibility = CursorVisibility.Invisible;	break;
-				case 1:		initialCursorVisibility = CursorVisibility.Normal;	break;
-				case 2:		initialCursorVisibility = CursorVisibility.Block;	break;
-				default:	initialCursorVisibility = null;				break;
-			}
-
-			if (initialCursorVisibility != null) {
-				currentCursorVisibility = CursorVisibility.Normal;
+			// 
+			// We are setting Invisible as default so we could ignore XTerm DECSUSR setting
+			//
+			switch (Curses.curs_set (0)) {
+				case 0:		currentCursorVisibility = initialCursorVisibility = CursorVisibility.Invisible;	break;
+				case 1:		currentCursorVisibility = initialCursorVisibility = CursorVisibility.Underline;	Curses.curs_set (1); break;
+				case 2:		currentCursorVisibility = initialCursorVisibility = CursorVisibility.Box;		Curses.curs_set (2); break;
+				default:	currentCursorVisibility = initialCursorVisibility = null;						break;
 			}
 
 			Curses.raw ();
@@ -886,7 +888,7 @@ namespace Terminal.Gui {
 
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
-			visibility = CursorVisibility.Normal;
+			visibility = CursorVisibility.Invisible;
 
 			if (!currentCursorVisibility.HasValue) {
 				return false;
@@ -903,11 +905,15 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			switch (currentCursorVisibility = visibility) {
-				case CursorVisibility.Invisible:	Curses.curs_set (0); break;
-				case CursorVisibility.Normal:		Curses.curs_set (1); break;
-				case CursorVisibility.Block:		Curses.curs_set (2); break;
+			Curses.curs_set (((int) visibility >> 16) & 0x000000FF);
+
+			if (visibility != CursorVisibility.Invisible)
+			{
+				Console.Out.Write ("\x1b[{0} q", ((int) visibility >> 24) & 0xFF);
+				Console.Out.Flush ();
 			}
+
+			currentCursorVisibility = visibility;
 
 			return true;
 		}

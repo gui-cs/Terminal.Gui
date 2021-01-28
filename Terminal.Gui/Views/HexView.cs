@@ -396,12 +396,22 @@ namespace Terminal.Gui {
 			edits = new SortedDictionary<long, byte> ();
 		}
 
-		///<inheritdoc/>
-		public override bool OnEnter (View view)
-		{
-			Application.Driver.SetCursorVisibility (CursorVisibility.Normal);
+		private CursorVisibility wishedCursorVisibility = CursorVisibility.BoxBlinking;
 
-			return base.OnEnter (view);
+		/// <summary>
+		/// Get / Set the wished cursor when the field is focused
+		/// </summary>
+		public CursorVisibility WishedCursorVisibility 
+		{ 
+			get => wishedCursorVisibility; 
+			set {
+				if (wishedCursorVisibility != value && HasFocus)
+				{
+					Application.Driver.SetCursorVisibility (value);		
+				}
+
+				wishedCursorVisibility = value;
+			}
 		}
 	}
 }

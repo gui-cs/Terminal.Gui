@@ -36,6 +36,19 @@ namespace UICatalog {
 					new MenuItem ("C_ut", "", () => Cut()),
 					new MenuItem ("_Paste", "", () => Paste())
 				}),
+				new MenuBarItem ("_Cursor", new MenuItem [] {
+					new MenuItem ("_Invisible",           "", () => SetCursor(CursorVisibility.Invisible)),
+					new MenuItem ("_Box",                 "", () => SetCursor(CursorVisibility.Box)),
+					new MenuItem ("_Underline",           "", () => SetCursor(CursorVisibility.Underline)),
+					new MenuItem ("", 				      "", () => {}, () => { return false; }),
+					new MenuItem ("xTerm :", 			  "", () => {}, () => { return false; }),
+					new MenuItem ("", 				      "", () => {}, () => { return false; }),
+					new MenuItem ("  _Default",    		  "", () => SetCursor(CursorVisibility.Default)),
+					new MenuItem ("  B_ox Blinking",      "", () => SetCursor(CursorVisibility.BoxBlinking)),
+					new MenuItem ("  U_nderline Blinking","", () => SetCursor(CursorVisibility.UnderlineBlinking)),
+					new MenuItem ("  _Vertical",          "", () => SetCursor(CursorVisibility.Vertical)),
+					new MenuItem ("  V_ertical Blinking", "", () => SetCursor(CursorVisibility.VerticalBlinking))
+				}),
 				new MenuBarItem ("_ScrollBarView", CreateKeepChecked ())
 			});
 			Top.Add (menu);
@@ -139,6 +152,11 @@ namespace UICatalog {
 			//if (_textView != null && _textView.SelectedLength != 0) {
 			//	_textView.Copy ();
 			//}
+		}
+
+		private void SetCursor (CursorVisibility visibility)
+		{
+			_textView.WishedCursorVisibility = visibility;
 		}
 
 		private void Open ()

@@ -867,10 +867,29 @@ namespace Terminal.Gui {
 			return ev;
 		}
 
+
+		private CursorVisibility wishedCursorVisibility = CursorVisibility.BoxBlinking;
+
+		/// <summary>
+		/// Get / Set the wished cursor when the field is focused
+		/// </summary>
+		public CursorVisibility WishedCursorVisibility 
+		{ 
+			get => wishedCursorVisibility; 
+			set {
+				if (wishedCursorVisibility != value && HasFocus)
+				{
+					Application.Driver.SetCursorVisibility (value);		
+				}
+
+				wishedCursorVisibility = value;
+			}
+		}
+
 		///<inheritdoc/>
 		public override bool OnEnter (View view)
 		{
-			Application.Driver.SetCursorVisibility (CursorVisibility.Normal);
+			Application.Driver.SetCursorVisibility (WishedCursorVisibility);
 
 			return base.OnEnter (view);
 		}

@@ -18,10 +18,6 @@ namespace Terminal.Gui {
 		IntPtr InputHandle, OutputHandle, ErrorHandle;
 		uint originalInputConsoleMode, originalOutputConsoleMode, originalErrorConsoleMode;
 
-		CursorVisibility? initialCursorVisibility = null;
-		CursorVisibility? currentCursorVisibility = null;
-		CursorVisibility? pendingCursorVisibility = null;
-
 		public NetWinVTConsole ()
 		{
 			InputHandle = GetStdHandle (STD_INPUT_HANDLE);
@@ -63,52 +59,23 @@ namespace Terminal.Gui {
 
 		public bool GetCursorVisibility (out CursorVisibility visibility)
 		{
-			//if (initialCursorVisibility.HasValue) {
-			//	visibility = currentCursorVisibility.Value;
-			//	return true;
-			//}
-
-			visibility = CursorVisibility.Normal;
+			visibility = CursorVisibility.Default;
 
 			return false;
 		}
 
 		public bool SetCursorVisibility (CursorVisibility visibility)
 		{
-			//if (initialCursorVisibility.HasValue == false) {
-			//	pendingCursorVisibility = visibility;
-			//	return false;
-			//}
-
-			//if (currentCursorVisibility.HasValue == false ||  currentCursorVisibility.Value != visibility) {
-			//	Console.Out.Write (visibility != CursorVisibility.Invisible ? "\x1b[?25h" : "\x1b[?25l");
-			//	Console.Out.Flush ();
-			//	Console.CursorVisible = visibility != CursorVisibility.Invisible;
-			//	currentCursorVisibility = visibility;
-			//	return true;
-			//}
-
 			return false;
 		}
 
 		public bool EnsureCursorVisibility ()
 		{
-			//if (initialCursorVisibility.HasValue == false && pendingCursorVisibility.HasValue == true) {
-			//	initialCursorVisibility = CursorVisibility.Normal;
-			//	SetCursorVisibility (pendingCursorVisibility.Value);
-			//	pendingCursorVisibility = null;
-			//	return true;
-			//}
-
 			return false;
 		}
 
 		public void Cleanup ()
 		{
-			if (initialCursorVisibility.HasValue) {
-				SetCursorVisibility (initialCursorVisibility.Value);
-			}
-
 			if (!SetConsoleMode (InputHandle, originalInputConsoleMode)) {
 				throw new ApplicationException ($"Failed to restore input console mode, error code: {GetLastError ()}.");
 			}

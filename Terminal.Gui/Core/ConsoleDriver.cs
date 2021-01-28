@@ -479,21 +479,58 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Cursors Visibility that are displayed
 	/// </summary>
-	public enum CursorVisibility : Int32 {
+	// 
+	// Hexa value are set as 0xAABBCCDD where :
+	//
+	//     AA stand for the TERMINFO DECSUSR parameter value to be used under Linux & MacOS
+	//     BB stand for the NCurses curs_set parameter value to be used under Linux & MacOS
+	//     CC stand for the CONSOLE_CURSOR_INFO.bVisible parameter value to be used under Windows
+	//     DD stand for the CONSOLE_CURSOR_INFO.dwSize parameter value to be used under Windows
+	//
+	public enum CursorVisibility {
+		/// <summary>
+		///	Cursor caret has default
+		/// </summary>
+		Default 			= 0x00010119,
+
 		/// <summary>
 		///	Cursor caret is hidden
 		/// </summary>
-		Invisible = 0,
+		Invisible 			= 0x03000019,
 
 		/// <summary>
-		///	Cursor caret is normally shown
+		///	Cursor caret is normally shown as an _
 		/// </summary>
-		Normal = 1,
+		/// <remarks>Under Windows, this is equivalent to <see ref="UnderscoreBlinking"/></remarks>
+		Underline			= 0x04010019,
 
 		/// <summary>
-		///	Cursor caret is displayed a block
+		///	Cursor caret is normally shown as an blinking _
 		/// </summary>
-		Block = 2
+		UnderlineBlinking	= 0x03010019,
+
+		/// <summary>
+		///	Cursor caret is displayed a bar |
+		/// </summary>
+		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="UnderscoreBlinking"/></remarks>
+		Vertical			= 0x06010019,
+
+		/// <summary>
+		///	Cursor caret is displayed a blinking bar |
+		/// </summary>
+		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="UnderscoreBlinking"/></remarks>
+		VerticalBlinking	= 0x05010019,
+
+		/// <summary>
+		///	Cursor caret is displayed a block ▉
+		/// </summary>
+		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="BlockBlinking"/></remarks>
+		Box					= 0x02020064,
+
+		/// <summary>
+		///	Cursor caret is displayed a block ▉
+		/// </summary>
+		BoxBlinking			= 0x01020064,
 	}
 
 	///// <summary>

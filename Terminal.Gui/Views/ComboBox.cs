@@ -217,8 +217,6 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnEnter (View view)
 		{
-			Application.Driver.SetCursorVisibility (CursorVisibility.Normal);
-
 			if (!search.HasFocus && !listview.HasFocus) {
 				search.SetFocus ();
 			}

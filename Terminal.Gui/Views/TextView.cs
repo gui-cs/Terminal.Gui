@@ -480,6 +480,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public int Lines => model.Count;
 
+
 		/// <summary>
 		/// Loads the contents of the file into the  <see cref="TextView"/>.
 		/// </summary>
@@ -598,11 +599,29 @@ namespace Terminal.Gui {
 			}
 		}
 
+		private CursorVisibility wishedCursorVisibility = CursorVisibility.BoxBlinking;
+
+		/// <summary>
+		/// Get / Set the wished cursor when the field is focused
+		/// </summary>
+		public CursorVisibility WishedCursorVisibility 
+		{ 
+			get => wishedCursorVisibility; 
+			set {
+				if (wishedCursorVisibility != value && HasFocus)
+				{
+					Application.Driver.SetCursorVisibility (value);		
+				}
+
+				wishedCursorVisibility = value;
+			}
+		}
+
 		///<inheritdoc/>
 		public override bool OnEnter (View view)
 		{
 			//TODO: Improve it by handling read only mode of the text field
-			Application.Driver.SetCursorVisibility (CursorVisibility.Normal);
+			Application.Driver.SetCursorVisibility (WishedCursorVisibility);
 
 			return base.OnEnter (view);
 		}
