@@ -491,6 +491,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		///	Cursor caret has default
 		/// </summary>
+		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/>. This default directly depends of the XTerm user configuration settings so it could be Block, I-Beam, Underline with possible blinking.</remarks>
 		Default = 0x00010119,
 
 		/// <summary>
@@ -512,10 +513,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		///	Cursor caret is displayed a blinking vertical bar |
 		/// </summary>
+		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/></remarks>
 		Vertical = 0x05010119,
 
 		/// <summary>
-		///	Cursor caret is displayed a blinking bar |
+		///	Cursor caret is displayed a blinking vertical bar |
 		/// </summary>
 		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/></remarks>
 		VerticalFix = 0x06010119,

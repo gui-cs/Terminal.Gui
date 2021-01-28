@@ -418,6 +418,7 @@ namespace Terminal.Gui {
 		{
 		}
 
+		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
 			visibility = CursorVisibility.Default;
@@ -425,11 +426,13 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
 			return false;
 		}
 
+		/// <inheritdoc/>
 		public override bool EnsureCursorVisibility ()
 		{
 			return false;

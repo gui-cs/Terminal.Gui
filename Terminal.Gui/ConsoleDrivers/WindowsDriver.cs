@@ -1448,16 +1448,19 @@ namespace Terminal.Gui {
 			return currentAttribute;
 		}
 
+		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
 			return winConsole.GetCursorVisibility (out visibility);
 		}
 
+		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
 			return winConsole.SetCursorVisibility (visibility);
 		}
 
+		/// <inheritdoc/>
 		public override bool EnsureCursorVisibility ()
 		{
 			return winConsole.EnsureCursorVisibility ();

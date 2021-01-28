@@ -886,6 +886,7 @@ namespace Terminal.Gui {
 			return currentAttribute;
 		}
 
+		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
 			visibility = CursorVisibility.Invisible;
@@ -899,6 +900,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
 			if (initialCursorVisibility.HasValue == false) {
@@ -918,6 +920,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <inheritdoc/>
 		public override bool EnsureCursorVisibility ()
 		{
 			return false;

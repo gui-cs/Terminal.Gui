@@ -57,23 +57,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public bool GetCursorVisibility (out CursorVisibility visibility)
-		{
-			visibility = CursorVisibility.Default;
-
-			return false;
-		}
-
-		public bool SetCursorVisibility (CursorVisibility visibility)
-		{
-			return false;
-		}
-
-		public bool EnsureCursorVisibility ()
-		{
-			return false;
-		}
-
 		public void Cleanup ()
 		{
 			if (!SetConsoleMode (InputHandle, originalInputConsoleMode)) {
@@ -1730,19 +1713,24 @@ namespace Terminal.Gui {
 		{
 		}
 
+		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
-			return NetWinConsole.GetCursorVisibility (out visibility);
+			visibility = CursorVisibility.Default;
+
+			return false;
 		}
 
+		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
-			return NetWinConsole?.SetCursorVisibility (visibility) ?? false;
+			return false;
 		}
 
+		/// <inheritdoc/>
 		public override bool EnsureCursorVisibility ()
 		{
-			return NetWinConsole?.EnsureCursorVisibility () ?? false;
+			return false;
 		}
 		#endregion
 
