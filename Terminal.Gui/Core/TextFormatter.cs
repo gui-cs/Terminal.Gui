@@ -195,7 +195,7 @@ namespace Terminal.Gui {
 					break;
 				}
 			}
-			return ustring.Make (runes); ;
+			return ustring.Make (runes);
 		}
 
 		/// <summary>
@@ -396,9 +396,16 @@ namespace Terminal.Gui {
 		public static int MaxWidth (ustring text, int width)
 		{
 			var result = TextFormatter.Format (text, width, TextAlignment.Left, true);
-			return result.Max (s => s.RuneCount);
+			var max = 0;
+			result.ForEach (s => {
+				var m = 0;
+				s.ToRuneList ().ForEach (r => m += Rune.ColumnWidth (r));
+				if (m > max) {
+					max = m;
+				}
+			});
+			return max;
 		}
-
 
 		/// <summary>
 		///  Calculates the rectangle required to hold text, assuming no word wrapping.
@@ -409,8 +416,9 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public static Rect CalcRect (int x, int y, ustring text)
 		{
-			if (ustring.IsNullOrEmpty (text))
+			if (ustring.IsNullOrEmpty (text)) {
 				return new Rect (new Point (x, y), Size.Empty);
+			}
 
 			int mw = 0;
 			int ml = 1;
@@ -419,17 +427,24 @@ namespace Terminal.Gui {
 			foreach (var rune in text) {
 				if (rune == '\n') {
 					ml++;
-					if (cols > mw)
+					if (cols > mw) {
 						mw = cols;
+					}
 					cols = 0;
 				} else {
 					if (rune != '\r') {
 						cols++;
+						var rw = Rune.ColumnWidth (rune);
+						if (rw > 0) {
+							rw--;
+						}
+						cols += rw;
 					}
 				}
 			}
-			if (cols > mw)
+			if (cols > mw) {
 				mw = cols;
+			}
 
 			return new Rect (x, y, mw, ml);
 		}
@@ -587,15 +602,16 @@ namespace Terminal.Gui {
 				default:
 					throw new ArgumentOutOfRangeException ();
 				}
-				for (var col = bounds.Left; col < bounds.Left + bounds.Width; col++) {
+				var col = bounds.Left;
+				for (var idx = bounds.Left; idx < bounds.Left + bounds.Width; idx++) {
 					Application.Driver?.Move (col, bounds.Top + line);
 					var rune = (Rune)' ';
-					if (col >= x && col < (x + runes.Length)) {
-						rune = runes [col - x];
+					if (idx >= x && idx < (x + runes.Length)) {
+						rune = runes [idx - x];
 					}
 					if ((rune & HotKeyTagMask) == HotKeyTagMask) {
 						if (textAlignment == TextAlignment.Justified) {
-							CursorPosition = col - bounds.Left;
+							CursorPosition = idx - bounds.Left;
 						}
 						Application.Driver?.SetAttribute (hotColor);
 						Application.Driver?.AddRune ((Rune)((uint)rune & ~HotKeyTagMask));
@@ -603,9 +619,12 @@ namespace Terminal.Gui {
 					} else {
 						Application.Driver?.AddRune (rune);
 					}
+					col += Rune.ColumnWidth (rune);
+					if (idx + 1 < runes.Length && col + Rune.ColumnWidth (runes [idx + 1]) > bounds.Width) {
+						break;
+					}
 				}
 			}
 		}
-
 	}
 }
