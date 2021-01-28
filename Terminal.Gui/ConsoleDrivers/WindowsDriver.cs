@@ -504,6 +504,7 @@ namespace Terminal.Gui {
 		[DllImport ("kernel32.dll")]
 		static extern bool GetConsoleMode (IntPtr hConsoleHandle, out uint lpMode);
 
+
 		[DllImport ("kernel32.dll")]
 		static extern bool SetConsoleMode (IntPtr hConsoleHandle, uint dwMode);
 
@@ -1490,7 +1491,6 @@ namespace Terminal.Gui {
 		public override void CookMouse ()
 		{
 		}
-
 		#endregion
 	}
 

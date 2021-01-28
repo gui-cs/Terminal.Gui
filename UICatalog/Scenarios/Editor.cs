@@ -24,25 +24,24 @@ namespace UICatalog {
 				Top = Application.Top;
 			}
 
-			List<MenuBarItem> menuBarItems = new List<MenuBarItem> ();
-
-			menuBarItems.AddRange	(	new MenuBarItem [] 
-							{
-								new MenuBarItem ("_File", new MenuItem [] {
-									new MenuItem ("_New", "", () => New()),
-									new MenuItem ("_Open", "", () => Open()),
-									new MenuItem ("_Save", "", () => Save()),
-									null,
-									new MenuItem ("_Quit", "", () => Quit()),
-								}),
-								new MenuBarItem ("_Edit", new MenuItem [] {
-									new MenuItem ("_Copy", "", () => Copy()),
-									new MenuItem ("C_ut", "", () => Cut()),
-									new MenuItem ("_Paste", "", () => Paste())
-								}),
-								new MenuBarItem ("_ScrollBarView", CreateKeepChecked ())
-							}
-						);
+			List<MenuBarItem> menuBarItems = new List<MenuBarItem> (
+				new MenuBarItem [] 
+				{
+					new MenuBarItem ("_File", new MenuItem [] {
+						new MenuItem ("_New", "", () => New()),
+						new MenuItem ("_Open", "", () => Open()),
+						new MenuItem ("_Save", "", () => Save()),
+						null,
+						new MenuItem ("_Quit", "", () => Quit()),
+					}),
+					new MenuBarItem ("_Edit", new MenuItem [] {
+						new MenuItem ("_Copy", "", () => Copy()),
+						new MenuItem ("C_ut", "", () => Cut()),
+						new MenuItem ("_Paste", "", () => Paste())
+					}),
+					new MenuBarItem ("_ScrollBarView", CreateKeepChecked ())
+				}
+			);
 
 			if (!Application.UseSystemConsole) {
 				menuBarItems.Add (new MenuBarItem ("_Cursor", new MenuItem [] {

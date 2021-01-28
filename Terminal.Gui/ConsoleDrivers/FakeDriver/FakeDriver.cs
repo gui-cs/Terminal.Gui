@@ -422,12 +422,12 @@ namespace Terminal.Gui {
 		{
 			visibility = CursorVisibility.Default;
 
-			return true;
+			return false;
 		}
 
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
-			return true;
+			return false;
 		}
 
 		public override bool EnsureCursorVisibility ()

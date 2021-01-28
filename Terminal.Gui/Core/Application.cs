@@ -503,7 +503,6 @@ namespace Terminal.Gui {
 			toplevel.PositionCursor ();
 			Driver.Refresh ();
 
-
 			return rs;
 		}
 
@@ -711,7 +710,8 @@ namespace Terminal.Gui {
 					RunLoop (runToken);
 
 					End (runToken);
-				} catch (Exception error)
+				} 
+				catch (Exception error)
 				{
 					if (errorHandler == null)
 					{
