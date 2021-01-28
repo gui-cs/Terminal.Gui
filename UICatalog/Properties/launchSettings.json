@@ -1,8 +1,7 @@
 {
   "profiles": {
     "UICatalog": {
-      "commandName": "Project",
-      "commandLineArgs": "-usc"
+      "commandName": "Project"
     }
   }
 }

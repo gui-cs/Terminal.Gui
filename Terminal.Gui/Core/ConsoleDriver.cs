@@ -491,46 +491,45 @@ namespace Terminal.Gui {
 		/// <summary>
 		///	Cursor caret has default
 		/// </summary>
-		Default 			= 0x00010119,
+		Default = 0x00010119,
 
 		/// <summary>
 		///	Cursor caret is hidden
 		/// </summary>
-		Invisible 			= 0x03000019,
+		Invisible = 0x03000019,
 
 		/// <summary>
-		///	Cursor caret is normally shown as an _
+		///	Cursor caret is normally shown as a blinking underline bar _
+		/// </summary>
+		Underline = 0x03010119,
+
+		/// <summary>
+		///	Cursor caret is normally shown as a underline bar _
 		/// </summary>
 		/// <remarks>Under Windows, this is equivalent to <see ref="UnderscoreBlinking"/></remarks>
-		Underline			= 0x04010019,
+		UnderlineFix = 0x04010119,
 
 		/// <summary>
-		///	Cursor caret is normally shown as an blinking _
+		///	Cursor caret is displayed a blinking vertical bar |
 		/// </summary>
-		UnderlineBlinking	= 0x03010019,
-
-		/// <summary>
-		///	Cursor caret is displayed a bar |
-		/// </summary>
-		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="UnderscoreBlinking"/></remarks>
-		Vertical			= 0x06010019,
+		Vertical = 0x05010119,
 
 		/// <summary>
 		///	Cursor caret is displayed a blinking bar |
 		/// </summary>
-		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="UnderscoreBlinking"/></remarks>
-		VerticalBlinking	= 0x05010019,
+		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/></remarks>
+		VerticalFix = 0x06010119,
+
+		/// <summary>
+		///	Cursor caret is displayed as a blinking block ▉
+		/// </summary>
+		Box = 0x01020164,
 
 		/// <summary>
 		///	Cursor caret is displayed a block ▉
 		/// </summary>
-		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="BlockBlinking"/></remarks>
-		Box					= 0x02020064,
-
-		/// <summary>
-		///	Cursor caret is displayed a block ▉
-		/// </summary>
-		BoxBlinking			= 0x01020064,
+		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Block"/></remarks>
+		BoxFix = 0x02020164,
 	}
 
 	///// <summary>

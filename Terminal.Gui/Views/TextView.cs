@@ -599,7 +599,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private CursorVisibility wishedCursorVisibility = CursorVisibility.BoxBlinking;
+		private CursorVisibility wishedCursorVisibility = CursorVisibility.BoxFix;
 
 		/// <summary>
 		/// Get / Set the wished cursor when the field is focused

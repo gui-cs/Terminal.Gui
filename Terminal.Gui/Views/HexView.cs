@@ -396,7 +396,7 @@ namespace Terminal.Gui {
 			edits = new SortedDictionary<long, byte> ();
 		}
 
-		private CursorVisibility wishedCursorVisibility = CursorVisibility.BoxBlinking;
+		private CursorVisibility wishedCursorVisibility = CursorVisibility.BoxFix;
 
 		/// <summary>
 		/// Get / Set the wished cursor when the field is focused

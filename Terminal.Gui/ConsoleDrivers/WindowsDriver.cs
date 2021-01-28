@@ -85,7 +85,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			if (GetCursorVisibility (out CursorVisibility visibility)) {
+			if (!initialCursorVisibility.HasValue && GetCursorVisibility (out CursorVisibility visibility)) {
 				initialCursorVisibility = visibility;
 			}
 
@@ -129,9 +129,9 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (!info.bVisible)			visibility = CursorVisibility.Invisible;
-			else if (info.dwSize > 50)	visibility = CursorVisibility.Box;
-			else						visibility = CursorVisibility.Underline;
+			if (!info.bVisible)        visibility = CursorVisibility.Invisible;
+			else if (info.dwSize > 50) visibility = CursorVisibility.Box;
+			else                       visibility = CursorVisibility.Underline;
 
 			return true;
 		}

@@ -1737,12 +1737,12 @@ namespace Terminal.Gui {
 
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
-			return NetWinConsole.SetCursorVisibility (visibility);
+			return NetWinConsole?.SetCursorVisibility (visibility) ?? false;
 		}
 
 		public override bool EnsureCursorVisibility ()
 		{
-			return NetWinConsole.EnsureCursorVisibility ();
+			return NetWinConsole?.EnsureCursorVisibility () ?? false;
 		}
 		#endregion
 
