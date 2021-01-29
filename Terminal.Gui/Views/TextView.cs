@@ -599,21 +599,21 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private CursorVisibility wishedCursorVisibility = CursorVisibility.BoxFix;
+		private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
 
 		/// <summary>
 		/// Get / Set the wished cursor when the field is focused
 		/// </summary>
-		public CursorVisibility WishedCursorVisibility 
+		public CursorVisibility DesiredCursorVisibility 
 		{ 
-			get => wishedCursorVisibility; 
+			get => desiredCursorVisibility; 
 			set {
-				if (wishedCursorVisibility != value && HasFocus)
+				if (desiredCursorVisibility != value && HasFocus)
 				{
 					Application.Driver.SetCursorVisibility (value);		
 				}
 
-				wishedCursorVisibility = value;
+				desiredCursorVisibility = value;
 			}
 		}
 
@@ -621,7 +621,7 @@ namespace Terminal.Gui {
 		public override bool OnEnter (View view)
 		{
 			//TODO: Improve it by handling read only mode of the text field
-			Application.Driver.SetCursorVisibility (WishedCursorVisibility);
+			Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
 
 			return base.OnEnter (view);
 		}

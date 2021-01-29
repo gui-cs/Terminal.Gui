@@ -700,10 +700,23 @@ namespace Terminal.Gui {
 			// We are setting Invisible as default so we could ignore XTerm DECSUSR setting
 			//
 			switch (Curses.curs_set (0)) {
-				case 0:		currentCursorVisibility = initialCursorVisibility = CursorVisibility.Invisible;	break;
-				case 1:		currentCursorVisibility = initialCursorVisibility = CursorVisibility.Underline;	Curses.curs_set (1); break;
-				case 2:		currentCursorVisibility = initialCursorVisibility = CursorVisibility.Box;		Curses.curs_set (2); break;
-				default:	currentCursorVisibility = initialCursorVisibility = null;						break;
+				case 0:		
+					currentCursorVisibility = initialCursorVisibility = CursorVisibility.Invisible;	
+					break;
+
+				case 1:		
+					currentCursorVisibility = initialCursorVisibility = CursorVisibility.Underline;	
+					Curses.curs_set (1); 
+					break;
+
+				case 2:		
+					currentCursorVisibility = initialCursorVisibility = CursorVisibility.Box;		
+					Curses.curs_set (2); 
+					break;
+
+				default:	
+					currentCursorVisibility = initialCursorVisibility = null;						
+					break;
 			}
 
 			Curses.raw ();
@@ -891,9 +904,8 @@ namespace Terminal.Gui {
 		{
 			visibility = CursorVisibility.Invisible;
 
-			if (!currentCursorVisibility.HasValue) {
+			if (!currentCursorVisibility.HasValue)
 				return false;
-			}
 
 			visibility = currentCursorVisibility.Value;
 
@@ -909,8 +921,7 @@ namespace Terminal.Gui {
 
 			Curses.curs_set (((int) visibility >> 16) & 0x000000FF);
 
-			if (visibility != CursorVisibility.Invisible)
-			{
+			if (visibility != CursorVisibility.Invisible) {
 				Console.Out.Write ("\x1b[{0} q", ((int) visibility >> 24) & 0xFF);
 				Console.Out.Flush ();
 			}

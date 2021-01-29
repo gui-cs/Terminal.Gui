@@ -117,21 +117,21 @@ namespace Terminal.Gui {
 		public bool GetCursorVisibility (out CursorVisibility visibility)
 		{
 			if (!GetConsoleCursorInfo (ScreenBuffer, out ConsoleCursorInfo info)) {
-
 				var err = Marshal.GetLastWin32Error ();
-
 				if (err != 0) {
 					throw new System.ComponentModel.Win32Exception (err);
-				}
-
+				}				
 				visibility = Gui.CursorVisibility.Default;
 
 				return false;
 			}
 
-			if (!info.bVisible)        visibility = CursorVisibility.Invisible;
-			else if (info.dwSize > 50) visibility = CursorVisibility.Box;
-			else                       visibility = CursorVisibility.Underline;
+			if (!info.bVisible)        
+				visibility = CursorVisibility.Invisible;
+			else if (info.dwSize > 50) 
+				visibility = CursorVisibility.Box;
+			else                       
+				visibility = CursorVisibility.Underline;
 
 			return true;
 		}

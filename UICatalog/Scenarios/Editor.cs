@@ -24,43 +24,34 @@ namespace UICatalog {
 				Top = Application.Top;
 			}
 
-			List<MenuBarItem> menuBarItems = new List<MenuBarItem> (
-				new MenuBarItem [] 
-				{
-					new MenuBarItem ("_File", new MenuItem [] {
-						new MenuItem ("_New", "", () => New()),
-						new MenuItem ("_Open", "", () => Open()),
-						new MenuItem ("_Save", "", () => Save()),
-						null,
-						new MenuItem ("_Quit", "", () => Quit()),
-					}),
-					new MenuBarItem ("_Edit", new MenuItem [] {
-						new MenuItem ("_Copy", "", () => Copy()),
-						new MenuItem ("C_ut", "", () => Cut()),
-						new MenuItem ("_Paste", "", () => Paste())
-					}),
-					new MenuBarItem ("_ScrollBarView", CreateKeepChecked ())
-				}
-			);
-
-			if (!Application.UseSystemConsole) {
-				menuBarItems.Add (new MenuBarItem ("_Cursor", new MenuItem [] {
-							new MenuItem ("_Invisible",      "", () => SetCursor(CursorVisibility.Invisible)),
-							new MenuItem ("_Box",            "", () => SetCursor(CursorVisibility.Box)),
-							new MenuItem ("_Underline",      "", () => SetCursor(CursorVisibility.Underline)),
-							new MenuItem ("",                "", () => {}, () => { return false; }),
-							new MenuItem ("xTerm :",         "", () => {}, () => { return false; }),
-							new MenuItem ("",                "", () => {}, () => { return false; }),
-							new MenuItem ("  _Default",      "", () => SetCursor(CursorVisibility.Default)),
-							new MenuItem ("  _Vertical",     "", () => SetCursor(CursorVisibility.Vertical)),
-							new MenuItem ("  V_ertical Fix", "", () => SetCursor(CursorVisibility.VerticalFix)),
-							new MenuItem ("  B_ox Fix",      "", () => SetCursor(CursorVisibility.BoxFix)),
-							new MenuItem ("  U_nderline Fix","", () => SetCursor(CursorVisibility.UnderlineFix))
-						}));
-			}
-
-			var menu = new MenuBar (menuBarItems.ToArray());
-
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("_File", new MenuItem [] {
+					new MenuItem ("_New", "", () => New()),
+					new MenuItem ("_Open", "", () => Open()),
+					new MenuItem ("_Save", "", () => Save()),
+					null,
+					new MenuItem ("_Quit", "", () => Quit()),
+				}),
+				new MenuBarItem ("_Edit", new MenuItem [] {
+					new MenuItem ("_Copy", "", () => Copy()),
+					new MenuItem ("C_ut", "", () => Cut()),
+					new MenuItem ("_Paste", "", () => Paste())
+				}),
+				new MenuBarItem ("_ScrollBarView", CreateKeepChecked ()),
+				new MenuBarItem ("_Cursor", new MenuItem [] {
+					new MenuItem ("_Invisible", "", () => SetCursor(CursorVisibility.Invisible)),
+					new MenuItem ("_Box", "", () => SetCursor(CursorVisibility.Box)),
+					new MenuItem ("_Underline", "", () => SetCursor(CursorVisibility.Underline)),
+					new MenuItem ("", "", () => {}, () => { return false; }),
+					new MenuItem ("xTerm :", "", () => {}, () => { return false; }),
+					new MenuItem ("", "", () => {}, () => { return false; }),
+					new MenuItem ("  _Default", "", () => SetCursor(CursorVisibility.Default)),
+					new MenuItem ("  _Vertical", "", () => SetCursor(CursorVisibility.Vertical)),
+					new MenuItem ("  V_ertical Fix", "", () => SetCursor(CursorVisibility.VerticalFix)),
+					new MenuItem ("  B_ox Fix", "", () => SetCursor(CursorVisibility.BoxFix)),
+					new MenuItem ("  U_nderline Fix","", () => SetCursor(CursorVisibility.UnderlineFix))
+				})
+			});
 			Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
@@ -166,7 +157,7 @@ namespace UICatalog {
 
 		private void SetCursor (CursorVisibility visibility)
 		{
-			_textView.WishedCursorVisibility = visibility;
+			_textView.DesiredCursorVisibility = visibility;
 		}
 
 		private void Open ()
