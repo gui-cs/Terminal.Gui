@@ -708,9 +708,8 @@ namespace Terminal.Gui {
 					resume = false;
 					var runToken = Begin (view);
 					RunLoop (runToken);
-
 					End (runToken);
-				} 
+				}
 				catch (Exception error)
 				{
 					if (errorHandler == null)
