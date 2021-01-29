@@ -867,7 +867,6 @@ namespace Terminal.Gui {
 			return ev;
 		}
 
-
 		private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
 
 		/// <summary>
@@ -877,8 +876,7 @@ namespace Terminal.Gui {
 		{ 
 			get => desiredCursorVisibility; 
 			set {
-				if (desiredCursorVisibility != value && HasFocus)
-				{
+				if (desiredCursorVisibility != value && HasFocus) {
 					Application.Driver.SetCursorVisibility (value);		
 				}
 

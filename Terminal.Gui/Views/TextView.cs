@@ -480,7 +480,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public int Lines => model.Count;
 
-
 		/// <summary>
 		/// Loads the contents of the file into the  <see cref="TextView"/>.
 		/// </summary>
@@ -608,8 +607,7 @@ namespace Terminal.Gui {
 		{ 
 			get => desiredCursorVisibility; 
 			set {
-				if (desiredCursorVisibility != value && HasFocus)
-				{
+				if (desiredCursorVisibility != value && HasFocus) {
 					Application.Driver.SetCursorVisibility (value);		
 				}
 

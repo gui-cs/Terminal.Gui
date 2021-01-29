@@ -161,9 +161,8 @@ namespace Terminal.Gui {
 					bVisible = ((uint) visibility & 0xFF00) != 0
 				};
 
-				if (!SetConsoleCursorInfo (ScreenBuffer, ref info)) {
+				if (!SetConsoleCursorInfo (ScreenBuffer, ref info)) 
 					return false;
-				}
 
 				currentCursorVisibility = visibility;
 			}

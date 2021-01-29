@@ -915,9 +915,8 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
-			if (initialCursorVisibility.HasValue == false) {
+			if (initialCursorVisibility.HasValue == false) 
 				return false;
-			}
 
 			Curses.curs_set (((int) visibility >> 16) & 0x000000FF);
 
