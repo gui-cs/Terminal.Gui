@@ -147,6 +147,14 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		public void ForceRefreshCursorVisibility ()
+		{
+			if (currentCursorVisibility.HasValue) {
+				pendingCursorVisibility = currentCursorVisibility;
+				currentCursorVisibility = null;
+			}
+		}
+
 		public bool SetCursorVisibility (CursorVisibility visibility)
 		{
 			if (initialCursorVisibility.HasValue == false) {
@@ -1305,6 +1313,7 @@ namespace Terminal.Gui {
 				Bottom = (short)Rows,
 				Right = (short)Cols
 			};
+			winConsole.ForceRefreshCursorVisibility ();
 		}
 
 		void UpdateOffScreen ()
