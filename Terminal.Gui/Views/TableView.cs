@@ -580,7 +580,7 @@ namespace Terminal.Gui {
 		{
 			if(Table == null){
 				PositionCursor ();
-				return true;
+				return false;
 			}
 
 			if(keyEvent.Key == CellActivationKey && Table != null) {
