@@ -617,6 +617,10 @@ namespace Terminal.Gui {
 
 					MainLoop.MainIteration ();
 					Iteration?.Invoke ();
+					
+					if (Driver.EnsureCursorVisibility ()) {
+						state.Toplevel.SetNeedsDisplay ();
+					}
 				} else if (!wait) {
 					return;
 				}

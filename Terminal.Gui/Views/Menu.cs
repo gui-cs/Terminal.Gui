@@ -749,6 +749,14 @@ namespace Terminal.Gui {
 
 			return pos;
 		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnEnter (view);
+		}
 	}
 
 
@@ -1621,6 +1629,13 @@ namespace Terminal.Gui {
 
 			return true;
 		}
-	}
 
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnEnter (view);
+		}
+	}
 }
