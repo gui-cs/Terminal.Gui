@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ConsoleDriver
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.56.6.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -61,11 +61,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -913,6 +913,34 @@ Set flags to enable/disable <a class="xref" href="Terminal.Gui.ConsoleDriver.htm
   </table>
   
   
+  <a id="Terminal_Gui_ConsoleDriver_HeightAsBuffer_" data-uid="Terminal.Gui.ConsoleDriver.HeightAsBuffer*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_HeightAsBuffer" data-uid="Terminal.Gui.ConsoleDriver.HeightAsBuffer">HeightAsBuffer</h4>
+  <div class="markdown level1 summary">
+If false height is measured by the window height and thus no scrolling.
+If true then height is measured by the buffer height, enabling scrolling.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract bool HeightAsBuffer { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_ConsoleDriver_Rows_" data-uid="Terminal.Gui.ConsoleDriver.Rows*"></a>
   <h4 id="Terminal_Gui_ConsoleDriver_Rows" data-uid="Terminal.Gui.ConsoleDriver.Rows">Rows</h4>
   <div class="markdown level1 summary">
@@ -922,6 +950,33 @@ The current number of rows in the terminal.
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public abstract int Rows { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_Top_" data-uid="Terminal.Gui.ConsoleDriver.Top*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_Top" data-uid="Terminal.Gui.ConsoleDriver.Top">Top</h4>
+  <div class="markdown level1 summary">
+The current top in the terminal.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract int Top { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1050,7 +1105,7 @@ Draws a frame on the specified region with the specified padding around the fram
     </tbody>
   </table>
   <h5 id="Terminal_Gui_ConsoleDriver_DrawFrame_Terminal_Gui_Rect_System_Int32_System_Boolean__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">This API has been superceded by <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawWindowFrame_Terminal_Gui_Rect_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_">DrawWindowFrame(Rect, Int32, Int32, Int32, Int32, Boolean, Boolean)</a>.</div>
+  <div class="markdown level1 remarks">This API has been superseded by <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_DrawWindowFrame_Terminal_Gui_Rect_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_">DrawWindowFrame(Rect, Int32, Int32, Int32, Int32, Boolean, Boolean)</a>.</div>
   
   
   <a id="Terminal_Gui_ConsoleDriver_DrawWindowFrame_" data-uid="Terminal.Gui.ConsoleDriver.DrawWindowFrame*"></a>
@@ -1165,7 +1220,7 @@ Draws the title for a Window-style view incorporating padding.
       <tr>
         <td><a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a></td>
         <td><span class="parametername">textAlignment</span></td>
-        <td>Not yet immplemented.</td>
+        <td>Not yet implemented.</td>
       </tr>
     </tbody>
   </table>
@@ -1181,6 +1236,104 @@ Ends the execution of the console driver.
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public abstract void End()</code></pre>
   </div>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_EnsureCursorVisibility_" data-uid="Terminal.Gui.ConsoleDriver.EnsureCursorVisibility*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_EnsureCursorVisibility" data-uid="Terminal.Gui.ConsoleDriver.EnsureCursorVisibility">EnsureCursorVisibility()</h4>
+  <div class="markdown level1 summary">
+Ensure the cursor visibility
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract bool EnsureCursorVisibility()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>true upon success</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_GetAttribute_" data-uid="Terminal.Gui.ConsoleDriver.GetAttribute*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_GetAttribute" data-uid="Terminal.Gui.ConsoleDriver.GetAttribute">GetAttribute()</h4>
+  <div class="markdown level1 summary">
+Gets the current <a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract Attribute GetAttribute()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a></td>
+        <td>The current attribute.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_ConsoleDriver_GetCursorVisibility_" data-uid="Terminal.Gui.ConsoleDriver.GetCursorVisibility*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_GetCursorVisibility_Terminal_Gui_CursorVisibility__" data-uid="Terminal.Gui.ConsoleDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)">GetCursorVisibility(out CursorVisibility)</h4>
+  <div class="markdown level1 summary">
+Retreive the cursor caret visibility
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract bool GetCursorVisibility(out CursorVisibility visibility)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+        <td><span class="parametername">visibility</span></td>
+        <td>The current <a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>true upon success</td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="Terminal_Gui_ConsoleDriver_Init_" data-uid="Terminal.Gui.ConsoleDriver.Init*"></a>
@@ -1499,6 +1652,50 @@ that independently with the R, G, B values.
   </table>
   
   
+  <a id="Terminal_Gui_ConsoleDriver_SetCursorVisibility_" data-uid="Terminal.Gui.ConsoleDriver.SetCursorVisibility*"></a>
+  <h4 id="Terminal_Gui_ConsoleDriver_SetCursorVisibility_Terminal_Gui_CursorVisibility_" data-uid="Terminal.Gui.ConsoleDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)">SetCursorVisibility(CursorVisibility)</h4>
+  <div class="markdown level1 summary">
+Change the cursor caret visibility
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract bool SetCursorVisibility(CursorVisibility visibility)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+        <td><span class="parametername">visibility</span></td>
+        <td>The wished <a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>true upon success</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_ConsoleDriver_SetTerminalResized_" data-uid="Terminal.Gui.ConsoleDriver.SetTerminalResized*"></a>
   <h4 id="Terminal_Gui_ConsoleDriver_SetTerminalResized_System_Action_" data-uid="Terminal.Gui.ConsoleDriver.SetTerminalResized(System.Action)">SetTerminalResized(Action)</h4>
   <div class="markdown level1 summary">
@@ -1608,7 +1805,8 @@ Redraws the physical screen with the contents that have been queued up via any o
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

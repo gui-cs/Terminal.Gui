@@ -5,12 +5,12 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class NetMainLoop
+    <title>Class FakeMainLoop
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class NetMainLoop
+    <meta name="title" content="Class FakeMainLoop
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.56.6.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -61,11 +61,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -78,10 +78,10 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Terminal.Gui.NetMainLoop">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.FakeMainLoop">
   
   
-  <h1 id="Terminal_Gui_NetMainLoop" data-uid="Terminal.Gui.NetMainLoop" class="text-break">Class NetMainLoop
+  <h1 id="Terminal_Gui_FakeMainLoop" data-uid="Terminal.Gui.FakeMainLoop" class="text-break">Class FakeMainLoop
   </h1>
   <div class="markdown level0 summary">
 Mainloop intended to be used with the .NET System.Console API, and can
@@ -92,7 +92,7 @@ file descriptor monitoring.
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><span class="xref">System.Object</span></div>
-    <div class="level1"><span class="xref">NetMainLoop</span></div>
+    <div class="level1"><span class="xref">FakeMainLoop</span></div>
   </div>
   <div classs="implements">
     <h5>Implements</h5>
@@ -124,27 +124,27 @@ file descriptor monitoring.
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Terminal_Gui_NetMainLoop_syntax">Syntax</h5>
+  <h5 id="Terminal_Gui_FakeMainLoop_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class NetMainLoop : IMainLoopDriver</code></pre>
+    <pre><code class="lang-csharp hljs">public class FakeMainLoop : IMainLoopDriver</code></pre>
   </div>
-  <h5 id="Terminal_Gui_NetMainLoop_remarks"><strong>Remarks</strong></h5>
+  <h5 id="Terminal_Gui_FakeMainLoop_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks">
-This implementation is used for both NetDriver and FakeDriver. 
+This implementation is used for FakeDriver.
 </div>
   <h3 id="constructors">Constructors
   </h3>
   
   
-  <a id="Terminal_Gui_NetMainLoop__ctor_" data-uid="Terminal.Gui.NetMainLoop.#ctor*"></a>
-  <h4 id="Terminal_Gui_NetMainLoop__ctor_System_Func_System_ConsoleKeyInfo__" data-uid="Terminal.Gui.NetMainLoop.#ctor(System.Func{System.ConsoleKeyInfo})">NetMainLoop(Func&lt;ConsoleKeyInfo&gt;)</h4>
+  <a id="Terminal_Gui_FakeMainLoop__ctor_" data-uid="Terminal.Gui.FakeMainLoop.#ctor*"></a>
+  <h4 id="Terminal_Gui_FakeMainLoop__ctor_System_Func_System_ConsoleKeyInfo__" data-uid="Terminal.Gui.FakeMainLoop.#ctor(System.Func{System.ConsoleKeyInfo})">FakeMainLoop(Func&lt;ConsoleKeyInfo&gt;)</h4>
   <div class="markdown level1 summary">
 Initializes the class.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public NetMainLoop(Func&lt;ConsoleKeyInfo&gt; consoleKeyReaderFn = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public FakeMainLoop(Func&lt;ConsoleKeyInfo&gt; consoleKeyReaderFn = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -163,15 +163,15 @@ Initializes the class.
       </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_NetMainLoop__ctor_System_Func_System_ConsoleKeyInfo___remarks">Remarks</h5>
+  <h5 id="Terminal_Gui_FakeMainLoop__ctor_System_Func_System_ConsoleKeyInfo___remarks">Remarks</h5>
   <div class="markdown level1 remarks">
-Passing a consoleKeyReaderfn is provided to support unit test sceanrios.
+Passing a consoleKeyReaderfn is provided to support unit test scenarios.
 </div>
   <h3 id="fields">Fields
   </h3>
   
   
-  <h4 id="Terminal_Gui_NetMainLoop_KeyPressed" data-uid="Terminal.Gui.NetMainLoop.KeyPressed">KeyPressed</h4>
+  <h4 id="Terminal_Gui_FakeMainLoop_KeyPressed" data-uid="Terminal.Gui.FakeMainLoop.KeyPressed">KeyPressed</h4>
   <div class="markdown level1 summary">
 Invoked when a Key is pressed.
 </div>
@@ -199,8 +199,8 @@ Invoked when a Key is pressed.
   </h3>
   
   
-  <a id="Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_EventsPending_" data-uid="Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending*"></a>
-  <h4 id="Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_EventsPending_System_Boolean_" data-uid="Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending(System.Boolean)">IMainLoopDriver.EventsPending(Boolean)</h4>
+  <a id="Terminal_Gui_FakeMainLoop_Terminal_Gui_IMainLoopDriver_EventsPending_" data-uid="Terminal.Gui.FakeMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending*"></a>
+  <h4 id="Terminal_Gui_FakeMainLoop_Terminal_Gui_IMainLoopDriver_EventsPending_System_Boolean_" data-uid="Terminal.Gui.FakeMainLoop.Terminal#Gui#IMainLoopDriver#EventsPending(System.Boolean)">IMainLoopDriver.EventsPending(Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -241,8 +241,8 @@ Invoked when a Key is pressed.
   </table>
   
   
-  <a id="Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_MainIteration_" data-uid="Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration*"></a>
-  <h4 id="Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_MainIteration" data-uid="Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration">IMainLoopDriver.MainIteration()</h4>
+  <a id="Terminal_Gui_FakeMainLoop_Terminal_Gui_IMainLoopDriver_MainIteration_" data-uid="Terminal.Gui.FakeMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration*"></a>
+  <h4 id="Terminal_Gui_FakeMainLoop_Terminal_Gui_IMainLoopDriver_MainIteration" data-uid="Terminal.Gui.FakeMainLoop.Terminal#Gui#IMainLoopDriver#MainIteration">IMainLoopDriver.MainIteration()</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -251,8 +251,8 @@ Invoked when a Key is pressed.
   </div>
   
   
-  <a id="Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_Setup_" data-uid="Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#Setup*"></a>
-  <h4 id="Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_Setup_Terminal_Gui_MainLoop_" data-uid="Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#Setup(Terminal.Gui.MainLoop)">IMainLoopDriver.Setup(MainLoop)</h4>
+  <a id="Terminal_Gui_FakeMainLoop_Terminal_Gui_IMainLoopDriver_Setup_" data-uid="Terminal.Gui.FakeMainLoop.Terminal#Gui#IMainLoopDriver#Setup*"></a>
+  <h4 id="Terminal_Gui_FakeMainLoop_Terminal_Gui_IMainLoopDriver_Setup_Terminal_Gui_MainLoop_" data-uid="Terminal.Gui.FakeMainLoop.Terminal#Gui#IMainLoopDriver#Setup(Terminal.Gui.MainLoop)">IMainLoopDriver.Setup(MainLoop)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -278,8 +278,8 @@ Invoked when a Key is pressed.
   </table>
   
   
-  <a id="Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_Wakeup_" data-uid="Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup*"></a>
-  <h4 id="Terminal_Gui_NetMainLoop_Terminal_Gui_IMainLoopDriver_Wakeup" data-uid="Terminal.Gui.NetMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup">IMainLoopDriver.Wakeup()</h4>
+  <a id="Terminal_Gui_FakeMainLoop_Terminal_Gui_IMainLoopDriver_Wakeup_" data-uid="Terminal.Gui.FakeMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup*"></a>
+  <h4 id="Terminal_Gui_FakeMainLoop_Terminal_Gui_IMainLoopDriver_Wakeup" data-uid="Terminal.Gui.FakeMainLoop.Terminal#Gui#IMainLoopDriver#Wakeup">IMainLoopDriver.Wakeup()</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -300,7 +300,8 @@ Invoked when a Key is pressed.
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
