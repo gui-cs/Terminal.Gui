@@ -190,7 +190,7 @@ Use NuGet to install the `Terminal.Gui` NuGet package: https://www.nuget.org/pac
 To install Terminal.Gui into a .NET Core project, use the `dotnet` CLI tool with following command.
 
 ```
-dotnet package add Terminal.Gui
+dotnet add package Terminal.Gui
 ```
 
 ## Running and Building
