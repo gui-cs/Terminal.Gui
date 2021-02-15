@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Toplevel
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.56.6.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -61,11 +61,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -197,10 +197,13 @@ Toplevel views can be modally executed.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">View.SetNeedsDisplay()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ClearLayoutNeeded">View.ClearLayoutNeeded()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay_Terminal_Gui_Rect_">View.SetNeedsDisplay(Rect)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ChildNeedsDisplay">View.ChildNeedsDisplay()</a>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetChildNeedsDisplay">View.SetChildNeedsDisplay()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">View.Add(View[])</a>
@@ -365,6 +368,12 @@ Toplevel views can be modally executed.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Visible">View.Visible</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetWidth_System_Int32_System_Int32__">View.SetWidth(Int32, Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetHeight_System_Int32_System_Int32__">View.SetHeight(Int32, Int32)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a>
     </div>
     <div>
@@ -398,7 +407,7 @@ Toplevel views can be modally executed.
   <h5 id="Terminal_Gui_Toplevel_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks">
 <p>
-  Toplevels can be modally executing views, started by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_">Run(Toplevel)</a>. 
+  Toplevels can be modally executing views, started by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a>. 
   They return control to the caller when <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop">RequestStop()</a> has 
   been called (which sets the <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Running">Running</a> property to false). 
 </p>
@@ -406,7 +415,7 @@ Toplevel views can be modally executed.
   A Toplevel is created when an application initialzies Terminal.Gui by callling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_">Init(ConsoleDriver, IMainLoopDriver)</a>.
   The application Toplevel can be accessed via <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Top">Top</a>. Additional Toplevels can be created 
   and run (e.g. <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>s. To run a Toplevel, create the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> and 
-  call <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_">Run(Toplevel)</a>.
+  call <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a>.
 </p>
 <p>
   Toplevels can also opt-in to more sophisticated initialization
@@ -991,7 +1000,7 @@ Removes all subviews (children) added via <a class="xref" href="Terminal.Gui.Vie
   <a id="Terminal_Gui_Toplevel_WillPresent_" data-uid="Terminal.Gui.Toplevel.WillPresent*"></a>
   <h4 id="Terminal_Gui_Toplevel_WillPresent" data-uid="Terminal.Gui.Toplevel.WillPresent">WillPresent()</h4>
   <div class="markdown level1 summary">
-Invoked by <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_">Begin(Toplevel)</a> as part of the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_">Run(Toplevel)</a> after
+Invoked by <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_">Begin(Toplevel)</a> as part of the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a> after
 the views have been laid out, and before the views are drawn for the first time.
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -1034,7 +1043,7 @@ A Loaded event handler is a good place to finalize initialization before calling
   <div class="markdown level1 summary">
 Fired once the Toplevel&apos;s <a class="xref" href="Terminal.Gui.MainLoop.html">MainLoop</a> has started it&apos;s first iteration.
 Subscribe to this event to perform tasks when the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> has been laid out and focus has been set.
-changes. A Ready event handler is a good place to finalize initialization after calling `<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run">Run()</a>(topLevel)`.
+changes. A Ready event handler is a good place to finalize initialization after calling `<a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_System_Func_System_Exception_System_Boolean__">Run(Func&lt;Exception, Boolean&gt;)</a>(topLevel)`.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -1103,7 +1112,8 @@ A Unloaded event handler is a good place to disposing after calling `<a class="x
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

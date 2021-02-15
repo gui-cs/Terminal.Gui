@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class View
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.56.6.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -61,11 +61,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -105,6 +105,7 @@ View is the base class for all views on the screen and represents a visible elem
       <div class="level3"><a class="xref" href="Terminal.Gui.ScrollBarView.html">ScrollBarView</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.ScrollView.html">ScrollView</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.StatusBar.html">StatusBar</a></div>
+      <div class="level3"><a class="xref" href="Terminal.Gui.TableView.html">TableView</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.TextField.html">TextField</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.TextView.html">TextView</a></div>
       <div class="level3"><a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a></div>
@@ -1567,18 +1568,6 @@ Brings the specified subview to the front so it is drawn on top of any other vie
 </div>
   
   
-  <a id="Terminal_Gui_View_ChildNeedsDisplay_" data-uid="Terminal.Gui.View.ChildNeedsDisplay*"></a>
-  <h4 id="Terminal_Gui_View_ChildNeedsDisplay" data-uid="Terminal.Gui.View.ChildNeedsDisplay">ChildNeedsDisplay()</h4>
-  <div class="markdown level1 summary">
-Indicates that any child views (in the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Subviews">Subviews</a> list) need to be repainted.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void ChildNeedsDisplay()</code></pre>
-  </div>
-  
-  
   <a id="Terminal_Gui_View_Clear_" data-uid="Terminal.Gui.View.Clear*"></a>
   <h4 id="Terminal_Gui_View_Clear" data-uid="Terminal.Gui.View.Clear">Clear()</h4>
   <div class="markdown level1 summary">
@@ -1629,10 +1618,22 @@ Clears the specified region with the current color.
 </div>
   
   
+  <a id="Terminal_Gui_View_ClearLayoutNeeded_" data-uid="Terminal.Gui.View.ClearLayoutNeeded*"></a>
+  <h4 id="Terminal_Gui_View_ClearLayoutNeeded" data-uid="Terminal.Gui.View.ClearLayoutNeeded">ClearLayoutNeeded()</h4>
+  <div class="markdown level1 summary">
+Removes the <span class="xref">Terminal.Gui.View.SetNeedsLayout</span> setting on this view.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void ClearLayoutNeeded()</code></pre>
+  </div>
+  
+  
   <a id="Terminal_Gui_View_ClearNeedsDisplay_" data-uid="Terminal.Gui.View.ClearNeedsDisplay*"></a>
   <h4 id="Terminal_Gui_View_ClearNeedsDisplay" data-uid="Terminal.Gui.View.ClearNeedsDisplay">ClearNeedsDisplay()</h4>
   <div class="markdown level1 summary">
-Removes the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">SetNeedsDisplay()</a> and the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ChildNeedsDisplay">ChildNeedsDisplay()</a> setting on this view.
+Removes the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">SetNeedsDisplay()</a> and the <span class="xref">Terminal.Gui.View.ChildNeedsDisplay()</span> setting on this view.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -2833,6 +2834,18 @@ Sends the specified subview to the front so it is the first view drawn
 </div>
   
   
+  <a id="Terminal_Gui_View_SetChildNeedsDisplay_" data-uid="Terminal.Gui.View.SetChildNeedsDisplay*"></a>
+  <h4 id="Terminal_Gui_View_SetChildNeedsDisplay" data-uid="Terminal.Gui.View.SetChildNeedsDisplay">SetChildNeedsDisplay()</h4>
+  <div class="markdown level1 summary">
+Indicates that any child views (in the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Subviews">Subviews</a> list) need to be repainted.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetChildNeedsDisplay()</code></pre>
+  </div>
+  
+  
   <a id="Terminal_Gui_View_SetClip_" data-uid="Terminal.Gui.View.SetClip*"></a>
   <h4 id="Terminal_Gui_View_SetClip_Terminal_Gui_Rect_" data-uid="Terminal.Gui.View.SetClip(Terminal.Gui.Rect)">SetClip(Rect)</h4>
   <div class="markdown level1 summary">
@@ -2889,6 +2902,55 @@ Causes the specified view and the entire parent hierarchy to have the focused or
   </div>
   
   
+  <a id="Terminal_Gui_View_SetHeight_" data-uid="Terminal.Gui.View.SetHeight*"></a>
+  <h4 id="Terminal_Gui_View_SetHeight_System_Int32_System_Int32__" data-uid="Terminal.Gui.View.SetHeight(System.Int32,System.Int32@)">SetHeight(Int32, out Int32)</h4>
+  <div class="markdown level1 summary">
+Calculate the height based on the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Height">Height</a> settings.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool SetHeight(int desiredHeight, out int resultHeight)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">desiredHeight</span></td>
+        <td>The desired height.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">resultHeight</span></td>
+        <td>The real result height.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>True if the height can be directly assigned, false otherwise.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_View_SetNeedsDisplay_" data-uid="Terminal.Gui.View.SetNeedsDisplay*"></a>
   <h4 id="Terminal_Gui_View_SetNeedsDisplay" data-uid="Terminal.Gui.View.SetNeedsDisplay">SetNeedsDisplay()</h4>
   <div class="markdown level1 summary">
@@ -2925,6 +2987,55 @@ Flags the view-relative region on this View as needing to be repainted.
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">region</span></td>
         <td>The view-relative region that must be flagged for repaint.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_View_SetWidth_" data-uid="Terminal.Gui.View.SetWidth*"></a>
+  <h4 id="Terminal_Gui_View_SetWidth_System_Int32_System_Int32__" data-uid="Terminal.Gui.View.SetWidth(System.Int32,System.Int32@)">SetWidth(Int32, out Int32)</h4>
+  <div class="markdown level1 summary">
+Calculate the width based on the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Width">Width</a> settings.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool SetWidth(int desiredWidth, out int resultWidth)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">desiredWidth</span></td>
+        <td>The desired width.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">resultWidth</span></td>
+        <td>The real result width.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td>True if the width can be directly assigned, false otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -3362,7 +3473,8 @@ Event fired when a subview is being removed from this view.
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
