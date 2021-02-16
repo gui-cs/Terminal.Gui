@@ -683,7 +683,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if(me.Flags == MouseFlags.Button1Clicked) {
+			if(me.Flags.HasFlag(MouseFlags.Button1Clicked)) {
 
 				var map = BuildLineMap();
 				
@@ -717,8 +717,22 @@ namespace Terminal.Gui {
 					}
 				}
 				else {
-					// It is a first click somewhere in the current line that doesn't look like an expansion/collapse attempt
-					SelectedObject = clickedBranch.Model;
+
+
+					// The previously selected object
+					var oldBranch = SelectedObject == null ? null : ObjectToBranch(SelectedObject);
+					var oldIdx = oldBranch == null ? -1 : Array.IndexOf(map,oldBranch);
+
+					if(me.Flags.HasFlag(MouseFlags.ButtonShift))
+					{
+						// Expand current selection
+						AdjustSelection(1,true);
+					}
+					else{
+						// It is a first click somewhere in the current line that doesn't look like an expansion/collapse attempt
+						SelectedObject = clickedBranch.Model;
+						_multiSelectedRegions.Clear();
+					}
 				}
 
 				SetNeedsDisplay();
@@ -923,6 +937,25 @@ namespace Terminal.Gui {
 		{
 			return SelectedObject == model ||
 				(MultiSelect && _multiSelectedRegions.Any(s=>s.Contains(model)));
+		}
+
+		/// <summary>
+		/// Returns <see cref="SelectedObject"/> (if not null) and all multi selected objects if <see cref="MultiSelect"/> is true
+		/// </summary>
+		/// <returns></returns>
+		public IEnumerable<T> GetAllSelectedObjects()
+		{
+			if(SelectedObject != null)
+				yield return SelectedObject;
+
+			// To determine multi selected objects, start with the line map, that avoids yielding hidden nodes that were selected then the parent collapsed e.g. programmatically or with mouse click
+			if(MultiSelect){
+				foreach(var m in BuildLineMap().Select(b=>b.Model).Where(IsSelected)){
+					if(m != SelectedObject){
+						yield return m;
+					}
+				}	
+			}
 		}
 	}
 
