@@ -425,6 +425,55 @@ namespace UnitTests {
 		}
 
 
+		[Fact]
+		public void MultiSelect_GetAllSelectedObjects()
+		{
+			var tree = new TreeView();
+
+			TreeNode l1;
+			TreeNode l2;
+			TreeNode l3;
+			TreeNode l4;
+
+			var root = new TreeNode("Root");
+			root.Children.Add(l1 = new TreeNode("Leaf1"));
+			root.Children.Add(l2 = new TreeNode("Leaf2"));
+			root.Children.Add(l3 = new TreeNode("Leaf3"));
+			root.Children.Add(l4 = new TreeNode("Leaf4"));
+
+			tree.AddObject(root);
+			tree.MultiSelect = true;
+
+			tree.Expand(root);
+			Assert.Empty(tree.GetAllSelectedObjects());
+
+			tree.SelectedObject = root;
+
+			Assert.Equal(1,tree.GetAllSelectedObjects().Count());
+			Assert.Contains(root,tree.GetAllSelectedObjects());
+
+			// move selection down 1
+			tree.AdjustSelection(1,false);
+
+			Assert.Equal(1,tree.GetAllSelectedObjects().Count());
+			Assert.Contains(l1,tree.GetAllSelectedObjects());
+
+			// expand selection down 2 (e.g. shift down twice)
+			tree.AdjustSelection(1,true);
+			tree.AdjustSelection(1,true);
+
+			Assert.Equal(3,tree.GetAllSelectedObjects().Count());
+			Assert.Contains(l1,tree.GetAllSelectedObjects());
+			Assert.Contains(l2,tree.GetAllSelectedObjects());
+			Assert.Contains(l3,tree.GetAllSelectedObjects());
+
+			tree.Collapse(root);
+			
+			// No selected objects since the root was collapsed
+			Assert.Empty(tree.GetAllSelectedObjects());
+		}
+
+
 		/// <summary>
 		/// Simulates behind the scenes changes to an object (which children it has) and how to sync that into the tree using <see cref="TreeView.RefreshObject(object, bool)"/>
 		/// </summary>

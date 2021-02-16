@@ -714,25 +714,14 @@ namespace Terminal.Gui {
 						clickedBranch.Expand();
 					else {
 						SelectedObject = clickedBranch.Model; // It is a leaf node
+						_multiSelectedRegions.Clear();
 					}
 				}
 				else {
 
-
-					// The previously selected object
-					var oldBranch = SelectedObject == null ? null : ObjectToBranch(SelectedObject);
-					var oldIdx = oldBranch == null ? -1 : Array.IndexOf(map,oldBranch);
-
-					if(me.Flags.HasFlag(MouseFlags.ButtonShift))
-					{
-						// Expand current selection
-						AdjustSelection(1,true);
-					}
-					else{
-						// It is a first click somewhere in the current line that doesn't look like an expansion/collapse attempt
-						SelectedObject = clickedBranch.Model;
-						_multiSelectedRegions.Clear();
-					}
+					// It is a first click somewhere in the current line that doesn't look like an expansion/collapse attempt
+					SelectedObject = clickedBranch.Model;
+					_multiSelectedRegions.Clear();
 				}
 
 				SetNeedsDisplay();
@@ -914,7 +903,20 @@ namespace Terminal.Gui {
 			if(toCollapse == null)
 				return;
 
-			ObjectToBranch(toCollapse)?.Collapse();
+			var branch = ObjectToBranch(toCollapse);
+			
+			// Nothing to collapse
+			if(branch == null)
+				return;
+			
+			branch.Collapse();
+
+			if(SelectedObject != null && ObjectToBranch(SelectedObject) == null)
+			{
+				// If the old selection suddenly became invalid then clear it
+				SelectedObject = null;
+			}	
+			
 			SetNeedsDisplay();
 		}
 
@@ -929,7 +931,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns true if the <paramref name="model"/> is either the <see cref="SelectedObject"/> or part of a <see cref="MultiSelectedObjects"/>
+		/// Returns true if the <paramref name="model"/> is either the <see cref="SelectedObject"/> or part of a <see cref="MultiSelect"/>
 		/// </summary>
 		/// <param name="model"></param>
 		/// <returns></returns>
@@ -945,12 +947,14 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public IEnumerable<T> GetAllSelectedObjects()
 		{
+			var map = BuildLineMap();
+
 			if(SelectedObject != null)
 				yield return SelectedObject;
 
 			// To determine multi selected objects, start with the line map, that avoids yielding hidden nodes that were selected then the parent collapsed e.g. programmatically or with mouse click
 			if(MultiSelect){
-				foreach(var m in BuildLineMap().Select(b=>b.Model).Where(IsSelected)){
+				foreach(var m in map.Select(b=>b.Model).Where(IsSelected)){
 					if(m != SelectedObject){
 						yield return m;
 					}
@@ -1377,7 +1381,6 @@ namespace Terminal.Gui {
 
 			return false;
 		}
-
 	}
 
 	/// <summary>
