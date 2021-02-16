@@ -269,7 +269,7 @@ namespace Terminal.Gui {
 		public bool LeaveLastRow {get;set;}
 
 	}
-
+	
 	/// <summary>
 	/// Hierarchical tree view with expandable branches.  Branch objects are dynamically determined when expanded using a user defined <see cref="ITreeBuilder{T}"/>
 	/// </summary>
@@ -295,8 +295,15 @@ namespace Terminal.Gui {
 		/// </summary>
 		public TreeStyle Style {get;set;} = new TreeStyle();
 
+
 		/// <summary>
-		/// The currently selected object in the tree
+		/// True to allow multiple objects to be selected at once
+		/// </summary>
+		/// <value></value>
+		public bool MultiSelect {get;set;} = true;
+
+		/// <summary>
+		/// The currently selected object in the tree.  When <see cref="MultiSelect"/> is true this is the object at which the cursor is at
 		/// </summary>
 		public T SelectedObject { 
 			get => selectedObject; 
@@ -308,7 +315,12 @@ namespace Terminal.Gui {
 					SelectionChanged?.Invoke(this,new SelectionChangedEventArgs<T>(this,oldValue,value));
 			}
 		}
-		
+
+		/// <summary>
+		/// Secondary selected regions of tree when <see cref="MultiSelect"/> is true
+		/// </summary>
+		private Stack<TreeSelection<T>> _multiSelectedRegions = new Stack<TreeSelection<T>>();
+
 		/// <summary>
 		/// Called when the <see cref="SelectedObject"/> changes
 		/// </summary>
@@ -392,6 +404,7 @@ namespace Terminal.Gui {
 		public void ClearObjects()
 		{
 			SelectedObject = default(T);
+			_multiSelectedRegions.Clear();
 			roots = new Dictionary<T, Branch<T>>();
 			SetNeedsDisplay();
 		}
@@ -600,17 +613,21 @@ namespace Terminal.Gui {
 				break;
 			
 				case Key.CursorUp:
-					AdjustSelection(-1);
+				case Key.CursorUp | Key.ShiftMask:
+					AdjustSelection(-1,keyEvent.Key.HasFlag(Key.ShiftMask));
 				break;
 				case Key.CursorDown:
-					AdjustSelection(1);
+				case Key.CursorDown | Key.ShiftMask:
+					AdjustSelection(1,keyEvent.Key.HasFlag(Key.ShiftMask));
 				break;
 				case Key.PageUp:
-					AdjustSelection(-Bounds.Height);
+				case Key.PageUp | Key.ShiftMask:
+					AdjustSelection(-Bounds.Height,keyEvent.Key.HasFlag(Key.ShiftMask));
 				break;
 				
 				case Key.PageDown:
-					AdjustSelection(Bounds.Height);
+				case Key.PageDown | Key.ShiftMask:
+					AdjustSelection(Bounds.Height,keyEvent.Key.HasFlag(Key.ShiftMask));
 				break;
 				case Key.Home:
 					GoToFirst();
@@ -779,8 +796,13 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>If nothing is currently selected the first root is selected.  If the selected object is no longer in the tree the first object is selected</remarks>
 		/// <param name="offset"></param>
-		public void AdjustSelection (int offset)
+		/// <param name="expandSelection">True to expand the selection (assuming <see cref="MultiSelect"/> is enabled).  False to replace</param>
+		public void AdjustSelection (int offset, bool expandSelection = false)
 		{
+			// if it is not a shift click or we don't allow multi select
+			if(!expandSelection || !MultiSelect)
+				_multiSelectedRegions.Clear();
+
 			if(SelectedObject == null){
 				SelectedObject = roots.Keys.FirstOrDefault();
 			}
@@ -796,7 +818,26 @@ namespace Terminal.Gui {
 				}
 				else {
 					var newIdx = Math.Min(Math.Max(0,idx+offset),map.Length-1);
-					SelectedObject = map[newIdx].Model;
+					
+					var newBranch = map[newIdx];
+
+					// If it is a multi selection
+					if(expandSelection && MultiSelect)
+					{
+						if(_multiSelectedRegions.Any())
+						{
+							// expand the existing head selection
+							var head = _multiSelectedRegions.Pop();
+							_multiSelectedRegions.Push(new TreeSelection<T>(head.Origin,newIdx,map));
+						}
+						else
+						{
+							// or start a new multi selection region
+							_multiSelectedRegions.Push(new TreeSelection<T>(map[idx],newIdx,map));
+						}
+					}
+
+					SelectedObject = newBranch.Model;
 
  					/*this -1 allows for possible horizontal scroll bar in the last row of the control*/
 					int leaveSpace = Style.LeaveLastRow ? 1 :0;
@@ -871,6 +912,51 @@ namespace Terminal.Gui {
 		private Branch<T> ObjectToBranch(T toFind)
 		{
 			return BuildLineMap().FirstOrDefault(o=>o.Model.Equals(toFind));
+		}
+
+		/// <summary>
+		/// Returns true if the <paramref name="model"/> is either the <see cref="SelectedObject"/> or part of a <see cref="MultiSelectedObjects"/>
+		/// </summary>
+		/// <param name="model"></param>
+		/// <returns></returns>
+		public bool IsSelected (T model)
+		{
+			return SelectedObject == model ||
+				(MultiSelect && _multiSelectedRegions.Any(s=>s.Contains(model)));
+		}
+	}
+
+	class TreeSelection<T> where T : class {
+
+		public Branch<T> Origin {get;}
+
+		private HashSet<Branch<T>> alsoIncluded = new HashSet<Branch<T>>();
+
+		/// <summary>
+		/// Creates a new selection between two branches in the tree
+		/// </summary>
+		/// <param name="from"></param>
+		/// <param name="toIndex"></param>
+		/// <param name="map"></param>
+		public TreeSelection(Branch<T> from, int toIndex, Branch<T>[] map )
+		{
+			Origin = from;
+			var oldIdx = Array.IndexOf(map,from);
+
+			var lowIndex = Math.Min(oldIdx,toIndex);
+			var highIndex = Math.Max(oldIdx,toIndex);
+
+			// Select everything between the old and new indexes
+			foreach(var alsoInclude in map.Skip(lowIndex).Take(highIndex-lowIndex)){
+				alsoIncluded.Add(alsoInclude);
+			}
+		
+		}
+		public bool Contains(T model)
+		{
+			return 
+			Equals(Origin.Model,model) || 
+			alsoIncluded.Any(b=>Equals(b.Model,model));
 		}
 	}
 
@@ -956,7 +1042,7 @@ namespace Terminal.Gui {
 		public virtual void Draw(ConsoleDriver driver,ColorScheme colorScheme, int y, int availableWidth)
 		{
 			// true if the current line of the tree is the selected one and control has focus
-			bool isSelected = tree.SelectedObject == Model && tree.HasFocus;
+			bool isSelected = tree.IsSelected(Model) && tree.HasFocus;
 			Attribute lineColor = isSelected? colorScheme.Focus : colorScheme.Normal;
 
 			driver.SetAttribute(lineColor);
