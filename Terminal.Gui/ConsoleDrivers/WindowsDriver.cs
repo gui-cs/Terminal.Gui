@@ -65,31 +65,10 @@ namespace Terminal.Gui {
 			return WriteConsoleOutput (ScreenBuffer, charInfoBuffer, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
 		}
 
-		public SmallRect ReadFromConsoleOutput (Size size, Coord coords, SmallRect window)
+		public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
 		{
-			ScreenBuffer = CreateConsoleScreenBuffer (
-				DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
-				ShareMode.FileShareRead | ShareMode.FileShareWrite,
-				IntPtr.Zero,
-				1,
-				IntPtr.Zero
-			);
-			if (ScreenBuffer == INVALID_HANDLE_VALUE) {
-				var err = Marshal.GetLastWin32Error ();
-
-				if (err != 0 && HeightAsBuffer) {
-					throw new System.ComponentModel.Win32Exception (err);
-				}
-			}
-
-			if (!SetConsoleActiveScreenBuffer (ScreenBuffer)) {
-				var err = Marshal.GetLastWin32Error ();
-				if (HeightAsBuffer) {
-					throw new System.ComponentModel.Win32Exception (err);
-				}
-			}
-
 			OriginalStdOutChars = new CharInfo [size.Height * size.Width];
+
 			ReadConsoleOutput (OutputHandle, OriginalStdOutChars, coords, new Coord () { X = 0, Y = 0 }, ref window);
 
 			return window;
@@ -464,156 +443,62 @@ namespace Terminal.Gui {
 			}
 		}
 
-		// Not needed on the constructor. Perhaps could be used on resizing. To study.
+#if false      // Not needed on the constructor. Perhaps could be used on resizing. To study.
 		[DllImport ("kernel32.dll", ExactSpelling = true)]
 		static extern IntPtr GetConsoleWindow ();
 
-		internal IntPtr GetConsole ()
-		{
-			return GetConsoleWindow ();
-		}
+		[DllImport ("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		static extern bool ShowWindow (IntPtr hWnd, int nCmdShow);
 
-		[DllImport ("user32.dll")]
-		[return: MarshalAs (UnmanagedType.Bool)]
-		static extern bool GetWindowPlacement (IntPtr hWnd, ref WindowPlacement lpwndpl);
-
-		[DllImport ("user32.dll", SetLastError = true)]
-		[return: MarshalAs (UnmanagedType.Bool)]
-		static extern bool SetWindowPlacement (IntPtr hWnd, [In] ref WindowPlacement lpwndpl);
-
-		internal struct WindowPlacement {
-			public int length;
-			public int flags;
-			public int showCmd;
-			public System.Drawing.Point ptMinPosition;
-			public System.Drawing.Point ptMaxPosition;
-			public System.Drawing.Rectangle rcNormalPosition;
-#if _MAC
-			public System.Drawing.Rectangle rcDevice;
-#endif
-		}
-
-		// flags
-		public const int WPF_SET_MIN_POSITION = 1;
-		public const int WPF_RESTORE_TO_MAXIMIZED = 2;
-		public const int WPF_ASYNC_WINDOWPLACEMENT = 4;
-
-		// showCmd
 		public const int HIDE = 0;
-		public const int SHOW_NORMAL = 1;
-		public const int SHOW_MINIMIZED = 2;
-		public const int SHOW_MAXIMIZED = 3;
-		public const int SHOW_NOACTIVATE = 4;
-		public const int SHOW = 5;
+		public const int MAXIMIZE = 3;
 		public const int MINIMIZE = 6;
-		public const int SHOW_MIN_NOACTIVE = 7;
-		public const int SHOW_NA = 8;
 		public const int RESTORE = 9;
-		public const int SHOW_DEFAULT = 10;
-		public const int FORCE_MINIMIZE = 11;
 
-		internal bool GetWindow (IntPtr handle, ref WindowPlacement placement)
+		internal void ShowWindow (int state)
 		{
-			placement = new WindowPlacement {
-				length = Marshal.SizeOf (typeof (WindowPlacement))
-			};
-			return GetWindowPlacement (handle, ref placement);
+			IntPtr thisConsole = GetConsoleWindow ();
+			ShowWindow (thisConsole, state);
 		}
+#endif
+#if false // See: https://github.com/migueldeicaza/gui.cs/issues/357
+		[StructLayout (LayoutKind.Sequential)]
+		public struct SMALL_RECT {
+			public short Left;
+			public short Top;
+			public short Right;
+			public short Bottom;
 
-		internal bool SetWindow (IntPtr handle, ref WindowPlacement placement)
-		{
-			return SetWindowPlacement (handle, ref placement);
-		}
-
-		[DllImport ("user32.dll", SetLastError = true)]
-		static extern bool GetWindowRect (IntPtr hwnd, out System.Drawing.Rectangle lpRect);
-
-		internal bool GetRect (IntPtr handle, out System.Drawing.Rectangle lpRect)
-		{
-			return GetWindowRect (handle, out lpRect);
-		}
-
-		[StructLayout (LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-		public class ConsoleFontInfoEx {
-			private int cbSize;
-			public ConsoleFontInfoEx ()
+			public SMALL_RECT (short Left, short Top, short Right, short Bottom)
 			{
-				cbSize = Marshal.SizeOf (typeof (ConsoleFontInfoEx));
+				this.Left = Left;
+				this.Top = Top;
+				this.Right = Right;
+				this.Bottom = Bottom;
 			}
-			public int FontIndex;
-			public short FontWidth;
-			public short FontHeight;
-			public int FontFamily;
-			public int FontWeight;
-			[MarshalAs (UnmanagedType.ByValTStr, SizeConst = 32)]
-			public string FaceName;
 		}
 
-		[DllImport ("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-		extern static bool GetCurrentConsoleFontEx (
-			IntPtr hConsoleOutput,
-			bool bMaximumWindow,
-			[In, Out] ConsoleFontInfoEx lpConsoleCurrentFont);
-
-		internal ConsoleFontInfoEx GetCurrentFontSize ()
-		{
-			//IntPtr _consoleOutputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
-			IntPtr _consoleOutputHandle = OutputHandle;
-
-			ConsoleFontInfoEx currentFont = new ConsoleFontInfoEx ();
-			GetCurrentConsoleFontEx (
-				_consoleOutputHandle,
-				false,
-				currentFont);
-
-			return currentFont;
-		}
-
-#if false
-		// size of a device name string
-		private const int CCHDEVICENAME = 32;
-
-		[StructLayout (LayoutKind.Sequential, CharSet = CharSet.Auto)]
-		internal struct MonitorInfoEx {
-			public uint cbSize;
-			public System.Drawing.Rectangle rcMonitor;
-			public System.Drawing.Rectangle rcWork;
-			public int dwFlags;
-			[MarshalAs (UnmanagedType.ByValTStr, SizeConst = CCHDEVICENAME)]
-			public string szDevice;
-		}
-
-		[DllImport ("user32.dll", CharSet = CharSet.Auto)]
-		static extern bool GetMonitorInfo (IntPtr hMonitor, ref MonitorInfoEx lpmi);
-
-		internal bool GetMonitor(IntPtr hMonitor, ref MonitorInfoEx minfo)
-		{
-			minfo.cbSize = (uint)Marshal.SizeOf (minfo);
-			return GetMonitorInfo (hMonitor, ref minfo);
-		}
-
-		[DllImport ("user32.dll")]
-		static extern IntPtr MonitorFromWindow (IntPtr hwnd, uint dwFlags);
-
-		public const int MONITOR_DEFAULTTONULL = 0;
-		public const int MONITOR_DEFAULTTOPRIMARY = 1;
-		public const int MONITOR_DEFAULTTONEAREST = 2;
-
-		internal IntPtr GetMonitorWindow (IntPtr hwnd, uint dwFlag)
-		{
-			return MonitorFromWindow (hwnd, dwFlag);
+		[StructLayout (LayoutKind.Sequential)]
+		public struct CONSOLE_SCREEN_BUFFER_INFO {
+			public int dwSize;
+			public int dwCursorPosition;
+			public short wAttributes;
+			public SMALL_RECT srWindow;
+			public int dwMaximumWindowSize;
 		}
 
 		[DllImport ("kernel32.dll", SetLastError = true)]
-		static extern bool GetConsoleScreenBufferInfo (IntPtr hConsoleOutput, out ConsoleScreenBufferInfo ConsoleScreenBufferInfo);
+		static extern bool GetConsoleScreenBufferInfo (IntPtr hConsoleOutput, out CONSOLE_SCREEN_BUFFER_INFO ConsoleScreenBufferInfo);
 
-		// Theoretically GetConsoleScreenBuffer height should give the console Window size, but the Top is always 0.
+		// Theoretically GetConsoleScreenBuffer height should give the console Windoww size
 		// It does not work, however, and always returns the size the window was initially created at
-		internal Size GetWindowSize (IntPtr handle)
+		internal Size GetWindowSize ()
 		{
-			GetConsoleScreenBufferInfo (handle, out ConsoleScreenBufferInfo consoleScreenBufferInfo);
-			return new Size (consoleScreenBufferInfo.srWindow.Right - consoleScreenBufferInfo.srWindow.Left + 1,
-				consoleScreenBufferInfo.srWindow.Bottom - consoleScreenBufferInfo.srWindow.Top + 1);
+			var consoleScreenBufferInfo = new CONSOLE_SCREEN_BUFFER_INFO ();
+			//consoleScreenBufferInfo.dwSize = Marshal.SizeOf (typeof (CONSOLE_SCREEN_BUFFER_INFO));
+			GetConsoleScreenBufferInfo (OutputHandle, out consoleScreenBufferInfo);
+			return new Size (consoleScreenBufferInfo.srWindow.Right - consoleScreenBufferInfo.srWindow.Left,
+				consoleScreenBufferInfo.srWindow.Bottom - consoleScreenBufferInfo.srWindow.Top);
 		}
 #endif
 	}
@@ -629,24 +514,6 @@ namespace Terminal.Gui {
 		public override int Rows => rows;
 		public override int Top => top;
 
-		bool heightAsBuffer;
-		public override bool HeightAsBuffer {
-			get => heightAsBuffer;
-			set {
-				heightAsBuffer = value;
-				if (heightAsBuffer) {
-					ResizeScreen ();
-					UpdateOffScreen ();
-					var bufferCoords = new WindowsConsole.Coord () {
-						X = (short)cols,
-						Y = (short)rows
-					};
-					winConsole.ReadFromConsoleOutput (new Size (cols, rows), bufferCoords, damageRegion);
-				}
-				Refresh ();
-			}
-		}
-
 		public WindowsConsole WinConsole {
 			get => winConsole;
 			private set => winConsole = value;
@@ -659,12 +526,10 @@ namespace Terminal.Gui {
 
 		public WindowsDriver ()
 		{
-			winConsole = new WindowsConsole () {
-				HeightAsBuffer = this.HeightAsBuffer
-			};
+			winConsole = new WindowsConsole ();
 		}
 
-		MainLoop mainLoop;
+		bool winChanging;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
@@ -672,32 +537,30 @@ namespace Terminal.Gui {
 			this.keyDownHandler = keyDownHandler;
 			this.keyUpHandler = keyUpHandler;
 			this.mouseHandler = mouseHandler;
-			this.mainLoop = mainLoop;
 
 			var mLoop = mainLoop.Driver as WindowsMainLoop;
 
 			mLoop.ProcessInput = (e) => ProcessInput (e);
 
-			mLoop.WinChanged = (e) => ChangeWin (e);
+			mLoop.WinChanged = (e) => {
+				ChangeWin (e);
+			};
 		}
 
-		bool winChanging;
-		bool wasChangeWin;
-
-		void ChangeWin (Size size)
+		private void ChangeWin (Size e)
 		{
+			winChanging = true;
 			if (!HeightAsBuffer) {
-				winChanging = true;
 				top = 0;
-				cols = size.Width;
-				rows = size.Height;
+				cols = e.Width;
+				rows = e.Height;
 				ResizeScreen ();
 				UpdateOffScreen ();
 				var bufferCoords = new WindowsConsole.Coord () {
-					X = (short)cols,
-					Y = (short)rows
+					X = (short)Clip.Width,
+					Y = (short)Clip.Height
 				};
-				winConsole.ReadFromConsoleOutput (size, bufferCoords, damageRegion);
+				winConsole.ReadFromConsoleOutput (e, bufferCoords, ref damageRegion);
 				if (!winChanging) {
 					TerminalResized.Invoke ();
 				}
@@ -798,25 +661,11 @@ namespace Terminal.Gui {
 				break;
 
 			case WindowsConsole.EventType.WindowBufferSize:
-				if (HeightAsBuffer) {
-					cols = inputEvent.WindowBufferSizeEvent.size.X;
-					rows = inputEvent.WindowBufferSizeEvent.size.Y;
-					ResizeScreen ();
-					UpdateOffScreen ();
-					TerminalResized?.Invoke ();
-				} else if (!HeightAsBuffer && !wasChangeWin && !(mainLoop.Driver as WindowsMainLoop).Maximized
-					&& !isFromRestore) {
-					ChangeWin (new Size (inputEvent.WindowBufferSizeEvent.size.X,
-						inputEvent.WindowBufferSizeEvent.size.Y));
-				} else if (!HeightAsBuffer && wasChangeWin && (mainLoop.Driver as WindowsMainLoop).Restored) {
-					(mainLoop.Driver as WindowsMainLoop).Restored = false;
-					isFromRestore = true;
-				} else if (!HeightAsBuffer && wasChangeWin && !(mainLoop.Driver as WindowsMainLoop).Maximized
-					&& !(mainLoop.Driver as WindowsMainLoop).Restored && !isFromRestore) {
-					wasChangeWin = false;
-				} else if (isFromRestore) {
-					isFromRestore = false;
-				}
+				cols = inputEvent.WindowBufferSizeEvent.size.X;
+				rows = inputEvent.WindowBufferSizeEvent.size.Y;
+				ResizeScreen ();
+				UpdateOffScreen ();
+				TerminalResized?.Invoke ();
 				break;
 
 			case WindowsConsole.EventType.Focus:
@@ -1389,7 +1238,7 @@ namespace Terminal.Gui {
 
 			UpdateCursor ();
 			winConsole.WriteToConsole (OutputBuffer, bufferCoords, damageRegion);
-			//System.Diagnostics.Debugger.Log(0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
+			//			System.Diagnostics.Debugger.Log(0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
 			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
 		}
 
@@ -1474,9 +1323,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Action<Size> WinChanged;
 
-		public bool Maximized;
-		public bool Restored;
-
 		public WindowsMainLoop (ConsoleDriver consoleDriver = null)
 		{
 			if (consoleDriver == null) {
@@ -1516,95 +1362,16 @@ namespace Terminal.Gui {
 			}
 		}
 
-		bool docked;
-
 		void WaitWinChange ()
 		{
-			var handle = winConsole.GetConsole ();
-			var fontSize = winConsole.GetCurrentFontSize ();
-
-			while (!consoleDriver.HeightAsBuffer) {
-				WindowsConsole.WindowPlacement windowPlacement = new WindowsConsole.WindowPlacement ();
-				winConsole.GetWindow (handle, ref windowPlacement);
-
-				if (windowPlacement.rcNormalPosition.Size.Height > -1) {
-					windowSize = SetWindowSize (windowPlacement.rcNormalPosition);
-
-					if (windowPlacement.showCmd != WindowsConsole.SHOW_MAXIMIZED && !Maximized && !Restored && !docked
-						&& (windowSize.Width != consoleDriver.Cols || windowSize.Height != consoleDriver.Rows)) {
-						docked = false;
-						return;
-					} else if (windowPlacement.showCmd == WindowsConsole.SHOW_MAXIMIZED && !Maximized
-						&& (Console.LargestWindowWidth != consoleDriver.Cols || Console.LargestWindowHeight != consoleDriver.Rows)) {
-						windowSize = new Size (Console.LargestWindowWidth, Console.LargestWindowHeight);
-						Maximized = true;
-						docked = false;
-						return;
-					} else if (windowPlacement.showCmd != WindowsConsole.SHOW_MAXIMIZED && Maximized) {
-						windowPlacement = new WindowsConsole.WindowPlacement () {
-							showCmd = WindowsConsole.RESTORE
-						};
-						winConsole.SetWindow (handle, ref windowPlacement);
-						Restored = true;
-						Maximized = false;
-						docked = false;
-						return;
-					} else if (!Maximized && IsDockedToMonitor (handle, windowPlacement)) {
-						return;
+			while (true) {
+				if (!consoleDriver.HeightAsBuffer) {
+					windowSize = new Size (Console.WindowWidth, Console.WindowHeight);
+					if (windowSize.Height < consoleDriver.Rows) {
+						// I still haven't been able to find a way to capture the shrinking in height.
+						//return;
 					}
 				}
-			}
-
-			Size SetWindowSize (System.Drawing.Rectangle rect)
-			{
-				var fontHDividerW = fontSize.FontHeight / fontSize.FontWidth;
-				var w = (rect.Width - rect.X) / fontSize.FontWidth;
-				var h = (rect.Height - rect.Y) / fontSize.FontHeight;
-
-				return new Size (Math.Max ((w) - (fontHDividerW * 3) - (w < (Console.LargestWindowWidth / 2) ? -1 : 2), 0),
-					Math.Max ((h) - fontHDividerW - (w < (Console.LargestWindowHeight / 2) ? -1 : 1), 0));
-			}
-
-			bool IsDockedToMonitor (IntPtr hWnd, WindowsConsole.WindowPlacement placement)
-			{
-				System.Drawing.Rectangle rc;
-				winConsole.GetRect (hWnd, out rc);
-
-				var changed = placement.showCmd == WindowsConsole.SHOW_NORMAL
-				    && (rc.Left != placement.rcNormalPosition.Left ||
-					rc.Top != placement.rcNormalPosition.Top ||
-					rc.Right != placement.rcNormalPosition.Right ||
-					rc.Bottom != placement.rcNormalPosition.Bottom);
-
-				if (changed) {
-					var pSize = new Size (placement.rcNormalPosition.Size.Width - placement.rcNormalPosition.X,
-						placement.rcNormalPosition.Size.Height - placement.rcNormalPosition.Y);
-					var rSize = new Size (rc.Width - rc.X,
-						rc.Height - rc.Y);
-					windowSize = SetWindowSize (rc);
-
-					if ((rc.X < 0) || (rc.Y == 0) || (rc.Y == 0 && rc.X < 0)
-						|| (rc.Y == 0 && rc.Right / fontSize.FontWidth >= Console.LargestWindowWidth)
-						|| (rc.X < 0 && rc.Bottom / fontSize.FontHeight >= Console.LargestWindowHeight)
-						|| (rc.X / fontSize.FontWidth >= Console.LargestWindowWidth / 2 - 1 && rc.Bottom / fontSize.FontHeight >= Console.LargestWindowHeight)) {
-						if (!docked || consoleDriver.Cols != windowSize.Width
-							|| consoleDriver.Rows != windowSize.Height) {
-							docked = true;
-						} else {
-							changed = false;
-						}
-					} else {
-						if (!docked && (pSize == rSize || rSize.Width / fontSize.FontWidth >= Console.LargestWindowWidth
-							|| rSize.Height / fontSize.FontHeight >= Console.LargestWindowHeight)) {
-							changed = false;
-						}
-						docked = false;
-					}
-				} else {
-					docked = false;
-				}
-
-				return changed;
 			}
 		}
 
@@ -1622,9 +1389,7 @@ namespace Terminal.Gui {
 
 			//result = null;
 			waitForProbe.Set ();
-			if (!consoleDriver.HeightAsBuffer) {
-				winChange.Set ();
-			}
+			winChange.Set ();
 
 			try {
 				if (!tokenSource.IsCancellationRequested) {
