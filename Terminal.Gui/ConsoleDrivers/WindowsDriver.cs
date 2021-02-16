@@ -59,7 +59,7 @@ namespace Terminal.Gui {
 		public bool WriteToConsole (CharInfo [] charInfoBuffer, Coord coords, SmallRect window)
 		{
 			if (ScreenBuffer == IntPtr.Zero) {
-				window = ReadFromConsoleOutput (new Size (Console.WindowWidth, Console.WindowHeight), coords, window);
+				ReadFromConsoleOutput (new Size (Console.WindowWidth, Console.WindowHeight), coords, ref window);
 			}
 
 			return WriteConsoleOutput (ScreenBuffer, charInfoBuffer, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
@@ -67,11 +67,28 @@ namespace Terminal.Gui {
 
 		public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
 		{
+			ScreenBuffer = CreateConsoleScreenBuffer (
+				DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
+				ShareMode.FileShareRead | ShareMode.FileShareWrite,
+				IntPtr.Zero,
+				1,
+				IntPtr.Zero
+			);
+			if (ScreenBuffer == INVALID_HANDLE_VALUE) {
+				var err = Marshal.GetLastWin32Error ();
+
+				if (err != 0)
+					throw new System.ComponentModel.Win32Exception (err);
+			}
+
+			if (!SetConsoleActiveScreenBuffer (ScreenBuffer)) {
+				var err = Marshal.GetLastWin32Error ();
+				throw new System.ComponentModel.Win32Exception (err);
+			}
+
 			OriginalStdOutChars = new CharInfo [size.Height * size.Width];
 
 			ReadConsoleOutput (OutputHandle, OriginalStdOutChars, coords, new Coord () { X = 0, Y = 0 }, ref window);
-
-			return window;
 		}
 
 		public bool SetCursorPosition (Coord position)
@@ -513,6 +530,7 @@ namespace Terminal.Gui {
 		public override int Cols => cols;
 		public override int Rows => rows;
 		public override int Top => top;
+		public override bool HeightAsBuffer { get; set; }
 
 		public WindowsConsole WinConsole {
 			get => winConsole;
@@ -564,11 +582,8 @@ namespace Terminal.Gui {
 				if (!winChanging) {
 					TerminalResized.Invoke ();
 				}
-				wasChangeWin = true;
 			}
 		}
-
-		bool isFromRestore;
 
 		void ProcessInput (WindowsConsole.InputRecord inputEvent)
 		{
@@ -1336,7 +1351,8 @@ namespace Terminal.Gui {
 		{
 			this.mainLoop = mainLoop;
 			Task.Run (WindowsInputHandler);
-			Task.Run (CheckWinChange);
+			// Nor working yet.
+			//Task.Run (CheckWinChange);
 		}
 
 		void WindowsInputHandler ()
@@ -1387,9 +1403,10 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			//result = null;
+			result = null;
 			waitForProbe.Set ();
-			winChange.Set ();
+			// Nor working yet.
+			//winChange.Set ();
 
 			try {
 				if (!tokenSource.IsCancellationRequested) {
