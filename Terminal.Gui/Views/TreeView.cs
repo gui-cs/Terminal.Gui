@@ -1344,7 +1344,7 @@ namespace Terminal.Gui {
 				if(IsExpanded) {
 					//if we are expanded we need to updatethe visible children
 					foreach(var child in ChildBranches) {
-						child.Value.Refresh(false);
+						child.Value.Rebuild();
 					}
 					
 				}
