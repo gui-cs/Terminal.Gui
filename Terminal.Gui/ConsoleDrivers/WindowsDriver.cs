@@ -1317,12 +1317,12 @@ namespace Terminal.Gui {
 	internal class WindowsMainLoop : IMainLoopDriver {
 		ManualResetEventSlim eventReady = new ManualResetEventSlim (false);
 		ManualResetEventSlim waitForProbe = new ManualResetEventSlim (false);
-		ManualResetEventSlim winChange = new ManualResetEventSlim (false);
+		//ManualResetEventSlim winChange = new ManualResetEventSlim (false);
 		MainLoop mainLoop;
 		ConsoleDriver consoleDriver;
 		WindowsConsole winConsole;
-		bool winChanged;
-		Size windowSize;
+		//bool winChanged;
+		//Size windowSize;
 		CancellationTokenSource tokenSource = new CancellationTokenSource ();
 
 		// The records that we keep fetching
@@ -1367,29 +1367,29 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void CheckWinChange ()
-		{
-			while (true) {
-				winChange.Wait ();
-				winChange.Reset ();
-				WaitWinChange ();
-				winChanged = true;
-				eventReady.Set ();
-			}
-		}
+		//void CheckWinChange ()
+		//{
+		//	while (true) {
+		//		winChange.Wait ();
+		//		winChange.Reset ();
+		//		WaitWinChange ();
+		//		winChanged = true;
+		//		eventReady.Set ();
+		//	}
+		//}
 
-		void WaitWinChange ()
-		{
-			while (true) {
-				if (!consoleDriver.HeightAsBuffer) {
-					windowSize = new Size (Console.WindowWidth, Console.WindowHeight);
-					if (windowSize.Height < consoleDriver.Rows) {
-						// I still haven't been able to find a way to capture the shrinking in height.
-						//return;
-					}
-				}
-			}
-		}
+		//void WaitWinChange ()
+		//{
+		//	while (true) {
+		//		if (!consoleDriver.HeightAsBuffer) {
+		//			windowSize = new Size (Console.WindowWidth, Console.WindowHeight);
+		//			if (windowSize.Height < consoleDriver.Rows) {
+		//				// I still haven't been able to find a way to capture the shrinking in height.
+		//				//return;
+		//			}
+		//		}
+		//	}
+		//}
 
 		void IMainLoopDriver.Wakeup ()
 		{
@@ -1419,7 +1419,8 @@ namespace Terminal.Gui {
 			}
 
 			if (!tokenSource.IsCancellationRequested) {
-				return result != null || CheckTimers (wait, out _) || winChanged;
+				//return result != null || CheckTimers (wait, out _) || winChanged;
+				return result != null || CheckTimers (wait, out _);
 			}
 
 			tokenSource.Dispose ();
@@ -1457,10 +1458,10 @@ namespace Terminal.Gui {
 				result = null;
 				ProcessInput?.Invoke (inputEvent);
 			}
-			if (winChanged) {
-				winChanged = false;
-				WinChanged?.Invoke (windowSize);
-			}
+			//if (winChanged) {
+			//	winChanged = false;
+			//	WinChanged?.Invoke (windowSize);
+			//}
 		}
 	}
 }
