@@ -117,62 +117,70 @@ namespace UICatalog.Scenarios {
 		private void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<object> e)
 		{
 			var val = e.NewValue;
+			var all = treeView.GetAllSelectedObjects().ToArray();
 
 			if(val == null || val is ShowForType)
 				return;
 			try {
 				
-				StringBuilder sb = new StringBuilder();
+				if(all.Length > 1){
 
-				// tell the user about the currently selected tree node
-				sb.AppendLine(e.NewValue.GetType().Name);
+					textView.Text = all.Length  + " Objects";
+				}
+				else
+				{
+					StringBuilder sb = new StringBuilder();
+
+					// tell the user about the currently selected tree node
+					sb.AppendLine(e.NewValue.GetType().Name);
+					
+					if(val is Assembly ass) {
+						sb.AppendLine($"Location:{ass.Location}");
+						sb.AppendLine($"FullName:{ass.FullName}");
+					}
+
+					if(val is PropertyInfo p) {
+						sb.AppendLine($"Name:{p.Name}");
+						sb.AppendLine($"Type:{p.PropertyType}");
+						sb.AppendLine($"CanWrite:{p.CanWrite}");
+						sb.AppendLine($"CanRead:{p.CanRead}");
+					}
 				
-				if(val is Assembly ass) {
-					sb.AppendLine($"Location:{ass.Location}");
-					sb.AppendLine($"FullName:{ass.FullName}");
-				}
-
-				if(val is PropertyInfo p) {
-					sb.AppendLine($"Name:{p.Name}");
-					sb.AppendLine($"Type:{p.PropertyType}");
-					sb.AppendLine($"CanWrite:{p.CanWrite}");
-					sb.AppendLine($"CanRead:{p.CanRead}");
-				}
-			
-				if(val is FieldInfo f) {
-					sb.AppendLine($"Name:{f.Name}");
-					sb.AppendLine($"Type:{f.FieldType}");
-				}
+					if(val is FieldInfo f) {
+						sb.AppendLine($"Name:{f.Name}");
+						sb.AppendLine($"Type:{f.FieldType}");
+					}
+							
+					if(val is EventInfo ev) {
+						sb.AppendLine($"Name:{ev.Name}");
+						sb.AppendLine($"Parameters:");
+						foreach(var parameter in ev.EventHandlerType.GetMethod("Invoke").GetParameters()) {
+							sb.AppendLine($"  {parameter.ParameterType} {parameter.Name}");
+						}
+					}
 						
-				if(val is EventInfo ev) {
-					sb.AppendLine($"Name:{ev.Name}");
-					sb.AppendLine($"Parameters:");
-					foreach(var parameter in ev.EventHandlerType.GetMethod("Invoke").GetParameters()) {
-						sb.AppendLine($"  {parameter.ParameterType} {parameter.Name}");
+					if(val is MethodInfo method) {
+						sb.AppendLine($"Name:{method.Name}");
+						sb.AppendLine($"IsPublic:{method.IsPublic}");
+						sb.AppendLine($"IsStatic:{method.IsStatic}");
+						sb.AppendLine($"Parameters:{(method.GetParameters().Any() ? "":"None")}");
+						foreach(var parameter in method.GetParameters()) {
+							sb.AppendLine($"  {parameter.ParameterType} {parameter.Name}");
+						}
 					}
-				}
-					
-				if(val is MethodInfo method) {
-					sb.AppendLine($"Name:{method.Name}");
-					sb.AppendLine($"IsPublic:{method.IsPublic}");
-					sb.AppendLine($"IsStatic:{method.IsStatic}");
-					sb.AppendLine($"Parameters:{(method.GetParameters().Any() ? "":"None")}");
-					foreach(var parameter in method.GetParameters()) {
-						sb.AppendLine($"  {parameter.ParameterType} {parameter.Name}");
+				
+						
+					if(val is ConstructorInfo ctor) {
+						sb.AppendLine($"Name:{ctor.Name}");
+						sb.AppendLine($"Parameters:{(ctor.GetParameters().Any() ? "":"None")}");
+						foreach(var parameter in ctor.GetParameters()) {
+							sb.AppendLine($"  {parameter.ParameterType} {parameter.Name}");
+						}
 					}
-				}
-			
-					
-				if(val is ConstructorInfo ctor) {
-					sb.AppendLine($"Name:{ctor.Name}");
-					sb.AppendLine($"Parameters:{(ctor.GetParameters().Any() ? "":"None")}");
-					foreach(var parameter in ctor.GetParameters()) {
-						sb.AppendLine($"  {parameter.ParameterType} {parameter.Name}");
-					}
-				}
 
-				textView.Text = sb.ToString().Replace("\r\n","\n");
-
+					textView.Text = sb.ToString().Replace("\r\n","\n");
+				}
+								
 			} catch (Exception ex) {
 
 				textView.Text = ex.Message;

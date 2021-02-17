@@ -312,7 +312,7 @@ namespace Terminal.Gui {
 				selectedObject = value; 
 
 				if(!ReferenceEquals(oldValue,value))
-					SelectionChanged?.Invoke(this,new SelectionChangedEventArgs<T>(this,oldValue,value));
+					OnSelectionChanged(new SelectionChangedEventArgs<T>(this,oldValue,value));
 			}
 		}
 
@@ -645,6 +645,9 @@ namespace Terminal.Gui {
 				case Key.PageDown | Key.ShiftMask:
 					AdjustSelection(Bounds.Height,keyEvent.Key.HasFlag(Key.ShiftMask));
 				break;
+				case Key.A | Key.CtrlMask:
+					SelectAll();
+					break;
 				case Key.Home:
 					GoToFirst();
 				break;
@@ -1041,6 +1044,37 @@ namespace Terminal.Gui {
 					}
 				}	
 			}
+		}
+
+		/// <summary>
+		/// Selects all objects in the tree when <see cref="MultiSelect"/> is enabled otherwise does nothing
+		/// </summary>
+		public void SelectAll()
+		{
+			if(!MultiSelect)
+				return;
+
+			_multiSelectedRegions.Clear();
+
+			var map = BuildLineMap();
+
+			if(map.Length == 0)
+				return;
+
+			_multiSelectedRegions.Push(new TreeSelection<T>(map[0],map.Length,map));
+			SetNeedsDisplay();
+			
+			OnSelectionChanged(new SelectionChangedEventArgs<T>(this,SelectedObject,SelectedObject));
+		}
+
+
+		/// <summary>
+		/// Raises the SelectionChanged event
+		/// </summary>
+		/// <param name="e"></param>
+		protected virtual void OnSelectionChanged (SelectionChangedEventArgs<T> e)
+		{
+			SelectionChanged?.Invoke(this,e);
 		}
 	}
 
