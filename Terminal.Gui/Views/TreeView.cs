@@ -1226,7 +1226,7 @@ namespace Terminal.Gui {
 			if(lineBody.Sum(l=>Rune.ColumnWidth(l)) > availableWidth)
 			{
 				// remaining space is zero and truncate the line
-				lineBody = new string(lineBody.TakeWhile(c=>(availableWidth -= Rune.ColumnWidth(c)) > 0).ToArray());
+				lineBody = new string(lineBody.TakeWhile(c=>(availableWidth -= Rune.ColumnWidth(c)) >= 0).ToArray());
 				availableWidth = 0;
 			}
 			else{
