@@ -132,7 +132,7 @@ namespace UICatalog.Scenarios {
 					sb.AppendLine($"Name:{ev.Name}");
 					sb.AppendLine($"Parameters:");
 					foreach(var parameter in ev.EventHandlerType.GetMethod("Invoke").GetParameters()) {
-						sb.AppendLine($"\t{parameter.ParameterType} {parameter.Name}");
+						sb.AppendLine($"  {parameter.ParameterType} {parameter.Name}");
 					}
 				}
 					
@@ -142,7 +142,7 @@ namespace UICatalog.Scenarios {
 					sb.AppendLine($"IsStatic:{method.IsStatic}");
 					sb.AppendLine($"Parameters:{(method.GetParameters().Any() ? "":"None")}");
 					foreach(var parameter in method.GetParameters()) {
-						sb.AppendLine($"\t{parameter.ParameterType} {parameter.Name}");
+						sb.AppendLine($"  {parameter.ParameterType} {parameter.Name}");
 					}
 				}
 			
@@ -151,7 +151,7 @@ namespace UICatalog.Scenarios {
 					sb.AppendLine($"Name:{ctor.Name}");
 					sb.AppendLine($"Parameters:{(ctor.GetParameters().Any() ? "":"None")}");
 					foreach(var parameter in ctor.GetParameters()) {
-						sb.AppendLine($"\t{parameter.ParameterType} {parameter.Name}");
+						sb.AppendLine($"  {parameter.ParameterType} {parameter.Name}");
 					}
 				}
 
