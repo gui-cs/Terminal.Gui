@@ -33,6 +33,19 @@ namespace UICatalog.Scenarios {
 			public Type Type {get;set;}
 			public Showable ToShow {get;set;}
 
+			// Make sure to implement Equals methods on your objects if you intend to return new instances every time in ChildGetter
+			public override bool Equals (object obj)
+			{
+				return obj is ShowForType type &&
+				       EqualityComparer<Type>.Default.Equals (Type, type.Type) &&
+				       ToShow == type.ToShow;
+			}
+
+			public override int GetHashCode ()
+			{
+				return HashCode.Combine (Type, ToShow);
+			}
+
 			public override string ToString ()
 			{
 				return ToShow.ToString();
@@ -177,8 +190,11 @@ namespace UICatalog.Scenarios {
 				}
 
 				if(arg is Type t) {
-					// Note that here we must 
-					return Enum.GetValues(typeof(Showable)).Cast<Showable>().Select(v=>new ShowForType(v,t));
+					// Note that here we cannot simply return the enum values as the same object cannot appear under multiple branches
+					return Enum.GetValues(typeof(Showable))
+						.Cast<Showable>()
+						// Although we new the Type every time the delegate is called state is preserved because the class has appropriate equality members
+						.Select(v=>new ShowForType(v,t));
 				}
 
 				if(arg is ShowForType show) {
