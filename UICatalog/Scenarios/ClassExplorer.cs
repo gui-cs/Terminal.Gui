@@ -68,7 +68,9 @@ namespace UICatalog.Scenarios {
 					miShowPrivate = new MenuItem ("_Include Private", "", () => ShowPrivate()){
 						Checked = false,
 						CheckType = MenuItemCheckStyle.Checked
-					} }),
+					},
+				new MenuItem ("_Expand All", "", () => treeView.ExpandAll()),
+				new MenuItem ("_Collapse All", "", () => treeView.CollapseAll()) }),
 			});
 			Top.Add (menu);
 

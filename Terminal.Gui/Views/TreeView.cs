@@ -620,8 +620,12 @@ namespace Terminal.Gui {
 				case Key.CursorRight:
 					Expand(SelectedObject);
 				break;
+				case Key.CursorRight | Key.CtrlMask:
+					ExpandAll(SelectedObject);
+				break;
 				case Key.CursorLeft:
-					CursorLeft();
+				case Key.CursorLeft | Key.CtrlMask:
+					CursorLeft(keyEvent.Key.HasFlag(Key.CtrlMask));
 				break;
 			
 				case Key.CursorUp:
@@ -768,10 +772,16 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Determines systems behaviour when the left arrow key is pressed.  Default behaviour is to collapse the current tree node if possible otherwise changes selection to current branches parent
 		/// </summary>
-		protected virtual void CursorLeft()
+		protected virtual void CursorLeft(bool ctrl)
 		{
-			if(IsExpanded(SelectedObject))
-				Collapse(SelectedObject);
+			if(IsExpanded(SelectedObject)) {
+				
+				if(ctrl)
+					CollapseAll(SelectedObject);
+				else
+					Collapse(SelectedObject);
+
+			}
 			else
 			{
 				var parent = GetParent(SelectedObject);
@@ -887,6 +897,29 @@ namespace Terminal.Gui {
 		}
 		
 		/// <summary>
+		/// Expands the supplied object and all child objects
+		/// </summary>
+		/// <param name="toExpand">The object to expand</param>
+		public void ExpandAll(T toExpand)
+		{
+			if(toExpand == null)
+				return;
+			
+			ObjectToBranch(toExpand)?.ExpandAll();
+			SetNeedsDisplay();
+		}
+		/// <summary>
+		/// Fully expands all nodes in the tree, if the tree is very big and built dynamically this may take a while (e.g. for file system)
+		/// </summary>
+		public void ExpandAll()
+		{
+			foreach (var item in roots) {
+				item.Value.ExpandAll();
+			}
+
+			SetNeedsDisplay();
+		}
+		/// <summary>
 		/// Returns true if the given object <paramref name="o"/> is exposed in the tree and can be expanded otherwise false
 		/// </summary>
 		/// <param name="o"></param>
@@ -912,6 +945,38 @@ namespace Terminal.Gui {
 		/// <param name="toCollapse">The object to collapse</param>
 		public void Collapse(T toCollapse)
 		{
+			CollapseImpl(toCollapse,false);
+		}
+		
+		/// <summary>
+		/// Collapses the supplied object if it is currently expanded.  Also collapses all children branches (this will only become apparent when/if the user expands it again)
+		/// </summary>
+		/// <param name="toCollapse">The object to collapse</param>
+		public void CollapseAll(T toCollapse)
+		{
+			CollapseImpl(toCollapse,true);
+		}
+
+		/// <summary>
+		/// Collapses all root nodes in the tree
+		/// </summary>
+		public void CollapseAll()
+		{
+			foreach (var item in roots) {
+				item.Value.Collapse();
+			}
+
+			SetNeedsDisplay();
+		}
+
+		/// <summary>
+		/// Implementation of <see cref="Collapse(T)"/> and <see cref="CollapseAll(T)"/>.  Performs operation and updates selection if disapeared
+		/// </summary>
+		/// <param name="toCollapse"></param>
+		/// <param name="all"></param>
+		protected void CollapseImpl(T toCollapse, bool all)
+		{
+			
 			if(toCollapse == null)
 				return;
 
@@ -920,8 +985,12 @@ namespace Terminal.Gui {
 			// Nothing to collapse
 			if(branch == null)
 				return;
-			
-			branch.Collapse();
+
+			if (all) {
+				branch.CollapseAll();
+			} else {
+				branch.Collapse();
+			}
 
 			if(SelectedObject != null && ObjectToBranch(SelectedObject) == null)
 			{
@@ -1392,6 +1461,32 @@ namespace Terminal.Gui {
 			}
 
 			return false;
+		}
+
+		/// <summary>
+		/// Expands the current branch and all children branches
+		/// </summary>
+		internal void ExpandAll ()
+		{
+			Expand();
+
+			if(ChildBranches != null)
+				foreach (var child in ChildBranches) {
+					child.Value.ExpandAll();
+				}
+		}
+
+		/// <summary>
+		/// Collapses the current branch and all children branches (even though those branches are no longer visible they retain collapse/expansion state)
+		/// </summary>
+		internal void CollapseAll ()
+		{
+			Collapse();
+
+			if(ChildBranches != null)
+				foreach (var child in ChildBranches) {
+					child.Value.CollapseAll();
+				}
 		}
 	}
 
