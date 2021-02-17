@@ -949,7 +949,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public bool IsSelected (T model)
 		{
-			return SelectedObject == model ||
+			return Equals(SelectedObject , model) ||
 				(MultiSelect && _multiSelectedRegions.Any(s=>s.Contains(model)));
 		}
 

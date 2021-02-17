@@ -101,6 +101,7 @@ namespace UICatalog.Scenarios {
 		{
 			miShowPrivate.Checked = !miShowPrivate.Checked;
 			treeView.RebuildTree();
+			treeView.SetFocus();
 		}
 
 		private BindingFlags GetFlags()
