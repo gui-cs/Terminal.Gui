@@ -22,6 +22,9 @@ namespace Terminal.Gui {
 		public override int Top => 0;
 		public override bool HeightAsBuffer { get; set; }
 
+		CursorVisibility? initialCursorVisibility = null;
+		CursorVisibility? currentCursorVisibility = null;
+
 		// Current row, and current col, tracked by Move/AddRune only
 		int ccol, crow;
 		bool needMove;
@@ -82,6 +85,9 @@ namespace Terminal.Gui {
 			if (reportableMouseEvents.HasFlag (Curses.Event.ReportMousePosition)) {
 				StopReportingMouseMoves ();
 			}
+
+			SetCursorVisibility (CursorVisibility.Default);
+			
 			Curses.endwin ();
 			// Clear and reset entire screen.
 			Console.Out.Write ("\x1b[2J");
@@ -689,6 +695,30 @@ namespace Terminal.Gui {
 			} catch (Exception e) {
 				Console.WriteLine ("Curses failed to initialize, the exception is: " + e);
 			}
+
+			// 
+			// We are setting Invisible as default so we could ignore XTerm DECSUSR setting
+			//
+			switch (Curses.curs_set (0)) {
+				case 0:		
+					currentCursorVisibility = initialCursorVisibility = CursorVisibility.Invisible;	
+					break;
+
+				case 1:		
+					currentCursorVisibility = initialCursorVisibility = CursorVisibility.Underline;	
+					Curses.curs_set (1); 
+					break;
+
+				case 2:		
+					currentCursorVisibility = initialCursorVisibility = CursorVisibility.Box;		
+					Curses.curs_set (2); 
+					break;
+
+				default:	
+					currentCursorVisibility = initialCursorVisibility = null;						
+					break;
+			}
+
 			Curses.raw ();
 			Curses.noecho ();
 
@@ -867,6 +897,43 @@ namespace Terminal.Gui {
 		public override Attribute GetAttribute ()
 		{
 			return currentAttribute;
+		}
+
+		/// <inheritdoc/>
+		public override bool GetCursorVisibility (out CursorVisibility visibility)
+		{
+			visibility = CursorVisibility.Invisible;
+
+			if (!currentCursorVisibility.HasValue)
+				return false;
+
+			visibility = currentCursorVisibility.Value;
+
+			return true;
+		}
+
+		/// <inheritdoc/>
+		public override bool SetCursorVisibility (CursorVisibility visibility)
+		{
+			if (initialCursorVisibility.HasValue == false) 
+				return false;
+
+			Curses.curs_set (((int) visibility >> 16) & 0x000000FF);
+
+			if (visibility != CursorVisibility.Invisible) {
+				Console.Out.Write ("\x1b[{0} q", ((int) visibility >> 24) & 0xFF);
+				Console.Out.Flush ();
+			}
+
+			currentCursorVisibility = visibility;
+
+			return true;
+		}
+
+		/// <inheritdoc/>
+		public override bool EnsureCursorVisibility ()
+		{
+			return false;
 		}
 	}
 

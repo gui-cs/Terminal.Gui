@@ -14,9 +14,9 @@
           
        e.g. If AssemblyVersion is 1.2.3.4, Version could be EITHER 1.2.3.4 or 1.2.3-pre.4 depending on whether it's a pre-release or not.
     -->
-    <Version>1.0.0-pre.6</Version>
-    <AssemblyVersion>1.0.0.6</AssemblyVersion>
-    <FileVersion>1.0.0.6</FileVersion>    
+    <Version>1.0.0-pre.8</Version>
+    <AssemblyVersion>1.0.0.8</AssemblyVersion>
+    <FileVersion>1.0.0.8</FileVersion>    
     <Authors>Miguel de Icaza, Charlie Kindel (@tig), @BDisp</Authors>
   </PropertyGroup>
 

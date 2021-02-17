@@ -9,6 +9,7 @@
 //  - Does not support IEnumerable
 // Any udpates done here should probably be done in Window as well; TODO: Merge these classes
 
+using System.Linq;
 using NStack;
 
 namespace Terminal.Gui {
@@ -190,6 +191,16 @@ namespace Terminal.Gui {
 			set {
 				base.TextAlignment = contentView.TextAlignment = value;
 			}
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			if (Subviews.Count == 0 || !Subviews.Any (subview => subview.CanFocus)) {
+				Application.Driver?.SetCursorVisibility (CursorVisibility.Invisible);
+			}
+
+			return base.OnEnter (view);
 		}
 	}
 }

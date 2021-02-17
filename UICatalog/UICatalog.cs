@@ -75,7 +75,7 @@ namespace UICatalog {
 
 			_scenarios = Scenario.GetDerivedClasses<Scenario> ().OrderBy (t => Scenario.ScenarioMetadata.GetName (t)).ToList ();
 
-			if (args.Length > 0 && args.Contains("-usc")) {
+			if (args.Length > 0 && args.Contains ("-usc")) {
 				_useSystemConsole = true;
 				args = args.Where (val => val != "-usc").ToArray ();
 			}
@@ -259,6 +259,7 @@ namespace UICatalog {
 					_top.LayoutSubviews();
 					_top.SetChildNeedsDisplay();
 				}),
+				new StatusItem (Key.CharMask, Application.Driver.GetType ().Name, null),
 			};
 
 			SetColorScheme ();
@@ -331,7 +332,7 @@ namespace UICatalog {
 			var index = 0;
 
 			List<MenuItem> menuItems = new List<MenuItem> ();
-			foreach (Enum diag in Enum.GetValues(_diagnosticFlags.GetType())) {
+			foreach (Enum diag in Enum.GetValues (_diagnosticFlags.GetType ())) {
 				var item = new MenuItem ();
 				item.Title = GetDiagnosticsTitle (diag);
 				item.Shortcut = Key.AltMask + index.ToString () [0];

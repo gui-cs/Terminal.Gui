@@ -395,5 +395,22 @@ namespace Terminal.Gui {
 			}
 			edits = new SortedDictionary<long, byte> ();
 		}
+
+		private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
+
+		/// <summary>
+		/// Get / Set the wished cursor when the field is focused
+		/// </summary>
+		public CursorVisibility DesiredCursorVisibility 
+		{ 
+			get => desiredCursorVisibility; 
+			set {
+				if (desiredCursorVisibility != value && HasFocus) {
+					Application.Driver.SetCursorVisibility (value);		
+				}
+
+				desiredCursorVisibility = value;
+			}
+		}
 	}
 }

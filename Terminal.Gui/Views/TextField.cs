@@ -866,6 +866,31 @@ namespace Terminal.Gui {
 			TextChanging?.Invoke (ev);
 			return ev;
 		}
+
+		private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
+
+		/// <summary>
+		/// Get / Set the wished cursor when the field is focused
+		/// </summary>
+		public CursorVisibility DesiredCursorVisibility 
+		{ 
+			get => desiredCursorVisibility; 
+			set {
+				if (desiredCursorVisibility != value && HasFocus) {
+					Application.Driver.SetCursorVisibility (value);		
+				}
+
+				desiredCursorVisibility = value;
+			}
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
+
+			return base.OnEnter (view);
+		}
 	}
 
 	/// <summary>

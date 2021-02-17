@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Namespace Terminal.Gui
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.56.6.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -61,11 +61,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -103,6 +103,10 @@ Captures the execution state for the provided <span class="xref">Terminal.Gui.Ap
       <section>
 Button is a <a class="xref" href="Terminal.Gui.View.html">View</a> that provides an item that invokes an <span class="xref">System.Action</span> when activated by the user.
 </section>
+      <h4><a class="xref" href="Terminal.Gui.CellActivatedEventArgs.html">CellActivatedEventArgs</a></h4>
+      <section>
+Defines the event arguments for <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_CellActivated">CellActivated</a> event
+</section>
       <h4><a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a></h4>
       <section>
 The <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> <a class="xref" href="Terminal.Gui.View.html">View</a> shows an on/off toggle that the user can set
@@ -121,6 +125,10 @@ The default <a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a>
 Color scheme definitions, they cover some common scenarios and are used
 typically in containers such as <a class="xref" href="Terminal.Gui.Window.html">Window</a> and <a class="xref" href="Terminal.Gui.FrameView.html">FrameView</a> to set the scheme that is used by all the
 views contained inside.
+</section>
+      <h4><a class="xref" href="Terminal.Gui.ColumnStyle.html">ColumnStyle</a></h4>
+      <section>
+Describes how to render a given column in  a <a class="xref" href="Terminal.Gui.TableView.html">TableView</a> including <a class="xref" href="Terminal.Gui.ColumnStyle.html#Terminal_Gui_ColumnStyle_Alignment">Alignment</a> and textual representation of cells (e.g. date formats)
 </section>
       <h4><a class="xref" href="Terminal.Gui.ComboBox.html">ComboBox</a></h4>
       <section>
@@ -155,6 +163,12 @@ Dim properties of a <a class="xref" href="Terminal.Gui.View.html">View</a> to co
       <h4><a class="xref" href="Terminal.Gui.FakeDriver.html">FakeDriver</a></h4>
       <section>
 Implements a mock ConsoleDriver for unit testing
+</section>
+      <h4><a class="xref" href="Terminal.Gui.FakeMainLoop.html">FakeMainLoop</a></h4>
+      <section>
+Mainloop intended to be used with the .NET System.Console API, and can
+be used on Windows and Unix, it is cross platform but lacks things like
+file descriptor monitoring.
 </section>
       <h4><a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a></h4>
       <section>
@@ -214,12 +228,6 @@ A <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a> has a title, an
       <section>
 MessageBox displays a modal message to the user, with a title, a message and a series of options that the user can choose from.
 </section>
-      <h4><a class="xref" href="Terminal.Gui.NetMainLoop.html">NetMainLoop</a></h4>
-      <section>
-Mainloop intended to be used with the .NET System.Console API, and can
-be used on Windows and Unix, it is cross platform but lacks things like
-file descriptor monitoring.
-</section>
       <h4><a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialog</a></h4>
       <section>
 The <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialog</a>provides an interactive dialog box for users to select files or directories.
@@ -261,6 +269,10 @@ ScrollBarViews are views that display a 1-character scrollbar, either horizontal
       <section>
 Scrollviews are views that present a window into a virtual space where subviews are added.  Similar to the iOS UIScrollView.
 </section>
+      <h4><a class="xref" href="Terminal.Gui.SelectedCellChangedEventArgs.html">SelectedCellChangedEventArgs</a></h4>
+      <section>
+Defines the event arguments for <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_SelectedCellChanged">SelectedCellChanged</a> 
+</section>
       <h4><a class="xref" href="Terminal.Gui.ShortcutHelper.html">ShortcutHelper</a></h4>
       <section>
 Represents a helper to manipulate shortcut keys used on views.
@@ -281,6 +293,18 @@ The <a class="xref" href="Terminal.Gui.StatusItem.html#Terminal_Gui_StatusItem_S
 The colour of the <a class="xref" href="Terminal.Gui.StatusItem.html#Terminal_Gui_StatusItem_Title">Title</a> will be changed after each ~. 
 A <a class="xref" href="Terminal.Gui.StatusItem.html#Terminal_Gui_StatusItem_Title">Title</a> set to `~F1~ Help` will render as *F1* using <a class="xref" href="Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_HotNormal">HotNormal</a> and
 *Help* as <a class="xref" href="Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_HotNormal">HotNormal</a>.
+</section>
+      <h4><a class="xref" href="Terminal.Gui.TableSelection.html">TableSelection</a></h4>
+      <section>
+Describes a selected region of the table
+</section>
+      <h4><a class="xref" href="Terminal.Gui.TableStyle.html">TableStyle</a></h4>
+      <section>
+Defines rendering options that affect how the table is displayed
+</section>
+      <h4><a class="xref" href="Terminal.Gui.TableView.html">TableView</a></h4>
+      <section>
+View for tabular data based on a <span class="xref">System.Data.DataTable</span>
 </section>
       <h4><a class="xref" href="Terminal.Gui.TextChangingEventArgs.html">TextChangingEventArgs</a></h4>
       <section>
@@ -370,7 +394,11 @@ Basic colors that can be used to set the foreground and background colors in con
 </section>
       <h4><a class="xref" href="Terminal.Gui.ConsoleDriver.DiagnosticFlags.html">ConsoleDriver.DiagnosticFlags</a></h4>
       <section>
-Enables diagnostic funcions
+Enables diagnostic functions
+</section>
+      <h4><a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></h4>
+      <section>
+Cursors Visibility that are displayed
 </section>
       <h4><a class="xref" href="Terminal.Gui.DisplayModeLayout.html">DisplayModeLayout</a></h4>
       <section>
@@ -409,7 +437,8 @@ Text alignment enumeration, controls how text is displayed.
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

@@ -598,6 +598,32 @@ namespace Terminal.Gui {
 			}
 		}
 
+		private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
+
+		/// <summary>
+		/// Get / Set the wished cursor when the field is focused
+		/// </summary>
+		public CursorVisibility DesiredCursorVisibility 
+		{ 
+			get => desiredCursorVisibility; 
+			set {
+				if (desiredCursorVisibility != value && HasFocus) {
+					Application.Driver.SetCursorVisibility (value);		
+				}
+
+				desiredCursorVisibility = value;
+			}
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			//TODO: Improve it by handling read only mode of the text field
+			Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
+
+			return base.OnEnter (view);
+		}
+
 		// Returns an encoded region start..end (top 32 bits are the row, low32 the column)
 		void GetEncodedRegionBounds (out long start, out long end)
 		{

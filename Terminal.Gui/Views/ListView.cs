@@ -657,6 +657,8 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnEnter (View view)
 		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
 			if (lastSelectedItem == -1) {
 				EnsuresVisibilitySelectedItem ();
 				OnSelectedChanged ();

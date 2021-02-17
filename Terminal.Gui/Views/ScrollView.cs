@@ -12,6 +12,7 @@
 // - Perhaps allow an option to not display the scrollbar arrow indicators?
 
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace Terminal.Gui {
@@ -521,6 +522,16 @@ namespace Terminal.Gui {
 				horizontal?.Dispose ();
 			}
 			base.Dispose (disposing);
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			if (Subviews.Count == 0 || !Subviews.Any (subview => subview.CanFocus)) {
+				Application.Driver?.SetCursorVisibility (CursorVisibility.Invisible);
+			}
+
+			return base.OnEnter (view);
 		}
 	}
 }

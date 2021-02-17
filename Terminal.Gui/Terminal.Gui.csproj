@@ -22,6 +22,32 @@
     <Summary>Application framework for creating modern console applications using .NET</Summary>
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
     <PackageReleaseNotes>
+      v1.0.0-pre.8
+      * NOTE: Windows Terminal is broken - see #1099
+      * NEW CONTROL: TableView - Thanks @tznind!
+      * NetDriver is signficantly imporved - thanks @bdisp!
+      * Fixes #1016. Window is drawing its frame over the menu.
+      * Fixes #1018. Since childNeedsDisplay is used outside the View class it must to be a property.
+      * Fixes #1024. TextView is printing theFixes #1030. Getting colors from the Attributes of a ColorScheme. new line character "\n" with a symbol
+      * Fixes #1030. Getting colors from the Attributes of a ColorScheme.
+      * Fixes #1034. The NuGet packages need to be updated.
+      * Fixes #1043. The menu separator is being printed in the wrong place.
+      * Fixes #93. Audit TextView just like we did TextField to ensure proper treatment of Unicode.
+      * Fixes #1050. ScrollView takes too long to scroll enormous content size.
+      * BREAKING CHANGE - Fixes #1052. Application.CurrentView looks unused.
+      * Fixes #1053. ProcessMouseEvent seems to initialize MouseEvent incorrectly.
+      * Fixes #1056. Window doesn't redraw his SuperView properly.
+      * Fixes #1061. ComputerLayout scenario does not drawn correctly.
+      * Added unhandled exception handling in Application.Run (#1063)
+      * Fixes #1068. The ResizeView doesn't handle the AutoSize properly.
+      * Fixes #1071. Toplevel.GetTopLevelSubviews (). Changed from HashSet to IList.
+      * Fixes #1073, #1058, #480 #1049. Provides more automation to the ScrollBarView, allowing easily implement on any view.
+      * Application.Shutdown() does not reset SynchronizationContext (#1085).
+      * Fixes #1088. On WindowsDriver moving the mouse with a button pressed, when it is released, the button clicked event is fired, causing an unintentional event.
+      * Fixes #1091. Continuous button pressed not working properly on Linux.
+      * Fixes #1100. TextFormatter doesn't handle ColumnWidth greater than 1.
+      * Cursor shape and visibility #1102
+
       v1.0.0-pre.6
       * If StatusBar.Visible is set to false, TopLevel resizes correctly enabling hiding/showing of a StatusBar. UICatalog demonstrates.
       * New sample/demo app - ReactiveExample - Shows how to use reactive extensions and ReactiveUI with gui.cs. (Thanks @worldbeater)

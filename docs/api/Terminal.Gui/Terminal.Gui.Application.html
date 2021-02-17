@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Application
    ">
-    <meta name="generator" content="docfx 2.56.2.0">
+    <meta name="generator" content="docfx 2.56.6.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -61,11 +61,11 @@
       <div class="container body-content">
         
         <div id="search-results">
-          <div class="search-list"></div>
+          <div class="search-list">Search Results for <span></span></div>
           <div class="sr-items">
             <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
           </div>
-          <ul id="pagination"></ul>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
         </div>
       </div>
       <div role="main" class="container body-content hide-when-search">
@@ -291,10 +291,37 @@ If set, it forces the use of the System.Console-based driver.
   </h3>
   
   
+  <a id="Terminal_Gui_Application_AlwaysSetPosition_" data-uid="Terminal.Gui.Application.AlwaysSetPosition*"></a>
+  <h4 id="Terminal_Gui_Application_AlwaysSetPosition" data-uid="Terminal.Gui.Application.AlwaysSetPosition">AlwaysSetPosition</h4>
+  <div class="markdown level1 summary">
+Used only by <span class="xref">Terminal.Gui.NetDriver</span> to forcing always moving the cursor position when writing to the screen.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool AlwaysSetPosition { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_Application_Current_" data-uid="Terminal.Gui.Application.Current*"></a>
   <h4 id="Terminal_Gui_Application_Current" data-uid="Terminal.Gui.Application.Current">Current</h4>
   <div class="markdown level1 summary">
-The current <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> object. This is updated when <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run">Run()</a> enters and leaves to point to the current <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> .
+The current <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> object. This is updated when <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_System_Func_System_Exception_System_Boolean__">Run(Func&lt;Exception, Boolean&gt;)</a> enters and leaves to point to the current <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> .
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -318,15 +345,15 @@ The current <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> objec
   </table>
   
   
-  <a id="Terminal_Gui_Application_CurrentView_" data-uid="Terminal.Gui.Application.CurrentView*"></a>
-  <h4 id="Terminal_Gui_Application_CurrentView" data-uid="Terminal.Gui.Application.CurrentView">CurrentView</h4>
+  <a id="Terminal_Gui_Application_HeightAsBuffer_" data-uid="Terminal.Gui.Application.HeightAsBuffer*"></a>
+  <h4 id="Terminal_Gui_Application_HeightAsBuffer" data-uid="Terminal.Gui.Application.HeightAsBuffer">HeightAsBuffer</h4>
   <div class="markdown level1 summary">
-TThe current <a class="xref" href="Terminal.Gui.View.html">View</a> object being redrawn.
+The current <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_HeightAsBuffer">HeightAsBuffer</a> used in the terminal.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static View CurrentView { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public static bool HeightAsBuffer { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -338,8 +365,8 @@ TThe current <a class="xref" href="Terminal.Gui.View.html">View</a> object being
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
-        <td>The current.</td>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -553,7 +580,7 @@ Call this method once per instance (or after <a class="xref" href="Terminal.Gui.
 Loads the right <a class="xref" href="Terminal.Gui.ConsoleDriver.html">ConsoleDriver</a> for the platform.
 </p>
 <p>
-Creates a <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> and assigns it to <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Top">Top</a> and <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_CurrentView">CurrentView</a>
+Creates a <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> and assigns it to <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Top">Top</a>
 </p>
 </div>
   
@@ -627,7 +654,7 @@ Stops running the most recent <a class="xref" href="Terminal.Gui.Toplevel.html">
   <h5 id="Terminal_Gui_Application_RequestStop_remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 <p>
-This will cause <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run">Run()</a> to return.
+This will cause <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_System_Func_System_Exception_System_Boolean__">Run(Func&lt;Exception, Boolean&gt;)</a> to return.
 </p>
 <p>
   Calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop">RequestStop()</a> is equivalent to setting the <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Running">Running</a> property on the curently running <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> to false.
@@ -636,26 +663,43 @@ This will cause <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui
   
   
   <a id="Terminal_Gui_Application_Run_" data-uid="Terminal.Gui.Application.Run*"></a>
-  <h4 id="Terminal_Gui_Application_Run" data-uid="Terminal.Gui.Application.Run">Run()</h4>
+  <h4 id="Terminal_Gui_Application_Run_System_Func_System_Exception_System_Boolean__" data-uid="Terminal.Gui.Application.Run(System.Func{System.Exception,System.Boolean})">Run(Func&lt;Exception, Boolean&gt;)</h4>
   <div class="markdown level1 summary">
-Runs the application by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_">Run(Toplevel)</a> with the value of <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Top">Top</a>
+Runs the application by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a> with the value of <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Top">Top</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static void Run()</code></pre>
+    <pre><code class="lang-csharp hljs">public static void Run(Func&lt;Exception, bool&gt; errorHandler = null)</code></pre>
   </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Exception</span>, <span class="xref">System.Boolean</span>&gt;</td>
+        <td><span class="parametername">errorHandler</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="Terminal_Gui_Application_Run_" data-uid="Terminal.Gui.Application.Run*"></a>
-  <h4 id="Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_" data-uid="Terminal.Gui.Application.Run(Terminal.Gui.Toplevel)">Run(Toplevel)</h4>
+  <h4 id="Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__" data-uid="Terminal.Gui.Application.Run(Terminal.Gui.Toplevel,System.Func{System.Exception,System.Boolean})">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</h4>
   <div class="markdown level1 summary">
 Runs the main loop on the given <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> container.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static void Run(Toplevel view)</code></pre>
+    <pre><code class="lang-csharp hljs">public static void Run(Toplevel view, Func&lt;Exception, bool&gt; errorHandler = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -672,9 +716,14 @@ Runs the main loop on the given <a class="xref" href="Terminal.Gui.Toplevel.html
         <td><span class="parametername">view</span></td>
         <td>The <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> tu run modally.</td>
       </tr>
+      <tr>
+        <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Exception</span>, <span class="xref">System.Boolean</span>&gt;</td>
+        <td><span class="parametername">errorHandler</span></td>
+        <td>Handler for any unhandled exceptions (resumes when returns true, rethrows when null).</td>
+      </tr>
     </tbody>
   </table>
-  <h5 id="Terminal_Gui_Application_Run_Terminal_Gui_Toplevel__remarks">Remarks</h5>
+  <h5 id="Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean___remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 <p>
   This method is used to start processing events
@@ -682,10 +731,10 @@ Runs the main loop on the given <a class="xref" href="Terminal.Gui.Toplevel.html
   run other modal <a class="xref" href="Terminal.Gui.View.html">View</a>s such as <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> boxes.
 </p>
 <p>
-  To make a <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_">Run(Toplevel)</a> stop execution, call <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop">RequestStop()</a>.
+  To make a <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a> stop execution, call <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RequestStop">RequestStop()</a>.
 </p>
 <p>
-  Calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_">Run(Toplevel)</a> is equivalent to calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_">Begin(Toplevel)</a>, followed by <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_">RunLoop(Application.RunState, Boolean)</a>,
+  Calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a> is equivalent to calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_">Begin(Toplevel)</a>, followed by <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_">RunLoop(Application.RunState, Boolean)</a>,
   and then calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_End_Terminal_Gui_Application_RunState_">End(Application.RunState)</a>.
 </p>
 <p>
@@ -695,20 +744,40 @@ Runs the main loop on the given <a class="xref" href="Terminal.Gui.Toplevel.html
   the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_RunLoop_Terminal_Gui_Application_RunState_System_Boolean_">RunLoop(Application.RunState, Boolean)</a> method will only process any pending events, timers, idle handlers and
   then return control immediately.
 </p>
+<p>
+  When <code data-dev-comment-type="paramref" class="paramref">errorHandler</code> is null the exception is rethrown, when it returns true the application is resumed and when false method exits gracefully.
+</p>
 </div>
   
   
   <a id="Terminal_Gui_Application_Run_" data-uid="Terminal.Gui.Application.Run*"></a>
-  <h4 id="Terminal_Gui_Application_Run__1" data-uid="Terminal.Gui.Application.Run``1">Run&lt;T&gt;()</h4>
+  <h4 id="Terminal_Gui_Application_Run__1_System_Func_System_Exception_System_Boolean__" data-uid="Terminal.Gui.Application.Run``1(System.Func{System.Exception,System.Boolean})">Run&lt;T&gt;(Func&lt;Exception, Boolean&gt;)</h4>
   <div class="markdown level1 summary">
-Runs the application by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_">Run(Toplevel)</a> with a new instance of the specified <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a>-derived class
+Runs the application by calling <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a> with a new instance of the specified <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a>-derived class
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static void Run&lt;T&gt;()
+    <pre><code class="lang-csharp hljs">public static void Run&lt;T&gt;(Func&lt;Exception, bool&gt; errorHandler = null)
     where T : Toplevel, new()</code></pre>
   </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Exception</span>, <span class="xref">System.Boolean</span>&gt;</td>
+        <td><span class="parametername">errorHandler</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h5 class="typeParameters">Type Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
@@ -797,7 +866,8 @@ Releases the mouse grab, so mouse events will be routed to the view on which the
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>

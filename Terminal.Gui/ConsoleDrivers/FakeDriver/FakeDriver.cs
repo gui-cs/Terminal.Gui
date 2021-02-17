@@ -417,6 +417,27 @@ namespace Terminal.Gui {
 		public override void UncookMouse ()
 		{
 		}
+
+		/// <inheritdoc/>
+		public override bool GetCursorVisibility (out CursorVisibility visibility)
+		{
+			visibility = CursorVisibility.Default;
+
+			return false;
+		}
+
+		/// <inheritdoc/>
+		public override bool SetCursorVisibility (CursorVisibility visibility)
+		{
+			return false;
+		}
+
+		/// <inheritdoc/>
+		public override bool EnsureCursorVisibility ()
+		{
+			return false;
+		}
+
 		#endregion
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 	}
