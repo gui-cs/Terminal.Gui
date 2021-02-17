@@ -320,6 +320,12 @@ namespace Terminal.Gui {
 		/// Secondary selected regions of tree when <see cref="MultiSelect"/> is true
 		/// </summary>
 		private Stack<TreeSelection<T>> _multiSelectedRegions = new Stack<TreeSelection<T>>();
+		
+
+		/// <summary>
+		/// Error message to display when the control is not properly initialized at draw time (nodes added but no tree builder set)
+		/// </summary>
+		public static ustring NoBuilderError = "ERROR: Builder Not Set";
 
 		/// <summary>
 		/// Called when the <see cref="SelectedObject"/> changes
@@ -500,6 +506,12 @@ namespace Terminal.Gui {
 		{
 			if(roots == null)
 				return;
+
+			if(TreeBuilder == null) {
+				Move(0,0);
+				Driver.AddStr(NoBuilderError);
+				return;
+			}
 
 			var map = BuildLineMap();
 
