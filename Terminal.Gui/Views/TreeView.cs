@@ -319,8 +319,13 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Secondary selected regions of tree when <see cref="MultiSelect"/> is true
 		/// </summary>
-		private Stack<TreeSelection<T>> _multiSelectedRegions = new Stack<TreeSelection<T>>();
+		private Stack<TreeSelection<T>> multiSelectedRegions = new Stack<TreeSelection<T>>();
 		
+		/// <summary>
+		/// Cached result of <see cref="BuildLineMap"/>
+		/// </summary>
+		private Branch<T>[] cachedLineMap;
+
 
 		/// <summary>
 		/// Error message to display when the control is not properly initialized at draw time (nodes added but no tree builder set)
@@ -400,9 +405,11 @@ namespace Terminal.Gui {
 		{
 			if(!roots.ContainsKey(o)) {
 				roots.Add(o,new Branch<T>(this,null,o));
+				InvalidateLineMap();
 				SetNeedsDisplay();
 			}
 		}
+
 
 		/// <summary>
 		/// Removes all objects from the tree and clears <see cref="SelectedObject"/>
@@ -410,8 +417,9 @@ namespace Terminal.Gui {
 		public void ClearObjects()
 		{
 			SelectedObject = default(T);
-			_multiSelectedRegions.Clear();
+			multiSelectedRegions.Clear();
 			roots = new Dictionary<T, Branch<T>>();
+			InvalidateLineMap();
 			SetNeedsDisplay();
 		}
 
@@ -424,6 +432,7 @@ namespace Terminal.Gui {
 		{
 			if(roots.ContainsKey(o)) {
 				roots.Remove(o);
+				InvalidateLineMap();
 				SetNeedsDisplay();
 
 				if(Equals(SelectedObject,o))
@@ -445,9 +454,11 @@ namespace Terminal.Gui {
 					objectsAdded = true;
 				}	
 			}
-				
-			if(objectsAdded)
+
+			if (objectsAdded) {
+				InvalidateLineMap();
 				SetNeedsDisplay();
+			}
 		}
 
 		/// <summary>
@@ -461,6 +472,7 @@ namespace Terminal.Gui {
 			var branch = ObjectToBranch(o);
 			if(branch != null) {
 				branch.Refresh(startAtTop);
+				InvalidateLineMap();
 				SetNeedsDisplay();
 			}
 
@@ -474,6 +486,7 @@ namespace Terminal.Gui {
 			foreach(var branch in roots.Values)
 				branch.Rebuild();
 			
+			InvalidateLineMap();
 			SetNeedsDisplay();
 		}
 
@@ -590,13 +603,16 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private Branch<T>[] BuildLineMap()
 		{
+			if(cachedLineMap != null)
+				return cachedLineMap;
+
 			List<Branch<T>> toReturn = new List<Branch<T>>();
 
 			foreach(var root in roots.Values) {
 				toReturn.AddRange(AddToLineMap(root));
 			}
 
-			return toReturn.ToArray();
+			return cachedLineMap = toReturn.ToArray();
 		}
 
 		private IEnumerable<Branch<T>> AddToLineMap (Branch<T> currentBranch)
@@ -733,14 +749,14 @@ namespace Terminal.Gui {
 						clickedBranch.Expand();
 					else {
 						SelectedObject = clickedBranch.Model; // It is a leaf node
-						_multiSelectedRegions.Clear();
+						multiSelectedRegions.Clear();
 					}
 				}
 				else {
 
 					// It is a first click somewhere in the current line that doesn't look like an expansion/collapse attempt
 					SelectedObject = clickedBranch.Model;
-					_multiSelectedRegions.Clear();
+					multiSelectedRegions.Clear();
 				}
 
 				SetNeedsDisplay();
@@ -829,7 +845,7 @@ namespace Terminal.Gui {
 		{
 			// if it is not a shift click or we don't allow multi select
 			if(!expandSelection || !MultiSelect)
-				_multiSelectedRegions.Clear();
+				multiSelectedRegions.Clear();
 
 			if(SelectedObject == null){
 				SelectedObject = roots.Keys.FirstOrDefault();
@@ -852,16 +868,16 @@ namespace Terminal.Gui {
 					// If it is a multi selection
 					if(expandSelection && MultiSelect)
 					{
-						if(_multiSelectedRegions.Any())
+						if(multiSelectedRegions.Any())
 						{
 							// expand the existing head selection
-							var head = _multiSelectedRegions.Pop();
-							_multiSelectedRegions.Push(new TreeSelection<T>(head.Origin,newIdx,map));
+							var head = multiSelectedRegions.Pop();
+							multiSelectedRegions.Push(new TreeSelection<T>(head.Origin,newIdx,map));
 						}
 						else
 						{
 							// or start a new multi selection region
-							_multiSelectedRegions.Push(new TreeSelection<T>(map[idx],newIdx,map));
+							multiSelectedRegions.Push(new TreeSelection<T>(map[idx],newIdx,map));
 						}
 					}
 
@@ -882,7 +898,8 @@ namespace Terminal.Gui {
 				}
 
 			}
-						
+
+			InvalidateLineMap();						
 			SetNeedsDisplay();
 		}
 
@@ -896,6 +913,7 @@ namespace Terminal.Gui {
 				return;
 			
 			ObjectToBranch(toExpand)?.Expand();
+			InvalidateLineMap();
 			SetNeedsDisplay();
 		}
 		
@@ -909,6 +927,7 @@ namespace Terminal.Gui {
 				return;
 			
 			ObjectToBranch(toExpand)?.ExpandAll();
+			InvalidateLineMap();
 			SetNeedsDisplay();
 		}
 		/// <summary>
@@ -919,7 +938,8 @@ namespace Terminal.Gui {
 			foreach (var item in roots) {
 				item.Value.ExpandAll();
 			}
-
+			
+			InvalidateLineMap();
 			SetNeedsDisplay();
 		}
 		/// <summary>
@@ -968,7 +988,8 @@ namespace Terminal.Gui {
 			foreach (var item in roots) {
 				item.Value.Collapse();
 			}
-
+			
+			InvalidateLineMap();
 			SetNeedsDisplay();
 		}
 
@@ -1001,7 +1022,16 @@ namespace Terminal.Gui {
 				SelectedObject = null;
 			}	
 			
+			InvalidateLineMap();
 			SetNeedsDisplay();
+		}
+		
+		/// <summary>
+		/// Clears any cached results of <see cref="BuildLineMap"/>
+		/// </summary>
+		protected void InvalidateLineMap()
+		{
+			cachedLineMap = null;
 		}
 
 		/// <summary>
@@ -1022,7 +1052,7 @@ namespace Terminal.Gui {
 		public bool IsSelected (T model)
 		{
 			return Equals(SelectedObject , model) ||
-				(MultiSelect && _multiSelectedRegions.Any(s=>s.Contains(model)));
+				(MultiSelect && multiSelectedRegions.Any(s=>s.Contains(model)));
 		}
 
 		/// <summary>
@@ -1054,14 +1084,14 @@ namespace Terminal.Gui {
 			if(!MultiSelect)
 				return;
 
-			_multiSelectedRegions.Clear();
+			multiSelectedRegions.Clear();
 
 			var map = BuildLineMap();
 
 			if(map.Length == 0)
 				return;
 
-			_multiSelectedRegions.Push(new TreeSelection<T>(map[0],map.Length,map));
+			multiSelectedRegions.Push(new TreeSelection<T>(map[0],map.Length,map));
 			SetNeedsDisplay();
 			
 			OnSelectionChanged(new SelectionChangedEventArgs<T>(this,SelectedObject,SelectedObject));
