@@ -1082,7 +1082,7 @@ namespace Terminal.Gui {
 
 		public Branch<T> Origin {get;}
 
-		private HashSet<Branch<T>> alsoIncluded = new HashSet<Branch<T>>();
+		private HashSet<T> included = new HashSet<T>();
 
 		/// <summary>
 		/// Creates a new selection between two branches in the tree
@@ -1093,6 +1093,8 @@ namespace Terminal.Gui {
 		public TreeSelection(Branch<T> from, int toIndex, Branch<T>[] map )
 		{
 			Origin = from;
+			included.Add(Origin.Model);
+
 			var oldIdx = Array.IndexOf(map,from);
 
 			var lowIndex = Math.Min(oldIdx,toIndex);
@@ -1100,15 +1102,13 @@ namespace Terminal.Gui {
 
 			// Select everything between the old and new indexes
 			foreach(var alsoInclude in map.Skip(lowIndex).Take(highIndex-lowIndex)){
-				alsoIncluded.Add(alsoInclude);
+				included.Add(alsoInclude.Model);
 			}
 		
 		}
 		public bool Contains(T model)
 		{
-			return 
-			Equals(Origin.Model,model) || 
-			alsoIncluded.Any(b=>Equals(b.Model,model));
+			return included.Contains(model);
 		}
 	}
 
