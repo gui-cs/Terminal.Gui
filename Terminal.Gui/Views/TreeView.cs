@@ -13,10 +13,20 @@ namespace Terminal.Gui {
 	public interface ITreeNode
 	{
 		/// <summary>
+		/// Text to display when rendering the node
+		/// </summary>
+		string Text {get;set;}
+
+		/// <summary>
 		/// The children of your class which should be rendered underneath it when expanded
 		/// </summary>
 		/// <value></value>
 		IList<ITreeNode> Children {get;}
+
+		/// <summary>
+		/// Optionally allows you to store some custom data/class here.
+		/// </summary>
+		object Tag {get;set;}
 	}
 
 	/// <summary>
@@ -35,6 +45,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value></value>
 		public string Text {get;set;}
+
+		/// <summary>
+		/// Optionally allows you to store some custom data/class here.
+		/// </summary>
+		public object Tag {get;set;}
 
 		/// <summary>
 		/// returns <see cref="Text"/>
@@ -228,6 +243,7 @@ namespace Terminal.Gui {
 		public TreeView ()
 		{
 			TreeBuilder = new TreeNodeBuilder();
+			AspectGetter = o=>o == null ? "Null" : (o.Text ?? o?.ToString() ?? "Unamed Node");
 		}
 	}
 	

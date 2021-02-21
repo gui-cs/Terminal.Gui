@@ -43,7 +43,7 @@ namespace UICatalog.Scenarios {
         }
 
         // Your data class
-		private class House : ITreeNode {
+		private class House : TreeNode {
 
 
             // Your properties
@@ -59,13 +59,9 @@ namespace UICatalog.Scenarios {
 				return Address;
 			}
 		}
-		private class Room : ITreeNode{
+		private class Room : TreeNode{
             
             public string Name {get;set;}
-
-
-            // Rooms have no sub objects
-			public IList<ITreeNode> Children => new List<ITreeNode>();
 
 			public override string ToString ()
 			{

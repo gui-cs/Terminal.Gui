@@ -34,7 +34,7 @@ Having to create a bunch of TreeNode objects can be a pain especially if you alr
 
 ```csharp
 // Your data class
-private class House : ITreeNode {
+private class House : TreeNode {
 
 
     // Your properties
@@ -52,7 +52,7 @@ private class House : ITreeNode {
 }
 
 // Your other data class
-private class Room : ITreeNode{
+private class Room : TreeNode{
     
     public string Name {get;set;}
 
