@@ -26,6 +26,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit()),
 				}) 
 				});
+			Top.Add(menu);
 			
 			treeView = new TreeView() {
 				X = 0,
