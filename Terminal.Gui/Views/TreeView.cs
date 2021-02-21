@@ -1079,16 +1079,16 @@ namespace Terminal.Gui {
 		{
 			var map = BuildLineMap();
 
-			if(SelectedObject != null)
-				yield return SelectedObject;
-
 			// To determine multi selected objects, start with the line map, that avoids yielding hidden nodes that were selected then the parent collapsed e.g. programmatically or with mouse click
 			if(MultiSelect){
 				foreach(var m in map.Select(b=>b.Model).Where(IsSelected)){
-					if(m != SelectedObject){
-						yield return m;
-					}
+					yield return m;
 				}	
+			}
+			else
+			{
+				if(SelectedObject != null)
+					yield return SelectedObject;
 			}
 		}
 
