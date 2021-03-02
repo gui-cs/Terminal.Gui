@@ -692,6 +692,12 @@ namespace Terminal.Gui {
 				case Key.CursorDown | Key.ShiftMask:
 					AdjustSelection(1,keyEvent.Key.HasFlag(Key.ShiftMask));
 				break;
+				case Key.CursorUp | Key.CtrlMask:
+					AdjustSelectionToBranchStart();
+				break;
+				case Key.CursorDown | Key.CtrlMask:
+					AdjustSelectionToBranchEnd();
+				break;
 				case Key.PageUp:
 				case Key.PageUp | Key.ShiftMask:
 					AdjustSelection(-Bounds.Height,keyEvent.Key.HasFlag(Key.ShiftMask));
@@ -932,24 +938,115 @@ namespace Terminal.Gui {
 
 					SelectedObject = newBranch.Model;
 
- 					/*this -1 allows for possible horizontal scroll bar in the last row of the control*/
-					int leaveSpace = Style.LeaveLastRow ? 1 :0;
-					
-					if(newIdx < ScrollOffsetVertical) {
-						//if user has scrolled up too far to see their selection
-						ScrollOffsetVertical = newIdx;
-					}
-					else if(newIdx >= ScrollOffsetVertical + Bounds.Height - leaveSpace){
-						
-						//if user has scrolled off bottom of visible tree
-						ScrollOffsetVertical = Math.Max(0,(newIdx+1) - (Bounds.Height-leaveSpace));
-					}
+					EnsureVisible(SelectedObject);
 				}
 
 			}
-
-			InvalidateLineMap();						
+						
 			SetNeedsDisplay();
+		}
+
+		/// <summary>
+		/// Moves the selection to the first child in the currently selected level
+		/// </summary>
+		public void AdjustSelectionToBranchStart()
+		{
+			var o = SelectedObject;
+			if(o == null)
+				return;
+
+			var map = BuildLineMap();
+
+			int currentIdx = Array.FindIndex(map,b=>Equals(b.Model,o));
+
+			if(currentIdx == -1)
+				return;
+
+			var currentBranch = map[currentIdx];
+			var next = currentBranch;
+
+			for(;currentIdx >= 0;currentIdx--)
+			{
+				//if it is the beginning of the current depth of branch
+				if(currentBranch.Depth != next.Depth){
+
+						SelectedObject = currentBranch.Model;
+						EnsureVisible(currentBranch.Model);
+						SetNeedsDisplay();
+						return;
+					}
+				
+				// look at next branch up for consideration
+				currentBranch = next;
+				next = map[currentIdx];
+			}
+
+			// We ran all the way to top of tree
+			GoToFirst();
+		}
+
+		/// <summary>
+		/// Moves the selection to the last child in the currently selected level
+		/// </summary>
+		public void AdjustSelectionToBranchEnd()
+		{
+			var o = SelectedObject;
+			if(o == null)
+				return;
+
+			var map = BuildLineMap();
+
+			int currentIdx = Array.FindIndex(map,b=>Equals(b.Model,o));
+
+			if(currentIdx == -1)
+				return;
+
+			var currentBranch = map[currentIdx];
+			var next = currentBranch;
+
+			for(;currentIdx < map.Length;currentIdx++)
+			{
+				//if it is the end of the current depth of branch
+				if(currentBranch.Depth != next.Depth){
+
+						SelectedObject = currentBranch.Model;
+						EnsureVisible(currentBranch.Model);
+						SetNeedsDisplay();
+						return;
+					}
+				
+				// look at next branch for consideration
+				currentBranch = next;
+				next = map[currentIdx];
+			}
+
+			GoToEnd();
+		}
+
+		/// <summary>
+		/// Adjusts the <see cref="ScrollOffsetVertical"/> to ensure the given <paramref name="model"/> is visible.  Has no effect if already visible
+		/// </summary>
+		public void EnsureVisible(T model)
+		{
+			var map = BuildLineMap();
+			
+			var idx = Array.FindIndex(map,b=>Equals(b.Model,model));
+
+			if(idx == -1)
+				return;
+
+			/*this -1 allows for possible horizontal scroll bar in the last row of the control*/
+			int leaveSpace = Style.LeaveLastRow ? 1 :0;
+					
+			if(idx < ScrollOffsetVertical) {
+				//if user has scrolled up too far to see their selection
+				ScrollOffsetVertical = idx;
+			}
+			else if(idx >= ScrollOffsetVertical + Bounds.Height - leaveSpace){
+						
+				//if user has scrolled off bottom of visible tree
+				ScrollOffsetVertical = Math.Max(0,(idx+1) - (Bounds.Height-leaveSpace));
+			}
 		}
 
 		/// <summary>
