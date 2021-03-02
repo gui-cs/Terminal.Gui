@@ -103,9 +103,7 @@ namespace UnitTests {
 			var tree = CreateTree(out Factory f, out Car car1, out _);
 			tree.Bounds = new Rect(0,0,10,10);
 			
-			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-			driver.Init (() => { });
+			InitFakeDriver();
 
 			//-+Factory
 			Assert.Equal(9,tree.GetContentWidth(true));
@@ -129,9 +127,7 @@ namespace UnitTests {
 			// control only allows 1 row to be viewed at once
 			tree.Bounds = new Rect(0,0,20,1);
 			
-			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
-			driver.Init (() => { });
+			InitFakeDriver();
 
 			//-+Factory
 			Assert.Equal(9,tree.GetContentWidth(true));
@@ -449,14 +445,12 @@ namespace UnitTests {
 
 			tree.SelectedObject = root;
 
-			Assert.Equal(1,tree.GetAllSelectedObjects().Count());
-			Assert.Contains(root,tree.GetAllSelectedObjects());
+			Assert.Single(tree.GetAllSelectedObjects(),root);
 
 			// move selection down 1
 			tree.AdjustSelection(1,false);
 
-			Assert.Equal(1,tree.GetAllSelectedObjects().Count());
-			Assert.Contains(l1,tree.GetAllSelectedObjects());
+			Assert.Single(tree.GetAllSelectedObjects(),l1);
 
 			// expand selection down 2 (e.g. shift down twice)
 			tree.AdjustSelection(1,true);
@@ -472,6 +466,85 @@ namespace UnitTests {
 			// No selected objects since the root was collapsed
 			Assert.Empty(tree.GetAllSelectedObjects());
 		}
+
+		[Fact]
+		public void ObjectActivated_Called()
+		{
+			var tree = CreateTree(out Factory f, out Car car1, out _);
+
+			InitFakeDriver();
+
+			object activated = null;
+			bool called = false;
+
+			// register for the event
+			tree.ObjectActivated += (s)=>
+			{
+				activated = s.ActivatedObject;
+				called = true;
+			};
+
+			Assert.False(called);
+			
+			// no object is selected yet so no event should happen
+			tree.ProcessKey(new KeyEvent(Key.Enter,new KeyModifiers()));
+
+			Assert.Null(activated);
+			Assert.False(called);
+
+			// down to select factory
+			tree.ProcessKey(new KeyEvent(Key.CursorDown,new KeyModifiers()));
+
+			tree.ProcessKey(new KeyEvent(Key.Enter,new KeyModifiers()));
+			
+			Assert.True(called);
+			Assert.Same(f,activated);			
+		}
+
+
+		[Fact]
+		public void ObjectActivated_CustomKey()
+		{
+			var tree = CreateTree(out Factory f, out Car car1, out _);
+			
+			InitFakeDriver();
+
+			tree.ObjectActivationKey = Key.Delete;
+			object activated = null;
+			bool called = false;
+
+			// register for the event
+			tree.ObjectActivated += (s)=>
+			{
+				activated = s.ActivatedObject;
+				called = true;
+			};
+
+			Assert.False(called);
+			
+			// no object is selected yet so no event should happen
+			tree.ProcessKey(new KeyEvent(Key.Enter,new KeyModifiers()));
+
+			Assert.Null(activated);
+			Assert.False(called);
+
+			// down to select factory
+			tree.ProcessKey(new KeyEvent(Key.CursorDown,new KeyModifiers()));
+
+			tree.ProcessKey(new KeyEvent(Key.Enter,new KeyModifiers()));
+			
+			// Enter is not the activation key in this unit test
+			Assert.Null(activated);
+			Assert.False(called);
+
+			// Delete is the activation key in this test so should result in activation occurring
+			tree.ProcessKey(new KeyEvent(Key.Delete,new KeyModifiers()));
+
+			Assert.True(called);
+			Assert.Same(f,activated);
+			
+		}
+
 
 
 		/// <summary>
@@ -526,6 +599,13 @@ namespace UnitTests {
 			{
 				return obj is EqualityTestObject eto && Equals(Name, eto.Name);
 			}
+		}
+
+		private void InitFakeDriver()
+		{
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			driver.Init (() => { });
 		}
 	}
 }
