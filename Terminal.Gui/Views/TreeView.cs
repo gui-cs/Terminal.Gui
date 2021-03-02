@@ -318,6 +318,13 @@ namespace Terminal.Gui {
 		/// <value></value>
 		public bool MultiSelect {get;set;} = true;
 
+
+		/// <summary>
+		/// True makes a letter key press navigate to the next visible branch that begins with that letter/digit
+		/// </summary>
+		/// <value></value>
+		public bool AllowLetterBasedNavigation {get;set;} = true;
+
 		/// <summary>
 		/// The currently selected object in the tree.  When <see cref="MultiSelect"/> is true this is the object at which the cursor is at
 		/// </summary>
@@ -670,6 +677,21 @@ namespace Terminal.Gui {
 					return true;
 				 }				
 			}
+			
+			
+			var character = (char)keyEvent.KeyValue;
+
+			// if it is a singl character pressed without any control keys
+			if(char.IsLetterOrDigit(character) && AllowLetterBasedNavigation && !keyEvent.IsShift && !keyEvent.IsAlt && !keyEvent.IsCtrl)
+			{				
+				// search for next branch that begins with that letter
+				var characterAsStr = character.ToString();
+				AdjustSelectionToNext(b=>AspectGetter(b.Model).StartsWith(characterAsStr,StringComparison.CurrentCultureIgnoreCase));
+
+				PositionCursor ();
+				return true;
+			}
+			
 
 			switch (keyEvent.Key) {
 				
@@ -1021,6 +1043,43 @@ namespace Terminal.Gui {
 			}
 
 			GoToEnd();
+		}
+
+
+		/// <summary>
+		/// Sets the selection to the next branch that matches the <paramref name="predicate"/>
+		/// </summary>
+		/// <param name="predicate"></param>
+		private void AdjustSelectionToNext (Func<Branch<T>, bool> predicate)
+		{
+			var map = BuildLineMap();
+
+			// empty map means we can't select anything anyway
+			if(map.Length == 0)
+				return;
+			
+			// Start searching from the first element in the map
+			var idxStart = 0;
+			
+			// or the current selected branch
+			if(SelectedObject !=null)
+				idxStart = Array.FindIndex(map,b=>Equals(b.Model,SelectedObject));
+
+			// if currently selected object mysteriously vanished, search from beginning
+			if(idxStart == -1)
+				idxStart = 0;
+
+			// loop around all indexes and back to first index
+			for(int idxCur = (idxStart+1)%map.Length;idxCur != idxStart;idxCur = (idxCur+1) % map.Length)
+			{
+				if(predicate(map[idxCur]))
+				{
+					SelectedObject = map[idxCur].Model;
+					EnsureVisible(map[idxCur].Model);
+					SetNeedsDisplay();
+					return;
+				}
+			}
 		}
 
 		/// <summary>
