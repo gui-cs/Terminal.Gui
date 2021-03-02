@@ -38,13 +38,13 @@ namespace Terminal.Gui {
 		/// Children of the current node
 		/// </summary>
 		/// <returns></returns>
-		public IList<ITreeNode> Children {get;set;} = new List<ITreeNode>();
+		public virtual IList<ITreeNode> Children {get;set;} = new List<ITreeNode>();
 		
 		/// <summary>
 		/// Text to display in tree node for current entry
 		/// </summary>
 		/// <value></value>
-		public string Text {get;set;}
+		public virtual string Text {get;set;}
 
 		/// <summary>
 		/// Optionally allows you to store some custom data/class here.
@@ -730,7 +730,7 @@ namespace Terminal.Gui {
 		/// Raises the <see cref="ObjectActivated"/> event
 		/// </summary>
 		/// <param name="e"></param>
-		protected void OnObjectActivated(ObjectActivatedEventArgs<T> e)
+		protected virtual void OnObjectActivated(ObjectActivatedEventArgs<T> e)
 		{
 			ObjectActivated?.Invoke(e);
 		}

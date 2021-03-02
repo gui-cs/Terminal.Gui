@@ -45,28 +45,20 @@ namespace UICatalog.Scenarios {
         // Your data class
 		private class House : TreeNode {
 
-
             // Your properties
             public string Address {get;set;}
             public List<Room> Rooms {get;set;}
 
             // ITreeNode member:
+			public override IList<ITreeNode> Children => Rooms.Cast<ITreeNode>().ToList();
 
-			public IList<ITreeNode> Children => Rooms.Cast<ITreeNode>().ToList();
-			
-            public override string ToString ()
-			{
-				return Address;
-			}
+			public override string Text { get => Address; set => Address = value; }
 		}
 		private class Room : TreeNode{
             
             public string Name {get;set;}
 
-			public override string ToString ()
-			{
-				return Name;
-			}
+			public override string Text{get=>Name;set{Name=value;}}
         }
 
 		private void LoadRooms()
