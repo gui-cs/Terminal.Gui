@@ -678,18 +678,21 @@ namespace Terminal.Gui {
 				 }				
 			}
 			
-			
-			var character = (char)keyEvent.KeyValue;
+			if(keyEvent.KeyValue >0 && keyEvent.KeyValue <0xFFFF){
 
-			// if it is a singl character pressed without any control keys
-			if(char.IsLetterOrDigit(character) && AllowLetterBasedNavigation && !keyEvent.IsShift && !keyEvent.IsAlt && !keyEvent.IsCtrl)
-			{				
-				// search for next branch that begins with that letter
-				var characterAsStr = character.ToString();
-				AdjustSelectionToNext(b=>AspectGetter(b.Model).StartsWith(characterAsStr,StringComparison.CurrentCultureIgnoreCase));
+				var character = (char)keyEvent.KeyValue;
 
-				PositionCursor ();
-				return true;
+				// if it is a single character pressed without any control keys
+				if(char.IsLetterOrDigit(character) && AllowLetterBasedNavigation && !keyEvent.IsShift && !keyEvent.IsAlt && !keyEvent.IsCtrl)
+				{				
+					// search for next branch that begins with that letter
+					var characterAsStr = character.ToString();
+					AdjustSelectionToNext(b=>AspectGetter(b.Model).StartsWith(characterAsStr,StringComparison.CurrentCultureIgnoreCase));
+
+					PositionCursor ();
+					return true;
+				}
+
 			}
 			
 
