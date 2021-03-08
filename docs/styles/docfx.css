@@ -42,7 +42,11 @@ h6 mark {
 .inheritance .level2:before,
 .inheritance .level3:before,
 .inheritance .level4:before,
-.inheritance .level5:before {
+.inheritance .level5:before,
+.inheritance .level6:before,
+.inheritance .level7:before,
+.inheritance .level8:before,
+.inheritance .level9:before {
     content: '↳';
     margin-right: 5px;
 }
@@ -69,6 +73,22 @@ h6 mark {
 
 .inheritance .level5 {
     margin-left: 5em;
+}
+
+.inheritance .level6 {
+    margin-left: 6em;
+}
+
+.inheritance .level7 {
+    margin-left: 7em;
+}
+
+.inheritance .level8 {
+    margin-left: 8em;
+}
+
+.inheritance .level9 {
+    margin-left: 9em;
 }
 
 .level0.summary {

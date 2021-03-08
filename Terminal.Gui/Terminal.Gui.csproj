@@ -22,6 +22,11 @@
     <Summary>Application framework for creating modern console applications using .NET</Summary>
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
     <PackageReleaseNotes>
+      v1.0.0-pre.9
+      * NEW CONTROL: TreeView - Thanks @tznind!
+      * Fixes #1066. View sizing across the various terminals has been fixed; works in Windows Terminal again - thanks @bdisp
+      * Fixes #1117. Newfile Modal.
+
       v1.0.0-pre.8
       * NOTE: Windows Terminal is broken - see #1099
       * NEW CONTROL: TableView - Thanks @tznind!

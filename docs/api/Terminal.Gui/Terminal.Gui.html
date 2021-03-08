@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Namespace Terminal.Gui
    ">
-    <meta name="generator" content="docfx 2.56.6.0">
+    <meta name="generator" content="docfx 2.56.7.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -147,6 +147,10 @@ Simple Date editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <section>
 Defines the event arguments for <a class="xref" href="Terminal.Gui.DateField.html#Terminal_Gui_DateField_DateChanged">DateChanged</a> and <a class="xref" href="Terminal.Gui.TimeField.html#Terminal_Gui_TimeField_TimeChanged">TimeChanged</a> events.
 </section>
+      <h4><a class="xref" href="Terminal.Gui.DelegateTreeBuilder-1.html">DelegateTreeBuilder&lt;T&gt;</a></h4>
+      <section>
+Implementation of <a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a> that uses user defined functions
+</section>
       <h4><a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a></h4>
       <section>
 The <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> <a class="xref" href="Terminal.Gui.View.html">View</a> is a <a class="xref" href="Terminal.Gui.Window.html">Window</a> that by default is centered and contains one 
@@ -228,6 +232,10 @@ A <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a> has a title, an
       <section>
 MessageBox displays a modal message to the user, with a title, a message and a series of options that the user can choose from.
 </section>
+      <h4><a class="xref" href="Terminal.Gui.ObjectActivatedEventArgs-1.html">ObjectActivatedEventArgs&lt;T&gt;</a></h4>
+      <section>
+Event args for the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ObjectActivated">ObjectActivated</a> event
+</section>
       <h4><a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialog</a></h4>
       <section>
 The <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialog</a>provides an interactive dialog box for users to select files or directories.
@@ -272,6 +280,10 @@ Scrollviews are views that present a window into a virtual space where subviews 
       <h4><a class="xref" href="Terminal.Gui.SelectedCellChangedEventArgs.html">SelectedCellChangedEventArgs</a></h4>
       <section>
 Defines the event arguments for <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_SelectedCellChanged">SelectedCellChanged</a> 
+</section>
+      <h4><a class="xref" href="Terminal.Gui.SelectionChangedEventArgs-1.html">SelectionChangedEventArgs&lt;T&gt;</a></h4>
+      <section>
+Event arguments describing a change in selected object in a tree view
 </section>
       <h4><a class="xref" href="Terminal.Gui.ShortcutHelper.html">ShortcutHelper</a></h4>
       <section>
@@ -330,6 +342,32 @@ Time editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <section>
 Toplevel views can be modally executed.
 </section>
+      <h4><a class="xref" href="Terminal.Gui.TreeBuilder-1.html">TreeBuilder&lt;T&gt;</a></h4>
+      <section>
+Abstract implementation of <a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a>.
+</section>
+      <h4><a class="xref" href="Terminal.Gui.TreeNode.html">TreeNode</a></h4>
+      <section>
+Simple class for representing nodes, use with regular (non generic) <a class="xref" href="Terminal.Gui.TreeView.html">TreeView</a>.
+</section>
+      <h4><a class="xref" href="Terminal.Gui.TreeNodeBuilder.html">TreeNodeBuilder</a></h4>
+      <section>
+<a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a> implementation for <a class="xref" href="Terminal.Gui.ITreeNode.html">ITreeNode</a> objects
+</section>
+      <h4><a class="xref" href="Terminal.Gui.TreeStyle.html">TreeStyle</a></h4>
+      <section>
+Defines rendering options that affect how the tree is displayed
+</section>
+      <h4><a class="xref" href="Terminal.Gui.TreeView.html">TreeView</a></h4>
+      <section>
+Convenience implementation of generic <a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView&lt;T&gt;</a> for any tree were all nodes
+implement <a class="xref" href="Terminal.Gui.ITreeNode.html">ITreeNode</a>
+</section>
+      <h4><a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView&lt;T&gt;</a></h4>
+      <section>
+Hierarchical tree view with expandable branches.  Branch objects are dynamically determined
+when expanded using a user defined <a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a>
+</section>
       <h4><a class="xref" href="Terminal.Gui.View.html">View</a></h4>
       <section>
 View is the base class for all views on the screen and represents a visible element that can render itself and contains zero or more nested views.
@@ -386,6 +424,21 @@ Implement <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSour
       <section>
 Public interface to create your own platform specific main loop driver.
 </section>
+      <h4><a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a></h4>
+      <section>
+Interface for supplying data to a <a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView&lt;T&gt;</a> on demand as root level nodes
+are expanded by the user
+</section>
+      <h4><a class="xref" href="Terminal.Gui.ITreeNode.html">ITreeNode</a></h4>
+      <section>
+Interface to implement when you want the regular (non generic) <a class="xref" href="Terminal.Gui.TreeView.html">TreeView</a>
+to automatically determine children for your class (without having to specify 
+an <a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a>)
+</section>
+      <h4><a class="xref" href="Terminal.Gui.ITreeView.html">ITreeView</a></h4>
+      <section>
+Interface for all non generic members of <a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView&lt;T&gt;</a>
+</section>
     <h3 id="enums">Enums
   </h3>
       <h4><a class="xref" href="Terminal.Gui.Color.html">Color</a></h4>
@@ -426,6 +479,12 @@ Mouse flags reported in <a class="xref" href="Terminal.Gui.MouseEvent.html">Mous
       <h4><a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a></h4>
       <section>
 Text alignment enumeration, controls how text is displayed.
+</section>
+    <h3 id="delegates">Delegates
+  </h3>
+      <h4><a class="xref" href="Terminal.Gui.AspectGetterDelegate-1.html">AspectGetterDelegate&lt;T&gt;</a></h4>
+      <section>
+Delegates of this type are used to fetch string representations of user&apos;s model objects
 </section>
 </article>
           </div>
