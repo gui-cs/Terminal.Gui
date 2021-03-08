@@ -73,6 +73,8 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (),
 			};
 
+			treeViewFiles.ObjectActivated += TreeViewFiles_ObjectActivated;
+
 			SetupFileTree ();
 
 			Win.Add (treeViewFiles);
@@ -131,6 +133,29 @@ namespace UICatalog.Scenarios {
 			treeViewFiles.AspectGetter = FileSystemAspectGetter;
 
 			treeViewFiles.AddObjects (DriveInfo.GetDrives ().Select (d => d.RootDirectory));
+		}
+
+		private void TreeViewFiles_ObjectActivated (ObjectActivatedEventArgs<FileSystemInfo> obj)
+		{
+			if (obj.ActivatedObject is FileInfo f) {
+				System.Text.StringBuilder sb = new System.Text.StringBuilder ();
+				sb.AppendLine ($"Path:{f.DirectoryName}");
+				sb.AppendLine ($"Size:{f.Length:N0} bytes");
+				sb.AppendLine ($"Modified:{ f.LastWriteTime}");
+				sb.AppendLine ($"Created:{ f.CreationTime}");
+
+				MessageBox.Query (f.Name, sb.ToString (), "Close");
+			}
+
+			if (obj.ActivatedObject is DirectoryInfo dir) {
+
+				System.Text.StringBuilder sb = new System.Text.StringBuilder ();
+				sb.AppendLine ($"Path:{dir.Parent?.FullName}");
+				sb.AppendLine ($"Modified:{ dir.LastWriteTime}");
+				sb.AppendLine ($"Created:{ dir.CreationTime}");
+
+				MessageBox.Query (dir.Name, sb.ToString (), "Close");
+			}
 		}
 
 		private void ShowLines ()
