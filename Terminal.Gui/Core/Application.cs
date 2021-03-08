@@ -88,7 +88,6 @@ namespace Terminal.Gui {
 				}
 				if (Driver.HeightAsBuffer != value) {
 					Driver.HeightAsBuffer = value;
-					Driver.Refresh ();
 				}
 			}
 		}
