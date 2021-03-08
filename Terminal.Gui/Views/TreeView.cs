@@ -98,17 +98,17 @@ namespace Terminal.Gui {
 		/// <remarks>Only implement this method if you have a very fast way of determining whether 
 		/// an object can have children e.g. checking a Type (directories can always be expanded)
 		/// </remarks>
-		/// <param name="model"></param>
+		/// <param name="toExpand"></param>
 		/// <returns></returns>
-		bool CanExpand (T model);
+		bool CanExpand (T toExpand);
 
 		/// <summary>
-		/// Returns all children of a given <paramref name="model"/> which should be added to the 
+		/// Returns all children of a given <paramref name="forObject"/> which should be added to the 
 		/// tree as new branches underneath it
 		/// </summary>
-		/// <param name="model"></param>
+		/// <param name="forObject"></param>
 		/// <returns></returns>
-		IEnumerable<T> GetChildren (T model);
+		IEnumerable<T> GetChildren (T forObject);
 	}
 
 	/// <summary>
@@ -124,16 +124,16 @@ namespace Terminal.Gui {
 		/// returns results.  If you are implementing this method ensure you passed true in base 
 		/// constructor or set <see cref="SupportsCanExpand"/>
 		/// </summary>
-		/// <param name="model"></param>
+		/// <param name="toExpand"></param>
 		/// <returns></returns>
-		public virtual bool CanExpand (T model)
+		public virtual bool CanExpand (T toExpand)
 		{
 
-			return GetChildren (model).Any ();
+			return GetChildren (toExpand).Any ();
 		}
 
 		/// <inheritdoc/>
-		public abstract IEnumerable<T> GetChildren (T model);
+		public abstract IEnumerable<T> GetChildren (T forObject);
 
 		/// <summary>
 		/// Constructs base and initializes <see cref="SupportsCanExpand"/>
@@ -206,21 +206,21 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Returns whether a node can be expanded based on the delegate passed during construction
 		/// </summary>
-		/// <param name="model"></param>
+		/// <param name="toExpand"></param>
 		/// <returns></returns>
-		public override bool CanExpand (T model)
+		public override bool CanExpand (T toExpand)
 		{
-			return canExpand?.Invoke (model) ?? base.CanExpand (model);
+			return canExpand?.Invoke (toExpand) ?? base.CanExpand (toExpand);
 		}
 
 		/// <summary>
 		/// Returns children using the delegate method passed during construction
 		/// </summary>
-		/// <param name="model"></param>
+		/// <param name="forObject"></param>
 		/// <returns></returns>
-		public override IEnumerable<T> GetChildren (T model)
+		public override IEnumerable<T> GetChildren (T forObject)
 		{
-			return childGetter.Invoke (model);
+			return childGetter.Invoke (forObject);
 		}
 	}
 
@@ -820,8 +820,15 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
-			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
-				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp && me.Flags != MouseFlags.WheeledRight && me.Flags != MouseFlags.WheeledLeft) {
+			// If it is not an event we care about
+			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) &&
+				!me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
+				!me.Flags.HasFlag (MouseFlags.WheeledDown) &&
+				!me.Flags.HasFlag (MouseFlags.WheeledUp) &&
+				!me.Flags.HasFlag (MouseFlags.WheeledRight) &&
+				!me.Flags.HasFlag (MouseFlags.WheeledLeft)) {
+
+				// do nothing
 				return false;
 			}
 
@@ -977,11 +984,29 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Changes the selected object by a number of screen lines
+		/// Changes the <see cref="SelectedObject"/> to <paramref name="toSelect"/> and scrolls to ensure
+		/// it is visible.  Has no effect if <paramref name="toSelect"/> is not exposed in the tree (e.g. 
+		/// its parents are collapsed)
 		/// </summary>
-		/// <remarks>If nothing is currently selected the first root is selected.  If the selected
-		/// object is no longer in the tree the first object is selected</remarks>
-		/// <param name="offset"></param>
+		/// <param name="toSelect"></param>
+		public void GoTo(T toSelect)
+		{
+			if(ObjectToBranch(toSelect) == null) {
+				return;
+			}
+
+			SelectedObject = toSelect;
+			EnsureVisible(toSelect);
+			SetNeedsDisplay();
+		}
+
+		/// <summary>
+		/// The number of screen lines to move the currently selected object by.  Supports negative 
+		/// <paramref name="offset"/>.  Each branch occupies 1 line on screen
+		/// </summary>
+		/// <remarks>If nothing is currently selected or the selected object is no longer in the tree
+		/// then the first object in the tree is selected instead</remarks>
+		/// <param name="offset">Positive to move the selection down the screen, negative to move it up</param>
 		/// <param name="expandSelection">True to expand the selection (assuming 
 		/// <see cref="MultiSelect"/> is enabled).  False to replace</param>
 		public void AdjustSelection (int offset, bool expandSelection = false)
@@ -1775,7 +1800,7 @@ namespace Terminal.Gui {
 					//also if the user has this node selected (its disapearing) so lets change selection to us (the parent object) to be helpful
 					if (Equals (tree.SelectedObject, toRemove)) {
 						tree.SelectedObject = Model;
-					}	
+					}
 				}
 
 				// New children need to be added
@@ -1889,9 +1914,9 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Delegates of this type are used to fetch string representations of user's model objects
 	/// </summary>
-	/// <param name="model"></param>
+	/// <param name="toRender">The object that is being rendered</param>
 	/// <returns></returns>
-	public delegate string AspectGetterDelegate<T> (T model) where T : class;
+	public delegate string AspectGetterDelegate<T> (T toRender) where T : class;
 
 	/// <summary>
 	/// Event arguments describing a change in selected object in a tree view

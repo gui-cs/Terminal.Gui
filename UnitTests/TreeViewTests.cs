@@ -499,6 +499,33 @@ namespace UnitTests {
 
 
 		[Fact]
+		public void GoTo_OnlyAppliesToExposedObjects ()
+		{
+			var tree = CreateTree (out Factory f, out Car car1, out _);
+
+			// Make tree bounds 1 in height so that EnsureVisible always requires updating scroll offset
+			tree.Bounds = new Rect (0, 0, 50, 1);
+
+			Assert.Null (tree.SelectedObject);
+			Assert.Equal (0, tree.ScrollOffsetVertical);
+
+			// car 1 is not yet exposed
+			tree.GoTo (car1);
+
+			Assert.Null (tree.SelectedObject);
+			Assert.Equal (0, tree.ScrollOffsetVertical);
+
+			tree.Expand (f);
+
+			// Car1 is now exposed by expanding the factory
+			tree.GoTo (car1);
+
+			Assert.Equal (car1, tree.SelectedObject);
+			Assert.Equal (1, tree.ScrollOffsetVertical);
+		}
+
+
+		[Fact]
 		public void ObjectActivated_CustomKey ()
 		{
 			var tree = CreateTree (out Factory f, out Car car1, out _);
