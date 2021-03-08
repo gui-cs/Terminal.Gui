@@ -120,6 +120,14 @@ namespace Terminal.Gui {
 		public Key ObjectActivationKey { get; set; } = Key.Enter;
 
 		/// <summary>
+		/// Mouse event to trigger <see cref="TreeView{T}.ObjectActivated"/>.
+		/// Defaults to double click (<see cref="MouseFlags.Button1DoubleClicked"/>).
+		/// Set to null to disable this feature.
+		/// </summary>
+		/// <value></value>
+		public MouseFlags? ObjectActivationButton {get;set;} = MouseFlags.Button1DoubleClicked;
+
+		/// <summary>
 		/// Secondary selected regions of tree when <see cref="MultiSelect"/> is true
 		/// </summary>
 		private Stack<TreeSelection<T>> multiSelectedRegions = new Stack<TreeSelection<T>> ();
@@ -564,7 +572,7 @@ namespace Terminal.Gui {
 		{
 			// If it is not an event we care about
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) &&
-				!me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
+				!me.Flags.HasFlag (ObjectActivationButton ?? MouseFlags.Button1DoubleClicked) &&
 				!me.Flags.HasFlag (MouseFlags.WheeledDown) &&
 				!me.Flags.HasFlag (MouseFlags.WheeledUp) &&
 				!me.Flags.HasFlag (MouseFlags.WheeledRight) &&
@@ -607,17 +615,12 @@ namespace Terminal.Gui {
 
 			if (me.Flags.HasFlag (MouseFlags.Button1Clicked)) {
 
-				var map = BuildLineMap ();
-
-				var idx = me.Y + ScrollOffsetVertical;
-
-				// click is outside any visible nodes
-				if (idx < 0 || idx >= map.Count) {
+				// The line they clicked on a branch
+				var clickedBranch = HitTest(me.Y);
+				
+				if(clickedBranch == null){
 					return false;
 				}
-
-				// The line they clicked on
-				var clickedBranch = map.ElementAt (idx);
 
 				bool isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol (Driver, me.X);
 
@@ -651,7 +654,50 @@ namespace Terminal.Gui {
 				return true;
 			}
 
+			// If it is activation via mouse (e.g. double click)
+			if(ObjectActivationButton.HasValue && me.Flags.HasFlag(ObjectActivationButton.Value))
+			{
+				// The line they clicked on a branch
+				var clickedBranch = HitTest(me.Y);
+				
+				if(clickedBranch == null){
+					return false;
+				}
+
+				// Double click changes the selection to the clicked node as well as triggering
+				// activation otherwise it feels wierd
+				SelectedObject = clickedBranch.Model;
+				SetNeedsDisplay();
+
+				// trigger activation event				
+				OnObjectActivated(new ObjectActivatedEventArgs<T>(this,clickedBranch.Model));
+				
+				// mouse event is handled.
+				return true;
+			}
+
 			return false;
+		}
+
+		/// <summary>
+		/// Returns the branch at the given <paramref name="y"/> client
+		/// coordinate e.g. following a click event
+		/// </summary>
+		/// <param name="y">Client Y position in the controls bounds</param>
+		/// <returns>The clicked branch or null if outside of tree region</returns>
+		private Branch<T> HitTest (int y)
+		{
+			var map = BuildLineMap ();
+
+			var idx = y + ScrollOffsetVertical;
+
+			// click is outside any visible nodes
+			if (idx < 0 || idx >= map.Count) {
+				return null;
+			}
+
+			// The line they clicked on
+			return map.ElementAt (idx);
 		}
 
 		/// <summary>
