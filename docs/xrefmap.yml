@@ -342,6 +342,15 @@ references:
   commentId: F:Terminal.Gui.Application.UseSystemConsole
   fullName: Terminal.Gui.Application.UseSystemConsole
   nameWithType: Application.UseSystemConsole
+- uid: Terminal.Gui.AspectGetterDelegate`1
+  name: AspectGetterDelegate<T>
+  href: api/Terminal.Gui/Terminal.Gui.AspectGetterDelegate-1.html
+  commentId: T:Terminal.Gui.AspectGetterDelegate`1
+  name.vb: AspectGetterDelegate(Of T)
+  fullName: Terminal.Gui.AspectGetterDelegate<T>
+  fullName.vb: Terminal.Gui.AspectGetterDelegate(Of T)
+  nameWithType: AspectGetterDelegate<T>
+  nameWithType.vb: AspectGetterDelegate(Of T)
 - uid: Terminal.Gui.Attribute
   name: Attribute
   href: api/Terminal.Gui/Terminal.Gui.Attribute.html
@@ -2297,6 +2306,76 @@ references:
   fullName.vb: Terminal.Gui.DateTimeEventArgs(Of T).OldValue
   nameWithType: DateTimeEventArgs<T>.OldValue
   nameWithType.vb: DateTimeEventArgs(Of T).OldValue
+- uid: Terminal.Gui.DelegateTreeBuilder`1
+  name: DelegateTreeBuilder<T>
+  href: api/Terminal.Gui/Terminal.Gui.DelegateTreeBuilder-1.html
+  commentId: T:Terminal.Gui.DelegateTreeBuilder`1
+  name.vb: DelegateTreeBuilder(Of T)
+  fullName: Terminal.Gui.DelegateTreeBuilder<T>
+  fullName.vb: Terminal.Gui.DelegateTreeBuilder(Of T)
+  nameWithType: DelegateTreeBuilder<T>
+  nameWithType.vb: DelegateTreeBuilder(Of T)
+- uid: Terminal.Gui.DelegateTreeBuilder`1.#ctor(System.Func{`0,System.Collections.Generic.IEnumerable{`0}})
+  name: DelegateTreeBuilder(Func<T, IEnumerable<T>>)
+  href: api/Terminal.Gui/Terminal.Gui.DelegateTreeBuilder-1.html#Terminal_Gui_DelegateTreeBuilder_1__ctor_System_Func__0_System_Collections_Generic_IEnumerable__0___
+  commentId: M:Terminal.Gui.DelegateTreeBuilder`1.#ctor(System.Func{`0,System.Collections.Generic.IEnumerable{`0}})
+  name.vb: DelegateTreeBuilder(Func(Of T, IEnumerable(Of T)))
+  fullName: Terminal.Gui.DelegateTreeBuilder<T>.DelegateTreeBuilder(System.Func<T, System.Collections.Generic.IEnumerable<T>>)
+  fullName.vb: Terminal.Gui.DelegateTreeBuilder(Of T).DelegateTreeBuilder(System.Func(Of T, System.Collections.Generic.IEnumerable(Of T)))
+  nameWithType: DelegateTreeBuilder<T>.DelegateTreeBuilder(Func<T, IEnumerable<T>>)
+  nameWithType.vb: DelegateTreeBuilder(Of T).DelegateTreeBuilder(Func(Of T, IEnumerable(Of T)))
+- uid: Terminal.Gui.DelegateTreeBuilder`1.#ctor(System.Func{`0,System.Collections.Generic.IEnumerable{`0}},System.Func{`0,System.Boolean})
+  name: DelegateTreeBuilder(Func<T, IEnumerable<T>>, Func<T, Boolean>)
+  href: api/Terminal.Gui/Terminal.Gui.DelegateTreeBuilder-1.html#Terminal_Gui_DelegateTreeBuilder_1__ctor_System_Func__0_System_Collections_Generic_IEnumerable__0___System_Func__0_System_Boolean__
+  commentId: M:Terminal.Gui.DelegateTreeBuilder`1.#ctor(System.Func{`0,System.Collections.Generic.IEnumerable{`0}},System.Func{`0,System.Boolean})
+  name.vb: DelegateTreeBuilder(Func(Of T, IEnumerable(Of T)), Func(Of T, Boolean))
+  fullName: Terminal.Gui.DelegateTreeBuilder<T>.DelegateTreeBuilder(System.Func<T, System.Collections.Generic.IEnumerable<T>>, System.Func<T, System.Boolean>)
+  fullName.vb: Terminal.Gui.DelegateTreeBuilder(Of T).DelegateTreeBuilder(System.Func(Of T, System.Collections.Generic.IEnumerable(Of T)), System.Func(Of T, System.Boolean))
+  nameWithType: DelegateTreeBuilder<T>.DelegateTreeBuilder(Func<T, IEnumerable<T>>, Func<T, Boolean>)
+  nameWithType.vb: DelegateTreeBuilder(Of T).DelegateTreeBuilder(Func(Of T, IEnumerable(Of T)), Func(Of T, Boolean))
+- uid: Terminal.Gui.DelegateTreeBuilder`1.#ctor*
+  name: DelegateTreeBuilder
+  href: api/Terminal.Gui/Terminal.Gui.DelegateTreeBuilder-1.html#Terminal_Gui_DelegateTreeBuilder_1__ctor_
+  commentId: Overload:Terminal.Gui.DelegateTreeBuilder`1.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.DelegateTreeBuilder<T>.DelegateTreeBuilder
+  fullName.vb: Terminal.Gui.DelegateTreeBuilder(Of T).DelegateTreeBuilder
+  nameWithType: DelegateTreeBuilder<T>.DelegateTreeBuilder
+  nameWithType.vb: DelegateTreeBuilder(Of T).DelegateTreeBuilder
+- uid: Terminal.Gui.DelegateTreeBuilder`1.CanExpand(`0)
+  name: CanExpand(T)
+  href: api/Terminal.Gui/Terminal.Gui.DelegateTreeBuilder-1.html#Terminal_Gui_DelegateTreeBuilder_1_CanExpand__0_
+  commentId: M:Terminal.Gui.DelegateTreeBuilder`1.CanExpand(`0)
+  fullName: Terminal.Gui.DelegateTreeBuilder<T>.CanExpand(T)
+  fullName.vb: Terminal.Gui.DelegateTreeBuilder(Of T).CanExpand(T)
+  nameWithType: DelegateTreeBuilder<T>.CanExpand(T)
+  nameWithType.vb: DelegateTreeBuilder(Of T).CanExpand(T)
+- uid: Terminal.Gui.DelegateTreeBuilder`1.CanExpand*
+  name: CanExpand
+  href: api/Terminal.Gui/Terminal.Gui.DelegateTreeBuilder-1.html#Terminal_Gui_DelegateTreeBuilder_1_CanExpand_
+  commentId: Overload:Terminal.Gui.DelegateTreeBuilder`1.CanExpand
+  isSpec: "True"
+  fullName: Terminal.Gui.DelegateTreeBuilder<T>.CanExpand
+  fullName.vb: Terminal.Gui.DelegateTreeBuilder(Of T).CanExpand
+  nameWithType: DelegateTreeBuilder<T>.CanExpand
+  nameWithType.vb: DelegateTreeBuilder(Of T).CanExpand
+- uid: Terminal.Gui.DelegateTreeBuilder`1.GetChildren(`0)
+  name: GetChildren(T)
+  href: api/Terminal.Gui/Terminal.Gui.DelegateTreeBuilder-1.html#Terminal_Gui_DelegateTreeBuilder_1_GetChildren__0_
+  commentId: M:Terminal.Gui.DelegateTreeBuilder`1.GetChildren(`0)
+  fullName: Terminal.Gui.DelegateTreeBuilder<T>.GetChildren(T)
+  fullName.vb: Terminal.Gui.DelegateTreeBuilder(Of T).GetChildren(T)
+  nameWithType: DelegateTreeBuilder<T>.GetChildren(T)
+  nameWithType.vb: DelegateTreeBuilder(Of T).GetChildren(T)
+- uid: Terminal.Gui.DelegateTreeBuilder`1.GetChildren*
+  name: GetChildren
+  href: api/Terminal.Gui/Terminal.Gui.DelegateTreeBuilder-1.html#Terminal_Gui_DelegateTreeBuilder_1_GetChildren_
+  commentId: Overload:Terminal.Gui.DelegateTreeBuilder`1.GetChildren
+  isSpec: "True"
+  fullName: Terminal.Gui.DelegateTreeBuilder<T>.GetChildren
+  fullName.vb: Terminal.Gui.DelegateTreeBuilder(Of T).GetChildren
+  nameWithType: DelegateTreeBuilder<T>.GetChildren
+  nameWithType.vb: DelegateTreeBuilder(Of T).GetChildren
 - uid: Terminal.Gui.Dialog
   name: Dialog
   href: api/Terminal.Gui/Terminal.Gui.Dialog.html
@@ -4455,6 +4534,156 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.IMainLoopDriver.Wakeup
   nameWithType: IMainLoopDriver.Wakeup
+- uid: Terminal.Gui.ITreeBuilder`1
+  name: ITreeBuilder<T>
+  href: api/Terminal.Gui/Terminal.Gui.ITreeBuilder-1.html
+  commentId: T:Terminal.Gui.ITreeBuilder`1
+  name.vb: ITreeBuilder(Of T)
+  fullName: Terminal.Gui.ITreeBuilder<T>
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T)
+  nameWithType: ITreeBuilder<T>
+  nameWithType.vb: ITreeBuilder(Of T)
+- uid: Terminal.Gui.ITreeBuilder`1.CanExpand(`0)
+  name: CanExpand(T)
+  href: api/Terminal.Gui/Terminal.Gui.ITreeBuilder-1.html#Terminal_Gui_ITreeBuilder_1_CanExpand__0_
+  commentId: M:Terminal.Gui.ITreeBuilder`1.CanExpand(`0)
+  fullName: Terminal.Gui.ITreeBuilder<T>.CanExpand(T)
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T).CanExpand(T)
+  nameWithType: ITreeBuilder<T>.CanExpand(T)
+  nameWithType.vb: ITreeBuilder(Of T).CanExpand(T)
+- uid: Terminal.Gui.ITreeBuilder`1.CanExpand*
+  name: CanExpand
+  href: api/Terminal.Gui/Terminal.Gui.ITreeBuilder-1.html#Terminal_Gui_ITreeBuilder_1_CanExpand_
+  commentId: Overload:Terminal.Gui.ITreeBuilder`1.CanExpand
+  isSpec: "True"
+  fullName: Terminal.Gui.ITreeBuilder<T>.CanExpand
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T).CanExpand
+  nameWithType: ITreeBuilder<T>.CanExpand
+  nameWithType.vb: ITreeBuilder(Of T).CanExpand
+- uid: Terminal.Gui.ITreeBuilder`1.GetChildren(`0)
+  name: GetChildren(T)
+  href: api/Terminal.Gui/Terminal.Gui.ITreeBuilder-1.html#Terminal_Gui_ITreeBuilder_1_GetChildren__0_
+  commentId: M:Terminal.Gui.ITreeBuilder`1.GetChildren(`0)
+  fullName: Terminal.Gui.ITreeBuilder<T>.GetChildren(T)
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T).GetChildren(T)
+  nameWithType: ITreeBuilder<T>.GetChildren(T)
+  nameWithType.vb: ITreeBuilder(Of T).GetChildren(T)
+- uid: Terminal.Gui.ITreeBuilder`1.GetChildren*
+  name: GetChildren
+  href: api/Terminal.Gui/Terminal.Gui.ITreeBuilder-1.html#Terminal_Gui_ITreeBuilder_1_GetChildren_
+  commentId: Overload:Terminal.Gui.ITreeBuilder`1.GetChildren
+  isSpec: "True"
+  fullName: Terminal.Gui.ITreeBuilder<T>.GetChildren
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T).GetChildren
+  nameWithType: ITreeBuilder<T>.GetChildren
+  nameWithType.vb: ITreeBuilder(Of T).GetChildren
+- uid: Terminal.Gui.ITreeBuilder`1.SupportsCanExpand
+  name: SupportsCanExpand
+  href: api/Terminal.Gui/Terminal.Gui.ITreeBuilder-1.html#Terminal_Gui_ITreeBuilder_1_SupportsCanExpand
+  commentId: P:Terminal.Gui.ITreeBuilder`1.SupportsCanExpand
+  fullName: Terminal.Gui.ITreeBuilder<T>.SupportsCanExpand
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T).SupportsCanExpand
+  nameWithType: ITreeBuilder<T>.SupportsCanExpand
+  nameWithType.vb: ITreeBuilder(Of T).SupportsCanExpand
+- uid: Terminal.Gui.ITreeBuilder`1.SupportsCanExpand*
+  name: SupportsCanExpand
+  href: api/Terminal.Gui/Terminal.Gui.ITreeBuilder-1.html#Terminal_Gui_ITreeBuilder_1_SupportsCanExpand_
+  commentId: Overload:Terminal.Gui.ITreeBuilder`1.SupportsCanExpand
+  isSpec: "True"
+  fullName: Terminal.Gui.ITreeBuilder<T>.SupportsCanExpand
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T).SupportsCanExpand
+  nameWithType: ITreeBuilder<T>.SupportsCanExpand
+  nameWithType.vb: ITreeBuilder(Of T).SupportsCanExpand
+- uid: Terminal.Gui.ITreeNode
+  name: ITreeNode
+  href: api/Terminal.Gui/Terminal.Gui.ITreeNode.html
+  commentId: T:Terminal.Gui.ITreeNode
+  fullName: Terminal.Gui.ITreeNode
+  nameWithType: ITreeNode
+- uid: Terminal.Gui.ITreeNode.Children
+  name: Children
+  href: api/Terminal.Gui/Terminal.Gui.ITreeNode.html#Terminal_Gui_ITreeNode_Children
+  commentId: P:Terminal.Gui.ITreeNode.Children
+  fullName: Terminal.Gui.ITreeNode.Children
+  nameWithType: ITreeNode.Children
+- uid: Terminal.Gui.ITreeNode.Children*
+  name: Children
+  href: api/Terminal.Gui/Terminal.Gui.ITreeNode.html#Terminal_Gui_ITreeNode_Children_
+  commentId: Overload:Terminal.Gui.ITreeNode.Children
+  isSpec: "True"
+  fullName: Terminal.Gui.ITreeNode.Children
+  nameWithType: ITreeNode.Children
+- uid: Terminal.Gui.ITreeNode.Tag
+  name: Tag
+  href: api/Terminal.Gui/Terminal.Gui.ITreeNode.html#Terminal_Gui_ITreeNode_Tag
+  commentId: P:Terminal.Gui.ITreeNode.Tag
+  fullName: Terminal.Gui.ITreeNode.Tag
+  nameWithType: ITreeNode.Tag
+- uid: Terminal.Gui.ITreeNode.Tag*
+  name: Tag
+  href: api/Terminal.Gui/Terminal.Gui.ITreeNode.html#Terminal_Gui_ITreeNode_Tag_
+  commentId: Overload:Terminal.Gui.ITreeNode.Tag
+  isSpec: "True"
+  fullName: Terminal.Gui.ITreeNode.Tag
+  nameWithType: ITreeNode.Tag
+- uid: Terminal.Gui.ITreeNode.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.ITreeNode.html#Terminal_Gui_ITreeNode_Text
+  commentId: P:Terminal.Gui.ITreeNode.Text
+  fullName: Terminal.Gui.ITreeNode.Text
+  nameWithType: ITreeNode.Text
+- uid: Terminal.Gui.ITreeNode.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.ITreeNode.html#Terminal_Gui_ITreeNode_Text_
+  commentId: Overload:Terminal.Gui.ITreeNode.Text
+  isSpec: "True"
+  fullName: Terminal.Gui.ITreeNode.Text
+  nameWithType: ITreeNode.Text
+- uid: Terminal.Gui.ITreeView
+  name: ITreeView
+  href: api/Terminal.Gui/Terminal.Gui.ITreeView.html
+  commentId: T:Terminal.Gui.ITreeView
+  fullName: Terminal.Gui.ITreeView
+  nameWithType: ITreeView
+- uid: Terminal.Gui.ITreeView.ClearObjects
+  name: ClearObjects()
+  href: api/Terminal.Gui/Terminal.Gui.ITreeView.html#Terminal_Gui_ITreeView_ClearObjects
+  commentId: M:Terminal.Gui.ITreeView.ClearObjects
+  fullName: Terminal.Gui.ITreeView.ClearObjects()
+  nameWithType: ITreeView.ClearObjects()
+- uid: Terminal.Gui.ITreeView.ClearObjects*
+  name: ClearObjects
+  href: api/Terminal.Gui/Terminal.Gui.ITreeView.html#Terminal_Gui_ITreeView_ClearObjects_
+  commentId: Overload:Terminal.Gui.ITreeView.ClearObjects
+  isSpec: "True"
+  fullName: Terminal.Gui.ITreeView.ClearObjects
+  nameWithType: ITreeView.ClearObjects
+- uid: Terminal.Gui.ITreeView.SetNeedsDisplay
+  name: SetNeedsDisplay()
+  href: api/Terminal.Gui/Terminal.Gui.ITreeView.html#Terminal_Gui_ITreeView_SetNeedsDisplay
+  commentId: M:Terminal.Gui.ITreeView.SetNeedsDisplay
+  fullName: Terminal.Gui.ITreeView.SetNeedsDisplay()
+  nameWithType: ITreeView.SetNeedsDisplay()
+- uid: Terminal.Gui.ITreeView.SetNeedsDisplay*
+  name: SetNeedsDisplay
+  href: api/Terminal.Gui/Terminal.Gui.ITreeView.html#Terminal_Gui_ITreeView_SetNeedsDisplay_
+  commentId: Overload:Terminal.Gui.ITreeView.SetNeedsDisplay
+  isSpec: "True"
+  fullName: Terminal.Gui.ITreeView.SetNeedsDisplay
+  nameWithType: ITreeView.SetNeedsDisplay
+- uid: Terminal.Gui.ITreeView.Style
+  name: Style
+  href: api/Terminal.Gui/Terminal.Gui.ITreeView.html#Terminal_Gui_ITreeView_Style
+  commentId: P:Terminal.Gui.ITreeView.Style
+  fullName: Terminal.Gui.ITreeView.Style
+  nameWithType: ITreeView.Style
+- uid: Terminal.Gui.ITreeView.Style*
+  name: Style
+  href: api/Terminal.Gui/Terminal.Gui.ITreeView.html#Terminal_Gui_ITreeView_Style_
+  commentId: Overload:Terminal.Gui.ITreeView.Style
+  isSpec: "True"
+  fullName: Terminal.Gui.ITreeView.Style
+  nameWithType: ITreeView.Style
 - uid: Terminal.Gui.Key
   name: Key
   href: api/Terminal.Gui/Terminal.Gui.Key.html
@@ -6794,6 +7023,67 @@ references:
   commentId: F:Terminal.Gui.MouseFlags.WheeledUp
   fullName: Terminal.Gui.MouseFlags.WheeledUp
   nameWithType: MouseFlags.WheeledUp
+- uid: Terminal.Gui.ObjectActivatedEventArgs`1
+  name: ObjectActivatedEventArgs<T>
+  href: api/Terminal.Gui/Terminal.Gui.ObjectActivatedEventArgs-1.html
+  commentId: T:Terminal.Gui.ObjectActivatedEventArgs`1
+  name.vb: ObjectActivatedEventArgs(Of T)
+  fullName: Terminal.Gui.ObjectActivatedEventArgs<T>
+  fullName.vb: Terminal.Gui.ObjectActivatedEventArgs(Of T)
+  nameWithType: ObjectActivatedEventArgs<T>
+  nameWithType.vb: ObjectActivatedEventArgs(Of T)
+- uid: Terminal.Gui.ObjectActivatedEventArgs`1.#ctor(Terminal.Gui.TreeView{`0},`0)
+  name: ObjectActivatedEventArgs(TreeView<T>, T)
+  href: api/Terminal.Gui/Terminal.Gui.ObjectActivatedEventArgs-1.html#Terminal_Gui_ObjectActivatedEventArgs_1__ctor_Terminal_Gui_TreeView__0___0_
+  commentId: M:Terminal.Gui.ObjectActivatedEventArgs`1.#ctor(Terminal.Gui.TreeView{`0},`0)
+  name.vb: ObjectActivatedEventArgs(TreeView(Of T), T)
+  fullName: Terminal.Gui.ObjectActivatedEventArgs<T>.ObjectActivatedEventArgs(Terminal.Gui.TreeView<T>, T)
+  fullName.vb: Terminal.Gui.ObjectActivatedEventArgs(Of T).ObjectActivatedEventArgs(Terminal.Gui.TreeView(Of T), T)
+  nameWithType: ObjectActivatedEventArgs<T>.ObjectActivatedEventArgs(TreeView<T>, T)
+  nameWithType.vb: ObjectActivatedEventArgs(Of T).ObjectActivatedEventArgs(TreeView(Of T), T)
+- uid: Terminal.Gui.ObjectActivatedEventArgs`1.#ctor*
+  name: ObjectActivatedEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.ObjectActivatedEventArgs-1.html#Terminal_Gui_ObjectActivatedEventArgs_1__ctor_
+  commentId: Overload:Terminal.Gui.ObjectActivatedEventArgs`1.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.ObjectActivatedEventArgs<T>.ObjectActivatedEventArgs
+  fullName.vb: Terminal.Gui.ObjectActivatedEventArgs(Of T).ObjectActivatedEventArgs
+  nameWithType: ObjectActivatedEventArgs<T>.ObjectActivatedEventArgs
+  nameWithType.vb: ObjectActivatedEventArgs(Of T).ObjectActivatedEventArgs
+- uid: Terminal.Gui.ObjectActivatedEventArgs`1.ActivatedObject
+  name: ActivatedObject
+  href: api/Terminal.Gui/Terminal.Gui.ObjectActivatedEventArgs-1.html#Terminal_Gui_ObjectActivatedEventArgs_1_ActivatedObject
+  commentId: P:Terminal.Gui.ObjectActivatedEventArgs`1.ActivatedObject
+  fullName: Terminal.Gui.ObjectActivatedEventArgs<T>.ActivatedObject
+  fullName.vb: Terminal.Gui.ObjectActivatedEventArgs(Of T).ActivatedObject
+  nameWithType: ObjectActivatedEventArgs<T>.ActivatedObject
+  nameWithType.vb: ObjectActivatedEventArgs(Of T).ActivatedObject
+- uid: Terminal.Gui.ObjectActivatedEventArgs`1.ActivatedObject*
+  name: ActivatedObject
+  href: api/Terminal.Gui/Terminal.Gui.ObjectActivatedEventArgs-1.html#Terminal_Gui_ObjectActivatedEventArgs_1_ActivatedObject_
+  commentId: Overload:Terminal.Gui.ObjectActivatedEventArgs`1.ActivatedObject
+  isSpec: "True"
+  fullName: Terminal.Gui.ObjectActivatedEventArgs<T>.ActivatedObject
+  fullName.vb: Terminal.Gui.ObjectActivatedEventArgs(Of T).ActivatedObject
+  nameWithType: ObjectActivatedEventArgs<T>.ActivatedObject
+  nameWithType.vb: ObjectActivatedEventArgs(Of T).ActivatedObject
+- uid: Terminal.Gui.ObjectActivatedEventArgs`1.Tree
+  name: Tree
+  href: api/Terminal.Gui/Terminal.Gui.ObjectActivatedEventArgs-1.html#Terminal_Gui_ObjectActivatedEventArgs_1_Tree
+  commentId: P:Terminal.Gui.ObjectActivatedEventArgs`1.Tree
+  fullName: Terminal.Gui.ObjectActivatedEventArgs<T>.Tree
+  fullName.vb: Terminal.Gui.ObjectActivatedEventArgs(Of T).Tree
+  nameWithType: ObjectActivatedEventArgs<T>.Tree
+  nameWithType.vb: ObjectActivatedEventArgs(Of T).Tree
+- uid: Terminal.Gui.ObjectActivatedEventArgs`1.Tree*
+  name: Tree
+  href: api/Terminal.Gui/Terminal.Gui.ObjectActivatedEventArgs-1.html#Terminal_Gui_ObjectActivatedEventArgs_1_Tree_
+  commentId: Overload:Terminal.Gui.ObjectActivatedEventArgs`1.Tree
+  isSpec: "True"
+  fullName: Terminal.Gui.ObjectActivatedEventArgs<T>.Tree
+  fullName.vb: Terminal.Gui.ObjectActivatedEventArgs(Of T).Tree
+  nameWithType: ObjectActivatedEventArgs<T>.Tree
+  nameWithType.vb: ObjectActivatedEventArgs(Of T).Tree
 - uid: Terminal.Gui.OpenDialog
   name: OpenDialog
   href: api/Terminal.Gui/Terminal.Gui.OpenDialog.html
@@ -8725,6 +9015,84 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.SelectedCellChangedEventArgs.Table
   nameWithType: SelectedCellChangedEventArgs.Table
+- uid: Terminal.Gui.SelectionChangedEventArgs`1
+  name: SelectionChangedEventArgs<T>
+  href: api/Terminal.Gui/Terminal.Gui.SelectionChangedEventArgs-1.html
+  commentId: T:Terminal.Gui.SelectionChangedEventArgs`1
+  name.vb: SelectionChangedEventArgs(Of T)
+  fullName: Terminal.Gui.SelectionChangedEventArgs<T>
+  fullName.vb: Terminal.Gui.SelectionChangedEventArgs(Of T)
+  nameWithType: SelectionChangedEventArgs<T>
+  nameWithType.vb: SelectionChangedEventArgs(Of T)
+- uid: Terminal.Gui.SelectionChangedEventArgs`1.#ctor(Terminal.Gui.TreeView{`0},`0,`0)
+  name: SelectionChangedEventArgs(TreeView<T>, T, T)
+  href: api/Terminal.Gui/Terminal.Gui.SelectionChangedEventArgs-1.html#Terminal_Gui_SelectionChangedEventArgs_1__ctor_Terminal_Gui_TreeView__0___0__0_
+  commentId: M:Terminal.Gui.SelectionChangedEventArgs`1.#ctor(Terminal.Gui.TreeView{`0},`0,`0)
+  name.vb: SelectionChangedEventArgs(TreeView(Of T), T, T)
+  fullName: Terminal.Gui.SelectionChangedEventArgs<T>.SelectionChangedEventArgs(Terminal.Gui.TreeView<T>, T, T)
+  fullName.vb: Terminal.Gui.SelectionChangedEventArgs(Of T).SelectionChangedEventArgs(Terminal.Gui.TreeView(Of T), T, T)
+  nameWithType: SelectionChangedEventArgs<T>.SelectionChangedEventArgs(TreeView<T>, T, T)
+  nameWithType.vb: SelectionChangedEventArgs(Of T).SelectionChangedEventArgs(TreeView(Of T), T, T)
+- uid: Terminal.Gui.SelectionChangedEventArgs`1.#ctor*
+  name: SelectionChangedEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.SelectionChangedEventArgs-1.html#Terminal_Gui_SelectionChangedEventArgs_1__ctor_
+  commentId: Overload:Terminal.Gui.SelectionChangedEventArgs`1.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.SelectionChangedEventArgs<T>.SelectionChangedEventArgs
+  fullName.vb: Terminal.Gui.SelectionChangedEventArgs(Of T).SelectionChangedEventArgs
+  nameWithType: SelectionChangedEventArgs<T>.SelectionChangedEventArgs
+  nameWithType.vb: SelectionChangedEventArgs(Of T).SelectionChangedEventArgs
+- uid: Terminal.Gui.SelectionChangedEventArgs`1.NewValue
+  name: NewValue
+  href: api/Terminal.Gui/Terminal.Gui.SelectionChangedEventArgs-1.html#Terminal_Gui_SelectionChangedEventArgs_1_NewValue
+  commentId: P:Terminal.Gui.SelectionChangedEventArgs`1.NewValue
+  fullName: Terminal.Gui.SelectionChangedEventArgs<T>.NewValue
+  fullName.vb: Terminal.Gui.SelectionChangedEventArgs(Of T).NewValue
+  nameWithType: SelectionChangedEventArgs<T>.NewValue
+  nameWithType.vb: SelectionChangedEventArgs(Of T).NewValue
+- uid: Terminal.Gui.SelectionChangedEventArgs`1.NewValue*
+  name: NewValue
+  href: api/Terminal.Gui/Terminal.Gui.SelectionChangedEventArgs-1.html#Terminal_Gui_SelectionChangedEventArgs_1_NewValue_
+  commentId: Overload:Terminal.Gui.SelectionChangedEventArgs`1.NewValue
+  isSpec: "True"
+  fullName: Terminal.Gui.SelectionChangedEventArgs<T>.NewValue
+  fullName.vb: Terminal.Gui.SelectionChangedEventArgs(Of T).NewValue
+  nameWithType: SelectionChangedEventArgs<T>.NewValue
+  nameWithType.vb: SelectionChangedEventArgs(Of T).NewValue
+- uid: Terminal.Gui.SelectionChangedEventArgs`1.OldValue
+  name: OldValue
+  href: api/Terminal.Gui/Terminal.Gui.SelectionChangedEventArgs-1.html#Terminal_Gui_SelectionChangedEventArgs_1_OldValue
+  commentId: P:Terminal.Gui.SelectionChangedEventArgs`1.OldValue
+  fullName: Terminal.Gui.SelectionChangedEventArgs<T>.OldValue
+  fullName.vb: Terminal.Gui.SelectionChangedEventArgs(Of T).OldValue
+  nameWithType: SelectionChangedEventArgs<T>.OldValue
+  nameWithType.vb: SelectionChangedEventArgs(Of T).OldValue
+- uid: Terminal.Gui.SelectionChangedEventArgs`1.OldValue*
+  name: OldValue
+  href: api/Terminal.Gui/Terminal.Gui.SelectionChangedEventArgs-1.html#Terminal_Gui_SelectionChangedEventArgs_1_OldValue_
+  commentId: Overload:Terminal.Gui.SelectionChangedEventArgs`1.OldValue
+  isSpec: "True"
+  fullName: Terminal.Gui.SelectionChangedEventArgs<T>.OldValue
+  fullName.vb: Terminal.Gui.SelectionChangedEventArgs(Of T).OldValue
+  nameWithType: SelectionChangedEventArgs<T>.OldValue
+  nameWithType.vb: SelectionChangedEventArgs(Of T).OldValue
+- uid: Terminal.Gui.SelectionChangedEventArgs`1.Tree
+  name: Tree
+  href: api/Terminal.Gui/Terminal.Gui.SelectionChangedEventArgs-1.html#Terminal_Gui_SelectionChangedEventArgs_1_Tree
+  commentId: P:Terminal.Gui.SelectionChangedEventArgs`1.Tree
+  fullName: Terminal.Gui.SelectionChangedEventArgs<T>.Tree
+  fullName.vb: Terminal.Gui.SelectionChangedEventArgs(Of T).Tree
+  nameWithType: SelectionChangedEventArgs<T>.Tree
+  nameWithType.vb: SelectionChangedEventArgs(Of T).Tree
+- uid: Terminal.Gui.SelectionChangedEventArgs`1.Tree*
+  name: Tree
+  href: api/Terminal.Gui/Terminal.Gui.SelectionChangedEventArgs-1.html#Terminal_Gui_SelectionChangedEventArgs_1_Tree_
+  commentId: Overload:Terminal.Gui.SelectionChangedEventArgs`1.Tree
+  isSpec: "True"
+  fullName: Terminal.Gui.SelectionChangedEventArgs<T>.Tree
+  fullName.vb: Terminal.Gui.SelectionChangedEventArgs(Of T).Tree
+  nameWithType: SelectionChangedEventArgs<T>.Tree
+  nameWithType.vb: SelectionChangedEventArgs(Of T).Tree
 - uid: Terminal.Gui.ShortcutHelper
   name: ShortcutHelper
   href: api/Terminal.Gui/Terminal.Gui.ShortcutHelper.html
@@ -11187,6 +11555,1155 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Toplevel.WillPresent
   nameWithType: Toplevel.WillPresent
+- uid: Terminal.Gui.TreeBuilder`1
+  name: TreeBuilder<T>
+  href: api/Terminal.Gui/Terminal.Gui.TreeBuilder-1.html
+  commentId: T:Terminal.Gui.TreeBuilder`1
+  name.vb: TreeBuilder(Of T)
+  fullName: Terminal.Gui.TreeBuilder<T>
+  fullName.vb: Terminal.Gui.TreeBuilder(Of T)
+  nameWithType: TreeBuilder<T>
+  nameWithType.vb: TreeBuilder(Of T)
+- uid: Terminal.Gui.TreeBuilder`1.#ctor(System.Boolean)
+  name: TreeBuilder(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TreeBuilder-1.html#Terminal_Gui_TreeBuilder_1__ctor_System_Boolean_
+  commentId: M:Terminal.Gui.TreeBuilder`1.#ctor(System.Boolean)
+  fullName: Terminal.Gui.TreeBuilder<T>.TreeBuilder(System.Boolean)
+  fullName.vb: Terminal.Gui.TreeBuilder(Of T).TreeBuilder(System.Boolean)
+  nameWithType: TreeBuilder<T>.TreeBuilder(Boolean)
+  nameWithType.vb: TreeBuilder(Of T).TreeBuilder(Boolean)
+- uid: Terminal.Gui.TreeBuilder`1.#ctor*
+  name: TreeBuilder
+  href: api/Terminal.Gui/Terminal.Gui.TreeBuilder-1.html#Terminal_Gui_TreeBuilder_1__ctor_
+  commentId: Overload:Terminal.Gui.TreeBuilder`1.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeBuilder<T>.TreeBuilder
+  fullName.vb: Terminal.Gui.TreeBuilder(Of T).TreeBuilder
+  nameWithType: TreeBuilder<T>.TreeBuilder
+  nameWithType.vb: TreeBuilder(Of T).TreeBuilder
+- uid: Terminal.Gui.TreeBuilder`1.CanExpand(`0)
+  name: CanExpand(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeBuilder-1.html#Terminal_Gui_TreeBuilder_1_CanExpand__0_
+  commentId: M:Terminal.Gui.TreeBuilder`1.CanExpand(`0)
+  fullName: Terminal.Gui.TreeBuilder<T>.CanExpand(T)
+  fullName.vb: Terminal.Gui.TreeBuilder(Of T).CanExpand(T)
+  nameWithType: TreeBuilder<T>.CanExpand(T)
+  nameWithType.vb: TreeBuilder(Of T).CanExpand(T)
+- uid: Terminal.Gui.TreeBuilder`1.CanExpand*
+  name: CanExpand
+  href: api/Terminal.Gui/Terminal.Gui.TreeBuilder-1.html#Terminal_Gui_TreeBuilder_1_CanExpand_
+  commentId: Overload:Terminal.Gui.TreeBuilder`1.CanExpand
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeBuilder<T>.CanExpand
+  fullName.vb: Terminal.Gui.TreeBuilder(Of T).CanExpand
+  nameWithType: TreeBuilder<T>.CanExpand
+  nameWithType.vb: TreeBuilder(Of T).CanExpand
+- uid: Terminal.Gui.TreeBuilder`1.GetChildren(`0)
+  name: GetChildren(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeBuilder-1.html#Terminal_Gui_TreeBuilder_1_GetChildren__0_
+  commentId: M:Terminal.Gui.TreeBuilder`1.GetChildren(`0)
+  fullName: Terminal.Gui.TreeBuilder<T>.GetChildren(T)
+  fullName.vb: Terminal.Gui.TreeBuilder(Of T).GetChildren(T)
+  nameWithType: TreeBuilder<T>.GetChildren(T)
+  nameWithType.vb: TreeBuilder(Of T).GetChildren(T)
+- uid: Terminal.Gui.TreeBuilder`1.GetChildren*
+  name: GetChildren
+  href: api/Terminal.Gui/Terminal.Gui.TreeBuilder-1.html#Terminal_Gui_TreeBuilder_1_GetChildren_
+  commentId: Overload:Terminal.Gui.TreeBuilder`1.GetChildren
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeBuilder<T>.GetChildren
+  fullName.vb: Terminal.Gui.TreeBuilder(Of T).GetChildren
+  nameWithType: TreeBuilder<T>.GetChildren
+  nameWithType.vb: TreeBuilder(Of T).GetChildren
+- uid: Terminal.Gui.TreeBuilder`1.SupportsCanExpand
+  name: SupportsCanExpand
+  href: api/Terminal.Gui/Terminal.Gui.TreeBuilder-1.html#Terminal_Gui_TreeBuilder_1_SupportsCanExpand
+  commentId: P:Terminal.Gui.TreeBuilder`1.SupportsCanExpand
+  fullName: Terminal.Gui.TreeBuilder<T>.SupportsCanExpand
+  fullName.vb: Terminal.Gui.TreeBuilder(Of T).SupportsCanExpand
+  nameWithType: TreeBuilder<T>.SupportsCanExpand
+  nameWithType.vb: TreeBuilder(Of T).SupportsCanExpand
+- uid: Terminal.Gui.TreeBuilder`1.SupportsCanExpand*
+  name: SupportsCanExpand
+  href: api/Terminal.Gui/Terminal.Gui.TreeBuilder-1.html#Terminal_Gui_TreeBuilder_1_SupportsCanExpand_
+  commentId: Overload:Terminal.Gui.TreeBuilder`1.SupportsCanExpand
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeBuilder<T>.SupportsCanExpand
+  fullName.vb: Terminal.Gui.TreeBuilder(Of T).SupportsCanExpand
+  nameWithType: TreeBuilder<T>.SupportsCanExpand
+  nameWithType.vb: TreeBuilder(Of T).SupportsCanExpand
+- uid: Terminal.Gui.TreeNode
+  name: TreeNode
+  href: api/Terminal.Gui/Terminal.Gui.TreeNode.html
+  commentId: T:Terminal.Gui.TreeNode
+  fullName: Terminal.Gui.TreeNode
+  nameWithType: TreeNode
+- uid: Terminal.Gui.TreeNode.#ctor
+  name: TreeNode()
+  href: api/Terminal.Gui/Terminal.Gui.TreeNode.html#Terminal_Gui_TreeNode__ctor
+  commentId: M:Terminal.Gui.TreeNode.#ctor
+  fullName: Terminal.Gui.TreeNode.TreeNode()
+  nameWithType: TreeNode.TreeNode()
+- uid: Terminal.Gui.TreeNode.#ctor(System.String)
+  name: TreeNode(String)
+  href: api/Terminal.Gui/Terminal.Gui.TreeNode.html#Terminal_Gui_TreeNode__ctor_System_String_
+  commentId: M:Terminal.Gui.TreeNode.#ctor(System.String)
+  fullName: Terminal.Gui.TreeNode.TreeNode(System.String)
+  nameWithType: TreeNode.TreeNode(String)
+- uid: Terminal.Gui.TreeNode.#ctor*
+  name: TreeNode
+  href: api/Terminal.Gui/Terminal.Gui.TreeNode.html#Terminal_Gui_TreeNode__ctor_
+  commentId: Overload:Terminal.Gui.TreeNode.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeNode.TreeNode
+  nameWithType: TreeNode.TreeNode
+- uid: Terminal.Gui.TreeNode.Children
+  name: Children
+  href: api/Terminal.Gui/Terminal.Gui.TreeNode.html#Terminal_Gui_TreeNode_Children
+  commentId: P:Terminal.Gui.TreeNode.Children
+  fullName: Terminal.Gui.TreeNode.Children
+  nameWithType: TreeNode.Children
+- uid: Terminal.Gui.TreeNode.Children*
+  name: Children
+  href: api/Terminal.Gui/Terminal.Gui.TreeNode.html#Terminal_Gui_TreeNode_Children_
+  commentId: Overload:Terminal.Gui.TreeNode.Children
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeNode.Children
+  nameWithType: TreeNode.Children
+- uid: Terminal.Gui.TreeNode.Tag
+  name: Tag
+  href: api/Terminal.Gui/Terminal.Gui.TreeNode.html#Terminal_Gui_TreeNode_Tag
+  commentId: P:Terminal.Gui.TreeNode.Tag
+  fullName: Terminal.Gui.TreeNode.Tag
+  nameWithType: TreeNode.Tag
+- uid: Terminal.Gui.TreeNode.Tag*
+  name: Tag
+  href: api/Terminal.Gui/Terminal.Gui.TreeNode.html#Terminal_Gui_TreeNode_Tag_
+  commentId: Overload:Terminal.Gui.TreeNode.Tag
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeNode.Tag
+  nameWithType: TreeNode.Tag
+- uid: Terminal.Gui.TreeNode.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.TreeNode.html#Terminal_Gui_TreeNode_Text
+  commentId: P:Terminal.Gui.TreeNode.Text
+  fullName: Terminal.Gui.TreeNode.Text
+  nameWithType: TreeNode.Text
+- uid: Terminal.Gui.TreeNode.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.TreeNode.html#Terminal_Gui_TreeNode_Text_
+  commentId: Overload:Terminal.Gui.TreeNode.Text
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeNode.Text
+  nameWithType: TreeNode.Text
+- uid: Terminal.Gui.TreeNode.ToString
+  name: ToString()
+  href: api/Terminal.Gui/Terminal.Gui.TreeNode.html#Terminal_Gui_TreeNode_ToString
+  commentId: M:Terminal.Gui.TreeNode.ToString
+  fullName: Terminal.Gui.TreeNode.ToString()
+  nameWithType: TreeNode.ToString()
+- uid: Terminal.Gui.TreeNode.ToString*
+  name: ToString
+  href: api/Terminal.Gui/Terminal.Gui.TreeNode.html#Terminal_Gui_TreeNode_ToString_
+  commentId: Overload:Terminal.Gui.TreeNode.ToString
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeNode.ToString
+  nameWithType: TreeNode.ToString
+- uid: Terminal.Gui.TreeNodeBuilder
+  name: TreeNodeBuilder
+  href: api/Terminal.Gui/Terminal.Gui.TreeNodeBuilder.html
+  commentId: T:Terminal.Gui.TreeNodeBuilder
+  fullName: Terminal.Gui.TreeNodeBuilder
+  nameWithType: TreeNodeBuilder
+- uid: Terminal.Gui.TreeNodeBuilder.#ctor
+  name: TreeNodeBuilder()
+  href: api/Terminal.Gui/Terminal.Gui.TreeNodeBuilder.html#Terminal_Gui_TreeNodeBuilder__ctor
+  commentId: M:Terminal.Gui.TreeNodeBuilder.#ctor
+  fullName: Terminal.Gui.TreeNodeBuilder.TreeNodeBuilder()
+  nameWithType: TreeNodeBuilder.TreeNodeBuilder()
+- uid: Terminal.Gui.TreeNodeBuilder.#ctor*
+  name: TreeNodeBuilder
+  href: api/Terminal.Gui/Terminal.Gui.TreeNodeBuilder.html#Terminal_Gui_TreeNodeBuilder__ctor_
+  commentId: Overload:Terminal.Gui.TreeNodeBuilder.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeNodeBuilder.TreeNodeBuilder
+  nameWithType: TreeNodeBuilder.TreeNodeBuilder
+- uid: Terminal.Gui.TreeNodeBuilder.GetChildren(Terminal.Gui.ITreeNode)
+  name: GetChildren(ITreeNode)
+  href: api/Terminal.Gui/Terminal.Gui.TreeNodeBuilder.html#Terminal_Gui_TreeNodeBuilder_GetChildren_Terminal_Gui_ITreeNode_
+  commentId: M:Terminal.Gui.TreeNodeBuilder.GetChildren(Terminal.Gui.ITreeNode)
+  fullName: Terminal.Gui.TreeNodeBuilder.GetChildren(Terminal.Gui.ITreeNode)
+  nameWithType: TreeNodeBuilder.GetChildren(ITreeNode)
+- uid: Terminal.Gui.TreeNodeBuilder.GetChildren*
+  name: GetChildren
+  href: api/Terminal.Gui/Terminal.Gui.TreeNodeBuilder.html#Terminal_Gui_TreeNodeBuilder_GetChildren_
+  commentId: Overload:Terminal.Gui.TreeNodeBuilder.GetChildren
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeNodeBuilder.GetChildren
+  nameWithType: TreeNodeBuilder.GetChildren
+- uid: Terminal.Gui.TreeStyle
+  name: TreeStyle
+  href: api/Terminal.Gui/Terminal.Gui.TreeStyle.html
+  commentId: T:Terminal.Gui.TreeStyle
+  fullName: Terminal.Gui.TreeStyle
+  nameWithType: TreeStyle
+- uid: Terminal.Gui.TreeStyle.CollapseableSymbol
+  name: CollapseableSymbol
+  href: api/Terminal.Gui/Terminal.Gui.TreeStyle.html#Terminal_Gui_TreeStyle_CollapseableSymbol
+  commentId: P:Terminal.Gui.TreeStyle.CollapseableSymbol
+  fullName: Terminal.Gui.TreeStyle.CollapseableSymbol
+  nameWithType: TreeStyle.CollapseableSymbol
+- uid: Terminal.Gui.TreeStyle.CollapseableSymbol*
+  name: CollapseableSymbol
+  href: api/Terminal.Gui/Terminal.Gui.TreeStyle.html#Terminal_Gui_TreeStyle_CollapseableSymbol_
+  commentId: Overload:Terminal.Gui.TreeStyle.CollapseableSymbol
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeStyle.CollapseableSymbol
+  nameWithType: TreeStyle.CollapseableSymbol
+- uid: Terminal.Gui.TreeStyle.ColorExpandSymbol
+  name: ColorExpandSymbol
+  href: api/Terminal.Gui/Terminal.Gui.TreeStyle.html#Terminal_Gui_TreeStyle_ColorExpandSymbol
+  commentId: P:Terminal.Gui.TreeStyle.ColorExpandSymbol
+  fullName: Terminal.Gui.TreeStyle.ColorExpandSymbol
+  nameWithType: TreeStyle.ColorExpandSymbol
+- uid: Terminal.Gui.TreeStyle.ColorExpandSymbol*
+  name: ColorExpandSymbol
+  href: api/Terminal.Gui/Terminal.Gui.TreeStyle.html#Terminal_Gui_TreeStyle_ColorExpandSymbol_
+  commentId: Overload:Terminal.Gui.TreeStyle.ColorExpandSymbol
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeStyle.ColorExpandSymbol
+  nameWithType: TreeStyle.ColorExpandSymbol
+- uid: Terminal.Gui.TreeStyle.ExpandableSymbol
+  name: ExpandableSymbol
+  href: api/Terminal.Gui/Terminal.Gui.TreeStyle.html#Terminal_Gui_TreeStyle_ExpandableSymbol
+  commentId: P:Terminal.Gui.TreeStyle.ExpandableSymbol
+  fullName: Terminal.Gui.TreeStyle.ExpandableSymbol
+  nameWithType: TreeStyle.ExpandableSymbol
+- uid: Terminal.Gui.TreeStyle.ExpandableSymbol*
+  name: ExpandableSymbol
+  href: api/Terminal.Gui/Terminal.Gui.TreeStyle.html#Terminal_Gui_TreeStyle_ExpandableSymbol_
+  commentId: Overload:Terminal.Gui.TreeStyle.ExpandableSymbol
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeStyle.ExpandableSymbol
+  nameWithType: TreeStyle.ExpandableSymbol
+- uid: Terminal.Gui.TreeStyle.InvertExpandSymbolColors
+  name: InvertExpandSymbolColors
+  href: api/Terminal.Gui/Terminal.Gui.TreeStyle.html#Terminal_Gui_TreeStyle_InvertExpandSymbolColors
+  commentId: P:Terminal.Gui.TreeStyle.InvertExpandSymbolColors
+  fullName: Terminal.Gui.TreeStyle.InvertExpandSymbolColors
+  nameWithType: TreeStyle.InvertExpandSymbolColors
+- uid: Terminal.Gui.TreeStyle.InvertExpandSymbolColors*
+  name: InvertExpandSymbolColors
+  href: api/Terminal.Gui/Terminal.Gui.TreeStyle.html#Terminal_Gui_TreeStyle_InvertExpandSymbolColors_
+  commentId: Overload:Terminal.Gui.TreeStyle.InvertExpandSymbolColors
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeStyle.InvertExpandSymbolColors
+  nameWithType: TreeStyle.InvertExpandSymbolColors
+- uid: Terminal.Gui.TreeStyle.LeaveLastRow
+  name: LeaveLastRow
+  href: api/Terminal.Gui/Terminal.Gui.TreeStyle.html#Terminal_Gui_TreeStyle_LeaveLastRow
+  commentId: P:Terminal.Gui.TreeStyle.LeaveLastRow
+  fullName: Terminal.Gui.TreeStyle.LeaveLastRow
+  nameWithType: TreeStyle.LeaveLastRow
+- uid: Terminal.Gui.TreeStyle.LeaveLastRow*
+  name: LeaveLastRow
+  href: api/Terminal.Gui/Terminal.Gui.TreeStyle.html#Terminal_Gui_TreeStyle_LeaveLastRow_
+  commentId: Overload:Terminal.Gui.TreeStyle.LeaveLastRow
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeStyle.LeaveLastRow
+  nameWithType: TreeStyle.LeaveLastRow
+- uid: Terminal.Gui.TreeStyle.ShowBranchLines
+  name: ShowBranchLines
+  href: api/Terminal.Gui/Terminal.Gui.TreeStyle.html#Terminal_Gui_TreeStyle_ShowBranchLines
+  commentId: P:Terminal.Gui.TreeStyle.ShowBranchLines
+  fullName: Terminal.Gui.TreeStyle.ShowBranchLines
+  nameWithType: TreeStyle.ShowBranchLines
+- uid: Terminal.Gui.TreeStyle.ShowBranchLines*
+  name: ShowBranchLines
+  href: api/Terminal.Gui/Terminal.Gui.TreeStyle.html#Terminal_Gui_TreeStyle_ShowBranchLines_
+  commentId: Overload:Terminal.Gui.TreeStyle.ShowBranchLines
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeStyle.ShowBranchLines
+  nameWithType: TreeStyle.ShowBranchLines
+- uid: Terminal.Gui.TreeView
+  name: TreeView
+  href: api/Terminal.Gui/Terminal.Gui.TreeView.html
+  commentId: T:Terminal.Gui.TreeView
+  fullName: Terminal.Gui.TreeView
+  nameWithType: TreeView
+- uid: Terminal.Gui.TreeView.#ctor
+  name: TreeView()
+  href: api/Terminal.Gui/Terminal.Gui.TreeView.html#Terminal_Gui_TreeView__ctor
+  commentId: M:Terminal.Gui.TreeView.#ctor
+  fullName: Terminal.Gui.TreeView.TreeView()
+  nameWithType: TreeView.TreeView()
+- uid: Terminal.Gui.TreeView.#ctor*
+  name: TreeView
+  href: api/Terminal.Gui/Terminal.Gui.TreeView.html#Terminal_Gui_TreeView__ctor_
+  commentId: Overload:Terminal.Gui.TreeView.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView.TreeView
+  nameWithType: TreeView.TreeView
+- uid: Terminal.Gui.TreeView`1
+  name: TreeView<T>
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html
+  commentId: T:Terminal.Gui.TreeView`1
+  name.vb: TreeView(Of T)
+  fullName: Terminal.Gui.TreeView<T>
+  fullName.vb: Terminal.Gui.TreeView(Of T)
+  nameWithType: TreeView<T>
+  nameWithType.vb: TreeView(Of T)
+- uid: Terminal.Gui.TreeView`1.#ctor
+  name: TreeView()
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1__ctor
+  commentId: M:Terminal.Gui.TreeView`1.#ctor
+  fullName: Terminal.Gui.TreeView<T>.TreeView()
+  fullName.vb: Terminal.Gui.TreeView(Of T).TreeView()
+  nameWithType: TreeView<T>.TreeView()
+  nameWithType.vb: TreeView(Of T).TreeView()
+- uid: Terminal.Gui.TreeView`1.#ctor(Terminal.Gui.ITreeBuilder{`0})
+  name: TreeView(ITreeBuilder<T>)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1__ctor_Terminal_Gui_ITreeBuilder__0__
+  commentId: M:Terminal.Gui.TreeView`1.#ctor(Terminal.Gui.ITreeBuilder{`0})
+  name.vb: TreeView(ITreeBuilder(Of T))
+  fullName: Terminal.Gui.TreeView<T>.TreeView(Terminal.Gui.ITreeBuilder<T>)
+  fullName.vb: Terminal.Gui.TreeView(Of T).TreeView(Terminal.Gui.ITreeBuilder(Of T))
+  nameWithType: TreeView<T>.TreeView(ITreeBuilder<T>)
+  nameWithType.vb: TreeView(Of T).TreeView(ITreeBuilder(Of T))
+- uid: Terminal.Gui.TreeView`1.#ctor*
+  name: TreeView
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1__ctor_
+  commentId: Overload:Terminal.Gui.TreeView`1.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.TreeView
+  fullName.vb: Terminal.Gui.TreeView(Of T).TreeView
+  nameWithType: TreeView<T>.TreeView
+  nameWithType.vb: TreeView(Of T).TreeView
+- uid: Terminal.Gui.TreeView`1.AddObject(`0)
+  name: AddObject(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AddObject__0_
+  commentId: M:Terminal.Gui.TreeView`1.AddObject(`0)
+  fullName: Terminal.Gui.TreeView<T>.AddObject(T)
+  fullName.vb: Terminal.Gui.TreeView(Of T).AddObject(T)
+  nameWithType: TreeView<T>.AddObject(T)
+  nameWithType.vb: TreeView(Of T).AddObject(T)
+- uid: Terminal.Gui.TreeView`1.AddObject*
+  name: AddObject
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AddObject_
+  commentId: Overload:Terminal.Gui.TreeView`1.AddObject
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.AddObject
+  fullName.vb: Terminal.Gui.TreeView(Of T).AddObject
+  nameWithType: TreeView<T>.AddObject
+  nameWithType.vb: TreeView(Of T).AddObject
+- uid: Terminal.Gui.TreeView`1.AddObjects(System.Collections.Generic.IEnumerable{`0})
+  name: AddObjects(IEnumerable<T>)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AddObjects_System_Collections_Generic_IEnumerable__0__
+  commentId: M:Terminal.Gui.TreeView`1.AddObjects(System.Collections.Generic.IEnumerable{`0})
+  name.vb: AddObjects(IEnumerable(Of T))
+  fullName: Terminal.Gui.TreeView<T>.AddObjects(System.Collections.Generic.IEnumerable<T>)
+  fullName.vb: Terminal.Gui.TreeView(Of T).AddObjects(System.Collections.Generic.IEnumerable(Of T))
+  nameWithType: TreeView<T>.AddObjects(IEnumerable<T>)
+  nameWithType.vb: TreeView(Of T).AddObjects(IEnumerable(Of T))
+- uid: Terminal.Gui.TreeView`1.AddObjects*
+  name: AddObjects
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AddObjects_
+  commentId: Overload:Terminal.Gui.TreeView`1.AddObjects
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.AddObjects
+  fullName.vb: Terminal.Gui.TreeView(Of T).AddObjects
+  nameWithType: TreeView<T>.AddObjects
+  nameWithType.vb: TreeView(Of T).AddObjects
+- uid: Terminal.Gui.TreeView`1.AdjustSelection(System.Int32,System.Boolean)
+  name: AdjustSelection(Int32, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AdjustSelection_System_Int32_System_Boolean_
+  commentId: M:Terminal.Gui.TreeView`1.AdjustSelection(System.Int32,System.Boolean)
+  fullName: Terminal.Gui.TreeView<T>.AdjustSelection(System.Int32, System.Boolean)
+  fullName.vb: Terminal.Gui.TreeView(Of T).AdjustSelection(System.Int32, System.Boolean)
+  nameWithType: TreeView<T>.AdjustSelection(Int32, Boolean)
+  nameWithType.vb: TreeView(Of T).AdjustSelection(Int32, Boolean)
+- uid: Terminal.Gui.TreeView`1.AdjustSelection*
+  name: AdjustSelection
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AdjustSelection_
+  commentId: Overload:Terminal.Gui.TreeView`1.AdjustSelection
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.AdjustSelection
+  fullName.vb: Terminal.Gui.TreeView(Of T).AdjustSelection
+  nameWithType: TreeView<T>.AdjustSelection
+  nameWithType.vb: TreeView(Of T).AdjustSelection
+- uid: Terminal.Gui.TreeView`1.AdjustSelectionToBranchEnd
+  name: AdjustSelectionToBranchEnd()
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AdjustSelectionToBranchEnd
+  commentId: M:Terminal.Gui.TreeView`1.AdjustSelectionToBranchEnd
+  fullName: Terminal.Gui.TreeView<T>.AdjustSelectionToBranchEnd()
+  fullName.vb: Terminal.Gui.TreeView(Of T).AdjustSelectionToBranchEnd()
+  nameWithType: TreeView<T>.AdjustSelectionToBranchEnd()
+  nameWithType.vb: TreeView(Of T).AdjustSelectionToBranchEnd()
+- uid: Terminal.Gui.TreeView`1.AdjustSelectionToBranchEnd*
+  name: AdjustSelectionToBranchEnd
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AdjustSelectionToBranchEnd_
+  commentId: Overload:Terminal.Gui.TreeView`1.AdjustSelectionToBranchEnd
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.AdjustSelectionToBranchEnd
+  fullName.vb: Terminal.Gui.TreeView(Of T).AdjustSelectionToBranchEnd
+  nameWithType: TreeView<T>.AdjustSelectionToBranchEnd
+  nameWithType.vb: TreeView(Of T).AdjustSelectionToBranchEnd
+- uid: Terminal.Gui.TreeView`1.AdjustSelectionToBranchStart
+  name: AdjustSelectionToBranchStart()
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AdjustSelectionToBranchStart
+  commentId: M:Terminal.Gui.TreeView`1.AdjustSelectionToBranchStart
+  fullName: Terminal.Gui.TreeView<T>.AdjustSelectionToBranchStart()
+  fullName.vb: Terminal.Gui.TreeView(Of T).AdjustSelectionToBranchStart()
+  nameWithType: TreeView<T>.AdjustSelectionToBranchStart()
+  nameWithType.vb: TreeView(Of T).AdjustSelectionToBranchStart()
+- uid: Terminal.Gui.TreeView`1.AdjustSelectionToBranchStart*
+  name: AdjustSelectionToBranchStart
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AdjustSelectionToBranchStart_
+  commentId: Overload:Terminal.Gui.TreeView`1.AdjustSelectionToBranchStart
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.AdjustSelectionToBranchStart
+  fullName.vb: Terminal.Gui.TreeView(Of T).AdjustSelectionToBranchStart
+  nameWithType: TreeView<T>.AdjustSelectionToBranchStart
+  nameWithType.vb: TreeView(Of T).AdjustSelectionToBranchStart
+- uid: Terminal.Gui.TreeView`1.AllowLetterBasedNavigation
+  name: AllowLetterBasedNavigation
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AllowLetterBasedNavigation
+  commentId: P:Terminal.Gui.TreeView`1.AllowLetterBasedNavigation
+  fullName: Terminal.Gui.TreeView<T>.AllowLetterBasedNavigation
+  fullName.vb: Terminal.Gui.TreeView(Of T).AllowLetterBasedNavigation
+  nameWithType: TreeView<T>.AllowLetterBasedNavigation
+  nameWithType.vb: TreeView(Of T).AllowLetterBasedNavigation
+- uid: Terminal.Gui.TreeView`1.AllowLetterBasedNavigation*
+  name: AllowLetterBasedNavigation
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AllowLetterBasedNavigation_
+  commentId: Overload:Terminal.Gui.TreeView`1.AllowLetterBasedNavigation
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.AllowLetterBasedNavigation
+  fullName.vb: Terminal.Gui.TreeView(Of T).AllowLetterBasedNavigation
+  nameWithType: TreeView<T>.AllowLetterBasedNavigation
+  nameWithType.vb: TreeView(Of T).AllowLetterBasedNavigation
+- uid: Terminal.Gui.TreeView`1.AspectGetter
+  name: AspectGetter
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AspectGetter
+  commentId: P:Terminal.Gui.TreeView`1.AspectGetter
+  fullName: Terminal.Gui.TreeView<T>.AspectGetter
+  fullName.vb: Terminal.Gui.TreeView(Of T).AspectGetter
+  nameWithType: TreeView<T>.AspectGetter
+  nameWithType.vb: TreeView(Of T).AspectGetter
+- uid: Terminal.Gui.TreeView`1.AspectGetter*
+  name: AspectGetter
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AspectGetter_
+  commentId: Overload:Terminal.Gui.TreeView`1.AspectGetter
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.AspectGetter
+  fullName.vb: Terminal.Gui.TreeView(Of T).AspectGetter
+  nameWithType: TreeView<T>.AspectGetter
+  nameWithType.vb: TreeView(Of T).AspectGetter
+- uid: Terminal.Gui.TreeView`1.CanExpand(`0)
+  name: CanExpand(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_CanExpand__0_
+  commentId: M:Terminal.Gui.TreeView`1.CanExpand(`0)
+  fullName: Terminal.Gui.TreeView<T>.CanExpand(T)
+  fullName.vb: Terminal.Gui.TreeView(Of T).CanExpand(T)
+  nameWithType: TreeView<T>.CanExpand(T)
+  nameWithType.vb: TreeView(Of T).CanExpand(T)
+- uid: Terminal.Gui.TreeView`1.CanExpand*
+  name: CanExpand
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_CanExpand_
+  commentId: Overload:Terminal.Gui.TreeView`1.CanExpand
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.CanExpand
+  fullName.vb: Terminal.Gui.TreeView(Of T).CanExpand
+  nameWithType: TreeView<T>.CanExpand
+  nameWithType.vb: TreeView(Of T).CanExpand
+- uid: Terminal.Gui.TreeView`1.ClearObjects
+  name: ClearObjects()
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ClearObjects
+  commentId: M:Terminal.Gui.TreeView`1.ClearObjects
+  fullName: Terminal.Gui.TreeView<T>.ClearObjects()
+  fullName.vb: Terminal.Gui.TreeView(Of T).ClearObjects()
+  nameWithType: TreeView<T>.ClearObjects()
+  nameWithType.vb: TreeView(Of T).ClearObjects()
+- uid: Terminal.Gui.TreeView`1.ClearObjects*
+  name: ClearObjects
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ClearObjects_
+  commentId: Overload:Terminal.Gui.TreeView`1.ClearObjects
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.ClearObjects
+  fullName.vb: Terminal.Gui.TreeView(Of T).ClearObjects
+  nameWithType: TreeView<T>.ClearObjects
+  nameWithType.vb: TreeView(Of T).ClearObjects
+- uid: Terminal.Gui.TreeView`1.Collapse(`0)
+  name: Collapse(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Collapse__0_
+  commentId: M:Terminal.Gui.TreeView`1.Collapse(`0)
+  fullName: Terminal.Gui.TreeView<T>.Collapse(T)
+  fullName.vb: Terminal.Gui.TreeView(Of T).Collapse(T)
+  nameWithType: TreeView<T>.Collapse(T)
+  nameWithType.vb: TreeView(Of T).Collapse(T)
+- uid: Terminal.Gui.TreeView`1.Collapse*
+  name: Collapse
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Collapse_
+  commentId: Overload:Terminal.Gui.TreeView`1.Collapse
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.Collapse
+  fullName.vb: Terminal.Gui.TreeView(Of T).Collapse
+  nameWithType: TreeView<T>.Collapse
+  nameWithType.vb: TreeView(Of T).Collapse
+- uid: Terminal.Gui.TreeView`1.CollapseAll
+  name: CollapseAll()
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_CollapseAll
+  commentId: M:Terminal.Gui.TreeView`1.CollapseAll
+  fullName: Terminal.Gui.TreeView<T>.CollapseAll()
+  fullName.vb: Terminal.Gui.TreeView(Of T).CollapseAll()
+  nameWithType: TreeView<T>.CollapseAll()
+  nameWithType.vb: TreeView(Of T).CollapseAll()
+- uid: Terminal.Gui.TreeView`1.CollapseAll(`0)
+  name: CollapseAll(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_CollapseAll__0_
+  commentId: M:Terminal.Gui.TreeView`1.CollapseAll(`0)
+  fullName: Terminal.Gui.TreeView<T>.CollapseAll(T)
+  fullName.vb: Terminal.Gui.TreeView(Of T).CollapseAll(T)
+  nameWithType: TreeView<T>.CollapseAll(T)
+  nameWithType.vb: TreeView(Of T).CollapseAll(T)
+- uid: Terminal.Gui.TreeView`1.CollapseAll*
+  name: CollapseAll
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_CollapseAll_
+  commentId: Overload:Terminal.Gui.TreeView`1.CollapseAll
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.CollapseAll
+  fullName.vb: Terminal.Gui.TreeView(Of T).CollapseAll
+  nameWithType: TreeView<T>.CollapseAll
+  nameWithType.vb: TreeView(Of T).CollapseAll
+- uid: Terminal.Gui.TreeView`1.CollapseImpl(`0,System.Boolean)
+  name: CollapseImpl(T, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_CollapseImpl__0_System_Boolean_
+  commentId: M:Terminal.Gui.TreeView`1.CollapseImpl(`0,System.Boolean)
+  fullName: Terminal.Gui.TreeView<T>.CollapseImpl(T, System.Boolean)
+  fullName.vb: Terminal.Gui.TreeView(Of T).CollapseImpl(T, System.Boolean)
+  nameWithType: TreeView<T>.CollapseImpl(T, Boolean)
+  nameWithType.vb: TreeView(Of T).CollapseImpl(T, Boolean)
+- uid: Terminal.Gui.TreeView`1.CollapseImpl*
+  name: CollapseImpl
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_CollapseImpl_
+  commentId: Overload:Terminal.Gui.TreeView`1.CollapseImpl
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.CollapseImpl
+  fullName.vb: Terminal.Gui.TreeView(Of T).CollapseImpl
+  nameWithType: TreeView<T>.CollapseImpl
+  nameWithType.vb: TreeView(Of T).CollapseImpl
+- uid: Terminal.Gui.TreeView`1.ContentHeight
+  name: ContentHeight
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ContentHeight
+  commentId: P:Terminal.Gui.TreeView`1.ContentHeight
+  fullName: Terminal.Gui.TreeView<T>.ContentHeight
+  fullName.vb: Terminal.Gui.TreeView(Of T).ContentHeight
+  nameWithType: TreeView<T>.ContentHeight
+  nameWithType.vb: TreeView(Of T).ContentHeight
+- uid: Terminal.Gui.TreeView`1.ContentHeight*
+  name: ContentHeight
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ContentHeight_
+  commentId: Overload:Terminal.Gui.TreeView`1.ContentHeight
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.ContentHeight
+  fullName.vb: Terminal.Gui.TreeView(Of T).ContentHeight
+  nameWithType: TreeView<T>.ContentHeight
+  nameWithType.vb: TreeView(Of T).ContentHeight
+- uid: Terminal.Gui.TreeView`1.CursorLeft(System.Boolean)
+  name: CursorLeft(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_CursorLeft_System_Boolean_
+  commentId: M:Terminal.Gui.TreeView`1.CursorLeft(System.Boolean)
+  fullName: Terminal.Gui.TreeView<T>.CursorLeft(System.Boolean)
+  fullName.vb: Terminal.Gui.TreeView(Of T).CursorLeft(System.Boolean)
+  nameWithType: TreeView<T>.CursorLeft(Boolean)
+  nameWithType.vb: TreeView(Of T).CursorLeft(Boolean)
+- uid: Terminal.Gui.TreeView`1.CursorLeft*
+  name: CursorLeft
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_CursorLeft_
+  commentId: Overload:Terminal.Gui.TreeView`1.CursorLeft
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.CursorLeft
+  fullName.vb: Terminal.Gui.TreeView(Of T).CursorLeft
+  nameWithType: TreeView<T>.CursorLeft
+  nameWithType.vb: TreeView(Of T).CursorLeft
+- uid: Terminal.Gui.TreeView`1.EnsureVisible(`0)
+  name: EnsureVisible(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_EnsureVisible__0_
+  commentId: M:Terminal.Gui.TreeView`1.EnsureVisible(`0)
+  fullName: Terminal.Gui.TreeView<T>.EnsureVisible(T)
+  fullName.vb: Terminal.Gui.TreeView(Of T).EnsureVisible(T)
+  nameWithType: TreeView<T>.EnsureVisible(T)
+  nameWithType.vb: TreeView(Of T).EnsureVisible(T)
+- uid: Terminal.Gui.TreeView`1.EnsureVisible*
+  name: EnsureVisible
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_EnsureVisible_
+  commentId: Overload:Terminal.Gui.TreeView`1.EnsureVisible
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.EnsureVisible
+  fullName.vb: Terminal.Gui.TreeView(Of T).EnsureVisible
+  nameWithType: TreeView<T>.EnsureVisible
+  nameWithType.vb: TreeView(Of T).EnsureVisible
+- uid: Terminal.Gui.TreeView`1.Expand(`0)
+  name: Expand(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Expand__0_
+  commentId: M:Terminal.Gui.TreeView`1.Expand(`0)
+  fullName: Terminal.Gui.TreeView<T>.Expand(T)
+  fullName.vb: Terminal.Gui.TreeView(Of T).Expand(T)
+  nameWithType: TreeView<T>.Expand(T)
+  nameWithType.vb: TreeView(Of T).Expand(T)
+- uid: Terminal.Gui.TreeView`1.Expand*
+  name: Expand
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Expand_
+  commentId: Overload:Terminal.Gui.TreeView`1.Expand
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.Expand
+  fullName.vb: Terminal.Gui.TreeView(Of T).Expand
+  nameWithType: TreeView<T>.Expand
+  nameWithType.vb: TreeView(Of T).Expand
+- uid: Terminal.Gui.TreeView`1.ExpandAll
+  name: ExpandAll()
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ExpandAll
+  commentId: M:Terminal.Gui.TreeView`1.ExpandAll
+  fullName: Terminal.Gui.TreeView<T>.ExpandAll()
+  fullName.vb: Terminal.Gui.TreeView(Of T).ExpandAll()
+  nameWithType: TreeView<T>.ExpandAll()
+  nameWithType.vb: TreeView(Of T).ExpandAll()
+- uid: Terminal.Gui.TreeView`1.ExpandAll(`0)
+  name: ExpandAll(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ExpandAll__0_
+  commentId: M:Terminal.Gui.TreeView`1.ExpandAll(`0)
+  fullName: Terminal.Gui.TreeView<T>.ExpandAll(T)
+  fullName.vb: Terminal.Gui.TreeView(Of T).ExpandAll(T)
+  nameWithType: TreeView<T>.ExpandAll(T)
+  nameWithType.vb: TreeView(Of T).ExpandAll(T)
+- uid: Terminal.Gui.TreeView`1.ExpandAll*
+  name: ExpandAll
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ExpandAll_
+  commentId: Overload:Terminal.Gui.TreeView`1.ExpandAll
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.ExpandAll
+  fullName.vb: Terminal.Gui.TreeView(Of T).ExpandAll
+  nameWithType: TreeView<T>.ExpandAll
+  nameWithType.vb: TreeView(Of T).ExpandAll
+- uid: Terminal.Gui.TreeView`1.GetAllSelectedObjects
+  name: GetAllSelectedObjects()
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GetAllSelectedObjects
+  commentId: M:Terminal.Gui.TreeView`1.GetAllSelectedObjects
+  fullName: Terminal.Gui.TreeView<T>.GetAllSelectedObjects()
+  fullName.vb: Terminal.Gui.TreeView(Of T).GetAllSelectedObjects()
+  nameWithType: TreeView<T>.GetAllSelectedObjects()
+  nameWithType.vb: TreeView(Of T).GetAllSelectedObjects()
+- uid: Terminal.Gui.TreeView`1.GetAllSelectedObjects*
+  name: GetAllSelectedObjects
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GetAllSelectedObjects_
+  commentId: Overload:Terminal.Gui.TreeView`1.GetAllSelectedObjects
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.GetAllSelectedObjects
+  fullName.vb: Terminal.Gui.TreeView(Of T).GetAllSelectedObjects
+  nameWithType: TreeView<T>.GetAllSelectedObjects
+  nameWithType.vb: TreeView(Of T).GetAllSelectedObjects
+- uid: Terminal.Gui.TreeView`1.GetChildren(`0)
+  name: GetChildren(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GetChildren__0_
+  commentId: M:Terminal.Gui.TreeView`1.GetChildren(`0)
+  fullName: Terminal.Gui.TreeView<T>.GetChildren(T)
+  fullName.vb: Terminal.Gui.TreeView(Of T).GetChildren(T)
+  nameWithType: TreeView<T>.GetChildren(T)
+  nameWithType.vb: TreeView(Of T).GetChildren(T)
+- uid: Terminal.Gui.TreeView`1.GetChildren*
+  name: GetChildren
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GetChildren_
+  commentId: Overload:Terminal.Gui.TreeView`1.GetChildren
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.GetChildren
+  fullName.vb: Terminal.Gui.TreeView(Of T).GetChildren
+  nameWithType: TreeView<T>.GetChildren
+  nameWithType.vb: TreeView(Of T).GetChildren
+- uid: Terminal.Gui.TreeView`1.GetContentWidth(System.Boolean)
+  name: GetContentWidth(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GetContentWidth_System_Boolean_
+  commentId: M:Terminal.Gui.TreeView`1.GetContentWidth(System.Boolean)
+  fullName: Terminal.Gui.TreeView<T>.GetContentWidth(System.Boolean)
+  fullName.vb: Terminal.Gui.TreeView(Of T).GetContentWidth(System.Boolean)
+  nameWithType: TreeView<T>.GetContentWidth(Boolean)
+  nameWithType.vb: TreeView(Of T).GetContentWidth(Boolean)
+- uid: Terminal.Gui.TreeView`1.GetContentWidth*
+  name: GetContentWidth
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GetContentWidth_
+  commentId: Overload:Terminal.Gui.TreeView`1.GetContentWidth
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.GetContentWidth
+  fullName.vb: Terminal.Gui.TreeView(Of T).GetContentWidth
+  nameWithType: TreeView<T>.GetContentWidth
+  nameWithType.vb: TreeView(Of T).GetContentWidth
+- uid: Terminal.Gui.TreeView`1.GetParent(`0)
+  name: GetParent(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GetParent__0_
+  commentId: M:Terminal.Gui.TreeView`1.GetParent(`0)
+  fullName: Terminal.Gui.TreeView<T>.GetParent(T)
+  fullName.vb: Terminal.Gui.TreeView(Of T).GetParent(T)
+  nameWithType: TreeView<T>.GetParent(T)
+  nameWithType.vb: TreeView(Of T).GetParent(T)
+- uid: Terminal.Gui.TreeView`1.GetParent*
+  name: GetParent
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GetParent_
+  commentId: Overload:Terminal.Gui.TreeView`1.GetParent
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.GetParent
+  fullName.vb: Terminal.Gui.TreeView(Of T).GetParent
+  nameWithType: TreeView<T>.GetParent
+  nameWithType.vb: TreeView(Of T).GetParent
+- uid: Terminal.Gui.TreeView`1.GetScrollOffsetOf(`0)
+  name: GetScrollOffsetOf(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GetScrollOffsetOf__0_
+  commentId: M:Terminal.Gui.TreeView`1.GetScrollOffsetOf(`0)
+  fullName: Terminal.Gui.TreeView<T>.GetScrollOffsetOf(T)
+  fullName.vb: Terminal.Gui.TreeView(Of T).GetScrollOffsetOf(T)
+  nameWithType: TreeView<T>.GetScrollOffsetOf(T)
+  nameWithType.vb: TreeView(Of T).GetScrollOffsetOf(T)
+- uid: Terminal.Gui.TreeView`1.GetScrollOffsetOf*
+  name: GetScrollOffsetOf
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GetScrollOffsetOf_
+  commentId: Overload:Terminal.Gui.TreeView`1.GetScrollOffsetOf
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.GetScrollOffsetOf
+  fullName.vb: Terminal.Gui.TreeView(Of T).GetScrollOffsetOf
+  nameWithType: TreeView<T>.GetScrollOffsetOf
+  nameWithType.vb: TreeView(Of T).GetScrollOffsetOf
+- uid: Terminal.Gui.TreeView`1.GoTo(`0)
+  name: GoTo(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GoTo__0_
+  commentId: M:Terminal.Gui.TreeView`1.GoTo(`0)
+  fullName: Terminal.Gui.TreeView<T>.GoTo(T)
+  fullName.vb: Terminal.Gui.TreeView(Of T).GoTo(T)
+  nameWithType: TreeView<T>.GoTo(T)
+  nameWithType.vb: TreeView(Of T).GoTo(T)
+- uid: Terminal.Gui.TreeView`1.GoTo*
+  name: GoTo
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GoTo_
+  commentId: Overload:Terminal.Gui.TreeView`1.GoTo
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.GoTo
+  fullName.vb: Terminal.Gui.TreeView(Of T).GoTo
+  nameWithType: TreeView<T>.GoTo
+  nameWithType.vb: TreeView(Of T).GoTo
+- uid: Terminal.Gui.TreeView`1.GoToEnd
+  name: GoToEnd()
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GoToEnd
+  commentId: M:Terminal.Gui.TreeView`1.GoToEnd
+  fullName: Terminal.Gui.TreeView<T>.GoToEnd()
+  fullName.vb: Terminal.Gui.TreeView(Of T).GoToEnd()
+  nameWithType: TreeView<T>.GoToEnd()
+  nameWithType.vb: TreeView(Of T).GoToEnd()
+- uid: Terminal.Gui.TreeView`1.GoToEnd*
+  name: GoToEnd
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GoToEnd_
+  commentId: Overload:Terminal.Gui.TreeView`1.GoToEnd
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.GoToEnd
+  fullName.vb: Terminal.Gui.TreeView(Of T).GoToEnd
+  nameWithType: TreeView<T>.GoToEnd
+  nameWithType.vb: TreeView(Of T).GoToEnd
+- uid: Terminal.Gui.TreeView`1.GoToFirst
+  name: GoToFirst()
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GoToFirst
+  commentId: M:Terminal.Gui.TreeView`1.GoToFirst
+  fullName: Terminal.Gui.TreeView<T>.GoToFirst()
+  fullName.vb: Terminal.Gui.TreeView(Of T).GoToFirst()
+  nameWithType: TreeView<T>.GoToFirst()
+  nameWithType.vb: TreeView(Of T).GoToFirst()
+- uid: Terminal.Gui.TreeView`1.GoToFirst*
+  name: GoToFirst
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_GoToFirst_
+  commentId: Overload:Terminal.Gui.TreeView`1.GoToFirst
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.GoToFirst
+  fullName.vb: Terminal.Gui.TreeView(Of T).GoToFirst
+  nameWithType: TreeView<T>.GoToFirst
+  nameWithType.vb: TreeView(Of T).GoToFirst
+- uid: Terminal.Gui.TreeView`1.InvalidateLineMap
+  name: InvalidateLineMap()
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_InvalidateLineMap
+  commentId: M:Terminal.Gui.TreeView`1.InvalidateLineMap
+  fullName: Terminal.Gui.TreeView<T>.InvalidateLineMap()
+  fullName.vb: Terminal.Gui.TreeView(Of T).InvalidateLineMap()
+  nameWithType: TreeView<T>.InvalidateLineMap()
+  nameWithType.vb: TreeView(Of T).InvalidateLineMap()
+- uid: Terminal.Gui.TreeView`1.InvalidateLineMap*
+  name: InvalidateLineMap
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_InvalidateLineMap_
+  commentId: Overload:Terminal.Gui.TreeView`1.InvalidateLineMap
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.InvalidateLineMap
+  fullName.vb: Terminal.Gui.TreeView(Of T).InvalidateLineMap
+  nameWithType: TreeView<T>.InvalidateLineMap
+  nameWithType.vb: TreeView(Of T).InvalidateLineMap
+- uid: Terminal.Gui.TreeView`1.IsExpanded(`0)
+  name: IsExpanded(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_IsExpanded__0_
+  commentId: M:Terminal.Gui.TreeView`1.IsExpanded(`0)
+  fullName: Terminal.Gui.TreeView<T>.IsExpanded(T)
+  fullName.vb: Terminal.Gui.TreeView(Of T).IsExpanded(T)
+  nameWithType: TreeView<T>.IsExpanded(T)
+  nameWithType.vb: TreeView(Of T).IsExpanded(T)
+- uid: Terminal.Gui.TreeView`1.IsExpanded*
+  name: IsExpanded
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_IsExpanded_
+  commentId: Overload:Terminal.Gui.TreeView`1.IsExpanded
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.IsExpanded
+  fullName.vb: Terminal.Gui.TreeView(Of T).IsExpanded
+  nameWithType: TreeView<T>.IsExpanded
+  nameWithType.vb: TreeView(Of T).IsExpanded
+- uid: Terminal.Gui.TreeView`1.IsSelected(`0)
+  name: IsSelected(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_IsSelected__0_
+  commentId: M:Terminal.Gui.TreeView`1.IsSelected(`0)
+  fullName: Terminal.Gui.TreeView<T>.IsSelected(T)
+  fullName.vb: Terminal.Gui.TreeView(Of T).IsSelected(T)
+  nameWithType: TreeView<T>.IsSelected(T)
+  nameWithType.vb: TreeView(Of T).IsSelected(T)
+- uid: Terminal.Gui.TreeView`1.IsSelected*
+  name: IsSelected
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_IsSelected_
+  commentId: Overload:Terminal.Gui.TreeView`1.IsSelected
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.IsSelected
+  fullName.vb: Terminal.Gui.TreeView(Of T).IsSelected
+  nameWithType: TreeView<T>.IsSelected
+  nameWithType.vb: TreeView(Of T).IsSelected
+- uid: Terminal.Gui.TreeView`1.MouseEvent(Terminal.Gui.MouseEvent)
+  name: MouseEvent(MouseEvent)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_MouseEvent_Terminal_Gui_MouseEvent_
+  commentId: M:Terminal.Gui.TreeView`1.MouseEvent(Terminal.Gui.MouseEvent)
+  fullName: Terminal.Gui.TreeView<T>.MouseEvent(Terminal.Gui.MouseEvent)
+  fullName.vb: Terminal.Gui.TreeView(Of T).MouseEvent(Terminal.Gui.MouseEvent)
+  nameWithType: TreeView<T>.MouseEvent(MouseEvent)
+  nameWithType.vb: TreeView(Of T).MouseEvent(MouseEvent)
+- uid: Terminal.Gui.TreeView`1.MouseEvent*
+  name: MouseEvent
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_MouseEvent_
+  commentId: Overload:Terminal.Gui.TreeView`1.MouseEvent
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.MouseEvent
+  fullName.vb: Terminal.Gui.TreeView(Of T).MouseEvent
+  nameWithType: TreeView<T>.MouseEvent
+  nameWithType.vb: TreeView(Of T).MouseEvent
+- uid: Terminal.Gui.TreeView`1.MultiSelect
+  name: MultiSelect
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_MultiSelect
+  commentId: P:Terminal.Gui.TreeView`1.MultiSelect
+  fullName: Terminal.Gui.TreeView<T>.MultiSelect
+  fullName.vb: Terminal.Gui.TreeView(Of T).MultiSelect
+  nameWithType: TreeView<T>.MultiSelect
+  nameWithType.vb: TreeView(Of T).MultiSelect
+- uid: Terminal.Gui.TreeView`1.MultiSelect*
+  name: MultiSelect
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_MultiSelect_
+  commentId: Overload:Terminal.Gui.TreeView`1.MultiSelect
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.MultiSelect
+  fullName.vb: Terminal.Gui.TreeView(Of T).MultiSelect
+  nameWithType: TreeView<T>.MultiSelect
+  nameWithType.vb: TreeView(Of T).MultiSelect
+- uid: Terminal.Gui.TreeView`1.NoBuilderError
+  name: NoBuilderError
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_NoBuilderError
+  commentId: F:Terminal.Gui.TreeView`1.NoBuilderError
+  fullName: Terminal.Gui.TreeView<T>.NoBuilderError
+  fullName.vb: Terminal.Gui.TreeView(Of T).NoBuilderError
+  nameWithType: TreeView<T>.NoBuilderError
+  nameWithType.vb: TreeView(Of T).NoBuilderError
+- uid: Terminal.Gui.TreeView`1.ObjectActivated
+  name: ObjectActivated
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ObjectActivated
+  commentId: E:Terminal.Gui.TreeView`1.ObjectActivated
+  fullName: Terminal.Gui.TreeView<T>.ObjectActivated
+  fullName.vb: Terminal.Gui.TreeView(Of T).ObjectActivated
+  nameWithType: TreeView<T>.ObjectActivated
+  nameWithType.vb: TreeView(Of T).ObjectActivated
+- uid: Terminal.Gui.TreeView`1.ObjectActivationKey
+  name: ObjectActivationKey
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ObjectActivationKey
+  commentId: P:Terminal.Gui.TreeView`1.ObjectActivationKey
+  fullName: Terminal.Gui.TreeView<T>.ObjectActivationKey
+  fullName.vb: Terminal.Gui.TreeView(Of T).ObjectActivationKey
+  nameWithType: TreeView<T>.ObjectActivationKey
+  nameWithType.vb: TreeView(Of T).ObjectActivationKey
+- uid: Terminal.Gui.TreeView`1.ObjectActivationKey*
+  name: ObjectActivationKey
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ObjectActivationKey_
+  commentId: Overload:Terminal.Gui.TreeView`1.ObjectActivationKey
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.ObjectActivationKey
+  fullName.vb: Terminal.Gui.TreeView(Of T).ObjectActivationKey
+  nameWithType: TreeView<T>.ObjectActivationKey
+  nameWithType.vb: TreeView(Of T).ObjectActivationKey
+- uid: Terminal.Gui.TreeView`1.Objects
+  name: Objects
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Objects
+  commentId: P:Terminal.Gui.TreeView`1.Objects
+  fullName: Terminal.Gui.TreeView<T>.Objects
+  fullName.vb: Terminal.Gui.TreeView(Of T).Objects
+  nameWithType: TreeView<T>.Objects
+  nameWithType.vb: TreeView(Of T).Objects
+- uid: Terminal.Gui.TreeView`1.Objects*
+  name: Objects
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Objects_
+  commentId: Overload:Terminal.Gui.TreeView`1.Objects
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.Objects
+  fullName.vb: Terminal.Gui.TreeView(Of T).Objects
+  nameWithType: TreeView<T>.Objects
+  nameWithType.vb: TreeView(Of T).Objects
+- uid: Terminal.Gui.TreeView`1.OnObjectActivated(Terminal.Gui.ObjectActivatedEventArgs{`0})
+  name: OnObjectActivated(ObjectActivatedEventArgs<T>)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_OnObjectActivated_Terminal_Gui_ObjectActivatedEventArgs__0__
+  commentId: M:Terminal.Gui.TreeView`1.OnObjectActivated(Terminal.Gui.ObjectActivatedEventArgs{`0})
+  name.vb: OnObjectActivated(ObjectActivatedEventArgs(Of T))
+  fullName: Terminal.Gui.TreeView<T>.OnObjectActivated(Terminal.Gui.ObjectActivatedEventArgs<T>)
+  fullName.vb: Terminal.Gui.TreeView(Of T).OnObjectActivated(Terminal.Gui.ObjectActivatedEventArgs(Of T))
+  nameWithType: TreeView<T>.OnObjectActivated(ObjectActivatedEventArgs<T>)
+  nameWithType.vb: TreeView(Of T).OnObjectActivated(ObjectActivatedEventArgs(Of T))
+- uid: Terminal.Gui.TreeView`1.OnObjectActivated*
+  name: OnObjectActivated
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_OnObjectActivated_
+  commentId: Overload:Terminal.Gui.TreeView`1.OnObjectActivated
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.OnObjectActivated
+  fullName.vb: Terminal.Gui.TreeView(Of T).OnObjectActivated
+  nameWithType: TreeView<T>.OnObjectActivated
+  nameWithType.vb: TreeView(Of T).OnObjectActivated
+- uid: Terminal.Gui.TreeView`1.OnSelectionChanged(Terminal.Gui.SelectionChangedEventArgs{`0})
+  name: OnSelectionChanged(SelectionChangedEventArgs<T>)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_OnSelectionChanged_Terminal_Gui_SelectionChangedEventArgs__0__
+  commentId: M:Terminal.Gui.TreeView`1.OnSelectionChanged(Terminal.Gui.SelectionChangedEventArgs{`0})
+  name.vb: OnSelectionChanged(SelectionChangedEventArgs(Of T))
+  fullName: Terminal.Gui.TreeView<T>.OnSelectionChanged(Terminal.Gui.SelectionChangedEventArgs<T>)
+  fullName.vb: Terminal.Gui.TreeView(Of T).OnSelectionChanged(Terminal.Gui.SelectionChangedEventArgs(Of T))
+  nameWithType: TreeView<T>.OnSelectionChanged(SelectionChangedEventArgs<T>)
+  nameWithType.vb: TreeView(Of T).OnSelectionChanged(SelectionChangedEventArgs(Of T))
+- uid: Terminal.Gui.TreeView`1.OnSelectionChanged*
+  name: OnSelectionChanged
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_OnSelectionChanged_
+  commentId: Overload:Terminal.Gui.TreeView`1.OnSelectionChanged
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.OnSelectionChanged
+  fullName.vb: Terminal.Gui.TreeView(Of T).OnSelectionChanged
+  nameWithType: TreeView<T>.OnSelectionChanged
+  nameWithType.vb: TreeView(Of T).OnSelectionChanged
+- uid: Terminal.Gui.TreeView`1.PositionCursor
+  name: PositionCursor()
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_PositionCursor
+  commentId: M:Terminal.Gui.TreeView`1.PositionCursor
+  fullName: Terminal.Gui.TreeView<T>.PositionCursor()
+  fullName.vb: Terminal.Gui.TreeView(Of T).PositionCursor()
+  nameWithType: TreeView<T>.PositionCursor()
+  nameWithType.vb: TreeView(Of T).PositionCursor()
+- uid: Terminal.Gui.TreeView`1.PositionCursor*
+  name: PositionCursor
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_PositionCursor_
+  commentId: Overload:Terminal.Gui.TreeView`1.PositionCursor
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.PositionCursor
+  fullName.vb: Terminal.Gui.TreeView(Of T).PositionCursor
+  nameWithType: TreeView<T>.PositionCursor
+  nameWithType.vb: TreeView(Of T).PositionCursor
+- uid: Terminal.Gui.TreeView`1.ProcessKey(Terminal.Gui.KeyEvent)
+  name: ProcessKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ProcessKey_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.TreeView`1.ProcessKey(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.TreeView<T>.ProcessKey(Terminal.Gui.KeyEvent)
+  fullName.vb: Terminal.Gui.TreeView(Of T).ProcessKey(Terminal.Gui.KeyEvent)
+  nameWithType: TreeView<T>.ProcessKey(KeyEvent)
+  nameWithType.vb: TreeView(Of T).ProcessKey(KeyEvent)
+- uid: Terminal.Gui.TreeView`1.ProcessKey*
+  name: ProcessKey
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ProcessKey_
+  commentId: Overload:Terminal.Gui.TreeView`1.ProcessKey
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.ProcessKey
+  fullName.vb: Terminal.Gui.TreeView(Of T).ProcessKey
+  nameWithType: TreeView<T>.ProcessKey
+  nameWithType.vb: TreeView(Of T).ProcessKey
+- uid: Terminal.Gui.TreeView`1.RebuildTree
+  name: RebuildTree()
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_RebuildTree
+  commentId: M:Terminal.Gui.TreeView`1.RebuildTree
+  fullName: Terminal.Gui.TreeView<T>.RebuildTree()
+  fullName.vb: Terminal.Gui.TreeView(Of T).RebuildTree()
+  nameWithType: TreeView<T>.RebuildTree()
+  nameWithType.vb: TreeView(Of T).RebuildTree()
+- uid: Terminal.Gui.TreeView`1.RebuildTree*
+  name: RebuildTree
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_RebuildTree_
+  commentId: Overload:Terminal.Gui.TreeView`1.RebuildTree
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.RebuildTree
+  fullName.vb: Terminal.Gui.TreeView(Of T).RebuildTree
+  nameWithType: TreeView<T>.RebuildTree
+  nameWithType.vb: TreeView(Of T).RebuildTree
+- uid: Terminal.Gui.TreeView`1.Redraw(Terminal.Gui.Rect)
+  name: Redraw(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Redraw_Terminal_Gui_Rect_
+  commentId: M:Terminal.Gui.TreeView`1.Redraw(Terminal.Gui.Rect)
+  fullName: Terminal.Gui.TreeView<T>.Redraw(Terminal.Gui.Rect)
+  fullName.vb: Terminal.Gui.TreeView(Of T).Redraw(Terminal.Gui.Rect)
+  nameWithType: TreeView<T>.Redraw(Rect)
+  nameWithType.vb: TreeView(Of T).Redraw(Rect)
+- uid: Terminal.Gui.TreeView`1.Redraw*
+  name: Redraw
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Redraw_
+  commentId: Overload:Terminal.Gui.TreeView`1.Redraw
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.Redraw
+  fullName.vb: Terminal.Gui.TreeView(Of T).Redraw
+  nameWithType: TreeView<T>.Redraw
+  nameWithType.vb: TreeView(Of T).Redraw
+- uid: Terminal.Gui.TreeView`1.RefreshObject(`0,System.Boolean)
+  name: RefreshObject(T, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_RefreshObject__0_System_Boolean_
+  commentId: M:Terminal.Gui.TreeView`1.RefreshObject(`0,System.Boolean)
+  fullName: Terminal.Gui.TreeView<T>.RefreshObject(T, System.Boolean)
+  fullName.vb: Terminal.Gui.TreeView(Of T).RefreshObject(T, System.Boolean)
+  nameWithType: TreeView<T>.RefreshObject(T, Boolean)
+  nameWithType.vb: TreeView(Of T).RefreshObject(T, Boolean)
+- uid: Terminal.Gui.TreeView`1.RefreshObject*
+  name: RefreshObject
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_RefreshObject_
+  commentId: Overload:Terminal.Gui.TreeView`1.RefreshObject
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.RefreshObject
+  fullName.vb: Terminal.Gui.TreeView(Of T).RefreshObject
+  nameWithType: TreeView<T>.RefreshObject
+  nameWithType.vb: TreeView(Of T).RefreshObject
+- uid: Terminal.Gui.TreeView`1.Remove(`0)
+  name: Remove(T)
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Remove__0_
+  commentId: M:Terminal.Gui.TreeView`1.Remove(`0)
+  fullName: Terminal.Gui.TreeView<T>.Remove(T)
+  fullName.vb: Terminal.Gui.TreeView(Of T).Remove(T)
+  nameWithType: TreeView<T>.Remove(T)
+  nameWithType.vb: TreeView(Of T).Remove(T)
+- uid: Terminal.Gui.TreeView`1.Remove*
+  name: Remove
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Remove_
+  commentId: Overload:Terminal.Gui.TreeView`1.Remove
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.Remove
+  fullName.vb: Terminal.Gui.TreeView(Of T).Remove
+  nameWithType: TreeView<T>.Remove
+  nameWithType.vb: TreeView(Of T).Remove
+- uid: Terminal.Gui.TreeView`1.ScrollOffsetHorizontal
+  name: ScrollOffsetHorizontal
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ScrollOffsetHorizontal
+  commentId: P:Terminal.Gui.TreeView`1.ScrollOffsetHorizontal
+  fullName: Terminal.Gui.TreeView<T>.ScrollOffsetHorizontal
+  fullName.vb: Terminal.Gui.TreeView(Of T).ScrollOffsetHorizontal
+  nameWithType: TreeView<T>.ScrollOffsetHorizontal
+  nameWithType.vb: TreeView(Of T).ScrollOffsetHorizontal
+- uid: Terminal.Gui.TreeView`1.ScrollOffsetHorizontal*
+  name: ScrollOffsetHorizontal
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ScrollOffsetHorizontal_
+  commentId: Overload:Terminal.Gui.TreeView`1.ScrollOffsetHorizontal
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.ScrollOffsetHorizontal
+  fullName.vb: Terminal.Gui.TreeView(Of T).ScrollOffsetHorizontal
+  nameWithType: TreeView<T>.ScrollOffsetHorizontal
+  nameWithType.vb: TreeView(Of T).ScrollOffsetHorizontal
+- uid: Terminal.Gui.TreeView`1.ScrollOffsetVertical
+  name: ScrollOffsetVertical
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ScrollOffsetVertical
+  commentId: P:Terminal.Gui.TreeView`1.ScrollOffsetVertical
+  fullName: Terminal.Gui.TreeView<T>.ScrollOffsetVertical
+  fullName.vb: Terminal.Gui.TreeView(Of T).ScrollOffsetVertical
+  nameWithType: TreeView<T>.ScrollOffsetVertical
+  nameWithType.vb: TreeView(Of T).ScrollOffsetVertical
+- uid: Terminal.Gui.TreeView`1.ScrollOffsetVertical*
+  name: ScrollOffsetVertical
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ScrollOffsetVertical_
+  commentId: Overload:Terminal.Gui.TreeView`1.ScrollOffsetVertical
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.ScrollOffsetVertical
+  fullName.vb: Terminal.Gui.TreeView(Of T).ScrollOffsetVertical
+  nameWithType: TreeView<T>.ScrollOffsetVertical
+  nameWithType.vb: TreeView(Of T).ScrollOffsetVertical
+- uid: Terminal.Gui.TreeView`1.SelectAll
+  name: SelectAll()
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_SelectAll
+  commentId: M:Terminal.Gui.TreeView`1.SelectAll
+  fullName: Terminal.Gui.TreeView<T>.SelectAll()
+  fullName.vb: Terminal.Gui.TreeView(Of T).SelectAll()
+  nameWithType: TreeView<T>.SelectAll()
+  nameWithType.vb: TreeView(Of T).SelectAll()
+- uid: Terminal.Gui.TreeView`1.SelectAll*
+  name: SelectAll
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_SelectAll_
+  commentId: Overload:Terminal.Gui.TreeView`1.SelectAll
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.SelectAll
+  fullName.vb: Terminal.Gui.TreeView(Of T).SelectAll
+  nameWithType: TreeView<T>.SelectAll
+  nameWithType.vb: TreeView(Of T).SelectAll
+- uid: Terminal.Gui.TreeView`1.SelectedObject
+  name: SelectedObject
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_SelectedObject
+  commentId: P:Terminal.Gui.TreeView`1.SelectedObject
+  fullName: Terminal.Gui.TreeView<T>.SelectedObject
+  fullName.vb: Terminal.Gui.TreeView(Of T).SelectedObject
+  nameWithType: TreeView<T>.SelectedObject
+  nameWithType.vb: TreeView(Of T).SelectedObject
+- uid: Terminal.Gui.TreeView`1.SelectedObject*
+  name: SelectedObject
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_SelectedObject_
+  commentId: Overload:Terminal.Gui.TreeView`1.SelectedObject
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.SelectedObject
+  fullName.vb: Terminal.Gui.TreeView(Of T).SelectedObject
+  nameWithType: TreeView<T>.SelectedObject
+  nameWithType.vb: TreeView(Of T).SelectedObject
+- uid: Terminal.Gui.TreeView`1.SelectionChanged
+  name: SelectionChanged
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_SelectionChanged
+  commentId: E:Terminal.Gui.TreeView`1.SelectionChanged
+  fullName: Terminal.Gui.TreeView<T>.SelectionChanged
+  fullName.vb: Terminal.Gui.TreeView(Of T).SelectionChanged
+  nameWithType: TreeView<T>.SelectionChanged
+  nameWithType.vb: TreeView(Of T).SelectionChanged
+- uid: Terminal.Gui.TreeView`1.Style
+  name: Style
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Style
+  commentId: P:Terminal.Gui.TreeView`1.Style
+  fullName: Terminal.Gui.TreeView<T>.Style
+  fullName.vb: Terminal.Gui.TreeView(Of T).Style
+  nameWithType: TreeView<T>.Style
+  nameWithType.vb: TreeView(Of T).Style
+- uid: Terminal.Gui.TreeView`1.Style*
+  name: Style
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_Style_
+  commentId: Overload:Terminal.Gui.TreeView`1.Style
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.Style
+  fullName.vb: Terminal.Gui.TreeView(Of T).Style
+  nameWithType: TreeView<T>.Style
+  nameWithType.vb: TreeView(Of T).Style
+- uid: Terminal.Gui.TreeView`1.TreeBuilder
+  name: TreeBuilder
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_TreeBuilder
+  commentId: P:Terminal.Gui.TreeView`1.TreeBuilder
+  fullName: Terminal.Gui.TreeView<T>.TreeBuilder
+  fullName.vb: Terminal.Gui.TreeView(Of T).TreeBuilder
+  nameWithType: TreeView<T>.TreeBuilder
+  nameWithType.vb: TreeView(Of T).TreeBuilder
+- uid: Terminal.Gui.TreeView`1.TreeBuilder*
+  name: TreeBuilder
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_TreeBuilder_
+  commentId: Overload:Terminal.Gui.TreeView`1.TreeBuilder
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.TreeBuilder
+  fullName.vb: Terminal.Gui.TreeView(Of T).TreeBuilder
+  nameWithType: TreeView<T>.TreeBuilder
+  nameWithType.vb: TreeView(Of T).TreeBuilder
 - uid: Terminal.Gui.View
   name: View
   href: api/Terminal.Gui/Terminal.Gui.View.html
