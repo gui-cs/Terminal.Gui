@@ -28,11 +28,11 @@ namespace UICatalog.Scenarios {
 
 		public override void Setup ()
 		{
-			Win.Title = this.GetName();
+			Win.Title = this.GetName ();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
 			Top.LayoutSubviews ();
-			
+
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Quit()),
@@ -60,26 +60,26 @@ namespace UICatalog.Scenarios {
 			});
 			Top.Add (statusBar);
 
-			var lblFiles = new Label("File Tree:"){
-				X=0,
-				Y=1
+			var lblFiles = new Label ("File Tree:") {
+				X = 0,
+				Y = 1
 			};
-			Win.Add(lblFiles);
+			Win.Add (lblFiles);
 
 			treeViewFiles = new TreeView<FileSystemInfo> () {
 				X = 0,
-				Y = Pos.Bottom(lblFiles),
-				Width = Dim.Fill(),
-				Height = Dim.Fill(),
+				Y = Pos.Bottom (lblFiles),
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
 			};
-			
-			SetupFileTree();
 
-			Win.Add(treeViewFiles);
-			
-			SetupScrollBar();
-						
-			green = Application.Driver.MakeAttribute (Color.Green, Color.Blue);			
+			SetupFileTree ();
+
+			Win.Add (treeViewFiles);
+
+			SetupScrollBar ();
+
+			green = Application.Driver.MakeAttribute (Color.Green, Color.Blue);
 			red = Application.Driver.MakeAttribute (Color.Red, Color.Blue);
 		}
 
@@ -97,7 +97,7 @@ namespace UICatalog.Scenarios {
 				}
 				treeViewFiles.SetNeedsDisplay ();
 			};
-			
+
 			_scrollBar.OtherScrollBarView.ChangedPosition += () => {
 				treeViewFiles.ScrollOffsetHorizontal = _scrollBar.OtherScrollBarView.Position;
 				if (treeViewFiles.ScrollOffsetHorizontal != _scrollBar.OtherScrollBarView.Position) {
@@ -105,11 +105,11 @@ namespace UICatalog.Scenarios {
 				}
 				treeViewFiles.SetNeedsDisplay ();
 			};
-			
+
 			treeViewFiles.DrawContent += (e) => {
 				_scrollBar.Size = treeViewFiles.ContentHeight;
 				_scrollBar.Position = treeViewFiles.ScrollOffsetVertical;
-				_scrollBar.OtherScrollBarView.Size = treeViewFiles.GetContentWidth(true);
+				_scrollBar.OtherScrollBarView.Size = treeViewFiles.GetContentWidth (true);
 				_scrollBar.OtherScrollBarView.Position = treeViewFiles.ScrollOffsetHorizontal;
 				_scrollBar.Refresh ();
 			};
@@ -117,20 +117,20 @@ namespace UICatalog.Scenarios {
 
 		private void SetupFileTree ()
 		{
-			
+
 			// setup delegates
-			treeViewFiles.TreeBuilder = new DelegateTreeBuilder<FileSystemInfo>(
+			treeViewFiles.TreeBuilder = new DelegateTreeBuilder<FileSystemInfo> (
 
 				// Determines how to compute children of any given branch
 				GetChildren,
 				// As a shortcut to enumerating half the file system, tell tree that all directories are expandable (even if they turn out to be empty later on)				
-				(o)=>o is DirectoryInfo
+				(o) => o is DirectoryInfo
 			);
 
 			// Determines how to represent objects as strings on the screen
 			treeViewFiles.AspectGetter = FileSystemAspectGetter;
 
-			treeViewFiles.AddObjects(DriveInfo.GetDrives().Select(d=>d.RootDirectory));
+			treeViewFiles.AddObjects (DriveInfo.GetDrives ().Select (d => d.RootDirectory));
 		}
 
 		private void ShowLines ()
@@ -138,78 +138,81 @@ namespace UICatalog.Scenarios {
 			miShowLines.Checked = !miShowLines.Checked;
 
 			treeViewFiles.Style.ShowBranchLines = miShowLines.Checked;
-			treeViewFiles.SetNeedsDisplay();
+			treeViewFiles.SetNeedsDisplay ();
 		}
-		
-		private void SetExpandableSymbols(Rune? expand, Rune? collapse)
+
+		private void SetExpandableSymbols (Rune? expand, Rune? collapse)
 		{
 			miPlusMinus.Checked = expand == '+';
 			miArrowSymbols.Checked = expand == '>';
 			miNoSymbols.Checked = expand == null;
 			miUnicodeSymbols.Checked = expand == 'ஹ';
-						
+
 			treeViewFiles.Style.ExpandableSymbol = expand;
 			treeViewFiles.Style.CollapseableSymbol = collapse;
-			treeViewFiles.SetNeedsDisplay();
+			treeViewFiles.SetNeedsDisplay ();
 		}
-		private void ShowColoredExpandableSymbols()
+		private void ShowColoredExpandableSymbols ()
 		{
 			miColoredSymbols.Checked = !miColoredSymbols.Checked;
 
-			treeViewFiles.Style.ColorExpandSymbol =  miColoredSymbols.Checked;
-			treeViewFiles.SetNeedsDisplay();
+			treeViewFiles.Style.ColorExpandSymbol = miColoredSymbols.Checked;
+			treeViewFiles.SetNeedsDisplay ();
 		}
-		private void InvertExpandableSymbols(){
+		private void InvertExpandableSymbols ()
+		{
 			miInvertSymbols.Checked = !miInvertSymbols.Checked;
 
-			treeViewFiles.Style.InvertExpandSymbolColors =  miInvertSymbols.Checked;
-			treeViewFiles.SetNeedsDisplay();
+			treeViewFiles.Style.InvertExpandSymbolColors = miInvertSymbols.Checked;
+			treeViewFiles.SetNeedsDisplay ();
 		}
 
-		private void SetFullName()
+		private void SetFullName ()
 		{
 			miFullPaths.Checked = !miFullPaths.Checked;
 
-			if(miFullPaths.Checked)
-				treeViewFiles.AspectGetter = (f)=>f.FullName;
-			else
-				treeViewFiles.AspectGetter = (f)=>f.Name;
+			if (miFullPaths.Checked) {
+				treeViewFiles.AspectGetter = (f) => f.FullName;
+			} else {
+				treeViewFiles.AspectGetter = (f) => f.Name;
+			}
 		}
 
-		private void SetLeaveLastRow()
+		private void SetLeaveLastRow ()
 		{
 			miLeaveLastRow.Checked = !miLeaveLastRow.Checked;
 			treeViewFiles.Style.LeaveLastRow = miLeaveLastRow.Checked;
 		}
 
 
-		private IEnumerable<FileSystemInfo> GetChildren(FileSystemInfo model)
+		private IEnumerable<FileSystemInfo> GetChildren (FileSystemInfo model)
 		{
 			// If it is a directory it's children are all contained files and dirs
-			if(model is DirectoryInfo d) {
+			if (model is DirectoryInfo d) {
 				try {
-					return d.GetFileSystemInfos()
+					return d.GetFileSystemInfos ()
 						//show directories first
-						.OrderBy(a=>a is DirectoryInfo ? 0:1)
-						.ThenBy(b=>b.Name);
-				}
-				catch(SystemException) {
+						.OrderBy (a => a is DirectoryInfo ? 0 : 1)
+						.ThenBy (b => b.Name);
+				} catch (SystemException) {
 
 					// Access violation or other error getting the file list for directory
-					return Enumerable.Empty<FileSystemInfo>();
+					return Enumerable.Empty<FileSystemInfo> ();
 				}
 			}
 
-		    return Enumerable.Empty<FileSystemInfo>();;
+			return Enumerable.Empty<FileSystemInfo> (); ;
 		}
-		private string FileSystemAspectGetter(FileSystemInfo model)
+		private string FileSystemAspectGetter (FileSystemInfo model)
 		{
-			if(model is DirectoryInfo d)
+			if (model is DirectoryInfo d) {
 				return d.Name;
-			if(model is FileInfo f)
+			}
+			if (model is FileInfo f) {
 				return f.Name;
+			}
 
-			return model.ToString();
+			return model.ToString ();
 		}
 
 		private void Quit ()

@@ -9,15 +9,15 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Controls")]
 	class TreeUseCases : Scenario {
 
-        View currentTree;
+		View currentTree;
 
-	    public override void Setup ()
+		public override void Setup ()
 		{
-			Win.Title = this.GetName();
+			Win.Title = this.GetName ();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
 			Top.LayoutSubviews ();
-			
+
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Quit()),
@@ -29,8 +29,8 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Armies With Delegate", "", () => LoadArmies(true)),
 				}),
 			});
-			
-            Top.Add (menu);
+
+			Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
@@ -38,85 +38,82 @@ namespace UICatalog.Scenarios {
 
 			Top.Add (statusBar);
 
-            // Start with the most basic use case
-            LoadSimpleNodes();
-        }
+			// Start with the most basic use case
+			LoadSimpleNodes ();
+		}
 
-        // Your data class
+		// Your data class
 		private class House : TreeNode {
 
-            // Your properties
-            public string Address {get;set;}
-            public List<Room> Rooms {get;set;}
+			// Your properties
+			public string Address { get; set; }
+			public List<Room> Rooms { get; set; }
 
-            // ITreeNode member:
-			public override IList<ITreeNode> Children => Rooms.Cast<ITreeNode>().ToList();
+			// ITreeNode member:
+			public override IList<ITreeNode> Children => Rooms.Cast<ITreeNode> ().ToList ();
 
 			public override string Text { get => Address; set => Address = value; }
 		}
-		private class Room : TreeNode{
-            
-            public string Name {get;set;}
+		private class Room : TreeNode {
 
-			public override string Text{get=>Name;set{Name=value;}}
-        }
+			public string Name { get; set; }
 
-		private void LoadRooms()
+			public override string Text { get => Name; set { Name = value; } }
+		}
+
+		private void LoadRooms ()
 		{
-            var myHouse = new House()
-            {
-                Address = "23 Nowhere Street",
-                Rooms = new List<Room>{
-                    new Room(){Name = "Ballroom"},
-                    new Room(){Name = "Bedroom 1"},
-                    new Room(){Name = "Bedroom 2"}
-                }
-            };
+			var myHouse = new House () {
+				Address = "23 Nowhere Street",
+				Rooms = new List<Room>{
+		    new Room(){Name = "Ballroom"},
+		    new Room(){Name = "Bedroom 1"},
+		    new Room(){Name = "Bedroom 2"}
+		}
+			};
 
-            if(currentTree != null)
-                Win.Remove(currentTree);
+			if (currentTree != null) {
+				Win.Remove (currentTree);
+			}
 
-			var tree = new TreeView()
-			{
-                X = 0,
-                Y = 0,
+
+			var tree = new TreeView () {
+				X = 0,
+				Y = 0,
 				Width = 40,
 				Height = 20
 			};
 
-            Win.Add(tree);
+			Win.Add (tree);
 
-            tree.AddObject(myHouse);
+			tree.AddObject (myHouse);
 
-            currentTree = tree;
+			currentTree = tree;
 		}
 
 
 
-        private abstract class GameObject
-        {
+		private abstract class GameObject {
 
-        }
-        private class Army : GameObject
-        {
-            public string Designation {get;set;}
-            public List<Unit> Units {get;set;}
+		}
+		private class Army : GameObject {
+			public string Designation { get; set; }
+			public List<Unit> Units { get; set; }
 
 
 			public override string ToString ()
 			{
 				return Designation;
 			}
-        }
+		}
 
-        private class Unit : GameObject
-        {
-            public string Name {get;set;}
+		private class Unit : GameObject {
+			public string Name { get; set; }
 			public override string ToString ()
 			{
 				return Name;
 			}
-        }
+		}
 
 		private class GameObjectTreeBuilder : ITreeBuilder<GameObject> {
 			public bool SupportsCanExpand => true;
@@ -128,49 +125,49 @@ namespace UICatalog.Scenarios {
 
 			public IEnumerable<GameObject> GetChildren (GameObject model)
 			{
-                if(model is Army a)
-                    return a.Units;
+				if (model is Army a) {
+					return a.Units;
+				}
 
-				return Enumerable.Empty<GameObject>();
+				return Enumerable.Empty<GameObject> ();
 			}
 		}
 
 
-		private void LoadArmies(bool useDelegate)
+		private void LoadArmies (bool useDelegate)
 		{
-            var army1 = new Army()
-            {
-                Designation = "3rd Infantry",
-                Units = new List<Unit>{
-                    new Unit(){Name = "Orc"},
-                    new Unit(){Name = "Troll"},
-                    new Unit(){Name = "Goblin"},
-                }
-            };
+			var army1 = new Army () {
+				Designation = "3rd Infantry",
+				Units = new List<Unit>{
+		    new Unit(){Name = "Orc"},
+		    new Unit(){Name = "Troll"},
+		    new Unit(){Name = "Goblin"},
+		}
+			};
 
-            if(currentTree != null)
-                Win.Remove(currentTree);
+			if (currentTree != null) {
+				Win.Remove (currentTree);
+			}
 
-			var tree = new TreeView<GameObject>()
-			{
-                X = 0,
-                Y = 0,
+
+			var tree = new TreeView<GameObject> () {
+				X = 0,
+				Y = 0,
 				Width = 40,
 				Height = 20
 			};
 
-            if(useDelegate){
-                tree.TreeBuilder = new DelegateTreeBuilder<GameObject>((o)=>o is Army a ? a.Units : Enumerable.Empty<GameObject>());
-            }
-            else{
-                tree.TreeBuilder = new GameObjectTreeBuilder();
-            }
+			if (useDelegate) {
+				tree.TreeBuilder = new DelegateTreeBuilder<GameObject> ((o) => o is Army a ? a.Units : Enumerable.Empty<GameObject> ());
+			} else {
+				tree.TreeBuilder = new GameObjectTreeBuilder ();
+			}
 
-            Win.Add(tree);
+			Win.Add (tree);
 
-            tree.AddObject(army1);
+			tree.AddObject (army1);
 
-            currentTree = tree;
+			currentTree = tree;
 		}
 
 		private void Quit ()
@@ -178,33 +175,34 @@ namespace UICatalog.Scenarios {
 			Application.RequestStop ();
 		}
 
-		private void LoadSimpleNodes()
+		private void LoadSimpleNodes ()
 		{
-            if(currentTree != null)
-                Win.Remove(currentTree);
+			if (currentTree != null) {
+				Win.Remove (currentTree);
+			}
 
-			var tree = new TreeView()
-			{
-                X = 0,
-                Y = 0,
+
+			var tree = new TreeView () {
+				X = 0,
+				Y = 0,
 				Width = 40,
 				Height = 20
 			};
 
-            Win.Add(tree);
+			Win.Add (tree);
 
-			var root1 = new TreeNode("Root1");
-			root1.Children.Add(new TreeNode("Child1.1"));
-			root1.Children.Add(new TreeNode("Child1.2"));
+			var root1 = new TreeNode ("Root1");
+			root1.Children.Add (new TreeNode ("Child1.1"));
+			root1.Children.Add (new TreeNode ("Child1.2"));
 
-			var root2 = new TreeNode("Root2");
-			root2.Children.Add(new TreeNode("Child2.1"));
-			root2.Children.Add(new TreeNode("Child2.2"));
-		
-			tree.AddObject(root1);
-			tree.AddObject(root2);
+			var root2 = new TreeNode ("Root2");
+			root2.Children.Add (new TreeNode ("Child2.1"));
+			root2.Children.Add (new TreeNode ("Child2.2"));
 
-            currentTree = tree;
+			tree.AddObject (root1);
+			tree.AddObject (root2);
+
+			currentTree = tree;
 
 		}
 	}
