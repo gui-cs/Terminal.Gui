@@ -630,9 +630,11 @@ namespace Terminal.Gui {
 
 					if (clickedBranch.IsExpanded) {
 						clickedBranch.Collapse ();
+						InvalidateLineMap ();
 					} else
 					if (clickedBranch.CanExpand ()) {
 						clickedBranch.Expand ();
+						InvalidateLineMap ();
 					} else {
 						SelectedObject = clickedBranch.Model; // It is a leaf node
 						multiSelectedRegions.Clear ();
