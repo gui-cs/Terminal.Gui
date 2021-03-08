@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using NStack;
 
@@ -126,7 +127,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Cached result of <see cref="BuildLineMap"/>
 		/// </summary>
-		private Branch<T> [] cachedLineMap;
+		private IReadOnlyCollection<Branch<T>> cachedLineMap;
 
 
 		/// <summary>
@@ -356,9 +357,9 @@ namespace Terminal.Gui {
 				var idxToRender = ScrollOffsetVertical + line;
 
 				// Is there part of the tree view to render?
-				if (idxToRender < map.Length) {
+				if (idxToRender < map.Count) {
 					// Render the line
-					map [idxToRender].Draw (Driver, ColorScheme, line, bounds.Width);
+					map.ElementAt (idxToRender).Draw (Driver, ColorScheme, line, bounds.Width);
 				} else {
 
 					// Else clear the line to prevent stale symbols due to scrolling etc
@@ -383,8 +384,8 @@ namespace Terminal.Gui {
 		public int GetScrollOffsetOf (T o)
 		{
 			var map = BuildLineMap ();
-			for (int i = 0; i < map.Length; i++) {
-				if (map [i].Model.Equals (o)) {
+			for (int i = 0; i < map.Count; i++) {
+				if (map.ElementAt (i).Model.Equals (o)) {
 					return i;
 				}
 			}
@@ -404,14 +405,14 @@ namespace Terminal.Gui {
 		{
 			var map = BuildLineMap ();
 
-			if (map.Length == 0) {
+			if (map.Count == 0) {
 				return 0;
 			}
 
 			if (visible) {
 
 				//Somehow we managed to scroll off the end of the control
-				if (ScrollOffsetVertical >= map.Length) {
+				if (ScrollOffsetVertical >= map.Count) {
 					return 0;
 				}
 
@@ -434,7 +435,7 @@ namespace Terminal.Gui {
 		/// <remarks>Index 0 of the returned array is the first item that should be visible in the
 		/// top of the control, index 1 is the next etc.</remarks>
 		/// <returns></returns>
-		private Branch<T> [] BuildLineMap ()
+		private IReadOnlyCollection<Branch<T>> BuildLineMap ()
 		{
 			if (cachedLineMap != null) {
 				return cachedLineMap;
@@ -446,7 +447,7 @@ namespace Terminal.Gui {
 				toReturn.AddRange (AddToLineMap (root));
 			}
 
-			return cachedLineMap = toReturn.ToArray ();
+			return cachedLineMap = new ReadOnlyCollection<Branch<T>>(toReturn);
 		}
 
 		private IEnumerable<Branch<T>> AddToLineMap (Branch<T> currentBranch)
@@ -611,12 +612,12 @@ namespace Terminal.Gui {
 				var idx = me.Y + ScrollOffsetVertical;
 
 				// click is outside any visible nodes
-				if (idx < 0 || idx >= map.Length) {
+				if (idx < 0 || idx >= map.Count) {
 					return false;
 				}
 
 				// The line they clicked on
-				var clickedBranch = map [idx];
+				var clickedBranch = map.ElementAt (idx);
 
 				bool isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol (Driver, me.X);
 
@@ -661,7 +662,7 @@ namespace Terminal.Gui {
 			if (CanFocus && HasFocus && Visible && SelectedObject != null) {
 
 				var map = BuildLineMap ();
-				var idx = Array.FindIndex (map, b => b.Model.Equals (SelectedObject));
+				var idx = map.IndexOf(b => b.Model.Equals (SelectedObject));
 
 				// if currently selected line is visible
 				if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Bounds.Height) {
@@ -720,7 +721,7 @@ namespace Terminal.Gui {
 		public void GoToEnd ()
 		{
 			var map = BuildLineMap ();
-			ScrollOffsetVertical = Math.Max (0, map.Length - Bounds.Height + 1);
+			ScrollOffsetVertical = Math.Max (0, map.Count - Bounds.Height + 1);
 			SelectedObject = map.Last ().Model;
 
 			SetNeedsDisplay ();
@@ -764,16 +765,16 @@ namespace Terminal.Gui {
 			} else {
 				var map = BuildLineMap ();
 
-				var idx = Array.FindIndex (map, b => b.Model.Equals (SelectedObject));
+				var idx = map.IndexOf(b => b.Model.Equals (SelectedObject));
 
 				if (idx == -1) {
 
 					// The current selection has disapeared!
 					SelectedObject = roots.Keys.FirstOrDefault ();
 				} else {
-					var newIdx = Math.Min (Math.Max (0, idx + offset), map.Length - 1);
+					var newIdx = Math.Min (Math.Max (0, idx + offset), map.Count - 1);
 
-					var newBranch = map [newIdx];
+					var newBranch = map.ElementAt(newIdx);
 
 					// If it is a multi selection
 					if (expandSelection && MultiSelect) {
@@ -783,7 +784,7 @@ namespace Terminal.Gui {
 							multiSelectedRegions.Push (new TreeSelection<T> (head.Origin, newIdx, map));
 						} else {
 							// or start a new multi selection region
-							multiSelectedRegions.Push (new TreeSelection<T> (map [idx], newIdx, map));
+							multiSelectedRegions.Push (new TreeSelection<T> (map.ElementAt(idx), newIdx, map));
 						}
 					}
 
@@ -809,13 +810,13 @@ namespace Terminal.Gui {
 
 			var map = BuildLineMap ();
 
-			int currentIdx = Array.FindIndex (map, b => Equals (b.Model, o));
+			int currentIdx = map.IndexOf(b => Equals (b.Model, o));
 
 			if (currentIdx == -1) {
 				return;
 			}
 
-			var currentBranch = map [currentIdx];
+			var currentBranch = map.ElementAt(currentIdx);
 			var next = currentBranch;
 
 			for (; currentIdx >= 0; currentIdx--) {
@@ -830,7 +831,7 @@ namespace Terminal.Gui {
 
 				// look at next branch up for consideration
 				currentBranch = next;
-				next = map [currentIdx];
+				next = map.ElementAt(currentIdx);
 			}
 
 			// We ran all the way to top of tree
@@ -849,16 +850,16 @@ namespace Terminal.Gui {
 
 			var map = BuildLineMap ();
 
-			int currentIdx = Array.FindIndex (map, b => Equals (b.Model, o));
+			int currentIdx = map.IndexOf(b => Equals (b.Model, o));
 
 			if (currentIdx == -1) {
 				return;
 			}
 
-			var currentBranch = map [currentIdx];
+			var currentBranch = map.ElementAt(currentIdx);
 			var next = currentBranch;
 
-			for (; currentIdx < map.Length; currentIdx++) {
+			for (; currentIdx < map.Count; currentIdx++) {
 				//if it is the end of the current depth of branch
 				if (currentBranch.Depth != next.Depth) {
 
@@ -870,7 +871,7 @@ namespace Terminal.Gui {
 
 				// look at next branch for consideration
 				currentBranch = next;
-				next = map [currentIdx];
+				next = map.ElementAt(currentIdx);
 			}
 
 			GoToEnd ();
@@ -886,7 +887,7 @@ namespace Terminal.Gui {
 			var map = BuildLineMap ();
 
 			// empty map means we can't select anything anyway
-			if (map.Length == 0) {
+			if (map.Count == 0) {
 				return;
 			}
 
@@ -895,7 +896,7 @@ namespace Terminal.Gui {
 
 			// or the current selected branch
 			if (SelectedObject != null) {
-				idxStart = Array.FindIndex (map, b => Equals (b.Model, SelectedObject));
+				idxStart = map.IndexOf(b => Equals (b.Model, SelectedObject));
 			}
 
 			// if currently selected object mysteriously vanished, search from beginning
@@ -904,10 +905,10 @@ namespace Terminal.Gui {
 			}
 
 			// loop around all indexes and back to first index
-			for (int idxCur = (idxStart + 1) % map.Length; idxCur != idxStart; idxCur = (idxCur + 1) % map.Length) {
-				if (predicate (map [idxCur])) {
-					SelectedObject = map [idxCur].Model;
-					EnsureVisible (map [idxCur].Model);
+			for (int idxCur = (idxStart + 1) % map.Count; idxCur != idxStart; idxCur = (idxCur + 1) % map.Count) {
+				if (predicate (map.ElementAt(idxCur))) {
+					SelectedObject = map.ElementAt(idxCur).Model;
+					EnsureVisible (map.ElementAt(idxCur).Model);
 					SetNeedsDisplay ();
 					return;
 				}
@@ -922,7 +923,7 @@ namespace Terminal.Gui {
 		{
 			var map = BuildLineMap ();
 
-			var idx = Array.FindIndex (map, b => Equals (b.Model, model));
+			var idx = map.IndexOf(b => Equals (b.Model, model));
 
 			if (idx == -1) {
 				return;
@@ -1145,11 +1146,11 @@ namespace Terminal.Gui {
 
 			var map = BuildLineMap ();
 
-			if (map.Length == 0) {
+			if (map.Count == 0) {
 				return;
 			}
 
-			multiSelectedRegions.Push (new TreeSelection<T> (map [0], map.Length, map));
+			multiSelectedRegions.Push (new TreeSelection<T> (map.ElementAt(0), map.Count, map));
 			SetNeedsDisplay ();
 
 			OnSelectionChanged (new SelectionChangedEventArgs<T> (this, SelectedObject, SelectedObject));
@@ -1209,12 +1210,12 @@ namespace Terminal.Gui {
 		/// <param name="from"></param>
 		/// <param name="toIndex"></param>
 		/// <param name="map"></param>
-		public TreeSelection (Branch<T> from, int toIndex, Branch<T> [] map)
+		public TreeSelection (Branch<T> from, int toIndex, IReadOnlyCollection<Branch<T>> map)
 		{
 			Origin = from;
 			included.Add (Origin.Model);
 
-			var oldIdx = Array.IndexOf (map, from);
+			var oldIdx = map.IndexOf(from);
 
 			var lowIndex = Math.Min (oldIdx, toIndex);
 			var highIndex = Math.Max (oldIdx, toIndex);
@@ -1692,6 +1693,30 @@ namespace Terminal.Gui {
 			Tree = tree;
 			OldValue = oldValue;
 			NewValue = newValue;
+		}
+	}
+
+	static class ReadOnlyCollectionExtensions {
+		
+		public static int IndexOf<T> (this IReadOnlyCollection<T> self, Func<T,bool> predicate)
+		{
+			int i = 0;
+			foreach (T element in self) {
+				if (predicate(element))
+					return i;
+				i++;
+			}
+			return -1;
+		}
+		public static int IndexOf<T> (this IReadOnlyCollection<T> self, T toFind)
+		{
+			int i = 0;
+			foreach (T element in self) {
+				if (Equals(element,toFind))
+					return i;
+				i++;
+			}
+			return -1;
 		}
 	}
 }
