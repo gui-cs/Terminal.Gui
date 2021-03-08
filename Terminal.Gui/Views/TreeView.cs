@@ -125,7 +125,7 @@ namespace Terminal.Gui {
 		/// Set to null to disable this feature.
 		/// </summary>
 		/// <value></value>
-		public MouseFlags? ObjectActivationButton {get;set;} = MouseFlags.Button1DoubleClicked;
+		public MouseFlags? ObjectActivationButton { get; set; } = MouseFlags.Button1DoubleClicked;
 
 		/// <summary>
 		/// Secondary selected regions of tree when <see cref="MultiSelect"/> is true
@@ -455,7 +455,7 @@ namespace Terminal.Gui {
 				toReturn.AddRange (AddToLineMap (root));
 			}
 
-			return cachedLineMap = new ReadOnlyCollection<Branch<T>>(toReturn);
+			return cachedLineMap = new ReadOnlyCollection<Branch<T>> (toReturn);
 		}
 
 		private IEnumerable<Branch<T>> AddToLineMap (Branch<T> currentBranch)
@@ -616,9 +616,9 @@ namespace Terminal.Gui {
 			if (me.Flags.HasFlag (MouseFlags.Button1Clicked)) {
 
 				// The line they clicked on a branch
-				var clickedBranch = HitTest(me.Y);
-				
-				if(clickedBranch == null){
+				var clickedBranch = HitTest (me.Y);
+
+				if (clickedBranch == null) {
 					return false;
 				}
 
@@ -655,23 +655,22 @@ namespace Terminal.Gui {
 			}
 
 			// If it is activation via mouse (e.g. double click)
-			if(ObjectActivationButton.HasValue && me.Flags.HasFlag(ObjectActivationButton.Value))
-			{
+			if (ObjectActivationButton.HasValue && me.Flags.HasFlag (ObjectActivationButton.Value)) {
 				// The line they clicked on a branch
-				var clickedBranch = HitTest(me.Y);
-				
-				if(clickedBranch == null){
+				var clickedBranch = HitTest (me.Y);
+
+				if (clickedBranch == null) {
 					return false;
 				}
 
 				// Double click changes the selection to the clicked node as well as triggering
 				// activation otherwise it feels wierd
 				SelectedObject = clickedBranch.Model;
-				SetNeedsDisplay();
+				SetNeedsDisplay ();
 
 				// trigger activation event				
-				OnObjectActivated(new ObjectActivatedEventArgs<T>(this,clickedBranch.Model));
-				
+				OnObjectActivated (new ObjectActivatedEventArgs<T> (this, clickedBranch.Model));
+
 				// mouse event is handled.
 				return true;
 			}

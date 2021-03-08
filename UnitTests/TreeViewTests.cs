@@ -586,11 +586,11 @@ namespace UnitTests {
 			Assert.False (called);
 
 			// double click triggers activation
-			tree.MouseEvent(new MouseEvent(){Y = 0,Flags = MouseFlags.Button1DoubleClicked});
+			tree.MouseEvent (new MouseEvent () { Y = 0, Flags = MouseFlags.Button1DoubleClicked });
 
 			Assert.True (called);
-			Assert.Same (f,activated);
-			Assert.Same (f,tree.SelectedObject);
+			Assert.Same (f, activated);
+			Assert.Same (f, tree.SelectedObject);
 		}
 
 		[Fact]
@@ -615,7 +615,7 @@ namespace UnitTests {
 			Assert.False (called);
 
 			// double click does nothing because we changed button to null
-			tree.MouseEvent(new MouseEvent(){Y = 0,Flags = MouseFlags.Button1DoubleClicked});
+			tree.MouseEvent (new MouseEvent () { Y = 0, Flags = MouseFlags.Button1DoubleClicked });
 
 			Assert.False (called);
 			Assert.Null (activated);
@@ -645,16 +645,16 @@ namespace UnitTests {
 			Assert.False (called);
 
 			// double click does nothing because we changed button binding to right click
-			tree.MouseEvent(new MouseEvent(){Y = 1,Flags = MouseFlags.Button1DoubleClicked});
+			tree.MouseEvent (new MouseEvent () { Y = 1, Flags = MouseFlags.Button1DoubleClicked });
 
 			Assert.Null (activated);
 			Assert.False (called);
 
-			tree.MouseEvent (new MouseEvent(){Y = 1,Flags = MouseFlags.Button2Clicked});
+			tree.MouseEvent (new MouseEvent () { Y = 1, Flags = MouseFlags.Button2Clicked });
 
 			Assert.True (called);
-			Assert.Same (car1,activated);
-			Assert.Same (car1,tree.SelectedObject);
+			Assert.Same (car1, activated);
+			Assert.Same (car1, tree.SelectedObject);
 		}
 
 
