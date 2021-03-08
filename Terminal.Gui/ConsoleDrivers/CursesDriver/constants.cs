@@ -89,7 +89,7 @@ namespace Unix.Terminal {
 		public const int DownEnd = unchecked((int)0x6);
 		public const int Home = unchecked((int)0x7);
 #else
-		public const int LeftRightUpNPagePPage= unchecked((int)0x0);
+		public const int LeftRightUpNPagePPage = unchecked((int)0x0);
 		public const int DownEnd = unchecked((int)0x0);
 		public const int Home = unchecked((int)0x0);
 #endif
@@ -165,8 +165,16 @@ namespace Unix.Terminal {
 		public const int AltCtrlKeyPPage = unchecked((int)0x22d + LeftRightUpNPagePPage);
 		public const int AltCtrlKeyHome = unchecked((int)0x219 + Home);
 		public const int AltCtrlKeyEnd = unchecked((int)0x214 + DownEnd);
-		public const int LC_ALL = 6;
-		static public int ColorPair(int n){
+
+		// see #949
+		static public int LC_ALL { get; private set; }
+		static Curses ()
+		{
+			LC_ALL = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform (System.Runtime.InteropServices.OSPlatform.OSX) ? 0 : 6;
+		}
+
+		static public int ColorPair (int n)
+		{
 			return 0 + n * 256;
 		}
 	}
