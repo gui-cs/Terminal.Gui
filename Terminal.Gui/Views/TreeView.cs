@@ -732,15 +732,15 @@ namespace Terminal.Gui {
 		/// its parents are collapsed)
 		/// </summary>
 		/// <param name="toSelect"></param>
-		public void GoTo(T toSelect)
+		public void GoTo (T toSelect)
 		{
-			if(ObjectToBranch(toSelect) == null) {
+			if (ObjectToBranch (toSelect) == null) {
 				return;
 			}
 
 			SelectedObject = toSelect;
-			EnsureVisible(toSelect);
-			SetNeedsDisplay();
+			EnsureVisible (toSelect);
+			SetNeedsDisplay ();
 		}
 
 		/// <summary>
