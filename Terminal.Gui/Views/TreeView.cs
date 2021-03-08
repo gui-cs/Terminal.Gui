@@ -361,10 +361,11 @@ namespace Terminal.Gui {
 			get => selectedObject; 
 			set {                
 				var oldValue = selectedObject;
-				selectedObject = value; 
+				selectedObject = value;
 
-				if(!ReferenceEquals(oldValue,value))
+				if (!ReferenceEquals (oldValue, value)) {
 					OnSelectionChanged(new SelectionChangedEventArgs<T>(this,oldValue,value));
+				}
 			}
 		}
 
@@ -511,8 +512,9 @@ namespace Terminal.Gui {
 				InvalidateLineMap();
 				SetNeedsDisplay();
 
-				if(Equals(SelectedObject,o))
+				if (Equals (SelectedObject, o)) {
 					SelectedObject = default(T);
+				}
 			}
 		}
 		
@@ -563,8 +565,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void RebuildTree()
 		{
-			foreach(var branch in roots.Values)
+			foreach(var branch in roots.Values) {
 				branch.Rebuild();
+			}	
 			
 			InvalidateLineMap();
 			SetNeedsDisplay();
@@ -580,8 +583,9 @@ namespace Terminal.Gui {
 		{
 			var branch = ObjectToBranch(o);
 
-			if(branch == null || !branch.IsExpanded)
+			if(branch == null || !branch.IsExpanded) {
 				return new T[0];
+			}	
 
 			return branch.ChildBranches?.Values?.Select(b=>b.Model)?.ToArray() ?? new T[0];
 		}
@@ -599,9 +603,10 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			if(roots == null)
+			if(roots == null) {
 				return;
-
+			}
+			
 			if(TreeBuilder == null) {
 				Move(0,0);
 				Driver.AddStr(NoBuilderError);
@@ -642,10 +647,10 @@ namespace Terminal.Gui {
 		public int GetScrollOffsetOf(T o)
 		{
 			var map = BuildLineMap();
-			for (int i = 0; i < map.Length; i++)
-			{
-				if (map[i].Model.Equals(o))
+			for (int i = 0; i < map.Length; i++) {
+				if (map [i].Model.Equals (o)) {
 					return i;
+				}
 			}
 
 			//object not found
@@ -659,22 +664,25 @@ namespace Terminal.Gui {
 		///  bounds and <see cref="ScrollOffsetVertical"/>.  False to calculate the width of 
 		/// every exposed branch in the tree</param>
 		/// <returns></returns>
-		public int GetContentWidth(bool visible){
-			
+		public int GetContentWidth(bool visible)
+		{
 			var map = BuildLineMap();
 
-			if(map.Length == 0)
+			if(map.Length == 0) {
 				return 0;
+			}
 
 			if(visible){
 
 				//Somehow we managed to scroll off the end of the control
-				if(ScrollOffsetVertical >= map.Length)
+				if(ScrollOffsetVertical >= map.Length) {
 					return 0;
+				}	
 
 				// If control has no height to it then there is no visible area for content
-				if(Bounds.Height == 0)
+				if(Bounds.Height == 0) {
 					return 0;
+				}
 
 				return map.Skip(ScrollOffsetVertical).Take(Bounds.Height).Max(b=>b.GetWidth(Driver));
 			}
@@ -693,8 +701,9 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private Branch<T>[] BuildLineMap()
 		{
-			if(cachedLineMap != null)
+			if(cachedLineMap != null) {
 				return cachedLineMap;
+			}	
 
 			List<Branch<T>> toReturn = new List<Branch<T>>();
 
@@ -709,9 +718,9 @@ namespace Terminal.Gui {
 		{
 			yield return currentBranch;
 
-			if(currentBranch.IsExpanded){
+			if(currentBranch.IsExpanded) {
 
-				foreach(var subBranch in currentBranch.ChildBranches.Values){
+				foreach(var subBranch in currentBranch.ChildBranches.Values) {
 					foreach(var sub in AddToLineMap(subBranch)) {
 						yield return sub;
 					}
@@ -722,11 +731,10 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if(keyEvent.Key == ObjectActivationKey)
-			{
+			if(keyEvent.Key == ObjectActivationKey) {
 				 var o = SelectedObject;
 
-				 if(o != null){
+				 if(o != null) {
 				 	OnObjectActivated(new ObjectActivatedEventArgs<T>(this,o));
 					
 					PositionCursor ();
@@ -820,8 +828,9 @@ namespace Terminal.Gui {
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
-				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp && me.Flags != MouseFlags.WheeledRight&& me.Flags != MouseFlags.WheeledLeft)
+				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp && me.Flags != MouseFlags.WheeledRight&& me.Flags != MouseFlags.WheeledLeft) {
 				return false;
+			}	
 
 			if (!HasFocus && CanFocus) {
 				SetFocus ();
@@ -869,10 +878,11 @@ namespace Terminal.Gui {
 				var clickedBranch = map[idx];
 
 				bool isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol(Driver,me.X);
-				
+
 				// If we are already selected (double click)
-				if(Equals(SelectedObject,clickedBranch.Model)) 
+				if (Equals (SelectedObject, clickedBranch.Model)) {
 					isExpandToggleAttempt = true;
+				}	
 
 				// if they clicked on the +/- expansion symbol
 				if( isExpandToggleAttempt) {
@@ -881,8 +891,9 @@ namespace Terminal.Gui {
 						clickedBranch.Collapse();
 					}
 					else
-					if(clickedBranch.CanExpand())
+					if (clickedBranch.CanExpand ()) {
 						clickedBranch.Expand();
+					}	
 					else {
 						SelectedObject = clickedBranch.Model; // It is a leaf node
 						multiSelectedRegions.Clear();
@@ -907,16 +918,18 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor()
 		{
-			if (CanFocus && HasFocus && Visible && SelectedObject != null) 
-			{
+			if (CanFocus && HasFocus && Visible && SelectedObject != null) {
+
 				var map = BuildLineMap();
 				var idx = Array.FindIndex(map,b=>b.Model.Equals(SelectedObject));
 
 				// if currently selected line is visible
-				if(idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical  < Bounds.Height)
+				if(idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical  < Bounds.Height) {
 					Move(0,idx - ScrollOffsetVertical);
-				else
+				}
+				else {
 					base.PositionCursor();
+				}	
 
 			} else {
 				base.PositionCursor();
@@ -932,16 +945,17 @@ namespace Terminal.Gui {
 		protected virtual void CursorLeft(bool ctrl)
 		{
 			if(IsExpanded(SelectedObject)) {
-				
-				if(ctrl)
-					CollapseAll(SelectedObject);
-				else
-					Collapse(SelectedObject);
 
+				if (ctrl) {
+					CollapseAll(SelectedObject);
+				} else {
+					Collapse(SelectedObject);
+				}
 			}
 			else
 			{
 				var parent = GetParent(SelectedObject);
+
 				if(parent != null){
 					SelectedObject = parent;
 					AdjustSelection(0);
@@ -986,9 +1000,10 @@ namespace Terminal.Gui {
 		public void AdjustSelection (int offset, bool expandSelection = false)
 		{
 			// if it is not a shift click or we don't allow multi select
-			if(!expandSelection || !MultiSelect)
+			if(!expandSelection || !MultiSelect) {
 				multiSelectedRegions.Clear();
-
+			}
+				
 			if(SelectedObject == null){
 				SelectedObject = roots.Keys.FirstOrDefault();
 			}
@@ -1039,15 +1054,17 @@ namespace Terminal.Gui {
 		public void AdjustSelectionToBranchStart()
 		{
 			var o = SelectedObject;
-			if(o == null)
+			if(o == null) {
 				return;
+			}	
 
 			var map = BuildLineMap();
 
 			int currentIdx = Array.FindIndex(map,b=>Equals(b.Model,o));
 
-			if(currentIdx == -1)
+			if(currentIdx == -1) {
 				return;
+			}
 
 			var currentBranch = map[currentIdx];
 			var next = currentBranch;
@@ -1078,15 +1095,17 @@ namespace Terminal.Gui {
 		public void AdjustSelectionToBranchEnd()
 		{
 			var o = SelectedObject;
-			if(o == null)
+			if(o == null) {
 				return;
+			}	
 
 			var map = BuildLineMap();
 
 			int currentIdx = Array.FindIndex(map,b=>Equals(b.Model,o));
 
-			if(currentIdx == -1)
+			if(currentIdx == -1) {
 				return;
+			}	
 
 			var currentBranch = map[currentIdx];
 			var next = currentBranch;
@@ -1120,19 +1139,22 @@ namespace Terminal.Gui {
 			var map = BuildLineMap();
 
 			// empty map means we can't select anything anyway
-			if(map.Length == 0)
+			if(map.Length == 0) {
 				return;
+			}	
 			
 			// Start searching from the first element in the map
 			var idxStart = 0;
 			
 			// or the current selected branch
-			if(SelectedObject !=null)
+			if(SelectedObject != null) {
 				idxStart = Array.FindIndex(map,b=>Equals(b.Model,SelectedObject));
+			}	
 
 			// if currently selected object mysteriously vanished, search from beginning
-			if(idxStart == -1)
+			if(idxStart == -1) {
 				idxStart = 0;
+			}	
 
 			// loop around all indexes and back to first index
 			for(int idxCur = (idxStart+1)%map.Length;idxCur != idxStart;idxCur = (idxCur+1) % map.Length)
@@ -1157,8 +1179,10 @@ namespace Terminal.Gui {
 			
 			var idx = Array.FindIndex(map,b=>Equals(b.Model,model));
 
-			if(idx == -1)
+			if(idx == -1) {
 				return;
+			}
+				
 
 			/*this -1 allows for possible horizontal scroll bar in the last row of the control*/
 			int leaveSpace = Style.LeaveLastRow ? 1 :0;
@@ -1181,8 +1205,9 @@ namespace Terminal.Gui {
 		/// <param name="toExpand">The object to expand</param>
 		public void Expand(T toExpand)
 		{
-			if(toExpand == null)
+			if(toExpand == null) {
 				return;
+			}	
 			
 			ObjectToBranch(toExpand)?.Expand();
 			InvalidateLineMap();
@@ -1195,9 +1220,10 @@ namespace Terminal.Gui {
 		/// <param name="toExpand">The object to expand</param>
 		public void ExpandAll(T toExpand)
 		{
-			if(toExpand == null)
+			if(toExpand == null) {
 				return;
-			
+			}
+
 			ObjectToBranch(toExpand)?.ExpandAll();
 			InvalidateLineMap();
 			SetNeedsDisplay();
@@ -1278,14 +1304,17 @@ namespace Terminal.Gui {
 		protected void CollapseImpl(T toCollapse, bool all)
 		{
 			
-			if(toCollapse == null)
+			if(toCollapse == null) {
 				return;
+			}
+				
 
 			var branch = ObjectToBranch(toCollapse);
 			
 			// Nothing to collapse
-			if(branch == null)
+			if(branch == null) {
 				return;
+			}
 
 			if (all) {
 				branch.CollapseAll();
@@ -1355,8 +1384,9 @@ namespace Terminal.Gui {
 			}
 			else
 			{
-				if(SelectedObject != null)
+				if(SelectedObject != null) {
 					yield return SelectedObject;
+				}	
 			}
 		}
 
@@ -1366,15 +1396,17 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void SelectAll()
 		{
-			if(!MultiSelect)
+			if (!MultiSelect) {
 				return;
+			}	
 
 			multiSelectedRegions.Clear();
 
 			var map = BuildLineMap();
 
-			if(map.Length == 0)
+			if(map.Length == 0) {
 				return;
+			}
 
 			multiSelectedRegions.Push(new TreeSelection<T>(map[0],map.Length,map));
 			SetNeedsDisplay();
@@ -1513,8 +1545,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void FetchChildren()
 		{
-			if (tree.TreeBuilder == null)
+			if (tree.TreeBuilder == null) {
 				return;
+			}	
 
 			var children = tree.TreeBuilder.GetChildren(this.Model) ?? Enumerable.Empty<T>();
 
@@ -1576,13 +1609,15 @@ namespace Terminal.Gui {
 			{
 				Attribute color;
 
-				if(tree.Style.ColorExpandSymbol)
+				if (tree.Style.ColorExpandSymbol) {
 					color = isSelected ? tree.ColorScheme.HotFocus : tree.ColorScheme.HotNormal;
-				else
+				} else {
 					color = lineColor;
+				}
 
-				if(tree.Style.InvertExpandSymbolColors)
+				if (tree.Style.InvertExpandSymbolColors) {
 					color = new Attribute(color.Background,color.Foreground);
+				}	
 
 				driver.SetAttribute(color);
 			}
@@ -1623,8 +1658,9 @@ namespace Terminal.Gui {
 			driver.SetAttribute(lineColor);
 			driver.AddStr(lineBody);
 
-			if(availableWidth > 0)
+			if(availableWidth > 0) {
 				driver.AddStr(new string(' ',availableWidth));
+			}	
 
 			driver.SetAttribute(colorScheme.Normal);
 		}
@@ -1649,18 +1685,20 @@ namespace Terminal.Gui {
 			// yield indentations with runes appropriate to the state of the parents
 			foreach(var cur in GetParentBranches().Reverse())
 			{
-				if(cur.IsLast())
+				if (cur.IsLast ()) {
 					yield return new Rune(' ');
-				else
+				} else {
 					yield return driver.VLine;
+				}	
 
 				yield return new Rune(' ');
 			}
 
-			if(IsLast())
+			if (IsLast ()) {
 				yield return driver.LLCorner;
-			else
+			} else {
 				yield return driver.LeftTee;
+			}	
 		}
 
 		/// <summary>
@@ -1689,11 +1727,13 @@ namespace Terminal.Gui {
 		{
 			var leafSymbol = tree.Style.ShowBranchLines ? driver.HLine : ' ';
 
-			if(IsExpanded)
+			if (IsExpanded) {
 				return tree.Style.CollapseableSymbol ?? leafSymbol;
+			}
 
-			if(CanExpand())
+			if (CanExpand ()) {
 				return tree.Style.ExpandableSymbol ?? leafSymbol;
+			}	
 
 			return leafSymbol;
 		}
@@ -1751,13 +1791,15 @@ namespace Terminal.Gui {
 		public void Refresh (bool startAtTop)
 		{
 			// if we must go up and refresh from the top down
-			if(startAtTop)
+			if (startAtTop) {
 				Parent?.Refresh(true);
+			}	
 
 			// we don't want to loose the state of our children so lets be selective about how we refresh
 			//if we don't know about any children yet just use the normal method
-			if(ChildBranches == null)
+			if(ChildBranches == null) {
 				FetchChildren();
+			}	
 			else {
 				// we already knew about some children so preserve the state of the old children
 
@@ -1821,8 +1863,9 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private bool IsLast()
 		{
-			if(Parent == null)
+			if(Parent == null) {
 				return this == tree.roots.Values.LastOrDefault();
+			}	
 
 			return Parent.ChildBranches.Values.LastOrDefault() == this;
 		}
@@ -1837,9 +1880,9 @@ namespace Terminal.Gui {
 		internal bool IsHitOnExpandableSymbol (ConsoleDriver driver, int x)
 		{
 			// if leaf node then we cannot expand
-			if(!CanExpand())
+			if (!CanExpand ()) {
 				return false;
-
+			}
 
 			// if we could theoretically expand
 			if(!IsExpanded && tree.Style.ExpandableSymbol != null) {
@@ -1861,10 +1904,11 @@ namespace Terminal.Gui {
 		{
 			Expand();
 
-			if(ChildBranches != null)
+			if(ChildBranches != null) {
 				foreach (var child in ChildBranches) {
 					child.Value.ExpandAll();
 				}
+			}
 		}
 
 		/// <summary>
@@ -1875,10 +1919,11 @@ namespace Terminal.Gui {
 		{
 			Collapse();
 
-			if(ChildBranches != null)
+			if(ChildBranches != null) {
 				foreach (var child in ChildBranches) {
 					child.Value.CollapseAll();
 				}
+			}
 		}
 	}
 
