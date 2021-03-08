@@ -1,4 +1,6 @@
-// This code is based on http://objectlistview.sourceforge.net (GPLv3 tree/list controls by phillip.piper@gmail.com).  Phillip has explicitly granted permission for his design and code to be used in this library under the MIT license.
+// This code is based on http://objectlistview.sourceforge.net (GPLv3 tree/list controls 
+// by phillip.piper@gmail.com).  Phillip has explicitly granted permission for his design
+// and code to be used in this library under the MIT license.
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +10,9 @@ using NStack;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// Interface to implement when you want the regular (non generic) <see cref="TreeView"/> to automatically determine children for your class (without having to specify a <see cref="ITreeBuilder{T}"/>)
+	/// Interface to implement when you want the regular (non generic) <see cref="TreeView"/>
+	/// to automatically determine children for your class (without having to specify 
+	/// an <see cref="ITreeBuilder{T}"/>)
 	/// </summary>
 	public interface ITreeNode
 	{
@@ -77,7 +81,8 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Interface for supplying data to a <see cref="TreeView{T}"/> on demand as root level nodes are expanded by the user
+	/// Interface for supplying data to a <see cref="TreeView{T}"/> on demand as root level nodes
+	/// are expanded by the user
 	/// </summary>
 	public interface ITreeBuilder<T>
 	{
@@ -88,15 +93,21 @@ namespace Terminal.Gui {
 		bool SupportsCanExpand {get;}
 
 		/// <summary>
-		/// Returns true/false for whether a model has children.  This method should be implemented when <see cref="GetChildren"/> is an expensive operation otherwise <see cref="SupportsCanExpand"/> should return false (in which case this method will not be called)
+		/// Returns true/false for whether a model has children.  This method should be implemented
+		/// when <see cref="GetChildren"/> is an expensive operation otherwise 
+		/// <see cref="SupportsCanExpand"/> should return false (in which case this method will not
+		/// be called)
 		/// </summary>
-		/// <remarks>Only implement this method if you have a very fast way of determining whether an object can have children e.g. checking a Type (directories can always be expanded)</remarks>
+		/// <remarks>Only implement this method if you have a very fast way of determining whether 
+		/// an object can have children e.g. checking a Type (directories can always be expanded)
+		/// </remarks>
 		/// <param name="model"></param>
 		/// <returns></returns>
 		bool CanExpand(T model);
 
 		/// <summary>
-		/// Returns all children of a given <paramref name="model"/> which should be added to the tree as new branches underneath it
+		/// Returns all children of a given <paramref name="model"/> which should be added to the 
+		/// tree as new branches underneath it
 		/// </summary>
 		/// <param name="model"></param>
 		/// <returns></returns>
@@ -112,7 +123,9 @@ namespace Terminal.Gui {
 		public bool SupportsCanExpand { get; protected set;} = false;
 
 		/// <summary>
-		/// Override this method to return a rapid answer as to whether <see cref="GetChildren(T)"/> returns results.  If you are implementing this method ensure you passed true in base constructor or set <see cref="SupportsCanExpand"/>
+		/// Override this method to return a rapid answer as to whether <see cref="GetChildren(T)"/> 
+		/// returns results.  If you are implementing this method ensure you passed true in base 
+		/// constructor or set <see cref="SupportsCanExpand"/>
 		/// </summary>
 		/// <param name="model"></param>
 		/// <returns></returns>
@@ -127,7 +140,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Constructs base and initializes <see cref="SupportsCanExpand"/>
 		/// </summary>
-		/// <param name="supportsCanExpand">Pass true if you intend to implement <see cref="CanExpand(T)"/> otherwise false</param>
+		/// <param name="supportsCanExpand">Pass true if you intend to 
+		/// implement <see cref="CanExpand(T)"/> otherwise false</param>
 		public TreeBuilder(bool supportsCanExpand)
 		{
 			SupportsCanExpand = supportsCanExpand;
@@ -141,7 +155,8 @@ namespace Terminal.Gui {
 	{
 		
 		/// <summary>
-		/// Initialises a new instance of builder for any model objects of Type <see cref="ITreeNode"/>
+		/// Initialises a new instance of builder for any model objects of 
+		/// Type <see cref="ITreeNode"/>
 		/// </summary>
 		public TreeNodeBuilder():base(false)
 		{
@@ -168,7 +183,8 @@ namespace Terminal.Gui {
 		private Func<T,bool> canExpand;
 
 		/// <summary>
-		/// Constructs an implementation of <see cref="ITreeBuilder{T}"/> that calls the user defined method <paramref name="childGetter"/> to determine children
+		/// Constructs an implementation of <see cref="ITreeBuilder{T}"/> that calls the user 
+		/// defined method <paramref name="childGetter"/> to determine children
 		/// </summary>
 		/// <param name="childGetter"></param>
 		/// <returns></returns>
@@ -178,7 +194,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Constructs an implementation of <see cref="ITreeBuilder{T}"/> that calls the user defined method <paramref name="childGetter"/> to determine children and <paramref name="canExpand"/> to determine expandability
+		/// Constructs an implementation of <see cref="ITreeBuilder{T}"/> that calls the user 
+		/// defined method <paramref name="childGetter"/> to determine children 
+		/// and <paramref name="canExpand"/> to determine expandability
 		/// </summary>
 		/// <param name="childGetter"></param>
 		/// <param name="canExpand"></param>
@@ -233,12 +251,14 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Convenience implementation of generic <see cref="TreeView{T}"/> for any tree were all nodes implement <see cref="ITreeNode"/>
+	/// Convenience implementation of generic <see cref="TreeView{T}"/> for any tree were all nodes
+	/// implement <see cref="ITreeNode"/>
 	/// </summary>
 	public class TreeView : TreeView<ITreeNode> {
 
 		/// <summary>
-		/// Creates a new instance of the tree control with absolute positioning and initialises <see cref="TreeBuilder{T}"/> with default <see cref="ITreeNode"/> based builder
+		/// Creates a new instance of the tree control with absolute positioning and initialises
+		/// <see cref="TreeBuilder{T}"/> with default <see cref="ITreeNode"/> based builder
 		/// </summary>
 		public TreeView ()
 		{
@@ -253,18 +273,21 @@ namespace Terminal.Gui {
 	public class TreeStyle {
 
 		/// <summary>
-		/// True to render vertical lines under expanded nodes to show which node belongs to which parent.  False to use only whitespace
+		/// True to render vertical lines under expanded nodes to show which node belongs to which 
+		/// parent.  False to use only whitespace
 		/// </summary>
 		/// <value></value>
 		public bool ShowBranchLines {get;set;} = true;
 				
 		/// <summary>
-		/// Symbol to use for branch nodes that can be expanded to indicate this to the user.  Defaults to '+'. Set to null to hide
+		/// Symbol to use for branch nodes that can be expanded to indicate this to the user.  
+		/// Defaults to '+'. Set to null to hide
 		/// </summary>
 		public Rune? ExpandableSymbol {get;set;} = '+';
 				
 		/// <summary>
-		/// Symbol to use for branch nodes that can be collapsed (are currently expanded).  Defaults to '-'.  Set to null to hide
+		/// Symbol to use for branch nodes that can be collapsed (are currently expanded).
+		/// Defaults to '-'.  Set to null to hide
 		/// </summary>
 		public Rune? CollapseableSymbol {get;set;} = '-';
 
@@ -279,7 +302,9 @@ namespace Terminal.Gui {
 		public bool InvertExpandSymbolColors {get;set;}
 
 		/// <summary>
-		/// True to leave the last row of the control free for overwritting (e.g. by a scrollbar). When True scrolling will be triggered on the second last row of the control rather than the last.
+		/// True to leave the last row of the control free for overwritting (e.g. by a scrollbar)
+		/// When True scrolling will be triggered on the second last row of the control rather than
+		/// the last.
 		/// </summary>
 		/// <value></value>
 		public bool LeaveLastRow {get;set;}
@@ -287,7 +312,8 @@ namespace Terminal.Gui {
 	}
 	
 	/// <summary>
-	/// Hierarchical tree view with expandable branches.  Branch objects are dynamically determined when expanded using a user defined <see cref="ITreeBuilder{T}"/>
+	/// Hierarchical tree view with expandable branches.  Branch objects are dynamically determined
+	/// when expanded using a user defined <see cref="ITreeBuilder{T}"/>
 	/// </summary>
 	public class TreeView<T> : View, ITreeView where T:class
 	{   
@@ -295,7 +321,8 @@ namespace Terminal.Gui {
 		private int scrollOffsetHorizontal;
 
 		/// <summary>
-		/// Determines how sub branches of the tree are dynamically built at runtime as the user expands root nodes
+		/// Determines how sub branches of the tree are dynamically built at runtime as the user
+		/// expands root nodes
 		/// </summary>
 		/// <value></value>
 		public ITreeBuilder<T> TreeBuilder { get;set;}
@@ -320,13 +347,15 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// True makes a letter key press navigate to the next visible branch that begins with that letter/digit
+		/// True makes a letter key press navigate to the next visible branch that begins with
+		/// that letter/digit
 		/// </summary>
 		/// <value></value>
 		public bool AllowLetterBasedNavigation {get;set;} = true;
 
 		/// <summary>
-		/// The currently selected object in the tree.  When <see cref="MultiSelect"/> is true this is the object at which the cursor is at
+		/// The currently selected object in the tree.  When <see cref="MultiSelect"/> is true this
+		/// is the object at which the cursor is at
 		/// </summary>
 		public T SelectedObject { 
 			get => selectedObject; 
@@ -341,12 +370,14 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// This event is raised when an object is activated e.g. by double clicking or pressing <see cref="ObjectActivationKey"/>
+		/// This event is raised when an object is activated e.g. by double clicking or 
+		/// pressing <see cref="ObjectActivationKey"/>
 		/// </summary>
 		public event Action<ObjectActivatedEventArgs<T>> ObjectActivated;
 
 		/// <summary>
-		/// Key which when pressed triggers <see cref="TreeView{T}.ObjectActivated"/>.  Defaults to Enter
+		/// Key which when pressed triggers <see cref="TreeView{T}.ObjectActivated"/>.
+		/// Defaults to Enter
 		/// </summary>
 		public Key ObjectActivationKey {get;set;} = Key.Enter;
 
@@ -362,9 +393,10 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Error message to display when the control is not properly initialized at draw time (nodes added but no tree builder set)
+		/// Error message to display when the control is not properly initialized at draw time 
+		/// (nodes added but no tree builder set)
 		/// </summary>
-		public static ustring NoBuilderError = "ERROR: Builder Not Set";
+		public static ustring NoBuilderError = "ERROR: TreeBuilder Not Set";
 
 		/// <summary>
 		/// Called when the <see cref="SelectedObject"/> changes
@@ -377,14 +409,17 @@ namespace Terminal.Gui {
 		public IEnumerable<T> Objects {get=>roots.Keys;}
 
 		/// <summary>
-		/// Map of root objects to the branches under them.  All objects have a <see cref="Branch{T}"/> even if that branch has no children
+		/// Map of root objects to the branches under them.  All objects have 
+		/// a <see cref="Branch{T}"/> even if that branch has no children
 		/// </summary>
 		internal Dictionary<T,Branch<T>> roots {get; set;} = new Dictionary<T, Branch<T>>();
 
 		/// <summary>
-		/// The amount of tree view that has been scrolled off the top of the screen (by the user scrolling down)
+		/// The amount of tree view that has been scrolled off the top of the screen (by the user 
+		/// scrolling down)
 		/// </summary>
-		/// <remarks>Setting a value of less than 0 will result in a offset of 0.  To see changes in the UI call <see cref="View.SetNeedsDisplay()"/></remarks>
+		/// <remarks>Setting a value of less than 0 will result in a offset of 0.  To see changes 
+		/// in the UI call <see cref="View.SetNeedsDisplay()"/></remarks>
 		public int ScrollOffsetVertical { 
 			get => scrollOffsetVertical;
 			set {
@@ -396,7 +431,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The amount of tree view that has been scrolled to the right (horizontally)
 		/// </summary>
-		/// <remarks>Setting a value of less than 0 will result in a offset of 0.  To see changes in the UI call <see cref="View.SetNeedsDisplay()"/></remarks>
+		/// <remarks>Setting a value of less than 0 will result in a offset of 0.  To see changes 
+		/// in the UI call <see cref="View.SetNeedsDisplay()"/></remarks>
 		public int ScrollOffsetHorizontal { 
 			get => scrollOffsetHorizontal;
 			set {
@@ -410,13 +446,16 @@ namespace Terminal.Gui {
 		public int ContentHeight => BuildLineMap().Count();
 
 		/// <summary>
-		/// Returns the string representation of model objects hosted in the tree.  Default implementation is to call <see cref="object.ToString"/>
+		/// Returns the string representation of model objects hosted in the tree.  Default 
+		/// implementation is to call <see cref="object.ToString"/>
 		/// </summary>
 		/// <value></value>
 		public AspectGetterDelegate<T> AspectGetter {get;set;} = (o)=>o.ToString() ?? "";
 
 		/// <summary>
-		/// Creates a new tree view with absolute positioning.  Use <see cref="AddObjects(IEnumerable{T})"/> to set set root objects for the tree.  Children will not be rendered until you set <see cref="TreeBuilder"/>
+		/// Creates a new tree view with absolute positioning.  
+		/// Use <see cref="AddObjects(IEnumerable{T})"/> to set set root objects for the tree.
+		/// Children will not be rendered until you set <see cref="TreeBuilder"/>
 		/// </summary>
 		public TreeView():base()
 		{
@@ -424,7 +463,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initialises <see cref="TreeBuilder"/>.Creates a new tree view with absolute positioning.  Use <see cref="AddObjects(IEnumerable{T})"/> to set set root objects for the tree.
+		/// Initialises <see cref="TreeBuilder"/>.Creates a new tree view with absolute 
+		/// positioning.  Use <see cref="AddObjects(IEnumerable{T})"/> to set set root 
+		/// objects for the tree.
 		/// </summary>
 		public TreeView(ITreeBuilder<T> builder) : this()
 		{
@@ -460,7 +501,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Removes the given root object from the tree
 		/// </summary>
-		/// <remarks>If <paramref name="o"/> is the currently <see cref="SelectedObject"/> then the selection is cleared</remarks>
+		/// <remarks>If <paramref name="o"/> is the currently <see cref="SelectedObject"/> then the
+		/// selection is cleared</remarks>
 		/// <param name="o"></param>
 		public void Remove(T o)
 		{
@@ -496,11 +538,13 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Refreshes the state of the object <paramref name="o"/> in the tree.  This will recompute children, string representation etc
+		/// Refreshes the state of the object <paramref name="o"/> in the tree.  This will 
+		/// recompute children, string representation etc
 		/// </summary>
 		/// <remarks>This has no effect if the object is not exposed in the tree.</remarks>
 		/// <param name="o"></param>
-		/// <param name="startAtTop">True to also refresh all ancestors of the objects branch (starting with the root).  False to refresh only the passed node</param>
+		/// <param name="startAtTop">True to also refresh all ancestors of the objects branch 
+		/// (starting with the root).  False to refresh only the passed node</param>
 		public void RefreshObject (T o, bool startAtTop = false)
 		{
 			var branch = ObjectToBranch(o);
@@ -513,7 +557,9 @@ namespace Terminal.Gui {
 		}
 		
 		/// <summary>
-		/// Rebuilds the tree structure for all exposed objects starting with the root objects.  Call this method when you know there are changes to the tree but don't know which objects have changed (otherwise use <see cref="RefreshObject(T, bool)"/>)
+		/// Rebuilds the tree structure for all exposed objects starting with the root objects.
+		/// Call this method when you know there are changes to the tree but don't know which 
+		/// objects have changed (otherwise use <see cref="RefreshObject(T, bool)"/>)
 		/// </summary>
 		public void RebuildTree()
 		{
@@ -525,7 +571,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns the currently expanded children of the passed object.  Returns an empty collection if the branch is not exposed or not expanded
+		/// Returns the currently expanded children of the passed object.  Returns an empty
+		/// collection if the branch is not exposed or not expanded
 		/// </summary>
 		/// <param name="o">An object in the tree</param>
 		/// <returns></returns>
@@ -539,7 +586,8 @@ namespace Terminal.Gui {
 			return branch.ChildBranches?.Values?.Select(b=>b.Model)?.ToArray() ?? new T[0];
 		}
 		/// <summary>
-		/// Returns the parent object of <paramref name="o"/> in the tree.  Returns null if the object is not exposed in the tree
+		/// Returns the parent object of <paramref name="o"/> in the tree.  Returns null if 
+		/// the object is not exposed in the tree
 		/// </summary>
 		/// <param name="o">An object in the tree</param>
 		/// <returns></returns>
@@ -582,11 +630,15 @@ namespace Terminal.Gui {
 		}
 		
 		/// <summary>
-		/// Returns the index of the object <paramref name="o"/> if it is currently exposed (it's parent(s) have been expanded).  This can be used with <see cref="ScrollOffsetVertical"/> and <see cref="View.SetNeedsDisplay()"/> to scroll to a specific object
+		/// Returns the index of the object <paramref name="o"/> if it is currently exposed (it's 
+		/// parent(s) have been expanded).  This can be used with <see cref="ScrollOffsetVertical"/>
+		/// and <see cref="View.SetNeedsDisplay()"/> to scroll to a specific object
 		/// </summary>
-		/// <remarks>Uses the Equals method and returns the first index at which the object is found or -1 if it is not found</remarks>
+		/// <remarks>Uses the Equals method and returns the first index at which the object is found
+		///  or -1 if it is not found</remarks>
 		/// <param name="o">An object that appears in your tree and is currently exposed</param>
-		/// <returns>The index the object was found at or -1 if it is not currently revealed or not in the tree at all</returns>
+		/// <returns>The index the object was found at or -1 if it is not currently revealed or
+		/// not in the tree at all</returns>
 		public int GetScrollOffsetOf(T o)
 		{
 			var map = BuildLineMap();
@@ -603,7 +655,9 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Returns the maximum width line in the tree including prefix and expansion symbols
 		/// </summary>
-		/// <param name="visible">True to consider only rows currently visible (based on window bounds and <see cref="ScrollOffsetVertical"/>.  False to calculate the width of every exposed branch in the tree</param>
+		/// <param name="visible">True to consider only rows currently visible (based on window
+		///  bounds and <see cref="ScrollOffsetVertical"/>.  False to calculate the width of 
+		/// every exposed branch in the tree</param>
 		/// <returns></returns>
 		public int GetContentWidth(bool visible){
 			
@@ -631,9 +685,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Calculates all currently visible/expanded branches (including leafs) and outputs them by index from the top of the screen
+		/// Calculates all currently visible/expanded branches (including leafs) and outputs them 
+		/// by index from the top of the screen
 		/// </summary>
-		/// <remarks>Index 0 of the returned array is the first item that should be visible in the top of the control, index 1 is the next etc.</remarks>
+		/// <remarks>Index 0 of the returned array is the first item that should be visible in the
+		/// top of the control, index 1 is the next etc.</remarks>
 		/// <returns></returns>
 		private Branch<T>[] BuildLineMap()
 		{
@@ -869,7 +925,9 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Determines systems behaviour when the left arrow key is pressed.  Default behaviour is to collapse the current tree node if possible otherwise changes selection to current branches parent
+		/// Determines systems behaviour when the left arrow key is pressed.  Default behaviour is
+		/// to collapse the current tree node if possible otherwise changes selection to current 
+		/// branches parent
 		/// </summary>
 		protected virtual void CursorLeft(bool ctrl)
 		{
@@ -893,7 +951,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Changes the <see cref="SelectedObject"/> to the first root object and resets the <see cref="ScrollOffsetVertical"/> to 0
+		/// Changes the <see cref="SelectedObject"/> to the first root object and resets 
+		/// the <see cref="ScrollOffsetVertical"/> to 0
 		/// </summary>
 		public void GoToFirst()
 		{
@@ -904,7 +963,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Changes the <see cref="SelectedObject"/> to the last object in the tree and scrolls so that it is visible
+		/// Changes the <see cref="SelectedObject"/> to the last object in the tree and scrolls so
+		/// that it is visible
 		/// </summary>
 		public void GoToEnd ()
 		{
@@ -918,9 +978,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Changes the selected object by a number of screen lines
 		/// </summary>
-		/// <remarks>If nothing is currently selected the first root is selected.  If the selected object is no longer in the tree the first object is selected</remarks>
+		/// <remarks>If nothing is currently selected the first root is selected.  If the selected
+		/// object is no longer in the tree the first object is selected</remarks>
 		/// <param name="offset"></param>
-		/// <param name="expandSelection">True to expand the selection (assuming <see cref="MultiSelect"/> is enabled).  False to replace</param>
+		/// <param name="expandSelection">True to expand the selection (assuming 
+		/// <see cref="MultiSelect"/> is enabled).  False to replace</param>
 		public void AdjustSelection (int offset, bool expandSelection = false)
 		{
 			// if it is not a shift click or we don't allow multi select
@@ -1086,7 +1148,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Adjusts the <see cref="ScrollOffsetVertical"/> to ensure the given <paramref name="model"/> is visible.  Has no effect if already visible
+		/// Adjusts the <see cref="ScrollOffsetVertical"/> to ensure the given
+		/// <paramref name="model"/> is visible.  Has no effect if already visible
 		/// </summary>
 		public void EnsureVisible(T model)
 		{
@@ -1112,7 +1175,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Expands the supplied object if it is contained in the tree (either as a root object or as an exposed branch object)
+		/// Expands the supplied object if it is contained in the tree (either as a root object or 
+		/// as an exposed branch object)
 		/// </summary>
 		/// <param name="toExpand">The object to expand</param>
 		public void Expand(T toExpand)
@@ -1139,7 +1203,8 @@ namespace Terminal.Gui {
 			SetNeedsDisplay();
 		}
 		/// <summary>
-		/// Fully expands all nodes in the tree, if the tree is very big and built dynamically this may take a while (e.g. for file system)
+		/// Fully expands all nodes in the tree, if the tree is very big and built dynamically this
+		/// may take a while (e.g. for file system)
 		/// </summary>
 		public void ExpandAll()
 		{
@@ -1151,7 +1216,8 @@ namespace Terminal.Gui {
 			SetNeedsDisplay();
 		}
 		/// <summary>
-		/// Returns true if the given object <paramref name="o"/> is exposed in the tree and can be expanded otherwise false
+		/// Returns true if the given object <paramref name="o"/> is exposed in the tree and can be
+		/// expanded otherwise false
 		/// </summary>
 		/// <param name="o"></param>
 		/// <returns></returns>
@@ -1161,7 +1227,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns true if the given object <paramref name="o"/> is exposed in the tree and expanded otherwise false
+		/// Returns true if the given object <paramref name="o"/> is exposed in the tree and 
+		/// expanded otherwise false
 		/// </summary>
 		/// <param name="o"></param>
 		/// <returns></returns>
@@ -1180,7 +1247,8 @@ namespace Terminal.Gui {
 		}
 		
 		/// <summary>
-		/// Collapses the supplied object if it is currently expanded.  Also collapses all children branches (this will only become apparent when/if the user expands it again)
+		/// Collapses the supplied object if it is currently expanded.  Also collapses all children
+		/// branches (this will only become apparent when/if the user expands it again)
 		/// </summary>
 		/// <param name="toCollapse">The object to collapse</param>
 		public void CollapseAll(T toCollapse)
@@ -1202,7 +1270,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Implementation of <see cref="Collapse(T)"/> and <see cref="CollapseAll(T)"/>.  Performs operation and updates selection if disapeared
+		/// Implementation of <see cref="Collapse(T)"/> and <see cref="CollapseAll(T)"/>.  Performs
+		/// operation and updates selection if disapeared
 		/// </summary>
 		/// <param name="toCollapse"></param>
 		/// <param name="all"></param>
@@ -1243,17 +1312,21 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns the corresponding <see cref="Branch{T}"/> in the tree for <paramref name="toFind"/>.  This will not work for objects hidden by their parent being collapsed
+		/// Returns the corresponding <see cref="Branch{T}"/> in the tree for
+		/// <paramref name="toFind"/>.  This will not work for objects hidden
+		/// by their parent being collapsed
 		/// </summary>
 		/// <param name="toFind"></param>
-		/// <returns>The branch for <paramref name="toFind"/> or null if it is not currently exposed in the tree</returns>
+		/// <returns>The branch for <paramref name="toFind"/> or null if it is not currently 
+		/// exposed in the tree</returns>
 		private Branch<T> ObjectToBranch(T toFind)
 		{
 			return BuildLineMap().FirstOrDefault(o=>o.Model.Equals(toFind));
 		}
 
 		/// <summary>
-		/// Returns true if the <paramref name="model"/> is either the <see cref="SelectedObject"/> or part of a <see cref="MultiSelect"/>
+		/// Returns true if the <paramref name="model"/> is either the 
+		/// <see cref="SelectedObject"/> or part of a <see cref="MultiSelect"/>
 		/// </summary>
 		/// <param name="model"></param>
 		/// <returns></returns>
@@ -1264,14 +1337,17 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns <see cref="SelectedObject"/> (if not null) and all multi selected objects if <see cref="MultiSelect"/> is true
+		/// Returns <see cref="SelectedObject"/> (if not null) and all multi selected objects if 
+		/// <see cref="MultiSelect"/> is true
 		/// </summary>
 		/// <returns></returns>
 		public IEnumerable<T> GetAllSelectedObjects()
 		{
 			var map = BuildLineMap();
 
-			// To determine multi selected objects, start with the line map, that avoids yielding hidden nodes that were selected then the parent collapsed e.g. programmatically or with mouse click
+			// To determine multi selected objects, start with the line map, that avoids yielding 
+			// hidden nodes that were selected then the parent collapsed e.g. programmatically or
+			// with mouse click
 			if(MultiSelect){
 				foreach(var m in map.Select(b=>b.Model).Where(IsSelected)){
 					yield return m;
@@ -1285,7 +1361,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Selects all objects in the tree when <see cref="MultiSelect"/> is enabled otherwise does nothing
+		/// Selects all objects in the tree when <see cref="MultiSelect"/> is enabled otherwise 
+		/// does nothing
 		/// </summary>
 		public void SelectAll()
 		{
@@ -1399,7 +1476,8 @@ namespace Terminal.Gui {
 		public int Depth {get;private set;} = 0;
 
 		/// <summary>
-		/// The children of the current branch.  This is null until the first call to <see cref="FetchChildren"/> to avoid enumerating the entire underlying hierarchy
+		/// The children of the current branch.  This is null until the first call to 
+		/// <see cref="FetchChildren"/> to avoid enumerating the entire underlying hierarchy
 		/// </summary>
 		public Dictionary<T,Branch<T>> ChildBranches {get;set;}
 
@@ -1411,10 +1489,12 @@ namespace Terminal.Gui {
 		private TreeView<T> tree;
 		
 		/// <summary>
-		/// Declares a new branch of <paramref name="tree"/> in which the users object <paramref name="model"/> is presented
+		/// Declares a new branch of <paramref name="tree"/> in which the users object 
+		/// <paramref name="model"/> is presented
 		/// </summary>
 		/// <param name="tree">The UI control in which the branch resides</param>
-		/// <param name="parentBranchIfAny">Pass null for root level branches, otherwise pass the parent</param>
+		/// <param name="parentBranchIfAny">Pass null for root level branches, otherwise
+		/// pass the parent</param>
 		/// <param name="model">The user's object that should be displayed</param>
 		public Branch(TreeView<T> tree,Branch<T> parentBranchIfAny,T model)
 		{
@@ -1442,7 +1522,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns the width of the line including prefix and the results of <see cref="TreeView{T}.AspectGetter"/> (the line body).
+		/// Returns the width of the line including prefix and the results 
+		/// of <see cref="TreeView{T}.AspectGetter"/> (the line body).
 		/// </summary>
 		/// <returns></returns>
 		public virtual int GetWidth (ConsoleDriver driver)
@@ -1549,7 +1630,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets all characters to render prior to the current branches line.  This includes indentation whitespace and any tree branches (if enabled)
+		/// Gets all characters to render prior to the current branches line.  This includes indentation
+		/// whitespace and any tree branches (if enabled)
 		/// </summary>
 		/// <param name="driver"></param>
 		/// <returns></returns>
@@ -1597,7 +1679,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns an appropriate symbol for displaying next to the string representation of the <see cref="Model"/> object to indicate whether it <see cref="IsExpanded"/> or not (or it is a leaf)
+		/// Returns an appropriate symbol for displaying next to the string representation of 
+		/// the <see cref="Model"/> object to indicate whether it <see cref="IsExpanded"/> or
+		/// not (or it is a leaf)
 		/// </summary>
 		/// <param name="driver"></param>
 		/// <returns></returns>
@@ -1615,7 +1699,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns true if the current branch can be expanded according to the <see cref="TreeBuilder{T}"/> or cached children already fetched
+		/// Returns true if the current branch can be expanded according to 
+		/// the <see cref="TreeBuilder{T}"/> or cached children already fetched
 		/// </summary>
 		/// <returns></returns>
 		public bool CanExpand ()
@@ -1661,7 +1746,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Refreshes cached knowledge in this branch e.g. what children an object has
 		/// </summary>
-		/// <param name="startAtTop">True to also refresh all <see cref="Parent"/> branches (starting with the root)</param>
+		/// <param name="startAtTop">True to also refresh all <see cref="Parent"/> 
+		/// branches (starting with the root)</param>
 		public void Refresh (bool startAtTop)
 		{
 			// if we must go up and refresh from the top down
@@ -1729,7 +1815,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns true if this branch has parents and it is the last node of it's parents branches (or last root of the tree)
+		/// Returns true if this branch has parents and it is the last node of it's parents 
+		/// branches (or last root of the tree)
 		/// </summary>
 		/// <returns></returns>
 		private bool IsLast()
@@ -1741,7 +1828,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns true if the given x offset on the branch line is the +/- symbol.  Returns false if not showing expansion symbols or leaf node etc
+		/// Returns true if the given x offset on the branch line is the +/- symbol.  Returns 
+		/// false if not showing expansion symbols or leaf node etc
 		/// </summary>
 		/// <param name="driver"></param>
 		/// <param name="x"></param>
@@ -1780,7 +1868,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Collapses the current branch and all children branches (even though those branches are no longer visible they retain collapse/expansion state)
+		/// Collapses the current branch and all children branches (even though those branches are 
+		/// no longer visible they retain collapse/expansion state)
 		/// </summary>
 		internal void CollapseAll ()
 		{
@@ -1821,7 +1910,8 @@ namespace Terminal.Gui {
 		public T NewValue { get; }
 
 		/// <summary>
-		/// Creates a new instance of event args describing a change of selection in <paramref name="tree"/>
+		/// Creates a new instance of event args describing a change of selection 
+		/// in <paramref name="tree"/>
 		/// </summary>
 		/// <param name="tree"></param>
 		/// <param name="oldValue"></param>
