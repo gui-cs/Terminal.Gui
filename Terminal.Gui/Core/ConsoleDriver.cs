@@ -63,7 +63,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The bright cyan color.
 		/// </summary>
-		BrighCyan,
+		BrightCyan,
 		/// <summary>
 		/// The bright red color.
 		/// </summary>

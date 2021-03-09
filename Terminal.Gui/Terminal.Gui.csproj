@@ -17,10 +17,13 @@
     <Summary>Application framework for creating modern console applications using .NET</Summary>
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
     <PackageReleaseNotes>
+      v1.0.???
+      * Fixes #1048 - BrighCyan to BrightCyan spelling
+
       v1.0.0-beta.8
       * Now using MinVer to generate version numbers from git tags.
       * Updated publish-to-nuget to work with minver
-      
+
       v1.0.0-pre.9
       * NEW CONTROL: TreeView - Thanks @tznind!
       * Fixes #1066. View sizing across the various terminals has been fixed; works in Windows Terminal again - thanks @bdisp

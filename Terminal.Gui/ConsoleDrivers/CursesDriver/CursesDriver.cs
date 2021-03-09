@@ -834,7 +834,7 @@ namespace Terminal.Gui {
 				return Curses.COLOR_BLUE | Curses.A_BOLD;
 			case Color.BrightGreen:
 				return Curses.COLOR_GREEN | Curses.A_BOLD;
-			case Color.BrighCyan:
+			case Color.BrightCyan:
 				return Curses.COLOR_CYAN | Curses.A_BOLD;
 			case Color.BrightRed:
 				return Curses.COLOR_RED | Curses.A_BOLD;
