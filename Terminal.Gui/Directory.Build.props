@@ -3,26 +3,7 @@
   <PropertyGroup>
     <!--
        Version info for Terminal.Gui is managed by MinVer (https://github.com/adamralph/minver)
-       
-       - To release a new version simply tag at commit
-
-      git tag major.minor.patch.build.height
-      
-      // patch can indicate pre-release or not
-
-       e.g: 
-       
-       git tag 1.3.4-beta.5
-       
-          or
-       
-       git tag 2.3.4.5
-       
-       Then build.
-       
-       - When the .revision changes a new nuget package will be generated when a PR is merged to master as part of CI/CD.
-
-       - Miguel can hide defunct/old nuget packages.
+       See Terminal.Gui/README.md for more info.
     -->
     <Authors>Miguel de Icaza, Charlie Kindel (@tig), @BDisp</Authors>
   </PropertyGroup>
