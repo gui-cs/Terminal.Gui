@@ -17,7 +17,7 @@
     <Summary>Application framework for creating modern console applications using .NET</Summary>
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
     <PackageReleaseNotes>
-      v1.0.0-beta.1
+      v1.0.0-beta.6
       * Now using MinVer to generate version numbers from git tags.
       * Updated publish-to-nuget to work with minver
       
