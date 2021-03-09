@@ -25,14 +25,14 @@ jobs:
           dotnet tool install --global minver-cli --version 2.4.0
           echo "MINVERVERSIONOVERRIDE=$(minver -t v -d rc)" >> $GITHUB_ENV
 
-      - name: Install dependencies
-        run: dotnet restore
+      #- name: Install dependencies
+      #  run: dotnet restore
 
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
+      #- name: Build
+      #  run: dotnet build --configuration Release --no-restore
 
-      - name: Pack nuget package with symbols
-        run: dotnet pack --include-symbols
+      #- name: Pack nuget package with symbols
+      #  run: dotnet pack --include-symbols
       
       - name: Publish Terminal.Gui
         id: publish_nuget
@@ -69,4 +69,5 @@ jobs:
           # NUGET_SOURCE: https://api.nuget.org
 
           # Flag to toggle pushing symbols along with nuget package to the server, disabled by default
-          INCLUDE_SYMBOLS: true
+          # This is broken - see https://github.com/brandedoutcast/publish-nuget/issues/30
+          INCLUDE_SYMBOLS: false
