@@ -19,6 +19,7 @@
     <PackageReleaseNotes>
       v1.0.???
       * Fixes #1048 - BrighCyan to BrightCyan spelling
+      * Fixes #1130 - Broken Table/TreeView links in docs.
 
       v1.0.0-beta.8
       * Now using MinVer to generate version numbers from git tags.
