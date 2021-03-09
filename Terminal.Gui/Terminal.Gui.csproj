@@ -17,8 +17,7 @@
     <Summary>Application framework for creating modern console applications using .NET</Summary>
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
     <PackageReleaseNotes>
-      v1.0.0
-      * Version 1.0 !!!!!
+      v1.0.???
       * Fixes #1048 - BrighCyan to BrightCyan spelling
 
       v1.0.0-beta.8
