@@ -6,13 +6,13 @@
 
 # Terminal.Gui - Terminal GUI toolkit for .NET
 
-A simple toolkit for buiding console GUI apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
+A simple toolkit for building console GUI apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
 
 ![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.gif)
 
-The most recent released [Nuget package is version `0.90.x`](https://www.nuget.org/packages/Terminal.Gui) which is the "Stable, Feature Complete" pre-release of 1.0. 
+The most recent released [Nuget package is version `0.90.x`](https://www.nuget.org/packages/Terminal.Gui) which is the "Stable, Feature Complete" pre-release of 1.0.
 
-Nuget also contains pre-release versions of 1.0; they are identified with `-pre` in the version number (e.g. `1.0.0-pre.1`)
+Nuget also contains pre-release versions of 1.0; they are identified with `-pre` or `-beta` in the version number (e.g. `1.0.0-pre.1`)
 
 ## Controls & Features
 

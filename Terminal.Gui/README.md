@@ -27,7 +27,7 @@ Version info for Terminal.Gui is managed by MinVer (https://github.com/adamralph
 To release a new version simply tag a commit
 
 ```powershell
-git tag major.minor.patch.build.height
+git tag vmajor.minor.patch.build.height
 ```      
 
 `patch` can indicate pre-release or not
@@ -35,13 +35,13 @@ git tag major.minor.patch.build.height
 e.g: 
        
 ```powershell
-git tag 1.3.4-beta.5
+git tag v1.3.4-beta.5
 ```
 
     or
        
 ```powershell
-git tag 2.3.4.5
+git tag v2.3.4.5
 ```       
 
 Then rebuild the project and the version info will be updated.
@@ -50,7 +50,7 @@ Then rebuild the project and the version info will be updated.
 
 https://www.nuget.org/packages/Terminal.Gui
 
-When the `.patch` changes a new nuget package will be generated when the PR is merged to master as part of CI/CD.
+When a new version tag is defined, and merged into master, a nuget package will be generated.
 
 If the version is pre-release (includes a hyphen, e.g. `1.3.4-beta.5`) the Nuget package will be tagged as pre-release.
 
