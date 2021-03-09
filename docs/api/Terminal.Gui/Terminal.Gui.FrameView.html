@@ -650,9 +650,7 @@ Add the specified <a class="xref" href="Terminal.Gui.View.html">View</a> to this
   
   <a id="Terminal_Gui_FrameView_OnEnter_" data-uid="Terminal.Gui.FrameView.OnEnter*"></a>
   <h4 id="Terminal_Gui_FrameView_OnEnter_Terminal_Gui_View_" data-uid="Terminal.Gui.FrameView.OnEnter(Terminal.Gui.View)">OnEnter(View)</h4>
-  <div class="markdown level1 summary">
-Method invoked when a view gets focus.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -671,7 +669,7 @@ Method invoked when a view gets focus.
       <tr>
         <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
         <td><span class="parametername">view</span></td>
-        <td>The view that is losing focus.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -686,7 +684,7 @@ Method invoked when a view gets focus.
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -696,9 +694,7 @@ Method invoked when a view gets focus.
   
   <a id="Terminal_Gui_FrameView_Redraw_" data-uid="Terminal.Gui.FrameView.Redraw*"></a>
   <h4 id="Terminal_Gui_FrameView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.FrameView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
-  <div class="markdown level1 summary">
-Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -717,26 +713,12 @@ Redraws this view and its subviews; only redraws the views that have been flagge
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">bounds</span></td>
-        <td>The bounds (view-relative region) to redraw.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  <h5 id="Terminal_Gui_FrameView_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
-</p>
-<p>
-   Views should set the color that they want to use on entry, as otherwise this will inherit
-   the last color that was set globally on the driver.
-</p>
-<p>
-   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
-   larger than the <code>region</code> parameter.
-</p>
-</div>
   
   
   <a id="Terminal_Gui_FrameView_Remove_" data-uid="Terminal.Gui.FrameView.Remove*"></a>

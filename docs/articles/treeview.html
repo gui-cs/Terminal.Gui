@@ -73,6 +73,7 @@
 <h1 id="tree-view">Tree View</h1>
 
 <p>TreeView is a control for navigating hierarchical objects. It comes in two forms <code>TreeView</code> and <code>TreeView&lt;T&gt;</code>.</p>
+<p><a href="api/Terminal.Gui/Terminal.Gui.TreeView.html">TreeView API Reference</a></p>
 <h2 id="using-treeview">Using TreeView</h2>
 <p>The basic non generic TreeView class is populated by <code>ITreeNode</code> objects. The simplest tree you can make would look something like:</p>
 <pre><code class="lang-csharp">var tree = new TreeView()
@@ -97,42 +98,42 @@ tree.AddObject(root2);
 <pre><code class="lang-csharp">// Your data class
 private class House : TreeNode {
 
-  // Your properties
-  public string Address {get;set;}
-  public List&lt;Room&gt; Rooms {get;set;}
+    // Your properties
+    public string Address {get;set;}
+    public List&lt;Room&gt; Rooms {get;set;}
 
-  // ITreeNode member:
-  public override IList&lt;ITreeNode&gt; Children =&gt; Rooms.Cast&lt;ITreeNode&gt;().ToList();
+    // ITreeNode member:
+    public override IList&lt;ITreeNode&gt; Children =&gt; Rooms.Cast&lt;ITreeNode&gt;().ToList();
 
-  public override string Text { get =&gt; Address; set =&gt; Address = value; }
+    public override string Text { get =&gt; Address; set =&gt; Address = value; }
 }
 
 
 // Your other data class
 private class Room : TreeNode{
 
-  public string Name {get;set;}
+    public string Name {get;set;}
 
-  public override string Text{get=&gt;Name;set{Name=value;}}
+    public override string Text{get=&gt;Name;set{Name=value;}}
 }
 </code></pre><p>After implementing the interface you can add your objects directly to the tree</p>
 <pre><code class="lang-csharp">
 var myHouse = new House()
 {
-  Address = &quot;23 Nowhere Street&quot;,
-  Rooms = new List&lt;Room&gt;{
-    new Room(){Name = &quot;Ballroom&quot;},
-    new Room(){Name = &quot;Bedroom 1&quot;},
-    new Room(){Name = &quot;Bedroom 2&quot;}
-  }
+    Address = &quot;23 Nowhere Street&quot;,
+    Rooms = new List&lt;Room&gt;{
+      new Room(){Name = &quot;Ballroom&quot;},
+      new Room(){Name = &quot;Bedroom 1&quot;},
+      new Room(){Name = &quot;Bedroom 2&quot;}
+    }
 };
 
 var tree = new TreeView()
 {
-  X = 0,
-  Y = 0,
-  Width = 40,
-  Height = 20
+    X = 0,
+    Y = 0,
+    Width = 40,
+    Height = 20
 };
 
 tree.AddObject(myHouse);
@@ -146,72 +147,73 @@ tree.AddObject(myHouse);
 {
 
 }
+
 private class Army : GameObject
 {
-  public string Designation {get;set;}
-  public List&lt;Unit&gt; Units {get;set;}
+    public string Designation {get;set;}
+    public List&lt;Unit&gt; Units {get;set;}
 
 
-  public override string ToString ()
-  {
-    return Designation;
-  }
+    public override string ToString ()
+    {
+        return Designation;
+    }
 }
 
 private class Unit : GameObject
 {
-  public string Name {get;set;}
-  public override string ToString ()
-  {
-    return Name;
-  }
+    public string Name {get;set;}
+    public override string ToString ()
+    {
+        return Name;
+    }
 }
 </code></pre><p>An <code>ITreeBuilder&lt;T&gt;</code> for these classes might look like:</p>
 <pre><code class="lang-csharp">
 private class GameObjectTreeBuilder : ITreeBuilder&lt;GameObject&gt; {
-  public bool SupportsCanExpand =&gt; true;
+    public bool SupportsCanExpand =&gt; true;
 
-  public bool CanExpand (GameObject model)
-  {
-    return model is Army;
-  }
+    public bool CanExpand (GameObject model)
+    {
+        return model is Army;
+    }
 
-  public IEnumerable&lt;GameObject&gt; GetChildren (GameObject model)
-  {
-    if(model is Army a)
-      return a.Units;
+    public IEnumerable&lt;GameObject&gt; GetChildren (GameObject model)
+    {
+        if(model is Army a)
+            return a.Units;
 
-    return Enumerable.Empty&lt;GameObject&gt;();
-  }
+        return Enumerable.Empty&lt;GameObject&gt;();
+    }
 }
 </code></pre><p>To use the builder in a tree you would use:</p>
 <pre><code class="lang-csharp">var army1 = new Army()
 {
-  Designation = &quot;3rd Infantry&quot;,
-  Units = new List&lt;Unit&gt;{
-    new Unit(){Name = &quot;Orc&quot;},
-    new Unit(){Name = &quot;Troll&quot;},
-    new Unit(){Name = &quot;Goblin&quot;},
-  }
+    Designation = &quot;3rd Infantry&quot;,
+    Units = new List&lt;Unit&gt;{
+        new Unit(){Name = &quot;Orc&quot;},
+        new Unit(){Name = &quot;Troll&quot;},
+        new Unit(){Name = &quot;Goblin&quot;},
+    }
 };
 
 var tree = new TreeView&lt;GameObject&gt;()
 {
-  X = 0,
-  Y = 0,
-  Width = 40,
-  Height = 20,
-  TreeBuilder = new GameObjectTreeBuilder()
+    X = 0,
+    Y = 0,
+    Width = 40,
+    Height = 20,
+    TreeBuilder = new GameObjectTreeBuilder()
 };
 
 
 tree.AddObject(army1);
 </code></pre><p>Alternatively you can use <code>DelegateTreeBuilder&lt;T&gt;</code> instead of implementing your own <code>ITreeBuilder&lt;T&gt;</code>. For example:</p>
 <pre><code class="lang-csharp">tree.TreeBuilder = new DelegateTreeBuilder&lt;GameObject&gt;(
-  (o)=&gt;o is Army a ? a.Units 
-    : Enumerable.Empty&lt;GameObject&gt;());
+    (o)=&gt;o is Army a ? a.Units 
+      : Enumerable.Empty&lt;GameObject&gt;());
 </code></pre><h2 id="node-text-and-tostring">Node Text and ToString</h2>
-<p>The default behaviour of TreeView is to use the <code>ToString</code> method on the objects for rendering. You can customise this by changing the <code>AspectGetter</code>. For example:</p>
+<p>The default behavior of TreeView is to use the <code>ToString</code> method on the objects for rendering. You can customise this by changing the <code>AspectGetter</code>. For example:</p>
 <pre><code class="lang-csharp">treeViewFiles.AspectGetter = (f)=&gt;f.FullName;
 </code></pre></article>
           </div>
