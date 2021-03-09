@@ -30,6 +30,9 @@ jobs:
 
       - name: Build
         run: dotnet build --configuration Release --no-restore
+
+      - name: Pack nuget package with symbols
+        run: dotnet pack --include-symbols
       
       - name: Publish Terminal.Gui
         id: publish_nuget
