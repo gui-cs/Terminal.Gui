@@ -194,7 +194,13 @@
     <PackageReference Include="MinVer" Version="2.4.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>  </ItemGroup>
+    </PackageReference>  
+  </ItemGroup>
+
+  <PropertyGroup>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+  </PropertyGroup>
+  
   <ItemGroup>
     <None Remove="ConsoleDrivers\#ConsoleDriver.cs#" />
   </ItemGroup>
