@@ -20,6 +20,46 @@ Contains all files required to build the **Terminal.Gui** library (and nuget pac
 - `Views/` - A folder (not namespace) containing the source for all built-in classes that drive from `View` (non-modals). 
 - `Windows/` - A folder (not namespace) containing the source all built-in classes that derive from `Window`.
 
+## Version numbers
+
+Version info for Terminal.Gui is managed by MinVer (https://github.com/adamralph/minver).
+
+To release a new version simply tag a commit
+
+```powershell
+git tag vmajor.minor.patch.build.height -a
+git push upstream origin vmajor.minor.patch.build.height
+
+```      
+
+`patch` can indicate pre-release or not
+
+e.g: 
+       
+```powershell
+git tag v1.3.4-beta.5 -a
+git push upstream v1.3.4-beta.5
+```
+
+    or
+       
+```powershell
+git tag v2.3.4.5 -a
+git push upstream v2.3.4.5
+```       
+
+Then rebuild the project and the version info will be updated.
+
+## Nuget
+
+https://www.nuget.org/packages/Terminal.Gui
+
+When a new version tag is defined, and merged into master, a nuget package will be generated.
+
+If the version is pre-release (includes a hyphen, e.g. `1.3.4-beta.5`) the Nuget package will be tagged as pre-release.
+
+Miguel can hide defunct/old nuget packages.
+
 ## Contributing
 
 See [CONTRIBUTING.md](https://github.com/migueldeicaza/gui.cs/blob/master/CONTRIBUTING.md).

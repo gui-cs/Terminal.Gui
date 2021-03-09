@@ -1,25 +1,46 @@
-name: publish Terminal.Gui to nuget
+name: Publish Terminal.Gui to nuget
 on:
   push:
-    branches:
-      - master # Default release branch
+    tags:
+      - v*
+
 jobs:
+
   publish:
     name: build, pack & publish
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.100
 
-      # Publish
-      - name: publish on version change
+      - name: minver-cli
+        run: |
+          dotnet tool install --global minver-cli --version 2.4.0
+          echo "MINVERVERSIONOVERRIDE=$(minver -t v -d rc)" >> $GITHUB_ENV
+
+      #- name: Install dependencies
+      #  run: dotnet restore
+
+      #- name: Build
+      #  run: dotnet build --configuration Release --no-restore
+
+      #- name: Pack nuget package with symbols
+      #  run: dotnet pack --include-symbols
+      
+      - name: Publish Terminal.Gui
         id: publish_nuget
-        uses: brandedoutcast/publish-nuget@v2
+        uses: brandedoutcast/publish-nuget@v2.5.5
         with:
+          VERSION_STATIC: ${{ env.MINVERVERSIONOVERRIDE }}
+          NUGET_SOURCE: https://api.nuget.org
+
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: Terminal.Gui/Terminal.Gui.csproj
           
@@ -27,16 +48,16 @@ jobs:
           PACKAGE_NAME: Terminal.Gui
           
           # Filepath with version info, relative to root of repository & defaults to PROJECT_FILE_PATH
-          VERSION_FILE_PATH: Terminal.Gui/Directory.Build.props
+          #VERSION_FILE_PATH: Terminal.Gui/Directory.Build.props
 
           # Regex pattern to extract version info in a capturing group
-          VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
+          #VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
           
           # Useful with external providers like Nerdbank.GitVersioning, ignores VERSION_FILE_PATH & VERSION_REGEX
           # VERSION_STATIC: 1.0.0
 
           # Flag to toggle git tagging, enabled by default
-          TAG_COMMIT: true
+          TAG_COMMIT: false
 
           # Format of the git tag, [*] gets replaced with actual version
           # TAG_FORMAT: v*
@@ -48,4 +69,5 @@ jobs:
           # NUGET_SOURCE: https://api.nuget.org
 
           # Flag to toggle pushing symbols along with nuget package to the server, disabled by default
+          # This is broken - see https://github.com/brandedoutcast/publish-nuget/issues/30
           INCLUDE_SYMBOLS: false

@@ -5,15 +5,10 @@
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
     <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
-    <!-- moved to ../Directory.Build.props -->
-    <!-- <AssemblyVersion>0.89.0.0</AssemblyVersion> -->
   </PropertyGroup>
   <PropertyGroup>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <PackageId>Terminal.Gui</PackageId>
-    <!-- moved to ../Directory.Build.props -->
-    <!-- <PackageVersion>0.89</PackageVersion> -->
-    <!-- <Authors>Miguel de Icaza, Charlie Kindel (@tig), @BDisp</Authors> -->
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/migueldeicaza/gui.cs/</PackageProjectUrl>
     <PackageTags>csharp, terminal, c#, f#, gui, toolkit, console</PackageTags>
@@ -22,6 +17,10 @@
     <Summary>Application framework for creating modern console applications using .NET</Summary>
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
     <PackageReleaseNotes>
+      v1.0.0-beta.8
+      * Now using MinVer to generate version numbers from git tags.
+      * Updated publish-to-nuget to work with minver
+      
       v1.0.0-pre.9
       * NEW CONTROL: TreeView - Thanks @tznind!
       * Fixes #1066. View sizing across the various terminals has been fixed; works in Windows Terminal again - thanks @bdisp
@@ -189,22 +188,19 @@
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
 
-  <!--<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net472|AnyCPU'">
-    <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net472|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
-  </PropertyGroup>-->
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="true" />
     <PackageReference Include="NStack.Core" Version="0.16.0" />
+    <PackageReference Include="MinVer" Version="2.4.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>  
   </ItemGroup>
-  <!--<ItemGroup>
-    <Reference Include="NStack">
-      <HintPath>..\..\..\Users\miguel\.nuget\packages\nstack.core\0.14.0\lib\netstandard2.0\NStack.dll</HintPath>
-    </Reference>
-  </ItemGroup>-->
+
+  <PropertyGroup>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+  </PropertyGroup>
+  
   <ItemGroup>
     <None Remove="ConsoleDrivers\#ConsoleDriver.cs#" />
   </ItemGroup>
