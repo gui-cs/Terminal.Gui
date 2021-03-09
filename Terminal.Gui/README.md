@@ -27,7 +27,9 @@ Version info for Terminal.Gui is managed by MinVer (https://github.com/adamralph
 To release a new version simply tag a commit
 
 ```powershell
-git tag vmajor.minor.patch.build.height
+git tag vmajor.minor.patch.build.height -a
+git push upstream origin vmajor.minor.patch.build.height
+
 ```      
 
 `patch` can indicate pre-release or not
@@ -35,13 +37,15 @@ git tag vmajor.minor.patch.build.height
 e.g: 
        
 ```powershell
-git tag v1.3.4-beta.5
+git tag v1.3.4-beta.5 -a
+git push upstream v1.3.4-beta.5
 ```
 
     or
        
 ```powershell
-git tag v2.3.4.5
+git tag v2.3.4.5 -a
+git push upstream v2.3.4.5
 ```       
 
 Then rebuild the project and the version info will be updated.
