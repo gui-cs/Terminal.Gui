@@ -70,6 +70,9 @@ namespace Terminal.Gui {
 	/// Control that hosts multiple sub views, presenting a single one at once
 	/// </summary>
 	public class TabView : View {
+		private Tab selectedTab;
+        View contentView;
+
 		/// <summary>
 		/// All tabs currently hosted by the control, after making changes call <see cref="View.SetNeedsDisplay()"/>
 		/// </summary>
@@ -80,7 +83,24 @@ namespace Terminal.Gui {
 		/// The currently selected member of <see cref="Tabs"/> chosen by the user
 		/// </summary>
 		/// <value></value>
-		public Tab SelectedTab { get; set; }
+		public Tab SelectedTab { 
+            get => selectedTab; 
+            set {
+
+                if(selectedTab != null){
+                    // remove old content
+                    contentView.Remove(selectedTab.View);
+                }
+
+                selectedTab = value;
+
+                if(value != null){
+                    
+                    // add new content
+                    contentView.Add(selectedTab.View);
+                }
+            } 
+        }
 
 		/// <summary>
 		/// Render choices for how to display tabs
@@ -95,6 +115,14 @@ namespace Terminal.Gui {
 		public TabView () : base ()
 		{
 			CanFocus = true;
+            contentView = new View(){
+                X = 1,
+                Y = 3,
+                Width = Dim.Fill(1),
+                Height = Dim.Fill(1),
+                };
+
+			base.Add (contentView);
 		}
 
 		///<inheritdoc/>
@@ -117,29 +145,31 @@ namespace Terminal.Gui {
 			RenderTabLine (tabLocations, width, currentLine);
 			currentLine++;
 
-			//RenderTabUnderline (tabLocations, width);
+            DrawFrame(new Rect(0,currentLine,bounds.Width,bounds.Height-currentLine),0,true);
 
+			RenderSelectedTabWhitespace(tabLocations, width, currentLine);
+
+            contentView.Redraw(contentView.Bounds);
 		}
 
 
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
+            if(HasFocus && CanFocus && Focused == null)
+            {
+                switch (keyEvent.Key) {
 
+    	    		case Key.CursorLeft:
+	    	    		SwitchTabBy (-1);
+                        return true;
+			        case Key.CursorRight:
+				        SwitchTabBy (1);
+                        return true;
+                    }
+            }
 
-			switch (keyEvent.Key) {
-			case Key.CursorLeft:
-				SwitchTabBy(-1);
-				break;
-			case Key.CursorRight:
-				SwitchTabBy(1);
-				break;
-			default:
-				// Not a keystroke we care about
-				return false;
-			}
-			PositionCursor ();
-			return true;
+            return base.ProcessKey(keyEvent);
 		}
 
 		/// <summary>
@@ -148,9 +178,9 @@ namespace Terminal.Gui {
 		/// the first tab will become selected
 		/// </summary>
 		/// <param name="amount"></param>
-		public void SwitchTabBy(int amount)
+		public void SwitchTabBy (int amount)
 		{
-			if(Tabs.Count == 0) {
+			if (Tabs.Count == 0) {
 				return;
 			}
 
@@ -161,7 +191,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var currentIdx = Tabs.IndexOf(SelectedTab);
+			var currentIdx = Tabs.IndexOf (SelectedTab);
 
 			// Currently selected tab has vanished!
 			if (currentIdx == -1) {
@@ -172,15 +202,12 @@ namespace Terminal.Gui {
 
 			var newIdx = Math.Max (0, Math.Min (currentIdx + amount, Tabs.Count - 1));
 
-			SelectedTab = Tabs[newIdx];
+			SelectedTab = Tabs [newIdx];
 			SetNeedsDisplay ();
 		}
 
 		private void RenderOverline (TabToRender [] tabLocations, int width)
 		{
-			// Renders the top line of selected tab like 
-			//          
-
 			Move (0, 0);
 
 			var selected = tabLocations.FirstOrDefault (t => t.IsSelected);
@@ -194,7 +221,7 @@ namespace Terminal.Gui {
 			}
 
 
-			Move (selected.X - 1,0);
+			Move (selected.X - 1, 0);
 			Driver.AddRune (Driver.ULCorner);
 
 			for (int i = 0; i < selected.Width; i++) {
@@ -203,7 +230,7 @@ namespace Terminal.Gui {
 					// we ran out of space horizontally
 					return;
 				}
-				
+
 				Driver.AddRune (Driver.HLine);
 			}
 
@@ -212,7 +239,7 @@ namespace Terminal.Gui {
 
 		}
 
-		private void RenderTabLine(TabToRender [] tabLocations, int width, int currentLine)
+		private void RenderTabLine (TabToRender [] tabLocations, int width, int currentLine)
 		{
 			foreach (var toRender in tabLocations) {
 
@@ -222,7 +249,7 @@ namespace Terminal.Gui {
 				}
 
 				Move (toRender.X, currentLine);
-				Driver.SetAttribute(HasFocus && toRender.IsSelected ? ColorScheme.Focus: ColorScheme.Normal);
+				Driver.SetAttribute (HasFocus && toRender.IsSelected ? ColorScheme.Focus : ColorScheme.Normal);
 				Driver.AddStr (toRender.Tab.Text);
 				Driver.SetAttribute (ColorScheme.Normal);
 
@@ -231,6 +258,28 @@ namespace Terminal.Gui {
 				}
 			}
 		}
+
+        /// <summary>
+        /// Draws whitespace over the top of the bounding rectangle so the selected tab appears
+        /// to flow into the box
+        /// </summary>
+        /// <param name="tabLocations"></param>
+        /// <param name="width"></param>
+        /// <param name="currentLine"></param>
+        private void RenderSelectedTabWhitespace (TabToRender [] tabLocations, int width, int currentLine){
+            
+            var selected = tabLocations.FirstOrDefault (t => t.IsSelected);
+
+            if(selected == null){
+                return;
+            }
+
+            Move (selected.X - 1, currentLine);
+			Driver.AddRune (selected.X == 1 ? Driver.VLine : Driver.LRCorner);
+
+            Driver.AddStr (new string(' ',selected.Width));
+            Driver.AddRune (Driver.LLCorner);
+        }
 
 		/// <summary>
 		/// Returns which tabs to render at each x location

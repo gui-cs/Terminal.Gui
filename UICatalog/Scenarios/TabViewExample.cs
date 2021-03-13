@@ -35,8 +35,35 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (1),
 			};
 
-			tabView.Tabs.Add(new Tab("Tab1",new View()));
+			var interactiveTab = new View(){
+				Width = Dim.Fill(),
+				Height = Dim.Fill()
+			};
+			var lblName = new Label("Name:");
+			interactiveTab.Add(lblName);
+
+			var tbName = new TextField(){
+				X = Pos.Right(lblName),
+				Width = 10};
+			interactiveTab.Add(tbName);
+
+			var lblAddr = new Label("Address:")
+			{
+				Y=1
+			};
+			interactiveTab.Add(lblAddr);
+
+			var tbAddr = new TextField()
+			{
+				X = Pos.Right(lblAddr),
+				Y=1,
+				Width = 10
+			};
+			interactiveTab.Add(tbAddr);
+
+			tabView.Tabs.Add(new Tab("Tab1",new Label("hodor!")));
 			tabView.Tabs.Add(new Tab("Tab2",new Label("durdur")));
+			tabView.Tabs.Add(new Tab("Interactive Tab",interactiveTab));
 
 			tabView.SelectedTab = tabView.Tabs[0];
 
