@@ -54,6 +54,30 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (1),
 			};
 
+
+			tabView.Tabs.Add(new Tab("Tab1",new Label("hodor!")));
+			tabView.Tabs.Add(new Tab("Tab2",new Label("durdur")));
+			tabView.Tabs.Add(new Tab("Interactive Tab",GetInteractiveTab()));
+			tabView.Tabs.Add(new Tab("Big Text",GetBigTextFileTab()));
+
+			for(int i=0;i<100;i++)
+			{
+				tabView.Tabs.Add(new Tab($"Tab{i}",new Label($"Welcome to tab {i}")));
+			}
+
+			tabView.SelectedTab = tabView.Tabs[0];
+
+			Win.Add (tabView);
+
+			var statusBar = new StatusBar (new StatusItem [] {
+				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+			});
+			Top.Add (statusBar);
+		}
+
+		private View GetInteractiveTab ()
+		{
+			
 			var interactiveTab = new View(){
 				Width = Dim.Fill(),
 				Height = Dim.Fill()
@@ -80,20 +104,31 @@ namespace UICatalog.Scenarios {
 			};
 			interactiveTab.Add(tbAddr);
 
-			tabView.Tabs.Add(new Tab("Tab1",new Label("hodor!")));
-			tabView.Tabs.Add(new Tab("Tab2",new Label("durdur")));
-			tabView.Tabs.Add(new Tab("Interactive Tab",interactiveTab));
-
-			tabView.SelectedTab = tabView.Tabs[0];
-
-			Win.Add (tabView);
-
-			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
-			});
-			Top.Add (statusBar);
+			return interactiveTab;
 		}
 
+
+		private View GetBigTextFileTab ()
+		{
+			
+			var text = new TextView(){
+				Width = Dim.Fill(),
+				Height = Dim.Fill()
+			};
+
+			var sb = new System.Text.StringBuilder();
+
+			for(int y=0;y<300;y++){
+				for(int x=0;x<500;x++)
+				{
+					sb.Append((x+y)%2 ==0 ? '1':'0');
+				}
+				sb.AppendLine();
+			}
+			text.Text = sb.ToString();
+
+			return text;
+		}
 
 		private void ShowTopLine()
 		{

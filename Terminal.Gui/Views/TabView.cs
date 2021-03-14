@@ -94,6 +94,13 @@ namespace Terminal.Gui {
 		/// <value></value>
 		public List<Tab> Tabs { get; set; } = new List<Tab> ();
 
+        /// <summary>
+        /// When there are too many tabs to render, this indicates the first
+        /// tab to render on the screen.
+        /// </summary>
+        /// <value></value>
+        public int TabScrollOffset { get;set;}
+
 		/// <summary>
 		/// The currently selected member of <see cref="Tabs"/> chosen by the user
 		/// </summary>
@@ -182,7 +189,7 @@ namespace Terminal.Gui {
 			Move (0, 0);
 			Driver.SetAttribute (ColorScheme.Normal);
 
-			var tabLocations = MeasureTabs ().ToArray ();
+			var tabLocations = CalculateViewport (bounds).ToArray ();
 			var width = bounds.Width;
 
 			int currentLine = 0;
@@ -310,9 +317,36 @@ namespace Terminal.Gui {
 
 			SelectedTab = Tabs [newIdx];
 			SetNeedsDisplay ();
+
+            EnsureSelectedTabIsVisible();
 		}
 
 
+		/// <summary>
+		/// Updates <see cref="TabScrollOffset"/> to be a valid index of <see cref="Tabs"/>
+		/// </summary>
+		/// <remarks>Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/></remarks>
+		public void EnsureValidScrollOffsets ()
+		{
+			TabScrollOffset = Math.Max(Math.Min(TabScrollOffset,Tabs.Count -1),0);
+		}
+
+        /// <summary>
+        /// Updates <see cref="TabScrollOffset"/> to ensure that <see cref="SelectedTab"/> is visible
+        /// </summary>
+		public void EnsureSelectedTabIsVisible ()
+		{
+            if(SelectedTab == null){
+                return;
+            }
+
+            // if current viewport does not include the selected tab
+            if(!CalculateViewport(Bounds).Any(r=>Equals(SelectedTab,r.Tab))){
+                
+                // Set scroll offset so the first tab rendered is the
+                TabScrollOffset = Math.Max(0,Tabs.IndexOf(SelectedTab));
+            }
+		}
 
 		/// <summary>
 		/// Returns the number of rows occupied by rendering the tabs, this depends 
@@ -410,20 +444,34 @@ namespace Terminal.Gui {
 		(Style.TabsOnBottom ? Driver.URCorner : Driver.LRCorner));
 
 			Driver.AddStr (new string (' ', selected.Width));
-			Driver.AddRune (Style.TabsOnBottom ? Driver.ULCorner : Driver.LLCorner);
+
+
+			Driver.AddRune (selected.X + selected.Width ==  width - 1 ?
+             Driver.VLine :
+			(Style.TabsOnBottom ? Driver.ULCorner : Driver.LLCorner));
 		}
 
 		/// <summary>
 		/// Returns which tabs to render at each x location
 		/// </summary>
 		/// <returns></returns>
-		private IEnumerable<TabToRender> MeasureTabs ()
+		private IEnumerable<TabToRender> CalculateViewport (Rect bounds)
 		{
 			int i = 1;
-			var toReturn = new Dictionary<int, Tab> ();
 
-			foreach (var tab in Tabs) {
+            // Starting at the first or scrolled to tab
+			foreach (var tab in Tabs.Skip(TabScrollOffset)) {
+
+                // while there is space for the tab
 				var tabTextWidth = tab.Text.Sum (c => Rune.ColumnWidth (c));
+                
+                // if there is not enough space for this tab
+                if(i+tabTextWidth >= bounds.Width)
+                {
+                    break;
+                }
+
+                // there is enough space!
 				yield return new TabToRender (i, tab, Equals (SelectedTab, tab), tabTextWidth);
 				i += tabTextWidth + 1;
 			}
@@ -469,7 +517,7 @@ namespace Terminal.Gui {
 			{
 				base.PositionCursor ();
 
-				var selected = host.MeasureTabs ().FirstOrDefault (t => Equals (host.SelectedTab, t.Tab));
+				var selected = host.CalculateViewport (Bounds).FirstOrDefault (t => Equals (host.SelectedTab, t.Tab));
 
 				if (selected == null) {
 					return;
