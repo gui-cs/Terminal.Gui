@@ -121,6 +121,8 @@ namespace Terminal.Gui {
 					// add new content
 					contentView.Add (selectedTab.View);
 				}
+
+                EnsureSelectedTabIsVisible();
 			}
 		}
 
@@ -207,7 +209,6 @@ namespace Terminal.Gui {
 				currentLine++;
 			}
 
-
 			if (Style.ShowBorder) {
 
 				// How muc space do we need to leave at the bottom to show the tabs
@@ -215,14 +216,21 @@ namespace Terminal.Gui {
 
 				DrawFrame (new Rect (0, currentLine, bounds.Width,
 			       bounds.Height - spaceAtBottom - currentLine), 0, true);
-			} else {
+			} 
+            
+            // if we drew border then that will include a line under the tabs.  Otherwise we have to
+            // draw that line manually
+            if (!Style.ShowBorder){
 
-				Move (0, currentLine);
+                // Prepare to draw the horizontal line below the tab text
+                currentLine = Style.TabsOnBottom ? bounds.Height - GetTabHeight(false) : GetTabHeight(true)-1;
+
+                Move (0,currentLine);
 
 				for (int x = 0; x < width; x++) {
 					Driver.AddRune (Driver.HLine);
 				}
-			}
+            }
 
 
 			if (Style.TabsOnBottom) {
@@ -243,6 +251,27 @@ namespace Terminal.Gui {
 			}
 
 			RenderSelectedTabWhitespace (tabLocations, width, currentLine);
+
+            // draw scroll indicators
+            currentLine = Style.TabsOnBottom ? bounds.Height - GetTabHeight(false) : GetTabHeight(true)-1;
+            
+            // if there are more tabs to the left not visible
+            if(TabScrollOffset > 0)
+            {
+				Move (0,currentLine);
+
+                // indicate that
+                Driver.AddRune (Driver.LeftArrow);
+            }
+
+            // if there are mmore tabs to the right not visible
+            if(tabLocations.LastOrDefault()?.Tab != Tabs.LastOrDefault())
+            {
+				Move (bounds.Width -1,currentLine);
+
+                // indicate that
+                Driver.AddRune (Driver.RightArrow);
+            }
 
 			contentView.Redraw (contentView.Bounds);
 		}
@@ -278,6 +307,12 @@ namespace Terminal.Gui {
 					return true;
 				case Key.CursorRight:
 					SwitchTabBy (1);
+					return true;
+				case Key.Home:
+					SelectedTab = Tabs.FirstOrDefault();
+					return true;
+				case Key.End:
+					SelectedTab = Tabs.LastOrDefault();
 					return true;
 				}
 			}
