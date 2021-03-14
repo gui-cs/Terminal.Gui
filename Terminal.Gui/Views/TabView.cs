@@ -77,6 +77,15 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class TabView : View {
 		private Tab selectedTab;
+
+        /// <summary>
+        /// It seems like a control cannot have both subviews and be
+        /// focusable.  Therefore this proxy view is needed. It allows
+        /// tab based navigation to switch between the <see cref="contentView"/>
+        /// and the tabs
+        /// </summary>
+        View tabsBar;
+
 		View contentView;
 
 		/// <summary>
@@ -122,8 +131,15 @@ namespace Terminal.Gui {
 		{
 			CanFocus = true;
 			contentView = new View ();
+            tabsBar = new View(){
+                CanFocus = true,
+                Height = 1,
+                Width = Dim.Fill(),
+            };
+
 			ApplyStyleChanges ();
 
+            base.Add (tabsBar);
 			base.Add (contentView);
 		}
 
@@ -141,6 +157,8 @@ namespace Terminal.Gui {
 
 			contentView.Height = Dim.Fill(GetTabHeight (false));
 			contentView.Width = Dim.Fill (Style.ShowBorder ? 1 : 0);
+
+            tabsBar.Y = Style.ShowBorder ? 1 :0;
 
 			SetNeedsDisplay ();
 		}
@@ -207,7 +225,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if (HasFocus && CanFocus && Focused == null) {
+			if (HasFocus && CanFocus && Focused == tabsBar) {
 				switch (keyEvent.Key) {
 
 				case Key.CursorLeft:
