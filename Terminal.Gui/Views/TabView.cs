@@ -87,19 +87,20 @@ namespace Terminal.Gui {
 		TabRowView tabsBar;
 
 		View contentView;
+		private List<Tab> tabs = new List<Tab> ();
 
 		/// <summary>
 		/// All tabs currently hosted by the control, after making changes call <see cref="View.SetNeedsDisplay()"/>
 		/// </summary>
 		/// <value></value>
-		public List<Tab> Tabs { get; set; } = new List<Tab> ();
+		public IReadOnlyCollection<Tab> Tabs { get => tabs.AsReadOnly(); }
 
-        /// <summary>
-        /// When there are too many tabs to render, this indicates the first
-        /// tab to render on the screen.
-        /// </summary>
-        /// <value></value>
-        public int TabScrollOffset { get;set;}
+		/// <summary>
+		/// When there are too many tabs to render, this indicates the first
+		/// tab to render on the screen.
+		/// </summary>
+		/// <value></value>
+		public int TabScrollOffset { get; set; }
 
 		/// <summary>
 		/// The currently selected member of <see cref="Tabs"/> chosen by the user
@@ -122,7 +123,7 @@ namespace Terminal.Gui {
 					contentView.Add (selectedTab.View);
 				}
 
-                EnsureSelectedTabIsVisible();
+				EnsureSelectedTabIsVisible ();
 			}
 		}
 
@@ -176,7 +177,7 @@ namespace Terminal.Gui {
 				contentView.Height = Dim.Fill (Style.ShowBorder ? 1 : 0);
 
 				// Should be able to just use 1 or 0 but switching between top/bottom tabs repeatedly breaks in ValidatePosDim if just using 1/0 without Pos.Top
-				tabsBar.Y = Pos.Top(this) + (Style.ShowBorder ? 1 : 0);
+				tabsBar.Y = Pos.Top (this) + (Style.ShowBorder ? 1 : 0);
 			}
 
 
@@ -216,21 +217,21 @@ namespace Terminal.Gui {
 
 				DrawFrame (new Rect (0, currentLine, bounds.Width,
 			       bounds.Height - spaceAtBottom - currentLine), 0, true);
-			} 
-            
-            // if we drew border then that will include a line under the tabs.  Otherwise we have to
-            // draw that line manually
-            if (!Style.ShowBorder){
+			}
 
-                // Prepare to draw the horizontal line below the tab text
-                currentLine = Style.TabsOnBottom ? bounds.Height - GetTabHeight(false) : GetTabHeight(true)-1;
+			// if we drew border then that will include a line under the tabs.  Otherwise we have to
+			// draw that line manually
+			if (!Style.ShowBorder) {
 
-                Move (0,currentLine);
+				// Prepare to draw the horizontal line below the tab text
+				currentLine = Style.TabsOnBottom ? bounds.Height - GetTabHeight (false) : GetTabHeight (true) - 1;
+
+				Move (0, currentLine);
 
 				for (int x = 0; x < width; x++) {
 					Driver.AddRune (Driver.HLine);
 				}
-            }
+			}
 
 
 			if (Style.TabsOnBottom) {
@@ -252,26 +253,24 @@ namespace Terminal.Gui {
 
 			RenderSelectedTabWhitespace (tabLocations, width, currentLine);
 
-            // draw scroll indicators
-            currentLine = Style.TabsOnBottom ? bounds.Height - GetTabHeight(false) : GetTabHeight(true)-1;
-            
-            // if there are more tabs to the left not visible
-            if(TabScrollOffset > 0)
-            {
-				Move (0,currentLine);
+			// draw scroll indicators
+			currentLine = Style.TabsOnBottom ? bounds.Height - GetTabHeight (false) : GetTabHeight (true) - 1;
 
-                // indicate that
-                Driver.AddRune (Driver.LeftArrow);
-            }
+			// if there are more tabs to the left not visible
+			if (TabScrollOffset > 0) {
+				Move (0, currentLine);
 
-            // if there are mmore tabs to the right not visible
-            if(tabLocations.LastOrDefault()?.Tab != Tabs.LastOrDefault())
-            {
-				Move (bounds.Width -1,currentLine);
+				// indicate that
+				Driver.AddRune (Driver.LeftArrow);
+			}
 
-                // indicate that
-                Driver.AddRune (Driver.RightArrow);
-            }
+			// if there are mmore tabs to the right not visible
+			if (tabLocations.LastOrDefault ()?.Tab != Tabs.LastOrDefault ()) {
+				Move (bounds.Width - 1, currentLine);
+
+				// indicate that
+				Driver.AddRune (Driver.RightArrow);
+			}
 
 			contentView.Redraw (contentView.Bounds);
 		}
@@ -309,10 +308,10 @@ namespace Terminal.Gui {
 					SwitchTabBy (1);
 					return true;
 				case Key.Home:
-					SelectedTab = Tabs.FirstOrDefault();
+					SelectedTab = Tabs.FirstOrDefault ();
 					return true;
 				case Key.End:
-					SelectedTab = Tabs.LastOrDefault();
+					SelectedTab = Tabs.LastOrDefault ();
 					return true;
 				}
 			}
@@ -334,7 +333,7 @@ namespace Terminal.Gui {
 
 			// if there is only one tab anyway or nothing is selected
 			if (Tabs.Count == 1 || SelectedTab == null) {
-				SelectedTab = Tabs [0];
+				SelectedTab = Tabs.ElementAt (0);
 				SetNeedsDisplay ();
 				return;
 			}
@@ -343,17 +342,17 @@ namespace Terminal.Gui {
 
 			// Currently selected tab has vanished!
 			if (currentIdx == -1) {
-				SelectedTab = Tabs [0];
+				SelectedTab = Tabs.ElementAt (0);
 				SetNeedsDisplay ();
 				return;
 			}
 
 			var newIdx = Math.Max (0, Math.Min (currentIdx + amount, Tabs.Count - 1));
 
-			SelectedTab = Tabs [newIdx];
+			SelectedTab = tabs [newIdx];
 			SetNeedsDisplay ();
 
-            EnsureSelectedTabIsVisible();
+			EnsureSelectedTabIsVisible ();
 		}
 
 
@@ -363,24 +362,24 @@ namespace Terminal.Gui {
 		/// <remarks>Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/></remarks>
 		public void EnsureValidScrollOffsets ()
 		{
-			TabScrollOffset = Math.Max(Math.Min(TabScrollOffset,Tabs.Count -1),0);
+			TabScrollOffset = Math.Max (Math.Min (TabScrollOffset, Tabs.Count - 1), 0);
 		}
 
-        /// <summary>
-        /// Updates <see cref="TabScrollOffset"/> to ensure that <see cref="SelectedTab"/> is visible
-        /// </summary>
+		/// <summary>
+		/// Updates <see cref="TabScrollOffset"/> to ensure that <see cref="SelectedTab"/> is visible
+		/// </summary>
 		public void EnsureSelectedTabIsVisible ()
 		{
-            if(SelectedTab == null){
-                return;
-            }
+			if (SelectedTab == null) {
+				return;
+			}
 
-            // if current viewport does not include the selected tab
-            if(!CalculateViewport(Bounds).Any(r=>Equals(SelectedTab,r.Tab))){
-                
-                // Set scroll offset so the first tab rendered is the
-                TabScrollOffset = Math.Max(0,Tabs.IndexOf(SelectedTab));
-            }
+			// if current viewport does not include the selected tab
+			if (!CalculateViewport (Bounds).Any (r => Equals (SelectedTab, r.Tab))) {
+
+				// Set scroll offset so the first tab rendered is the
+				TabScrollOffset = Math.Max (0, Tabs.IndexOf (SelectedTab));
+			}
 		}
 
 		/// <summary>
@@ -481,8 +480,8 @@ namespace Terminal.Gui {
 			Driver.AddStr (new string (' ', selected.Width));
 
 
-			Driver.AddRune (selected.X + selected.Width ==  width - 1 ?
-             Driver.VLine :
+			Driver.AddRune (selected.X + selected.Width == width - 1 ?
+	     Driver.VLine :
 			(Style.TabsOnBottom ? Driver.ULCorner : Driver.LLCorner));
 		}
 
@@ -494,22 +493,60 @@ namespace Terminal.Gui {
 		{
 			int i = 1;
 
-            // Starting at the first or scrolled to tab
-			foreach (var tab in Tabs.Skip(TabScrollOffset)) {
+			// Starting at the first or scrolled to tab
+			foreach (var tab in Tabs.Skip (TabScrollOffset)) {
 
-                // while there is space for the tab
+				// while there is space for the tab
 				var tabTextWidth = tab.Text.Sum (c => Rune.ColumnWidth (c));
-                
-                // if there is not enough space for this tab
-                if(i+tabTextWidth >= bounds.Width)
-                {
-                    break;
-                }
 
-                // there is enough space!
+				// if there is not enough space for this tab
+				if (i + tabTextWidth >= bounds.Width) {
+					break;
+				}
+
+				// there is enough space!
 				yield return new TabToRender (i, tab, Equals (SelectedTab, tab), tabTextWidth);
 				i += tabTextWidth + 1;
 			}
+		}
+
+		/// <summary>
+		/// Adds the given <paramref name="tab"/> to <see cref="Tabs"/>
+		/// </summary>
+		/// <param name="tab"></param>
+		public void AddTab (Tab tab)
+		{
+			tabs.Add (tab);
+
+            if(SelectedTab == null){
+                SelectedTab = tab;
+                EnsureSelectedTabIsVisible();
+            }
+
+			SetNeedsDisplay ();
+		}
+
+
+		/// <summary>
+		/// Removes the given <paramref name="tab"/> from <see cref="Tabs"/>.
+        /// Optionally disposes the tabs hosted <see cref="Tab.View"/>>
+		/// </summary>
+		/// <param name="tab"></param>
+		/// <param name="dispose">True to dispose of the tabs control</param>
+		public void RemoveTab (Tab tab, bool dispose)
+		{
+            if(tab == null || !tabs.Contains(tab))
+            {
+                return;
+            }
+
+			tabs.Remove (tab);
+
+            if(dispose){
+                tab.View.Dispose();
+            }
+
+			SetNeedsDisplay ();
 		}
 
 		private class TabToRender {

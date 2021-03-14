@@ -55,17 +55,17 @@ namespace UICatalog.Scenarios {
 			};
 
 
-			tabView.Tabs.Add(new Tab("Tab1",new Label("hodor!")));
-			tabView.Tabs.Add(new Tab("Tab2",new Label("durdur")));
-			tabView.Tabs.Add(new Tab("Interactive Tab",GetInteractiveTab()));
-			tabView.Tabs.Add(new Tab("Big Text",GetBigTextFileTab()));
+			tabView.AddTab(new Tab("Tab1",new Label("hodor!")));
+			tabView.AddTab(new Tab("Tab2",new Label("durdur")));
+			tabView.AddTab(new Tab("Interactive Tab",GetInteractiveTab()));
+			tabView.AddTab(new Tab("Big Text",GetBigTextFileTab()));
 
 			for(int i=0;i<100;i++)
 			{
-				tabView.Tabs.Add(new Tab($"Tab{i}",new Label($"Welcome to tab {i}")));
+				tabView.AddTab(new Tab($"Tab{i}",new Label($"Welcome to tab {i}")));
 			}
 
-			tabView.SelectedTab = tabView.Tabs[0];
+			tabView.SelectedTab = tabView.Tabs.First();
 
 			Win.Add (tabView);
 
