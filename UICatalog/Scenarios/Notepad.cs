@@ -14,6 +14,7 @@ namespace UICatalog.Scenarios {
 	class Notepad : Scenario {
 
 		TabView tabView;
+		Label lblStatus;
 
 		private int numbeOfNewTabs = 1;
 
@@ -40,7 +41,7 @@ namespace UICatalog.Scenarios {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
-				Height = Dim.Fill (2),
+				Height = Dim.Fill(1),
 			};
 
 			tabView.Style.ShowBorder = false;
@@ -51,14 +52,30 @@ namespace UICatalog.Scenarios {
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
-				new StatusItem(Key.CtrlMask | Key.N, "~^O~ Open", () => Open()),
-				new StatusItem(Key.CtrlMask | Key.N, "~^N~ New", () => New()),
+
+				// These shortcut keys don't seem to work correctly in linux 
+				//new StatusItem(Key.CtrlMask | Key.N, "~^O~ Open", () => Open()),
+				//new StatusItem(Key.CtrlMask | Key.N, "~^N~ New", () => New()),
+
 				new StatusItem(Key.CtrlMask | Key.S, "~^S~ Save", () => Save()),
 				new StatusItem(Key.CtrlMask | Key.W, "~^W~ Close", () => Close()),
 			});
+
+			Win.Add(lblStatus = new Label("Len:"){
+				Y = Pos.Bottom(tabView),
+				Width = Dim.Fill(),
+				TextAlignment = TextAlignment.Right
+			});
+
+			tabView.SelectedTabChanged += (s,e) => UpdateStatus(e.NewTab);
+
 			Top.Add (statusBar);
 		}
 
+		private void UpdateStatus (Tab newTab)
+		{
+			lblStatus.Text  = $"Len:{(newTab?.View?.Text?.Length ??0)}" ;
+		}
 
 		private void New ()
 		{

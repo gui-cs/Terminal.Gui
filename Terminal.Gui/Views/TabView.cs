@@ -102,6 +102,12 @@ namespace Terminal.Gui {
 		/// <value></value>
 		public int TabScrollOffset { get; set; }
 
+
+        /// <summary>
+        /// Event for when <see cref="SelectedTab"/> changes
+        /// </summary>
+        public event EventHandler<TabChangedEventArgs> SelectedTabChanged;
+
 		/// <summary>
 		/// The currently selected member of <see cref="Tabs"/> chosen by the user
 		/// </summary>
@@ -109,6 +115,8 @@ namespace Terminal.Gui {
 		public Tab SelectedTab {
 			get => selectedTab;
 			set {
+
+                var old = selectedTab;
 
 				if (selectedTab != null) {
 					// remove old content
@@ -122,8 +130,13 @@ namespace Terminal.Gui {
 					// add new content
 					contentView.Add (selectedTab.View);
 				}
-
+                
 				EnsureSelectedTabIsVisible ();
+
+                if(old != value){
+                    OnSelectedTabChanged(old,value);
+                }
+
 			}
 		}
 
@@ -294,6 +307,13 @@ namespace Terminal.Gui {
 			}
 		}
 
+        /// <summary>
+        /// Raises the <see cref="SelectedTabChanged"/> event
+        /// </summary>
+        protected virtual void OnSelectedTabChanged(Tab oldTab, Tab newTab){
+            
+            SelectedTabChanged?.Invoke(this,new TabChangedEventArgs(oldTab,newTab));
+        }
 
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
@@ -626,4 +646,30 @@ namespace Terminal.Gui {
 		}
 	}
 
+    /// <summary>
+    /// Describes a change in <see cref="TabView.SelectedTab"/>
+    /// </summary>
+	public class TabChangedEventArgs : EventArgs{
+
+        /// <summary>
+        /// The previously selected tab. May be null
+        /// </summary>
+        public Tab OldTab {get;}
+
+        /// <summary>
+        /// The currently selected tab. May be null
+        /// </summary>
+        public Tab NewTab {get;}
+
+        /// <summary>
+        /// Documents a tab change
+        /// </summary>
+        /// <param name="oldTab"></param>
+        /// <param name="newTab"></param>
+        public TabChangedEventArgs(Tab oldTab, Tab newTab)
+        {
+            OldTab = oldTab;
+            NewTab = newTab;
+        }
+	}
 }
