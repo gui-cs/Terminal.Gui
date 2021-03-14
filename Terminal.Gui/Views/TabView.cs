@@ -438,6 +438,10 @@ namespace Terminal.Gui {
 
 		private void RenderTabLine (TabToRender [] tabLocations, int width, int currentLine)
 		{
+            // clear any old text
+            Move(0,currentLine);
+            Driver.AddStr(new string(' ',width));
+
 			foreach (var toRender in tabLocations) {
 
 				if (toRender.IsSelected) {
@@ -514,11 +518,12 @@ namespace Terminal.Gui {
 		/// Adds the given <paramref name="tab"/> to <see cref="Tabs"/>
 		/// </summary>
 		/// <param name="tab"></param>
-		public void AddTab (Tab tab)
+		/// <param name="andSelect">True to make the newly added Tab the <see cref="SelectedTab"/></param>
+		public void AddTab (Tab tab, bool andSelect)
 		{
 			tabs.Add (tab);
 
-            if(SelectedTab == null){
+            if(SelectedTab == null || andSelect){
                 SelectedTab = tab;
                 EnsureSelectedTabIsVisible();
             }
@@ -540,12 +545,32 @@ namespace Terminal.Gui {
                 return;
             }
 
+            // what tab was selected before closing
+            var idx = tabs.IndexOf(tab);
+
 			tabs.Remove (tab);
 
             if(dispose){
                 tab.View.Dispose();
             }
 
+            // if the currently selected tab is no longer a member of Tabs
+            if(!Tabs.Contains(SelectedTab))
+            {
+                // select the tab closest to the one that disapeared
+                var toSelect = Math.Max(idx-1,0);
+
+                if(toSelect < Tabs.Count){
+                    SelectedTab = Tabs.ElementAt(toSelect);
+                }
+                else
+                {
+                    SelectedTab = Tabs.LastOrDefault();
+                }
+
+            }
+
+            EnsureSelectedTabIsVisible();
 			SetNeedsDisplay ();
 		}
 

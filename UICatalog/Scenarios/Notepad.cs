@@ -15,6 +15,8 @@ namespace UICatalog.Scenarios {
 
 		TabView tabView;
 
+		private int numbeOfNewTabs = 1;
+
 		public override void Setup ()
 		{
 			Win.Title = this.GetName ();
@@ -24,6 +26,7 @@ namespace UICatalog.Scenarios {
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
+					new MenuItem ("_New", "", () => New()),
 					new MenuItem ("_Open", "", () => Open()),
 					new MenuItem ("_Save", "", () => Save()),
 					new MenuItem ("_Save As", "", () => SaveAs()),
@@ -42,17 +45,51 @@ namespace UICatalog.Scenarios {
 
 			tabView.Style.ShowBorder = false;
 			tabView.Style.ShowHeaderOverline = false;
+			tabView.ApplyStyleChanges();
 
 			Win.Add (tabView);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Key.CtrlMask | Key.N, "~^O~ Open", () => Open()),
+				new StatusItem(Key.CtrlMask | Key.N, "~^N~ New", () => New()),
+				new StatusItem(Key.CtrlMask | Key.S, "~^S~ Save", () => Save()),
+				new StatusItem(Key.CtrlMask | Key.W, "~^W~ Close", () => Close()),
 			});
 			Top.Add (statusBar);
 		}
 
+
+		private void New ()
+		{
+			Open("",null,$"new {numbeOfNewTabs++}");
+		}
+
 		private void Close ()
 		{
+			var tab = tabView.SelectedTab as OpenedFile;
+
+			if(tab == null){
+				return;
+			}
+
+			if(tab.UnsavedChanges){
+
+				int result = MessageBox.Query("Save Changes","Yes","No","Cancel");
+				
+				if(result == -1 || result == 2){
+
+					// user cancelled
+					return;
+				}
+
+				if(result == 0){
+					tab.Save();
+				}
+			}
+
+			// close and dispose the tab
+			tabView.RemoveTab(tab,true);
 			
 		}
 
@@ -68,46 +105,117 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
+			Open(File.ReadAllText(path),new FileInfo(path),Path.GetFileName(path));
+		}
+
+		/// <summary>
+		/// Creates a new tab with initial text
+		/// </summary>
+		/// <param name="initialText"></param>
+		/// <param name="fileInfo">File that was read or null if a new blank document</param>
+		private void Open (string initialText, FileInfo fileInfo, string tabName)
+		{
+			
 			var textView = new TextView(){
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill(),
 				Height = Dim.Fill(),
+				Text = initialText
 			};
 
-			var filename = Path.GetFileName(path);
-			textView.Text = File.ReadAllText(path);
+			var tab = new OpenedFile(tabName,fileInfo,textView);
+			tabView.AddTab(tab,true);
 
-			var tab = new Tab(filename,textView);
+			// when user makes changes rename tab to indicate unsaved
+			textView.KeyUp += (k)=> {
 
-			tabView.AddTab(tab);
+				// if current text doesn't match saved text
+				var areDiff = tab.UnsavedChanges;
 
-			// when user makes changes rename tab to indicate that
-			textView.TextChanged += ()=> {
-				if(!tab.Text.ToString().EndsWith('*')){
-					tab.Text.Append((uint)'*');
+				if(areDiff){
+					if(!tab.Text.ToString().EndsWith('*')){
 
-					tabView.SetNeedsDisplay();
+						tab.Text = tab.Text.ToString() + '*';
+						tabView.SetNeedsDisplay();
+					}
+				}
+				else{
+
+					if(tab.Text.ToString().EndsWith('*')){
+
+						tab.Text = tab.Text.ToString().TrimEnd('*');
+						tabView.SetNeedsDisplay();
+					}
 				}
 			};
-
-
 		}
 
 		public void Save()
 		{
+			var tab = tabView.SelectedTab as OpenedFile;
+
+			if(tab == null){
+				return;
+			}
+
+			if(tab.File == null){
+				SaveAs();
+			}
+
+			tab.Save();
 
 		}
 
-		public void SaveAs()
+		public bool SaveAs()
 		{
-			
+			var tab = tabView.SelectedTab as OpenedFile;
+
+			if(tab == null){
+				return false;
+			}
+
+			var fd = new SaveDialog();
+			Application.Run(fd);
+
+			if(string.IsNullOrWhiteSpace(fd.FilePath?.ToString())){
+				return false;
+			}
+
+			tab.File = new FileInfo(fd.FilePath.ToString());
+			tab.Save();
+
+			return true;
 		}
 
-		private class OpenedFile{
+		private class OpenedFile : Tab{
 
-			public string Path {get;set;}
-			public Tab Tab {get;set;}
+
+			public FileInfo File { get; set;}
+
+			/// <summary>
+			/// The text of the tab the last time it was saved
+			/// </summary>
+			/// <value></value>
+			public string SavedText{get;set;}
+
+			public bool UnsavedChanges =>!string.Equals(SavedText,View.Text.ToString());
+
+			public OpenedFile(string name,FileInfo file,TextView control) : base(name,control)
+			{
+				File = file;
+				SavedText = control.Text.ToString();
+			}
+
+			internal void Save ()
+			{
+				var newText = View.Text.ToString();
+
+				System.IO.File.WriteAllText(File.FullName,newText);
+				SavedText = newText;
+
+				Text = Text.ToString().TrimEnd('*');
+			}
 		}
 
 		private void Quit ()
