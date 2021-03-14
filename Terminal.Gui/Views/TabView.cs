@@ -59,7 +59,7 @@ namespace Terminal.Gui {
 		/// </summary> 
 		public bool ShowHeaderOverline { get; set; } = true;
 
-		
+
 		/// <summary>
 		/// True to show a solid box around the edge of the control.  Defaults to true.
 		/// </summary>
@@ -78,13 +78,13 @@ namespace Terminal.Gui {
 	public class TabView : View {
 		private Tab selectedTab;
 
-        /// <summary>
-        /// It seems like a control cannot have both subviews and be
-        /// focusable.  Therefore this proxy view is needed. It allows
-        /// tab based navigation to switch between the <see cref="contentView"/>
-        /// and the tabs
-        /// </summary>
-        View tabsBar;
+		/// <summary>
+		/// It seems like a control cannot have both subviews and be
+		/// focusable.  Therefore this proxy view is needed. It allows
+		/// tab based navigation to switch between the <see cref="contentView"/>
+		/// and the tabs
+		/// </summary>
+		TabRowView tabsBar;
 
 		View contentView;
 
@@ -131,15 +131,11 @@ namespace Terminal.Gui {
 		{
 			CanFocus = true;
 			contentView = new View ();
-            tabsBar = new View(){
-                CanFocus = true,
-                Height = 1,
-                Width = Dim.Fill(),
-            };
+			tabsBar = new TabRowView (this);
 
 			ApplyStyleChanges ();
 
-            base.Add (tabsBar);
+			base.Add (tabsBar);
 			base.Add (contentView);
 		}
 
@@ -149,16 +145,16 @@ namespace Terminal.Gui {
 		/// selected tab's content).  This method includes a call 
 		/// to <see cref="View.SetNeedsDisplay()"/>
 		/// </summary>
-		public void ApplyStyleChanges()
+		public void ApplyStyleChanges ()
 		{
 
 			contentView.X = Style.ShowBorder ? 1 : 0;
-			contentView.Y = GetTabHeight(true);
+			contentView.Y = GetTabHeight (true);
 
-			contentView.Height = Dim.Fill(GetTabHeight (false));
+			contentView.Height = Dim.Fill (GetTabHeight (false));
 			contentView.Width = Dim.Fill (Style.ShowBorder ? 1 : 0);
 
-            tabsBar.Y = Style.ShowBorder ? 1 :0;
+			tabsBar.Y = Style.ShowBorder ? 1 : 0;
 
 			SetNeedsDisplay ();
 		}
@@ -191,11 +187,11 @@ namespace Terminal.Gui {
 
 				Move (0, currentLine);
 
-				for (int x =0;x<width; x++) {
+				for (int x = 0; x < width; x++) {
 					Driver.AddRune (Driver.HLine);
 				}
 			}
-				
+
 
 			RenderSelectedTabWhitespace (tabLocations, width, currentLine);
 
@@ -209,15 +205,15 @@ namespace Terminal.Gui {
 		protected override void Dispose (bool disposing)
 		{
 			base.Dispose (disposing);
-			
+
 			// The selected tab will automatically be disposed but
 			// any tabs not visible will need to be manually disposed
 
 			foreach (var tab in Tabs) {
-				if (!Equals (SelectedTab, tab)){
+				if (!Equals (SelectedTab, tab)) {
 					tab.View.Dispose ();
 				}
-				
+
 			}
 		}
 
@@ -273,6 +269,7 @@ namespace Terminal.Gui {
 			SelectedTab = Tabs [newIdx];
 			SetNeedsDisplay ();
 		}
+
 
 
 		/// <summary>
@@ -401,6 +398,37 @@ namespace Terminal.Gui {
 				Tab = tab;
 				IsSelected = isSelected;
 				Width = width;
+			}
+		}
+
+		private class TabRowView : View {
+
+			readonly TabView host;
+
+			public TabRowView (TabView host)
+			{
+				this.host = host;
+
+				CanFocus = true;
+				Height = 1;
+				Width = Dim.Fill ();
+			}
+
+			/// <summary>
+			/// Positions the cursor at the start of the currently selected tab
+			/// </summary>
+			public override void PositionCursor ()
+			{
+				base.PositionCursor ();
+
+				var selected = host.MeasureTabs().FirstOrDefault (t => Equals (host.SelectedTab, t.Tab));
+	
+				if (selected == null) {
+					return;
+				}
+
+
+				Move (selected.X, 0);
 			}
 		}
 	}
