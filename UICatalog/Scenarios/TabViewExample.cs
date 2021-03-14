@@ -14,6 +14,9 @@ namespace UICatalog.Scenarios {
 
 		TabView tabView;
 
+		MenuItem miShowTopLine;
+		MenuItem miShowBorder;
+
 		public override void Setup ()
 		{
 			Win.Title = this.GetName ();
@@ -24,7 +27,17 @@ namespace UICatalog.Scenarios {
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Quit", "", () => Quit()),
-				})
+				}),
+				new MenuBarItem ("_View", new MenuItem [] {
+					miShowTopLine = new MenuItem ("_Show Top Line", "", () => ShowTopLine()){
+						Checked = true,
+						CheckType = MenuItemCheckStyle.Checked
+					},
+					miShowBorder = new MenuItem ("_Show Border", "", () => ShowBorder()){
+						Checked = true,
+						CheckType = MenuItemCheckStyle.Checked
+					}
+					})
 				});
 			Top.Add (menu);
 
@@ -73,6 +86,22 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 			});
 			Top.Add (statusBar);
+		}
+
+
+		private void ShowTopLine()
+		{
+			miShowTopLine.Checked = !miShowTopLine.Checked;
+
+			tabView.Style.ShowHeaderOverline = miShowTopLine.Checked;
+			tabView.ApplyStyleChanges();
+		}
+		private void ShowBorder ()
+		{
+			miShowBorder.Checked = !miShowBorder.Checked;
+
+			tabView.Style.ShowBorder = miShowBorder.Checked;
+			tabView.ApplyStyleChanges ();
 		}
 
 		private void Quit ()

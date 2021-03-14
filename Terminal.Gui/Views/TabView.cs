@@ -59,6 +59,12 @@ namespace Terminal.Gui {
 		/// </summary> 
 		public bool ShowHeaderOverline { get; set; } = true;
 
+		
+		/// <summary>
+		/// True to show a solid box around the edge of the control.  Defaults to true.
+		/// </summary>
+		public bool ShowBorder { get; set; } = true;
+
 		/// <summary>
 		/// True to render tabs at the bottom of the view instead of the top
 		/// </summary>
@@ -71,7 +77,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class TabView : View {
 		private Tab selectedTab;
-        View contentView;
+		View contentView;
 
 		/// <summary>
 		/// All tabs currently hosted by the control, after making changes call <see cref="View.SetNeedsDisplay()"/>
@@ -83,27 +89,27 @@ namespace Terminal.Gui {
 		/// The currently selected member of <see cref="Tabs"/> chosen by the user
 		/// </summary>
 		/// <value></value>
-		public Tab SelectedTab { 
-            get => selectedTab; 
-            set {
+		public Tab SelectedTab {
+			get => selectedTab;
+			set {
 
-                if(selectedTab != null){
-                    // remove old content
-                    contentView.Remove(selectedTab.View);
-                }
+				if (selectedTab != null) {
+					// remove old content
+					contentView.Remove (selectedTab.View);
+				}
 
-                selectedTab = value;
+				selectedTab = value;
 
-                if(value != null){
-                    
-                    // add new content
-                    contentView.Add(selectedTab.View);
-                }
-            } 
-        }
+				if (value != null) {
+
+					// add new content
+					contentView.Add (selectedTab.View);
+				}
+			}
+		}
 
 		/// <summary>
-		/// Render choices for how to display tabs
+		/// Render choices for how to display tabs.  After making changes, call <see cref="ApplyStyleChanges()"/>
 		/// </summary>
 		/// <value></value>
 		public TabStyle Style { get; set; } = new TabStyle ();
@@ -115,15 +121,31 @@ namespace Terminal.Gui {
 		public TabView () : base ()
 		{
 			CanFocus = true;
-            contentView = new View(){
-                X = 1,
-                Y = 3,
-                Width = Dim.Fill(1),
-                Height = Dim.Fill(1),
-                };
+			contentView = new View ();
+			ApplyStyleChanges ();
 
 			base.Add (contentView);
 		}
+
+		/// <summary>
+		/// Updates the control to use the latest state settings in <see cref="Style"/>.
+		/// This can change the size of the client area of the tab (for rendering the 
+		/// selected tab's content).  This method includes a call 
+		/// to <see cref="View.SetNeedsDisplay()"/>
+		/// </summary>
+		public void ApplyStyleChanges()
+		{
+
+			contentView.X = Style.ShowBorder ? 1 : 0;
+			contentView.Y = GetTabHeight(true);
+
+			contentView.Height = Dim.Fill(GetTabHeight (false));
+			contentView.Width = Dim.Fill (Style.ShowBorder ? 1 : 0);
+
+			SetNeedsDisplay ();
+		}
+
+
 
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
@@ -145,31 +167,59 @@ namespace Terminal.Gui {
 			RenderTabLine (tabLocations, width, currentLine);
 			currentLine++;
 
-            DrawFrame(new Rect(0,currentLine,bounds.Width,bounds.Height-currentLine),0,true);
+			if (Style.ShowBorder) {
+				DrawFrame (new Rect (0, currentLine, bounds.Width, bounds.Height - currentLine), 0, true);
+			} else {
 
-			RenderSelectedTabWhitespace(tabLocations, width, currentLine);
+				Move (0, currentLine);
 
-            contentView.Redraw(contentView.Bounds);
+				for (int x =0;x<width; x++) {
+					Driver.AddRune (Driver.HLine);
+				}
+			}
+				
+
+			RenderSelectedTabWhitespace (tabLocations, width, currentLine);
+
+			contentView.Redraw (contentView.Bounds);
+		}
+
+		/// <summary>
+		/// Disposes the control and all <see cref="Tabs"/>
+		/// </summary>
+		/// <param name="disposing"></param>
+		protected override void Dispose (bool disposing)
+		{
+			base.Dispose (disposing);
+			
+			// The selected tab will automatically be disposed but
+			// any tabs not visible will need to be manually disposed
+
+			foreach (var tab in Tabs) {
+				if (!Equals (SelectedTab, tab)){
+					tab.View.Dispose ();
+				}
+				
+			}
 		}
 
 
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-            if(HasFocus && CanFocus && Focused == null)
-            {
-                switch (keyEvent.Key) {
+			if (HasFocus && CanFocus && Focused == null) {
+				switch (keyEvent.Key) {
 
-    	    		case Key.CursorLeft:
-	    	    		SwitchTabBy (-1);
-                        return true;
-			        case Key.CursorRight:
-				        SwitchTabBy (1);
-                        return true;
-                    }
-            }
+				case Key.CursorLeft:
+					SwitchTabBy (-1);
+					return true;
+				case Key.CursorRight:
+					SwitchTabBy (1);
+					return true;
+				}
+			}
 
-            return base.ProcessKey(keyEvent);
+			return base.ProcessKey (keyEvent);
 		}
 
 		/// <summary>
@@ -204,6 +254,24 @@ namespace Terminal.Gui {
 
 			SelectedTab = Tabs [newIdx];
 			SetNeedsDisplay ();
+		}
+
+
+		/// <summary>
+		/// Returns the number of rows occupied by rendering the tabs, this depends 
+		/// on <see cref="TabStyle.ShowHeaderOverline"/> and can be 0 (e.g. if 
+		/// <see cref="TabStyle.TabsOnBottom"/> and you ask for <paramref name="top"/>).
+		/// </summary>
+		/// <param name="top">True to measure the space required at the top of the control,
+		/// false to measure space at the bottom</param>
+		/// <returns></returns>
+		private int GetTabHeight (bool top)
+		{
+			if (top && Style.TabsOnBottom) {
+				return 0;
+			}
+
+			return Style.ShowHeaderOverline ? 3 : 2;
 		}
 
 		private void RenderOverline (TabToRender [] tabLocations, int width)
@@ -259,27 +327,28 @@ namespace Terminal.Gui {
 			}
 		}
 
-        /// <summary>
-        /// Draws whitespace over the top of the bounding rectangle so the selected tab appears
-        /// to flow into the box
-        /// </summary>
-        /// <param name="tabLocations"></param>
-        /// <param name="width"></param>
-        /// <param name="currentLine"></param>
-        private void RenderSelectedTabWhitespace (TabToRender [] tabLocations, int width, int currentLine){
-            
-            var selected = tabLocations.FirstOrDefault (t => t.IsSelected);
+		/// <summary>
+		/// Draws whitespace over the top of the bounding rectangle so the selected tab appears
+		/// to flow into the box
+		/// </summary>
+		/// <param name="tabLocations"></param>
+		/// <param name="width"></param>
+		/// <param name="currentLine"></param>
+		private void RenderSelectedTabWhitespace (TabToRender [] tabLocations, int width, int currentLine)
+		{
 
-            if(selected == null){
-                return;
-            }
+			var selected = tabLocations.FirstOrDefault (t => t.IsSelected);
 
-            Move (selected.X - 1, currentLine);
+			if (selected == null) {
+				return;
+			}
+
+			Move (selected.X - 1, currentLine);
 			Driver.AddRune (selected.X == 1 ? Driver.VLine : Driver.LRCorner);
 
-            Driver.AddStr (new string(' ',selected.Width));
-            Driver.AddRune (Driver.LLCorner);
-        }
+			Driver.AddStr (new string (' ', selected.Width));
+			Driver.AddRune (Driver.LLCorner);
+		}
 
 		/// <summary>
 		/// Returns which tabs to render at each x location
