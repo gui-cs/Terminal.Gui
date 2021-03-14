@@ -16,6 +16,7 @@ namespace UICatalog.Scenarios {
 
 		MenuItem miShowTopLine;
 		MenuItem miShowBorder;
+		MenuItem miTabsOnBottom;
 
 		public override void Setup ()
 		{
@@ -36,7 +37,12 @@ namespace UICatalog.Scenarios {
 					miShowBorder = new MenuItem ("_Show Border", "", () => ShowBorder()){
 						Checked = true,
 						CheckType = MenuItemCheckStyle.Checked
+					},
+					miTabsOnBottom = new MenuItem ("_Tabs On Bottom", "", () => SetTabsOnBottom()){
+						Checked = false,
+						CheckType = MenuItemCheckStyle.Checked
 					}
+					
 					})
 				});
 			Top.Add (menu);
@@ -101,6 +107,13 @@ namespace UICatalog.Scenarios {
 			miShowBorder.Checked = !miShowBorder.Checked;
 
 			tabView.Style.ShowBorder = miShowBorder.Checked;
+			tabView.ApplyStyleChanges ();
+		}
+		private void SetTabsOnBottom ()
+		{
+			miTabsOnBottom.Checked = !miTabsOnBottom.Checked;
+
+			tabView.Style.TabsOnBottom = miTabsOnBottom.Checked;
 			tabView.ApplyStyleChanges ();
 		}
 

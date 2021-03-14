@@ -147,14 +147,30 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ApplyStyleChanges ()
 		{
-
 			contentView.X = Style.ShowBorder ? 1 : 0;
-			contentView.Y = GetTabHeight (true);
+            contentView.Width = Dim.Fill(Style.ShowBorder ? 1 : 0);
 
-			contentView.Height = Dim.Fill (GetTabHeight (false));
-			contentView.Width = Dim.Fill (Style.ShowBorder ? 1 : 0);
+            if(Style.TabsOnBottom)
+            {
+                // Tabs are along the bottom so just dodge the border
+                contentView.Y = Style.ShowBorder ? 1 : 0;
 
-			tabsBar.Y = Style.ShowBorder ? 1 : 0;
+                // Fill client area leaving space at bottom for tabs
+                contentView.Height = Dim.Fill(GetTabHeight(false));
+
+    			tabsBar.Y = Pos.Bottom(this) - (Style.ShowHeaderOverline ? 1 : 0);
+            }
+            else{
+
+                // Tabs are along the top
+                contentView.Y = GetTabHeight (true);
+
+                // Fill client area leaving space at bottom for border
+                contentView.Height = Dim.Fill(Style.ShowBorder ? 1 : 0);
+
+    			tabsBar.Y = Style.ShowBorder ? 1 : 0;
+            }
+
 
 			SetNeedsDisplay ();
 		}
@@ -172,17 +188,27 @@ namespace Terminal.Gui {
 
 			int currentLine = 0;
 
-			if (Style.ShowHeaderOverline) {
-				RenderOverline (tabLocations, width);
-				currentLine++;
-			}
+            if(!Style.TabsOnBottom){
 
-			Move (0, currentLine);
-			RenderTabLine (tabLocations, width, currentLine);
-			currentLine++;
+                if ( Style.ShowHeaderOverline) {
+				    RenderOverline (tabLocations, width,currentLine);
+				    currentLine++;
+			    }
+
+			    Move (0, currentLine);
+			    RenderTabLine (tabLocations, width, currentLine);
+			    
+                currentLine++;
+            }
+			
 
 			if (Style.ShowBorder) {
-				DrawFrame (new Rect (0, currentLine, bounds.Width, bounds.Height - currentLine), 0, true);
+
+                // How muc space do we need to leave at the bottom to show the tabs
+                int spaceAtBottom = Math.Max(0,GetTabHeight(false) -1);
+
+    			DrawFrame (new Rect (0,currentLine,bounds.Width,
+                           bounds.Height - spaceAtBottom - currentLine), 0, true);
 			} else {
 
 				Move (0, currentLine);
@@ -192,6 +218,23 @@ namespace Terminal.Gui {
 				}
 			}
 
+
+            if(Style.TabsOnBottom){
+
+                currentLine = bounds.Height -1;
+
+			    Move (0, currentLine);
+
+                if ( Style.ShowHeaderOverline) {
+				    RenderOverline (tabLocations, width, currentLine);
+                    currentLine--;
+			    }
+
+			    Move (0, currentLine);
+			    RenderTabLine (tabLocations, width, currentLine);
+			    
+                currentLine--;
+            }
 
 			RenderSelectedTabWhitespace (tabLocations, width, currentLine);
 
@@ -286,12 +329,16 @@ namespace Terminal.Gui {
 				return 0;
 			}
 
+			if (!top && !Style.TabsOnBottom) {
+				return 0;
+			}
+
 			return Style.ShowHeaderOverline ? 3 : 2;
 		}
 
-		private void RenderOverline (TabToRender [] tabLocations, int width)
+		private void RenderOverline (TabToRender [] tabLocations, int width, int y)
 		{
-			Move (0, 0);
+			Move (0, y);
 
 			var selected = tabLocations.FirstOrDefault (t => t.IsSelected);
 
@@ -304,8 +351,8 @@ namespace Terminal.Gui {
 			}
 
 
-			Move (selected.X - 1, 0);
-			Driver.AddRune (Driver.ULCorner);
+			Move (selected.X - 1, y);
+			Driver.AddRune (Style.TabsOnBottom ? Driver.LLCorner : Driver.ULCorner);
 
 			for (int i = 0; i < selected.Width; i++) {
 
@@ -318,7 +365,7 @@ namespace Terminal.Gui {
 			}
 
 			// Add the end of the selected tab
-			Driver.AddRune (Driver.URCorner);
+			Driver.AddRune (Style.TabsOnBottom ? Driver.LRCorner: Driver.URCorner);
 
 		}
 
@@ -359,10 +406,12 @@ namespace Terminal.Gui {
 			}
 
 			Move (selected.X - 1, currentLine);
-			Driver.AddRune (selected.X == 1 ? Driver.VLine : Driver.LRCorner);
+            
+			Driver.AddRune (selected.X == 1 ? Driver.VLine : 
+                (Style.TabsOnBottom ? Driver.URCorner: Driver.LRCorner));
 
 			Driver.AddStr (new string (' ', selected.Width));
-			Driver.AddRune (Driver.LLCorner);
+			Driver.AddRune (Style.TabsOnBottom ? Driver.ULCorner : Driver.LLCorner);
 		}
 
 		/// <summary>
