@@ -79,13 +79,14 @@ namespace Terminal.Gui {
 		private Tab selectedTab;
 
 		/// <summary>
-		/// It seems like a control cannot have both subviews and be
-		/// focusable.  Therefore this proxy view is needed. It allows
-		/// tab based navigation to switch between the <see cref="contentView"/>
-		/// and the tabs
+		// This sub view is the 2 or 3 line control that represents the actual tabs themselves
 		/// </summary>
 		TabRowView tabsBar;
 
+		/// <summary>
+		/// This sub view is the main client area of the current tab.  It hosts the <see cref="Tab.View"/> 
+		/// of the tab, the <see cref="SelectedTab"/>
+		/// </summary>
 		View contentView;
 		private List<Tab> tabs = new List<Tab> ();
 
@@ -180,17 +181,29 @@ namespace Terminal.Gui {
 				// Fill client area leaving space at bottom for tabs
 				contentView.Height = Dim.Fill (GetTabHeight (false));
 
-				tabsBar.Y = Pos.Bottom (this) - (Style.ShowHeaderOverline ? 2 : 1);
+				var tabHeight = GetTabHeight (false);
+				tabsBar.Height = tabHeight;
+
+				tabsBar.Y = Pos.Bottom (this) - tabHeight;
+
 			} else {
 
 				// Tabs are along the top
-				contentView.Y = GetTabHeight (true);
+
+				var tabHeight = GetTabHeight (true);
+
+				//move content down to make space for tabs
+				contentView.Y = tabHeight;
 
 				// Fill client area leaving space at bottom for border
 				contentView.Height = Dim.Fill (Style.ShowBorder ? 1 : 0);
 
-				// Should be able to just use 1 or 0 but switching between top/bottom tabs repeatedly breaks in ValidatePosDim if just using 1/0 without Pos.Top
-				tabsBar.Y = Pos.Top (this) + (Style.ShowBorder ? 1 : 0);
+				// The top tab should be 2 or 3 pixels high and on the top
+
+				tabsBar.Height = tabHeight;
+
+				// Should be able to just use 0 but switching between top/bottom tabs repeatedly breaks in ValidatePosDim if just using 0 without Pos.Top
+				tabsBar.Y = Pos.Top (this);
 			}
 
 
@@ -205,85 +218,18 @@ namespace Terminal.Gui {
 			Move (0, 0);
 			Driver.SetAttribute (ColorScheme.Normal);
 
-			var tabLocations = CalculateViewport (bounds).ToArray ();
-			var width = bounds.Width;
-
-			int currentLine = 0;
-
-			if (!Style.TabsOnBottom) {
-
-				if (Style.ShowHeaderOverline) {
-					RenderOverline (tabLocations, width, currentLine);
-					currentLine++;
-				}
-
-				Move (0, currentLine);
-				RenderTabLine (tabLocations, width, currentLine);
-
-				currentLine++;
-			}
-
 			if (Style.ShowBorder) {
 
 				// How muc space do we need to leave at the bottom to show the tabs
 				int spaceAtBottom = Math.Max (0, GetTabHeight (false) - 1);
+				int startAtY = Math.Max (0, GetTabHeight (true) - 1);
 
-				DrawFrame (new Rect (0, currentLine, bounds.Width,
-			       bounds.Height - spaceAtBottom - currentLine), 0, true);
-			}
-
-			// if we drew border then that will include a line under the tabs.  Otherwise we have to
-			// draw that line manually
-			if (!Style.ShowBorder) {
-
-				// Prepare to draw the horizontal line below the tab text
-				currentLine = Style.TabsOnBottom ? bounds.Height - GetTabHeight (false) : GetTabHeight (true) - 1;
-
-				Move (0, currentLine);
-
-				for (int x = 0; x < width; x++) {
-					Driver.AddRune (Driver.HLine);
-				}
+				DrawFrame (new Rect (0, startAtY, bounds.Width,
+			       bounds.Height - spaceAtBottom - startAtY), 0, true);
 			}
 
 
-			if (Style.TabsOnBottom) {
-
-				currentLine = bounds.Height - 1;
-
-				Move (0, currentLine);
-
-				if (Style.ShowHeaderOverline) {
-					RenderOverline (tabLocations, width, currentLine);
-					currentLine--;
-				}
-
-				Move (0, currentLine);
-				RenderTabLine (tabLocations, width, currentLine);
-
-				currentLine--;
-			}
-
-			RenderSelectedTabWhitespace (tabLocations, width, currentLine);
-
-			// draw scroll indicators
-			currentLine = Style.TabsOnBottom ? bounds.Height - GetTabHeight (false) : GetTabHeight (true) - 1;
-
-			// if there are more tabs to the left not visible
-			if (TabScrollOffset > 0) {
-				Move (0, currentLine);
-
-				// indicate that
-				Driver.AddRune (Driver.LeftArrow);
-			}
-
-			// if there are mmore tabs to the right not visible
-			if (tabLocations.LastOrDefault ()?.Tab != Tabs.LastOrDefault ()) {
-				Move (bounds.Width - 1, currentLine);
-
-				// indicate that
-				Driver.AddRune (Driver.RightArrow);
-			}
+			tabsBar.Redraw (tabsBar.Bounds);
 
 			contentView.Redraw (contentView.Bounds);
 		}
@@ -340,55 +286,6 @@ namespace Terminal.Gui {
 			return base.ProcessKey (keyEvent);
 		}
 
-		public override bool MouseEvent (MouseEvent me)
-		{
-			if (!me.Flags.HasFlag (MouseFlags.Button1Pressed))
-				return false;
-
-			if (!HasFocus && CanFocus) {
-				SetFocus ();
-			}
-
-
-			if (me.Flags.HasFlag (MouseFlags.Button1Pressed)) {
-
-				var hit = ScreenToTab (me.X, me.Y);
-				if (hit != null) {
-					SelectedTab = hit;
-					SetNeedsDisplay ();
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// Translates the client coordinates of a click into a tab when the click is in
-		/// the header area of a tab.
-		/// </summary>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
-		/// <returns></returns>
-		public Tab ScreenToTab (int x, int y)
-		{
-			if (Style.TabsOnBottom) {
-
-				// y click is above the tabs and tabs are on the bottom
-				if (y < Bounds.Height - GetTabHeight (false)) {
-					return null;
-				}
-			} else {
-				// y click is below the tabs and tabs are on the top
-				if (y > GetTabHeight (true)) {
-					return null;
-				}
-			}
-
-			var tabs = CalculateViewport (Bounds);
-
-			return tabs.LastOrDefault (t => x >= t.X &&  x < t.X + t.Width)?.Tab;
-		}
 
 		/// <summary>
 		/// Changes the <see cref="SelectedTab"/> by the given <paramref name="amount"/>.  Positive for right, 
@@ -474,107 +371,6 @@ namespace Terminal.Gui {
 			return Style.ShowHeaderOverline ? 3 : 2;
 		}
 
-		private void RenderOverline (TabToRender [] tabLocations, int width, int y)
-		{
-			Move (0, y);
-
-			var selected = tabLocations.FirstOrDefault (t => t.IsSelected);
-
-			// Clear out everything
-			Driver.AddStr (new string (' ', width));
-
-			// Nothing is selected... odd but we are done
-			if (selected == null) {
-				return;
-			}
-
-
-			Move (selected.X - 1, y);
-			Driver.AddRune (Style.TabsOnBottom ? Driver.LLCorner : Driver.ULCorner);
-
-			for (int i = 0; i < selected.Width; i++) {
-
-				if (selected.X + i > width) {
-					// we ran out of space horizontally
-					return;
-				}
-
-				Driver.AddRune (Driver.HLine);
-			}
-
-			// Add the end of the selected tab
-			Driver.AddRune (Style.TabsOnBottom ? Driver.LRCorner : Driver.URCorner);
-
-		}
-
-		private void RenderTabLine (TabToRender [] tabLocations, int width, int currentLine)
-		{
-			// clear any old text
-			Move (0, currentLine);
-			Driver.AddStr (new string (' ', width));
-
-			foreach (var toRender in tabLocations) {
-
-				if (toRender.IsSelected) {
-					Move (toRender.X - 1, currentLine);
-					Driver.AddRune (Driver.VLine);
-				}
-
-				Move (toRender.X, currentLine);
-
-				// if tab is the selected one and focus is inside this control
-				if (toRender.IsSelected && HasFocus) {
-
-					if (Focused == tabsBar) {
-
-						// if focus is the tab bar (tab name) itself 
-						Driver.SetAttribute (ColorScheme.HotFocus);
-
-					} else {
-
-						// Focus is inside the tab
-						Driver.SetAttribute (ColorScheme.HotNormal);
-					}
-				}
-
-
-				Driver.AddStr (toRender.Tab.Text);
-				Driver.SetAttribute (ColorScheme.Normal);
-
-				if (toRender.IsSelected) {
-					Driver.AddRune (Driver.VLine);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Draws whitespace over the top of the bounding rectangle so the selected tab appears
-		/// to flow into the box
-		/// </summary>
-		/// <param name="tabLocations"></param>
-		/// <param name="width"></param>
-		/// <param name="currentLine"></param>
-		private void RenderSelectedTabWhitespace (TabToRender [] tabLocations, int width, int currentLine)
-		{
-
-			var selected = tabLocations.FirstOrDefault (t => t.IsSelected);
-
-			if (selected == null) {
-				return;
-			}
-
-			Move (selected.X - 1, currentLine);
-
-			Driver.AddRune (selected.X == 1 ? Driver.VLine :
-		(Style.TabsOnBottom ? Driver.URCorner : Driver.LRCorner));
-
-			Driver.AddStr (new string (' ', selected.Width));
-
-
-			Driver.AddRune (selected.X + selected.Width == width - 1 ?
-	     Driver.VLine :
-			(Style.TabsOnBottom ? Driver.ULCorner : Driver.LLCorner));
-		}
 
 		/// <summary>
 		/// Returns which tabs to render at each x location
@@ -600,6 +396,7 @@ namespace Terminal.Gui {
 				i += tabTextWidth + 1;
 			}
 		}
+
 
 		/// <summary>
 		/// Adds the given <paramref name="tab"/> to <see cref="Tabs"/>
@@ -704,7 +501,229 @@ namespace Terminal.Gui {
 				}
 
 
-				Move (selected.X, 0);
+				Move (selected.X,
+					host.Style.ShowHeaderOverline ? 1 : 0);
+			}
+
+			public override void Redraw (Rect bounds)
+			{
+				base.Redraw (bounds);
+
+				var tabLocations = host.CalculateViewport (bounds).ToArray ();
+				var width = bounds.Width;
+				Driver.SetAttribute (ColorScheme.Normal);
+
+				if (host.Style.ShowHeaderOverline) {
+					RenderOverline (tabLocations, width);
+				}
+
+				RenderTabLine (tabLocations, width);
+
+				RenderUnderline (tabLocations, width);
+				Driver.SetAttribute (ColorScheme.Normal);
+
+
+			}
+
+			/// <summary>
+			/// Renders the line of the tabs that does not adjoin the content
+			/// </summary>
+			/// <param name="tabLocations"></param>
+			/// <param name="width"></param>
+			private void RenderOverline (TabToRender [] tabLocations, int width)
+			{
+				// if tabs are on the bottom draw the side of the tab that doesn't border the content area at the bottom otherwise the top
+				int y = host.Style.TabsOnBottom ? 2 : 0;
+
+				Move (0, y);
+
+				var selected = tabLocations.FirstOrDefault (t => t.IsSelected);
+
+				// Clear out everything
+				Driver.AddStr (new string (' ', width));
+
+				// Nothing is selected... odd but we are done
+				if (selected == null) {
+					return;
+				}
+
+
+				Move (selected.X - 1, y);
+				Driver.AddRune (host.Style.TabsOnBottom ? Driver.LLCorner : Driver.ULCorner);
+
+				for (int i = 0; i < selected.Width; i++) {
+
+					if (selected.X + i > width) {
+						// we ran out of space horizontally
+						return;
+					}
+
+					Driver.AddRune (Driver.HLine);
+				}
+
+				// Add the end of the selected tab
+				Driver.AddRune (host.Style.TabsOnBottom ? Driver.LRCorner : Driver.URCorner);
+
+			}
+
+			/// <summary>
+			/// Renders the line with the tab names in it
+			/// </summary>
+			/// <param name="tabLocations"></param>
+			/// <param name="width"></param>
+			private void RenderTabLine (TabToRender [] tabLocations, int width)
+			{
+				int y;
+
+				if (host.Style.TabsOnBottom) {
+
+					y = 1;
+				} else {
+					y = host.Style.ShowHeaderOverline ? 1 : 0;
+				}
+
+
+
+				// clear any old text
+				Move (0, y);
+				Driver.AddStr (new string (' ', width));
+
+				foreach (var toRender in tabLocations) {
+
+					if (toRender.IsSelected) {
+						Move (toRender.X - 1, y);
+						Driver.AddRune (Driver.VLine);
+					}
+
+					Move (toRender.X, y);
+
+					// if tab is the selected one and focus is inside this control
+					if (toRender.IsSelected && host.HasFocus) {
+
+						if (host.Focused == this) {
+
+							// if focus is the tab bar ourself then show that they can switch tabs
+							Driver.SetAttribute (ColorScheme.HotFocus);
+
+						} else {
+
+							// Focus is inside the tab
+							Driver.SetAttribute (ColorScheme.HotNormal);
+						}
+					}
+
+
+					Driver.AddStr (toRender.Tab.Text);
+					Driver.SetAttribute (ColorScheme.Normal);
+
+					if (toRender.IsSelected) {
+						Driver.AddRune (Driver.VLine);
+					}
+				}
+			}
+
+			/// <summary>
+			/// Renders the line of the tab that adjoins the content of the tab
+			/// </summary>
+			/// <param name="tabLocations"></param>
+			/// <param name="width"></param>
+			private void RenderUnderline (TabToRender [] tabLocations, int width)
+			{
+
+				int y;
+
+				if (host.Style.TabsOnBottom) {
+
+					y = 0;
+				} else {
+
+					y = host.Style.ShowHeaderOverline ? 2 : 1;
+				}
+
+				Move (0, y);
+
+				// If host has no border then we need to draw the solid line first (then we draw gaps over the top)
+				if (!host.Style.ShowBorder) {
+
+					for (int x = 0; x < width; x++) {
+						Driver.AddRune (Driver.HLine);
+					}
+
+
+				}
+				var selected = tabLocations.FirstOrDefault (t => t.IsSelected);
+
+				if (selected == null) {
+					return;
+				}
+
+				Move (selected.X - 1, y);
+
+				Driver.AddRune (selected.X == 1 ? Driver.VLine :
+			(host.Style.TabsOnBottom ? Driver.URCorner : Driver.LRCorner));
+
+				Driver.AddStr (new string (' ', selected.Width));
+
+
+				Driver.AddRune (selected.X + selected.Width == width - 1 ?
+		     Driver.VLine :
+				(host.Style.TabsOnBottom ? Driver.ULCorner : Driver.LLCorner));
+
+
+				// draw scroll indicators
+
+				// if there are more tabs to the left not visible
+				if (host.TabScrollOffset > 0) {
+					Move (0, y);
+
+					// indicate that
+					Driver.AddRune (Driver.LeftArrow);
+				}
+
+				// if there are mmore tabs to the right not visible
+				if (tabLocations.LastOrDefault ()?.Tab != host.Tabs.LastOrDefault ()) {
+					Move (width - 1, y);
+
+					// indicate that
+					Driver.AddRune (Driver.RightArrow);
+				}
+			}
+
+			public override bool MouseEvent (MouseEvent me)
+			{
+				if (!me.Flags.HasFlag (MouseFlags.Button1Pressed))
+					return false;
+
+				if (!HasFocus && CanFocus) {
+					SetFocus ();
+				}
+
+
+				if (me.Flags.HasFlag (MouseFlags.Button1Pressed)) {
+
+					var hit = ScreenToTab (me.X, me.Y);
+					if (hit != null) {
+						host.SelectedTab = hit;
+						SetNeedsDisplay ();
+						return true;
+					}
+				}
+
+				return false;
+			}
+
+
+			/// <summary>
+			/// Translates the client coordinates of a click into a tab when the click is on top of a tab
+			/// </summary>
+			/// <param name="x"></param>
+			/// <param name="y"></param>
+			/// <returns></returns>
+			public Tab ScreenToTab (int x, int y)
+			{
+				var tabs = host.CalculateViewport (Bounds);
+
+				return tabs.LastOrDefault (t => x >= t.X && x < t.X + t.Width)?.Tab;
 			}
 		}
 	}
