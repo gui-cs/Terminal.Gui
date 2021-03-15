@@ -503,9 +503,18 @@ namespace Terminal.Gui {
 					return;
 				}
 
+				int y;
 
-				Move (selected.X,
-					host.Style.ShowHeaderOverline && !host.Style.TabsOnBottom ? 1 : 0);
+				if (host.Style.TabsOnBottom) {
+					y = 1;
+				} else {
+					y = host.Style.ShowHeaderOverline? 1 : 0;
+				}
+
+				Move (selected.X,y);
+
+
+
 			}
 
 			public override void Redraw (Rect bounds)
