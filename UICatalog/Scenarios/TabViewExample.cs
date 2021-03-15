@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,6 +60,7 @@ namespace UICatalog.Scenarios {
 			tabView.AddTab (new Tab ("Tab2", new Label ("durdur")), false);
 			tabView.AddTab (new Tab ("Interactive Tab", GetInteractiveTab ()), false);
 			tabView.AddTab (new Tab ("Big Text", GetBigTextFileTab ()), false);
+			tabView.AddTab (new Tab ("Les Mise" + Char.ConvertFromUtf32 (Int32.Parse ("0301", NumberStyles.HexNumber)) + "rables", new Label ("This tab name is unicode")), false);
 
 			for (int i = 0; i < 100; i++) {
 				tabView.AddTab (new Tab ($"Tab{i}", new Label ($"Welcome to tab {i}")), false);
