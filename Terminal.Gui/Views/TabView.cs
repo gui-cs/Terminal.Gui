@@ -120,12 +120,11 @@ namespace Terminal.Gui {
 				var old = selectedTab;
 
 				if (selectedTab != null) {
-                    
-                    if(selectedTab.View != null)
-                    {
-    					// remove old content
-	    				contentView.Remove (selectedTab.View);
-                    }
+
+					if (selectedTab.View != null) {
+						// remove old content
+						contentView.Remove (selectedTab.View);
+					}
 				}
 
 				selectedTab = value;
@@ -133,9 +132,9 @@ namespace Terminal.Gui {
 				if (value != null) {
 
 					// add new content
-                    if(selectedTab.View != null){
-                        contentView.Add (selectedTab.View);
-                    }
+					if (selectedTab.View != null) {
+						contentView.Add (selectedTab.View);
+					}
 				}
 
 				EnsureSelectedTabIsVisible ();
@@ -415,10 +414,10 @@ namespace Terminal.Gui {
 
 			if (SelectedTab == null || andSelect) {
 				SelectedTab = tab;
-				
-                EnsureSelectedTabIsVisible ();
 
-                tab.View?.SetFocus();
+				EnsureSelectedTabIsVisible ();
+
+				tab.View?.SetFocus ();
 			}
 
 			SetNeedsDisplay ();
@@ -514,10 +513,10 @@ namespace Terminal.Gui {
 				if (host.Style.TabsOnBottom) {
 					y = 1;
 				} else {
-					y = host.Style.ShowHeaderOverline? 1 : 0;
+					y = host.Style.ShowHeaderOverline ? 1 : 0;
 				}
 
-				Move (selected.X,y);
+				Move (selected.X, y);
 
 
 

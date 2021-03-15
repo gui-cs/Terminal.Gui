@@ -92,7 +92,7 @@ namespace UICatalog.Scenarios {
 
 			if (tab.UnsavedChanges) {
 
-				int result = MessageBox.Query ("Save Changes", $"Save changes to {tab.Text.ToString().TrimEnd('*')}","Yes", "No", "Cancel");
+				int result = MessageBox.Query ("Save Changes", $"Save changes to {tab.Text.ToString ().TrimEnd ('*')}", "Yes", "No", "Cancel");
 
 				if (result == -1 || result == 2) {
 
