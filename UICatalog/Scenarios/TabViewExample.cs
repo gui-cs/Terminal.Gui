@@ -8,7 +8,7 @@ using static UICatalog.Scenario;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "Tab View", Description: "Demos TabView control")]
+	[ScenarioMetadata (Name: "Tab View", Description: "Demos TabView control with limited screen space in Absolute layout")]
 	[ScenarioCategory ("Controls")]
 	class TabViewExample : Scenario {
 
@@ -42,7 +42,7 @@ namespace UICatalog.Scenarios {
 						Checked = false,
 						CheckType = MenuItemCheckStyle.Checked
 					}
-					
+
 					})
 				});
 			Top.Add (menu);
@@ -50,24 +50,61 @@ namespace UICatalog.Scenarios {
 			tabView = new TabView () {
 				X = 0,
 				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (1),
+				Width = 60,
+				Height = 20,
 			};
 
 
-			tabView.AddTab(new Tab("Tab1",new Label("hodor!")),false);
-			tabView.AddTab(new Tab("Tab2",new Label("durdur")),false);
-			tabView.AddTab(new Tab("Interactive Tab",GetInteractiveTab()),false);
-			tabView.AddTab(new Tab("Big Text",GetBigTextFileTab()),false);
+			tabView.AddTab (new Tab ("Tab1", new Label ("hodor!")), false);
+			tabView.AddTab (new Tab ("Tab2", new Label ("durdur")), false);
+			tabView.AddTab (new Tab ("Interactive Tab", GetInteractiveTab ()), false);
+			tabView.AddTab (new Tab ("Big Text", GetBigTextFileTab ()), false);
 
-			for(int i=0;i<100;i++)
-			{
-				tabView.AddTab(new Tab($"Tab{i}",new Label($"Welcome to tab {i}")),false);
+			for (int i = 0; i < 100; i++) {
+				tabView.AddTab (new Tab ($"Tab{i}", new Label ($"Welcome to tab {i}")), false);
 			}
 
-			tabView.SelectedTab = tabView.Tabs.First();
+			tabView.SelectedTab = tabView.Tabs.First ();
 
 			Win.Add (tabView);
+
+			var frameRight = new FrameView ("About") {
+				X = Pos.Right (tabView),
+				Y = 0,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+			};
+
+
+			frameRight.Add (new TextView () {
+				Text = @"This demos the tabs control
+Switch between tabs using cursor keys
+
+",
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			});
+
+			Win.Add (frameRight);
+
+
+
+			var frameBelow = new FrameView ("Bottom Frame") {
+				X = 0,
+				Y = Pos.Bottom (tabView),
+				Width = tabView.Width,
+				Height = Dim.Fill (),
+			};
+
+
+			frameBelow.Add (new TextView () {
+				Text = @"This frame exists to check you can still tab here
+and that the tab control doesn't overspill it's bounds",
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			});
+
+			Win.Add (frameBelow);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
@@ -77,32 +114,31 @@ namespace UICatalog.Scenarios {
 
 		private View GetInteractiveTab ()
 		{
-			
-			var interactiveTab = new View(){
-				Width = Dim.Fill(),
-				Height = Dim.Fill()
+
+			var interactiveTab = new View () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
 			};
-			var lblName = new Label("Name:");
-			interactiveTab.Add(lblName);
+			var lblName = new Label ("Name:");
+			interactiveTab.Add (lblName);
 
-			var tbName = new TextField(){
-				X = Pos.Right(lblName),
-				Width = 10};
-			interactiveTab.Add(tbName);
-
-			var lblAddr = new Label("Address:")
-			{
-				Y=1
-			};
-			interactiveTab.Add(lblAddr);
-
-			var tbAddr = new TextField()
-			{
-				X = Pos.Right(lblAddr),
-				Y=1,
+			var tbName = new TextField () {
+				X = Pos.Right (lblName),
 				Width = 10
 			};
-			interactiveTab.Add(tbAddr);
+			interactiveTab.Add (tbName);
+
+			var lblAddr = new Label ("Address:") {
+				Y = 1
+			};
+			interactiveTab.Add (lblAddr);
+
+			var tbAddr = new TextField () {
+				X = Pos.Right (lblAddr),
+				Y = 1,
+				Width = 10
+			};
+			interactiveTab.Add (tbAddr);
 
 			return interactiveTab;
 		}
@@ -110,32 +146,31 @@ namespace UICatalog.Scenarios {
 
 		private View GetBigTextFileTab ()
 		{
-			
-			var text = new TextView(){
-				Width = Dim.Fill(),
-				Height = Dim.Fill()
+
+			var text = new TextView () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
 			};
 
-			var sb = new System.Text.StringBuilder();
+			var sb = new System.Text.StringBuilder ();
 
-			for(int y=0;y<300;y++){
-				for(int x=0;x<500;x++)
-				{
-					sb.Append((x+y)%2 ==0 ? '1':'0');
+			for (int y = 0; y < 300; y++) {
+				for (int x = 0; x < 500; x++) {
+					sb.Append ((x + y) % 2 == 0 ? '1' : '0');
 				}
-				sb.AppendLine();
+				sb.AppendLine ();
 			}
-			text.Text = sb.ToString();
+			text.Text = sb.ToString ();
 
 			return text;
 		}
 
-		private void ShowTopLine()
+		private void ShowTopLine ()
 		{
 			miShowTopLine.Checked = !miShowTopLine.Checked;
 
 			tabView.Style.ShowHeaderOverline = miShowTopLine.Checked;
-			tabView.ApplyStyleChanges();
+			tabView.ApplyStyleChanges ();
 		}
 		private void ShowBorder ()
 		{

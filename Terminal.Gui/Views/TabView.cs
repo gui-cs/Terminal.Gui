@@ -93,7 +93,7 @@ namespace Terminal.Gui {
 		/// All tabs currently hosted by the control, after making changes call <see cref="View.SetNeedsDisplay()"/>
 		/// </summary>
 		/// <value></value>
-		public IReadOnlyCollection<Tab> Tabs { get => tabs.AsReadOnly(); }
+		public IReadOnlyCollection<Tab> Tabs { get => tabs.AsReadOnly (); }
 
 		/// <summary>
 		/// When there are too many tabs to render, this indicates the first
@@ -103,10 +103,10 @@ namespace Terminal.Gui {
 		public int TabScrollOffset { get; set; }
 
 
-        /// <summary>
-        /// Event for when <see cref="SelectedTab"/> changes
-        /// </summary>
-        public event EventHandler<TabChangedEventArgs> SelectedTabChanged;
+		/// <summary>
+		/// Event for when <see cref="SelectedTab"/> changes
+		/// </summary>
+		public event EventHandler<TabChangedEventArgs> SelectedTabChanged;
 
 		/// <summary>
 		/// The currently selected member of <see cref="Tabs"/> chosen by the user
@@ -116,7 +116,7 @@ namespace Terminal.Gui {
 			get => selectedTab;
 			set {
 
-                var old = selectedTab;
+				var old = selectedTab;
 
 				if (selectedTab != null) {
 					// remove old content
@@ -130,12 +130,12 @@ namespace Terminal.Gui {
 					// add new content
 					contentView.Add (selectedTab.View);
 				}
-                
+
 				EnsureSelectedTabIsVisible ();
 
-                if(old != value){
-                    OnSelectedTabChanged(old,value);
-                }
+				if (old != value) {
+					OnSelectedTabChanged (old, value);
+				}
 
 			}
 		}
@@ -307,13 +307,14 @@ namespace Terminal.Gui {
 			}
 		}
 
-        /// <summary>
-        /// Raises the <see cref="SelectedTabChanged"/> event
-        /// </summary>
-        protected virtual void OnSelectedTabChanged(Tab oldTab, Tab newTab){
-            
-            SelectedTabChanged?.Invoke(this,new TabChangedEventArgs(oldTab,newTab));
-        }
+		/// <summary>
+		/// Raises the <see cref="SelectedTabChanged"/> event
+		/// </summary>
+		protected virtual void OnSelectedTabChanged (Tab oldTab, Tab newTab)
+		{
+
+			SelectedTabChanged?.Invoke (this, new TabChangedEventArgs (oldTab, newTab));
+		}
 
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
@@ -458,9 +459,9 @@ namespace Terminal.Gui {
 
 		private void RenderTabLine (TabToRender [] tabLocations, int width, int currentLine)
 		{
-            // clear any old text
-            Move(0,currentLine);
-            Driver.AddStr(new string(' ',width));
+			// clear any old text
+			Move (0, currentLine);
+			Driver.AddStr (new string (' ', width));
 
 			foreach (var toRender in tabLocations) {
 
@@ -470,7 +471,23 @@ namespace Terminal.Gui {
 				}
 
 				Move (toRender.X, currentLine);
-				Driver.SetAttribute (HasFocus && toRender.IsSelected ? ColorScheme.Focus : ColorScheme.Normal);
+
+				// if tab is the selected one and focus is inside this control
+				if (toRender.IsSelected && HasFocus) {
+
+					if (Focused == tabsBar) {
+
+						// if focus is the tab bar (tab name) itself 
+						Driver.SetAttribute (ColorScheme.HotFocus);
+
+					} else {
+
+						// Focus is inside the tab
+						Driver.SetAttribute (ColorScheme.HotNormal);
+					}
+				}
+
+
 				Driver.AddStr (toRender.Tab.Text);
 				Driver.SetAttribute (ColorScheme.Normal);
 
@@ -543,10 +560,10 @@ namespace Terminal.Gui {
 		{
 			tabs.Add (tab);
 
-            if(SelectedTab == null || andSelect){
-                SelectedTab = tab;
-                EnsureSelectedTabIsVisible();
-            }
+			if (SelectedTab == null || andSelect) {
+				SelectedTab = tab;
+				EnsureSelectedTabIsVisible ();
+			}
 
 			SetNeedsDisplay ();
 		}
@@ -554,43 +571,39 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Removes the given <paramref name="tab"/> from <see cref="Tabs"/>.
-        /// Optionally disposes the tabs hosted <see cref="Tab.View"/>>
+		/// Optionally disposes the tabs hosted <see cref="Tab.View"/>>
 		/// </summary>
 		/// <param name="tab"></param>
 		/// <param name="dispose">True to dispose of the tabs control</param>
 		public void RemoveTab (Tab tab, bool dispose)
 		{
-            if(tab == null || !tabs.Contains(tab))
-            {
-                return;
-            }
+			if (tab == null || !tabs.Contains (tab)) {
+				return;
+			}
 
-            // what tab was selected before closing
-            var idx = tabs.IndexOf(tab);
+			// what tab was selected before closing
+			var idx = tabs.IndexOf (tab);
 
 			tabs.Remove (tab);
 
-            if(dispose){
-                tab.View.Dispose();
-            }
+			if (dispose) {
+				tab.View.Dispose ();
+			}
 
-            // if the currently selected tab is no longer a member of Tabs
-            if(!Tabs.Contains(SelectedTab))
-            {
-                // select the tab closest to the one that disapeared
-                var toSelect = Math.Max(idx-1,0);
+			// if the currently selected tab is no longer a member of Tabs
+			if (!Tabs.Contains (SelectedTab)) {
+				// select the tab closest to the one that disapeared
+				var toSelect = Math.Max (idx - 1, 0);
 
-                if(toSelect < Tabs.Count){
-                    SelectedTab = Tabs.ElementAt(toSelect);
-                }
-                else
-                {
-                    SelectedTab = Tabs.LastOrDefault();
-                }
+				if (toSelect < Tabs.Count) {
+					SelectedTab = Tabs.ElementAt (toSelect);
+				} else {
+					SelectedTab = Tabs.LastOrDefault ();
+				}
 
-            }
+			}
 
-            EnsureSelectedTabIsVisible();
+			EnsureSelectedTabIsVisible ();
 			SetNeedsDisplay ();
 		}
 
@@ -646,30 +659,30 @@ namespace Terminal.Gui {
 		}
 	}
 
-    /// <summary>
-    /// Describes a change in <see cref="TabView.SelectedTab"/>
-    /// </summary>
-	public class TabChangedEventArgs : EventArgs{
+	/// <summary>
+	/// Describes a change in <see cref="TabView.SelectedTab"/>
+	/// </summary>
+	public class TabChangedEventArgs : EventArgs {
 
-        /// <summary>
-        /// The previously selected tab. May be null
-        /// </summary>
-        public Tab OldTab {get;}
+		/// <summary>
+		/// The previously selected tab. May be null
+		/// </summary>
+		public Tab OldTab { get; }
 
-        /// <summary>
-        /// The currently selected tab. May be null
-        /// </summary>
-        public Tab NewTab {get;}
+		/// <summary>
+		/// The currently selected tab. May be null
+		/// </summary>
+		public Tab NewTab { get; }
 
-        /// <summary>
-        /// Documents a tab change
-        /// </summary>
-        /// <param name="oldTab"></param>
-        /// <param name="newTab"></param>
-        public TabChangedEventArgs(Tab oldTab, Tab newTab)
-        {
-            OldTab = oldTab;
-            NewTab = newTab;
-        }
+		/// <summary>
+		/// Documents a tab change
+		/// </summary>
+		/// <param name="oldTab"></param>
+		/// <param name="newTab"></param>
+		public TabChangedEventArgs (Tab oldTab, Tab newTab)
+		{
+			OldTab = oldTab;
+			NewTab = newTab;
+		}
 	}
 }
