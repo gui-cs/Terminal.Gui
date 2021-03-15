@@ -79,7 +79,7 @@ namespace Terminal.Gui {
 		private Tab selectedTab;
 
 		/// <summary>
-		// This sub view is the 2 or 3 line control that represents the actual tabs themselves
+		/// This sub view is the 2 or 3 line control that represents the actual tabs themselves
 		/// </summary>
 		TabRowView tabsBar;
 
@@ -409,7 +409,10 @@ namespace Terminal.Gui {
 
 			if (SelectedTab == null || andSelect) {
 				SelectedTab = tab;
-				EnsureSelectedTabIsVisible ();
+				
+                EnsureSelectedTabIsVisible ();
+
+                tab.View?.SetFocus();
 			}
 
 			SetNeedsDisplay ();
