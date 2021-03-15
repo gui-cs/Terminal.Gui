@@ -120,8 +120,12 @@ namespace Terminal.Gui {
 				var old = selectedTab;
 
 				if (selectedTab != null) {
-					// remove old content
-					contentView.Remove (selectedTab.View);
+                    
+                    if(selectedTab.View != null)
+                    {
+    					// remove old content
+	    				contentView.Remove (selectedTab.View);
+                    }
 				}
 
 				selectedTab = value;
@@ -129,7 +133,9 @@ namespace Terminal.Gui {
 				if (value != null) {
 
 					// add new content
-					contentView.Add (selectedTab.View);
+                    if(selectedTab.View != null){
+                        contentView.Add (selectedTab.View);
+                    }
 				}
 
 				EnsureSelectedTabIsVisible ();
@@ -247,7 +253,7 @@ namespace Terminal.Gui {
 
 			foreach (var tab in Tabs) {
 				if (!Equals (SelectedTab, tab)) {
-					tab.View.Dispose ();
+					tab.View?.Dispose ();
 				}
 
 			}
@@ -437,7 +443,7 @@ namespace Terminal.Gui {
 			tabs.Remove (tab);
 
 			if (dispose) {
-				tab.View.Dispose ();
+				tab?.View.Dispose ();
 			}
 
 			// if the currently selected tab is no longer a member of Tabs

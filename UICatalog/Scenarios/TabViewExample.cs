@@ -28,6 +28,8 @@ namespace UICatalog.Scenarios {
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
+
+					new MenuItem ("_Add Blank Tab", "", () => AddBlankTab()),
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
@@ -112,6 +114,11 @@ and that the tab control doesn't overspill it's bounds",
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 			});
 			Top.Add (statusBar);
+		}
+
+		private void AddBlankTab ()
+		{
+			tabView.AddTab (new Tab (), false);
 		}
 
 		private View GetInteractiveTab ()
