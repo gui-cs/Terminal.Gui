@@ -340,6 +340,56 @@ namespace Terminal.Gui {
 			return base.ProcessKey (keyEvent);
 		}
 
+		public override bool MouseEvent (MouseEvent me)
+		{
+			if (!me.Flags.HasFlag (MouseFlags.Button1Pressed))
+				return false;
+
+			if (!HasFocus && CanFocus) {
+				SetFocus ();
+			}
+
+
+			if (me.Flags.HasFlag (MouseFlags.Button1Pressed)) {
+
+				var hit = ScreenToTab (me.X, me.Y);
+				if (hit != null) {
+					SelectedTab = hit;
+					SetNeedsDisplay ();
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Translates the client coordinates of a click into a tab when the click is in
+		/// the header area of a tab.
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <returns></returns>
+		public Tab ScreenToTab (int x, int y)
+		{
+			if (Style.TabsOnBottom) {
+
+				// y click is above the tabs and tabs are on the bottom
+				if (y < Bounds.Height - GetTabHeight (false)) {
+					return null;
+				}
+			} else {
+				// y click is below the tabs and tabs are on the top
+				if (y > GetTabHeight (true)) {
+					return null;
+				}
+			}
+
+			var tabs = CalculateViewport (Bounds);
+
+			return tabs.LastOrDefault (t => x >= t.X &&  x < t.X + t.Width)?.Tab;
+		}
+
 		/// <summary>
 		/// Changes the <see cref="SelectedTab"/> by the given <paramref name="amount"/>.  Positive for right, 
 		/// negative for left.
