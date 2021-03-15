@@ -505,7 +505,7 @@ namespace Terminal.Gui {
 
 
 				Move (selected.X,
-					host.Style.ShowHeaderOverline ? 1 : 0);
+					host.Style.ShowHeaderOverline && !host.Style.TabsOnBottom ? 1 : 0);
 			}
 
 			public override void Redraw (Rect bounds)
