@@ -91,7 +91,7 @@ namespace Terminal.Gui {
 		private List<Tab> tabs = new List<Tab> ();
 
 		/// <summary>
-		/// All tabs currently hosted by the control, after making changes call <see cref="View.SetNeedsDisplay()"/>
+		/// All tabs currently hosted by the control
 		/// </summary>
 		/// <value></value>
 		public IReadOnlyCollection<Tab> Tabs { get => tabs.AsReadOnly (); }
@@ -294,8 +294,8 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Changes the <see cref="SelectedTab"/> by the given <paramref name="amount"/>.  Positive for right, 
-		/// negative for left.
+		/// Changes the <see cref="SelectedTab"/> by the given <paramref name="amount"/>.  
+		/// Positive for right, negative for left.  If no tab is currently selected then
 		/// the first tab will become selected
 		/// </summary>
 		/// <param name="amount"></param>
@@ -447,7 +447,7 @@ namespace Terminal.Gui {
 			}
 
 			// if the currently selected tab is no longer a member of Tabs
-			if (!Tabs.Contains (SelectedTab)) {
+			if (SelectedTab == null || !Tabs.Contains (SelectedTab)) {
 				// select the tab closest to the one that disapeared
 				var toSelect = Math.Max (idx - 1, 0);
 

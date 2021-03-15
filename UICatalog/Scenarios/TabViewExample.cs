@@ -30,6 +30,8 @@ namespace UICatalog.Scenarios {
 				new MenuBarItem ("_File", new MenuItem [] {
 
 					new MenuItem ("_Add Blank Tab", "", () => AddBlankTab()),
+
+					new MenuItem ("_Clear SelectedTab", "", () => tabView.SelectedTab=null),
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
