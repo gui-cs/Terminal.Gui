@@ -189,7 +189,7 @@ namespace Terminal.Gui {
 				var tabHeight = GetTabHeight (false);
 				tabsBar.Height = tabHeight;
 
-				tabsBar.Y = Pos.Bottom (this) - tabHeight;
+				tabsBar.Y = Pos.Percent (100) - tabHeight;
 
 			} else {
 
@@ -207,8 +207,8 @@ namespace Terminal.Gui {
 
 				tabsBar.Height = tabHeight;
 
-				// Should be able to just use 0 but switching between top/bottom tabs repeatedly breaks in ValidatePosDim if just using 0 without Pos.Top
-				tabsBar.Y = Pos.Top (this);
+				// Should be able to just use 0 but switching between top/bottom tabs repeatedly breaks in ValidatePosDim if just using the absolute value 0
+				tabsBar.Y = Pos.Percent (0);
 			}
 
 
