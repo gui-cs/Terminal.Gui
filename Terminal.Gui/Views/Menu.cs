@@ -402,7 +402,7 @@ namespace Terminal.Gui {
 			this.host = host;
 			if (barItems.IsTopLevel) {
 				// This is a standalone MenuItem on a MenuBar
-				ColorScheme = Colors.Menu;
+				ColorScheme = host.ColorScheme;
 				CanFocus = true;
 			} else {
 
@@ -413,7 +413,7 @@ namespace Terminal.Gui {
 						break;
 					}
 				}
-				ColorScheme = Colors.Menu;
+				ColorScheme = host.ColorScheme;
 				CanFocus = true;
 				WantMousePositionReports = host.WantMousePositionReports;
 			}
@@ -905,7 +905,7 @@ namespace Terminal.Gui {
 		public override void Redraw (Rect bounds)
 		{
 			Move (0, 0);
-			Driver.SetAttribute (Colors.Menu.Normal);
+			Driver.SetAttribute (ColorScheme.Normal);
 			for (int i = 0; i < Frame.Width; i++)
 				Driver.AddRune (' ');
 
