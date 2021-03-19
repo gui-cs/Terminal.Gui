@@ -312,6 +312,8 @@ namespace Terminal.Gui {
 				if (Application.mouseGrabView != null && Application.mouseGrabView == this) {
 					Application.UngrabMouse ();
 				}
+			} else {
+				contentBottomRightCorner.Visible = false;
 			}
 			if (showScrollIndicator) {
 				Redraw (Bounds);
