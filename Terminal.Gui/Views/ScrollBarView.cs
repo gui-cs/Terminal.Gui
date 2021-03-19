@@ -291,6 +291,9 @@ namespace Terminal.Gui {
 		void ShowHideScrollBars ()
 		{
 			if (!hosted || (hosted && !autoHideScrollBars)) {
+				if (contentBottomRightCorner != null && contentBottomRightCorner.Visible) {
+					contentBottomRightCorner.Visible = false;
+				}
 				return;
 			}
 
