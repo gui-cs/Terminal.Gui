@@ -702,8 +702,13 @@ namespace Terminal.Gui {
 			var resume = true;
 			while (resume)
 			{
-				try
-				{
+#if DEBUG
+				resume = false;
+				var runToken = Begin (view);
+				RunLoop (runToken);
+				End (runToken);
+#else
+				try {
 					resume = false;
 					var runToken = Begin (view);
 					RunLoop (runToken);
@@ -717,6 +722,7 @@ namespace Terminal.Gui {
 					}
 					resume = errorHandler(error);
 				}
+#endif
 			}
 		}
 
