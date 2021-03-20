@@ -131,7 +131,7 @@ namespace Terminal.Gui {
 		{
 			var sb = new StringBuilder ();
 			for (int i = 0; i < lines.Count; i++) {
-				sb.Append (ustring.Make (lines[i]));
+				sb.Append (ustring.Make (lines [i]));
 				if ((i + 1) < lines.Count) {
 					sb.AppendLine ();
 				}
@@ -268,6 +268,88 @@ namespace Terminal.Gui {
 		}
 	}
 
+	class WordWrapManager {
+		class WrappedLine {
+			public int ModelLine;
+			public List<(int Row, int Col)> WrappedLines = new List<(int Row, int Col)> ();
+		}
+
+		List<WrappedLine> wrappedModelLines = new List<WrappedLine> ();
+
+		public TextModel Model { get; }
+
+		public WordWrapManager (TextModel model)
+		{
+			Model = model;
+		}
+
+		public TextModel WrapModel (int width, out int nRow, out int nCol, int row = 0, int col = 0)
+		{
+			var wrappedModel = new TextModel ();
+			int lines = 0;
+			int modelRow;
+			nRow = 0;
+			nCol = 0;
+			bool isRowAndColSetted = row == 0 && col == 0;
+
+			if (row > 0) {
+				modelRow = GetModelLineFromWrappedLines (row);
+			} else {
+				modelRow = 0;
+			}
+			wrappedModelLines = new List<WrappedLine> ();
+
+			for (int i = 0; i < Model.Count; i++) {
+				var wrappedLine = new WrappedLine () { ModelLine = i };
+				var line = Model.GetLine (i);
+				var wrappedLines = ToListRune (
+					TextFormatter.Format (ustring.Make (line), width, TextAlignment.Left, true));
+				for (int j = 0; j < wrappedLines.Count; j++) {
+					var wrapLine = wrappedLines [j];
+					if (!isRowAndColSetted && modelRow == i) {
+						if (nCol + wrapLine.Count < col) {
+							nCol += wrapLine.Count;
+							nRow = i;
+						} else if (nCol + wrapLine.Count > col) {
+							if (col >= width - 1) {
+								nCol = wrapLine.Count - 1 - col;
+								nRow = lines;
+							} else {
+								nCol = col - nCol;
+								nRow = Math.Max (lines, row);
+							}
+							isRowAndColSetted = true;
+						} else if (nCol + wrapLine.Count == col) {
+							nCol += wrapLine.Count;
+							nRow = lines;
+							isRowAndColSetted = true;
+						}
+					}
+					wrappedModel.AddLine (lines, wrapLine);
+					wrappedLine.WrappedLines.Add ((lines, wrapLine.Count));
+					wrappedModelLines.Add (wrappedLine);
+					lines++;
+				}
+			}
+
+			return wrappedModel;
+		}
+
+		public List<List<Rune>> ToListRune (List<ustring> textList)
+		{
+			var runesList = new List<List<Rune>> ();
+
+			foreach (var text in textList) {
+				runesList.Add (text.ToRuneList ());
+			}
+
+			return runesList;
+		}
+
+		public int GetModelLineFromWrappedLines (int line) =>
+			wrappedModelLines [Math.Min (line, wrappedModelLines.Count - 1)].ModelLine;
+	}
+
 	/// <summary>
 	///   Multi-line text editing <see cref="View"/>
 	/// </summary>
@@ -393,6 +475,8 @@ namespace Terminal.Gui {
 		int selectionStartColumn, selectionStartRow;
 		bool selecting;
 		//bool used;
+		bool wordWrap;
+		WordWrapManager wrapManager;
 
 		/// <summary>
 		/// Raised when the <see cref="Text"/> of the <see cref="TextView"/> changes.
@@ -456,6 +540,15 @@ namespace Terminal.Gui {
 			get => base.Frame;
 			set {
 				base.Frame = value;
+				if (wordWrap && wrapManager != null) {
+					model = wrapManager.WrapModel (Frame.Width - 2,
+						out int nRow, out int nCol,
+						TopRow + currentRow, currentColumn);
+					ResetPosition ();
+					currentRow = nRow;
+					currentColumn = nCol;
+					SetNeedsDisplay ();
+				}
 				Adjust ();
 			}
 		}
@@ -479,6 +572,27 @@ namespace Terminal.Gui {
 		/// Gets the  number of lines.
 		/// </summary>
 		public int Lines => model.Count;
+
+		/// <summary>
+		/// Allows word wrap the to fit the available container width.
+		/// </summary>
+		public bool WordWrap {
+			get => wordWrap;
+			set {
+				if (value == wordWrap) {
+					return;
+				}
+				wordWrap = value;
+				ResetPosition ();
+				if (wordWrap) {
+					wrapManager = new WordWrapManager (model);
+					model = wrapManager.WrapModel (Frame.Width - 2, out _, out _);
+				} else if (!wordWrap && wrapManager != null) {
+					model = wrapManager.Model;
+				}
+				SetNeedsDisplay ();
+			}
+		}
 
 		/// <summary>
 		/// Loads the contents of the file into the  <see cref="TextView"/>.
@@ -547,8 +661,8 @@ namespace Terminal.Gui {
 			var retreat = 0;
 			var col = 0;
 			if (line.Count > 0) {
-				retreat = Math.Max ((SpecialRune (line [Math.Max (CurrentColumn - leftColumn - 1, 0)])
-				? 1 : 0), 0);
+				retreat = Math.Max (SpecialRune (line [Math.Min (Math.Max (CurrentColumn - leftColumn - 1, 0), line.Count - 1)])
+				? 1 : 0, 0);
 				for (int idx = leftColumn < 0 ? 0 : leftColumn; idx < line.Count; idx++) {
 					if (idx == CurrentColumn)
 						break;
@@ -603,12 +717,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Get / Set the wished cursor when the field is focused
 		/// </summary>
-		public CursorVisibility DesiredCursorVisibility 
-		{ 
-			get => desiredCursorVisibility; 
+		public CursorVisibility DesiredCursorVisibility {
+			get => desiredCursorVisibility;
 			set {
 				if (desiredCursorVisibility != value && HasFocus) {
-					Application.Driver.SetCursorVisibility (value);		
+					Application.Driver.SetCursorVisibility (value);
 				}
 
 				desiredCursorVisibility = value;
@@ -757,7 +870,8 @@ namespace Terminal.Gui {
 			case 0xd:
 				return true;
 			default:
-				return false;			}
+				return false;
+			}
 		}
 
 		///<inheritdoc/>
@@ -871,7 +985,7 @@ namespace Terminal.Gui {
 		{
 			var offB = OffSetBackground ();
 			var line = GetCurrentLine ();
-			bool need = false;
+			bool need = !NeedDisplay.IsEmpty;
 			if (currentColumn < leftColumn) {
 				leftColumn = currentColumn;
 				need = true;
@@ -1009,6 +1123,7 @@ namespace Terminal.Gui {
 						currentColumn = 0;
 						if (currentRow >= topRow + Frame.Height) {
 							topRow++;
+							SetNeedsDisplay ();
 						}
 					}
 				}
@@ -1024,6 +1139,7 @@ namespace Terminal.Gui {
 						currentRow--;
 						if (currentRow < topRow) {
 							topRow--;
+							SetNeedsDisplay ();
 						}
 						currentLine = GetCurrentLine ();
 						currentColumn = currentLine.Count;

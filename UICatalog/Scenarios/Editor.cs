@@ -49,7 +49,8 @@ namespace UICatalog {
 					new MenuItem ("  V_ertical Fix", "", () => SetCursor(CursorVisibility.VerticalFix)),
 					new MenuItem ("  B_ox Fix", "", () => SetCursor(CursorVisibility.BoxFix)),
 					new MenuItem ("  U_nderline Fix","", () => SetCursor(CursorVisibility.UnderlineFix))
-				})
+				}),
+				new MenuBarItem ("Forma_t", CreateWrapChecked ())
 			});
 			Top.Add (menu);
 
@@ -104,8 +105,10 @@ namespace UICatalog {
 			_textView.DrawContent += (e) => {
 				_scrollBar.Size = _textView.Lines - 1;
 				_scrollBar.Position = _textView.TopRow;
-				_scrollBar.OtherScrollBarView.Size = _textView.Maxlength;
-				_scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
+				if (_scrollBar.OtherScrollBarView != null) {
+					_scrollBar.OtherScrollBarView.Size = _textView.Maxlength;
+					_scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
+				}
 				_scrollBar.LayoutSubviews ();
 				_scrollBar.Refresh ();
 			};
@@ -175,7 +178,7 @@ namespace UICatalog {
 			if (_fileName != null) {
 				// BUGBUG: #279 TextView does not know how to deal with \r\n, only \r 
 				// As a result files saved on Windows and then read back will show invalid chars.
-				System.IO.File.WriteAllText (_fileName, _textView.Text.ToString());
+				System.IO.File.WriteAllText (_fileName, _textView.Text.ToString ());
 				_saved = true;
 			}
 		}
@@ -185,7 +188,7 @@ namespace UICatalog {
 			Application.RequestStop ();
 		}
 
-		private void CreateDemoFile(string fileName)
+		private void CreateDemoFile (string fileName)
 		{
 			var sb = new StringBuilder ();
 			// BUGBUG: #279 TextView does not know how to deal with \r\n, only \r
@@ -207,6 +210,25 @@ namespace UICatalog {
 			item.CheckType |= MenuItemCheckStyle.Checked;
 			item.Checked = true;
 			item.Action += () => _scrollBar.KeepContentAlwaysInViewport = item.Checked = !item.Checked;
+
+			return new MenuItem [] { item };
+		}
+
+		private MenuItem [] CreateWrapChecked ()
+		{
+			var item = new MenuItem ();
+			item.Title = "Word Wrap";
+			item.CheckType |= MenuItemCheckStyle.Checked;
+			item.Checked = false;
+			item.Action += () => {
+				_textView.WordWrap = item.Checked = !item.Checked;
+				if (_textView.WordWrap) {
+					_scrollBar.AutoHideScrollBars = false;
+					_scrollBar.OtherScrollBarView.ShowScrollIndicator = false;
+				} else {
+					_scrollBar.AutoHideScrollBars = true;
+				}
+			};
 
 			return new MenuItem [] { item };
 		}
