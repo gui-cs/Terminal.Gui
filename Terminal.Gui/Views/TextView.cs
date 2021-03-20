@@ -316,7 +316,7 @@ namespace Terminal.Gui {
 								nRow = lines;
 							} else {
 								nCol = col - nCol;
-								nRow = Math.Max (lines, row);
+								nRow = lines;
 							}
 							isRowAndColSetted = true;
 						} else if (nCol + wrapLine.Count == col) {
@@ -543,8 +543,7 @@ namespace Terminal.Gui {
 				if (wordWrap && wrapManager != null) {
 					model = wrapManager.WrapModel (Frame.Width - 2,
 						out int nRow, out int nCol,
-						TopRow + currentRow, currentColumn);
-					ResetPosition ();
+						currentRow, currentColumn);
 					currentRow = nRow;
 					currentColumn = nCol;
 					SetNeedsDisplay ();
