@@ -271,7 +271,9 @@ namespace Terminal.Gui {
 	class WordWrapManager {
 		class WrappedLine {
 			public int ModelLine;
-			public List<(int Row, int Col)> WrappedLines = new List<(int Row, int Col)> ();
+			public int Row;
+			public int RowIndex;
+			public int ColWidth;
 		}
 
 		List<WrappedLine> wrappedModelLines = new List<WrappedLine> ();
@@ -287,50 +289,51 @@ namespace Terminal.Gui {
 		{
 			var wrappedModel = new TextModel ();
 			int lines = 0;
-			int modelRow;
+			var modelRow = GetModelLineFromWrappedLines (row);
+			var modelCol = GetModelColFromWrappedLines (row, col);
 			nRow = 0;
 			nCol = 0;
 			bool isRowAndColSetted = row == 0 && col == 0;
-
-			if (row > 0) {
-				modelRow = GetModelLineFromWrappedLines (row);
-			} else {
-				modelRow = 0;
-			}
-			wrappedModelLines = new List<WrappedLine> ();
+			List<WrappedLine> wModelLines = new List<WrappedLine> ();
 
 			for (int i = 0; i < Model.Count; i++) {
-				var wrappedLine = new WrappedLine () { ModelLine = i };
 				var line = Model.GetLine (i);
 				var wrappedLines = ToListRune (
-					TextFormatter.Format (ustring.Make (line), width, TextAlignment.Left, true));
+					TextFormatter.Format (ustring.Make (line), width, TextAlignment.Left, true, true));
+				int sumColWidth = 0;
 				for (int j = 0; j < wrappedLines.Count; j++) {
 					var wrapLine = wrappedLines [j];
 					if (!isRowAndColSetted && modelRow == i) {
-						if (nCol + wrapLine.Count < col) {
+						if (nCol + wrapLine.Count <= modelCol) {
 							nCol += wrapLine.Count;
-							nRow = i;
-						} else if (nCol + wrapLine.Count > col) {
-							if (col >= width - 1) {
-								nCol = wrapLine.Count - 1 - col;
-								nRow = lines;
-							} else {
-								nCol = col - nCol;
-								nRow = lines;
+							nRow = lines;
+							if (nCol == modelCol) {
+								nCol = wrapLine.Count;
+								isRowAndColSetted = true;
+							} else if (j == wrappedLines.Count - 1) {
+								nCol = wrapLine.Count - j + modelCol - nCol;
+								isRowAndColSetted = true;
 							}
-							isRowAndColSetted = true;
-						} else if (nCol + wrapLine.Count == col) {
-							nCol += wrapLine.Count;
+						} else {
+							var offset = nCol + wrapLine.Count - modelCol;
+							nCol = wrapLine.Count - offset;
 							nRow = lines;
 							isRowAndColSetted = true;
 						}
 					}
 					wrappedModel.AddLine (lines, wrapLine);
-					wrappedLine.WrappedLines.Add ((lines, wrapLine.Count));
-					wrappedModelLines.Add (wrappedLine);
+					sumColWidth += wrapLine.Count;
+					var wrappedLine = new WrappedLine () {
+						ModelLine = i,
+						Row = lines,
+						RowIndex = j,
+						ColWidth = wrapLine.Count,
+					};
+					wModelLines.Add (wrappedLine);
 					lines++;
 				}
 			}
+			wrappedModelLines = wModelLines;
 
 			return wrappedModel;
 		}
@@ -346,8 +349,32 @@ namespace Terminal.Gui {
 			return runesList;
 		}
 
-		public int GetModelLineFromWrappedLines (int line) =>
-			wrappedModelLines [Math.Min (line, wrappedModelLines.Count - 1)].ModelLine;
+		public int GetModelLineFromWrappedLines (int line) => wrappedModelLines.Count > 0
+			? wrappedModelLines [Math.Min (line, wrappedModelLines.Count - 1)].ModelLine
+			: 0;
+
+		public int GetModelColFromWrappedLines (int line, int col)
+		{
+			if (wrappedModelLines?.Count == 0) {
+				return 0;
+			}
+
+			var modelLine = GetModelLineFromWrappedLines (line);
+			var firstLine = wrappedModelLines.IndexOf (r => r.ModelLine == modelLine);
+			int modelCol = 0;
+
+			for (int i = firstLine; i <= line; i++) {
+				var wLine = wrappedModelLines [i];
+
+				if (i < line) {
+					modelCol += wLine.ColWidth;
+				} else {
+					modelCol += col;
+				}
+			}
+
+			return modelCol;
+		}
 	}
 
 	/// <summary>
@@ -515,6 +542,7 @@ namespace Terminal.Gui {
 		void ResetPosition ()
 		{
 			topRow = leftColumn = currentRow = currentColumn = 0;
+			ResetCursorVisibility ();
 		}
 
 		/// <summary>
@@ -593,6 +621,24 @@ namespace Terminal.Gui {
 			}
 		}
 
+		CursorVisibility savedCursorVisibility = CursorVisibility.Default;
+
+		void SaveCursorVisibility ()
+		{
+			if (desiredCursorVisibility != CursorVisibility.Invisible) {
+				savedCursorVisibility = desiredCursorVisibility;
+				DesiredCursorVisibility = CursorVisibility.Invisible;
+			}
+		}
+
+		void ResetCursorVisibility ()
+		{
+			if (savedCursorVisibility != desiredCursorVisibility) {
+				DesiredCursorVisibility = savedCursorVisibility;
+				savedCursorVisibility = CursorVisibility.Default;
+			}
+		}
+
 		/// <summary>
 		/// Loads the contents of the file into the  <see cref="TextView"/>.
 		/// </summary>
@@ -660,19 +706,22 @@ namespace Terminal.Gui {
 			var retreat = 0;
 			var col = 0;
 			if (line.Count > 0) {
-				retreat = Math.Max (SpecialRune (line [Math.Min (Math.Max (CurrentColumn - leftColumn - 1, 0), line.Count - 1)])
+				retreat = Math.Max (SpecialRune (line [Math.Min (Math.Max (currentColumn - leftColumn - 1, 0), line.Count - 1)])
 				? 1 : 0, 0);
 				for (int idx = leftColumn < 0 ? 0 : leftColumn; idx < line.Count; idx++) {
-					if (idx == CurrentColumn)
+					if (idx == currentColumn)
 						break;
 					var cols = Rune.ColumnWidth (line [idx]);
 					col += cols - 1;
 				}
 			}
-			var ccol = CurrentColumn - leftColumn - retreat + col;
-			if (leftColumn <= CurrentColumn && ccol < Frame.Width
-				&& topRow <= CurrentRow && CurrentRow - topRow < Frame.Height) {
-				Move (ccol, CurrentRow - topRow);
+			var ccol = currentColumn - leftColumn - retreat + col;
+			if (leftColumn <= currentColumn && ccol < Frame.Width
+				&& topRow <= currentRow && currentRow - topRow < Frame.Height) {
+				ResetCursorVisibility ();
+				Move (ccol, currentRow - topRow);
+			} else {
+				SaveCursorVisibility ();
 			}
 		}
 
@@ -711,7 +760,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
+		CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
 
 		/// <summary>
 		/// Get / Set the wished cursor when the field is focused
