@@ -2312,7 +2312,7 @@ namespace Terminal.Gui {
 		{
 			ustring text = " A sentence has words. \n This is the second Line - 2. ";
 
-			// With keepEndSapces = false by default.
+			// With preserveTrailingSpaces = false by default.
 			var list1 = TextFormatter.Format (text, 4, TextAlignment.Left, true);
 			ustring wrappedText1 = ustring.Empty;
 			var idx = 0;
@@ -2363,7 +2363,7 @@ namespace Terminal.Gui {
 			}
 			Assert.Equal (" Asentencehaswords.  This isthesecondLine- 2.", wrappedText1);
 
-			// With keepEndSapces = true.
+			// With preserveTrailingSpaces = true.
 			var list2 = TextFormatter.Format (text, 4, TextAlignment.Left, true, true);
 			ustring wrappedText2 = ustring.Empty;
 			idx = 0;
