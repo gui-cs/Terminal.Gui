@@ -51,13 +51,13 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// True to show the top lip of tabs.  False to directly begin with tab text during 
-		/// rendering.  When true header line occupies 3 pixels, when false only 2.
+		/// rendering.  When true header line occupies 3 rows, when false only 2.
 		/// Defaults to true.
 		/// 
 		/// <para>When <see cref="TabsOnBottom"/> is enabled this instead applies to the
-		///  bottomost line of the control</para>
+		///  bottommost line of the control</para>
 		/// </summary> 
-		public bool ShowHeaderOverline { get; set; } = true;
+		public bool ShowTopLine { get; set; } = true;
 
 
 		/// <summary>
@@ -81,7 +81,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The default <see cref="MaxTabTextWidth"/> to set on new <see cref="TabView"/> controls
 		/// </summary>
-		public const int DefaultMaxTabTextWidth = 30;
+		public const uint DefaultMaxTabTextWidth = 30;
 
 		/// <summary>
 		/// This sub view is the 2 or 3 line control that represents the actual tabs themselves
@@ -110,9 +110,9 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// The maximum number of characters to render in a Tab header.  This prevents one long tab 
-		/// from pushing out all the others. Values less than 0 are ignored
+		/// from pushing out all the others.
 		/// </summary>
-		public int MaxTabTextWidth { get; set; } = DefaultMaxTabTextWidth;
+		public uint MaxTabTextWidth { get; set; } = DefaultMaxTabTextWidth;
 
 		/// <summary>
 		/// Event for when <see cref="SelectedTab"/> changes
@@ -213,7 +213,7 @@ namespace Terminal.Gui {
 				// Fill client area leaving space at bottom for border
 				contentView.Height = Dim.Fill (Style.ShowBorder ? 1 : 0);
 
-				// The top tab should be 2 or 3 pixels high and on the top
+				// The top tab should be 2 or 3 rows high and on the top
 
 				tabsBar.Height = tabHeight;
 
@@ -367,7 +367,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Returns the number of rows occupied by rendering the tabs, this depends 
-		/// on <see cref="TabStyle.ShowHeaderOverline"/> and can be 0 (e.g. if 
+		/// on <see cref="TabStyle.ShowTopLine"/> and can be 0 (e.g. if 
 		/// <see cref="TabStyle.TabsOnBottom"/> and you ask for <paramref name="top"/>).
 		/// </summary>
 		/// <param name="top">True to measure the space required at the top of the control,
@@ -383,7 +383,7 @@ namespace Terminal.Gui {
 				return 0;
 			}
 
-			return Style.ShowHeaderOverline ? 3 : 2;
+			return Style.ShowTopLine ? 3 : 2;
 		}
 
 
@@ -402,11 +402,11 @@ namespace Terminal.Gui {
 				var tabTextWidth = tab.Text.Sum (c => Rune.ColumnWidth (c));
 
 				string text = tab.Text.ToString();
-				int maxWidth = Math.Max(0,MaxTabTextWidth);
+				var maxWidth = MaxTabTextWidth;
 
 				if(tabTextWidth > maxWidth){
-					text = tab.Text.ToString().Substring(0,maxWidth);
-					tabTextWidth = maxWidth;
+					text = tab.Text.ToString().Substring(0,(int)maxWidth);
+					tabTextWidth = (int)maxWidth;
 				}
 
 				// if there is not enough space for this tab
@@ -444,11 +444,11 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Removes the given <paramref name="tab"/> from <see cref="Tabs"/>.
-		/// Optionally disposes the tabs hosted <see cref="Tab.View"/>>
+		/// Caller is responsible for disposing the tab's hosted <see cref="Tab.View"/>
+		/// if appropriate.
 		/// </summary>
 		/// <param name="tab"></param>
-		/// <param name="dispose">True to dispose of the tabs control</param>
-		public void RemoveTab (Tab tab, bool dispose)
+		public void RemoveTab (Tab tab)
 		{
 			if (tab == null || !tabs.Contains (tab)) {
 				return;
@@ -458,10 +458,6 @@ namespace Terminal.Gui {
 			var idx = tabs.IndexOf (tab);
 
 			tabs.Remove (tab);
-
-			if (dispose) {
-				tab?.View.Dispose ();
-			}
 
 			// if the currently selected tab is no longer a member of Tabs
 			if (SelectedTab == null || !Tabs.Contains (SelectedTab)) {
@@ -533,7 +529,7 @@ namespace Terminal.Gui {
 				if (host.Style.TabsOnBottom) {
 					y = 1;
 				} else {
-					y = host.Style.ShowHeaderOverline ? 1 : 0;
+					y = host.Style.ShowTopLine ? 1 : 0;
 				}
 
 				Move (selected.X, y);
@@ -550,7 +546,7 @@ namespace Terminal.Gui {
 				var width = bounds.Width;
 				Driver.SetAttribute (ColorScheme.Normal);
 
-				if (host.Style.ShowHeaderOverline) {
+				if (host.Style.ShowTopLine) {
 					RenderOverline (tabLocations, width);
 				}
 
@@ -616,7 +612,7 @@ namespace Terminal.Gui {
 
 					y = 1;
 				} else {
-					y = host.Style.ShowHeaderOverline ? 1 : 0;
+					y = host.Style.ShowTopLine ? 1 : 0;
 				}
 
 
@@ -674,7 +670,7 @@ namespace Terminal.Gui {
 					y = 0;
 				} else {
 
-					y = host.Style.ShowHeaderOverline ? 2 : 1;
+					y = host.Style.ShowTopLine ? 2 : 1;
 				}
 
 				Move (0, y);

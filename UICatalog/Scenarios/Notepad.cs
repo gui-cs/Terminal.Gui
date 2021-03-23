@@ -45,7 +45,6 @@ namespace UICatalog.Scenarios {
 			};
 
 			tabView.Style.ShowBorder = false;
-			tabView.Style.ShowHeaderOverline = false;
 			tabView.ApplyStyleChanges ();
 
 			Win.Add (tabView);
@@ -106,13 +105,15 @@ namespace UICatalog.Scenarios {
 			}
 
 			// close and dispose the tab
-			tabView.RemoveTab (tab, true);
+			tabView.RemoveTab (tab);
+			tab.View.Dispose();
 
 		}
 
 		private void Open ()
 		{
-			var open = new FileDialog ();
+			
+			var open = new FileDialog("Open File","Open","File","Select which file to open");
 
 			Application.Run (open);
 

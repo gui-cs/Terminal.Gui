@@ -87,10 +87,7 @@ namespace UICatalog.Scenarios {
 
 
 			frameRight.Add (new TextView () {
-				Text = @"This demos the tabs control
-Switch between tabs using cursor keys
-
-",
+				Text = "This demos the tabs control\nSwitch between tabs using cursor keys",
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			});
@@ -108,8 +105,7 @@ Switch between tabs using cursor keys
 
 
 			frameBelow.Add (new TextView () {
-				Text = @"This frame exists to check you can still tab here
-and that the tab control doesn't overspill it's bounds",
+				Text = "This frame exists to check you can still tab here\nand that the tab control doesn't overspill it's bounds",
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			});
@@ -184,7 +180,7 @@ and that the tab control doesn't overspill it's bounds",
 		{
 			miShowTopLine.Checked = !miShowTopLine.Checked;
 
-			tabView.Style.ShowHeaderOverline = miShowTopLine.Checked;
+			tabView.Style.ShowTopLine = miShowTopLine.Checked;
 			tabView.ApplyStyleChanges ();
 		}
 		private void ShowBorder ()
