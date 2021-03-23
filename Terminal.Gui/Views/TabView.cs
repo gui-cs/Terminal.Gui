@@ -401,11 +401,11 @@ namespace Terminal.Gui {
 				// while there is space for the tab
 				var tabTextWidth = tab.Text.Sum (c => Rune.ColumnWidth (c));
 
-				string text = tab.Text.ToString();
+				string text = tab.Text.ToString ();
 				var maxWidth = MaxTabTextWidth;
 
-				if(tabTextWidth > maxWidth){
-					text = tab.Text.ToString().Substring(0,(int)maxWidth);
+				if (tabTextWidth > maxWidth) {
+					text = tab.Text.ToString ().Substring (0, (int)maxWidth);
 					tabTextWidth = (int)maxWidth;
 				}
 
@@ -415,7 +415,7 @@ namespace Terminal.Gui {
 				}
 
 				// there is enough space!
-				yield return new TabToRender (i, tab,text, Equals (SelectedTab, tab), tabTextWidth);
+				yield return new TabToRender (i, tab, text, Equals (SelectedTab, tab), tabTextWidth);
 				i += tabTextWidth + 1;
 			}
 		}
@@ -662,16 +662,7 @@ namespace Terminal.Gui {
 			/// <param name="width"></param>
 			private void RenderUnderline (TabToRender [] tabLocations, int width)
 			{
-
-				int y;
-
-				if (host.Style.TabsOnBottom) {
-
-					y = 0;
-				} else {
-
-					y = host.Style.ShowTopLine ? 2 : 1;
-				}
+				int y = GetUnderlineYPosition ();
 
 				Move (0, y);
 
@@ -714,11 +705,27 @@ namespace Terminal.Gui {
 				}
 
 				// if there are mmore tabs to the right not visible
-				if (tabLocations.LastOrDefault ()?.Tab != host.Tabs.LastOrDefault ()) {
+				if (ShouldDrawRightScrollIndicator (tabLocations)) {
 					Move (width - 1, y);
 
 					// indicate that
 					Driver.AddRune (Driver.RightArrow);
+				}
+			}
+
+			private bool ShouldDrawRightScrollIndicator (TabToRender [] tabLocations)
+			{
+				return tabLocations.LastOrDefault ()?.Tab != host.Tabs.LastOrDefault ();
+			}
+
+			private int GetUnderlineYPosition ()
+			{
+				if (host.Style.TabsOnBottom) {
+
+					return 0;
+				} else {
+
+					return host.Style.ShowTopLine ? 2 : 1;
 				}
 			}
 
@@ -734,6 +741,33 @@ namespace Terminal.Gui {
 
 				if (me.Flags.HasFlag (MouseFlags.Button1Pressed)) {
 
+					var scrollIndicatorHit = ScreenToScrollIndicator (me.X, me.Y);
+
+					if (scrollIndicatorHit != 0) {
+
+						var visibleTabs = host.CalculateViewport (Bounds).ToArray ();
+						var allTabs = host.Tabs;
+						
+						// if nothing is selected, select last or first visible tab
+						if(host.SelectedTab == null || allTabs.IndexOf(host.selectedTab) == -1) {
+							host.SelectedTab = scrollIndicatorHit < 0 ? visibleTabs.FirstOrDefault ()?.Tab :
+							visibleTabs.LastOrDefault ()?.Tab;
+						}
+						else {
+							// something is selected, so adjust the tab 1 to right or left accordingly
+							var idx = allTabs.IndexOf (host.selectedTab);
+
+							// go + or - 1 idx
+							var newIdx = Math.Min (allTabs.Count - 1, Math.Max (0, idx + scrollIndicatorHit));
+
+							host.SelectedTab = allTabs.ElementAt(newIdx);
+							host.EnsureSelectedTabIsVisible ();
+						}
+
+						SetNeedsDisplay ();
+						return true;
+					}
+
 					var hit = ScreenToTab (me.X, me.Y);
 					if (hit != null) {
 						host.SelectedTab = hit;
@@ -745,6 +779,29 @@ namespace Terminal.Gui {
 				return false;
 			}
 
+			/// <summary>
+			/// Calculates whether scroll indicators are visible and if so whether the click
+			/// was on one of them.
+			/// </summary>
+			/// <param name="x"></param>
+			/// <param name="y"></param>
+			/// <returns>-1 for click in scroll left, 1 for scroll right or 0 for no hit</returns>
+			private int ScreenToScrollIndicator (int x, int y)
+			{
+				// scroll indicator is showing
+				if (host.TabScrollOffset > 0 && x == 0) {
+
+					return y == GetUnderlineYPosition () ? -1 : 0;
+				}
+
+				// scroll indicator is showing
+				if (x == Bounds.Width - 1 && ShouldDrawRightScrollIndicator (host.CalculateViewport (Bounds).ToArray ())) {
+
+					return y == GetUnderlineYPosition () ? 1 : 0;
+				}
+
+				return 0;
+			}
 
 			/// <summary>
 			/// Translates the client coordinates of a click into a tab when the click is on top of a tab
