@@ -243,10 +243,10 @@ namespace Terminal.Gui {
 			       bounds.Height - spaceAtBottom - startAtY), 0, true);
 			}
 
-
-			tabsBar.Redraw (tabsBar.Bounds);
-
-			contentView.Redraw (contentView.Bounds);
+			if(Tabs.Any()){
+				tabsBar.Redraw (tabsBar.Bounds);
+				contentView.Redraw (contentView.Bounds);
+			}
 		}
 
 		/// <summary>

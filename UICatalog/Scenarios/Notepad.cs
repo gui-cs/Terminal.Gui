@@ -69,6 +69,8 @@ namespace UICatalog.Scenarios {
 			tabView.SelectedTabChanged += (s, e) => UpdateStatus (e.NewTab);
 
 			Top.Add (statusBar);
+
+			New();
 		}
 
 		private void UpdateStatus (Tab newTab)
