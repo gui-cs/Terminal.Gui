@@ -79,6 +79,11 @@ namespace Terminal.Gui {
 		private Tab selectedTab;
 
 		/// <summary>
+		/// The default <see cref="MaxTabTextWidth"/> to set on new <see cref="TabView"/> controls
+		/// </summary>
+		public const int DefaultMaxTabTextWidth = 30;
+
+		/// <summary>
 		/// This sub view is the 2 or 3 line control that represents the actual tabs themselves
 		/// </summary>
 		TabRowView tabsBar;
@@ -103,6 +108,11 @@ namespace Terminal.Gui {
 		/// <value></value>
 		public int TabScrollOffset { get; set; }
 
+		/// <summary>
+		/// The maximum number of characters to render in a Tab header.  This prevents one long tab 
+		/// from pushing out all the others. Values less than 0 are ignored
+		/// </summary>
+		public int MaxTabTextWidth { get; set; } = DefaultMaxTabTextWidth;
 
 		/// <summary>
 		/// Event for when <see cref="SelectedTab"/> changes
@@ -391,13 +401,21 @@ namespace Terminal.Gui {
 				// while there is space for the tab
 				var tabTextWidth = tab.Text.Sum (c => Rune.ColumnWidth (c));
 
+				string text = tab.Text.ToString();
+				int maxWidth = Math.Max(0,MaxTabTextWidth);
+
+				if(tabTextWidth > maxWidth){
+					text = tab.Text.ToString().Substring(0,maxWidth);
+					tabTextWidth = maxWidth;
+				}
+
 				// if there is not enough space for this tab
 				if (i + tabTextWidth >= bounds.Width) {
 					break;
 				}
 
 				// there is enough space!
-				yield return new TabToRender (i, tab, Equals (SelectedTab, tab), tabTextWidth);
+				yield return new TabToRender (i, tab,text, Equals (SelectedTab, tab), tabTextWidth);
 				i += tabTextWidth + 1;
 			}
 		}
@@ -472,13 +490,15 @@ namespace Terminal.Gui {
 			/// <value></value>
 			public bool IsSelected { get; set; }
 			public int Width { get; }
+			public string TextToRender { get; }
 
-			public TabToRender (int x, Tab tab, bool isSelected, int width)
+			public TabToRender (int x, Tab tab, string textToRender, bool isSelected, int width)
 			{
 				X = x;
 				Tab = tab;
 				IsSelected = isSelected;
 				Width = width;
+				TextToRender = textToRender;
 			}
 		}
 
@@ -630,7 +650,7 @@ namespace Terminal.Gui {
 					}
 
 
-					Driver.AddStr (toRender.Tab.Text);
+					Driver.AddStr (toRender.TextToRender);
 					Driver.SetAttribute (ColorScheme.Normal);
 
 					if (toRender.IsSelected) {
