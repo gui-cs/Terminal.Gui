@@ -243,7 +243,7 @@ namespace Terminal.Gui {
 			       bounds.Height - spaceAtBottom - startAtY), 0, true);
 			}
 
-			if(Tabs.Any()){
+			if (Tabs.Any ()) {
 				tabsBar.Redraw (tabsBar.Bounds);
 				contentView.Redraw (contentView.Bounds);
 			}
@@ -747,20 +747,19 @@ namespace Terminal.Gui {
 
 						var visibleTabs = host.CalculateViewport (Bounds).ToArray ();
 						var allTabs = host.Tabs;
-						
+
 						// if nothing is selected, select last or first visible tab
-						if(host.SelectedTab == null || allTabs.IndexOf(host.selectedTab) == -1) {
+						if (host.SelectedTab == null || allTabs.IndexOf (host.selectedTab) == -1) {
 							host.SelectedTab = scrollIndicatorHit < 0 ? visibleTabs.FirstOrDefault ()?.Tab :
 							visibleTabs.LastOrDefault ()?.Tab;
-						}
-						else {
+						} else {
 							// something is selected, so adjust the tab 1 to right or left accordingly
 							var idx = allTabs.IndexOf (host.selectedTab);
 
 							// go + or - 1 idx
 							var newIdx = Math.Min (allTabs.Count - 1, Math.Max (0, idx + scrollIndicatorHit));
 
-							host.SelectedTab = allTabs.ElementAt(newIdx);
+							host.SelectedTab = allTabs.ElementAt (newIdx);
 							host.EnsureSelectedTabIsVisible ();
 						}
 

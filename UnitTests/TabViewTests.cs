@@ -8,96 +8,95 @@ using Xunit;
 using System.Globalization;
 
 namespace UnitTests {
-	public class TabViewTests 
-	{
-        private TabView GetTabView()
-        {
-            return GetTabView(out _, out _);
-        }
+	public class TabViewTests {
+		private TabView GetTabView ()
+		{
+			return GetTabView (out _, out _);
+		}
 
-        private TabView GetTabView(out Tab tab1, out Tab tab2)
-        {
-            InitFakeDriver();
+		private TabView GetTabView (out Tab tab1, out Tab tab2)
+		{
+			InitFakeDriver ();
 
-            var tv = new TabView();
-            tv.AddTab(tab1 = new Tab("Tab1",new TextField("hi")),false);
-            tv.AddTab(tab2 = new Tab("Tab2",new Label("hi2")),false);
-            return tv;
-        }
+			var tv = new TabView ();
+			tv.AddTab (tab1 = new Tab ("Tab1", new TextField ("hi")), false);
+			tv.AddTab (tab2 = new Tab ("Tab2", new Label ("hi2")), false);
+			return tv;
+		}
 
-        [Fact]
-        public void AddTwoTabs_SecondIsSelected()
-        {
-            InitFakeDriver();
+		[Fact]
+		public void AddTwoTabs_SecondIsSelected ()
+		{
+			InitFakeDriver ();
 
-            var tv = new TabView();
-            Tab tab1;
-            Tab tab2;
-            tv.AddTab(tab1 = new Tab("Tab1",new TextField("hi")),false);
-            tv.AddTab(tab2 = new Tab("Tab1",new Label("hi2")),true);
+			var tv = new TabView ();
+			Tab tab1;
+			Tab tab2;
+			tv.AddTab (tab1 = new Tab ("Tab1", new TextField ("hi")), false);
+			tv.AddTab (tab2 = new Tab ("Tab1", new Label ("hi2")), true);
 
-            Assert.Equal(2,tv.Tabs.Count);
-            Assert.Equal(tab2,tv.SelectedTab);   
+			Assert.Equal (2, tv.Tabs.Count);
+			Assert.Equal (tab2, tv.SelectedTab);
 		}
 
 
-        [Fact]
-        public void EnsureSelectedTabVisible_NullSelect()
-        {
-            var tv = GetTabView();
+		[Fact]
+		public void EnsureSelectedTabVisible_NullSelect ()
+		{
+			var tv = GetTabView ();
 
-            tv.SelectedTab = null;
+			tv.SelectedTab = null;
 
-            Assert.Null(tv.SelectedTab);
-            Assert.Equal(0,tv.TabScrollOffset);
+			Assert.Null (tv.SelectedTab);
+			Assert.Equal (0, tv.TabScrollOffset);
 
-            tv.EnsureSelectedTabIsVisible();
+			tv.EnsureSelectedTabIsVisible ();
 
-            Assert.Null(tv.SelectedTab);
-            Assert.Equal(0,tv.TabScrollOffset);
+			Assert.Null (tv.SelectedTab);
+			Assert.Equal (0, tv.TabScrollOffset);
 		}
 
-        [Fact]
-        public void EnsureSelectedTabVisible_MustScroll()
-        {
-            var tv = GetTabView(out var tab1, out var tab2);
+		[Fact]
+		public void EnsureSelectedTabVisible_MustScroll ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2);
 
-            // Make tab width small to force only one tab visible at once
-            tv.Width = 4;
+			// Make tab width small to force only one tab visible at once
+			tv.Width = 4;
 
-            tv.SelectedTab = tab1;
-            Assert.Equal(0,tv.TabScrollOffset);
-            tv.EnsureSelectedTabIsVisible();
-            Assert.Equal(0,tv.TabScrollOffset);
+			tv.SelectedTab = tab1;
+			Assert.Equal (0, tv.TabScrollOffset);
+			tv.EnsureSelectedTabIsVisible ();
+			Assert.Equal (0, tv.TabScrollOffset);
 
-            // Asking to show tab2 should automatically move scroll offset accordingly
-            tv.SelectedTab = tab2;
-            Assert.Equal(1,tv.TabScrollOffset);
+			// Asking to show tab2 should automatically move scroll offset accordingly
+			tv.SelectedTab = tab2;
+			Assert.Equal (1, tv.TabScrollOffset);
 		}
 
 
-        [Fact]
-        public void SelectedTabChanged_Called()
-        {
-            var tv = GetTabView(out var tab1, out var tab2);
+		[Fact]
+		public void SelectedTabChanged_Called ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2);
 
-            tv.SelectedTab = tab1;
+			tv.SelectedTab = tab1;
 
-            Tab oldTab = null;
-            Tab newTab = null;
-            int called = 0;
+			Tab oldTab = null;
+			Tab newTab = null;
+			int called = 0;
 
-            tv.SelectedTabChanged += (s,e)=>{
-                oldTab = e.OldTab;
-                newTab = e.NewTab;
-                called++;
-                };
-            
-            tv.SelectedTab = tab2;
+			tv.SelectedTabChanged += (s, e) => {
+				oldTab = e.OldTab;
+				newTab = e.NewTab;
+				called++;
+			};
 
-            Assert.Equal(1,called);
-            Assert.Equal(tab1,oldTab);
-            Assert.Equal(tab2,newTab);
+			tv.SelectedTab = tab2;
+
+			Assert.Equal (1, called);
+			Assert.Equal (tab1, oldTab);
+			Assert.Equal (tab2, newTab);
 		}
 
 		private void InitFakeDriver ()

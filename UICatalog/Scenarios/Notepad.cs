@@ -70,7 +70,7 @@ namespace UICatalog.Scenarios {
 
 			Top.Add (statusBar);
 
-			New();
+			New ();
 		}
 
 		private void UpdateStatus (Tab newTab)
@@ -108,14 +108,14 @@ namespace UICatalog.Scenarios {
 
 			// close and dispose the tab
 			tabView.RemoveTab (tab);
-			tab.View.Dispose();
+			tab.View.Dispose ();
 
 		}
 
 		private void Open ()
 		{
-			
-			var open = new FileDialog("Open File","Open","File","Select which file to open");
+
+			var open = new FileDialog ("Open File", "Open", "File", "Select which file to open");
 
 			Application.Run (open);
 
