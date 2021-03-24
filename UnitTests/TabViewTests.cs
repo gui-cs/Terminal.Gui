@@ -98,6 +98,113 @@ namespace UnitTests {
 			Assert.Equal (tab1, oldTab);
 			Assert.Equal (tab2, newTab);
 		}
+		[Fact]
+		public void RemoveTab_ChangesSelection ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2);
+
+			tv.SelectedTab = tab1;
+			tv.RemoveTab (tab1);
+
+			Assert.Equal (tab2, tv.SelectedTab);
+		}
+
+		[Fact]
+		public void RemoveTab_MultipleCalls_NotAnError ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2);
+
+			tv.SelectedTab = tab1;
+
+			// Repeated calls to remove a tab that is not part of
+			// the collection should be ignored
+			tv.RemoveTab (tab1);
+			tv.RemoveTab (tab1);
+			tv.RemoveTab (tab1);
+			tv.RemoveTab (tab1);
+
+			Assert.Equal (tab2, tv.SelectedTab);
+		}
+
+		[Fact]
+		public void RemoveAllTabs_ClearsSelection ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2);
+
+			tv.SelectedTab = tab1;
+			tv.RemoveTab (tab1);
+			tv.RemoveTab (tab2);
+
+			Assert.Null (tv.SelectedTab);
+		}
+
+		[Fact]
+		public void SwitchTabBy_NormalUsage ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2);
+
+			Tab tab3;
+			Tab tab4;
+			Tab tab5;
+
+			tv.AddTab (tab3 = new Tab (), false);
+			tv.AddTab (tab4 = new Tab (), false);
+			tv.AddTab (tab5 = new Tab (), false);
+
+			tv.SelectedTab = tab1;
+
+			int called = 0;
+			tv.SelectedTabChanged += (s, e) => { called++; };
+
+			tv.SwitchTabBy (1);
+
+			Assert.Equal (1, called);
+			Assert.Equal (tab2, tv.SelectedTab);
+
+			//reset called counter
+			called = 0;
+
+			// go right 2
+			tv.SwitchTabBy (2);
+
+			// even though we go right 2 indexes the event should only be called once
+			Assert.Equal (1, called);
+			Assert.Equal (tab4, tv.SelectedTab);
+		}
+
+		[Fact]
+		public void AddTab_SameTabMoreThanOnce ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2);
+
+			Assert.Equal (2, tv.Tabs.Count);
+
+			// Tab is already part of the control so shouldn't result in duplication
+			tv.AddTab (tab1, false);
+			tv.AddTab (tab1, false);
+			tv.AddTab (tab1, false);
+			tv.AddTab (tab1, false);
+
+			Assert.Equal (2, tv.Tabs.Count);
+		}
+
+
+
+		[Fact]
+		public void SwitchTabBy_OutOfTabsRange ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2);
+
+			tv.SelectedTab = tab1;
+			tv.SwitchTabBy (500);
+
+			Assert.Equal (tab2, tv.SelectedTab);
+
+			tv.SwitchTabBy (-500);
+
+			Assert.Equal (tab1, tv.SelectedTab);
+
+		}
 
 		private void InitFakeDriver ()
 		{

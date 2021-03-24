@@ -428,6 +428,11 @@ namespace Terminal.Gui {
 		/// <param name="andSelect">True to make the newly added Tab the <see cref="SelectedTab"/></param>
 		public void AddTab (Tab tab, bool andSelect)
 		{
+			if (tabs.Contains (tab)) {
+				return;
+			}
+
+
 			tabs.Add (tab);
 
 			if (SelectedTab == null || andSelect) {
