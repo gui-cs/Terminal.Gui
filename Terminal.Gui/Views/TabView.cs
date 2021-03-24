@@ -736,7 +736,9 @@ namespace Terminal.Gui {
 
 			public override bool MouseEvent (MouseEvent me)
 			{
-				if (!me.Flags.HasFlag (MouseFlags.Button1Pressed))
+				if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && 
+				!me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
+				!me.Flags.HasFlag (MouseFlags.Button1TripleClicked))
 					return false;
 
 				if (!HasFocus && CanFocus) {
@@ -744,9 +746,21 @@ namespace Terminal.Gui {
 				}
 
 
-				if (me.Flags.HasFlag (MouseFlags.Button1Pressed)) {
+				if (me.Flags.HasFlag (MouseFlags.Button1Clicked) ||
+				me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) ||
+				me.Flags.HasFlag (MouseFlags.Button1TripleClicked)) {
 
 					var scrollIndicatorHit = ScreenToScrollIndicator (me.X, me.Y);
+
+					var multiple = 1;
+					if( me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)){
+						multiple = 2;
+					}
+					if( me.Flags.HasFlag (MouseFlags.Button1TripleClicked)){
+						multiple = 3;
+					}
+
+					scrollIndicatorHit *= multiple;
 
 					if (scrollIndicatorHit != 0) {
 
