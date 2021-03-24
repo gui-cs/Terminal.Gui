@@ -752,35 +752,9 @@ namespace Terminal.Gui {
 
 					var scrollIndicatorHit = ScreenToScrollIndicator (me.X, me.Y);
 
-					var multiple = 1;
-					if( me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)){
-						multiple = 2;
-					}
-					if( me.Flags.HasFlag (MouseFlags.Button1TripleClicked)){
-						multiple = 3;
-					}
-
-					scrollIndicatorHit *= multiple;
-
 					if (scrollIndicatorHit != 0) {
 
-						var visibleTabs = host.CalculateViewport (Bounds).ToArray ();
-						var allTabs = host.Tabs;
-
-						// if nothing is selected, select last or first visible tab
-						if (host.SelectedTab == null || allTabs.IndexOf (host.selectedTab) == -1) {
-							host.SelectedTab = scrollIndicatorHit < 0 ? visibleTabs.FirstOrDefault ()?.Tab :
-							visibleTabs.LastOrDefault ()?.Tab;
-						} else {
-							// something is selected, so adjust the tab 1 to right or left accordingly
-							var idx = allTabs.IndexOf (host.selectedTab);
-
-							// go + or - 1 idx
-							var newIdx = Math.Min (allTabs.Count - 1, Math.Max (0, idx + scrollIndicatorHit));
-
-							host.SelectedTab = allTabs.ElementAt (newIdx);
-							host.EnsureSelectedTabIsVisible ();
-						}
+						host.SwitchTabBy (scrollIndicatorHit);
 
 						SetNeedsDisplay ();
 						return true;
