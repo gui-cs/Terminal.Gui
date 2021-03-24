@@ -115,17 +115,22 @@ namespace UICatalog.Scenarios {
 		private void Open ()
 		{
 
-			var open = new FileDialog ("Open File", "Open", "File", "Select which file to open");
+			var open = new OpenDialog ("Open", "Open a file") { AllowsMultipleSelection = true };
 
 			Application.Run (open);
 
-			var path = open.FilePath?.ToString ();
+			if (!open.Canceled) {
 
-			if (string.IsNullOrEmpty (path) || !File.Exists (path)) {
-				return;
+				foreach (var path in open.FilePaths) {
+
+					if (string.IsNullOrEmpty (path) || !File.Exists (path)) {
+						return;
+					}
+
+					Open (File.ReadAllText (path), new FileInfo (path), Path.GetFileName (path));
+				}
 			}
 
-			Open (File.ReadAllText (path), new FileInfo (path), Path.GetFileName (path));
 		}
 
 		/// <summary>
