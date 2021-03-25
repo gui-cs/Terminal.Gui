@@ -77,7 +77,7 @@ namespace UICatalog {
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-
+				BottomOffset = 1
 			};
 
 			LoadFile ();
@@ -225,8 +225,10 @@ namespace UICatalog {
 				if (_textView.WordWrap) {
 					_scrollBar.AutoHideScrollBars = false;
 					_scrollBar.OtherScrollBarView.ShowScrollIndicator = false;
+					_textView.BottomOffset = 0;
 				} else {
 					_scrollBar.AutoHideScrollBars = true;
+					_textView.BottomOffset = 1;
 				}
 			};
 

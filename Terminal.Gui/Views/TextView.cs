@@ -79,8 +79,7 @@ namespace Terminal.Gui {
 		{
 			var lines = new List<List<Rune>> ();
 			int start = 0, i = 0;
-			// BUGBUG: I think this is buggy w.r.t Unicode. content.Length is bytes, and content[i] is bytes
-			// and content[i] == 10 may be the middle of a Rune.
+			// ASCII code 10 = Line Feed.
 			for (; i < content.Length; i++) {
 				if (content [i] == 10) {
 					if (i - start > 0)
@@ -151,7 +150,19 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>The line.</returns>
 		/// <param name="line">Line number to retrieve.</param>
-		public List<Rune> GetLine (int line) => line < Count ? lines [line] : lines [Count - 1];
+		public List<Rune> GetLine (int line)
+		{
+			if (lines.Count > 0) {
+				if (line < Count) {
+					return lines [line];
+				} else {
+					return lines [Count - 1];
+				}
+			} else {
+				lines.Add (new List<Rune> ());
+				return lines [0];
+			}
+		}
 
 		/// <summary>
 		/// Adds a line to the model at the specified position.
@@ -169,7 +180,9 @@ namespace Terminal.Gui {
 		/// <param name="pos">Position.</param>
 		public void RemoveLine (int pos)
 		{
-			lines.RemoveAt (pos);
+			if (lines.Count > 0) {
+				lines.RemoveAt (pos);
+			}
 		}
 
 		/// <summary>
@@ -277,6 +290,8 @@ namespace Terminal.Gui {
 		}
 
 		List<WrappedLine> wrappedModelLines = new List<WrappedLine> ();
+		int frameWidth;
+		bool isWrapModelRefreshing;
 
 		public TextModel Model { get; }
 
@@ -287,10 +302,12 @@ namespace Terminal.Gui {
 
 		public TextModel WrapModel (int width, out int nRow, out int nCol, int row = 0, int col = 0)
 		{
+			frameWidth = width;
+
+			var modelRow = isWrapModelRefreshing ? row : GetModelLineFromWrappedLines (row);
+			var modelCol = isWrapModelRefreshing ? col : GetModelColFromWrappedLines (row, col);
 			var wrappedModel = new TextModel ();
 			int lines = 0;
-			var modelRow = GetModelLineFromWrappedLines (row);
-			var modelCol = GetModelColFromWrappedLines (row, col);
 			nRow = 0;
 			nCol = 0;
 			bool isRowAndColSetted = row == 0 && col == 0;
@@ -374,6 +391,100 @@ namespace Terminal.Gui {
 			}
 
 			return modelCol;
+		}
+
+		List<Rune> GetCurrentLine (int row) => Model.GetLine (row);
+
+		public void AddLine (int row, int col)
+		{
+			var modelRow = GetModelLineFromWrappedLines (row);
+			var modelCol = GetModelColFromWrappedLines (row, col);
+			var line = GetCurrentLine (modelRow);
+			var restCount = line.Count - modelCol;
+			var rest = line.GetRange (modelCol, restCount);
+			line.RemoveRange (modelCol, restCount);
+			Model.AddLine (modelRow + 1, rest);
+			isWrapModelRefreshing = true;
+			WrapModel (frameWidth, out _, out _, modelRow + 1, 0);
+			isWrapModelRefreshing = false;
+		}
+
+		public bool Insert (int row, int col, Rune rune)
+		{
+			var line = GetCurrentLine (GetModelLineFromWrappedLines (row));
+			line.Insert (GetModelColFromWrappedLines (row, col), rune);
+			if (line.Count > frameWidth) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		public bool RemoveAt (int row, int col)
+		{
+			var modelRow = GetModelLineFromWrappedLines (row);
+			var line = GetCurrentLine (modelRow);
+			var modelCol = GetModelColFromWrappedLines (row, col);
+
+			if (modelCol >= line.Count) {
+				Model.RemoveLine (modelRow);
+				RemoveAt (row, 0);
+				return false;
+			}
+			line.RemoveAt (modelCol);
+			if (line.Count > frameWidth || (row + 1 < wrappedModelLines.Count
+				&& wrappedModelLines [row + 1].ModelLine == modelRow)) {
+				return true;
+			}
+
+			return false;
+		}
+
+		public bool RemoveLine (int row, int col, out bool lineRemoved, bool forward = true)
+		{
+			lineRemoved = false;
+			var modelRow = GetModelLineFromWrappedLines (row);
+			var line = GetCurrentLine (modelRow);
+			var modelCol = GetModelColFromWrappedLines (row, col);
+
+			if (modelCol == 0 && line.Count == 0) {
+				Model.RemoveLine (modelRow);
+				return false;
+			} else if (modelCol < line.Count) {
+				if (forward) {
+					line.RemoveAt (modelCol);
+					return true;
+				} else if (modelCol - 1 > -1) {
+					line.RemoveAt (modelCol - 1);
+					return true;
+				}
+			}
+			lineRemoved = true;
+			if (forward) {
+				if (modelRow + 1 == Model.Count) {
+					return false;
+				}
+
+				var nextLine = Model.GetLine (modelRow + 1);
+				line.AddRange (nextLine);
+				Model.RemoveLine (modelRow + 1);
+				if (line.Count > frameWidth) {
+					return true;
+				}
+			} else {
+				if (modelRow == 0) {
+					return false;
+				}
+
+				var prevLine = Model.GetLine (modelRow - 1);
+				prevLine.AddRange (line);
+				Model.RemoveLine (modelRow);
+				if (prevLine.Count > frameWidth) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 	}
 
@@ -568,15 +679,20 @@ namespace Terminal.Gui {
 			get => base.Frame;
 			set {
 				base.Frame = value;
-				if (wordWrap && wrapManager != null) {
-					model = wrapManager.WrapModel (Frame.Width - 2,
-						out int nRow, out int nCol,
-						currentRow, currentColumn);
-					currentRow = nRow;
-					currentColumn = nCol;
-					SetNeedsDisplay ();
-				}
+				WrapTextModel ();
 				Adjust ();
+			}
+		}
+
+		void WrapTextModel ()
+		{
+			if (wordWrap && wrapManager != null) {
+				model = wrapManager.WrapModel (Frame.Width - 2,
+					out int nRow, out int nCol,
+					currentRow, currentColumn);
+				currentRow = nRow;
+				currentColumn = nCol;
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -620,6 +736,12 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 			}
 		}
+
+		/// <summary>
+		/// The bottom offset needed to use a horizontal scrollbar or for another reason.
+		/// This is only needed with the keyboard navigation.
+		/// </summary>
+		public int BottomOffset { get; set; }
 
 		CursorVisibility savedCursorVisibility = CursorVisibility.Default;
 
@@ -935,16 +1057,23 @@ namespace Terminal.Gui {
 
 		void AppendClipboard (ustring text)
 		{
-			Clipboard.Contents = Clipboard.Contents + text;
+			Clipboard.Contents += text;
 		}
 
 		void Insert (Rune rune)
 		{
 			var line = GetCurrentLine ();
-			line.Insert (currentColumn, rune);
+			line.Insert (Math.Min (currentColumn, line.Count), rune);
+			if (wordWrap) {
+				wrapNeeded = wrapManager.Insert (currentRow, currentColumn, rune);
+				if (wrapNeeded) {
+					SetNeedsDisplay ();
+				}
+			}
 			var prow = currentRow - topRow;
-
-			SetNeedsDisplay (new Rect (0, prow, Frame.Width, prow + 1));
+			if (!wrapNeeded) {
+				SetNeedsDisplay (new Rect (0, prow, Frame.Width, prow + 1));
+			}
 		}
 
 		ustring StringFromRunes (List<Rune> runes)
@@ -990,25 +1119,33 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			// Keep a copy of the rest of the line
-			var restCount = line.Count - currentColumn;
-			var rest = line.GetRange (currentColumn, restCount);
-			line.RemoveRange (currentColumn, restCount);
+			List<Rune> rest = null;
+			int lastp = 0;
+
+			if (model.Count > 0 && currentColumn > 0) {
+				// Keep a copy of the rest of the line
+				var restCount = line.Count - currentColumn;
+				rest = line.GetRange (currentColumn, restCount);
+				line.RemoveRange (currentColumn, restCount);
+			}
 
 			// First line is inserted at the current location, the rest is appended
-			line.InsertRange (currentColumn, lines [0]);
+			//line.InsertRange (currentColumn, lines [0]);
+			model.AddLine (currentRow, lines [0]);
 
 			for (int i = 1; i < lines.Count; i++) {
 				model.AddLine (currentRow + i, lines [i]);
 			}
 
-			var last = model.GetLine (currentRow + lines.Count - 1);
-			var lastp = last.Count;
-			last.InsertRange (last.Count, rest);
+			if (rest != null) {
+				var last = model.GetLine (currentRow + lines.Count - 1);
+				lastp = last.Count;
+				last.InsertRange (last.Count, rest);
+			}
 
 			// Now adjust column and row positions
 			currentRow += lines.Count - 1;
-			currentColumn = lastp;
+			currentColumn = rest != null ? lastp : lines [lines.Count - 1].Count;
 			Adjust ();
 		}
 
@@ -1033,7 +1170,7 @@ namespace Terminal.Gui {
 		{
 			var offB = OffSetBackground ();
 			var line = GetCurrentLine ();
-			bool need = !NeedDisplay.IsEmpty;
+			bool need = !NeedDisplay.IsEmpty || wrapNeeded;
 			if (currentColumn < leftColumn) {
 				leftColumn = currentColumn;
 				need = true;
@@ -1046,11 +1183,15 @@ namespace Terminal.Gui {
 			if (currentRow < topRow) {
 				topRow = currentRow;
 				need = true;
-			} else if (currentRow - topRow >= Frame.Height + offB.height) {
-				topRow = Math.Min (Math.Max (currentRow - Frame.Height + 1, 0), currentRow);
+			} else if (currentRow - topRow + BottomOffset >= Frame.Height + offB.height) {
+				topRow = Math.Min (Math.Max (currentRow - Frame.Height + 1 + BottomOffset, 0), currentRow);
 				need = true;
 			}
 			if (need) {
+				if (wrapNeeded) {
+					WrapTextModel ();
+					wrapNeeded = false;
+				}
 				SetNeedsDisplay ();
 			} else {
 				PositionCursor ();
@@ -1092,12 +1233,14 @@ namespace Terminal.Gui {
 		}
 
 		bool lastWasKill;
+		bool wrapNeeded;
 
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			int restCount;
 			List<Rune> rest;
+			bool lineRemoved = false;
 
 			// Handle some state here - whether the last command was a kill
 			// operation and the column tracking (up/down)
@@ -1204,6 +1347,9 @@ namespace Terminal.Gui {
 					// Delete backwards 
 					currentLine = GetCurrentLine ();
 					currentLine.RemoveAt (currentColumn - 1);
+					if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn - 1)) {
+						wrapNeeded = true;
+					}
 					currentColumn--;
 					if (currentColumn < leftColumn) {
 						leftColumn--;
@@ -1219,8 +1365,15 @@ namespace Terminal.Gui {
 					var prevCount = prevRow.Count;
 					model.GetLine (prowIdx).AddRange (GetCurrentLine ());
 					model.RemoveLine (currentRow);
+					if (wordWrap && wrapManager.RemoveLine (currentRow, currentColumn, out lineRemoved, false)) {
+						wrapNeeded = true;
+					}
 					currentRow--;
-					currentColumn = prevCount;
+					if (wrapNeeded && !lineRemoved) {
+						currentColumn = prevCount - 1;
+					} else {
+						currentColumn = prevCount;
+					}
 					Adjust ();
 				}
 				break;
@@ -1242,10 +1395,16 @@ namespace Terminal.Gui {
 					var nextLine = model.GetLine (currentRow + 1);
 					currentLine.AddRange (nextLine);
 					model.RemoveLine (currentRow + 1);
+					if (wordWrap && wrapManager.RemoveLine (currentRow, currentColumn, out _)) {
+						wrapNeeded = true;
+					}
 					var sr = currentRow - topRow;
 					SetNeedsDisplay (new Rect (0, sr, Frame.Width, sr + 1));
 				} else {
 					currentLine.RemoveAt (currentColumn);
+					if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn)) {
+						wrapNeeded = true;
+					}
 					var r = currentRow - topRow;
 					SetNeedsDisplay (new Rect (currentColumn - leftColumn, r, Frame.Width, r + 1));
 				}
@@ -1265,20 +1424,38 @@ namespace Terminal.Gui {
 				currentLine = GetCurrentLine ();
 				if (currentLine.Count == 0) {
 					model.RemoveLine (currentRow);
-					var val = ustring.Make ((Rune)'\n');
-					if (lastWasKill)
-						AppendClipboard (val);
-					else
-						SetClipboard (val);
+					if (model.Count > 0) {
+						var val = ustring.Make ((Rune)'\n');
+						if (lastWasKill) {
+							AppendClipboard (val);
+						} else {
+							SetClipboard (val);
+						}
+					}
+					if (currentRow > 0) {
+						currentRow--;
+					}
 				} else {
 					restCount = currentLine.Count - currentColumn;
 					rest = currentLine.GetRange (currentColumn, restCount);
-					var val = StringFromRunes (rest);
-					if (lastWasKill)
+					var val = ustring.Empty;
+					if (currentColumn == 0 && currentRow > 0 && lastWasKill) {
+						val = ustring.Make ((Rune)'\n');
+					}
+					val += StringFromRunes (rest);
+					if (lastWasKill) {
 						AppendClipboard (val);
-					else
+					} else {
 						SetClipboard (val);
-					currentLine.RemoveRange (currentColumn, restCount);
+					}
+					if (currentColumn == 0) {
+						model.RemoveLine (currentRow);
+						if (currentRow > 0) {
+							currentRow--;
+						}
+					} else {
+						currentLine.RemoveRange (currentColumn, restCount);
+					}
 				}
 				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
 				lastWasKill = true;
@@ -1334,6 +1511,10 @@ namespace Terminal.Gui {
 				rest = currentLine.GetRange (currentColumn, restCount);
 				currentLine.RemoveRange (currentColumn, restCount);
 				model.AddLine (currentRow + 1, rest);
+				if (wordWrap) {
+					wrapManager.AddLine (currentRow, currentColumn);
+					wrapNeeded = true;
+				}
 				currentRow++;
 				bool fullNeedsDisplay = false;
 				if (currentRow >= topRow + Frame.Height) {
@@ -1373,9 +1554,14 @@ namespace Terminal.Gui {
 					leftColumn++;
 					SetNeedsDisplay ();
 				}
-				PositionCursor ();
-				return true;
+				break;
 			}
+			if (NeedDisplay.IsEmpty) {
+				PositionCursor ();
+			} else {
+				Adjust ();
+			}
+
 			return true;
 		}
 
@@ -1402,7 +1588,7 @@ namespace Terminal.Gui {
 					columnTrack = currentColumn;
 				}
 				currentRow++;
-				if (currentRow >= topRow + Frame.Height) {
+				if (currentRow + BottomOffset >= topRow + Frame.Height) {
 					topRow++;
 					SetNeedsDisplay ();
 				}
@@ -1441,6 +1627,8 @@ namespace Terminal.Gui {
 		public void MoveEnd ()
 		{
 			currentRow = model.Count - 1;
+			var line = GetCurrentLine ();
+			currentColumn = line.Count;
 			TrackColumn ();
 			PositionCursor ();
 		}
@@ -1451,6 +1639,7 @@ namespace Terminal.Gui {
 		public void MoveHome ()
 		{
 			currentRow = 0;
+			currentColumn = 0;
 			TrackColumn ();
 			PositionCursor ();
 		}
