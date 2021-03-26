@@ -487,10 +487,12 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		public void UpdateModel (TextModel model, int row, int col)
+		public void UpdateModel (TextModel model, out int nRow, out int nCol, int row, int col)
 		{
+			isWrapModelRefreshing = true;
 			Model = model;
-			WrapModel (frameWidth, out _, out _, row, col);
+			WrapModel (frameWidth, out nRow, out nCol, row, col);
+			isWrapModelRefreshing = false;
 		}
 	}
 
@@ -1435,9 +1437,10 @@ namespace Terminal.Gui {
 			case Key.K | Key.CtrlMask: // kill-to-end
 				if (isReadOnly)
 					break;
+				var cRow = currentRow;
 				if (wordWrap) {
-					currentRow = wrapManager.GetModelLineFromWrappedLines (currentRow);
-					currentColumn = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
+					currentRow = wrapManager.GetModelLineFromWrappedLines (cRow);
+					currentColumn = wrapManager.GetModelColFromWrappedLines (cRow, currentColumn);
 					model = wrapManager.Model;
 				}
 				currentLine = GetCurrentLine ();
@@ -1486,7 +1489,10 @@ namespace Terminal.Gui {
 					}
 				}
 				if (wordWrap) {
-					wrapManager.UpdateModel (model, currentRow, CurrentColumn);
+					wrapManager.UpdateModel (model, out int nRow, out int nCol,
+						currentRow, currentColumn);
+					currentRow = nRow;
+					currentColumn = nCol;
 					wrapNeeded = true;
 				}
 				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
@@ -1497,13 +1503,17 @@ namespace Terminal.Gui {
 				if (isReadOnly)
 					break;
 				if (wordWrap) {
-					currentRow = wrapManager.GetModelLineFromWrappedLines (currentRow);
-					currentColumn = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
+					cRow = currentRow;
+					currentRow = wrapManager.GetModelLineFromWrappedLines (cRow);
+					currentColumn = wrapManager.GetModelColFromWrappedLines (cRow, currentColumn);
 					model = wrapManager.Model;
 				}
 				InsertText (Clipboard.Contents);
 				if (wordWrap) {
-					wrapManager.UpdateModel (model, currentRow, CurrentColumn);
+					wrapManager.UpdateModel (model, out int nRow, out int nCol,
+						currentRow, currentColumn);
+					currentRow = nRow;
+					currentColumn = nCol;
 					wrapNeeded = true;
 				}
 				selecting = false;
