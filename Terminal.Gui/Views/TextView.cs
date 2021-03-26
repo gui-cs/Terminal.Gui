@@ -663,12 +663,20 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public override ustring Text {
 			get {
-				return model.ToString ();
+				if (wordWrap) {
+					return wrapManager.Model.ToString ();
+				} else {
+					return model.ToString ();
+				}
 			}
 
 			set {
 				ResetPosition ();
 				model.LoadString (value);
+				if (wordWrap) {
+					wrapManager = new WordWrapManager (model);
+					model = wrapManager.WrapModel (Frame.Width - 2, out _, out _);
+				}
 				TextChanged?.Invoke ();
 				SetNeedsDisplay ();
 			}
@@ -997,7 +1005,7 @@ namespace Terminal.Gui {
 			ColorNormal ();
 
 			int bottom = bounds.Bottom;
-			int right = bounds.Right;
+			int right = bounds.Right + 1;
 			for (int row = bounds.Top; row < bottom; row++) {
 				int textLine = topRow + row;
 				if (textLine >= model.Count) {
