@@ -1127,7 +1127,7 @@ namespace Terminal.Gui {
 				line.InsertRange (currentColumn, lines [0]);
 				currentColumn += lines [0].Count;
 				if (!wordWrap && currentColumn - leftColumn > Frame.Width) {
-					leftColumn = currentColumn - Frame.Width + 1;
+					leftColumn = Math.Max (currentColumn - Frame.Width + 1, 0);
 				}
 				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, currentRow - topRow + 1));
 				return;
@@ -1384,7 +1384,7 @@ namespace Terminal.Gui {
 					}
 					currentRow--;
 					if (wrapNeeded && !lineRemoved) {
-						currentColumn = prevCount - 1;
+						currentColumn = Math.Max (prevCount - 1, 0);
 					} else {
 						currentColumn = prevCount;
 					}
@@ -1441,6 +1441,7 @@ namespace Terminal.Gui {
 					model = wrapManager.Model;
 				}
 				currentLine = GetCurrentLine ();
+				var setLastWasKill = true;
 				if (currentLine.Count == 0) {
 					model.RemoveLine (currentRow);
 					if (model.Count > 0 || lastWasKill) {
@@ -1450,10 +1451,10 @@ namespace Terminal.Gui {
 						} else {
 							SetClipboard (val);
 						}
-						if (model.Count == 0) {
-							// Prevents from adding line feeds if there is no more lines.
-							lastWasKill = false;
-						}
+					}
+					if (model.Count == 0) {
+						// Prevents from adding line feeds if there is no more lines.
+						setLastWasKill = false;
 					}
 					if (currentRow > 0) {
 						currentRow--;
@@ -1462,8 +1463,7 @@ namespace Terminal.Gui {
 					restCount = currentLine.Count - currentColumn;
 					rest = currentLine.GetRange (currentColumn, restCount);
 					var val = ustring.Empty;
-					if (currentColumn == 0 && lastWasKill && Clipboard.Contents.Length > 0
-						&& !Clipboard.Contents.StartsWith ("\n")) {
+					if (currentColumn == 0 && lastWasKill && currentLine.Count > 0) {
 						val = ustring.Make ((Rune)'\n');
 					}
 					val += StringFromRunes (rest);
@@ -1480,13 +1480,17 @@ namespace Terminal.Gui {
 					} else {
 						currentLine.RemoveRange (currentColumn, restCount);
 					}
+					if (model.Count == 0) {
+						// Prevents from adding line feeds if there is no more lines.
+						setLastWasKill = false;
+					}
 				}
 				if (wordWrap) {
 					wrapManager.UpdateModel (model, currentRow, CurrentColumn);
 					wrapNeeded = true;
 				}
 				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
-				lastWasKill = true;
+				lastWasKill = setLastWasKill;
 				break;
 
 			case Key.Y | Key.CtrlMask: // Control-y, yank
@@ -1819,7 +1823,7 @@ namespace Terminal.Gui {
 					var r = GetCurrentLine ();
 					var idx = TextModel.GetColFromX (r, leftColumn, ev.X);
 					if (idx - leftColumn >= r.Count) {
-						currentColumn = r.Count - leftColumn;
+						currentColumn = Math.Max (r.Count - leftColumn, 0);
 					} else {
 						currentColumn = idx + leftColumn;
 					}
