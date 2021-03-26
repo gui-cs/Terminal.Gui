@@ -1144,8 +1144,8 @@ namespace Terminal.Gui {
 			}
 
 			// First line is inserted at the current location, the rest is appended
-			//line.InsertRange (currentColumn, lines [0]);
-			model.AddLine (currentRow, lines [0]);
+			line.InsertRange (currentColumn, lines [0]);
+			//model.AddLine (currentRow, lines [0]);
 
 			for (int i = 1; i < lines.Count; i++) {
 				model.AddLine (currentRow + i, lines [i]);
@@ -1443,12 +1443,16 @@ namespace Terminal.Gui {
 				currentLine = GetCurrentLine ();
 				if (currentLine.Count == 0) {
 					model.RemoveLine (currentRow);
-					if (model.Count > 0) {
+					if (model.Count > 0 || lastWasKill) {
 						var val = ustring.Make ((Rune)'\n');
 						if (lastWasKill) {
 							AppendClipboard (val);
 						} else {
 							SetClipboard (val);
+						}
+						if (model.Count == 0) {
+							// Prevents from adding line feeds if there is no more lines.
+							lastWasKill = false;
 						}
 					}
 					if (currentRow > 0) {
