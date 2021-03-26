@@ -1447,7 +1447,8 @@ namespace Terminal.Gui {
 					restCount = currentLine.Count - currentColumn;
 					rest = currentLine.GetRange (currentColumn, restCount);
 					var val = ustring.Empty;
-					if (currentColumn == 0 && currentRow > 0 && lastWasKill) {
+					if (currentColumn == 0 && lastWasKill && Clipboard.Contents.Length > 0
+						&& !Clipboard.Contents.StartsWith ("\n")) {
 						val = ustring.Make ((Rune)'\n');
 					}
 					val += StringFromRunes (rest);
