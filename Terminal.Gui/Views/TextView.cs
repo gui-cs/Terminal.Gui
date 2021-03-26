@@ -293,7 +293,7 @@ namespace Terminal.Gui {
 		int frameWidth;
 		bool isWrapModelRefreshing;
 
-		public TextModel Model { get; }
+		public TextModel Model { get; private set; }
 
 		public WordWrapManager (TextModel model)
 		{
@@ -485,6 +485,12 @@ namespace Terminal.Gui {
 			}
 
 			return false;
+		}
+
+		public void UpdateModel (TextModel model, int row, int col)
+		{
+			Model = model;
+			WrapModel (frameWidth, out _, out _, row, col);
 		}
 	}
 
@@ -1120,7 +1126,7 @@ namespace Terminal.Gui {
 			if (lines.Count == 1) {
 				line.InsertRange (currentColumn, lines [0]);
 				currentColumn += lines [0].Count;
-				if (currentColumn - leftColumn > Frame.Width) {
+				if (!wordWrap && currentColumn - leftColumn > Frame.Width) {
 					leftColumn = currentColumn - Frame.Width + 1;
 				}
 				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, currentRow - topRow + 1));
@@ -1179,11 +1185,11 @@ namespace Terminal.Gui {
 			var offB = OffSetBackground ();
 			var line = GetCurrentLine ();
 			bool need = !NeedDisplay.IsEmpty || wrapNeeded;
-			if (currentColumn < leftColumn) {
+			if (!wordWrap && currentColumn < leftColumn) {
 				leftColumn = currentColumn;
 				need = true;
-			} else if (currentColumn - leftColumn > Frame.Width + offB.width ||
-				TextModel.DisplaySize (line, leftColumn, currentColumn).size >= Frame.Width + offB.width) {
+			} else if (!wordWrap && (currentColumn - leftColumn > Frame.Width + offB.width ||
+				TextModel.DisplaySize (line, leftColumn, currentColumn).size >= Frame.Width + offB.width)) {
 				leftColumn = Math.Max (TextModel.CalculateLeftColumn (line, leftColumn,
 					currentColumn, Frame.Width - 1 + offB.width, currentColumn), 0);
 				need = true;
@@ -1233,7 +1239,7 @@ namespace Terminal.Gui {
 			}
 			if (isRow) {
 				topRow = Math.Max (idx > model.Count - 1 ? model.Count - 1 : idx, 0);
-			} else {
+			} else if (!wordWrap) {
 				var maxlength = model.GetMaxVisibleLine (topRow, topRow + Frame.Height);
 				leftColumn = Math.Max (idx > maxlength - 1 ? maxlength - 1 : idx, 0);
 			}
@@ -1429,6 +1435,11 @@ namespace Terminal.Gui {
 			case Key.K | Key.CtrlMask: // kill-to-end
 				if (isReadOnly)
 					break;
+				if (wordWrap) {
+					currentRow = wrapManager.GetModelLineFromWrappedLines (currentRow);
+					currentColumn = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
+					model = wrapManager.Model;
+				}
 				currentLine = GetCurrentLine ();
 				if (currentLine.Count == 0) {
 					model.RemoveLine (currentRow);
@@ -1466,6 +1477,10 @@ namespace Terminal.Gui {
 						currentLine.RemoveRange (currentColumn, restCount);
 					}
 				}
+				if (wordWrap) {
+					wrapManager.UpdateModel (model, currentRow, CurrentColumn);
+					wrapNeeded = true;
+				}
 				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
 				lastWasKill = true;
 				break;
@@ -1473,7 +1488,16 @@ namespace Terminal.Gui {
 			case Key.Y | Key.CtrlMask: // Control-y, yank
 				if (isReadOnly)
 					break;
+				if (wordWrap) {
+					currentRow = wrapManager.GetModelLineFromWrappedLines (currentRow);
+					currentColumn = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
+					model = wrapManager.Model;
+				}
 				InsertText (Clipboard.Contents);
+				if (wordWrap) {
+					wrapManager.UpdateModel (model, currentRow, CurrentColumn);
+					wrapNeeded = true;
+				}
 				selecting = false;
 				break;
 
@@ -1531,7 +1555,7 @@ namespace Terminal.Gui {
 					fullNeedsDisplay = true;
 				}
 				currentColumn = 0;
-				if (currentColumn < leftColumn) {
+				if (!wordWrap && currentColumn < leftColumn) {
 					fullNeedsDisplay = true;
 					leftColumn = 0;
 				}
