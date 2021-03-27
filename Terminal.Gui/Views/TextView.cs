@@ -1670,7 +1670,11 @@ namespace Terminal.Gui {
 			}
 		}
 
-		Rune RuneAt (int col, int row) => model.GetLine (row) [col];
+		Rune RuneAt (int col, int row)
+		{
+			var line = model.GetLine (row);
+			return line [col > line.Count - 1 ? line.Count - 1 : col];
+		}
 
 		/// <summary>
 		/// Will scroll the <see cref="TextView"/> to the last line and position the cursor there.
@@ -1755,6 +1759,9 @@ namespace Terminal.Gui {
 						if (Rune.IsLetterOrDigit (rune))
 							break;
 					}
+					if (row != fromRow && Rune.IsLetterOrDigit (rune)) {
+						return (col, row);
+					}
 					while (MoveNext (ref col, ref row, out rune)) {
 						if (!Rune.IsLetterOrDigit (rune))
 							break;
@@ -1766,7 +1773,7 @@ namespace Terminal.Gui {
 					}
 				}
 				if (fromCol != col || fromRow != row)
-					return (col, row);
+					return (col + 1, row);
 				return null;
 			} catch (Exception) {
 				return null;
@@ -1778,7 +1785,7 @@ namespace Terminal.Gui {
 			if (fromRow == 0 && fromCol == 0)
 				return null;
 
-			var col = fromCol;
+			var col = Math.Max (fromCol - 1, 0);
 			var row = fromRow;
 			try {
 				var rune = RuneAt (col, row);
@@ -1788,9 +1795,18 @@ namespace Terminal.Gui {
 						if (Rune.IsLetterOrDigit (rune))
 							break;
 					}
+					int lastValidCol = -1;
 					while (MovePrev (ref col, ref row, out rune)) {
-						if (!Rune.IsLetterOrDigit (rune))
+						if (col == 0 && Rune.IsLetterOrDigit (rune)) {
+							return (col, row);
+						} else if (col == 0 && !Rune.IsLetterOrDigit (rune) && lastValidCol > -1) {
+							col = lastValidCol;
+							return (col, row);
+						}
+						if (!Rune.IsLetterOrDigit (rune)) {
 							break;
+						}
+						lastValidCol = Rune.IsLetterOrDigit (rune) ? col : -1;
 					}
 				} else {
 					while (MovePrev (ref col, ref row, out rune)) {
@@ -1798,8 +1814,11 @@ namespace Terminal.Gui {
 							break;
 					}
 				}
-				if (fromCol != col || fromRow != row)
-					return (col, row);
+				if (fromCol != col && fromRow == row) {
+					return (col == 0 ? col : col + 1, row);
+				} else if (fromCol != col && fromRow != row) {
+					return (col + 1, row);
+				}
 				return null;
 			} catch (Exception) {
 				return null;
