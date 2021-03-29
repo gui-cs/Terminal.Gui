@@ -34,7 +34,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// if <c>width</c> and <c>height</c> are both 0, the Dialog will be vertically and horizontally centered in the
 		/// container and the size will be 85% of the container. 
-		/// After initialzation use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
+		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
 		/// </remarks>
 		/// <remarks>
 		/// Use the constructor that does not take a <c>width</c> and <c>height</c> instead.
@@ -60,6 +60,13 @@ namespace Terminal.Gui {
 					this.buttons.Add (b);
 					Add (b);
 				}
+			} else {
+				var nb = new Button ("Ok");
+				nb.Clicked += () => {
+					Application.RequestStop ();
+				};
+				this.buttons.Add (nb);
+				Add (nb);
 			}
 
 			LayoutStarted += (args) => {
@@ -73,7 +80,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// <para>
 		/// Te Dialog will be vertically and horizontally centered in the container and the size will be 85% of the container. 
-		/// After initialzation use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
+		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
 		/// </para>
 		/// <para>
 		/// Use <see cref="AddButton(Button)"/> to add buttons to the dialog.
@@ -89,7 +96,7 @@ namespace Terminal.Gui {
 		/// <param name="buttons">Optional buttons to lay out at the bottom of the dialog.</param>
 		/// <remarks>
 		/// Te Dialog will be vertically and horizontally centered in the container and the size will be 85% of the container. 
-		/// After initialzation use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
+		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
 		/// </remarks>
 		public Dialog (ustring title, params Button [] buttons) : this (title: title, width: 0, height: 0, buttons: buttons) { }
 
