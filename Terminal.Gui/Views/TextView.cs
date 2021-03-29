@@ -687,6 +687,7 @@ namespace Terminal.Gui {
 		{
 			topRow = leftColumn = currentRow = currentColumn = 0;
 			selecting = false;
+			shiftSelecting = false;
 			ResetCursorVisibility ();
 		}
 
@@ -810,6 +811,8 @@ namespace Terminal.Gui {
 			if (savedCursorVisibility != desiredCursorVisibility) {
 				DesiredCursorVisibility = savedCursorVisibility;
 				savedCursorVisibility = CursorVisibility.Default;
+			} else {
+				DesiredCursorVisibility = CursorVisibility.Underline;
 			}
 		}
 
