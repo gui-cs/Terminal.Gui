@@ -300,17 +300,23 @@ namespace Terminal.Gui {
 			Model = model;
 		}
 
-		public TextModel WrapModel (int width, out int nRow, out int nCol, int row = 0, int col = 0)
+		public TextModel WrapModel (int width, out int nRow, out int nCol, out int nStartRow, out int nStartCol,
+			int row = 0, int col = 0, int startRow = 0, int startCol = 0)
 		{
 			frameWidth = width;
 
 			var modelRow = isWrapModelRefreshing ? row : GetModelLineFromWrappedLines (row);
 			var modelCol = isWrapModelRefreshing ? col : GetModelColFromWrappedLines (row, col);
+			var modelStartRow = isWrapModelRefreshing ? startRow : GetModelLineFromWrappedLines (startRow);
+			var modelStartCol = isWrapModelRefreshing ? startCol : GetModelColFromWrappedLines (startRow, startCol);
 			var wrappedModel = new TextModel ();
 			int lines = 0;
 			nRow = 0;
 			nCol = 0;
+			nStartRow = 0;
+			nStartCol = 0;
 			bool isRowAndColSetted = row == 0 && col == 0;
+			bool isStartRowAndColSetted = startRow == 0 && startCol == 0;
 			List<WrappedLine> wModelLines = new List<WrappedLine> ();
 
 			for (int i = 0; i < Model.Count; i++) {
@@ -336,6 +342,24 @@ namespace Terminal.Gui {
 							nCol = wrapLine.Count - offset;
 							nRow = lines;
 							isRowAndColSetted = true;
+						}
+					}
+					if (!isStartRowAndColSetted && modelStartRow == i) {
+						if (nStartCol + wrapLine.Count <= modelStartCol) {
+							nStartCol += wrapLine.Count;
+							nStartRow = lines;
+							if (nStartCol == modelStartCol) {
+								nStartCol = wrapLine.Count;
+								isStartRowAndColSetted = true;
+							} else if (j == wrappedLines.Count - 1) {
+								nStartCol = wrapLine.Count - j + modelStartCol - nStartCol;
+								isStartRowAndColSetted = true;
+							}
+						} else {
+							var offset = nStartCol + wrapLine.Count - modelStartCol;
+							nStartCol = wrapLine.Count - offset;
+							nStartRow = lines;
+							isStartRowAndColSetted = true;
 						}
 					}
 					wrappedModel.AddLine (lines, wrapLine);
@@ -405,7 +429,7 @@ namespace Terminal.Gui {
 			line.RemoveRange (modelCol, restCount);
 			Model.AddLine (modelRow + 1, rest);
 			isWrapModelRefreshing = true;
-			WrapModel (frameWidth, out _, out _, modelRow + 1, 0);
+			WrapModel (frameWidth, out _, out _, out _, out _, modelRow + 1, 0);
 			isWrapModelRefreshing = false;
 		}
 
@@ -487,11 +511,12 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		public void UpdateModel (TextModel model, out int nRow, out int nCol, int row, int col)
+		public void UpdateModel (TextModel model, out int nRow, out int nCol, out int nStartRow, out int nStartCol,
+			int row, int col, int startRow, int startCol)
 		{
 			isWrapModelRefreshing = true;
 			Model = model;
-			WrapModel (frameWidth, out nRow, out nCol, row, col);
+			WrapModel (frameWidth, out nRow, out nCol, out nStartRow, out nStartCol, row, col, startRow, startCol);
 			isWrapModelRefreshing = false;
 		}
 	}
@@ -661,6 +686,7 @@ namespace Terminal.Gui {
 		void ResetPosition ()
 		{
 			topRow = leftColumn = currentRow = currentColumn = 0;
+			selecting = false;
 			ResetCursorVisibility ();
 		}
 
@@ -683,7 +709,7 @@ namespace Terminal.Gui {
 				model.LoadString (value);
 				if (wordWrap) {
 					wrapManager = new WordWrapManager (model);
-					model = wrapManager.WrapModel (Frame.Width - 2, out _, out _);
+					model = wrapManager.WrapModel (Frame.Width - 2, out _, out _, out _, out _);
 				}
 				TextChanged?.Invoke ();
 				SetNeedsDisplay ();
@@ -705,9 +731,13 @@ namespace Terminal.Gui {
 			if (wordWrap && wrapManager != null) {
 				model = wrapManager.WrapModel (Frame.Width - 2,
 					out int nRow, out int nCol,
-					currentRow, currentColumn);
+					out int nStartRow, out int nStartCol,
+					currentRow, currentColumn,
+					selectionStartRow, selectionStartColumn);
 				currentRow = nRow;
 				currentColumn = nCol;
+				selectionStartRow = nStartRow;
+				selectionStartColumn = nStartCol;
 				SetNeedsDisplay ();
 			}
 		}
@@ -745,7 +775,7 @@ namespace Terminal.Gui {
 				ResetPosition ();
 				if (wordWrap) {
 					wrapManager = new WordWrapManager (model);
-					model = wrapManager.WrapModel (Frame.Width - 2, out _, out _);
+					model = wrapManager.WrapModel (Frame.Width - 2, out _, out _, out _, out _);
 				} else if (!wordWrap && wrapManager != null) {
 					model = wrapManager.Model;
 				}
@@ -758,6 +788,12 @@ namespace Terminal.Gui {
 		/// This is only needed with the keyboard navigation.
 		/// </summary>
 		public int BottomOffset { get; set; }
+
+		/// <summary>
+		/// The right offset needed to use a vertical scrollbar or for another reason.
+		/// This is only needed with the keyboard navigation.
+		/// </summary>
+		public int RightOffset { get; set; }
 
 		CursorVisibility savedCursorVisibility = CursorVisibility.Default;
 
@@ -879,10 +915,7 @@ namespace Terminal.Gui {
 
 		void ColorSelection ()
 		{
-			if (HasFocus)
-				Driver.SetAttribute (ColorScheme.Focus);
-			else
-				Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (ColorScheme.Focus);
 		}
 
 		bool isReadOnly = false;
@@ -942,7 +975,7 @@ namespace Terminal.Gui {
 			long start, end;
 			GetEncodedRegionBounds (out start, out end);
 			var q = ((long)(uint)row << 32) | (uint)col;
-			return q >= start && q <= end;
+			return q >= start && q <= end - 1;
 		}
 
 		//
@@ -953,6 +986,9 @@ namespace Terminal.Gui {
 		{
 			long start, end;
 			GetEncodedRegionBounds (out start, out end);
+			if (start == end) {
+				return ustring.Empty;
+			}
 			int startRow = (int)(start >> 32);
 			var maxrow = ((int)(end >> 32));
 			int startCol = (int)(start & 0xffffffff);
@@ -960,7 +996,7 @@ namespace Terminal.Gui {
 			var line = model.GetLine (startRow);
 
 			if (startRow == maxrow)
-				return StringFromRunes (line.GetRange (startCol, endCol));
+				return StringFromRunes (line.GetRange (startCol, endCol - startCol));
 
 			ustring res = StringFromRunes (line.GetRange (startCol, line.Count - startCol));
 
@@ -989,7 +1025,11 @@ namespace Terminal.Gui {
 			if (startRow == maxrow) {
 				line.RemoveRange (startCol, endCol - startCol);
 				currentColumn = startCol;
-				SetNeedsDisplay (new Rect (0, startRow - topRow, Frame.Width, startRow - topRow + 1));
+				if (wordWrap) {
+					SetNeedsDisplay ();
+				} else {
+					SetNeedsDisplay (new Rect (0, startRow - topRow, Frame.Width, startRow - topRow + 1));
+				}
 				return;
 			}
 
@@ -1005,6 +1045,38 @@ namespace Terminal.Gui {
 			currentColumn = startCol;
 
 			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Restore from original model.
+		/// </summary>
+		void SetWrapModel ()
+		{
+			if (wordWrap) {
+				currentColumn = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
+				currentRow = wrapManager.GetModelLineFromWrappedLines (currentRow);
+				selectionStartColumn = wrapManager.GetModelColFromWrappedLines (selectionStartRow, selectionStartColumn);
+				selectionStartRow = wrapManager.GetModelLineFromWrappedLines (selectionStartRow);
+				model = wrapManager.Model;
+			}
+		}
+
+		/// <summary>
+		/// Update the original model.
+		/// </summary>
+		void UpdateWrapModel ()
+		{
+			if (wordWrap) {
+				wrapManager.UpdateModel (model, out int nRow, out int nCol,
+					out int nStartRow, out int nStartCol,
+					currentRow, currentColumn,
+					selectionStartRow, selectionStartColumn);
+				currentRow = nRow;
+				currentColumn = nCol;
+				selectionStartRow = nStartRow;
+				selectionStartColumn = nStartCol;
+				wrapNeeded = true;
+			}
 		}
 
 		///<inheritdoc/>
@@ -1034,7 +1106,7 @@ namespace Terminal.Gui {
 					var lineCol = leftColumn + idx;
 					var rune = lineCol >= lineRuneCount ? ' ' : line [lineCol];
 					var cols = Rune.ColumnWidth (rune);
-					if (selecting && PointInSelection (idx, row)) {
+					if (lineCol < line.Count && selecting && PointInSelection (idx + leftColumn, row + topRow)) {
 						ColorSelection ();
 					} else {
 						ColorNormal ();
@@ -1068,7 +1140,9 @@ namespace Terminal.Gui {
 
 		void SetClipboard (ustring text)
 		{
-			Clipboard.Contents = text;
+			if (!text.IsEmpty) {
+				Clipboard.Contents = text;
+			}
 		}
 
 		void AppendClipboard (ustring text)
@@ -1131,7 +1205,11 @@ namespace Terminal.Gui {
 				if (!wordWrap && currentColumn - leftColumn > Frame.Width) {
 					leftColumn = Math.Max (currentColumn - Frame.Width + 1, 0);
 				}
-				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, currentRow - topRow + 1));
+				if (wordWrap) {
+					SetNeedsDisplay ();
+				} else {
+					SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, currentRow - topRow + 1));
+				}
 				return;
 			}
 
@@ -1190,10 +1268,10 @@ namespace Terminal.Gui {
 			if (!wordWrap && currentColumn < leftColumn) {
 				leftColumn = currentColumn;
 				need = true;
-			} else if (!wordWrap && (currentColumn - leftColumn > Frame.Width + offB.width ||
-				TextModel.DisplaySize (line, leftColumn, currentColumn).size >= Frame.Width + offB.width)) {
+			} else if (!wordWrap && (currentColumn - leftColumn + RightOffset > Frame.Width + offB.width ||
+				TextModel.DisplaySize (line, leftColumn, currentColumn).size + RightOffset >= Frame.Width + offB.width)) {
 				leftColumn = Math.Max (TextModel.CalculateLeftColumn (line, leftColumn,
-					currentColumn, Frame.Width - 1 + offB.width, currentColumn), 0);
+					currentColumn + RightOffset, Frame.Width - 1 + offB.width, currentColumn), 0);
 				need = true;
 			}
 			if (currentRow < topRow) {
@@ -1242,7 +1320,7 @@ namespace Terminal.Gui {
 			if (isRow) {
 				topRow = Math.Max (idx > model.Count - 1 ? model.Count - 1 : idx, 0);
 			} else if (!wordWrap) {
-				var maxlength = model.GetMaxVisibleLine (topRow, topRow + Frame.Height);
+				var maxlength = model.GetMaxVisibleLine (topRow, topRow + Frame.Height + RightOffset);
 				leftColumn = Math.Max (idx > maxlength - 1 ? maxlength - 1 : idx, 0);
 			}
 			SetNeedsDisplay ();
@@ -1250,6 +1328,7 @@ namespace Terminal.Gui {
 
 		bool lastWasKill;
 		bool wrapNeeded;
+		bool shiftSelecting;
 
 		///<inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
@@ -1257,6 +1336,12 @@ namespace Terminal.Gui {
 			int restCount;
 			List<Rune> rest;
 			bool lineRemoved = false;
+
+			if (shiftSelecting && selecting && !kb.Key.HasFlag (Key.ShiftMask)
+				&& !kb.Key.HasFlag (Key.CtrlMask | Key.C)) {
+				shiftSelecting = false;
+				selecting = false;
+			}
 
 			// Handle some state here - whether the last command was a kill
 			// operation and the column tracking (up/down)
@@ -1279,6 +1364,10 @@ namespace Terminal.Gui {
 			switch (kb.Key) {
 			case Key.PageDown:
 			case Key.V | Key.CtrlMask:
+			case Key.PageDown | Key.ShiftMask:
+				if (kb.Key.HasFlag (Key.ShiftMask)) {
+					StartSelecting ();
+				}
 				int nPageDnShift = Frame.Height - 1;
 				if (currentRow < model.Count) {
 					if (columnTrack == -1)
@@ -1295,6 +1384,10 @@ namespace Terminal.Gui {
 
 			case Key.PageUp:
 			case ((int)'V' + Key.AltMask):
+			case Key.PageUp | Key.ShiftMask:
+				if (kb.Key.HasFlag (Key.ShiftMask)) {
+					StartSelecting ();
+				}
 				int nPageUpShift = Frame.Height - 1;
 				if (currentRow > 0) {
 					if (columnTrack == -1)
@@ -1311,16 +1404,28 @@ namespace Terminal.Gui {
 
 			case Key.N | Key.CtrlMask:
 			case Key.CursorDown:
+			case Key.CursorDown | Key.ShiftMask:
+				if (kb.Key.HasFlag (Key.ShiftMask)) {
+					StartSelecting ();
+				}
 				MoveDown ();
 				break;
 
 			case Key.P | Key.CtrlMask:
 			case Key.CursorUp:
+			case Key.CursorUp | Key.ShiftMask:
+				if (kb.Key.HasFlag (Key.ShiftMask)) {
+					StartSelecting ();
+				}
 				MoveUp ();
 				break;
 
 			case Key.F | Key.CtrlMask:
 			case Key.CursorRight:
+			case Key.CursorRight | Key.ShiftMask:
+				if (kb.Key.HasFlag (Key.ShiftMask)) {
+					StartSelecting ();
+				}
 				var currentLine = GetCurrentLine ();
 				if (currentColumn < currentLine.Count) {
 					currentColumn++;
@@ -1339,6 +1444,10 @@ namespace Terminal.Gui {
 
 			case Key.B | Key.CtrlMask:
 			case Key.CursorLeft:
+			case Key.CursorLeft | Key.ShiftMask:
+				if (kb.Key.HasFlag (Key.ShiftMask)) {
+					StartSelecting ();
+				}
 				if (currentColumn > 0) {
 					currentColumn--;
 				} else {
@@ -1359,6 +1468,10 @@ namespace Terminal.Gui {
 			case Key.Backspace:
 				if (isReadOnly)
 					break;
+				if (selecting) {
+					Cut ();
+					return true;
+				}
 				if (currentColumn > 0) {
 					// Delete backwards 
 					currentLine = GetCurrentLine ();
@@ -1396,7 +1509,11 @@ namespace Terminal.Gui {
 
 			// Home, C-A
 			case Key.Home:
+			case Key.Home | Key.ShiftMask:
 			case Key.A | Key.CtrlMask:
+				if (kb.Key.HasFlag (Key.ShiftMask)) {
+					StartSelecting ();
+				}
 				currentColumn = 0;
 				Adjust ();
 				break;
@@ -1404,6 +1521,10 @@ namespace Terminal.Gui {
 			case Key.D | Key.CtrlMask: // Delete
 				if (isReadOnly)
 					break;
+				if (selecting) {
+					Cut ();
+					return true;
+				}
 				currentLine = GetCurrentLine ();
 				if (currentColumn == currentLine.Count) {
 					if (currentRow + 1 == model.Count)
@@ -1427,7 +1548,11 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.End:
+			case Key.End | Key.ShiftMask:
 			case Key.E | Key.CtrlMask: // End
+				if (kb.Key.HasFlag (Key.ShiftMask)) {
+					StartSelecting ();
+				}
 				currentLine = GetCurrentLine ();
 				currentColumn = currentLine.Count;
 				int pcol = leftColumn;
@@ -1438,11 +1563,7 @@ namespace Terminal.Gui {
 				if (isReadOnly)
 					break;
 				var cRow = currentRow;
-				if (wordWrap) {
-					currentRow = wrapManager.GetModelLineFromWrappedLines (cRow);
-					currentColumn = wrapManager.GetModelColFromWrappedLines (cRow, currentColumn);
-					model = wrapManager.Model;
-				}
+				SetWrapModel ();
 				currentLine = GetCurrentLine ();
 				var setLastWasKill = true;
 				if (currentLine.Count == 0) {
@@ -1488,13 +1609,7 @@ namespace Terminal.Gui {
 						setLastWasKill = false;
 					}
 				}
-				if (wordWrap) {
-					wrapManager.UpdateModel (model, out int nRow, out int nCol,
-						currentRow, currentColumn);
-					currentRow = nRow;
-					currentColumn = nCol;
-					wrapNeeded = true;
-				}
+				UpdateWrapModel ();
 				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
 				lastWasKill = setLastWasKill;
 				break;
@@ -1502,39 +1617,32 @@ namespace Terminal.Gui {
 			case Key.Y | Key.CtrlMask: // Control-y, yank
 				if (isReadOnly)
 					break;
-				if (wordWrap) {
-					cRow = currentRow;
-					currentRow = wrapManager.GetModelLineFromWrappedLines (cRow);
-					currentColumn = wrapManager.GetModelColFromWrappedLines (cRow, currentColumn);
-					model = wrapManager.Model;
-				}
-				InsertText (Clipboard.Contents);
-				if (wordWrap) {
-					wrapManager.UpdateModel (model, out int nRow, out int nCol,
-						currentRow, currentColumn);
-					currentRow = nRow;
-					currentColumn = nCol;
-					wrapNeeded = true;
-				}
-				selecting = false;
-				break;
+				Paste ();
+				return true;
 
 			case Key.Space | Key.CtrlMask:
-				selecting = true;
+				selecting = !selecting;
 				selectionStartColumn = currentColumn;
 				selectionStartRow = currentRow;
 				break;
 
+			case ((int)'C' + Key.AltMask):
+			case Key.C | Key.CtrlMask:
+				Copy ();
+				return true;
+
 			case ((int)'W' + Key.AltMask):
 			case Key.W | Key.CtrlMask:
-				SetClipboard (GetRegion ());
-				if (!isReadOnly)
-					ClearRegion ();
-				selecting = false;
-				break;
+			case Key.X | Key.CtrlMask:
+				Cut ();
+				return true;
 
 			case Key.CtrlMask | Key.CursorLeft:
+			case Key.CtrlMask | Key.CursorLeft | Key.ShiftMask:
 			case (Key)((int)'B' + Key.AltMask):
+				if (kb.Key.HasFlag (Key.ShiftMask)) {
+					StartSelecting ();
+				}
 				var newPos = WordBackward (currentColumn, currentRow);
 				if (newPos.HasValue) {
 					currentColumn = newPos.Value.col;
@@ -1545,7 +1653,11 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.CtrlMask | Key.CursorRight:
+			case Key.CtrlMask | Key.CursorRight | Key.ShiftMask:
 			case (Key)((int)'F' + Key.AltMask):
+				if (kb.Key.HasFlag (Key.ShiftMask)) {
+					StartSelecting ();
+				}
 				newPos = WordForward (currentColumn, currentRow);
 				if (newPos.HasValue) {
 					currentColumn = newPos.Value.col;
@@ -1585,10 +1697,18 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.CtrlMask | Key.End:
+			case Key.CtrlMask | Key.End | Key.ShiftMask:
+				if (kb.Key.HasFlag (Key.ShiftMask)) {
+					StartSelecting ();
+				}
 				MoveEnd ();
 				break;
 
 			case Key.CtrlMask | Key.Home:
+			case Key.CtrlMask | Key.Home | Key.ShiftMask:
+				if (kb.Key.HasFlag (Key.ShiftMask)) {
+					StartSelecting ();
+				}
 				MoveHome ();
 				break;
 
@@ -1599,6 +1719,9 @@ namespace Terminal.Gui {
 				//So that special keys like tab can be processed
 				if (isReadOnly)
 					return true;
+				if (selecting) {
+					Cut ();
+				}
 				Insert ((uint)kb.Key);
 				currentColumn++;
 				if (currentColumn >= leftColumn + Frame.Width) {
@@ -1607,13 +1730,85 @@ namespace Terminal.Gui {
 				}
 				break;
 			}
+			DoNeededAction ();
+
+			return true;
+		}
+
+		///<inheritdoc/>
+		public override bool OnKeyUp (KeyEvent kb)
+		{
+			switch (kb.Key) {
+			case Key.Space | Key.CtrlMask:
+				return true;
+			}
+
+			return false;
+		}
+
+		void DoNeededAction ()
+		{
 			if (NeedDisplay.IsEmpty) {
 				PositionCursor ();
 			} else {
 				Adjust ();
 			}
+		}
 
-			return true;
+		/// <summary>
+		/// Copy the selected text to the clipboard contents.
+		/// </summary>
+		public void Copy ()
+		{
+			SetWrapModel ();
+			SetClipboard (GetRegion ());
+			UpdateWrapModel ();
+			DoNeededAction ();
+		}
+
+		/// <summary>
+		/// Cut the selected text to the clipboard contents.
+		/// </summary>
+		public void Cut ()
+		{
+			SetWrapModel ();
+			SetClipboard (GetRegion ());
+			if (!isReadOnly) {
+				ClearRegion ();
+			}
+			UpdateWrapModel ();
+			selecting = false;
+			DoNeededAction ();
+		}
+
+		/// <summary>
+		/// Paste the clipboard contents into the current selected position.
+		/// </summary>
+		public void Paste ()
+		{
+			if (isReadOnly) {
+				return;
+			}
+
+			SetWrapModel ();
+			if (selecting) {
+				ClearRegion ();
+			}
+			InsertText (Clipboard.Contents);
+			UpdateWrapModel ();
+			selecting = false;
+			DoNeededAction ();
+		}
+
+		void StartSelecting ()
+		{
+			if (shiftSelecting && selecting) {
+				return;
+			}
+			shiftSelecting = true;
+			selecting = true;
+			selectionStartColumn = currentColumn;
+			selectionStartRow = currentRow;
 		}
 
 		void MoveUp ()
@@ -1828,8 +2023,11 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent ev)
 		{
-			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked) &&
-				!ev.Flags.HasFlag (MouseFlags.WheeledDown) && !ev.Flags.HasFlag (MouseFlags.WheeledUp)) {
+			if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked) && !ev.Flags.HasFlag (MouseFlags.Button1Pressed)
+				&& !ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)
+				&& !ev.Flags.HasFlag (MouseFlags.Button1Released)
+				&& !ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ButtonShift)
+				&& !ev.Flags.HasFlag (MouseFlags.WheeledDown) && !ev.Flags.HasFlag (MouseFlags.WheeledUp)) {
 				return false;
 			}
 
@@ -1842,21 +2040,11 @@ namespace Terminal.Gui {
 			}
 
 			if (ev.Flags == MouseFlags.Button1Clicked) {
-				if (model.Count > 0) {
-					var maxCursorPositionableLine = Math.Max ((model.Count - 1) - topRow, 0);
-					if (ev.Y > maxCursorPositionableLine) {
-						currentRow = maxCursorPositionableLine;
-					} else {
-						currentRow = ev.Y + topRow;
-					}
-					var r = GetCurrentLine ();
-					var idx = TextModel.GetColFromX (r, leftColumn, ev.X);
-					if (idx - leftColumn >= r.Count) {
-						currentColumn = Math.Max (r.Count - leftColumn, 0);
-					} else {
-						currentColumn = idx + leftColumn;
-					}
+				if (shiftSelecting) {
+					shiftSelecting = false;
+					selecting = false;
 				}
+				ProcessMouseClick (ev, out _);
 				PositionCursor ();
 				lastWasKill = false;
 				columnTrack = currentColumn;
@@ -1876,9 +2064,93 @@ namespace Terminal.Gui {
 				lastWasKill = false;
 				columnTrack = currentColumn;
 				ScrollTo (leftColumn - 1, false);
+			} else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
+				ProcessMouseClick (ev, out List<Rune> line);
+				PositionCursor ();
+				if (model.Count > 0 && shiftSelecting && selecting) {
+					if (currentRow - topRow + BottomOffset >= Frame.Height - 1
+						&& model.Count + BottomOffset > topRow + currentRow) {
+						ScrollTo (topRow + Frame.Height);
+					} else if (topRow > 0 && currentRow <= topRow) {
+						ScrollTo (topRow - Frame.Height);
+					} else if (ev.Y >= Frame.Height) {
+						ScrollTo (model.Count + BottomOffset);
+					} else if (ev.Y < 0 && topRow > 0) {
+						ScrollTo (0);
+					}
+					if (currentColumn - leftColumn + RightOffset >= Frame.Width - 1
+						&& line.Count + RightOffset > leftColumn + currentColumn) {
+						ScrollTo (leftColumn + Frame.Width, false);
+					} else if (leftColumn > 0 && currentColumn <= leftColumn) {
+						ScrollTo (leftColumn - Frame.Width, false);
+					} else if (ev.X >= Frame.Width) {
+						ScrollTo (line.Count + RightOffset, false);
+					} else if (ev.X < 0 && leftColumn > 0) {
+						ScrollTo (0, false);
+					}
+				}
+				lastWasKill = false;
+				columnTrack = currentColumn;
+			} else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ButtonShift)) {
+				if (!shiftSelecting) {
+					StartSelecting ();
+				}
+				ProcessMouseClick (ev, out _);
+				PositionCursor ();
+				lastWasKill = false;
+				columnTrack = currentColumn;
+			} else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed)) {
+				if (shiftSelecting) {
+					shiftSelecting = false;
+					selecting = false;
+				}
+				ProcessMouseClick (ev, out _);
+				PositionCursor ();
+				if (!selecting) {
+					StartSelecting ();
+				}
+				lastWasKill = false;
+				columnTrack = currentColumn;
+				if (Application.mouseGrabView == null) {
+					Application.GrabMouse (this);
+				}
+			} else if (ev.Flags.HasFlag (MouseFlags.Button1Released)) {
+				Application.UngrabMouse ();
 			}
 
 			return true;
+		}
+
+		void ProcessMouseClick (MouseEvent ev, out List<Rune> line)
+		{
+			List<Rune> r = null;
+			if (model.Count > 0) {
+				var maxCursorPositionableLine = Math.Max ((model.Count - 1) - topRow, 0);
+				if (Math.Max (ev.Y, 0) > maxCursorPositionableLine) {
+					currentRow = maxCursorPositionableLine + topRow;
+				} else {
+					currentRow = Math.Max (ev.Y + topRow, 0);
+				}
+				r = GetCurrentLine ();
+				var idx = TextModel.GetColFromX (r, leftColumn, Math.Max (ev.X, 0));
+				if (idx - leftColumn >= r.Count + RightOffset) {
+					currentColumn = Math.Max (r.Count - leftColumn + RightOffset, 0);
+				} else {
+					currentColumn = idx + leftColumn;
+				}
+			}
+
+			line = r;
+		}
+
+		///<inheritdoc/>
+		public override bool OnLeave (View view)
+		{
+			if (Application.mouseGrabView != null && Application.mouseGrabView == this) {
+				Application.UngrabMouse ();
+			}
+
+			return base.OnLeave (view);
 		}
 	}
 

@@ -32,9 +32,9 @@ namespace UICatalog {
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_Edit", new MenuItem [] {
-					new MenuItem ("_Copy", "", () => Copy()),
-					new MenuItem ("C_ut", "", () => Cut()),
-					new MenuItem ("_Paste", "", () => Paste())
+					new MenuItem ("_Copy", "", () => Copy(),null,null, Key.CtrlMask | Key.C),
+					new MenuItem ("C_ut", "", () => Cut(),null,null, Key.CtrlMask | Key.W),
+					new MenuItem ("_Paste", "", () => Paste(),null,null, Key.CtrlMask | Key.Y)
 				}),
 				new MenuBarItem ("_ScrollBarView", CreateKeepChecked ()),
 				new MenuBarItem ("_Cursor", new MenuItem [] {
@@ -77,7 +77,8 @@ namespace UICatalog {
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				BottomOffset = 1
+				BottomOffset = 1,
+				RightOffset = 1
 			};
 
 			LoadFile ();
@@ -103,7 +104,7 @@ namespace UICatalog {
 			};
 
 			_textView.DrawContent += (e) => {
-				_scrollBar.Size = _textView.Lines - 1;
+				_scrollBar.Size = _textView.Lines;
 				_scrollBar.Position = _textView.TopRow;
 				if (_scrollBar.OtherScrollBarView != null) {
 					_scrollBar.OtherScrollBarView.Size = _textView.Maxlength;
@@ -141,20 +142,23 @@ namespace UICatalog {
 
 		private void Paste ()
 		{
-			MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok");
+			if (_textView != null) {
+				_textView.Paste ();
+			}
 		}
 
 		private void Cut ()
 		{
-			MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok");
+			if (_textView != null) {
+				_textView.Cut ();
+			}
 		}
 
 		private void Copy ()
 		{
-			MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok");
-			//if (_textView != null && _textView.SelectedLength != 0) {
-			//	_textView.Copy ();
-			//}
+			if (_textView != null) {
+				_textView.Copy ();
+			}
 		}
 
 		private void SetCursor (CursorVisibility visibility)
