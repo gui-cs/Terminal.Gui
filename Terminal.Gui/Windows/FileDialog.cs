@@ -494,18 +494,38 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="title">The title.</param>
 		/// <param name="prompt">The prompt.</param>
-		/// <param name="nameFieldLabel">The name field label.</param>
+		/// <param name="nameFieldLabel">The name of the file field label..</param>
 		/// <param name="message">The message.</param>
-		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message) : base (title)//, Driver.Cols - 20, Driver.Rows - 5, null)
+		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message)
+			: this (title, prompt, ustring.Empty, nameFieldLabel, message) { }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="FileDialog"/>
+		/// </summary>
+		/// <param name="title">The title.</param>
+		/// <param name="prompt">The prompt.</param>
+		/// <param name="message">The message.</param>
+
+		public FileDialog (ustring title, ustring prompt, ustring message) : this (title, prompt, ustring.Empty, message) { }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="FileDialog"/>
+		/// </summary>
+		/// <param name="title">The title.</param>
+		/// <param name="prompt">The prompt.</param>
+		/// <param name="nameDirLabel">The name of the directory field label.</param>
+		/// <param name="nameFieldLabel">The name of the file field label..</param>
+		/// <param name="message">The message.</param>
+		public FileDialog (ustring title, ustring prompt, ustring nameDirLabel, ustring nameFieldLabel, ustring message) : base (title)//, Driver.Cols - 20, Driver.Rows - 5, null)
 		{
-			this.message = new Label (message) { 
+			this.message = new Label (message) {
 				X = 1,
 				Y = 0,
 			};
 			Add (this.message);
 			var msgLines = TextFormatter.MaxLines (message, Driver.Cols - 20);
 
-			dirLabel = new Label ("Directory: ") {
+			dirLabel = new Label (nameDirLabel.IsEmpty ? "Directory: " : $"{nameDirLabel}: ") {
 				X = 1,
 				Y = 1 + msgLines
 			};
@@ -521,8 +541,8 @@ namespace Terminal.Gui {
 			};
 			Add (dirLabel, dirEntry);
 
-			this.nameFieldLabel = new Label ("Open: ") {
-				X = 6,
+			this.nameFieldLabel = new Label (nameFieldLabel.IsEmpty ? "File: " : $"{nameFieldLabel}: ") {
+				X = 1,
 				Y = 3 + msgLines,
 			};
 			nameEntry = new TextField ("") {
@@ -550,7 +570,7 @@ namespace Terminal.Gui {
 			};
 			AddButton (cancel);
 
-			this.prompt = new Button (prompt) {
+			this.prompt = new Button (prompt.IsEmpty ? "Ok" : prompt) {
 				IsDefault = true,
 			};
 			this.prompt.Clicked += () => {
