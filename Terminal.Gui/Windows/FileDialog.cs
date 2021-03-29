@@ -574,6 +574,9 @@ namespace Terminal.Gui {
 				IsDefault = true,
 			};
 			this.prompt.Clicked += () => {
+				if (nameEntry.Text.IsEmpty) {
+					return;
+				}
 				canceled = false;
 				Application.RequestStop ();
 			};
