@@ -572,15 +572,21 @@ namespace Terminal.Gui {
 
 			this.prompt = new Button (prompt.IsEmpty ? "Ok" : prompt) {
 				IsDefault = true,
+				CanFocus = nameEntry.Text.IsEmpty ? false : true
 			};
 			this.prompt.Clicked += () => {
-				if (nameEntry.Text.IsEmpty) {
-					return;
-				}
 				canceled = false;
 				Application.RequestStop ();
 			};
 			AddButton (this.prompt);
+
+			nameEntry.TextChanged += (e) => {
+				if (nameEntry.Text.IsEmpty) {
+					this.prompt.CanFocus = false;
+				} else {
+					this.prompt.CanFocus = true;
+				}
+			};
 
 			Width = Dim.Percent (80);
 			Height = Dim.Percent (80);
