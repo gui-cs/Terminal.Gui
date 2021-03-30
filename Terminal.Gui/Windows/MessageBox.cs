@@ -39,7 +39,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public static int Query (int width, int height, ustring title, ustring message, params ustring [] buttons)
 		{
-			return QueryFull (false, width, height, title, message, buttons);
+			return QueryFull (false, width, height, title, message, 0, buttons);
 		}
 
 		/// <summary>
@@ -55,7 +55,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public static int Query (ustring title, ustring message, params ustring [] buttons)
 		{
-			return QueryFull (false, 0, 0, title, message, buttons);
+			return QueryFull (false, 0, 0, title, message, 0, buttons);
 		}
 
 		/// <summary>
@@ -72,7 +72,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public static int ErrorQuery (int width, int height, ustring title, ustring message, params ustring [] buttons)
 		{
-			return QueryFull (true, width, height, title, message, buttons);
+			return QueryFull (true, width, height, title, message, 0, buttons);
 		}
 
 		/// <summary>
@@ -88,10 +88,80 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public static int ErrorQuery (ustring title, ustring message, params ustring [] buttons)
 		{
-			return QueryFull (true, 0, 0, title, message, buttons);
+			return QueryFull (true, 0, 0, title, message, 0, buttons);
 		}
 
-		static int QueryFull (bool useErrorColors, int width, int height, ustring title, ustring message, params ustring [] buttons)
+		/// <summary>
+		/// Presents a normal <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to the user.
+		/// </summary>
+		/// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
+		/// <param name="width">Width for the window.</param>
+		/// <param name="height">Height for the window.</param>
+		/// <param name="title">Title for the query.</param>
+		/// <param name="message">Message to display, might contain multiple lines.</param>
+		/// <param name="defaultButton">Index of the default button.</param>
+		/// <param name="buttons">Array of buttons to add.</param>
+		/// <remarks>
+		/// Use <see cref="Query(ustring, ustring, ustring[])"/> instead; it automatically sizes the MessageBox based on the contents.
+		/// </remarks>
+		public static int Query (int width, int height, ustring title, ustring message, int defaultButton = 0, params ustring [] buttons)
+		{
+			return QueryFull (false, width, height, title, message, defaultButton, buttons);
+		}
+
+		/// <summary>
+		/// Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to the user.
+		/// </summary>
+		/// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
+		/// <param name="title">Title for the query.</param>
+		/// <param name="message">Message to display, might contain multiple lines.</param>
+		/// <param name="defaultButton">Index of the default button.</param>
+		/// <param name="buttons">Array of buttons to add.</param>
+		/// <remarks>
+		/// The message box will be vertically and horizontally centered in the container and the size will be automatically determined
+		/// from the size of the message and buttons.
+		/// </remarks>
+		public static int Query (ustring title, ustring message, int defaultButton = 0, params ustring [] buttons)
+		{
+			return QueryFull (false, 0, 0, title, message, defaultButton, buttons);
+		}
+
+		/// <summary>
+		/// Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to the user.
+		/// </summary>
+		/// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
+		/// <param name="width">Width for the window.</param>
+		/// <param name="height">Height for the window.</param>
+		/// <param name="title">Title for the query.</param>
+		/// <param name="message">Message to display, might contain multiple lines.</param>
+		/// <param name="defaultButton">Index of the default button.</param>
+		/// <param name="buttons">Array of buttons to add.</param>
+		/// <remarks>
+		/// Use <see cref="ErrorQuery(ustring, ustring, ustring[])"/> instead; it automatically sizes the MessageBox based on the contents.
+		/// </remarks>
+		public static int ErrorQuery (int width, int height, ustring title, ustring message, int defaultButton = 0, params ustring [] buttons)
+		{
+			return QueryFull (true, width, height, title, message, defaultButton, buttons);
+		}
+
+		/// <summary>
+		/// Presents an error <see cref="MessageBox"/> with the specified title and message and a list of buttons to show to the user.
+		/// </summary>
+		/// <returns>The index of the selected button, or -1 if the user pressed ESC to close the dialog.</returns>
+		/// <param name="title">Title for the query.</param>
+		/// <param name="message">Message to display, might contain multiple lines.</param>
+		/// <param name="defaultButton">Index of the default button.</param>
+		/// <param name="buttons">Array of buttons to add.</param>
+		/// <remarks>
+		/// The message box will be vertically and horizontally centered in the container and the size will be automatically determined
+		/// from the size of the title, message. and buttons.
+		/// </remarks>
+		public static int ErrorQuery (ustring title, ustring message, int defaultButton = 0, params ustring [] buttons)
+		{
+			return QueryFull (true, 0, 0, title, message, defaultButton, buttons);
+		}
+
+		static int QueryFull (bool useErrorColors, int width, int height, ustring title, ustring message, int defaultButton = 0, params ustring [] buttons)
 		{
 			const int defaultWidth = 50;
 			int textWidth = TextFormatter.MaxWidth (message, width == 0 ? defaultWidth : width);
@@ -103,7 +173,7 @@ namespace Terminal.Gui {
 			List<Button> buttonList = new List<Button> ();
 			foreach (var s in buttons) {
 				var b = new Button (s);
-				if (count == 0) {
+				if (count == defaultButton) {
 					b.IsDefault = true;
 				}
 				buttonList.Add (b);
@@ -142,13 +212,17 @@ namespace Terminal.Gui {
 			int clicked = -1;
 			for (int n = 0; n < buttonList.Count; n++) {
 				int buttonId = n;
-				buttonList [n].Clicked += () => {
+				var b = buttonList [n];
+				b.Clicked += () => {
 					clicked = buttonId;
 					Application.RequestStop ();
 				};
+				if (b.IsDefault) {
+					b.SetFocus ();
+				}
 			}
 
-			// Rin the modal; do not shutdown the mainloop driver when done
+			// Run the modal; do not shutdown the mainloop driver when done
 			Application.Run (d);
 			return clicked;
 		}
