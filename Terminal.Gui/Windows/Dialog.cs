@@ -60,13 +60,6 @@ namespace Terminal.Gui {
 					this.buttons.Add (b);
 					Add (b);
 				}
-			} else {
-				var nb = new Button ("Ok");
-				nb.Clicked += () => {
-					Application.RequestStop ();
-				};
-				this.buttons.Add (nb);
-				Add (nb);
 			}
 
 			LayoutStarted += (args) => {
