@@ -14,6 +14,7 @@ namespace UICatalog {
 		private TextView _textView;
 		private bool _saved = true;
 		private ScrollBarView _scrollBar;
+		private byte [] _originalText;
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
 		{
@@ -28,6 +29,7 @@ namespace UICatalog {
 					new MenuItem ("_New", "", () => New()),
 					new MenuItem ("_Open", "", () => Open()),
 					new MenuItem ("_Save", "", () => Save()),
+					new MenuItem ("_Save As", "", () => SaveAs()),
 					null,
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
@@ -121,20 +123,23 @@ namespace UICatalog {
 
 		private void New ()
 		{
-			Win.Title = _fileName = "Untitled";
-			throw new NotImplementedException ();
+			if (!CanCloseFile ()) {
+				return;
+			}
+
+			Win.Title = "Untitled.txt";
+			_fileName = null;
+			_originalText = new System.IO.MemoryStream ().ToArray ();
+			_textView.Text = _originalText;
 		}
 
 		private void LoadFile ()
 		{
-			if (!_saved) {
-				MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok");
-			}
-
 			if (_fileName != null) {
 				// BUGBUG: #452 TextView.LoadFile keeps file open and provides no way of closing it
 				//_textView.LoadFile(_fileName);
 				_textView.Text = System.IO.File.ReadAllText (_fileName);
+				_originalText = _textView.Text.ToByteArray ();
 				Win.Title = _fileName;
 				_saved = true;
 			}
@@ -166,8 +171,29 @@ namespace UICatalog {
 			_textView.DesiredCursorVisibility = visibility;
 		}
 
+		private bool CanCloseFile ()
+		{
+			if (_textView.Text == _originalText) {
+				return true;
+			}
+
+			var r = MessageBox.ErrorQuery ("Save File",
+				$"Do you want save changes in {Win.Title}?", "Yes", "No", "Cancel");
+			if (r == 0) {
+				return Save ();
+			} else if (r == 1) {
+				return true;
+			}
+
+			return false;
+		}
+
 		private void Open ()
 		{
+			if (!CanCloseFile ()) {
+				return;
+			}
+
 			var d = new OpenDialog ("Open", "Open a file") { AllowsMultipleSelection = false };
 			Application.Run (d);
 
@@ -177,14 +203,54 @@ namespace UICatalog {
 			}
 		}
 
-		private void Save ()
+		private bool Save ()
 		{
 			if (_fileName != null) {
 				// BUGBUG: #279 TextView does not know how to deal with \r\n, only \r 
 				// As a result files saved on Windows and then read back will show invalid chars.
+				return SaveFile (Win.Title.ToString (), _fileName);
+			} else {
+				return SaveAs ();
+			}
+		}
+
+		private bool SaveAs ()
+		{
+			var sd = new SaveDialog ("Save file", "Choose the path where to save the file.");
+			sd.FilePath = System.IO.Path.Combine (sd.FilePath.ToString (), Win.Title.ToString ());
+			Application.Run (sd);
+
+			if (!sd.Canceled) {
+				if (System.IO.File.Exists (sd.FilePath.ToString ())) {
+					if (MessageBox.Query ("Save File",
+						"File already exists. Overwrite any way?", "No", "Ok") == 1) {
+						return SaveFile (sd.FileName.ToString (), sd.FilePath.ToString ());
+					} else {
+						return _saved = false;
+					}
+				} else {
+					return SaveFile (sd.FileName.ToString (), sd.FilePath.ToString ());
+				}
+			} else {
+				return _saved = false;
+			}
+		}
+
+		private bool SaveFile (string title, string file)
+		{
+			try {
+				Win.Title = title;
+				_fileName = file;
 				System.IO.File.WriteAllText (_fileName, _textView.Text.ToString ());
 				_saved = true;
+				MessageBox.Query ("Save File", "File was successfully saved.", "Ok");
+
+			} catch (Exception ex) {
+				MessageBox.ErrorQuery ("Error", ex.Message, "Ok");
+				return false;
 			}
+
+			return true;
 		}
 
 		private void Quit ()
