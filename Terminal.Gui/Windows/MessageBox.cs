@@ -171,6 +171,9 @@ namespace Terminal.Gui {
 			// Create button array for Dialog
 			int count = 0;
 			List<Button> buttonList = new List<Button> ();
+			if (buttons != null && defaultButton > buttons.Length - 1) {
+				defaultButton = buttons.Length - 1;
+			}
 			foreach (var s in buttons) {
 				var b = new Button (s);
 				if (count == defaultButton) {
