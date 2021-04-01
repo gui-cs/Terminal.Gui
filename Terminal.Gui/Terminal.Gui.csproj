@@ -17,7 +17,18 @@
     <Summary>Application framework for creating modern console applications using .NET</Summary>
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
     <PackageReleaseNotes>
-      v1.0.???
+      v1.0.0-beta.9
+      * NEW CONTROL: Tabview - thanks @tznind!
+      * UI Catalog now shows correct Terminal.gui.dll version
+      * Fixes #939 - README sample does not compile - thanks @buzzfrog!
+      * Fixes #1154 - FileDialog blank constructor results in unstable window
+      * Fixes #1155 - MoveForward/MoveBackward not bound on Text controls.
+      * Fixes #1152 - Generic TreeView`1 breaks upon selection in All Views Tester)
+      * Fixes #1148 - TextFormatter.Format does not keep the end spaces on wrapped text.
+      * Fixes #134 - (HUGE) TextView: Add line wrapping.
+      * Fixes #1145 - ScrollBar down arrow is not showing.
+      * Fixes #1143 - Cannot change the MenuBar's background color.
+      * Fixes #1141 - Cannot change the StatusBar's background color.
       * Fixes #1048 - BrighCyan to BrightCyan spelling
       * Fixes #1130 - Broken Table/TreeView links in docs.
 
