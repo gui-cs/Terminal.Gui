@@ -480,7 +480,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class FileDialog : Dialog {
 		Button prompt, cancel;
-		Label nameFieldLabel, message, dirLabel;
+		Label nameFieldLabel, message, nameDirLabel;
 		TextField dirEntry, nameEntry;
 		internal DirListView dirListView;
 
@@ -525,13 +525,14 @@ namespace Terminal.Gui {
 			Add (this.message);
 			var msgLines = TextFormatter.MaxLines (message, Driver.Cols - 20);
 
-			dirLabel = new Label (nameDirLabel.IsEmpty ? "Directory: " : $"{nameDirLabel}: ") {
+			this.nameDirLabel = new Label (nameDirLabel.IsEmpty ? "Directory: " : $"{nameDirLabel}: ") {
 				X = 1,
-				Y = 1 + msgLines
+				Y = 1 + msgLines,
+				AutoSize = true
 			};
 
 			dirEntry = new TextField ("") {
-				X = Pos.Right (dirLabel),
+				X = Pos.Right (this.nameDirLabel),
 				Y = 1 + msgLines,
 				Width = Dim.Fill () - 1,
 			};
@@ -539,11 +540,12 @@ namespace Terminal.Gui {
 				DirectoryPath = dirEntry.Text;
 				nameEntry.Text = ustring.Empty;
 			};
-			Add (dirLabel, dirEntry);
+			Add (this.nameDirLabel, dirEntry);
 
 			this.nameFieldLabel = new Label (nameFieldLabel.IsEmpty ? "File: " : $"{nameFieldLabel}: ") {
 				X = 1,
 				Y = 3 + msgLines,
+				AutoSize = true
 			};
 			nameEntry = new TextField ("") {
 				X = Pos.Left (dirEntry),
@@ -622,13 +624,24 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Gets or sets the name of the directory field label.
+		/// </summary>
+		/// <value>The name of the directory field label.</value>
+		public ustring NameDirLabel {
+			get => nameDirLabel.Text;
+			set {
+				nameDirLabel.Text = $"{value}: ";
+			}
+		}
+
+		/// <summary>
 		/// Gets or sets the name field label.
 		/// </summary>
 		/// <value>The name field label.</value>
 		public ustring NameFieldLabel {
 			get => nameFieldLabel.Text;
 			set {
-				nameFieldLabel.Text = value;
+				nameFieldLabel.Text = $"{value}: ";
 			}
 		}
 
