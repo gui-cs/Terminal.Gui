@@ -1864,7 +1864,9 @@ namespace Terminal.Gui {
 			void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> update)
 			{
 				if (pos is Pos.PosView pv) {
-					update.Add ((pv.Target, from));
+					if (pv.Target != this) {
+						update.Add ((pv.Target, from));
+					}
 					foreach (var v in from.InternalSubviews) {
 						CollectAll (v, ref nNodes, ref update);
 					}
@@ -1881,7 +1883,9 @@ namespace Terminal.Gui {
 			void CollectDim (Dim dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> update)
 			{
 				if (dim is Dim.DimView dv) {
-					update.Add ((dv.Target, from));
+					if (dv.Target != this) {
+						update.Add ((dv.Target, from));
+					}
 					foreach (var v in from.InternalSubviews) {
 						CollectAll (v, ref nNodes, ref update);
 					}

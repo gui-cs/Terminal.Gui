@@ -379,7 +379,7 @@ namespace Terminal.Gui {
 			var t = Application.Top;
 
 			var w = new Window ("w") {
-				X = Pos.At (2),
+				X = Pos.Left (t) + 2,
 				Y = Pos.At (2)
 			};
 			var v = new View ("v") {
@@ -433,7 +433,7 @@ namespace Terminal.Gui {
 			var t = Application.Top;
 
 			var w = new Window ("w") {
-				X = Pos.At (2),
+				X = Pos.Left (t) + 2,
 				Y = Pos.At (2)
 			};
 			var v = new View ("v") {
