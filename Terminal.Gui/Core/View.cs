@@ -1471,6 +1471,8 @@ namespace Terminal.Gui {
 			KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
+			if (Focused?.ProcessKey (keyEvent) == true)
+				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
 			foreach (var view in subviews)
@@ -1485,6 +1487,8 @@ namespace Terminal.Gui {
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
 			KeyPress?.Invoke (args);
 			if (args.Handled)
+				return true;
+			if (Focused?.ProcessKey (keyEvent) == true)
 				return true;
 			if (subviews == null || subviews.Count == 0)
 				return false;
