@@ -17,7 +17,7 @@
     <Summary>Application framework for creating modern console applications using .NET</Summary>
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
     <PackageReleaseNotes>
-      v1.0.0-beta.10
+      v1.0.0-beta.11
       * NEW CONTROL: Tabview - thanks @tznind!
       * UI Catalog now shows correct Terminal.gui.dll version
       * Fixes #939 - README sample does not compile - thanks @buzzfrog!
