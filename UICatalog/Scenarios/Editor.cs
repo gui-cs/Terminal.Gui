@@ -226,13 +226,15 @@ namespace UICatalog {
 						"File already exists. Overwrite any way?", "No", "Ok") == 1) {
 						return SaveFile (sd.FileName.ToString (), sd.FilePath.ToString ());
 					} else {
-						return _saved = false;
+						_saved = false;
+						return _saved;
 					}
 				} else {
 					return SaveFile (sd.FileName.ToString (), sd.FilePath.ToString ());
 				}
 			} else {
-				return _saved = false;
+				_saved = false;
+				return _saved;
 			}
 		}
 
