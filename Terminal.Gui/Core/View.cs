@@ -1777,7 +1777,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			if (edges.Any ()) {
+			if (edges.Any () && edges.First ().From != Application.Top) {
 				if (!ReferenceEquals (edges.First ().From, edges.First ().To)) {
 					throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {edges.First ().From}. Did you forget to add it to {this}?");
 				} else {
@@ -1861,55 +1861,55 @@ namespace Terminal.Gui {
 			var nodes = new HashSet<View> ();
 			var edges = new HashSet<(View, View)> ();
 
-			void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> update)
+			void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
 			{
 				if (pos is Pos.PosView pv) {
 					if (pv.Target != this) {
-						update.Add ((pv.Target, from));
+						nEdges.Add ((pv.Target, from));
 					}
 					foreach (var v in from.InternalSubviews) {
-						CollectAll (v, ref nNodes, ref update);
+						CollectAll (v, ref nNodes, ref nEdges);
 					}
 					return;
 				}
 				if (pos is Pos.PosCombine pc) {
 					foreach (var v in from.InternalSubviews) {
-						CollectPos (pc.left, from, ref nNodes, ref update);
-						CollectPos (pc.right, from, ref nNodes, ref update);
+						CollectPos (pc.left, from, ref nNodes, ref nEdges);
+						CollectPos (pc.right, from, ref nNodes, ref nEdges);
 					}
 				}
 			}
 
-			void CollectDim (Dim dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> update)
+			void CollectDim (Dim dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
 			{
 				if (dim is Dim.DimView dv) {
 					if (dv.Target != this) {
-						update.Add ((dv.Target, from));
+						nEdges.Add ((dv.Target, from));
 					}
 					foreach (var v in from.InternalSubviews) {
-						CollectAll (v, ref nNodes, ref update);
+						CollectAll (v, ref nNodes, ref nEdges);
 					}
 					return;
 				}
 				if (dim is Dim.DimCombine dc) {
 					foreach (var v in from.InternalSubviews) {
-						CollectDim (dc.left, from, ref nNodes, ref update);
-						CollectDim (dc.right, from, ref nNodes, ref update);
+						CollectDim (dc.left, from, ref nNodes, ref nEdges);
+						CollectDim (dc.right, from, ref nNodes, ref nEdges);
 					}
 				}
 			}
 
-			void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> update)
+			void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
 			{
 				foreach (var v in from.InternalSubviews) {
 					nNodes.Add (v);
 					if (v.layoutStyle != LayoutStyle.Computed) {
 						continue;
 					}
-					CollectPos (v.X, v, ref nNodes, ref update);
-					CollectPos (v.Y, v, ref nNodes, ref update);
-					CollectDim (v.Width, v, ref nNodes, ref update);
-					CollectDim (v.Height, v, ref nNodes, ref update);
+					CollectPos (v.X, v, ref nNodes, ref nEdges);
+					CollectPos (v.Y, v, ref nNodes, ref nEdges);
+					CollectDim (v.Width, v, ref nNodes, ref nEdges);
+					CollectDim (v.Height, v, ref nNodes, ref nEdges);
 				}
 			}
 
