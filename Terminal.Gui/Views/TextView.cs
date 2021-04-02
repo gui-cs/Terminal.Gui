@@ -1365,8 +1365,7 @@ namespace Terminal.Gui {
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
 				} else if (shiftSelecting && selecting) {
-					shiftSelecting = false;
-					selecting = false;
+					StopSelecting ();
 				}
 				int nPageDnShift = Frame.Height - 1;
 				if (currentRow < model.Count) {
@@ -1388,8 +1387,7 @@ namespace Terminal.Gui {
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
 				} else if (shiftSelecting && selecting) {
-					shiftSelecting = false;
-					selecting = false;
+					StopSelecting ();
 				}
 				int nPageUpShift = Frame.Height - 1;
 				if (currentRow > 0) {
@@ -1411,8 +1409,7 @@ namespace Terminal.Gui {
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
 				} else if (shiftSelecting && selecting) {
-					shiftSelecting = false;
-					selecting = false;
+					StopSelecting ();
 				}
 				MoveDown ();
 				break;
@@ -1423,8 +1420,7 @@ namespace Terminal.Gui {
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
 				} else if (shiftSelecting && selecting) {
-					shiftSelecting = false;
-					selecting = false;
+					StopSelecting ();
 				}
 				MoveUp ();
 				break;
@@ -1435,8 +1431,7 @@ namespace Terminal.Gui {
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
 				} else if (shiftSelecting && selecting) {
-					shiftSelecting = false;
-					selecting = false;
+					StopSelecting ();
 				}
 				var currentLine = GetCurrentLine ();
 				if (currentColumn < currentLine.Count) {
@@ -1460,8 +1455,7 @@ namespace Terminal.Gui {
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
 				} else if (shiftSelecting && selecting) {
-					shiftSelecting = false;
-					selecting = false;
+					StopSelecting ();
 				}
 				if (currentColumn > 0) {
 					currentColumn--;
@@ -1529,8 +1523,7 @@ namespace Terminal.Gui {
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
 				} else if (shiftSelecting && selecting) {
-					shiftSelecting = false;
-					selecting = false;
+					StopSelecting ();
 				}
 				currentColumn = 0;
 				Adjust ();
@@ -1571,8 +1564,7 @@ namespace Terminal.Gui {
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
 				} else if (shiftSelecting && selecting) {
-					shiftSelecting = false;
-					selecting = false;
+					StopSelecting ();
 				}
 				currentLine = GetCurrentLine ();
 				currentColumn = currentLine.Count;
@@ -1664,8 +1656,7 @@ namespace Terminal.Gui {
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
 				} else if (shiftSelecting && selecting) {
-					shiftSelecting = false;
-					selecting = false;
+					StopSelecting ();
 				}
 				var newPos = WordBackward (currentColumn, currentRow);
 				if (newPos.HasValue) {
@@ -1682,8 +1673,7 @@ namespace Terminal.Gui {
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
 				} else if (shiftSelecting && selecting) {
-					shiftSelecting = false;
-					selecting = false;
+					StopSelecting ();
 				}
 				newPos = WordForward (currentColumn, currentRow);
 				if (newPos.HasValue) {
@@ -1728,8 +1718,7 @@ namespace Terminal.Gui {
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
 				} else if (shiftSelecting && selecting) {
-					shiftSelecting = false;
-					selecting = false;
+					StopSelecting ();
 				}
 				MoveEnd ();
 				break;
@@ -1739,8 +1728,7 @@ namespace Terminal.Gui {
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
 				} else if (shiftSelecting && selecting) {
-					shiftSelecting = false;
-					selecting = false;
+					StopSelecting ();
 				}
 				MoveHome ();
 				break;
@@ -1842,6 +1830,12 @@ namespace Terminal.Gui {
 			selecting = true;
 			selectionStartColumn = currentColumn;
 			selectionStartRow = currentRow;
+		}
+
+		void StopSelecting ()
+		{
+			shiftSelecting = false;
+			selecting = false;
 		}
 
 		void MoveUp ()
