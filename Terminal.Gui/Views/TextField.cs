@@ -86,7 +86,7 @@ namespace Terminal.Gui {
 			if (text == null)
 				text = "";
 
-			this.text = TextModel.ToRunes (text);
+			this.text = TextModel.ToRunes (text.Split ("\n") [0]);
 			point = text.RuneCount;
 			first = point > w ? point - w : 0;
 			CanFocus = true;
@@ -139,7 +139,7 @@ namespace Terminal.Gui {
 				if (oldText == value)
 					return;
 
-				var newText = OnTextChanging (value);
+				var newText = OnTextChanging (value.Split ("\n") [0]);
 				if (newText.Cancel) {
 					return;
 				}
