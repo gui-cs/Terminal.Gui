@@ -242,17 +242,7 @@ static class Demo {
 
 		var ntop = Application.Top;
 
-		var menu = new MenuBar (new MenuBarItem [] {
-			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_Close", "", () => { if (Quit ()) { running = MainApp; Application.RequestStop (); } }, null, null, Key.AltMask | Key.Q),
-			}),
-			new MenuBarItem ("_Edit", new MenuItem [] {
-				new MenuItem ("_Copy", "", null, null, null, Key.C | Key.CtrlMask),
-				new MenuItem ("C_ut", "", null, null, null, Key.X | Key.CtrlMask),
-				new MenuItem ("_Paste", "", null, null, null, Key.V | Key.CtrlMask)
-			}),
-		});
-		ntop.Add (menu);
+		var text = new TextView () { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
 		string fname = GetFileName ();
 
@@ -264,11 +254,42 @@ static class Demo {
 		};
 		ntop.Add (win);
 
-		var text = new TextView () { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
-
 		if (fname != null)
 			text.Text = System.IO.File.ReadAllText (fname);
 		win.Add (text);
+
+		void Paste ()
+		{
+			if (text != null) {
+				text.Paste ();
+			}
+		}
+
+		void Cut ()
+		{
+			if (text != null) {
+				text.Cut ();
+			}
+		}
+
+		void Copy ()
+		{
+			if (text != null) {
+				text.Copy ();
+			}
+		}
+
+		var menu = new MenuBar (new MenuBarItem [] {
+			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuItem ("_Close", "", () => { if (Quit ()) { running = MainApp; Application.RequestStop (); } }, null, null, Key.AltMask | Key.Q),
+			}),
+			new MenuBarItem ("_Edit", new MenuItem [] {
+				new MenuItem ("_Copy", "", Copy, null, null, Key.C | Key.CtrlMask),
+				new MenuItem ("C_ut", "", Cut, null, null, Key.X | Key.CtrlMask),
+				new MenuItem ("_Paste", "", Paste, null, null, Key.Y | Key.CtrlMask)
+			}),
+		});
+		ntop.Add (menu);
 
 		Application.Run (ntop);
 	}
