@@ -700,19 +700,15 @@ namespace Terminal.Gui {
 		public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
 		{
 			var resume = true;
-			while (resume)
-			{
-#if DEBUG
+			while (resume) {
+#if !DEBUG
+				try {
+#endif
 				resume = false;
 				var runToken = Begin (view);
 				RunLoop (runToken);
 				End (runToken);
-#else
-				try {
-					resume = false;
-					var runToken = Begin (view);
-					RunLoop (runToken);
-					End (runToken);
+#if !DEBUG
 				}
 				catch (Exception error)
 				{
