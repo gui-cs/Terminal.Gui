@@ -1478,7 +1478,7 @@ namespace Terminal.Gui {
 				if (isReadOnly)
 					break;
 				if (selecting) {
-					Cut ();
+					ClearSelectedRegion ();
 					return true;
 				}
 				if (currentColumn > 0) {
@@ -1533,7 +1533,7 @@ namespace Terminal.Gui {
 				if (isReadOnly)
 					break;
 				if (selecting) {
-					Cut ();
+					ClearSelectedRegion ();
 					return true;
 				}
 				currentLine = GetCurrentLine ();
@@ -1741,7 +1741,7 @@ namespace Terminal.Gui {
 				if (isReadOnly)
 					return true;
 				if (selecting) {
-					Cut ();
+					ClearSelectedRegion ();
 				}
 				Insert ((uint)kb.Key);
 				currentColumn++;
@@ -1836,6 +1836,17 @@ namespace Terminal.Gui {
 		{
 			shiftSelecting = false;
 			selecting = false;
+		}
+
+		void ClearSelectedRegion ()
+		{
+			SetWrapModel ();
+			if (!isReadOnly) {
+				ClearRegion ();
+			}
+			UpdateWrapModel ();
+			selecting = false;
+			DoNeededAction ();
 		}
 
 		void MoveUp ()
