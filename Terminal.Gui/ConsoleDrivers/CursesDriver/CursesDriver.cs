@@ -50,7 +50,7 @@ namespace Terminal.Gui {
 					Curses.move (crow, ccol);
 					needMove = false;
 				}
-				Curses.addch ((int)(uint)MakePrintable(rune));
+				Curses.addch ((int)(uint)MakePrintable (rune));
 			} else
 				needMove = true;
 			if (sync)
@@ -71,7 +71,8 @@ namespace Terminal.Gui {
 				AddRune (rune);
 		}
 
-		public override void Refresh () {
+		public override void Refresh ()
+		{
 			Curses.refresh ();
 			if (Curses.CheckWinChange ()) {
 				Clip = new Rect (0, 0, Cols, Rows);
@@ -87,7 +88,7 @@ namespace Terminal.Gui {
 			}
 
 			SetCursorVisibility (CursorVisibility.Default);
-			
+
 			Curses.endwin ();
 			// Clear and reset entire screen.
 			Console.Out.Write ("\x1b[2J");
@@ -100,7 +101,8 @@ namespace Terminal.Gui {
 
 		int currentAttribute;
 
-		public override void SetAttribute (Attribute c) {
+		public override void SetAttribute (Attribute c)
+		{
 			currentAttribute = c.Value;
 			Curses.attrset (currentAttribute);
 		}
@@ -266,7 +268,7 @@ namespace Terminal.Gui {
 				if (cev.ButtonState == Curses.Event.ReportMousePosition) {
 					mouseFlag = MapCursesButton ((Curses.Event)LastMouseButtonPressed) | MouseFlags.ReportMousePosition;
 					point = new Point ();
-					//cancelButtonClicked = true;
+					cancelButtonClicked = true;
 				} else {
 					point = new Point () {
 						X = cev.X,
@@ -700,23 +702,23 @@ namespace Terminal.Gui {
 			// We are setting Invisible as default so we could ignore XTerm DECSUSR setting
 			//
 			switch (Curses.curs_set (0)) {
-				case 0:		
-					currentCursorVisibility = initialCursorVisibility = CursorVisibility.Invisible;	
-					break;
+			case 0:
+				currentCursorVisibility = initialCursorVisibility = CursorVisibility.Invisible;
+				break;
 
-				case 1:		
-					currentCursorVisibility = initialCursorVisibility = CursorVisibility.Underline;	
-					Curses.curs_set (1); 
-					break;
+			case 1:
+				currentCursorVisibility = initialCursorVisibility = CursorVisibility.Underline;
+				Curses.curs_set (1);
+				break;
 
-				case 2:		
-					currentCursorVisibility = initialCursorVisibility = CursorVisibility.Box;		
-					Curses.curs_set (2); 
-					break;
+			case 2:
+				currentCursorVisibility = initialCursorVisibility = CursorVisibility.Box;
+				Curses.curs_set (2);
+				break;
 
-				default:	
-					currentCursorVisibility = initialCursorVisibility = null;						
-					break;
+			default:
+				currentCursorVisibility = initialCursorVisibility = null;
+				break;
 			}
 
 			Curses.raw ();
@@ -915,13 +917,13 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
-			if (initialCursorVisibility.HasValue == false) 
+			if (initialCursorVisibility.HasValue == false)
 				return false;
 
-			Curses.curs_set (((int) visibility >> 16) & 0x000000FF);
+			Curses.curs_set (((int)visibility >> 16) & 0x000000FF);
 
 			if (visibility != CursorVisibility.Invisible) {
-				Console.Out.Write ("\x1b[{0} q", ((int) visibility >> 24) & 0xFF);
+				Console.Out.Write ("\x1b[{0} q", ((int)visibility >> 24) & 0xFF);
 				Console.Out.Flush ();
 			}
 
