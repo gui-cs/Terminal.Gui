@@ -1340,12 +1340,6 @@ namespace Terminal.Gui {
 			List<Rune> rest;
 			bool lineRemoved = false;
 
-			if (shiftSelecting && selecting && !kb.Key.HasFlag (Key.ShiftMask)
-				&& !kb.Key.HasFlag (Key.CtrlMask | Key.C)) {
-				shiftSelecting = false;
-				selecting = false;
-			}
-
 			// Handle some state here - whether the last command was a kill
 			// operation and the column tracking (up/down)
 			switch (kb.Key) {
@@ -1370,6 +1364,8 @@ namespace Terminal.Gui {
 			case Key.PageDown | Key.ShiftMask:
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
+				} else if (shiftSelecting && selecting) {
+					StopSelecting ();
 				}
 				int nPageDnShift = Frame.Height - 1;
 				if (currentRow < model.Count) {
@@ -1390,6 +1386,8 @@ namespace Terminal.Gui {
 			case Key.PageUp | Key.ShiftMask:
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
+				} else if (shiftSelecting && selecting) {
+					StopSelecting ();
 				}
 				int nPageUpShift = Frame.Height - 1;
 				if (currentRow > 0) {
@@ -1410,6 +1408,8 @@ namespace Terminal.Gui {
 			case Key.CursorDown | Key.ShiftMask:
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
+				} else if (shiftSelecting && selecting) {
+					StopSelecting ();
 				}
 				MoveDown ();
 				break;
@@ -1419,6 +1419,8 @@ namespace Terminal.Gui {
 			case Key.CursorUp | Key.ShiftMask:
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
+				} else if (shiftSelecting && selecting) {
+					StopSelecting ();
 				}
 				MoveUp ();
 				break;
@@ -1428,6 +1430,8 @@ namespace Terminal.Gui {
 			case Key.CursorRight | Key.ShiftMask:
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
+				} else if (shiftSelecting && selecting) {
+					StopSelecting ();
 				}
 				var currentLine = GetCurrentLine ();
 				if (currentColumn < currentLine.Count) {
@@ -1450,6 +1454,8 @@ namespace Terminal.Gui {
 			case Key.CursorLeft | Key.ShiftMask:
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
+				} else if (shiftSelecting && selecting) {
+					StopSelecting ();
 				}
 				if (currentColumn > 0) {
 					currentColumn--;
@@ -1516,6 +1522,8 @@ namespace Terminal.Gui {
 			case Key.A | Key.CtrlMask:
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
+				} else if (shiftSelecting && selecting) {
+					StopSelecting ();
 				}
 				currentColumn = 0;
 				Adjust ();
@@ -1555,6 +1563,8 @@ namespace Terminal.Gui {
 			case Key.E | Key.CtrlMask: // End
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
+				} else if (shiftSelecting && selecting) {
+					StopSelecting ();
 				}
 				currentLine = GetCurrentLine ();
 				currentColumn = currentLine.Count;
@@ -1645,6 +1655,8 @@ namespace Terminal.Gui {
 			case (Key)((int)'B' + Key.AltMask):
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
+				} else if (shiftSelecting && selecting) {
+					StopSelecting ();
 				}
 				var newPos = WordBackward (currentColumn, currentRow);
 				if (newPos.HasValue) {
@@ -1660,6 +1672,8 @@ namespace Terminal.Gui {
 			case (Key)((int)'F' + Key.AltMask):
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
+				} else if (shiftSelecting && selecting) {
+					StopSelecting ();
 				}
 				newPos = WordForward (currentColumn, currentRow);
 				if (newPos.HasValue) {
@@ -1703,6 +1717,8 @@ namespace Terminal.Gui {
 			case Key.CtrlMask | Key.End | Key.ShiftMask:
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
+				} else if (shiftSelecting && selecting) {
+					StopSelecting ();
 				}
 				MoveEnd ();
 				break;
@@ -1711,6 +1727,8 @@ namespace Terminal.Gui {
 			case Key.CtrlMask | Key.Home | Key.ShiftMask:
 				if (kb.Key.HasFlag (Key.ShiftMask)) {
 					StartSelecting ();
+				} else if (shiftSelecting && selecting) {
+					StopSelecting ();
 				}
 				MoveHome ();
 				break;
@@ -1812,6 +1830,12 @@ namespace Terminal.Gui {
 			selecting = true;
 			selectionStartColumn = currentColumn;
 			selectionStartRow = currentRow;
+		}
+
+		void StopSelecting ()
+		{
+			shiftSelecting = false;
+			selecting = false;
 		}
 
 		void MoveUp ()
