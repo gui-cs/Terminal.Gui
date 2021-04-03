@@ -86,7 +86,7 @@ namespace Terminal.Gui {
 			if (text == null)
 				text = "";
 
-			this.text = TextModel.ToRunes (text);
+			this.text = TextModel.ToRunes (text.Split ("\n") [0]);
 			point = text.RuneCount;
 			first = point > w ? point - w : 0;
 			CanFocus = true;
@@ -139,7 +139,7 @@ namespace Terminal.Gui {
 				if (oldText == value)
 					return;
 
-				var newText = OnTextChanging (value);
+				var newText = OnTextChanging (value.Split ("\n") [0]);
 				if (newText.Cancel) {
 					return;
 				}
@@ -826,8 +826,8 @@ namespace Terminal.Gui {
 			(var _, var len) = TextModel.DisplaySize (text, 0, selStart, false);
 			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + selLength, false);
 			(var _, var len3) = TextModel.DisplaySize (text, selStart + selLength, actualText.RuneCount, false);
-			Text = actualText[0, len] +
-				actualText[len + len2, len + len2 + len3];
+			Text = actualText [0, len] +
+				actualText [len + len2, len + len2 + len3];
 			ClearAllSelection ();
 			point = selStart >= Text.RuneCount ? Text.RuneCount : selStart;
 			Adjust ();
@@ -848,7 +848,7 @@ namespace Terminal.Gui {
 			(int _, int len) = TextModel.DisplaySize (text, 0, selStart, false);
 			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + length, false);
 			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.RuneCount, false);
-			ustring cbTxt = Clipboard.Contents ?? "";
+			ustring cbTxt = Clipboard.Contents.Split ("\n") [0] ?? "";
 			Text = actualText [0, len] +
 				cbTxt +
 				actualText [len + len2, len + len2 + len3];
@@ -874,12 +874,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Get / Set the wished cursor when the field is focused
 		/// </summary>
-		public CursorVisibility DesiredCursorVisibility 
-		{ 
-			get => desiredCursorVisibility; 
+		public CursorVisibility DesiredCursorVisibility {
+			get => desiredCursorVisibility;
 			set {
 				if (desiredCursorVisibility != value && HasFocus) {
-					Application.Driver.SetCursorVisibility (value);		
+					Application.Driver.SetCursorVisibility (value);
 				}
 
 				desiredCursorVisibility = value;
