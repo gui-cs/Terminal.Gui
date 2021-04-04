@@ -29,7 +29,7 @@ namespace Terminal.Gui {
 		/// to 1 row/col of console space being 1 unit of data space.		/// 
 		/// </summary>
 		/// <returns></returns>
-		public PointF Zoom {get;set;} = new PointF(1,1);
+		public PointF CellSize {get;set;} = new PointF(1,1);
 
 		public GraphView()
 		{
@@ -79,7 +79,7 @@ namespace Terminal.Gui {
 		public RectangleF ViewToDataSpace (int col, int row)
 		{
 			// TODO: fix this to respect Zoom etc
-			return new RectangleF(col,Bounds.Height - row,1,1);
+			return new RectangleF(col * CellSize.X, (Bounds.Height - row)*CellSize.Y ,CellSize.X,CellSize.Y);
 		}
 
 		/// <summary>
@@ -202,12 +202,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			float lastTick = 0;
-
-			// each unit horizontally / vertically 
-			float cellWidth = Orientation == Orientation.Horizontal ?
-						 Graph.Zoom.X :
-						 Graph.Zoom.Y;
+			float nextTick = 0;
 
 			Rune tickSymbol = Orientation == Orientation.Horizontal ? 
 								Driver.TopTee :
@@ -221,11 +216,16 @@ namespace Terminal.Gui {
 				for(int i=0;i<bounds.Width;i++){
 					Move (i,0);
 
-					// are we overdue drawing a tick line?
-					if(lastTick < i*cellWidth)
+					var rect = Graph.ViewToDataSpace (i, 0);
+					
+					if(rect.X>= nextTick && nextTick <= rect.Right)
 					{
 						Driver.AddRune(tickSymbol);
-						lastTick = i*cellWidth;
+
+						// find the next tick spot that is outside of the current cell
+						while (nextTick <= rect.Right) {
+							nextTick += Increment;
+						}
 					}
 					else
 					{
@@ -234,17 +234,20 @@ namespace Terminal.Gui {
 				}
 			}
 			else{
-
-				for(int i=0;i<bounds.Height;i++){
+				// draw axis bottom up
+				for(int i= bounds.Height; i>0;i--){
 					Move (0, i);
-					
-					// are we overdue drawing a tick line?
-					if(lastTick < i*cellWidth)
-					{
-						Driver.AddRune(tickSymbol);
-						lastTick = i*cellWidth;
-					}
-					else
+
+					var rect = Graph.ViewToDataSpace (0, i);
+
+					if (rect.Y >= nextTick && nextTick <= rect.Bottom) {
+						Driver.AddRune (tickSymbol);
+
+						// find the next tick spot that is outside of the current cell
+						while(nextTick <= rect.Bottom) {
+							nextTick += Increment;
+						}
+					} else
 					{
 						Driver.AddRune(nonTickSymbol);
 					}

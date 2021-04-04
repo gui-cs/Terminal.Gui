@@ -29,8 +29,8 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
-					new MenuItem ("Zoom _In", "", () => Zoom(2)),
-					 new MenuItem ("Zoom _Out", "", () =>  Zoom(0.5f)),
+					new MenuItem ("Zoom _In", "", () => Zoom(0.5f)),
+					 new MenuItem ("Zoom _Out", "", () =>  Zoom(2f)),
 				}),
 
 				});
@@ -56,7 +56,7 @@ namespace UICatalog.Scenarios {
 			// One graph per 10%
 			graphView.AxisY.Increment = 10;
 
-			graphView.Zoom = new PointF(1,5);
+			graphView.CellSize = new PointF(1,5);
 
 
 			Win.Add (graphView);
@@ -102,9 +102,9 @@ namespace UICatalog.Scenarios {
 
 		private void Zoom (float factor)
 		{
-			graphView.Zoom = new PointF(
-				graphView.Zoom.X * factor,
-				graphView.Zoom.Y * factor
+			graphView.CellSize = new PointF(
+				graphView.CellSize.X * factor,
+				graphView.CellSize.Y * factor
 			);
 
 			graphView.SetNeedsDisplay();
