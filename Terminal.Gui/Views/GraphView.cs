@@ -12,8 +12,10 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class GraphView : View {
 
-		AxisView AxisX {get;} = new AxisView(Orientation.Horizontal);
-		AxisView AxisY {get;} = new AxisView(Orientation.Vertical);
+		public AxisView AxisX {get;} = new AxisView(Orientation.Horizontal);
+		public AxisView AxisY {get;} = new AxisView(Orientation.Vertical);
+
+		public List<ISeries> Series {get;} = new List<ISeries>();
 
 		/// <summary>
 		/// The data space position of the bottom left of the control.
@@ -33,21 +35,47 @@ namespace Terminal.Gui {
 		{
 			Add(AxisX);
 			Add(AxisY);
-			RefreshViewport();
-
 		}
-		
 
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
+			base.Redraw(bounds);
+
 			RefreshViewport();
 
 			Move (0, 0);
 			Driver.SetAttribute (ColorScheme.Normal);
 
-			AxisX.Redraw (AxisX.Bounds);
-			AxisY.Redraw (AxisY.Bounds);
+			for(int x=0;x<Bounds.Width;x++){
+				for(int y=0;y<Bounds.Width;y++){
+
+					var space = ViewToDataSpace(x,y);
+
+					foreach(var s in Series){
+						var rune = s.GetCellValueIfAny(space);
+						
+						if(rune.HasValue){
+							Move(x,y);
+							Driver.AddRune(rune.Value);
+						}
+					}
+			
+				}
+			}
+		}
+
+		/// <summary>
+		/// Projects the given screen location (in client area) into the 
+		/// data space (coordinate system of the <see cref="Series"/>)
+		/// </summary>
+		/// <param name="col"></param>
+		/// <param name="row"></param>
+		/// <returns></returns>
+		public RectangleF ViewToDataSpace (int col, int row)
+		{
+			// TODO: fix this to respect Zoom etc
+			return new RectangleF(col,Bounds.Height - row,1,1);
 		}
 
 		/// <summary>
@@ -87,6 +115,37 @@ namespace Terminal.Gui {
 			}
 
 			return base.ProcessKey (keyEvent);
+		}
+	}
+
+	/// <summary>
+	/// Describes a series of data that can be rendered into a <see cref="GraphView"/>>
+	/// </summary>
+	public interface ISeries 
+	{
+		/// <summary>
+		/// Return the rune that should be drawn on the screen (if any)
+		/// for the current position in the control
+		/// </summary>
+		/// <param name="dataSpace">Projection of the screen location into the chart data space</param>
+		Rune? GetCellValueIfAny(RectangleF dataSpace);
+	}
+
+	public class ScatterSeries : ISeries
+	{
+		/// <summary>
+		/// Collection of each discrete point in the series
+		/// </summary>
+		/// <returns></returns>
+		public List<PointF> Points {get;set;} = new List<PointF>();
+
+		public Rune? GetCellValueIfAny (RectangleF dataSpace)
+		{
+			if(Points.Any(p=>dataSpace.Contains(p))){
+				return 'x';
+			}
+
+			return null;
 		}
 	}
 

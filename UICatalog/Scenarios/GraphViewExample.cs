@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -38,8 +39,16 @@ namespace UICatalog.Scenarios {
 				Height = 20,
 			};
 
+			graphView.Series.Add(new ScatterSeries(){
+				Points = new List<PointF>{
+					new PointF(1,2),
+				 new PointF(2,3),
+				 new PointF(5,5)}
+			});
+
 
 			Win.Add (graphView);
+
 
 			var frameRight = new FrameView ("About") {
 				X = Pos.Right (graphView),
@@ -56,8 +65,6 @@ namespace UICatalog.Scenarios {
 			});
 
 			Win.Add (frameRight);
-
-
 
 			var frameBelow = new FrameView ("Bottom Frame") {
 				X = 0,
@@ -80,7 +87,6 @@ namespace UICatalog.Scenarios {
 			});
 			Top.Add (statusBar);
 		}
-
 
 		private void Quit ()
 		{
