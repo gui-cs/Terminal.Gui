@@ -1211,7 +1211,7 @@ namespace Terminal.Gui {
 				if (wordWrap) {
 					SetNeedsDisplay ();
 				} else {
-					SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, currentRow - topRow + 1));
+					SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Math.Max (currentRow - topRow + 1, 0)));
 				}
 				return;
 			}
