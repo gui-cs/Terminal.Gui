@@ -7,7 +7,10 @@ using System.Linq;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> and textual representation of cells (e.g. date formats)
+	/// Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> 
+	/// and textual representation of cells (e.g. date formats)
+	/// 
+	/// <a href="https://migueldeicaza.github.io/gui.cs/articles/tableview.html">See TableView Deep Dive for more information</a>.
 	/// </summary>
 	public class ColumnStyle {
 		
@@ -75,7 +78,9 @@ namespace Terminal.Gui {
 		}
 	}
 	/// <summary>
-	/// Defines rendering options that affect how the table is displayed
+	/// Defines rendering options that affect how the table is displayed.
+	/// 
+	/// <a href="https://migueldeicaza.github.io/gui.cs/articles/tableview.html">See TableView Deep Dive for more information</a>.
 	/// </summary>
 	public class TableStyle {
 		
@@ -132,9 +137,11 @@ namespace Terminal.Gui {
 			return ColumnStyles[col];
 		}
 	}
-	
+
 	/// <summary>
-	/// View for tabular data based on a <see cref="DataTable"/>
+	/// View for tabular data based on a <see cref="DataTable"/>.
+	/// 
+	/// <a href="https://migueldeicaza.github.io/gui.cs/articles/tableview.html">See TableView Deep Dive for more information</a>.
 	/// </summary>
 	public class TableView : View {
 

@@ -1,24 +1,25 @@
 # Table View
 
-This control supports viewing and editing tabular data.  It provides a view of a [System.DataTable](https://docs.microsoft.com/en-us/dotnet/api/system.data.datatable?view=net-5.0).
+This control supports viewing and editing tabular data. It provides a view of a [System.DataTable](https://docs.microsoft.com/en-us/dotnet/api/system.data.datatable?view=net-5.0).
 
 System.DataTable is a core class of .net standard and can be created very easily
 
+[TableView API Reference](api/Terminal.Gui/Terminal.Gui.TableView.html)
+
 ## Csv Example
 
-You can create a DataTable from a CSV file by creating a new instance and adding columns and rows as you read them.  For a robust solution however you might want to look into a CSV parser library that deals with escaping, multi line rows etc.
+You can create a DataTable from a CSV file by creating a new instance and adding columns and rows as you read them. For a robust solution however you might want to look into a CSV parser library that deals with escaping, multi line rows etc.
 
 ```csharp
 var dt = new DataTable();
 var lines = File.ReadAllLines(filename);
-			
+
 foreach(var h in lines[0].Split(',')){
-	dt.Columns.Add(h);
+   dt.Columns.Add(h);
 }
-				
 
 foreach(var line in lines.Skip(1)) {
-	dt.Rows.Add(line.Split(','));
+    dt.Rows.Add(line.Split(','));
 }
 ```
 
@@ -45,12 +46,11 @@ Once you have set up your data table set it in the view:
 
 ```csharp
 tableView = new TableView () {
-	X = 0,
-	Y = 0,
-	Width = 50,
-	Height = 10,
+    X = 0,
+    Y = 0,
+    Width = 50,
+    Height = 10,
 };
 
 tableView.Table = yourDataTable;
 ```
-

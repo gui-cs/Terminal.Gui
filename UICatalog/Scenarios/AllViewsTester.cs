@@ -344,6 +344,20 @@ namespace UICatalog {
 
 		View CreateClass (Type type)
 		{
+			// If we are to create a generic Type
+			if (type.IsGenericType) {
+
+				// For each of the <T> arguments
+				List<Type> typeArguments = new List<Type> ();
+
+				// use <object>
+				foreach (var arg in type.GetGenericArguments ()) {
+					typeArguments.Add (typeof (object));
+				}
+
+				// And change what type we are instantiating from MyClass<T> to MyClass<object>
+				type = type.MakeGenericType (typeArguments.ToArray ());
+			}
 			// Instantiate view
 			var view = (View)Activator.CreateInstance (type);
 

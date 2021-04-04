@@ -12,10 +12,10 @@ namespace Terminal.Gui {
 
 	/// <summary>
 	/// Interface for all non generic members of <see cref="TreeView{T}"/>
+	/// 
+	/// <a href="https://migueldeicaza.github.io/gui.cs/articles/treeview.html">See TreeView Deep Dive for more information</a>.
 	/// </summary>
 	public interface ITreeView {
-
-
 		/// <summary>
 		/// Contains options for changing how the tree is rendered
 		/// </summary>
@@ -34,7 +34,9 @@ namespace Terminal.Gui {
 
 	/// <summary>
 	/// Convenience implementation of generic <see cref="TreeView{T}"/> for any tree were all nodes
-	/// implement <see cref="ITreeNode"/>
+	/// implement <see cref="ITreeNode"/>.
+	/// 
+	/// <a href="https://migueldeicaza.github.io/gui.cs/articles/treeview.html">See TreeView Deep Dive for more information</a>.
 	/// </summary>
 	public class TreeView : TreeView<ITreeNode> {
 
@@ -52,6 +54,8 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Hierarchical tree view with expandable branches.  Branch objects are dynamically determined
 	/// when expanded using a user defined <see cref="ITreeBuilder{T}"/>
+	/// 
+	/// <a href="https://migueldeicaza.github.io/gui.cs/articles/treeview.html">See TreeView Deep Dive for more information</a>.
 	/// </summary>
 	public class TreeView<T> : View, ITreeView where T : class {
 		private int scrollOffsetVertical;

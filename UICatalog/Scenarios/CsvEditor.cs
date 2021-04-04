@@ -367,7 +367,7 @@ namespace UICatalog.Scenarios {
 
 			Application.Run(ofd);
 			
-			if(!string.IsNullOrWhiteSpace(ofd.FilePath?.ToString()))
+			if(!ofd.Canceled && !string.IsNullOrWhiteSpace(ofd.FilePath?.ToString()))
 			{
 				Open(ofd.FilePath.ToString());
 			}

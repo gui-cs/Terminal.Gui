@@ -86,6 +86,8 @@
   <div class="markdown level0 summary">
 Hierarchical tree view with expandable branches.  Branch objects are dynamically determined
 when expanded using a user defined <a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a>
+
+<a href="https://migueldeicaza.github.io/gui.cs/articles/treeview.html">See TreeView Deep Dive for more information</a>.
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -620,6 +622,35 @@ True to allow multiple objects to be selected at once
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TreeView_1_ObjectActivationButton_" data-uid="Terminal.Gui.TreeView`1.ObjectActivationButton*"></a>
+  <h4 id="Terminal_Gui_TreeView_1_ObjectActivationButton" data-uid="Terminal.Gui.TreeView`1.ObjectActivationButton">ObjectActivationButton</h4>
+  <div class="markdown level1 summary">
+Mouse event to trigger <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ObjectActivated">ObjectActivated</a>.
+Defaults to double click (<a class="xref" href="Terminal.Gui.MouseFlags.html#Terminal_Gui_MouseFlags_Button1DoubleClicked">Button1DoubleClicked</a>).
+Set to null to disable this feature.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MouseFlags? ObjectActivationButton { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Nullable</span>&lt;<a class="xref" href="Terminal.Gui.MouseFlags.html">MouseFlags</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -1619,9 +1650,7 @@ Returns true if the <code data-dev-comment-type="paramref" class="paramref">mode
   
   <a id="Terminal_Gui_TreeView_1_MouseEvent_" data-uid="Terminal.Gui.TreeView`1.MouseEvent*"></a>
   <h4 id="Terminal_Gui_TreeView_1_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.TreeView`1.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
-  <div class="markdown level1 summary">
-Method invoked when a mouse event is generated
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1655,7 +1684,7 @@ Method invoked when a mouse event is generated
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -1737,10 +1766,7 @@ Positions the cursor at the start of the selected objects line (if visible)
   
   <a id="Terminal_Gui_TreeView_1_ProcessKey_" data-uid="Terminal.Gui.TreeView`1.ProcessKey*"></a>
   <h4 id="Terminal_Gui_TreeView_1_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.TreeView`1.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary">
-If the view is focused, gives the view a
-chance to process the keystroke.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1759,7 +1785,7 @@ chance to process the keystroke.
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td>Contains the details about the key that produced the event.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -1780,25 +1806,6 @@ chance to process the keystroke.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_TreeView_1_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-  Views can override this method if they are
-  interested in processing the given keystroke.
-  If they consume the keystroke, they must
-  return true to stop the keystroke from being
-  processed by other widgets or consumed by the
-  widget engine.    If they return false, the
-  keystroke will be passed using the ProcessColdKey
-  method to other views to process.
-</p>
-<p>
-  The View implementation does nothing but return false,
-  so it is not necessary to call base.ProcessKey if you
-  derive directly from View, but you should if you derive
-  other View subclasses.
-</p>
-</div>
   
   
   <a id="Terminal_Gui_TreeView_1_RebuildTree_" data-uid="Terminal.Gui.TreeView`1.RebuildTree*"></a>
@@ -1817,9 +1824,7 @@ objects have changed (otherwise use <a class="xref" href="Terminal.Gui.TreeView-
   
   <a id="Terminal_Gui_TreeView_1_Redraw_" data-uid="Terminal.Gui.TreeView`1.Redraw*"></a>
   <h4 id="Terminal_Gui_TreeView_1_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.TreeView`1.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
-  <div class="markdown level1 summary">
-Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1838,26 +1843,12 @@ Redraws this view and its subviews; only redraws the views that have been flagge
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">bounds</span></td>
-        <td>The bounds (view-relative region) to redraw.</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  <h5 id="Terminal_Gui_TreeView_1_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-<p>
-   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
-</p>
-<p>
-   Views should set the color that they want to use on entry, as otherwise this will inherit
-   the last color that was set globally on the driver.
-</p>
-<p>
-   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
-   larger than the <code>region</code> parameter.
-</p>
-</div>
   
   
   <a id="Terminal_Gui_TreeView_1_RefreshObject_" data-uid="Terminal.Gui.TreeView`1.RefreshObject*"></a>

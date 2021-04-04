@@ -2306,5 +2306,125 @@ namespace Terminal.Gui {
 			c = new System.Text.Rune (127);
 			Assert.Equal (1, c.Utf8SequenceLength);		// non printable character
 		}
+
+		[Fact]
+		public void Format_WordWrap_Keep_End_Spaces ()
+		{
+			ustring text = " A sentence has words. \n This is the second Line - 2. ";
+
+			// With preserveTrailingSpaces = false by default.
+			var list1 = TextFormatter.Format (text, 4, TextAlignment.Left, true);
+			ustring wrappedText1 = ustring.Empty;
+			var idx = 0;
+			foreach (var txt in list1) {
+				wrappedText1 += txt;
+				switch (idx) {
+				case 0:
+					Assert.Equal (" A", txt);
+					break;
+				case 1:
+					Assert.Equal ("sent", txt);
+					break;
+				case 2:
+					Assert.Equal ("ence", txt);
+					break;
+				case 3:
+					Assert.Equal ("has", txt);
+					break;
+				case 4:
+					Assert.Equal ("word", txt);
+					break;
+				case 5:
+					Assert.Equal ("s. ", txt);
+					break;
+				case 6:
+					Assert.Equal (" Thi", txt);
+					break;
+				case 7:
+					Assert.Equal ("s is", txt);
+					break;
+				case 8:
+					Assert.Equal ("the", txt);
+					break;
+				case 9:
+					Assert.Equal ("seco", txt);
+					break;
+				case 10:
+					Assert.Equal ("nd", txt);
+					break;
+				case 11:
+					Assert.Equal ("Line", txt);
+					break;
+				case 12:
+					Assert.Equal ("- 2.", txt);
+					break;
+				}
+				idx++;
+			}
+			Assert.Equal (" Asentencehaswords.  This isthesecondLine- 2.", wrappedText1);
+
+			// With preserveTrailingSpaces = true.
+			var list2 = TextFormatter.Format (text, 4, TextAlignment.Left, true, true);
+			ustring wrappedText2 = ustring.Empty;
+			idx = 0;
+			foreach (var txt in list2) {
+				wrappedText2 += txt;
+				switch (idx) {
+				case 0:
+					Assert.Equal (" A", txt);
+					break;
+				case 1:
+					Assert.Equal (" sen", txt);
+					break;
+				case 2:
+					Assert.Equal ("tenc", txt);
+					break;
+				case 3:
+					Assert.Equal ("e", txt);
+					break;
+				case 4:
+					Assert.Equal (" has", txt);
+					break;
+				case 5:
+					Assert.Equal (" wor", txt);
+					break;
+				case 6:
+					Assert.Equal ("ds. ", txt);
+					break;
+				case 7:
+					Assert.Equal (" Thi", txt);
+					break;
+				case 8:
+					Assert.Equal ("s is", txt);
+					break;
+				case 9:
+					Assert.Equal (" the", txt);
+					break;
+				case 10:
+					Assert.Equal (" sec", txt);
+					break;
+				case 11:
+					Assert.Equal ("ond", txt);
+					break;
+				case 12:
+					Assert.Equal (" Lin", txt);
+					break;
+				case 13:
+					Assert.Equal ("e -", txt);
+					break;
+				case 14:
+					Assert.Equal (" 2. ", txt);
+					break;
+				}
+				idx++;
+			}
+			Assert.Equal (" A sentence has words.  This is the second Line - 2. ", wrappedText2);
+		}
+
+		[Fact]
+		public void Format_Throw_ArgumentException_With_WordWrap_As_False_And_Keep_End_Spaces_As_True ()
+		{
+			Assert.Throws<ArgumentException> (() => TextFormatter.Format ("Some text", 4, TextAlignment.Left, false, true));
+		}
 	}
 }

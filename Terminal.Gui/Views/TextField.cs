@@ -86,7 +86,7 @@ namespace Terminal.Gui {
 			if (text == null)
 				text = "";
 
-			this.text = TextModel.ToRunes (text);
+			this.text = TextModel.ToRunes (text.Split ("\n") [0]);
 			point = text.RuneCount;
 			first = point > w ? point - w : 0;
 			CanFocus = true;
@@ -139,7 +139,7 @@ namespace Terminal.Gui {
 				if (oldText == value)
 					return;
 
-				var newText = OnTextChanging (value);
+				var newText = OnTextChanging (value.Split ("\n") [0]);
 				if (newText.Cancel) {
 					return;
 				}
@@ -389,6 +389,7 @@ namespace Terminal.Gui {
 
 			case Key.CursorLeft | Key.ShiftMask | Key.CtrlMask:
 			case Key.CursorUp | Key.ShiftMask | Key.CtrlMask:
+			case (Key)((int)'B' + Key.ShiftMask | Key.AltMask):
 				if (point > 0) {
 					int x = start > -1 && start > point ? start : point;
 					if (x > 0) {
@@ -402,6 +403,7 @@ namespace Terminal.Gui {
 
 			case Key.CursorRight | Key.ShiftMask | Key.CtrlMask:
 			case Key.CursorDown | Key.ShiftMask | Key.CtrlMask:
+			case (Key)((int)'F' + Key.ShiftMask | Key.AltMask):
 				if (point < text.Count) {
 					int x = start > -1 && start > point ? start : point;
 					int sfw = WordForward (x);
@@ -503,7 +505,7 @@ namespace Terminal.Gui {
 
 			case Key.CursorLeft | Key.CtrlMask:
 			case Key.CursorUp | Key.CtrlMask:
-			case (Key)((int)'b' + Key.AltMask):
+			case (Key)((int)'B' + Key.AltMask):
 				ClearAllSelection ();
 				int bw = WordBackward (point);
 				if (bw != -1)
@@ -513,7 +515,7 @@ namespace Terminal.Gui {
 
 			case Key.CursorRight | Key.CtrlMask:
 			case Key.CursorDown | Key.CtrlMask:
-			case (Key)((int)'f' + Key.AltMask):
+			case (Key)((int)'F' + Key.AltMask):
 				ClearAllSelection ();
 				int fw = WordForward (point);
 				if (fw != -1)
@@ -604,7 +606,7 @@ namespace Terminal.Gui {
 				}
 			}
 			if (i != p)
-				return i;
+				return i + 1;
 			return -1;
 		}
 
@@ -824,8 +826,8 @@ namespace Terminal.Gui {
 			(var _, var len) = TextModel.DisplaySize (text, 0, selStart, false);
 			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + selLength, false);
 			(var _, var len3) = TextModel.DisplaySize (text, selStart + selLength, actualText.RuneCount, false);
-			Text = actualText[0, len] +
-				actualText[len + len2, len + len2 + len3];
+			Text = actualText [0, len] +
+				actualText [len + len2, len + len2 + len3];
 			ClearAllSelection ();
 			point = selStart >= Text.RuneCount ? Text.RuneCount : selStart;
 			Adjust ();
@@ -846,7 +848,7 @@ namespace Terminal.Gui {
 			(int _, int len) = TextModel.DisplaySize (text, 0, selStart, false);
 			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + length, false);
 			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.RuneCount, false);
-			ustring cbTxt = Clipboard.Contents ?? "";
+			ustring cbTxt = Clipboard.Contents.Split ("\n") [0] ?? "";
 			Text = actualText [0, len] +
 				cbTxt +
 				actualText [len + len2, len + len2 + len3];
@@ -872,12 +874,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Get / Set the wished cursor when the field is focused
 		/// </summary>
-		public CursorVisibility DesiredCursorVisibility 
-		{ 
-			get => desiredCursorVisibility; 
+		public CursorVisibility DesiredCursorVisibility {
+			get => desiredCursorVisibility;
 			set {
 				if (desiredCursorVisibility != value && HasFocus) {
-					Application.Driver.SetCursorVisibility (value);		
+					Application.Driver.SetCursorVisibility (value);
 				}
 
 				desiredCursorVisibility = value;
