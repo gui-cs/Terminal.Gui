@@ -1906,7 +1906,11 @@ namespace Terminal.Gui {
 		Rune RuneAt (int col, int row)
 		{
 			var line = model.GetLine (row);
-			return line [col > line.Count - 1 ? line.Count - 1 : col];
+			if (line.Count > 0) {
+				return line [col > line.Count - 1 ? line.Count - 1 : col];
+			} else {
+				return 0;
+			}
 		}
 
 		/// <summary>
@@ -1986,27 +1990,45 @@ namespace Terminal.Gui {
 			try {
 				var rune = RuneAt (col, row);
 
-				var srow = row;
-				if (Rune.IsPunctuation (rune) || Rune.IsWhiteSpace (rune)) {
-					while (MoveNext (ref col, ref row, out rune)) {
-						if (Rune.IsLetterOrDigit (rune))
-							break;
-					}
-					if (row != fromRow && Rune.IsLetterOrDigit (rune)) {
-						return (col, row);
-					}
-					while (MoveNext (ref col, ref row, out rune)) {
-						if (!Rune.IsLetterOrDigit (rune))
-							break;
-					}
-				} else {
-					while (MoveNext (ref col, ref row, out rune)) {
-						if (!Rune.IsLetterOrDigit (rune))
-							break;
+				void ProcMoveNext (ref int nCol, ref int nRow, Rune nRune)
+				{
+					if (Rune.IsSymbol (nRune) || Rune.IsWhiteSpace (nRune)) {
+						while (MoveNext (ref nCol, ref nRow, out nRune)) {
+							if (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune))
+								return;
+						}
+						if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune))) {
+							return;
+						}
+						while (MoveNext (ref nCol, ref nRow, out nRune)) {
+							if (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune))
+								break;
+						}
+					} else {
+						if (!MoveNext (ref nCol, ref nRow, out nRune)) {
+							return;
+						}
+
+						var line = model.GetLine (fromRow);
+						if ((nRow != fromRow && fromCol < line.Count)
+							|| (nRow == fromRow && nCol == line.Count - 1)) {
+							nCol = line.Count;
+							nRow = fromRow;
+							return;
+						} else if (nRow != fromRow && fromCol == line.Count) {
+							line = model.GetLine (nRow);
+							if (Rune.IsLetterOrDigit (line [nCol]) || Rune.IsPunctuation (line [nCol])) {
+								return;
+							}
+						}
+						ProcMoveNext (ref nCol, ref nRow, nRune);
 					}
 				}
+
+				ProcMoveNext (ref col, ref row, rune);
+
 				if (fromCol != col || fromRow != row)
-					return (col + 1, row);
+					return (col, row);
 				return null;
 			} catch (Exception) {
 				return null;
@@ -2022,36 +2044,36 @@ namespace Terminal.Gui {
 			var row = fromRow;
 			try {
 				var rune = RuneAt (col, row);
+				int lastValidCol = Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) ? col : -1;
 
-				if (Rune.IsPunctuation (rune) || Rune.IsSymbol (rune) || Rune.IsWhiteSpace (rune)) {
-					while (MovePrev (ref col, ref row, out rune)) {
-						if (Rune.IsLetterOrDigit (rune))
-							break;
-					}
-					int lastValidCol = -1;
-					while (MovePrev (ref col, ref row, out rune)) {
-						if (col == 0 && Rune.IsLetterOrDigit (rune)) {
-							return (col, row);
-						} else if (col == 0 && !Rune.IsLetterOrDigit (rune) && lastValidCol > -1) {
-							col = lastValidCol;
-							return (col, row);
+				void ProcMovePrev (ref int nCol, ref int nRow, Rune nRune)
+				{
+					if (nCol + 1 < fromCol && (Rune.IsSymbol (nRune) || Rune.IsWhiteSpace (nRune))) {
+						if (lastValidCol > -1) {
+							nCol = lastValidCol;
 						}
-						if (!Rune.IsLetterOrDigit (rune)) {
-							break;
+					} else {
+						if (!MovePrev (ref nCol, ref nRow, out nRune)) {
+							return;
 						}
-						lastValidCol = Rune.IsLetterOrDigit (rune) ? col : -1;
-					}
-				} else {
-					while (MovePrev (ref col, ref row, out rune)) {
-						if (!Rune.IsLetterOrDigit (rune))
-							break;
+
+						var line = model.GetLine (nRow);
+						if (nCol == 0 && nRow == fromRow && (Rune.IsLetterOrDigit (line [0]) || Rune.IsPunctuation (line [0]))) {
+							return;
+						}
+						lastValidCol = Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) ? nCol : lastValidCol;
+						if (fromRow != nRow) {
+							nCol = line.Count;
+							return;
+						}
+						ProcMovePrev (ref nCol, ref nRow, nRune);
 					}
 				}
-				if (fromCol != col && fromRow == row) {
-					return (col == 0 ? col : col + 1, row);
-				} else if (fromCol != col && fromRow != row) {
-					return (col + 1, row);
-				}
+
+				ProcMovePrev (ref col, ref row, rune);
+
+				if (fromCol != col || fromRow != row)
+					return (col, row);
 				return null;
 			} catch (Exception) {
 				return null;
@@ -2065,7 +2087,9 @@ namespace Terminal.Gui {
 				&& !ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)
 				&& !ev.Flags.HasFlag (MouseFlags.Button1Released)
 				&& !ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ButtonShift)
-				&& !ev.Flags.HasFlag (MouseFlags.WheeledDown) && !ev.Flags.HasFlag (MouseFlags.WheeledUp)) {
+				&& !ev.Flags.HasFlag (MouseFlags.WheeledDown) && !ev.Flags.HasFlag (MouseFlags.WheeledUp)
+				&& !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
+				&& !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked | MouseFlags.ButtonShift)) {
 				return false;
 			}
 
@@ -2154,6 +2178,40 @@ namespace Terminal.Gui {
 				}
 			} else if (ev.Flags.HasFlag (MouseFlags.Button1Released)) {
 				Application.UngrabMouse ();
+			} else if (ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked)) {
+				if (ev.Flags.HasFlag (MouseFlags.ButtonShift)) {
+					if (!selecting) {
+						StartSelecting ();
+					}
+				} else if (selecting) {
+					StopSelecting ();
+				}
+				ProcessMouseClick (ev, out List<Rune> line);
+				(int col, int row)? newPos = null;
+				if (currentColumn > 0 && line [currentColumn - 1] != ' ') {
+					newPos = WordBackward (currentColumn, currentRow);
+					if (newPos.HasValue) {
+						currentColumn = newPos.Value.col;
+						currentRow = newPos.Value.row;
+					}
+				}
+				if (!selecting) {
+					StartSelecting ();
+				}
+				if (currentRow < selectionStartRow || currentRow == selectionStartRow && currentColumn < selectionStartColumn) {
+					if (currentColumn > 0 && line [currentColumn - 1] != ' ') {
+						newPos = WordBackward (currentColumn, currentRow);
+					}
+				} else {
+					newPos = WordForward (currentColumn, currentRow);
+				}
+				if (newPos != null && newPos.HasValue) {
+					currentColumn = newPos.Value.col;
+					currentRow = newPos.Value.row;
+				}
+				PositionCursor ();
+				lastWasKill = false;
+				columnTrack = currentColumn;
 			}
 
 			return true;
