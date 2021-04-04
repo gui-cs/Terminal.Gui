@@ -12,8 +12,8 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class GraphView : View {
 
-		public AxisView AxisX {get;} = new AxisView(Orientation.Horizontal);
-		public AxisView AxisY {get;} = new AxisView(Orientation.Vertical);
+		public AxisView AxisX {get;} 
+		public AxisView AxisY {get;} 
 
 		public List<ISeries> Series {get;} = new List<ISeries>();
 
@@ -33,6 +33,10 @@ namespace Terminal.Gui {
 
 		public GraphView()
 		{
+
+			AxisX = new AxisView(this,Orientation.Horizontal);
+		 	AxisY = new AxisView(this,Orientation.Vertical);
+
 			Add(AxisX);
 			Add(AxisY);
 		}
@@ -166,40 +170,104 @@ namespace Terminal.Gui {
 		/// <value></value>
 		public bool ShowLabels {get;set;}
 
+		/// <summary>
+		/// Number of units of data space between ticks on axis
+		/// </summary>
+		/// <value></value>
+		public float Increment {get;set;} = 1;
+
+		/// <summary>
+		/// Parent <see cref="GraphView"/> in which this axis is displayed
+		/// </summary>
+		/// <value></value>
+		public GraphView Graph {get;}
+
 		public AxisView()
 		{
 
 		}
-		public AxisView(Orientation orientation)
+		public AxisView(GraphView graph,Orientation orientation)
 		{
 			Orientation = orientation;
+			Graph = graph;
 		}
 
 		public override void Redraw (Rect bounds)
 		{
 			Move (0, 0);
-			//Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (ColorScheme.Normal);
+
+			// Cannot render orphan axes
+			if(Graph == null){
+				return;
+			}
+
+			float lastTick = 0;
+
+			// each unit horizontally / vertically 
+			float cellWidth = Orientation == Orientation.Horizontal ?
+						 Graph.Zoom.X :
+						 Graph.Zoom.Y;
+
+			Rune tickSymbol = Orientation == Orientation.Horizontal ? 
+								Driver.TopTee :
+								Driver.RightTee ;
+
+			Rune nonTickSymbol = Orientation == Orientation.Horizontal ? 
+								Driver.HLine :
+								Driver.VLine ;
 
 			if(Orientation == Orientation.Horizontal){
 				for(int i=0;i<bounds.Width;i++){
 					Move (i,0);
-					Driver.AddRune(Driver.TopTee);
+
+					// are we overdue drawing a tick line?
+					if(lastTick < i*cellWidth)
+					{
+						Driver.AddRune(tickSymbol);
+						lastTick = i*cellWidth;
+					}
+					else
+					{
+						Driver.AddRune(nonTickSymbol);
+					}
 				}
 			}
 			else{
 
 				for(int i=0;i<bounds.Height;i++){
 					Move (0, i);
-					Driver.AddRune(Driver.RightTee);
+					
+					// are we overdue drawing a tick line?
+					if(lastTick < i*cellWidth)
+					{
+						Driver.AddRune(tickSymbol);
+						lastTick = i*cellWidth;
+					}
+					else
+					{
+						Driver.AddRune(nonTickSymbol);
+					}
 				}
 			}
 		}
 
 	}
 
+	/// <summary>
+	/// Direction of an element (horizontal or vertical)
+	/// </summary>
 	public enum Orientation
 	{
+		
+		/// <summary>
+		/// Left to right 
+		/// </summary>
 		Horizontal,
+
+		/// <summary>
+		/// Bottom to top
+		/// </summary>
 		Vertical
 	}
 }

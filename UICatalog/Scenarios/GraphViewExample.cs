@@ -28,6 +28,10 @@ namespace UICatalog.Scenarios {
 
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
+				new MenuBarItem ("_View", new MenuItem [] {
+					new MenuItem ("Zoom _In", "", () => Zoom(2)),
+					 new MenuItem ("Zoom _Out", "", () =>  Zoom(0.5f)),
+				}),
 
 				});
 			Top.Add (menu);
@@ -45,6 +49,14 @@ namespace UICatalog.Scenarios {
 				 new PointF(2,3),
 				 new PointF(5,5)}
 			});
+
+			// One graph line per 2 squares
+			graphView.AxisX.Increment = 2;
+
+			// One graph per 10%
+			graphView.AxisY.Increment = 10;
+
+			graphView.Zoom = new PointF(1,5);
 
 
 			Win.Add (graphView);
@@ -86,6 +98,19 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 			});
 			Top.Add (statusBar);
+		}
+
+		private void Zoom (float factor)
+		{
+			graphView.Zoom = new PointF(
+				graphView.Zoom.X * factor,
+				graphView.Zoom.Y * factor
+			);
+
+			graphView.SetNeedsDisplay();
+			graphView.AxisX.SetNeedsDisplay();
+			graphView.AxisY.SetNeedsDisplay();
+			
 		}
 
 		private void Quit ()
