@@ -744,7 +744,8 @@ namespace Terminal.Gui {
 				MouseEvent = mouseEvent
 			});
 
-			if (!isButtonClicked && lastMouseEvent.Position != default && lastMouseEvent.Position == point
+			if (!isButtonClicked && !lastMouseEvent.ButtonState.HasFlag (MouseButtonState.ReportMousePosition)
+				&& lastMouseEvent.Position != default && lastMouseEvent.Position == point
 				&& ((buttonState & MouseButtonState.Button1Released) != 0
 				|| (buttonState & MouseButtonState.Button2Released) != 0
 				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
