@@ -35,8 +35,8 @@ namespace Terminal.Gui {
 		{
 			CanFocus = true;
 
-			AxisX = new AxisView(this,Orientation.Horizontal);
-		 	AxisY = new AxisView(this,Orientation.Vertical);
+			AxisX = new HorizontalAxis(this);
+		 	AxisY = new VerticalAxis(this);
 
 			Add(AxisX);
 			Add(AxisY);
@@ -214,25 +214,31 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Renders a continuous line with grid line ticks and labels
 	/// </summary>
-	public class AxisView : View
+	public abstract class AxisView : View
 	{
 		/// <summary>
 		/// Direction of the axis
 		/// </summary>
 		/// <value></value>
-		public Orientation Orientation {get;set;}
-
-		/// <summary>
-		/// True to render labels next to the 
-		/// </summary>
-		/// <value></value>
-		public bool ShowLabels {get;set;}
-
+		public Orientation Orientation {get;}
+				
 		/// <summary>
 		/// Number of units of graph space between ticks on axis
 		/// </summary>
 		/// <value></value>
 		public float Increment {get;set;} = 1;
+
+		/// <summary>
+		/// The number of <see cref="Increment"/> before an label is added.
+		/// 0 = never show labels
+		/// </summary>
+		public uint ShowLabelsEvery { get; set; } = 5;
+
+		/// <summary>
+		/// Allows you to control what label text is rendered for a given <see cref="Increment"/>
+		/// when <see cref="ShowLabelsEvery"/> is above 0
+		/// </summary>
+		public LabelGetterDelegate LabelGetter = DefaultLabelGetter;
 
 		/// <summary>
 		/// Parent <see cref="GraphView"/> in which this axis is displayed
@@ -245,17 +251,40 @@ namespace Terminal.Gui {
 		/// This is a measure perpendicular to the <see cref="Orientation"/>
 		/// (i.e. it is height of a Horizontal axis and width of a Vertical axis)
 		/// </summary>
-		public int Thickness { get; } = 1;
+		public abstract int Thickness { get; }
 
-		public AxisView()
-		{
 
-		}
-		public AxisView(GraphView graph,Orientation orientation)
+		protected AxisView (Orientation orientation)
 		{
 			Orientation = orientation;
+		}
+		protected AxisView(GraphView graph,Orientation orientation):this(orientation)
+		{
 			Graph = graph;
 		}
+
+
+		private static string DefaultLabelGetter (AxisIncrementToRender toRender)
+		{
+			return ((int)(toRender.GraphSpace.X + toRender.GraphSpace.Width/2)).ToString ();
+		}
+	}
+
+	public class HorizontalAxis : AxisView {
+		public HorizontalAxis ():base(Orientation.Horizontal)
+		{
+
+		}
+		public HorizontalAxis (GraphView graph) : base (graph,Orientation.Horizontal)
+		{
+
+		}
+
+		/// <summary>
+		/// If no labels then thickness of axis is 1 otherwise 2 (text runs along
+		/// the bottom).
+		/// </summary>
+		public override int Thickness => ShowLabelsEvery == 0 ? 1 : 2;
 
 		public override void Redraw (Rect bounds)
 		{
@@ -263,9 +292,78 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (ColorScheme.Normal);
 
 			// Cannot render orphan axes
-			if(Graph == null){
+			if (Graph == null) {
 				return;
 			}
+
+			AxisIncrementToRender toRender = null;
+			int labels = 0;
+
+			for (int i = 0; i < bounds.Width; i++) {
+
+				Move (i, 0);
+
+				// what bit of the graph is supposed to go here?
+				var graphSpace = Graph.ScreenToGraphSpace (i,0);
+
+				// if we are overdue rendering a label
+				if (toRender == null || toRender.GraphSpace.X + Increment > graphSpace.X) {
+
+					toRender = new AxisIncrementToRender (Orientation, new Point (i, 0), graphSpace);
+				}
+
+				if(toRender == null) {
+					Driver.AddRune (Driver.HLine);
+				}
+				else {
+					Driver.AddRune (Driver.TopTee);
+
+					if (ShowLabelsEvery != 0) {
+
+						// if this increment also needs a label
+						if(labels++ % ShowLabelsEvery == 0) {
+							Move (i, 1);
+							Driver.AddStr (LabelGetter (toRender));
+						};
+					}
+					
+				}
+				
+
+
+
+			}
+		}
+	}
+
+	public class VerticalAxis : AxisView {
+
+
+		/// <summary>
+		/// TODO: thickness will be the widest string representation
+		/// </summary>
+		public override int Thickness => 1;
+		public VerticalAxis () :base(Orientation.Vertical)
+		{
+
+		}
+		public VerticalAxis (GraphView graph) : base (graph, Orientation.Vertical)
+		{
+
+		}
+
+		public override void Redraw (Rect bounds)
+		{
+			Driver.SetAttribute (ColorScheme.Normal);
+
+			// Draw solid line
+			// draw axis bottom up
+			for (int i = bounds.Height; i > 0; i--) {
+				Move (0, i);
+				Driver.AddRune (Driver.VLine);
+			}
+			
+			/*
 
 			float nextTick = 0;
 
@@ -317,10 +415,47 @@ namespace Terminal.Gui {
 						Driver.AddRune(nonTickSymbol);
 					}
 				}
-			}
+			}*/
 		}
-
 	}
+
+	/// <summary>
+	/// A location on an axis of a <see cref="GraphView"/> that may
+	/// or may not have a label associated with it
+	/// </summary>
+	public class AxisIncrementToRender {
+
+		/// <summary>
+		/// Direction of the parent axis
+		/// </summary>
+		public Orientation Orientation { get; }
+
+		/// <summary>
+		/// Location in the <see cref="AxisView"/> that the axis increment appears
+		/// </summary>
+		public Point ScreenLocation { get;  }
+
+		/// <summary>
+		/// The volume of graph that is represented by this screen coordingate
+		/// </summary>
+		public RectangleF GraphSpace { get; }
+
+		public AxisIncrementToRender (Orientation orientation,Point screen, RectangleF graphSpace)
+		{
+			Orientation = orientation;
+			ScreenLocation = screen;
+			GraphSpace = graphSpace;
+		}
+	}
+
+
+	/// <summary>
+	/// Determines what should be displayed at a given label
+	/// </summary>
+	/// <param name="toRender">The axis increment to which the label is attached</param>
+	/// <returns></returns>
+	public delegate string LabelGetterDelegate (AxisIncrementToRender toRender);
+
 
 	/// <summary>
 	/// Direction of an element (horizontal or vertical)
