@@ -12,9 +12,22 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class GraphView : View {
 
+		/// <summary>
+		/// Horizontal axis
+		/// </summary>
+		/// <value></value>
 		public AxisView AxisX {get;} 
+
+		/// <summary>
+		/// Vertical axis
+		/// </summary>
+		/// <value></value>
 		public AxisView AxisY {get;} 
 
+		/// <summary>
+		/// Collection of data series that are rendered in the graph
+		/// </summary>
+		/// <returns></returns>
 		public List<ISeries> Series {get;} = new List<ISeries>();
 
 		/// <summary>
@@ -31,6 +44,9 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public PointF CellSize {get;set;} = new PointF(1,1);
 
+		/// <summary>
+		/// Creates a new graph with a 1 to 1 graph space with absolute layout
+		/// </summary>
 		public GraphView()
 		{
 			CanFocus = true;
@@ -130,7 +146,7 @@ namespace Terminal.Gui {
 
 			// Float the Y axis so that it accurately represents the origin of the graph
 			// but anchor it to left/right if the origin is offscreen
-			AxisY.X = Math.Min (Math.Max (0, origin.X), Bounds.Width - AxisX.Thickness);
+			AxisY.X = Math.Min (Math.Max (0, origin.X - AxisX.Thickness), Bounds.Width);
 			AxisY.Y = 0;
 			AxisY.Height = Bounds.Height;
 			AxisY.Width = AxisY.Thickness;
@@ -192,6 +208,9 @@ namespace Terminal.Gui {
 		Rune? GetCellValueIfAny(RectangleF graphSpace);
 	}
 
+	/// <summary>
+	/// Series composed of any number of discrete data points 
+	/// </summary>
 	public class ScatterSeries : ISeries
 	{
 		/// <summary>
@@ -200,6 +219,12 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public List<PointF> Points {get;set;} = new List<PointF>();
 
+		/// <summary>
+		/// Returns a point symbol if the <paramref name="graphSpace"/> contains 
+		/// any of the <see cref="Points"/>
+		/// </summary>
+		/// <param name="graphSpace"></param>
+		/// <returns></returns>
 		public Rune? GetCellValueIfAny (RectangleF graphSpace)
 		{
 			if(Points.Any(p=>graphSpace.Contains(p))){
@@ -252,7 +277,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public abstract int Thickness { get; }
 
-
 		protected AxisView (Orientation orientation)
 		{
 			Orientation = orientation;
@@ -263,6 +287,9 @@ namespace Terminal.Gui {
 		}
 	}
 
+	/// <summary>
+	/// The horizontal (x axis) of a <see cref="GraphView"/>
+	/// </summary>
 	public class HorizontalAxis : AxisView {
 		public HorizontalAxis ():base(Orientation.Horizontal)
 		{
@@ -285,6 +312,11 @@ namespace Terminal.Gui {
 			return ((int)(toRender.GraphSpace.X + toRender.GraphSpace.Width / 2)).ToString ();
 		}
 
+
+		/// <summary>
+		/// Draws the horizontal x axis including labels and increment ticks
+		/// </summary>
+		/// <param name="bounds"></param>
 		public override void Redraw (Rect bounds)
 		{
 			Move (0, 0);
@@ -331,6 +363,9 @@ namespace Terminal.Gui {
 		}
 	}
 
+	/// <summary>
+	/// The vertical (i.e. Y axis) of a <see cref="GraphView"/>
+	/// </summary>
 	public class VerticalAxis : AxisView {
 
 		/// <summary>
@@ -369,6 +404,10 @@ namespace Terminal.Gui {
 			return ((int)(toRender.GraphSpace.Y + toRender.GraphSpace.Height / 2)).ToString ();
 		}
 
+		/// <summary>
+		/// Draws the vertical y axis including labels and increment ticks
+		/// </summary>
+		/// <param name="bounds"></param>
 		public override void Redraw (Rect bounds)
 		{
 			// Cannot render orphan axes
@@ -462,6 +501,13 @@ namespace Terminal.Gui {
 		/// <value></value>
 		public string Text { get; internal set; } = "";
 
+		/// <summary>
+		/// Describe a new section of an axis that requires an axis increment
+		/// symbol and/or label
+		/// </summary>
+		/// <param name="orientation"></param>
+		/// <param name="screen"></param>
+		/// <param name="graphSpace"></param>
 		public AxisIncrementToRender (Orientation orientation,Point screen, RectangleF graphSpace)
 		{
 			Orientation = orientation;
