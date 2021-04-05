@@ -79,7 +79,7 @@ namespace UICatalog.Scenarios {
 		{
 
 			xAxisLabel.Text = "Atomic Number";
-			about.Text = "This graph shows the atomic weight of each element in the periodic table.  Starting with Hydrogen (atomic Number 1 with a weight of 1.007)";
+			about.Text = "This graph shows the atomic weight of each element in the periodic table.\nStarting with Hydrogen (atomic Number 1 with a weight of 1.007)";
 			//about.WordWrap = true;
 
 			//AtomicNumber and AtomicMass of all elements in the periodic table

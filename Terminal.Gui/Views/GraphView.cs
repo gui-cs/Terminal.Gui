@@ -72,7 +72,6 @@ namespace Terminal.Gui {
 							Driver.AddRune(rune.Value);
 						}
 					}
-			
 				}
 			}
 		}
@@ -238,7 +237,7 @@ namespace Terminal.Gui {
 		/// Allows you to control what label text is rendered for a given <see cref="Increment"/>
 		/// when <see cref="ShowLabelsEvery"/> is above 0
 		/// </summary>
-		public LabelGetterDelegate LabelGetter = DefaultLabelGetter;
+		public LabelGetterDelegate LabelGetter;
 
 		/// <summary>
 		/// Parent <see cref="GraphView"/> in which this axis is displayed
@@ -262,22 +261,17 @@ namespace Terminal.Gui {
 		{
 			Graph = graph;
 		}
-
-
-		private static string DefaultLabelGetter (AxisIncrementToRender toRender)
-		{
-			return ((int)(toRender.GraphSpace.X + toRender.GraphSpace.Width/2)).ToString ();
-		}
 	}
 
 	public class HorizontalAxis : AxisView {
 		public HorizontalAxis ():base(Orientation.Horizontal)
 		{
 
+			LabelGetter = DefaultLabelGetter;
 		}
 		public HorizontalAxis (GraphView graph) : base (graph,Orientation.Horizontal)
 		{
-
+			LabelGetter = DefaultLabelGetter;
 		}
 
 		/// <summary>
@@ -285,6 +279,11 @@ namespace Terminal.Gui {
 		/// the bottom).
 		/// </summary>
 		public override int Thickness => ShowLabelsEvery == 0 ? 1 : 2;
+
+		private string DefaultLabelGetter (AxisIncrementToRender toRender)
+		{
+			return ((int)(toRender.GraphSpace.X + toRender.GraphSpace.Width / 2)).ToString ();
+		}
 
 		public override void Redraw (Rect bounds)
 		{
@@ -338,80 +337,66 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// TODO: thickness will be the widest string representation
 		/// </summary>
-		public override int Thickness => 1;
+		public override int Thickness => 2;
 		public VerticalAxis () :base(Orientation.Vertical)
 		{
 
+			LabelGetter = DefaultLabelGetter;
 		}
 		public VerticalAxis (GraphView graph) : base (graph, Orientation.Vertical)
 		{
+			LabelGetter = DefaultLabelGetter;
+		}
 
+		private string DefaultLabelGetter (AxisIncrementToRender toRender)
+		{
+			return ((int)(toRender.GraphSpace.Y + toRender.GraphSpace.Height / 2)).ToString ();
 		}
 
 		public override void Redraw (Rect bounds)
 		{
+			// Cannot render orphan axes
+			if (Graph == null) {
+				return;
+			}
+
 			Driver.SetAttribute (ColorScheme.Normal);
+
+			AxisIncrementToRender toRender = null;
+			int labels = 0;
+
+			int width = Thickness;
 
 			// Draw solid line
 			// draw axis bottom up
 			for (int i = Bounds.Height; i > 0; i--) {
-				Move (0, i);
-				Driver.AddRune (Driver.VLine);
-			}
-			
-			/*
+				Move (width-1, i);
 
-			float nextTick = 0;
+				// what bit of the graph is supposed to go here?
+				var graphSpace = Graph.ScreenToGraphSpace (0,i);
 
-			Rune tickSymbol = Orientation == Orientation.Horizontal ? 
-								Driver.TopTee :
-								Driver.RightTee ;
+				// if we are overdue rendering a label
+				if (toRender == null || graphSpace.Y > toRender.GraphSpace.Y + Increment) {
 
-			Rune nonTickSymbol = Orientation == Orientation.Horizontal ? 
-								Driver.HLine :
-								Driver.VLine ;
+					toRender = new AxisIncrementToRender (Orientation, new Point (width - 1, i), graphSpace);
 
-			if(Orientation == Orientation.Horizontal){
-				for(int i=0;i<bounds.Width;i++){
-					Move (i,0);
+					// draw the tick on the axis
+					Driver.AddRune (Driver.RightTee);
 
-					var rect = Graph.ScreenToGraphSpace (i, 0);
-					
-					if(rect.X>= nextTick && nextTick <= rect.Right)
-					{
-						Driver.AddRune(tickSymbol);
+					// and the label (if we are due one)
+					if (ShowLabelsEvery != 0) {
 
-						// find the next tick spot that is outside of the current cell
-						while (nextTick <= rect.Right) {
-							nextTick += Increment;
-						}
+						// if this increment also needs a label
+						if (labels++ % ShowLabelsEvery == 0) {
+							Move (0, i);
+							Driver.AddStr (LabelGetter (toRender).Substring(width-1));
+						};
 					}
-					else
-					{
-						Driver.AddRune(nonTickSymbol);
-					}
+				} else {
+					Driver.AddRune (Driver.VLine);
 				}
 			}
-			else{
-				// draw axis bottom up
-				for(int i= bounds.Height; i>0;i--){
-					Move (0, i);
 
-					var rect = Graph.ScreenToGraphSpace (0, i);
-
-					if (rect.Y >= nextTick && nextTick <= rect.Bottom) {
-						Driver.AddRune (tickSymbol);
-
-						// find the next tick spot that is outside of the current cell
-						while(nextTick <= rect.Bottom) {
-							nextTick += Increment;
-						}
-					} else
-					{
-						Driver.AddRune(nonTickSymbol);
-					}
-				}
-			}*/
 		}
 	}
 
