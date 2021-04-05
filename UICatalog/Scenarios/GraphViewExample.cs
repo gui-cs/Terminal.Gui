@@ -121,8 +121,6 @@ namespace UICatalog.Scenarios {
 			// One label every 5 atomic weight
 			graphView.AxisY.Increment = 5;
 			graphView.AxisY.ShowLabelsEvery = 1;
-
-			graphView.RefreshViewport ();
 		}
 
 		private void Zoom (float factor)
@@ -133,8 +131,6 @@ namespace UICatalog.Scenarios {
 			);
 
 			graphView.SetNeedsDisplay ();
-			graphView.AxisX.SetNeedsDisplay ();
-			graphView.AxisY.SetNeedsDisplay ();
 		}
 
 		private void Quit ()

@@ -16,13 +16,13 @@ namespace Terminal.Gui {
 		/// Horizontal axis
 		/// </summary>
 		/// <value></value>
-		public AxisView AxisX {get;} 
+		public Axis AxisX {get;} 
 
 		/// <summary>
 		/// Vertical axis
 		/// </summary>
 		/// <value></value>
-		public AxisView AxisY {get;} 
+		public Axis AxisY {get;} 
 
 		/// <summary>
 		/// Collection of data series that are rendered in the graph
@@ -51,11 +51,8 @@ namespace Terminal.Gui {
 		{
 			CanFocus = true;
 
-			AxisX = new HorizontalAxis(this);
-		 	AxisY = new VerticalAxis(this);
-
-			Add(AxisX);
-			Add(AxisY);
+			AxisX = new HorizontalAxis();
+		 	AxisY = new VerticalAxis();
 		}
 
 		///<inheritdoc/>
@@ -73,9 +70,10 @@ namespace Terminal.Gui {
 
 			base.Redraw(bounds);
 
-			RefreshViewport();
-						
-			for(int x=0;x<Bounds.Width;x++){
+			AxisX.Redraw (Driver, this, Bounds);
+			AxisY.Redraw (Driver, this, Bounds);
+
+			for (int x=0;x<Bounds.Width;x++){
 				for(int y=0;y<Bounds.Height;y++){
 
 					var space = ScreenToGraphSpace(x,y);
@@ -123,34 +121,6 @@ namespace Terminal.Gui {
 				);
 		}
 
-		/// <summary>
-		/// Refreshes the render area of the graph. Call after changing the
-		/// scroll area, axis increments etc
-		/// </summary>
-		public void RefreshViewport(){
-
-			// find the origin of the graph in screen space (this allows for 'crosshair' style
-			// graphs where positive and negative numbers visible
-			var origin = GraphSpaceToScreen (new PointF (0, 0));
-
-			// position X axis
-			AxisX.X = 0;
-
-			// Float the X axis so that it accurately represents the origin of the graph
-			// but anchor it to top/bottom if the origin is offscreen
-			AxisX.Y = Math.Min(Math.Max(0, origin.Y), Bounds.Height-AxisX.Thickness);
-			AxisX.Height = AxisX.Thickness;
-			AxisX.Width = Bounds.Width;
-
-			// position Y axis
-
-			// Float the Y axis so that it accurately represents the origin of the graph
-			// but anchor it to left/right if the origin is offscreen
-			AxisY.X = Math.Min (Math.Max (0, origin.X - AxisX.Thickness), Bounds.Width);
-			AxisY.Y = 0;
-			AxisY.Height = Bounds.Height;
-			AxisY.Width = AxisY.Thickness;
-		}
 
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
@@ -190,7 +160,6 @@ namespace Terminal.Gui {
 				ScrollOffset.X + offsetX,
 				ScrollOffset.Y + offsetY);
 
-			RefreshViewport ();
 			SetNeedsDisplay ();
 		}
 	}
@@ -238,7 +207,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Renders a continuous line with grid line ticks and labels
 	/// </summary>
-	public abstract class AxisView : View
+	public abstract class Axis
 	{
 		/// <summary>
 		/// Direction of the axis
@@ -264,100 +233,82 @@ namespace Terminal.Gui {
 		/// </summary>
 		public LabelGetterDelegate LabelGetter;
 
-		/// <summary>
-		/// Parent <see cref="GraphView"/> in which this axis is displayed
-		/// </summary>
-		/// <value></value>
-		public GraphView Graph {get;}
-
-		/// <summary>
-		/// The amount of screen space required to render the line and labels.
-		/// This is a measure perpendicular to the <see cref="Orientation"/>
-		/// (i.e. it is height of a Horizontal axis and width of a Vertical axis)
-		/// </summary>
-		public abstract int Thickness { get; }
-
-		protected AxisView (Orientation orientation)
+		protected Axis (Orientation orientation)
 		{
 			Orientation = orientation;
 		}
-		protected AxisView(GraphView graph,Orientation orientation):this(orientation)
-		{
-			Graph = graph;
-		}
+
+		/// <summary>
+		/// Draws the axis
+		/// </summary>
+		/// <param name="driver"></param>
+		/// <param name="graph"></param>
+		/// <param name="bounds"></param>
+		public abstract void Redraw (ConsoleDriver driver, GraphView graph, Rect bounds);
 	}
 
 	/// <summary>
 	/// The horizontal (x axis) of a <see cref="GraphView"/>
 	/// </summary>
-	public class HorizontalAxis : AxisView {
+	public class HorizontalAxis : Axis {
 		public HorizontalAxis ():base(Orientation.Horizontal)
 		{
 
 			LabelGetter = DefaultLabelGetter;
 		}
-		public HorizontalAxis (GraphView graph) : base (graph,Orientation.Horizontal)
-		{
-			LabelGetter = DefaultLabelGetter;
-		}
-
-		/// <summary>
-		/// If no labels then thickness of axis is 1 otherwise 2 (text runs along
-		/// the bottom).
-		/// </summary>
-		public override int Thickness => ShowLabelsEvery == 0 ? 1 : 2;
 
 		private string DefaultLabelGetter (AxisIncrementToRender toRender)
 		{
-			return ((int)(toRender.GraphSpace.X + toRender.GraphSpace.Width / 2)).ToString ();
+			return toRender.GraphSpace.X.ToString ("N0");
 		}
-
 
 		/// <summary>
 		/// Draws the horizontal x axis including labels and increment ticks
 		/// </summary>
-		/// <param name="bounds"></param>
-		public override void Redraw (Rect bounds)
+		public override void Redraw (ConsoleDriver driver,GraphView graph,Rect bounds)
 		{
-			Move (0, 0);
-			Driver.SetAttribute (ColorScheme.Normal);
-
-			// Cannot render orphan axes
-			if (Graph == null) {
-				return;
-			}
+			graph.Move (0, 0);
+			driver.SetAttribute (graph.ColorScheme.Normal);
 
 			AxisIncrementToRender toRender = null;
 			int labels = 0;
 
-			for (int i = 0; i < Bounds.Width; i++) {
+			// find the origin of the graph in screen space (this allows for 'crosshair' style
+			// graphs where positive and negative numbers visible
+			var origin = graph.GraphSpaceToScreen (new PointF (0, 0));
 
-				Move (i, 0);
+			// Float the X axis so that it accurately represents the origin of the graph
+			// but anchor it to top/bottom if the origin is offscreen
+			int y = Math.Min (Math.Max (0, origin.Y), bounds.Height - 1);
+			
+			for (int i = 0; i < bounds.Width; i++) {
+
+				graph.Move (i, y);
 
 				// what bit of the graph is supposed to go here?
-				var graphSpace = Graph.ScreenToGraphSpace (i,0);
+				var graphSpace = graph.ScreenToGraphSpace (i,y);
 
 				// if we are overdue rendering a label
 				if (toRender == null || graphSpace.X > toRender.GraphSpace.X + Increment) {
 
-					toRender = new AxisIncrementToRender (Orientation, new Point (i, 0), graphSpace);
+					toRender = new AxisIncrementToRender (Orientation, new Point (i, y), graphSpace);
 
 					// draw the tick on the axis
-					Driver.AddRune (Driver.TopTee);
+					driver.AddRune (driver.TopTee);
 
 					// and the label (if we are due one)
 					if (ShowLabelsEvery != 0) {
 
 						// if this increment also needs a label
 						if (labels++ % ShowLabelsEvery == 0) {
-							Move (i, 1);
-							Driver.AddStr (LabelGetter (toRender));
+							graph.Move (i, y +1);
+							driver.AddStr (LabelGetter (toRender));
 						};
 					}
 				}
 				else
 				{
-					Driver.AddRune (Driver.HLine);
+					driver.AddRune (driver.HLine);
 				}
 			}
 		}
@@ -366,17 +317,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// The vertical (i.e. Y axis) of a <see cref="GraphView"/>
 	/// </summary>
-	public class VerticalAxis : AxisView {
-
-		/// <summary>
-		/// Returns 1 + widest visible label
-		/// </summary>
-		public override int Thickness => GetThickness();
-
-		private int GetThickness()
-		{
-			return GetThickness(GetLabels());
-		}
+	public class VerticalAxis : Axis {
 
 		private int GetThickness (IEnumerable<AxisIncrementToRender> labels)
 		{
@@ -391,68 +332,69 @@ namespace Terminal.Gui {
 
 		public VerticalAxis () :base(Orientation.Vertical)
 		{
-
-			LabelGetter = DefaultLabelGetter;
-		}
-		public VerticalAxis (GraphView graph) : base (graph, Orientation.Vertical)
-		{
 			LabelGetter = DefaultLabelGetter;
 		}
 
 		private string DefaultLabelGetter (AxisIncrementToRender toRender)
 		{
-			return ((int)(toRender.GraphSpace.Y + toRender.GraphSpace.Height / 2)).ToString ();
+			return toRender.GraphSpace.Y.ToString ("N0");
 		}
 
 		/// <summary>
 		/// Draws the vertical y axis including labels and increment ticks
 		/// </summary>
 		/// <param name="bounds"></param>
-		public override void Redraw (Rect bounds)
+		public override void Redraw (ConsoleDriver driver, GraphView graph, Rect bounds)
 		{
-			// Cannot render orphan axes
-			if (Graph == null) {
-				return;
-			}
+			driver.SetAttribute (graph.ColorScheme.Normal);
 
-			Driver.SetAttribute (ColorScheme.Normal);
 
-			var labels = GetLabels();
+			// find the origin of the graph in screen space (this allows for 'crosshair' style
+			// graphs where positive and negative numbers visible
+			var origin = graph.GraphSpaceToScreen (new PointF (0, 0));
+
+			// position Y axis
+
+			// Float the Y axis so that it accurately represents the origin of the graph
+			// but anchor it to left/right if the origin is offscreen
+			int x = Math.Min (Math.Max (0, origin.X), bounds.Width);			
+
+			var labels = GetLabels(graph,bounds);
 			var width = GetThickness(labels);
 			
 			// Draw solid line
 			// draw axis bottom up
-			for (int i = Bounds.Height; i > 0; i--) {
-				Move (width-1, i);
+			for (int i = bounds.Height; i > 0; i--) {
+				graph.Move (x, i);
 
 				var label = labels.FirstOrDefault(l=>l.ScreenLocation.Y == i);
 
 				if(label != null){
 					// draw the tick on the axis
-					Driver.AddRune (Driver.RightTee);
+					driver.AddRune (driver.RightTee);
 
 					// and the label text
 					if(!string.IsNullOrWhiteSpace(label.Text)){
-						Move (0, i);
-						Driver.AddStr (label.Text);
+						graph.Move (x - width, i);
+						driver.AddStr (label.Text);
 					}
 				} else {
-					Driver.AddRune (Driver.VLine);
+					driver.AddRune (driver.VLine);
 				}
 			}
 
 		}
 
-		private IEnumerable<AxisIncrementToRender> GetLabels ()
+		private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph,Rect bounds)
 		{
 			
 			AxisIncrementToRender toRender = null;
 			int labels = 0;
 
-			for (int i = Bounds.Height; i > 0; i--) {
+			for (int i = bounds.Height; i > 0; i--) {
 
 				// what bit of the graph is supposed to go here?
-				var graphSpace = Graph.ScreenToGraphSpace (0,i);
+				var graphSpace = graph.ScreenToGraphSpace (0,i);
 
 				// if we are overdue rendering a label
 				if (toRender == null || graphSpace.Y > toRender.GraphSpace.Y + Increment) {
@@ -486,7 +428,7 @@ namespace Terminal.Gui {
 		public Orientation Orientation { get; }
 
 		/// <summary>
-		/// Location in the <see cref="AxisView"/> that the axis increment appears
+		/// Location in the <see cref="Axis"/> that the axis increment appears
 		/// </summary>
 		public Point ScreenLocation { get;  }
 
