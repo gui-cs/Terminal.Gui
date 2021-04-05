@@ -391,7 +391,7 @@ namespace Terminal.Gui {
 			case Key.CursorUp | Key.ShiftMask | Key.CtrlMask:
 			case (Key)((int)'B' + Key.ShiftMask | Key.AltMask):
 				if (point > 0) {
-					int x = start > -1 && start > point ? start : point;
+					int x = Math.Min (start > -1 && start > point ? start : point, text.Count - 1);
 					if (x > 0) {
 						int sbw = WordBackward (x);
 						if (sbw != -1)
