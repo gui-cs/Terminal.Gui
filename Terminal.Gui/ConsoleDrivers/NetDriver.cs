@@ -255,10 +255,18 @@ namespace Terminal.Gui {
 			case 91:
 				ConsoleKeyInfo [] cki = new ConsoleKeyInfo [] { consoleKeyInfo };
 				ConsoleModifiers mod = consoleKeyInfo.Modifiers;
-				while (Console.KeyAvailable) {
-					var result = Console.ReadKey (true);
-					Array.Resize (ref cki, cki == null ? 1 : cki.Length + 1);
-					cki [cki.Length - 1] = result;
+				int delay = 0;
+				while (delay < 100) {
+					if (Console.KeyAvailable) {
+						do {
+							var result = Console.ReadKey (true);
+							Array.Resize (ref cki, cki == null ? 1 : cki.Length + 1);
+							cki [cki.Length - 1] = result;
+						} while (Console.KeyAvailable);
+						break;
+					}
+					Thread.Sleep (50);
+					delay += 50;
 				}
 				SplitCSI (cki, ref inputResult, ref newConsoleKeyInfo, ref key, ref mouseEvent, ref mod);
 				return;
