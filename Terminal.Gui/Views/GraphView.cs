@@ -60,7 +60,7 @@ namespace Terminal.Gui {
 			RefreshViewport();
 						
 			for(int x=0;x<Bounds.Width;x++){
-				for(int y=0;y<Bounds.Width;y++){
+				for(int y=0;y<Bounds.Height;y++){
 
 					var space = ScreenToGraphSpace(x,y);
 
@@ -123,7 +123,7 @@ namespace Terminal.Gui {
 
 			// Float the X axis so that it accurately represents the origin of the graph
 			// but anchor it to top/bottom if the origin is offscreen
-			AxisX.Y = Math.Min(Math.Max(0, origin.Y), Bounds.Height);
+			AxisX.Y = Math.Min(Math.Max(0, origin.Y), Bounds.Height-AxisX.Thickness);
 			AxisX.Height = AxisX.Thickness;
 			AxisX.Width = Bounds.Width;
 
@@ -299,7 +299,7 @@ namespace Terminal.Gui {
 			AxisIncrementToRender toRender = null;
 			int labels = 0;
 
-			for (int i = 0; i < bounds.Width; i++) {
+			for (int i = 0; i < Bounds.Width; i++) {
 
 				Move (i, 0);
 
@@ -307,31 +307,27 @@ namespace Terminal.Gui {
 				var graphSpace = Graph.ScreenToGraphSpace (i,0);
 
 				// if we are overdue rendering a label
-				if (toRender == null || toRender.GraphSpace.X + Increment > graphSpace.X) {
+				if (toRender == null || graphSpace.X > toRender.GraphSpace.X + Increment) {
 
 					toRender = new AxisIncrementToRender (Orientation, new Point (i, 0), graphSpace);
-				}
 
-				if(toRender == null) {
-					Driver.AddRune (Driver.HLine);
-				}
-				else {
+					// draw the tick on the axis
 					Driver.AddRune (Driver.TopTee);
 
+					// and the label (if we are due one)
 					if (ShowLabelsEvery != 0) {
 
 						// if this increment also needs a label
-						if(labels++ % ShowLabelsEvery == 0) {
+						if (labels++ % ShowLabelsEvery == 0) {
 							Move (i, 1);
 							Driver.AddStr (LabelGetter (toRender));
 						};
 					}
-					
 				}
-				
-
-
-
+				else
+				{
+					Driver.AddRune (Driver.HLine);
+				}
 			}
 		}
 	}
@@ -358,7 +354,7 @@ namespace Terminal.Gui {
 
 			// Draw solid line
 			// draw axis bottom up
-			for (int i = bounds.Height; i > 0; i--) {
+			for (int i = Bounds.Height; i > 0; i--) {
 				Move (0, i);
 				Driver.AddRune (Driver.VLine);
 			}
