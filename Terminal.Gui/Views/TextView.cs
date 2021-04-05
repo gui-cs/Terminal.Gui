@@ -884,7 +884,7 @@ namespace Terminal.Gui {
 			var col = 0;
 			if (line.Count > 0) {
 				retreat = Math.Max (SpecialRune (line [Math.Min (Math.Max (currentColumn - leftColumn - 1, 0), line.Count - 1)])
-				? 1 : 0, 0);
+					? 1 : 0, 0);
 				for (int idx = leftColumn < 0 ? 0 : leftColumn; idx < line.Count; idx++) {
 					if (idx == currentColumn)
 						break;
@@ -892,7 +892,7 @@ namespace Terminal.Gui {
 					col += cols - 1;
 				}
 			}
-			var ccol = currentColumn - leftColumn - retreat + col;
+			var ccol = currentColumn - leftColumn + retreat + col;
 			if (leftColumn <= currentColumn && ccol < Frame.Width
 				&& topRow <= currentRow && currentRow - topRow < Frame.Height) {
 				ResetCursorVisibility ();
@@ -1117,6 +1117,8 @@ namespace Terminal.Gui {
 
 					if (!SpecialRune (rune)) {
 						AddRune (col, row, rune);
+					} else {
+						col++;
 					}
 					col = TextModel.SetCol (col, bounds.Right, cols);
 				}
