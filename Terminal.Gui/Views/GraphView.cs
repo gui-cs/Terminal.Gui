@@ -333,11 +333,27 @@ namespace Terminal.Gui {
 
 	public class VerticalAxis : AxisView {
 
-
 		/// <summary>
-		/// TODO: thickness will be the widest string representation
+		/// Returns 1 + widest visible label
 		/// </summary>
-		public override int Thickness => 2;
+		public override int Thickness => GetThickness();
+
+		private int GetThickness()
+		{
+			return GetThickness(GetLabels());
+		}
+
+		private int GetThickness (IEnumerable<AxisIncrementToRender> labels)
+		{
+			// Thickness is 1 (line) + the widest label
+			var l = labels.ToArray();
+			if(l.Length == 0){
+				return 1;
+			}
+
+			return  l.Max(s=>s.Text.Length) + 1;
+		}
+
 		public VerticalAxis () :base(Orientation.Vertical)
 		{
 
@@ -362,15 +378,39 @@ namespace Terminal.Gui {
 
 			Driver.SetAttribute (ColorScheme.Normal);
 
-			AxisIncrementToRender toRender = null;
-			int labels = 0;
-
-			int width = Thickness;
-
+			var labels = GetLabels();
+			var width = GetThickness(labels);
+			
 			// Draw solid line
 			// draw axis bottom up
 			for (int i = Bounds.Height; i > 0; i--) {
 				Move (width-1, i);
+
+				var label = labels.FirstOrDefault(l=>l.ScreenLocation.Y == i);
+
+				if(label != null){
+					// draw the tick on the axis
+					Driver.AddRune (Driver.RightTee);
+
+					// and the label text
+					if(!string.IsNullOrWhiteSpace(label.Text)){
+						Move (0, i);
+						Driver.AddStr (label.Text);
+					}
+				} else {
+					Driver.AddRune (Driver.VLine);
+				}
+			}
+
+		}
+
+		private IEnumerable<AxisIncrementToRender> GetLabels ()
+		{
+			
+			AxisIncrementToRender toRender = null;
+			int labels = 0;
+
+			for (int i = Bounds.Height; i > 0; i--) {
 
 				// what bit of the graph is supposed to go here?
 				var graphSpace = Graph.ScreenToGraphSpace (0,i);
@@ -378,25 +418,20 @@ namespace Terminal.Gui {
 				// if we are overdue rendering a label
 				if (toRender == null || graphSpace.Y > toRender.GraphSpace.Y + Increment) {
 
-					toRender = new AxisIncrementToRender (Orientation, new Point (width - 1, i), graphSpace);
-
-					// draw the tick on the axis
-					Driver.AddRune (Driver.RightTee);
+					toRender = new AxisIncrementToRender (Orientation, new Point (0, i), graphSpace);
 
 					// and the label (if we are due one)
 					if (ShowLabelsEvery != 0) {
 
 						// if this increment also needs a label
 						if (labels++ % ShowLabelsEvery == 0) {
-							Move (0, i);
-							Driver.AddStr (LabelGetter (toRender).Substring(width-1));
+							toRender.Text = LabelGetter(toRender);
 						};
+
+						yield return toRender;
 					}
-				} else {
-					Driver.AddRune (Driver.VLine);
 				}
 			}
-
 		}
 	}
 
@@ -420,6 +455,12 @@ namespace Terminal.Gui {
 		/// The volume of graph that is represented by this screen coordingate
 		/// </summary>
 		public RectangleF GraphSpace { get; }
+
+		/// <summary>
+		/// The text (if any) that should be displayed at this axis increment
+		/// </summary>
+		/// <value></value>
+		public string Text { get; internal set; } = "";
 
 		public AxisIncrementToRender (Orientation orientation,Point screen, RectangleF graphSpace)
 		{

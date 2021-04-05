@@ -118,8 +118,9 @@ namespace UICatalog.Scenarios {
 			graphView.AxisX.Increment = 5;
 			graphView.AxisX.ShowLabelsEvery = 1;
 
-			// One label every 10 atomic weight
-			graphView.AxisY.Increment = 10;
+			// One label every 5 atomic weight
+			graphView.AxisY.Increment = 5;
+			graphView.AxisY.ShowLabelsEvery = 1;
 
 			graphView.RefreshViewport ();
 		}
