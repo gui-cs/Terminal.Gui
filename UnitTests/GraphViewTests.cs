@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using Terminal.Gui;
 using Xunit;
 
@@ -222,5 +224,38 @@ namespace UnitTests {
 		}
 
 		#endregion
+		
+		[Fact]
+		public void TestNoOverlappingCells()
+		{
+			var gv = new GraphView ();
+			gv.Bounds = new Rect (0, 0, 50, 30);
+
+			// How much graph space each cell of the console depicts
+			gv.CellSize = new PointF (0.1f, 0.25f);
+			gv.AxisX.Increment = 1f;
+			gv.AxisX.ShowLabelsEvery = 1;
+
+			gv.AxisY.Increment = 1f;
+			gv.AxisY.ShowLabelsEvery = 1;
+
+			// Start the graph at 80 years because that is where most of our data is
+			gv.ScrollOffset = new PointF (0, 80);
+
+			List<RectangleF> otherRects = new List<RectangleF> ();
+
+
+			for(int x = 0;x<gv.Bounds.Width; x++) {
+				for (int y = 0;y < gv.Bounds.Height; y++) {
+
+					var graphSpace = gv.ScreenToGraphSpace (x, y);
+					var overlapping = otherRects.Where (r=>r.IntersectsWith (graphSpace)).ToArray();
+					
+					Assert.Empty(overlapping);
+
+					otherRects.Add (graphSpace);
+				}
+			}
+		}
 	}
 }
