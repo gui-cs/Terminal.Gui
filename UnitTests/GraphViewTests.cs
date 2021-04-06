@@ -244,16 +244,69 @@ namespace UnitTests {
 
 			List<RectangleF> otherRects = new List<RectangleF> ();
 
+			List<System.Drawing.Point> overlappingPoints = new List<System.Drawing.Point> ();
 
 			for(int x = 0;x<gv.Bounds.Width; x++) {
 				for (int y = 0;y < gv.Bounds.Height; y++) {
 
 					var graphSpace = gv.ScreenToGraphSpace (x, y);
 					var overlapping = otherRects.Where (r=>r.IntersectsWith (graphSpace)).ToArray();
-					
-					Assert.Empty(overlapping);
+
+					if (overlapping.Any ()) {
+						overlappingPoints.Add (new System.Drawing.Point (x, y));
+					}
 
 					otherRects.Add (graphSpace);
+				}
+			}
+
+			// There are 1,500 grid positions in the control, none should overlap in graph space
+			Assert.Empty (overlappingPoints);
+		}
+
+		/// <summary>
+		/// Tests that each point in the screen space maps to a rectangle of
+		/// (float) graph space and that each corner of that rectangle of graph
+		/// space maps back to the same row/col of the graph that was fed in
+		/// </summary>
+		[Fact]
+		public void TestReversing_ScreenToGraphSpace ()
+		{
+			var gv = new GraphView ();
+			gv.Bounds = new Rect (0, 0, 50, 30);
+
+			// How much graph space each cell of the console depicts
+			gv.CellSize = new PointF (0.1f, 0.25f);
+			gv.AxisX.Increment = 1f;
+			gv.AxisX.ShowLabelsEvery = 1;
+
+			gv.AxisY.Increment = 1f;
+			gv.AxisY.ShowLabelsEvery = 1;
+
+			// Start the graph at 80 years because that is where most of our data is
+			gv.ScrollOffset = new PointF (0, 80);
+
+			for (int x = 0; x < gv.Bounds.Width; x++) {
+				for (int y = 0; y < gv.Bounds.Height; y++) {
+
+					var graphSpace = gv.ScreenToGraphSpace (x, y);
+					
+					var p = gv.GraphSpaceToScreen (new PointF (graphSpace.Left, graphSpace.Top));
+					Assert.Equal (x, p.X);
+					Assert.Equal (y, p.Y);
+
+					p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - 0.000001f, graphSpace.Top));
+					Assert.Equal (x, p.X);
+					Assert.Equal (y, p.Y);
+
+					p = gv.GraphSpaceToScreen (new PointF (graphSpace.Left, graphSpace.Bottom - 0.000001f));
+					Assert.Equal (x, p.X);
+					Assert.Equal (y, p.Y);
+
+					p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - 0.000001f, graphSpace.Bottom - 0.000001f));
+					Assert.Equal (x, p.X);
+					Assert.Equal (y, p.Y);
+
 				}
 			}
 		}
