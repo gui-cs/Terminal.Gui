@@ -418,34 +418,17 @@ namespace Terminal.Gui {
 
 		private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph, Rect bounds)
 		{
-			AxisIncrementToRender toRender = null;
 			int labels = 0;
 			int y = GetAxisYPosition (graph, bounds);
-
+			
 			for (int i = 0; i < bounds.Width; i++) {
 
 				// what bit of the graph is supposed to go here?
 				var graphSpace = graph.ScreenToGraphSpace (i,y);
-				bool dueLabel = false;
 
-				if (toRender == null) {
-					toRender = new AxisIncrementToRender (Orientation, new Point (i, y), graphSpace);
-					dueLabel = true;
-				} else {
-
-					// next tick is due here
-					float nextTickX = toRender.GraphSpace.X + Increment;
-
-					// if we are overdue rendering a label
-					if (graphSpace.X >= nextTickX && nextTickX < graphSpace.X + graphSpace.Width) {
-
-						toRender = new AxisIncrementToRender (Orientation, new Point (i, y), graphSpace);
-						dueLabel = true;
-					}
-				}
-
-				// and the label (if we are due one)
-				if (dueLabel) {
+				if(Math.Abs(graphSpace.X) % Increment < graph.CellSize.X)
+				{
+					var toRender =  new AxisIncrementToRender (Orientation, new Point (i, y), graphSpace);
 
 					if (ShowLabelsEvery != 0) {
 
@@ -454,6 +437,7 @@ namespace Terminal.Gui {
 							toRender.Text = LabelGetter (toRender);
 						};
 					}
+
 					yield return toRender;
 				}
 			}
@@ -550,8 +534,6 @@ namespace Terminal.Gui {
 
 		private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph,Rect bounds)
 		{
-			
-			AxisIncrementToRender toRender = null;
 			int labels = 0;
 
 			int x = GetAxisXPosition (graph, bounds);
@@ -561,10 +543,9 @@ namespace Terminal.Gui {
 				// what bit of the graph is supposed to go here?
 				var graphSpace = graph.ScreenToGraphSpace (x,i);
 
-				// if we are overdue rendering a label
-				if (toRender == null || graphSpace.Y > toRender.GraphSpace.Y + Increment) {
-
-					toRender = new AxisIncrementToRender (Orientation, new Point (x, i), graphSpace);
+				if(Math.Abs(graphSpace.Y) % Increment < graph.CellSize.Y)
+				{
+					var toRender =  new AxisIncrementToRender (Orientation, new Point (x,i), graphSpace);
 
 					// and the label (if we are due one)
 					if (ShowLabelsEvery != 0) {
@@ -576,7 +557,9 @@ namespace Terminal.Gui {
 
 						yield return toRender;
 					}
+
 				}
+				
 			}
 		}
 
