@@ -31,6 +31,18 @@ namespace Terminal.Gui {
 		public List<ISeries> Series {get;} = new List<ISeries>();
 
 		/// <summary>
+		/// Amount of space to leave on left of control.  Graph content (<see cref="Series"/>)
+		/// will not be rendered in margins but axis labels may be
+		/// </summary>
+		public uint MarginLeft { get; set; }
+
+		/// <summary>
+		/// Amount of space to leave on bottom of control.  Graph content (<see cref="Series"/>)
+		/// will not be rendered in margins but axis labels may be
+		/// </summary>
+		public uint MarginBottom { get; set; }
+
+		/// <summary>
 		/// The graph space position of the bottom left of the control.
 		/// Changing this scrolls the viewport around in the graph
 		/// </summary>
@@ -103,8 +115,8 @@ namespace Terminal.Gui {
 		public RectangleF ScreenToGraphSpace (int col, int row)
 		{
 			return new RectangleF (
-				ScrollOffset.X + (col * CellSize.X),
-				ScrollOffset.Y + ((Bounds.Height - row) * CellSize.Y),
+				(ScrollOffset.X - MarginLeft) + (col * CellSize.X),
+				(ScrollOffset.Y - MarginBottom) + ((Bounds.Height - row) * CellSize.Y),
 				CellSize.X, CellSize.Y);
 		}
 
@@ -118,9 +130,9 @@ namespace Terminal.Gui {
 		{
 			return new Point (
 				
-				(int)((location.X - ScrollOffset.X) / CellSize.X),
+				(int)((location.X - (ScrollOffset.X - MarginLeft)) / CellSize.X),
 				 // screen coordinates are top down while graph coordinates are bottom up
-				 Bounds.Height - (int)((location.Y - ScrollOffset.Y) / CellSize.Y) 
+				 Bounds.Height - (int)((location.Y - (ScrollOffset.Y - MarginBottom)) / CellSize.Y) 
 				);
 		}
 
@@ -229,7 +241,7 @@ namespace Terminal.Gui {
 		/// 0 = never show labels
 		/// </summary>
 		public uint ShowLabelsEvery { get; set; } = 5;
-
+				
 		/// <summary>
 		/// Allows you to control what label text is rendered for a given <see cref="Increment"/>
 		/// when <see cref="ShowLabelsEvery"/> is above 0
@@ -362,7 +374,7 @@ namespace Terminal.Gui {
 
 			// Float the X axis so that it accurately represents the origin of the graph
 			// but anchor it to top/bottom if the origin is offscreen
-			return Math.Min (Math.Max (0, origin.Y), bounds.Height - 1);
+			return Math.Min (Math.Max (0, origin.Y), bounds.Height - ((int)graph.MarginBottom+1));
 		}
 	}
 
@@ -483,7 +495,7 @@ namespace Terminal.Gui {
 
 			// Float the Y axis so that it accurately represents the origin of the graph
 			// but anchor it to left/right if the origin is offscreen
-			return Math.Min (Math.Max (0, origin.X), bounds.Width);
+			return Math.Min (Math.Max ((int)graph.MarginLeft, origin.X), bounds.Width);
 		}
 	}
 

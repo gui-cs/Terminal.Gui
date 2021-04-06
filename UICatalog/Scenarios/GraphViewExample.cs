@@ -112,7 +112,8 @@ namespace UICatalog.Scenarios {
 			graphView.CellSize = new PointF (1, 5);
 
 			// leave space for axis labels
-			graphView.ScrollOffset = new PointF (-1, -10);
+			graphView.MarginBottom = 1;
+			graphView.MarginLeft = 3;
 
 			// One axis tick/label per 5 atomic numbers
 			graphView.AxisX.Increment = 5;

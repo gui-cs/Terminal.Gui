@@ -26,7 +26,40 @@ namespace UnitTests {
 			Assert.Equal (1, up2along1.X);
 			Assert.Equal (2, up2along1.Y);
 		}
+		[Fact]
+		public void ScreenToGraphSpace_DefaultCellSize_WithMargin ()
+		{
+			var gv = new GraphView ();
+			gv.Bounds = new Rect (0, 0, 20, 10);
 
+			// origin should be bottom left
+			var botLeft = gv.ScreenToGraphSpace (0, 10);
+			Assert.Equal (0, botLeft.X);
+			Assert.Equal (0, botLeft.Y);
+			Assert.Equal (1, botLeft.Width);
+			Assert.Equal (1, botLeft.Height);
+
+			gv.MarginLeft = 1;
+
+			botLeft = gv.ScreenToGraphSpace (0, 10);
+			// Origin should be at 1,10 now to leave a margin of 1
+			// so screen position 0,10 would be data space -1,0
+			Assert.Equal (-1, botLeft.X);
+			Assert.Equal (0, botLeft.Y);
+			Assert.Equal (1, botLeft.Width);
+			Assert.Equal (1, botLeft.Height);
+
+			gv.MarginLeft = 1;
+			gv.MarginBottom = 1;
+
+			botLeft = gv.ScreenToGraphSpace (0, 10);
+			// Origin should be at 1,0 (to leave a margin of 1 in both sides)
+			// so screen position 0,10 would be data space -1,-1
+			Assert.Equal (-1, botLeft.X);
+			Assert.Equal (-1, botLeft.Y);
+			Assert.Equal (1, botLeft.Width);
+			Assert.Equal (1, botLeft.Height);
+		}
 		[Fact]
 		public void ScreenToGraphSpace_CustomCellSize ()
 		{
@@ -70,6 +103,33 @@ namespace UnitTests {
 			var along2up1 = gv.GraphSpaceToScreen (new PointF (2, 1));
 			Assert.Equal (2, along2up1.X);
 			Assert.Equal (9, along2up1.Y);
+		}
+
+		[Fact]
+		public void GraphSpaceToScreen_DefaultCellSize_WithMargin ()
+		{
+			var gv = new GraphView ();
+			gv.Bounds = new Rect (0, 0, 20, 10);
+
+			// origin should be bottom left
+			var botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
+			Assert.Equal (0, botLeft.X);
+			Assert.Equal (10, botLeft.Y); // row 10 of the view is the bottom left
+
+			gv.MarginLeft = 1;
+
+			// With a margin of 1 the origin should be at x=1 y= 10
+			botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
+			Assert.Equal (1, botLeft.X);
+			Assert.Equal (10, botLeft.Y); // row 10 of the view is the bottom left
+
+			gv.MarginLeft = 1;
+			gv.MarginBottom = 1;
+
+			// With a margin of 1 in both directions the origin should be at x=1 y= 9
+			botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
+			Assert.Equal (1, botLeft.X);
+			Assert.Equal (9, botLeft.Y); // row 9 of the view is the bottom left up 1 cell
 		}
 
 		[Fact]
