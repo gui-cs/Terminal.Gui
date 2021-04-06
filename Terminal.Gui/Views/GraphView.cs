@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 
 namespace Terminal.Gui {
@@ -47,14 +48,14 @@ namespace Terminal.Gui {
 		/// Changing this scrolls the viewport around in the graph
 		/// </summary>
 		/// <value></value>
-		public PointF ScrollOffset {get;set;} = new PointF(0,0);
+		public PointD ScrollOffset {get;set;} = new PointD(0,0);
 
 		/// <summary>
 		/// Translates console width/height into graph space. Defaults
 		/// to 1 row/col of console space being 1 unit of graph space. 
 		/// </summary>
 		/// <returns></returns>
-		public PointF CellSize {get;set;} = new PointF(1,1);
+		public PointD CellSize {get;set;} = new PointD(1,1);
 
 		/// <summary>
 		/// Creates a new graph with a 1 to 1 graph space with absolute layout
@@ -118,9 +119,9 @@ namespace Terminal.Gui {
 		/// <param name="col"></param>
 		/// <param name="row"></param>
 		/// <returns></returns>
-		public RectangleF ScreenToGraphSpace (int col, int row)
+		public RectangleD ScreenToGraphSpace (int col, int row)
 		{
-			return new RectangleF (
+			return new RectangleD (
 				(ScrollOffset.X - MarginLeft) + (col * CellSize.X),
 				(ScrollOffset.Y - MarginBottom) + ((Bounds.Height - row) * CellSize.Y),
 				CellSize.X, CellSize.Y);
@@ -132,7 +133,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="location">Point within the graph</param>
 		/// <returns>Screen position (Row / Column) which would be used to render the <paramref name="location"/></returns>
-		public Point GraphSpaceToScreen (PointF location)
+		public Point GraphSpaceToScreen (PointD location)
 		{
 			return new Point (
 				
@@ -175,9 +176,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="offsetX"></param>
 		/// <param name="offsetY"></param>
-		private void Scroll (float offsetX, float offsetY)
+		private void Scroll (decimal offsetX, decimal offsetY)
 		{
-			ScrollOffset = new PointF (
+			ScrollOffset = new PointD (
 				ScrollOffset.X + offsetX,
 				ScrollOffset.Y + offsetY);
 
@@ -195,7 +196,7 @@ namespace Terminal.Gui {
 		/// for the current position in the control
 		/// </summary>
 		/// <param name="graphSpace">Projection of the screen location into the chart graph space</param>
-		Rune? GetCellValueIfAny(RectangleF graphSpace);
+		Rune? GetCellValueIfAny(RectangleD graphSpace);
 	}
 
 	/// <summary>
@@ -207,7 +208,7 @@ namespace Terminal.Gui {
 		/// Collection of each discrete point in the series
 		/// </summary>
 		/// <returns></returns>
-		public List<PointF> Points {get;set;} = new List<PointF>();
+		public List<PointD> Points {get;set;} = new List<PointD>();
 
 		/// <summary>
 		/// Returns a point symbol if the <paramref name="graphSpace"/> contains 
@@ -215,7 +216,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="graphSpace"></param>
 		/// <returns></returns>
-		public Rune? GetCellValueIfAny (RectangleF graphSpace)
+		public Rune? GetCellValueIfAny (RectangleD graphSpace)
 		{
 			if(Points.Any(p=>graphSpace.Contains(p))){
 				return 'x';
@@ -237,9 +238,9 @@ namespace Terminal.Gui {
 		/// every 1 unit of graph space a bar is rendered.  Note that you should
 		/// also consider <see cref="GraphView.CellSize"/> when changing this.
 		/// </summary>
-		public float BarEvery { get; set; } = 1;
+		public decimal BarEvery { get; set; } = 1;
 
-		public Rune? GetCellValueIfAny (RectangleF graphSpace)
+		public Rune? GetCellValueIfAny (RectangleD graphSpace)
 		{
 			Bar bar = XLocationToBar (graphSpace);
 
@@ -262,12 +263,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="graphSpace"></param>
 		/// <returns></returns>
-		private Bar XLocationToBar (RectangleF graphSpace)
+		private Bar XLocationToBar (RectangleD graphSpace)
 		{
 			// Position bars on x axis Bar1 at x=1, Bar2 at x=2 etc
 			for (int i = 0; i < Bars.Count; i++) {
 
-				float barXPosition = (i + 1f) * BarEvery;
+				decimal barXPosition = (i + 1) * BarEvery;
 
 				// if a bar contained in this cell's X axis of data space
 				if (barXPosition >= graphSpace.X && barXPosition < graphSpace.Right) {
@@ -292,9 +293,9 @@ namespace Terminal.Gui {
 		public class Bar {
 			public string Name { get; }
 			public Rune FillRune { get; }
-			public double Value { get; }
+			public decimal Value { get; }
 
-			public Bar (string name, Rune fillRune, double value)
+			public Bar (string name, Rune fillRune, decimal value)
 			{
 				Name = name;
 				FillRune = fillRune;
@@ -320,7 +321,7 @@ namespace Terminal.Gui {
 		/// Number of units of graph space between ticks on axis
 		/// </summary>
 		/// <value></value>
-		public float Increment {get;set;} = 1;
+		public decimal Increment {get;set;} = 1;
 
 		/// <summary>
 		/// The number of <see cref="Increment"/> before an label is added.
@@ -453,9 +454,9 @@ namespace Terminal.Gui {
 		{
 			// find the origin of the graph in screen space (this allows for 'crosshair' style
 			// graphs where positive and negative numbers visible
-			var origin = graph.GraphSpaceToScreen (new PointF (0, 0));
+			var origin = graph.GraphSpaceToScreen (new PointD (0, 0));
 
-			// Float the X axis so that it accurately represents the origin of the graph
+			// decimal the X axis so that it accurately represents the origin of the graph
 			// but anchor it to top/bottom if the origin is offscreen
 			return Math.Min (Math.Max (0, origin.Y), bounds.Height - ((int)graph.MarginBottom+1));
 		}
@@ -574,13 +575,14 @@ namespace Terminal.Gui {
 		{
 			// find the origin of the graph in screen space (this allows for 'crosshair' style
 			// graphs where positive and negative numbers visible
-			var origin = graph.GraphSpaceToScreen (new PointF (0, 0));
+			var origin = graph.GraphSpaceToScreen (new PointD (0, 0));
 
-			// Float the Y axis so that it accurately represents the origin of the graph
+			// decimal the Y axis so that it accurately represents the origin of the graph
 			// but anchor it to left/right if the origin is offscreen
 			return Math.Min (Math.Max ((int)graph.MarginLeft, origin.X), bounds.Width);
 		}
 	}
+
 
 	/// <summary>
 	/// A location on an axis of a <see cref="GraphView"/> that may
@@ -601,7 +603,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The volume of graph that is represented by this screen coordingate
 		/// </summary>
-		public RectangleF GraphSpace { get; }
+		public RectangleD GraphSpace { get; }
 
 		private string _text = "";
 
@@ -621,7 +623,7 @@ namespace Terminal.Gui {
 		/// <param name="orientation"></param>
 		/// <param name="screen"></param>
 		/// <param name="graphSpace"></param>
-		public AxisIncrementToRender (Orientation orientation,Point screen, RectangleF graphSpace)
+		public AxisIncrementToRender (Orientation orientation,Point screen, RectangleD graphSpace)
 		{
 			Orientation = orientation;
 			ScreenLocation = screen;
@@ -629,7 +631,230 @@ namespace Terminal.Gui {
 		}
 	}
 
+	public class RectangleD {
 
+		public static readonly RectangleD Empty = new RectangleD (0,0,0,0);
+
+		private decimal x;
+		private decimal y;
+		private decimal width;
+		private decimal height;
+		public RectangleD (decimal x, decimal y, decimal width, decimal height)
+		{
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+		}
+		public RectangleD (PointD location, SizeD size)
+		{
+			this.x = location.X;
+			this.y = location.Y;
+			this.width = size.Width;
+			this.height = size.Height;
+		}
+			
+		public decimal X {
+			get {
+				return x;
+			}
+			set {
+				x = value;
+			}
+		}
+		public decimal Y {
+			get {
+				return y;
+			}
+			set {
+				y = value;
+			}
+		}
+		public decimal Width {
+			get {
+				return width;
+			}
+			set {
+				width = value;
+			}
+		}
+		public decimal Height {
+			get {
+				return height;
+			}
+			set {
+				height = value;
+			}
+		}
+		
+		public decimal Left {
+			get {
+				return X;
+			}
+		}
+		
+		public decimal Top {
+			get {
+				return Y;
+			}
+		}
+		
+		public decimal Right {
+			get {
+				return X + Width;
+			}
+		}
+		
+		public decimal Bottom {
+			get {
+				return Y + Height;
+			}
+		}
+		
+		public bool IsEmpty {
+			get {
+				return (Width <= 0) || (Height <= 0);
+			}
+		}
+		public override bool Equals (object obj)
+		{
+			if (!(obj is RectangleD))
+				return false;
+			RectangleD comp = (RectangleD)obj;
+			return (comp.X == this.X) &&
+			       (comp.Y == this.Y) &&
+			       (comp.Width == this.Width) &&
+			       (comp.Height == this.Height);
+		}
+		public static bool operator == (RectangleD left, RectangleD right)
+		{
+			return (left.X == right.X
+				 && left.Y == right.Y
+				 && left.Width == right.Width
+				 && left.Height == right.Height);
+		}
+		public static bool operator != (RectangleD left, RectangleD right)
+		{
+			return !(left == right);
+		}
+		public bool Contains (decimal x, decimal y)
+		{
+			return this.X <= x &&
+			x < this.X + this.Width &&
+			this.Y <= y &&
+			y < this.Y + this.Height;
+		}
+		public bool Contains (PointD pt)
+		{
+			return Contains (pt.X, pt.Y);
+		}
+		public bool Contains (RectangleD rect)
+		{
+			return (this.X <= rect.X) &&
+			       ((rect.X + rect.Width) <= (this.X + this.Width)) &&
+			       (this.Y <= rect.Y) &&
+			       ((rect.Y + rect.Height) <= (this.Y + this.Height));
+		}
+		// !! Not in C++ version
+		public override int GetHashCode ()
+		{
+			return (int)((UInt32)X ^
+			(((UInt32)Y << 13) | ((UInt32)Y >> 19)) ^
+			(((UInt32)Width << 26) | ((UInt32)Width >> 6)) ^
+			(((UInt32)Height << 7) | ((UInt32)Height >> 25)));
+		}
+		public void Inflate (decimal x, decimal y)
+		{
+			this.X -= x;
+			this.Y -= y;
+			this.Width += 2 * x;
+			this.Height += 2 * y;
+		}
+		public void Inflate (SizeD size)
+		{
+			Inflate (size.Width, size.Height);
+		}
+		// !! Not in C++
+		public static RectangleD Inflate (RectangleD rect, decimal x, decimal y)
+		{
+			RectangleD r = rect;
+			r.Inflate (x, y);
+			return r;
+		}
+		public void Intersect (RectangleD rect)
+		{
+			RectangleD result = RectangleD.Intersect (rect, this);
+			this.X = result.X;
+			this.Y = result.Y;
+			this.Width = result.Width;
+			this.Height = result.Height;
+		}
+		public static RectangleD Intersect (RectangleD a, RectangleD b)
+		{
+			decimal x1 = Math.Max (a.X, b.X);
+			decimal x2 = Math.Min (a.X + a.Width, b.X + b.Width);
+			decimal y1 = Math.Max (a.Y, b.Y);
+			decimal y2 = Math.Min (a.Y + a.Height, b.Y + b.Height);
+			if (x2 >= x1
+			    && y2 >= y1) {
+				return new RectangleD (x1, y1, x2 - x1, y2 - y1);
+			}
+			return RectangleD.Empty;
+		}
+		public bool IntersectsWith (RectangleD rect)
+		{
+			return (rect.X < this.X + this.Width) &&
+			       (this.X < (rect.X + rect.Width)) &&
+			       (rect.Y < this.Y + this.Height) &&
+			       (this.Y < rect.Y + rect.Height);
+		}
+		public static RectangleD Union (RectangleD a, RectangleD b)
+		{
+			decimal x1 = Math.Min (a.X, b.X);
+			decimal x2 = Math.Max (a.X + a.Width, b.X + b.Width);
+			decimal y1 = Math.Min (a.Y, b.Y);
+			decimal y2 = Math.Max (a.Y + a.Height, b.Y + b.Height);
+			return new RectangleD (x1, y1, x2 - x1, y2 - y1);
+		}
+		public void Offset (PointD pos)
+		{
+			Offset (pos.X, pos.Y);
+		}
+		public void Offset (decimal x, decimal y)
+		{
+			this.X += x;
+			this.Y += y;
+		}
+		public override string ToString ()
+		{
+			return "{X=" + X.ToString (CultureInfo.CurrentCulture) + ",Y=" + Y.ToString (CultureInfo.CurrentCulture) +
+			",Width=" + Width.ToString (CultureInfo.CurrentCulture) +
+			",Height=" + Height.ToString (CultureInfo.CurrentCulture) + "}";
+		}
+	}
+
+	public class PointD {
+		public decimal X;
+		public decimal Y;
+
+		public PointD (decimal x, decimal y)
+		{
+			this.X = x;
+			this.Y = y;
+		}
+	}
+
+	public class SizeD {
+
+		public decimal Width;
+		public decimal Height;
+
+		public SizeD (decimal width, decimal height)
+		{
+			this.Width = width;
+			this.Height = height;
+		}
+	}
 	/// <summary>
 	/// Determines what should be displayed at a given label
 	/// </summary>

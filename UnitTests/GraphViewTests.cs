@@ -69,20 +69,20 @@ namespace UnitTests {
 			gv.Bounds = new Rect (0, 0, 20, 10);
 
 			// Each cell of screen measures 5 units in graph data model vertically and 1/4 horizontally
-			gv.CellSize = new PointF (0.25f, 5);
+			gv.CellSize = new PointD (0.25M, 5);
 
 			// origin should be bottom left
 			var botLeft = gv.ScreenToGraphSpace (0, 10);
 			Assert.Equal (0, botLeft.X);
 			Assert.Equal (0, botLeft.Y);
-			Assert.Equal (0.25, botLeft.Width);
+			Assert.Equal (0.25M, botLeft.Width);
 			Assert.Equal (5, botLeft.Height);
 
 			// up 2 rows of the console and along 1 col
 			var up2along1 = gv.ScreenToGraphSpace (1, 8);
-			Assert.Equal (0.25, up2along1.X);
+			Assert.Equal (0.25M, up2along1.X);
 			Assert.Equal (10, up2along1.Y);
-			Assert.Equal (0.25, botLeft.Width);
+			Assert.Equal (0.25M, botLeft.Width);
 			Assert.Equal (5, botLeft.Height);
 		}
 
@@ -97,12 +97,12 @@ namespace UnitTests {
 			gv.Bounds = new Rect (0, 0, 20, 10);
 
 			// origin should be bottom left
-			var botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
+			var botLeft = gv.GraphSpaceToScreen (new PointD (0, 0));
 			Assert.Equal (0, botLeft.X);
 			Assert.Equal (10, botLeft.Y); // row 10 of the view is the bottom left
 
 			// along 2 and up 1 in graph space
-			var along2up1 = gv.GraphSpaceToScreen (new PointF (2, 1));
+			var along2up1 = gv.GraphSpaceToScreen (new PointD (2, 1));
 			Assert.Equal (2, along2up1.X);
 			Assert.Equal (9, along2up1.Y);
 		}
@@ -114,14 +114,14 @@ namespace UnitTests {
 			gv.Bounds = new Rect (0, 0, 20, 10);
 
 			// origin should be bottom left
-			var botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
+			var botLeft = gv.GraphSpaceToScreen (new PointD (0, 0));
 			Assert.Equal (0, botLeft.X);
 			Assert.Equal (10, botLeft.Y); // row 10 of the view is the bottom left
 
 			gv.MarginLeft = 1;
 
 			// With a margin of 1 the origin should be at x=1 y= 10
-			botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
+			botLeft = gv.GraphSpaceToScreen (new PointD (0, 0));
 			Assert.Equal (1, botLeft.X);
 			Assert.Equal (10, botLeft.Y); // row 10 of the view is the bottom left
 
@@ -129,7 +129,7 @@ namespace UnitTests {
 			gv.MarginBottom = 1;
 
 			// With a margin of 1 in both directions the origin should be at x=1 y= 9
-			botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
+			botLeft = gv.GraphSpaceToScreen (new PointD (0, 0));
 			Assert.Equal (1, botLeft.X);
 			Assert.Equal (9, botLeft.Y); // row 9 of the view is the bottom left up 1 cell
 		}
@@ -141,15 +141,15 @@ namespace UnitTests {
 			gv.Bounds = new Rect (0, 0, 20, 10);
 
 			//graph is scrolled to present chart space -5 to 5 in both axes
-			gv.ScrollOffset = new PointF (-5, -5);
+			gv.ScrollOffset = new PointD (-5, -5);
 
 			// origin should be right in the middle of the control
-			var botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
+			var botLeft = gv.GraphSpaceToScreen (new PointD (0, 0));
 			Assert.Equal (5, botLeft.X);
 			Assert.Equal (5, botLeft.Y);
 
 			// along 2 and up 1 in graph space
-			var along2up1 = gv.GraphSpaceToScreen (new PointF (2, 1));
+			var along2up1 = gv.GraphSpaceToScreen (new PointD (2, 1));
 			Assert.Equal (7, along2up1.X);
 			Assert.Equal (4, along2up1.Y);
 		}
@@ -161,32 +161,32 @@ namespace UnitTests {
 
 			// Each cell of screen is responsible for rendering 5 units in graph data model
 			// vertically and 1/4 horizontally
-			gv.CellSize = new PointF (0.25f, 5);
+			gv.CellSize = new PointD (0.25M, 5);
 
 			// origin should be bottom left
-			var botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
+			var botLeft = gv.GraphSpaceToScreen (new PointD (0, 0));
 			Assert.Equal (0, botLeft.X);
 			Assert.Equal (10, botLeft.Y); // row 10 of the view is the bottom left
 
 			// along 2 and up 1 in graph space
-			var along2up1 = gv.GraphSpaceToScreen (new PointF (2, 1));
+			var along2up1 = gv.GraphSpaceToScreen (new PointD (2, 1));
 			Assert.Equal (8, along2up1.X);
 			Assert.Equal (10, along2up1.Y);
 
 			// Y value 4 should be rendered in bottom most row
-			Assert.Equal (10, gv.GraphSpaceToScreen(new PointF (2, 4)).Y);
+			Assert.Equal (10, gv.GraphSpaceToScreen(new PointD (2, 4)).Y);
 			
 			// Cell height is 5 so this is the first point of graph space that should
 			// be rendered in the graph in next row up (row 9)
-			Assert.Equal (9, gv.GraphSpaceToScreen (new PointF (2, 5)).Y);
+			Assert.Equal (9, gv.GraphSpaceToScreen (new PointD (2, 5)).Y);
 			
 			// More boundary testing for this cell size
-			Assert.Equal (9, gv.GraphSpaceToScreen (new PointF (2, 6)).Y);
-			Assert.Equal (9, gv.GraphSpaceToScreen (new PointF (2, 7)).Y);
-			Assert.Equal (9, gv.GraphSpaceToScreen (new PointF (2, 8)).Y);
-			Assert.Equal (9, gv.GraphSpaceToScreen (new PointF (2, 9)).Y);
-			Assert.Equal (8, gv.GraphSpaceToScreen (new PointF (2, 10)).Y);
-			Assert.Equal (8, gv.GraphSpaceToScreen (new PointF (2, 11)).Y);
+			Assert.Equal (9, gv.GraphSpaceToScreen (new PointD (2, 6)).Y);
+			Assert.Equal (9, gv.GraphSpaceToScreen (new PointD (2, 7)).Y);
+			Assert.Equal (9, gv.GraphSpaceToScreen (new PointD (2, 8)).Y);
+			Assert.Equal (9, gv.GraphSpaceToScreen (new PointD (2, 9)).Y);
+			Assert.Equal (8, gv.GraphSpaceToScreen (new PointD (2, 10)).Y);
+			Assert.Equal (8, gv.GraphSpaceToScreen (new PointD (2, 11)).Y);
 		}
 
 
@@ -198,29 +198,29 @@ namespace UnitTests {
 
 			// Each cell of screen is responsible for rendering 5 units in graph data model
 			// vertically and 1/4 horizontally
-			gv.CellSize = new PointF (0.25f, 5);
+			gv.CellSize = new PointD (0.25M, 5);
 
 			//graph is scrolled to present some negative chart (4 negative cols and 2 negative rows)
-			gv.ScrollOffset = new PointF (-1, -10);
+			gv.ScrollOffset = new PointD (-1, -10);
 
 			// origin should be in the lower left (but not right at the bottom)
-			var botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
+			var botLeft = gv.GraphSpaceToScreen (new PointD (0, 0));
 			Assert.Equal (4, botLeft.X);
 			Assert.Equal (8, botLeft.Y);
 
 			// along 2 and up 1 in graph space
-			var along2up1 = gv.GraphSpaceToScreen (new PointF (2, 1));
+			var along2up1 = gv.GraphSpaceToScreen (new PointD (2, 1));
 			Assert.Equal (12, along2up1.X);
 			Assert.Equal (8, along2up1.Y);
 
 
 			// More boundary testing for this cell size/offset
-			Assert.Equal (7, gv.GraphSpaceToScreen (new PointF (2, 6)).Y);
-			Assert.Equal (7, gv.GraphSpaceToScreen (new PointF (2, 7)).Y);
-			Assert.Equal (7, gv.GraphSpaceToScreen (new PointF (2, 8)).Y);
-			Assert.Equal (7, gv.GraphSpaceToScreen (new PointF (2, 9)).Y);
-			Assert.Equal (6, gv.GraphSpaceToScreen (new PointF (2, 10)).Y);
-			Assert.Equal (6, gv.GraphSpaceToScreen (new PointF (2, 11)).Y);
+			Assert.Equal (7, gv.GraphSpaceToScreen (new PointD (2, 6)).Y);
+			Assert.Equal (7, gv.GraphSpaceToScreen (new PointD (2, 7)).Y);
+			Assert.Equal (7, gv.GraphSpaceToScreen (new PointD (2, 8)).Y);
+			Assert.Equal (7, gv.GraphSpaceToScreen (new PointD (2, 9)).Y);
+			Assert.Equal (6, gv.GraphSpaceToScreen (new PointD (2, 10)).Y);
+			Assert.Equal (6, gv.GraphSpaceToScreen (new PointD (2, 11)).Y);
 		}
 
 		#endregion
@@ -232,17 +232,17 @@ namespace UnitTests {
 			gv.Bounds = new Rect (0, 0, 50, 30);
 
 			// How much graph space each cell of the console depicts
-			gv.CellSize = new PointF (0.1f, 0.25f);
-			gv.AxisX.Increment = 1f;
+			gv.CellSize = new PointD (0.1M, 0.25M);
+			gv.AxisX.Increment = 1M;
 			gv.AxisX.ShowLabelsEvery = 1;
 
-			gv.AxisY.Increment = 1f;
+			gv.AxisY.Increment = 1M;
 			gv.AxisY.ShowLabelsEvery = 1;
 
 			// Start the graph at 80 years because that is where most of our data is
-			gv.ScrollOffset = new PointF (0, 80);
+			gv.ScrollOffset = new PointD (0, 80);
 
-			List<RectangleF> otherRects = new List<RectangleF> ();
+			List<RectangleD> otherRects = new List<RectangleD> ();
 
 			List<System.Drawing.Point> overlappingPoints = new List<System.Drawing.Point> ();
 
@@ -276,34 +276,34 @@ namespace UnitTests {
 			gv.Bounds = new Rect (0, 0, 50, 30);
 
 			// How much graph space each cell of the console depicts
-			gv.CellSize = new PointF (0.1f, 0.25f);
-			gv.AxisX.Increment = 1f;
+			gv.CellSize = new PointD (0.1M, 0.25M);
+			gv.AxisX.Increment = 1;
 			gv.AxisX.ShowLabelsEvery = 1;
 
-			gv.AxisY.Increment = 1f;
+			gv.AxisY.Increment = 1;
 			gv.AxisY.ShowLabelsEvery = 1;
 
 			// Start the graph at 80 years because that is where most of our data is
-			gv.ScrollOffset = new PointF (0, 80);
+			gv.ScrollOffset = new PointD (0, 80);
 
 			for (int x = 0; x < gv.Bounds.Width; x++) {
 				for (int y = 0; y < gv.Bounds.Height; y++) {
 
 					var graphSpace = gv.ScreenToGraphSpace (x, y);
 					
-					var p = gv.GraphSpaceToScreen (new PointF (graphSpace.Left, graphSpace.Top));
+					var p = gv.GraphSpaceToScreen (new PointD (graphSpace.Left, graphSpace.Top));
 					Assert.Equal (x, p.X);
 					Assert.Equal (y, p.Y);
 
-					p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - 0.000001f, graphSpace.Top));
+					p = gv.GraphSpaceToScreen (new PointD (graphSpace.Right - 0.000001M, graphSpace.Top));
 					Assert.Equal (x, p.X);
 					Assert.Equal (y, p.Y);
 
-					p = gv.GraphSpaceToScreen (new PointF (graphSpace.Left, graphSpace.Bottom - 0.000001f));
+					p = gv.GraphSpaceToScreen (new PointD (graphSpace.Left, graphSpace.Bottom - 0.000001M));
 					Assert.Equal (x, p.X);
 					Assert.Equal (y, p.Y);
 
-					p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - 0.000001f, graphSpace.Bottom - 0.000001f));
+					p = gv.GraphSpaceToScreen (new PointD (graphSpace.Right - 0.000001M, graphSpace.Bottom - 0.000001M));
 					Assert.Equal (x, p.X);
 					Assert.Equal (y, p.Y);
 
