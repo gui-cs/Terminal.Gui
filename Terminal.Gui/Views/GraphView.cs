@@ -82,6 +82,12 @@ namespace Terminal.Gui {
 
 			base.Redraw(bounds);
 
+			// If there is no data do not display a graph
+			if (!Series.Any ()) {
+				return;
+			}
+				
+
 			AxisX.DrawAxisLine (Driver, this, Bounds);
 			AxisY.DrawAxisLine (Driver, this, Bounds);
 
@@ -420,22 +426,35 @@ namespace Terminal.Gui {
 
 				// what bit of the graph is supposed to go here?
 				var graphSpace = graph.ScreenToGraphSpace (i,y);
+				bool dueLabel = false;
 
-				// if we are overdue rendering a label
-				if (toRender == null || graphSpace.X > toRender.GraphSpace.X + Increment) {
+				if (toRender == null) {
+					toRender = new AxisIncrementToRender (Orientation, new Point (i, y), graphSpace);
+					dueLabel = true;
+				} else {
 
-					toRender = new AxisIncrementToRender (Orientation, new Point (i,y), graphSpace);
+					// next tick is due here
+					float nextTickX = toRender.GraphSpace.X + Increment;
 
-					// and the label (if we are due one)
+					// if we are overdue rendering a label
+					if (graphSpace.X >= nextTickX && nextTickX < graphSpace.X + graphSpace.Width) {
+
+						toRender = new AxisIncrementToRender (Orientation, new Point (i, y), graphSpace);
+						dueLabel = true;
+					}
+				}
+
+				// and the label (if we are due one)
+				if (dueLabel) {
+
 					if (ShowLabelsEvery != 0) {
 
 						// if this increment also needs a label
 						if (labels++ % ShowLabelsEvery == 0) {
 							toRender.Text = LabelGetter (toRender);
 						};
-
-						yield return toRender;
 					}
+					yield return toRender;
 				}
 			}
 		}

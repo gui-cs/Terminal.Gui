@@ -141,7 +141,7 @@ namespace UICatalog.Scenarios {
 
 			// How much graph space each cell of the console depicts
 			graphView.CellSize = new PointF (0.1f, 0.25f);
-			graphView.AxisX.Increment = 0.1f;
+			graphView.AxisX.Increment = 1f;
 			graphView.AxisX.ShowLabelsEvery = 1;
 			graphView.AxisX.LabelGetter = v => barSeries.GetLabelText(v);
 
