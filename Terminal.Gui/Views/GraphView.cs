@@ -88,8 +88,8 @@ namespace Terminal.Gui {
 			AxisX.DrawAxisLabels (Driver, this, Bounds);
 			AxisY.DrawAxisLabels (Driver, this, Bounds);
 
-			for (int x=0;x<Bounds.Width;x++){
-				for(int y=0;y<Bounds.Height;y++){
+			for (int x= (int)MarginLeft;x<Bounds.Width;x++){
+				for(int y=0;y<Bounds.Height - (int)MarginBottom;y++){
 
 					var space = ScreenToGraphSpace(x,y);
 
@@ -217,6 +217,86 @@ namespace Terminal.Gui {
 
 			return null;
 		}
+	}
+
+	/// <summary>
+	/// Series of bars positioned at regular intervals
+	/// </summary>
+	public class BarSeries : ISeries {
+
+		public List<Bar> Bars {get;set;}
+
+		/// <summary>
+		/// Determines the spacing of bars along the axis. Defaults to 1 i.e. 
+		/// every 1 unit of graph space a bar is rendered.  Note that you should
+		/// also consider <see cref="GraphView.CellSize"/> when changing this.
+		/// </summary>
+		public float BarEvery { get; set; } = 1;
+
+		public Rune? GetCellValueIfAny (RectangleF graphSpace)
+		{
+			Bar bar = XLocationToBar (graphSpace);
+
+			//if no bar should be rendered at this x position
+			if(bar == null) {
+				return null;
+			}
+
+			// and the bar is at least this high
+			if (bar.Value >= graphSpace.Top) {
+
+				return bar?.FillRune;
+			}
+			return null;
+		}
+
+		/// <summary>
+		/// Translates a position on the x axis to the Bar (if any) that
+		/// should be rendered
+		/// </summary>
+		/// <param name="graphSpace"></param>
+		/// <returns></returns>
+		private Bar XLocationToBar (RectangleF graphSpace)
+		{
+			// Position bars on x axis Bar1 at x=1, Bar2 at x=2 etc
+			for (int i = 0; i < Bars.Count; i++) {
+
+				float barXPosition = (i + 1f) * BarEvery;
+
+				// if a bar contained in this cell's X axis of data space
+				if (barXPosition >= graphSpace.X && barXPosition < graphSpace.Right) {
+					return Bars [i];
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Returns the name of the bar (if any) that is rendered at this
+		/// point in the x axis
+		/// </summary>
+		/// <param name="axisPoint"></param>
+		/// <returns></returns>
+		public string GetLabelText (AxisIncrementToRender axisPoint)
+		{
+			return XLocationToBar (axisPoint.GraphSpace)?.Name;
+		}
+
+		public class Bar {
+			public string Name { get; }
+			public Rune FillRune { get; }
+			public double Value { get; }
+
+			public Bar (string name, Rune fillRune, double value)
+			{
+				Name = name;
+				FillRune = fillRune;
+				Value = value;
+			}
+
+		}
+
 	}
 
 	/// <summary>
@@ -423,6 +503,7 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
+		/// Draws axis <see cref="Axis.Increment"/> markers and labels
 		/// </summary>
 		/// <param name="bounds"></param>
 		public override void DrawAxisLabels (ConsoleDriver driver, GraphView graph, Rect bounds)
@@ -520,11 +601,16 @@ namespace Terminal.Gui {
 		/// </summary>
 		public RectangleF GraphSpace { get; }
 
+		private string _text = "";
+
 		/// <summary>
 		/// The text (if any) that should be displayed at this axis increment
 		/// </summary>
 		/// <value></value>
-		public string Text { get; internal set; } = "";
+		public string Text {
+			get => _text;
+			internal set { _text = value ?? ""; }
+		}
 
 		/// <summary>
 		/// Describe a new section of an axis that requires an axis increment

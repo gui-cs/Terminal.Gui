@@ -21,6 +21,8 @@ namespace UICatalog.Scenarios {
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
+					new MenuItem ("_Open Scatter Plot", "", () => SetupPeriodicTableScatterPlot()),
+					new MenuItem ("_Open Bar Graph", "", () => SetupLifeExpectancyBarGraph()),
 
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
@@ -72,10 +74,90 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
 			});
 			Top.Add (statusBar);
-			SetupPeriodicTable ();
 		}
 
-		private void SetupPeriodicTable ()
+			/*
+			Country,Both,Male,Female
+
+"Switzerland",83.4,81.8,85.1
+"South Korea",83.3,80.3,86.1
+"Singapore",83.2,81,85.5
+"Spain",83.2,80.7,85.7
+"Cyprus",83.1,81.1,85.1
+"Australia",83,81.3,84.8
+"Italy",83,80.9,84.9
+"Norway",83,81.2,84.7
+"Israel",82.6,80.8,84.4
+"France",82.5,79.8,85.1
+"Luxembourg",82.4,80.6,84.2
+"Sweden",82.4,80.8,84
+"Iceland",82.3,80.8,83.9
+"Canada",82.2,80.4,84.1
+"New Zealand",82,80.4,83.5
+"Malta,81.9",79.9,83.8
+"Ireland",81.8,80.2,83.5
+"Netherlands",81.8,80.4,83.1
+"Germany",81.7,78.7,84.8
+"Austria",81.6,79.4,83.8
+"Finland",81.6,79.2,84
+"Portugal",81.6,78.6,84.4
+"Belgium",81.4,79.3,83.5
+"United Kingdom",81.4,79.8,83
+"Denmark",81.3,79.6,83
+"Slovenia",81.3,78.6,84.1
+"Greece",81.1,78.6,83.6
+"Kuwait",81,79.3,83.9
+"Costa Rica",80.8,78.3,83.4*/
+
+		private void SetupLifeExpectancyBarGraph()
+		{
+			xAxisLabel.Text = "Country";
+			about.Text = "This graph shows the life expectancy at birth of a range of countries";
+
+			var stiple = Application.Driver.Stipple;
+			var barSeries = new BarSeries () {
+				Bars = new List<BarSeries.Bar> () {
+					new BarSeries.Bar ("Switzerland", stiple, 83.4f),
+					new BarSeries.Bar ("South Korea", stiple, 83.3f),
+					new BarSeries.Bar ("Singapore", stiple, 83.2),
+					new BarSeries.Bar ("Spain", stiple, 83.2),
+					new BarSeries.Bar ("Cyprus", stiple, 83.1),
+					new BarSeries.Bar ("Australia", stiple, 83),
+					new BarSeries.Bar ("Italy", stiple, 83),
+					new BarSeries.Bar ("Norway", stiple, 83),
+					new BarSeries.Bar ("Israel", stiple, 82.6),
+					new BarSeries.Bar ("France", stiple, 82.5),
+					new BarSeries.Bar ("Luxembourg", stiple, 82.4),
+					new BarSeries.Bar ("Sweden", stiple, 82.4),
+					new BarSeries.Bar ("Iceland", stiple, 82.3),
+					new BarSeries.Bar ("Canada", stiple, 82.2),
+					new BarSeries.Bar ("New Zealand", stiple, 82),
+					new BarSeries.Bar ("Malta", stiple, 81.9),
+					new BarSeries.Bar ("Ireland", stiple, 81.8)
+				}
+			};
+
+			graphView.Series.Add (barSeries);
+
+			// How much graph space each cell of the console depicts
+			graphView.CellSize = new PointF (0.1f, 0.25f);
+			graphView.AxisX.Increment = 0.1f;
+			graphView.AxisX.ShowLabelsEvery = 1;
+			graphView.AxisX.LabelGetter = v => barSeries.GetLabelText(v);
+
+			graphView.AxisY.Increment = 1f;
+			graphView.AxisY.ShowLabelsEvery = 1;
+			graphView.AxisY.LabelGetter = v => v.GraphSpace.Y.ToString ("N2");
+
+			// leave space for axis labels
+			graphView.MarginBottom = 1;
+			graphView.MarginLeft = 2;
+
+			// Start the graph at 80 years because that is where most of our data is
+			graphView.ScrollOffset = new PointF (0, 80);
+		}
+
+		private void SetupPeriodicTableScatterPlot ()
 		{
 
 			xAxisLabel.Text = "Atomic Number";
