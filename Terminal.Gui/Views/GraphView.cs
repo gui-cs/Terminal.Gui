@@ -272,6 +272,7 @@ namespace Terminal.Gui {
 		}
 	}
 
+
 	/// <summary>
 	/// Series of bars positioned at regular intervals
 	/// </summary>
@@ -286,17 +287,24 @@ namespace Terminal.Gui {
 		/// </summary>
 		public decimal BarEvery { get; set; } = 1;
 
+		/// <summary>
+		/// Direction bars protrude from the corresponding axis.
+		/// Defaults to vertical
+		/// </summary>
+		public Orientation Orientation { get; set; } = Orientation.Vertical;
+
 		public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
 		{
-			Bar bar = XLocationToBar (graphSpace);
+			Bar bar = LocationToBar (graphSpace);
 
 			//if no bar should be rendered at this x position
 			if(bar == null) {
 				return null;
 			}
-
-			// and the bar is at least this high
-			if (bar.Value >= graphSpace.Top) {
+			
+			var toBeat = Orientation == Orientation.Vertical ? graphSpace.Top : graphSpace.Right;
+			// and the bar is at least this high / wide
+			if (bar.Value >= toBeat) {
 
 				return bar?.Fill;
 			}
@@ -304,20 +312,27 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Translates a position on the x axis to the Bar (if any) that
-		/// should be rendered
+		/// Translates a position in the graph to the Bar (if any) that
+		/// should be rendered there (assuming the bar was long enough).
+		/// This depends on the <see cref="Orientation"/>
 		/// </summary>
 		/// <param name="graphSpace"></param>
 		/// <returns></returns>
-		private Bar XLocationToBar (RectangleD graphSpace)
+		private Bar LocationToBar (RectangleD graphSpace)
 		{
-			// Position bars on x axis Bar1 at x=1, Bar2 at x=2 etc
+			// Position bars on x axis Bar1 at: 
+			// Vertical Bars: x=1, Bar2 at x=2 etc
+			// Horizontal Bars: y=1, Bar2 at y=2 etc
 			for (int i = 0; i < Bars.Count; i++) {
 
-				decimal barXPosition = (i + 1) * BarEvery;
+				decimal barPosition = (i + 1) * BarEvery;
 
-				// if a bar contained in this cell's X axis of data space
-				if (barXPosition >= graphSpace.X && barXPosition < graphSpace.Right) {
+				// the x/y position that the cell would have to be between for the bar to be rendered
+				var low = Orientation == Orientation.Vertical ? graphSpace.X : graphSpace.Y;
+				var high = Orientation == Orientation.Vertical ? graphSpace.Right : graphSpace.Bottom;
+
+				// if a bar contained in this cell's X/Y axis of data space
+				if (barPosition >=  low && barPosition < high) {
 					return Bars [i];
 				}
 			}
@@ -333,7 +348,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public string GetLabelText (AxisIncrementToRender axisPoint)
 		{
-			return XLocationToBar (axisPoint.GraphSpace)?.Name;
+			return LocationToBar (axisPoint.GraphSpace)?.Name;
 		}
 
 		public class Bar {

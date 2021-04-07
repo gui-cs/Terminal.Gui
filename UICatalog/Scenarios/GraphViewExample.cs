@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
@@ -21,7 +22,8 @@ namespace UICatalog.Scenarios {
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					new MenuItem ("_Open Scatter Plot", "", () => SetupPeriodicTableScatterPlot()),
-					new MenuItem ("_Open Bar Graph", "", () => SetupLifeExpectancyBarGraph()),
+					new MenuItem ("_Open V Bar Graph", "", () => SetupLifeExpectancyBarGraph(true)),
+					new MenuItem ("_Open H Bar Graph", "", () => SetupLifeExpectancyBarGraph(false)),
 
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
@@ -99,7 +101,7 @@ namespace UICatalog.Scenarios {
 "Kuwait",81,79.3,83.9
 "Costa Rica",80.8,78.3,83.4*/
 
-		private void SetupLifeExpectancyBarGraph()
+		private void SetupLifeExpectancyBarGraph(bool verticalBars)
 		{
 			about.Text = "This graph shows the life expectancy at birth of a range of countries";
 
@@ -129,24 +131,53 @@ namespace UICatalog.Scenarios {
 
 			graphView.Series.Add (barSeries);
 
-			// How much graph space each cell of the console depicts
-			graphView.CellSize = new PointD (0.1M, 0.25M);
-			graphView.AxisX.Increment = 1M;
-			graphView.AxisX.ShowLabelsEvery = 1;
-			graphView.AxisX.LabelGetter = v => barSeries.GetLabelText(v);
-			graphView.AxisX.Text = "Country";
+			if (verticalBars) {
 
-			graphView.AxisY.Increment = 1M;
-			graphView.AxisY.ShowLabelsEvery = 1;
-			graphView.AxisY.LabelGetter = v => v.GraphSpace.Y.ToString ("N2");
-			graphView.AxisY.Text = "Age";
+				barSeries.Orientation = Orientation.Vertical;
 
-			// leave space for axis labels and title
-			graphView.MarginBottom = 2;
-			graphView.MarginLeft = 6;
+				// How much graph space each cell of the console depicts
+				graphView.CellSize = new PointD (0.1M, 0.25M);
+				graphView.AxisX.Increment = 1M;
+				graphView.AxisX.ShowLabelsEvery = 1;
+				graphView.AxisX.LabelGetter = v => barSeries.GetLabelText (v);
+				graphView.AxisX.Text = "Country";
 
-			// Start the graph at 80 years because that is where most of our data is
-			graphView.ScrollOffset = new PointD (0, 80);
+				graphView.AxisY.Increment = 1M;
+				graphView.AxisY.ShowLabelsEvery = 1;
+				graphView.AxisY.LabelGetter = v => v.GraphSpace.Y.ToString ("N2");
+				graphView.AxisY.Text = "Age";
+
+				// leave space for axis labels and title
+				graphView.MarginBottom = 2;
+				graphView.MarginLeft = 6;
+
+				// Start the graph at 80 years because that is where most of our data is
+				graphView.ScrollOffset = new PointD (0, 80);
+
+			} else {
+				barSeries.Orientation = Orientation.Horizontal;
+
+				// How much graph space each cell of the console depicts
+				graphView.CellSize = new PointD (0.1M,0.5M);
+				graphView.AxisY.Increment = 1M;
+				graphView.AxisY.ShowLabelsEvery = 1;
+				graphView.AxisY.LabelGetter = v => barSeries.GetLabelText (v);
+				graphView.AxisY.Text = "Country";
+
+				graphView.AxisX.Increment = 1M;
+				graphView.AxisX.ShowLabelsEvery = 1;
+				graphView.AxisX.LabelGetter = v => v.GraphSpace.X.ToString ("N2");
+				graphView.AxisX.Text = "Age";
+
+				// leave space for axis labels and title
+				graphView.MarginBottom = 2;
+				graphView.MarginLeft = (uint)barSeries.Bars.Max(b=>b.Name.Length)+2;
+
+				// Start the graph at 80 years because that is where most of our data is
+				graphView.ScrollOffset = new PointD (80,0);
+			}
+
+			
 		}
 
 		private void SetupPeriodicTableScatterPlot ()
