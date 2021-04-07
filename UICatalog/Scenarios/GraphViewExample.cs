@@ -105,6 +105,8 @@ namespace UICatalog.Scenarios {
 
 		private void SetupLifeExpectancyBarGraph(bool verticalBars)
 		{
+			graphView.Reset();
+
 			about.Text = "This graph shows the life expectancy at birth of a range of countries";
 
 			var stiple = new GraphCellToRender(Application.Driver.Stipple);
@@ -178,6 +180,8 @@ namespace UICatalog.Scenarios {
 				// Start the graph at 80 years because that is where most of our data is
 				graphView.ScrollOffset = new PointD (80,0);
 			}			
+
+			graphView.SetNeedsDisplay();
 		}
 
 		private void SetupPopulationPyramid()
@@ -206,8 +210,10 @@ namespace UICatalog.Scenarios {
 95-99,34524,95559
 100+,3016,12818*/
 
-			// 21 categories
+			about.Text = "This graph shows population of each age divided by gender";
 
+			graphView.Reset();
+			
 			// How much graph space each cell of the console depicts
 			graphView.CellSize = new PointD (100_000, 1);
 
@@ -295,11 +301,14 @@ namespace UICatalog.Scenarios {
 			};
 			graphView.Series.Add (femalesSeries);
 
+			graphView.SetNeedsDisplay();
+
 		}
 		private void SetupPeriodicTableScatterPlot ()
 		{
+			graphView.Reset();
+
 			about.Text = "This graph shows the atomic weight of each element in the periodic table.\nStarting with Hydrogen (atomic Number 1 with a weight of 1.007)";
-			//about.WordWrap = true;
 
 			//AtomicNumber and AtomicMass of all elements in the periodic table
 			graphView.Series.Add (
@@ -342,6 +351,8 @@ namespace UICatalog.Scenarios {
 			// One label every 5 atomic weight
 			graphView.AxisY.Increment = 5;
 			graphView.AxisY.ShowLabelsEvery = 1;
+
+			graphView.SetNeedsDisplay();
 		}
 
 		private void Zoom (decimal factor)

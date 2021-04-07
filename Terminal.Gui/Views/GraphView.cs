@@ -68,6 +68,20 @@ namespace Terminal.Gui {
 		 	AxisY = new VerticalAxis();
 		}
 
+		/// <summary>
+		/// Clears all settings configured on the graph and resets all properties
+		/// to default values (<see cref="CellSize"/>, <see cref="ScrollOffset"/> etc) 
+		/// </summary>
+		public void Reset()
+		{
+			ScrollOffset = new PointD(0,0);
+			CellSize = new PointD(1,1);
+			AxisX.Reset();
+		 	AxisY.Reset();
+			Series.Clear();
+			SetNeedsDisplay();
+		}
+
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
@@ -167,14 +181,26 @@ namespace Terminal.Gui {
 				case Key.CursorLeft:
 					Scroll (-CellSize.X, 0);
 					return true;
+				case Key.CursorLeft | Key.CtrlMask:
+					Scroll (-CellSize.X*5, 0);
+					return true;
 				case Key.CursorRight:
 					Scroll (CellSize.X, 0);
+					return true;
+				case Key.CursorRight | Key.CtrlMask:
+					Scroll (CellSize.X*5, 0);
 					return true;
 				case Key.CursorDown:
 					Scroll (0, -CellSize.Y);
 					return true;
+				case Key.CursorDown | Key.CtrlMask:
+					Scroll (0, -CellSize.Y*5);
+					return true;
 				case Key.CursorUp:
 					Scroll (0,CellSize.Y);
+					return true;
+				case Key.CursorUp | Key.CtrlMask:
+					Scroll (0,CellSize.Y*5);
 					return true;
 				}
 			}
@@ -418,6 +444,11 @@ namespace Terminal.Gui {
 	public abstract class Axis
 	{
 		/// <summary>
+		/// Default value for <see cref="ShowLabelsEvery"/>
+		/// </summary>
+		const uint DefaultShowLabelsEvery = 5;
+
+		/// <summary>
 		/// Direction of the axis
 		/// </summary>
 		/// <value></value>
@@ -433,7 +464,7 @@ namespace Terminal.Gui {
 		/// The number of <see cref="Increment"/> before an label is added.
 		/// 0 = never show labels
 		/// </summary>
-		public uint ShowLabelsEvery { get; set; } = 5;
+		public uint ShowLabelsEvery { get; set; } = DefaultShowLabelsEvery;
 				
 		/// <summary>
 		/// Allows you to control what label text is rendered for a given <see cref="Increment"/>
@@ -472,6 +503,15 @@ namespace Terminal.Gui {
 		/// <param name="bounds"></param>
 
 		public abstract void DrawAxisLabels (ConsoleDriver driver, GraphView graph, Rect bounds);
+
+		/// <summary>
+		/// Resets all configurable properties of the axis to default values
+		/// </summary>
+		public virtual void Reset ()
+		{
+			Increment = 1;
+			ShowLabelsEvery = DefaultShowLabelsEvery;
+		}
 	}
 
 	/// <summary>
@@ -484,6 +524,13 @@ namespace Terminal.Gui {
 		/// </summary>
 		public HorizontalAxis ():base(Orientation.Horizontal)
 		{
+			LabelGetter = DefaultLabelGetter;
+		}
+
+		/// <inheritdoc/>
+		public override void Reset ()
+		{
+			base.Reset ();
 
 			LabelGetter = DefaultLabelGetter;
 		}
@@ -637,6 +684,13 @@ namespace Terminal.Gui {
 			LabelGetter = DefaultLabelGetter;
 		}
 
+		/// <inheritdoc/>
+		public override void Reset ()
+		{
+			base.Reset ();
+
+			LabelGetter = DefaultLabelGetter;
+		}
 		private string DefaultLabelGetter (AxisIncrementToRender toRender)
 		{
 			return toRender.GraphSpace.Y.ToString ("N0");
