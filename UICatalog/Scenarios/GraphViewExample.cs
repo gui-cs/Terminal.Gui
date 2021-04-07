@@ -9,7 +9,6 @@ namespace UICatalog.Scenarios {
 	class GraphViewExample : Scenario {
 
 		GraphView graphView;
-		private Label xAxisLabel;
 		private TextView about;
 
 		public override void Setup ()
@@ -35,8 +34,8 @@ namespace UICatalog.Scenarios {
 			Top.Add (menu);
 
 			graphView = new GraphView () {
-				X = 0,
-				Y = 0,
+				X = 1,
+				Y = 1,
 				Width = 60,
 				Height = 20,
 			};
@@ -60,15 +59,6 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (frameRight);
 
-			xAxisLabel = new Label ("AxisLabel") {
-				X = 0,
-				Y = Pos.Bottom (graphView),
-				Width = graphView.Width,
-				Height = 1,
-				TextAlignment = TextAlignment.Centered
-			};
-
-			Win.Add (xAxisLabel);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
@@ -111,7 +101,6 @@ namespace UICatalog.Scenarios {
 
 		private void SetupLifeExpectancyBarGraph()
 		{
-			xAxisLabel.Text = "Country";
 			about.Text = "This graph shows the life expectancy at birth of a range of countries";
 
 			var stiple = Application.Driver.Stipple;
@@ -144,14 +133,16 @@ namespace UICatalog.Scenarios {
 			graphView.AxisX.Increment = 1M;
 			graphView.AxisX.ShowLabelsEvery = 1;
 			graphView.AxisX.LabelGetter = v => barSeries.GetLabelText(v);
+			graphView.AxisX.Text = "Country";
 
 			graphView.AxisY.Increment = 1M;
 			graphView.AxisY.ShowLabelsEvery = 1;
 			graphView.AxisY.LabelGetter = v => v.GraphSpace.Y.ToString ("N2");
+			graphView.AxisY.Text = "Age";
 
-			// leave space for axis labels
-			graphView.MarginBottom = 1;
-			graphView.MarginLeft = 5;
+			// leave space for axis labels and title
+			graphView.MarginBottom = 2;
+			graphView.MarginLeft = 6;
 
 			// Start the graph at 80 years because that is where most of our data is
 			graphView.ScrollOffset = new PointD (0, 80);
@@ -159,8 +150,6 @@ namespace UICatalog.Scenarios {
 
 		private void SetupPeriodicTableScatterPlot ()
 		{
-
-			xAxisLabel.Text = "Atomic Number";
 			about.Text = "This graph shows the atomic weight of each element in the periodic table.\nStarting with Hydrogen (atomic Number 1 with a weight of 1.007)";
 			//about.WordWrap = true;
 
@@ -200,6 +189,7 @@ namespace UICatalog.Scenarios {
 			// One axis tick/label per 5 atomic numbers
 			graphView.AxisX.Increment = 5;
 			graphView.AxisX.ShowLabelsEvery = 1;
+			graphView.AxisX.Text = "Atomic Number";
 
 			// One label every 5 atomic weight
 			graphView.AxisY.Increment = 5;

@@ -335,6 +335,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public LabelGetterDelegate LabelGetter;
 
+		/// <summary>
+		/// Displayed below/to left of labels (see <see cref="Orientation"/>).
+		/// If text is not visible, check <see cref="GraphView.MarginBottom"/> / <see cref="GraphView.MarginLeft"/>
+		/// </summary>
+		public string Text;
+
 		protected Axis (Orientation orientation)
 		{
 			Orientation = orientation;
@@ -414,6 +420,20 @@ namespace Terminal.Gui {
 					graph.Move (label.ScreenLocation.X - (label.Text.Length/2), label.ScreenLocation.Y+1);
 					driver.AddStr (label.Text);
 				}
+			}
+
+			// if there is a title
+			if (!string.IsNullOrWhiteSpace (Text)) {
+				
+				string toRender = Text;
+
+				// if label is too long
+				if (toRender.Length > graph.Bounds.Width) {
+					toRender = toRender.Substring (0, graph.Bounds.Width);
+				}
+
+				graph.Move (graph.Bounds.Width/2 - (toRender.Length / 2), graph.Bounds.Height -1);
+				driver.AddStr (toRender);
 			}
 		}
 
@@ -498,8 +518,7 @@ namespace Terminal.Gui {
 			var x = GetAxisXPosition (graph, bounds);
 
 			// Draw solid line
-			// draw axis bottom up
-			for (int i = bounds.Height; i > 0; i--) {
+			for (int i = 0; i < bounds.Height; i++) {
 				graph.Move (x, i);
 				driver.AddRune (driver.VLine);
 			}
@@ -531,6 +550,27 @@ namespace Terminal.Gui {
 					driver.AddStr (label.Text);
 				}
 			}
+
+			// if there is a title
+			if (!string.IsNullOrWhiteSpace (Text)) {
+
+				string toRender = Text;
+
+				// if label is too long
+				if (toRender.Length > graph.Bounds.Height) {
+					toRender = toRender.Substring (0, graph.Bounds.Height);
+				}
+
+				// Draw it 1 letter at a time vertically down row 0 of the control
+				int startDrawingAtY = graph.Bounds.Height / 2 - (toRender.Length / 2);
+
+				for(int i= 0; i< toRender.Length; i++) {
+
+					graph.Move (0, startDrawingAtY+i);
+					driver.AddRune(toRender[i]);
+				}
+
+			}
 		}
 
 		private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph,Rect bounds)
@@ -539,7 +579,7 @@ namespace Terminal.Gui {
 
 			int x = GetAxisXPosition (graph, bounds);
 
-			for (int i = bounds.Height; i > 0; i--) {
+			for (int i = 0; i < bounds.Height; i++) {
 
 				// what bit of the graph is supposed to go here?
 				var graphSpace = graph.ScreenToGraphSpace (x,i);
@@ -601,7 +641,7 @@ namespace Terminal.Gui {
 		public Point ScreenLocation { get;  }
 
 		/// <summary>
-		/// The volume of graph that is represented by this screen coordingate
+		/// The volume of graph that is represented by this screen coordinate
 		/// </summary>
 		public RectangleD GraphSpace { get; }
 
