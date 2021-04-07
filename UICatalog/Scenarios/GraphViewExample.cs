@@ -171,7 +171,7 @@ namespace UICatalog.Scenarios {
 
 				// leave space for axis labels and title
 				graphView.MarginBottom = 2;
-				graphView.MarginLeft = (uint)barSeries.Bars.Max(b=>b.Name.Length)+2;
+				graphView.MarginLeft = (uint)barSeries.Bars.Max(b=>b.Text.Length)+2;
 
 				// Start the graph at 80 years because that is where most of our data is
 				graphView.ScrollOffset = new PointD (80,0);

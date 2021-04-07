@@ -139,10 +139,12 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Calculates the screen location for a given point in graph space.
-		/// Bear in mind these This may not be off screen
+		/// Bear in mind these be off screen
 		/// </summary>
-		/// <param name="location">Point within the graph</param>
-		/// <returns>Screen position (Row / Column) which would be used to render the <paramref name="location"/></returns>
+		/// <param name="location">Point in graph space that may or may not be represented in the
+		/// visible area of graph currently presented.  E.g. 0,0 for origin</param>
+		/// <returns>Screen position (Column/Row) which would be used to render the graph <paramref name="location"/>.
+		/// Note that this can be outside the current client area of the control</returns>
 		public Point GraphSpaceToScreen (PointD location)
 		{
 			return new Point (
@@ -278,6 +280,9 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class BarSeries : ISeries {
 
+		/// <summary>
+		/// Ordered collection of graph bars to position along axis
+		/// </summary>
 		public List<Bar> Bars {get;set;}
 
 		/// <summary>
@@ -293,6 +298,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Orientation Orientation { get; set; } = Orientation.Vertical;
 
+		/// <summary>
+		/// Returns the <see cref="Bar.Fill"/> of the first bar that extends over
+		/// the <paramref name="graphSpace"/> specified
+		/// </summary>
+		/// <param name="graphSpace"></param>
+		/// <returns></returns>
 		public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
 		{
 			Bar bar = LocationToBar (graphSpace);
@@ -348,17 +359,41 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public string GetLabelText (AxisIncrementToRender axisPoint)
 		{
-			return LocationToBar (axisPoint.GraphSpace)?.Name;
+			return LocationToBar (axisPoint.GraphSpace)?.Text;
 		}
 
+		/// <summary>
+		/// A single bar in a <see cref="BarSeries"/>
+		/// </summary>
 		public class Bar {
-			public string Name { get; }
+
+			/// <summary>
+			/// Optional text that describes the bar.  This can be added as a label on the axis by setting
+			/// <see cref="Axis.LabelGetter"/> = <see cref="BarSeries.GetLabelText(AxisIncrementToRender)"/>
+			/// </summary>
+			public string Text { get; }
+
+			/// <summary>
+			/// The color and character that will be rendered in the console
+			/// when the bar extends over it
+			/// </summary>
 			public GraphCellToRender Fill { get; }
+
+			/// <summary>
+			/// The value in graph space X/Y (depending on <see cref="Orientation"/>) to which the bar extends.
+			/// </summary>
 			public decimal Value { get; }
 
-			public Bar (string name, GraphCellToRender fill, decimal value)
+			/// <summary>
+			/// Creates a new instance of a single bar rendered in the given <paramref name="fill"/> that extends
+			/// out <paramref name="value"/> graph space units in the default <see cref="Orientation"/>
+			/// </summary>
+			/// <param name="text"></param>
+			/// <param name="fill"></param>
+			/// <param name="value"></param>
+			public Bar (string text, GraphCellToRender fill, decimal value)
 			{
-				Name = name;
+				Text = text;
 				Fill = fill;
 				Value = value;
 			}
@@ -400,6 +435,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public string Text;
 
+		/// <summary>
+		/// Populates base properties and sets the read only <see cref="Orientation"/>
+		/// </summary>
+		/// <param name="orientation"></param>
 		protected Axis (Orientation orientation)
 		{
 			Orientation = orientation;
@@ -427,6 +466,10 @@ namespace Terminal.Gui {
 	/// The horizontal (x axis) of a <see cref="GraphView"/>
 	/// </summary>
 	public class HorizontalAxis : Axis {
+
+		/// <summary>
+		/// Creates a new instance of axis with an <see cref="Orientation"/> of <see cref="Orientation.Horizontal"/>
+		/// </summary>
 		public HorizontalAxis ():base(Orientation.Horizontal)
 		{
 
@@ -574,6 +617,9 @@ namespace Terminal.Gui {
 			return  l.Max(s=>s.Text.Length);
 		}
 
+		/// <summary>
+		/// Creates a new <see cref="Orientation.Vertical"/> axis
+		/// </summary>
 		public VerticalAxis () :base(Orientation.Vertical)
 		{
 			LabelGetter = DefaultLabelGetter;
@@ -605,6 +651,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Draws axis <see cref="Axis.Increment"/> markers and labels
 		/// </summary>
+		/// <param name="driver"></param>
+		/// <param name="graph"></param>
 		/// <param name="bounds"></param>
 		public override void DrawAxisLabels (ConsoleDriver driver, GraphView graph, Rect bounds)
 		{
@@ -748,91 +796,100 @@ namespace Terminal.Gui {
 		}
 	}
 
+	/// <summary>
+	/// Rectangle class based on the exact floating point primative 'decimal'
+	/// </summary>
 	public class RectangleD {
 
+		/// <summary>
+		/// A rectangle with 0 size positioned at the origin (0,0)
+		/// </summary>
 		public static readonly RectangleD Empty = new RectangleD (0,0,0,0);
 
-		private decimal x;
-		private decimal y;
-		private decimal width;
-		private decimal height;
+		/// <summary>
+		/// X coordinate of the Upper Left of this rectangle
+		/// </summary>
+		public decimal X { get; private set; }
+		/// <summary>
+		/// Y coordinate of the Upper Left of this rectangle
+		/// </summary>
+		public decimal Y { get; private set; }
+		/// <summary>
+		/// Width of the rectangle
+		/// </summary>
+		public decimal Width { get; private set; }
+
+		/// <summary>
+		/// Height of the rectangle
+		/// </summary>
+		public decimal Height { get; private set; }
+
+		/// <summary>
+		/// Creates a new rectangle of the given size and position
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
 		public RectangleD (decimal x, decimal y, decimal width, decimal height)
 		{
-			this.x = x;
-			this.y = y;
-			this.width = width;
-			this.height = height;
+			this.X = x;
+			this.Y = y;
+			this.Width= width;
+			this.Height = height;
 		}
-		public RectangleD (PointD location, SizeD size)
-		{
-			this.x = location.X;
-			this.y = location.Y;
-			this.width = size.Width;
-			this.height = size.Height;
-		}
-			
-		public decimal X {
-			get {
-				return x;
-			}
-			set {
-				x = value;
-			}
-		}
-		public decimal Y {
-			get {
-				return y;
-			}
-			set {
-				y = value;
-			}
-		}
-		public decimal Width {
-			get {
-				return width;
-			}
-			set {
-				width = value;
-			}
-		}
-		public decimal Height {
-			get {
-				return height;
-			}
-			set {
-				height = value;
-			}
-		}
-		
+
+		/// <summary>
+		/// X Coordinate of the left edge of rectangle
+		/// </summary>
 		public decimal Left {
 			get {
 				return X;
 			}
 		}
-		
+
+		/// <summary>
+		/// Y Coordinate of the top edge of rectangle
+		/// </summary>
 		public decimal Top {
 			get {
 				return Y;
 			}
 		}
-		
+
+		/// <summary>
+		/// X Coordinate of the right edge of rectangle
+		/// </summary>
 		public decimal Right {
 			get {
 				return X + Width;
 			}
 		}
-		
+
+		/// <summary>
+		/// Y Coordinate of the bottom edge of rectangle.  Note <see cref="Bottom"/> is 
+		/// larger than <see cref="Top"/> because rectangles are measured from upper left
+		/// </summary>
 		public decimal Bottom {
 			get {
 				return Y + Height;
 			}
 		}
 		
+		/// <summary>
+		/// Returns true if the Width or Height are 0 or negative
+		/// </summary>
 		public bool IsEmpty {
 			get {
 				return (Width <= 0) || (Height <= 0);
 			}
 		}
+
+		/// <summary>
+		/// True if both rectangles cover exactly the same space
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <returns></returns>
 		public override bool Equals (object obj)
 		{
 			if (!(obj is RectangleD))
@@ -843,6 +900,12 @@ namespace Terminal.Gui {
 			       (comp.Width == this.Width) &&
 			       (comp.Height == this.Height);
 		}
+		/// <summary>
+		/// True if both rectangles cover exactly the same space
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns></returns>
 		public static bool operator == (RectangleD left, RectangleD right)
 		{
 			return (left.X == right.X
@@ -850,10 +913,26 @@ namespace Terminal.Gui {
 				 && left.Width == right.Width
 				 && left.Height == right.Height);
 		}
+
+		/// <summary>
+		/// True if any dimension or corner of rectangles differ
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns></returns>
 		public static bool operator != (RectangleD left, RectangleD right)
 		{
 			return !(left == right);
 		}
+
+		/// <summary>
+		/// True if the given point is inside the rectangle.  Note that this is
+		/// inclusive of <see cref="X"/> and <see cref="Y"/> but exclusive of
+		/// <see cref="Right"/> and <see cref="Bottom"/>
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <returns></returns>
 		public bool Contains (decimal x, decimal y)
 		{
 			return this.X <= x &&
@@ -861,18 +940,22 @@ namespace Terminal.Gui {
 			this.Y <= y &&
 			y < this.Y + this.Height;
 		}
+
+		/// <summary>
+		/// True if the given point is inside the rectangle.  Note that this is
+		/// inclusive of <see cref="X"/> and <see cref="Y"/> but exclusive of
+		/// <see cref="Right"/> and <see cref="Bottom"/>
+		/// </summary>
+		/// <param name="pt"></param>
+		/// <returns></returns>
 		public bool Contains (PointD pt)
 		{
 			return Contains (pt.X, pt.Y);
 		}
-		public bool Contains (RectangleD rect)
-		{
-			return (this.X <= rect.X) &&
-			       ((rect.X + rect.Width) <= (this.X + this.Width)) &&
-			       (this.Y <= rect.Y) &&
-			       ((rect.Y + rect.Height) <= (this.Y + this.Height));
-		}
-		// !! Not in C++ version
+		/// <summary>
+		/// Generates a hashcode from the X,Y Width and Height elements
+		/// </summary>
+		/// <returns></returns>
 		public override int GetHashCode ()
 		{
 			return (int)((UInt32)X ^
@@ -880,6 +963,11 @@ namespace Terminal.Gui {
 			(((UInt32)Width << 26) | ((UInt32)Width >> 6)) ^
 			(((UInt32)Height << 7) | ((UInt32)Height >> 25)));
 		}
+		/// <summary>
+		/// Increases the size of the rectangle by the provided factors
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
 		public void Inflate (decimal x, decimal y)
 		{
 			this.X -= x;
@@ -887,17 +975,12 @@ namespace Terminal.Gui {
 			this.Width += 2 * x;
 			this.Height += 2 * y;
 		}
-		public void Inflate (SizeD size)
-		{
-			Inflate (size.Width, size.Height);
-		}
-		// !! Not in C++
-		public static RectangleD Inflate (RectangleD rect, decimal x, decimal y)
-		{
-			RectangleD r = rect;
-			r.Inflate (x, y);
-			return r;
-		}
+
+		/// <summary>
+		/// Modifies the Rectangle to include only the section that overlaps
+		/// with <paramref name="rect"/>
+		/// </summary>
+		/// <param name="rect"></param>
 		public void Intersect (RectangleD rect)
 		{
 			RectangleD result = RectangleD.Intersect (rect, this);
@@ -906,6 +989,12 @@ namespace Terminal.Gui {
 			this.Width = result.Width;
 			this.Height = result.Height;
 		}
+		/// <summary>
+		/// Returns the overlapping section of <paramref name="a"/> and <paramref name="b"/>
+		/// </summary>
+		/// <param name="a"></param>
+		/// <param name="b"></param>
+		/// <returns></returns>
 		public static RectangleD Intersect (RectangleD a, RectangleD b)
 		{
 			decimal x1 = Math.Max (a.X, b.X);
@@ -918,6 +1007,12 @@ namespace Terminal.Gui {
 			}
 			return RectangleD.Empty;
 		}
+		/// <summary>
+		/// Returns true if the provided <paramref name="rect"/> overlaps with
+		/// this rectangle
+		/// </summary>
+		/// <param name="rect"></param>
+		/// <returns></returns>
 		public bool IntersectsWith (RectangleD rect)
 		{
 			return (rect.X < this.X + this.Width) &&
@@ -925,23 +1020,11 @@ namespace Terminal.Gui {
 			       (rect.Y < this.Y + this.Height) &&
 			       (this.Y < rect.Y + rect.Height);
 		}
-		public static RectangleD Union (RectangleD a, RectangleD b)
-		{
-			decimal x1 = Math.Min (a.X, b.X);
-			decimal x2 = Math.Max (a.X + a.Width, b.X + b.Width);
-			decimal y1 = Math.Min (a.Y, b.Y);
-			decimal y2 = Math.Max (a.Y + a.Height, b.Y + b.Height);
-			return new RectangleD (x1, y1, x2 - x1, y2 - y1);
-		}
-		public void Offset (PointD pos)
-		{
-			Offset (pos.X, pos.Y);
-		}
-		public void Offset (decimal x, decimal y)
-		{
-			this.X += x;
-			this.Y += y;
-		}
+
+		/// <summary>
+		/// Returns user friendly description of current rectangle size/location
+		/// </summary>
+		/// <returns></returns>
 		public override string ToString ()
 		{
 			return "{X=" + X.ToString (CultureInfo.CurrentCulture) + ",Y=" + Y.ToString (CultureInfo.CurrentCulture) +
@@ -950,10 +1033,27 @@ namespace Terminal.Gui {
 		}
 	}
 
+	/// <summary>
+	/// Describes a point in X and Y space based on the exact floating
+	/// point primative 'decimal'
+	/// </summary>
 	public class PointD {
+
+		/// <summary>
+		/// X coordinate of the point
+		/// </summary>
 		public decimal X;
+
+		/// <summary>
+		/// Y coordinate of the point
+		/// </summary>
 		public decimal Y;
 
+		/// <summary>
+		/// Creates a new point at the given coordinates
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
 		public PointD (decimal x, decimal y)
 		{
 			this.X = x;
@@ -961,17 +1061,6 @@ namespace Terminal.Gui {
 		}
 	}
 
-	public class SizeD {
-
-		public decimal Width;
-		public decimal Height;
-
-		public SizeD (decimal width, decimal height)
-		{
-			this.Width = width;
-			this.Height = height;
-		}
-	}
 	/// <summary>
 	/// Determines what should be displayed at a given label
 	/// </summary>
