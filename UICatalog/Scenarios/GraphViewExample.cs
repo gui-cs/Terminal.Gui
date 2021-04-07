@@ -45,7 +45,7 @@ namespace UICatalog.Scenarios {
 
 
 			var frameRight = new FrameView ("About") {
-				X = Pos.Right (graphView),
+				X = Pos.Right (graphView)+1,
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),

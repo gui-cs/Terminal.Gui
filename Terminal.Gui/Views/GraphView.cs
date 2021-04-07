@@ -417,8 +417,26 @@ namespace Terminal.Gui {
 
 				// and the label text
 				if (!string.IsNullOrWhiteSpace (label.Text)) {
-					graph.Move (label.ScreenLocation.X - (label.Text.Length/2), label.ScreenLocation.Y+1);
-					driver.AddStr (label.Text);
+
+					// center the label but don't draw it outside bounds of the graph
+					int drawAtX = Math.Max (0, label.ScreenLocation.X - (label.Text.Length / 2));
+					string toRender = label.Text;
+
+					// this is how much space is left
+					int xSpaceAvailable = graph.Bounds.Width - drawAtX;
+
+					// There is no space for the label at all!
+					if (xSpaceAvailable <= 0) {
+						continue;
+					}
+
+					// if we are close to right side of graph, don't overspill
+					if (toRender.Length > xSpaceAvailable) {
+						toRender = toRender.Substring (0, xSpaceAvailable);
+					}
+
+					graph.Move (drawAtX,label.ScreenLocation.Y + 1);
+					driver.AddStr (toRender);
 				}
 			}
 
