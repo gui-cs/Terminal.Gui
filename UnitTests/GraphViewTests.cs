@@ -16,7 +16,7 @@ namespace UnitTests {
 			gv.Bounds = new Rect(0,0,20,10);
 
 			// origin should be bottom left
-			var botLeft = gv.ScreenToGraphSpace (0, 10);
+			var botLeft = gv.ScreenToGraphSpace (0, 9);
 			Assert.Equal (0, botLeft.X);
 			Assert.Equal (0, botLeft.Y);
 			Assert.Equal (1, botLeft.Width);
@@ -24,7 +24,7 @@ namespace UnitTests {
 			
 
 			// up 2 rows of the console and along 1 col
-			var up2along1 = gv.ScreenToGraphSpace (1, 8);
+			var up2along1 = gv.ScreenToGraphSpace (1, 7);
 			Assert.Equal (1, up2along1.X);
 			Assert.Equal (2, up2along1.Y);
 		}
@@ -35,7 +35,7 @@ namespace UnitTests {
 			gv.Bounds = new Rect (0, 0, 20, 10);
 
 			// origin should be bottom left
-			var botLeft = gv.ScreenToGraphSpace (0, 10);
+			var botLeft = gv.ScreenToGraphSpace (0, 9);
 			Assert.Equal (0, botLeft.X);
 			Assert.Equal (0, botLeft.Y);
 			Assert.Equal (1, botLeft.Width);
@@ -43,9 +43,9 @@ namespace UnitTests {
 
 			gv.MarginLeft = 1;
 
-			botLeft = gv.ScreenToGraphSpace (0, 10);
-			// Origin should be at 1,10 now to leave a margin of 1
-			// so screen position 0,10 would be data space -1,0
+			botLeft = gv.ScreenToGraphSpace (0, 9);
+			// Origin should be at 1,9 now to leave a margin of 1
+			// so screen position 0,9 would be data space -1,0
 			Assert.Equal (-1, botLeft.X);
 			Assert.Equal (0, botLeft.Y);
 			Assert.Equal (1, botLeft.Width);
@@ -54,9 +54,9 @@ namespace UnitTests {
 			gv.MarginLeft = 1;
 			gv.MarginBottom = 1;
 
-			botLeft = gv.ScreenToGraphSpace (0, 10);
+			botLeft = gv.ScreenToGraphSpace (0, 9);
 			// Origin should be at 1,0 (to leave a margin of 1 in both sides)
-			// so screen position 0,10 would be data space -1,-1
+			// so screen position 0,9 would be data space -1,-1
 			Assert.Equal (-1, botLeft.X);
 			Assert.Equal (-1, botLeft.Y);
 			Assert.Equal (1, botLeft.Width);
@@ -71,15 +71,16 @@ namespace UnitTests {
 			// Each cell of screen measures 5 units in graph data model vertically and 1/4 horizontally
 			gv.CellSize = new PointD (0.25M, 5);
 
-			// origin should be bottom left
-			var botLeft = gv.ScreenToGraphSpace (0, 10);
+			// origin should be bottom left 
+			// (note that y=10 is actually overspilling the control, the last row is 9)
+			var botLeft = gv.ScreenToGraphSpace (0, 9);
 			Assert.Equal (0, botLeft.X);
 			Assert.Equal (0, botLeft.Y);
 			Assert.Equal (0.25M, botLeft.Width);
 			Assert.Equal (5, botLeft.Height);
 
 			// up 2 rows of the console and along 1 col
-			var up2along1 = gv.ScreenToGraphSpace (1, 8);
+			var up2along1 = gv.ScreenToGraphSpace (1, 7);
 			Assert.Equal (0.25M, up2along1.X);
 			Assert.Equal (10, up2along1.Y);
 			Assert.Equal (0.25M, botLeft.Width);
@@ -99,12 +100,12 @@ namespace UnitTests {
 			// origin should be bottom left
 			var botLeft = gv.GraphSpaceToScreen (new PointD (0, 0));
 			Assert.Equal (0, botLeft.X);
-			Assert.Equal (10, botLeft.Y); // row 10 of the view is the bottom left
+			Assert.Equal (9, botLeft.Y); // row 9 of the view is the bottom left
 
 			// along 2 and up 1 in graph space
 			var along2up1 = gv.GraphSpaceToScreen (new PointD (2, 1));
 			Assert.Equal (2, along2up1.X);
-			Assert.Equal (9, along2up1.Y);
+			Assert.Equal (8, along2up1.Y);
 		}
 
 		[Fact]
@@ -116,14 +117,14 @@ namespace UnitTests {
 			// origin should be bottom left
 			var botLeft = gv.GraphSpaceToScreen (new PointD (0, 0));
 			Assert.Equal (0, botLeft.X);
-			Assert.Equal (10, botLeft.Y); // row 10 of the view is the bottom left
+			Assert.Equal (9, botLeft.Y); // row 9 of the view is the bottom left
 
 			gv.MarginLeft = 1;
 
-			// With a margin of 1 the origin should be at x=1 y= 10
+			// With a margin of 1 the origin should be at x=1 y= 9
 			botLeft = gv.GraphSpaceToScreen (new PointD (0, 0));
 			Assert.Equal (1, botLeft.X);
-			Assert.Equal (10, botLeft.Y); // row 10 of the view is the bottom left
+			Assert.Equal (9, botLeft.Y); // row 9 of the view is the bottom left
 
 			gv.MarginLeft = 1;
 			gv.MarginBottom = 1;
@@ -131,7 +132,7 @@ namespace UnitTests {
 			// With a margin of 1 in both directions the origin should be at x=1 y= 9
 			botLeft = gv.GraphSpaceToScreen (new PointD (0, 0));
 			Assert.Equal (1, botLeft.X);
-			Assert.Equal (9, botLeft.Y); // row 9 of the view is the bottom left up 1 cell
+			Assert.Equal (8, botLeft.Y); // row 8 of the view is the bottom left up 1 cell
 		}
 
 		[Fact]
@@ -146,12 +147,12 @@ namespace UnitTests {
 			// origin should be right in the middle of the control
 			var botLeft = gv.GraphSpaceToScreen (new PointD (0, 0));
 			Assert.Equal (5, botLeft.X);
-			Assert.Equal (5, botLeft.Y);
+			Assert.Equal (4, botLeft.Y);
 
 			// along 2 and up 1 in graph space
 			var along2up1 = gv.GraphSpaceToScreen (new PointD (2, 1));
 			Assert.Equal (7, along2up1.X);
-			Assert.Equal (4, along2up1.Y);
+			Assert.Equal (3, along2up1.Y);
 		}
 		[Fact]
 		public void GraphSpaceToScreen_CustomCellSize ()
@@ -166,27 +167,28 @@ namespace UnitTests {
 			// origin should be bottom left
 			var botLeft = gv.GraphSpaceToScreen (new PointD (0, 0));
 			Assert.Equal (0, botLeft.X);
-			Assert.Equal (10, botLeft.Y); // row 10 of the view is the bottom left
+			// row 9 of the view is the bottom left (height is 10 so 0,1,2,3..9)
+			Assert.Equal (9, botLeft.Y); 
 
 			// along 2 and up 1 in graph space
 			var along2up1 = gv.GraphSpaceToScreen (new PointD (2, 1));
 			Assert.Equal (8, along2up1.X);
-			Assert.Equal (10, along2up1.Y);
+			Assert.Equal (9, along2up1.Y);
 
 			// Y value 4 should be rendered in bottom most row
-			Assert.Equal (10, gv.GraphSpaceToScreen(new PointD (2, 4)).Y);
+			Assert.Equal (9, gv.GraphSpaceToScreen(new PointD (2, 4)).Y);
 			
 			// Cell height is 5 so this is the first point of graph space that should
 			// be rendered in the graph in next row up (row 9)
-			Assert.Equal (9, gv.GraphSpaceToScreen (new PointD (2, 5)).Y);
+			Assert.Equal (8, gv.GraphSpaceToScreen (new PointD (2, 5)).Y);
 			
 			// More boundary testing for this cell size
-			Assert.Equal (9, gv.GraphSpaceToScreen (new PointD (2, 6)).Y);
-			Assert.Equal (9, gv.GraphSpaceToScreen (new PointD (2, 7)).Y);
-			Assert.Equal (9, gv.GraphSpaceToScreen (new PointD (2, 8)).Y);
-			Assert.Equal (9, gv.GraphSpaceToScreen (new PointD (2, 9)).Y);
-			Assert.Equal (8, gv.GraphSpaceToScreen (new PointD (2, 10)).Y);
-			Assert.Equal (8, gv.GraphSpaceToScreen (new PointD (2, 11)).Y);
+			Assert.Equal (8, gv.GraphSpaceToScreen (new PointD (2, 6)).Y);
+			Assert.Equal (8, gv.GraphSpaceToScreen (new PointD (2, 7)).Y);
+			Assert.Equal (8, gv.GraphSpaceToScreen (new PointD (2, 8)).Y);
+			Assert.Equal (8, gv.GraphSpaceToScreen (new PointD (2, 9)).Y);
+			Assert.Equal (7, gv.GraphSpaceToScreen (new PointD (2, 10)).Y);
+			Assert.Equal (7, gv.GraphSpaceToScreen (new PointD (2, 11)).Y);
 		}
 
 
@@ -206,21 +208,21 @@ namespace UnitTests {
 			// origin should be in the lower left (but not right at the bottom)
 			var botLeft = gv.GraphSpaceToScreen (new PointD (0, 0));
 			Assert.Equal (4, botLeft.X);
-			Assert.Equal (8, botLeft.Y);
+			Assert.Equal (7, botLeft.Y);
 
 			// along 2 and up 1 in graph space
 			var along2up1 = gv.GraphSpaceToScreen (new PointD (2, 1));
 			Assert.Equal (12, along2up1.X);
-			Assert.Equal (8, along2up1.Y);
+			Assert.Equal (7, along2up1.Y);
 
 
 			// More boundary testing for this cell size/offset
-			Assert.Equal (7, gv.GraphSpaceToScreen (new PointD (2, 6)).Y);
-			Assert.Equal (7, gv.GraphSpaceToScreen (new PointD (2, 7)).Y);
-			Assert.Equal (7, gv.GraphSpaceToScreen (new PointD (2, 8)).Y);
-			Assert.Equal (7, gv.GraphSpaceToScreen (new PointD (2, 9)).Y);
-			Assert.Equal (6, gv.GraphSpaceToScreen (new PointD (2, 10)).Y);
-			Assert.Equal (6, gv.GraphSpaceToScreen (new PointD (2, 11)).Y);
+			Assert.Equal (6, gv.GraphSpaceToScreen (new PointD (2, 6)).Y);
+			Assert.Equal (6, gv.GraphSpaceToScreen (new PointD (2, 7)).Y);
+			Assert.Equal (6, gv.GraphSpaceToScreen (new PointD (2, 8)).Y);
+			Assert.Equal (6, gv.GraphSpaceToScreen (new PointD (2, 9)).Y);
+			Assert.Equal (5, gv.GraphSpaceToScreen (new PointD (2, 10)).Y);
+			Assert.Equal (5, gv.GraphSpaceToScreen (new PointD (2, 11)).Y);
 		}
 
 		#endregion

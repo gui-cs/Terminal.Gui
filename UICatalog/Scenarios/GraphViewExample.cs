@@ -103,7 +103,8 @@ namespace UICatalog.Scenarios {
 		{
 			about.Text = "This graph shows the life expectancy at birth of a range of countries";
 
-			var stiple = Application.Driver.Stipple;
+			var stiple = new GraphCellToRender(Application.Driver.Stipple);
+
 			var barSeries = new BarSeries () {
 				Bars = new List<BarSeries.Bar> () {
 					new BarSeries.Bar ("Switzerland", stiple, 83.4M),

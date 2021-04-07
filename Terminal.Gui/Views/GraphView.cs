@@ -101,11 +101,21 @@ namespace Terminal.Gui {
 					var space = ScreenToGraphSpace(x,y);
 
 					foreach(var s in Series){
-						var rune = s.GetCellValueIfAny(space);
+						var render = s.GetCellValueIfAny(space);
 						
-						if(rune.HasValue){
+						if(render != null){
 							Move(x,y);
-							Driver.AddRune(rune.Value);
+
+							var old = Driver.GetAttribute ();
+							if (render.Color.HasValue) {
+								Driver.SetAttribute (render.Color.Value);
+							}
+
+							Driver.AddRune(render.Rune);
+
+							if (render.Color.HasValue) {
+								Driver.SetAttribute (old);
+							}
 						}
 					}
 				}
@@ -122,8 +132,8 @@ namespace Terminal.Gui {
 		public RectangleD ScreenToGraphSpace (int col, int row)
 		{
 			return new RectangleD (
-				(ScrollOffset.X - MarginLeft) + (col * CellSize.X),
-				(ScrollOffset.Y - MarginBottom) + ((Bounds.Height - row) * CellSize.Y),
+				ScrollOffset.X + ((col - MarginLeft) * CellSize.X),
+				ScrollOffset.Y + ((Bounds.Height - (row + MarginBottom+1)) * CellSize.Y),
 				CellSize.X, CellSize.Y);
 		}
 
@@ -136,10 +146,10 @@ namespace Terminal.Gui {
 		public Point GraphSpaceToScreen (PointD location)
 		{
 			return new Point (
-				
-				(int)((location.X - (ScrollOffset.X - MarginLeft)) / CellSize.X),
+
+				(int)((location.X - ScrollOffset.X) / CellSize.X) + (int)MarginLeft,
 				 // screen coordinates are top down while graph coordinates are bottom up
-				 Bounds.Height - (int)((location.Y - (ScrollOffset.Y - MarginBottom)) / CellSize.Y) 
+				 (Bounds.Height-1) - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y) 
 				);
 		}
 
@@ -196,7 +206,43 @@ namespace Terminal.Gui {
 		/// for the current position in the control
 		/// </summary>
 		/// <param name="graphSpace">Projection of the screen location into the chart graph space</param>
-		Rune? GetCellValueIfAny(RectangleD graphSpace);
+		GraphCellToRender GetCellValueIfAny (RectangleD graphSpace);
+	}
+
+	/// <summary>
+	/// Describes how to render a single row/column of a <see cref="GraphView"/> based
+	/// on the value(s) in <see cref="ISeries"/> at that location
+	/// </summary>
+	public class GraphCellToRender {
+
+		/// <summary>
+		/// The character to render in the console
+		/// </summary>
+		public Rune Rune { get; set; }
+
+		/// <summary>
+		/// Optional color to render the <see cref="Rune"/> with
+		/// </summary>
+		public Attribute? Color { get; set; }
+
+		/// <summary>
+		/// Creates instance and sets <see cref="Rune"/> with default graph coloring
+		/// </summary>
+		/// <param name="rune"></param>
+		public GraphCellToRender (Rune rune)
+		{
+			Rune = rune;
+		}
+		/// <summary>
+		/// Creates instance and sets <see cref="Rune"/> with custom graph coloring
+		/// </summary>
+		/// <param name="rune"></param>
+		/// <param name="color"></param>
+		public GraphCellToRender (Rune rune, Attribute color):this(rune)
+		{
+			Color = color;
+		}
+
 	}
 
 	/// <summary>
@@ -216,10 +262,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="graphSpace"></param>
 		/// <returns></returns>
-		public Rune? GetCellValueIfAny (RectangleD graphSpace)
+		public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
 		{
 			if(Points.Any(p=>graphSpace.Contains(p))){
-				return 'x';
+				return new GraphCellToRender('x');
 			}
 
 			return null;
@@ -240,7 +286,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public decimal BarEvery { get; set; } = 1;
 
-		public Rune? GetCellValueIfAny (RectangleD graphSpace)
+		public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
 		{
 			Bar bar = XLocationToBar (graphSpace);
 
@@ -252,7 +298,7 @@ namespace Terminal.Gui {
 			// and the bar is at least this high
 			if (bar.Value >= graphSpace.Top) {
 
-				return bar?.FillRune;
+				return bar?.Fill;
 			}
 			return null;
 		}
@@ -292,18 +338,16 @@ namespace Terminal.Gui {
 
 		public class Bar {
 			public string Name { get; }
-			public Rune FillRune { get; }
+			public GraphCellToRender Fill { get; }
 			public decimal Value { get; }
 
-			public Bar (string name, Rune fillRune, decimal value)
+			public Bar (string name, GraphCellToRender fill, decimal value)
 			{
 				Name = name;
-				FillRune = fillRune;
+				Fill = fill;
 				Value = value;
 			}
-
 		}
-
 	}
 
 	/// <summary>
