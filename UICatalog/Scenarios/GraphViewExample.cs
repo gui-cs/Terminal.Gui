@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Open Scatter Plot", "", () => SetupPeriodicTableScatterPlot()),
 					new MenuItem ("_Open V Bar Graph", "", () => SetupLifeExpectancyBarGraph(true)),
 					new MenuItem ("_Open H Bar Graph", "", () => SetupLifeExpectancyBarGraph(false)),
+					new MenuItem ("Open Population Pyramid","",()=>SetupPopulationPyramid()),
 
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
@@ -175,11 +177,94 @@ namespace UICatalog.Scenarios {
 
 				// Start the graph at 80 years because that is where most of our data is
 				graphView.ScrollOffset = new PointD (80,0);
-			}
-
-			
+			}			
 		}
 
+		private void SetupPopulationPyramid()
+		{
+			/*
+			Age,M,F
+0-4,2009363,1915127
+5-9,2108550,2011016
+10-14,2022370,1933970
+15-19,1880611,1805522
+20-24,2072674,2001966
+25-29,2275138,2208929
+30-34,2361054,2345774
+35-39,2279836,2308360
+40-44,2148253,2159877
+45-49,2128343,2167778
+50-54,2281421,2353119
+55-59,2232388,2306537
+60-64,1919839,1985177
+65-69,1647391,1734370
+70-74,1624635,1763853
+75-79,1137438,1304709
+80-84,766956,969611
+85-89,438663,638892
+90-94,169952,320625
+95-99,34524,95559
+100+,3016,12818*/
+
+			// 21 categories
+
+			// How much graph space each cell of the console depicts
+			graphView.CellSize = new PointD (100_000, 1);
+
+			//center the x axis in middle of screen to show both sides
+			graphView.ScrollOffset = new PointD(-2_000_000,0);
+
+			graphView.AxisX.Text = "Number Of People";
+			graphView.AxisX.Increment = 500_000;
+			graphView.AxisX.ShowLabelsEvery = 2;
+			
+			// use Abs to make negative axis labels positive
+			graphView.AxisX.LabelGetter = (v)=>Math.Abs(v.GraphSpace.X).ToString("N0");
+
+			// leave space for axis labels
+			graphView.MarginBottom = 1;
+			graphView.MarginLeft = 1;
+
+			graphView.AxisY.ShowLabelsEvery = 1;
+
+			graphView.AxisY.Text = "M";
+
+			var stiple = new GraphCellToRender(Application.Driver.Stipple);
+
+			// Bars in 2 directions
+
+			// Males
+			var malesSeries = new BarSeries(){
+				Orientation = Orientation.Horizontal,
+				Bars = new List<BarSeries.Bar>()
+				{
+					new BarSeries.Bar("0-4",stiple,2009363),
+					new BarSeries.Bar("5-9",stiple,2108550),
+					new BarSeries.Bar("10-14",stiple,2022370),
+					new BarSeries.Bar("15-19",stiple,1880611),
+					new BarSeries.Bar("20-24",stiple,2072674),
+					new BarSeries.Bar("25-29",stiple,2275138),
+					new BarSeries.Bar("30-34",stiple,2361054),
+					new BarSeries.Bar("35-39",stiple,2279836),
+					new BarSeries.Bar("40-44",stiple,2148253),
+					new BarSeries.Bar("45-49",stiple,2128343),
+					new BarSeries.Bar("50-54",stiple,2281421),
+					new BarSeries.Bar("55-59",stiple,2232388),
+					new BarSeries.Bar("60-64",stiple,1919839),
+					new BarSeries.Bar("65-69",stiple,1647391),
+					new BarSeries.Bar("70-74",stiple,1624635),
+					new BarSeries.Bar("75-79",stiple,1137438),
+					new BarSeries.Bar("80-84",stiple,766956),
+					new BarSeries.Bar("85-89",stiple,438663),
+					new BarSeries.Bar("90-94",stiple,169952),
+					new BarSeries.Bar("95-99",stiple,34524),
+					new BarSeries.Bar("100+",stiple,3016)
+
+				}
+			};
+			graphView.Series.Add(malesSeries);
+			
+		}
 		private void SetupPeriodicTableScatterPlot ()
 		{
 			about.Text = "This graph shows the atomic weight of each element in the periodic table.\nStarting with Hydrogen (atomic Number 1 with a weight of 1.007)";
