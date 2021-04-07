@@ -233,37 +233,68 @@ namespace UICatalog.Scenarios {
 
 			// Bars in 2 directions
 
-			// Males
+			// Males (negative to make the bars go left)
 			var malesSeries = new BarSeries(){
 				Orientation = Orientation.Horizontal,
 				Bars = new List<BarSeries.Bar>()
 				{
-					new BarSeries.Bar("0-4",stiple,2009363),
-					new BarSeries.Bar("5-9",stiple,2108550),
-					new BarSeries.Bar("10-14",stiple,2022370),
-					new BarSeries.Bar("15-19",stiple,1880611),
-					new BarSeries.Bar("20-24",stiple,2072674),
-					new BarSeries.Bar("25-29",stiple,2275138),
-					new BarSeries.Bar("30-34",stiple,2361054),
-					new BarSeries.Bar("35-39",stiple,2279836),
-					new BarSeries.Bar("40-44",stiple,2148253),
-					new BarSeries.Bar("45-49",stiple,2128343),
-					new BarSeries.Bar("50-54",stiple,2281421),
-					new BarSeries.Bar("55-59",stiple,2232388),
-					new BarSeries.Bar("60-64",stiple,1919839),
-					new BarSeries.Bar("65-69",stiple,1647391),
-					new BarSeries.Bar("70-74",stiple,1624635),
-					new BarSeries.Bar("75-79",stiple,1137438),
-					new BarSeries.Bar("80-84",stiple,766956),
-					new BarSeries.Bar("85-89",stiple,438663),
-					new BarSeries.Bar("90-94",stiple,169952),
-					new BarSeries.Bar("95-99",stiple,34524),
-					new BarSeries.Bar("100+",stiple,3016)
+					new BarSeries.Bar("0-4",stiple,-2009363),
+					new BarSeries.Bar("5-9",stiple,-2108550),
+					new BarSeries.Bar("10-14",stiple,-2022370),
+					new BarSeries.Bar("15-19",stiple,-1880611),
+					new BarSeries.Bar("20-24",stiple,-2072674),
+					new BarSeries.Bar("25-29",stiple,-2275138),
+					new BarSeries.Bar("30-34",stiple,-2361054),
+					new BarSeries.Bar("35-39",stiple,-2279836),
+					new BarSeries.Bar("40-44",stiple,-2148253),
+					new BarSeries.Bar("45-49",stiple,-2128343),
+					new BarSeries.Bar("50-54",stiple,-2281421),
+					new BarSeries.Bar("55-59",stiple,-2232388),
+					new BarSeries.Bar("60-64",stiple,-1919839),
+					new BarSeries.Bar("65-69",stiple,-1647391),
+					new BarSeries.Bar("70-74",stiple,-1624635),
+					new BarSeries.Bar("75-79",stiple,-1137438),
+					new BarSeries.Bar("80-84",stiple,-766956),
+					new BarSeries.Bar("85-89",stiple,-438663),
+					new BarSeries.Bar("90-94",stiple,-169952),
+					new BarSeries.Bar("95-99",stiple,-34524),
+					new BarSeries.Bar("100+",stiple,-3016)
 
 				}
 			};
 			graphView.Series.Add(malesSeries);
+
 			
+			// Females
+			var femalesSeries = new BarSeries () {
+				Orientation = Orientation.Horizontal,
+				Bars = new List<BarSeries.Bar> ()
+				{
+					new BarSeries.Bar("0-4",stiple,1915127),
+					new BarSeries.Bar("5-9",stiple,2011016),
+					new BarSeries.Bar("10-14",stiple,1933970),
+					new BarSeries.Bar("15-19",stiple,1805522),
+					new BarSeries.Bar("20-24",stiple,2001966),
+					new BarSeries.Bar("25-29",stiple,2208929),
+					new BarSeries.Bar("30-34",stiple,2345774),
+					new BarSeries.Bar("35-39",stiple,2308360),
+					new BarSeries.Bar("40-44",stiple,2159877),
+					new BarSeries.Bar("45-49",stiple,2167778),
+					new BarSeries.Bar("50-54",stiple,2353119),
+					new BarSeries.Bar("55-59",stiple,2306537),
+					new BarSeries.Bar("60-64",stiple,1985177),
+					new BarSeries.Bar("65-69",stiple,1734370),
+					new BarSeries.Bar("70-74",stiple,1763853),
+					new BarSeries.Bar("75-79",stiple,1304709),
+					new BarSeries.Bar("80-84",stiple,969611),
+					new BarSeries.Bar("85-89",stiple,638892),
+					new BarSeries.Bar("90-94",stiple,320625),
+					new BarSeries.Bar("95-99",stiple,95559),
+					new BarSeries.Bar("100+",stiple,12818)
+				}
+			};
+			graphView.Series.Add (femalesSeries);
+
 		}
 		private void SetupPeriodicTableScatterPlot ()
 		{

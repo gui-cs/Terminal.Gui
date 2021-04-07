@@ -308,16 +308,28 @@ namespace Terminal.Gui {
 		{
 			Bar bar = LocationToBar (graphSpace);
 
-			//if no bar should be rendered at this x position
+			//if no bar should be rendered at this position
 			if(bar == null) {
 				return null;
 			}
 			
 			var toBeat = Orientation == Orientation.Vertical ? graphSpace.Top : graphSpace.Right;
-			// and the bar is at least this high / wide
-			if (bar.Value >= toBeat) {
+			
+			// for negative bars
+			if(bar.Value < 0) {
 
-				return bar?.Fill;
+				// fill above (up to 0)
+				if (bar.Value <= toBeat && toBeat < 0) {
+					return bar.Fill;
+				}
+			}
+			else {
+				// and the bar is at least this high / wide
+				if (bar.Value >= toBeat && toBeat > 0) {
+
+					return bar.Fill;
+				}
+
 			}
 			return null;
 		}
