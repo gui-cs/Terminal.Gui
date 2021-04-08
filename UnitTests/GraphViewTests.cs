@@ -5,6 +5,8 @@ using Terminal.Gui;
 using Xunit;
 
 namespace UnitTests {
+
+
 	public class GraphViewTests {
 
 		#region Screen to Graph Tests

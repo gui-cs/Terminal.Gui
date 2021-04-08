@@ -1,4 +1,4 @@
-using NStack;
+﻿using NStack;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -438,6 +438,99 @@ namespace Terminal.Gui {
 		}
 	}
 
+	public class LineSeries : ISeries {
+
+		public List<PointD> Points { get; set; }  = new List<PointD> ();
+
+		public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
+		{
+			// we are on a plot point
+			if (Points.Any (graphSpace.Contains)) {
+				return new GraphCellToRender ('x');
+			}
+				
+			var points = Points.OrderBy (p => p.X).ToArray();
+
+			// find the last point before this cell of graph space
+						
+			// the previous point
+			var ptBefore = points.LastOrDefault (p => p.X < graphSpace.Left);
+
+			// the next point
+			var ptAfter = points.FirstOrDefault (p => p.X >= graphSpace.Right);
+
+			// points which are in line with this cell
+			var ptsInLine = points.Where (p => p.X > graphSpace.Left && p.X < graphSpace.Left).ToArray();
+
+			// if we have run out of graph
+			if (ptBefore == null || ptAfter == null) {
+				return null;
+			}
+
+			// if we are in line with the next point
+			if (ptsInLine.Any ()) {
+
+				return new GraphCellToRender (Application.Driver.HLine);
+
+				/*
+				var maxy = ptsInLine.Max (p => p.Y);
+				var miny = ptsInLine.Max (p => p.Y);
+
+				// we need
+				if(maxy > graphSpace.Top) {
+
+				}*/
+			}
+
+			var clippedLine = CohenSutherland.CohenSutherlandLineClip (graphSpace, ptBefore, ptAfter);
+			
+			// the line passes through the current cell of the graph 
+			if(clippedLine != null) {
+
+				// TODO: use proper symbol
+				return new GraphCellToRender ('-');
+			}
+
+			return null;
+		}
+
+
+		/*
+		 * 
+		 * 
+    default_symbols = ['┼', '┤', '╶', '╴', '─', '╰', '╭', '╮', '╯', '│']
+		 * # plot the line
+        for x in range(0, len(series[i]) - 1):
+            d0 = series[i][x + 0]
+            d1 = series[i][x + 1]
+
+            if isnan(d0) and isnan(d1):
+                continue
+
+            if isnan(d0) and _isnum(d1):
+                result[rows - scaled(d1)][x + offset] = colored(symbols[2], color)
+                continue
+
+            if _isnum(d0) and isnan(d1):
+                result[rows - scaled(d0)][x + offset] = colored(symbols[3], color)
+                continue
+
+            y0 = scaled(d0)
+            y1 = scaled(d1)
+            if y0 == y1:
+                result[rows - y0][x + offset] = colored(symbols[4], color)
+                continue
+
+            result[rows - y1][x + offset] = colored(symbols[5], color) if y0 > y1 else colored(symbols[6], color)
+            result[rows - y0][x + offset] = colored(symbols[7], color) if y0 > y1 else colored(symbols[8], color)
+
+            start = min(y0, y1) + 1
+            end = max(y0, y1)
+            for y in range(start, end):
+                result[rows - y][x + offset] = colored(symbols[9], color)
+
+    return '\n'.join([''.join(row).rstrip() for row in result])*/
+	}
 	/// <summary>
 	/// Renders a continuous line with grid line ticks and labels
 	/// </summary>
@@ -1126,6 +1219,31 @@ namespace Terminal.Gui {
 			this.Y = y;
 		}
 	}
+	/// <summary>
+	/// Describes two points in graph space and a line between them
+	/// </summary>
+	public class LineD {
+		/// <summary>
+		/// The start of the line
+		/// </summary>
+		public PointD Start { get; }
+
+		/// <summary>
+		/// The end point of the line
+		/// </summary>
+		public PointD End { get; }
+
+		/// <summary>
+		/// Creates a new point at the given coordinates
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		public LineD(PointD start, PointD end)
+		{
+			this.Start = start;
+			this.End = end;
+		}
+	}
 
 	/// <summary>
 	/// Determines what should be displayed at a given label
@@ -1150,5 +1268,124 @@ namespace Terminal.Gui {
 		/// Bottom to top
 		/// </summary>
 		Vertical
+	}
+
+	/// <summary>
+	/// This is the Cohen–Sutherland algorithm for checking if a line intersects a rectangle
+	/// https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
+	/// </summary>
+	public static class CohenSutherland {
+
+		/// <summary>
+		/// Bitfields used to partition the space into 9 regiond
+		/// </summary>
+		private const byte INSIDE = 0; // 0000
+		private const byte LEFT = 1;   // 0001
+		private const byte RIGHT = 2;  // 0010
+		private const byte ABOVE = 4; // 0100
+		private const byte BELOW = 8;    // 1000
+
+		/// <summary>
+		/// Compute the bit code for a point (x, y) using the clip rectangle
+		/// bounded diagonally by (xmin, ymin), and (xmax, ymax)
+		/// ASSUME THAT xmax , xmin , ymax and ymin are global constants.
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <returns></returns>
+		private static byte ComputeOutCode (RectangleD rect, decimal x, decimal y)
+		{
+			// initialised as being inside of clip window
+			byte code = INSIDE;
+
+			if (x < rect.Left)           // to the left of clip window
+				code |= LEFT;
+			else if (x > rect.Right)     // to the right of clip window
+				code |= RIGHT;
+			if (y < rect.Top)         // below the clip window
+				code |= ABOVE;
+			else if (y > rect.Bottom)       // above the clip window
+				code |= BELOW;
+
+			return code;
+		}
+
+		/// <summary>
+		/// Cohen–Sutherland clipping algorithm clips a line from
+		/// P0 = (x0, y0) to P1 = (x1, y1) against a rectangle with
+		/// diagonal from (xmin, ymin) to (xmax, ymax).
+		/// </summary>
+		/// <param name="x0"></param>
+		/// <param name="y0"</param>
+		/// <param name="x1"></param>
+		/// <param name="y1"></param>
+		/// <returns>a list of two points in the resulting clipped line, or zero</returns>
+		public static LineD CohenSutherlandLineClip (RectangleD rect,
+				       PointD p0, PointD p1)
+		{
+			decimal x0 = p0.X;
+			decimal y0 = p0.Y;
+			decimal x1 = p1.X;
+			decimal y1 = p1.Y;
+
+			// compute outcodes for P0, P1, and whatever point lies outside the clip rectangle
+			byte outcode0 = CohenSutherland.ComputeOutCode (rect, x0, y0);
+			byte outcode1 = CohenSutherland.ComputeOutCode (rect, x1, y1);
+			bool accept = false;
+
+			while (true) {
+				// Bitwise OR is 0. Trivially accept and get out of loop
+				if ((outcode0 | outcode1) == 0) {
+					accept = true;
+					break;
+				}
+				// Bitwise AND is not 0. Trivially reject and get out of loop
+				else if ((outcode0 & outcode1) != 0) {
+					break;
+				} else {
+					// failed both tests, so calculate the line segment to clip
+					// from an outside point to an intersection with clip edge
+					decimal x, y;
+
+					// At least one endpoint is outside the clip rectangle; pick it.
+					byte outcodeOut = (outcode0 != 0) ? outcode0 : outcode1;
+
+					// Now find the intersection point;
+					// use formulas y = y0 + slope * (x - x0), x = x0 + (1 / slope) * (y - y0)
+					if ((outcodeOut & BELOW) != 0) {   // point is above the clip rectangle
+						x = x0 + (x1 - x0) * (rect.Bottom - y0) / (y1 - y0);
+						y = rect.Bottom;
+					} else if ((outcodeOut & ABOVE) != 0) { // point is below the clip rectangle
+						x = x0 + (x1 - x0) * (rect.Top - y0) / (y1 - y0);
+						y = rect.Top;
+					} else if ((outcodeOut & RIGHT) != 0) {  // point is to the right of clip rectangle
+						y = y0 + (y1 - y0) * (rect.Right - x0) / (x1 - x0);
+						x = rect.Right;
+					} else if ((outcodeOut & LEFT) != 0) {   // point is to the left of clip rectangle
+						y = y0 + (y1 - y0) * (rect.Left - x0) / (x1 - x0);
+						x = rect.Left;
+					} else {
+						return null;
+					}
+
+					// Now we move outside point to intersection point to clip
+					// and get ready for next pass.
+					if (outcodeOut == outcode0) {
+						x0 = x;
+						y0 = y;
+						outcode0 = CohenSutherland.ComputeOutCode (rect, x0, y0);
+					} else {
+						x1 = x;
+						y1 = y;
+						outcode1 = CohenSutherland.ComputeOutCode (rect, x1, y1);
+					}
+				}
+			}
+
+			// return the clipped line
+			return (accept) ?
+			    new LineD (new PointD(x0,y0),new PointD(x1, y1)) : null;
+
+		}
 	}
 }

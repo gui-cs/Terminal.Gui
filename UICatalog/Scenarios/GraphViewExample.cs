@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -26,6 +26,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Open V Bar Graph", "", () => SetupLifeExpectancyBarGraph(true)),
 					new MenuItem ("_Open H Bar Graph", "", () => SetupLifeExpectancyBarGraph(false)),
 					new MenuItem ("Open Population Pyramid","",()=>SetupPopulationPyramid()),
+					new MenuItem ("Open Line Graph","",()=>SetupLineGraph()),
 
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
@@ -70,8 +71,46 @@ namespace UICatalog.Scenarios {
 			Top.Add (statusBar);
 		}
 
-			/*
-			Country,Both,Male,Female
+		private void SetupLineGraph ()
+		{
+			graphView.Reset ();
+
+			about.Text = "This graph shows random points";
+
+			List<PointD> randomPoints = new List<PointD> ();
+
+			Random r = new Random ();
+
+			for(int i = 0; i < 20; i++) {
+				randomPoints.Add(new PointD(r.Next (100), r.Next (100)));
+			}
+			
+			graphView.Series.Add (
+				new LineSeries () {Points = randomPoints
+				});
+
+			// How much graph space each cell of the console depicts
+			graphView.CellSize = new PointD (2, 5);
+
+			// leave space for axis labels
+			graphView.MarginBottom = 2;
+			graphView.MarginLeft = 3;
+
+			// One axis tick/label per
+			graphView.AxisX.Increment = 20;
+			graphView.AxisX.ShowLabelsEvery = 1;
+			graphView.AxisX.Text = "X →";
+
+			// One label every 5 atomic weight
+			graphView.AxisY.Increment = 20;
+			graphView.AxisY.ShowLabelsEvery = 1;
+			graphView.AxisY.Text = "↑Y";
+
+			graphView.SetNeedsDisplay ();
+		}
+
+		/*
+		Country,Both,Male,Female
 
 "Switzerland",83.4,81.8,85.1
 "South Korea",83.3,80.3,86.1
