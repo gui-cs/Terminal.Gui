@@ -1102,16 +1102,17 @@ namespace Terminal.Gui {
 		{
 			return Contains (pt.X, pt.Y);
 		}
+		
 		/// <summary>
 		/// Generates a hashcode from the X,Y Width and Height elements
 		/// </summary>
 		/// <returns></returns>
 		public override int GetHashCode ()
 		{
-			return (int)((UInt32)X ^
-			(((UInt32)Y << 13) | ((UInt32)Y >> 19)) ^
-			(((UInt32)Width << 26) | ((UInt32)Width >> 6)) ^
-			(((UInt32)Height << 7) | ((UInt32)Height >> 25)));
+			unchecked{
+				return (int)((int)X * Y * Width * Height);
+			}
+
 		}
 		/// <summary>
 		/// Increases the size of the rectangle by the provided factors
