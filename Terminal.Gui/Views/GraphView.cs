@@ -439,17 +439,32 @@ namespace Terminal.Gui {
 		}
 	}
 
+	/// <summary>
+	/// Series of points linked with a line
+	/// </summary>
 	public class LineSeries : ISeries, IComparer<PointD> {
 
 		List<PointD> points = new List<PointD>();
+
+		/// <summary>
+		/// Ordered collection of points in the series
+		/// </summary>
 		public ReadOnlyCollection<PointD> Points { get => points.AsReadOnly (); }
 
+		/// <summary>
+		/// Adds <paramref name="toAdd"/> to <see cref="Points"/> in order of X
+		/// </summary>
+		/// <param name="toAdd"></param>
 		public void Add(PointD toAdd)
 		{
 			points.Add (toAdd);
 			points.Sort(this);
 		}
 
+		/// <summary>
+		/// Adds <paramref name="toAdd"/> to <see cref="Points"/> in order of X
+		/// </summary>
+		/// <param name="toAdd"></param>
 		public void AddRange (IEnumerable<PointD> toAdd)
 		{
 			points.AddRange (toAdd);
@@ -475,14 +490,19 @@ namespace Terminal.Gui {
 			return  -1;
 		}
 
+		/// <summary>
+		/// Returns a symbol if the line between any two consecutive points crosses the graph space
+		/// </summary>
+		/// <param name="graphSpace"></param>
+		/// <returns></returns>
 		public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
 		{
-			// we are on a plot point
-			if (Points.Any (graphSpace.Contains)) {
-				return new GraphCellToRender ('x');
-			}
-
 			foreach (var line in PointsToLines (graphSpace)) {
+				
+				// we are on a plot point
+				if (graphSpace.Contains(line.Start) || graphSpace.Contains (line.End)) {
+					return new GraphCellToRender ('x');
+				}
 
 				var clip = CohenSutherland.CohenSutherlandLineClip (graphSpace, line.Start, line.End);
 
@@ -1228,8 +1248,6 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new point at the given coordinates
 		/// </summary>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
 		public LineD(PointD start, PointD end)
 		{
 			this.Start = start;
@@ -1295,11 +1313,8 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Compute the bit code for a point (x, y) using the clip rectangle
-		/// bounded diagonally by (xmin, ymin), and (xmax, ymax)
-		/// ASSUME THAT xmax , xmin , ymax and ymin are global constants.
+		/// bounded diagonally by <paramref name="rect"/>
 		/// </summary>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
 		/// <returns></returns>
 		private static byte ComputeOutCode (RectangleD rect, decimal x, decimal y)
 		{
@@ -1321,12 +1336,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Cohen–Sutherland clipping algorithm clips a line from
 		/// P0 = (x0, y0) to P1 = (x1, y1) against a rectangle with
-		/// diagonal from (xmin, ymin) to (xmax, ymax).
+		/// diagonal from <paramref name="rect"/>
 		/// </summary>
-		/// <param name="x0"></param>
-		/// <param name="y0"</param>
-		/// <param name="x1"></param>
-		/// <param name="y1"></param>
 		/// <returns>a list of two points in the resulting clipped line, or zero</returns>
 		public static LineD CohenSutherlandLineClip (RectangleD rect,
 				       PointD p0, PointD p1)
