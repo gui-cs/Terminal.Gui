@@ -4,6 +4,9 @@ using System.Drawing;
 using System.Linq;
 using Terminal.Gui;
 
+using Color = Terminal.Gui.Color;
+using Attribute = Terminal.Gui.Attribute;
+
 namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Graph View", Description: "Demos GraphView control")]
@@ -78,6 +81,12 @@ namespace UICatalog.Scenarios {
 
 			about.Text = "This graph shows random points";
 
+			var black = new Attribute (graphView.ColorScheme.Normal.Foreground, Color.Black);
+			var cyan = new Attribute (Color.BrightCyan, Color.Black);
+			var magenta = new Attribute (Color.BrightMagenta, Color.Black);
+
+			graphView.Color = black;
+
 			List<PointD> randomPoints = new List<PointD> ();
 
 			Random r = new Random ();
@@ -86,9 +95,21 @@ namespace UICatalog.Scenarios {
 				randomPoints.Add(new PointD(r.Next (100), r.Next (100)));
 			}
 
-			var lineSeries = new LineSeries ();
+
+			var lineSeries = new LineSeries () { LineColor = cyan };
 			lineSeries.AddRange (randomPoints);
 			graphView.Series.Add (lineSeries);
+
+
+			randomPoints = new List<PointD> ();
+
+			for (int i = 0; i < 10; i++) {
+				randomPoints.Add (new PointD (r.Next (100), r.Next (100)));
+			}
+
+			var lineSeries2 = new LineSeries () { LineColor = magenta };
+			lineSeries2.AddRange (randomPoints);
+			graphView.Series.Add (lineSeries2);
 
 			// How much graph space each cell of the console depicts
 			graphView.CellSize = new PointD (2, 5);

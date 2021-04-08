@@ -59,6 +59,11 @@ namespace Terminal.Gui {
 		public PointD CellSize {get;set;} = new PointD(1,1);
 
 		/// <summary>
+		/// The color of the background of the graph and axis/labels
+		/// </summary>
+		public Attribute? Color { get; set; }
+
+		/// <summary>
 		/// Creates a new graph with a 1 to 1 graph space with absolute layout
 		/// </summary>
 		public GraphView()
@@ -80,13 +85,14 @@ namespace Terminal.Gui {
 			AxisX.Reset();
 		 	AxisY.Reset();
 			Series.Clear();
+			Color = null;
 			SetNeedsDisplay();
 		}
 
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			Driver.SetAttribute (ColorScheme.Normal);
+			Driver.SetAttribute (Color ??ColorScheme.Normal);
 
 			Move (0, 0);
 
@@ -95,8 +101,6 @@ namespace Terminal.Gui {
 				Move (0, i);
 				Driver.AddStr (new string (' ', Bounds.Width));
 			}
-
-			base.Redraw(bounds);
 
 			// If there is no data do not display a graph
 			if (!Series.Any ()) {
@@ -271,7 +275,13 @@ namespace Terminal.Gui {
 		{
 			Color = color;
 		}
-
+		/// <summary>
+		/// Creates instance and sets <see cref="Rune"/> and <see cref="Color"/> (or default if null)
+		/// </summary>
+		public GraphCellToRender (Rune rune, Attribute? color) : this (rune)
+		{
+			Color = color;
+		}
 	}
 
 	/// <summary>
@@ -450,6 +460,22 @@ namespace Terminal.Gui {
 		/// Ordered collection of points in the series
 		/// </summary>
 		public ReadOnlyCollection<PointD> Points { get => points.AsReadOnly (); }
+		
+		
+		/// <summary>
+		/// Color for the line that connects points
+		/// </summary>
+		public Attribute? LineColor { get; set; }
+
+		/// <summary>
+		/// Color for the points
+		/// </summary>
+		public Attribute? PointColor { get; set; }
+
+		/// <summary>
+		/// The symbol to show on screen at each point.  Deafults to 'x'
+		/// </summary>
+		public Rune PointSymbol { get; set; } = 'x';
 
 		/// <summary>
 		/// Adds <paramref name="toAdd"/> to <see cref="Points"/> in order of X
@@ -501,14 +527,14 @@ namespace Terminal.Gui {
 				
 				// we are on a plot point
 				if (graphSpace.Contains(line.Start) || graphSpace.Contains (line.End)) {
-					return new GraphCellToRender ('x');
+					return new GraphCellToRender (PointSymbol, PointColor);
 				}
 
 				var clip = CohenSutherland.CohenSutherlandLineClip (graphSpace, line.Start, line.End);
 
 				// the line passes through the current cell of the graph 
 				if (clip != null) {
-					return new GraphCellToRender ('.');
+					return new GraphCellToRender ('.',LineColor);
 				}
 			}
 
@@ -653,7 +679,6 @@ namespace Terminal.Gui {
 		public override void DrawAxisLine (ConsoleDriver driver, GraphView graph, Rect bounds)
 		{
 			graph.Move (0, 0);
-			driver.SetAttribute (graph.ColorScheme.Normal);
 
 			var y = GetAxisYPosition (graph, bounds);
 
@@ -669,8 +694,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void DrawAxisLabels (ConsoleDriver driver,GraphView graph,Rect bounds)
 		{
-			driver.SetAttribute (graph.ColorScheme.Normal);
-
 			var labels = GetLabels (graph, bounds);
 
 			foreach (var label in labels) {
@@ -826,8 +849,6 @@ namespace Terminal.Gui {
 		/// <param name="bounds"></param>
 		public override void DrawAxisLabels (ConsoleDriver driver, GraphView graph, Rect bounds)
 		{
-			driver.SetAttribute (graph.ColorScheme.Normal);
-
 			var x = GetAxisXPosition (graph, bounds);
 			var labels = GetLabels(graph,bounds);
 			var labelThickness = GetLabelThickness (labels);
