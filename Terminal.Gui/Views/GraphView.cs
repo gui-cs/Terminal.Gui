@@ -1,6 +1,7 @@
 ﻿using NStack;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
@@ -438,9 +439,41 @@ namespace Terminal.Gui {
 		}
 	}
 
-	public class LineSeries : ISeries {
+	public class LineSeries : ISeries, IComparer<PointD> {
 
-		public List<PointD> Points { get; set; }  = new List<PointD> ();
+		List<PointD> points = new List<PointD>();
+		public ReadOnlyCollection<PointD> Points { get => points.AsReadOnly (); }
+
+		public void Add(PointD toAdd)
+		{
+			points.Add (toAdd);
+			points.Sort(this);
+		}
+
+		public void AddRange (IEnumerable<PointD> toAdd)
+		{
+			points.AddRange (toAdd);
+			points.Sort (this);
+		}
+
+		/// <summary>
+		/// Compares points on the X axis 
+		/// </summary>
+		/// <param name="a"></param>
+		/// <param name="b"></param>
+		/// <returns></returns>
+		public int Compare (PointD a, PointD b)
+		{
+			if (a.X == b.X) {
+				return 0;
+			}
+
+			if (a.X > b.X) {
+				return 1;
+			}
+			
+			return  -1;
+		}
 
 		public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
 		{
@@ -449,7 +482,7 @@ namespace Terminal.Gui {
 				return new GraphCellToRender ('x');
 			}
 
-			foreach (var line in PointsToLines ()) {
+			foreach (var line in PointsToLines (graphSpace)) {
 
 				var clip = CohenSutherland.CohenSutherlandLineClip (graphSpace, line.Start, line.End);
 
@@ -462,51 +495,32 @@ namespace Terminal.Gui {
 			return null;
 		}
 
-		private IEnumerable<LineD> PointsToLines ()
-		{
-			var points = Points.OrderBy (p => p.X).ToArray ();
+		/// <summary>
+		/// Returns all lines that could potentially pass through <paramref name="graphSpace"/>
+		/// </summary>
+		/// <param name="graphSpace"></param>
+		/// <returns></returns>
+		private IEnumerable<LineD> PointsToLines (RectangleD graphSpace)
+		{						
+			var first = points.LastOrDefault (p => p.X < graphSpace.X);
+			var then = points.Where(p => p.X >= graphSpace.X && p.X < graphSpace.Right);
+			var last = points.FirstOrDefault(p => p.X > graphSpace.X);
 
-			for (int i=0;i< points.Length - 1; i++) {
-				yield return new LineD (points [i], points [i + 1]);
+			var consider = new List<PointD> ();
+			consider.Add (first);
+			consider.AddRange (then);
+			consider.Add (last);
+
+
+			for (int i=0;i< consider.Count - 1; i++) {
+				
+				var line = new LineD (consider [i], consider [i + 1]);
+				if (line.Start != null && line.End != null) {
+					yield return line;
+				}
+					
 			}
 		}
-
-
-		/*
-		 * 
-		 * 
-    default_symbols = ['┼', '┤', '╶', '╴', '─', '╰', '╭', '╮', '╯', '│']
-		 * # plot the line
-        for x in range(0, len(series[i]) - 1):
-            d0 = series[i][x + 0]
-            d1 = series[i][x + 1]
-
-            if isnan(d0) and isnan(d1):
-                continue
-
-            if isnan(d0) and _isnum(d1):
-                result[rows - scaled(d1)][x + offset] = colored(symbols[2], color)
-                continue
-
-            if _isnum(d0) and isnan(d1):
-                result[rows - scaled(d0)][x + offset] = colored(symbols[3], color)
-                continue
-
-            y0 = scaled(d0)
-            y1 = scaled(d1)
-            if y0 == y1:
-                result[rows - y0][x + offset] = colored(symbols[4], color)
-                continue
-
-            result[rows - y1][x + offset] = colored(symbols[5], color) if y0 > y1 else colored(symbols[6], color)
-            result[rows - y0][x + offset] = colored(symbols[7], color) if y0 > y1 else colored(symbols[8], color)
-
-            start = min(y0, y1) + 1
-            end = max(y0, y1)
-            for y in range(start, end):
-                result[rows - y][x + offset] = colored(symbols[9], color)
-
-    return '\n'.join([''.join(row).rstrip() for row in result])*/
 	}
 	/// <summary>
 	/// Renders a continuous line with grid line ticks and labels

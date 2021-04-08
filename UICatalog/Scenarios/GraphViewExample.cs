@@ -27,6 +27,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Open H Bar Graph", "", () => SetupLifeExpectancyBarGraph(false)),
 					new MenuItem ("Open Population Pyramid","",()=>SetupPopulationPyramid()),
 					new MenuItem ("Open Line Graph","",()=>SetupLineGraph()),
+					new MenuItem ("Open Sine Wave","",()=>SetupSineWave()),
 
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
@@ -84,10 +85,10 @@ namespace UICatalog.Scenarios {
 			for(int i = 0; i < 10; i++) {
 				randomPoints.Add(new PointD(r.Next (100), r.Next (100)));
 			}
-			
-			graphView.Series.Add (
-				new LineSeries () {Points = randomPoints
-				});
+
+			var lineSeries = new LineSeries ();
+			lineSeries.AddRange (randomPoints);
+			graphView.Series.Add (lineSeries);
 
 			// How much graph space each cell of the console depicts
 			graphView.CellSize = new PointD (2, 5);
@@ -101,7 +102,6 @@ namespace UICatalog.Scenarios {
 			graphView.AxisX.ShowLabelsEvery = 1;
 			graphView.AxisX.Text = "X →";
 
-			// One label every 5 atomic weight
 			graphView.AxisY.Increment = 20;
 			graphView.AxisY.ShowLabelsEvery = 1;
 			graphView.AxisY.Text = "↑Y";
@@ -109,6 +109,44 @@ namespace UICatalog.Scenarios {
 			graphView.SetNeedsDisplay ();
 		}
 
+		private void SetupSineWave()
+		{
+			graphView.Reset ();
+
+			about.Text = "This graph shows a sine wave";
+
+
+			var lineSeries = new LineSeries ();
+
+			// Generate line graph with 2,000 points
+			for (decimal x = -500; x < 500; x+=0.5M) {
+				lineSeries.Add(new PointD(x,(decimal)Math.Sin ((double)x)));
+			}
+
+			graphView.Series.Add (lineSeries);
+
+			// How much graph space each cell of the console depicts
+			graphView.CellSize = new PointD (0.1M, 0.1M);
+
+			// leave space for axis labels
+			graphView.MarginBottom = 2;
+			graphView.MarginLeft = 3;
+
+			// One axis tick/label per
+			graphView.AxisX.Increment = 0.5M;
+			graphView.AxisX.ShowLabelsEvery = 2;
+			graphView.AxisX.Text = "X →";
+			graphView.AxisX.LabelGetter = (v) => v.GraphSpace.X.ToString ("N2");
+
+			graphView.AxisY.Increment = 0.2M;
+			graphView.AxisY.ShowLabelsEvery = 2;
+			graphView.AxisY.Text = "↑Y";
+			graphView.AxisY.LabelGetter = (v) => v.GraphSpace.Y.ToString ("N2");
+
+			graphView.ScrollOffset = new PointD (-2.5M, -1);
+
+			graphView.SetNeedsDisplay ();
+		}
 		/*
 		Country,Both,Male,Female
 
