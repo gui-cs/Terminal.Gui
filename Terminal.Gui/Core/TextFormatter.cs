@@ -625,7 +625,8 @@ namespace Terminal.Gui {
 						Application.Driver?.AddRune (rune);
 					}
 					col += Rune.ColumnWidth (rune);
-					if (idx + 1 < runes.Length && col + Rune.ColumnWidth (runes [idx + 1]) > bounds.Width) {
+					if (idx + 1 > - 1 && idx + 1 < runes.Length && col
+						+ Rune.ColumnWidth (runes [idx + 1]) > bounds.Width) {
 						break;
 					}
 				}
