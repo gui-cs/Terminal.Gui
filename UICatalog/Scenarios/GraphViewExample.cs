@@ -81,7 +81,7 @@ namespace UICatalog.Scenarios {
 
 			Random r = new Random ();
 
-			for(int i = 0; i < 20; i++) {
+			for(int i = 0; i < 10; i++) {
 				randomPoints.Add(new PointD(r.Next (100), r.Next (100)));
 			}
 			

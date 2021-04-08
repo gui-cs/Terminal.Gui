@@ -448,50 +448,27 @@ namespace Terminal.Gui {
 			if (Points.Any (graphSpace.Contains)) {
 				return new GraphCellToRender ('x');
 			}
-				
-			var points = Points.OrderBy (p => p.X).ToArray();
 
-			// find the last point before this cell of graph space
-						
-			// the previous point
-			var ptBefore = points.LastOrDefault (p => p.X < graphSpace.Left);
+			foreach (var line in PointsToLines ()) {
 
-			// the next point
-			var ptAfter = points.FirstOrDefault (p => p.X >= graphSpace.Right);
+				var clip = CohenSutherland.CohenSutherlandLineClip (graphSpace, line.Start, line.End);
 
-			// points which are in line with this cell
-			var ptsInLine = points.Where (p => p.X > graphSpace.Left && p.X < graphSpace.Left).ToArray();
-
-			// if we have run out of graph
-			if (ptBefore == null || ptAfter == null) {
-				return null;
-			}
-
-			// if we are in line with the next point
-			if (ptsInLine.Any ()) {
-
-				return new GraphCellToRender (Application.Driver.HLine);
-
-				/*
-				var maxy = ptsInLine.Max (p => p.Y);
-				var miny = ptsInLine.Max (p => p.Y);
-
-				// we need
-				if(maxy > graphSpace.Top) {
-
-				}*/
-			}
-
-			var clippedLine = CohenSutherland.CohenSutherlandLineClip (graphSpace, ptBefore, ptAfter);
-			
-			// the line passes through the current cell of the graph 
-			if(clippedLine != null) {
-
-				// TODO: use proper symbol
-				return new GraphCellToRender ('-');
+				// the line passes through the current cell of the graph 
+				if (clip != null) {
+					return new GraphCellToRender ('.');
+				}
 			}
 
 			return null;
+		}
+
+		private IEnumerable<LineD> PointsToLines ()
+		{
+			var points = Points.OrderBy (p => p.X).ToArray ();
+
+			for (int i=0;i< points.Length - 1; i++) {
+				yield return new LineD (points [i], points [i + 1]);
+			}
 		}
 
 
@@ -1242,6 +1219,22 @@ namespace Terminal.Gui {
 		{
 			this.Start = start;
 			this.End = end;
+		}
+
+		/// <summary>
+		/// Returns the gradient of the line.  If vertical then <see cref="decimal.MaxValue"/> is returned
+		/// </summary>
+		/// <returns></returns>
+		public decimal GetGradient ()
+		{
+			decimal changeInHeight = End.Y - Start.Y;
+			decimal changeInWidth = End.X - Start.X;
+
+			if(changeInWidth == 0) {
+				return decimal.MaxValue;
+			}
+
+			return changeInHeight / changeInWidth;
 		}
 	}
 
