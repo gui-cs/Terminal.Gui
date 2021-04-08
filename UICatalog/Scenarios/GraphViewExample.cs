@@ -81,9 +81,11 @@ namespace UICatalog.Scenarios {
 
 			about.Text = "This graph shows random points";
 
-			var black = new Attribute (graphView.ColorScheme.Normal.Foreground, Color.Black);
-			var cyan = new Attribute (Color.BrightCyan, Color.Black);
-			var magenta = new Attribute (Color.BrightMagenta, Color.Black);
+			
+			var black = Application.Driver.MakeAttribute(graphView.ColorScheme.Normal.Foreground, Color.Black);
+			var cyan = Application.Driver.MakeAttribute(Color.BrightCyan, Color.Black);
+			var magenta = Application.Driver.MakeAttribute(Color.BrightMagenta, Color.Black);
+			var red = Application.Driver.MakeAttribute(Color.BrightRed, Color.Black);
 
 			graphView.Color = black;
 
@@ -96,7 +98,9 @@ namespace UICatalog.Scenarios {
 			}
 
 
-			var lineSeries = new LineSeries () { LineColor = cyan };
+			var lineSeries = new LineSeries () {
+				 LineColor = cyan				 
+				 };
 			lineSeries.AddRange (randomPoints);
 			graphView.Series.Add (lineSeries);
 
@@ -107,7 +111,10 @@ namespace UICatalog.Scenarios {
 				randomPoints.Add (new PointD (r.Next (100), r.Next (100)));
 			}
 
-			var lineSeries2 = new LineSeries () { LineColor = magenta };
+			var lineSeries2 = new LineSeries () {
+				 LineColor = magenta,
+				 PointColor = red
+				 };
 			lineSeries2.AddRange (randomPoints);
 			graphView.Series.Add (lineSeries2);
 
