@@ -353,10 +353,16 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="numberOfBarsPerCategory">Each category has this many bars</param>
 		/// <param name="barsEvery">How far appart to put each category (in graph space)</param>
-		/// <param name="spacing">How much spacing between bars in a category (should be less than <paramref name="barsEvery"/>/<paramref name="numberOfBars"/>)</param>
+		/// <param name="spacing">How much spacing between bars in a category (should be less than <paramref name="barsEvery"/>/<paramref name="numberOfBarsPerCategory"/>)</param>
+		/// <param name="colors">Array of colors that define bar colour in each category.  Length must match <paramref name="numberOfBarsPerCategory"/></param>
 		public MultiBarSeries (int numberOfBarsPerCategory, decimal barsEvery, decimal spacing, Attribute[] colors = null)
 		{
 			subSeries = new BarSeries [numberOfBarsPerCategory];
+
+			if(colors != null && colors.Length != numberOfBarsPerCategory){
+				throw new ArgumentException("Number of colours must match the number of bars",nameof(numberOfBarsPerCategory));
+			}
+
 
 			for(int i = 0; i < numberOfBarsPerCategory; i++) {
 				subSeries [i] = new BarSeries ();
