@@ -1751,7 +1751,7 @@ namespace Terminal.Gui {
 			var result = new List<View> ();
 
 			// Set of all nodes with no incoming edges
-			var S = new HashSet<View> (nodes.Where (n => edges.All (e => e.To.Equals (n) == false)));
+			var S = new HashSet<View> (nodes.Where (n => edges.All (e => !e.To.Equals (n))));
 
 			while (S.Any ()) {
 				//  remove a node n from S
@@ -1770,15 +1770,15 @@ namespace Terminal.Gui {
 					edges.Remove (e);
 
 					// if m has no other incoming edges then
-					if (edges.All (me => me.To.Equals (m) == false) && m != this?.SuperView) {
+					if (edges.All (me => !me.To.Equals (m)) && m != this?.SuperView) {
 						// insert m into S
 						S.Add (m);
 					}
 				}
 			}
 
-			if (edges.Any ()) {
-				if (!object.ReferenceEquals (edges.First ().From, edges.First ().To)) {
+			if (edges.Any () && edges.First ().From != Application.Top) {
+				if (!ReferenceEquals (edges.First ().From, edges.First ().To)) {
 					throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {edges.First ().From}. Did you forget to add it to {this}?");
 				} else {
 					throw new InvalidOperationException ("TopologicalSort encountered a recursive cycle in the relative Pos/Dim in the views of " + this);
@@ -1861,19 +1861,59 @@ namespace Terminal.Gui {
 			var nodes = new HashSet<View> ();
 			var edges = new HashSet<(View, View)> ();
 
-			foreach (var v in InternalSubviews) {
-				nodes.Add (v);
-				if (v.LayoutStyle == LayoutStyle.Computed) {
-					if (v.X is Pos.PosView vX)
-						edges.Add ((vX.Target, v));
-					if (v.Y is Pos.PosView vY)
-						edges.Add ((vY.Target, v));
-					if (v.Width is Dim.DimView vWidth)
-						edges.Add ((vWidth.Target, v));
-					if (v.Height is Dim.DimView vHeight)
-						edges.Add ((vHeight.Target, v));
+			void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
+			{
+				if (pos is Pos.PosView pv) {
+					if (pv.Target != this) {
+						nEdges.Add ((pv.Target, from));
+					}
+					foreach (var v in from.InternalSubviews) {
+						CollectAll (v, ref nNodes, ref nEdges);
+					}
+					return;
+				}
+				if (pos is Pos.PosCombine pc) {
+					foreach (var v in from.InternalSubviews) {
+						CollectPos (pc.left, from, ref nNodes, ref nEdges);
+						CollectPos (pc.right, from, ref nNodes, ref nEdges);
+					}
 				}
 			}
+
+			void CollectDim (Dim dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
+			{
+				if (dim is Dim.DimView dv) {
+					if (dv.Target != this) {
+						nEdges.Add ((dv.Target, from));
+					}
+					foreach (var v in from.InternalSubviews) {
+						CollectAll (v, ref nNodes, ref nEdges);
+					}
+					return;
+				}
+				if (dim is Dim.DimCombine dc) {
+					foreach (var v in from.InternalSubviews) {
+						CollectDim (dc.left, from, ref nNodes, ref nEdges);
+						CollectDim (dc.right, from, ref nNodes, ref nEdges);
+					}
+				}
+			}
+
+			void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
+			{
+				foreach (var v in from.InternalSubviews) {
+					nNodes.Add (v);
+					if (v.layoutStyle != LayoutStyle.Computed) {
+						continue;
+					}
+					CollectPos (v.X, v, ref nNodes, ref nEdges);
+					CollectPos (v.Y, v, ref nNodes, ref nEdges);
+					CollectDim (v.Width, v, ref nNodes, ref nEdges);
+					CollectDim (v.Height, v, ref nNodes, ref nEdges);
+				}
+			}
+
+			CollectAll (this, ref nodes, ref edges);
 
 			var ordered = TopologicalSort (nodes, edges);
 
@@ -1884,7 +1924,6 @@ namespace Terminal.Gui {
 
 				v.LayoutSubviews ();
 				v.LayoutNeeded = false;
-
 			}
 
 			if (SuperView == Application.Top && LayoutNeeded && ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {

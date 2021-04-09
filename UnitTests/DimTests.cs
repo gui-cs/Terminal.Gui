@@ -511,6 +511,84 @@ namespace Terminal.Gui {
 			Application.Shutdown ();
 		}
 
-		// TODO: Test operators
+		// DONE: Test operators
+		[Fact]
+		public void DimCombine_Do_Not_Throws ()
+		{
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = Application.Top;
+
+			var w = new Window ("w") {
+				Width = Dim.Width (t) - 2,
+				Height = Dim.Height (t) - 2
+			};
+			var f = new FrameView ("f");
+			var v1 = new View ("v1") {
+				Width = Dim.Width (w) - 2,
+				Height = Dim.Height (w) - 2
+			};
+			var v2 = new View ("v2") {
+				Width = Dim.Width (v1) - 2,
+				Height = Dim.Height (v1) - 2
+			};
+
+			f.Add (v1, v2);
+			w.Add (f);
+			t.Add (w);
+
+			f.Width = Dim.Width (t) - Dim.Width (v2);
+			f.Height = Dim.Height (t) - Dim.Height (v2);
+
+			t.Ready += () => {
+				Assert.Equal (80, t.Frame.Width);
+				Assert.Equal (25, t.Frame.Height);
+				Assert.Equal (78, w.Frame.Width);
+				Assert.Equal (23, w.Frame.Height);
+				Assert.Equal (6, f.Frame.Width);
+				Assert.Equal (6, f.Frame.Height);
+				Assert.Equal (76, v1.Frame.Width);
+				Assert.Equal (21, v1.Frame.Height);
+				Assert.Equal (74, v2.Frame.Width);
+				Assert.Equal (19, v2.Frame.Height);
+			};
+
+			Application.Iteration += () => Application.RequestStop ();
+
+			Application.Run ();
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void PosCombine_Will_Throws ()
+		{
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var t = Application.Top;
+
+			var w = new Window ("w") {
+				Width = Dim.Width (t) - 2,
+				Height = Dim.Height (t) - 2
+			};
+			var f = new FrameView ("f");
+			var v1 = new View ("v1") {
+				Width = Dim.Width (w) - 2,
+				Height = Dim.Height (w) - 2
+			};
+			var v2 = new View ("v2") {
+				Width = Dim.Width (v1) - 2,
+				Height = Dim.Height (v1) - 2
+			};
+
+			f.Add (v1); // v2 not added
+			w.Add (f);
+			t.Add (w);
+
+			f.Width = Dim.Width (t) - Dim.Width (v2);
+			f.Height = Dim.Height (t) - Dim.Height (v2);
+
+			Assert.Throws<InvalidOperationException> (() => Application.Run ());
+			Application.Shutdown ();
+		}
 	}
 }
