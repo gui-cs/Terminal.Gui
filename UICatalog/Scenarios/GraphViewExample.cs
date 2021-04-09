@@ -16,6 +16,9 @@ namespace UICatalog.Scenarios {
 		GraphView graphView;
 		private TextView about;
 
+		int currentGraph = 0;
+		Action [] graphs;
+
 		public override void Setup ()
 		{
 			Win.Title = this.GetName ();
@@ -23,16 +26,26 @@ namespace UICatalog.Scenarios {
 			Win.Height = Dim.Fill (1); // status bar
 			Top.LayoutSubviews ();
 
+			graphs = new Action[] {
+				 ()=>SetupPeriodicTableScatterPlot(),   //0
+				 ()=>SetupLifeExpectancyBarGraph(true), //1
+				 ()=>SetupLifeExpectancyBarGraph(false),//2
+				 ()=>SetupPopulationPyramid(),          //3
+				 ()=>SetupLineGraph(),                  //4
+				 ()=>SetupSineWave(),                   //5
+				 ()=>SetupDisco()                       //6
+			};
+
+
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("Scatter _Plot", "", () => SetupPeriodicTableScatterPlot()),
-					new MenuItem ("_V Bar Graph", "", () => SetupLifeExpectancyBarGraph(true)),
-					new MenuItem ("_H Bar Graph", "", () => SetupLifeExpectancyBarGraph(false)),
-					new MenuItem ("P_opulation Pyramid","",()=>SetupPopulationPyramid()),
-					new MenuItem ("_Line Graph","",()=>SetupLineGraph()),
-					new MenuItem ("Sine _Wave","",()=>SetupSineWave()),
-					new MenuItem ("Silent _Disco","",()=>SetupDisco()),
-
+					new MenuItem ("Scatter _Plot", "",()=>graphs[currentGraph = 0]()),
+					new MenuItem ("_V Bar Graph", "", ()=>graphs[currentGraph = 1]()),
+					new MenuItem ("_H Bar Graph", "", ()=>graphs[currentGraph = 2]()) ,
+					new MenuItem ("P_opulation Pyramid","",()=>graphs[currentGraph = 3]()),
+					new MenuItem ("_Line Graph","",()=>graphs[currentGraph = 4]()),
+					new MenuItem ("Sine _Wave","",()=>graphs[currentGraph = 5]()),
+					new MenuItem ("Silent _Disco","",()=>graphs[currentGraph = 6]()),
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
@@ -72,6 +85,7 @@ namespace UICatalog.Scenarios {
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Key.CtrlMask | Key.G, "~^G~ Next", ()=>graphs[currentGraph++%graphs.Length]()),
 			});
 			Top.Add (statusBar);
 		}
