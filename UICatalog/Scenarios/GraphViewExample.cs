@@ -121,6 +121,9 @@ namespace UICatalog.Scenarios {
 			graphView.CellSize = new PointD (0.25M, 1000);
 			graphView.Series.Add (series);
 			graphView.SetNeedsDisplay ();
+
+			graphView.MarginLeft = 3;
+			graphView.AxisY.LabelGetter = (v)=>'$' + (v.GraphSpace.Y /1000M).ToString("N0") + 'k';
 		}
 
 		private void SetupLineGraph ()
@@ -566,7 +569,7 @@ namespace UICatalog.Scenarios {
 			graphView.CellSize = new PointD (1, 5);
 
 			// leave space for axis labels
-			graphView.MarginBottom = 1;
+			graphView.MarginBottom = 2;
 			graphView.MarginLeft = 3;
 
 			// One axis tick/label per 5 atomic numbers

@@ -108,11 +108,6 @@ namespace Terminal.Gui {
 			}
 
 			
-			AxisX.DrawAxisLine (Driver, this, Bounds);
-			AxisY.DrawAxisLine (Driver, this, Bounds);
-			
-			AxisX.DrawAxisLabels (Driver, this, Bounds);
-			AxisY.DrawAxisLabels (Driver, this, Bounds);
 
 			for (int x= (int)MarginLeft;x<Bounds.Width;x++){
 				for(int y=0;y<Bounds.Height - (int)MarginBottom;y++){
@@ -139,6 +134,27 @@ namespace Terminal.Gui {
 					}
 				}
 			}
+
+			AxisY.DrawAxisLine (Driver, this, Bounds);
+			AxisX.DrawAxisLine (Driver, this, Bounds);
+			
+			AxisY.DrawAxisLabels (Driver, this, Bounds);
+			AxisX.DrawAxisLabels (Driver, this, Bounds);
+
+			// Draw origin with plus
+			var origin = GraphSpaceToScreen(new PointD(0,0));
+
+
+			if(origin.X >= MarginLeft && origin.X<Bounds.Width){
+				if(origin.Y >= 0 && origin.Y<=Bounds.Height - MarginBottom){
+
+					if(AxisX.Visible && AxisY.Visible){
+						Move(origin.X,origin.Y);
+						AddRune(origin.X,origin.Y,'\u253C');
+					}
+				}
+			}
+
 		}
 
 		/// <summary>
@@ -776,6 +792,7 @@ namespace Terminal.Gui {
 			Increment = 1;
 			ShowLabelsEvery = DefaultShowLabelsEvery;
 			Visible = true;
+			Text = "";
 		}
 	}
 
@@ -1018,7 +1035,7 @@ namespace Terminal.Gui {
 
 				// and the label text
 				if (!string.IsNullOrWhiteSpace (label.Text)) {
-					graph.Move (x - labelThickness, label.ScreenLocation.Y);
+					graph.Move (Math.Max(0,x - labelThickness), label.ScreenLocation.Y);
 					driver.AddStr (label.Text);
 				}
 			}
