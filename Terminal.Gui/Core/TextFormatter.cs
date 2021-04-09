@@ -28,12 +28,89 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
+	/// Vertical text alignment enumeration, controls how text is displayed.
+	/// </summary>
+	public enum VerticalTextAlignment {
+		/// <summary>
+		/// Aligns the text to the top of the frame.
+		/// </summary>
+		Top,
+		/// <summary>
+		/// Aligns the text to the bottom of the frame.
+		/// </summary>
+		Bottom,
+		/// <summary>
+		/// Centers the text verticaly in the frame.
+		/// </summary>
+		Middle,
+		/// <summary>
+		/// Shows the text as justified text in the frame.
+		/// </summary>
+		Justified
+	}
+
+	/// TextDirection  [H] = Horizontal  [V] = Vertical
+	/// =============
+	/// LeftRight_TopBottom [H] Normal
+	/// TopBottom_LeftRight [V] Normal
+	/// 
+	/// RightLeft_TopBottom [H] Invert Text
+	/// TopBottom_RightLeft [V] Invert Lines
+	/// 
+	/// LeftRight_BottomTop [H] Invert Lines
+	/// BottomTop_LeftRight [V] Invert Text
+	/// 
+	/// RightLeft_BottomTop [H] Invert Text + Invert Lines
+	/// BottomTop_RightLeft [V] Invert Text + Invert Lines
+	///
+	/// BAD: JUSTIFY does not work well with those who invert.
+	/// <summary>
+	/// Text direction enumeration, controls how text is displayed.
+	/// </summary>
+	public enum TextDirection {
+		/// <summary>
+		/// Normal Horizontal
+		/// </summary>
+		LeftRight_TopBottom,
+		/// <summary>
+		/// Normal Vertical
+		/// </summary>
+		TopBottom_LeftRight,
+		/// <summary>
+		/// 
+		/// </summary>
+		RightLeft_TopBottom,
+		/// <summary>
+		/// 
+		/// </summary>
+		TopBottom_RightLeft,
+		/// <summary>
+		/// 
+		/// </summary>
+		LeftRight_BottomTop,
+		/// <summary>
+		/// 
+		/// </summary>
+		BottomTop_LeftRight,
+		/// <summary>
+		/// 
+		/// </summary>
+		RightLeft_BottomTop,
+		/// <summary>
+		/// 
+		/// </summary>
+		BottomTop_RightLeft
+	}
+
+	/// <summary>
 	/// Provides text formatting capabilities for console apps. Supports, hotkeys, horizontal alignment, multiple lines, and word-based line wrap.
 	/// </summary>
 	public class TextFormatter {
 		List<ustring> lines = new List<ustring> ();
 		ustring text;
 		TextAlignment textAlignment;
+		VerticalTextAlignment textVerticalAlignment;
+		TextDirection textDirection;
 		Attribute textColor = -1;
 		bool needsFormat;
 		Key hotKey;
@@ -69,6 +146,63 @@ namespace Terminal.Gui {
 				NeedsFormat = true;
 			}
 		}
+
+		/// <summary>
+		/// Controls the vertical text-alignment property. 
+		/// </summary>
+		/// <value>The text vertical alignment.</value>
+		public VerticalTextAlignment VerticalAlignment {
+			get => textVerticalAlignment;
+			set {
+				textVerticalAlignment = value;
+				NeedsFormat = true;
+			}
+		}
+
+		/// <summary>
+		/// Controls the text-direction property. 
+		/// </summary>
+		/// <value>The text vertical alignment.</value>
+		public TextDirection Direction {
+			get => textDirection;
+			set {
+				textDirection = value;
+				NeedsFormat = true;
+			}
+		}
+
+		/// <summary>
+		/// Check if it is a horizontal direction
+		/// </summary>
+		public static bool IsHorizontalDirection (TextDirection textDirection)
+		{
+			switch (textDirection) {
+			case TextDirection.LeftRight_TopBottom:
+			case TextDirection.LeftRight_BottomTop:
+			case TextDirection.RightLeft_TopBottom:
+			case TextDirection.RightLeft_BottomTop:
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Check if it is a vertical direction
+		/// </summary>
+		public static bool IsVerticalDirection (TextDirection textDirection)
+		{
+			switch (textDirection) {
+			case TextDirection.TopBottom_LeftRight:
+			case TextDirection.TopBottom_RightLeft:
+			case TextDirection.BottomTop_LeftRight:
+			case TextDirection.BottomTop_RightLeft:
+				return true;
+			default:
+				return false;
+			}
+		}
+
 
 		/// <summary>
 		///  Gets or sets the size of the area the text will be constrained to when formatted.
@@ -113,7 +247,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// <para>
 		/// Upon a 'get' of this property, if the text needs to be formatted (if <see cref="NeedsFormat"/> is <c>true</c>)
-		/// <see cref="Format(ustring, int, TextAlignment, bool, bool)"/> will be called internally. 
+		/// <see cref="Format(ustring, int, bool, bool, bool)"/> will be called internally. 
 		/// </para>
 		/// </remarks>
 		public List<ustring> Lines {
@@ -135,7 +269,13 @@ namespace Terminal.Gui {
 					if (Size.IsEmpty) {
 						throw new InvalidOperationException ("Size must be set before accessing Lines");
 					}
-					lines = Format (shown_text, Size.Width, textAlignment, Size.Height > 1);
+
+					if (IsVerticalDirection (textDirection)) {
+						lines = Format (shown_text, Size.Height, textVerticalAlignment == VerticalTextAlignment.Justified, Size.Width > 1);
+					} else {
+						lines = Format (shown_text, Size.Width, textAlignment == TextAlignment.Justified, Size.Height > 1);
+					}
+
 					NeedsFormat = false;
 				}
 				return lines;
@@ -257,6 +397,18 @@ namespace Terminal.Gui {
 		/// <returns>Justified and clipped text.</returns>
 		public static ustring ClipAndJustify (ustring text, int width, TextAlignment talign)
 		{
+			return ClipAndJustify (text, width, talign == TextAlignment.Justified);
+		}
+
+		/// <summary>
+		/// Justifies text within a specified width. 
+		/// </summary>
+		/// <param name="text">The text to justify.</param>
+		/// <param name="width">If the text length is greater that <c>width</c> it will be clipped.</param>
+		/// <param name="justify">Justify.</param>
+		/// <returns>Justified and clipped text.</returns>
+		public static ustring ClipAndJustify (ustring text, int width, bool justify)
+		{
 			if (width < 0) {
 				throw new ArgumentOutOfRangeException ("Width cannot be negative.");
 			}
@@ -269,7 +421,7 @@ namespace Terminal.Gui {
 			if (slen > width) {
 				return ustring.Make (runes.GetRange (0, width));
 			} else {
-				if (talign == TextAlignment.Justified) {
+				if (justify) {
 					return Justify (text, width);
 				}
 				return text;
@@ -338,6 +490,31 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public static List<ustring> Format (ustring text, int width, TextAlignment talign, bool wordWrap, bool preserveTrailingSpaces = false)
 		{
+			return Format (text, width, talign == TextAlignment.Justified, wordWrap, preserveTrailingSpaces);
+		}
+
+		/// <summary>
+		/// Reformats text into lines, applying text alignment and optionally wrapping text to new lines on word boundaries.
+		/// </summary>
+		/// <param name="text"></param>
+		/// <param name="width">The width to bound the text to for word wrapping and clipping.</param>
+		/// <param name="justify">Specifies whether the text should be justified.</param>
+		/// <param name="wordWrap">If <c>true</c>, the text will be wrapped to new lines as need. If <c>false</c>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to <c>width</c></param>
+		/// <param name="preserveTrailingSpaces">If <c>true</c> and 'wordWrap' also true, the wrapped text will keep the trailing spaces. If <c>false</c>, the trailing spaces will be trimmed.</param>
+		/// <returns>A list of word wrapped lines.</returns>
+		/// <remarks>
+		/// <para>
+		/// An empty <c>text</c> string will result in one empty line.
+		/// </para>
+		/// <para>
+		/// If <c>width</c> is 0, a single, empty line will be returned.
+		/// </para>
+		/// <para>
+		/// If <c>width</c> is int.MaxValue, the text will be formatted to the maximum width possible. 
+		/// </para>
+		/// </remarks>
+		public static List<ustring> Format (ustring text, int width, bool justify, bool wordWrap, bool preserveTrailingSpaces = false)
+		{
 			if (width < 0) {
 				throw new ArgumentOutOfRangeException ("width cannot be negative");
 			}
@@ -353,7 +530,7 @@ namespace Terminal.Gui {
 
 			if (wordWrap == false) {
 				text = ReplaceCRLFWithSpace (text);
-				lineResult.Add (ClipAndJustify (text, width, talign));
+				lineResult.Add (ClipAndJustify (text, width, justify));
 				return lineResult;
 			}
 
@@ -365,7 +542,7 @@ namespace Terminal.Gui {
 				if (c == '\n') {
 					var wrappedLines = WordWrap (ustring.Make (runes.GetRange (lp, i - lp)), width, preserveTrailingSpaces);
 					foreach (var line in wrappedLines) {
-						lineResult.Add (ClipAndJustify (line, width, talign));
+						lineResult.Add (ClipAndJustify (line, width, justify));
 					}
 					if (wrappedLines.Count == 0) {
 						lineResult.Add (ustring.Empty);
@@ -374,7 +551,7 @@ namespace Terminal.Gui {
 				}
 			}
 			foreach (var line in WordWrap (ustring.Make (runes.GetRange (lp, runeCount - lp)), width, preserveTrailingSpaces)) {
-				lineResult.Add (ClipAndJustify (line, width, talign));
+				lineResult.Add (ClipAndJustify (line, width, justify));
 			}
 
 			return lineResult;
@@ -388,7 +565,7 @@ namespace Terminal.Gui {
 		/// <param name="width">The minimum width for the text.</param>
 		public static int MaxLines (ustring text, int width)
 		{
-			var result = TextFormatter.Format (text, width, TextAlignment.Left, true);
+			var result = TextFormatter.Format (text, width, false, true);
 			return result.Count;
 		}
 
@@ -400,7 +577,7 @@ namespace Terminal.Gui {
 		/// <param name="width">The minimum width for the text.</param>
 		public static int MaxWidth (ustring text, int width)
 		{
-			var result = TextFormatter.Format (text, width, TextAlignment.Left, true);
+			var result = TextFormatter.Format (text, width, false, true);
 			var max = 0;
 			result.ForEach (s => {
 				var m = 0;
@@ -585,38 +762,119 @@ namespace Terminal.Gui {
 			Application.Driver?.SetAttribute (normalColor);
 
 			// Use "Lines" to ensure a Format (don't use "lines"))
-			for (int line = 0; line < Lines.Count; line++) {
-				if (line > bounds.Height)
+
+			var linesFormated = Lines;
+			switch (textDirection) {
+			case TextDirection.TopBottom_RightLeft:
+			case TextDirection.LeftRight_BottomTop:
+			case TextDirection.RightLeft_BottomTop:
+			case TextDirection.BottomTop_RightLeft:
+				linesFormated.Reverse ();
+				break;
+			}
+
+			for (int line = 0; line < linesFormated.Count; line++) {
+				var isVertical = IsVerticalDirection (textDirection);
+
+				if ((isVertical && (line > bounds.Width)) || (!isVertical && (line > bounds.Height)))
 					continue;
+
 				var runes = lines [line].ToRunes ();
-				int x;
+
+				switch (textDirection) {
+				case TextDirection.RightLeft_BottomTop:
+				case TextDirection.RightLeft_TopBottom:
+				case TextDirection.BottomTop_LeftRight:
+				case TextDirection.BottomTop_RightLeft:
+					runes = runes.Reverse ().ToArray ();
+					break;
+				}
+
+
+				int x, y;
+				// Horizontal Alignment
 				switch (textAlignment) {
 				case TextAlignment.Left:
 				case TextAlignment.Justified:
-					x = bounds.Left;
+					if (isVertical) {
+						x = bounds.Left + line;
+					} else {
+						x = bounds.Left;
+					}
 					CursorPosition = hotKeyPos;
 					break;
 				case TextAlignment.Right:
-					x = bounds.Right - runes.Length;
-					CursorPosition = bounds.Width - runes.Length + hotKeyPos;
+					if (isVertical) {
+						x = bounds.Right - Lines.Count + line;
+						CursorPosition = bounds.Width - Lines.Count + hotKeyPos;
+					} else {
+						x = bounds.Right - runes.Length;
+						CursorPosition = bounds.Width - runes.Length + hotKeyPos;
+					}
 					break;
 				case TextAlignment.Centered:
-					x = bounds.Left + (bounds.Width - runes.Length) / 2;
-					CursorPosition = (bounds.Width - runes.Length) / 2 + hotKeyPos;
+					if (isVertical) {
+						x = bounds.Left + line + ((bounds.Width - Lines.Count) / 2);
+						CursorPosition = (bounds.Width - Lines.Count) / 2 + hotKeyPos;
+					} else {
+						x = bounds.Left + (bounds.Width - runes.Length) / 2;
+						CursorPosition = (bounds.Width - runes.Length) / 2 + hotKeyPos;
+					}
 					break;
 				default:
 					throw new ArgumentOutOfRangeException ();
 				}
-				var col = bounds.Left;
-				for (var idx = bounds.Left; idx < bounds.Left + bounds.Width; idx++) {
-					Application.Driver?.Move (col, bounds.Top + line);
+				// Vertical Alignment
+				switch (textVerticalAlignment) {
+				case VerticalTextAlignment.Justified:
+				case VerticalTextAlignment.Top:
+					if (isVertical) {
+						y = bounds.Top;
+					} else {
+						y = bounds.Top + line;
+					}
+					break;
+				case VerticalTextAlignment.Middle:
+					if (isVertical) {
+						var s = (bounds.Height - runes.Length) / 2;
+						y = bounds.Top + s;
+					} else {
+						var s = (bounds.Height - Lines.Count) / 2;
+						y = bounds.Top + line + s;
+					}
+					break;
+				case VerticalTextAlignment.Bottom:
+					if (isVertical) {
+						y = bounds.Bottom - runes.Length;
+					} else {
+						y = bounds.Bottom - Lines.Count + line;
+					}
+					break;
+				default:
+					throw new ArgumentOutOfRangeException ();
+				}
+
+				var start = isVertical ? bounds.Top : bounds.Left;
+				var size = isVertical ? bounds.Height : bounds.Width;
+
+				var current = start;
+				for (var idx = start; idx < start + size; idx++) {
 					var rune = (Rune)' ';
-					if (idx >= x && idx < (x + runes.Length)) {
-						rune = runes [idx - x];
+					if (isVertical) {
+						Application.Driver?.Move (x, current);
+						if (idx >= y && idx < (y + runes.Length)) {
+							rune = runes [idx - y];
+						}
+					} else {
+						Application.Driver?.Move (current, y);
+						if (idx >= x && idx < (x + runes.Length)) {
+							rune = runes [idx - x];
+						}
 					}
 					if ((rune & HotKeyTagMask) == HotKeyTagMask) {
-						if (textAlignment == TextAlignment.Justified) {
-							CursorPosition = idx - bounds.Left;
+						if ((isVertical && textVerticalAlignment == VerticalTextAlignment.Justified) ||
+						    (!isVertical && textAlignment == TextAlignment.Justified)) {
+							CursorPosition = idx - start;
 						}
 						Application.Driver?.SetAttribute (hotColor);
 						Application.Driver?.AddRune ((Rune)((uint)rune & ~HotKeyTagMask));
@@ -624,8 +882,8 @@ namespace Terminal.Gui {
 					} else {
 						Application.Driver?.AddRune (rune);
 					}
-					col += Rune.ColumnWidth (rune);
-					if (idx + 1 < runes.Length && col + Rune.ColumnWidth (runes [idx + 1]) > bounds.Width) {
+					current += Rune.ColumnWidth (rune);
+					if (idx + 1 < runes.Length && current + Rune.ColumnWidth (runes [idx + 1]) > size) {
 						break;
 					}
 				}
