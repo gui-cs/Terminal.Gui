@@ -2153,14 +2153,17 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="desiredWidth">The desired width.</param>
 		/// <param name="resultWidth">The real result width.</param>
+		/// <param name="currentWidth">The real current width.</param>
 		/// <returns>True if the width can be directly assigned, false otherwise.</returns>
-		public bool SetWidth (int desiredWidth, out int resultWidth)
+		public bool SetWidth (int desiredWidth, out int resultWidth, out int currentWidth)
 		{
 			int w = desiredWidth;
+			currentWidth = Width != null ? Width.Anchor (0) : 0;
 			bool canSetWidth;
 			if (Width is Dim.DimCombine || Width is Dim.DimView || Width is Dim.DimFill) {
 				// It's a Dim.DimCombine and so can't be assigned. Let it have it's width anchored.
 				w = Width.Anchor (w);
+				currentWidth = Width.Anchor (w);
 				canSetWidth = false;
 			} else if (Width is Dim.DimFactor factor) {
 				// Tries to get the SuperView width otherwise the view width.
@@ -2169,6 +2172,7 @@ namespace Terminal.Gui {
 					sw -= Frame.X;
 				}
 				w = Width.Anchor (sw);
+				currentWidth = Width.Anchor (sw);
 				canSetWidth = false;
 			} else {
 				canSetWidth = true;
@@ -2183,14 +2187,17 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="desiredHeight">The desired height.</param>
 		/// <param name="resultHeight">The real result height.</param>
+		/// <param name="currentHeight">The real current height.</param>
 		/// <returns>True if the height can be directly assigned, false otherwise.</returns>
-		public bool SetHeight (int desiredHeight, out int resultHeight)
+		public bool SetHeight (int desiredHeight, out int resultHeight, out int currentHeight)
 		{
 			int h = desiredHeight;
+			currentHeight = Height != null ? Height.Anchor (0) : 0;
 			bool canSetHeight;
 			if (Height is Dim.DimCombine || Height is Dim.DimView || Height is Dim.DimFill) {
 				// It's a Dim.DimCombine and so can't be assigned. Let it have it's height anchored.
 				h = Height.Anchor (h);
+				currentHeight = Height.Anchor (h);
 				canSetHeight = false;
 			} else if (Height is Dim.DimFactor factor) {
 				// Tries to get the SuperView height otherwise the view height.
@@ -2199,6 +2206,7 @@ namespace Terminal.Gui {
 					sh -= Frame.Y;
 				}
 				h = Height.Anchor (sh);
+				currentHeight = Height.Anchor (sh);
 				canSetHeight = false;
 			} else {
 				canSetHeight = true;

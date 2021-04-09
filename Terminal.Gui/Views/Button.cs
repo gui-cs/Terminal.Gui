@@ -146,10 +146,12 @@ namespace Terminal.Gui {
 				base.Text = ustring.Make (_leftBracket) + " " + text + " " + ustring.Make (_rightBracket);
 
 			int w = base.Text.RuneCount - (base.Text.Contains (HotKeySpecifier) ? 1 : 0);
-			var canSetWidth = SetWidth (w, out int rWidth);
-			if (canSetWidth && (AutoSize || Width.Anchor (0) < rWidth)) {
+			var canSetWidth = SetWidth (w, out int rWidth, out int cWidth);
+			if (canSetWidth && (cWidth < rWidth || AutoSize)) {
 				Width = rWidth;
 				w = rWidth;
+			} else if (!canSetWidth || !AutoSize) {
+				w = cWidth;
 			}
 			var layout = LayoutStyle;
 			bool layoutChanged = false;

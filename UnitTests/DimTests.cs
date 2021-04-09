@@ -483,6 +483,10 @@ namespace Terminal.Gui {
 				Assert.Equal (1, v3.Frame.Height); // 1 because is Dim.DimAbsolute
 
 				v4.Text = "Button4";
+				v4.AutoSize = false;
+				Assert.Equal ("Dim.Absolute(50)", v4.Width.ToString ());
+				Assert.Equal ("Dim.Absolute(1)", v4.Height.ToString ());
+				v4.AutoSize = true;
 				Assert.Equal ("Dim.Absolute(11)", v4.Width.ToString ());
 				Assert.Equal ("Dim.Absolute(1)", v4.Height.ToString ());
 				Assert.Equal (11, v4.Frame.Width); // 11 is the text length and because is Dim.DimAbsolute
