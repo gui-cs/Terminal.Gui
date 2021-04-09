@@ -550,13 +550,13 @@ namespace Terminal.Gui {
 			/// Optional text that describes the bar.  This can be added as a label on the axis by setting
 			/// <see cref="Axis.LabelGetter"/> = <see cref="BarSeries.GetLabelText(AxisIncrementToRender)"/>
 			/// </summary>
-			public string Text { get; }
+			public string Text { get; set;}
 
 			/// <summary>
 			/// The color and character that will be rendered in the console
 			/// when the bar extends over it
 			/// </summary>
-			public GraphCellToRender Fill { get; }
+			public GraphCellToRender Fill { get; set;}
 
 			/// <summary>
 			/// Allows you to control the color of the bar at a given graph location.  This

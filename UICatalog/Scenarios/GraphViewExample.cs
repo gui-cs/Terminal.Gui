@@ -262,28 +262,29 @@ namespace UICatalog.Scenarios {
 			graphView.Reset();
 
 			about.Text = "This graph shows the life expectancy at birth of a range of countries";
-
-			var stiple = new GraphCellToRender(Application.Driver.Stipple);
+			
+			var softStiple = new GraphCellToRender('\u2591');
+			var mediumStiple = new GraphCellToRender('\u2592');
 
 			var barSeries = new BarSeries () {
 				Bars = new List<BarSeries.Bar> () {
-					new BarSeries.Bar ("Switzerland", stiple, 83.4M),
-					new BarSeries.Bar ("South Korea", stiple, 83.3M),
-					new BarSeries.Bar ("Singapore", stiple, 83.2M),
-					new BarSeries.Bar ("Spain", stiple, 83.2M),
-					new BarSeries.Bar ("Cyprus", stiple, 83.1M),
-					new BarSeries.Bar ("Australia", stiple, 83),
-					new BarSeries.Bar ("Italy", stiple, 83),
-					new BarSeries.Bar ("Norway", stiple, 83),
-					new BarSeries.Bar ("Israel", stiple, 82.6M),
-					new BarSeries.Bar ("France", stiple, 82.5M),
-					new BarSeries.Bar ("Luxembourg", stiple, 82.4M),
-					new BarSeries.Bar ("Sweden", stiple, 82.4M),
-					new BarSeries.Bar ("Iceland", stiple, 82.3M),
-					new BarSeries.Bar ("Canada", stiple, 82.2M),
-					new BarSeries.Bar ("New Zealand", stiple, 82),
-					new BarSeries.Bar ("Malta", stiple, 81.9M),
-					new BarSeries.Bar ("Ireland", stiple, 81.8M)
+					new BarSeries.Bar ("Switzerland", softStiple, 83.4M),
+					new BarSeries.Bar ("South Korea", !verticalBars?mediumStiple:softStiple, 83.3M),
+					new BarSeries.Bar ("Singapore", softStiple, 83.2M),
+					new BarSeries.Bar ("Spain", !verticalBars?mediumStiple:softStiple, 83.2M),
+					new BarSeries.Bar ("Cyprus", softStiple, 83.1M),
+					new BarSeries.Bar ("Australia", !verticalBars?mediumStiple:softStiple, 83),
+					new BarSeries.Bar ("Italy", softStiple, 83),
+					new BarSeries.Bar ("Norway", !verticalBars?mediumStiple:softStiple, 83),
+					new BarSeries.Bar ("Israel", softStiple, 82.6M),
+					new BarSeries.Bar ("France", !verticalBars?mediumStiple:softStiple, 82.5M),
+					new BarSeries.Bar ("Luxembourg", softStiple, 82.4M),
+					new BarSeries.Bar ("Sweden", !verticalBars?mediumStiple:softStiple, 82.4M),
+					new BarSeries.Bar ("Iceland", softStiple, 82.3M),
+					new BarSeries.Bar ("Canada", !verticalBars?mediumStiple:softStiple, 82.2M),
+					new BarSeries.Bar ("New Zealand", softStiple, 82),
+					new BarSeries.Bar ("Malta", !verticalBars?mediumStiple:softStiple, 81.9M),
+					new BarSeries.Bar ("Ireland", softStiple, 81.8M)
 				}
 			};
 
@@ -316,7 +317,7 @@ namespace UICatalog.Scenarios {
 				barSeries.Orientation = Orientation.Horizontal;
 
 				// How much graph space each cell of the console depicts
-				graphView.CellSize = new PointD (0.1M,0.5M);
+				graphView.CellSize = new PointD (0.1M,1M);
 				graphView.AxisY.Increment = 1M;
 				graphView.AxisY.ShowLabelsEvery = 1;
 				graphView.AxisY.LabelGetter = v => barSeries.GetLabelText (v);
@@ -453,6 +454,16 @@ namespace UICatalog.Scenarios {
 					new BarSeries.Bar("100+",stiple,12818)
 				}
 			};
+
+
+			var softStiple = new GraphCellToRender('\u2591');
+			var mediumStiple = new GraphCellToRender('\u2592');
+			
+			for(int i=0;i<malesSeries.Bars.Count;i++){
+				malesSeries.Bars[i].Fill = i%2 == 0 ?softStiple:mediumStiple;
+				femalesSeries.Bars[i].Fill = i%2 == 0 ?softStiple:mediumStiple;
+			}
+			
 			graphView.Series.Add (femalesSeries);
 
 			graphView.AxisY.LabelGetter = (v)=>femalesSeries.GetLabelText(v);
@@ -590,6 +601,9 @@ namespace UICatalog.Scenarios {
 				graphView.CellSize.X * factor,
 				graphView.CellSize.Y * factor
 			);
+
+			graphView.AxisX.Increment *= factor;
+			graphView.AxisY.Increment *= factor;
 
 			graphView.SetNeedsDisplay ();
 		}
