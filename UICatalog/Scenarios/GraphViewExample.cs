@@ -123,7 +123,13 @@ namespace UICatalog.Scenarios {
 			graphView.SetNeedsDisplay ();
 
 			graphView.MarginLeft = 3;
+			graphView.MarginBottom = 1;
+
 			graphView.AxisY.LabelGetter = (v)=>'$' + (v.GraphSpace.Y /1000M).ToString("N0") + 'k';
+
+			graphView.AxisX.Increment = 1;
+			graphView.AxisX.ShowLabelsEvery = 1;
+			graphView.AxisX.LabelGetter = (v)=>series.SubSeries.First().GetLabelText(v);
 		}
 
 		private void SetupLineGraph ()

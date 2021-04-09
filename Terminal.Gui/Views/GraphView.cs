@@ -389,7 +389,7 @@ namespace Terminal.Gui {
 			}
 			
 			for (int i = 0; i < values.Length; i++) {
-				subSeries [i].Bars.Add(new BarSeries.Bar(null,
+				subSeries [i].Bars.Add(new BarSeries.Bar(label,
 					new GraphCellToRender(fill),values[i]));
 			}
 		}
