@@ -61,7 +61,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The color of the background of the graph and axis/labels
 		/// </summary>
-		public Attribute? Color { get; set; }
+		public Attribute? GraphColor { get; set; }
 
 		/// <summary>
 		/// Creates a new graph with a 1 to 1 graph space with absolute layout
@@ -85,14 +85,14 @@ namespace Terminal.Gui {
 			AxisX.Reset();
 		 	AxisY.Reset();
 			Series.Clear();
-			Color = null;
+			GraphColor = null;
 			SetNeedsDisplay();
 		}
 
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			Driver.SetAttribute (Color ??ColorScheme.Normal);
+			Driver.SetAttribute (GraphColor ??ColorScheme.Normal);
 
 			Move (0, 0);
 
@@ -313,6 +313,87 @@ namespace Terminal.Gui {
 
 
 	/// <summary>
+	/// Collection of <see cref="BarSeries"/> in which bars are clustered by category
+	/// </summary>
+	public class MultiBarSeries :ISeries{
+
+		BarSeries [] subSeries;
+
+		/// <summary>
+		/// Sub collections.  Each series contains the bars for a different category.  Thus 
+		/// SubSeries[0].Bars[0] is the first bar on the axis and SubSeries[1].Bars[0] is the
+		/// second etc
+		/// </summary>
+		public IReadOnlyCollection<BarSeries> SubSeries { get => new ReadOnlyCollection<BarSeries> (subSeries); }
+
+		/// <summary>
+		/// The number of units of graph space between bars.  Should be 
+		/// less than <see cref="BarSeries.BarEvery"/>
+		/// </summary>
+		public decimal Spacing { get; }
+
+		/// <summary>
+		/// Creates a new series of clustered bars.
+		/// </summary>
+		/// <param name="numberOfBarsPerCategory">Each category has this many bars</param>
+		/// <param name="barsEvery">How far appart to put each category (in graph space)</param>
+		/// <param name="spacing">How much spacing between bars in a category (should be less than <paramref name="barsEvery"/>/<paramref name="numberOfBars"/>)</param>
+		public MultiBarSeries (int numberOfBarsPerCategory, decimal barsEvery, decimal spacing, Attribute[] colors = null)
+		{
+			subSeries = new BarSeries [numberOfBarsPerCategory];
+
+			for(int i = 0; i < numberOfBarsPerCategory; i++) {
+				subSeries [i] = new BarSeries ();
+				subSeries [i].BarEvery = barsEvery;
+				subSeries [i].Offset = i * spacing;
+
+				if(colors != null) {
+					subSeries [i].OverrideBarColor = colors [i];
+				}
+			}
+			Spacing = spacing;
+		}
+
+		/// <summary>
+		/// Adds a new cluster of bars
+		/// </summary>
+		/// <param name="label"></param>
+		/// <param name="fill"></param>
+		/// <param name="values">Values for each bar in category, must match the number of bars per category</param>
+		public void AddBars (string label,Rune fill, params decimal[] values)
+		{
+			if(values.Length != subSeries.Length) {
+				throw new ArgumentException ("Number of values must match the number of bars per category", nameof (values));
+			}
+			
+			for (int i = 0; i < values.Length; i++) {
+				subSeries [i].Bars.Add(new BarSeries.Bar(null,
+					new GraphCellToRender(fill),values[i]));
+			}
+		}
+
+		/// <summary>
+		/// Iterates over each <see cref="SubSeries"/> bar and returns the first
+		/// that wants to render in the given graph space
+		/// </summary>
+		/// <param name="graphSpace"></param>
+		/// <returns></returns>
+		public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
+		{
+			foreach(var bar in subSeries) {
+
+				var cell = bar.GetCellValueIfAny (graphSpace);
+
+				if(cell != null) {
+					return cell;
+				}
+			}
+
+			return null;
+		}
+	}
+
+	/// <summary>
 	/// Series of bars positioned at regular intervals
 	/// </summary>
 	public class BarSeries : ISeries {
@@ -320,7 +401,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Ordered collection of graph bars to position along axis
 		/// </summary>
-		public List<Bar> Bars {get;set;}
+		public List<Bar> Bars { get; set; } = new List<Bar> ();
 
 		/// <summary>
 		/// Determines the spacing of bars along the axis. Defaults to 1 i.e. 
@@ -334,7 +415,19 @@ namespace Terminal.Gui {
 		/// Defaults to vertical
 		/// </summary>
 		public Orientation Orientation { get; set; } = Orientation.Vertical;
-		
+
+		/// <summary>
+		/// The number of units of graph space along the axis before rendering the first bar
+		/// (and subsequent bars - see <see cref="BarEvery"/>).  Defaults to 0
+		/// </summary>
+		public decimal Offset { get; internal set; } = 0;
+
+		/// <summary>
+		/// Overrides the <see cref="Bar.Fill"/> and <see cref="Bar.ColorGetter"/>
+		/// with a fixed color
+		/// </summary>
+		public Attribute? OverrideBarColor { get; internal set; }
+
 		/// <summary>
 		/// Returns the <see cref="Bar.Fill"/> of the first bar that extends over
 		/// the <paramref name="graphSpace"/> specified
@@ -357,18 +450,32 @@ namespace Terminal.Gui {
 
 				// fill above (up to 0)
 				if (bar.Value <= toBeat && toBeat < 0) {
-					return bar.GetFinalFill(graphSpace);
+					return ApplyColor(bar.GetFinalFill(graphSpace));
 				}
 			}
 			else {
 				// and the bar is at least this high / wide
 				if (bar.Value >= toBeat && toBeat > 0) {
 
-					return bar.GetFinalFill (graphSpace);
+					return ApplyColor(bar.GetFinalFill (graphSpace));
 				}
 
 			}
 			return null;
+		}
+
+		/// <summary>
+		/// Applies any color overriding
+		/// </summary>
+		/// <param name="graphCellToRender"></param>
+		/// <returns></returns>
+		protected virtual GraphCellToRender ApplyColor (GraphCellToRender graphCellToRender)
+		{
+			if(OverrideBarColor.HasValue) {
+				graphCellToRender.Color = OverrideBarColor;
+			}
+
+			return graphCellToRender;
 		}
 
 		/// <summary>
@@ -386,6 +493,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < Bars.Count; i++) {
 
 				decimal barPosition = (i + 1) * BarEvery;
+				barPosition += Offset;
 
 				// the x/y position that the cell would have to be between for the bar to be rendered
 				var low = Orientation == Orientation.Vertical ? graphSpace.X : graphSpace.Y;

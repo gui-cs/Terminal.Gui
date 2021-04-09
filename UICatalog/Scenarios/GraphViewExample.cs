@@ -33,7 +33,8 @@ namespace UICatalog.Scenarios {
 				 ()=>SetupPopulationPyramid(),          //3
 				 ()=>SetupLineGraph(),                  //4
 				 ()=>SetupSineWave(),                   //5
-				 ()=>SetupDisco()                       //6
+				 ()=>SetupDisco(),                      //6
+				 ()=>MultiBarGraph()                    //7
 			};
 
 
@@ -46,6 +47,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Line Graph","",()=>graphs[currentGraph = 4]()),
 					new MenuItem ("Sine _Wave","",()=>graphs[currentGraph = 5]()),
 					new MenuItem ("Silent _Disco","",()=>graphs[currentGraph = 6]()),
+					new MenuItem ("_Multi Bar Graph","",()=>graphs[currentGraph = 7]()),
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
@@ -90,20 +92,49 @@ namespace UICatalog.Scenarios {
 			Top.Add (statusBar);
 		}
 
+		private void MultiBarGraph ()
+		{
+			graphView.Reset ();
+
+			about.Text = "Housing Expenditures by income thirds 1996-2003";
+
+			var black = Application.Driver.MakeAttribute (graphView.ColorScheme.Normal.Foreground, Color.Black);
+			var cyan = Application.Driver.MakeAttribute (Color.BrightCyan, Color.Black);
+			var magenta = Application.Driver.MakeAttribute (Color.BrightMagenta, Color.Black);
+			var red = Application.Driver.MakeAttribute (Color.BrightRed, Color.Black);
+
+			graphView.GraphColor = black;
+
+			var series = new MultiBarSeries (3, 1, 0.25M, new [] {magenta,cyan,red});
+
+			var stiple = Application.Driver.Stipple;
+
+			series.AddBars("'96", stiple, 5900, 9000, 14000);
+			series.AddBars ("'97", stiple, 6100, 9200, 14800);
+			series.AddBars ("'98", stiple, 6000, 9300, 14600);
+			series.AddBars ("'99", stiple, 6100, 9400, 14950);
+			series.AddBars ("'00", stiple, 6200, 9500, 15200);
+			series.AddBars ("'01", stiple, 6250, 9900, 16000);
+			series.AddBars ("'02", stiple, 6600, 11000, 16700);
+			series.AddBars ("'03", stiple, 7000, 12000, 17000);
+
+			graphView.CellSize = new PointD (0.25M, 1000);
+			graphView.Series.Add (series);
+			graphView.SetNeedsDisplay ();
+		}
 
 		private void SetupLineGraph ()
 		{
 			graphView.Reset ();
 
 			about.Text = "This graph shows random points";
-
-			
+						
 			var black = Application.Driver.MakeAttribute(graphView.ColorScheme.Normal.Foreground, Color.Black);
 			var cyan = Application.Driver.MakeAttribute(Color.BrightCyan, Color.Black);
 			var magenta = Application.Driver.MakeAttribute(Color.BrightMagenta, Color.Black);
 			var red = Application.Driver.MakeAttribute(Color.BrightRed, Color.Black);
 
-			graphView.Color = black;
+			graphView.GraphColor = black;
 
 			List<PointD> randomPoints = new List<PointD> ();
 
@@ -432,7 +463,7 @@ namespace UICatalog.Scenarios {
 
 			about.Text = "This graph shows a graphic equaliser for an imaginary song";
 
-			graphView.Color = Application.Driver.MakeAttribute (Color.White, Color.Black);
+			graphView.GraphColor = Application.Driver.MakeAttribute (Color.White, Color.Black);
 
 			var green = Application.Driver.MakeAttribute (Color.BrightGreen, Color.Black);
 			var brightgreen = Application.Driver.MakeAttribute (Color.Green, Color.Black);
