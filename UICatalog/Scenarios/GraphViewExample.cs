@@ -369,17 +369,17 @@ namespace UICatalog.Scenarios {
 			graphView.CellSize = new PointD (100_000, 1);
 
 			//center the x axis in middle of screen to show both sides
-			graphView.ScrollOffset = new PointD(-2_000_000,0);
+			graphView.ScrollOffset = new PointD(-3_000_000,0);
 
 			graphView.AxisX.Text = "Number Of People";
 			graphView.AxisX.Increment = 500_000;
 			graphView.AxisX.ShowLabelsEvery = 2;
 			
 			// use Abs to make negative axis labels positive
-			graphView.AxisX.LabelGetter = (v)=>Math.Abs(v.GraphSpace.X).ToString("N0");
+			graphView.AxisX.LabelGetter = (v)=>Math.Abs(v.GraphSpace.X/1_000_000).ToString("N2")+"M";
 
 			// leave space for axis labels
-			graphView.MarginBottom = 1;
+			graphView.MarginBottom = 2;
 			graphView.MarginLeft = 1;
 
 			graphView.AxisY.ShowLabelsEvery = 1;
@@ -451,6 +451,8 @@ namespace UICatalog.Scenarios {
 				}
 			};
 			graphView.Series.Add (femalesSeries);
+
+			graphView.AxisY.LabelGetter = (v)=>femalesSeries.GetLabelText(v);
 
 			graphView.SetNeedsDisplay();
 
