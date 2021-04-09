@@ -106,11 +106,11 @@ namespace Terminal.Gui {
 			if (!Series.Any ()) {
 				return;
 			}
-				
 
+			
 			AxisX.DrawAxisLine (Driver, this, Bounds);
 			AxisY.DrawAxisLine (Driver, this, Bounds);
-
+			
 			AxisX.DrawAxisLabels (Driver, this, Bounds);
 			AxisY.DrawAxisLabels (Driver, this, Bounds);
 
@@ -334,7 +334,7 @@ namespace Terminal.Gui {
 		/// Defaults to vertical
 		/// </summary>
 		public Orientation Orientation { get; set; } = Orientation.Vertical;
-
+		
 		/// <summary>
 		/// Returns the <see cref="Bar.Fill"/> of the first bar that extends over
 		/// the <paramref name="graphSpace"/> specified
@@ -357,14 +357,14 @@ namespace Terminal.Gui {
 
 				// fill above (up to 0)
 				if (bar.Value <= toBeat && toBeat < 0) {
-					return bar.Fill;
+					return bar.GetFinalFill(graphSpace);
 				}
 			}
 			else {
 				// and the bar is at least this high / wide
 				if (bar.Value >= toBeat && toBeat > 0) {
 
-					return bar.Fill;
+					return bar.GetFinalFill (graphSpace);
 				}
 
 			}
@@ -429,6 +429,12 @@ namespace Terminal.Gui {
 			public GraphCellToRender Fill { get; }
 
 			/// <summary>
+			/// Allows you to control the color of the bar at a given graph location.  This
+			/// overrides the <see cref="Fill"/>
+			/// </summary>
+			public GraphAttributeGetterDelegate ColorGetter { get; set; }
+
+			/// <summary>
 			/// The value in graph space X/Y (depending on <see cref="Orientation"/>) to which the bar extends.
 			/// </summary>
 			public decimal Value { get; }
@@ -445,6 +451,21 @@ namespace Terminal.Gui {
 				Text = text;
 				Fill = fill;
 				Value = value;
+			}
+
+			/// <summary>
+			/// Returns <see cref="Fill"/> with optional overriding color (see <see cref="ColorGetter"/>)
+			/// </summary>
+			/// <returns></returns>
+			internal GraphCellToRender GetFinalFill (RectangleD graphSpace)
+			{
+				var customColor = ColorGetter?.Invoke (graphSpace);
+
+				if(customColor == null) {
+					return Fill;
+				}
+
+				return new GraphCellToRender (Fill.Rune, customColor);
 			}
 		}
 	}
@@ -595,7 +616,12 @@ namespace Terminal.Gui {
 		/// 0 = never show labels
 		/// </summary>
 		public uint ShowLabelsEvery { get; set; } = DefaultShowLabelsEvery;
-				
+
+		/// <summary>
+		/// True to render axis.  Defaults to true
+		/// </summary>
+		public bool Visible { get; set; } = true;
+
 		/// <summary>
 		/// Allows you to control what label text is rendered for a given <see cref="Increment"/>
 		/// when <see cref="ShowLabelsEvery"/> is above 0
@@ -641,6 +667,7 @@ namespace Terminal.Gui {
 		{
 			Increment = 1;
 			ShowLabelsEvery = DefaultShowLabelsEvery;
+			Visible = true;
 		}
 	}
 
@@ -678,6 +705,10 @@ namespace Terminal.Gui {
 		/// <param name="bounds"></param>
 		public override void DrawAxisLine (ConsoleDriver driver, GraphView graph, Rect bounds)
 		{
+			if (!Visible) {
+				return;
+			}
+
 			graph.Move (0, 0);
 
 			var y = GetAxisYPosition (graph, bounds);
@@ -694,6 +725,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void DrawAxisLabels (ConsoleDriver driver,GraphView graph,Rect bounds)
 		{
+			if (!Visible) {
+				return;
+			}
+
 			var labels = GetLabels (graph, bounds);
 
 			foreach (var label in labels) {
@@ -745,6 +780,11 @@ namespace Terminal.Gui {
 
 		private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph, Rect bounds)
 		{
+			// if no labels
+			if(Increment == 0) {
+				yield break;
+			}
+
 			int labels = 0;
 			int y = GetAxisYPosition (graph, bounds);
 			
@@ -831,6 +871,10 @@ namespace Terminal.Gui {
 		/// <param name="bounds"></param>
 		public override void DrawAxisLine (ConsoleDriver driver, GraphView graph, Rect bounds)
 		{
+			if (!Visible) {
+				return;
+			}
+
 			var x = GetAxisXPosition (graph, bounds);
 
 			// Draw solid line
@@ -849,6 +893,10 @@ namespace Terminal.Gui {
 		/// <param name="bounds"></param>
 		public override void DrawAxisLabels (ConsoleDriver driver, GraphView graph, Rect bounds)
 		{
+			if (!Visible) {
+				return;
+			}
+
 			var x = GetAxisXPosition (graph, bounds);
 			var labels = GetLabels(graph,bounds);
 			var labelThickness = GetLabelThickness (labels);
@@ -891,6 +939,11 @@ namespace Terminal.Gui {
 
 		private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph,Rect bounds)
 		{
+			// if no labels
+			if (Increment == 0) {
+				yield break;
+			}
+
 			int labels = 0;
 
 			int x = GetAxisXPosition (graph, bounds);
@@ -1299,6 +1352,12 @@ namespace Terminal.Gui {
 	/// <returns></returns>
 	public delegate string LabelGetterDelegate (AxisIncrementToRender toRender);
 
+	/// <summary>
+	/// Determines what color (if non default) should be used to render a graph element at the given location
+	/// </summary>
+	/// <param name="graphLocation">The section of graph space which this screen cell represents</param>
+	/// <returns></returns>
+	public delegate Attribute? GraphAttributeGetterDelegate (RectangleD graphLocation);
 
 	/// <summary>
 	/// Direction of an element (horizontal or vertical)

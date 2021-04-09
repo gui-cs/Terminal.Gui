@@ -25,12 +25,13 @@ namespace UICatalog.Scenarios {
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_Open Scatter Plot", "", () => SetupPeriodicTableScatterPlot()),
-					new MenuItem ("_Open V Bar Graph", "", () => SetupLifeExpectancyBarGraph(true)),
-					new MenuItem ("_Open H Bar Graph", "", () => SetupLifeExpectancyBarGraph(false)),
-					new MenuItem ("Open Population Pyramid","",()=>SetupPopulationPyramid()),
-					new MenuItem ("Open Line Graph","",()=>SetupLineGraph()),
-					new MenuItem ("Open Sine Wave","",()=>SetupSineWave()),
+					new MenuItem ("Scatter _Plot", "", () => SetupPeriodicTableScatterPlot()),
+					new MenuItem ("_V Bar Graph", "", () => SetupLifeExpectancyBarGraph(true)),
+					new MenuItem ("_H Bar Graph", "", () => SetupLifeExpectancyBarGraph(false)),
+					new MenuItem ("P_opulation Pyramid","",()=>SetupPopulationPyramid()),
+					new MenuItem ("_Line Graph","",()=>SetupLineGraph()),
+					new MenuItem ("Sine _Wave","",()=>SetupSineWave()),
+					new MenuItem ("Silent _Disco","",()=>SetupDisco()),
 
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
@@ -74,6 +75,7 @@ namespace UICatalog.Scenarios {
 			});
 			Top.Add (statusBar);
 		}
+
 
 		private void SetupLineGraph ()
 		{
@@ -142,7 +144,6 @@ namespace UICatalog.Scenarios {
 			graphView.Reset ();
 
 			about.Text = "This graph shows a sine wave";
-
 
 			var lineSeries = new LineSeries ();
 
@@ -408,6 +409,79 @@ namespace UICatalog.Scenarios {
 
 			graphView.SetNeedsDisplay();
 
+		}
+
+
+		private void SetupDisco ()
+		{
+			graphView.Reset ();
+
+			about.Text = "This graph shows a graphic equaliser for an imaginary song";
+
+			graphView.Color = Application.Driver.MakeAttribute (Color.White, Color.Black);
+
+			var green = Application.Driver.MakeAttribute (Color.BrightGreen, Color.Black);
+			var brightgreen = Application.Driver.MakeAttribute (Color.Green, Color.Black);
+			var brightyellow = Application.Driver.MakeAttribute (Color.BrightYellow, Color.Black);
+			var red = Application.Driver.MakeAttribute (Color.Red, Color.Black);
+			var brightred = Application.Driver.MakeAttribute (Color.BrightRed, Color.Black);
+
+			var colorDelegate = new GraphAttributeGetterDelegate (
+				(g) => {
+					if (g.Top >= 85M) {
+						return red;
+					}
+					if (g.Top >= 66M) {
+						return brightred;
+					}
+					if (g.Top >= 45M) {
+						return brightyellow;
+					}
+					if (g.Top >= 25M) {
+						return brightgreen;
+					}
+
+					return green;
+				}
+				);
+
+			var stiple = new GraphCellToRender ('\u2593');
+
+			Random r = new Random ();
+			var series = new BarSeries ();
+			var bars = new List<BarSeries.Bar> ();
+
+			Func<MainLoop,bool> genSample = (l) => {
+
+				bars.Clear ();
+				// generate an imaginary sample
+				for (int i = 0; i < 31; i++) {
+					bars.Add (
+						new BarSeries.Bar (null, stiple, r.Next (0, 100)) {
+							ColorGetter = colorDelegate
+						});
+				}
+				graphView.SetNeedsDisplay ();
+				
+
+				// while the equaliser is showing
+				return graphView.Series.Contains (series);
+			};
+
+			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds(250),genSample);
+
+			series.Bars = bars;
+
+			graphView.Series.Add (series);
+
+			// How much graph space each cell of the console depicts
+			graphView.CellSize = new PointD (1, 10);
+			graphView.AxisX.Increment = 0; // No graph ticks
+			graphView.AxisX.ShowLabelsEvery = 0; // no labels
+
+			graphView.AxisY.Visible = false;
+
+			graphView.SetNeedsDisplay ();
 		}
 		private void SetupPeriodicTableScatterPlot ()
 		{
