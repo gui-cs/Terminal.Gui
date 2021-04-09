@@ -889,7 +889,7 @@ namespace Terminal.Gui {
 						toRender = toRender.Substring (0, xSpaceAvailable);
 					}
 
-					graph.Move (drawAtX,label.ScreenLocation.Y + 1);
+					graph.Move (drawAtX,Math.Min(label.ScreenLocation.Y + 1,bounds.Height-1));
 					driver.AddStr (toRender);
 				}
 			}
