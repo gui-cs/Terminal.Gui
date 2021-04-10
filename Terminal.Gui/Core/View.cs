@@ -8,7 +8,7 @@
 //   - "Colors" type or "Attributes" type?
 //   - What to surface as "BackgroundCOlor" when clearing a window, an attribute or colors?
 //
-// Optimziations
+// Optimizations
 //   - Add rendering limitation to the exposed area
 using System;
 using System.Collections;
@@ -47,9 +47,9 @@ namespace Terminal.Gui {
 	/// </para>
 	/// <para>
 	///    Views supports two layout styles: Absolute or Computed. The choice as to which layout style is used by the View 
-	///    is determined when the View is initizlied. To create a View using Absolute layout, call a constructor that takes a
+	///    is determined when the View is initialized. To create a View using Absolute layout, call a constructor that takes a
 	///    Rect parameter to specify the absolute position and size (the <c>View.<see cref="Frame "/></c>)/. To create a View 
-	///    using Computed layout use a constructor that does not take a Rect parametr and set the X, Y, Width and Height 
+	///    using Computed layout use a constructor that does not take a Rect parameter and set the X, Y, Width and Height 
 	///    properties on the view. Both approaches use coordinates that are relative to the container they are being added to. 
 	/// </para>
 	/// <para>
@@ -69,7 +69,7 @@ namespace Terminal.Gui {
 	/// </para>
 	/// <para>
 	///    Absolute layout requires specifying coordinates and sizes of Views explicitly, and the
-	///    View will typcialy stay in a fixed position and size. To change the position and size use the
+	///    View will typically stay in a fixed position and size. To change the position and size use the
 	///    <see cref="Frame"/> property.
 	/// </para>
 	/// <para>
@@ -463,7 +463,7 @@ namespace Terminal.Gui {
 		Pos x, y;
 
 		/// <summary>
-		/// Gets or sets the X position for the view (the column). Only used whe <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
+		/// Gets or sets the X position for the view (the column). Only used the <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The X Position.</value>
 		/// <remarks>
@@ -483,7 +483,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the Y position for the view (the row). Only used whe <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
+		/// Gets or sets the Y position for the view (the row). Only used the <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The y position (line).</value>
 		/// <remarks>
@@ -505,7 +505,7 @@ namespace Terminal.Gui {
 		Dim width, height;
 
 		/// <summary>
-		/// Gets or sets the width of the view. Only used whe <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
+		/// Gets or sets the width of the view. Only used the <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The width.</value>
 		/// <remarks>
@@ -525,7 +525,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the height of the view. Only used whe <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
+		/// Gets or sets the height of the view. Only used the <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/>.
 		/// </summary>
 		/// <value>The height.</value>
 		/// If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
@@ -567,18 +567,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="frame">The region covered by this view.</param>
 		/// <remarks>
-		/// This constructor intitalize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use <see cref="View()"/> to 
+		/// This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>. Use <see cref="View()"/> to 
 		/// initialize a View with  <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/> 
 		/// </remarks>
 		public View (Rect frame)
 		{
-			textFormatter = new TextFormatter ();
-			this.Text = ustring.Empty;
-
-			shortcutHelper = new ShortcutHelper ();
-
-			this.Frame = frame;
-			LayoutStyle = LayoutStyle.Absolute;
+			Initialize (ustring.Empty, frame, LayoutStyle.Absolute);
 		}
 
 		/// <summary>
@@ -595,12 +589,11 @@ namespace Terminal.Gui {
 		///   If <c>Height</c> is greater than one, word wrapping is provided.
 		/// </para>
 		/// <para>
-		///   This constructor intitalize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
+		///   This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Computed"/>. 
 		///   Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically control the size and location of the view.
 		/// </para>
 		/// </remarks>
 		public View () : this (text: string.Empty) { }
-
 
 		/// <summary>
 		///   Initializes a new instance of <see cref="View"/> using <see cref="LayoutStyle.Absolute"/> layout.
@@ -635,12 +628,9 @@ namespace Terminal.Gui {
 		/// </remarks>
 		/// <param name="rect">Location.</param>
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
-		public View (Rect rect, ustring text) : this (rect)
+		public View (Rect rect, ustring text)
 		{
-			textFormatter = new TextFormatter ();
-			this.Text = text;
-
-			shortcutHelper = new ShortcutHelper ();
+			Initialize (text, rect, LayoutStyle.Absolute);
 		}
 
 		/// <summary>
@@ -659,6 +649,11 @@ namespace Terminal.Gui {
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
 		public View (ustring text)
 		{
+			Initialize (text, Rect.Empty);
+		}
+
+		void Initialize (ustring text, Rect rect, LayoutStyle layoutStyle = LayoutStyle.Computed)
+		{
 			textFormatter = new TextFormatter ();
 			Text = text;
 
@@ -667,13 +662,20 @@ namespace Terminal.Gui {
 			CanFocus = false;
 			TabIndex = -1;
 			TabStop = false;
-			LayoutStyle = LayoutStyle.Computed;
+			LayoutStyle = layoutStyle;
 			// BUGBUG: CalcRect doesn't account for line wrapping
-			var r = TextFormatter.CalcRect (0, 0, text);
-			x = Pos.At (0);
-			y = Pos.At (0);
+			Rect r;
+			if (rect.IsEmpty) {
+				r = TextFormatter.CalcRect (0, 0, text);
+			} else {
+				r = rect;
+			}
+			x = Pos.At (r.X);
+			y = Pos.At (r.Y);
 			Width = r.Width;
 			Height = r.Height;
+
+			Frame = r;
 		}
 
 		/// <summary>
@@ -1022,7 +1024,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Sets the <see cref="ConsoleDriver"/>'s clip region to the current View's <see cref="Bounds"/>.
 		/// </summary>
-		/// <returns>The existing driver's clip region, which can be then re-eapplied by setting <c><see cref="Driver"/>.Clip</c> (<see cref="ConsoleDriver.Clip"/>).</returns>
+		/// <returns>The existing driver's clip region, which can be then re-applied by setting <c><see cref="Driver"/>.Clip</c> (<see cref="ConsoleDriver.Clip"/>).</returns>
 		/// <remarks>
 		/// <see cref="Bounds"/> is View-relative.
 		/// </remarks>
@@ -1084,7 +1086,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Utility function to draw strings that contains a hotkey using a <see cref="ColorScheme"/> and the "focused" state.
 		/// </summary>
-		/// <param name="text">String to display, the underscoore before a letter flags the next letter as the hotkey.</param>
+		/// <param name="text">String to display, the underscore before a letter flags the next letter as the hotkey.</param>
 		/// <param name="focused">If set to <c>true</c> this uses the focused colors from the color scheme, otherwise the regular ones.</param>
 		/// <param name="scheme">The color scheme to use.</param>
 		public void DrawHotString (ustring text, bool focused, ColorScheme scheme)
@@ -2105,7 +2107,6 @@ namespace Terminal.Gui {
 				return true;
 			if (MouseEvent (mouseEvent))
 				return true;
-
 
 			if (mouseEvent.Flags == MouseFlags.Button1Clicked) {
 				if (CanFocus && !HasFocus && SuperView != null) {
