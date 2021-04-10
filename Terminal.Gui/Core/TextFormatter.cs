@@ -63,7 +63,6 @@ namespace Terminal.Gui {
 	/// RightLeft_BottomTop [H] Invert Text + Invert Lines
 	/// BottomTop_RightLeft [V] Invert Text + Invert Lines
 	///
-	/// BAD: JUSTIFY does not work well with those who invert.
 	/// <summary>
 	/// Text direction enumeration, controls how text is displayed.
 	/// </summary>
@@ -203,6 +202,33 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Check if it is Left to Right direction
+		/// </summary>
+		public static bool IsLeftToRight (TextDirection textDirection)
+		{
+			switch (textDirection) {
+			case TextDirection.LeftRight_TopBottom:
+			case TextDirection.LeftRight_BottomTop:
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Check if it is Top to Bottom direction
+		/// </summary>
+		public static bool IsTopToBottom (TextDirection textDirection)
+		{
+			switch (textDirection) {
+			case TextDirection.TopBottom_LeftRight:
+			case TextDirection.TopBottom_RightLeft:
+				return true;
+			default:
+				return false;
+			}
+		}
 
 		/// <summary>
 		///  Gets or sets the size of the area the text will be constrained to when formatted.
@@ -790,20 +816,11 @@ namespace Terminal.Gui {
 					break;
 				}
 
+				// When text is justified, we lost left or right, so we use the direction to align. 
 
 				int x, y;
 				// Horizontal Alignment
-				switch (textAlignment) {
-				case TextAlignment.Left:
-				case TextAlignment.Justified:
-					if (isVertical) {
-						x = bounds.Left + line;
-					} else {
-						x = bounds.Left;
-					}
-					CursorPosition = hotKeyPos;
-					break;
-				case TextAlignment.Right:
+				if (textAlignment == TextAlignment.Right || (textAlignment == TextAlignment.Justified && !IsLeftToRight (textDirection))) {
 					if (isVertical) {
 						x = bounds.Right - Lines.Count + line;
 						CursorPosition = bounds.Width - Lines.Count + hotKeyPos;
@@ -811,8 +828,14 @@ namespace Terminal.Gui {
 						x = bounds.Right - runes.Length;
 						CursorPosition = bounds.Width - runes.Length + hotKeyPos;
 					}
-					break;
-				case TextAlignment.Centered:
+				} else if (textAlignment == TextAlignment.Left || textAlignment == TextAlignment.Justified) {
+					if (isVertical) {
+						x = bounds.Left + line;
+					} else {
+						x = bounds.Left;
+					}
+					CursorPosition = hotKeyPos;
+				} else if (textAlignment == TextAlignment.Centered) {
 					if (isVertical) {
 						x = bounds.Left + line + ((bounds.Width - Lines.Count) / 2);
 						CursorPosition = (bounds.Width - Lines.Count) / 2 + hotKeyPos;
@@ -820,21 +843,24 @@ namespace Terminal.Gui {
 						x = bounds.Left + (bounds.Width - runes.Length) / 2;
 						CursorPosition = (bounds.Width - runes.Length) / 2 + hotKeyPos;
 					}
-					break;
-				default:
+				} else {
 					throw new ArgumentOutOfRangeException ();
 				}
+
 				// Vertical Alignment
-				switch (textVerticalAlignment) {
-				case VerticalTextAlignment.Justified:
-				case VerticalTextAlignment.Top:
+				if (textVerticalAlignment == VerticalTextAlignment.Bottom || (textVerticalAlignment == VerticalTextAlignment.Justified && !IsTopToBottom (textDirection))) {
+					if (isVertical) {
+						y = bounds.Bottom - runes.Length;
+					} else {
+						y = bounds.Bottom - Lines.Count + line;
+					}
+				} else if (textVerticalAlignment == VerticalTextAlignment.Top || textVerticalAlignment == VerticalTextAlignment.Justified) {
 					if (isVertical) {
 						y = bounds.Top;
 					} else {
 						y = bounds.Top + line;
 					}
-					break;
-				case VerticalTextAlignment.Middle:
+				} else if (textVerticalAlignment == VerticalTextAlignment.Middle) {
 					if (isVertical) {
 						var s = (bounds.Height - runes.Length) / 2;
 						y = bounds.Top + s;
@@ -842,15 +868,7 @@ namespace Terminal.Gui {
 						var s = (bounds.Height - Lines.Count) / 2;
 						y = bounds.Top + line + s;
 					}
-					break;
-				case VerticalTextAlignment.Bottom:
-					if (isVertical) {
-						y = bounds.Bottom - runes.Length;
-					} else {
-						y = bounds.Bottom - Lines.Count + line;
-					}
-					break;
-				default:
+				} else {
 					throw new ArgumentOutOfRangeException ();
 				}
 
