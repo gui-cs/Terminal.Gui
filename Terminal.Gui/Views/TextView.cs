@@ -1356,6 +1356,8 @@ namespace Terminal.Gui {
 				if (!isReadOnly && replace) {
 					ClearSelectedRegion ();
 					InsertText (textToReplace);
+					StartSelecting ();
+					selectionStartColumn = currentColumn - textToReplace.RuneCount;
 				} else {
 					UpdateWrapModel ();
 					SetNeedsDisplay ();
