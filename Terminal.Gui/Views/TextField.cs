@@ -201,7 +201,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			ColorScheme color = Colors.Menu;
+			var selColor = new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground);
 			SetSelectedStartSelectedLength ();
 
 			Driver.SetAttribute (ColorScheme.Focus);
@@ -218,9 +218,9 @@ namespace Terminal.Gui {
 				if (idx == point && HasFocus && !Used && SelectedLength == 0 && !ReadOnly) {
 					Driver.SetAttribute (Colors.Menu.HotFocus);
 				} else if (ReadOnly) {
-					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : roc);
+					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? selColor : roc);
 				} else {
-					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : ColorScheme.Focus);
+					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? selColor : ColorScheme.Focus);
 				}
 				if (col + cols <= width) {
 					Driver.AddRune ((Rune)(Secret ? '*' : rune));
@@ -391,7 +391,7 @@ namespace Terminal.Gui {
 			case Key.CursorUp | Key.ShiftMask | Key.CtrlMask:
 			case (Key)((int)'B' + Key.ShiftMask | Key.AltMask):
 				if (point > 0) {
-					int x = start > -1 && start > point ? start : point;
+					int x = Math.Min (start > -1 && start > point ? start : point, text.Count - 1);
 					if (x > 0) {
 						int sbw = WordBackward (x);
 						if (sbw != -1)
