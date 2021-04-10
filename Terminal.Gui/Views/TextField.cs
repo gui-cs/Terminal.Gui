@@ -838,7 +838,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void Paste ()
 		{
-			if (ReadOnly) {
+			if (ReadOnly || Clipboard.Contents == null) {
 				return;
 			}
 
