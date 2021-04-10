@@ -279,6 +279,147 @@ namespace Terminal.Gui {
 			}
 			return col;
 		}
+
+		(Point startPointToFind, Point currentPointToFind, bool found) toFind;
+
+		internal (Point current, bool found) FindNextText (ustring text, out bool gaveFullTurn, bool matchCase = false)
+		{
+			if (text == null || lines.Count == 0) {
+				gaveFullTurn = false;
+				return (Point.Empty, false);
+			}
+
+			if (toFind.found) {
+				toFind.currentPointToFind.X++;
+			}
+			var foundPos = GetFoundNextTextPoint (text, lines.Count, matchCase, toFind.currentPointToFind);
+			if (!foundPos.found && toFind.currentPointToFind != toFind.startPointToFind) {
+				foundPos = GetFoundNextTextPoint (text, toFind.startPointToFind.Y + 1, matchCase, Point.Empty);
+			}
+			gaveFullTurn = ApplyToFind (foundPos);
+
+			return foundPos;
+		}
+
+		internal (Point current, bool found) FindPreviousText (ustring text, out bool gaveFullTurn, bool matchCase = false)
+		{
+			if (text == null || lines.Count == 0) {
+				gaveFullTurn = false;
+				return (Point.Empty, false);
+			}
+
+			if (toFind.found) {
+				toFind.currentPointToFind.X++;
+			}
+			var foundPos = GetFoundPreviousTextPoint (text, toFind.currentPointToFind.Y, matchCase, toFind.currentPointToFind);
+			if (!foundPos.found && toFind.currentPointToFind != toFind.startPointToFind) {
+				foundPos = GetFoundPreviousTextPoint (text, lines.Count - 1, matchCase,
+					new Point (lines [lines.Count - 1].Count, lines.Count));
+			}
+			gaveFullTurn = ApplyToFind (foundPos);
+
+			return foundPos;
+		}
+
+		internal (Point current, bool found) ReplaceAllText (ustring text, bool matchCase = false, ustring textToReplace = null)
+		{
+			bool found = false;
+			Point pos = Point.Empty;
+
+			for (int i = 0; i < lines.Count; i++) {
+				var x = lines [i];
+				var txt = ustring.Make (x).ToString ();
+				var origTxt = txt;
+				if (!matchCase) {
+					txt = txt.ToUpper ();
+				}
+				var matchText = !matchCase ? text.ToUpper ().ToString () : text.ToString ();
+				var col = txt.IndexOf (matchText);
+				if (!found && col > -1) {
+					found = true;
+				} else if (col > -1) {
+					pos = new Point (col, i);
+				}
+				if (col > -1) {
+					lines [i] = ((ustring)origTxt.Replace (text.ToString (),
+						textToReplace.ToString ())).ToRuneList ();
+				}
+			}
+
+			return (pos, found);
+		}
+
+		bool ApplyToFind ((Point current, bool found) foundPos)
+		{
+			bool gaveFullTurn = false;
+			if (foundPos.found) {
+				toFind.currentPointToFind = foundPos.current;
+				if (toFind.found && toFind.currentPointToFind == toFind.startPointToFind) {
+					gaveFullTurn = true;
+				}
+				if (!toFind.found) {
+					toFind.startPointToFind = toFind.currentPointToFind = foundPos.current;
+					toFind.found = foundPos.found;
+				}
+			}
+
+			return gaveFullTurn;
+		}
+
+		(Point current, bool found) GetFoundNextTextPoint (ustring text, int linesCount, bool matchCase, Point start)
+		{
+			for (int i = start.Y; i < linesCount; i++) {
+				var x = lines [i];
+				var txt = ustring.Make (x).ToString ();
+				if (!matchCase) {
+					txt = txt.ToUpper ();
+				}
+				var matchText = !matchCase ? text.ToUpper ().ToString () : text.ToString ();
+				var col = txt.IndexOf (matchText, Math.Min (start.X, txt.Length));
+				if (col > -1 && ((i == start.Y && col >= start.X)
+					|| i > start.Y)
+					&& txt.Contains (matchText)) {
+					return (new Point (col, i), true);
+				} else if (col == -1 && start.X > 0) {
+					start.X = 0;
+				}
+			}
+
+			return (Point.Empty, false);
+		}
+
+		(Point current, bool found) GetFoundPreviousTextPoint (ustring text, int linesCount, bool matchCase, Point start)
+		{
+			for (int i = linesCount; i >= 0; i--) {
+				var x = lines [i];
+				var txt = ustring.Make (x).ToString ();
+				if (!matchCase) {
+					txt = txt.ToUpper ();
+				}
+				if (start.Y != i) {
+					start.X = Math.Max (x.Count - 1, 0);
+				}
+				var matchText = !matchCase ? text.ToUpper ().ToString () : text.ToString ();
+				var col = txt.LastIndexOf (matchText, start.X);
+				if (col > -1 && ((i == linesCount && col <= start.X)
+					|| i < start.Y)
+					&& txt.Contains (matchText)) {
+					return (new Point (col, i), true);
+				}
+			}
+
+			return (Point.Empty, false);
+		}
+
+		/// <summary>
+		/// Redefine column and line tracking.
+		/// </summary>
+		/// <param name="point">Contains the column and line.</param>
+		internal void ResetContinuousFind (Point point)
+		{
+			toFind.startPointToFind = toFind.currentPointToFind = point;
+			toFind.found = false;
+		}
 	}
 
 	class WordWrapManager {
@@ -648,6 +789,7 @@ namespace Terminal.Gui {
 		//bool used;
 		bool wordWrap;
 		WordWrapManager wrapManager;
+		bool continuousFind;
 
 		/// <summary>
 		/// Raised when the <see cref="Text"/> of the <see cref="TextView"/> changes.
@@ -762,6 +904,61 @@ namespace Terminal.Gui {
 		/// Gets the  number of lines.
 		/// </summary>
 		public int Lines => model.Count;
+
+		/// <summary>
+		///    Sets or gets the current cursor position.
+		/// </summary>
+		public Point CursorPosition {
+			get => new Point (currentColumn, currentRow);
+			set {
+				currentColumn = value.X;
+				currentRow = value.Y;
+				SetNeedsDisplay ();
+				Adjust ();
+			}
+		}
+
+		/// <summary>
+		/// Start column position of the selected text.
+		/// </summary>
+		public int SelectionStartColumn {
+			get => selectionStartColumn;
+			set {
+				selectionStartColumn = value;
+				SetNeedsDisplay ();
+				Adjust ();
+			}
+		}
+
+		/// <summary>
+		/// Start row position of the selected text.
+		/// </summary>
+		public int SelectionStartRow {
+			get => selectionStartRow;
+			set {
+				selectionStartRow = value;
+				SetNeedsDisplay ();
+				Adjust ();
+			}
+		}
+
+		/// <summary>
+		/// The selected text.
+		/// </summary>
+		public ustring SelectedText {
+			get {
+				if (!selecting) {
+					return ustring.Empty;
+				}
+
+				SetWrapModel ();
+				var sel = GetRegion ();
+				UpdateWrapModel ();
+				Adjust ();
+
+				return sel;
+			}
+		}
 
 		/// <summary>
 		/// Allows word wrap the to fit the available container width.
@@ -1048,6 +1245,138 @@ namespace Terminal.Gui {
 			currentColumn = startCol;
 
 			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Select all text.
+		/// </summary>
+		public void SelectAll ()
+		{
+			if (model.Count == 0) {
+				return;
+			}
+
+			StartSelecting ();
+			selectionStartColumn = 0;
+			selectionStartRow = 0;
+			currentColumn = model.GetLine (model.Count - 1).Count;
+			currentRow = model.Count - 1;
+			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Find the next text based on the match case with the option to replace it.
+		/// </summary>
+		/// <param name="textToFind">The text to find.</param>
+		/// <param name="gaveFullTurn"><c>true</c>If all the text was forward searched.<c>false</c>otherwise.</param>
+		/// <param name="matchCase">The match case setting.</param>
+		/// <param name="textToReplace">The text to replace.</param>
+		/// <param name="replace"><c>true</c>If is replacing.<c>false</c>otherwise.</param>
+		/// <returns><c>true</c>If the text was found.<c>false</c>otherwise.</returns>
+		public bool FindNextText (ustring textToFind, out bool gaveFullTurn, bool matchCase = false,
+			ustring textToReplace = null, bool replace = false)
+		{
+			if (model.Count == 0) {
+				gaveFullTurn = false;
+				return false;
+			}
+
+			SetWrapModel ();
+			ResetContinuousFind ();
+			var foundPos = model.FindNextText (textToFind, out gaveFullTurn, matchCase);
+
+			return SetFoundText (textToFind, foundPos, textToReplace, replace);
+		}
+
+		/// <summary>
+		/// Find the previous text based on the match case with the option to replace it.
+		/// </summary>
+		/// <param name="textToFind">The text to find.</param>
+		/// <param name="gaveFullTurn"><c>true</c>If all the text was backward searched.<c>false</c>otherwise.</param>
+		/// <param name="matchCase">The match case setting.</param>
+		/// <param name="textToReplace">The text to replace.</param>
+		/// <param name="replace"><c>true</c>If the text was found.<c>false</c>otherwise.</param>
+		/// <returns><c>true</c>If the text was found.<c>false</c>otherwise.</returns>
+		public bool FindPreviousText (ustring textToFind, out bool gaveFullTurn, bool matchCase = false,
+			ustring textToReplace = null, bool replace = false)
+		{
+			if (model.Count == 0) {
+				gaveFullTurn = false;
+				return false;
+			}
+
+			SetWrapModel ();
+			ResetContinuousFind ();
+			var foundPos = model.FindPreviousText (textToFind, out gaveFullTurn, matchCase);
+
+			return SetFoundText (textToFind, foundPos, textToReplace, replace);
+		}
+
+		/// <summary>
+		/// Reset the flag to stop continuous find.
+		/// </summary>
+		public void FindTextChanged ()
+		{
+			continuousFind = false;
+		}
+
+		/// <summary>
+		/// Replaces all the text based on the match case.
+		/// </summary>
+		/// <param name="textToFind">The text to find.</param>
+		/// <param name="matchCase">The match case setting.</param>
+		/// <param name="textToReplace">The text to replace.</param>
+		/// <returns><c>true</c>If the text was found.<c>false</c>otherwise.</returns>
+		public bool ReplaceAllText (ustring textToFind, bool matchCase = false, ustring textToReplace = null)
+		{
+			if (isReadOnly || model.Count == 0) {
+				return false;
+			}
+
+			SetWrapModel ();
+			ResetContinuousFind ();
+			var foundPos = model.ReplaceAllText (textToFind, matchCase, textToReplace);
+
+			return SetFoundText (textToFind, foundPos, textToReplace, false, true);
+		}
+
+		bool SetFoundText (ustring text, (Point current, bool found) foundPos,
+			ustring textToReplace = null, bool replace = false, bool replaceAll = false)
+		{
+			if (foundPos.found) {
+				StartSelecting ();
+				selectionStartColumn = foundPos.current.X;
+				selectionStartRow = foundPos.current.Y;
+				if (!replaceAll) {
+					currentColumn = selectionStartColumn + text.RuneCount;
+				} else {
+					currentColumn = selectionStartColumn + textToReplace.RuneCount;
+				}
+				currentRow = foundPos.current.Y;
+				if (!isReadOnly && replace) {
+					ClearSelectedRegion ();
+					InsertText (textToReplace);
+				} else {
+					UpdateWrapModel ();
+					SetNeedsDisplay ();
+					Adjust ();
+				}
+				continuousFind = true;
+				return foundPos.found;
+			}
+			UpdateWrapModel ();
+			continuousFind = false;
+
+			return foundPos.found;
+		}
+
+		void ResetContinuousFind ()
+		{
+			if (!continuousFind) {
+				var col = selecting ? selectionStartColumn : currentColumn;
+				var row = selecting ? selectionStartRow : currentRow;
+				model.ResetContinuousFind (new Point (col, row));
+			}
 		}
 
 		/// <summary>
@@ -1350,8 +1679,34 @@ namespace Terminal.Gui {
 			case Key.P | Key.CtrlMask:
 			case Key.CursorUp:
 				lastWasKill = false;
+				continuousFind = false;
 				break;
 			case Key.K | Key.CtrlMask:
+				break;
+			case Key.F | Key.CtrlMask:
+			case Key.B | Key.CtrlMask:
+			case (Key)((int)'B' + Key.AltMask):
+			case Key.A | Key.CtrlMask:
+			case Key.E | Key.CtrlMask:
+			case Key.CursorRight:
+			case Key.CursorLeft:
+			case Key.CursorRight | Key.CtrlMask:
+			case Key.CursorLeft | Key.CtrlMask:
+			case Key.CursorRight | Key.ShiftMask:
+			case Key.CursorLeft | Key.ShiftMask:
+			case Key.CursorRight | Key.CtrlMask | Key.ShiftMask:
+			case Key.CursorLeft | Key.CtrlMask | Key.ShiftMask:
+			case Key.Home:
+			case Key.Home | Key.CtrlMask:
+			case Key.Home | Key.ShiftMask:
+			case Key.Home | Key.CtrlMask | Key.ShiftMask:
+			case Key.End:
+			case Key.End | Key.CtrlMask:
+			case Key.End | Key.ShiftMask:
+			case Key.End | Key.CtrlMask | Key.ShiftMask:
+				lastWasKill = false;
+				columnTrack = -1;
+				continuousFind = false;
 				break;
 			default:
 				lastWasKill = false;
@@ -1735,6 +2090,10 @@ namespace Terminal.Gui {
 				MoveHome ();
 				break;
 
+			case Key.T | Key.CtrlMask:
+				SelectAll ();
+				break;
+
 			default:
 				// Ignore control characters and other special keys
 				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
@@ -2102,6 +2461,8 @@ namespace Terminal.Gui {
 			if (!HasFocus) {
 				SetFocus ();
 			}
+
+			continuousFind = false;
 
 			if (ev.Flags == MouseFlags.Button1Clicked) {
 				if (shiftSelecting) {
