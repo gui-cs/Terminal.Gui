@@ -2413,7 +2413,21 @@ namespace Terminal.Gui {
 
 				void ProcMovePrev (ref int nCol, ref int nRow, Rune nRune)
 				{
-					if (nCol + 1 < fromCol && (Rune.IsSymbol (nRune) || Rune.IsWhiteSpace (nRune))) {
+					if (Rune.IsSymbol (nRune) || Rune.IsWhiteSpace (nRune)) {
+						while (MovePrev (ref nCol, ref nRow, out nRune)) {
+							if (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune)) {
+								lastValidCol = nCol;
+								break;
+							}
+						}
+						if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune))) {
+							return;
+						}
+						while (MovePrev (ref nCol, ref nRow, out nRune)) {
+							if (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune))
+								break;
+							lastValidCol = nCol;
+						}
 						if (lastValidCol > -1) {
 							nCol = lastValidCol;
 						}
@@ -2427,6 +2441,10 @@ namespace Terminal.Gui {
 							return;
 						}
 						lastValidCol = Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) ? nCol : lastValidCol;
+						if (lastValidCol > -1 && (Rune.IsSymbol (nRune) || Rune.IsWhiteSpace (nRune))) {
+							nCol = lastValidCol;
+							return;
+						}
 						if (fromRow != nRow) {
 							nCol = line.Count;
 							return;
