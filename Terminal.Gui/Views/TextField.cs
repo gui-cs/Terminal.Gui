@@ -178,8 +178,8 @@ namespace Terminal.Gui {
 			get { return point; }
 			set {
 				point = value;
-				Adjust ();
 				SetNeedsDisplay ();
+				Adjust ();
 			}
 		}
 
@@ -586,27 +586,30 @@ namespace Terminal.Gui {
 			if (p >= text.Count)
 				return -1;
 
-			int i = p;
-			if (Rune.IsPunctuation (text [p]) || Rune.IsWhiteSpace (text [p])) {
+			int i = p + 1;
+			if (i == text.Count)
+				return text.Count;
+
+			var ti = text [i];
+			if (Rune.IsPunctuation (ti) || Rune.IsSymbol (ti) || Rune.IsWhiteSpace (ti)) {
 				for (; i < text.Count; i++) {
-					var r = text [i];
-					if (Rune.IsLetterOrDigit (r))
-						break;
-				}
-				for (; i < text.Count; i++) {
-					var r = text [i];
-					if (!Rune.IsLetterOrDigit (r))
-						break;
+					if (Rune.IsLetterOrDigit (text [i]))
+						return i;
 				}
 			} else {
 				for (; i < text.Count; i++) {
-					var r = text [i];
-					if (!Rune.IsLetterOrDigit (r))
+					if (!Rune.IsLetterOrDigit (text [i]))
+						break;
+				}
+				for (; i < text.Count; i++) {
+					if (Rune.IsLetterOrDigit (text [i]))
 						break;
 				}
 			}
+
 			if (i != p)
-				return i + 1;
+				return Math.Min (i, text.Count);
+
 			return -1;
 		}
 
@@ -620,25 +623,34 @@ namespace Terminal.Gui {
 				return 0;
 
 			var ti = text [i];
+			var lastValidCol = -1;
 			if (Rune.IsPunctuation (ti) || Rune.IsSymbol (ti) || Rune.IsWhiteSpace (ti)) {
 				for (; i >= 0; i--) {
-					if (Rune.IsLetterOrDigit (text [i]))
+					if (Rune.IsLetterOrDigit (text [i])) {
+						lastValidCol = i;
 						break;
+					}
 				}
 				for (; i >= 0; i--) {
 					if (!Rune.IsLetterOrDigit (text [i]))
 						break;
+				}
+				if (lastValidCol > -1) {
+					return i + 1;
 				}
 			} else {
 				for (; i >= 0; i--) {
 					if (!Rune.IsLetterOrDigit (text [i]))
 						break;
+					lastValidCol = i;
+				}
+				if (lastValidCol > -1) {
+					return i + 1;
 				}
 			}
-			i++;
 
 			if (i != p)
-				return i;
+				return Math.Max (i, 0);
 
 			return -1;
 		}
@@ -651,12 +663,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Length of the selected text.
 		/// </summary>
-		public int SelectedLength { get; set; } = 0;
+		public int SelectedLength { get; private set; }
 
 		/// <summary>
 		/// The selected text.
 		/// </summary>
-		public ustring SelectedText { get; set; }
+		public ustring SelectedText { get; private set; }
 
 		int start, length;
 		bool isButtonPressed;
@@ -707,7 +719,14 @@ namespace Terminal.Gui {
 				}
 				int sfw = WordForward (x);
 				ClearAllSelection ();
-				PrepareSelection (sbw, sfw - sbw);
+				if (sfw != -1 && sbw != -1) {
+					SelectedStart = sbw;
+					SelectedLength = sfw - sbw;
+					point = SelectedStart + SelectedLength;
+					Adjust ();
+				} else {
+					PrepareSelection (sbw, sfw - sbw);
+				}
 			} else if (ev.Flags == MouseFlags.Button1TripleClicked) {
 				PositionCursor (0);
 				ClearAllSelection ();
