@@ -190,6 +190,9 @@ namespace UICatalog.Scenarios {
 			graphView.AxisY.ShowLabelsEvery = 1;
 			graphView.AxisY.Text = "↑Y";
 
+			var max = lineSeries.Points.Union (lineSeries2.Points).OrderByDescending (p => p.Y).First ();
+			graphView.Annotations.Add (new TextAnnotation () { Text = "(Max)", GraphPosition = new PointD (max.X + (2*graphView.CellSize.X), max.Y) });
+
 			graphView.SetNeedsDisplay ();
 		}
 
