@@ -634,9 +634,10 @@ namespace Terminal.Gui {
 				for (; i >= 0; i--) {
 					if (!Rune.IsLetterOrDigit (text [i]))
 						break;
+					lastValidCol = i;
 				}
 				if (lastValidCol > -1) {
-					return i + 1;
+					return lastValidCol;
 				}
 			} else {
 				for (; i >= 0; i--) {
@@ -645,7 +646,7 @@ namespace Terminal.Gui {
 					lastValidCol = i;
 				}
 				if (lastValidCol > -1) {
-					return i + 1;
+					return lastValidCol;
 				}
 			}
 
