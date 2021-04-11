@@ -305,19 +305,51 @@ namespace Terminal.Gui {
 		public void Render(GraphView graph, ConsoleDriver driver,Rect screenBounds)
 		{
 			if(ScreenPosition.HasValue){
-				graph.Move(ScreenPosition.Value.X,ScreenPosition.Value.Y);
-				driver.AddStr(Text);
+				DrawText( graph,driver,screenBounds,ScreenPosition.Value.X,ScreenPosition.Value.Y);
 				return;
 			}
 
 			if(GraphPosition != null){
 				var screenPos = graph.GraphSpaceToScreen(GraphPosition);
 
-				if(screenBounds.Contains(screenPos)){
-					
-					graph.Move(screenPos.X,screenPos.Y);
-					driver.AddStr(Text);
-				}
+				DrawText(graph,driver,screenBounds,screenPos.X,screenPos.Y);
+			}
+		}
+
+		/// <summary>
+		/// Draws the <see cref="Text"/> at the given coordinates with truncation to avoid
+		/// spilling over <paramref name="screenBounds"/> of the <paramref name="graph"/>
+		/// </summary>
+		/// <param name="graph"></param>
+		/// <param name="driver"></param>
+		/// <param name="screenBounds"></param>
+		/// <param name="x">Screen x position to start drawing string</param>
+		/// <param name="y">Screen y position to start drawing string</param>
+		protected void DrawText (GraphView graph, ConsoleDriver driver, Rect screenBounds, int x, int y)
+		{
+			// the draw point is out of control bounds
+			if(!screenBounds.Contains(new Point(x,y))){
+				return;
+			}
+
+			// There is no text to draw
+			if(string.IsNullOrWhiteSpace(Text)){
+				return;
+			}
+
+			graph.Move(x,y);
+
+			int availableWidth = screenBounds.Width-x;
+
+			if(availableWidth <= 0){
+				return;
+			}
+
+			if(Text.Length < availableWidth){
+				driver.AddStr(Text);
+			}
+			else{
+				driver.AddStr(Text.Substring(0,availableWidth));
 			}
 		}
 	}
@@ -1197,7 +1229,7 @@ namespace Terminal.Gui {
 
 			// decimal the Y axis so that it accurately represents the origin of the graph
 			// but anchor it to left/right if the origin is offscreen
-			return Math.Min (Math.Max ((int)graph.MarginLeft, origin.X), bounds.Width);
+			return Math.Min (Math.Max ((int)graph.MarginLeft, origin.X), bounds.Width-1);
 		}
 	}
 
