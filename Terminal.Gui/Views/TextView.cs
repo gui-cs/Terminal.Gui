@@ -1730,7 +1730,9 @@ namespace Terminal.Gui {
 				if (currentRow < model.Count) {
 					if (columnTrack == -1)
 						columnTrack = currentColumn;
-					currentRow = (currentRow + nPageDnShift) > model.Count ? model.Count : currentRow + nPageDnShift;
+					currentRow = (currentRow + nPageDnShift) > model.Count
+						? model.Count > 0 ? model.Count - 1 : 0
+						: currentRow + nPageDnShift;
 					if (topRow < currentRow - nPageDnShift) {
 						topRow = currentRow >= model.Count ? currentRow - nPageDnShift : topRow + nPageDnShift;
 						SetNeedsDisplay ();
