@@ -29,8 +29,13 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Collection of data series that are rendered in the graph
 		/// </summary>
-		/// <returns></returns>
 		public List<ISeries> Series {get;} = new List<ISeries>();
+
+
+		/// <summary>
+		/// Elements drawn into graph after series have been drawn e.g. Legends etc
+		/// </summary>
+		public List<IAnnotation> Annotations {get;} = new List<IAnnotation>();
 
 		/// <summary>
 		/// Amount of space to leave on left of control.  Graph content (<see cref="Series"/>)
@@ -155,6 +160,11 @@ namespace Terminal.Gui {
 				}
 			}
 
+			// Draw annotations
+			foreach(var a in Annotations){
+				a.Render(this,Driver,Bounds);
+			}
+
 		}
 
 		/// <summary>
@@ -244,6 +254,74 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 	}
+
+	/// <summary>
+	/// Describes an overlay element that is rendered after series.
+	/// Annotations can be positioned either in screen space (e.g.
+	/// a legend) or in graph space (e.g. a line showing high point)
+	/// </summary>
+	public interface IAnnotation
+	{
+		/// <summary>
+		/// Called once after series have been rendered.
+		/// </summary>
+		/// <param name="graph"></param>
+		/// <param name="driver"></param>
+		/// <param name="screenBounds"></param>
+		void Render(GraphView graph, ConsoleDriver driver,Rect screenBounds);
+	}
+
+	/// <summary>
+	/// Displays text at a given position (in screen space or graph space)
+	/// </summary>
+	public class TextAnnotation : IAnnotation{
+
+		/// <summary>
+		/// The location on screen to draw the <see cref="Text"/> regadless
+		/// of scroll/zoom settings.  This overrides <see cref="GraphPosition"/>
+		/// if specified.
+		/// </summary>
+		public Point? ScreenPosition{get;set;}
+
+		/// <summary>
+		/// The location in graph space to draw the <see cref="Text"/>.  This
+		/// annotation will only show if the point is in the current viewable
+		/// area of the graph presented in the <see cref="GraphView"/>
+		/// </summary>
+		public PointD GraphPosition{get;set;}
+
+		/// <summary>
+		/// Text to display on the graph
+		/// </summary>
+		/// <value></value>
+		public string Text {get;set;}
+
+		/// <summary>
+		/// Draws the annotation
+		/// </summary>
+		/// <param name="graph"></param>
+		/// <param name="driver"></param>
+		/// <param name="screenBounds"></param>
+		public void Render(GraphView graph, ConsoleDriver driver,Rect screenBounds)
+		{
+			if(ScreenPosition.HasValue){
+				graph.Move(ScreenPosition.Value.X,ScreenPosition.Value.Y);
+				driver.AddStr(Text);
+				return;
+			}
+
+			if(GraphPosition != null){
+				var screenPos = graph.GraphSpaceToScreen(GraphPosition);
+
+				if(screenBounds.Contains(screenPos)){
+					
+					graph.Move(screenPos.X,screenPos.Y);
+					driver.AddStr(Text);
+				}
+			}
+		}
+	}
+
 
 	/// <summary>
 	/// Describes a series of data that can be rendered into a <see cref="GraphView"/>>

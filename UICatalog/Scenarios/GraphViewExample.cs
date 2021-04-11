@@ -394,8 +394,6 @@ namespace UICatalog.Scenarios {
 
 			graphView.AxisY.ShowLabelsEvery = 1;
 
-			graphView.AxisY.Text = "M";
-
 			var stiple = new GraphCellToRender(Application.Driver.Stipple);
 
 			// Bars in 2 directions
@@ -473,6 +471,10 @@ namespace UICatalog.Scenarios {
 			graphView.Series.Add (femalesSeries);
 
 			graphView.AxisY.LabelGetter = (v)=>femalesSeries.GetLabelText(v);
+
+
+			graphView.Annotations.Add(new TextAnnotation(){Text="M",ScreenPosition = new Terminal.Gui.Point(0,10)});
+			graphView.Annotations.Add(new TextAnnotation(){Text="F",ScreenPosition = new Terminal.Gui.Point(graphView.Bounds.Width-1,10)});
 
 			graphView.SetNeedsDisplay();
 
