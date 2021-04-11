@@ -90,6 +90,7 @@ namespace Terminal.Gui {
 			AxisX.Reset();
 		 	AxisY.Reset();
 			Series.Clear();
+			Annotations.Clear();
 			GraphColor = null;
 			SetNeedsDisplay();
 		}
@@ -277,7 +278,7 @@ namespace Terminal.Gui {
 	public class TextAnnotation : IAnnotation{
 
 		/// <summary>
-		/// The location on screen to draw the <see cref="Text"/> regadless
+		/// The location on screen to draw the <see cref="Text"/> regardless
 		/// of scroll/zoom settings.  This overrides <see cref="GraphPosition"/>
 		/// if specified.
 		/// </summary>
@@ -1063,7 +1064,7 @@ namespace Terminal.Gui {
 			// graphs where positive and negative numbers visible
 			var origin = graph.GraphSpaceToScreen (new PointD (0, 0));
 
-			// decimal the X axis so that it accurately represents the origin of the graph
+			// float the X axis so that it accurately represents the origin of the graph
 			// but anchor it to top/bottom if the origin is offscreen
 			return Math.Min (Math.Max (0, origin.Y), bounds.Height - ((int)graph.MarginBottom+1));
 		}
@@ -1227,7 +1228,7 @@ namespace Terminal.Gui {
 			// graphs where positive and negative numbers visible
 			var origin = graph.GraphSpaceToScreen (new PointD (0, 0));
 
-			// decimal the Y axis so that it accurately represents the origin of the graph
+			// float the Y axis so that it accurately represents the origin of the graph
 			// but anchor it to left/right if the origin is offscreen
 			return Math.Min (Math.Max ((int)graph.MarginLeft, origin.X), bounds.Width-1);
 		}
