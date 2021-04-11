@@ -104,8 +104,8 @@ namespace Terminal.Gui {
 		{
 			if (Application.mouseGrabView != null && Application.mouseGrabView == this)
 				Application.UngrabMouse ();
-			if (SelectedLength != 0 && !(Application.mouseGrabView is MenuBar))
-				ClearAllSelection ();
+			//if (SelectedLength != 0 && !(Application.mouseGrabView is MenuBar))
+			//	ClearAllSelection ();
 
 			return base.OnLeave (view);
 		}
@@ -869,7 +869,7 @@ namespace Terminal.Gui {
 			return ev;
 		}
 
-		private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
+		CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
 
 		/// <summary>
 		/// Get / Set the wished cursor when the field is focused
