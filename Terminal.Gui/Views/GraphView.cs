@@ -113,7 +113,12 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			
+			// Draw 'before' annotations
+			foreach (var a in Annotations.Where (a => a.BeforeSeries)){
+				a.Render (this, Driver, Bounds);
+			}
+
+			Driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
 
 			for (int x= (int)MarginLeft;x<Bounds.Width;x++){
 				for(int y=0;y<Bounds.Height - (int)MarginBottom;y++){
@@ -141,11 +146,15 @@ namespace Terminal.Gui {
 				}
 			}
 
+			Driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
+
 			AxisY.DrawAxisLine (Driver, this, Bounds);
 			AxisX.DrawAxisLine (Driver, this, Bounds);
 			
 			AxisY.DrawAxisLabels (Driver, this, Bounds);
 			AxisX.DrawAxisLabels (Driver, this, Bounds);
+
+			Driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
 
 			// Draw origin with plus
 			var origin = GraphSpaceToScreen(new PointD(0,0));
@@ -161,8 +170,8 @@ namespace Terminal.Gui {
 				}
 			}
 
-			// Draw annotations
-			foreach(var a in Annotations){
+			// Draw 'after' annotations
+			foreach(var a in Annotations.Where(a=>!a.BeforeSeries)){
 				a.Render(this,Driver,Bounds);
 			}
 
@@ -183,6 +192,18 @@ namespace Terminal.Gui {
 				CellSize.X, CellSize.Y);
 		}
 
+
+		/// <summary>
+		/// Returns the section of the graph that is represented by the screen area
+		/// </summary>
+		/// <param name="screenArea"></param>
+		/// <returns></returns>
+		public RectangleD ScreenToGraphSpace (Rect screenArea)
+		{
+			var pos = ScreenToGraphSpace (screenArea.X, screenArea.Y);
+			
+			return new RectangleD (pos.X, pos.Y, screenArea.Width * CellSize.X, screenArea.Y * CellSize.Y);
+		}
 		/// <summary>
 		/// Calculates the screen location for a given point in graph space.
 		/// Bear in mind these be off screen
@@ -200,6 +221,7 @@ namespace Terminal.Gui {
 				 (Bounds.Height-1) - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y) 
 				);
 		}
+
 
 
 		/// <inheritdoc/>
@@ -264,6 +286,11 @@ namespace Terminal.Gui {
 	public interface IAnnotation
 	{
 		/// <summary>
+		/// True if annotation should be drawn before <see cref="ISeries"/>
+		/// </summary>
+		bool BeforeSeries { get; }
+
+		/// <summary>
 		/// Called once after series have been rendered.
 		/// </summary>
 		/// <param name="graph"></param>
@@ -296,6 +323,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value></value>
 		public string Text {get;set;}
+
+		/// <summary>
+		/// True to add text before plotting series.  Defaults to false
+		/// </summary>
+		public bool BeforeSeries { get; set; }
 
 		/// <summary>
 		/// Draws the annotation
@@ -423,6 +455,13 @@ namespace Terminal.Gui {
 		public List<PointD> Points {get;set;} = new List<PointD>();
 
 		/// <summary>
+		/// The color and character that will be rendered in the console
+		/// when there are point(s) in the corresponding graph space.
+		/// Defaults to uncolored 'x'
+		/// </summary>
+		public GraphCellToRender Fill { get; set; } = new GraphCellToRender ('x');
+
+		/// <summary>
 		/// Returns a point symbol if the <paramref name="graphSpace"/> contains 
 		/// any of the <see cref="Points"/>
 		/// </summary>
@@ -431,7 +470,7 @@ namespace Terminal.Gui {
 		public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
 		{
 			if(Points.Any(p=>graphSpace.Contains(p))){
-				return new GraphCellToRender('x');
+				return Fill;
 			}
 
 			return null;
@@ -523,6 +562,13 @@ namespace Terminal.Gui {
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Does nothing
+		/// </summary>
+		public void FinishRendering ()
+		{
 		}
 	}
 
@@ -712,121 +758,115 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Series of points linked with a line
+	/// Sequence of lines to connect points e.g. of a <see cref="ScatterSeries"/>
 	/// </summary>
-	public class LineSeries : ISeries, IComparer<PointD> {
-
-		List<PointD> points = new List<PointD>();
+	public class PathAnnotation : IAnnotation {
 
 		/// <summary>
-		/// Ordered collection of points in the series
+		/// Points that should be connected.  Lines will be drawn between points in the order
+		/// they appear in the list
 		/// </summary>
-		public ReadOnlyCollection<PointD> Points { get => points.AsReadOnly (); }
-		
+		public List<PointD> Points { get; set;} = new List<PointD>();
 		
 		/// <summary>
 		/// Color for the line that connects points
 		/// </summary>
 		public Attribute? LineColor { get; set; }
 
-		/// <summary>
-		/// Color for the points
-		/// </summary>
-		public Attribute? PointColor { get; set; }
 
 		/// <summary>
-		/// The symbol to show on screen at each point.  Deafults to 'x'
+		/// True to add line before plotting series.  Defaults to false
 		/// </summary>
-		public Rune PointSymbol { get; set; } = 'x';
+		public bool BeforeSeries { get; set; }
+
 
 		/// <summary>
-		/// Adds <paramref name="toAdd"/> to <see cref="Points"/> in order of X
+		/// Draws lines connecting each of the <see cref="Points"/>
 		/// </summary>
-		/// <param name="toAdd"></param>
-		public void Add(PointD toAdd)
+		/// <param name="graph"></param>
+		/// <param name="driver"></param>
+		/// <param name="screenBounds"></param>
+		public void Render (GraphView graph, ConsoleDriver driver, Rect screenBounds)
 		{
-			points.Add (toAdd);
-			points.Sort(this);
-		}
+			View.Driver.SetAttribute (LineColor ?? graph.ColorScheme.Normal);
 
-		/// <summary>
-		/// Adds <paramref name="toAdd"/> to <see cref="Points"/> in order of X
-		/// </summary>
-		/// <param name="toAdd"></param>
-		public void AddRange (IEnumerable<PointD> toAdd)
-		{
-			points.AddRange (toAdd);
-			points.Sort (this);
-		}
-
-		/// <summary>
-		/// Compares points on the X axis 
-		/// </summary>
-		/// <param name="a"></param>
-		/// <param name="b"></param>
-		/// <returns></returns>
-		public int Compare (PointD a, PointD b)
-		{
-			if (a.X == b.X) {
-				return 0;
+			foreach (var line in PointsToLines()){
+				DrawLine (graph, line.Start, line.End);
 			}
-
-			if (a.X > b.X) {
-				return 1;
-			}
-			
-			return  -1;
 		}
 
 		/// <summary>
-		/// Returns a symbol if the line between any two consecutive points crosses the graph space
+		/// Generates lines joining <see cref="Points"/> 
 		/// </summary>
-		/// <param name="graphSpace"></param>
 		/// <returns></returns>
-		public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
-		{
-			foreach (var line in PointsToLines (graphSpace)) {
+		private IEnumerable<LineD> PointsToLines ()
+		{	
+			for (int i=0;i< Points.Count - 1; i++) {
 				
-				// we are on a plot point
-				if (graphSpace.Contains(line.Start) || graphSpace.Contains (line.End)) {
-					return new GraphCellToRender (PointSymbol, PointColor);
-				}
-
-				var clip = CohenSutherland.CohenSutherlandLineClip (graphSpace, line.Start, line.End);
-
-				// the line passes through the current cell of the graph 
-				if (clip != null) {
-					return new GraphCellToRender ('.',LineColor);
-				}
-			}
-
-			return null;
-		}
-
-		/// <summary>
-		/// Returns all lines that could potentially pass through <paramref name="graphSpace"/>
-		/// </summary>
-		/// <param name="graphSpace"></param>
-		/// <returns></returns>
-		private IEnumerable<LineD> PointsToLines (RectangleD graphSpace)
-		{						
-			var first = points.LastOrDefault (p => p.X < graphSpace.X);
-			var then = points.Where(p => p.X >= graphSpace.X && p.X < graphSpace.Right);
-			var last = points.FirstOrDefault(p => p.X > graphSpace.X);
-
-			var consider = new List<PointD> ();
-			consider.Add (first);
-			consider.AddRange (then);
-			consider.Add (last);
-
-
-			for (int i=0;i< consider.Count - 1; i++) {
-				
-				var line = new LineD (consider [i], consider [i + 1]);
+				var line = new LineD (Points [i], Points [i + 1]);
 				if (line.Start != null && line.End != null) {
 					yield return line;
 				}
-					
+			}
+		}
+
+
+		private void Plot (GraphView view, int x, int y)
+		{
+			view.AddRune ((int)x, (int)y,'.');
+		}
+
+		int ipart (decimal x) { return (int)x; }
+
+
+		decimal fpart (decimal x)
+		{
+			if (x < 0) return (1 - (x - Math.Floor (x)));
+			return (x - Math.Floor (x));
+		}
+
+
+		/// <summary>
+		/// Draws a line between two points in graph space
+		/// </summary>
+		/// <param name="view"></param>
+		/// <param name="start"></param>
+		/// <param name="end"></param>
+		public void DrawLine (GraphView view, PointD start, PointD end)
+		{
+			var screenStart = view.GraphSpaceToScreen (start);
+			var screenEnd = view.GraphSpaceToScreen (end);
+
+			DrawLine (view, screenStart, screenEnd);
+		}
+
+		/// <summary>
+		/// Draws a line between two points in screen space
+		/// </summary>
+		/// <param name="view"></param>
+		/// <param name="start"></param>
+		/// <param name="end"></param>
+		public void DrawLine (GraphView view, Point start, Point end)
+		{
+			if (Equals (start, end)) {
+				return;
+			}
+
+			int x0 = start.X;
+			int y0 = start.Y;
+			int x1 = end.X;
+			int y1 = end.Y;
+
+			int dx = Math.Abs (x1 - x0), sx = x0 < x1 ? 1 : -1;
+			int dy = Math.Abs (y1 - y0), sy = y0 < y1 ? 1 : -1;
+			int err = (dx > dy ? dx : -dy) / 2, e2;
+
+			while (true) {
+				Plot(view,x0, y0);
+				if (x0 == x1 && y0 == y1) break;
+				e2 = err;
+				if (e2 > -dx) { err -= dy; x0 += sx; }
+				if (e2 < dy) { err += dx; y0 += sy; }
 			}
 		}
 	}
@@ -1616,117 +1656,5 @@ namespace Terminal.Gui {
 		/// Bottom to top
 		/// </summary>
 		Vertical
-	}
-
-	/// <summary>
-	/// This is the Cohen–Sutherland algorithm for checking if a line intersects a rectangle
-	/// https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
-	/// </summary>
-	public static class CohenSutherland {
-
-		/// <summary>
-		/// Bitfields used to partition the space into 9 regiond
-		/// </summary>
-		private const byte INSIDE = 0; // 0000
-		private const byte LEFT = 1;   // 0001
-		private const byte RIGHT = 2;  // 0010
-		private const byte ABOVE = 4; // 0100
-		private const byte BELOW = 8;    // 1000
-
-		/// <summary>
-		/// Compute the bit code for a point (x, y) using the clip rectangle
-		/// bounded diagonally by <paramref name="rect"/>
-		/// </summary>
-		/// <returns></returns>
-		private static byte ComputeOutCode (RectangleD rect, decimal x, decimal y)
-		{
-			// initialised as being inside of clip window
-			byte code = INSIDE;
-
-			if (x < rect.Left)           // to the left of clip window
-				code |= LEFT;
-			else if (x > rect.Right)     // to the right of clip window
-				code |= RIGHT;
-			if (y < rect.Top)         // below the clip window
-				code |= ABOVE;
-			else if (y > rect.Bottom)       // above the clip window
-				code |= BELOW;
-
-			return code;
-		}
-
-		/// <summary>
-		/// Cohen–Sutherland clipping algorithm clips a line from
-		/// P0 = (x0, y0) to P1 = (x1, y1) against a rectangle with
-		/// diagonal from <paramref name="rect"/>
-		/// </summary>
-		/// <returns>a list of two points in the resulting clipped line, or zero</returns>
-		public static LineD CohenSutherlandLineClip (RectangleD rect,
-				       PointD p0, PointD p1)
-		{
-			decimal x0 = p0.X;
-			decimal y0 = p0.Y;
-			decimal x1 = p1.X;
-			decimal y1 = p1.Y;
-
-			// compute outcodes for P0, P1, and whatever point lies outside the clip rectangle
-			byte outcode0 = CohenSutherland.ComputeOutCode (rect, x0, y0);
-			byte outcode1 = CohenSutherland.ComputeOutCode (rect, x1, y1);
-			bool accept = false;
-
-			while (true) {
-				// Bitwise OR is 0. Trivially accept and get out of loop
-				if ((outcode0 | outcode1) == 0) {
-					accept = true;
-					break;
-				}
-				// Bitwise AND is not 0. Trivially reject and get out of loop
-				else if ((outcode0 & outcode1) != 0) {
-					break;
-				} else {
-					// failed both tests, so calculate the line segment to clip
-					// from an outside point to an intersection with clip edge
-					decimal x, y;
-
-					// At least one endpoint is outside the clip rectangle; pick it.
-					byte outcodeOut = (outcode0 != 0) ? outcode0 : outcode1;
-
-					// Now find the intersection point;
-					// use formulas y = y0 + slope * (x - x0), x = x0 + (1 / slope) * (y - y0)
-					if ((outcodeOut & BELOW) != 0) {   // point is above the clip rectangle
-						x = x0 + (x1 - x0) * (rect.Bottom - y0) / (y1 - y0);
-						y = rect.Bottom;
-					} else if ((outcodeOut & ABOVE) != 0) { // point is below the clip rectangle
-						x = x0 + (x1 - x0) * (rect.Top - y0) / (y1 - y0);
-						y = rect.Top;
-					} else if ((outcodeOut & RIGHT) != 0) {  // point is to the right of clip rectangle
-						y = y0 + (y1 - y0) * (rect.Right - x0) / (x1 - x0);
-						x = rect.Right;
-					} else if ((outcodeOut & LEFT) != 0) {   // point is to the left of clip rectangle
-						y = y0 + (y1 - y0) * (rect.Left - x0) / (x1 - x0);
-						x = rect.Left;
-					} else {
-						return null;
-					}
-
-					// Now we move outside point to intersection point to clip
-					// and get ready for next pass.
-					if (outcodeOut == outcode0) {
-						x0 = x;
-						y0 = y;
-						outcode0 = CohenSutherland.ComputeOutCode (rect, x0, y0);
-					} else {
-						x1 = x;
-						y1 = y;
-						outcode1 = CohenSutherland.ComputeOutCode (rect, x1, y1);
-					}
-				}
-			}
-
-			// return the clipped line
-			return (accept) ?
-			    new LineD (new PointD(x0,y0),new PointD(x1, y1)) : null;
-
-		}
 	}
 }

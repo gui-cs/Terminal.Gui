@@ -153,12 +153,18 @@ namespace UICatalog.Scenarios {
 				randomPoints.Add(new PointD(r.Next (100), r.Next (100)));
 			}
 
+			var points = new ScatterSeries () {
+				Points = randomPoints
+			};
 
-			var lineSeries = new LineSeries () {
-				 LineColor = cyan				 
-				 };
-			lineSeries.AddRange (randomPoints);
-			graphView.Series.Add (lineSeries);
+			var line = new PathAnnotation () {
+				LineColor = cyan,
+				Points = randomPoints.OrderBy(p=>p.X).ToList(),
+				BeforeSeries = true,
+			};
+
+			graphView.Series.Add (points);
+			graphView.Annotations.Add (line);
 
 
 			randomPoints = new List<PointD> ();
@@ -167,12 +173,20 @@ namespace UICatalog.Scenarios {
 				randomPoints.Add (new PointD (r.Next (100), r.Next (100)));
 			}
 
-			var lineSeries2 = new LineSeries () {
-				 LineColor = magenta,
-				 PointColor = red
-				 };
-			lineSeries2.AddRange (randomPoints);
-			graphView.Series.Add (lineSeries2);
+
+			var points2 = new ScatterSeries () {
+				Points = randomPoints,
+				Fill = new GraphCellToRender('x',red)
+			};
+
+			var line2 = new PathAnnotation () {
+				LineColor = magenta,
+				Points = randomPoints.OrderBy (p => p.X).ToList (),
+				BeforeSeries = true,
+			};
+
+			graphView.Series.Add (points2);
+			graphView.Annotations.Add (line2);
 
 			// How much graph space each cell of the console depicts
 			graphView.CellSize = new PointD (2, 5);
@@ -190,7 +204,7 @@ namespace UICatalog.Scenarios {
 			graphView.AxisY.ShowLabelsEvery = 1;
 			graphView.AxisY.Text = "↑Y";
 
-			var max = lineSeries.Points.Union (lineSeries2.Points).OrderByDescending (p => p.Y).First ();
+			var max = line.Points.Union (line2.Points).OrderByDescending (p => p.Y).First ();
 			graphView.Annotations.Add (new TextAnnotation () { Text = "(Max)", GraphPosition = new PointD (max.X + (2*graphView.CellSize.X), max.Y) });
 
 			graphView.SetNeedsDisplay ();
@@ -202,14 +216,17 @@ namespace UICatalog.Scenarios {
 
 			about.Text = "This graph shows a sine wave";
 
-			var lineSeries = new LineSeries ();
+			var points = new ScatterSeries();
+			var line = new PathAnnotation ();
 
 			// Generate line graph with 2,000 points
 			for (decimal x = -500; x < 500; x+=0.5M) {
-				lineSeries.Add(new PointD(x,(decimal)Math.Sin ((double)x)));
+				points.Points.Add(new PointD(x,(decimal)Math.Sin ((double)x)));
+				line.Points.Add (new PointD (x, (decimal)Math.Sin ((double)x)));
 			}
 
-			graphView.Series.Add (lineSeries);
+			graphView.Series.Add (points);
+			graphView.Annotations.Add (line);
 
 			// How much graph space each cell of the console depicts
 			graphView.CellSize = new PointD (0.1M, 0.1M);
