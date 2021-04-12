@@ -745,13 +745,9 @@ namespace Terminal.Gui {
 				int sfw = WordForward (x);
 				ClearAllSelection ();
 				if (sfw != -1 && sbw != -1) {
-					selectedStart = sbw;
-					SelectedLength = sfw - sbw;
-					point = SelectedStart + SelectedLength;
-					Adjust ();
-				} else {
-					PrepareSelection (sbw, sfw - sbw);
+					point = sfw;
 				}
+				PrepareSelection (sbw, sfw - sbw);
 			} else if (ev.Flags == MouseFlags.Button1TripleClicked) {
 				PositionCursor (0);
 				ClearAllSelection ();
