@@ -20,6 +20,8 @@ namespace Terminal.Gui {
 	public class TextField : View {
 		List<Rune> text;
 		int first, point;
+		int selectedStart = -1; // -1 represents there is no text selection.
+		ustring selectedText;
 
 		/// <summary>
 		/// Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so new input should be appended at the cursor position, rather than clearing the entry
@@ -177,9 +179,14 @@ namespace Terminal.Gui {
 		public int CursorPosition {
 			get { return point; }
 			set {
-				point = value;
-				Adjust ();
-				SetNeedsDisplay ();
+				if (value < 0) {
+					point = 0;
+				} else if (value > text.Count) {
+					point = text.Count;
+				} else {
+					point = value;
+				}
+				PrepareSelection (selectedStart, point - selectedStart);
 			}
 		}
 
@@ -586,27 +593,30 @@ namespace Terminal.Gui {
 			if (p >= text.Count)
 				return -1;
 
-			int i = p;
-			if (Rune.IsPunctuation (text [p]) || Rune.IsWhiteSpace (text [p])) {
+			int i = p + 1;
+			if (i == text.Count)
+				return text.Count;
+
+			var ti = text [i];
+			if (Rune.IsPunctuation (ti) || Rune.IsSymbol (ti) || Rune.IsWhiteSpace (ti)) {
 				for (; i < text.Count; i++) {
-					var r = text [i];
-					if (Rune.IsLetterOrDigit (r))
-						break;
-				}
-				for (; i < text.Count; i++) {
-					var r = text [i];
-					if (!Rune.IsLetterOrDigit (r))
-						break;
+					if (Rune.IsLetterOrDigit (text [i]))
+						return i;
 				}
 			} else {
 				for (; i < text.Count; i++) {
-					var r = text [i];
-					if (!Rune.IsLetterOrDigit (r))
+					if (!Rune.IsLetterOrDigit (text [i]))
+						break;
+				}
+				for (; i < text.Count; i++) {
+					if (Rune.IsLetterOrDigit (text [i]))
 						break;
 				}
 			}
+
 			if (i != p)
-				return i + 1;
+				return Math.Min (i, text.Count);
+
 			return -1;
 		}
 
@@ -620,25 +630,35 @@ namespace Terminal.Gui {
 				return 0;
 
 			var ti = text [i];
+			var lastValidCol = -1;
 			if (Rune.IsPunctuation (ti) || Rune.IsSymbol (ti) || Rune.IsWhiteSpace (ti)) {
 				for (; i >= 0; i--) {
-					if (Rune.IsLetterOrDigit (text [i]))
+					if (Rune.IsLetterOrDigit (text [i])) {
+						lastValidCol = i;
 						break;
+					}
 				}
 				for (; i >= 0; i--) {
 					if (!Rune.IsLetterOrDigit (text [i]))
 						break;
+					lastValidCol = i;
+				}
+				if (lastValidCol > -1) {
+					return lastValidCol;
 				}
 			} else {
 				for (; i >= 0; i--) {
 					if (!Rune.IsLetterOrDigit (text [i]))
 						break;
+					lastValidCol = i;
+				}
+				if (lastValidCol > -1) {
+					return lastValidCol;
 				}
 			}
-			i++;
 
 			if (i != p)
-				return i;
+				return Math.Max (i, 0);
 
 			return -1;
 		}
@@ -646,17 +666,32 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Start position of the selected text.
 		/// </summary>
-		public int SelectedStart { get; set; } = -1;
+		public int SelectedStart {
+			get => selectedStart;
+			set {
+				if (value < -1) {
+					selectedStart = -1;
+				} else if (value > text.Count) {
+					selectedStart = text.Count;
+				} else {
+					selectedStart = value;
+				}
+				PrepareSelection (selectedStart, point - selectedStart);
+			}
+		}
 
 		/// <summary>
 		/// Length of the selected text.
 		/// </summary>
-		public int SelectedLength { get; set; } = 0;
+		public int SelectedLength { get; private set; }
 
 		/// <summary>
 		/// The selected text.
 		/// </summary>
-		public ustring SelectedText { get; set; }
+		public ustring SelectedText {
+			get => Secret ? null : selectedText;
+			private set => selectedText = value;
+		}
 
 		int start, length;
 		bool isButtonPressed;
@@ -707,7 +742,14 @@ namespace Terminal.Gui {
 				}
 				int sfw = WordForward (x);
 				ClearAllSelection ();
-				PrepareSelection (sbw, sfw - sbw);
+				if (sfw != -1 && sbw != -1) {
+					selectedStart = sbw;
+					SelectedLength = sfw - sbw;
+					point = SelectedStart + SelectedLength;
+					Adjust ();
+				} else {
+					PrepareSelection (sbw, sfw - sbw);
+				}
 			} else if (ev.Flags == MouseFlags.Button1TripleClicked) {
 				PositionCursor (0);
 				ClearAllSelection ();
@@ -750,20 +792,20 @@ namespace Terminal.Gui {
 
 		void PrepareSelection (int x, int direction = 0)
 		{
-			x = x + first < 0 ? 0 : x;
-			SelectedStart = SelectedStart == -1 && text.Count > 0 && x >= 0 && x <= text.Count ? x : SelectedStart;
-			if (SelectedStart > -1) {
-				SelectedLength = x + direction <= text.Count ? x + direction - SelectedStart : text.Count - SelectedStart;
+			x = x + first < -1 ? 0 : x;
+			selectedStart = selectedStart == -1 && text.Count > 0 && x >= 0 && x <= text.Count ? x : selectedStart;
+			if (selectedStart > -1) {
+				SelectedLength = x + direction <= text.Count ? x + direction - selectedStart : text.Count - selectedStart;
 				SetSelectedStartSelectedLength ();
-				if (start > -1) {
-					SelectedText = length > 0 ? ustring.Make (text).ToString ().Substring (
+				if (start > -1 && length > 0) {
+					selectedText = length > 0 ? ustring.Make (text).ToString ().Substring (
 						start < 0 ? 0 : start, length > text.Count ? text.Count : length) : "";
 					if (first > start) {
 						first = start;
 					}
-				} else {
-					ClearAllSelection ();
 				}
+			} else if (SelectedLength > 0) {
+				ClearAllSelection ();
 			}
 			Adjust ();
 		}
@@ -773,11 +815,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ClearAllSelection ()
 		{
-			if (SelectedStart == -1 && SelectedLength == 0)
+			if (selectedStart == -1 && SelectedLength == 0)
 				return;
-			SelectedStart = -1;
+
+			selectedStart = -1;
 			SelectedLength = 0;
-			SelectedText = "";
+			selectedText = null;
 			start = 0;
 			length = 0;
 			SetNeedsDisplay ();
@@ -799,12 +842,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void Copy ()
 		{
-			if (Secret)
+			if (Secret || SelectedLength == 0)
 				return;
 
-			if (SelectedLength != 0) {
-				Clipboard.Contents = SelectedText;
-			}
+			Clipboard.Contents = SelectedText;
 		}
 
 		/// <summary>
@@ -812,10 +853,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void Cut ()
 		{
-			if (SelectedLength != 0) {
-				Clipboard.Contents = SelectedText;
-				DeleteSelectedText ();
-			}
+			if (Secret || SelectedLength == 0)
+				return;
+
+			Clipboard.Contents = SelectedText;
+			DeleteSelectedText ();
 		}
 
 		void DeleteSelectedText ()
