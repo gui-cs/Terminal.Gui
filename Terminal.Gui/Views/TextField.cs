@@ -226,6 +226,8 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (Colors.Menu.HotFocus);
 				} else if (ReadOnly) {
 					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? selColor : roc);
+				} else if (!HasFocus) {
+					Driver.SetAttribute (ColorScheme.Focus);
 				} else {
 					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? selColor : ColorScheme.Focus);
 				}
