@@ -61,7 +61,7 @@ namespace UICatalog {
 			};
 			Win.Add (hexView);
 
-			var dateField = new DateField (System.DateTime.Now, isJalaali: true) {
+			var dateField = new DateField (System.DateTime.Now) {
 				X = 1,
 				Y = Pos.Bottom (hexView) + 1,
 				Width = 20,
