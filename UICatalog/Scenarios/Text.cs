@@ -61,12 +61,13 @@ namespace UICatalog {
 			};
 			Win.Add (hexView);
 
-			var dateField = new DateField (System.DateTime.Now) {
+			var dateField = new DateField (System.DateTime.Now, isJalaali: true) {
 				X = 1,
 				Y = Pos.Bottom (hexView) + 1,
 				Width = 20,
 				//ColorScheme = Colors.Dialog,
-				IsShortFormat = false
+				IsShortFormat = false,
+			
 			};
 			Win.Add (dateField);
 
@@ -81,6 +82,7 @@ namespace UICatalog {
 			dateField.TextChanged += (prev) => {
 				labelMirroringDateField.Text = dateField.Text;
 			};
+			
 
 			_timeField = new TimeField (DateTime.Now.TimeOfDay) {
 				X = Pos.Right (labelMirroringDateField) + 5,
