@@ -18,6 +18,7 @@ namespace UICatalog {
 		private string _textToFind;
 		private string _textToReplace;
 		private bool _matchCase;
+		private bool _matchWholeWord;
 		Window winDialog;
 
 		public override void Init (Toplevel top, ColorScheme colorScheme)
@@ -222,16 +223,16 @@ namespace UICatalog {
 
 			if (next) {
 				if (!replace) {
-					found = _textView.FindNextText (_textToFind, out gaveFullTurn, _matchCase);
+					found = _textView.FindNextText (_textToFind, out gaveFullTurn, _matchCase, _matchWholeWord);
 				} else {
-					found = _textView.FindNextText (_textToFind, out gaveFullTurn, _matchCase,
+					found = _textView.FindNextText (_textToFind, out gaveFullTurn, _matchCase, _matchWholeWord,
 						_textToReplace, true);
 				}
 			} else {
 				if (!replace) {
-					found = _textView.FindPreviousText (_textToFind, out gaveFullTurn, _matchCase);
+					found = _textView.FindPreviousText (_textToFind, out gaveFullTurn, _matchCase, _matchWholeWord);
 				} else {
-					found = _textView.FindPreviousText (_textToFind, out gaveFullTurn, _matchCase,
+					found = _textView.FindPreviousText (_textToFind, out gaveFullTurn, _matchCase, _matchWholeWord,
 						_textToReplace, true);
 				}
 			}
@@ -259,12 +260,12 @@ namespace UICatalog {
 
 		private void ReplaceAll ()
 		{
-			if (string.IsNullOrEmpty (_textToReplace) && winDialog == null) {
+			if (string.IsNullOrEmpty (_textToFind) || (string.IsNullOrEmpty (_textToReplace) && winDialog == null)) {
 				Replace ();
 				return;
 			}
 
-			if (_textView.ReplaceAllText (_textToFind, _matchCase, _textToReplace)) {
+			if (_textView.ReplaceAllText (_textToFind, _matchCase, _matchWholeWord, _textToReplace)) {
 				MessageBox.Query ("Replace All", $"All occurrences were replaced for the following specified text: '{_textToReplace}'", "Ok");
 			} else {
 				MessageBox.Query ("Replace All", $"None of the following specified text was found: '{_textToFind}'", "Ok");
@@ -415,8 +416,8 @@ namespace UICatalog {
 		private void CreateFindReplace (bool isFind = true)
 		{
 			winDialog = new Window (isFind ? "Find" : "Replace") {
-				X = 30,
-				Y = 10,
+				X = Win.Bounds.Width / 2 - 30,
+				Y = Win.Bounds.Height / 2 - 10,
 				ColorScheme = Colors.Menu
 			};
 
@@ -523,12 +524,21 @@ namespace UICatalog {
 			};
 			d.Add (btnCancel);
 
-			var ckbMatchCase = new CheckBox ("Match case") {
+			var ckbMatchCase = new CheckBox ("Match c_ase") {
 				X = 0,
-				Y = Pos.Top (btnCancel)
+				Y = Pos.Top (txtToFind) + 2,
+				Checked = _matchCase
 			};
 			ckbMatchCase.Toggled += (e) => _matchCase = ckbMatchCase.Checked;
 			d.Add (ckbMatchCase);
+
+			var ckbMatchWholeWord = new CheckBox ("Match _whole word") {
+				X = 0,
+				Y = Pos.Top (ckbMatchCase) + 1,
+				Checked = _matchWholeWord
+			};
+			ckbMatchWholeWord.Toggled += (e) => _matchWholeWord = ckbMatchWholeWord.Checked;
+			d.Add (ckbMatchWholeWord);
 
 			d.Width = label.Width + txtToFind.Width + btnFindNext.Width + 2;
 			d.Height = btnFindNext.Height + btnFindPrevious.Height + btnCancel.Height + 4;
@@ -631,16 +641,26 @@ namespace UICatalog {
 				TextAlignment = TextAlignment.Centered
 			};
 			btnCancel.Clicked += () => {
-				Application.RequestStop ();
+				Win.Remove (winDialog);
+				winDialog = null;
 			};
 			d.Add (btnCancel);
 
-			var ckbMatchCase = new CheckBox ("Match case") {
+			var ckbMatchCase = new CheckBox ("Match c_ase") {
 				X = 0,
-				Y = Pos.Top (btnCancel)
+				Y = Pos.Top (txtToFind) + 2,
+				Checked = _matchCase
 			};
 			ckbMatchCase.Toggled += (e) => _matchCase = ckbMatchCase.Checked;
 			d.Add (ckbMatchCase);
+
+			var ckbMatchWholeWord = new CheckBox ("Match _whole word") {
+				X = 0,
+				Y = Pos.Top (ckbMatchCase) + 1,
+				Checked = _matchWholeWord
+			};
+			ckbMatchWholeWord.Toggled += (e) => _matchWholeWord = ckbMatchWholeWord.Checked;
+			d.Add (ckbMatchWholeWord);
 
 			d.Width = lblWidth + txtToFind.Width + btnFindNext.Width + 2;
 			d.Height = btnFindNext.Height + btnFindPrevious.Height + btnCancel.Height + 4;

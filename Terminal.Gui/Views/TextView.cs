@@ -282,7 +282,7 @@ namespace Terminal.Gui {
 
 		(Point startPointToFind, Point currentPointToFind, bool found) toFind;
 
-		internal (Point current, bool found) FindNextText (ustring text, out bool gaveFullTurn, bool matchCase = false)
+		internal (Point current, bool found) FindNextText (ustring text, out bool gaveFullTurn, bool matchCase = false, bool matchWholeWord = false)
 		{
 			if (text == null || lines.Count == 0) {
 				gaveFullTurn = false;
@@ -292,16 +292,16 @@ namespace Terminal.Gui {
 			if (toFind.found) {
 				toFind.currentPointToFind.X++;
 			}
-			var foundPos = GetFoundNextTextPoint (text, lines.Count, matchCase, toFind.currentPointToFind);
+			var foundPos = GetFoundNextTextPoint (text, lines.Count, matchCase, matchWholeWord, toFind.currentPointToFind);
 			if (!foundPos.found && toFind.currentPointToFind != toFind.startPointToFind) {
-				foundPos = GetFoundNextTextPoint (text, toFind.startPointToFind.Y + 1, matchCase, Point.Empty);
+				foundPos = GetFoundNextTextPoint (text, toFind.startPointToFind.Y + 1, matchCase, matchWholeWord, Point.Empty);
 			}
 			gaveFullTurn = ApplyToFind (foundPos);
 
 			return foundPos;
 		}
 
-		internal (Point current, bool found) FindPreviousText (ustring text, out bool gaveFullTurn, bool matchCase = false)
+		internal (Point current, bool found) FindPreviousText (ustring text, out bool gaveFullTurn, bool matchCase = false, bool matchWholeWord = false)
 		{
 			if (text == null || lines.Count == 0) {
 				gaveFullTurn = false;
@@ -311,9 +311,9 @@ namespace Terminal.Gui {
 			if (toFind.found) {
 				toFind.currentPointToFind.X++;
 			}
-			var foundPos = GetFoundPreviousTextPoint (text, toFind.currentPointToFind.Y, matchCase, toFind.currentPointToFind);
+			var foundPos = GetFoundPreviousTextPoint (text, toFind.currentPointToFind.Y, matchCase, matchWholeWord, toFind.currentPointToFind);
 			if (!foundPos.found && toFind.currentPointToFind != toFind.startPointToFind) {
-				foundPos = GetFoundPreviousTextPoint (text, lines.Count - 1, matchCase,
+				foundPos = GetFoundPreviousTextPoint (text, lines.Count - 1, matchCase, matchWholeWord,
 					new Point (lines [lines.Count - 1].Count, lines.Count));
 			}
 			gaveFullTurn = ApplyToFind (foundPos);
@@ -321,7 +321,7 @@ namespace Terminal.Gui {
 			return foundPos;
 		}
 
-		internal (Point current, bool found) ReplaceAllText (ustring text, bool matchCase = false, ustring textToReplace = null)
+		internal (Point current, bool found) ReplaceAllText (ustring text, bool matchCase = false, bool matchWholeWord = false, ustring textToReplace = null)
 		{
 			bool found = false;
 			Point pos = Point.Empty;
@@ -329,24 +329,37 @@ namespace Terminal.Gui {
 			for (int i = 0; i < lines.Count; i++) {
 				var x = lines [i];
 				var txt = ustring.Make (x).ToString ();
-				var origTxt = txt;
 				if (!matchCase) {
 					txt = txt.ToUpper ();
 				}
 				var matchText = !matchCase ? text.ToUpper ().ToString () : text.ToString ();
 				var col = txt.IndexOf (matchText);
+				if (col > -1 && matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
+					continue;
+				}
 				if (!found && col > -1) {
 					found = true;
 				} else if (col > -1) {
 					pos = new Point (col, i);
 				}
 				if (col > -1) {
-					lines [i] = ((ustring)origTxt.Replace (text.ToString (),
-						textToReplace.ToString ())).ToRuneList ();
+					lines [i] = ReplaceText (x, textToReplace, matchText, col).ToRuneList ();
 				}
 			}
 
 			return (pos, found);
+		}
+
+		ustring ReplaceText (List<Rune> source, ustring textToReplace, string matchText, int col)
+		{
+			var origTxt = ustring.Make (source);
+			(int _, int len) = TextModel.DisplaySize (source, 0, col, false);
+			(var _, var len2) = TextModel.DisplaySize (source, col, col + matchText.Length, false);
+			(var _, var len3) = TextModel.DisplaySize (source, col + matchText.Length, origTxt.RuneCount, false);
+
+			return origTxt [0, len] +
+				textToReplace.ToString () +
+				origTxt [len + len2, len + len2 + len3];
 		}
 
 		bool ApplyToFind ((Point current, bool found) foundPos)
@@ -366,7 +379,7 @@ namespace Terminal.Gui {
 			return gaveFullTurn;
 		}
 
-		(Point current, bool found) GetFoundNextTextPoint (ustring text, int linesCount, bool matchCase, Point start)
+		(Point current, bool found) GetFoundNextTextPoint (ustring text, int linesCount, bool matchCase, bool matchWholeWord, Point start)
 		{
 			for (int i = start.Y; i < linesCount; i++) {
 				var x = lines [i];
@@ -376,6 +389,9 @@ namespace Terminal.Gui {
 				}
 				var matchText = !matchCase ? text.ToUpper ().ToString () : text.ToString ();
 				var col = txt.IndexOf (matchText, Math.Min (start.X, txt.Length));
+				if (col > -1 && matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
+					continue;
+				}
 				if (col > -1 && ((i == start.Y && col >= start.X)
 					|| i > start.Y)
 					&& txt.Contains (matchText)) {
@@ -388,7 +404,7 @@ namespace Terminal.Gui {
 			return (Point.Empty, false);
 		}
 
-		(Point current, bool found) GetFoundPreviousTextPoint (ustring text, int linesCount, bool matchCase, Point start)
+		(Point current, bool found) GetFoundPreviousTextPoint (ustring text, int linesCount, bool matchCase, bool matchWholeWord, Point start)
 		{
 			for (int i = linesCount; i >= 0; i--) {
 				var x = lines [i];
@@ -401,6 +417,9 @@ namespace Terminal.Gui {
 				}
 				var matchText = !matchCase ? text.ToUpper ().ToString () : text.ToString ();
 				var col = txt.LastIndexOf (matchText, start.X);
+				if (col > -1 && matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
+					continue;
+				}
 				if (col > -1 && ((i == linesCount && col <= start.X)
 					|| i < start.Y)
 					&& txt.Contains (matchText)) {
@@ -409,6 +428,24 @@ namespace Terminal.Gui {
 			}
 
 			return (Point.Empty, false);
+		}
+
+		bool MatchWholeWord (string source, string matchText, int index = 0)
+		{
+			if (string.IsNullOrEmpty (source) || string.IsNullOrEmpty (matchText)) {
+				return false;
+			}
+
+			var txt = matchText.Trim ();
+			var start = index > 0 ? index - 1 : 0;
+			var end = index + txt.Length;
+
+			if ((start == 0 || Rune.IsWhiteSpace (source [start]))
+				&& (end == source.Length || Rune.IsWhiteSpace (source [end]))) {
+				return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -1274,7 +1311,7 @@ namespace Terminal.Gui {
 		/// <param name="replace"><c>true</c>If is replacing.<c>false</c>otherwise.</param>
 		/// <returns><c>true</c>If the text was found.<c>false</c>otherwise.</returns>
 		public bool FindNextText (ustring textToFind, out bool gaveFullTurn, bool matchCase = false,
-			ustring textToReplace = null, bool replace = false)
+			bool matchWholeWord = false, ustring textToReplace = null, bool replace = false)
 		{
 			if (model.Count == 0) {
 				gaveFullTurn = false;
@@ -1283,7 +1320,7 @@ namespace Terminal.Gui {
 
 			SetWrapModel ();
 			ResetContinuousFind ();
-			var foundPos = model.FindNextText (textToFind, out gaveFullTurn, matchCase);
+			var foundPos = model.FindNextText (textToFind, out gaveFullTurn, matchCase, matchWholeWord);
 
 			return SetFoundText (textToFind, foundPos, textToReplace, replace);
 		}
@@ -1298,7 +1335,7 @@ namespace Terminal.Gui {
 		/// <param name="replace"><c>true</c>If the text was found.<c>false</c>otherwise.</param>
 		/// <returns><c>true</c>If the text was found.<c>false</c>otherwise.</returns>
 		public bool FindPreviousText (ustring textToFind, out bool gaveFullTurn, bool matchCase = false,
-			ustring textToReplace = null, bool replace = false)
+			bool matchWholeWord = false, ustring textToReplace = null, bool replace = false)
 		{
 			if (model.Count == 0) {
 				gaveFullTurn = false;
@@ -1307,7 +1344,7 @@ namespace Terminal.Gui {
 
 			SetWrapModel ();
 			ResetContinuousFind ();
-			var foundPos = model.FindPreviousText (textToFind, out gaveFullTurn, matchCase);
+			var foundPos = model.FindPreviousText (textToFind, out gaveFullTurn, matchCase, matchWholeWord);
 
 			return SetFoundText (textToFind, foundPos, textToReplace, replace);
 		}
@@ -1327,7 +1364,8 @@ namespace Terminal.Gui {
 		/// <param name="matchCase">The match case setting.</param>
 		/// <param name="textToReplace">The text to replace.</param>
 		/// <returns><c>true</c>If the text was found.<c>false</c>otherwise.</returns>
-		public bool ReplaceAllText (ustring textToFind, bool matchCase = false, ustring textToReplace = null)
+		public bool ReplaceAllText (ustring textToFind, bool matchCase = false, bool matchWholeWord = false,
+			ustring textToReplace = null)
 		{
 			if (isReadOnly || model.Count == 0) {
 				return false;
@@ -1335,7 +1373,7 @@ namespace Terminal.Gui {
 
 			SetWrapModel ();
 			ResetContinuousFind ();
-			var foundPos = model.ReplaceAllText (textToFind, matchCase, textToReplace);
+			var foundPos = model.ReplaceAllText (textToFind, matchCase, matchWholeWord, textToReplace);
 
 			return SetFoundText (textToFind, foundPos, textToReplace, false, true);
 		}
@@ -1354,6 +1392,7 @@ namespace Terminal.Gui {
 				}
 				currentRow = foundPos.current.Y;
 				if (!isReadOnly && replace) {
+					Adjust ();
 					ClearSelectedRegion ();
 					InsertText (textToReplace);
 					StartSelecting ();
