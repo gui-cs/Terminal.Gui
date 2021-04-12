@@ -26,7 +26,7 @@ namespace UICatalog.Scenarios {
 			Win.Height = Dim.Fill (1); // status bar
 			Top.LayoutSubviews ();
 
-			graphs = new Action[] {
+			graphs = new Action [] {
 				 ()=>SetupPeriodicTableScatterPlot(),   //0
 				 ()=>SetupLifeExpectancyBarGraph(true), //1
 				 ()=>SetupLifeExpectancyBarGraph(false),//2
@@ -70,7 +70,7 @@ namespace UICatalog.Scenarios {
 
 
 			var frameRight = new FrameView ("About") {
-				X = Pos.Right (graphView)+1,
+				X = Pos.Right (graphView) + 1,
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
@@ -105,11 +105,11 @@ namespace UICatalog.Scenarios {
 
 			graphView.GraphColor = black;
 
-			var series = new MultiBarSeries (3, 1, 0.25M, new [] {magenta,cyan,red});
+			var series = new MultiBarSeries (3, 1, 0.25M, new [] { magenta, cyan, red });
 
 			var stiple = Application.Driver.Stipple;
 
-			series.AddBars("'96", stiple, 5900, 9000, 14000);
+			series.AddBars ("'96", stiple, 5900, 9000, 14000);
 			series.AddBars ("'97", stiple, 6100, 9200, 14800);
 			series.AddBars ("'98", stiple, 6000, 9300, 14600);
 			series.AddBars ("'99", stiple, 6100, 9400, 14950);
@@ -125,11 +125,11 @@ namespace UICatalog.Scenarios {
 			graphView.MarginLeft = 3;
 			graphView.MarginBottom = 1;
 
-			graphView.AxisY.LabelGetter = (v)=>'$' + (v.GraphSpace.Y /1000M).ToString("N0") + 'k';
+			graphView.AxisY.LabelGetter = (v) => '$' + (v.GraphSpace.Y / 1000M).ToString ("N0") + 'k';
 
 			graphView.AxisX.Increment = 1;
 			graphView.AxisX.ShowLabelsEvery = 1;
-			graphView.AxisX.LabelGetter = (v)=>series.SubSeries.First().GetLabelText(v);
+			graphView.AxisX.LabelGetter = (v) => series.SubSeries.First ().GetLabelText (v);
 		}
 
 		private void SetupLineGraph ()
@@ -137,11 +137,11 @@ namespace UICatalog.Scenarios {
 			graphView.Reset ();
 
 			about.Text = "This graph shows random points";
-						
-			var black = Application.Driver.MakeAttribute(graphView.ColorScheme.Normal.Foreground, Color.Black);
-			var cyan = Application.Driver.MakeAttribute(Color.BrightCyan, Color.Black);
-			var magenta = Application.Driver.MakeAttribute(Color.BrightMagenta, Color.Black);
-			var red = Application.Driver.MakeAttribute(Color.BrightRed, Color.Black);
+
+			var black = Application.Driver.MakeAttribute (graphView.ColorScheme.Normal.Foreground, Color.Black);
+			var cyan = Application.Driver.MakeAttribute (Color.BrightCyan, Color.Black);
+			var magenta = Application.Driver.MakeAttribute (Color.BrightMagenta, Color.Black);
+			var red = Application.Driver.MakeAttribute (Color.BrightRed, Color.Black);
 
 			graphView.GraphColor = black;
 
@@ -149,8 +149,8 @@ namespace UICatalog.Scenarios {
 
 			Random r = new Random ();
 
-			for(int i = 0; i < 10; i++) {
-				randomPoints.Add(new PointD(r.Next (100), r.Next (100)));
+			for (int i = 0; i < 10; i++) {
+				randomPoints.Add (new PointD (r.Next (100), r.Next (100)));
 			}
 
 			var points = new ScatterSeries () {
@@ -159,7 +159,7 @@ namespace UICatalog.Scenarios {
 
 			var line = new PathAnnotation () {
 				LineColor = cyan,
-				Points = randomPoints.OrderBy(p=>p.X).ToList(),
+				Points = randomPoints.OrderBy (p => p.X).ToList (),
 				BeforeSeries = true,
 			};
 
@@ -176,7 +176,7 @@ namespace UICatalog.Scenarios {
 
 			var points2 = new ScatterSeries () {
 				Points = randomPoints,
-				Fill = new GraphCellToRender('x',red)
+				Fill = new GraphCellToRender ('x', red)
 			};
 
 			var line2 = new PathAnnotation () {
@@ -205,23 +205,23 @@ namespace UICatalog.Scenarios {
 			graphView.AxisY.Text = "↑Y";
 
 			var max = line.Points.Union (line2.Points).OrderByDescending (p => p.Y).First ();
-			graphView.Annotations.Add (new TextAnnotation () { Text = "(Max)", GraphPosition = new PointD (max.X + (2*graphView.CellSize.X), max.Y) });
+			graphView.Annotations.Add (new TextAnnotation () { Text = "(Max)", GraphPosition = new PointD (max.X + (2 * graphView.CellSize.X), max.Y) });
 
 			graphView.SetNeedsDisplay ();
 		}
 
-		private void SetupSineWave()
+		private void SetupSineWave ()
 		{
 			graphView.Reset ();
 
 			about.Text = "This graph shows a sine wave";
 
-			var points = new ScatterSeries();
+			var points = new ScatterSeries ();
 			var line = new PathAnnotation ();
 
 			// Generate line graph with 2,000 points
-			for (decimal x = -500; x < 500; x+=0.5M) {
-				points.Points.Add(new PointD(x,(decimal)Math.Sin ((double)x)));
+			for (decimal x = -500; x < 500; x += 0.5M) {
+				points.Points.Add (new PointD (x, (decimal)Math.Sin ((double)x)));
 				line.Points.Add (new PointD (x, (decimal)Math.Sin ((double)x)));
 			}
 
@@ -283,14 +283,14 @@ namespace UICatalog.Scenarios {
 "Kuwait",81,79.3,83.9
 "Costa Rica",80.8,78.3,83.4*/
 
-		private void SetupLifeExpectancyBarGraph(bool verticalBars)
+		private void SetupLifeExpectancyBarGraph (bool verticalBars)
 		{
-			graphView.Reset();
+			graphView.Reset ();
 
 			about.Text = "This graph shows the life expectancy at birth of a range of countries";
-			
-			var softStiple = new GraphCellToRender('\u2591');
-			var mediumStiple = new GraphCellToRender('\u2592');
+
+			var softStiple = new GraphCellToRender ('\u2591');
+			var mediumStiple = new GraphCellToRender ('\u2592');
 
 			var barSeries = new BarSeries () {
 				Bars = new List<BarSeries.Bar> () {
@@ -343,7 +343,7 @@ namespace UICatalog.Scenarios {
 				barSeries.Orientation = Orientation.Horizontal;
 
 				// How much graph space each cell of the console depicts
-				graphView.CellSize = new PointD (0.1M,1M);
+				graphView.CellSize = new PointD (0.1M, 1M);
 				graphView.AxisY.Increment = 1M;
 				graphView.AxisY.ShowLabelsEvery = 1;
 				graphView.AxisY.LabelGetter = v => barSeries.GetLabelText (v);
@@ -356,16 +356,16 @@ namespace UICatalog.Scenarios {
 
 				// leave space for axis labels and title
 				graphView.MarginBottom = 2;
-				graphView.MarginLeft = (uint)barSeries.Bars.Max(b=>b.Text.Length)+2;
+				graphView.MarginLeft = (uint)barSeries.Bars.Max (b => b.Text.Length) + 2;
 
 				// Start the graph at 80 years because that is where most of our data is
-				graphView.ScrollOffset = new PointD (80,0);
-			}			
+				graphView.ScrollOffset = new PointD (80, 0);
+			}
 
-			graphView.SetNeedsDisplay();
+			graphView.SetNeedsDisplay ();
 		}
 
-		private void SetupPopulationPyramid()
+		private void SetupPopulationPyramid ()
 		{
 			/*
 			Age,M,F
@@ -393,20 +393,20 @@ namespace UICatalog.Scenarios {
 
 			about.Text = "This graph shows population of each age divided by gender";
 
-			graphView.Reset();
-			
+			graphView.Reset ();
+
 			// How much graph space each cell of the console depicts
 			graphView.CellSize = new PointD (100_000, 1);
 
 			//center the x axis in middle of screen to show both sides
-			graphView.ScrollOffset = new PointD(-3_000_000,0);
+			graphView.ScrollOffset = new PointD (-3_000_000, 0);
 
 			graphView.AxisX.Text = "Number Of People";
 			graphView.AxisX.Increment = 500_000;
 			graphView.AxisX.ShowLabelsEvery = 2;
-			
+
 			// use Abs to make negative axis labels positive
-			graphView.AxisX.LabelGetter = (v)=>Math.Abs(v.GraphSpace.X/1_000_000).ToString("N2")+"M";
+			graphView.AxisX.LabelGetter = (v) => Math.Abs (v.GraphSpace.X / 1_000_000).ToString ("N2") + "M";
 
 			// leave space for axis labels
 			graphView.MarginBottom = 2;
@@ -414,14 +414,14 @@ namespace UICatalog.Scenarios {
 
 			graphView.AxisY.ShowLabelsEvery = 1;
 
-			var stiple = new GraphCellToRender(Application.Driver.Stipple);
+			var stiple = new GraphCellToRender (Application.Driver.Stipple);
 
 			// Bars in 2 directions
 
 			// Males (negative to make the bars go left)
-			var malesSeries = new BarSeries(){
+			var malesSeries = new BarSeries () {
 				Orientation = Orientation.Horizontal,
-				Bars = new List<BarSeries.Bar>()
+				Bars = new List<BarSeries.Bar> ()
 				{
 					new BarSeries.Bar("0-4",stiple,-2009363),
 					new BarSeries.Bar("5-9",stiple,-2108550),
@@ -447,9 +447,9 @@ namespace UICatalog.Scenarios {
 
 				}
 			};
-			graphView.Series.Add(malesSeries);
+			graphView.Series.Add (malesSeries);
 
-			
+
 			// Females
 			var femalesSeries = new BarSeries () {
 				Orientation = Orientation.Horizontal,
@@ -480,23 +480,23 @@ namespace UICatalog.Scenarios {
 			};
 
 
-			var softStiple = new GraphCellToRender('\u2591');
-			var mediumStiple = new GraphCellToRender('\u2592');
-			
-			for(int i=0;i<malesSeries.Bars.Count;i++){
-				malesSeries.Bars[i].Fill = i%2 == 0 ?softStiple:mediumStiple;
-				femalesSeries.Bars[i].Fill = i%2 == 0 ?softStiple:mediumStiple;
+			var softStiple = new GraphCellToRender ('\u2591');
+			var mediumStiple = new GraphCellToRender ('\u2592');
+
+			for (int i = 0; i < malesSeries.Bars.Count; i++) {
+				malesSeries.Bars [i].Fill = i % 2 == 0 ? softStiple : mediumStiple;
+				femalesSeries.Bars [i].Fill = i % 2 == 0 ? softStiple : mediumStiple;
 			}
-			
+
 			graphView.Series.Add (femalesSeries);
 
-			graphView.AxisY.LabelGetter = (v)=>femalesSeries.GetLabelText(v);
+			graphView.AxisY.LabelGetter = (v) => femalesSeries.GetLabelText (v);
 
 
-			graphView.Annotations.Add(new TextAnnotation(){Text="M",ScreenPosition = new Terminal.Gui.Point(0,10)});
-			graphView.Annotations.Add(new TextAnnotation(){Text="F",ScreenPosition = new Terminal.Gui.Point(graphView.Bounds.Width-1,10)});
+			graphView.Annotations.Add (new TextAnnotation () { Text = "M", ScreenPosition = new Terminal.Gui.Point (0, 10) });
+			graphView.Annotations.Add (new TextAnnotation () { Text = "F", ScreenPosition = new Terminal.Gui.Point (graphView.Bounds.Width - 1, 10) });
 
-			graphView.SetNeedsDisplay();
+			graphView.SetNeedsDisplay ();
 
 		}
 
@@ -540,7 +540,7 @@ namespace UICatalog.Scenarios {
 			var series = new BarSeries ();
 			var bars = new List<BarSeries.Bar> ();
 
-			Func<MainLoop,bool> genSample = (l) => {
+			Func<MainLoop, bool> genSample = (l) => {
 
 				bars.Clear ();
 				// generate an imaginary sample
@@ -551,13 +551,13 @@ namespace UICatalog.Scenarios {
 						});
 				}
 				graphView.SetNeedsDisplay ();
-				
+
 
 				// while the equaliser is showing
 				return graphView.Series.Contains (series);
 			};
 
-			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds(250),genSample);
+			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (250), genSample);
 
 			series.Bars = bars;
 
@@ -574,7 +574,7 @@ namespace UICatalog.Scenarios {
 		}
 		private void SetupPeriodicTableScatterPlot ()
 		{
-			graphView.Reset();
+			graphView.Reset ();
 
 			about.Text = "This graph shows the atomic weight of each element in the periodic table.\nStarting with Hydrogen (atomic Number 1 with a weight of 1.007)";
 
@@ -620,7 +620,7 @@ namespace UICatalog.Scenarios {
 			graphView.AxisY.Increment = 5;
 			graphView.AxisY.ShowLabelsEvery = 1;
 
-			graphView.SetNeedsDisplay();
+			graphView.SetNeedsDisplay ();
 		}
 
 		private void Zoom (decimal factor)

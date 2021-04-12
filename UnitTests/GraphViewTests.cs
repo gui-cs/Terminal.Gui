@@ -12,10 +12,10 @@ namespace UnitTests {
 		#region Screen to Graph Tests
 
 		[Fact]
-		public void ScreenToGraphSpace_DefaultCellSize()
+		public void ScreenToGraphSpace_DefaultCellSize ()
 		{
 			var gv = new GraphView ();
-			gv.Bounds = new Rect(0,0,20,10);
+			gv.Bounds = new Rect (0, 0, 20, 10);
 
 			// origin should be bottom left
 			var botLeft = gv.ScreenToGraphSpace (0, 9);
@@ -23,7 +23,7 @@ namespace UnitTests {
 			Assert.Equal (0, botLeft.Y);
 			Assert.Equal (1, botLeft.Width);
 			Assert.Equal (1, botLeft.Height);
-			
+
 
 			// up 2 rows of the console and along 1 col
 			var up2along1 = gv.ScreenToGraphSpace (1, 7);
@@ -170,7 +170,7 @@ namespace UnitTests {
 			var botLeft = gv.GraphSpaceToScreen (new PointD (0, 0));
 			Assert.Equal (0, botLeft.X);
 			// row 9 of the view is the bottom left (height is 10 so 0,1,2,3..9)
-			Assert.Equal (9, botLeft.Y); 
+			Assert.Equal (9, botLeft.Y);
 
 			// along 2 and up 1 in graph space
 			var along2up1 = gv.GraphSpaceToScreen (new PointD (2, 1));
@@ -178,12 +178,12 @@ namespace UnitTests {
 			Assert.Equal (9, along2up1.Y);
 
 			// Y value 4 should be rendered in bottom most row
-			Assert.Equal (9, gv.GraphSpaceToScreen(new PointD (2, 4)).Y);
-			
+			Assert.Equal (9, gv.GraphSpaceToScreen (new PointD (2, 4)).Y);
+
 			// Cell height is 5 so this is the first point of graph space that should
 			// be rendered in the graph in next row up (row 9)
 			Assert.Equal (8, gv.GraphSpaceToScreen (new PointD (2, 5)).Y);
-			
+
 			// More boundary testing for this cell size
 			Assert.Equal (8, gv.GraphSpaceToScreen (new PointD (2, 6)).Y);
 			Assert.Equal (8, gv.GraphSpaceToScreen (new PointD (2, 7)).Y);
@@ -228,9 +228,9 @@ namespace UnitTests {
 		}
 
 		#endregion
-		
+
 		[Fact]
-		public void TestNoOverlappingCells()
+		public void TestNoOverlappingCells ()
 		{
 			var gv = new GraphView ();
 			gv.Bounds = new Rect (0, 0, 50, 30);
@@ -250,11 +250,11 @@ namespace UnitTests {
 
 			List<System.Drawing.Point> overlappingPoints = new List<System.Drawing.Point> ();
 
-			for(int x = 0;x<gv.Bounds.Width; x++) {
-				for (int y = 0;y < gv.Bounds.Height; y++) {
+			for (int x = 0; x < gv.Bounds.Width; x++) {
+				for (int y = 0; y < gv.Bounds.Height; y++) {
 
 					var graphSpace = gv.ScreenToGraphSpace (x, y);
-					var overlapping = otherRects.Where (r=>r.IntersectsWith (graphSpace)).ToArray();
+					var overlapping = otherRects.Where (r => r.IntersectsWith (graphSpace)).ToArray ();
 
 					if (overlapping.Any ()) {
 						overlappingPoints.Add (new System.Drawing.Point (x, y));
@@ -294,7 +294,7 @@ namespace UnitTests {
 				for (int y = 0; y < gv.Bounds.Height; y++) {
 
 					var graphSpace = gv.ScreenToGraphSpace (x, y);
-					
+
 					var p = gv.GraphSpaceToScreen (new PointD (graphSpace.Left, graphSpace.Top));
 					Assert.Equal (x, p.X);
 					Assert.Equal (y, p.Y);

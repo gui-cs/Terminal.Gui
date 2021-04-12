@@ -18,24 +18,24 @@ namespace Terminal.Gui {
 		/// Horizontal axis
 		/// </summary>
 		/// <value></value>
-		public Axis AxisX {get;} 
+		public Axis AxisX { get; }
 
 		/// <summary>
 		/// Vertical axis
 		/// </summary>
 		/// <value></value>
-		public Axis AxisY {get;} 
+		public Axis AxisY { get; }
 
 		/// <summary>
 		/// Collection of data series that are rendered in the graph
 		/// </summary>
-		public List<ISeries> Series {get;} = new List<ISeries>();
+		public List<ISeries> Series { get; } = new List<ISeries> ();
 
 
 		/// <summary>
 		/// Elements drawn into graph after series have been drawn e.g. Legends etc
 		/// </summary>
-		public List<IAnnotation> Annotations {get;} = new List<IAnnotation>();
+		public List<IAnnotation> Annotations { get; } = new List<IAnnotation> ();
 
 		/// <summary>
 		/// Amount of space to leave on left of control.  Graph content (<see cref="Series"/>)
@@ -54,14 +54,14 @@ namespace Terminal.Gui {
 		/// Changing this scrolls the viewport around in the graph
 		/// </summary>
 		/// <value></value>
-		public PointD ScrollOffset {get;set;} = new PointD(0,0);
+		public PointD ScrollOffset { get; set; } = new PointD (0, 0);
 
 		/// <summary>
 		/// Translates console width/height into graph space. Defaults
 		/// to 1 row/col of console space being 1 unit of graph space. 
 		/// </summary>
 		/// <returns></returns>
-		public PointD CellSize {get;set;} = new PointD(1,1);
+		public PointD CellSize { get; set; } = new PointD (1, 1);
 
 		/// <summary>
 		/// The color of the background of the graph and axis/labels
@@ -71,34 +71,34 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new graph with a 1 to 1 graph space with absolute layout
 		/// </summary>
-		public GraphView()
+		public GraphView ()
 		{
 			CanFocus = true;
 
-			AxisX = new HorizontalAxis();
-		 	AxisY = new VerticalAxis();
+			AxisX = new HorizontalAxis ();
+			AxisY = new VerticalAxis ();
 		}
 
 		/// <summary>
 		/// Clears all settings configured on the graph and resets all properties
 		/// to default values (<see cref="CellSize"/>, <see cref="ScrollOffset"/> etc) 
 		/// </summary>
-		public void Reset()
+		public void Reset ()
 		{
-			ScrollOffset = new PointD(0,0);
-			CellSize = new PointD(1,1);
-			AxisX.Reset();
-		 	AxisY.Reset();
-			Series.Clear();
-			Annotations.Clear();
+			ScrollOffset = new PointD (0, 0);
+			CellSize = new PointD (1, 1);
+			AxisX.Reset ();
+			AxisY.Reset ();
+			Series.Clear ();
+			Annotations.Clear ();
 			GraphColor = null;
-			SetNeedsDisplay();
+			SetNeedsDisplay ();
 		}
 
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			Driver.SetAttribute (GraphColor ??ColorScheme.Normal);
+			Driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
 
 			Move (0, 0);
 
@@ -114,29 +114,29 @@ namespace Terminal.Gui {
 			}
 
 			// Draw 'before' annotations
-			foreach (var a in Annotations.Where (a => a.BeforeSeries)){
+			foreach (var a in Annotations.Where (a => a.BeforeSeries)) {
 				a.Render (this, Driver, Bounds);
 			}
 
 			Driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
 
-			for (int x= (int)MarginLeft;x<Bounds.Width;x++){
-				for(int y=0;y<Bounds.Height - (int)MarginBottom;y++){
+			for (int x = (int)MarginLeft; x < Bounds.Width; x++) {
+				for (int y = 0; y < Bounds.Height - (int)MarginBottom; y++) {
 
-					var space = ScreenToGraphSpace(x,y);
+					var space = ScreenToGraphSpace (x, y);
 
-					foreach(var s in Series){
-						var render = s.GetCellValueIfAny(space);
-						
-						if(render != null){
-							Move(x,y);
+					foreach (var s in Series) {
+						var render = s.GetCellValueIfAny (space);
+
+						if (render != null) {
+							Move (x, y);
 
 							var old = Driver.GetAttribute ();
 							if (render.Color.HasValue) {
 								Driver.SetAttribute (render.Color.Value);
 							}
 
-							Driver.AddRune(render.Rune);
+							Driver.AddRune (render.Rune);
 
 							if (render.Color.HasValue) {
 								Driver.SetAttribute (old);
@@ -150,29 +150,29 @@ namespace Terminal.Gui {
 
 			AxisY.DrawAxisLine (Driver, this, Bounds);
 			AxisX.DrawAxisLine (Driver, this, Bounds);
-			
+
 			AxisY.DrawAxisLabels (Driver, this, Bounds);
 			AxisX.DrawAxisLabels (Driver, this, Bounds);
 
 			Driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
 
 			// Draw origin with plus
-			var origin = GraphSpaceToScreen(new PointD(0,0));
+			var origin = GraphSpaceToScreen (new PointD (0, 0));
 
 
-			if(origin.X >= MarginLeft && origin.X<Bounds.Width){
-				if(origin.Y >= 0 && origin.Y<=Bounds.Height - MarginBottom){
+			if (origin.X >= MarginLeft && origin.X < Bounds.Width) {
+				if (origin.Y >= 0 && origin.Y <= Bounds.Height - MarginBottom) {
 
-					if(AxisX.Visible && AxisY.Visible){
-						Move(origin.X,origin.Y);
-						AddRune(origin.X,origin.Y,'\u253C');
+					if (AxisX.Visible && AxisY.Visible) {
+						Move (origin.X, origin.Y);
+						AddRune (origin.X, origin.Y, '\u253C');
 					}
 				}
 			}
 
 			// Draw 'after' annotations
-			foreach(var a in Annotations.Where(a=>!a.BeforeSeries)){
-				a.Render(this,Driver,Bounds);
+			foreach (var a in Annotations.Where (a => !a.BeforeSeries)) {
+				a.Render (this, Driver, Bounds);
 			}
 
 		}
@@ -188,7 +188,7 @@ namespace Terminal.Gui {
 		{
 			return new RectangleD (
 				ScrollOffset.X + ((col - MarginLeft) * CellSize.X),
-				ScrollOffset.Y + ((Bounds.Height - (row + MarginBottom+1)) * CellSize.Y),
+				ScrollOffset.Y + ((Bounds.Height - (row + MarginBottom + 1)) * CellSize.Y),
 				CellSize.X, CellSize.Y);
 		}
 
@@ -201,7 +201,7 @@ namespace Terminal.Gui {
 		public RectangleD ScreenToGraphSpace (Rect screenArea)
 		{
 			var pos = ScreenToGraphSpace (screenArea.X, screenArea.Y);
-			
+
 			return new RectangleD (pos.X, pos.Y, screenArea.Width * CellSize.X, screenArea.Y * CellSize.Y);
 		}
 		/// <summary>
@@ -218,7 +218,7 @@ namespace Terminal.Gui {
 
 				(int)((location.X - ScrollOffset.X) / CellSize.X) + (int)MarginLeft,
 				 // screen coordinates are top down while graph coordinates are bottom up
-				 (Bounds.Height-1) - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y) 
+				 (Bounds.Height - 1) - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y)
 				);
 		}
 
@@ -229,32 +229,32 @@ namespace Terminal.Gui {
 		{
 			//&& Focused == tabsBar
 
-			if (HasFocus && CanFocus ) {
+			if (HasFocus && CanFocus) {
 				switch (keyEvent.Key) {
 
 				case Key.CursorLeft:
 					Scroll (-CellSize.X, 0);
 					return true;
 				case Key.CursorLeft | Key.CtrlMask:
-					Scroll (-CellSize.X*5, 0);
+					Scroll (-CellSize.X * 5, 0);
 					return true;
 				case Key.CursorRight:
 					Scroll (CellSize.X, 0);
 					return true;
 				case Key.CursorRight | Key.CtrlMask:
-					Scroll (CellSize.X*5, 0);
+					Scroll (CellSize.X * 5, 0);
 					return true;
 				case Key.CursorDown:
 					Scroll (0, -CellSize.Y);
 					return true;
 				case Key.CursorDown | Key.CtrlMask:
-					Scroll (0, -CellSize.Y*5);
+					Scroll (0, -CellSize.Y * 5);
 					return true;
 				case Key.CursorUp:
-					Scroll (0,CellSize.Y);
+					Scroll (0, CellSize.Y);
 					return true;
 				case Key.CursorUp | Key.CtrlMask:
-					Scroll (0,CellSize.Y*5);
+					Scroll (0, CellSize.Y * 5);
 					return true;
 				}
 			}
@@ -283,8 +283,7 @@ namespace Terminal.Gui {
 	/// Annotations can be positioned either in screen space (e.g.
 	/// a legend) or in graph space (e.g. a line showing high point)
 	/// </summary>
-	public interface IAnnotation
-	{
+	public interface IAnnotation {
 		/// <summary>
 		/// True if annotation should be drawn before <see cref="ISeries"/>
 		/// </summary>
@@ -296,33 +295,33 @@ namespace Terminal.Gui {
 		/// <param name="graph"></param>
 		/// <param name="driver"></param>
 		/// <param name="screenBounds"></param>
-		void Render(GraphView graph, ConsoleDriver driver,Rect screenBounds);
+		void Render (GraphView graph, ConsoleDriver driver, Rect screenBounds);
 	}
 
 	/// <summary>
 	/// Displays text at a given position (in screen space or graph space)
 	/// </summary>
-	public class TextAnnotation : IAnnotation{
+	public class TextAnnotation : IAnnotation {
 
 		/// <summary>
 		/// The location on screen to draw the <see cref="Text"/> regardless
 		/// of scroll/zoom settings.  This overrides <see cref="GraphPosition"/>
 		/// if specified.
 		/// </summary>
-		public Point? ScreenPosition{get;set;}
+		public Point? ScreenPosition { get; set; }
 
 		/// <summary>
 		/// The location in graph space to draw the <see cref="Text"/>.  This
 		/// annotation will only show if the point is in the current viewable
 		/// area of the graph presented in the <see cref="GraphView"/>
 		/// </summary>
-		public PointD GraphPosition{get;set;}
+		public PointD GraphPosition { get; set; }
 
 		/// <summary>
 		/// Text to display on the graph
 		/// </summary>
 		/// <value></value>
-		public string Text {get;set;}
+		public string Text { get; set; }
 
 		/// <summary>
 		/// True to add text before plotting series.  Defaults to false
@@ -335,17 +334,17 @@ namespace Terminal.Gui {
 		/// <param name="graph"></param>
 		/// <param name="driver"></param>
 		/// <param name="screenBounds"></param>
-		public void Render(GraphView graph, ConsoleDriver driver,Rect screenBounds)
+		public void Render (GraphView graph, ConsoleDriver driver, Rect screenBounds)
 		{
-			if(ScreenPosition.HasValue){
-				DrawText( graph,driver,screenBounds,ScreenPosition.Value.X,ScreenPosition.Value.Y);
+			if (ScreenPosition.HasValue) {
+				DrawText (graph, driver, screenBounds, ScreenPosition.Value.X, ScreenPosition.Value.Y);
 				return;
 			}
 
-			if(GraphPosition != null){
-				var screenPos = graph.GraphSpaceToScreen(GraphPosition);
+			if (GraphPosition != null) {
+				var screenPos = graph.GraphSpaceToScreen (GraphPosition);
 
-				DrawText(graph,driver,screenBounds,screenPos.X,screenPos.Y);
+				DrawText (graph, driver, screenBounds, screenPos.X, screenPos.Y);
 			}
 		}
 
@@ -361,28 +360,27 @@ namespace Terminal.Gui {
 		protected void DrawText (GraphView graph, ConsoleDriver driver, Rect screenBounds, int x, int y)
 		{
 			// the draw point is out of control bounds
-			if(!screenBounds.Contains(new Point(x,y))){
+			if (!screenBounds.Contains (new Point (x, y))) {
 				return;
 			}
 
 			// There is no text to draw
-			if(string.IsNullOrWhiteSpace(Text)){
+			if (string.IsNullOrWhiteSpace (Text)) {
 				return;
 			}
 
-			graph.Move(x,y);
+			graph.Move (x, y);
 
-			int availableWidth = screenBounds.Width-x;
+			int availableWidth = screenBounds.Width - x;
 
-			if(availableWidth <= 0){
+			if (availableWidth <= 0) {
 				return;
 			}
 
-			if(Text.Length < availableWidth){
-				driver.AddStr(Text);
-			}
-			else{
-				driver.AddStr(Text.Substring(0,availableWidth));
+			if (Text.Length < availableWidth) {
+				driver.AddStr (Text);
+			} else {
+				driver.AddStr (Text.Substring (0, availableWidth));
 			}
 		}
 	}
@@ -391,8 +389,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Describes a series of data that can be rendered into a <see cref="GraphView"/>>
 	/// </summary>
-	public interface ISeries 
-	{
+	public interface ISeries {
 		/// <summary>
 		/// Return the rune that should be drawn on the screen (if any)
 		/// for the current position in the control
@@ -430,7 +427,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="rune"></param>
 		/// <param name="color"></param>
-		public GraphCellToRender (Rune rune, Attribute color):this(rune)
+		public GraphCellToRender (Rune rune, Attribute color) : this (rune)
 		{
 			Color = color;
 		}
@@ -446,13 +443,12 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Series composed of any number of discrete data points 
 	/// </summary>
-	public class ScatterSeries : ISeries
-	{
+	public class ScatterSeries : ISeries {
 		/// <summary>
 		/// Collection of each discrete point in the series
 		/// </summary>
 		/// <returns></returns>
-		public List<PointD> Points {get;set;} = new List<PointD>();
+		public List<PointD> Points { get; set; } = new List<PointD> ();
 
 		/// <summary>
 		/// The color and character that will be rendered in the console
@@ -469,7 +465,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
 		{
-			if(Points.Any(p=>graphSpace.Contains(p))){
+			if (Points.Any (p => graphSpace.Contains (p))) {
 				return Fill;
 			}
 
@@ -481,7 +477,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Collection of <see cref="BarSeries"/> in which bars are clustered by category
 	/// </summary>
-	public class MultiBarSeries :ISeries{
+	public class MultiBarSeries : ISeries {
 
 		BarSeries [] subSeries;
 
@@ -505,21 +501,21 @@ namespace Terminal.Gui {
 		/// <param name="barsEvery">How far appart to put each category (in graph space)</param>
 		/// <param name="spacing">How much spacing between bars in a category (should be less than <paramref name="barsEvery"/>/<paramref name="numberOfBarsPerCategory"/>)</param>
 		/// <param name="colors">Array of colors that define bar colour in each category.  Length must match <paramref name="numberOfBarsPerCategory"/></param>
-		public MultiBarSeries (int numberOfBarsPerCategory, decimal barsEvery, decimal spacing, Attribute[] colors = null)
+		public MultiBarSeries (int numberOfBarsPerCategory, decimal barsEvery, decimal spacing, Attribute [] colors = null)
 		{
 			subSeries = new BarSeries [numberOfBarsPerCategory];
 
-			if(colors != null && colors.Length != numberOfBarsPerCategory){
-				throw new ArgumentException("Number of colours must match the number of bars",nameof(numberOfBarsPerCategory));
+			if (colors != null && colors.Length != numberOfBarsPerCategory) {
+				throw new ArgumentException ("Number of colours must match the number of bars", nameof (numberOfBarsPerCategory));
 			}
 
 
-			for(int i = 0; i < numberOfBarsPerCategory; i++) {
+			for (int i = 0; i < numberOfBarsPerCategory; i++) {
 				subSeries [i] = new BarSeries ();
 				subSeries [i].BarEvery = barsEvery;
 				subSeries [i].Offset = i * spacing;
 
-				if(colors != null) {
+				if (colors != null) {
 					subSeries [i].OverrideBarColor = colors [i];
 				}
 			}
@@ -532,15 +528,15 @@ namespace Terminal.Gui {
 		/// <param name="label"></param>
 		/// <param name="fill"></param>
 		/// <param name="values">Values for each bar in category, must match the number of bars per category</param>
-		public void AddBars (string label,Rune fill, params decimal[] values)
+		public void AddBars (string label, Rune fill, params decimal [] values)
 		{
-			if(values.Length != subSeries.Length) {
+			if (values.Length != subSeries.Length) {
 				throw new ArgumentException ("Number of values must match the number of bars per category", nameof (values));
 			}
-			
+
 			for (int i = 0; i < values.Length; i++) {
-				subSeries [i].Bars.Add(new BarSeries.Bar(label,
-					new GraphCellToRender(fill),values[i]));
+				subSeries [i].Bars.Add (new BarSeries.Bar (label,
+					new GraphCellToRender (fill), values [i]));
 			}
 		}
 
@@ -552,11 +548,11 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
 		{
-			foreach(var bar in subSeries) {
+			foreach (var bar in subSeries) {
 
 				var cell = bar.GetCellValueIfAny (graphSpace);
 
-				if(cell != null) {
+				if (cell != null) {
 					return cell;
 				}
 			}
@@ -618,25 +614,24 @@ namespace Terminal.Gui {
 			Bar bar = LocationToBar (graphSpace);
 
 			//if no bar should be rendered at this position
-			if(bar == null) {
+			if (bar == null) {
 				return null;
 			}
-			
+
 			var toBeat = Orientation == Orientation.Vertical ? graphSpace.Top : graphSpace.Right;
-			
+
 			// for negative bars
-			if(bar.Value < 0) {
+			if (bar.Value < 0) {
 
 				// fill above (up to 0)
 				if (bar.Value <= toBeat && toBeat < 0) {
-					return ApplyColor(bar.GetFinalFill(graphSpace));
+					return ApplyColor (bar.GetFinalFill (graphSpace));
 				}
-			}
-			else {
+			} else {
 				// and the bar is at least this high / wide
 				if (bar.Value >= toBeat && toBeat > 0) {
 
-					return ApplyColor(bar.GetFinalFill (graphSpace));
+					return ApplyColor (bar.GetFinalFill (graphSpace));
 				}
 
 			}
@@ -650,7 +645,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		protected virtual GraphCellToRender ApplyColor (GraphCellToRender graphCellToRender)
 		{
-			if(OverrideBarColor.HasValue) {
+			if (OverrideBarColor.HasValue) {
 				graphCellToRender.Color = OverrideBarColor;
 			}
 
@@ -679,7 +674,7 @@ namespace Terminal.Gui {
 				var high = Orientation == Orientation.Vertical ? graphSpace.Right : graphSpace.Bottom;
 
 				// if a bar contained in this cell's X/Y axis of data space
-				if (barPosition >=  low && barPosition < high) {
+				if (barPosition >= low && barPosition < high) {
 					return Bars [i];
 				}
 			}
@@ -707,13 +702,13 @@ namespace Terminal.Gui {
 			/// Optional text that describes the bar.  This can be added as a label on the axis by setting
 			/// <see cref="Axis.LabelGetter"/> = <see cref="BarSeries.GetLabelText(AxisIncrementToRender)"/>
 			/// </summary>
-			public string Text { get; set;}
+			public string Text { get; set; }
 
 			/// <summary>
 			/// The color and character that will be rendered in the console
 			/// when the bar extends over it
 			/// </summary>
-			public GraphCellToRender Fill { get; set;}
+			public GraphCellToRender Fill { get; set; }
 
 			/// <summary>
 			/// Allows you to control the color of the bar at a given graph location.  This
@@ -748,7 +743,7 @@ namespace Terminal.Gui {
 			{
 				var customColor = ColorGetter?.Invoke (graphSpace);
 
-				if(customColor == null) {
+				if (customColor == null) {
 					return Fill;
 				}
 
@@ -766,8 +761,8 @@ namespace Terminal.Gui {
 		/// Points that should be connected.  Lines will be drawn between points in the order
 		/// they appear in the list
 		/// </summary>
-		public List<PointD> Points { get; set;} = new List<PointD>();
-		
+		public List<PointD> Points { get; set; } = new List<PointD> ();
+
 		/// <summary>
 		/// Color for the line that connects points
 		/// </summary>
@@ -790,7 +785,7 @@ namespace Terminal.Gui {
 		{
 			View.Driver.SetAttribute (LineColor ?? graph.ColorScheme.Normal);
 
-			foreach (var line in PointsToLines()){
+			foreach (var line in PointsToLines ()) {
 				DrawLine (graph, line.Start, line.End);
 			}
 		}
@@ -800,9 +795,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns></returns>
 		private IEnumerable<LineD> PointsToLines ()
-		{	
-			for (int i=0;i< Points.Count - 1; i++) {
-				
+		{
+			for (int i = 0; i < Points.Count - 1; i++) {
+
 				var line = new LineD (Points [i], Points [i + 1]);
 				if (line.Start != null && line.End != null) {
 					yield return line;
@@ -813,7 +808,7 @@ namespace Terminal.Gui {
 
 		private void Plot (GraphView view, int x, int y)
 		{
-			view.AddRune ((int)x, (int)y,'.');
+			view.AddRune ((int)x, (int)y, '.');
 		}
 
 		int ipart (decimal x) { return (int)x; }
@@ -862,7 +857,7 @@ namespace Terminal.Gui {
 			int err = (dx > dy ? dx : -dy) / 2, e2;
 
 			while (true) {
-				Plot(view,x0, y0);
+				Plot (view, x0, y0);
 				if (x0 == x1 && y0 == y1) break;
 				e2 = err;
 				if (e2 > -dx) { err -= dy; x0 += sx; }
@@ -873,8 +868,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Renders a continuous line with grid line ticks and labels
 	/// </summary>
-	public abstract class Axis
-	{
+	public abstract class Axis {
 		/// <summary>
 		/// Default value for <see cref="ShowLabelsEvery"/>
 		/// </summary>
@@ -884,13 +878,13 @@ namespace Terminal.Gui {
 		/// Direction of the axis
 		/// </summary>
 		/// <value></value>
-		public Orientation Orientation {get;}
-				
+		public Orientation Orientation { get; }
+
 		/// <summary>
 		/// Number of units of graph space between ticks on axis
 		/// </summary>
 		/// <value></value>
-		public decimal Increment {get;set;} = 1;
+		public decimal Increment { get; set; } = 1;
 
 		/// <summary>
 		/// The number of <see cref="Increment"/> before an label is added.
@@ -961,7 +955,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new instance of axis with an <see cref="Orientation"/> of <see cref="Orientation.Horizontal"/>
 		/// </summary>
-		public HorizontalAxis ():base(Orientation.Horizontal)
+		public HorizontalAxis () : base (Orientation.Horizontal)
 		{
 			LabelGetter = DefaultLabelGetter;
 		}
@@ -1005,7 +999,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Draws the horizontal x axis labels and <see cref="Axis.Increment"/> ticks
 		/// </summary>
-		public override void DrawAxisLabels (ConsoleDriver driver,GraphView graph,Rect bounds)
+		public override void DrawAxisLabels (ConsoleDriver driver, GraphView graph, Rect bounds)
 		{
 			if (!Visible) {
 				return;
@@ -1040,14 +1034,14 @@ namespace Terminal.Gui {
 						toRender = toRender.Substring (0, xSpaceAvailable);
 					}
 
-					graph.Move (drawAtX,Math.Min(label.ScreenLocation.Y + 1,bounds.Height-1));
+					graph.Move (drawAtX, Math.Min (label.ScreenLocation.Y + 1, bounds.Height - 1));
 					driver.AddStr (toRender);
 				}
 			}
 
 			// if there is a title
 			if (!string.IsNullOrWhiteSpace (Text)) {
-				
+
 				string toRender = Text;
 
 				// if label is too long
@@ -1055,7 +1049,7 @@ namespace Terminal.Gui {
 					toRender = toRender.Substring (0, graph.Bounds.Width);
 				}
 
-				graph.Move (graph.Bounds.Width/2 - (toRender.Length / 2), graph.Bounds.Height -1);
+				graph.Move (graph.Bounds.Width / 2 - (toRender.Length / 2), graph.Bounds.Height - 1);
 				driver.AddStr (toRender);
 			}
 		}
@@ -1063,21 +1057,20 @@ namespace Terminal.Gui {
 		private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph, Rect bounds)
 		{
 			// if no labels
-			if(Increment == 0) {
+			if (Increment == 0) {
 				yield break;
 			}
 
 			int labels = 0;
 			int y = GetAxisYPosition (graph, bounds);
-			
+
 			for (int i = 0; i < bounds.Width; i++) {
 
 				// what bit of the graph is supposed to go here?
-				var graphSpace = graph.ScreenToGraphSpace (i,y);
+				var graphSpace = graph.ScreenToGraphSpace (i, y);
 
-				if(Math.Abs(graphSpace.X) % Increment < graph.CellSize.X)
-				{
-					var toRender =  new AxisIncrementToRender (Orientation, new Point (i, y), graphSpace);
+				if (Math.Abs (graphSpace.X) % Increment < graph.CellSize.X) {
+					var toRender = new AxisIncrementToRender (Orientation, new Point (i, y), graphSpace);
 
 					if (ShowLabelsEvery != 0) {
 
@@ -1098,7 +1091,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="graph"></param>
 		/// <param name="bounds"></param>
-		private int GetAxisYPosition(GraphView graph, Rect bounds)
+		private int GetAxisYPosition (GraphView graph, Rect bounds)
 		{
 			// find the origin of the graph in screen space (this allows for 'crosshair' style
 			// graphs where positive and negative numbers visible
@@ -1106,7 +1099,7 @@ namespace Terminal.Gui {
 
 			// float the X axis so that it accurately represents the origin of the graph
 			// but anchor it to top/bottom if the origin is offscreen
-			return Math.Min (Math.Max (0, origin.Y), bounds.Height - ((int)graph.MarginBottom+1));
+			return Math.Min (Math.Max (0, origin.Y), bounds.Height - ((int)graph.MarginBottom + 1));
 		}
 	}
 
@@ -1117,18 +1110,18 @@ namespace Terminal.Gui {
 
 		private int GetLabelThickness (IEnumerable<AxisIncrementToRender> labels)
 		{
-			var l = labels.ToArray();
-			if(l.Length == 0){
+			var l = labels.ToArray ();
+			if (l.Length == 0) {
 				return 1;
 			}
 
-			return  l.Max(s=>s.Text.Length);
+			return l.Max (s => s.Text.Length);
 		}
 
 		/// <summary>
 		/// Creates a new <see cref="Orientation.Vertical"/> axis
 		/// </summary>
-		public VerticalAxis () :base(Orientation.Vertical)
+		public VerticalAxis () : base (Orientation.Vertical)
 		{
 			LabelGetter = DefaultLabelGetter;
 		}
@@ -1180,10 +1173,10 @@ namespace Terminal.Gui {
 			}
 
 			var x = GetAxisXPosition (graph, bounds);
-			var labels = GetLabels(graph,bounds);
+			var labels = GetLabels (graph, bounds);
 			var labelThickness = GetLabelThickness (labels);
-				
-			foreach(var label in labels) {
+
+			foreach (var label in labels) {
 
 				graph.Move (label.ScreenLocation.X, label.ScreenLocation.Y);
 
@@ -1192,7 +1185,7 @@ namespace Terminal.Gui {
 
 				// and the label text
 				if (!string.IsNullOrWhiteSpace (label.Text)) {
-					graph.Move (Math.Max(0,x - labelThickness), label.ScreenLocation.Y);
+					graph.Move (Math.Max (0, x - labelThickness), label.ScreenLocation.Y);
 					driver.AddStr (label.Text);
 				}
 			}
@@ -1210,16 +1203,16 @@ namespace Terminal.Gui {
 				// Draw it 1 letter at a time vertically down row 0 of the control
 				int startDrawingAtY = graph.Bounds.Height / 2 - (toRender.Length / 2);
 
-				for(int i= 0; i< toRender.Length; i++) {
+				for (int i = 0; i < toRender.Length; i++) {
 
-					graph.Move (0, startDrawingAtY+i);
-					driver.AddRune(toRender[i]);
+					graph.Move (0, startDrawingAtY + i);
+					driver.AddRune (toRender [i]);
 				}
 
 			}
 		}
 
-		private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph,Rect bounds)
+		private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph, Rect bounds)
 		{
 			// if no labels
 			if (Increment == 0) {
@@ -1233,25 +1226,24 @@ namespace Terminal.Gui {
 			for (int i = 0; i < bounds.Height; i++) {
 
 				// what bit of the graph is supposed to go here?
-				var graphSpace = graph.ScreenToGraphSpace (x,i);
+				var graphSpace = graph.ScreenToGraphSpace (x, i);
 
-				if(Math.Abs(graphSpace.Y) % Increment < graph.CellSize.Y)
-				{
-					var toRender =  new AxisIncrementToRender (Orientation, new Point (x,i), graphSpace);
+				if (Math.Abs (graphSpace.Y) % Increment < graph.CellSize.Y) {
+					var toRender = new AxisIncrementToRender (Orientation, new Point (x, i), graphSpace);
 
 					// and the label (if we are due one)
 					if (ShowLabelsEvery != 0) {
 
 						// if this increment also needs a label
 						if (labels++ % ShowLabelsEvery == 0) {
-							toRender.Text = LabelGetter(toRender);
+							toRender.Text = LabelGetter (toRender);
 						};
 
 						yield return toRender;
 					}
 
 				}
-				
+
 			}
 		}
 
@@ -1270,7 +1262,7 @@ namespace Terminal.Gui {
 
 			// float the Y axis so that it accurately represents the origin of the graph
 			// but anchor it to left/right if the origin is offscreen
-			return Math.Min (Math.Max ((int)graph.MarginLeft, origin.X), bounds.Width-1);
+			return Math.Min (Math.Max ((int)graph.MarginLeft, origin.X), bounds.Width - 1);
 		}
 	}
 
@@ -1289,7 +1281,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Location in the <see cref="Axis"/> that the axis increment appears
 		/// </summary>
-		public Point ScreenLocation { get;  }
+		public Point ScreenLocation { get; }
 
 		/// <summary>
 		/// The volume of graph that is represented by this screen coordinate
@@ -1314,7 +1306,7 @@ namespace Terminal.Gui {
 		/// <param name="orientation"></param>
 		/// <param name="screen"></param>
 		/// <param name="graphSpace"></param>
-		public AxisIncrementToRender (Orientation orientation,Point screen, RectangleD graphSpace)
+		public AxisIncrementToRender (Orientation orientation, Point screen, RectangleD graphSpace)
 		{
 			Orientation = orientation;
 			ScreenLocation = screen;
@@ -1330,7 +1322,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// A rectangle with 0 size positioned at the origin (0,0)
 		/// </summary>
-		public static readonly RectangleD Empty = new RectangleD (0,0,0,0);
+		public static readonly RectangleD Empty = new RectangleD (0, 0, 0, 0);
 
 		/// <summary>
 		/// X coordinate of the Upper Left of this rectangle
@@ -1361,7 +1353,7 @@ namespace Terminal.Gui {
 		{
 			this.X = x;
 			this.Y = y;
-			this.Width= width;
+			this.Width = width;
 			this.Height = height;
 		}
 
@@ -1401,7 +1393,7 @@ namespace Terminal.Gui {
 				return Y + Height;
 			}
 		}
-		
+
 		/// <summary>
 		/// Returns true if the Width or Height are 0 or negative
 		/// </summary>
@@ -1478,14 +1470,14 @@ namespace Terminal.Gui {
 		{
 			return Contains (pt.X, pt.Y);
 		}
-		
+
 		/// <summary>
 		/// Generates a hashcode from the X,Y Width and Height elements
 		/// </summary>
 		/// <returns></returns>
 		public override int GetHashCode ()
 		{
-			unchecked{
+			unchecked {
 				return (int)((int)X * Y * Width * Height);
 			}
 
@@ -1604,7 +1596,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new point at the given coordinates
 		/// </summary>
-		public LineD(PointD start, PointD end)
+		public LineD (PointD start, PointD end)
 		{
 			this.Start = start;
 			this.End = end;
@@ -1619,7 +1611,7 @@ namespace Terminal.Gui {
 			decimal changeInHeight = End.Y - Start.Y;
 			decimal changeInWidth = End.X - Start.X;
 
-			if(changeInWidth == 0) {
+			if (changeInWidth == 0) {
 				return decimal.MaxValue;
 			}
 
@@ -1644,9 +1636,8 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Direction of an element (horizontal or vertical)
 	/// </summary>
-	public enum Orientation
-	{
-		
+	public enum Orientation {
+
 		/// <summary>
 		/// Left to right 
 		/// </summary>
