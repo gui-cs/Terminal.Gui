@@ -202,7 +202,7 @@ namespace Terminal.Gui {
 		{
 			var pos = ScreenToGraphSpace (screenArea.X, screenArea.Y);
 
-			return new RectangleD (pos.X, pos.Y, screenArea.Width * CellSize.X, screenArea.Y * CellSize.Y);
+			return new RectangleD (pos.X, pos.Y, screenArea.Width * CellSize.X, screenArea.Height * CellSize.Y);
 		}
 		/// <summary>
 		/// Calculates the screen location for a given point in graph space.
