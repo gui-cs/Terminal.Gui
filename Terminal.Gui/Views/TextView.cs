@@ -1039,7 +1039,7 @@ namespace Terminal.Gui {
 				ResetPosition ();
 				if (wordWrap) {
 					wrapManager = new WordWrapManager (model);
-					model = wrapManager.WrapModel (Frame.Width - 2, out _, out _, out _, out _);
+					model = wrapManager.WrapModel (Math.Max (Frame.Width - 2, 0), out _, out _, out _, out _);
 				} else if (!wordWrap && wrapManager != null) {
 					model = wrapManager.Model;
 				}
