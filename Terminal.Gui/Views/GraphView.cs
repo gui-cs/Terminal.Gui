@@ -109,7 +109,7 @@ namespace Terminal.Gui {
 			}
 
 			// If there is no data do not display a graph
-			if (!Series.Any ()) {
+			if (!Series.Any () && !Annotations.Any ()) {
 				return;
 			}
 
