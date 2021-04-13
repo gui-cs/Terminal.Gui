@@ -823,7 +823,6 @@ namespace Terminal.Gui {
 		int currentColumn;
 		int selectionStartColumn, selectionStartRow;
 		bool selecting;
-		//bool used;
 		bool wordWrap;
 		WordWrapManager wrapManager;
 		bool continuousFind;
@@ -850,7 +849,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public TextView (Rect frame) : base (frame)
 		{
-			CanFocus = true;
+			Initialize ();
 		}
 
 		/// <summary>
@@ -859,8 +858,20 @@ namespace Terminal.Gui {
 		/// </summary>
 		public TextView () : base ()
 		{
-			CanFocus = true;
+			Initialize ();
 		}
+
+		void Initialize ()
+		{
+			CanFocus = true;
+			Used = true;
+		}
+
+		/// <summary>
+		/// Tracks whether the text view should be considered "used", that is, that the user has moved in the entry,
+		/// so new input should be appended at the cursor position, rather than clearing the entry
+		/// </summary>
+		public bool Used { get; set; }
 
 		void ResetPosition ()
 		{
@@ -948,8 +959,10 @@ namespace Terminal.Gui {
 		public Point CursorPosition {
 			get => new Point (currentColumn, currentRow);
 			set {
-				currentColumn = value.X;
-				currentRow = value.Y;
+				var line = model.GetLine (Math.Max (Math.Min (value.Y, model.Count - 1), 0));
+				currentColumn = value.X < 0 ? 0 : value.X > line.Count ? line.Count : value.X;
+				currentRow = value.Y < 0 ? 0 : value.Y > model.Count - 1
+					? Math.Max (model.Count - 1, 0) : value.Y;
 				SetNeedsDisplay ();
 				Adjust ();
 			}
@@ -961,7 +974,9 @@ namespace Terminal.Gui {
 		public int SelectionStartColumn {
 			get => selectionStartColumn;
 			set {
-				selectionStartColumn = value;
+				var line = model.GetLine (currentRow);
+				selectionStartColumn = value < 0 ? 0 : value > line.Count ? line.Count : value;
+				selecting = true;
 				SetNeedsDisplay ();
 				Adjust ();
 			}
@@ -973,7 +988,9 @@ namespace Terminal.Gui {
 		public int SelectionStartRow {
 			get => selectionStartRow;
 			set {
-				selectionStartRow = value;
+				selectionStartRow = value < 0 ? 0 : value > model.Count - 1
+					? Math.Max (model.Count - 1, 0) : value;
+				selecting = true;
 				SetNeedsDisplay ();
 				Adjust ();
 			}
@@ -984,7 +1001,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public ustring SelectedText {
 			get {
-				if (!selecting) {
+				if (!selecting || (model.Count == 1 && model.GetLine (0).Count == 0)) {
 					return ustring.Empty;
 				}
 
@@ -997,6 +1014,18 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Length of the selected text.
+		/// </summary>
+		public int SelectedLength => GetSelectedLength ();
+
+		/// <summary>
+		/// Get or sets the selecting.
+		/// </summary>
+		public bool Selecting {
+			get => selecting;
+			set => selecting = value;
+		}
 		/// <summary>
 		/// Allows word wrap the to fit the available container width.
 		/// </summary>
@@ -1029,6 +1058,11 @@ namespace Terminal.Gui {
 		/// This is only needed with the keyboard navigation.
 		/// </summary>
 		public int RightOffset { get; set; }
+
+		int GetSelectedLength ()
+		{
+			return SelectedText.Length;
+		}
 
 		CursorVisibility savedCursorVisibility = CursorVisibility.Default;
 
@@ -1153,6 +1187,11 @@ namespace Terminal.Gui {
 		void ColorSelection ()
 		{
 			Driver.SetAttribute (ColorScheme.Focus);
+		}
+
+		void ColorUsed ()
+		{
+			Driver.SetAttribute (ColorScheme.HotFocus);
 		}
 
 		bool isReadOnly = false;
@@ -1461,7 +1500,7 @@ namespace Terminal.Gui {
 			ColorNormal ();
 
 			int bottom = bounds.Bottom;
-			int right = bounds.Right + 1;
+			int right = bounds.Right;
 			for (int row = bounds.Top; row < bottom; row++) {
 				int textLine = topRow + row;
 				if (textLine >= model.Count) {
@@ -1484,6 +1523,9 @@ namespace Terminal.Gui {
 					var cols = Rune.ColumnWidth (rune);
 					if (lineCol < line.Count && selecting && PointInSelection (idx + leftColumn, row + topRow)) {
 						ColorSelection ();
+					} else if (lineCol == currentColumn && textLine == currentRow && !selecting && !Used
+						&& lineCol < lineRuneCount) {
+						ColorUsed ();
 					} else {
 						ColorNormal ();
 					}
@@ -1494,6 +1536,14 @@ namespace Terminal.Gui {
 						col++;
 					}
 					col = TextModel.SetCol (col, bounds.Right, cols);
+					if (idx + 1 < lineRuneCount && col + Rune.ColumnWidth (line [idx + 1]) > right) {
+						break;
+					} else if (idx == lineRuneCount - 1) {
+						ColorNormal ();
+						for (int i = col; i < right; i++) {
+							Driver.AddRune (' ');
+						}
+					}
 				}
 			}
 			PositionCursor ();
@@ -1531,9 +1581,21 @@ namespace Terminal.Gui {
 		void Insert (Rune rune)
 		{
 			var line = GetCurrentLine ();
-			line.Insert (Math.Min (currentColumn, line.Count), rune);
+			if (Used) {
+				line.Insert (Math.Min (currentColumn, line.Count), rune);
+			} else {
+				if (currentColumn < line.Count) {
+					line.RemoveAt (currentColumn);
+				}
+				line.Insert (Math.Min (currentColumn, line.Count), rune);
+			}
 			if (wordWrap) {
-				wrapNeeded = wrapManager.Insert (currentRow, currentColumn, rune);
+				if (Used) {
+					wrapNeeded = wrapManager.Insert (currentRow, currentColumn, rune);
+				} else {
+					wrapNeeded = wrapManager.RemoveAt (currentRow, currentColumn);
+					wrapNeeded = wrapManager.Insert (currentRow, currentColumn, rune);
+				}
 				if (wrapNeeded) {
 					SetNeedsDisplay ();
 				}
@@ -2140,6 +2202,11 @@ namespace Terminal.Gui {
 				SelectAll ();
 				break;
 
+			case Key.InsertChar:
+				Used = !Used;
+				SetNeedsDisplay ();
+				break;
+
 			default:
 				// Ignore control characters and other special keys
 				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
@@ -2150,11 +2217,16 @@ namespace Terminal.Gui {
 				if (selecting) {
 					ClearSelectedRegion ();
 				}
-				Insert ((uint)kb.Key);
-				currentColumn++;
-				if (currentColumn >= leftColumn + Frame.Width) {
-					leftColumn++;
-					SetNeedsDisplay ();
+				if (Used) {
+					Insert ((uint)kb.Key);
+					currentColumn++;
+					if (currentColumn >= leftColumn + Frame.Width) {
+						leftColumn++;
+						SetNeedsDisplay ();
+					}
+				} else {
+					Insert ((uint)kb.Key);
+					currentColumn++;
 				}
 				break;
 			}
@@ -2349,6 +2421,9 @@ namespace Terminal.Gui {
 			if (col + 1 < line.Count) {
 				col++;
 				rune = line [col];
+				if (col + 1 == line.Count) {
+					col++;
+				}
 				return true;
 			}
 			while (row + 1 < model.Count) {
