@@ -1524,7 +1524,7 @@ namespace Terminal.Gui {
 					if (lineCol < line.Count && selecting && PointInSelection (idx + leftColumn, row + topRow)) {
 						ColorSelection ();
 					} else if (lineCol == currentColumn && textLine == currentRow && !selecting && !Used
-						&& lineCol < lineRuneCount) {
+						&& HasFocus && lineCol < lineRuneCount) {
 						ColorUsed ();
 					} else {
 						ColorNormal ();
