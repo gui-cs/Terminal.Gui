@@ -337,13 +337,13 @@ namespace Terminal.Gui {
 				if (col > -1 && matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
 					continue;
 				}
-				if (!found && col > -1) {
-					found = true;
-				} else if (col > -1) {
-					pos = new Point (col, i);
-				}
 				if (col > -1) {
+					if (!found) {
+						found = true;
+					}
+					pos = new Point (col, i);
 					lines [i] = ReplaceText (x, textToReplace, matchText, col).ToRuneList ();
+					i--;
 				}
 			}
 

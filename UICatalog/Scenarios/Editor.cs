@@ -132,11 +132,18 @@ namespace UICatalog {
 			};
 
 			Win.KeyPress += (e) => {
-				if (winDialog != null && e.KeyEvent.Key == Key.Esc) {
-					Win.Remove (winDialog);
-					winDialog = null;
+				if (winDialog != null && (e.KeyEvent.Key == Key.Esc
+					|| e.KeyEvent.Key.HasFlag (Key.Q | Key.CtrlMask))) {
+					DisposeWinDialog ();
 				}
 			};
+		}
+
+		private void DisposeWinDialog ()
+		{
+			winDialog.Dispose ();
+			Win.Remove (winDialog);
+			winDialog = null;
 		}
 
 		public override void Setup ()
@@ -213,7 +220,8 @@ namespace UICatalog {
 			if (!replace && string.IsNullOrEmpty (_textToFind)) {
 				Find ();
 				return;
-			} else if (replace && (string.IsNullOrEmpty (_textToFind) || string.IsNullOrEmpty (_textToReplace))) {
+			} else if (replace && (string.IsNullOrEmpty (_textToFind)
+				|| (winDialog == null && string.IsNullOrEmpty (_textToReplace)))) {
 				Replace ();
 				return;
 			}
@@ -519,8 +527,7 @@ namespace UICatalog {
 				TextAlignment = TextAlignment.Centered
 			};
 			btnCancel.Clicked += () => {
-				Win.Remove (winDialog);
-				winDialog = null;
+				DisposeWinDialog ();
 			};
 			d.Add (btnCancel);
 
@@ -641,8 +648,7 @@ namespace UICatalog {
 				TextAlignment = TextAlignment.Centered
 			};
 			btnCancel.Clicked += () => {
-				Win.Remove (winDialog);
-				winDialog = null;
+				DisposeWinDialog ();
 			};
 			d.Add (btnCancel);
 
