@@ -438,60 +438,66 @@ namespace Terminal.Gui {
 				_textField.ProcessKey (new KeyEvent (Key.CursorLeft | Key.CtrlMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
-					Assert.Equal (48, _textField.CursorPosition);
+					Assert.Equal (54, _textField.CursorPosition);
 					Assert.Equal (-1, _textField.SelectedStart);
 					Assert.Equal (0, _textField.SelectedLength);
 					Assert.Null (_textField.SelectedText);
 					break;
 				case 1:
-					Assert.Equal (46, _textField.CursorPosition);
+					Assert.Equal (48, _textField.CursorPosition);
 					Assert.Equal (-1, _textField.SelectedStart);
 					Assert.Equal (0, _textField.SelectedLength);
 					Assert.Null (_textField.SelectedText);
 					break;
 				case 2:
-					Assert.Equal (40, _textField.CursorPosition);
+					Assert.Equal (46, _textField.CursorPosition);
 					Assert.Equal (-1, _textField.SelectedStart);
 					Assert.Equal (0, _textField.SelectedLength);
 					Assert.Null (_textField.SelectedText);
 					break;
 				case 3:
-					Assert.Equal (38, _textField.CursorPosition);
+					Assert.Equal (40, _textField.CursorPosition);
 					Assert.Equal (-1, _textField.SelectedStart);
 					Assert.Equal (0, _textField.SelectedLength);
 					Assert.Null (_textField.SelectedText);
 					break;
 				case 4:
-					Assert.Equal (28, _textField.CursorPosition);
+					Assert.Equal (38, _textField.CursorPosition);
 					Assert.Equal (-1, _textField.SelectedStart);
 					Assert.Equal (0, _textField.SelectedLength);
 					Assert.Null (_textField.SelectedText);
 					break;
 				case 5:
-					Assert.Equal (25, _textField.CursorPosition);
+					Assert.Equal (28, _textField.CursorPosition);
 					Assert.Equal (-1, _textField.SelectedStart);
 					Assert.Equal (0, _textField.SelectedLength);
 					Assert.Null (_textField.SelectedText);
 					break;
 				case 6:
-					Assert.Equal (12, _textField.CursorPosition);
+					Assert.Equal (25, _textField.CursorPosition);
 					Assert.Equal (-1, _textField.SelectedStart);
 					Assert.Equal (0, _textField.SelectedLength);
 					Assert.Null (_textField.SelectedText);
 					break;
 				case 7:
-					Assert.Equal (9, _textField.CursorPosition);
+					Assert.Equal (12, _textField.CursorPosition);
 					Assert.Equal (-1, _textField.SelectedStart);
 					Assert.Equal (0, _textField.SelectedLength);
 					Assert.Null (_textField.SelectedText);
 					break;
 				case 8:
-					Assert.Equal (6, _textField.CursorPosition);
+					Assert.Equal (9, _textField.CursorPosition);
 					Assert.Equal (-1, _textField.SelectedStart);
 					Assert.Equal (0, _textField.SelectedLength);
 					Assert.Null (_textField.SelectedText);
 					break;
 				case 9:
+					Assert.Equal (6, _textField.CursorPosition);
+					Assert.Equal (-1, _textField.SelectedStart);
+					Assert.Equal (0, _textField.SelectedLength);
+					Assert.Null (_textField.SelectedText);
+					break;
+				case 10:
 					Assert.Equal (0, _textField.CursorPosition);
 					Assert.Equal (-1, _textField.SelectedStart);
 					Assert.Equal (0, _textField.SelectedLength);

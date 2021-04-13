@@ -638,6 +638,9 @@ namespace Terminal.Gui {
 						lastValidCol = i;
 						break;
 					}
+					if (i - 1 > 0 && !Rune.IsWhiteSpace (text [i]) && Rune.IsWhiteSpace (text [i - 1])) {
+						return i;
+					}
 				}
 				for (; i >= 0; i--) {
 					if (!Rune.IsLetterOrDigit (text [i]))
