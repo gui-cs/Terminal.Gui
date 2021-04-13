@@ -255,10 +255,18 @@ namespace Terminal.Gui {
 			case 91:
 				ConsoleKeyInfo [] cki = new ConsoleKeyInfo [] { consoleKeyInfo };
 				ConsoleModifiers mod = consoleKeyInfo.Modifiers;
-				while (Console.KeyAvailable) {
-					var result = Console.ReadKey (true);
-					Array.Resize (ref cki, cki == null ? 1 : cki.Length + 1);
-					cki [cki.Length - 1] = result;
+				int delay = 0;
+				while (delay < 100) {
+					if (Console.KeyAvailable) {
+						do {
+							var result = Console.ReadKey (true);
+							Array.Resize (ref cki, cki == null ? 1 : cki.Length + 1);
+							cki [cki.Length - 1] = result;
+						} while (Console.KeyAvailable);
+						break;
+					}
+					Thread.Sleep (50);
+					delay += 50;
 				}
 				SplitCSI (cki, ref inputResult, ref newConsoleKeyInfo, ref key, ref mouseEvent, ref mod);
 				return;
@@ -744,7 +752,8 @@ namespace Terminal.Gui {
 				MouseEvent = mouseEvent
 			});
 
-			if (!isButtonClicked && lastMouseEvent.Position != default && lastMouseEvent.Position == point
+			if (!isButtonClicked && !lastMouseEvent.ButtonState.HasFlag (MouseButtonState.ReportMousePosition)
+				&& lastMouseEvent.Position != default && lastMouseEvent.Position == point
 				&& ((buttonState & MouseButtonState.Button1Released) != 0
 				|| (buttonState & MouseButtonState.Button2Released) != 0
 				|| (buttonState & MouseButtonState.Button3Released) != 0)) {
