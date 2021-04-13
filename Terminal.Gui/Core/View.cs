@@ -1753,7 +1753,7 @@ namespace Terminal.Gui {
 			var result = new List<View> ();
 
 			// Set of all nodes with no incoming edges
-			var S = new HashSet<View> (nodes.Where (n => edges.All (e => e.To.Equals (n) == false)));
+			var S = new HashSet<View> (nodes.Where (n => edges.All (e => !e.To.Equals (n))));
 
 			while (S.Any ()) {
 				//  remove a node n from S
@@ -1772,15 +1772,15 @@ namespace Terminal.Gui {
 					edges.Remove (e);
 
 					// if m has no other incoming edges then
-					if (edges.All (me => me.To.Equals (m) == false) && m != this?.SuperView) {
+					if (edges.All (me => !me.To.Equals (m)) && m != this?.SuperView) {
 						// insert m into S
 						S.Add (m);
 					}
 				}
 			}
 
-			if (edges.Any ()) {
-				if (!object.ReferenceEquals (edges.First ().From, edges.First ().To)) {
+			if (edges.Any () && edges.First ().From != Application.Top) {
+				if (!ReferenceEquals (edges.First ().From, edges.First ().To)) {
 					throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {edges.First ().From}. Did you forget to add it to {this}?");
 				} else {
 					throw new InvalidOperationException ("TopologicalSort encountered a recursive cycle in the relative Pos/Dim in the views of " + this);
@@ -1863,19 +1863,59 @@ namespace Terminal.Gui {
 			var nodes = new HashSet<View> ();
 			var edges = new HashSet<(View, View)> ();
 
-			foreach (var v in InternalSubviews) {
-				nodes.Add (v);
-				if (v.LayoutStyle == LayoutStyle.Computed) {
-					if (v.X is Pos.PosView vX)
-						edges.Add ((vX.Target, v));
-					if (v.Y is Pos.PosView vY)
-						edges.Add ((vY.Target, v));
-					if (v.Width is Dim.DimView vWidth)
-						edges.Add ((vWidth.Target, v));
-					if (v.Height is Dim.DimView vHeight)
-						edges.Add ((vHeight.Target, v));
+			void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
+			{
+				if (pos is Pos.PosView pv) {
+					if (pv.Target != this) {
+						nEdges.Add ((pv.Target, from));
+					}
+					foreach (var v in from.InternalSubviews) {
+						CollectAll (v, ref nNodes, ref nEdges);
+					}
+					return;
+				}
+				if (pos is Pos.PosCombine pc) {
+					foreach (var v in from.InternalSubviews) {
+						CollectPos (pc.left, from, ref nNodes, ref nEdges);
+						CollectPos (pc.right, from, ref nNodes, ref nEdges);
+					}
 				}
 			}
+
+			void CollectDim (Dim dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
+			{
+				if (dim is Dim.DimView dv) {
+					if (dv.Target != this) {
+						nEdges.Add ((dv.Target, from));
+					}
+					foreach (var v in from.InternalSubviews) {
+						CollectAll (v, ref nNodes, ref nEdges);
+					}
+					return;
+				}
+				if (dim is Dim.DimCombine dc) {
+					foreach (var v in from.InternalSubviews) {
+						CollectDim (dc.left, from, ref nNodes, ref nEdges);
+						CollectDim (dc.right, from, ref nNodes, ref nEdges);
+					}
+				}
+			}
+
+			void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
+			{
+				foreach (var v in from.InternalSubviews) {
+					nNodes.Add (v);
+					if (v.layoutStyle != LayoutStyle.Computed) {
+						continue;
+					}
+					CollectPos (v.X, v, ref nNodes, ref nEdges);
+					CollectPos (v.Y, v, ref nNodes, ref nEdges);
+					CollectDim (v.Width, v, ref nNodes, ref nEdges);
+					CollectDim (v.Height, v, ref nNodes, ref nEdges);
+				}
+			}
+
+			CollectAll (this, ref nodes, ref edges);
 
 			var ordered = TopologicalSort (nodes, edges);
 
@@ -1886,7 +1926,6 @@ namespace Terminal.Gui {
 
 				v.LayoutSubviews ();
 				v.LayoutNeeded = false;
-
 			}
 
 			if (SuperView == Application.Top && LayoutNeeded && ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
@@ -2154,14 +2193,17 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="desiredWidth">The desired width.</param>
 		/// <param name="resultWidth">The real result width.</param>
+		/// <param name="currentWidth">The real current width.</param>
 		/// <returns>True if the width can be directly assigned, false otherwise.</returns>
-		public bool SetWidth (int desiredWidth, out int resultWidth)
+		public bool SetWidth (int desiredWidth, out int resultWidth, out int currentWidth)
 		{
 			int w = desiredWidth;
+			currentWidth = Width != null ? Width.Anchor (0) : 0;
 			bool canSetWidth;
 			if (Width is Dim.DimCombine || Width is Dim.DimView || Width is Dim.DimFill) {
 				// It's a Dim.DimCombine and so can't be assigned. Let it have it's width anchored.
 				w = Width.Anchor (w);
+				currentWidth = Width.Anchor (w);
 				canSetWidth = false;
 			} else if (Width is Dim.DimFactor factor) {
 				// Tries to get the SuperView width otherwise the view width.
@@ -2170,6 +2212,7 @@ namespace Terminal.Gui {
 					sw -= Frame.X;
 				}
 				w = Width.Anchor (sw);
+				currentWidth = Width.Anchor (sw);
 				canSetWidth = false;
 			} else {
 				canSetWidth = true;
@@ -2184,14 +2227,17 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="desiredHeight">The desired height.</param>
 		/// <param name="resultHeight">The real result height.</param>
+		/// <param name="currentHeight">The real current height.</param>
 		/// <returns>True if the height can be directly assigned, false otherwise.</returns>
-		public bool SetHeight (int desiredHeight, out int resultHeight)
+		public bool SetHeight (int desiredHeight, out int resultHeight, out int currentHeight)
 		{
 			int h = desiredHeight;
+			currentHeight = Height != null ? Height.Anchor (0) : 0;
 			bool canSetHeight;
 			if (Height is Dim.DimCombine || Height is Dim.DimView || Height is Dim.DimFill) {
 				// It's a Dim.DimCombine and so can't be assigned. Let it have it's height anchored.
 				h = Height.Anchor (h);
+				currentHeight = Height.Anchor (h);
 				canSetHeight = false;
 			} else if (Height is Dim.DimFactor factor) {
 				// Tries to get the SuperView height otherwise the view height.
@@ -2200,6 +2246,7 @@ namespace Terminal.Gui {
 					sh -= Frame.Y;
 				}
 				h = Height.Anchor (sh);
+				currentHeight = Height.Anchor (sh);
 				canSetHeight = false;
 			} else {
 				canSetHeight = true;

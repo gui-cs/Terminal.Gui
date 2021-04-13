@@ -140,13 +140,8 @@ namespace UICatalog {
 			};
 			frame.Add (styleRadioGroup);
 
-			void Top_Loaded ()
-			{
-				frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (messageEdit)
-					+ Dim.Height (numButtonsEdit) + Dim.Height (defaultButtonEdit) + Dim.Height (styleRadioGroup) + 2;
-				Top.Loaded -= Top_Loaded;
-			}
-			Top.Loaded += Top_Loaded;
+			frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (messageEdit)
+				+ Dim.Height (numButtonsEdit) + Dim.Height(defaultButtonEdit) + Dim.Height (styleRadioGroup) + 2;
 
 			label = new Label ("Button Pressed:") {
 				X = Pos.Center (),
