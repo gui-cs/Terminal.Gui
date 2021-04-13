@@ -760,6 +760,9 @@ namespace Terminal.Gui {
 		static void TerminalResized ()
 		{
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
+			Top.Frame = full;
+			Top.Width = full.Width;
+			Top.Height = full.Height;
 			Resized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
 			Driver.Clip = full;
 			foreach (var t in toplevels) {
