@@ -41,7 +41,7 @@ namespace Terminal.Gui {
 			_textField.CursorPosition = 2;
 			_textField.SelectedStart = 33;
 			Assert.Equal (32, _textField.SelectedStart);
-			Assert.Equal (-30, _textField.SelectedLength);
+			Assert.Equal (30, _textField.SelectedLength);
 			Assert.Equal ("B to jump between text fields.", _textField.SelectedText);
 		}
 
@@ -238,37 +238,37 @@ namespace Terminal.Gui {
 				case 0:
 					Assert.Equal (25, _textField.CursorPosition);
 					Assert.Equal (32, _textField.SelectedStart);
-					Assert.Equal (-7, _textField.SelectedLength);
+					Assert.Equal (7, _textField.SelectedLength);
 					Assert.Equal ("fields.", _textField.SelectedText);
 					break;
 				case 1:
 					Assert.Equal (20, _textField.CursorPosition);
 					Assert.Equal (32, _textField.SelectedStart);
-					Assert.Equal (-12, _textField.SelectedLength);
+					Assert.Equal (12, _textField.SelectedLength);
 					Assert.Equal ("text fields.", _textField.SelectedText);
 					break;
 				case 2:
 					Assert.Equal (12, _textField.CursorPosition);
 					Assert.Equal (32, _textField.SelectedStart);
-					Assert.Equal (-20, _textField.SelectedLength);
+					Assert.Equal (20, _textField.SelectedLength);
 					Assert.Equal ("between text fields.", _textField.SelectedText);
 					break;
 				case 3:
 					Assert.Equal (7, _textField.CursorPosition);
 					Assert.Equal (32, _textField.SelectedStart);
-					Assert.Equal (-25, _textField.SelectedLength);
+					Assert.Equal (25, _textField.SelectedLength);
 					Assert.Equal ("jump between text fields.", _textField.SelectedText);
 					break;
 				case 4:
 					Assert.Equal (4, _textField.CursorPosition);
 					Assert.Equal (32, _textField.SelectedStart);
-					Assert.Equal (-28, _textField.SelectedLength);
+					Assert.Equal (28, _textField.SelectedLength);
 					Assert.Equal ("to jump between text fields.", _textField.SelectedText);
 					break;
 				case 5:
 					Assert.Equal (0, _textField.CursorPosition);
 					Assert.Equal (32, _textField.SelectedStart);
-					Assert.Equal (-32, _textField.SelectedLength);
+					Assert.Equal (32, _textField.SelectedLength);
 					Assert.Equal ("TAB to jump between text fields.", _textField.SelectedText);
 					break;
 				}
@@ -328,19 +328,19 @@ namespace Terminal.Gui {
 				case 0:
 					Assert.Equal (7, _textField.CursorPosition);
 					Assert.Equal (10, _textField.SelectedStart);
-					Assert.Equal (-3, _textField.SelectedLength);
+					Assert.Equal (3, _textField.SelectedLength);
 					Assert.Equal ("jum", _textField.SelectedText);
 					break;
 				case 1:
 					Assert.Equal (4, _textField.CursorPosition);
 					Assert.Equal (10, _textField.SelectedStart);
-					Assert.Equal (-6, _textField.SelectedLength);
+					Assert.Equal (6, _textField.SelectedLength);
 					Assert.Equal ("to jum", _textField.SelectedText);
 					break;
 				case 2:
 					Assert.Equal (0, _textField.CursorPosition);
 					Assert.Equal (10, _textField.SelectedStart);
-					Assert.Equal (-10, _textField.SelectedLength);
+					Assert.Equal (10, _textField.SelectedLength);
 					Assert.Equal ("TAB to jum", _textField.SelectedText);
 					break;
 				}

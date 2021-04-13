@@ -222,7 +222,7 @@ namespace Terminal.Gui {
 			for (int idx = p; idx < tcount; idx++) {
 				var rune = text [idx];
 				var cols = Rune.ColumnWidth (rune);
-				if (idx == point && HasFocus && !Used && SelectedLength == 0 && !ReadOnly) {
+				if (idx == point && HasFocus && !Used && length == 0 && !ReadOnly) {
 					Driver.SetAttribute (Colors.Menu.HotFocus);
 				} else if (ReadOnly) {
 					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? selColor : roc);
@@ -325,13 +325,12 @@ namespace Terminal.Gui {
 				if (ReadOnly)
 					return true;
 
-				if (SelectedLength == 0) {
+				if (length == 0) {
 					if (text.Count == 0 || text.Count == point)
 						return true;
 
 					SetText (text.GetRange (0, point).Concat (text.GetRange (point + 1, text.Count - (point + 1))));
 					Adjust ();
-
 				} else {
 					DeleteSelectedText ();
 				}
@@ -341,7 +340,7 @@ namespace Terminal.Gui {
 				if (ReadOnly)
 					return true;
 
-				if (SelectedLength == 0) {
+				if (length == 0) {
 					if (point == 0)
 						return true;
 
@@ -565,7 +564,7 @@ namespace Terminal.Gui {
 				if (ReadOnly)
 					return true;
 
-				if (SelectedLength != 0) {
+				if (length > 0) {
 					DeleteSelectedText ();
 					oldCursorPos = point;
 				}
@@ -685,7 +684,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Length of the selected text.
 		/// </summary>
-		public int SelectedLength { get; private set; }
+		public int SelectedLength { get => length; }
 
 		/// <summary>
 		/// The selected text.
@@ -793,7 +792,7 @@ namespace Terminal.Gui {
 			x = x + first < -1 ? 0 : x;
 			selectedStart = selectedStart == -1 && text.Count > 0 && x >= 0 && x <= text.Count ? x : selectedStart;
 			if (selectedStart > -1) {
-				SelectedLength = x + direction <= text.Count ? x + direction - selectedStart : text.Count - selectedStart;
+				length = Math.Abs (x + direction <= text.Count ? x + direction - selectedStart : text.Count - selectedStart);
 				SetSelectedStartSelectedLength ();
 				if (start > -1 && length > 0) {
 					selectedText = length > 0 ? ustring.Make (text).ToString ().Substring (
@@ -802,7 +801,7 @@ namespace Terminal.Gui {
 						first = start;
 					}
 				}
-			} else if (SelectedLength > 0) {
+			} else if (length > 0) {
 				ClearAllSelection ();
 			}
 			Adjust ();
@@ -813,11 +812,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ClearAllSelection ()
 		{
-			if (selectedStart == -1 && SelectedLength == 0)
+			if (selectedStart == -1 && length == 0)
 				return;
 
 			selectedStart = -1;
-			SelectedLength = 0;
+			length = 0;
 			selectedText = null;
 			start = 0;
 			length = 0;
@@ -826,12 +825,10 @@ namespace Terminal.Gui {
 
 		void SetSelectedStartSelectedLength ()
 		{
-			if (SelectedLength < 0) {
-				start = SelectedLength + SelectedStart;
-				length = Math.Abs (SelectedLength);
+			if (SelectedStart > -1 && point < SelectedStart) {
+				start = point - SelectedStart + SelectedStart;
 			} else {
 				start = SelectedStart;
-				length = SelectedLength;
 			}
 		}
 
@@ -840,7 +837,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void Copy ()
 		{
-			if (Secret || SelectedLength == 0)
+			if (Secret || length == 0)
 				return;
 
 			Clipboard.Contents = SelectedText;
@@ -851,7 +848,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void Cut ()
 		{
-			if (Secret || SelectedLength == 0)
+			if (Secret || length == 0)
 				return;
 
 			Clipboard.Contents = SelectedText;
@@ -861,11 +858,10 @@ namespace Terminal.Gui {
 		void DeleteSelectedText ()
 		{
 			ustring actualText = Text;
-			int selStart = SelectedLength < 0 ? SelectedLength + SelectedStart : SelectedStart;
-			int selLength = Math.Abs (SelectedLength);
+			int selStart = point < SelectedStart ? SelectedStart - point + SelectedStart : SelectedStart;
 			(var _, var len) = TextModel.DisplaySize (text, 0, selStart, false);
-			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + selLength, false);
-			(var _, var len3) = TextModel.DisplaySize (text, selStart + selLength, actualText.RuneCount, false);
+			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + length, false);
+			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.RuneCount, false);
 			Text = actualText [0, len] +
 				actualText [len + len2, len + len2 + len3];
 			ClearAllSelection ();
