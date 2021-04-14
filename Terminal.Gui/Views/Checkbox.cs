@@ -100,8 +100,11 @@ namespace Terminal.Gui {
 				hot_pos = -1;
 				hot_key = (char)0;
 				foreach (Rune c in text) {
-					if (Rune.IsUpper (c)) {
-						hot_key = c;
+					//if (Rune.IsUpper (c)) {
+					if (c == '_') {
+						hot_key = text [i + 1];
+						HotKey = (Key)(char)hot_key.ToString ().ToUpper () [0];
+						text = text.ToString ().Replace ("_", "");
 						hot_pos = i;
 						break;
 					}
@@ -143,6 +146,21 @@ namespace Terminal.Gui {
 				return true;
 			}
 			return base.ProcessKey (kb);
+		}
+
+		///<inheritdoc/>
+		public override bool ProcessHotKey (KeyEvent ke)
+		{
+			if (ke.Key == (Key.AltMask | HotKey)) {
+				SetFocus ();
+				var previousChecked = Checked;
+				Checked = !Checked;
+				OnToggled (previousChecked);
+				SetNeedsDisplay ();
+				return true;
+			}
+
+			return false;
 		}
 
 		///<inheritdoc/>
