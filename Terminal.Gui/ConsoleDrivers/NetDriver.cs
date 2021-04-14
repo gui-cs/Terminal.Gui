@@ -969,6 +969,9 @@ namespace Terminal.Gui {
 			case '1':
 				key = ConsoleKey.F10;
 				break;
+			case '2':
+				key = ConsoleKey.Insert;
+				break;
 			case '3':
 				if (length == 5) {
 					key = ConsoleKey.F11;

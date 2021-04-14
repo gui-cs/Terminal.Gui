@@ -124,7 +124,7 @@ namespace Terminal.Gui {
 		/// <param name="background">Background</param>
 		public Attribute (Color foreground = new Color (), Color background = new Color ())
 		{
-			Value = (int)foreground | ((int)background << 4);
+			Value = Make (foreground, background).Value;
 			Foreground = foreground;
 			Background = background;
 		}
