@@ -2188,14 +2188,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		/// <summary>
-		/// Calculate the width based on the <see cref="Width"/> settings.
-		/// </summary>
-		/// <param name="desiredWidth">The desired width.</param>
-		/// <param name="resultWidth">The real result width.</param>
-		/// <param name="currentWidth">The real current width.</param>
-		/// <returns>True if the width can be directly assigned, false otherwise.</returns>
-		public bool SetWidth (int desiredWidth, out int resultWidth, out int currentWidth)
+		bool CanSetWidth (int desiredWidth, out int resultWidth, out int currentWidth)
 		{
 			int w = desiredWidth;
 			currentWidth = Width != null ? Width.Anchor (0) : 0;
@@ -2222,14 +2215,7 @@ namespace Terminal.Gui {
 			return canSetWidth;
 		}
 
-		/// <summary>
-		/// Calculate the height based on the <see cref="Height"/> settings.
-		/// </summary>
-		/// <param name="desiredHeight">The desired height.</param>
-		/// <param name="resultHeight">The real result height.</param>
-		/// <param name="currentHeight">The real current height.</param>
-		/// <returns>True if the height can be directly assigned, false otherwise.</returns>
-		public bool SetHeight (int desiredHeight, out int resultHeight, out int currentHeight)
+		bool CanSetHeight (int desiredHeight, out int resultHeight, out int currentHeight)
 		{
 			int h = desiredHeight;
 			currentHeight = Height != null ? Height.Anchor (0) : 0;
@@ -2254,6 +2240,48 @@ namespace Terminal.Gui {
 			resultHeight = h;
 
 			return canSetHeight;
+		}
+
+		/// <summary>
+		/// Calculate the width based on the <see cref="Width"/> settings.
+		/// </summary>
+		/// <param name="desiredWidth">The desired width.</param>
+		/// <param name="resultWidth">The real result width.</param>
+		/// <returns><c>true</c> if the width can be directly assigned, <c>false</c> otherwise.</returns>
+		public bool SetWidth (int desiredWidth, out int resultWidth)
+		{
+			return CanSetWidth (desiredWidth, out resultWidth, out _);
+		}
+
+		/// <summary>
+		/// Calculate the height based on the <see cref="Height"/> settings.
+		/// </summary>
+		/// <param name="desiredHeight">The desired height.</param>
+		/// <param name="resultHeight">The real result height.</param>
+		/// <returns><c>true</c> if the height can be directly assigned, <c>false</c> otherwise.</returns>
+		public bool SetHeight (int desiredHeight, out int resultHeight)
+		{
+			return CanSetHeight (desiredHeight, out resultHeight, out _);
+		}
+
+		/// <summary>
+		/// Gets the current width based on the <see cref="Width"/> settings.
+		/// </summary>
+		/// <param name="currentWidth">The real current width.</param>
+		/// <returns><c>true</c> if the width can be directly assigned, <c>false</c> otherwise.</returns>
+		public bool GetCurrentWidth (out int currentWidth)
+		{
+			return CanSetWidth (0, out _, out currentWidth);
+		}
+
+		/// <summary>
+		/// Calculate the height based on the <see cref="Height"/> settings.
+		/// </summary>
+		/// <param name="currentHeight">The real current height.</param>
+		/// <returns><c>true</c> if the height can be directly assigned, <c>false</c> otherwise.</returns>
+		public bool GetCurrentHeight (out int currentHeight)
+		{
+			return CanSetHeight (0, out _, out currentHeight);
 		}
 	}
 }
