@@ -36,7 +36,7 @@ namespace Terminal.Gui {
 			return 0;
 		}
 
-		class PosFactor : Pos {
+		internal class PosFactor : Pos {
 			float factor;
 
 			public PosFactor (float n)
@@ -82,7 +82,7 @@ namespace Terminal.Gui {
 
 		static PosAnchorEnd endNoMargin;
 
-		class PosAnchorEnd : Pos {
+		internal class PosAnchorEnd : Pos {
 			int n;
 
 			public PosAnchorEnd (int n)
@@ -205,8 +205,8 @@ namespace Terminal.Gui {
 			return new PosAbsolute (n);
 		}
 
-		class PosCombine : Pos {
-			Pos left, right;
+		internal class PosCombine : Pos {
+			internal Pos left, right;
 			bool add;
 			public PosCombine (bool add, Pos left, Pos right)
 			{
@@ -500,7 +500,7 @@ namespace Terminal.Gui {
 		}
 
 		internal class DimCombine : Dim {
-			Dim left, right;
+			internal Dim left, right;
 			bool add;
 			public DimCombine (bool add, Dim left, Dim right)
 			{
