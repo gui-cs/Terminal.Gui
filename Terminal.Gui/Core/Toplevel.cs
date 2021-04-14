@@ -370,7 +370,7 @@ namespace Terminal.Gui {
 				l = SuperView.Frame.Width;
 			}
 			nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;
-			SetWidth (top.Frame.Width, out int rWidth, out _);
+			SetWidth (top.Frame.Width, out int rWidth);
 			if (rWidth < 0 && nx >= top.Frame.X) {
 				nx = Math.Max (top.Frame.Right - 2, 0);
 			}
@@ -399,7 +399,7 @@ namespace Terminal.Gui {
 			}
 			ny = Math.Min (ny, l);
 			ny = ny + top.Frame.Height > l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
-			SetHeight (top.Frame.Height, out int rHeight, out _);
+			SetHeight (top.Frame.Height, out int rHeight);
 			if (rHeight < 0 && ny >= top.Frame.Y) {
 				ny = Math.Max (top.Frame.Bottom - 2, 0);
 			}
