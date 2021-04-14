@@ -118,14 +118,35 @@ namespace Terminal.Gui {
 				a.Render (this, Driver, Bounds);
 			}
 
+
 			Driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
 
-			for (int x = (int)MarginLeft; x < Bounds.Width; x++) {
-				for (int y = 0; y < Bounds.Height - (int)MarginBottom; y++) {
+
+			// The drawable area of the graph (anything that isn't in the margins
+			Rect drawBounds = new Rect((int)MarginLeft,0, Bounds.Width - ((int)MarginLeft), Bounds.Height - (int)MarginBottom);
+			RectangleD graphSpace = ScreenToGraphSpace (drawBounds);
+
+			foreach (var s in Series.Where(s=>s.DrawMode == SeriesDrawMode.AllAtOnce)) {
+
+				s.DrawSeries (this, Driver, drawBounds, graphSpace);
+
+				// If a series changes the graph color reset it
+				Driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
+			}
+
+			var cellByCellSeries = Series.Where (s => s.DrawMode == SeriesDrawMode.CellByCell).ToArray();
+
+			for (int x = drawBounds.X; x < drawBounds.Right; x++) {
+				for (int y = drawBounds.Y; y < drawBounds.Bottom; y++) {
+
+					// if no series use this draw mode then don't even bother translating coordinates
+					if (!cellByCellSeries.Any ()) {
+						continue;
+					}
 
 					var space = ScreenToGraphSpace (x, y);
 
-					foreach (var s in Series) {
+					foreach (var s in cellByCellSeries) {
 						var render = s.GetCellValueIfAny (space);
 
 						if (render != null) {
@@ -200,7 +221,8 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public RectangleD ScreenToGraphSpace (Rect screenArea)
 		{
-			var pos = ScreenToGraphSpace (screenArea.X, screenArea.Y);
+			// get position of the bottom left
+			var pos = ScreenToGraphSpace (screenArea.Left, screenArea.Bottom);
 
 			return new RectangleD (pos.X, pos.Y, screenArea.Width * CellSize.X, screenArea.Height * CellSize.Y);
 		}
@@ -387,10 +409,44 @@ namespace Terminal.Gui {
 
 
 	/// <summary>
+	/// Which strategy to use for drawing an <see cref="ISeries"/>
+	/// </summary>
+	public enum SeriesDrawMode {
+
+		/// <summary>
+		/// Series is drawn in one go
+		/// </summary>
+		AllAtOnce,
+
+		/// <summary>
+		/// Series is drawn one cell at a time by iterating over
+		/// all the console screen coordinates.
+		/// </summary>
+		CellByCell
+	}
+
+	/// <summary>
 	/// Describes a series of data that can be rendered into a <see cref="GraphView"/>>
 	/// </summary>
 	public interface ISeries {
+
 		/// <summary>
+		/// Indicates which method is used for drawing
+		/// </summary>
+		SeriesDrawMode DrawMode {get; }
+
+		/// <summary>
+		/// Draw method when <see cref="DrawMode"/> is <see cref="SeriesDrawMode.AllAtOnce"/>.
+		/// Do custom drawing as needed to fill relevant areas of the graph
+		/// </summary>
+		/// <param name="graph">Graph series is to be drawn onto</param>
+		/// <param name="driver"></param>
+		/// <param name="bounds">Visible area of the graph in Console Screen units (excluding margins)</param>
+		/// <param name="graphBounds">Visible area of the graph in Graph space units</param>
+		void DrawSeries (GraphView graph, ConsoleDriver driver, Rect bounds, RectangleD graphBounds);
+
+		/// <summary>
+		/// Draw method when <see cref="DrawMode"/> is <see cref="SeriesDrawMode.CellByCell"/>.
 		/// Return the rune that should be drawn on the screen (if any)
 		/// for the current position in the control
 		/// </summary>
@@ -441,9 +497,51 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
+	/// Abstract base implementation of <see cref="ISeries"/>
+	/// </summary>
+	public abstract class Series : ISeries {
+
+		/// <summary>
+		/// Indicates which method is called for drawing
+		/// </summary>
+		public SeriesDrawMode DrawMode {get;}
+
+		/// <summary>
+		/// Base constructor, indicates which method should be used for drawing
+		/// </summary>
+		/// <param name="drawMode">Pass value that corresponds to whether you intend to implement
+		/// <see cref="DrawSeries(GraphView, ConsoleDriver, Rect, RectangleD)"/> or
+		/// <see cref="GetCellValueIfAny(RectangleD)"/></param>
+		public Series (SeriesDrawMode drawMode)
+		{
+			DrawMode = drawMode;
+		}
+
+		/// <summary>
+		/// Override if using <see cref="SeriesDrawMode.AllAtOnce"/>
+		/// </summary>
+		/// <param name="graph"></param>
+		/// <param name="driver"></param>
+		/// <param name="bounds"></param>
+		/// <param name="graphBounds"></param>
+		public virtual void DrawSeries (GraphView graph, ConsoleDriver driver, Rect bounds, RectangleD graphBounds)
+		{
+			
+		}
+
+		/// <summary>
+		/// Override if using <see cref="SeriesDrawMode.CellByCell"/>
+		/// </summary>
+		public virtual GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
+		{
+			return null;
+		}
+	}
+
+	/// <summary>
 	/// Series composed of any number of discrete data points 
 	/// </summary>
-	public class ScatterSeries : ISeries {
+	public class ScatterSeries : Series {
 		/// <summary>
 		/// Collection of each discrete point in the series
 		/// </summary>
@@ -458,26 +556,39 @@ namespace Terminal.Gui {
 		public GraphCellToRender Fill { get; set; } = new GraphCellToRender ('x');
 
 		/// <summary>
-		/// Returns a point symbol if the <paramref name="graphSpace"/> contains 
-		/// any of the <see cref="Points"/>
+		/// Creates a new instance of the series and initializes base constructor
 		/// </summary>
-		/// <param name="graphSpace"></param>
-		/// <returns></returns>
-		public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
+		public ScatterSeries () : base(SeriesDrawMode.AllAtOnce)
 		{
-			if (Points.Any (p => graphSpace.Contains (p))) {
-				return Fill;
+
+		}
+
+		/// <summary>
+		/// Draws all points directly onto the graph
+		/// </summary>
+		public override void DrawSeries (GraphView graph, ConsoleDriver driver, Rect bounds, RectangleD graphBounds)
+		{
+			base.DrawSeries (graph, driver, bounds, graphBounds);
+
+			if (Fill.Color.HasValue) {
+				driver.SetAttribute (Fill.Color.Value);
 			}
 
-			return null;
+			foreach (var p in Points.Where (p => graphBounds.Contains (p))) {
+
+				var screenPoint = graph.GraphSpaceToScreen (p);
+				graph.AddRune(screenPoint.X, screenPoint.Y, Fill.Rune);
+			}
+
 		}
+
 	}
 
 
 	/// <summary>
 	/// Collection of <see cref="BarSeries"/> in which bars are clustered by category
 	/// </summary>
-	public class MultiBarSeries : ISeries {
+	public class MultiBarSeries : Series {
 
 		BarSeries [] subSeries;
 
@@ -501,7 +612,7 @@ namespace Terminal.Gui {
 		/// <param name="barsEvery">How far appart to put each category (in graph space)</param>
 		/// <param name="spacing">How much spacing between bars in a category (should be less than <paramref name="barsEvery"/>/<paramref name="numberOfBarsPerCategory"/>)</param>
 		/// <param name="colors">Array of colors that define bar colour in each category.  Length must match <paramref name="numberOfBarsPerCategory"/></param>
-		public MultiBarSeries (int numberOfBarsPerCategory, decimal barsEvery, decimal spacing, Attribute [] colors = null)
+		public MultiBarSeries (int numberOfBarsPerCategory, decimal barsEvery, decimal spacing, Attribute [] colors = null) : base(SeriesDrawMode.CellByCell)
 		{
 			subSeries = new BarSeries [numberOfBarsPerCategory];
 
@@ -546,7 +657,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="graphSpace"></param>
 		/// <returns></returns>
-		public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
+		public override GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
 		{
 			foreach (var bar in subSeries) {
 
@@ -571,7 +682,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Series of bars positioned at regular intervals
 	/// </summary>
-	public class BarSeries : ISeries {
+	public class BarSeries : Series {
 
 		/// <summary>
 		/// Ordered collection of graph bars to position along axis
@@ -604,12 +715,20 @@ namespace Terminal.Gui {
 		public Attribute? OverrideBarColor { get; internal set; }
 
 		/// <summary>
+		/// Creates a new instance of the series and initializes base constructor
+		/// </summary>
+		public BarSeries ():base(SeriesDrawMode.CellByCell)
+		{
+
+		}
+
+		/// <summary>
 		/// Returns the <see cref="Bar.Fill"/> of the first bar that extends over
 		/// the <paramref name="graphSpace"/> specified
 		/// </summary>
 		/// <param name="graphSpace"></param>
 		/// <returns></returns>
-		public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
+		public override GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
 		{
 			Bar bar = LocationToBar (graphSpace);
 
