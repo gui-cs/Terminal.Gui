@@ -98,7 +98,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			Driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
+			SetDriverColorToGraphColor (Driver); 
 
 			Move (0, 0);
 
@@ -118,9 +118,7 @@ namespace Terminal.Gui {
 				a.Render (this, Driver, Bounds);
 			}
 
-
-			Driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
-
+			SetDriverColorToGraphColor (Driver);
 
 			// The drawable area of the graph (anything that isn't in the margins
 			Rect drawBounds = new Rect((int)MarginLeft,0, Bounds.Width - ((int)MarginLeft), Bounds.Height - (int)MarginBottom);
@@ -131,7 +129,7 @@ namespace Terminal.Gui {
 				s.DrawSeries (this, Driver, drawBounds, graphSpace);
 
 				// If a series changes the graph color reset it
-				Driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
+				SetDriverColorToGraphColor (Driver);
 			}
 
 			var cellByCellSeries = Series.Where (s => s.DrawMode == SeriesDrawMode.CellByCell).ToArray();
@@ -167,7 +165,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			Driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
+			SetDriverColorToGraphColor (Driver);
 
 			AxisY.DrawAxisLine (Driver, this, Bounds);
 			AxisX.DrawAxisLine (Driver, this, Bounds);
@@ -175,7 +173,7 @@ namespace Terminal.Gui {
 			AxisY.DrawAxisLabels (Driver, this, Bounds);
 			AxisX.DrawAxisLabels (Driver, this, Bounds);
 
-			Driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
+			SetDriverColorToGraphColor (Driver);
 
 			// Draw origin with plus
 			var origin = GraphSpaceToScreen (new PointD (0, 0));
@@ -196,6 +194,15 @@ namespace Terminal.Gui {
 				a.Render (this, Driver, Bounds);
 			}
 
+		}
+
+		/// <summary>
+		/// Sets the color attribute of <paramref name="driver"/> to the <see cref="GraphColor"/>
+		/// (if defined) or <see cref="ColorScheme"/> otherwise.
+		/// </summary>
+		public void SetDriverColorToGraphColor (ConsoleDriver driver)
+		{
+			driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
 		}
 
 		/// <summary>
@@ -407,6 +414,137 @@ namespace Terminal.Gui {
 		}
 	}
 
+	/// <summary>
+	/// A box containing symbol definitions e.g. meanings for colors in a graph.
+	/// The 'Key' to the graph
+	/// </summary>
+	public class LegendAnnotation : IAnnotation {
+
+		/// <summary>
+		/// True to draw a solid border around the legend.
+		/// Defaults to true
+		/// </summary>
+		public bool Border { get; set; } = true;
+
+		/// <summary>
+		/// Defines the screen area available for the legend to render in
+		/// </summary>
+		public Rect Bounds { get; set; }
+
+		/// <summary>
+		/// Returns false i.e. Lengends render after series
+		/// </summary>
+		public bool BeforeSeries =>false;
+
+		/// <summary>
+		/// Ordered collection of entries that are rendered in the legend.
+		/// </summary>
+		List<Tuple<GraphCellToRender, string>> entries = new List<Tuple<GraphCellToRender, string>>();
+
+		/// <summary>
+		/// Creates a new empty legend at the given screen coordinates
+		/// </summary>
+		/// <param name="legendBounds">Defines the area available for the legend to render in
+		/// (within the graph).  This is in screen units (i.e. not graph space)</param>
+		public LegendAnnotation (Rect legendBounds)
+		{
+			Bounds = legendBounds;
+		}
+
+		/// <summary>
+		/// Draws the Legend and all entries into the area within <see cref="Bounds"/>
+		/// </summary>
+		/// <param name="graph"></param>
+		/// <param name="driver"></param>
+		/// <param name="screenBounds"></param>
+		public void Render (GraphView graph, ConsoleDriver driver, Rect screenBounds)
+		{
+			if (Border) {
+				graph.DrawFrame (Bounds, 0, true);
+			}
+
+			// start the legend at
+			int y = Bounds.Top + (Border ? 1 : 0);
+			int x = Bounds.Left + (Border ? 1 : 0);
+
+			// how much horizontal space is available for writing legend entries?
+			int availableWidth = Bounds.Width - (Border ? 2 : 0);
+			int availableHeight = Bounds.Height - (Border ? 2 : 0);
+
+			int linesDrawn = 0;
+
+			foreach (var entry in entries) {
+				
+				if (entry.Item1.Color.HasValue) {
+					driver.SetAttribute (entry.Item1.Color.Value);
+				} else {
+					graph.SetDriverColorToGraphColor (driver);
+				}
+
+				// add the symbol
+				graph.AddRune (x,y + linesDrawn, entry.Item1.Rune);
+
+				// switch to normal coloring (for the text)
+				graph.SetDriverColorToGraphColor (driver);
+
+				// add the text
+				graph.Move (x + 1, y + linesDrawn);
+
+				string str = TruncateOrPad(entry.Item2,availableWidth-1,TextAlignment.Left);				
+				driver.AddStr (str);
+
+				linesDrawn++;
+
+				// Legend has run out of space
+				if(linesDrawn >= availableHeight) {
+					break;
+				}
+			}
+		}
+
+		private string TruncateOrPad (string text, int width, TextAlignment alignment)
+		{
+			if (string.IsNullOrEmpty (text))
+				return text;
+
+			// if value is not wide enough
+			if (text.Sum (c => Rune.ColumnWidth (c)) < width) {
+
+				// pad it out with spaces to the given alignment
+				int toPad = width - (text.Sum (c => Rune.ColumnWidth (c)));
+
+				switch (alignment) {
+
+				case TextAlignment.Left:
+					return text + new string (' ', toPad);
+				case TextAlignment.Right:
+					return new string (' ', toPad) + text;
+
+				// TODO: With single line cells, centered and justified are the same right?
+				case TextAlignment.Centered:
+				case TextAlignment.Justified:
+					return
+						new string (' ', (int)Math.Floor (toPad / 2.0)) + // round down
+						text +
+						 new string (' ', (int)Math.Ceiling (toPad / 2.0)); // round up
+				}
+			}
+
+			// value is too wide
+			return new string (text.TakeWhile (c => (width -= Rune.ColumnWidth (c)) > 0).ToArray ());
+		}
+
+		/// <summary>
+		/// Adds an entry into the legend.  Duplicate entries are permissable
+		/// </summary>
+		/// <param name="graphCellToRender">The symbol appearing on the graph that should appear in the legend</param>
+		/// <param name="text">Text to render on this line of the legend.  Will be truncated
+		/// if outside of Legend <see cref="Bounds"/></param>
+		public void AddEntry (GraphCellToRender graphCellToRender, string text)
+		{
+			entries.Add (Tuple.Create (graphCellToRender, text));
+		}
+	}
 
 	/// <summary>
 	/// Which strategy to use for drawing an <see cref="ISeries"/>

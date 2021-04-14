@@ -130,6 +130,12 @@ namespace UICatalog.Scenarios {
 			graphView.AxisX.Increment = 1;
 			graphView.AxisX.ShowLabelsEvery = 1;
 			graphView.AxisX.LabelGetter = (v) => series.SubSeries.First ().GetLabelText (v);
+
+			var legend = new LegendAnnotation (new Rect (graphView.Bounds.Width - 20,0, 20, 5));
+			legend.AddEntry (new GraphCellToRender (stiple, series.SubSeries.ElementAt (0).OverrideBarColor), "Lower Third");
+			legend.AddEntry (new GraphCellToRender (stiple, series.SubSeries.ElementAt (1).OverrideBarColor), "Middle Third");
+			legend.AddEntry (new GraphCellToRender (stiple, series.SubSeries.ElementAt (2).OverrideBarColor), "Upper Third");
+			graphView.Annotations.Add (legend);
 		}
 
 		private void SetupLineGraph ()
