@@ -57,6 +57,16 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
+		public void SelectedStart_Greater_Than_CursorPosition_All_Selection_Is_Overwritten_On_Typing ()
+		{
+			_textField.SelectedStart = 19;
+			_textField.CursorPosition = 12;
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+			_textField.ProcessKey (new KeyEvent ((Key)0x75, new KeyModifiers ())); // u
+			Assert.Equal ("TAB to jump u text fields.", _textField.Text);
+		}
+
+		[Fact]
 		public void CursorPosition_With_Value_Less_Than_Zero_Changes_To_Zero ()
 		{
 			_textField.CursorPosition = -1;
@@ -636,7 +646,6 @@ namespace Terminal.Gui {
 			Assert.Equal ("TAB to jumusep between text fields.", _textField.Text);
 			_textField.ProcessKey (new KeyEvent ((Key)0x64, new KeyModifiers ())); // d
 			Assert.Equal ("TAB to jumusedp between text fields.", _textField.Text);
-
 		}
 
 		[Fact]
@@ -653,7 +662,6 @@ namespace Terminal.Gui {
 			Assert.Equal ("TAB to jumuseetween text fields.", _textField.Text);
 			_textField.ProcessKey (new KeyEvent ((Key)0x64, new KeyModifiers ())); // d
 			Assert.Equal ("TAB to jumusedtween text fields.", _textField.Text);
-
 		}
 	}
 }

@@ -829,7 +829,7 @@ namespace Terminal.Gui {
 		void SetSelectedStartSelectedLength ()
 		{
 			if (SelectedStart > -1 && point < SelectedStart) {
-				start = point - SelectedStart + SelectedStart;
+				start = point;
 			} else {
 				start = SelectedStart;
 			}
@@ -861,7 +861,8 @@ namespace Terminal.Gui {
 		void DeleteSelectedText ()
 		{
 			ustring actualText = Text;
-			int selStart = point < SelectedStart ? SelectedStart - point + SelectedStart : SelectedStart;
+			SetSelectedStartSelectedLength ();
+			int selStart = SelectedStart > -1 ? start : point;
 			(var _, var len) = TextModel.DisplaySize (text, 0, selStart, false);
 			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + length, false);
 			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.RuneCount, false);
