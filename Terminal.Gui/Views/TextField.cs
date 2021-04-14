@@ -223,7 +223,7 @@ namespace Terminal.Gui {
 				var rune = text [idx];
 				var cols = Rune.ColumnWidth (rune);
 				if (idx == point && HasFocus && !Used && length == 0 && !ReadOnly) {
-					Driver.SetAttribute (Colors.Menu.HotFocus);
+					Driver.SetAttribute (selColor);
 				} else if (ReadOnly) {
 					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? selColor : roc);
 				} else if (!HasFocus) {
