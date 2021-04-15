@@ -98,6 +98,11 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
+			if(CellSize.X == 0 || CellSize.Y == 0) {
+				throw new Exception ($"{nameof(CellSize)} cannot be 0");
+			}
+
+
 			SetDriverColorToGraphColor (Driver); 
 
 			Move (0, 0);
@@ -120,7 +125,7 @@ namespace Terminal.Gui {
 
 			SetDriverColorToGraphColor (Driver);
 
-			// The drawable area of the graph (anything that isn't in the margins
+			// The drawable area of the graph (anything that isn't in the margins)
 			Rect drawBounds = new Rect((int)MarginLeft,0, Bounds.Width - ((int)MarginLeft), Bounds.Height - (int)MarginBottom);
 			RectangleD graphSpace = ScreenToGraphSpace (drawBounds);
 
@@ -229,7 +234,7 @@ namespace Terminal.Gui {
 		public RectangleD ScreenToGraphSpace (Rect screenArea)
 		{
 			// get position of the bottom left
-			var pos = ScreenToGraphSpace (screenArea.Left, screenArea.Bottom);
+			var pos = ScreenToGraphSpace (screenArea.Left, screenArea.Bottom-1);
 
 			return new RectangleD (pos.X, pos.Y, screenArea.Width * CellSize.X, screenArea.Height * CellSize.Y);
 		}

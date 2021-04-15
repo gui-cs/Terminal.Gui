@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Terminal.Gui;
@@ -8,6 +9,14 @@ namespace UnitTests {
 
 
 	public class GraphViewTests {
+
+
+		private void InitFakeDriver ()
+		{
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			driver.Init (() => { });
+		}
 
 		#region Screen to Graph Tests
 
@@ -225,6 +234,76 @@ namespace UnitTests {
 			Assert.Equal (6, gv.GraphSpaceToScreen (new PointD (2, 9)).Y);
 			Assert.Equal (5, gv.GraphSpaceToScreen (new PointD (2, 10)).Y);
 			Assert.Equal (5, gv.GraphSpaceToScreen (new PointD (2, 11)).Y);
+		}
+
+		#endregion
+
+
+		/// <summary>
+		/// A cell size of 0 would result in mapping all graph space into the
+		/// same cell of the console.  Since <see cref="GraphView.CellSize"/>
+		/// is mutable a sensible place to check this is in redraw.
+		/// </summary>
+		[Fact]
+		public void CellSizeZero()
+		{
+			InitFakeDriver ();
+
+			var gv = new GraphView ();
+			gv.ColorScheme = new ColorScheme ();
+			gv.Bounds = new Rect (0, 0, 50, 30);
+			gv.Series.Add (new ScatterSeries () { Points = new List<PointD> { new PointD (1, 1) } });
+			gv.CellSize.X = 0;
+			var ex = Assert.Throws<Exception>(()=>gv.Redraw (gv.Bounds));
+
+			Assert.Equal ("CellSize cannot be 0", ex.Message);
+		}
+
+		#region ISeries tests
+		[Fact]
+		public void Series_GetsPassedCorrectBounds ()
+		{
+			InitFakeDriver ();
+
+			var gv = new GraphView ();
+			gv.ColorScheme = new ColorScheme ();
+			gv.Bounds = new Rect (0, 0, 50, 30);
+
+			RectangleD fullGraphBounds = null;
+			var series = new FakeSeries ((v,c,s,g)=> { fullGraphBounds = g; },(g)=>throw new Exception("Unexpected call"));
+			gv.Series.Add (series);
+
+
+			gv.Redraw (gv.Bounds);
+			Assert.Equal (new RectangleD(0,0,50,30), fullGraphBounds);
+			
+		}
+
+		private class FakeSeries : ISeries {
+
+			readonly Action<GraphView, ConsoleDriver, Rect, RectangleD> drawSeries;
+			readonly Func<RectangleD, GraphCellToRender> getCellVal;
+
+			public SeriesDrawMode DrawMode { get; set; }
+
+			public FakeSeries (
+				Action<GraphView, ConsoleDriver, Rect, RectangleD> drawSeries,
+				Func<RectangleD, GraphCellToRender> getCellVal
+				)
+			{
+				this.drawSeries = drawSeries;
+				this.getCellVal = getCellVal;
+			}
+
+			public void DrawSeries (GraphView graph, ConsoleDriver driver, Rect bounds, RectangleD graphBounds)
+			{
+				drawSeries (graph,driver,bounds,graphBounds);
+			}
+
+			public GraphCellToRender GetCellValueIfAny (RectangleD graphSpace)
+			{
+				return getCellVal (graphSpace);
+			}
 		}
 
 		#endregion
