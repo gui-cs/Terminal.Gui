@@ -261,7 +261,7 @@ namespace UnitTests {
 
 		#region ISeries tests
 		[Fact]
-		public void Series_GetsPassedCorrectBounds ()
+		public void Series_GetsPassedCorrectBounds_AllAtOnce ()
 		{
 			InitFakeDriver ();
 
@@ -270,13 +270,160 @@ namespace UnitTests {
 			gv.Bounds = new Rect (0, 0, 50, 30);
 
 			RectangleD fullGraphBounds = null;
-			var series = new FakeSeries ((v,c,s,g)=> { fullGraphBounds = g; },(g)=>throw new Exception("Unexpected call"));
+			Rect graphScreenBounds = Rect.Empty;
+
+			var series = new FakeSeries ((v,c,s,g)=> { graphScreenBounds = s; fullGraphBounds = g; },(g)=>throw new Exception("Unexpected call"));
+			series.DrawMode = SeriesDrawMode.AllAtOnce;
 			gv.Series.Add (series);
 
 
 			gv.Redraw (gv.Bounds);
 			Assert.Equal (new RectangleD(0,0,50,30), fullGraphBounds);
-			
+			Assert.Equal (new Rect (0, 0, 50, 30), graphScreenBounds);
+
+			// Now we put a margin in
+			// Graph should not spill into the margins
+
+			gv.MarginBottom = 2;
+			gv.MarginLeft = 5;
+
+			// Even with a margin the graph should be drawn from 
+			// the origin, we just get less visible width/height
+			gv.Redraw (gv.Bounds);
+			Assert.Equal (new RectangleD (0, 0, 45, 28), fullGraphBounds);
+
+			// The screen space the graph will be rendered into should
+			// not overspill the margins
+			Assert.Equal (new Rect (5, 0, 45, 28), graphScreenBounds);
+		}
+
+		/// <summary>
+		/// Tests that the bounds passed to the ISeries for drawing into are 
+		/// correct even when the <see cref="GraphView.CellSize"/> results in
+		/// multiple units of graph space being condensed into each cell of
+		/// console
+		/// </summary>
+		[Fact]
+		public void Series_GetsPassedCorrectBounds_AllAtOnce_LargeCellSize ()
+		{
+			InitFakeDriver ();
+
+			var gv = new GraphView ();
+			gv.ColorScheme = new ColorScheme ();
+			gv.Bounds = new Rect (0, 0, 50, 30);
+
+			// the larger the cell size the more condensed (smaller) the graph space is
+			gv.CellSize = new PointD (2, 5);
+
+			RectangleD fullGraphBounds = null;
+			Rect graphScreenBounds = Rect.Empty;
+
+			var series = new FakeSeries ((v, c, s, g) => { graphScreenBounds = s; fullGraphBounds = g; }, (g) => throw new Exception ("Unexpected call"));
+			series.DrawMode = SeriesDrawMode.AllAtOnce;
+			gv.Series.Add (series);
+
+			gv.Redraw (gv.Bounds);
+			// Since each cell of the console is 2x5 of graph space the graph
+			// bounds to be rendered are larger
+			Assert.Equal (new RectangleD (0, 0, 100, 150), fullGraphBounds);
+			Assert.Equal (new Rect (0, 0, 50, 30), graphScreenBounds);
+
+			// Graph should not spill into the margins
+
+			gv.MarginBottom = 2;
+			gv.MarginLeft = 5;
+
+			// Even with a margin the graph should be drawn from 
+			// the origin, we just get less visible width/height
+			gv.Redraw (gv.Bounds);
+			Assert.Equal (new RectangleD (0, 0, 90, 140), fullGraphBounds);
+
+			// The screen space the graph will be rendered into should
+			// not overspill the margins
+			Assert.Equal (new Rect (5, 0, 45, 28), graphScreenBounds);
+		}
+
+		[Fact]
+		public void Series_GetsPassedCorrectBounds_CellByCell ()
+		{
+			InitFakeDriver ();
+
+			var gv = new GraphView ();
+			gv.ColorScheme = new ColorScheme ();
+			gv.Bounds = new Rect (0, 0, 50, 30);
+
+			List<RectangleD> cells = new List<RectangleD>();
+			var series = new FakeSeries ((v, c, s, g) => { throw new Exception ("Unexpected call"); }, (g) => { cells.Add (g);return null; });
+			series.DrawMode = SeriesDrawMode.CellByCell;
+			gv.Series.Add (series);
+
+			gv.Redraw (gv.Bounds);
+			// expect 1 call per cell in graph (50x30)
+			Assert.Equal (1500, cells.Count);
+
+			// first cell we get passed will be the top left of the screen
+			// which is high on the Y axis and 0 on the x axis since screen
+			// space starts at 0 in upper left while graph space starts with
+			// lowest numbers (e.g. 0) in lower left
+			Assert.Equal (new RectangleD(0,29,1,1), cells.First ());
+
+			// Graph should not spill into the margins
+
+			gv.MarginBottom = 2;
+			gv.MarginLeft = 5;
+
+			// reset the test recording list and redraw
+			cells.Clear ();
+			gv.Redraw (gv.Bounds);
+
+			// all cells should be within this space
+
+			// expect 1 call per console cell in graph view excluding margins (45x28)
+			Assert.Equal (1260, cells.Count);
+			var expectedBounds = new RectangleD (0, 0, 45, 28);
+			Assert.True (cells.All (c => expectedBounds.Contains (c.X, c.Y)));
+			Assert.True (cells.All (c => expectedBounds.Contains (c.X + c.Width-0.000001M, c.Y + c.Height - 0.0000001M)));
+		}
+
+		[Fact]
+		public void Series_GetsPassedCorrectBounds_CellByCell_LargeCellSize ()
+		{
+			InitFakeDriver ();
+
+			var gv = new GraphView ();
+			gv.CellSize = new PointD (2, 5);
+			gv.ColorScheme = new ColorScheme ();
+			gv.Bounds = new Rect (0, 0, 50, 30);
+
+			List<RectangleD> cells = new List<RectangleD> ();
+			var series = new FakeSeries ((v, c, s, g) => { throw new Exception ("Unexpected call"); }, (g) => { cells.Add (g); return null; });
+			series.DrawMode = SeriesDrawMode.CellByCell;
+			gv.Series.Add (series);
+
+			gv.Redraw (gv.Bounds);
+			// expect 1 call per cell in graph (50x30)
+			Assert.Equal (1500, cells.Count);
+
+			// Each console cell is 2x5 and graph space at the top of the screen
+			// is 145
+			Assert.Equal (new RectangleD (0, 145, 2, 5), cells.First ());
+
+			// Graph should not spill into the margins
+
+			gv.MarginBottom = 2;
+			gv.MarginLeft = 5;
+
+			// reset the test recording list and redraw
+			cells.Clear ();
+			gv.Redraw (gv.Bounds);
+
+			// all cells should be within this space
+
+			// expect 1 call per console cell in graph view excluding margins (45x28)
+			Assert.Equal (1260, cells.Count);
+			var expectedBounds = new RectangleD (0, 0, 90/*45 console cells = 90 graph units*/, 140);
+			Assert.True (cells.All (c => expectedBounds.Contains (c.X, c.Y)));
+			Assert.True (cells.All (c => expectedBounds.Contains (c.X + c.Width - 0.000001M, c.Y + c.Height - 0.0000001M)));
 		}
 
 		private class FakeSeries : ISeries {
