@@ -914,7 +914,6 @@ namespace Terminal.Gui {
 		public void Kill_To_Start_Delete_Backwards_And_Copy_To_The_Clipboard ()
 		{
 			_textView.Text = "This is the first line.\nThis is the second line.";
-			//_textView.CursorPosition = new Point (0, _textView.Lines - 1);
 			_textView.MoveEnd ();
 			var iteration = 0;
 			bool iterationsFinished = false;
