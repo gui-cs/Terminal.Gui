@@ -888,7 +888,7 @@ namespace Terminal.Gui {
 				case 0:
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("\r\nThis is the second line.", _textView.Text);
+					Assert.Equal ($"{System.Environment.NewLine}This is the second line.", _textView.Text);
 					break;
 				case 1:
 					Assert.Equal (0, _textView.CursorPosition.X);
@@ -924,7 +924,7 @@ namespace Terminal.Gui {
 				case 0:
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (1, _textView.CursorPosition.Y);
-					Assert.Equal ("This is the first line.\r\n", _textView.Text);
+					Assert.Equal ($"This is the first line.{System.Environment.NewLine}", _textView.Text);
 					break;
 				case 1:
 					Assert.Equal (23, _textView.CursorPosition.X);
