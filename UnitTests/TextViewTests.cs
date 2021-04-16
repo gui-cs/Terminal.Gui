@@ -1188,14 +1188,14 @@ namespace Terminal.Gui {
 			_textView.CursorPosition = new Point (0, _textView.Lines - 1);
 			_textView.ProcessKey (new KeyEvent (Key.C | Key.CtrlMask, new KeyModifiers ()));
 			_textView.Paste ();
-			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", _textView.Text);
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}", _textView.Text);
 			_textView.CursorPosition = new Point (3, 1);
 			_textView.ProcessKey (new KeyEvent (Key.C | Key.CtrlMask, new KeyModifiers ()));
 			_textView.Paste ();
-			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}", _textView.Text);
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}", _textView.Text);
 			Assert.Equal (new Point (3, 2), _textView.CursorPosition);
 			_textView.Paste ();
-			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}", _textView.Text);
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}", _textView.Text);
 			Assert.Equal (new Point (3, 3), _textView.CursorPosition);
 		}
 	}
