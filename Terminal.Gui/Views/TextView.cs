@@ -2356,7 +2356,14 @@ namespace Terminal.Gui {
 		public void Copy ()
 		{
 			SetWrapModel ();
-			SetClipboard (GetRegion ());
+			if (selecting) {
+				SetClipboard (GetRegion ());
+			} else {
+				var currentLine = GetCurrentLine ();
+				if (currentLine.Count > 0) {
+					SetClipboard (ustring.Make (currentLine) + Environment.NewLine);
+				}
+			}
 			UpdateWrapModel ();
 			DoNeededAction ();
 		}
