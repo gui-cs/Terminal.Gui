@@ -994,7 +994,6 @@ namespace Terminal.Gui {
 		public void Kill_Delete_WordBackward ()
 		{
 			_textView.Text = "This is the first line.";
-			//_textView.CursorPosition = new Point (0, _textView.Lines - 1);
 			_textView.MoveEnd ();
 			var iteration = 0;
 			bool iterationsFinished = false;
@@ -1023,6 +1022,164 @@ namespace Terminal.Gui {
 					Assert.Equal ("This ", _textView.Text);
 					break;
 				case 4:
+					Assert.Equal (0, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("", _textView.Text);
+					break;
+				default:
+					iterationsFinished = true;
+					break;
+				}
+				iteration++;
+			}
+		}
+
+		[Fact]
+		public void Kill_Delete_WordForward_Multiline ()
+		{
+			_textView.Text = "This is the first line.\nThis is the second line.";
+			_textView.Width = 4;
+			var iteration = 0;
+			bool iterationsFinished = false;
+
+			while (!iterationsFinished) {
+				_textView.ProcessKey (new KeyEvent (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ()));
+				switch (iteration) {
+				case 0:
+					Assert.Equal (0, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("is the first line." + Environment.NewLine
+						+ "This is the second line.", _textView.Text);
+					break;
+				case 1:
+					Assert.Equal (0, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("the first line." + Environment.NewLine
+						+ "This is the second line.", _textView.Text);
+					break;
+				case 2:
+					Assert.Equal (0, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("first line." + Environment.NewLine
+						+ "This is the second line.", _textView.Text);
+					break;
+				case 3:
+					Assert.Equal (0, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("line." + Environment.NewLine
+						+ "This is the second line.", _textView.Text);
+					break;
+				case 4:
+					Assert.Equal (0, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("" + Environment.NewLine
+						+ "This is the second line.", _textView.Text);
+					break;
+				case 5:
+					Assert.Equal (0, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("This is the second line.", _textView.Text);
+					break;
+				case 6:
+					Assert.Equal (0, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("is the second line.", _textView.Text);
+					break;
+				case 7:
+					Assert.Equal (0, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("the second line.", _textView.Text);
+					break;
+				case 8:
+					Assert.Equal (0, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("second line.", _textView.Text);
+					break;
+				case 9:
+					Assert.Equal (0, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("line.", _textView.Text);
+					break;
+				case 10:
+					Assert.Equal (0, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("", _textView.Text);
+					break;
+				default:
+					iterationsFinished = true;
+					break;
+				}
+				iteration++;
+			}
+		}
+
+		[Fact]
+		public void Kill_Delete_WordBackward_Multiline ()
+		{
+			_textView.Text = "This is the first line.\nThis is the second line.";
+			_textView.Width = 4;
+			_textView.MoveEnd ();
+			var iteration = 0;
+			bool iterationsFinished = false;
+
+			while (!iterationsFinished) {
+				_textView.ProcessKey (new KeyEvent (Key.Backspace | Key.CtrlMask, new KeyModifiers ()));
+				switch (iteration) {
+				case 0:
+					Assert.Equal (19, _textView.CursorPosition.X);
+					Assert.Equal (1, _textView.CursorPosition.Y);
+					Assert.Equal ("This is the first line." + Environment.NewLine
+						+ "This is the second ", _textView.Text);
+					break;
+				case 1:
+					Assert.Equal (12, _textView.CursorPosition.X);
+					Assert.Equal (1, _textView.CursorPosition.Y);
+					Assert.Equal ("This is the first line." + Environment.NewLine
+						+ "This is the ", _textView.Text);
+					break;
+				case 2:
+					Assert.Equal (8, _textView.CursorPosition.X);
+					Assert.Equal (1, _textView.CursorPosition.Y);
+					Assert.Equal ("This is the first line." + Environment.NewLine
+						+ "This is ", _textView.Text);
+					break;
+				case 3:
+					Assert.Equal (5, _textView.CursorPosition.X);
+					Assert.Equal (1, _textView.CursorPosition.Y);
+					Assert.Equal ("This is the first line." + Environment.NewLine
+						+ "This ", _textView.Text);
+					break;
+				case 4:
+					Assert.Equal (0, _textView.CursorPosition.X);
+					Assert.Equal (1, _textView.CursorPosition.Y);
+					Assert.Equal ("This is the first line." + Environment.NewLine, _textView.Text);
+					break;
+				case 5:
+					Assert.Equal (23, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("This is the first line.", _textView.Text);
+					break;
+				case 6:
+					Assert.Equal (18, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("This is the first ", _textView.Text);
+					break;
+				case 7:
+					Assert.Equal (12, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("This is the ", _textView.Text);
+					break;
+				case 8:
+					Assert.Equal (8, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("This is ", _textView.Text);
+					break;
+				case 9:
+					Assert.Equal (5, _textView.CursorPosition.X);
+					Assert.Equal (0, _textView.CursorPosition.Y);
+					Assert.Equal ("This ", _textView.Text);
+					break;
+				case 10:
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
 					Assert.Equal ("", _textView.Text);

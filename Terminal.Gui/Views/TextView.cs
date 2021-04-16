@@ -689,6 +689,21 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		public bool RemoveRange (int row, int index, int count)
+		{
+			var modelRow = GetModelLineFromWrappedLines (row);
+			var line = GetCurrentLine (modelRow);
+			var modelCol = GetModelColFromWrappedLines (row, index);
+
+			try {
+				line.RemoveRange (modelCol, count);
+			} catch (Exception) {
+				return false;
+			}
+
+			return true;
+		}
+
 		public void UpdateModel (TextModel model, out int nRow, out int nCol, out int nStartRow, out int nStartCol,
 			int row, int col, int startRow, int startCol)
 		{
@@ -1993,12 +2008,10 @@ namespace Terminal.Gui {
 			case Key.DeleteChar | Key.CtrlMask | Key.ShiftMask:
 				if (isReadOnly)
 					break;
-				SetWrapModel ();
 				currentLine = GetCurrentLine ();
 				var setLastWasKill = true;
 				if (currentLine.Count > 0 && currentColumn == currentLine.Count) {
 					DeleteTextForwards ();
-					UpdateWrapModel ();
 					return true;
 				}
 				if (currentLine.Count == 0) {
@@ -2032,7 +2045,6 @@ namespace Terminal.Gui {
 					}
 					currentLine.RemoveRange (currentColumn, restCount);
 				}
-				UpdateWrapModel ();
 				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
 				lastWasKill = setLastWasKill;
 				break;
@@ -2040,12 +2052,10 @@ namespace Terminal.Gui {
 			case Key.Backspace | Key.CtrlMask | Key.ShiftMask: // kill-to-start
 				if (isReadOnly)
 					break;
-				SetWrapModel ();
 				currentLine = GetCurrentLine ();
 				setLastWasKill = true;
 				if (currentLine.Count > 0 && currentColumn == 0) {
 					DeleteTextBackwards ();
-					UpdateWrapModel ();
 					return true;
 				}
 				if (currentLine.Count == 0) {
@@ -2071,7 +2081,6 @@ namespace Terminal.Gui {
 					currentLine.RemoveRange (0, restCount);
 					currentColumn = 0;
 				}
-				UpdateWrapModel ();
 				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
 				lastWasKill = setLastWasKill;
 				break;
@@ -2135,14 +2144,13 @@ namespace Terminal.Gui {
 			case Key.DeleteChar | Key.CtrlMask: // kill-word-forwards
 				if (isReadOnly)
 					break;
-				SetWrapModel ();
 				currentLine = GetCurrentLine ();
 				if (currentLine.Count == 0 || currentColumn == currentLine.Count) {
 					DeleteTextForwards ();
-					UpdateWrapModel ();
 					return true;
 				}
 				newPos = WordForward (currentColumn, currentRow);
+				restCount = 0;
 				if (newPos.HasValue && currentRow == newPos.Value.row) {
 					restCount = newPos.Value.col - currentColumn;
 					currentLine.RemoveRange (currentColumn, restCount);
@@ -2150,31 +2158,46 @@ namespace Terminal.Gui {
 					restCount = currentLine.Count - currentColumn;
 					currentLine.RemoveRange (currentColumn, restCount);
 				}
-				UpdateWrapModel ();
-				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+				if (wordWrap && wrapManager.RemoveRange (currentRow, currentColumn, restCount)) {
+					wrapNeeded = true;
+				}
+				if (wrapNeeded) {
+					SetNeedsDisplay ();
+				} else {
+					SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+				}
 				break;
 
 			case Key.Backspace | Key.CtrlMask: // kill-word-backwards
 				if (isReadOnly)
 					break;
-				SetWrapModel ();
 				currentLine = GetCurrentLine ();
-				if (currentLine.Count > 0 && currentColumn == 0) {
+				if (currentColumn == 0) {
 					DeleteTextBackwards ();
-					UpdateWrapModel ();
 					return true;
 				}
 				newPos = WordBackward (currentColumn, currentRow);
 				if (newPos.HasValue && currentRow == newPos.Value.row) {
 					restCount = currentColumn - newPos.Value.col;
 					currentLine.RemoveRange (newPos.Value.col, restCount);
+					if (wordWrap && wrapManager.RemoveRange (currentRow, newPos.Value.col, restCount)) {
+						wrapNeeded = true;
+					}
 					currentColumn = newPos.Value.col;
 				} else if (newPos.HasValue) {
 					restCount = currentLine.Count - currentColumn;
 					currentLine.RemoveRange (currentColumn, restCount);
+					if (wordWrap && wrapManager.RemoveRange (currentRow, currentColumn, restCount)) {
+						wrapNeeded = true;
+					}
+					currentColumn = newPos.Value.col;
+					currentRow = newPos.Value.row;
 				}
-				UpdateWrapModel ();
-				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+				if (wrapNeeded) {
+					SetNeedsDisplay ();
+				} else {
+					SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+				}
 				break;
 
 			case Key.Enter:
@@ -2649,6 +2672,9 @@ namespace Terminal.Gui {
 							}
 						}
 						if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune))) {
+							if (lastValidCol > -1) {
+								nCol = lastValidCol;
+							}
 							return;
 						}
 						while (MovePrev (ref nCol, ref nRow, out nRune)) {
