@@ -542,4 +542,20 @@ namespace UnitTests {
 			}
 		}
 	}
+
+	public class AxisIncrementToRenderTests {
+		[Fact]
+		public void AxisIncrementToRenderTests_Constructor ()
+		{
+			var render = new AxisIncrementToRender (Orientation.Horizontal,new Terminal.Gui.Point(1,2),new RectangleD(0,1,1,1));
+
+			Assert.Equal (Orientation.Horizontal, render.Orientation);
+			Assert.Equal (1, render.ScreenLocation.X);
+			Assert.Equal (2, render.ScreenLocation.Y);
+			Assert.Equal (0, render.GraphSpace.X);
+			Assert.Equal (1, render.GraphSpace.Y);
+			Assert.Equal (1, render.GraphSpace.Width);
+			Assert.Equal (1, render.GraphSpace.Height);
+		}
+	}
 }

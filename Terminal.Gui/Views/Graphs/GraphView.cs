@@ -1585,9 +1585,9 @@ namespace Terminal.Gui.Graphs {
 		/// The text (if any) that should be displayed at this axis increment
 		/// </summary>
 		/// <value></value>
-		public string Text {
+		internal string Text {
 			get => _text;
-			internal set { _text = value ?? ""; }
+			set { _text = value ?? ""; }
 		}
 
 		/// <summary>
