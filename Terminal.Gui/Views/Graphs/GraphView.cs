@@ -1073,6 +1073,9 @@ namespace Terminal.Gui.Graphs {
 			view.AddRune ((int)x, (int)y, '.');
 		}
 
+		#region Bresenham's line algorithm
+		// https://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#C.23
+
 		int ipart (decimal x) { return (int)x; }
 
 
@@ -1124,6 +1127,32 @@ namespace Terminal.Gui.Graphs {
 				e2 = err;
 				if (e2 > -dx) { err -= dy; x0 += sx; }
 				if (e2 < dy) { err += dx; y0 += sy; }
+			}
+		}
+
+		#endregion
+
+		/// <summary>
+		/// Describes two points in graph space and a line between them
+		/// </summary>
+		public class LineD {
+			/// <summary>
+			/// The start of the line
+			/// </summary>
+			public PointD Start { get; }
+
+			/// <summary>
+			/// The end point of the line
+			/// </summary>
+			public PointD End { get; }
+
+			/// <summary>
+			/// Creates a new point at the given coordinates
+			/// </summary>
+			public LineD (PointD start, PointD end)
+			{
+				this.Start = start;
+				this.End = end;
 			}
 		}
 	}
@@ -1212,7 +1241,7 @@ namespace Terminal.Gui.Graphs {
 	/// <summary>
 	/// The horizontal (x axis) of a <see cref="GraphView"/>
 	/// </summary>
-	public class HorizontalAxis : Axis {
+	class HorizontalAxis : Axis {
 
 		/// <summary>
 		/// Creates a new instance of axis with an <see cref="Orientation"/> of <see cref="Orientation.Horizontal"/>
@@ -1368,7 +1397,7 @@ namespace Terminal.Gui.Graphs {
 	/// <summary>
 	/// The vertical (i.e. Y axis) of a <see cref="GraphView"/>
 	/// </summary>
-	public class VerticalAxis : Axis {
+	class VerticalAxis : Axis {
 
 		private int GetLabelThickness (IEnumerable<AxisIncrementToRender> labels)
 		{
@@ -1580,6 +1609,9 @@ namespace Terminal.Gui.Graphs {
 	/// Rectangle class based on the exact floating point primative 'decimal'
 	/// </summary>
 	public class RectangleD {
+
+		// Code adapted from dotnet source:
+		// http://www.dotnetframework.org/default.aspx/DotNET/DotNET/8@0/untmp/whidbey/REDBITS/ndp/fx/src/CommonUI/System/Drawing/Advanced/RectangleF@cs/1/RectangleF@cs
 
 		/// <summary>
 		/// A rectangle with 0 size positioned at the origin (0,0)
@@ -1839,45 +1871,6 @@ namespace Terminal.Gui.Graphs {
 		{
 			this.X = x;
 			this.Y = y;
-		}
-	}
-	/// <summary>
-	/// Describes two points in graph space and a line between them
-	/// </summary>
-	public class LineD {
-		/// <summary>
-		/// The start of the line
-		/// </summary>
-		public PointD Start { get; }
-
-		/// <summary>
-		/// The end point of the line
-		/// </summary>
-		public PointD End { get; }
-
-		/// <summary>
-		/// Creates a new point at the given coordinates
-		/// </summary>
-		public LineD (PointD start, PointD end)
-		{
-			this.Start = start;
-			this.End = end;
-		}
-
-		/// <summary>
-		/// Returns the gradient of the line.  If vertical then <see cref="decimal.MaxValue"/> is returned
-		/// </summary>
-		/// <returns></returns>
-		public decimal GetGradient ()
-		{
-			decimal changeInHeight = End.Y - Start.Y;
-			decimal changeInWidth = End.X - Start.X;
-
-			if (changeInWidth == 0) {
-				return decimal.MaxValue;
-			}
-
-			return changeInHeight / changeInWidth;
 		}
 	}
 
