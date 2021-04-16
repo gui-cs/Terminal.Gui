@@ -1998,6 +1998,7 @@ namespace Terminal.Gui {
 				var setLastWasKill = true;
 				if (currentLine.Count > 0 && currentColumn == currentLine.Count) {
 					DeleteTextForwards ();
+					UpdateWrapModel ();
 					return true;
 				}
 				if (currentLine.Count == 0) {
@@ -2044,6 +2045,7 @@ namespace Terminal.Gui {
 				setLastWasKill = true;
 				if (currentLine.Count > 0 && currentColumn == 0) {
 					DeleteTextBackwards ();
+					UpdateWrapModel ();
 					return true;
 				}
 				if (currentLine.Count == 0) {
@@ -2137,6 +2139,7 @@ namespace Terminal.Gui {
 				currentLine = GetCurrentLine ();
 				if (currentLine.Count == 0 || currentColumn == currentLine.Count) {
 					DeleteTextForwards ();
+					UpdateWrapModel ();
 					return true;
 				}
 				newPos = WordForward (currentColumn, currentRow);
@@ -2158,6 +2161,7 @@ namespace Terminal.Gui {
 				currentLine = GetCurrentLine ();
 				if (currentLine.Count > 0 && currentColumn == 0) {
 					DeleteTextBackwards ();
+					UpdateWrapModel ();
 					return true;
 				}
 				newPos = WordBackward (currentColumn, currentRow);
