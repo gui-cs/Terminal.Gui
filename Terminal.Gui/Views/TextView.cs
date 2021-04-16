@@ -2350,6 +2350,8 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		bool copyWithoutSelection;
+
 		/// <summary>
 		/// Copy the selected text to the clipboard contents.
 		/// </summary>
@@ -2358,10 +2360,12 @@ namespace Terminal.Gui {
 			SetWrapModel ();
 			if (selecting) {
 				SetClipboard (GetRegion ());
+				copyWithoutSelection = false;
 			} else {
 				var currentLine = GetCurrentLine ();
 				if (currentLine.Count > 0) {
-					SetClipboard (ustring.Make (currentLine) + Environment.NewLine);
+					SetClipboard ($"\n{ustring.Make (currentLine)}");
+					copyWithoutSelection = true;
 				}
 			}
 			UpdateWrapModel ();
@@ -2388,15 +2392,23 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void Paste ()
 		{
-			if (isReadOnly) {
+			if (isReadOnly || Clipboard.Contents == null || Clipboard.Contents == "") {
 				return;
 			}
 
 			SetWrapModel ();
-			if (selecting) {
-				ClearRegion ();
+			if (copyWithoutSelection) {
+				var cCol = currentColumn;
+				currentColumn = GetCurrentLine ().Count;
+				InsertText (Clipboard.Contents);
+				currentColumn = cCol;
+			} else {
+				if (selecting) {
+					ClearRegion ();
+				}
+				InsertText (Clipboard.Contents);
+				copyWithoutSelection = false;
 			}
-			InsertText (Clipboard.Contents);
 			UpdateWrapModel ();
 			selecting = false;
 			DoNeededAction ();

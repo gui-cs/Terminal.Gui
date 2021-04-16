@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace Terminal.Gui {
 	public class TextViewTests {
@@ -1178,6 +1179,24 @@ namespace Terminal.Gui {
 			Assert.Equal ("TAB to jumuseetween text fields.", _textView.Text);
 			_textView.ProcessKey (new KeyEvent ((Key)0x64, new KeyModifiers ())); // d
 			Assert.Equal ("TAB to jumusedtween text fields.", _textView.Text);
+		}
+
+		[Fact]
+		public void Copy_Without_Selection ()
+		{
+			_textView.Text = "This is the first line.\nThis is the second line.\n";
+			_textView.CursorPosition = new Point (0, _textView.Lines - 1);
+			_textView.ProcessKey (new KeyEvent (Key.C | Key.CtrlMask, new KeyModifiers ()));
+			_textView.Paste ();
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", _textView.Text);
+			_textView.CursorPosition = new Point (3, 1);
+			_textView.ProcessKey (new KeyEvent (Key.C | Key.CtrlMask, new KeyModifiers ()));
+			_textView.Paste ();
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}", _textView.Text);
+			Assert.Equal (new Point (3, 2), _textView.CursorPosition);
+			_textView.Paste ();
+			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}", _textView.Text);
+			Assert.Equal (new Point (3, 3), _textView.CursorPosition);
 		}
 	}
 }
