@@ -7,7 +7,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Graphs {
 
 	/// <summary>
 	/// Control for rendering graphs (bar, scatter etc)

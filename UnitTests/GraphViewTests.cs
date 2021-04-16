@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using Terminal.Gui;
 using Xunit;
+using Terminal.Gui.Graphs;
 
 namespace UnitTests {
 

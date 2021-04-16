@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Terminal.Gui;
+using Terminal.Gui.Graphs;
 
 using Color = Terminal.Gui.Color;
 using Attribute = Terminal.Gui.Attribute;
