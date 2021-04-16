@@ -1996,6 +1996,30 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Gets or sets how the View's <see cref="Text"/> is aligned verticaly when drawn. Changing this property will redisplay the <see cref="View"/>.
+		/// </summary>
+		/// <value>The text alignment.</value>
+		public virtual VerticalTextAlignment VerticalTextAlignment {
+			get => textFormatter.VerticalAlignment;
+			set {
+				textFormatter.VerticalAlignment = value;
+				SetNeedsDisplay ();
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the direction of the View's <see cref="Text"/>. Changing this property will redisplay the <see cref="View"/>.
+		/// </summary>
+		/// <value>The text alignment.</value>
+		public virtual TextDirection TextDirection {
+			get => textFormatter.Direction;
+			set {
+				textFormatter.Direction = value;
+				SetNeedsDisplay ();
+			}
+		}
+
+		/// <summary>
 		/// Get or sets if  the <see cref="View"/> was already initialized.
 		/// This derived from <see cref="ISupportInitializeNotification"/> to allow notify all the views that are being initialized.
 		/// </summary>
