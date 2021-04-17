@@ -142,7 +142,7 @@ namespace Terminal.Gui {
 					}
 					break;
 				case TextMaskType.Regex:
-					if (Validate (text) == false) {
+					if (Validate (text) == false && RegexValidateInput == true) {
 						text = new List<Rune> ();
 					}
 					break;
@@ -182,6 +182,11 @@ namespace Terminal.Gui {
 		/// If set, shows the mask. If this is set to false it shows <see cref="InputRune"/>.
 		/// </summary>
 		public bool ShowMaskOnEmpty { get; set; } = false;
+
+		/// <summary>
+		/// Validates input on MaskType.Regex.
+		/// </summary>
+		public bool RegexValidateInput { get; set; } = true;
 
 		///inheritdoc/>
 		public override void PositionCursor ()
@@ -427,7 +432,7 @@ namespace Terminal.Gui {
 					// Validate text copy first.
 					var aux = text.ToList ();
 					aux.Insert (cursorPosition, key);
-					if (Validate (aux)) {
+					if (Validate (aux) || RegexValidateInput == false) {
 						text.Insert (cursorPosition, key);
 						TextChanged?.Invoke (Text);
 						IncCursorPosition ();
@@ -439,10 +444,8 @@ namespace Terminal.Gui {
 				break;
 			}
 
-			// used for styling the field
-			if (masktype == TextMaskType.Mask) {
-				error = Validate (text) ? false : true;
-			}
+			// Used for style
+			error = Validate (text) ? false : true;
 
 			SetNeedsDisplay ();
 			return true;
