@@ -409,11 +409,11 @@ namespace Terminal.Gui {
 			switch (kb.Key) {
 			case Key.Home: HomeKeyHandler (); break;
 			case Key.End: EndKeyHandler (); break;
+			case Key.Delete:
 			case Key.DeleteChar: DeleteKeyHandler (); break;
 			case Key.Backspace: BackspaceKeyHandler (); break;
 			case Key.CursorLeft: DecCursorPosition (); break;
 			case Key.CursorRight: IncCursorPosition (); break;
-			case Key.Delete:
 			default:
 				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
 					return false;
