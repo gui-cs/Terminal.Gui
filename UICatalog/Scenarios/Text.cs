@@ -101,6 +101,54 @@ namespace UICatalog {
 
 			_timeField.TimeChanged += TimeChanged;
 
+
+			var phoneFieldLabel = new Label ("Phone Number") {
+				X = Pos.Left (dateField),
+				Y = Pos.Bottom (dateField) + 1
+			};
+			Win.Add (phoneFieldLabel);
+
+			var phoneField = new TextMaskField ("+(999) 000-0000") {
+				X = Pos.Right (phoneFieldLabel) + 1,
+				Y = Pos.Y (phoneFieldLabel),
+				Width = 25,
+				TextAlignment = TextAlignment.Centered
+			};
+			Win.Add (phoneField);
+
+			var phoneFieldMaskLabel = new Label ("MASK = +(999) 000-0000") {
+				X = Pos.Right (phoneField) + 1,
+				Y = Pos.Y (phoneField)
+			};
+			Win.Add (phoneFieldMaskLabel);
+
+			phoneField.OnValidation += (valid) => {
+				if (valid) {
+					phoneFieldMaskLabel.ColorScheme = Colors.Base;
+				} else {
+					phoneFieldMaskLabel.ColorScheme = Colors.Error;
+				}
+			};
+
+			var rangeFieldLabel = new Label ("Number between 0 and 1000 inclusive") {
+				X = Pos.Left (phoneFieldLabel),
+				Y = Pos.Bottom (phoneFieldLabel) + 1
+			};
+			Win.Add (rangeFieldLabel);
+
+			var rangeField = new TextMaskField ("^([0-9]?[0-9]?[0-9]|1000)$", TextMaskField.TextMaskType.Regex) {
+				X = Pos.Right (rangeFieldLabel) + 1,
+				Y = Pos.Y (rangeFieldLabel),
+				Width = 25,
+				TextAlignment = TextAlignment.Centered
+			};
+			Win.Add (rangeField);
+
+			var rangeMaskField = new Label ("REGEX = ^([0-9]?[0-9]?[0-9]|1000)$") {
+				X = Pos.Right (rangeField) + 1,
+				Y = Pos.Y (rangeField)
+			};
+			Win.Add (rangeMaskField);
 		}
 
 		TimeField _timeField;
