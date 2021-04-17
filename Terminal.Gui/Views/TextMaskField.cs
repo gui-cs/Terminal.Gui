@@ -17,16 +17,6 @@ namespace Terminal.Gui {
 
 	/// <summary>
 	/// TextField with Mask
-	/// 
-	/// Mask:
-	///	000-9000
-	/// Input:
-	///	123- 456
-	/// Output:
-	///	123456
-	///	123 456
-	///	123-456
-	///	123- 456
 	/// </summary>
 	public class TextMaskField : View {
 
@@ -102,7 +92,7 @@ namespace Terminal.Gui {
 
 		void Initialize ()
 		{
-			this.Width = masktype == TextMaskType.Mask ? text.Count : 20;
+			this.Width = masktype == TextMaskType.Mask ? text.Count : 20; // default width.
 			this.Height = 1;
 			this.CanFocus = true;
 		}
@@ -179,7 +169,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// 
+		///  
 		/// </summary>
 		public Rune EmptyRune { get; set; } = ' ';
 
@@ -189,7 +179,7 @@ namespace Terminal.Gui {
 		public Rune InputRune { get; set; } = '_';
 
 		/// <summary>
-		/// If char is not set, shows the mask. If this is set to false it shows <see cref="InputRune"/>.
+		/// If set, shows the mask. If this is set to false it shows <see cref="InputRune"/>.
 		/// </summary>
 		public bool ShowMaskOnEmpty { get; set; } = false;
 
@@ -276,7 +266,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Moves cursor to the left. In mask mode, skip until it finds the an editable char.
+		/// Moves cursor to the left. In mask mode, skip until it finds an editable char.
 		/// </summary>
 		/// <returns>True if moved.</returns>
 		bool DecCursorPosition ()
