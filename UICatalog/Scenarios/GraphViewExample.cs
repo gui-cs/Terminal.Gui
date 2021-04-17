@@ -6,7 +6,6 @@ using Terminal.Gui;
 using Terminal.Gui.Graphs;
 
 using Color = Terminal.Gui.Color;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
 
@@ -52,8 +51,8 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
-					new MenuItem ("Zoom _In", "", () => Zoom(0.5M)),
-					 new MenuItem ("Zoom _Out", "", () =>  Zoom(2M)),
+					new MenuItem ("Zoom _In", "", () => Zoom(0.5f)),
+					 new MenuItem ("Zoom _Out", "", () =>  Zoom(2f)),
 				}),
 
 				});
@@ -106,7 +105,7 @@ namespace UICatalog.Scenarios {
 
 			graphView.GraphColor = black;
 
-			var series = new MultiBarSeries (3, 1, 0.25M, new [] { magenta, cyan, red });
+			var series = new MultiBarSeries (3, 1, 0.25f, new [] { magenta, cyan, red });
 
 			var stiple = Application.Driver.Stipple;
 
@@ -119,18 +118,17 @@ namespace UICatalog.Scenarios {
 			series.AddBars ("'02", stiple, 6600, 11000, 16700);
 			series.AddBars ("'03", stiple, 7000, 12000, 17000);
 
-			graphView.CellSize = new PointD (0.25M, 1000);
+			graphView.CellSize = new PointF (0.25f, 1000);
 			graphView.Series.Add (series);
 			graphView.SetNeedsDisplay ();
 
 			graphView.MarginLeft = 3;
 			graphView.MarginBottom = 1;
 
-			graphView.AxisY.LabelGetter = (v) => '$' + (v.GraphSpace.Y / 1000M).ToString ("N0") + 'k';
+			graphView.AxisY.LabelGetter = (v) => '$' + (v.GraphSpace.Y / 1000f).ToString ("N0") + 'k';
 
 			graphView.AxisX.Increment = 1;
 			graphView.AxisX.ShowLabelsEvery = 1;
-			graphView.AxisX.LabelGetter = (v) => series.SubSeries.First ().GetLabelText (v);
 
 			var legend = new LegendAnnotation (new Rect (graphView.Bounds.Width - 20,0, 20, 5));
 			legend.AddEntry (new GraphCellToRender (stiple, series.SubSeries.ElementAt (0).OverrideBarColor), "Lower Third");
@@ -152,12 +150,12 @@ namespace UICatalog.Scenarios {
 
 			graphView.GraphColor = black;
 
-			List<PointD> randomPoints = new List<PointD> ();
+			List<PointF> randomPoints = new List<PointF> ();
 
 			Random r = new Random ();
 
 			for (int i = 0; i < 10; i++) {
-				randomPoints.Add (new PointD (r.Next (100), r.Next (100)));
+				randomPoints.Add (new PointF (r.Next (100), r.Next (100)));
 			}
 
 			var points = new ScatterSeries () {
@@ -174,10 +172,10 @@ namespace UICatalog.Scenarios {
 			graphView.Annotations.Add (line);
 
 
-			randomPoints = new List<PointD> ();
+			randomPoints = new List<PointF> ();
 
 			for (int i = 0; i < 10; i++) {
-				randomPoints.Add (new PointD (r.Next (100), r.Next (100)));
+				randomPoints.Add (new PointF (r.Next (100), r.Next (100)));
 			}
 
 
@@ -196,7 +194,7 @@ namespace UICatalog.Scenarios {
 			graphView.Annotations.Add (line2);
 
 			// How much graph space each cell of the console depicts
-			graphView.CellSize = new PointD (2, 5);
+			graphView.CellSize = new PointF (2, 5);
 
 			// leave space for axis labels
 			graphView.MarginBottom = 2;
@@ -212,7 +210,7 @@ namespace UICatalog.Scenarios {
 			graphView.AxisY.Text = "↑Y";
 
 			var max = line.Points.Union (line2.Points).OrderByDescending (p => p.Y).First ();
-			graphView.Annotations.Add (new TextAnnotation () { Text = "(Max)", GraphPosition = new PointD (max.X + (2 * graphView.CellSize.X), max.Y) });
+			graphView.Annotations.Add (new TextAnnotation () { Text = "(Max)", GraphPosition = new PointF (max.X + (2 * graphView.CellSize.X), max.Y) });
 
 			graphView.SetNeedsDisplay ();
 		}
@@ -227,33 +225,33 @@ namespace UICatalog.Scenarios {
 			var line = new PathAnnotation ();
 
 			// Generate line graph with 2,000 points
-			for (decimal x = -500; x < 500; x += 0.5M) {
-				points.Points.Add (new PointD (x, (decimal)Math.Sin ((double)x)));
-				line.Points.Add (new PointD (x, (decimal)Math.Sin ((double)x)));
+			for (float x = -500; x < 500; x += 0.5f) {
+				points.Points.Add (new PointF (x, (float)Math.Sin (x)));
+				line.Points.Add (new PointF (x, (float)Math.Sin (x)));
 			}
 
 			graphView.Series.Add (points);
 			graphView.Annotations.Add (line);
 
 			// How much graph space each cell of the console depicts
-			graphView.CellSize = new PointD (0.1M, 0.1M);
+			graphView.CellSize = new PointF (0.1f, 0.1f);
 
 			// leave space for axis labels
 			graphView.MarginBottom = 2;
 			graphView.MarginLeft = 3;
 
 			// One axis tick/label per
-			graphView.AxisX.Increment = 0.5M;
+			graphView.AxisX.Increment = 0.5f;
 			graphView.AxisX.ShowLabelsEvery = 2;
 			graphView.AxisX.Text = "X →";
 			graphView.AxisX.LabelGetter = (v) => v.GraphSpace.X.ToString ("N2");
 
-			graphView.AxisY.Increment = 0.2M;
+			graphView.AxisY.Increment = 0.2f;
 			graphView.AxisY.ShowLabelsEvery = 2;
 			graphView.AxisY.Text = "↑Y";
 			graphView.AxisY.LabelGetter = (v) => v.GraphSpace.Y.ToString ("N2");
 
-			graphView.ScrollOffset = new PointD (-2.5M, -1);
+			graphView.ScrollOffset = new PointF (-2.5f, -1);
 
 			graphView.SetNeedsDisplay ();
 		}
@@ -301,23 +299,23 @@ namespace UICatalog.Scenarios {
 
 			var barSeries = new BarSeries () {
 				Bars = new List<BarSeries.Bar> () {
-					new BarSeries.Bar ("Switzerland", softStiple, 83.4M),
-					new BarSeries.Bar ("South Korea", !verticalBars?mediumStiple:softStiple, 83.3M),
-					new BarSeries.Bar ("Singapore", softStiple, 83.2M),
-					new BarSeries.Bar ("Spain", !verticalBars?mediumStiple:softStiple, 83.2M),
-					new BarSeries.Bar ("Cyprus", softStiple, 83.1M),
+					new BarSeries.Bar ("Switzerland", softStiple, 83.4f),
+					new BarSeries.Bar ("South Korea", !verticalBars?mediumStiple:softStiple, 83.3f),
+					new BarSeries.Bar ("Singapore", softStiple, 83.2f),
+					new BarSeries.Bar ("Spain", !verticalBars?mediumStiple:softStiple, 83.2f),
+					new BarSeries.Bar ("Cyprus", softStiple, 83.1f),
 					new BarSeries.Bar ("Australia", !verticalBars?mediumStiple:softStiple, 83),
 					new BarSeries.Bar ("Italy", softStiple, 83),
 					new BarSeries.Bar ("Norway", !verticalBars?mediumStiple:softStiple, 83),
-					new BarSeries.Bar ("Israel", softStiple, 82.6M),
-					new BarSeries.Bar ("France", !verticalBars?mediumStiple:softStiple, 82.5M),
-					new BarSeries.Bar ("Luxembourg", softStiple, 82.4M),
-					new BarSeries.Bar ("Sweden", !verticalBars?mediumStiple:softStiple, 82.4M),
-					new BarSeries.Bar ("Iceland", softStiple, 82.3M),
-					new BarSeries.Bar ("Canada", !verticalBars?mediumStiple:softStiple, 82.2M),
-					new BarSeries.Bar ("New Zealand", softStiple, 82),
-					new BarSeries.Bar ("Malta", !verticalBars?mediumStiple:softStiple, 81.9M),
-					new BarSeries.Bar ("Ireland", softStiple, 81.8M)
+					new BarSeries.Bar ("Israel", softStiple, 82.6f),
+					new BarSeries.Bar ("France", !verticalBars?mediumStiple:softStiple, 82.5f),
+					new BarSeries.Bar ("Luxembourg", softStiple, 82.4f),
+					new BarSeries.Bar ("Sweden", !verticalBars?mediumStiple:softStiple, 82.4f),
+					new BarSeries.Bar ("Iceland", softStiple, 82.3f),
+					new BarSeries.Bar ("Canada", !verticalBars?mediumStiple:softStiple, 82.2f),
+					new BarSeries.Bar ("New Zealand", softStiple, 8f),
+					new BarSeries.Bar ("Malta", !verticalBars?mediumStiple:softStiple, 81.9f),
+					new BarSeries.Bar ("Ireland", softStiple, 81.8f)
 				}
 			};
 
@@ -328,13 +326,12 @@ namespace UICatalog.Scenarios {
 				barSeries.Orientation = Orientation.Vertical;
 
 				// How much graph space each cell of the console depicts
-				graphView.CellSize = new PointD (0.1M, 0.25M);
-				graphView.AxisX.Increment = 1M;
+				graphView.CellSize = new PointF (0.1f, 0.25f);
+				graphView.AxisX.Increment = 1f;
 				graphView.AxisX.ShowLabelsEvery = 1;
-				graphView.AxisX.LabelGetter = v => barSeries.GetLabelText (v);
 				graphView.AxisX.Text = "Country";
 
-				graphView.AxisY.Increment = 1M;
+				graphView.AxisY.Increment = 1f;
 				graphView.AxisY.ShowLabelsEvery = 1;
 				graphView.AxisY.LabelGetter = v => v.GraphSpace.Y.ToString ("N2");
 				graphView.AxisY.Text = "Age";
@@ -344,19 +341,18 @@ namespace UICatalog.Scenarios {
 				graphView.MarginLeft = 6;
 
 				// Start the graph at 80 years because that is where most of our data is
-				graphView.ScrollOffset = new PointD (0, 80);
+				graphView.ScrollOffset = new PointF (0, 80);
 
 			} else {
 				barSeries.Orientation = Orientation.Horizontal;
 
 				// How much graph space each cell of the console depicts
-				graphView.CellSize = new PointD (0.1M, 1M);
-				graphView.AxisY.Increment = 1M;
+				graphView.CellSize = new PointF (0.1f, 1f);
+				graphView.AxisY.Increment = 1f;
 				graphView.AxisY.ShowLabelsEvery = 1;
-				graphView.AxisY.LabelGetter = v => barSeries.GetLabelText (v);
 				graphView.AxisY.Text = "Country";
 
-				graphView.AxisX.Increment = 1M;
+				graphView.AxisX.Increment = 1f;
 				graphView.AxisX.ShowLabelsEvery = 1;
 				graphView.AxisX.LabelGetter = v => v.GraphSpace.X.ToString ("N2");
 				graphView.AxisX.Text = "Age";
@@ -366,7 +362,7 @@ namespace UICatalog.Scenarios {
 				graphView.MarginLeft = (uint)barSeries.Bars.Max (b => b.Text.Length) + 2;
 
 				// Start the graph at 80 years because that is where most of our data is
-				graphView.ScrollOffset = new PointD (80, 0);
+				graphView.ScrollOffset = new PointF (80, 0);
 			}
 
 			graphView.SetNeedsDisplay ();
@@ -403,10 +399,10 @@ namespace UICatalog.Scenarios {
 			graphView.Reset ();
 
 			// How much graph space each cell of the console depicts
-			graphView.CellSize = new PointD (100_000, 1);
+			graphView.CellSize = new PointF (100_000, 1);
 
 			//center the x axis in middle of screen to show both sides
-			graphView.ScrollOffset = new PointD (-3_000_000, 0);
+			graphView.ScrollOffset = new PointF (-3_000_000, 0);
 
 			graphView.AxisX.Text = "Number Of People";
 			graphView.AxisX.Increment = 500_000;
@@ -497,9 +493,6 @@ namespace UICatalog.Scenarios {
 
 			graphView.Series.Add (femalesSeries);
 
-			graphView.AxisY.LabelGetter = (v) => femalesSeries.GetLabelText (v);
-
-
 			graphView.Annotations.Add (new TextAnnotation () { Text = "M", ScreenPosition = new Terminal.Gui.Point (0, 10) });
 			graphView.Annotations.Add (new TextAnnotation () { Text = "F", ScreenPosition = new Terminal.Gui.Point (graphView.Bounds.Width - 1, 10) });
 
@@ -522,6 +515,7 @@ namespace UICatalog.Scenarios {
 			var red = Application.Driver.MakeAttribute (Color.Red, Color.Black);
 			var brightred = Application.Driver.MakeAttribute (Color.BrightRed, Color.Black);
 
+			/*
 			var colorDelegate = new GraphAttributeGetterDelegate (
 				(g) => {
 					if (g.Top >= 85M) {
@@ -540,7 +534,7 @@ namespace UICatalog.Scenarios {
 					return green;
 				}
 				);
-
+			*/
 			var stiple = new GraphCellToRender ('\u2593');
 
 			Random r = new Random ();
@@ -554,7 +548,7 @@ namespace UICatalog.Scenarios {
 				for (int i = 0; i < 31; i++) {
 					bars.Add (
 						new BarSeries.Bar (null, stiple, r.Next (0, 100)) {
-							ColorGetter = colorDelegate
+							//ColorGetter = colorDelegate
 						});
 				}
 				graphView.SetNeedsDisplay ();
@@ -571,7 +565,7 @@ namespace UICatalog.Scenarios {
 			graphView.Series.Add (series);
 
 			// How much graph space each cell of the console depicts
-			graphView.CellSize = new PointD (1, 10);
+			graphView.CellSize = new PointF (1, 10);
 			graphView.AxisX.Increment = 0; // No graph ticks
 			graphView.AxisX.ShowLabelsEvery = 0; // no labels
 
@@ -588,31 +582,31 @@ namespace UICatalog.Scenarios {
 			//AtomicNumber and AtomicMass of all elements in the periodic table
 			graphView.Series.Add (
 				new ScatterSeries () {
-					Points = new List<PointD>{
-						new PointD(1,1.007M),new PointD(2,4.002M),new PointD(3,6.941M),new PointD(4,9.012M),new PointD(5,10.811M),new PointD(6,12.011M),
-						new PointD(7,14.007M),new PointD(8,15.999M),new PointD(9,18.998M),new PointD(10,20.18M),new PointD(11,22.99M),new PointD(12,24.305M),
-						new PointD(13,26.982M),new PointD(14,28.086M),new PointD(15,30.974M),new PointD(16,32.065M),new PointD(17,35.453M),new PointD(18,39.948M),
-						new PointD(19,39.098M),new PointD(20,40.078M),new PointD(21,44.956M),new PointD(22,47.867M),new PointD(23,50.942M),new PointD(24,51.996M),
-						new PointD(25,54.938M),new PointD(26,55.845M),new PointD(27,58.933M),new PointD(28,58.693M),new PointD(29,63.546M),new PointD(30,65.38M),
-						new PointD(31,69.723M),new PointD(32,72.64M),new PointD(33,74.922M),new PointD(34,78.96M),new PointD(35,79.904M),new PointD(36,83.798M),
-						new PointD(37,85.468M),new PointD(38,87.62M),new PointD(39,88.906M),new PointD(40,91.224M),new PointD(41,92.906M),new PointD(42,95.96M),
-						new PointD(43,98M),new PointD(44,101.07M),new PointD(45,102.906M),new PointD(46,106.42M),new PointD(47,107.868M),new PointD(48,112.411M),
-						new PointD(49,114.818M),new PointD(50,118.71M),new PointD(51,121.76M),new PointD(52,127.6M),new PointD(53,126.904M),new PointD(54,131.293M),
-						new PointD(55,132.905M),new PointD(56,137.327M),new PointD(57,138.905M),new PointD(58,140.116M),new PointD(59,140.908M),new PointD(60,144.242M),
-						new PointD(61,145),new PointD(62,150.36M),new PointD(63,151.964M),new PointD(64,157.25M),new PointD(65,158.925M),new PointD(66,162.5M),
-						new PointD(67,164.93M),new PointD(68,167.259M),new PointD(69,168.934M),new PointD(70,173.054M),new PointD(71,174.967M),new PointD(72,178.49M),
-						new PointD(73,180.948M),new PointD(74,183.84M),new PointD(75,186.207M),new PointD(76,190.23M),new PointD(77,192.217M),new PointD(78,195.084M),
-						new PointD(79,196.967M),new PointD(80,200.59M),new PointD(81,204.383M),new PointD(82,207.2M),new PointD(83,208.98M),new PointD(84,210),
-						new PointD(85,210),new PointD(86,222),new PointD(87,223),new PointD(88,226),new PointD(89,227),new PointD(90,232.038M),new PointD(91,231.036M),
-						new PointD(92,238.029M),new PointD(93,237),new PointD(94,244),new PointD(95,243),new PointD(96,247),new PointD(97,247),new PointD(98,251),
-						new PointD(99,252),new PointD(100,257),new PointD(101,258),new PointD(102,259),new PointD(103,262),new PointD(104,261),new PointD(105,262),
-						new PointD(106,266),new PointD(107,264),new PointD(108,267),new PointD(109,268),new PointD(113,284),new PointD(114,289),new PointD(115,288),
-						new PointD(116,292),new PointD(117,295),new PointD(118,294)
+					Points = new List<PointF>{
+						new PointF(1,1.007f),new PointF(2,4.002f),new PointF(3,6.941f),new PointF(4,9.012f),new PointF(5,10.811f),new PointF(6,12.011f),
+						new PointF(7,14.007f),new PointF(8,15.999f),new PointF(9,18.998f),new PointF(10,20.18f),new PointF(11,22.99f),new PointF(12,24.305f),
+						new PointF(13,26.982f),new PointF(14,28.086f),new PointF(15,30.974f),new PointF(16,32.065f),new PointF(17,35.453f),new PointF(18,39.948f),
+						new PointF(19,39.098f),new PointF(20,40.078f),new PointF(21,44.956f),new PointF(22,47.867f),new PointF(23,50.942f),new PointF(24,51.996f),
+						new PointF(25,54.938f),new PointF(26,55.845f),new PointF(27,58.933f),new PointF(28,58.693f),new PointF(29,63.546f),new PointF(30,65.38f),
+						new PointF(31,69.723f),new PointF(32,72.64f),new PointF(33,74.922f),new PointF(34,78.96f),new PointF(35,79.904f),new PointF(36,83.798f),
+						new PointF(37,85.468f),new PointF(38,87.62f),new PointF(39,88.906f),new PointF(40,91.224f),new PointF(41,92.906f),new PointF(42,95.96f),
+						new PointF(43,98f),new PointF(44,101.07f),new PointF(45,102.906f),new PointF(46,106.42f),new PointF(47,107.868f),new PointF(48,112.411f),
+						new PointF(49,114.818f),new PointF(50,118.71f),new PointF(51,121.76f),new PointF(52,127.6f),new PointF(53,126.904f),new PointF(54,131.293f),
+						new PointF(55,132.905f),new PointF(56,137.327f),new PointF(57,138.905f),new PointF(58,140.116f),new PointF(59,140.908f),new PointF(60,144.242f),
+						new PointF(61,145),new PointF(62,150.36f),new PointF(63,151.964f),new PointF(64,157.25f),new PointF(65,158.925f),new PointF(66,162.5f),
+						new PointF(67,164.93f),new PointF(68,167.259f),new PointF(69,168.934f),new PointF(70,173.054f),new PointF(71,174.967f),new PointF(72,178.49f),
+						new PointF(73,180.948f),new PointF(74,183.84f),new PointF(75,186.207f),new PointF(76,190.23f),new PointF(77,192.217f),new PointF(78,195.084f),
+						new PointF(79,196.967f),new PointF(80,200.59f),new PointF(81,204.383f),new PointF(82,207.2f),new PointF(83,208.98f),new PointF(84,210),
+						new PointF(85,210),new PointF(86,222),new PointF(87,223),new PointF(88,226),new PointF(89,227),new PointF(90,232.038f),new PointF(91,231.036f),
+						new PointF(92,238.029f),new PointF(93,237),new PointF(94,244),new PointF(95,243),new PointF(96,247),new PointF(97,247),new PointF(98,251),
+						new PointF(99,252),new PointF(100,257),new PointF(101,258),new PointF(102,259),new PointF(103,262),new PointF(104,261),new PointF(105,262),
+						new PointF(106,266),new PointF(107,264),new PointF(108,267),new PointF(109,268),new PointF(113,284),new PointF(114,289),new PointF(115,288),
+						new PointF(116,292),new PointF(117,295),new PointF(118,294)
 			}
 				});
 
 			// How much graph space each cell of the console depicts
-			graphView.CellSize = new PointD (1, 5);
+			graphView.CellSize = new PointF (1, 5);
 
 			// leave space for axis labels
 			graphView.MarginBottom = 2;
@@ -630,9 +624,9 @@ namespace UICatalog.Scenarios {
 			graphView.SetNeedsDisplay ();
 		}
 
-		private void Zoom (decimal factor)
+		private void Zoom (float factor)
 		{
-			graphView.CellSize = new PointD (
+			graphView.CellSize = new PointF (
 				graphView.CellSize.X * factor,
 				graphView.CellSize.Y * factor
 			);
