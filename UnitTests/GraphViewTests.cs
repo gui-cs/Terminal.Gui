@@ -362,45 +362,6 @@ namespace UnitTests {
 
 		#endregion
 
-		[Fact]
-		public void TestNoOverlappingCells ()
-		{
-			var gv = new GraphView ();
-			gv.Bounds = new Rect (0, 0, 50, 30);
-
-			// How much graph space each cell of the console depicts
-			gv.CellSize = new PointF (0.1f, 0.25f);
-			gv.AxisX.Increment = 1f;
-			gv.AxisX.ShowLabelsEvery = 1;
-
-			gv.AxisY.Increment = 1f;
-			gv.AxisY.ShowLabelsEvery = 1;
-
-			// Start the graph at 80 years because that is where most of our data is
-			gv.ScrollOffset = new PointF (0, 80);
-
-			List<RectangleF> otherRects = new List<RectangleF> ();
-
-			List<System.Drawing.Point> overlappingPoints = new List<System.Drawing.Point> ();
-
-			for (int x = 0; x < gv.Bounds.Width; x++) {
-				for (int y = 0; y < gv.Bounds.Height; y++) {
-
-					var graphSpace = gv.ScreenToGraphSpace (x, y);
-					var overlapping = otherRects.Where (r => r.IntersectsWith (graphSpace)).ToArray ();
-
-					if (overlapping.Any ()) {
-						overlappingPoints.Add (new System.Drawing.Point (x, y));
-					}
-
-					otherRects.Add (graphSpace);
-				}
-			}
-
-			// There are 1,500 grid positions in the control, none should overlap in graph space
-			Assert.Empty (overlappingPoints);
-		}
-
 		/// <summary>
 		/// Tests that each point in the screen space maps to a rectangle of
 		/// (float) graph space and that each corner of that rectangle of graph
@@ -428,19 +389,23 @@ namespace UnitTests {
 
 					var graphSpace = gv.ScreenToGraphSpace (x, y);
 
-					var p = gv.GraphSpaceToScreen (new PointF (graphSpace.Left, graphSpace.Top));
+					// See 
+					// https://en.wikipedia.org/wiki/Machine_epsilon
+					float epsilon = 0.000001f;
+
+					var p = gv.GraphSpaceToScreen (new PointF (graphSpace.Left + epsilon, graphSpace.Top + epsilon));
 					Assert.Equal (x, p.X);
 					Assert.Equal (y, p.Y);
 
-					p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - 0.000001f, graphSpace.Top));
+					p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - epsilon , graphSpace.Top + epsilon));
 					Assert.Equal (x, p.X);
 					Assert.Equal (y, p.Y);
 
-					p = gv.GraphSpaceToScreen (new PointF (graphSpace.Left, graphSpace.Bottom - 0.000001f));
+					p = gv.GraphSpaceToScreen (new PointF (graphSpace.Left + epsilon, graphSpace.Bottom - epsilon));
 					Assert.Equal (x, p.X);
 					Assert.Equal (y, p.Y);
 
-					p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - 0.000001f, graphSpace.Bottom - 0.000001f));
+					p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - epsilon, graphSpace.Bottom - epsilon));
 					Assert.Equal (x, p.X);
 					Assert.Equal (y, p.Y);
 
@@ -453,15 +418,11 @@ namespace UnitTests {
 		[Fact]
 		public void AxisIncrementToRenderTests_Constructor ()
 		{
-			var render = new AxisIncrementToRender (Orientation.Horizontal,new Terminal.Gui.Point(1,2),new RectangleF(0,1,1,1));
+			var render = new AxisIncrementToRender (Orientation.Horizontal,1,6.6f);
 
 			Assert.Equal (Orientation.Horizontal, render.Orientation);
-			Assert.Equal (1, render.ScreenLocation.X);
-			Assert.Equal (2, render.ScreenLocation.Y);
-			Assert.Equal (0, render.GraphSpace.X);
-			Assert.Equal (1, render.GraphSpace.Y);
-			Assert.Equal (1, render.GraphSpace.Width);
-			Assert.Equal (1, render.GraphSpace.Height);
+			Assert.Equal (1, render.ScreenLocation);
+			Assert.Equal (6.6f, render.Value);
 		}
 	}
 }

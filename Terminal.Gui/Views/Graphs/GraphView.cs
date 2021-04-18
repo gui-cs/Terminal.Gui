@@ -128,6 +128,9 @@ namespace Terminal.Gui.Graphs {
 			AxisY.DrawAxisLine (Driver, this, Bounds);
 			AxisX.DrawAxisLine (Driver, this, Bounds);
 
+			AxisY.DrawAxisLabels (Driver, this, Bounds);
+			AxisX.DrawAxisLabels (Driver, this, Bounds);
+
 			SetDriverColorToGraphColor (Driver);
 
 			// The drawable area of the graph (anything that isn't in the margins)
@@ -142,11 +145,6 @@ namespace Terminal.Gui.Graphs {
 				SetDriverColorToGraphColor (Driver);
 			}
 
-			SetDriverColorToGraphColor (Driver);
-
-
-			AxisY.DrawAxisLabels (Driver, this, Bounds);
-			AxisX.DrawAxisLabels (Driver, this, Bounds);
 
 			SetDriverColorToGraphColor (Driver);
 
@@ -1089,6 +1087,7 @@ namespace Terminal.Gui.Graphs {
 			Visible = true;
 			Text = "";
 			LabelGetter = DefaultLabelGetter;
+			Minimum = null;
 		}
 
 		private string DefaultLabelGetter (AxisIncrementToRender toRender)

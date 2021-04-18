@@ -224,6 +224,9 @@ namespace UICatalog.Scenarios {
 			var points = new ScatterSeries ();
 			var line = new PathAnnotation ();
 
+			// Draw line first so it does not draw over top of points or axis labels
+			line.BeforeSeries = true;
+
 			// Generate line graph with 2,000 points
 			for (float x = -500; x < 500; x += 0.5f) {
 				points.Points.Add (new PointF (x, (float)Math.Sin (x)));
