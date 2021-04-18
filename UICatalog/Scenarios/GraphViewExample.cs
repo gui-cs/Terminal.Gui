@@ -503,6 +503,52 @@ namespace UICatalog.Scenarios {
 
 		}
 
+		class DiscoBarSeries : BarSeries {
+			private Terminal.Gui.Attribute green;
+			private Terminal.Gui.Attribute brightgreen;
+			private Terminal.Gui.Attribute brightyellow;
+			private Terminal.Gui.Attribute red;
+			private Terminal.Gui.Attribute brightred;
+
+			public DiscoBarSeries ()
+			{
+
+				green = Application.Driver.MakeAttribute (Color.BrightGreen, Color.Black);
+				brightgreen = Application.Driver.MakeAttribute (Color.Green, Color.Black);
+				brightyellow = Application.Driver.MakeAttribute (Color.BrightYellow, Color.Black);
+				red = Application.Driver.MakeAttribute (Color.Red, Color.Black);
+				brightred = Application.Driver.MakeAttribute (Color.BrightRed, Color.Black);
+			}
+			protected override void DrawBarLine (GraphView graph, ConsoleDriver driver, Terminal.Gui.Point start, Terminal.Gui.Point end, Bar beingDrawn)
+			{
+				int x = start.X;
+				for(int y = end.Y; y <= start.Y; y++) {
+
+					var height = graph.ScreenToGraphSpace (x, y).Y;
+
+					if (height >= 85) {
+						driver.SetAttribute(red);
+					}
+					else
+					if (height >= 66) {
+						driver.SetAttribute (brightred);
+					} 
+					else
+					if (height >= 45) {
+						driver.SetAttribute (brightyellow);
+					} 
+					else
+					if (height >= 25) {
+						driver.SetAttribute (brightgreen);
+					}
+
+					graph.AddRune (x, y, beingDrawn.Fill.Rune);
+				}
+				
+			
+
+			}
+		}
 
 		private void SetupDisco ()
 		{
@@ -512,36 +558,10 @@ namespace UICatalog.Scenarios {
 
 			graphView.GraphColor = Application.Driver.MakeAttribute (Color.White, Color.Black);
 
-			var green = Application.Driver.MakeAttribute (Color.BrightGreen, Color.Black);
-			var brightgreen = Application.Driver.MakeAttribute (Color.Green, Color.Black);
-			var brightyellow = Application.Driver.MakeAttribute (Color.BrightYellow, Color.Black);
-			var red = Application.Driver.MakeAttribute (Color.Red, Color.Black);
-			var brightred = Application.Driver.MakeAttribute (Color.BrightRed, Color.Black);
-
-			/*
-			var colorDelegate = new GraphAttributeGetterDelegate (
-				(g) => {
-					if (g.Top >= 85M) {
-						return red;
-					}
-					if (g.Top >= 66M) {
-						return brightred;
-					}
-					if (g.Top >= 45M) {
-						return brightyellow;
-					}
-					if (g.Top >= 25M) {
-						return brightgreen;
-					}
-
-					return green;
-				}
-				);
-			*/
 			var stiple = new GraphCellToRender ('\u2593');
 
 			Random r = new Random ();
-			var series = new BarSeries ();
+			var series = new DiscoBarSeries ();
 			var bars = new List<BarSeries.Bar> ();
 
 			Func<MainLoop, bool> genSample = (l) => {
