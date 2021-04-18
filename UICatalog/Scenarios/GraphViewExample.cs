@@ -125,7 +125,7 @@ namespace UICatalog.Scenarios {
 			graphView.MarginLeft = 3;
 			graphView.MarginBottom = 1;
 
-			graphView.AxisY.LabelGetter = (v) => '$' + (v.GraphSpace.Y / 1000f).ToString ("N0") + 'k';
+			graphView.AxisY.LabelGetter = (v) => '$' + (v.Value / 1000f).ToString ("N0") + 'k';
 
 			graphView.AxisX.Increment = 1;
 			graphView.AxisX.ShowLabelsEvery = 1;
@@ -244,12 +244,12 @@ namespace UICatalog.Scenarios {
 			graphView.AxisX.Increment = 0.5f;
 			graphView.AxisX.ShowLabelsEvery = 2;
 			graphView.AxisX.Text = "X →";
-			graphView.AxisX.LabelGetter = (v) => v.GraphSpace.X.ToString ("N2");
+			graphView.AxisX.LabelGetter = (v) => v.Value.ToString ("N2");
 
 			graphView.AxisY.Increment = 0.2f;
 			graphView.AxisY.ShowLabelsEvery = 2;
 			graphView.AxisY.Text = "↑Y";
-			graphView.AxisY.LabelGetter = (v) => v.GraphSpace.Y.ToString ("N2");
+			graphView.AxisY.LabelGetter = (v) => v.Value.ToString ("N2");
 
 			graphView.ScrollOffset = new PointF (-2.5f, -1);
 
@@ -313,7 +313,7 @@ namespace UICatalog.Scenarios {
 					new BarSeries.Bar ("Sweden", !verticalBars?mediumStiple:softStiple, 82.4f),
 					new BarSeries.Bar ("Iceland", softStiple, 82.3f),
 					new BarSeries.Bar ("Canada", !verticalBars?mediumStiple:softStiple, 82.2f),
-					new BarSeries.Bar ("New Zealand", softStiple, 8f),
+					new BarSeries.Bar ("New Zealand", softStiple, 82),
 					new BarSeries.Bar ("Malta", !verticalBars?mediumStiple:softStiple, 81.9f),
 					new BarSeries.Bar ("Ireland", softStiple, 81.8f)
 				}
@@ -327,13 +327,13 @@ namespace UICatalog.Scenarios {
 
 				// How much graph space each cell of the console depicts
 				graphView.CellSize = new PointF (0.1f, 0.25f);
-				graphView.AxisX.Increment = 1f;
-				graphView.AxisX.ShowLabelsEvery = 1;
+				// No axis marks since Bar will add it's own categorical marks
+				graphView.AxisX.Increment = 0f;
 				graphView.AxisX.Text = "Country";
 
 				graphView.AxisY.Increment = 1f;
 				graphView.AxisY.ShowLabelsEvery = 1;
-				graphView.AxisY.LabelGetter = v => v.GraphSpace.Y.ToString ("N2");
+				graphView.AxisY.LabelGetter = v => v.Value.ToString ("N2");
 				graphView.AxisY.Text = "Age";
 
 				// leave space for axis labels and title
@@ -348,13 +348,14 @@ namespace UICatalog.Scenarios {
 
 				// How much graph space each cell of the console depicts
 				graphView.CellSize = new PointF (0.1f, 1f);
-				graphView.AxisY.Increment = 1f;
+				// No axis marks since Bar will add it's own categorical marks
+				graphView.AxisY.Increment = 0f;
 				graphView.AxisY.ShowLabelsEvery = 1;
 				graphView.AxisY.Text = "Country";
 
 				graphView.AxisX.Increment = 1f;
 				graphView.AxisX.ShowLabelsEvery = 1;
-				graphView.AxisX.LabelGetter = v => v.GraphSpace.X.ToString ("N2");
+				graphView.AxisX.LabelGetter = v => v.Value.ToString ("N2");
 				graphView.AxisX.Text = "Age";
 
 				// leave space for axis labels and title
@@ -409,13 +410,15 @@ namespace UICatalog.Scenarios {
 			graphView.AxisX.ShowLabelsEvery = 2;
 
 			// use Abs to make negative axis labels positive
-			graphView.AxisX.LabelGetter = (v) => Math.Abs (v.GraphSpace.X / 1_000_000).ToString ("N2") + "M";
+			graphView.AxisX.LabelGetter = (v) => Math.Abs (v.Value / 1_000_000).ToString ("N2") + "M";
 
 			// leave space for axis labels
 			graphView.MarginBottom = 2;
 			graphView.MarginLeft = 1;
 
-			graphView.AxisY.ShowLabelsEvery = 1;
+			// do not show axis titles (bars have their own categories)
+			graphView.AxisY.Increment = 0;
+			graphView.AxisY.ShowLabelsEvery = 0;
 
 			var stiple = new GraphCellToRender (Application.Driver.Stipple);
 
