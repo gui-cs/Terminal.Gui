@@ -689,6 +689,21 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		public bool RemoveRange (int row, int index, int count)
+		{
+			var modelRow = GetModelLineFromWrappedLines (row);
+			var line = GetCurrentLine (modelRow);
+			var modelCol = GetModelColFromWrappedLines (row, index);
+
+			try {
+				line.RemoveRange (modelCol, count);
+			} catch (Exception) {
+				return false;
+			}
+
+			return true;
+		}
+
 		public void UpdateModel (TextModel model, out int nRow, out int nCol, out int nStartRow, out int nStartCol,
 			int row, int col, int startRow, int startCol)
 		{
@@ -1568,7 +1583,7 @@ namespace Terminal.Gui {
 
 		void SetClipboard (ustring text)
 		{
-			if (!text.IsEmpty) {
+			if (text != null) {
 				Clipboard.Contents = text;
 			}
 		}
@@ -1775,7 +1790,6 @@ namespace Terminal.Gui {
 		{
 			int restCount;
 			List<Rune> rest;
-			bool lineRemoved = false;
 
 			// Handle some state here - whether the last command was a kill
 			// operation and the column tracking (up/down)
@@ -1946,38 +1960,8 @@ namespace Terminal.Gui {
 					ClearSelectedRegion ();
 					return true;
 				}
-				if (currentColumn > 0) {
-					// Delete backwards 
-					currentLine = GetCurrentLine ();
-					currentLine.RemoveAt (currentColumn - 1);
-					if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn - 1)) {
-						wrapNeeded = true;
-					}
-					currentColumn--;
-					if (currentColumn < leftColumn) {
-						leftColumn--;
-						SetNeedsDisplay ();
-					} else
-						SetNeedsDisplay (new Rect (0, currentRow - topRow, 1, Frame.Width));
-				} else {
-					// Merges the current line with the previous one.
-					if (currentRow == 0)
-						return true;
-					var prowIdx = currentRow - 1;
-					var prevRow = model.GetLine (prowIdx);
-					var prevCount = prevRow.Count;
-					model.GetLine (prowIdx).AddRange (GetCurrentLine ());
-					model.RemoveLine (currentRow);
-					if (wordWrap && wrapManager.RemoveLine (currentRow, currentColumn, out lineRemoved, false)) {
-						wrapNeeded = true;
-					}
-					currentRow--;
-					if (wrapNeeded && !lineRemoved) {
-						currentColumn = Math.Max (prevCount - 1, 0);
-					} else {
-						currentColumn = prevCount;
-					}
-					Adjust ();
+				if (DeleteTextBackwards ()) {
+					return true;
 				}
 				break;
 
@@ -2001,25 +1985,8 @@ namespace Terminal.Gui {
 					ClearSelectedRegion ();
 					return true;
 				}
-				currentLine = GetCurrentLine ();
-				if (currentColumn == currentLine.Count) {
-					if (currentRow + 1 == model.Count)
-						break;
-					var nextLine = model.GetLine (currentRow + 1);
-					currentLine.AddRange (nextLine);
-					model.RemoveLine (currentRow + 1);
-					if (wordWrap && wrapManager.RemoveLine (currentRow, currentColumn, out _)) {
-						wrapNeeded = true;
-					}
-					var sr = currentRow - topRow;
-					SetNeedsDisplay (new Rect (0, sr, Frame.Width, sr + 1));
-				} else {
-					currentLine.RemoveAt (currentColumn);
-					if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn)) {
-						wrapNeeded = true;
-					}
-					var r = currentRow - topRow;
-					SetNeedsDisplay (new Rect (currentColumn - leftColumn, r, Frame.Width, r + 1));
+				if (DeleteTextForwards ()) {
+					return true;
 				}
 				break;
 
@@ -2038,14 +2005,19 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.K | Key.CtrlMask: // kill-to-end
+			case Key.DeleteChar | Key.CtrlMask | Key.ShiftMask:
 				if (isReadOnly)
 					break;
-				var cRow = currentRow;
-				SetWrapModel ();
 				currentLine = GetCurrentLine ();
 				var setLastWasKill = true;
+				if (currentLine.Count > 0 && currentColumn == currentLine.Count) {
+					DeleteTextForwards ();
+					return true;
+				}
 				if (currentLine.Count == 0) {
-					model.RemoveLine (currentRow);
+					if (currentRow < model.Count - 1) {
+						model.RemoveLine (currentRow);
+					}
 					if (model.Count > 0 || lastWasKill) {
 						var val = ustring.Make ((Rune)'\n');
 						if (lastWasKill) {
@@ -2057,9 +2029,6 @@ namespace Terminal.Gui {
 					if (model.Count == 0) {
 						// Prevents from adding line feeds if there is no more lines.
 						setLastWasKill = false;
-					}
-					if (currentRow > 0) {
-						currentRow--;
 					}
 				} else {
 					restCount = currentLine.Count - currentColumn;
@@ -2074,20 +2043,44 @@ namespace Terminal.Gui {
 					} else {
 						SetClipboard (val);
 					}
-					if (currentColumn == 0) {
-						model.RemoveLine (currentRow);
-						if (currentRow > 0) {
-							currentRow--;
-						}
-					} else {
-						currentLine.RemoveRange (currentColumn, restCount);
-					}
-					if (model.Count == 0) {
-						// Prevents from adding line feeds if there is no more lines.
-						setLastWasKill = false;
-					}
+					currentLine.RemoveRange (currentColumn, restCount);
 				}
-				UpdateWrapModel ();
+				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+				lastWasKill = setLastWasKill;
+				break;
+
+			case Key.Backspace | Key.CtrlMask | Key.ShiftMask: // kill-to-start
+				if (isReadOnly)
+					break;
+				currentLine = GetCurrentLine ();
+				setLastWasKill = true;
+				if (currentLine.Count > 0 && currentColumn == 0) {
+					DeleteTextBackwards ();
+					return true;
+				}
+				if (currentLine.Count == 0) {
+					if (currentRow > 0) {
+						model.RemoveLine (currentRow);
+						currentRow--;
+						currentLine = model.GetLine (currentRow);
+						currentColumn = currentLine.Count;
+					}
+				} else {
+					restCount = currentColumn;
+					rest = currentLine.GetRange (0, restCount);
+					var val = ustring.Empty;
+					if (currentColumn == 0 && lastWasKill && currentLine.Count > 0) {
+						val = ustring.Make ((Rune)'\n');
+					}
+					val += StringFromRunes (rest);
+					if (lastWasKill) {
+						AppendClipboard (val);
+					} else {
+						SetClipboard (val);
+					}
+					currentLine.RemoveRange (0, restCount);
+					currentColumn = 0;
+				}
 				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
 				lastWasKill = setLastWasKill;
 				break;
@@ -2146,6 +2139,65 @@ namespace Terminal.Gui {
 					currentRow = newPos.Value.row;
 				}
 				Adjust ();
+				break;
+
+			case Key.DeleteChar | Key.CtrlMask: // kill-word-forwards
+				if (isReadOnly)
+					break;
+				currentLine = GetCurrentLine ();
+				if (currentLine.Count == 0 || currentColumn == currentLine.Count) {
+					DeleteTextForwards ();
+					return true;
+				}
+				newPos = WordForward (currentColumn, currentRow);
+				restCount = 0;
+				if (newPos.HasValue && currentRow == newPos.Value.row) {
+					restCount = newPos.Value.col - currentColumn;
+					currentLine.RemoveRange (currentColumn, restCount);
+				} else if (newPos.HasValue) {
+					restCount = currentLine.Count - currentColumn;
+					currentLine.RemoveRange (currentColumn, restCount);
+				}
+				if (wordWrap && wrapManager.RemoveRange (currentRow, currentColumn, restCount)) {
+					wrapNeeded = true;
+				}
+				if (wrapNeeded) {
+					SetNeedsDisplay ();
+				} else {
+					SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+				}
+				break;
+
+			case Key.Backspace | Key.CtrlMask: // kill-word-backwards
+				if (isReadOnly)
+					break;
+				currentLine = GetCurrentLine ();
+				if (currentColumn == 0) {
+					DeleteTextBackwards ();
+					return true;
+				}
+				newPos = WordBackward (currentColumn, currentRow);
+				if (newPos.HasValue && currentRow == newPos.Value.row) {
+					restCount = currentColumn - newPos.Value.col;
+					currentLine.RemoveRange (newPos.Value.col, restCount);
+					if (wordWrap && wrapManager.RemoveRange (currentRow, newPos.Value.col, restCount)) {
+						wrapNeeded = true;
+					}
+					currentColumn = newPos.Value.col;
+				} else if (newPos.HasValue) {
+					restCount = currentLine.Count - currentColumn;
+					currentLine.RemoveRange (currentColumn, restCount);
+					if (wordWrap && wrapManager.RemoveRange (currentRow, currentColumn, restCount)) {
+						wrapNeeded = true;
+					}
+					currentColumn = newPos.Value.col;
+					currentRow = newPos.Value.row;
+				}
+				if (wrapNeeded) {
+					SetNeedsDisplay ();
+				} else {
+					SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+				}
 				break;
 
 			case Key.Enter:
@@ -2255,13 +2307,88 @@ namespace Terminal.Gui {
 			}
 		}
 
+		bool DeleteTextForwards ()
+		{
+			var currentLine = GetCurrentLine ();
+			if (currentColumn == currentLine.Count) {
+				if (currentRow + 1 == model.Count)
+					return true;
+				var nextLine = model.GetLine (currentRow + 1);
+				currentLine.AddRange (nextLine);
+				model.RemoveLine (currentRow + 1);
+				if (wordWrap && wrapManager.RemoveLine (currentRow, currentColumn, out _)) {
+					wrapNeeded = true;
+				}
+				var sr = currentRow - topRow;
+				SetNeedsDisplay (new Rect (0, sr, Frame.Width, sr + 1));
+			} else {
+				currentLine.RemoveAt (currentColumn);
+				if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn)) {
+					wrapNeeded = true;
+				}
+				var r = currentRow - topRow;
+				SetNeedsDisplay (new Rect (currentColumn - leftColumn, r, Frame.Width, r + 1));
+			}
+
+			return false;
+		}
+
+		bool DeleteTextBackwards ()
+		{
+			if (currentColumn > 0) {
+				// Delete backwards 
+				var currentLine = GetCurrentLine ();
+				currentLine.RemoveAt (currentColumn - 1);
+				if (wordWrap && wrapManager.RemoveAt (currentRow, currentColumn - 1)) {
+					wrapNeeded = true;
+				}
+				currentColumn--;
+				if (currentColumn < leftColumn) {
+					leftColumn--;
+					SetNeedsDisplay ();
+				} else
+					SetNeedsDisplay (new Rect (0, currentRow - topRow, 1, Frame.Width));
+			} else {
+				// Merges the current line with the previous one.
+				if (currentRow == 0)
+					return true;
+				var prowIdx = currentRow - 1;
+				var prevRow = model.GetLine (prowIdx);
+				var prevCount = prevRow.Count;
+				model.GetLine (prowIdx).AddRange (GetCurrentLine ());
+				model.RemoveLine (currentRow);
+				bool lineRemoved = false;
+				if (wordWrap && wrapManager.RemoveLine (currentRow, currentColumn, out lineRemoved, false)) {
+					wrapNeeded = true;
+				}
+				currentRow--;
+				if (wrapNeeded && !lineRemoved) {
+					currentColumn = Math.Max (prevCount - 1, 0);
+				} else {
+					currentColumn = prevCount;
+				}
+				Adjust ();
+			}
+
+			return false;
+		}
+
+		bool copyWithoutSelection;
+
 		/// <summary>
 		/// Copy the selected text to the clipboard contents.
 		/// </summary>
 		public void Copy ()
 		{
 			SetWrapModel ();
-			SetClipboard (GetRegion ());
+			if (selecting) {
+				SetClipboard (GetRegion ());
+				copyWithoutSelection = false;
+			} else {
+				var currentLine = GetCurrentLine ();
+				SetClipboard (ustring.Make (currentLine));
+				copyWithoutSelection = true;
+			}
 			UpdateWrapModel ();
 			DoNeededAction ();
 		}
@@ -2291,10 +2418,17 @@ namespace Terminal.Gui {
 			}
 
 			SetWrapModel ();
-			if (selecting) {
-				ClearRegion ();
+			if (copyWithoutSelection) {
+				var runeList = Clipboard.Contents == null ? new List<Rune> () : Clipboard.Contents.ToRuneList ();
+				model.AddLine (currentRow, runeList);
+				currentRow++;
+			} else {
+				if (selecting) {
+					ClearRegion ();
+				}
+				InsertText (Clipboard.Contents);
+				copyWithoutSelection = false;
 			}
-			InsertText (Clipboard.Contents);
 			UpdateWrapModel ();
 			selecting = false;
 			DoNeededAction ();
@@ -2538,15 +2672,22 @@ namespace Terminal.Gui {
 							}
 						}
 						if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune))) {
+							if (lastValidCol > -1) {
+								nCol = lastValidCol;
+							}
 							return;
 						}
 						while (MovePrev (ref nCol, ref nRow, out nRune)) {
 							if (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune))
 								break;
+							if (nRow != fromRow) {
+								break;
+							}
 							lastValidCol = nCol;
 						}
 						if (lastValidCol > -1) {
 							nCol = lastValidCol;
+							nRow = fromRow;
 						}
 					} else {
 						if (!MovePrev (ref nCol, ref nRow, out nRune)) {
