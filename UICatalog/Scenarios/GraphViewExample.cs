@@ -127,8 +127,13 @@ namespace UICatalog.Scenarios {
 
 			graphView.AxisY.LabelGetter = (v) => '$' + (v.Value / 1000f).ToString ("N0") + 'k';
 
-			graphView.AxisX.Increment = 1;
-			graphView.AxisX.ShowLabelsEvery = 1;
+			// Do not show x axis labels (bars draw their own labels)
+			graphView.AxisX.Increment = 0;
+			graphView.AxisX.ShowLabelsEvery = 0;
+			graphView.AxisX.Minimum = 0;
+
+
+			graphView.AxisY.Minimum = 0;
 
 			var legend = new LegendAnnotation (new Rect (graphView.Bounds.Width - 20,0, 20, 5));
 			legend.AddEntry (new GraphCellToRender (stiple, series.SubSeries.ElementAt (0).OverrideBarColor), "Lower Third");
@@ -543,6 +548,9 @@ namespace UICatalog.Scenarios {
 					else
 					if (height >= 25) {
 						driver.SetAttribute (brightgreen);
+					}
+					else{
+						driver.SetAttribute (green);
 					}
 
 					graph.AddRune (x, y, beingDrawn.Fill.Rune);

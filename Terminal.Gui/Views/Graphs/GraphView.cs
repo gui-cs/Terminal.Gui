@@ -390,11 +390,8 @@ namespace Terminal.Gui.Graphs {
 				return;
 			}
 
-			if (GraphPosition != null) {
-				var screenPos = graph.GraphSpaceToScreen (GraphPosition);
-
-				DrawText (graph, driver, screenBounds, screenPos.X, screenPos.Y);
-			}
+			var screenPos = graph.GraphSpaceToScreen (GraphPosition);
+			DrawText (graph, driver, screenBounds, screenPos.X, screenPos.Y);
 		}
 
 		/// <summary>
@@ -574,7 +571,7 @@ namespace Terminal.Gui.Graphs {
 
 		/// <summary>
 		/// Draws the <paramref name="graphBounds"/> section of a series into the
-		/// <paramref name="graph"/> view <paramref name="bounds"/>
+		/// <paramref name="graph"/> view <paramref name="drawBounds"/>
 		/// </summary>
 		/// <param name="graph">Graph series is to be drawn onto</param>
 		/// <param name="driver"></param>
@@ -703,6 +700,9 @@ namespace Terminal.Gui.Graphs {
 				subSeries [i].BarEvery = barsEvery;
 				subSeries [i].Offset = i * spacing;
 
+				// Only draw labels for the first bar in each category
+				subSeries [i].DrawLabels = i == 0;
+
 				if (colors != null) {
 					subSeries [i].OverrideBarColor = colors [i];
 				}
@@ -728,6 +728,13 @@ namespace Terminal.Gui.Graphs {
 			}
 		}
 
+		/// <summary>
+		/// Draws all <see cref="SubSeries"/>
+		/// </summary>
+		/// <param name="graph"></param>
+		/// <param name="driver"></param>
+		/// <param name="drawBounds"></param>
+		/// <param name="graphBounds"></param>
 		public void DrawSeries (GraphView graph, ConsoleDriver driver, Rect drawBounds, RectangleF graphBounds)
 		{
 			foreach (var bar in subSeries) {
@@ -815,13 +822,17 @@ namespace Terminal.Gui.Graphs {
 
 				// Start the bar from wherever the axis is
 				if (Orientation == Orientation.Horizontal) {
-					screenStart.X = graph.AxisY.GetAxisXPosition (graph);
+					
+					screenStart.X = graph.AxisY.GetAxisXPosition (graph)+1;
+
 					// if bar is off the screen
 					if (screenStart.Y < 0 || screenStart.Y > drawBounds.Height - graph.MarginBottom) {
 						continue;
 					}
 				} else {
-					screenStart.Y = graph.AxisX.GetAxisYPosition (graph);
+
+					// Start the axis
+					screenStart.Y = graph.AxisX.GetAxisYPosition (graph)-1;
 
 					// if bar is off the screen
 					if (screenStart.X < graph.MarginLeft || screenStart.X > graph.MarginLeft+drawBounds.Width-1) {
@@ -829,11 +840,15 @@ namespace Terminal.Gui.Graphs {
 					}
 				}
 
-				
+				// draw the bar unless it has no height
+				if(Bars[i].Value != 0){
+					DrawBarLine (graph, driver,screenStart,screenEnd,Bars [i]);
+				}
 
-				DrawBarLine (graph, driver,screenStart,screenEnd,Bars [i]);
+				// If we are drawing labels and the bar has one
+				if (DrawLabels && !string.IsNullOrWhiteSpace(Bars [i].Text)) {
 
-				if (DrawLabels) {
+					// Add the label to the relevant axis
 					if(Orientation == Orientation.Horizontal) {
 
 						graph.AxisY.DrawAxisLabel (graph, driver, screenStart.Y, Bars [i].Text);
@@ -873,8 +888,8 @@ namespace Terminal.Gui.Graphs {
 		public class Bar {
 
 			/// <summary>
-			/// Optional text that describes the bar.  This can be added as a label on the axis by setting
-			/// <see cref="Axis.LabelGetter"/> = <see cref="BarSeries.GetLabelText(AxisIncrementToRender)"/>
+			/// Optional text that describes the bar.  This will be rendered on the corresponding
+			/// <see cref="Axis"/> unless <see cref="DrawLabels"/> is false
 			/// </summary>
 			public string Text { get; set; }
 
@@ -954,23 +969,17 @@ namespace Terminal.Gui.Graphs {
 		/// Generates lines joining <see cref="Points"/> 
 		/// </summary>
 		/// <returns></returns>
-		private IEnumerable<LineD> PointsToLines ()
+		private IEnumerable<LineF> PointsToLines ()
 		{
 			for (int i = 0; i < Points.Count - 1; i++) {
-
-				var line = new LineD (Points [i], Points [i + 1]);
-				if (line.Start != null && line.End != null) {
-					yield return line;
-				}
+				yield return new LineF (Points [i], Points [i + 1]);
 			}
 		}
-
-
 
 		/// <summary>
 		/// Describes two points in graph space and a line between them
 		/// </summary>
-		public class LineD {
+		public class LineF {
 			/// <summary>
 			/// The start of the line
 			/// </summary>
@@ -984,7 +993,7 @@ namespace Terminal.Gui.Graphs {
 			/// <summary>
 			/// Creates a new point at the given coordinates
 			/// </summary>
-			public LineD (PointF start, PointF end)
+			public LineF (PointF start, PointF end)
 			{
 				this.Start = start;
 				this.End = end;
@@ -1167,6 +1176,14 @@ namespace Terminal.Gui.Graphs {
 			}
 		}
 
+		/// <summary>
+		/// Draws the given <paramref name="text"/> on the axis at x <paramref name="screenPosition"/>.
+		/// For the screen y position use <see cref="GetAxisYPosition(GraphView)"/>
+		/// </summary>
+		/// <param name="graph">Graph being drawn onto</param>
+		/// <param name="driver"></param>
+		/// <param name="screenPosition">Number of screen columns along the axis to take before rendering</param>
+		/// <param name="text">Text to render under the axis tick</param>
 		public override void DrawAxisLabel (GraphView graph, ConsoleDriver driver, int screenPosition, string text)
 		{
 			var y = GetAxisYPosition (graph);
@@ -1397,6 +1414,15 @@ namespace Terminal.Gui.Graphs {
 			}
 		}
 
+		/// <summary>
+		/// Draws the given <paramref name="text"/> on the axis at y <paramref name="screenPosition"/>.
+		/// For the screen x position use <see cref="GetAxisXPosition(GraphView)"/>
+		/// </summary>
+		/// <param name="graph">Graph being drawn onto</param>
+		/// <param name="driver"></param>
+		/// <param name="screenPosition">Number of rows from the top of the screen (i.e. down the axis) before rendering</param>
+		/// <param name="text">Text to render to the left of the axis tick.  Ensure to 
+		/// set <see cref="GraphView.MarginLeft"/> or <see cref="GraphView.ScrollOffset"/> sufficient that it is visible</param>
 		public override void DrawAxisLabel (GraphView graph, ConsoleDriver driver, int screenPosition, string text)
 		{
 			var x = GetAxisXPosition (graph);
