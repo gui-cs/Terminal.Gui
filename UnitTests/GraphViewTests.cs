@@ -381,7 +381,7 @@ namespace UnitTests {
 			gv.AxisY.Increment = 1;
 			gv.AxisY.ShowLabelsEvery = 1;
 
-			// Start the graph at 80 years because that is where most of our data is
+			// Start the graph at 80
 			gv.ScrollOffset = new PointF (0, 80);
 
 			for (int x = 0; x < gv.Bounds.Width; x++) {
@@ -391,7 +391,7 @@ namespace UnitTests {
 
 					// See 
 					// https://en.wikipedia.org/wiki/Machine_epsilon
-					float epsilon = 0.000001f;
+					float epsilon = 0.0001f;
 
 					var p = gv.GraphSpaceToScreen (new PointF (graphSpace.Left + epsilon, graphSpace.Top + epsilon));
 					Assert.Equal (x, p.X);
