@@ -1038,6 +1038,11 @@ namespace Terminal.Gui.Graphs {
 		public string Text;
 
 		/// <summary>
+		/// The minimum axis point to show.  Defaults to null (no minimum)
+		/// </summary>
+		public float? Minimum { get; set; }
+
+		/// <summary>
 		/// Populates base properties and sets the read only <see cref="Orientation"/>
 		/// </summary>
 		/// <param name="orientation"></param>
@@ -1120,8 +1125,13 @@ namespace Terminal.Gui.Graphs {
 			graph.Move (0, 0);
 
 			var y = GetAxisYPosition (graph);
+			var xStart = 0;
 
-			for (int i = 0; i < bounds.Width; i++) {
+			if (Minimum.HasValue) {
+				xStart = graph.GraphSpaceToScreen (new PointF (Minimum.Value, y)).X;
+			}
+
+			for (int i = xStart; i < bounds.Width; i++) {
 
 				graph.Move (i, y);
 				driver.AddRune (driver.HLine);
@@ -1204,6 +1214,12 @@ namespace Terminal.Gui.Graphs {
 
 			var start = graph.ScreenToGraphSpace (0, y);
 			var end = graph.ScreenToGraphSpace (bounds.Width, y);
+
+			// don't draw labels below the minimum
+			if (Minimum.HasValue) {
+				start.X = Math.Max (start.X, Minimum.Value);
+			}
+
 			var current = start;
 
 			while (current.X < end.X) {
@@ -1271,11 +1287,30 @@ namespace Terminal.Gui.Graphs {
 
 			var x = GetAxisXPosition (graph);
 
+			var yEnd = GetAxisYEnd (graph);
+
+			// don't draw down further than the control bounds
+			yEnd = Math.Min (yEnd, bounds.Height - (int)graph.MarginBottom);
+
 			// Draw solid line
-			for (int i = 0; i < bounds.Height; i++) {
+			for (int i = 0; i < yEnd ; i++) {
 				graph.Move (x, i);
 				driver.AddRune (driver.VLine);
 			}
+		}
+
+
+		private int GetAxisYEnd (GraphView graph)
+		{
+			// draw down the screen (0 is top of screen)
+			// end at the bottom of the screen
+
+			//unless there is a minimum 
+			if (Minimum.HasValue) {
+				return graph.GraphSpaceToScreen (new PointF (0, Minimum.Value)).Y;
+			}
+
+			return graph.Bounds.Height;
 		}
 
 
@@ -1334,6 +1369,12 @@ namespace Terminal.Gui.Graphs {
 			// space value is at the bottom of the screen
 			var start = graph.ScreenToGraphSpace (x, bounds.Height - 1);
 			var end = graph.ScreenToGraphSpace (x, 0);
+
+			// don't draw labels below the minimum
+			if (Minimum.HasValue) {
+				start.Y = Math.Max(start.Y,Minimum.Value);
+			}
+
 			var current = start;
 
 			while (current.Y < end.Y) {

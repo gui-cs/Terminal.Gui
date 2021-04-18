@@ -639,10 +639,12 @@ namespace UICatalog.Scenarios {
 			graphView.AxisX.Increment = 5;
 			graphView.AxisX.ShowLabelsEvery = 1;
 			graphView.AxisX.Text = "Atomic Number";
+			graphView.AxisX.Minimum = 0;
 
 			// One label every 5 atomic weight
 			graphView.AxisY.Increment = 5;
 			graphView.AxisY.ShowLabelsEvery = 1;
+			graphView.AxisY.Minimum = 0;
 
 			graphView.SetNeedsDisplay ();
 		}
