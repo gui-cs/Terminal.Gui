@@ -580,9 +580,9 @@ namespace Terminal.Gui.Graphs {
 		/// </summary>
 		/// <param name="graph">Graph series is to be drawn onto</param>
 		/// <param name="driver"></param>
-		/// <param name="bounds">Visible area of the graph in Console Screen units (excluding margins)</param>
+		/// <param name="drawBounds">Visible area of the graph in Console Screen units (excluding margins)</param>
 		/// <param name="graphBounds">Visible area of the graph in Graph space units</param>
-		void DrawSeries (GraphView graph, ConsoleDriver driver, Rect bounds, RectangleF graphBounds);
+		void DrawSeries (GraphView graph, ConsoleDriver driver, Rect drawBounds, RectangleF graphBounds);
 	}
 
 	/// <summary>
@@ -647,7 +647,7 @@ namespace Terminal.Gui.Graphs {
 		/// <summary>
 		/// Draws all points directly onto the graph
 		/// </summary>
-		public void DrawSeries (GraphView graph, ConsoleDriver driver, Rect bounds, RectangleF graphBounds)
+		public void DrawSeries (GraphView graph, ConsoleDriver driver, Rect drawBounds, RectangleF graphBounds)
 		{
 			if (Fill.Color.HasValue) {
 				driver.SetAttribute (Fill.Color.Value);
@@ -730,10 +730,10 @@ namespace Terminal.Gui.Graphs {
 			}
 		}
 
-		public void DrawSeries (GraphView graph, ConsoleDriver driver, Rect bounds, RectangleF graphBounds)
+		public void DrawSeries (GraphView graph, ConsoleDriver driver, Rect drawBounds, RectangleF graphBounds)
 		{
 			foreach (var bar in subSeries) {
-				bar.DrawSeries (graph, driver, bounds, graphBounds);
+				bar.DrawSeries (graph, driver, drawBounds, graphBounds);
 			}
 
 		}
@@ -793,7 +793,14 @@ namespace Terminal.Gui.Graphs {
 			return graphCellToRender;
 		}
 
-		public virtual void DrawSeries (GraphView graph, ConsoleDriver driver, Rect bounds, RectangleF graphBounds)
+		/// <summary>
+		/// Draws bars that are currently in the <paramref name="drawBounds"/>
+		/// </summary>
+		/// <param name="graph"></param>
+		/// <param name="driver"></param>
+		/// <param name="drawBounds">Screen area of the graph excluding margins</param>
+		/// <param name="graphBounds">Graph space area that should be drawn into <paramref name="drawBounds"/></param>
+		public virtual void DrawSeries (GraphView graph, ConsoleDriver driver, Rect drawBounds, RectangleF graphBounds)
 		{
 			for(int i = 0;i<Bars.Count;i++) {
 				
@@ -811,9 +818,20 @@ namespace Terminal.Gui.Graphs {
 				// Start the bar from wherever the axis is
 				if (Orientation == Orientation.Horizontal) {
 					screenStart.X = graph.AxisY.GetAxisXPosition (graph);
+					// if bar is off the screen
+					if (screenStart.Y < 0 || screenStart.Y > drawBounds.Height - graph.MarginBottom) {
+						continue;
+					}
 				} else {
 					screenStart.Y = graph.AxisX.GetAxisYPosition (graph);
+
+					// if bar is off the screen
+					if (screenStart.X < graph.MarginLeft || screenStart.X > graph.MarginLeft+drawBounds.Width-1) {
+						continue;
+					}
 				}
+
+				
 
 				DrawBarLine (graph, driver,screenStart,screenEnd,Bars [i]);
 
@@ -1190,7 +1208,6 @@ namespace Terminal.Gui.Graphs {
 
 			while (current.X < end.X) {
 
-				current.X += Increment;
 
 				var toRender = new AxisIncrementToRender (Orientation,
 					graph.GraphSpaceToScreen (new PointF (current.X, current.Y)).X,
@@ -1205,6 +1222,8 @@ namespace Terminal.Gui.Graphs {
 				}
 
 				yield return toRender;
+
+				current.X += Increment;
 			}
 		}
 		/// <summary>
@@ -1319,7 +1338,6 @@ namespace Terminal.Gui.Graphs {
 
 			while (current.Y < end.Y) {
 
-				current.Y += Increment;
 				int screenY = graph.GraphSpaceToScreen (new PointF (current.X, current.Y)).Y;
 
 				var toRender = new AxisIncrementToRender (Orientation, screenY, current.Y);
@@ -1334,6 +1352,8 @@ namespace Terminal.Gui.Graphs {
 				}
 				
 				yield return toRender;
+
+				current.Y += Increment;
 			}
 		}
 
