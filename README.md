@@ -3,8 +3,9 @@
 [![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui)
 [![Downloads](https://img.shields.io/nuget/dt/Terminal.Gui)](https://www.nuget.org/packages/Terminal.Gui)
 [![License](https://img.shields.io/github/license/migueldeicaza/gui.cs.svg)](LICENSE)
+![Bugs](https://img.shields.io/github/issues/migueldeicaza/gui.cs/bug)
 
-# Terminal.Gui - Terminal GUI toolkit for .NET
+# Terminal.Gui - Cross Platform Terminal GUI toolkit for .NET
 
 A toolkit for building console GUI apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
 
