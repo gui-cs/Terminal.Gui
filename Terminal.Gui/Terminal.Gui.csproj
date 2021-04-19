@@ -14,7 +14,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>  
-    <None Remove="ConsoleDrivers\#ConsoleDriver.cs#" />
+    <!-- <None Remove="ConsoleDrivers\#ConsoleDriver.cs#" /> -->
   </ItemGroup>
   
   <PropertyGroup>
