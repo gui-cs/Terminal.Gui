@@ -238,6 +238,7 @@
     </PackageReference>  
   </ItemGroup>
 
+  <!-- See Terminal.Gui/README.md for how version numbering works -->
   <PropertyGroup>
     <MinVerTagPrefix>v</MinVerTagPrefix>
   </PropertyGroup>
