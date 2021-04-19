@@ -18,13 +18,13 @@ namespace Terminal.Gui.Graphs {
 		/// Horizontal axis
 		/// </summary>
 		/// <value></value>
-		public HorizontalAxis AxisX { get; }
+		public HorizontalAxis AxisX { get; set; }
 
 		/// <summary>
 		/// Vertical axis
 		/// </summary>
 		/// <value></value>
-		public VerticalAxis AxisY { get; }
+		public VerticalAxis AxisY { get; set; }
 
 		/// <summary>
 		/// Collection of data series that are rendered in the graph
@@ -125,11 +125,11 @@ namespace Terminal.Gui.Graphs {
 
 			SetDriverColorToGraphColor (Driver);
 
-			AxisY.DrawAxisLine (Driver, this, Bounds);
-			AxisX.DrawAxisLine (Driver, this, Bounds);
+			AxisY.DrawAxisLine (this,Driver, Bounds);
+			AxisX.DrawAxisLine (this,Driver, Bounds);
 
-			AxisY.DrawAxisLabels (Driver, this, Bounds);
-			AxisX.DrawAxisLabels (Driver, this, Bounds);
+			AxisY.DrawAxisLabels (this, Driver, Bounds);
+			AxisX.DrawAxisLabels (this, Driver, Bounds);
 
 			SetDriverColorToGraphColor (Driver);
 
@@ -823,7 +823,7 @@ namespace Terminal.Gui.Graphs {
 				// Start the bar from wherever the axis is
 				if (Orientation == Orientation.Horizontal) {
 					
-					screenStart.X = graph.AxisY.GetAxisXPosition (graph)+1;
+					screenStart.X = graph.AxisY.GetAxisXPosition (graph);
 
 					// if bar is off the screen
 					if (screenStart.Y < 0 || screenStart.Y > drawBounds.Height - graph.MarginBottom) {
@@ -832,7 +832,7 @@ namespace Terminal.Gui.Graphs {
 				} else {
 
 					// Start the axis
-					screenStart.Y = graph.AxisX.GetAxisYPosition (graph)-1;
+					screenStart.Y = graph.AxisX.GetAxisYPosition (graph);
 
 					// if bar is off the screen
 					if (screenStart.X < graph.MarginLeft || screenStart.X > graph.MarginLeft+drawBounds.Width-1) {
@@ -1065,7 +1065,16 @@ namespace Terminal.Gui.Graphs {
 		/// <param name="driver"></param>
 		/// <param name="graph"></param>
 		/// <param name="bounds"></param>
-		public abstract void DrawAxisLine (ConsoleDriver driver, GraphView graph, Rect bounds);
+		public abstract void DrawAxisLine (GraphView graph, ConsoleDriver driver, Rect bounds);
+
+		/// <summary>
+		/// Draws a single cell of the solid line of the axis
+		/// </summary>
+		/// <param name="graph"></param>
+		/// <param name="driver"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		protected abstract void DrawAxisLine (GraphView graph, ConsoleDriver driver, int x, int y);
 
 		/// <summary>
 		/// Draws labels and axis <see cref="Increment"/> ticks
@@ -1074,7 +1083,7 @@ namespace Terminal.Gui.Graphs {
 		/// <param name="graph"></param>
 		/// <param name="bounds"></param>
 
-		public abstract void DrawAxisLabels (ConsoleDriver driver, GraphView graph, Rect bounds);
+		public abstract void DrawAxisLabels (GraphView graph, ConsoleDriver driver, Rect bounds);
 
 		/// <summary>
 		/// Draws a custom label <paramref name="text"/> at <paramref name="screenPosition"/> units
@@ -1124,7 +1133,7 @@ namespace Terminal.Gui.Graphs {
 		/// <param name="driver"></param>
 		/// <param name="graph"></param>
 		/// <param name="bounds"></param>
-		public override void DrawAxisLine (ConsoleDriver driver, GraphView graph, Rect bounds)
+		public override void DrawAxisLine (GraphView graph, ConsoleDriver driver, Rect bounds)
 		{
 			if (!Visible) {
 				return;
@@ -1141,15 +1150,29 @@ namespace Terminal.Gui.Graphs {
 
 			for (int i = xStart; i < bounds.Width; i++) {
 
-				graph.Move (i, y);
-				driver.AddRune (driver.HLine);
+				DrawAxisLine(graph,driver,i, y);
 			}
+		}
+
+
+		/// <summary>
+		/// Draws a horizontal axis line at the given <paramref name="x"/>, <paramref name="y"/> 
+		/// screen coordinates
+		/// </summary>
+		/// <param name="graph"></param>
+		/// <param name="driver"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		protected override void DrawAxisLine (GraphView graph, ConsoleDriver driver, int x, int y)
+		{
+			graph.Move (x, y);
+			driver.AddRune (driver.HLine);
 		}
 
 		/// <summary>
 		/// Draws the horizontal x axis labels and <see cref="Axis.Increment"/> ticks
 		/// </summary>
-		public override void DrawAxisLabels (ConsoleDriver driver, GraphView graph, Rect bounds)
+		public override void DrawAxisLabels (GraphView graph,ConsoleDriver driver, Rect bounds)
 		{
 			if (!Visible || Increment == 0) {
 				return;
@@ -1295,7 +1318,7 @@ namespace Terminal.Gui.Graphs {
 		/// <param name="driver"></param>
 		/// <param name="graph"></param>
 		/// <param name="bounds"></param>
-		public override void DrawAxisLine (ConsoleDriver driver, GraphView graph, Rect bounds)
+		public override void DrawAxisLine (GraphView graph,ConsoleDriver driver, Rect bounds)
 		{
 			if (!Visible) {
 				return;
@@ -1310,11 +1333,24 @@ namespace Terminal.Gui.Graphs {
 
 			// Draw solid line
 			for (int i = 0; i < yEnd ; i++) {
-				graph.Move (x, i);
-				driver.AddRune (driver.VLine);
+
+				DrawAxisLine (graph, driver, x, i);
 			}
 		}
 
+		/// <summary>
+		/// Draws a vertical axis line at the given <paramref name="x"/>, <paramref name="y"/> 
+		/// screen coordinates
+		/// </summary>
+		/// <param name="graph"></param>
+		/// <param name="driver"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		protected override void DrawAxisLine (GraphView graph, ConsoleDriver driver, int x, int y)
+		{
+			graph.Move (x, y);
+			driver.AddRune (driver.VLine);
+		}
 
 		private int GetAxisYEnd (GraphView graph)
 		{
@@ -1336,7 +1372,7 @@ namespace Terminal.Gui.Graphs {
 		/// <param name="driver"></param>
 		/// <param name="graph"></param>
 		/// <param name="bounds"></param>
-		public override void DrawAxisLabels (ConsoleDriver driver, GraphView graph, Rect bounds)
+		public override void DrawAxisLabels (GraphView graph, ConsoleDriver driver, Rect bounds)
 		{
 			if (!Visible || Increment == 0) {
 				return;
@@ -1508,7 +1544,7 @@ namespace Terminal.Gui.Graphs {
 	}
 
 	/// <summary>
-	/// Determines what should be displayed at a given label
+	/// Delegate for custom formatting of axis labels.  Determines what should be displayed at a given label
 	/// </summary>
 	/// <param name="toRender">The axis increment to which the label is attached</param>
 	/// <returns></returns>

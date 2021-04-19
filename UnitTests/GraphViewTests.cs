@@ -5,6 +5,7 @@ using System.Linq;
 using Terminal.Gui;
 using Xunit;
 using Terminal.Gui.Graphs;
+using Point = Terminal.Gui.Point;
 
 namespace UnitTests {
 
@@ -260,107 +261,7 @@ namespace UnitTests {
 			Assert.Equal ("CellSize cannot be 0", ex.Message);
 		}
 
-		#region ISeries tests
-		[Fact]
-		public void Series_GetsPassedCorrectBounds_AllAtOnce ()
-		{
-			InitFakeDriver ();
-
-			var gv = new GraphView ();
-			gv.ColorScheme = new ColorScheme ();
-			gv.Bounds = new Rect (0, 0, 50, 30);
-
-			RectangleF fullGraphBounds = RectangleF.Empty;
-			Rect graphScreenBounds = Rect.Empty;
-
-			var series = new FakeSeries ((v,c,s,g)=> { graphScreenBounds = s; fullGraphBounds = g; });
-			gv.Series.Add (series);
-
-
-			gv.Redraw (gv.Bounds);
-			Assert.Equal (new RectangleF(0,0,50,30), fullGraphBounds);
-			Assert.Equal (new Rect (0, 0, 50, 30), graphScreenBounds);
-
-			// Now we put a margin in
-			// Graph should not spill into the margins
-
-			gv.MarginBottom = 2;
-			gv.MarginLeft = 5;
-
-			// Even with a margin the graph should be drawn from 
-			// the origin, we just get less visible width/height
-			gv.Redraw (gv.Bounds);
-			Assert.Equal (new RectangleF (0, 0, 45, 28), fullGraphBounds);
-
-			// The screen space the graph will be rendered into should
-			// not overspill the margins
-			Assert.Equal (new Rect (5, 0, 45, 28), graphScreenBounds);
-		}
-
-		/// <summary>
-		/// Tests that the bounds passed to the ISeries for drawing into are 
-		/// correct even when the <see cref="GraphView.CellSize"/> results in
-		/// multiple units of graph space being condensed into each cell of
-		/// console
-		/// </summary>
-		[Fact]
-		public void Series_GetsPassedCorrectBounds_AllAtOnce_LargeCellSize ()
-		{
-			InitFakeDriver ();
-
-			var gv = new GraphView ();
-			gv.ColorScheme = new ColorScheme ();
-			gv.Bounds = new Rect (0, 0, 50, 30);
-
-			// the larger the cell size the more condensed (smaller) the graph space is
-			gv.CellSize = new PointF (2, 5);
-
-			RectangleF fullGraphBounds = RectangleF.Empty;
-			Rect graphScreenBounds = Rect.Empty;
-
-			var series = new FakeSeries ((v, c, s, g) => { graphScreenBounds = s; fullGraphBounds = g; });
-			
-			gv.Series.Add (series);
-
-			gv.Redraw (gv.Bounds);
-			// Since each cell of the console is 2x5 of graph space the graph
-			// bounds to be rendered are larger
-			Assert.Equal (new RectangleF (0, 0, 100, 150), fullGraphBounds);
-			Assert.Equal (new Rect (0, 0, 50, 30), graphScreenBounds);
-
-			// Graph should not spill into the margins
-
-			gv.MarginBottom = 2;
-			gv.MarginLeft = 5;
-
-			// Even with a margin the graph should be drawn from 
-			// the origin, we just get less visible width/height
-			gv.Redraw (gv.Bounds);
-			Assert.Equal (new RectangleF (0, 0, 90, 140), fullGraphBounds);
-
-			// The screen space the graph will be rendered into should
-			// not overspill the margins
-			Assert.Equal (new Rect (5, 0, 45, 28), graphScreenBounds);
-		}
-
-		private class FakeSeries : ISeries {
-
-			readonly Action<GraphView, ConsoleDriver, Rect, RectangleF> drawSeries;
-
-			public FakeSeries (
-				Action<GraphView, ConsoleDriver, Rect, RectangleF> drawSeries
-				)
-			{
-				this.drawSeries = drawSeries;
-			}
-
-			public void DrawSeries (GraphView graph, ConsoleDriver driver, Rect bounds, RectangleF graphBounds)
-			{
-				drawSeries (graph,driver,bounds,graphBounds);
-			}
-		}
-
-		#endregion
+		
 
 		/// <summary>
 		/// Tests that each point in the screen space maps to a rectangle of
@@ -410,6 +311,157 @@ namespace UnitTests {
 					Assert.Equal (y, p.Y);
 
 				}
+			}
+		}
+	}
+
+	public class SeriesTests {
+
+		private void InitFakeDriver ()
+		{
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			driver.Init (() => { });
+		}
+
+		[Fact]
+		public void Series_GetsPassedCorrectBounds_AllAtOnce ()
+		{
+			InitFakeDriver ();
+
+			var gv = new GraphView ();
+			gv.ColorScheme = new ColorScheme ();
+			gv.Bounds = new Rect (0, 0, 50, 30);
+
+			RectangleF fullGraphBounds = RectangleF.Empty;
+			Rect graphScreenBounds = Rect.Empty;
+
+			var series = new FakeSeries ((v, c, s, g) => { graphScreenBounds = s; fullGraphBounds = g; });
+			gv.Series.Add (series);
+
+
+			gv.Redraw (gv.Bounds);
+			Assert.Equal (new RectangleF (0, 0, 50, 30), fullGraphBounds);
+			Assert.Equal (new Rect (0, 0, 50, 30), graphScreenBounds);
+
+			// Now we put a margin in
+			// Graph should not spill into the margins
+
+			gv.MarginBottom = 2;
+			gv.MarginLeft = 5;
+
+			// Even with a margin the graph should be drawn from 
+			// the origin, we just get less visible width/height
+			gv.Redraw (gv.Bounds);
+			Assert.Equal (new RectangleF (0, 0, 45, 28), fullGraphBounds);
+
+			// The screen space the graph will be rendered into should
+			// not overspill the margins
+			Assert.Equal (new Rect (5, 0, 45, 28), graphScreenBounds);
+		}
+
+		/// <summary>
+		/// Tests that the bounds passed to the ISeries for drawing into are 
+		/// correct even when the <see cref="GraphView.CellSize"/> results in
+		/// multiple units of graph space being condensed into each cell of
+		/// console
+		/// </summary>
+		[Fact]
+		public void Series_GetsPassedCorrectBounds_AllAtOnce_LargeCellSize ()
+		{
+			InitFakeDriver ();
+
+			var gv = new GraphView ();
+			gv.ColorScheme = new ColorScheme ();
+			gv.Bounds = new Rect (0, 0, 50, 30);
+
+			// the larger the cell size the more condensed (smaller) the graph space is
+			gv.CellSize = new PointF (2, 5);
+
+			RectangleF fullGraphBounds = RectangleF.Empty;
+			Rect graphScreenBounds = Rect.Empty;
+
+			var series = new FakeSeries ((v, c, s, g) => { graphScreenBounds = s; fullGraphBounds = g; });
+
+			gv.Series.Add (series);
+
+			gv.Redraw (gv.Bounds);
+			// Since each cell of the console is 2x5 of graph space the graph
+			// bounds to be rendered are larger
+			Assert.Equal (new RectangleF (0, 0, 100, 150), fullGraphBounds);
+			Assert.Equal (new Rect (0, 0, 50, 30), graphScreenBounds);
+
+			// Graph should not spill into the margins
+
+			gv.MarginBottom = 2;
+			gv.MarginLeft = 5;
+
+			// Even with a margin the graph should be drawn from 
+			// the origin, we just get less visible width/height
+			gv.Redraw (gv.Bounds);
+			Assert.Equal (new RectangleF (0, 0, 90, 140), fullGraphBounds);
+
+			// The screen space the graph will be rendered into should
+			// not overspill the margins
+			Assert.Equal (new Rect (5, 0, 45, 28), graphScreenBounds);
+		}
+
+		private class FakeSeries : ISeries {
+
+			readonly Action<GraphView, ConsoleDriver, Rect, RectangleF> drawSeries;
+
+			public FakeSeries (
+				Action<GraphView, ConsoleDriver, Rect, RectangleF> drawSeries
+				)
+			{
+				this.drawSeries = drawSeries;
+			}
+
+			public void DrawSeries (GraphView graph, ConsoleDriver driver, Rect bounds, RectangleF graphBounds)
+			{
+				drawSeries (graph, driver, bounds, graphBounds);
+			}
+		}
+	}
+
+	public class AxisTests {
+
+		private void InitFakeDriver ()
+		{
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			driver.Init (() => { });
+		}
+
+		[Fact]
+		public void TestHAxis_NoMargin()
+		{
+			InitFakeDriver ();
+
+			var gv = new GraphView ();
+			gv.ColorScheme = new ColorScheme ();
+			gv.Bounds = new Rect (0, 0, 50, 30);
+			// graph can't be completely empty or it won't draw
+			gv.Series.Add (new ScatterSeries ());
+
+			var axis = new FakeHAxis ();
+			gv.AxisX = axis;
+
+			gv.Redraw (gv.Bounds);
+
+			Assert.Contains (new Point (0, 29),axis.DrawAxisLinePoints);
+		}
+
+		private class FakeHAxis : HorizontalAxis {
+
+			public List<Point> DrawAxisLinePoints = new List<Point> ();
+
+			protected override void DrawAxisLine (GraphView graph, ConsoleDriver driver, int x, int y)
+			{
+				base.DrawAxisLine (graph, driver, x, y);
+				DrawAxisLinePoints.Add (new Point(x, y));
+
+
 			}
 		}
 	}
