@@ -338,10 +338,12 @@ namespace UICatalog.Scenarios {
 				// No axis marks since Bar will add it's own categorical marks
 				graphView.AxisX.Increment = 0f;
 				graphView.AxisX.Text = "Country";
+				graphView.AxisX.Minimum = 0;
 
 				graphView.AxisY.Increment = 1f;
 				graphView.AxisY.ShowLabelsEvery = 1;
 				graphView.AxisY.LabelGetter = v => v.Value.ToString ("N2");
+				graphView.AxisY.Minimum = 0;
 				graphView.AxisY.Text = "Age";
 
 				// leave space for axis labels and title
@@ -360,11 +362,13 @@ namespace UICatalog.Scenarios {
 				graphView.AxisY.Increment = 0f;
 				graphView.AxisY.ShowLabelsEvery = 1;
 				graphView.AxisY.Text = "Country";
+				graphView.AxisY.Minimum = 0;
 
 				graphView.AxisX.Increment = 1f;
 				graphView.AxisX.ShowLabelsEvery = 1;
 				graphView.AxisX.LabelGetter = v => v.Value.ToString ("N2");
 				graphView.AxisX.Text = "Age";
+				graphView.AxisX.Minimum = 0;
 
 				// leave space for axis labels and title
 				graphView.MarginBottom = 2;
@@ -427,6 +431,7 @@ namespace UICatalog.Scenarios {
 			// do not show axis titles (bars have their own categories)
 			graphView.AxisY.Increment = 0;
 			graphView.AxisY.ShowLabelsEvery = 0;
+			graphView.AxisY.Minimum = 0;
 
 			var stiple = new GraphCellToRender (Application.Driver.Stipple);
 
@@ -603,6 +608,7 @@ namespace UICatalog.Scenarios {
 			graphView.AxisX.Increment = 0; // No graph ticks
 			graphView.AxisX.ShowLabelsEvery = 0; // no labels
 
+			graphView.AxisX.Visible = false;
 			graphView.AxisY.Visible = false;
 
 			graphView.SetNeedsDisplay ();

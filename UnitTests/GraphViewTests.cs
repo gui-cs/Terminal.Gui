@@ -435,6 +435,14 @@ namespace UnitTests {
 
 		private GraphView GetGraph (out FakeHAxis axis)
 		{
+			return GetGraph(out axis, out _);
+		}
+		private GraphView GetGraph (out FakeVAxis axis)
+		{
+			return GetGraph(out _, out axis);
+		}
+		private GraphView GetGraph (out FakeHAxis axisX, out FakeVAxis axisY)
+		{
 			InitFakeDriver ();
 
 			var gv = new GraphView ();
@@ -443,11 +451,15 @@ namespace UnitTests {
 			// graph can't be completely empty or it won't draw
 			gv.Series.Add (new ScatterSeries ());
 
-			axis = new FakeHAxis ();
-			gv.AxisX = axis;
+			axisX = new FakeHAxis ();
+			axisY = new FakeVAxis ();
+			gv.AxisX = axisX;
+			gv.AxisY = axisY;
 
 			return gv;
 		}
+
+		#region HorizontalAxis Tests
 
 		/// <summary>
 		/// Tests that the horizontal axis is computed correctly and does not over spill
@@ -467,6 +479,9 @@ namespace UnitTests {
 			Assert.Contains (new Point (48, 29), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (49, 29), axis.DrawAxisLinePoints);
 			Assert.DoesNotContain (new Point (50, 29), axis.DrawAxisLinePoints);
+
+			Assert.InRange(axis.LabelPoints.Max(),0,49);
+			Assert.InRange(axis.LabelPoints.Min(),0,49);
 		}
 
 		[Fact]
@@ -484,6 +499,9 @@ namespace UnitTests {
 			Assert.Contains (new Point (48, 19), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (49, 19), axis.DrawAxisLinePoints);
 			Assert.DoesNotContain (new Point (50, 19), axis.DrawAxisLinePoints);
+
+			Assert.InRange(axis.LabelPoints.Max(),0,49);
+			Assert.InRange(axis.LabelPoints.Min(),0,49);
 		}
 
 		[Fact]
@@ -501,17 +519,116 @@ namespace UnitTests {
 			Assert.Contains (new Point (48, 29), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (49, 29), axis.DrawAxisLinePoints);
 			Assert.DoesNotContain (new Point (50, 29), axis.DrawAxisLinePoints);
+
+			// Axis lables should not be drawn in the margin
+			Assert.InRange(axis.LabelPoints.Max(),5,49);
+			Assert.InRange(axis.LabelPoints.Min(),5,49);
 		}
+
+		#endregion
+
+		#region VerticalAxisTests
+
+
+		/// <summary>
+		/// Tests that the horizontal axis is computed correctly and does not over spill
+		/// it's bounds
+		/// </summary>
+		[Fact]
+		public void TestVAxisLocation_NoMargin ()
+		{
+			var gv = GetGraph (out FakeVAxis axis);
+
+			gv.Redraw (gv.Bounds);
+
+			Assert.DoesNotContain (new Point (0, -1), axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (0, 1),axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (0, 2), axis.DrawAxisLinePoints);
+						
+			Assert.Contains (new Point (0, 28), axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (0, 29), axis.DrawAxisLinePoints);
+			Assert.DoesNotContain (new Point (0, 30), axis.DrawAxisLinePoints);
+
+			Assert.InRange(axis.LabelPoints.Max(),0,29);
+			Assert.InRange(axis.LabelPoints.Min(),0,29);
+		}
+
+		[Fact]
+		public void TestVAxisLocation_MarginBottom ()
+		{
+			var gv = GetGraph (out FakeVAxis axis);
+
+			gv.MarginBottom = 10;
+			gv.Redraw (gv.Bounds);
+
+			Assert.DoesNotContain (new Point (0, -1), axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (0, 1),axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (0, 2), axis.DrawAxisLinePoints);
+						
+			Assert.Contains (new Point (0, 18), axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (0, 19), axis.DrawAxisLinePoints);
+			Assert.DoesNotContain (new Point (0, 20), axis.DrawAxisLinePoints);
+
+			// Labels should not be drawn into the axis
+			Assert.InRange(axis.LabelPoints.Max(),0,19);
+			Assert.InRange(axis.LabelPoints.Min(),0,19);
+		}
+
+		[Fact]
+		public void TestVAxisLocation_MarginLeft ()
+		{
+			var gv = GetGraph (out FakeVAxis axis);
+
+			gv.MarginLeft = 5;
+			gv.Redraw (gv.Bounds);
+
+			Assert.DoesNotContain (new Point (5, -1), axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (5, 1),axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (5, 2), axis.DrawAxisLinePoints);
+						
+			Assert.Contains (new Point (5, 28), axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (5, 29), axis.DrawAxisLinePoints);
+			Assert.DoesNotContain (new Point (5, 30), axis.DrawAxisLinePoints);
+
+			Assert.InRange(axis.LabelPoints.Max(),0,29);
+			Assert.InRange(axis.LabelPoints.Min(),0,29);
+		}
+
+		#endregion
+
+
 		private class FakeHAxis : HorizontalAxis {
 
 			public List<Point> DrawAxisLinePoints = new List<Point> ();
+			public List<int> LabelPoints = new List<int>();
 
 			protected override void DrawAxisLine (GraphView graph, ConsoleDriver driver, int x, int y)
 			{
 				base.DrawAxisLine (graph, driver, x, y);
 				DrawAxisLinePoints.Add (new Point(x, y));
+			}
 
+			public override void DrawAxisLabel (GraphView graph, ConsoleDriver driver, int screenPosition, string text)
+			{
+				base.DrawAxisLabel (graph, driver, screenPosition, text);
+				LabelPoints.Add(screenPosition);
+			}
+		}
 
+		private class FakeVAxis : VerticalAxis {
+
+			public List<Point> DrawAxisLinePoints = new List<Point> ();
+			public List<int> LabelPoints = new List<int>();
+
+			protected override void DrawAxisLine (GraphView graph, ConsoleDriver driver, int x, int y)
+			{
+				base.DrawAxisLine (graph, driver, x, y);
+				DrawAxisLinePoints.Add (new Point(x, y));
+			}
+			public override void DrawAxisLabel (GraphView graph, ConsoleDriver driver, int screenPosition, string text)
+			{
+				base.DrawAxisLabel (graph, driver, screenPosition, text);
+				LabelPoints.Add(screenPosition);
 			}
 		}
 	}
