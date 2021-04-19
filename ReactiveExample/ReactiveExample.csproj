@@ -5,9 +5,9 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Pharmacist.MsBuild" Version="2.0.6" PrivateAssets="all" />
-        <PackageReference Include="Pharmacist.Common" Version="2.0.6" />
+        <PackageReference Include="Pharmacist.Common" Version="2.0.8" />
         <PackageReference Include="Terminal.Gui" Version="1.0.0-pre.*" />
         <PackageReference Include="ReactiveUI.Fody" Version="13.0.1" />
-        <PackageReference Include="ReactiveUI" Version="13.0.1" />
+        <PackageReference Include="ReactiveUI" Version="13.2.18" />
     </ItemGroup>
 </Project>
