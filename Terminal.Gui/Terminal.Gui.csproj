@@ -17,7 +17,30 @@
     <Summary>Application framework for creating modern console applications using .NET</Summary>
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
     <PackageReleaseNotes>
-      v1.0.0-beta.9
+      v1.0.0-RC.1
+      * Added Dependabot support and updated dependencies
+      * Renamed master branch to main
+      * Fixes #1211. Added support to TextView for word based operations Ctrl+Del and Ctrl+Backspace
+      * Fixes #1208. Now the selected text is overwritten if SelectedStart is greater than CursorPosition.
+      * Fixes #1206. NetDriver now print the selected text. Attribute struct now create a valid Value for the current driver. Insert key is detected by NetDriver.
+      * Fixes #1202. CheckBox now deals with a functional '_' underscore hotkey.
+      * Fixes #1199. Normalize views constructors and did some typo fixing.
+      * Fixes #1197. Prevents width negative value if added directly to the A
+      * Added Vertical Alignment and Text Direction + UICatalog Demo (thanks @jmprricone!)
+      * Fixes #1193. A non auto size default Button now preserves his width and thus the text alignment now work.
+      * Fixes #1187. Prevents WordBackward throwing an exception if point is greater than the text length
+      * Fixes #1185. Button click is only processed if there are no mouse mov
+      * Fixes #1183. ListView now return true on the handled keys
+      * Fixes #1179. TextView does not copy to the clipboard on deleting
+      * Fixes #1177. Now is possible to copy or cut on the TextView with the...
+      * Fixes #1175. demo.cs editor now implement "Copy", "Cut" and "Paste".
+      * Fixes #1173. TextField only need to handle a single line.
+      * Fixes #1171. Delete and Backspace now deletes the selected text
+      * Fixes #1167. Application.Run method with #DEBUG can be simplified.
+      * Fixes #1165. Changing the directory name label or the field name crashes
+      * Fixes #1159. Dialog must have a default button if none is provided.
+
+      v1.0.0-beta.11
       * NEW CONTROL: Tabview - thanks @tznind!
       * UI Catalog now shows correct Terminal.gui.dll version
       * Fixes #939 - README sample does not compile - thanks @buzzfrog!
