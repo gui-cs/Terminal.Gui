@@ -24,7 +24,7 @@ Contains all files required to build the **Terminal.Gui** library (and nuget pac
 
 Version info for Terminal.Gui is managed by MinVer (https://github.com/adamralph/minver).
 
-The version is determined from the latest `git tag`. 
+The project version (the nuget package and in `Terminal.Gui.dlls`) is determined from the latest `git tag`. 
 
 The format of version numbers is `vmajor.minor.patch.build.height` and follows the [Semantic Versioning](https://semver.org/) rules.
 
@@ -37,11 +37,11 @@ dotnet build -c Release
 
 If the current commit does not have a version tag, another number is added to the pre-release identifiers. This is the number of commits since the latest commit with a version tag or, if no commits have a version tag, since the root commit. This is known as "height". For example, if the latest version tag found is 1.0.0-beta.1, at a height of 42 commits, the calculated version is 1.0.0-beta.1.42.
 
-You can see the version in the `UICatalog` about box:
+You can see the version in the `UICatalog` about box or by viewing the "Details" page of the file properties of `/Terminal.Gui/bin/Release/net5.0/Terminal.Gui.dll.
 
 ![About Box](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/about.png)
 
-Or, by viewing the "Details" page of the file properties of `/Terminal.Gui/bin/Release/net5.0/Terminal.Gui.dll.
+## Publishing a Release of Terminal.Gui
 
 To release a new version (e.g. with a higher `major`, `minor`, or `patch` value) tag a commit using `git tag` and then push that tag directly to the upstream repo:
 
