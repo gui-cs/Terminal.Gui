@@ -26,11 +26,24 @@ Version info for Terminal.Gui is managed by MinVer (https://github.com/adamralph
 
 The version is determined from the latest `git tag`. 
 
-Thus rebuilding the project will cause the `height` part of the version to increment. You can see the version in the `UICatalog` about box:
+The format of version numbers is `vmajor.minor.patch.build.height` and follows the [Semantic Versioning](https://semver.org/) rules.
 
+To define a new version (e.g. with a higher `major`, `minor`, `patch`, or `build` value) tag a commit using `git tag`:
 
+```powershell
+git tag v1.3.4-beta.5 -a -m "v1.3.4 Beta 5"
+dotnet build -c Release
+``
 
-To release a new version tag a commit using `git tag`, then push that tag directly to the upstream repo:
+If the current commit does not have a version tag, another number is added to the pre-release identifiers. This is the number of commits since the latest commit with a version tag or, if no commits have a version tag, since the root commit. This is known as "height". For example, if the latest version tag found is 1.0.0-beta.1, at a height of 42 commits, the calculated version is 1.0.0-beta.1.42.
+
+You can see the version in the `UICatalog` about box:
+
+![About Box](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/about.png)
+
+Or, by viewing the "Details" page of the file properties of `/Terminal.Gui/bin/Release/net5.0/Terminal.Gui.dll.
+
+To release a new version (e.g. with a higher `major`, `minor`, or `patch` value) tag a commit using `git tag` and then push that tag directly to the upstream repo:
 
 ```powershell
 git tag vmajor.minor.patch.build.height -a -m "Descriptive comment about release"
