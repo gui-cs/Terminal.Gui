@@ -1142,10 +1142,18 @@ namespace Terminal.Gui.Graphs {
 			graph.Move (0, 0);
 
 			var y = GetAxisYPosition (graph);
-			var xStart = 0;
 
+			// start the x axis at left of screen (either 0 or margin)
+			var xStart = (int)graph.MarginLeft;
+
+			// but if the x axis has a minmum (minimum is in graph space units)
 			if (Minimum.HasValue) {
-				xStart = graph.GraphSpaceToScreen (new PointF (Minimum.Value, y)).X;
+
+				// start at the screen location of the minimum
+				var minimumScreenX = graph.GraphSpaceToScreen (new PointF (Minimum.Value, y)).X;
+
+				// unless that is off the screen to the left
+				xStart = Math.Max(xStart,minimumScreenX);
 			}
 
 			for (int i = xStart; i < bounds.Width; i++) {

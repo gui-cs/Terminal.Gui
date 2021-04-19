@@ -433,8 +433,7 @@ namespace UnitTests {
 			driver.Init (() => { });
 		}
 
-		[Fact]
-		public void TestHAxis_NoMargin()
+		private GraphView GetGraph (out FakeHAxis axis)
 		{
 			InitFakeDriver ();
 
@@ -444,14 +443,65 @@ namespace UnitTests {
 			// graph can't be completely empty or it won't draw
 			gv.Series.Add (new ScatterSeries ());
 
-			var axis = new FakeHAxis ();
+			axis = new FakeHAxis ();
 			gv.AxisX = axis;
+
+			return gv;
+		}
+
+		/// <summary>
+		/// Tests that the horizontal axis is computed correctly and does not over spill
+		/// it's bounds
+		/// </summary>
+		[Fact]
+		public void TestHAxisLocation_NoMargin ()
+		{
+			var gv = GetGraph (out FakeHAxis axis);
 
 			gv.Redraw (gv.Bounds);
 
+			Assert.DoesNotContain (new Point (-1, 29), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (0, 29),axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (1, 29), axis.DrawAxisLinePoints);
+						
+			Assert.Contains (new Point (48, 29), axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (49, 29), axis.DrawAxisLinePoints);
+			Assert.DoesNotContain (new Point (50, 29), axis.DrawAxisLinePoints);
 		}
 
+		[Fact]
+		public void TestHAxisLocation_MarginBottom ()
+		{
+			var gv = GetGraph (out FakeHAxis axis);
+
+			gv.MarginBottom = 10;
+			gv.Redraw (gv.Bounds);
+
+			Assert.DoesNotContain (new Point (-1, 19), axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (0, 19), axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (1, 19), axis.DrawAxisLinePoints);
+
+			Assert.Contains (new Point (48, 19), axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (49, 19), axis.DrawAxisLinePoints);
+			Assert.DoesNotContain (new Point (50, 19), axis.DrawAxisLinePoints);
+		}
+
+		[Fact]
+		public void TestHAxisLocation_MarginLeft ()
+		{
+			var gv = GetGraph (out FakeHAxis axis);
+
+			gv.MarginLeft = 5;
+			gv.Redraw (gv.Bounds);
+
+			Assert.DoesNotContain (new Point (4, 29), axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (5, 29), axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (6, 29), axis.DrawAxisLinePoints);
+
+			Assert.Contains (new Point (48, 29), axis.DrawAxisLinePoints);
+			Assert.Contains (new Point (49, 29), axis.DrawAxisLinePoints);
+			Assert.DoesNotContain (new Point (50, 29), axis.DrawAxisLinePoints);
+		}
 		private class FakeHAxis : HorizontalAxis {
 
 			public List<Point> DrawAxisLinePoints = new List<Point> ();
