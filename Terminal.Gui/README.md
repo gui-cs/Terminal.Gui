@@ -24,31 +24,35 @@ Contains all files required to build the **Terminal.Gui** library (and nuget pac
 
 Version info for Terminal.Gui is managed by MinVer (https://github.com/adamralph/minver).
 
-To release a new version simply tag a commit
+The version is determined from the latest `git tag`. 
+
+Thus rebuilding the project will cause the `height` part of the version to increment. You can see the version in the `UICatalog` about box:
+
+
+
+To release a new version tag a commit using `git tag`, then push that tag directly to the upstream repo:
 
 ```powershell
-git tag vmajor.minor.patch.build.height -a
-git push upstream origin vmajor.minor.patch.build.height
+git tag vmajor.minor.patch.build.height -a -m "Descriptive comment about release"
+git push upstream vmajor.minor.patch.build.height
 
 ```      
 
-`patch` can indicate pre-release or not
+`patch` can indicate pre-release or not (e.g. `pre`, `beta`, `rc`, etc...). 
 
-e.g: 
+For example, to launch v1.3.4-beta.5 as a Pre-Release nuget package, do the following:
        
 ```powershell
-git tag v1.3.4-beta.5 -a
+git tag v1.3.4-beta.5 -a -m "v1.3.4 Beta 5"
 git push upstream v1.3.4-beta.5
 ```
 
-    or
+To launch version 2.3.4.5 as a Release nuget package do this:
        
 ```powershell
-git tag v2.3.4.5 -a
+git tag v2.3.4.5 -a -m "v2.3.4.5 Release"
 git push upstream v2.3.4.5
 ```       
-
-Then rebuild the project and the version info will be updated.
 
 ## Nuget
 
