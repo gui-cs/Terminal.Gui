@@ -19,7 +19,7 @@
   
   <PropertyGroup>
     <!-- See Terminal.Gui/README.md for how version numbering works -->
-    <!-- This enables prefixing version tags with v, e.g. v1.0.0.0. Instead of 1.0.0.0 -->
+    <!-- This enables prefixing version tags with v, e.g. v1.0.0 Instead of 1.0.0 -->
     <MinVerTagPrefix>v</MinVerTagPrefix>
 
     <TargetFrameworks>net472;netstandard2.0;net5.0</TargetFrameworks>

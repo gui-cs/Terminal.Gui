@@ -46,8 +46,8 @@ You can see the version in the `UICatalog` about box or by viewing the "Details"
 To release a new version (e.g. with a higher `major`, `minor`, or `patch` value) tag a commit using `git tag` and then push that tag directly to the upstream repo:
 
 ```powershell
-git tag vmajor.minor.patch.build.height -a -m "Descriptive comment about release"
-git push upstream vmajor.minor.patch.build.height
+git tag vmajor.minor.patch.build -a -m "Descriptive comment about release"
+git push upstream vmajor.minor.patch.build
 
 ```      
 
@@ -60,11 +60,11 @@ git tag v1.3.4-beta.5 -a -m "v1.3.4 Beta 5"
 git push upstream v1.3.4-beta.5
 ```
 
-To launch version 2.3.4.5 as a Release nuget package do this:
+To launch version 2.3.4 as a Release nuget package do this:
        
 ```powershell
-git tag v2.3.4.5 -a -m "v2.3.4.5 Release"
-git push upstream v2.3.4.5
+git tag v2.3.4 -a -m "v2.3.4 Release"
+git push upstream v2.3.4
 ```       
 
 ## Nuget
