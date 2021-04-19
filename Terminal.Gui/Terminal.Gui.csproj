@@ -1,4 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <!-- See Terminal.Gui/README.md for how version numbering works -->
+  <PropertyGroup>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+  </PropertyGroup>
   <PropertyGroup>
     <TargetFrameworks>net472;netstandard2.0;net5.0</TargetFrameworks>
     <RootNamespace>Terminal.Gui</RootNamespace>
@@ -237,11 +241,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>  
   </ItemGroup>
-
-  <!-- See Terminal.Gui/README.md for how version numbering works -->
-  <PropertyGroup>
-    <MinVerTagPrefix>v</MinVerTagPrefix>
-  </PropertyGroup>
   
   <ItemGroup>
     <None Remove="ConsoleDrivers\#ConsoleDriver.cs#" />
