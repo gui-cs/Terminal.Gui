@@ -402,6 +402,12 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AutoSize">View.AutoSize</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VerticalTextAlignment">View.VerticalTextAlignment</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextDirection">View.TextDirection</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
     </div>
     <div>
@@ -436,6 +442,12 @@ Base class for the <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialo
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetHeight_System_Int32_System_Int32__">View.SetHeight(Int32, Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentWidth_System_Int32__">View.GetCurrentWidth(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -482,6 +494,45 @@ Initializes a new <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog
   
   
   <a id="Terminal_Gui_FileDialog__ctor_" data-uid="Terminal.Gui.FileDialog.#ctor*"></a>
+  <h4 id="Terminal_Gui_FileDialog__ctor_NStack_ustring_NStack_ustring_NStack_ustring_" data-uid="Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring)">FileDialog(ustring, ustring, ustring)</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FileDialog(ustring title, ustring prompt, ustring message)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">title</span></td>
+        <td>The title.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">prompt</span></td>
+        <td>The prompt.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">message</span></td>
+        <td>The message.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_FileDialog__ctor_" data-uid="Terminal.Gui.FileDialog.#ctor*"></a>
   <h4 id="Terminal_Gui_FileDialog__ctor_NStack_ustring_NStack_ustring_NStack_ustring_NStack_ustring_" data-uid="Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring)">FileDialog(ustring, ustring, ustring, ustring)</h4>
   <div class="markdown level1 summary">
 Initializes a new instance of <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a>
@@ -514,7 +565,56 @@ Initializes a new instance of <a class="xref" href="Terminal.Gui.FileDialog.html
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
         <td><span class="parametername">nameFieldLabel</span></td>
-        <td>The name field label.</td>
+        <td>The name of the file field label..</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">message</span></td>
+        <td>The message.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_FileDialog__ctor_" data-uid="Terminal.Gui.FileDialog.#ctor*"></a>
+  <h4 id="Terminal_Gui_FileDialog__ctor_NStack_ustring_NStack_ustring_NStack_ustring_NStack_ustring_NStack_ustring_" data-uid="Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring)">FileDialog(ustring, ustring, ustring, ustring, ustring)</h4>
+  <div class="markdown level1 summary">
+Initializes a new instance of <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FileDialog(ustring title, ustring prompt, ustring nameDirLabel, ustring nameFieldLabel, ustring message)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">title</span></td>
+        <td>The title.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">prompt</span></td>
+        <td>The prompt.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">nameDirLabel</span></td>
+        <td>The name of the directory field label.</td>
+      </tr>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td><span class="parametername">nameFieldLabel</span></td>
+        <td>The name of the file field label..</td>
       </tr>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
@@ -743,6 +843,33 @@ Gets or sets the message displayed to the user, defaults to nothing
   </table>
   
   
+  <a id="Terminal_Gui_FileDialog_NameDirLabel_" data-uid="Terminal.Gui.FileDialog.NameDirLabel*"></a>
+  <h4 id="Terminal_Gui_FileDialog_NameDirLabel" data-uid="Terminal.Gui.FileDialog.NameDirLabel">NameDirLabel</h4>
+  <div class="markdown level1 summary">
+Gets or sets the name of the directory field label.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ustring NameDirLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">NStack.ustring</span></td>
+        <td>The name of the directory field label.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="Terminal_Gui_FileDialog_NameFieldLabel_" data-uid="Terminal.Gui.FileDialog.NameFieldLabel*"></a>
   <h4 id="Terminal_Gui_FileDialog_NameFieldLabel" data-uid="Terminal.Gui.FileDialog.NameFieldLabel">NameFieldLabel</h4>
   <div class="markdown level1 summary">
@@ -801,7 +928,10 @@ Gets or sets the prompt label for the <a class="xref" href="Terminal.Gui.Button.
   
   <a id="Terminal_Gui_FileDialog_WillPresent_" data-uid="Terminal.Gui.FileDialog.WillPresent*"></a>
   <h4 id="Terminal_Gui_FileDialog_WillPresent" data-uid="Terminal.Gui.FileDialog.WillPresent">WillPresent()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Invoked by <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Begin_Terminal_Gui_Toplevel_">Begin(Toplevel)</a> as part of the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Run_Terminal_Gui_Toplevel_System_Func_System_Exception_System_Boolean__">Run(Toplevel, Func&lt;Exception, Boolean&gt;)</a> after
+the views have been laid out, and before the views are drawn for the first time.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">

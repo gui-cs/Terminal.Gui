@@ -776,6 +776,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.CheckBox.PositionCursor
   nameWithType: CheckBox.PositionCursor
+- uid: Terminal.Gui.CheckBox.ProcessHotKey(Terminal.Gui.KeyEvent)
+  name: ProcessHotKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox_ProcessHotKey_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.CheckBox.ProcessHotKey(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.CheckBox.ProcessHotKey(Terminal.Gui.KeyEvent)
+  nameWithType: CheckBox.ProcessHotKey(KeyEvent)
+- uid: Terminal.Gui.CheckBox.ProcessHotKey*
+  name: ProcessHotKey
+  href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox_ProcessHotKey_
+  commentId: Overload:Terminal.Gui.CheckBox.ProcessHotKey
+  isSpec: "True"
+  fullName: Terminal.Gui.CheckBox.ProcessHotKey
+  nameWithType: CheckBox.ProcessHotKey
 - uid: Terminal.Gui.CheckBox.ProcessKey(Terminal.Gui.KeyEvent)
   name: ProcessKey(KeyEvent)
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox_ProcessKey_Terminal_Gui_KeyEvent_
@@ -3937,12 +3950,24 @@ references:
   commentId: M:Terminal.Gui.FileDialog.#ctor
   fullName: Terminal.Gui.FileDialog.FileDialog()
   nameWithType: FileDialog.FileDialog()
+- uid: Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring)
+  name: FileDialog(ustring, ustring, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog__ctor_NStack_ustring_NStack_ustring_NStack_ustring_
+  commentId: M:Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring)
+  fullName: Terminal.Gui.FileDialog.FileDialog(NStack.ustring, NStack.ustring, NStack.ustring)
+  nameWithType: FileDialog.FileDialog(ustring, ustring, ustring)
 - uid: Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring)
   name: FileDialog(ustring, ustring, ustring, ustring)
   href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog__ctor_NStack_ustring_NStack_ustring_NStack_ustring_NStack_ustring_
   commentId: M:Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring)
   fullName: Terminal.Gui.FileDialog.FileDialog(NStack.ustring, NStack.ustring, NStack.ustring, NStack.ustring)
   nameWithType: FileDialog.FileDialog(ustring, ustring, ustring, ustring)
+- uid: Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring)
+  name: FileDialog(ustring, ustring, ustring, ustring, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog__ctor_NStack_ustring_NStack_ustring_NStack_ustring_NStack_ustring_NStack_ustring_
+  commentId: M:Terminal.Gui.FileDialog.#ctor(NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring,NStack.ustring)
+  fullName: Terminal.Gui.FileDialog.FileDialog(NStack.ustring, NStack.ustring, NStack.ustring, NStack.ustring, NStack.ustring)
+  nameWithType: FileDialog.FileDialog(ustring, ustring, ustring, ustring, ustring)
 - uid: Terminal.Gui.FileDialog.#ctor*
   name: FileDialog
   href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog__ctor_
@@ -4054,6 +4079,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.FileDialog.Message
   nameWithType: FileDialog.Message
+- uid: Terminal.Gui.FileDialog.NameDirLabel
+  name: NameDirLabel
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_NameDirLabel
+  commentId: P:Terminal.Gui.FileDialog.NameDirLabel
+  fullName: Terminal.Gui.FileDialog.NameDirLabel
+  nameWithType: FileDialog.NameDirLabel
+- uid: Terminal.Gui.FileDialog.NameDirLabel*
+  name: NameDirLabel
+  href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_NameDirLabel_
+  commentId: Overload:Terminal.Gui.FileDialog.NameDirLabel
+  isSpec: "True"
+  fullName: Terminal.Gui.FileDialog.NameDirLabel
+  nameWithType: FileDialog.NameDirLabel
 - uid: Terminal.Gui.FileDialog.NameFieldLabel
   name: NameFieldLabel
   href: api/Terminal.Gui/Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_NameFieldLabel
@@ -6747,6 +6785,15 @@ references:
   fullName.vb: Terminal.Gui.MessageBox.ErrorQuery(NStack.ustring, NStack.ustring, NStack.ustring())
   nameWithType: MessageBox.ErrorQuery(ustring, ustring, ustring[])
   nameWithType.vb: MessageBox.ErrorQuery(ustring, ustring, ustring())
+- uid: Terminal.Gui.MessageBox.ErrorQuery(NStack.ustring,NStack.ustring,System.Int32,NStack.ustring[])
+  name: ErrorQuery(ustring, ustring, Int32, ustring[])
+  href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_ErrorQuery_NStack_ustring_NStack_ustring_System_Int32_NStack_ustring___
+  commentId: M:Terminal.Gui.MessageBox.ErrorQuery(NStack.ustring,NStack.ustring,System.Int32,NStack.ustring[])
+  name.vb: ErrorQuery(ustring, ustring, Int32, ustring())
+  fullName: Terminal.Gui.MessageBox.ErrorQuery(NStack.ustring, NStack.ustring, System.Int32, NStack.ustring[])
+  fullName.vb: Terminal.Gui.MessageBox.ErrorQuery(NStack.ustring, NStack.ustring, System.Int32, NStack.ustring())
+  nameWithType: MessageBox.ErrorQuery(ustring, ustring, Int32, ustring[])
+  nameWithType.vb: MessageBox.ErrorQuery(ustring, ustring, Int32, ustring())
 - uid: Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,NStack.ustring,NStack.ustring,NStack.ustring[])
   name: ErrorQuery(Int32, Int32, ustring, ustring, ustring[])
   href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_ErrorQuery_System_Int32_System_Int32_NStack_ustring_NStack_ustring_NStack_ustring___
@@ -6756,6 +6803,15 @@ references:
   fullName.vb: Terminal.Gui.MessageBox.ErrorQuery(System.Int32, System.Int32, NStack.ustring, NStack.ustring, NStack.ustring())
   nameWithType: MessageBox.ErrorQuery(Int32, Int32, ustring, ustring, ustring[])
   nameWithType.vb: MessageBox.ErrorQuery(Int32, Int32, ustring, ustring, ustring())
+- uid: Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,NStack.ustring,NStack.ustring,System.Int32,NStack.ustring[])
+  name: ErrorQuery(Int32, Int32, ustring, ustring, Int32, ustring[])
+  href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_ErrorQuery_System_Int32_System_Int32_NStack_ustring_NStack_ustring_System_Int32_NStack_ustring___
+  commentId: M:Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,NStack.ustring,NStack.ustring,System.Int32,NStack.ustring[])
+  name.vb: ErrorQuery(Int32, Int32, ustring, ustring, Int32, ustring())
+  fullName: Terminal.Gui.MessageBox.ErrorQuery(System.Int32, System.Int32, NStack.ustring, NStack.ustring, System.Int32, NStack.ustring[])
+  fullName.vb: Terminal.Gui.MessageBox.ErrorQuery(System.Int32, System.Int32, NStack.ustring, NStack.ustring, System.Int32, NStack.ustring())
+  nameWithType: MessageBox.ErrorQuery(Int32, Int32, ustring, ustring, Int32, ustring[])
+  nameWithType.vb: MessageBox.ErrorQuery(Int32, Int32, ustring, ustring, Int32, ustring())
 - uid: Terminal.Gui.MessageBox.ErrorQuery*
   name: ErrorQuery
   href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_ErrorQuery_
@@ -6772,6 +6828,15 @@ references:
   fullName.vb: Terminal.Gui.MessageBox.Query(NStack.ustring, NStack.ustring, NStack.ustring())
   nameWithType: MessageBox.Query(ustring, ustring, ustring[])
   nameWithType.vb: MessageBox.Query(ustring, ustring, ustring())
+- uid: Terminal.Gui.MessageBox.Query(NStack.ustring,NStack.ustring,System.Int32,NStack.ustring[])
+  name: Query(ustring, ustring, Int32, ustring[])
+  href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_Query_NStack_ustring_NStack_ustring_System_Int32_NStack_ustring___
+  commentId: M:Terminal.Gui.MessageBox.Query(NStack.ustring,NStack.ustring,System.Int32,NStack.ustring[])
+  name.vb: Query(ustring, ustring, Int32, ustring())
+  fullName: Terminal.Gui.MessageBox.Query(NStack.ustring, NStack.ustring, System.Int32, NStack.ustring[])
+  fullName.vb: Terminal.Gui.MessageBox.Query(NStack.ustring, NStack.ustring, System.Int32, NStack.ustring())
+  nameWithType: MessageBox.Query(ustring, ustring, Int32, ustring[])
+  nameWithType.vb: MessageBox.Query(ustring, ustring, Int32, ustring())
 - uid: Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,NStack.ustring,NStack.ustring,NStack.ustring[])
   name: Query(Int32, Int32, ustring, ustring, ustring[])
   href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_Query_System_Int32_System_Int32_NStack_ustring_NStack_ustring_NStack_ustring___
@@ -6781,6 +6846,15 @@ references:
   fullName.vb: Terminal.Gui.MessageBox.Query(System.Int32, System.Int32, NStack.ustring, NStack.ustring, NStack.ustring())
   nameWithType: MessageBox.Query(Int32, Int32, ustring, ustring, ustring[])
   nameWithType.vb: MessageBox.Query(Int32, Int32, ustring, ustring, ustring())
+- uid: Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,NStack.ustring,NStack.ustring,System.Int32,NStack.ustring[])
+  name: Query(Int32, Int32, ustring, ustring, Int32, ustring[])
+  href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_Query_System_Int32_System_Int32_NStack_ustring_NStack_ustring_System_Int32_NStack_ustring___
+  commentId: M:Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,NStack.ustring,NStack.ustring,System.Int32,NStack.ustring[])
+  name.vb: Query(Int32, Int32, ustring, ustring, Int32, ustring())
+  fullName: Terminal.Gui.MessageBox.Query(System.Int32, System.Int32, NStack.ustring, NStack.ustring, System.Int32, NStack.ustring[])
+  fullName.vb: Terminal.Gui.MessageBox.Query(System.Int32, System.Int32, NStack.ustring, NStack.ustring, System.Int32, NStack.ustring())
+  nameWithType: MessageBox.Query(Int32, Int32, ustring, ustring, Int32, ustring[])
+  nameWithType.vb: MessageBox.Query(Int32, Int32, ustring, ustring, Int32, ustring())
 - uid: Terminal.Gui.MessageBox.Query*
   name: Query
   href: api/Terminal.Gui/Terminal.Gui.MessageBox.html#Terminal_Gui_MessageBox_Query_
@@ -9615,6 +9689,102 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.StatusItem.Title
   nameWithType: StatusItem.Title
+- uid: Terminal.Gui.Tab
+  name: Tab
+  href: api/Terminal.Gui/Terminal.Gui.Tab.html
+  commentId: T:Terminal.Gui.Tab
+  fullName: Terminal.Gui.Tab
+  nameWithType: Tab
+- uid: Terminal.Gui.Tab.#ctor
+  name: Tab()
+  href: api/Terminal.Gui/Terminal.Gui.Tab.html#Terminal_Gui_Tab__ctor
+  commentId: M:Terminal.Gui.Tab.#ctor
+  fullName: Terminal.Gui.Tab.Tab()
+  nameWithType: Tab.Tab()
+- uid: Terminal.Gui.Tab.#ctor(System.String,Terminal.Gui.View)
+  name: Tab(String, View)
+  href: api/Terminal.Gui/Terminal.Gui.Tab.html#Terminal_Gui_Tab__ctor_System_String_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.Tab.#ctor(System.String,Terminal.Gui.View)
+  fullName: Terminal.Gui.Tab.Tab(System.String, Terminal.Gui.View)
+  nameWithType: Tab.Tab(String, View)
+- uid: Terminal.Gui.Tab.#ctor*
+  name: Tab
+  href: api/Terminal.Gui/Terminal.Gui.Tab.html#Terminal_Gui_Tab__ctor_
+  commentId: Overload:Terminal.Gui.Tab.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.Tab.Tab
+  nameWithType: Tab.Tab
+- uid: Terminal.Gui.Tab.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.Tab.html#Terminal_Gui_Tab_Text
+  commentId: P:Terminal.Gui.Tab.Text
+  fullName: Terminal.Gui.Tab.Text
+  nameWithType: Tab.Text
+- uid: Terminal.Gui.Tab.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.Tab.html#Terminal_Gui_Tab_Text_
+  commentId: Overload:Terminal.Gui.Tab.Text
+  isSpec: "True"
+  fullName: Terminal.Gui.Tab.Text
+  nameWithType: Tab.Text
+- uid: Terminal.Gui.Tab.View
+  name: View
+  href: api/Terminal.Gui/Terminal.Gui.Tab.html#Terminal_Gui_Tab_View
+  commentId: P:Terminal.Gui.Tab.View
+  fullName: Terminal.Gui.Tab.View
+  nameWithType: Tab.View
+- uid: Terminal.Gui.Tab.View*
+  name: View
+  href: api/Terminal.Gui/Terminal.Gui.Tab.html#Terminal_Gui_Tab_View_
+  commentId: Overload:Terminal.Gui.Tab.View
+  isSpec: "True"
+  fullName: Terminal.Gui.Tab.View
+  nameWithType: Tab.View
+- uid: Terminal.Gui.TabChangedEventArgs
+  name: TabChangedEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.TabChangedEventArgs.html
+  commentId: T:Terminal.Gui.TabChangedEventArgs
+  fullName: Terminal.Gui.TabChangedEventArgs
+  nameWithType: TabChangedEventArgs
+- uid: Terminal.Gui.TabChangedEventArgs.#ctor(Terminal.Gui.Tab,Terminal.Gui.Tab)
+  name: TabChangedEventArgs(Tab, Tab)
+  href: api/Terminal.Gui/Terminal.Gui.TabChangedEventArgs.html#Terminal_Gui_TabChangedEventArgs__ctor_Terminal_Gui_Tab_Terminal_Gui_Tab_
+  commentId: M:Terminal.Gui.TabChangedEventArgs.#ctor(Terminal.Gui.Tab,Terminal.Gui.Tab)
+  fullName: Terminal.Gui.TabChangedEventArgs.TabChangedEventArgs(Terminal.Gui.Tab, Terminal.Gui.Tab)
+  nameWithType: TabChangedEventArgs.TabChangedEventArgs(Tab, Tab)
+- uid: Terminal.Gui.TabChangedEventArgs.#ctor*
+  name: TabChangedEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.TabChangedEventArgs.html#Terminal_Gui_TabChangedEventArgs__ctor_
+  commentId: Overload:Terminal.Gui.TabChangedEventArgs.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.TabChangedEventArgs.TabChangedEventArgs
+  nameWithType: TabChangedEventArgs.TabChangedEventArgs
+- uid: Terminal.Gui.TabChangedEventArgs.NewTab
+  name: NewTab
+  href: api/Terminal.Gui/Terminal.Gui.TabChangedEventArgs.html#Terminal_Gui_TabChangedEventArgs_NewTab
+  commentId: P:Terminal.Gui.TabChangedEventArgs.NewTab
+  fullName: Terminal.Gui.TabChangedEventArgs.NewTab
+  nameWithType: TabChangedEventArgs.NewTab
+- uid: Terminal.Gui.TabChangedEventArgs.NewTab*
+  name: NewTab
+  href: api/Terminal.Gui/Terminal.Gui.TabChangedEventArgs.html#Terminal_Gui_TabChangedEventArgs_NewTab_
+  commentId: Overload:Terminal.Gui.TabChangedEventArgs.NewTab
+  isSpec: "True"
+  fullName: Terminal.Gui.TabChangedEventArgs.NewTab
+  nameWithType: TabChangedEventArgs.NewTab
+- uid: Terminal.Gui.TabChangedEventArgs.OldTab
+  name: OldTab
+  href: api/Terminal.Gui/Terminal.Gui.TabChangedEventArgs.html#Terminal_Gui_TabChangedEventArgs_OldTab
+  commentId: P:Terminal.Gui.TabChangedEventArgs.OldTab
+  fullName: Terminal.Gui.TabChangedEventArgs.OldTab
+  nameWithType: TabChangedEventArgs.OldTab
+- uid: Terminal.Gui.TabChangedEventArgs.OldTab*
+  name: OldTab
+  href: api/Terminal.Gui/Terminal.Gui.TabChangedEventArgs.html#Terminal_Gui_TabChangedEventArgs_OldTab_
+  commentId: Overload:Terminal.Gui.TabChangedEventArgs.OldTab
+  isSpec: "True"
+  fullName: Terminal.Gui.TabChangedEventArgs.OldTab
+  nameWithType: TabChangedEventArgs.OldTab
 - uid: Terminal.Gui.TableSelection
   name: TableSelection
   href: api/Terminal.Gui/Terminal.Gui.TableSelection.html
@@ -10203,6 +10373,277 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TableView.Update
   nameWithType: TableView.Update
+- uid: Terminal.Gui.TabStyle
+  name: TabStyle
+  href: api/Terminal.Gui/Terminal.Gui.TabStyle.html
+  commentId: T:Terminal.Gui.TabStyle
+  fullName: Terminal.Gui.TabStyle
+  nameWithType: TabStyle
+- uid: Terminal.Gui.TabStyle.ShowBorder
+  name: ShowBorder
+  href: api/Terminal.Gui/Terminal.Gui.TabStyle.html#Terminal_Gui_TabStyle_ShowBorder
+  commentId: P:Terminal.Gui.TabStyle.ShowBorder
+  fullName: Terminal.Gui.TabStyle.ShowBorder
+  nameWithType: TabStyle.ShowBorder
+- uid: Terminal.Gui.TabStyle.ShowBorder*
+  name: ShowBorder
+  href: api/Terminal.Gui/Terminal.Gui.TabStyle.html#Terminal_Gui_TabStyle_ShowBorder_
+  commentId: Overload:Terminal.Gui.TabStyle.ShowBorder
+  isSpec: "True"
+  fullName: Terminal.Gui.TabStyle.ShowBorder
+  nameWithType: TabStyle.ShowBorder
+- uid: Terminal.Gui.TabStyle.ShowTopLine
+  name: ShowTopLine
+  href: api/Terminal.Gui/Terminal.Gui.TabStyle.html#Terminal_Gui_TabStyle_ShowTopLine
+  commentId: P:Terminal.Gui.TabStyle.ShowTopLine
+  fullName: Terminal.Gui.TabStyle.ShowTopLine
+  nameWithType: TabStyle.ShowTopLine
+- uid: Terminal.Gui.TabStyle.ShowTopLine*
+  name: ShowTopLine
+  href: api/Terminal.Gui/Terminal.Gui.TabStyle.html#Terminal_Gui_TabStyle_ShowTopLine_
+  commentId: Overload:Terminal.Gui.TabStyle.ShowTopLine
+  isSpec: "True"
+  fullName: Terminal.Gui.TabStyle.ShowTopLine
+  nameWithType: TabStyle.ShowTopLine
+- uid: Terminal.Gui.TabStyle.TabsOnBottom
+  name: TabsOnBottom
+  href: api/Terminal.Gui/Terminal.Gui.TabStyle.html#Terminal_Gui_TabStyle_TabsOnBottom
+  commentId: P:Terminal.Gui.TabStyle.TabsOnBottom
+  fullName: Terminal.Gui.TabStyle.TabsOnBottom
+  nameWithType: TabStyle.TabsOnBottom
+- uid: Terminal.Gui.TabStyle.TabsOnBottom*
+  name: TabsOnBottom
+  href: api/Terminal.Gui/Terminal.Gui.TabStyle.html#Terminal_Gui_TabStyle_TabsOnBottom_
+  commentId: Overload:Terminal.Gui.TabStyle.TabsOnBottom
+  isSpec: "True"
+  fullName: Terminal.Gui.TabStyle.TabsOnBottom
+  nameWithType: TabStyle.TabsOnBottom
+- uid: Terminal.Gui.TabView
+  name: TabView
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html
+  commentId: T:Terminal.Gui.TabView
+  fullName: Terminal.Gui.TabView
+  nameWithType: TabView
+- uid: Terminal.Gui.TabView.#ctor
+  name: TabView()
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView__ctor
+  commentId: M:Terminal.Gui.TabView.#ctor
+  fullName: Terminal.Gui.TabView.TabView()
+  nameWithType: TabView.TabView()
+- uid: Terminal.Gui.TabView.#ctor*
+  name: TabView
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView__ctor_
+  commentId: Overload:Terminal.Gui.TabView.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.TabView
+  nameWithType: TabView.TabView
+- uid: Terminal.Gui.TabView.AddTab(Terminal.Gui.Tab,System.Boolean)
+  name: AddTab(Tab, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_AddTab_Terminal_Gui_Tab_System_Boolean_
+  commentId: M:Terminal.Gui.TabView.AddTab(Terminal.Gui.Tab,System.Boolean)
+  fullName: Terminal.Gui.TabView.AddTab(Terminal.Gui.Tab, System.Boolean)
+  nameWithType: TabView.AddTab(Tab, Boolean)
+- uid: Terminal.Gui.TabView.AddTab*
+  name: AddTab
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_AddTab_
+  commentId: Overload:Terminal.Gui.TabView.AddTab
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.AddTab
+  nameWithType: TabView.AddTab
+- uid: Terminal.Gui.TabView.ApplyStyleChanges
+  name: ApplyStyleChanges()
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_ApplyStyleChanges
+  commentId: M:Terminal.Gui.TabView.ApplyStyleChanges
+  fullName: Terminal.Gui.TabView.ApplyStyleChanges()
+  nameWithType: TabView.ApplyStyleChanges()
+- uid: Terminal.Gui.TabView.ApplyStyleChanges*
+  name: ApplyStyleChanges
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_ApplyStyleChanges_
+  commentId: Overload:Terminal.Gui.TabView.ApplyStyleChanges
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.ApplyStyleChanges
+  nameWithType: TabView.ApplyStyleChanges
+- uid: Terminal.Gui.TabView.DefaultMaxTabTextWidth
+  name: DefaultMaxTabTextWidth
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_DefaultMaxTabTextWidth
+  commentId: F:Terminal.Gui.TabView.DefaultMaxTabTextWidth
+  fullName: Terminal.Gui.TabView.DefaultMaxTabTextWidth
+  nameWithType: TabView.DefaultMaxTabTextWidth
+- uid: Terminal.Gui.TabView.Dispose(System.Boolean)
+  name: Dispose(Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_Dispose_System_Boolean_
+  commentId: M:Terminal.Gui.TabView.Dispose(System.Boolean)
+  fullName: Terminal.Gui.TabView.Dispose(System.Boolean)
+  nameWithType: TabView.Dispose(Boolean)
+- uid: Terminal.Gui.TabView.Dispose*
+  name: Dispose
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_Dispose_
+  commentId: Overload:Terminal.Gui.TabView.Dispose
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.Dispose
+  nameWithType: TabView.Dispose
+- uid: Terminal.Gui.TabView.EnsureSelectedTabIsVisible
+  name: EnsureSelectedTabIsVisible()
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_EnsureSelectedTabIsVisible
+  commentId: M:Terminal.Gui.TabView.EnsureSelectedTabIsVisible
+  fullName: Terminal.Gui.TabView.EnsureSelectedTabIsVisible()
+  nameWithType: TabView.EnsureSelectedTabIsVisible()
+- uid: Terminal.Gui.TabView.EnsureSelectedTabIsVisible*
+  name: EnsureSelectedTabIsVisible
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_EnsureSelectedTabIsVisible_
+  commentId: Overload:Terminal.Gui.TabView.EnsureSelectedTabIsVisible
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.EnsureSelectedTabIsVisible
+  nameWithType: TabView.EnsureSelectedTabIsVisible
+- uid: Terminal.Gui.TabView.EnsureValidScrollOffsets
+  name: EnsureValidScrollOffsets()
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_EnsureValidScrollOffsets
+  commentId: M:Terminal.Gui.TabView.EnsureValidScrollOffsets
+  fullName: Terminal.Gui.TabView.EnsureValidScrollOffsets()
+  nameWithType: TabView.EnsureValidScrollOffsets()
+- uid: Terminal.Gui.TabView.EnsureValidScrollOffsets*
+  name: EnsureValidScrollOffsets
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_EnsureValidScrollOffsets_
+  commentId: Overload:Terminal.Gui.TabView.EnsureValidScrollOffsets
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.EnsureValidScrollOffsets
+  nameWithType: TabView.EnsureValidScrollOffsets
+- uid: Terminal.Gui.TabView.MaxTabTextWidth
+  name: MaxTabTextWidth
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_MaxTabTextWidth
+  commentId: P:Terminal.Gui.TabView.MaxTabTextWidth
+  fullName: Terminal.Gui.TabView.MaxTabTextWidth
+  nameWithType: TabView.MaxTabTextWidth
+- uid: Terminal.Gui.TabView.MaxTabTextWidth*
+  name: MaxTabTextWidth
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_MaxTabTextWidth_
+  commentId: Overload:Terminal.Gui.TabView.MaxTabTextWidth
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.MaxTabTextWidth
+  nameWithType: TabView.MaxTabTextWidth
+- uid: Terminal.Gui.TabView.OnSelectedTabChanged(Terminal.Gui.Tab,Terminal.Gui.Tab)
+  name: OnSelectedTabChanged(Tab, Tab)
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_OnSelectedTabChanged_Terminal_Gui_Tab_Terminal_Gui_Tab_
+  commentId: M:Terminal.Gui.TabView.OnSelectedTabChanged(Terminal.Gui.Tab,Terminal.Gui.Tab)
+  fullName: Terminal.Gui.TabView.OnSelectedTabChanged(Terminal.Gui.Tab, Terminal.Gui.Tab)
+  nameWithType: TabView.OnSelectedTabChanged(Tab, Tab)
+- uid: Terminal.Gui.TabView.OnSelectedTabChanged*
+  name: OnSelectedTabChanged
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_OnSelectedTabChanged_
+  commentId: Overload:Terminal.Gui.TabView.OnSelectedTabChanged
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.OnSelectedTabChanged
+  nameWithType: TabView.OnSelectedTabChanged
+- uid: Terminal.Gui.TabView.ProcessKey(Terminal.Gui.KeyEvent)
+  name: ProcessKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_ProcessKey_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.TabView.ProcessKey(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.TabView.ProcessKey(Terminal.Gui.KeyEvent)
+  nameWithType: TabView.ProcessKey(KeyEvent)
+- uid: Terminal.Gui.TabView.ProcessKey*
+  name: ProcessKey
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_ProcessKey_
+  commentId: Overload:Terminal.Gui.TabView.ProcessKey
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.ProcessKey
+  nameWithType: TabView.ProcessKey
+- uid: Terminal.Gui.TabView.Redraw(Terminal.Gui.Rect)
+  name: Redraw(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_Redraw_Terminal_Gui_Rect_
+  commentId: M:Terminal.Gui.TabView.Redraw(Terminal.Gui.Rect)
+  fullName: Terminal.Gui.TabView.Redraw(Terminal.Gui.Rect)
+  nameWithType: TabView.Redraw(Rect)
+- uid: Terminal.Gui.TabView.Redraw*
+  name: Redraw
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_Redraw_
+  commentId: Overload:Terminal.Gui.TabView.Redraw
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.Redraw
+  nameWithType: TabView.Redraw
+- uid: Terminal.Gui.TabView.RemoveTab(Terminal.Gui.Tab)
+  name: RemoveTab(Tab)
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_RemoveTab_Terminal_Gui_Tab_
+  commentId: M:Terminal.Gui.TabView.RemoveTab(Terminal.Gui.Tab)
+  fullName: Terminal.Gui.TabView.RemoveTab(Terminal.Gui.Tab)
+  nameWithType: TabView.RemoveTab(Tab)
+- uid: Terminal.Gui.TabView.RemoveTab*
+  name: RemoveTab
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_RemoveTab_
+  commentId: Overload:Terminal.Gui.TabView.RemoveTab
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.RemoveTab
+  nameWithType: TabView.RemoveTab
+- uid: Terminal.Gui.TabView.SelectedTab
+  name: SelectedTab
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_SelectedTab
+  commentId: P:Terminal.Gui.TabView.SelectedTab
+  fullName: Terminal.Gui.TabView.SelectedTab
+  nameWithType: TabView.SelectedTab
+- uid: Terminal.Gui.TabView.SelectedTab*
+  name: SelectedTab
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_SelectedTab_
+  commentId: Overload:Terminal.Gui.TabView.SelectedTab
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.SelectedTab
+  nameWithType: TabView.SelectedTab
+- uid: Terminal.Gui.TabView.SelectedTabChanged
+  name: SelectedTabChanged
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_SelectedTabChanged
+  commentId: E:Terminal.Gui.TabView.SelectedTabChanged
+  fullName: Terminal.Gui.TabView.SelectedTabChanged
+  nameWithType: TabView.SelectedTabChanged
+- uid: Terminal.Gui.TabView.Style
+  name: Style
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_Style
+  commentId: P:Terminal.Gui.TabView.Style
+  fullName: Terminal.Gui.TabView.Style
+  nameWithType: TabView.Style
+- uid: Terminal.Gui.TabView.Style*
+  name: Style
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_Style_
+  commentId: Overload:Terminal.Gui.TabView.Style
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.Style
+  nameWithType: TabView.Style
+- uid: Terminal.Gui.TabView.SwitchTabBy(System.Int32)
+  name: SwitchTabBy(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_SwitchTabBy_System_Int32_
+  commentId: M:Terminal.Gui.TabView.SwitchTabBy(System.Int32)
+  fullName: Terminal.Gui.TabView.SwitchTabBy(System.Int32)
+  nameWithType: TabView.SwitchTabBy(Int32)
+- uid: Terminal.Gui.TabView.SwitchTabBy*
+  name: SwitchTabBy
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_SwitchTabBy_
+  commentId: Overload:Terminal.Gui.TabView.SwitchTabBy
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.SwitchTabBy
+  nameWithType: TabView.SwitchTabBy
+- uid: Terminal.Gui.TabView.Tabs
+  name: Tabs
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_Tabs
+  commentId: P:Terminal.Gui.TabView.Tabs
+  fullName: Terminal.Gui.TabView.Tabs
+  nameWithType: TabView.Tabs
+- uid: Terminal.Gui.TabView.Tabs*
+  name: Tabs
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_Tabs_
+  commentId: Overload:Terminal.Gui.TabView.Tabs
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.Tabs
+  nameWithType: TabView.Tabs
+- uid: Terminal.Gui.TabView.TabScrollOffset
+  name: TabScrollOffset
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_TabScrollOffset
+  commentId: P:Terminal.Gui.TabView.TabScrollOffset
+  fullName: Terminal.Gui.TabView.TabScrollOffset
+  nameWithType: TabView.TabScrollOffset
+- uid: Terminal.Gui.TabView.TabScrollOffset*
+  name: TabScrollOffset
+  href: api/Terminal.Gui/Terminal.Gui.TabView.html#Terminal_Gui_TabView_TabScrollOffset_
+  commentId: Overload:Terminal.Gui.TabView.TabScrollOffset
+  isSpec: "True"
+  fullName: Terminal.Gui.TabView.TabScrollOffset
+  nameWithType: TabView.TabScrollOffset
 - uid: Terminal.Gui.TextAlignment
   name: TextAlignment
   href: api/Terminal.Gui/Terminal.Gui.TextAlignment.html
@@ -10278,6 +10719,60 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextChangingEventArgs.NewText
   nameWithType: TextChangingEventArgs.NewText
+- uid: Terminal.Gui.TextDirection
+  name: TextDirection
+  href: api/Terminal.Gui/Terminal.Gui.TextDirection.html
+  commentId: T:Terminal.Gui.TextDirection
+  fullName: Terminal.Gui.TextDirection
+  nameWithType: TextDirection
+- uid: Terminal.Gui.TextDirection.BottomTop_LeftRight
+  name: BottomTop_LeftRight
+  href: api/Terminal.Gui/Terminal.Gui.TextDirection.html#Terminal_Gui_TextDirection_BottomTop_LeftRight
+  commentId: F:Terminal.Gui.TextDirection.BottomTop_LeftRight
+  fullName: Terminal.Gui.TextDirection.BottomTop_LeftRight
+  nameWithType: TextDirection.BottomTop_LeftRight
+- uid: Terminal.Gui.TextDirection.BottomTop_RightLeft
+  name: BottomTop_RightLeft
+  href: api/Terminal.Gui/Terminal.Gui.TextDirection.html#Terminal_Gui_TextDirection_BottomTop_RightLeft
+  commentId: F:Terminal.Gui.TextDirection.BottomTop_RightLeft
+  fullName: Terminal.Gui.TextDirection.BottomTop_RightLeft
+  nameWithType: TextDirection.BottomTop_RightLeft
+- uid: Terminal.Gui.TextDirection.LeftRight_BottomTop
+  name: LeftRight_BottomTop
+  href: api/Terminal.Gui/Terminal.Gui.TextDirection.html#Terminal_Gui_TextDirection_LeftRight_BottomTop
+  commentId: F:Terminal.Gui.TextDirection.LeftRight_BottomTop
+  fullName: Terminal.Gui.TextDirection.LeftRight_BottomTop
+  nameWithType: TextDirection.LeftRight_BottomTop
+- uid: Terminal.Gui.TextDirection.LeftRight_TopBottom
+  name: LeftRight_TopBottom
+  href: api/Terminal.Gui/Terminal.Gui.TextDirection.html#Terminal_Gui_TextDirection_LeftRight_TopBottom
+  commentId: F:Terminal.Gui.TextDirection.LeftRight_TopBottom
+  fullName: Terminal.Gui.TextDirection.LeftRight_TopBottom
+  nameWithType: TextDirection.LeftRight_TopBottom
+- uid: Terminal.Gui.TextDirection.RightLeft_BottomTop
+  name: RightLeft_BottomTop
+  href: api/Terminal.Gui/Terminal.Gui.TextDirection.html#Terminal_Gui_TextDirection_RightLeft_BottomTop
+  commentId: F:Terminal.Gui.TextDirection.RightLeft_BottomTop
+  fullName: Terminal.Gui.TextDirection.RightLeft_BottomTop
+  nameWithType: TextDirection.RightLeft_BottomTop
+- uid: Terminal.Gui.TextDirection.RightLeft_TopBottom
+  name: RightLeft_TopBottom
+  href: api/Terminal.Gui/Terminal.Gui.TextDirection.html#Terminal_Gui_TextDirection_RightLeft_TopBottom
+  commentId: F:Terminal.Gui.TextDirection.RightLeft_TopBottom
+  fullName: Terminal.Gui.TextDirection.RightLeft_TopBottom
+  nameWithType: TextDirection.RightLeft_TopBottom
+- uid: Terminal.Gui.TextDirection.TopBottom_LeftRight
+  name: TopBottom_LeftRight
+  href: api/Terminal.Gui/Terminal.Gui.TextDirection.html#Terminal_Gui_TextDirection_TopBottom_LeftRight
+  commentId: F:Terminal.Gui.TextDirection.TopBottom_LeftRight
+  fullName: Terminal.Gui.TextDirection.TopBottom_LeftRight
+  nameWithType: TextDirection.TopBottom_LeftRight
+- uid: Terminal.Gui.TextDirection.TopBottom_RightLeft
+  name: TopBottom_RightLeft
+  href: api/Terminal.Gui/Terminal.Gui.TextDirection.html#Terminal_Gui_TextDirection_TopBottom_RightLeft
+  commentId: F:Terminal.Gui.TextDirection.TopBottom_RightLeft
+  fullName: Terminal.Gui.TextDirection.TopBottom_RightLeft
+  nameWithType: TextDirection.TopBottom_RightLeft
 - uid: Terminal.Gui.TextField
   name: TextField
   href: api/Terminal.Gui/Terminal.Gui.TextField.html
@@ -10645,6 +11140,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextFormatter.CalcRect
   nameWithType: TextFormatter.CalcRect
+- uid: Terminal.Gui.TextFormatter.ClipAndJustify(NStack.ustring,System.Int32,System.Boolean)
+  name: ClipAndJustify(ustring, Int32, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_ClipAndJustify_NStack_ustring_System_Int32_System_Boolean_
+  commentId: M:Terminal.Gui.TextFormatter.ClipAndJustify(NStack.ustring,System.Int32,System.Boolean)
+  fullName: Terminal.Gui.TextFormatter.ClipAndJustify(NStack.ustring, System.Int32, System.Boolean)
+  nameWithType: TextFormatter.ClipAndJustify(ustring, Int32, Boolean)
 - uid: Terminal.Gui.TextFormatter.ClipAndJustify(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment)
   name: ClipAndJustify(ustring, Int32, TextAlignment)
   href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_ClipAndJustify_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_
@@ -10671,6 +11172,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextFormatter.CursorPosition
   nameWithType: TextFormatter.CursorPosition
+- uid: Terminal.Gui.TextFormatter.Direction
+  name: Direction
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Direction
+  commentId: P:Terminal.Gui.TextFormatter.Direction
+  fullName: Terminal.Gui.TextFormatter.Direction
+  nameWithType: TextFormatter.Direction
+- uid: Terminal.Gui.TextFormatter.Direction*
+  name: Direction
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Direction_
+  commentId: Overload:Terminal.Gui.TextFormatter.Direction
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.Direction
+  nameWithType: TextFormatter.Direction
 - uid: Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute)
   name: Draw(Rect, Attribute, Attribute)
   href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Draw_Terminal_Gui_Rect_Terminal_Gui_Attribute_Terminal_Gui_Attribute_
@@ -10700,12 +11214,18 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextFormatter.FindHotKey
   nameWithType: TextFormatter.FindHotKey
-- uid: Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment,System.Boolean)
-  name: Format(ustring, Int32, TextAlignment, Boolean)
-  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean_
-  commentId: M:Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment,System.Boolean)
-  fullName: Terminal.Gui.TextFormatter.Format(NStack.ustring, System.Int32, Terminal.Gui.TextAlignment, System.Boolean)
-  nameWithType: TextFormatter.Format(ustring, Int32, TextAlignment, Boolean)
+- uid: Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,System.Boolean,System.Boolean,System.Boolean)
+  name: Format(ustring, Int32, Boolean, Boolean, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_System_Boolean_System_Boolean_System_Boolean_
+  commentId: M:Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,System.Boolean,System.Boolean,System.Boolean)
+  fullName: Terminal.Gui.TextFormatter.Format(NStack.ustring, System.Int32, System.Boolean, System.Boolean, System.Boolean)
+  nameWithType: TextFormatter.Format(ustring, Int32, Boolean, Boolean, Boolean)
+- uid: Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment,System.Boolean,System.Boolean)
+  name: Format(ustring, Int32, TextAlignment, Boolean, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_NStack_ustring_System_Int32_Terminal_Gui_TextAlignment_System_Boolean_System_Boolean_
+  commentId: M:Terminal.Gui.TextFormatter.Format(NStack.ustring,System.Int32,Terminal.Gui.TextAlignment,System.Boolean,System.Boolean)
+  fullName: Terminal.Gui.TextFormatter.Format(NStack.ustring, System.Int32, Terminal.Gui.TextAlignment, System.Boolean, System.Boolean)
+  nameWithType: TextFormatter.Format(ustring, Int32, TextAlignment, Boolean, Boolean)
 - uid: Terminal.Gui.TextFormatter.Format*
   name: Format
   href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Format_
@@ -10765,6 +11285,58 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextFormatter.HotKeyTagMask
   nameWithType: TextFormatter.HotKeyTagMask
+- uid: Terminal.Gui.TextFormatter.IsHorizontalDirection(Terminal.Gui.TextDirection)
+  name: IsHorizontalDirection(TextDirection)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_IsHorizontalDirection_Terminal_Gui_TextDirection_
+  commentId: M:Terminal.Gui.TextFormatter.IsHorizontalDirection(Terminal.Gui.TextDirection)
+  fullName: Terminal.Gui.TextFormatter.IsHorizontalDirection(Terminal.Gui.TextDirection)
+  nameWithType: TextFormatter.IsHorizontalDirection(TextDirection)
+- uid: Terminal.Gui.TextFormatter.IsHorizontalDirection*
+  name: IsHorizontalDirection
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_IsHorizontalDirection_
+  commentId: Overload:Terminal.Gui.TextFormatter.IsHorizontalDirection
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.IsHorizontalDirection
+  nameWithType: TextFormatter.IsHorizontalDirection
+- uid: Terminal.Gui.TextFormatter.IsLeftToRight(Terminal.Gui.TextDirection)
+  name: IsLeftToRight(TextDirection)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_IsLeftToRight_Terminal_Gui_TextDirection_
+  commentId: M:Terminal.Gui.TextFormatter.IsLeftToRight(Terminal.Gui.TextDirection)
+  fullName: Terminal.Gui.TextFormatter.IsLeftToRight(Terminal.Gui.TextDirection)
+  nameWithType: TextFormatter.IsLeftToRight(TextDirection)
+- uid: Terminal.Gui.TextFormatter.IsLeftToRight*
+  name: IsLeftToRight
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_IsLeftToRight_
+  commentId: Overload:Terminal.Gui.TextFormatter.IsLeftToRight
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.IsLeftToRight
+  nameWithType: TextFormatter.IsLeftToRight
+- uid: Terminal.Gui.TextFormatter.IsTopToBottom(Terminal.Gui.TextDirection)
+  name: IsTopToBottom(TextDirection)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_IsTopToBottom_Terminal_Gui_TextDirection_
+  commentId: M:Terminal.Gui.TextFormatter.IsTopToBottom(Terminal.Gui.TextDirection)
+  fullName: Terminal.Gui.TextFormatter.IsTopToBottom(Terminal.Gui.TextDirection)
+  nameWithType: TextFormatter.IsTopToBottom(TextDirection)
+- uid: Terminal.Gui.TextFormatter.IsTopToBottom*
+  name: IsTopToBottom
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_IsTopToBottom_
+  commentId: Overload:Terminal.Gui.TextFormatter.IsTopToBottom
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.IsTopToBottom
+  nameWithType: TextFormatter.IsTopToBottom
+- uid: Terminal.Gui.TextFormatter.IsVerticalDirection(Terminal.Gui.TextDirection)
+  name: IsVerticalDirection(TextDirection)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_IsVerticalDirection_Terminal_Gui_TextDirection_
+  commentId: M:Terminal.Gui.TextFormatter.IsVerticalDirection(Terminal.Gui.TextDirection)
+  fullName: Terminal.Gui.TextFormatter.IsVerticalDirection(Terminal.Gui.TextDirection)
+  nameWithType: TextFormatter.IsVerticalDirection(TextDirection)
+- uid: Terminal.Gui.TextFormatter.IsVerticalDirection*
+  name: IsVerticalDirection
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_IsVerticalDirection_
+  commentId: Overload:Terminal.Gui.TextFormatter.IsVerticalDirection
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.IsVerticalDirection
+  nameWithType: TextFormatter.IsVerticalDirection
 - uid: Terminal.Gui.TextFormatter.Justify(NStack.ustring,System.Int32,System.Char)
   name: Justify(ustring, Int32, Char)
   href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_Justify_NStack_ustring_System_Int32_System_Char_
@@ -10882,12 +11454,25 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextFormatter.Text
   nameWithType: TextFormatter.Text
-- uid: Terminal.Gui.TextFormatter.WordWrap(NStack.ustring,System.Int32)
-  name: WordWrap(ustring, Int32)
-  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_
-  commentId: M:Terminal.Gui.TextFormatter.WordWrap(NStack.ustring,System.Int32)
-  fullName: Terminal.Gui.TextFormatter.WordWrap(NStack.ustring, System.Int32)
-  nameWithType: TextFormatter.WordWrap(ustring, Int32)
+- uid: Terminal.Gui.TextFormatter.VerticalAlignment
+  name: VerticalAlignment
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_VerticalAlignment
+  commentId: P:Terminal.Gui.TextFormatter.VerticalAlignment
+  fullName: Terminal.Gui.TextFormatter.VerticalAlignment
+  nameWithType: TextFormatter.VerticalAlignment
+- uid: Terminal.Gui.TextFormatter.VerticalAlignment*
+  name: VerticalAlignment
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_VerticalAlignment_
+  commentId: Overload:Terminal.Gui.TextFormatter.VerticalAlignment
+  isSpec: "True"
+  fullName: Terminal.Gui.TextFormatter.VerticalAlignment
+  nameWithType: TextFormatter.VerticalAlignment
+- uid: Terminal.Gui.TextFormatter.WordWrap(NStack.ustring,System.Int32,System.Boolean)
+  name: WordWrap(ustring, Int32, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_WordWrap_NStack_ustring_System_Int32_System_Boolean_
+  commentId: M:Terminal.Gui.TextFormatter.WordWrap(NStack.ustring,System.Int32,System.Boolean)
+  fullName: Terminal.Gui.TextFormatter.WordWrap(NStack.ustring, System.Int32, System.Boolean)
+  nameWithType: TextFormatter.WordWrap(ustring, Int32, Boolean)
 - uid: Terminal.Gui.TextFormatter.WordWrap*
   name: WordWrap
   href: api/Terminal.Gui/Terminal.Gui.TextFormatter.html#Terminal_Gui_TextFormatter_WordWrap_
@@ -10920,6 +11505,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.TextView
   nameWithType: TextView.TextView
+- uid: Terminal.Gui.TextView.BottomOffset
+  name: BottomOffset
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_BottomOffset
+  commentId: P:Terminal.Gui.TextView.BottomOffset
+  fullName: Terminal.Gui.TextView.BottomOffset
+  nameWithType: TextView.BottomOffset
+- uid: Terminal.Gui.TextView.BottomOffset*
+  name: BottomOffset
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_BottomOffset_
+  commentId: Overload:Terminal.Gui.TextView.BottomOffset
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.BottomOffset
+  nameWithType: TextView.BottomOffset
 - uid: Terminal.Gui.TextView.CanFocus
   name: CanFocus
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_CanFocus
@@ -10946,6 +11544,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.CloseFile
   nameWithType: TextView.CloseFile
+- uid: Terminal.Gui.TextView.Copy
+  name: Copy()
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Copy
+  commentId: M:Terminal.Gui.TextView.Copy
+  fullName: Terminal.Gui.TextView.Copy()
+  nameWithType: TextView.Copy()
+- uid: Terminal.Gui.TextView.Copy*
+  name: Copy
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Copy_
+  commentId: Overload:Terminal.Gui.TextView.Copy
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.Copy
+  nameWithType: TextView.Copy
 - uid: Terminal.Gui.TextView.CurrentColumn
   name: CurrentColumn
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_CurrentColumn
@@ -10972,6 +11583,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.CurrentRow
   nameWithType: TextView.CurrentRow
+- uid: Terminal.Gui.TextView.CursorPosition
+  name: CursorPosition
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_CursorPosition
+  commentId: P:Terminal.Gui.TextView.CursorPosition
+  fullName: Terminal.Gui.TextView.CursorPosition
+  nameWithType: TextView.CursorPosition
+- uid: Terminal.Gui.TextView.CursorPosition*
+  name: CursorPosition
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_CursorPosition_
+  commentId: Overload:Terminal.Gui.TextView.CursorPosition
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.CursorPosition
+  nameWithType: TextView.CursorPosition
+- uid: Terminal.Gui.TextView.Cut
+  name: Cut()
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Cut
+  commentId: M:Terminal.Gui.TextView.Cut
+  fullName: Terminal.Gui.TextView.Cut()
+  nameWithType: TextView.Cut()
+- uid: Terminal.Gui.TextView.Cut*
+  name: Cut
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Cut_
+  commentId: Overload:Terminal.Gui.TextView.Cut
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.Cut
+  nameWithType: TextView.Cut
 - uid: Terminal.Gui.TextView.DesiredCursorVisibility
   name: DesiredCursorVisibility
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_DesiredCursorVisibility
@@ -10985,6 +11622,51 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.DesiredCursorVisibility
   nameWithType: TextView.DesiredCursorVisibility
+- uid: Terminal.Gui.TextView.FindNextText(NStack.ustring,System.Boolean@,System.Boolean,System.Boolean,NStack.ustring,System.Boolean)
+  name: FindNextText(ustring, out Boolean, Boolean, Boolean, ustring, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_FindNextText_NStack_ustring_System_Boolean__System_Boolean_System_Boolean_NStack_ustring_System_Boolean_
+  commentId: M:Terminal.Gui.TextView.FindNextText(NStack.ustring,System.Boolean@,System.Boolean,System.Boolean,NStack.ustring,System.Boolean)
+  name.vb: FindNextText(ustring, ByRef Boolean, Boolean, Boolean, ustring, Boolean)
+  fullName: Terminal.Gui.TextView.FindNextText(NStack.ustring, out System.Boolean, System.Boolean, System.Boolean, NStack.ustring, System.Boolean)
+  fullName.vb: Terminal.Gui.TextView.FindNextText(NStack.ustring, ByRef System.Boolean, System.Boolean, System.Boolean, NStack.ustring, System.Boolean)
+  nameWithType: TextView.FindNextText(ustring, out Boolean, Boolean, Boolean, ustring, Boolean)
+  nameWithType.vb: TextView.FindNextText(ustring, ByRef Boolean, Boolean, Boolean, ustring, Boolean)
+- uid: Terminal.Gui.TextView.FindNextText*
+  name: FindNextText
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_FindNextText_
+  commentId: Overload:Terminal.Gui.TextView.FindNextText
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.FindNextText
+  nameWithType: TextView.FindNextText
+- uid: Terminal.Gui.TextView.FindPreviousText(NStack.ustring,System.Boolean@,System.Boolean,System.Boolean,NStack.ustring,System.Boolean)
+  name: FindPreviousText(ustring, out Boolean, Boolean, Boolean, ustring, Boolean)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_FindPreviousText_NStack_ustring_System_Boolean__System_Boolean_System_Boolean_NStack_ustring_System_Boolean_
+  commentId: M:Terminal.Gui.TextView.FindPreviousText(NStack.ustring,System.Boolean@,System.Boolean,System.Boolean,NStack.ustring,System.Boolean)
+  name.vb: FindPreviousText(ustring, ByRef Boolean, Boolean, Boolean, ustring, Boolean)
+  fullName: Terminal.Gui.TextView.FindPreviousText(NStack.ustring, out System.Boolean, System.Boolean, System.Boolean, NStack.ustring, System.Boolean)
+  fullName.vb: Terminal.Gui.TextView.FindPreviousText(NStack.ustring, ByRef System.Boolean, System.Boolean, System.Boolean, NStack.ustring, System.Boolean)
+  nameWithType: TextView.FindPreviousText(ustring, out Boolean, Boolean, Boolean, ustring, Boolean)
+  nameWithType.vb: TextView.FindPreviousText(ustring, ByRef Boolean, Boolean, Boolean, ustring, Boolean)
+- uid: Terminal.Gui.TextView.FindPreviousText*
+  name: FindPreviousText
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_FindPreviousText_
+  commentId: Overload:Terminal.Gui.TextView.FindPreviousText
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.FindPreviousText
+  nameWithType: TextView.FindPreviousText
+- uid: Terminal.Gui.TextView.FindTextChanged
+  name: FindTextChanged()
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_FindTextChanged
+  commentId: M:Terminal.Gui.TextView.FindTextChanged
+  fullName: Terminal.Gui.TextView.FindTextChanged()
+  nameWithType: TextView.FindTextChanged()
+- uid: Terminal.Gui.TextView.FindTextChanged*
+  name: FindTextChanged
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_FindTextChanged_
+  commentId: Overload:Terminal.Gui.TextView.FindTextChanged
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.FindTextChanged
+  nameWithType: TextView.FindTextChanged
 - uid: Terminal.Gui.TextView.Frame
   name: Frame
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Frame
@@ -11115,6 +11797,45 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.OnEnter
   nameWithType: TextView.OnEnter
+- uid: Terminal.Gui.TextView.OnKeyUp(Terminal.Gui.KeyEvent)
+  name: OnKeyUp(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_OnKeyUp_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.TextView.OnKeyUp(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.TextView.OnKeyUp(Terminal.Gui.KeyEvent)
+  nameWithType: TextView.OnKeyUp(KeyEvent)
+- uid: Terminal.Gui.TextView.OnKeyUp*
+  name: OnKeyUp
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_OnKeyUp_
+  commentId: Overload:Terminal.Gui.TextView.OnKeyUp
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.OnKeyUp
+  nameWithType: TextView.OnKeyUp
+- uid: Terminal.Gui.TextView.OnLeave(Terminal.Gui.View)
+  name: OnLeave(View)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_OnLeave_Terminal_Gui_View_
+  commentId: M:Terminal.Gui.TextView.OnLeave(Terminal.Gui.View)
+  fullName: Terminal.Gui.TextView.OnLeave(Terminal.Gui.View)
+  nameWithType: TextView.OnLeave(View)
+- uid: Terminal.Gui.TextView.OnLeave*
+  name: OnLeave
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_OnLeave_
+  commentId: Overload:Terminal.Gui.TextView.OnLeave
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.OnLeave
+  nameWithType: TextView.OnLeave
+- uid: Terminal.Gui.TextView.Paste
+  name: Paste()
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Paste
+  commentId: M:Terminal.Gui.TextView.Paste
+  fullName: Terminal.Gui.TextView.Paste()
+  nameWithType: TextView.Paste()
+- uid: Terminal.Gui.TextView.Paste*
+  name: Paste
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Paste_
+  commentId: Overload:Terminal.Gui.TextView.Paste
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.Paste
+  nameWithType: TextView.Paste
 - uid: Terminal.Gui.TextView.PositionCursor
   name: PositionCursor()
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_PositionCursor
@@ -11167,6 +11888,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.Redraw
   nameWithType: TextView.Redraw
+- uid: Terminal.Gui.TextView.ReplaceAllText(NStack.ustring,System.Boolean,System.Boolean,NStack.ustring)
+  name: ReplaceAllText(ustring, Boolean, Boolean, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ReplaceAllText_NStack_ustring_System_Boolean_System_Boolean_NStack_ustring_
+  commentId: M:Terminal.Gui.TextView.ReplaceAllText(NStack.ustring,System.Boolean,System.Boolean,NStack.ustring)
+  fullName: Terminal.Gui.TextView.ReplaceAllText(NStack.ustring, System.Boolean, System.Boolean, NStack.ustring)
+  nameWithType: TextView.ReplaceAllText(ustring, Boolean, Boolean, ustring)
+- uid: Terminal.Gui.TextView.ReplaceAllText*
+  name: ReplaceAllText
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ReplaceAllText_
+  commentId: Overload:Terminal.Gui.TextView.ReplaceAllText
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.ReplaceAllText
+  nameWithType: TextView.ReplaceAllText
+- uid: Terminal.Gui.TextView.RightOffset
+  name: RightOffset
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_RightOffset
+  commentId: P:Terminal.Gui.TextView.RightOffset
+  fullName: Terminal.Gui.TextView.RightOffset
+  nameWithType: TextView.RightOffset
+- uid: Terminal.Gui.TextView.RightOffset*
+  name: RightOffset
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_RightOffset_
+  commentId: Overload:Terminal.Gui.TextView.RightOffset
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.RightOffset
+  nameWithType: TextView.RightOffset
 - uid: Terminal.Gui.TextView.ScrollTo(System.Int32,System.Boolean)
   name: ScrollTo(Int32, Boolean)
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_ScrollTo_System_Int32_System_Boolean_
@@ -11180,6 +11927,84 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.ScrollTo
   nameWithType: TextView.ScrollTo
+- uid: Terminal.Gui.TextView.SelectAll
+  name: SelectAll()
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SelectAll
+  commentId: M:Terminal.Gui.TextView.SelectAll
+  fullName: Terminal.Gui.TextView.SelectAll()
+  nameWithType: TextView.SelectAll()
+- uid: Terminal.Gui.TextView.SelectAll*
+  name: SelectAll
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SelectAll_
+  commentId: Overload:Terminal.Gui.TextView.SelectAll
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.SelectAll
+  nameWithType: TextView.SelectAll
+- uid: Terminal.Gui.TextView.SelectedLength
+  name: SelectedLength
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SelectedLength
+  commentId: P:Terminal.Gui.TextView.SelectedLength
+  fullName: Terminal.Gui.TextView.SelectedLength
+  nameWithType: TextView.SelectedLength
+- uid: Terminal.Gui.TextView.SelectedLength*
+  name: SelectedLength
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SelectedLength_
+  commentId: Overload:Terminal.Gui.TextView.SelectedLength
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.SelectedLength
+  nameWithType: TextView.SelectedLength
+- uid: Terminal.Gui.TextView.SelectedText
+  name: SelectedText
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SelectedText
+  commentId: P:Terminal.Gui.TextView.SelectedText
+  fullName: Terminal.Gui.TextView.SelectedText
+  nameWithType: TextView.SelectedText
+- uid: Terminal.Gui.TextView.SelectedText*
+  name: SelectedText
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SelectedText_
+  commentId: Overload:Terminal.Gui.TextView.SelectedText
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.SelectedText
+  nameWithType: TextView.SelectedText
+- uid: Terminal.Gui.TextView.Selecting
+  name: Selecting
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Selecting
+  commentId: P:Terminal.Gui.TextView.Selecting
+  fullName: Terminal.Gui.TextView.Selecting
+  nameWithType: TextView.Selecting
+- uid: Terminal.Gui.TextView.Selecting*
+  name: Selecting
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Selecting_
+  commentId: Overload:Terminal.Gui.TextView.Selecting
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.Selecting
+  nameWithType: TextView.Selecting
+- uid: Terminal.Gui.TextView.SelectionStartColumn
+  name: SelectionStartColumn
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SelectionStartColumn
+  commentId: P:Terminal.Gui.TextView.SelectionStartColumn
+  fullName: Terminal.Gui.TextView.SelectionStartColumn
+  nameWithType: TextView.SelectionStartColumn
+- uid: Terminal.Gui.TextView.SelectionStartColumn*
+  name: SelectionStartColumn
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SelectionStartColumn_
+  commentId: Overload:Terminal.Gui.TextView.SelectionStartColumn
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.SelectionStartColumn
+  nameWithType: TextView.SelectionStartColumn
+- uid: Terminal.Gui.TextView.SelectionStartRow
+  name: SelectionStartRow
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SelectionStartRow
+  commentId: P:Terminal.Gui.TextView.SelectionStartRow
+  fullName: Terminal.Gui.TextView.SelectionStartRow
+  nameWithType: TextView.SelectionStartRow
+- uid: Terminal.Gui.TextView.SelectionStartRow*
+  name: SelectionStartRow
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_SelectionStartRow_
+  commentId: Overload:Terminal.Gui.TextView.SelectionStartRow
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.SelectionStartRow
+  nameWithType: TextView.SelectionStartRow
 - uid: Terminal.Gui.TextView.Text
   name: Text
   href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Text
@@ -11212,6 +12037,32 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextView.TopRow
   nameWithType: TextView.TopRow
+- uid: Terminal.Gui.TextView.Used
+  name: Used
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Used
+  commentId: P:Terminal.Gui.TextView.Used
+  fullName: Terminal.Gui.TextView.Used
+  nameWithType: TextView.Used
+- uid: Terminal.Gui.TextView.Used*
+  name: Used
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_Used_
+  commentId: Overload:Terminal.Gui.TextView.Used
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.Used
+  nameWithType: TextView.Used
+- uid: Terminal.Gui.TextView.WordWrap
+  name: WordWrap
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_WordWrap
+  commentId: P:Terminal.Gui.TextView.WordWrap
+  fullName: Terminal.Gui.TextView.WordWrap
+  nameWithType: TextView.WordWrap
+- uid: Terminal.Gui.TextView.WordWrap*
+  name: WordWrap
+  href: api/Terminal.Gui/Terminal.Gui.TextView.html#Terminal_Gui_TextView_WordWrap_
+  commentId: Overload:Terminal.Gui.TextView.WordWrap
+  isSpec: "True"
+  fullName: Terminal.Gui.TextView.WordWrap
+  nameWithType: TextView.WordWrap
 - uid: Terminal.Gui.TimeField
   name: TimeField
   href: api/Terminal.Gui/Terminal.Gui.TimeField.html
@@ -12721,6 +13572,36 @@ references:
   fullName.vb: Terminal.Gui.TreeView(Of T).TreeBuilder
   nameWithType: TreeView<T>.TreeBuilder
   nameWithType.vb: TreeView(Of T).TreeBuilder
+- uid: Terminal.Gui.VerticalTextAlignment
+  name: VerticalTextAlignment
+  href: api/Terminal.Gui/Terminal.Gui.VerticalTextAlignment.html
+  commentId: T:Terminal.Gui.VerticalTextAlignment
+  fullName: Terminal.Gui.VerticalTextAlignment
+  nameWithType: VerticalTextAlignment
+- uid: Terminal.Gui.VerticalTextAlignment.Bottom
+  name: Bottom
+  href: api/Terminal.Gui/Terminal.Gui.VerticalTextAlignment.html#Terminal_Gui_VerticalTextAlignment_Bottom
+  commentId: F:Terminal.Gui.VerticalTextAlignment.Bottom
+  fullName: Terminal.Gui.VerticalTextAlignment.Bottom
+  nameWithType: VerticalTextAlignment.Bottom
+- uid: Terminal.Gui.VerticalTextAlignment.Justified
+  name: Justified
+  href: api/Terminal.Gui/Terminal.Gui.VerticalTextAlignment.html#Terminal_Gui_VerticalTextAlignment_Justified
+  commentId: F:Terminal.Gui.VerticalTextAlignment.Justified
+  fullName: Terminal.Gui.VerticalTextAlignment.Justified
+  nameWithType: VerticalTextAlignment.Justified
+- uid: Terminal.Gui.VerticalTextAlignment.Middle
+  name: Middle
+  href: api/Terminal.Gui/Terminal.Gui.VerticalTextAlignment.html#Terminal_Gui_VerticalTextAlignment_Middle
+  commentId: F:Terminal.Gui.VerticalTextAlignment.Middle
+  fullName: Terminal.Gui.VerticalTextAlignment.Middle
+  nameWithType: VerticalTextAlignment.Middle
+- uid: Terminal.Gui.VerticalTextAlignment.Top
+  name: Top
+  href: api/Terminal.Gui/Terminal.Gui.VerticalTextAlignment.html#Terminal_Gui_VerticalTextAlignment_Top
+  commentId: F:Terminal.Gui.VerticalTextAlignment.Top
+  fullName: Terminal.Gui.VerticalTextAlignment.Top
+  nameWithType: VerticalTextAlignment.Top
 - uid: Terminal.Gui.View
   name: View
   href: api/Terminal.Gui/Terminal.Gui.View.html
@@ -13186,6 +14067,38 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.Frame
   nameWithType: View.Frame
+- uid: Terminal.Gui.View.GetCurrentHeight(System.Int32@)
+  name: GetCurrentHeight(out Int32)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__
+  commentId: M:Terminal.Gui.View.GetCurrentHeight(System.Int32@)
+  name.vb: GetCurrentHeight(ByRef Int32)
+  fullName: Terminal.Gui.View.GetCurrentHeight(out System.Int32)
+  fullName.vb: Terminal.Gui.View.GetCurrentHeight(ByRef System.Int32)
+  nameWithType: View.GetCurrentHeight(out Int32)
+  nameWithType.vb: View.GetCurrentHeight(ByRef Int32)
+- uid: Terminal.Gui.View.GetCurrentHeight*
+  name: GetCurrentHeight
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_
+  commentId: Overload:Terminal.Gui.View.GetCurrentHeight
+  isSpec: "True"
+  fullName: Terminal.Gui.View.GetCurrentHeight
+  nameWithType: View.GetCurrentHeight
+- uid: Terminal.Gui.View.GetCurrentWidth(System.Int32@)
+  name: GetCurrentWidth(out Int32)
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentWidth_System_Int32__
+  commentId: M:Terminal.Gui.View.GetCurrentWidth(System.Int32@)
+  name.vb: GetCurrentWidth(ByRef Int32)
+  fullName: Terminal.Gui.View.GetCurrentWidth(out System.Int32)
+  fullName.vb: Terminal.Gui.View.GetCurrentWidth(ByRef System.Int32)
+  nameWithType: View.GetCurrentWidth(out Int32)
+  nameWithType.vb: View.GetCurrentWidth(ByRef Int32)
+- uid: Terminal.Gui.View.GetCurrentWidth*
+  name: GetCurrentWidth
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentWidth_
+  commentId: Overload:Terminal.Gui.View.GetCurrentWidth
+  isSpec: "True"
+  fullName: Terminal.Gui.View.GetCurrentWidth
+  nameWithType: View.GetCurrentWidth
 - uid: Terminal.Gui.View.HasFocus
   name: HasFocus
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_HasFocus
@@ -13997,6 +14910,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.TextAlignment
   nameWithType: View.TextAlignment
+- uid: Terminal.Gui.View.TextDirection
+  name: TextDirection
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_TextDirection
+  commentId: P:Terminal.Gui.View.TextDirection
+  fullName: Terminal.Gui.View.TextDirection
+  nameWithType: View.TextDirection
+- uid: Terminal.Gui.View.TextDirection*
+  name: TextDirection
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_TextDirection_
+  commentId: Overload:Terminal.Gui.View.TextDirection
+  isSpec: "True"
+  fullName: Terminal.Gui.View.TextDirection
+  nameWithType: View.TextDirection
 - uid: Terminal.Gui.View.ToString
   name: ToString()
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_ToString
@@ -14010,6 +14936,19 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.View.ToString
   nameWithType: View.ToString
+- uid: Terminal.Gui.View.VerticalTextAlignment
+  name: VerticalTextAlignment
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_VerticalTextAlignment
+  commentId: P:Terminal.Gui.View.VerticalTextAlignment
+  fullName: Terminal.Gui.View.VerticalTextAlignment
+  nameWithType: View.VerticalTextAlignment
+- uid: Terminal.Gui.View.VerticalTextAlignment*
+  name: VerticalTextAlignment
+  href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_VerticalTextAlignment_
+  commentId: Overload:Terminal.Gui.View.VerticalTextAlignment
+  isSpec: "True"
+  fullName: Terminal.Gui.View.VerticalTextAlignment
+  nameWithType: View.VerticalTextAlignment
 - uid: Terminal.Gui.View.Visible
   name: Visible
   href: api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Visible

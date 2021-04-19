@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class ObjectActivatedEventArgs&lt;T&gt;
+    <title>Class TabStyle
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class ObjectActivatedEventArgs&lt;T&gt;
+    <meta name="title" content="Class TabStyle
    ">
     <meta name="generator" content="docfx 2.56.7.0">
     
@@ -78,19 +78,19 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.TabStyle">
   
   
-  <h1 id="Terminal_Gui_ObjectActivatedEventArgs_1" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1" class="text-break">Class ObjectActivatedEventArgs&lt;T&gt;
+  <h1 id="Terminal_Gui_TabStyle" data-uid="Terminal.Gui.TabStyle" class="text-break">Class TabStyle
   </h1>
   <div class="markdown level0 summary">
-Event args for the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ObjectActivated">ObjectActivated</a> event
+Describes render stylistic selections of a <a class="xref" href="Terminal.Gui.TabView.html">TabView</a>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><span class="xref">System.Object</span></div>
-    <div class="level1"><span class="xref">ObjectActivatedEventArgs&lt;T&gt;</span></div>
+    <div class="level1"><span class="xref">TabStyle</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -118,75 +118,23 @@ Event args for the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_G
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Terminal_Gui_ObjectActivatedEventArgs_1_syntax">Syntax</h5>
+  <h5 id="Terminal_Gui_TabStyle_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ObjectActivatedEventArgs&lt;T&gt;
-    where T : class</code></pre>
+    <pre><code class="lang-csharp hljs">public class TabStyle</code></pre>
   </div>
-  <h5 class="typeParameters">Type Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="parametername">T</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="constructors">Constructors
-  </h3>
-  
-  
-  <a id="Terminal_Gui_ObjectActivatedEventArgs_1__ctor_" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1.#ctor*"></a>
-  <h4 id="Terminal_Gui_ObjectActivatedEventArgs_1__ctor_Terminal_Gui_TreeView__0___0_" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1.#ctor(Terminal.Gui.TreeView{`0},`0)">ObjectActivatedEventArgs(TreeView&lt;T&gt;, T)</h4>
-  <div class="markdown level1 summary">
-Creates a new instance documenting activation of the <code data-dev-comment-type="paramref" class="paramref">activated</code> object
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ObjectActivatedEventArgs(TreeView&lt;T&gt; tree, T activated)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView</a>&lt;T&gt;</td>
-        <td><span class="parametername">tree</span></td>
-        <td>Tree in which the activation is happening</td>
-      </tr>
-      <tr>
-        <td><span class="xref">T</span></td>
-        <td><span class="parametername">activated</span></td>
-        <td>What object is being activated</td>
-      </tr>
-    </tbody>
-  </table>
   <h3 id="properties">Properties
   </h3>
   
   
-  <a id="Terminal_Gui_ObjectActivatedEventArgs_1_ActivatedObject_" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1.ActivatedObject*"></a>
-  <h4 id="Terminal_Gui_ObjectActivatedEventArgs_1_ActivatedObject" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1.ActivatedObject">ActivatedObject</h4>
+  <a id="Terminal_Gui_TabStyle_ShowBorder_" data-uid="Terminal.Gui.TabStyle.ShowBorder*"></a>
+  <h4 id="Terminal_Gui_TabStyle_ShowBorder" data-uid="Terminal.Gui.TabStyle.ShowBorder">ShowBorder</h4>
   <div class="markdown level1 summary">
-The object that was selected at the time of activation
+True to show a solid box around the edge of the control.  Defaults to true.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public T ActivatedObject { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool ShowBorder { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -198,22 +146,27 @@ The object that was selected at the time of activation
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">T</span></td>
+        <td><span class="xref">System.Boolean</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_ObjectActivatedEventArgs_1_Tree_" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1.Tree*"></a>
-  <h4 id="Terminal_Gui_ObjectActivatedEventArgs_1_Tree" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1.Tree">Tree</h4>
+  <a id="Terminal_Gui_TabStyle_ShowTopLine_" data-uid="Terminal.Gui.TabStyle.ShowTopLine*"></a>
+  <h4 id="Terminal_Gui_TabStyle_ShowTopLine" data-uid="Terminal.Gui.TabStyle.ShowTopLine">ShowTopLine</h4>
   <div class="markdown level1 summary">
-The tree in which the activation occurred
+True to show the top lip of tabs.  False to directly begin with tab text during 
+rendering.  When true header line occupies 3 rows, when false only 2.
+Defaults to true.
+
+<p>When <a class="xref" href="Terminal.Gui.TabStyle.html#Terminal_Gui_TabStyle_TabsOnBottom">TabsOnBottom</a> is enabled this instead applies to the
+ bottommost line of the control</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TreeView&lt;T&gt; Tree { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool ShowTopLine { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -225,7 +178,34 @@ The tree in which the activation occurred
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView</a>&lt;T&gt;</td>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TabStyle_TabsOnBottom_" data-uid="Terminal.Gui.TabStyle.TabsOnBottom*"></a>
+  <h4 id="Terminal_Gui_TabStyle_TabsOnBottom" data-uid="Terminal.Gui.TabStyle.TabsOnBottom">TabsOnBottom</h4>
+  <div class="markdown level1 summary">
+True to render tabs at the bottom of the view instead of the top
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool TabsOnBottom { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
         <td></td>
       </tr>
     </tbody>

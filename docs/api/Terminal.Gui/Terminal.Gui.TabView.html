@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class ScrollView
+    <title>Class TabView
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class ScrollView
+    <meta name="title" content="Class TabView
    ">
     <meta name="generator" content="docfx 2.56.7.0">
     
@@ -78,13 +78,13 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Terminal.Gui.ScrollView">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.TabView">
   
   
-  <h1 id="Terminal_Gui_ScrollView" data-uid="Terminal.Gui.ScrollView" class="text-break">Class ScrollView
+  <h1 id="Terminal_Gui_TabView" data-uid="Terminal.Gui.TabView" class="text-break">Class TabView
   </h1>
   <div class="markdown level0 summary">
-Scrollviews are views that present a window into a virtual space where subviews are added.  Similar to the iOS UIScrollView.
+Control that hosts multiple sub views, presenting a single one at once
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -92,7 +92,7 @@ Scrollviews are views that present a window into a virtual space where subviews 
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><a class="xref" href="Terminal.Gui.Responder.html">Responder</a></div>
     <div class="level2"><a class="xref" href="Terminal.Gui.View.html">View</a></div>
-    <div class="level3"><span class="xref">ScrollView</span></div>
+    <div class="level3"><span class="xref">TabView</span></div>
   </div>
   <div classs="implements">
     <h5>Implements</h5>
@@ -208,7 +208,13 @@ Scrollviews are views that present a window into a virtual space where subviews 
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetChildNeedsDisplay">View.SetChildNeedsDisplay()</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">View.Add(View)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View___">View.Add(View[])</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_RemoveAll">View.RemoveAll()</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Remove_Terminal_Gui_View_">View.Remove(View)</a>
@@ -253,6 +259,9 @@ Scrollviews are views that present a window into a virtual space where subviews 
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Move_System_Int32_System_Int32_">View.Move(Int32, Int32)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_PositionCursor">View.PositionCursor()</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HasFocus">View.HasFocus</a>
     </div>
     <div>
@@ -260,6 +269,9 @@ Scrollviews are views that present a window into a virtual space where subviews 
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnRemoved_Terminal_Gui_View_">View.OnRemoved(View)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnLeave_Terminal_Gui_View_">View.OnLeave(View)</a>
@@ -391,6 +403,9 @@ Scrollviews are views that present a window into a virtual space where subviews 
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
     </div>
     <div>
@@ -414,60 +429,48 @@ Scrollviews are views that present a window into a virtual space where subviews 
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Terminal_Gui_ScrollView_syntax">Syntax</h5>
+  <h5 id="Terminal_Gui_TabView_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ScrollView : View, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
+    <pre><code class="lang-csharp hljs">public class TabView : View, IDisposable, ISupportInitializeNotification, ISupportInitialize</code></pre>
   </div>
-  <h5 id="Terminal_Gui_ScrollView_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks">
-<p>
-  The subviews that are added to this <a class="xref" href="Terminal.Gui.ScrollView.html">ScrollView</a> are offset by the
-<a class="xref" href="Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ContentOffset">ContentOffset</a> property.  The view itself is a window into the 
-space represented by the <a class="xref" href="Terminal.Gui.ScrollView.html#Terminal_Gui_ScrollView_ContentSize">ContentSize</a>.
-</p>
-<p>
-  Use the 
-</p>
-</div>
   <h3 id="constructors">Constructors
   </h3>
   
   
-  <a id="Terminal_Gui_ScrollView__ctor_" data-uid="Terminal.Gui.ScrollView.#ctor*"></a>
-  <h4 id="Terminal_Gui_ScrollView__ctor" data-uid="Terminal.Gui.ScrollView.#ctor">ScrollView()</h4>
+  <a id="Terminal_Gui_TabView__ctor_" data-uid="Terminal.Gui.TabView.#ctor*"></a>
+  <h4 id="Terminal_Gui_TabView__ctor" data-uid="Terminal.Gui.TabView.#ctor">TabView()</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of the <a class="xref" href="Terminal.Gui.ScrollView.html">ScrollView</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> positioning.
+Initialzies a <a class="xref" href="Terminal.Gui.TabView.html">TabView</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ScrollView()</code></pre>
+    <pre><code class="lang-csharp hljs">public TabView()</code></pre>
   </div>
+  <h3 id="fields">Fields
+  </h3>
   
   
-  <a id="Terminal_Gui_ScrollView__ctor_" data-uid="Terminal.Gui.ScrollView.#ctor*"></a>
-  <h4 id="Terminal_Gui_ScrollView__ctor_Terminal_Gui_Rect_" data-uid="Terminal.Gui.ScrollView.#ctor(Terminal.Gui.Rect)">ScrollView(Rect)</h4>
+  <h4 id="Terminal_Gui_TabView_DefaultMaxTabTextWidth" data-uid="Terminal.Gui.TabView.DefaultMaxTabTextWidth">DefaultMaxTabTextWidth</h4>
   <div class="markdown level1 summary">
-Initializes a new instance of the <a class="xref" href="Terminal.Gui.ScrollView.html">ScrollView</a> class using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> positioning.
+The default <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_MaxTabTextWidth">MaxTabTextWidth</a> to set on new <a class="xref" href="Terminal.Gui.TabView.html">TabView</a> controls
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ScrollView(Rect frame)</code></pre>
+    <pre><code class="lang-csharp hljs">public const uint DefaultMaxTabTextWidth = 30U</code></pre>
   </div>
-  <h5 class="parameters">Parameters</h5>
+  <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
         <th>Type</th>
-        <th>Name</th>
         <th>Description</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
-        <td><span class="parametername">frame</span></td>
+        <td><span class="xref">System.UInt32</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -476,15 +479,16 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.ScrollView.
   </h3>
   
   
-  <a id="Terminal_Gui_ScrollView_AutoHideScrollBars_" data-uid="Terminal.Gui.ScrollView.AutoHideScrollBars*"></a>
-  <h4 id="Terminal_Gui_ScrollView_AutoHideScrollBars" data-uid="Terminal.Gui.ScrollView.AutoHideScrollBars">AutoHideScrollBars</h4>
+  <a id="Terminal_Gui_TabView_MaxTabTextWidth_" data-uid="Terminal.Gui.TabView.MaxTabTextWidth*"></a>
+  <h4 id="Terminal_Gui_TabView_MaxTabTextWidth" data-uid="Terminal.Gui.TabView.MaxTabTextWidth">MaxTabTextWidth</h4>
   <div class="markdown level1 summary">
-If true the vertical/horizontal scroll bars won&apos;t be showed if it&apos;s not needed.
+The maximum number of characters to render in a Tab header.  This prevents one long tab 
+from pushing out all the others.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool AutoHideScrollBars { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public uint MaxTabTextWidth { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -496,22 +500,22 @@ If true the vertical/horizontal scroll bars won&apos;t be showed if it&apos;s no
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="xref">System.UInt32</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_ScrollView_ContentOffset_" data-uid="Terminal.Gui.ScrollView.ContentOffset*"></a>
-  <h4 id="Terminal_Gui_ScrollView_ContentOffset" data-uid="Terminal.Gui.ScrollView.ContentOffset">ContentOffset</h4>
+  <a id="Terminal_Gui_TabView_SelectedTab_" data-uid="Terminal.Gui.TabView.SelectedTab*"></a>
+  <h4 id="Terminal_Gui_TabView_SelectedTab" data-uid="Terminal.Gui.TabView.SelectedTab">SelectedTab</h4>
   <div class="markdown level1 summary">
-Represents the top left corner coordinate that is displayed by the scrollview
+The currently selected member of <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_Tabs">Tabs</a> chosen by the user
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Point ContentOffset { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Tab SelectedTab { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -523,76 +527,22 @@ Represents the top left corner coordinate that is displayed by the scrollview
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
-        <td>The content offset.</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_ScrollView_ContentSize_" data-uid="Terminal.Gui.ScrollView.ContentSize*"></a>
-  <h4 id="Terminal_Gui_ScrollView_ContentSize" data-uid="Terminal.Gui.ScrollView.ContentSize">ContentSize</h4>
-  <div class="markdown level1 summary">
-Represents the contents of the data shown inside the scrollview
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Size ContentSize { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.Size.html">Size</a></td>
-        <td>The size of the content.</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_ScrollView_KeepContentAlwaysInViewport_" data-uid="Terminal.Gui.ScrollView.KeepContentAlwaysInViewport*"></a>
-  <h4 id="Terminal_Gui_ScrollView_KeepContentAlwaysInViewport" data-uid="Terminal.Gui.ScrollView.KeepContentAlwaysInViewport">KeepContentAlwaysInViewport</h4>
-  <div class="markdown level1 summary">
-Get or sets if the view-port is kept always visible in the area of this <a class="xref" href="Terminal.Gui.ScrollView.html">ScrollView</a>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool KeepContentAlwaysInViewport { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><a class="xref" href="Terminal.Gui.Tab.html">Tab</a></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_ScrollView_ShowHorizontalScrollIndicator_" data-uid="Terminal.Gui.ScrollView.ShowHorizontalScrollIndicator*"></a>
-  <h4 id="Terminal_Gui_ScrollView_ShowHorizontalScrollIndicator" data-uid="Terminal.Gui.ScrollView.ShowHorizontalScrollIndicator">ShowHorizontalScrollIndicator</h4>
+  <a id="Terminal_Gui_TabView_Style_" data-uid="Terminal.Gui.TabView.Style*"></a>
+  <h4 id="Terminal_Gui_TabView_Style" data-uid="Terminal.Gui.TabView.Style">Style</h4>
   <div class="markdown level1 summary">
-Gets or sets the visibility for the horizontal scroll indicator.
+Render choices for how to display tabs.  After making changes, call <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_ApplyStyleChanges">ApplyStyleChanges()</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool ShowHorizontalScrollIndicator { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public TabStyle Style { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -604,22 +554,22 @@ Gets or sets the visibility for the horizontal scroll indicator.
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><code>true</code> if show horizontal scroll indicator; otherwise, <code>false</code>.</td>
+        <td><a class="xref" href="Terminal.Gui.TabStyle.html">TabStyle</a></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_ScrollView_ShowVerticalScrollIndicator_" data-uid="Terminal.Gui.ScrollView.ShowVerticalScrollIndicator*"></a>
-  <h4 id="Terminal_Gui_ScrollView_ShowVerticalScrollIndicator" data-uid="Terminal.Gui.ScrollView.ShowVerticalScrollIndicator">ShowVerticalScrollIndicator</h4>
+  <a id="Terminal_Gui_TabView_Tabs_" data-uid="Terminal.Gui.TabView.Tabs*"></a>
+  <h4 id="Terminal_Gui_TabView_Tabs" data-uid="Terminal.Gui.TabView.Tabs">Tabs</h4>
   <div class="markdown level1 summary">
-/// Gets or sets the visibility for the vertical scroll indicator.
+All tabs currently hosted by the control
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool ShowVerticalScrollIndicator { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public IReadOnlyCollection&lt;Tab&gt; Tabs { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -631,8 +581,36 @@ Gets or sets the visibility for the horizontal scroll indicator.
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><code>true</code> if show vertical scroll indicator; otherwise, <code>false</code>.</td>
+        <td><span class="xref">System.Collections.Generic.IReadOnlyCollection</span>&lt;<a class="xref" href="Terminal.Gui.Tab.html">Tab</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TabView_TabScrollOffset_" data-uid="Terminal.Gui.TabView.TabScrollOffset*"></a>
+  <h4 id="Terminal_Gui_TabView_TabScrollOffset" data-uid="Terminal.Gui.TabView.TabScrollOffset">TabScrollOffset</h4>
+  <div class="markdown level1 summary">
+When there are too many tabs to render, this indicates the first
+tab to render on the screen.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int TabScrollOffset { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -640,15 +618,15 @@ Gets or sets the visibility for the horizontal scroll indicator.
   </h3>
   
   
-  <a id="Terminal_Gui_ScrollView_Add_" data-uid="Terminal.Gui.ScrollView.Add*"></a>
-  <h4 id="Terminal_Gui_ScrollView_Add_Terminal_Gui_View_" data-uid="Terminal.Gui.ScrollView.Add(Terminal.Gui.View)">Add(View)</h4>
+  <a id="Terminal_Gui_TabView_AddTab_" data-uid="Terminal.Gui.TabView.AddTab*"></a>
+  <h4 id="Terminal_Gui_TabView_AddTab_Terminal_Gui_Tab_System_Boolean_" data-uid="Terminal.Gui.TabView.AddTab(Terminal.Gui.Tab,System.Boolean)">AddTab(Tab, Boolean)</h4>
   <div class="markdown level1 summary">
-Adds the view to the scrollview.
+Adds the given <code data-dev-comment-type="paramref" class="paramref">tab</code> to <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_Tabs">Tabs</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override void Add(View view)</code></pre>
+    <pre><code class="lang-csharp hljs">public void AddTab(Tab tab, bool andSelect)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -661,20 +639,38 @@ Adds the view to the scrollview.
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
-        <td><span class="parametername">view</span></td>
-        <td>The view to add to the scrollview.</td>
+        <td><a class="xref" href="Terminal.Gui.Tab.html">Tab</a></td>
+        <td><span class="parametername">tab</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">andSelect</span></td>
+        <td>True to make the newly added Tab the <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_SelectedTab">SelectedTab</a></td>
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_">View.Add(View)</a></div>
   
   
-  <a id="Terminal_Gui_ScrollView_Dispose_" data-uid="Terminal.Gui.ScrollView.Dispose*"></a>
-  <h4 id="Terminal_Gui_ScrollView_Dispose_System_Boolean_" data-uid="Terminal.Gui.ScrollView.Dispose(System.Boolean)">Dispose(Boolean)</h4>
+  <a id="Terminal_Gui_TabView_ApplyStyleChanges_" data-uid="Terminal.Gui.TabView.ApplyStyleChanges*"></a>
+  <h4 id="Terminal_Gui_TabView_ApplyStyleChanges" data-uid="Terminal.Gui.TabView.ApplyStyleChanges">ApplyStyleChanges()</h4>
   <div class="markdown level1 summary">
-Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+Updates the control to use the latest state settings in <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_Style">Style</a>.
+This can change the size of the client area of the tab (for rendering the 
+selected tab&apos;s content).  This method includes a call 
+to <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">SetNeedsDisplay()</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ApplyStyleChanges()</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_TabView_Dispose_" data-uid="Terminal.Gui.TabView.Dispose*"></a>
+  <h4 id="Terminal_Gui_TabView_Dispose_System_Boolean_" data-uid="Terminal.Gui.TabView.Dispose(System.Boolean)">Dispose(Boolean)</h4>
+  <div class="markdown level1 summary">
+Disposes the control and all <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_Tabs">Tabs</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -700,26 +696,43 @@ Performs application-defined tasks associated with freeing, releasing, or resett
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Dispose_System_Boolean_">View.Dispose(Boolean)</a></div>
-  <h5 id="Terminal_Gui_ScrollView_Dispose_System_Boolean__remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-If disposing equals true, the method has been called directly
-or indirectly by a user&apos;s code. Managed and unmanaged resources
-can be disposed.
-If disposing equals false, the method has been called by the
-runtime from inside the finalizer and you should not reference
-other objects. Only unmanaged resources can be disposed.		
-</div>
   
   
-  <a id="Terminal_Gui_ScrollView_MouseEvent_" data-uid="Terminal.Gui.ScrollView.MouseEvent*"></a>
-  <h4 id="Terminal_Gui_ScrollView_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.ScrollView.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
+  <a id="Terminal_Gui_TabView_EnsureSelectedTabIsVisible_" data-uid="Terminal.Gui.TabView.EnsureSelectedTabIsVisible*"></a>
+  <h4 id="Terminal_Gui_TabView_EnsureSelectedTabIsVisible" data-uid="Terminal.Gui.TabView.EnsureSelectedTabIsVisible">EnsureSelectedTabIsVisible()</h4>
   <div class="markdown level1 summary">
-Method invoked when a mouse event is generated
+Updates <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_TabScrollOffset">TabScrollOffset</a> to ensure that <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_SelectedTab">SelectedTab</a> is visible
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override bool MouseEvent(MouseEvent me)</code></pre>
+    <pre><code class="lang-csharp hljs">public void EnsureSelectedTabIsVisible()</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_TabView_EnsureValidScrollOffsets_" data-uid="Terminal.Gui.TabView.EnsureValidScrollOffsets*"></a>
+  <h4 id="Terminal_Gui_TabView_EnsureValidScrollOffsets" data-uid="Terminal.Gui.TabView.EnsureValidScrollOffsets">EnsureValidScrollOffsets()</h4>
+  <div class="markdown level1 summary">
+Updates <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_TabScrollOffset">TabScrollOffset</a> to be a valid index of <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_Tabs">Tabs</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void EnsureValidScrollOffsets()</code></pre>
+  </div>
+  <h5 id="Terminal_Gui_TabView_EnsureValidScrollOffsets_remarks">Remarks</h5>
+  <div class="markdown level1 remarks">Changes will not be immediately visible in the display until you call <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetNeedsDisplay">SetNeedsDisplay()</a></div>
+  
+  
+  <a id="Terminal_Gui_TabView_OnSelectedTabChanged_" data-uid="Terminal.Gui.TabView.OnSelectedTabChanged*"></a>
+  <h4 id="Terminal_Gui_TabView_OnSelectedTabChanged_Terminal_Gui_Tab_Terminal_Gui_Tab_" data-uid="Terminal.Gui.TabView.OnSelectedTabChanged(Terminal.Gui.Tab,Terminal.Gui.Tab)">OnSelectedTabChanged(Tab, Tab)</h4>
+  <div class="markdown level1 summary">
+Raises the <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_SelectedTabChanged">SelectedTabChanged</a> event
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void OnSelectedTabChanged(Tab oldTab, Tab newTab)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -732,93 +745,21 @@ Method invoked when a mouse event is generated
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></td>
-        <td><span class="parametername">me</span></td>
+        <td><a class="xref" href="Terminal.Gui.Tab.html">Tab</a></td>
+        <td><span class="parametername">oldTab</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Tab.html">Tab</a></td>
+        <td><span class="parametername">newTab</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a></div>
   
   
-  <a id="Terminal_Gui_ScrollView_OnEnter_" data-uid="Terminal.Gui.ScrollView.OnEnter*"></a>
-  <h4 id="Terminal_Gui_ScrollView_OnEnter_Terminal_Gui_View_" data-uid="Terminal.Gui.ScrollView.OnEnter(Terminal.Gui.View)">OnEnter(View)</h4>
-  <div class="markdown level1 summary">
-Method invoked when a view gets focus.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override bool OnEnter(View view)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
-        <td><span class="parametername">view</span></td>
-        <td>The view that is losing focus.</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_OnEnter_Terminal_Gui_View_">View.OnEnter(View)</a></div>
-  
-  
-  <a id="Terminal_Gui_ScrollView_PositionCursor_" data-uid="Terminal.Gui.ScrollView.PositionCursor*"></a>
-  <h4 id="Terminal_Gui_ScrollView_PositionCursor" data-uid="Terminal.Gui.ScrollView.PositionCursor">PositionCursor()</h4>
-  <div class="markdown level1 summary">
-Positions the cursor in the right position based on the currently focused view in the chain.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override void PositionCursor()</code></pre>
-  </div>
-  <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_PositionCursor">View.PositionCursor()</a></div>
-  
-  
-  <a id="Terminal_Gui_ScrollView_ProcessKey_" data-uid="Terminal.Gui.ScrollView.ProcessKey*"></a>
-  <h4 id="Terminal_Gui_ScrollView_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.ScrollView.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
+  <a id="Terminal_Gui_TabView_ProcessKey_" data-uid="Terminal.Gui.TabView.ProcessKey*"></a>
+  <h4 id="Terminal_Gui_TabView_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.TabView.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
   <div class="markdown level1 summary">
 If the view is focused, gives the view a
 chance to process the keystroke.
@@ -826,7 +767,7 @@ chance to process the keystroke.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override bool ProcessKey(KeyEvent kb)</code></pre>
+    <pre><code class="lang-csharp hljs">public override bool ProcessKey(KeyEvent keyEvent)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -840,8 +781,8 @@ chance to process the keystroke.
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
-        <td><span class="parametername">kb</span></td>
-        <td></td>
+        <td><span class="parametername">keyEvent</span></td>
+        <td>Contains the details about the key that produced the event.</td>
       </tr>
     </tbody>
   </table>
@@ -862,7 +803,7 @@ chance to process the keystroke.
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
-  <h5 id="Terminal_Gui_ScrollView_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <h5 id="Terminal_Gui_TabView_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 <p>
   Views can override this method if they are
@@ -883,15 +824,15 @@ chance to process the keystroke.
 </div>
   
   
-  <a id="Terminal_Gui_ScrollView_Redraw_" data-uid="Terminal.Gui.ScrollView.Redraw*"></a>
-  <h4 id="Terminal_Gui_ScrollView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.ScrollView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
+  <a id="Terminal_Gui_TabView_Redraw_" data-uid="Terminal.Gui.TabView.Redraw*"></a>
+  <h4 id="Terminal_Gui_TabView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.TabView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
   <div class="markdown level1 summary">
 Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override void Redraw(Rect region)</code></pre>
+    <pre><code class="lang-csharp hljs">public override void Redraw(Rect bounds)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -905,14 +846,14 @@ Redraws this view and its subviews; only redraws the views that have been flagge
     <tbody>
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
-        <td><span class="parametername">region</span></td>
-        <td></td>
+        <td><span class="parametername">bounds</span></td>
+        <td>The bounds (view-relative region) to redraw.</td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
-  <h5 id="Terminal_Gui_ScrollView_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
+  <h5 id="Terminal_Gui_TabView_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 <p>
    Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
@@ -928,32 +869,48 @@ Redraws this view and its subviews; only redraws the views that have been flagge
 </div>
   
   
-  <a id="Terminal_Gui_ScrollView_RemoveAll_" data-uid="Terminal.Gui.ScrollView.RemoveAll*"></a>
-  <h4 id="Terminal_Gui_ScrollView_RemoveAll" data-uid="Terminal.Gui.ScrollView.RemoveAll">RemoveAll()</h4>
+  <a id="Terminal_Gui_TabView_RemoveTab_" data-uid="Terminal.Gui.TabView.RemoveTab*"></a>
+  <h4 id="Terminal_Gui_TabView_RemoveTab_Terminal_Gui_Tab_" data-uid="Terminal.Gui.TabView.RemoveTab(Terminal.Gui.Tab)">RemoveTab(Tab)</h4>
   <div class="markdown level1 summary">
-Removes all widgets from this container.
+Removes the given <code data-dev-comment-type="paramref" class="paramref">tab</code> from <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_Tabs">Tabs</a>.
+Caller is responsible for disposing the tab&apos;s hosted <a class="xref" href="Terminal.Gui.Tab.html#Terminal_Gui_Tab_View">View</a>
+if appropriate.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override void RemoveAll()</code></pre>
+    <pre><code class="lang-csharp hljs">public void RemoveTab(Tab tab)</code></pre>
   </div>
-  <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_RemoveAll">View.RemoveAll()</a></div>
-  <h5 id="Terminal_Gui_ScrollView_RemoveAll_remarks">Remarks</h5>
-  <div class="markdown level1 remarks">
-</div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Tab.html">Tab</a></td>
+        <td><span class="parametername">tab</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
-  <a id="Terminal_Gui_ScrollView_ScrollDown_" data-uid="Terminal.Gui.ScrollView.ScrollDown*"></a>
-  <h4 id="Terminal_Gui_ScrollView_ScrollDown_System_Int32_" data-uid="Terminal.Gui.ScrollView.ScrollDown(System.Int32)">ScrollDown(Int32)</h4>
+  <a id="Terminal_Gui_TabView_SwitchTabBy_" data-uid="Terminal.Gui.TabView.SwitchTabBy*"></a>
+  <h4 id="Terminal_Gui_TabView_SwitchTabBy_System_Int32_" data-uid="Terminal.Gui.TabView.SwitchTabBy(System.Int32)">SwitchTabBy(Int32)</h4>
   <div class="markdown level1 summary">
-Scrolls the view down.
+Changes the <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_SelectedTab">SelectedTab</a> by the given <code data-dev-comment-type="paramref" class="paramref">amount</code>.  
+Positive for right, negative for left.  If no tab is currently selected then
+the first tab will become selected
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool ScrollDown(int lines)</code></pre>
+    <pre><code class="lang-csharp hljs">public void SwitchTabBy(int amount)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -967,56 +924,25 @@ Scrolls the view down.
     <tbody>
       <tr>
         <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">lines</span></td>
-        <td>Number of lines to scroll.</td>
+        <td><span class="parametername">amount</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><code>true</code>, if left was scrolled, <code>false</code> otherwise.</td>
-      </tr>
-    </tbody>
-  </table>
+  <h3 id="events">Events
+  </h3>
   
   
-  <a id="Terminal_Gui_ScrollView_ScrollLeft_" data-uid="Terminal.Gui.ScrollView.ScrollLeft*"></a>
-  <h4 id="Terminal_Gui_ScrollView_ScrollLeft_System_Int32_" data-uid="Terminal.Gui.ScrollView.ScrollLeft(System.Int32)">ScrollLeft(Int32)</h4>
+  <h4 id="Terminal_Gui_TabView_SelectedTabChanged" data-uid="Terminal.Gui.TabView.SelectedTabChanged">SelectedTabChanged</h4>
   <div class="markdown level1 summary">
-Scrolls the view to the left
+Event for when <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_SelectedTab">SelectedTab</a> changes
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool ScrollLeft(int cols)</code></pre>
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;TabChangedEventArgs&gt; SelectedTabChanged</code></pre>
   </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">cols</span></td>
-        <td>Number of columns to scroll by.</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
+  <h5 class="eventType">Event Type</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -1026,96 +952,8 @@ Scrolls the view to the left
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><code>true</code>, if left was scrolled, <code>false</code> otherwise.</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_ScrollView_ScrollRight_" data-uid="Terminal.Gui.ScrollView.ScrollRight*"></a>
-  <h4 id="Terminal_Gui_ScrollView_ScrollRight_System_Int32_" data-uid="Terminal.Gui.ScrollView.ScrollRight(System.Int32)">ScrollRight(Int32)</h4>
-  <div class="markdown level1 summary">
-Scrolls the view to the right.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool ScrollRight(int cols)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">cols</span></td>
-        <td>Number of columns to scroll by.</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><code>true</code>, if right was scrolled, <code>false</code> otherwise.</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_ScrollView_ScrollUp_" data-uid="Terminal.Gui.ScrollView.ScrollUp*"></a>
-  <h4 id="Terminal_Gui_ScrollView_ScrollUp_System_Int32_" data-uid="Terminal.Gui.ScrollView.ScrollUp(System.Int32)">ScrollUp(Int32)</h4>
-  <div class="markdown level1 summary">
-Scrolls the view up.
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool ScrollUp(int lines)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">lines</span></td>
-        <td>Number of lines to scroll.</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><code>true</code>, if left was scrolled, <code>false</code> otherwise.</td>
+        <td><span class="xref">System.EventHandler</span>&lt;<a class="xref" href="Terminal.Gui.TabChangedEventArgs.html">TabChangedEventArgs</a>&gt;</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
