@@ -10,10 +10,6 @@ A simple toolkit for building console GUI apps for .NET, .NET Core, and Mono tha
 
 ![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.gif)
 
-The most recent released [Nuget package is version `0.90.x`](https://www.nuget.org/packages/Terminal.Gui) which is the "Stable, Feature Complete" pre-release of 1.0.
-
-Nuget also contains pre-release versions of 1.0; they are identified with `-pre` or `-beta` in the version number (e.g. `1.0.0-pre.1`)
-
 ## Controls & Features
 
 *Terminal.Gui* contains various controls for building text user interfaces:
@@ -222,4 +218,4 @@ A presentation of this was part of the [Retro.NET](https://channel9.msdn.com/Eve
 
 Release history can be found in the [Terminal.Gui.csproj](https://github.com/migueldeicaza/gui.cs/blob/master/Terminal.Gui/Terminal.Gui.csproj) file.
 
-In 2019 and 2020, Charlie Kindel (https://github.com/tig) and @BDisp (https://github.com/BDisp) vastly extended, improved, polished and fixed gui.cs to what it is today.
+In 2019, 2020, and 2021, Charlie Kindel (https://github.com/tig), @BDisp (https://github.com/BDisp), and Thomas Nind (https://github.com/tznind) vastly extended, improved, polished and fixed gui.cs to what it is today.
