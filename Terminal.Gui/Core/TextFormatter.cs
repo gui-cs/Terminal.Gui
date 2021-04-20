@@ -877,6 +877,9 @@ namespace Terminal.Gui {
 
 				var current = start;
 				for (var idx = start; idx < start + size; idx++) {
+					if (idx < 0) {
+						continue;
+					}
 					var rune = (Rune)' ';
 					if (isVertical) {
 						Application.Driver?.Move (x, current);

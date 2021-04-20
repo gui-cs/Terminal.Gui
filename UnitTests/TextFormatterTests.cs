@@ -7,7 +7,7 @@ using System.Linq;
 using Terminal.Gui;
 using Xunit;
 
-// Alais Console to MockConsole so we don't accidentally use Console
+// Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui {
@@ -16,7 +16,7 @@ namespace Terminal.Gui {
 		[Fact]
 		public void Basic_Usage ()
 		{
-			var testText = ustring.Make("test");
+			var testText = ustring.Make ("test");
 			var expectedSize = new Size ();
 			var testBounds = new Rect (0, 0, 100, 1);
 			var tf = new TextFormatter ();
@@ -26,7 +26,7 @@ namespace Terminal.Gui {
 			Assert.Equal (testText, tf.Text);
 			Assert.Equal (TextAlignment.Left, tf.Alignment);
 			Assert.Equal (expectedSize, tf.Size);
-			tf.Draw (testBounds, new Attribute(), new Attribute());
+			tf.Draw (testBounds, new Attribute (), new Attribute ());
 			Assert.Equal (expectedSize, tf.Size);
 			Assert.NotEmpty (tf.Lines);
 
@@ -76,7 +76,7 @@ namespace Terminal.Gui {
 			Assert.False (tf.NeedsFormat);
 
 			tf.Size = new Size (1, 1);
-			Assert.True (tf.NeedsFormat); 
+			Assert.True (tf.NeedsFormat);
 			Assert.NotEmpty (tf.Lines);
 			Assert.False (tf.NeedsFormat); // get_Lines causes a Format
 
@@ -1961,7 +1961,7 @@ namespace Terminal.Gui {
 			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list[0]);
+			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
 
 			maxWidth = text.RuneCount - 1;
 			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
@@ -2011,10 +2011,10 @@ namespace Terminal.Gui {
 			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
 
 			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth); 
+			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]).Replace("\n", " "), list [0]);
+			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\n", " "), list [0]);
 
 			// no clip
 			maxWidth = text.RuneCount + 0;
@@ -2051,7 +2051,7 @@ namespace Terminal.Gui {
 			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth) + 1;
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\r\n", " ").ToString(), list [0].ToString());
+			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\r\n", " ").ToString (), list [0].ToString ());
 
 			// no clip
 			maxWidth = text.RuneCount + 0;
@@ -2145,7 +2145,6 @@ namespace Terminal.Gui {
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
 			Assert.Equal ("012 456 89 end", list [0]);
-		
 		}
 
 		[Fact]
@@ -2295,16 +2294,16 @@ namespace Terminal.Gui {
 			Assert.Equal (1, c.Utf8SequenceLength);
 
 			c = new System.Text.Rune ('\u1150');
-			Assert.Equal (3, c.Utf8SequenceLength);		// 0x1150	ᅐ	Unicode Technical Report #11
+			Assert.Equal (3, c.Utf8SequenceLength);         // 0x1150	ᅐ	Unicode Technical Report #11
 
 			c = new System.Text.Rune ('\u1161');
-			Assert.Equal (3, c.Utf8SequenceLength);		// 0x1161	ᅡ	column width of 0
+			Assert.Equal (3, c.Utf8SequenceLength);         // 0x1161	ᅡ	column width of 0
 
 			c = new System.Text.Rune (31);
-			Assert.Equal (1, c.Utf8SequenceLength);		// non printable character
+			Assert.Equal (1, c.Utf8SequenceLength);         // non printable character
 
 			c = new System.Text.Rune (127);
-			Assert.Equal (1, c.Utf8SequenceLength);		// non printable character
+			Assert.Equal (1, c.Utf8SequenceLength);         // non printable character
 		}
 
 		[Fact]
@@ -2425,6 +2424,58 @@ namespace Terminal.Gui {
 		public void Format_Throw_ArgumentException_With_WordWrap_As_False_And_Keep_End_Spaces_As_True ()
 		{
 			Assert.Throws<ArgumentException> (() => TextFormatter.Format ("Some text", 4, TextAlignment.Left, false, true));
+		}
+
+		[Fact]
+		public void Draw_Horizontal_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
+		{
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var top = Application.Top;
+
+			var view = new View ("view") { X = -2 };
+			top.Add (view);
+
+			Application.Iteration += () => {
+				Assert.Equal (-2, view.X);
+
+				Application.RequestStop ();
+			};
+
+			try {
+				Application.Run ();
+			} catch (IndexOutOfRangeException ex) {
+				// After the fix this exception will not be caught.
+				Assert.IsType<IndexOutOfRangeException> (ex);
+			}
+		}
+
+		[Fact]
+		public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
+		{
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			var top = Application.Top;
+
+			var view = new View ("view") {
+				Y = -2,
+				Height = 10,
+				TextDirection = TextDirection.TopBottom_LeftRight
+			};
+			top.Add (view);
+
+			Application.Iteration += () => {
+				Assert.Equal (-2, view.Y);
+
+				Application.RequestStop ();
+			};
+
+			try {
+				Application.Run ();
+			} catch (IndexOutOfRangeException ex) {
+				// After the fix this exception will not be caught.
+				Assert.IsType<IndexOutOfRangeException> (ex);
+			}
 		}
 	}
 }
