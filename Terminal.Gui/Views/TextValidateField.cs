@@ -28,6 +28,13 @@ namespace Terminal.Gui {
 			bool Fixed { get; }
 
 			/// <summary>
+			/// Set Cursor position to <paramref name="pos"/>.
+			/// </summary>
+			/// <param name="pos"></param>
+			/// <returns>Return first valid position.</returns>
+			int Cursor (int pos);
+
+			/// <summary>
 			/// First valid position before <paramref name="pos"/>.
 			/// </summary>
 			/// <param name="pos"></param>
@@ -131,6 +138,20 @@ namespace Terminal.Gui {
 
 			///<inheritdoc/>
 			public bool Fixed => true;
+
+			///<inheritdoc/>
+			public int Cursor (int pos)
+			{
+				if (pos < 0) {
+					return CursorStart ();
+				} else if (pos > provider.Length) {
+					return CursorEnd ();
+				} else {
+					var p = provider.FindEditPositionFrom (pos, false);
+					if (p == -1) p = provider.FindEditPositionFrom (pos, true);
+					return p;
+				}
+			}
 
 			///<inheritdoc/>
 			public int CursorStart ()
@@ -240,6 +261,23 @@ namespace Terminal.Gui {
 			public int CursorEnd ()
 			{
 				return CursorLeft (text.Count);
+			}
+
+			///<inheritdoc/>
+			public int Cursor (int pos)
+			{
+				if (pos < 0) {
+					return CursorStart ();
+				} else if (pos >= text.Count) {
+					return CursorEnd ();
+				} else {
+					if (MaskRunes.ContainsKey (mask [pos])) {
+						return pos;
+					}
+					var p = CursorLeft (pos);
+					if (p == pos) p = CursorRight (pos);
+					return p;
+				}
 			}
 
 			///<inheritdoc/>
@@ -424,15 +462,27 @@ namespace Terminal.Gui {
 			}
 
 			///<inheritdoc/>
+			public int Cursor (int pos)
+			{
+				if (pos < 0) {
+					return CursorStart ();
+				} else if (pos > text.Count) {
+					return CursorEnd ();
+				} else {
+					return pos;
+				}
+			}
+
+			///<inheritdoc/>
 			public int CursorStart ()
 			{
-				return CursorRight (0);
+				return 0;
 			}
 
 			///<inheritdoc/>
 			public int CursorEnd ()
 			{
-				return CursorLeft (text.Count);
+				return text.Count;
 			}
 
 			///<inheritdoc/>
@@ -548,7 +598,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent mouseEvent)
 		{
-			cursorPosition = provider.CursorLeft (mouseEvent.X + 1);
+			cursorPosition = provider.Cursor (mouseEvent.X - GetMargins (Frame.Width).left);
 			SetFocus ();
 			SetNeedsDisplay ();
 			return true;
