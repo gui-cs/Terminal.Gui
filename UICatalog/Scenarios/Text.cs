@@ -114,7 +114,8 @@ namespace UICatalog {
 			var netProviderField = new TextValidateField<NetMaskedTextProvider> ("999 000 LLL >LLL AAA aaa") {
 				X = Pos.Right (netProvider) + 1,
 				Y = Pos.Y (netProvider),
-				//Width = 25
+				Width = 40,
+				TextAlignment = TextAlignment.Centered
 			};
 			Win.Add (netProviderField);
 
@@ -125,9 +126,11 @@ namespace UICatalog {
 			};
 			Win.Add (guiMaskProvider);
 
-			var guiMaskProviderField = new TextValidateField<TextMaskProvider> ("+(999) 000-0000]") {
+			var guiMaskProviderField = new TextValidateField<TextMaskProvider> ("+(999) 000-0000") {
 				X = Pos.Right (guiMaskProvider) + 1,
 				Y = Pos.Y (guiMaskProvider),
+				TextAlignment = TextAlignment.Centered,
+				Width = 30
 			};
 			Win.Add (guiMaskProviderField);
 
@@ -141,7 +144,8 @@ namespace UICatalog {
 			var regexProviderField = new TextValidateField<TextRegexProvider> ("^([0-9]?[0-9]?[0-9]|1000)$") {
 				X = Pos.Right (regexProvider) + 1,
 				Y = Pos.Y (regexProvider),
-				Width = 25
+				Width = 40,
+				TextAlignment = TextAlignment.Centered
 			};
 			// Access the inner Provider to configure.
 			regexProviderField.Provider.ValidateOnInput = false;
