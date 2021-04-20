@@ -8,7 +8,43 @@ using Terminal.Gui.Graphs;
 using Point = Terminal.Gui.Point;
 
 namespace UnitTests {
+		
+		#region Helper Classes
+		class FakeHAxis : HorizontalAxis {
 
+			public List<Point> DrawAxisLinePoints = new List<Point> ();
+			public List<int> LabelPoints = new List<int>();
+
+			protected override void DrawAxisLine (GraphView graph, ConsoleDriver driver, int x, int y)
+			{
+				base.DrawAxisLine (graph, driver, x, y);
+				DrawAxisLinePoints.Add (new Point(x, y));
+			}
+
+			public override void DrawAxisLabel (GraphView graph, ConsoleDriver driver, int screenPosition, string text)
+			{
+				base.DrawAxisLabel (graph, driver, screenPosition, text);
+				LabelPoints.Add(screenPosition);
+			}
+		}
+
+		class FakeVAxis : VerticalAxis {
+
+			public List<Point> DrawAxisLinePoints = new List<Point> ();
+			public List<int> LabelPoints = new List<int>();
+
+			protected override void DrawAxisLine (GraphView graph, ConsoleDriver driver, int x, int y)
+			{
+				base.DrawAxisLine (graph, driver, x, y);
+				DrawAxisLinePoints.Add (new Point(x, y));
+			}
+			public override void DrawAxisLabel (GraphView graph, ConsoleDriver driver, int screenPosition, string text)
+			{
+				base.DrawAxisLabel (graph, driver, screenPosition, text);
+				LabelPoints.Add(screenPosition);
+			}
+		}
+	#endregion
 
 	public class GraphViewTests {
 
@@ -424,6 +460,90 @@ namespace UnitTests {
 		}
 	}
 
+	public class BarSeriesTests{
+
+		private void InitFakeDriver ()
+		{
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			driver.Init (() => { });
+		}
+
+		private GraphView GetGraph (out FakeBarSeries series, out FakeHAxis axisX, out FakeVAxis axisY)
+		{
+			InitFakeDriver ();
+
+			var gv = new GraphView ();
+			gv.ColorScheme = new ColorScheme ();
+
+			// y axis goes from 0.1 to 1 across 10 console rows
+			// x axis goes from 0 to 10 across 20 console columns
+			gv.Bounds = new Rect (0, 0, 20, 10);
+			gv.CellSize = new PointF(0.5f,0.1f);
+
+			gv.Series.Add (series = new FakeBarSeries ());
+
+			// don't show axis labels that means any labels
+			// that appaer are explicitly from the bars
+			gv.AxisX = axisX = new FakeHAxis(){Increment=0};
+			gv.AxisY = axisY = new FakeVAxis(){Increment=0};
+
+			return gv;
+		}
+
+		[Fact]
+		public void TestZeroHeightBar_WithName(){
+
+			var graph = GetGraph(out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
+			graph.Redraw(graph.Bounds);
+
+			// no bars
+			Assert.Empty(barSeries.BarScreenStarts);
+			Assert.Empty(axisX.LabelPoints);
+			Assert.Empty(axisY.LabelPoints);
+
+			// bar of height 0
+			barSeries.Bars.Add(new BarSeries.Bar("hi",new GraphCellToRender('.'),0));
+			barSeries.Orientation = Orientation.Vertical;
+
+			// redraw graph
+			graph.Redraw(graph.Bounds);
+
+			// bar should not be drawn
+			Assert.Empty(barSeries.BarScreenStarts);
+
+			Assert.NotEmpty(axisX.LabelPoints);
+			Assert.Empty(axisY.LabelPoints);
+
+			// but bar name should be
+			// Screen position x=2 because bars are drawn every 1f of
+			// graph space and CellSize.X is 0.5f
+			Assert.Contains(2, axisX.LabelPoints);
+		}
+
+		private class FakeBarSeries : BarSeries{
+			public GraphCellToRender FinalColor { get; private set; }
+
+			public List<Point> BarScreenStarts { get; private set; } = new List<Point>();
+			public List<Point> BarScreenEnds { get; private set; } = new List<Point>();
+			
+			protected override GraphCellToRender AdjustColor (GraphCellToRender graphCellToRender)
+			{
+				return FinalColor = base.AdjustColor (graphCellToRender);	
+			}
+
+			protected override void DrawBarLine (GraphView graph, ConsoleDriver driver, Point start, Point end, Bar beingDrawn)
+			{
+				base.DrawBarLine (graph, driver, start, end, beingDrawn);
+				
+				BarScreenStarts.Add(start);
+				BarScreenEnds.Add(end);
+			}
+
+		}
+	}
+
+
 	public class AxisTests {
 
 		private void InitFakeDriver ()
@@ -597,40 +717,7 @@ namespace UnitTests {
 		#endregion
 
 
-		private class FakeHAxis : HorizontalAxis {
-
-			public List<Point> DrawAxisLinePoints = new List<Point> ();
-			public List<int> LabelPoints = new List<int>();
-
-			protected override void DrawAxisLine (GraphView graph, ConsoleDriver driver, int x, int y)
-			{
-				base.DrawAxisLine (graph, driver, x, y);
-				DrawAxisLinePoints.Add (new Point(x, y));
-			}
-
-			public override void DrawAxisLabel (GraphView graph, ConsoleDriver driver, int screenPosition, string text)
-			{
-				base.DrawAxisLabel (graph, driver, screenPosition, text);
-				LabelPoints.Add(screenPosition);
-			}
-		}
-
-		private class FakeVAxis : VerticalAxis {
-
-			public List<Point> DrawAxisLinePoints = new List<Point> ();
-			public List<int> LabelPoints = new List<int>();
-
-			protected override void DrawAxisLine (GraphView graph, ConsoleDriver driver, int x, int y)
-			{
-				base.DrawAxisLine (graph, driver, x, y);
-				DrawAxisLinePoints.Add (new Point(x, y));
-			}
-			public override void DrawAxisLabel (GraphView graph, ConsoleDriver driver, int screenPosition, string text)
-			{
-				base.DrawAxisLabel (graph, driver, screenPosition, text);
-				LabelPoints.Add(screenPosition);
-			}
-		}
+		
 	}
 
 	public class AxisIncrementToRenderTests {
