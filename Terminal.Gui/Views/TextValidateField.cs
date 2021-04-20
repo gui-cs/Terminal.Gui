@@ -469,7 +469,7 @@ namespace Terminal.Gui {
 				} else if (pos > text.Count) {
 					return CursorEnd ();
 				} else {
-					return pos;
+					return pos + 1;
 				}
 			}
 
