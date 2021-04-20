@@ -521,6 +521,118 @@ namespace UnitTests {
 			Assert.Contains(2, axisX.LabelPoints);
 		}
 
+
+		[Fact]
+		public void TestTwoTallBars_WithOffset(){
+
+			var graph = GetGraph(out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
+			graph.Redraw(graph.Bounds);
+
+			// no bars
+			Assert.Empty(barSeries.BarScreenStarts);
+			Assert.Empty(axisX.LabelPoints);
+			Assert.Empty(axisY.LabelPoints);
+
+			// 0.5 units of graph fit every screen cell
+			// so 1 unit of graph space is 2 screen columns
+			graph.CellSize = new PointF(0.5f,0.1f);
+
+			// Start bar 1 screen unit along
+			barSeries.Offset = 0.5f;
+			barSeries.BarEvery = 1f;
+
+			barSeries.Bars.Add(
+				new BarSeries.Bar("hi1",new GraphCellToRender('.'),100));
+			barSeries.Bars.Add(
+				new BarSeries.Bar("hi2",new GraphCellToRender('.'),100));
+
+			barSeries.Orientation = Orientation.Vertical;
+
+			// redraw graph
+			graph.Redraw(graph.Bounds);
+
+			// bar should be drawn at BarEvery 1f + offset 0.5f = 3 screen units
+			Assert.Equal(3,barSeries.BarScreenStarts[0].X);
+			Assert.Equal(3,barSeries.BarScreenEnds[0].X);
+
+			// second bar should be BarEveryx2 = 2f + offset 0.5f = 5 screen units
+			Assert.Equal(5,barSeries.BarScreenStarts[1].X);
+			Assert.Equal(5,barSeries.BarScreenEnds[1].X);
+
+			// both bars should have labels
+			Assert.Equal(2,axisX.LabelPoints.Count);
+			Assert.Contains(3, axisX.LabelPoints);
+			Assert.Contains(5, axisX.LabelPoints);
+
+			// bars are very tall but should not draw up off top of screen
+			Assert.Equal(9,barSeries.BarScreenStarts[0].Y);
+			Assert.Equal(0,barSeries.BarScreenEnds[0].Y);
+			Assert.Equal(9,barSeries.BarScreenStarts[1].Y);
+			Assert.Equal(0,barSeries.BarScreenEnds[1].Y);
+		}
+
+
+
+		[Fact]
+		public void TestOneLongOneShortHorizontalBars_WithOffset(){
+
+			var graph = GetGraph(out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
+			graph.Redraw(graph.Bounds);
+
+			// no bars
+			Assert.Empty(barSeries.BarScreenStarts);
+			Assert.Empty(axisX.LabelPoints);
+			Assert.Empty(axisY.LabelPoints);
+
+			// 0.1 units of graph y fit every screen row
+			// so 1 unit of graph y space is 10 screen rows
+			graph.CellSize = new PointF(0.5f,0.1f);
+
+			// Start bar 3 screen units up (y = height-3)
+			barSeries.Offset = 0.25f;
+			// 1 bar every 3 rows of screen
+			barSeries.BarEvery = 0.3f;
+			barSeries.Orientation = Orientation.Horizontal;
+
+			// 1 bar that is very wide (100 graph units horizontally = screen pos 50 but bounded by screen)
+			barSeries.Bars.Add(
+				new BarSeries.Bar("hi1",new GraphCellToRender('.'),100));
+
+			// 1 bar that is shorter
+			barSeries.Bars.Add(
+				new BarSeries.Bar("hi2",new GraphCellToRender('.'),5));
+
+			// redraw graph
+			graph.Redraw(graph.Bounds);
+
+			// since bars are horizontal all have the same X start cordinates
+			Assert.Equal(0,barSeries.BarScreenStarts[0].X);
+			Assert.Equal(0,barSeries.BarScreenStarts[1].X);
+
+			// bar goes all the way to the end so bumps up against right screen boundary
+			// width of graph is 20
+			Assert.Equal(19,barSeries.BarScreenEnds[0].X);
+
+			// shorter bar is 5 graph units wide which is 10 screen units
+			Assert.Equal(10,barSeries.BarScreenEnds[1].X);
+
+			// first  bar should be offset 6 screen units (0.25f + 0.3f graph units)
+			// since height of control is 10 then first bar should be at screen row 4 (10-6)
+			Assert.Equal(4,barSeries.BarScreenStarts[0].Y);
+
+			// second  bar should be offset 9 screen units (0.25f + 0.6f graph units)
+			// since height of control is 10 then second bar should be at screen row 1 (10-9)
+			Assert.Equal(1,barSeries.BarScreenStarts[1].Y);
+
+			// both bars should have labels but on the y axis
+			Assert.Equal(2,axisY.LabelPoints.Count);
+			Assert.Empty(axisX.LabelPoints);
+
+			// labels should align with the bars (same screen y axis point)
+			Assert.Contains(4, axisY.LabelPoints);
+			Assert.Contains(1, axisY.LabelPoints);
+		}
+
 		private class FakeBarSeries : BarSeries{
 			public GraphCellToRender FinalColor { get; private set; }
 

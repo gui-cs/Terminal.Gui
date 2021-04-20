@@ -764,12 +764,12 @@ namespace Terminal.Gui.Graphs {
 		/// The number of units of graph space along the axis before rendering the first bar
 		/// (and subsequent bars - see <see cref="BarEvery"/>).  Defaults to 0
 		/// </summary>
-		public float Offset { get; internal set; } = 0;
+		public float Offset { get; set; } = 0;
 
 		/// <summary>
 		/// Overrides the <see cref="Bar.Fill"/> with a fixed color
 		/// </summary>
-		public Attribute? OverrideBarColor { get; internal set; }
+		public Attribute? OverrideBarColor { get; set; }
 
 		/// <summary>
 		/// True to draw <see cref="Bar.Text"/> along the axis under the bar.  Defaults
@@ -818,6 +818,9 @@ namespace Terminal.Gui.Graphs {
 					
 					screenStart.X = graph.AxisY.GetAxisXPosition (graph);
 
+					// dont draw bar off the right of the control
+					screenEnd.X = Math.Min(graph.Bounds.Width-1,screenEnd.X);
+
 					// if bar is off the screen
 					if (screenStart.Y < 0 || screenStart.Y > drawBounds.Height - graph.MarginBottom) {
 						continue;
@@ -826,6 +829,9 @@ namespace Terminal.Gui.Graphs {
 
 					// Start the axis
 					screenStart.Y = graph.AxisX.GetAxisYPosition (graph);
+					
+					// dont draw bar up above top of control
+					screenEnd.Y = Math.Max(0,screenEnd.Y);
 
 					// if bar is off the screen
 					if (screenStart.X < graph.MarginLeft || screenStart.X > graph.MarginLeft+drawBounds.Width-1) {
