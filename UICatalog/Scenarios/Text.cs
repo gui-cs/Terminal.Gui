@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Text;
 using Terminal.Gui;
+using Terminal.Gui.TextValidateProviders;
+
+
 
 namespace UICatalog {
 	[ScenarioMetadata (Name: "Text Input Controls", Description: "Tests all text input controls")]
@@ -101,6 +104,49 @@ namespace UICatalog {
 
 			_timeField.TimeChanged += TimeChanged;
 
+			// MaskedTextProvider
+			var netProvider = new Label (".Net MaskedTextProvider [ 999 000 aaa AAA >AAA ]") {
+				X = Pos.Left (dateField),
+				Y = Pos.Bottom (dateField) + 1
+			};
+			Win.Add (netProvider);
+
+			var netProviderField = new TextValidateField<NetMaskedTextProvider> ("999 000 LLL >LLL AAA aaa") {
+				X = Pos.Right (netProvider) + 1,
+				Y = Pos.Y (netProvider),
+				//Width = 25
+			};
+			Win.Add (netProviderField);
+
+			// TextMaskProvider
+			var guiMaskProvider = new Label ("Gui.cs TextMaskProvider [ +(999) 000-0000 ]") {
+				X = Pos.Left (netProvider),
+				Y = Pos.Bottom (netProvider) + 1
+			};
+			Win.Add (guiMaskProvider);
+
+			var guiMaskProviderField = new TextValidateField<TextMaskProvider> ("+(999) 000-0000]") {
+				X = Pos.Right (guiMaskProvider) + 1,
+				Y = Pos.Y (guiMaskProvider),
+			};
+			Win.Add (guiMaskProviderField);
+
+			// TextRegexProvider
+			var regexProvider = new Label ("Gui.cs TextRegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]") {
+				X = Pos.Left (guiMaskProvider),
+				Y = Pos.Bottom (guiMaskProvider) + 1
+			};
+			Win.Add (regexProvider);
+
+			var regexProviderField = new TextValidateField<TextRegexProvider> ("^([0-9]?[0-9]?[0-9]|1000)$") {
+				X = Pos.Right (regexProvider) + 1,
+				Y = Pos.Y (regexProvider),
+				Width = 25
+			};
+			// Access the inner Provider to configure.
+			regexProviderField.Provider.ValidateOnInput = false;
+
+			Win.Add (regexProviderField);
 		}
 
 		TimeField _timeField;
@@ -109,7 +155,6 @@ namespace UICatalog {
 		private void TimeChanged (DateTimeEventArgs<TimeSpan> e)
 		{
 			_labelMirroringTimeField.Text = _timeField.Text;
-
 		}
 	}
 }
