@@ -466,10 +466,10 @@ namespace Terminal.Gui {
 			{
 				if (pos < 0) {
 					return CursorStart ();
-				} else if (pos > text.Count) {
+				} else if (pos >= text.Count) {
 					return CursorEnd ();
 				} else {
-					return pos + 1;
+					return pos;
 				}
 			}
 
@@ -577,7 +577,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="mask"></param>
 		/// <param name="text">Initial Value</param>
-		/// <param name="options">Provider specific options</param>
 		public TextValidateField (ustring mask, ustring text) : base ()
 		{
 			provider = Activator.CreateInstance (typeof (T)) as ITextValidateProvider;
@@ -598,7 +597,11 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent mouseEvent)
 		{
-			cursorPosition = provider.Cursor (mouseEvent.X - GetMargins (Frame.Width).left);
+			var c = provider.Cursor (mouseEvent.X - GetMargins (Frame.Width).left);
+			if (provider.Fixed == false && TextAlignment == TextAlignment.Right && Text.Length > 0) {
+				c += 1;
+			}
+			cursorPosition = c;
 			SetFocus ();
 			SetNeedsDisplay ();
 			return true;
