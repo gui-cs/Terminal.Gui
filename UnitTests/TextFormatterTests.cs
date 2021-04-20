@@ -2459,7 +2459,6 @@ namespace Terminal.Gui {
 
 			var view = new View ("view") {
 				Y = -2,
-				Width = 1,
 				Height = 10,
 				TextDirection = TextDirection.TopBottom_LeftRight
 			};
