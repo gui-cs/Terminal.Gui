@@ -55,7 +55,6 @@ namespace Terminal.Gui.Graphs {
 		/// <summary>
 		/// Text to display on the graph
 		/// </summary>
-		/// <value></value>
 		public string Text { get; set; }
 
 		/// <summary>
@@ -314,7 +313,7 @@ namespace Terminal.Gui.Graphs {
 			public PointF End { get; }
 
 			/// <summary>
-			/// Creates a new point at the given coordinates
+			/// Creates a new line between the points
 			/// </summary>
 			public LineF (PointF start, PointF end)
 			{
