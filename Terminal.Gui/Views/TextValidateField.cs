@@ -107,6 +107,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public class NetMaskedTextProvider : ITextValidateProvider {
 			MaskedTextProvider provider;
+			string text;
 
 			/// <summary>
 			/// Empty Constructor
@@ -120,6 +121,9 @@ namespace Terminal.Gui {
 				}
 				set {
 					provider = new MaskedTextProvider (value == ustring.Empty ? "&&&&&&" : value.ToString ());
+					if (string.IsNullOrEmpty (text) == false) {
+						provider.Set (text);
+					}
 				}
 			}
 
@@ -129,6 +133,7 @@ namespace Terminal.Gui {
 					return provider.ToDisplayString ();
 				}
 				set {
+					text = value.ToString ();
 					provider.Set (value.ToString ());
 				}
 			}
@@ -175,20 +180,20 @@ namespace Terminal.Gui {
 			public int CursorLeft (int pos)
 			{
 				var c = provider.FindEditPositionFrom (pos - 1, false);
-				return c == -1 ? CursorEnd () : c;
+				return c == -1 ? pos : c;
 			}
 
 			///<inheritdoc/>
 			public int CursorRight (int pos)
 			{
 				var c = provider.FindEditPositionFrom (pos + 1, true);
-				return c == -1 ? CursorStart () : c;
+				return c == -1 ? pos : c;
 			}
 
 			///<inheritdoc/>
 			public bool Delete (int pos)
 			{
-				return provider.RemoveAt (pos);
+				return provider.Replace (' ', pos);// .RemoveAt (pos);
 			}
 
 			///<inheritdoc/>
