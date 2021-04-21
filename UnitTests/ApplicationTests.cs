@@ -1,16 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Terminal.Gui;
 using Xunit;
 
 // Alais Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
-
-// Since Application is a singleton we can't run tests in parallel
-[assembly: CollectionBehavior (DisableTestParallelization = true)]
 
 namespace Terminal.Gui.Core {
 	public class ApplicationTests {
