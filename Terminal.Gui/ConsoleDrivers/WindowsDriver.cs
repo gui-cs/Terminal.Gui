@@ -116,23 +116,23 @@ namespace Terminal.Gui {
 				var err = Marshal.GetLastWin32Error ();
 				if (err != 0) {
 					throw new System.ComponentModel.Win32Exception (err);
-				}				
+				}
 				visibility = Gui.CursorVisibility.Default;
 
 				return false;
 			}
 
-			if (!info.bVisible)        
+			if (!info.bVisible)
 				visibility = CursorVisibility.Invisible;
-			else if (info.dwSize > 50) 
+			else if (info.dwSize > 50)
 				visibility = CursorVisibility.Box;
-			else                       
+			else
 				visibility = CursorVisibility.Underline;
 
 			return true;
 		}
 
-		public bool EnsureCursorVisibility () 
+		public bool EnsureCursorVisibility ()
 		{
 			if (initialCursorVisibility.HasValue && pendingCursorVisibility.HasValue && SetCursorVisibility (pendingCursorVisibility.Value)) {
 				pendingCursorVisibility = null;
@@ -161,11 +161,11 @@ namespace Terminal.Gui {
 
 			if (currentCursorVisibility.HasValue == false || currentCursorVisibility.Value != visibility) {
 				ConsoleCursorInfo info = new ConsoleCursorInfo {
-					dwSize   =  (uint) visibility & 0x00FF,
-					bVisible = ((uint) visibility & 0xFF00) != 0
+					dwSize = (uint)visibility & 0x00FF,
+					bVisible = ((uint)visibility & 0xFF00) != 0
 				};
 
-				if (!SetConsoleCursorInfo (ScreenBuffer, ref info)) 
+				if (!SetConsoleCursorInfo (ScreenBuffer, ref info))
 					return false;
 
 				currentCursorVisibility = visibility;
@@ -1418,6 +1418,36 @@ namespace Terminal.Gui {
 
 		public override void CookMouse ()
 		{
+		}
+
+		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
+		{
+			WindowsConsole.InputRecord input = new WindowsConsole.InputRecord ();
+			input.EventType = WindowsConsole.EventType.Key;
+
+			WindowsConsole.KeyEventRecord keyEvent = new WindowsConsole.KeyEventRecord ();
+			keyEvent.bKeyDown = true;
+			keyEvent.UnicodeChar = keyChar;
+			keyEvent.wVirtualKeyCode = (ushort)key;
+			WindowsConsole.ControlKeyState controlKey = new WindowsConsole.ControlKeyState ();
+			if (shift) {
+				controlKey |= WindowsConsole.ControlKeyState.ShiftPressed;
+			}
+			if (alt) {
+				controlKey |= WindowsConsole.ControlKeyState.LeftAltPressed;
+				controlKey |= WindowsConsole.ControlKeyState.RightAltPressed;
+			}
+			if (control) {
+				controlKey |= WindowsConsole.ControlKeyState.LeftControlPressed;
+				controlKey |= WindowsConsole.ControlKeyState.RightControlPressed;
+			}
+			keyEvent.dwControlKeyState = controlKey;
+
+			input.KeyEvent = keyEvent;
+
+			try {
+				ProcessInput (input);
+			} catch (OverflowException) { }
 		}
 		#endregion
 	}

@@ -226,7 +226,7 @@ namespace Terminal.Gui {
 		void GetConsoleInputType (ConsoleKeyInfo consoleKeyInfo)
 		{
 			InputResult inputResult = new InputResult {
-				EventType = EventType.key
+				EventType = EventType.Key
 			};
 			ConsoleKeyInfo newConsoleKeyInfo = consoleKeyInfo;
 			ConsoleKey key = 0;
@@ -280,7 +280,7 @@ namespace Terminal.Gui {
 				newConsoleKeyInfo = consoleKeyInfo;
 				break;
 			}
-			if (inputResult.EventType == EventType.key) {
+			if (inputResult.EventType == EventType.Key) {
 				inputResult.ConsoleKeyInfo = newConsoleKeyInfo;
 			} else {
 				inputResult.MouseEvent = mouseEvent;
@@ -440,7 +440,7 @@ namespace Terminal.Gui {
 				GetMouseEvent (cki);
 				return;
 			}
-			if (inputResult.EventType == EventType.key) {
+			if (inputResult.EventType == EventType.Key) {
 				inputResult.ConsoleKeyInfo = newConsoleKeyInfo;
 			} else {
 				inputResult.MouseEvent = mouseEvent;
@@ -1010,7 +1010,7 @@ namespace Terminal.Gui {
 		}
 
 		public enum EventType {
-			key = 1,
+			Key = 1,
 			Mouse = 2,
 			WindowSize = 3,
 			WindowPosition = 4
@@ -1557,7 +1557,7 @@ namespace Terminal.Gui {
 		void ProcessInput (NetEvents.InputResult inputEvent)
 		{
 			switch (inputEvent.EventType) {
-			case NetEvents.EventType.key:
+			case NetEvents.EventType.Key:
 				var map = MapKey (inputEvent.ConsoleKeyInfo);
 				if (map == (Key)0xffffffff) {
 					return;
@@ -1743,6 +1743,17 @@ namespace Terminal.Gui {
 		public override bool EnsureCursorVisibility ()
 		{
 			return false;
+		}
+
+		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
+		{
+			NetEvents.InputResult input = new NetEvents.InputResult ();
+			input.EventType = NetEvents.EventType.Key;
+			input.ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, key, shift, alt, control);
+
+			try {
+				ProcessInput (input);
+			} catch (OverflowException) { }
 		}
 		#endregion
 
