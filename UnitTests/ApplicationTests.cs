@@ -12,7 +12,7 @@ using Console = Terminal.Gui.FakeConsole;
 // Since Application is a singleton we can't run tests in parallel
 [assembly: CollectionBehavior (DisableTestParallelization = true)]
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Core {
 	public class ApplicationTests {
 		public ApplicationTests ()
 		{
