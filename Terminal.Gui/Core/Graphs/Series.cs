@@ -280,6 +280,8 @@ namespace Terminal.Gui.Graphs {
 			}
 
 			graph.DrawLine (start, end, adjusted.Rune);
+
+			graph.SetDriverColorToGraphColor ();
 		}
 
 		/// <summary>
