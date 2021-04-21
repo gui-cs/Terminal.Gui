@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -33,4 +33,25 @@
     <ProjectReference Include="..\UICatalog\UICatalog.csproj" />
   </ItemGroup>
 
+  <PropertyGroup Label="FineCodeCoverage">
+    <Enabled>
+      True
+    </Enabled>
+    <Exclude>
+      [UICatalog]*
+    </Exclude>
+    <Include>
+    </Include>
+    <ExcludeByFile>
+      <!--**/Migrations/*
+      **/Hacks/*.cs-->
+    </ExcludeByFile>
+    <ExcludeByAttribute>
+      <!--MyCustomExcludeFromCodeCoverage-->
+    </ExcludeByAttribute>
+    <IncludeTestAssembly>
+      False
+    </IncludeTestAssembly>
+  </PropertyGroup>
+  
 </Project>
