@@ -100,8 +100,7 @@ namespace Terminal.Gui {
 				throw new Exception ($"{nameof(CellSize)} cannot be 0");
 			}
 
-
-			SetDriverColorToGraphColor (Driver); 
+			SetDriverColorToGraphColor (); 
 
 			Move (0, 0);
 
@@ -118,16 +117,16 @@ namespace Terminal.Gui {
 
 			// Draw 'before' annotations
 			foreach (var a in Annotations.Where (a => a.BeforeSeries)) {
-				a.Render (this, Driver, Bounds);
+				a.Render (this);
 			}
 
-			SetDriverColorToGraphColor (Driver);
+			SetDriverColorToGraphColor ();
 
-			AxisY.DrawAxisLine (this,Driver, Bounds);
-			AxisX.DrawAxisLine (this,Driver, Bounds);
+			AxisY.DrawAxisLine (this);
+			AxisX.DrawAxisLine (this);
 
-			AxisY.DrawAxisLabels (this, Driver, Bounds);
-			AxisX.DrawAxisLabels (this, Driver, Bounds);
+			AxisY.DrawAxisLabels (this);
+			AxisX.DrawAxisLabels (this);
 
 			// Draw a cross where the two axis cross
 			var axisIntersection = new Point(AxisY.GetAxisXPosition(this),AxisX.GetAxisYPosition(this));
@@ -137,7 +136,7 @@ namespace Terminal.Gui {
 				AddRune (axisIntersection.X, axisIntersection.Y, '\u253C');
 			}
 
-			SetDriverColorToGraphColor (Driver);
+			SetDriverColorToGraphColor ();
 
 			// The drawable area of the graph (anything that isn't in the margins)
 			Rect drawBounds = new Rect((int)MarginLeft,0, Bounds.Width - ((int)MarginLeft), Bounds.Height - (int)MarginBottom);
@@ -145,28 +144,28 @@ namespace Terminal.Gui {
 
 			foreach (var s in Series) {
 
-				s.DrawSeries (this, Driver, drawBounds, graphSpace);
+				s.DrawSeries (this, drawBounds, graphSpace);
 
 				// If a series changes the graph color reset it
-				SetDriverColorToGraphColor (Driver);
+				SetDriverColorToGraphColor ();
 			}
 
-			SetDriverColorToGraphColor (Driver);
+			SetDriverColorToGraphColor ();
 
 			// Draw 'after' annotations
 			foreach (var a in Annotations.Where (a => !a.BeforeSeries)) {
-				a.Render (this, Driver, Bounds);
+				a.Render (this);
 			}
 
 		}
 
 		/// <summary>
-		/// Sets the color attribute of <paramref name="driver"/> to the <see cref="GraphColor"/>
+		/// Sets the color attribute of <see cref="Application.Driver"/> to the <see cref="GraphColor"/>
 		/// (if defined) or <see cref="ColorScheme"/> otherwise.
 		/// </summary>
-		public void SetDriverColorToGraphColor (ConsoleDriver driver)
+		public void SetDriverColorToGraphColor ()
 		{
-			driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
+			Driver.SetAttribute (GraphColor ?? ColorScheme.Normal);
 		}
 
 		/// <summary>

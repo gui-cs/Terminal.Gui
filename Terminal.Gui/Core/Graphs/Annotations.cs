@@ -5,23 +5,31 @@ using System.Linq;
 
 namespace Terminal.Gui.Graphs {
 	/// <summary>
-	/// Describes an overlay element that is rendered after series.
-	/// Annotations can be positioned either in screen space (e.g.
+	/// <para>Describes an overlay element that is rendered either before or
+	/// after a series.</para>
+	/// 
+	/// <para>Annotations can be positioned either in screen space (e.g.
 	/// a legend) or in graph space (e.g. a line showing high point)
+	/// </para>
+	/// <para>Unlike <see cref="ISeries"/>, annotations are allowed to
+	/// draw into graph margins
+	/// </para>
 	/// </summary>
 	public interface IAnnotation {
 		/// <summary>
-		/// True if annotation should be drawn before <see cref="ISeries"/>
+		/// True if annotation should be drawn before <see cref="ISeries"/>.  This
+		/// allowes Series and later annotations to potentially draw over the top
+		/// of this annotation.
 		/// </summary>
 		bool BeforeSeries { get; }
 
 		/// <summary>
-		/// Called once after series have been rendered.
+		/// Called once after series have been rendered (or before if <see cref="BeforeSeries"/> is true).
+		/// Use <see cref="View.Driver"/> to draw and <see cref="View.Bounds"/> to avoid drawing outside of
+		/// graph
 		/// </summary>
 		/// <param name="graph"></param>
-		/// <param name="driver"></param>
-		/// <param name="screenBounds"></param>
-		void Render (GraphView graph, ConsoleDriver driver, Rect screenBounds);
+		void Render (GraphView graph);
 	}
 
 
@@ -59,32 +67,28 @@ namespace Terminal.Gui.Graphs {
 		/// Draws the annotation
 		/// </summary>
 		/// <param name="graph"></param>
-		/// <param name="driver"></param>
-		/// <param name="screenBounds"></param>
-		public void Render (GraphView graph, ConsoleDriver driver, Rect screenBounds)
+		public void Render (GraphView graph)
 		{
 			if (ScreenPosition.HasValue) {
-				DrawText (graph, driver, screenBounds, ScreenPosition.Value.X, ScreenPosition.Value.Y);
+				DrawText (graph, ScreenPosition.Value.X, ScreenPosition.Value.Y);
 				return;
 			}
 
 			var screenPos = graph.GraphSpaceToScreen (GraphPosition);
-			DrawText (graph, driver, screenBounds, screenPos.X, screenPos.Y);
+			DrawText (graph, screenPos.X, screenPos.Y);
 		}
 
 		/// <summary>
 		/// Draws the <see cref="Text"/> at the given coordinates with truncation to avoid
-		/// spilling over <paramref name="screenBounds"/> of the <paramref name="graph"/>
+		/// spilling over <see name="View.Bounds"/> of the <paramref name="graph"/>
 		/// </summary>
 		/// <param name="graph"></param>
-		/// <param name="driver"></param>
-		/// <param name="screenBounds"></param>
 		/// <param name="x">Screen x position to start drawing string</param>
 		/// <param name="y">Screen y position to start drawing string</param>
-		protected void DrawText (GraphView graph, ConsoleDriver driver, Rect screenBounds, int x, int y)
+		protected void DrawText (GraphView graph, int x, int y)
 		{
 			// the draw point is out of control bounds
-			if (!screenBounds.Contains (new Point (x, y))) {
+			if (!graph.Bounds.Contains (new Point (x, y))) {
 				return;
 			}
 
@@ -95,16 +99,16 @@ namespace Terminal.Gui.Graphs {
 
 			graph.Move (x, y);
 
-			int availableWidth = screenBounds.Width - x;
+			int availableWidth = graph.Bounds.Width - x;
 
 			if (availableWidth <= 0) {
 				return;
 			}
 
 			if (Text.Length < availableWidth) {
-				driver.AddStr (Text);
+				View.Driver.AddStr (Text);
 			} else {
-				driver.AddStr (Text.Substring (0, availableWidth));
+				View.Driver.AddStr (Text.Substring (0, availableWidth));
 			}
 		}
 	}
@@ -117,7 +121,9 @@ namespace Terminal.Gui.Graphs {
 
 		/// <summary>
 		/// True to draw a solid border around the legend.
-		/// Defaults to true
+		/// Defaults to true.  This border will be within the
+		/// <see cref="Bounds"/> and so reduces the width/height
+		/// available for text by 2
 		/// </summary>
 		public bool Border { get; set; } = true;
 
@@ -150,9 +156,7 @@ namespace Terminal.Gui.Graphs {
 		/// Draws the Legend and all entries into the area within <see cref="Bounds"/>
 		/// </summary>
 		/// <param name="graph"></param>
-		/// <param name="driver"></param>
-		/// <param name="screenBounds"></param>
-		public void Render (GraphView graph, ConsoleDriver driver, Rect screenBounds)
+		public void Render (GraphView graph)
 		{
 			if (Border) {
 				graph.DrawFrame (Bounds, 0, true);
@@ -171,22 +175,22 @@ namespace Terminal.Gui.Graphs {
 			foreach (var entry in entries) {
 
 				if (entry.Item1.Color.HasValue) {
-					driver.SetAttribute (entry.Item1.Color.Value);
+					Application.Driver.SetAttribute (entry.Item1.Color.Value);
 				} else {
-					graph.SetDriverColorToGraphColor (driver);
+					graph.SetDriverColorToGraphColor ();
 				}
 
 				// add the symbol
 				graph.AddRune (x, y + linesDrawn, entry.Item1.Rune);
 
 				// switch to normal coloring (for the text)
-				graph.SetDriverColorToGraphColor (driver);
+				graph.SetDriverColorToGraphColor ();
 
 				// add the text
 				graph.Move (x + 1, y + linesDrawn);
 
 				string str = TruncateOrPad (entry.Item2, availableWidth - 1, TextAlignment.Left);
-				driver.AddStr (str);
+				Application.Driver.AddStr (str);
 
 				linesDrawn++;
 
@@ -272,9 +276,7 @@ namespace Terminal.Gui.Graphs {
 		/// Draws lines connecting each of the <see cref="Points"/>
 		/// </summary>
 		/// <param name="graph"></param>
-		/// <param name="driver"></param>
-		/// <param name="screenBounds"></param>
-		public void Render (GraphView graph, ConsoleDriver driver, Rect screenBounds)
+		public void Render (GraphView graph)
 		{
 			View.Driver.SetAttribute (LineColor ?? graph.ColorScheme.Normal);
 

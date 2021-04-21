@@ -15,10 +15,9 @@ namespace Terminal.Gui.Graphs {
 		/// <paramref name="graph"/> view <paramref name="drawBounds"/>
 		/// </summary>
 		/// <param name="graph">Graph series is to be drawn onto</param>
-		/// <param name="driver"></param>
 		/// <param name="drawBounds">Visible area of the graph in Console Screen units (excluding margins)</param>
 		/// <param name="graphBounds">Visible area of the graph in Graph space units</param>
-		void DrawSeries (GraphView graph, ConsoleDriver driver, Rect drawBounds, RectangleF graphBounds);
+		void DrawSeries (GraphView graph, Rect drawBounds, RectangleF graphBounds);
 	}
 
 
@@ -42,10 +41,10 @@ namespace Terminal.Gui.Graphs {
 		/// <summary>
 		/// Draws all points directly onto the graph
 		/// </summary>
-		public void DrawSeries (GraphView graph, ConsoleDriver driver, Rect drawBounds, RectangleF graphBounds)
+		public void DrawSeries (GraphView graph, Rect drawBounds, RectangleF graphBounds)
 		{
 			if (Fill.Color.HasValue) {
-				driver.SetAttribute (Fill.Color.Value);
+				Application.Driver.SetAttribute (Fill.Color.Value);
 			}
 
 			foreach (var p in Points.Where (p => graphBounds.Contains (p))) {
@@ -132,13 +131,12 @@ namespace Terminal.Gui.Graphs {
 		/// Draws all <see cref="SubSeries"/>
 		/// </summary>
 		/// <param name="graph"></param>
-		/// <param name="driver"></param>
 		/// <param name="drawBounds"></param>
 		/// <param name="graphBounds"></param>
-		public void DrawSeries (GraphView graph, ConsoleDriver driver, Rect drawBounds, RectangleF graphBounds)
+		public void DrawSeries (GraphView graph, Rect drawBounds, RectangleF graphBounds)
 		{
 			foreach (var bar in subSeries) {
-				bar.DrawSeries (graph, driver, drawBounds, graphBounds);
+				bar.DrawSeries (graph, drawBounds, graphBounds);
 			}
 
 		}
@@ -202,13 +200,11 @@ namespace Terminal.Gui.Graphs {
 		/// Draws bars that are currently in the <paramref name="drawBounds"/>
 		/// </summary>
 		/// <param name="graph"></param>
-		/// <param name="driver"></param>
 		/// <param name="drawBounds">Screen area of the graph excluding margins</param>
 		/// <param name="graphBounds">Graph space area that should be drawn into <paramref name="drawBounds"/></param>
-		public virtual void DrawSeries (GraphView graph, ConsoleDriver driver, Rect drawBounds, RectangleF graphBounds)
+		public virtual void DrawSeries (GraphView graph, Rect drawBounds, RectangleF graphBounds)
 		{
 			for (int i = 0; i < Bars.Count; i++) {
-
 
 				float xStart = Orientation == Orientation.Horizontal ? 0 : Offset + ((i + 1) * BarEvery);
 				float yStart = Orientation == Orientation.Horizontal ? Offset + ((i + 1) * BarEvery) : 0;
@@ -248,7 +244,7 @@ namespace Terminal.Gui.Graphs {
 
 				// draw the bar unless it has no height
 				if (Bars [i].Value != 0) {
-					DrawBarLine (graph, driver, screenStart, screenEnd, Bars [i]);
+					DrawBarLine (graph, screenStart, screenEnd, Bars [i]);
 				}
 
 				// If we are drawing labels and the bar has one
@@ -257,10 +253,10 @@ namespace Terminal.Gui.Graphs {
 					// Add the label to the relevant axis
 					if (Orientation == Orientation.Horizontal) {
 
-						graph.AxisY.DrawAxisLabel (graph, driver, screenStart.Y, Bars [i].Text);
+						graph.AxisY.DrawAxisLabel (graph, screenStart.Y, Bars [i].Text);
 					} else if (Orientation == Orientation.Vertical) {
 
-						graph.AxisX.DrawAxisLabel (graph, driver, screenStart.X, Bars [i].Text);
+						graph.AxisX.DrawAxisLabel (graph, screenStart.X, Bars [i].Text);
 					}
 				}
 			}
@@ -272,16 +268,15 @@ namespace Terminal.Gui.Graphs {
 		/// symbol mid bar.
 		/// </summary>
 		/// <param name="graph"></param>
-		/// <param name="driver"></param>
 		/// <param name="start">Screen position of the start of the bar</param>
 		/// <param name="end">Screen position of the end of the bar</param>
 		/// <param name="beingDrawn">The Bar that occupies this space and is being drawn</param>
-		protected virtual void DrawBarLine (GraphView graph, ConsoleDriver driver, Point start, Point end, Bar beingDrawn)
+		protected virtual void DrawBarLine (GraphView graph, Point start, Point end, Bar beingDrawn)
 		{
 			var adjusted = AdjustColor (beingDrawn.Fill);
 
 			if (adjusted.Color.HasValue) {
-				driver.SetAttribute (adjusted.Color.Value);
+				Application.Driver.SetAttribute (adjusted.Color.Value);
 			}
 
 			graph.DrawLine (start, end, adjusted.Rune);

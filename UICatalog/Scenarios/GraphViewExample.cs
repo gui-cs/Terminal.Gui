@@ -532,8 +532,10 @@ namespace UICatalog.Scenarios {
 				red = Application.Driver.MakeAttribute (Color.Red, Color.Black);
 				brightred = Application.Driver.MakeAttribute (Color.BrightRed, Color.Black);
 			}
-			protected override void DrawBarLine (GraphView graph, ConsoleDriver driver, Terminal.Gui.Point start, Terminal.Gui.Point end, Bar beingDrawn)
+			protected override void DrawBarLine (GraphView graph, Terminal.Gui.Point start, Terminal.Gui.Point end, Bar beingDrawn)
 			{
+				var driver = Application.Driver;
+
 				int x = start.X;
 				for(int y = end.Y; y <= start.Y; y++) {
 
@@ -560,9 +562,6 @@ namespace UICatalog.Scenarios {
 
 					graph.AddRune (x, y, beingDrawn.Fill.Rune);
 				}
-				
-			
-
 			}
 		}
 

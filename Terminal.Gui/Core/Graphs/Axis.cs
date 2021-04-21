@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui.Graphs {
 
@@ -70,38 +66,32 @@ namespace Terminal.Gui.Graphs {
 		/// <summary>
 		/// Draws the solid line of the axis
 		/// </summary>
-		/// <param name="driver"></param>
 		/// <param name="graph"></param>
-		/// <param name="bounds"></param>
-		public abstract void DrawAxisLine (GraphView graph, ConsoleDriver driver, Rect bounds);
+		public abstract void DrawAxisLine (GraphView graph);
 
 		/// <summary>
 		/// Draws a single cell of the solid line of the axis
 		/// </summary>
 		/// <param name="graph"></param>
-		/// <param name="driver"></param>
 		/// <param name="x"></param>
 		/// <param name="y"></param>
-		protected abstract void DrawAxisLine (GraphView graph, ConsoleDriver driver, int x, int y);
+		protected abstract void DrawAxisLine (GraphView graph, int x, int y);
 
 		/// <summary>
 		/// Draws labels and axis <see cref="Increment"/> ticks
 		/// </summary>
-		/// <param name="driver"></param>
 		/// <param name="graph"></param>
-		/// <param name="bounds"></param>
 
-		public abstract void DrawAxisLabels (GraphView graph, ConsoleDriver driver, Rect bounds);
+		public abstract void DrawAxisLabels (GraphView graph);
 
 		/// <summary>
 		/// Draws a custom label <paramref name="text"/> at <paramref name="screenPosition"/> units
 		/// along the axis (X or Y depending on <see cref="Orientation"/>)
 		/// </summary>
 		/// <param name="graph"></param>
-		/// <param name="driver"></param>
 		/// <param name="screenPosition"></param>
 		/// <param name="text"></param>
-		public abstract void DrawAxisLabel (GraphView graph, ConsoleDriver driver, int screenPosition, string text);
+		public abstract void DrawAxisLabel (GraphView graph, int screenPosition, string text);
 
 		/// <summary>
 		/// Resets all configurable properties of the axis to default values
@@ -138,14 +128,13 @@ namespace Terminal.Gui.Graphs {
 		/// <summary>
 		/// Draws the horizontal axis line
 		/// </summary>
-		/// <param name="driver"></param>
 		/// <param name="graph"></param>
-		/// <param name="bounds"></param>
-		public override void DrawAxisLine (GraphView graph, ConsoleDriver driver, Rect bounds)
+		public override void DrawAxisLine (GraphView graph)
 		{
 			if (!Visible) {
 				return;
 			}
+			var bounds = graph.Bounds;
 
 			graph.Move (0, 0);
 
@@ -166,7 +155,7 @@ namespace Terminal.Gui.Graphs {
 
 			for (int i = xStart; i < bounds.Width; i++) {
 
-				DrawAxisLine (graph, driver, i, y);
+				DrawAxisLine (graph, i, y);
 			}
 		}
 
@@ -176,28 +165,29 @@ namespace Terminal.Gui.Graphs {
 		/// screen coordinates
 		/// </summary>
 		/// <param name="graph"></param>
-		/// <param name="driver"></param>
 		/// <param name="x"></param>
 		/// <param name="y"></param>
-		protected override void DrawAxisLine (GraphView graph, ConsoleDriver driver, int x, int y)
+		protected override void DrawAxisLine (GraphView graph, int x, int y)
 		{
 			graph.Move (x, y);
-			driver.AddRune (driver.HLine);
+			Application.Driver.AddRune (Application.Driver.HLine);
 		}
 
 		/// <summary>
 		/// Draws the horizontal x axis labels and <see cref="Axis.Increment"/> ticks
 		/// </summary>
-		public override void DrawAxisLabels (GraphView graph, ConsoleDriver driver, Rect bounds)
+		public override void DrawAxisLabels (GraphView graph)
 		{
 			if (!Visible || Increment == 0) {
 				return;
 			}
 
+			var bounds = graph.Bounds;
+
 			var labels = GetLabels (graph, bounds);
 
 			foreach (var label in labels) {
-				DrawAxisLabel (graph, driver, label.ScreenLocation, label.Text);
+				DrawAxisLabel (graph, label.ScreenLocation, label.Text);
 			}
 
 			// if there is a title
@@ -211,7 +201,7 @@ namespace Terminal.Gui.Graphs {
 				}
 
 				graph.Move (graph.Bounds.Width / 2 - (toRender.Length / 2), graph.Bounds.Height - 1);
-				driver.AddStr (toRender);
+				Application.Driver.AddStr (toRender);
 			}
 		}
 
@@ -220,15 +210,15 @@ namespace Terminal.Gui.Graphs {
 		/// For the screen y position use <see cref="GetAxisYPosition(GraphView)"/>
 		/// </summary>
 		/// <param name="graph">Graph being drawn onto</param>
-		/// <param name="driver"></param>
 		/// <param name="screenPosition">Number of screen columns along the axis to take before rendering</param>
 		/// <param name="text">Text to render under the axis tick</param>
-		public override void DrawAxisLabel (GraphView graph, ConsoleDriver driver, int screenPosition, string text)
+		public override void DrawAxisLabel (GraphView graph, int screenPosition, string text)
 		{
+			var driver = Application.Driver;
 			var y = GetAxisYPosition (graph);
 
 			graph.Move (screenPosition, y);
-
+			
 			// draw the tick on the axis
 			driver.AddRune (driver.TopTee);
 
@@ -283,7 +273,7 @@ namespace Terminal.Gui.Graphs {
 
 				// Ensure the axis point does not draw into the margin
 				if (screenX >= graph.MarginLeft) {
-					// The increment we will render (a T symbol)
+					// The increment we will render (normally a top T unicode symbol)
 					var toRender = new AxisIncrementToRender (Orientation, screenX, current.X);
 
 					// Not every increment has to have a label
@@ -336,14 +326,13 @@ namespace Terminal.Gui.Graphs {
 		/// <summary>
 		/// Draws the vertical axis line
 		/// </summary>
-		/// <param name="driver"></param>
 		/// <param name="graph"></param>
-		/// <param name="bounds"></param>
-		public override void DrawAxisLine (GraphView graph, ConsoleDriver driver, Rect bounds)
+		public override void DrawAxisLine (GraphView graph)
 		{
 			if (!Visible) {
 				return;
 			}
+			Rect bounds = graph.Bounds;
 
 			var x = GetAxisXPosition (graph);
 
@@ -355,7 +344,7 @@ namespace Terminal.Gui.Graphs {
 			// Draw solid line
 			for (int i = 0; i < yEnd; i++) {
 
-				DrawAxisLine (graph, driver, x, i);
+				DrawAxisLine (graph, x, i);
 			}
 		}
 
@@ -364,13 +353,12 @@ namespace Terminal.Gui.Graphs {
 		/// screen coordinates
 		/// </summary>
 		/// <param name="graph"></param>
-		/// <param name="driver"></param>
 		/// <param name="x"></param>
 		/// <param name="y"></param>
-		protected override void DrawAxisLine (GraphView graph, ConsoleDriver driver, int x, int y)
+		protected override void DrawAxisLine (GraphView graph, int x, int y)
 		{
 			graph.Move (x, y);
-			driver.AddRune (driver.VLine);
+			Application.Driver.AddRune (Application.Driver.VLine);
 		}
 
 		private int GetAxisYEnd (GraphView graph)
@@ -390,20 +378,19 @@ namespace Terminal.Gui.Graphs {
 		/// <summary>
 		/// Draws axis <see cref="Axis.Increment"/> markers and labels
 		/// </summary>
-		/// <param name="driver"></param>
 		/// <param name="graph"></param>
-		/// <param name="bounds"></param>
-		public override void DrawAxisLabels (GraphView graph, ConsoleDriver driver, Rect bounds)
+		public override void DrawAxisLabels (GraphView graph)
 		{
 			if (!Visible || Increment == 0) {
 				return;
 			}
 
+			var bounds = graph.Bounds;
 			var labels = GetLabels (graph, bounds);
 
 			foreach (var label in labels) {
 
-				DrawAxisLabel (graph, driver, label.ScreenLocation, label.Text);
+				DrawAxisLabel (graph, label.ScreenLocation, label.Text);
 			}
 
 			// if there is a title
@@ -422,7 +409,7 @@ namespace Terminal.Gui.Graphs {
 				for (int i = 0; i < toRender.Length; i++) {
 
 					graph.Move (0, startDrawingAtY + i);
-					driver.AddRune (toRender [i]);
+					Application.Driver.AddRune (toRender [i]);
 				}
 
 			}
@@ -482,11 +469,10 @@ namespace Terminal.Gui.Graphs {
 		/// For the screen x position use <see cref="GetAxisXPosition(GraphView)"/>
 		/// </summary>
 		/// <param name="graph">Graph being drawn onto</param>
-		/// <param name="driver"></param>
 		/// <param name="screenPosition">Number of rows from the top of the screen (i.e. down the axis) before rendering</param>
 		/// <param name="text">Text to render to the left of the axis tick.  Ensure to 
 		/// set <see cref="GraphView.MarginLeft"/> or <see cref="GraphView.ScrollOffset"/> sufficient that it is visible</param>
-		public override void DrawAxisLabel (GraphView graph, ConsoleDriver driver, int screenPosition, string text)
+		public override void DrawAxisLabel (GraphView graph, int screenPosition, string text)
 		{
 			var x = GetAxisXPosition (graph);
 			var labelThickness = text.Length;
@@ -494,12 +480,12 @@ namespace Terminal.Gui.Graphs {
 			graph.Move (x, screenPosition);
 
 			// draw the tick on the axis
-			driver.AddRune (driver.RightTee);
+			Application.Driver.AddRune (Application.Driver.RightTee);
 
 			// and the label text
 			if (!string.IsNullOrWhiteSpace (text)) {
 				graph.Move (Math.Max (0, x - labelThickness), screenPosition);
-				driver.AddStr (text);
+				Application.Driver.AddStr (text);
 			}
 		}
 

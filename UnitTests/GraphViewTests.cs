@@ -15,15 +15,15 @@ namespace UnitTests {
 			public List<Point> DrawAxisLinePoints = new List<Point> ();
 			public List<int> LabelPoints = new List<int>();
 
-			protected override void DrawAxisLine (GraphView graph, ConsoleDriver driver, int x, int y)
+			protected override void DrawAxisLine (GraphView graph, int x, int y)
 			{
-				base.DrawAxisLine (graph, driver, x, y);
+				base.DrawAxisLine (graph, x, y);
 				DrawAxisLinePoints.Add (new Point(x, y));
 			}
 
-			public override void DrawAxisLabel (GraphView graph, ConsoleDriver driver, int screenPosition, string text)
+			public override void DrawAxisLabel (GraphView graph, int screenPosition, string text)
 			{
-				base.DrawAxisLabel (graph, driver, screenPosition, text);
+				base.DrawAxisLabel (graph, screenPosition, text);
 				LabelPoints.Add(screenPosition);
 			}
 		}
@@ -33,14 +33,14 @@ namespace UnitTests {
 			public List<Point> DrawAxisLinePoints = new List<Point> ();
 			public List<int> LabelPoints = new List<int>();
 
-			protected override void DrawAxisLine (GraphView graph, ConsoleDriver driver, int x, int y)
+			protected override void DrawAxisLine (GraphView graph, int x, int y)
 			{
-				base.DrawAxisLine (graph, driver, x, y);
+				base.DrawAxisLine (graph, x, y);
 				DrawAxisLinePoints.Add (new Point(x, y));
 			}
-			public override void DrawAxisLabel (GraphView graph, ConsoleDriver driver, int screenPosition, string text)
+			public override void DrawAxisLabel (GraphView graph, int screenPosition, string text)
 			{
-				base.DrawAxisLabel (graph, driver, screenPosition, text);
+				base.DrawAxisLabel (graph, screenPosition, text);
 				LabelPoints.Add(screenPosition);
 			}
 		}
@@ -372,7 +372,7 @@ namespace UnitTests {
 			RectangleF fullGraphBounds = RectangleF.Empty;
 			Rect graphScreenBounds = Rect.Empty;
 
-			var series = new FakeSeries ((v, c, s, g) => { graphScreenBounds = s; fullGraphBounds = g; });
+			var series = new FakeSeries ((v, s, g) => { graphScreenBounds = s; fullGraphBounds = g; });
 			gv.Series.Add (series);
 
 
@@ -417,7 +417,7 @@ namespace UnitTests {
 			RectangleF fullGraphBounds = RectangleF.Empty;
 			Rect graphScreenBounds = Rect.Empty;
 
-			var series = new FakeSeries ((v, c, s, g) => { graphScreenBounds = s; fullGraphBounds = g; });
+			var series = new FakeSeries ((v, s, g) => { graphScreenBounds = s; fullGraphBounds = g; });
 
 			gv.Series.Add (series);
 
@@ -444,18 +444,18 @@ namespace UnitTests {
 
 		private class FakeSeries : ISeries {
 
-			readonly Action<GraphView, ConsoleDriver, Rect, RectangleF> drawSeries;
+			readonly Action<GraphView, Rect, RectangleF> drawSeries;
 
 			public FakeSeries (
-				Action<GraphView, ConsoleDriver, Rect, RectangleF> drawSeries
+				Action<GraphView, Rect, RectangleF> drawSeries
 				)
 			{
 				this.drawSeries = drawSeries;
 			}
 
-			public void DrawSeries (GraphView graph, ConsoleDriver driver, Rect bounds, RectangleF graphBounds)
+			public void DrawSeries (GraphView graph, Rect bounds, RectangleF graphBounds)
 			{
-				drawSeries (graph, driver, bounds, graphBounds);
+				drawSeries (graph, bounds, graphBounds);
 			}
 		}
 	}
@@ -644,9 +644,9 @@ namespace UnitTests {
 				return FinalColor = base.AdjustColor (graphCellToRender);	
 			}
 
-			protected override void DrawBarLine (GraphView graph, ConsoleDriver driver, Point start, Point end, Bar beingDrawn)
+			protected override void DrawBarLine (GraphView graph, Point start, Point end, Bar beingDrawn)
 			{
-				base.DrawBarLine (graph, driver, start, end, beingDrawn);
+				base.DrawBarLine (graph, start, end, beingDrawn);
 				
 				BarScreenStarts.Add(start);
 				BarScreenEnds.Add(end);
