@@ -49,10 +49,10 @@ namespace Terminal.Gui {
 			Assert.Equal (new Rect (0, 0, 0, 0), r.Frame);
 			Assert.Null (r.Focused);
 			Assert.Null (r.ColorScheme);
-			Assert.NotNull (r.Width);	// All view Dim are initialized now,
-			Assert.NotNull (r.Height);	// avoiding Dim errors.
-			Assert.NotNull (r.X);		// All view Pos are initialized now,
-			Assert.NotNull (r.Y);		// avoiding Pos errors.
+			Assert.NotNull (r.Width);       // All view Dim are initialized now,
+			Assert.NotNull (r.Height);      // avoiding Dim errors.
+			Assert.NotNull (r.X);           // All view Pos are initialized now,
+			Assert.NotNull (r.Y);           // avoiding Pos errors.
 			Assert.False (r.IsCurrentTop);
 			Assert.Empty (r.Id);
 			Assert.Empty (r.Subviews);
@@ -973,7 +973,7 @@ namespace Terminal.Gui {
 
 			void FirstDialogToplevel ()
 			{
-				var od = new OpenDialog();
+				var od = new OpenDialog ();
 				od.Ready += SecoundDialogToplevel;
 
 				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
@@ -1107,6 +1107,33 @@ namespace Terminal.Gui {
 			Assert.Equal ("FrameSubview", top.MostFocused.Text);
 			top.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
+		}
+
+		[Fact]
+		public void KeyPress_Handled_To_True_Prevents_Changes ()
+		{
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
+			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('N', ConsoleKey.N, false, false, false));
+
+			var top = Application.Top;
+
+			var text = new TextField ("");
+			text.KeyPress += (e) => {
+				e.Handled = true;
+				Assert.True (e.Handled);
+				Assert.Equal (Key.N, e.KeyEvent.Key);
+			};
+			top.Add (text);
+
+			Application.Iteration += () => {
+				Console.MockKeyPresses.Push (new ConsoleKeyInfo ('N', ConsoleKey.N, false, false, false));
+				Assert.Equal ("", text.Text);
+
+				Application.RequestStop ();
+			};
+
+			Application.Run ();
 		}
 	}
 }
