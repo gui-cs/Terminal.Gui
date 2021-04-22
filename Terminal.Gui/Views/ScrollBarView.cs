@@ -291,6 +291,9 @@ namespace Terminal.Gui {
 		void ShowHideScrollBars ()
 		{
 			if (!hosted || (hosted && !autoHideScrollBars)) {
+				if (contentBottomRightCorner != null && contentBottomRightCorner.Visible) {
+					contentBottomRightCorner.Visible = false;
+				}
 				return;
 			}
 
@@ -312,6 +315,8 @@ namespace Terminal.Gui {
 				if (Application.mouseGrabView != null && Application.mouseGrabView == this) {
 					Application.UngrabMouse ();
 				}
+			} else {
+				contentBottomRightCorner.Visible = false;
 			}
 			if (showScrollIndicator) {
 				Redraw (Bounds);

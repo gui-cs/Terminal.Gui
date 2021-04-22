@@ -480,7 +480,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class FileDialog : Dialog {
 		Button prompt, cancel;
-		Label nameFieldLabel, message, dirLabel;
+		Label nameFieldLabel, message, nameDirLabel;
 		TextField dirEntry, nameEntry;
 		internal DirListView dirListView;
 
@@ -494,24 +494,45 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="title">The title.</param>
 		/// <param name="prompt">The prompt.</param>
-		/// <param name="nameFieldLabel">The name field label.</param>
+		/// <param name="nameFieldLabel">The name of the file field label..</param>
 		/// <param name="message">The message.</param>
-		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message) : base (title)//, Driver.Cols - 20, Driver.Rows - 5, null)
+		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message)
+			: this (title, prompt, ustring.Empty, nameFieldLabel, message) { }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="FileDialog"/>
+		/// </summary>
+		/// <param name="title">The title.</param>
+		/// <param name="prompt">The prompt.</param>
+		/// <param name="message">The message.</param>
+
+		public FileDialog (ustring title, ustring prompt, ustring message) : this (title, prompt, ustring.Empty, message) { }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="FileDialog"/>
+		/// </summary>
+		/// <param name="title">The title.</param>
+		/// <param name="prompt">The prompt.</param>
+		/// <param name="nameDirLabel">The name of the directory field label.</param>
+		/// <param name="nameFieldLabel">The name of the file field label..</param>
+		/// <param name="message">The message.</param>
+		public FileDialog (ustring title, ustring prompt, ustring nameDirLabel, ustring nameFieldLabel, ustring message) : base (title)//, Driver.Cols - 20, Driver.Rows - 5, null)
 		{
-			this.message = new Label (message) { 
+			this.message = new Label (message) {
 				X = 1,
 				Y = 0,
 			};
 			Add (this.message);
 			var msgLines = TextFormatter.MaxLines (message, Driver.Cols - 20);
 
-			dirLabel = new Label ("Directory: ") {
+			this.nameDirLabel = new Label (nameDirLabel.IsEmpty ? "Directory: " : $"{nameDirLabel}: ") {
 				X = 1,
-				Y = 1 + msgLines
+				Y = 1 + msgLines,
+				AutoSize = true
 			};
 
 			dirEntry = new TextField ("") {
-				X = Pos.Right (dirLabel),
+				X = Pos.Right (this.nameDirLabel),
 				Y = 1 + msgLines,
 				Width = Dim.Fill () - 1,
 			};
@@ -519,11 +540,12 @@ namespace Terminal.Gui {
 				DirectoryPath = dirEntry.Text;
 				nameEntry.Text = ustring.Empty;
 			};
-			Add (dirLabel, dirEntry);
+			Add (this.nameDirLabel, dirEntry);
 
-			this.nameFieldLabel = new Label ("Open: ") {
-				X = 6,
+			this.nameFieldLabel = new Label (nameFieldLabel.IsEmpty ? "File: " : $"{nameFieldLabel}: ") {
+				X = 1,
 				Y = 3 + msgLines,
+				AutoSize = true
 			};
 			nameEntry = new TextField ("") {
 				X = Pos.Left (dirEntry),
@@ -550,14 +572,23 @@ namespace Terminal.Gui {
 			};
 			AddButton (cancel);
 
-			this.prompt = new Button (prompt) {
+			this.prompt = new Button (prompt.IsEmpty ? "Ok" : prompt) {
 				IsDefault = true,
+				CanFocus = nameEntry.Text.IsEmpty ? false : true
 			};
 			this.prompt.Clicked += () => {
 				canceled = false;
 				Application.RequestStop ();
 			};
 			AddButton (this.prompt);
+
+			nameEntry.TextChanged += (e) => {
+				if (nameEntry.Text.IsEmpty) {
+					this.prompt.CanFocus = false;
+				} else {
+					this.prompt.CanFocus = true;
+				}
+			};
 
 			Width = Dim.Percent (80);
 			Height = Dim.Percent (80);
@@ -593,13 +624,24 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Gets or sets the name of the directory field label.
+		/// </summary>
+		/// <value>The name of the directory field label.</value>
+		public ustring NameDirLabel {
+			get => nameDirLabel.Text;
+			set {
+				nameDirLabel.Text = $"{value}: ";
+			}
+		}
+
+		/// <summary>
 		/// Gets or sets the name field label.
 		/// </summary>
 		/// <value>The name field label.</value>
 		public ustring NameFieldLabel {
 			get => nameFieldLabel.Text;
 			set {
-				nameFieldLabel.Text = value;
+				nameFieldLabel.Text = $"{value}: ";
 			}
 		}
 

@@ -20,6 +20,8 @@ namespace Terminal.Gui {
 	public class TextField : View {
 		List<Rune> text;
 		int first, point;
+		int selectedStart = -1; // -1 represents there is no text selection.
+		ustring selectedText;
 
 		/// <summary>
 		/// Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so new input should be appended at the cursor position, rather than clearing the entry
@@ -86,7 +88,7 @@ namespace Terminal.Gui {
 			if (text == null)
 				text = "";
 
-			this.text = TextModel.ToRunes (text);
+			this.text = TextModel.ToRunes (text.Split ("\n") [0]);
 			point = text.RuneCount;
 			first = point > w ? point - w : 0;
 			CanFocus = true;
@@ -104,8 +106,8 @@ namespace Terminal.Gui {
 		{
 			if (Application.mouseGrabView != null && Application.mouseGrabView == this)
 				Application.UngrabMouse ();
-			if (SelectedLength != 0 && !(Application.mouseGrabView is MenuBar))
-				ClearAllSelection ();
+			//if (SelectedLength != 0 && !(Application.mouseGrabView is MenuBar))
+			//	ClearAllSelection ();
 
 			return base.OnLeave (view);
 		}
@@ -139,7 +141,7 @@ namespace Terminal.Gui {
 				if (oldText == value)
 					return;
 
-				var newText = OnTextChanging (value);
+				var newText = OnTextChanging (value.Split ("\n") [0]);
 				if (newText.Cancel) {
 					return;
 				}
@@ -177,9 +179,14 @@ namespace Terminal.Gui {
 		public int CursorPosition {
 			get { return point; }
 			set {
-				point = value;
-				Adjust ();
-				SetNeedsDisplay ();
+				if (value < 0) {
+					point = 0;
+				} else if (value > text.Count) {
+					point = text.Count;
+				} else {
+					point = value;
+				}
+				PrepareSelection (selectedStart, point - selectedStart);
 			}
 		}
 
@@ -201,7 +208,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			ColorScheme color = Colors.Menu;
+			var selColor = new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground);
 			SetSelectedStartSelectedLength ();
 
 			Driver.SetAttribute (ColorScheme.Focus);
@@ -215,12 +222,14 @@ namespace Terminal.Gui {
 			for (int idx = p; idx < tcount; idx++) {
 				var rune = text [idx];
 				var cols = Rune.ColumnWidth (rune);
-				if (idx == point && HasFocus && !Used && SelectedLength == 0 && !ReadOnly) {
-					Driver.SetAttribute (Colors.Menu.HotFocus);
+				if (idx == point && HasFocus && !Used && length == 0 && !ReadOnly) {
+					Driver.SetAttribute (selColor);
 				} else if (ReadOnly) {
-					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : roc);
+					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? selColor : roc);
+				} else if (!HasFocus) {
+					Driver.SetAttribute (ColorScheme.Focus);
 				} else {
-					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? color.Focus : ColorScheme.Focus);
+					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? selColor : ColorScheme.Focus);
 				}
 				if (col + cols <= width) {
 					Driver.AddRune ((Rune)(Secret ? '*' : rune));
@@ -316,13 +325,12 @@ namespace Terminal.Gui {
 				if (ReadOnly)
 					return true;
 
-				if (SelectedLength == 0) {
+				if (length == 0) {
 					if (text.Count == 0 || text.Count == point)
 						return true;
 
 					SetText (text.GetRange (0, point).Concat (text.GetRange (point + 1, text.Count - (point + 1))));
 					Adjust ();
-
 				} else {
 					DeleteSelectedText ();
 				}
@@ -332,7 +340,7 @@ namespace Terminal.Gui {
 				if (ReadOnly)
 					return true;
 
-				if (SelectedLength == 0) {
+				if (length == 0) {
 					if (point == 0)
 						return true;
 
@@ -389,8 +397,9 @@ namespace Terminal.Gui {
 
 			case Key.CursorLeft | Key.ShiftMask | Key.CtrlMask:
 			case Key.CursorUp | Key.ShiftMask | Key.CtrlMask:
+			case (Key)((int)'B' + Key.ShiftMask | Key.AltMask):
 				if (point > 0) {
-					int x = start > -1 && start > point ? start : point;
+					int x = Math.Min (start > -1 && start > point ? start : point, text.Count - 1);
 					if (x > 0) {
 						int sbw = WordBackward (x);
 						if (sbw != -1)
@@ -402,6 +411,7 @@ namespace Terminal.Gui {
 
 			case Key.CursorRight | Key.ShiftMask | Key.CtrlMask:
 			case Key.CursorDown | Key.ShiftMask | Key.CtrlMask:
+			case (Key)((int)'F' + Key.ShiftMask | Key.AltMask):
 				if (point < text.Count) {
 					int x = start > -1 && start > point ? start : point;
 					int sfw = WordForward (x);
@@ -503,7 +513,7 @@ namespace Terminal.Gui {
 
 			case Key.CursorLeft | Key.CtrlMask:
 			case Key.CursorUp | Key.CtrlMask:
-			case (Key)((int)'b' + Key.AltMask):
+			case (Key)((int)'B' + Key.AltMask):
 				ClearAllSelection ();
 				int bw = WordBackward (point);
 				if (bw != -1)
@@ -513,7 +523,7 @@ namespace Terminal.Gui {
 
 			case Key.CursorRight | Key.CtrlMask:
 			case Key.CursorDown | Key.CtrlMask:
-			case (Key)((int)'f' + Key.AltMask):
+			case (Key)((int)'F' + Key.AltMask):
 				ClearAllSelection ();
 				int fw = WordForward (point);
 				if (fw != -1)
@@ -554,7 +564,7 @@ namespace Terminal.Gui {
 				if (ReadOnly)
 					return true;
 
-				if (SelectedLength != 0) {
+				if (length > 0) {
 					DeleteSelectedText ();
 					oldCursorPos = point;
 				}
@@ -584,27 +594,30 @@ namespace Terminal.Gui {
 			if (p >= text.Count)
 				return -1;
 
-			int i = p;
-			if (Rune.IsPunctuation (text [p]) || Rune.IsWhiteSpace (text [p])) {
+			int i = p + 1;
+			if (i == text.Count)
+				return text.Count;
+
+			var ti = text [i];
+			if (Rune.IsPunctuation (ti) || Rune.IsSymbol (ti) || Rune.IsWhiteSpace (ti)) {
 				for (; i < text.Count; i++) {
-					var r = text [i];
-					if (Rune.IsLetterOrDigit (r))
-						break;
-				}
-				for (; i < text.Count; i++) {
-					var r = text [i];
-					if (!Rune.IsLetterOrDigit (r))
-						break;
+					if (Rune.IsLetterOrDigit (text [i]))
+						return i;
 				}
 			} else {
 				for (; i < text.Count; i++) {
-					var r = text [i];
-					if (!Rune.IsLetterOrDigit (r))
+					if (!Rune.IsLetterOrDigit (text [i]))
+						break;
+				}
+				for (; i < text.Count; i++) {
+					if (Rune.IsLetterOrDigit (text [i]))
 						break;
 				}
 			}
+
 			if (i != p)
-				return i;
+				return Math.Min (i, text.Count);
+
 			return -1;
 		}
 
@@ -618,25 +631,38 @@ namespace Terminal.Gui {
 				return 0;
 
 			var ti = text [i];
+			var lastValidCol = -1;
 			if (Rune.IsPunctuation (ti) || Rune.IsSymbol (ti) || Rune.IsWhiteSpace (ti)) {
 				for (; i >= 0; i--) {
-					if (Rune.IsLetterOrDigit (text [i]))
+					if (Rune.IsLetterOrDigit (text [i])) {
+						lastValidCol = i;
 						break;
+					}
+					if (i - 1 > 0 && !Rune.IsWhiteSpace (text [i]) && Rune.IsWhiteSpace (text [i - 1])) {
+						return i;
+					}
 				}
 				for (; i >= 0; i--) {
 					if (!Rune.IsLetterOrDigit (text [i]))
 						break;
+					lastValidCol = i;
+				}
+				if (lastValidCol > -1) {
+					return lastValidCol;
 				}
 			} else {
 				for (; i >= 0; i--) {
 					if (!Rune.IsLetterOrDigit (text [i]))
 						break;
+					lastValidCol = i;
+				}
+				if (lastValidCol > -1) {
+					return lastValidCol;
 				}
 			}
-			i++;
 
 			if (i != p)
-				return i;
+				return Math.Max (i, 0);
 
 			return -1;
 		}
@@ -644,17 +670,32 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Start position of the selected text.
 		/// </summary>
-		public int SelectedStart { get; set; } = -1;
+		public int SelectedStart {
+			get => selectedStart;
+			set {
+				if (value < -1) {
+					selectedStart = -1;
+				} else if (value > text.Count) {
+					selectedStart = text.Count;
+				} else {
+					selectedStart = value;
+				}
+				PrepareSelection (selectedStart, point - selectedStart);
+			}
+		}
 
 		/// <summary>
 		/// Length of the selected text.
 		/// </summary>
-		public int SelectedLength { get; set; } = 0;
+		public int SelectedLength { get => length; }
 
 		/// <summary>
 		/// The selected text.
 		/// </summary>
-		public ustring SelectedText { get; set; }
+		public ustring SelectedText {
+			get => Secret ? null : selectedText;
+			private set => selectedText = value;
+		}
 
 		int start, length;
 		bool isButtonPressed;
@@ -705,6 +746,9 @@ namespace Terminal.Gui {
 				}
 				int sfw = WordForward (x);
 				ClearAllSelection ();
+				if (sfw != -1 && sbw != -1) {
+					point = sfw;
+				}
 				PrepareSelection (sbw, sfw - sbw);
 			} else if (ev.Flags == MouseFlags.Button1TripleClicked) {
 				PositionCursor (0);
@@ -748,20 +792,20 @@ namespace Terminal.Gui {
 
 		void PrepareSelection (int x, int direction = 0)
 		{
-			x = x + first < 0 ? 0 : x;
-			SelectedStart = SelectedStart == -1 && text.Count > 0 && x >= 0 && x <= text.Count ? x : SelectedStart;
-			if (SelectedStart > -1) {
-				SelectedLength = x + direction <= text.Count ? x + direction - SelectedStart : text.Count - SelectedStart;
+			x = x + first < -1 ? 0 : x;
+			selectedStart = selectedStart == -1 && text.Count > 0 && x >= 0 && x <= text.Count ? x : selectedStart;
+			if (selectedStart > -1) {
+				length = Math.Abs (x + direction <= text.Count ? x + direction - selectedStart : text.Count - selectedStart);
 				SetSelectedStartSelectedLength ();
-				if (start > -1) {
-					SelectedText = length > 0 ? ustring.Make (text).ToString ().Substring (
+				if (start > -1 && length > 0) {
+					selectedText = length > 0 ? ustring.Make (text).ToString ().Substring (
 						start < 0 ? 0 : start, length > text.Count ? text.Count : length) : "";
 					if (first > start) {
 						first = start;
 					}
-				} else {
-					ClearAllSelection ();
 				}
+			} else if (length > 0) {
+				ClearAllSelection ();
 			}
 			Adjust ();
 		}
@@ -771,11 +815,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ClearAllSelection ()
 		{
-			if (SelectedStart == -1 && SelectedLength == 0)
+			if (selectedStart == -1 && length == 0)
 				return;
-			SelectedStart = -1;
-			SelectedLength = 0;
-			SelectedText = "";
+
+			selectedStart = -1;
+			length = 0;
+			selectedText = null;
 			start = 0;
 			length = 0;
 			SetNeedsDisplay ();
@@ -783,12 +828,10 @@ namespace Terminal.Gui {
 
 		void SetSelectedStartSelectedLength ()
 		{
-			if (SelectedLength < 0) {
-				start = SelectedLength + SelectedStart;
-				length = Math.Abs (SelectedLength);
+			if (SelectedStart > -1 && point < SelectedStart) {
+				start = point;
 			} else {
 				start = SelectedStart;
-				length = SelectedLength;
 			}
 		}
 
@@ -797,12 +840,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void Copy ()
 		{
-			if (Secret)
+			if (Secret || length == 0)
 				return;
 
-			if (SelectedLength != 0) {
-				Clipboard.Contents = SelectedText;
-			}
+			Clipboard.Contents = SelectedText;
 		}
 
 		/// <summary>
@@ -810,22 +851,23 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void Cut ()
 		{
-			if (SelectedLength != 0) {
-				Clipboard.Contents = SelectedText;
-				DeleteSelectedText ();
-			}
+			if (Secret || length == 0)
+				return;
+
+			Clipboard.Contents = SelectedText;
+			DeleteSelectedText ();
 		}
 
 		void DeleteSelectedText ()
 		{
 			ustring actualText = Text;
-			int selStart = SelectedLength < 0 ? SelectedLength + SelectedStart : SelectedStart;
-			int selLength = Math.Abs (SelectedLength);
+			SetSelectedStartSelectedLength ();
+			int selStart = SelectedStart > -1 ? start : point;
 			(var _, var len) = TextModel.DisplaySize (text, 0, selStart, false);
-			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + selLength, false);
-			(var _, var len3) = TextModel.DisplaySize (text, selStart + selLength, actualText.RuneCount, false);
-			Text = actualText[0, len] +
-				actualText[len + len2, len + len2 + len3];
+			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + length, false);
+			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.RuneCount, false);
+			Text = actualText [0, len] +
+				actualText [len + len2, len + len2 + len3];
 			ClearAllSelection ();
 			point = selStart >= Text.RuneCount ? Text.RuneCount : selStart;
 			Adjust ();
@@ -836,7 +878,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void Paste ()
 		{
-			if (ReadOnly) {
+			if (ReadOnly || Clipboard.Contents == null) {
 				return;
 			}
 
@@ -846,7 +888,7 @@ namespace Terminal.Gui {
 			(int _, int len) = TextModel.DisplaySize (text, 0, selStart, false);
 			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + length, false);
 			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.RuneCount, false);
-			ustring cbTxt = Clipboard.Contents ?? "";
+			ustring cbTxt = Clipboard.Contents.Split ("\n") [0] ?? "";
 			Text = actualText [0, len] +
 				cbTxt +
 				actualText [len + len2, len + len2 + len3];
@@ -867,17 +909,16 @@ namespace Terminal.Gui {
 			return ev;
 		}
 
-		private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
+		CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
 
 		/// <summary>
 		/// Get / Set the wished cursor when the field is focused
 		/// </summary>
-		public CursorVisibility DesiredCursorVisibility 
-		{ 
-			get => desiredCursorVisibility; 
+		public CursorVisibility DesiredCursorVisibility {
+			get => desiredCursorVisibility;
 			set {
 				if (desiredCursorVisibility != value && HasFocus) {
-					Application.Driver.SetCursorVisibility (value);		
+					Application.Driver.SetCursorVisibility (value);
 				}
 
 				desiredCursorVisibility = value;

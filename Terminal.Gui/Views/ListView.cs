@@ -401,8 +401,11 @@ namespace Terminal.Gui {
 			case Key.Home:
 				return MoveHome ();
 
+			default:
+				return false;
 			}
-			return base.ProcessKey (kb);
+
+			return true;
 		}
 
 		/// <summary>

@@ -700,14 +700,15 @@ namespace Terminal.Gui {
 		public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
 		{
 			var resume = true;
-			while (resume)
-			{
-				try
-				{
-					resume = false;
-					var runToken = Begin (view);
-					RunLoop (runToken);
-					End (runToken);
+			while (resume) {
+#if !DEBUG
+				try {
+#endif
+				resume = false;
+				var runToken = Begin (view);
+				RunLoop (runToken);
+				End (runToken);
+#if !DEBUG
 				}
 				catch (Exception error)
 				{
@@ -717,6 +718,7 @@ namespace Terminal.Gui {
 					}
 					resume = errorHandler(error);
 				}
+#endif
 			}
 		}
 
@@ -758,6 +760,9 @@ namespace Terminal.Gui {
 		static void TerminalResized ()
 		{
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
+			Top.Frame = full;
+			Top.Width = full.Width;
+			Top.Height = full.Height;
 			Resized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
 			Driver.Clip = full;
 			foreach (var t in toplevels) {

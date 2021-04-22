@@ -858,18 +858,18 @@ references:
   commentId: F:Terminal.Gui.Color.Blue
   fullName: Terminal.Gui.Color.Blue
   nameWithType: Color.Blue
-- uid: Terminal.Gui.Color.BrighCyan
-  name: BrighCyan
-  href: api/Terminal.Gui/Terminal.Gui.Color.html#Terminal_Gui_Color_BrighCyan
-  commentId: F:Terminal.Gui.Color.BrighCyan
-  fullName: Terminal.Gui.Color.BrighCyan
-  nameWithType: Color.BrighCyan
 - uid: Terminal.Gui.Color.BrightBlue
   name: BrightBlue
   href: api/Terminal.Gui/Terminal.Gui.Color.html#Terminal_Gui_Color_BrightBlue
   commentId: F:Terminal.Gui.Color.BrightBlue
   fullName: Terminal.Gui.Color.BrightBlue
   nameWithType: Color.BrightBlue
+- uid: Terminal.Gui.Color.BrightCyan
+  name: BrightCyan
+  href: api/Terminal.Gui/Terminal.Gui.Color.html#Terminal_Gui_Color_BrightCyan
+  commentId: F:Terminal.Gui.Color.BrightCyan
+  fullName: Terminal.Gui.Color.BrightCyan
+  nameWithType: Color.BrightCyan
 - uid: Terminal.Gui.Color.BrightGreen
   name: BrightGreen
   href: api/Terminal.Gui/Terminal.Gui.Color.html#Terminal_Gui_Color_BrightGreen
@@ -12422,6 +12422,23 @@ references:
   fullName.vb: Terminal.Gui.TreeView(Of T).ObjectActivated
   nameWithType: TreeView<T>.ObjectActivated
   nameWithType.vb: TreeView(Of T).ObjectActivated
+- uid: Terminal.Gui.TreeView`1.ObjectActivationButton
+  name: ObjectActivationButton
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ObjectActivationButton
+  commentId: P:Terminal.Gui.TreeView`1.ObjectActivationButton
+  fullName: Terminal.Gui.TreeView<T>.ObjectActivationButton
+  fullName.vb: Terminal.Gui.TreeView(Of T).ObjectActivationButton
+  nameWithType: TreeView<T>.ObjectActivationButton
+  nameWithType.vb: TreeView(Of T).ObjectActivationButton
+- uid: Terminal.Gui.TreeView`1.ObjectActivationButton*
+  name: ObjectActivationButton
+  href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ObjectActivationButton_
+  commentId: Overload:Terminal.Gui.TreeView`1.ObjectActivationButton
+  isSpec: "True"
+  fullName: Terminal.Gui.TreeView<T>.ObjectActivationButton
+  fullName.vb: Terminal.Gui.TreeView(Of T).ObjectActivationButton
+  nameWithType: TreeView<T>.ObjectActivationButton
+  nameWithType.vb: TreeView(Of T).ObjectActivationButton
 - uid: Terminal.Gui.TreeView`1.ObjectActivationKey
   name: ObjectActivationKey
   href: api/Terminal.Gui/Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ObjectActivationKey
@@ -16325,7 +16342,14 @@ references:
 - uid: Unix.Terminal.Curses.LC_ALL
   name: LC_ALL
   href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_LC_ALL
-  commentId: F:Unix.Terminal.Curses.LC_ALL
+  commentId: P:Unix.Terminal.Curses.LC_ALL
+  fullName: Unix.Terminal.Curses.LC_ALL
+  nameWithType: Curses.LC_ALL
+- uid: Unix.Terminal.Curses.LC_ALL*
+  name: LC_ALL
+  href: api/Terminal.Gui/Unix.Terminal.Curses.html#Unix_Terminal_Curses_LC_ALL_
+  commentId: Overload:Unix.Terminal.Curses.LC_ALL
+  isSpec: "True"
   fullName: Unix.Terminal.Curses.LC_ALL
   nameWithType: Curses.LC_ALL
 - uid: Unix.Terminal.Curses.leaveok(System.IntPtr,System.Boolean)

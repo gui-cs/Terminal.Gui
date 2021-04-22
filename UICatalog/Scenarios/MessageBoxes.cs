@@ -110,6 +110,22 @@ namespace UICatalog {
 			};
 			frame.Add (numButtonsEdit);
 
+			label = new Label ("Default Button:") {
+				X = 0,
+				Y = Pos.Bottom (label),
+				Width = Dim.Width (label),
+				Height = 1,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
+			};
+			frame.Add (label);
+			var defaultButtonEdit = new TextField ("0") {
+				X = Pos.Right (label) + 1,
+				Y = Pos.Top (label),
+				Width = 5,
+				Height = 1
+			};
+			frame.Add (defaultButtonEdit);
+
 			label = new Label ("Style:") {
 				X = 0,
 				Y = Pos.Bottom (label),
@@ -124,13 +140,8 @@ namespace UICatalog {
 			};
 			frame.Add (styleRadioGroup);
 
-			void Top_Loaded ()
-			{
-				frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (messageEdit)
-					+ Dim.Height (numButtonsEdit) + Dim.Height (styleRadioGroup) + 2;
-				Top.Loaded -= Top_Loaded;
-			}
-			Top.Loaded += Top_Loaded;
+			frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (messageEdit)
+				+ Dim.Height (numButtonsEdit) + Dim.Height(defaultButtonEdit) + Dim.Height (styleRadioGroup) + 2;
 
 			label = new Label ("Button Pressed:") {
 				X = Pos.Center (),
@@ -145,6 +156,7 @@ namespace UICatalog {
 				Width = 25,
 				Height = 1,
 				ColorScheme = Colors.Error,
+				TextAlignment = Terminal.Gui.TextAlignment.Centered
 			};
 
 			//var btnText = new [] { "_Zero", "_One", "T_wo", "_Three", "_Four", "Fi_ve", "Si_x", "_Seven", "_Eight", "_Nine" };
@@ -159,6 +171,7 @@ namespace UICatalog {
 					int width = int.Parse (widthEdit.Text.ToString ());
 					int height = int.Parse (heightEdit.Text.ToString ());
 					int numButtons = int.Parse (numButtonsEdit.Text.ToString ());
+					int defaultButton = int.Parse (defaultButtonEdit.Text.ToString ());
 
 					var btns = new List<ustring> ();
 					for (int i = 0; i < numButtons; i++) {
@@ -166,9 +179,9 @@ namespace UICatalog {
 						btns.Add (NumberToWords.Convert (i));
 					}
 					if (styleRadioGroup.SelectedItem == 0) {
-						buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), btns.ToArray ())}";
+						buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, btns.ToArray ())}";
 					} else {
-						buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), btns.ToArray ())}";
+						buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, btns.ToArray ())}";
 					}
 				} catch (FormatException) {
 					buttonPressedLabel.Text = "Invalid Options";
