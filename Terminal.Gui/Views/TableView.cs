@@ -6,137 +6,7 @@ using System.Linq;
 
 namespace Terminal.Gui {
 
-	/// <summary>
-	/// Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> 
-	/// and textual representation of cells (e.g. date formats)
-	/// 
-	/// <a href="https://migueldeicaza.github.io/gui.cs/articles/tableview.html">See TableView Deep Dive for more information</a>.
-	/// </summary>
-	public class ColumnStyle {
-		
-		/// <summary>
-		/// Defines the default alignment for all values rendered in this column.  For custom alignment based on cell contents use <see cref="AlignmentGetter"/>.
-		/// </summary>
-		public TextAlignment Alignment {get;set;}
 	
-		/// <summary>
-		/// Defines a delegate for returning custom alignment per cell based on cell values.  When specified this will override <see cref="Alignment"/>
-		/// </summary>
-		public Func<object,TextAlignment> AlignmentGetter;
-
-		/// <summary>
-		/// Defines a delegate for returning custom representations of cell values.  If not set then <see cref="object.ToString()"/> is used.  Return values from your delegate may be truncated e.g. based on <see cref="MaxWidth"/>
-		/// </summary>
-		public Func<object,string> RepresentationGetter;
-
-		/// <summary>
-		/// Defines the format for values e.g. "yyyy-MM-dd" for dates
-		/// </summary>
-		public string Format{get;set;}
-
-		/// <summary>
-		/// Set the maximum width of the column in characters.  This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/>.  Defaults to <see cref="TableView.DefaultMaxCellWidth"/>
-		/// </summary>
-		public int MaxWidth {get;set;} = TableView.DefaultMaxCellWidth;
-
-		/// <summary>
-		/// Set the minimum width of the column in characters.  This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/> or the <see cref="MaxWidth"/>
-		/// </summary>
-		public int MinWidth {get;set;}
-
-		/// <summary>
-		/// Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/<see cref="Alignment"/>
-		/// </summary>
-		/// <param name="cellValue"></param>
-		/// <returns></returns>
-		public TextAlignment GetAlignment(object cellValue)
-		{
-			if(AlignmentGetter != null)
-				return AlignmentGetter(cellValue);
-
-			return Alignment;
-		}
-
-		/// <summary>
-		/// Returns the full string to render (which may be truncated if too long) that the current style says best represents the given <paramref name="value"/>
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public string GetRepresentation (object value)
-		{
-			if(!string.IsNullOrWhiteSpace(Format)) {
-
-				if(value is IFormattable f)
-					return f.ToString(Format,null);
-			}
-				
-
-			if(RepresentationGetter != null)
-				return RepresentationGetter(value);
-
-			return value?.ToString();
-		}
-	}
-	/// <summary>
-	/// Defines rendering options that affect how the table is displayed.
-	/// 
-	/// <a href="https://migueldeicaza.github.io/gui.cs/articles/tableview.html">See TableView Deep Dive for more information</a>.
-	/// </summary>
-	public class TableStyle {
-		
-		/// <summary>
-		/// When scrolling down always lock the column headers in place as the first row of the table
-		/// </summary>
-		public bool AlwaysShowHeaders {get;set;} = false;
-
-		/// <summary>
-		/// True to render a solid line above the headers
-		/// </summary>
-		public bool ShowHorizontalHeaderOverline {get;set;} = true;
-
-		/// <summary>
-		/// True to render a solid line under the headers
-		/// </summary>
-		public bool ShowHorizontalHeaderUnderline {get;set;} = true;
-
-		/// <summary>
-		/// True to render a solid line vertical line between cells
-		/// </summary>
-		public bool ShowVerticalCellLines {get;set;} = true;
-
-		/// <summary>
-		/// True to render a solid line vertical line between headers
-		/// </summary>
-		public bool ShowVerticalHeaderLines {get;set;} = true;
-
-		/// <summary>
-		/// Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)
-		/// </summary>
-		public Dictionary<DataColumn,ColumnStyle> ColumnStyles {get;set; }  = new Dictionary<DataColumn, ColumnStyle>();
-
-		/// <summary>
-		/// Returns the entry from <see cref="ColumnStyles"/> for the given <paramref name="col"/> or null if no custom styling is defined for it
-		/// </summary>
-		/// <param name="col"></param>
-		/// <returns></returns>
-		public ColumnStyle GetColumnStyleIfAny (DataColumn col)
-		{
-			return ColumnStyles.TryGetValue(col,out ColumnStyle result) ? result : null;
-		}
-
-		/// <summary>
-		/// Returns an existing <see cref="ColumnStyle"/> for the given <paramref name="col"/> or creates a new one with default options
-		/// </summary>
-		/// <param name="col"></param>
-		/// <returns></returns>
-		public ColumnStyle GetOrCreateColumnStyle (DataColumn col)
-		{
-			if(!ColumnStyles.ContainsKey(col))
-				ColumnStyles.Add(col,new ColumnStyle());
-
-			return ColumnStyles[col];
-		}
-	}
 
 	/// <summary>
 	/// View for tabular data based on a <see cref="DataTable"/>.
@@ -1197,140 +1067,270 @@ namespace Terminal.Gui {
 
 			return colStyle != null ? colStyle.GetRepresentation(value): value.ToString();
 		}
-	}
 
-	/// <summary>
-	/// Describes a desire to render a column at a given horizontal position in the UI
-	/// </summary>
-	internal class ColumnToRender {
 
+		#region Nested Types
 		/// <summary>
-		/// The column to render
+		/// Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> 
+		/// and textual representation of cells (e.g. date formats)
+		/// 
+		/// <a href="https://migueldeicaza.github.io/gui.cs/articles/tableview.html">See TableView Deep Dive for more information</a>.
 		/// </summary>
-		public DataColumn Column {get;set;}
+		public class ColumnStyle {
 
-		/// <summary>
-		/// The horizontal position to begin rendering the column at
-		/// </summary>
-		public int X{get;set;}
+			/// <summary>
+			/// Defines the default alignment for all values rendered in this column.  For custom alignment based on cell contents use <see cref="AlignmentGetter"/>.
+			/// </summary>
+			public TextAlignment Alignment { get; set; }
 
-		public ColumnToRender (DataColumn col, int x)
-		{
-			Column = col;
-			X = x;
+			/// <summary>
+			/// Defines a delegate for returning custom alignment per cell based on cell values.  When specified this will override <see cref="Alignment"/>
+			/// </summary>
+			public Func<object, TextAlignment> AlignmentGetter;
+
+			/// <summary>
+			/// Defines a delegate for returning custom representations of cell values.  If not set then <see cref="object.ToString()"/> is used.  Return values from your delegate may be truncated e.g. based on <see cref="MaxWidth"/>
+			/// </summary>
+			public Func<object, string> RepresentationGetter;
+
+			/// <summary>
+			/// Defines the format for values e.g. "yyyy-MM-dd" for dates
+			/// </summary>
+			public string Format { get; set; }
+
+			/// <summary>
+			/// Set the maximum width of the column in characters.  This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/>.  Defaults to <see cref="TableView.DefaultMaxCellWidth"/>
+			/// </summary>
+			public int MaxWidth { get; set; } = TableView.DefaultMaxCellWidth;
+
+			/// <summary>
+			/// Set the minimum width of the column in characters.  This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/> or the <see cref="MaxWidth"/>
+			/// </summary>
+			public int MinWidth { get; set; }
+
+			/// <summary>
+			/// Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/<see cref="Alignment"/>
+			/// </summary>
+			/// <param name="cellValue"></param>
+			/// <returns></returns>
+			public TextAlignment GetAlignment (object cellValue)
+			{
+				if (AlignmentGetter != null)
+					return AlignmentGetter (cellValue);
+
+				return Alignment;
+			}
+
+			/// <summary>
+			/// Returns the full string to render (which may be truncated if too long) that the current style says best represents the given <paramref name="value"/>
+			/// </summary>
+			/// <param name="value"></param>
+			/// <returns></returns>
+			public string GetRepresentation (object value)
+			{
+				if (!string.IsNullOrWhiteSpace (Format)) {
+
+					if (value is IFormattable f)
+						return f.ToString (Format, null);
+				}
+
+
+				if (RepresentationGetter != null)
+					return RepresentationGetter (value);
+
+				return value?.ToString ();
+			}
 		}
-	}
-
-	/// <summary>
-	/// Defines the event arguments for <see cref="TableView.SelectedCellChanged"/> 
-	/// </summary>
-	public class SelectedCellChangedEventArgs : EventArgs
-	{
 		/// <summary>
-		/// The current table to which the new indexes refer.  May be null e.g. if selection change is the result of clearing the table from the view
+		/// Defines rendering options that affect how the table is displayed.
+		/// 
+		/// <a href="https://migueldeicaza.github.io/gui.cs/articles/tableview.html">See TableView Deep Dive for more information</a>.
 		/// </summary>
-		/// <value></value>
-		public DataTable Table {get;}
+		public class TableStyle {
 
+			/// <summary>
+			/// When scrolling down always lock the column headers in place as the first row of the table
+			/// </summary>
+			public bool AlwaysShowHeaders { get; set; } = false;
 
-		/// <summary>
-		/// The previous selected column index.  May be invalid e.g. when the selection has been changed as a result of replacing the existing Table with a smaller one
-		/// </summary>
-		/// <value></value>
-		public int OldCol {get;}
+			/// <summary>
+			/// True to render a solid line above the headers
+			/// </summary>
+			public bool ShowHorizontalHeaderOverline { get; set; } = true;
 
+			/// <summary>
+			/// True to render a solid line under the headers
+			/// </summary>
+			public bool ShowHorizontalHeaderUnderline { get; set; } = true;
 
-		/// <summary>
-		/// The newly selected column index.
-		/// </summary>
-		/// <value></value>
-		public int NewCol {get;}
+			/// <summary>
+			/// True to render a solid line vertical line between cells
+			/// </summary>
+			public bool ShowVerticalCellLines { get; set; } = true;
 
+			/// <summary>
+			/// True to render a solid line vertical line between headers
+			/// </summary>
+			public bool ShowVerticalHeaderLines { get; set; } = true;
 
-		/// <summary>
-		/// The previous selected row index.  May be invalid e.g. when the selection has been changed as a result of deleting rows from the table
-		/// </summary>
-		/// <value></value>
-		public int OldRow {get;}
+			/// <summary>
+			/// Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)
+			/// </summary>
+			public Dictionary<DataColumn, ColumnStyle> ColumnStyles { get; set; } = new Dictionary<DataColumn, ColumnStyle> ();
 
+			/// <summary>
+			/// Returns the entry from <see cref="ColumnStyles"/> for the given <paramref name="col"/> or null if no custom styling is defined for it
+			/// </summary>
+			/// <param name="col"></param>
+			/// <returns></returns>
+			public ColumnStyle GetColumnStyleIfAny (DataColumn col)
+			{
+				return ColumnStyles.TryGetValue (col, out ColumnStyle result) ? result : null;
+			}
 
-		/// <summary>
-		/// The newly selected row index.
-		/// </summary>
-		/// <value></value>
-		public int NewRow {get;}
+			/// <summary>
+			/// Returns an existing <see cref="ColumnStyle"/> for the given <paramref name="col"/> or creates a new one with default options
+			/// </summary>
+			/// <param name="col"></param>
+			/// <returns></returns>
+			public ColumnStyle GetOrCreateColumnStyle (DataColumn col)
+			{
+				if (!ColumnStyles.ContainsKey (col))
+					ColumnStyles.Add (col, new ColumnStyle ());
 
-		/// <summary>
-		/// Creates a new instance of arguments describing a change in selected cell in a <see cref="TableView"/>
-		/// </summary>
-		/// <param name="t"></param>
-		/// <param name="oldCol"></param>
-		/// <param name="newCol"></param>
-		/// <param name="oldRow"></param>
-		/// <param name="newRow"></param>
-		public SelectedCellChangedEventArgs(DataTable t, int oldCol, int newCol, int oldRow, int newRow)
-		{
-			Table = t;
-			OldCol = oldCol;
-			NewCol = newCol;
-			OldRow = oldRow;
-			NewRow = newRow;
+				return ColumnStyles [col];
+			}
 		}
-	}
-
-	/// <summary>
-	/// Describes a selected region of the table
-	/// </summary>
-	public class TableSelection
-	{
 
 		/// <summary>
-		/// Corner of the <see cref="Rect"/> where selection began
+		/// Describes a desire to render a column at a given horizontal position in the UI
 		/// </summary>
-		/// <value></value>
-		public Point Origin{get;set;}
+		internal class ColumnToRender {
 
-		/// <summary>
-		/// Area selected
-		/// </summary>
-		/// <value></value>
-		public Rect Rect { get; set;}
+			/// <summary>
+			/// The column to render
+			/// </summary>
+			public DataColumn Column { get; set; }
 
-		/// <summary>
-		/// Creates a new selected area starting at the origin corner and covering the provided rectangular area
-		/// </summary>
-		/// <param name="origin"></param>
-		/// <param name="rect"></param>
-		public TableSelection(Point origin, Rect rect)
-		{
-			Origin = origin;
-			Rect = rect;
+			/// <summary>
+			/// The horizontal position to begin rendering the column at
+			/// </summary>
+			public int X { get; set; }
+
+			public ColumnToRender (DataColumn col, int x)
+			{
+				Column = col;
+				X = x;
+			}
 		}
-	}
-	
-	/// <summary>
-	///  Defines the event arguments for <see cref="TableView.CellActivated"/> event
-	/// </summary>
-	public class CellActivatedEventArgs : EventArgs
-	{
-		/// <summary>
-		/// The current table to which the new indexes refer.  May be null e.g. if selection change is the result of clearing the table from the view
-		/// </summary>
-		/// <value></value>
-		public DataTable Table {get;}
-
 
 		/// <summary>
-		/// The column index of the <see cref="Table"/> cell that is being activated
+		/// Defines the event arguments for <see cref="TableView.SelectedCellChanged"/> 
 		/// </summary>
-		/// <value></value>
-		public int Col {get;}
-		
+		public class SelectedCellChangedEventArgs : EventArgs {
+			/// <summary>
+			/// The current table to which the new indexes refer.  May be null e.g. if selection change is the result of clearing the table from the view
+			/// </summary>
+			/// <value></value>
+			public DataTable Table { get; }
+
+
+			/// <summary>
+			/// The previous selected column index.  May be invalid e.g. when the selection has been changed as a result of replacing the existing Table with a smaller one
+			/// </summary>
+			/// <value></value>
+			public int OldCol { get; }
+
+
+			/// <summary>
+			/// The newly selected column index.
+			/// </summary>
+			/// <value></value>
+			public int NewCol { get; }
+
+
+			/// <summary>
+			/// The previous selected row index.  May be invalid e.g. when the selection has been changed as a result of deleting rows from the table
+			/// </summary>
+			/// <value></value>
+			public int OldRow { get; }
+
+
+			/// <summary>
+			/// The newly selected row index.
+			/// </summary>
+			/// <value></value>
+			public int NewRow { get; }
+
+			/// <summary>
+			/// Creates a new instance of arguments describing a change in selected cell in a <see cref="TableView"/>
+			/// </summary>
+			/// <param name="t"></param>
+			/// <param name="oldCol"></param>
+			/// <param name="newCol"></param>
+			/// <param name="oldRow"></param>
+			/// <param name="newRow"></param>
+			public SelectedCellChangedEventArgs (DataTable t, int oldCol, int newCol, int oldRow, int newRow)
+			{
+				Table = t;
+				OldCol = oldCol;
+				NewCol = newCol;
+				OldRow = oldRow;
+				NewRow = newRow;
+			}
+		}
+
 		/// <summary>
-		/// The row index of the <see cref="Table"/> cell that is being activated
+		/// Describes a selected region of the table
 		/// </summary>
-		/// <value></value>
-		public int Row {get;}
+		public class TableSelection {
+
+			/// <summary>
+			/// Corner of the <see cref="Rect"/> where selection began
+			/// </summary>
+			/// <value></value>
+			public Point Origin { get; set; }
+
+			/// <summary>
+			/// Area selected
+			/// </summary>
+			/// <value></value>
+			public Rect Rect { get; set; }
+
+			/// <summary>
+			/// Creates a new selected area starting at the origin corner and covering the provided rectangular area
+			/// </summary>
+			/// <param name="origin"></param>
+			/// <param name="rect"></param>
+			public TableSelection (Point origin, Rect rect)
+			{
+				Origin = origin;
+				Rect = rect;
+			}
+		}
+
+		/// <summary>
+		///  Defines the event arguments for <see cref="TableView.CellActivated"/> event
+		/// </summary>
+		public class CellActivatedEventArgs : EventArgs {
+			/// <summary>
+			/// The current table to which the new indexes refer.  May be null e.g. if selection change is the result of clearing the table from the view
+			/// </summary>
+			/// <value></value>
+			public DataTable Table { get; }
+
+
+			/// <summary>
+			/// The column index of the <see cref="Table"/> cell that is being activated
+			/// </summary>
+			/// <value></value>
+			public int Col { get; }
+
+			/// <summary>
+			/// The row index of the <see cref="Table"/> cell that is being activated
+			/// </summary>
+			/// <value></value>
+			public int Row { get; }
 
 			/// <summary>
 			/// Creates a new instance of arguments describing a cell being activated in <see cref="TableView"/>
@@ -1338,11 +1338,15 @@ namespace Terminal.Gui {
 			/// <param name="t"></param>
 			/// <param name="col"></param>
 			/// <param name="row"></param>
-			public CellActivatedEventArgs(DataTable t, int col, int row)
-		{
-			Table = t;
-			Col = col;
-			Row = row;
+			public CellActivatedEventArgs (DataTable t, int col, int row)
+			{
+				Table = t;
+				Col = col;
+				Row = row;
+			}
 		}
+		#endregion
 	}
+
+	
 }

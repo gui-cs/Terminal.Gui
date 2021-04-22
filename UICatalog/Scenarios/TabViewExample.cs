@@ -120,7 +120,7 @@ namespace UICatalog.Scenarios {
 
 		private void AddBlankTab ()
 		{
-			tabView.AddTab (new Tab (), false);
+			tabView.AddTab (new TabView.Tab (), false);
 		}
 
 		private View GetInteractiveTab ()
