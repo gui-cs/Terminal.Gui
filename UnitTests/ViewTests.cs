@@ -924,100 +924,100 @@ namespace Terminal.Gui.Views {
 			Application.Shutdown ();
 		}
 
-		//[Fact]
-		//public void Multi_Thread_Toplevels ()
-		//{
-		//	Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+		[Fact]
+		public void Multi_Thread_Toplevels ()
+		{
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
-		//	var t = Application.Top;
-		//	var w = new Window ();
-		//	t.Add (w);
+			var t = Application.Top;
+			var w = new Window ();
+			t.Add (w);
 
-		//	int count = 0, count1 = 0, count2 = 0;
-		//	bool log = false, log1 = false, log2 = false;
-		//	bool fromTopStillKnowFirstIsRunning = false;
-		//	bool fromTopStillKnowSecondIsRunning = false;
-		//	bool fromFirstStillKnowSecondIsRunning = false;
+			int count = 0, count1 = 0, count2 = 0;
+			bool log = false, log1 = false, log2 = false;
+			bool fromTopStillKnowFirstIsRunning = false;
+			bool fromTopStillKnowSecondIsRunning = false;
+			bool fromFirstStillKnowSecondIsRunning = false;
 
-		//	Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
-		//		count++;
-		//		if (count1 == 5) {
-		//			log1 = true;
-		//		}
-		//		if (count1 > 13 && count < 15) {
-		//			fromTopStillKnowFirstIsRunning = true;
-		//		}
-		//		if (count2 > 6 && count2 < 8) {
-		//			fromTopStillKnowSecondIsRunning = true;
-		//		}
-		//		if (count == 30) {
-		//			Assert.Equal (30, count);
-		//			Assert.Equal (20, count1);
-		//			Assert.Equal (10, count2);
+			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+				count++;
+				if (count1 == 5) {
+					log1 = true;
+				}
+				if (count1 == 14 && count2 == 10 && count == 15) { // count2 is already stopped
+					fromTopStillKnowFirstIsRunning = true;
+				}
+				if (count1 == 7 && count2 == 7 && count == 8) {
+					fromTopStillKnowSecondIsRunning = true;
+				}
+				if (count == 30) {
+					Assert.Equal (30, count);
+					Assert.Equal (20, count1);
+					Assert.Equal (10, count2);
 
-		//			Assert.True (log);
-		//			Assert.True (log1);
-		//			Assert.True (log2);
+					Assert.True (log);
+					Assert.True (log1);
+					Assert.True (log2);
 
-		//			Assert.True (fromTopStillKnowFirstIsRunning);
-		//			Assert.True (fromTopStillKnowSecondIsRunning);
-		//			Assert.True (fromFirstStillKnowSecondIsRunning);
+					Assert.True (fromTopStillKnowFirstIsRunning);
+					Assert.True (fromTopStillKnowSecondIsRunning);
+					Assert.True (fromFirstStillKnowSecondIsRunning);
 
-		//			Application.RequestStop ();
-		//			return false;
-		//		}
-		//		return true;
-		//	});
+					Application.RequestStop ();
+					return false;
+				}
+				return true;
+			});
 
-		//	t.Ready += FirstDialogToplevel;
+			t.Ready += FirstDialogToplevel;
 
-		//	void FirstDialogToplevel ()
-		//	{
-		//		var od = new OpenDialog ();
-		//		od.Ready += SecoundDialogToplevel;
+			void FirstDialogToplevel ()
+			{
+				var od = new OpenDialog ();
+				od.Ready += SecoundDialogToplevel;
 
-		//		Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
-		//			count1++;
-		//			if (count2 == 5) {
-		//				log2 = true;
-		//			}
-		//			if (count2 > 3 && count2 < 5) {
-		//				fromFirstStillKnowSecondIsRunning = true;
-		//			}
-		//			if (count1 == 20) {
-		//				Assert.Equal (20, count1);
-		//				Application.RequestStop ();
-		//				return false;
-		//			}
-		//			return true;
-		//		});
+				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+					count1++;
+					if (count2 == 5) {
+						log2 = true;
+					}
+					if (count2 == 4 && count1 == 5 && count == 5) {
+						fromFirstStillKnowSecondIsRunning = true;
+					}
+					if (count1 == 20) {
+						Assert.Equal (20, count1);
+						Application.RequestStop ();
+						return false;
+					}
+					return true;
+				});
 
-		//		Application.Run (od);
-		//	}
+				Application.Run (od);
+			}
 
-		//	void SecoundDialogToplevel ()
-		//	{
-		//		var d = new Dialog ();
+			void SecoundDialogToplevel ()
+			{
+				var d = new Dialog ();
 
-		//		Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
-		//			count2++;
-		//			if (count < 30) {
-		//				log = true;
-		//			}
-		//			if (count2 == 10) {
-		//				Assert.Equal (10, count2);
-		//				Application.RequestStop ();
-		//				return false;
-		//			}
-		//			return true;
-		//		});
+				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+					count2++;
+					if (count < 30) {
+						log = true;
+					}
+					if (count2 == 10) {
+						Assert.Equal (10, count2);
+						Application.RequestStop ();
+						return false;
+					}
+					return true;
+				});
 
-		//		Application.Run (d);
-		//	}
+				Application.Run (d);
+			}
 
-		//	Application.Run ();
-		//	Application.Shutdown ();
-		//}
+			Application.Run ();
+			Application.Shutdown ();
+		}
 
 		[Fact]
 		public void View_Difference_Between_An_Object_Initializer_And_A_Constructor ()
