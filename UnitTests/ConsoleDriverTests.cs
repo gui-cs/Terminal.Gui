@@ -156,7 +156,7 @@ namespace Terminal.Gui {
 				List<Key> keys = new List<Key> ();
 
 				foreach (Key k in Enum.GetValues (typeof (Key))) {
-					if (k != Key.Null && k != Key.Enter && k != Key.Delete && (uint)k <= 0xff) {
+					if (k != Key.Enter && k != Key.Delete && (uint)k <= 0xff) {
 						keys.Add (k);
 					} else if ((uint)k > 0xff) {
 						break;
@@ -168,9 +168,6 @@ namespace Terminal.Gui {
 
 			view.KeyPress += (e) => {
 				e.Handled = true;
-				if ((char)e.KeyEvent.Key == '~') {
-					return;
-				}
 				PopIterations++;
 				var rMk = new KeyModifiers () {
 					Shift = e.KeyEvent.IsShift,
