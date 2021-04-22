@@ -1460,6 +1460,9 @@ namespace Terminal.Gui {
 			KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
+			Focused?.KeyPress?.Invoke (args);
+			if (args.Handled)
+				return true;
 			if (Focused?.ProcessKey (keyEvent) == true)
 				return true;
 
@@ -1471,6 +1474,9 @@ namespace Terminal.Gui {
 		{
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
 			KeyPress?.Invoke (args);
+			if (args.Handled)
+				return true;
+			Focused?.KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
 			if (Focused?.ProcessKey (keyEvent) == true)
@@ -1488,6 +1494,9 @@ namespace Terminal.Gui {
 		{
 			KeyEventEventArgs args = new KeyEventEventArgs (keyEvent);
 			KeyPress?.Invoke (args);
+			if (args.Handled)
+				return true;
+			Focused?.KeyPress?.Invoke (args);
 			if (args.Handled)
 				return true;
 			if (Focused?.ProcessKey (keyEvent) == true)

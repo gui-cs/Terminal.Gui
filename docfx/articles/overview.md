@@ -425,4 +425,4 @@ label.TextColor = myColor
 MainLoop, Threads and Input Handling
 ====================================
 
-Detailed description of the mainlop is described on the [Event Processing and the Application Main Loop](mainloop.html) document.
+Detailed description of the mainloop is described on the [Event Processing and the Application Main Loop](mainloop.html) document.
