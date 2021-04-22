@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
 using Xunit;
@@ -78,15 +79,17 @@ namespace Terminal.Gui {
 			var oem3 = 0;
 
 			view.KeyPress += (e) => {
-				if (oem3 < 10) {
-					Assert.Equal ('~', (uint)e.KeyEvent.Key);
-					oem3++;
-				} else {
-					Application.RequestStop ();
-				}
+				Assert.Equal ('~', (uint)e.KeyEvent.Key);
 				e.Handled = true;
 			};
 			top.Add (view);
+
+			Application.Iteration += () => {
+				oem3++;
+				if (oem3 == 10) {
+					Application.RequestStop ();
+				}
+			};
 
 			Application.Run ();
 
@@ -96,16 +99,16 @@ namespace Terminal.Gui {
 		[Fact]
 		public void FakeDriver_MockKeyPresses ()
 		{
+			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+
 			var text = "MockKeyPresses";
-			var mKeys = new System.Collections.Generic.Stack<ConsoleKeyInfo> ();
+			var mKeys = new Stack<ConsoleKeyInfo> ();
 			foreach (var r in text.Reverse ()) {
 				var ck = char.IsLetter (r) ? (ConsoleKey)char.ToUpper (r) : (ConsoleKey)r;
 				var cki = new ConsoleKeyInfo (r, ck, false, false, false);
 				mKeys.Push (cki);
 			}
-			Console.MockKeyPresses = mKeys;
-
-			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			FakeConsole.MockKeyPresses = mKeys;
 
 			var top = Application.Top;
 			var view = new View ();
@@ -117,12 +120,15 @@ namespace Terminal.Gui {
 				rText += (char)e.KeyEvent.Key;
 				Assert.Equal (rText, text.Substring (0, idx + 1));
 				e.Handled = true;
-				if (rText == text) {
-					Application.RequestStop ();
-				}
 				idx++;
 			};
 			top.Add (view);
+
+			Application.Iteration += () => {
+				if (mKeys.Count == 0) {
+					Application.RequestStop ();
+				}
+			};
 
 			Application.Run ();
 
@@ -138,59 +144,91 @@ namespace Terminal.Gui {
 			var view = new View ();
 			var shift = false; var alt = false; var control = false;
 			Key key = default;
-			var wasSendKeysProcessed = false;
+			Key lastKey = default;
+			List<Key> keyEnums = GetKeys ();
+			int i = 0;
+			int idxKey = 0;
+			var PushIterations = 0;
+			var PopIterations = 0;
+
+			List<Key> GetKeys ()
+			{
+				List<Key> keys = new List<Key> ();
+
+				foreach (Key k in Enum.GetValues (typeof (Key))) {
+					if (k != Key.Null && k != Key.Enter && k != Key.Delete && (uint)k <= 0xff) {
+						keys.Add (k);
+					} else if ((uint)k > 0xff) {
+						break;
+					}
+				}
+
+				return keys;
+			}
 
 			view.KeyPress += (e) => {
 				e.Handled = true;
 				if ((char)e.KeyEvent.Key == '~') {
 					return;
 				}
+				PopIterations++;
 				var rMk = new KeyModifiers () {
 					Shift = e.KeyEvent.IsShift,
 					Alt = e.KeyEvent.IsAlt,
 					Ctrl = e.KeyEvent.IsCtrl
 				};
-				Assert.Equal (key, ShortcutHelper.GetModifiersKey (new KeyEvent (e.KeyEvent.Key, rMk)));
-				wasSendKeysProcessed = true;
+				lastKey = ShortcutHelper.GetModifiersKey (new KeyEvent (e.KeyEvent.Key, rMk));
+				Assert.Equal (key, lastKey);
 			};
 			top.Add (view);
 
 			Application.Iteration += () => {
-				for (int i = 0; i < 4; i++) {
-					switch (i) {
-					case 1:
-						shift = true;
-						break;
-					case 2:
-						alt = true;
-						break;
-					case 3:
-						control = true;
-						break;
-					}
-					foreach (Key k in Enum.GetValues (typeof (Key))) {
-						if (k == Key.Null) {
-							continue;
-						} else if ((uint)k > 255) {
-							break;
-						}
-						var c = (char)k;
-						var ck = char.IsLetter (c) ? (ConsoleKey)char.ToUpper (c) : (ConsoleKey)c;
-						var mk = new KeyModifiers () {
-							Shift = shift,
-							Alt = alt,
-							Ctrl = control
-						};
-						key = ShortcutHelper.GetModifiersKey (new KeyEvent (k, mk));
-						Application.Driver.SendKeys (c, ck, shift, alt, control);
-					}
+				switch (i) {
+				case 0:
+					SendKeys ();
+					break;
+				case 1:
+					shift = true;
+					SendKeys ();
+					break;
+				case 2:
+					alt = true;
+					SendKeys ();
+					break;
+				case 3:
+					control = true;
+					SendKeys ();
+					break;
 				}
-				Application.RequestStop ();
+				if (PushIterations == keyEnums.Count * 4) {
+					Application.RequestStop ();
+				}
 			};
+
+			void SendKeys ()
+			{
+				var k = keyEnums [idxKey];
+				var c = (char)k;
+				var ck = char.IsLetter (c) ? (ConsoleKey)char.ToUpper (c) : (ConsoleKey)c;
+				var mk = new KeyModifiers () {
+					Shift = shift,
+					Alt = alt,
+					Ctrl = control
+				};
+				key = ShortcutHelper.GetModifiersKey (new KeyEvent (k, mk));
+				Application.Driver.SendKeys (c, ck, shift, alt, control);
+				PushIterations++;
+				if (idxKey + 1 < keyEnums.Count) {
+					idxKey++;
+				} else {
+					idxKey = 0;
+					i++;
+				}
+			}
 
 			Application.Run ();
 
-			Assert.True (wasSendKeysProcessed);
+			Assert.Equal (key, lastKey);
 		}
 	}
 }
