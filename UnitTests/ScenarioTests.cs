@@ -132,8 +132,9 @@ namespace Terminal.Gui {
 
 			Assert.Equal (0, abortCount);
 			// # of key up events should match # of iterations
-			//Assert.Equal (1, iterations);
-			Assert.Equal (stackSize, iterations);
+			Assert.Equal (1, iterations);
+			// Using variable in the left side of Assert.Equal/NotEqual give error. Must be used literals values.
+			//Assert.Equal (stackSize, iterations);
 
 #if DEBUG_IDISPOSABLE
 			foreach (var inst in Responder.Instances) {
