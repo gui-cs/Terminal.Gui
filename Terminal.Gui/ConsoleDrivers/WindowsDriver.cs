@@ -1427,27 +1427,51 @@ namespace Terminal.Gui {
 
 			WindowsConsole.KeyEventRecord keyEvent = new WindowsConsole.KeyEventRecord ();
 			keyEvent.bKeyDown = true;
-			keyEvent.UnicodeChar = keyChar;
-			keyEvent.wVirtualKeyCode = (ushort)key;
 			WindowsConsole.ControlKeyState controlKey = new WindowsConsole.ControlKeyState ();
 			if (shift) {
 				controlKey |= WindowsConsole.ControlKeyState.ShiftPressed;
+				keyEvent.UnicodeChar = '\0';
+				keyEvent.wVirtualKeyCode = 16;
 			}
 			if (alt) {
 				controlKey |= WindowsConsole.ControlKeyState.LeftAltPressed;
 				controlKey |= WindowsConsole.ControlKeyState.RightAltPressed;
+				keyEvent.UnicodeChar = '\0';
+				keyEvent.wVirtualKeyCode = 18;
 			}
 			if (control) {
 				controlKey |= WindowsConsole.ControlKeyState.LeftControlPressed;
 				controlKey |= WindowsConsole.ControlKeyState.RightControlPressed;
+				keyEvent.UnicodeChar = '\0';
+				keyEvent.wVirtualKeyCode = 17;
 			}
 			keyEvent.dwControlKeyState = controlKey;
+
+			input.KeyEvent = keyEvent;
+
+			if (shift || alt || control) {
+				ProcessInput (input);
+			}
+
+			keyEvent.UnicodeChar = keyChar;
+			if ((shift || alt || control)
+				&& (key >= ConsoleKey.A && key <= ConsoleKey.Z
+				|| key >= ConsoleKey.D0 && key <= ConsoleKey.D9)) {
+				keyEvent.wVirtualKeyCode = (ushort)key;
+			} else {
+				keyEvent.wVirtualKeyCode = '\0';
+			}
 
 			input.KeyEvent = keyEvent;
 
 			try {
 				ProcessInput (input);
 			} catch (OverflowException) { }
+			finally {
+				keyEvent.bKeyDown = false;
+				input.KeyEvent = keyEvent;
+				ProcessInput (input);
+			}
 		}
 		#endregion
 	}

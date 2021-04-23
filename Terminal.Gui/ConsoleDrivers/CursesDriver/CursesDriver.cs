@@ -942,11 +942,23 @@ namespace Terminal.Gui {
 
 		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
 		{
-			var k = (Key)keyChar;
-			keyModifiers = new KeyModifiers ();
-			keyModifiers.Shift = shift;
-			keyModifiers.Alt = alt;
-			keyModifiers.Ctrl = control;
+			Key k;
+
+			if ((shift || alt || control)
+				&& keyChar - (int)Key.Space >= (uint)Key.A && keyChar - (int)Key.Space <= (uint)Key.Z) {
+				k = (Key)(keyChar - (uint)Key.Space);
+			} else {
+				k = (Key)keyChar;
+			}
+			if (shift) {
+				k |= Key.ShiftMask;
+			}
+			if (alt) {
+				k |= Key.AltMask;
+			}
+			if (control) {
+				k |= Key.CtrlMask;
+			}
 			keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 		}
 	}
