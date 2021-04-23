@@ -1,4 +1,4 @@
-name: .NET Core
+name: Build Terminal.Gui with .NET Core
 
 on:
   push:
@@ -26,7 +26,9 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
+      run: |
+        dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
+        copy UnitTests/TestResults/*/coverage.opencover.xml UnitTests/TestResults
 
     - name: Create Test Coverage Badge
       uses: simon-k/dotnet-code-coverage-badge@v1.0.0
@@ -34,7 +36,7 @@ jobs:
       with:
         label: Unit Test Coverage
         color: brightgreen
-        path: UnitTest/TestResults/<uuid>/coverage.opencover.xml
+        path: UnitTest/TestResults/coverage.opencover.xml
         gist-filename: code-coverage.json
         # https://gist.github.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27
         gist-id: 90ef67a684cb71db1817921a970f8d27
