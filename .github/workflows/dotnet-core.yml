@@ -28,7 +28,7 @@ jobs:
     - name: Test
       run: |
         dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
-        copy UnitTests/TestResults/*/coverage.opencover.xml UnitTests/TestResults
+        cp UnitTests/TestResults/*/coverage.opencover.xml UnitTests/TestResults
 
     - name: Create Test Coverage Badge
       uses: simon-k/dotnet-code-coverage-badge@v1.0.0
