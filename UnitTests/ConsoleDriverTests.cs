@@ -70,30 +70,30 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void FakeDriver_Always_Sends_ConsoleKey_Oem3_Without_Using_MockKeyPresses ()
+		public void FakeDriver_Only_Sends_Keystrokes_Through_MockKeyPresses ()
 		{
 			Application.Init (new FakeDriver (), new FakeMainLoop (() => FakeConsole.ReadKey (true)));
 
 			var top = Application.Top;
 			var view = new View ();
-			var oem3 = 0;
+			var count = 0;
+			var wasKeyPressed = false;
 
 			view.KeyPress += (e) => {
-				Assert.Equal ('~', (uint)e.KeyEvent.Key);
-				e.Handled = true;
+				wasKeyPressed = true;
 			};
 			top.Add (view);
 
 			Application.Iteration += () => {
-				oem3++;
-				if (oem3 == 10) {
+				count++;
+				if (count == 10) {
 					Application.RequestStop ();
 				}
 			};
 
 			Application.Run ();
 
-			Assert.Equal (10, oem3);
+			Assert.False (wasKeyPressed);
 		}
 
 		[Fact]
