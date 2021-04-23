@@ -1748,8 +1748,14 @@ namespace Terminal.Gui {
 		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
 		{
 			NetEvents.InputResult input = new NetEvents.InputResult ();
+			ConsoleKey ck;
+			if (char.IsLetter (keyChar)) {
+				ck = key;
+			} else {
+				ck = (ConsoleKey)'\0';
+			}
 			input.EventType = NetEvents.EventType.Key;
-			input.ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, key, shift, alt, control);
+			input.ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, ck, shift, alt, control);
 
 			try {
 				ProcessInput (input);
