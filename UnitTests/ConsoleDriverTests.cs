@@ -156,7 +156,7 @@ namespace Terminal.Gui {
 				List<Key> keys = new List<Key> ();
 
 				foreach (Key k in Enum.GetValues (typeof (Key))) {
-					if (k != Key.Enter && k != Key.Delete && (uint)k <= 0xff) {
+					if ((uint)k <= 0xff) {
 						keys.Add (k);
 					} else if ((uint)k > 0xff) {
 						break;

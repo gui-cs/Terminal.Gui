@@ -348,6 +348,9 @@ namespace Terminal.Gui {
 
 				return (Key)((uint)Key.F1 + delta);
 			}
+			if (keyInfo.KeyChar != 0) {
+				return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
+			}
 
 			return (Key)(0xffffffff);
 		}
