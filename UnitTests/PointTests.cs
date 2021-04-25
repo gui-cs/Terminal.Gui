@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Types {
 	public class PointTests {
 		[Fact]
 		public void Point_New ()
@@ -20,7 +20,7 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void Point__SetsValue ()
+		public void Point_SetsValue ()
 		{
 			var point = new Point () {
 				X = 0,

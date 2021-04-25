@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Views {
 	public class TextViewTests {
 		private TextView _textView;
 

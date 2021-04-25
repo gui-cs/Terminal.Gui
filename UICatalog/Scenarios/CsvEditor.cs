@@ -504,7 +504,7 @@ namespace UICatalog.Scenarios {
 			enteredText = okPressed? tf.Text.ToString() : null;
 			return okPressed;
 		}
-		private void EditCurrentCell (CellActivatedEventArgs e)
+		private void EditCurrentCell (TableView.CellActivatedEventArgs e)
 		{
 			if(e.Table == null)
 				return;
