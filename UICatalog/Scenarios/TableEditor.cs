@@ -273,7 +273,7 @@ namespace UICatalog.Scenarios {
 			tableView.Table = BuildSimpleDataTable(big ? 30 : 5, big ? 1000 : 5);
 		}
 
-		private void EditCurrentCell (CellActivatedEventArgs e)
+		private void EditCurrentCell (TableView.CellActivatedEventArgs e)
 		{
 			if(e.Table == null)
 				return;
