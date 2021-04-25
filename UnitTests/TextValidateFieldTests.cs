@@ -3,7 +3,7 @@ using Terminal.Gui.TextValidateProviders;
 
 using Xunit;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Views {
 	public class TextValidateField_NET_Provider_Tests {
 		public TextValidateField_NET_Provider_Tests ()
 		{
