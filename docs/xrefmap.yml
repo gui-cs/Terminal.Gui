@@ -616,64 +616,6 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.Button.Text
   nameWithType: Button.Text
-- uid: Terminal.Gui.CellActivatedEventArgs
-  name: CellActivatedEventArgs
-  href: api/Terminal.Gui/Terminal.Gui.CellActivatedEventArgs.html
-  commentId: T:Terminal.Gui.CellActivatedEventArgs
-  fullName: Terminal.Gui.CellActivatedEventArgs
-  nameWithType: CellActivatedEventArgs
-- uid: Terminal.Gui.CellActivatedEventArgs.#ctor(System.Data.DataTable,System.Int32,System.Int32)
-  name: CellActivatedEventArgs(DataTable, Int32, Int32)
-  href: api/Terminal.Gui/Terminal.Gui.CellActivatedEventArgs.html#Terminal_Gui_CellActivatedEventArgs__ctor_System_Data_DataTable_System_Int32_System_Int32_
-  commentId: M:Terminal.Gui.CellActivatedEventArgs.#ctor(System.Data.DataTable,System.Int32,System.Int32)
-  fullName: Terminal.Gui.CellActivatedEventArgs.CellActivatedEventArgs(System.Data.DataTable, System.Int32, System.Int32)
-  nameWithType: CellActivatedEventArgs.CellActivatedEventArgs(DataTable, Int32, Int32)
-- uid: Terminal.Gui.CellActivatedEventArgs.#ctor*
-  name: CellActivatedEventArgs
-  href: api/Terminal.Gui/Terminal.Gui.CellActivatedEventArgs.html#Terminal_Gui_CellActivatedEventArgs__ctor_
-  commentId: Overload:Terminal.Gui.CellActivatedEventArgs.#ctor
-  isSpec: "True"
-  fullName: Terminal.Gui.CellActivatedEventArgs.CellActivatedEventArgs
-  nameWithType: CellActivatedEventArgs.CellActivatedEventArgs
-- uid: Terminal.Gui.CellActivatedEventArgs.Col
-  name: Col
-  href: api/Terminal.Gui/Terminal.Gui.CellActivatedEventArgs.html#Terminal_Gui_CellActivatedEventArgs_Col
-  commentId: P:Terminal.Gui.CellActivatedEventArgs.Col
-  fullName: Terminal.Gui.CellActivatedEventArgs.Col
-  nameWithType: CellActivatedEventArgs.Col
-- uid: Terminal.Gui.CellActivatedEventArgs.Col*
-  name: Col
-  href: api/Terminal.Gui/Terminal.Gui.CellActivatedEventArgs.html#Terminal_Gui_CellActivatedEventArgs_Col_
-  commentId: Overload:Terminal.Gui.CellActivatedEventArgs.Col
-  isSpec: "True"
-  fullName: Terminal.Gui.CellActivatedEventArgs.Col
-  nameWithType: CellActivatedEventArgs.Col
-- uid: Terminal.Gui.CellActivatedEventArgs.Row
-  name: Row
-  href: api/Terminal.Gui/Terminal.Gui.CellActivatedEventArgs.html#Terminal_Gui_CellActivatedEventArgs_Row
-  commentId: P:Terminal.Gui.CellActivatedEventArgs.Row
-  fullName: Terminal.Gui.CellActivatedEventArgs.Row
-  nameWithType: CellActivatedEventArgs.Row
-- uid: Terminal.Gui.CellActivatedEventArgs.Row*
-  name: Row
-  href: api/Terminal.Gui/Terminal.Gui.CellActivatedEventArgs.html#Terminal_Gui_CellActivatedEventArgs_Row_
-  commentId: Overload:Terminal.Gui.CellActivatedEventArgs.Row
-  isSpec: "True"
-  fullName: Terminal.Gui.CellActivatedEventArgs.Row
-  nameWithType: CellActivatedEventArgs.Row
-- uid: Terminal.Gui.CellActivatedEventArgs.Table
-  name: Table
-  href: api/Terminal.Gui/Terminal.Gui.CellActivatedEventArgs.html#Terminal_Gui_CellActivatedEventArgs_Table
-  commentId: P:Terminal.Gui.CellActivatedEventArgs.Table
-  fullName: Terminal.Gui.CellActivatedEventArgs.Table
-  nameWithType: CellActivatedEventArgs.Table
-- uid: Terminal.Gui.CellActivatedEventArgs.Table*
-  name: Table
-  href: api/Terminal.Gui/Terminal.Gui.CellActivatedEventArgs.html#Terminal_Gui_CellActivatedEventArgs_Table_
-  commentId: Overload:Terminal.Gui.CellActivatedEventArgs.Table
-  isSpec: "True"
-  fullName: Terminal.Gui.CellActivatedEventArgs.Table
-  nameWithType: CellActivatedEventArgs.Table
 - uid: Terminal.Gui.CheckBox
   name: CheckBox
   href: api/Terminal.Gui/Terminal.Gui.CheckBox.html
@@ -9971,6 +9913,64 @@ references:
   commentId: E:Terminal.Gui.TableView.CellActivated
   fullName: Terminal.Gui.TableView.CellActivated
   nameWithType: TableView.CellActivated
+- uid: Terminal.Gui.TableView.CellActivatedEventArgs
+  name: TableView.CellActivatedEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.TableView.CellActivatedEventArgs.html
+  commentId: T:Terminal.Gui.TableView.CellActivatedEventArgs
+  fullName: Terminal.Gui.TableView.CellActivatedEventArgs
+  nameWithType: TableView.CellActivatedEventArgs
+- uid: Terminal.Gui.TableView.CellActivatedEventArgs.#ctor(System.Data.DataTable,System.Int32,System.Int32)
+  name: CellActivatedEventArgs(DataTable, Int32, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TableView.CellActivatedEventArgs.html#Terminal_Gui_TableView_CellActivatedEventArgs__ctor_System_Data_DataTable_System_Int32_System_Int32_
+  commentId: M:Terminal.Gui.TableView.CellActivatedEventArgs.#ctor(System.Data.DataTable,System.Int32,System.Int32)
+  fullName: Terminal.Gui.TableView.CellActivatedEventArgs.CellActivatedEventArgs(System.Data.DataTable, System.Int32, System.Int32)
+  nameWithType: TableView.CellActivatedEventArgs.CellActivatedEventArgs(DataTable, Int32, Int32)
+- uid: Terminal.Gui.TableView.CellActivatedEventArgs.#ctor*
+  name: CellActivatedEventArgs
+  href: api/Terminal.Gui/Terminal.Gui.TableView.CellActivatedEventArgs.html#Terminal_Gui_TableView_CellActivatedEventArgs__ctor_
+  commentId: Overload:Terminal.Gui.TableView.CellActivatedEventArgs.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.TableView.CellActivatedEventArgs.CellActivatedEventArgs
+  nameWithType: TableView.CellActivatedEventArgs.CellActivatedEventArgs
+- uid: Terminal.Gui.TableView.CellActivatedEventArgs.Col
+  name: Col
+  href: api/Terminal.Gui/Terminal.Gui.TableView.CellActivatedEventArgs.html#Terminal_Gui_TableView_CellActivatedEventArgs_Col
+  commentId: P:Terminal.Gui.TableView.CellActivatedEventArgs.Col
+  fullName: Terminal.Gui.TableView.CellActivatedEventArgs.Col
+  nameWithType: TableView.CellActivatedEventArgs.Col
+- uid: Terminal.Gui.TableView.CellActivatedEventArgs.Col*
+  name: Col
+  href: api/Terminal.Gui/Terminal.Gui.TableView.CellActivatedEventArgs.html#Terminal_Gui_TableView_CellActivatedEventArgs_Col_
+  commentId: Overload:Terminal.Gui.TableView.CellActivatedEventArgs.Col
+  isSpec: "True"
+  fullName: Terminal.Gui.TableView.CellActivatedEventArgs.Col
+  nameWithType: TableView.CellActivatedEventArgs.Col
+- uid: Terminal.Gui.TableView.CellActivatedEventArgs.Row
+  name: Row
+  href: api/Terminal.Gui/Terminal.Gui.TableView.CellActivatedEventArgs.html#Terminal_Gui_TableView_CellActivatedEventArgs_Row
+  commentId: P:Terminal.Gui.TableView.CellActivatedEventArgs.Row
+  fullName: Terminal.Gui.TableView.CellActivatedEventArgs.Row
+  nameWithType: TableView.CellActivatedEventArgs.Row
+- uid: Terminal.Gui.TableView.CellActivatedEventArgs.Row*
+  name: Row
+  href: api/Terminal.Gui/Terminal.Gui.TableView.CellActivatedEventArgs.html#Terminal_Gui_TableView_CellActivatedEventArgs_Row_
+  commentId: Overload:Terminal.Gui.TableView.CellActivatedEventArgs.Row
+  isSpec: "True"
+  fullName: Terminal.Gui.TableView.CellActivatedEventArgs.Row
+  nameWithType: TableView.CellActivatedEventArgs.Row
+- uid: Terminal.Gui.TableView.CellActivatedEventArgs.Table
+  name: Table
+  href: api/Terminal.Gui/Terminal.Gui.TableView.CellActivatedEventArgs.html#Terminal_Gui_TableView_CellActivatedEventArgs_Table
+  commentId: P:Terminal.Gui.TableView.CellActivatedEventArgs.Table
+  fullName: Terminal.Gui.TableView.CellActivatedEventArgs.Table
+  nameWithType: TableView.CellActivatedEventArgs.Table
+- uid: Terminal.Gui.TableView.CellActivatedEventArgs.Table*
+  name: Table
+  href: api/Terminal.Gui/Terminal.Gui.TableView.CellActivatedEventArgs.html#Terminal_Gui_TableView_CellActivatedEventArgs_Table_
+  commentId: Overload:Terminal.Gui.TableView.CellActivatedEventArgs.Table
+  isSpec: "True"
+  fullName: Terminal.Gui.TableView.CellActivatedEventArgs.Table
+  nameWithType: TableView.CellActivatedEventArgs.Table
 - uid: Terminal.Gui.TableView.CellActivationKey
   name: CellActivationKey
   href: api/Terminal.Gui/Terminal.Gui.TableView.html#Terminal_Gui_TableView_CellActivationKey
@@ -10172,12 +10172,12 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TableView.NullSymbol
   nameWithType: TableView.NullSymbol
-- uid: Terminal.Gui.TableView.OnCellActivated(Terminal.Gui.CellActivatedEventArgs)
-  name: OnCellActivated(CellActivatedEventArgs)
-  href: api/Terminal.Gui/Terminal.Gui.TableView.html#Terminal_Gui_TableView_OnCellActivated_Terminal_Gui_CellActivatedEventArgs_
-  commentId: M:Terminal.Gui.TableView.OnCellActivated(Terminal.Gui.CellActivatedEventArgs)
-  fullName: Terminal.Gui.TableView.OnCellActivated(Terminal.Gui.CellActivatedEventArgs)
-  nameWithType: TableView.OnCellActivated(CellActivatedEventArgs)
+- uid: Terminal.Gui.TableView.OnCellActivated(Terminal.Gui.TableView.CellActivatedEventArgs)
+  name: OnCellActivated(TableView.CellActivatedEventArgs)
+  href: api/Terminal.Gui/Terminal.Gui.TableView.html#Terminal_Gui_TableView_OnCellActivated_Terminal_Gui_TableView_CellActivatedEventArgs_
+  commentId: M:Terminal.Gui.TableView.OnCellActivated(Terminal.Gui.TableView.CellActivatedEventArgs)
+  fullName: Terminal.Gui.TableView.OnCellActivated(Terminal.Gui.TableView.CellActivatedEventArgs)
+  nameWithType: TableView.OnCellActivated(TableView.CellActivatedEventArgs)
 - uid: Terminal.Gui.TableView.OnCellActivated*
   name: OnCellActivated
   href: api/Terminal.Gui/Terminal.Gui.TableView.html#Terminal_Gui_TableView_OnCellActivated_
@@ -11480,6 +11480,676 @@ references:
   isSpec: "True"
   fullName: Terminal.Gui.TextFormatter.WordWrap
   nameWithType: TextFormatter.WordWrap
+- uid: Terminal.Gui.TextValidateField`1
+  name: TextValidateField<T>
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html
+  commentId: T:Terminal.Gui.TextValidateField`1
+  name.vb: TextValidateField(Of T)
+  fullName: Terminal.Gui.TextValidateField<T>
+  fullName.vb: Terminal.Gui.TextValidateField(Of T)
+  nameWithType: TextValidateField<T>
+  nameWithType.vb: TextValidateField(Of T)
+- uid: Terminal.Gui.TextValidateField`1.#ctor
+  name: TextValidateField()
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1__ctor
+  commentId: M:Terminal.Gui.TextValidateField`1.#ctor
+  fullName: Terminal.Gui.TextValidateField<T>.TextValidateField()
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).TextValidateField()
+  nameWithType: TextValidateField<T>.TextValidateField()
+  nameWithType.vb: TextValidateField(Of T).TextValidateField()
+- uid: Terminal.Gui.TextValidateField`1.#ctor(NStack.ustring)
+  name: TextValidateField(ustring)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1__ctor_NStack_ustring_
+  commentId: M:Terminal.Gui.TextValidateField`1.#ctor(NStack.ustring)
+  fullName: Terminal.Gui.TextValidateField<T>.TextValidateField(NStack.ustring)
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).TextValidateField(NStack.ustring)
+  nameWithType: TextValidateField<T>.TextValidateField(ustring)
+  nameWithType.vb: TextValidateField(Of T).TextValidateField(ustring)
+- uid: Terminal.Gui.TextValidateField`1.#ctor(NStack.ustring,NStack.ustring)
+  name: TextValidateField(ustring, ustring)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1__ctor_NStack_ustring_NStack_ustring_
+  commentId: M:Terminal.Gui.TextValidateField`1.#ctor(NStack.ustring,NStack.ustring)
+  fullName: Terminal.Gui.TextValidateField<T>.TextValidateField(NStack.ustring, NStack.ustring)
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).TextValidateField(NStack.ustring, NStack.ustring)
+  nameWithType: TextValidateField<T>.TextValidateField(ustring, ustring)
+  nameWithType.vb: TextValidateField(Of T).TextValidateField(ustring, ustring)
+- uid: Terminal.Gui.TextValidateField`1.#ctor*
+  name: TextValidateField
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1__ctor_
+  commentId: Overload:Terminal.Gui.TextValidateField`1.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateField<T>.TextValidateField
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).TextValidateField
+  nameWithType: TextValidateField<T>.TextValidateField
+  nameWithType.vb: TextValidateField(Of T).TextValidateField
+- uid: Terminal.Gui.TextValidateField`1.IsValid
+  name: IsValid
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_IsValid
+  commentId: P:Terminal.Gui.TextValidateField`1.IsValid
+  fullName: Terminal.Gui.TextValidateField<T>.IsValid
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).IsValid
+  nameWithType: TextValidateField<T>.IsValid
+  nameWithType.vb: TextValidateField(Of T).IsValid
+- uid: Terminal.Gui.TextValidateField`1.IsValid*
+  name: IsValid
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_IsValid_
+  commentId: Overload:Terminal.Gui.TextValidateField`1.IsValid
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateField<T>.IsValid
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).IsValid
+  nameWithType: TextValidateField<T>.IsValid
+  nameWithType.vb: TextValidateField(Of T).IsValid
+- uid: Terminal.Gui.TextValidateField`1.Mask
+  name: Mask
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Mask
+  commentId: P:Terminal.Gui.TextValidateField`1.Mask
+  fullName: Terminal.Gui.TextValidateField<T>.Mask
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).Mask
+  nameWithType: TextValidateField<T>.Mask
+  nameWithType.vb: TextValidateField(Of T).Mask
+- uid: Terminal.Gui.TextValidateField`1.Mask*
+  name: Mask
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Mask_
+  commentId: Overload:Terminal.Gui.TextValidateField`1.Mask
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateField<T>.Mask
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).Mask
+  nameWithType: TextValidateField<T>.Mask
+  nameWithType.vb: TextValidateField(Of T).Mask
+- uid: Terminal.Gui.TextValidateField`1.MouseEvent(Terminal.Gui.MouseEvent)
+  name: MouseEvent(MouseEvent)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_MouseEvent_Terminal_Gui_MouseEvent_
+  commentId: M:Terminal.Gui.TextValidateField`1.MouseEvent(Terminal.Gui.MouseEvent)
+  fullName: Terminal.Gui.TextValidateField<T>.MouseEvent(Terminal.Gui.MouseEvent)
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).MouseEvent(Terminal.Gui.MouseEvent)
+  nameWithType: TextValidateField<T>.MouseEvent(MouseEvent)
+  nameWithType.vb: TextValidateField(Of T).MouseEvent(MouseEvent)
+- uid: Terminal.Gui.TextValidateField`1.MouseEvent*
+  name: MouseEvent
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_MouseEvent_
+  commentId: Overload:Terminal.Gui.TextValidateField`1.MouseEvent
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateField<T>.MouseEvent
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).MouseEvent
+  nameWithType: TextValidateField<T>.MouseEvent
+  nameWithType.vb: TextValidateField(Of T).MouseEvent
+- uid: Terminal.Gui.TextValidateField`1.PositionCursor
+  name: PositionCursor()
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_PositionCursor
+  commentId: M:Terminal.Gui.TextValidateField`1.PositionCursor
+  fullName: Terminal.Gui.TextValidateField<T>.PositionCursor()
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).PositionCursor()
+  nameWithType: TextValidateField<T>.PositionCursor()
+  nameWithType.vb: TextValidateField(Of T).PositionCursor()
+- uid: Terminal.Gui.TextValidateField`1.PositionCursor*
+  name: PositionCursor
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_PositionCursor_
+  commentId: Overload:Terminal.Gui.TextValidateField`1.PositionCursor
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateField<T>.PositionCursor
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).PositionCursor
+  nameWithType: TextValidateField<T>.PositionCursor
+  nameWithType.vb: TextValidateField(Of T).PositionCursor
+- uid: Terminal.Gui.TextValidateField`1.ProcessKey(Terminal.Gui.KeyEvent)
+  name: ProcessKey(KeyEvent)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_ProcessKey_Terminal_Gui_KeyEvent_
+  commentId: M:Terminal.Gui.TextValidateField`1.ProcessKey(Terminal.Gui.KeyEvent)
+  fullName: Terminal.Gui.TextValidateField<T>.ProcessKey(Terminal.Gui.KeyEvent)
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).ProcessKey(Terminal.Gui.KeyEvent)
+  nameWithType: TextValidateField<T>.ProcessKey(KeyEvent)
+  nameWithType.vb: TextValidateField(Of T).ProcessKey(KeyEvent)
+- uid: Terminal.Gui.TextValidateField`1.ProcessKey*
+  name: ProcessKey
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_ProcessKey_
+  commentId: Overload:Terminal.Gui.TextValidateField`1.ProcessKey
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateField<T>.ProcessKey
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).ProcessKey
+  nameWithType: TextValidateField<T>.ProcessKey
+  nameWithType.vb: TextValidateField(Of T).ProcessKey
+- uid: Terminal.Gui.TextValidateField`1.Provider
+  name: Provider
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Provider
+  commentId: P:Terminal.Gui.TextValidateField`1.Provider
+  fullName: Terminal.Gui.TextValidateField<T>.Provider
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).Provider
+  nameWithType: TextValidateField<T>.Provider
+  nameWithType.vb: TextValidateField(Of T).Provider
+- uid: Terminal.Gui.TextValidateField`1.Provider*
+  name: Provider
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Provider_
+  commentId: Overload:Terminal.Gui.TextValidateField`1.Provider
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateField<T>.Provider
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).Provider
+  nameWithType: TextValidateField<T>.Provider
+  nameWithType.vb: TextValidateField(Of T).Provider
+- uid: Terminal.Gui.TextValidateField`1.Redraw(Terminal.Gui.Rect)
+  name: Redraw(Rect)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Redraw_Terminal_Gui_Rect_
+  commentId: M:Terminal.Gui.TextValidateField`1.Redraw(Terminal.Gui.Rect)
+  fullName: Terminal.Gui.TextValidateField<T>.Redraw(Terminal.Gui.Rect)
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).Redraw(Terminal.Gui.Rect)
+  nameWithType: TextValidateField<T>.Redraw(Rect)
+  nameWithType.vb: TextValidateField(Of T).Redraw(Rect)
+- uid: Terminal.Gui.TextValidateField`1.Redraw*
+  name: Redraw
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Redraw_
+  commentId: Overload:Terminal.Gui.TextValidateField`1.Redraw
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateField<T>.Redraw
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).Redraw
+  nameWithType: TextValidateField<T>.Redraw
+  nameWithType.vb: TextValidateField(Of T).Redraw
+- uid: Terminal.Gui.TextValidateField`1.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Text
+  commentId: P:Terminal.Gui.TextValidateField`1.Text
+  fullName: Terminal.Gui.TextValidateField<T>.Text
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).Text
+  nameWithType: TextValidateField<T>.Text
+  nameWithType.vb: TextValidateField(Of T).Text
+- uid: Terminal.Gui.TextValidateField`1.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateField-1.html#Terminal_Gui_TextValidateField_1_Text_
+  commentId: Overload:Terminal.Gui.TextValidateField`1.Text
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateField<T>.Text
+  fullName.vb: Terminal.Gui.TextValidateField(Of T).Text
+  nameWithType: TextValidateField<T>.Text
+  nameWithType.vb: TextValidateField(Of T).Text
+- uid: Terminal.Gui.TextValidateProviders
+  name: Terminal.Gui.TextValidateProviders
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.html
+  commentId: N:Terminal.Gui.TextValidateProviders
+  fullName: Terminal.Gui.TextValidateProviders
+  nameWithType: Terminal.Gui.TextValidateProviders
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider
+  name: ITextValidateProvider
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html
+  commentId: T:Terminal.Gui.TextValidateProviders.ITextValidateProvider
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider
+  nameWithType: ITextValidateProvider
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Cursor(System.Int32)
+  name: Cursor(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_Cursor_System_Int32_
+  commentId: M:Terminal.Gui.TextValidateProviders.ITextValidateProvider.Cursor(System.Int32)
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Cursor(System.Int32)
+  nameWithType: ITextValidateProvider.Cursor(Int32)
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Cursor*
+  name: Cursor
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_Cursor_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.ITextValidateProvider.Cursor
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Cursor
+  nameWithType: ITextValidateProvider.Cursor
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorEnd
+  name: CursorEnd()
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_CursorEnd
+  commentId: M:Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorEnd
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorEnd()
+  nameWithType: ITextValidateProvider.CursorEnd()
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorEnd*
+  name: CursorEnd
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_CursorEnd_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorEnd
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorEnd
+  nameWithType: ITextValidateProvider.CursorEnd
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorLeft(System.Int32)
+  name: CursorLeft(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_CursorLeft_System_Int32_
+  commentId: M:Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorLeft(System.Int32)
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorLeft(System.Int32)
+  nameWithType: ITextValidateProvider.CursorLeft(Int32)
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorLeft*
+  name: CursorLeft
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_CursorLeft_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorLeft
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorLeft
+  nameWithType: ITextValidateProvider.CursorLeft
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorRight(System.Int32)
+  name: CursorRight(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_CursorRight_System_Int32_
+  commentId: M:Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorRight(System.Int32)
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorRight(System.Int32)
+  nameWithType: ITextValidateProvider.CursorRight(Int32)
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorRight*
+  name: CursorRight
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_CursorRight_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorRight
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorRight
+  nameWithType: ITextValidateProvider.CursorRight
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorStart
+  name: CursorStart()
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_CursorStart
+  commentId: M:Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorStart
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorStart()
+  nameWithType: ITextValidateProvider.CursorStart()
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorStart*
+  name: CursorStart
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_CursorStart_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorStart
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.CursorStart
+  nameWithType: ITextValidateProvider.CursorStart
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Delete(System.Int32)
+  name: Delete(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_Delete_System_Int32_
+  commentId: M:Terminal.Gui.TextValidateProviders.ITextValidateProvider.Delete(System.Int32)
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Delete(System.Int32)
+  nameWithType: ITextValidateProvider.Delete(Int32)
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Delete*
+  name: Delete
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_Delete_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.ITextValidateProvider.Delete
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Delete
+  nameWithType: ITextValidateProvider.Delete
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Fixed
+  name: Fixed
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_Fixed
+  commentId: P:Terminal.Gui.TextValidateProviders.ITextValidateProvider.Fixed
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Fixed
+  nameWithType: ITextValidateProvider.Fixed
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Fixed*
+  name: Fixed
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_Fixed_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.ITextValidateProvider.Fixed
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Fixed
+  nameWithType: ITextValidateProvider.Fixed
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.InsertAt(System.Char,System.Int32)
+  name: InsertAt(Char, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_InsertAt_System_Char_System_Int32_
+  commentId: M:Terminal.Gui.TextValidateProviders.ITextValidateProvider.InsertAt(System.Char,System.Int32)
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.InsertAt(System.Char, System.Int32)
+  nameWithType: ITextValidateProvider.InsertAt(Char, Int32)
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.InsertAt*
+  name: InsertAt
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_InsertAt_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.ITextValidateProvider.InsertAt
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.InsertAt
+  nameWithType: ITextValidateProvider.InsertAt
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.IsValid
+  name: IsValid
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_IsValid
+  commentId: P:Terminal.Gui.TextValidateProviders.ITextValidateProvider.IsValid
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.IsValid
+  nameWithType: ITextValidateProvider.IsValid
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.IsValid*
+  name: IsValid
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_IsValid_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.ITextValidateProvider.IsValid
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.IsValid
+  nameWithType: ITextValidateProvider.IsValid
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Mask
+  name: Mask
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_Mask
+  commentId: P:Terminal.Gui.TextValidateProviders.ITextValidateProvider.Mask
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Mask
+  nameWithType: ITextValidateProvider.Mask
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Mask*
+  name: Mask
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_Mask_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.ITextValidateProvider.Mask
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Mask
+  nameWithType: ITextValidateProvider.Mask
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_Text
+  commentId: P:Terminal.Gui.TextValidateProviders.ITextValidateProvider.Text
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Text
+  nameWithType: ITextValidateProvider.Text
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.ITextValidateProvider.html#Terminal_Gui_TextValidateProviders_ITextValidateProvider_Text_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.ITextValidateProvider.Text
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider.Text
+  nameWithType: ITextValidateProvider.Text
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider
+  name: NetMaskedTextProvider
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html
+  commentId: T:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider
+  nameWithType: NetMaskedTextProvider
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.#ctor
+  name: NetMaskedTextProvider()
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider__ctor
+  commentId: M:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.#ctor
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.NetMaskedTextProvider()
+  nameWithType: NetMaskedTextProvider.NetMaskedTextProvider()
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.#ctor*
+  name: NetMaskedTextProvider
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider__ctor_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.NetMaskedTextProvider
+  nameWithType: NetMaskedTextProvider.NetMaskedTextProvider
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Cursor(System.Int32)
+  name: Cursor(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Cursor_System_Int32_
+  commentId: M:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Cursor(System.Int32)
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Cursor(System.Int32)
+  nameWithType: NetMaskedTextProvider.Cursor(Int32)
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Cursor*
+  name: Cursor
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Cursor_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Cursor
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Cursor
+  nameWithType: NetMaskedTextProvider.Cursor
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorEnd
+  name: CursorEnd()
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorEnd
+  commentId: M:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorEnd
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorEnd()
+  nameWithType: NetMaskedTextProvider.CursorEnd()
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorEnd*
+  name: CursorEnd
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorEnd_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorEnd
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorEnd
+  nameWithType: NetMaskedTextProvider.CursorEnd
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorLeft(System.Int32)
+  name: CursorLeft(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorLeft_System_Int32_
+  commentId: M:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorLeft(System.Int32)
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorLeft(System.Int32)
+  nameWithType: NetMaskedTextProvider.CursorLeft(Int32)
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorLeft*
+  name: CursorLeft
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorLeft_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorLeft
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorLeft
+  nameWithType: NetMaskedTextProvider.CursorLeft
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorRight(System.Int32)
+  name: CursorRight(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorRight_System_Int32_
+  commentId: M:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorRight(System.Int32)
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorRight(System.Int32)
+  nameWithType: NetMaskedTextProvider.CursorRight(Int32)
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorRight*
+  name: CursorRight
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorRight_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorRight
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorRight
+  nameWithType: NetMaskedTextProvider.CursorRight
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorStart
+  name: CursorStart()
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorStart
+  commentId: M:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorStart
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorStart()
+  nameWithType: NetMaskedTextProvider.CursorStart()
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorStart*
+  name: CursorStart
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorStart_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorStart
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorStart
+  nameWithType: NetMaskedTextProvider.CursorStart
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Delete(System.Int32)
+  name: Delete(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Delete_System_Int32_
+  commentId: M:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Delete(System.Int32)
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Delete(System.Int32)
+  nameWithType: NetMaskedTextProvider.Delete(Int32)
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Delete*
+  name: Delete
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Delete_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Delete
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Delete
+  nameWithType: NetMaskedTextProvider.Delete
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Fixed
+  name: Fixed
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Fixed
+  commentId: P:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Fixed
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Fixed
+  nameWithType: NetMaskedTextProvider.Fixed
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Fixed*
+  name: Fixed
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Fixed_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Fixed
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Fixed
+  nameWithType: NetMaskedTextProvider.Fixed
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.InsertAt(System.Char,System.Int32)
+  name: InsertAt(Char, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_InsertAt_System_Char_System_Int32_
+  commentId: M:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.InsertAt(System.Char,System.Int32)
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.InsertAt(System.Char, System.Int32)
+  nameWithType: NetMaskedTextProvider.InsertAt(Char, Int32)
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.InsertAt*
+  name: InsertAt
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_InsertAt_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.InsertAt
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.InsertAt
+  nameWithType: NetMaskedTextProvider.InsertAt
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.IsValid
+  name: IsValid
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_IsValid
+  commentId: P:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.IsValid
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.IsValid
+  nameWithType: NetMaskedTextProvider.IsValid
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.IsValid*
+  name: IsValid
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_IsValid_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.IsValid
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.IsValid
+  nameWithType: NetMaskedTextProvider.IsValid
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Mask
+  name: Mask
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Mask
+  commentId: P:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Mask
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Mask
+  nameWithType: NetMaskedTextProvider.Mask
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Mask*
+  name: Mask
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Mask_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Mask
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Mask
+  nameWithType: NetMaskedTextProvider.Mask
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Text
+  commentId: P:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Text
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Text
+  nameWithType: NetMaskedTextProvider.Text
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html#Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Text_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Text
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Text
+  nameWithType: NetMaskedTextProvider.Text
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider
+  name: TextRegexProvider
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html
+  commentId: T:Terminal.Gui.TextValidateProviders.TextRegexProvider
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider
+  nameWithType: TextRegexProvider
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.#ctor
+  name: TextRegexProvider()
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider__ctor
+  commentId: M:Terminal.Gui.TextValidateProviders.TextRegexProvider.#ctor
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.TextRegexProvider()
+  nameWithType: TextRegexProvider.TextRegexProvider()
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.#ctor*
+  name: TextRegexProvider
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider__ctor_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.#ctor
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.TextRegexProvider
+  nameWithType: TextRegexProvider.TextRegexProvider
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Cursor(System.Int32)
+  name: Cursor(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Cursor_System_Int32_
+  commentId: M:Terminal.Gui.TextValidateProviders.TextRegexProvider.Cursor(System.Int32)
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.Cursor(System.Int32)
+  nameWithType: TextRegexProvider.Cursor(Int32)
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Cursor*
+  name: Cursor
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Cursor_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.Cursor
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.Cursor
+  nameWithType: TextRegexProvider.Cursor
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorEnd
+  name: CursorEnd()
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_CursorEnd
+  commentId: M:Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorEnd
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorEnd()
+  nameWithType: TextRegexProvider.CursorEnd()
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorEnd*
+  name: CursorEnd
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_CursorEnd_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorEnd
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorEnd
+  nameWithType: TextRegexProvider.CursorEnd
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorLeft(System.Int32)
+  name: CursorLeft(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_CursorLeft_System_Int32_
+  commentId: M:Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorLeft(System.Int32)
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorLeft(System.Int32)
+  nameWithType: TextRegexProvider.CursorLeft(Int32)
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorLeft*
+  name: CursorLeft
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_CursorLeft_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorLeft
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorLeft
+  nameWithType: TextRegexProvider.CursorLeft
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorRight(System.Int32)
+  name: CursorRight(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_CursorRight_System_Int32_
+  commentId: M:Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorRight(System.Int32)
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorRight(System.Int32)
+  nameWithType: TextRegexProvider.CursorRight(Int32)
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorRight*
+  name: CursorRight
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_CursorRight_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorRight
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorRight
+  nameWithType: TextRegexProvider.CursorRight
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorStart
+  name: CursorStart()
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_CursorStart
+  commentId: M:Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorStart
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorStart()
+  nameWithType: TextRegexProvider.CursorStart()
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorStart*
+  name: CursorStart
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_CursorStart_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorStart
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.CursorStart
+  nameWithType: TextRegexProvider.CursorStart
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Delete(System.Int32)
+  name: Delete(Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Delete_System_Int32_
+  commentId: M:Terminal.Gui.TextValidateProviders.TextRegexProvider.Delete(System.Int32)
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.Delete(System.Int32)
+  nameWithType: TextRegexProvider.Delete(Int32)
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Delete*
+  name: Delete
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Delete_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.Delete
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.Delete
+  nameWithType: TextRegexProvider.Delete
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Fixed
+  name: Fixed
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Fixed
+  commentId: P:Terminal.Gui.TextValidateProviders.TextRegexProvider.Fixed
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.Fixed
+  nameWithType: TextRegexProvider.Fixed
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Fixed*
+  name: Fixed
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Fixed_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.Fixed
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.Fixed
+  nameWithType: TextRegexProvider.Fixed
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.InsertAt(System.Char,System.Int32)
+  name: InsertAt(Char, Int32)
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_InsertAt_System_Char_System_Int32_
+  commentId: M:Terminal.Gui.TextValidateProviders.TextRegexProvider.InsertAt(System.Char,System.Int32)
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.InsertAt(System.Char, System.Int32)
+  nameWithType: TextRegexProvider.InsertAt(Char, Int32)
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.InsertAt*
+  name: InsertAt
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_InsertAt_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.InsertAt
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.InsertAt
+  nameWithType: TextRegexProvider.InsertAt
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.IsValid
+  name: IsValid
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_IsValid
+  commentId: P:Terminal.Gui.TextValidateProviders.TextRegexProvider.IsValid
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.IsValid
+  nameWithType: TextRegexProvider.IsValid
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.IsValid*
+  name: IsValid
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_IsValid_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.IsValid
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.IsValid
+  nameWithType: TextRegexProvider.IsValid
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Mask
+  name: Mask
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Mask
+  commentId: P:Terminal.Gui.TextValidateProviders.TextRegexProvider.Mask
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.Mask
+  nameWithType: TextRegexProvider.Mask
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Mask*
+  name: Mask
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Mask_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.Mask
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.Mask
+  nameWithType: TextRegexProvider.Mask
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Text
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Text
+  commentId: P:Terminal.Gui.TextValidateProviders.TextRegexProvider.Text
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.Text
+  nameWithType: TextRegexProvider.Text
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.Text*
+  name: Text
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_Text_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.Text
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.Text
+  nameWithType: TextRegexProvider.Text
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.ValidateOnInput
+  name: ValidateOnInput
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_ValidateOnInput
+  commentId: P:Terminal.Gui.TextValidateProviders.TextRegexProvider.ValidateOnInput
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.ValidateOnInput
+  nameWithType: TextRegexProvider.ValidateOnInput
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider.ValidateOnInput*
+  name: ValidateOnInput
+  href: api/Terminal.Gui/Terminal.Gui.TextValidateProviders.TextRegexProvider.html#Terminal_Gui_TextValidateProviders_TextRegexProvider_ValidateOnInput_
+  commentId: Overload:Terminal.Gui.TextValidateProviders.TextRegexProvider.ValidateOnInput
+  isSpec: "True"
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider.ValidateOnInput
+  nameWithType: TextRegexProvider.ValidateOnInput
 - uid: Terminal.Gui.TextView
   name: TextView
   href: api/Terminal.Gui/Terminal.Gui.TextView.html
