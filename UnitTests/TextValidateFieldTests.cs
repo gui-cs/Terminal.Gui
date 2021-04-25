@@ -438,7 +438,7 @@ namespace Terminal.Gui.Views {
 					Width = 20
 				};
 			} catch (RegexParseException ex) {
-				Assert.True (true);
+				Assert.True (true, ex.Message);
 				return;
 			}
 			Assert.True (false);
