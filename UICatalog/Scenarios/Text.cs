@@ -105,13 +105,13 @@ namespace UICatalog {
 			_timeField.TimeChanged += TimeChanged;
 
 			// MaskedTextProvider
-			var netProvider = new Label (".Net MaskedTextProvider [ 999 000 aaa AAA >AAA ]") {
+			var netProvider = new Label (".Net MaskedTextProvider [ 999 000 LLL >LLL| AAA aaa ]") {
 				X = Pos.Left (dateField),
 				Y = Pos.Bottom (dateField) + 1
 			};
 			Win.Add (netProvider);
 
-			var netProviderField = new TextValidateField<NetMaskedTextProvider> ("999 000 LLL >LLL AAA aaa") {
+			var netProviderField = new TextValidateField<NetMaskedTextProvider> ("999 000 LLL >LLL| AAA aaa") {
 				X = Pos.Right (netProvider) + 1,
 				Y = Pos.Y (netProvider),
 				Width = 40,
@@ -119,25 +119,10 @@ namespace UICatalog {
 			};
 			Win.Add (netProviderField);
 
-			// TextMaskProvider
-			var guiMaskProvider = new Label ("Gui.cs TextMaskProvider [ +(999) 000-0000 ]") {
-				X = Pos.Left (netProvider),
-				Y = Pos.Bottom (netProvider) + 1
-			};
-			Win.Add (guiMaskProvider);
-
-			var guiMaskProviderField = new TextValidateField<TextMaskProvider> ("+(999) 000-0000") {
-				X = Pos.Right (guiMaskProvider) + 1,
-				Y = Pos.Y (guiMaskProvider),
-				TextAlignment = TextAlignment.Centered,
-				Width = 30
-			};
-			Win.Add (guiMaskProviderField);
-
 			// TextRegexProvider
 			var regexProvider = new Label ("Gui.cs TextRegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]") {
-				X = Pos.Left (guiMaskProvider),
-				Y = Pos.Bottom (guiMaskProvider) + 1
+				X = Pos.Left (netProvider),
+				Y = Pos.Bottom (netProvider) + 1
 			};
 			Win.Add (regexProvider);
 
