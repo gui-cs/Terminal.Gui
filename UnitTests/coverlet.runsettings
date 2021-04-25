@@ -5,8 +5,8 @@
       <DataCollector friendlyName="XPlat code coverage">
         <Configuration>
           <Format>opencover</Format>          
-          <Exclude>[coverlet.*.tests?]*,[*]Coverlet.Core*</Exclude> <!-- [Assembly-Filter]Type-Filter -->
-          <Include>[coverlet.*]*,[*]Coverlet.Core*</Include> <!-- [Assembly-Filter]Type-Filter -->
+          <Exclude>[UnitTests]*,[UICatalog]*,[coverlet.*.tests?]*,[*]Coverlet.Core*</Exclude> <!-- [Assembly-Filter]Type-Filter -->
+          <Include></Include> <!-- [Assembly-Filter]Type-Filter -->
           <ExcludeByAttribute></ExcludeByAttribute>
           <ExcludeByFile></ExcludeByFile> <!-- Globbing filter -->
           <IncludeDirectory></IncludeDirectory>
