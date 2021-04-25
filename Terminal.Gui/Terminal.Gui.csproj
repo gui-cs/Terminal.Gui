@@ -40,8 +40,9 @@
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
 
     <PackageReleaseNotes>
-      v1.0.0.0
+      v1.0.0
       * Version 1.0 Release!!! - Thank you to @migueldeicaza, @tig, @bdisp, @tznind, @jmprricone, and many more!
+      * Added TextValidateField - Enables masked and validated text input. Thanks @jmperricone!
       
       v1.0.0-RC.1
       * Added Dependabot support and updated dependencies
