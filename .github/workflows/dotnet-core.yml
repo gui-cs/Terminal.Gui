@@ -26,7 +26,8 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Test
-      run: |
+      id: test_step
+        run: |
         dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
         mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
 
@@ -44,6 +45,5 @@ jobs:
 
     - name: Print Code Coverage
       run: |
-        echo "Code coverage percentage ${{steps.create_coverage_badge.outputs.percentage}}%"
-        echo "Badge data ${{steps.test_step.outputs.badge}}"
-        
+        echo "Code coverage percentage: ${{steps.create_coverage_badge.outputs.percentage}}%"
+        echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
