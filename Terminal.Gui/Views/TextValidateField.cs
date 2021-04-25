@@ -336,11 +336,6 @@ namespace Terminal.Gui {
 			}
 
 			/// <summary>
-			/// <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/character-escapes-in-regular-expressions"></a>
-			/// </summary>
-			static readonly List<Rune> RegexSpecialsChars = new List<Rune> { '.', '$', '^', '{', '[', '(', '|', ')', '*', '+', '?', '\\' };
-
-			/// <summary>
 			/// Compiles the regex pattern for validation./>
 			/// </summary>
 			private void CompileMask ()
@@ -359,7 +354,6 @@ namespace Terminal.Gui {
 
 		ITextValidateProvider provider;
 		int cursorPosition = 0;
-		bool error = false;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextValidateField{T}"/> class using <see cref="LayoutStyle.Computed"/> positioning.
@@ -442,15 +436,15 @@ namespace Terminal.Gui {
 		///inheritdoc/>
 		public override void PositionCursor ()
 		{
-			var margin = GetMargins (Frame.Width);
+			var (left, _) = GetMargins (Frame.Width);
 
 			// Fixed = true, is for inputs thar have fixed width, like masked ones.
 			// Fixed = false, is for normal input.
 			// When it's right-aligned and it's a normal input, the cursor behaves differently.
 			if (provider.Fixed == false && TextAlignment == TextAlignment.Right) {
-				Move (cursorPosition + margin.left - 1, 0);
+				Move (cursorPosition + left - 1, 0);
 			} else {
-				Move (cursorPosition + margin.left, 0);
+				Move (cursorPosition + left, 0);
 			}
 		}
 
@@ -478,16 +472,16 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			var bgcolor = error ? Color.BrightRed : ColorScheme.Focus.Background;
+			var bgcolor = !IsValid ? Color.BrightRed : ColorScheme.Focus.Background;
 			var textColor = new Attribute (ColorScheme.Focus.Foreground, bgcolor);
 
-			var margins = GetMargins (bounds.Width);
+			var (margin_left, margin_right) = GetMargins (bounds.Width);
 
 			Move (0, 0);
 
 			// Left Margin
 			Driver.SetAttribute (textColor);
-			for (int i = 0; i < margins.left; i++) {
+			for (int i = 0; i < margin_left; i++) {
 				Driver.AddRune (' ');
 			}
 
@@ -500,7 +494,7 @@ namespace Terminal.Gui {
 
 			// Right Margin
 			Driver.SetAttribute (textColor);
-			for (int i = 0; i < margins.right; i++) {
+			for (int i = 0; i < margin_right; i++) {
 				Driver.AddRune (' ');
 			}
 		}
@@ -599,9 +593,6 @@ namespace Terminal.Gui {
 
 				break;
 			}
-
-			// Used for styling the field when it's invalid.
-			error = IsValid ? false : true;
 
 			SetNeedsDisplay ();
 			return true;
