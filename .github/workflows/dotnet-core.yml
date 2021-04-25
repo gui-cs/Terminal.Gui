@@ -26,8 +26,7 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Test
-      id: test_step
-        run: |
+      run: |
         dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
         mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
 
