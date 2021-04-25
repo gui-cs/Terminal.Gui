@@ -11,7 +11,7 @@ using Xunit;
 // Alais Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Core {
 	public class DimTests {
 		public DimTests ()
 		{

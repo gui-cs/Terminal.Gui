@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Types {
 	public class SizeTests {
 		[Fact]
 		public void Size_New ()
@@ -30,7 +30,7 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void Size__SetsValue ()
+		public void Size_SetsValue ()
 		{
 			var size = new Size () {
 				Width = 0,
