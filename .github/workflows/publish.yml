@@ -34,7 +34,7 @@ jobs:
       #- name: Pack nuget package with symbols
       #  run: dotnet pack --include-symbols
       
-      # - name: Publish Terminal.Gui
+      - name: Publish Terminal.Gui
         id: publish_nuget
         uses: brandedoutcast/publish-nuget@v2.5.5
         with:
