@@ -25,8 +25,8 @@ jobs:
           dotnet tool install --global minver-cli --version 2.4.0
           echo "MINVERVERSIONOVERRIDE=$(minver -t v -d rc)" >> $GITHUB_ENV
 
-      #- name: Install dependencies
-      #  run: dotnet restore
+      - name: Install dependencies
+        run: dotnet restore
 
       #- name: Build
       #  run: dotnet build --configuration Release --no-restore
