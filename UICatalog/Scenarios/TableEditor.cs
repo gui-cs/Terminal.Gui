@@ -235,19 +235,19 @@ namespace UICatalog.Scenarios {
 
 		private void SetDemoTableStyles ()
 		{
-			var alignMid = new ColumnStyle() {
+			var alignMid = new TableView.ColumnStyle () {
 				Alignment = TextAlignment.Centered
 			};
-			var alignRight = new ColumnStyle() {
+			var alignRight = new TableView.ColumnStyle () {
 				Alignment = TextAlignment.Right
 			};
 
-			var dateFormatStyle = new ColumnStyle() {
+			var dateFormatStyle = new TableView.ColumnStyle () {
 				Alignment = TextAlignment.Right,
 				RepresentationGetter = (v)=> v is DateTime d ? d.ToString("yyyy-MM-dd"):v.ToString()
 			};
 
-			var negativeRight = new ColumnStyle() {
+			var negativeRight = new TableView.ColumnStyle () {
 				
 				Format = "0.##",
 				MinWidth = 10,

@@ -14,13 +14,13 @@ namespace Terminal.Gui.Views {
 			return GetTabView (out _, out _);
 		}
 
-		private TabView GetTabView (out Tab tab1, out Tab tab2)
+		private TabView GetTabView (out TabView.Tab tab1, out TabView.Tab tab2)
 		{
 			InitFakeDriver ();
 
 			var tv = new TabView ();
-			tv.AddTab (tab1 = new Tab ("Tab1", new TextField ("hi")), false);
-			tv.AddTab (tab2 = new Tab ("Tab2", new Label ("hi2")), false);
+			tv.AddTab (tab1 = new TabView.Tab ("Tab1", new TextField ("hi")), false);
+			tv.AddTab (tab2 = new TabView.Tab ("Tab2", new Label ("hi2")), false);
 			return tv;
 		}
 
@@ -30,10 +30,10 @@ namespace Terminal.Gui.Views {
 			InitFakeDriver ();
 
 			var tv = new TabView ();
-			Tab tab1;
-			Tab tab2;
-			tv.AddTab (tab1 = new Tab ("Tab1", new TextField ("hi")), false);
-			tv.AddTab (tab2 = new Tab ("Tab1", new Label ("hi2")), true);
+			TabView.Tab tab1;
+			TabView.Tab tab2;
+			tv.AddTab (tab1 = new TabView.Tab ("Tab1", new TextField ("hi")), false);
+			tv.AddTab (tab2 = new TabView.Tab ("Tab1", new Label ("hi2")), true);
 
 			Assert.Equal (2, tv.Tabs.Count);
 			Assert.Equal (tab2, tv.SelectedTab);
@@ -82,8 +82,8 @@ namespace Terminal.Gui.Views {
 
 			tv.SelectedTab = tab1;
 
-			Tab oldTab = null;
-			Tab newTab = null;
+			TabView.Tab oldTab = null;
+			TabView.Tab newTab = null;
 			int called = 0;
 
 			tv.SelectedTabChanged += (s, e) => {
@@ -143,13 +143,13 @@ namespace Terminal.Gui.Views {
 		{
 			var tv = GetTabView (out var tab1, out var tab2);
 
-			Tab tab3;
-			Tab tab4;
-			Tab tab5;
+			TabView.Tab tab3;
+			TabView.Tab tab4;
+			TabView.Tab tab5;
 
-			tv.AddTab (tab3 = new Tab (), false);
-			tv.AddTab (tab4 = new Tab (), false);
-			tv.AddTab (tab5 = new Tab (), false);
+			tv.AddTab (tab3 = new TabView.Tab (), false);
+			tv.AddTab (tab4 = new TabView.Tab (), false);
+			tv.AddTab (tab5 = new TabView.Tab (), false);
 
 			tv.SelectedTab = tab1;
 
