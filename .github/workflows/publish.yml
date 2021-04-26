@@ -72,6 +72,13 @@ jobs:
           # This is broken - see https://github.com/brandedoutcast/publish-nuget/issues/30
           INCLUDE_SYMBOLS: false
 
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Test
+      run: |
+        dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
+        mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
       - name: Test to generate Code Coverage Report
         run: |
           dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
