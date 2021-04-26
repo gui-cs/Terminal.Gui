@@ -54,6 +54,13 @@ namespace UICatalog {
 				labelMirroringTextView.Text = textView.Text;
 			};
 
+			var btnMultiline = new Button ("Toggle Multiline") {
+				X = Pos.Right (textView) + 1,
+				Y = Pos.Top (textView) + 1
+			};
+			btnMultiline.Clicked += () => textView.Multiline = !textView.Multiline;
+			Win.Add (btnMultiline);
+
 			// BUGBUG: 531 - TAB doesn't go to next control from HexView
 			var hexView = new HexView (new System.IO.MemoryStream (Encoding.ASCII.GetBytes (s))) {
 				X = 1,
