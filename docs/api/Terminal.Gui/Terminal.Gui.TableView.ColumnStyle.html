@@ -1,0 +1,418 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class TableView.ColumnStyle
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class TableView.ColumnStyle
+   ">
+    <meta name="generator" content="docfx 2.56.7.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.TableView.ColumnStyle">
+  
+  
+  <h1 id="Terminal_Gui_TableView_ColumnStyle" data-uid="Terminal.Gui.TableView.ColumnStyle" class="text-break">Class TableView.ColumnStyle
+  </h1>
+  <div class="markdown level0 summary">
+Describes how to render a given column in  a <a class="xref" href="Terminal.Gui.TableView.html">TableView</a> including <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_Alignment">Alignment</a> 
+and textual representation of cells (e.g. date formats)
+
+<a href="https://migueldeicaza.github.io/gui.cs/articles/tableview.html">See TableView Deep Dive for more information</a>.
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">TableView.ColumnStyle</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
+  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
+  <h5 id="Terminal_Gui_TableView_ColumnStyle_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class ColumnStyle</code></pre>
+  </div>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_AlignmentGetter" data-uid="Terminal.Gui.TableView.ColumnStyle.AlignmentGetter">AlignmentGetter</h4>
+  <div class="markdown level1 summary">
+Defines a delegate for returning custom alignment per cell based on cell values.  When specified this will override <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_Alignment">Alignment</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;object, TextAlignment&gt; AlignmentGetter</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Object</span>, <a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_RepresentationGetter" data-uid="Terminal.Gui.TableView.ColumnStyle.RepresentationGetter">RepresentationGetter</h4>
+  <div class="markdown level1 summary">
+Defines a delegate for returning custom representations of cell values.  If not set then <span class="xref">System.Object.ToString()</span> is used.  Return values from your delegate may be truncated e.g. based on <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_MaxWidth">MaxWidth</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;object, string&gt; RepresentationGetter</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Object</span>, <span class="xref">System.String</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Terminal_Gui_TableView_ColumnStyle_Alignment_" data-uid="Terminal.Gui.TableView.ColumnStyle.Alignment*"></a>
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_Alignment" data-uid="Terminal.Gui.TableView.ColumnStyle.Alignment">Alignment</h4>
+  <div class="markdown level1 summary">
+Defines the default alignment for all values rendered in this column.  For custom alignment based on cell contents use <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_AlignmentGetter">AlignmentGetter</a>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TextAlignment Alignment { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TableView_ColumnStyle_Format_" data-uid="Terminal.Gui.TableView.ColumnStyle.Format*"></a>
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_Format" data-uid="Terminal.Gui.TableView.ColumnStyle.Format">Format</h4>
+  <div class="markdown level1 summary">
+Defines the format for values e.g. &quot;yyyy-MM-dd&quot; for dates
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Format { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TableView_ColumnStyle_MaxWidth_" data-uid="Terminal.Gui.TableView.ColumnStyle.MaxWidth*"></a>
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_MaxWidth" data-uid="Terminal.Gui.TableView.ColumnStyle.MaxWidth">MaxWidth</h4>
+  <div class="markdown level1 summary">
+Set the maximum width of the column in characters.  This value will be ignored if more than the tables <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_MaxCellWidth">MaxCellWidth</a>.  Defaults to <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_DefaultMaxCellWidth">DefaultMaxCellWidth</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int MaxWidth { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TableView_ColumnStyle_MinWidth_" data-uid="Terminal.Gui.TableView.ColumnStyle.MinWidth*"></a>
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_MinWidth" data-uid="Terminal.Gui.TableView.ColumnStyle.MinWidth">MinWidth</h4>
+  <div class="markdown level1 summary">
+Set the minimum width of the column in characters.  This value will be ignored if more than the tables <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_MaxCellWidth">MaxCellWidth</a> or the <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_MaxWidth">MaxWidth</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int MinWidth { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Terminal_Gui_TableView_ColumnStyle_GetAlignment_" data-uid="Terminal.Gui.TableView.ColumnStyle.GetAlignment*"></a>
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_GetAlignment_System_Object_" data-uid="Terminal.Gui.TableView.ColumnStyle.GetAlignment(System.Object)">GetAlignment(Object)</h4>
+  <div class="markdown level1 summary">
+Returns the alignment for the cell based on <code data-dev-comment-type="paramref" class="paramref">cellValue</code> and <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_AlignmentGetter">AlignmentGetter</a>/<a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_Alignment">Alignment</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TextAlignment GetAlignment(object cellValue)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">cellValue</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TableView_ColumnStyle_GetRepresentation_" data-uid="Terminal.Gui.TableView.ColumnStyle.GetRepresentation*"></a>
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_GetRepresentation_System_Object_" data-uid="Terminal.Gui.TableView.ColumnStyle.GetRepresentation(System.Object)">GetRepresentation(Object)</h4>
+  <div class="markdown level1 summary">
+Returns the full string to render (which may be truncated if too long) that the current style says best represents the given <code data-dev-comment-type="paramref" class="paramref">value</code>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string GetRepresentation(object value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

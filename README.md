@@ -1,13 +1,14 @@
 ![.NET Core](https://github.com/migueldeicaza/gui.cs/workflows/.NET%20Core/badge.svg?branch=master)
 ![Code scanning - action](https://github.com/migueldeicaza/gui.cs/workflows/Code%20scanning%20-%20action/badge.svg)
 [![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui)
-![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27/raw/a315df88b9a7b81136b708bd669614099dd95979/code-coverage.json)
+![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27/raw/code-coverage.json)
 [![Downloads](https://img.shields.io/nuget/dt/Terminal.Gui)](https://www.nuget.org/packages/Terminal.Gui)
 [![License](https://img.shields.io/github/license/migueldeicaza/gui.cs.svg)](LICENSE)
+![Bugs](https://img.shields.io/github/issues/migueldeicaza/gui.cs/bug)
 
-# Terminal.Gui - Terminal GUI toolkit for .NET
+# Terminal.Gui - Cross Platform Terminal GUI toolkit for .NET
 
-A simple toolkit for building console GUI apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
+A toolkit for building console GUI apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
 
 ![Sample app](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/sample.gif)
 
@@ -32,6 +33,7 @@ A simple toolkit for building console GUI apps for .NET, .NET Core, and Mono tha
 * [TableView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TableView.html)
 * [Time & Date Fields](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TimeField.html)
 * [TextField](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextField.html)
+* [TextValidateField](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextValidateField.html)
 * [TextView (Text Editor)](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TextView.html)
 * [TreeView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.TreeView.html)
 * [ScrollView](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.ScrollView.html)
@@ -76,7 +78,7 @@ You can force the use of `System.Console` on Unix as well; see `Core.cs`.
 
 ## Showcase & Examples
 
-* **[UI Catalog](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog)** - The UI Catalog project provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run` in the `UICatalog` directory to run the UI Catalog.
+* **[UI Catalog](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog)** - The UI Catalog project provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run --project UICatalog` to run the UI Catalog.
 * **[Reactive Example](https://github.com/migueldeicaza/gui.cs/tree/master/ReactiveExample)** - A sample app that shows how to use `System.Reactive` and `ReactiveUI` with `Terminal.Gui`. The app uses the MVVM architecture that may seem familiar to folks coming from WPF, Xamarin Forms, UWP, Avalonia, or Windows Forms. In this app, we implement the data bindings using ReactiveUI `WhenAnyValue` syntax and [Pharmacist](https://github.com/reactiveui/pharmacist) — a tool that converts all events in a NuGet package into observable wrappers.
 * **[Example (aka `demo.cs`)](https://github.com/migueldeicaza/gui.cs/tree/master/Example)** - Run `dotnet run` in the `Example` directory to run the simple demo.
 * **[Standalone Example](https://github.com/migueldeicaza/gui.cs/tree/master/StandaloneExample)** - A trivial .NET core sample application can be found in the `StandaloneExample` directory. Run `dotnet run` in directory to test.
@@ -200,7 +202,7 @@ dotnet add package Terminal.Gui
 
 ## Running and Building
 
-* Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet ./UICatalog/bin/Debug/net5.0/UICatalog.dll` or by directly executing `./UICatalog/bin/Debug/net5.0/UICatalog.exe`.
+* Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet run --project ./UICatalog` or by directly executing `./UICatalog/bin/Debug/net5.0/UICatalog.exe`.
 * Windows - Open `Terminal.Gui.sln` with Visual Studio 2019.
 
 ## Contributing

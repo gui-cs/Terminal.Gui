@@ -407,6 +407,12 @@ Time editing <a class="xref" href="Terminal.Gui.View.html">View</a>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextAlignment">View.TextAlignment</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VerticalTextAlignment">View.VerticalTextAlignment</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextDirection">View.TextDirection</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
     </div>
     <div>
@@ -441,6 +447,12 @@ Time editing <a class="xref" href="Terminal.Gui.View.html">View</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetHeight_System_Int32_System_Int32__">View.SetHeight(Int32, Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentWidth_System_Int32__">View.GetCurrentWidth(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -626,7 +638,9 @@ Gets or sets the time of the <a class="xref" href="Terminal.Gui.TimeField.html">
   
   <a id="Terminal_Gui_TimeField_MouseEvent_" data-uid="Terminal.Gui.TimeField.MouseEvent*"></a>
   <h4 id="Terminal_Gui_TimeField_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.TimeField.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a mouse event is generated
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -660,7 +674,7 @@ Gets or sets the time of the <a class="xref" href="Terminal.Gui.TimeField.html">
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -699,7 +713,9 @@ Event firing method that invokes the <a class="xref" href="Terminal.Gui.TimeFiel
   
   <a id="Terminal_Gui_TimeField_ProcessKey_" data-uid="Terminal.Gui.TimeField.ProcessKey*"></a>
   <h4 id="Terminal_Gui_TimeField_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.TimeField.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Processes key presses for the <a class="xref" href="Terminal.Gui.TextField.html">TextField</a>.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -739,6 +755,11 @@ Event firing method that invokes the <a class="xref" href="Terminal.Gui.TimeFiel
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_ProcessKey_Terminal_Gui_KeyEvent_">TextField.ProcessKey(KeyEvent)</a></div>
+  <h5 id="Terminal_Gui_TimeField_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+The <a class="xref" href="Terminal.Gui.TextField.html">TextField</a> control responds to the following keys:
+<table><thead><tr><th>Keys</th><th>Function</th></tr></thead><tbody><tr><td><a class="xref" href="Terminal.Gui.Key.html#Terminal_Gui_Key_Delete">Delete</a>, <a class="xref" href="Terminal.Gui.Key.html#Terminal_Gui_Key_Backspace">Backspace</a></td><td>Deletes the character before cursor.</td></tr></tbody></table>
+</div>
   <h3 id="events">Events
   </h3>
   
