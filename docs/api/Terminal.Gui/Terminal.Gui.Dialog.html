@@ -398,6 +398,12 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_AutoSize">View.AutoSize</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VerticalTextAlignment">View.VerticalTextAlignment</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextDirection">View.TextDirection</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
     </div>
     <div>
@@ -432,6 +438,12 @@ or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetHeight_System_Int32_System_Int32__">View.SetHeight(Int32, Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentWidth_System_Int32__">View.GetCurrentWidth(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -485,7 +497,7 @@ Initializes a new instance of the <a class="xref" href="Terminal.Gui.Dialog.html
   <div class="markdown level1 remarks">
 <p>
 Te Dialog will be vertically and horizontally centered in the container and the size will be 85% of the container. 
-After initialzation use <code>X</code>, <code>Y</code>, <code>Width</code>, and <code>Height</code> to override this with a location or size.
+After initialization use <code>X</code>, <code>Y</code>, <code>Width</code>, and <code>Height</code> to override this with a location or size.
 </p>
 <p>
 Use <a class="xref" href="Terminal.Gui.Dialog.html#Terminal_Gui_Dialog_AddButton_Terminal_Gui_Button_">AddButton(Button)</a> to add buttons to the dialog.
@@ -540,7 +552,7 @@ and an optional set of <a class="xref" href="Terminal.Gui.Button.html">Button</a
   <div class="markdown level1 remarks">
 if <code>width</code> and <code>height</code> are both 0, the Dialog will be vertically and horizontally centered in the
 container and the size will be 85% of the container. 
-After initialzation use <code>X</code>, <code>Y</code>, <code>Width</code>, and <code>Height</code> to override this with a location or size.
+After initialization use <code>X</code>, <code>Y</code>, <code>Width</code>, and <code>Height</code> to override this with a location or size.
 </div>
   
   
@@ -580,7 +592,7 @@ and with an optional set of <a class="xref" href="Terminal.Gui.Button.html">Butt
   <h5 id="Terminal_Gui_Dialog__ctor_NStack_ustring_Terminal_Gui_Button____remarks">Remarks</h5>
   <div class="markdown level1 remarks">
 Te Dialog will be vertically and horizontally centered in the container and the size will be 85% of the container. 
-After initialzation use <code>X</code>, <code>Y</code>, <code>Width</code>, and <code>Height</code> to override this with a location or size.
+After initialization use <code>X</code>, <code>Y</code>, <code>Width</code>, and <code>Height</code> to override this with a location or size.
 </div>
   <h3 id="methods">Methods
   </h3>
@@ -617,7 +629,10 @@ Adds a <a class="xref" href="Terminal.Gui.Button.html">Button</a> to the <a clas
   
   <a id="Terminal_Gui_Dialog_ProcessKey_" data-uid="Terminal.Gui.Dialog.ProcessKey*"></a>
   <h4 id="Terminal_Gui_Dialog_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.Dialog.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+If the view is focused, gives the view a
+chance to process the keystroke.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -657,6 +672,25 @@ Adds a <a class="xref" href="Terminal.Gui.Button.html">Button</a> to the <a clas
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_ProcessKey_Terminal_Gui_KeyEvent_">Toplevel.ProcessKey(KeyEvent)</a></div>
+  <h5 id="Terminal_Gui_Dialog_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  Views can override this method if they are
+  interested in processing the given keystroke.
+  If they consume the keystroke, they must
+  return true to stop the keystroke from being
+  processed by other widgets or consumed by the
+  widget engine.    If they return false, the
+  keystroke will be passed using the ProcessColdKey
+  method to other views to process.
+</p>
+<p>
+  The View implementation does nothing but return false,
+  so it is not necessary to call base.ProcessKey if you
+  derive directly from View, but you should if you derive
+  other View subclasses.
+</p>
+</div>
   <h3 id="implements">Implements</h3>
   <div>
       <span class="xref">System.IDisposable</span>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using Terminal.Gui;
+using Terminal.Gui.Trees;
 using System.Linq;
 using System.Globalization;
 using System.IO;
@@ -94,7 +95,7 @@ namespace UICatalog.Scenarios {
 		}
 
 
-		private void OnSelectedCellChanged (SelectedCellChangedEventArgs e)
+		private void OnSelectedCellChanged (TableView.SelectedCellChangedEventArgs e)
 		{
 			selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";
 			
@@ -504,7 +505,7 @@ namespace UICatalog.Scenarios {
 			enteredText = okPressed? tf.Text.ToString() : null;
 			return okPressed;
 		}
-		private void EditCurrentCell (CellActivatedEventArgs e)
+		private void EditCurrentCell (TableView.CellActivatedEventArgs e)
 		{
 			if(e.Table == null)
 				return;

@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Types {
 	public class RectTests {
 		[Fact]
 		public void Rect_New ()
@@ -33,7 +33,7 @@ namespace Terminal.Gui {
 		}
 
 		[Fact]
-		public void Rect__SetsValue ()
+		public void Rect_SetsValue ()
 		{
 			var rect = new Rect () {
 				X = 0,

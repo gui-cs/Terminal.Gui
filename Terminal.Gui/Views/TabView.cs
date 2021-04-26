@@ -7,72 +7,6 @@ using System.Linq;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// A single tab in a <see cref="TabView"/>
-	/// </summary>
-	public class Tab {
-		private ustring text;
-
-		/// <summary>
-		/// The text to display in a <see cref="TabView"/>
-		/// </summary>
-		/// <value></value>
-		public ustring Text { get => text ?? "Unamed"; set => text = value; }
-
-		/// <summary>
-		/// The control to display when the tab is selected
-		/// </summary>
-		/// <value></value>
-		public View View { get; set; }
-
-		/// <summary>
-		/// Creates a new unamed tab with no controls inside
-		/// </summary>
-		public Tab ()
-		{
-
-		}
-
-		/// <summary>
-		/// Creates a new tab with the given text hosting a view
-		/// </summary>
-		/// <param name="text"></param>
-		/// <param name="view"></param>
-		public Tab (string text, View view)
-		{
-			this.Text = text;
-			this.View = view;
-		}
-	}
-
-	/// <summary>
-	/// Describes render stylistic selections of a <see cref="TabView"/>
-	/// </summary>
-	public class TabStyle {
-
-		/// <summary>
-		/// True to show the top lip of tabs.  False to directly begin with tab text during 
-		/// rendering.  When true header line occupies 3 rows, when false only 2.
-		/// Defaults to true.
-		/// 
-		/// <para>When <see cref="TabsOnBottom"/> is enabled this instead applies to the
-		///  bottommost line of the control</para>
-		/// </summary> 
-		public bool ShowTopLine { get; set; } = true;
-
-
-		/// <summary>
-		/// True to show a solid box around the edge of the control.  Defaults to true.
-		/// </summary>
-		public bool ShowBorder { get; set; } = true;
-
-		/// <summary>
-		/// True to render tabs at the bottom of the view instead of the top
-		/// </summary>
-		public bool TabsOnBottom { get; set; } = false;
-
-	}
-
-	/// <summary>
 	/// Control that hosts multiple sub views, presenting a single one at once
 	/// </summary>
 	public class TabView : View {
@@ -481,6 +415,8 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
+		#region Nested Types
+
 		private class TabToRender {
 			public int X { get; set; }
 			public Tab Tab { get; set; }
@@ -808,32 +744,100 @@ namespace Terminal.Gui {
 				return tabs.LastOrDefault (t => x >= t.X && x < t.X + t.Width)?.Tab;
 			}
 		}
-	}
 
-	/// <summary>
-	/// Describes a change in <see cref="TabView.SelectedTab"/>
-	/// </summary>
-	public class TabChangedEventArgs : EventArgs {
 
 		/// <summary>
-		/// The previously selected tab. May be null
+		/// A single tab in a <see cref="TabView"/>
 		/// </summary>
-		public Tab OldTab { get; }
+		public class Tab {
+			private ustring text;
 
-		/// <summary>
-		/// The currently selected tab. May be null
-		/// </summary>
-		public Tab NewTab { get; }
+			/// <summary>
+			/// The text to display in a <see cref="TabView"/>
+			/// </summary>
+			/// <value></value>
+			public ustring Text { get => text ?? "Unamed"; set => text = value; }
 
-		/// <summary>
-		/// Documents a tab change
-		/// </summary>
-		/// <param name="oldTab"></param>
-		/// <param name="newTab"></param>
-		public TabChangedEventArgs (Tab oldTab, Tab newTab)
-		{
-			OldTab = oldTab;
-			NewTab = newTab;
+			/// <summary>
+			/// The control to display when the tab is selected
+			/// </summary>
+			/// <value></value>
+			public View View { get; set; }
+
+			/// <summary>
+			/// Creates a new unamed tab with no controls inside
+			/// </summary>
+			public Tab ()
+			{
+
+			}
+
+			/// <summary>
+			/// Creates a new tab with the given text hosting a view
+			/// </summary>
+			/// <param name="text"></param>
+			/// <param name="view"></param>
+			public Tab (string text, View view)
+			{
+				this.Text = text;
+				this.View = view;
+			}
 		}
+
+		/// <summary>
+		/// Describes render stylistic selections of a <see cref="TabView"/>
+		/// </summary>
+		public class TabStyle {
+
+			/// <summary>
+			/// True to show the top lip of tabs.  False to directly begin with tab text during 
+			/// rendering.  When true header line occupies 3 rows, when false only 2.
+			/// Defaults to true.
+			/// 
+			/// <para>When <see cref="TabsOnBottom"/> is enabled this instead applies to the
+			///  bottommost line of the control</para>
+			/// </summary> 
+			public bool ShowTopLine { get; set; } = true;
+
+
+			/// <summary>
+			/// True to show a solid box around the edge of the control.  Defaults to true.
+			/// </summary>
+			public bool ShowBorder { get; set; } = true;
+
+			/// <summary>
+			/// True to render tabs at the bottom of the view instead of the top
+			/// </summary>
+			public bool TabsOnBottom { get; set; } = false;
+
+		}
+
+		/// <summary>
+		/// Describes a change in <see cref="TabView.SelectedTab"/>
+		/// </summary>
+		public class TabChangedEventArgs : EventArgs {
+
+			/// <summary>
+			/// The previously selected tab. May be null
+			/// </summary>
+			public Tab OldTab { get; }
+
+			/// <summary>
+			/// The currently selected tab. May be null
+			/// </summary>
+			public Tab NewTab { get; }
+
+			/// <summary>
+			/// Documents a tab change
+			/// </summary>
+			/// <param name="oldTab"></param>
+			/// <param name="newTab"></param>
+			public TabChangedEventArgs (Tab oldTab, Tab newTab)
+			{
+				OldTab = oldTab;
+				NewTab = newTab;
+			}
+		}
+		#endregion
 	}
 }
