@@ -433,7 +433,7 @@ namespace Terminal.Gui {
 						}
 					} else if (rune == '\t') {
 						length += tabWidth + 1;
-						if (length == tabWidth && tabWidth > cWidth) {//  || (length == cWidth && tabWidth < cWidth)
+						if (length == tabWidth && tabWidth > cWidth) {
 							return to + 1;
 						} else if (length > cWidth && tabWidth > cWidth) {
 							return to;
