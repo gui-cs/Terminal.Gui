@@ -94,7 +94,7 @@ namespace UICatalog.Scenarios {
 		}
 
 
-		private void OnSelectedCellChanged (SelectedCellChangedEventArgs e)
+		private void OnSelectedCellChanged (TableView.SelectedCellChangedEventArgs e)
 		{
 			selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";
 			

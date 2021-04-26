@@ -436,9 +436,9 @@ namespace UICatalog {
 				Height = Dim.Fill ()
 			};
 
-			tabView.AddTab (new Tab ("Find", FindTab ()), isFind);
+			tabView.AddTab (new TabView.Tab ("Find", FindTab ()), isFind);
 			var replace = ReplaceTab ();
-			tabView.AddTab (new Tab ("Replace", replace), !isFind);
+			tabView.AddTab (new TabView.Tab ("Replace", replace), !isFind);
 			tabView.SelectedTabChanged += (s, e) => tabView.SelectedTab.View.FocusFirst ();
 			winDialog.Add (tabView);
 
