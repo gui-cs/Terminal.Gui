@@ -34,54 +34,47 @@ jobs:
       #- name: Pack nuget package with symbols
       #  run: dotnet pack --include-symbols
       
-      - name: Publish Terminal.Gui
-        id: publish_nuget
-        uses: brandedoutcast/publish-nuget@v2.5.5
-        with:
-          VERSION_STATIC: ${{ env.MINVERVERSIONOVERRIDE }}
-          NUGET_SOURCE: https://api.nuget.org
+      # - name: Publish Terminal.Gui
+      #   id: publish_nuget
+      #   uses: brandedoutcast/publish-nuget@v2.5.5
+      #   with:
+      #     VERSION_STATIC: ${{ env.MINVERVERSIONOVERRIDE }}
+      #     NUGET_SOURCE: https://api.nuget.org
 
-          # Filepath of the project to be packaged, relative to root of repository
-          PROJECT_FILE_PATH: Terminal.Gui/Terminal.Gui.csproj
+      #     # Filepath of the project to be packaged, relative to root of repository
+      #     PROJECT_FILE_PATH: Terminal.Gui/Terminal.Gui.csproj
           
-          # NuGet package id, used for version detection & defaults to project name
-          PACKAGE_NAME: Terminal.Gui
+      #     # NuGet package id, used for version detection & defaults to project name
+      #     PACKAGE_NAME: Terminal.Gui
           
-          # Filepath with version info, relative to root of repository & defaults to PROJECT_FILE_PATH
-          #VERSION_FILE_PATH: Terminal.Gui/Directory.Build.props
+      #     # Filepath with version info, relative to root of repository & defaults to PROJECT_FILE_PATH
+      #     #VERSION_FILE_PATH: Terminal.Gui/Directory.Build.props
 
-          # Regex pattern to extract version info in a capturing group
-          #VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
+      #     # Regex pattern to extract version info in a capturing group
+      #     #VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
           
-          # Useful with external providers like Nerdbank.GitVersioning, ignores VERSION_FILE_PATH & VERSION_REGEX
-          # VERSION_STATIC: 1.0.0
+      #     # Useful with external providers like Nerdbank.GitVersioning, ignores VERSION_FILE_PATH & VERSION_REGEX
+      #     # VERSION_STATIC: 1.0.0
 
-          # Flag to toggle git tagging, enabled by default
-          TAG_COMMIT: false
+      #     # Flag to toggle git tagging, enabled by default
+      #     TAG_COMMIT: false
 
-          # Format of the git tag, [*] gets replaced with actual version
-          # TAG_FORMAT: v*
+      #     # Format of the git tag, [*] gets replaced with actual version
+      #     # TAG_FORMAT: v*
 
-          # API key to authenticate with NuGet server
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+      #     # API key to authenticate with NuGet server
+      #     NUGET_KEY: ${{secrets.NUGET_API_KEY}}
 
-          # NuGet server uri hosting the packages, defaults to https://api.nuget.org
-          # NUGET_SOURCE: https://api.nuget.org
+      #     # NuGet server uri hosting the packages, defaults to https://api.nuget.org
+      #     # NUGET_SOURCE: https://api.nuget.org
 
-          # Flag to toggle pushing symbols along with nuget package to the server, disabled by default
-          # This is broken - see https://github.com/brandedoutcast/publish-nuget/issues/30
-          INCLUDE_SYMBOLS: false
+      #     # Flag to toggle pushing symbols along with nuget package to the server, disabled by default
+      #     # This is broken - see https://github.com/brandedoutcast/publish-nuget/issues/30
+      #     INCLUDE_SYMBOLS: false
 
-    - name: Install dependencies
-      run: dotnet restore
-
-    - name: Test
-      run: |
-        dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
-        mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
       - name: Test to generate Code Coverage Report
         run: |
-          dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
+          dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings
           mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
 
       - name: Create Test Coverage Badge
