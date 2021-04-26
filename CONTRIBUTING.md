@@ -85,10 +85,39 @@ See also: https://www.codeproject.com/Articles/20550/C-Event-Implementation-Fund
 - Tag all pull requests that cause breaking changes to user behavior or the public API with the [breaking-change](https://github.com/migueldeicaza/gui.cs/issues?q=is%3Aopen+is%3Aissue+label%3Abreaking-change) tag. This will help project maintainers track and document these.
 - Add a `<remark></remark>` to the XML Documentation to the code describing the breaking change. These will get picked up in the [API Documentation](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.html).
 
-## Examples & Tests
+## Unit Tests
 
-**Terminal.Gui** has an automated unit or regression test suite. See the [Testing wiki](https://github.com/migueldeicaza/gui.cs/wiki/Testing) 
+PRs should never cause code coverage to go down. Ideally, every PR will get the project closer to 100%. PRs that include new functionality (e.g. a new control) should have at least 70% code coverage for the new functionality. 
 
-In addition [UI Catalog](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog) is a great sample app for manual testing.
+**Terminal.Gui** has an automated unit or regression test suite. See the [Testing wiki](https://github.com/migueldeicaza/gui.cs/wiki/Testing).
+
+We analyze unit tests and code coverage on each PR push. 
+
+The code coverage of the latest released build (on NuGet) is shown as a badge at the top of `README.md`. Here as well:
+
+![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27/raw/code-coverage.json)
+
+
+
+The project uses Fine Code Coverage to allow easy access to code coverage info on a per-component basis.
+
+Use the following command to generate the same CC info that the Publish Github Action uses to publish the results to the badge:
+
+```
+dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
+```
+
+Then open up the resulting `coverage.opencover.xml` file and you'll see the `sequenceCoverage` value:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<CoverageSession>
+  <Summary numSequencePoints="15817" visitedSequencePoints="7249" numBranchPoints="9379" visitedBranchPoints="3640" sequenceCoverage="45.83" branchCoverage="38.81" maxCyclomaticComplexity="10276" minCyclomaticComplexity="10276" visitedClasses="105" numClasses="141" visitedMethods="965" numMethods="1751" />
+ 
+```
+
+## Sample Code
+
+[UI Catalog](https://github.com/migueldeicaza/gui.cs/tree/master/UICatalog) is a great sample app for manual testing.
 
 When adding new functionality, fixing bugs, or changing things, please either add a new `Scenario` to **UICatalog** or update an existing `Scenario` to fully illustrate your work and provide a test-case.
