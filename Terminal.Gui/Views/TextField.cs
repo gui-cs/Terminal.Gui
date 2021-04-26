@@ -200,7 +200,7 @@ namespace Terminal.Gui {
 				if (idx == point)
 					break;
 				var cols = Rune.ColumnWidth (text [idx]);
-				col = TextModel.SetCol (col, Frame.Width - 1, cols);
+				TextModel.SetCol (ref col, Frame.Width - 1, cols);
 			}
 			Move (col, 0);
 		}
@@ -234,7 +234,9 @@ namespace Terminal.Gui {
 				if (col + cols <= width) {
 					Driver.AddRune ((Rune)(Secret ? '*' : rune));
 				}
-				col = TextModel.SetCol (col, width, cols);
+				if (!TextModel.SetCol (ref col, width, cols)) {
+					break;
+				}
 				if (idx + 1 < tcount && col + Rune.ColumnWidth (text [idx + 1]) > width) {
 					break;
 				}
@@ -256,7 +258,7 @@ namespace Terminal.Gui {
 			} else if (first + point - (Frame.Width + offB) == 0 ||
 				  TextModel.DisplaySize (text, first, point).size >= Frame.Width + offB) {
 				first = Math.Max (TextModel.CalculateLeftColumn (text, first,
-					point, Frame.Width - 1 + offB, point), 0);
+					point, Frame.Width + offB), 0);
 			}
 			SetNeedsDisplay ();
 		}
@@ -399,7 +401,7 @@ namespace Terminal.Gui {
 			case Key.CursorUp | Key.ShiftMask | Key.CtrlMask:
 			case (Key)((int)'B' + Key.ShiftMask | Key.AltMask):
 				if (point > 0) {
-					int x = Math.Min (start > -1 && start > point ? start : point, text.Count - 1);
+					int x = Math.Min (start > -1 && start > point ? start : point, text.Count);
 					if (x > 0) {
 						int sbw = WordBackward (x);
 						if (sbw != -1)
@@ -895,6 +897,7 @@ namespace Terminal.Gui {
 			point = selStart + cbTxt.RuneCount;
 			ClearAllSelection ();
 			SetNeedsDisplay ();
+			Adjust ();
 		}
 
 		/// <summary>
