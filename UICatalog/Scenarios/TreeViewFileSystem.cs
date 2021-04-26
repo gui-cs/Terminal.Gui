@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Terminal.Gui;
+using Terminal.Gui.Trees;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "TreeViewFileSystem", Description: "Hierarchical file system explorer based on TreeView")]

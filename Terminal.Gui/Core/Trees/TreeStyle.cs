@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Trees {
 	/// <summary>
 	/// Defines rendering options that affect how the tree is displayed
 	/// </summary>
