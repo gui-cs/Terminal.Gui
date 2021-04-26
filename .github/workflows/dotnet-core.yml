@@ -30,6 +30,7 @@ jobs:
         dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
         mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
 
+    # Note: this step is currently not writing to the gist for some reason
     - name: Create Test Coverage Badge
       uses: simon-k/dotnet-code-coverage-badge@v1.0.0
       id: create_coverage_badge
