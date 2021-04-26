@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Views {
 	public class TextFieldTests {
 		private TextField _textField;
 

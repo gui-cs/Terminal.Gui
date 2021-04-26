@@ -10,6 +10,8 @@ packages
 
 docfx/api
 
+UnitTests/TestResults
+
 #git merge files
 *.orig
 
