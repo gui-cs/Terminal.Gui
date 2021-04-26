@@ -42,9 +42,13 @@
     <PackageReleaseNotes>
       v1.0.0
       * Version 1.0 Release!!! - Thank you to @migueldeicaza, @tig, @bdisp, @tznind, @jmprricone, and many more!
+
+      v1.0.0-rc.7
       * Added TextValidateField - Enables masked and validated text input. Thanks @jmperricone!
-      
-      v1.0.0-RC.1
+      * Refactored TreeView and TabView to reduce api surface area
+      * Added code coverage reporting
+
+      v1.0.0-rc.1
       * Added Dependabot support and updated dependencies
       * Renamed master branch to main
       * Fixes #1211. Added support to TextView for word based operations Ctrl+Del and Ctrl+Backspace

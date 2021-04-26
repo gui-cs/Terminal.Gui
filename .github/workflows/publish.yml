@@ -26,7 +26,7 @@ jobs:
           echo "MINVERVERSIONOVERRIDE=$(minver -t v -d rc)" >> $GITHUB_ENV
 
       #- name: Install dependencies
-      #  run: dotnet restore
+      #   run: dotnet restore
 
       #- name: Build
       #  run: dotnet build --configuration Release --no-restore
@@ -71,3 +71,25 @@ jobs:
           # Flag to toggle pushing symbols along with nuget package to the server, disabled by default
           # This is broken - see https://github.com/brandedoutcast/publish-nuget/issues/30
           INCLUDE_SYMBOLS: false
+
+      - name: Test to generate Code Coverage Report
+        run: |
+          dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings
+          mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
+
+      - name: Create Test Coverage Badge
+        uses: simon-k/dotnet-code-coverage-badge@v1.0.0
+        id: create_coverage_badge
+        with:
+          label: Unit Test Coverage
+          color: brightgreen
+          path: UnitTests/TestResults/coverage.opencover.xml
+          gist-filename: code-coverage.json
+          # https://gist.github.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27
+          gist-id: 90ef67a684cb71db1817921a970f8d27
+          gist-auth-token: ${{ secrets.GIST_AUTH_TOKEN }}   
+
+      - name: Print Code Coverage
+        run: |
+          echo "Code coverage percentage: ${{steps.create_coverage_badge.outputs.percentage}}%"
+          echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
