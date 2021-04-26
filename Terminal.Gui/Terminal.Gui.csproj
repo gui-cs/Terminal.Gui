@@ -1,5 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType></DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="true" />
+    <PackageReference Include="NStack.Core" Version="0.16.0" />
+    <PackageReference Include="MinVer" Version="2.5.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>  
+    <!-- <None Remove="ConsoleDrivers\#ConsoleDriver.cs#" /> -->
+  </ItemGroup>
+  
   <PropertyGroup>
+    <!-- See Terminal.Gui/README.md for how version numbering works -->
+    <!-- This enables prefixing version tags with v, e.g. v1.0.0 Instead of 1.0.0 -->
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+
     <TargetFrameworks>net472;netstandard2.0;net5.0</TargetFrameworks>
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
@@ -9,13 +31,21 @@
     <PackageId>Terminal.Gui</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/migueldeicaza/gui.cs/</PackageProjectUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageTags>csharp, terminal, c#, f#, gui, toolkit, console</PackageTags>
     <Description>Console user interface toolkit for .NET applications.</Description>
     <Owners>Miguel de Icaza</Owners>
     <Summary>Application framework for creating modern console applications using .NET</Summary>
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
+
     <PackageReleaseNotes>
-      v1.0.0-RC.1
+      v1.0.0-rc.2
+      * Added TextValidateField - Enables masked and validated text input. Thanks @jmperricone!
+      * Refactored TreeView and TabView to reduce api surface area
+      * Added code coverage reporting
+
+      v1.0.0-rc.1
       * Added Dependabot support and updated dependencies
       * Renamed master branch to main
       * Fixes #1211. Added support to TextView for word based operations Ctrl+Del and Ctrl+Backspace
@@ -210,34 +240,4 @@
       * Fixes #838. Added a Visible property to the View. (Thanks @bidsp!)
     </PackageReleaseNotes>
   </PropertyGroup>
-
-  <PropertyGroup>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType></DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="true" />
-    <PackageReference Include="NStack.Core" Version="0.16.0" />
-    <PackageReference Include="MinVer" Version="2.5.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>  
-  </ItemGroup>
-
-  <PropertyGroup>
-    <MinVerTagPrefix>v</MinVerTagPrefix>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <None Remove="ConsoleDrivers\#ConsoleDriver.cs#" />
-  </ItemGroup>
 </Project>

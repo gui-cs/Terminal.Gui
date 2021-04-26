@@ -24,31 +24,48 @@ Contains all files required to build the **Terminal.Gui** library (and nuget pac
 
 Version info for Terminal.Gui is managed by MinVer (https://github.com/adamralph/minver).
 
-To release a new version simply tag a commit
+The project version (the nuget package and in `Terminal.Gui.dlls`) is determined from the latest `git tag`. 
+
+The format of version numbers is `vmajor.minor.patch.build.height` and follows the [Semantic Versioning](https://semver.org/) rules.
+
+To define a new version (e.g. with a higher `major`, `minor`, `patch`, or `build` value) tag a commit using `git tag`:
 
 ```powershell
-git tag vmajor.minor.patch.build.height -a
-git push upstream origin vmajor.minor.patch.build.height
+git tag v1.3.4-beta.5 -a -m "v1.3.4 Beta 5"
+dotnet build -c Release
+``
+
+If the current commit does not have a version tag, another number is added to the pre-release identifiers. This is the number of commits since the latest commit with a version tag or, if no commits have a version tag, since the root commit. This is known as "height". For example, if the latest version tag found is 1.0.0-beta.1, at a height of 42 commits, the calculated version is 1.0.0-beta.1.42.
+
+You can see the version in the `UICatalog` about box or by viewing the "Details" page of the file properties of `/Terminal.Gui/bin/Release/net5.0/Terminal.Gui.dll.
+
+![About Box](https://raw.githubusercontent.com/migueldeicaza/gui.cs/master/docfx/about.png)
+
+## Publishing a Release of Terminal.Gui
+
+To release a new version (e.g. with a higher `major`, `minor`, or `patch` value) tag a commit using `git tag` and then push that tag directly to the upstream repo:
+
+```powershell
+git tag vmajor.minor.patch.build -a -m "Descriptive comment about release"
+git push upstream vmajor.minor.patch.build
 
 ```      
 
-`patch` can indicate pre-release or not
+`patch` can indicate pre-release or not (e.g. `pre`, `beta`, `rc`, etc...). 
 
-e.g: 
+For example, to launch v1.3.4-beta.5 as a Pre-Release nuget package, do the following:
        
 ```powershell
-git tag v1.3.4-beta.5 -a
+git tag v1.3.4-beta.5 -a -m "v1.3.4 Beta 5"
 git push upstream v1.3.4-beta.5
 ```
 
-    or
+To launch version 2.3.4 as a Release nuget package do this:
        
 ```powershell
-git tag v2.3.4.5 -a
-git push upstream v2.3.4.5
+git tag v2.3.4 -a -m "v2.3.4 Release"
+git push upstream v2.3.4
 ```       
-
-Then rebuild the project and the version info will be updated.
 
 ## Nuget
 

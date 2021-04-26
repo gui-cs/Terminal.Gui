@@ -361,6 +361,12 @@ The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a stri
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextAlignment">View.TextAlignment</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VerticalTextAlignment">View.VerticalTextAlignment</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextDirection">View.TextDirection</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
     </div>
     <div>
@@ -392,6 +398,12 @@ The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a stri
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetHeight_System_Int32_System_Int32__">View.SetHeight(Int32, Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentWidth_System_Int32__">View.GetCurrentWidth(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_MouseEvent_Terminal_Gui_MouseEvent_">Responder.MouseEvent(MouseEvent)</a>
@@ -444,7 +456,9 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
   
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
   <h4 id="Terminal_Gui_Label__ctor_NStack_ustring_" data-uid="Terminal.Gui.Label.#ctor(NStack.ustring)">Label(ustring)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Initializes a new instance of <a class="xref" href="Terminal.Gui.View.html">View</a> using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> layout.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -463,15 +477,28 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
         <td><span class="parametername">text</span></td>
-        <td></td>
+        <td>text to initialize the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">Text</a> property with.</td>
       </tr>
     </tbody>
   </table>
+  <h5 id="Terminal_Gui_Label__ctor_NStack_ustring__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  The <a class="xref" href="Terminal.Gui.View.html">View</a> will be created using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a>
+  coordinates with the given string. The initial size (<a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> will be 
+  adjusted to fit the contents of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">Text</a>, including newlines (&apos;\n&apos;) for multiple lines. 
+</p>
+<p>
+  If <code>Height</code> is greater than one, word wrapping is provided.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
   <h4 id="Terminal_Gui_Label__ctor_System_Int32_System_Int32_NStack_ustring_" data-uid="Terminal.Gui.Label.#ctor(System.Int32,System.Int32,NStack.ustring)">Label(Int32, Int32, ustring)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Initializes a new instance of <a class="xref" href="Terminal.Gui.View.html">View</a> using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> layout.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -490,25 +517,39 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">x</span></td>
-        <td></td>
+        <td>column to locate the Label.</td>
       </tr>
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">y</span></td>
-        <td></td>
+        <td>row to locate the Label.</td>
       </tr>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
         <td><span class="parametername">text</span></td>
-        <td></td>
+        <td>text to initialize the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">Text</a> property with.</td>
       </tr>
     </tbody>
   </table>
+  <h5 id="Terminal_Gui_Label__ctor_System_Int32_System_Int32_NStack_ustring__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  The <a class="xref" href="Terminal.Gui.View.html">View</a> will be created at the given
+  coordinates with the given string. The size (<a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> will be 
+  adjusted to fit the contents of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">Text</a>, including newlines (&apos;\n&apos;) for multiple lines. 
+</p>
+<p>
+  No line wrapping is provided.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
   <h4 id="Terminal_Gui_Label__ctor_Terminal_Gui_Rect_" data-uid="Terminal.Gui.Label.#ctor(Terminal.Gui.Rect)">Label(Rect)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Initializes a new instance of a <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> <a class="xref" href="Terminal.Gui.View.html">View</a> class with the absolute
+dimensions specified in the <code>frame</code> parameter. 
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -527,15 +568,22 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">frame</span></td>
-        <td></td>
+        <td>The region covered by this view.</td>
       </tr>
     </tbody>
   </table>
+  <h5 id="Terminal_Gui_Label__ctor_Terminal_Gui_Rect__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+This constructor initialize a View with a <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle">LayoutStyle</a> of <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a>. Use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View__ctor">View()</a> to 
+initialize a View with  <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutStyle">LayoutStyle</a> of <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Computed">Computed</a> 
+</div>
   
   
   <a id="Terminal_Gui_Label__ctor_" data-uid="Terminal.Gui.Label.#ctor*"></a>
   <h4 id="Terminal_Gui_Label__ctor_Terminal_Gui_Rect_NStack_ustring_" data-uid="Terminal.Gui.Label.#ctor(Terminal.Gui.Rect,NStack.ustring)">Label(Rect, ustring)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Initializes a new instance of <a class="xref" href="Terminal.Gui.View.html">View</a> using <a class="xref" href="Terminal.Gui.LayoutStyle.html#Terminal_Gui_LayoutStyle_Absolute">Absolute</a> layout.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -554,22 +602,35 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">rect</span></td>
-        <td></td>
+        <td>Location.</td>
       </tr>
       <tr>
         <td><span class="xref">NStack.ustring</span></td>
         <td><span class="parametername">text</span></td>
-        <td></td>
+        <td>text to initialize the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">Text</a> property with.</td>
       </tr>
     </tbody>
   </table>
+  <h5 id="Terminal_Gui_Label__ctor_Terminal_Gui_Rect_NStack_ustring__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  The <a class="xref" href="Terminal.Gui.View.html">View</a> will be created at the given
+  coordinates with the given string. The initial size (<a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> will be 
+  adjusted to fit the contents of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Text">Text</a>, including newlines (&apos;\n&apos;) for multiple lines. 
+</p>
+<p>
+  If <code>rect.Height</code> is greater than one, word wrapping is provided.
+</p>
+</div>
   <h3 id="methods">Methods
   </h3>
   
   
   <a id="Terminal_Gui_Label_OnEnter_" data-uid="Terminal.Gui.Label.OnEnter*"></a>
   <h4 id="Terminal_Gui_Label_OnEnter_Terminal_Gui_View_" data-uid="Terminal.Gui.Label.OnEnter(Terminal.Gui.View)">OnEnter(View)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a view gets focus.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -588,7 +649,7 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
       <tr>
         <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
         <td><span class="parametername">view</span></td>
-        <td></td>
+        <td>The view that is losing focus.</td>
       </tr>
     </tbody>
   </table>
@@ -603,7 +664,7 @@ The <a class="xref" href="Terminal.Gui.Label.html">Label</a> view is functionali
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>

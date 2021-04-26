@@ -85,7 +85,7 @@
   </h1>
   <div class="markdown level0 summary">
 Convenience implementation of generic <a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView&lt;T&gt;</a> for any tree were all nodes
-implement <a class="xref" href="Terminal.Gui.ITreeNode.html">ITreeNode</a>.
+implement <a class="xref" href="Terminal.Gui.Trees.ITreeNode.html">ITreeNode</a>.
 
 <a href="https://migueldeicaza.github.io/gui.cs/articles/treeview.html">See TreeView Deep Dive for more information</a>.
 </div>
@@ -95,7 +95,7 @@ implement <a class="xref" href="Terminal.Gui.ITreeNode.html">ITreeNode</a>.
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><a class="xref" href="Terminal.Gui.Responder.html">Responder</a></div>
     <div class="level2"><a class="xref" href="Terminal.Gui.View.html">View</a></div>
-    <div class="level3"><a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView</a>&lt;<a class="xref" href="Terminal.Gui.ITreeNode.html">ITreeNode</a>&gt;</div>
+    <div class="level3"><a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView</a>&lt;<a class="xref" href="Terminal.Gui.Trees.ITreeNode.html">ITreeNode</a>&gt;</div>
     <div class="level4"><span class="xref">TreeView</span></div>
   </div>
   <div classs="implements">
@@ -189,7 +189,7 @@ implement <a class="xref" href="Terminal.Gui.ITreeNode.html">ITreeNode</a>.
       <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ProcessKey_Terminal_Gui_KeyEvent_">TreeView&lt;ITreeNode&gt;.ProcessKey(KeyEvent)</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_OnObjectActivated_Terminal_Gui_ObjectActivatedEventArgs__0__">TreeView&lt;ITreeNode&gt;.OnObjectActivated(ObjectActivatedEventArgs&lt;ITreeNode&gt;)</a>
+      <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_OnObjectActivated_Terminal_Gui_Trees_ObjectActivatedEventArgs__0__">TreeView&lt;ITreeNode&gt;.OnObjectActivated(ObjectActivatedEventArgs&lt;ITreeNode&gt;)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_MouseEvent_Terminal_Gui_MouseEvent_">TreeView&lt;ITreeNode&gt;.MouseEvent(MouseEvent)</a>
@@ -261,7 +261,7 @@ implement <a class="xref" href="Terminal.Gui.ITreeNode.html">ITreeNode</a>.
       <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_SelectAll">TreeView&lt;ITreeNode&gt;.SelectAll()</a>
     </div>
     <div>
-      <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_OnSelectionChanged_Terminal_Gui_SelectionChangedEventArgs__0__">TreeView&lt;ITreeNode&gt;.OnSelectionChanged(SelectionChangedEventArgs&lt;ITreeNode&gt;)</a>
+      <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_OnSelectionChanged_Terminal_Gui_Trees_SelectionChangedEventArgs__0__">TreeView&lt;ITreeNode&gt;.OnSelectionChanged(SelectionChangedEventArgs&lt;ITreeNode&gt;)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Added">View.Added</a>
@@ -516,6 +516,12 @@ implement <a class="xref" href="Terminal.Gui.ITreeNode.html">ITreeNode</a>.
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextAlignment">View.TextAlignment</a>
     </div>
     <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_VerticalTextAlignment">View.VerticalTextAlignment</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_TextDirection">View.TextDirection</a>
+    </div>
+    <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_IsInitialized">View.IsInitialized</a>
     </div>
     <div>
@@ -550,6 +556,12 @@ implement <a class="xref" href="Terminal.Gui.ITreeNode.html">ITreeNode</a>.
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetHeight_System_Int32_System_Int32__">View.SetHeight(Int32, Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentWidth_System_Int32__">View.GetCurrentWidth(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_GetCurrentHeight_System_Int32__">View.GetCurrentHeight(Int32)</a>
     </div>
     <div>
       <a class="xref" href="Terminal.Gui.Responder.html#Terminal_Gui_Responder_Dispose">Responder.Dispose()</a>
@@ -587,7 +599,7 @@ implement <a class="xref" href="Terminal.Gui.ITreeNode.html">ITreeNode</a>.
   <h4 id="Terminal_Gui_TreeView__ctor" data-uid="Terminal.Gui.TreeView.#ctor">TreeView()</h4>
   <div class="markdown level1 summary">
 Creates a new instance of the tree control with absolute positioning and initialises
-<a class="xref" href="Terminal.Gui.TreeBuilder-1.html">TreeBuilder&lt;T&gt;</a> with default <a class="xref" href="Terminal.Gui.ITreeNode.html">ITreeNode</a> based builder
+<a class="xref" href="Terminal.Gui.Trees.TreeBuilder-1.html">TreeBuilder&lt;T&gt;</a> with default <a class="xref" href="Terminal.Gui.Trees.ITreeNode.html">ITreeNode</a> based builder
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
