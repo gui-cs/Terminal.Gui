@@ -85,7 +85,7 @@
   </h1>
   <div class="markdown level0 summary">
 Hierarchical tree view with expandable branches.  Branch objects are dynamically determined
-when expanded using a user defined <a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a>
+when expanded using a user defined <a class="xref" href="Terminal.Gui.Trees.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a>
 
 <a href="https://migueldeicaza.github.io/gui.cs/articles/treeview.html">See TreeView Deep Dive for more information</a>.
 </div>
@@ -469,7 +469,7 @@ Children will not be rendered until you set <a class="xref" href="Terminal.Gui.T
   
   
   <a id="Terminal_Gui_TreeView_1__ctor_" data-uid="Terminal.Gui.TreeView`1.#ctor*"></a>
-  <h4 id="Terminal_Gui_TreeView_1__ctor_Terminal_Gui_ITreeBuilder__0__" data-uid="Terminal.Gui.TreeView`1.#ctor(Terminal.Gui.ITreeBuilder{`0})">TreeView(ITreeBuilder&lt;T&gt;)</h4>
+  <h4 id="Terminal_Gui_TreeView_1__ctor_Terminal_Gui_Trees_ITreeBuilder__0__" data-uid="Terminal.Gui.TreeView`1.#ctor(Terminal.Gui.Trees.ITreeBuilder{`0})">TreeView(ITreeBuilder&lt;T&gt;)</h4>
   <div class="markdown level1 summary">
 Initialises <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_TreeBuilder">TreeBuilder</a>.Creates a new tree view with absolute 
 positioning.  Use <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AddObjects_System_Collections_Generic_IEnumerable__0__">AddObjects(IEnumerable&lt;T&gt;)</a> to set set root 
@@ -491,7 +491,7 @@ objects for the tree.
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder</a>&lt;T&gt;</td>
+        <td><a class="xref" href="Terminal.Gui.Trees.ITreeBuilder-1.html">ITreeBuilder</a>&lt;T&gt;</td>
         <td><span class="parametername">builder</span></td>
         <td></td>
       </tr>
@@ -579,7 +579,7 @@ implementation is to call <span class="xref">System.Object.ToString()</span>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.AspectGetterDelegate-1.html">AspectGetterDelegate</a>&lt;T&gt;</td>
+        <td><a class="xref" href="Terminal.Gui.Trees.AspectGetterDelegate-1.html">AspectGetterDelegate</a>&lt;T&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -833,7 +833,7 @@ Contains options for changing how the tree is rendered
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.TreeStyle.html">TreeStyle</a></td>
+        <td><a class="xref" href="Terminal.Gui.Trees.TreeStyle.html">TreeStyle</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -861,7 +861,7 @@ expands root nodes
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder</a>&lt;T&gt;</td>
+        <td><a class="xref" href="Terminal.Gui.Trees.ITreeBuilder-1.html">ITreeBuilder</a>&lt;T&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -1662,7 +1662,9 @@ Returns true if the <code data-dev-comment-type="paramref" class="paramref">mode
   
   <a id="Terminal_Gui_TreeView_1_MouseEvent_" data-uid="Terminal.Gui.TreeView`1.MouseEvent*"></a>
   <h4 id="Terminal_Gui_TreeView_1_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.TreeView`1.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a mouse event is generated
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1696,7 +1698,7 @@ Returns true if the <code data-dev-comment-type="paramref" class="paramref">mode
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -1705,7 +1707,7 @@ Returns true if the <code data-dev-comment-type="paramref" class="paramref">mode
   
   
   <a id="Terminal_Gui_TreeView_1_OnObjectActivated_" data-uid="Terminal.Gui.TreeView`1.OnObjectActivated*"></a>
-  <h4 id="Terminal_Gui_TreeView_1_OnObjectActivated_Terminal_Gui_ObjectActivatedEventArgs__0__" data-uid="Terminal.Gui.TreeView`1.OnObjectActivated(Terminal.Gui.ObjectActivatedEventArgs{`0})">OnObjectActivated(ObjectActivatedEventArgs&lt;T&gt;)</h4>
+  <h4 id="Terminal_Gui_TreeView_1_OnObjectActivated_Terminal_Gui_Trees_ObjectActivatedEventArgs__0__" data-uid="Terminal.Gui.TreeView`1.OnObjectActivated(Terminal.Gui.Trees.ObjectActivatedEventArgs{`0})">OnObjectActivated(ObjectActivatedEventArgs&lt;T&gt;)</h4>
   <div class="markdown level1 summary">
 Raises the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ObjectActivated">ObjectActivated</a> event
 </div>
@@ -1725,7 +1727,7 @@ Raises the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeV
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.ObjectActivatedEventArgs-1.html">ObjectActivatedEventArgs</a>&lt;T&gt;</td>
+        <td><a class="xref" href="Terminal.Gui.Trees.ObjectActivatedEventArgs-1.html">ObjectActivatedEventArgs</a>&lt;T&gt;</td>
         <td><span class="parametername">e</span></td>
         <td></td>
       </tr>
@@ -1734,7 +1736,7 @@ Raises the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeV
   
   
   <a id="Terminal_Gui_TreeView_1_OnSelectionChanged_" data-uid="Terminal.Gui.TreeView`1.OnSelectionChanged*"></a>
-  <h4 id="Terminal_Gui_TreeView_1_OnSelectionChanged_Terminal_Gui_SelectionChangedEventArgs__0__" data-uid="Terminal.Gui.TreeView`1.OnSelectionChanged(Terminal.Gui.SelectionChangedEventArgs{`0})">OnSelectionChanged(SelectionChangedEventArgs&lt;T&gt;)</h4>
+  <h4 id="Terminal_Gui_TreeView_1_OnSelectionChanged_Terminal_Gui_Trees_SelectionChangedEventArgs__0__" data-uid="Terminal.Gui.TreeView`1.OnSelectionChanged(Terminal.Gui.Trees.SelectionChangedEventArgs{`0})">OnSelectionChanged(SelectionChangedEventArgs&lt;T&gt;)</h4>
   <div class="markdown level1 summary">
 Raises the SelectionChanged event
 </div>
@@ -1754,7 +1756,7 @@ Raises the SelectionChanged event
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.SelectionChangedEventArgs-1.html">SelectionChangedEventArgs</a>&lt;T&gt;</td>
+        <td><a class="xref" href="Terminal.Gui.Trees.SelectionChangedEventArgs-1.html">SelectionChangedEventArgs</a>&lt;T&gt;</td>
         <td><span class="parametername">e</span></td>
         <td></td>
       </tr>
@@ -1778,7 +1780,10 @@ Positions the cursor at the start of the selected objects line (if visible)
   
   <a id="Terminal_Gui_TreeView_1_ProcessKey_" data-uid="Terminal.Gui.TreeView`1.ProcessKey*"></a>
   <h4 id="Terminal_Gui_TreeView_1_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.TreeView`1.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+If the view is focused, gives the view a
+chance to process the keystroke.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1797,7 +1802,7 @@ Positions the cursor at the start of the selected objects line (if visible)
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td></td>
+        <td>Contains the details about the key that produced the event.</td>
       </tr>
     </tbody>
   </table>
@@ -1818,6 +1823,25 @@ Positions the cursor at the start of the selected objects line (if visible)
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
+  <h5 id="Terminal_Gui_TreeView_1_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  Views can override this method if they are
+  interested in processing the given keystroke.
+  If they consume the keystroke, they must
+  return true to stop the keystroke from being
+  processed by other widgets or consumed by the
+  widget engine.    If they return false, the
+  keystroke will be passed using the ProcessColdKey
+  method to other views to process.
+</p>
+<p>
+  The View implementation does nothing but return false,
+  so it is not necessary to call base.ProcessKey if you
+  derive directly from View, but you should if you derive
+  other View subclasses.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_TreeView_1_RebuildTree_" data-uid="Terminal.Gui.TreeView`1.RebuildTree*"></a>
@@ -1836,7 +1860,9 @@ objects have changed (otherwise use <a class="xref" href="Terminal.Gui.TreeView-
   
   <a id="Terminal_Gui_TreeView_1_Redraw_" data-uid="Terminal.Gui.TreeView`1.Redraw*"></a>
   <h4 id="Terminal_Gui_TreeView_1_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.TreeView`1.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1855,12 +1881,26 @@ objects have changed (otherwise use <a class="xref" href="Terminal.Gui.TreeView-
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">bounds</span></td>
-        <td></td>
+        <td>The bounds (view-relative region) to redraw.</td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
+  <h5 id="Terminal_Gui_TreeView_1_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
+</p>
+<p>
+   Views should set the color that they want to use on entry, as otherwise this will inherit
+   the last color that was set globally on the driver.
+</p>
+<p>
+   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
+   larger than the <code>region</code> parameter.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_TreeView_1_RefreshObject_" data-uid="Terminal.Gui.TreeView`1.RefreshObject*"></a>
@@ -1968,7 +2008,7 @@ pressing <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeVie
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.ObjectActivatedEventArgs-1.html">ObjectActivatedEventArgs</a>&lt;T&gt;&gt;</td>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.Trees.ObjectActivatedEventArgs-1.html">ObjectActivatedEventArgs</a>&lt;T&gt;&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -1994,7 +2034,7 @@ Called when the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.EventHandler</span>&lt;<a class="xref" href="Terminal.Gui.SelectionChangedEventArgs-1.html">SelectionChangedEventArgs</a>&lt;T&gt;&gt;</td>
+        <td><span class="xref">System.EventHandler</span>&lt;<a class="xref" href="Terminal.Gui.Trees.SelectionChangedEventArgs-1.html">SelectionChangedEventArgs</a>&lt;T&gt;&gt;</td>
         <td></td>
       </tr>
     </tbody>

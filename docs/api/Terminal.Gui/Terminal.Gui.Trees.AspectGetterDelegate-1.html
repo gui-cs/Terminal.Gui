@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class TabChangedEventArgs
+    <title>Delegate AspectGetterDelegate&lt;T&gt;
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class TabChangedEventArgs
+    <meta name="title" content="Delegate AspectGetterDelegate&lt;T&gt;
    ">
     <meta name="generator" content="docfx 2.56.7.0">
     
@@ -78,67 +78,21 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Terminal.Gui.TabChangedEventArgs">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.Trees.AspectGetterDelegate`1">
   
   
-  <h1 id="Terminal_Gui_TabChangedEventArgs" data-uid="Terminal.Gui.TabChangedEventArgs" class="text-break">Class TabChangedEventArgs
+  <h1 id="Terminal_Gui_Trees_AspectGetterDelegate_1" data-uid="Terminal.Gui.Trees.AspectGetterDelegate`1" class="text-break">Delegate AspectGetterDelegate&lt;T&gt;
   </h1>
   <div class="markdown level0 summary">
-Describes a change in <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_SelectedTab">SelectedTab</a>
+Delegates of this type are used to fetch string representations of user&apos;s model objects
 </div>
   <div class="markdown level0 conceptual"></div>
-  <div class="inheritance">
-    <h5>Inheritance</h5>
-    <div class="level0"><span class="xref">System.Object</span></div>
-    <div class="level1"><span class="xref">System.EventArgs</span></div>
-    <div class="level2"><span class="xref">TabChangedEventArgs</span></div>
-  </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.EventArgs.Empty</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.Trees.html">Terminal.Gui.Trees</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Terminal_Gui_TabChangedEventArgs_syntax">Syntax</h5>
+  <h5 id="Terminal_Gui_Trees_AspectGetterDelegate_1_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class TabChangedEventArgs : EventArgs</code></pre>
-  </div>
-  <h3 id="constructors">Constructors
-  </h3>
-  
-  
-  <a id="Terminal_Gui_TabChangedEventArgs__ctor_" data-uid="Terminal.Gui.TabChangedEventArgs.#ctor*"></a>
-  <h4 id="Terminal_Gui_TabChangedEventArgs__ctor_Terminal_Gui_Tab_Terminal_Gui_Tab_" data-uid="Terminal.Gui.TabChangedEventArgs.#ctor(Terminal.Gui.Tab,Terminal.Gui.Tab)">TabChangedEventArgs(Tab, Tab)</h4>
-  <div class="markdown level1 summary">
-Documents a tab change
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TabChangedEventArgs(Tab oldTab, Tab newTab)</code></pre>
+    <pre><code class="lang-csharp hljs">public delegate string AspectGetterDelegate&lt;T&gt;(T toRender)
+    where T : class;</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -151,32 +105,13 @@ Documents a tab change
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Tab.html">Tab</a></td>
-        <td><span class="parametername">oldTab</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="Terminal.Gui.Tab.html">Tab</a></td>
-        <td><span class="parametername">newTab</span></td>
-        <td></td>
+        <td><span class="xref">T</span></td>
+        <td><span class="parametername">toRender</span></td>
+        <td>The object that is being rendered</td>
       </tr>
     </tbody>
   </table>
-  <h3 id="properties">Properties
-  </h3>
-  
-  
-  <a id="Terminal_Gui_TabChangedEventArgs_NewTab_" data-uid="Terminal.Gui.TabChangedEventArgs.NewTab*"></a>
-  <h4 id="Terminal_Gui_TabChangedEventArgs_NewTab" data-uid="Terminal.Gui.TabChangedEventArgs.NewTab">NewTab</h4>
-  <div class="markdown level1 summary">
-The currently selected tab. May be null
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Tab NewTab { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
+  <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -186,34 +121,22 @@ The currently selected tab. May be null
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Tab.html">Tab</a></td>
+        <td><span class="xref">System.String</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
-  
-  
-  <a id="Terminal_Gui_TabChangedEventArgs_OldTab_" data-uid="Terminal.Gui.TabChangedEventArgs.OldTab*"></a>
-  <h4 id="Terminal_Gui_TabChangedEventArgs_OldTab" data-uid="Terminal.Gui.TabChangedEventArgs.OldTab">OldTab</h4>
-  <div class="markdown level1 summary">
-The previously selected tab. May be null
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Tab OldTab { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
+  <h5 class="typeParameters">Type Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
-        <th>Type</th>
+        <th>Name</th>
         <th>Description</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Tab.html">Tab</a></td>
+        <td><span class="parametername">T</span></td>
         <td></td>
       </tr>
     </tbody>

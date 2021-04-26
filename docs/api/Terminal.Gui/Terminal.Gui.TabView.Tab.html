@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class ObjectActivatedEventArgs&lt;T&gt;
+    <title>Class TabView.Tab
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class ObjectActivatedEventArgs&lt;T&gt;
+    <meta name="title" content="Class TabView.Tab
    ">
     <meta name="generator" content="docfx 2.56.7.0">
     
@@ -78,19 +78,19 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.TabView.Tab">
   
   
-  <h1 id="Terminal_Gui_ObjectActivatedEventArgs_1" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1" class="text-break">Class ObjectActivatedEventArgs&lt;T&gt;
+  <h1 id="Terminal_Gui_TabView_Tab" data-uid="Terminal.Gui.TabView.Tab" class="text-break">Class TabView.Tab
   </h1>
   <div class="markdown level0 summary">
-Event args for the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ObjectActivated">ObjectActivated</a> event
+A single tab in a <a class="xref" href="Terminal.Gui.TabView.html">TabView</a>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><span class="xref">System.Object</span></div>
-    <div class="level1"><span class="xref">ObjectActivatedEventArgs&lt;T&gt;</span></div>
+    <div class="level1"><span class="xref">TabView.Tab</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -118,40 +118,35 @@ Event args for the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_G
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Terminal_Gui_ObjectActivatedEventArgs_1_syntax">Syntax</h5>
+  <h5 id="Terminal_Gui_TabView_Tab_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ObjectActivatedEventArgs&lt;T&gt;
-
-    where T : class</code></pre>
+    <pre><code class="lang-csharp hljs">public class Tab</code></pre>
   </div>
-  <h5 class="typeParameters">Type Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="parametername">T</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
   <h3 id="constructors">Constructors
   </h3>
   
   
-  <a id="Terminal_Gui_ObjectActivatedEventArgs_1__ctor_" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1.#ctor*"></a>
-  <h4 id="Terminal_Gui_ObjectActivatedEventArgs_1__ctor_Terminal_Gui_TreeView__0___0_" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1.#ctor(Terminal.Gui.TreeView{`0},`0)">ObjectActivatedEventArgs(TreeView&lt;T&gt;, T)</h4>
+  <a id="Terminal_Gui_TabView_Tab__ctor_" data-uid="Terminal.Gui.TabView.Tab.#ctor*"></a>
+  <h4 id="Terminal_Gui_TabView_Tab__ctor" data-uid="Terminal.Gui.TabView.Tab.#ctor">Tab()</h4>
   <div class="markdown level1 summary">
-Creates a new instance documenting activation of the <code data-dev-comment-type="paramref" class="paramref">activated</code> object
+Creates a new unamed tab with no controls inside
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ObjectActivatedEventArgs(TreeView&lt;T&gt; tree, T activated)</code></pre>
+    <pre><code class="lang-csharp hljs">public Tab()</code></pre>
+  </div>
+  
+  
+  <a id="Terminal_Gui_TabView_Tab__ctor_" data-uid="Terminal.Gui.TabView.Tab.#ctor*"></a>
+  <h4 id="Terminal_Gui_TabView_Tab__ctor_System_String_Terminal_Gui_View_" data-uid="Terminal.Gui.TabView.Tab.#ctor(System.String,Terminal.Gui.View)">Tab(String, View)</h4>
+  <div class="markdown level1 summary">
+Creates a new tab with the given text hosting a view
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Tab(string text, View view)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -164,14 +159,14 @@ Creates a new instance documenting activation of the <code data-dev-comment-type
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView</a>&lt;T&gt;</td>
-        <td><span class="parametername">tree</span></td>
-        <td>Tree in which the activation is happening</td>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">text</span></td>
+        <td></td>
       </tr>
       <tr>
-        <td><span class="xref">T</span></td>
-        <td><span class="parametername">activated</span></td>
-        <td>What object is being activated</td>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td><span class="parametername">view</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -179,15 +174,15 @@ Creates a new instance documenting activation of the <code data-dev-comment-type
   </h3>
   
   
-  <a id="Terminal_Gui_ObjectActivatedEventArgs_1_ActivatedObject_" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1.ActivatedObject*"></a>
-  <h4 id="Terminal_Gui_ObjectActivatedEventArgs_1_ActivatedObject" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1.ActivatedObject">ActivatedObject</h4>
+  <a id="Terminal_Gui_TabView_Tab_Text_" data-uid="Terminal.Gui.TabView.Tab.Text*"></a>
+  <h4 id="Terminal_Gui_TabView_Tab_Text" data-uid="Terminal.Gui.TabView.Tab.Text">Text</h4>
   <div class="markdown level1 summary">
-The object that was selected at the time of activation
+The text to display in a <a class="xref" href="Terminal.Gui.TabView.html">TabView</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public T ActivatedObject { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public ustring Text { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -199,22 +194,22 @@ The object that was selected at the time of activation
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">T</span></td>
+        <td><span class="xref">NStack.ustring</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_ObjectActivatedEventArgs_1_Tree_" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1.Tree*"></a>
-  <h4 id="Terminal_Gui_ObjectActivatedEventArgs_1_Tree" data-uid="Terminal.Gui.ObjectActivatedEventArgs`1.Tree">Tree</h4>
+  <a id="Terminal_Gui_TabView_Tab_View_" data-uid="Terminal.Gui.TabView.Tab.View*"></a>
+  <h4 id="Terminal_Gui_TabView_Tab_View" data-uid="Terminal.Gui.TabView.Tab.View">View</h4>
   <div class="markdown level1 summary">
-The tree in which the activation occurred
+The control to display when the tab is selected
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TreeView&lt;T&gt; Tree { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public View View { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -226,7 +221,7 @@ The tree in which the activation occurred
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView</a>&lt;T&gt;</td>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
         <td></td>
       </tr>
     </tbody>

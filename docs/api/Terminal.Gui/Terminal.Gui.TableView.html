@@ -481,7 +481,7 @@ Initialzies a <a class="xref" href="Terminal.Gui.TableView.html">TableView</a> c
   
   <h4 id="Terminal_Gui_TableView_DefaultMaxCellWidth" data-uid="Terminal.Gui.TableView.DefaultMaxCellWidth">DefaultMaxCellWidth</h4>
   <div class="markdown level1 summary">
-The default maximum cell width for <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_MaxCellWidth">MaxCellWidth</a> and <a class="xref" href="Terminal.Gui.ColumnStyle.html#Terminal_Gui_ColumnStyle_MaxWidth">MaxWidth</a>
+The default maximum cell width for <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_MaxCellWidth">MaxCellWidth</a> and <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_MaxWidth">MaxWidth</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -652,7 +652,7 @@ When <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_Mu
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Stack&lt;TableSelection&gt; MultiSelectedRegions { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Stack&lt;TableView.TableSelection&gt; MultiSelectedRegions { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -664,7 +664,7 @@ When <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_Mu
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.Stack</span>&lt;<a class="xref" href="Terminal.Gui.TableSelection.html">TableSelection</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.Stack</span>&lt;<a class="xref" href="Terminal.Gui.TableView.TableSelection.html">TableView.TableSelection</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -814,7 +814,7 @@ Contains options for changing how the table is rendered
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TableStyle Style { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public TableView.TableStyle Style { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -826,7 +826,7 @@ Contains options for changing how the table is rendered
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.TableStyle.html">TableStyle</a></td>
+        <td><a class="xref" href="Terminal.Gui.TableView.TableStyle.html">TableView.TableStyle</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -1070,7 +1070,9 @@ Returns true if the given cell is selected either because it is the active cell 
   
   <a id="Terminal_Gui_TableView_MouseEvent_" data-uid="Terminal.Gui.TableView.MouseEvent*"></a>
   <h4 id="Terminal_Gui_TableView_MouseEvent_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.TableView.MouseEvent(Terminal.Gui.MouseEvent)">MouseEvent(MouseEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Method invoked when a mouse event is generated
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1104,7 +1106,7 @@ Returns true if the given cell is selected either because it is the active cell 
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td><code>true</code>, if the event was handled, <code>false</code> otherwise.</td>
       </tr>
     </tbody>
   </table>
@@ -1142,14 +1144,14 @@ Invokes the <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_Table
   
   
   <a id="Terminal_Gui_TableView_OnSelectedCellChanged_" data-uid="Terminal.Gui.TableView.OnSelectedCellChanged*"></a>
-  <h4 id="Terminal_Gui_TableView_OnSelectedCellChanged_Terminal_Gui_SelectedCellChangedEventArgs_" data-uid="Terminal.Gui.TableView.OnSelectedCellChanged(Terminal.Gui.SelectedCellChangedEventArgs)">OnSelectedCellChanged(SelectedCellChangedEventArgs)</h4>
+  <h4 id="Terminal_Gui_TableView_OnSelectedCellChanged_Terminal_Gui_TableView_SelectedCellChangedEventArgs_" data-uid="Terminal.Gui.TableView.OnSelectedCellChanged(Terminal.Gui.TableView.SelectedCellChangedEventArgs)">OnSelectedCellChanged(TableView.SelectedCellChangedEventArgs)</h4>
   <div class="markdown level1 summary">
 Invokes the <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_SelectedCellChanged">SelectedCellChanged</a> event
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected virtual void OnSelectedCellChanged(SelectedCellChangedEventArgs args)</code></pre>
+    <pre><code class="lang-csharp hljs">protected virtual void OnSelectedCellChanged(TableView.SelectedCellChangedEventArgs args)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1162,7 +1164,7 @@ Invokes the <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_Table
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.SelectedCellChangedEventArgs.html">SelectedCellChangedEventArgs</a></td>
+        <td><a class="xref" href="Terminal.Gui.TableView.SelectedCellChangedEventArgs.html">TableView.SelectedCellChangedEventArgs</a></td>
         <td><span class="parametername">args</span></td>
         <td></td>
       </tr>
@@ -1186,7 +1188,10 @@ Positions the cursor in the area of the screen in which the start of the active 
   
   <a id="Terminal_Gui_TableView_ProcessKey_" data-uid="Terminal.Gui.TableView.ProcessKey*"></a>
   <h4 id="Terminal_Gui_TableView_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.TableView.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+If the view is focused, gives the view a
+chance to process the keystroke.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1205,7 +1210,7 @@ Positions the cursor in the area of the screen in which the start of the active 
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td></td>
+        <td>Contains the details about the key that produced the event.</td>
       </tr>
     </tbody>
   </table>
@@ -1226,11 +1231,32 @@ Positions the cursor in the area of the screen in which the start of the active 
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
+  <h5 id="Terminal_Gui_TableView_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  Views can override this method if they are
+  interested in processing the given keystroke.
+  If they consume the keystroke, they must
+  return true to stop the keystroke from being
+  processed by other widgets or consumed by the
+  widget engine.    If they return false, the
+  keystroke will be passed using the ProcessColdKey
+  method to other views to process.
+</p>
+<p>
+  The View implementation does nothing but return false,
+  so it is not necessary to call base.ProcessKey if you
+  derive directly from View, but you should if you derive
+  other View subclasses.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_TableView_Redraw_" data-uid="Terminal.Gui.TableView.Redraw*"></a>
   <h4 id="Terminal_Gui_TableView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.TableView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -1249,12 +1275,26 @@ Positions the cursor in the area of the screen in which the start of the active 
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">bounds</span></td>
-        <td></td>
+        <td>The bounds (view-relative region) to redraw.</td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
+  <h5 id="Terminal_Gui_TableView_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
+</p>
+<p>
+   Views should set the color that they want to use on entry, as otherwise this will inherit
+   the last color that was set globally on the driver.
+</p>
+<p>
+   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
+   larger than the <code>region</code> parameter.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_TableView_ScreenToCell_" data-uid="Terminal.Gui.TableView.ScreenToCell*"></a>
@@ -1406,7 +1446,7 @@ This event is raised when the selected cell in the table changes.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public event Action&lt;SelectedCellChangedEventArgs&gt; SelectedCellChanged</code></pre>
+    <pre><code class="lang-csharp hljs">public event Action&lt;TableView.SelectedCellChangedEventArgs&gt; SelectedCellChanged</code></pre>
   </div>
   <h5 class="eventType">Event Type</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1418,7 +1458,7 @@ This event is raised when the selected cell in the table changes.
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.SelectedCellChangedEventArgs.html">SelectedCellChangedEventArgs</a>&gt;</td>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Terminal.Gui.TableView.SelectedCellChangedEventArgs.html">TableView.SelectedCellChangedEventArgs</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>

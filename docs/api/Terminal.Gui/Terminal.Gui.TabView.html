@@ -515,7 +515,7 @@ The currently selected member of <a class="xref" href="Terminal.Gui.TabView.html
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Tab SelectedTab { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public TabView.Tab SelectedTab { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -527,7 +527,7 @@ The currently selected member of <a class="xref" href="Terminal.Gui.TabView.html
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Tab.html">Tab</a></td>
+        <td><a class="xref" href="Terminal.Gui.TabView.Tab.html">TabView.Tab</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -542,7 +542,7 @@ Render choices for how to display tabs.  After making changes, call <a class="xr
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TabStyle Style { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public TabView.TabStyle Style { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -554,7 +554,7 @@ Render choices for how to display tabs.  After making changes, call <a class="xr
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.TabStyle.html">TabStyle</a></td>
+        <td><a class="xref" href="Terminal.Gui.TabView.TabStyle.html">TabView.TabStyle</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -569,7 +569,7 @@ All tabs currently hosted by the control
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IReadOnlyCollection&lt;Tab&gt; Tabs { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public IReadOnlyCollection&lt;TabView.Tab&gt; Tabs { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -581,7 +581,7 @@ All tabs currently hosted by the control
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyCollection</span>&lt;<a class="xref" href="Terminal.Gui.Tab.html">Tab</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IReadOnlyCollection</span>&lt;<a class="xref" href="Terminal.Gui.TabView.Tab.html">TabView.Tab</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -619,14 +619,14 @@ tab to render on the screen.
   
   
   <a id="Terminal_Gui_TabView_AddTab_" data-uid="Terminal.Gui.TabView.AddTab*"></a>
-  <h4 id="Terminal_Gui_TabView_AddTab_Terminal_Gui_Tab_System_Boolean_" data-uid="Terminal.Gui.TabView.AddTab(Terminal.Gui.Tab,System.Boolean)">AddTab(Tab, Boolean)</h4>
+  <h4 id="Terminal_Gui_TabView_AddTab_Terminal_Gui_TabView_Tab_System_Boolean_" data-uid="Terminal.Gui.TabView.AddTab(Terminal.Gui.TabView.Tab,System.Boolean)">AddTab(TabView.Tab, Boolean)</h4>
   <div class="markdown level1 summary">
 Adds the given <code data-dev-comment-type="paramref" class="paramref">tab</code> to <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_Tabs">Tabs</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void AddTab(Tab tab, bool andSelect)</code></pre>
+    <pre><code class="lang-csharp hljs">public void AddTab(TabView.Tab tab, bool andSelect)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -639,7 +639,7 @@ Adds the given <code data-dev-comment-type="paramref" class="paramref">tab</code
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Tab.html">Tab</a></td>
+        <td><a class="xref" href="Terminal.Gui.TabView.Tab.html">TabView.Tab</a></td>
         <td><span class="parametername">tab</span></td>
         <td></td>
       </tr>
@@ -725,14 +725,14 @@ Updates <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_Tab
   
   
   <a id="Terminal_Gui_TabView_OnSelectedTabChanged_" data-uid="Terminal.Gui.TabView.OnSelectedTabChanged*"></a>
-  <h4 id="Terminal_Gui_TabView_OnSelectedTabChanged_Terminal_Gui_Tab_Terminal_Gui_Tab_" data-uid="Terminal.Gui.TabView.OnSelectedTabChanged(Terminal.Gui.Tab,Terminal.Gui.Tab)">OnSelectedTabChanged(Tab, Tab)</h4>
+  <h4 id="Terminal_Gui_TabView_OnSelectedTabChanged_Terminal_Gui_TabView_Tab_Terminal_Gui_TabView_Tab_" data-uid="Terminal.Gui.TabView.OnSelectedTabChanged(Terminal.Gui.TabView.Tab,Terminal.Gui.TabView.Tab)">OnSelectedTabChanged(TabView.Tab, TabView.Tab)</h4>
   <div class="markdown level1 summary">
 Raises the <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_SelectedTabChanged">SelectedTabChanged</a> event
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected virtual void OnSelectedTabChanged(Tab oldTab, Tab newTab)</code></pre>
+    <pre><code class="lang-csharp hljs">protected virtual void OnSelectedTabChanged(TabView.Tab oldTab, TabView.Tab newTab)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -745,12 +745,12 @@ Raises the <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Tab.html">Tab</a></td>
+        <td><a class="xref" href="Terminal.Gui.TabView.Tab.html">TabView.Tab</a></td>
         <td><span class="parametername">oldTab</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Tab.html">Tab</a></td>
+        <td><a class="xref" href="Terminal.Gui.TabView.Tab.html">TabView.Tab</a></td>
         <td><span class="parametername">newTab</span></td>
         <td></td>
       </tr>
@@ -760,7 +760,10 @@ Raises the <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_
   
   <a id="Terminal_Gui_TabView_ProcessKey_" data-uid="Terminal.Gui.TabView.ProcessKey*"></a>
   <h4 id="Terminal_Gui_TabView_ProcessKey_Terminal_Gui_KeyEvent_" data-uid="Terminal.Gui.TabView.ProcessKey(Terminal.Gui.KeyEvent)">ProcessKey(KeyEvent)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+If the view is focused, gives the view a
+chance to process the keystroke.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -779,7 +782,7 @@ Raises the <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_
       <tr>
         <td><a class="xref" href="Terminal.Gui.KeyEvent.html">KeyEvent</a></td>
         <td><span class="parametername">keyEvent</span></td>
-        <td></td>
+        <td>Contains the details about the key that produced the event.</td>
       </tr>
     </tbody>
   </table>
@@ -800,11 +803,32 @@ Raises the <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_ProcessKey_Terminal_Gui_KeyEvent_">View.ProcessKey(KeyEvent)</a></div>
+  <h5 id="Terminal_Gui_TabView_ProcessKey_Terminal_Gui_KeyEvent__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+  Views can override this method if they are
+  interested in processing the given keystroke.
+  If they consume the keystroke, they must
+  return true to stop the keystroke from being
+  processed by other widgets or consumed by the
+  widget engine.    If they return false, the
+  keystroke will be passed using the ProcessColdKey
+  method to other views to process.
+</p>
+<p>
+  The View implementation does nothing but return false,
+  so it is not necessary to call base.ProcessKey if you
+  derive directly from View, but you should if you derive
+  other View subclasses.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_TabView_Redraw_" data-uid="Terminal.Gui.TabView.Redraw*"></a>
   <h4 id="Terminal_Gui_TabView_Redraw_Terminal_Gui_Rect_" data-uid="Terminal.Gui.TabView.Redraw(Terminal.Gui.Rect)">Redraw(Rect)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -823,25 +847,39 @@ Raises the <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_
       <tr>
         <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
         <td><span class="parametername">bounds</span></td>
-        <td></td>
+        <td>The bounds (view-relative region) to redraw.</td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">View.Redraw(Rect)</a></div>
+  <h5 id="Terminal_Gui_TabView_Redraw_Terminal_Gui_Rect__remarks">Remarks</h5>
+  <div class="markdown level1 remarks">
+<p>
+   Always use <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a> (view-relative) when calling <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a>, NOT <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> (superview-relative).
+</p>
+<p>
+   Views should set the color that they want to use on entry, as otherwise this will inherit
+   the last color that was set globally on the driver.
+</p>
+<p>
+   Overrides of <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Redraw_Terminal_Gui_Rect_">Redraw(Rect)</a> must ensure they do not set <code>Driver.Clip</code> to a clip region
+   larger than the <code>region</code> parameter.
+</p>
+</div>
   
   
   <a id="Terminal_Gui_TabView_RemoveTab_" data-uid="Terminal.Gui.TabView.RemoveTab*"></a>
-  <h4 id="Terminal_Gui_TabView_RemoveTab_Terminal_Gui_Tab_" data-uid="Terminal.Gui.TabView.RemoveTab(Terminal.Gui.Tab)">RemoveTab(Tab)</h4>
+  <h4 id="Terminal_Gui_TabView_RemoveTab_Terminal_Gui_TabView_Tab_" data-uid="Terminal.Gui.TabView.RemoveTab(Terminal.Gui.TabView.Tab)">RemoveTab(TabView.Tab)</h4>
   <div class="markdown level1 summary">
 Removes the given <code data-dev-comment-type="paramref" class="paramref">tab</code> from <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_Tabs">Tabs</a>.
-Caller is responsible for disposing the tab&apos;s hosted <a class="xref" href="Terminal.Gui.Tab.html#Terminal_Gui_Tab_View">View</a>
+Caller is responsible for disposing the tab&apos;s hosted <a class="xref" href="Terminal.Gui.TabView.Tab.html#Terminal_Gui_TabView_Tab_View">View</a>
 if appropriate.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void RemoveTab(Tab tab)</code></pre>
+    <pre><code class="lang-csharp hljs">public void RemoveTab(TabView.Tab tab)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -854,7 +892,7 @@ if appropriate.
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.Tab.html">Tab</a></td>
+        <td><a class="xref" href="Terminal.Gui.TabView.Tab.html">TabView.Tab</a></td>
         <td><span class="parametername">tab</span></td>
         <td></td>
       </tr>
@@ -902,7 +940,7 @@ Event for when <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabV
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public event EventHandler&lt;TabChangedEventArgs&gt; SelectedTabChanged</code></pre>
+    <pre><code class="lang-csharp hljs">public event EventHandler&lt;TabView.TabChangedEventArgs&gt; SelectedTabChanged</code></pre>
   </div>
   <h5 class="eventType">Event Type</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -914,7 +952,7 @@ Event for when <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabV
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.EventHandler</span>&lt;<a class="xref" href="Terminal.Gui.TabChangedEventArgs.html">TabChangedEventArgs</a>&gt;</td>
+        <td><span class="xref">System.EventHandler</span>&lt;<a class="xref" href="Terminal.Gui.TabView.TabChangedEventArgs.html">TabView.TabChangedEventArgs</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>

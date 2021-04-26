@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class TabStyle
+    <title>Class TableView.SelectedCellChangedEventArgs
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class TabStyle
+    <meta name="title" content="Class TableView.SelectedCellChangedEventArgs
    ">
     <meta name="generator" content="docfx 2.56.7.0">
     
@@ -78,22 +78,26 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Terminal.Gui.TabStyle">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.TableView.SelectedCellChangedEventArgs">
   
   
-  <h1 id="Terminal_Gui_TabStyle" data-uid="Terminal.Gui.TabStyle" class="text-break">Class TabStyle
+  <h1 id="Terminal_Gui_TableView_SelectedCellChangedEventArgs" data-uid="Terminal.Gui.TableView.SelectedCellChangedEventArgs" class="text-break">Class TableView.SelectedCellChangedEventArgs
   </h1>
   <div class="markdown level0 summary">
-Describes render stylistic selections of a <a class="xref" href="Terminal.Gui.TabView.html">TabView</a>
+Defines the event arguments for <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_SelectedCellChanged">SelectedCellChanged</a> 
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><span class="xref">System.Object</span></div>
-    <div class="level1"><span class="xref">TabStyle</span></div>
+    <div class="level1"><span class="xref">System.EventArgs</span></div>
+    <div class="level2"><span class="xref">TableView.SelectedCellChangedEventArgs</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.EventArgs.Empty</span>
+    </div>
     <div>
       <span class="xref">System.Object.Equals(System.Object)</span>
     </div>
@@ -118,23 +122,74 @@ Describes render stylistic selections of a <a class="xref" href="Terminal.Gui.Ta
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Terminal_Gui_TabStyle_syntax">Syntax</h5>
+  <h5 id="Terminal_Gui_TableView_SelectedCellChangedEventArgs_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class TabStyle</code></pre>
+    <pre><code class="lang-csharp hljs">public class SelectedCellChangedEventArgs : EventArgs</code></pre>
   </div>
+  <h3 id="constructors">Constructors
+  </h3>
+  
+  
+  <a id="Terminal_Gui_TableView_SelectedCellChangedEventArgs__ctor_" data-uid="Terminal.Gui.TableView.SelectedCellChangedEventArgs.#ctor*"></a>
+  <h4 id="Terminal_Gui_TableView_SelectedCellChangedEventArgs__ctor_System_Data_DataTable_System_Int32_System_Int32_System_Int32_System_Int32_" data-uid="Terminal.Gui.TableView.SelectedCellChangedEventArgs.#ctor(System.Data.DataTable,System.Int32,System.Int32,System.Int32,System.Int32)">SelectedCellChangedEventArgs(DataTable, Int32, Int32, Int32, Int32)</h4>
+  <div class="markdown level1 summary">
+Creates a new instance of arguments describing a change in selected cell in a <a class="xref" href="Terminal.Gui.TableView.html">TableView</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SelectedCellChangedEventArgs(DataTable t, int oldCol, int newCol, int oldRow, int newRow)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Data.DataTable</span></td>
+        <td><span class="parametername">t</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">oldCol</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">newCol</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">oldRow</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">newRow</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="properties">Properties
   </h3>
   
   
-  <a id="Terminal_Gui_TabStyle_ShowBorder_" data-uid="Terminal.Gui.TabStyle.ShowBorder*"></a>
-  <h4 id="Terminal_Gui_TabStyle_ShowBorder" data-uid="Terminal.Gui.TabStyle.ShowBorder">ShowBorder</h4>
+  <a id="Terminal_Gui_TableView_SelectedCellChangedEventArgs_NewCol_" data-uid="Terminal.Gui.TableView.SelectedCellChangedEventArgs.NewCol*"></a>
+  <h4 id="Terminal_Gui_TableView_SelectedCellChangedEventArgs_NewCol" data-uid="Terminal.Gui.TableView.SelectedCellChangedEventArgs.NewCol">NewCol</h4>
   <div class="markdown level1 summary">
-True to show a solid box around the edge of the control.  Defaults to true.
+The newly selected column index.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool ShowBorder { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int NewCol { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -146,27 +201,22 @@ True to show a solid box around the edge of the control.  Defaults to true.
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="xref">System.Int32</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_TabStyle_ShowTopLine_" data-uid="Terminal.Gui.TabStyle.ShowTopLine*"></a>
-  <h4 id="Terminal_Gui_TabStyle_ShowTopLine" data-uid="Terminal.Gui.TabStyle.ShowTopLine">ShowTopLine</h4>
+  <a id="Terminal_Gui_TableView_SelectedCellChangedEventArgs_NewRow_" data-uid="Terminal.Gui.TableView.SelectedCellChangedEventArgs.NewRow*"></a>
+  <h4 id="Terminal_Gui_TableView_SelectedCellChangedEventArgs_NewRow" data-uid="Terminal.Gui.TableView.SelectedCellChangedEventArgs.NewRow">NewRow</h4>
   <div class="markdown level1 summary">
-True to show the top lip of tabs.  False to directly begin with tab text during 
-rendering.  When true header line occupies 3 rows, when false only 2.
-Defaults to true.
-
-<p>When <a class="xref" href="Terminal.Gui.TabStyle.html#Terminal_Gui_TabStyle_TabsOnBottom">TabsOnBottom</a> is enabled this instead applies to the
- bottommost line of the control</p>
+The newly selected row index.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool ShowTopLine { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int NewRow { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -178,22 +228,22 @@ Defaults to true.
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="xref">System.Int32</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_TabStyle_TabsOnBottom_" data-uid="Terminal.Gui.TabStyle.TabsOnBottom*"></a>
-  <h4 id="Terminal_Gui_TabStyle_TabsOnBottom" data-uid="Terminal.Gui.TabStyle.TabsOnBottom">TabsOnBottom</h4>
+  <a id="Terminal_Gui_TableView_SelectedCellChangedEventArgs_OldCol_" data-uid="Terminal.Gui.TableView.SelectedCellChangedEventArgs.OldCol*"></a>
+  <h4 id="Terminal_Gui_TableView_SelectedCellChangedEventArgs_OldCol" data-uid="Terminal.Gui.TableView.SelectedCellChangedEventArgs.OldCol">OldCol</h4>
   <div class="markdown level1 summary">
-True to render tabs at the bottom of the view instead of the top
+The previous selected column index.  May be invalid e.g. when the selection has been changed as a result of replacing the existing Table with a smaller one
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool TabsOnBottom { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int OldCol { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -205,7 +255,61 @@ True to render tabs at the bottom of the view instead of the top
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TableView_SelectedCellChangedEventArgs_OldRow_" data-uid="Terminal.Gui.TableView.SelectedCellChangedEventArgs.OldRow*"></a>
+  <h4 id="Terminal_Gui_TableView_SelectedCellChangedEventArgs_OldRow" data-uid="Terminal.Gui.TableView.SelectedCellChangedEventArgs.OldRow">OldRow</h4>
+  <div class="markdown level1 summary">
+The previous selected row index.  May be invalid e.g. when the selection has been changed as a result of deleting rows from the table
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int OldRow { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TableView_SelectedCellChangedEventArgs_Table_" data-uid="Terminal.Gui.TableView.SelectedCellChangedEventArgs.Table*"></a>
+  <h4 id="Terminal_Gui_TableView_SelectedCellChangedEventArgs_Table" data-uid="Terminal.Gui.TableView.SelectedCellChangedEventArgs.Table">Table</h4>
+  <div class="markdown level1 summary">
+The current table to which the new indexes refer.  May be null e.g. if selection change is the result of clearing the table from the view
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DataTable Table { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Data.DataTable</span></td>
         <td></td>
       </tr>
     </tbody>

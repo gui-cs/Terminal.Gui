@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class ColumnStyle
+    <title>Class TreeStyle
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class ColumnStyle
+    <meta name="title" content="Class TreeStyle
    ">
     <meta name="generator" content="docfx 2.56.7.0">
     
@@ -78,22 +78,19 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Terminal.Gui.ColumnStyle">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.Trees.TreeStyle">
   
   
-  <h1 id="Terminal_Gui_ColumnStyle" data-uid="Terminal.Gui.ColumnStyle" class="text-break">Class ColumnStyle
+  <h1 id="Terminal_Gui_Trees_TreeStyle" data-uid="Terminal.Gui.Trees.TreeStyle" class="text-break">Class TreeStyle
   </h1>
   <div class="markdown level0 summary">
-Describes how to render a given column in  a <a class="xref" href="Terminal.Gui.TableView.html">TableView</a> including <a class="xref" href="Terminal.Gui.ColumnStyle.html#Terminal_Gui_ColumnStyle_Alignment">Alignment</a> 
-and textual representation of cells (e.g. date formats)
-
-<a href="https://migueldeicaza.github.io/gui.cs/articles/tableview.html">See TableView Deep Dive for more information</a>.
+Defines rendering options that affect how the tree is displayed
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><span class="xref">System.Object</span></div>
-    <div class="level1"><span class="xref">ColumnStyle</span></div>
+    <div class="level1"><span class="xref">TreeStyle</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -119,79 +116,26 @@ and textual representation of cells (e.g. date formats)
       <span class="xref">System.Object.ToString()</span>
     </div>
   </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.Trees.html">Terminal.Gui.Trees</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Terminal_Gui_ColumnStyle_syntax">Syntax</h5>
+  <h5 id="Terminal_Gui_Trees_TreeStyle_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ColumnStyle</code></pre>
+    <pre><code class="lang-csharp hljs">public class TreeStyle</code></pre>
   </div>
-  <h3 id="fields">Fields
-  </h3>
-  
-  
-  <h4 id="Terminal_Gui_ColumnStyle_AlignmentGetter" data-uid="Terminal.Gui.ColumnStyle.AlignmentGetter">AlignmentGetter</h4>
-  <div class="markdown level1 summary">
-Defines a delegate for returning custom alignment per cell based on cell values.  When specified this will override <a class="xref" href="Terminal.Gui.ColumnStyle.html#Terminal_Gui_ColumnStyle_Alignment">Alignment</a>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Func&lt;object, TextAlignment&gt; AlignmentGetter</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Object</span>, <a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <h4 id="Terminal_Gui_ColumnStyle_RepresentationGetter" data-uid="Terminal.Gui.ColumnStyle.RepresentationGetter">RepresentationGetter</h4>
-  <div class="markdown level1 summary">
-Defines a delegate for returning custom representations of cell values.  If not set then <span class="xref">System.Object.ToString()</span> is used.  Return values from your delegate may be truncated e.g. based on <a class="xref" href="Terminal.Gui.ColumnStyle.html#Terminal_Gui_ColumnStyle_MaxWidth">MaxWidth</a>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Func&lt;object, string&gt; RepresentationGetter</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Object</span>, <span class="xref">System.String</span>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
   <h3 id="properties">Properties
   </h3>
   
   
-  <a id="Terminal_Gui_ColumnStyle_Alignment_" data-uid="Terminal.Gui.ColumnStyle.Alignment*"></a>
-  <h4 id="Terminal_Gui_ColumnStyle_Alignment" data-uid="Terminal.Gui.ColumnStyle.Alignment">Alignment</h4>
+  <a id="Terminal_Gui_Trees_TreeStyle_CollapseableSymbol_" data-uid="Terminal.Gui.Trees.TreeStyle.CollapseableSymbol*"></a>
+  <h4 id="Terminal_Gui_Trees_TreeStyle_CollapseableSymbol" data-uid="Terminal.Gui.Trees.TreeStyle.CollapseableSymbol">CollapseableSymbol</h4>
   <div class="markdown level1 summary">
-Defines the default alignment for all values rendered in this column.  For custom alignment based on cell contents use <a class="xref" href="Terminal.Gui.ColumnStyle.html#Terminal_Gui_ColumnStyle_AlignmentGetter">AlignmentGetter</a>.
+Symbol to use for branch nodes that can be collapsed (are currently expanded).
+Defaults to &apos;-&apos;.  Set to null to hide
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TextAlignment Alignment { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Rune? CollapseableSymbol { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -203,22 +147,22 @@ Defines the default alignment for all values rendered in this column.  For custo
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a></td>
+        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.Rune</span>&gt;</td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_ColumnStyle_Format_" data-uid="Terminal.Gui.ColumnStyle.Format*"></a>
-  <h4 id="Terminal_Gui_ColumnStyle_Format" data-uid="Terminal.Gui.ColumnStyle.Format">Format</h4>
+  <a id="Terminal_Gui_Trees_TreeStyle_ColorExpandSymbol_" data-uid="Terminal.Gui.Trees.TreeStyle.ColorExpandSymbol*"></a>
+  <h4 id="Terminal_Gui_Trees_TreeStyle_ColorExpandSymbol" data-uid="Terminal.Gui.Trees.TreeStyle.ColorExpandSymbol">ColorExpandSymbol</h4>
   <div class="markdown level1 summary">
-Defines the format for values e.g. &quot;yyyy-MM-dd&quot; for dates
+Set to true to highlight expand/collapse symbols in hot key color
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string Format { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool ColorExpandSymbol { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -230,22 +174,23 @@ Defines the format for values e.g. &quot;yyyy-MM-dd&quot; for dates
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><span class="xref">System.Boolean</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_ColumnStyle_MaxWidth_" data-uid="Terminal.Gui.ColumnStyle.MaxWidth*"></a>
-  <h4 id="Terminal_Gui_ColumnStyle_MaxWidth" data-uid="Terminal.Gui.ColumnStyle.MaxWidth">MaxWidth</h4>
+  <a id="Terminal_Gui_Trees_TreeStyle_ExpandableSymbol_" data-uid="Terminal.Gui.Trees.TreeStyle.ExpandableSymbol*"></a>
+  <h4 id="Terminal_Gui_Trees_TreeStyle_ExpandableSymbol" data-uid="Terminal.Gui.Trees.TreeStyle.ExpandableSymbol">ExpandableSymbol</h4>
   <div class="markdown level1 summary">
-Set the maximum width of the column in characters.  This value will be ignored if more than the tables <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_MaxCellWidth">MaxCellWidth</a>.  Defaults to <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_DefaultMaxCellWidth">DefaultMaxCellWidth</a>
+Symbol to use for branch nodes that can be expanded to indicate this to the user.  
+Defaults to &apos;+&apos;. Set to null to hide
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int MaxWidth { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Rune? ExpandableSymbol { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -257,22 +202,22 @@ Set the maximum width of the column in characters.  This value will be ignored i
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Int32</span></td>
+        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.Rune</span>&gt;</td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_ColumnStyle_MinWidth_" data-uid="Terminal.Gui.ColumnStyle.MinWidth*"></a>
-  <h4 id="Terminal_Gui_ColumnStyle_MinWidth" data-uid="Terminal.Gui.ColumnStyle.MinWidth">MinWidth</h4>
+  <a id="Terminal_Gui_Trees_TreeStyle_InvertExpandSymbolColors_" data-uid="Terminal.Gui.Trees.TreeStyle.InvertExpandSymbolColors*"></a>
+  <h4 id="Terminal_Gui_Trees_TreeStyle_InvertExpandSymbolColors" data-uid="Terminal.Gui.Trees.TreeStyle.InvertExpandSymbolColors">InvertExpandSymbolColors</h4>
   <div class="markdown level1 summary">
-Set the minimum width of the column in characters.  This value will be ignored if more than the tables <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_MaxCellWidth">MaxCellWidth</a> or the <a class="xref" href="Terminal.Gui.ColumnStyle.html#Terminal_Gui_ColumnStyle_MaxWidth">MaxWidth</a>
+Invert console colours used to render the expand symbol
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int MinWidth { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool InvertExpandSymbolColors { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -284,43 +229,26 @@ Set the minimum width of the column in characters.  This value will be ignored i
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Int32</span></td>
+        <td><span class="xref">System.Boolean</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
-  <h3 id="methods">Methods
-  </h3>
   
   
-  <a id="Terminal_Gui_ColumnStyle_GetAlignment_" data-uid="Terminal.Gui.ColumnStyle.GetAlignment*"></a>
-  <h4 id="Terminal_Gui_ColumnStyle_GetAlignment_System_Object_" data-uid="Terminal.Gui.ColumnStyle.GetAlignment(System.Object)">GetAlignment(Object)</h4>
+  <a id="Terminal_Gui_Trees_TreeStyle_LeaveLastRow_" data-uid="Terminal.Gui.Trees.TreeStyle.LeaveLastRow*"></a>
+  <h4 id="Terminal_Gui_Trees_TreeStyle_LeaveLastRow" data-uid="Terminal.Gui.Trees.TreeStyle.LeaveLastRow">LeaveLastRow</h4>
   <div class="markdown level1 summary">
-Returns the alignment for the cell based on <code data-dev-comment-type="paramref" class="paramref">cellValue</code> and <a class="xref" href="Terminal.Gui.ColumnStyle.html#Terminal_Gui_ColumnStyle_AlignmentGetter">AlignmentGetter</a>/<a class="xref" href="Terminal.Gui.ColumnStyle.html#Terminal_Gui_ColumnStyle_Alignment">Alignment</a>
+True to leave the last row of the control free for overwritting (e.g. by a scrollbar)
+When True scrolling will be triggered on the second last row of the control rather than
+the last.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TextAlignment GetAlignment(object cellValue)</code></pre>
+    <pre><code class="lang-csharp hljs">public bool LeaveLastRow { get; set; }</code></pre>
   </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Object</span></td>
-        <td><span class="parametername">cellValue</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
+  <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -330,41 +258,25 @@ Returns the alignment for the cell based on <code data-dev-comment-type="paramre
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a></td>
+        <td><span class="xref">System.Boolean</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_ColumnStyle_GetRepresentation_" data-uid="Terminal.Gui.ColumnStyle.GetRepresentation*"></a>
-  <h4 id="Terminal_Gui_ColumnStyle_GetRepresentation_System_Object_" data-uid="Terminal.Gui.ColumnStyle.GetRepresentation(System.Object)">GetRepresentation(Object)</h4>
+  <a id="Terminal_Gui_Trees_TreeStyle_ShowBranchLines_" data-uid="Terminal.Gui.Trees.TreeStyle.ShowBranchLines*"></a>
+  <h4 id="Terminal_Gui_Trees_TreeStyle_ShowBranchLines" data-uid="Terminal.Gui.Trees.TreeStyle.ShowBranchLines">ShowBranchLines</h4>
   <div class="markdown level1 summary">
-Returns the full string to render (which may be truncated if too long) that the current style says best represents the given <code data-dev-comment-type="paramref" class="paramref">value</code>
+True to render vertical lines under expanded nodes to show which node belongs to which 
+parent.  False to use only whitespace
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string GetRepresentation(object value)</code></pre>
+    <pre><code class="lang-csharp hljs">public bool ShowBranchLines { get; set; }</code></pre>
   </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Object</span></td>
-        <td><span class="parametername">value</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
+  <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -374,7 +286,7 @@ Returns the full string to render (which may be truncated if too long) that the 
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><span class="xref">System.Boolean</span></td>
         <td></td>
       </tr>
     </tbody>

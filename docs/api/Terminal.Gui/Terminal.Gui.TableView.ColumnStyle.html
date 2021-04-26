@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class TableStyle
+    <title>Class TableView.ColumnStyle
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class TableStyle
+    <meta name="title" content="Class TableView.ColumnStyle
    ">
     <meta name="generator" content="docfx 2.56.7.0">
     
@@ -78,13 +78,14 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Terminal.Gui.TableStyle">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.TableView.ColumnStyle">
   
   
-  <h1 id="Terminal_Gui_TableStyle" data-uid="Terminal.Gui.TableStyle" class="text-break">Class TableStyle
+  <h1 id="Terminal_Gui_TableView_ColumnStyle" data-uid="Terminal.Gui.TableView.ColumnStyle" class="text-break">Class TableView.ColumnStyle
   </h1>
   <div class="markdown level0 summary">
-Defines rendering options that affect how the table is displayed.
+Describes how to render a given column in  a <a class="xref" href="Terminal.Gui.TableView.html">TableView</a> including <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_Alignment">Alignment</a> 
+and textual representation of cells (e.g. date formats)
 
 <a href="https://migueldeicaza.github.io/gui.cs/articles/tableview.html">See TableView Deep Dive for more information</a>.
 </div>
@@ -92,7 +93,7 @@ Defines rendering options that affect how the table is displayed.
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><span class="xref">System.Object</span></div>
-    <div class="level1"><span class="xref">TableStyle</span></div>
+    <div class="level1"><span class="xref">TableView.ColumnStyle</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -120,23 +121,77 @@ Defines rendering options that affect how the table is displayed.
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Terminal_Gui_TableStyle_syntax">Syntax</h5>
+  <h5 id="Terminal_Gui_TableView_ColumnStyle_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class TableStyle</code></pre>
+    <pre><code class="lang-csharp hljs">public class ColumnStyle</code></pre>
   </div>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_AlignmentGetter" data-uid="Terminal.Gui.TableView.ColumnStyle.AlignmentGetter">AlignmentGetter</h4>
+  <div class="markdown level1 summary">
+Defines a delegate for returning custom alignment per cell based on cell values.  When specified this will override <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_Alignment">Alignment</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;object, TextAlignment&gt; AlignmentGetter</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Object</span>, <a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_RepresentationGetter" data-uid="Terminal.Gui.TableView.ColumnStyle.RepresentationGetter">RepresentationGetter</h4>
+  <div class="markdown level1 summary">
+Defines a delegate for returning custom representations of cell values.  If not set then <span class="xref">System.Object.ToString()</span> is used.  Return values from your delegate may be truncated e.g. based on <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_MaxWidth">MaxWidth</a>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;object, string&gt; RepresentationGetter</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Object</span>, <span class="xref">System.String</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="properties">Properties
   </h3>
   
   
-  <a id="Terminal_Gui_TableStyle_AlwaysShowHeaders_" data-uid="Terminal.Gui.TableStyle.AlwaysShowHeaders*"></a>
-  <h4 id="Terminal_Gui_TableStyle_AlwaysShowHeaders" data-uid="Terminal.Gui.TableStyle.AlwaysShowHeaders">AlwaysShowHeaders</h4>
+  <a id="Terminal_Gui_TableView_ColumnStyle_Alignment_" data-uid="Terminal.Gui.TableView.ColumnStyle.Alignment*"></a>
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_Alignment" data-uid="Terminal.Gui.TableView.ColumnStyle.Alignment">Alignment</h4>
   <div class="markdown level1 summary">
-When scrolling down always lock the column headers in place as the first row of the table
+Defines the default alignment for all values rendered in this column.  For custom alignment based on cell contents use <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_AlignmentGetter">AlignmentGetter</a>.
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool AlwaysShowHeaders { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public TextAlignment Alignment { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -148,22 +203,22 @@ When scrolling down always lock the column headers in place as the first row of 
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_TableStyle_ColumnStyles_" data-uid="Terminal.Gui.TableStyle.ColumnStyles*"></a>
-  <h4 id="Terminal_Gui_TableStyle_ColumnStyles" data-uid="Terminal.Gui.TableStyle.ColumnStyles">ColumnStyles</h4>
+  <a id="Terminal_Gui_TableView_ColumnStyle_Format_" data-uid="Terminal.Gui.TableView.ColumnStyle.Format*"></a>
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_Format" data-uid="Terminal.Gui.TableView.ColumnStyle.Format">Format</h4>
   <div class="markdown level1 summary">
-Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)
+Defines the format for values e.g. &quot;yyyy-MM-dd&quot; for dates
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Dictionary&lt;DataColumn, ColumnStyle&gt; ColumnStyles { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public string Format { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -175,22 +230,22 @@ Collection of columns for which you want special rendering (e.g. custom column l
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.Dictionary</span>&lt;<span class="xref">System.Data.DataColumn</span>, <a class="xref" href="Terminal.Gui.ColumnStyle.html">ColumnStyle</a>&gt;</td>
+        <td><span class="xref">System.String</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_TableStyle_ShowHorizontalHeaderOverline_" data-uid="Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline*"></a>
-  <h4 id="Terminal_Gui_TableStyle_ShowHorizontalHeaderOverline" data-uid="Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline">ShowHorizontalHeaderOverline</h4>
+  <a id="Terminal_Gui_TableView_ColumnStyle_MaxWidth_" data-uid="Terminal.Gui.TableView.ColumnStyle.MaxWidth*"></a>
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_MaxWidth" data-uid="Terminal.Gui.TableView.ColumnStyle.MaxWidth">MaxWidth</h4>
   <div class="markdown level1 summary">
-True to render a solid line above the headers
+Set the maximum width of the column in characters.  This value will be ignored if more than the tables <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_MaxCellWidth">MaxCellWidth</a>.  Defaults to <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_DefaultMaxCellWidth">DefaultMaxCellWidth</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool ShowHorizontalHeaderOverline { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int MaxWidth { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -202,22 +257,22 @@ True to render a solid line above the headers
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="xref">System.Int32</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_TableStyle_ShowHorizontalHeaderUnderline_" data-uid="Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline*"></a>
-  <h4 id="Terminal_Gui_TableStyle_ShowHorizontalHeaderUnderline" data-uid="Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline">ShowHorizontalHeaderUnderline</h4>
+  <a id="Terminal_Gui_TableView_ColumnStyle_MinWidth_" data-uid="Terminal.Gui.TableView.ColumnStyle.MinWidth*"></a>
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_MinWidth" data-uid="Terminal.Gui.TableView.ColumnStyle.MinWidth">MinWidth</h4>
   <div class="markdown level1 summary">
-True to render a solid line under the headers
+Set the minimum width of the column in characters.  This value will be ignored if more than the tables <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_MaxCellWidth">MaxCellWidth</a> or the <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_MaxWidth">MaxWidth</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool ShowHorizontalHeaderUnderline { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int MinWidth { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -229,61 +284,7 @@ True to render a solid line under the headers
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_TableStyle_ShowVerticalCellLines_" data-uid="Terminal.Gui.TableStyle.ShowVerticalCellLines*"></a>
-  <h4 id="Terminal_Gui_TableStyle_ShowVerticalCellLines" data-uid="Terminal.Gui.TableStyle.ShowVerticalCellLines">ShowVerticalCellLines</h4>
-  <div class="markdown level1 summary">
-True to render a solid line vertical line between cells
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool ShowVerticalCellLines { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_TableStyle_ShowVerticalHeaderLines_" data-uid="Terminal.Gui.TableStyle.ShowVerticalHeaderLines*"></a>
-  <h4 id="Terminal_Gui_TableStyle_ShowVerticalHeaderLines" data-uid="Terminal.Gui.TableStyle.ShowVerticalHeaderLines">ShowVerticalHeaderLines</h4>
-  <div class="markdown level1 summary">
-True to render a solid line vertical line between headers
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool ShowVerticalHeaderLines { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="xref">System.Int32</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -292,15 +293,15 @@ True to render a solid line vertical line between headers
   </h3>
   
   
-  <a id="Terminal_Gui_TableStyle_GetColumnStyleIfAny_" data-uid="Terminal.Gui.TableStyle.GetColumnStyleIfAny*"></a>
-  <h4 id="Terminal_Gui_TableStyle_GetColumnStyleIfAny_System_Data_DataColumn_" data-uid="Terminal.Gui.TableStyle.GetColumnStyleIfAny(System.Data.DataColumn)">GetColumnStyleIfAny(DataColumn)</h4>
+  <a id="Terminal_Gui_TableView_ColumnStyle_GetAlignment_" data-uid="Terminal.Gui.TableView.ColumnStyle.GetAlignment*"></a>
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_GetAlignment_System_Object_" data-uid="Terminal.Gui.TableView.ColumnStyle.GetAlignment(System.Object)">GetAlignment(Object)</h4>
   <div class="markdown level1 summary">
-Returns the entry from <a class="xref" href="Terminal.Gui.TableStyle.html#Terminal_Gui_TableStyle_ColumnStyles">ColumnStyles</a> for the given <code data-dev-comment-type="paramref" class="paramref">col</code> or null if no custom styling is defined for it
+Returns the alignment for the cell based on <code data-dev-comment-type="paramref" class="paramref">cellValue</code> and <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_AlignmentGetter">AlignmentGetter</a>/<a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html#Terminal_Gui_TableView_ColumnStyle_Alignment">Alignment</a>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ColumnStyle GetColumnStyleIfAny(DataColumn col)</code></pre>
+    <pre><code class="lang-csharp hljs">public TextAlignment GetAlignment(object cellValue)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -313,8 +314,8 @@ Returns the entry from <a class="xref" href="Terminal.Gui.TableStyle.html#Termin
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Data.DataColumn</span></td>
-        <td><span class="parametername">col</span></td>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">cellValue</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -329,22 +330,22 @@ Returns the entry from <a class="xref" href="Terminal.Gui.TableStyle.html#Termin
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.ColumnStyle.html">ColumnStyle</a></td>
+        <td><a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="Terminal_Gui_TableStyle_GetOrCreateColumnStyle_" data-uid="Terminal.Gui.TableStyle.GetOrCreateColumnStyle*"></a>
-  <h4 id="Terminal_Gui_TableStyle_GetOrCreateColumnStyle_System_Data_DataColumn_" data-uid="Terminal.Gui.TableStyle.GetOrCreateColumnStyle(System.Data.DataColumn)">GetOrCreateColumnStyle(DataColumn)</h4>
+  <a id="Terminal_Gui_TableView_ColumnStyle_GetRepresentation_" data-uid="Terminal.Gui.TableView.ColumnStyle.GetRepresentation*"></a>
+  <h4 id="Terminal_Gui_TableView_ColumnStyle_GetRepresentation_System_Object_" data-uid="Terminal.Gui.TableView.ColumnStyle.GetRepresentation(System.Object)">GetRepresentation(Object)</h4>
   <div class="markdown level1 summary">
-Returns an existing <a class="xref" href="Terminal.Gui.ColumnStyle.html">ColumnStyle</a> for the given <code data-dev-comment-type="paramref" class="paramref">col</code> or creates a new one with default options
+Returns the full string to render (which may be truncated if too long) that the current style says best represents the given <code data-dev-comment-type="paramref" class="paramref">value</code>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ColumnStyle GetOrCreateColumnStyle(DataColumn col)</code></pre>
+    <pre><code class="lang-csharp hljs">public string GetRepresentation(object value)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -357,8 +358,8 @@ Returns an existing <a class="xref" href="Terminal.Gui.ColumnStyle.html">ColumnS
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Data.DataColumn</span></td>
-        <td><span class="parametername">col</span></td>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">value</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -373,7 +374,7 @@ Returns an existing <a class="xref" href="Terminal.Gui.ColumnStyle.html">ColumnS
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Terminal.Gui.ColumnStyle.html">ColumnStyle</a></td>
+        <td><span class="xref">System.String</span></td>
         <td></td>
       </tr>
     </tbody>

@@ -149,7 +149,10 @@ Empty Constructor
   
   <a id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Fixed_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Fixed*"></a>
   <h4 id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Fixed" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Fixed">Fixed</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Set that this provider uses a fixed width.
+e.g. Masked ones are fixed.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -174,7 +177,9 @@ Empty Constructor
   
   <a id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_IsValid_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.IsValid*"></a>
   <h4 id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_IsValid" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.IsValid">IsValid</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+True if the input is valid, otherwise false.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -199,7 +204,11 @@ Empty Constructor
   
   <a id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Mask_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Mask*"></a>
   <h4 id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Mask" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Mask">Mask</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Mask used for validation.
+Not always a mask, can by a regex expression.
+TODO: Maybe we can change the name.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -224,7 +233,9 @@ Empty Constructor
   
   <a id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Text_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Text*"></a>
   <h4 id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Text" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Text">Text</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Set the input text, and get the formatted string for display.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -251,7 +262,9 @@ Empty Constructor
   
   <a id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Cursor_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Cursor*"></a>
   <h4 id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Cursor_System_Int32_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Cursor(System.Int32)">Cursor(Int32)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Set Cursor position to <code data-dev-comment-type="paramref" class="paramref">pos</code>.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -285,7 +298,7 @@ Empty Constructor
     <tbody>
       <tr>
         <td><span class="xref">System.Int32</span></td>
-        <td></td>
+        <td>Return first valid position.</td>
       </tr>
     </tbody>
   </table>
@@ -293,7 +306,9 @@ Empty Constructor
   
   <a id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorEnd_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorEnd*"></a>
   <h4 id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorEnd" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorEnd">CursorEnd()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Find the last valid character position.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -310,7 +325,7 @@ Empty Constructor
     <tbody>
       <tr>
         <td><span class="xref">System.Int32</span></td>
-        <td></td>
+        <td>New cursor position.</td>
       </tr>
     </tbody>
   </table>
@@ -318,7 +333,9 @@ Empty Constructor
   
   <a id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorLeft_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorLeft*"></a>
   <h4 id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorLeft_System_Int32_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorLeft(System.Int32)">CursorLeft(Int32)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+First valid position before <code data-dev-comment-type="paramref" class="paramref">pos</code>.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -352,7 +369,7 @@ Empty Constructor
     <tbody>
       <tr>
         <td><span class="xref">System.Int32</span></td>
-        <td></td>
+        <td>New cursor position if any, otherwise returns <code data-dev-comment-type="paramref" class="paramref">pos</code></td>
       </tr>
     </tbody>
   </table>
@@ -360,7 +377,9 @@ Empty Constructor
   
   <a id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorRight_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorRight*"></a>
   <h4 id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorRight_System_Int32_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorRight(System.Int32)">CursorRight(Int32)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+First valid position after <code data-dev-comment-type="paramref" class="paramref">pos</code>.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -379,7 +398,7 @@ Empty Constructor
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">pos</span></td>
-        <td></td>
+        <td>Current position.</td>
       </tr>
     </tbody>
   </table>
@@ -394,7 +413,7 @@ Empty Constructor
     <tbody>
       <tr>
         <td><span class="xref">System.Int32</span></td>
-        <td></td>
+        <td>New cursor position if any, otherwise returns <code data-dev-comment-type="paramref" class="paramref">pos</code></td>
       </tr>
     </tbody>
   </table>
@@ -402,7 +421,9 @@ Empty Constructor
   
   <a id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorStart_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorStart*"></a>
   <h4 id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_CursorStart" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.CursorStart">CursorStart()</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Find the first valid character position.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -419,7 +440,7 @@ Empty Constructor
     <tbody>
       <tr>
         <td><span class="xref">System.Int32</span></td>
-        <td></td>
+        <td>New cursor position.</td>
       </tr>
     </tbody>
   </table>
@@ -427,7 +448,9 @@ Empty Constructor
   
   <a id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Delete_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Delete*"></a>
   <h4 id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_Delete_System_Int32_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.Delete(System.Int32)">Delete(Int32)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Deletes the current character in <code data-dev-comment-type="paramref" class="paramref">pos</code>.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -461,7 +484,7 @@ Empty Constructor
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td>true if the character was successfully removed, otherwise false.</td>
       </tr>
     </tbody>
   </table>
@@ -469,7 +492,9 @@ Empty Constructor
   
   <a id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_InsertAt_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.InsertAt*"></a>
   <h4 id="Terminal_Gui_TextValidateProviders_NetMaskedTextProvider_InsertAt_System_Char_System_Int32_" data-uid="Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.InsertAt(System.Char,System.Int32)">InsertAt(Char, Int32)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary">
+Insert character <code data-dev-comment-type="paramref" class="paramref">ch</code> in position <code data-dev-comment-type="paramref" class="paramref">pos</code>.
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -508,7 +533,7 @@ Empty Constructor
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td></td>
+        <td>true if the character was successfully inserted, otherwise false.</td>
       </tr>
     </tbody>
   </table>

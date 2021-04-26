@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class DelegateTreeBuilder&lt;T&gt;
+    <title>Class TableView.TableStyle
    </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class DelegateTreeBuilder&lt;T&gt;
+    <meta name="title" content="Class TableView.TableStyle
    ">
     <meta name="generator" content="docfx 2.56.7.0">
     
@@ -78,30 +78,24 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Terminal.Gui.DelegateTreeBuilder`1">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.TableView.TableStyle">
   
   
-  <h1 id="Terminal_Gui_DelegateTreeBuilder_1" data-uid="Terminal.Gui.DelegateTreeBuilder`1" class="text-break">Class DelegateTreeBuilder&lt;T&gt;
+  <h1 id="Terminal_Gui_TableView_TableStyle" data-uid="Terminal.Gui.TableView.TableStyle" class="text-break">Class TableView.TableStyle
   </h1>
   <div class="markdown level0 summary">
-Implementation of <a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a> that uses user defined functions
+Defines rendering options that affect how the table is displayed.
+
+<a href="https://migueldeicaza.github.io/gui.cs/articles/tableview.html">See TableView Deep Dive for more information</a>.
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><span class="xref">System.Object</span></div>
-    <div class="level1"><a class="xref" href="Terminal.Gui.TreeBuilder-1.html">TreeBuilder</a>&lt;T&gt;</div>
-    <div class="level2"><span class="xref">DelegateTreeBuilder&lt;T&gt;</span></div>
-  </div>
-  <div classs="implements">
-    <h5>Implements</h5>
-    <div><a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder</a>&lt;T&gt;</div>
+    <div class="level1"><span class="xref">TableView.TableStyle</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
-    <div>
-      <a class="xref" href="Terminal.Gui.TreeBuilder-1.html#Terminal_Gui_TreeBuilder_1_SupportsCanExpand">TreeBuilder&lt;T&gt;.SupportsCanExpand</a>
-    </div>
     <div>
       <span class="xref">System.Object.Equals(System.Object)</span>
     </div>
@@ -126,125 +120,25 @@ Implementation of <a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeB
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.Gui.html">Terminal.Gui</a></h6>
   <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
-  <h5 id="Terminal_Gui_DelegateTreeBuilder_1_syntax">Syntax</h5>
+  <h5 id="Terminal_Gui_TableView_TableStyle_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class DelegateTreeBuilder&lt;T&gt; : TreeBuilder&lt;T&gt;, ITreeBuilder&lt;T&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public class TableStyle</code></pre>
   </div>
-  <h5 class="typeParameters">Type Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="parametername">T</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="constructors">Constructors
+  <h3 id="properties">Properties
   </h3>
   
   
-  <a id="Terminal_Gui_DelegateTreeBuilder_1__ctor_" data-uid="Terminal.Gui.DelegateTreeBuilder`1.#ctor*"></a>
-  <h4 id="Terminal_Gui_DelegateTreeBuilder_1__ctor_System_Func__0_System_Collections_Generic_IEnumerable__0___" data-uid="Terminal.Gui.DelegateTreeBuilder`1.#ctor(System.Func{`0,System.Collections.Generic.IEnumerable{`0}})">DelegateTreeBuilder(Func&lt;T, IEnumerable&lt;T&gt;&gt;)</h4>
+  <a id="Terminal_Gui_TableView_TableStyle_AlwaysShowHeaders_" data-uid="Terminal.Gui.TableView.TableStyle.AlwaysShowHeaders*"></a>
+  <h4 id="Terminal_Gui_TableView_TableStyle_AlwaysShowHeaders" data-uid="Terminal.Gui.TableView.TableStyle.AlwaysShowHeaders">AlwaysShowHeaders</h4>
   <div class="markdown level1 summary">
-Constructs an implementation of <a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a> that calls the user 
-defined method <code data-dev-comment-type="paramref" class="paramref">childGetter</code> to determine children
+When scrolling down always lock the column headers in place as the first row of the table
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DelegateTreeBuilder(Func&lt;T, IEnumerable&lt;T&gt;&gt; childGetter)</code></pre>
+    <pre><code class="lang-csharp hljs">public bool AlwaysShowHeaders { get; set; }</code></pre>
   </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Func</span>&lt;T, <span class="xref">System.Collections.Generic.IEnumerable</span>&lt;T&gt;&gt;</td>
-        <td><span class="parametername">childGetter</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="Terminal_Gui_DelegateTreeBuilder_1__ctor_" data-uid="Terminal.Gui.DelegateTreeBuilder`1.#ctor*"></a>
-  <h4 id="Terminal_Gui_DelegateTreeBuilder_1__ctor_System_Func__0_System_Collections_Generic_IEnumerable__0___System_Func__0_System_Boolean__" data-uid="Terminal.Gui.DelegateTreeBuilder`1.#ctor(System.Func{`0,System.Collections.Generic.IEnumerable{`0}},System.Func{`0,System.Boolean})">DelegateTreeBuilder(Func&lt;T, IEnumerable&lt;T&gt;&gt;, Func&lt;T, Boolean&gt;)</h4>
-  <div class="markdown level1 summary">
-Constructs an implementation of <a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a> that calls the user 
-defined method <code data-dev-comment-type="paramref" class="paramref">childGetter</code> to determine children 
-and <code data-dev-comment-type="paramref" class="paramref">canExpand</code> to determine expandability
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DelegateTreeBuilder(Func&lt;T, IEnumerable&lt;T&gt;&gt; childGetter, Func&lt;T, bool&gt; canExpand)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Func</span>&lt;T, <span class="xref">System.Collections.Generic.IEnumerable</span>&lt;T&gt;&gt;</td>
-        <td><span class="parametername">childGetter</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Func</span>&lt;T, <span class="xref">System.Boolean</span>&gt;</td>
-        <td><span class="parametername">canExpand</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="methods">Methods
-  </h3>
-  
-  
-  <a id="Terminal_Gui_DelegateTreeBuilder_1_CanExpand_" data-uid="Terminal.Gui.DelegateTreeBuilder`1.CanExpand*"></a>
-  <h4 id="Terminal_Gui_DelegateTreeBuilder_1_CanExpand__0_" data-uid="Terminal.Gui.DelegateTreeBuilder`1.CanExpand(`0)">CanExpand(T)</h4>
-  <div class="markdown level1 summary">
-Returns whether a node can be expanded based on the delegate passed during construction
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override bool CanExpand(T toExpand)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">T</span></td>
-        <td><span class="parametername">toExpand</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
+  <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -259,19 +153,154 @@ Returns whether a node can be expanded based on the delegate passed during const
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">Terminal.Gui.TreeBuilder&lt;T&gt;.CanExpand(T)</span></div>
   
   
-  <a id="Terminal_Gui_DelegateTreeBuilder_1_GetChildren_" data-uid="Terminal.Gui.DelegateTreeBuilder`1.GetChildren*"></a>
-  <h4 id="Terminal_Gui_DelegateTreeBuilder_1_GetChildren__0_" data-uid="Terminal.Gui.DelegateTreeBuilder`1.GetChildren(`0)">GetChildren(T)</h4>
+  <a id="Terminal_Gui_TableView_TableStyle_ColumnStyles_" data-uid="Terminal.Gui.TableView.TableStyle.ColumnStyles*"></a>
+  <h4 id="Terminal_Gui_TableView_TableStyle_ColumnStyles" data-uid="Terminal.Gui.TableView.TableStyle.ColumnStyles">ColumnStyles</h4>
   <div class="markdown level1 summary">
-Returns children using the delegate method passed during construction
+Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override IEnumerable&lt;T&gt; GetChildren(T forObject)</code></pre>
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;DataColumn, TableView.ColumnStyle&gt; ColumnStyles { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.Dictionary</span>&lt;<span class="xref">System.Data.DataColumn</span>, <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html">TableView.ColumnStyle</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TableView_TableStyle_ShowHorizontalHeaderOverline_" data-uid="Terminal.Gui.TableView.TableStyle.ShowHorizontalHeaderOverline*"></a>
+  <h4 id="Terminal_Gui_TableView_TableStyle_ShowHorizontalHeaderOverline" data-uid="Terminal.Gui.TableView.TableStyle.ShowHorizontalHeaderOverline">ShowHorizontalHeaderOverline</h4>
+  <div class="markdown level1 summary">
+True to render a solid line above the headers
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ShowHorizontalHeaderOverline { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TableView_TableStyle_ShowHorizontalHeaderUnderline_" data-uid="Terminal.Gui.TableView.TableStyle.ShowHorizontalHeaderUnderline*"></a>
+  <h4 id="Terminal_Gui_TableView_TableStyle_ShowHorizontalHeaderUnderline" data-uid="Terminal.Gui.TableView.TableStyle.ShowHorizontalHeaderUnderline">ShowHorizontalHeaderUnderline</h4>
+  <div class="markdown level1 summary">
+True to render a solid line under the headers
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ShowHorizontalHeaderUnderline { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TableView_TableStyle_ShowVerticalCellLines_" data-uid="Terminal.Gui.TableView.TableStyle.ShowVerticalCellLines*"></a>
+  <h4 id="Terminal_Gui_TableView_TableStyle_ShowVerticalCellLines" data-uid="Terminal.Gui.TableView.TableStyle.ShowVerticalCellLines">ShowVerticalCellLines</h4>
+  <div class="markdown level1 summary">
+True to render a solid line vertical line between cells
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ShowVerticalCellLines { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Terminal_Gui_TableView_TableStyle_ShowVerticalHeaderLines_" data-uid="Terminal.Gui.TableView.TableStyle.ShowVerticalHeaderLines*"></a>
+  <h4 id="Terminal_Gui_TableView_TableStyle_ShowVerticalHeaderLines" data-uid="Terminal.Gui.TableView.TableStyle.ShowVerticalHeaderLines">ShowVerticalHeaderLines</h4>
+  <div class="markdown level1 summary">
+True to render a solid line vertical line between headers
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ShowVerticalHeaderLines { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Terminal_Gui_TableView_TableStyle_GetColumnStyleIfAny_" data-uid="Terminal.Gui.TableView.TableStyle.GetColumnStyleIfAny*"></a>
+  <h4 id="Terminal_Gui_TableView_TableStyle_GetColumnStyleIfAny_System_Data_DataColumn_" data-uid="Terminal.Gui.TableView.TableStyle.GetColumnStyleIfAny(System.Data.DataColumn)">GetColumnStyleIfAny(DataColumn)</h4>
+  <div class="markdown level1 summary">
+Returns the entry from <a class="xref" href="Terminal.Gui.TableView.TableStyle.html#Terminal_Gui_TableView_TableStyle_ColumnStyles">ColumnStyles</a> for the given <code data-dev-comment-type="paramref" class="paramref">col</code> or null if no custom styling is defined for it
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TableView.ColumnStyle GetColumnStyleIfAny(DataColumn col)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -284,8 +313,8 @@ Returns children using the delegate method passed during construction
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">T</span></td>
-        <td><span class="parametername">forObject</span></td>
+        <td><span class="xref">System.Data.DataColumn</span></td>
+        <td><span class="parametername">col</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -300,17 +329,55 @@ Returns children using the delegate method passed during construction
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;T&gt;</td>
+        <td><a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html">TableView.ColumnStyle</a></td>
         <td></td>
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">Terminal.Gui.TreeBuilder&lt;T&gt;.GetChildren(T)</span></div>
-  <h3 id="implements">Implements</h3>
-  <div>
-      <a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a>
+  
+  
+  <a id="Terminal_Gui_TableView_TableStyle_GetOrCreateColumnStyle_" data-uid="Terminal.Gui.TableView.TableStyle.GetOrCreateColumnStyle*"></a>
+  <h4 id="Terminal_Gui_TableView_TableStyle_GetOrCreateColumnStyle_System_Data_DataColumn_" data-uid="Terminal.Gui.TableView.TableStyle.GetOrCreateColumnStyle(System.Data.DataColumn)">GetOrCreateColumnStyle(DataColumn)</h4>
+  <div class="markdown level1 summary">
+Returns an existing <a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html">TableView.ColumnStyle</a> for the given <code data-dev-comment-type="paramref" class="paramref">col</code> or creates a new one with default options
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TableView.ColumnStyle GetOrCreateColumnStyle(DataColumn col)</code></pre>
   </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Data.DataColumn</span></td>
+        <td><span class="parametername">col</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.TableView.ColumnStyle.html">TableView.ColumnStyle</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
 </article>
           </div>
           
