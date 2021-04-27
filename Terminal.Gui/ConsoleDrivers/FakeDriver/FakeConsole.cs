@@ -798,7 +798,7 @@ namespace Terminal.Gui {
 			if (MockKeyPresses.Count > 0) {
 				return MockKeyPresses.Pop();
 			} else {
-				return new ConsoleKeyInfo ('~', ConsoleKey.Oem3, false,false,false);
+				return new ConsoleKeyInfo ('\0', (ConsoleKey)'\0', false,false,false);
 			}
 		}
 

@@ -674,12 +674,14 @@ namespace Terminal.Gui {
 			//}
 		}
 
+		Action<KeyEvent> keyHandler;
 		Action<MouseEvent> mouseHandler;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			Curses.timeout (0);
+			this.keyHandler = keyHandler;
 			this.mouseHandler = mouseHandler;
 
 			var mLoop = mainLoop.Driver as UnixMainLoop;
@@ -945,6 +947,28 @@ namespace Terminal.Gui {
 		public override bool EnsureCursorVisibility ()
 		{
 			return false;
+		}
+
+		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
+		{
+			Key k;
+
+			if ((shift || alt || control)
+				&& keyChar - (int)Key.Space >= (uint)Key.A && keyChar - (int)Key.Space <= (uint)Key.Z) {
+				k = (Key)(keyChar - (uint)Key.Space);
+			} else {
+				k = (Key)keyChar;
+			}
+			if (shift) {
+				k |= Key.ShiftMask;
+			}
+			if (alt) {
+				k |= Key.AltMask;
+			}
+			if (control) {
+				k |= Key.CtrlMask;
+			}
+			keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 		}
 	}
 

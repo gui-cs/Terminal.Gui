@@ -181,6 +181,9 @@ namespace Terminal.Gui {
 		public void RemoveLine (int pos)
 		{
 			if (lines.Count > 0) {
+				if (lines.Count == 1 && lines [0].Count == 0) {
+					return;
+				}
 				lines.RemoveAt (pos);
 			}
 		}
@@ -190,12 +193,15 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="first">The first line.</param>
 		/// <param name="last">The last line.</param>
-		public int GetMaxVisibleLine (int first, int last)
+		/// <param name="tabWidth">The tab width.</param>
+		public int GetMaxVisibleLine (int first, int last, int tabWidth)
 		{
 			int maxLength = 0;
 			last = last < lines.Count ? last : lines.Count;
 			for (int i = first; i < last; i++) {
-				var l = GetLine (i).Count;
+				var line = GetLine (i);
+				var tabSum = line.Sum (r => r == '\t' ? tabWidth - 1 : 0);
+				var l = line.Count + tabSum;
 				if (l > maxLength) {
 					maxLength = l;
 				}
@@ -204,16 +210,17 @@ namespace Terminal.Gui {
 			return maxLength;
 		}
 
-		internal static int SetCol (int col, int width, int cols)
+		internal static bool SetCol (ref int col, int width, int cols)
 		{
 			if (col + cols <= width) {
 				col += cols;
+				return true;
 			}
 
-			return col;
+			return false;
 		}
 
-		internal static int GetColFromX (List<Rune> t, int start, int x)
+		internal static int GetColFromX (List<Rune> t, int start, int x, int tabWidth = 0)
 		{
 			if (x < 0) {
 				return x;
@@ -223,6 +230,9 @@ namespace Terminal.Gui {
 			for (int i = start; i < t.Count; i++) {
 				var r = t [i];
 				size += Rune.ColumnWidth (r);
+				if (r == '\t' && tabWidth > 0) {
+					size += tabWidth + 1;
+				}
 				if (i == pX || (size > pX)) {
 					return i - start;
 				}
@@ -231,7 +241,8 @@ namespace Terminal.Gui {
 		}
 
 		// Returns the size and length in a range of the string.
-		internal static (int size, int length) DisplaySize (List<Rune> t, int start = -1, int end = -1, bool checkNextRune = true)
+		internal static (int size, int length) DisplaySize (List<Rune> t, int start = -1, int end = -1,
+			bool checkNextRune = true, int tabWidth = 0)
 		{
 			if (t == null || t.Count == 0) {
 				return (0, 0);
@@ -244,39 +255,59 @@ namespace Terminal.Gui {
 				var rune = t [i];
 				size += Rune.ColumnWidth (rune);
 				len += Rune.RuneLen (rune);
-				if (checkNextRune && i == tcount - 1 && t.Count > tcount && Rune.ColumnWidth (t [i + 1]) > 1) {
-					size += Rune.ColumnWidth (t [i + 1]);
-					len += Rune.RuneLen (t [i + 1]);
+				if (rune == '\t' && tabWidth > 0) {
+					size += tabWidth + 1;
+					len += tabWidth - 1;
+				}
+				if (checkNextRune && i == tcount - 1 && t.Count > tcount
+					&& IsWideRune (t [i + 1], tabWidth, out int s, out int l)) {
+					size += s;
+					len += l;
 				}
 			}
+
+			bool IsWideRune (Rune r, int tWidth, out int s, out int l)
+			{
+				s = Rune.ColumnWidth (r);
+				l = Rune.RuneLen (r);
+				if (r == '\t' && tWidth > 0) {
+					s += tWidth + 1;
+					l += tWidth - 1;
+				}
+
+				return s > 1;
+			}
+
 			return (size, len);
 		}
 
 		// Returns the left column in a range of the string.
-		internal static int CalculateLeftColumn (List<Rune> t, int start, int end, int width, int currentColumn)
+		internal static int CalculateLeftColumn (List<Rune> t, int start, int end, int width, int tabWidth = 0)
 		{
-			if (t == null) {
+			if (t == null || t.Count == 0) {
 				return 0;
-			}
-			(var dSize, _) = TextModel.DisplaySize (t, start, end);
-			if (dSize < width) {
-				return start;
 			}
 			int size = 0;
 			int tcount = end > t.Count - 1 ? t.Count - 1 : end;
 			int col = 0;
-			for (int i = tcount; i > start; i--) {
+
+			for (int i = tcount; i >= 0; i--) {
 				var rune = t [i];
-				var s = Rune.ColumnWidth (rune);
-				size += s;
-				if (size >= dSize - width) {
-					col = tcount - i + start;
-					if (start == 0 || col == start || (currentColumn == t.Count && (currentColumn - col > width))) {
+				size += Rune.ColumnWidth (rune);
+				if (rune == '\t') {
+					size += tabWidth + 1;
+				}
+				if (size > width) {
+					if (end == t.Count) {
 						col++;
 					}
 					break;
+				} else if (end < t.Count && col > 0 && start < end && col == start) {
+					break;
 				}
+				col = i;
 			}
+
 			return col;
 		}
 
@@ -479,7 +510,7 @@ namespace Terminal.Gui {
 		}
 
 		public TextModel WrapModel (int width, out int nRow, out int nCol, out int nStartRow, out int nStartCol,
-			int row = 0, int col = 0, int startRow = 0, int startCol = 0)
+			int row = 0, int col = 0, int startRow = 0, int startCol = 0, int tabWidth = 0)
 		{
 			frameWidth = width;
 
@@ -500,7 +531,8 @@ namespace Terminal.Gui {
 			for (int i = 0; i < Model.Count; i++) {
 				var line = Model.GetLine (i);
 				var wrappedLines = ToListRune (
-					TextFormatter.Format (ustring.Make (line), width, TextAlignment.Left, true, true));
+					TextFormatter.Format (ustring.Make (line), width,
+					TextAlignment.Left, true, true, tabWidth));
 				int sumColWidth = 0;
 				for (int j = 0; j < wrappedLines.Count; j++) {
 					var wrapLine = wrappedLines [j];
@@ -841,6 +873,10 @@ namespace Terminal.Gui {
 		bool wordWrap;
 		WordWrapManager wrapManager;
 		bool continuousFind;
+		int tabWidth = 4;
+		bool allowsTab = true;
+		bool allowsReturn = true;
+		bool multiline = true;
 
 		/// <summary>
 		/// Raised when the <see cref="Text"/> of the <see cref="TextView"/> changes.
@@ -939,7 +975,8 @@ namespace Terminal.Gui {
 					out int nRow, out int nCol,
 					out int nStartRow, out int nStartCol,
 					currentRow, currentColumn,
-					selectionStartRow, selectionStartColumn);
+					selectionStartRow, selectionStartColumn,
+					tabWidth);
 				currentRow = nRow;
 				currentColumn = nCol;
 				selectionStartRow = nStartRow;
@@ -961,7 +998,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the maximum visible length line.
 		/// </summary>
-		public int Maxlength => model.GetMaxVisibleLine (topRow, topRow + Frame.Height);
+		public int Maxlength => model.GetMaxVisibleLine (topRow, topRow + Frame.Height, TabWidth);
 
 		/// <summary>
 		/// Gets the  number of lines.
@@ -1074,6 +1111,104 @@ namespace Terminal.Gui {
 		/// </summary>
 		public int RightOffset { get; set; }
 
+		/// <summary>
+		/// Gets or sets a value indicating whether pressing ENTER in a <see cref="TextView"/>
+		/// creates a new line of text in the view or activates the default button for the toplevel.
+		/// </summary>
+		public bool AllowsReturn {
+			get => allowsReturn;
+			set {
+				allowsReturn = value;
+				if (allowsReturn && !multiline) {
+					Multiline = true;
+				}
+				if (!allowsReturn && multiline) {
+					Multiline = false;
+					AllowsTab = false;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether pressing the TAB key in a <see cref="TextView"/>
+		/// types a TAB character in the view instead of moving the focus to the next view in the tab order.
+		/// </summary>
+		public bool AllowsTab {
+			get => allowsTab;
+			set {
+				allowsTab = value;
+				if (allowsTab && tabWidth == 0) {
+					tabWidth = 4;
+				}
+				if (allowsTab && !multiline) {
+					Multiline = true;
+				}
+				if (!allowsTab && multiline) {
+					Multiline = false;
+				}
+				if (!allowsTab && tabWidth > 0) {
+					tabWidth = 0;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating the number of whitespace when pressing the TAB key.
+		/// </summary>
+		public int TabWidth {
+			get => tabWidth;
+			set {
+				tabWidth = Math.Max (value, 0);
+				if (tabWidth == 0 && AllowsTab) {
+					AllowsTab = false;
+				}
+				if (tabWidth > 0 && !AllowsTab) {
+					AllowsTab = true;
+				}
+			}
+		}
+
+		Dim savedHeight = null;
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="TextView"/> is a multiline text view.
+		/// </summary>
+		public bool Multiline {
+			get => multiline;
+			set {
+				multiline = value;
+				if (multiline && !allowsTab) {
+					AllowsTab = true;
+				}
+				if (multiline && !allowsReturn) {
+					AllowsReturn = true;
+				}
+
+				if (!multiline) {
+					AllowsReturn = false;
+					AllowsTab = false;
+					currentColumn = 0;
+					currentRow = 0;
+					savedHeight = Height;
+					var lyout = LayoutStyle;
+					if (LayoutStyle == LayoutStyle.Computed) {
+						LayoutStyle = LayoutStyle.Absolute;
+					}
+					Height = 1;
+					LayoutStyle = lyout;
+					SetNeedsDisplay ();
+				} else if (multiline && savedHeight != null) {
+					var lyout = LayoutStyle;
+					if (LayoutStyle == LayoutStyle.Computed) {
+						LayoutStyle = LayoutStyle.Absolute;
+					}
+					Height = savedHeight;
+					LayoutStyle = lyout;
+					SetNeedsDisplay ();
+				}
+			}
+		}
+
 		int GetSelectedLength ()
 		{
 			return SelectedText.Length;
@@ -1168,18 +1303,22 @@ namespace Terminal.Gui {
 			if (line.Count > 0) {
 				retreat = Math.Max (SpecialRune (line [Math.Min (Math.Max (currentColumn - leftColumn - 1, 0), line.Count - 1)])
 					? 1 : 0, 0);
-				for (int idx = leftColumn < 0 ? 0 : leftColumn; idx < line.Count; idx++) {
-					if (idx == currentColumn)
+
+				for (int idx = leftColumn; idx < line.Count; idx++) {
+					if (idx >= currentColumn)
 						break;
 					var cols = Rune.ColumnWidth (line [idx]);
-					col += cols - 1;
+					if (line [idx] == '\t' && TabWidth > 0) {
+						cols += TabWidth + 1;
+					}
+					TextModel.SetCol (ref col, Frame.Width, cols);
 				}
 			}
-			var ccol = currentColumn - leftColumn + retreat + col;
-			if (leftColumn <= currentColumn && ccol < Frame.Width
-				&& topRow <= currentRow && currentRow - topRow < Frame.Height) {
+			col += retreat;
+			if ((col >= leftColumn || col < Frame.Width)
+				&& topRow <= currentRow && currentRow - topRow + BottomOffset < Frame.Height) {
 				ResetCursorVisibility ();
-				Move (ccol, currentRow - topRow);
+				Move (col, currentRow - topRow);
 			} else {
 				SaveCursorVisibility ();
 			}
@@ -1514,53 +1653,61 @@ namespace Terminal.Gui {
 		{
 			ColorNormal ();
 
-			int bottom = bounds.Bottom;
-			int right = bounds.Right;
-			for (int row = bounds.Top; row < bottom; row++) {
-				int textLine = topRow + row;
-				if (textLine >= model.Count) {
-					ColorNormal ();
-					ClearRegion (bounds.Left, row, bounds.Right, row + 1);
-					continue;
-				}
-				var line = model.GetLine (textLine);
+			var offB = OffSetBackground ();
+			int right = Frame.Width + offB.width + RightOffset;
+			int bottom = Frame.Height + offB.height + BottomOffset;
+			var row = 0;
+			for (int idxRow = topRow; idxRow < model.Count; idxRow++) {
+				var line = model.GetLine (idxRow);
 				int lineRuneCount = line.Count;
-				if (line.Count < bounds.Left) {
-					ClearRegion (bounds.Left, row, bounds.Right, row + 1);
-					continue;
-				}
-
-				Move (bounds.Left, row);
 				var col = 0;
-				for (int idx = bounds.Left; idx < right; idx++) {
-					var lineCol = leftColumn + idx;
-					var rune = lineCol >= lineRuneCount ? ' ' : line [lineCol];
+
+				Move (0, idxRow);
+				for (int idxCol = leftColumn; idxCol < lineRuneCount; idxCol++) {
+					var rune = idxCol >= lineRuneCount ? ' ' : line [idxCol];
 					var cols = Rune.ColumnWidth (rune);
-					if (lineCol < line.Count && selecting && PointInSelection (idx + leftColumn, row + topRow)) {
+					if (idxCol < line.Count && selecting && PointInSelection (idxCol, idxRow)) {
 						ColorSelection ();
-					} else if (lineCol == currentColumn && textLine == currentRow && !selecting && !Used
-						&& HasFocus && lineCol < lineRuneCount) {
+					} else if (idxCol == currentColumn && idxRow == currentRow && !selecting && !Used
+						&& HasFocus && idxCol < lineRuneCount) {
 						ColorUsed ();
 					} else {
 						ColorNormal ();
 					}
 
-					if (!SpecialRune (rune)) {
+					if (rune == '\t' && TabWidth > 0) {
+						cols += TabWidth + 1;
+						if (col + cols > right) {
+							cols = right - col;
+						}
+						for (int i = 0; i < cols; i++) {
+							if (col + i < right) {
+								AddRune (col + i, row, ' ');
+							}
+						}
+					} else if (!SpecialRune (rune)) {
 						AddRune (col, row, rune);
 					} else {
 						col++;
 					}
-					col = TextModel.SetCol (col, bounds.Right, cols);
-					if (idx + 1 < lineRuneCount && col + Rune.ColumnWidth (line [idx + 1]) > right) {
+					if (!TextModel.SetCol (ref col, bounds.Right, cols)) {
 						break;
-					} else if (idx == lineRuneCount - 1) {
-						ColorNormal ();
-						for (int i = col; i < right; i++) {
-							Driver.AddRune (' ');
-						}
+					}
+					if (idxCol + 1 < lineRuneCount && col + Rune.ColumnWidth (line [idxCol + 1]) > right) {
+						break;
 					}
 				}
+				if (col < right) {
+					ColorNormal ();
+					ClearRegion (col, row, right, row + 1);
+				}
+				row++;
 			}
+			if (row < bottom) {
+				ColorNormal ();
+				ClearRegion (bounds.Left, row, right, bottom);
+			}
+
 			PositionCursor ();
 		}
 
@@ -1720,15 +1867,21 @@ namespace Terminal.Gui {
 			var offB = OffSetBackground ();
 			var line = GetCurrentLine ();
 			bool need = !NeedDisplay.IsEmpty || wrapNeeded;
+			var tSize = TextModel.DisplaySize (line, -1, -1, false, TabWidth);
+			var dSize = TextModel.DisplaySize (line, leftColumn, currentColumn, true, TabWidth);
 			if (!wordWrap && currentColumn < leftColumn) {
 				leftColumn = currentColumn;
 				need = true;
-			} else if (!wordWrap && (currentColumn - leftColumn + RightOffset > Frame.Width + offB.width ||
-				TextModel.DisplaySize (line, leftColumn, currentColumn).size + RightOffset >= Frame.Width + offB.width)) {
-				leftColumn = Math.Max (TextModel.CalculateLeftColumn (line, leftColumn,
-					currentColumn + RightOffset, Frame.Width - 1 + offB.width, currentColumn), 0);
+			} else if (!wordWrap && (currentColumn - leftColumn + RightOffset > Frame.Width + offB.width
+				|| dSize.size + RightOffset >= Frame.Width + offB.width)) {
+				leftColumn = TextModel.CalculateLeftColumn (line, leftColumn, currentColumn,
+					Frame.Width + offB.width - RightOffset, TabWidth);
 				need = true;
+			} else if (dSize.size + RightOffset < Frame.Width + offB.width
+				&& tSize.size + RightOffset < Frame.Width + offB.width) {
+				leftColumn = 0;
 			}
+
 			if (currentRow < topRow) {
 				topRow = currentRow;
 				need = true;
@@ -1775,7 +1928,7 @@ namespace Terminal.Gui {
 			if (isRow) {
 				topRow = Math.Max (idx > model.Count - 1 ? model.Count - 1 : idx, 0);
 			} else if (!wordWrap) {
-				var maxlength = model.GetMaxVisibleLine (topRow, topRow + Frame.Height + RightOffset);
+				var maxlength = model.GetMaxVisibleLine (topRow, topRow + Frame.Height + RightOffset, TabWidth);
 				leftColumn = Math.Max (idx > maxlength - 1 ? maxlength - 1 : idx, 0);
 			}
 			SetNeedsDisplay ();
@@ -1845,7 +1998,7 @@ namespace Terminal.Gui {
 					StopSelecting ();
 				}
 				int nPageDnShift = Frame.Height - 1;
-				if (currentRow < model.Count) {
+				if (currentRow > 0 && currentRow < model.Count) {
 					if (columnTrack == -1)
 						columnTrack = currentColumn;
 					currentRow = (currentRow + nPageDnShift) > model.Count
@@ -1926,7 +2079,7 @@ namespace Terminal.Gui {
 					}
 				}
 				Adjust ();
-				break;
+				return true;
 
 			case Key.B | Key.CtrlMask:
 			case Key.CursorLeft:
@@ -1975,6 +2128,7 @@ namespace Terminal.Gui {
 					StopSelecting ();
 				}
 				currentColumn = 0;
+				leftColumn = 0;
 				Adjust ();
 				break;
 			case Key.DeleteChar:
@@ -2000,9 +2154,8 @@ namespace Terminal.Gui {
 				}
 				currentLine = GetCurrentLine ();
 				currentColumn = currentLine.Count;
-				int pcol = leftColumn;
 				Adjust ();
-				break;
+				return true;
 
 			case Key.K | Key.CtrlMask: // kill-to-end
 			case Key.DeleteChar | Key.CtrlMask | Key.ShiftMask:
@@ -2201,6 +2354,9 @@ namespace Terminal.Gui {
 				break;
 
 			case Key.Enter:
+				if (!AllowsReturn) {
+					return false;
+				}
 				if (isReadOnly)
 					break;
 				currentLine = GetCurrentLine ();
@@ -2259,31 +2415,58 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 				break;
 
+			case Key _ when ShortcutHelper.GetModifiersKey (kb) == Key.Tab:
+				if (!AllowsTab) {
+					return false;
+				}
+				InsertText (new KeyEvent ((Key)'\t', null));
+				break;
+
+			case Key _ when (ShortcutHelper.GetModifiersKey (kb) == (Key.BackTab | Key.ShiftMask)):
+				if (!AllowsTab) {
+					return false;
+				}
+				if (currentColumn > 0) {
+					currentLine = GetCurrentLine ();
+					if (currentLine.Count > 0 && currentLine [currentColumn - 1] == '\t') {
+						currentLine.RemoveAt (currentColumn - 1);
+						currentColumn--;
+					}
+				}
+				break;
+
 			default:
 				// Ignore control characters and other special keys
 				if (kb.Key < Key.Space || kb.Key > Key.CharMask)
 					return false;
-				//So that special keys like tab can be processed
-				if (isReadOnly)
-					return true;
-				if (selecting) {
-					ClearSelectedRegion ();
-				}
-				if (Used) {
-					Insert ((uint)kb.Key);
-					currentColumn++;
-					if (currentColumn >= leftColumn + Frame.Width) {
-						leftColumn++;
-						SetNeedsDisplay ();
-					}
-				} else {
-					Insert ((uint)kb.Key);
-					currentColumn++;
-				}
+
+				InsertText (kb);
 				break;
 			}
 			DoNeededAction ();
 
+			return true;
+		}
+
+		bool InsertText (KeyEvent kb)
+		{
+			//So that special keys like tab can be processed
+			if (isReadOnly)
+				return true;
+			if (selecting) {
+				ClearSelectedRegion ();
+			}
+			if (Used) {
+				Insert ((uint)kb.Key);
+				currentColumn++;
+				if (currentColumn >= leftColumn + Frame.Width) {
+					leftColumn++;
+					SetNeedsDisplay ();
+				}
+			} else {
+				Insert ((uint)kb.Key);
+				currentColumn++;
+			}
 			return true;
 		}
 
@@ -2544,7 +2727,9 @@ namespace Terminal.Gui {
 		public void MoveHome ()
 		{
 			currentRow = 0;
+			topRow = 0;
 			currentColumn = 0;
+			leftColumn = 0;
 			TrackColumn ();
 			PositionCursor ();
 		}
@@ -2871,7 +3056,7 @@ namespace Terminal.Gui {
 					currentRow = Math.Max (ev.Y + topRow, 0);
 				}
 				r = GetCurrentLine ();
-				var idx = TextModel.GetColFromX (r, leftColumn, Math.Max (ev.X, 0));
+				var idx = TextModel.GetColFromX (r, leftColumn, Math.Max (ev.X, 0), TabWidth);
 				if (idx - leftColumn >= r.Count + RightOffset) {
 					currentColumn = Math.Max (r.Count - leftColumn + RightOffset, 0);
 				} else {
