@@ -40,6 +40,11 @@
     <Title>Terminal.Gui is a framework for creating console user interfaces</Title>
 
     <PackageReleaseNotes>
+      v1.0.0-rc.9
+      * Fixes #1210. Added AllowsReturn, AllowsTab and Multiline into the TextView.
+      * Fixes #1241. Added SendKeys feature to the ConsoleDriver.
+      * Fixes #418 and #931. Unix terminal hangs after exit.
+
       v1.0.0-rc.2
       * Added TextValidateField - Enables masked and validated text input. Thanks @jmperricone!
       * Refactored TreeView and TabView to reduce api surface area
